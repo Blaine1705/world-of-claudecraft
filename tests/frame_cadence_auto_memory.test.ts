@@ -60,6 +60,20 @@ describe('automatic frame rate limit memory', () => {
     expect(parseFrameCadenceAutoRecord('30', key)).toBeNull();
   });
 
+  it('signs the preset and the render scale, and nothing else', () => {
+    const sign = () => localFrameCadenceAutoMemory.settingsSignature();
+    const write = (settings: Record<string, number>) =>
+      store.set('woc_settings', JSON.stringify(settings));
+    write({ graphicsPreset: 2, renderScale: 1, musicVolume: 0.2 });
+    const base = sign();
+    write({ graphicsPreset: 2, renderScale: 1, musicVolume: 0.9 });
+    expect(sign()).toBe(base);
+    write({ graphicsPreset: 3, renderScale: 1 });
+    expect(sign()).not.toBe(base);
+    write({ graphicsPreset: 2, renderScale: 0.75 });
+    expect(sign()).not.toBe(base);
+  });
+
   it('forgets on clear', () => {
     localFrameCadenceAutoMemory.save(60, SETTLED);
     localFrameCadenceAutoMemory.clear();

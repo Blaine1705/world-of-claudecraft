@@ -806,16 +806,13 @@ export class RenderBudgetGovernor {
     return this.state(out);
   }
 
-  /** Advances the cap probe's two dwells. Returns true while a dwell holds
-   *  the ladder still. The 'shed' phase is driven by degrade() itself. At
-   *  the end of the floor dwell the levels the probe started from come back
-   *  at once (a probe that proves a cap must not cost a capped display a
-   *  minute of climbing); at the end of the restored dwell the two cadences
-   *  decide: moved means shedding works (no cap, refused until the candidate
-   *  lapses, the normal rules shed again), unmoved means the cap. */
+  /** A chosen cadence engaged while a cap probe was in flight: the probe is
+   *  dropped and what it shed comes back. A probe can lose its origin (a
+   *  submit stall during a dwell sheds for real and clears it): the band
+   *  baselines stand in, as they do in advanceCapProbe. */
   private abandonCapProbe(sample: RenderBudgetSample): void {
-    const origin = this.capProbeOrigin;
-    if (origin && this.capProbe?.phase !== 'restored') {
+    const origin = this.capProbeOrigin ?? this.capProbeBaselines(sample.maxRenderScale);
+    if (this.capProbe) {
       this.levels.grass = origin.grass;
       this.levels.foliage = origin.foliage;
       this.levels.vfx = origin.vfx;
@@ -832,6 +829,25 @@ export class RenderBudgetGovernor {
     this.capMissFrames = 0;
   }
 
+  private capProbeBaselines(maxRenderScale: number): RenderBudgetLevels {
+    return {
+      grass: this.bands.grass.baseline,
+      foliage: this.bands.foliage.baseline,
+      vfx: this.bands.vfx.baseline,
+      lighting: this.bands.lighting.baseline,
+      resolution: maxRenderScale,
+      detail: this.bands.detail.baseline,
+      post: this.bands.post.baseline,
+    };
+  }
+
+  /** Advances the cap probe's two dwells. Returns true while a dwell holds
+   *  the ladder still. The 'shed' phase is driven by degrade() itself. At
+   *  the end of the floor dwell the levels the probe started from come back
+   *  at once (a probe that proves a cap must not cost a capped display a
+   *  minute of climbing); at the end of the restored dwell the two cadences
+   *  decide: moved means shedding works (no cap, refused until the candidate
+   *  lapses, the normal rules shed again), unmoved means the cap. */
   private advanceCapProbe(dt: number, minRenderScale: number, maxRenderScale: number): boolean {
     const probe = this.capProbe;
     if (!probe || probe.phase === 'shed') return false;
@@ -848,15 +864,7 @@ export class RenderBudgetGovernor {
       const high: RenderBudgetLevels =
         this.capProbeOrigin && probe.shedMoved
           ? this.capProbeOrigin
-          : {
-              grass: this.bands.grass.baseline,
-              foliage: this.bands.foliage.baseline,
-              vfx: this.bands.vfx.baseline,
-              lighting: this.bands.lighting.baseline,
-              resolution: maxRenderScale,
-              detail: this.bands.detail.baseline,
-              post: this.bands.post.baseline,
-            };
+          : this.capProbeBaselines(maxRenderScale);
       this.levels.grass = high.grass;
       this.levels.foliage = high.foliage;
       this.levels.vfx = high.vfx;

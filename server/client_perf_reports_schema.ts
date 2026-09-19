@@ -125,10 +125,11 @@ ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS desktop_shell BOOLEAN N
 -- raw_summary.cadence block that also says so is shed under a size squeeze.
 -- frame_cap_intent is 0 (none), 30 or 60; cadence_divisor is how many display
 -- refresh slots one rendered frame spans (1 = ceiling inert); refresh_hz is
--- the client's estimate of the display rate (0 = unknown, which with an intent
+-- the client's estimate of the display rate in WHOLE Hz (an INT on purpose:
+-- a finer reading would fingerprint the display) (0 = unknown, which with an intent
 -- set is the unpaced limiter). target_fps is the effective target from the
 -- same release on. Pre-column rows read as no ceiling, which is what they had.
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS frame_cap_intent INT NOT NULL DEFAULT 0;
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS cadence_divisor INT NOT NULL DEFAULT 1;
-ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS refresh_hz REAL NOT NULL DEFAULT 0;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS refresh_hz INT NOT NULL DEFAULT 0;
 `;

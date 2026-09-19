@@ -63,8 +63,8 @@ export const AUTO_EVIDENCE_RUN_S = 600;
 export const AUTO_MAX_FAIL_DOUBLINGS = 4;
 export const AUTO_PROBES_PER_SESSION = 2;
 export const AUTO_INCONCLUSIVE_PER_SESSION = 3;
-/** Rendered frames a probe keeps away from an exempt callback (a loading
- *  cover, a held world draw): the frames after one still pay for the arrival. */
+/** Rendered frames after an exempt callback (a loading cover, a held world
+ *  draw) that are neither read nor probed in: they still pay for the arrival. */
 export const AUTO_FRAMES_CLEAR_OF_EXEMPTION = 300;
 /** Fewer frames than this in a watch window is a stall or a pause, not a reading. */
 const MIN_WINDOW_FRAMES = 60;
@@ -297,13 +297,16 @@ function failProbe(state: FrameCadenceAutoState): void {
   clearReadings(state);
 }
 
-function stepDown(state: FrameCadenceAutoState, refreshHz: number): boolean {
+function stepDown(state: FrameCadenceAutoState, refreshHz: number, fastRule: boolean): boolean {
   const down = autoStepDown(state.ceiling, refreshHz);
   if (down === state.ceiling) return false;
-  if (state.phase === 'observe') {
-    state.confirmed = state.observeS >= AUTO_SETTLE_S;
-    state.provisionalS = 0;
-  }
+  // Two seconds of evidence are enough to act on and too little to settle on: a
+  // stutter episode on a capable machine (streamed decor, a compile burst) reads
+  // exactly like a weak one. Only the watch window, past the settle phase,
+  // confirms on the spot; any other descent owes its confirming probe.
+  if (fastRule) state.confirmed = false;
+  else if (state.phase === 'observe') state.confirmed = state.observeS >= AUTO_SETTLE_S;
+  if (!state.confirmed) state.provisionalS = 0;
   state.flagrantStreak = 0;
   state.phase = 'held';
   state.ceiling = down;
@@ -376,6 +379,9 @@ export function stepFrameCadenceAuto(
 
   if (state.phase === 'observe') state.observeS += frame.dtSeconds;
   if (state.phase === 'probation') state.probationS += frame.dtSeconds;
+  // The frames after a loading cover still pay for the arrival: they are no
+  // reading of what the machine holds, for a descent as for a probe.
+  if (frame.framesSinceExempt < AUTO_FRAMES_CLEAR_OF_EXEMPTION) return false;
 
   const slot = state.recentAt;
   state.recentLate += (frame.late ? 1 : 0) - state.recent[slot];
@@ -392,6 +398,7 @@ export function stepFrameCadenceAuto(
   }
 
   let uneven = false;
+  let fastRule = false;
   if (state.windowSeconds >= AUTO_WATCH_WINDOW_S) {
     const share = state.windowLate / Math.max(1, state.windowFrames);
     const enough = state.windowFrames >= MIN_WINDOW_FRAMES;
@@ -418,6 +425,7 @@ export function stepFrameCadenceAuto(
     if (share >= AUTO_FLAGRANT_SHARE) {
       state.lastShare = share;
       state.flagrantStreak++;
+      fastRule = !uneven;
       uneven = true;
     } else state.flagrantStreak = 0;
   }
@@ -432,7 +440,7 @@ export function stepFrameCadenceAuto(
     }
     const governorHadItsTurn = state.flagrantStreak >= AUTO_FLAGRANT_CHECKPOINTS_BEFORE_GOVERNOR;
     if (frame.governorShedding && !governorHadItsTurn) return false;
-    return stepDown(state, frame.refreshHz);
+    return stepDown(state, frame.refreshHz, fastRule);
   }
 
   if (!checkpoint) return false;

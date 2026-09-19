@@ -126,13 +126,18 @@ const TIMER_LATENESS_DECAY = 0.99;
 /** Callbacks an unread display is given on bare rAF skips before the limiter
  *  starts sleeping: several estimator recomputes' worth. */
 const UNREAD_BEFORE_SLEEP = 240;
+/** The frame clock's own clamp (main.ts caps its dt at a quarter second). */
+const AUTO_MAX_FRAME_MS = 250;
+/** An interval this long was not play: a hidden tab, a suspend, a long stall. */
+const AUTO_GAP_IS_NOT_PLAY_MS = 1000;
 
 export function parseFrameCeilingIntent(search: string): FrameCeilingIntent | null {
   const raw = new URLSearchParams(search).get('fpscap');
   if (raw === null) return null;
   if (raw === '30') return 30;
   if (raw === '60') return 60;
-  return 0;
+  // Anything else is no override at all: the stored choice and its listener stay.
+  return raw === 'display' ? 0 : null;
 }
 
 export class FrameCadenceWiring {
@@ -199,7 +204,12 @@ export class FrameCadenceWiring {
     // The observed lateness, held as a slowly decaying maximum, comes off the
     // next sleep, and a wake that is still early simply sleeps the remainder.
     const late = Math.max(0, this.deps.now() - this.timerDueAt);
-    this.timerLateMs = Math.max(late, this.timerLateMs * TIMER_LATENESS_DECAY);
+    // Capped at one interval: a single throttled tick of a second would otherwise
+    // hold the sleep at zero for hundreds of timers.
+    this.timerLateMs = Math.min(
+      this.cadence.targetIntervalMs,
+      Math.max(late, this.timerLateMs * TIMER_LATENESS_DECAY),
+    );
     this.frameCb?.(this.deps.now());
   };
 
@@ -280,8 +290,8 @@ export class FrameCadenceWiring {
       }
       this.lastWasIdle = false;
       if (!exempt) this.rendered++;
-      this.armedThisCallback = true;
       this.deps.requestFrame(frame);
+      this.armedThisCallback = true;
       return false;
     }
     const render = frameCadenceShouldRender(this.cadence, now);
@@ -320,7 +330,15 @@ export class FrameCadenceWiring {
         return;
       }
     }
-    const dtSeconds = (now - last) / 1000;
+    // A web tab that hides stops rAF at once, and the resume callback still holds
+    // the previous gate view, so the hidden span arrives here as one interval (an
+    // OS suspend or a long stall likewise). It is no play time and no reading.
+    if (now - last > AUTO_GAP_IS_NOT_PLAY_MS) {
+      this.framesSinceExempt = 0;
+      this.dropAutoReadings();
+      return;
+    }
+    const dtSeconds = Math.min(now - last, AUTO_MAX_FRAME_MS) / 1000;
     this.autoFrame.dtSeconds = dtSeconds;
     this.autoFrame.late = underCeiling ? this.cadence.lastLate : now - last > refreshMs * 1.5;
     this.autoFrame.refreshHz = refreshHz;
@@ -330,8 +348,16 @@ export class FrameCadenceWiring {
     this.autoFrame.framesSinceExempt = this.framesSinceExempt;
     if (!stepFrameCadenceAuto(this.autoState, this.autoFrame)) return;
     this.intent = this.autoState.ceiling;
-    // A probe is a question, not an answer: the record is the verdict behind it.
-    this.deps.autoMemory.save(refreshHz, frameCadenceAutoRecord(this.autoState));
+    this.rememberVerdict(refreshHz);
+  }
+
+  /** Only a settled verdict outlives the session. A probe is a question, not an
+   *  answer (the record is the verdict behind it), and a provisional descent is
+   *  a few seconds of evidence: neither may pin the next session. */
+  private rememberVerdict(refreshHz: number): void {
+    const record = frameCadenceAutoRecord(this.autoState);
+    if (record.ceiling !== 0 && !record.confirmed) return;
+    this.deps.autoMemory.save(refreshHz, record);
   }
 
   /** Readings that straddle an exempt span, a hidden tab or an unread display
@@ -339,12 +365,7 @@ export class FrameCadenceWiring {
   private dropAutoReadings(): void {
     if (!resetFrameCadenceAutoWindow(this.autoState)) return;
     if (this.auto) this.intent = this.autoState.ceiling;
-    if (this.estimator.refreshMs > 0) {
-      this.deps.autoMemory.save(
-        1000 / this.estimator.refreshMs,
-        frameCadenceAutoRecord(this.autoState),
-      );
-    }
+    if (this.estimator.refreshMs > 0) this.rememberVerdict(1000 / this.estimator.refreshMs);
   }
 
   /** Another display class, or a window of another size class: the verdict was
@@ -408,9 +429,11 @@ export class FrameCadenceWiring {
     // A hidden tab goes back to rAF, which the browser pauses there: a timer
     // chain would keep rendering a page nobody sees, once a second.
     const bareFrames = unread && this.unreadCallbacks < UNREAD_BEFORE_SLEEP;
-    this.armedThisCallback = true;
+    // Set only once the arm call returned: if it threw, the caller's catch must
+    // still see "nothing armed" (a second rAF costs a frame, no arm is a dead client).
     if (this.cadence.paced || reprobe || bareFrames || hidden) {
       this.deps.requestFrame(frame);
+      this.armedThisCallback = true;
       return;
     }
     // With no slots the timer itself starts the frame. Finishing an interval on
@@ -421,10 +444,13 @@ export class FrameCadenceWiring {
     this.armedByTimer = true;
     this.timerDueAt = this.deps.now() + sleep;
     this.deps.setTimer(this.onTimer, sleep);
+    this.armedThisCallback = true;
   }
 }
 
 let shared: FrameCadenceWiring | null = null;
+/** A persistent throw would log at display rate: once per session is enough. */
+let reportedFailure = false;
 
 /** What the ceiling is asked for at boot and on every settings broadcast. */
 export interface FrameRateChoice {
@@ -484,10 +510,10 @@ export function sharedFrameCadence(): FrameCadenceWiring {
         : window.innerWidth * window.innerHeight * (window.devicePixelRatio || 1) ** 2,
     autoMemory: localFrameCadenceAutoMemory,
   });
-  shared = wiring;
   const search = typeof location === 'undefined' ? '' : location.search;
   if (applyStoredChoice(wiring, search).fromUrl) {
     (globalThis as { __wocFrameCadence?: FrameCadenceWiring }).__wocFrameCadence = wiring;
+    shared = wiring;
     return wiring;
   }
   if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
@@ -497,6 +523,8 @@ export function sharedFrameCadence(): FrameCadenceWiring {
       wiring.noteSettingsChanged();
     });
   }
+  // Last: a throw above must not leave a half-wired singleton behind.
+  shared = wiring;
   return wiring;
 }
 
@@ -515,7 +543,10 @@ export function armFrameAndSkip(
     return wiring.armAndSkip(frame, now, gate);
   } catch (err) {
     if (!wiring?.armedThisCallback) requestAnimationFrame(frame);
-    console.error('[frame-cadence] disabled for this callback', err);
+    if (!reportedFailure) {
+      reportedFailure = true;
+      console.error('[frame-cadence] the frame rate limit failed and is off', err);
+    }
     return false;
   }
 }

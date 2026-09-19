@@ -7,6 +7,12 @@ import {
 } from '../src/game/frame_rate_cap_setting';
 import { SETTING_RANGES } from '../src/game/settings';
 
+it('pins the stored values the options row labels point at', () => {
+  expect(FRAME_RATE_CAP_VALUES).toEqual({ auto: 0, display: 1, sixty: 2, thirty: 3 });
+  expect(explicitCeilingIntent(frameRateCapChoiceFromValue(2))).toBe(60);
+  expect(explicitCeilingIntent(frameRateCapChoiceFromValue(3))).toBe(30);
+});
+
 describe('frame rate cap setting', () => {
   it('maps each stored value to its choice, and anything else to Display', () => {
     expect(frameRateCapChoiceFromValue(FRAME_RATE_CAP_VALUES.auto)).toBe('auto');

@@ -171,6 +171,56 @@ describe('a ceiling engaging while a cap probe is in flight', () => {
   });
 });
 
+describe('no chosen cadence', () => {
+  it('leaves the governor exactly as it was: the marker and an absent field are one state', () => {
+    const trace = (overrides: Partial<RenderBudgetSample>) => {
+      const g = governor('medium');
+      const states: string[] = [];
+      for (let i = 0; i < 1800; i++) {
+        // A session with a light stretch, a heavy one and a stall.
+        const heavy = i > 600 && i < 1200;
+        const stall = i === 900;
+        states.push(
+          JSON.stringify(
+            g.update(
+              sample({
+                frameMs: heavy ? 29 : 16.7,
+                dt: heavy ? 0.029 : 1 / 60,
+                totalMs: heavy ? 21 : 7,
+                submitMs: stall ? 90 : 5,
+                ...overrides,
+              }),
+            ),
+          ),
+        );
+      }
+      return states;
+    };
+    expect(trace({ chosenCadenceMissShare: NO_CHOSEN_CADENCE, holdRecovery: false })).toEqual(
+      trace({}),
+    );
+  });
+});
+
+describe('a ceiling engaging while a cap probe lost its origin', () => {
+  it('restores the band baselines: a stall during a dwell must not freeze the floors', () => {
+    const g = governor('low');
+    const before = { ...g.state().levels };
+    let s = g.state();
+    for (let t = 0; t < 60 && s.frameCapProbe !== 'restored'; t += 1 / 30) s = g.update(sample());
+    expect(s.frameCapProbe).toBe('restored');
+    // A submit stall during the dwell sheds for real, which clears the origin.
+    // (One frame: a run of them lapses the candidate and ends the probe by itself.)
+    s = g.update(sample({ submitMs: 120, totalMs: 130 }));
+    expect(s.frameCapProbe).toBe('restored');
+    expect(s.levels.foliage).toBeLessThan(before.foliage);
+    // The automatic ceiling engages with its recovery hold: nothing may stay shed.
+    const engaged = run(g, 30, { chosenCadenceMissShare: 0, holdRecovery: true });
+    expect(engaged.state.frameCapProbe).toBe('idle');
+    expect(engaged.state.levels).toEqual(before);
+  });
+});
+
 describe('the governor at baseline (the automatic ceiling headroom evidence)', () => {
   it('is at baseline once settled with nothing shed', () => {
     const g = governor('medium');

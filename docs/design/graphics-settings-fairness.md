@@ -530,7 +530,10 @@ tiers, where it happens in clear air.
 The Frame Rate Limit (`src/game/frame_cadence_core.ts`, the System card's `frameRateCap`
 option) renders on a divisor of the display's measured refresh rate: about 30 on a 60 Hz
 display is every second refresh. It is a new class in this document. It is not a tier
-knob (it never reads the preset, and the preset never reads it) and it is not a governor
+knob (no ceiling is ever decided from the preset, and the preset never reads the limit;
+the preset only SCOPES what the automatic mode remembers, in
+`src/game/frame_cadence_auto_memory.ts`, because a verdict learned on Ultra must not be
+reused on Low) and it is not a governor
 bucket (it removes no richness at all); it changes how often the whole picture is
 redrawn, exactly as a slower display would.
 

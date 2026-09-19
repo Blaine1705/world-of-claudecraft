@@ -234,6 +234,15 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     expect(unpaced.statusNumbers).toEqual({ fps: 30 });
     expect(capRow({ kind: 'inert' }).statusKey).toBe('hudChrome.options.frameRateCapStatusInert');
     expect(capRow({ kind: 'none' }).statusKey).toBeUndefined();
+    // The stored value each label stands for is what the game resolves
+    // (src/game/frame_rate_cap_setting.ts FRAME_RATE_CAP_VALUES): a swap here
+    // would make the 60 button ask for 30.
+    expect(capRow({ kind: 'none' }).options).toEqual([
+      { value: 0, labelKey: 'hudChrome.options.frameRateCapAuto' },
+      { value: 1, labelKey: 'hudChrome.options.frameRateCapDisplay' },
+      { value: 2, labelKey: 'hudChrome.options.frameRateCapSixty' },
+      { value: 3, labelKey: 'hudChrome.options.frameRateCapThirty' },
+    ]);
   });
 
   it('the graphics preset picker is an enumerated choice that re-renders, insane above ultra', () => {

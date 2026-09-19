@@ -22,6 +22,8 @@ const CADENCE_MODULES = [
   'src/game/frame_cadence_wiring.ts',
   'src/game/display_refresh_estimator_core.ts',
   'src/game/frame_rate_cap_setting.ts',
+  'src/render/chosen_cadence.ts',
+  'src/render/chosen_cadence_pressure_core.ts',
 ];
 const TIER_RESOLVERS = ['src/game/ui_effects_profile.ts', 'src/game/ui_tier_knobs.ts'];
 
@@ -32,6 +34,17 @@ describe('frame rate limit fairness', () => {
 
   it.each(CADENCE_MODULES)('%s never reads the graphics tier or the HUD effect profile', (path) => {
     expect(code(path)).not.toMatch(READS_GRAPHICS_TIER);
+  });
+
+  it('the automatic memory reads the preset only to key and to sign, never to decide', () => {
+    const source = code('src/game/frame_cadence_auto_memory.ts');
+    const reads = source.split('\n').filter((line) => READS_GRAPHICS_TIER.test(line));
+    expect(reads.map((line) => line.trim())).toEqual([
+      "preset = new Settings().get('graphicsPreset');",
+      "return `${settings.get('graphicsPreset')}|${settings.get('renderScale')}`;",
+    ]);
+    // Neither read can reach a ceiling: the module never names one.
+    expect(source).not.toMatch(/ceiling\s*=\s*(30|60)|return\s+(30|60)\b/);
   });
 
   it.each([

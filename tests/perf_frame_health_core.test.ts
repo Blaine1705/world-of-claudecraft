@@ -46,6 +46,21 @@ describe('frame health window', () => {
     );
   });
 
+  it('reads a fast automatic ceiling as a good session: a steady 72 on a 144 Hz display', () => {
+    const steady72 = win(72, 14.2);
+    expect(
+      isBadFrameWindow(steady72, { targetIntervalMs: 1000 / 72, missShare: 0, auto: true }),
+    ).toBe(false);
+    const steady60 = win(60, 17);
+    expect(
+      isBadFrameWindow(steady60, { targetIntervalMs: 1000 / 60, missShare: 0, auto: true }),
+    ).toBe(false);
+    // It still answers to the chosen-cadence rules.
+    expect(
+      isBadFrameWindow(steady72, { targetIntervalMs: 1000 / 72, missShare: 0.2, auto: true }),
+    ).toBe(true);
+  });
+
   it('treats an inactive ceiling as none', () => {
     expect(isBadFrameWindow(win(30, 34.5), { targetIntervalMs: 0, missShare: 0 })).toBe(true);
     expect(isBadFrameWindow(win(30, 34.5), null)).toBe(true);

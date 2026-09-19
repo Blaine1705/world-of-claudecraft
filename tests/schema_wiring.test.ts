@@ -1009,7 +1009,7 @@ describe('ensureSchema wires every schema module at boot', () => {
       'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS cadence_divisor INT NOT NULL DEFAULT 1;',
     );
     expect(first).toContain(
-      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS refresh_hz REAL NOT NULL DEFAULT 0;',
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS refresh_hz INT NOT NULL DEFAULT 0;',
     );
     // Never a rewrite of the existing rows' meaning: no DROP, no NOT NULL
     // added without a default, no type change on a shipped column.

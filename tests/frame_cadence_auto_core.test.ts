@@ -146,12 +146,36 @@ describe('the descent', () => {
     expect(s.ceiling).toBe(30);
   });
 
-  it('is a settled verdict when it comes after the settle phase', () => {
+  it('is a settled verdict only on the watch window, past the settle phase', () => {
     const s = createFrameCadenceAuto();
     play(s, 90);
-    play(s, 5, { lateEvery: 2 });
+    play(s, 20, { lateEvery: 5, untilChange: true });
     expect(s.ceiling).toBe(30);
     expect(s.confirmed).toBe(true);
+  });
+
+  it('is provisional on the fast rule however late it comes: a stutter episode is not a verdict', () => {
+    const s = createFrameCadenceAuto();
+    play(s, 90);
+    // One frame in three late (a streaming burst on a capable machine).
+    play(s, 10, { lateEvery: 3, untilChange: true });
+    expect(s.ceiling).toBe(30);
+    expect(s.confirmed).toBe(false);
+    expect(frameCadenceAutoHoldsQuality(s)).toBe(true);
+    // The burst over, a clean minute earns the probe, and a machine that holds
+    // its display goes back to it.
+    play(s, 70, { untilChange: true });
+    expect(s.phase).toBe('probe');
+    play(s, 5, { untilChange: true });
+    expect(s.phase).toBe('probation');
+    expect(s.ceiling).toBe(0);
+  });
+
+  it('reads nothing in the frames that follow an exempt span', () => {
+    const s = createFrameCadenceAuto();
+    expect(play(s, 60, { lateEvery: 2, framesSinceExempt: 299 })).toEqual([]);
+    expect(s.recentCount).toBe(0);
+    expect(play(s, 5, { lateEvery: 2, framesSinceExempt: 300, untilChange: true }).length).toBe(1);
   });
 
   it('keeps going down a rung at a time on a fast display', () => {
@@ -214,7 +238,6 @@ describe('the confirming probe of a provisional hold', () => {
 
   it.each([
     ['in combat', { calm: false }],
-    ['right after an exempt span', { framesSinceExempt: AUTO_FRAMES_CLEAR_OF_EXEMPTION - 1 }],
     ['while the governor sheds', { shedding: true }],
   ] as const)('is deferred %s, and starts once that clears', (_label, feed) => {
     const s = heldAt30(false);
@@ -303,7 +326,8 @@ describe('probation', () => {
     expect(s.phase).toBe('observe');
     expect(frameCadenceAutoRecord(s)).toEqual({ ceiling: 0, confirmed: false, failStreak: 0 });
     expect(frameCadenceAutoHoldsQuality(s)).toBe(false);
-    play(s, 5, { lateEvery: 2 });
+    // Two windows: the one in flight is diluted by the clean frames before it.
+    play(s, 35, { lateEvery: 5, untilChange: true });
     expect(s.ceiling).toBe(30);
     expect(s.confirmed).toBe(true);
   });
@@ -386,9 +410,10 @@ describe('a confirmed hold', () => {
   it('still steps down when its own rhythm is missed', () => {
     const s = createFrameCadenceAuto();
     restoreFrameCadenceAuto(s, { ceiling: 60, confirmed: true, failStreak: 0 });
-    play(s, 5, { lateEvery: 2, refreshHz: 144 });
+    play(s, 5, { lateEvery: 2, refreshHz: 144, untilChange: true });
     expect(s.ceiling).toBe(30);
-    expect(s.confirmed).toBe(true);
+    // On the fast rule, so it owes its confirming probe like any other.
+    expect(s.confirmed).toBe(false);
   });
 
   it('spends at most the session budget', () => {
