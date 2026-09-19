@@ -1,0 +1,38 @@
+<!-- electron/host_diag/: the host diagnostic shipped with the desktop client.
+     Local conventions only; root CLAUDE.md owns the repo-wide rules. -->
+
+# electron/host_diag/
+
+The host diagnostic (Windows layer): a standalone PowerShell tool that collects the machine
+configuration behind a game performance complaint. This directory is its single source of
+truth. The contract (options, envelope, every collector's `data`) lives in `SCHEMA.md`.
+
+- `win/Invoke-PcDiag.ps1`: the orchestrator plus the collector `$Registry`.
+- `win/collectors/*.ps1`: one `Get-Diag<Name>($Ctx)` per collector, returning an ordered hashtable.
+- `win/lib/*.cs`: the native helpers (C# 5, `using` inside the namespace: the files are concatenated).
+- `win/lib/Summary.ps1`: `Format-DiagSummary`, the human-readable `.txt` view.
+- `dist/HostDiag.ps1` + `dist/manifest.json`: the generated single-file script and its pin.
+
+## Contract the tool must keep
+- **Read-only, no admin rights, no interaction, no verdict.** It collects; the analysis is
+  server-side. A collector that would write, elevate or prompt does not belong here.
+- **Privacy**: no serial number, no user name, no user path. Every string leaving a collector
+  goes through `Protect-DiagText` / `Protect-DiagObject`; the machine name is hashed unless
+  `-NoAnonymize`. See `SCHEMA.md` "Privacy".
+- **Constrained Language Mode**: outside a `try` block the orchestrator uses only cmdlets,
+  operators and property reads, because every .NET method call throws under WDAC/AppLocker and
+  a JSON document must still come out. In the non-native collectors prefer `Get-DiagRound`
+  over `[math]::Round`.
+- **Whatever happens, a valid JSON document comes out**, and one broken collector never takes
+  another down (see `SCHEMA.md` "Fault tolerance").
+- **Pure ASCII** in every file under `win/`, no BOM. The tool runs under Windows PowerShell 5.1
+  on any locale, and the bundle's bytes are pinned.
+
+## Building
+- Never hand-edit `dist/`. Run `npm run host-diag:build` (`scripts/host_diag_build.mjs` over the
+  pure bundler `scripts/lib/host_diag_bundle.mjs`) and commit the result.
+- Freshness, the ASCII rule and the bundle's shape are pinned by `tests/host_diag_bundle.test.ts`;
+  `node scripts/host_diag_build.mjs --check` is the same check as a CLI.
+- The tool still identifies itself as `pc-diag` internally (`tool.name`, the `PCDIAG_*` test hooks,
+  the `PcDiag.*` C# namespaces, the output file prefix). Deliberate: those identifiers are renamed
+  on their own schedule, not with the repo-side layout.
