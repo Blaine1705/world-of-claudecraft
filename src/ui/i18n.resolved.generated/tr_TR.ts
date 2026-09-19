@@ -1706,7 +1706,7 @@ export const tr_TR: EnTranslations = {
       "frameRateCapDisplay": "Display",
       "frameRateCapSixty": "60",
       "frameRateCapThirty": "30",
-      "frameRateCapNote": "Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, and raises it back when it can. (Recommended). Display: no limit.",
+      "frameRateCapNote": "Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.",
       "frameRateCapStatusPaced": "Drawing {fps} images per second on a {hz} Hz display.",
       "frameRateCapStatusUnpaced": "Limiting to {fps} images per second.",
       "frameRateCapStatusInert": "This display already runs at or under this limit, so the limit changes nothing.",
