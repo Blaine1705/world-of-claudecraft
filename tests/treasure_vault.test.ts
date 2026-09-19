@@ -107,6 +107,14 @@ describe('digging on the X', () => {
     expect(portal.riftSeed).toBe(map.seed);
     expect(portal.riftBaseLevel).toBe(RIFT_RANK_BASE_LEVEL.A);
     expect(portal.riftEventId).toBeUndefined();
+    expect(ofType(evs, 'spellfxAt')).toContainEqual({
+      type: 'spellfxAt',
+      x: portal.pos.x,
+      z: portal.pos.z,
+      school: 'physical',
+      fx: 'hoardDig',
+      sfxKey: 'hoard_entrance_open',
+    });
   });
 
   it('an unentered portal closes after its lifetime', () => {

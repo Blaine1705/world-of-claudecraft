@@ -41,7 +41,6 @@ import {
 import { zoneAt } from './data';
 import { createGroundObject } from './entity';
 import { mountOwned } from './mounts';
-import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, type RiftRankTuning } from './rift/ranks';
 import { generateRiftPlan } from './rift/rift_gen';
 import type { RiftInstance } from './rift/types';
@@ -163,7 +162,14 @@ function spawnVaultPortal(
   portal.vaultExpiresAt = ctx.time + VAULT_PORTAL_LIFETIME;
   portal.facing = player.facing + Math.PI;
   ctx.addEntity(portal);
-  riftFx(ctx, portal.pos.x, portal.pos.z, 'arcane', 'burst', 'rift_portal_spawn');
+  ctx.emit({
+    type: 'spellfxAt',
+    x: portal.pos.x,
+    z: portal.pos.z,
+    school: 'physical',
+    fx: 'hoardDig',
+    sfxKey: 'hoard_entrance_open',
+  });
 }
 
 /** Once a second: an unentered vault portal past its lifetime closes. A portal

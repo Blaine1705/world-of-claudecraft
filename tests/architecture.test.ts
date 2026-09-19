@@ -223,6 +223,8 @@ const UI_PURE_CORES = [
   'src/ui/collection_actions_core.ts',
   'src/ui/hud/cosmetics/cosmetics_cards_view.ts',
   'src/ui/hud/cosmetics/cosmetics_view.ts',
+  'src/ui/hud/faction_reward_tooltip_view.ts',
+  'src/ui/hud/treasure/treasure_map_view.ts',
   'src/ui/hud/vehicle/vehicle_aim_core.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_view.ts',
   'src/ui/hud/vehicle/glider_action_bar_view.ts',
@@ -720,6 +722,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/hoard_entrance_core.ts',
   'src/render/tree_hide_index_core.ts',
   'src/render/view_candidate_scan_core.ts',
   'src/render/wisp_maze_core.ts',
@@ -2513,6 +2516,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/map/minimap_objective_tap.ts',
   'src/ui/hud/map/map_sidebar_collapse.ts',
+  'src/ui/hud/treasure/treasure_map_window.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',

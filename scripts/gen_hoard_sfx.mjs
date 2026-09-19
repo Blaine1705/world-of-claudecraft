@@ -1,6 +1,6 @@
 // Deterministic, original sampled masters. No rift samples are reused.
 // Run: node scripts/gen_hoard_sfx.mjs, then npm run sfx:manifest.
-import { mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { conformSfxAudio } from './sfx/conform_audio.mjs';

@@ -260,6 +260,7 @@ import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
+import { DynamicEntityAmbienceSources } from './dynamic_entity_ambience';
 import {
   dynamicResolutionAllocationScale,
   dynamicResolutionGovernorRange,
@@ -387,6 +388,7 @@ import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
+import { hoardEntrance } from './hoard_entrance';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
@@ -676,7 +678,6 @@ import type { RevealGateCore } from './reveal_gate_core';
 import { type RickshawMountViewState, updateRollingMountLoop } from './rickshaw_mount';
 import { FOOT_RUN_SPEED, updateRiddenMountAudio } from './ridden_mount_audio';
 import { createRiderAnchor, syncRiderAnchor } from './rider_anchor';
-import { RiftAmbienceSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
@@ -1927,7 +1928,7 @@ export class Renderer {
   // updateCamera: avoids allocating two arrays plus an object per match every
   // frame regardless of whether a rift is nearby (review finding, PR #2687).
   private readonly riftAmbienceScratch: AmbientPointSource[] = [];
-  private readonly riftAmbience = new RiftAmbienceSources();
+  private readonly riftAmbience = new DynamicEntityAmbienceSources();
   private readonly ambientPointsMergedScratch: AmbientPointSource[] = [];
 
   // 2v2 Fiesta juice: trauma-based screen shake (decays each frame). The
@@ -7477,6 +7478,7 @@ export class Renderer {
         break;
       }
       case 'spellfxAt': {
+        if (ev.fx === 'hoardDig') break;
         if (ev.fx === 'soulTravel') {
           if (ev.targetId !== undefined) {
             const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
@@ -7892,10 +7894,10 @@ export class Renderer {
         e.templateId === 'hoard_entrance';
       // The overworld ranked portal AND the post-boss victory exit both get the
       // bespoke "gate" GLB (the exit is literally the way home tearing open); the
-      // in-rift descent/pylons keep the procedural arch. Gate builder falls back to
-      // the arch if its asset is missing.
+      // in-rift descent/pylons and a missing gate asset keep the procedural arch.
       const asGate = e.templateId === 'rift_portal' || e.templateId === 'rift_exit';
       const built =
+        hoardEntrance(e, this.groundSample, () => this.reducedMotion()) ??
         (asGate ? buildRiftGateBody(this.lowGfx, e.riftTier) : null) ??
         buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;

@@ -18,7 +18,7 @@ const RIFT_DIR = path.join(__dirname, '../src/sim/rift');
 const SIM_DIR = path.join(__dirname, '../src/sim');
 const EXTRA_SCAN_FILES = [
   path.join(__dirname, '../src/sim/dev_commands.ts'),
-  // The treasure vault portal reuses the rift portal spawn cue.
+  // Keep the treasure-vault module scanned if a future riftFx call is introduced.
   path.join(__dirname, '../src/sim/treasure_vault.ts'),
 ];
 
