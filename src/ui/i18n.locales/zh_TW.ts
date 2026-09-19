@@ -16452,7 +16452,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.rewards': '獎勵',
   'hudChrome.weekly.alsoReceive': '你還將獲得：',
   'hudChrome.weekly.tally': '{count} / {required}',
-  'hudChrome.weekly.cacheDesc': '開啟後獲得一件你職業可用的裝備，來自英雄地城或上一個團隊副本（尼思拉克西斯，普通），外加{count}個{item}。',
+  'hudChrome.weekly.cacheDesc':
+    '開啟後獲得一件你職業可用的裝備，來自英雄地城或上一個團隊副本（尼思拉克西斯，普通），外加{count}個{item}。',
   'hudChrome.weekly.dialogNote': '同一時間只能有一項每週委託生效。它{reset}',
   'hudChrome.weekly.accept': '接受',
   'hudChrome.weekly.decline': '拒絕',
