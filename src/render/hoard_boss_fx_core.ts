@@ -49,6 +49,7 @@ export function hoardCueAppearance(cue: HoardBossCueView): HoardCueAppearancePla
     case 'storm-charge':
     case 'storm-field':
     case 'storm-static':
+    case 'storm-strike':
       return { shape: 'disc', palette: 'storm', countdown: 'disc', elementalRider: true };
     case 'frost-ice':
       return { shape: 'disc', palette: 'frost', countdown: 'disc', elementalRider: true };

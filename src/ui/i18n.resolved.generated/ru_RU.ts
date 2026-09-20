@@ -11193,7 +11193,8 @@ export const ru_RU: EnTranslations = {
       "hoard_cast_fear": "Ужасающий рёв",
       "hoard_cast_stun": "Оглушающий удар",
       "hoard_cast_silence": "Заглушающий визг",
-      "hoard_cast_hex": "Сглаз"
+      "hoard_cast_hex": "Сглаз",
+      "hoard_lightning_strike": "Удар молнии"
     }
   },
   "questUi": {

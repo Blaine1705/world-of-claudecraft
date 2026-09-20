@@ -11193,7 +11193,8 @@ export const sv_SE: EnTranslations = {
       "hoard_cast_fear": "Terrifying Roar",
       "hoard_cast_stun": "Stunning Blow",
       "hoard_cast_silence": "Silencing Shriek",
-      "hoard_cast_hex": "Hex"
+      "hoard_cast_hex": "Hex",
+      "hoard_lightning_strike": "Lightning Strike"
     }
   },
   "questUi": {

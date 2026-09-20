@@ -11193,7 +11193,8 @@ export const en_XA: EnTranslations = {
       "hoard_cast_fear": "[Ţéŕŕíƒýíñĝ Ŕóáŕ]",
       "hoard_cast_stun": "[Šţúññíñĝ Ɓļóŵ]",
       "hoard_cast_silence": "[Šíļéñçíñĝ Šĥŕíéķ]",
-      "hoard_cast_hex": "[Ĥéẋ]"
+      "hoard_cast_hex": "[Ĥéẋ]",
+      "hoard_lightning_strike": "[Ļíĝĥţñíñĝ Šţŕíķé]"
     }
   },
   "questUi": {

@@ -10,7 +10,6 @@
 // dev command + interaction click path; the per-tick drivers (updateRiftTriggers,
 // updateRiftInstances) are called from tick().
 
-import { tickHoardControlCasts } from './hoard_control_casts';
 import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
 import { delveChestItemsForTier } from '../content/delves/lockpick_tiers';
 import { HOARD_MIN_LEVEL } from '../content/treasure_maps';
@@ -42,6 +41,8 @@ import { DT, dist2d, type Entity, type SimEvent, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
 import { riftFx } from './fx';
 import { hoardBossCueViews, tickHoardBossMechanics } from './hoard_boss';
+import { tickHoardControlCasts } from './hoard_control_casts';
+import { tickHoardLightningStrikes } from './hoard_lightning_strike';
 import {
   RIFT_LOOT_RECOVERY_GRACE,
   RIFT_MIN_LEVEL,
@@ -269,7 +270,7 @@ function buildRiftStateEvent(
     name: floor.name,
     themeName: floor.themeName,
     tier: inst.tier,
-    hoardCues: active && inst.hoardBoss?.cues.length ? hoardBossCueViews(inst) : undefined,
+    hoardCues: active && hoardBossCueViews(inst).length ? hoardBossCueViews(inst) : undefined,
     expiresAtMs,
   };
 }
@@ -298,7 +299,7 @@ export function hoardBossCueViewsForPlayer(ctx: SimContext, pid: number) {
   const player = ctx.entities.get(pid);
   if (!player) return [];
   const inst = riftInstanceAtPos(ctx, player.pos);
-  return inst?.hoardBoss && inst.partyKey !== null ? hoardBossCueViews(inst) : [];
+  return inst && inst.partyKey !== null ? hoardBossCueViews(inst) : [];
 }
 
 // ---- Floor spawn / teardown -------------------------------------------------
@@ -1816,6 +1817,7 @@ export function updateRiftInstances(ctx: SimContext): void {
   }
   tickHoardBossMechanics(ctx);
   tickHoardControlCasts(ctx);
+  tickHoardLightningStrikes(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;

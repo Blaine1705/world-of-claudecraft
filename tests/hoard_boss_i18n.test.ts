@@ -17,6 +17,7 @@ const NAMES = [
   'Singularity Collapse',
   'Ring of Frost',
   'Tempest Judgment',
+  'Lightning Strike',
   'Charged Ground',
   'Healing Tide',
 ] as const;

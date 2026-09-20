@@ -17,6 +17,7 @@ import {
   pointInHoardAnnulus,
   pointInHoardTideWave,
 } from './hoard_boss_kits';
+import { hoardLightningStrikeCues } from './hoard_lightning_strike';
 import {
   resolveHoardStormStaticTargets,
   startHoardStormStatic,
@@ -157,8 +158,11 @@ export function nextHoardBossMechanic(
   return sweepTimer <= markTimer ? 'sweep' : 'mark';
 }
 
+/** Every live telegraph in the run: the boss kit's cues plus the trash casters'
+ *  Lightning Strikes, which ride the same view, mirror and painter. */
 export function hoardBossCueViews(inst: RiftInstance) {
-  return (inst.hoardBoss?.cues ?? []).map((cue) => ({
+  const cues = [...(inst.hoardBoss?.cues ?? []), ...hoardLightningStrikeCues(inst)];
+  return cues.map((cue) => ({
     instanceId: inst.instanceId,
     cueId: cue.id,
     kind: cue.kind,

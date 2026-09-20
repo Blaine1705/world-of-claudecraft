@@ -358,6 +358,8 @@ export interface RiftInstance {
   bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number; total: number }>;
   /** Runtime-only Buried Hoard boss kit. Ordinary Rifts never create it. */
   hoardBoss?: HoardBossState;
+  /** Runtime-only Storm Caller Lightning Strikes (hoard_lightning_strike.ts). */
+  hoardStrikes?: import('./hoard_lightning_strike').HoardLightningStrikeState;
 }
 
 export type HoardBossCueVariant =
@@ -377,6 +379,7 @@ export type HoardBossCueVariant =
   | 'storm-charge'
   | 'storm-field'
   | 'storm-static'
+  | 'storm-strike'
   | 'tide-wave'
   | 'tide-tether';
 

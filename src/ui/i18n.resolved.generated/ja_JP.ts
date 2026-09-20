@@ -11193,7 +11193,8 @@ export const ja_JP: EnTranslations = {
       "hoard_cast_fear": "戦慄の咆哮",
       "hoard_cast_stun": "昏倒の一撃",
       "hoard_cast_silence": "沈黙の金切り声",
-      "hoard_cast_hex": "呪術"
+      "hoard_cast_hex": "呪術",
+      "hoard_lightning_strike": "落雷"
     }
   },
   "questUi": {

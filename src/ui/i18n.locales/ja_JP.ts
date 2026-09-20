@@ -3170,6 +3170,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.hoard_cast_stun': '昏倒の一撃',
   'abilityUi.cast.hoard_cast_silence': '沈黙の金切り声',
   'abilityUi.cast.hoard_cast_hex': '呪術',
+  'abilityUi.cast.hoard_lightning_strike': '落雷',
   'abilityUi.cast.rift_venom_execution': '毒の沼',
   'abilityUi.cast.rift_venom_strike': '蜘蛛母の刻印',
   'questUi.tracker.title': 'クエスト',
