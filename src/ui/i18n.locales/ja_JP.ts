@@ -1797,6 +1797,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '専用ゲーミングGPUを使用',
   'hudChrome.options.forceHighPerfGpuNote':
     '既定でオン：デスクトップ版はこのコンピューターの専用ゲーミングGPUを要求します。ゲームが起動しない、起動後に画面が真っ暗になる、またはノートパソコンの画面が映らない場合はオフにしてください。この設定は次回ゲームを起動したときに反映されます。',
+  'hudChrome.options.frameRateCap': 'フレームレート制限',
+  'hudChrome.options.frameRateCapAuto': '自動',
+  'hudChrome.options.frameRateCapDisplay': 'ディスプレイ',
+  'hudChrome.options.frameRateCapNote':
+    'ゲームが1秒間に描画する画像の数を制限します。ディスプレイの速度に追いつけないコンピューターでは、低い制限にすると映像がより安定し、本体の発熱も抑えられます。制限はディスプレイに合わせて決まるため、実際の値は数値と少し異なる場合があります。自動：このコンピューターがディスプレイに追いつけないときだけ制限を下げ、その後は安定して維持します（推奨）。ディスプレイ：制限なし。',
+  'hudChrome.options.frameRateCapStatusPaced':
+    '{hz} Hz のディスプレイで毎秒 {fps} 枚を描画しています。',
+  'hudChrome.options.frameRateCapStatusUnpaced': '毎秒 {fps} 枚に制限しています。',
+  'hudChrome.options.frameRateCapStatusInert':
+    'このディスプレイはすでにこの制限以下で動作しているため、制限による変化はありません。',
   'hudChrome.options.shaderWarm': 'シェーダー事前ウォームアップ ワーカー',
   'hudChrome.options.shaderWarmAuto': '自動',
   'hudChrome.options.shaderWarmOff': 'オフ',
@@ -2836,6 +2846,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresForm': '{form}フォームである必要があります。',
   'hud.errors.bear': 'ブルーイン',
   'hud.errors.cat': '猫',
+  'hud.errors.bearOrCat': 'ブルーインまたは猫',
   'hud.errors.travel': 'フリート',
   'hud.errors.cantInForm': '{form}フォーム中は実行できません。',
   'hud.errors.shapeshifted': '変身中は実行できません。',
@@ -3098,6 +3109,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.energy': 'エネルギー',
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '猫',
+  'abilityUi.forms.bearOrCat': '熊または猫',
   'abilityUi.cast.fishing': '釣り',
   'abilityUi.cast.gathering': '採集',
   'abilityUi.cast.thunzharrStormcall': '嵐の呼び声',
@@ -7091,8 +7103,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'インターフェースのアニメーションをなくし、ウィンドウを即座に表示します。第一にはアクセシビリティのためのオプションですが、パフォーマンスもわずかに向上します。',
   'guide.settingsPage.rowPerfOverlay':
     'FPSやフレームタイムなどを画面上に表示します。このページの設定を調整する間だけオンにして、終わったらまた非表示に戻しましょう。',
+  'guide.settingsPage.rowFrameRateCap':
+    'ゲームが1秒間に描画する画像数の上限です。ディスプレイに追いつけないコンピューターは不規則なリズムになりがちですが、安定した30のほうが滑らかに見え、処理量は半分になり、本体の発熱も抑えられます。「ディスプレイ」は制限なしを意味します。',
   'guide.settingsPage.tableFoot':
-    'FPSの上限をお探しですか。探すものはありません。フレームの歩調はあなたのディスプレイに従います。描画距離はワールド詳細カードにある「視界距離」という独立したつまみで、あなたが自分で動かすまでは各プリセットが設定してくれます。',
+    '描画距離はワールド詳細カードにある「視界距離」という独立したつまみで、あなたが自分で動かすまでは各プリセットが設定してくれます。',
   'guide.settingsPage.mobileTitle': 'スマートフォンとタブレットでは',
   'guide.settingsPage.mobileBody':
     'スマートフォンやタブレットでは、ゲームはLowから始めます。タッチ端末はどれも初回起動でそこに着地します。これは意図的で、まず世界に入って遊べるようにするためです。グラフィックパネルからいつでも自分で上げてください。Androidのブラウザでは段のすべてが開かれており、選択もそのまま保たれます。iPhoneとiPadでも最上位のプリセットは選べ、「適用」を押せばすぐに効きますが、次回の起動時にゲームがHighへ戻します。これほど大きな場面を組み立てている最中に、iOSがタブを終了させることがあるためです。ダウンロード版アプリはさらに絞られていて、プリセットの一覧はHighで止まり、個別のシステムつまみは隠されています。アプリがそれらを自分で管理するからです。',

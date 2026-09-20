@@ -10676,7 +10676,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Omgevingsregen en sneeuw. Alleen sfeer, en uitzetten scheelt een beetje bij storm.',
   'guide.settingsPage.tableFoot':
-    'Zoek je een FPS-limiet? Er valt niets te zoeken: de beeldcadans volgt je scherm. De tekenafstand is een eigen knop, Zichtafstand, in de kaart Werelddetail, en elke voorinstelling zet hem voor je tot je hem zelf verschuift.',
+    'De tekenafstand is een eigen knop, Zichtafstand, in de kaart Werelddetail, en elke voorinstelling zet hem voor je tot je hem zelf verschuift.',
   'guide.settingsPage.tableHeading': 'Elke grafische optie, uitgelegd',
   'guide.settingsPage.tagReload': 'druk op Toepassen',
   'guide.settingsPage.value100': '100%',
