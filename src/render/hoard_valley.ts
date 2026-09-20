@@ -22,6 +22,7 @@ import {
   hoardValleySurfaceTint,
   isHoardValleyZoneId,
 } from './hoard_valley_core';
+import { hoardValleyRockVariants } from './hoard_valley_rocks';
 import { setRenderCategory } from './renderer_diagnostics';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import type { SkyView } from './sky';
@@ -163,32 +164,45 @@ function finishInstances(
   return mesh;
 }
 
-function buildCliffs(plan: HoardValleyPlan, shadows: boolean): THREE.InstancedMesh {
-  const mesh = new THREE.InstancedMesh(
-    sharedGeometries().cliff,
-    coloredMaterial('HoardValleyCliffs'),
-    plan.cliffs.length,
-  );
-  mesh.name = 'HoardValleyBoundaryCliffs';
+/** The boundary wall: every placement in the plan, drawn with real boulder shapes
+ *  when they are loaded (one InstancedMesh per variant, dealt round-robin so
+ *  neighbours differ) and with the single bent cylinder otherwise. Every batch
+ *  keeps the 'HoardValleyBoundaryCliffs' name the camera cutaway matches on. */
+function buildCliffs(plan: HoardValleyPlan, shadows: boolean, boulders: boolean): THREE.Object3D {
+  const shapes = (boulders ? hoardValleyRockVariants() : null) ?? [sharedGeometries().cliff];
+  const set = new THREE.Group();
+  set.name = 'HoardValleyCliffSet';
   const matrix = new THREE.Matrix4();
   const quaternion = new THREE.Quaternion();
   const position = new THREE.Vector3();
   const scale = new THREE.Vector3();
   const rotation = new THREE.Euler();
-  for (let i = 0; i < plan.cliffs.length; i++) {
-    const rock = plan.cliffs[i];
-    writeInstance(
-      mesh,
-      i,
-      position.set(rock.x, rock.scaleY * 0.74 - 0.7, rock.z),
-      rotation.set(0, rock.yaw, (i % 2 ? -1 : 1) * 0.08),
-      scale.set(rock.scaleX, rock.scaleY, rock.scaleZ),
-      rock.color,
-      matrix,
-      quaternion,
+  for (let variant = 0; variant < shapes.length; variant++) {
+    const count = Math.ceil((plan.cliffs.length - variant) / shapes.length);
+    if (count <= 0) continue;
+    const mesh = new THREE.InstancedMesh(
+      shapes[variant],
+      coloredMaterial('HoardValleyCliffs'),
+      count,
     );
+    mesh.name = 'HoardValleyBoundaryCliffs';
+    for (let slot = 0; slot < count; slot++) {
+      const i = variant + slot * shapes.length;
+      const rock = plan.cliffs[i];
+      writeInstance(
+        mesh,
+        slot,
+        position.set(rock.x, rock.scaleY * 0.74 - 0.7, rock.z),
+        rotation.set(0, rock.yaw, (i % 2 ? -1 : 1) * 0.08),
+        scale.set(rock.scaleX, rock.scaleY, rock.scaleZ),
+        rock.color,
+        matrix,
+        quaternion,
+      );
+    }
+    set.add(finishInstances(mesh, shadows));
   }
-  return finishInstances(mesh, shadows);
+  return set;
 }
 
 interface DressingPose {
@@ -390,13 +404,14 @@ class HoardValleyViewImpl implements HoardValleyView {
     );
     this.disposeGround = ground.dispose;
     this.group.add(ground.group);
-    this.group.add(buildCliffs(visualPlan, shadows));
+    this.group.add(buildCliffs(visualPlan, shadows, !low));
     this.group.add(
       buildHoardCavernShell(
         options.plan.layout,
         visualPlan,
         coloredMaterial('HoardCavern'),
         shadows,
+        low ? null : hoardValleyRockVariants(),
       ),
     );
     this.group.add(buildDressing(visualPlan, shadows));

@@ -36,6 +36,8 @@ export function buildHoardCavernShell(
   plan: HoardValleyPlan,
   material: THREE.Material,
   shadows: boolean,
+  /** Real boulder shapes for the cornice (hoard_valley_rocks.ts), when loaded. */
+  corniceShapes?: readonly THREE.BufferGeometry[] | null,
 ): THREE.Group {
   const shell = buildHoardCavernShellPlan(layout, plan);
   const group = new THREE.Group();
@@ -46,22 +48,34 @@ export function buildHoardCavernShell(
     ['HoardCavernCornice', shell.ledges],
     ['HoardCavernEntryRoof', shell.entryRoof],
   ] as const) {
-    const ledges = new THREE.InstancedMesh(hoardCavernRockGeometry(), material, placements.length);
-    ledges.name = name;
-    placements.forEach((ledge, i) => {
-      transform.position.set(ledge.x, ledge.y, ledge.z);
-      transform.rotation.set(0, ledge.yaw, 0.035 * Math.sin(i));
-      transform.scale.set(ledge.scaleX, ledge.scaleY, ledge.scaleZ);
-      transform.updateMatrix();
-      ledges.setMatrixAt(i, transform.matrix);
-      ledges.setColorAt(i, color.setHex(ledge.color));
-    });
-    ledges.instanceMatrix.needsUpdate = true;
-    if (ledges.instanceColor) ledges.instanceColor.needsUpdate = true;
-    ledges.castShadow = shadows;
-    ledges.computeBoundingSphere();
-    ledges.computeBoundingBox();
-    group.add(ledges);
+    // The entry roof stays ONE batch (the valley fades it by name as a whole);
+    // the cornice deals its ledges round-robin across the boulder shapes.
+    const shapes =
+      name === 'HoardCavernCornice' && corniceShapes?.length
+        ? corniceShapes
+        : [hoardCavernRockGeometry()];
+    for (let variant = 0; variant < shapes.length; variant++) {
+      const count = Math.ceil((placements.length - variant) / shapes.length);
+      if (count <= 0) continue;
+      const ledges = new THREE.InstancedMesh(shapes[variant], material, count);
+      ledges.name = name;
+      for (let slot = 0; slot < count; slot++) {
+        const i = variant + slot * shapes.length;
+        const ledge = placements[i];
+        transform.position.set(ledge.x, ledge.y, ledge.z);
+        transform.rotation.set(0, ledge.yaw, 0.035 * Math.sin(i));
+        transform.scale.set(ledge.scaleX, ledge.scaleY, ledge.scaleZ);
+        transform.updateMatrix();
+        ledges.setMatrixAt(slot, transform.matrix);
+        ledges.setColorAt(slot, color.setHex(ledge.color));
+      }
+      ledges.instanceMatrix.needsUpdate = true;
+      if (ledges.instanceColor) ledges.instanceColor.needsUpdate = true;
+      ledges.castShadow = shadows;
+      ledges.computeBoundingSphere();
+      ledges.computeBoundingBox();
+      group.add(ledges);
+    }
   }
   if (!root) {
     root = markSharedGeometry(new THREE.CylinderGeometry(0.45, 1, 1, 5));
