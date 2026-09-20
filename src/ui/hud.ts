@@ -1051,7 +1051,12 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 const PLAYER_PORTRAIT_KEY = 'player';
 // The render-layer lookups the player portrait rule needs (player_portrait_core.ts):
 // the look provider and the composed visual key, both owned by src/render/characters.
-const PLAYER_PORTRAIT_LOOKUPS = { lookFor: modularLookFor, visualKeyFor: modularKeyFor };
+// Resolved per CALL, never at module load: HUD suites mock that barrel with a fixed
+// export list, and a load-time read of a member the mock omits throws before any test.
+const PLAYER_PORTRAIT_LOOKUPS = {
+  lookFor: (e: Entity) => modularLookFor(e),
+  visualKeyFor: (e: Entity) => modularKeyFor(e),
+};
 // The modal one-shots that stay above every banded window AND the mobile
 // window backdrop (z 85): the confirm/input prompt plus the confirm-dialog
 // family's once-ever explainers (the scoped-popup 96 rule).
