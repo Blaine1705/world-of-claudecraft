@@ -31,11 +31,16 @@ interface Ground {
   wallAt?: number;
 }
 
+/** Rise over run of the synthetic terrain at `x` (a central difference). */
+function steepnessOf(ground: Ground, x: number): number {
+  return Math.abs(ground.terrain(x + 0.05) - ground.terrain(x - 0.05)) / 0.1;
+}
+
 function deps(ground: Ground): TrailbreakSweepDeps {
   const terrainAt = (x: number) => ground.terrain(x);
   return {
     groundAt: (x) => terrainAt(x),
-    steepnessAt: (x) => Math.abs(terrainAt(x + 0.05) - terrainAt(x - 0.05)) / 0.1,
+    steepnessAt: (x) => steepnessOf(ground, x),
     floorAt: (x, _z, maxY) => {
       const top = ground.prop?.(x);
       const terrain = terrainAt(x);
@@ -62,7 +67,22 @@ function fly(ground: Ground, launch: { vx: number; vz: number; vy: number }) {
   };
   for (let tick = 1; tick <= 200; tick++) {
     const nx = x + launch.vx * DT;
-    if (ground.wallAt !== undefined && nx >= ground.wallAt) {
+    // The open-world solver's airborne terrain wall gate (physics/character.ts
+    // `airborneClears`): ground at the END of the step that sits above the
+    // ENTRY feet, rising faster than the climb limit over the step or on
+    // steep-memo ground, is a wall, and a blocked airborne body loses its
+    // horizontal velocity. The one-tick lag between entry feet and exit
+    // ground is what this helper has to be honest about on ascending arcs.
+    const groundStart = ground.terrain(x);
+    const groundEnd = ground.terrain(nx);
+    const run = Math.abs(nx - x);
+    const terrainWall =
+      groundEnd > y &&
+      groundEnd > groundStart &&
+      run > 1e-9 &&
+      ((groundEnd - groundStart) / run > PLAYER_MAX_CLIMB_SLOPE ||
+        steepnessOf(ground, nx) > PLAYER_MAX_CLIMB_SLOPE);
+    if ((ground.wallAt !== undefined && nx >= ground.wallAt) || terrainWall) {
       launch = { ...launch, vx: 0, vz: 0 };
     } else {
       x = nx;

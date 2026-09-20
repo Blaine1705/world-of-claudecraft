@@ -58,8 +58,9 @@ const DIVERT_EPSILON = PLAYER_BODY_RADIUS * 0.25;
 export interface TrailbreakSweepDeps {
   /** Lift-inclusive terrain height: the surface the walkable-slope rule reads. */
   groundAt(x: number, z: number): number;
-  /** Terrain steepness (rise over run) at a point. */
-  steepnessAt(x: number, z: number): number;
+  /** Terrain steepness (rise over run) at a point; `ground` is the height the
+   *  sweep already sampled there, so a live binding need not read it again. */
+  steepnessAt(x: number, z: number, ground: number): number;
   /** The standable floor under a body whose feet may reach up to `maxY`:
    *  terrain, or a prop top within reach. */
   floorAt(x: number, z: number, maxY: number): number;
@@ -113,6 +114,15 @@ export function planTrailbreakArc(
   // own reach: a cliff, a terrace wall) or a face that keeps climbing (a
   // continuous unclimbable slope ratchets past that reach on its second
   // sample), so the leap ends at the foot instead of launching up the face.
+  //
+  // Sibling: heroic_leap.ts sweepLeapLanding walks the same half-yard line
+  // with the same divert epsilon, but gates differently on purpose: Vaulting
+  // Charge is a scripted flight to an aimed point, so it refuses ANY
+  // unclimbable rise and deep water at the aim, while this hop rides the real
+  // jump physics, which flies over a short steep feature and splashes into
+  // water the way any jump does. Two copies is inside the rule of three; a
+  // third leap-shaped ability should pull the line walk into one core with
+  // per-ability gates.
   let safeX = from.x;
   let safeZ = from.z;
   let safeFloor = from.y;
@@ -131,7 +141,7 @@ export function planTrailbreakArc(
     const unclimbable =
       nextGround > previousGround &&
       ((nextGround - previousGround) / step > PLAYER_MAX_CLIMB_SLOPE ||
-        deps.steepnessAt(nextX, nextZ) > PLAYER_MAX_CLIMB_SLOPE);
+        deps.steepnessAt(nextX, nextZ, nextGround) > PLAYER_MAX_CLIMB_SLOPE);
     if (unclimbable && nextGround > Math.max(from.y, walkableFloor) + MANTLE_REACH) break;
     const resolved = deps.resolve(safeX, safeZ, nextX, nextZ);
     if (Math.hypot(resolved.x - nextX, resolved.z - nextZ) > DIVERT_EPSILON) break;
@@ -231,7 +241,7 @@ export function trailbreakArcFor(ctx: SimContext, hunter: Entity, distance: numb
   return planTrailbreakArc(
     {
       groundAt: (x, z) => groundHeight(x, z, seed),
-      steepnessAt: (x, z) => walkedSteepnessAt(x, z, seed),
+      steepnessAt: (x, z, ground) => walkedSteepnessAt(x, z, seed, ground),
       floorAt: (x, z, maxY) => floorHeightAt(seed, x, z, PLAYER_BODY_RADIUS, maxY),
       resolve: (fromX, fromZ, toX, toZ) =>
         ctx.resolveMove(fromX, fromZ, toX, toZ, PLAYER_BODY_RADIUS, hunter, true),
