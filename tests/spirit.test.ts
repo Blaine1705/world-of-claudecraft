@@ -521,6 +521,20 @@ describe('spirit: forced facing reset also resets prevFacing (camera-follow conv
     expect(p.prevFacing).toBe(Math.PI / 2);
   });
 
+  it('a revive that moves the body still resets facing and prevFacing to 0', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.dead = true;
+    sim.releaseSpirit();
+    p.facing = Math.PI / 2;
+    p.prevFacing = Math.PI / 2;
+    sim.revivePlayerAt(sim.playerId, { x: p.pos.x + 30, y: p.pos.y, z: p.pos.z }, 1);
+    expect(p.dead).toBe(false);
+    expect(p.facing).toBe(0);
+    expect(p.prevFacing).toBe(0);
+  });
+
   it('a delve respawn resets prevFacing along with facing', () => {
     const sim = makeSim('rogue', 99);
     const reliquary = DELVES.collapsed_reliquary;
