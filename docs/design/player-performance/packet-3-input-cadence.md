@@ -250,9 +250,16 @@ R9. Gap-aware echo accounting, resolved into a server-side seq-gap counter. The 
     the lane verdict) keeps the high-water an in-order receipt mark for the whole
     socket, so a parsed command seq never reads as a gap on the next input frame.
     A command shed by the PRE-parse gate does book one gap there, the same as a
-    shed input frame: the counter is the parsed-stream share of the drops. The CLIENT-side surfacing of drops (a beacon field
-    riding packet 0's net-pipeline plumbing) is DEFERRED until packet 0 merges; the
-    server counter plus /metrics is the fleet visibility this packet ships.
+    shed input frame: the counter is the parsed-stream share of the drops. The two
+    folds are placed asymmetrically on purpose: the input arm folds AFTER the
+    movement lane verdict, so a lane-dropped input frame still books a gap on the
+    next frame (it is a lost movement frame, the thing the counter attributes),
+    while the command arm folds BEFORE the command lane verdict, so a lane-dropped
+    'target' is acked and never booked (the client hold then yields to the server's
+    value for a command that never ran, which is the only correct outcome). The
+    CLIENT-side surfacing of drops (a beacon field riding packet 0's net-pipeline
+    plumbing) is DEFERRED until packet 0 merges; the server counter plus /metrics
+    is the fleet visibility this packet ships.
 R10. Dedicated kick reason with matcher lockstep, enforced by byte pins (the S3
     scanner cannot see this class). Today the limiter kick reuses the literal pair
     kickSession(session, 'rejected by server', 'moderation action'): the client

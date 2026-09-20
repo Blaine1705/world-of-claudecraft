@@ -87,9 +87,12 @@ export function resolveSelfTarget(
   // change (target death, out of interest) applies again.
   if (ackedInputSeq >= pending.seq) return { targetId: serverTarget, pending: null };
   if (countStale) {
-    pending.snapshotsLeft -= 1;
+    const snapshotsLeft = pending.snapshotsLeft - 1;
     // Reconciliation valve: nothing ever acked the command. Server authority wins.
-    if (pending.snapshotsLeft <= 0) return { targetId: serverTarget, pending: null };
+    if (snapshotsLeft <= 0) return { targetId: serverTarget, pending: null };
+    // A fresh record, never an in-place decrement: the caller adopts the returned
+    // hold, and the input stays untouched (pure means pure).
+    return { targetId: pending.id, pending: { ...pending, snapshotsLeft } };
   }
   // A stale pre-command snapshot: keep displaying the optimistic value. Assigned
   // (not merely skipped) so the wireEntity write earlier in the same snapshot
