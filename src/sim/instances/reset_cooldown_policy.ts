@@ -13,8 +13,9 @@
 // or bounced off Heroic: one Normal to Heroic switch left the whole group
 // unable to switch again for five minutes.
 //
-// Kept as its own leaf so the reset loop stays a thin consumer and the
-// predicate is pinned directly (tests/dungeons.test.ts, "raid lockout gate").
+// Kept as its own leaf so the reset loop stays a thin consumer: the predicate
+// is pinned directly in tests/reset_cooldown_policy.test.ts and through
+// resetDungeonInstances in tests/dungeons.test.ts ("raid lockout gate").
 import { IGNIVAR_RAID_ROOM_IDS } from '../ignivar_raid_ids';
 
 // The dungeons only a raid group may claim: the Nythraxis boss arena and the

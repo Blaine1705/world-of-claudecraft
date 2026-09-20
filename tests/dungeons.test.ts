@@ -2988,6 +2988,7 @@ describe('dungeons: raid lockout gate', () => {
     for (const m of members) {
       expect(sim.dungeonResetLocks.has(`char:${700 + m}:nythraxis_boss_arena`)).toBe(false);
     }
+    expect(sim.dungeonResetLocks.size).toBe(0);
     sim.setDungeonDifficulty('normal', leader);
     sim.drainEvents();
 
@@ -3059,7 +3060,7 @@ describe('dungeons: raid lockout gate', () => {
     ).toBe(true);
   });
 
-  it('a fresh recruit joining a raid after a reset inherits no reset lock (there is none to inherit), while a standard-dungeon recruit still does', () => {
+  it('a fresh recruit joining a raid after a reset inherits no reset lock (there is none to inherit), while a standard-dungeon recruit still inherits one', () => {
     const sim = makeSim();
     const leader = attunedRaid(sim);
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
@@ -3073,9 +3074,58 @@ describe('dungeons: raid lockout gate', () => {
 
     expect(sim.dungeonResetLocks.has('char:601:nythraxis_boss_arena')).toBe(false);
     expect(sim.dungeonResetLocks.size).toBe(0);
+
+    // The standard-dungeon arm is untouched: a solo runner's Hollow Crypt reset
+    // still stamps the lock, and a recruit joining them still inherits it.
+    const solo = sim.addPlayer('mage', 'CryptRunner', { characterId: 602 });
+    enterDungeon(sim.ctx, 'hollow_crypt', solo);
+    teleport(sim, sim.entities.get(solo) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', solo);
+    sim.resetDungeonInstances(solo);
+    expect(sim.dungeonResetLocks.has('char:602:hollow_crypt')).toBe(true);
+    const cryptRecruit = sim.addPlayer('mage', 'CryptJoiner', { characterId: 603 });
+    sim.partyInvite(cryptRecruit, solo);
+    sim.partyAccept(cryptRecruit);
+    expect(sim.dungeonResetLocks.has('char:603:hollow_crypt')).toBe(true);
+    expect(sim.dungeonResetLocks.size).toBe(2);
   });
 
-  it('the Ignivar chain switches tier and back without the five-minute cooldown, and only the lift is ever reclaimed', () => {
+  it('one Reset All over a standard claim and a raid claim stamps the cooldown per claim: the crypt pays it, the arena does not', () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'Lead', { characterId: 650 });
+    while ((sim.partyOf(leader)?.members.length ?? 1) < 5) {
+      const pid = sim.addPlayer('priest', `Fill${sim.players.size}`);
+      sim.partyInvite(pid, leader);
+      sim.partyAccept(pid);
+    }
+    enterDungeon(sim.ctx, 'hollow_crypt', leader);
+    const cryptInst = claimedDungeon(sim, 'hollow_crypt', 'normal');
+    leaveDungeon(sim.ctx, leader);
+    sim.convertPartyToRaid(leader);
+    sim.players.get(leader)!.questsDone.add('q_nythraxis_bound_guardian');
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    const arenaInst = claimedDungeon(sim, 'nythraxis_boss_arena', 'normal');
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    expect(cryptInst.difficulty).toBe('heroic');
+    expect(arenaInst.difficulty).toBe('heroic');
+    // Same call, two verdicts: the five-man claim keeps its five-minute
+    // cooldown and member locks (the free-boss-respawn guard it exists for),
+    // the raid claim carries none.
+    expect(cryptInst.resetAvailableAt).toBeGreaterThan(sim.time);
+    expect(arenaInst.resetAvailableAt).toBeLessThanOrEqual(sim.time);
+    expect(sim.dungeonResetLocks.has('char:650:hollow_crypt')).toBe(true);
+    expect(sim.dungeonResetLocks.has('char:650:nythraxis_boss_arena')).toBe(false);
+    expect([...sim.dungeonResetLocks.keys()].every((key) => key.endsWith(':hollow_crypt'))).toBe(
+      true,
+    );
+  });
+
+  it('the Ignivar chain switches tier and back without the five-minute cooldown (the lift, its one reclaimed room, carries none)', () => {
     const sim = makeSim();
     const leader = attunedRaid(sim);
     const members = sim.partyOf(leader)!.members as number[];
