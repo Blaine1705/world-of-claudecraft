@@ -4661,6 +4661,7 @@ export const it_IT: EnTranslations = {
         "dormantKnowledge": "La conoscenza di {craft} viene mantenuta ma è dormiente finché la sua coppia o il passatempo non è attivo."
       },
       "stationRequired": "Devi essere al {station} per realizzarlo.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "Forgia",
         "kitchens": "Cucine",

@@ -4661,6 +4661,7 @@ export const da_DK: EnTranslations = {
         "dormantKnowledge": "{craft}-viden bevares men er inaktiv, indtil dens par eller hobby er aktiv."
       },
       "stationRequired": "Du skal være ved {station} for at lave det.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "Smedje",
         "kitchens": "Køkkener",

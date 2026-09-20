@@ -45,6 +45,7 @@ export * from './learned_profession_name';
 export * from './legendary_naming_controller';
 export * from './material_hint_view';
 export * from './material_profession_hint_view';
+export * from './mobile_station_title';
 export * from './mobile_station_tooltip';
 export * from './perfecting_candidate_view';
 export * from './perfecting_swap_controller';

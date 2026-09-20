@@ -4661,6 +4661,7 @@ export const ko_KR: EnTranslations = {
         "dormantKnowledge": "{craft} 지식은 유지되지만 해당 조합이나 취미가 활성화될 때까지 비활성 상태입니다."
       },
       "stationRequired": "그것을 제작하려면 {station}에 있어야 합니다.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "대장간",
         "kitchens": "주방",

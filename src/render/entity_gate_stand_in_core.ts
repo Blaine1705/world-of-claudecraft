@@ -207,4 +207,13 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     standIn:
       'for a plot: the static bed drawn at boot by buildFarmPatchProps (never gated, drawn at every tier) and, on a rebuild, the OUTGOING stage mesh, which keeps drawing until the replacement links and is released on that settle (or at once when the plot is removed meanwhile, so a harvest still bares the bed on the row frame); for a feast: the feast ENTITY itself, whose own view (the invisible click proxy, raycastable through the hold) and nameplate (nameplate_view.ts feastNear, shown within INTERACT_RANGE + 1, exactly where the feast is actionable) never ride this gate; beyond eating range the table is decoration that shows when its programs link, bounded by GATED_ATTACH_WATCHDOG_MS, and warm in practice because the farm program anchors staged after the first-paint boundary retain every farm program',
   },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/mobile_stations.ts',
+    callSite: 'void attachSceneGroupGated(',
+    hides:
+      "a placed mobile crafting station's prop cluster (the town station's bonfire, cauldron or anvil with its clutter, mobile_stations_core.ts) on its first appearance in interest scope, under the label kind mobile-station; a group retired before its gate settles (the station replaced or despawned) is never shown",
+    standIn:
+      "the station ENTITY itself, whose own view (the invisible click proxy the feast also gets, quest_objects.ts buildGroundQuestObject with no item) and nameplate (nameplate_view.ts feastNear, which admits a mobile-station templateId within INTERACT_RANGE + 1) never ride this gate, so the owner's name and the tool read on approach whatever the link state; the crafting gate itself reads the sim slot, never the prop, so a held cluster delays decoration only, bounded by GATED_ATTACH_WATCHDOG_MS",
+  },
 ];

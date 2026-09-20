@@ -4661,6 +4661,7 @@ export const pl_PL: EnTranslations = {
         "dormantKnowledge": "Wiedza rzemiosła {craft} jest zachowana, lecz uśpiona, dopóki jego para lub hobby nie będzie aktywne."
       },
       "stationRequired": "Aby to wytworzyć, musisz być w {station}.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "Kuźnia",
         "kitchens": "Kuchnie",

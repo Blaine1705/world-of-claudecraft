@@ -78,6 +78,37 @@ const FIRE_LIGHT_RANGE = 16;
 const FIRE_LIGHT_DECAY = 2;
 const FIRE_LIGHT_Y = 1.2;
 
+/** The kitchens flame cone: lathe profile, warm Lambert, ember-triggering
+ *  color. Shared by the town station build below and the placed mobile
+ *  station (mobile_stations.ts), so a field fire is byte-matched to a town
+ *  one. `geo` is the caller's shared lathe (stationFlameGeometry). */
+export function stationFlameGeometry(): THREE.LatheGeometry {
+  return new THREE.LatheGeometry(
+    FLAME_PROFILE.map(([r, y]) => new THREE.Vector2(r, y)),
+    7,
+  );
+}
+
+export const STATION_FLAME_Y = FLAME_Y;
+export const STATION_FLAME_BASE_SCALE = FLAME_BASE_SCALE;
+
+export function stationFlameMaterial(usePbr: boolean): THREE.MeshLambertMaterial {
+  return new THREE.MeshLambertMaterial({
+    color: 0xffaa33,
+    emissive: 0xff6600,
+    emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
+    transparent: true,
+    opacity: 0.92,
+  });
+}
+
+export function buildStationFlame(geo: THREE.BufferGeometry, usePbr: boolean): THREE.Mesh {
+  const flame = new THREE.Mesh(geo, stationFlameMaterial(usePbr));
+  flame.position.y = FLAME_Y;
+  flame.scale.setScalar(FLAME_BASE_SCALE);
+  return flame;
+}
+
 const loadedStationGltf = new Map<StationPropKind, THREE.Group>();
 
 if (typeof window !== 'undefined') {
@@ -129,7 +160,16 @@ function stationMaterial(src: THREE.Material): THREE.Material {
   return out;
 }
 
-function stationTemplateParts(kind: StationPropKind): GlbTemplatePart[] {
+/** Whether the kind's GLB has loaded (a fallback box part otherwise, whose
+ *  geometry the caller minted and owns). Exported for mobile_stations.ts. */
+export function stationModelLoaded(kind: StationPropKind): boolean {
+  return loadedStationGltf.has(kind);
+}
+
+/** The height-normalized mesh primitives of one station prop, wearing the
+ *  shared worn-detail material cache. Exported for mobile_stations.ts, so a
+ *  PLACED station draws the very same parts and materials as the town one. */
+export function stationTemplateParts(kind: StationPropKind): GlbTemplatePart[] {
   // The shared glb_instanced_props kernel (extracted at farming Phase 7 QA on
   // the rule of three); the worn-detail material cache rides mapMaterial.
   return glbTemplateParts(loadedStationGltf.get(kind), STATION_TARGET_HEIGHT[kind], {
@@ -169,10 +209,7 @@ export function buildStationProps(seed: number, stations: readonly StationDef[])
   const fireLights: THREE.PointLight[] = [];
   if (stations.length === 0) return { group, flames, fireLights };
 
-  const flameGeo = new THREE.LatheGeometry(
-    FLAME_PROFILE.map(([r, y]) => new THREE.Vector2(r, y)),
-    7,
-  );
+  const flameGeo = stationFlameGeometry();
   const usePbr = GFX.standardMaterials;
 
   // Group placements per (kind x region cell) and instance one mesh per
@@ -201,18 +238,7 @@ export function buildStationProps(seed: number, stations: readonly StationDef[])
       const holder = new THREE.Group();
       holder.position.copy(pos);
       holder.quaternion.copy(quat);
-      const flame = new THREE.Mesh(
-        flameGeo,
-        new THREE.MeshLambertMaterial({
-          color: 0xffaa33,
-          emissive: 0xff6600,
-          emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
-          transparent: true,
-          opacity: 0.92,
-        }),
-      );
-      flame.position.y = FLAME_Y;
-      flame.scale.setScalar(FLAME_BASE_SCALE);
+      const flame = buildStationFlame(flameGeo, usePbr);
       holder.add(flame);
       flames.push(flame);
       const light = new THREE.PointLight(

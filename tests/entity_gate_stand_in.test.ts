@@ -82,6 +82,12 @@ const GATE_CALL_SITES: readonly {
     file: 'src/render/farm_patches.ts',
     marker: 'attachSceneGroupGated(',
   },
+  {
+    // The placed mobile-station props: the same helper, its own file.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/mobile_stations.ts',
+    marker: 'attachSceneGroupGated(',
+  },
 ];
 
 /**
@@ -183,7 +189,11 @@ describe('entity gate stand-in registry', () => {
       const lines = sourceOf(file).split('\n');
       const callSites = lines.filter((line) => line.includes(marker));
       expect(callSites.length, `${gate} has call sites`).toBeGreaterThan(0);
-      const registered = ENTITY_GATE_STAND_INS.filter((row) => row.gate === gate);
+      // Scoped by gate AND file: the world-group helper is registered at two
+      // call sites (farm_patches.ts, mobile_stations.ts), each with its own row.
+      const registered = ENTITY_GATE_STAND_INS.filter(
+        (row) => row.gate === gate && row.file === file,
+      );
       for (const line of callSites) {
         const match = registered.find((row) => line.includes(row.callSite));
         expect(

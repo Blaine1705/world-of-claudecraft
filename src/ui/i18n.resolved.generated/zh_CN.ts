@@ -4661,6 +4661,7 @@ export const zh_CN: EnTranslations = {
         "dormantKnowledge": "{craft}知识已保留，但在其组合或爱好未启用时处于休眠状态。"
       },
       "stationRequired": "必须位于{station}才能制作该物品。",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "锻造坊",
         "kitchens": "厨房",

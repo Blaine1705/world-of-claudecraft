@@ -4661,6 +4661,7 @@ export const ja_JP: EnTranslations = {
         "dormantKnowledge": "{craft}の知識は保持されていますが、その組み合わせか趣味が有効になるまで休眠します。"
       },
       "stationRequired": "それを製作するには{station}にいる必要があります。",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "鍛冶場",
         "kitchens": "厨房",

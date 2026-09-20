@@ -1062,7 +1062,11 @@ const MONOLITHS: MonolithRow[] = [
     // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
     // composed with the release's own extractions above. Exact merged count,
     // zero slack.
-    ceiling: 11822,
+    // Down 11822 -> 11810 at the placed mobile-station object (v0.44.0): the
+    // "mobs forget the leaving player" sweep of removePlayer moved verbatim to
+    // src/sim/mob/forget_leaver.ts, paying for the one station-object drop
+    // call the leave path now needs. Exact count, zero slack.
+    ceiling: 11810,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "es_ES": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "fr_FR": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "fr_CA": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "de_DE": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "zh_CN": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "zh_TW": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "ko_KR": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "ja_JP": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "pt_BR": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "ru_RU": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "cs_CZ": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "nl_NL": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "pl_PL": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "id_ID": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "tr_TR": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "sv_SE": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "vi_VN": [
+    "hudChrome.crafting.mobileStationTitle"
+  ],
+  "da_DK": [
+    "hudChrome.crafting.mobileStationTitle"
+  ]
 };
