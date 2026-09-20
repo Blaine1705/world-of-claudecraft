@@ -18,6 +18,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "es_ES": [
@@ -29,6 +30,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "fr_FR": [
@@ -40,6 +42,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "fr_CA": [
@@ -51,6 +54,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "en_CA": [],
@@ -63,6 +67,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "de_DE": [
@@ -74,6 +79,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "zh_CN": [],
@@ -89,6 +95,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "ru_RU": [],
@@ -101,6 +108,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "nl_NL": [
@@ -112,6 +120,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "pl_PL": [
@@ -123,6 +132,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "id_ID": [
@@ -134,6 +144,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "tr_TR": [
@@ -145,6 +156,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "sv_SE": [
@@ -156,6 +168,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "vi_VN": [
@@ -167,6 +180,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ],
   "da_DK": [
@@ -178,6 +192,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.death.keeperTalkAccept",
     "hudChrome.death.keeperTalkBody",
     "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkSparedBody",
     "hudChrome.death.keeperTalkTitle"
   ]
 };

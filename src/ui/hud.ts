@@ -16639,7 +16639,7 @@ export class Hud {
   // the raise is irreversible and charges The Keeper's Toll from level 10 up. Only
   // the second OK sends the command; cancel/Escape at either step sends nothing.
   requestSpiritHealerResurrect(): void {
-    const talk = keeperReviveDialogue();
+    const talk = keeperReviveDialogue(this.sim.player.level);
     this.confirmDialog(t(talk.titleKey), t(talk.bodyKey), t(talk.okKey), t(talk.cancelKey), () => {
       const sure = keeperReviveConfirm(this.sim.player.level);
       this.confirmDialog(t(sure.titleKey), t(sure.bodyKey), t(sure.okKey), t(sure.cancelKey), () =>

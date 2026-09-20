@@ -83,13 +83,16 @@ export const hudChromeStrings = {
     spiritHealerAlive: 'The Pale Keeper watches over the dead. You are still among the living.',
     // The Pale Keeper's two-step revive (keeper_revive_dialog_core.ts). Step one is
     // the Keeper's dialogue, opened by talking to it; step two is the confirmation
-    // Revive Me opens, worded for whether the Toll lands on this character. The
-    // corpse run stays one-tap: it carries no penalty, so a confirm there would
-    // only add friction. The three bodies are WORDY by M16, so the five non-Latin
-    // overlays carry real fills.
+    // Revive Me opens. Both are worded for whether the Toll lands on this character:
+    // a levelled hero is never told a waiver exists, a newcomer is told the Toll
+    // exists but that they are spared it. The corpse run stays one-tap: it carries
+    // no penalty, so a confirm there would only add friction. The four bodies are
+    // WORDY by M16, so the five non-Latin overlays carry real fills.
     keeperTalkTitle: 'The Pale Keeper',
     keeperTalkBody:
-      "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Heroes below level 10 are spared the Toll entirely. Walking your spirit back to where you fell revives you with no penalty.",
+      "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+    keeperTalkSparedBody:
+      'I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.',
     keeperTalkAccept: 'Revive Me',
     keeperTalkLeave: 'Leave',
     healerConfirmTitle: "Accept the Keeper's Toll?",

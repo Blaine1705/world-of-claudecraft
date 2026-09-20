@@ -4399,7 +4399,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.keeperTalkLeave': '떠나기',
   'hudChrome.death.keeperConfirmSparedTitle': '영혼 치유사에게 부활을 맡기시겠습니까?',
   'hudChrome.death.keeperTalkBody':
-    '그 자리에서 되살려 줄 수 있지만 대가가 따릅니다. 부활 후유증으로 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다. 10레벨 미만의 영웅은 후유증을 전혀 겪지 않습니다. 영혼이 쓰러진 곳으로 달려가 부활하면 아무런 대가가 없습니다.',
+    '그 자리에서 되살려 줄 수 있지만 대가가 따릅니다. 부활 후유증으로 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다. 영혼이 쓰러진 곳으로 달려가 부활하면 아무런 대가가 없습니다.',
+  'hudChrome.death.keeperTalkSparedBody':
+    '그 자리에서 되살려 줄 수 있습니다. 본래라면 부활 후유증이 따라 한동안 당신의 모든 것이 약해지지만, 당신은 이 세계에 갓 발을 들였으니 이번에는 면해 주겠습니다. 영혼이 쓰러진 곳으로 달려가 부활하면 어느 쪽이든 아무런 대가가 없습니다.',
   'hudChrome.death.keeperConfirmBody':
     '정말입니까? 영혼 치유사가 당신을 부활시키지만 그 대가로 약해집니다. 부활 후유증이 사라질 때까지 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다.',
   'hudChrome.death.keeperConfirmSparedBody':

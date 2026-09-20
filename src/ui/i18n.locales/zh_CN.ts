@@ -4257,7 +4257,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.keeperTalkLeave': '离开',
   'hudChrome.death.keeperConfirmSparedTitle': '让灵魂医者复活你？',
   'hudChrome.death.keeperTalkBody':
-    '我可以让你就地复活，但代价随之而来：复活后遗症会使你的所有属性降低75%，等级越高持续越久，最长10分钟。10级以下的英雄完全不受后遗症影响。让你的灵魂跑回倒下的地方复活则没有任何惩罚。',
+    '我可以让你就地复活，但代价随之而来：复活后遗症会使你的所有属性降低75%，等级越高持续越久，最长10分钟。让你的灵魂跑回倒下的地方复活则没有任何惩罚。',
+  'hudChrome.death.keeperTalkSparedBody':
+    '我可以让你就地复活。通常这会附带复活后遗症，让你的一切在一段时间内变得虚弱，但你初来乍到，所以我会免去你的代价。无论如何，让你的灵魂跑回倒下的地方复活都没有任何惩罚。',
   'hudChrome.death.keeperConfirmBody':
     '确定吗？灵魂医者会复活你，但你会因此变得虚弱：复活后遗症会使你的所有属性降低75%，直到它消退，等级越高持续越久，最长10分钟。',
   'hudChrome.death.keeperConfirmSparedBody':

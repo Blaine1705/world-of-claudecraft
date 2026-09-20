@@ -9620,6 +9620,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.death.keeperTalkAccept'
   | 'hudChrome.death.keeperTalkBody'
   | 'hudChrome.death.keeperTalkLeave'
+  | 'hudChrome.death.keeperTalkSparedBody'
   | 'hudChrome.death.keeperTalkTitle'
   | 'hudChrome.death.resurrectAtCorpse'
   | 'hudChrome.death.resurrectAtHealer'

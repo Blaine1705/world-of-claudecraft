@@ -4430,7 +4430,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.keeperTalkLeave': '立ち去る',
   'hudChrome.death.keeperConfirmSparedTitle': '霊魂の癒し手に蘇らせてもらうか？',
   'hudChrome.death.keeperTalkBody':
-    'その場で蘇らせることはできるが、代償が伴う。復活の後遺症により、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。レベル10未満の英雄には後遺症は一切かからない。倒れた場所まで魂を走らせて復活すれば、代償は何もない。',
+    'その場で蘇らせることはできるが、代償が伴う。復活の後遺症により、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。倒れた場所まで魂を走らせて復活すれば、代償は何もない。',
+  'hudChrome.death.keeperTalkSparedBody':
+    'その場で蘇らせることはできる。本来なら復活の後遺症が伴い、しばらくのあいだ力のすべてが弱まるのだが、おまえはこの世界に来たばかりだ。だから今回は免じてやろう。倒れた場所まで魂を走らせて復活すれば、いずれにせよ代償は何もない。',
   'hudChrome.death.keeperConfirmBody':
     '本当によいか？霊魂の癒し手はあなたを蘇らせるが、その代償として弱くなる。復活の後遺症が消えるまで、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。',
   'hudChrome.death.keeperConfirmSparedBody':

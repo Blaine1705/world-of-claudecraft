@@ -4260,7 +4260,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.keeperTalkLeave': '離開',
   'hudChrome.death.keeperConfirmSparedTitle': '讓靈魂醫者復活你？',
   'hudChrome.death.keeperTalkBody':
-    '我可以讓你就地復活，但代價隨之而來：復活後遺症會使你的所有屬性降低75%，等級越高持續越久，最長10分鐘。10級以下的英雄完全不受後遺症影響。讓你的靈魂跑回倒下的地方復活則沒有任何懲罰。',
+    '我可以讓你就地復活，但代價隨之而來：復活後遺症會使你的所有屬性降低75%，等級越高持續越久，最長10分鐘。讓你的靈魂跑回倒下的地方復活則沒有任何懲罰。',
+  'hudChrome.death.keeperTalkSparedBody':
+    '我可以讓你就地復活。通常這會附帶復活後遺症，讓你的一切在一段時間內變得虛弱，但你初來乍到，所以我會免去你的代價。無論如何，讓你的靈魂跑回倒下的地方復活都沒有任何懲罰。',
   'hudChrome.death.keeperConfirmBody':
     '確定嗎？靈魂醫者會復活你，但你會因此變得虛弱：復活後遺症會使你的所有屬性降低75%，直到它消退，等級越高持續越久，最長10分鐘。',
   'hudChrome.death.keeperConfirmSparedBody':
