@@ -10,7 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -22,7 +24,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "es_ES": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -34,7 +38,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "fr_FR": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -46,7 +52,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "fr_CA": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -59,7 +67,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -71,7 +81,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "de_DE": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -99,7 +111,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "pt_BR": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -115,7 +129,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "cs_CZ": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -127,7 +143,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "nl_NL": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -139,7 +157,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "pl_PL": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -151,7 +171,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "id_ID": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -163,7 +185,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "tr_TR": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -175,7 +199,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "sv_SE": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -187,7 +213,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "vi_VN": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -199,7 +227,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "da_DK": [
+    "abilityUi.forms.bearOrCat",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",

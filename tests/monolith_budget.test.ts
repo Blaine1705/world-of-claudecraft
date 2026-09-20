@@ -1066,7 +1066,12 @@ const MONOLITHS: MonolithRow[] = [
     // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
     // composed with the release's own extractions above. Exact merged count,
     // zero slack.
-    ceiling: 11822,
+    // Down 11822 -> 11792 at the feral Wildfang pass fix round: the per-cast
+    // ResolvedAbility interface moved to src/sim/resolved_ability.ts (a new
+    // cast-scoped marker, naturesBoonPower, would otherwise have grown this
+    // file); sim.ts keeps the type import and the barrel re-export. Exact
+    // count, zero slack.
+    ceiling: 11792,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

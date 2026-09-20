@@ -10505,6 +10505,7 @@ export const ru_RU: EnTranslations = {
       "cantInForm": "В облике {form} это невозможно.",
       "bear": "бурого",
       "cat": "кота",
+      "bearOrCat": "бурого или кота",
       "travel": "скорохода",
       "shapeshifted": "В измененном облике это невозможно.",
       "stealthed": "Вы должны быть в незаметности.",
@@ -10836,7 +10837,8 @@ export const ru_RU: EnTranslations = {
     },
     "forms": {
       "bear": "бурого",
-      "cat": "кота"
+      "cat": "кота",
+      "bearOrCat": "бурого или кота"
     },
     "cast": {
       "fishing": "Рыбная ловля",
