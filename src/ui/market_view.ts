@@ -32,7 +32,7 @@ import {
   type MarketSubtypeFilter,
 } from './market_filters';
 
-export type MarketTab = 'browse' | 'sell' | 'collect';
+export type MarketTab = 'browse' | 'sell' | 'collect' | 'orders';
 
 /** Copper in one gold / one silver, for splitting a suggested ask into coins. */
 export const COPPER_PER_GOLD = 10000;
@@ -153,7 +153,10 @@ export type MarketView =
   | { kind: 'no-data' }
   | { kind: 'browse'; body: MarketBrowseBody }
   | { kind: 'sell'; body: MarketSellBody; meta: MarketSellMeta }
-  | { kind: 'collect'; body: MarketCollectBody };
+  | { kind: 'collect'; body: MarketCollectBody }
+  // The Wanted tab builds its own body in market_orders_core.ts (buildMarketOrders
+  // needs the viewer's bag counts, which this builder does not take).
+  | { kind: 'orders' };
 
 /** Inputs the painter feeds the builder each render. */
 export interface MarketViewInput {
@@ -325,6 +328,7 @@ export function buildMarketView(input: MarketViewInput): MarketView {
       },
     };
   }
+  if (tab === 'orders') return { kind: 'orders' };
   return { kind: 'collect', body: buildMarketCollect(info) };
 }
 

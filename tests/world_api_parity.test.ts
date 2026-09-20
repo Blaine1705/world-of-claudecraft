@@ -310,6 +310,9 @@ export const IWORLD_MEMBERS = [
   { name: 'marketSweep', kind: 'method' },
   { name: 'marketCancel', kind: 'method' },
   { name: 'marketCollect', kind: 'method' },
+  { name: 'marketOrderPlace', kind: 'method' },
+  { name: 'marketOrderFill', kind: 'method' },
+  { name: 'marketOrderCancel', kind: 'method' },
   // --- Ravenpost mail reads + commands ---
   { name: 'mailInfo', kind: 'data' },
   { name: 'mailUnread', kind: 'data' },
@@ -865,9 +868,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // methods, the Who tab data and method, CPU-hygiene entityRosterVersion,
     // and the account-wide Book of Deeds / Reliquary read halves. Counted
     // directly off the resolved IWORLD_MEMBERS literal.
-    expect(IWORLD_MEMBERS.length).toBe(378);
+    expect(IWORLD_MEMBERS.length).toBe(381);
     expect(DATA_MEMBERS.length).toBe(107);
-    expect(METHOD_MEMBERS.length).toBe(271);
+    expect(METHOD_MEMBERS.length).toBe(274);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1098,6 +1101,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketInfo',
       'marketList',
       'marketListInstance',
+      'marketOrderCancel',
+      'marketOrderFill',
+      'marketOrderPlace',
       'marketSearch',
       'marketSellPriceCheck',
       'marketSweep',
@@ -1522,6 +1528,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCollect',
       'marketList',
       'marketListInstance',
+      'marketOrderCancel',
+      'marketOrderFill',
+      'marketOrderPlace',
       'marketSearch',
       'marketSellPriceCheck',
       'marketSweep',
@@ -2040,6 +2049,9 @@ const FACET_MARKET = [
   'marketSweep',
   'marketCancel',
   'marketCollect',
+  'marketOrderPlace',
+  'marketOrderFill',
+  'marketOrderCancel',
 ] as const satisfies readonly (keyof IWorldMarket)[];
 type _ExhaustMarket = AssertNever<Exclude<keyof IWorldMarket, (typeof FACET_MARKET)[number]>>;
 
@@ -2391,8 +2403,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(378);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(378);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(381);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(381);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

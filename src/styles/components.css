@@ -15377,6 +15377,102 @@
     justify-content: center;
     font-style: italic;
   }
+  /* The Wanted tab (market_orders_panel.ts): the place-order card at the head,
+     the open-order rows (the .mkt-row grid), and the not-on-the-market strip. */
+  .mkt-order-card {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  .mkt-order-head,
+  .mkt-unlisted-head {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .mkt-order-card .mkt-sell-pick {
+    margin-bottom: 0;
+  }
+  .mkt-order-search-row .mkt-search {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+  .mkt-order-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mkt-order-matches:empty {
+    display: none;
+  }
+  .mkt-order-match {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  .mkt-order-match .item-icon,
+  .mkt-order-match img {
+    width: 22px;
+    height: 22px;
+  }
+  .mkt-order-match-none,
+  .mkt-order-total,
+  .mkt-unlisted-none {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+  }
+  .mkt-order-total:empty {
+    display: none;
+  }
+  .mkt-order-go {
+    align-self: flex-start;
+    padding: 4px 14px;
+  }
+  .mkt-order-list {
+    margin-bottom: 10px;
+  }
+  .mkt-order-row .mkt-each {
+    font-size: 10.5px;
+    color: var(--color-text-muted);
+    margin-left: 4px;
+  }
+  .mkt-order-row.mine {
+    box-shadow: inset 2px 0 0 var(--gold-dim);
+  }
+  .mkt-unlisted {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mkt-unlisted-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .mkt-unlisted-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px 3px 4px;
+    font-size: 11.5px;
+    cursor: var(--cursor-point);
+    min-height: 28px;
+  }
+  .mkt-unlisted-chip .item-icon,
+  .mkt-unlisted-chip img {
+    width: 20px;
+    height: 20px;
+  }
   /* Serif name, matching the Browse row headline. */
   .mkt-sell-pick .ps-name {
     font-family: var(--font-serif);

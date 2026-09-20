@@ -1213,6 +1213,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rite.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rooms.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market.ts'), 'utf8'),
+    // The buy-order board (Wanted tab): place / deliver / withdraw errors and
+    // loot lines, matched by error_text_i18n_core + sim_i18n RULES.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market_orders.ts'), 'utf8'),
     // Card Duel minigame (Card Master NPC): the queue/match log + error emits.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/social/card_duel.ts'), 'utf8'),
     // W2: the inventory/vendor command bodies (equip/use/discard + buy/sell/buyback).

@@ -243,6 +243,7 @@ import { DEV_SANDBOX_CFG, DEV_SANDBOX_CLASSES } from './dev/dev_sandbox_config';
 import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
 import { arenaMapForSlot } from './dungeon_layout';
+import { effectiveArmorOf, effectiveAttackPowerOf } from './effective_stats';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -6443,47 +6444,15 @@ export class Sim {
   // jumpMult moved to player_motion.ts (MV1; read only by the movement kernel).
 
   // Sunder Armor stacks shave flat armor off the defender for physical hits.
+  // Both are pure reads of an entity's stats + auras, extracted to
+  // effective_stats.ts (the monolith ratchet); the SimContext bindings above and
+  // the swing math keep resolving through these thin delegates.
   private effectiveArmor(e: Entity): number {
-    let armor = e.stats.armor;
-    // Player/rogue armor debuffs are PERCENTAGES that do NOT stack with each other:
-    // Sunder Armor (2% per stack, up to 10% at 5 stacks) and Faerie Fire (a flat 10%)
-    // max-combine, so a fully-stacked Sunder and a Faerie Fire are redundant rather
-    // than additive. Mob corrosion (kind 'corrode') is a separate FLAT shred that
-    // subtracts value*stacks before the percent debuffs apply.
-    let reductionPct = 0;
-    const baseArmor = e.stats.armor;
-    for (const a of e.auras) {
-      if (e.kind !== 'player' && a.kind === 'buff_armor') armor += a.value;
-      // Percent armor raid buff (Devotion Aura) on a controlled pet; players fold it
-      // in recalcPlayerStats.
-      else if (e.kind !== 'player' && a.kind === 'buff_armor_pct')
-        armor += (baseArmor * a.value) / 100;
-      // Mob corrosion: flat, stacking armor shred (value per stack).
-      if (a.kind === 'corrode') armor -= a.value * (a.stacks ?? 1);
-      else if (a.kind === 'sunder')
-        reductionPct = Math.max(reductionPct, SUNDER_ARMOR_PCT_PER_STACK * (a.stacks ?? 1));
-      else if (a.kind === 'faerie_fire')
-        reductionPct = Math.max(reductionPct, FAERIE_FIRE_ARMOR_PCT);
-      // Melting Acid carries its own fraction on the aura (0.05), so a future
-      // rank or talent scales the value rather than a constant here.
-      else if (a.kind === 'melting_acid') reductionPct = Math.max(reductionPct, a.value);
-    }
-    return Math.max(0, armor * (1 - reductionPct));
+    return effectiveArmorOf(e);
   }
 
   private effectiveAttackPower(e: Entity): number {
-    let attackPower = e.attackPower;
-    if (e.kind !== 'player') {
-      const base = e.attackPower;
-      for (const a of e.auras) {
-        if (a.kind === 'buff_ap') attackPower += a.value;
-        else if (a.kind === 'debuff_ap') attackPower -= a.value;
-        // Percent attack-power raid buffs (Blessing of Might / Battle Shout) on a
-        // controlled pet: percent of the pet's base AP. Players fold this in recalc.
-        else if (a.kind === 'buff_ap_pct') attackPower += (base * a.value) / 100;
-      }
-    }
-    return Math.max(0, attackPower);
+    return effectiveAttackPowerOf(e);
   }
 
   private petDamageMult(e: Entity): number {
@@ -10566,6 +10535,29 @@ export class Sim {
 
   marketCancel(listingId: number, pid?: number): void {
     this.market.marketCancel(listingId, pid);
+  }
+
+  // The buy-order board (market_orders.ts): the server's sold-volume observer
+  // reads the settled rows / units the place and fill arms return.
+  marketOrderPlace(
+    itemId: string,
+    count: number,
+    unitPrice: number,
+    pid?: number,
+  ): MarketListing[] {
+    return this.market.marketOrderPlace(itemId, count, unitPrice, pid);
+  }
+
+  marketOrderFill(orderId: number, count: number, pid?: number): { units: number; copper: number } {
+    return this.market.marketOrderFill(orderId, count, pid);
+  }
+
+  marketOrderCancel(orderId: number, pid?: number): void {
+    this.market.marketOrderCancel(orderId, pid);
+  }
+
+  get marketOrders() {
+    return this.market.marketOrders;
   }
 
   marketCollect(pid?: number): void {

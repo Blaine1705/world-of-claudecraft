@@ -4672,6 +4672,15 @@ export class ClientWorld extends ReconWireState implements IWorld {
   marketCollect(): void {
     this.cmd({ cmd: 'market_collect' });
   }
+  marketOrderPlace(itemId: string, count: number, unitPrice: number): void {
+    this.cmd({ cmd: 'market_order_place', item: itemId, count, price: unitPrice });
+  }
+  marketOrderFill(orderId: number, count: number): void {
+    this.cmd({ cmd: 'market_order_fill', id: orderId, count });
+  }
+  marketOrderCancel(orderId: number): void {
+    this.cmd({ cmd: 'market_order_cancel', id: orderId });
+  }
   // --- IWorldMail: Ravenpost letter sends (snake_case wire strings). mailInfo /
   // mailUnread are snapshot reads (mirror fields above). ---
   mailSend(to: string, subject: string, body: string, copper: number, items: InvSlot[]): void {

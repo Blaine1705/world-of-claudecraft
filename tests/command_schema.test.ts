@@ -170,8 +170,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // realm roster answered by the `who` frame; the chat /who stays as it was).
 // Market Sweep composes on top of it with `market_sweep_quote` and
 // `market_sweep`, both client-sent and server-dispatched.
-const EXPECTED_SEND_COUNT = 225;
-const EXPECTED_DISPATCH_COUNT = 239;
+// +3 send / +3 dispatch for the World Market buy-order board
+// (`market_order_place`, `market_order_fill`, `market_order_cancel`).
+const EXPECTED_SEND_COUNT = 228;
+const EXPECTED_DISPATCH_COUNT = 242;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

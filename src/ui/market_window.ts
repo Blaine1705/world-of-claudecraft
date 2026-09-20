@@ -69,6 +69,7 @@ import {
   marketItemMatches,
 } from './market_filters';
 import { marketNameColor } from './market_name_color';
+import { MarketOrdersPanel } from './market_orders_panel';
 import { marketPriceHtml } from './market_price_view';
 import { localizedMarketSearch } from './market_search_localized_core';
 import { sweepEligibleRow } from './market_sweep_core';
@@ -194,6 +195,20 @@ export class MarketWindow {
     repaint: () => this.renderContent(),
   });
 
+  // The Wanted tab (market_orders_panel.ts): the buy-order board, its place
+  // card, and the not-on-the-market strip. Same dep shape as the sweep card.
+  private readonly orders = new MarketOrdersPanel({
+    itemIcon: (item, quality) => this.deps.itemIcon(item, quality),
+    moneyHtml: (copper) => this.deps.moneyHtml(copper),
+    itemTooltip: (item, instance, sources) => this.deps.itemTooltip(item, instance, sources),
+    attachTooltip: (el, build) => this.deps.attachTooltip(el, build),
+    world: () => this.deps.world(),
+    showError: (text) => this.deps.showError(text),
+    confirmDialog: (title, body, ok, cancel, onOk) =>
+      this.deps.confirmDialog(title, body, ok, cancel, onOk),
+    fungibleBagCount: (itemId) => this.fungibleBagCount(itemId),
+  });
+
   constructor(private readonly deps: MarketWindowDeps) {}
 
   get isOpen(): boolean {
@@ -245,6 +260,7 @@ export class MarketWindow {
     this.sellInstance = null;
     this.pushSellPriceCheck();
     this.sweep.clear(false);
+    this.orders.reset();
     root.style.display = 'none';
     this.deps.hideTooltip();
     document.body.classList.remove('market-open');
@@ -370,6 +386,7 @@ export class MarketWindow {
       return;
     }
     if (this.tab === 'browse') this.sweep.refresh(this.deps.root());
+    if (this.tab === 'orders') this.orders.refresh();
     const sig = JSON.stringify([
       this.tab,
       this.itemTypeFilter,
@@ -392,6 +409,12 @@ export class MarketWindow {
       // this the open Collect tab would never repaint to show its row.
       info?.collectionSales,
       info?.collectionSalesOmitted,
+      // The Wanted tab's own axes: the board, the viewer's cap use, and the
+      // unlisted strip (bag counts ride the inventory, which the rows read live).
+      info?.orders,
+      info?.myOrderCount,
+      info?.unlistedMaterials,
+      this.tab === 'orders' ? this.deps.world().inventory : null,
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
@@ -473,6 +496,7 @@ export class MarketWindow {
     const tabLabel = (id: MarketTab): string => {
       if (id === 'browse') return t('itemUi.market.browse');
       if (id === 'sell') return t('itemUi.market.sell');
+      if (id === 'orders') return t('itemUi.market.ordersTab');
       const n = marketCollectBadgeCount(info);
       return n > 0
         ? t('itemUi.market.collectWithCount', {
@@ -501,6 +525,7 @@ export class MarketWindow {
       `<div class="mkt-tabs ui-tabs">` +
       tab('browse') +
       tab('sell') +
+      tab('orders') +
       tab('collect') +
       `</div>` +
       `<div class="mkt-layout${this.tab === 'browse' ? '' : ' mkt-layout-wide'}">${controlsHtml}<div id="market-body"></div></div>` +
@@ -534,6 +559,7 @@ export class MarketWindow {
         // Leaving Browse drops the staged sweep: nothing paints it elsewhere, and
         // a quote nobody reads must not stay staged server-side.
         if (next !== 'browse') this.sweep.clear(false);
+        if (next !== 'orders') this.orders.reset();
         this.tab = next;
         this.browsePage = 0;
         this.lastSig = '';
@@ -753,6 +779,10 @@ export class MarketWindow {
     }
     if (view.kind === 'sell') {
       this.renderSell(body, view.body, view.meta);
+      return;
+    }
+    if (view.kind === 'orders') {
+      this.orders.mount(body);
       return;
     }
     this.renderCollect(body, view.body);

@@ -70,6 +70,20 @@ export interface SoldVolumeSim {
   marketBuy(listingId: number, pid?: number): void;
 }
 
+/** The sim surface the two order arms read; `Sim` satisfies it. An order fill
+ *  by a deliverer settles no listing row, so the sim reports the units and
+ *  gross copper directly (zero on refusal). */
+export interface SoldVolumeOrderSim {
+  marketOrderPlace(
+    itemId: string,
+    count: number,
+    unitPrice: number,
+    pid?: number,
+  ): readonly SoldVolumeListing[];
+  marketOrderFill(orderId: number, count: number, pid?: number): { units: number; copper: number };
+  readonly marketOrders: readonly { id: number; itemId: string }[];
+}
+
 /** The sim surface sweepWithSoldVolume reads; `Sim` satisfies it. */
 export interface SoldVolumeSweepSim {
   readonly marketListings: readonly SoldVolumeListing[];
@@ -321,4 +335,44 @@ export function sweepWithSoldVolume(
     const entry = marketSaleFromBuy(row, null);
     if (entry !== null) enqueue(entry);
   }
+}
+
+/**
+ * A placed order's IMMEDIATE fills are listing sales exactly like a sweep's
+ * (the sim returns the rows it settled), so they book the same way. The open
+ * remainder is escrow, not volume: nothing has changed hands yet.
+ */
+export function orderPlaceWithSoldVolume(
+  sim: SoldVolumeOrderSim,
+  itemId: string,
+  count: number,
+  unitPrice: number,
+  pid: number,
+): void {
+  const settled = sim.marketOrderPlace(itemId, count, unitPrice, pid);
+  if (settled.length === 0) return;
+  if (classifyMarketMetricsItem(itemId) === null) return;
+  for (const row of settled) {
+    const entry = marketSaleFromBuy(row, null);
+    if (entry !== null) enqueue(entry);
+  }
+}
+
+/**
+ * A deliverer filling an order is one sale of `units` at the order's bid: the
+ * item id is read off the order BEFORE the fill (a completed fill removes the
+ * row), and the sim's returned units/copper are the settled figures (zero on
+ * any refusal, so a refused frame books nothing).
+ */
+export function orderFillWithSoldVolume(
+  sim: SoldVolumeOrderSim,
+  orderId: number,
+  count: number,
+  pid: number,
+): void {
+  const itemId = sim.marketOrders.find((o) => o.id === orderId)?.itemId ?? null;
+  const { units, copper } = sim.marketOrderFill(orderId, count, pid);
+  if (units === 0 || itemId === null) return;
+  if (classifyMarketMetricsItem(itemId) === null) return;
+  enqueue({ itemId, quantity: units, copper });
 }

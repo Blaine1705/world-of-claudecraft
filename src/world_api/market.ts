@@ -1,3 +1,4 @@
+import type { MarketOrderView } from '../sim/market_orders';
 import type {
   MarketArmorClassFilter,
   MarketItemTypeFilter,
@@ -86,6 +87,16 @@ export interface MarketInfo {
    *  UI trusts a quote only when it matches what it currently has staged, the
    *  sellPriceItemId precedent. Recomputed on the live book every snapshot. */
   sweepQuote: MarketSweepQuote | null;
+  /** The Wanted board (src/sim/market_orders.ts): every open buy order, the
+   *  viewer's own rows first, then by item name and best bid. Rows are
+   *  wire-capped (MARKET_ORDER_WIRE_LIMIT) like the browse page. */
+  orders: MarketOrderView[];
+  myOrderCount: number;
+  maxOrders: number; // per-buyer open-order cap
+  /** Honest materials with NO listing on the book at all (house stock included),
+   *  sorted by catalog name: the demand insight a listing-only browse cannot
+   *  give. Recomputed per book revision, never per viewer. */
+  unlistedMaterials: string[];
 }
 
 /** A server-planned Market Sweep: buy `count` units of `itemId` across other
@@ -129,6 +140,15 @@ export interface IWorldMarket {
   marketSweep(itemId: string, count: number, maxCopper: number): void;
   marketCancel(listingId: number): void;
   marketCollect(): void;
+  /** Place a buy order for `count` units of `itemId` at `unitPrice` each: the sim
+   *  fills what the book already offers at or under that price, escrows the
+   *  rest, and the order stays open until delivered into or withdrawn. */
+  marketOrderPlace(itemId: string, count: number, unitPrice: number): void;
+  /** Deliver `count` plain units from the caller's bags into another player's
+   *  open order; proceeds (less the cut) wait in the caller's collection. */
+  marketOrderFill(orderId: number, count: number): void;
+  /** Withdraw your own order; the unfilled escrow returns to the purse. */
+  marketOrderCancel(orderId: number): void;
 }
 
 // True when the caller's intended browse query no longer matches what the server
