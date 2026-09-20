@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { updateAuras } from '../src/sim/combat/auras';
 import { meleeSwing, rangedSwing, tryPlayerSwing } from '../src/sim/combat/auto_attack';
+import { NATURES_BOON_CHANCE } from '../src/sim/combat/druid_natures_boon';
 import { runWeaponProcs } from '../src/sim/combat/equip_procs';
 import { baseSwingSpeed } from '../src/sim/combat/form_swing';
 import { ENCHANTS } from '../src/sim/content/enchants';
@@ -570,9 +571,11 @@ describe("Last Flame's Zeal", () => {
       source.swingTimer = 0;
       tryPlayerSwing(ctx, source, meta);
       expect(target.hp).toBeLessThan(hpBefore);
-      // The white crit roll, then exactly ONE enchant roll at the form speed.
-      expect(chance).toHaveBeenCalledTimes(2);
-      expect(chance.mock.calls[1]?.[0]).toBe(speed / 60);
+      // White crit, Wildfang Nature's Boon, then exactly ONE enchant roll at
+      // the form speed. This still catches a duplicated Last Flame roll.
+      expect(chance).toHaveBeenCalledTimes(3);
+      expect(chance.mock.calls[1]?.[0]).toBe(NATURES_BOON_CHANCE);
+      expect(chance.mock.calls[2]?.[0]).toBe(speed / 60);
       expect(source.swingTimer).toBeCloseTo(speed, 10);
       const buff = source.auras.find((aura) => aura.id === ENCHANT);
       expect(buff).toMatchObject({ kind: 'buff_str', value: 50, remaining: 15, duration: 15 });
