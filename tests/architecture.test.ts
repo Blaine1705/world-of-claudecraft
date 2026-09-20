@@ -724,6 +724,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 const RENDER_PURE_CORES = [
   'src/render/hoard_boss_dressing_core.ts',
   'src/render/hoard_encounter_accents_core.ts',
+  'src/render/hoard_spell_fx_core.ts',
   'src/render/hoard_boss_fx_core.ts',
   'src/render/hoard_tide_wave_fx_core.ts',
   'src/render/hoard_entrance_core.ts',
