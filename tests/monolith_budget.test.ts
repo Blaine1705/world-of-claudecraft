@@ -493,7 +493,11 @@ const MONOLITHS: MonolithRow[] = [
     // Interface entry that joined it) moved to
     // src/ui/options_main_menu_controller.ts; the window keeps only the
     // routing and the touch gate. Exact count, zero slack.
-    ceiling: 2831,
+    // LOWERED 2831 -> 2830 when the placeholder resolver the choice status line
+    // and the notes both carried moved to src/ui/options_text_values.ts (the
+    // Frame Rate Limit row and its numeric status line arrived in the same
+    // change). Exact count, zero slack.
+    ceiling: 2830,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1062,7 +1066,12 @@ const MONOLITHS: MonolithRow[] = [
     // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
     // composed with the release's own extractions above. Exact merged count,
     // zero slack.
-    ceiling: 11822,
+    // Down 11822 -> 11792 at the feral Wildfang pass fix round: the per-cast
+    // ResolvedAbility interface moved to src/sim/resolved_ability.ts (a new
+    // cast-scoped marker, naturesBoonPower, would otherwise have grown this
+    // file); sim.ts keeps the type import and the barrel re-export. Exact
+    // count, zero slack.
+    ceiling: 11792,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
