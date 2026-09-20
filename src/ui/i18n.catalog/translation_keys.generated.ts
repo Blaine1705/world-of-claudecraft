@@ -3980,6 +3980,7 @@ export type TranslationKeyFlat =
   | 'entities.mobs.hedge_gnome.name'
   | 'entities.mobs.hedge_knight.name'
   | 'entities.mobs.heroic_boss_dummy.name'
+  | 'entities.mobs.hoard_abyssal_tentacle.name'
   | 'entities.mobs.hoard_bound_pulsar.name'
   | 'entities.mobs.hoard_brood_egg.name'
   | 'entities.mobs.hoard_brood_hatchling.name'

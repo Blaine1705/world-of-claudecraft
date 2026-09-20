@@ -18094,6 +18094,9 @@ export const ja_JP: EnTranslations = {
       "hoard_bound_pulsar": {
         "name": "縛られしパルサー"
       },
+      "hoard_abyssal_tentacle": {
+        "name": "深淵の顎の触手"
+      },
       "rift_spawnling": {
         "name": "リフトの落とし子"
       },

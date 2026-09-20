@@ -53,6 +53,10 @@ describe('Rift monster index', () => {
     expect(RIFT_MOBS.hoard_bound_pulsar).toBeUndefined();
     expect(RIFT_TRASH_IDS).not.toContain('hoard_bound_pulsar');
     expect(RIFT_MONSTER_BY_ID.hoard_bound_pulsar).toBeUndefined();
+    expect(HOARD_MOBS.hoard_abyssal_tentacle).toBeDefined();
+    expect(RIFT_MOBS.hoard_abyssal_tentacle).toBeUndefined();
+    expect(RIFT_TRASH_IDS).not.toContain('hoard_abyssal_tentacle');
+    expect(RIFT_MONSTER_BY_ID.hoard_abyssal_tentacle).toBeUndefined();
   });
 
   it('gives every ability key a human-readable label, never a raw camelCase leak', () => {

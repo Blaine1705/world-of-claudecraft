@@ -18094,6 +18094,9 @@ export const ko_KR: EnTranslations = {
       "hoard_bound_pulsar": {
         "name": "속박된 펄서"
       },
+      "hoard_abyssal_tentacle": {
+        "name": "심연의 아가리의 촉수"
+      },
       "rift_spawnling": {
         "name": "균열의 산물"
       },

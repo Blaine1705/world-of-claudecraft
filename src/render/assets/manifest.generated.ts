@@ -1763,6 +1763,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "vfx/spark_04.png": "/media/vfx/spark_04.542198dcb07a.png",
   "vfx/spark_06.png": "/media/vfx/spark_06.b615e988e12b.png",
   "vfx/star_07.png": "/media/vfx/star_07.ae3e59099231.png",
+  "vfx/tentacles/tentacle.glb": "/media/vfx/tentacles/tentacle.11bb8ac9b668.glb",
+  "vfx/tentacles/trunk.glb": "/media/vfx/tentacles/trunk.e7b1753abd09.glb",
   "vfx/trace_05.png": "/media/vfx/trace_05.89ec5d9a0267.png",
   "vfx/twirl_01.png": "/media/vfx/twirl_01.18137131f93a.png"
 } as const;

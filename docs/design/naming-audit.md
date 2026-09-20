@@ -698,6 +698,20 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Pulsar Lance | REJECTED before shipping | A named Aeldari weapon in Warhammer 40,000. Never used. |
 | Tracking Beam | the beam's damage line | KEEP. Plain descriptive English, chosen to replace the two above. |
 
+### Buried Hoard boss mechanics: the forge hammer and the tentacles (web-verified 2026-09-21)
+
+Exact-phrase and coined-token searches against the major game wikis.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Hammer of the Forge | Emberforge's arena cast | KEEP. Plain descriptive English. One match, a level 90 spear in Wynncraft: an item in one game, not a coined term, and nothing of ours resembles it. |
+| Forgefire Ring | the ring's damage line | KEEP. No match for the phrase. "Forgefire" alone is a shared compound (an ability in Total War: Warhammer, an item in a 5th Edition supplement), distinctive to neither. |
+| Tentacles of the Abyss | the Abyssal Maw's arena cast | KEEP. No match as a named ability; plain descriptive English. |
+| Abyssal Tentacle | REJECTED before shipping | A well known weapon in Old School RuneScape, and a gun in Enter the Gungeon. The mob's id keeps the word (ids are never shown); its display name does not. |
+| Tentacle of the Maw | the attackable tentacle mob | KEEP. No match. Named for its owner, the Abyssal Maw. |
+| Abyssal Lash | the line whip's damage line | KEEP. One match, a spell on a tabletop homebrew wiki; adjective plus common noun. |
+| Drowning Sweep | the circular sweep's damage line | KEEP. No match. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

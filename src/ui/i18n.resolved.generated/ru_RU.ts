@@ -18094,6 +18094,9 @@ export const ru_RU: EnTranslations = {
       "hoard_bound_pulsar": {
         "name": "Скованный пульсар"
       },
+      "hoard_abyssal_tentacle": {
+        "name": "Щупальце Пасти"
+      },
       "rift_spawnling": {
         "name": "Отпрыск Разлома"
       },

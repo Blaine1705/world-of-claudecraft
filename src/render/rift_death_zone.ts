@@ -29,6 +29,7 @@ import { HoardIceAgeFx } from './hoard_ice_age';
 import { HoardOrbitalLightning } from './hoard_orbital_lightning';
 import { HoardPulsarFx } from './hoard_pulsars';
 import { HoardSpellFx } from './hoard_spell_fx';
+import { HoardTentaclesFx } from './hoard_tentacles';
 import {
   deathZonePlan,
   deathZonePulseSpeed,
@@ -78,6 +79,7 @@ export class RiftDeathZoneVisuals {
   private readonly hoardIceAge: HoardIceAgeFx;
   private readonly hoardPulsars: HoardPulsarFx;
   private readonly hoardForgeHammer: HoardForgeHammerFx;
+  private readonly hoardTentacles: HoardTentaclesFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -109,6 +111,7 @@ export class RiftDeathZoneVisuals {
       reducedMotion,
       shake,
     );
+    this.hoardTentacles = new HoardTentaclesFx(scene, groundY, compileGate, reducedMotion, shake);
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -127,6 +130,7 @@ export class RiftDeathZoneVisuals {
     this.hoardIceAge.sync(hoardCues);
     this.hoardPulsars.sync(hoardCues);
     this.hoardForgeHammer.sync(hoardCues);
+    this.hoardTentacles.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
       const key = `${z.x.toFixed(1)}:${z.z.toFixed(1)}:${z.radius.toFixed(1)}`;
@@ -162,6 +166,7 @@ export class RiftDeathZoneVisuals {
     this.hoardIceAge.update(dt);
     this.hoardPulsars.update(dt);
     this.hoardForgeHammer.update(dt);
+    this.hoardTentacles.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -187,6 +192,7 @@ export class RiftDeathZoneVisuals {
     this.hoardIceAge.dispose();
     this.hoardPulsars.dispose();
     this.hoardForgeHammer.dispose();
+    this.hoardTentacles.dispose();
     this.hoardPresentation.dispose();
   }
 

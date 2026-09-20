@@ -51,6 +51,12 @@ import {
   tickHoardStormStaticCue,
 } from './hoard_storm_static';
 import { clearHoardStormSurge, tickHoardStormSurge } from './hoard_storm_surge';
+import {
+  clearHoardTentacles,
+  isTentacleCue,
+  tickHoardTentacleCue,
+  tickHoardTentacles,
+} from './hoard_tentacles';
 import { tickHoardTidePattern } from './hoard_tide_encounter';
 import { HOARD_TIDE_RECOVERY_SEC } from './hoard_tide_pattern';
 import { capRiftNonLethalMechanicDamage } from './ranks';
@@ -275,6 +281,7 @@ function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   clearHoardIceAge(boss, inst.hoardBoss);
   clearHoardPulsars(ctx, inst, boss, inst.hoardBoss);
   clearHoardForgeHammer(inst.hoardBoss);
+  clearHoardTentacles(ctx, inst, boss, inst.hoardBoss);
   delete inst.hoardBoss;
   for (const player of instancePlayers(ctx, inst)) {
     ctx.emit({ type: 'hoardBossCueClear', pid: player.id });
@@ -506,6 +513,9 @@ function tickSpecialKit(
       spawnHealingTideTotem(ctx, inst, boss, state);
     }
     tickHealingTideTotem(ctx, boss, state);
+    // After the totem, so his health threshold is answered first: the tether it
+    // lays keeps the tentacles down until the totem is dealt with.
+    tickHoardTentacles(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
   }
 }
 
@@ -822,6 +832,10 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     if (isForgeHammerCue(cue)) {
       if (tickHoardForgeHammerCue(ctx, inst, boss, state, cue, forgePlayers, emitCue))
         live.push(cue);
+      continue;
+    }
+    if (isTentacleCue(cue)) {
+      if (tickHoardTentacleCue(cue)) live.push(cue);
       continue;
     }
     if (isPulsarCue(cue)) {

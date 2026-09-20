@@ -405,6 +405,7 @@ describe('the density model covers the shipped world', () => {
       .sort();
     expect(noXp).toEqual([
       'dragonkin_egg',
+      'hoard_abyssal_tentacle',
       'hoard_bound_pulsar',
       'hoard_brood_egg',
       'hoard_healing_tide_totem',

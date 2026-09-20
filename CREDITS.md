@@ -430,6 +430,14 @@ something this file marks as restricted, ask first: tony@levystreet.com.
   mesh, texture or reference image is used.
   Source and provenance: `docs/design/forge-hammer/README.md`.
 
+### Tentacles of the Abyss (the Abyssal Maw's tentacles)
+
+- `public/vfx/tentacles/{tentacle,trunk}.glb`: original procedural Blender art
+  authored for this project (the Abyssal Maw's tentacle: one instanced segment, its
+  tip, the heaved flagstones and pool, and the attackable mob's root collar). No
+  third-party mesh, texture or reference image.
+  Source and provenance: `docs/design/tentacles/README.md`.
+
 ### Buried Hoard reward chest
 
 - `public/models/props/hoard_reward_chest.glb`: original procedural Blender art

@@ -138,6 +138,36 @@ export const HOARD_MOBS: Record<string, MobTemplate> = {
     // move cannot be terrain-pinned: opt it out.
     phasesThroughObstacles: true,
   },
+  // One of the Abyssal Maw's tentacles (src/sim/rift/hoard_tentacles.ts): it
+  // breaks the floor, lashes and sweeps from where it rose, and stops only when
+  // the party cuts it down. Its health is set from the boss's own when it erupts,
+  // so these numbers are only a floor. It never moves and never swings: every
+  // hit it lands is the mechanic's.
+  hoard_abyssal_tentacle: {
+    id: 'hoard_abyssal_tentacle',
+    // Display name only: "Abyssal Tentacle" is a well known RuneScape item
+    // (docs/design/naming-audit.md), so it is named for its owner instead.
+    name: 'Tentacle of the Maw',
+    minLevel: 18,
+    maxLevel: 23,
+    family: 'beast',
+    hpBase: 60,
+    hpPerLevel: 6,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 99,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0x2f6f78,
+    xpMult: 0,
+    idleStationary: true,
+    untameable: true,
+    // Rooted where it rose, so it can never be terrain-pinned (see the pulsar).
+    phasesThroughObstacles: true,
+  },
 };
 
 // Shared summoned adds (referenced by bosses' summonAdds.mobId). Low HP, no loot.

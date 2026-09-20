@@ -3682,6 +3682,19 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.9,
     clickRadius: 2,
   },
+  // The Abyssal Maw's tentacle (src/sim/rift/hoard_tentacles.ts). This body is
+  // only the ROOT COLLAR it grows out of, so targeting, the nameplate and the
+  // health bar are the ordinary ones; the living tentacle, bent every frame, is
+  // drawn over it by src/render/hoard_tentacles.ts. Original Blender art
+  // (docs/design/tentacles/), no clips, so it uses the static prop lane. The
+  // click volume is the standing tentacle's, not the collar's.
+  mob_abyssal_tentacle: {
+    url: 'vfx/tentacles/trunk.glb',
+    height: 1.5,
+    clips: STATIC_PROP,
+    selfIllumination: 0.12,
+    clickRadius: 2.2,
+  },
   // Bone Spike (the Nythraxis raid, src/sim/nythraxis_bone_spike.ts): the
   // Tripo cluster of bone spikes erupting from cracked flagstones with violet
   // tips that pins an impaled raider until the raid shatters it. A stationary
@@ -3895,6 +3908,7 @@ const MOB_KEYS: Record<string, string> = {
   hoard_brood_egg: 'mob_spider_egg_sac',
   hoard_healing_tide_totem: 'mob_healing_tide_totem',
   hoard_bound_pulsar: 'mob_bound_pulsar',
+  hoard_abyssal_tentacle: 'mob_abyssal_tentacle',
   // Broodmother clutch (q_broodmother): the destructible eggs reuse the egg-sac
   // model (not a live spider), and the hatchling is a small spider.
   spider_egg: 'mob_spider_egg_sac',

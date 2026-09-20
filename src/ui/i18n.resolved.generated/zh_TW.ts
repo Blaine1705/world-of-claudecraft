@@ -18094,6 +18094,9 @@ export const zh_TW: EnTranslations = {
       "hoard_bound_pulsar": {
         "name": "受縛脈衝星"
       },
+      "hoard_abyssal_tentacle": {
+        "name": "深淵之喉的觸手"
+      },
       "rift_spawnling": {
         "name": "裂隙孽生體"
       },

@@ -18094,6 +18094,9 @@ export const en_XA: EnTranslations = {
       "hoard_bound_pulsar": {
         "name": "[Ɓóúñð Þúļšáŕ]"
       },
+      "hoard_abyssal_tentacle": {
+        "name": "[Ţéñţáçļé óƒ ţĥé Ɱáŵ]"
+      },
       "rift_spawnling": {
         "name": "[Ŕíƒţ Šþáŵñļíñĝ]"
       },

@@ -9526,6 +9526,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.hoard_brood_hatchling.name': '维斯卡的幼蛛',
   'entities.mobs.hoard_healing_tide_totem.name': '治疗之潮图腾',
   'entities.mobs.hoard_bound_pulsar.name': '受缚脉冲星',
+  'entities.mobs.hoard_abyssal_tentacle.name': '深渊之喉的触手',
   'entities.mobs.rift_spawnling.name': '裂隙孽生体',
   'entities.mobs.rift_bonewalker.name': '复生骨行者',
   'entities.mobs.rift_frost_revenant.name': '霜缚亡魂',

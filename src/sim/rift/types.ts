@@ -396,7 +396,11 @@ export type HoardBossCueVariant =
   | 'arcane-pulsar-lock'
   | 'arcane-pulsar-beam'
   | 'ember-hammer'
-  | 'ember-hammer-strike';
+  | 'ember-hammer-strike'
+  | 'tide-tentacle'
+  | 'tide-tentacle-fall'
+  | 'tide-whip'
+  | 'tide-sweep';
 
 export type HoardBossCue =
   | {
@@ -451,6 +455,7 @@ export interface HoardBossState {
   iceAge?: import('./hoard_ice_age').HoardIceAgeState;
   pulsars?: import('./hoard_pulsars').HoardPulsarState;
   forgeHammer?: import('./hoard_forge_hammer').HoardForgeHammerState;
+  tentacles?: import('./hoard_tentacles').HoardTentacleState;
   /** Storm Surge (src/sim/rift/hoard_storm_surge.ts): Vharok's stacks while he
    *  stands in his own charged ground, and the size he returns to. */
   stormSurgeStacks?: number;

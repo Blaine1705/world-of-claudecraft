@@ -10117,6 +10117,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.hoard_brood_hatchling.name': 'Детёныш Висски',
   'entities.mobs.hoard_healing_tide_totem.name': 'Тотем целительного прилива',
   'entities.mobs.hoard_bound_pulsar.name': 'Скованный пульсар',
+  'entities.mobs.hoard_abyssal_tentacle.name': 'Щупальце Пасти',
   'entities.mobs.rift_spawnling.name': 'Отпрыск Разлома',
   'entities.mobs.rift_bonewalker.name': 'Восставший Костоход',
   'entities.mobs.rift_frost_revenant.name': 'Скованный Морозом Возвращенец',

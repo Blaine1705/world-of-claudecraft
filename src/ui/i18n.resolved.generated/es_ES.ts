@@ -18094,6 +18094,9 @@ export const es_ES: EnTranslations = {
       "hoard_bound_pulsar": {
         "name": "Bound Pulsar"
       },
+      "hoard_abyssal_tentacle": {
+        "name": "Tentacle of the Maw"
+      },
       "rift_spawnling": {
         "name": "Cría de la Brecha"
       },

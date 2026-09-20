@@ -6,6 +6,7 @@ import { HOARD_BRUTE_COMBO } from '../sim/rift/hoard_boss_kits';
 import { isForgeHammerVariant } from '../sim/rift/hoard_forge_hammer_core';
 import { isIceAgeVariant } from '../sim/rift/hoard_ice_age_core';
 import { isPulsarVariant } from '../sim/rift/hoard_pulsars_core';
+import { isTentacleVariant } from '../sim/rift/hoard_tentacles_core';
 import { vaultSeedZone } from '../sim/rift/vault_seed';
 import type { HoardBossCueView } from '../world_api/dungeons';
 import { attachSceneGroupGated } from './gated_scene_attach';
@@ -543,7 +544,8 @@ export class HoardBossFx {
         isBoneReaperVariant(cue.variant) ||
         isIceAgeVariant(cue.variant) ||
         isPulsarVariant(cue.variant) ||
-        isForgeHammerVariant(cue.variant)
+        isForgeHammerVariant(cue.variant) ||
+        isTentacleVariant(cue.variant)
       )
         continue;
       const key = `${cue.instanceId}:${cue.cueId}`;
