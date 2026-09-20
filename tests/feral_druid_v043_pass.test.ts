@@ -1,7 +1,7 @@
 // The v0.43 Wildfang pass, one suite per change:
 //   1. every melee attack a feral druid makes reaches 1 yd further
 //   2. Slinkstrike and Lunge each bank 1 Old Blood (cap 3)
-//   3. Nature's Boon: a landed autoattack has a 10% chance to arm one free
+//   3. Nature's Boon: a landed autoattack has a 1-in-15 chance to arm one free
 //      Wildbloom (any form) OR Oakhide (Bruin only) for 10 sec, 25% stronger
 //   4. Savage Mending is a Bruin AND Cat button
 import { readFileSync } from 'node:fs';
@@ -33,14 +33,20 @@ import {
   effectivePlayerAttackRange,
   RAID_BOSS_PLAYER_MELEE_RANGE,
 } from '../src/sim/combat/player_attack_reach';
+import { talentsFor } from '../src/sim/content/talents';
 import { ABILITIES, MOBS } from '../src/sim/data';
-import { createMob } from '../src/sim/entity';
+import { createMob, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
 import { IGNIVAR_BOSS_ID, MELEE_RANGE } from '../src/sim/types';
 import { makeSlotState } from '../src/ui/hud/action_bar/action_bar_view';
 
 type Spec = 'balance' | 'feral' | 'restoration';
+
+/** Exact number of windows 600 landed autos arm through the real 1-in-15 roll
+ *  for the seed-43 rig below (see the rate pin in suite 3). Re-measure only when
+ *  the rig's draw order changes, never to make a drifted rate pass. */
+const RATE_PIN_ARMS_AT_SEED_43 = 41;
 
 function rig(spec: Spec) {
   const sim = new Sim({ seed: 43, playerClass: 'druid', autoEquip: true });
@@ -108,7 +114,7 @@ function shiftInto(sim: Sim, formAbilityId: 'bear_form' | 'cat_form'): void {
   sim.player.resource = sim.player.maxResource;
 }
 
-/** Arm the window through the REAL hook with the 10% roll forced, in exactly
+/** Arm the window through the REAL hook with the 1-in-15 roll forced, in exactly
  *  one call and without drawing rng. Looping the hook until it happens would
  *  work too, but every failed roll advances the shared stream and so changes
  *  what the spell cast afterwards rolls on the hit table. */
@@ -212,6 +218,17 @@ describe('1. Wildfang reach: +1 yd on melee attacks', () => {
     balance.sim.castAbility('claw');
     for (let tick = 0; tick < 4; tick++) balance.sim.tick();
     expect(balanceMob.hp).toBe(balanceHpBefore);
+
+    // Positive control for the balance rig: the same druid, same button, a
+    // half yard INSIDE ordinary melee range does land, so the miss above is the
+    // missing reach and not the pushed form aura or the mana pool.
+    const control = rig('balance');
+    control.player.auras.push(formAura(control.player, 'form_cat'));
+    const controlMob = spawnMob(control.sim, MELEE_RANGE - 0.5);
+    const controlHpBefore = controlMob.hp;
+    control.sim.castAbility('claw');
+    for (let tick = 0; tick < 4; tick++) control.sim.tick();
+    expect(controlMob.hp).toBeLessThan(controlHpBefore);
   });
 });
 
@@ -266,6 +283,18 @@ describe("3. Nature's Boon", () => {
     expect([...NATURES_BOON_ABILITIES].sort()).toEqual(['barkskin', 'rejuvenation']);
   });
 
+  it('advertises the shipped numbers in the Wildfang spec description', () => {
+    // The spec text is the one place a player reads the passive, so its four
+    // numbers are pinned to the constants that drive it rather than typed twice.
+    const feral = talentsFor('druid')?.specs.find((spec) => spec.id === 'feral');
+    expect(feral).toBeDefined();
+    const text = feral?.description ?? '';
+    expect(text).toContain(`Reaches ${FERAL_MELEE_REACH_BONUS} yd further`);
+    expect(text).toContain(`about every ${Math.round(1 / NATURES_BOON_CHANCE)} sec`);
+    expect(text).toContain(`for ${NATURES_BOON_DURATION} sec`);
+    expect(text).toContain(`${Math.round((NATURES_BOON_POWER - 1) * 100)}% stronger`);
+  });
+
   it('recognizes an armed window for either spell and nothing else', () => {
     const armed = [
       {
@@ -307,6 +336,31 @@ describe("3. Nature's Boon", () => {
       naturesBoonOnAutoAttack(ctx, player);
     });
     expect(draws).toBe(1);
+  });
+
+  it('arms at the 1-in-15 rate through the real roll (an exact seeded count)', () => {
+    // The constant pin above says what the rate SHOULD be; this pins what the
+    // hook actually rolls. 600 landed autos through the real hook and the real
+    // seeded rng, each armed window cleared so the next proc is a fresh arm.
+    // The count is exact for seed 43, and it separates the shipped 1-in-15
+    // from both neighbours: the same stream arms 61 times at 1-in-10 and 33
+    // at 1-in-20, so a drifted threshold reds this even when every other
+    // test (which forces the roll through armBoon) stays green.
+    const { sim, player } = rig('feral');
+    const ctx = rawCtx(sim);
+    const swings = 600;
+    let armed = 0;
+    for (let swing = 0; swing < swings; swing++) {
+      naturesBoonOnAutoAttack(ctx, player);
+      const index = player.auras.findIndex((entry) => entry.id === NATURES_BOON_ID);
+      if (index < 0) continue;
+      armed++;
+      player.auras.splice(index, 1);
+    }
+    expect(armed).toBe(RATE_PIN_ARMS_AT_SEED_43);
+    // Sanity on the band, so a future re-seed lands the new exact count near
+    // the expectation rather than on a silently wrong rate.
+    expect(Math.abs(armed - swings * NATURES_BOON_CHANCE)).toBeLessThan(12);
   });
 
   it('draws no rng at all for a player who is not a feral druid', () => {
@@ -353,7 +407,7 @@ describe("3. Nature's Boon", () => {
       },
     ] as Parameters<typeof willAutoUnshift>[0];
     expect(willAutoUnshift(armedBear, ABILITIES.rejuvenation)).toBe(false);
-    // Lunar Tempest left the window, so it unshifts as it always did.
+    // Lunar Tempest is not a window member, so it unshifts as it always did.
     expect(willAutoUnshift(armedBear, ABILITIES.moonfire)).toBe(true);
     // A spell the window does not name still unshifts.
     expect(willAutoUnshift(armedBear, ABILITIES.wrath)).toBe(true);
@@ -377,6 +431,17 @@ describe("3. Nature's Boon", () => {
     expect(player.auras.some((entry) => entry.kind === 'form_cat')).toBe(true);
     // One window, one cast.
     expect(aura(player, NATURES_BOON_ID)).toBeUndefined();
+
+    // First cast wins: the OTHER member reverts. Oakhide pressed next, from
+    // Bruin Form where the window would have paid for it, bills its full cost
+    // and lands at its plain 20%, not the empowered 25%.
+    shiftInto(sim, 'bear_form');
+    player.resource = player.maxResource;
+    const rageBefore = player.resource;
+    sim.castAbility('barkskin');
+    for (let tick = 0; tick < 3; tick++) sim.tick();
+    expect(player.resource).toBe(rageBefore - ABILITIES.barkskin.cost);
+    expect(player.auras.find((entry) => entry.kind === 'buff_armor_pct')?.value).toBe(20);
   });
 
   it('leaves the unarmed behavior exactly as it was: Wildbloom drops Cat Form', () => {
@@ -542,7 +607,7 @@ describe('5. Stalk enters Cat Form from anywhere', () => {
 describe("Nature's Boon rolls on auto-attacks only", () => {
   it('costs no extra rng draw on an ability swing', () => {
     // The opts.autoAttack gate in combat/auto_attack.ts is the one thing that
-    // keeps every weaponStrike ability from rolling the 10%: Claw resolves
+    // keeps every weaponStrike ability from rolling the 1-in-15: Claw resolves
     // through the SAME meleeSwing shell that arms the passive.
     const { sim, player } = rig('feral');
     shiftInto(sim, 'cat_form');
@@ -873,6 +938,22 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
     expect(player.auras.some((a) => a.kind === 'buff_armor_pct')).toBe(true);
     expect(player.resource).toBe(rageBefore);
     expect(aura(player, NATURES_BOON_ID)).toBeUndefined();
+
+    // First cast wins: Wildbloom pressed next is an ordinary Wildbloom again.
+    // With no window it can no longer be cast FROM Bruin Form (the auto-unshift
+    // stands back up and drops the form), and its tick is the plain one, not
+    // the empowered one.
+    const plain = rig('feral');
+    plain.sim.castAbility('rejuvenation');
+    plain.sim.tick();
+    const plainTick = plain.player.auras.find((a) => a.id === 'rejuvenation')?.value ?? 0;
+    expect(plainTick).toBeGreaterThan(0);
+
+    for (let tick = 0; tick < 40; tick++) sim.tick();
+    sim.castAbility('rejuvenation');
+    sim.tick();
+    expect(player.auras.some((a) => a.kind === 'form_bear')).toBe(false);
+    expect(player.auras.find((a) => a.id === 'rejuvenation')?.value).toBe(plainTick);
   });
 
   it('never pays for Oakhide out of Bruin Form, and never spends the window', () => {
@@ -894,23 +975,54 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
 });
 
 describe('13. An armed window makes its spell 25% stronger', () => {
-  it('scales Wildbloom by a quarter', () => {
-    const plain = rig('feral');
-    plain.player.resource = plain.player.maxResource;
+  // Both arms run at a GEARED heal power, deliberately: the hot arm adds a
+  // Spell Power rider on top of the authored base, and a multiplier that only
+  // reached the base would read as 25% at zero heal power and shrink as gear
+  // grew (a level-20 rig with no heal power cannot tell the two apart). The
+  // printed 25% has to reach the whole tick.
+  // Heal power is DERIVED (entity.ts recalcPlayerStats: Intellect times the
+  // per-point rate, plus gear) and recalculated on the way through a cast, so a
+  // value pushed onto the entity does not survive; a feral druid's own leather
+  // carries almost none. A large Intellect buff is the lever the recalc keeps.
+  const GEARED_HEAL_POWER_FLOOR = 100;
+
+  function gearedRig() {
+    const { sim, player } = rig('feral');
+    player.auras.push({ ...formAura(player, 'buff_int'), id: 'test_geared_int', value: 2000 });
+    const meta = rawCtx(sim).players.get(player.id);
+    recalcPlayerStats(
+      player,
+      'druid',
+      meta.equipment,
+      rawCtx(sim).playerMods(meta),
+      meta.equipmentInstance,
+    );
+    player.resource = player.maxResource;
+    return { sim, player };
+  }
+
+  it('scales Wildbloom by a quarter, Spell Power rider included', () => {
+    const plain = gearedRig();
     plain.sim.castAbility('rejuvenation');
     plain.sim.tick();
     const plainTick = plain.player.auras.find((a) => a.id === 'rejuvenation')?.value ?? 0;
     expect(plainTick).toBeGreaterThan(0);
 
-    const boon = rig('feral');
+    const boon = gearedRig();
     armBoon(boon.sim);
     boon.player.resource = boon.player.maxResource;
     boon.sim.castAbility('rejuvenation');
     boon.sim.tick();
     const boonTick = boon.player.auras.find((a) => a.id === 'rejuvenation')?.value ?? 0;
 
+    // Both arms really carried a rider-sized heal power into the tick.
+    expect(plain.player.healPower).toBeGreaterThanOrEqual(GEARED_HEAL_POWER_FLOOR);
+    expect(boon.player.healPower).toBe(plain.player.healPower);
     expect(boonTick).toBeGreaterThan(plainTick);
+    // The rider is most of the tick at this heal power, so a base-only scale
+    // would land near 1.05 here; the band is one rounding step wide.
     expect(boonTick / plainTick).toBeCloseTo(NATURES_BOON_POWER, 1);
+    expect(boonTick).toBe(Math.round(plainTick * NATURES_BOON_POWER));
   });
 
   it('scales Oakhide in Bruin Form, and leaves an unempowered one alone', () => {
