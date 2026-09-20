@@ -58,10 +58,23 @@ interface StationVisual {
   ownedGeometries: THREE.BufferGeometry[];
   /** Flame cones and their authored base scale, for the per-frame flicker. */
   flames: { mesh: THREE.Mesh; base: number; phase: number }[];
+  /** Every station mesh, for the shadow budget. */
+  shadowMeshes: THREE.Mesh[];
+  /** The shadow budget's memo: written only when membership changes. */
+  castsShadow: boolean;
 }
+
+/** How many placed stations may CAST shadows at once (insertion order,
+ *  oldest first; the budget refills as stations despawn). Presence is never
+ *  capped: the station is actionable for its party, so every one in
+ *  interest scope draws; shadow casting is the expensive cosmetic half (a
+ *  shadow-map draw per mesh, and a cluster is up to nine), so it is the
+ *  half that sheds in a packed hub. The feast's FEAST_SHADOW_CAP twin. */
+export const MOBILE_STATION_SHADOW_CAP = 8;
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const FLICKER_SPEED = 9;
+const TWO_PI = Math.PI * 2;
 
 function ignoreRetiredAttach(error: unknown): void {
   if (!(error instanceof GatedSceneAttachCancelledError)) throw error;
@@ -100,11 +113,26 @@ export class MobileStationVisuals {
     for (const [id, visual] of this.stations) {
       if (!this.seen.has(id)) this.remove(id, visual);
     }
+    this.applyShadowBudget();
+  }
+
+  /** Re-derives which stations cast shadows (the first
+   *  MOBILE_STATION_SHADOW_CAP in insertion order). Runs on the throttled
+   *  read only; writes nothing when membership has not changed. */
+  private applyShadowBudget(): void {
+    let budget = MOBILE_STATION_SHADOW_CAP;
+    for (const visual of this.stations.values()) {
+      const cast = budget > 0;
+      if (cast) budget--;
+      if (visual.castsShadow === cast) continue;
+      visual.castsShadow = cast;
+      for (const mesh of visual.shadowMeshes) mesh.castShadow = cast;
+    }
   }
 
   /** Per-frame writes only: the flame flicker. Allocates nothing. */
   update(dt: number): void {
-    this.time += dt;
+    this.time = (this.time + dt) % TWO_PI;
     for (const visual of this.stations.values()) {
       for (const flame of visual.flames) {
         const t = this.time * FLICKER_SPEED + flame.phase;
@@ -119,12 +147,27 @@ export class MobileStationVisuals {
     return [...this.stations.keys()];
   }
 
+  /** Terminal release: every station is removed best-effort (one failing
+   *  geometry release strands nothing after it), the shared lathe and flame
+   *  material are freed in a finally, and the first failure is rethrown
+   *  after the drain (the renderer_resource_lifecycle.ts bestEffort shape). */
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
-    for (const [id, visual] of this.stations) this.remove(id, visual);
-    this.flameGeo.dispose();
-    this.flameMat.dispose();
+    let failure: unknown;
+    try {
+      for (const [id, visual] of this.stations) {
+        try {
+          this.remove(id, visual);
+        } catch (error) {
+          failure ??= error;
+        }
+      }
+    } finally {
+      this.flameGeo.dispose();
+      this.flameMat.dispose();
+    }
+    if (failure !== undefined) throw failure;
   }
 
   private create(e: Entity, seed: number): void {
@@ -133,11 +176,22 @@ export class MobileStationVisuals {
     const group = new THREE.Group();
     group.name = `mobileStation:${e.id}`;
     this.seat(group, e, seed);
-    const ownedGeometries: THREE.BufferGeometry[] = [];
+    const ownedGeometries: StationVisual['ownedGeometries'] = [];
     const flames: StationVisual['flames'] = [];
-    for (const prop of plan) group.add(this.buildProp(prop, e.id, ownedGeometries, flames));
+    const shadowMeshes: StationVisual['shadowMeshes'] = [];
+    for (const prop of plan) {
+      group.add(this.buildProp(prop, e.id, ownedGeometries, flames, shadowMeshes));
+    }
     setRenderCategory(group, 'props');
-    const record: StationVisual = { group, ownedGeometries, flames };
+    // Casting starts OFF; the budget pass at the sync tail turns on the
+    // first MOBILE_STATION_SHADOW_CAP stations.
+    const record: StationVisual = {
+      group,
+      ownedGeometries,
+      flames,
+      shadowMeshes,
+      castsShadow: false,
+    };
     this.stations.set(e.id, record);
     this.attachGated(group, `mobile-station:${e.id}`, () => this.stations.get(e.id) !== record);
   }
@@ -151,6 +205,7 @@ export class MobileStationVisuals {
     entityId: number,
     ownedGeometries: THREE.BufferGeometry[],
     flames: StationVisual['flames'],
+    shadowMeshes: THREE.Mesh[],
   ): THREE.Group {
     const holder = new THREE.Group();
     holder.position.set(prop.dx, 0, prop.dz);
@@ -160,8 +215,9 @@ export class MobileStationVisuals {
     for (const part of stationTemplateParts(prop.kind)) {
       const mesh = new THREE.Mesh(part.geo, part.mat);
       mesh.applyMatrix4(part.local);
-      mesh.castShadow = true;
+      mesh.castShadow = false;
       mesh.receiveShadow = true;
+      shadowMeshes.push(mesh);
       if (!loaded) ownedGeometries.push(part.geo);
       holder.add(mesh);
     }

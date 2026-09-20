@@ -7,7 +7,11 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { ENTITY_GATE_STAND_INS } from '../src/render/entity_gate_stand_in_core';
 import { FarmPatchVisuals, type FarmPlotSource } from '../src/render/farm_patches';
-import { type MobileStationCompileGate, MobileStationVisuals } from '../src/render/mobile_stations';
+import {
+  MOBILE_STATION_SHADOW_CAP,
+  type MobileStationCompileGate,
+  MobileStationVisuals,
+} from '../src/render/mobile_stations';
 import { mobileStationTemplateId } from '../src/sim/professions/mobile_station_object';
 import type { Entity } from '../src/sim/types';
 
@@ -90,6 +94,33 @@ describe('MobileStationVisuals', () => {
     visuals.update(0.05);
     expect(flame.scale.y).not.toBe(before);
     expect(scene.children.length).toBe(childrenBefore);
+  });
+
+  it('caps shadow casters at MOBILE_STATION_SHADOW_CAP, oldest first, refilling on despawn', () => {
+    const scene = new THREE.Scene();
+    const visuals = new MobileStationVisuals(scene);
+    const entities = new Map<number, Entity>();
+    const total = MOBILE_STATION_SHADOW_CAP + 2;
+    for (let id = 1; id <= total; id++) {
+      entities.set(id, station(id, 'laden_hearth', { x: id * 10, y: 0, z: 0 }));
+    }
+    visuals.sync(entities, SEED);
+    const casts = (id: number) => {
+      const group = groupOf(scene, id) as THREE.Group;
+      const meshes: THREE.Mesh[] = [];
+      group.traverse((o) => {
+        if ((o as THREE.Mesh).isMesh) meshes.push(o as THREE.Mesh);
+      });
+      // The flame cone never casts; every station part follows the budget.
+      return meshes.filter((m) => m.castShadow).length > 0;
+    };
+    for (let id = 1; id <= MOBILE_STATION_SHADOW_CAP; id++) expect(casts(id), `${id}`).toBe(true);
+    expect(casts(total - 1)).toBe(false);
+    expect(casts(total)).toBe(false);
+    entities.delete(1);
+    visuals.sync(entities, SEED);
+    expect(casts(total - 1)).toBe(true);
+    expect(casts(total)).toBe(false);
   });
 
   it('re-seats a station whose authoritative position moved', () => {

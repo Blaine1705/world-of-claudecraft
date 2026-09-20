@@ -93,13 +93,17 @@ export const STATION_FLAME_Y = FLAME_Y;
 export const STATION_FLAME_BASE_SCALE = FLAME_BASE_SCALE;
 
 export function stationFlameMaterial(usePbr: boolean): THREE.MeshLambertMaterial {
-  return new THREE.MeshLambertMaterial({
+  const mat = new THREE.MeshLambertMaterial({
     color: 0xffaa33,
     emissive: 0xff6600,
     emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
     transparent: true,
     opacity: 0.92,
   });
+  // Named so a capture's live-program row can name the flame program
+  // (the coach_trail_materials.ts precedent).
+  mat.name = 'stations:flame';
+  return mat;
 }
 
 export function buildStationFlame(geo: THREE.BufferGeometry, usePbr: boolean): THREE.Mesh {
@@ -143,7 +147,17 @@ const stationMatCache = new Map<string, THREE.Material>();
 
 export function resetStationProfileCaches(): void {
   stationMatCache.clear();
+  stationPartsCache.clear();
 }
+
+// The height-normalized parts per kind, memoized once the GLB has loaded:
+// the parts are read-only and shared, and re-deriving them costs a full
+// scene traversal plus a Box3 fit per call, which the placed-station mirror
+// would otherwise pay three times per station in one frame when a hub's
+// stations enter interest scope together. A fallback (not-yet-loaded) answer
+// is never cached: its box geometry is minted per call and owned by the
+// caller.
+const stationPartsCache = new Map<StationPropKind, GlbTemplatePart[]>();
 
 function stationMaterial(src: THREE.Material): THREE.Material {
   const cached = stationMatCache.get(src.uuid);
@@ -170,13 +184,18 @@ export function stationModelLoaded(kind: StationPropKind): boolean {
  *  shared worn-detail material cache. Exported for mobile_stations.ts, so a
  *  PLACED station draws the very same parts and materials as the town one. */
 export function stationTemplateParts(kind: StationPropKind): GlbTemplatePart[] {
+  const cached = stationPartsCache.get(kind);
+  if (cached) return cached;
   // The shared glb_instanced_props kernel (extracted at farming Phase 7 QA on
   // the rule of three); the worn-detail material cache rides mapMaterial.
-  return glbTemplateParts(loadedStationGltf.get(kind), STATION_TARGET_HEIGHT[kind], {
+  const loaded = loadedStationGltf.get(kind);
+  const parts = glbTemplateParts(loaded, STATION_TARGET_HEIGHT[kind], {
     fallbackWidthFactor: 0.7,
     makeFallbackMat: () => surfaceMat({ color: 0x8a6a4a }),
     mapMaterial: stationMaterial,
   });
+  if (loaded) stationPartsCache.set(kind, parts);
+  return parts;
 }
 
 export interface StationPropsView {
