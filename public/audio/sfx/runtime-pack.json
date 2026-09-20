@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "c2016d044a7eac65212b624747d8dc948405e97b7c6bf56c89a20433a39f0590",
-  "catalogHash": "df853d41995ab72113b3ce1aca072eb3f0b875f566de6192f56d9645e21efa30",
+  "bundleId": "e024fd8deeb002104f29b770690a9671f9b41117b005cc50e6a146965eafdbba",
+  "catalogHash": "2f952fc328c3aa8bc6ba0f46ac7d9aa13c461e039bce4079b070e8f03b7ebdc0",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -851,6 +851,54 @@
           "url": "/audio/sfx/hoard_entrance_open.mp3?v=7824ebb0d227",
           "bytes": 41422,
           "sha256": "7824ebb0d227b96f200fd3f5a2c13c30a56bca0ca72fa1cb35c88973c386c5ec"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "hoard_tide_build": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_tide_build.mp3?v=3198ef898ea9",
+          "bytes": 58976,
+          "sha256": "3198ef898ea9627135fb395e6878bce11776d878d26f035096a09beb20153e2e"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "hoard_tide_crash": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_tide_crash.mp3?v=3b489f1ae220",
+          "bytes": 63991,
+          "sha256": "3b489f1ae2207326fd270995f9daa6dc82149fee1aa0621706959049be005299"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "hoard_tide_hit": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_tide_hit.mp3?v=d9a76311c5a6",
+          "bytes": 20733,
+          "sha256": "d9a76311c5a6abd1226bde87f15893c2c59621301a447d116fc5119de2a12c32"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "hoard_tide_rush": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_tide_rush.mp3?v=f09720616fa7",
+          "bytes": 94711,
+          "sha256": "f09720616fa7b6ac9235b09e400ff07da777a852ae505333c2686b7e7cd4a35c"
         }
       ],
       "gain": 1,

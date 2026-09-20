@@ -16,6 +16,14 @@ import {
   pointInHoardAnnulus,
   pointInHoardTideWave,
 } from './hoard_boss_kits';
+import {
+  resolveHoardStormStaticTargets,
+  startHoardStormStatic,
+  tickHoardStormStaticCue,
+} from './hoard_storm_static';
+import { tickHoardTidePattern } from './hoard_tide_encounter';
+import { HOARD_TIDE_RECOVERY_SEC } from './hoard_tide_pattern';
+import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossCueVariant, HoardBossState, RiftInstance } from './types';
 
 export { type HoardBossKit, hoardBossKit } from './hoard_boss_kits';
@@ -140,6 +148,10 @@ export function hoardBossCueViews(inst: RiftInstance) {
     facing: cue.kind === 'sweep' ? cue.facing : undefined,
     halfAngle: cue.kind === 'sweep' ? cue.halfAngle : undefined,
     innerRadius: cue.kind === 'mark' ? cue.innerRadius : undefined,
+    targetId: cue.kind === 'mark' ? cue.targetId : undefined,
+    waveGap: cue.kind === 'sweep' ? cue.waveGap : undefined,
+    waveSpan: cue.kind === 'sweep' ? cue.waveSpan : undefined,
+    waveLead: cue.kind === 'sweep' ? cue.waveLead : undefined,
   }));
 }
 
@@ -177,6 +189,10 @@ function emitCue(ctx: SimContext, inst: RiftInstance, cue: HoardBossCue): void {
       facing: cue.kind === 'sweep' ? cue.facing : undefined,
       halfAngle: cue.kind === 'sweep' ? cue.halfAngle : undefined,
       innerRadius: cue.kind === 'mark' ? cue.innerRadius : undefined,
+      targetId: cue.kind === 'mark' ? cue.targetId : undefined,
+      waveGap: cue.kind === 'sweep' ? cue.waveGap : undefined,
+      waveSpan: cue.kind === 'sweep' ? cue.waveSpan : undefined,
+      waveLead: cue.kind === 'sweep' ? cue.waveLead : undefined,
     });
   }
 }
@@ -422,14 +438,27 @@ function hitPlayersInTideWave(
     if (
       player.dead ||
       cue.hitIds.has(player.id) ||
-      !pointInHoardTideWave(cue, cue.facing, player.pos, cue.radius, cue.remaining, cue.total)
+      !pointInHoardTideWave(
+        cue,
+        cue.facing,
+        player.pos,
+        cue.radius,
+        cue.remaining,
+        cue.total,
+        cue.waveGap,
+        cue.waveSpan,
+        cue.waveLead,
+      )
     )
       continue;
     cue.hitIds.add(player.id);
     ctx.dealDamage(
       boss,
       player,
-      Math.max(1, Math.round(player.maxHp * HOARD_TIDE_WAVE.damageFraction)),
+      capRiftNonLethalMechanicDamage(
+        Math.max(1, Math.round(player.maxHp * HOARD_TIDE_WAVE.damageFraction)),
+        player.maxHp,
+      ),
       false,
       HOARD_TIDE_WAVE.school,
       HOARD_TIDE_WAVE.ability,
@@ -445,6 +474,16 @@ function hitPlayersInTideWave(
       },
     };
     ctx.applyKnockback(waveCenter, player, HOARD_TIDE_WAVE.knockback);
+    ctx.emit({
+      type: 'spellfxAt',
+      x: player.pos.x,
+      z: player.pos.z,
+      school: 'frost',
+      fx: 'nova',
+      ability: 'Crashing Tide',
+      radius: 2,
+      sourceId: boss.id,
+    });
   }
 }
 
@@ -651,19 +690,30 @@ function finishSequence(
     }
   }
   if (cue.variant === 'tide-wave') {
-    if (state.sequenceStep >= 2) {
+    if (state.sequenceStep >= (state.tidePattern?.length ?? 2)) {
       state.sequenceStep = 0;
       state.sweepTimer = TIDE_WAVE_EVERY_SEC;
     } else {
-      state.sequenceTimer = 0.45;
+      state.sequenceTimer = HOARD_TIDE_RECOVERY_SEC;
     }
   }
 }
 
 function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: HoardBossState): void {
   const live: HoardBossCue[] = [];
+  const staticPlayers = state.cues.some((c) => c.variant === 'storm-static')
+    ? instancePlayers(ctx, inst).filter((p) => !p.dead)
+    : [];
+  const staticTargets = staticPlayers.length
+    ? resolveHoardStormStaticTargets(staticPlayers)
+    : undefined;
   for (const cue of state.cues) {
     cue.remaining = Math.max(0, cue.remaining - DT);
+    if (cue.kind === 'mark' && cue.variant === 'storm-static') {
+      tickHoardStormStaticCue(ctx, boss, cue, staticPlayers, staticTargets);
+      if (cue.remaining > 0) live.push(cue);
+      continue;
+    }
     if (cue.kind === 'sweep' && cue.variant === 'tide-tether') {
       const totem = state.totemId === null ? undefined : ctx.entities.get(state.totemId);
       if (!totem || totem.dead || totem.hp <= 0) {
@@ -853,27 +903,6 @@ function tickBrute(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoa
   state.sequenceStep = 1;
 }
 
-function tickTideWaves(
-  ctx: SimContext,
-  inst: RiftInstance,
-  boss: Entity,
-  state: HoardBossState,
-): void {
-  if (state.sequenceStep > 0) {
-    state.sequenceTimer -= DT;
-    if (state.sequenceTimer <= 0 && state.sequenceStep === 1) {
-      startSweep(ctx, inst, boss, state, HOARD_TIDE_WAVE, state.sequenceFacing + Math.PI);
-      state.sequenceStep = 2;
-    }
-    return;
-  }
-  state.sweepTimer -= DT;
-  if (state.sweepTimer > 0) return;
-  state.sequenceFacing = boss.facing;
-  startSweep(ctx, inst, boss, state, HOARD_TIDE_WAVE, state.sequenceFacing);
-  state.sequenceStep = 1;
-}
-
 function tickKit(
   ctx: SimContext,
   inst: RiftInstance,
@@ -888,7 +917,7 @@ function tickKit(
     return;
   }
   if (kit === 'tide') {
-    tickTideWaves(ctx, inst, boss, state);
+    tickHoardTidePattern(ctx, inst, boss, state, emitCue);
     return;
   }
   if (
@@ -903,7 +932,9 @@ function tickKit(
   if (kit === 'storm') {
     state.markTimer -= DT;
     if (state.markTimer <= 0) {
-      startCenteredMark(ctx, inst, boss, state, 'storm-charge');
+      if (state.sequenceStep === 0) startCenteredMark(ctx, inst, boss, state, 'storm-charge');
+      else startHoardStormStatic(ctx, inst, state, living, emitCue);
+      state.sequenceStep = 1 - state.sequenceStep;
       state.markTimer = STORM_EVERY_SEC;
     }
     return;

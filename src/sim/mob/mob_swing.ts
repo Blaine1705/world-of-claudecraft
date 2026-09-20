@@ -24,6 +24,7 @@ import { applyThornsReaction } from '../combat/thorns_charge';
 import { MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { nythraxisGravebreakerOnMobSwing } from '../encounters/nythraxis';
+import { suppressHoardStormShove } from '../rift/hoard_storm_static';
 import type { SimContext } from '../sim_context';
 import {
   type Aura,
@@ -558,6 +559,7 @@ export function runMobSwingAffixes(
     target.kind === 'player' &&
     !target.dead &&
     ctx.rng.chance(knockback.chance) &&
+    !suppressHoardStormShove(ctx, mob) &&
     // escape window: roll drawn, shove skipped (see ensnare above)
     !riftControlSuppressed(ctx, mob)
   ) {

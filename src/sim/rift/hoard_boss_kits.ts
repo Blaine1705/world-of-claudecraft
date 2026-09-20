@@ -86,7 +86,7 @@ export const HOARD_TIDE_WAVE: HoardSweepSpec = {
   radius: 28,
   halfAngle: Math.PI * 0.42,
   windup: 4.2,
-  damageFraction: 0.1,
+  damageFraction: 0.3,
   school: 'frost',
   knockback: 2.2,
   ability: 'Crashing Tide',
@@ -98,11 +98,16 @@ export const HOARD_TIDE_WAVE_HALF_DEPTH = 1.15;
 export const HOARD_TIDE_WAVE_LEAD_SEC = 1;
 
 /** Center of the traveling wave measured along its authored facing. */
-export function hoardTideWaveCenter(radius: number, remaining: number, total: number): number {
+export function hoardTideWaveCenter(
+  radius: number,
+  remaining: number,
+  total: number,
+  lead = HOARD_TIDE_WAVE_LEAD_SEC,
+): number {
   const elapsed = Math.max(0, total - remaining);
-  if (elapsed < HOARD_TIDE_WAVE_LEAD_SEC) return -radius * 0.5 - HOARD_TIDE_WAVE_HALF_DEPTH * 2;
-  const travelDuration = Math.max(0.05, total - HOARD_TIDE_WAVE_LEAD_SEC);
-  const progress = Math.max(0, Math.min(1, (elapsed - HOARD_TIDE_WAVE_LEAD_SEC) / travelDuration));
+  if (elapsed < lead) return -radius * 0.5;
+  const travelDuration = Math.max(0.05, total - lead);
+  const progress = Math.max(0, Math.min(1, (elapsed - lead) / travelDuration));
   return -radius * 0.5 + progress * radius;
 }
 
@@ -114,16 +119,20 @@ export function pointInHoardTideWave(
   radius: number,
   remaining: number,
   total: number,
+  gap = 0,
+  span = HOARD_TIDE_WAVE_HALF_SPAN,
+  lead = HOARD_TIDE_WAVE_LEAD_SEC,
 ): boolean {
+  if (total - remaining < lead || remaining <= 0) return false;
   const dx = point.x - origin.x;
   const dz = point.z - origin.z;
   const along = dx * Math.sin(facing) + dz * Math.cos(facing);
   const lateral = dx * Math.cos(facing) - dz * Math.sin(facing);
-  const center = hoardTideWaveCenter(radius, remaining, total);
+  const center = hoardTideWaveCenter(radius, remaining, total, lead);
   return (
     Math.abs(along - center) <= HOARD_TIDE_WAVE_HALF_DEPTH &&
-    Math.abs(lateral) <= HOARD_TIDE_WAVE_HALF_SPAN &&
-    Math.abs(lateral) >= HOARD_TIDE_WAVE_HALF_GAP
+    Math.abs(lateral) <= span &&
+    Math.abs(lateral - gap) >= HOARD_TIDE_WAVE_HALF_GAP
   );
 }
 

@@ -57,7 +57,7 @@ describe('Buried Hoard boss kit plans', () => {
       HOARD_TIDE_WAVE.windup,
       HOARD_TIDE_WAVE.windup,
     );
-    expect(start).toBeLessThan(-HOARD_TIDE_WAVE.radius * 0.5);
+    expect(start).toBe(-HOARD_TIDE_WAVE.radius * 0.5);
     expect(
       pointInHoardTideWave(
         origin,
@@ -67,7 +67,7 @@ describe('Buried Hoard boss kit plans', () => {
         HOARD_TIDE_WAVE.windup,
         HOARD_TIDE_WAVE.windup,
       ),
-    ).toBe(true);
+    ).toBe(false);
     const afterLead = HOARD_TIDE_WAVE.windup - HOARD_TIDE_WAVE_LEAD_SEC - 0.4;
     const center = hoardTideWaveCenter(HOARD_TIDE_WAVE.radius, afterLead, HOARD_TIDE_WAVE.windup);
     expect(

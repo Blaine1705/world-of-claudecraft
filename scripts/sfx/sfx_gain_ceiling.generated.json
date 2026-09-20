@@ -631,6 +631,50 @@
       }
     ]
   },
+  "hoard_tide_build": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "hoard_tide_build.mp3",
+        "sha256": "3198ef898ea9627135fb395e6878bce11776d878d26f035096a09beb20153e2e",
+        "size": 58976,
+        "peakDb": -6.1
+      }
+    ]
+  },
+  "hoard_tide_crash": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "hoard_tide_crash.mp3",
+        "sha256": "3b489f1ae2207326fd270995f9daa6dc82149fee1aa0621706959049be005299",
+        "size": 63991,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "hoard_tide_hit": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "hoard_tide_hit.mp3",
+        "sha256": "d9a76311c5a6abd1226bde87f15893c2c59621301a447d116fc5119de2a12c32",
+        "size": 20733,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "hoard_tide_rush": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "hoard_tide_rush.mp3",
+        "sha256": "f09720616fa7b6ac9235b09e400ff07da777a852ae505333c2686b7e7cd4a35c",
+        "size": 94711,
+        "peakDb": -6.1
+      }
+    ]
+  },
   "ice_block": {
     "ceilingDb": 6.3,
     "tracks": [

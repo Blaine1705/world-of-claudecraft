@@ -236,7 +236,7 @@ describe('Buried Hoard boss actionable cues', () => {
     const wave = object(root, 'hoard-boss-traveling-tide');
     visuals.update(0.1);
     expect(wave.visible).toBe(true);
-    expect(wave.children[0].position.z).not.toBe(0);
+    expect(object(wave, 'hoard-tide-crest-0').position.z).not.toBe(0);
 
     visuals.sync([
       cue({

@@ -62,6 +62,10 @@ export interface HoardBossCueView {
   facing?: number;
   halfAngle?: number;
   innerRadius?: number;
+  waveGap?: number;
+  waveSpan?: number;
+  waveLead?: number;
+  targetId?: number;
 }
 
 export interface IWorldDungeons {

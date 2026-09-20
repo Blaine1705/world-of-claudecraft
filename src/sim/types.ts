@@ -7880,6 +7880,10 @@ export type SimEvent = { pid?: number } & (
         facing?: number;
         halfAngle?: number;
         innerRadius?: number;
+        waveGap?: number;
+        waveSpan?: number;
+        waveLead?: number;
+        targetId?: number;
       }>;
       // Epoch-ms deadline (via ctx.lockoutNowMs, the same conversion
       // rift/persistence.ts uses for save/load) after which the rift's backing
@@ -8161,6 +8165,10 @@ export type SimEvent = { pid?: number } & (
       facing?: number;
       halfAngle?: number;
       innerRadius?: number;
+      waveGap?: number;
+      waveSpan?: number;
+      waveLead?: number;
+      targetId?: number;
     }
   | { type: 'hoardBossCueClear'; pid: number }
   // Trend nudge (Professions 2.0): a soft, at-most-once-per-window

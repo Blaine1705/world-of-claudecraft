@@ -1,19 +1,14 @@
 import * as THREE from 'three';
+import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
 import { HOARD_SWEEP_HALF_ANGLE, HOARD_SWEEP_RANGE } from '../sim/rift/hoard_boss';
-import {
-  HOARD_BRUTE_COMBO,
-  HOARD_TIDE_WAVE_HALF_DEPTH,
-  HOARD_TIDE_WAVE_HALF_GAP,
-  HOARD_TIDE_WAVE_HALF_SPAN,
-} from '../sim/rift/hoard_boss_kits';
+import { HOARD_BRUTE_COMBO } from '../sim/rift/hoard_boss_kits';
+import { vaultSeedZone } from '../sim/rift/vault_seed';
 import type { HoardBossCueView } from '../world_api/dungeons';
 import { attachSceneGroupGated } from './gated_scene_attach';
-import {
-  type HoardCuePalette,
-  hoardCueAppearance,
-  hoardCueVisualPlan,
-  hoardTideWaveOffset,
-} from './hoard_boss_fx_core';
+import { GFX } from './gfx';
+import { type HoardCuePalette, hoardCueAppearance, hoardCueVisualPlan } from './hoard_boss_fx_core';
+import { createHoardTideWaveResources, type HoardTideWaveView } from './hoard_tide_wave_fx';
+import { hoardTideThemeTint } from './hoard_tide_wave_fx_core';
 import {
   buildIgnivarFrontalTelegraph,
   syncIgnivarFrontalTelegraph,
@@ -29,7 +24,9 @@ interface CueSlot {
   bruteSweeps: THREE.Group[];
   genericSweep: THREE.Group;
   wave: THREE.Group;
-  waveFront: THREE.Group;
+  waveView: HoardTideWaveView;
+  waveTail: boolean;
+  observedAt: number;
   tether: THREE.Group;
   tetherBeam: THREE.Mesh;
   tetherRing: THREE.Mesh;
@@ -253,6 +250,7 @@ function writeSlash(
 
 /** Pooled, terrain-draped presentation for the Hoard boss's actionable cues. */
 export class HoardBossFx {
+  private readonly tideResources = createHoardTideWaveResources();
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
   private readonly slots: CueSlot[] = [];
@@ -344,23 +342,11 @@ export class HoardBossFx {
       ...Object.values(this.riderMaterials),
     ];
 
-    const waveLaneWidth = HOARD_TIDE_WAVE_HALF_SPAN - HOARD_TIDE_WAVE_HALF_GAP;
-    const waveLaneGeo = new THREE.PlaneGeometry(waveLaneWidth, HOARD_TIDE_WAVE_HALF_DEPTH * 2);
-    const waveCrestGeo = new THREE.PlaneGeometry(waveLaneWidth, 1.8);
-    const waveFoamGeo = new THREE.BoxGeometry(waveLaneWidth, 0.1, 0.16);
     const tetherBeamGeo = new THREE.BoxGeometry(0.18, 0.12, 1);
     const tetherRingGeo = new THREE.TorusGeometry(1.1, 0.1, 6, 24);
     const tetherColumnGeo = new THREE.CylinderGeometry(0.32, 0.62, 2.8, 8, 1, true);
     const sharedRiderGeo = riderGeometry();
-    this.geometries.push(
-      waveLaneGeo,
-      waveCrestGeo,
-      waveFoamGeo,
-      tetherBeamGeo,
-      tetherRingGeo,
-      tetherColumnGeo,
-      sharedRiderGeo,
-    );
+    this.geometries.push(tetherBeamGeo, tetherRingGeo, tetherColumnGeo, sharedRiderGeo);
 
     const sweepTemplate = buildIgnivarFrontalTelegraph({
       range: HOARD_SWEEP_RANGE,
@@ -408,22 +394,22 @@ export class HoardBossFx {
 
       const wave = new THREE.Group();
       wave.name = 'hoard-boss-traveling-tide';
-      const waveFront = new THREE.Group();
-      for (const side of [-1, 1]) {
-        const laneCenter = side * (HOARD_TIDE_WAVE_HALF_GAP + waveLaneWidth * 0.5);
-        const wash = new THREE.Mesh(waveLaneGeo, tideFill);
-        wash.rotation.x = -Math.PI / 2;
-        wash.position.set(laneCenter, 0.12, 0);
-        const crest = new THREE.Mesh(waveCrestGeo, tideEdge);
-        crest.position.set(laneCenter, 0.95, 0);
-        const foam = new THREE.Mesh(waveFoamGeo, tideEdge);
-        foam.position.set(laneCenter, 0.2, HOARD_TIDE_WAVE_HALF_DEPTH);
-        const spray = new THREE.Points(sharedRiderGeo, this.riderMaterials.tide);
-        spray.scale.set(waveLaneWidth * 0.5, 2.2, HOARD_TIDE_WAVE_HALF_DEPTH);
-        spray.position.set(laneCenter, 0.25, 0);
-        waveFront.add(wash, crest, foam, spray);
-      }
-      wave.add(waveFront);
+      const profile = resolveUiEffectsProfile({
+        presetLabel: GFX.tier,
+        effectsQuality: 1,
+        reduceMotion: false,
+      });
+      const waveView = this.tideResources.createView(profile.tier !== 'low', (x, z) => {
+        const facing = wave.rotation.y;
+        return (
+          this.groundY(
+            group.position.x + Math.cos(facing) * x + Math.sin(facing) * z,
+            group.position.z - Math.sin(facing) * x + Math.cos(facing) * z,
+          ) - group.position.y
+        );
+      });
+      waveView.root.visible = true;
+      wave.add(waveView.root);
 
       const tether = new THREE.Group();
       tether.name = 'hoard-healing-tide-link';
@@ -475,7 +461,9 @@ export class HoardBossFx {
         bruteSweeps,
         genericSweep,
         wave,
-        waveFront,
+        waveView,
+        waveTail: false,
+        observedAt: 0,
         tether,
         tetherBeam,
         tetherRing,
@@ -505,6 +493,7 @@ export class HoardBossFx {
 
   sync(cues: readonly HoardBossCueView[]): void {
     const seen = new Set<string>();
+    const now = performance.now();
     for (const cue of cues) {
       const key = `${cue.instanceId}:${cue.cueId}`;
       seen.add(key);
@@ -518,12 +507,17 @@ export class HoardBossFx {
         slot.key = key;
         slot.serial = ++this.serial;
         slot.terrainSignature = '';
+        slot.waveTail = false;
       }
       slot.cue = { ...cue };
+      slot.observedAt = now;
       this.syncSlot(slot);
     }
     for (const slot of this.slots) {
       if (!slot.cue || seen.has(slot.key)) continue;
+      slot.waveTail =
+        slot.cue.variant === 'tide-wave' &&
+        slot.cue.remaining - (now - slot.observedAt) / 1000 <= 0.06;
       slot.cue = null;
       slot.key = '';
       slot.terrainSignature = '';
@@ -531,10 +525,22 @@ export class HoardBossFx {
     }
   }
 
+  setTheme(seed: number | undefined): void {
+    this.tideResources.bodyMat.color.setHex(
+      hoardTideThemeTint(seed === undefined ? null : vaultSeedZone(seed)),
+    );
+  }
+
   update(_dt: number): void {
     for (const slot of this.slots) {
       const cue = slot.cue;
-      if (!cue) continue;
+      if (!cue) {
+        if (slot.waveTail) {
+          slot.waveTail = slot.waveView.finish(_dt);
+          slot.group.visible = slot.waveTail;
+        }
+        continue;
+      }
       const elapsed = Math.max(0, cue.total - cue.remaining);
       const plan = hoardCueVisualPlan(cue.remaining, cue.total, elapsed);
       const appearance = hoardCueAppearance(cue);
@@ -552,13 +558,7 @@ export class HoardBossFx {
           const pulse = plan.pulseScale * (0.94 + plan.progress * 0.06);
           slot.genericSweep.scale.set(pulse, 1, pulse);
         } else if (appearance.shape === 'wave') {
-          const offset = hoardTideWaveOffset(cue);
-          slot.waveFront.position.z = offset;
-          const facing = cue.facing ?? 0;
-          const worldX = cue.x + Math.sin(facing) * offset;
-          const worldZ = cue.z + Math.cos(facing) * offset;
-          slot.waveFront.position.y = this.groundY(worldX, worldZ) - this.groundY(cue.x, cue.z);
-          slot.waveFront.scale.y = 1 + Math.sin(elapsed * 8) * 0.12;
+          slot.waveView.update(cue, _dt);
         } else if (appearance.shape === 'tether') {
           const pulse = 1 + Math.sin(elapsed * Math.PI * 2) * 0.12;
           slot.tetherRing.scale.setScalar(pulse);
@@ -586,13 +586,15 @@ export class HoardBossFx {
     if (this.disposed) return;
     this.disposed = true;
     this.root.removeFromParent();
+    for (const slot of this.slots) slot.waveView.dispose();
+    this.tideResources.dispose();
     for (const ownedGeometry of this.geometries) ownedGeometry.dispose();
     for (const ownedMaterial of this.materials) ownedMaterial.dispose();
   }
 
   private syncSlot(slot: CueSlot): void {
     const cue = slot.cue;
-    slot.group.visible = cue !== null;
+    slot.group.visible = cue !== null || slot.waveTail;
     if (!cue) return;
     const centerY = this.groundY(cue.x, cue.z);
     slot.group.position.set(cue.x, centerY, cue.z);
@@ -641,6 +643,7 @@ export class HoardBossFx {
         (slot.genericSweep.children[1] as THREE.Mesh).material = palette[1];
       } else if (appearance.shape === 'wave') {
         slot.wave.rotation.y = cue.facing ?? 0;
+        slot.waveView.invalidateGround();
       } else if (appearance.shape === 'tether') {
         slot.tether.rotation.y = cue.facing ?? 0;
         slot.tetherBeam.position.z = cue.radius * 0.5;

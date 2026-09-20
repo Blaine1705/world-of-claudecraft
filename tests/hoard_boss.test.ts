@@ -568,13 +568,12 @@ describe('Buried Hoard boss encounter', () => {
     );
   });
 
-  it('sends two opposing Abyssal waves and stops healing when the totem dies', () => {
+  it('sends two distinct Abyssal waves and stops healing when the totem dies', () => {
     const { sim, inst, boss } = makeEncounter('rift_boss_tide');
     tickHoardBossMechanics(sim.ctx);
     sim.drainEvents();
     hoardState(inst).sweepTimer = 0;
     sim.player.pos.x = boss.pos.x + 4;
-    const hpBeforeWaves = sim.player.hp;
     const firstEvents = tickMechanic(sim, DT);
     const firstWave = firstEvents.find(
       (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
@@ -584,17 +583,15 @@ describe('Buried Hoard boss encounter', () => {
     tickHoardBossMechanics(sim.ctx);
     expect(hoardState(inst).totemId).toBeNull();
     sim.drainEvents();
-    const restEvents = tickMechanic(sim, HOARD_TIDE_WAVE.windup * 2 + 1);
+    const restEvents = tickMechanic(sim, (firstWave?.durationSecs ?? 10) * 2 + 2);
     const secondWave = restEvents.find(
       (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
         event.type === 'hoardBossCue' && event.variant === 'tide-wave',
     );
     expect(firstWave).toBeDefined();
     expect(secondWave).toBeDefined();
-    expect(Math.abs((secondWave?.facing ?? 0) - (firstWave?.facing ?? 0))).toBeCloseTo(Math.PI, 4);
-    expect(sim.player.hp).toBeLessThanOrEqual(
-      hpBeforeWaves - Math.round(sim.player.maxHp * HOARD_TIDE_WAVE.damageFraction) * 2,
-    );
+    expect(secondWave?.facing).not.toBe(firstWave?.facing);
+    expect(secondWave?.waveGap).not.toBe(firstWave?.waveGap);
 
     const totemId = hoardState(inst).totemId;
     expect(totemId).not.toBeNull();

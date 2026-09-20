@@ -19,6 +19,41 @@ function warning(overrides: Partial<Extract<SimEvent, { type: 'hoardBossCue' }>>
 }
 
 describe('Buried Hoard boss cue mirror', () => {
+  it('round trips wave geometry and following static targets through JSON events and reconnect', () => {
+    let now = 1000;
+    const mirror = new HoardBossCueMirror(() => now);
+    const event = warning({
+      kind: 'sweep',
+      variant: 'tide-wave',
+      waveGap: -4,
+      waveSpan: 15,
+      waveLead: 4.925,
+      durationSecs: 8.925,
+      facing: Math.PI / 2,
+    });
+    mirror.apply(JSON.parse(JSON.stringify(event)));
+    now += 500;
+    expect(mirror.views()[0]).toMatchObject({
+      waveGap: -4,
+      waveSpan: 15,
+      waveLead: 4.925,
+      remaining: 8.425,
+    });
+    const resumed = mirror.views();
+    mirror.apply({ type: 'riftState', active: true, hoardCues: resumed } as Extract<
+      SimEvent,
+      { type: 'riftState' }
+    >);
+    expect(mirror.views()[0]).toMatchObject({
+      waveGap: -4,
+      waveSpan: 15,
+      waveLead: 4.925,
+      remaining: 8.425,
+    });
+    mirror.apply(warning({ variant: 'storm-static', targetId: 42 }));
+    expect(mirror.views()[0]).toMatchObject({ variant: 'storm-static', targetId: 42 });
+  });
+
   it('counts events down and replaces a warning with its hazard phase', () => {
     let now = 1_000;
     const mirror = new HoardBossCueMirror(() => now);

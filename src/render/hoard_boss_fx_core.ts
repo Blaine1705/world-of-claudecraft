@@ -43,6 +43,7 @@ export function hoardCueAppearance(cue: HoardBossCueView): HoardCueAppearancePla
       return { shape: 'disc', palette: 'arcane', countdown: 'disc', elementalRider: true };
     case 'storm-charge':
     case 'storm-field':
+    case 'storm-static':
       return { shape: 'disc', palette: 'storm', countdown: 'disc', elementalRider: true };
     case 'frost-ice':
       return { shape: 'disc', palette: 'frost', countdown: 'disc', elementalRider: true };
@@ -55,7 +56,7 @@ export function hoardCueAppearance(cue: HoardBossCueView): HoardCueAppearancePla
 
 export function hoardTideWaveOffset(cue: HoardBossCueView): number {
   return cue.variant === 'tide-wave'
-    ? hoardTideWaveCenter(cue.radius, cue.remaining, cue.total)
+    ? hoardTideWaveCenter(cue.radius, cue.remaining, cue.total, cue.waveLead)
     : 0;
 }
 

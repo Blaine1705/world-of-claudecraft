@@ -1142,6 +1142,10 @@ export const SFX = [
   // Buried Hoard: locally authored earth/wood reveal and a warm resonant bed.
   { key: 'hoard_entrance_open', custom: true },
   { key: 'hoard_entrance_hum', custom: true, loop: true },
+  { key: 'hoard_tide_build', custom: true },
+  { key: 'hoard_tide_rush', custom: true, loop: true },
+  { key: 'hoard_tide_crash', custom: true },
+  { key: 'hoard_tide_hit', custom: true },
 
   // --- Rift mechanics (custom recordings, src/sim/rift/) --------------------
   // World-anchored one-shots and point-source loops for the procedural Rift

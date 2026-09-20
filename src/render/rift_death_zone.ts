@@ -16,8 +16,11 @@
 // zone; per-frame work is opacity writes and one scale write).
 
 import * as THREE from 'three';
+import type { SimEvent } from '../sim/types';
+import type { IWorld } from '../world_api';
 import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dungeons';
 import { HoardBossFx } from './hoard_boss_fx';
+import { HoardBossPresentation } from './hoard_boss_presentation';
 import {
   deathZonePlan,
   deathZonePulseSpeed,
@@ -58,13 +61,17 @@ interface ZoneVisual {
 export class RiftDeathZoneVisuals {
   private readonly zones = new Map<string, ZoneVisual>();
   private readonly hoardBossFx: HoardBossFx;
+  private readonly hoardPresentation: HoardBossPresentation;
 
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    private readonly world?: IWorld,
+    shake?: (amount: number) => void,
   ) {
     this.hoardBossFx = new HoardBossFx(scene, groundY, compileGate);
+    this.hoardPresentation = new HoardBossPresentation(world, shake);
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -72,6 +79,8 @@ export class RiftDeathZoneVisuals {
    * is sufficient; two coincident zones on the same tick are collapsed, which is
    * fine for gameplay). */
   sync(zones: readonly RiftBossDeathZoneView[], hoardCues: readonly HoardBossCueView[] = []): void {
+    this.hoardPresentation.sync(hoardCues);
+    this.hoardBossFx.setTheme(this.world?.riftFloor?.seed);
     this.hoardBossFx.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
@@ -117,6 +126,11 @@ export class RiftDeathZoneVisuals {
   dispose(): void {
     this.sync([]);
     this.hoardBossFx.dispose();
+    this.hoardPresentation.dispose();
+  }
+
+  handleEvent(event: SimEvent): void {
+    this.hoardPresentation.handleEvent(event);
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

@@ -44,6 +44,10 @@ export class HoardBossCueMirror {
       facing: event.facing,
       halfAngle: event.halfAngle,
       innerRadius: event.innerRadius,
+      waveGap: event.waveGap,
+      waveSpan: event.waveSpan,
+      waveLead: event.waveLead,
+      targetId: event.targetId,
       expiresAtMs: now + event.durationSecs * 1000,
     });
   }

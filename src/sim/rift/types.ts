@@ -373,6 +373,7 @@ export type HoardBossCueVariant =
   | 'arcane-ring'
   | 'storm-charge'
   | 'storm-field'
+  | 'storm-static'
   | 'tide-wave'
   | 'tide-tether';
 
@@ -390,6 +391,9 @@ export type HoardBossCue =
       total: number;
       /** Runtime-only per-player contact ledger for traveling tide waves. */
       hitIds?: Set<number>;
+      waveGap?: number;
+      waveSpan?: number;
+      waveLead?: number;
     }
   | {
       id: number;
@@ -403,6 +407,7 @@ export type HoardBossCue =
       total: number;
       pulseTimer?: number;
       innerRadius?: number;
+      targetId?: number;
     };
 
 export interface HoardBossState {
@@ -414,6 +419,7 @@ export interface HoardBossState {
   sequenceStep: number;
   sequenceTimer: number;
   sequenceFacing: number;
+  tidePattern?: import('./hoard_tide_pattern').HoardTidePatternWave[];
   specialTriggered: boolean;
   totemId: number | null;
   totemPulseTimer: number;

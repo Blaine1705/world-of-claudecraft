@@ -2975,6 +2975,7 @@ export class Renderer {
         this.scene,
         this.groundSample,
         this.worldCompileGate(),
+        this.sim, (amount) => this.addShake(amount),
       );
     });
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
@@ -7164,6 +7165,7 @@ export class Renderer {
   }
 
   handleEvent(ev: SimEvent): void {
+    this.riftDeathZoneVisuals?.handleEvent(ev);
     switch (ev.type) {
       case 'castStart': {
         if (ev.ability === 'needle_of_fate') {
