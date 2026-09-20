@@ -342,7 +342,7 @@ import {
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
 import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
-import { dispatchMarketCommand } from './market_commands';
+import { dispatchMarketCommand, marketWirePromptCommand } from './market_commands';
 import { dispatchInventoryGroupingCommand } from './material_stack_wire';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
 import {
@@ -690,7 +690,7 @@ const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
 // the whole listing book, the single most expensive per-viewer read in
 // selfWireJson on a grown book, and nothing in it carries a sub-second clock,
 // so 4 Hz keeps the window feeling live while capping the rebuild rate. The
-// viewer's OWN market commands re-arm the gate (MARKET_WIRE_PROMPT_CMDS) so
+// viewer's OWN market commands re-arm the gate (marketWirePromptCommand) so
 // their search/buy/cancel feedback still lands on the next snapshot. On top of
 // the cadence, a rebuild-only-on-change gate (sim.marketBrowseRevFor plus the
 // query object identity) skips the rebuild entirely while nothing changed;
@@ -699,20 +699,6 @@ const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
 const MARKET_WIRE_HZ = 4;
 const MARKET_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MARKET_WIRE_HZ)));
 const MARKET_BROWSE_REFRESH_TICKS = 40;
-const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
-  'market_search',
-  'market_sell_price_check',
-  'market_list',
-  'market_list_instance',
-  'market_buy',
-  'market_sweep_quote',
-  'market_sweep',
-  'market_cancel',
-  'market_collect',
-  'market_order_place',
-  'market_order_fill',
-  'market_order_cancel',
-]);
 // Commission order board readout, the market recipe applied to the second
 // O(realm-collection) read that shipped on the per-tick self path (issue
 // #1298's `corder`): commissionOrdersFor walks the whole board and every
@@ -6340,7 +6326,7 @@ export class GameServer {
     // The viewer's own market commands re-arm the market wire gate so their
     // search/list/buy/cancel/collect feedback lands on the next snapshot
     // instead of waiting out the MARKET_WIRE_HZ cadence.
-    if (typeof msg.cmd === 'string' && MARKET_WIRE_PROMPT_CMDS.has(msg.cmd)) {
+    if (typeof msg.cmd === 'string' && marketWirePromptCommand(msg.cmd)) {
       session.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
     }
     // Same prompt re-arm for the commission board gate.

@@ -18,6 +18,25 @@ import {
   sweepWithSoldVolume,
 } from './market_sold_volume';
 
+const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
+  'market_search',
+  'market_sell_price_check',
+  'market_list',
+  'market_list_instance',
+  'market_buy',
+  'market_sweep_quote',
+  'market_sweep',
+  'market_cancel',
+  'market_collect',
+  'market_order_place',
+  'market_order_fill',
+  'market_order_cancel',
+]);
+
+export function marketWirePromptCommand(command: string): boolean {
+  return MARKET_WIRE_PROMPT_CMDS.has(command);
+}
+
 /** Routes one market command frame. `msg` is the already-parsed client frame
  *  (game.ts's ClientMessage, structurally a string-keyed record); every field is
  *  TYPE-guarded here exactly as dispatchMessage guards its own cases, never
