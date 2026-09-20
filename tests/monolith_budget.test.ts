@@ -1091,7 +1091,11 @@ const MONOLITHS: MonolithRow[] = [
     // call the leave path now needs. The merged file measures 11767, below
     // both parent pins, so the ceiling follows it down. Exact count, zero
     // slack.
-    ceiling: 11767,
+    // Composed with the ghost passage fix: the released spirit's
+    // trigger set (door, rift, and the overworld passage it previously could
+    // not use) moved to src/sim/spirit_run_triggers.ts. The merged file now
+    // measures 11766. Exact count, zero slack.
+    ceiling: 11766,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
