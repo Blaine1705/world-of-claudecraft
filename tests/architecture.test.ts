@@ -640,6 +640,8 @@ const UI_PURE_CORES = [
   'src/game/presentation_gate.ts',
   'src/game/stale_chrome_focus.ts',
   'src/game/perf_diagnosis_core.ts',
+  // Imported by the diagnosis core above: the purity scan does not follow imports.
+  'src/game/perf_frame_health_core.ts',
   'src/game/post_entry_warmups_core.ts',
   'src/game/perf_shader_warm_core.ts',
   'src/game/ui_effects_profile.ts',
@@ -777,6 +779,7 @@ const RENDER_PURE_CORES = [
   'src/render/character_effects_core.ts',
   'src/render/character_presentation_core.ts',
   'src/render/character_view_core.ts',
+  'src/render/chosen_cadence_pressure_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',
   'src/render/dashed_ring_core.ts',

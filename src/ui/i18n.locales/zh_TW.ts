@@ -1733,6 +1733,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '使用獨立遊戲顯示卡',
   'hudChrome.options.forceHighPerfGpuNote':
     '預設開啟：桌面版會向本機要求使用獨立遊戲顯示卡。若遊戲無法啟動、啟動後黑屏，或筆記型電腦螢幕沒有畫面，請關閉此選項。此設定會在下次啟動遊戲時生效。',
+  'hudChrome.options.frameRateCap': '影格率上限',
+  'hudChrome.options.frameRateCapAuto': '自動',
+  'hudChrome.options.frameRateCapDisplay': '顯示器',
+  'hudChrome.options.frameRateCapNote':
+    '限制遊戲每秒繪製的畫面數量。如果電腦跟不上顯示器的速度，較低的上限會讓畫面更平穩，也能讓電腦更涼爽。上限會跟隨你的顯示器，因此實際數值可能與數字略有不同。自動：僅當這台電腦跟不上顯示器時才降低上限，之後保持穩定（建議）。顯示器：不限制。',
+  'hudChrome.options.frameRateCapStatusPaced': '正在 {hz} Hz 的顯示器上每秒繪製 {fps} 幀。',
+  'hudChrome.options.frameRateCapStatusUnpaced': '限制為每秒 {fps} 幀。',
+  'hudChrome.options.frameRateCapStatusInert':
+    '此顯示器的更新率已不高於該上限，因此上限不會帶來任何變化。',
   'hudChrome.options.shaderWarm': '著色器預熱工作執行緒',
   'hudChrome.options.shaderWarmAuto': '自動',
   'hudChrome.options.shaderWarmOff': '關閉',
@@ -2709,6 +2718,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresForm': '你必須處於{form}形態。',
   'hud.errors.bear': '巨熊',
   'hud.errors.cat': '貓',
+  'hud.errors.bearOrCat': '巨熊或貓',
   'hud.errors.travel': '迅捷',
   'hud.errors.cantInForm': '{form}形態下無法這樣做。',
   'hud.errors.shapeshifted': '變形狀態下不能這樣做。',
@@ -2963,6 +2973,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.energy': '能量',
   'abilityUi.forms.bear': '巨熊',
   'abilityUi.forms.cat': '貓',
+  'abilityUi.forms.bearOrCat': '巨熊或貓',
   'abilityUi.cast.fishing': '釣魚',
   'abilityUi.cast.gathering': '採集',
   'abilityUi.cast.thunzharrStormcall': '風暴召喚',
@@ -6821,8 +6832,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '移除介面動畫，讓視窗立即出現。首先是無障礙選項，順帶帶來少許效能提升。',
   'guide.settingsPage.rowPerfOverlay':
     '在畫面上即時顯示 FPS、影格時間等數據。調整本頁設定時先開著，調完再關掉。',
+  'guide.settingsPage.rowFrameRateCap':
+    '遊戲每秒繪製畫面數量的上限。跟不上顯示器的電腦會落入不均勻的節奏；穩定的 30 看起來比那更流暢，工作量減半，電腦也更涼爽。「顯示器」表示不限制。',
   'guide.settingsPage.tableFoot':
-    '在找幀數上限？沒什麼可找的：畫面節奏跟隨你的顯示器。繪製距離是一個獨立的旋鈕，即世界細節卡片中的「視野距離」，每個預設都會替你設定它，直到你親自調動為止。',
+    '繪製距離是一個獨立的旋鈕，即世界細節卡片中的「視野距離」，每個預設都會替你設定它，直到你親自調動為止。',
   'guide.settingsPage.mobileTitle': '在手機與平板上',
   'guide.settingsPage.mobileBody':
     '在手機或平板上，遊戲會讓你從 Low 起步。所有觸控裝置首次啟動時都會落在這一檔，這是刻意為之，好讓你進入世界開始遊玩；隨時可以在圖形面板中自行調高。在 Android 瀏覽器上整條階梯都向你敞開，你的選擇也會保留。在 iPhone 和 iPad 上你依然可以選擇最高的幾檔預設，按下「套用」後它們會立即生效，但遊戲會在你下次啟動時把你退回 High，因為 iOS 可能在建構這麼大的場景時終止分頁。下載的應用程式更為收緊：它的預設列表止於 High，各項系統旋鈕也被隱藏，因為應用程式會自行管理它們。',

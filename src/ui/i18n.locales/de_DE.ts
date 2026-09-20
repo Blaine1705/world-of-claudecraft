@@ -10594,7 +10594,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Umgebungsregen und Schnee. Nur Atmosphäre, und das Ausschalten spart bei Gewittern ein wenig.',
   'guide.settingsPage.tableFoot':
-    'Suchst du nach einer FPS-Begrenzung? Da gibt es nichts zu suchen: Die Bildfolge richtet sich nach deiner Anzeige. Die Sichtweite ist ein eigener Regler, Sichtweite, in der Karte Weltdetails, und jedes Preset stellt sie für dich ein, bis du sie selbst bewegst.',
+    'Die Sichtweite ist ein eigener Regler, Sichtweite, in der Karte Weltdetails, und jedes Preset stellt sie für dich ein, bis du sie selbst bewegst.',
   'guide.settingsPage.tableHeading': 'Jede Grafikoption, erklärt',
   'guide.settingsPage.tagReload': 'Übernehmen drücken',
   'guide.settingsPage.value100': '100 %',
