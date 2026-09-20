@@ -292,7 +292,13 @@ describe('the adapter', () => {
     deliver([scytheAsset, soulAsset]);
     await fx.readyForEntry;
     expect(seen).toHaveLength(1);
-    expect(seen[0].weapon).toEqual(['Scythe_Blade', 'Scythe_Fragments']);
+    // Both rigs (a full party in a rare enough hoard faces a pair) wear the asset.
+    expect(seen[0].weapon).toEqual([
+      'Scythe_Blade',
+      'Scythe_Blade',
+      'Scythe_Fragments',
+      'Scythe_Fragments',
+    ]);
     // A box has 24 vertices; the stand-in cone it replaced has a different count.
     expect(seen[0].soulVertices).toBe(24);
     expect(scene.children).toHaveLength(1);
@@ -341,9 +347,9 @@ describe('the adapter', () => {
     expect(count(low, 'Mesh')).toBeLessThan(count(high, 'Mesh'));
     // The weapon, its floor footprint and the souls are on both.
     for (const scene of [high, low]) {
-      expect(meshesOf(scene, 'MovementPivot')).toHaveLength(1);
+      expect(meshesOf(scene, 'MovementPivot')).toHaveLength(2);
       expect(meshesOf(scene, 'Soul_SpectralBody')).toHaveLength(1);
-      expect(count(scene, 'Line')).toBe(1);
+      expect(count(scene, 'Line')).toBe(2);
     }
     a.dispose();
     b.dispose();

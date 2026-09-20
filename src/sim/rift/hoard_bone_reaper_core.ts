@@ -18,7 +18,8 @@
 // Everything rides the ordinary hoard cue wire with no new fields:
 //   scythe carrier  kind 'sweep', variant 'bone-scythe'
 //                   x,z = anchor (the boss's post), facing = blade start angle,
-//                   radius = lateral span W, halfAngle = forward sign * depth,
+//                   radius = lateral span W (negative = the route mirrored, for
+//                   the second scythe of a pair), halfAngle = forward sign * depth,
 //                   pattern = cue id % patterns (the ember-meteor precedent)
 //   harvest carrier kind 'sweep', variant 'bone-harvest' (x,z = the boss)
 //   one soul        kind 'mark', variant 'bone-soul', x,z = where it appears,
@@ -72,6 +73,8 @@ export const BONE_SCYTHE = Object.freeze({
   /** Caps the route's width, and with it the pivot's pace: at 9 the three routes
    *  average about 3.5 to 4.5 yards a second, well under a player's run. */
   maxLateral: 9,
+  /** A second, mirrored scythe needs at least this much lateral room to stay readable. */
+  pairMinLateral: 6,
   minDepth: 16,
   maxDepth: 30,
 });
@@ -148,7 +151,9 @@ export function encodeScytheFrame(frame: BoneScytheFrame): { radius: number; hal
 
 export function decodeScytheFrame(radius: number, halfAngle: number): BoneScytheFrame {
   return {
-    lateral: Math.max(0, radius),
+    // A NEGATIVE lateral is a mirrored route (the second scythe of a pair): the
+    // path maths takes it as is, so left and right simply swap.
+    lateral: radius,
     // Object.is: a -1 sign on a zero depth packs as -0, which `< 0` would lose.
     forwardSign: halfAngle < 0 || Object.is(halfAngle, -0) ? -1 : 1,
     depth: Math.abs(halfAngle),
@@ -250,68 +255,145 @@ export const SOUL_HARVEST = Object.freeze({
   castSec: 1.6,
   /** They hold, brighten and turn toward him before they move. */
   holdSec: 0.9,
-  /** Souls by the living head count: a lone reader is never asked for six. */
-  baseCount: 4,
-  perExtraPlayers: 2,
-  maxCount: 7,
-  /** Yards per second once drawn. */
-  speed: 4.2,
+  /** Souls for a lone player, and one more for each player after the first. The
+   *  hoard's rarity adds its own (hoard_scaling.ts `extra`). */
+  soloCount: 3,
+  perExtraPlayer: 1,
+  minCount: 2,
+  maxCount: 8,
+  /** Yards per second once drawn, before the hoard's rarity presses it. */
+  speed: 4.4,
   /** A player this close releases the soul. Generous: no pixel hunting. */
   interactionRadius: 2.4,
   /** A soul this close to the boss is his. */
   absorbRadius: 2.6,
   /** No soul starts nearer the boss than this. */
-  minSpawnDistance: 13,
+  minSpawnDistance: 14,
+  /** Nor nearer another soul than this: they are never all in one place. */
+  minSeparation: 9,
   /** Nor nearer a player than this, so none is released by accident on arrival. */
-  playerClearance: 5,
+  playerClearance: 6,
+  /** Yards kept between a soul's start and the wall. */
+  wallMargin: 2.5,
   damagePerStack: 0.06,
   maxStacks: 8,
   /** A stack's life, refreshed by every new one. */
   stackDurationSec: 45,
-  /** Releasing a soul can repay the player (off for now; the hook is live). */
+  /** Releasing a soul BURDENS whoever did it: they take this much more damage
+   *  per stack. One player cannot simply sweep the room; a party shares them out,
+   *  and a lone player chooses which to take and which to let him have. */
+  burdenPerStack: 0.08,
+  burdenMaxStacks: 6,
+  burdenDurationSec: 20,
+  /** Releasing a soul can also repay the player (off for now; the hook is live). */
   playerRewardEnabled: false,
   playerRewardHealFraction: 0.03,
 });
 
-export function soulCountFor(livingPlayers: number): number {
-  const extra = Math.floor(Math.max(0, livingPlayers - 1) / SOUL_HARVEST.perExtraPlayers);
-  return Math.min(SOUL_HARVEST.maxCount, SOUL_HARVEST.baseCount + extra);
+/** The burden a released soul lays on the player who released it. */
+export const HOARD_SOUL_BURDEN_AURA_ID = 'hoard_soul_burden';
+
+/** Souls for `livingPlayers`, pressed by the hoard's rarity (`extra`). */
+export function soulCountFor(livingPlayers: number, extra = 0): number {
+  const byHeads =
+    SOUL_HARVEST.soloCount + Math.max(0, livingPlayers - 1) * SOUL_HARVEST.perExtraPlayer;
+  return Math.max(SOUL_HARVEST.minCount, Math.min(SOUL_HARVEST.maxCount, byHeads + extra));
 }
 
-/** Where the souls appear, in the boss's frame: an even ring around the middle
- *  of the room, turned by a seeded offset so no two casts match. */
+/** A cheap integer hash to [0, 1): deterministic, no rng draw. */
+function hash01(n: number): number {
+  let x = (n | 0) ^ 0x9e3779b9;
+  x = Math.imul(x ^ (x >>> 16), 0x85ebca6b);
+  x = Math.imul(x ^ (x >>> 13), 0xc2b2ae35);
+  return ((x ^ (x >>> 16)) >>> 0) / 4294967296;
+}
+
+/** Where the souls appear, in the boss's frame (`x` lateral, `f` forward into the
+ *  room): scattered over the WHOLE room, near walls and far end included, at
+ *  mixed distances so they arrive at different times and have to be chosen
+ *  between. Each takes its own slice of the compass (so they surround the room
+ *  rather than bunch), a seeded distance within it, and is nudged until it is
+ *  clear of the boss and of every soul already placed. `halfWidth` is the room's
+ *  half-width and `clearDepth` how far it was measured clear. */
 export function soulSpawnOffsets(
   count: number,
   seed: number,
   frame: BoneScytheFrame,
+  halfWidth = frame.lateral + BONE_SCYTHE.reach + BONE_SCYTHE.wallMargin,
+  clearDepth = frame.depth + BONE_SCYTHE.reach,
 ): Array<{ x: number; f: number }> {
-  const near = SOUL_HARVEST.minSpawnDistance;
-  const far = Math.max(near + 6, frame.depth);
-  const mid = (near + far) / 2;
-  const rx = frame.lateral + BONE_SCYTHE.reach * 0.55;
-  const rf = (far - near) / 2 + 2;
-  // A cheap integer hash of the cue id: deterministic, no rng draw.
-  const turn = (((seed * 2654435761) >>> 0) / 4294967296) * Math.PI * 2;
+  const maxX = Math.max(4, halfWidth - SOUL_HARVEST.wallMargin);
+  // Never past the depth the room was MEASURED clear to: a soul behind the far
+  // wall cannot be caught, which would hand the boss a free stack.
+  const far = Math.min(
+    Math.max(SOUL_HARVEST.minSpawnDistance + 8, frame.depth + BONE_SCYTHE.reach),
+    Math.max(SOUL_HARVEST.minSpawnDistance + 2, clearDepth),
+  );
+  const near = 4;
+  const centerF = (near + far) / 2;
+  const turn = hash01(seed) * Math.PI * 2;
   const out: Array<{ x: number; f: number }> = [];
   for (let index = 0; index < count; index++) {
-    const a = turn + (index / count) * Math.PI * 2;
-    let x = rx * Math.sin(a);
-    let f = mid + rf * Math.cos(a);
-    // Never nearer the boss than the minimum: push out along the ray from him.
-    const d = Math.hypot(x, f);
-    if (d < near) {
-      const k = near / Math.max(0.001, d);
-      x *= k;
-      f = Math.max(f * k, near * 0.6);
+    const slice = (Math.PI * 2) / count;
+    const a = turn + slice * (index + 0.15 + 0.7 * hash01(seed * 31 + index));
+    // Alternate far and nearer so neighbours never share an arrival time.
+    const reach = (index % 2 === 0 ? 0.78 : 0.46) + 0.22 * hash01(seed * 17 + index * 7);
+    out.push({
+      x: Math.sin(a) * maxX * reach,
+      f: centerF + Math.cos(a) * ((far - near) / 2) * reach,
+    });
+  }
+  // Relax: push any two that crowd each other apart, keep everyone inside the
+  // room and off the boss, and repeat until it holds. Deterministic (fixed
+  // order, fixed passes) and cheap: at most eight souls, once per cast.
+  const fit = (soul: { x: number; f: number }): void => {
+    soul.x = Math.max(-maxX, Math.min(maxX, soul.x));
+    soul.f = Math.max(near, Math.min(far, soul.f));
+    const fromBoss = Math.hypot(soul.x, soul.f);
+    if (fromBoss >= SOUL_HARVEST.minSpawnDistance) return;
+    // Out along the ray from the boss, then down the room if the wall stops it.
+    const k = SOUL_HARVEST.minSpawnDistance / Math.max(0.001, fromBoss);
+    soul.x = Math.max(-maxX, Math.min(maxX, soul.x * k));
+    const needF = Math.sqrt(
+      Math.max(0, SOUL_HARVEST.minSpawnDistance * SOUL_HARVEST.minSpawnDistance - soul.x * soul.x),
+    );
+    soul.f = Math.min(far, Math.max(soul.f * k, needF));
+  };
+  for (const soul of out) fit(soul);
+  const gap = SOUL_HARVEST.minSeparation + 0.05;
+  for (let pass = 0; pass < 60; pass++) {
+    let moved = false;
+    for (let i = 0; i < out.length; i++) {
+      for (let j = i + 1; j < out.length; j++) {
+        let dx = out[j].x - out[i].x;
+        let df = out[j].f - out[i].f;
+        let d = Math.hypot(dx, df);
+        if (d >= gap) continue;
+        if (d < 1e-6) {
+          dx = 1;
+          df = 0;
+          d = 1;
+        }
+        const push = (gap - d) / 2;
+        out[i].x -= (dx / d) * push;
+        out[i].f -= (df / d) * push;
+        out[j].x += (dx / d) * push;
+        out[j].f += (df / d) * push;
+        fit(out[i]);
+        fit(out[j]);
+        moved = true;
+      }
     }
-    out.push({ x, f: Math.max(3, f) });
+    if (!moved) break;
   }
   return out;
 }
 
-/** A soul's whole life in seconds, from its first wisp to the boss's ribs. */
-export function soulLifeSec(distanceToBoss: number): number {
-  const travel = Math.max(0, distanceToBoss - SOUL_HARVEST.absorbRadius) / SOUL_HARVEST.speed;
+/** A soul's whole life in seconds, from its first wisp to the boss's ribs.
+ *  `speedScale` is the hoard's rarity pressing its pace. */
+export function soulLifeSec(distanceToBoss: number, speedScale = 1): number {
+  const travel =
+    Math.max(0, distanceToBoss - SOUL_HARVEST.absorbRadius) / (SOUL_HARVEST.speed * speedScale);
   return SOUL_HARVEST.castSec + SOUL_HARVEST.holdSec + travel;
 }
 
@@ -330,6 +412,7 @@ export function soulPosition(
   boss: { x: number; z: number },
   elapsed: number,
   out: { x: number; z: number } = { x: 0, z: 0 },
+  life?: number,
 ): { x: number; z: number } {
   const dx = boss.x - spawn.x;
   const dz = boss.z - spawn.z;
@@ -340,7 +423,12 @@ export function soulPosition(
     out.z = spawn.z;
     return out;
   }
-  const travelSec = travelDistance / SOUL_HARVEST.speed;
+  // Its pace rides in its life (soulLifeSec): a rarer hoard draws them faster, and
+  // the renderer reads the same life off the cue, so both walk the same line.
+  const travelSec =
+    life !== undefined
+      ? Math.max(0.05, life - SOUL_HARVEST.castSec - SOUL_HARVEST.holdSec)
+      : travelDistance / SOUL_HARVEST.speed;
   const t = Math.max(0, Math.min(travelSec, elapsed - SOUL_HARVEST.castSec - SOUL_HARVEST.holdSec));
   // Quadratic ease in over the first third, linear after, normalised to travelSec.
   const easeSec = travelSec / 3;

@@ -25,6 +25,7 @@ import {
   HOARD_CAST_LIGHTNING_STRIKE,
   HOARD_LIGHTNING_STRIKE_CAST_SCHOOL,
 } from './hoard_control_cast_ids';
+import { hoardMechanicDamage } from './hoard_scaling';
 import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, RiftInstance } from './types';
 
@@ -159,6 +160,7 @@ function clearCast(caster: Entity | undefined): void {
 
 function land(
   ctx: SimContext,
+  inst: RiftInstance,
   caster: Entity,
   players: readonly Entity[],
   cue: Extract<HoardBossCue, { kind: 'mark' }>,
@@ -169,7 +171,7 @@ function land(
       caster,
       player,
       capRiftNonLethalMechanicDamage(
-        Math.max(1, Math.round(player.maxHp * HOARD_LIGHTNING_STRIKE.damageFraction)),
+        hoardMechanicDamage(inst, player, HOARD_LIGHTNING_STRIKE.damageFraction),
         player.maxHp,
       ),
       false,
@@ -228,7 +230,7 @@ export function tickHoardLightningStrikes(ctx: SimContext): void {
           continue;
         }
         clearCast(caster);
-        land(ctx, caster, players, strike.cue);
+        land(ctx, inst, caster, players, strike.cue);
       }
       state.strikes = live;
     }

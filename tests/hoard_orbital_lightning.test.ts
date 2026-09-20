@@ -9,6 +9,7 @@ import {
   orbitalShotTime,
   orbitalTarget,
 } from '../src/sim/rift/hoard_orbital_lightning_core';
+import { HOARD_RARITY_PRESSURE } from '../src/sim/rift/hoard_scaling';
 import { makeVaultSeed } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
 import { setLanguage } from '../src/ui/i18n';
@@ -133,7 +134,9 @@ describe('Hoard Orbital Lightning authoritative choreography', () => {
         }
       }
     }
-    expect(firstCastTick).toBe(39);
+    // 39 ticks on the baseline clock; this is a LEGENDARY hoard, whose rarity
+    // runs every kit's clocks faster (hoard_scaling.ts cadence).
+    expect(firstCastTick).toBe(Math.ceil(39 * HOARD_RARITY_PRESSURE.legendary.cadence));
     expect(casts).toEqual(['storm-orbital', 'storm-charge', 'storm-static', 'storm-orbital']);
     expect(chargedGroundCount).toBe(1);
     expect(state.sequenceStep).toBe(0);

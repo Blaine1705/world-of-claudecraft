@@ -19,6 +19,7 @@ import {
   decodeScytheFrame,
   encodeScytheFrame,
   HOARD_HARVESTED_SOUL_AURA_ID,
+  HOARD_SOUL_BURDEN_AURA_ID,
   isBoneReaperVariant,
   pointInScytheBlade,
   SOUL_HARVEST,
@@ -34,6 +35,12 @@ import {
   soulSpawnOffsets,
 } from './hoard_bone_reaper_core';
 import { hoardBossKit } from './hoard_boss_kits';
+import {
+  HOARD_DOUBLE_MECHANIC_INTENSITY,
+  hoardIntensity,
+  hoardMechanicDamage,
+  hoardPressure,
+} from './hoard_scaling';
 import { capRiftNonLethalMechanicDamage } from './ranks';
 import { generateRiftFloor } from './rift_gen';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
@@ -84,7 +91,10 @@ function reaperState(state: HoardBossState): HoardBoneReaperState {
 
 /** The room in front of the boss, measured off the floor's own shell so the
  *  route fits whatever hoard this is. Falls back to a modest room. */
-export function boneReaperFrame(inst: RiftInstance, boss: Entity): BoneScytheFrame {
+export function boneReaperFrame(
+  inst: RiftInstance,
+  boss: Entity,
+): BoneScytheFrame & { halfWidth: number; clearDepth: number } {
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const layout = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex, inst.upgrade).layout;
   // Measured from where he STANDS: he is pinned there for the cast, so the
@@ -119,7 +129,11 @@ export function boneReaperFrame(inst: RiftInstance, boss: Entity): BoneScytheFra
     clearDepth = step;
   }
   if (!Number.isFinite(narrowest)) narrowest = needed;
-  return scytheFrameFor(narrowest, clearDepth - BONE_SCYTHE.reach, forwardSign);
+  return {
+    ...scytheFrameFor(narrowest, clearDepth - BONE_SCYTHE.reach, forwardSign),
+    halfWidth: narrowest,
+    clearDepth,
+  };
 }
 
 function castFx(ctx: SimContext, boss: Entity, ability: string, duration: number): void {
@@ -140,23 +154,36 @@ function startScythe(
   inst: RiftInstance,
   boss: Entity,
   state: HoardBossState,
+  living: number,
   emit: Emit,
 ): void {
   const frame = encodeScytheFrame(boneReaperFrame(inst, boss));
-  const carrier: HoardBossCue = {
-    id: state.nextCueId++,
-    kind: 'sweep',
-    variant: 'bone-scythe',
-    x: boss.pos.x,
-    z: boss.pos.z,
-    facing: boss.facing,
-    radius: frame.radius,
-    halfAngle: frame.halfAngle,
-    remaining: BONE_SCYTHE_TOTAL_SEC,
-    total: BONE_SCYTHE_TOTAL_SEC,
-  };
-  state.cues.push(carrier);
-  emit(ctx, inst, carrier);
+  // Enough players in a rare enough hoard, and a SECOND scythe comes with it: its
+  // route mirrored left for right, its blade begun on the far side of the turn,
+  // and (its cue id being the next one) a different route pattern. Two readable
+  // hazards to thread between, never a lone player's problem. The two share the
+  // per-player hit cooldown on purpose: caught between them is one hit, never two.
+  // Only where the room is wide enough for the mirrored routes to stay apart: cornered
+  // against a wall the two would ride the same line, so he calls just the one.
+  const pair =
+    hoardIntensity(inst.vault, living) >= HOARD_DOUBLE_MECHANIC_INTENSITY &&
+    frame.radius >= BONE_SCYTHE.pairMinLateral;
+  for (let blade = 0; blade < (pair ? 2 : 1); blade++) {
+    const carrier: HoardBossCue = {
+      id: state.nextCueId++,
+      kind: 'sweep',
+      variant: 'bone-scythe',
+      x: boss.pos.x,
+      z: boss.pos.z,
+      facing: boss.facing + blade * Math.PI,
+      radius: blade === 0 ? frame.radius : -frame.radius,
+      halfAngle: frame.halfAngle,
+      remaining: BONE_SCYTHE_TOTAL_SEC,
+      total: BONE_SCYTHE_TOTAL_SEC,
+    };
+    state.cues.push(carrier);
+    emit(ctx, inst, carrier);
+  }
   castFx(ctx, boss, HOARD_SCYTHE_ABILITY, BONE_SCYTHE.castSec);
   ctx.emit({
     type: 'log',
@@ -175,8 +202,15 @@ function startHarvest(
   emit: Emit,
 ): void {
   const frame = boneReaperFrame(inst, boss);
+  const pressure = hoardPressure(inst.vault);
   const seed = state.nextCueId;
-  const offsets = soulSpawnOffsets(soulCountFor(players.length), seed, frame);
+  const offsets = soulSpawnOffsets(
+    soulCountFor(players.length, pressure.extra),
+    seed,
+    frame,
+    frame.halfWidth,
+    frame.clearDepth,
+  );
   const souls: MarkCue[] = [];
   let longest = 0;
   for (const offset of offsets) {
@@ -191,7 +225,7 @@ function startHarvest(
       x += SOUL_HARVEST.playerClearance * (nudge % 2 === 0 ? 1 : -1.6);
       z += frame.forwardSign * 1.5;
     }
-    const life = soulLifeSec(Math.hypot(boss.pos.x - x, boss.pos.z - z));
+    const life = soulLifeSec(Math.hypot(boss.pos.x - x, boss.pos.z - z), pressure.speed);
     longest = Math.max(longest, life);
     souls.push({
       id: 0,
@@ -264,15 +298,19 @@ export function tickHoardBoneReaper(
   // Never two of the same at once, and never a harvest with no room to run it.
   const busy = (variant: string) => state.cues.some((cue) => cue.variant === variant);
   if (reaper.step === 0 ? busy('bone-scythe') : busy('bone-harvest')) return;
-  if (reaper.step === 0) startScythe(ctx, inst, boss, state, emit);
+  if (reaper.step === 0) startScythe(ctx, inst, boss, state, living.length, emit);
   else startHarvest(ctx, inst, boss, state, living, emit);
   reaper.step = reaper.step === 0 ? 1 : 0;
   const pressed = boss.hp / Math.max(1, boss.maxHp) <= BONE_REAPER_PRESSED_HP;
-  reaper.timer = pressed ? BONE_REAPER_PRESSED_EVERY_SEC : BONE_REAPER_EVERY_SEC;
+  // The hoard's rarity presses the cadence, as it does every other boss's.
+  reaper.timer =
+    (pressed ? BONE_REAPER_PRESSED_EVERY_SEC : BONE_REAPER_EVERY_SEC) *
+    hoardPressure(inst.vault).cadence;
 }
 
 function tickScythe(
   ctx: SimContext,
+  inst: RiftInstance,
   boss: Entity,
   cue: SweepCue,
   reaper: HoardBoneReaperState,
@@ -291,7 +329,7 @@ function tickScythe(
       boss,
       player,
       capRiftNonLethalMechanicDamage(
-        Math.max(1, Math.round(player.maxHp * BONE_SCYTHE.damageFraction)),
+        hoardMechanicDamage(inst, player, BONE_SCYTHE.damageFraction),
         player.maxHp,
       ),
       false,
@@ -319,6 +357,28 @@ function tickScythe(
       sourceId: boss.id,
     });
   }
+}
+
+/** Releasing a soul costs the player who did it: a stack of Soul Burden, more
+ *  damage taken for a while. It is what stops one player sweeping the room, makes
+ *  a party share the souls out, and gives a lone player a real choice between
+ *  carrying the burden and feeding the boss. */
+function burden(ctx: SimContext, boss: Entity, player: Entity): void {
+  const held = player.auras.find((aura) => aura.id === HOARD_SOUL_BURDEN_AURA_ID);
+  const stacks = Math.min(SOUL_HARVEST.burdenMaxStacks, (held?.stacks ?? 0) + 1);
+  player.auras = player.auras.filter((aura) => aura.id !== HOARD_SOUL_BURDEN_AURA_ID);
+  ctx.applyAura(player, {
+    id: HOARD_SOUL_BURDEN_AURA_ID,
+    name: 'Soul Burden',
+    kind: 'vulnerability',
+    remaining: SOUL_HARVEST.burdenDurationSec,
+    duration: SOUL_HARVEST.burdenDurationSec,
+    value: stacks * SOUL_HARVEST.burdenPerStack,
+    stacks,
+    sourceId: boss.id,
+    school: 'shadow',
+    encounterOwned: true,
+  });
 }
 
 function applyStacks(ctx: SimContext, boss: Entity, reaper: HoardBoneReaperState): void {
@@ -353,7 +413,7 @@ function tickSoul(
 ): boolean {
   const elapsed = cue.total - cue.remaining;
   const phase = soulPhase(elapsed);
-  const at = soulPosition(cue, drawnTo, elapsed);
+  const at = soulPosition(cue, drawnTo, elapsed, undefined, cue.total);
   if (phase !== 'forming') {
     // Lowest id first, so two players on one soul resolve the same way everywhere.
     const catcher = players.find(
@@ -371,6 +431,7 @@ function tickSoul(
         radius: 1.8,
         sourceId: catcher.id,
       });
+      burden(ctx, boss, catcher);
       if (SOUL_HARVEST.playerRewardEnabled) {
         catcher.hp = Math.min(
           catcher.maxHp,
@@ -414,7 +475,7 @@ export function tickHoardBoneCue(
 ): boolean {
   const reaper = reaperState(state);
   if (cue.variant === 'bone-scythe' && cue.kind === 'sweep') {
-    tickScythe(ctx, boss, cue, reaper, players);
+    tickScythe(ctx, inst, boss, cue, reaper, players);
     return cue.remaining > 1e-8;
   }
   if (cue.variant === 'bone-soul' && cue.kind === 'mark') {

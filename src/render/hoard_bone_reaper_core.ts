@@ -177,7 +177,8 @@ export function soulPose(
   SCRATCH_SPAWN.z = spawnZ;
   SCRATCH_BOSS.x = bossX;
   SCRATCH_BOSS.z = bossZ;
-  const at = soulPosition(SCRATCH_SPAWN, SCRATCH_BOSS, elapsed, SCRATCH_A);
+  // `total` is the soul's life: its pace was set when it was cast.
+  const at = soulPosition(SCRATCH_SPAWN, SCRATCH_BOSS, elapsed, SCRATCH_A, total);
   const phase = soulPhase(elapsed);
   const forming = smooth(elapsed / SOUL_HARVEST.castSec);
   const left = Math.max(0, total - elapsed);

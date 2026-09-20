@@ -67,14 +67,21 @@ him is never swept for standing there.
 
 ## Soul Harvest
 
-Souls appear on a ring around the middle of the room (`soulSpawnOffsets`, turned
-by a hash of the cue id), never near the boss and never on a player. They form
-during the cast, hold and brighten, then walk a straight line to where the
-harvest was cast. A player within `interactionRadius` releases one; one that
-arrives gives the boss a stack of Harvested Soul (`damagePerStack`, `maxStacks`,
-`stackDurationSec`). A soul is one cue in a list that one function walks, so it
-resolves exactly once: it leaves the list in the call that released or absorbed
-it. A released soul is withdrawn from every client with a zero-length cue.
+Souls are scattered over the WHOLE room (`soulSpawnOffsets`: one compass slice
+each, turned by a hash of the cue id, alternating far and near, then a relaxation
+pass that keeps them `minSeparation` apart, inside the walls, never near the boss
+and never on a player). They form during the cast, hold and brighten, then walk a
+straight line to where the harvest was cast. A player within `interactionRadius`
+releases one; one that arrives gives the boss a stack of Harvested Soul
+(`damagePerStack`, `maxStacks`, `stackDurationSec`). A soul is one cue in a list
+that one function walks, so it resolves exactly once: it leaves the list in the
+call that released or absorbed it. A released soul is withdrawn from every client
+with a zero-length cue.
+
+Releasing a soul costs the catcher: a stack of Soul Burden, a `vulnerability`
+aura (`burdenPerStack`, `burdenMaxStacks`, `burdenDurationSec`). One player
+cannot catch them all for free, so a party shares the catching and a lone player
+chooses which souls are worth the damage taken.
 
 `playerRewardEnabled` is the hook for rewarding the catcher (a small heal is
 wired; it is off).
@@ -82,6 +89,28 @@ wired; it is off).
 Past half health the two mechanics come faster, so a harvest can start while the
 last scythe is still wandering: pressure, never a forced hit, because the souls
 keep their clearance and the blade is always outrun by a walking player.
+
+## Scaling: head count and rarity
+
+Every hoard already scales the boss's health and damage by head count
+(`vaultHealthFactor`, `vaultDamageFactor`) and maps rarity onto a Rift rank. On
+top of that, `src/sim/rift/hoard_scaling.ts` presses the MECHANICS of every hoard
+boss, not just this one:
+
+- `HOARD_RARITY_PRESSURE` (rare is the identity the kits were tuned on): mechanic
+  damage, the kit's cadence, extra simultaneous hazards, and hazard speed. Every
+  hoard mechanic's damage goes through `hoardMechanicDamage`, and
+  `tickHoardBossMechanics` runs the kit's clocks by the cadence, so a legendary
+  hoard is harder than a rare one even for a lone player.
+- Soul count is `soulCountFor(living, extra)`: `soloCount`, plus `perExtraPlayer`
+  for each further living player, plus the rarity's extra, clamped to
+  `minCount`..`maxCount`. Rarity also quickens the souls.
+- `hoardIntensity(vault, living)` adds the rarity step to the living head count.
+  At `HOARD_DOUBLE_MECHANIC_INTENSITY` the Wandering Scythe comes as a mirrored
+  PAIR (legendary with four or more, epic with five): the same route mirrored left
+  for right, the blades begun on opposite sides of the turn. The second carrier is
+  an ordinary carrier cue whose `radius` is negated, so the wire carries nothing
+  new. Where the room is narrower than `pairMinLateral` he calls only one.
 
 ## Blender or runtime
 
@@ -108,5 +137,8 @@ as the Harvested Soul buff, and the rib glow still grows with it).
   touching the geometry.
 - Too easy to ignore: shorten `rotationPeriod` (3.4 s) a little; do not raise
   `maxLateral`, which is also the pivot's pace.
-- Souls unreachable solo: lower `SOUL_HARVEST.speed` (4.2) or `baseCount` (4).
+- Souls unreachable solo: lower `SOUL_HARVEST.speed` or `soloCount`.
+- Catching feels free or too costly: `burdenPerStack` and `burdenDurationSec`.
+- A rarity feels flat or brutal: its row in `HOARD_RARITY_PRESSURE`, which moves
+  every hoard boss at once.
 - Stacks too scary: `damagePerStack` (6 percent) and `stackDurationSec` (45 s).

@@ -14,6 +14,7 @@ import {
   pointInLightningStrike,
   tickHoardLightningStrikes,
 } from '../src/sim/rift/hoard_lightning_strike';
+import { HOARD_RARITY_PRESSURE } from '../src/sim/rift/hoard_scaling';
 import { riftStateEventFor } from '../src/sim/rift/runs';
 import type { RiftInstance } from '../src/sim/rift/types';
 import { makeVaultSeed } from '../src/sim/rift/vault_seed';
@@ -136,8 +137,13 @@ describe('Storm Caller Lightning Strike', () => {
     // authored share of max health.
     const lost = hpBefore - sim.player.hp;
     expect(lost).toBeGreaterThan(sim.player.maxHp * HOARD_LIGHTNING_STRIKE.damageFraction * 0.5);
+    // An epic hoard: the authored share, pressed by the map's rarity.
     expect(lost).toBeLessThanOrEqual(
-      Math.round(sim.player.maxHp * HOARD_LIGHTNING_STRIKE.damageFraction),
+      Math.round(
+        sim.player.maxHp *
+          HOARD_LIGHTNING_STRIKE.damageFraction *
+          HOARD_RARITY_PRESSURE.epic.damage,
+      ),
     );
     expect(
       pointInLightningStrike(cue, { x: cue.x + HOARD_LIGHTNING_STRIKE.radius + 0.1, z: cue.z }),

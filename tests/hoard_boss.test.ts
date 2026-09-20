@@ -44,6 +44,7 @@ import {
   HOARD_TIDE_WAVE,
   hoardMarkSpec,
 } from '../src/sim/rift/hoard_boss_kits';
+import { HOARD_RARITY_PRESSURE } from '../src/sim/rift/hoard_scaling';
 import { bossInStormField, HOARD_STORM_SURGE_AURA_ID } from '../src/sim/rift/hoard_storm_surge';
 import { riftStateEventFor } from '../src/sim/rift/runs';
 import type { HoardBossState, RiftInstance } from '../src/sim/rift/types';
@@ -341,7 +342,10 @@ describe('Buried Hoard boss encounter', () => {
     ).toHaveLength(HOARD_SWEEP_METEOR_COUNT);
     expect(inst.hoardBoss?.cues).toHaveLength(1);
     const impactEvents = tickMechanic(sim, HOARD_SWEEP_WINDUP_SEC);
-    expect(sim.player.hp).toBe(hpBefore - Math.round(sim.player.maxHp * 0.24));
+    // A legendary hoard: the authored share, pressed by the map's rarity.
+    expect(sim.player.hp).toBe(
+      hpBefore - Math.round(sim.player.maxHp * 0.24 * HOARD_RARITY_PRESSURE.legendary.damage),
+    );
     expect(
       impactEvents.filter((event) => event.type === 'spellfxAt' && event.fx === 'meteorImpact'),
     ).toHaveLength(HOARD_SWEEP_METEOR_COUNT);
@@ -391,13 +395,17 @@ describe('Buried Hoard boss encounter', () => {
     const marked = { ...sim.player.pos };
     const hpBefore = sim.player.hp;
     tickMechanic(sim, HOARD_MARK_WINDUP_SEC);
-    expect(sim.player.hp).toBe(hpBefore - Math.round(sim.player.maxHp * 0.18));
+    expect(sim.player.hp).toBe(
+      hpBefore - Math.round(sim.player.maxHp * 0.18 * HOARD_RARITY_PRESSURE.legendary.damage),
+    );
     sim.player.pos.x += 10;
     tickMechanic(sim, HOARD_MARK_HAZARD_TICK_SEC * 0.5);
     sim.player.pos = marked;
     const beforePulse = sim.player.hp;
     tickMechanic(sim, HOARD_MARK_HAZARD_TICK_SEC);
-    expect(sim.player.hp).toBe(beforePulse - Math.round(sim.player.maxHp * 0.03));
+    expect(sim.player.hp).toBe(
+      beforePulse - Math.round(sim.player.maxHp * 0.03 * HOARD_RARITY_PRESSURE.legendary.damage),
+    );
     sim.player.pos.x += 10;
     const afterLeaving = sim.player.hp;
     tickMechanic(sim, HOARD_MARK_HAZARD_SEC);
@@ -479,7 +487,20 @@ describe('Buried Hoard boss encounter', () => {
     hoardState(normal.inst).markTimer = 0;
     normal.boss.hp = Math.floor(normal.boss.maxHp * 0.3) + 1;
     tickHoardBossMechanics(normal.sim.ctx);
+    // A clock the kit just reset keeps its full interval; the rarity cadence
+    // (hoard_scaling.ts) only moves a clock that ran this tick.
     expect(normal.inst.hoardBoss?.markTimer).toBe(HOARD_MARK_EVERY_SEC);
+    // A running clock in this legendary hoard loses a tick and the cadence's share.
+    const running = makeEncounter();
+    tickHoardBossMechanics(running.sim.ctx);
+    hoardState(running.inst).cues.length = 0;
+    hoardState(running.inst).sweepTimer = 99;
+    hoardState(running.inst).markTimer = 5;
+    tickHoardBossMechanics(running.sim.ctx);
+    expect(running.inst.hoardBoss?.markTimer).toBeCloseTo(
+      5 - DT / HOARD_RARITY_PRESSURE.legendary.cadence,
+      9,
+    );
 
     const enraged = makeEncounter();
     tickHoardBossMechanics(enraged.sim.ctx);

@@ -5,14 +5,17 @@ import { describe, expect, it } from 'vitest';
 import { HoardBossCueMirror } from '../src/net/hoard_boss_cue_mirror';
 import {
   BONE_REAPER_FIRST_SEC,
+  boneReaperFrame,
   HOARD_HARVESTED_SOUL_AURA_ID,
   holdHoardBoneReaper,
+  tickHoardBoneReaper,
 } from '../src/sim/rift/hoard_bone_reaper';
 import {
   BONE_SCYTHE,
   BONE_SCYTHE_TOTAL_SEC,
   decodeScytheFrame,
   encodeScytheFrame,
+  HOARD_SOUL_BURDEN_AURA_ID,
   pointInScytheBlade,
   SOUL_HARVEST,
   scytheAngle,
@@ -29,6 +32,13 @@ import {
   soulSpawnOffsets,
 } from '../src/sim/rift/hoard_bone_reaper_core';
 import { hoardBossCueViews, tickHoardBossMechanics } from '../src/sim/rift/hoard_boss';
+import {
+  HOARD_DOUBLE_MECHANIC_INTENSITY,
+  HOARD_RARITY_PRESSURE,
+  hoardIntensity,
+  hoardMechanicDamage,
+  hoardPressure,
+} from '../src/sim/rift/hoard_scaling';
 import type { RiftInstance } from '../src/sim/rift/types';
 import { makeVaultSeed } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
@@ -210,6 +220,10 @@ describe('Wandering Scythe (authoritative)', () => {
     expect(frame.lateral).toBeLessThanOrEqual(BONE_SCYTHE.maxLateral);
     expect(frame.depth).toBeGreaterThanOrEqual(BONE_SCYTHE.minDepth);
     expect(holdHoardBoneReaper(entry.sim.ctx, entry.boss)).toBe(true);
+    // No follow-up cast while we watch this one end (a legendary hoard's cadence
+    // would otherwise start the harvest, which pins him too).
+    const clock = entry.inst.hoardBoss?.boneReaper;
+    if (clock) clock.timer = 9999;
     // Dragged off his spot, he is put back: the route's clearance depends on it.
     entry.boss.pos.x += 6;
     expect(holdHoardBoneReaper(entry.sim.ctx, entry.boss)).toBe(true);
@@ -290,14 +304,76 @@ describe('Wandering Scythe (authoritative)', () => {
 });
 
 describe('the soul choreography (pure, shared with the renderer)', () => {
-  it('asks a lone player for four and never more than seven', () => {
-    expect(soulCountFor(1)).toBe(4);
-    expect(soulCountFor(3)).toBe(5);
-    expect(soulCountFor(5)).toBe(6);
-    expect(soulCountFor(40)).toBe(SOUL_HARVEST.maxCount);
+  it('scales the souls with the head count, and with the rarity on top', () => {
+    // One more soul for every player after the first.
+    expect([1, 2, 3, 4, 5].map((heads) => soulCountFor(heads))).toEqual([3, 4, 5, 6, 7]);
+    // The rarity presses it either way: a common hoard asks for fewer, a
+    // legendary one for more, a lone player included.
+    expect(soulCountFor(1, HOARD_RARITY_PRESSURE.common.extra)).toBe(2);
+    expect(soulCountFor(1, HOARD_RARITY_PRESSURE.legendary.extra)).toBe(4);
+    expect(soulCountFor(5, HOARD_RARITY_PRESSURE.legendary.extra)).toBe(8);
+    expect(soulCountFor(40, 3)).toBe(SOUL_HARVEST.maxCount);
+    expect(soulCountFor(1, -9)).toBe(SOUL_HARVEST.minCount);
+  });
+
+  it('scatters them over the WHOLE room: never bunched, never on the boss', () => {
+    for (let count = SOUL_HARVEST.minCount; count <= SOUL_HARVEST.maxCount; count++) {
+      for (const seed of [1, 2, 7, 40, 911]) {
+        const souls = soulSpawnOffsets(count, seed, FRAME, 24);
+        expect(souls).toHaveLength(count);
+        for (const soul of souls) {
+          expect(Math.hypot(soul.x, soul.f), `count ${count} seed ${seed}`).toBeGreaterThanOrEqual(
+            SOUL_HARVEST.minSpawnDistance - 1e-6,
+          );
+          expect(Math.abs(soul.x)).toBeLessThanOrEqual(24 - SOUL_HARVEST.wallMargin + 1e-6);
+        }
+        for (let i = 0; i < souls.length; i++)
+          for (let j = i + 1; j < souls.length; j++)
+            expect(
+              Math.hypot(souls[i].x - souls[j].x, souls[i].f - souls[j].f),
+              `count ${count} seed ${seed} souls ${i},${j}`,
+            ).toBeGreaterThanOrEqual(SOUL_HARVEST.minSeparation - 1e-6);
+        if (count >= 4) {
+          // They surround the room: both sides, and both the near and the far end.
+          expect(souls.some((s) => s.x > 3) && souls.some((s) => s.x < -3)).toBe(true);
+          const depths = souls.map((s) => s.f);
+          expect(Math.max(...depths) - Math.min(...depths)).toBeGreaterThan(12);
+          // And at mixed distances, so they arrive at different times.
+          const arrivals = souls.map((s) => soulLifeSec(Math.hypot(s.x, s.f)));
+          expect(Math.max(...arrivals) - Math.min(...arrivals)).toBeGreaterThan(1.5);
+        }
+      }
+    }
+  });
+
+  it('is drawn faster in a rarer hoard, and the pace rides in its own life', () => {
+    const slow = soulLifeSec(24, HOARD_RARITY_PRESSURE.common.speed);
+    const base = soulLifeSec(24, HOARD_RARITY_PRESSURE.rare.speed);
+    const fast = soulLifeSec(24, HOARD_RARITY_PRESSURE.legendary.speed);
+    expect(slow).toBeGreaterThan(base);
+    expect(fast).toBeLessThan(base);
+    // Given its life, it still arrives exactly on time: sim and renderer agree.
+    const spawn = { x: 24, z: 0 };
+    const boss = { x: 0, z: 0 };
+    expect(soulPosition(spawn, boss, fast, undefined, fast).x).toBeCloseTo(
+      SOUL_HARVEST.absorbRadius,
+      6,
+    );
+    expect(soulPosition(spawn, boss, fast * 0.5, undefined, fast).x).toBeLessThan(
+      soulPosition(spawn, boss, fast * 0.5, undefined, base).x,
+    );
   });
 
   it('spreads them round the room, none near the boss, differently each cast', () => {
+    // A shallow room: nothing is placed past the depth it was measured clear to.
+    for (let seed = 1; seed <= 20; seed++) {
+      for (const soul of soulSpawnOffsets(5, seed, FRAME, 24, 18)) {
+        expect(soul.f).toBeLessThanOrEqual(18 + 1e-9);
+        expect(Math.hypot(soul.x, soul.f)).toBeGreaterThanOrEqual(
+          SOUL_HARVEST.minSpawnDistance - 1e-6,
+        );
+      }
+    }
     const first = soulSpawnOffsets(6, 11, FRAME);
     expect(first).toHaveLength(6);
     for (const soul of first) {
@@ -340,7 +416,9 @@ describe('Soul Harvest (authoritative)', () => {
   it('raises souls round the room, clear of the boss and of the player, and pins the boss', () => {
     const entry = encounter();
     const souls = startHarvest(entry);
-    expect(souls).toHaveLength(soulCountFor(1));
+    // A lone player in a LEGENDARY hoard: the solo count plus the rarity's one.
+    expect(souls).toHaveLength(soulCountFor(1, HOARD_RARITY_PRESSURE.legendary.extra));
+    expect(souls).toHaveLength(4);
     for (const soul of souls) {
       expect(soul.kind).toBe('mark');
       // Untargeted on purpose: a targeted mark is drawn ON its target.
@@ -416,6 +494,111 @@ describe('Soul Harvest (authoritative)', () => {
     run(entry.sim, entry.boss, DT * 2);
     expect(hoardBossCueViews(entry.inst).filter((c) => c.variant?.startsWith('bone-'))).toEqual([]);
     expect(entry.boss.auras.some((a) => a.id === HOARD_HARVESTED_SOUL_AURA_ID)).toBe(false);
+  });
+});
+
+describe('the price of a soul, and pressure by party and rarity', () => {
+  it('burdens whoever releases a soul, stacking, and never feeds the boss for it', () => {
+    const entry = encounter();
+    const souls = startHarvest(entry);
+    run(entry.sim, entry.boss, SOUL_HARVEST.castSec + DT);
+    const burdenOf = () => entry.sim.player.auras.find((a) => a.id === HOARD_SOUL_BURDEN_AURA_ID);
+    expect(burdenOf()).toBeUndefined();
+    for (let taken = 1; taken <= 2; taken++) {
+      const soul = souls[taken - 1];
+      entry.sim.player.pos = { ...entry.sim.player.pos, x: soul.x, z: soul.z };
+      run(entry.sim, entry.boss, DT * 2);
+      expect(burdenOf()).toMatchObject({ kind: 'vulnerability', stacks: taken });
+      expect(burdenOf()?.value).toBeCloseTo(taken * SOUL_HARVEST.burdenPerStack, 9);
+      expect(burdenOf()?.remaining).toBeGreaterThan(SOUL_HARVEST.burdenDurationSec - 1);
+    }
+    expect(entry.boss.auras.some((a) => a.id === HOARD_HARVESTED_SOUL_AURA_ID)).toBe(false);
+    expect(SOUL_HARVEST.burdenMaxStacks * SOUL_HARVEST.burdenPerStack).toBeLessThan(0.6);
+  });
+
+  it('rarity presses every hoard the same way: harder, faster, more at once', () => {
+    const order = ['common', 'rare', 'epic', 'legendary'] as const;
+    for (let i = 1; i < order.length; i++) {
+      const lower = HOARD_RARITY_PRESSURE[order[i - 1]];
+      const higher = HOARD_RARITY_PRESSURE[order[i]];
+      expect(higher.damage).toBeGreaterThan(lower.damage);
+      expect(higher.cadence).toBeLessThan(lower.cadence);
+      expect(higher.speed).toBeGreaterThan(lower.speed);
+      expect(higher.extra).toBeGreaterThanOrEqual(lower.extra);
+    }
+    // Rare is the baseline every mechanic was tuned on: it changes nothing.
+    expect(HOARD_RARITY_PRESSURE.rare).toEqual({ damage: 1, cadence: 1, extra: 0, speed: 1 });
+    expect(hoardPressure(null)).toEqual(HOARD_RARITY_PRESSURE.rare);
+    // The same blow costs more of a lone player's health in a legendary hoard.
+    const entry = encounter();
+    const share = 0.2;
+    expect(hoardMechanicDamage(entry.inst, entry.sim.player, share)).toBe(
+      Math.round(entry.sim.player.maxHp * share * HOARD_RARITY_PRESSURE.legendary.damage),
+    );
+    if (entry.inst.vault) entry.inst.vault.rarity = 'common';
+    expect(hoardMechanicDamage(entry.inst, entry.sim.player, share)).toBe(
+      Math.round(entry.sim.player.maxHp * share * HOARD_RARITY_PRESSURE.common.damage),
+    );
+  });
+
+  it('sends a mirrored PAIR of scythes only at full pressure, never at a lone player', () => {
+    const heads = (vaultRarity: 'common' | 'rare' | 'epic' | 'legendary', n: number) =>
+      hoardIntensity({ rarity: vaultRarity, ownerPid: 1, headCount: n, level: 20 }, n);
+    expect(heads('legendary', 1)).toBeLessThan(HOARD_DOUBLE_MECHANIC_INTENSITY);
+    expect(heads('legendary', 3)).toBeLessThan(HOARD_DOUBLE_MECHANIC_INTENSITY);
+    expect(heads('legendary', 4)).toBeGreaterThanOrEqual(HOARD_DOUBLE_MECHANIC_INTENSITY);
+    expect(heads('epic', 5)).toBeGreaterThanOrEqual(HOARD_DOUBLE_MECHANIC_INTENSITY);
+    expect(heads('rare', 5)).toBeLessThan(HOARD_DOUBLE_MECHANIC_INTENSITY);
+
+    const entry = encounter();
+    const state = entry.inst.hoardBoss;
+    if (!state?.boneReaper) throw new Error('missing reaper state');
+    state.boneReaper.step = 0;
+    state.boneReaper.timer = 0;
+    // Five living players in this legendary hoard.
+    const party = Array.from({ length: 5 }, (_, i) => ({ ...entry.sim.player, id: 9000 + i }));
+    tickHoardBoneReaper(entry.sim.ctx, entry.inst, entry.boss, state, party, () => {});
+    const blades = state.cues.filter((cue) => cue.variant === 'bone-scythe');
+    expect(blades).toHaveLength(2);
+    const [a, b] = blades;
+    if (a.kind !== 'sweep' || b.kind !== 'sweep') throw new Error('not sweeps');
+    // Mirrored left for right, begun on opposite sides of the turn, on different routes.
+    expect(b.radius).toBe(-a.radius);
+    expect(b.facing - a.facing).toBeCloseTo(Math.PI, 9);
+    expect(scythePatternOf(b.id)).not.toBe(scythePatternOf(a.id));
+    const frameA = decodeScytheFrame(a.radius, a.halfAngle);
+    const frameB = decodeScytheFrame(b.radius, b.halfAngle);
+    const t = BONE_SCYTHE.castSec + 3;
+    const pa = scythePivot(a.x, a.z, 0, frameA, t);
+    const pb = scythePivot(b.x, b.z, 0, frameB, t);
+    // The same route mirrored: equal depth, opposite sides.
+    expect(pb.z).toBeCloseTo(pa.z, 9);
+    expect(pb.x - b.x).toBeCloseTo(-(pa.x - a.x), 9);
+    // Cornered against a wall the mirrored routes would ride one line: just the one.
+    const cornered = encounter();
+    const corneredState = cornered.inst.hoardBoss;
+    if (!corneredState?.boneReaper) throw new Error('missing reaper state');
+    const open = boneReaperFrame(cornered.inst, cornered.boss);
+    cornered.boss.pos.x += open.halfWidth - (BONE_SCYTHE.reach + BONE_SCYTHE.wallMargin + 4);
+    expect(boneReaperFrame(cornered.inst, cornered.boss).lateral).toBeLessThan(
+      BONE_SCYTHE.pairMinLateral,
+    );
+    corneredState.boneReaper.step = 0;
+    corneredState.boneReaper.timer = 0;
+    tickHoardBoneReaper(
+      cornered.sim.ctx,
+      cornered.inst,
+      cornered.boss,
+      corneredState,
+      party,
+      () => {},
+    );
+    expect(corneredState.cues.filter((cue) => cue.variant === 'bone-scythe')).toHaveLength(1);
+    // A lone player gets one.
+    const solo = encounter();
+    expect(hoardBossCueViews(solo.inst).filter((c) => c.variant === 'bone-scythe')).toHaveLength(0);
+    startScythe(solo);
+    expect(hoardBossCueViews(solo.inst).filter((c) => c.variant === 'bone-scythe')).toHaveLength(1);
   });
 });
 

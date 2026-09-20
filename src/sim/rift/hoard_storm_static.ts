@@ -1,5 +1,6 @@
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
+import { hoardMechanicDamage } from './hoard_scaling';
 import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
@@ -64,6 +65,7 @@ export function startHoardStormStatic(
 /** The caller advances the fuse. One cue per player means clustered groups never multiply damage. */
 export function tickHoardStormStaticCue(
   ctx: SimContext,
+  inst: RiftInstance,
   boss: Entity,
   cue: MarkCue,
   living: readonly Entity[],
@@ -81,7 +83,7 @@ export function tickHoardStormStaticCue(
     boss,
     player,
     capRiftNonLethalMechanicDamage(
-      Math.max(1, Math.round(player.maxHp * HOARD_STATIC_DAMAGE_FRACTION)),
+      hoardMechanicDamage(inst, player, HOARD_STATIC_DAMAGE_FRACTION),
       player.maxHp,
     ),
     false,

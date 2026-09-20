@@ -193,6 +193,47 @@ function bladeSectorGeometry(): THREE.BufferGeometry {
   return geometry;
 }
 
+/** Two at most: a full party in a rare enough hoard faces a mirrored pair
+ *  (src/sim/rift/hoard_scaling.ts HOARD_DOUBLE_MECHANIC_INTENSITY). */
+const SCYTHE_RIGS = 2;
+type Ribbon = ReturnType<typeof strip> & { mesh: THREE.Mesh; material: THREE.ShaderMaterial };
+
+/** One Wandering Scythe on screen: pivot -> (floorSpin | tilt -> spin -> weapon),
+ *  its own materials (each rig fades on its own clock) and the cue it follows. */
+interface ScytheRig {
+  pivot: THREE.Group;
+  floorSpin: THREE.Group;
+  tilt: THREE.Group;
+  spin: THREE.Group;
+  weapon: THREE.Group;
+  fragments: THREE.Group;
+  glowMaterial: THREE.MeshBasicMaterial;
+  sectorMaterial: THREE.MeshBasicMaterial;
+  sectorEdgeMaterial: THREE.LineBasicMaterial;
+  markerMaterial: THREE.MeshBasicMaterial;
+  reachMaterial: THREE.MeshBasicMaterial;
+  innerMaterial: THREE.MeshBasicMaterial;
+  hubGlow: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
+  trail?: Ribbon;
+  wake?: Ribbon;
+  pose: ScythePose;
+  scytheCueId: number;
+  scytheInstanceId: number;
+  scytheRemaining: number;
+  scytheElapsed: number;
+  scytheTotal: number;
+  scytheX: number;
+  scytheZ: number;
+  scytheFacing: number;
+  scytheRadius: number;
+  scytheHalfAngle: number;
+  scytheSeen: boolean;
+  scytheFresh: boolean;
+  scytheFrame: ReturnType<typeof decodeScytheFrame>;
+  wasBroken: boolean;
+  scrapeDebt: number;
+}
+
 export class HoardBoneReaperFx {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
@@ -202,57 +243,8 @@ export class HoardBoneReaperFx {
   private disposed = false;
   private time = 0;
 
-  // ---- the scythe (one: a client only ever stands in one hoard)
-  private readonly pivot = new THREE.Group();
-  private readonly floorSpin = new THREE.Group();
-  private readonly tilt = new THREE.Group();
-  private readonly spin = new THREE.Group();
-  private readonly weapon = new THREE.Group();
-  private readonly fragments = new THREE.Group();
-  private readonly glowMaterial: THREE.MeshBasicMaterial;
-  private readonly sectorMaterial: THREE.MeshBasicMaterial;
-  private readonly sectorEdgeMaterial: THREE.LineBasicMaterial;
-  private readonly markerMaterial: THREE.MeshBasicMaterial;
-  private readonly reachMaterial: THREE.MeshBasicMaterial;
-  private readonly innerMaterial: THREE.MeshBasicMaterial;
-  private readonly trail?: ReturnType<typeof strip> & {
-    mesh: THREE.Mesh;
-    material: THREE.ShaderMaterial;
-  };
-  private readonly wake?: ReturnType<typeof strip> & {
-    mesh: THREE.Mesh;
-    material: THREE.ShaderMaterial;
-  };
-  private readonly pose: ScythePose = {
-    x: 0,
-    z: 0,
-    angle: 0,
-    formed: 0,
-    lift: 0,
-    leanX: 0,
-    leanZ: 0,
-    glow: 0,
-    broken: 0,
-    speed: 0,
-    dirX: 0,
-    dirZ: 0,
-    active: false,
-  };
-  private scytheCueId = -1;
-  private scytheInstanceId = -1;
-  private scytheRemaining = -1;
-  private scytheElapsed = 0;
-  private scytheTotal = 0;
-  private scytheX = 0;
-  private scytheZ = 0;
-  private scytheFacing = 0;
-  private scytheRadius = Number.NaN;
-  private scytheHalfAngle = Number.NaN;
-  private scytheSeen = false;
-  private scytheFresh = false;
-  private scytheFrame = decodeScytheFrame(0, BONE_SCYTHE.minDepth);
-  private wasBroken = false;
-  private scrapeDebt = 0;
+  // ---- the scythes
+  private readonly rigs: ScytheRig[] = [];
 
   // ---- the souls
   private readonly soulSlots: SoulSlot[] = [];
@@ -260,7 +252,6 @@ export class HoardBoneReaperFx {
     [];
   private readonly soulMarkers: THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
   private readonly soulHalos: THREE.InstancedMesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
-  private readonly hubGlow: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   private readonly soulTrails?: ReturnType<typeof strip> & {
     mesh: THREE.Mesh;
     material: THREE.ShaderMaterial;
@@ -334,28 +325,8 @@ export class HoardBoneReaperFx {
           ? loadSources()
           : Promise.resolve(initial);
 
-    // ---- scythe rig: pivot -> (floorSpin | tilt -> spin -> weapon)
-    this.pivot.name = 'MovementPivot';
-    this.spin.name = 'RotationPivot';
-    this.pivot.add(this.floorSpin, this.tilt);
-    this.tilt.add(this.spin);
-    this.spin.add(this.weapon);
-    this.root.add(this.pivot);
-    this.glowMaterial = this.keep(this.basic(LOOK.necro, 1, true));
-    this.buildWeapon(initial?.[0]);
-
-    this.sectorMaterial = this.keep(this.basic(0x04140e, 0.5, false));
-    this.sectorEdgeMaterial = this.keep(
-      new THREE.LineBasicMaterial({
-        color: LOOK.necro,
-        transparent: true,
-        opacity: 0.75,
-        depthWrite: false,
-      }),
-    );
-    const sector = new THREE.Mesh(this.own(bladeSectorGeometry()), this.sectorMaterial);
-    sector.position.y = 0.05;
-    sector.renderOrder = 20;
+    const card = this.own(new THREE.PlaneGeometry(1, 1));
+    const sectorGeometry = this.own(bladeSectorGeometry());
     // The leading edge, where the blade is about to be: the line to stay ahead of.
     const lead = BONE_SCYTHE.bladeArc * BONE_SCYTHE.rotationDirection;
     const edgeGeometry = this.own(
@@ -372,46 +343,13 @@ export class HoardBoneReaperFx {
         ),
       ]),
     );
-    const edge = new THREE.Line(edgeGeometry, this.sectorEdgeMaterial);
-    edge.position.y = 0.07;
-    this.floorSpin.add(sector, edge);
-
-    const flatRing = (inner: number, outer: number) =>
-      this.own(new THREE.RingGeometry(inner, outer, 72).rotateX(-Math.PI / 2));
-    this.markerMaterial = this.keep(this.basic(LOOK.necro, 0.5, true));
-    this.reachMaterial = this.keep(this.basic(LOOK.necro, 0.26, true));
-    this.innerMaterial = this.keep(this.basic(LOOK.necroDeep, 0.2, true));
-    const marker = new THREE.Mesh(flatRing(0.85, 1.25), this.markerMaterial);
-    const reach = new THREE.Mesh(
-      flatRing(BONE_SCYTHE.reach - 0.07, BONE_SCYTHE.reach + 0.07),
-      this.reachMaterial,
-    );
-    const inner = new THREE.Mesh(
-      flatRing(BONE_SCYTHE.bladeInner - 0.05, BONE_SCYTHE.bladeInner + 0.05),
-      this.innerMaterial,
-    );
-    for (const mesh of [marker, reach, inner]) {
-      mesh.position.y = 0.06;
-      mesh.renderOrder = 21;
-      this.pivot.add(mesh);
-    }
-
-    if (!this.low) {
-      const trail = strip(TRAIL - 1);
-      const trailMaterial = this.keep(ribbonMaterial(LOOK.necro));
-      const trailMesh = new THREE.Mesh(this.own(trail.geometry), trailMaterial);
-      const wake = strip(WAKE - 1);
-      const wakeMaterial = this.keep(ribbonMaterial(LOOK.necroDeep));
-      const wakeMesh = new THREE.Mesh(this.own(wake.geometry), wakeMaterial);
-      for (const mesh of [trailMesh, wakeMesh]) {
-        mesh.frustumCulled = false;
-        mesh.renderOrder = 23;
-        mesh.visible = false;
-        this.root.add(mesh);
-      }
-      this.trail = { ...trail, mesh: trailMesh, material: trailMaterial };
-      this.wake = { ...wake, mesh: wakeMesh, material: wakeMaterial };
-    }
+    const rings = [
+      this.flatRing(0.85, 1.25),
+      this.flatRing(BONE_SCYTHE.reach - 0.07, BONE_SCYTHE.reach + 0.07),
+      this.flatRing(BONE_SCYTHE.bladeInner - 0.05, BONE_SCYTHE.bladeInner + 0.05),
+    ];
+    for (let index = 0; index < SCYTHE_RIGS; index++)
+      this.rigs.push(this.makeRig(initial?.[0], card, sectorGeometry, edgeGeometry, rings));
 
     // ---- souls: four instanced parts, a floor marker each, one shared tail strip
     const soulColors = [LOOK.soulDeep, LOOK.soulCore, LOOK.soul, 0x04161c];
@@ -435,7 +373,7 @@ export class HoardBoneReaperFx {
       this.soulParts.push(mesh);
     });
     this.soulMarkers = new THREE.InstancedMesh(
-      flatRing(SOUL_HARVEST.interactionRadius - 0.12, SOUL_HARVEST.interactionRadius),
+      this.flatRing(SOUL_HARVEST.interactionRadius - 0.12, SOUL_HARVEST.interactionRadius),
       this.keep(this.basic(LOOK.soul, 0.5, true)),
       SOUL_SLOTS,
     );
@@ -447,7 +385,6 @@ export class HoardBoneReaperFx {
     this.soulMarkers.count = 0;
     this.root.add(this.soulMarkers);
     // A soft halo behind each soul: what makes one findable across the room.
-    const card = this.own(new THREE.PlaneGeometry(1, 1));
     this.soulHalos = new THREE.InstancedMesh(
       card,
       this.keep(glowMaterial(LOOK.soul, true)),
@@ -460,13 +397,6 @@ export class HoardBoneReaperFx {
     this.soulHalos.renderOrder = 24;
     this.soulHalos.count = 0;
     this.root.add(this.soulHalos);
-    // The pivot's own light: the eye finds the centre of the hazard first.
-    this.hubGlow = new THREE.Mesh(card, this.keep(glowMaterial(LOOK.necro, false)));
-    this.hubGlow.frustumCulled = false;
-    this.hubGlow.renderOrder = 24;
-    this.hubGlow.position.y = LOOK.bladeHeight + 0.4;
-    this.hubGlow.scale.setScalar(4.2);
-    this.pivot.add(this.hubGlow);
     if (!this.low) {
       // Each soul owns a run of SOUL_TRAIL_SEGMENTS quads; a degenerate quad joins runs.
       const tails = strip(SOUL_SLOTS * (SOUL_TRAIL_SEGMENTS + 1) - 1);
@@ -495,7 +425,7 @@ export class HoardBoneReaperFx {
 
     // ---- endings, sparks, the empowered boss
     const ball = this.own(new THREE.IcosahedronGeometry(1, 2));
-    const burstRing = flatRing(0.95, 1);
+    const burstRing = this.flatRing(0.95, 1);
     for (let e = 0; e < ENDINGS; e++) {
       const flash = new THREE.Mesh(ball, this.keep(this.basic(LOOK.soulCore, 0, true)));
       const ring = new THREE.Mesh(burstRing, this.keep(this.basic(LOOK.soul, 0, true)));
@@ -538,7 +468,7 @@ export class HoardBoneReaperFx {
       };
     }
     this.ribs = new THREE.Mesh(card, this.keep(glowMaterial(LOOK.absorb, false)));
-    this.aura = new THREE.Mesh(flatRing(0.9, 1), this.keep(this.basic(LOOK.absorb, 0, true)));
+    this.aura = new THREE.Mesh(this.flatRing(0.9, 1), this.keep(this.basic(LOOK.absorb, 0, true)));
     for (const mesh of [this.ribs, this.aura]) {
       mesh.visible = false;
       mesh.frustumCulled = false;
@@ -554,14 +484,13 @@ export class HoardBoneReaperFx {
       this.orbiters.push(orb);
     }
 
-    this.pivot.visible = false;
     // Compile with everything present and visible-capable, then idle hidden.
     this.readyForEntry = pending
       .catch(() => undefined)
       .then(async (loaded) => {
         if (this.disposed) return;
         if (loaded && loaded !== initial) {
-          this.buildWeapon(loaded[0]);
+          for (const rig of this.rigs) this.buildWeapon(rig, loaded[0]);
           SOUL_PARTS.forEach((name, i) => {
             this.soulParts[i].geometry = this.partGeometry(loaded[1], name, i);
           });
@@ -569,6 +498,115 @@ export class HoardBoneReaperFx {
         await attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed);
       })
       .catch(() => {});
+  }
+
+  private flatRing(inner: number, outer: number): THREE.BufferGeometry {
+    return this.own(new THREE.RingGeometry(inner, outer, 72).rotateX(-Math.PI / 2));
+  }
+
+  /** Build one scythe rig. Geometry is shared between rigs; materials are per
+   *  rig, because each fades on its own cue's clock. */
+  private makeRig(
+    asset: THREE.Group | undefined,
+    card: THREE.BufferGeometry,
+    sectorGeometry: THREE.BufferGeometry,
+    edgeGeometry: THREE.BufferGeometry,
+    rings: readonly THREE.BufferGeometry[],
+  ): ScytheRig {
+    const rig: ScytheRig = {
+      pivot: new THREE.Group(),
+      floorSpin: new THREE.Group(),
+      tilt: new THREE.Group(),
+      spin: new THREE.Group(),
+      weapon: new THREE.Group(),
+      fragments: new THREE.Group(),
+      glowMaterial: this.keep(this.basic(LOOK.necro, 1, true)),
+      sectorMaterial: this.keep(this.basic(0x04140e, 0.5, false)),
+      sectorEdgeMaterial: this.keep(
+        new THREE.LineBasicMaterial({
+          color: LOOK.necro,
+          transparent: true,
+          opacity: 0.75,
+          depthWrite: false,
+        }),
+      ),
+      markerMaterial: this.keep(this.basic(LOOK.necro, 0.5, true)),
+      reachMaterial: this.keep(this.basic(LOOK.necro, 0.26, true)),
+      innerMaterial: this.keep(this.basic(LOOK.necroDeep, 0.2, true)),
+      hubGlow: new THREE.Mesh(card, this.keep(glowMaterial(LOOK.necro, false))),
+      pose: {
+        x: 0,
+        z: 0,
+        angle: 0,
+        formed: 0,
+        lift: 0,
+        leanX: 0,
+        leanZ: 0,
+        glow: 0,
+        broken: 0,
+        speed: 0,
+        dirX: 0,
+        dirZ: 0,
+        active: false,
+      },
+      scytheCueId: -1,
+      scytheInstanceId: -1,
+      scytheRemaining: -1,
+      scytheElapsed: 0,
+      scytheTotal: 0,
+      scytheX: 0,
+      scytheZ: 0,
+      scytheFacing: 0,
+      scytheRadius: Number.NaN,
+      scytheHalfAngle: Number.NaN,
+      scytheSeen: false,
+      scytheFresh: false,
+      scytheFrame: decodeScytheFrame(0, BONE_SCYTHE.minDepth),
+      wasBroken: false,
+      scrapeDebt: 0,
+    };
+    rig.pivot.name = 'MovementPivot';
+    rig.spin.name = 'RotationPivot';
+    rig.pivot.add(rig.floorSpin, rig.tilt);
+    rig.tilt.add(rig.spin);
+    rig.spin.add(rig.weapon);
+    this.root.add(rig.pivot);
+    this.buildWeapon(rig, asset);
+    const sector = new THREE.Mesh(sectorGeometry, rig.sectorMaterial);
+    sector.position.y = 0.05;
+    sector.renderOrder = 20;
+    const edge = new THREE.Line(edgeGeometry, rig.sectorEdgeMaterial);
+    edge.position.y = 0.07;
+    rig.floorSpin.add(sector, edge);
+    const ringMaterials = [rig.markerMaterial, rig.reachMaterial, rig.innerMaterial];
+    rings.forEach((geometry, i) => {
+      const mesh = new THREE.Mesh(geometry, ringMaterials[i]);
+      mesh.position.y = 0.06;
+      mesh.renderOrder = 21;
+      rig.pivot.add(mesh);
+    });
+    // The pivot's own light: the eye finds the centre of the hazard first.
+    rig.hubGlow.frustumCulled = false;
+    rig.hubGlow.renderOrder = 24;
+    rig.hubGlow.position.y = LOOK.bladeHeight + 0.4;
+    rig.hubGlow.scale.setScalar(4.2);
+    rig.pivot.add(rig.hubGlow);
+    if (!this.low) {
+      const ribbon = (segments: number, color: number): Ribbon => {
+        const built = strip(segments);
+        const material = this.keep(ribbonMaterial(color));
+        const mesh = new THREE.Mesh(this.own(built.geometry), material);
+        mesh.frustumCulled = false;
+        mesh.renderOrder = 23;
+        mesh.visible = false;
+        this.root.add(mesh);
+        return { ...built, mesh, material };
+      };
+      rig.trail = ribbon(TRAIL - 1, LOOK.necro);
+      rig.wake = ribbon(WAKE - 1, LOOK.necroDeep);
+    }
+    rig.pivot.visible = false;
+    return rig;
   }
 
   private own<T extends THREE.BufferGeometry>(geometry: T): T {
@@ -596,9 +634,9 @@ export class HoardBoneReaperFx {
   /** The weapon: the Blender model in the game's own surface material, its two
    *  glowing parts on a material of ours so the glow can breathe. A plain
    *  stand-in of the same reach serves until (or unless) the asset arrives. */
-  private buildWeapon(asset: THREE.Group | undefined): void {
-    this.weapon.clear();
-    this.fragments.clear();
+  private buildWeapon(rig: ScytheRig, asset: THREE.Group | undefined): void {
+    rig.weapon.clear();
+    rig.fragments.clear();
     if (!asset) {
       const shaft = new THREE.Mesh(
         this.own(
@@ -606,7 +644,7 @@ export class HoardBoneReaperFx {
         ),
         surfaceMat({ color: LOOK.bone, roughness: 0.75 }),
       );
-      this.weapon.add(shaft);
+      rig.weapon.add(shaft);
       return;
     }
     const model = asset.clone(true);
@@ -614,7 +652,7 @@ export class HoardBoneReaperFx {
       if (!(node instanceof THREE.Mesh)) return;
       node.castShadow = true;
       const convert = (material: THREE.Material): THREE.Material => {
-        if (material.name === 'NecroGlow') return this.glowMaterial;
+        if (material.name === 'NecroGlow') return rig.glowMaterial;
         const original = material as THREE.MeshStandardMaterial;
         return surfaceMat({
           color: original.color?.getHex(),
@@ -629,14 +667,14 @@ export class HoardBoneReaperFx {
         ? node.material.map(convert)
         : convert(node.material);
     });
-    this.weapon.add(model);
+    rig.weapon.add(model);
     // The shipped GLB is quantized, which moves node origins, so the drifting
     // shards hang on a group of ours and only that group bobs.
     model.updateMatrixWorld(true);
     const shards = model.getObjectByName('Scythe_Fragments');
     if (shards) {
-      this.weapon.add(this.fragments);
-      this.fragments.attach(shards);
+      rig.weapon.add(rig.fragments);
+      rig.fragments.attach(shards);
     }
   }
 
@@ -682,34 +720,50 @@ export class HoardBoneReaperFx {
 
   sync(cues: readonly HoardBossCueView[]): void {
     if (this.disposed) return;
-    this.scytheSeen = false;
+    for (const rig of this.rigs) rig.scytheSeen = false;
     this.harvestSeen = false;
     for (const slot of this.soulSlots) slot.seen = false;
     for (const cue of cues) {
       if (cue.remaining <= 0) continue;
       if (cue.variant === 'bone-scythe') {
-        this.scytheSeen = true;
-        if (this.scytheCueId !== cue.cueId || this.scytheInstanceId !== cue.instanceId) {
-          this.scytheCueId = cue.cueId;
-          this.scytheInstanceId = cue.instanceId;
-          this.scytheRemaining = -1;
-          this.wasBroken = false;
-          this.scrapeDebt = 0;
+        // The rig already following this cue, else a free one.
+        let rig: ScytheRig | undefined;
+        let free: ScytheRig | undefined;
+        for (let i = 0; i < this.rigs.length; i++) {
+          const candidate = this.rigs[i];
+          if (
+            candidate.scytheCueId === cue.cueId &&
+            candidate.scytheInstanceId === cue.instanceId
+          ) {
+            rig = candidate;
+            break;
+          }
+          if (!free && candidate.scytheCueId === -1) free = candidate;
         }
-        this.scytheX = cue.x;
-        this.scytheZ = cue.z;
-        this.scytheFacing = cue.facing ?? 0;
+        rig ??= free;
+        if (!rig) continue;
+        rig.scytheSeen = true;
+        if (rig.scytheCueId !== cue.cueId || rig.scytheInstanceId !== cue.instanceId) {
+          rig.scytheCueId = cue.cueId;
+          rig.scytheInstanceId = cue.instanceId;
+          rig.scytheRemaining = -1;
+          rig.wasBroken = false;
+          rig.scrapeDebt = 0;
+        }
+        rig.scytheX = cue.x;
+        rig.scytheZ = cue.z;
+        rig.scytheFacing = cue.facing ?? 0;
         const halfAngle = cue.halfAngle ?? BONE_SCYTHE.minDepth;
-        if (this.scytheRadius !== cue.radius || this.scytheHalfAngle !== halfAngle) {
-          this.scytheRadius = cue.radius;
-          this.scytheHalfAngle = halfAngle;
-          this.scytheFrame = decodeScytheFrame(cue.radius, halfAngle);
+        if (rig.scytheRadius !== cue.radius || rig.scytheHalfAngle !== halfAngle) {
+          rig.scytheRadius = cue.radius;
+          rig.scytheHalfAngle = halfAngle;
+          rig.scytheFrame = decodeScytheFrame(cue.radius, halfAngle);
         }
-        this.scytheTotal = cue.total;
-        if (this.scytheRemaining !== cue.remaining) {
-          this.scytheRemaining = cue.remaining;
-          this.scytheElapsed = Math.max(0, cue.total - cue.remaining);
-          this.scytheFresh = true;
+        rig.scytheTotal = cue.total;
+        if (rig.scytheRemaining !== cue.remaining) {
+          rig.scytheRemaining = cue.remaining;
+          rig.scytheElapsed = Math.max(0, cue.total - cue.remaining);
+          rig.scytheFresh = true;
         }
       } else if (cue.variant === 'bone-harvest') {
         if (this.harvestCueId !== cue.cueId) {
@@ -751,7 +805,7 @@ export class HoardBoneReaperFx {
         }
       }
     }
-    if (!this.scytheSeen) this.scytheCueId = -1;
+    for (const rig of this.rigs) if (!rig.scytheSeen) rig.scytheCueId = -1;
     for (const slot of this.soulSlots) {
       if (slot.seen || slot.instanceId === -1) continue;
       // Its cue is gone: released by a player, or taken by the boss.
@@ -842,65 +896,65 @@ export class HoardBoneReaperFx {
   update(dt: number): void {
     if (this.disposed) return;
     this.time += dt;
-    this.updateScythe(dt);
+    for (const rig of this.rigs) this.updateScythe(rig, dt);
     this.updateSouls(dt);
     this.updateEndings(dt);
     this.updateBoss(dt);
     this.updateSparks(dt);
   }
 
-  private updateScythe(dt: number): void {
-    if (!this.scytheSeen || this.scytheCueId === -1) {
-      if (this.pivot.visible) {
-        this.pivot.visible = false;
-        if (this.trail) this.trail.mesh.visible = false;
-        if (this.wake) this.wake.mesh.visible = false;
+  private updateScythe(rig: ScytheRig, dt: number): void {
+    if (!rig.scytheSeen || rig.scytheCueId === -1) {
+      if (rig.pivot.visible) {
+        rig.pivot.visible = false;
+        if (rig.trail) rig.trail.mesh.visible = false;
+        if (rig.wake) rig.wake.mesh.visible = false;
       }
       return;
     }
     // A cue that refreshed this frame already IS now (online it refreshes every
     // frame): only a stale one is carried forward, so the clock never double-steps.
-    if (this.scytheFresh) this.scytheFresh = false;
-    else this.scytheElapsed = Math.min(this.scytheTotal, this.scytheElapsed + dt);
-    const elapsed = this.scytheElapsed;
-    const frame = this.scytheFrame;
-    const pattern = scythePatternOf(this.scytheCueId);
+    if (rig.scytheFresh) rig.scytheFresh = false;
+    else rig.scytheElapsed = Math.min(rig.scytheTotal, rig.scytheElapsed + dt);
+    const elapsed = rig.scytheElapsed;
+    const frame = rig.scytheFrame;
+    const pattern = scythePatternOf(rig.scytheCueId);
     const pose = scythePose(
-      this.pose,
-      this.scytheX,
-      this.scytheZ,
-      this.scytheFacing,
+      rig.pose,
+      rig.scytheX,
+      rig.scytheZ,
+      rig.scytheFacing,
       pattern,
       frame,
       elapsed,
     );
     const ground = this.groundY(pose.x, pose.z);
-    this.pivot.visible = true;
-    this.pivot.position.set(pose.x, ground, pose.z);
-    this.floorSpin.rotation.y = pose.angle;
-    this.spin.rotation.y = pose.angle;
+    rig.pivot.visible = true;
+    rig.pivot.position.set(pose.x, ground, pose.z);
+    rig.floorSpin.rotation.y = pose.angle;
+    rig.spin.rotation.y = pose.angle;
     const still = this.reducedMotion();
-    this.tilt.rotation.set(still ? 0 : pose.leanX, 0, still ? 0 : pose.leanZ);
-    this.tilt.position.y = LOOK.bladeHeight + pose.lift;
-    this.weapon.scale.setScalar(Math.max(0.001, pose.formed));
-    this.fragments.position.y = still ? 0 : 0.14 * Math.sin(this.time * 1.7);
-    this.fragments.rotation.y = still ? 0 : 0.05 * Math.sin(this.time * 0.9);
+    rig.tilt.rotation.set(still ? 0 : pose.leanX, 0, still ? 0 : pose.leanZ);
+    rig.tilt.position.y = LOOK.bladeHeight + pose.lift;
+    rig.weapon.scale.setScalar(Math.max(0.001, pose.formed));
+    rig.fragments.position.y = still ? 0 : 0.14 * Math.sin(this.time * 1.7);
+    rig.fragments.rotation.y = still ? 0 : 0.05 * Math.sin(this.time * 0.9);
     // The glow breathes; as the weapon fails it flares, then gutters out.
     const flare = pose.broken > 0 ? 1 + 1.6 * Math.sin(pose.broken * Math.PI) : 1;
     const breathe = still ? 1 : 0.86 + 0.14 * Math.sin(this.time * 4.2);
-    this.glowMaterial.color.setHex(LOOK.necro).multiplyScalar(pose.glow * flare * breathe);
+    rig.glowMaterial.color.setHex(LOOK.necro).multiplyScalar(pose.glow * flare * breathe);
     // The floor footprint only means "this will hurt" while it can: it is drawn
     // faint while the blade assembles, solid while it is live.
     const live = pose.active ? 1 : 0.35 * pose.glow;
-    this.sectorMaterial.opacity = 0.5 * live;
-    this.sectorEdgeMaterial.opacity = 0.75 * live;
-    this.markerMaterial.opacity = 0.5 * pose.glow;
-    this.hubGlow.material.uniforms.alpha.value = 0.75 * pose.glow * flare * breathe;
-    this.reachMaterial.opacity = (pose.active ? 0.3 : 0.16) * pose.glow;
-    this.innerMaterial.opacity = 0.2 * pose.glow;
+    rig.sectorMaterial.opacity = 0.5 * live;
+    rig.sectorEdgeMaterial.opacity = 0.75 * live;
+    rig.markerMaterial.opacity = 0.5 * pose.glow;
+    rig.hubGlow.material.uniforms.alpha.value = 0.75 * pose.glow * flare * breathe;
+    rig.reachMaterial.opacity = (pose.active ? 0.3 : 0.16) * pose.glow;
+    rig.innerMaterial.opacity = 0.2 * pose.glow;
 
-    if (pose.broken > 0 && !this.wasBroken) {
-      this.wasBroken = true;
+    if (pose.broken > 0 && !rig.wasBroken) {
+      rig.wasBroken = true;
       // It comes apart: bone and light thrown off along the blade.
       for (let i = 0; i < 40; i++) {
         const r =
@@ -924,14 +978,14 @@ export class HoardBoneReaperFx {
     }
     if (pose.active && !still) {
       // The tip scrapes the floor: sparks thrown back along the turn.
-      this.scrapeDebt += dt * LOOK.scrapePerSec;
-      while (this.scrapeDebt >= 1) {
-        this.scrapeDebt -= 1;
+      rig.scrapeDebt += dt * LOOK.scrapePerSec;
+      while (rig.scrapeDebt >= 1) {
+        rig.scrapeDebt -= 1;
         const tip = scytheTipAt(
           this.tipA,
-          this.scytheX,
-          this.scytheZ,
-          this.scytheFacing,
+          rig.scytheX,
+          rig.scytheZ,
+          rig.scytheFacing,
           pattern,
           frame,
           elapsed,
@@ -953,10 +1007,10 @@ export class HoardBoneReaperFx {
       }
     } else if (!pose.active && pose.broken === 0 && !still) {
       // Assembling: bone fragments drawn up out of the floor around the pivot.
-      this.scrapeDebt += dt * 22;
-      while (this.scrapeDebt >= 1) {
-        this.scrapeDebt -= 1;
-        const a = this.time * 7.3 + this.scrapeDebt * 5;
+      rig.scrapeDebt += dt * 22;
+      while (rig.scrapeDebt >= 1) {
+        rig.scrapeDebt -= 1;
+        const a = this.time * 7.3 + rig.scrapeDebt * 5;
         const r = 1 + ((this.time * 131) % 1) * (BONE_SCYTHE.reach * 0.6);
         this.emit(
           pose.x + Math.sin(a) * r,
@@ -971,19 +1025,20 @@ export class HoardBoneReaperFx {
         );
       }
     }
-    this.writeTrail(pattern, frame, elapsed, pose);
+    this.writeTrail(rig, pattern, frame, elapsed, pose);
   }
 
   /** The spectral trail (the blade's true recent path: both transforms) and the
    *  faint wake the pivot leaves on the floor. */
   private writeTrail(
+    rig: ScytheRig,
     pattern: number,
     frame: ReturnType<typeof decodeScytheFrame>,
     elapsed: number,
     pose: ScythePose,
   ): void {
-    const trail = this.trail;
-    const wake = this.wake;
+    const trail = rig.trail;
+    const wake = rig.wake;
     if (!trail || !wake) return;
     const show = pose.active || pose.broken > 0;
     trail.mesh.visible = show;
@@ -995,9 +1050,9 @@ export class HoardBoneReaperFx {
       const t = Math.max(BONE_SCYTHE.castSec, elapsed - back);
       const inner = scytheTipAt(
         this.tipA,
-        this.scytheX,
-        this.scytheZ,
-        this.scytheFacing,
+        rig.scytheX,
+        rig.scytheZ,
+        rig.scytheFacing,
         pattern,
         frame,
         t,
@@ -1005,9 +1060,9 @@ export class HoardBoneReaperFx {
       );
       const outer = scytheTipAt(
         this.tipB,
-        this.scytheX,
-        this.scytheZ,
-        this.scytheFacing,
+        rig.scytheX,
+        rig.scytheZ,
+        rig.scytheFacing,
         pattern,
         frame,
         t,
@@ -1025,7 +1080,7 @@ export class HoardBoneReaperFx {
     for (let s = 0; s < WAKE; s++) {
       const back = (s / (WAKE - 1)) * LOOK.wakeSec;
       const t = Math.max(BONE_SCYTHE.castSec, elapsed - back);
-      const at = scythePivot(this.scytheX, this.scytheZ, pattern, frame, t, this.past);
+      const at = scythePivot(rig.scytheX, rig.scytheZ, pattern, frame, t, this.past);
       const y = this.groundY(at.x, at.z) + 0.07;
       // Widened across the travel direction.
       const wx = -pose.dirZ * 0.7;

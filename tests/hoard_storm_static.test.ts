@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { runMobSwingAffixes } from '../src/sim/mob/mob_swing';
 import { tickHoardBossMechanics } from '../src/sim/rift/hoard_boss';
+import { HOARD_RARITY_PRESSURE } from '../src/sim/rift/hoard_scaling';
 import {
   HOARD_STATIC_DAMAGE_FRACTION,
   HOARD_STATIC_RADIUS,
@@ -97,23 +98,26 @@ describe('Hoard Tempest static', () => {
     expect(cue).toMatchObject({ targetId: sim.player.id, radius: 6, remaining: 3 });
     sim.player.pos.x += 2;
     const damage = vi.spyOn(sim.ctx, 'dealDamage').mockReturnValue(0);
-    tickHoardStormStaticCue(sim.ctx, boss, cue, [sim.player]);
+    tickHoardStormStaticCue(sim.ctx, inst, boss, cue, [sim.player]);
     expect(cue.x).toBe(sim.player.pos.x);
     cue.remaining = 0;
-    tickHoardStormStaticCue(sim.ctx, boss, cue, [sim.player]);
+    tickHoardStormStaticCue(sim.ctx, inst, boss, cue, [sim.player]);
     expect(damage).not.toHaveBeenCalled();
     const ally = {
       ...sim.player,
       id: 888,
       pos: { ...sim.player.pos, x: sim.player.pos.x + HOARD_STATIC_RADIUS + 0.01 },
     };
-    tickHoardStormStaticCue(sim.ctx, boss, cue, [sim.player, ally]);
+    tickHoardStormStaticCue(sim.ctx, inst, boss, cue, [sim.player, ally]);
     expect(damage).not.toHaveBeenCalled();
     ally.pos.x = sim.player.pos.x + HOARD_STATIC_RADIUS;
-    tickHoardStormStaticCue(sim.ctx, boss, cue, [sim.player, ally]);
+    tickHoardStormStaticCue(sim.ctx, inst, boss, cue, [sim.player, ally]);
     expect(damage).toHaveBeenCalledTimes(1);
+    // A legendary hoard: the authored share, pressed by the map's rarity.
     expect(damage.mock.calls[0][2]).toBe(
-      Math.round(sim.player.maxHp * HOARD_STATIC_DAMAGE_FRACTION),
+      Math.round(
+        sim.player.maxHp * HOARD_STATIC_DAMAGE_FRACTION * HOARD_RARITY_PRESSURE.legendary.damage,
+      ),
     );
     expect(damage.mock.calls[0][2]).toBeLessThan(sim.player.maxHp);
   });

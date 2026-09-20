@@ -25,6 +25,7 @@ import {
 } from './hoard_boss_kits';
 import { hoardLightningStrikeCues } from './hoard_lightning_strike';
 import { startHoardOrbitalLightning, tickHoardOrbitalCarrier } from './hoard_orbital_lightning';
+import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
 import {
   resolveHoardStormStaticTargets,
   startHoardStormStatic,
@@ -503,7 +504,7 @@ function hitPlayersInTideWave(
       boss,
       player,
       capRiftNonLethalMechanicDamage(
-        Math.max(1, Math.round(player.maxHp * HOARD_TIDE_WAVE.damageFraction)),
+        hoardMechanicDamage(inst, player, HOARD_TIDE_WAVE.damageFraction),
         player.maxHp,
       ),
       false,
@@ -553,7 +554,7 @@ function hitPlayersInSweep(
     ctx.dealDamage(
       boss,
       player,
-      Math.max(1, Math.round(player.maxHp * spec.damageFraction)),
+      hoardMechanicDamage(inst, player, spec.damageFraction),
       false,
       spec.school,
       spec.ability,
@@ -572,7 +573,7 @@ function hitPlayersInSweep(
         ctx.dealDamage(
           boss,
           player,
-          Math.max(1, Math.round(player.maxHp * HOARD_SWEEP_METEOR_DAMAGE_FRACTION)),
+          hoardMechanicDamage(inst, player, HOARD_SWEEP_METEOR_DAMAGE_FRACTION),
           false,
           'fire',
           'Emberfall',
@@ -645,10 +646,10 @@ function hitPlayersInMark(
         player,
         cue.variant === 'storm-orbital-impact'
           ? capRiftNonLethalMechanicDamage(
-              Math.max(1, Math.round(player.maxHp * fraction)),
+              hoardMechanicDamage(inst, player, fraction),
               player.maxHp,
             )
-          : Math.max(1, Math.round(player.maxHp * fraction)),
+          : hoardMechanicDamage(inst, player, fraction),
         false,
         spec.school,
         spec.ability,
@@ -791,7 +792,7 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     // Decimal second timers must fire on their exact fixed-step boundary.
     if (cue.variant === 'storm-orbital-impact' && cue.remaining < 1e-8) cue.remaining = 0;
     if (cue.kind === 'mark' && cue.variant === 'storm-static') {
-      tickHoardStormStaticCue(ctx, boss, cue, staticPlayers, staticTargets);
+      tickHoardStormStaticCue(ctx, inst, boss, cue, staticPlayers, staticTargets);
       if (cue.remaining > 0) live.push(cue);
       continue;
     }
@@ -1103,6 +1104,17 @@ export function tickHoardBossMechanics(ctx: SimContext): void {
     tickCues(ctx, inst, boss, state);
     tickSpecialKit(ctx, inst, boss, state);
     if (state.cues.some((cue) => cue.kind === 'sweep' || cue.phase === 'warning')) continue;
+    const sweepBefore = state.sweepTimer;
+    const markBefore = state.markTimer;
     tickKit(ctx, inst, boss, state, kit);
+    // Rarity cadence (hoard_scaling.ts): the kit counts its clocks down by one
+    // tick; a rarer hoard takes a little more off them (a common one gives some
+    // back), so every boss's mechanics come faster the rarer the map. Only a
+    // clock the kit RAN this tick moves: one it never uses cannot drift, and one
+    // it just reset keeps its full interval. Wind-ups and hazard lives are
+    // untouched: only the time BETWEEN mechanics moves.
+    const extra = DT * (1 / hoardPressure(inst.vault).cadence - 1);
+    if (state.sweepTimer < sweepBefore) state.sweepTimer -= extra;
+    if (state.markTimer < markBefore) state.markTimer -= extra;
   }
 }
