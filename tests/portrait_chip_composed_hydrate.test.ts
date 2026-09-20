@@ -32,6 +32,14 @@ vi.mock('../src/render/characters/portrait', () => ({
   isComposedPortraitKey: (key?: string) => key?.includes(':mod:') === true,
   cachedPortraitByKey: (key: string) => portrait.cached.get(key) ?? null,
 }));
+// portrait_chip re-exports modularLookFor from the characters barrel, whose
+// real import starts GLB fetches that can outlive happy-dom teardown and
+// surface Three FileLoader ProgressEvent rejections after green assertions
+// (CI shard 1 on 2211c93118). This suite never resolves a look, so the barrel
+// stays inert like the portrait module above.
+vi.mock('../src/render/characters', () => ({
+  modularLookFor: () => null,
+}));
 vi.mock('../src/ui/i18n', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../src/ui/i18n')>()),
   t: () => 'Warrior portrait',
