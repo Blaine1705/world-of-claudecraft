@@ -26,6 +26,7 @@
 // cast. Math.random is fine here (render-only).
 
 import * as THREE from 'three';
+import { ABILITIES } from '../sim/data';
 import { NYTHRAXIS_GRAVE_ERUPTION_CAST_ID } from '../sim/nythraxis_grave_eruption';
 import type { SimEvent } from '../sim/types';
 import { type FloorVfxLayer, floorVfxRenderOrder } from './floor_vfx_layer';
@@ -176,8 +177,20 @@ export interface RuneCircleSpawn {
    *  rides this same visual and passes the mechanic's real school, so a fire
    *  boss doesn't wind up behind a violet ring that doesn't read as danger. */
   school?: string;
-  /** Encounter identity for an authored palette layered over the school. */
+  /** The cast behind the ring: a player ability id (the mage's own Rune of
+   *  Power) puts it on the player band of the floor ladder; an encounter cast
+   *  id (the Nythraxis binding sigil, which also picks the authored palette) or
+   *  no ability at all (a rift mob windup) puts it on the encounter band. */
   ability?: string;
+}
+
+/**
+ * The floor ladder band a rune circle rides. Only a player ability's own cast
+ * (Rune of Power) is a player effect; every other rune circle the sim emits
+ * is a mechanic windup the raid must read, so it paints over player VFX.
+ */
+export function runeCircleLayer(ability: string | undefined): FloorVfxLayer {
+  return ability !== undefined && ABILITIES[ability] !== undefined ? 'player' : 'encounter';
 }
 
 export interface SnowZoneSpawn {
@@ -1219,6 +1232,12 @@ export class MageGroundFx {
     if (this.disposed) return;
     const school = opts.school ?? 'arcane';
     const bindingSigil = isNythraxisBindingSigil(opts.ability);
+    // The same inscription serves the mage's own Rune of Power and the sim's
+    // mechanic windups (the Nythraxis sigil flare, a rift mob stomp or pulse
+    // ring): a windup a raid must dodge rides the encounter band, the
+    // player's own cast the player band. Steps are the legacy order minus
+    // one, the encounter band's rule, so the rung reads the same in both.
+    const layer = runeCircleLayer(opts.ability);
     const paletteKey = bindingSigil ? 'binding-sigil' : school;
     const schoolColor = capRingLightness(
       new THREE.Color(
@@ -1261,7 +1280,7 @@ export class MageGroundFx {
       const ringGeo = this.createTerrainRing(opts.x, opts.z, radius * 0.82, radius);
       const ring = new THREE.Mesh(ringGeo, mat);
       ring.name = name;
-      ring.renderOrder = floorVfxRenderOrder('player', 2);
+      ring.renderOrder = floorVfxRenderOrder(layer, 6);
       group.add(ring);
       mats.push(mat);
       matKinds.push(kind);
@@ -1293,7 +1312,7 @@ export class MageGroundFx {
       );
       const spoke = new THREE.Mesh(spokeGeo, mat);
       spoke.name = `mage-rune-power-spoke-${i}`;
-      spoke.renderOrder = floorVfxRenderOrder('player', 2);
+      spoke.renderOrder = floorVfxRenderOrder(layer, 6);
       group.add(spoke);
       mats.push(mat);
       matKinds.push(spokeKind);
@@ -1319,7 +1338,7 @@ export class MageGroundFx {
     );
     const glow = new THREE.Mesh(glowGeo, glowMat);
     glow.name = 'mage-rune-power-glow';
-    glow.renderOrder = floorVfxRenderOrder('player', 1);
+    glow.renderOrder = floorVfxRenderOrder(layer, 5);
     group.add(glow);
     mats.push(glowMat);
     matKinds.push(glowKind);
