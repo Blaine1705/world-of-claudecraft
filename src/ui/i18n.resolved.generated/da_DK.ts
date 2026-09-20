@@ -11189,7 +11189,11 @@ export const da_DK: EnTranslations = {
       "rift_storm_execution": "Lynstav",
       "rift_storm_strike": "Stormkalderens Vrede",
       "rift_tide_execution": "Afgrundens Gab",
-      "rift_tide_strike": "Knusende Dybde"
+      "rift_tide_strike": "Knusende Dybde",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const da_DK: EnTranslations = {
       },
       "stable_horse": {
         "name": "Staldhest"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

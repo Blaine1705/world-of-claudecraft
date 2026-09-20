@@ -538,6 +538,12 @@ const mergeStringsEn = {
       rift_storm_strike: "Stormcaller's Wrath",
       rift_tide_execution: 'Abyssal Maw',
       rift_tide_strike: 'Crushing Depth',
+      // Buried Hoard control casts (src/sim/rift/hoard_control_casts.ts): a fear,
+      // stun, silence or hex a hoard mob CASTS, so it can be interrupted.
+      hoard_cast_fear: 'Terrifying Roar',
+      hoard_cast_stun: 'Stunning Blow',
+      hoard_cast_silence: 'Silencing Shriek',
+      hoard_cast_hex: 'Hex',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

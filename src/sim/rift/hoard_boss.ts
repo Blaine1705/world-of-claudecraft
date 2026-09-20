@@ -21,6 +21,7 @@ import {
   startHoardStormStatic,
   tickHoardStormStaticCue,
 } from './hoard_storm_static';
+import { clearHoardStormSurge, tickHoardStormSurge } from './hoard_storm_surge';
 import { tickHoardTidePattern } from './hoard_tide_encounter';
 import { HOARD_TIDE_RECOVERY_SEC } from './hoard_tide_pattern';
 import { capRiftNonLethalMechanicDamage } from './ranks';
@@ -214,6 +215,7 @@ function removeTotem(
 function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   if (!inst.hoardBoss) return;
   removeTotem(ctx, inst, inst.hoardBoss, boss);
+  clearHoardStormSurge(boss, inst.hoardBoss);
   delete inst.hoardBoss;
   for (const player of instancePlayers(ctx, inst)) {
     ctx.emit({ type: 'hoardBossCueClear', pid: player.id });
@@ -291,7 +293,7 @@ function hatchBroodEggs(ctx: SimContext, inst: RiftInstance, boss: Entity): void
   boss.summonedIds = boss.summonedIds.filter((id) => !eggSet.has(id));
   inst.mobIds = inst.mobIds.filter((id) => !eggSet.has(id));
   boss.firedSummons = 1;
-  ctx.spawnBossAdds(boss, 'rift_spawnling', HOARD_BROOD_EGG_COUNT);
+  ctx.spawnBossAdds(boss, 'hoard_brood_hatchling', HOARD_BROOD_EGG_COUNT);
 }
 
 function removeBroodEggs(ctx: SimContext, inst: RiftInstance, boss: Entity): void {
@@ -416,6 +418,10 @@ function tickSpecialKit(
       boss.firedSummons++;
       summonBoneLegion(ctx, boss);
     }
+    return;
+  }
+  if (kit === 'storm') {
+    tickHoardStormSurge(ctx, boss, state);
     return;
   }
   if (kit === 'tide') {
@@ -595,25 +601,13 @@ function hitPlayersInMark(
         kind: 'slow',
         remaining: 1.1,
         duration: 1.1,
-        value: 0.9,
+        // A real slow and nothing else: the old per-pulse shove in the walking
+        // direction read as the ground nudging the player at random.
+        value: 0.55,
         sourceId: boss.id,
         school: 'frost',
         encounterOwned: true,
       });
-      const slideX = player.pos.x - player.prevPos.x;
-      const slideZ = player.pos.z - player.prevPos.z;
-      const slideLength = Math.hypot(slideX, slideZ);
-      if (slideLength > 0.02) {
-        const slideSource = {
-          ...boss,
-          pos: {
-            ...boss.pos,
-            x: player.pos.x - slideX / slideLength,
-            z: player.pos.z - slideZ / slideLength,
-          },
-        };
-        ctx.applyKnockback(slideSource, player, 0.7);
-      }
     }
     if (cue.variant === 'arcane-blizzard') {
       ctx.applyAura(player, {

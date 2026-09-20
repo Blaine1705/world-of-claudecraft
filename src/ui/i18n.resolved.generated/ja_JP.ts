@@ -11189,7 +11189,11 @@ export const ja_JP: EnTranslations = {
       "rift_storm_execution": "避雷針",
       "rift_storm_strike": "嵐の使者の怒り",
       "rift_tide_execution": "深淵の顎",
-      "rift_tide_strike": "粉砕の深淵"
+      "rift_tide_strike": "粉砕の深淵",
+      "hoard_cast_fear": "戦慄の咆哮",
+      "hoard_cast_stun": "昏倒の一撃",
+      "hoard_cast_silence": "沈黙の金切り声",
+      "hoard_cast_hex": "呪術"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const ja_JP: EnTranslations = {
       },
       "stable_horse": {
         "name": "厩舎の馬"
+      },
+      "hoard_brood_hatchling": {
+        "name": "ヴィスカの幼蜘蛛"
       },
       "hoard_healing_tide_totem": {
         "name": "癒やしの潮のトーテム"

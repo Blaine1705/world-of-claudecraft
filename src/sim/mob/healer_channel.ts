@@ -1,3 +1,4 @@
+import { HOARD_CONTROL_CAST_SCHOOLS } from '../rift/hoard_control_casts';
 import type { Aura } from '../types';
 import { VARKHUL_CINDER_REPAIR_CAST_ID } from '../varkhul_cinder_artificer';
 import { IGNIVAR_CINDER_LANCE_CAST_ID } from './ignivar_trash_automata';
@@ -17,4 +18,7 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: { school: 'fire' },
   [VARKHUL_CINDER_REPAIR_CAST_ID]: { school: 'fire' },
   [IGNIVAR_CINDER_LANCE_CAST_ID]: { school: 'fire' },
+  // Buried Hoard control casts: a fear, stun, silence or hex a hoard mob casts
+  // instead of landing instantly (src/sim/rift/hoard_control_casts.ts).
+  ...HOARD_CONTROL_CAST_SCHOOLS,
 };

@@ -11189,7 +11189,11 @@ export const tr_TR: EnTranslations = {
       "rift_storm_execution": "Yıldırım Çubuğu",
       "rift_storm_strike": "Fırtına Çağırıcısının Gazabı",
       "rift_tide_execution": "Uçurum Ağzı",
-      "rift_tide_strike": "Ezici Derinlik"
+      "rift_tide_strike": "Ezici Derinlik",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const tr_TR: EnTranslations = {
       },
       "stable_horse": {
         "name": "Ahır Atı"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

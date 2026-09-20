@@ -34,12 +34,16 @@ export interface HoardMarkSpec {
   ability: string;
 }
 
+/** Grask's frontals: quick enough to demand a reaction, each a touch wider than
+ *  it looks safe to hug. WORKING RULES from the owner's playtest. */
+export const HOARD_BRUTE_WINDUP_SEC = 1.5;
+
 export const HOARD_BRUTE_COMBO: readonly HoardSweepSpec[] = [
   {
     variant: 'brute-wide',
     radius: 8,
-    halfAngle: Math.PI * 0.37,
-    windup: 2,
+    halfAngle: Math.PI * 0.43,
+    windup: HOARD_BRUTE_WINDUP_SEC,
     damageFraction: 0.12,
     school: 'physical',
     knockback: 0,
@@ -48,8 +52,8 @@ export const HOARD_BRUTE_COMBO: readonly HoardSweepSpec[] = [
   {
     variant: 'brute-medium',
     radius: 12,
-    halfAngle: Math.PI * 0.24,
-    windup: 2,
+    halfAngle: Math.PI * 0.29,
+    windup: HOARD_BRUTE_WINDUP_SEC,
     damageFraction: 0.15,
     school: 'physical',
     knockback: 0,
@@ -58,8 +62,8 @@ export const HOARD_BRUTE_COMBO: readonly HoardSweepSpec[] = [
   {
     variant: 'brute-long',
     radius: 18,
-    halfAngle: Math.PI * 0.13,
-    windup: 2,
+    halfAngle: Math.PI * 0.17,
+    windup: HOARD_BRUTE_WINDUP_SEC,
     damageFraction: 0.2,
     school: 'physical',
     knockback: 1.5,
@@ -135,6 +139,19 @@ export function pointInHoardTideWave(
     Math.abs(lateral - gap) >= HOARD_TIDE_WAVE_HALF_GAP
   );
 }
+
+/** Tempest Judgment's charged ground. Large on purpose: the fight is about
+ *  dragging Vharok OUT of it (see HOARD_STORM_SURGE below). */
+export const HOARD_STORM_FIELD_RADIUS = 12;
+export const HOARD_STORM_FIELD_SEC = 9;
+/** Storm Surge: while Vharok stands in his own charged ground he gains a stack
+ *  every HOARD_STORM_SURGE_EVERY_SEC, each worth +damage and +size, up to the
+ *  cap; out of it the stacks bleed off one by one. */
+export const HOARD_STORM_SURGE_EVERY_SEC = 1.5;
+export const HOARD_STORM_SURGE_DECAY_SEC = 2.5;
+export const HOARD_STORM_SURGE_MAX_STACKS = 8;
+export const HOARD_STORM_SURGE_DAMAGE_PER_STACK = 0.08;
+export const HOARD_STORM_SURGE_SCALE_PER_STACK = 0.05;
 
 export function hoardBossKit(templateId: string): HoardBossKit {
   switch (templateId) {
@@ -223,10 +240,10 @@ export function hoardMarkSpec(variant: HoardBossCueVariant): HoardMarkSpec {
     case 'storm-charge':
       return {
         variant,
-        radius: 9,
+        radius: HOARD_STORM_FIELD_RADIUS,
         windup: 3.2,
         impactFraction: 0.34,
-        hazardDuration: 6,
+        hazardDuration: HOARD_STORM_FIELD_SEC,
         pulseFraction: 0.03,
         pulseEvery: 0.75,
         school: 'nature',
@@ -235,10 +252,10 @@ export function hoardMarkSpec(variant: HoardBossCueVariant): HoardMarkSpec {
     case 'storm-field':
       return {
         variant,
-        radius: 9,
+        radius: HOARD_STORM_FIELD_RADIUS,
         windup: 0,
         impactFraction: 0,
-        hazardDuration: 6,
+        hazardDuration: HOARD_STORM_FIELD_SEC,
         pulseFraction: 0.03,
         pulseEvery: 0.75,
         school: 'nature',

@@ -11189,7 +11189,11 @@ export const de_DE: EnTranslations = {
       "rift_storm_execution": "Blitzableiter",
       "rift_storm_strike": "Zorn des Sturmrufers",
       "rift_tide_execution": "Abgrundrachen",
-      "rift_tide_strike": "Erdrückende Tiefe"
+      "rift_tide_strike": "Erdrückende Tiefe",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const de_DE: EnTranslations = {
       },
       "stable_horse": {
         "name": "Stallpferd"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

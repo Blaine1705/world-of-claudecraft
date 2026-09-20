@@ -11189,7 +11189,11 @@ export const en_XA: EnTranslations = {
       "rift_storm_execution": "[Ļíĝĥţñíñĝ Ŕóð]",
       "rift_storm_strike": "[Šţóŕɱçáļļéŕ'š Ŵŕáţĥ]",
       "rift_tide_execution": "[Áƀýššáļ Ɱáŵ]",
-      "rift_tide_strike": "[Çŕúšĥíñĝ Ðéþţĥ]"
+      "rift_tide_strike": "[Çŕúšĥíñĝ Ðéþţĥ]",
+      "hoard_cast_fear": "[Ţéŕŕíƒýíñĝ Ŕóáŕ]",
+      "hoard_cast_stun": "[Šţúññíñĝ Ɓļóŵ]",
+      "hoard_cast_silence": "[Šíļéñçíñĝ Šĥŕíéķ]",
+      "hoard_cast_hex": "[Ĥéẋ]"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const en_XA: EnTranslations = {
       },
       "stable_horse": {
         "name": "[Šţáƀļé Ĥóŕšé]"
+      },
+      "hoard_brood_hatchling": {
+        "name": "[Ʋýššķá'š Ĥáţçĥļíñĝ]"
       },
       "hoard_healing_tide_totem": {
         "name": "[Ĥéáļíñĝ Ţíðé Ţóţéɱ]"

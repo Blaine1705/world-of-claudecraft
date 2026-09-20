@@ -11189,7 +11189,11 @@ export const cs_CZ: EnTranslations = {
       "rift_storm_execution": "Hromosvod",
       "rift_storm_strike": "Hněv Vyvolávače bouří",
       "rift_tide_execution": "Propastná tlama",
-      "rift_tide_strike": "Drtivá hlubina"
+      "rift_tide_strike": "Drtivá hlubina",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const cs_CZ: EnTranslations = {
       },
       "stable_horse": {
         "name": "Stájový kůň"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

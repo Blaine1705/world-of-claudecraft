@@ -5,6 +5,7 @@ import type { MaterialComposition } from './material_sources';
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
+import type { HoardControlCast } from './rift/hoard_control_casts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
 import type { TreasureMapRarity } from './content/treasure_maps';
@@ -5760,6 +5761,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // Sim time of the last "level too low" rift denial shown to this player, so
   // standing inside the portal trigger radius does not spam the toast per tick.
   riftDeniedAt?: number;
+  // A hard control this mob is CASTING inside a Buried Hoard instead of landing
+  // it instantly (src/sim/rift/hoard_control_casts.ts). Sim-only, never wired:
+  // the cast bar itself rides castingAbility / castRemaining.
+  hoardControlCast?: HoardControlCast;
   // Sim time of the last "pool full" / "event already cleared" denial shown to
   // this player on walk-in, so a 20 Hz trigger does not spam the error toast.
   riftPoolFullAt?: number;

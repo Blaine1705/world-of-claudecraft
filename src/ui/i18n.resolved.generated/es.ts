@@ -11189,7 +11189,11 @@ export const es: EnTranslations = {
       "rift_storm_execution": "Vara de rayo",
       "rift_storm_strike": "Ira del invocatormentas",
       "rift_tide_execution": "Fauces abisales",
-      "rift_tide_strike": "Profundidad aplastante"
+      "rift_tide_strike": "Profundidad aplastante",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const es: EnTranslations = {
       },
       "stable_horse": {
         "name": "Caballo de establo"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

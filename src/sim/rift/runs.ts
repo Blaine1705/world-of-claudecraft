@@ -10,6 +10,7 @@
 // dev command + interaction click path; the per-tick drivers (updateRiftTriggers,
 // updateRiftInstances) are called from tick().
 
+import { tickHoardControlCasts } from './hoard_control_casts';
 import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
 import { delveChestItemsForTier } from '../content/delves/lockpick_tiers';
 import { HOARD_MIN_LEVEL } from '../content/treasure_maps';
@@ -1814,6 +1815,7 @@ export function updateRiftInstances(ctx: SimContext): void {
     }
   }
   tickHoardBossMechanics(ctx);
+  tickHoardControlCasts(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;

@@ -39,6 +39,11 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.rift_storm_strike': true,
   'abilityUi.cast.rift_tide_execution': true,
   'abilityUi.cast.rift_tide_strike': true,
+  // Buried Hoard control casts (src/sim/rift/hoard_control_casts.ts).
+  'abilityUi.cast.hoard_cast_fear': true,
+  'abilityUi.cast.hoard_cast_stun': true,
+  'abilityUi.cast.hoard_cast_silence': true,
+  'abilityUi.cast.hoard_cast_hex': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');

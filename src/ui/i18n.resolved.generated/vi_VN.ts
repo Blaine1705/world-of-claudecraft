@@ -11189,7 +11189,11 @@ export const vi_VN: EnTranslations = {
       "rift_storm_execution": "Cột Thu Lôi",
       "rift_storm_strike": "Thịnh Nộ Của Kẻ Gọi Bão",
       "rift_tide_execution": "Hàm Vực Thẳm",
-      "rift_tide_strike": "Nghiền Nát Vực Sâu"
+      "rift_tide_strike": "Nghiền Nát Vực Sâu",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const vi_VN: EnTranslations = {
       },
       "stable_horse": {
         "name": "Ngựa chuồng"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

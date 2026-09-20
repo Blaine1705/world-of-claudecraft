@@ -28,10 +28,18 @@ import {
 } from '../src/sim/rift/hoard_boss';
 import {
   HOARD_BRUTE_COMBO,
+  HOARD_BRUTE_WINDUP_SEC,
   HOARD_FROST_GUST,
+  HOARD_STORM_FIELD_RADIUS,
+  HOARD_STORM_FIELD_SEC,
+  HOARD_STORM_SURGE_DECAY_SEC,
+  HOARD_STORM_SURGE_EVERY_SEC,
+  HOARD_STORM_SURGE_MAX_STACKS,
+  HOARD_STORM_SURGE_SCALE_PER_STACK,
   HOARD_TIDE_WAVE,
   hoardMarkSpec,
 } from '../src/sim/rift/hoard_boss_kits';
+import { bossInStormField, HOARD_STORM_SURGE_AURA_ID } from '../src/sim/rift/hoard_storm_surge';
 import { riftStateEventFor } from '../src/sim/rift/runs';
 import type { HoardBossState, RiftInstance } from '../src/sim/rift/types';
 import { makeVaultSeed } from '../src/sim/rift/vault_seed';
@@ -192,6 +200,9 @@ describe('Buried Hoard boss encounter', () => {
     expect(MOBS.rift_boss_venom.stackPoison).toBeDefined();
     expect(MOBS.rift_boss_venom.ensnare).toBeDefined();
     expect(HOARD_BROOD_HATCH_HP).toBe(0.5);
+    // The eggs hatch real spiderlings, never the shared demon add.
+    expect(MOBS.hoard_brood_hatchling.family).toBe('spider');
+    expect(MOBS.hoard_brood_hatchling.scale).toBeLessThan(1);
 
     hoardState(inst).sweepTimer = 0;
     hoardState(inst).markTimer = 99;
@@ -199,7 +210,7 @@ describe('Buried Hoard boss encounter', () => {
     tickHoardBossMechanics(sim.ctx);
     expect(eggIds.every((id) => sim.entities.has(id))).toBe(true);
     expect(
-      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'rift_spawnling'),
+      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'hoard_brood_hatchling'),
     ).toHaveLength(0);
 
     boss.hp = Math.floor(boss.maxHp * 0.5);
@@ -210,12 +221,12 @@ describe('Buried Hoard boss encounter', () => {
     );
     for (const id of eggIds) expect(sim.entities.has(id)).toBe(false);
     expect(
-      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'rift_spawnling'),
+      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'hoard_brood_hatchling'),
     ).toHaveLength(HOARD_BROOD_EGG_COUNT);
 
     tickHoardBossMechanics(sim.ctx);
     expect(
-      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'rift_spawnling'),
+      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'hoard_brood_hatchling'),
     ).toHaveLength(HOARD_BROOD_EGG_COUNT);
   });
 
@@ -232,7 +243,7 @@ describe('Buried Hoard boss encounter', () => {
     tickHoardBossMechanics(sim.ctx);
     expect(eggIds.every((id) => !sim.entities.has(id))).toBe(true);
     expect(
-      boss.summonedIds.some((id) => sim.entities.get(id)?.templateId === 'rift_spawnling'),
+      boss.summonedIds.some((id) => sim.entities.get(id)?.templateId === 'hoard_brood_hatchling'),
     ).toBe(false);
   });
 
@@ -458,7 +469,7 @@ describe('Buried Hoard boss encounter', () => {
     expect(enraged.inst.hoardBoss?.markTimer).toBe(HOARD_MARK_ENRAGED_EVERY_SEC);
   });
 
-  it('gives Hoarfrost slippery ice and a telegraphed pushing gust', () => {
+  it('gives Hoarfrost slowing ice (no shove) and a telegraphed pushing gust', () => {
     const { sim, inst } = makeEncounter('rift_boss_frost');
     tickHoardBossMechanics(sim.ctx);
     sim.drainEvents();
@@ -493,9 +504,10 @@ describe('Buried Hoard boss encounter', () => {
     const xBeforeSlide = sim.player.pos.x;
     tickMechanic(sim, hoardMarkSpec('frost-ice').windup + hoardMarkSpec('frost-ice').pulseEvery);
     expect(sim.player.auras).toContainEqual(
-      expect.objectContaining({ kind: 'slow', name: 'Treacherous Ice' }),
+      expect.objectContaining({ kind: 'slow', name: 'Treacherous Ice', value: 0.55 }),
     );
-    expect(sim.player.pos.x).toBeGreaterThan(xBeforeSlide);
+    // The ice slows and nothing else: it never nudges a player who walks on it.
+    expect(sim.player.pos.x).toBe(xBeforeSlide);
   });
 
   it('runs Grask through three locked frontals before his recovery window', () => {
@@ -517,7 +529,12 @@ describe('Buried Hoard boss encounter', () => {
       'brute-long',
     ]);
     expect(new Set(frontals.map((event) => event.facing)).size).toBe(3);
-    expect(frontals.every((event) => event.durationSecs >= 2)).toBe(true);
+    // Quick enough to demand a reaction, never a coin flip.
+    expect(frontals.every((event) => event.durationSecs === HOARD_BRUTE_WINDUP_SEC)).toBe(true);
+    expect(HOARD_BRUTE_WINDUP_SEC).toBe(1.5);
+    expect(HOARD_BRUTE_COMBO.map((step) => Number((step.halfAngle / Math.PI).toFixed(2)))).toEqual([
+      0.43, 0.29, 0.17,
+    ]);
     expect(hoardState(inst).sweepTimer).toBeGreaterThan(11);
   });
 
@@ -563,9 +580,66 @@ describe('Buried Hoard boss encounter', () => {
         cueId: warning?.cueId,
         variant: 'storm-field',
         phase: 'hazard',
-        durationSecs: 6,
+        durationSecs: HOARD_STORM_FIELD_SEC,
+        radius: HOARD_STORM_FIELD_RADIUS,
       }),
     );
+  });
+
+  it('surges Vharok while he stands in his charged ground and bleeds it off outside', () => {
+    const { sim, inst, boss } = makeEncounter('rift_boss_storm');
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    const baseScale = boss.scale;
+    hoardState(inst).markTimer = 0;
+    tickMechanic(sim, hoardMarkSpec('storm-charge').windup + 0.1);
+    const state = hoardState(inst);
+    expect(bossInStormField(boss, state)).toBe(true);
+
+    // Standing in it: one stack per interval, each worth damage and size.
+    const events = tickMechanic(sim, HOARD_STORM_SURGE_EVERY_SEC * 3 + 0.1);
+    expect(state.stormSurgeStacks).toBe(3);
+    expect(boss.scale).toBeCloseTo(baseScale * (1 + 3 * HOARD_STORM_SURGE_SCALE_PER_STACK));
+    expect(boss.auras.find((aura) => aura.id === HOARD_STORM_SURGE_AURA_ID)).toMatchObject({
+      kind: 'buff_dmg_done',
+      stacks: 3,
+    });
+    expect(
+      events.filter((event) => event.type === 'log' && event.text.includes('Drag him out')),
+    ).toHaveLength(1);
+
+    // Dragged out: the stacks bleed off one at a time, back to his own size.
+    boss.pos = { ...boss.pos, x: boss.pos.x + HOARD_STORM_FIELD_RADIUS + 3 };
+    expect(bossInStormField(boss, state)).toBe(false);
+    tickMechanic(sim, HOARD_STORM_SURGE_DECAY_SEC + 0.1);
+    expect(state.stormSurgeStacks).toBe(2);
+    tickMechanic(sim, HOARD_STORM_SURGE_DECAY_SEC * 2 + 0.2);
+    expect(state.stormSurgeStacks).toBe(0);
+    expect(boss.scale).toBeCloseTo(baseScale);
+    expect(boss.auras.some((aura) => aura.id === HOARD_STORM_SURGE_AURA_ID)).toBe(false);
+  });
+
+  it('caps the surge and restores Vharok when the fight resets', () => {
+    const { sim, inst, boss } = makeEncounter('rift_boss_storm');
+    tickHoardBossMechanics(sim.ctx);
+    const baseScale = boss.scale;
+    hoardState(inst).markTimer = 0;
+    tickMechanic(sim, hoardMarkSpec('storm-charge').windup + 0.1);
+    // Keep the field alive under him well past the cap (the player stands clear
+    // and topped up, so the fight never resets on a death).
+    sim.player.pos = { ...sim.player.pos, z: boss.pos.z + HOARD_STORM_FIELD_RADIUS + 6 };
+    for (let i = 0; i < 40; i++) {
+      sim.player.hp = sim.player.maxHp;
+      boss.aiState = 'attack';
+      for (const cue of hoardState(inst).cues) cue.remaining = Math.max(cue.remaining, 5);
+      tickMechanic(sim, 0.5);
+    }
+    expect(hoardState(inst).stormSurgeStacks).toBe(HOARD_STORM_SURGE_MAX_STACKS);
+    boss.aiState = 'idle';
+    tickHoardBossMechanics(sim.ctx);
+    expect(inst.hoardBoss).toBeUndefined();
+    expect(boss.scale).toBeCloseTo(baseScale);
+    expect(boss.auras.some((aura) => aura.id === HOARD_STORM_SURGE_AURA_ID)).toBe(false);
   });
 
   it('sends two distinct Abyssal waves and stops healing when the totem dies', () => {

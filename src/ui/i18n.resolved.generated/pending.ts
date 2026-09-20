@@ -10,6 +10,10 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -89,6 +93,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.treasure_casket.name",
     "entities.items.vestments_of_the_acolyte.name",
     "entities.mobs.fenbridge_infiltrator.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
     "entities.npcs.calligraphy_apprentice_1.name",
@@ -617,6 +622,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "es_ES": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -696,6 +705,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.treasure_casket.name",
     "entities.items.vestments_of_the_acolyte.name",
     "entities.mobs.fenbridge_infiltrator.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
     "entities.npcs.calligraphy_apprentice_1.name",
@@ -1224,6 +1234,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "fr_FR": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -1307,6 +1321,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -1915,6 +1930,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "fr_CA": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -1998,6 +2017,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -2607,6 +2627,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -2690,6 +2714,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -3298,6 +3323,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "de_DE": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -3381,6 +3410,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -4337,6 +4367,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardNotYours"
   ],
   "pt_BR": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -4420,6 +4454,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -5115,6 +5150,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardNotYours"
   ],
   "cs_CZ": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -5198,6 +5237,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -5806,6 +5846,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "nl_NL": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -5889,6 +5933,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -6497,6 +6542,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "pl_PL": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -6580,6 +6629,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -7188,6 +7238,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "id_ID": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -7271,6 +7325,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -7879,6 +7934,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "tr_TR": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -7962,6 +8021,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -8570,6 +8630,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "sv_SE": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -8653,6 +8717,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -9261,6 +9326,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "vi_VN": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -9344,6 +9413,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",
@@ -9952,6 +10022,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.hoardStepBack"
   ],
   "da_DK": [
+    "abilityUi.cast.hoard_cast_fear",
+    "abilityUi.cast.hoard_cast_hex",
+    "abilityUi.cast.hoard_cast_silence",
+    "abilityUi.cast.hoard_cast_stun",
     "apiError.world_quests.unknown_board",
     "clues.hunt_amberfall_lantern_ferry.0",
     "clues.hunt_amberfall_lantern_ferry.1",
@@ -10035,6 +10109,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.eastbrook_freight_caravan.name",
     "entities.mobs.fenbridge_infiltrator.name",
     "entities.mobs.frostveil_supply_caravan.name",
+    "entities.mobs.hoard_brood_hatchling.name",
     "entities.mobs.hoard_healing_tide_totem.name",
     "entities.mobs.willowfen_remedy_caravan.name",
     "entities.npcs.calligraphy_apprentice_1.greeting",

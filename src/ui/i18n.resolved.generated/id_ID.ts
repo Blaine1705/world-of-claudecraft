@@ -11189,7 +11189,11 @@ export const id_ID: EnTranslations = {
       "rift_storm_execution": "Penangkal Petir",
       "rift_storm_strike": "Amarah Sang Pemanggil Badai",
       "rift_tide_execution": "Rahang Jurang",
-      "rift_tide_strike": "Kedalaman Penghancur"
+      "rift_tide_strike": "Kedalaman Penghancur",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const id_ID: EnTranslations = {
       },
       "stable_horse": {
         "name": "Kuda Kandang"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

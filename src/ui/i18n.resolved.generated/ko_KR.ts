@@ -11189,7 +11189,11 @@ export const ko_KR: EnTranslations = {
       "rift_storm_execution": "피뢰침",
       "rift_storm_strike": "폭풍 소환사의 분노",
       "rift_tide_execution": "심연의 아가리",
-      "rift_tide_strike": "분쇄의 심연"
+      "rift_tide_strike": "분쇄의 심연",
+      "hoard_cast_fear": "공포의 포효",
+      "hoard_cast_stun": "기절의 일격",
+      "hoard_cast_silence": "침묵의 비명",
+      "hoard_cast_hex": "주술"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const ko_KR: EnTranslations = {
       },
       "stable_horse": {
         "name": "마구간 말"
+      },
+      "hoard_brood_hatchling": {
+        "name": "비스카의 새끼 거미"
       },
       "hoard_healing_tide_totem": {
         "name": "치유의 해일 토템"

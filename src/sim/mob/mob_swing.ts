@@ -24,6 +24,7 @@ import { applyThornsReaction } from '../combat/thorns_charge';
 import { MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { nythraxisGravebreakerOnMobSwing } from '../encounters/nythraxis';
+import { deferHoardControlAura } from '../rift/hoard_control_casts';
 import { suppressHoardStormShove } from '../rift/hoard_storm_static';
 import type { SimContext } from '../sim_context';
 import {
@@ -304,7 +305,7 @@ export function runMobSwingAffixes(
   // never silences the party. updateCasting interrupts any live spell next tick.
   const silence = MOBS[mob.templateId]?.silence;
   if (silence && mob.hostile && !target.dead && ctx.rng.chance(silence.chance)) {
-    ctx.applyAura(target, {
+    applyMobControl(ctx, mob, target, {
       id: `silence_${mob.templateId}`,
       name: silence.name,
       kind: 'silence',
@@ -536,7 +537,7 @@ export function runMobSwingAffixes(
     // escape window: roll drawn, control effect skipped (see ensnare above)
     !riftControlSuppressed(ctx, mob)
   ) {
-    ctx.applyAura(target, {
+    applyMobControl(ctx, mob, target, {
       id: `stun_${mob.templateId}`,
       name: stunOnHit.name,
       kind: 'stun',
@@ -834,7 +835,7 @@ export function runMobSwingAffixes(
       // a suppressed fear must consume exactly the rng a landed one would.
       const heading = ctx.rng.range(-Math.PI, Math.PI);
       if (!riftControlSuppressed(ctx, mob)) {
-        ctx.applyAura(target, {
+        applyMobControl(ctx, mob, target, {
           id: 'fear_incap',
           name: dread.name,
           kind: 'incapacitate',
@@ -869,7 +870,7 @@ export function runMobSwingAffixes(
   ) {
     const remaining = ctx.diminishedCrowdControlDuration(mob, target, 'polymorph', hex.duration);
     if (remaining !== null) {
-      ctx.applyAura(target, {
+      applyMobControl(ctx, mob, target, {
         id: `hex_${mob.templateId}`,
         name: hex.name,
         kind: 'polymorph',
@@ -897,7 +898,7 @@ export function runMobSwingAffixes(
     // escape window: roll drawn, stun skipped (see ensnare above)
     !riftControlSuppressed(ctx, mob)
   ) {
-    ctx.applyAura(target, {
+    applyMobControl(ctx, mob, target, {
       id: `concuss_${mob.templateId}`,
       name: concuss.name,
       kind: 'stun',
@@ -1136,4 +1137,11 @@ function applyCorrosion(
       school: corrode.school ?? 'nature',
     });
   }
+}
+
+/** A hard control a landed swing procs. Inside a Buried Hoard it becomes an
+ *  interruptible cast (src/sim/rift/hoard_control_casts.ts); anywhere else it
+ *  lands at once, exactly as before. */
+function applyMobControl(ctx: SimContext, mob: Entity, target: Entity, aura: Aura): void {
+  if (!deferHoardControlAura(ctx, mob, target, aura)) ctx.applyAura(target, aura);
 }

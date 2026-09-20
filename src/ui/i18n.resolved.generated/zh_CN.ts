@@ -11189,7 +11189,11 @@ export const zh_CN: EnTranslations = {
       "rift_storm_execution": "避雷针",
       "rift_storm_strike": "风暴召唤者之怒",
       "rift_tide_execution": "深渊之口",
-      "rift_tide_strike": "粉碎深渊"
+      "rift_tide_strike": "粉碎深渊",
+      "hoard_cast_fear": "恐惧咆哮",
+      "hoard_cast_stun": "震晕重击",
+      "hoard_cast_silence": "沉默尖啸",
+      "hoard_cast_hex": "妖术"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const zh_CN: EnTranslations = {
       },
       "stable_horse": {
         "name": "厩马"
+      },
+      "hoard_brood_hatchling": {
+        "name": "维斯卡的幼蛛"
       },
       "hoard_healing_tide_totem": {
         "name": "治疗之潮图腾"

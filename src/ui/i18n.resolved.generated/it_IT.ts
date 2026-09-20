@@ -11189,7 +11189,11 @@ export const it_IT: EnTranslations = {
       "rift_storm_execution": "Parafulmine",
       "rift_storm_strike": "Ira del Richiamatempeste",
       "rift_tide_execution": "Fauci Abissali",
-      "rift_tide_strike": "Profondità Schiacciante"
+      "rift_tide_strike": "Profondità Schiacciante",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const it_IT: EnTranslations = {
       },
       "stable_horse": {
         "name": "Cavallo da stalla"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

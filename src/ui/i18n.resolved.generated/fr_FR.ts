@@ -11189,7 +11189,11 @@ export const fr_FR: EnTranslations = {
       "rift_storm_execution": "Paratonnerre",
       "rift_storm_strike": "Colère de l'Invocateur des tempêtes",
       "rift_tide_execution": "Gueule abyssale",
-      "rift_tide_strike": "Profondeur écrasante"
+      "rift_tide_strike": "Profondeur écrasante",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const fr_FR: EnTranslations = {
       },
       "stable_horse": {
         "name": "Cheval d'écurie"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

@@ -11189,7 +11189,11 @@ export const pt_BR: EnTranslations = {
       "rift_storm_execution": "Para-raios",
       "rift_storm_strike": "Fúria do Invocador de Tempestades",
       "rift_tide_execution": "Fauces Abissais",
-      "rift_tide_strike": "Profundeza Esmagadora"
+      "rift_tide_strike": "Profundeza Esmagadora",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const pt_BR: EnTranslations = {
       },
       "stable_horse": {
         "name": "Cavalo de estábulo"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

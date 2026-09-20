@@ -11189,7 +11189,11 @@ export const en_CA: EnTranslations = {
       "rift_storm_execution": "Lightning Rod",
       "rift_storm_strike": "Stormcaller's Wrath",
       "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_tide_strike": "Crushing Depth",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const en_CA: EnTranslations = {
       },
       "stable_horse": {
         "name": "Stable Horse"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

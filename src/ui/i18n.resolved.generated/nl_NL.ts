@@ -11189,7 +11189,11 @@ export const nl_NL: EnTranslations = {
       "rift_storm_execution": "Bliksemstaaf",
       "rift_storm_strike": "Woede van de Stormroeper",
       "rift_tide_execution": "Afgrondmuil",
-      "rift_tide_strike": "Verpletterende Diepte"
+      "rift_tide_strike": "Verpletterende Diepte",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const nl_NL: EnTranslations = {
       },
       "stable_horse": {
         "name": "Stalpaard"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"

@@ -11189,7 +11189,11 @@ export const ru_RU: EnTranslations = {
       "rift_storm_execution": "Громоотвод",
       "rift_storm_strike": "Гнев призывателя бурь",
       "rift_tide_execution": "Пасть бездны",
-      "rift_tide_strike": "Сокрушающая глубина"
+      "rift_tide_strike": "Сокрушающая глубина",
+      "hoard_cast_fear": "Ужасающий рёв",
+      "hoard_cast_stun": "Оглушающий удар",
+      "hoard_cast_silence": "Заглушающий визг",
+      "hoard_cast_hex": "Сглаз"
     }
   },
   "questUi": {
@@ -17768,6 +17772,9 @@ export const ru_RU: EnTranslations = {
       },
       "stable_horse": {
         "name": "Конюшенная лошадь"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Детёныш Висски"
       },
       "hoard_healing_tide_totem": {
         "name": "Тотем целительного прилива"

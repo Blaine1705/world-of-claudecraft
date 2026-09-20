@@ -636,6 +636,7 @@ const baseEnTable = {
   'error.notInChannel': 'You are not in the {channel} channel.',
   'error.notInChannelJoin': 'You are not in the {channel} channel. Type /join {channel} first.',
   'log.bossUnleashes': '{name} unleashes {mechanic}!',
+  'log.hoardStormSurge': '{name} drinks the charged ground. Drag him out of it!',
   'log.mobChannels': '{name} channels {mechanic}.',
   'log.channelInterrupted': '{mechanic} is interrupted!',
   'aura.tamed': 'Tamed',
@@ -1341,6 +1342,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notInChannel': 'You are not in the {channel} channel.',
     'error.notInChannelJoin': 'You are not in the {channel} channel. Type /join {channel} first.',
     'log.bossUnleashes': '{name} unleashes {mechanic}!',
+    'log.hoardStormSurge': '{name} drinks the charged ground. Drag him out of it!',
     'log.mobChannels': '{name} channels {mechanic}.',
     'aura.tamed': 'Tamed',
     'aura.causticSpores': 'Caustic Spores',
@@ -1617,6 +1619,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notInChannel': 'No estás en el canal {channel}.',
     'error.notInChannelJoin': 'No estás en el canal {channel}. Escribe /join {channel} primero.',
     'log.bossUnleashes': '¡{name} desata {mechanic}!',
+    'log.hoardStormSurge': '¡{name} absorbe el suelo cargado. ¡Sácalo de ahí!',
     'log.mobChannels': '¡{name} canaliza {mechanic}!',
     'mechanic.warStomp': 'Pisotón de guerra',
     'mechanic.boneCarapace': 'Caparazón de hueso',
@@ -2432,6 +2435,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notInChannel': 'No estás en el canal {channel}.',
     'error.notInChannelJoin': 'No estás en el canal {channel}. Escribe /join {channel} primero.',
     'log.bossUnleashes': '¡{name} desata {mechanic}!',
+    'log.hoardStormSurge': '¡{name} absorbe el suelo cargado. ¡Sácalo de ahí!',
     'log.mobChannels': '¡{name} canaliza {mechanic}!',
     'mechanic.warStomp': 'Pisotón de guerra',
     'mechanic.boneCarapace': 'Caparazón de hueso',
@@ -4844,6 +4848,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notInChannel': 'You are not in the {channel} channel.',
     'error.notInChannelJoin': 'You are not in the {channel} channel. Type /join {channel} first.',
     'log.bossUnleashes': '{name} unleashes {mechanic}!',
+    'log.hoardStormSurge': '{name} drinks the charged ground. Drag him out of it!',
     'log.mobChannels': '{name} channels {mechanic}.',
     'mechanic.warStomp': 'Shuddering Stomp',
     'mechanic.boneCarapace': 'Bone Carapace',
@@ -6976,6 +6981,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notInChannel': '你不在{channel}频道中。',
     'error.notInChannelJoin': '你不在{channel}频道中。请先输入 /join {channel}。',
     'log.bossUnleashes': '{name}释放了{mechanic}！',
+    'log.hoardStormSurge': '{name}正在汲取带电的地面。快把他引出去！',
     'log.mobChannels': '{name}正在引导{mechanic}。',
     'mechanic.warStomp': '战争践踏',
     'mechanic.boneCarapace': '白骨甲壳',
@@ -7728,6 +7734,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notInChannel': '你不在「{channel}」頻道中。',
     'error.notInChannelJoin': '你不在「{channel}」頻道中。請先輸入 /join {channel}。',
     'log.bossUnleashes': '{name}釋放出{mechanic}！',
+    'log.hoardStormSurge': '{name}正在汲取帶電的地面。快把他引出去！',
     'log.mobChannels': '{name}正在引導{mechanic}。',
     'mechanic.warStomp': '戰爭踐踏',
     'mechanic.boneCarapace': '骸骨甲殼',
@@ -8488,6 +8495,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notInChannelJoin':
       '{channel} 채널에 있지 않습니다. 먼저 /join {channel}을(를) 입력하세요.',
     'log.bossUnleashes': '{name}이(가) {mechanic}을(를) 시전합니다!',
+    'log.hoardStormSurge': '{name}이(가) 충전된 땅의 힘을 흡수합니다. 밖으로 끌어내세요!',
     'log.mobChannels': '{name}이(가) {mechanic}을(를) 시전합니다.',
     'mechanic.warStomp': '전투 발구르기',
     'mechanic.boneCarapace': '뼈 갑각',
@@ -9288,6 +9296,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notInChannelJoin':
       '「{channel}」チャンネルに参加していません。まず/join {channel}と入力してください。',
     'log.bossUnleashes': '{name}が「{mechanic}」を発動！',
+    'log.hoardStormSurge': '{name}が帯電した地面の力を吸収している。外へ引き離せ！',
     'log.mobChannels': '{name}が「{mechanic}」を唱えている。',
     'mechanic.warStomp': '大震脚',
     'mechanic.boneCarapace': '骨甲殻',
@@ -10927,6 +10936,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.notInChannelJoin':
       'Вы не состоите в канале «{channel}». Сначала введите /join {channel}.',
     'log.bossUnleashes': '{name} обрушивает {mechanic}!',
+    'log.hoardStormSurge': '{name} впитывает заряженную землю. Выведите его оттуда!',
     'log.mobChannels': '{name} направляет {mechanic}.',
     'mechanic.warStomp': 'Боевой топот',
     'mechanic.boneCarapace': 'Костяной панцирь',
@@ -18006,6 +18016,11 @@ const RULES: Rule[] = [
   {
     re: /^(.+) is interrupted!$/,
     build: (m) => tSim('log.channelInterrupted', { mechanic: locBossMechanic(m[1]) }),
+  },
+  // Storm Surge (src/sim/rift/hoard_storm_surge.ts): Vharok standing in his own field.
+  {
+    re: /^(.+) drinks the charged ground\. Drag him out of it!$/,
+    build: (m) => tSim('log.hoardStormSurge', { name: locMob(m[1]) }),
   },
   {
     re: /^(.+) unleashes (.+)!$/,

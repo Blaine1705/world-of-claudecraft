@@ -423,6 +423,12 @@ export interface HoardBossState {
   specialTriggered: boolean;
   totemId: number | null;
   totemPulseTimer: number;
+  /** Storm Surge (src/sim/rift/hoard_storm_surge.ts): Vharok's stacks while he
+   *  stands in his own charged ground, and the size he returns to. */
+  stormSurgeStacks?: number;
+  stormSurgeTimer?: number;
+  stormSurgeInField?: boolean;
+  stormSurgeBaseScale?: number;
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for

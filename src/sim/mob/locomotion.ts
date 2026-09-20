@@ -1,4 +1,5 @@
 import { gliderActionsLocked } from '../glider_action_lock';
+import { deferHoardTerrify } from '../rift/hoard_control_casts';
 import { hasShadowCloak } from '../shadow_action_lock';
 // Mob locomotion (M2), extracted from the Sim monolith.
 //
@@ -1333,16 +1334,19 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
     if (mob.terrifyTimer <= 0 && !mechanicSlotHeld(mob, 'terrify')) {
       mob.terrifyTimer = terrify.every;
       claimMechanicSpacing(mob);
+      // Inside a Buried Hoard the wail is an interruptible cast, never instant.
+      const deferred = deferHoardTerrify(ctx, mob, terrify);
       const school = terrify.school ?? 'shadow';
-      ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-      if (!MOBS[mob.templateId]?.quietMechanics)
+      if (!deferred)
+        ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+      if (!deferred && !MOBS[mob.templateId]?.quietMechanics)
         ctx.emit({
           type: 'log',
           text: `${mob.name} unleashes ${terrify.name}!`,
           color: '#ff9933',
           entityId: mob.id,
         });
-      for (const meta of ctx.players.values()) {
+      for (const meta of deferred ? [] : ctx.players.values()) {
         const pe = ctx.entities.get(meta.entityId);
         if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > terrify.radius) continue;
         const remaining = ctx.diminishedCrowdControlDuration(mob, pe, 'fear', terrify.duration);

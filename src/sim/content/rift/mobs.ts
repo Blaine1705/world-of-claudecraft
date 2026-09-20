@@ -43,6 +43,28 @@ const bossLoot = (c: number, rareId: string, rareChance: number): LootEntry[] =>
 /** Buried Hoard-only encounter actors. Kept out of RIFT_MOBS so ordinary Rift
  * generation, search metadata, and upgrade manifests remain byte-for-byte isolated. */
 export const HOARD_MOBS: Record<string, MobTemplate> = {
+  // Broodmother Vysska's eggs hatch into these: real spiderlings (the shared
+  // rift_spawnling add is a demon, which read wrong bursting out of a spider egg).
+  hoard_brood_hatchling: {
+    id: 'hoard_brood_hatchling',
+    name: "Vysska's Hatchling",
+    minLevel: 18,
+    maxLevel: 23,
+    family: 'spider',
+    hpBase: 30,
+    hpPerLevel: 11,
+    dmgBase: 6,
+    dmgPerLevel: 1.9,
+    attackSpeed: 1.6,
+    armorPerLevel: 10,
+    moveSpeed: 8.5,
+    aggroRadius: 12,
+    loot: [],
+    scale: 0.6,
+    color: 0x9acd32,
+    xpMult: 0.25,
+    untameable: true,
+  },
   hoard_healing_tide_totem: {
     id: 'hoard_healing_tide_totem',
     name: 'Healing Tide Totem',
