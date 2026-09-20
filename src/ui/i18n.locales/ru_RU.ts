@@ -10083,6 +10083,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': 'Сестра Нхалия, Утонувшая Песнь',
   'entities.mobs.edda_reedhand.name': 'Эдда Тростниковая Рука',
   'entities.mobs.tolling_bell.name': 'Звонящий Колокол',
+  'entities.mobs.hoard_brood_egg.name': 'Кладка выводка',
   'entities.mobs.hoard_brood_hatchling.name': 'Детёныш Висски',
   'entities.mobs.hoard_healing_tide_totem.name': 'Тотем целительного прилива',
   'entities.mobs.rift_spawnling.name': 'Отпрыск Разлома',

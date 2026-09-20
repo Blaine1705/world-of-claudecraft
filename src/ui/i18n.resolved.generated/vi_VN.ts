@@ -17773,6 +17773,9 @@ export const vi_VN: EnTranslations = {
       "stable_horse": {
         "name": "Ngựa chuồng"
       },
+      "hoard_brood_egg": {
+        "name": "Brood Clutch"
+      },
       "hoard_brood_hatchling": {
         "name": "Vysska's Hatchling"
       },

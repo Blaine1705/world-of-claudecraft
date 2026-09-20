@@ -17773,6 +17773,9 @@ export const ko_KR: EnTranslations = {
       "stable_horse": {
         "name": "마구간 말"
       },
+      "hoard_brood_egg": {
+        "name": "알 무리"
+      },
       "hoard_brood_hatchling": {
         "name": "비스카의 새끼 거미"
       },

@@ -17773,6 +17773,9 @@ export const en_XA: EnTranslations = {
       "stable_horse": {
         "name": "[Šţáƀļé Ĥóŕšé]"
       },
+      "hoard_brood_egg": {
+        "name": "[Ɓŕóóð Çļúţçĥ]"
+      },
       "hoard_brood_hatchling": {
         "name": "[Ʋýššķá'š Ĥáţçĥļíñĝ]"
       },

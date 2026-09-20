@@ -33,7 +33,10 @@ export const HOARD_CONTROL_CAST_SCHOOLS: Readonly<Record<string, { school: Aura[
 
 /** Bar length for a single-target control and for a room-wide one. */
 export const HOARD_CONTROL_CAST_SEC = 1.8;
-export const HOARD_CONTROL_AOE_CAST_SEC = 2.4;
+/** A fear takes a player out of the fight outright, so it is the slowest bar to
+ *  land: the single-target Dread and, slower still, the room-wide terrify. */
+export const HOARD_CONTROL_FEAR_CAST_SEC = 2.6;
+export const HOARD_CONTROL_AOE_CAST_SEC = 3.4;
 
 export type HoardControlCast =
   | { castId: string; kind: 'aura'; targetId: number; aura: Aura }
@@ -88,7 +91,7 @@ export function deferHoardControlAura(
   beginCast(
     mob,
     { castId: castIdForAura(aura), kind: 'aura', targetId: target.id, aura },
-    HOARD_CONTROL_CAST_SEC,
+    aura.kind === 'incapacitate' ? HOARD_CONTROL_FEAR_CAST_SEC : HOARD_CONTROL_CAST_SEC,
   );
   return true;
 }

@@ -9917,6 +9917,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': '修道女ナリア、溺れし聖歌',
   'entities.mobs.edda_reedhand.name': 'エッダ・リードハンド',
   'entities.mobs.tolling_bell.name': '鳴り響く鐘',
+  'entities.mobs.hoard_brood_egg.name': '卵嚢の群れ',
   'entities.mobs.hoard_brood_hatchling.name': 'ヴィスカの幼蜘蛛',
   'entities.mobs.hoard_healing_tide_totem.name': '癒やしの潮のトーテム',
   'entities.mobs.rift_spawnling.name': 'リフトの落とし子',

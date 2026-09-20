@@ -43,6 +43,27 @@ const bossLoot = (c: number, rareId: string, rareChance: number): LootEntry[] =>
 /** Buried Hoard-only encounter actors. Kept out of RIFT_MOBS so ordinary Rift
  * generation, search metadata, and upgrade manifests remain byte-for-byte isolated. */
 export const HOARD_MOBS: Record<string, MobTemplate> = {
+  // Broodmother Vysska's clutch. Encounter scenery: it hatches when she drops to
+  // half health and cannot be attacked, so it carries no health bar or target.
+  hoard_brood_egg: {
+    id: 'hoard_brood_egg',
+    name: 'Brood Clutch',
+    minLevel: 18,
+    maxLevel: 23,
+    family: 'spider',
+    hpBase: 1,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 99,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0x9bd36a,
+    xpMult: 0,
+  },
   // Broodmother Vysska's eggs hatch into these: real spiderlings (the shared
   // rift_spawnling add is a demon, which read wrong bursting out of a spider egg).
   hoard_brood_hatchling: {

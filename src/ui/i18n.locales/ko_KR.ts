@@ -9895,6 +9895,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': '나할리아 수녀, 익사한 성가',
   'entities.mobs.edda_reedhand.name': '에다 리드핸드',
   'entities.mobs.tolling_bell.name': '울리는 종',
+  'entities.mobs.hoard_brood_egg.name': '알 무리',
   'entities.mobs.hoard_brood_hatchling.name': '비스카의 새끼 거미',
   'entities.mobs.hoard_healing_tide_totem.name': '치유의 해일 토템',
   'entities.mobs.rift_spawnling.name': '균열의 산물',

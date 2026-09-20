@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   HOARD_BRUTE_COMBO,
   HOARD_FROST_GUST,
+  HOARD_STORM_FIELD_SEC,
   HOARD_TIDE_WAVE,
   HOARD_TIDE_WAVE_HALF_GAP,
   HOARD_TIDE_WAVE_LEAD_SEC,
@@ -36,7 +37,7 @@ describe('Buried Hoard boss kit plans', () => {
   });
 
   it('gives Ring of Frost a safe center and the storm a long escape cast', () => {
-    const ring = hoardMarkSpec('arcane-ring');
+    const ring = hoardMarkSpec('frost-ring');
     const storm = hoardMarkSpec('storm-charge');
     expect(ring.innerRadius).toBeGreaterThan(0);
     const innerRadius = ring.innerRadius ?? 0;
@@ -47,7 +48,7 @@ describe('Buried Hoard boss kit plans', () => {
       true,
     );
     expect(storm.windup).toBeGreaterThanOrEqual(3);
-    expect(storm.hazardDuration).toBe(6);
+    expect(storm.hazardDuration).toBe(HOARD_STORM_FIELD_SEC);
   });
 
   it('moves each tide front across two lanes with a central escape gap and lead time', () => {

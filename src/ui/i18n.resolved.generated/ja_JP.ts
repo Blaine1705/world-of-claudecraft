@@ -17773,6 +17773,9 @@ export const ja_JP: EnTranslations = {
       "stable_horse": {
         "name": "厩舎の馬"
       },
+      "hoard_brood_egg": {
+        "name": "卵嚢の群れ"
+      },
       "hoard_brood_hatchling": {
         "name": "ヴィスカの幼蜘蛛"
       },

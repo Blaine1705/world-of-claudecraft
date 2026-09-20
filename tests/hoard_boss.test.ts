@@ -4,6 +4,7 @@ import { runMobSwingAffixes } from '../src/sim/mob/mob_swing';
 import {
   HOARD_BONE_WAVE_COUNT,
   HOARD_BROOD_EGG_COUNT,
+  HOARD_BROOD_EGG_TEMPLATE,
   HOARD_BROOD_HATCH_HP,
   HOARD_MARK_ENRAGED_EVERY_SEC,
   HOARD_MARK_ENRAGED_WINDUP_SEC,
@@ -14,6 +15,7 @@ import {
   HOARD_SWEEP_ENRAGED_WINDUP_SEC,
   HOARD_SWEEP_HALF_ANGLE,
   HOARD_SWEEP_METEOR_COUNT,
+  HOARD_SWEEP_METEOR_DAMAGE_FRACTION,
   HOARD_SWEEP_RANGE,
   HOARD_SWEEP_WINDUP_SEC,
   HOARD_TOTEM_HEAL_FRACTION,
@@ -29,6 +31,9 @@ import {
 import {
   HOARD_BRUTE_COMBO,
   HOARD_BRUTE_WINDUP_SEC,
+  HOARD_COLLAPSE_RADIUS,
+  HOARD_EVENT_HORIZON_EYE_RADIUS,
+  HOARD_EVENT_HORIZON_RADIUS,
   HOARD_FROST_GUST,
   HOARD_STORM_FIELD_RADIUS,
   HOARD_STORM_FIELD_SEC,
@@ -129,8 +134,9 @@ describe('Buried Hoard boss pure decisions', () => {
     expect(HOARD_SWEEP_HALF_ANGLE).toBeLessThan(Math.PI / 2);
   });
 
-  it('places the reused meteor falls deterministically inside the frontal', () => {
+  it('scatters the meteor falls around the boss, deterministically and clear of the frontal', () => {
     const cue = {
+      id: 7,
       x: 12,
       z: -8,
       facing: 0.7,
@@ -140,7 +146,20 @@ describe('Buried Hoard boss pure decisions', () => {
     const first = hoardSweepMeteorPoints(cue);
     expect(first).toHaveLength(HOARD_SWEEP_METEOR_COUNT);
     expect(hoardSweepMeteorPoints(cue)).toEqual(first);
-    for (const point of first) expect(pointInHoardSweep(cue, cue.facing, point)).toBe(true);
+    expect(hoardSweepMeteorPoints({ ...cue, id: 8 })).not.toEqual(first);
+    const bearings: number[] = [];
+    for (const point of first) {
+      // Never stacked on the cone a player is already dodging.
+      expect(pointInHoardSweep(cue, cue.facing, point)).toBe(false);
+      const distance = Math.hypot(point.x - cue.x, point.z - cue.z);
+      expect(distance).toBeGreaterThanOrEqual(5);
+      expect(distance).toBeLessThanOrEqual(HOARD_SWEEP_RANGE + 2);
+      bearings.push(Math.atan2(point.x - cue.x, point.z - cue.z));
+    }
+    // Spread all around him, not bunched on one flank.
+    const relative = bearings.map((bearing) => Math.sin(bearing - cue.facing));
+    expect(Math.min(...relative)).toBeLessThan(-0.3);
+    expect(Math.max(...relative)).toBeGreaterThan(0.3);
   });
 });
 
@@ -187,12 +206,14 @@ describe('Buried Hoard boss encounter', () => {
     tickHoardBossMechanics(sim.ctx);
     sim.drainEvents();
     const eggIds = boss.summonedIds.filter(
-      (id) => sim.entities.get(id)?.templateId === 'spider_egg_sac',
+      (id) => sim.entities.get(id)?.templateId === HOARD_BROOD_EGG_TEMPLATE,
     );
     expect(eggIds).toHaveLength(HOARD_BROOD_EGG_COUNT);
     for (const [index, id] of eggIds.entries()) {
       const egg = sim.entities.get(id);
       expect(egg?.damageImmune).toBe(true);
+      // Scenery, not an enemy: it hatches on her health and cannot be fought.
+      expect(egg?.hostile).toBe(false);
       expect(
         Math.hypot((egg?.pos.x ?? 0) - boss.spawnPos.x, (egg?.pos.z ?? 0) - boss.spawnPos.z),
       ).toBeCloseTo(index % 2 === 0 ? 5.2 : 6.1, 4);
@@ -235,7 +256,7 @@ describe('Buried Hoard boss encounter', () => {
     boss.templateId = 'rift_boss_venom';
     tickHoardBossMechanics(sim.ctx);
     const eggIds = boss.summonedIds.filter(
-      (id) => sim.entities.get(id)?.templateId === 'spider_egg_sac',
+      (id) => sim.entities.get(id)?.templateId === HOARD_BROOD_EGG_TEMPLATE,
     );
     expect(eggIds).toHaveLength(4);
     boss.hp = 0;
@@ -538,26 +559,116 @@ describe('Buried Hoard boss encounter', () => {
     expect(hoardState(inst).sweepTimer).toBeGreaterThan(11);
   });
 
-  it('alternates Nyxaris Blizzard with a one-time Ring of Frost', () => {
-    const { sim, inst, boss } = makeEncounter('rift_boss_arcane');
+  it('gives Hoarfrost the Blizzard in turn with the ice, and a one-time Ring of Frost', () => {
+    const { sim, inst, boss } = makeEncounter('rift_boss_frost');
     tickHoardBossMechanics(sim.ctx);
     sim.drainEvents();
-    hoardState(inst).markTimer = 0;
-    tickHoardBossMechanics(sim.ctx);
-    expect(sim.drainEvents()).toContainEqual(
-      expect.objectContaining({ type: 'hoardBossCue', variant: 'arcane-blizzard' }),
-    );
-    tickMechanic(sim, hoardMarkSpec('arcane-blizzard').windup + 0.1);
+    const marks: string[] = [];
+    for (let round = 0; round < 2; round++) {
+      hoardState(inst).markTimer = 0;
+      hoardState(inst).sweepTimer = 99;
+      tickHoardBossMechanics(sim.ctx);
+      for (const event of sim.drainEvents()) {
+        if (event.type === 'hoardBossCue' && event.kind === 'mark' && event.phase === 'warning')
+          marks.push(event.variant ?? '');
+      }
+      tickMechanic(sim, 8);
+      sim.drainEvents();
+    }
+    expect(new Set(marks)).toEqual(new Set(['frost-ice', 'frost-blizzard']));
+
     boss.hp = Math.floor(boss.maxHp * 0.5);
     tickHoardBossMechanics(sim.ctx);
     const ring = sim
       .drainEvents()
       .find(
         (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
-          event.type === 'hoardBossCue' && event.variant === 'arcane-ring',
+          event.type === 'hoardBossCue' && event.variant === 'frost-ring',
       );
     expect(ring).toMatchObject({ innerRadius: 4.5, radius: 8.5 });
     expect(hoardState(inst).specialTriggered).toBe(true);
+  });
+
+  it('never drops a snow circle in the middle of the Whiteout Gust', () => {
+    const { sim, inst } = makeEncounter('rift_boss_frost');
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    hoardState(inst).sweepTimer = 0;
+    hoardState(inst).markTimer = 99;
+    tickHoardBossMechanics(sim.ctx);
+    const events = sim.drainEvents();
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'hoardBossCue', variant: 'frost-gust' }),
+    );
+    expect(events.some((event) => event.type === 'spellfxAt' && event.fx === 'snowZone')).toBe(
+      false,
+    );
+  });
+
+  it('makes Nyxaris a run-in, run-out dance: Voidfall, then Event Horizon into Collapse', () => {
+    const { sim, inst, boss } = makeEncounter('rift_boss_arcane');
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    hoardState(inst).markTimer = 0;
+    tickHoardBossMechanics(sim.ctx);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'hoardBossCue', variant: 'arcane-voidfall' }),
+    );
+    tickMechanic(sim, hoardMarkSpec('arcane-voidfall').windup + 4.5);
+    sim.drainEvents();
+
+    hoardState(inst).markTimer = 0;
+    tickHoardBossMechanics(sim.ctx);
+    const horizon = sim
+      .drainEvents()
+      .find(
+        (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
+          event.type === 'hoardBossCue' && event.variant === 'arcane-horizon',
+      );
+    expect(horizon).toMatchObject({
+      innerRadius: HOARD_EVENT_HORIZON_EYE_RADIUS,
+      radius: HOARD_EVENT_HORIZON_RADIUS,
+    });
+    // The eye is safe from the Horizon but not from the Collapse that follows,
+    // and the run out is always makeable.
+    expect(HOARD_COLLAPSE_RADIUS).toBeGreaterThan(HOARD_EVENT_HORIZON_EYE_RADIUS);
+    expect(hoardMarkSpec('arcane-collapse').windup).toBeGreaterThanOrEqual(2);
+
+    // Stand in the eye: the Horizon passes over, and the Collapse is cast on it.
+    sim.player.pos = { ...sim.player.pos, x: horizon?.x ?? 0, z: horizon?.z ?? 0 };
+    const hpBefore = sim.player.hp;
+    const resolved = tickMechanic(sim, hoardMarkSpec('arcane-horizon').windup + 0.1);
+    expect(sim.player.hp).toBe(hpBefore);
+    const collapse = resolved.find(
+      (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
+        event.type === 'hoardBossCue' && event.variant === 'arcane-collapse',
+    );
+    expect(collapse).toMatchObject({ x: horizon?.x, z: horizon?.z, radius: HOARD_COLLAPSE_RADIUS });
+    // Below half health the run out is no longer clean.
+    expect(resolved.some((e) => e.type === 'hoardBossCue' && e.variant === 'arcane-voidfall')).toBe(
+      false,
+    );
+    expect(boss.hp / boss.maxHp).toBeGreaterThan(0.5);
+  });
+
+  it('hurts anyone standing under a scattered Emberforge meteor', () => {
+    const { sim, inst, boss } = makeEncounter('rift_boss_ember');
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    hoardState(inst).sweepTimer = 0;
+    hoardState(inst).markTimer = 99;
+    tickHoardBossMechanics(sim.ctx);
+    const sweep = hoardState(inst).cues.find((cue) => cue.kind === 'sweep');
+    if (!sweep || sweep.kind !== 'sweep') throw new Error('no ember sweep');
+    const [meteor] = hoardSweepMeteorPoints(sweep);
+    sim.player.pos = { ...sim.player.pos, x: meteor.x, z: meteor.z };
+    expect(pointInHoardSweep(sweep, sweep.facing, sim.player.pos)).toBe(false);
+    const hpBefore = sim.player.hp;
+    tickMechanic(sim, sweep.total + 0.1);
+    expect(hpBefore - sim.player.hp).toBeGreaterThanOrEqual(
+      Math.round(sim.player.maxHp * HOARD_SWEEP_METEOR_DAMAGE_FRACTION) - 1,
+    );
+    expect(boss.dead).toBe(false);
   });
 
   it('casts Vharok thunder with time to escape and leaves charged ground', () => {
@@ -604,6 +715,11 @@ describe('Buried Hoard boss encounter', () => {
       kind: 'buff_dmg_done',
       stacks: 3,
     });
+    // An honest timer, never an hour: how long the charge would last if he left
+    // now, held full while he stands in the ground.
+    const surge = boss.auras.find((aura) => aura.id === HOARD_STORM_SURGE_AURA_ID);
+    expect(surge?.duration).toBeCloseTo(3 * HOARD_STORM_SURGE_DECAY_SEC);
+    expect(surge?.remaining).toBeCloseTo(3 * HOARD_STORM_SURGE_DECAY_SEC, 0);
     expect(
       events.filter((event) => event.type === 'log' && event.text.includes('Drag him out')),
     ).toHaveLength(1);
@@ -720,7 +836,7 @@ describe('Buried Hoard boss encounter', () => {
   });
 
   it('includes every active telegraph in the reconnect rift state', () => {
-    const { sim, inst, boss } = makeEncounter('rift_boss_arcane');
+    const { sim, inst, boss } = makeEncounter('rift_boss_frost');
     tickHoardBossMechanics(sim.ctx);
     sim.drainEvents();
     boss.hp = Math.floor(boss.maxHp * 0.5);
@@ -731,10 +847,10 @@ describe('Buried Hoard boss encounter', () => {
         instanceId: inst.instanceId,
         cueId: 1,
         kind: 'mark',
-        variant: 'arcane-ring',
+        variant: 'frost-ring',
         innerRadius: 4.5,
-        remaining: hoardMarkSpec('arcane-ring').windup,
-        total: hoardMarkSpec('arcane-ring').windup,
+        remaining: hoardMarkSpec('frost-ring').windup,
+        total: hoardMarkSpec('frost-ring').windup,
       }),
     ]);
   });

@@ -17773,6 +17773,9 @@ export const zh_TW: EnTranslations = {
       "stable_horse": {
         "name": "廄馬"
       },
+      "hoard_brood_egg": {
+        "name": "蟲卵群"
+      },
       "hoard_brood_hatchling": {
         "name": "維斯卡的幼蛛"
       },

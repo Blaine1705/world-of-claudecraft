@@ -9491,6 +9491,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': '娜哈莉亞修女，溺亡的聖歌',
   'entities.mobs.edda_reedhand.name': '艾達·蘆手',
   'entities.mobs.tolling_bell.name': '鳴鐘',
+  'entities.mobs.hoard_brood_egg.name': '蟲卵群',
   'entities.mobs.hoard_brood_hatchling.name': '維斯卡的幼蛛',
   'entities.mobs.hoard_healing_tide_totem.name': '治療之潮圖騰',
   'entities.mobs.rift_spawnling.name': '裂隙孽生體',

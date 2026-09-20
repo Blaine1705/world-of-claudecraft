@@ -3876,6 +3876,7 @@ export type TranslationKeyFlat =
   | 'entities.mobs.hedge_gnome.name'
   | 'entities.mobs.hedge_knight.name'
   | 'entities.mobs.heroic_boss_dummy.name'
+  | 'entities.mobs.hoard_brood_egg.name'
   | 'entities.mobs.hoard_brood_hatchling.name'
   | 'entities.mobs.hoard_healing_tide_totem.name'
   | 'entities.mobs.hollow_acolyte.name'

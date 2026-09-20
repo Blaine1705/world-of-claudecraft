@@ -37,10 +37,15 @@ export function hoardCueAppearance(cue: HoardBossCueView): HoardCueAppearancePla
       return { shape: 'wave', palette: 'tide', countdown: 'none', elementalRider: true };
     case 'tide-tether':
       return { shape: 'tether', palette: 'tide', countdown: 'none', elementalRider: true };
-    case 'arcane-ring':
+    case 'frost-ring':
+      return { shape: 'annulus', palette: 'frost', countdown: 'annulus', elementalRider: true };
+    case 'arcane-horizon':
       return { shape: 'annulus', palette: 'arcane', countdown: 'annulus', elementalRider: true };
-    case 'arcane-blizzard':
+    case 'arcane-voidfall':
+    case 'arcane-collapse':
       return { shape: 'disc', palette: 'arcane', countdown: 'disc', elementalRider: true };
+    case 'frost-blizzard':
+      return { shape: 'disc', palette: 'frost', countdown: 'disc', elementalRider: true };
     case 'storm-charge':
     case 'storm-field':
     case 'storm-static':

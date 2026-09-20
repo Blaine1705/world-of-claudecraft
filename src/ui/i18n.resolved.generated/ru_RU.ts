@@ -17773,6 +17773,9 @@ export const ru_RU: EnTranslations = {
       "stable_horse": {
         "name": "Конюшенная лошадь"
       },
+      "hoard_brood_egg": {
+        "name": "Кладка выводка"
+      },
       "hoard_brood_hatchling": {
         "name": "Детёныш Висски"
       },

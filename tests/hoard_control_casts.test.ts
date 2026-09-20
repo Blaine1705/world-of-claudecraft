@@ -14,6 +14,7 @@ import {
   HOARD_CAST_STUN,
   HOARD_CONTROL_AOE_CAST_SEC,
   HOARD_CONTROL_CAST_SEC,
+  HOARD_CONTROL_FEAR_CAST_SEC,
   tickHoardControlCasts,
 } from '../src/sim/rift/hoard_control_casts';
 import type { RiftInstance } from '../src/sim/rift/types';
@@ -85,6 +86,20 @@ describe('hoard control casts', () => {
     expect(sim.player.auras).toContainEqual(
       expect.objectContaining({ kind: 'stun', name: 'Thunderclap' }),
     );
+  });
+
+  it('gives a fear the slowest bar: more time to kick what takes a player out', () => {
+    const { sim, trash } = makeHoard();
+    deferHoardControlAura(sim.ctx, trash, sim.player, {
+      ...STUN,
+      kind: 'incapacitate',
+      sourceId: trash.id,
+    });
+    expect(trash.castingAbility).toBe(HOARD_CAST_FEAR);
+    expect(trash.castTotal).toBe(HOARD_CONTROL_FEAR_CAST_SEC);
+    expect(HOARD_CONTROL_FEAR_CAST_SEC).toBeGreaterThan(HOARD_CONTROL_CAST_SEC);
+    expect(HOARD_CONTROL_AOE_CAST_SEC).toBeGreaterThan(HOARD_CONTROL_FEAR_CAST_SEC);
+    expect(HOARD_CONTROL_AOE_CAST_SEC).toBeGreaterThanOrEqual(3);
   });
 
   it('an interrupt drops the control for good', () => {

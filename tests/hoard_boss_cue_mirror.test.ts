@@ -70,10 +70,10 @@ describe('Buried Hoard boss cue mirror', () => {
   it('preserves mechanic identity and safe inner radius across the online mirror', () => {
     const mirror = new HoardBossCueMirror(() => 1_000);
     mirror.apply(
-      warning({ variant: 'arcane-ring', radius: 8.5, innerRadius: 4.5, durationSecs: 2.2 }),
+      warning({ variant: 'frost-ring', radius: 8.5, innerRadius: 4.5, durationSecs: 2.2 }),
     );
     expect(mirror.views()[0]).toMatchObject({
-      variant: 'arcane-ring',
+      variant: 'frost-ring',
       radius: 8.5,
       innerRadius: 4.5,
       remaining: 2.2,
@@ -106,7 +106,7 @@ describe('Buried Hoard boss cue mirror', () => {
           instanceId: 12,
           cueId: 9,
           kind: 'mark',
-          variant: 'arcane-ring',
+          variant: 'frost-ring',
           phase: 'warning',
           x: 2,
           z: 3,
@@ -122,7 +122,7 @@ describe('Buried Hoard boss cue mirror', () => {
     now += 300;
     expect(mirror.views()[0]).toMatchObject({
       cueId: 9,
-      variant: 'arcane-ring',
+      variant: 'frost-ring',
       innerRadius: 4.5,
       remaining: 0.5,
       total: 1.45,

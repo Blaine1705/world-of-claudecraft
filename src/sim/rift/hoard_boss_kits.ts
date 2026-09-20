@@ -1,5 +1,9 @@
 import type { HoardBossCueVariant } from './types';
 
+/** Broodmother Vysska's clutch: encounter scenery, never an enemy. Lives here
+ *  (an import-free module) so the nameplate view core can name it cheaply. */
+export const HOARD_BROOD_EGG_TEMPLATE = 'hoard_brood_egg';
+
 export type HoardBossKit =
   | 'frost'
   | 'ember'
@@ -153,6 +157,12 @@ export const HOARD_STORM_SURGE_MAX_STACKS = 8;
 export const HOARD_STORM_SURGE_DAMAGE_PER_STACK = 0.08;
 export const HOARD_STORM_SURGE_SCALE_PER_STACK = 0.05;
 
+/** Event Horizon burns everything out to this radius except the eye; the
+ *  Collapse that follows is wider than the eye, so standing still is never safe. */
+export const HOARD_EVENT_HORIZON_RADIUS = 30;
+export const HOARD_EVENT_HORIZON_EYE_RADIUS = 5.5;
+export const HOARD_COLLAPSE_RADIUS = 9.5;
+
 export function hoardBossKit(templateId: string): HoardBossKit {
   switch (templateId) {
     case 'rift_boss_frost':
@@ -212,7 +222,7 @@ export function hoardMarkSpec(variant: HoardBossCueVariant): HoardMarkSpec {
         school: 'fire',
         ability: 'Emberfall',
       };
-    case 'arcane-blizzard':
+    case 'frost-blizzard':
       return {
         variant,
         radius: 5.2,
@@ -222,9 +232,9 @@ export function hoardMarkSpec(variant: HoardBossCueVariant): HoardMarkSpec {
         pulseFraction: 0.035,
         pulseEvery: 0.75,
         school: 'frost',
-        ability: 'Nyxaris Blizzard',
+        ability: 'Howling Blizzard',
       };
-    case 'arcane-ring':
+    case 'frost-ring':
       return {
         variant,
         radius: 8.5,
@@ -236,6 +246,46 @@ export function hoardMarkSpec(variant: HoardBossCueVariant): HoardMarkSpec {
         pulseEvery: 1,
         school: 'frost',
         ability: 'Ring of Frost',
+      };
+    // Archon Nyxaris. Voidfall is the steady pressure; Event Horizon into
+    // Singularity Collapse is the dance: the whole room burns EXCEPT the eye at
+    // its centre, then the eye itself detonates, so the party runs in, then out.
+    case 'arcane-voidfall':
+      return {
+        variant,
+        radius: 3.2,
+        windup: 1.7,
+        impactFraction: 0.16,
+        hazardDuration: 4,
+        pulseFraction: 0.02,
+        pulseEvery: 0.7,
+        school: 'arcane',
+        ability: 'Voidfall',
+      };
+    case 'arcane-horizon':
+      return {
+        variant,
+        radius: HOARD_EVENT_HORIZON_RADIUS,
+        innerRadius: HOARD_EVENT_HORIZON_EYE_RADIUS,
+        windup: 3.4,
+        impactFraction: 0.32,
+        hazardDuration: 0,
+        pulseFraction: 0,
+        pulseEvery: 1,
+        school: 'arcane',
+        ability: 'Event Horizon',
+      };
+    case 'arcane-collapse':
+      return {
+        variant,
+        radius: HOARD_COLLAPSE_RADIUS,
+        windup: 2.2,
+        impactFraction: 0.3,
+        hazardDuration: 0,
+        pulseFraction: 0,
+        pulseEvery: 1,
+        school: 'arcane',
+        ability: 'Singularity Collapse',
       };
     case 'storm-charge':
       return {

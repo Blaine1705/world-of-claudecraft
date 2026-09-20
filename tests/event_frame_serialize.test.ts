@@ -391,7 +391,7 @@ describe('routeEvents frame bytes and session mutations', () => {
       instanceId: 19,
       cueId: 7,
       kind: 'mark',
-      variant: 'arcane-ring',
+      variant: 'frost-ring',
       phase: 'warning',
       x: nearPos.x,
       z: nearPos.z,

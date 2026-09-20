@@ -19,6 +19,7 @@
 // idiom elsewhere in src/render.
 
 import { isFeastTemplateId } from '../sim/professions/feast';
+import { HOARD_BROOD_EGG_TEMPLATE } from '../sim/rift/hoard_boss_kits';
 import type { Entity } from '../sim/types';
 import { INTERACT_RANGE } from '../sim/types';
 import { comboPipsFor } from './nameplate_combo';
@@ -149,6 +150,8 @@ export function nameplatePlanInto(
 
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
+    // Encounter scenery (Vysska's clutch hatches on HER health): no plate, no bar.
+    e.templateId === HOARD_BROOD_EGG_TEMPLATE ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
     (!standIn &&

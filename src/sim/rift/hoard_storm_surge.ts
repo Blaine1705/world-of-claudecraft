@@ -44,8 +44,10 @@ function applyStacks(ctx: SimContext, boss: Entity, state: HoardBossState): void
     id: HOARD_STORM_SURGE_AURA_ID,
     name: 'Storm Surge',
     kind: 'buff_dmg_done',
-    remaining: 3600,
-    duration: 3600,
+    // An honest timer: how long the charge would last if he left the ground
+    // right now (one stack bleeds off per HOARD_STORM_SURGE_DECAY_SEC).
+    remaining: stacks * HOARD_STORM_SURGE_DECAY_SEC,
+    duration: stacks * HOARD_STORM_SURGE_DECAY_SEC,
     value: stacks * HOARD_STORM_SURGE_DAMAGE_PER_STACK,
     stacks,
     sourceId: boss.id,
@@ -66,6 +68,10 @@ export function tickHoardStormSurge(ctx: SimContext, boss: Entity, state: HoardB
   }
   state.stormSurgeTimer += DT;
   if (inField) {
+    // Standing in it keeps the charge topped up, so the timer never runs down
+    // while the stacks are in fact safe.
+    const surge = boss.auras.find((aura) => aura.id === HOARD_STORM_SURGE_AURA_ID);
+    if (surge) surge.remaining = surge.duration;
     if (
       state.stormSurgeTimer < HOARD_STORM_SURGE_EVERY_SEC ||
       state.stormSurgeStacks >= HOARD_STORM_SURGE_MAX_STACKS

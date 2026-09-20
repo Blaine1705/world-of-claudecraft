@@ -7,7 +7,11 @@ import {
   IGNIVAR_FRONTAL_FLAME_CURTAINS_NAME,
   IGNIVAR_FRONTAL_HEAT_BANDS_NAME,
 } from '../src/render/ignivar_frontal_telegraph';
-import { HOARD_SWEEP_HALF_ANGLE } from '../src/sim/rift/hoard_boss';
+import {
+  HOARD_SWEEP_HALF_ANGLE,
+  HOARD_SWEEP_METEOR_COUNT,
+  hoardSweepMeteorPoints,
+} from '../src/sim/rift/hoard_boss';
 import { HOARD_BRUTE_COMBO } from '../src/sim/rift/hoard_boss_kits';
 import type { HoardBossCueView } from '../src/world_api/dungeons';
 
@@ -76,7 +80,7 @@ describe('Buried Hoard boss actionable cues', () => {
     visuals.dispose();
   });
 
-  it('rebuilds the same three Ignivar meteor warnings from a resumed sweep', () => {
+  it('rebuilds the same Ignivar meteor warnings from a resumed sweep', () => {
     const warnings = hoardSweepMeteorWarnings([
       cue({
         instanceId: 9,
@@ -89,12 +93,21 @@ describe('Buried Hoard boss actionable cues', () => {
         total: 2.2,
       }),
     ]);
-    expect(warnings).toHaveLength(3);
-    expect(warnings.map((warning) => warning.id)).toEqual([
-      'hoard-sweep:9:12:0',
-      'hoard-sweep:9:12:1',
-      'hoard-sweep:9:12:2',
-    ]);
+    expect(warnings).toHaveLength(HOARD_SWEEP_METEOR_COUNT);
+    expect(warnings.map((warning) => warning.id)).toEqual(
+      Array.from({ length: HOARD_SWEEP_METEOR_COUNT }, (_, index) => `hoard-sweep:9:12:${index}`),
+    );
+    // The mirrored cue id seeds the scatter, so a reconnect rebuilds the SAME points.
+    expect(warnings.map(({ x, z }) => ({ x, z }))).toEqual(
+      hoardSweepMeteorPoints({
+        id: 12,
+        x: 12,
+        z: 34,
+        facing: 0.8,
+        radius: 13,
+        halfAngle: HOARD_SWEEP_HALF_ANGLE,
+      }),
+    );
     expect(warnings.every((warning) => warning.remaining === 1.1)).toBe(true);
     expect(hoardSweepMeteorWarnings([cue()])).toEqual([]);
   });
@@ -169,7 +182,7 @@ describe('Buried Hoard boss actionable cues', () => {
 
     visuals.sync([
       cue({
-        variant: 'arcane-ring',
+        variant: 'frost-ring',
         radius: 8.5,
         innerRadius: 4.5,
       }),
@@ -203,13 +216,13 @@ describe('Buried Hoard boss actionable cues', () => {
       shape: 'tether',
       palette: 'tide',
     });
-    expect(hoardCueAppearance(cue({ variant: 'arcane-ring' }))).toMatchObject({
+    expect(hoardCueAppearance(cue({ variant: 'frost-ring' }))).toMatchObject({
       shape: 'annulus',
       countdown: 'annulus',
     });
     for (const variant of [
       'frost-ice',
-      'arcane-blizzard',
+      'frost-blizzard',
       'storm-charge',
       'storm-field',
       'ember-fire',

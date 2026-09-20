@@ -17773,6 +17773,9 @@ export const it_IT: EnTranslations = {
       "stable_horse": {
         "name": "Cavallo da stalla"
       },
+      "hoard_brood_egg": {
+        "name": "Brood Clutch"
+      },
       "hoard_brood_hatchling": {
         "name": "Vysska's Hatchling"
       },

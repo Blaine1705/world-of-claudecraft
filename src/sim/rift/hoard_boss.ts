@@ -5,6 +5,7 @@ import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
 import { riftFx } from './fx';
 import {
+  HOARD_BROOD_EGG_TEMPLATE,
   HOARD_BRUTE_COMBO,
   HOARD_BRUTE_FACING_OFFSETS,
   HOARD_FROST_GUST,
@@ -27,7 +28,7 @@ import { HOARD_TIDE_RECOVERY_SEC } from './hoard_tide_pattern';
 import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossCueVariant, HoardBossState, RiftInstance } from './types';
 
-export { type HoardBossKit, hoardBossKit } from './hoard_boss_kits';
+export { HOARD_BROOD_EGG_TEMPLATE, type HoardBossKit, hoardBossKit } from './hoard_boss_kits';
 
 export const HOARD_SWEEP_RANGE = 13;
 export const HOARD_SWEEP_HALF_ANGLE = Math.PI * 0.31;
@@ -38,14 +39,17 @@ export const HOARD_MARK_WINDUP_SEC = 2.1;
 export const HOARD_MARK_ENRAGED_WINDUP_SEC = 1.65;
 export const HOARD_MARK_HAZARD_SEC = 2;
 export const HOARD_MARK_HAZARD_TICK_SEC = 0.5;
-export const HOARD_SWEEP_METEOR_COUNT = 3;
+export const HOARD_SWEEP_METEOR_COUNT = 5;
+/** Share of max health a scattered Emberforge meteor deals to anyone under it. */
+export const HOARD_SWEEP_METEOR_DAMAGE_FRACTION = 0.14;
 export const HOARD_BONE_WAVE_COUNT = 4;
 export const HOARD_BROOD_EGG_COUNT = 4;
 export const HOARD_BROOD_HATCH_HP = 0.5;
 export const HOARD_TOTEM_TRIGGER_HP = 0.65;
 export const HOARD_TOTEM_HEAL_FRACTION = 0.025;
 export const HOARD_TOTEM_PULSE_SEC = 2;
-export const HOARD_ARCANE_RING_HP = 0.5;
+export const HOARD_FROST_RING_HP = 0.5;
+export const HOARD_ARCANE_OVERLOAD_HP = 0.5;
 export const HOARD_BRUTE_EXHAUSTED_SEC = 3;
 
 const SWEEP_FIRST_SEC = 3.5;
@@ -57,7 +61,7 @@ export const HOARD_MARK_ENRAGED_EVERY_SEC = 7.5;
 const FROST_GUST_EVERY_SEC = 10;
 const FROST_ICE_EVERY_SEC = 8;
 const BRUTE_COMBO_EVERY_SEC = 11;
-const ARCANE_BLIZZARD_EVERY_SEC = 9;
+const ARCANE_EVERY_SEC = 8;
 const STORM_EVERY_SEC = 11;
 const TIDE_WAVE_EVERY_SEC = 10;
 const BONE_WAVE_THRESHOLDS = [0.7, 0.35] as const;
@@ -107,23 +111,42 @@ export function pointInHoardSweep(
   return dot >= Math.cos(halfAngle);
 }
 
+/** A cheap deterministic hash in [0, 1). Pure on purpose: the renderer rebuilds
+ *  the same meteor points from the mirrored cue, so this can never touch ctx.rng. */
+function meteorHash(a: number, b: number): number {
+  let h = (Math.imul(a | 0, 0x9e3779b1) ^ Math.imul(b | 0, 0x85ebca6b)) >>> 0;
+  h ^= h >>> 15;
+  h = Math.imul(h, 0x2c1b3c6d) >>> 0;
+  h ^= h >>> 12;
+  return (h >>> 0) / 0x1_0000_0000;
+}
+
+/** Where the Emberforge meteors land: scattered all AROUND the boss and clear of
+ *  the frontal itself, so sidestepping the cone is a choice with a cost rather
+ *  than a free dodge onto a stacked warning. */
 export function hoardSweepMeteorPoints(cue: {
+  id?: number;
   x: number;
   z: number;
   facing: number;
   radius: number;
   halfAngle: number;
 }): Array<{ x: number; z: number }> {
-  const lanes = [-0.42, 0.32, -0.08];
-  const distances = [0.46, 0.7, 0.88];
-  return lanes.slice(0, HOARD_SWEEP_METEOR_COUNT).map((lane, index) => {
-    const angle = cue.facing + cue.halfAngle * lane;
-    const distance = cue.radius * distances[index];
-    return {
+  const seed = cue.id ?? 0;
+  const clear = Math.min(Math.PI * 0.9, cue.halfAngle + 0.3);
+  const arc = Math.PI * 2 - clear * 2;
+  const points: Array<{ x: number; z: number }> = [];
+  for (let index = 0; index < HOARD_SWEEP_METEOR_COUNT; index++) {
+    const slot = (index + 0.5) / HOARD_SWEEP_METEOR_COUNT;
+    const jitter = ((meteorHash(seed, index) - 0.5) * 0.7) / HOARD_SWEEP_METEOR_COUNT;
+    const angle = cue.facing + clear + arc * (slot + jitter);
+    const distance = 5 + meteorHash(seed, index + 17) * Math.max(3, cue.radius - 3);
+    points.push({
       x: cue.x + Math.sin(angle) * distance,
       z: cue.z + Math.cos(angle) * distance,
-    };
-  });
+    });
+  }
+  return points;
 }
 
 export function nextHoardBossMechanic(
@@ -254,8 +277,9 @@ function summonBoneLegion(ctx: SimContext, boss: Entity): void {
 
 function ensureBroodEggs(ctx: SimContext, inst: RiftInstance, boss: Entity): void {
   if (boss.firedSummons > 0) return;
-  if (boss.summonedIds.some((id) => ctx.entities.get(id)?.templateId === 'spider_egg_sac')) return;
-  const template = MOBS.spider_egg_sac;
+  if (boss.summonedIds.some((id) => ctx.entities.get(id)?.templateId === HOARD_BROOD_EGG_TEMPLATE))
+    return;
+  const template = MOBS[HOARD_BROOD_EGG_TEMPLATE];
   if (!template) return;
   for (let index = 0; index < HOARD_BROOD_EGG_COUNT; index++) {
     const angle = (index / HOARD_BROOD_EGG_COUNT) * Math.PI * 2 + Math.PI * 0.25;
@@ -271,7 +295,10 @@ function ensureBroodEggs(ctx: SimContext, inst: RiftInstance, boss: Entity): voi
     );
     egg.facing = angle + Math.PI;
     egg.prevFacing = egg.facing;
+    // Encounter scenery: it hatches on the boss's health, never by being hit, so
+    // it is no enemy (no threat, no tab target) and wears no health bar.
     egg.damageImmune = true;
+    egg.hostile = false;
     egg.summonedAdd = true;
     ctx.addEntity(egg);
     boss.summonedIds.push(egg.id);
@@ -281,7 +308,7 @@ function ensureBroodEggs(ctx: SimContext, inst: RiftInstance, boss: Entity): voi
 
 function hatchBroodEggs(ctx: SimContext, inst: RiftInstance, boss: Entity): void {
   const eggIds = boss.summonedIds.filter(
-    (id) => ctx.entities.get(id)?.templateId === 'spider_egg_sac',
+    (id) => ctx.entities.get(id)?.templateId === HOARD_BROOD_EGG_TEMPLATE,
   );
   for (const id of eggIds) {
     const egg = ctx.entities.get(id);
@@ -298,7 +325,7 @@ function hatchBroodEggs(ctx: SimContext, inst: RiftInstance, boss: Entity): void
 
 function removeBroodEggs(ctx: SimContext, inst: RiftInstance, boss: Entity): void {
   const eggIds = boss.summonedIds.filter(
-    (id) => ctx.entities.get(id)?.templateId === 'spider_egg_sac',
+    (id) => ctx.entities.get(id)?.templateId === HOARD_BROOD_EGG_TEMPLATE,
   );
   if (eggIds.length === 0) return;
   const eggSet = new Set(eggIds);
@@ -523,6 +550,22 @@ function hitPlayersInSweep(
   }
   if (cue.variant === 'ember-frontal' || cue.variant === undefined) {
     for (const [index, impact] of hoardSweepMeteorPoints(cue).entries()) {
+      for (const player of instancePlayers(ctx, inst)) {
+        const dx = player.pos.x - impact.x;
+        const dz = player.pos.z - impact.z;
+        if (player.dead || dx * dx + dz * dz > IGNIVAR_METEOR_RADIUS * IGNIVAR_METEOR_RADIUS)
+          continue;
+        ctx.dealDamage(
+          boss,
+          player,
+          Math.max(1, Math.round(player.maxHp * HOARD_SWEEP_METEOR_DAMAGE_FRACTION)),
+          false,
+          'fire',
+          'Emberfall',
+          'hit',
+          true,
+        );
+      }
       ctx.emit({
         type: 'spellfxAt',
         x: impact.x,
@@ -609,10 +652,10 @@ function hitPlayersInMark(
         encounterOwned: true,
       });
     }
-    if (cue.variant === 'arcane-blizzard') {
+    if (cue.variant === 'frost-blizzard') {
       ctx.applyAura(player, {
         id: `hoard_blizzard_${boss.id}`,
-        name: 'Nyxaris Blizzard',
+        name: 'Howling Blizzard',
         kind: 'slow',
         remaining: 1.2,
         duration: 1.2,
@@ -622,8 +665,8 @@ function hitPlayersInMark(
         encounterOwned: true,
       });
     }
-    if (cue.variant === 'arcane-ring') {
-      ctx.applyRootAura(boss, player, 'Ring of Frost', 'hoard_arcane_ring', 2.2, 'frost');
+    if (cue.variant === 'frost-ring') {
+      ctx.applyRootAura(boss, player, 'Ring of Frost', 'hoard_frost_ring', 2.2, 'frost');
     }
   }
   riftFx(ctx, cue.x, cue.z, spec.school, fraction > 0.1 ? 'nova' : 'burst');
@@ -634,14 +677,14 @@ function emitHazardVisual(
   boss: Entity,
   cue: Extract<HoardBossCue, { kind: 'mark' }>,
 ): void {
-  if (cue.variant === 'frost-ice' || cue.variant === 'arcane-blizzard') {
+  if (cue.variant === 'frost-ice' || cue.variant === 'frost-blizzard') {
     ctx.emit({
       type: 'spellfxAt',
       x: cue.x,
       z: cue.z,
       school: 'frost',
       fx: 'snowZone',
-      ability: cue.variant === 'arcane-blizzard' ? 'blizzard' : 'frost_nova',
+      ability: cue.variant === 'frost-blizzard' ? 'blizzard' : 'frost_nova',
       radius: cue.radius,
       duration: cue.total,
       sourceId: boss.id,
@@ -654,6 +697,17 @@ function emitHazardVisual(
       school: 'nature',
       fx: 'nova',
       ability: 'chain_lightning',
+      radius: cue.radius,
+      sourceId: boss.id,
+    });
+  } else if (cue.variant === 'arcane-voidfall') {
+    ctx.emit({
+      type: 'spellfxAt',
+      x: cue.x,
+      z: cue.z,
+      school: 'arcane',
+      fx: 'nova',
+      ability: 'arcane_explosion',
       radius: cue.radius,
       sourceId: boss.id,
     });
@@ -748,6 +802,17 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     if (cue.phase !== 'warning') continue;
     const spec = hoardMarkSpec(cue.variant ?? 'buried-mark');
     hitPlayersInMark(ctx, inst, boss, cue, spec.impactFraction);
+    if (cue.variant === 'arcane-horizon') {
+      const collapse = startMarkAt(ctx, inst, state, 'arcane-collapse', cue.x, cue.z);
+      live.push(collapse);
+      // Overloaded (the back half of the fight): Voidfall rains during the run out.
+      if (boss.hp / Math.max(1, boss.maxHp) <= HOARD_ARCANE_OVERLOAD_HP) {
+        const runners = instancePlayers(ctx, inst).filter((player) => !player.dead);
+        const before = state.cues.length;
+        startMarks(ctx, inst, runners, state, 'arcane-voidfall', 3);
+        live.push(...state.cues.slice(before));
+      }
+    }
     if (spec.hazardDuration <= 0) continue;
     cue.phase = 'hazard';
     cue.variant = cue.variant === 'storm-charge' ? 'storm-field' : cue.variant;
@@ -788,20 +853,6 @@ function startSweep(
   state.cues.push(cue);
   emitCue(ctx, inst, cue);
   emitSweepMeteors(ctx, inst, boss, cue);
-  if (spec.variant === 'frost-gust') {
-    const distance = spec.radius * 0.45;
-    ctx.emit({
-      type: 'spellfxAt',
-      x: cue.x + Math.sin(facing) * distance,
-      z: cue.z + Math.cos(facing) * distance,
-      school: 'frost',
-      fx: 'snowZone',
-      ability: 'blizzard',
-      radius: 7,
-      duration: cue.total,
-      sourceId: boss.id,
-    });
-  }
 }
 
 function startMarks(
@@ -843,21 +894,22 @@ function startMarks(
   }
 }
 
-function startCenteredMark(
+function startMarkAt(
   ctx: SimContext,
   inst: RiftInstance,
-  boss: Entity,
   state: HoardBossState,
   variant: HoardBossCueVariant,
-): void {
+  x: number,
+  z: number,
+): HoardBossCue {
   const spec = hoardMarkSpec(variant);
   const cue: HoardBossCue = {
     id: state.nextCueId++,
     kind: 'mark',
     variant,
     phase: 'warning',
-    x: boss.pos.x,
-    z: boss.pos.z,
+    x,
+    z,
     radius: spec.radius,
     innerRadius: spec.innerRadius,
     remaining: spec.windup,
@@ -865,6 +917,17 @@ function startCenteredMark(
   };
   state.cues.push(cue);
   emitCue(ctx, inst, cue);
+  return cue;
+}
+
+function startCenteredMark(
+  ctx: SimContext,
+  inst: RiftInstance,
+  boss: Entity,
+  state: HoardBossState,
+  variant: HoardBossCueVariant,
+): void {
+  startMarkAt(ctx, inst, state, variant, boss.pos.x, boss.pos.z);
 }
 
 function tickBrute(ctx: SimContext, inst: RiftInstance, boss: Entity, state: HoardBossState): void {
@@ -915,11 +978,11 @@ function tickKit(
     return;
   }
   if (
-    kit === 'arcane' &&
+    kit === 'frost' &&
     !state.specialTriggered &&
-    boss.hp / Math.max(1, boss.maxHp) <= HOARD_ARCANE_RING_HP
+    boss.hp / Math.max(1, boss.maxHp) <= HOARD_FROST_RING_HP
   ) {
-    startCenteredMark(ctx, inst, boss, state, 'arcane-ring');
+    startCenteredMark(ctx, inst, boss, state, 'frost-ring');
     state.specialTriggered = true;
     return;
   }
@@ -936,8 +999,10 @@ function tickKit(
   if (kit === 'arcane') {
     state.markTimer -= DT;
     if (state.markTimer <= 0 && living.length > 0) {
-      startMarks(ctx, inst, living, state, 'arcane-blizzard', 1);
-      state.markTimer = ARCANE_BLIZZARD_EVERY_SEC;
+      if (state.sequenceStep === 0) startMarks(ctx, inst, living, state, 'arcane-voidfall', 3);
+      else startCenteredMark(ctx, inst, boss, state, 'arcane-horizon');
+      state.sequenceStep = 1 - state.sequenceStep;
+      state.markTimer = ARCANE_EVERY_SEC;
     }
     return;
   }
@@ -949,7 +1014,10 @@ function tickKit(
       startSweep(ctx, inst, boss, state, HOARD_FROST_GUST);
       state.sweepTimer = FROST_GUST_EVERY_SEC;
     } else if (mechanic === 'mark' && living.length > 0) {
-      startMarks(ctx, inst, living, state, 'frost-ice', 2);
+      // Treacherous Ice and the Howling Blizzard take turns.
+      if (state.sequenceStep === 0) startMarks(ctx, inst, living, state, 'frost-ice', 2);
+      else startMarks(ctx, inst, living, state, 'frost-blizzard', 1);
+      state.sequenceStep = 1 - state.sequenceStep;
       state.markTimer = FROST_ICE_EVERY_SEC;
     }
     return;
