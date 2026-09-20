@@ -205,6 +205,8 @@ function buildForge(): {
   const barrier = additive(0xff6b13, 0.54);
   const ring = new THREE.Mesh(floorGeometry(new THREE.RingGeometry(3.15, 3.55, 64), 0.12), barrier);
   ring.name = 'varkhul-assembly-forge-boundary';
+  // Shipped with no order: the band floor, per legacy minus one.
+  ring.renderOrder = floorVfxRenderOrder('encounter', 0);
   group.add(ring);
 
   const segments: THREE.Mesh[] = [];

@@ -120,6 +120,8 @@ function buildSafeMarker(): THREE.Group {
   );
   innerRune.rotation.x = -Math.PI / 2;
   innerRune.position.y = 0.14;
+  // Shipped with no order, like the shelter foundation: the band floor.
+  innerRune.renderOrder = floorVfxRenderOrder('encounter', 0);
 
   const beacon = new THREE.Mesh(
     new THREE.CylinderGeometry(0.34, 1.45, 6.5, 20, 1, true),
@@ -246,6 +248,7 @@ function buildShelter(index: number): THREE.Group {
     }),
   );
   fissures.name = 'ignivarForgeJudgmentShelterFissures';
+  fissures.renderOrder = floorVfxRenderOrder('encounter', 0);
   shelter.add(foundation, rim, fissures, buildSafeMarker());
   return shelter;
 }
@@ -308,6 +311,7 @@ function buildWarning(index: number): THREE.Group {
       depthWrite: false,
     }),
   );
+  fissures.renderOrder = floorVfxRenderOrder('encounter', 0);
   dangerScar.add(scarRing, fissures);
   dangerScar.visible = false;
   warning.add(fill, rim, buildSafeMarker(), dangerScar);

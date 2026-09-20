@@ -129,12 +129,15 @@ function createVisual(bossId: number): InterceptBeamVisual {
   );
   targetOuter.name = 'varkhul-tempering-ray-target-outer';
   targetOuter.position.y = GROUND_LIFT;
+  // The floor rings shipped with no order: the band floor, per legacy minus one.
+  targetOuter.renderOrder = floorVfxRenderOrder('encounter', 0);
   const targetInner = new THREE.Mesh(
     new THREE.RingGeometry(0.62, 0.82, 32).rotateX(-Math.PI / 2),
     material(0xffca55, 0.94),
   );
   targetInner.name = 'varkhul-tempering-ray-target-inner';
   targetInner.position.y = GROUND_LIFT + 0.025;
+  targetInner.renderOrder = floorVfxRenderOrder('encounter', 0);
   const targetSpire = new THREE.Mesh(
     new THREE.ConeGeometry(0.52, 2.6, 8, 1, true),
     material(0xff5b12, 0.6),
@@ -153,6 +156,7 @@ function createVisual(bossId: number): InterceptBeamVisual {
   );
   blockerRing.name = 'varkhul-tempering-ray-blocker-ring';
   blockerRing.position.y = GROUND_LIFT + 0.04;
+  blockerRing.renderOrder = floorVfxRenderOrder('encounter', 0);
   const blockerShield = new THREE.Mesh(
     new THREE.CircleGeometry(0.78, 28),
     material(0xc8ffff, 0.46),
