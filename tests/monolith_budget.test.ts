@@ -1066,7 +1066,10 @@ const MONOLITHS: MonolithRow[] = [
     // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
     // composed with the release's own extractions above. Exact merged count,
     // zero slack.
-    ceiling: 11822,
+    // Down 11822 -> 11821 at the ghost passage fix: the released spirit's
+    // trigger set (door, rift, and the overworld passage it previously could
+    // not use) moved to src/sim/spirit_run_triggers.ts. Exact count, zero slack.
+    ceiling: 11821,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
