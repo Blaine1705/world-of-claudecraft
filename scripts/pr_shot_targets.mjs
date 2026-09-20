@@ -7461,6 +7461,95 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-wanted-tab',
+    label: 'World Market Wanted tab (buy orders and the not-on-the-market strip)',
+    when: ['ui/market_orders', 'sim/market_orders'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Seed two other buyers' orders straight onto the board (the market-sweep
+    // precedent: offline there is one player, so other buyers can only be staged by
+    // writing the book), plus one of the viewer's own, hand the viewer some ore so a
+    // Deliver button is live, then open the Wanted tab. On the base commit the tab
+    // does not exist, so the shot falls back to the Browse tab: the contrast the
+    // pair is for. The teleport reads the Merchant's LIVE position off the entity
+    // table rather than a literal (the stall has moved before).
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const p = sim?.player;
+        let merchant = null;
+        for (const e of sim?.entities?.values?.() ?? []) {
+          if (e.kind === 'npc' && e.name === 'The Merchant') {
+            merchant = e;
+            break;
+          }
+        }
+        if (p?.pos && merchant) {
+          p.pos.x = merchant.pos.x + 1;
+          p.pos.z = merchant.pos.z + 1;
+          if (p.prevPos) {
+            p.prevPos.x = p.pos.x;
+            p.prevPos.z = p.pos.z;
+          }
+        }
+        const now = sim?.time ?? 0;
+        const meta = sim?.players?.get?.(sim?.playerId);
+        if (meta) {
+          meta.copper = 50000;
+          meta.inventory?.push?.({ itemId: 'copper_ore', count: 4 });
+        }
+        const orders = sim?.market?.marketOrders;
+        if (orders) {
+          orders.length = 0;
+          orders.push(
+            {
+              id: 1,
+              buyerKey: 'Rhaelin',
+              buyerName: 'Rhaelin',
+              itemId: 'copper_ore',
+              count: 10,
+              unitPrice: 30,
+              expiresAt: now + 1e6,
+            },
+            {
+              id: 2,
+              buyerKey: 'Torvald',
+              buyerName: 'Torvald',
+              itemId: 'raw_stillmere_salmon',
+              count: 5,
+              unitPrice: 45,
+              expiresAt: now + 1e6,
+            },
+          );
+          if (meta) {
+            orders.push({
+              id: 3,
+              buyerKey: meta.name,
+              buyerName: meta.name,
+              itemId: 'goldleaf_herb',
+              count: 3,
+              unitPrice: 80,
+              expiresAt: now + 1e6,
+            });
+          }
+        }
+        const el = document.querySelector('#market-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openMarket?.();
+        const bags = document.querySelector('#bags');
+        if (bags) bags.style.display = 'none';
+      });
+      if (!(await pollForSize(page, '#market-window'))) return {};
+      // Present only on this branch.
+      await page.evaluate(() => {
+        const tab = document.querySelector('[data-tab="orders"]');
+        if (tab instanceof HTMLButtonElement) tab.click();
+      });
+      await awaitVeilSettled(page);
+      await wait(600);
+      return { clip: '#market-window' };
+    },
+  },
+  {
     key: 'market-sell-price-ref',
     label: 'World Market Sell tab (current lowest listing price reference, issue 3043)',
     when: ['ui/market_window', 'ui/market_view', 'sim/market'],

@@ -29,6 +29,7 @@ import {
 import { removeVendorSellUnits } from './items';
 import { collapseToLowestPerItem } from './market_collapse';
 import { planListingIds, playerListingIdFloor } from './market_listing_ids';
+import { MARKET_MAX_ORDERS, MarketOrderBook, type MarketOrderSaveRow } from './market_orders';
 import {
   MARKET_PAGE_SIZE,
   type MarketQuery,
@@ -222,6 +223,10 @@ export interface MarketSave {
     sales?: MarketSaleLog;
   }[];
   nextListingId: number;
+  /** Additive: the buy-order board (market_orders.ts). Absent on every
+   *  pre-order save, which loads to an empty board. */
+  orders?: MarketOrderSaveRow[];
+  nextOrderId?: number;
 }
 
 export class Market {
@@ -271,7 +276,36 @@ export class Market {
     byItem: Map<string, MarketListing[]>;
   } | null = null;
 
-  constructor(private readonly ctx: SimContext) {}
+  // The buy-order board (market_orders.ts), driven through a host seam of thin
+  // closures over this class's private helpers so settlement, escrow, and the
+  // rev bumps stay defined once. Built in the ctor body: `ctx` is a parameter
+  // property, so a field initializer would read it before it is assigned.
+  private readonly orderBook: MarketOrderBook;
+
+  constructor(private readonly ctx: SimContext) {
+    this.orderBook = new MarketOrderBook({
+      ctx: this.ctx,
+      nearMerchant: (e) => this.nearMerchant(e),
+      playerKey: (meta) => this.marketSellerKey(meta),
+      keyBelongsTo: (key, meta) => key === this.marketSellerKey(meta) || key === meta.name,
+      collectionFor: (key) => this.collectionFor(key),
+      metaByKey: (key) => this.metaByMarketSellerKey(key),
+      bumpBook: () => this.bumpBook(),
+      candidatesFor: (itemId) => this.sweepCandidatesFor(itemId),
+      settleListing: (listing, def, meta) => {
+        const idx = this.marketListings.indexOf(listing);
+        if (idx < 0) return false;
+        this.settleBuy(idx, listing, def, meta);
+        return true;
+      },
+      previewPlainBucketCount: (meta, itemId, want) =>
+        this.previewPlainBucketCount(meta, itemId, want),
+      escrowPlainBuckets: (meta, itemId, want) => this.escrowPlainBuckets(meta, itemId, want),
+      cutPct: () => MARKET_CUT,
+      minPrice: () => MARKET_MIN_PRICE,
+      maxPrice: () => MARKET_MAX_PRICE,
+    });
+  }
 
   private bumpBook(): void {
     this.bookRev++;
@@ -450,6 +484,7 @@ export class Market {
         if (rekeySigner(listing.instance, oldName, newName)) changed = true;
       }
     }
+    if (this.orderBook.rekey(key, oldName, newName)) changed = true;
     const collection = this.marketCollections.get(key);
     for (const slot of collection?.items ?? []) {
       if (rekeyMaterialSignature(slot, oldName, newName)) changed = true;
@@ -491,6 +526,7 @@ export class Market {
     }
     if (this.marketCollections.delete(key)) changed = true;
     if (name !== '' && name !== key && this.marketCollections.delete(name)) changed = true;
+    if (this.orderBook.purge(key, name)) changed = true;
     if (changed) this.bumpBook();
     return changed;
   }
@@ -632,17 +668,7 @@ export class Market {
     // item leaves the seller's bag (#2605 review: a dual-provenance stack
     // could otherwise push the seller over the listing cap, or price a
     // bucket at 0 copper and hand the item away for free).
-    const materialTransfer = planPlainMaterialTransfer(meta.inventory, itemId, want);
-    const previewByRecipe = new Map<string | undefined, number>();
-    let previewLeft = want;
-    for (let i = meta.inventory.length - 1; i >= 0 && previewLeft > 0; i--) {
-      const s = meta.inventory[i];
-      if (s.itemId !== itemId || s.instance) continue;
-      const take = Math.min(s.count, previewLeft);
-      previewByRecipe.set(s.craftedRecipeId, (previewByRecipe.get(s.craftedRecipeId) ?? 0) + take);
-      previewLeft -= take;
-    }
-    const bucketCountPreview = materialTransfer?.rows.length ?? previewByRecipe.size;
+    const bucketCountPreview = this.previewPlainBucketCount(meta, itemId, want);
     if (mine + bucketCountPreview > MARKET_MAX_LISTINGS) {
       this.ctx.error(
         meta.entityId,
@@ -654,23 +680,7 @@ export class Market {
       this.ctx.error(meta.entityId, 'Name a price of at least 1 copper.');
       return;
     }
-    let buckets: InvSlot[];
-    if (materialTransfer) {
-      buckets = materialTransfer.rows;
-      applyMaterialInventoryTake(meta.inventory, materialTransfer.plan);
-      this.ctx.onInventoryChangedForQuests?.(meta);
-    } else {
-      const units = removeVendorSellUnits(this.ctx, itemId, want, meta.entityId, () => true);
-      const byRecipe = new Map<string | undefined, number>();
-      for (const unit of units) {
-        byRecipe.set(unit.craftedRecipeId, (byRecipe.get(unit.craftedRecipeId) ?? 0) + 1);
-      }
-      buckets = [...byRecipe].map(([craftedRecipeId, count]) => ({
-        itemId,
-        count,
-        ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
-      }));
-    }
+    const buckets = this.escrowPlainBuckets(meta, itemId, want);
     let priceLeft = ask;
     buckets.forEach((bucket, i) => {
       const { craftedRecipeId, count: bucketCount } = bucket;
@@ -708,6 +718,55 @@ export class Market {
       text: `Listed ${def.name}${want > 1 ? ' x' + want : ''} on the World Market for ${formatMoney(ask)}.`,
       pid: meta.entityId,
     });
+  }
+
+  // How many provenance buckets removing `want` plain units of `itemId` from
+  // `meta`'s bags would produce, WITHOUT mutating: the material planner's rows
+  // when the item is a material, else the distinct craftedRecipeId markers on
+  // the plain slots the removal walk (highest index first) would take. Shared
+  // by marketList (the per-seller cap and per-row minimum price must hold for
+  // the split BEFORE anything leaves the bags) and the order board's fill.
+  private previewPlainBucketCount(meta: PlayerMeta, itemId: string, want: number): number {
+    const materialTransfer = planPlainMaterialTransfer(meta.inventory, itemId, want);
+    if (materialTransfer) return materialTransfer.rows.length;
+    const previewByRecipe = new Map<string | undefined, number>();
+    let previewLeft = want;
+    for (let i = meta.inventory.length - 1; i >= 0 && previewLeft > 0; i--) {
+      const s = meta.inventory[i];
+      if (s.itemId !== itemId || s.instance) continue;
+      const take = Math.min(s.count, previewLeft);
+      previewByRecipe.set(s.craftedRecipeId, (previewByRecipe.get(s.craftedRecipeId) ?? 0) + take);
+      previewLeft -= take;
+    }
+    return previewByRecipe.size;
+  }
+
+  // Escrow `want` plain units of `itemId` out of `meta`'s bags into provenance
+  // buckets (one InvSlot per material signature or craftedRecipeId marker).
+  // Per unit rather than a blind bulk decrement, so each removed unit's marker
+  // is known (BUG #9: losing it let a crafted item launder its provenance
+  // through the World Market and reopen the disenchant anti-farming gate,
+  // professions/enchanting.ts isCraftedDisenchantVictim). The always-skip
+  // predicate is defence in depth on top of the caller's countFungibleItem
+  // gate: the market stays fungible-only (#1165), never touching an instanced
+  // or bound copy. Callers gate the count and preview the split first.
+  private escrowPlainBuckets(meta: PlayerMeta, itemId: string, want: number): InvSlot[] {
+    const materialTransfer = planPlainMaterialTransfer(meta.inventory, itemId, want);
+    if (materialTransfer) {
+      applyMaterialInventoryTake(meta.inventory, materialTransfer.plan);
+      this.ctx.onInventoryChangedForQuests?.(meta);
+      return materialTransfer.rows;
+    }
+    const units = removeVendorSellUnits(this.ctx, itemId, want, meta.entityId, () => true);
+    const byRecipe = new Map<string | undefined, number>();
+    for (const unit of units) {
+      byRecipe.set(unit.craftedRecipeId, (byRecipe.get(unit.craftedRecipeId) ?? 0) + 1);
+    }
+    return [...byRecipe].map(([craftedRecipeId, count]) => ({
+      itemId,
+      count,
+      ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+    }));
   }
 
   // List ONE instanced copy (#1165 completion): a signed, enchanted, masterwork,
@@ -1049,6 +1108,30 @@ export class Market {
     return settled;
   }
 
+  // The buy-order board (market_orders.ts): place / deliver-into / withdraw.
+  // Thin delegates; the board owns the rules and the tests pin them there.
+  marketOrderPlace(
+    itemId: string,
+    count: number,
+    unitPrice: number,
+    pid?: number,
+  ): MarketListing[] {
+    return this.orderBook.place(itemId, count, unitPrice, pid);
+  }
+
+  marketOrderFill(orderId: number, count: number, pid?: number): { units: number; copper: number } {
+    return this.orderBook.fill(orderId, count, pid);
+  }
+
+  marketOrderCancel(orderId: number, pid?: number): void {
+    this.orderBook.cancel(orderId, pid);
+  }
+
+  /** Live read of the order board (tests + the /listings readout). */
+  get marketOrders() {
+    return this.orderBook.orders;
+  }
+
   // Reclaim your own listing; the escrowed goods go straight back to your bags.
   marketCancel(listingId: number, pid?: number): void {
     const r = this.ctx.resolve(pid);
@@ -1175,6 +1258,7 @@ export class Market {
   // Once a second: return expired player listings to their seller's collection.
   private updateMarket(): void {
     if (this.ctx.tickCount % 20 !== 0) return;
+    if (this.orderBook.expire(this.ctx.time)) this.bumpBook();
     for (let i = this.marketListings.length - 1; i >= 0; i--) {
       const l = this.marketListings[i];
       if (l.house || this.ctx.time < l.expiresAt) continue;
@@ -1328,6 +1412,12 @@ export class Market {
       // viewer asked to sweep, echoed with its request so the UI can tell a stale
       // snapshot from the quote it is waiting for, the sellPriceItemId precedent.
       sweepQuote: meta.sweepQuote ? this.sweepQuoteFor(meta, meta.sweepQuote) : null,
+      // The Wanted board (market_orders.ts): open buy orders, own rows first,
+      // plus the materials nobody has listed, memoized per book revision.
+      orders: this.orderBook.viewsFor(meta, this.bookRev),
+      myOrderCount: this.orderBook.countForMeta(meta),
+      maxOrders: MARKET_MAX_ORDERS,
+      unlistedMaterials: this.orderBook.unlistedFor(this.marketListings, this.bookRev),
     };
   }
 
@@ -1382,6 +1472,9 @@ export class Market {
         ...(isSaleLogEmpty(c.sales) ? {} : { sales: cloneSaleLog(c.sales) }),
       })),
       nextListingId: this.nextListingId,
+      // Conditional inside serialize(): an untouched board writes no key at
+      // all, so blobs from before the board round-trip byte-identical.
+      ...this.orderBook.serialize(this.ctx.time),
     };
   }
 
@@ -1526,6 +1619,7 @@ export class Market {
       );
     }
     this.reclaimSoulboundListings();
+    this.orderBook.load(save.orders, save.nextOrderId, this.ctx.time);
     this.bumpBook();
   }
 

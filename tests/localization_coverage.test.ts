@@ -374,6 +374,7 @@ describe('i18n Localization Key Coverage', () => {
     base: 14,
     rested: 18,
     buyer: 'Mira',
+    seller: 'Bramblefoot',
     channel: 'World',
     classes: 'Warrior, Mage',
     className: 'Mage',

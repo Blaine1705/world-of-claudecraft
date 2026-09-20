@@ -1095,7 +1095,10 @@ const MONOLITHS: MonolithRow[] = [
     // trigger set (door, rift, and the overworld passage it previously could
     // not use) moved to src/sim/spirit_run_triggers.ts. The merged file now
     // measures 11766. Exact count, zero slack.
-    ceiling: 11766,
+    // Composed with the market Wanted board, whose branch also carried the
+    // ResolvedAbility extraction. The merged file measures 11756, below both
+    // parent pins. Exact count, zero slack.
+    ceiling: 11756,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

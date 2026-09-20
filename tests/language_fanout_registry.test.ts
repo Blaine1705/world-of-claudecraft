@@ -480,6 +480,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the Market Sweep card is rebuilt by the Browse list repaint (MarketSweepPanel.mount, reached from the market window render via renderContent), which resets lastQuoteSig and paints the quote line with the CURRENT language; the memo only elides same-language re-paints of an unchanged quote between list repaints',
   },
   {
+    file: 'market_orders_panel.ts',
+    memos: ['lastCardSig'],
+    answer: 'this.marketWindow.render',
+    why: 'the Wanted tab place card is rebuilt by the tab repaint (MarketOrdersPanel.mount, reached from the market window render via renderContent), and mount() resets lastCardSig before syncCard() repaints the total line and pick with the CURRENT language; the memo only elides same-language re-patches of an unchanged stage between repaints',
+  },
+  {
     file: 'market_window.ts',
     memos: ['lastSig', 'lastSellPriceRefSig', 'searchEcho'],
     answer: 'this.marketWindow.render',

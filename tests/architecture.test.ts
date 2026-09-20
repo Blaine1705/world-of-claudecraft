@@ -494,6 +494,8 @@ const UI_PURE_CORES = [
   'src/ui/bank_item_name_core.ts',
   'src/ui/market_buy_confirm_core.ts',
   'src/ui/market_sweep_core.ts',
+  // The Wanted tab's rows, place-form validity, and item-picker search.
+  'src/ui/market_orders_core.ts',
   'src/ui/usd_text.ts',
   'src/ui/woc_tokens_text.ts',
   'src/ui/woc_log_tones.ts',
@@ -2598,6 +2600,7 @@ const UI_DOM_MODULES = [
   // so the focused chip or quest row survives that swap.
   'src/ui/map_sidebar_controller.ts',
   'src/ui/market_sweep_panel.ts',
+  'src/ui/market_orders_panel.ts',
   'src/ui/market_window.ts',
   'src/ui/woc_market_window.ts',
   'src/ui/material_sources_dialog.ts',

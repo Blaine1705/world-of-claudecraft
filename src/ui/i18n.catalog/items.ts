@@ -379,6 +379,45 @@ const itemStringsEn = {
       saleBuyer: 'Sold to {buyer}',
       saleOlder: 'Plus {count} earlier sales, included in the total.',
       collectAll: 'Collect All',
+      // The Wanted tab (src/sim/market_orders.ts): buy orders and the not-on-the-
+      // market strip. Place card, order rows (Deliver / Withdraw), and the strip.
+      ordersTab: 'Wanted',
+      ordersNote:
+        'Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.',
+      ordersListAria: 'Open buy orders',
+      ordersEmpty: 'No open orders yet. Post one and gatherers will see what you need.',
+      orderCardTitle: 'Place an order',
+      orderPickLabel: 'Item wanted',
+      orderPickEmpty: 'Search for an item below, or pick one from the strip at the bottom.',
+      orderSearchPlaceholder: 'Search items...',
+      orderSearchAria: 'Search for an item to order',
+      orderPickNone: 'No item matches.',
+      orderQuantity: 'Units wanted',
+      orderPriceEach: 'Price each',
+      orderEscrowLine: 'Gold held at the Merchant: {total}',
+      orderCannotAfford: 'You cannot afford {total} for this order.',
+      orderAtCap: 'You have no free order slots. Withdraw one first.',
+      orderPlaceButton: 'Place Order',
+      orderConfirmTitle: 'Confirm Order',
+      orderConfirmBody:
+        'Order {item} x{count} at {each} each? {total} is held at the Merchant until the order is filled or withdrawn.',
+      orderWanted: 'x{count} wanted',
+      orderBy: 'Wanted by {buyer}',
+      orderMine: 'Your order',
+      orderEach: 'each',
+      orderDeliver: 'Deliver',
+      orderDeliverAria: 'Deliver {item} to {buyer}',
+      orderDeliverNone: 'None of this item in your bags.',
+      orderWithdraw: 'Withdraw',
+      orderWithdrawAria: 'Withdraw your order for {item}',
+      orderDeliverConfirmTitle: 'Confirm Delivery',
+      orderDeliverConfirmBody:
+        "Deliver {item} x{count} to {buyer} for {total} ({each} each)? You collect {proceeds} after the Merchant's cut.",
+      unlistedTitle: 'Not on the market',
+      unlistedNote:
+        'Materials with no listing at all. Post an order for one, or gather and list it.',
+      unlistedNone: 'Every material has at least one listing right now.',
+      unlistedStageAria: 'Order {item}',
     },
     logs: {
       listedItem: 'Listed {item} on the World Market for {money}.',
@@ -387,6 +426,14 @@ const itemStringsEn = {
       collectedMoney: 'You collect {money} from the Merchant.',
       reclaimedItem: 'Reclaimed {item} from the market.',
       expiredListing: 'Your market listing of {item} expired and waits at the Merchant.',
+      // The Wanted tab's notices (src/sim/market_orders.ts).
+      orderPlaced: 'Placed an order for {item} x{count} at {each} each.',
+      orderDelivered:
+        'Delivered {item} x{count} to {buyer} for {money}. Collect {proceeds} from the Merchant.',
+      orderReceived:
+        '{seller} delivered {item} x{count} to your order. Collect it from the Merchant.',
+      orderWithdrawn: 'Withdrew your order for {item}; {money} returned.',
+      orderExpired: 'Your order for {item} expired; {money} waits at the Merchant.',
     },
     errors: {
       notSoldHere: 'That item is not sold here.',
@@ -407,6 +454,12 @@ const itemStringsEn = {
       // the live total moving past the quoted cap between quote and buy.
       sweepNoListings: 'No listings of that item are available to sweep.',
       sweepPriceChanged: 'Prices changed before your sweep landed. Check the quote and try again.',
+      // Buy-order refusals (src/sim/market_orders.ts).
+      orderCountNeeded: 'Name how many you want.',
+      tooManyOrders: 'You may keep at most {count} orders open at once.',
+      orderClosed: 'That order is no longer open.',
+      orderOwn: 'That is your own order. Cancel it to withdraw it.',
+      orderNotYours: 'That is not your order.',
     },
   },
 };

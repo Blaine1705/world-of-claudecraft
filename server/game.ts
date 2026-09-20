@@ -709,6 +709,9 @@ const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
   'market_sweep',
   'market_cancel',
   'market_collect',
+  'market_order_place',
+  'market_order_fill',
+  'market_order_cancel',
 ]);
 // Commission order board readout, the market recipe applied to the second
 // O(realm-collection) read that shipped on the per-tick self path (issue
@@ -7588,6 +7591,9 @@ export class GameServer {
       case 'market_sweep':
       case 'market_cancel':
       case 'market_collect':
+      case 'market_order_place':
+      case 'market_order_fill':
+      case 'market_order_cancel':
         // Arm-marked heavy-self members (market_sweep) mark only when the frame
         // reached the sim, the farming precedent above.
         if (dispatchMarketCommand(sim, msg, pid) && heavySelfMarkOnAccept(command)) {
