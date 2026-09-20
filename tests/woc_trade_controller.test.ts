@@ -539,7 +539,7 @@ describe('the staged row amount box (one step instead of one click per unit)', (
   }
 
   it('renders a number box capped at the held total and a Max button', () => {
-    const r = stagedRig(112, 1);
+    stagedRig(112, 1);
     const box = document.querySelector<HTMLInputElement>('#trade-window .trade-qty-input');
     expect(box).not.toBeNull();
     expect(box?.min).toBe('1');

@@ -256,7 +256,11 @@ export function bindActionBarBindBannerDrag(el: HTMLElement, uiRoot: HTMLElement
   if (!win) return;
   const Controller = win.AbortController;
   const resizeAbort = Controller ? new Controller() : null;
-  win.addEventListener('resize', onResize, resizeAbort ? { signal: resizeAbort.signal } : undefined);
+  win.addEventListener(
+    'resize',
+    onResize,
+    resizeAbort ? { signal: resizeAbort.signal } : undefined,
+  );
   const Observer = win.MutationObserver;
   if (!Observer) return;
   const observer = new Observer(() => {
