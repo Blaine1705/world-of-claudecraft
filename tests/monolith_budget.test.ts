@@ -477,7 +477,11 @@ const MONOLITHS: MonolithRow[] = [
     // "which body does this player's frame show" rule moved out to
     // src/ui/player_portrait_core.ts, so the three frame draws and the
     // portrait update listener each became one call. Exact count, zero slack.
-    ceiling: 18284,
+    // Re-measured at the release/v0.44.0 sync of that change (the release's
+    // frame-rate-limit wiring plus the per-call portrait lookups compose to
+    // 18291 by wc -l on the merged tree, still under the 18309 the branch
+    // started from). Exact count, zero slack.
+    ceiling: 18291,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
