@@ -5,6 +5,7 @@ import { crowdBucketLabel } from './crowd_bucket';
 import {
   createHostEssentialsProbe,
   type HostEssentials,
+  type HostEssentialsProbe,
   hostEssentialsPayloadFields,
 } from './desktop_host_essentials';
 import { frameCadenceBeaconBlock, frameCadenceBeaconFields } from './frame_cadence_wiring';
@@ -61,6 +62,12 @@ export interface PerfReporterOptions {
   // session keeps beaconing reports whose frames were never rendered, diluting
   // the fleet fps average with zeros. Absent means never shell-hidden.
   shellHidden?: () => boolean;
+  // The host-essentials probe constructor, for tests. It exists so the three
+  // claims about this probe (never constructed for a non-desktop session,
+  // stopped in teardown, read from the CACHE on the unload path) can be
+  // asserted from BEHAVIOR rather than from a grep of this file's source.
+  // Absent means the real one; production never passes it.
+  hostEssentialsProbeFactory?: () => HostEssentialsProbe;
 }
 
 export type PerfReporterSkipReason = 'disabled' | 'hidden' | 'not-ready' | 'no-renderer';
@@ -788,7 +795,10 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
   // without the shell bridge, its first fetch is seconds out, and its refresh
   // cadence is shorter than the report cadence so every beacon sees a reading
   // from its own interval. The final keepalive flush reads the cache only.
-  const hostEssentialsProbe = options.desktopShell === true ? createHostEssentialsProbe() : null;
+  const hostEssentialsProbe =
+    options.desktopShell === true
+      ? (options.hostEssentialsProbeFactory ?? createHostEssentialsProbe)()
+      : null;
   hostEssentialsProbe?.start();
   let stopped = false;
   let timer: number | null = null;

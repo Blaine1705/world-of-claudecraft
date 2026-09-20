@@ -42,8 +42,15 @@ export const HOST_POWER_MODES = [
   'other',
 ] as const;
 
-/** Upper bound on every megabyte field: 4 TiB, the shell's own clamp. */
+/** Upper bound on the two HOST memory fields: 4 TiB, the shell's own clamp. */
 export const HOST_MEM_MAX_MB = 4_194_304;
+
+/** The tighter upper bound on the three APP working-set fields: 64 GiB. They
+ *  measure this app's own processes, not the machine, so they get a ceiling a
+ *  real reading can never approach; the server applies the same pair of
+ *  ceilings on ingest and
+ *  tests/host_essentials_vocabulary_parity.test.ts pins the two equal. */
+export const APP_MEM_MAX_MB = 65_536;
 
 /**
  * How often the probe re-reads the shell. Deliberately SHORTER than the perf
@@ -89,9 +96,9 @@ export interface HostEssentialsProbe {
   value(): HostEssentials | null;
 }
 
-function finiteMb(value: unknown): number | null {
+function finiteMb(value: unknown, maxMb: number = HOST_MEM_MAX_MB): number | null {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null;
-  return Math.min(HOST_MEM_MAX_MB, Math.round(value));
+  return Math.min(maxMb, Math.round(value));
 }
 
 function strictBoolean(value: unknown): boolean | null {
@@ -116,9 +123,9 @@ export function narrowHostEssentials(raw: unknown): HostEssentials | null {
   return {
     hostMemTotalMb: finiteMb(record.hostMemTotalMb),
     hostMemFreeMb: finiteMb(record.hostMemFreeMb),
-    appWorkingSetMb: finiteMb(record.appWorkingSetMb),
-    appRendererWsMb: finiteMb(record.appRendererWsMb),
-    appGpuWsMb: finiteMb(record.appGpuWsMb),
+    appWorkingSetMb: finiteMb(record.appWorkingSetMb, APP_MEM_MAX_MB),
+    appRendererWsMb: finiteMb(record.appRendererWsMb, APP_MEM_MAX_MB),
+    appGpuWsMb: finiteMb(record.appGpuWsMb, APP_MEM_MAX_MB),
     hostOnBattery: strictBoolean(record.hostOnBattery),
     hostPowerPlan: choice(record.hostPowerPlan, HOST_POWER_PLANS),
     hostPowerMode: choice(record.hostPowerMode, HOST_POWER_MODES),

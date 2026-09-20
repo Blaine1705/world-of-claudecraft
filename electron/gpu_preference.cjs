@@ -243,13 +243,52 @@ function isRegValueAbsent(err) {
 //
 // The key and the value name are constants written in the calling module, never
 // anything derived from a player, a page, or the environment. They are still
-// checked against a strict allowlist here rather than trusted, so this reader
-// cannot be turned into a general "read any registry value" primitive by a
-// later caller: a key must be an HKLM or HKCU path of ordinary name characters,
-// and a value name a short ordinary name. Anything else answers null without
-// running reg.exe at all.
-const REG_QUERY_KEY_RE = /^HK(LM|CU)\\[A-Za-z0-9\\ _-]+$/;
-const REG_QUERY_VALUE_NAME_RE = /^[A-Za-z0-9][A-Za-z0-9 _-]{0,63}$/;
+// checked here rather than trusted, and the check is an EXACT, FROZEN allowlist
+// of the five (key, valueName) PAIRS this app actually reads, not a shape
+// pattern. That makes the claim literally true rather than merely intended:
+// this reader CANNOT be turned into a general "read any registry value"
+// primitive by a later caller, because a well-formed but unlisted pair (say
+// HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion + ProductId, a machine's
+// Windows product id) is refused without running anything at all. A new reading
+// is a deliberate edit to REG_QUERY_ALLOWLIST below, which
+// tests/electron_gpu_preference.test.ts pins element by element.
+//
+// The pairs live HERE, in the module that enforces them, and
+// electron/host_essentials.cjs imports these same constants for its own reads:
+// one definition, so the caller and the allowlist cannot drift apart.
+const POWER_SCHEMES_KEY = 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\Power\\User\\PowerSchemes';
+const GRAPHICS_DRIVERS_KEY = 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers';
+const GAME_BAR_KEY = 'HKCU\\Software\\Microsoft\\GameBar';
+
+const ACTIVE_POWER_SCHEME_VALUE = 'ActivePowerScheme';
+const ACTIVE_OVERLAY_AC_VALUE = 'ActiveOverlayAcPowerScheme';
+const ACTIVE_OVERLAY_DC_VALUE = 'ActiveOverlayDcPowerScheme';
+const HW_SCH_MODE_VALUE = 'HwSchMode';
+const AUTO_GAME_MODE_VALUE = 'AutoGameModeEnabled';
+
+/** Every registry value this application may read, in full. Nothing else. */
+const REG_QUERY_ALLOWLIST = Object.freeze([
+  Object.freeze({ key: POWER_SCHEMES_KEY, valueName: ACTIVE_POWER_SCHEME_VALUE }),
+  Object.freeze({ key: POWER_SCHEMES_KEY, valueName: ACTIVE_OVERLAY_AC_VALUE }),
+  Object.freeze({ key: POWER_SCHEMES_KEY, valueName: ACTIVE_OVERLAY_DC_VALUE }),
+  Object.freeze({ key: GRAPHICS_DRIVERS_KEY, valueName: HW_SCH_MODE_VALUE }),
+  Object.freeze({ key: GAME_BAR_KEY, valueName: AUTO_GAME_MODE_VALUE }),
+]);
+
+// key -> the value names allowed under it. A Map of Sets rather than a joined
+// string, so no separator character can ever be used to forge a match.
+const REG_QUERY_ALLOWED = new Map();
+for (const pair of REG_QUERY_ALLOWLIST) {
+  const names = REG_QUERY_ALLOWED.get(pair.key) ?? new Set();
+  names.add(pair.valueName);
+  REG_QUERY_ALLOWED.set(pair.key, names);
+}
+
+/** True only for one of the exact pairs in REG_QUERY_ALLOWLIST. */
+function isAllowedRegRead(key, valueName) {
+  if (typeof key !== 'string' || typeof valueName !== 'string') return false;
+  return REG_QUERY_ALLOWED.get(key)?.has(valueName) === true;
+}
 
 // Frozen and exported so the unit test can pin the WHOLE options object: what a
 // scan cannot judge is the options bag, so the control against a later
@@ -282,18 +321,14 @@ function parseRegQueryValue(stdout) {
 /**
  * Read one registry value. Resolves to `{ type, value }` for a REG_SZ /
  * REG_EXPAND_SZ / REG_DWORD, `{ absent: true }` when the value or its key does
- * not exist (reg.exe exits 1), and null for everything else: a refused key or
- * value name, a timeout kill, a blocked or missing reg.exe, an access denial,
- * and a value type this reader cannot express. Never rejects and never throws,
- * so a caller can fire four of these in parallel and read four answers.
+ * not exist (reg.exe exits 1), and null for everything else: a pair outside
+ * REG_QUERY_ALLOWLIST, a timeout kill, a blocked or missing reg.exe, an access
+ * denial, and a value type this reader cannot express. Never rejects and never
+ * throws, so a caller can fire four of these in parallel and read four answers.
  */
 function queryRegValue({ key, valueName } = {}, deps = {}) {
   return new Promise((resolve) => {
-    if (typeof key !== 'string' || !REG_QUERY_KEY_RE.test(key)) {
-      resolve(null);
-      return;
-    }
-    if (typeof valueName !== 'string' || !REG_QUERY_VALUE_NAME_RE.test(valueName)) {
+    if (!isAllowedRegRead(key, valueName)) {
       resolve(null);
       return;
     }
@@ -721,7 +756,17 @@ module.exports = {
   LINUX_OZONE_X11_ARG,
   PRIME_RELAUNCH_MARKER,
   PRIME_RELAUNCH_ADDED_ENV,
+  REG_QUERY_ALLOWLIST,
   REG_QUERY_OPTIONS,
+  ACTIVE_OVERLAY_AC_VALUE,
+  ACTIVE_OVERLAY_DC_VALUE,
+  ACTIVE_POWER_SCHEME_VALUE,
+  AUTO_GAME_MODE_VALUE,
+  GAME_BAR_KEY,
+  GRAPHICS_DRIVERS_KEY,
+  HW_SCH_MODE_VALUE,
+  POWER_SCHEMES_KEY,
+  isAllowedRegRead,
   buildLinuxPrimeEnv,
   hasExplicitOzonePlatformArg,
   isLinuxHybridGpu,

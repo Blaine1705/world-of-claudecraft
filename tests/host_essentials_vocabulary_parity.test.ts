@@ -20,15 +20,65 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_host_esse
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { POWER_MODE_BY_GUID, POWER_MODES, POWER_PLANS } from '../electron/host_essentials.cjs';
 import {
+  POWER_MODE_BY_GUID,
+  POWER_MODES,
+  POWER_PLANS,
+  APP_MEM_MAX_MB as SHELL_APP_MAX,
+  HOST_MEM_TOTAL_MAX_MB as SHELL_HOST_MAX,
+} from '../electron/host_essentials.cjs';
+import {
+  APP_MEM_MAX_MB as SERVER_APP_MAX,
+  HOST_MEM_MAX_MB as SERVER_HOST_MAX,
   HOST_POWER_MODES as SERVER_MODES,
   HOST_POWER_PLANS as SERVER_PLANS,
 } from '../server/perf_report_host';
 import {
+  APP_MEM_MAX_MB as CLIENT_APP_MAX,
+  HOST_MEM_MAX_MB as CLIENT_HOST_MAX,
   HOST_POWER_MODES as CLIENT_MODES,
   HOST_POWER_PLANS as CLIENT_PLANS,
 } from '../src/game/desktop_host_essentials';
+
+/**
+ * PowerShell source with its comments removed: `<# ... #>` blocks first, then
+ * every line-comment tail. A `#` inside a single- or double-quoted string on
+ * the line is left alone, which matters here because the registry paths and the
+ * switch expressions being pinned are quoted strings.
+ */
+function stripPowerShellComments(source: string): string {
+  const withoutBlocks = source.replace(/<#[\s\S]*?#>/g, '');
+  return withoutBlocks
+    .split('\n')
+    .map((line) => {
+      let quote: string | null = null;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (quote) {
+          if (ch === quote) quote = null;
+          continue;
+        }
+        if (ch === "'" || ch === '"') {
+          quote = ch;
+          continue;
+        }
+        if (ch === '#') return line.slice(0, i);
+      }
+      return line;
+    })
+    .join('\n');
+}
+
+describe('Gpu.ps1 comment stripping', () => {
+  it('removes line comments and block comments but keeps quoted hashes', () => {
+    // The guard on the guard: if this helper were a no-op, the pin below would
+    // go on passing against a commented-out collector.
+    expect(stripPowerShellComments('$v = 1 # .HwSchMode\n')).toBe('$v = 1 \n');
+    expect(stripPowerShellComments('<#\n.HwSchMode\n#>\n$keep = 2')).toBe('\n$keep = 2');
+    expect(stripPowerShellComments("$k = 'a#b' # tail")).toBe("$k = 'a#b' ");
+    expect(stripPowerShellComments('$k = "a#b"')).toBe('$k = "a#b"');
+  });
+});
 
 describe('host essentials vocabulary parity', () => {
   it('keeps the power-PLAN vocabulary identical across shell, client and server', () => {
@@ -41,6 +91,23 @@ describe('host essentials vocabulary parity', () => {
     expect([...SERVER_MODES]).toEqual([...POWER_MODES]);
   });
 
+  it('keeps the two megabyte CEILINGS identical across shell, client and server', () => {
+    // Not only the vocabularies: the numeric bounds are the other thing the
+    // three layers each keep their own copy of, and a client that clamped at a
+    // different ceiling than the ingest would make the column's meaning depend
+    // on which layer a reader trusted.
+    expect(CLIENT_HOST_MAX).toBe(SERVER_HOST_MAX);
+    expect(SHELL_HOST_MAX).toBe(SERVER_HOST_MAX);
+    expect(CLIENT_APP_MAX).toBe(SERVER_APP_MAX);
+    expect(SHELL_APP_MAX).toBe(SERVER_APP_MAX);
+    // The values themselves, so a change that moved all three together is still
+    // a deliberate edit here.
+    expect(SERVER_HOST_MAX).toBe(4_194_304);
+    expect(SERVER_APP_MAX).toBe(65_536);
+    // And the whole point of the second ceiling: it is the tighter one.
+    expect(SERVER_APP_MAX).toBeLessThan(SERVER_HOST_MAX);
+  });
+
   it("keeps '' in both vocabularies as the unknown member", () => {
     // The server's choice fallback is '', so a vocabulary without it would
     // store a value no reader could interpret.
@@ -50,9 +117,11 @@ describe('host essentials vocabulary parity', () => {
 
   it('keeps the power-MODE GUID map equal to the host diagnostic collector', () => {
     // Parse Power.ps1's $overlayNames hashtable: '<guid>' = 'Name'.
-    const script = readFileSync(
-      new URL('../electron/host_diag/win/collectors/Power.ps1', import.meta.url),
-      'utf8',
+    const script = stripPowerShellComments(
+      readFileSync(
+        new URL('../electron/host_diag/win/collectors/Power.ps1', import.meta.url),
+        'utf8',
+      ),
     );
     const block = script.slice(
       script.indexOf('$overlayNames'),
@@ -84,10 +153,14 @@ describe('host essentials vocabulary parity', () => {
   it('keeps the HAGS and Game Mode rules equal to the Gpu.ps1 collector', () => {
     // Textual, because the .ps1 cannot be executed here: the two registry
     // addresses and the 2 = on / 1 = off mapping must still be the ones the
-    // shell module reads.
-    const script = readFileSync(
-      new URL('../electron/host_diag/win/collectors/Gpu.ps1', import.meta.url),
-      'utf8',
+    // shell module reads. COMMENTS ARE STRIPPED FIRST, because a textual pin
+    // that matches anywhere in the file is otherwise satisfied by a
+    // commented-out copy of the very line whose removal it is meant to catch.
+    const script = stripPowerShellComments(
+      readFileSync(
+        new URL('../electron/host_diag/win/collectors/Gpu.ps1', import.meta.url),
+        'utf8',
+      ),
     );
     expect(script).toContain("'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers'");
     expect(script).toContain('.HwSchMode');

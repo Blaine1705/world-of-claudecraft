@@ -120,20 +120,27 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       cadenceDivisor: 4,
       refreshHz: 144,
       // The host-essentials block, appended LAST to both halves of the
-      // statement. Pairwise-distinct numbers, and the three booleans are
-      // deliberately a true/false/true spread so a slip between any two of the
-      // nullable boolean columns (gl_laptop false, host_on_battery false)
-      // flips an assertion.
+      // statement. The numbers are pairwise distinct. Three booleans cannot all
+      // differ from each other AND from the pre-existing gl_laptop (false)
+      // with only two values, so the pattern chosen is: every ADJACENT pair in
+      // COLUMN ORDER differs, which is what a slipped placeholder actually
+      // produces. In column order the block runs
+      //   ... app_gpu_ws_mb, host_on_battery, host_power_plan, host_power_mode,
+      //       host_hags, host_game_mode
+      // so host_on_battery is TRUE (its neighbours are a number and a string,
+      // and it differs from gl_laptop false), and host_hags FALSE beside
+      // host_game_mode TRUE. The only same-valued pair, host_on_battery and
+      // host_game_mode, is the furthest-apart pair in the whole appended run.
       hostMemTotalMb: 32512,
       hostMemFreeMb: 9088,
       appWorkingSetMb: 1733,
       appRendererWsMb: 911,
       appGpuWsMb: 407,
-      hostOnBattery: false,
+      hostOnBattery: true,
       hostPowerPlan: 'high_performance',
       hostPowerMode: 'best_performance',
-      hostHags: true,
-      hostGameMode: false,
+      hostHags: false,
+      hostGameMode: true,
     });
 
     const res = await db.pool.query('SELECT * FROM client_perf_reports WHERE session_id = $1', [
@@ -205,11 +212,11 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(r.app_working_set_mb).toBe(1733);
     expect(r.app_renderer_ws_mb).toBe(911);
     expect(r.app_gpu_ws_mb).toBe(407);
-    expect(r.host_on_battery).toBe(false);
+    expect(r.host_on_battery).toBe(true);
     expect(r.host_power_plan).toBe('high_performance');
     expect(r.host_power_mode).toBe('best_performance');
-    expect(r.host_hags).toBe(true);
-    expect(r.host_game_mode).toBe(false);
+    expect(r.host_hags).toBe(false);
+    expect(r.host_game_mode).toBe(true);
   });
 
   it('serves the row back through clientPerfRaw with the dimensions and suggestion ids mapped', async () => {
@@ -244,11 +251,11 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(row?.appWorkingSetMb).toBe(1733);
     expect(row?.appRendererWsMb).toBe(911);
     expect(row?.appGpuWsMb).toBe(407);
-    expect(row?.hostOnBattery).toBe(false);
+    expect(row?.hostOnBattery).toBe(true);
     expect(row?.hostPowerPlan).toBe('high_performance');
     expect(row?.hostPowerMode).toBe('best_performance');
-    expect(row?.hostHags).toBe(true);
-    expect(row?.hostGameMode).toBe(false);
+    expect(row?.hostHags).toBe(false);
+    expect(row?.hostGameMode).toBe(true);
   });
 
   it('aggregates suggestionCounts through clientPerfSummary from the live rows', async () => {

@@ -447,14 +447,17 @@ anything that could fingerprint a machine is coarsened before it leaves the clie
   by the ADD COLUMN block in `server/client_perf_reports_schema.ts`:
   `hostMemTotalMb`, `hostMemFreeMb` (physical RAM and free RAM, rounded to 256 MB
   and 64 MB), `appWorkingSetMb`, `appRendererWsMb`, `appGpuWsMb` (this app's own
-  process memory), `hostOnBattery`, `hostPowerPlan`, `hostPowerMode` (closed
+  process memory, rounded to 16 MB so no figure in the row is left at full
+  entropy, and bounded by a 64 GiB ceiling of their own rather than the 4 TiB
+  host ceiling, so one absurd anonymous value cannot skew a future aggregate),
+  `hostOnBattery`, `hostPowerPlan`, `hostPowerMode` (closed
   vocabularies, never the raw Windows GUID: same fingerprint rule that rounds
   `refreshHz` to whole Hz), `hostHags` and `hostGameMode`.
   An absent field is OMITTED from the payload rather than sent as null, so a web
   payload is byte-identical to one built before the dimension existed, and the
   ingest ignores the whole block unless the same report is a desktop-shell report.
-  The three copies of the vocabularies are pinned equal by
-  `tests/host_essentials_vocabulary_parity.test.ts`, the same pattern as
+  The three copies of the vocabularies, and the two megabyte ceilings, are pinned
+  equal by `tests/host_essentials_vocabulary_parity.test.ts`, the same pattern as
   `tests/perf_suggestion_id_parity.test.ts`. No grouped summary dimension and no
   Prometheus label yet: the columns land first, the fleet reads come later.
 

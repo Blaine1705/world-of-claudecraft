@@ -4,10 +4,13 @@
 // runs against fakes with no Electron and no real registry.
 
 import { describe, expect, it, vi } from 'vitest';
+import { REG_QUERY_ALLOWLIST } from '../electron/gpu_preference.cjs';
 import {
   ACTIVE_OVERLAY_AC_VALUE,
   ACTIVE_OVERLAY_DC_VALUE,
   ACTIVE_POWER_SCHEME_VALUE,
+  APP_MEM_MAX_MB,
+  APP_MEM_STEP_MB,
   createHostEssentials,
   foldGameModeReading,
   foldHagsReading,
@@ -15,6 +18,7 @@ import {
   foldPowerPlanGuid,
   GAME_BAR_KEY,
   GRAPHICS_DRIVERS_KEY,
+  HOST_ESSENTIALS_MIN_INTERVAL_MS,
   HOST_MEM_FREE_STEP_MB,
   HOST_MEM_TOTAL_MAX_MB,
   HOST_MEM_TOTAL_STEP_MB,
@@ -41,9 +45,7 @@ describe('power plan folding', () => {
     // The whole reason the fold happens in the SHELL: the perf endpoint accepts
     // anonymous posts, and a custom plan's GUID is unique to one machine.
     const custom = '11111111-2222-3333-4444-555555555555';
-    const folded = foldPowerPlanGuid(sz(custom));
-    expect(folded).toBe('other');
-    expect(folded).not.toContain('1111');
+    expect(foldPowerPlanGuid(sz(custom))).toBe('other');
   });
 
   it('answers the unknown member for an absent value, a failed read, and a foreign type', () => {
@@ -104,13 +106,38 @@ describe('readStaticHostEssentials', () => {
     return { asked, queryRegValue };
   }
 
-  it('reads the four values in parallel and folds them', async () => {
-    const { asked, queryRegValue } = reader({
-      [ACTIVE_POWER_SCHEME_VALUE]: sz('8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'),
-      [ACTIVE_OVERLAY_AC_VALUE]: sz('ded574b5-45a0-4f42-8737-46345c09c238'),
-      HwSchMode: dword(2),
-      AutoGameModeEnabled: dword(0),
+  /**
+   * The same recorder, but every answer is held behind a gate that opens only
+   * once `expected` requests have been ISSUED. A parallel implementation gets
+   * all four out and then sees them all settle; a sequential one would await
+   * the first answer forever and this test would time out. That is what makes
+   * the "in parallel" claim decisive rather than decorative.
+   */
+  function gatedReader(answers: Record<string, unknown>, expected: number) {
+    const asked: { key: string; valueName: string }[] = [];
+    let openGate = (): void => {};
+    const allIssued = new Promise<void>((resolve) => {
+      openGate = resolve;
     });
+    const queryRegValue = async (request: { key: string; valueName: string }) => {
+      asked.push(request);
+      if (asked.length >= expected) openGate();
+      await allIssued;
+      return (answers[request.valueName] ?? null) as never;
+    };
+    return { asked, queryRegValue };
+  }
+
+  it('issues all four reads before any of them resolves, then folds them', async () => {
+    const { asked, queryRegValue } = gatedReader(
+      {
+        [ACTIVE_POWER_SCHEME_VALUE]: sz('8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'),
+        [ACTIVE_OVERLAY_AC_VALUE]: sz('ded574b5-45a0-4f42-8737-46345c09c238'),
+        HwSchMode: dword(2),
+        AutoGameModeEnabled: dword(0),
+      },
+      4,
+    );
     await expect(
       readStaticHostEssentials({ platform: 'win32', onBattery: false, queryRegValue }),
     ).resolves.toEqual({
@@ -125,6 +152,22 @@ describe('readStaticHostEssentials', () => {
       `${GRAPHICS_DRIVERS_KEY}|HwSchMode`,
       `${GAME_BAR_KEY}|AutoGameModeEnabled`,
     ]);
+    // The 2 s timeout below is short on purpose: a sequential regression
+    // deadlocks on the gate, and this is how long that failure takes to report.
+  }, 2_000);
+
+  it('asks for exactly the pairs the reader allowlist admits', async () => {
+    // The shell's four reads and gpu_preference.cjs REG_QUERY_ALLOWLIST are one
+    // set of constants, but this is the pin that the READS are inside it: a
+    // future read added here with a key the allowlist does not carry would
+    // silently answer null on every real machine.
+    const allowed = new Set(REG_QUERY_ALLOWLIST.map((pair) => `${pair.key}|${pair.valueName}`));
+    for (const onBattery of [false, true]) {
+      const { asked, queryRegValue } = reader({});
+      await readStaticHostEssentials({ platform: 'win32', onBattery, queryRegValue });
+      expect(asked).toHaveLength(4);
+      for (const a of asked) expect(allowed).toContain(`${a.key}|${a.valueName}`);
+    }
   });
 
   it('reads the DC overlay value when the machine is on battery', async () => {
@@ -166,7 +209,7 @@ describe('readStaticHostEssentials', () => {
 });
 
 describe('reduceAppMemory', () => {
-  it('sums every process, takes the LARGEST Tab, and the GPU process', () => {
+  it('sums every process, takes the LARGEST Tab and the GPU process, rounded to 16 MB', () => {
     expect(
       reduceAppMemory([
         { type: 'Browser', memory: { workingSetSize: 100 * 1024 } },
@@ -175,7 +218,33 @@ describe('reduceAppMemory', () => {
         { type: 'GPU', memory: { workingSetSize: 300 * 1024 } },
         { type: 'Utility', memory: { workingSetSize: 50 * 1024 } },
       ]),
-    ).toEqual({ appWorkingSetMb: 1550, appRendererWsMb: 900, appGpuWsMb: 300 });
+      // 1550 -> 1552, 900 -> 896, 300 -> 304: the raw sums are NOT what is
+      // reported. These three used to be the only unrounded, highest-entropy
+      // numbers in an otherwise coarsened row.
+    ).toEqual({ appWorkingSetMb: 1552, appRendererWsMb: 896, appGpuWsMb: 304 });
+  });
+
+  it('rounds every app figure to the 16 MB step and clamps at 64 GiB', () => {
+    expect(APP_MEM_STEP_MB).toBe(16);
+    expect(APP_MEM_MAX_MB).toBe(65_536);
+    // A one-megabyte move must not move the reported figure: the step, not a
+    // pass-through, is what stands between a fleet row and a memory-use
+    // fingerprint that changes with every frame drawn.
+    const at = (mb: number) =>
+      reduceAppMemory([{ type: 'GPU', memory: { workingSetSize: mb * 1024 } }]).appGpuWsMb;
+    expect(at(297)).toBe(304);
+    expect(at(298)).toBe(304);
+    expect(at(303)).toBe(304);
+    // Exactly on a half-step rounds up, like every other figure in the module.
+    expect(at(312)).toBe(320);
+    expect(at(8)).toBe(16);
+    expect(at(7)).toBe(0);
+    for (const mb of [1, 17, 4097, 65_535]) {
+      expect(at(mb)! % APP_MEM_STEP_MB, String(mb)).toBe(0);
+    }
+    // Far below the 4 TiB HOST ceiling: an app process is not a machine.
+    expect(at(999_999)).toBe(APP_MEM_MAX_MB);
+    expect(APP_MEM_MAX_MB).toBeLessThan(HOST_MEM_TOTAL_MAX_MB);
   });
 
   it('answers nulls for a missing or malformed metrics list', () => {
@@ -233,7 +302,7 @@ describe('readLiveHostEssentials', () => {
 });
 
 describe('createHostEssentials', () => {
-  function harness(nowRef: { value: number }) {
+  function harness(nowRef: { value: number }, minIntervalMs: number | undefined = 60_000) {
     const queryRegValue = vi.fn(async () => ({ absent: true }) as never);
     const essentials = createHostEssentials({
       platform: 'win32',
@@ -242,10 +311,35 @@ describe('createHostEssentials', () => {
       powerMonitor: { isOnBatteryPower: () => false },
       queryRegValue,
       now: () => nowRef.value,
-      minIntervalMs: 60_000,
+      // `undefined` exercises the DEFAULT, which is the guard production runs.
+      ...(minIntervalMs === undefined ? {} : { minIntervalMs }),
     });
     return { essentials, queryRegValue };
   }
+
+  it('pins the shipped anti-hammering floor at one minute', () => {
+    // The value itself, not merely "some floor": this is what stops a
+    // misbehaving (or compromised) renderer turning the IPC channel into a
+    // reg.exe spawn loop, and every test below that injects 60_000 is only
+    // meaningful while the default agrees with it.
+    expect(HOST_ESSENTIALS_MIN_INTERVAL_MS).toBe(60_000);
+  });
+
+  it('applies that default floor when nothing is injected', async () => {
+    // The injected-interval tests cannot see a regression that changes the
+    // DEFAULT (or drops the `??` that reads it), so this one builds the
+    // collector the way electron/main.cjs does: with no minIntervalMs at all.
+    const now = { value: 5_000_000 };
+    const { essentials, queryRegValue } = harness(now, undefined);
+    const first = await essentials.snapshot();
+    now.value += 59_000;
+    expect(await essentials.snapshot()).toBe(first);
+    expect(queryRegValue).toHaveBeenCalledTimes(4);
+    now.value += 1_001;
+    const third = await essentials.snapshot();
+    expect(queryRegValue).toHaveBeenCalledTimes(8);
+    expect(third).not.toBe(first);
+  });
 
   it('collects once for two calls inside the one-minute floor', async () => {
     const now = { value: 1_000_000 };

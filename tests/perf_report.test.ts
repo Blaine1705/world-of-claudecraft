@@ -9,6 +9,17 @@ vi.mock('../server/db', () => ({
 
 import { accountAndScopeForToken, getCharacter, insertClientPerfReport } from '../server/db';
 import { handlePerfReport, perfReportInternalsForTest } from '../server/perf_report';
+import {
+  ABSENT_HOST_ESSENTIALS,
+  APP_MEM_MAX_MB,
+  HOST_MEM_MAX_MB,
+  HOST_POWER_MODES,
+  HOST_POWER_PLANS,
+  hostBoolIn,
+  hostChoiceIn,
+  hostEssentialsRow,
+  hostMbIn,
+} from '../server/perf_report_host';
 import { resetRateLimitClock, setRateLimitClock } from '../server/ratelimit';
 import {
   PREWARM_REPORT_BUDGET_VARIANTS,
@@ -2931,7 +2942,12 @@ describe('host essentials ingest', () => {
     );
     expect(stored.hostPowerPlan).toBe('');
     expect(stored.hostPowerMode).toBe('');
-    expect(JSON.stringify(stored)).not.toContain(guid);
+    // Not "this one GUID is absent" (the two assertions above already say
+    // that): NO GUID-shaped text survives anywhere in the stored row, so a
+    // future column that carried one through would fail here too.
+    expect(JSON.stringify(stored)).not.toMatch(
+      /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/,
+    );
   });
 
   it('falls back to the unknown member for any out-of-vocabulary value', async () => {
@@ -2983,7 +2999,11 @@ describe('host essentials ingest', () => {
     expect(stored.hostGameMode).toBe(false);
   });
 
-  it('drops a negative, NaN, infinite or non-numeric megabyte figure and clamps a huge one', async () => {
+  it('drops a negative, a string and a JSON null OVER THE WIRE, and clamps a huge one', async () => {
+    // What this arm actually exercises, now that the title says so. NaN and
+    // Infinity CANNOT reach the guard through JSON (both serialize to null), so
+    // naming them here was a test of JSON.stringify; they are exercised
+    // directly against hostMbIn in the narrowing-unit describe below.
     const stored = await post(
       {
         sessionId: 'host-ess-numbers',
@@ -2997,14 +3017,35 @@ describe('host essentials ingest', () => {
       '203.0.113.156',
       ELECTRON_UA,
     );
-    // NaN and Infinity do not survive JSON, so the wire form of both is null;
-    // the string and the negative are the live arms here, and the clamp is the
-    // bound against a client claiming an absurd machine.
-    expect(stored.hostMemTotalMb).toBe(4_194_304);
+    expect(stored.hostMemTotalMb).toBe(HOST_MEM_MAX_MB);
     expect(stored.hostMemFreeMb).toBeNull();
     expect(stored.appWorkingSetMb).toBeNull();
+    // Arrived as JSON null, which is not a number either.
     expect(stored.appRendererWsMb).toBeNull();
     expect(stored.appGpuWsMb).toBe(300);
+  });
+
+  it('clamps an absurd APP working set to its own tighter ceiling, not the host one', async () => {
+    const stored = await post(
+      {
+        sessionId: 'host-ess-app-ceiling',
+        desktopShell: true,
+        hostMemTotalMb: 99_999_999_999,
+        appWorkingSetMb: 99_999_999_999,
+        appRendererWsMb: 99_999_999_999,
+        appGpuWsMb: 99_999_999_999,
+      },
+      '203.0.113.158',
+      ELECTRON_UA,
+    );
+    // The two ceilings are genuinely different and the app columns take the low
+    // one: one absurd anonymous value is worth 64 GiB to a future aggregate
+    // over these columns rather than 4 TiB.
+    expect(stored.hostMemTotalMb).toBe(HOST_MEM_MAX_MB);
+    expect(stored.appWorkingSetMb).toBe(APP_MEM_MAX_MB);
+    expect(stored.appRendererWsMb).toBe(APP_MEM_MAX_MB);
+    expect(stored.appGpuWsMb).toBe(APP_MEM_MAX_MB);
+    expect(APP_MEM_MAX_MB).toBeLessThan(HOST_MEM_MAX_MB);
   });
 
   it('stores the absent shape for a shell report that sends no block at all', async () => {
@@ -3016,5 +3057,97 @@ describe('host essentials ingest', () => {
     expect(stored.hostPowerPlan).toBe('');
     expect(stored.hostMemTotalMb).toBeNull();
     expect(stored.hostHags).toBeNull();
+  });
+});
+
+// The wire tests above can only carry values JSON can express. These call the
+// exported narrowing functions directly, which is the only way to exercise the
+// arms a JSON body can never deliver (a real NaN, a real Infinity) and the only
+// place the two ceilings can be checked value by value.
+describe('host essentials narrowing units', () => {
+  it('hostMbIn: rejects every non-number and every non-finite number', () => {
+    for (const value of [
+      Number.NaN,
+      Number.POSITIVE_INFINITY,
+      Number.NEGATIVE_INFINITY,
+      -1,
+      -0.5,
+      '12',
+      '',
+      null,
+      undefined,
+      true,
+      false,
+      {},
+      [],
+      [12],
+      12n,
+    ]) {
+      expect(hostMbIn(value), String(value)).toBeNull();
+    }
+  });
+
+  it('hostMbIn: keeps a real figure, floors a fractional one, and stores zero as zero', () => {
+    expect(hostMbIn(0)).toBe(0);
+    expect(hostMbIn(1550)).toBe(1550);
+    expect(hostMbIn(1550.99)).toBe(1550);
+  });
+
+  it('hostMbIn: clamps at the ceiling it is GIVEN, host by default', () => {
+    expect(hostMbIn(1e12)).toBe(HOST_MEM_MAX_MB);
+    expect(hostMbIn(1e12, APP_MEM_MAX_MB)).toBe(APP_MEM_MAX_MB);
+    // The default really is the host ceiling, so an app column that forgot to
+    // pass its own would store four million megabytes instead of 64 GiB.
+    expect(hostMbIn(HOST_MEM_MAX_MB)).toBe(HOST_MEM_MAX_MB);
+    expect(hostMbIn(APP_MEM_MAX_MB + 1, APP_MEM_MAX_MB)).toBe(APP_MEM_MAX_MB);
+    expect(hostMbIn(APP_MEM_MAX_MB - 1, APP_MEM_MAX_MB)).toBe(APP_MEM_MAX_MB - 1);
+  });
+
+  it('hostBoolIn: only a real boolean, so "off" stays apart from "unknown"', () => {
+    expect(hostBoolIn(true)).toBe(true);
+    expect(hostBoolIn(false)).toBe(false);
+    for (const value of [1, 0, 'true', 'false', '', null, undefined, {}, Number.NaN]) {
+      expect(hostBoolIn(value), String(value)).toBeNull();
+    }
+  });
+
+  it('hostChoiceIn: a member passes, everything else stores the unknown member', () => {
+    expect(hostChoiceIn('balanced', HOST_POWER_PLANS)).toBe('balanced');
+    expect(hostChoiceIn('', HOST_POWER_PLANS)).toBe('');
+    // A vocabulary is not interchangeable with the other one.
+    expect(hostChoiceIn('best_performance', HOST_POWER_PLANS)).toBe('');
+    expect(hostChoiceIn('high_performance', HOST_POWER_MODES)).toBe('');
+    for (const value of [
+      '381b4222-f694-41f0-9685-ff5bb260df2e',
+      'Balanced',
+      ' balanced',
+      7,
+      null,
+      undefined,
+      ['balanced'],
+    ]) {
+      expect(hostChoiceIn(value, HOST_POWER_PLANS), String(value)).toBe('');
+    }
+  });
+
+  it('hostEssentialsRow: the whole block is ignored for a non-shell report', () => {
+    const body = {
+      hostMemTotalMb: 16384,
+      appWorkingSetMb: 1550,
+      hostOnBattery: true,
+      hostPowerPlan: 'balanced',
+      hostHags: true,
+    };
+    expect(hostEssentialsRow(body, false)).toEqual(ABSENT_HOST_ESSENTIALS);
+    expect(hostEssentialsRow(body, true)).toMatchObject({
+      hostMemTotalMb: 16384,
+      appWorkingSetMb: 1550,
+      hostOnBattery: true,
+      hostPowerPlan: 'balanced',
+      hostHags: true,
+    });
+    // A fresh object each time: a caller must not be able to mutate the frozen
+    // absent shape through a returned row.
+    expect(hostEssentialsRow(body, false)).not.toBe(ABSENT_HOST_ESSENTIALS);
   });
 });

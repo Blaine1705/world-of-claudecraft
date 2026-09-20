@@ -22,6 +22,8 @@ export const POWER_MODES: readonly string[];
 export const HOST_MEM_TOTAL_MAX_MB: number;
 export const HOST_MEM_TOTAL_STEP_MB: number;
 export const HOST_MEM_FREE_STEP_MB: number;
+export const APP_MEM_MAX_MB: number;
+export const APP_MEM_STEP_MB: number;
 export const HOST_ESSENTIALS_MIN_INTERVAL_MS: number;
 
 export function normalizeGuid(value: unknown): string;

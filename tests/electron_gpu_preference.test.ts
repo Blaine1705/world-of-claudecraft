@@ -18,6 +18,7 @@ import {
   PRIME_RELAUNCH_MARKER,
   parseRegQueryData,
   queryRegValue,
+  REG_QUERY_ALLOWLIST,
   REG_QUERY_OPTIONS,
   relaunchForLinuxPrime,
   shouldRelaunchForLinuxPrime,
@@ -1157,21 +1158,90 @@ describe('queryRegValue', () => {
   });
 
   it('answers null for a value type it cannot round-trip', async () => {
-    const { execFile } = fakeExecFile({ stdout: '    Blob    REG_BINARY    00ff\r\n' });
-    await expect(queryRegValue({ key: KEY, valueName: 'Blob' }, { execFile })).resolves.toBeNull();
+    // An ALLOWED pair (the allowlist is exact), whose stored value is a type
+    // this reader cannot express.
+    const { execFile } = fakeExecFile({
+      stdout: '    ActivePowerScheme    REG_BINARY    00ff\r\n',
+    });
+    await expect(
+      queryRegValue({ key: KEY, valueName: 'ActivePowerScheme' }, { execFile }),
+    ).resolves.toBeNull();
   });
 
-  it('refuses a key or value name outside the allowlist WITHOUT running anything', async () => {
-    const refusals = [
-      { key: 'HKCR\\Something', valueName: 'A' },
-      { key: 'HKLM\\System & calc.exe', valueName: 'A' },
+  it('pins the EXACT allowlist: these five pairs and nothing else', () => {
+    // The whole safety claim of this reader is that it cannot become a general
+    // "read any registry value" primitive. That is true only while the
+    // allowlist is this exact list, so it is pinned element by element rather
+    // than by count or by shape. Growing it is a deliberate edit here.
+    expect(REG_QUERY_ALLOWLIST.map((pair) => ({ ...pair }))).toEqual([
+      { key: KEY, valueName: 'ActivePowerScheme' },
+      { key: KEY, valueName: 'ActiveOverlayAcPowerScheme' },
+      { key: KEY, valueName: 'ActiveOverlayDcPowerScheme' },
+      {
+        key: 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers',
+        valueName: 'HwSchMode',
+      },
+      { key: 'HKCU\\Software\\Microsoft\\GameBar', valueName: 'AutoGameModeEnabled' },
+    ]);
+    // Frozen, so nothing can push a sixth pair on at runtime.
+    expect(Object.isFrozen(REG_QUERY_ALLOWLIST)).toBe(true);
+  });
+
+  it('refuses any pair outside the exact allowlist WITHOUT running anything', async () => {
+    const refusals: { key: unknown; valueName: unknown }[] = [
+      // The case a SHAPE allowlist would have admitted: a perfectly
+      // well-formed HKLM key and an ordinary value name that this app simply
+      // does not read. It is the machine's Windows product id.
+      {
+        key: 'HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion',
+        valueName: 'ProductId',
+      },
+      // An allowed KEY with a value name from no pair at all.
+      { key: KEY, valueName: 'PreferredPlan' },
+      // An allowed VALUE NAME under a key that never carries it.
+      { key: 'HKCU\\Software\\Microsoft\\GameBar', valueName: 'HwSchMode' },
+      // The pair crossed the other way.
+      {
+        key: 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers',
+        valueName: 'ActivePowerScheme',
+      },
+      // A trailing separator, a case change and a subkey are all different keys.
+      { key: `${KEY}\\`, valueName: 'ActivePowerScheme' },
+      { key: KEY.toLowerCase(), valueName: 'ActivePowerScheme' },
+      { key: `${KEY}\\Sub`, valueName: 'ActivePowerScheme' },
+      // The old shape-rejections, still rejected.
+      { key: 'HKCR\\Something', valueName: 'ActivePowerScheme' },
+      { key: 'HKLM\\System & calc.exe', valueName: 'ActivePowerScheme' },
       { key: KEY, valueName: 'A/B' },
       { key: KEY, valueName: '' },
+      // And a non-string on either side.
+      { key: KEY, valueName: undefined },
+      { key: undefined, valueName: 'ActivePowerScheme' },
+      { key: 42, valueName: 'ActivePowerScheme' },
     ];
     for (const request of refusals) {
       const { calls, execFile } = fakeExecFile({ stdout: '' });
-      await expect(queryRegValue(request, { execFile })).resolves.toBeNull();
-      expect(calls).toHaveLength(0);
+      await expect(
+        queryRegValue(request as { key: string; valueName: string }, { execFile }),
+        JSON.stringify(request),
+      ).resolves.toBeNull();
+      expect(calls, JSON.stringify(request)).toHaveLength(0);
+    }
+  });
+
+  it('admits every allowlisted pair, so the exact list is not merely restrictive', async () => {
+    // The other arm: a list that refused everything would pass the test above
+    // and silently kill the dimension on every real machine.
+    for (const pair of REG_QUERY_ALLOWLIST) {
+      const { calls, execFile } = fakeExecFile({
+        stdout: `    ${pair.valueName}    REG_DWORD    0x1\r\n`,
+      });
+      await expect(queryRegValue({ ...pair }, { execFile })).resolves.toEqual({
+        type: 'dword',
+        value: 1,
+      });
+      expect(calls, pair.valueName).toHaveLength(1);
+      expect(calls[0].args).toEqual(['query', pair.key, '/v', pair.valueName]);
     }
   });
 

@@ -38,8 +38,19 @@ export const HOST_POWER_MODES = [
   'other',
 ] as const;
 
-/** 4 TiB in MB: the ceiling every megabyte column is clamped into. */
+/** 4 TiB in MB: the ceiling the two HOST memory columns are clamped into. It has
+ *  to be absurd, because it bounds a machine's installed RAM. */
 export const HOST_MEM_MAX_MB = 4_194_304;
+
+/** 64 GiB in MB: the tighter ceiling for the three APP process working sets.
+ *  Those describe THIS app's own processes, which no real machine runs anywhere
+ *  near, so the host ceiling would let one absurd anonymous value (this endpoint
+ *  accepts anonymous posts) drag a future average over these columns by four
+ *  million megabytes. Kept equal to the shell's own clamp
+ *  (electron/host_essentials.cjs APP_MEM_MAX_MB) and the renderer narrowing's
+ *  (src/game/desktop_host_essentials.ts) by
+ *  tests/host_essentials_vocabulary_parity.test.ts. */
+export const APP_MEM_MAX_MB = 65_536;
 
 export interface HostEssentialsRow {
   hostMemTotalMb: number | null;
@@ -72,11 +83,13 @@ export const ABSENT_HOST_ESSENTIALS: Readonly<HostEssentialsRow> = Object.freeze
 /**
  * A nullable whole-megabyte column. Absent, non-numeric, NaN, Infinity and
  * negative all store null (an absent dimension, not a zero, which would read as
- * "this machine has no memory"); anything above the ceiling is clamped.
+ * "this machine has no memory"); anything above `maxMb` is clamped. The ceiling
+ * is a parameter because the host columns and the app columns bound genuinely
+ * different quantities (see APP_MEM_MAX_MB).
  */
-export function hostMbIn(value: unknown): number | null {
+export function hostMbIn(value: unknown, maxMb: number = HOST_MEM_MAX_MB): number | null {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null;
-  return Math.min(HOST_MEM_MAX_MB, Math.floor(value));
+  return Math.min(maxMb, Math.floor(value));
 }
 
 /**
@@ -108,9 +121,9 @@ export function hostEssentialsRow(
   return {
     hostMemTotalMb: hostMbIn(body.hostMemTotalMb),
     hostMemFreeMb: hostMbIn(body.hostMemFreeMb),
-    appWorkingSetMb: hostMbIn(body.appWorkingSetMb),
-    appRendererWsMb: hostMbIn(body.appRendererWsMb),
-    appGpuWsMb: hostMbIn(body.appGpuWsMb),
+    appWorkingSetMb: hostMbIn(body.appWorkingSetMb, APP_MEM_MAX_MB),
+    appRendererWsMb: hostMbIn(body.appRendererWsMb, APP_MEM_MAX_MB),
+    appGpuWsMb: hostMbIn(body.appGpuWsMb, APP_MEM_MAX_MB),
     hostOnBattery: hostBoolIn(body.hostOnBattery),
     hostPowerPlan: hostChoiceIn(body.hostPowerPlan, HOST_POWER_PLANS),
     hostPowerMode: hostChoiceIn(body.hostPowerMode, HOST_POWER_MODES),

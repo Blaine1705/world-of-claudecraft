@@ -11,12 +11,16 @@
 // mails to support. This one is four registry values and three Electron
 // getters, cheap enough to refresh every few minutes for the life of a session,
 // and it never spawns PowerShell: reg.exe only, through the sanctioned process
-// module (electron/gpu_preference.cjs queryRegValue).
+// module (electron/gpu_preference.cjs queryRegValue), whose EXACT allowlist of
+// (key, valueName) pairs is the same set of constants this module imports and
+// reads, so neither side can drift from the other.
 //
 // PRIVACY is what shapes every field here. The perf-report endpoint accepts
 // ANONYMOUS posts, so nothing may carry a machine-identifying figure:
 //  - the memory sizes are rounded hard (256 MB total, 64 MB free), because an
-//    exact byte count of installed RAM is a fingerprint-grade number;
+//    exact byte count of installed RAM is a fingerprint-grade number, and the
+//    three app working sets round to 16 MB so no figure in the row is left at
+//    full entropy;
 //  - the power plan and power mode are folded to a CLOSED VOCABULARY here, in
 //    the shell, and the raw GUID is never stored, never returned, and never
 //    sent: a custom power plan's GUID is unique to one machine. This is the
@@ -28,19 +32,24 @@
 // import at module top (main.cjs passes app/powerMonitor/process in), so
 // tests/electron_host_essentials.test.ts drives the whole flow against fakes.
 
-const { queryRegValue } = require('./gpu_preference.cjs');
-
 // --- Registry addresses (constants, never derived) ---------------------------
-
-const POWER_SCHEMES_KEY = 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\Power\\User\\PowerSchemes';
-const GRAPHICS_DRIVERS_KEY = 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers';
-const GAME_BAR_KEY = 'HKCU\\Software\\Microsoft\\GameBar';
-
-const ACTIVE_POWER_SCHEME_VALUE = 'ActivePowerScheme';
-const ACTIVE_OVERLAY_AC_VALUE = 'ActiveOverlayAcPowerScheme';
-const ACTIVE_OVERLAY_DC_VALUE = 'ActiveOverlayDcPowerScheme';
-const HW_SCH_MODE_VALUE = 'HwSchMode';
-const AUTO_GAME_MODE_VALUE = 'AutoGameModeEnabled';
+//
+// IMPORTED, never re-declared: gpu_preference.cjs owns these five (key,
+// valueName) pairs because that is where the reader's EXACT allowlist enforces
+// them, and a second copy here is exactly the drift that would let this module
+// ask for something the allowlist refuses (or, worse, let the allowlist grow to
+// cover a read nobody makes). One definition, imported by the caller.
+const {
+  ACTIVE_OVERLAY_AC_VALUE,
+  ACTIVE_OVERLAY_DC_VALUE,
+  ACTIVE_POWER_SCHEME_VALUE,
+  AUTO_GAME_MODE_VALUE,
+  GAME_BAR_KEY,
+  GRAPHICS_DRIVERS_KEY,
+  HW_SCH_MODE_VALUE,
+  POWER_SCHEMES_KEY,
+  queryRegValue,
+} = require('./gpu_preference.cjs');
 
 // --- The closed vocabularies -------------------------------------------------
 //
@@ -166,6 +175,16 @@ const HOST_MEM_TOTAL_MAX_MB = 4_194_304;
 const HOST_MEM_TOTAL_STEP_MB = 256;
 /** Free RAM moves constantly, so a finer 64 MB step is not a fingerprint. */
 const HOST_MEM_FREE_STEP_MB = 64;
+/** The largest app working set we will report, in MB (64 GiB): far above any
+ *  real Electron process, far below the 4 TiB host ceiling, so one absurd
+ *  anonymous value cannot skew a future aggregate over these columns. */
+const APP_MEM_MAX_MB = 65_536;
+/** App working sets round to 16 MB. They are OUR OWN memory use rather than a
+ *  property of the machine, so the step is not a privacy floor; it is simply
+ *  the reason these three stopped being the only unrounded, highest-entropy
+ *  numbers in an otherwise coarsened row. A fleet reads them in hundreds of
+ *  megabytes, so nothing an analyst asks of them survives at finer grain. */
+const APP_MEM_STEP_MB = 16;
 
 /** Kilobytes (what Electron's memory APIs speak) to megabytes, or null. */
 function kbToMb(kilobytes) {
@@ -180,11 +199,13 @@ function roundMb(megabytes, step) {
   return Math.min(HOST_MEM_TOTAL_MAX_MB, Math.max(0, rounded));
 }
 
-/** Whole megabytes for an app-process working set (no privacy rounding needed:
- *  this is OUR OWN memory use, not a property of the machine). */
+/** An app-process working set, rounded to APP_MEM_STEP_MB and clamped into
+ *  0..APP_MEM_MAX_MB. */
 function appMb(kilobytes) {
   const mb = kbToMb(kilobytes);
-  return mb === null ? null : Math.min(HOST_MEM_TOTAL_MAX_MB, Math.round(mb));
+  if (mb === null) return null;
+  const rounded = Math.round(mb / APP_MEM_STEP_MB) * APP_MEM_STEP_MB;
+  return Math.min(APP_MEM_MAX_MB, Math.max(0, rounded));
 }
 
 // --- Electron readings -------------------------------------------------------
@@ -354,6 +375,8 @@ function createHostEssentials(deps = {}) {
 }
 
 module.exports = {
+  APP_MEM_MAX_MB,
+  APP_MEM_STEP_MB,
   ACTIVE_OVERLAY_AC_VALUE,
   ACTIVE_OVERLAY_DC_VALUE,
   ACTIVE_POWER_SCHEME_VALUE,
