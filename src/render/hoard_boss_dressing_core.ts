@@ -19,6 +19,9 @@ export const HOARD_SURGE_BOLT_COUNT = 10;
 /** How often (Hz) arcs and bolts re-roll their shape: fast enough to crackle,
  *  slow enough to read as lightning rather than noise. */
 export const HOARD_LIGHTNING_REROLL_HZ = 14;
+/** The calm re-roll under reduced motion: the lightning still reads as alive,
+ *  without the strobe. */
+export const HOARD_LIGHTNING_CALM_HZ = 1.5;
 
 /** A cheap deterministic hash in [0, 1): the dressing never touches Math.random,
  *  so a captured frame is reproducible and the test below can pin shapes. */
@@ -77,8 +80,14 @@ export function hoardIceGrowth(
 
 /** One jagged arc across a field: a chord between two rim points, its inner
  *  points displaced sideways. `bucket` is the re-roll tick. Returns flat x,z
- *  pairs as fractions of the field radius. */
-export function hoardStormArc(cueId: number, arcIndex: number, bucket: number): number[] {
+ *  pairs as fractions of the field radius, written into `out` (a caller-owned
+ *  scratch the adapter reuses, so a re-roll allocates nothing). */
+export function hoardStormArc(
+  cueId: number,
+  arcIndex: number,
+  bucket: number,
+  out: number[] = [],
+): number[] {
   const from = hoardHash(cueId, arcIndex, bucket) * Math.PI * 2;
   const sweep = (0.45 + hoardHash(cueId, arcIndex, bucket + 7) * 1.1) * Math.PI;
   const to = from + sweep;
@@ -89,7 +98,7 @@ export function hoardStormArc(cueId: number, arcIndex: number, bucket: number): 
   const bz = Math.sin(to) * reach;
   const nx = -(bz - az);
   const nz = bx - ax;
-  const out: number[] = [];
+  out.length = 0;
   for (let point = 0; point < HOARD_STORM_ARC_POINTS; point++) {
     const t = point / (HOARD_STORM_ARC_POINTS - 1);
     // Pinned ends, a belly of displacement in the middle.
@@ -114,27 +123,38 @@ export interface HoardSurgePlan {
 }
 
 /** The charged look for `stacks` of Storm Surge. Nothing shows at zero. */
-export function hoardSurgePlan(stacks: number, maxStacks: number, elapsed: number): HoardSurgePlan {
+export function hoardSurgePlan(
+  stacks: number,
+  maxStacks: number,
+  elapsed: number,
+  calm = false,
+): HoardSurgePlan {
   const cap = Math.max(1, maxStacks);
   const intensity = Math.max(0, Math.min(1, stacks / cap));
   if (intensity <= 0)
     return { intensity: 0, bolts: 0, shellScale: 1, shellOpacity: 0, ringSpin: 0 };
-  const flutter = 0.5 + 0.5 * Math.sin(elapsed * 23) * Math.sin(elapsed * 7.3);
+  // Reduced motion holds the shell steady: no flutter, no spin.
+  const flutter = calm ? 0.5 : 0.5 + 0.5 * Math.sin(elapsed * 23) * Math.sin(elapsed * 7.3);
   return {
     intensity,
     bolts: Math.max(2, Math.round(HOARD_SURGE_BOLT_COUNT * intensity)),
     shellScale: 1.05 + intensity * 0.35,
     shellOpacity: (0.12 + intensity * 0.3) * (0.7 + 0.3 * flutter),
-    ringSpin: 1.2 + intensity * 4.5,
+    ringSpin: calm ? 0 : 1.2 + intensity * 4.5,
   };
 }
 
 /** One bolt climbing the surged boss: flat x,y,z triples in the boss's local
  *  frame (radius 1, height 1), a rising helix kicked sideways per point. */
-export function hoardSurgeBolt(boltIndex: number, bucket: number, points: number): number[] {
+export function hoardSurgeBolt(
+  boltIndex: number,
+  bucket: number,
+  points: number,
+  out: number[] = [],
+): number[] {
   const start = hoardHash(boltIndex, bucket, 3) * Math.PI * 2;
   const twist = (hoardHash(boltIndex, bucket, 5) - 0.5) * 3.2;
-  const out: number[] = [];
+  out.length = 0;
   for (let point = 0; point < points; point++) {
     const t = point / (points - 1);
     const angle = start + twist * t;

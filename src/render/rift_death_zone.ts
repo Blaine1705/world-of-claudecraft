@@ -71,10 +71,11 @@ export class RiftDeathZoneVisuals {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly world?: IWorld,
     shake?: (amount: number) => void,
+    reducedMotion?: () => boolean,
   ) {
     this.hoardBossFx = new HoardBossFx(scene, groundY, compileGate);
     this.hoardPresentation = new HoardBossPresentation(world, shake);
-    this.hoardDressing = new HoardBossDressing(scene, groundY, world, compileGate);
+    this.hoardDressing = new HoardBossDressing(scene, groundY, world, compileGate, reducedMotion);
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().

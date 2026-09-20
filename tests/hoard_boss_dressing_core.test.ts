@@ -85,6 +85,22 @@ describe('Storm Surge look', () => {
     expect(hoardSurgePlan(20, 8, 1).intensity).toBe(1);
   });
 
+  it('holds still under reduced motion: no flutter, no spin', () => {
+    const calmA = hoardSurgePlan(6, 8, 0.13, true);
+    const calmB = hoardSurgePlan(6, 8, 0.91, true);
+    expect(calmA.ringSpin).toBe(0);
+    expect(calmA.shellOpacity).toBe(calmB.shellOpacity);
+    expect(calmA.bolts).toBe(hoardSurgePlan(6, 8, 0.13).bolts);
+  });
+
+  it('fills a caller-owned scratch instead of allocating per re-roll', () => {
+    const scratch: number[] = [];
+    expect(hoardSurgeBolt(3, 50, 9, scratch)).toBe(scratch);
+    expect(scratch).toEqual(hoardSurgeBolt(3, 50, 9));
+    expect(hoardStormArc(5, 2, 100, scratch)).toBe(scratch);
+    expect(scratch).toEqual(hoardStormArc(5, 2, 100));
+  });
+
   it('climbs each bolt from the ground to the top of the boss', () => {
     const bolt = hoardSurgeBolt(3, 50, 9);
     expect(bolt).toHaveLength(27);

@@ -19,7 +19,7 @@ const SEGMENTS = 40;
 /** Concentric rings a floor disc or sector is draped over. A plain fan only
  *  samples the ground at its centre and rim, so any bump in between poked
  *  through the telegraph; a grid follows the ground all the way across. */
-const RINGS = 6;
+const RINGS = 4;
 const LIFT = 0.16;
 
 interface CueSlot {
@@ -70,7 +70,13 @@ function material(color: number, opacity: number, additive = false): THREE.MeshB
 
 function geometry(vertexCount: number, indices: number[]): THREE.BufferGeometry {
   const result = new THREE.BufferGeometry();
-  result.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertexCount * 3), 3));
+  // Rewritten whenever a cue moves or turns, so never a static buffer.
+  result.setAttribute(
+    'position',
+    new THREE.BufferAttribute(new Float32Array(vertexCount * 3), 3).setUsage(
+      THREE.DynamicDrawUsage,
+    ),
+  );
   result.setIndex(indices);
   return result;
 }

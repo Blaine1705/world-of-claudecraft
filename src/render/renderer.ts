@@ -2975,7 +2975,7 @@ export class Renderer {
         this.scene,
         this.groundSample,
         this.worldCompileGate(),
-        this.sim, (amount) => this.addShake(amount),
+        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(),
       );
     });
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
