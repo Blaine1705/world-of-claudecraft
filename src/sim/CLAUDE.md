@@ -181,6 +181,9 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
   refuses; exports `VendorBuyOptions`, the one buyItem request shape.
 - `market_listing_ids.ts`: the World Market id allocator, including the reserved house
   band and load-time reissue that keeps one row per id.
+- `revive_facing.ts`: the heading a revived body lands with (kept when the revive lands
+  where the spirit stands, reset to 0 when the body is displaced); `spirit.ts` reviveAt
+  is its only consumer.
 - `resurrection.ts`: both sicknesses (The Keeper's Toll and the shorter Unstuck one),
   shared by every death site, PLUS the two "which auras survive this wipe" predicates
   every wipe site routes through so the rule cannot drift: `aurasSurvivingDeath` (death
