@@ -12,9 +12,9 @@ import type { InvSlot } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import {
   buildTradeItemRow,
-  resolveTradeOfferAdjust,
+  removeTradeOfferUnits,
+  resolveTradeOfferRemove,
   resolveTradeOfferSubmit,
-  setTradeOfferLine,
   stageTradeOffer,
   TRADE_OFFER_MAX_LINES,
   tradeOfferCeiling,
@@ -125,48 +125,43 @@ describe('stageTradeOffer (counted stage, the plain click and the prompt)', () =
   });
 });
 
-describe('setTradeOfferLine (the trade window adjust prompt)', () => {
-  const inventory: InvSlot[] = [
-    { itemId: 'mat_linen_cloth', count: 20 },
-    { itemId: 'mat_linen_cloth', count: 5 },
-  ];
-
-  it('sets a staged line to the requested total in place', () => {
-    const line = { itemId: 'mat_linen_cloth', count: 3 };
+describe('removeTradeOfferUnits (the trade window remove prompt)', () => {
+  it('takes the units off the line in place', () => {
+    const line = { itemId: 'mat_linen_cloth', count: 12 };
     const staged: InvSlot[] = [{ itemId: 'other', count: 1 }, line];
-    expect(setTradeOfferLine(staged, inventory, 'mat_linen_cloth', 12)).toBe(true);
+    expect(removeTradeOfferUnits(staged, 'mat_linen_cloth', 5)).toBe(true);
     expect(staged[1]).toBe(line);
-    expect(line.count).toBe(12);
+    expect(line.count).toBe(7);
   });
 
-  it('clamps to the summed held total', () => {
+  it('drops the whole line once nothing is left (or more was asked than staged)', () => {
     const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
-    expect(setTradeOfferLine(staged, inventory, 'mat_linen_cloth', 99)).toBe(true);
-    expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 25 }]);
-  });
-
-  it('removes the line at 0 or below and reports an unchanged line as no-op', () => {
-    const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
-    expect(setTradeOfferLine(staged, inventory, 'mat_linen_cloth', 3)).toBe(false);
-    expect(setTradeOfferLine(staged, inventory, 'mat_linen_cloth', 0)).toBe(true);
+    expect(removeTradeOfferUnits(staged, 'mat_linen_cloth', 3)).toBe(true);
     expect(staged).toEqual([]);
-    expect(setTradeOfferLine(staged, inventory, 'mat_linen_cloth', 4)).toBe(false);
+    const again: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
+    expect(removeTradeOfferUnits(again, 'mat_linen_cloth', 50)).toBe(true);
+    expect(again).toEqual([]);
+  });
+
+  it('is a no-op for a missing line or an empty count', () => {
+    const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
+    expect(removeTradeOfferUnits(staged, 'mat_wool_cloth', 1)).toBe(false);
+    expect(removeTradeOfferUnits(staged, 'mat_linen_cloth', 0)).toBe(false);
+    expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 3 }]);
   });
 });
 
-describe('resolveTradeOfferAdjust (the adjust prompt stale guard)', () => {
-  const inventory: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 20 }];
-  const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
+describe('resolveTradeOfferRemove (the remove prompt stale guard)', () => {
+  const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 12 }];
 
-  it('refuses when the line left the table or the bags no longer hold the item', () => {
-    expect(resolveTradeOfferAdjust([], inventory, 'mat_linen_cloth', 5)).toBeNull();
-    expect(resolveTradeOfferAdjust(staged, [], 'mat_linen_cloth', 5)).toBeNull();
+  it('refuses when the line left the table', () => {
+    expect(resolveTradeOfferRemove([], 'mat_linen_cloth', 5)).toBeNull();
   });
 
-  it('clamps the typed total into [1, held total]', () => {
-    expect(resolveTradeOfferAdjust(staged, inventory, 'mat_linen_cloth', 5)).toBe(5);
-    expect(resolveTradeOfferAdjust(staged, inventory, 'mat_linen_cloth', 50)).toBe(20);
-    expect(resolveTradeOfferAdjust(staged, inventory, 'mat_linen_cloth', 0)).toBe(1);
+  it('clamps the typed count into [1, the line count]', () => {
+    expect(resolveTradeOfferRemove(staged, 'mat_linen_cloth', 5)).toBe(5);
+    expect(resolveTradeOfferRemove(staged, 'mat_linen_cloth', 50)).toBe(12);
+    expect(resolveTradeOfferRemove(staged, 'mat_linen_cloth', 0)).toBe(1);
   });
 });
 

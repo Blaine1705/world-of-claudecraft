@@ -523,7 +523,10 @@ export const en: EnTranslations = {
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",
       "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
       "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",
@@ -10737,7 +10740,7 @@ export const en: EnTranslations = {
       "emptyTheirs": "Nothing offered yet",
       "money": "Money",
       "copper": "copper",
-      "hint": "Click an offered item to change or remove it. Both sides must press Accept Trade.",
+      "hint": "Click an offered item to remove some or all of it. Both sides must press Accept Trade.",
       "accept": "Accept Trade",
       "waiting": "Waiting...",
       "cancel": "Cancel"

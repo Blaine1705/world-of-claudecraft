@@ -40,9 +40,8 @@ import { dismissInstalledPrompt, installPromptDialog } from '../../prompt_dialog
 import { termsUrlFor } from '../../terms_link';
 import {
   buildTradeItemRow,
-  resolveTradeOfferAdjust,
-  setTradeOfferLine,
-  tradeOfferCeiling,
+  removeTradeOfferUnits,
+  resolveTradeOfferRemove,
   tradeRowTooltipTarget,
 } from '../../trade_view';
 import {
@@ -1238,13 +1237,14 @@ export class WocTradeController {
    *  before the shell's windows are wired. */
   private tradeWindowEl: HTMLElement | null = null;
 
-  /** A click on one of this side's offered rows: the same offer-quantity
-   *  prompt the bags open (bank_quantity_prompt.ts), in ADJUST mode. It opens
-   *  on the line's current count, caps at the summed held total, Offer sets
-   *  the line to the typed count, Offer all maxes it, and Remove takes the
-   *  line off the table. The window is the inert root; the submit re-resolves
-   *  the live line so a prompt left open across a vanished line refuses. */
-  private showOfferAdjustPrompt(itemId: string): void {
+  /** A click on one of this side's offered rows: the same quantity prompt the
+   *  bags open (bank_quantity_prompt.ts), in REMOVE mode. The number is how
+   *  many units to take off the line (capped at the line's count, with the
+   *  vault's unit and whole-stack step pairs), Remove takes that many, Remove
+   *  all takes the whole line. The window is the inert root; the submit
+   *  re-resolves the live line so a prompt left open across a vanished line
+   *  refuses. */
+  private showOfferRemovePrompt(itemId: string): void {
     const line = this.stagedTrade.items.find((s) => s.itemId === itemId);
     if (!line) return;
     const el = this.tradeWindow();
@@ -1252,10 +1252,6 @@ export class WocTradeController {
     const itemName = item ? itemDisplayName(item) : itemId;
     const stepSize = stackSizeOf(item);
     const count = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });
-    const apply = (next: number): void => {
-      const inventory = this.deps.world().inventory;
-      if (setTradeOfferLine(this.stagedTrade.items, inventory, itemId, next)) this.pushTradeOffer();
-    };
     showQuantityPrompt(
       {
         installPromptDialog: (prompt, opener, close) =>
@@ -1274,22 +1270,17 @@ export class WocTradeController {
           unitDownAriaText: t('hudChrome.bank.quantityStepDownAria', { count: count(1) }),
           unitUpAriaText: t('hudChrome.bank.quantityStepUpAria', { count: count(1) }),
         },
-        titleText: t('hudChrome.trade.offerQuantityTitle', { item: itemName }),
-        inputAriaText: t('hudChrome.trade.offerQuantityInput'),
-        confirmText: t('hudChrome.trade.offerQuantityConfirm'),
-        confirmAllText: t('hudChrome.trade.offerQuantityAll'),
-        remove: { text: t('hudChrome.trade.offerRemove'), run: () => apply(0) },
+        titleText: t('hudChrome.trade.offerRemoveTitle', { item: itemName }),
+        inputAriaText: t('hudChrome.trade.offerRemoveInput'),
+        confirmText: t('hudChrome.trade.offerRemove'),
+        confirmAllText: t('hudChrome.trade.offerRemoveAll'),
         cancelText: t('itemUi.vendor.sellQuantityCancel'),
-        maxCount: Math.max(1, tradeOfferCeiling(this.deps.world().inventory, itemId)),
-        initialCount: line.count,
+        maxCount: Math.max(1, Math.floor(line.count)),
         resolveCount: (requested) =>
-          resolveTradeOfferAdjust(
-            this.stagedTrade.items,
-            this.deps.world().inventory,
-            itemId,
-            requested,
-          ),
-        send: apply,
+          resolveTradeOfferRemove(this.stagedTrade.items, itemId, requested),
+        send: (taken) => {
+          if (removeTradeOfferUnits(this.stagedTrade.items, itemId, taken)) this.pushTradeOffer();
+        },
         afterClose: () => {
           // The push repaints the window wholesale (the opener row is gone),
           // so land on its always-present close button.
@@ -1632,7 +1623,7 @@ export class WocTradeController {
       restoreWocTradeFocus(el, keptFocusKey);
       el.querySelectorAll('.trade-item.mine').forEach((row) => {
         row.addEventListener('click', () => {
-          this.showOfferAdjustPrompt((row as HTMLElement).dataset.item ?? '');
+          this.showOfferRemovePrompt((row as HTMLElement).dataset.item ?? '');
         });
       });
       // Wire the same stat tooltip bag/vendor/bank slots use onto both offer

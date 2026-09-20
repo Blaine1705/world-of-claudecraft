@@ -15,7 +15,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "es_ES": [
     "hudChrome.trade.offerQuantityAll",
@@ -23,7 +26,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "fr_FR": [
     "hudChrome.trade.offerQuantityAll",
@@ -31,7 +37,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "fr_CA": [
     "hudChrome.trade.offerQuantityAll",
@@ -39,7 +48,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "en_CA": [],
   "it_IT": [
@@ -48,7 +60,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "de_DE": [
     "hudChrome.trade.offerQuantityAll",
@@ -56,7 +71,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -68,7 +86,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -77,7 +98,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "nl_NL": [
     "hudChrome.trade.offerQuantityAll",
@@ -85,7 +109,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "pl_PL": [
     "hudChrome.trade.offerQuantityAll",
@@ -93,7 +120,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "id_ID": [
     "hudChrome.trade.offerQuantityAll",
@@ -101,7 +131,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "tr_TR": [
     "hudChrome.trade.offerQuantityAll",
@@ -109,7 +142,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "sv_SE": [
     "hudChrome.trade.offerQuantityAll",
@@ -117,7 +153,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "vi_VN": [
     "hudChrome.trade.offerQuantityAll",
@@ -125,7 +164,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "da_DK": [
     "hudChrome.trade.offerQuantityAll",
@@ -133,6 +175,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle",
-    "hudChrome.trade.offerRemove"
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ]
 };

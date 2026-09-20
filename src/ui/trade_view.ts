@@ -69,42 +69,35 @@ export function stageTradeOffer(
   return added;
 }
 
-/** Set one staged line to exactly `count` units (the trade window's adjust
- *  prompt), clamped to the summed held total; 0 or less takes the line off
- *  the table. Mutates `staged` in place (the Hud-owned live object) and
- *  returns whether anything changed, so the caller can skip a no-op push. A
- *  line that is no longer staged is left alone (a stale prompt). */
-export function setTradeOfferLine(
-  staged: InvSlot[],
-  inventory: InvSlot[],
-  itemId: string,
-  count: number,
-): boolean {
+/** Take `count` units off one staged line (the trade window's remove
+ *  prompt); the whole line leaves the table once nothing is left. Mutates
+ *  `staged` in place (the Hud-owned live object) and returns whether anything
+ *  changed, so the caller can skip a no-op push. A line that is no longer
+ *  staged is left alone (a stale prompt). */
+export function removeTradeOfferUnits(staged: InvSlot[], itemId: string, count: number): boolean {
   const index = staged.findIndex((s) => s.itemId === itemId);
   if (index < 0) return false;
-  const next = Math.min(tradeOfferCeiling(inventory, itemId), Math.floor(count));
-  if (next < 1) {
+  const taken = Math.floor(count);
+  if (taken < 1) return false;
+  if (taken >= staged[index].count) {
     staged.splice(index, 1);
     return true;
   }
-  if (staged[index].count === next) return false;
-  staged[index].count = next;
+  staged[index].count -= taken;
   return true;
 }
 
-/** The adjust prompt's submit guard: null REFUSES when the line left the
- *  table or the bags no longer hold the item, else the requested total
- *  clamped to [1, held total]. */
-export function resolveTradeOfferAdjust(
+/** The remove prompt's submit guard: null REFUSES when the line already left
+ *  the table, else the requested count clamped to [1, the line's live count]
+ *  (so "remove 50" of a line of 12 removes the line). */
+export function resolveTradeOfferRemove(
   staged: InvSlot[],
-  inventory: InvSlot[],
   itemId: string,
   requested: number,
 ): number | null {
-  if (!staged.some((s) => s.itemId === itemId)) return null;
-  const ceiling = tradeOfferCeiling(inventory, itemId);
-  if (ceiling < 1) return null;
-  return Math.max(1, Math.min(ceiling, Math.floor(requested) || 0));
+  const line = staged.find((s) => s.itemId === itemId);
+  if (!line || line.count < 1) return null;
+  return Math.max(1, Math.min(line.count, Math.floor(requested) || 0));
 }
 
 /** Re-resolve the trade quantity prompt at submit against the LIVE headroom
