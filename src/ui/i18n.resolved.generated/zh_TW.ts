@@ -11258,6 +11258,7 @@ export const zh_TW: EnTranslations = {
       "orderDelivered": "已向 {buyer} 送交 {item} x{count}，售價 {money}。請到商人處領取 {proceeds}。",
       "orderReceived": "{seller} 向你的訂單送交了 {item} x{count}。請到商人處領取。",
       "orderWithdrawn": "已撤回 {item} 的訂單；退還 {money}。",
+      "orderExpired": "你對 {item} 的訂單已過期；{money} 正在商人處等待領取。",
       "boughtBackItem": "你以 {money} 買回了 {item}。"
     },
     "errors": {

@@ -11258,6 +11258,7 @@ export const ru_RU: EnTranslations = {
       "orderDelivered": "Вы доставили {item} x{count} для {buyer} за {money}. Заберите {proceeds} у Торговца.",
       "orderReceived": "{seller} доставил(а) {item} x{count} по вашему заказу. Заберите товар у Торговца.",
       "orderWithdrawn": "Заказ на {item} отозван; возвращено {money}.",
+      "orderExpired": "Ваш заказ на {item} истёк; {money} ждёт у Торговца.",
       "boughtBackItem": "Вы выкупили {item} за {money}."
     },
     "errors": {

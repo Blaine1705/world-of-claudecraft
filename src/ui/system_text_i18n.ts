@@ -191,6 +191,12 @@ export function localizeSystemText(text: string): string {
       item: itemDisplayNameFromSource(match[2]),
       count: localizeSimCount(match[3]),
     });
+  match = /^Your order for (.+) expired; (.+) waits at the Merchant\.$/.exec(text);
+  if (match)
+    return t('itemUi.logs.orderExpired', {
+      item: itemDisplayNameFromSource(match[1]),
+      money: localizeSimMoney(match[2]),
+    });
   match = /^Withdrew your order for (.+); (.+) returned\.$/.exec(text);
   if (match)
     return t('itemUi.logs.orderWithdrawn', {

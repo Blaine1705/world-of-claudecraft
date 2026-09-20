@@ -11258,6 +11258,7 @@ export const ja_JP: EnTranslations = {
       "orderDelivered": "{item} x{count} を {buyer} に {money} で納品しました。商人から {proceeds} を受け取ってください。",
       "orderReceived": "{seller} があなたの注文に {item} x{count} を納品しました。商人から受け取ってください。",
       "orderWithdrawn": "{item} の注文を取り下げました。{money} が返金されました。",
+      "orderExpired": "{item} の注文が期限切れになりました。{money} が商人のもとで待機しています。",
       "boughtBackItem": "{item}を{money}で買い戻しました。"
     },
     "errors": {

@@ -3502,6 +3502,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{item} x{count}을(를) {buyer} 님에게 {money}에 납품했습니다. 상인에게서 {proceeds}을(를) 수령하세요.',
   'itemUi.logs.orderReceived':
     '{seller} 님이 내 주문에 {item} x{count}을(를) 납품했습니다. 상인에게서 수령하세요.',
+  'itemUi.logs.orderExpired':
+    '{item} 주문이 만료되었습니다. {money}이(가) 상인에게 보관되어 있습니다.',
   'itemUi.logs.orderWithdrawn': '{item} 주문을 철회했습니다. {money}이(가) 반환되었습니다.',
   'itemUi.errors.orderCountNeeded': '원하는 수량을 입력하세요.',
   'itemUi.errors.tooManyOrders': '주문은 한 번에 최대 {count}개까지 열어 둘 수 있습니다.',

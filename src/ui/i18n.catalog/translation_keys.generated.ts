@@ -12965,6 +12965,7 @@ export type TranslationKeyFlat =
   | 'itemUi.logs.expiredListing'
   | 'itemUi.logs.listedItem'
   | 'itemUi.logs.orderDelivered'
+  | 'itemUi.logs.orderExpired'
   | 'itemUi.logs.orderPlaced'
   | 'itemUi.logs.orderReceived'
   | 'itemUi.logs.orderWithdrawn'

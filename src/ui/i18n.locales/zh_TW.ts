@@ -3377,6 +3377,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.logs.orderDelivered':
     '已向 {buyer} 送交 {item} x{count}，售價 {money}。請到商人處領取 {proceeds}。',
   'itemUi.logs.orderReceived': '{seller} 向你的訂單送交了 {item} x{count}。請到商人處領取。',
+  'itemUi.logs.orderExpired': '你對 {item} 的訂單已過期；{money} 正在商人處等待領取。',
   'itemUi.logs.orderWithdrawn': '已撤回 {item} 的訂單；退還 {money}。',
   'itemUi.errors.orderCountNeeded': '請填寫需求數量。',
   'itemUi.errors.tooManyOrders': '最多只能同時開啟 {count} 個訂單。',

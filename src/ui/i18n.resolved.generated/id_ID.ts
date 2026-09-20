@@ -11258,6 +11258,7 @@ export const id_ID: EnTranslations = {
       "orderDelivered": "Delivered {item} x{count} to {buyer} for {money}. Collect {proceeds} from the Merchant.",
       "orderReceived": "{seller} delivered {item} x{count} to your order. Collect it from the Merchant.",
       "orderWithdrawn": "Withdrew your order for {item}; {money} returned.",
+      "orderExpired": "Your order for {item} expired; {money} waits at the Merchant.",
       "boughtBackItem": "Membeli kembali {item} seharga {money}."
     },
     "errors": {

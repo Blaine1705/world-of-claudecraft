@@ -54,6 +54,21 @@ export class MarketOrdersPanel {
   private stagedItemId: string | null = null;
   private card: HTMLElement | null = null;
   private lastCardSig = '';
+  // The card's live refs, resolved ONCE when the card is minted (never
+  // querySelector'd from the per-poll refresh path).
+  private refs: {
+    search: HTMLInputElement;
+    matches: HTMLElement;
+    qty: HTMLInputElement;
+    g: HTMLInputElement;
+    s: HTMLInputElement;
+    c: HTMLInputElement;
+    pick: HTMLElement;
+    total: HTMLElement;
+    go: HTMLButtonElement;
+  } | null = null;
+  /** The item id the pick's tooltip is currently attached for (attach once). */
+  private tooltipFor: string | null = null;
 
   constructor(private readonly deps: MarketOrdersPanelDeps) {}
 
@@ -61,6 +76,8 @@ export class MarketOrdersPanel {
   reset(): void {
     this.stagedItemId = null;
     this.card = null;
+    this.refs = null;
+    this.tooltipFor = null;
     this.lastCardSig = '';
   }
 
@@ -68,7 +85,7 @@ export class MarketOrdersPanel {
   stage(itemId: string): void {
     this.stagedItemId = itemId;
     this.syncCard();
-    this.card?.querySelector<HTMLInputElement>('#mkt-order-qty')?.focus();
+    this.refs?.qty.focus();
   }
 
   /** Build the whole tab into `body` (the window's renderContent for this tab). */
@@ -77,6 +94,13 @@ export class MarketOrdersPanel {
     const info = world.marketInfo;
     if (!info) return;
     const view = buildMarketOrders(info, (id) => this.deps.fungibleBagCount(id));
+    // A full mount re-labels the card (a language switch repaints through here)
+    // and re-attaches it, so the memo is dropped and a focused field inside the
+    // card is put back after the rebuild (the Sell tab's typed-input rule).
+    const active = document.activeElement;
+    const focusedId = active instanceof HTMLElement && this.card?.contains(active) ? active.id : '';
+    this.relabelCard();
+    this.lastCardSig = '';
     body.innerHTML = `<div class="mkt-note">${esc(
       t('itemUi.market.ordersNote', {
         cut: count0(view.cutPct),
@@ -96,6 +120,38 @@ export class MarketOrdersPanel {
     for (const row of view.rows) list.appendChild(this.buildRow(row));
     body.appendChild(list);
     body.appendChild(this.buildUnlisted(view.unlisted));
+    if (focusedId) this.card?.querySelector<HTMLElement>(`#${focusedId}`)?.focus();
+  }
+
+  /** Re-apply every t() label on an existing card (the language fan-out). */
+  private relabelCard(): void {
+    const card = this.card;
+    const r = this.refs;
+    if (!card || !r) return;
+    card.setAttribute('aria-label', t('itemUi.market.orderCardTitle'));
+    const head = card.querySelector('.mkt-order-head');
+    if (head) head.textContent = t('itemUi.market.orderCardTitle');
+    const pickLabel = card.querySelector('label[for="mkt-order-search"]');
+    if (pickLabel) pickLabel.textContent = t('itemUi.market.orderPickLabel');
+    r.search.placeholder = t('itemUi.market.orderSearchPlaceholder');
+    r.search.setAttribute('aria-label', t('itemUi.market.orderSearchAria'));
+    r.matches.setAttribute('aria-label', t('itemUi.market.orderSearchAria'));
+    const qtyLabel = card.querySelector('label[for="mkt-order-qty"]');
+    if (qtyLabel) qtyLabel.textContent = t('itemUi.market.orderQuantity');
+    const priceLabel = card.querySelector('[data-order-price-label]');
+    if (priceLabel) priceLabel.textContent = t('itemUi.market.orderPriceEach');
+    r.g.setAttribute('aria-label', t('itemUi.money.gold'));
+    r.s.setAttribute('aria-label', t('itemUi.money.silver'));
+    r.c.setAttribute('aria-label', t('itemUi.money.copper'));
+    const tagText = [
+      t('itemUi.money.goldShort'),
+      t('itemUi.money.silverShort'),
+      t('itemUi.money.copperShort'),
+    ];
+    card.querySelectorAll('.mkt-coin-tag').forEach((el, i) => {
+      el.textContent = tagText[i] ?? '';
+    });
+    r.go.textContent = t('itemUi.market.orderPlaceButton');
   }
 
   /** Per-frame: the card's stage-dependent lines (purse-driven affordability). */
@@ -117,28 +173,45 @@ export class MarketOrdersPanel {
       `<div class="mkt-order-matches" role="listbox" aria-label="${esc(t('itemUi.market.orderSearchAria'))}"></div>` +
       `<div class="mkt-price-row"><label for="mkt-order-qty">${esc(t('itemUi.market.orderQuantity'))}</label>` +
       `<input class="coininput ui-input" id="mkt-order-qty" type="number" min="1" max="${MARKET_ORDER_MAX_UNITS}" inputmode="numeric" value="1"></div>` +
-      `<div class="mkt-price-row"><label>${esc(t('itemUi.market.orderPriceEach'))}</label>` +
+      `<div class="mkt-price-row"><label data-order-price-label>${esc(t('itemUi.market.orderPriceEach'))}</label>` +
       `<input class="coininput ui-input" id="mkt-order-g" type="number" min="0" value="0" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>` +
       `<input class="coininput ui-input" id="mkt-order-s" type="number" min="0" max="99" value="0" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>` +
       `<input class="coininput ui-input" id="mkt-order-c" type="number" min="0" max="99" value="0" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span></div>` +
       `<div class="mkt-order-total" role="status" aria-live="polite"></div>` +
       `<button type="button" class="mkt-order-go ui-btn ui-btn--gold" disabled>${esc(t('itemUi.market.orderPlaceButton'))}</button>`;
-    const search = card.querySelector<HTMLInputElement>('#mkt-order-search');
-    search?.addEventListener('input', () => this.paintMatches(card, search.value));
-    for (const id of ['#mkt-order-qty', '#mkt-order-g', '#mkt-order-s', '#mkt-order-c']) {
-      card.querySelector<HTMLInputElement>(id)?.addEventListener('input', () => this.syncCard());
+    const q = <T extends Element>(sel: string): T => {
+      const el = card.querySelector<T>(sel);
+      if (!el) throw new Error(`market orders card: missing ${sel}`);
+      return el;
+    };
+    const refs = {
+      search: q<HTMLInputElement>('#mkt-order-search'),
+      matches: q<HTMLElement>('.mkt-order-matches'),
+      qty: q<HTMLInputElement>('#mkt-order-qty'),
+      g: q<HTMLInputElement>('#mkt-order-g'),
+      s: q<HTMLInputElement>('#mkt-order-s'),
+      c: q<HTMLInputElement>('#mkt-order-c'),
+      pick: q<HTMLElement>('[data-order-pick]'),
+      total: q<HTMLElement>('.mkt-order-total'),
+      go: q<HTMLButtonElement>('.mkt-order-go'),
+    };
+    refs.search.addEventListener('input', () => this.paintMatches(refs.search.value));
+    for (const input of [refs.qty, refs.g, refs.s, refs.c]) {
+      input.addEventListener('input', () => this.syncCard());
     }
-    card.querySelector('.mkt-order-go')?.addEventListener('click', () => {
+    refs.go.addEventListener('click', () => {
       audio.click();
       this.promptPlace();
     });
     this.card = card;
+    this.refs = refs;
     return card;
   }
 
-  private paintMatches(card: HTMLElement, query: string): void {
-    const box = card.querySelector<HTMLElement>('.mkt-order-matches');
-    if (!box) return;
+  private paintMatches(query: string): void {
+    const r = this.refs;
+    if (!r) return;
+    const box = r.matches;
     box.innerHTML = '';
     const matches = orderableMatches(query, itemDisplayName);
     if (query.trim() !== '' && matches.length === 0) {
@@ -150,13 +223,13 @@ export class MarketOrdersPanel {
       btn.type = 'button';
       btn.className = 'mkt-order-match ui-btn';
       btn.setAttribute('role', 'option');
+      btn.setAttribute('aria-selected', 'false');
       const parts = wornItemCellParts(item, undefined);
       btn.innerHTML = `${this.deps.itemIcon(item, parts.quality)}<span style="color:${marketNameColor(parts.quality)}">${esc(parts.name)}</span>`;
       btn.addEventListener('click', () => {
         audio.click();
         box.innerHTML = '';
-        const search = card.querySelector<HTMLInputElement>('#mkt-order-search');
-        if (search) search.value = '';
+        r.search.value = '';
         this.stage(item.id);
       });
       box.appendChild(btn);
@@ -164,25 +237,20 @@ export class MarketOrdersPanel {
   }
 
   private readStage(): MarketOrderStage {
-    const card = this.card;
-    const num = (id: string, fallback: number) => {
-      const v = parseInt(card?.querySelector<HTMLInputElement>(id)?.value ?? '', 10);
-      return Number.isFinite(v) ? Math.max(0, v) : fallback;
+    const r = this.refs;
+    const num = (input: HTMLInputElement | undefined) => {
+      const v = parseInt(input?.value ?? '', 10);
+      return Number.isFinite(v) ? Math.max(0, v) : 0;
     };
-    const count = orderCountFromInput(
-      card?.querySelector<HTMLInputElement>('#mkt-order-qty')?.value ?? '1',
-    );
-    const unitPrice =
-      num('#mkt-order-g', 0) * COPPER_PER_GOLD +
-      num('#mkt-order-s', 0) * COPPER_PER_SILVER +
-      num('#mkt-order-c', 0);
+    const count = orderCountFromInput(r?.qty.value ?? '1');
+    const unitPrice = num(r?.g) * COPPER_PER_GOLD + num(r?.s) * COPPER_PER_SILVER + num(r?.c);
     return { itemId: this.stagedItemId, count, unitPrice };
   }
 
   /** Patch the staged-item pick, the total line, and the button's state. */
   private syncCard(): void {
-    const card = this.card;
-    if (!card) return;
+    const r = this.refs;
+    if (!r) return;
     const world = this.deps.world();
     const info = world.marketInfo;
     const stage = this.readStage();
@@ -192,25 +260,31 @@ export class MarketOrdersPanel {
       info?.myOrderCount ?? 0,
       info?.maxOrders ?? 0,
     );
-    const sig = JSON.stringify([stage, problem]);
+    // A primitive signature (no per-poll allocation beyond the key string).
+    const sig = `${stage.itemId ?? ''}|${stage.count}|${stage.unitPrice}|${problem}`;
     if (sig === this.lastCardSig) return;
     this.lastCardSig = sig;
-    const pick = card.querySelector<HTMLElement>('[data-order-pick]');
-    if (pick) {
-      const item = stage.itemId ? orderableItemById(stage.itemId) : null;
-      if (item) {
-        const parts = wornItemCellParts(item, undefined);
-        pick.className = 'mkt-order-pick mkt-sell-pick ui-card';
-        pick.innerHTML = `${this.deps.itemIcon(item, parts.quality)}<span class="ps-name" style="color:${marketNameColor(parts.quality)}">${esc(parts.name)}</span>`;
-        this.deps.attachTooltip(pick, () => this.deps.itemTooltip(item));
-      } else {
-        pick.className = 'mkt-order-pick mkt-sell-pick ui-card empty';
-        pick.textContent = t('itemUi.market.orderPickEmpty');
+    const pick = r.pick;
+    const item = stage.itemId ? orderableItemById(stage.itemId) : null;
+    if (item) {
+      const parts = wornItemCellParts(item, undefined);
+      pick.className = 'mkt-order-pick mkt-sell-pick ui-card';
+      pick.innerHTML = `${this.deps.itemIcon(item, parts.quality)}<span class="ps-name" style="color:${marketNameColor(parts.quality)}">${esc(parts.name)}</span>`;
+      // Attached ONCE per staged item: attachTooltip adds listeners with no
+      // dedupe, and the sig moves on every keystroke in the coin fields.
+      if (this.tooltipFor !== item.id) {
+        this.tooltipFor = item.id;
+        this.deps.attachTooltip(pick, () => {
+          const live = this.stagedItemId ? orderableItemById(this.stagedItemId) : null;
+          return live ? this.deps.itemTooltip(live) : '';
+        });
       }
+    } else {
+      pick.className = 'mkt-order-pick mkt-sell-pick ui-card empty';
+      pick.textContent = t('itemUi.market.orderPickEmpty');
     }
-    const total = card.querySelector<HTMLElement>('.mkt-order-total');
-    const go = card.querySelector<HTMLButtonElement>('.mkt-order-go');
-    if (!total || !go) return;
+    const total = r.total;
+    const go = r.go;
     if (problem === 'no-item') total.textContent = '';
     else if (problem === 'at-cap') total.textContent = t('itemUi.market.orderAtCap');
     else if (problem === 'bad-price') total.textContent = t('itemUi.market.minPriceError');
@@ -285,7 +359,14 @@ export class MarketOrdersPanel {
         t('itemUi.market.orderDeliverAria', { item: name, buyer: row.buyerName }),
       );
       btn.disabled = row.deliverable < 1;
-      if (btn.disabled) btn.title = t('itemUi.market.orderDeliverNone');
+      if (btn.disabled) {
+        // The reason rides the accessible name (a title on a disabled button
+        // is neither announced nor reachable by keyboard or touch).
+        btn.setAttribute(
+          'aria-label',
+          `${t('itemUi.market.orderDeliverAria', { item: name, buyer: row.buyerName })}. ${t('itemUi.market.orderDeliverNone')}`,
+        );
+      }
       btn.addEventListener('click', () => {
         audio.click();
         this.promptDeliver(row, name);

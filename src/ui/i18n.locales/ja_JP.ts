@@ -3530,6 +3530,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{item} x{count} を {buyer} に {money} で納品しました。商人から {proceeds} を受け取ってください。',
   'itemUi.logs.orderReceived':
     '{seller} があなたの注文に {item} x{count} を納品しました。商人から受け取ってください。',
+  'itemUi.logs.orderExpired':
+    '{item} の注文が期限切れになりました。{money} が商人のもとで待機しています。',
   'itemUi.logs.orderWithdrawn': '{item} の注文を取り下げました。{money} が返金されました。',
   'itemUi.errors.orderCountNeeded': '希望数を入力してください。',
   'itemUi.errors.tooManyOrders': '同時に出せる注文は {count} 件までです。',

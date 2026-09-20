@@ -5,9 +5,14 @@
 // round trip, and the rename / delete follow-through. The planner's own walk is
 // pinned in tests/market_orders_plan.test.ts.
 import { describe, expect, it } from 'vitest';
+import { bagPools, canGrantCopies } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import { MARKET_CUT } from '../src/sim/market';
-import { MARKET_MAX_ORDERS, MARKET_ORDER_MAX_UNITS } from '../src/sim/market_orders';
+import {
+  MARKET_MAX_ORDERS,
+  MARKET_ORDER_DURATION,
+  MARKET_ORDER_MAX_UNITS,
+} from '../src/sim/market_orders';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -344,7 +349,24 @@ describe('the readout', () => {
     ]);
     expect(i.myOrderCount).toBe(0);
     expect(i.unlistedMaterials).toContain(ORE);
-    expect(info(sim, a).orders.filter((o) => o.mine)).toHaveLength(2);
+    // The viewer's own rows come FIRST (positionally, not just by count).
+    expect(info(sim, a).orders.map((o) => o.mine)).toEqual([true, true, false]);
+    expect(MARKET_MAX_ORDERS).toBe(6);
+  });
+
+  it('caps the wire at MARKET_ORDER_WIRE_LIMIT rows with own rows kept', () => {
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < 12; i++) pids.push(player(sim, `B${i}`, 'mage', 100_000));
+    // 12 buyers x 6 orders = 72 open rows, past the 60-row wire cap.
+    for (const pid of pids) {
+      for (let k = 0; k < MARKET_MAX_ORDERS; k++) sim.marketOrderPlace(ORE, 1, 2 + k, pid);
+    }
+    expect(sim.marketOrders).toHaveLength(72);
+    const last = pids[pids.length - 1];
+    const rows = info(sim, last).orders;
+    expect(rows).toHaveLength(60);
+    expect(rows.slice(0, MARKET_MAX_ORDERS).every((o) => o.mine)).toBe(true);
   });
 
   it('drops a material from the unlisted strip once it is listed, and restores it when the listing goes', () => {
@@ -392,15 +414,62 @@ describe('persistence and identity', () => {
     sim.marketOrderCancel(1, buyer);
     const save = sim.serializeMarket();
     expect(save.orders).toEqual([
-      { id: 2, buyerKey: String(buyer), buyerName: 'Buyer', itemId: FANG, count: 1, unitPrice: 7 },
+      {
+        id: 2,
+        buyerKey: String(buyer),
+        buyerName: 'Buyer',
+        itemId: FANG,
+        count: 1,
+        unitPrice: 7,
+        secondsLeft: MARKET_ORDER_DURATION,
+      },
     ]);
     expect(save.nextOrderId).toBe(3);
     const fresh = makeWorld();
     fresh.loadMarket(JSON.parse(JSON.stringify(save)));
-    expect(fresh.marketOrders).toEqual(save.orders);
+    expect(fresh.marketOrders.map(({ expiresAt: _e, ...o }) => o)).toEqual(
+      save.orders?.map(({ secondsLeft: _s, ...o }) => o),
+    );
+    expect(fresh.marketOrders[0].expiresAt).toBe(fresh.time + MARKET_ORDER_DURATION);
     const again = player(fresh, 'Again', 'mage', 1_000);
     fresh.marketOrderPlace(ORE, 1, 1, again);
     expect(fresh.marketOrders.map((o) => o.id)).toEqual([2, 3]);
+    // An emptied board still carries the counter, so ids are never reissued.
+    fresh.marketOrderCancel(2, buyer);
+    fresh.marketOrderCancel(3, again);
+    const empty = fresh.serializeMarket();
+    expect('orders' in empty).toBe(false);
+    expect(empty.nextOrderId).toBe(4);
+    const later = makeWorld();
+    later.loadMarket(JSON.parse(JSON.stringify(empty)));
+    const c = player(later, 'C', 'mage', 1_000);
+    later.marketOrderPlace(ORE, 1, 1, c);
+    expect(later.marketOrders[0].id).toBe(4);
+    // A saved counter above the max id wins over max id + 1.
+    const high = makeWorld();
+    high.loadMarket({ ...save, nextOrderId: 50 });
+    const d = player(high, 'D', 'mage', 1_000);
+    high.marketOrderPlace(ORE, 1, 1, d);
+    expect(high.marketOrders.at(-1)?.id).toBe(50);
+  });
+
+  it('expires an order after MARKET_ORDER_DURATION and refunds the escrow to the collection', () => {
+    const sim = makeWorld();
+    const buyer = player(sim, 'Buyer', 'mage', 1_000);
+    sim.marketOrderPlace(ORE, 4, 25, buyer);
+    expect(playerOf(sim, buyer).copper).toBe(900);
+    sim.marketOrders[0].expiresAt = sim.time - 1;
+    const ticked: string[] = [];
+    for (let i = 0; i < 20; i++) {
+      // The once-a-second sweep; tick() hands back the frame's events.
+      for (const e of sim.tick()) if (e.type === 'log') ticked.push(e.text);
+    }
+    expect(sim.marketOrders).toHaveLength(0);
+    expect(playerOf(sim, buyer).copper).toBe(900);
+    expect(info(sim, buyer).collectionCopper).toBe(100);
+    expect(ticked.some((t) => t.startsWith('Your order for'))).toBe(true);
+    sim.marketCollect(buyer);
+    expect(playerOf(sim, buyer).copper).toBe(1_000);
   });
 
   it('loads a pre-order save and a malformed board defensively', () => {
@@ -419,13 +488,23 @@ describe('persistence and identity', () => {
         { id: 6, buyerKey: 'k', buyerName: 'K', itemId: 'no_such_item', count: 1, unitPrice: 3 },
         // biome-ignore lint/suspicious/noExplicitAny: a hand-mangled blob row
         { id: 7 } as any,
+        { id: 8, buyerKey: 'k', buyerName: 'K', itemId: ORE, count: 1, unitPrice: 0 },
+        { id: 9, buyerKey: '', buyerName: 'Nobody', itemId: ORE, count: 1, unitPrice: 3 },
+        // biome-ignore lint/suspicious/noExplicitAny: an id-less row
+        { buyerKey: 'k', buyerName: 'K', itemId: ORE, count: 1, unitPrice: 3 } as any,
+        // Out-of-band price and count are clamped, never trusted (no minting).
+        { id: 10, buyerKey: 'k', buyerName: 'K', itemId: ORE, count: 9_999, unitPrice: 1e12 },
       ],
       nextOrderId: 2,
     });
-    expect(dirty.marketOrders.map((o) => o.id)).toEqual([4, 6]);
+    expect(dirty.marketOrders.map((o) => o.id)).toEqual([4, 6, 10]);
+    expect(dirty.marketOrders[2]).toMatchObject({
+      count: MARKET_ORDER_MAX_UNITS,
+      unitPrice: 5_000_000,
+    });
     const b = player(dirty, 'B', 'mage', 100);
     dirty.marketOrderPlace(ORE, 1, 1, b);
-    expect(dirty.marketOrders.at(-1)?.id).toBe(7);
+    expect(dirty.marketOrders.at(-1)?.id).toBe(11);
   });
 
   it('follows a rename and leaves with a deleted character', () => {
@@ -436,6 +515,68 @@ describe('persistence and identity', () => {
     sim.marketOrderPlace(ORE, 1, 5, pid);
     expect(sim.rekeyMarketSeller(77, 'Old', 'New')).toBe(true);
     expect(sim.marketOrders[0]).toMatchObject({ buyerKey: '77', buyerName: 'New' });
+    expect(sim.purgeMarketSeller(77, 'New')).toBe(true);
+    expect(sim.marketOrders).toHaveLength(0);
+  });
+});
+
+describe('edges the reviewers asked for', () => {
+  it('takes fill rows only while they fit in the bags and escrows the rest', () => {
+    const sim = makeWorld();
+    const seller = player(sim, 'Seller', 'mage');
+    sim.addItem(ORE, 40, seller);
+    sim.marketList(ORE, 20, 20, seller);
+    sim.marketList(ORE, 20, 40, seller);
+    const buyer = player(sim, 'Buyer', 'mage', 10_000);
+    // Fill the bags with singles of another item until only ONE of the two
+    // 20-stacks fits (the pools are opaque, so ask the fit gate, not a count).
+    const meta = playerOf(sim, buyer);
+    const pools = bagPools(meta.bags);
+    let guard = 0;
+    while (canGrantCopies(meta.inventory, pools, ORE, 40) && guard++ < 400) {
+      meta.inventory.push({ itemId: FANG, count: 1 });
+    }
+    expect(canGrantCopies(meta.inventory, pools, ORE, 20)).toBe(true);
+    const settled = sim.marketOrderPlace(ORE, 40, 2, buyer);
+    expect(settled).toHaveLength(1);
+    expect(sim.marketOrders).toHaveLength(1);
+    expect(sim.marketOrders[0].count).toBe(20);
+    expect(meta.copper).toBe(10_000 - 20 - 20 * 2);
+  });
+
+  it('refuses a dead caller on place and fill, and a noMarketList item', () => {
+    const sim = makeWorld();
+    const buyer = player(sim, 'Buyer', 'mage', 1_000);
+    sim.marketOrderPlace(ORE, 1, 5, buyer);
+    const dead = player(sim, 'Dead', 'mage', 1_000);
+    sim.addItem(ORE, 1, dead);
+    entityOf(sim, dead).dead = true;
+    sim.marketOrderPlace(ORE, 1, 5, dead);
+    expect(sim.marketOrderFill(sim.marketOrders[0].id, 1, dead)).toEqual({ units: 0, copper: 0 });
+    expect(sim.marketOrders).toHaveLength(1);
+    expect(playerOf(sim, dead).copper).toBe(1_000);
+    const locked = Object.values(ITEMS).find(
+      (d) => d.noMarketList && !d.soulbound && d.kind !== 'quest',
+    );
+    if (locked) {
+      sim.marketOrderPlace(locked.id, 1, 5, buyer);
+      expect(errors(sim).at(-1)).toBe('That item cannot be listed on the World Market.');
+    }
+  });
+
+  it('migrates a legacy name-keyed order on rename and purges it on delete', () => {
+    const sim = makeWorld();
+    sim.loadMarket({
+      listings: [],
+      collections: [],
+      nextListingId: 1000,
+      orders: [{ id: 1, buyerKey: 'Old', buyerName: 'Old', itemId: ORE, count: 1, unitPrice: 3 }],
+      nextOrderId: 2,
+    });
+    expect(sim.rekeyMarketSeller(77, 'Old', 'New')).toBe(true);
+    expect(sim.marketOrders[0]).toMatchObject({ buyerKey: '77', buyerName: 'New' });
+    expect(sim.rekeyMarketSeller(77, 'Old', 'New')).toBe(false);
+    expect(sim.purgeMarketSeller(78, 'Other')).toBe(false);
     expect(sim.purgeMarketSeller(77, 'New')).toBe(true);
     expect(sim.marketOrders).toHaveLength(0);
   });

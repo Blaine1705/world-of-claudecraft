@@ -3375,6 +3375,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.logs.orderDelivered':
     '已向 {buyer} 送交 {item} x{count}，售价 {money}。请到商人处领取 {proceeds}。',
   'itemUi.logs.orderReceived': '{seller} 向你的订单送交了 {item} x{count}。请到商人处领取。',
+  'itemUi.logs.orderExpired': '你对 {item} 的订单已过期；{money} 正在商人处等待领取。',
   'itemUi.logs.orderWithdrawn': '已撤回 {item} 的订单；退还 {money}。',
   'itemUi.errors.orderCountNeeded': '请填写需求数量。',
   'itemUi.errors.tooManyOrders': '最多只能同时开启 {count} 个订单。',

@@ -1071,7 +1071,7 @@ const MONOLITHS: MonolithRow[] = [
     // cast-scoped marker, naturesBoonPower, would otherwise have grown this
     // file); sim.ts keeps the type import and the barrel re-export. Exact
     // count, zero slack.
-    ceiling: 11792,
+    ceiling: 11782,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

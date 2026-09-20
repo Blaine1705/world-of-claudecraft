@@ -3552,6 +3552,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.logs.orderPlaced': 'Размещён заказ на {item} x{count} по {each} за штуку.',
   'itemUi.logs.orderDelivered': 'Вы доставили {item} x{count} для {buyer} за {money}. Заберите {proceeds} у Торговца.',
   'itemUi.logs.orderReceived': '{seller} доставил(а) {item} x{count} по вашему заказу. Заберите товар у Торговца.',
+  'itemUi.logs.orderExpired': 'Ваш заказ на {item} истёк; {money} ждёт у Торговца.',
   'itemUi.logs.orderWithdrawn': 'Заказ на {item} отозван; возвращено {money}.',
   'itemUi.errors.orderCountNeeded': 'Укажите, сколько вам нужно.',
   'itemUi.errors.tooManyOrders': 'Одновременно можно держать не более {count} заказов.',

@@ -11258,6 +11258,7 @@ export const en_XA: EnTranslations = {
       "orderDelivered": "[Ðéļíʋéŕéð {item} ẋ{count} ţó {buyer} ƒóŕ {money}. Çóļļéçţ {proceeds} ƒŕóɱ ţĥé Ɱéŕçĥáñţ.]",
       "orderReceived": "[{seller} ðéļíʋéŕéð {item} ẋ{count} ţó ýóúŕ óŕðéŕ. Çóļļéçţ íţ ƒŕóɱ ţĥé Ɱéŕçĥáñţ.]",
       "orderWithdrawn": "[Ŵíţĥðŕéŵ ýóúŕ óŕðéŕ ƒóŕ {item}; {money} ŕéţúŕñéð.]",
+      "orderExpired": "[Ýóúŕ óŕðéŕ ƒóŕ {item} éẋþíŕéð; {money} ŵáíţš áţ ţĥé Ɱéŕçĥáñţ.]",
       "boughtBackItem": "[Ɓóúĝĥţ ƀáçķ {item} ƒóŕ {money}.]"
     },
     "errors": {

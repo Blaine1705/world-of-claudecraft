@@ -433,6 +433,7 @@ const itemStringsEn = {
       orderReceived:
         '{seller} delivered {item} x{count} to your order. Collect it from the Merchant.',
       orderWithdrawn: 'Withdrew your order for {item}; {money} returned.',
+      orderExpired: 'Your order for {item} expired; {money} waits at the Merchant.',
     },
     errors: {
       notSoldHere: 'That item is not sold here.',

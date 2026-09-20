@@ -11258,6 +11258,7 @@ export const ko_KR: EnTranslations = {
       "orderDelivered": "{item} x{count}을(를) {buyer} 님에게 {money}에 납품했습니다. 상인에게서 {proceeds}을(를) 수령하세요.",
       "orderReceived": "{seller} 님이 내 주문에 {item} x{count}을(를) 납품했습니다. 상인에게서 수령하세요.",
       "orderWithdrawn": "{item} 주문을 철회했습니다. {money}이(가) 반환되었습니다.",
+      "orderExpired": "{item} 주문이 만료되었습니다. {money}이(가) 상인에게 보관되어 있습니다.",
       "boughtBackItem": "{item}을(를) {money}에 되샀습니다."
     },
     "errors": {

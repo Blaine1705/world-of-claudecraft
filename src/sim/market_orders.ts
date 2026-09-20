@@ -24,8 +24,11 @@
 //     the buyer is usually offline or away, and the collection already has the
 //     capacity-gated pickup path. The deliverer's proceeds (less the Merchant's
 //     cut) wait in their own collection exactly like a listing sale.
-//   - Orders never expire. The escrow is the buyer's own gold, parked by choice;
-//     a cancel at the Merchant returns the unfilled remainder to the purse at once.
+//   - Orders expire after MARKET_ORDER_DURATION (the listing rule, longer): the
+//     unfilled escrow returns to the buyer's COLLECTION (they are usually away),
+//     so the board is bounded in realm age rather than growing with every
+//     character that ever posted and stopped playing. A cancel at the Merchant
+//     returns the unfilled remainder to the purse at once.
 //   - The Merchant's house stock never fills an order (it pays no one and never
 //     depletes, so it is not a market), the same reason it is not swept.
 //
@@ -47,6 +50,10 @@ import type { Entity, InvSlot, ItemDef } from './types';
 export const MARKET_MAX_ORDERS = 6;
 /** The most units one order may ask for; shares the sweep's fat-finger cap. */
 export const MARKET_ORDER_MAX_UNITS = MARKET_SWEEP_MAX_UNITS;
+/** Sim-seconds an unfilled order stays open before its escrow returns to the
+ *  buyer's collection: a week, longer than a listing's two days because a
+ *  standing bid is the demand signal the board exists to show. */
+export const MARKET_ORDER_DURATION = 7 * 24 * 3600;
 /** Most order rows shipped to one viewer per snapshot (the MARKET_WIRE_LIMIT idea). */
 export const MARKET_ORDER_WIRE_LIMIT = 60;
 /** Most unlisted-material ids shipped per snapshot. The registry is about a
@@ -62,6 +69,7 @@ export interface MarketOrder {
   itemId: string;
   count: number; // units still wanted; the row leaves the board at 0
   unitPrice: number; // copper per unit; count * unitPrice is the escrow still held
+  expiresAt: number; // sim time; the sweep refunds the escrow past it
 }
 
 /** The additive MarketSave shape: absent on every pre-order blob. */
@@ -72,6 +80,9 @@ export interface MarketOrderSaveRow {
   itemId: string;
   count: number;
   unitPrice: number;
+  /** Stored instead of an absolute time: sim.time resets to 0 on every boot
+   *  (the MarketSave listing precedent). */
+  secondsLeft?: number;
 }
 
 export interface MarketOrderFillPlan {
@@ -178,8 +189,9 @@ export interface MarketOrderHost {
   bumpBook(): void;
   /** The item's per-unit-sorted, plain, non-house sweep candidates (memoized). */
   candidatesFor(itemId: string): readonly MarketListing[];
-  /** Settle one listing into `meta`'s bags: coin out, goods in, seller paid. */
-  settleListing(listing: MarketListing, def: ItemDef, meta: PlayerMeta): void;
+  /** Settle one listing into `meta`'s bags: coin out, goods in, seller paid.
+   *  False when the row is no longer on the book (nothing changed hands). */
+  settleListing(listing: MarketListing, def: ItemDef, meta: PlayerMeta): boolean;
   /** How many provenance buckets escrowing `want` plain units would produce. */
   previewPlainBucketCount(meta: PlayerMeta, itemId: string, want: number): number;
   /** Escrow `want` plain units out of `meta`'s bags into provenance buckets. */
@@ -192,8 +204,16 @@ export interface MarketOrderHost {
 export class MarketOrderBook {
   orders: MarketOrder[] = [];
   private nextOrderId = 1;
-  private unlistedCache: { rev: number; source: readonly MarketListing[]; ids: string[] } | null =
-    null;
+  private unlistedCache: {
+    rev: number;
+    source: readonly MarketListing[];
+    length: number;
+    ids: string[];
+  } | null = null;
+  // The board in wire order (item name, best bid, id), memoized per book
+  // revision the way market.ts memoizes sortedBook(): the ICU localeCompare
+  // sort is viewer-independent, so per-viewer reads only partition it.
+  private sortedCache: { rev: number; length: number; rows: MarketOrder[] } | null = null;
 
   constructor(private readonly host: MarketOrderHost) {}
 
@@ -258,11 +278,10 @@ export class MarketOrderBook {
     }
     // Immediate fill against the live book. Plan on the memoized candidates,
     // then settle by id (each settlement splices the book and invalidates the
-    // memo, so the plan is captured before the first one). Every planned row is
-    // a plain stack of one item, so they all merge and a bag-full refusal on a
-    // later row cannot happen once the summed check passes; rather than refuse
-    // the whole order over bag space, the fill takes rows while they fit and
-    // the rest of the ask simply stays open.
+    // memo, so the plan is captured before the first one). Each row is checked
+    // against the bags as they stand after the previous settlement; rather
+    // than refuse the whole order over bag space, the fill takes rows while
+    // they fit and the rest of the ask simply stays open as escrow.
     const key = this.host.playerKey(meta);
     const plan = planOrderFill(
       this.host.candidatesFor(itemId),
@@ -281,7 +300,7 @@ export class MarketOrderBook {
       const listing = byId.get(id);
       if (!listing) continue;
       if (!canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, listing.count)) break;
-      this.host.settleListing(listing, def, meta);
+      if (!this.host.settleListing(listing, def, meta)) continue;
       settled.push(listing);
       filled += listing.count;
       spent += listing.price;
@@ -304,6 +323,7 @@ export class MarketOrderBook {
         itemId,
         count: remaining,
         unitPrice: bid,
+        expiresAt: ctx.time + MARKET_ORDER_DURATION,
       });
       // A 'log' line (the expiry-notice color), not 'loot': nothing landed in
       // the bags, and the system-text matcher (src/ui/system_text_i18n.ts) is
@@ -444,22 +464,68 @@ export class MarketOrderBook {
 
   /** The viewer's own rows first, then everyone else's, by item name then bid
    *  descending (the best offer for a gatherer at the top), capped for the wire. */
-  viewsFor(meta: PlayerMeta): MarketOrderView[] {
+  viewsFor(meta: PlayerMeta, bookRev: number): MarketOrderView[] {
+    const rows = this.sortedRows(bookRev);
+    // One partition pass, the viewer's key resolved once: own rows first, then
+    // everyone else's, both in the shared wire order, capped for the wire.
+    const key = this.host.playerKey(meta);
+    const owns = (o: MarketOrder) => o.buyerKey === key || o.buyerKey === meta.name;
+    const mine: MarketOrderView[] = [];
+    const others: MarketOrderView[] = [];
+    for (const o of rows) {
+      const isMine = owns(o);
+      if (!isMine && mine.length + others.length >= MARKET_ORDER_WIRE_LIMIT) continue;
+      (isMine ? mine : others).push({
+        id: o.id,
+        buyerName: isMine ? meta.name : o.buyerName,
+        itemId: o.itemId,
+        count: o.count,
+        unitPrice: o.unitPrice,
+        mine: isMine,
+      });
+    }
+    return mine.concat(others).slice(0, MARKET_ORDER_WIRE_LIMIT);
+  }
+
+  /** The whole board in wire order, viewer-independent, memoized per book
+   *  revision (plus a length guard for a row pushed without a bump, the
+   *  sortedBook precedent). Display ordering only: localeCompare is host-ICU
+   *  dependent and never feeds sim state. */
+  private sortedRows(bookRev: number): readonly MarketOrder[] {
+    const c = this.sortedCache;
+    if (c && c.rev === bookRev && c.length === this.orders.length) return c.rows;
     const name = (id: string) => ITEMS[id]?.name ?? id;
     const rows = [...this.orders].sort(
       (a, b) =>
         name(a.itemId).localeCompare(name(b.itemId)) || b.unitPrice - a.unitPrice || a.id - b.id,
     );
-    const mine = rows.filter((o) => this.orderBelongsTo(o, meta));
-    const others = rows.filter((o) => !this.orderBelongsTo(o, meta));
-    return [...mine, ...others].slice(0, MARKET_ORDER_WIRE_LIMIT).map((o) => ({
-      id: o.id,
-      buyerName: this.orderBelongsTo(o, meta) ? meta.name : o.buyerName,
-      itemId: o.itemId,
-      count: o.count,
-      unitPrice: o.unitPrice,
-      mine: this.orderBelongsTo(o, meta),
-    }));
+    this.sortedCache = { rev: bookRev, length: this.orders.length, rows };
+    return rows;
+  }
+
+  /** Once a second (the listing sweep's cadence): refund every expired order's
+   *  escrow into the buyer's collection and drop the row. Returns whether the
+   *  board changed (the caller bumps). */
+  expire(now: number): boolean {
+    let changed = false;
+    for (let i = this.orders.length - 1; i >= 0; i--) {
+      const o = this.orders[i];
+      if (now < o.expiresAt) continue;
+      this.orders.splice(i, 1);
+      changed = true;
+      const refund = orderEscrow(o);
+      this.host.collectionFor(o.buyerKey).copper += refund;
+      const buyerMeta = this.host.metaByKey(o.buyerKey);
+      if (buyerMeta) {
+        this.host.ctx.emit({
+          type: 'log',
+          text: `Your order for ${ITEMS[o.itemId]?.name ?? o.itemId} expired; ${formatMoney(refund)} waits at the Merchant.`,
+          color: MARKET_NOTICE_COLOR,
+          pid: buyerMeta.entityId,
+        });
+      }
+    }
+    return changed;
   }
 
   countForMeta(meta: PlayerMeta): number {
@@ -469,9 +535,10 @@ export class MarketOrderBook {
   /** The unlisted-material readout, memoized per book revision. */
   unlistedFor(listings: readonly MarketListing[], bookRev: number): string[] {
     const c = this.unlistedCache;
-    if (c && c.rev === bookRev && c.source === listings && c.ids) return c.ids;
+    if (c && c.rev === bookRev && c.source === listings && c.length === listings.length)
+      return c.ids;
     const ids = unlistedMaterialIds(listings);
-    this.unlistedCache = { rev: bookRev, source: listings, ids };
+    this.unlistedCache = { rev: bookRev, source: listings, length: listings.length, ids };
     return ids;
   }
 
@@ -496,44 +563,66 @@ export class MarketOrderBook {
     return this.orders.length !== before;
   }
 
-  serialize(): { orders: MarketOrderSaveRow[]; nextOrderId: number } {
+  /** The additive save keys. An untouched board (no order ever placed) writes
+   *  none of them, so pre-order blobs round-trip byte-identical; once the
+   *  counter has moved it is always written, even with the board empty, so a
+   *  restart never reissues an id a client may still hold. */
+  serialize(now: number): { orders?: MarketOrderSaveRow[]; nextOrderId?: number } {
+    if (this.orders.length === 0 && this.nextOrderId === 1) return {};
     return {
-      orders: this.orders.map((o) => ({
-        id: o.id,
-        buyerKey: o.buyerKey,
-        buyerName: o.buyerName,
-        itemId: o.itemId,
-        count: o.count,
-        unitPrice: o.unitPrice,
-      })),
+      ...(this.orders.length === 0
+        ? {}
+        : {
+            orders: this.orders.map((o) => ({
+              id: o.id,
+              buyerKey: o.buyerKey,
+              buyerName: o.buyerName,
+              itemId: o.itemId,
+              count: o.count,
+              unitPrice: o.unitPrice,
+              secondsLeft: Math.max(0, Math.round(o.expiresAt - now)),
+            })),
+          }),
       nextOrderId: this.nextOrderId,
     };
   }
 
-  /** Untrusted blob data, the loadMarket doctrine: a row with no item id or a
-   *  non-positive count is dropped (nothing is escrowed behind it), an unknown
-   *  item id is KEPT dormant so the buyer can still withdraw its gold. */
-  load(rows: readonly Partial<MarketOrderSaveRow>[] | undefined, nextOrderId: unknown): void {
+  /** Untrusted blob data, the loadMarket doctrine: a row with no item id, no
+   *  buyer key (nobody could ever withdraw it, anybody could deliver into it),
+   *  or a non-positive count or price is dropped; the price and count are
+   *  clamped into the bands place() admits, so no hand-edited save can mint
+   *  gold through a cancel; an unknown item id is KEPT dormant so the buyer
+   *  can still withdraw its gold. */
+  load(
+    rows: readonly Partial<MarketOrderSaveRow>[] | undefined,
+    nextOrderId: unknown,
+    now: number,
+  ): void {
     this.orders = [];
+    this.sortedCache = null;
     let maxId = 0;
     for (const raw of rows ?? []) {
       if (!raw || typeof raw.itemId !== 'string') continue;
-      const count = Math.floor(Number(raw.count));
-      const unitPrice = Math.floor(Number(raw.unitPrice));
-      if (!(count >= 1) || !(unitPrice >= 1)) continue;
+      const buyerKey = typeof raw.buyerKey === 'string' ? raw.buyerKey : '';
+      if (buyerKey === '') continue;
+      const count = Math.min(MARKET_ORDER_MAX_UNITS, Math.floor(Number(raw.count)));
+      const unitPrice = Math.min(this.host.maxPrice(), Math.floor(Number(raw.unitPrice)));
+      if (!(count >= 1) || !(unitPrice >= this.host.minPrice())) continue;
       const id = Number.isInteger(raw.id) && (raw.id as number) >= 1 ? (raw.id as number) : 0;
       if (id === 0 || this.orders.some((o) => o.id === id)) continue;
       if (!ITEMS[raw.itemId])
         console.warn(`market: keeping order with unknown item id ${raw.itemId}`);
       maxId = Math.max(maxId, id);
+      const secondsLeft = Number(raw.secondsLeft);
       this.orders.push({
         id,
-        buyerKey: String(raw.buyerKey ?? ''),
-        buyerName: String(raw.buyerName ?? raw.buyerKey ?? '?'),
+        buyerKey,
+        buyerName: String(raw.buyerName ?? buyerKey),
         itemId: raw.itemId,
-        // Never clamped: the count IS the escrow the buyer is owed on withdraw.
         count,
         unitPrice,
+        expiresAt:
+          now + (Number.isFinite(secondsLeft) ? Math.max(0, secondsLeft) : MARKET_ORDER_DURATION),
       });
     }
     const saved =

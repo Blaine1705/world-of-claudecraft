@@ -9,6 +9,8 @@ import {
 import {
   buyWithSoldVolume,
   marketSaleFromBuy,
+  orderFillWithSoldVolume,
+  orderPlaceWithSoldVolume,
   resetMarketSoldVolumeForTests,
   SOLD_VOLUME_TAIL_MAX_DEPTH,
   soldVolumeTailStats,
@@ -295,6 +297,107 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
       'start:vale_wheat_seed',
       'end:vale_wheat_seed',
     ]);
+  });
+});
+
+describe('orderPlaceWithSoldVolume / orderFillWithSoldVolume (the buy-order arms)', () => {
+  interface WrittenRow {
+    itemId: string;
+    quantity: number;
+    copper: number;
+    saleCount?: number;
+  }
+
+  function recordingWriter() {
+    const recorded: WrittenRow[] = [];
+    resetMarketSoldVolumeForTests((row) => {
+      recorded.push({ ...row });
+      return Promise.resolve();
+    });
+    return recorded;
+  }
+
+  beforeEach(() => {
+    resetMarketSoldVolumeForTests();
+  });
+
+  it('books a completing fill even though the fill removes the order row', async () => {
+    // The item id is read off the order BEFORE marketOrderFill runs: a fill
+    // that completes the order splices it out, so an after-the-fact lookup
+    // would find nothing and silently drop the sale.
+    const recorded = recordingWriter();
+    const orders: Array<{ id: number; itemId: string }> = [{ id: 9, itemId: 'wyrmfall_core' }];
+    const sim = {
+      marketOrders: orders,
+      marketOrderPlace: vi.fn(() => []),
+      marketOrderFill: vi.fn((orderId: number, count: number) => {
+        const index = orders.findIndex((o) => o.id === orderId);
+        if (index >= 0) orders.splice(index, 1);
+        return { units: count, copper: count * 300 };
+      }),
+    };
+    orderFillWithSoldVolume(sim, 9, 2, 42);
+    expect(sim.marketOrderFill).toHaveBeenCalledWith(9, 2, 42);
+    expect(orders).toEqual([]);
+    await soldVolumeWriterIdle();
+    expect(recorded).toEqual([{ itemId: 'wyrmfall_core', quantity: 2, copper: 600, saleCount: 1 }]);
+  });
+
+  it('books nothing for a refused fill (zero units)', async () => {
+    const recorded = recordingWriter();
+    const sim = {
+      marketOrders: [{ id: 9, itemId: 'wyrmfall_core' }],
+      marketOrderPlace: vi.fn(() => []),
+      marketOrderFill: vi.fn(() => ({ units: 0, copper: 0 })),
+    };
+    orderFillWithSoldVolume(sim, 9, 2, 42);
+    expect(sim.marketOrderFill).toHaveBeenCalledTimes(1);
+    await soldVolumeWriterIdle();
+    expect(recorded).toEqual([]);
+  });
+
+  it('books nothing for a fill of an untracked item', async () => {
+    // linen_cloth classifies into no metrics bucket, so the row would be one
+    // nothing reads and one players could grow the table with.
+    const recorded = recordingWriter();
+    const sim = {
+      marketOrders: [{ id: 9, itemId: 'linen_cloth' }],
+      marketOrderPlace: vi.fn(() => []),
+      marketOrderFill: vi.fn(() => ({ units: 2, copper: 600 })),
+    };
+    orderFillWithSoldVolume(sim, 9, 2, 42);
+    expect(sim.marketOrderFill).toHaveBeenCalledTimes(1);
+    await soldVolumeWriterIdle();
+    expect(recorded).toEqual([]);
+  });
+
+  it('books exactly one sale per settled listing on a place, never the open remainder', async () => {
+    // A place that fills one listing and leaves the rest open: the settled row
+    // is a sale at ITS listing price (marketSaleFromBuy semantics), and the
+    // escrowed remainder is not volume because nothing changed hands yet.
+    const recorded = recordingWriter();
+    const sim = {
+      marketOrders: [{ id: 1, itemId: 'wyrmfall_core' }],
+      marketOrderPlace: vi.fn(() => [listing({ id: 5, count: 2, price: 500 })]),
+      marketOrderFill: vi.fn(() => ({ units: 0, copper: 0 })),
+    };
+    orderPlaceWithSoldVolume(sim, 'wyrmfall_core', 5, 400, 42);
+    expect(sim.marketOrderPlace).toHaveBeenCalledWith('wyrmfall_core', 5, 400, 42);
+    await soldVolumeWriterIdle();
+    expect(recorded).toEqual([{ itemId: 'wyrmfall_core', quantity: 2, copper: 500, saleCount: 1 }]);
+  });
+
+  it('books nothing for a place that settles no listing', async () => {
+    const recorded = recordingWriter();
+    const sim = {
+      marketOrders: [],
+      marketOrderPlace: vi.fn(() => []),
+      marketOrderFill: vi.fn(() => ({ units: 0, copper: 0 })),
+    };
+    orderPlaceWithSoldVolume(sim, 'wyrmfall_core', 5, 400, 42);
+    expect(sim.marketOrderPlace).toHaveBeenCalledTimes(1);
+    await soldVolumeWriterIdle();
+    expect(recorded).toEqual([]);
   });
 });
 

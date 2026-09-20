@@ -294,7 +294,9 @@ export class Market {
       candidatesFor: (itemId) => this.sweepCandidatesFor(itemId),
       settleListing: (listing, def, meta) => {
         const idx = this.marketListings.indexOf(listing);
-        if (idx >= 0) this.settleBuy(idx, listing, def, meta);
+        if (idx < 0) return false;
+        this.settleBuy(idx, listing, def, meta);
+        return true;
       },
       previewPlainBucketCount: (meta, itemId, want) =>
         this.previewPlainBucketCount(meta, itemId, want),
@@ -1256,6 +1258,7 @@ export class Market {
   // Once a second: return expired player listings to their seller's collection.
   private updateMarket(): void {
     if (this.ctx.tickCount % 20 !== 0) return;
+    if (this.orderBook.expire(this.ctx.time)) this.bumpBook();
     for (let i = this.marketListings.length - 1; i >= 0; i--) {
       const l = this.marketListings[i];
       if (l.house || this.ctx.time < l.expiresAt) continue;
@@ -1411,7 +1414,7 @@ export class Market {
       sweepQuote: meta.sweepQuote ? this.sweepQuoteFor(meta, meta.sweepQuote) : null,
       // The Wanted board (market_orders.ts): open buy orders, own rows first,
       // plus the materials nobody has listed, memoized per book revision.
-      orders: this.orderBook.viewsFor(meta),
+      orders: this.orderBook.viewsFor(meta, this.bookRev),
       myOrderCount: this.orderBook.countForMeta(meta),
       maxOrders: MARKET_MAX_ORDERS,
       unlistedMaterials: this.orderBook.unlistedFor(this.marketListings, this.bookRev),
@@ -1469,9 +1472,9 @@ export class Market {
         ...(isSaleLogEmpty(c.sales) ? {} : { sales: cloneSaleLog(c.sales) }),
       })),
       nextListingId: this.nextListingId,
-      // Conditional: a save with no open orders writes no `orders` key at all,
-      // so blobs from before the board round-trip byte-identical.
-      ...(this.orderBook.orders.length === 0 ? {} : this.orderBook.serialize()),
+      // Conditional inside serialize(): an untouched board writes no key at
+      // all, so blobs from before the board round-trip byte-identical.
+      ...this.orderBook.serialize(this.ctx.time),
     };
   }
 
@@ -1616,7 +1619,7 @@ export class Market {
       );
     }
     this.reclaimSoulboundListings();
-    this.orderBook.load(save.orders, save.nextOrderId);
+    this.orderBook.load(save.orders, save.nextOrderId, this.ctx.time);
     this.bumpBook();
   }
 
