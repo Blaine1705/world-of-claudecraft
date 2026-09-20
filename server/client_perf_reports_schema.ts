@@ -132,4 +132,32 @@ ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS desktop_shell BOOLEAN N
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS frame_cap_intent INT NOT NULL DEFAULT 0;
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS cadence_divisor INT NOT NULL DEFAULT 1;
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS refresh_hz INT NOT NULL DEFAULT 0;
+-- "Host essentials": the host facts only the Electron desktop shell can see,
+-- which the browser sandbox cannot (electron/host_essentials.cjs). Web and
+-- mobile rows carry none of them, and the ingest IGNORES the whole block unless
+-- desktop_shell is true for the same report. The memory figures are already
+-- rounded by the shell (256 MB total, 64 MB free) because an exact installed-RAM
+-- byte count is a fingerprint on an endpoint that accepts anonymous posts, and
+-- the two power settings are CLOSED VOCABULARIES folded in the shell: the raw
+-- Windows power-scheme GUID is never sent or stored, since a custom plan's GUID
+-- identifies one machine (the same reason refresh_hz is rounded to whole Hz).
+-- host_power_plan is '' | balanced | high_performance | power_saver | ultimate |
+-- other; host_power_mode is '' | best_efficiency | balanced | better_performance
+-- | best_performance | other; both are TEXT NOT NULL DEFAULT '' so a future
+-- grouped read keeps the GROUPING-bits contract, and '' is "no evidence", which
+-- is also what every pre-column row reads. The booleans are NULLABLE because
+-- "could not be read" is a real and common answer that must stay apart from
+-- "off". NO new index: the reads that split on these aggregate over a created_at
+-- window, and a big live table's indexes go through server/client_perf_indexes.ts
+-- (CONCURRENTLY), never boot DDL.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_mem_total_mb INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_mem_free_mb INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS app_working_set_mb INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS app_renderer_ws_mb INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS app_gpu_ws_mb INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_on_battery BOOLEAN;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_power_plan TEXT NOT NULL DEFAULT '';
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_power_mode TEXT NOT NULL DEFAULT '';
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_hags BOOLEAN;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_game_mode BOOLEAN;
 `;

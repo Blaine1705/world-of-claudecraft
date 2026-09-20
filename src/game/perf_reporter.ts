@@ -2,6 +2,11 @@ import { apiUrl } from '../client_origin';
 import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
+import {
+  createHostEssentialsProbe,
+  type HostEssentials,
+  hostEssentialsPayloadFields,
+} from './desktop_host_essentials';
 import { frameCadenceBeaconBlock, frameCadenceBeaconFields } from './frame_cadence_wiring';
 import { createGpuAdapterProbe } from './gpu_adapter_probe';
 import { collectLoadSpans } from './load_profiler';
@@ -569,6 +574,9 @@ function payloadFromSnapshot(
   // is still in flight or on any browser that has no WebGPU to ask.
   gpuHpAdapter: string | null = null,
   bootPhases: BootPhaseDurations | null = null,
+  // The desktop shell's host facts, or null on web/mobile and until the
+  // shell probe first settles (src/game/desktop_host_essentials.ts).
+  hostEssentials: HostEssentials | null = null,
 ): Record<string, unknown> | null {
   const renderer = snapshot.renderer;
   if (!renderer) return null;
@@ -666,6 +674,12 @@ function payloadFromSnapshot(
     crowdBucket: crowdBucketLabel(activeViews),
     worst10sFrameP95Ms: snapshot.windows.worst10s?.frameMs.p95 ?? null,
     suggestionIds,
+    // The desktop shell's host essentials, as TOP-LEVEL scalars and never
+    // inside rawSummary: that block is already over its byte budget and its
+    // lower rungs get shed server-side, and these are stored as columns. Each
+    // absent field is OMITTED rather than sent as null, so a web payload is
+    // byte-identical to what it was before this dimension existed.
+    ...hostEssentialsPayloadFields(hostEssentials),
     rawSummary: {
       graphicsConfigVersion: renderer.graphicsConfigVersion,
       seconds: snapshot.seconds,
@@ -769,6 +783,13 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
   // report built before it settles just carries null.
   const gpuAdapterProbe = createGpuAdapterProbe();
   gpuAdapterProbe.start();
+  // Owned HERE rather than in main.ts (which is a firewall pinned at its exact
+  // line count): the probe only exists to feed this payload. It is a no-op
+  // without the shell bridge, its first fetch is seconds out, and its refresh
+  // cadence is shorter than the report cadence so every beacon sees a reading
+  // from its own interval. The final keepalive flush reads the cache only.
+  const hostEssentialsProbe = options.desktopShell === true ? createHostEssentialsProbe() : null;
+  hostEssentialsProbe?.start();
   let stopped = false;
   let timer: number | null = null;
   let lastFinalFlushAt = 0;
@@ -818,6 +839,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
       options.desktopShell ?? false,
       gpuAdapterProbe.value(),
       currentBootPhases(),
+      hostEssentialsProbe?.value() ?? null,
     );
     if (!body) {
       skip('no-renderer', sendOptions.final ? null : cadenceDelay(REPEAT_REPORT_MS));
@@ -909,6 +931,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
     status.enabled = false;
     status.nextSendAt = null;
     if (timer !== null) window.clearTimeout(timer);
+    hostEssentialsProbe?.stop();
     window.removeEventListener('pagehide', flushFinal);
     document.removeEventListener('visibilitychange', handleVisibilityChange);
     cleanupDebug();

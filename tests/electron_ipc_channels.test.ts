@@ -45,6 +45,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-get-gpu-force-opt-out',
         'desktop-get-launch-settings',
         'desktop-host-diag-run',
+        'desktop-host-essentials',
         'desktop-login-open-browser',
         'desktop-restart-app',
         'desktop-login-take-code',

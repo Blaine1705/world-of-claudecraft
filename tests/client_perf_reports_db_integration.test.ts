@@ -119,6 +119,21 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       frameCapIntent: 30,
       cadenceDivisor: 4,
       refreshHz: 144,
+      // The host-essentials block, appended LAST to both halves of the
+      // statement. Pairwise-distinct numbers, and the three booleans are
+      // deliberately a true/false/true spread so a slip between any two of the
+      // nullable boolean columns (gl_laptop false, host_on_battery false)
+      // flips an assertion.
+      hostMemTotalMb: 32512,
+      hostMemFreeMb: 9088,
+      appWorkingSetMb: 1733,
+      appRendererWsMb: 911,
+      appGpuWsMb: 407,
+      hostOnBattery: false,
+      hostPowerPlan: 'high_performance',
+      hostPowerMode: 'best_performance',
+      hostHags: true,
+      hostGameMode: false,
     });
 
     const res = await db.pool.query('SELECT * FROM client_perf_reports WHERE session_id = $1', [
@@ -182,6 +197,19 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(r.frame_cap_intent).toBe(30);
     expect(r.cadence_divisor).toBe(4);
     expect(r.refresh_hz).toBe(144);
+    // The host-essentials block, now last in the column list: every one read
+    // back BY NAME, so a slipped placeholder anywhere in the appended run
+    // lands a value in the wrong column and flips at least one of these.
+    expect(r.host_mem_total_mb).toBe(32512);
+    expect(r.host_mem_free_mb).toBe(9088);
+    expect(r.app_working_set_mb).toBe(1733);
+    expect(r.app_renderer_ws_mb).toBe(911);
+    expect(r.app_gpu_ws_mb).toBe(407);
+    expect(r.host_on_battery).toBe(false);
+    expect(r.host_power_plan).toBe('high_performance');
+    expect(r.host_power_mode).toBe('best_performance');
+    expect(r.host_hags).toBe(true);
+    expect(r.host_game_mode).toBe(false);
   });
 
   it('serves the row back through clientPerfRaw with the dimensions and suggestion ids mapped', async () => {
@@ -208,6 +236,19 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(row?.frameCapIntent).toBe(30);
     expect(row?.cadenceDivisor).toBe(4);
     expect(row?.refreshHz).toBe(144);
+    // The admin raw reader's explicit SELECT list and mapper carry the
+    // host-essentials columns too: a column added to the insert but forgotten
+    // there reads back undefined here.
+    expect(row?.hostMemTotalMb).toBe(32512);
+    expect(row?.hostMemFreeMb).toBe(9088);
+    expect(row?.appWorkingSetMb).toBe(1733);
+    expect(row?.appRendererWsMb).toBe(911);
+    expect(row?.appGpuWsMb).toBe(407);
+    expect(row?.hostOnBattery).toBe(false);
+    expect(row?.hostPowerPlan).toBe('high_performance');
+    expect(row?.hostPowerMode).toBe('best_performance');
+    expect(row?.hostHags).toBe(true);
+    expect(row?.hostGameMode).toBe(false);
   });
 
   it('aggregates suggestionCounts through clientPerfSummary from the live rows', async () => {
@@ -293,7 +334,10 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       `SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
               suggestion_ids, gl_backend, gl_renderer_raw, gl_model, gl_laptop, gpu_hp_adapter,
               shader_warm_worker_active, shader_warm_refusal, desktop_shell,
-              frame_cap_intent, cadence_divisor, refresh_hz
+              frame_cap_intent, cadence_divisor, refresh_hz,
+              host_mem_total_mb, host_mem_free_mb, app_working_set_mb, app_renderer_ws_mb,
+              app_gpu_ws_mb, host_on_battery, host_power_plan, host_power_mode,
+              host_hags, host_game_mode
          FROM client_perf_reports WHERE session_id = $1`,
       [`${MARKER}-legacy`],
     );
@@ -320,6 +364,19 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       frame_cap_intent: 0,
       cadence_divisor: 1,
       refresh_hz: 0,
+      // A row older than the host-essentials block, and equally every web and
+      // mobile row: NULL is "could not be read / not collected", '' is the
+      // unknown member of the two closed vocabularies.
+      host_mem_total_mb: null,
+      host_mem_free_mb: null,
+      app_working_set_mb: null,
+      app_renderer_ws_mb: null,
+      app_gpu_ws_mb: null,
+      host_on_battery: null,
+      host_power_plan: '',
+      host_power_mode: '',
+      host_hags: null,
+      host_game_mode: null,
     });
   });
 

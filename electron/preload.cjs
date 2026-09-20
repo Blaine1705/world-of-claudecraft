@@ -252,6 +252,11 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     if (mode !== 'borderless' && mode !== 'windowed') return Promise.resolve(false);
     return ipcRenderer.invoke('desktop-set-display-mode', mode);
   },
+  // The host facts the automatic perf report carries (memory, this app's own
+  // working sets, battery, and the Windows power/GPU-scheduling settings the
+  // browser sandbox cannot see). Argument-free, and everything it answers is
+  // already a plain scalar folded to a closed vocabulary on the main side.
+  getHostEssentials: () => ipcRenderer.invoke('desktop-host-essentials'),
   // The host diagnostic: the shell collects the machine's configuration and the
   // player saves ONE JSON file to send to support. The game's own context comes
   // along, pre-sanitized HERE to the same key whitelist main accepts (a fresh

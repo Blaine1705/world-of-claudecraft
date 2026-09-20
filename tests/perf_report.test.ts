@@ -2862,3 +2862,159 @@ describe('shader warm-up report fields', () => {
     expect(raw.shaderWarm).toMatchObject({ mode: 'off', refusal: 'ready-timeout', held: 7 });
   });
 });
+
+describe('host essentials ingest', () => {
+  const ELECTRON_UA =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
+    'WorldOfClaudecraft/0.43.0 Chrome/145.0.0.0 Electron/42.4.1 Safari/537.36';
+
+  const GOOD = {
+    hostMemTotalMb: 16384,
+    hostMemFreeMb: 4992,
+    appWorkingSetMb: 1550,
+    appRendererWsMb: 900,
+    appGpuWsMb: 300,
+    hostOnBattery: false,
+    hostPowerPlan: 'high_performance',
+    hostPowerMode: 'better_performance',
+    hostHags: true,
+    hostGameMode: false,
+  };
+
+  async function post(body: Record<string, unknown>, remoteAddress: string, userAgent?: string) {
+    const res = fakeRes();
+    await handlePerfReport(fakeReq(body, { remoteAddress, userAgent }), res);
+    expect(res.statusCode).toBe(200);
+    return vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+  }
+
+  it('stores a well-formed desktop-shell block verbatim', async () => {
+    const stored = await post(
+      { sessionId: 'host-ess-ok', desktopShell: true, ...GOOD },
+      '203.0.113.150',
+      ELECTRON_UA,
+    );
+    for (const [key, value] of Object.entries(GOOD)) {
+      expect(stored[key as keyof typeof stored], key).toBe(value);
+    }
+  });
+
+  it('IGNORES the whole block when the report is not a desktop-shell report', async () => {
+    // A browser tab has no business claiming a Windows power plan, and this
+    // endpoint accepts anonymous posts.
+    const stored = await post({ sessionId: 'host-ess-web', ...GOOD }, '203.0.113.151');
+    expect(stored.hostPowerPlan).toBe('');
+    expect(stored.hostPowerMode).toBe('');
+    expect(stored.hostMemTotalMb).toBeNull();
+    expect(stored.hostMemFreeMb).toBeNull();
+    expect(stored.appWorkingSetMb).toBeNull();
+    expect(stored.appRendererWsMb).toBeNull();
+    expect(stored.appGpuWsMb).toBeNull();
+    expect(stored.hostOnBattery).toBeNull();
+    expect(stored.hostHags).toBeNull();
+    expect(stored.hostGameMode).toBeNull();
+  });
+
+  it('never stores a raw power-scheme GUID: it falls back to the unknown member', async () => {
+    // The fingerprinting guard. A custom plan's GUID identifies one machine,
+    // which is the same reason refreshHz is rounded to whole Hz.
+    const guid = '11111111-2222-3333-4444-555555555555';
+    const stored = await post(
+      {
+        sessionId: 'host-ess-guid',
+        desktopShell: true,
+        hostPowerPlan: guid,
+        hostPowerMode: '381b4222-f694-41f0-9685-ff5bb260df2e',
+      },
+      '203.0.113.152',
+      ELECTRON_UA,
+    );
+    expect(stored.hostPowerPlan).toBe('');
+    expect(stored.hostPowerMode).toBe('');
+    expect(JSON.stringify(stored)).not.toContain(guid);
+  });
+
+  it('falls back to the unknown member for any out-of-vocabulary value', async () => {
+    const stored = await post(
+      {
+        sessionId: 'host-ess-vocab',
+        desktopShell: true,
+        hostPowerPlan: 'turbo',
+        hostPowerMode: 7,
+      },
+      '203.0.113.153',
+      ELECTRON_UA,
+    );
+    expect(stored.hostPowerPlan).toBe('');
+    expect(stored.hostPowerMode).toBe('');
+  });
+
+  it('accepts ONLY real booleans, so "off" stays apart from "could not be read"', async () => {
+    const stored = await post(
+      {
+        sessionId: 'host-ess-bool',
+        desktopShell: true,
+        hostOnBattery: 'false',
+        hostHags: 1,
+        hostGameMode: 0,
+      },
+      '203.0.113.154',
+      ELECTRON_UA,
+    );
+    expect(stored.hostOnBattery).toBeNull();
+    expect(stored.hostHags).toBeNull();
+    expect(stored.hostGameMode).toBeNull();
+  });
+
+  it('stores false as false, never as null', async () => {
+    const stored = await post(
+      {
+        sessionId: 'host-ess-false',
+        desktopShell: true,
+        hostOnBattery: false,
+        hostHags: false,
+        hostGameMode: false,
+      },
+      '203.0.113.155',
+      ELECTRON_UA,
+    );
+    expect(stored.hostOnBattery).toBe(false);
+    expect(stored.hostHags).toBe(false);
+    expect(stored.hostGameMode).toBe(false);
+  });
+
+  it('drops a negative, NaN, infinite or non-numeric megabyte figure and clamps a huge one', async () => {
+    const stored = await post(
+      {
+        sessionId: 'host-ess-numbers',
+        desktopShell: true,
+        hostMemTotalMb: 99_999_999_999,
+        hostMemFreeMb: -1,
+        appWorkingSetMb: 'lots',
+        appRendererWsMb: Number.POSITIVE_INFINITY,
+        appGpuWsMb: 300,
+      },
+      '203.0.113.156',
+      ELECTRON_UA,
+    );
+    // NaN and Infinity do not survive JSON, so the wire form of both is null;
+    // the string and the negative are the live arms here, and the clamp is the
+    // bound against a client claiming an absurd machine.
+    expect(stored.hostMemTotalMb).toBe(4_194_304);
+    expect(stored.hostMemFreeMb).toBeNull();
+    expect(stored.appWorkingSetMb).toBeNull();
+    expect(stored.appRendererWsMb).toBeNull();
+    expect(stored.appGpuWsMb).toBe(300);
+  });
+
+  it('stores the absent shape for a shell report that sends no block at all', async () => {
+    const stored = await post(
+      { sessionId: 'host-ess-none', desktopShell: true },
+      '203.0.113.157',
+      ELECTRON_UA,
+    );
+    expect(stored.hostPowerPlan).toBe('');
+    expect(stored.hostMemTotalMb).toBeNull();
+    expect(stored.hostHags).toBeNull();
+  });
+});

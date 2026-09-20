@@ -67,6 +67,7 @@ const {
 } = require('./diagnostics.cjs');
 const { initLogging } = require('./logging.cjs');
 const { flattenSwitchPairs, runHostDiag } = require('./host_diag.cjs');
+const { createHostEssentials } = require('./host_essentials.cjs');
 const { DEFAULT_SHELL_STRINGS, sanitizeShellStrings } = require('./shell_strings.cjs');
 const { registerLinuxUrlHandler } = require('./linux_url_handler.cjs');
 const { allowGpuUnderSteamOverlay } = require('./steam_overlay_guard.cjs');
@@ -1350,6 +1351,28 @@ function hostDiagShellState() {
     displayMode: desktopPrefs.displayMode,
   };
 }
+
+// The "host essentials" the automatic perf report carries: a handful of host
+// facts the browser sandbox cannot see (rounded memory sizes, this app's own
+// working sets, the battery state, and the Windows power plan / power mode /
+// GPU-scheduling / Game Mode settings, each already folded to a closed
+// vocabulary by electron/host_essentials.cjs, never a raw registry GUID).
+// Created here but NEVER read on the startup path: the collector's first
+// registry read happens on the renderer's first request, minutes into a
+// session, and a one-minute floor plus single-flighting keep a misbehaving
+// renderer from turning this channel into a reg.exe spawn loop.
+const hostEssentials = createHostEssentials({ app, powerMonitor });
+
+ipcMain.handle('desktop-host-essentials', async (event) => {
+  if (!trustedSender(event)) return null;
+  try {
+    return await hostEssentials.snapshot();
+  } catch {
+    // A failed collection is an absent dimension in one perf report, never a
+    // rejected invoke the renderer has to handle.
+    return null;
+  }
+});
 
 // The player-triggered host diagnostic: one JSON file they save and send to
 // support (electron/host_diag.cjs owns all of it, the native PowerShell layer

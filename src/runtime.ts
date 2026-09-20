@@ -181,6 +181,46 @@ export interface DesktopHostDiagResult {
   fileName?: string;
 }
 
+/**
+ * The host facts the desktop shell can see and the browser sandbox cannot,
+ * attached to every automatic perf report as top-level scalars. Web and mobile
+ * reports simply lack them.
+ *
+ * Every field is already privacy-folded by the shell
+ * (electron/host_essentials.cjs): the memory sizes are rounded hard (256 MB
+ * total, 64 MB free) and the two power settings are CLOSED VOCABULARIES, never
+ * the raw Windows GUIDs, because a custom power plan's GUID identifies one
+ * machine and the perf-report endpoint accepts anonymous posts. The renderer
+ * re-validates all of it anyway (src/game/desktop_host_essentials.ts).
+ */
+export interface DesktopHostEssentials {
+  /** Physical RAM in MB, rounded to the nearest 256 MB. */
+  hostMemTotalMb: number | null;
+  /** Free physical RAM in MB, rounded to the nearest 64 MB. */
+  hostMemFreeMb: number | null;
+  /** This app's working set across every process, in MB. */
+  appWorkingSetMb: number | null;
+  /** The largest renderer ('Tab') process's working set, in MB. */
+  appRendererWsMb: number | null;
+  /** The GPU process's working set, in MB. */
+  appGpuWsMb: number | null;
+  hostOnBattery: boolean | null;
+  /** '' is unknown or not Windows. */
+  hostPowerPlan: '' | 'balanced' | 'high_performance' | 'power_saver' | 'ultimate' | 'other';
+  /** The Windows 10/11 power-mode slider. '' is unknown or not Windows. */
+  hostPowerMode:
+    | ''
+    | 'best_efficiency'
+    | 'balanced'
+    | 'better_performance'
+    | 'best_performance'
+    | 'other';
+  /** Hardware-accelerated GPU scheduling; null when it could not be read. */
+  hostHags: boolean | null;
+  /** Windows Game Mode; null when it could not be read. */
+  hostGameMode: boolean | null;
+}
+
 export interface DesktopBridge {
   openBrowserLogin(): Promise<void>;
   takeLoginCode(): Promise<string | null>;
@@ -280,6 +320,12 @@ export interface DesktopBridge {
   // can be a while (the native layer takes a few seconds and the player then
   // picks a folder). Absent on older shells: feature-check before use.
   runHostDiag?(game: DesktopHostDiagGameInfo): Promise<DesktopHostDiagResult>;
+  // The host facts the automatic perf report carries as top-level scalars
+  // (memory, this app's working sets, battery, the Windows power and
+  // GPU-scheduling settings). Cheap and argument-free; resolves null when the
+  // shell could not collect them. Absent on older shells: feature-check before
+  // use.
+  getHostEssentials?(): Promise<DesktopHostEssentials | null>;
   // Gracefully exits the desktop application through the shell's normal quit
   // lifecycle. Absent on older shells: feature-check before use.
   quitApp?(): Promise<boolean>;

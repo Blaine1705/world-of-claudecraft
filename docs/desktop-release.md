@@ -941,6 +941,31 @@ behavior is pinned by `tests/electron_host_diag.test.ts`):
   single-channel memory, hybrid adapters). Off Windows the file says
   `native.status: "unsupported-platform"` rather than hiding the gap.
 
+### The sibling: host essentials in the automatic perf report
+
+Not to be confused with the diagnostic above. `electron/host_essentials.cjs` is a
+much smaller, unattended collector behind the `desktop-host-essentials` IPC channel
+(`DesktopBridge.getHostEssentials` in `src/runtime.ts`): a handful of scalars the
+browser sandbox cannot see, attached to every automatic perf report as TOP-LEVEL
+fields by `src/game/desktop_host_essentials.ts` and `src/game/perf_reporter.ts`, and
+stored as typed columns (`server/perf_report_host.ts`,
+`server/client_perf_reports_schema.ts`). Web and mobile reports simply lack them.
+
+It never spawns PowerShell: the four Windows settings (power plan, power mode,
+hardware-accelerated GPU scheduling, Game Mode) come from `reg.exe` through the
+sanctioned `queryRegValue` reader in `electron/gpu_preference.cjs`, async, with a
+fixed argv and a strict key allowlist. It is never invoked on the startup path (the
+first read is the renderer's first request), a collection younger than a minute is
+reused, and concurrent requests share one run.
+
+Privacy shapes every field, because the perf endpoint accepts anonymous posts: the
+memory sizes are rounded hard (256 MB total, 64 MB free) and the two power settings
+are folded to CLOSED VOCABULARIES inside the shell, so the raw Windows power-scheme
+GUID (which for a custom plan identifies one machine) never leaves it. The three
+copies of those vocabularies are kept equal by
+`tests/host_essentials_vocabulary_parity.test.ts`, which also ties the power-mode map
+to `electron/host_diag/win/collectors/Power.ps1`.
+
 ### What ships where, and the hash check
 
 `build.extraResources` copies `electron/host_diag/dist/HostDiag.ps1` to

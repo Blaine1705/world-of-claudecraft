@@ -17,6 +17,8 @@ import {
   mergeHighPerformancePreference,
   PRIME_RELAUNCH_MARKER,
   parseRegQueryData,
+  queryRegValue,
+  REG_QUERY_OPTIONS,
   relaunchForLinuxPrime,
   shouldRelaunchForLinuxPrime,
   summarizeGpuDevices,
@@ -1061,5 +1063,124 @@ describe('electron-dev.mjs PRIME pre-apply pin', () => {
   it('feeds the pre-applied config into the electron spawn (env and argv both)', () => {
     expect(source).toContain("spawn(electronCommand, ['.', ...prime.args]");
     expect(source).toContain('...prime.env,');
+  });
+});
+
+// --- queryRegValue: the async, read-only single-value reader ------------------
+//
+// The second sanctioned process call in this module. Its whole safety story is
+// "fixed argv, absolute reg.exe, no shell, bounded", and a scan cannot judge the
+// options bag, so the WHOLE options object is pinned with toEqual below: a later
+// `shell: true` or a dropped windowsHide fails here.
+describe('queryRegValue', () => {
+  const KEY = 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\Power\\User\\PowerSchemes';
+  const REG = 'C:\\Windows\\System32\\reg.exe';
+
+  /** An execFile seam that records its call and answers with the given result. */
+  function fakeExecFile(result: { err?: unknown; stdout?: string }) {
+    const calls: { command: string; args: string[]; options: unknown }[] = [];
+    const execFile = (
+      command: string,
+      args: string[],
+      options: unknown,
+      callback: (err: unknown, stdout: string) => void,
+    ) => {
+      calls.push({ command, args, options });
+      callback(result.err ?? null, result.stdout ?? '');
+      return undefined;
+    };
+    return { calls, execFile };
+  }
+
+  it('runs reg.exe with the exact argv and the exact options object (no shell)', async () => {
+    const { calls, execFile } = fakeExecFile({
+      stdout: `\r\n${KEY}\r\n    ActivePowerScheme    REG_SZ    381b4222-f694-41f0-9685-ff5bb260df2e\r\n\r\n`,
+    });
+    await queryRegValue(
+      { key: KEY, valueName: 'ActivePowerScheme' },
+      { execFile, env: { SystemRoot: 'C:\\Windows' } },
+    );
+    expect(calls).toHaveLength(1);
+    expect(calls[0].command).toBe(REG);
+    expect(calls[0].args).toEqual(['query', KEY, '/v', 'ActivePowerScheme']);
+    // toEqual, not toMatchObject: an added `shell: true` must fail this.
+    expect(calls[0].options).toEqual({
+      timeout: 1500,
+      windowsHide: true,
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024,
+    });
+    expect(REG_QUERY_OPTIONS).toEqual(calls[0].options);
+  });
+
+  it('parses a REG_SZ value', async () => {
+    const { execFile } = fakeExecFile({
+      stdout: `    ActivePowerScheme    REG_SZ    381b4222-f694-41f0-9685-ff5bb260df2e\r\n`,
+    });
+    await expect(
+      queryRegValue({ key: KEY, valueName: 'ActivePowerScheme' }, { execFile }),
+    ).resolves.toEqual({ type: 'sz', value: '381b4222-f694-41f0-9685-ff5bb260df2e' });
+  });
+
+  it('parses a REG_DWORD value from its hex form', async () => {
+    const { execFile } = fakeExecFile({ stdout: '    HwSchMode    REG_DWORD    0x2\r\n' });
+    await expect(
+      queryRegValue(
+        {
+          key: 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers',
+          valueName: 'HwSchMode',
+        },
+        { execFile },
+      ),
+    ).resolves.toEqual({ type: 'dword', value: 2 });
+  });
+
+  it('reports an absent value apart from a failed read', async () => {
+    // reg.exe exits 1 for a missing value; execFile puts that on err.code.
+    const { execFile } = fakeExecFile({ err: Object.assign(new Error('exit 1'), { code: 1 }) });
+    await expect(
+      queryRegValue({ key: KEY, valueName: 'ActiveOverlayDcPowerScheme' }, { execFile }),
+    ).resolves.toEqual({ absent: true });
+  });
+
+  it('answers null on a timeout kill and on any other failure', async () => {
+    const killed = fakeExecFile({
+      err: Object.assign(new Error('killed'), { code: 1, killed: true, signal: 'SIGTERM' }),
+    });
+    await expect(
+      queryRegValue({ key: KEY, valueName: 'ActivePowerScheme' }, { execFile: killed.execFile }),
+    ).resolves.toBeNull();
+    const missing = fakeExecFile({ err: Object.assign(new Error('enoent'), { code: 'ENOENT' }) });
+    await expect(
+      queryRegValue({ key: KEY, valueName: 'ActivePowerScheme' }, { execFile: missing.execFile }),
+    ).resolves.toBeNull();
+  });
+
+  it('answers null for a value type it cannot round-trip', async () => {
+    const { execFile } = fakeExecFile({ stdout: '    Blob    REG_BINARY    00ff\r\n' });
+    await expect(queryRegValue({ key: KEY, valueName: 'Blob' }, { execFile })).resolves.toBeNull();
+  });
+
+  it('refuses a key or value name outside the allowlist WITHOUT running anything', async () => {
+    const refusals = [
+      { key: 'HKCR\\Something', valueName: 'A' },
+      { key: 'HKLM\\System & calc.exe', valueName: 'A' },
+      { key: KEY, valueName: 'A/B' },
+      { key: KEY, valueName: '' },
+    ];
+    for (const request of refusals) {
+      const { calls, execFile } = fakeExecFile({ stdout: '' });
+      await expect(queryRegValue(request, { execFile })).resolves.toBeNull();
+      expect(calls).toHaveLength(0);
+    }
+  });
+
+  it('answers null rather than throwing when the seam itself throws', async () => {
+    const execFile = () => {
+      throw new Error('blocked');
+    };
+    await expect(
+      queryRegValue({ key: KEY, valueName: 'ActivePowerScheme' }, { execFile }),
+    ).resolves.toBeNull();
   });
 });

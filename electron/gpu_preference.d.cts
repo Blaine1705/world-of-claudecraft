@@ -74,6 +74,42 @@ export function mergeHighPerformancePreference(existingData: unknown): string;
 export function alreadyHighPerformance(regQueryStdout: unknown): boolean;
 export function hasUnparseableValueType(regQueryStdout: unknown): boolean;
 
+/** The frozen options bag every queryRegValue execFile call is given. */
+export const REG_QUERY_OPTIONS: Readonly<{
+  timeout: number;
+  windowsHide: boolean;
+  encoding: string;
+  maxBuffer: number;
+}>;
+
+export type RegValueReading =
+  | { type: 'sz'; value: string }
+  | { type: 'dword'; value: number }
+  | { absent: true }
+  | null;
+
+export function parseRegQueryValue(
+  regQueryStdout: unknown,
+): { type: 'sz'; value: string } | { type: 'dword'; value: number } | null;
+
+export type RegExecFile = (
+  command: string,
+  args: string[],
+  options: unknown,
+  callback: (err: unknown, stdout: string, stderr?: string) => void,
+) => unknown;
+
+export interface QueryRegValueDeps {
+  execFile?: RegExecFile;
+  regExe?: string;
+  env?: Record<string, string | undefined>;
+}
+
+export function queryRegValue(
+  request: { key: string; valueName: string },
+  deps?: QueryRegValueDeps,
+): Promise<RegValueReading>;
+
 export interface GpuDeviceSummary {
   vendorId: string;
   deviceId: string;

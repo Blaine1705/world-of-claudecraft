@@ -1,4 +1,8 @@
-const { execFileSync: nodeExecFileSync, spawn: nodeSpawn } = require('node:child_process');
+const {
+  execFile: nodeExecFile,
+  execFileSync: nodeExecFileSync,
+  spawn: nodeSpawn,
+} = require('node:child_process');
 const {
   existsSync: nodeExistsSync,
   readdirSync: nodeReaddirSync,
@@ -218,7 +222,97 @@ function defaultRegExe(env) {
  * silently delete the user's sibling per-app tokens; those failures must skip the write.
  */
 function isRegValueAbsent(err) {
-  return err?.status === 1 && !err?.killed && !err?.signal;
+  // `status` is the synchronous (execFileSync) spelling of the exit code;
+  // `code` is the asynchronous (execFile callback) one, which queryRegValue
+  // below runs through this same predicate. A numeric 1 on purpose: execFile
+  // also puts a STRING errno ('ENOENT') on `code`, and that is not an absent
+  // value, it is a missing reg.exe.
+  const exitCode = typeof err?.status === 'number' ? err.status : err?.code;
+  return exitCode === 1 && !err?.killed && !err?.signal;
+}
+
+// --- The generic registry value reader ---------------------------------------
+//
+// The async sibling of the fixed query above, for the read-only host facts the
+// perf reporter needs (electron/host_essentials.cjs is its only caller). Async
+// on purpose: unlike the GPU preference, nothing here has to beat the GPU
+// process, so nothing here may block the main process and freeze the game's
+// window. Same posture as the sync path otherwise: a FIXED argv array, reg.exe
+// by absolute path from SystemRoot rather than PATH, never a shell, never a
+// string command line.
+//
+// The key and the value name are constants written in the calling module, never
+// anything derived from a player, a page, or the environment. They are still
+// checked against a strict allowlist here rather than trusted, so this reader
+// cannot be turned into a general "read any registry value" primitive by a
+// later caller: a key must be an HKLM or HKCU path of ordinary name characters,
+// and a value name a short ordinary name. Anything else answers null without
+// running reg.exe at all.
+const REG_QUERY_KEY_RE = /^HK(LM|CU)\\[A-Za-z0-9\\ _-]+$/;
+const REG_QUERY_VALUE_NAME_RE = /^[A-Za-z0-9][A-Za-z0-9 _-]{0,63}$/;
+
+// Frozen and exported so the unit test can pin the WHOLE options object: what a
+// scan cannot judge is the options bag, so the control against a later
+// `shell: true` (or a dropped windowsHide, which would flash a console window
+// over a full-screen game) is that pin. The 1500 ms timeout is the same bound
+// the synchronous query uses, with 10x-plus headroom over reg.exe's normal
+// sub-100 ms runs; maxBuffer bounds a reg.exe that prints forever.
+const REG_QUERY_OPTIONS = Object.freeze({
+  timeout: 1500,
+  windowsHide: true,
+  encoding: 'utf8',
+  maxBuffer: 64 * 1024,
+});
+
+/**
+ * The typed reading in a `reg query /v` stdout, or null when the output holds
+ * no value line this module can round-trip (a REG_MULTI_SZ, a REG_BINARY, an
+ * empty document). REG_EXPAND_SZ is read as a plain string on purpose: nothing
+ * is expanded, the stored text is simply reported.
+ */
+function parseRegQueryValue(stdout) {
+  const text = String(stdout ?? '');
+  const sz = text.match(/\bREG_(?:EXPAND_)?SZ\s+([^\r\n]*)/);
+  if (sz) return { type: 'sz', value: sz[1].trim() };
+  const dword = text.match(/\bREG_DWORD\s+0x([0-9a-fA-F]+)/);
+  if (dword) return { type: 'dword', value: Number.parseInt(dword[1], 16) };
+  return null;
+}
+
+/**
+ * Read one registry value. Resolves to `{ type, value }` for a REG_SZ /
+ * REG_EXPAND_SZ / REG_DWORD, `{ absent: true }` when the value or its key does
+ * not exist (reg.exe exits 1), and null for everything else: a refused key or
+ * value name, a timeout kill, a blocked or missing reg.exe, an access denial,
+ * and a value type this reader cannot express. Never rejects and never throws,
+ * so a caller can fire four of these in parallel and read four answers.
+ */
+function queryRegValue({ key, valueName } = {}, deps = {}) {
+  return new Promise((resolve) => {
+    if (typeof key !== 'string' || !REG_QUERY_KEY_RE.test(key)) {
+      resolve(null);
+      return;
+    }
+    if (typeof valueName !== 'string' || !REG_QUERY_VALUE_NAME_RE.test(valueName)) {
+      resolve(null);
+      return;
+    }
+    const execFile = deps.execFile ?? nodeExecFile;
+    const reg = deps.regExe ?? defaultRegExe(deps.env ?? process.env);
+    try {
+      execFile(reg, ['query', key, '/v', valueName], REG_QUERY_OPTIONS, (err, stdout) => {
+        if (err) {
+          resolve(isRegValueAbsent(err) ? { absent: true } : null);
+          return;
+        }
+        resolve(parseRegQueryValue(stdout));
+      });
+    } catch {
+      // A synchronous throw (a seam that is not a function, EACCES surfaced
+      // eagerly): one unreadable value must not cost the whole snapshot.
+      resolve(null);
+    }
+  });
 }
 
 /**
@@ -627,6 +721,7 @@ module.exports = {
   LINUX_OZONE_X11_ARG,
   PRIME_RELAUNCH_MARKER,
   PRIME_RELAUNCH_ADDED_ENV,
+  REG_QUERY_OPTIONS,
   buildLinuxPrimeEnv,
   hasExplicitOzonePlatformArg,
   isLinuxHybridGpu,
@@ -640,6 +735,8 @@ module.exports = {
   mergeHighPerformancePreference,
   alreadyHighPerformance,
   hasUnparseableValueType,
+  parseRegQueryValue,
+  queryRegValue,
   summarizeGpuDevices,
   forceHighPerformanceGpu,
 };

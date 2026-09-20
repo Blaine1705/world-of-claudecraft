@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { shaderWarmToken } from '../server/perf_report_entry_blocks';
 import { RAW_SUMMARY_KNOWN_KEYS } from '../server/perf_report_shed';
@@ -2347,5 +2348,99 @@ describe('perf reporter world-entry blocks', () => {
       }
       expect(sentBootPhases(fetchImpl, 1)).toEqual(first);
     });
+  });
+});
+
+describe('perf reporter host essentials', () => {
+  const HOST = {
+    hostMemTotalMb: 16384,
+    hostMemFreeMb: 4992,
+    appWorkingSetMb: 1550,
+    appRendererWsMb: 900,
+    appGpuWsMb: 300,
+    hostOnBattery: false,
+    hostPowerPlan: 'high_performance' as const,
+    hostPowerMode: 'better_performance' as const,
+    hostHags: true,
+    hostGameMode: false,
+  };
+
+  beforeEach(() => {
+    installBrowserGlobals();
+  });
+
+  it('spreads the shell fields as TOP-LEVEL scalars, never inside rawSummary', () => {
+    const settings = new Settings();
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+      null,
+      true,
+      null,
+      null,
+      HOST,
+    )!;
+    for (const [key, value] of Object.entries(HOST)) {
+      expect(body[key]).toBe(value);
+      // rawSummary is over its byte budget and its lower rungs are shed
+      // server-side, so a column's value must never live there.
+      expect((body.rawSummary as Record<string, unknown>)[key]).toBeUndefined();
+    }
+  });
+
+  it('omits every host field when the probe has no value (web payload unchanged)', () => {
+    const settings = new Settings();
+    const withHost = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+      null,
+      false,
+      null,
+      null,
+      null,
+    )!;
+    const legacy = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+    // Byte-identical to a payload built the way every web client builds one:
+    // not merely "the fields are null", but "the keys are not there".
+    expect(JSON.stringify(withHost)).toBe(JSON.stringify(legacy));
+    for (const key of Object.keys(HOST)) expect(key in withHost).toBe(false);
+  });
+
+  it('omits an individually absent field rather than sending null', () => {
+    const settings = new Settings();
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+      null,
+      true,
+      null,
+      null,
+      { ...HOST, hostHags: null, appGpuWsMb: null },
+    )!;
+    expect('hostHags' in body).toBe(false);
+    expect('appGpuWsMb' in body).toBe(false);
+    expect(body.hostMemTotalMb).toBe(16384);
+  });
+
+  it('never starts the shell probe for a non-desktop session', () => {
+    // The probe is created only under options.desktopShell, so a browser tab
+    // never arms a timer and never reaches for a bridge that is not there.
+    const source = readFileSync(new URL('../src/game/perf_reporter.ts', import.meta.url), 'utf8');
+    expect(source).toContain('options.desktopShell === true ? createHostEssentialsProbe() : null');
+    expect(source).toContain('hostEssentialsProbe?.stop();');
+    // The final keepalive flush goes through the same send(), which reads the
+    // CACHE synchronously: no await, no fetch on the unload path.
+    expect(source).toContain('hostEssentialsProbe?.value() ?? null,');
   });
 });
