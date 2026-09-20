@@ -48,6 +48,11 @@ describe('Rift monster index', () => {
     expect(RIFT_MOBS.hoard_healing_tide_totem).toBeUndefined();
     expect(RIFT_TRASH_IDS).not.toContain('hoard_healing_tide_totem');
     expect(RIFT_MONSTER_BY_ID.hoard_healing_tide_totem).toBeUndefined();
+    // Nyxaris's unbound orbs: a boss mechanic's adds, never Rift trash or a bestiary row.
+    expect(HOARD_MOBS.hoard_bound_pulsar).toBeDefined();
+    expect(RIFT_MOBS.hoard_bound_pulsar).toBeUndefined();
+    expect(RIFT_TRASH_IDS).not.toContain('hoard_bound_pulsar');
+    expect(RIFT_MONSTER_BY_ID.hoard_bound_pulsar).toBeUndefined();
   });
 
   it('gives every ability key a human-readable label, never a raw camelCase leak', () => {

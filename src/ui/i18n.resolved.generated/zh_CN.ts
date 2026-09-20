@@ -11198,7 +11198,8 @@ export const zh_CN: EnTranslations = {
       "hoard_cast_silence": "沉默尖啸",
       "hoard_cast_hex": "妖术",
       "hoard_lightning_strike": "雷霆打击",
-      "hoard_ice_age": "冰河时代"
+      "hoard_ice_age": "冰河时代",
+      "hoard_pulsar_overload": "脉冲星过载"
     }
   },
   "questUi": {
@@ -18089,6 +18090,9 @@ export const zh_CN: EnTranslations = {
       },
       "hoard_healing_tide_totem": {
         "name": "治疗之潮图腾"
+      },
+      "hoard_bound_pulsar": {
+        "name": "受缚脉冲星"
       },
       "rift_spawnling": {
         "name": "裂隙孽生体"

@@ -11198,7 +11198,8 @@ export const ru_RU: EnTranslations = {
       "hoard_cast_silence": "Заглушающий визг",
       "hoard_cast_hex": "Сглаз",
       "hoard_lightning_strike": "Удар молнии",
-      "hoard_ice_age": "Ледниковый период"
+      "hoard_ice_age": "Ледниковый период",
+      "hoard_pulsar_overload": "Перегрузка пульсара"
     }
   },
   "questUi": {
@@ -18089,6 +18090,9 @@ export const ru_RU: EnTranslations = {
       },
       "hoard_healing_tide_totem": {
         "name": "Тотем целительного прилива"
+      },
+      "hoard_bound_pulsar": {
+        "name": "Скованный пульсар"
       },
       "rift_spawnling": {
         "name": "Отпрыск Разлома"

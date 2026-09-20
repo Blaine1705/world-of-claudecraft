@@ -11198,7 +11198,8 @@ export const ko_KR: EnTranslations = {
       "hoard_cast_silence": "침묵의 비명",
       "hoard_cast_hex": "주술",
       "hoard_lightning_strike": "번개 강타",
-      "hoard_ice_age": "빙하기"
+      "hoard_ice_age": "빙하기",
+      "hoard_pulsar_overload": "펄서 과부하"
     }
   },
   "questUi": {
@@ -18089,6 +18090,9 @@ export const ko_KR: EnTranslations = {
       },
       "hoard_healing_tide_totem": {
         "name": "치유의 해일 토템"
+      },
+      "hoard_bound_pulsar": {
+        "name": "속박된 펄서"
       },
       "rift_spawnling": {
         "name": "균열의 산물"

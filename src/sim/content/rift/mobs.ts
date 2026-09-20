@@ -107,6 +107,37 @@ export const HOARD_MOBS: Record<string, MobTemplate> = {
     idleStationary: true,
     untameable: true,
   },
+  // One of Nyxaris's pulsars once he unbinds it (src/sim/rift/hoard_pulsars.ts):
+  // it holds a station in the room, burns a player with a chasing beam, and keeps
+  // him immune until it dies. Its health is set from the boss's own at the cast,
+  // so these numbers are only a floor. It never moves and never swings.
+  hoard_bound_pulsar: {
+    id: 'hoard_bound_pulsar',
+    name: 'Bound Pulsar',
+    minLevel: 18,
+    maxLevel: 23,
+    family: 'elemental',
+    hpBase: 60,
+    hpPerLevel: 6,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 99,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0x5fb4ff,
+    xpMult: 0,
+    idleStationary: true,
+    untameable: true,
+    // It never moves, so a player shooting it from range is always out of its
+    // reach. In open ground the chase-stall probe (mob/reachability.ts) lets that
+    // be, but with an obstacle between them it would read it as a terrain exploit
+    // and pin the orb immune for ten seconds, mid burn phase. A mob that cannot
+    // move cannot be terrain-pinned: opt it out.
+    phasesThroughObstacles: true,
+  },
 };
 
 // Shared summoned adds (referenced by bosses' summonAdds.mobId). Low HP, no loot.

@@ -681,6 +681,23 @@ caution from the sweep: never add "Weathered", "Carved" or "Runed" as further
 tier words beside "Gilded", which would reproduce WoW's upgrade-crest ladder
 (our common map is already "Weathered Treasure Map"; keep it at that).
 
+### Buried Hoard boss mechanics: Ice Age and the pulsars (web-verified 2026-09-20)
+
+Exact-phrase and coined-token searches against the major game wikis.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Ice Age | Hoarfrost's survival cast | KEEP. A geological term and common English; used as a generic spell or card name across many unrelated games, distinctive to none. |
+| Falling Icicle | the icicle's damage line | KEEP. Plain descriptive English. |
+| Bound Pulsar | the attackable orb mob | KEEP. No match. "Pulsar" is an astronomy word; the pairing is ours. |
+| Twin Pulsars | the mechanic | KEEP. No match. |
+| Bound Pulsars | the boss aura | KEEP. No match. |
+| Pulsar Ward | the boss's immunity aura | KEEP. No match. |
+| Pulsar Overload | the phase's deadline cast | KEEP. No match as a named ability ("Beams: Overload" in Star Trek Online is a different phrase). |
+| Pulsar Beam | REJECTED before shipping | A named technology in StarCraft and a named weapon in Homeworld. Replaced. |
+| Pulsar Lance | REJECTED before shipping | A named Aeldari weapon in Warhammer 40,000. Never used. |
+| Tracking Beam | the beam's damage line | KEEP. Plain descriptive English, chosen to replace the two above. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

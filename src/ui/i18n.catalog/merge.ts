@@ -547,6 +547,9 @@ const mergeStringsEn = {
       hoard_lightning_strike: 'Lightning Strike',
       // Hoarfrost's survival cast (src/sim/rift/hoard_ice_age.ts): read, never kicked.
       hoard_ice_age: 'Ice Age',
+      // Nyxaris's pulsar phase (src/sim/rift/hoard_pulsars.ts): the bar is the
+      // deadline the orbs must die by.
+      hoard_pulsar_overload: 'Pulsar Overload',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

@@ -416,6 +416,13 @@ something this file marks as restricted, ask first: tony@levystreet.com.
   texture or reference image is used.
   Source and provenance: `docs/design/ice-age/README.md`.
 
+### Bound Pulsars (Archon Nyxaris's orbs)
+
+- `public/vfx/pulsars/{orb,core}.glb`: original procedural Blender art authored for
+  World of ClaudeCraft from the owner's orb brief. No third-party mesh, texture or
+  reference image is used, and the design copies no other game's orbs.
+  Source and provenance: `docs/design/pulsars/README.md`.
+
 ### Buried Hoard reward chest
 
 - `public/models/props/hoard_reward_chest.glb`: original procedural Blender art

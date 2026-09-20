@@ -4,6 +4,7 @@ import { isBoneReaperVariant } from '../sim/rift/hoard_bone_reaper_core';
 import { HOARD_SWEEP_HALF_ANGLE, HOARD_SWEEP_RANGE } from '../sim/rift/hoard_boss';
 import { HOARD_BRUTE_COMBO } from '../sim/rift/hoard_boss_kits';
 import { isIceAgeVariant } from '../sim/rift/hoard_ice_age_core';
+import { isPulsarVariant } from '../sim/rift/hoard_pulsars_core';
 import { vaultSeedZone } from '../sim/rift/vault_seed';
 import type { HoardBossCueView } from '../world_api/dungeons';
 import { attachSceneGroupGated } from './gated_scene_attach';
@@ -537,7 +538,12 @@ export class HoardBossFx {
       if (cue.variant === 'storm-orbital') continue;
       // Xarreth's scythe and souls draw themselves (hoard_bone_reaper.ts): their
       // cue numbers carry a route, not a floor shape.
-      if (isBoneReaperVariant(cue.variant) || isIceAgeVariant(cue.variant)) continue;
+      if (
+        isBoneReaperVariant(cue.variant) ||
+        isIceAgeVariant(cue.variant) ||
+        isPulsarVariant(cue.variant)
+      )
+        continue;
       const key = `${cue.instanceId}:${cue.cueId}`;
       seen.add(key);
       let slot = this.slots.find((candidate) => candidate.key === key);

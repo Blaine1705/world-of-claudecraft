@@ -11198,7 +11198,8 @@ export const es_ES: EnTranslations = {
       "hoard_cast_silence": "Silencing Shriek",
       "hoard_cast_hex": "Hex",
       "hoard_lightning_strike": "Lightning Strike",
-      "hoard_ice_age": "Ice Age"
+      "hoard_ice_age": "Ice Age",
+      "hoard_pulsar_overload": "Pulsar Overload"
     }
   },
   "questUi": {
@@ -18089,6 +18090,9 @@ export const es_ES: EnTranslations = {
       },
       "hoard_healing_tide_totem": {
         "name": "Healing Tide Totem"
+      },
+      "hoard_bound_pulsar": {
+        "name": "Bound Pulsar"
       },
       "rift_spawnling": {
         "name": "Cría de la Brecha"

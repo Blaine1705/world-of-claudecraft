@@ -405,6 +405,8 @@ describe('the density model covers the shipped world', () => {
       .sort();
     expect(noXp).toEqual([
       'dragonkin_egg',
+      'hoard_bound_pulsar',
+      'hoard_brood_egg',
       'hoard_healing_tide_totem',
       'nythraxis_bone_spike',
       'spider_egg',
@@ -413,7 +415,8 @@ describe('the density model covers the shipped world', () => {
     ]);
     // Two are camp-spawned: the sac is placed by delve room logic, the cat is a
     // battleground objective, the Nythraxis Bone Spike is raised by the raid
-    // encounter script, and the Healing Tide Totem is raised by a Hoard boss,
+    // encounter script, and the Healing Tide Totem, the Brood Clutch and the Bound
+    // Pulsars are raised by Hoard bosses,
     // so no camp cluster can ever hold those and the density model never sees them.
     //
     // spider_egg is the second, and it is deliberately NOT added to the

@@ -11198,7 +11198,8 @@ export const ja_JP: EnTranslations = {
       "hoard_cast_silence": "沈黙の金切り声",
       "hoard_cast_hex": "呪術",
       "hoard_lightning_strike": "落雷",
-      "hoard_ice_age": "氷河期"
+      "hoard_ice_age": "氷河期",
+      "hoard_pulsar_overload": "パルサー過負荷"
     }
   },
   "questUi": {
@@ -18089,6 +18090,9 @@ export const ja_JP: EnTranslations = {
       },
       "hoard_healing_tide_totem": {
         "name": "癒やしの潮のトーテム"
+      },
+      "hoard_bound_pulsar": {
+        "name": "縛られしパルサー"
       },
       "rift_spawnling": {
         "name": "リフトの落とし子"

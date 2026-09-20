@@ -26,6 +26,10 @@ export const HOARD_CONTROL_CAST_SCHOOLS: Readonly<Record<string, { school: Aura[
  *  kick, so it has no interruptible school. */
 export const HOARD_CAST_ICE_AGE = 'hoard_ice_age';
 
+/** Nyxaris's pulsar phase (hoard_pulsars.ts): the bar is the deadline the orbs
+ *  must die by, never a cast to kick. */
+export const HOARD_CAST_PULSAR_OVERLOAD = 'hoard_pulsar_overload';
+
 /** The Storm Caller's Lightning Strike (hoard_lightning_strike.ts), here for the
  *  same reason: healer_channel.ts reads its school. */
 export const HOARD_CAST_LIGHTNING_STRIKE = 'hoard_lightning_strike';

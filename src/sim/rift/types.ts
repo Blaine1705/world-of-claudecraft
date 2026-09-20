@@ -390,7 +390,11 @@ export type HoardBossCueVariant =
   | 'bone-harvest'
   | 'bone-soul'
   | 'frost-iceage'
-  | 'frost-pillar';
+  | 'frost-pillar'
+  | 'arcane-pulsar-ward'
+  | 'arcane-pulsar'
+  | 'arcane-pulsar-lock'
+  | 'arcane-pulsar-beam';
 
 export type HoardBossCue =
   | {
@@ -443,6 +447,7 @@ export interface HoardBossState {
   /** Bonelord Xarreth's Wandering Scythe and Soul Harvest (hoard_bone_reaper.ts). */
   boneReaper?: import('./hoard_bone_reaper').HoardBoneReaperState;
   iceAge?: import('./hoard_ice_age').HoardIceAgeState;
+  pulsars?: import('./hoard_pulsars').HoardPulsarState;
   /** Storm Surge (src/sim/rift/hoard_storm_surge.ts): Vharok's stacks while he
    *  stands in his own charged ground, and the size he returns to. */
   stormSurgeStacks?: number;

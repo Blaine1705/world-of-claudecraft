@@ -11198,7 +11198,8 @@ export const en_XA: EnTranslations = {
       "hoard_cast_silence": "[Šíļéñçíñĝ Šĥŕíéķ]",
       "hoard_cast_hex": "[Ĥéẋ]",
       "hoard_lightning_strike": "[Ļíĝĥţñíñĝ Šţŕíķé]",
-      "hoard_ice_age": "[Íçé Áĝé]"
+      "hoard_ice_age": "[Íçé Áĝé]",
+      "hoard_pulsar_overload": "[Þúļšáŕ Óʋéŕļóáð]"
     }
   },
   "questUi": {
@@ -18089,6 +18090,9 @@ export const en_XA: EnTranslations = {
       },
       "hoard_healing_tide_totem": {
         "name": "[Ĥéáļíñĝ Ţíðé Ţóţéɱ]"
+      },
+      "hoard_bound_pulsar": {
+        "name": "[Ɓóúñð Þúļšáŕ]"
       },
       "rift_spawnling": {
         "name": "[Ŕíƒţ Šþáŵñļíñĝ]"

@@ -3668,6 +3668,20 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.35,
     selfIllumination: 0.14,
   },
+  // Nyxaris's Bound Pulsar (src/sim/rift/hoard_pulsars.ts): an unbound orb holding
+  // its station in the room. This body is the NUCLEUS alone, hovering where the
+  // players can reach it, so targeting, the nameplate and the health bar are the
+  // ordinary ones; its armour, rings, links and beam are drawn round it by
+  // src/render/hoard_pulsars.ts. Original Blender art (docs/design/pulsars/), no
+  // clips, so it uses the static prop lane.
+  mob_bound_pulsar: {
+    url: 'vfx/pulsars/core.glb',
+    height: 1.5,
+    hover: 2.25,
+    clips: STATIC_PROP,
+    selfIllumination: 0.9,
+    clickRadius: 2,
+  },
   // Bone Spike (the Nythraxis raid, src/sim/nythraxis_bone_spike.ts): the
   // Tripo cluster of bone spikes erupting from cracked flagstones with violet
   // tips that pins an impaled raider until the raid shatters it. A stationary
@@ -3880,6 +3894,7 @@ const MOB_KEYS: Record<string, string> = {
   spider_egg_sac: 'mob_spider_egg_sac',
   hoard_brood_egg: 'mob_spider_egg_sac',
   hoard_healing_tide_totem: 'mob_healing_tide_totem',
+  hoard_bound_pulsar: 'mob_bound_pulsar',
   // Broodmother clutch (q_broodmother): the destructible eggs reuse the egg-sac
   // model (not a live spider), and the hatchling is a small spider.
   spider_egg: 'mob_spider_egg_sac',

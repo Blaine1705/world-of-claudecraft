@@ -141,6 +141,7 @@ const MOB_IDS = [
   'hoard_brood_egg',
   'hoard_brood_hatchling',
   'hoard_healing_tide_totem',
+  'hoard_bound_pulsar',
   'rift_spawnling',
   'rift_bonewalker',
   'rift_frost_revenant',

@@ -31,6 +31,13 @@ import {
 } from './hoard_ice_age';
 import { hoardLightningStrikeCues } from './hoard_lightning_strike';
 import { startHoardOrbitalLightning, tickHoardOrbitalCarrier } from './hoard_orbital_lightning';
+import {
+  clearHoardPulsars,
+  ensureHoardPulsars,
+  isPulsarCue,
+  tickHoardPulsarCue,
+  tickHoardPulsars,
+} from './hoard_pulsars';
 import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
 import {
   resolveHoardStormStaticTargets,
@@ -260,6 +267,7 @@ function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   clearHoardStormSurge(boss, inst.hoardBoss);
   clearHoardBoneReaper(boss, inst.hoardBoss);
   clearHoardIceAge(boss, inst.hoardBoss);
+  clearHoardPulsars(ctx, inst, boss, inst.hoardBoss);
   delete inst.hoardBoss;
   for (const player of instancePlayers(ctx, inst)) {
     ctx.emit({ type: 'hoardBossCueClear', pid: player.id });
@@ -475,6 +483,10 @@ function tickSpecialKit(
   }
   if (kit === 'frost') {
     tickHoardIceAge(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
+    return;
+  }
+  if (kit === 'arcane') {
+    tickHoardPulsars(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     return;
   }
   if (kit === 'tide') {
@@ -795,6 +807,10 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
       if (tickHoardBoneCue(ctx, inst, boss, state, cue, bonePlayers, emitCue)) live.push(cue);
       continue;
     }
+    if (isPulsarCue(cue)) {
+      if (tickHoardPulsarCue(cue)) live.push(cue);
+      continue;
+    }
     if (isIceAgeCue(cue)) {
       if (tickHoardIceAgeCue(ctx, inst, boss, state, cue, icePlayers)) live.push(cue);
       continue;
@@ -1110,6 +1126,7 @@ export function tickHoardBossMechanics(ctx: SimContext): void {
       continue;
     }
     if (kit === 'brood') ensureBroodEggs(ctx, inst, boss);
+    if (kit === 'arcane') ensureHoardPulsars(ctx, inst, boss);
     const engaged = boss.aiState === 'attack' || boss.aiState === 'chase';
     if (!engaged) {
       clearState(ctx, inst, boss);

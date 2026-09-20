@@ -243,6 +243,9 @@ const CLIPLESS_RIGS = new Set([
   'mob_duskwisp',
   'mob_spider_egg_sac',
   'mob_healing_tide_totem',
+  // Nyxaris's Bound Pulsar: the nucleus as a static prop; every motion it has is
+  // drawn round it procedurally (src/render/hoard_pulsars.ts)
+  'mob_bound_pulsar',
   // the dragonkin clutch shell: a two-state prop whose GLB ships no clips
   // (alive/dead is a mesh-visibility swap, VisualDef.corpseMeshSwap)
   'mob_dragon_egg',
