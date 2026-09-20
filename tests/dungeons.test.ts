@@ -2964,7 +2964,59 @@ describe('dungeons: raid lockout gate', () => {
     ).toBe(true);
   });
 
-  it('blocks the disband-and-reform bypass: an active reset lock still bars a fresh raid slot under a brand-new party id', () => {
+  it('a raid can switch difficulty again right after a reset: no five-minute cooldown rides a raid claim, the raid lockout is its rate limit', () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    const members = sim.partyOf(leader)!.members as number[];
+    for (const m of members) {
+      sim.players.get(m)!.characterId = 700 + m;
+      sim.players.get(m)!.questsDone.add('q_nythraxis_bound_guardian');
+      enterDungeon(sim.ctx, 'nythraxis_boss_arena', m);
+    }
+    for (const m of members) teleport(sim, sim.entities.get(m) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.resetDungeonInstances(leader);
+    const inst = claimedDungeon(sim, 'nythraxis_boss_arena', 'heroic');
+    expect(inst).toBeDefined();
+    // The reported bug: the Normal to Heroic switch stamped the five-minute
+    // reset cooldown on the claim AND on every raid member, so a raid that
+    // bounced off Heroic could not drop back to Normal (or correct a wrong
+    // pick) for five minutes. Raid rooms carry their own daily/weekly
+    // lockout at both tiers (checked above), so the cooldown guarded
+    // nothing there and only stranded the group.
+    expect(inst.resetAvailableAt).toBeLessThanOrEqual(sim.time);
+    for (const m of members) {
+      expect(sim.dungeonResetLocks.has(`char:${700 + m}:nythraxis_boss_arena`)).toBe(false);
+    }
+    expect(sim.dungeonResetLocks.size).toBe(0);
+    sim.setDungeonDifficulty('normal', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    expect(inst.difficulty).toBe('normal');
+    expect(inst.partyKey).not.toBeNull();
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === leader &&
+          event.text === 'All instances have been reset.',
+      ),
+    ).toBe(true);
+    // Every member walks straight into the fresh Normal claim.
+    for (const m of members) {
+      sim.drainEvents();
+      expect(enterDungeon(sim.ctx, 'nythraxis_boss_arena', m)).toBe(true);
+      expect(
+        (sim.drainEvents() as any[]).some(
+          (event) => event.text === 'Instances can only be reset once every 5 minutes.',
+        ),
+      ).toBe(false);
+    }
+  });
+
+  it('a raid reformed under a fresh party id claims a fresh slot at once, exactly what Reset All now gives it; the daily lockout is what still bars it', () => {
     const sim = makeSim();
     const leader = attunedRaid(sim);
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
@@ -2972,12 +3024,6 @@ describe('dungeons: raid lockout gate', () => {
     sim.setDungeonDifficulty('heroic', leader);
     sim.resetDungeonInstances(leader);
 
-    // Every other member leaves, dissolving the raid entirely (down to a
-    // solo leader); re-inviting the same four and reconverting to a raid
-    // reforms under a genuinely fresh (ephemeral) party id. Before this fix
-    // that reform was the ONLY way a raid group could switch difficulty at
-    // all, because a fresh party key claims a brand-new slot with none of
-    // the checks Reset All enforces (issue #3784).
     const others = (sim.partyOf(leader)!.members as number[]).filter((m) => m !== leader);
     for (const m of others) sim.partyLeave(m);
     for (const m of others) {
@@ -2988,20 +3034,33 @@ describe('dungeons: raid lockout gate', () => {
     sim.setDungeonDifficulty('normal', leader);
     sim.drainEvents();
 
-    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    expect(enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader)).toBe(true);
+    expect(claimedDungeon(sim, 'nythraxis_boss_arena', 'normal').partyKey).toBe(
+      instanceKeyFor(sim.ctx, leader),
+    );
 
+    // The reform was never the exploit; a kill's lockout is. With the arena
+    // cleared on Normal today, neither the door nor a reset opens another
+    // Normal claim.
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.players.get(leader)!.raidLockouts.set('nythraxis_boss_arena', 999999999);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.resetDungeonInstances(leader);
+    sim.setDungeonDifficulty('normal', leader);
+    sim.drainEvents();
+    sim.resetDungeonInstances(leader);
+    expect(claimedDungeon(sim, 'nythraxis_boss_arena', 'heroic')).toBeDefined();
     expect(
       (sim.drainEvents() as any[]).some(
         (event) =>
           event.type === 'error' &&
           event.pid === leader &&
-          event.text === 'Instances can only be reset once every 5 minutes.',
+          event.text === 'You are locked to Nythraxis Raid Arena.',
       ),
     ).toBe(true);
-    expect(sim.instanceSlotAt((sim.entities.get(leader) as AnyEntity).pos)).toBeNull();
   });
 
-  it('a fresh recruit inherits the raid claim reset lock on party join, the same way a standard claim already did', () => {
+  it('a fresh recruit joining a raid after a reset inherits no reset lock (there is none to inherit), while a standard-dungeon recruit still inherits one', () => {
     const sim = makeSim();
     const leader = attunedRaid(sim);
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
@@ -3013,7 +3072,87 @@ describe('dungeons: raid lockout gate', () => {
     sim.partyInvite(recruit, leader);
     sim.partyAccept(recruit);
 
-    expect(sim.dungeonResetLocks.has('char:601:nythraxis_boss_arena')).toBe(true);
+    expect(sim.dungeonResetLocks.has('char:601:nythraxis_boss_arena')).toBe(false);
+    expect(sim.dungeonResetLocks.size).toBe(0);
+
+    // The standard-dungeon arm is untouched: a solo runner's Hollow Crypt reset
+    // still stamps the lock, and a recruit joining them still inherits it.
+    const solo = sim.addPlayer('mage', 'CryptRunner', { characterId: 602 });
+    enterDungeon(sim.ctx, 'hollow_crypt', solo);
+    teleport(sim, sim.entities.get(solo) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', solo);
+    sim.resetDungeonInstances(solo);
+    expect(sim.dungeonResetLocks.has('char:602:hollow_crypt')).toBe(true);
+    const cryptRecruit = sim.addPlayer('mage', 'CryptJoiner', { characterId: 603 });
+    sim.partyInvite(cryptRecruit, solo);
+    sim.partyAccept(cryptRecruit);
+    expect(sim.dungeonResetLocks.has('char:603:hollow_crypt')).toBe(true);
+    expect(sim.dungeonResetLocks.size).toBe(2);
+  });
+
+  it('one Reset All over a standard claim and a raid claim stamps the cooldown per claim: the crypt pays it, the arena does not', () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'Lead', { characterId: 650 });
+    while ((sim.partyOf(leader)?.members.length ?? 1) < 5) {
+      const pid = sim.addPlayer('priest', `Fill${sim.players.size}`);
+      sim.partyInvite(pid, leader);
+      sim.partyAccept(pid);
+    }
+    enterDungeon(sim.ctx, 'hollow_crypt', leader);
+    const cryptInst = claimedDungeon(sim, 'hollow_crypt', 'normal');
+    leaveDungeon(sim.ctx, leader);
+    sim.convertPartyToRaid(leader);
+    sim.players.get(leader)!.questsDone.add('q_nythraxis_bound_guardian');
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    const arenaInst = claimedDungeon(sim, 'nythraxis_boss_arena', 'normal');
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    expect(cryptInst.difficulty).toBe('heroic');
+    expect(arenaInst.difficulty).toBe('heroic');
+    // Same call, two verdicts: the five-man claim keeps its five-minute
+    // cooldown and member locks (the free-boss-respawn guard it exists for),
+    // the raid claim carries none.
+    expect(cryptInst.resetAvailableAt).toBeGreaterThan(sim.time);
+    expect(arenaInst.resetAvailableAt).toBeLessThanOrEqual(sim.time);
+    expect(sim.dungeonResetLocks.has('char:650:hollow_crypt')).toBe(true);
+    expect(sim.dungeonResetLocks.has('char:650:nythraxis_boss_arena')).toBe(false);
+    expect([...sim.dungeonResetLocks.keys()].every((key) => key.endsWith(':hollow_crypt'))).toBe(
+      true,
+    );
+  });
+
+  it('the Ignivar chain switches tier and back without the five-minute cooldown (the lift, its one reclaimed room, carries none)', () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    const members = sim.partyOf(leader)!.members as number[];
+    for (const m of members) {
+      sim.players.get(m)!.characterId = 800 + m;
+      expect(enterDungeon(sim.ctx, 'ignivar_forge_lift', m)).toBe(true);
+    }
+    for (const m of members) teleport(sim, sim.entities.get(m) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.resetDungeonInstances(leader);
+    const lift = claimedDungeon(sim, 'ignivar_forge_lift', 'heroic');
+    expect(lift).toBeDefined();
+    expect(lift.resetAvailableAt).toBeLessThanOrEqual(sim.time);
+    expect(sim.dungeonResetLocks.size).toBe(0);
+    sim.setDungeonDifficulty('normal', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    expect(lift.difficulty).toBe('normal');
+    expect(lift.partyKey).toBe(instanceKeyFor(sim.ctx, leader));
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) => event.pid === leader && event.text === 'All instances have been reset.',
+      ),
+    ).toBe(true);
+    for (const m of members) expect(enterDungeon(sim.ctx, 'ignivar_forge_lift', m)).toBe(true);
   });
 
   it('Reset All Instances is atomic across everything the key owns: a raid claim can block resetting an unrelated standard dungeon claim held under the same party', () => {
