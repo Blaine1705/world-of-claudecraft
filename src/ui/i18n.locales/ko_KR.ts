@@ -1787,6 +1787,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '전용 게이밍 GPU 사용',
   'hudChrome.options.forceHighPerfGpuNote':
     '기본값 켜짐: 데스크톱 앱이 이 컴퓨터의 전용 게이밍 GPU를 요청합니다. 게임이 시작되지 않거나, 시작 후 검은 화면만 보이거나, 노트북 화면이 나오지 않으면 끄세요. 이 설정은 다음에 게임을 시작할 때 적용됩니다.',
+  'hudChrome.options.frameRateCap': '프레임 속도 제한',
+  'hudChrome.options.frameRateCapAuto': '자동',
+  'hudChrome.options.frameRateCapDisplay': '디스플레이',
+  'hudChrome.options.frameRateCapNote':
+    '게임이 초당 그리는 이미지 수를 제한합니다. 디스플레이 속도를 따라가지 못하는 컴퓨터에서는 제한을 낮추면 화면이 더 안정되고 컴퓨터 발열도 줄어듭니다. 제한은 디스플레이에 맞춰지므로 실제 값은 숫자와 조금 다를 수 있습니다. 자동: 이 컴퓨터가 디스플레이를 따라가지 못할 때만 제한을 낮추고, 그 뒤로는 안정적으로 유지합니다(권장). 디스플레이: 제한 없음.',
+  'hudChrome.options.frameRateCapStatusPaced':
+    '{hz} Hz 디스플레이에서 초당 {fps}장을 그리고 있습니다.',
+  'hudChrome.options.frameRateCapStatusUnpaced': '초당 {fps}장으로 제한하고 있습니다.',
+  'hudChrome.options.frameRateCapStatusInert':
+    '이 디스플레이는 이미 이 제한 이하로 동작하므로 제한을 걸어도 달라지는 것이 없습니다.',
   'hudChrome.options.shaderWarm': '셰이더 사전 워밍업 워커',
   'hudChrome.options.shaderWarmAuto': '자동',
   'hudChrome.options.shaderWarmOff': '끄기',
@@ -2809,6 +2819,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresForm': '{form} 변신 상태여야 합니다.',
   'hud.errors.bear': '큰곰',
   'hud.errors.cat': '고양이',
+  'hud.errors.bearOrCat': '곰 또는 표범',
   'hud.errors.travel': '쾌속',
   'hud.errors.cantInForm': '{form} 변신 상태에서는 할 수 없습니다.',
   'hud.errors.shapeshifted': '변신 중에는 할 수 없습니다.',
@@ -3069,6 +3080,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.energy': '기력',
   'abilityUi.forms.bear': '곰',
   'abilityUi.forms.cat': '고양이',
+  'abilityUi.forms.bearOrCat': '곰 또는 고양이',
   'abilityUi.cast.fishing': '낚시',
   'abilityUi.cast.gathering': '채집',
   'abilityUi.cast.thunzharrStormcall': '폭풍의 부름',
@@ -7069,8 +7081,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '인터페이스 애니메이션을 없애 창이 즉시 나타나게 합니다. 접근성을 위한 옵션이 우선이지만, 성능에도 약간의 보너스가 있습니다.',
   'guide.settingsPage.rowPerfOverlay':
     'FPS, 프레임 시간 등을 화면 위에 실시간으로 보여 줍니다. 이 페이지를 참고해 설정을 조정하는 동안 켜 두었다가 다시 숨기면 됩니다.',
+  'guide.settingsPage.rowFrameRateCap':
+    '게임이 초당 그리는 이미지 수의 상한입니다. 디스플레이를 따라가지 못하는 컴퓨터는 고르지 않은 리듬에 머물게 되는데, 안정적인 30이 그보다 더 부드럽게 보이고 작업량을 절반으로 줄이며 컴퓨터 발열도 낮춥니다. 디스플레이는 제한 없음을 뜻합니다.',
   'guide.settingsPage.tableFoot':
-    "FPS 상한을 찾고 계신가요? 찾을 것이 없습니다. 프레임의 박자는 당신의 화면을 따릅니다. 그리기 거리는 세계 디테일 카드에 있는 '시야 거리'라는 독립된 조절기이며, 당신이 직접 옮기기 전까지는 각 사전 설정이 대신 정해 줍니다.",
+    "그리기 거리는 세계 디테일 카드에 있는 '시야 거리'라는 독립된 조절기이며, 당신이 직접 옮기기 전까지는 각 사전 설정이 대신 정해 줍니다.",
   'guide.settingsPage.mobileTitle': '휴대폰과 태블릿에서',
   'guide.settingsPage.mobileBody':
     "휴대폰이나 태블릿에서는 게임이 Low로 시작하게 합니다. 모든 터치 기기는 처음 실행할 때 그곳에 내려앉는데, 이는 당신이 세계에 들어와 플레이할 수 있도록 일부러 그렇게 한 것입니다. 언제든 그래픽 창에서 직접 올리세요. 안드로이드 브라우저에서는 사다리 전체가 열려 있고 선택도 그대로 유지됩니다. 아이폰과 아이패드에서도 최상위 사전 설정을 고를 수 있고 '적용'을 누르는 즉시 적용되지만, 다음에 실행할 때 게임이 당신을 High로 되돌립니다. 그만큼 큰 장면을 세우는 동안 iOS가 탭을 끝내 버릴 수 있기 때문입니다. 내려받은 앱은 한층 더 좁습니다. 사전 설정 목록이 High에서 멈추고 개별 시스템 조절기는 숨겨져 있는데, 앱이 그것들을 스스로 관리하기 때문입니다.",

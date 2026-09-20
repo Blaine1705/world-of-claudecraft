@@ -11268,7 +11268,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Xung quanh mưa và tuyết. Chỉ có khí quyển và tắt nó sẽ tiết kiệm được một chút khi có bão.',
   'guide.settingsPage.tableFoot':
-    'Đang tìm giới hạn FPS? Chẳng có gì để tìm cả: nhịp khung hình theo màn hình của bạn. Khoảng vẽ là một núm riêng, Tầm Nhìn, trong thẻ Chi Tiết Thế Giới, và mỗi thiết lập sẵn đặt nó giúp bạn cho tới khi bạn tự chỉnh.',
+    'Khoảng vẽ là một núm riêng, Tầm Nhìn, trong thẻ Chi Tiết Thế Giới, và mỗi thiết lập sẵn đặt nó giúp bạn cho tới khi bạn tự chỉnh.',
   'guide.settingsPage.tableHeading': 'Mọi tùy chọn đồ họa, được giải thích',
   'guide.settingsPage.tagReload': 'nhấn Áp dụng',
   'guide.settingsPage.value100': '100%',
