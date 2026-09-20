@@ -4394,6 +4394,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '영혼 치유사가 이 자리에서 부활시켜 주지만, 부활의 후유증으로 모든 능력치가 75% 감소하며 높은 레벨에서는 최대 10분간 지속됩니다. 영혼이 시신까지 걸어가서 부활하면 아무런 불이익이 없습니다.',
   'hudChrome.death.healerConfirmAccept': '부활',
   'hudChrome.death.healerConfirmCancel': '취소',
+  'hudChrome.death.keeperTalkTitle': '영혼 치유사',
+  'hudChrome.death.keeperTalkAccept': '부활',
+  'hudChrome.death.keeperTalkLeave': '떠나기',
+  'hudChrome.death.keeperConfirmSparedTitle': '영혼 치유사에게 부활을 맡기시겠습니까?',
+  'hudChrome.death.keeperTalkBody':
+    '그 자리에서 되살려 줄 수 있지만 대가가 따릅니다. 부활 후유증으로 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다. 10레벨 미만의 영웅은 후유증을 전혀 겪지 않습니다. 영혼이 쓰러진 곳으로 달려가 부활하면 아무런 대가가 없습니다.',
+  'hudChrome.death.keeperConfirmBody':
+    '정말입니까? 영혼 치유사가 당신을 부활시키지만 그 대가로 약해집니다. 부활 후유증이 사라질 때까지 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다.',
+  'hudChrome.death.keeperConfirmSparedBody':
+    '정말입니까? 영혼 치유사가 여기서 당신을 부활시킵니다. 당신은 10레벨 미만이므로 이번에는 부활 후유증으로 약해지지 않습니다.',
   'hudChrome.death.spiritHealerAlive': '영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다.',
   'hudChrome.death.ghostHint': '죽은 장소로 달려가거나 영혼 치유사에게 말을 걸어 부활하세요',
   'entities.npcs.spirit_healer.name': '영혼 치유사',

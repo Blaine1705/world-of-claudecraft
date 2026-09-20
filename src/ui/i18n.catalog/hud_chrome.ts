@@ -81,11 +81,27 @@ export const hudChromeStrings = {
     // WORDY by M16, so the five non-Latin overlays carry real fills.
     ghostHint: 'Run to the location of your death or talk to the Pale Keeper to revive',
     spiritHealerAlive: 'The Pale Keeper watches over the dead. You are still among the living.',
-    // Confirm dialog gating the Pale Keeper revive (the corpse run stays one-tap:
-    // it carries no penalty, so a confirm there would only add friction).
+    // The Pale Keeper's two-step revive (keeper_revive_dialog_core.ts). Step one is
+    // the Keeper's dialogue, opened by talking to it; step two is the confirmation
+    // Revive Me opens, worded for whether the Toll lands on this character. The
+    // corpse run stays one-tap: it carries no penalty, so a confirm there would
+    // only add friction. The three bodies are WORDY by M16, so the five non-Latin
+    // overlays carry real fills.
+    keeperTalkTitle: 'The Pale Keeper',
+    keeperTalkBody:
+      "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Heroes below level 10 are spared the Toll entirely. Walking your spirit back to where you fell revives you with no penalty.",
+    keeperTalkAccept: 'Revive Me',
+    keeperTalkLeave: 'Leave',
     healerConfirmTitle: "Accept the Keeper's Toll?",
+    // RETIRED in place: the single confirm's body, superseded by the two level-aware
+    // bodies below (the hud.core.mobileTarget retired-but-translated precedent).
     healerConfirmBody:
       "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+    keeperConfirmBody:
+      "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+    keeperConfirmSparedTitle: 'Let the Keeper raise you?',
+    keeperConfirmSparedBody:
+      "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
   },

@@ -11,28 +11,70 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "es_ES": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "fr_FR": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "fr_CA": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "en_CA": [],
   "it_IT": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "de_DE": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +82,102 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "nl_NL": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "pl_PL": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "id_ID": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "tr_TR": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "sv_SE": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "vi_VN": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ],
   "da_DK": [
     "hud.system.respawnKeeperToll",
-    "hudChrome.death.ghostHint"
+    "hudChrome.death.ghostHint",
+    "hudChrome.death.keeperConfirmBody",
+    "hudChrome.death.keeperConfirmSparedBody",
+    "hudChrome.death.keeperConfirmSparedTitle",
+    "hudChrome.death.keeperTalkAccept",
+    "hudChrome.death.keeperTalkBody",
+    "hudChrome.death.keeperTalkLeave",
+    "hudChrome.death.keeperTalkTitle"
   ]
 };

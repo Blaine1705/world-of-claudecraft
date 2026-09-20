@@ -4425,6 +4425,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '霊魂の癒し手はこの場で復活させてくれますが、復活の後遺症により全属性が75%低下します。高レベルでは最長10分間続きます。魂を遺体まで戻せばペナルティなしで復活できます。',
   'hudChrome.death.healerConfirmAccept': '復活する',
   'hudChrome.death.healerConfirmCancel': 'キャンセル',
+  'hudChrome.death.keeperTalkTitle': '霊魂の癒し手',
+  'hudChrome.death.keeperTalkAccept': '復活する',
+  'hudChrome.death.keeperTalkLeave': '立ち去る',
+  'hudChrome.death.keeperConfirmSparedTitle': '霊魂の癒し手に蘇らせてもらうか？',
+  'hudChrome.death.keeperTalkBody':
+    'その場で蘇らせることはできるが、代償が伴う。復活の後遺症により、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。レベル10未満の英雄には後遺症は一切かからない。倒れた場所まで魂を走らせて復活すれば、代償は何もない。',
+  'hudChrome.death.keeperConfirmBody':
+    '本当によいか？霊魂の癒し手はあなたを蘇らせるが、その代償として弱くなる。復活の後遺症が消えるまで、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。',
+  'hudChrome.death.keeperConfirmSparedBody':
+    '本当によいか？霊魂の癒し手はここであなたを蘇らせる。あなたはレベル10未満なので、今回は復活の後遺症で弱ることはない。',
   'hudChrome.death.spiritHealerAlive': '霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。',
   'hudChrome.death.ghostHint': '死亡した場所まで走るか、霊魂の癒し手に話しかけて復活しよう',
   'entities.npcs.spirit_healer.name': '霊魂の癒し手',

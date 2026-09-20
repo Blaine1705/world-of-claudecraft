@@ -209,6 +209,9 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  // The Pale Keeper's two-step revive copy (dialogue, then a level-aware confirm);
+  // hud.ts resolves the keys and owns the dialog DOM.
+  'src/ui/keeper_revive_dialog_core.ts',
   // The one clamp and disabled rule the source picker's row steppers and the
   // bank quantity prompt share (quantity_stepper.ts is their DOM consumer).
   'src/ui/quantity_step_core.ts',

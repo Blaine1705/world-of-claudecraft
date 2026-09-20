@@ -647,6 +647,7 @@ import {
   itemSetTooltipModel,
 } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
+import { keeperReviveConfirm, keeperReviveDialogue } from './keeper_revive_dialog_core';
 import { bindActionDisplayName } from './keybind_action_names_core';
 import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
@@ -16633,21 +16634,18 @@ export class Hud {
     );
   }
 
-  // The Pale Keeper revive is irreversible and applies The Keeper's Toll (all
-  // attributes -75%, level-scaled up to 10 minutes), so it confirms first; the
-  // penalty-free corpse run stays one tap. OK sends the exact pre-existing
-  // command; cancel/Escape sends nothing. Public because every entry point to
-  // the revive routes through this one gate: the world-click on the Pale Keeper
-  // (game/interactions.ts) and the interact key (game/nearby_interaction.ts).
-  // The ghost prompt no longer carries a Keeper button: the ghost talks to the Keeper.
+  // Talking to the Pale Keeper (world click, interact key) opens its dialogue, and
+  // Revive Me there opens a level-aware confirmation (keeper_revive_dialog_core.ts):
+  // the raise is irreversible and charges The Keeper's Toll from level 10 up. Only
+  // the second OK sends the command; cancel/Escape at either step sends nothing.
   requestSpiritHealerResurrect(): void {
-    this.confirmDialog(
-      t('hudChrome.death.healerConfirmTitle'),
-      t('hudChrome.death.healerConfirmBody'),
-      t('hudChrome.death.healerConfirmAccept'),
-      t('hudChrome.death.healerConfirmCancel'),
-      () => this.onResurrectAtSpiritHealer?.(),
-    );
+    const talk = keeperReviveDialogue();
+    this.confirmDialog(t(talk.titleKey), t(talk.bodyKey), t(talk.okKey), t(talk.cancelKey), () => {
+      const sure = keeperReviveConfirm(this.sim.player.level);
+      this.confirmDialog(t(sure.titleKey), t(sure.bodyKey), t(sure.okKey), t(sure.cancelKey), () =>
+        this.onResurrectAtSpiritHealer?.(),
+      );
+    });
   }
 
   // Heroic Quartermaster purchases debit Heroic Marks with no buyback recorded
