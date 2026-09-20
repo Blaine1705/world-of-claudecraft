@@ -1748,6 +1748,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "vfx/fire_01.png": "/media/vfx/fire_01.35fc73c16895.png",
   "vfx/flame_03.png": "/media/vfx/flame_03.195f614a39a4.png",
   "vfx/flare_01.png": "/media/vfx/flare_01.439a58c4e348.png",
+  "vfx/forge-hammer/hammer.glb": "/media/vfx/forge-hammer/hammer.fb4cd15a2cf5.glb",
   "vfx/ice-age/pillars.glb": "/media/vfx/ice-age/pillars.95fe950bdf6c.glb",
   "vfx/light_01.png": "/media/vfx/light_01.c9e0e947892b.png",
   "vfx/light_02.png": "/media/vfx/light_02.9ec3befd7a9f.png",

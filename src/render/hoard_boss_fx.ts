@@ -3,6 +3,7 @@ import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
 import { isBoneReaperVariant } from '../sim/rift/hoard_bone_reaper_core';
 import { HOARD_SWEEP_HALF_ANGLE, HOARD_SWEEP_RANGE } from '../sim/rift/hoard_boss';
 import { HOARD_BRUTE_COMBO } from '../sim/rift/hoard_boss_kits';
+import { isForgeHammerVariant } from '../sim/rift/hoard_forge_hammer_core';
 import { isIceAgeVariant } from '../sim/rift/hoard_ice_age_core';
 import { isPulsarVariant } from '../sim/rift/hoard_pulsars_core';
 import { vaultSeedZone } from '../sim/rift/vault_seed';
@@ -541,7 +542,8 @@ export class HoardBossFx {
       if (
         isBoneReaperVariant(cue.variant) ||
         isIceAgeVariant(cue.variant) ||
-        isPulsarVariant(cue.variant)
+        isPulsarVariant(cue.variant) ||
+        isForgeHammerVariant(cue.variant)
       )
         continue;
       const key = `${cue.instanceId}:${cue.cueId}`;

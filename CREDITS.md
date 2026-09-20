@@ -423,6 +423,13 @@ something this file marks as restricted, ask first: tony@levystreet.com.
   reference image is used, and the design copies no other game's orbs.
   Source and provenance: `docs/design/pulsars/README.md`.
 
+### Hammer of the Forge (Emberforge's falling hammer)
+
+- `public/vfx/forge-hammer/hammer.glb`: original procedural Blender art authored
+  for World of ClaudeCraft from the owner's forge hammer brief. No third-party
+  mesh, texture or reference image is used.
+  Source and provenance: `docs/design/forge-hammer/README.md`.
+
 ### Buried Hoard reward chest
 
 - `public/models/props/hoard_reward_chest.glb`: original procedural Blender art

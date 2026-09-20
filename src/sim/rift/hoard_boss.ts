@@ -24,6 +24,12 @@ import {
   pointInHoardTideWave,
 } from './hoard_boss_kits';
 import {
+  clearHoardForgeHammer,
+  isForgeHammerCue,
+  tickHoardForgeHammer,
+  tickHoardForgeHammerCue,
+} from './hoard_forge_hammer';
+import {
   clearHoardIceAge,
   isIceAgeCue,
   tickHoardIceAge,
@@ -268,6 +274,7 @@ function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   clearHoardBoneReaper(boss, inst.hoardBoss);
   clearHoardIceAge(boss, inst.hoardBoss);
   clearHoardPulsars(ctx, inst, boss, inst.hoardBoss);
+  clearHoardForgeHammer(inst.hoardBoss);
   delete inst.hoardBoss;
   for (const player of instancePlayers(ctx, inst)) {
     ctx.emit({ type: 'hoardBossCueClear', pid: player.id });
@@ -483,6 +490,10 @@ function tickSpecialKit(
   }
   if (kit === 'frost') {
     tickHoardIceAge(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
+    return;
+  }
+  if (kit === 'ember') {
+    tickHoardForgeHammer(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     return;
   }
   if (kit === 'arcane') {
@@ -801,10 +812,16 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     : undefined;
   const bonePlayers = state.cues.some(isBoneReaperCue) ? instancePlayers(ctx, inst) : [];
   const icePlayers = state.cues.some(isIceAgeCue) ? instancePlayers(ctx, inst) : [];
+  const forgePlayers = state.cues.some(isForgeHammerCue) ? instancePlayers(ctx, inst) : [];
   for (const cue of state.cues) {
     cue.remaining = Math.max(0, cue.remaining - DT);
     if (isBoneReaperCue(cue)) {
       if (tickHoardBoneCue(ctx, inst, boss, state, cue, bonePlayers, emitCue)) live.push(cue);
+      continue;
+    }
+    if (isForgeHammerCue(cue)) {
+      if (tickHoardForgeHammerCue(ctx, inst, boss, state, cue, forgePlayers, emitCue))
+        live.push(cue);
       continue;
     }
     if (isPulsarCue(cue)) {

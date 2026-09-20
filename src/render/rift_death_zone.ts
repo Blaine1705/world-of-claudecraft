@@ -24,6 +24,7 @@ import { HoardBossDressing } from './hoard_boss_dressing';
 import { HoardBossFx } from './hoard_boss_fx';
 import { HoardBossPresentation } from './hoard_boss_presentation';
 import { HoardEncounterAccents } from './hoard_encounter_accents';
+import { HoardForgeHammerFx } from './hoard_forge_hammer';
 import { HoardIceAgeFx } from './hoard_ice_age';
 import { HoardOrbitalLightning } from './hoard_orbital_lightning';
 import { HoardPulsarFx } from './hoard_pulsars';
@@ -76,6 +77,7 @@ export class RiftDeathZoneVisuals {
   private readonly hoardBoneReaper: HoardBoneReaperFx;
   private readonly hoardIceAge: HoardIceAgeFx;
   private readonly hoardPulsars: HoardPulsarFx;
+  private readonly hoardForgeHammer: HoardForgeHammerFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -100,6 +102,13 @@ export class RiftDeathZoneVisuals {
     this.hoardBoneReaper = new HoardBoneReaperFx(scene, groundY, world, compileGate, reducedMotion);
     this.hoardIceAge = new HoardIceAgeFx(scene, groundY, compileGate, reducedMotion, shake);
     this.hoardPulsars = new HoardPulsarFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.hoardForgeHammer = new HoardForgeHammerFx(
+      scene,
+      groundY,
+      compileGate,
+      reducedMotion,
+      shake,
+    );
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -117,6 +126,7 @@ export class RiftDeathZoneVisuals {
     this.hoardBoneReaper.sync(hoardCues);
     this.hoardIceAge.sync(hoardCues);
     this.hoardPulsars.sync(hoardCues);
+    this.hoardForgeHammer.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
       const key = `${z.x.toFixed(1)}:${z.z.toFixed(1)}:${z.radius.toFixed(1)}`;
@@ -151,6 +161,7 @@ export class RiftDeathZoneVisuals {
     this.hoardBoneReaper.update(dt);
     this.hoardIceAge.update(dt);
     this.hoardPulsars.update(dt);
+    this.hoardForgeHammer.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -175,6 +186,7 @@ export class RiftDeathZoneVisuals {
     this.hoardBoneReaper.dispose();
     this.hoardIceAge.dispose();
     this.hoardPulsars.dispose();
+    this.hoardForgeHammer.dispose();
     this.hoardPresentation.dispose();
   }
 
