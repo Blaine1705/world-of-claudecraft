@@ -14,22 +14,21 @@
 import { MOBS } from '../data';
 import type { SimContext } from '../sim_context';
 import { type Aura, DT, dist2d, type Entity } from '../types';
+import {
+  HOARD_CAST_FEAR,
+  HOARD_CAST_HEX,
+  HOARD_CAST_SILENCE,
+  HOARD_CAST_STUN,
+} from './hoard_control_cast_ids';
 import type { RiftInstance } from './types';
 
-/** Cast ids per control family. Each has a localized cast-bar name
- *  (src/ui/cast_display_name.ts) and an interruptible school. */
-export const HOARD_CAST_FEAR = 'hoard_cast_fear';
-export const HOARD_CAST_STUN = 'hoard_cast_stun';
-export const HOARD_CAST_SILENCE = 'hoard_cast_silence';
-export const HOARD_CAST_HEX = 'hoard_cast_hex';
-
-export const HOARD_CONTROL_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['school'] }>> =
-  Object.freeze({
-    [HOARD_CAST_FEAR]: { school: 'shadow' },
-    [HOARD_CAST_STUN]: { school: 'nature' },
-    [HOARD_CAST_SILENCE]: { school: 'shadow' },
-    [HOARD_CAST_HEX]: { school: 'nature' },
-  });
+export {
+  HOARD_CAST_FEAR,
+  HOARD_CAST_HEX,
+  HOARD_CAST_SILENCE,
+  HOARD_CAST_STUN,
+  HOARD_CONTROL_CAST_SCHOOLS,
+} from './hoard_control_cast_ids';
 
 /** Bar length for a single-target control and for a room-wide one. */
 /** Owner rule: no hoard caster bar is shorter than two seconds. */

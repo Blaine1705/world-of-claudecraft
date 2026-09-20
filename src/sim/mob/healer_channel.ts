@@ -1,5 +1,7 @@
-import { HOARD_CONTROL_CAST_SCHOOLS } from '../rift/hoard_control_casts';
-import { HOARD_LIGHTNING_STRIKE_CAST_SCHOOL } from '../rift/hoard_lightning_strike';
+import {
+  HOARD_CONTROL_CAST_SCHOOLS,
+  HOARD_LIGHTNING_STRIKE_CAST_SCHOOL,
+} from '../rift/hoard_control_cast_ids';
 import type { Aura } from '../types';
 import { VARKHUL_CINDER_REPAIR_CAST_ID } from '../varkhul_cinder_artificer';
 import { IGNIVAR_CINDER_LANCE_CAST_ID } from './ignivar_trash_automata';

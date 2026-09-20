@@ -21,6 +21,10 @@
 import { RIFT_REGION_HALF_X, RIFT_REGION_HALF_Z, riftInstanceOrigin } from '../data';
 import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
+import {
+  HOARD_CAST_LIGHTNING_STRIKE,
+  HOARD_LIGHTNING_STRIKE_CAST_SCHOOL,
+} from './hoard_control_cast_ids';
 import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, RiftInstance } from './types';
 
@@ -42,10 +46,7 @@ export const HOARD_LIGHTNING_STRIKE = {
   rangeYards: 32,
 } as const;
 
-export const HOARD_CAST_LIGHTNING_STRIKE = 'hoard_lightning_strike';
-export const HOARD_LIGHTNING_STRIKE_CAST_SCHOOL: Readonly<Record<string, { school: 'nature' }>> = {
-  [HOARD_CAST_LIGHTNING_STRIKE]: { school: 'nature' },
-};
+export { HOARD_CAST_LIGHTNING_STRIKE, HOARD_LIGHTNING_STRIKE_CAST_SCHOOL };
 
 /** Strike cue ids live far above the boss kit's own counter, so the two never
  *  collide inside one instance. */
