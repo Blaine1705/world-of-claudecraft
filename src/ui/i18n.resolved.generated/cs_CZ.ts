@@ -388,7 +388,7 @@ export const cs_CZ: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
-      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými.",
       "healerConfirmTitle": "Přijmout strážcovo mýto?",
       "healerConfirmBody": "Bledý strážce tě zde oživí, ale Strážcovo mýto sníží všechny tvé vlastnosti o 75 %, na vyšších úrovních až na 10 minut. Když se jako duch vrátíš ke svému tělu, oživíš se bez postihu.",

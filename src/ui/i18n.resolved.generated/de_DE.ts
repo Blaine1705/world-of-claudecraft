@@ -388,7 +388,7 @@ export const de_DE: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Am Leichnam wiederbeleben",
       "resurrectAtHealer": "Der Bleiche Hüter (Zoll des Hüters)",
-      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Der Bleiche Hüter wacht über die Toten. Du weilst noch unter den Lebenden.",
       "healerConfirmTitle": "Den Hüterzoll annehmen?",
       "healerConfirmBody": "Der Bleiche Hüter belebt dich hier wieder, doch der Hüterzoll verringert alle deine Attribute um 75 %, auf höheren Stufen bis zu 10 Minuten lang. Kehrst du als Geist zu deinem Leichnam zurück, wirst du ohne Strafe wiederbelebt.",

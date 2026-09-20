@@ -4393,7 +4393,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmAccept': '부활',
   'hudChrome.death.healerConfirmCancel': '취소',
   'hudChrome.death.spiritHealerAlive': '영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다.',
-  'hudChrome.death.ghostHint': '당신의 시신으로 달려가거나 영혼 치유사에게 말을 걸어 부활하세요',
+  'hudChrome.death.ghostHint': '죽은 장소로 달려가거나 영혼 치유사에게 말을 걸어 부활하세요',
   'entities.npcs.spirit_healer.name': '영혼 치유사',
   'entities.npcs.spirit_healer.title': '죽은 자의 수호자',
   'entities.npcs.spirit_healer.greeting':

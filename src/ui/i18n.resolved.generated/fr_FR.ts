@@ -388,7 +388,7 @@ export const fr_FR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Ressusciter près du cadavre",
       "resurrectAtHealer": "Le Veilleur pâle (Glas du Veilleur)",
-      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Le Veilleur pâle veille sur les morts. Vous êtes encore parmi les vivants.",
       "healerConfirmTitle": "Accepter le Glas du Veilleur ?",
       "healerConfirmBody": "Le Veilleur pâle vous fera revivre ici, mais le Glas du Veilleur réduit tous vos attributs de 75 % pendant un maximum de 10 minutes aux niveaux supérieurs. Ramener votre esprit à votre cadavre vous réanime sans pénalité.",

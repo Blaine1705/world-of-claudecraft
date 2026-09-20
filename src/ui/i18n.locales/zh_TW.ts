@@ -4254,7 +4254,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmAccept': '復活',
   'hudChrome.death.healerConfirmCancel': '取消',
   'hudChrome.death.spiritHealerAlive': '靈魂醫者只看護逝者。你仍是生者。',
-  'hudChrome.death.ghostHint': '跑回你的屍體，或與靈魂醫者交談以復活',
+  'hudChrome.death.ghostHint': '跑回你死亡的地點，或與靈魂醫者交談以復活',
   'entities.npcs.spirit_healer.name': '靈魂醫者',
   'entities.npcs.spirit_healer.title': '亡者的守護者',
   'entities.npcs.spirit_healer.greeting':

@@ -388,7 +388,7 @@ export const id_ID: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Bangkit di Jasad",
       "resurrectAtHealer": "Sang Penjaga Pucat (Upeti Sang Penjaga)",
-      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Sang Penjaga Pucat mengawasi para mati. Kamu masih termasuk yang hidup.",
       "healerConfirmTitle": "Terima Upeti Sang Penjaga?",
       "healerConfirmBody": "Sang Penjaga Pucat akan menghidupkan Anda kembali di sini, tetapi Upeti Sang Penjaga mengurangi semua atribut Anda sebesar 75%, hingga 10 menit pada level yang lebih tinggi. Membawa roh Anda kembali ke mayat Anda akan menghidupkan Anda kembali tanpa penalti.",

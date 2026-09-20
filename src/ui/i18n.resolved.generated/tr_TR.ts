@@ -388,7 +388,7 @@ export const tr_TR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Cesedinin Başında Diril",
       "resurrectAtHealer": "Solgun Bekçi (Bekçinin Bedeli)",
-      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Solgun Bekçi ölüleri gözetir. Sen hâlâ yaşayanlar arasındasın.",
       "healerConfirmTitle": "Bekçinin Bedelini kabul ediyor musunuz?",
       "healerConfirmBody": "Solgun Bekçi sizi burada canlandıracak, ancak Bekçinin Bedeli, daha yüksek seviyelerde 10 dakikaya kadar tüm niteliklerinizi %75 azaltır. Ruhunuzu cesedinize geri götürmek sizi hiçbir ceza almadan canlandırır.",

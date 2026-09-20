@@ -79,7 +79,7 @@ export const hudChromeStrings = {
     resurrectAtHealer: "The Pale Keeper (Keeper's Toll)",
     // The standing top-of-screen line for the whole ghost run (#ghost-hint).
     // WORDY by M16, so the five non-Latin overlays carry real fills.
-    ghostHint: 'Run to your body or talk to the Pale Keeper to revive',
+    ghostHint: 'Run to the location of your death or talk to the Pale Keeper to revive',
     spiritHealerAlive: 'The Pale Keeper watches over the dead. You are still among the living.',
     // Confirm dialog gating the Pale Keeper revive (the corpse run stays one-tap:
     // it carries no penalty, so a confirm there would only add friction).

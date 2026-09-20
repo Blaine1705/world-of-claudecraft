@@ -4435,7 +4435,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmAccept': 'Воскресить',
   'hudChrome.death.healerConfirmCancel': 'Отмена',
   'hudChrome.death.spiritHealerAlive': 'Целитель душ оберегает мёртвых. Вы всё ещё среди живых.',
-  'hudChrome.death.ghostHint': 'Бегите к своему телу или поговорите с Целителем душ, чтобы воскреснуть',
+  'hudChrome.death.ghostHint': 'Бегите к месту своей гибели или поговорите с Целителем душ, чтобы воскреснуть',
   'entities.npcs.spirit_healer.name': 'Целитель душ',
   'entities.npcs.spirit_healer.title': 'Хранитель мёртвых',
   'entities.npcs.spirit_healer.greeting':

@@ -388,7 +388,7 @@ export const es_ES: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Resucitar en el cadáver",
       "resurrectAtHealer": "El Guardián Pálido (Tañido del Guardián)",
-      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "El Guardián Pálido vela por los muertos. Tú aún estás entre los vivos.",
       "healerConfirmTitle": "¿Aceptar el Tañido del Guardián?",
       "healerConfirmBody": "El Guardián Pálido te revivirá aquí, pero el Tañido del Guardián reduce todos tus atributos un 75% durante un máximo de 10 minutos en los niveles más altos. Llevar tu espíritu de vuelta al cadáver te revive sin penalización.",
