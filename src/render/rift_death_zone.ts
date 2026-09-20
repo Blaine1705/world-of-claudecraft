@@ -23,6 +23,7 @@ import { HoardBoneReaperFx } from './hoard_bone_reaper';
 import { HoardBossDressing } from './hoard_boss_dressing';
 import { HoardBossFx } from './hoard_boss_fx';
 import { HoardBossPresentation } from './hoard_boss_presentation';
+import { HoardBoulderFx } from './hoard_boulder';
 import { HoardEncounterAccents } from './hoard_encounter_accents';
 import { HoardForgeHammerFx } from './hoard_forge_hammer';
 import { HoardIceAgeFx } from './hoard_ice_age';
@@ -80,6 +81,7 @@ export class RiftDeathZoneVisuals {
   private readonly hoardPulsars: HoardPulsarFx;
   private readonly hoardForgeHammer: HoardForgeHammerFx;
   private readonly hoardTentacles: HoardTentaclesFx;
+  private readonly hoardBoulder: HoardBoulderFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -112,6 +114,14 @@ export class RiftDeathZoneVisuals {
       shake,
     );
     this.hoardTentacles = new HoardTentaclesFx(scene, groundY, compileGate, reducedMotion, shake);
+    this.hoardBoulder = new HoardBoulderFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+    );
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -131,6 +141,7 @@ export class RiftDeathZoneVisuals {
     this.hoardPulsars.sync(hoardCues);
     this.hoardForgeHammer.sync(hoardCues);
     this.hoardTentacles.sync(hoardCues);
+    this.hoardBoulder.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
       const key = `${z.x.toFixed(1)}:${z.z.toFixed(1)}:${z.radius.toFixed(1)}`;
@@ -167,6 +178,7 @@ export class RiftDeathZoneVisuals {
     this.hoardPulsars.update(dt);
     this.hoardForgeHammer.update(dt);
     this.hoardTentacles.update(dt);
+    this.hoardBoulder.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -193,6 +205,7 @@ export class RiftDeathZoneVisuals {
     this.hoardPulsars.dispose();
     this.hoardForgeHammer.dispose();
     this.hoardTentacles.dispose();
+    this.hoardBoulder.dispose();
     this.hoardPresentation.dispose();
   }
 

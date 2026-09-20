@@ -550,6 +550,8 @@ const mergeStringsEn = {
       // Nyxaris's pulsar phase (src/sim/rift/hoard_pulsars.ts): the bar is the
       // deadline the orbs must die by.
       hoard_pulsar_overload: 'Pulsar Overload',
+      // Grask's throw (src/sim/rift/hoard_boulder.ts): read and answered, never kicked.
+      hoard_rolling_boulder: 'Rolling Boulder',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

@@ -3173,6 +3173,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.hoard_lightning_strike': '落雷',
   'abilityUi.cast.hoard_ice_age': '氷河期',
   'abilityUi.cast.hoard_pulsar_overload': 'パルサー過負荷',
+  'abilityUi.cast.hoard_rolling_boulder': '転がる大岩',
   'abilityUi.cast.rift_venom_execution': '毒の沼',
   'abilityUi.cast.rift_venom_strike': '蜘蛛母の刻印',
   'questUi.tracker.title': 'クエスト',

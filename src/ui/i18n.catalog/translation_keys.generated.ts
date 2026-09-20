@@ -37,6 +37,7 @@ export type TranslationKeyFlat =
   | 'abilityUi.cast.hoard_ice_age'
   | 'abilityUi.cast.hoard_lightning_strike'
   | 'abilityUi.cast.hoard_pulsar_overload'
+  | 'abilityUi.cast.hoard_rolling_boulder'
   | 'abilityUi.cast.rift_arcane_execution'
   | 'abilityUi.cast.rift_arcane_strike'
   | 'abilityUi.cast.rift_brute_execution'

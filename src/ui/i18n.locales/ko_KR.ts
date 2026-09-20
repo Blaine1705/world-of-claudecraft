@@ -3144,6 +3144,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.hoard_lightning_strike': '번개 강타',
   'abilityUi.cast.hoard_ice_age': '빙하기',
   'abilityUi.cast.hoard_pulsar_overload': '펄서 과부하',
+  'abilityUi.cast.hoard_rolling_boulder': '구르는 바위',
   'abilityUi.cast.rift_venom_execution': '독액 웅덩이',
   'abilityUi.cast.rift_venom_strike': '여왕 거미의 낙인',
   'questUi.tracker.title': '퀘스트',

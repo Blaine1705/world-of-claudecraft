@@ -11199,7 +11199,8 @@ export const ja_JP: EnTranslations = {
       "hoard_cast_hex": "呪術",
       "hoard_lightning_strike": "落雷",
       "hoard_ice_age": "氷河期",
-      "hoard_pulsar_overload": "パルサー過負荷"
+      "hoard_pulsar_overload": "パルサー過負荷",
+      "hoard_rolling_boulder": "転がる大岩"
     }
   },
   "questUi": {

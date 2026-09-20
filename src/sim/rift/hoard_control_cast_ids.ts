@@ -30,6 +30,10 @@ export const HOARD_CAST_ICE_AGE = 'hoard_ice_age';
  *  must die by, never a cast to kick. */
 export const HOARD_CAST_PULSAR_OVERLOAD = 'hoard_pulsar_overload';
 
+/** Grask's Rolling Boulder (hoard_boulder.ts): the wind-up of the throw, read
+ *  and answered, never kicked. */
+export const HOARD_CAST_ROLLING_BOULDER = 'hoard_rolling_boulder';
+
 /** The Storm Caller's Lightning Strike (hoard_lightning_strike.ts), here for the
  *  same reason: healer_channel.ts reads its school. */
 export const HOARD_CAST_LIGHTNING_STRIKE = 'hoard_lightning_strike';

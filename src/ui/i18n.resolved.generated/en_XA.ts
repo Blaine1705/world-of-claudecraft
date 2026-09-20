@@ -11199,7 +11199,8 @@ export const en_XA: EnTranslations = {
       "hoard_cast_hex": "[Ĥéẋ]",
       "hoard_lightning_strike": "[Ļíĝĥţñíñĝ Šţŕíķé]",
       "hoard_ice_age": "[Íçé Áĝé]",
-      "hoard_pulsar_overload": "[Þúļšáŕ Óʋéŕļóáð]"
+      "hoard_pulsar_overload": "[Þúļšáŕ Óʋéŕļóáð]",
+      "hoard_rolling_boulder": "[Ŕóļļíñĝ Ɓóúļðéŕ]"
     }
   },
   "questUi": {

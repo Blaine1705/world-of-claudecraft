@@ -11199,7 +11199,8 @@ export const ko_KR: EnTranslations = {
       "hoard_cast_hex": "주술",
       "hoard_lightning_strike": "번개 강타",
       "hoard_ice_age": "빙하기",
-      "hoard_pulsar_overload": "펄서 과부하"
+      "hoard_pulsar_overload": "펄서 과부하",
+      "hoard_rolling_boulder": "구르는 바위"
     }
   },
   "questUi": {

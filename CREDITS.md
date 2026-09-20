@@ -438,6 +438,13 @@ something this file marks as restricted, ask first: tony@levystreet.com.
   third-party mesh, texture or reference image.
   Source and provenance: `docs/design/tentacles/README.md`.
 
+### Rolling Boulder (Warlord Grask's boulder)
+
+- `public/vfx/boulder/boulder.glb`: original procedural Blender art authored for
+  this project (the iron-banded rock, its glowing fissures and the nine pieces it
+  breaks into). No third-party mesh, texture or reference image.
+  Source and provenance: `docs/design/boulder/README.md`.
+
 ### Buried Hoard reward chest
 
 - `public/models/props/hoard_reward_chest.glb`: original procedural Blender art

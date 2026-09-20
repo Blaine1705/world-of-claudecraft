@@ -11199,7 +11199,8 @@ export const zh_TW: EnTranslations = {
       "hoard_cast_hex": "妖術",
       "hoard_lightning_strike": "雷霆打擊",
       "hoard_ice_age": "冰河時代",
-      "hoard_pulsar_overload": "脈衝星過載"
+      "hoard_pulsar_overload": "脈衝星過載",
+      "hoard_rolling_boulder": "滾石"
     }
   },
   "questUi": {

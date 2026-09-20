@@ -3036,6 +3036,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.hoard_lightning_strike': '雷霆打击',
   'abilityUi.cast.hoard_ice_age': '冰河时代',
   'abilityUi.cast.hoard_pulsar_overload': '脉冲星过载',
+  'abilityUi.cast.hoard_rolling_boulder': '滚石',
   'abilityUi.cast.rift_venom_execution': '毒液池',
   'abilityUi.cast.rift_venom_strike': '蜘蛛母后之印',
   'questUi.tracker.title': '任务',

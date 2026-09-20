@@ -1742,6 +1742,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "textures/water/waternormals.jpg": "/media/textures/water/waternormals.add9912b158a.jpg",
   "vfx/bone-reaper/scythe.glb": "/media/vfx/bone-reaper/scythe.aaeef9775125.glb",
   "vfx/bone-reaper/soul.glb": "/media/vfx/bone-reaper/soul.b41ebdff4859.glb",
+  "vfx/boulder/boulder.glb": "/media/vfx/boulder/boulder.dc27f902ffcd.glb",
   "vfx/circle_05.png": "/media/vfx/circle_05.05e87b80ad4e.png",
   "vfx/dirt_02.png": "/media/vfx/dirt_02.64c4d7d7f529.png",
   "vfx/fel_meteor_impact.png": "/media/vfx/fel_meteor_impact.dd8ea4c48cc5.png",

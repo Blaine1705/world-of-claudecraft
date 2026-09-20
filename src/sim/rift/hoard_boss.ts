@@ -24,6 +24,12 @@ import {
   pointInHoardTideWave,
 } from './hoard_boss_kits';
 import {
+  clearHoardBoulder,
+  isBoulderCue,
+  tickHoardBoulder,
+  tickHoardBoulderCue,
+} from './hoard_boulder';
+import {
   clearHoardForgeHammer,
   isForgeHammerCue,
   tickHoardForgeHammer,
@@ -282,6 +288,7 @@ function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   clearHoardPulsars(ctx, inst, boss, inst.hoardBoss);
   clearHoardForgeHammer(inst.hoardBoss);
   clearHoardTentacles(ctx, inst, boss, inst.hoardBoss);
+  clearHoardBoulder(ctx, boss, inst.hoardBoss);
   delete inst.hoardBoss;
   for (const player of instancePlayers(ctx, inst)) {
     ctx.emit({ type: 'hoardBossCueClear', pid: player.id });
@@ -493,6 +500,10 @@ function tickSpecialKit(
   }
   if (kit === 'storm') {
     tickHoardStormSurge(ctx, boss, state);
+    return;
+  }
+  if (kit === 'brute') {
+    tickHoardBoulder(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     return;
   }
   if (kit === 'frost') {
@@ -832,6 +843,10 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     if (isForgeHammerCue(cue)) {
       if (tickHoardForgeHammerCue(ctx, inst, boss, state, cue, forgePlayers, emitCue))
         live.push(cue);
+      continue;
+    }
+    if (isBoulderCue(cue)) {
+      if (tickHoardBoulderCue(cue)) live.push(cue);
       continue;
     }
     if (isTentacleCue(cue)) {

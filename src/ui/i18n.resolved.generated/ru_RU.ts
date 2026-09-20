@@ -11199,7 +11199,8 @@ export const ru_RU: EnTranslations = {
       "hoard_cast_hex": "Сглаз",
       "hoard_lightning_strike": "Удар молнии",
       "hoard_ice_age": "Ледниковый период",
-      "hoard_pulsar_overload": "Перегрузка пульсара"
+      "hoard_pulsar_overload": "Перегрузка пульсара",
+      "hoard_rolling_boulder": "Катящийся валун"
     }
   },
   "questUi": {

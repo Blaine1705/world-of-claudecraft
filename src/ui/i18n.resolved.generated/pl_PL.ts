@@ -11199,7 +11199,8 @@ export const pl_PL: EnTranslations = {
       "hoard_cast_hex": "Hex",
       "hoard_lightning_strike": "Lightning Strike",
       "hoard_ice_age": "Ice Age",
-      "hoard_pulsar_overload": "Pulsar Overload"
+      "hoard_pulsar_overload": "Pulsar Overload",
+      "hoard_rolling_boulder": "Rolling Boulder"
     }
   },
   "questUi": {

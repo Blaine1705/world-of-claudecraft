@@ -711,6 +711,9 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Tentacle of the Maw | the attackable tentacle mob | KEEP. No match. Named for its owner, the Abyssal Maw. |
 | Abyssal Lash | the line whip's damage line | KEEP. One match, a spell on a tabletop homebrew wiki; adjective plus common noun. |
 | Drowning Sweep | the circular sweep's damage line | KEEP. No match. |
+| Rolling Boulder | Warlord Grask's arena cast (web-verified 2026-09-21) | KEEP. Plain descriptive English for a rolling rock, a stock hazard across games and film. One match as a named ability (Earth Spirit in Dota 2, where the hero rides it); ours is a thrown hazard a party answers, and shares nothing but the two common words. |
+| Rooted in Dread | the marked player's root | KEEP. No match. |
+| Crushed / Staggered | the fail stun, and Grask's stun when it is thrown back | KEEP. Single common English words. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
