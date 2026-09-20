@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { padMissingUv } from '../src/render/characters/far_bake_uv_pad';
+import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 
@@ -21,7 +22,8 @@ function kitMesh(): THREE.Mesh {
   geo.setAttribute('uv', new THREE.BufferAttribute(KIT_UV.slice(), 2));
   geo.setIndex([0, 1, 2]);
   const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ name: 'kit' }));
-  m.name = 'body';
+  // Named as the knight chest piece so the composed walk keeps it as a part.
+  m.name = 'Armor_knight_Chest';
   return m;
 }
 
@@ -34,7 +36,8 @@ function faceMesh(): THREE.Mesh {
   );
   geo.setIndex([0, 1, 2]);
   const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ name: 'skin' }));
-  m.name = 'face';
+  // Named as the base head so the composed walk keeps it as a part.
+  m.name = 'M_Head';
   return m;
 }
 
@@ -108,5 +111,18 @@ describe('far-LOD bake uv survival', () => {
     const kitIndex = values.findIndex((_, i) => i % 2 === 0 && values[i] === needle);
     expect(kitIndex).toBeGreaterThanOrEqual(0);
     expect(values.slice(kitIndex, kitIndex + KIT_UV.length)).toEqual(Array.from(KIT_UV));
+  });
+
+  it('keeps the uv on the COMPOSED bake too, the path the report came in on', async () => {
+    const assets = await loadAssets();
+    // The real modularFarBake over the stub: a knight chest (mapped) beside a
+    // base head (colour-only), the exact mix every composed body carries.
+    const bake = assets.modularFarBake(MODULAR_WARRIOR_KEY, DEFAULT_LOOK);
+    expect(bake).not.toBeNull();
+    // Both parts made it into the one merged buffer (three vertices each).
+    expect(bake?.geo.getAttribute('position').count).toBe(6);
+    const uv = bake?.geo.getAttribute('uv');
+    expect(uv).toBeDefined();
+    expect(uv?.count).toBe(6);
   });
 });
