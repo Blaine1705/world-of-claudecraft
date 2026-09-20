@@ -75,6 +75,7 @@ import {
 import { ignivarExitRoom, ignivarExitSealed } from './ignivar_exit';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
 import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
+import { RAID_REQUIRED_DUNGEON_IDS, resetCooldownApplies } from './reset_cooldown_policy';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -83,10 +84,8 @@ const RAID_ALLOWED_DUNGEON_IDS = new Set([
   'nythraxis_boss_arena',
   ...IGNIVAR_RAID_ROOM_IDS,
 ]);
-export const RAID_REQUIRED_DUNGEON_IDS: ReadonlySet<string> = new Set([
-  'nythraxis_boss_arena',
-  ...IGNIVAR_RAID_ROOM_IDS,
-]);
+
+export { RAID_REQUIRED_DUNGEON_IDS };
 // A claim whose final boss is already dead (inst.clearedBy is non-empty) idles
 // this much longer than INSTANCE_EMPTY_TIMEOUT before the reaper frees it: a
 // clean kill that wipes the whole party, with nobody left to resurrect, must
@@ -1232,6 +1231,11 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
     }
     claimInstance(ctx, inst, key, claimDifficultyForDungeon(inst.dungeonId, selected));
     if (inst.exitId === null) throw new Error('Dungeon reset replacement claim has no identity.');
+    // The raid rooms skip the five-minute cooldown and its per-member locks:
+    // their own daily/weekly lockout (checked above) is the rate limit, and
+    // the cooldown only ever stranded a raid that wanted to switch tier
+    // again (see reset_cooldown_policy.ts).
+    if (!resetCooldownApplies(inst.dungeonId)) continue;
     inst.resetAvailableAt = ctx.time + INSTANCE_EMPTY_TIMEOUT;
     for (const ownerPid of ownerPids) {
       ctx.dungeonResetLocks.set(resetCooldownKey(ctx, ownerPid, inst.dungeonId), {
