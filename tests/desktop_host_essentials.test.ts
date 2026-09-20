@@ -6,6 +6,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import {
+  APP_MEM_MAX_MB,
   createHostEssentialsProbe,
   HOST_ESSENTIALS_FIRST_DELAY_MS,
   HOST_ESSENTIALS_REFRESH_MS,
@@ -100,7 +101,12 @@ describe('narrowHostEssentials', () => {
     expect(narrowed?.hostMemFreeMb).toBeNull();
     expect(narrowed?.appWorkingSetMb).toBeNull();
     expect(narrowed?.appRendererWsMb).toBeNull();
-    expect(narrowed?.appGpuWsMb).toBe(HOST_MEM_MAX_MB);
+    // The process figures clamp at their OWN, tighter ceiling, and a host figure
+    // at the host one: two ceilings, never one shared.
+    expect(narrowed?.appGpuWsMb).toBe(APP_MEM_MAX_MB);
+    expect(narrowHostEssentials({ ...FULL, hostMemTotalMb: 999_999_999 })?.hostMemTotalMb).toBe(
+      HOST_MEM_MAX_MB,
+    );
   });
 
   it('answers null for anything that is not an object', () => {
