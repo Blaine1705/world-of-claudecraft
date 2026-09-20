@@ -772,6 +772,23 @@ describe('frame loop survival', () => {
     expect(at(25_000)).toBe(true);
   });
 
+  it('does not count pre-reset timer callbacks as a fresh display read', () => {
+    const read: Array<{ at: number; displayRead: boolean }> = [];
+    runHost({
+      refreshMs: null,
+      idleMs: 50,
+      costMs: 1,
+      seconds: 32,
+      intent: 30,
+      cover: (t) => t > 15_000 && t < 16_000,
+      onFrame: (t, wiring) => read.push({ at: t, displayRead: wiring.snapshot().displayRead }),
+    });
+    const at = (ms: number) => read.filter((r) => r.at <= ms).pop()?.displayRead;
+    expect(at(14_000)).toBe(true);
+    expect(at(20_000)).toBe(false);
+    expect(at(31_000)).toBe(true);
+  });
+
   it('a hidden web tab goes back to rAF, which the browser pauses: no timer chain renders it', () => {
     const shown = runHost({ ...busyGpuHost(), seconds: 20 });
     expect(shown.timerArms).toBeGreaterThan(100);

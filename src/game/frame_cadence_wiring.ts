@@ -275,6 +275,7 @@ export class FrameCadenceWiring {
       this.dropAutoReadings();
       this.lastRenderAt = 0;
       this.callbacksSinceEstimatorReset = 0;
+      this.unreadCallbacks = 0;
     } else {
       this.callbacksSinceEstimatorReset++;
       if (this.lastCallbackAt > 0 && !crossedTimer) {
