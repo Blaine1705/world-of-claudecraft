@@ -1418,8 +1418,8 @@ export const ru_RU: EnTranslations = {
     },
     "riftTracker": {
       "title": "Разлом",
-      "hoardTitle": "Buried Hoard",
-      "hoardGoal": "Defeat the hoard keeper",
+      "hoardTitle": "Зарытый клад",
+      "hoardGoal": "Победите хранителя клада",
       "hoardChestGoal": "Откройте сундук с кладом",
       "hoardClaimedGoal": "Клад ваш",
       "floor": "Этаж {current} из {total}",
@@ -2323,16 +2323,16 @@ export const ru_RU: EnTranslations = {
       "openProfessions": "Открыть профессии"
     },
     "treasureMap": {
-      "close": "Close treasure map",
-      "zone": "Somewhere in {zone}",
-      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A buried hoard opens for you and your party.",
-      "upgradeNote": "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
-      "upgradeMaxed": "No cartographer could better this map.",
+      "close": "Закрыть карту сокровищ",
+      "zone": "Где-то в зоне «{zone}»",
+      "hint": "Найдите место, изображённое на карте, встаньте на крестик и используйте карту ещё раз, чтобы копать. Зарытый клад откроется для вас и вашей группы.",
+      "upgradeNote": "Чтобы перерисовать её в карту качества «{rarity}», нужно чернил картографа: {inks} (у вас: {held}). Их продают интенданты фракций.",
+      "upgradeMaxed": "Ни один картограф не сделает эту карту лучше.",
       "rarity": {
-        "common": "Common",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary"
+        "common": "Обычная",
+        "rare": "Редкая",
+        "epic": "Эпическая",
+        "legendary": "Легендарная"
       }
     },
     "currencies": {
@@ -9436,10 +9436,10 @@ export const ru_RU: EnTranslations = {
       "pylonLit": "Рунный пилон вспыхивает ({lit}/{total}).",
       "wayDownOpens": "Путь вниз разверзается.",
       "exitOpens": "Разлом содрогается. Позади павших разверзается путь домой.",
-      "hoardEnter": "You climb down into {name}.",
+      "hoardEnter": "Вы спускаетесь в {name}.",
       "hoardExitOpens": "Сокровища ваши. Вернитесь ко входу, чтобы выбраться наружу.",
       "hoardStepBack": "Вы выбираетесь наружу через вход в сокровищницу.",
-      "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardNotYours": "Этот клад откопала другая группа.",
       "portalOpens": "В {zone} разверзся разлом ранга {tier}!",
       "portalSealed": "Разлом ранга {tier} в {zone} запечатан.",
       "portalCollapses": "Разлом ранга {tier} в {zone} обрушился.",
@@ -11613,13 +11613,13 @@ export const ru_RU: EnTranslations = {
       "clueHuntDone": "Охота за сокровищем завершена: {title}. Сундук ваш.",
       "clueHuntAbandoned": "Охота за сокровищем оставлена: {title}",
       "clueCasketOpened": "В сундуке {money} и {items}.",
-      "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
-      "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
-      "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
-      "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
-      "treasureVaultOpened": "The ground gives way. A buried hoard lies open before you.",
-      "treasureVaultLooted": "The hoard holds {money} and {items}.",
-      "treasureVaultCapped": "You have shared in enough hoards today; this one pays you nothing."
+      "treasureMapEarned": "Все локальные задания дня выполнены: вы нашли предмет «{map}».",
+      "treasureMapLost": "Все локальные задания дня выполнены, но в сумках нет места для карты сокровищ.",
+      "treasureMapRead": "Вы изучаете предмет «{map}». Крестик где-то в зоне «{zone}».",
+      "treasureMapUpgraded": "Карта перерисована более тонкими чернилами: теперь это «{map}».",
+      "treasureVaultOpened": "Земля проваливается. Перед вами открывается зарытый клад.",
+      "treasureVaultLooted": "В кладе: {money} и {items}.",
+      "treasureVaultCapped": "Сегодня вы уже получили долю в достаточном числе кладов; этот ничего вам не даст."
     },
     "errors": {
       "unavailable": "Это задание недоступно.",
@@ -16603,6 +16603,309 @@ export const ru_RU: EnTranslations = {
       },
       "formula_enchant_gloves_forged_might": {
         "name": "Formula: Enchant Gloves - Forged Might"
+      },
+      "treasure_map_common": {
+        "name": "Потрёпанная карта сокровищ"
+      },
+      "treasure_map_rare": {
+        "name": "Карта сокровищ, вычерченная тушью"
+      },
+      "treasure_map_epic": {
+        "name": "Золочёная карта сокровищ"
+      },
+      "treasure_map_legendary": {
+        "name": "Карта сокровищ властителя"
+      },
+      "cartographers_ink": {
+        "name": "Чернила картографа"
+      },
+      "collapsar_band_of_nyxaris": {
+        "name": "Кольцо коллапсара Никсариса"
+      },
+      "rare_collapsar_band_of_nyxaris": {
+        "name": "Кольцо коллапсара Никсариса в патине"
+      },
+      "legendary_collapsar_band_of_nyxaris": {
+        "name": "Кольцо коллапсара Никсариса властителя"
+      },
+      "orb_collapsing_void": {
+        "name": "Сфера коллапсирующей пустоты"
+      },
+      "rare_orb_collapsing_void": {
+        "name": "Сфера коллапсирующей пустоты в патине"
+      },
+      "legendary_orb_collapsing_void": {
+        "name": "Сфера коллапсирующей пустоты властителя"
+      },
+      "cowl_of_event_horizon": {
+        "name": "Капюшон горизонта событий"
+      },
+      "rare_cowl_of_event_horizon": {
+        "name": "Капюшон горизонта событий в патине"
+      },
+      "legendary_cowl_of_event_horizon": {
+        "name": "Капюшон горизонта событий властителя"
+      },
+      "mantle_of_singularity": {
+        "name": "Мантия сингулярности"
+      },
+      "rare_mantle_of_singularity": {
+        "name": "Мантия сингулярности в патине"
+      },
+      "legendary_mantle_of_singularity": {
+        "name": "Мантия сингулярности властителя"
+      },
+      "glacier_hewn_bulwark": {
+        "name": "Оплот из ледниковой глыбы"
+      },
+      "rare_glacier_hewn_bulwark": {
+        "name": "Оплот из ледниковой глыбы в патине"
+      },
+      "legendary_glacier_hewn_bulwark": {
+        "name": "Оплот из ледниковой глыбы властителя"
+      },
+      "permafrost_legguards": {
+        "name": "Поножи вечной мерзлоты"
+      },
+      "rare_permafrost_legguards": {
+        "name": "Поножи вечной мерзлоты в патине"
+      },
+      "legendary_permafrost_legguards": {
+        "name": "Поножи вечной мерзлоты властителя"
+      },
+      "frostbitten_rime_slippers": {
+        "name": "Обмороженные туфли из инея"
+      },
+      "rare_frostbitten_rime_slippers": {
+        "name": "Обмороженные туфли из инея в патине"
+      },
+      "legendary_frostbitten_rime_slippers": {
+        "name": "Обмороженные туфли из инея властителя"
+      },
+      "rime_crusted_grips": {
+        "name": "Перчатки в корке инея"
+      },
+      "rare_rime_crusted_grips": {
+        "name": "Перчатки в корке инея в патине"
+      },
+      "legendary_rime_crusted_grips": {
+        "name": "Перчатки в корке инея властителя"
+      },
+      "ember_wrought_crown": {
+        "name": "Корона, кованная в углях"
+      },
+      "rare_ember_wrought_crown": {
+        "name": "Корона, кованная в углях в патине"
+      },
+      "legendary_ember_wrought_crown": {
+        "name": "Корона, кованная в углях властителя"
+      },
+      "cinder_stitched_robes": {
+        "name": "Одеяния, сшитые золой"
+      },
+      "rare_cinder_stitched_robes": {
+        "name": "Одеяния, сшитые золой в патине"
+      },
+      "legendary_cinder_stitched_robes": {
+        "name": "Одеяния, сшитые золой властителя"
+      },
+      "chained_ember_choker": {
+        "name": "Цепное колье с угольком"
+      },
+      "rare_chained_ember_choker": {
+        "name": "Цепное колье с угольком в патине"
+      },
+      "legendary_chained_ember_choker": {
+        "name": "Цепное колье с угольком властителя"
+      },
+      "molten_clinker_girdle": {
+        "name": "Пояс из расплавленного шлака"
+      },
+      "rare_molten_clinker_girdle": {
+        "name": "Пояс из расплавленного шлака в патине"
+      },
+      "legendary_molten_clinker_girdle": {
+        "name": "Пояс из расплавленного шлака властителя"
+      },
+      "storm_tuned_buckler": {
+        "name": "Баклер, настроенный на бурю"
+      },
+      "rare_storm_tuned_buckler": {
+        "name": "Баклер, настроенный на бурю в патине"
+      },
+      "legendary_storm_tuned_buckler": {
+        "name": "Баклер, настроенный на бурю властителя"
+      },
+      "hauberk_tempest_gale": {
+        "name": "Хауберк штормового шквала"
+      },
+      "rare_hauberk_tempest_gale": {
+        "name": "Хауберк штормового шквала в патине"
+      },
+      "legendary_hauberk_tempest_gale": {
+        "name": "Хауберк штормового шквала властителя"
+      },
+      "gale_strider_boots": {
+        "name": "Сапоги шагающего по ветру"
+      },
+      "rare_gale_strider_boots": {
+        "name": "Сапоги шагающего по ветру в патине"
+      },
+      "legendary_gale_strider_boots": {
+        "name": "Сапоги шагающего по ветру властителя"
+      },
+      "tempest_strike_grips": {
+        "name": "Перчатки удара бури"
+      },
+      "rare_tempest_strike_grips": {
+        "name": "Перчатки удара бури в патине"
+      },
+      "legendary_tempest_strike_grips": {
+        "name": "Перчатки удара бури властителя"
+      },
+      "breastplate_tectonic_might": {
+        "name": "Нагрудник тектонической мощи"
+      },
+      "rare_breastplate_tectonic_might": {
+        "name": "Нагрудник тектонической мощи в патине"
+      },
+      "legendary_breastplate_tectonic_might": {
+        "name": "Нагрудник тектонической мощи властителя"
+      },
+      "band_mountains_weight": {
+        "name": "Кольцо тяжести гор"
+      },
+      "rare_band_mountains_weight": {
+        "name": "Кольцо тяжести гор в патине"
+      },
+      "legendary_band_mountains_weight": {
+        "name": "Кольцо тяжести гор властителя"
+      },
+      "monolithic_shoulderguards": {
+        "name": "Монолитные наплечники"
+      },
+      "rare_monolithic_shoulderguards": {
+        "name": "Монолитные наплечники в патине"
+      },
+      "legendary_monolithic_shoulderguards": {
+        "name": "Монолитные наплечники властителя"
+      },
+      "earthshaker_warboots": {
+        "name": "Боевые сапоги сотрясателя земли"
+      },
+      "rare_earthshaker_warboots": {
+        "name": "Боевые сапоги сотрясателя земли в патине"
+      },
+      "legendary_earthshaker_warboots": {
+        "name": "Боевые сапоги сотрясателя земли властителя"
+      },
+      "silkstalker_woven_vest": {
+        "name": "Тканый жилет шёлкового охотника"
+      },
+      "rare_silkstalker_woven_vest": {
+        "name": "Тканый жилет шёлкового охотника в патине"
+      },
+      "legendary_silkstalker_woven_vest": {
+        "name": "Тканый жилет шёлкового охотника властителя"
+      },
+      "spun_venom_spaulders": {
+        "name": "Наплечники из спрядённого яда"
+      },
+      "rare_spun_venom_spaulders": {
+        "name": "Наплечники из спрядённого яда в патине"
+      },
+      "legendary_spun_venom_spaulders": {
+        "name": "Наплечники из спрядённого яда властителя"
+      },
+      "broodmother_chitin_cowl": {
+        "name": "Хитиновый капюшон Прародительницы"
+      },
+      "rare_broodmother_chitin_cowl": {
+        "name": "Хитиновый капюшон Прародительницы в патине"
+      },
+      "legendary_broodmother_chitin_cowl": {
+        "name": "Хитиновый капюшон Прародительницы властителя"
+      },
+      "venom_etched_waistcord": {
+        "name": "Пояс-шнур с ядовитой гравировкой"
+      },
+      "rare_venom_etched_waistcord": {
+        "name": "Пояс-шнур с ядовитой гравировкой в патине"
+      },
+      "legendary_venom_etched_waistcord": {
+        "name": "Пояс-шнур с ядовитой гравировкой властителя"
+      },
+      "bone_studded_pauldrons": {
+        "name": "Наплечники с костяными шипами"
+      },
+      "rare_bone_studded_pauldrons": {
+        "name": "Наплечники с костяными шипами в патине"
+      },
+      "legendary_bone_studded_pauldrons": {
+        "name": "Наплечники с костяными шипами властителя"
+      },
+      "legguards_of_the_ossuary": {
+        "name": "Поножи костницы"
+      },
+      "rare_legguards_of_the_ossuary": {
+        "name": "Поножи костницы в патине"
+      },
+      "legendary_legguards_of_the_ossuary": {
+        "name": "Поножи костницы властителя"
+      },
+      "seal_of_the_cryptwalker": {
+        "name": "Печать бродящего по склепам"
+      },
+      "rare_seal_of_the_cryptwalker": {
+        "name": "Печать бродящего по склепам в патине"
+      },
+      "legendary_seal_of_the_cryptwalker": {
+        "name": "Печать бродящего по склепам властителя"
+      },
+      "ossuary_bone_crown": {
+        "name": "Костяная корона костницы"
+      },
+      "rare_ossuary_bone_crown": {
+        "name": "Костяная корона костницы в патине"
+      },
+      "legendary_ossuary_bone_crown": {
+        "name": "Костяная корона костницы властителя"
+      },
+      "chalice_of_living_tides": {
+        "name": "Чаша живых приливов"
+      },
+      "rare_chalice_of_living_tides": {
+        "name": "Чаша живых приливов в патине"
+      },
+      "legendary_chalice_of_living_tides": {
+        "name": "Чаша живых приливов властителя"
+      },
+      "pendant_continuous_flow": {
+        "name": "Подвеска непрерывного потока"
+      },
+      "rare_pendant_continuous_flow": {
+        "name": "Подвеска непрерывного потока в патине"
+      },
+      "legendary_pendant_continuous_flow": {
+        "name": "Подвеска непрерывного потока властителя"
+      },
+      "coral_encrusted_girdle": {
+        "name": "Пояс, обросший кораллами"
+      },
+      "rare_coral_encrusted_girdle": {
+        "name": "Пояс, обросший кораллами в патине"
+      },
+      "legendary_coral_encrusted_girdle": {
+        "name": "Пояс, обросший кораллами властителя"
+      },
+      "riptide_handwraps": {
+        "name": "Обмотки отбойного течения"
+      },
+      "rare_riptide_handwraps": {
+        "name": "Обмотки отбойного течения в патине"
+      },
+      "legendary_riptide_handwraps": {
+        "name": "Обмотки отбойного течения властителя"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

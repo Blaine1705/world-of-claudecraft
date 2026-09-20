@@ -1418,8 +1418,8 @@ export const zh_CN: EnTranslations = {
     },
     "riftTracker": {
       "title": "裂隙",
-      "hoardTitle": "Buried Hoard",
-      "hoardGoal": "Defeat the hoard keeper",
+      "hoardTitle": "埋藏的宝藏",
+      "hoardGoal": "击败宝藏守护者",
       "hoardChestGoal": "打开宝藏箱",
       "hoardClaimedGoal": "宝藏归你了",
       "floor": "第 {current} 层，共 {total} 层",
@@ -2323,16 +2323,16 @@ export const zh_CN: EnTranslations = {
       "openProfessions": "打开专业"
     },
     "treasureMap": {
-      "close": "Close treasure map",
-      "zone": "Somewhere in {zone}",
-      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A buried hoard opens for you and your party.",
-      "upgradeNote": "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
-      "upgradeMaxed": "No cartographer could better this map.",
+      "close": "关闭藏宝图",
+      "zone": "{zone}的某处",
+      "hint": "找到这张地图所示的地方，站在 X 标记上，再次使用地图进行挖掘。一处埋藏的宝藏将为你和你的队伍开启。",
+      "upgradeNote": "将其重绘为{rarity}地图需要 {inks} 瓶制图师的墨水（你持有 {held} 瓶）。各阵营军需官均有出售。",
+      "upgradeMaxed": "没有哪位制图师能让这张地图更进一步。",
       "rarity": {
-        "common": "Common",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary"
+        "common": "普通",
+        "rare": "稀有",
+        "epic": "史诗",
+        "legendary": "传说"
       }
     },
     "currencies": {
@@ -9436,10 +9436,10 @@ export const zh_CN: EnTranslations = {
       "pylonLit": "一座符文尖塔亮起（{lit}/{total}）。",
       "wayDownOpens": "通往下层的裂口被撕开了。",
       "exitOpens": "裂隙震颤。一条归途在倒下的敌人身后撕裂开来。",
-      "hoardEnter": "You climb down into {name}.",
+      "hoardEnter": "你向下爬进了{name}。",
       "hoardExitOpens": "宝藏已经属于你。返回入口并爬出去。",
       "hoardStepBack": "你从宝藏入口爬回了地面。",
-      "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardNotYours": "这处宝藏是另一支队伍挖出的。",
       "portalOpens": "一道{tier}级裂隙在{zone}撕裂而开！",
       "portalSealed": "{zone}的{tier}级裂隙已被封印。",
       "portalCollapses": "{zone}的{tier}级裂隙坍塌了。",
@@ -11613,13 +11613,13 @@ export const zh_CN: EnTranslations = {
       "clueHuntDone": "寻宝完成：{title}。宝箱归你了。",
       "clueHuntAbandoned": "已放弃寻宝：{title}",
       "clueCasketOpened": "宝箱中有{money}和{items}。",
-      "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
-      "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
-      "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
-      "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
-      "treasureVaultOpened": "The ground gives way. A buried hoard lies open before you.",
-      "treasureVaultLooted": "The hoard holds {money} and {items}.",
-      "treasureVaultCapped": "You have shared in enough hoards today; this one pays you nothing."
+      "treasureMapEarned": "今日所有世界任务均已完成：你找到了一张{map}。",
+      "treasureMapLost": "今日所有世界任务均已完成，但你的背包没有空间放藏宝图。",
+      "treasureMapRead": "你研究了{map}。X 标记位于{zone}的某处。",
+      "treasureMapUpgraded": "地图以更精细的墨水重绘：现在它是一张{map}。",
+      "treasureVaultOpened": "地面塌陷。一处埋藏的宝藏在你面前敞开。",
+      "treasureVaultLooted": "宝藏中有{money}和{items}。",
+      "treasureVaultCapped": "你今天已经分享了足够多的宝藏；这一处不会给你任何奖励。"
     },
     "errors": {
       "unavailable": "该任务不可用。",
@@ -16603,6 +16603,309 @@ export const zh_CN: EnTranslations = {
       },
       "formula_enchant_gloves_forged_might": {
         "name": "Formula: Enchant Gloves - Forged Might"
+      },
+      "treasure_map_common": {
+        "name": "风化的藏宝图"
+      },
+      "treasure_map_rare": {
+        "name": "墨绘藏宝图"
+      },
+      "treasure_map_epic": {
+        "name": "鎏金藏宝图"
+      },
+      "treasure_map_legendary": {
+        "name": "至尊藏宝图"
+      },
+      "cartographers_ink": {
+        "name": "制图师的墨水"
+      },
+      "collapsar_band_of_nyxaris": {
+        "name": "尼克萨里斯的坍缩星指环"
+      },
+      "rare_collapsar_band_of_nyxaris": {
+        "name": "失色的尼克萨里斯的坍缩星指环"
+      },
+      "legendary_collapsar_band_of_nyxaris": {
+        "name": "至尊尼克萨里斯的坍缩星指环"
+      },
+      "orb_collapsing_void": {
+        "name": "坍缩虚空宝珠"
+      },
+      "rare_orb_collapsing_void": {
+        "name": "失色的坍缩虚空宝珠"
+      },
+      "legendary_orb_collapsing_void": {
+        "name": "至尊坍缩虚空宝珠"
+      },
+      "cowl_of_event_horizon": {
+        "name": "事件视界兜帽"
+      },
+      "rare_cowl_of_event_horizon": {
+        "name": "失色的事件视界兜帽"
+      },
+      "legendary_cowl_of_event_horizon": {
+        "name": "至尊事件视界兜帽"
+      },
+      "mantle_of_singularity": {
+        "name": "奇点披肩"
+      },
+      "rare_mantle_of_singularity": {
+        "name": "失色的奇点披肩"
+      },
+      "legendary_mantle_of_singularity": {
+        "name": "至尊奇点披肩"
+      },
+      "glacier_hewn_bulwark": {
+        "name": "冰川凿成的壁垒"
+      },
+      "rare_glacier_hewn_bulwark": {
+        "name": "失色的冰川凿成的壁垒"
+      },
+      "legendary_glacier_hewn_bulwark": {
+        "name": "至尊冰川凿成的壁垒"
+      },
+      "permafrost_legguards": {
+        "name": "永冻护腿"
+      },
+      "rare_permafrost_legguards": {
+        "name": "失色的永冻护腿"
+      },
+      "legendary_permafrost_legguards": {
+        "name": "至尊永冻护腿"
+      },
+      "frostbitten_rime_slippers": {
+        "name": "霜噬白霜便鞋"
+      },
+      "rare_frostbitten_rime_slippers": {
+        "name": "失色的霜噬白霜便鞋"
+      },
+      "legendary_frostbitten_rime_slippers": {
+        "name": "至尊霜噬白霜便鞋"
+      },
+      "rime_crusted_grips": {
+        "name": "覆霜护手"
+      },
+      "rare_rime_crusted_grips": {
+        "name": "失色的覆霜护手"
+      },
+      "legendary_rime_crusted_grips": {
+        "name": "至尊覆霜护手"
+      },
+      "ember_wrought_crown": {
+        "name": "余烬锻造之冠"
+      },
+      "rare_ember_wrought_crown": {
+        "name": "失色的余烬锻造之冠"
+      },
+      "legendary_ember_wrought_crown": {
+        "name": "至尊余烬锻造之冠"
+      },
+      "cinder_stitched_robes": {
+        "name": "灰烬缝制长袍"
+      },
+      "rare_cinder_stitched_robes": {
+        "name": "失色的灰烬缝制长袍"
+      },
+      "legendary_cinder_stitched_robes": {
+        "name": "至尊灰烬缝制长袍"
+      },
+      "chained_ember_choker": {
+        "name": "锁链余烬项圈"
+      },
+      "rare_chained_ember_choker": {
+        "name": "失色的锁链余烬项圈"
+      },
+      "legendary_chained_ember_choker": {
+        "name": "至尊锁链余烬项圈"
+      },
+      "molten_clinker_girdle": {
+        "name": "熔渣腰带"
+      },
+      "rare_molten_clinker_girdle": {
+        "name": "失色的熔渣腰带"
+      },
+      "legendary_molten_clinker_girdle": {
+        "name": "至尊熔渣腰带"
+      },
+      "storm_tuned_buckler": {
+        "name": "风暴调谐圆盾"
+      },
+      "rare_storm_tuned_buckler": {
+        "name": "失色的风暴调谐圆盾"
+      },
+      "legendary_storm_tuned_buckler": {
+        "name": "至尊风暴调谐圆盾"
+      },
+      "hauberk_tempest_gale": {
+        "name": "暴风烈风锁甲"
+      },
+      "rare_hauberk_tempest_gale": {
+        "name": "失色的暴风烈风锁甲"
+      },
+      "legendary_hauberk_tempest_gale": {
+        "name": "至尊暴风烈风锁甲"
+      },
+      "gale_strider_boots": {
+        "name": "疾风行者长靴"
+      },
+      "rare_gale_strider_boots": {
+        "name": "失色的疾风行者长靴"
+      },
+      "legendary_gale_strider_boots": {
+        "name": "至尊疾风行者长靴"
+      },
+      "tempest_strike_grips": {
+        "name": "暴风打击护手"
+      },
+      "rare_tempest_strike_grips": {
+        "name": "失色的暴风打击护手"
+      },
+      "legendary_tempest_strike_grips": {
+        "name": "至尊暴风打击护手"
+      },
+      "breastplate_tectonic_might": {
+        "name": "地壳之力胸甲"
+      },
+      "rare_breastplate_tectonic_might": {
+        "name": "失色的地壳之力胸甲"
+      },
+      "legendary_breastplate_tectonic_might": {
+        "name": "至尊地壳之力胸甲"
+      },
+      "band_mountains_weight": {
+        "name": "山岳之重指环"
+      },
+      "rare_band_mountains_weight": {
+        "name": "失色的山岳之重指环"
+      },
+      "legendary_band_mountains_weight": {
+        "name": "至尊山岳之重指环"
+      },
+      "monolithic_shoulderguards": {
+        "name": "巨石护肩"
+      },
+      "rare_monolithic_shoulderguards": {
+        "name": "失色的巨石护肩"
+      },
+      "legendary_monolithic_shoulderguards": {
+        "name": "至尊巨石护肩"
+      },
+      "earthshaker_warboots": {
+        "name": "撼地战靴"
+      },
+      "rare_earthshaker_warboots": {
+        "name": "失色的撼地战靴"
+      },
+      "legendary_earthshaker_warboots": {
+        "name": "至尊撼地战靴"
+      },
+      "silkstalker_woven_vest": {
+        "name": "丝猎者的编织背心"
+      },
+      "rare_silkstalker_woven_vest": {
+        "name": "失色的丝猎者的编织背心"
+      },
+      "legendary_silkstalker_woven_vest": {
+        "name": "至尊丝猎者的编织背心"
+      },
+      "spun_venom_spaulders": {
+        "name": "纺毒护肩"
+      },
+      "rare_spun_venom_spaulders": {
+        "name": "失色的纺毒护肩"
+      },
+      "legendary_spun_venom_spaulders": {
+        "name": "至尊纺毒护肩"
+      },
+      "broodmother_chitin_cowl": {
+        "name": "育母的甲壳兜帽"
+      },
+      "rare_broodmother_chitin_cowl": {
+        "name": "失色的育母的甲壳兜帽"
+      },
+      "legendary_broodmother_chitin_cowl": {
+        "name": "至尊育母的甲壳兜帽"
+      },
+      "venom_etched_waistcord": {
+        "name": "蚀毒腰绳"
+      },
+      "rare_venom_etched_waistcord": {
+        "name": "失色的蚀毒腰绳"
+      },
+      "legendary_venom_etched_waistcord": {
+        "name": "至尊蚀毒腰绳"
+      },
+      "bone_studded_pauldrons": {
+        "name": "镶骨肩铠"
+      },
+      "rare_bone_studded_pauldrons": {
+        "name": "失色的镶骨肩铠"
+      },
+      "legendary_bone_studded_pauldrons": {
+        "name": "至尊镶骨肩铠"
+      },
+      "legguards_of_the_ossuary": {
+        "name": "藏骨堂护腿"
+      },
+      "rare_legguards_of_the_ossuary": {
+        "name": "失色的藏骨堂护腿"
+      },
+      "legendary_legguards_of_the_ossuary": {
+        "name": "至尊藏骨堂护腿"
+      },
+      "seal_of_the_cryptwalker": {
+        "name": "墓穴行者之印"
+      },
+      "rare_seal_of_the_cryptwalker": {
+        "name": "失色的墓穴行者之印"
+      },
+      "legendary_seal_of_the_cryptwalker": {
+        "name": "至尊墓穴行者之印"
+      },
+      "ossuary_bone_crown": {
+        "name": "藏骨堂骨冠"
+      },
+      "rare_ossuary_bone_crown": {
+        "name": "失色的藏骨堂骨冠"
+      },
+      "legendary_ossuary_bone_crown": {
+        "name": "至尊藏骨堂骨冠"
+      },
+      "chalice_of_living_tides": {
+        "name": "活潮圣杯"
+      },
+      "rare_chalice_of_living_tides": {
+        "name": "失色的活潮圣杯"
+      },
+      "legendary_chalice_of_living_tides": {
+        "name": "至尊活潮圣杯"
+      },
+      "pendant_continuous_flow": {
+        "name": "不息流动吊坠"
+      },
+      "rare_pendant_continuous_flow": {
+        "name": "失色的不息流动吊坠"
+      },
+      "legendary_pendant_continuous_flow": {
+        "name": "至尊不息流动吊坠"
+      },
+      "coral_encrusted_girdle": {
+        "name": "珊瑚镶嵌腰带"
+      },
+      "rare_coral_encrusted_girdle": {
+        "name": "失色的珊瑚镶嵌腰带"
+      },
+      "legendary_coral_encrusted_girdle": {
+        "name": "至尊珊瑚镶嵌腰带"
+      },
+      "riptide_handwraps": {
+        "name": "激流裹手"
+      },
+      "rare_riptide_handwraps": {
+        "name": "失色的激流裹手"
+      },
+      "legendary_riptide_handwraps": {
+        "name": "至尊激流裹手"
       },
       "conjured_water4": {
         "name": "魔法泉水"

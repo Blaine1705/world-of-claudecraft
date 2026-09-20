@@ -231,9 +231,10 @@ describe('combat-rating tier ladder', () => {
     // (maul_of_the_scourged_wilds), and the seven Roots' Bramblehide pieces
     // (the feral druid's Strength leather family), and the seven Nythraxis
     // gap-fill drops (three one-handers, the healer shield, the leather caster
-    // helm, the mail caster gloves and feet).
+    // helm, the mail caster gloves and feet), and the 32 epic-tier Buried Hoard
+    // boss pieces (content/hoard_loot.ts), jewellery included.
     const ilvl29 = allGear.filter((item) => itemLevel(item) === 29);
-    expect(ilvl29).toHaveLength(28);
+    expect(ilvl29).toHaveLength(60);
     for (const item of ilvl29) expect(ratingValues(item), item.id).toEqual([20]);
 
     // ilvl-31: heroic five-man boss pieces (40 rating) + rift clear-time epics
@@ -262,6 +263,16 @@ describe('combat-rating tier ladder', () => {
       ilvl31.length - warfareAtIlvl31.length,
       'ilvl-31 PvE epics still carry their ratings',
     ).toBeGreaterThan(0);
+
+    // ilvl-32: the legendary-map tier of the Buried Hoard pieces, the one rung
+    // between the ilvl-31 epics and the raids. It keeps the ilvl-31 allowance,
+    // exactly one rating: two on a piece stays the raid tier's identity.
+    const ilvl32 = allGear.filter((item) => itemLevel(item) === 32);
+    expect(ilvl32).toHaveLength(32);
+    for (const item of ilvl32) {
+      expect(ratingCount(item), `${item.id} (ilvl 32) carries one rating`).toBe(1);
+      expect(Math.max(...ratingValues(item)), item.id).toBeLessThanOrEqual(40);
+    }
 
     const directHeroicRaidWeapons = new Set([
       'scepter_of_the_deathless_court',

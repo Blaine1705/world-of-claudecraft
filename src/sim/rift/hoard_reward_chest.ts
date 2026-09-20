@@ -16,17 +16,9 @@ import { createGroundObject } from '../entity';
 import type { SimContext } from '../sim_context';
 import { payTreasureVault } from '../treasure_vault';
 import { dist2d } from '../types';
-import type { RiftInstance } from './types';
+import type { HoardRewardChestState, RiftInstance } from './types';
 
-/** The payout, with the fallen boss's template for the hoard's own loot table.
- *  Typed here with that optional fourth argument so the chest carries it through
- *  whether or not the payout reads it yet. */
-const payShare = payTreasureVault as (
-  ctx: SimContext,
-  vault: NonNullable<RiftInstance['vault']>,
-  participants: readonly number[],
-  bossTemplateId?: string,
-) => void;
+export type { HoardRewardChestState };
 
 export const HOARD_REWARD_CHEST_TEMPLATE = 'hoard_reward_chest';
 export const HOARD_REWARD_CHEST_OPEN_TEMPLATE = 'hoard_reward_chest_open';
@@ -34,15 +26,6 @@ export const HOARD_REWARD_CHEST_OPEN_TEMPLATE = 'hoard_reward_chest_open';
 export const HOARD_REWARD_CHEST_DAIS_GAP = 7.5;
 /** Yards from the chest within which it can be opened. */
 export const HOARD_REWARD_CHEST_RANGE = 4;
-
-export interface HoardRewardChestState {
-  entityId: number;
-  /** Frozen at the kill: the entrants this run pays. */
-  eligible: number[];
-  claimed: number[];
-  /** The boss that fell: its template picks the hoard's own loot table. */
-  bossTemplateId?: string;
-}
 
 export function isHoardRewardChestTemplate(templateId: string | undefined): boolean {
   return (
@@ -108,7 +91,7 @@ export function openHoardRewardChest(ctx: SimContext, objectId: number, pid?: nu
     return;
   }
   state.claimed.push(player);
-  payShare(ctx, inst.vault, [player], state.bossTemplateId);
+  payTreasureVault(ctx, inst.vault, [player], state.bossTemplateId);
   // The first hand on it swings the lid open for everyone in the room.
   if (chest.templateId === HOARD_REWARD_CHEST_TEMPLATE) {
     chest.templateId = HOARD_REWARD_CHEST_OPEN_TEMPLATE;
@@ -123,7 +106,7 @@ export function settleHoardRewardChest(ctx: SimContext, inst: RiftInstance, pid:
   const state = inst.vault?.chest;
   if (!inst.vault || !state || !unclaimed(state, pid)) return;
   state.claimed.push(pid);
-  payShare(ctx, inst.vault, [pid], state.bossTemplateId);
+  payTreasureVault(ctx, inst.vault, [pid], state.bossTemplateId);
   closeIfSpent(ctx, state);
 }
 

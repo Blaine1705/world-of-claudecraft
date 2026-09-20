@@ -7,7 +7,6 @@
 // Data-as-code. The engine is src/sim/treasure_vault.ts; every number below is
 // a WORKING RULE to tune in playtests, never a classic-era formula.
 
-import type { LootTier } from '../lockpick';
 import type { RiftTier } from '../types';
 
 export const TREASURE_MAP_RARITIES = ['common', 'rare', 'epic', 'legendary'] as const;
@@ -50,9 +49,11 @@ export function nextTreasureMapRarity(rarity: TreasureMapRarity): TreasureMapRar
  *  is about 140: two inks. */
 export const CARTOGRAPHERS_INK_ITEM_ID = 'cartographers_ink';
 export const CARTOGRAPHERS_INK_CURRENCY_COST = 60;
-/** Inks one redraw spends, by the map's CURRENT rarity. */
+/** Inks one redraw spends, by the map's CURRENT rarity. Epic to legendary is the
+ *  steep one (15 inks, about a week of full world-quest days): a legendary hoard
+ *  pays a guaranteed piece above everything outside a raid. */
 export const TREASURE_MAP_UPGRADE_INKS: Readonly<Record<TreasureMapRarity, number>> = Object.freeze(
-  { common: 1, rare: 3, epic: 8, legendary: 0 },
+  { common: 1, rare: 3, epic: 15, legendary: 0 },
 );
 
 /** The lowest level a Buried Hoard admits (the daily board's higher bracket). */
@@ -85,9 +86,9 @@ export interface VaultPayoutDef {
   copperMult: number;
   /** Units of one top-tier gathered material. */
   materials: number;
-  /** Odds of a delve chest piece, and the rung it draws from. */
+  /** Odds the map's OWNER takes one piece off the fallen boss's own table
+   *  (content/hoard_loot.ts), at the tier the map's rarity buys. */
   gearChance: number;
-  gearTier: LootTier;
   /** Odds of a Heroic Mark stack, and its size. */
   markChance: number;
   marks: number;
@@ -101,45 +102,50 @@ export interface VaultPayoutDef {
  *  average about 1.3% across the drop weights above. */
 export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> = Object.freeze({
   common: {
-    copperMult: 1,
+    copperMult: 0.3,
     materials: 4,
     gearChance: 0.1,
-    gearTier: 'low',
     markChance: 0.05,
     marks: 2,
     mountChance: 0.01,
     nextMapChance: 0.15,
   },
   rare: {
-    copperMult: 1.5,
+    copperMult: 0.6,
     materials: 6,
-    gearChance: 0.25,
-    gearTier: 'medium',
+    gearChance: 0.3,
     markChance: 0.1,
     marks: 2,
     mountChance: 0.015,
     nextMapChance: 0.1,
   },
   epic: {
-    copperMult: 2,
+    copperMult: 0.9,
     materials: 8,
     gearChance: 0.5,
-    gearTier: 'premium',
     markChance: 0.25,
     marks: 3,
     mountChance: 0.025,
     nextMapChance: 0.05,
   },
   legendary: {
-    copperMult: 3,
+    copperMult: 1.3,
     materials: 12,
     gearChance: 1,
-    gearTier: 'premium',
     markChance: 1,
     marks: 5,
     mountChance: 0.05,
     nextMapChance: 0,
   },
+});
+
+/** The same roll for a GUEST (anyone in the hoard who did not read the map):
+ *  the owner paid for the map, so the owner's odds are the map's headline. */
+export const VAULT_GUEST_GEAR_CHANCE: Readonly<Record<TreasureMapRarity, number>> = Object.freeze({
+  common: 0.05,
+  rare: 0.1,
+  epic: 0.2,
+  legendary: 0.4,
 });
 
 export interface TreasureSiteDef {

@@ -15,8 +15,8 @@
 // behind the world-quest save. Every roll draws from ctx.rng in a fixed order.
 
 import { treasureCasketCopper } from './clue_casket';
-import { delveChestItemsForTier } from './content/delves/lockpick_tiers';
 import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
+import { rollHoardBossDrop } from './content/hoard_loot';
 import {
   CARTOGRAPHERS_INK_ITEM_ID,
   isTreasureMapRarity,
@@ -31,6 +31,7 @@ import {
   TREASURE_SITES_BY_ID,
   type TreasureMapProgress,
   type TreasureMapRarity,
+  VAULT_GUEST_GEAR_CHANCE,
   VAULT_GUEST_PAYOUTS_PER_CYCLE,
   VAULT_OWNER_COPPER_BONUS,
   VAULT_PAYOUTS,
@@ -246,12 +247,14 @@ export function vaultScaledTuning(
   };
 }
 
-/** The boss fell: pay every entrant the rarity's table. A guest past the
+/** The boss fell: pay every entrant the rarity's table, the gear off the fallen
+ *  boss's own loot (`bossTemplateId`, content/hoard_loot.ts). A guest past the
  *  per-cycle cap is told so and paid nothing; the owner is never capped. */
 export function payTreasureVault(
   ctx: SimContext,
   vault: NonNullable<RiftInstance['vault']>,
   participants: readonly number[],
+  bossTemplateId: string | undefined,
 ): void {
   for (const pid of participants) {
     const meta = ctx.players.get(pid);
@@ -269,7 +272,7 @@ export function payTreasureVault(
       }
       meta.vaultGuestPayouts = (meta.vaultGuestPayouts ?? 0) + 1;
     }
-    payOne(ctx, meta, player, vault.rarity, owner);
+    payOne(ctx, meta, player, vault.rarity, owner, bossTemplateId);
   }
 }
 
@@ -279,6 +282,7 @@ function payOne(
   player: Entity,
   rarity: TreasureMapRarity,
   owner: boolean,
+  bossTemplateId: string | undefined,
 ): void {
   const pid = meta.entityId;
   const def = VAULT_PAYOUTS[rarity];
@@ -286,11 +290,10 @@ function payOne(
   const material = CASKET_MATERIAL_POOL[ctx.rng.int(0, CASKET_MATERIAL_POOL.length - 1)];
   ctx.addItem(material, def.materials, pid);
   itemIds.push(material);
-  if (ctx.rng.chance(def.gearChance)) {
-    const pieces = delveChestItemsForTier(def.gearTier, meta.cls, ctx.rng);
-    const piece = pieces.length === 1 ? pieces[0] : pieces[ctx.rng.int(0, pieces.length - 1)];
-    ctx.addItem(piece.itemId, piece.count, pid);
-    itemIds.push(piece.itemId);
+  if (ctx.rng.chance(owner ? def.gearChance : VAULT_GUEST_GEAR_CHANCE[rarity])) {
+    const itemId = rollHoardBossDrop(ctx.rng, bossTemplateId, rarity, meta.cls);
+    ctx.addItem(itemId, 1, pid);
+    itemIds.push(itemId);
   }
   if (ctx.rng.chance(def.markChance)) {
     ctx.addItem(HEROIC_MARK_ITEM_ID, def.marks, pid);

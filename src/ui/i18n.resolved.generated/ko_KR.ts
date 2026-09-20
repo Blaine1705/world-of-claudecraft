@@ -1418,8 +1418,8 @@ export const ko_KR: EnTranslations = {
     },
     "riftTracker": {
       "title": "균열",
-      "hoardTitle": "Buried Hoard",
-      "hoardGoal": "Defeat the hoard keeper",
+      "hoardTitle": "묻힌 보물",
+      "hoardGoal": "보물 수호자를 처치하세요",
       "hoardChestGoal": "보물 상자를 여세요",
       "hoardClaimedGoal": "보물은 당신의 것입니다",
       "floor": "{total}층 중 {current}층",
@@ -2323,16 +2323,16 @@ export const ko_KR: EnTranslations = {
       "openProfessions": "전문 기술 열기"
     },
     "treasureMap": {
-      "close": "Close treasure map",
-      "zone": "Somewhere in {zone}",
-      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A buried hoard opens for you and your party.",
-      "upgradeNote": "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
-      "upgradeMaxed": "No cartographer could better this map.",
+      "close": "보물 지도 닫기",
+      "zone": "{zone} 어딘가",
+      "hint": "이 지도가 가리키는 땅을 찾아 X 표시 위에 서서 지도를 다시 사용해 땅을 파세요. 당신과 파티를 위해 묻힌 보물이 열립니다.",
+      "upgradeNote": "{rarity} 지도로 다시 그리려면 지도 제작자의 잉크 {inks}개가 필요합니다(보유: {held}). 진영 병참장교가 판매합니다.",
+      "upgradeMaxed": "어떤 지도 제작자도 이 지도를 더 낫게 만들 수 없습니다.",
       "rarity": {
-        "common": "Common",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary"
+        "common": "일반",
+        "rare": "희귀",
+        "epic": "영웅",
+        "legendary": "전설"
       }
     },
     "currencies": {
@@ -9436,10 +9436,10 @@ export const ko_KR: EnTranslations = {
       "pylonLit": "룬 첨탑이 빛을 발합니다 ({lit}/{total}).",
       "wayDownOpens": "아래로 향하는 길이 찢겨 열립니다.",
       "exitOpens": "균열이 요동칩니다. 쓰러진 적 너머로 귀환의 길이 열립니다.",
-      "hoardEnter": "You climb down into {name}.",
+      "hoardEnter": "{name} 안으로 내려갑니다.",
       "hoardExitOpens": "보물은 당신의 것입니다. 입구로 돌아가 밖으로 올라가세요.",
       "hoardStepBack": "보물 입구를 통해 지상으로 올라왔습니다.",
-      "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardNotYours": "이 보물은 다른 파티가 파낸 것입니다.",
       "portalOpens": "{zone}에 {tier}등급 균열이 찢어져 열렸습니다!",
       "portalSealed": "{zone}의 {tier}등급 균열이 봉인되었습니다.",
       "portalCollapses": "{zone}의 {tier}등급 균열이 무너졌습니다.",
@@ -11613,13 +11613,13 @@ export const ko_KR: EnTranslations = {
       "clueHuntDone": "보물찾기 완료: {title}. 보물 상자는 당신 것입니다.",
       "clueHuntAbandoned": "보물찾기 포기: {title}",
       "clueCasketOpened": "보물 상자에는 {money}과(와) {items}이(가) 들어 있었습니다.",
-      "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
-      "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
-      "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
-      "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
-      "treasureVaultOpened": "The ground gives way. A buried hoard lies open before you.",
-      "treasureVaultLooted": "The hoard holds {money} and {items}.",
-      "treasureVaultCapped": "You have shared in enough hoards today; this one pays you nothing."
+      "treasureMapEarned": "오늘의 전역 퀘스트를 모두 완료했습니다: {map}을(를) 발견했습니다.",
+      "treasureMapLost": "오늘의 전역 퀘스트를 모두 완료했지만 가방에 보물 지도를 넣을 공간이 없습니다.",
+      "treasureMapRead": "{map}을(를) 살펴봅니다. X 표시는 {zone} 어딘가에 있습니다.",
+      "treasureMapUpgraded": "지도가 더 고운 잉크로 다시 그려졌습니다: 이제 {map}입니다.",
+      "treasureVaultOpened": "땅이 꺼집니다. 묻힌 보물이 눈앞에 열려 있습니다.",
+      "treasureVaultLooted": "보물에는 {money}와(과) {items}이(가) 들어 있습니다.",
+      "treasureVaultCapped": "오늘은 이미 충분한 보물을 나눠 받았습니다. 이번 보물에서는 아무것도 받지 못합니다."
     },
     "errors": {
       "unavailable": "그 퀘스트는 이용할 수 없습니다.",
@@ -16603,6 +16603,309 @@ export const ko_KR: EnTranslations = {
       },
       "formula_enchant_gloves_forged_might": {
         "name": "Formula: Enchant Gloves - Forged Might"
+      },
+      "treasure_map_common": {
+        "name": "낡은 보물 지도"
+      },
+      "treasure_map_rare": {
+        "name": "먹으로 그린 보물 지도"
+      },
+      "treasure_map_epic": {
+        "name": "금박 보물 지도"
+      },
+      "treasure_map_legendary": {
+        "name": "지존의 보물 지도"
+      },
+      "cartographers_ink": {
+        "name": "지도 제작자의 잉크"
+      },
+      "collapsar_band_of_nyxaris": {
+        "name": "닉사리스의 붕괴성 반지"
+      },
+      "rare_collapsar_band_of_nyxaris": {
+        "name": "빛바랜 닉사리스의 붕괴성 반지"
+      },
+      "legendary_collapsar_band_of_nyxaris": {
+        "name": "지존의 닉사리스의 붕괴성 반지"
+      },
+      "orb_collapsing_void": {
+        "name": "붕괴하는 공허의 보주"
+      },
+      "rare_orb_collapsing_void": {
+        "name": "빛바랜 붕괴하는 공허의 보주"
+      },
+      "legendary_orb_collapsing_void": {
+        "name": "지존의 붕괴하는 공허의 보주"
+      },
+      "cowl_of_event_horizon": {
+        "name": "사건의 지평선 두건"
+      },
+      "rare_cowl_of_event_horizon": {
+        "name": "빛바랜 사건의 지평선 두건"
+      },
+      "legendary_cowl_of_event_horizon": {
+        "name": "지존의 사건의 지평선 두건"
+      },
+      "mantle_of_singularity": {
+        "name": "특이점의 어깨걸이"
+      },
+      "rare_mantle_of_singularity": {
+        "name": "빛바랜 특이점의 어깨걸이"
+      },
+      "legendary_mantle_of_singularity": {
+        "name": "지존의 특이점의 어깨걸이"
+      },
+      "glacier_hewn_bulwark": {
+        "name": "빙하를 깎아 만든 방벽"
+      },
+      "rare_glacier_hewn_bulwark": {
+        "name": "빛바랜 빙하를 깎아 만든 방벽"
+      },
+      "legendary_glacier_hewn_bulwark": {
+        "name": "지존의 빙하를 깎아 만든 방벽"
+      },
+      "permafrost_legguards": {
+        "name": "영구동토 다리보호구"
+      },
+      "rare_permafrost_legguards": {
+        "name": "빛바랜 영구동토 다리보호구"
+      },
+      "legendary_permafrost_legguards": {
+        "name": "지존의 영구동토 다리보호구"
+      },
+      "frostbitten_rime_slippers": {
+        "name": "동상 입은 서리 단화"
+      },
+      "rare_frostbitten_rime_slippers": {
+        "name": "빛바랜 동상 입은 서리 단화"
+      },
+      "legendary_frostbitten_rime_slippers": {
+        "name": "지존의 동상 입은 서리 단화"
+      },
+      "rime_crusted_grips": {
+        "name": "서리 덮인 장갑"
+      },
+      "rare_rime_crusted_grips": {
+        "name": "빛바랜 서리 덮인 장갑"
+      },
+      "legendary_rime_crusted_grips": {
+        "name": "지존의 서리 덮인 장갑"
+      },
+      "ember_wrought_crown": {
+        "name": "잉걸불로 벼린 왕관"
+      },
+      "rare_ember_wrought_crown": {
+        "name": "빛바랜 잉걸불로 벼린 왕관"
+      },
+      "legendary_ember_wrought_crown": {
+        "name": "지존의 잉걸불로 벼린 왕관"
+      },
+      "cinder_stitched_robes": {
+        "name": "재로 꿰맨 로브"
+      },
+      "rare_cinder_stitched_robes": {
+        "name": "빛바랜 재로 꿰맨 로브"
+      },
+      "legendary_cinder_stitched_robes": {
+        "name": "지존의 재로 꿰맨 로브"
+      },
+      "chained_ember_choker": {
+        "name": "사슬 달린 잉걸불 목걸이"
+      },
+      "rare_chained_ember_choker": {
+        "name": "빛바랜 사슬 달린 잉걸불 목걸이"
+      },
+      "legendary_chained_ember_choker": {
+        "name": "지존의 사슬 달린 잉걸불 목걸이"
+      },
+      "molten_clinker_girdle": {
+        "name": "녹은 광재 허리띠"
+      },
+      "rare_molten_clinker_girdle": {
+        "name": "빛바랜 녹은 광재 허리띠"
+      },
+      "legendary_molten_clinker_girdle": {
+        "name": "지존의 녹은 광재 허리띠"
+      },
+      "storm_tuned_buckler": {
+        "name": "폭풍 조율 원형 방패"
+      },
+      "rare_storm_tuned_buckler": {
+        "name": "빛바랜 폭풍 조율 원형 방패"
+      },
+      "legendary_storm_tuned_buckler": {
+        "name": "지존의 폭풍 조율 원형 방패"
+      },
+      "hauberk_tempest_gale": {
+        "name": "폭풍 돌풍의 사슬 갑옷"
+      },
+      "rare_hauberk_tempest_gale": {
+        "name": "빛바랜 폭풍 돌풍의 사슬 갑옷"
+      },
+      "legendary_hauberk_tempest_gale": {
+        "name": "지존의 폭풍 돌풍의 사슬 갑옷"
+      },
+      "gale_strider_boots": {
+        "name": "질풍 질주자의 장화"
+      },
+      "rare_gale_strider_boots": {
+        "name": "빛바랜 질풍 질주자의 장화"
+      },
+      "legendary_gale_strider_boots": {
+        "name": "지존의 질풍 질주자의 장화"
+      },
+      "tempest_strike_grips": {
+        "name": "폭풍 강타 장갑"
+      },
+      "rare_tempest_strike_grips": {
+        "name": "빛바랜 폭풍 강타 장갑"
+      },
+      "legendary_tempest_strike_grips": {
+        "name": "지존의 폭풍 강타 장갑"
+      },
+      "breastplate_tectonic_might": {
+        "name": "지각의 힘 흉갑"
+      },
+      "rare_breastplate_tectonic_might": {
+        "name": "빛바랜 지각의 힘 흉갑"
+      },
+      "legendary_breastplate_tectonic_might": {
+        "name": "지존의 지각의 힘 흉갑"
+      },
+      "band_mountains_weight": {
+        "name": "산의 무게 반지"
+      },
+      "rare_band_mountains_weight": {
+        "name": "빛바랜 산의 무게 반지"
+      },
+      "legendary_band_mountains_weight": {
+        "name": "지존의 산의 무게 반지"
+      },
+      "monolithic_shoulderguards": {
+        "name": "거석 어깨보호구"
+      },
+      "rare_monolithic_shoulderguards": {
+        "name": "빛바랜 거석 어깨보호구"
+      },
+      "legendary_monolithic_shoulderguards": {
+        "name": "지존의 거석 어깨보호구"
+      },
+      "earthshaker_warboots": {
+        "name": "대지를 흔드는 전투 장화"
+      },
+      "rare_earthshaker_warboots": {
+        "name": "빛바랜 대지를 흔드는 전투 장화"
+      },
+      "legendary_earthshaker_warboots": {
+        "name": "지존의 대지를 흔드는 전투 장화"
+      },
+      "silkstalker_woven_vest": {
+        "name": "비단 추적자의 엮은 조끼"
+      },
+      "rare_silkstalker_woven_vest": {
+        "name": "빛바랜 비단 추적자의 엮은 조끼"
+      },
+      "legendary_silkstalker_woven_vest": {
+        "name": "지존의 비단 추적자의 엮은 조끼"
+      },
+      "spun_venom_spaulders": {
+        "name": "독으로 자은 어깨갑옷"
+      },
+      "rare_spun_venom_spaulders": {
+        "name": "빛바랜 독으로 자은 어깨갑옷"
+      },
+      "legendary_spun_venom_spaulders": {
+        "name": "지존의 독으로 자은 어깨갑옷"
+      },
+      "broodmother_chitin_cowl": {
+        "name": "어미의 키틴 두건"
+      },
+      "rare_broodmother_chitin_cowl": {
+        "name": "빛바랜 어미의 키틴 두건"
+      },
+      "legendary_broodmother_chitin_cowl": {
+        "name": "지존의 어미의 키틴 두건"
+      },
+      "venom_etched_waistcord": {
+        "name": "독 새긴 허리끈"
+      },
+      "rare_venom_etched_waistcord": {
+        "name": "빛바랜 독 새긴 허리끈"
+      },
+      "legendary_venom_etched_waistcord": {
+        "name": "지존의 독 새긴 허리끈"
+      },
+      "bone_studded_pauldrons": {
+        "name": "뼈 박힌 견갑"
+      },
+      "rare_bone_studded_pauldrons": {
+        "name": "빛바랜 뼈 박힌 견갑"
+      },
+      "legendary_bone_studded_pauldrons": {
+        "name": "지존의 뼈 박힌 견갑"
+      },
+      "legguards_of_the_ossuary": {
+        "name": "납골당의 다리보호구"
+      },
+      "rare_legguards_of_the_ossuary": {
+        "name": "빛바랜 납골당의 다리보호구"
+      },
+      "legendary_legguards_of_the_ossuary": {
+        "name": "지존의 납골당의 다리보호구"
+      },
+      "seal_of_the_cryptwalker": {
+        "name": "묘실 방랑자의 인장"
+      },
+      "rare_seal_of_the_cryptwalker": {
+        "name": "빛바랜 묘실 방랑자의 인장"
+      },
+      "legendary_seal_of_the_cryptwalker": {
+        "name": "지존의 묘실 방랑자의 인장"
+      },
+      "ossuary_bone_crown": {
+        "name": "납골당 뼈 왕관"
+      },
+      "rare_ossuary_bone_crown": {
+        "name": "빛바랜 납골당 뼈 왕관"
+      },
+      "legendary_ossuary_bone_crown": {
+        "name": "지존의 납골당 뼈 왕관"
+      },
+      "chalice_of_living_tides": {
+        "name": "살아있는 조류의 성배"
+      },
+      "rare_chalice_of_living_tides": {
+        "name": "빛바랜 살아있는 조류의 성배"
+      },
+      "legendary_chalice_of_living_tides": {
+        "name": "지존의 살아있는 조류의 성배"
+      },
+      "pendant_continuous_flow": {
+        "name": "끊임없는 흐름의 펜던트"
+      },
+      "rare_pendant_continuous_flow": {
+        "name": "빛바랜 끊임없는 흐름의 펜던트"
+      },
+      "legendary_pendant_continuous_flow": {
+        "name": "지존의 끊임없는 흐름의 펜던트"
+      },
+      "coral_encrusted_girdle": {
+        "name": "산호 뒤덮인 허리띠"
+      },
+      "rare_coral_encrusted_girdle": {
+        "name": "빛바랜 산호 뒤덮인 허리띠"
+      },
+      "legendary_coral_encrusted_girdle": {
+        "name": "지존의 산호 뒤덮인 허리띠"
+      },
+      "riptide_handwraps": {
+        "name": "이안류 손싸개"
+      },
+      "rare_riptide_handwraps": {
+        "name": "빛바랜 이안류 손싸개"
+      },
+      "legendary_riptide_handwraps": {
+        "name": "지존의 이안류 손싸개"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
 import { ITEM_ART_AUDIT_RENDERER_FINGERPRINT } from '../scripts/lib/item_art_audit.mjs';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
+import { HOARD_ITEMS } from '../src/sim/content/hoard_loot';
 import { ITEMS } from '../src/sim/data';
 import { ITEM_ART_PENDING } from '../src/ui/icons';
 
@@ -841,7 +842,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
     // The wq-reputation merge's 15 faction quartermaster items: 1,320.
     // The Clue Scroll items (clue_scroll, treasure_casket): 1,322.
-    expect(Object.keys(ITEMS)).toHaveLength(1322);
+    // The faction reward items (18), the treasure maps and Cartographer's Ink (5)
+    // and the Buried Hoard boss loot (content/hoard_loot.ts, 96): 1,441.
+    expect(Object.keys(ITEMS)).toHaveLength(1441);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1002,9 +1005,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // SVG compositions) join at the wq-reputation merge: 1,302.
     // The Clue Scroll icons (clue-scroll-icons-2026-09-17, two SVG
     // compositions) join: 1,304.
-    expect(new Set(currentOwnerIds).size).toBe(1304);
-    expect(shippingIds).toHaveLength(1304);
-    expect(Object.keys(ITEMS)).toHaveLength(1322);
+    // The faction reward icons (faction-rewards-icons-2026-09-17, 18), the
+    // treasure map icons (buried-hoard-treasure-maps-2026-09-19, 5) and the hoard
+    // boss loot icons (hoard-boss-loot-icons-2026-09-20, 96) join: 1,423.
+    expect(new Set(currentOwnerIds).size).toBe(1423);
+    expect(shippingIds).toHaveLength(1423);
+    expect(Object.keys(ITEMS)).toHaveLength(1441);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1073,6 +1079,50 @@ describe('item-art consistency accepted-art provenance', () => {
       .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
       .flatMap(({ itemIds }) => itemIds);
     expect(sorted(clueScrollBatchIds)).toEqual(['clue_scroll', 'treasure_casket']);
+    // The faction reward items, one SVG batch (faction-rewards-icons-2026-09-17),
+    // additive beyond the chain the same way.
+    const factionRewardBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'faction-rewards-icons-2026-09-17')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(factionRewardBatchIds)).toEqual([
+      'allied_hearthstone',
+      'allied_vanguard_duffel',
+      'clockwork_shock_bomb',
+      'clockwork_target_dummy',
+      'dawn_battle_standard',
+      'dense_sharpening_stone',
+      'elixir_of_mana_regeneration',
+      'formula_enchant_feet_shadowstride',
+      'formula_enchant_gloves_forged_might',
+      'formula_enchant_offhand_spirit',
+      'pattern_reinforced_armor_kit',
+      'plans_dense_sharpening_stone',
+      'potion_of_invisibility',
+      'recipe_elixir_of_mana_regeneration',
+      'recipe_potion_of_invisibility',
+      'reinforced_armor_kit',
+      'rift_feather_glider',
+      'schematic_clockwork_shock_bomb',
+    ]);
+    // The treasure maps and Cartographer's Ink (buried-hoard-treasure-maps-2026-09-19).
+    const treasureMapBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'buried-hoard-treasure-maps-2026-09-19')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(treasureMapBatchIds)).toEqual([
+      'cartographers_ink',
+      'treasure_map_common',
+      'treasure_map_epic',
+      'treasure_map_legendary',
+      'treasure_map_rare',
+    ]);
+    // The Buried Hoard boss loot (hoard-boss-loot-icons-2026-09-20): one icon per
+    // generated item id, 32 pieces at three tiers, pinned against the live table
+    // rather than as 96 literals.
+    const hoardLootBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'hoard-boss-loot-icons-2026-09-20')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(hoardLootBatchIds).toHaveLength(96);
+    expect(sorted(hoardLootBatchIds)).toEqual(sorted(Object.keys(HOARD_ITEMS)));
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
     // this whole historical chain too, the same way the Field Kit is.
     expect(
@@ -1082,6 +1132,9 @@ describe('item-art consistency accepted-art provenance', () => {
         ...worldQuestBatchIds,
         ...factionVendorBatchIds,
         ...clueScrollBatchIds,
+        ...factionRewardBatchIds,
+        ...treasureMapBatchIds,
+        ...hoardLootBatchIds,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
@@ -1247,8 +1300,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // world-quest-freight-icons, 2026-09-01) at the release/v0.43.0 merge = 33.
     // The wq-reputation merge adds the faction quartermaster icons' batch
     // (faction-vendor-icons-2026-09-16) = 34. The Clue Scroll items add their
-    // batch (clue-scroll-icons-2026-09-17) = 35.
-    expect(mapping.generatedBatches).toHaveLength(35);
+    // batch (clue-scroll-icons-2026-09-17) = 35. The faction reward icons, the
+    // treasure map icons and the hoard boss loot icons add one batch each = 38.
+    expect(mapping.generatedBatches).toHaveLength(38);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1312,14 +1366,15 @@ describe('item-art consistency accepted-art provenance', () => {
     // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755. The
     // world-quest branch's two batches add four ids at the release/v0.43.0
     // merge: 759. The faction quartermaster batch adds 15 at the
-    // wq-reputation merge: 774. The Clue Scroll batch adds 2: 776.
-    expect(priorGeneratedIds).toHaveLength(776);
+    // wq-reputation merge: 774. The Clue Scroll batch adds 2: 776. The faction
+    // reward (18), treasure map (5) and hoard boss loot (96) batches: 895.
+    expect(priorGeneratedIds).toHaveLength(895);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1304);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1304);
+    expect(allCurrentOwnerIds).toHaveLength(1423);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1423);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1330,8 +1385,9 @@ describe('item-art consistency accepted-art provenance', () => {
       entries: 43,
       // 755 + the world-quest branch's four batch ids (release/v0.43.0 merge)
       // + the 15 faction quartermaster ids (wq-reputation merge) = 774
-      // + the 2 Clue Scroll ids = 776.
-      priorGenerated: 776,
+      // + the 2 Clue Scroll ids = 776 + the 18 faction reward, 5 treasure map
+      // and 96 hoard boss loot ids = 895.
+      priorGenerated: 895,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1403,6 +1459,9 @@ describe('item-art consistency accepted-art provenance', () => {
                 'faction-vendor-icons-2026-09-16',
                 // The Clue Scroll items.
                 'clue-scroll-icons-2026-09-17',
+                'faction-rewards-icons-2026-09-17',
+                'buried-hoard-treasure-maps-2026-09-19',
+                'hoard-boss-loot-icons-2026-09-20',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1410,7 +1469,7 @@ describe('item-art consistency accepted-art provenance', () => {
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
       ]),
-      'the dated catalog plus the release batches, the world-quest, faction-vendor and clue-scroll batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
+      'the dated catalog plus the release batches, the world-quest, faction-vendor, clue-scroll, faction-reward, treasure-map and hoard-loot batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1540,10 +1599,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
     // batch ids + 46 Crucible-professions batch ids = 1283.
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
-    // merge = 1302. Plus the two Clue Scroll owners = 1304.
-    if (ownerIds.length !== 1304)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1304`);
-    if (fileIds.length !== 1304) violations.push(`shipping WebP count: ${fileIds.length} != 1304`);
+    // merge = 1302. Plus the two Clue Scroll owners = 1304. Plus the 18 faction
+    // reward, 5 treasure map and 96 hoard boss loot owners = 1423.
+    if (ownerIds.length !== 1423)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1423`);
+    if (fileIds.length !== 1423) violations.push(`shipping WebP count: ${fileIds.length} != 1423`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

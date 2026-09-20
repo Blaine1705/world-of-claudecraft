@@ -16604,6 +16604,309 @@ export const en_XA: EnTranslations = {
       "formula_enchant_gloves_forged_might": {
         "name": "[Ƒóŕɱúļá: Éñçĥáñţ Ĝļóʋéš - Ƒóŕĝéð Ɱíĝĥţ]"
       },
+      "treasure_map_common": {
+        "name": "[Ŵéáţĥéŕéð Ţŕéášúŕé Ɱáþ]"
+      },
+      "treasure_map_rare": {
+        "name": "[Íñķéð Ţŕéášúŕé Ɱáþ]"
+      },
+      "treasure_map_epic": {
+        "name": "[Ĝíļðéð Ţŕéášúŕé Ɱáþ]"
+      },
+      "treasure_map_legendary": {
+        "name": "[Šóʋéŕéíĝñ Ţŕéášúŕé Ɱáþ]"
+      },
+      "cartographers_ink": {
+        "name": "[Çáŕţóĝŕáþĥéŕ'š Íñķ]"
+      },
+      "collapsar_band_of_nyxaris": {
+        "name": "[Çóļļáþšáŕ Ɓáñð óƒ Ñýẋáŕíš]"
+      },
+      "rare_collapsar_band_of_nyxaris": {
+        "name": "[Ţáŕñíšĥéð Çóļļáþšáŕ Ɓáñð óƒ Ñýẋáŕíš]"
+      },
+      "legendary_collapsar_band_of_nyxaris": {
+        "name": "[Šóʋéŕéíĝñ Çóļļáþšáŕ Ɓáñð óƒ Ñýẋáŕíš]"
+      },
+      "orb_collapsing_void": {
+        "name": "[Óŕƀ óƒ Çóļļáþšíñĝ Ʋóíð]"
+      },
+      "rare_orb_collapsing_void": {
+        "name": "[Ţáŕñíšĥéð Óŕƀ óƒ Çóļļáþšíñĝ Ʋóíð]"
+      },
+      "legendary_orb_collapsing_void": {
+        "name": "[Šóʋéŕéíĝñ Óŕƀ óƒ Çóļļáþšíñĝ Ʋóíð]"
+      },
+      "cowl_of_event_horizon": {
+        "name": "[Çóŵļ óƒ ţĥé Éʋéñţ Ĥóŕížóñ]"
+      },
+      "rare_cowl_of_event_horizon": {
+        "name": "[Ţáŕñíšĥéð Çóŵļ óƒ ţĥé Éʋéñţ Ĥóŕížóñ]"
+      },
+      "legendary_cowl_of_event_horizon": {
+        "name": "[Šóʋéŕéíĝñ Çóŵļ óƒ ţĥé Éʋéñţ Ĥóŕížóñ]"
+      },
+      "mantle_of_singularity": {
+        "name": "[Ɱáñţļé óƒ Šíñĝúļáŕíţý]"
+      },
+      "rare_mantle_of_singularity": {
+        "name": "[Ţáŕñíšĥéð Ɱáñţļé óƒ Šíñĝúļáŕíţý]"
+      },
+      "legendary_mantle_of_singularity": {
+        "name": "[Šóʋéŕéíĝñ Ɱáñţļé óƒ Šíñĝúļáŕíţý]"
+      },
+      "glacier_hewn_bulwark": {
+        "name": "[Ĝļáçíéŕ-Ĥéŵñ Ɓúļŵáŕķ]"
+      },
+      "rare_glacier_hewn_bulwark": {
+        "name": "[Ţáŕñíšĥéð Ĝļáçíéŕ-Ĥéŵñ Ɓúļŵáŕķ]"
+      },
+      "legendary_glacier_hewn_bulwark": {
+        "name": "[Šóʋéŕéíĝñ Ĝļáçíéŕ-Ĥéŵñ Ɓúļŵáŕķ]"
+      },
+      "permafrost_legguards": {
+        "name": "[Þéŕɱáƒŕóšţ Ļéĝĝúáŕðš]"
+      },
+      "rare_permafrost_legguards": {
+        "name": "[Ţáŕñíšĥéð Þéŕɱáƒŕóšţ Ļéĝĝúáŕðš]"
+      },
+      "legendary_permafrost_legguards": {
+        "name": "[Šóʋéŕéíĝñ Þéŕɱáƒŕóšţ Ļéĝĝúáŕðš]"
+      },
+      "frostbitten_rime_slippers": {
+        "name": "[Ƒŕóšţƀíţţéñ Ŕíɱé Šļíþþéŕš]"
+      },
+      "rare_frostbitten_rime_slippers": {
+        "name": "[Ţáŕñíšĥéð Ƒŕóšţƀíţţéñ Ŕíɱé Šļíþþéŕš]"
+      },
+      "legendary_frostbitten_rime_slippers": {
+        "name": "[Šóʋéŕéíĝñ Ƒŕóšţƀíţţéñ Ŕíɱé Šļíþþéŕš]"
+      },
+      "rime_crusted_grips": {
+        "name": "[Ŕíɱé-Çŕúšţéð Ĝŕíþš]"
+      },
+      "rare_rime_crusted_grips": {
+        "name": "[Ţáŕñíšĥéð Ŕíɱé-Çŕúšţéð Ĝŕíþš]"
+      },
+      "legendary_rime_crusted_grips": {
+        "name": "[Šóʋéŕéíĝñ Ŕíɱé-Çŕúšţéð Ĝŕíþš]"
+      },
+      "ember_wrought_crown": {
+        "name": "[Éɱƀéŕ-Ŵŕóúĝĥţ Çŕóŵñ]"
+      },
+      "rare_ember_wrought_crown": {
+        "name": "[Ţáŕñíšĥéð Éɱƀéŕ-Ŵŕóúĝĥţ Çŕóŵñ]"
+      },
+      "legendary_ember_wrought_crown": {
+        "name": "[Šóʋéŕéíĝñ Éɱƀéŕ-Ŵŕóúĝĥţ Çŕóŵñ]"
+      },
+      "cinder_stitched_robes": {
+        "name": "[Çíñðéŕ-Šţíţçĥéð Ŕóƀéš]"
+      },
+      "rare_cinder_stitched_robes": {
+        "name": "[Ţáŕñíšĥéð Çíñðéŕ-Šţíţçĥéð Ŕóƀéš]"
+      },
+      "legendary_cinder_stitched_robes": {
+        "name": "[Šóʋéŕéíĝñ Çíñðéŕ-Šţíţçĥéð Ŕóƀéš]"
+      },
+      "chained_ember_choker": {
+        "name": "[Çĥáíñéð Éɱƀéŕ Çĥóķéŕ]"
+      },
+      "rare_chained_ember_choker": {
+        "name": "[Ţáŕñíšĥéð Çĥáíñéð Éɱƀéŕ Çĥóķéŕ]"
+      },
+      "legendary_chained_ember_choker": {
+        "name": "[Šóʋéŕéíĝñ Çĥáíñéð Éɱƀéŕ Çĥóķéŕ]"
+      },
+      "molten_clinker_girdle": {
+        "name": "[Ɱóļţéñ Çļíñķéŕ Ĝíŕðļé]"
+      },
+      "rare_molten_clinker_girdle": {
+        "name": "[Ţáŕñíšĥéð Ɱóļţéñ Çļíñķéŕ Ĝíŕðļé]"
+      },
+      "legendary_molten_clinker_girdle": {
+        "name": "[Šóʋéŕéíĝñ Ɱóļţéñ Çļíñķéŕ Ĝíŕðļé]"
+      },
+      "storm_tuned_buckler": {
+        "name": "[Šţóŕɱ-Ţúñéð Ɓúçķļéŕ]"
+      },
+      "rare_storm_tuned_buckler": {
+        "name": "[Ţáŕñíšĥéð Šţóŕɱ-Ţúñéð Ɓúçķļéŕ]"
+      },
+      "legendary_storm_tuned_buckler": {
+        "name": "[Šóʋéŕéíĝñ Šţóŕɱ-Ţúñéð Ɓúçķļéŕ]"
+      },
+      "hauberk_tempest_gale": {
+        "name": "[Ĥáúƀéŕķ óƒ ţĥé Ţéɱþéšţ Ĝáļé]"
+      },
+      "rare_hauberk_tempest_gale": {
+        "name": "[Ţáŕñíšĥéð Ĥáúƀéŕķ óƒ ţĥé Ţéɱþéšţ Ĝáļé]"
+      },
+      "legendary_hauberk_tempest_gale": {
+        "name": "[Šóʋéŕéíĝñ Ĥáúƀéŕķ óƒ ţĥé Ţéɱþéšţ Ĝáļé]"
+      },
+      "gale_strider_boots": {
+        "name": "[Ĝáļé-Šţŕíðéŕ Ɓóóţš]"
+      },
+      "rare_gale_strider_boots": {
+        "name": "[Ţáŕñíšĥéð Ĝáļé-Šţŕíðéŕ Ɓóóţš]"
+      },
+      "legendary_gale_strider_boots": {
+        "name": "[Šóʋéŕéíĝñ Ĝáļé-Šţŕíðéŕ Ɓóóţš]"
+      },
+      "tempest_strike_grips": {
+        "name": "[Ţéɱþéšţ-Šţŕíķé Ĝŕíþš]"
+      },
+      "rare_tempest_strike_grips": {
+        "name": "[Ţáŕñíšĥéð Ţéɱþéšţ-Šţŕíķé Ĝŕíþš]"
+      },
+      "legendary_tempest_strike_grips": {
+        "name": "[Šóʋéŕéíĝñ Ţéɱþéšţ-Šţŕíķé Ĝŕíþš]"
+      },
+      "breastplate_tectonic_might": {
+        "name": "[Ɓŕéášţþļáţé óƒ Ţéçţóñíç Ɱíĝĥţ]"
+      },
+      "rare_breastplate_tectonic_might": {
+        "name": "[Ţáŕñíšĥéð Ɓŕéášţþļáţé óƒ Ţéçţóñíç Ɱíĝĥţ]"
+      },
+      "legendary_breastplate_tectonic_might": {
+        "name": "[Šóʋéŕéíĝñ Ɓŕéášţþļáţé óƒ Ţéçţóñíç Ɱíĝĥţ]"
+      },
+      "band_mountains_weight": {
+        "name": "[Ɓáñð óƒ ţĥé Ɱóúñţáíñ'š Ŵéíĝĥţ]"
+      },
+      "rare_band_mountains_weight": {
+        "name": "[Ţáŕñíšĥéð Ɓáñð óƒ ţĥé Ɱóúñţáíñ'š Ŵéíĝĥţ]"
+      },
+      "legendary_band_mountains_weight": {
+        "name": "[Šóʋéŕéíĝñ Ɓáñð óƒ ţĥé Ɱóúñţáíñ'š Ŵéíĝĥţ]"
+      },
+      "monolithic_shoulderguards": {
+        "name": "[Ɱóñóļíţĥíç Šĥóúļðéŕĝúáŕðš]"
+      },
+      "rare_monolithic_shoulderguards": {
+        "name": "[Ţáŕñíšĥéð Ɱóñóļíţĥíç Šĥóúļðéŕĝúáŕðš]"
+      },
+      "legendary_monolithic_shoulderguards": {
+        "name": "[Šóʋéŕéíĝñ Ɱóñóļíţĥíç Šĥóúļðéŕĝúáŕðš]"
+      },
+      "earthshaker_warboots": {
+        "name": "[Éáŕţĥšĥáķéŕ Ŵáŕƀóóţš]"
+      },
+      "rare_earthshaker_warboots": {
+        "name": "[Ţáŕñíšĥéð Éáŕţĥšĥáķéŕ Ŵáŕƀóóţš]"
+      },
+      "legendary_earthshaker_warboots": {
+        "name": "[Šóʋéŕéíĝñ Éáŕţĥšĥáķéŕ Ŵáŕƀóóţš]"
+      },
+      "silkstalker_woven_vest": {
+        "name": "[Ŵóʋéñ Ʋéšţ óƒ ţĥé Šíļķšţáļķéŕ]"
+      },
+      "rare_silkstalker_woven_vest": {
+        "name": "[Ţáŕñíšĥéð Ŵóʋéñ Ʋéšţ óƒ ţĥé Šíļķšţáļķéŕ]"
+      },
+      "legendary_silkstalker_woven_vest": {
+        "name": "[Šóʋéŕéíĝñ Ŵóʋéñ Ʋéšţ óƒ ţĥé Šíļķšţáļķéŕ]"
+      },
+      "spun_venom_spaulders": {
+        "name": "[Šþúñ-Ʋéñóɱ Šþáúļðéŕš]"
+      },
+      "rare_spun_venom_spaulders": {
+        "name": "[Ţáŕñíšĥéð Šþúñ-Ʋéñóɱ Šþáúļðéŕš]"
+      },
+      "legendary_spun_venom_spaulders": {
+        "name": "[Šóʋéŕéíĝñ Šþúñ-Ʋéñóɱ Šþáúļðéŕš]"
+      },
+      "broodmother_chitin_cowl": {
+        "name": "[Çĥíţíñ Çóŵļ óƒ ţĥé Ɓŕóóðɱóţĥéŕ]"
+      },
+      "rare_broodmother_chitin_cowl": {
+        "name": "[Ţáŕñíšĥéð Çĥíţíñ Çóŵļ óƒ ţĥé Ɓŕóóðɱóţĥéŕ]"
+      },
+      "legendary_broodmother_chitin_cowl": {
+        "name": "[Šóʋéŕéíĝñ Çĥíţíñ Çóŵļ óƒ ţĥé Ɓŕóóðɱóţĥéŕ]"
+      },
+      "venom_etched_waistcord": {
+        "name": "[Ʋéñóɱ-Éţçĥéð Ŵáíšţçóŕð]"
+      },
+      "rare_venom_etched_waistcord": {
+        "name": "[Ţáŕñíšĥéð Ʋéñóɱ-Éţçĥéð Ŵáíšţçóŕð]"
+      },
+      "legendary_venom_etched_waistcord": {
+        "name": "[Šóʋéŕéíĝñ Ʋéñóɱ-Éţçĥéð Ŵáíšţçóŕð]"
+      },
+      "bone_studded_pauldrons": {
+        "name": "[Ɓóñé-Šţúððéð Þáúļðŕóñš]"
+      },
+      "rare_bone_studded_pauldrons": {
+        "name": "[Ţáŕñíšĥéð Ɓóñé-Šţúððéð Þáúļðŕóñš]"
+      },
+      "legendary_bone_studded_pauldrons": {
+        "name": "[Šóʋéŕéíĝñ Ɓóñé-Šţúððéð Þáúļðŕóñš]"
+      },
+      "legguards_of_the_ossuary": {
+        "name": "[Ļéĝĝúáŕðš óƒ ţĥé Óššúáŕý]"
+      },
+      "rare_legguards_of_the_ossuary": {
+        "name": "[Ţáŕñíšĥéð Ļéĝĝúáŕðš óƒ ţĥé Óššúáŕý]"
+      },
+      "legendary_legguards_of_the_ossuary": {
+        "name": "[Šóʋéŕéíĝñ Ļéĝĝúáŕðš óƒ ţĥé Óššúáŕý]"
+      },
+      "seal_of_the_cryptwalker": {
+        "name": "[Šéáļ óƒ ţĥé Çŕýþţŵáļķéŕ]"
+      },
+      "rare_seal_of_the_cryptwalker": {
+        "name": "[Ţáŕñíšĥéð Šéáļ óƒ ţĥé Çŕýþţŵáļķéŕ]"
+      },
+      "legendary_seal_of_the_cryptwalker": {
+        "name": "[Šóʋéŕéíĝñ Šéáļ óƒ ţĥé Çŕýþţŵáļķéŕ]"
+      },
+      "ossuary_bone_crown": {
+        "name": "[Óššúáŕý Ɓóñé Çŕóŵñ]"
+      },
+      "rare_ossuary_bone_crown": {
+        "name": "[Ţáŕñíšĥéð Óššúáŕý Ɓóñé Çŕóŵñ]"
+      },
+      "legendary_ossuary_bone_crown": {
+        "name": "[Šóʋéŕéíĝñ Óššúáŕý Ɓóñé Çŕóŵñ]"
+      },
+      "chalice_of_living_tides": {
+        "name": "[Çĥáļíçé óƒ ţĥé Ļíʋíñĝ Ţíðéš]"
+      },
+      "rare_chalice_of_living_tides": {
+        "name": "[Ţáŕñíšĥéð Çĥáļíçé óƒ ţĥé Ļíʋíñĝ Ţíðéš]"
+      },
+      "legendary_chalice_of_living_tides": {
+        "name": "[Šóʋéŕéíĝñ Çĥáļíçé óƒ ţĥé Ļíʋíñĝ Ţíðéš]"
+      },
+      "pendant_continuous_flow": {
+        "name": "[Þéñðáñţ óƒ Çóñţíñúóúš Ƒļóŵ]"
+      },
+      "rare_pendant_continuous_flow": {
+        "name": "[Ţáŕñíšĥéð Þéñðáñţ óƒ Çóñţíñúóúš Ƒļóŵ]"
+      },
+      "legendary_pendant_continuous_flow": {
+        "name": "[Šóʋéŕéíĝñ Þéñðáñţ óƒ Çóñţíñúóúš Ƒļóŵ]"
+      },
+      "coral_encrusted_girdle": {
+        "name": "[Çóŕáļ-Éñçŕúšţéð Ĝíŕðļé]"
+      },
+      "rare_coral_encrusted_girdle": {
+        "name": "[Ţáŕñíšĥéð Çóŕáļ-Éñçŕúšţéð Ĝíŕðļé]"
+      },
+      "legendary_coral_encrusted_girdle": {
+        "name": "[Šóʋéŕéíĝñ Çóŕáļ-Éñçŕúšţéð Ĝíŕðļé]"
+      },
+      "riptide_handwraps": {
+        "name": "[Ŕíþţíðé Ĥáñðŵŕáþš]"
+      },
+      "rare_riptide_handwraps": {
+        "name": "[Ţáŕñíšĥéð Ŕíþţíðé Ĥáñðŵŕáþš]"
+      },
+      "legendary_riptide_handwraps": {
+        "name": "[Šóʋéŕéíĝñ Ŕíþţíðé Ĥáñðŵŕáþš]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

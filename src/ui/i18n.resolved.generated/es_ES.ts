@@ -1418,8 +1418,8 @@ export const es_ES: EnTranslations = {
     },
     "riftTracker": {
       "title": "Brecha",
-      "hoardTitle": "Buried Hoard",
-      "hoardGoal": "Defeat the hoard keeper",
+      "hoardTitle": "Tesoro enterrado",
+      "hoardGoal": "Derrota al guardián del tesoro",
       "hoardChestGoal": "Abre el cofre del tesoro",
       "hoardClaimedGoal": "El tesoro es tuyo",
       "floor": "Piso {current} de {total}",
@@ -2323,16 +2323,16 @@ export const es_ES: EnTranslations = {
       "openProfessions": "Profesiones abiertas"
     },
     "treasureMap": {
-      "close": "Close treasure map",
-      "zone": "Somewhere in {zone}",
-      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A buried hoard opens for you and your party.",
-      "upgradeNote": "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
-      "upgradeMaxed": "No cartographer could better this map.",
+      "close": "Cerrar mapa del tesoro",
+      "zone": "En algún lugar de {zone}",
+      "hint": "Encuentra el terreno que muestra este mapa, colócate sobre la X y usa el mapa otra vez para cavar. Se abrirá un tesoro enterrado para ti y tu grupo.",
+      "upgradeNote": "Redibujarlo como mapa {rarity} cuesta {inks} de Tinta de cartógrafo (tienes {held}). La venden los intendentes de las facciones.",
+      "upgradeMaxed": "Ningún cartógrafo podría mejorar este mapa.",
       "rarity": {
-        "common": "Common",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary"
+        "common": "Común",
+        "rare": "Raro",
+        "epic": "Épico",
+        "legendary": "Legendario"
       }
     },
     "currencies": {
@@ -9436,10 +9436,10 @@ export const es_ES: EnTranslations = {
       "pylonLit": "Un pilar rúnico cobra vida ({lit}/{total}).",
       "wayDownOpens": "El camino hacia abajo se abre.",
       "exitOpens": "La brecha se estremece. Un camino a casa se abre tras los caídos.",
-      "hoardEnter": "You climb down into {name}.",
+      "hoardEnter": "Desciendes a {name}.",
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
-      "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardNotYours": "Este tesoro lo desenterró otro grupo.",
       "portalOpens": "¡Una brecha de rango {tier} se abre en {zone}!",
       "portalSealed": "La brecha de rango {tier} en {zone} ha sido sellada.",
       "portalCollapses": "La brecha de rango {tier} en {zone} colapsa.",
@@ -11613,13 +11613,13 @@ export const es_ES: EnTranslations = {
       "clueHuntDone": "Treasure hunt complete: {title}. The casket is yours.",
       "clueHuntAbandoned": "Treasure hunt abandoned: {title}",
       "clueCasketOpened": "The casket holds {money} and {items}.",
-      "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
-      "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
-      "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
-      "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
-      "treasureVaultOpened": "The ground gives way. A buried hoard lies open before you.",
-      "treasureVaultLooted": "The hoard holds {money} and {items}.",
-      "treasureVaultCapped": "You have shared in enough hoards today; this one pays you nothing."
+      "treasureMapEarned": "Todas las misiones de mundo del día están hechas: has encontrado un {map}.",
+      "treasureMapLost": "Todas las misiones de mundo del día están hechas, pero no tienes sitio en las bolsas para el mapa del tesoro.",
+      "treasureMapRead": "Estudias el {map}. La X está en algún lugar de {zone}.",
+      "treasureMapUpgraded": "El mapa se ha redibujado con tinta más fina: ahora es un {map}.",
+      "treasureVaultOpened": "El suelo cede. Un tesoro enterrado se abre ante ti.",
+      "treasureVaultLooted": "El tesoro contiene {money} y {items}.",
+      "treasureVaultCapped": "Hoy ya has compartido suficientes tesoros; este no te da nada."
     },
     "errors": {
       "unavailable": "Esa misión no está disponible.",
@@ -16603,6 +16603,309 @@ export const es_ES: EnTranslations = {
       },
       "formula_enchant_gloves_forged_might": {
         "name": "Formula: Enchant Gloves - Forged Might"
+      },
+      "treasure_map_common": {
+        "name": "Mapa del tesoro desgastado"
+      },
+      "treasure_map_rare": {
+        "name": "Mapa del tesoro entintado"
+      },
+      "treasure_map_epic": {
+        "name": "Mapa del tesoro dorado"
+      },
+      "treasure_map_legendary": {
+        "name": "Mapa del tesoro del soberano"
+      },
+      "cartographers_ink": {
+        "name": "Tinta de cartógrafo"
+      },
+      "collapsar_band_of_nyxaris": {
+        "name": "Anillo de colapsar de Nyxaris"
+      },
+      "rare_collapsar_band_of_nyxaris": {
+        "name": "Anillo de colapsar de Nyxaris con pátina"
+      },
+      "legendary_collapsar_band_of_nyxaris": {
+        "name": "Anillo de colapsar de Nyxaris del soberano"
+      },
+      "orb_collapsing_void": {
+        "name": "Orbe del vacío colapsante"
+      },
+      "rare_orb_collapsing_void": {
+        "name": "Orbe del vacío colapsante con pátina"
+      },
+      "legendary_orb_collapsing_void": {
+        "name": "Orbe del vacío colapsante del soberano"
+      },
+      "cowl_of_event_horizon": {
+        "name": "Capucha del horizonte de sucesos"
+      },
+      "rare_cowl_of_event_horizon": {
+        "name": "Capucha del horizonte de sucesos con pátina"
+      },
+      "legendary_cowl_of_event_horizon": {
+        "name": "Capucha del horizonte de sucesos del soberano"
+      },
+      "mantle_of_singularity": {
+        "name": "Manto de la singularidad"
+      },
+      "rare_mantle_of_singularity": {
+        "name": "Manto de la singularidad con pátina"
+      },
+      "legendary_mantle_of_singularity": {
+        "name": "Manto de la singularidad del soberano"
+      },
+      "glacier_hewn_bulwark": {
+        "name": "Baluarte tallado en glaciar"
+      },
+      "rare_glacier_hewn_bulwark": {
+        "name": "Baluarte tallado en glaciar con pátina"
+      },
+      "legendary_glacier_hewn_bulwark": {
+        "name": "Baluarte tallado en glaciar del soberano"
+      },
+      "permafrost_legguards": {
+        "name": "Quijotes de permafrost"
+      },
+      "rare_permafrost_legguards": {
+        "name": "Quijotes de permafrost con pátina"
+      },
+      "legendary_permafrost_legguards": {
+        "name": "Quijotes de permafrost del soberano"
+      },
+      "frostbitten_rime_slippers": {
+        "name": "Zapatillas de escarcha helada"
+      },
+      "rare_frostbitten_rime_slippers": {
+        "name": "Zapatillas de escarcha helada con pátina"
+      },
+      "legendary_frostbitten_rime_slippers": {
+        "name": "Zapatillas de escarcha helada del soberano"
+      },
+      "rime_crusted_grips": {
+        "name": "Guanteletes cubiertos de escarcha"
+      },
+      "rare_rime_crusted_grips": {
+        "name": "Guanteletes cubiertos de escarcha con pátina"
+      },
+      "legendary_rime_crusted_grips": {
+        "name": "Guanteletes cubiertos de escarcha del soberano"
+      },
+      "ember_wrought_crown": {
+        "name": "Corona forjada en ascuas"
+      },
+      "rare_ember_wrought_crown": {
+        "name": "Corona forjada en ascuas con pátina"
+      },
+      "legendary_ember_wrought_crown": {
+        "name": "Corona forjada en ascuas del soberano"
+      },
+      "cinder_stitched_robes": {
+        "name": "Togas cosidas con ceniza"
+      },
+      "rare_cinder_stitched_robes": {
+        "name": "Togas cosidas con ceniza con pátina"
+      },
+      "legendary_cinder_stitched_robes": {
+        "name": "Togas cosidas con ceniza del soberano"
+      },
+      "chained_ember_choker": {
+        "name": "Gargantilla de ascua encadenada"
+      },
+      "rare_chained_ember_choker": {
+        "name": "Gargantilla de ascua encadenada con pátina"
+      },
+      "legendary_chained_ember_choker": {
+        "name": "Gargantilla de ascua encadenada del soberano"
+      },
+      "molten_clinker_girdle": {
+        "name": "Faja de escoria fundida"
+      },
+      "rare_molten_clinker_girdle": {
+        "name": "Faja de escoria fundida con pátina"
+      },
+      "legendary_molten_clinker_girdle": {
+        "name": "Faja de escoria fundida del soberano"
+      },
+      "storm_tuned_buckler": {
+        "name": "Broquel afinado por la tormenta"
+      },
+      "rare_storm_tuned_buckler": {
+        "name": "Broquel afinado por la tormenta con pátina"
+      },
+      "legendary_storm_tuned_buckler": {
+        "name": "Broquel afinado por la tormenta del soberano"
+      },
+      "hauberk_tempest_gale": {
+        "name": "Cota del vendaval tempestuoso"
+      },
+      "rare_hauberk_tempest_gale": {
+        "name": "Cota del vendaval tempestuoso con pátina"
+      },
+      "legendary_hauberk_tempest_gale": {
+        "name": "Cota del vendaval tempestuoso del soberano"
+      },
+      "gale_strider_boots": {
+        "name": "Botas del zancavientos"
+      },
+      "rare_gale_strider_boots": {
+        "name": "Botas del zancavientos con pátina"
+      },
+      "legendary_gale_strider_boots": {
+        "name": "Botas del zancavientos del soberano"
+      },
+      "tempest_strike_grips": {
+        "name": "Guanteletes de golpe de tempestad"
+      },
+      "rare_tempest_strike_grips": {
+        "name": "Guanteletes de golpe de tempestad con pátina"
+      },
+      "legendary_tempest_strike_grips": {
+        "name": "Guanteletes de golpe de tempestad del soberano"
+      },
+      "breastplate_tectonic_might": {
+        "name": "Coraza del poder tectónico"
+      },
+      "rare_breastplate_tectonic_might": {
+        "name": "Coraza del poder tectónico con pátina"
+      },
+      "legendary_breastplate_tectonic_might": {
+        "name": "Coraza del poder tectónico del soberano"
+      },
+      "band_mountains_weight": {
+        "name": "Anillo del peso de la montaña"
+      },
+      "rare_band_mountains_weight": {
+        "name": "Anillo del peso de la montaña con pátina"
+      },
+      "legendary_band_mountains_weight": {
+        "name": "Anillo del peso de la montaña del soberano"
+      },
+      "monolithic_shoulderguards": {
+        "name": "Guardahombros monolíticos"
+      },
+      "rare_monolithic_shoulderguards": {
+        "name": "Guardahombros monolíticos con pátina"
+      },
+      "legendary_monolithic_shoulderguards": {
+        "name": "Guardahombros monolíticos del soberano"
+      },
+      "earthshaker_warboots": {
+        "name": "Botas de guerra sacudetierras"
+      },
+      "rare_earthshaker_warboots": {
+        "name": "Botas de guerra sacudetierras con pátina"
+      },
+      "legendary_earthshaker_warboots": {
+        "name": "Botas de guerra sacudetierras del soberano"
+      },
+      "silkstalker_woven_vest": {
+        "name": "Chaleco tejido del acechasedas"
+      },
+      "rare_silkstalker_woven_vest": {
+        "name": "Chaleco tejido del acechasedas con pátina"
+      },
+      "legendary_silkstalker_woven_vest": {
+        "name": "Chaleco tejido del acechasedas del soberano"
+      },
+      "spun_venom_spaulders": {
+        "name": "Espaldares de veneno hilado"
+      },
+      "rare_spun_venom_spaulders": {
+        "name": "Espaldares de veneno hilado con pátina"
+      },
+      "legendary_spun_venom_spaulders": {
+        "name": "Espaldares de veneno hilado del soberano"
+      },
+      "broodmother_chitin_cowl": {
+        "name": "Capucha de quitina de la Progenitora"
+      },
+      "rare_broodmother_chitin_cowl": {
+        "name": "Capucha de quitina de la Progenitora con pátina"
+      },
+      "legendary_broodmother_chitin_cowl": {
+        "name": "Capucha de quitina de la Progenitora del soberano"
+      },
+      "venom_etched_waistcord": {
+        "name": "Cordón de cintura grabado con veneno"
+      },
+      "rare_venom_etched_waistcord": {
+        "name": "Cordón de cintura grabado con veneno con pátina"
+      },
+      "legendary_venom_etched_waistcord": {
+        "name": "Cordón de cintura grabado con veneno del soberano"
+      },
+      "bone_studded_pauldrons": {
+        "name": "Hombreras tachonadas de hueso"
+      },
+      "rare_bone_studded_pauldrons": {
+        "name": "Hombreras tachonadas de hueso con pátina"
+      },
+      "legendary_bone_studded_pauldrons": {
+        "name": "Hombreras tachonadas de hueso del soberano"
+      },
+      "legguards_of_the_ossuary": {
+        "name": "Quijotes del osario"
+      },
+      "rare_legguards_of_the_ossuary": {
+        "name": "Quijotes del osario con pátina"
+      },
+      "legendary_legguards_of_the_ossuary": {
+        "name": "Quijotes del osario del soberano"
+      },
+      "seal_of_the_cryptwalker": {
+        "name": "Sello del caminacriptas"
+      },
+      "rare_seal_of_the_cryptwalker": {
+        "name": "Sello del caminacriptas con pátina"
+      },
+      "legendary_seal_of_the_cryptwalker": {
+        "name": "Sello del caminacriptas del soberano"
+      },
+      "ossuary_bone_crown": {
+        "name": "Corona de hueso del osario"
+      },
+      "rare_ossuary_bone_crown": {
+        "name": "Corona de hueso del osario con pátina"
+      },
+      "legendary_ossuary_bone_crown": {
+        "name": "Corona de hueso del osario del soberano"
+      },
+      "chalice_of_living_tides": {
+        "name": "Cáliz de las mareas vivas"
+      },
+      "rare_chalice_of_living_tides": {
+        "name": "Cáliz de las mareas vivas con pátina"
+      },
+      "legendary_chalice_of_living_tides": {
+        "name": "Cáliz de las mareas vivas del soberano"
+      },
+      "pendant_continuous_flow": {
+        "name": "Colgante del flujo continuo"
+      },
+      "rare_pendant_continuous_flow": {
+        "name": "Colgante del flujo continuo con pátina"
+      },
+      "legendary_pendant_continuous_flow": {
+        "name": "Colgante del flujo continuo del soberano"
+      },
+      "coral_encrusted_girdle": {
+        "name": "Faja incrustada de coral"
+      },
+      "rare_coral_encrusted_girdle": {
+        "name": "Faja incrustada de coral con pátina"
+      },
+      "legendary_coral_encrusted_girdle": {
+        "name": "Faja incrustada de coral del soberano"
+      },
+      "riptide_handwraps": {
+        "name": "Vendas de resaca"
+      },
+      "rare_riptide_handwraps": {
+        "name": "Vendas de resaca con pátina"
+      },
+      "legendary_riptide_handwraps": {
+        "name": "Vendas de resaca del soberano"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"

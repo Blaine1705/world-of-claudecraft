@@ -1418,8 +1418,8 @@ export const ja_JP: EnTranslations = {
     },
     "riftTracker": {
       "title": "リフト",
-      "hoardTitle": "Buried Hoard",
-      "hoardGoal": "Defeat the hoard keeper",
+      "hoardTitle": "埋もれた財宝",
+      "hoardGoal": "財宝の番人を倒せ",
       "hoardChestGoal": "宝の箱を開けよう",
       "hoardClaimedGoal": "財宝はあなたのもの",
       "floor": "フロア {current}/{total}",
@@ -2323,16 +2323,16 @@ export const ja_JP: EnTranslations = {
       "openProfessions": "職業を開く"
     },
     "treasureMap": {
-      "close": "Close treasure map",
-      "zone": "Somewhere in {zone}",
-      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A buried hoard opens for you and your party.",
-      "upgradeNote": "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
-      "upgradeMaxed": "No cartographer could better this map.",
+      "close": "宝の地図を閉じる",
+      "zone": "{zone}のどこか",
+      "hint": "この地図が示す場所を見つけ、X印の上に立ち、もう一度地図を使って掘りましょう。あなたとパーティーのために埋もれた財宝が開かれます。",
+      "upgradeNote": "{rarity}の地図として描き直すには地図職人のインクが{inks}個必要です（所持: {held}）。各勢力の補給係が販売しています。",
+      "upgradeMaxed": "どんな地図職人もこの地図をこれ以上良くはできません。",
       "rarity": {
-        "common": "Common",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary"
+        "common": "コモン",
+        "rare": "レア",
+        "epic": "エピック",
+        "legendary": "レジェンダリー"
       }
     },
     "currencies": {
@@ -9436,10 +9436,10 @@ export const ja_JP: EnTranslations = {
       "pylonLit": "ルーンの尖塔が光を放った（{lit}/{total}）。",
       "wayDownOpens": "下層への道が裂け開いた。",
       "exitOpens": "裂け目が震える。倒れた敵の後ろに帰り道が裂け開いた。",
-      "hoardEnter": "You climb down into {name}.",
+      "hoardEnter": "{name}へと降りていった。",
       "hoardExitOpens": "財宝はあなたのものです。入口に戻って外へ登ってください。",
       "hoardStepBack": "財宝庫の入口から地上へ戻った。",
-      "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardNotYours": "この財宝は別のパーティーが掘り当てたものです。",
       "portalOpens": "{zone}に{tier}ランクの裂け目が裂け開いた！",
       "portalSealed": "{zone}の{tier}ランクの裂け目が封印された。",
       "portalCollapses": "{zone}の{tier}ランクの裂け目が崩れ落ちた。",
@@ -11613,13 +11613,13 @@ export const ja_JP: EnTranslations = {
       "clueHuntDone": "宝探し完了：{title}。宝箱は君のものだ。",
       "clueHuntAbandoned": "宝探しを放棄：{title}",
       "clueCasketOpened": "宝箱には{money}と{items}が入っていた。",
-      "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
-      "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
-      "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
-      "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
-      "treasureVaultOpened": "The ground gives way. A buried hoard lies open before you.",
-      "treasureVaultLooted": "The hoard holds {money} and {items}.",
-      "treasureVaultCapped": "You have shared in enough hoards today; this one pays you nothing."
+      "treasureMapEarned": "本日のワールドクエストをすべて達成：{map}を見つけました。",
+      "treasureMapLost": "本日のワールドクエストをすべて達成しましたが、宝の地図を入れるバッグの空きがありません。",
+      "treasureMapRead": "{map}を調べた。X印は{zone}のどこかにある。",
+      "treasureMapUpgraded": "地図がより上質なインクで描き直された：今や{map}だ。",
+      "treasureVaultOpened": "地面が崩れ落ちた。目の前に埋もれた財宝が口を開けている。",
+      "treasureVaultLooted": "財宝には{money}と{items}が入っていた。",
+      "treasureVaultCapped": "今日はもう十分な数の財宝の分け前を得ました。この財宝からは何も得られません。"
     },
     "errors": {
       "unavailable": "そのクエストは利用できません。",
@@ -16603,6 +16603,309 @@ export const ja_JP: EnTranslations = {
       },
       "formula_enchant_gloves_forged_might": {
         "name": "Formula: Enchant Gloves - Forged Might"
+      },
+      "treasure_map_common": {
+        "name": "風化した宝の地図"
+      },
+      "treasure_map_rare": {
+        "name": "墨入りの宝の地図"
+      },
+      "treasure_map_epic": {
+        "name": "金箔の宝の地図"
+      },
+      "treasure_map_legendary": {
+        "name": "至高の宝の地図"
+      },
+      "cartographers_ink": {
+        "name": "地図職人のインク"
+      },
+      "collapsar_band_of_nyxaris": {
+        "name": "ニクサリスの崩壊星の指輪"
+      },
+      "rare_collapsar_band_of_nyxaris": {
+        "name": "くすんだニクサリスの崩壊星の指輪"
+      },
+      "legendary_collapsar_band_of_nyxaris": {
+        "name": "至高のニクサリスの崩壊星の指輪"
+      },
+      "orb_collapsing_void": {
+        "name": "崩壊する虚無のオーブ"
+      },
+      "rare_orb_collapsing_void": {
+        "name": "くすんだ崩壊する虚無のオーブ"
+      },
+      "legendary_orb_collapsing_void": {
+        "name": "至高の崩壊する虚無のオーブ"
+      },
+      "cowl_of_event_horizon": {
+        "name": "事象の地平面の頭巾"
+      },
+      "rare_cowl_of_event_horizon": {
+        "name": "くすんだ事象の地平面の頭巾"
+      },
+      "legendary_cowl_of_event_horizon": {
+        "name": "至高の事象の地平面の頭巾"
+      },
+      "mantle_of_singularity": {
+        "name": "特異点のマント"
+      },
+      "rare_mantle_of_singularity": {
+        "name": "くすんだ特異点のマント"
+      },
+      "legendary_mantle_of_singularity": {
+        "name": "至高の特異点のマント"
+      },
+      "glacier_hewn_bulwark": {
+        "name": "氷河削りの大盾"
+      },
+      "rare_glacier_hewn_bulwark": {
+        "name": "くすんだ氷河削りの大盾"
+      },
+      "legendary_glacier_hewn_bulwark": {
+        "name": "至高の氷河削りの大盾"
+      },
+      "permafrost_legguards": {
+        "name": "永久凍土の脚甲"
+      },
+      "rare_permafrost_legguards": {
+        "name": "くすんだ永久凍土の脚甲"
+      },
+      "legendary_permafrost_legguards": {
+        "name": "至高の永久凍土の脚甲"
+      },
+      "frostbitten_rime_slippers": {
+        "name": "凍てつく霧氷の上靴"
+      },
+      "rare_frostbitten_rime_slippers": {
+        "name": "くすんだ凍てつく霧氷の上靴"
+      },
+      "legendary_frostbitten_rime_slippers": {
+        "name": "至高の凍てつく霧氷の上靴"
+      },
+      "rime_crusted_grips": {
+        "name": "霧氷まみれの手袋"
+      },
+      "rare_rime_crusted_grips": {
+        "name": "くすんだ霧氷まみれの手袋"
+      },
+      "legendary_rime_crusted_grips": {
+        "name": "至高の霧氷まみれの手袋"
+      },
+      "ember_wrought_crown": {
+        "name": "熾火鍛えの王冠"
+      },
+      "rare_ember_wrought_crown": {
+        "name": "くすんだ熾火鍛えの王冠"
+      },
+      "legendary_ember_wrought_crown": {
+        "name": "至高の熾火鍛えの王冠"
+      },
+      "cinder_stitched_robes": {
+        "name": "燃え殻縫いのローブ"
+      },
+      "rare_cinder_stitched_robes": {
+        "name": "くすんだ燃え殻縫いのローブ"
+      },
+      "legendary_cinder_stitched_robes": {
+        "name": "至高の燃え殻縫いのローブ"
+      },
+      "chained_ember_choker": {
+        "name": "鎖付き熾火のチョーカー"
+      },
+      "rare_chained_ember_choker": {
+        "name": "くすんだ鎖付き熾火のチョーカー"
+      },
+      "legendary_chained_ember_choker": {
+        "name": "至高の鎖付き熾火のチョーカー"
+      },
+      "molten_clinker_girdle": {
+        "name": "溶けた鉱滓の腰帯"
+      },
+      "rare_molten_clinker_girdle": {
+        "name": "くすんだ溶けた鉱滓の腰帯"
+      },
+      "legendary_molten_clinker_girdle": {
+        "name": "至高の溶けた鉱滓の腰帯"
+      },
+      "storm_tuned_buckler": {
+        "name": "嵐に調律された円盾"
+      },
+      "rare_storm_tuned_buckler": {
+        "name": "くすんだ嵐に調律された円盾"
+      },
+      "legendary_storm_tuned_buckler": {
+        "name": "至高の嵐に調律された円盾"
+      },
+      "hauberk_tempest_gale": {
+        "name": "暴風の鎖帷子"
+      },
+      "rare_hauberk_tempest_gale": {
+        "name": "くすんだ暴風の鎖帷子"
+      },
+      "legendary_hauberk_tempest_gale": {
+        "name": "至高の暴風の鎖帷子"
+      },
+      "gale_strider_boots": {
+        "name": "疾風を渡る者の長靴"
+      },
+      "rare_gale_strider_boots": {
+        "name": "くすんだ疾風を渡る者の長靴"
+      },
+      "legendary_gale_strider_boots": {
+        "name": "至高の疾風を渡る者の長靴"
+      },
+      "tempest_strike_grips": {
+        "name": "嵐撃の手甲"
+      },
+      "rare_tempest_strike_grips": {
+        "name": "くすんだ嵐撃の手甲"
+      },
+      "legendary_tempest_strike_grips": {
+        "name": "至高の嵐撃の手甲"
+      },
+      "breastplate_tectonic_might": {
+        "name": "地殻の剛力の胸当て"
+      },
+      "rare_breastplate_tectonic_might": {
+        "name": "くすんだ地殻の剛力の胸当て"
+      },
+      "legendary_breastplate_tectonic_might": {
+        "name": "至高の地殻の剛力の胸当て"
+      },
+      "band_mountains_weight": {
+        "name": "山の重みの指輪"
+      },
+      "rare_band_mountains_weight": {
+        "name": "くすんだ山の重みの指輪"
+      },
+      "legendary_band_mountains_weight": {
+        "name": "至高の山の重みの指輪"
+      },
+      "monolithic_shoulderguards": {
+        "name": "一枚岩の肩当て"
+      },
+      "rare_monolithic_shoulderguards": {
+        "name": "くすんだ一枚岩の肩当て"
+      },
+      "legendary_monolithic_shoulderguards": {
+        "name": "至高の一枚岩の肩当て"
+      },
+      "earthshaker_warboots": {
+        "name": "大地を揺るがす軍靴"
+      },
+      "rare_earthshaker_warboots": {
+        "name": "くすんだ大地を揺るがす軍靴"
+      },
+      "legendary_earthshaker_warboots": {
+        "name": "至高の大地を揺るがす軍靴"
+      },
+      "silkstalker_woven_vest": {
+        "name": "糸の狩人の織りベスト"
+      },
+      "rare_silkstalker_woven_vest": {
+        "name": "くすんだ糸の狩人の織りベスト"
+      },
+      "legendary_silkstalker_woven_vest": {
+        "name": "至高の糸の狩人の織りベスト"
+      },
+      "spun_venom_spaulders": {
+        "name": "毒紡ぎの肩甲"
+      },
+      "rare_spun_venom_spaulders": {
+        "name": "くすんだ毒紡ぎの肩甲"
+      },
+      "legendary_spun_venom_spaulders": {
+        "name": "至高の毒紡ぎの肩甲"
+      },
+      "broodmother_chitin_cowl": {
+        "name": "母胎のキチン頭巾"
+      },
+      "rare_broodmother_chitin_cowl": {
+        "name": "くすんだ母胎のキチン頭巾"
+      },
+      "legendary_broodmother_chitin_cowl": {
+        "name": "至高の母胎のキチン頭巾"
+      },
+      "venom_etched_waistcord": {
+        "name": "毒刻みの腰紐"
+      },
+      "rare_venom_etched_waistcord": {
+        "name": "くすんだ毒刻みの腰紐"
+      },
+      "legendary_venom_etched_waistcord": {
+        "name": "至高の毒刻みの腰紐"
+      },
+      "bone_studded_pauldrons": {
+        "name": "骨鋲の肩鎧"
+      },
+      "rare_bone_studded_pauldrons": {
+        "name": "くすんだ骨鋲の肩鎧"
+      },
+      "legendary_bone_studded_pauldrons": {
+        "name": "至高の骨鋲の肩鎧"
+      },
+      "legguards_of_the_ossuary": {
+        "name": "納骨堂の脚甲"
+      },
+      "rare_legguards_of_the_ossuary": {
+        "name": "くすんだ納骨堂の脚甲"
+      },
+      "legendary_legguards_of_the_ossuary": {
+        "name": "至高の納骨堂の脚甲"
+      },
+      "seal_of_the_cryptwalker": {
+        "name": "墓所を歩む者の印章"
+      },
+      "rare_seal_of_the_cryptwalker": {
+        "name": "くすんだ墓所を歩む者の印章"
+      },
+      "legendary_seal_of_the_cryptwalker": {
+        "name": "至高の墓所を歩む者の印章"
+      },
+      "ossuary_bone_crown": {
+        "name": "納骨堂の骨冠"
+      },
+      "rare_ossuary_bone_crown": {
+        "name": "くすんだ納骨堂の骨冠"
+      },
+      "legendary_ossuary_bone_crown": {
+        "name": "至高の納骨堂の骨冠"
+      },
+      "chalice_of_living_tides": {
+        "name": "生ける潮の聖杯"
+      },
+      "rare_chalice_of_living_tides": {
+        "name": "くすんだ生ける潮の聖杯"
+      },
+      "legendary_chalice_of_living_tides": {
+        "name": "至高の生ける潮の聖杯"
+      },
+      "pendant_continuous_flow": {
+        "name": "絶えざる流れのペンダント"
+      },
+      "rare_pendant_continuous_flow": {
+        "name": "くすんだ絶えざる流れのペンダント"
+      },
+      "legendary_pendant_continuous_flow": {
+        "name": "至高の絶えざる流れのペンダント"
+      },
+      "coral_encrusted_girdle": {
+        "name": "珊瑚まといの腰帯"
+      },
+      "rare_coral_encrusted_girdle": {
+        "name": "くすんだ珊瑚まといの腰帯"
+      },
+      "legendary_coral_encrusted_girdle": {
+        "name": "至高の珊瑚まといの腰帯"
+      },
+      "riptide_handwraps": {
+        "name": "離岸流の手巻き"
+      },
+      "rare_riptide_handwraps": {
+        "name": "くすんだ離岸流の手巻き"
+      },
+      "legendary_riptide_handwraps": {
+        "name": "至高の離岸流の手巻き"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

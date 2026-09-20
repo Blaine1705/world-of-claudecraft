@@ -340,7 +340,7 @@ export interface RiftInstance {
     /** The owner's level on entry: the hoard's mobs never exceed it. */
     level: number;
     /** The reward chest the final boss leaves (hoard_reward_chest.ts). */
-    chest?: import('./hoard_reward_chest').HoardRewardChestState;
+    chest?: HoardRewardChestState;
   } | null;
   /** The sealed reward cache the giga-boss drops (`rift_locked_chest`), opened via
    * the shared lockpicking minigame; null until the boss falls. */
@@ -453,4 +453,16 @@ export interface RiftPlan {
   /** Theme id of the final (boss) floor, which names the rift. */
   themeId: string;
   floorCount: number;
+}
+
+/** A Buried Hoard's reward chest (hoard_reward_chest.ts). Declared here, in the
+ *  types leaf, so RiftInstance never imports the chest's logic (and, through it,
+ *  the payout and the deeds catalog) into every bundle that only reads types. */
+export interface HoardRewardChestState {
+  entityId: number;
+  /** Frozen at the kill: the entrants this run pays. */
+  eligible: number[];
+  claimed: number[];
+  /** The boss that fell: its template picks the hoard's own loot table. */
+  bossTemplateId?: string;
 }

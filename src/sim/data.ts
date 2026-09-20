@@ -146,6 +146,7 @@ import {
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { HEALING_TRAINING_MOBS } from './content/healing_training';
+import { HOARD_ITEMS } from './content/hoard_loot';
 import {
   IGNIVAR_RAID_LORE_NPCS,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
@@ -418,6 +419,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   CRUCIBLE_PROFESSION_ITEMS,
   WORLD_QUEST_ITEMS,
   FACTION_VENDOR_ITEMS,
+  HOARD_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';

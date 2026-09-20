@@ -452,6 +452,8 @@ describe('i18n Localization Key Coverage', () => {
     weapon: 'Crossbow',
     // The elixir use line's buff duration in whole minutes (itemUi.tooltip.useElixir*).
     minutes: 10,
+    // The treasure map a log line names (questUi.logs.treasureMap*).
+    map: 'Inked Treasure Map',
     money: '12 copper',
     moves: '3 moves remaining',
     name: 'Aki',
