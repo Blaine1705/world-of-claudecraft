@@ -22,6 +22,7 @@ import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dunge
 import { HoardBossDressing } from './hoard_boss_dressing';
 import { HoardBossFx } from './hoard_boss_fx';
 import { HoardBossPresentation } from './hoard_boss_presentation';
+import { HoardEncounterAccents } from './hoard_encounter_accents';
 import {
   deathZonePlan,
   deathZonePulseSpeed,
@@ -64,6 +65,7 @@ export class RiftDeathZoneVisuals {
   private readonly hoardBossFx: HoardBossFx;
   private readonly hoardPresentation: HoardBossPresentation;
   private readonly hoardDressing: HoardBossDressing;
+  private readonly hoardAccents: HoardEncounterAccents;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -76,6 +78,13 @@ export class RiftDeathZoneVisuals {
     this.hoardBossFx = new HoardBossFx(scene, groundY, compileGate);
     this.hoardPresentation = new HoardBossPresentation(world, shake);
     this.hoardDressing = new HoardBossDressing(scene, groundY, world, compileGate, reducedMotion);
+    this.hoardAccents = new HoardEncounterAccents(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+    );
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -87,6 +96,7 @@ export class RiftDeathZoneVisuals {
     this.hoardBossFx.setTheme(this.world?.riftFloor?.seed);
     this.hoardBossFx.sync(hoardCues);
     this.hoardDressing.sync(hoardCues);
+    this.hoardAccents.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
       const key = `${z.x.toFixed(1)}:${z.z.toFixed(1)}:${z.radius.toFixed(1)}`;
@@ -115,6 +125,7 @@ export class RiftDeathZoneVisuals {
   update(dt: number): void {
     this.hoardBossFx.update(dt);
     this.hoardDressing.update(dt);
+    this.hoardAccents.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -133,6 +144,7 @@ export class RiftDeathZoneVisuals {
     this.sync([]);
     this.hoardBossFx.dispose();
     this.hoardDressing.dispose();
+    this.hoardAccents.dispose();
     this.hoardPresentation.dispose();
   }
 
