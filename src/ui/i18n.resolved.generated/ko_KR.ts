@@ -17769,6 +17769,9 @@ export const ko_KR: EnTranslations = {
       "stable_horse": {
         "name": "마구간 말"
       },
+      "hoard_healing_tide_totem": {
+        "name": "치유의 해일 토템"
+      },
       "rift_spawnling": {
         "name": "균열의 산물"
       },

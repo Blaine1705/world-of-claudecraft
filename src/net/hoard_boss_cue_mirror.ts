@@ -35,6 +35,7 @@ export class HoardBossCueMirror {
       instanceId: event.instanceId,
       cueId: event.cueId,
       kind: event.kind,
+      variant: event.variant,
       phase: event.phase,
       x: event.x,
       z: event.z,
@@ -42,6 +43,7 @@ export class HoardBossCueMirror {
       total: event.durationSecs,
       facing: event.facing,
       halfAngle: event.halfAngle,
+      innerRadius: event.innerRadius,
       expiresAtMs: now + event.durationSecs * 1000,
     });
   }

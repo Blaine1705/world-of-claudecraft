@@ -368,7 +368,9 @@ describe('isHarvestableCorpse', () => {
     // practice targets rather than harvestable corpses: 196.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
     // Three caravan enemies and the undead Fenbridge infiltrator add no components.
-    expect(untagged).toHaveLength(200);
+    // The Hoard boss Healing Tide Totem is a temporary summoned construct and
+    // adds one more deliberately unharvestable template.
+    expect(untagged).toHaveLength(201);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

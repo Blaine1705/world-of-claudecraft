@@ -1,5 +1,6 @@
 import { IGNIVAR_METEOR_RADIUS, IGNIVAR_METEOR_REVEAL_DELAY_SECONDS } from '../sim/ignivar_meteors';
 import { hoardSweepMeteorPoints } from '../sim/rift/hoard_boss';
+import { hoardTideWaveCenter } from '../sim/rift/hoard_boss_kits';
 import type { HoardBossCue } from '../sim/rift/types';
 import type { HoardBossCueView } from '../world_api/dungeons';
 
@@ -8,6 +9,54 @@ export interface HoardCueVisualPlan {
   pulseScale: number;
   countdownScale: number;
   urgent: boolean;
+}
+
+export type HoardCueShape = 'ignivar' | 'sector' | 'wave' | 'tether' | 'disc' | 'annulus';
+export type HoardCuePalette = 'physical' | 'fire' | 'frost' | 'arcane' | 'storm' | 'tide';
+
+export interface HoardCueAppearancePlan {
+  shape: HoardCueShape;
+  palette: HoardCuePalette;
+  countdown: 'disc' | 'annulus' | 'none';
+  elementalRider: boolean;
+}
+
+/** Pure semantic plan shared by every graphics tier and pinned in unit tests. */
+export function hoardCueAppearance(cue: HoardBossCueView): HoardCueAppearancePlan {
+  switch (cue.variant) {
+    case undefined:
+    case 'ember-frontal':
+      return { shape: 'ignivar', palette: 'fire', countdown: 'none', elementalRider: false };
+    case 'frost-gust':
+      return { shape: 'sector', palette: 'frost', countdown: 'none', elementalRider: true };
+    case 'brute-wide':
+    case 'brute-medium':
+    case 'brute-long':
+      return { shape: 'sector', palette: 'physical', countdown: 'none', elementalRider: false };
+    case 'tide-wave':
+      return { shape: 'wave', palette: 'tide', countdown: 'none', elementalRider: true };
+    case 'tide-tether':
+      return { shape: 'tether', palette: 'tide', countdown: 'none', elementalRider: true };
+    case 'arcane-ring':
+      return { shape: 'annulus', palette: 'arcane', countdown: 'annulus', elementalRider: true };
+    case 'arcane-blizzard':
+      return { shape: 'disc', palette: 'arcane', countdown: 'disc', elementalRider: true };
+    case 'storm-charge':
+    case 'storm-field':
+      return { shape: 'disc', palette: 'storm', countdown: 'disc', elementalRider: true };
+    case 'frost-ice':
+      return { shape: 'disc', palette: 'frost', countdown: 'disc', elementalRider: true };
+    case 'ember-fire':
+      return { shape: 'disc', palette: 'fire', countdown: 'disc', elementalRider: true };
+    default:
+      return { shape: 'disc', palette: 'physical', countdown: 'disc', elementalRider: false };
+  }
+}
+
+export function hoardTideWaveOffset(cue: HoardBossCueView): number {
+  return cue.variant === 'tide-wave'
+    ? hoardTideWaveCenter(cue.radius, cue.remaining, cue.total)
+    : 0;
 }
 
 export const HOARD_CUE_URGENT_SEC = 0.65;
@@ -49,10 +98,13 @@ export function hoardSweepMeteorWarnings(
 ): HoardSweepMeteorWarning[] {
   const warnings: HoardSweepMeteorWarning[] = [];
   for (const cue of cues) {
-    if (cue.kind !== 'sweep') continue;
+    if (cue.kind !== 'sweep' || (cue.variant !== undefined && cue.variant !== 'ember-frontal')) {
+      continue;
+    }
     const sweep: Extract<HoardBossCue, { kind: 'sweep' }> = {
       id: cue.cueId,
       kind: 'sweep',
+      variant: cue.variant,
       x: cue.x,
       z: cue.z,
       facing: cue.facing ?? 0,

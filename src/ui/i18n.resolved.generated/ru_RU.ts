@@ -17769,6 +17769,9 @@ export const ru_RU: EnTranslations = {
       "stable_horse": {
         "name": "Конюшенная лошадь"
       },
+      "hoard_healing_tide_totem": {
+        "name": "Тотем целительного прилива"
+      },
       "rift_spawnling": {
         "name": "Отпрыск Разлома"
       },

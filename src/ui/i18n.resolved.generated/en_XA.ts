@@ -17769,6 +17769,9 @@ export const en_XA: EnTranslations = {
       "stable_horse": {
         "name": "[Šţáƀļé Ĥóŕšé]"
       },
+      "hoard_healing_tide_totem": {
+        "name": "[Ĥéáļíñĝ Ţíðé Ţóţéɱ]"
+      },
       "rift_spawnling": {
         "name": "[Ŕíƒţ Šþáŵñļíñĝ]"
       },

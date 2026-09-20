@@ -40,6 +40,32 @@ const bossLoot = (c: number, rareId: string, rareChance: number): LootEntry[] =>
   { itemId: RIFT_ESSENCE_ITEM_ID, chance: 0.5 },
 ];
 
+/** Buried Hoard-only encounter actors. Kept out of RIFT_MOBS so ordinary Rift
+ * generation, search metadata, and upgrade manifests remain byte-for-byte isolated. */
+export const HOARD_MOBS: Record<string, MobTemplate> = {
+  hoard_healing_tide_totem: {
+    id: 'hoard_healing_tide_totem',
+    name: 'Healing Tide Totem',
+    minLevel: 18,
+    maxLevel: 23,
+    family: 'elemental',
+    hpBase: 54,
+    hpPerLevel: 5,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 3,
+    armorPerLevel: 4,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1.35,
+    color: 0x55d9cf,
+    xpMult: 0,
+    idleStationary: true,
+    untameable: true,
+  },
+};
+
 // Shared summoned adds (referenced by bosses' summonAdds.mobId). Low HP, no loot.
 const ADDS: Record<string, MobTemplate> = {
   rift_spawnling: {

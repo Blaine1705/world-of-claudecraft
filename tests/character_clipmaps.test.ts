@@ -242,6 +242,7 @@ const CLIPLESS_RIGS = new Set([
   'mob_glimmerwisp',
   'mob_duskwisp',
   'mob_spider_egg_sac',
+  'mob_healing_tide_totem',
   // the dragonkin clutch shell: a two-state prop whose GLB ships no clips
   // (alive/dead is a mesh-visibility swap, VisualDef.corpseMeshSwap)
   'mob_dragon_egg',

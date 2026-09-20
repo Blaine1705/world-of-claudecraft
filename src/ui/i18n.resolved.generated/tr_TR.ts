@@ -17769,6 +17769,9 @@ export const tr_TR: EnTranslations = {
       "stable_horse": {
         "name": "Ahır Atı"
       },
+      "hoard_healing_tide_totem": {
+        "name": "Healing Tide Totem"
+      },
       "rift_spawnling": {
         "name": "Yarık Yavrusu"
       },

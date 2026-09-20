@@ -390,14 +390,14 @@ describe('routeEvents frame bytes and session mutations', () => {
       pid: near.pid,
       instanceId: 19,
       cueId: 7,
-      kind: 'sweep',
+      kind: 'mark',
+      variant: 'arcane-ring',
       phase: 'warning',
       x: nearPos.x,
       z: nearPos.z,
       radius: 13,
+      innerRadius: 4.5,
       durationSecs: 1.45,
-      facing: 1.2,
-      halfAngle: Math.PI * 0.31,
     };
     routeRaw(server, [cue]);
     expect(fNear.sent).toEqual([eventsFrame(cue)]);

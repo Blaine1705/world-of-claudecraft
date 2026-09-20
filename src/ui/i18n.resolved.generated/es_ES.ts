@@ -17769,6 +17769,9 @@ export const es_ES: EnTranslations = {
       "stable_horse": {
         "name": "Caballo de establo"
       },
+      "hoard_healing_tide_totem": {
+        "name": "Healing Tide Totem"
+      },
       "rift_spawnling": {
         "name": "Cría de la Brecha"
       },

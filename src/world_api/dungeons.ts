@@ -52,6 +52,7 @@ export interface HoardBossCueView {
   instanceId: number;
   cueId: number;
   kind: 'sweep' | 'mark';
+  variant?: import('../sim/rift/types').HoardBossCueVariant;
   phase: 'warning' | 'hazard';
   x: number;
   z: number;
@@ -60,6 +61,7 @@ export interface HoardBossCueView {
   total: number;
   facing?: number;
   halfAngle?: number;
+  innerRadius?: number;
 }
 
 export interface IWorldDungeons {

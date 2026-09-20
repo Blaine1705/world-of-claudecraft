@@ -17769,6 +17769,9 @@ export const cs_CZ: EnTranslations = {
       "stable_horse": {
         "name": "Stájový kůň"
       },
+      "hoard_healing_tide_totem": {
+        "name": "Healing Tide Totem"
+      },
       "rift_spawnling": {
         "name": "Trhlinové plůdě"
       },

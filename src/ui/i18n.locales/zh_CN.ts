@@ -9486,6 +9486,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': '娜哈莉亚修女，溺亡的圣歌',
   'entities.mobs.edda_reedhand.name': '艾达·芦手',
   'entities.mobs.tolling_bell.name': '鸣钟',
+  'entities.mobs.hoard_healing_tide_totem.name': '治疗之潮图腾',
   'entities.mobs.rift_spawnling.name': '裂隙孽生体',
   'entities.mobs.rift_bonewalker.name': '复生骨行者',
   'entities.mobs.rift_frost_revenant.name': '霜缚亡魂',

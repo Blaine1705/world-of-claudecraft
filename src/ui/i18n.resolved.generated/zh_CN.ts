@@ -17769,6 +17769,9 @@ export const zh_CN: EnTranslations = {
       "stable_horse": {
         "name": "厩马"
       },
+      "hoard_healing_tide_totem": {
+        "name": "治疗之潮图腾"
+      },
       "rift_spawnling": {
         "name": "裂隙孽生体"
       },

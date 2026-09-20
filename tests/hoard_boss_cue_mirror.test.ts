@@ -32,6 +32,19 @@ describe('Buried Hoard boss cue mirror', () => {
     expect(mirror.views()).toEqual([]);
   });
 
+  it('preserves mechanic identity and safe inner radius across the online mirror', () => {
+    const mirror = new HoardBossCueMirror(() => 1_000);
+    mirror.apply(
+      warning({ variant: 'arcane-ring', radius: 8.5, innerRadius: 4.5, durationSecs: 2.2 }),
+    );
+    expect(mirror.views()[0]).toMatchObject({
+      variant: 'arcane-ring',
+      radius: 8.5,
+      innerRadius: 4.5,
+      remaining: 2.2,
+    });
+  });
+
   it('hydrates active cues from a resumed rift state and clears them', () => {
     let now = 5_000;
     const mirror = new HoardBossCueMirror(() => now);
@@ -57,7 +70,8 @@ describe('Buried Hoard boss cue mirror', () => {
         {
           instanceId: 12,
           cueId: 9,
-          kind: 'sweep',
+          kind: 'mark',
+          variant: 'arcane-ring',
           phase: 'warning',
           x: 2,
           z: 3,
@@ -66,11 +80,18 @@ describe('Buried Hoard boss cue mirror', () => {
           total: 1.45,
           facing: 1,
           halfAngle: 0.7,
+          innerRadius: 4.5,
         },
       ],
     });
     now += 300;
-    expect(mirror.views()[0]).toMatchObject({ cueId: 9, remaining: 0.5, total: 1.45 });
+    expect(mirror.views()[0]).toMatchObject({
+      cueId: 9,
+      variant: 'arcane-ring',
+      innerRadius: 4.5,
+      remaining: 0.5,
+      total: 1.45,
+    });
     mirror.apply({ type: 'hoardBossCueClear', pid: 7 });
     expect(mirror.views()).toEqual([]);
   });

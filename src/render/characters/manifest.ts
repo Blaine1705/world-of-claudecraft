@@ -3657,6 +3657,17 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Idle',
     },
   },
+  // Buried Hoard Healing Tide Totem. The quest prop is already a curated,
+  // chunky carved totem and ships without clips, so it uses the static prop lane.
+  mob_healing_tide_totem: {
+    url: 'models/quest/ogre_war_totem.glb',
+    height: 2.5,
+    clips: STATIC_PROP,
+    authoredAtlas: true,
+    tint: 'entity',
+    tintStrength: 0.35,
+    selfIllumination: 0.14,
+  },
   // Bone Spike (the Nythraxis raid, src/sim/nythraxis_bone_spike.ts): the
   // Tripo cluster of bone spikes erupting from cracked flagstones with violet
   // tips that pins an impaled raider until the raid shatters it. A stationary
@@ -3867,6 +3878,7 @@ const MOB_KEYS: Record<string, string> = {
   // instead of the family fallback (beast -> wolf, undead -> skeleton minion).
   mirefen_widowling: 'mob_spider',
   spider_egg_sac: 'mob_spider_egg_sac',
+  hoard_healing_tide_totem: 'mob_healing_tide_totem',
   // Broodmother clutch (q_broodmother): the destructible eggs reuse the egg-sac
   // model (not a live spider), and the hatchling is a small spider.
   spider_egg: 'mob_spider_egg_sac',

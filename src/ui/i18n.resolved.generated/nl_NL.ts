@@ -17769,6 +17769,9 @@ export const nl_NL: EnTranslations = {
       "stable_horse": {
         "name": "Stalpaard"
       },
+      "hoard_healing_tide_totem": {
+        "name": "Healing Tide Totem"
+      },
       "rift_spawnling": {
         "name": "Riftbroedsel"
       },

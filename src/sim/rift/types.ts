@@ -360,10 +360,27 @@ export interface RiftInstance {
   hoardBoss?: HoardBossState;
 }
 
+export type HoardBossCueVariant =
+  | 'buried-mark'
+  | 'ember-frontal'
+  | 'ember-fire'
+  | 'frost-gust'
+  | 'frost-ice'
+  | 'brute-wide'
+  | 'brute-medium'
+  | 'brute-long'
+  | 'arcane-blizzard'
+  | 'arcane-ring'
+  | 'storm-charge'
+  | 'storm-field'
+  | 'tide-wave'
+  | 'tide-tether';
+
 export type HoardBossCue =
   | {
       id: number;
       kind: 'sweep';
+      variant?: HoardBossCueVariant;
       x: number;
       z: number;
       facing: number;
@@ -371,10 +388,13 @@ export type HoardBossCue =
       halfAngle: number;
       remaining: number;
       total: number;
+      /** Runtime-only per-player contact ledger for traveling tide waves. */
+      hitIds?: Set<number>;
     }
   | {
       id: number;
       kind: 'mark';
+      variant?: HoardBossCueVariant;
       phase: 'warning' | 'hazard';
       x: number;
       z: number;
@@ -382,6 +402,7 @@ export type HoardBossCue =
       remaining: number;
       total: number;
       pulseTimer?: number;
+      innerRadius?: number;
     };
 
 export interface HoardBossState {
@@ -390,6 +411,12 @@ export interface HoardBossState {
   targetCursor: number;
   nextCueId: number;
   cues: HoardBossCue[];
+  sequenceStep: number;
+  sequenceTimer: number;
+  sequenceFacing: number;
+  specialTriggered: boolean;
+  totemId: number | null;
+  totemPulseTimer: number;
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for

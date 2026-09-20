@@ -95,8 +95,9 @@ describe('mob portrait source manifest', () => {
     // 250: plus the five Eastbrook healing-training role dummies, each with
     // its own rendered portrait.
     // 254: plus the world quest branch's Fenbridge infiltrator and its three
-    // regional freight caravans (Eastbrook, Willowfen, Frostveil).
-    expect(liveIds).toHaveLength(254);
+    // regional freight caravans (Eastbrook, Willowfen, Frostveil). The Hoard
+    // Healing Tide Totem is the 255th live target portrait.
+    expect(liveIds).toHaveLength(255);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

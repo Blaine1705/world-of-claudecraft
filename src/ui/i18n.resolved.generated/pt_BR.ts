@@ -17769,6 +17769,9 @@ export const pt_BR: EnTranslations = {
       "stable_horse": {
         "name": "Cavalo de estábulo"
       },
+      "hoard_healing_tide_totem": {
+        "name": "Healing Tide Totem"
+      },
       "rift_spawnling": {
         "name": "Prole da Fenda"
       },

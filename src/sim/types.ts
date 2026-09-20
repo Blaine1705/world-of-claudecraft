@@ -7,7 +7,7 @@ import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
-import type { TreasureMapProgress, TreasureMapRarity } from './content/treasure_maps';
+import type { TreasureMapRarity } from './content/treasure_maps';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
 import type { WispMazeState } from './minigames/wisp_maze';
@@ -7870,6 +7870,7 @@ export type SimEvent = { pid?: number } & (
         instanceId: number;
         cueId: number;
         kind: 'sweep' | 'mark';
+        variant?: import('./rift/types').HoardBossCueVariant;
         phase: 'warning' | 'hazard';
         x: number;
         z: number;
@@ -7878,6 +7879,7 @@ export type SimEvent = { pid?: number } & (
         total: number;
         facing?: number;
         halfAngle?: number;
+        innerRadius?: number;
       }>;
       // Epoch-ms deadline (via ctx.lockoutNowMs, the same conversion
       // rift/persistence.ts uses for save/load) after which the rift's backing
@@ -8150,6 +8152,7 @@ export type SimEvent = { pid?: number } & (
       instanceId: number;
       cueId: number;
       kind: 'sweep' | 'mark';
+      variant?: import('./rift/types').HoardBossCueVariant;
       phase: 'warning' | 'hazard';
       x: number;
       z: number;
@@ -8157,6 +8160,7 @@ export type SimEvent = { pid?: number } & (
       durationSecs: number;
       facing?: number;
       halfAngle?: number;
+      innerRadius?: number;
     }
   | { type: 'hoardBossCueClear'; pid: number }
   // Trend nudge (Professions 2.0): a soft, at-most-once-per-window

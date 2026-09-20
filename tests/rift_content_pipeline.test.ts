@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
+import { HOARD_MOBS, RIFT_MOBS, RIFT_TRASH_IDS } from '../src/sim/content/rift/mobs';
 import {
   ABILITY_KEYS,
   queryRiftMonsters,
@@ -41,6 +41,13 @@ describe('Rift monster index', () => {
     }
     expect(queryRiftMonsters({ themeId: 'frost', bosses: false }).length).toBeGreaterThanOrEqual(2);
     expect(queryRiftMonsters({ themeId: 'frost', bosses: true })).toHaveLength(1);
+  });
+
+  it('keeps Buried Hoard actors out of ordinary Rift content and trash pools', () => {
+    expect(HOARD_MOBS.hoard_healing_tide_totem).toBeDefined();
+    expect(RIFT_MOBS.hoard_healing_tide_totem).toBeUndefined();
+    expect(RIFT_TRASH_IDS).not.toContain('hoard_healing_tide_totem');
+    expect(RIFT_MONSTER_BY_ID.hoard_healing_tide_totem).toBeUndefined();
   });
 
   it('gives every ability key a human-readable label, never a raw camelCase leak', () => {

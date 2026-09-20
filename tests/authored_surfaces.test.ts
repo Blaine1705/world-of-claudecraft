@@ -131,6 +131,7 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_ignivar_crucible_warden',
   'mob_ignivar_ember_sentinel',
   'mob_ignivar_cinder_artificer',
+  'mob_healing_tide_totem',
   'mob_varkhul_forgefather',
   'mount_mech_bird',
   'mob_dragonkin_whelp',

@@ -3872,6 +3872,7 @@ export type TranslationKeyFlat =
   | 'entities.mobs.hedge_gnome.name'
   | 'entities.mobs.hedge_knight.name'
   | 'entities.mobs.heroic_boss_dummy.name'
+  | 'entities.mobs.hoard_healing_tide_totem.name'
   | 'entities.mobs.hollow_acolyte.name'
   | 'entities.mobs.hub_healing_dummy.name'
   | 'entities.mobs.hub_training_dummy.name'

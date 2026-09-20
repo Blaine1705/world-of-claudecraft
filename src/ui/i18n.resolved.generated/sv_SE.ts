@@ -17769,6 +17769,9 @@ export const sv_SE: EnTranslations = {
       "stable_horse": {
         "name": "Stallhäst"
       },
+      "hoard_healing_tide_totem": {
+        "name": "Healing Tide Totem"
+      },
       "rift_spawnling": {
         "name": "Revyngel"
       },

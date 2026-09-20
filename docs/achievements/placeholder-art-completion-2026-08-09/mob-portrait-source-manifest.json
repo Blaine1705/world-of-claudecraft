@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "a743144dd25c63fe21855e28874be604d9d6c8ea6bbb10a6c1f519636250291f",
+  "rendererFingerprint": "9ce2907f1e3790efad93d22d584efc0449c0b5a6e38d7df56cbcadc8f78f6802",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -14,7 +14,7 @@
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "153",
-    "browserVersion": "Edg/153.0.4234.32",
+    "browserVersion": "Edg/153.0.4234.48",
     "requestedBackend": "swiftshader",
     "fingerprint": "1e20b2b6d2d59cc8f4b804141fdbe6a011e07e40a953c202402d3b2e19cd108d"
   },
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4955840,
-      "sha256": "9e2c3461bda09731ca8420b7a0c48dafe157d5a3a3aad3f36f5a50b274cc20c5",
+      "bytes": 4989544,
+      "sha256": "f3ec25db4c60c85c8b300703e6bf617ca80e4127632b4a0fa821762f275d2db8",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 254,
+  "portraitCount": 255,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -3373,6 +3373,40 @@
         "path": "public/ui/mobs/heroic_boss_dummy.webp",
         "bytes": 1814,
         "sha256": "18d84e8902899716f6a8491515fb749a579e564a6fd1471b906195598b4700b3"
+      }
+    },
+    {
+      "id": "hoard_healing_tide_totem",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_healing_tide_totem",
+      "renderSpec": {
+        "model": {
+          "url": "models/quest/ogre_war_totem.glb",
+          "path": "public/models/quest/ogre_war_totem.glb",
+          "bytes": 307884,
+          "sha256": "74dedbc163bbbf8c1746b21c0b9449ce69c7cb91b9322e5efb9a9091c608ce86"
+        },
+        "idle": "Idle",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#55d9cf",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "d6b3df1ff5ff84c495fcf5d557939f4b990c5b3057874fe48cf390019a816dd4",
+      "output": {
+        "path": "public/ui/mobs/hoard_healing_tide_totem.webp",
+        "bytes": 2150,
+        "sha256": "4e35eeadaab8d10a6cca0e79f9f081353282eaccd43e7bba8dd2dc8afa803f42"
       }
     },
     {

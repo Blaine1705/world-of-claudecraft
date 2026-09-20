@@ -17769,6 +17769,9 @@ export const ja_JP: EnTranslations = {
       "stable_horse": {
         "name": "厩舎の馬"
       },
+      "hoard_healing_tide_totem": {
+        "name": "癒やしの潮のトーテム"
+      },
       "rift_spawnling": {
         "name": "リフトの落とし子"
       },

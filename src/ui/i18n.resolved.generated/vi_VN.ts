@@ -17769,6 +17769,9 @@ export const vi_VN: EnTranslations = {
       "stable_horse": {
         "name": "Ngựa chuồng"
       },
+      "hoard_healing_tide_totem": {
+        "name": "Healing Tide Totem"
+      },
       "rift_spawnling": {
         "name": "Ấu Trùng Rạn Nứt"
       },

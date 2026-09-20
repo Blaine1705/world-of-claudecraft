@@ -16,6 +16,8 @@ import {
   HOARD_SWEEP_METEOR_COUNT,
   HOARD_SWEEP_RANGE,
   HOARD_SWEEP_WINDUP_SEC,
+  HOARD_TOTEM_HEAL_FRACTION,
+  HOARD_TOTEM_TRIGGER_HP,
   hoardBossKit,
   hoardMarkTargetCount,
   hoardMarkTargets,
@@ -24,13 +26,19 @@ import {
   pointInHoardSweep,
   tickHoardBossMechanics,
 } from '../src/sim/rift/hoard_boss';
+import {
+  HOARD_BRUTE_COMBO,
+  HOARD_FROST_GUST,
+  HOARD_TIDE_WAVE,
+  hoardMarkSpec,
+} from '../src/sim/rift/hoard_boss_kits';
 import { riftStateEventFor } from '../src/sim/rift/runs';
 import type { HoardBossState, RiftInstance } from '../src/sim/rift/types';
 import { makeVaultSeed } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
 
-function makeEncounter(): {
+function makeEncounter(templateId = 'rift_boss_ember'): {
   sim: Sim;
   inst: RiftInstance;
   boss: Entity;
@@ -54,6 +62,7 @@ function makeEncounter(): {
   if (!inst || inst.bossId === null) throw new Error('missing Hoard instance boss');
   const boss = sim.entities.get(inst.bossId);
   if (!boss) throw new Error('missing Hoard boss entity');
+  boss.templateId = templateId;
   boss.aiState = 'attack';
   boss.inCombat = true;
   boss.targetId = sim.player.id;
@@ -79,10 +88,15 @@ function tickMechanic(sim: Sim, seconds: number): SimEvent[] {
 }
 
 describe('Buried Hoard boss pure decisions', () => {
-  it('assigns bespoke kits only to the skeleton and spider bosses', () => {
+  it('assigns one deterministic kit to every Hoard boss', () => {
+    expect(hoardBossKit('rift_boss_frost')).toBe('frost');
+    expect(hoardBossKit('rift_boss_ember')).toBe('ember');
     expect(hoardBossKit('rift_boss_necro')).toBe('bone-legion');
     expect(hoardBossKit('rift_boss_venom')).toBe('brood');
-    expect(hoardBossKit('rift_boss_ember')).toBe('frontal');
+    expect(hoardBossKit('rift_boss_brute')).toBe('brute');
+    expect(hoardBossKit('rift_boss_arcane')).toBe('arcane');
+    expect(hoardBossKit('rift_boss_storm')).toBe('storm');
+    expect(hoardBossKit('rift_boss_tide')).toBe('tide');
   });
 
   it('scales marks with living party size and rotates targets without rng', () => {
@@ -444,6 +458,177 @@ describe('Buried Hoard boss encounter', () => {
     expect(enraged.inst.hoardBoss?.markTimer).toBe(HOARD_MARK_ENRAGED_EVERY_SEC);
   });
 
+  it('gives Hoarfrost slippery ice and a telegraphed pushing gust', () => {
+    const { sim, inst } = makeEncounter('rift_boss_frost');
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    hoardState(inst).sweepTimer = 0;
+    hoardState(inst).markTimer = 99;
+    tickHoardBossMechanics(sim.ctx);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'hoardBossCue',
+        variant: 'frost-gust',
+        radius: HOARD_FROST_GUST.radius,
+        durationSecs: HOARD_FROST_GUST.windup,
+      }),
+    );
+
+    const hpBeforeGust = sim.player.hp;
+    const zBeforeGust = sim.player.pos.z;
+    tickMechanic(sim, HOARD_FROST_GUST.windup);
+    expect(sim.player.hp).toBeLessThan(hpBeforeGust);
+    expect(sim.player.pos.z).toBeGreaterThan(zBeforeGust);
+    hoardState(inst).sweepTimer = 99;
+    hoardState(inst).markTimer = 0;
+    tickHoardBossMechanics(sim.ctx);
+    const ice = sim
+      .drainEvents()
+      .find(
+        (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
+          event.type === 'hoardBossCue' && event.variant === 'frost-ice',
+      );
+    expect(ice).toMatchObject({ radius: hoardMarkSpec('frost-ice').radius });
+    sim.player.prevPos = { ...sim.player.pos, x: sim.player.pos.x - 1 };
+    const xBeforeSlide = sim.player.pos.x;
+    tickMechanic(sim, hoardMarkSpec('frost-ice').windup + hoardMarkSpec('frost-ice').pulseEvery);
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({ kind: 'slow', name: 'Treacherous Ice' }),
+    );
+    expect(sim.player.pos.x).toBeGreaterThan(xBeforeSlide);
+  });
+
+  it('runs Grask through three locked frontals before his recovery window', () => {
+    const { sim, inst, boss } = makeEncounter('rift_boss_brute');
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    hoardState(inst).sweepTimer = 0;
+    const events = tickMechanic(
+      sim,
+      HOARD_BRUTE_COMBO.reduce((sum, step) => sum + step.windup, 0) + 1,
+    );
+    const frontals = events.filter(
+      (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
+        event.type === 'hoardBossCue' && event.kind === 'sweep',
+    );
+    expect(frontals.map((event) => event.variant)).toEqual([
+      'brute-wide',
+      'brute-medium',
+      'brute-long',
+    ]);
+    expect(new Set(frontals.map((event) => event.facing))).toEqual(new Set([boss.facing]));
+    expect(hoardState(inst).sweepTimer).toBeGreaterThan(11);
+  });
+
+  it('alternates Nyxaris Blizzard with a one-time Ring of Frost', () => {
+    const { sim, inst, boss } = makeEncounter('rift_boss_arcane');
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    hoardState(inst).markTimer = 0;
+    tickHoardBossMechanics(sim.ctx);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'hoardBossCue', variant: 'arcane-blizzard' }),
+    );
+    tickMechanic(sim, hoardMarkSpec('arcane-blizzard').windup + 0.1);
+    boss.hp = Math.floor(boss.maxHp * 0.5);
+    tickHoardBossMechanics(sim.ctx);
+    const ring = sim
+      .drainEvents()
+      .find(
+        (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
+          event.type === 'hoardBossCue' && event.variant === 'arcane-ring',
+      );
+    expect(ring).toMatchObject({ innerRadius: 4.5, radius: 8.5 });
+    expect(hoardState(inst).specialTriggered).toBe(true);
+  });
+
+  it('casts Vharok thunder with time to escape and leaves charged ground', () => {
+    const { sim, inst } = makeEncounter('rift_boss_storm');
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    hoardState(inst).markTimer = 0;
+    tickHoardBossMechanics(sim.ctx);
+    const warning = sim
+      .drainEvents()
+      .find(
+        (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
+          event.type === 'hoardBossCue' && event.variant === 'storm-charge',
+      );
+    expect(warning?.durationSecs).toBeGreaterThanOrEqual(3);
+    const hazardEvents = tickMechanic(sim, hoardMarkSpec('storm-charge').windup);
+    expect(hazardEvents).toContainEqual(
+      expect.objectContaining({
+        type: 'hoardBossCue',
+        cueId: warning?.cueId,
+        variant: 'storm-field',
+        phase: 'hazard',
+        durationSecs: 6,
+      }),
+    );
+  });
+
+  it('sends two opposing Abyssal waves and stops healing when the totem dies', () => {
+    const { sim, inst, boss } = makeEncounter('rift_boss_tide');
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    hoardState(inst).sweepTimer = 0;
+    sim.player.pos.x = boss.pos.x + 4;
+    const hpBeforeWaves = sim.player.hp;
+    const firstEvents = tickMechanic(sim, DT);
+    const firstWave = firstEvents.find(
+      (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
+        event.type === 'hoardBossCue' && event.variant === 'tide-wave',
+    );
+    boss.hp = Math.floor(boss.maxHp * HOARD_TOTEM_TRIGGER_HP);
+    tickHoardBossMechanics(sim.ctx);
+    expect(hoardState(inst).totemId).toBeNull();
+    sim.drainEvents();
+    const restEvents = tickMechanic(sim, HOARD_TIDE_WAVE.windup * 2 + 1);
+    const secondWave = restEvents.find(
+      (event): event is Extract<SimEvent, { type: 'hoardBossCue' }> =>
+        event.type === 'hoardBossCue' && event.variant === 'tide-wave',
+    );
+    expect(firstWave).toBeDefined();
+    expect(secondWave).toBeDefined();
+    expect(Math.abs((secondWave?.facing ?? 0) - (firstWave?.facing ?? 0))).toBeCloseTo(Math.PI, 4);
+    expect(sim.player.hp).toBeLessThanOrEqual(
+      hpBeforeWaves - Math.round(sim.player.maxHp * HOARD_TIDE_WAVE.damageFraction) * 2,
+    );
+
+    const totemId = hoardState(inst).totemId;
+    expect(totemId).not.toBeNull();
+    if (totemId === null) throw new Error('expected a healing tide totem');
+    const totem = sim.entities.get(totemId);
+    expect(totem?.templateId).toBe('hoard_healing_tide_totem');
+    expect(restEvents).toContainEqual(
+      expect.objectContaining({ type: 'hoardBossCue', variant: 'tide-tether' }),
+    );
+    const beforeHeal = boss.hp;
+    hoardState(inst).totemPulseTimer = 0;
+    const healingEvents = tickMechanic(sim, DT);
+    expect(boss.hp).toBeGreaterThanOrEqual(
+      beforeHeal + Math.round(boss.maxHp * HOARD_TOTEM_HEAL_FRACTION),
+    );
+    expect(healingEvents).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfxAt',
+        ability: 'healing_wave',
+        fx: 'burst',
+        sourceId: totemId,
+      }),
+    );
+    if (!totem) throw new Error('missing Healing Tide Totem');
+    totem.hp = 0;
+    totem.dead = true;
+    const afterKill = boss.hp;
+    tickMechanic(sim, 2.5);
+    expect(boss.hp).toBe(afterKill);
+    expect(hoardState(inst).totemId).toBeNull();
+    expect(sim.entities.has(totemId)).toBe(false);
+    expect(inst.mobIds).not.toContain(totemId);
+    expect(boss.summonedIds).not.toContain(totemId);
+  });
+
   it('runs through Sim.tick and regenerates the same cue trace from the same seed', () => {
     const trace = (): unknown[] => {
       const { sim, inst } = makeEncounter();
@@ -463,19 +648,21 @@ describe('Buried Hoard boss encounter', () => {
   });
 
   it('includes every active telegraph in the reconnect rift state', () => {
-    const { sim, inst } = makeEncounter();
+    const { sim, inst, boss } = makeEncounter('rift_boss_arcane');
     tickHoardBossMechanics(sim.ctx);
-    hoardState(inst).sweepTimer = 0;
-    hoardState(inst).markTimer = 99;
+    sim.drainEvents();
+    boss.hp = Math.floor(boss.maxHp * 0.5);
     tickHoardBossMechanics(sim.ctx);
     const resumed = riftStateEventFor(sim.ctx, sim.player.id);
     expect(resumed?.hoardCues).toEqual([
       expect.objectContaining({
         instanceId: inst.instanceId,
         cueId: 1,
-        kind: 'sweep',
-        remaining: HOARD_SWEEP_WINDUP_SEC,
-        total: HOARD_SWEEP_WINDUP_SEC,
+        kind: 'mark',
+        variant: 'arcane-ring',
+        innerRadius: 4.5,
+        remaining: hoardMarkSpec('arcane-ring').windup,
+        total: hoardMarkSpec('arcane-ring').windup,
       }),
     ]);
   });

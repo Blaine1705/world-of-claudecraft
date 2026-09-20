@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { HoardBossFx } from '../src/render/hoard_boss_fx';
-import { hoardSweepMeteorWarnings } from '../src/render/hoard_boss_fx_core';
+import { hoardCueAppearance, hoardSweepMeteorWarnings } from '../src/render/hoard_boss_fx_core';
 import {
   IGNIVAR_FRONTAL_FILL_NAME,
   IGNIVAR_FRONTAL_FLAME_CURTAINS_NAME,
@@ -113,6 +113,112 @@ describe('Buried Hoard boss actionable cues', () => {
     expect(sweep.rotation.y).toBeCloseTo(1.2);
     visuals.update(0.3);
     expect(sweep.scale.x).toBeGreaterThan(0.95);
+    visuals.dispose();
+  });
+
+  it('uses shaped elemental warnings instead of Ignivar fire for non-fire bosses', async () => {
+    const scene = new THREE.Scene();
+    const visuals = new HoardBossFx(scene, () => 0);
+    await visuals.readyForEntry;
+    visuals.sync([
+      cue({
+        kind: 'sweep',
+        variant: 'frost-gust',
+        radius: 20,
+        facing: 0.4,
+        halfAngle: Math.PI * 0.3,
+      }),
+    ]);
+    const root = object(scene, 'hoard-boss-actionable-cues');
+    expect(object(root, 'hoard-boss-sweep').visible).toBe(false);
+    const shaped = object(root, 'hoard-boss-shaped-sweep');
+    expect(shaped.visible).toBe(true);
+    expect(shaped.rotation.y).toBeCloseTo(0.4);
+
+    visuals.sync([
+      cue({
+        variant: 'arcane-ring',
+        radius: 8.5,
+        innerRadius: 4.5,
+      }),
+    ]);
+    const warning = object(root, 'hoard-boss-mark-warning');
+    expect(warning.visible).toBe(true);
+    expect(warning.children[0].visible).toBe(false);
+    expect(warning.children[1].visible).toBe(true);
+    expect((warning.children[1] as THREE.Mesh).geometry).toBe(
+      (warning.children[2] as THREE.Mesh).geometry,
+    );
+    expect(warning.children[2].visible).toBe(true);
+    visuals.dispose();
+  });
+
+  it('plans every bespoke shape and keeps elemental riders reconnectable', () => {
+    expect(hoardCueAppearance(cue({ kind: 'sweep', variant: 'ember-frontal' }))).toMatchObject({
+      shape: 'ignivar',
+      palette: 'fire',
+    });
+    expect(hoardCueAppearance(cue({ kind: 'sweep', variant: 'brute-long' }))).toMatchObject({
+      shape: 'sector',
+      palette: 'physical',
+    });
+    expect(hoardCueAppearance(cue({ kind: 'sweep', variant: 'tide-wave' }))).toMatchObject({
+      shape: 'wave',
+      palette: 'tide',
+      elementalRider: true,
+    });
+    expect(hoardCueAppearance(cue({ kind: 'sweep', variant: 'tide-tether' }))).toMatchObject({
+      shape: 'tether',
+      palette: 'tide',
+    });
+    expect(hoardCueAppearance(cue({ variant: 'arcane-ring' }))).toMatchObject({
+      shape: 'annulus',
+      countdown: 'annulus',
+    });
+    for (const variant of [
+      'frost-ice',
+      'arcane-blizzard',
+      'storm-charge',
+      'storm-field',
+      'ember-fire',
+    ] as const) {
+      expect(hoardCueAppearance(cue({ variant })).elementalRider).toBe(true);
+    }
+  });
+
+  it('renders a traveling wave and a persistent Healing Tide link', async () => {
+    const scene = new THREE.Scene();
+    const visuals = new HoardBossFx(scene, () => 0);
+    await visuals.readyForEntry;
+    visuals.sync([
+      cue({
+        kind: 'sweep',
+        variant: 'tide-wave',
+        radius: 28,
+        facing: 0,
+        remaining: 2,
+        total: 4.2,
+      }),
+    ]);
+    const root = object(scene, 'hoard-boss-actionable-cues');
+    const wave = object(root, 'hoard-boss-traveling-tide');
+    visuals.update(0.1);
+    expect(wave.visible).toBe(true);
+    expect(wave.children[0].position.z).not.toBe(0);
+
+    visuals.sync([
+      cue({
+        kind: 'sweep',
+        variant: 'tide-tether',
+        radius: 6,
+        facing: 1,
+        remaining: 1.5,
+        total: 2.1,
+      }),
+    ]);
+    const tether = object(root, 'hoard-healing-tide-link');
+    expect(tether.visible).toBe(true);
+    expect((tether.children[0] as THREE.Mesh).scale.z).toBe(6);
     visuals.dispose();
   });
 });
