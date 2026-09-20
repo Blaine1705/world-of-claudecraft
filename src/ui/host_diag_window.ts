@@ -125,19 +125,8 @@ export function renderHostDiagPanel(
   body.classList.add('hostdiag-options');
   note(body, t('hudChrome.hostDiag.intro'));
 
-  const card = settingsCard(body, t('hudChrome.hostDiag.containsTitle'), {
-    className: 'hostdiag-card',
-  });
-  const list = document.createElement('ul');
-  list.className = 'hostdiag-list';
-  list.setAttribute('role', 'list');
-  for (const key of CONTENTS_KEYS) {
-    const item = document.createElement('li');
-    item.textContent = t(key);
-    list.appendChild(item);
-  }
-  card.appendChild(list);
-
+  // Privacy and the action come BEFORE the long contents card, so the button and
+  // its verdict never sit below the fold of the pinned-footer scroller.
   note(body, t('hudChrome.hostDiag.privacy'), 'set-note hostdiag-privacy');
 
   const action = document.createElement('div');
@@ -161,10 +150,26 @@ export function renderHostDiagPanel(
   message.className = 'hostdiag-message';
   const detail = document.createElement('div');
   detail.className = 'hostdiag-detail';
-  live.append(message, detail);
+  // What to do with the file, said with the verdict rather than as a standing
+  // line under it: below a long panel it sat under the pinned footer at exactly
+  // the moment it mattered.
+  const hint = document.createElement('div');
+  hint.className = 'hostdiag-detail';
+  live.append(message, detail, hint);
   body.appendChild(live);
 
-  note(body, t('hudChrome.hostDiag.sendHint'));
+  const card = settingsCard(body, t('hudChrome.hostDiag.containsTitle'), {
+    className: 'hostdiag-card',
+  });
+  const list = document.createElement('ul');
+  list.className = 'hostdiag-list';
+  list.setAttribute('role', 'list');
+  for (const key of CONTENTS_KEYS) {
+    const item = document.createElement('li');
+    item.textContent = t(key);
+    list.appendChild(item);
+  }
+  card.appendChild(list);
 
   const TONE_CLASSES = ['is-success', 'is-info', 'is-error'] as const;
   const paintResult = (model: HostDiagResultModel | null): void => {
@@ -172,6 +177,7 @@ export function renderHostDiagPanel(
     if (!model) {
       message.textContent = '';
       detail.textContent = '';
+      hint.textContent = '';
       return;
     }
     live.classList.add(`is-${model.tone}`);
@@ -180,6 +186,7 @@ export function renderHostDiagPanel(
     // this panel prints).
     message.innerHTML = esc(t(model.messageKey, model.messageValues));
     detail.textContent = model.detailKey ? t(model.detailKey) : '';
+    hint.textContent = model.tone === 'success' ? t('hudChrome.hostDiag.sendHint') : '';
   };
 
   let state: HostDiagState = hostDiagIdle();
@@ -195,6 +202,7 @@ export function renderHostDiagPanel(
       live.classList.add('is-info');
       message.textContent = t('hudChrome.hostDiag.running');
       detail.textContent = '';
+      hint.textContent = '';
       return;
     }
     paintResult(state.result);

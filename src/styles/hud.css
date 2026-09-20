@@ -5193,8 +5193,10 @@
     margin-top: 10px;
   }
   /* Busy state is aria-disabled (keyboard focus survives a run), so it borrows
-     the .btn:disabled family look explicitly. */
-  .hostdiag-action .btn[aria-disabled="true"] {
+     the .btn:disabled family look explicitly. The #options-menu prefix is load
+     bearing: that window resets its buttons with an ID-specific
+     `all: revert-layer`, which would erase a class-only filter. */
+  #options-menu .hostdiag-action .btn[aria-disabled="true"] {
     filter: grayscale(1) brightness(0.7);
     cursor: default;
   }

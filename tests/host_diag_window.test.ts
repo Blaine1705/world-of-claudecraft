@@ -104,10 +104,18 @@ describe('host_diag_window: structure', () => {
       t('hudChrome.hostDiag.containsBrowsers'),
       t('hudChrome.hostDiag.containsGame'),
     ]);
-    // The two lines that manage the player's expectations: nothing is uploaded,
-    // and here is what to do with the file afterwards.
+    // Nothing is uploaded: said before the player presses anything. What to do
+    // with the file is said WITH the verdict (see the run tests), not as a
+    // standing line that the pinned footer used to cover.
     expect(text).toContain(t('hudChrome.hostDiag.privacy'));
-    expect(text).toContain(t('hudChrome.hostDiag.sendHint'));
+    expect(text).not.toContain(t('hudChrome.hostDiag.sendHint'));
+    // The action sits above the long contents card, so it never opens below the fold.
+    const btn = createButton(host);
+    const card = host.body.querySelector('.hostdiag-card') as HTMLElement;
+    expect(
+      btn.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING,
+      'the contents card must follow the Create report button',
+    ).toBeTruthy();
   });
 
   it('carries a POLITE live region that exists before anything is written into it', () => {
@@ -157,6 +165,8 @@ describe('host_diag_window: a run', () => {
     // Focus stays put because the button is never rebuilt.
     expect(host.body.contains(btn)).toBe(true);
     expect(live(host).textContent).not.toContain(t('hudChrome.hostDiag.running'));
+    // A saved report says what to do with the file, in the announced region.
+    expect(live(host).textContent).toContain(t('hudChrome.hostDiag.sendHint'));
   });
 
   it('sends the perf-report session id and the game context it could resolve', async () => {
