@@ -483,7 +483,10 @@ const MONOLITHS: MonolithRow[] = [
     // beside #4099. The shared collapse-settings extraction still paid its
     // own map work; this is the integrated release tree's measured zero-slack
     // count (`wc -l < src/ui/hud.ts`).
-    ceiling: 18307,
+    // Re-pinned at this release/v0.44.0 merge: the feral Wildfang pass composes
+    // with that integrated release tree at 18309 by wc -l. Exact count,
+    // zero slack.
+    ceiling: 18309,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1076,14 +1079,13 @@ const MONOLITHS: MonolithRow[] = [
     // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
     // composed with the release's own extractions above. Exact merged count,
     // zero slack.
-    // LOWERED 11822 -> 11809 at the pending Town Focus fix: the townFocus /
-    // harvestPreference load and save pair moved out to
-    // src/sim/professions/gathering_settings_persist.ts (where the queued
-    // re-spec's persistence joined them), and the private
-    // updateTownFocusRespec wrapper retired in favor of the module call.
-    // The residual is the two townFocusPending delegates. Exact count
+    // Down 11822 -> 11779 after composing the pending Town Focus fix with the
+    // feral Wildfang pass fix round: the townFocus / harvestPreference load
+    // and save pair moved to src/sim/professions/gathering_settings_persist.ts,
+    // updateTownFocusRespec retired, and the per-cast ResolvedAbility interface
+    // moved to src/sim/resolved_ability.ts. Exact merged count
     // (wc -l < src/sim/sim.ts), zero slack.
-    ceiling: 11809,
+    ceiling: 11779,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

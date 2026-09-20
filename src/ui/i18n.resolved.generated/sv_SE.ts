@@ -10509,6 +10509,7 @@ export const sv_SE: EnTranslations = {
       "cantInForm": "Du kan inte göra det i {form}-form.",
       "bear": "Bruin",
       "cat": "Katt",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "Du kan inte göra det medan du är förvandlad.",
       "stealthed": "Du måste smyga.",
@@ -10844,7 +10845,8 @@ export const sv_SE: EnTranslations = {
     },
     "forms": {
       "bear": "Björn",
-      "cat": "Katt"
+      "cat": "Katt",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Fiske",

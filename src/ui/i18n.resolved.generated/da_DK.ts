@@ -10509,6 +10509,7 @@ export const da_DK: EnTranslations = {
       "cantInForm": "Du kan ikke gøre det i {form}-form.",
       "bear": "Bruin",
       "cat": "Kat",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "Du kan ikke gøre det, mens du er formskiftet.",
       "stealthed": "Du skal være sneget.",
@@ -10844,7 +10845,8 @@ export const da_DK: EnTranslations = {
     },
     "forms": {
       "bear": "Bruin",
-      "cat": "Kat"
+      "cat": "Kat",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Fiskeri",

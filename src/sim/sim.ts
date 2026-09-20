@@ -24,7 +24,6 @@ import type {
 } from '../world_api';
 import type { GroundAimPointXZ } from '../world_api/combat';
 import { abilityNeedsLineOfSight } from './ability_line_of_sight';
-import type { AbilityOutputScaling } from './ability_output_scaling';
 import { autoEquipFamilyConflict } from './auto_equip_gate';
 import * as bagsMod from './bags';
 import {
@@ -650,6 +649,7 @@ import {
   reliquarySaveFragment,
 } from './reliquary';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
+import type { ResolvedAbility } from './resolved_ability';
 import { freshCounters, type RewardCounters } from './reward_counters';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
@@ -1265,40 +1265,10 @@ export interface InstanceSlot {
   raidBossWelcomeKeys: Set<string>;
 }
 
-export interface ResolvedAbility {
-  def: AbilityDef;
-  outputScaling?: AbilityOutputScaling;
-  rank: number;
-  cost: number;
-  castTime: number;
-  cooldown: number; // base def.cooldown, after talent cooldown modifiers
-  /** Cooldown map key when a cooldown-carrying transform shares the base
-   *  button's clock (one slot, one clock); absent for every other resolve. */
-  cooldownId?: string;
-  effects: AbilityEffect[];
-  threatFlat: number; // classic bonus threat on a successful use
-  threatMult: number; // classic multiplier on this ability's damage-threat
-  castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
-  damagePushbackImmune?: boolean; // talent-granted immunity to damage-driven cast pushback
-  ignoreStealthRequirement?: boolean; // Cheap Trick: the resolved ability drops requiresStealth
-  // Set when a next_cast_free/next_execute_free empowerment (e.g. Borrowed Tempo)
-  // zeroed this cast's cost: a spendsCombo finisher cast this way banks its combo
-  // points instead of spending them (issue #2426), since "free" means the whole
-  // cast, not just the resource bill. Never set by a next_cast_cheap/next_cast_instant
-  // consume (those only discount cost/cast time, e.g. Knife's Dividend/Formrush).
-  freeCast?: boolean;
-  charges?: number; // authored stored uses; undefined means one use
-  bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
-  /** Individual Temporal Echo conversion after worn-set resolution. */
-  echoConvertSingle?: number;
-  /** Destruction-only cast-time reservation; consumed once even if a projectile resists/fizzles. */
-  ruinousBrandCopy?: { targetId: number; value: number };
-  /** 1-based authoritative charge stage for hold-to-charge spells. */
-  empowerLevel?: number;
-  hunterApex?: boolean;
-  hunterOverdraw?: boolean;
-  hunterRhythm?: boolean;
-}
+// The per-cast resolved ability lives in its own module (./resolved_ability.ts)
+// so a new cast-scoped marker never grows this coordinator; re-exported here
+// because every consumer imports it from the sim barrel.
+export type { ResolvedAbility } from './resolved_ability';
 
 export interface SentChat {
   channel:

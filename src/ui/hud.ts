@@ -9400,6 +9400,7 @@ export class Hud {
       actionBarWorld.inventory = sim.inventory;
       actionBarWorld.stealthed = stealthed;
       actionBarWorld.paladinSpec = sim.talentSpec;
+      actionBarWorld.playerClass = sim.cfg.playerClass;
       actionBarWorld.fateThreads = fateThreads;
       actionBarWorld.entities = sim.entities.values();
       actionBarWorld.activeAimSlot = this.groundAim.activeSlot();
@@ -9410,6 +9411,7 @@ export class Hud {
         inventory: sim.inventory,
         stealthed,
         paladinSpec: sim.talentSpec,
+        playerClass: sim.cfg.playerClass,
         fateThreads,
         entities: sim.entities.values(),
         activeAimSlot: this.groundAim.activeSlot(),

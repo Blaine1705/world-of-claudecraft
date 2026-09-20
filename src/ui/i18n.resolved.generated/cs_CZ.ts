@@ -10509,6 +10509,7 @@ export const cs_CZ: EnTranslations = {
       "cantInForm": "To nemůžeš dělat v podobě {form}.",
       "bear": "Medvěd",
       "cat": "Kočka",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Rychlost",
       "shapeshifted": "To nemůžeš dělat při změně podoby.",
       "stealthed": "Musíš být v plížení.",
@@ -10844,7 +10845,8 @@ export const cs_CZ: EnTranslations = {
     },
     "forms": {
       "bear": "Medvěd",
-      "cat": "Kočka"
+      "cat": "Kočka",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Rybaření",

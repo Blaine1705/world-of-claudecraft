@@ -10509,6 +10509,7 @@ export const es_ES: EnTranslations = {
       "cantInForm": "No puedes hacer eso en forma de {form}.",
       "bear": "Bruin",
       "cat": "gato",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "No puedes hacer eso transformado.",
       "stealthed": "Debes estar en sigilo.",
@@ -10844,7 +10845,8 @@ export const es_ES: EnTranslations = {
     },
     "forms": {
       "bear": "Bruin",
-      "cat": "gato"
+      "cat": "gato",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Pesca",
