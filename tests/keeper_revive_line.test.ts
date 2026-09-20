@@ -5,8 +5,8 @@
 // revive below the Toll's minimum level, keep the plain event.
 
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { RES_SICKNESS_MIN_LEVEL } from '../src/sim/resurrection';
+import { Sim } from '../src/sim/sim';
 import { hasResurrectionSickness } from '../src/sim/spirit';
 import type { Entity, SimEvent } from '../src/sim/types';
 
