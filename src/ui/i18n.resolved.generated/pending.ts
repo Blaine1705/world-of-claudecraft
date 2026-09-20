@@ -11,68 +11,233 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "es_ES": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "fr_FR": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "fr_CA": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "en_CA": [],
   "it_IT": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "de_DE": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "zh_TW": [
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "ko_KR": [
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "ja_JP": [
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapThirty"
+  ],
   "pt_BR": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapThirty"
+  ],
   "cs_CZ": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "nl_NL": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "pl_PL": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "id_ID": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "tr_TR": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "sv_SE": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "vi_VN": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ],
   "da_DK": [
     "abilityUi.forms.bearOrCat",
-    "hud.errors.bearOrCat"
+    "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
   ]
 };

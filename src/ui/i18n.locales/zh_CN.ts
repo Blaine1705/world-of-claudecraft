@@ -1731,6 +1731,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '使用独立游戏显卡',
   'hudChrome.options.forceHighPerfGpuNote':
     '默认开启：桌面版会向本机申请使用独立游戏显卡。如果游戏无法启动、启动后黑屏，或笔记本屏幕没有画面，请关闭此选项。该设置将在下次启动游戏时生效。',
+  'hudChrome.options.frameRateCap': '帧率上限',
+  'hudChrome.options.frameRateCapAuto': '自动',
+  'hudChrome.options.frameRateCapDisplay': '显示器',
+  'hudChrome.options.frameRateCapNote':
+    '限制游戏每秒绘制的画面数量。如果电脑跟不上显示器的速度，较低的上限会让画面更平稳，也能让电脑更凉爽。上限会跟随你的显示器，因此实际数值可能与数字略有不同。自动：仅当这台电脑跟不上显示器时才降低上限，之后保持稳定（推荐）。显示器：不限制。',
+  'hudChrome.options.frameRateCapStatusPaced': '正在 {hz} Hz 的显示器上每秒绘制 {fps} 帧。',
+  'hudChrome.options.frameRateCapStatusUnpaced': '限制为每秒 {fps} 帧。',
+  'hudChrome.options.frameRateCapStatusInert':
+    '此显示器的刷新率已不高于该上限，因此上限不会带来任何变化。',
   'hudChrome.options.shaderWarm': '着色器预热工作线程',
   'hudChrome.options.shaderWarmAuto': '自动',
   'hudChrome.options.shaderWarmOff': '关闭',
@@ -6821,8 +6830,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '移除界面动画，让窗口即刻显示。它首先是一项无障碍选项，顺带还有一点性能收益。',
   'guide.settingsPage.rowPerfOverlay':
     '在屏幕上实时显示 FPS、帧时间等数据。调校本页选项时先打开它，调完再隐藏。',
+  'guide.settingsPage.rowFrameRateCap':
+    '游戏每秒绘制画面数量的上限。跟不上显示器的电脑会落入不均匀的节奏；稳定的 30 看起来比那更流畅，工作量减半，电脑也更凉爽。“显示器”表示不限制。',
   'guide.settingsPage.tableFoot':
-    '在找帧数上限？没什么可找的：帧的节奏跟随你的显示器。绘制距离是一个单独的旋钮，即世界细节卡片中的“视野距离”，每个预设都会替你设定它，直到你亲自调动为止。',
+    '绘制距离是一个单独的旋钮，即世界细节卡片中的“视野距离”，每个预设都会替你设定它，直到你亲自调动为止。',
   'guide.settingsPage.mobileTitle': '手机与平板',
   'guide.settingsPage.mobileBody':
     '在手机或平板上，游戏会让你从 Low 起步。所有触屏设备首次启动时都会落在这一档，这是刻意为之，好让你进入世界开始游玩；随时可以在图形面板中自行调高。在安卓浏览器上整条阶梯都向你敞开，你的选择也会保留。在 iPhone 和 iPad 上你依然可以选择最高的几档预设，按下“应用”后它们会立即生效，但游戏会在你下次启动时把你退回 High，因为 iOS 可能在构建这么大的场景时终止标签页。下载的应用更为收紧：它的预设列表止于 High，各项系统旋钮也被隐藏，因为应用会自行管理它们。',

@@ -10665,7 +10665,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Chuva ambiente e neve. Apenas atmosfera, e desligá-lo economiza um pouco durante as tempestades.',
   'guide.settingsPage.tableFoot':
-    'Procurando um limite de FPS? Não há o que procurar: o ritmo dos quadros acompanha sua tela. A distância de desenho é um controle próprio, Distância de visão, no cartão Detalhe do mundo, e cada ajuste predefinido a fixa para você até que você a mova.',
+    'A distância de desenho é um controle próprio, Distância de visão, no cartão Detalhe do mundo, e cada ajuste predefinido a fixa para você até que você a mova.',
   'guide.settingsPage.tableHeading': 'Cada opção de gráficos, explicada',
   'guide.settingsPage.tagReload': 'pressione Aplicar',
   'guide.settingsPage.value100': '100%',
