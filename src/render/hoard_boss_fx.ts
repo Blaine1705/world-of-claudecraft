@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { HOARD_SWEEP_HALF_ANGLE, HOARD_SWEEP_RANGE } from '../sim/rift/hoard_boss';
 import {
+  HOARD_BRUTE_COMBO,
   HOARD_TIDE_WAVE_HALF_DEPTH,
   HOARD_TIDE_WAVE_HALF_GAP,
   HOARD_TIDE_WAVE_HALF_SPAN,
@@ -25,6 +26,7 @@ const LIFT = 0.1;
 interface CueSlot {
   group: THREE.Group;
   sweep: THREE.Group;
+  bruteSweeps: THREE.Group[];
   genericSweep: THREE.Group;
   wave: THREE.Group;
   waveFront: THREE.Group;
@@ -364,14 +366,19 @@ export class HoardBossFx {
       range: HOARD_SWEEP_RANGE,
       halfAngle: HOARD_SWEEP_HALF_ANGLE,
     });
-    sweepTemplate.visible = true;
-    sweepTemplate.traverse((node) => {
-      const mesh = node as THREE.Mesh;
-      if (!mesh.geometry || !mesh.material) return;
-      this.geometries.push(mesh.geometry);
-      if (Array.isArray(mesh.material)) this.materials.push(...mesh.material);
-      else this.materials.push(mesh.material);
-    });
+    const bruteTemplates = HOARD_BRUTE_COMBO.map((step) =>
+      buildIgnivarFrontalTelegraph({ range: step.radius, halfAngle: step.halfAngle }),
+    );
+    for (const template of [sweepTemplate, ...bruteTemplates]) {
+      template.visible = true;
+      template.traverse((node) => {
+        const mesh = node as THREE.Mesh;
+        if (!mesh.geometry || !mesh.material) return;
+        this.geometries.push(mesh.geometry);
+        if (Array.isArray(mesh.material)) this.materials.push(...mesh.material);
+        else this.materials.push(mesh.material);
+      });
+    }
 
     for (let index = 0; index < SLOT_COUNT; index++) {
       const markDisc = fanGeometry();
@@ -386,6 +393,11 @@ export class HoardBossFx {
       group.name = `hoard-boss-cue-${index}`;
       const sweep = sweepTemplate.clone(true);
       sweep.name = 'hoard-boss-sweep';
+      const bruteSweeps = bruteTemplates.map((template, step) => {
+        const frontal = template.clone(true);
+        frontal.name = `hoard-grask-frontal-${step}`;
+        return frontal;
+      });
       const genericSweep = new THREE.Group();
       genericSweep.name = 'hoard-boss-shaped-sweep';
       const sectorFill = new THREE.Mesh(sectorDisc, frostFill);
@@ -455,11 +467,12 @@ export class HoardBossFx {
       hazardSlashB.renderOrder = 21;
       markHazard.add(hazardFill, hazardRing, hazardSlashA, hazardSlashB);
 
-      group.add(sweep, genericSweep, wave, tether, markWarning, markHazard, rider);
+      group.add(sweep, ...bruteSweeps, genericSweep, wave, tether, markWarning, markHazard, rider);
       this.root.add(group);
       this.slots.push({
         group,
         sweep,
+        bruteSweeps,
         genericSweep,
         wave,
         waveFront,
@@ -527,7 +540,14 @@ export class HoardBossFx {
       const appearance = hoardCueAppearance(cue);
       if (cue.kind === 'sweep') {
         if (appearance.shape === 'ignivar') {
-          syncIgnivarFrontalTelegraph(slot.sweep, true, plan.progress, 1, _dt);
+          const step = HOARD_BRUTE_COMBO.findIndex((spec) => spec.variant === cue.variant);
+          syncIgnivarFrontalTelegraph(
+            step < 0 ? slot.sweep : slot.bruteSweeps[step],
+            true,
+            plan.progress,
+            1,
+            _dt,
+          );
         } else if (appearance.shape === 'sector') {
           const pulse = plan.pulseScale * (0.94 + plan.progress * 0.06);
           slot.genericSweep.scale.set(pulse, 1, pulse);
@@ -578,7 +598,12 @@ export class HoardBossFx {
     slot.group.position.set(cue.x, centerY, cue.z);
     const appearance = hoardCueAppearance(cue);
     const ignivarSweep = cue.kind === 'sweep' && appearance.shape === 'ignivar';
-    slot.sweep.visible = ignivarSweep;
+    const bruteStep = HOARD_BRUTE_COMBO.findIndex((spec) => spec.variant === cue.variant);
+    slot.sweep.visible = ignivarSweep && bruteStep < 0;
+    slot.bruteSweeps.forEach((frontal, step) => {
+      frontal.visible = ignivarSweep && step === bruteStep;
+      frontal.rotation.y = cue.facing ?? 0;
+    });
     slot.genericSweep.visible = cue.kind === 'sweep' && appearance.shape === 'sector';
     slot.wave.visible = appearance.shape === 'wave';
     slot.tether.visible = appearance.shape === 'tether';

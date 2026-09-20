@@ -6,6 +6,7 @@ import { DT, type Entity } from '../types';
 import { riftFx } from './fx';
 import {
   HOARD_BRUTE_COMBO,
+  HOARD_BRUTE_FACING_OFFSETS,
   HOARD_FROST_GUST,
   HOARD_TIDE_WAVE,
   type HoardBossKit,
@@ -832,7 +833,7 @@ function tickBrute(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoa
         boss,
         state,
         HOARD_BRUTE_COMBO[state.sequenceStep],
-        state.sequenceFacing,
+        state.sequenceFacing + HOARD_BRUTE_FACING_OFFSETS[state.sequenceStep],
       );
       state.sequenceStep++;
     }
@@ -841,7 +842,14 @@ function tickBrute(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoa
   state.sweepTimer -= DT;
   if (state.sweepTimer > 0) return;
   state.sequenceFacing = boss.facing;
-  startSweep(ctx, inst, boss, state, HOARD_BRUTE_COMBO[0], state.sequenceFacing);
+  startSweep(
+    ctx,
+    inst,
+    boss,
+    state,
+    HOARD_BRUTE_COMBO[0],
+    state.sequenceFacing + HOARD_BRUTE_FACING_OFFSETS[0],
+  );
   state.sequenceStep = 1;
 }
 

@@ -499,7 +499,7 @@ describe('Buried Hoard boss encounter', () => {
   });
 
   it('runs Grask through three locked frontals before his recovery window', () => {
-    const { sim, inst, boss } = makeEncounter('rift_boss_brute');
+    const { sim, inst } = makeEncounter('rift_boss_brute');
     tickHoardBossMechanics(sim.ctx);
     sim.drainEvents();
     hoardState(inst).sweepTimer = 0;
@@ -516,7 +516,8 @@ describe('Buried Hoard boss encounter', () => {
       'brute-medium',
       'brute-long',
     ]);
-    expect(new Set(frontals.map((event) => event.facing))).toEqual(new Set([boss.facing]));
+    expect(new Set(frontals.map((event) => event.facing)).size).toBe(3);
+    expect(frontals.every((event) => event.durationSecs >= 2)).toBe(true);
     expect(hoardState(inst).sweepTimer).toBeGreaterThan(11);
   });
 

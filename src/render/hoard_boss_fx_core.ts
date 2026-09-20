@@ -32,7 +32,7 @@ export function hoardCueAppearance(cue: HoardBossCueView): HoardCueAppearancePla
     case 'brute-wide':
     case 'brute-medium':
     case 'brute-long':
-      return { shape: 'sector', palette: 'physical', countdown: 'none', elementalRider: false };
+      return { shape: 'ignivar', palette: 'physical', countdown: 'none', elementalRider: false };
     case 'tide-wave':
       return { shape: 'wave', palette: 'tide', countdown: 'none', elementalRider: true };
     case 'tide-tether':

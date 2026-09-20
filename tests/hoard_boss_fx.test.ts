@@ -8,6 +8,7 @@ import {
   IGNIVAR_FRONTAL_HEAT_BANDS_NAME,
 } from '../src/render/ignivar_frontal_telegraph';
 import { HOARD_SWEEP_HALF_ANGLE } from '../src/sim/rift/hoard_boss';
+import { HOARD_BRUTE_COMBO } from '../src/sim/rift/hoard_boss_kits';
 import type { HoardBossCueView } from '../src/world_api/dungeons';
 
 function cue(overrides: Partial<HoardBossCueView> = {}): HoardBossCueView {
@@ -44,6 +45,37 @@ function verticalRange(target: THREE.Object3D): number {
 }
 
 describe('Buried Hoard boss actionable cues', () => {
+  it('selects each Grask Ignivar warning with its own combat dimensions and no meteors', async () => {
+    const scene = new THREE.Scene();
+    const visuals = new HoardBossFx(scene, () => 0);
+    await visuals.readyForEntry;
+    for (const [index, step] of HOARD_BRUTE_COMBO.entries()) {
+      const warning = cue({
+        kind: 'sweep',
+        variant: step.variant,
+        radius: step.radius,
+        halfAngle: step.halfAngle,
+        facing: 0.7,
+        total: step.windup,
+      });
+      visuals.sync([warning]);
+      visuals.update(0.1);
+      const frontal = object(scene, `hoard-grask-frontal-${index}`);
+      expect(frontal.visible).toBe(true);
+      expect(frontal.userData.range).toBe(step.radius);
+      expect(frontal.userData.halfAngle).toBe(step.halfAngle);
+      expect(frontal.rotation.y).toBeCloseTo(0.7);
+      expect(object(frontal, IGNIVAR_FRONTAL_FILL_NAME)).toBeInstanceOf(THREE.Mesh);
+      expect(object(scene, 'hoard-boss-sweep').visible).toBe(false);
+      expect(object(scene, 'hoard-boss-shaped-sweep').visible).toBe(false);
+      for (let other = 0; other < 3; other++) {
+        expect(object(scene, `hoard-grask-frontal-${other}`).visible).toBe(other === index);
+      }
+      expect(hoardSweepMeteorWarnings([warning])).toEqual([]);
+    }
+    visuals.dispose();
+  });
+
   it('rebuilds the same three Ignivar meteor warnings from a resumed sweep', () => {
     const warnings = hoardSweepMeteorWarnings([
       cue({
@@ -159,7 +191,7 @@ describe('Buried Hoard boss actionable cues', () => {
       palette: 'fire',
     });
     expect(hoardCueAppearance(cue({ kind: 'sweep', variant: 'brute-long' }))).toMatchObject({
-      shape: 'sector',
+      shape: 'ignivar',
       palette: 'physical',
     });
     expect(hoardCueAppearance(cue({ kind: 'sweep', variant: 'tide-wave' }))).toMatchObject({

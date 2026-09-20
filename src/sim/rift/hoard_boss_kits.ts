@@ -39,7 +39,7 @@ export const HOARD_BRUTE_COMBO: readonly HoardSweepSpec[] = [
     variant: 'brute-wide',
     radius: 8,
     halfAngle: Math.PI * 0.37,
-    windup: 1.8,
+    windup: 2,
     damageFraction: 0.12,
     school: 'physical',
     knockback: 0,
@@ -49,7 +49,7 @@ export const HOARD_BRUTE_COMBO: readonly HoardSweepSpec[] = [
     variant: 'brute-medium',
     radius: 12,
     halfAngle: Math.PI * 0.24,
-    windup: 1.25,
+    windup: 2,
     damageFraction: 0.15,
     school: 'physical',
     knockback: 0,
@@ -59,13 +59,16 @@ export const HOARD_BRUTE_COMBO: readonly HoardSweepSpec[] = [
     variant: 'brute-long',
     radius: 18,
     halfAngle: Math.PI * 0.13,
-    windup: 1.1,
+    windup: 2,
     damageFraction: 0.2,
     school: 'physical',
     knockback: 1.5,
     ability: 'Grask Skullsplitter',
   },
 ] as const;
+
+/** Alternate left, right, then center around the opening aim. Each cue locks its own aim. */
+export const HOARD_BRUTE_FACING_OFFSETS = [-0.7, 0.7, 0] as const;
 
 export const HOARD_FROST_GUST: HoardSweepSpec = {
   variant: 'frost-gust',
