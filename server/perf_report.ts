@@ -12,6 +12,7 @@ import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
 import {
   sanitizeBootPhases,
+  sanitizeCadence,
   sanitizePostRevealLinks,
   sanitizeShaderWarm,
   shaderWarmToken,
@@ -131,6 +132,13 @@ function numberIn(value: unknown, min: number, max: number, fallback: number): n
 
 function intIn(value: unknown, min: number, max: number, fallback: number): number {
   return Math.floor(numberIn(value, min, max, fallback));
+}
+
+/** The frame rate ceiling is a closed choice: anything else reads as none. The
+ *  range is wide on purpose, a tight one would clamp 9000 onto 60. */
+function frameCapIntentIn(value: unknown): number {
+  const n = intIn(value, 0, 1000, 0);
+  return n === 30 || n === 60 ? n : 0;
 }
 
 function nullableNumberIn(value: unknown, min: number, max: number): number | null {
@@ -781,6 +789,9 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const shaderWarm = sanitizeShaderWarm(parsed.shaderWarm);
     if (shaderWarm) parsed.shaderWarm = shaderWarm;
     else delete parsed.shaderWarm;
+    const cadence = sanitizeCadence(parsed.cadence);
+    if (cadence) parsed.cadence = cadence;
+    else delete parsed.cadence;
     // The prewarm summary rides through verbatim under the cap, bounded only
     // by the body cap, so its client-supplied LISTS are bounded here explicitly.
     // Without this the resume block's entries and failed-unit ids reach storage
@@ -878,6 +889,12 @@ export async function handlePerfReport(
     shaderWarmWorkerActive: Boolean(body.shaderWarmWorkerActive),
     shaderWarmRefusal: shaderWarmToken(body.shaderWarmRefusal),
     targetFps: intIn(body.targetFps, 0, 240, 0),
+    frameCapIntent: frameCapIntentIn(body.frameCapIntent),
+    cadenceDivisor: intIn(body.cadenceDivisor, 1, 16, 1),
+    // Whole Hz: the fleet reads a display CLASS (60, 120, 144), and a finer
+    // estimate would be a stable per-display value on an endpoint that accepts
+    // anonymous reports.
+    refreshHz: Math.round(numberIn(body.refreshHz, 0, 1000, 0)),
     renderScale: numberIn(body.renderScale, 0.3, 1.5, 1),
     effectiveRenderScale: numberIn(body.effectiveRenderScale, 0.3, 1.5, 1),
     fpsAvg: numberIn(body.fpsAvg, 0, 300, 0),

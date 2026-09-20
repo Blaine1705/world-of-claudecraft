@@ -2103,6 +2103,21 @@ export const hudChromeStrings = {
     shaderWarmOn: 'On',
     shaderWarmNote:
       'Pre-warm shader cache in the background to prevent in-game stuttering. Auto: Enabled only when supported by your graphics system. (Recommended). On: Forced everywhere. May worsen performance on some setups. Off: Disabled.',
+    // Graphics System card: the frame rate ceiling. The rate is a divisor of the
+    // measured display refresh, so the status line under the buttons states
+    // the rate actually obtained. Wordy values, M16: the five non-Latin fills
+    // land in this same change.
+    frameRateCap: 'Frame Rate Limit',
+    frameRateCapAuto: 'Auto',
+    frameRateCapDisplay: 'Display',
+    frameRateCapSixty: '60',
+    frameRateCapThirty: '30',
+    frameRateCapNote:
+      'Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.',
+    frameRateCapStatusPaced: 'Drawing {fps} images per second on a {hz} Hz display.',
+    frameRateCapStatusUnpaced: 'Limiting to {fps} images per second.',
+    frameRateCapStatusInert:
+      'This display already runs at or under this limit, so the limit changes nothing.',
     gpuBackend: 'Graphics Backend',
     gpuBackendAuto: 'Auto',
     gpuBackendVulkan: 'Vulkan',

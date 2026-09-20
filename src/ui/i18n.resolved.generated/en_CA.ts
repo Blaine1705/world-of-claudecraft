@@ -1710,6 +1710,15 @@ export const en_CA: EnTranslations = {
       "shaderWarmOff": "Off",
       "shaderWarmOn": "On",
       "shaderWarmNote": "Pre-warm shader cache in the background to prevent in-game stuttering. Auto: Enabled only when supported by your graphics system. (Recommended). On: Forced everywhere. May worsen performance on some setups. Off: Disabled.",
+      "frameRateCap": "Frame Rate Limit",
+      "frameRateCapAuto": "Auto",
+      "frameRateCapDisplay": "Display",
+      "frameRateCapSixty": "60",
+      "frameRateCapThirty": "30",
+      "frameRateCapNote": "Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.",
+      "frameRateCapStatusPaced": "Drawing {fps} images per second on a {hz} Hz display.",
+      "frameRateCapStatusUnpaced": "Limiting to {fps} images per second.",
+      "frameRateCapStatusInert": "This display already runs at or under this limit, so the limit changes nothing.",
       "gpuBackend": "Graphics Backend",
       "gpuBackendAuto": "Auto",
       "gpuBackendVulkan": "Vulkan",
@@ -6218,6 +6227,7 @@ export const en_CA: EnTranslations = {
       "rowBrightness": "Scene exposure, darker or brighter. Pure preference.",
       "rowWeather": "Ambient rain and snow. Atmosphere only, and switching it off saves a little during storms.",
       "rowBrowserEffects": "How fancy the interface itself is allowed to be: glass blur, glow, animated menus. Auto matches your browser; the 3D world is untouched either way.",
+      "rowFrameRateCap": "A ceiling on how many images the game draws each second. A computer that cannot keep up with its display lands on an uneven rhythm; a steady 30 looks smoother than that, halves the work, and keeps the computer cooler. Display means no limit.",
       "rowTerrainDetail": "Rich, blended ground textures versus a simpler, faster terrain look.",
       "rowFoliageDensity": "How far and how thick the grass grows around your character.",
       "rowEffectsQuality": "Bloom, ambient occlusion, and how many torches and spells cast real light. The single biggest saving among the detail dials, and the switch the other lighting dials depend on.",
@@ -6225,7 +6235,7 @@ export const en_CA: EnTranslations = {
       "rowFrostedPanels": "A frosted-glass blur behind windows. Pretty, and exactly the kind of effect a weaker browser feels; leave it off for the classic crisp look.",
       "rowReduceMotion": "Removes interface animations so windows appear instantly. An accessibility option first, with a small performance bonus.",
       "rowPerfOverlay": "An on-screen readout of FPS, frame time, and more. Turn it on while you tune this page, then hide it again.",
-      "tableFoot": "Looking for an FPS cap? There is nothing to hunt for: frame pacing follows your display. Draw distance is a dial of its own, View Distance, in the World Detail card, and each preset sets it for you until you move it.",
+      "tableFoot": "Draw distance is a dial of its own, View Distance, in the World Detail card, and each preset sets it for you until you move it.",
       "mobileTitle": "On phones and tablets",
       "mobileBody": "On a phone or tablet the game starts you on Low. Every touch device lands there on its first launch, on purpose, so you can get into the world and play; raise it yourself from the Graphics panel any time. On an Android browser the whole ladder is open to you and your choice sticks. On iPhone and iPad you can still pick the top presets and they take hold as soon as you press Apply, but the game sets you back to High the next time you launch, because iOS can end the tab while a scene that large is being built. The downloaded app is shorter still: its preset list stops at High and the per-system dials are hidden, because the app manages those itself.",
       "touchBody": "On a touchscreen the Graphics panel grows a Touch Controls card of its own: joystick size and deadzone, on-screen button size, control opacity, an optional camera stick, a left-handed mirrored layout, and inverted touch look, so the screen fits your hands rather than the other way around.",
@@ -10505,6 +10515,7 @@ export const en_CA: EnTranslations = {
       "cantInForm": "You can't do that in {form} Form.",
       "bear": "Bruin",
       "cat": "Cat",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "You cannot do that while shapeshifted.",
       "stealthed": "You must be stealthed.",
@@ -10836,7 +10847,8 @@ export const en_CA: EnTranslations = {
     },
     "forms": {
       "bear": "Bruin",
-      "cat": "Cat"
+      "cat": "Cat",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Fishing",
@@ -12191,7 +12203,7 @@ export const en_CA: EnTranslations = {
       },
       "barkskin": {
         "name": "Oakhide",
-        "description": "Your skin hardens like bark, increasing armor by 150 for 15 sec."
+        "description": "Your skin hardens like bark, increasing armor by 20% for 15 sec."
       },
       "sacred_bulwark": {
         "name": "Sacred Bulwark",
@@ -12232,11 +12244,11 @@ export const en_CA: EnTranslations = {
       },
       "pounce": {
         "name": "Slinkstrike",
-        "description": "A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Cat Form only. Out of stealth this button is Lunge."
+        "description": "A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3). Cat Form only. Out of stealth this button is Lunge."
       },
       "lunge": {
         "name": "Lunge",
-        "description": "Lunge at an enemy up to 12 yd away. On arrival, deals 60% weapon damage and awards 1 combo point; a lunge cut short refunds its cooldown. Cat Form only."
+        "description": "Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage, awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3); a lunge cut short refunds its cooldown. Usable in any form."
       },
       "hamstring_bite": {
         "name": "Takedown",
@@ -12725,7 +12737,7 @@ export const en_CA: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Savage Mending",
-        "description": "Restores 40% of your maximum health over 10 sec. Bruin Form only."
+        "description": "Restores 40% of your maximum health over 10 sec. Bruin or Cat Form only."
       },
       "frost_trap": {
         "name": "Rime Snare",
@@ -12954,7 +12966,7 @@ export const en_CA: EnTranslations = {
       },
       "bear_charge": {
         "name": "Bruin Rush",
-        "description": "Rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Bruin Form only."
+        "description": "Shift into Bruin Form if you are not already, then rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Usable in any form."
       },
       "demoralizing_roar": {
         "name": "Craven Roar",
@@ -12962,7 +12974,7 @@ export const en_CA: EnTranslations = {
       },
       "prowl": {
         "name": "Stalk",
-        "description": "Enter stealth while in Cat Form. Cannot be used in combat."
+        "description": "Shift into Cat Form if you are not already, and enter stealth. Usable in any form. Cannot be used in combat."
       },
       "rake": {
         "name": "Flense",

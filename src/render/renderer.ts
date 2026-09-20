@@ -199,6 +199,14 @@ import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
+import {
+  chosenCadenceHoldsQuality,
+  chosenCadenceMissShare,
+  frameLoadMs,
+  noteCadenceProbeContext,
+  noteGovernorShedding,
+  resetChosenCadenceForRenderer,
+} from './chosen_cadence';
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
@@ -2111,6 +2119,7 @@ export class Renderer {
     // The lightweight material path does not preload HDR sky/water assets.
     // Keep the renderer's HDR/IBL branch aligned with that preload decision.
     this.lowGfx = !GFX.standardMaterials;
+    resetChosenCadenceForRenderer();
     this.renderBudgetGovernor = new RenderBudgetGovernor({
       tier: GFX.tier,
       budget: GFX.budget,
@@ -4600,6 +4609,8 @@ export class Renderer {
     const sample = this.renderBudgetSample;
     sample.dt = dt;
     sample.frameMs = frameMs;
+    sample.chosenCadenceMissShare = chosenCadenceMissShare();
+    sample.holdRecovery = chosenCadenceHoldsQuality();
     // Non-composer profiles read info.render live, where three's per-render
     // auto-reset drops the off-screen water-simulation passes: add them back
     // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
@@ -4624,6 +4635,11 @@ export class Renderer {
     // preparation waits. The budget's frame boundary is fed in sync() instead,
     // where it lands on every frame rather than only on a presented one.
     this.gpuPrepBudget.notePressure(state.mode === 'degrading');
+    noteGovernorShedding(state.mode === 'degrading', dt);
+    noteCadenceProbeContext(
+      this.renderBudgetGovernor.atBaseline(sample.maxRenderScale),
+      this.sim.player.inCombat,
+    );
     this.frameMsEma = state.frameMsEma;
     this.adaptiveCooldown = state.cooldownSeconds;
     this.stableFrameTime = state.stableSeconds;
@@ -4665,6 +4681,7 @@ export class Renderer {
     input.constrainedMemory = GFX.constrainedMemory;
     input.entryElapsedMs = this.runtimeEntryElapsedMs;
     input.dt = dt;
+    input.frameLoadMs = frameLoadMs(dt * 1000);
     input.frameMsEma = this.frameMsEma;
     input.dropFrameMs = GFX.budget.dropFrameMs;
     return runtimeViewCreateBudget(input, this.viewCreateBudgetState);
@@ -9323,8 +9340,8 @@ export class Renderer {
         requestedFar,
         this.gpuHitchCompileLifecycle?.records ?? null,
         residencyFar,
-        Math.max(0, dt * 1000),
-        this.renderBudgetState.externalFrameCap,
+        frameLoadMs(Math.max(0, dt * 1000)),
+        this.renderBudgetState.externalFrameCap || chosenCadenceMissShare() >= 0,
       );
       if (vista) {
         // Entry settle (one-shot, armed by farVistaReady behind the opaque
@@ -9839,7 +9856,7 @@ export class Renderer {
     // so both per-frame slots latched while the queue's clock kept aging. Same
     // dt-derived ms the governor samples, and the tier's live drop-frame
     // threshold, which a tier change reassigns.
-    this.gpuPrepBudget.noteFrame(Math.min(250, dt * 1000), GFX.budget.dropFrameMs);
+    this.gpuPrepBudget.noteFrame(frameLoadMs(Math.min(250, dt * 1000)), GFX.budget.dropFrameMs);
     let phaseStart = totalStart;
     const frameStats = this.lastFrameStats;
     const framePhaseMs = frameStats.phaseMs;
@@ -11957,7 +11974,7 @@ export class Renderer {
     if (this.hitchLogEnabled) {
       const sample = this.hitchAligner.atEnd(
         afterSubmit,
-        Math.min(250, Math.max(0, dt * 1000)),
+        frameLoadMs(Math.min(250, Math.max(0, dt * 1000))),
         framePhaseMs.submit,
         createdViews,
         framePhaseMs.total,
