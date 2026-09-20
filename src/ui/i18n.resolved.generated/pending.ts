@@ -10,10 +10,12 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -33,10 +35,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "es_ES": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -56,10 +60,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "fr_FR": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -79,10 +85,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "fr_CA": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -103,10 +111,12 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -126,10 +136,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "de_DE": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -165,10 +177,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "pt_BR": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -192,10 +206,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "cs_CZ": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -215,10 +231,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "nl_NL": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -238,10 +256,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "pl_PL": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -261,10 +281,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "id_ID": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -284,10 +306,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "tr_TR": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -307,10 +331,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "sv_SE": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -330,10 +356,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "vi_VN": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",
@@ -353,10 +381,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.title"
   ],
   "da_DK": [
+    "abilityUi.forms.bearOrCat",
     "desktop.hostDiag.fileType",
     "desktop.hostDiag.saveButton",
     "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
+    "hud.errors.bearOrCat",
     "hudChrome.hostDiag.create",
     "hudChrome.hostDiag.failed",
     "hudChrome.hostDiag.intro",

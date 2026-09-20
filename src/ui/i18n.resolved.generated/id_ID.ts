@@ -10520,6 +10520,7 @@ export const id_ID: EnTranslations = {
       "cantInForm": "Kamu tidak bisa melakukan itu dalam Wujud {form}.",
       "bear": "Bruin",
       "cat": "Kucing",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "Kamu tidak bisa melakukan itu saat berubah wujud.",
       "stealthed": "Kamu harus dalam mode siluman.",
@@ -10851,7 +10852,8 @@ export const id_ID: EnTranslations = {
     },
     "forms": {
       "bear": "Bruin",
-      "cat": "Kucing"
+      "cat": "Kucing",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Memancing",

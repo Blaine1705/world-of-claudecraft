@@ -10520,6 +10520,7 @@ export const tr_TR: EnTranslations = {
       "cantInForm": "{form} Formunda bunu yapamazsın.",
       "bear": "Bruin",
       "cat": "Kedi",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "Şekil değiştirmişken bunu yapamazsın.",
       "stealthed": "Gizlenmiş olmalısın.",
@@ -10851,7 +10852,8 @@ export const tr_TR: EnTranslations = {
     },
     "forms": {
       "bear": "Bruin",
-      "cat": "Kedi"
+      "cat": "Kedi",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Balık Tutma",
