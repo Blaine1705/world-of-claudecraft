@@ -5512,6 +5512,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.practiceDps.prompt': '허수아비를 공격하여 측정을 시작하세요',
   'hudChrome.practiceDps.previous': '이전 측정',
   'hudChrome.riftTracker.title': '균열',
+  'hudChrome.riftTracker.hoardChestGoal': '보물 상자를 여세요',
+  'hudChrome.riftTracker.hoardClaimedGoal': '보물은 당신의 것입니다',
   'hudChrome.riftTracker.floor': '{total}층 중 {current}층',
   'hudChrome.riftTracker.closesIn': '균열이 {time} 후 닫힙니다',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',

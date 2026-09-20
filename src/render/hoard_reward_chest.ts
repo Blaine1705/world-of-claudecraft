@@ -379,5 +379,7 @@ export function buildHoardRewardChest(
 
   body.userData.hoardChestRarity = rarity;
   body.userData.hoardChestOpened = opened;
+  // Where its label floats: just over the lid, not up where a door's would.
+  body.userData.labelHeight = 2.3;
   return { body };
 }

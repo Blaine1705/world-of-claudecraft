@@ -1420,6 +1420,8 @@ export const ko_KR: EnTranslations = {
       "title": "균열",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "보물 상자를 여세요",
+      "hoardClaimedGoal": "보물은 당신의 것입니다",
       "floor": "{total}층 중 {current}층",
       "closesIn": "균열이 {time} 후 닫힙니다",
       "clockMs": "{minutes}:{seconds}",

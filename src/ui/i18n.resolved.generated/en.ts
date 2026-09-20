@@ -1420,6 +1420,8 @@ export const en: EnTranslations = {
       "title": "Rift",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Floor {current} of {total}",
       "closesIn": "Closes in {time}",
       "clockMs": "{minutes}:{seconds}",

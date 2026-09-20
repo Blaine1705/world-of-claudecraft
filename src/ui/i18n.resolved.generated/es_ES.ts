@@ -1420,6 +1420,8 @@ export const es_ES: EnTranslations = {
       "title": "Brecha",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Abre el cofre del tesoro",
+      "hoardClaimedGoal": "El tesoro es tuyo",
       "floor": "Piso {current} de {total}",
       "closesIn": "Se cierra en {time}",
       "clockMs": "{minutes}:{seconds}",

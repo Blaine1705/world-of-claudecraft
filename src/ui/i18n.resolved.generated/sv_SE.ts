@@ -1420,6 +1420,8 @@ export const sv_SE: EnTranslations = {
       "title": "Reva",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Våning {current} av {total}",
       "closesIn": "Stänger om {time}",
       "clockMs": "{minutes}:{seconds}",

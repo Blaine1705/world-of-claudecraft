@@ -1420,6 +1420,8 @@ export const vi_VN: EnTranslations = {
       "title": "Rạn Nứt",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Tầng {current}/{total}",
       "closesIn": "Đóng sau {time}",
       "clockMs": "{minutes}:{seconds}",

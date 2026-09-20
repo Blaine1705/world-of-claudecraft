@@ -1420,6 +1420,8 @@ export const id_ID: EnTranslations = {
       "title": "Rift",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Lantai {current} dari {total}",
       "closesIn": "Tutup dalam {time}",
       "clockMs": "{minutes}:{seconds}",

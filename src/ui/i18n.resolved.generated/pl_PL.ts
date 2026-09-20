@@ -1420,6 +1420,8 @@ export const pl_PL: EnTranslations = {
       "title": "Szczelina",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Piętro {current} z {total}",
       "closesIn": "Zamyka się za {time}",
       "clockMs": "{minutes}:{seconds}",

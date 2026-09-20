@@ -5539,6 +5539,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.practiceDps.prompt': 'ダミーを攻撃して計測を開始',
   'hudChrome.practiceDps.previous': 'これまでの計測',
   'hudChrome.riftTracker.title': 'リフト',
+  'hudChrome.riftTracker.hoardChestGoal': '宝の箱を開けよう',
+  'hudChrome.riftTracker.hoardClaimedGoal': '財宝はあなたのもの',
   'hudChrome.riftTracker.floor': 'フロア {current}/{total}',
   'hudChrome.riftTracker.closesIn': 'リフトは{time}後に閉じます',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',

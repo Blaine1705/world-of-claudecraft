@@ -14224,6 +14224,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.verdance':
     'Verdor {stacks}/{max}. Cada Floración Silvestre o Segundo Florecer NUEVO que plantes añade 1. Con {max}, Alivio presto se convierte en Sobrefloración',
   'hudChrome.riftTracker.title': 'Brecha',
+  'hudChrome.riftTracker.hoardChestGoal': 'Abre el cofre del tesoro',
+  'hudChrome.riftTracker.hoardClaimedGoal': 'El tesoro es tuyo',
   'hudChrome.riftTracker.floor': 'Piso {current} de {total}',
   'hudChrome.riftTracker.closesIn': 'Se cierra en {time}',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',

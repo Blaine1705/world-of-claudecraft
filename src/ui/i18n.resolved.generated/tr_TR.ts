@@ -1420,6 +1420,8 @@ export const tr_TR: EnTranslations = {
       "title": "Yarık",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Kat {current}/{total}",
       "closesIn": "{time} içinde kapanır",
       "clockMs": "{minutes}:{seconds}",

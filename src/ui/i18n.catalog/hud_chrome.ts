@@ -1575,6 +1575,9 @@ export const hudChromeStrings = {
     // A Buried Hoard (a treasure map's vault) replaces the floor line with its goal.
     hoardTitle: 'Buried Hoard',
     hoardGoal: 'Defeat the hoard keeper',
+    // Once the keeper falls the goal becomes the reward chest it leaves, then rests.
+    hoardChestGoal: 'Open the hoard chest',
+    hoardClaimedGoal: 'The hoard is yours',
     // {current}/{total} are 1-based floor numbers (e.g. "Floor 2 of 5").
     floor: 'Floor {current} of {total}',
     // {time} is a pre-built clock string (see clockMs/clockHms below). This is

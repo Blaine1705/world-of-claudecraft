@@ -7908,7 +7908,7 @@ export class Renderer {
         buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;
       portal = built.portal;
-      height = 4.6;
+      height = built.body.userData.labelHeight ?? 4.6;
       objectMesh = built.body;
       // World-spawned ranked portals carry their rank as a big floating badge
       // (colour square + letter) so the tier reads from across the zone.

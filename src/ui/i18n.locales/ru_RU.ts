@@ -5536,6 +5536,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.practiceDps.prompt': 'Атакуйте манекен, чтобы начать замер',
   'hudChrome.practiceDps.previous': 'Предыдущие замеры',
   'hudChrome.riftTracker.title': 'Разлом',
+  'hudChrome.riftTracker.hoardChestGoal': 'Откройте сундук с кладом',
+  'hudChrome.riftTracker.hoardClaimedGoal': 'Клад ваш',
   'hudChrome.riftTracker.floor': 'Этаж {current} из {total}',
   'hudChrome.riftTracker.closesIn': 'Разлом закроется через {time}',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',

@@ -121,6 +121,7 @@ export function nameplatePlanInto(
   const isDelveInteract =
     e.templateId === 'delve_locked_chest' ||
     e.templateId === 'delve_reward_chest' ||
+    e.templateId === 'hoard_reward_chest' ||
     e.templateId === 'delve_surface_exit' ||
     e.templateId === 'delve_drowned_reliquary' ||
     e.templateId === 'delve_drowned_reliquary_open' ||

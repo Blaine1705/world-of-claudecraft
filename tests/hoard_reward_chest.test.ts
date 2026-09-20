@@ -101,6 +101,22 @@ describe('Buried Hoard reward chest', () => {
     expect(paid(sim.drainEvents())).toBe(0);
   });
 
+  it('opens from the interact key and from a click: both reach the sim as pickUpObject', () => {
+    // The client never calls the sim's interact() for an object: the F key
+    // (src/game/nearby_interaction.ts) and a click (src/game/interactions.ts)
+    // both send pickUpObject, offline and over the wire. A chest that only
+    // answered interact() looked fine in a test and could not be opened in game.
+    const { sim, inst, boss } = makeHoard();
+    killBoss(sim, boss);
+    const chest = chestOf(sim, inst);
+    if (!chest) throw new Error('no chest');
+    sim.player.pos = { ...chest.pos, z: chest.pos.z - 2.5 };
+    sim.player.targetId = null;
+    expect(sim.pickUpObject(chest.id, sim.player.id)).toBe(true);
+    expect(paid(sim.drainEvents())).toBe(1);
+    expect(chest.templateId).toBe(HOARD_REWARD_CHEST_OPEN_TEMPLATE);
+  });
+
   it('settles an unopened share when its owner leaves, so walking out costs nothing', () => {
     const { sim, inst, boss } = makeHoard();
     killBoss(sim, boss);

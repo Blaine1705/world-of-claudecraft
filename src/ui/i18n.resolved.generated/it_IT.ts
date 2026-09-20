@@ -1420,6 +1420,8 @@ export const it_IT: EnTranslations = {
       "title": "Squarcio",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Piano {current} di {total}",
       "closesIn": "Si chiude tra {time}",
       "clockMs": "{minutes}:{seconds}",

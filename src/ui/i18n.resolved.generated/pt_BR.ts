@@ -1420,6 +1420,8 @@ export const pt_BR: EnTranslations = {
       "title": "Fenda",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Andar {current} de {total}",
       "closesIn": "Fecha em {time}",
       "clockMs": "{minutes}:{seconds}",

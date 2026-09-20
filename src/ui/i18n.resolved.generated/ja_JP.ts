@@ -1420,6 +1420,8 @@ export const ja_JP: EnTranslations = {
       "title": "リフト",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "宝の箱を開けよう",
+      "hoardClaimedGoal": "財宝はあなたのもの",
       "floor": "フロア {current}/{total}",
       "closesIn": "リフトは{time}後に閉じます",
       "clockMs": "{minutes}:{seconds}",

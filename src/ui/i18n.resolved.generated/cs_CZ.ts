@@ -1420,6 +1420,8 @@ export const cs_CZ: EnTranslations = {
       "title": "Trhlina",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Patro {current} z {total}",
       "closesIn": "Zavře se za {time}",
       "clockMs": "{minutes}:{seconds}",

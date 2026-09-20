@@ -1420,6 +1420,8 @@ export const zh_CN: EnTranslations = {
       "title": "裂隙",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "打开宝藏箱",
+      "hoardClaimedGoal": "宝藏归你了",
       "floor": "第 {current} 层，共 {total} 层",
       "closesIn": "裂隙将在 {time} 后关闭",
       "clockMs": "{minutes}:{seconds}",

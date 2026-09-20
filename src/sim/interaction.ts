@@ -279,6 +279,12 @@ export function pickUpObject(
   }
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable) return false;
+  // The hoard reward chest holds no ground item, but it IS what the interact
+  // key and a click on it reach (both arrive here, offline and over the wire).
+  if (isHoardRewardChestTemplate(obj.templateId)) {
+    openHoardRewardChest(ctx, obj.id, p.id);
+    return true;
+  }
   const vehicleStation = vehicleStationByEntityId(obj.id);
   if (vehicleStation) return enterVehicle(ctx, vehicleStation.id, p.id);
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);

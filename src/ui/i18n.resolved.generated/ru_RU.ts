@@ -1420,6 +1420,8 @@ export const ru_RU: EnTranslations = {
       "title": "Разлом",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Откройте сундук с кладом",
+      "hoardClaimedGoal": "Клад ваш",
       "floor": "Этаж {current} из {total}",
       "closesIn": "Разлом закроется через {time}",
       "clockMs": "{minutes}:{seconds}",

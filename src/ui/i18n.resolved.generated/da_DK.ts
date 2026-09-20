@@ -1420,6 +1420,8 @@ export const da_DK: EnTranslations = {
       "title": "Rift",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Etage {current} af {total}",
       "closesIn": "Lukker om {time}",
       "clockMs": "{minutes}:{seconds}",

@@ -1420,6 +1420,8 @@ export const en_XA: EnTranslations = {
       "title": "[Ŕíƒţ]",
       "hoardTitle": "[Ɓúŕíéð Ĥóáŕð]",
       "hoardGoal": "[Ðéƒéáţ ţĥé ĥóáŕð ķééþéŕ]",
+      "hoardChestGoal": "[Óþéñ ţĥé ĥóáŕð çĥéšţ]",
+      "hoardClaimedGoal": "[Ţĥé ĥóáŕð íš ýóúŕš]",
       "floor": "[Ƒļóóŕ {current} óƒ {total}]",
       "closesIn": "[Çļóšéš íñ {time}]",
       "clockMs": "[{minutes}:{seconds}]",

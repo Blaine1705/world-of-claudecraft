@@ -5326,6 +5326,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.practiceDps.prompt': '攻击假人以开始一轮测试',
   'hudChrome.practiceDps.previous': '之前的测试',
   'hudChrome.riftTracker.title': '裂隙',
+  'hudChrome.riftTracker.hoardChestGoal': '打开宝藏箱',
+  'hudChrome.riftTracker.hoardClaimedGoal': '宝藏归你了',
   'hudChrome.riftTracker.floor': '第 {current} 层，共 {total} 层',
   'hudChrome.riftTracker.closesIn': '裂隙将在 {time} 后关闭',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',

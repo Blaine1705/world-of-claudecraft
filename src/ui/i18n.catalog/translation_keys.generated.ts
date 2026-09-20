@@ -12371,6 +12371,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.riftTracker.clockMs'
   | 'hudChrome.riftTracker.closesIn'
   | 'hudChrome.riftTracker.floor'
+  | 'hudChrome.riftTracker.hoardChestGoal'
+  | 'hudChrome.riftTracker.hoardClaimedGoal'
   | 'hudChrome.riftTracker.hoardGoal'
   | 'hudChrome.riftTracker.hoardTitle'
   | 'hudChrome.riftTracker.title'

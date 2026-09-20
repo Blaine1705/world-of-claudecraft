@@ -1420,6 +1420,8 @@ export const nl_NL: EnTranslations = {
       "title": "Rift",
       "hoardTitle": "Buried Hoard",
       "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Verdieping {current} van {total}",
       "closesIn": "Sluit over {time}",
       "clockMs": "{minutes}:{seconds}",

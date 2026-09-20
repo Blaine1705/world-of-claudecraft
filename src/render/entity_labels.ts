@@ -41,7 +41,7 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === 'delve_locked_chest') {
     return t('worldContent.delveLockedChestInteract');
   }
-  if (entity.templateId === 'delve_reward_chest') {
+  if (entity.templateId === 'delve_reward_chest' || entity.templateId === 'hoard_reward_chest') {
     return t('worldContent.delveRewardChestInteract');
   }
   if (entity.templateId === 'delve_surface_exit') {
