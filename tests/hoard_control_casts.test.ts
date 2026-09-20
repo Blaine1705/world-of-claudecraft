@@ -15,6 +15,7 @@ import {
   HOARD_CONTROL_AOE_CAST_SEC,
   HOARD_CONTROL_CAST_SEC,
   HOARD_CONTROL_FEAR_CAST_SEC,
+  HOARD_DROPPED_CONTROLS,
   tickHoardControlCasts,
 } from '../src/sim/rift/hoard_control_casts';
 import type { RiftInstance } from '../src/sim/rift/types';
@@ -100,6 +101,25 @@ describe('hoard control casts', () => {
     expect(HOARD_CONTROL_FEAR_CAST_SEC).toBeGreaterThan(HOARD_CONTROL_CAST_SEC);
     expect(HOARD_CONTROL_AOE_CAST_SEC).toBeGreaterThan(HOARD_CONTROL_FEAR_CAST_SEC);
     expect(HOARD_CONTROL_AOE_CAST_SEC).toBeGreaterThanOrEqual(3);
+  });
+
+  it('never gives a hoard caster a bar shorter than two seconds', () => {
+    expect(HOARD_CONTROL_CAST_SEC).toBeGreaterThanOrEqual(2);
+  });
+
+  it('drops the stun of Tempest Vharok outright inside a hoard', () => {
+    const { sim, boss } = makeHoard();
+    boss.templateId = 'rift_boss_storm';
+    expect(deferHoardControlAura(sim.ctx, boss, sim.player, { ...STUN, sourceId: boss.id })).toBe(
+      true,
+    );
+    expect(boss.castingAbility).toBeNull();
+    expect(boss.hoardControlCast).toBeUndefined();
+    tickCasts(sim, 4);
+    expect(sim.player.auras.some((aura) => aura.kind === 'stun')).toBe(false);
+    // His other controls, and everyone else's stun, are untouched.
+    expect(HOARD_DROPPED_CONTROLS.rift_boss_storm).toEqual(['stun']);
+    expect(HOARD_DROPPED_CONTROLS.rift_storm_caller).toBeUndefined();
   });
 
   it('an interrupt drops the control for good', () => {

@@ -65,7 +65,9 @@ function openStrike(sim: Sim, inst: RiftInstance, caller: Entity) {
 
 describe('Storm Caller Lightning Strike', () => {
   it('exposes its tunables in one place and is a kickable cast', () => {
-    expect(HOARD_LIGHTNING_STRIKE.telegraphSec).toBeCloseTo(1);
+    // Never shorter than two seconds: there is always time to kick it or walk out.
+    expect(HOARD_LIGHTNING_STRIKE.telegraphSec).toBeGreaterThanOrEqual(2);
+    expect(HOARD_LIGHTNING_STRIKE.telegraphSec).toBeLessThanOrEqual(2.5);
     expect(HOARD_LIGHTNING_STRIKE.radius).toBeGreaterThan(2);
     expect(HOARD_LIGHTNING_STRIKE.damageFraction).toBeGreaterThan(0);
     expect(HOARD_LIGHTNING_STRIKE.cooldownSec).toBeGreaterThan(HOARD_LIGHTNING_STRIKE.telegraphSec);
@@ -146,7 +148,12 @@ describe('Storm Caller Lightning Strike', () => {
     const { sim, inst, caller } = makeRoom();
     openStrike(sim, inst, caller);
     tick(sim, caller, HOARD_LIGHTNING_STRIKE.telegraphSec + 0.1);
-    const quiet = tick(sim, caller, HOARD_LIGHTNING_STRIKE.cooldownSec - 2);
+    // The cooldown runs from the moment the circle was placed.
+    const quiet = tick(
+      sim,
+      caller,
+      HOARD_LIGHTNING_STRIKE.cooldownSec - HOARD_LIGHTNING_STRIKE.telegraphSec - 1.5,
+    );
     expect(quiet.some((event) => event.type === 'hoardBossCue')).toBe(false);
     const again = tick(sim, caller, 2);
     expect(again.some((event) => event.type === 'hoardBossCue')).toBe(true);

@@ -32,11 +32,19 @@ export const HOARD_CONTROL_CAST_SCHOOLS: Readonly<Record<string, { school: Aura[
   });
 
 /** Bar length for a single-target control and for a room-wide one. */
-export const HOARD_CONTROL_CAST_SEC = 1.8;
+/** Owner rule: no hoard caster bar is shorter than two seconds. */
+export const HOARD_CONTROL_CAST_SEC = 2.2;
 /** A fear takes a player out of the fight outright, so it is the slowest bar to
  *  land: the single-target Dread and, slower still, the room-wide terrify. */
 export const HOARD_CONTROL_FEAR_CAST_SEC = 2.6;
 export const HOARD_CONTROL_AOE_CAST_SEC = 3.4;
+
+/** On-hit controls a hoard boss simply does not have. Tempest Vharok already
+ *  asks a lot (Tempest Judgment, Storm Surge, static, his casters' Lightning
+ *  Strikes); a stun on top of that was one ask too many. */
+export const HOARD_DROPPED_CONTROLS: Readonly<Record<string, readonly Aura['kind'][]>> = {
+  rift_boss_storm: ['stun'],
+};
 
 export type HoardControlCast =
   | { castId: string; kind: 'aura'; targetId: number; aura: Aura }
@@ -87,6 +95,9 @@ export function deferHoardControlAura(
   aura: Aura,
 ): boolean {
   if (!buriedHoardOf(ctx, mob)) return false;
+  // Dropped outright for this boss inside a hoard (owner playtest): swallowed,
+  // never cast, never applied.
+  if (HOARD_DROPPED_CONTROLS[mob.templateId]?.includes(aura.kind)) return true;
   if (mob.castingAbility !== null) return true;
   beginCast(
     mob,

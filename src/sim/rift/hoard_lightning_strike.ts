@@ -28,14 +28,15 @@ import type { HoardBossCue, RiftInstance } from './types';
 export const HOARD_LIGHTNING_STRIKE = {
   /** Mob templates that know the ability. */
   casters: ['rift_storm_caller'] as readonly string[],
-  /** Seconds between the circle appearing and the bolt landing. */
-  telegraphSec: 1,
+  /** Seconds between the circle appearing and the bolt landing. Owner rule: no
+   *  hoard caster bar is shorter than two seconds, so a kick is always possible. */
+  telegraphSec: 2.2,
   /** Circle radius in yards: the telegraph AND the hitbox. */
   radius: 3.2,
   /** Share of the victim's max health the bolt deals. */
   damageFraction: 0.22,
   /** Seconds between one caller's strikes, and before its first. */
-  cooldownSec: 7,
+  cooldownSec: 8,
   firstDelaySec: 2.5,
   /** A target further than this from the caller is not picked. */
   rangeYards: 32,
