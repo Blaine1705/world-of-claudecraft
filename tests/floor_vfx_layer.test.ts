@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { GroundDecals } from '../src/render/ability_vfx/decals';
@@ -17,11 +17,46 @@ import {
   floorVfxRenderOrder,
 } from '../src/render/floor_vfx_layer_core';
 import { GroundAimReticleVisual } from '../src/render/ground_aim_reticle_visual';
+import { buildIgnivarBrandTelegraph } from '../src/render/ignivar_brand_telegraph';
+import {
+  buildIgnivarEncounterPrewarmVisual,
+  buildIgnivarSkyfireTelegraph,
+} from '../src/render/ignivar_encounter';
+import { buildGroundFireAoeStandIn } from '../src/render/ignivar_fire_vfx';
+import { IGNIVAR_FORGE_CHAIN_VISUAL_NAME } from '../src/render/ignivar_forge_chains';
+import {
+  buildIgnivarForgeJudgmentPrewarmVisual,
+  buildIgnivarForgeJudgmentVisual,
+} from '../src/render/ignivar_forge_judgment';
+import { buildIgnivarForgeWaveVisual } from '../src/render/ignivar_forge_wave';
 import { buildIgnivarFrontalTelegraph } from '../src/render/ignivar_frontal_telegraph';
+import {
+  buildIgnivarRotatingRaysPrewarmVisual,
+  buildIgnivarRotatingRaysTelegraph,
+} from '../src/render/ignivar_rotating_rays';
 import { buildIgnivarSoakTelegraph } from '../src/render/ignivar_soak_telegraph';
-import { MageGroundFx } from '../src/render/mage_ground_fx';
+import { MageGroundFx, type RuneCircleSpawn, runeCircleLayer } from '../src/render/mage_ground_fx';
+import { buildNythraxisBoundCagePrewarmVisual } from '../src/render/nythraxis_bound_cage_visual';
+import { buildNythraxisGravePrewarmVisual } from '../src/render/nythraxis_grave_flame_visual';
+import { buildNythraxisGravefirePrewarmVisual } from '../src/render/nythraxis_gravefire_visual';
 import { buildNythraxisBindingSigilPrewarmVisual } from '../src/render/nythraxis_sigil_visual';
+import {
+  buildNythraxisSoulRendMarker,
+  buildNythraxisSoulRendMarkerPrewarmVisual,
+} from '../src/render/nythraxis_soul_rend_marker';
 import { PaladinConsecrationVisuals } from '../src/render/paladin_consecration_visual';
+import { buildVarkhulAssemblyPrewarmVisual } from '../src/render/varkhul_assembly_visual';
+import {
+  buildVarkhulCinderOrbsTelegraph,
+  buildVarkhulEncounterPrewarmVisual,
+  buildVarkhulMakersBrandTelegraph,
+} from '../src/render/varkhul_encounter';
+import { buildVarkhulForgeBeamPrewarmVisual } from '../src/render/varkhul_forge_beam_visual';
+import { buildVarkhulFrontalVisual } from '../src/render/varkhul_frontal_visual';
+import { buildVarkhulInterceptBeamPrewarmVisual } from '../src/render/varkhul_intercept_beam_visual';
+import { buildVarkhulWorldfirePrewarmVisual } from '../src/render/varkhul_worldfire_visual';
+import { ABILITIES } from '../src/sim/data';
+import { NYTHRAXIS_SIGIL_CAST_ID } from '../src/sim/nythraxis_binding_sigil';
 import { NYTHRAXIS_GRAVE_ERUPTION_CAST_ID } from '../src/sim/nythraxis_grave_eruption';
 
 // The floor VFX ladder (src/render/floor_vfx_layer_core.ts) is what keeps a
@@ -86,6 +121,8 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // band, and never covers a telegraph.
   { file: 'src/render/renderer.ts', layer: 'player', strict: false },
   // boss and encounter mechanics
+  { file: 'src/render/ignivar_encounter.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/ignivar_forge_wave.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_frontal_telegraph.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_soak_telegraph.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_brand_telegraph.ts', layer: 'encounter', strict: true },
@@ -106,6 +143,7 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/varkhul_forge_beam_visual.ts', layer: 'encounter', strict: true },
   { file: 'src/render/varkhul_worldfire_visual.ts', layer: 'encounter', strict: true },
   { file: 'src/render/varkhul_encounter.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/varkhul_frontal_visual.ts', layer: 'encounter', strict: true },
   { file: 'src/render/rift_death_zone.ts', layer: 'encounter', strict: true },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
@@ -218,13 +256,16 @@ function groupOrders(root: THREE.Object3D): number[] {
 }
 
 function renderSourceFiles(): string[] {
-  return readdirSync(renderRoot, { recursive: true })
-    .map(String)
-    .filter((f) => f.endsWith('.ts') && !f.endsWith('.d.ts'))
-    .map((f) => join(renderRoot, f))
-    .filter((f) => statSync(f).isFile())
-    .map((f) => relative(repoRoot, f))
-    .sort();
+  return (
+    readdirSync(renderRoot, { recursive: true })
+      .map(String)
+      .filter((f) => f.endsWith('.ts') && !f.endsWith('.d.ts'))
+      .map((f) => join(renderRoot, f))
+      .filter((f) => statSync(f).isFile())
+      // forward slashes on every platform, so the registry paths match on Windows too
+      .map((f) => relative(repoRoot, f).split(sep).join('/'))
+      .sort()
+  );
 }
 
 /** Identifiers a file binds to `new THREE.Group()`, locals and `this.` fields. */
@@ -483,6 +524,7 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
       buildIgnivarSoakTelegraph(),
       buildIgnivarFrontalTelegraph(),
       buildNythraxisBindingSigilPrewarmVisual(),
+      buildVarkhulFrontalVisual(),
     ];
   }
 
@@ -546,6 +588,58 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
     expect(shape(world)).toEqual(shape(own));
   });
 
+  it("puts a boss sigil flare or a mob windup rune on the encounter band and the mage's own Rune of Power on the player band", () => {
+    const runeOrders = (spawn: RuneCircleSpawn): number[] => {
+      const scene = new THREE.Scene();
+      const fx = new MageGroundFx(scene, () => 0, vi.fn());
+      fx.spawnRune(spawn);
+      const rune = scene.getObjectByName('mage-rune-power');
+      expect(rune).toBeDefined();
+      const orders: number[] = [];
+      (rune as THREE.Object3D).traverse((object) => {
+        // the terrain-draped inscription (rings, spokes, glow); the orbiting
+        // motes are airborne spheres and deliberately outside the ladder
+        if (isRenderable(object) && object.name.startsWith('mage-rune-power-')) {
+          orders.push(object.renderOrder);
+        }
+      });
+      expect(orders.length).toBeGreaterThan(3);
+      return orders;
+    };
+    // The player arm keys off the ability catalog: pin the anchor it relies on.
+    expect(ABILITIES.rune_of_power).toBeDefined();
+    expect(ABILITIES[NYTHRAXIS_SIGIL_CAST_ID]).toBeUndefined();
+    const own = runeOrders({
+      x: 0,
+      z: 0,
+      radius: 8,
+      duration: 15,
+      school: 'arcane',
+      ability: 'rune_of_power',
+    });
+    const sigil = runeOrders({
+      x: 0,
+      z: 0,
+      radius: 6,
+      duration: 4,
+      school: 'arcane',
+      ability: NYTHRAXIS_SIGIL_CAST_ID,
+    });
+    // a rift mob's stomp or pulse windup arrives with a school and no ability
+    const windup = runeOrders({ x: 0, z: 0, radius: 5, duration: 3, school: 'fire' });
+    for (const order of own) expect(floorVfxLayerOf(order), `own ${order}`).toBe('player');
+    for (const order of sigil) expect(floorVfxLayerOf(order), `sigil ${order}`).toBe('encounter');
+    for (const order of windup) expect(floorVfxLayerOf(order), `windup ${order}`).toBe('encounter');
+    // The same rungs in either band: the stack does not change shape with the caller.
+    const shape = (orders: number[]) => orders.map((o) => o - Math.min(...orders)).sort();
+    expect(shape(sigil)).toEqual(shape(own));
+    expect(shape(windup)).toEqual(shape(own));
+    // The rule itself, so a new emitter can be checked without a scene.
+    expect(runeCircleLayer('rune_of_power')).toBe('player');
+    expect(runeCircleLayer(NYTHRAXIS_SIGIL_CAST_ID)).toBe('encounter');
+    expect(runeCircleLayer(undefined)).toBe('encounter');
+  });
+
   it('keeps the ground aim reticle above the encounter band, additive so it hides nothing', () => {
     const scene = new THREE.Scene();
     const reticle = new GroundAimReticleVisual(scene, () => 0, 1);
@@ -557,5 +651,129 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
       const material = (object as THREE.Mesh).material as THREE.Material | undefined;
       if (material) expect(material.blending).toBe(THREE.AdditiveBlending);
     });
+  });
+});
+
+describe('floor VFX ladder (every encounter builder, built cold)', () => {
+  /**
+   * Every no-argument encounter builder and prewarm visual: the whole boss
+   * floor, the way the prewarm pass and the live syncs build it. A telegraph
+   * piece that sets no order at all is invisible to the bare-literal sweep
+   * above (the Forgefather sweep shipped that way), so this is the guard that
+   * catches it: every flat, ground-hugging renderable must classify as
+   * encounter. A new boss floor builder joins this list.
+   */
+  const ENCOUNTER_BUILDERS: ReadonlyArray<readonly [string, () => THREE.Object3D]> = [
+    ['ignivar brand telegraph', buildIgnivarBrandTelegraph],
+    ['ignivar skyfire telegraph', buildIgnivarSkyfireTelegraph],
+    ['ignivar encounter prewarm', buildIgnivarEncounterPrewarmVisual],
+    ['ignivar forge judgment', buildIgnivarForgeJudgmentVisual],
+    ['ignivar forge judgment prewarm', buildIgnivarForgeJudgmentPrewarmVisual],
+    ['ignivar forge wave', buildIgnivarForgeWaveVisual],
+    ['ignivar frontal telegraph', buildIgnivarFrontalTelegraph],
+    ['ignivar rotating rays telegraph', buildIgnivarRotatingRaysTelegraph],
+    ['ignivar rotating rays prewarm', buildIgnivarRotatingRaysPrewarmVisual],
+    ['ignivar soak telegraph', () => buildIgnivarSoakTelegraph()],
+    ['ignivar ground fire AoE stand-in', buildGroundFireAoeStandIn],
+    ['varkhul assembly prewarm', buildVarkhulAssemblyPrewarmVisual],
+    ['varkhul cinder orbs telegraph', buildVarkhulCinderOrbsTelegraph],
+    ['varkhul makers brand telegraph', buildVarkhulMakersBrandTelegraph],
+    ['varkhul encounter prewarm', buildVarkhulEncounterPrewarmVisual],
+    ['varkhul forgefather sweep', buildVarkhulFrontalVisual],
+    ['varkhul forge beam prewarm', buildVarkhulForgeBeamPrewarmVisual],
+    ['varkhul tempering ray prewarm', buildVarkhulInterceptBeamPrewarmVisual],
+    ['varkhul worldfire prewarm', buildVarkhulWorldfirePrewarmVisual],
+    ['nythraxis bound cage prewarm', buildNythraxisBoundCagePrewarmVisual],
+    ['nythraxis grave prewarm', buildNythraxisGravePrewarmVisual],
+    ['nythraxis gravefire prewarm', buildNythraxisGravefirePrewarmVisual],
+    ['nythraxis binding sigil prewarm', buildNythraxisBindingSigilPrewarmVisual],
+    ['nythraxis soul rend marker', buildNythraxisSoulRendMarker],
+    ['nythraxis soul rend marker prewarm', buildNythraxisSoulRendMarkerPrewarmVisual],
+  ];
+
+  /**
+   * A floor piece: the renderable's OWN geometry, in world space, is no taller
+   * than a draped disc, ring, line or thin slab, and hugs the builder's ground
+   * (every builder here stages at y 0). Vertical pieces (cones, beams, spires,
+   * the airborne crown of a marker) are outside the ladder's concern.
+   */
+  const FLOOR_PIECE_MAX_HEIGHT = 0.25;
+  const FLOOR_PIECE_MAX_LIFT = 0.3;
+  const box = new THREE.Box3();
+
+  /**
+   * The forge chain is a body-height tether between two chained players; its
+   * cold build lays the beam at the origin until the live sync lifts it to
+   * chest height, so it is the one subtree the floor rule must skip.
+   */
+  const NOT_A_FLOOR_SUBTREE = new Set<string>([IGNIVAR_FORGE_CHAIN_VISUAL_NAME]);
+
+  function isFloorPiece(object: THREE.Object3D): boolean {
+    const instanced = object as THREE.InstancedMesh;
+    if (instanced.isInstancedMesh) {
+      // the instance transforms place the pieces (rings up a column, embers
+      // around a rune), so the box must include them
+      instanced.computeBoundingBox();
+      box.copy(instanced.boundingBox as THREE.Box3).applyMatrix4(object.matrixWorld);
+    } else {
+      const geometry = (object as THREE.Mesh).geometry as THREE.BufferGeometry | undefined;
+      if (!geometry?.getAttribute('position')) return false;
+      if (geometry.boundingBox === null) geometry.computeBoundingBox();
+      box.copy(geometry.boundingBox as THREE.Box3).applyMatrix4(object.matrixWorld);
+    }
+    if (box.isEmpty()) return false;
+    return box.max.y - box.min.y <= FLOOR_PIECE_MAX_HEIGHT && box.min.y <= FLOOR_PIECE_MAX_LIFT;
+  }
+
+  function floorPieces(root: THREE.Object3D): Array<{ name: string; order: number }> {
+    root.updateMatrixWorld(true);
+    const pieces: Array<{ name: string; order: number }> = [];
+    const walk = (object: THREE.Object3D): void => {
+      if (NOT_A_FLOOR_SUBTREE.has(object.name)) return;
+      if (isRenderable(object) && isFloorPiece(object)) {
+        pieces.push({ name: object.name || object.type, order: object.renderOrder });
+      }
+      for (const child of object.children) walk(child);
+    };
+    walk(root);
+    return pieces;
+  }
+
+  it('every flat, ground-hugging renderable of every builder rides the encounter band', () => {
+    const offenders: string[] = [];
+    const counted = new Map<string, number>();
+    for (const [label, build] of ENCOUNTER_BUILDERS) {
+      const pieces = floorPieces(build());
+      counted.set(label, pieces.length);
+      for (const piece of pieces) {
+        if (floorVfxLayerOf(piece.order) !== 'encounter') {
+          offenders.push(`${label}: ${piece.name} at renderOrder ${piece.order}`);
+        }
+      }
+    }
+    // The classes the review found, so the guard is known to see them.
+    for (const label of [
+      'varkhul forgefather sweep',
+      'varkhul tempering ray prewarm',
+      'ignivar skyfire telegraph',
+      'ignivar forge wave',
+      'varkhul assembly prewarm',
+      'ignivar forge judgment',
+      'nythraxis grave prewarm',
+      'ignivar soak telegraph',
+    ]) {
+      expect(counted.get(label), `${label} has floor pieces`).toBeGreaterThan(0);
+    }
+    expect(
+      offenders,
+      "a boss floor piece sits outside the encounter band: give it floorVfxRenderOrder('encounter', step)",
+    ).toEqual([]);
+  });
+
+  it('leaves every Group of every builder at renderOrder 0 so groupOrder never outranks the ladder', () => {
+    for (const [label, build] of ENCOUNTER_BUILDERS) {
+      const offenders = groupOrders(build()).filter((order) => order !== 0);
+      expect(offenders, `${label} has Groups carrying an order`).toEqual([]);
+    }
   });
 });

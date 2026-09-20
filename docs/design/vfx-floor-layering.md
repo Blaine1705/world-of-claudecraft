@@ -53,7 +53,21 @@ from step 0, since player effects only ever overlap other player effects there.
 A builder that serves two callers picks its band per spawn: the meteor telegraph
 in `src/render/mage_ground_fx.ts` rides `player` for the mage's own Meteor and
 `encounter` for the sim's world warnings (Ignivar meteors, Varkhul anvils and
-forgestorm, Nythraxis grave eruptions), which arrive with a persistent id.
+forgestorm, Nythraxis grave eruptions), which arrive with a persistent id. The
+rune circle in the same module does the same: only a player ability's own cast
+(Rune of Power) rides `player`; the Nythraxis binding sigil flare and a rift
+mob's stomp or pulse windup, which the sim emits with an encounter cast id or
+no ability at all, ride `encounter`. Both builders keep legacy-minus-one steps
+in either band, so the stack reads the same whoever cast it.
+
+Packing the `player` band from step 0 lets two modules share a rung: the pooled
+dissolve decals, the consecration wash and the Ring of Frost band all sit on the
+band floor, and the shock rings and the aegis ground ring share the rung two
+above. That is accepted on purpose: every one of those pieces is additive, so a
+tie is colour-invariant and the flip a shared rung produces as the camera orbits
+changes nothing a player can see. A new normal-blended floor piece in the
+player band should take a rung no other module's normal-blended floor piece
+uses; check the neighbours before picking one.
 
 ## Rules for a floor module
 
@@ -66,6 +80,10 @@ forgestorm, Nythraxis grave eruptions), which arrive with a persistent id.
   named in the test's out-of-scope list with a reason; the completeness sweep
   fails otherwise. A Group carrying a `renderOrder` anywhere under `src/render/`
   fails the same test unless it is one of the pinned pre-existing carriers.
+- A telegraph piece that sets no order at all is invisible to that literal sweep,
+  so the test also builds every no-argument encounter builder and prewarm visual
+  and fails if any flat, ground-hugging renderable in them sits outside the
+  `encounter` band. A new boss floor builder joins that list.
 - Put the order on renderable leaves (mesh, points, sprite, line), never on a
   Group. `applyFloorVfxLayer(root, layer, step)` does this for a subtree and
   resets every Group to 0.
@@ -89,9 +107,10 @@ forgestorm, Nythraxis grave eruptions), which arrive with a persistent id.
   its stack cannot tie with a player band.
 - The selection ring under a target and the static dungeon hazard pools stay on
   their existing orders. They are not VFX a player emits or a boss casts.
-- Two world markers far from any raid floor (the mount call beacon and the race
-  line marker root) still carry an order on a Group. They are pre-existing and
-  out of scope here; a module that gains a floor mechanic near them must move
-  its order to leaves first.
+- Three pre-existing Group orders stay where they are: two world markers far
+  from any raid floor (the mount call beacon and the race line marker root) and
+  the camera-attached underwater overlay. They are pinned in the test as the
+  only carriers, a list that may only shrink; a module that gains a floor
+  mechanic near them must move its order to leaves first.
 - Materials, lifts, polygon offsets, and depth flags are untouched; the ladder
   changes only which floor mesh paints last.
