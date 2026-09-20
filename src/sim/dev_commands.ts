@@ -6,6 +6,7 @@ import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { displacePlayerForDev } from './dev/dev_displace';
+import { handleDevHoardTravel } from './dev/hoard_travel';
 import { devTownList, resolveDevTown } from './dev/town_teleport';
 import { handleDevClueCommand } from './dev_clue_scrolls';
 import { applyDevKit } from './dev_kit';
@@ -297,6 +298,12 @@ export function handleDevChat(
   const clueMatch = /^\/dev\s+clue(?:\s+(\S+))?(?:\s+(\S+))?\s*$/i.exec(raw);
   if (clueMatch) {
     handleDevClueCommand(ctx, pid, (clueMatch[1] ?? '').toLowerCase(), clueMatch[2] ?? '');
+    return null;
+  }
+
+  const hoardMatch = /^\/dev\s+hoard(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (hoardMatch) {
+    handleDevHoardTravel(ctx, pid, hoardMatch[1] ?? 'list');
     return null;
   }
 
