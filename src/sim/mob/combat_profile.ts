@@ -7,6 +7,7 @@ import {
   releasePin,
 } from '../instances/instance_combat_hold';
 import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from '../mob_combat';
+import { holdHoardBoneReaper } from '../rift/hoard_bone_reaper';
 import { holdHoardOrbitalLightning } from '../rift/hoard_orbital_lightning';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
@@ -155,7 +156,7 @@ export function updateMobCombatProfile(
     return 'done';
   }
 
-  if (holdHoardOrbitalLightning(ctx, mob)) {
+  if (holdHoardOrbitalLightning(ctx, mob) || holdHoardBoneReaper(ctx, mob)) {
     onEngagedTick?.('stationary');
     mob.swingTimer = Math.max(0, mob.swingTimer - DT);
     tryMobMeleeSwingInRange(ctx, mob, target);

@@ -19,6 +19,7 @@ import * as THREE from 'three';
 import type { SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dungeons';
+import { HoardBoneReaperFx } from './hoard_bone_reaper';
 import { HoardBossDressing } from './hoard_boss_dressing';
 import { HoardBossFx } from './hoard_boss_fx';
 import { HoardBossPresentation } from './hoard_boss_presentation';
@@ -70,6 +71,7 @@ export class RiftDeathZoneVisuals {
   private readonly hoardAccents: HoardEncounterAccents;
   private readonly hoardSpells: HoardSpellFx;
   private readonly hoardOrbital: HoardOrbitalLightning;
+  private readonly hoardBoneReaper: HoardBoneReaperFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -91,6 +93,7 @@ export class RiftDeathZoneVisuals {
     );
     this.hoardSpells = new HoardSpellFx(scene, groundY, compileGate, reducedMotion);
     this.hoardOrbital = new HoardOrbitalLightning(scene, groundY, compileGate, reducedMotion);
+    this.hoardBoneReaper = new HoardBoneReaperFx(scene, groundY, world, compileGate, reducedMotion);
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -105,6 +108,7 @@ export class RiftDeathZoneVisuals {
     this.hoardAccents.sync(hoardCues);
     this.hoardSpells.sync(hoardCues);
     this.hoardOrbital.sync(hoardCues);
+    this.hoardBoneReaper.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
       const key = `${z.x.toFixed(1)}:${z.z.toFixed(1)}:${z.radius.toFixed(1)}`;
@@ -136,6 +140,7 @@ export class RiftDeathZoneVisuals {
     this.hoardAccents.update(dt);
     this.hoardSpells.update(dt);
     this.hoardOrbital.update(dt);
+    this.hoardBoneReaper.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -157,6 +162,7 @@ export class RiftDeathZoneVisuals {
     this.hoardAccents.dispose();
     this.hoardSpells.dispose();
     this.hoardOrbital.dispose();
+    this.hoardBoneReaper.dispose();
     this.hoardPresentation.dispose();
   }
 

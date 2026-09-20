@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
+import { isBoneReaperVariant } from '../sim/rift/hoard_bone_reaper_core';
 import { HOARD_SWEEP_HALF_ANGLE, HOARD_SWEEP_RANGE } from '../sim/rift/hoard_boss';
 import { HOARD_BRUTE_COMBO } from '../sim/rift/hoard_boss_kits';
 import { vaultSeedZone } from '../sim/rift/vault_seed';
@@ -533,6 +534,9 @@ export class HoardBossFx {
     const now = performance.now();
     for (const cue of cues) {
       if (cue.variant === 'storm-orbital') continue;
+      // Xarreth's scythe and souls draw themselves (hoard_bone_reaper.ts): their
+      // cue numbers carry a route, not a floor shape.
+      if (isBoneReaperVariant(cue.variant)) continue;
       const key = `${cue.instanceId}:${cue.cueId}`;
       seen.add(key);
       let slot = this.slots.find((candidate) => candidate.key === key);

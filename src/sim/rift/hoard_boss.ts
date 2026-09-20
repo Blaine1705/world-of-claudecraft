@@ -5,6 +5,12 @@ import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
 import { riftFx } from './fx';
 import {
+  clearHoardBoneReaper,
+  isBoneReaperCue,
+  tickHoardBoneCue,
+  tickHoardBoneReaper,
+} from './hoard_bone_reaper';
+import {
   HOARD_BROOD_EGG_TEMPLATE,
   HOARD_BRUTE_COMBO,
   HOARD_BRUTE_FACING_OFFSETS,
@@ -245,6 +251,7 @@ function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   if (!inst.hoardBoss) return;
   removeTotem(ctx, inst, inst.hoardBoss, boss);
   clearHoardStormSurge(boss, inst.hoardBoss);
+  clearHoardBoneReaper(boss, inst.hoardBoss);
   delete inst.hoardBoss;
   for (const player of instancePlayers(ctx, inst)) {
     ctx.emit({ type: 'hoardBossCueClear', pid: player.id });
@@ -451,6 +458,7 @@ function tickSpecialKit(
       boss.firedSummons++;
       summonBoneLegion(ctx, boss);
     }
+    tickHoardBoneReaper(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     return;
   }
   if (kit === 'storm') {
@@ -767,8 +775,13 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
   const staticTargets = staticPlayers.length
     ? resolveHoardStormStaticTargets(staticPlayers)
     : undefined;
+  const bonePlayers = state.cues.some(isBoneReaperCue) ? instancePlayers(ctx, inst) : [];
   for (const cue of state.cues) {
     cue.remaining = Math.max(0, cue.remaining - DT);
+    if (isBoneReaperCue(cue)) {
+      if (tickHoardBoneCue(ctx, inst, boss, state, cue, bonePlayers, emitCue)) live.push(cue);
+      continue;
+    }
     if (cue.variant === 'storm-orbital') {
       if (cue.kind === 'sweep')
         spawned.push(...tickHoardOrbitalCarrier(ctx, inst, state, cue, emitCue));
