@@ -10,22 +10,28 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "es_ES": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "fr_FR": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "fr_CA": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "en_CA": [],
   "it_IT": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "de_DE": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "zh_CN": [],
@@ -33,31 +39,40 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "nl_NL": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "pl_PL": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "id_ID": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "tr_TR": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "sv_SE": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "vi_VN": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ],
   "da_DK": [
+    "hud.system.respawnKeeperToll",
     "hudChrome.death.ghostHint"
   ]
 };

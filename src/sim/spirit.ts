@@ -344,6 +344,11 @@ export function resurrectAtCorpse(ctx: SimContext, pid?: number): void {
 }
 
 // Resurrect at the Spirit Healer: instant, in place, but with Resurrection Sickness.
+/** Whether The Keeper's Toll is on the player (nothing is charged below level 10). */
+export function hasResurrectionSickness(p: Entity): boolean {
+  return p.auras.some((a) => a.id === RESURRECTION_SICKNESS_ID);
+}
+
 export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
@@ -354,7 +359,14 @@ export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean 
   // The Spirit Healer always inflicts Resurrection Sickness and returns you at only
   // RES_HEALER_HP_FRACTION of your pools (the corpse run is the penalty-free choice).
   reviveAt(ctx, meta, p, p.pos, RES_HEALER_HP_FRACTION, 'resurrection');
-  ctx.emit({ type: 'respawn', pid: meta.entityId });
+  // The client reads the sickness tag to say "revived, but weaker" rather than
+  // the penalty-free line; nothing below RES_SICKNESS_MIN_LEVEL is charged, so the
+  // tag only travels when the Toll actually landed.
+  ctx.emit({
+    type: 'respawn',
+    pid: meta.entityId,
+    ...(hasResurrectionSickness(p) ? { sickness: 'resurrection' as const } : {}),
+  });
   // Credited too, deliberately: the lesson teaches the corpse run, but a
   // player who took the Keeper instead has no corpse left to walk to, and a
   // quest they can no longer finish is worse than one finished the long way.

@@ -2675,6 +2675,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapDrowned': '你已经死亡。你淹死了。',
   'hud.system.deathRecapCauterized': '你已经死亡。灼烧术的烈焰吞噬了你。',
   'hud.system.respawn': '你再次感到精力恢复、身体完整。',
+  'hud.system.respawnKeeperToll':
+    '灵魂医者复活了你，但你因此变得虚弱：在复活后遗症消退之前，你的所有属性都会被削弱。',
   'hud.system.ignoringChat': '已屏蔽来自 {name} 的聊天。',
   'hud.system.noLongerIgnoring': '不再屏蔽 {name}。',
   'hud.system.playerNotNearby': '该玩家不在附近。',

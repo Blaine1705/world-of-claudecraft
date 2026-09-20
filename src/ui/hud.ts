@@ -13409,7 +13409,9 @@ export class Hud {
           break;
         }
         case 'respawn':
-          this.log(t('hud.system.respawn'), HUD_LOG.GOOD);
+          if (ev.sickness === 'resurrection')
+            this.log(t('hud.system.respawnKeeperToll'), HUD_LOG.NOTICE);
+          else this.log(t('hud.system.respawn'), HUD_LOG.GOOD);
           break;
         case 'unstuck': {
           const feedback = unstuckFeedback(ev);

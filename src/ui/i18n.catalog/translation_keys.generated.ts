@@ -8217,6 +8217,7 @@ export type TranslationKeyFlat =
   | 'hud.system.playerDeath'
   | 'hud.system.playerNotNearby'
   | 'hud.system.respawn'
+  | 'hud.system.respawnKeeperToll'
   | 'hud.trade.accept'
   | 'hud.trade.cancel'
   | 'hud.trade.copper'
