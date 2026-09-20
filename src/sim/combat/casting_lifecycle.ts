@@ -1333,8 +1333,8 @@ export function castAbility(
     // An armed Nature's Boon window is a form exemption for exactly the two
     // spells it names (combat/druid_natures_boon.ts). Checked here rather than
     // folded into usableInForm because it is aura state, not a property of the
-    // button: with no window armed, Wildbloom and Lunar Tempest refuse and
-    // auto-unshift exactly as they always have.
+    // button: with no window armed, Wildbloom refuses and auto-unshifts exactly
+    // as it always has (Oakhide is usableInForm and never reaches this arm).
     !naturesBoonArmedFor(p.auras, ability.id)
   ) {
     // Only the DECISION is made here, so the ladder below continues for a cast
@@ -2153,6 +2153,12 @@ function scaleNaturesBoonPower(p: Entity, res: ResolvedAbility): ResolvedAbility
   const amp = naturesBoonPowerFor(p.auras, res.def.id);
   if (amp === 1) return res;
   const effects = res.effects.map((eff) => {
+    // A heal or a HoT is NOT scaled here: those sites add a Spell Power rider
+    // on top of the authored base, so scaling the base alone would deliver
+    // less than the printed 25% at any real heal power. They take the whole
+    // multiplier in runEffects instead, through the cast-scoped heal multiplier
+    // that `naturesBoonPower` below feeds (the Stonehearth 2pc shape).
+    if (eff.type === 'heal' || eff.type === 'hot') return eff;
     const scaled: Record<string, unknown> = { ...eff };
     for (const key of ['min', 'max', 'amount', 'total', 'value'] as const) {
       const v = scaled[key];
@@ -2160,7 +2166,7 @@ function scaleNaturesBoonPower(p: Entity, res: ResolvedAbility): ResolvedAbility
     }
     return scaled as AbilityEffect;
   });
-  return { ...res, effects };
+  return { ...res, effects, naturesBoonPower: amp };
 }
 
 function consumeOverload(ctx: SimContext, p: Entity, res: ResolvedAbility): ResolvedAbility {

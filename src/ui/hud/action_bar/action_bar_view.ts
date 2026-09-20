@@ -275,7 +275,10 @@ export interface ActionBarWorldInput {
   inventory: readonly { itemId: string; count: number }[];
   /** Aura-derived because the online player entity's local cache is not wired. */
   stealthed: boolean;
-  /** Committed Paladin spec: the redesigned bar swaps a slot per spec. */
+  /** The committed spec of EVERY class (the HUD hands in `IWorld.talentSpec`,
+   *  which both worlds fill for every class; the name predates its wider use).
+   *  The redesigned Paladin bar swaps a slot per spec, and the melee-reach
+   *  question below reads a druid's 'feral' from the same field. */
   paladinSpec?: string | null;
   /** The player's class. Paired with `paladinSpec` it answers the attacker half
    *  of the melee-reach question (sim/combat/feral_reach.ts), so the bar's

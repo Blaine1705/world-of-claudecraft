@@ -133,7 +133,9 @@ function isWildfangDruid(ctx: SimContext, player: Entity): boolean {
 }
 
 /** Arm the window, replacing any window already running (a fresh proc refreshes
- *  the 10 sec rather than stacking). */
+ *  the 10 sec rather than stacking). Both arms emit the proc flash: a refresh
+ *  is a proc the player can see and act on (a fresh 10 sec), so a silent one
+ *  would read as the window quietly outliving its timer. */
 function armNaturesBoon(ctx: SimContext, player: Entity): void {
   const existing = player.auras.find(
     (aura) => aura.id === NATURES_BOON_ID && aura.sourceId === player.id,
@@ -143,19 +145,19 @@ function armNaturesBoon(ctx: SimContext, player: Entity): void {
     existing.remaining = NATURES_BOON_DURATION;
     existing.duration = NATURES_BOON_DURATION;
     existing.empowerAbilities = boonAbilityList();
-    return;
+  } else {
+    ctx.applyAura(player, {
+      id: NATURES_BOON_ID,
+      name: NATURES_BOON_NAME,
+      kind: 'next_cast_free',
+      remaining: NATURES_BOON_DURATION,
+      duration: NATURES_BOON_DURATION,
+      value: 0,
+      sourceId: player.id,
+      school: 'nature',
+      empowerAbilities: boonAbilityList(),
+    });
   }
-  ctx.applyAura(player, {
-    id: NATURES_BOON_ID,
-    name: NATURES_BOON_NAME,
-    kind: 'next_cast_free',
-    remaining: NATURES_BOON_DURATION,
-    duration: NATURES_BOON_DURATION,
-    value: 0,
-    sourceId: player.id,
-    school: 'nature',
-    empowerAbilities: boonAbilityList(),
-  });
   ctx.emit({
     type: 'spellfx',
     sourceId: player.id,

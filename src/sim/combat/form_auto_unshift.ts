@@ -128,8 +128,9 @@ export function applyAutoUnshift(
     p.auras.splice(i, 1);
     ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
   }
-  // Stalk is Cat Form's stealth (requiresForm: 'cat'), so it goes out with the
-  // form. Pressing the form button by hand already ends it, though only as a
+  // Stalk is Cat Form's stealth (the button shifts you into Cat to enter it, see
+  // combat/druid_form_entry.ts), so it goes out with the form. Pressing the form
+  // button by hand already ends it, though only as a
   // side effect: casting an ability breaks stealth when its effects resolve.
   // An auto-unshift casts no form button, so without this the druid would keep
   // Stalk through the whole spell and only lose it at the cast's own commit,

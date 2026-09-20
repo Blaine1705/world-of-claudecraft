@@ -9,7 +9,7 @@
 // auto-attack and ability alike, in any form or none. "Melee reach" means an
 // ability whose authored range is MELEE_RANGE or less (an authored 0 means
 // "melee" and resolves to MELEE_RANGE). A ranged or gap-closing button keeps
-// its authored range untouched: Lunge (12 yd) and Slinkstrike (8 yd) are
+// its authored range untouched: Lunge (25 yd) and Slinkstrike (8 yd) are
 // deliberately NOT melee-reach attacks and gain nothing here.
 import type { SimContext } from '../sim_context';
 import type { Entity, PlayerClass } from '../types';
