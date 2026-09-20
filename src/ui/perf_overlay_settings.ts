@@ -8,6 +8,7 @@
 // drag-to-move on the live overlay can push the dropped X/Y back into the sliders
 // without a full re-render.
 
+import { hostDiagAvailable } from '../game/desktop_host_diag';
 import { type HostDiagSectionDeps, renderHostDiagSection } from './host_diag_section_controller';
 import { formatNumber, t } from './i18n';
 import type { PerfOverlayConfig, PerfOverlayPatch } from './perf_overlay_config';
@@ -99,10 +100,15 @@ export class PerfOverlaySettingsPanel {
     const panel = div('perf-panel');
     scroll.appendChild(panel);
 
-    // The view is "Performance" now, so the overlay controls carry their own
-    // section heading: the shared card-title chrome, spanning the panel rather
-    // than boxed, so the overlay cards below stay one level deep.
-    subhead(panel, t('hudChrome.perf.overlaySection'), 'perf-card-title');
+    // The view is "Performance" now. The overlay controls get their own section
+    // heading ONLY when a second section follows them (the desktop shell's System
+    // Report): a heading over a view's single section is noise, and on a phone in
+    // landscape it would cost close to half of the short strip this scroller gets.
+    // The shared card-title chrome, spanning the panel rather than boxed, so the
+    // overlay cards below stay one level deep.
+    if (hostDiagAvailable()) {
+      subhead(panel, t('hudChrome.perf.overlaySection'), 'perf-card-title');
+    }
     this.buildMaster(panel);
 
     const cols = div('perf-cols');

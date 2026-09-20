@@ -70,7 +70,20 @@ describe('PerfOverlaySettingsPanel: the two sections', () => {
     delete (globalThis as BridgeHost).wocDesktop;
   });
 
-  it('titles the view "Performance" and heads the overlay controls "Performance Overlay"', () => {
+  it('titles the view "Performance" with no section heading when the overlay is the only section', () => {
+    // A browser or phone session: one section, so no heading (on a phone in
+    // landscape it would eat close to half of the visible strip).
+    delete (globalThis as BridgeHost).wocDesktop;
+    const container = render();
+    expect(container.querySelector('.panel-title span')?.textContent).toBe(
+      t('hudChrome.perf.title'),
+    );
+    expect(container.querySelector('.perf-panel > .perf-card-title')).toBeNull();
+    expect(container.textContent).not.toContain(t('hudChrome.hostDiag.title'));
+  });
+
+  it('heads the overlay controls "Performance Overlay" once the System Report follows them', () => {
+    installBridge(true);
     const container = render();
     expect(container.querySelector('.panel-title span')?.textContent).toBe(
       t('hudChrome.perf.title'),
