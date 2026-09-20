@@ -9,7 +9,6 @@
 // list and tells every client to clear) need nothing new. Draws no rng: a cast's
 // route and its souls' places are seeded from the cue id.
 
-import { riftInstanceOrigin } from '../data';
 import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
 import {
@@ -35,6 +34,7 @@ import {
   soulSpawnOffsets,
 } from './hoard_bone_reaper_core';
 import { hoardBossKit } from './hoard_boss_kits';
+import { measureHoardRoom } from './hoard_room';
 import {
   HOARD_DOUBLE_MECHANIC_INTENSITY,
   hoardIntensity,
@@ -42,7 +42,6 @@ import {
   hoardPressure,
 } from './hoard_scaling';
 import { capRiftNonLethalMechanicDamage } from './ranks';
-import { generateRiftFloor } from './rift_gen';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export { HOARD_HARVESTED_SOUL_AURA_ID };
@@ -95,44 +94,19 @@ export function boneReaperFrame(
   inst: RiftInstance,
   boss: Entity,
 ): BoneScytheFrame & { halfWidth: number; clearDepth: number } {
-  const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
-  const layout = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex, inst.upgrade).layout;
   // Measured from where he STANDS: he is pinned there for the cast, so the
-  // route's clearance round him holds wherever he was being fought.
-  const localX = boss.pos.x - origin.x;
-  const localZ = boss.pos.z - origin.z;
-  const forwardSign: 1 | -1 = layout.sideWallZ < localZ ? -1 : 1;
-  const right = (layout.shellPolygon ?? []).filter((p) => p.x > 0).sort((a, b) => a.z - b.z);
-  const halfWidthAt = (z: number): number => {
-    let before: { x: number; z: number } | undefined;
-    for (const point of right) {
-      if (z <= point.z) {
-        if (!before) return point.x;
-        const t = (z - before.z) / Math.max(1e-6, point.z - before.z);
-        return before.x + (point.x - before.x) * t;
-      }
-      before = point;
-    }
-    return before?.x ?? layout.floorHalfX ?? 20;
-  };
-  // Walk forward from the boss: the room is "clear" while it stays wide enough
-  // to leave a way round the blade, and the narrowest width on the way sizes it.
-  const needed = BONE_SCYTHE.reach + BONE_SCYTHE.wallMargin + BONE_SCYTHE.minLateral;
-  let narrowest = Number.POSITIVE_INFINITY;
-  let clearDepth = 0;
-  for (let step = 2; step <= BONE_SCYTHE.maxDepth + BONE_SCYTHE.reach; step += 2) {
-    const z = localZ + forwardSign * step;
-    if (z < layout.zMin + 2 || z > layout.zMax - 2) break;
-    const half = halfWidthAt(z) - Math.abs(localX);
-    if (half < needed) break;
-    narrowest = Math.min(narrowest, half);
-    clearDepth = step;
-  }
-  if (!Number.isFinite(narrowest)) narrowest = needed;
+  // route's clearance round him holds wherever he was being fought. The room is
+  // "clear" while it stays wide enough to leave a way round the blade.
+  const room = measureHoardRoom(
+    inst,
+    boss,
+    BONE_SCYTHE.reach + BONE_SCYTHE.wallMargin + BONE_SCYTHE.minLateral,
+    BONE_SCYTHE.maxDepth + BONE_SCYTHE.reach,
+  );
   return {
-    ...scytheFrameFor(narrowest, clearDepth - BONE_SCYTHE.reach, forwardSign),
-    halfWidth: narrowest,
-    clearDepth,
+    ...scytheFrameFor(room.halfWidth, room.clearDepth - BONE_SCYTHE.reach, room.forwardSign),
+    halfWidth: room.halfWidth,
+    clearDepth: room.clearDepth,
   };
 }
 

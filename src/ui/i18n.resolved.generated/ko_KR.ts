@@ -11197,7 +11197,8 @@ export const ko_KR: EnTranslations = {
       "hoard_cast_stun": "기절의 일격",
       "hoard_cast_silence": "침묵의 비명",
       "hoard_cast_hex": "주술",
-      "hoard_lightning_strike": "번개 강타"
+      "hoard_lightning_strike": "번개 강타",
+      "hoard_ice_age": "빙하기"
     }
   },
   "questUi": {

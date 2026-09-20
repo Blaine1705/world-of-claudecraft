@@ -11197,7 +11197,8 @@ export const fr_FR: EnTranslations = {
       "hoard_cast_stun": "Stunning Blow",
       "hoard_cast_silence": "Silencing Shriek",
       "hoard_cast_hex": "Hex",
-      "hoard_lightning_strike": "Lightning Strike"
+      "hoard_lightning_strike": "Lightning Strike",
+      "hoard_ice_age": "Ice Age"
     }
   },
   "questUi": {

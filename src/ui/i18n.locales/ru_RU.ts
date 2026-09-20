@@ -3184,6 +3184,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.hoard_cast_silence': 'Заглушающий визг',
   'abilityUi.cast.hoard_cast_hex': 'Сглаз',
   'abilityUi.cast.hoard_lightning_strike': 'Удар молнии',
+  'abilityUi.cast.hoard_ice_age': 'Ледниковый период',
   'abilityUi.cast.rift_venom_execution': 'Ядовитая лужа',
   'abilityUi.cast.rift_venom_strike': 'Метка паучьей матки',
   'questUi.tracker.title': 'Задания',

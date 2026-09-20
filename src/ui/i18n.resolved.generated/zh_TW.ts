@@ -11197,7 +11197,8 @@ export const zh_TW: EnTranslations = {
       "hoard_cast_stun": "震暈重擊",
       "hoard_cast_silence": "沉默尖嘯",
       "hoard_cast_hex": "妖術",
-      "hoard_lightning_strike": "雷霆打擊"
+      "hoard_lightning_strike": "雷霆打擊",
+      "hoard_ice_age": "冰河時代"
     }
   },
   "questUi": {

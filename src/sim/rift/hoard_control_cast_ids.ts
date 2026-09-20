@@ -22,6 +22,10 @@ export const HOARD_CONTROL_CAST_SCHOOLS: Readonly<Record<string, { school: Aura[
     [HOARD_CAST_HEX]: { school: 'nature' },
   });
 
+/** Hoarfrost's Ice Age (hoard_ice_age.ts): a cast bar to read, never one to
+ *  kick, so it has no interruptible school. */
+export const HOARD_CAST_ICE_AGE = 'hoard_ice_age';
+
 /** The Storm Caller's Lightning Strike (hoard_lightning_strike.ts), here for the
  *  same reason: healer_channel.ts reads its school. */
 export const HOARD_CAST_LIGHTNING_STRIKE = 'hoard_lightning_strike';

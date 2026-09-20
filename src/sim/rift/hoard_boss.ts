@@ -23,6 +23,12 @@ import {
   pointInHoardAnnulus,
   pointInHoardTideWave,
 } from './hoard_boss_kits';
+import {
+  clearHoardIceAge,
+  isIceAgeCue,
+  tickHoardIceAge,
+  tickHoardIceAgeCue,
+} from './hoard_ice_age';
 import { hoardLightningStrikeCues } from './hoard_lightning_strike';
 import { startHoardOrbitalLightning, tickHoardOrbitalCarrier } from './hoard_orbital_lightning';
 import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
@@ -253,6 +259,7 @@ function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   removeTotem(ctx, inst, inst.hoardBoss, boss);
   clearHoardStormSurge(boss, inst.hoardBoss);
   clearHoardBoneReaper(boss, inst.hoardBoss);
+  clearHoardIceAge(boss, inst.hoardBoss);
   delete inst.hoardBoss;
   for (const player of instancePlayers(ctx, inst)) {
     ctx.emit({ type: 'hoardBossCueClear', pid: player.id });
@@ -464,6 +471,10 @@ function tickSpecialKit(
   }
   if (kit === 'storm') {
     tickHoardStormSurge(ctx, boss, state);
+    return;
+  }
+  if (kit === 'frost') {
+    tickHoardIceAge(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     return;
   }
   if (kit === 'tide') {
@@ -777,10 +788,15 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     ? resolveHoardStormStaticTargets(staticPlayers)
     : undefined;
   const bonePlayers = state.cues.some(isBoneReaperCue) ? instancePlayers(ctx, inst) : [];
+  const icePlayers = state.cues.some(isIceAgeCue) ? instancePlayers(ctx, inst) : [];
   for (const cue of state.cues) {
     cue.remaining = Math.max(0, cue.remaining - DT);
     if (isBoneReaperCue(cue)) {
       if (tickHoardBoneCue(ctx, inst, boss, state, cue, bonePlayers, emitCue)) live.push(cue);
+      continue;
+    }
+    if (isIceAgeCue(cue)) {
+      if (tickHoardIceAgeCue(ctx, inst, boss, state, cue, icePlayers)) live.push(cue);
       continue;
     }
     if (cue.variant === 'storm-orbital') {

@@ -34,6 +34,7 @@ export type TranslationKeyFlat =
   | 'abilityUi.cast.hoard_cast_hex'
   | 'abilityUi.cast.hoard_cast_silence'
   | 'abilityUi.cast.hoard_cast_stun'
+  | 'abilityUi.cast.hoard_ice_age'
   | 'abilityUi.cast.hoard_lightning_strike'
   | 'abilityUi.cast.rift_arcane_execution'
   | 'abilityUi.cast.rift_arcane_strike'

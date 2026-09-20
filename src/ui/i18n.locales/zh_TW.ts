@@ -3036,6 +3036,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.hoard_cast_silence': '沉默尖嘯',
   'abilityUi.cast.hoard_cast_hex': '妖術',
   'abilityUi.cast.hoard_lightning_strike': '雷霆打擊',
+  'abilityUi.cast.hoard_ice_age': '冰河時代',
   'abilityUi.cast.rift_venom_execution': '毒液池',
   'abilityUi.cast.rift_venom_strike': '蜘蛛母后之印',
   'questUi.tracker.title': '任務',

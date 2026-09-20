@@ -409,6 +409,13 @@ something this file marks as restricted, ask first: tony@levystreet.com.
   third-party mesh, texture or reference image is used.
   Source and provenance: `docs/design/bone-reaper/README.md`.
 
+### Ice Age (Hoarfrost's fallen icicles)
+
+- `public/vfx/ice-age/pillars.glb`: original procedural Blender art authored for
+  World of ClaudeCraft from the owner's Ice Age brief. No third-party mesh,
+  texture or reference image is used.
+  Source and provenance: `docs/design/ice-age/README.md`.
+
 ### Buried Hoard reward chest
 
 - `public/models/props/hoard_reward_chest.glb`: original procedural Blender art

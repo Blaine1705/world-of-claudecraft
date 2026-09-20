@@ -45,6 +45,7 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.hoard_cast_silence': true,
   'abilityUi.cast.hoard_cast_hex': true,
   'abilityUi.cast.hoard_lightning_strike': true,
+  'abilityUi.cast.hoard_ice_age': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');

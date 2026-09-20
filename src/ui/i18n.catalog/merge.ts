@@ -545,6 +545,8 @@ const mergeStringsEn = {
       hoard_cast_silence: 'Silencing Shriek',
       hoard_cast_hex: 'Hex',
       hoard_lightning_strike: 'Lightning Strike',
+      // Hoarfrost's survival cast (src/sim/rift/hoard_ice_age.ts): read, never kicked.
+      hoard_ice_age: 'Ice Age',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
