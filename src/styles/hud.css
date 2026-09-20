@@ -2813,10 +2813,19 @@
     gap: 4px;
     margin-top: 4px;
     height: 10px;
+    /* The bar stack tucks 14px under the portrait medallion (.uf-bars
+       margin-left), and the 64px disc overhangs the stack by a further 18px.
+       Bars read fine under that edge and the name plaque pads past it, but
+       a 12px pip at the stack's left edge sat FULLY under the disc: five
+       combo points showed as four beside the name. Pay the overhang here so
+       every pip starts clear of the disc on desktop and the touch layout
+       (which inherits the same tuck). */
+    padding-left: 22px;
   }
   .combo-pip {
     width: 12px;
     height: 10px;
+    flex-shrink: 0;
     border-radius: 50%;
     border: 1px solid #5c2020;
     background: #2a0d0d;
