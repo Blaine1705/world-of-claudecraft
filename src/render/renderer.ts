@@ -388,7 +388,7 @@ import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
-import { hoardEntrance } from './hoard_entrance';
+import { HOARD_BODY_IDS, hoardEntrance } from './hoard_entrance';
 import {
   buildHoardValley,
   disposeHoardValleyGroup,
@@ -993,7 +993,7 @@ const BLOB_SHADOW_RANGE_SQ = CHARACTER_LOD_RANGE_SQ;
 // `onGround`, so the flag alone never fires the jump clip for the mirrored world.
 // Rift portal-family template ids (module-hoisted: createView is a hot path and
 // allocated this Set per view).
-const RIFT_PORTAL_IDS = new Set(['rift_portal', 'rift_descent', 'rift_exit', 'hoard_entrance']);
+const RIFT_PORTAL_IDS = new Set(['rift_portal', 'rift_descent', 'rift_exit', ...HOARD_BODY_IDS]);
 
 const AIRBORNE_EPS = 0.4;
 /**

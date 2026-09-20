@@ -339,6 +339,8 @@ export interface RiftInstance {
     headCount: number;
     /** The owner's level on entry: the hoard's mobs never exceed it. */
     level: number;
+    /** The reward chest the final boss leaves (hoard_reward_chest.ts). */
+    chest?: import('./hoard_reward_chest').HoardRewardChestState;
   } | null;
   /** The sealed reward cache the giga-boss drops (`rift_locked_chest`), opened via
    * the shared lockpicking minigame; null until the boss falls. */

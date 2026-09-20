@@ -13,6 +13,7 @@ import {
   hoardRimScale,
   hoardTerrainSample,
 } from './hoard_entrance_core';
+import { HOARD_REWARD_CHEST_TEMPLATES, hoardRewardChest } from './hoard_reward_chest';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 const URL = '/models/props/hoard_entrance.glb';
@@ -28,6 +29,9 @@ const pebble = markSharedGeometry(new THREE.IcosahedronGeometry(1, 0));
 const plane = markSharedGeometry(new THREE.PlaneGeometry(1, 1));
 const materials = new Map<string, THREE.Material>();
 
+/** Every object the hoard gives a bespoke body through the override below. */
+export const HOARD_BODY_IDS = ['hoard_entrance', ...HOARD_REWARD_CHEST_TEMPLATES];
+
 /** The orchestrator's optional body override leaves every ordinary door unchanged. */
 export function hoardEntrance(
   entity: Entity,
@@ -35,9 +39,10 @@ export function hoardEntrance(
   reducedMotion: () => boolean,
   alreadyOpen = false,
 ) {
+  // The hoard's other bespoke object rides the same override: the reward chest.
   return entity.templateId === 'hoard_entrance'
     ? buildHoardEntrance(entity, ground, reducedMotion, source, alreadyOpen)
-    : null;
+    : hoardRewardChest(entity, reducedMotion);
 }
 
 function lightMaterial(color: number, shaft = false): THREE.ShaderMaterial {

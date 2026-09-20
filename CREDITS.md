@@ -402,6 +402,13 @@ something this file marks as restricted, ask first: tony@levystreet.com.
   No third-party models or textures. Project asset, with the project only.
   Source and provenance: `docs/design/orbital-lightning/shipping-assets.md`.
 
+### Buried Hoard reward chest
+
+- `public/models/props/hoard_reward_chest.glb`: original procedural Blender art
+  authored for World of ClaudeCraft from the owner's reward chest brief. No
+  third-party mesh, texture or reference image is used.
+  Source and provenance: `docs/design/reward-chest/README.md`.
+
 ### Buried Hoard entrance
 
 - `public/models/props/hoard_entrance.glb`: original procedural model authored for

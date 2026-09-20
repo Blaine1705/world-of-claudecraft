@@ -16,6 +16,7 @@ import {
   vaultHealthFactor,
 } from '../src/sim/content/treasure_maps';
 import { isRiftPos } from '../src/sim/data';
+import { openHoardRewardChest } from '../src/sim/rift/hoard_reward_chest';
 import { RIFT_RANK_BASE_LEVEL, riftRankTuningFor } from '../src/sim/rift/ranks';
 import { riftFloorCount } from '../src/sim/rift/rift_gen';
 import { vaultSeedOpen, vaultSeedTier, vaultSeedZone } from '../src/sim/rift/vault_seed';
@@ -218,6 +219,14 @@ describe('the vault run', () => {
       sim.player.hp = sim.player.maxHp;
       evs.push(...sim.tick());
     }
+    // The kill no longer pays by itself: it leaves a chest, and opening it pays.
+    expect(ofType(evs, 'treasureVaultLooted')).toHaveLength(0);
+    const chestId = inst.vault?.chest?.entityId;
+    const chest = chestId === undefined ? undefined : sim.entities.get(chestId);
+    if (!chest) throw new Error('missing hoard reward chest');
+    sim.player.pos = { ...chest.pos, x: chest.pos.x + 1.5 };
+    openHoardRewardChest(sim.ctx, chest.id, sim.player.id);
+    evs.push(...sim.drainEvents());
     const looted = ofType(evs, 'treasureVaultLooted');
     expect(looted).toHaveLength(1);
     expect(looted[0].capped).toBe(false);

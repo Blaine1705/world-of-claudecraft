@@ -1,3 +1,4 @@
+import { isHoardRewardChestTemplate, openHoardRewardChest } from './rift/hoard_reward_chest';
 import { isRiftEntranceTemplate } from './rift/vault_seed';
 import { vehicleStationByEntityId } from './vehicle_stations';
 import { enterVehicle } from './vehicles';
@@ -485,6 +486,10 @@ export function interact(
           }
           return;
         }
+        if (isHoardRewardChestTemplate(target.templateId)) {
+          openHoardRewardChest(ctx, target.id, p.id);
+          return;
+        }
         if (target.templateId === 'rift_treasure') {
           ctx.riftOpenTreasure(target.id, p.id);
           return;
@@ -594,6 +599,10 @@ export function interact(
         p.riftLockpickOfferAt = ctx.time;
         ctx.emit({ type: 'lockpickOffer', objectId: obj.id, bountiful: false, pid: p.id });
       }
+      return;
+    }
+    if (isHoardRewardChestTemplate(obj.templateId)) {
+      openHoardRewardChest(ctx, obj.id, p.id);
       return;
     }
     if (obj.templateId === 'rift_treasure') {

@@ -33,7 +33,6 @@ import { cancelProfessionSessionOnDisplacement } from '../professions/session_te
 import type { SimContext } from '../sim_context';
 import {
   mayEnterVaultPortal,
-  payTreasureVault,
   vaultForPortal,
   vaultScaledTuning,
 } from '../treasure_vault';
@@ -43,6 +42,12 @@ import { riftFx } from './fx';
 import { hoardBossCueViews, tickHoardBossMechanics } from './hoard_boss';
 import { tickHoardControlCasts } from './hoard_control_casts';
 import { tickHoardLightningStrikes } from './hoard_lightning_strike';
+import {
+  clearHoardRewardChest,
+  HOARD_REWARD_CHEST_DAIS_GAP,
+  settleHoardRewardChest,
+  spawnHoardRewardChest,
+} from './hoard_reward_chest';
 import {
   RIFT_LOOT_RECOVERY_GRACE,
   RIFT_MIN_LEVEL,
@@ -509,6 +514,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
     }
     ctx.dropEntity(id);
   }
+  clearHoardRewardChest(ctx, inst);
   dropObjects(ctx, inst.objectIds);
   if (inst.descentId !== null) dropObjects(ctx, [inst.descentId]);
   if (inst.exitId !== null) dropObjects(ctx, [inst.exitId]);
@@ -949,6 +955,7 @@ function forceExitRiftPlayer(
   if (!p) return;
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   if (!inRiftFloorRegion(p.pos, origin) && forced) return;
+  settleHoardRewardChest(ctx, inst, pid);
   const dest = inst.returnPos;
   // Walk-in grace so the overworld portal cannot re-swallow the player the
   // tick they land next to it (clicking it deliberately still re-enters).
@@ -1460,6 +1467,14 @@ function creditRiftClearDeeds(ctx: SimContext, inst: RiftInstance, participants:
  * open for loot and egress; losing the race only forfeits the first-clear
  * extras, never the run. Returns true when this run is decided and should get
  * its exit spawned. */
+/** Where the hoard's reward chest stands: in front of the dais, the room's own
+ *  reward anchor, clear of the boss's corpse and of the way home behind it. */
+function hoardRewardChestPos(inst: RiftInstance): { x: number; z: number } {
+  const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
+  const dais = floorForInstance(inst).layout.dais;
+  return { x: origin.x + dais.x, z: origin.z + dais.z - HOARD_REWARD_CHEST_DAIS_GAP };
+}
+
 function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | null): boolean {
   if (inst.rewarded) return inst.outcome !== 'active';
   const present = instancePlayerIds(ctx, inst);
@@ -1482,7 +1497,10 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   // guaranteed themed rare + coin, B/A/S the epic ladder. No Heroic Marks.
   // A treasure vault pays its own table to every entrant instead (the rank
   // gear ladder would make a daily map a raid-gear faucet).
-  if (inst.vault) payTreasureVault(ctx, inst.vault, participants);
+  // The hoard pays through a chest the entrants open (hoard_reward_chest.ts);
+  // an unopened share is settled the moment its owner leaves.
+  if (inst.vault)
+    spawnHoardRewardChest(ctx, inst, participants, hoardRewardChestPos(inst), boss?.templateId);
   else if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
 
   // A cleared rift seals its way in: no LIVING entrant may ever walk into a
