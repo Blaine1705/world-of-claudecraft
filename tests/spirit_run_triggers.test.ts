@@ -7,15 +7,15 @@
 
 import { describe, expect, it, vi } from 'vitest';
 
-const calls: string[] = [];
+const calls: { name: string; ctx: unknown; p: unknown }[] = [];
 vi.mock('../src/sim/instances/dungeons', () => ({
-  updateDoorTriggers: () => calls.push('door'),
+  updateDoorTriggers: (ctx: unknown, p: unknown) => calls.push({ name: 'door', ctx, p }),
 }));
 vi.mock('../src/sim/rift/runs', () => ({
-  updateRiftTriggers: () => calls.push('rift'),
+  updateRiftTriggers: (ctx: unknown, p: unknown) => calls.push({ name: 'rift', ctx, p }),
 }));
 vi.mock('../src/sim/portals', () => ({
-  updatePortalTriggers: () => calls.push('portal'),
+  updatePortalTriggers: (ctx: unknown, p: unknown) => calls.push({ name: 'portal', ctx, p }),
 }));
 
 const { updateSpiritRunTriggers } = await import('../src/sim/spirit_run_triggers');
@@ -26,6 +26,11 @@ describe('updateSpiritRunTriggers', () => {
     const ctx = {} as never;
     const ghost = { kind: 'player', dead: true, ghost: true } as never;
     updateSpiritRunTriggers(ctx, ghost);
-    expect(calls).toEqual(['door', 'rift', 'portal']);
+    expect(calls.map((c) => c.name)).toEqual(['door', 'rift', 'portal']);
+    // Every trigger receives the same context and the same entity, in that order.
+    for (const c of calls) {
+      expect(c.ctx).toBe(ctx);
+      expect(c.p).toBe(ghost);
+    }
   });
 });
