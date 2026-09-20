@@ -211,10 +211,12 @@ function Invoke-DiagCollector($c) {
     $entry = [ordered]@{ status = 'ok'; durationMs = 0; error = $null; errorType = $null; data = $null }
     $t0 = Get-Date
     try {
-        # Test hooks (environment variables are inherited by worker processes).
+        #region BUILD:TESTHOOKS dev-only, the bundler strips this region from the shipped script
+        # Environment variables are inherited by worker processes.
         if ($env:HOSTDIAG_TEST_FAIL  -eq $c.Name) { throw 'injected failure (HOSTDIAG_TEST_FAIL)' }
         if ($env:HOSTDIAG_TEST_HANG  -eq $c.Name) { Start-Sleep -Seconds 3600 }
         if ($env:HOSTDIAG_TEST_CRASH -eq $c.Name) { [Environment]::FailFast('injected crash (HOSTDIAG_TEST_CRASH)') }
+        #endregion
         $reason = $null
         if ($c.Condition) { $reason = & $c.Condition }
         if ($reason) { $entry.status = 'skipped'; $entry.error = "$reason" }

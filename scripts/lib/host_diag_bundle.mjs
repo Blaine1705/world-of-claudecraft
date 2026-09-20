@@ -33,6 +33,11 @@ export const INCLUDES_HEADER =
  *  exactly like the `(?s)#region BUILD:INCLUDES.*?#endregion` pattern it ports. */
 const INCLUDES_REGION = /#region BUILD:INCLUDES[\s\S]*?#endregion/;
 
+/** Dev-only fault-injection hooks (`HOSTDIAG_TEST_*` environment variables).
+ *  Whole lines, stripped from the shipped script: a player's session
+ *  environment must not be able to hang or crash a collector. */
+const TESTHOOKS_REGION = /^[ \t]*#region BUILD:TESTHOOKS[\s\S]*?#endregion[ \t]*\r?\n/gm;
+
 const CRLF = '\r\n';
 
 /** Normalizes every line ending (LF or CRLF) to CRLF. */
@@ -103,7 +108,13 @@ export function bundleHostDiag({
   const region = buildIncludesRegion({ csFiles, libPsFiles, collectorPsFiles });
   // A function replacement, so `$&` and friends inside the region stay literal
   // (PowerShell variables are everywhere in these sources).
-  return main.replace(INCLUDES_REGION, () => region);
+  const bundled = main.replace(INCLUDES_REGION, () => region);
+  // After the inlining, so a hook region in any source file is stripped too.
+  const shipped = bundled.replace(TESTHOOKS_REGION, '');
+  if (/HOSTDIAG_TEST_/.test(shipped)) {
+    throw new Error('host-diag: a HOSTDIAG_TEST_ hook sits outside a BUILD:TESTHOOKS region');
+  }
+  return shipped;
 }
 
 /** The exact bytes that ship: UTF-8 with a BOM, because Windows PowerShell 5.1

@@ -1736,7 +1736,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.failed': 'バグ報告を送信できませんでした。もう一度お試しください。',
   'hudChrome.hostDiag.title': 'システムレポート',
   'hudChrome.hostDiag.intro':
-    'このコンピューターの詳細情報をファイルにまとめ、パフォーマンスの問題の診断に役立てます。送信は一切行われません。ファイルはお使いのコンピューターに保存されるだけです。',
+    'このコンピューターの詳細情報(プロセッサとメモリを最も多く使用しているプログラムを含む)をファイルにまとめ、パフォーマンスの問題の診断に役立てます。送信は一切行われません。ファイルはお使いのコンピューターに保存されるだけです。',
   'hudChrome.hostDiag.create': 'システムレポートを作成',
   'hudChrome.hostDiag.running': 'システム情報を収集しています...',
   'hudChrome.hostDiag.saved': 'レポートを {fileName} として保存しました。',

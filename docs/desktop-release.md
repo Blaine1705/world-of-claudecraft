@@ -997,7 +997,11 @@ Be precise about what that check buys, because it is easy to overclaim:
   and no arrangement of read-then-spawn inside one process closes that window. It is
   also not the threat to design against: such malware already owns the player's
   account, so editing a diagnostic script is a strictly worse option than what it can
-  already do directly.
+  already do directly. The window is also wider than the first spawn: the script
+  re-spawns itself from the same path once per isolated collector and once more on
+  the 32-bit relaunch arm, so it is re-read from the install directory throughout
+  the run, and the hash pins the FIRST read only. Same trust domain, same
+  conclusion, but the check should not be read as covering the later reads.
 
 ### Rebuilding it
 
@@ -1039,6 +1043,14 @@ runtime is the shape heuristic engines dislike, so verify by hand:
 4. If an engine does quarantine the script, confirm the shell degrades cleanly:
    `native.status: "unavailable"`, reason `missing`, and the Electron half still
    saved.
+
+Two behaviors are the first suspects when an engine flags the script, so triage a
+false positive against both: the `Add-Type` compile into `%TEMP%` (see
+`electron/host_diag/CLAUDE.md`), and the Browsers collector reading each Chromium
+browser's `Local State` file. That file is single-line JSON, so extracting the one
+hardware-acceleration boolean means reading it whole, and it also holds the
+DPAPI-wrapped `os_crypt` key, which makes "PowerShell spawned by a game reads
+`Local State`" a classic infostealer indicator. Only the boolean is kept.
 
 ## Post-release verification checklist (each OS, each channel)
 

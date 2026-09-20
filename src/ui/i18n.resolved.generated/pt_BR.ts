@@ -2523,7 +2523,7 @@ export const pt_BR: EnTranslations = {
     },
     "hostDiag": {
       "title": "System Report",
-      "intro": "Collects details about this computer into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
       "create": "Generate system report",
       "running": "Collecting system details...",
       "saved": "Report saved as {fileName}.",

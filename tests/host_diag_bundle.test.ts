@@ -126,6 +126,14 @@ describe('host-diag: the bundle is the shipping form, not the dev tree', () => {
     expect(ORCHESTRATOR).toContain("Get-Content (Join-Path $PSScriptRoot 'lib\\");
   });
 
+  it('strips the dev-only fault-injection hooks from the shipped script', () => {
+    expect(FRESH_TEXT).not.toContain('HOSTDIAG_TEST_');
+    expect(FRESH_TEXT).not.toContain('BUILD:TESTHOOKS');
+    // The hooks ARE still in the dev orchestrator, so the absence is a real strip.
+    expect(ORCHESTRATOR).toContain('#region BUILD:TESTHOOKS');
+    expect(ORCHESTRATOR).toContain('$env:HOSTDIAG_TEST_HANG');
+  });
+
   it('defines every collector function the orchestrator registry dispatches to', () => {
     const fns = [...ORCHESTRATOR.matchAll(/Fn\s*=\s*'(Get-Diag\w+)'/g)].map((m) => m[1]);
     expect(fns.length).toBeGreaterThanOrEqual(9);
@@ -283,6 +291,24 @@ describe('host-diag: bundler contract on synthetic inputs', () => {
     expect(() =>
       bundleHostDiag({ ...inputs, csFiles: [{ name: 'Bad.cs', text: "ok\n'@ oops\nmore\n" }] }),
     ).toThrow(/Bad\.cs/);
+  });
+
+  it('strips a BUILD:TESTHOOKS region whole and keeps its neighbours', () => {
+    const hooked = {
+      ...inputs,
+      orchestrator: `${shell}before\n  #region BUILD:TESTHOOKS dev\n  if ($env:HOSTDIAG_TEST_FAIL) { throw 'x' }\n  #endregion\nafter\n`,
+    };
+    const text = bundleHostDiag(hooked);
+    expect(text).toContain('before\r\nafter\r\n');
+    expect(text).not.toContain('HOSTDIAG_TEST_');
+  });
+
+  it('refuses a test hook that sits outside a BUILD:TESTHOOKS region', () => {
+    const stray = {
+      ...inputs,
+      collectorPsFiles: [{ name: 'Ant.ps1', text: 'if ($env:HOSTDIAG_TEST_HANG) { }\n' }],
+    };
+    expect(() => bundleHostDiag(stray)).toThrow(/outside a BUILD:TESTHOOKS region/);
   });
 
   it('reads the tool and schema versions out of the orchestrator text', () => {

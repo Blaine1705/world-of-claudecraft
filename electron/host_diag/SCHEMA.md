@@ -47,7 +47,7 @@ Phase 1 runs in parallel, then `processes`, then `sampling` alone (so we do not 
 | `-Only` / `-Skip` with an unknown name | reported in `warnings`; exit code 2 if nothing runs any more |
 
 In every case a valid JSON document comes out, and the other collectors are unaffected.
-Test hooks: `HOSTDIAG_TEST_FAIL`, `HOSTDIAG_TEST_HANG`, `HOSTDIAG_TEST_CRASH` = `<collector>`.
+Test hooks: `HOSTDIAG_TEST_FAIL`, `HOSTDIAG_TEST_HANG`, `HOSTDIAG_TEST_CRASH` = `<collector>`. They exist in the dev sources only (`win/Invoke-HostDiag.ps1`); the bundler strips the `BUILD:TESTHOOKS` region, so the shipped `dist/HostDiag.ps1` ignores them.
 
 Progress (stdout, one line per collector): `[name] status  durationMs  error`.
 

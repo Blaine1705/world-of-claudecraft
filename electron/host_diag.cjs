@@ -37,7 +37,10 @@
 //
 // What it does NOT defeat: a verify-then-spawn race. Malware already running as
 // the player can swap the file between the hash read here and the moment
-// PowerShell opens it, and this check cannot close that window. It is also not
+// PowerShell opens it, and this check cannot close that window. The window is
+// wider than that first open, too: the script re-spawns itself from the same
+// path per isolated collector and on the 32-bit relaunch arm, so it is re-read
+// throughout the run and the hash pins the FIRST read only. It is also not
 // worth pretending otherwise: such malware already owns the account, so it has
 // far better options than editing a diagnostic script. The stronger control is
 // not a tighter check here but Authenticode-signing the .ps1 in the release
@@ -208,7 +211,7 @@ function buildHostDiagArgs({ scriptPath, appExeName } = {}) {
 
 /** The app's own exe name for -Apps, or null when it is not a plain name. */
 function appExeNameFor(execPath) {
-  const name = nodePath.basename(String(execPath ?? ''));
+  const name = nodePath.win32.basename(String(execPath ?? ''));
   return APP_EXE_NAME_RE.test(name) ? name : null;
 }
 
@@ -829,7 +832,7 @@ async function saveHostDiagFile(text, deps = {}) {
   }
   // The BASE name only: the full path names the player's home directory, and
   // this value crosses to the renderer.
-  return { status: 'saved', fileName: nodePath.basename(filePath) };
+  return { status: 'saved', fileName: nodePath.win32.basename(filePath) };
 }
 
 module.exports = {

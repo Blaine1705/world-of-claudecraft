@@ -960,6 +960,7 @@ function Get-DiagBrowsers {
         if ($path) { try { $version = (Get-Item $path).VersionInfo.ProductVersion } catch { } }
 
         # Targeted read: only the hardware-acceleration flag is extracted, nothing else is parsed or kept.
+        # Local State is single-line JSON, so the read is whole-file by necessity (docs/desktop-release.md, antivirus checklist).
         $disabled = $null; $note = $null
         try {
             if ($d.kind -eq 'chromium' -and (Test-Path $d.state)) {
@@ -1697,10 +1698,6 @@ function Invoke-DiagCollector($c) {
     $entry = [ordered]@{ status = 'ok'; durationMs = 0; error = $null; errorType = $null; data = $null }
     $t0 = Get-Date
     try {
-        # Test hooks (environment variables are inherited by worker processes).
-        if ($env:HOSTDIAG_TEST_FAIL  -eq $c.Name) { throw 'injected failure (HOSTDIAG_TEST_FAIL)' }
-        if ($env:HOSTDIAG_TEST_HANG  -eq $c.Name) { Start-Sleep -Seconds 3600 }
-        if ($env:HOSTDIAG_TEST_CRASH -eq $c.Name) { [Environment]::FailFast('injected crash (HOSTDIAG_TEST_CRASH)') }
         $reason = $null
         if ($c.Condition) { $reason = & $c.Condition }
         if ($reason) { $entry.status = 'skipped'; $entry.error = "$reason" }

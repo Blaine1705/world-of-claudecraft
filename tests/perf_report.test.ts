@@ -2910,6 +2910,41 @@ describe('host essentials ingest', () => {
     }
   });
 
+  it('accepts the block on EITHER desktop-shell arm alone: the flag, or the Electron agent', async () => {
+    const byFlag = await post(
+      { sessionId: 'host-ess-flag-only', desktopShell: true, ...GOOD },
+      '203.0.113.161',
+    );
+    const byAgent = await post(
+      { sessionId: 'host-ess-agent-only', ...GOOD },
+      '203.0.113.159',
+      ELECTRON_UA,
+    );
+    for (const stored of [byFlag, byAgent]) {
+      expect(stored.hostMemTotalMb).toBe(GOOD.hostMemTotalMb);
+      expect(stored.hostPowerPlan).toBe(GOOD.hostPowerPlan);
+      expect(stored.hostHags).toBe(true);
+    }
+  });
+
+  it("stores the shell's 'other' fold target as itself, never as the unknown member", async () => {
+    // A custom plan or overlay folds to 'other' in the shell. Were the server
+    // vocabulary to drop it, every such machine would collapse into "no evidence".
+    const stored = await post(
+      {
+        sessionId: 'host-ess-other',
+        desktopShell: true,
+        ...GOOD,
+        hostPowerPlan: 'other',
+        hostPowerMode: 'other',
+      },
+      '203.0.113.160',
+      ELECTRON_UA,
+    );
+    expect(stored.hostPowerPlan).toBe('other');
+    expect(stored.hostPowerMode).toBe('other');
+  });
+
   it('IGNORES the whole block when the report is not a desktop-shell report', async () => {
     // A browser tab has no business claiming a Windows power plan, and this
     // endpoint accepts anonymous posts.

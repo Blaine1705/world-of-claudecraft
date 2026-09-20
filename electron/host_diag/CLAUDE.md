@@ -37,6 +37,11 @@ truth. The contract (options, envelope, every collector's `data`) lives in `SCHE
   antivirus and EDR heuristic, so a first false-positive report starts there: check whether the
   engine flagged the compile rather than the script, and note that the non-native collectors
   keep working when `Add-Type` is blocked.
+- **The Browsers collector reads Chromium's `Local State` whole**, the second suspect after
+  `Add-Type`. The file is single-line JSON, so there is no bounded read that finds the
+  `hardware_acceleration_mode` flag, and it also holds the DPAPI-wrapped `os_crypt` key, so an
+  engine can read the access as infostealer-shaped. Only the boolean leaves the collector: never
+  widen what is parsed or kept from that file.
 - **The tool names itself `host-diag`**: `tool.name`, the `HOSTDIAG_*` test hooks, the
   `HostDiag.*` C# namespaces, the `@@HOSTDIAG...@@` splice markers and the `host-diag-*` output
   file prefix. The collector and helper functions stay neutral (`Get-Diag*`, `Protect-Diag*`).

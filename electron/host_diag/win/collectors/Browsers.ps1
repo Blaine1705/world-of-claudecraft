@@ -31,6 +31,7 @@ function Get-DiagBrowsers {
         if ($path) { try { $version = (Get-Item $path).VersionInfo.ProductVersion } catch { } }
 
         # Targeted read: only the hardware-acceleration flag is extracted, nothing else is parsed or kept.
+        # Local State is single-line JSON, so the read is whole-file by necessity (docs/desktop-release.md, antivirus checklist).
         $disabled = $null; $note = $null
         try {
             if ($d.kind -eq 'chromium' -and (Test-Path $d.state)) {

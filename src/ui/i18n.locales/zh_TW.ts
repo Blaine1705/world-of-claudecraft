@@ -1675,7 +1675,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.failed': '無法傳送錯誤回報。請重試。',
   'hudChrome.hostDiag.title': '系統報告',
   'hudChrome.hostDiag.intro':
-    '將這台電腦的詳細資訊收集到一個檔案中，協助診斷效能問題。不會傳送任何內容：該檔案只保存在你的電腦上。',
+    '將這台電腦的詳細資訊(包括占用最多處理器與記憶體的程式)收集到一個檔案中，協助診斷效能問題。不會傳送任何內容：該檔案只保存在你的電腦上。',
   'hudChrome.hostDiag.create': '產生系統報告',
   'hudChrome.hostDiag.running': '正在收集系統資訊...',
   'hudChrome.hostDiag.saved': '報告已儲存為 {fileName}。',

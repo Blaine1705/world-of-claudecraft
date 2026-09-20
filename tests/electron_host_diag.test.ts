@@ -887,6 +887,23 @@ describe('runHostDiag (the IPC handler is wiring only)', () => {
     expect(h.showItemInFolder).toHaveBeenCalledWith('C:\\Users\\player\\Documents\\diag.json');
   });
 
+  it('degrades to the Electron half in the WRITTEN file when the script fails its hash', async () => {
+    const spawn = vi.fn();
+    const h = runDeps({
+      platform: 'win32',
+      spawn,
+      readFileSync: () => Buffer.from('tampered'),
+      sha256Hex: () => 'deadbeef',
+    });
+    const result = await runHostDiag(h.deps);
+    expect(result).toMatchObject({ status: 'saved', nativeStatus: 'unavailable' });
+    expect(spawn).not.toHaveBeenCalled();
+    const written = JSON.parse((h.writeFileSync.mock.calls[0] as unknown as [string, string])[1]);
+    expect(written.native).toMatchObject({ status: 'unavailable', reason: 'hash-mismatch' });
+    // The Electron half is populated beside it, not an empty shell.
+    expect(written.electron.appVersion).toBe('0.43.2');
+  });
+
   it('writes nothing when the player cancels', async () => {
     const h = runDeps({
       dialog: { showSaveDialog: () => Promise.resolve({ canceled: true, filePath: '' }) },

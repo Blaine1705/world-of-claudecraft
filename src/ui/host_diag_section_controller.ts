@@ -31,7 +31,6 @@ import { perfReportSessionId } from '../game/perf_reporter';
 import { activeGpuRendererName, GFX, graphicsPresetLabel } from '../render/gfx';
 import { zoneBiomeAt } from '../sim/world';
 import { appVersionInfo } from './app_version';
-import { esc } from './esc';
 import {
   type HostDiagResultModel,
   type HostDiagState,
@@ -137,10 +136,9 @@ export function renderHostDiagSection(parent: HTMLElement, deps: HostDiagSection
       return;
     }
     live.classList.add(`is-${model.tone}`);
-    // esc() on the resolved line: it is written as HTML so an interpolated file
-    // name the shell handed back can never be markup (the one untrusted value
-    // this section prints).
-    message.innerHTML = esc(t(model.messageKey, model.messageValues));
+    // textContent, never HTML: the interpolated file name the shell handed
+    // back is the one untrusted value this section prints.
+    message.textContent = t(model.messageKey, model.messageValues);
   };
 
   let state: HostDiagState = hostDiagIdle();

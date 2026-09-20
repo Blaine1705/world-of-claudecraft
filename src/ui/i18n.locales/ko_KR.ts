@@ -1726,7 +1726,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.failed': '버그 신고를 보낼 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.hostDiag.title': '시스템 보고서',
   'hudChrome.hostDiag.intro':
-    '이 컴퓨터의 세부 정보를 파일로 모아 성능 문제를 진단하는 데 도움을 줍니다. 전송되는 것은 없습니다. 파일은 사용자의 컴퓨터에만 남습니다.',
+    '프로세서와 메모리를 가장 많이 사용하는 프로그램을 포함한 이 컴퓨터의 세부 정보를 파일로 모아 성능 문제를 진단하는 데 도움을 줍니다. 전송되는 것은 없습니다. 파일은 사용자의 컴퓨터에만 남습니다.',
   'hudChrome.hostDiag.create': '시스템 보고서 만들기',
   'hudChrome.hostDiag.running': '시스템 정보를 수집하는 중...',
   'hudChrome.hostDiag.saved': '보고서가 {fileName}(으)로 저장되었습니다.',

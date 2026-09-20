@@ -135,10 +135,13 @@ ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS refresh_hz INT NOT NULL
 -- "Host essentials": the host facts only the Electron desktop shell can see,
 -- which the browser sandbox cannot (electron/host_essentials.cjs). Web and
 -- mobile rows carry none of them, and the ingest IGNORES the whole block unless
--- desktop_shell is true for the same report. The memory figures are already
--- rounded by the shell (256 MB total, 64 MB free) because an exact installed-RAM
--- byte count is a fingerprint on an endpoint that accepts anonymous posts, and
--- the two power settings are CLOSED VOCABULARIES folded in the shell: the raw
+-- desktop_shell is true for the same report. The memory figures are rounded BY
+-- THE SHELL (256 MB total, 64 MB free, electron/host_essentials.cjs) because an
+-- exact installed-RAM byte count is a fingerprint on an endpoint that accepts
+-- anonymous posts. The shell owns that rounding: the ingest floors to whole MB
+-- and clamps (hostMbIn), it does not re-snap to those steps, so the guarantee
+-- holds for our shell and not for a hand-crafted post. The
+-- two power settings are CLOSED VOCABULARIES folded in the shell: the raw
 -- Windows power-scheme GUID is never sent or stored, since a custom plan's GUID
 -- identifies one machine (the same reason refresh_hz is rounded to whole Hz).
 -- host_power_plan is '' | balanced | high_performance | power_saver | ultimate |
