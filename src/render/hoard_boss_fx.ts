@@ -16,7 +16,11 @@ import {
 
 const SLOT_COUNT = 8;
 const SEGMENTS = 40;
-const LIFT = 0.1;
+/** Concentric rings a floor disc or sector is draped over. A plain fan only
+ *  samples the ground at its centre and rim, so any bump in between poked
+ *  through the telegraph; a grid follows the ground all the way across. */
+const RINGS = 6;
+const LIFT = 0.16;
 
 interface CueSlot {
   group: THREE.Group;
@@ -56,6 +60,11 @@ function material(color: number, opacity: number, additive = false): THREE.MeshB
     blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
     side: THREE.DoubleSide,
     toneMapped: false,
+    // Pull the telegraph toward the camera in depth, so it never z-fights the
+    // floor it is lying on.
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -4,
   });
 }
 
@@ -66,10 +75,26 @@ function geometry(vertexCount: number, indices: number[]): THREE.BufferGeometry 
   return result;
 }
 
+/** Vertex index of ring `ring` (1-based), rim point `index`, in a radial grid. */
+function gridVertex(ring: number, index: number): number {
+  return 1 + (ring - 1) * (SEGMENTS + 1) + index;
+}
+
+/** A centre vertex plus RINGS rings of SEGMENTS + 1 points: a fan to the first
+ *  ring, then quads ring to ring. */
 function fanGeometry(): THREE.BufferGeometry {
   const indices: number[] = [];
-  for (let index = 0; index < SEGMENTS; index++) indices.push(0, index + 1, index + 2);
-  return geometry(SEGMENTS + 2, indices);
+  for (let index = 0; index < SEGMENTS; index++) {
+    indices.push(0, gridVertex(1, index), gridVertex(1, index + 1));
+    for (let ring = 1; ring < RINGS; ring++) {
+      const a = gridVertex(ring, index);
+      const b = gridVertex(ring, index + 1);
+      const c = gridVertex(ring + 1, index);
+      const d = gridVertex(ring + 1, index + 1);
+      indices.push(a, c, b, b, c, d);
+    }
+  }
+  return geometry(1 + RINGS * (SEGMENTS + 1), indices);
 }
 
 function ringGeometry(): THREE.BufferGeometry {
@@ -124,18 +149,21 @@ function writeDisc(
 ): void {
   const position = positionAttribute(target);
   setLocalVertex(position, 0, 0, 0, centerY, cue.x, cue.z, groundY);
-  for (let index = 0; index <= SEGMENTS; index++) {
-    const angle = (index / SEGMENTS) * Math.PI * 2;
-    setLocalVertex(
-      position,
-      index + 1,
-      Math.cos(angle) * cue.radius * 0.82,
-      Math.sin(angle) * cue.radius * 0.82,
-      centerY,
-      cue.x,
-      cue.z,
-      groundY,
-    );
+  for (let ring = 1; ring <= RINGS; ring++) {
+    const radius = cue.radius * 0.82 * (ring / RINGS);
+    for (let index = 0; index <= SEGMENTS; index++) {
+      const angle = (index / SEGMENTS) * Math.PI * 2;
+      setLocalVertex(
+        position,
+        gridVertex(ring, index),
+        Math.cos(angle) * radius,
+        Math.sin(angle) * radius,
+        centerY,
+        cue.x,
+        cue.z,
+        groundY,
+      );
+    }
   }
   position.needsUpdate = true;
   target.computeBoundingSphere();
@@ -184,18 +212,21 @@ function writeSector(
     const angle = -halfAngle + (index / SEGMENTS) * halfAngle * 2;
     const sin = Math.sin(angle);
     const cos = Math.cos(angle);
-    const worldX = Math.sin(facing + angle) * cue.radius;
-    const worldZ = Math.cos(facing + angle) * cue.radius;
-    setLocalVertex(
-      discPosition,
-      index + 1,
-      sin * cue.radius,
-      cos * cue.radius,
-      centerY,
-      cue.x + worldX - sin * cue.radius,
-      cue.z + worldZ - cos * cue.radius,
-      groundY,
-    );
+    for (let ring = 1; ring <= RINGS; ring++) {
+      const ringRadius = cue.radius * (ring / RINGS);
+      const worldX = Math.sin(facing + angle) * ringRadius;
+      const worldZ = Math.cos(facing + angle) * ringRadius;
+      setLocalVertex(
+        discPosition,
+        gridVertex(ring, index),
+        sin * ringRadius,
+        cos * ringRadius,
+        centerY,
+        cue.x + worldX - sin * ringRadius,
+        cue.z + worldZ - cos * ringRadius,
+        groundY,
+      );
+    }
     for (let edge = 0; edge < 2; edge++) {
       const radius = cue.radius * (edge === 0 ? 0.94 : 1);
       const dx = sin * radius;

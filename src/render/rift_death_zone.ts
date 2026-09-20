@@ -19,6 +19,7 @@ import * as THREE from 'three';
 import type { SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dungeons';
+import { HoardBossDressing } from './hoard_boss_dressing';
 import { HoardBossFx } from './hoard_boss_fx';
 import { HoardBossPresentation } from './hoard_boss_presentation';
 import {
@@ -62,6 +63,7 @@ export class RiftDeathZoneVisuals {
   private readonly zones = new Map<string, ZoneVisual>();
   private readonly hoardBossFx: HoardBossFx;
   private readonly hoardPresentation: HoardBossPresentation;
+  private readonly hoardDressing: HoardBossDressing;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -72,6 +74,7 @@ export class RiftDeathZoneVisuals {
   ) {
     this.hoardBossFx = new HoardBossFx(scene, groundY, compileGate);
     this.hoardPresentation = new HoardBossPresentation(world, shake);
+    this.hoardDressing = new HoardBossDressing(scene, groundY, world, compileGate);
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -82,6 +85,7 @@ export class RiftDeathZoneVisuals {
     this.hoardPresentation.sync(hoardCues);
     this.hoardBossFx.setTheme(this.world?.riftFloor?.seed);
     this.hoardBossFx.sync(hoardCues);
+    this.hoardDressing.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
       const key = `${z.x.toFixed(1)}:${z.z.toFixed(1)}:${z.radius.toFixed(1)}`;
@@ -109,6 +113,7 @@ export class RiftDeathZoneVisuals {
   /** Called each frame with the elapsed frame time in seconds. */
   update(dt: number): void {
     this.hoardBossFx.update(dt);
+    this.hoardDressing.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -126,6 +131,7 @@ export class RiftDeathZoneVisuals {
   dispose(): void {
     this.sync([]);
     this.hoardBossFx.dispose();
+    this.hoardDressing.dispose();
     this.hoardPresentation.dispose();
   }
 
