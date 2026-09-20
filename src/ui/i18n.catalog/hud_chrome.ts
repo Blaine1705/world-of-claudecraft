@@ -253,6 +253,9 @@ export const hudChromeStrings = {
     offerQuantityInput: 'Quantity to offer',
     offerQuantityConfirm: 'Offer',
     offerQuantityAll: 'Offer all',
+    // The adjust prompt's third action (click an offered row): the line
+    // leaves the table.
+    offerRemove: 'Remove',
     woc: {
       tabGold: 'Gold',
       tabWoc: '$WOC',

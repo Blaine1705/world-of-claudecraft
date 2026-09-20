@@ -523,6 +523,7 @@ export const pl_PL: EnTranslations = {
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",
       "offerQuantityAll": "Offer all",
+      "offerRemove": "Remove",
       "woc": {
         "tabGold": "Złoto",
         "tabWoc": "$WOC",

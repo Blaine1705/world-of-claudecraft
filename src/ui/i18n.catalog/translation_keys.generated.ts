@@ -12238,6 +12238,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.trade.offerQuantityHint'
   | 'hudChrome.trade.offerQuantityInput'
   | 'hudChrome.trade.offerQuantityTitle'
+  | 'hudChrome.trade.offerRemove'
   | 'hudChrome.trade.windowClosed'
   | 'hudChrome.trade.woc.accept'
   | 'hudChrome.trade.woc.accepted'

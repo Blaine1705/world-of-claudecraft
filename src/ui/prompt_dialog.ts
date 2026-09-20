@@ -54,6 +54,23 @@ export interface PromptDialogHandle {
   dismissAndReturn: () => void;
 }
 
+// Every installed prompt's handle, keyed by its element, so a family teardown
+// that only knows the prompt ELEMENT (a selector sweep over #prompt-stack) can
+// still route through dismiss() and clear the root it made inert. A prompt
+// from one window torn down by another window's sweep (the trade window's
+// adjust prompt under a bags sweep, or the reverse) would otherwise leave its
+// own root inert with nothing left to clear it.
+const HANDLES = new WeakMap<HTMLElement, PromptDialogHandle>();
+
+/** Tear down an installed prompt through its own dismiss() (inert cleared,
+ *  the caller's close run); a prompt this recipe never installed is simply
+ *  removed. */
+export function dismissInstalledPrompt(prompt: Element): void {
+  const handle = prompt instanceof HTMLElement ? HANDLES.get(prompt) : undefined;
+  if (handle) handle.dismiss();
+  else prompt.remove();
+}
+
 export function installPromptDialog(
   prompt: HTMLElement,
   opener: HTMLElement | null,
@@ -110,6 +127,7 @@ export function installPromptDialog(
     dismiss();
     opener?.focus();
   };
+  HANDLES.set(prompt, { dismiss, dismissAndReturn });
   prompt.addEventListener('keydown', (e) => {
     const ke = e as KeyboardEvent;
     // Escape: stopPropagation, not just preventDefault. The input layer's

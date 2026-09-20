@@ -55,8 +55,16 @@ export interface QuantityPromptOpts {
    *  single confirm. Goes through the same resolveCount clamp as a typed
    *  count, so a stale ceiling still lands on the live one. */
   confirmAllText?: string;
+  /** Optional destructive action beside the confirms (the trade prompt's
+   *  "Remove", taking the line off the table): closes the prompt and runs
+   *  `run` without touching resolveCount or send. */
+  remove?: { text: string; run(): void };
   cancelText: string;
   maxCount: number;
+  /** The count the input opens on, clamped to [1, maxCount]; 1 when absent
+   *  (the withdraw and deposit prompts). The trade adjust prompt seeds the
+   *  line's current count so a nudge is one press. */
+  initialCount?: number;
   /** Re-resolve the live target at submit: null refuses (stale), else the
    *  count clamped against the live state. */
   resolveCount(requested: number): number | null;
@@ -84,7 +92,9 @@ export function showQuantityPrompt(wiring: QuantityPromptWiring, opts: QuantityP
   input.min = '1';
   input.max = String(opts.maxCount);
   input.step = '1';
-  input.value = '1';
+  input.value = String(
+    Math.max(1, Math.min(opts.maxCount, Math.floor(opts.initialCount ?? 1) || 1)),
+  );
   const confirm = document.createElement('button');
   confirm.className = 'btn ui-btn ui-btn--red';
   confirm.textContent = opts.confirmText;
@@ -96,7 +106,14 @@ export function showQuantityPrompt(wiring: QuantityPromptWiring, opts: QuantityP
     confirmAll.className = 'btn ui-btn';
     confirmAll.textContent = opts.confirmAllText ?? '';
   }
-  const actions = confirmAll ? [confirm, confirmAll, cancel] : [confirm, cancel];
+  const remove = opts.remove === undefined ? null : document.createElement('button');
+  if (remove) {
+    remove.className = 'btn ui-btn';
+    remove.textContent = opts.remove?.text ?? '';
+  }
+  const actions = [confirm, confirmAll, remove, cancel].filter(
+    (b): b is HTMLButtonElement => b !== null,
+  );
   if (opts.step) {
     const { size, downAriaText, upAriaText, unitDownAriaText, unitUpAriaText } = opts.step;
     const steps = document.createElement('div');
@@ -142,6 +159,11 @@ export function showQuantityPrompt(wiring: QuantityPromptWiring, opts: QuantityP
   const submit = (): void => submitRequested(Math.floor(Number(input.value) || 0));
   confirm.addEventListener('click', submit);
   confirmAll?.addEventListener('click', () => submitRequested(opts.maxCount));
+  remove?.addEventListener('click', () => {
+    dismiss();
+    opts.remove?.run();
+    opts.afterClose(true);
+  });
   cancel.addEventListener('click', dismissAndReturn);
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submit();

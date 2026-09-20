@@ -112,6 +112,7 @@ import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
 import { BAG_ITEM_ROW_ATTR } from './panel_key_guard';
 import {
+  dismissInstalledPrompt,
   installPromptDialog as installModalPromptDialog,
   type PromptDialogHandle,
 } from './prompt_dialog';
@@ -147,7 +148,10 @@ export function dismissBagPrompts(
   owner: HTMLElement | null = document.getElementById('bags'),
 ): void {
   if (owner) closeMaterialSourcesDialogForOwner(owner);
-  for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) p.remove();
+  // Through each prompt's own dismiss() (prompt_dialog.ts registry), so a
+  // prompt another window installed over its own root (the trade window's
+  // adjust prompt shares the trade-offer-prompt class) clears that root too.
+  for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) dismissInstalledPrompt(p);
 }
 
 // An item row runs a GAME action (use / summon / equip / sell / deposit), so it

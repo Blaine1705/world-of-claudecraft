@@ -12,7 +12,9 @@ import type { InvSlot } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import {
   buildTradeItemRow,
+  resolveTradeOfferAdjust,
   resolveTradeOfferSubmit,
+  setTradeOfferLine,
   stageTradeOffer,
   TRADE_OFFER_MAX_LINES,
   tradeOfferCeiling,
@@ -120,6 +122,51 @@ describe('stageTradeOffer (counted stage, the plain click and the prompt)', () =
     expect(stageTradeOffer([], inventory, 'mat_linen_cloth', 0)).toBe(0);
     expect(stageTradeOffer([], inventory, 'mat_wool_cloth', 4)).toBe(0);
     expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 25 }]);
+  });
+});
+
+describe('setTradeOfferLine (the trade window adjust prompt)', () => {
+  const inventory: InvSlot[] = [
+    { itemId: 'mat_linen_cloth', count: 20 },
+    { itemId: 'mat_linen_cloth', count: 5 },
+  ];
+
+  it('sets a staged line to the requested total in place', () => {
+    const line = { itemId: 'mat_linen_cloth', count: 3 };
+    const staged: InvSlot[] = [{ itemId: 'other', count: 1 }, line];
+    expect(setTradeOfferLine(staged, inventory, 'mat_linen_cloth', 12)).toBe(true);
+    expect(staged[1]).toBe(line);
+    expect(line.count).toBe(12);
+  });
+
+  it('clamps to the summed held total', () => {
+    const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
+    expect(setTradeOfferLine(staged, inventory, 'mat_linen_cloth', 99)).toBe(true);
+    expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 25 }]);
+  });
+
+  it('removes the line at 0 or below and reports an unchanged line as no-op', () => {
+    const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
+    expect(setTradeOfferLine(staged, inventory, 'mat_linen_cloth', 3)).toBe(false);
+    expect(setTradeOfferLine(staged, inventory, 'mat_linen_cloth', 0)).toBe(true);
+    expect(staged).toEqual([]);
+    expect(setTradeOfferLine(staged, inventory, 'mat_linen_cloth', 4)).toBe(false);
+  });
+});
+
+describe('resolveTradeOfferAdjust (the adjust prompt stale guard)', () => {
+  const inventory: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 20 }];
+  const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
+
+  it('refuses when the line left the table or the bags no longer hold the item', () => {
+    expect(resolveTradeOfferAdjust([], inventory, 'mat_linen_cloth', 5)).toBeNull();
+    expect(resolveTradeOfferAdjust(staged, [], 'mat_linen_cloth', 5)).toBeNull();
+  });
+
+  it('clamps the typed total into [1, held total]', () => {
+    expect(resolveTradeOfferAdjust(staged, inventory, 'mat_linen_cloth', 5)).toBe(5);
+    expect(resolveTradeOfferAdjust(staged, inventory, 'mat_linen_cloth', 50)).toBe(20);
+    expect(resolveTradeOfferAdjust(staged, inventory, 'mat_linen_cloth', 0)).toBe(1);
   });
 });
 

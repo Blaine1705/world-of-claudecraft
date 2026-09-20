@@ -523,6 +523,7 @@ export const nl_NL: EnTranslations = {
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",
       "offerQuantityAll": "Offer all",
+      "offerRemove": "Remove",
       "woc": {
         "tabGold": "Goud",
         "tabWoc": "$WOC",

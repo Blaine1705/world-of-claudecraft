@@ -523,6 +523,7 @@ export const vi_VN: EnTranslations = {
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",
       "offerQuantityAll": "Offer all",
+      "offerRemove": "Remove",
       "woc": {
         "tabGold": "Vàng",
         "tabWoc": "$WOC",

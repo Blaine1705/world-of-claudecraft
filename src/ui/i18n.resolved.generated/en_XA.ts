@@ -523,6 +523,7 @@ export const en_XA: EnTranslations = {
       "offerQuantityInput": "[Ɋúáñţíţý ţó óƒƒéŕ]",
       "offerQuantityConfirm": "[Óƒƒéŕ]",
       "offerQuantityAll": "[Óƒƒéŕ áļļ]",
+      "offerRemove": "[Ŕéɱóʋé]",
       "woc": {
         "tabGold": "[Ĝóļð]",
         "tabWoc": "[$ŴÓÇ]",
@@ -10736,7 +10737,7 @@ export const en_XA: EnTranslations = {
       "emptyTheirs": "[Ñóţĥíñĝ óƒƒéŕéð ýéţ]",
       "money": "[Ɱóñéý]",
       "copper": "[çóþþéŕ]",
-      "hint": "[Çļíçķ áñ óƒƒéŕéð íţéɱ ţó ŕéɱóʋé íţ. Ɓóţĥ šíðéš ɱúšţ þŕéšš Áççéþţ Ţŕáðé.]",
+      "hint": "[Çļíçķ áñ óƒƒéŕéð íţéɱ ţó çĥáñĝé óŕ ŕéɱóʋé íţ. Ɓóţĥ šíðéš ɱúšţ þŕéšš Áççéþţ Ţŕáðé.]",
       "accept": "[Áççéþţ Ţŕáðé]",
       "waiting": "[Ŵáíţíñĝ...]",
       "cancel": "[Çáñçéļ]"

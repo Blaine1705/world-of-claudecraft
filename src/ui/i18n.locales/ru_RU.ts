@@ -16400,6 +16400,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.offerQuantityInput': 'Количество для предложения',
   'hudChrome.trade.offerQuantityConfirm': 'Предложить',
   'hudChrome.trade.offerQuantityAll': 'Предложить всё',
+  'hudChrome.trade.offerRemove': 'Убрать',
   'hudChrome.trade.woc.hintInsufficientBalance':
     'Это больше $WOC, чем есть в подключённом кошельке.',
   'hudChrome.trade.woc.priceLabel': 'Цена в долларах',

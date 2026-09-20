@@ -50,7 +50,7 @@ interface Rig {
 
 function rig(marketHooks: WocMarketHooks | null = null): Rig {
   document.body.innerHTML =
-    '<div id="trade-window" style="display:none"></div><div id="bags" style="display:none"></div>';
+    '<div id="trade-window" style="display:none"></div><div id="bags" style="display:none"></div><div id="prompt-stack"></div>';
   const host: Rig['host'] = {
     staged: { items: [], copper: 0 },
     inventory: [],
@@ -504,25 +504,101 @@ describe('a staged item renders its name in the quality colour', () => {
   });
 });
 
-describe('the unstage click mutates the LIVE staged object', () => {
-  it('decrements the very array the host holds and pushes the offer', () => {
+describe('the offered-row click opens the adjust prompt over the LIVE staged object', () => {
+  const prompt = (): HTMLElement | null =>
+    document.querySelector('#prompt-stack .trade-offer-prompt');
+  const actions = (): HTMLButtonElement[] => [
+    ...(prompt()?.querySelectorAll<HTMLButtonElement>(':scope > button') ?? []),
+  ];
+
+  function openWithLine(count = 2): Rig {
     const r = rig();
     // Open with the wolf_fang already in the sim's own-side offer (the cleaned
     // table the row renders from), avoiding a non-null assertion on tradeInfo.
-    openTrade(r, [{ itemId: 'wolf_fang', count: 2 }]);
+    openTrade(r, [{ itemId: 'wolf_fang', count }]);
+    r.host.inventory = [{ itemId: 'wolf_fang', count: 7 }];
     // Stage after the open reset, exactly as the bags window does: by writing
     // into the same object staged() returns.
-    const live = r.host.staged;
-    live.items.push({ itemId: 'wolf_fang', count: 2 });
+    r.host.staged.items.push({ itemId: 'wolf_fang', count });
     r.controller.updateTradeWindow();
     const mine = document.querySelector<HTMLElement>('#trade-window .trade-item.mine');
     expect(mine).not.toBeNull();
     mine?.click();
-    // The click handler must have walked through staged() to the live array:
-    // a defensive copy would leave the host's copy untouched and this red.
-    expect(live.items).toEqual([{ itemId: 'wolf_fang', count: 1 }]);
+    return r;
+  }
+
+  it('opens seeded with the line count, capped at the held total, with Offer / Offer all / Remove / Cancel', () => {
+    const r = openWithLine(2);
+    const p = prompt();
+    expect(p).not.toBeNull();
+    const input = p?.querySelector<HTMLInputElement>('input.prompt-number');
+    expect(input?.value).toBe('2');
+    expect(input?.max).toBe('7');
+    expect(actions().map((b) => b.textContent)).toEqual(['Offer', 'Offer all', 'Remove', 'Cancel']);
+    expect(p?.querySelectorAll('.prompt-steps button')).toHaveLength(4);
+    // The window is the inert root while the prompt is up; nothing pushed yet.
+    expect(document.querySelector<HTMLElement>('#trade-window')?.inert).toBe(true);
+    expect(r.host.pushed).toBe(0);
+  });
+
+  it('Offer sets the line to the typed count on the very array the host holds', () => {
+    const r = openWithLine(2);
+    const live = r.host.staged;
+    const input = prompt()?.querySelector<HTMLInputElement>('input.prompt-number');
+    if (input) input.value = '5';
+    actions()[0].click();
+    // The handler must have walked through staged() to the live array: a
+    // defensive copy would leave the host's copy untouched and this red.
+    expect(live.items).toEqual([{ itemId: 'wolf_fang', count: 5 }]);
     expect(r.host.staged).toBe(live);
     expect(r.host.pushed).toBe(1);
+    expect(prompt()).toBeNull();
+    expect(document.querySelector<HTMLElement>('#trade-window')?.inert).toBe(false);
+  });
+
+  it('Offer all raises the line to the held total; Remove takes it off the table', () => {
+    const r = openWithLine(2);
+    actions()[1].click();
+    expect(r.host.staged.items).toEqual([{ itemId: 'wolf_fang', count: 7 }]);
+    expect(r.host.pushed).toBe(1);
+    r.controller.updateTradeWindow();
+    document.querySelector<HTMLElement>('#trade-window .trade-item.mine')?.click();
+    actions()[2].click();
+    expect(r.host.staged.items).toEqual([]);
+    expect(r.host.pushed).toBe(2);
+    expect(prompt()).toBeNull();
+  });
+
+  it('a typed count is clamped to the LIVE held total and an unchanged count pushes nothing', () => {
+    const r = openWithLine(2);
+    r.host.inventory = [{ itemId: 'wolf_fang', count: 3 }];
+    const input = prompt()?.querySelector<HTMLInputElement>('input.prompt-number');
+    if (input) input.value = '50';
+    actions()[0].click();
+    expect(r.host.staged.items).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
+    expect(r.host.pushed).toBe(1);
+    r.controller.updateTradeWindow();
+    document.querySelector<HTMLElement>('#trade-window .trade-item.mine')?.click();
+    actions()[0].click();
+    expect(r.host.pushed).toBe(1);
+  });
+
+  it('refuses a stale prompt whose line already left the table', () => {
+    const r = openWithLine(2);
+    r.host.staged.items.splice(0);
+    actions()[0].click();
+    expect(r.host.pushed).toBe(0);
+    expect(prompt()).toBeNull();
+    expect(document.querySelector<HTMLElement>('#trade-window')?.inert).toBe(false);
+  });
+
+  it('the close transition tears the prompt down and clears inert', () => {
+    const r = openWithLine(2);
+    expect(prompt()).not.toBeNull();
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    expect(prompt()).toBeNull();
+    expect(document.querySelector<HTMLElement>('#trade-window')?.inert).toBe(false);
   });
 });
 

@@ -523,6 +523,7 @@ export const ja_JP: EnTranslations = {
       "offerQuantityInput": "差し出す数量",
       "offerQuantityConfirm": "差し出す",
       "offerQuantityAll": "すべて差し出す",
+      "offerRemove": "取り除く",
       "woc": {
         "tabGold": "金貨",
         "tabWoc": "$WOC",

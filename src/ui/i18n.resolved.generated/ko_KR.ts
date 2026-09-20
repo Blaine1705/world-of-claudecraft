@@ -523,6 +523,7 @@ export const ko_KR: EnTranslations = {
       "offerQuantityInput": "내놓을 수량",
       "offerQuantityConfirm": "내놓기",
       "offerQuantityAll": "모두 내놓기",
+      "offerRemove": "제거",
       "woc": {
         "tabGold": "금화",
         "tabWoc": "$WOC",

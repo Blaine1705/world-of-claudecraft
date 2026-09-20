@@ -523,6 +523,7 @@ export const zh_CN: EnTranslations = {
       "offerQuantityInput": "要提供的数量",
       "offerQuantityConfirm": "提供",
       "offerQuantityAll": "全部提供",
+      "offerRemove": "移除",
       "woc": {
         "tabGold": "金币",
         "tabWoc": "$WOC",

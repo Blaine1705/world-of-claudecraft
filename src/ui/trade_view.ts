@@ -69,6 +69,44 @@ export function stageTradeOffer(
   return added;
 }
 
+/** Set one staged line to exactly `count` units (the trade window's adjust
+ *  prompt), clamped to the summed held total; 0 or less takes the line off
+ *  the table. Mutates `staged` in place (the Hud-owned live object) and
+ *  returns whether anything changed, so the caller can skip a no-op push. A
+ *  line that is no longer staged is left alone (a stale prompt). */
+export function setTradeOfferLine(
+  staged: InvSlot[],
+  inventory: InvSlot[],
+  itemId: string,
+  count: number,
+): boolean {
+  const index = staged.findIndex((s) => s.itemId === itemId);
+  if (index < 0) return false;
+  const next = Math.min(tradeOfferCeiling(inventory, itemId), Math.floor(count));
+  if (next < 1) {
+    staged.splice(index, 1);
+    return true;
+  }
+  if (staged[index].count === next) return false;
+  staged[index].count = next;
+  return true;
+}
+
+/** The adjust prompt's submit guard: null REFUSES when the line left the
+ *  table or the bags no longer hold the item, else the requested total
+ *  clamped to [1, held total]. */
+export function resolveTradeOfferAdjust(
+  staged: InvSlot[],
+  inventory: InvSlot[],
+  itemId: string,
+  requested: number,
+): number | null {
+  if (!staged.some((s) => s.itemId === itemId)) return null;
+  const ceiling = tradeOfferCeiling(inventory, itemId);
+  if (ceiling < 1) return null;
+  return Math.max(1, Math.min(ceiling, Math.floor(requested) || 0));
+}
+
 /** Re-resolve the trade quantity prompt at submit against the LIVE headroom
  *  (the bank family's stale-prompt guard, bank_quantity_prompt.ts): null
  *  REFUSES when nothing fits any more (the trade closed, the stack left the
