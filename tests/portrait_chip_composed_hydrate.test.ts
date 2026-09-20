@@ -92,6 +92,22 @@ describe('composed chip in-place hydration', () => {
     expect(chip.hasAttribute('data-portrait-pending')).toBe(false);
   });
 
+  it('fills EVERY chip under root waiting on that key, not the first', () => {
+    // In production the player menu chip and the character sheet chip share a
+    // key (one look, one capture); a single-chip upgrade would leave the other
+    // on its crest.
+    const root = mountChip(
+      portraitChipHtml({ cls: 'warrior', name: 'Ayla', look: LOOK }) +
+        portraitChipHtml({ cls: 'warrior', name: 'Ayla', look: LOOK, variant: 'md' }),
+    );
+    portrait.cached.set(KEY, composedUrl);
+    emit(KEY);
+    const imgs = [...root.querySelectorAll<HTMLImageElement>('.portrait-img')];
+    expect(imgs).toHaveLength(2);
+    for (const img of imgs) expect(img.getAttribute('src')).toBe(composedUrl);
+    expect(root.querySelectorAll('.portrait-chip[data-portrait-pending]')).toHaveLength(0);
+  });
+
   it('leaves a chip waiting on a different look alone', () => {
     const root = mountChip(portraitChipHtml({ cls: 'warrior', name: 'Ayla', look: LOOK }));
     const otherKey = 'player_warrior_modular:mod:male:headshot';

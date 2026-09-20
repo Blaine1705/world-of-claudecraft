@@ -74,10 +74,16 @@ describe('a landed composed portrait reaches its consumers', () => {
     // The regression: the target and target-of-target frames used to call
     // drawClass for every player, the stock art, so a peer's authored face
     // (which rides the identity wire) never reached them.
-    for (const fn of ['drawTargetPortrait', 'drawTargetOfTargetPortrait']) {
+    // Full statements, canvas and subject both: the two draws are near twins,
+    // and a prefix pin would pass with the frames swapped.
+    const pins: Array<[string, string]> = [
+      ['drawTargetPortrait', 'this.drawPlayerPortrait(this.targetPortraitEl, target);'],
+      ['drawTargetOfTargetPortrait', 'this.drawPlayerPortrait(this.totPortraitEl, tot);'],
+    ];
+    for (const [fn, statement] of pins) {
       const draw = hud.slice(hud.indexOf(`private ${fn}(): void {`));
       const fnBody = draw.slice(0, draw.indexOf('\n  }'));
-      expect(fnBody).toContain('this.drawPlayerPortrait(');
+      expect(fnBody).toContain(statement);
       expect(fnBody).not.toContain('drawClass(');
     }
   });

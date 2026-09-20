@@ -868,7 +868,7 @@ import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
 import { TargetDiscordController } from './target_discord_controller';
-import { fillTargetFrameDescriptor } from './target_frame_descriptor';
+import { fillTargetFrameDescriptor, targetPortraitKey } from './target_frame_descriptor';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -5688,9 +5688,6 @@ export class Hud {
     slotName: (slot) => itemSlotName(slot),
     showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
     mountPreview: (container, params) => this.mountInspectPreview(container, params),
-    // The in-range card is only ever opened with the live entity (openInspect
-    // reads it off the roster), so the wire-shaped InspectEntity IS an Entity.
-    composedLook: (e) => modularLookFor(e as Entity),
   });
   // Options window painter (options_view.ts core + options_window.ts painter). The
   // window renders no item rows, so it composes no PainterHostPresentation bag; it
@@ -9199,7 +9196,7 @@ export class Hud {
           totFrame.name = entityDisplayName(tot);
           totFrame.titlePre = '';
           totFrame.titlePost = '';
-          totFrame.portraitKey = String(tot.id);
+          totFrame.portraitKey = targetPortraitKey(tot);
           totFrame.absorb = null;
           totFrame.dead = false;
           totFrame.outOfRange = false;
@@ -17596,6 +17593,7 @@ export class Hud {
       Date.now(),
       self ? selfCuratorStanding(this.sim) : null,
       self ? this.sim.equipmentInstances : undefined,
+      modularLookFor(e),
     );
   }
 

@@ -173,6 +173,12 @@ export class UnitPortraitPainter {
    * the composed capture replaces a few frames later. With every player a
    * target frame can hold composed, that doubled the portrait work of a tab
    * through a crowd; the post-entry prewarm fills the class headshots anyway.
+   *
+   * The trade-off: a composed subject whose capture FAILS holds the crest
+   * until that prewarm reaches its class and skin (750 ms per unit across the
+   * catalog), where the old ladder recovered to the class face within one
+   * capture. Bounded and rare (the lane backs a failing key off, and the
+   * prewarm is already scheduled), so the crest is accepted as the interim.
    */
   drawModularPlayer(
     canvas: HTMLCanvasElement,

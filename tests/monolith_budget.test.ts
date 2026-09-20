@@ -481,7 +481,10 @@ const MONOLITHS: MonolithRow[] = [
     // frame-rate-limit wiring plus the per-call portrait lookups compose to
     // 18291 by wc -l on the merged tree, still under the 18309 the branch
     // started from). Exact count, zero slack.
-    ceiling: 18291,
+    // LOWERED 18291 -> 18289 at the PR 4100 review round: the Inspect look now
+    // travels as an openInspect parameter (no InspectEntity cast dep), and
+    // the target-of-target key reads targetPortraitKey. Exact count, zero slack.
+    ceiling: 18289,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

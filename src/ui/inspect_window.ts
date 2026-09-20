@@ -135,9 +135,6 @@ export interface InspectWindowDeps extends PainterHostPresentation {
       look: ModularLook | null;
     },
   ): void;
-  /** The look an in-range entity composes with (the Hud's modularLookFor),
-   *  null when it keeps the fixed class rig. */
-  composedLook(e: InspectEntity): ModularLook | null;
 }
 
 export class InspectWindow {
@@ -178,6 +175,12 @@ export class InspectWindow {
     // is eqi-shaped ONLINE (no perfected), so without this the self card's
     // Unique-Equipped tag would diverge between hosts (2026-08-27 ruling).
     selfEquippedInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
+    // The inspected player's authored look, resolved by the Hud from the LIVE
+    // entity through the render layer's look provider (modularLookFor). A
+    // parameter for the same reason as selfStanding: InspectEntity mirrors the
+    // wire, and a composed look is a render-layer resolution over it, not a
+    // wire field, so the window never casts the mirror back to an Entity.
+    look?: ModularLook | null,
   ): void {
     const cls = e.templateId as PlayerClass;
     const el = this.deps.root();
@@ -271,7 +274,7 @@ export class InspectWindow {
         mainhand: e.equippedItems.mainhand ?? null,
         offhand: e.equippedItems.offhand ?? null,
         weaponSkinId: e.weaponSkinId ?? null,
-        look: this.deps.composedLook(e),
+        look: look ?? null,
       });
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
