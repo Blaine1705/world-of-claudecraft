@@ -3,6 +3,13 @@
 // zone identities, boundary coverage and combat-lane clearance testable in Node.
 
 import type { BiomeId } from '../sim/types';
+import {
+  CLIFF_SHOULDER_BOOST,
+  cliffFaceDepth,
+  cliffHeight,
+  cliffPerimeter,
+  cliffShoulder,
+} from './hoard_cliff_mass_core';
 
 export const HOARD_VALLEY_ZONE_IDS = [
   'amberfall',
@@ -193,6 +200,9 @@ export interface HoardValleyGroundStrip {
 
 export interface HoardValleyRockPlacement extends HoardValleyPoint {
   y: number;
+  /** Explicit centre height. Absent on the classic full-height wall rocks, whose
+   *  centre is derived from their scale; set on rocks embedded in the cliff body. */
+  centerY?: number;
   scaleX: number;
   scaleY: number;
   scaleZ: number;
@@ -210,6 +220,9 @@ export interface HoardValleyDressingPlacement extends HoardValleyPoint {
 
 export interface HoardValleyPlan {
   zone: HoardValleyZoneProfile;
+  /** The room outline the cliff body follows. */
+  outline: readonly HoardValleyPoint[];
+  seed: number;
   ground: HoardValleyGroundStrip[];
   cliffs: HoardValleyRockPlacement[];
   dressing: HoardValleyDressingPlacement[];
@@ -315,47 +328,90 @@ function buildGround(
   return strips;
 }
 
+/** The rock detail layer of the wall. The continuous body (hoard_cliff_mass_core)
+ *  is the wall; these are formations EMBEDDED in it, sized and placed from the
+ *  same height field so nothing can float:
+ *   - primaries: big rocks sunk into the face, only their fronts showing;
+ *   - crowns: rocks buried in the plateau that break up the skyline;
+ *   - seams: small rocks pressed into the face between the primaries. */
 function buildCliffs(
   layout: HoardValleyLayoutInput,
   zone: HoardValleyZoneProfile,
   seed: number,
   revealZ: number,
 ): HoardValleyRockPlacement[] {
-  const polygon = polygonFor(layout);
+  const perimeter = cliffPerimeter(polygonFor(layout));
   const rocks: HoardValleyRockPlacement[] = [];
   let serial = 0;
-  for (let edge = 0; edge < polygon.length; edge++) {
-    const a = polygon[edge];
-    const b = polygon[(edge + 1) % polygon.length];
-    const dx = b.x - a.x;
-    const dz = b.z - a.z;
-    const length = Math.hypot(dx, dz);
-    const nx = dz / Math.max(0.001, length);
-    const nz = -dx / Math.max(0.001, length);
-    const count = Math.max(1, Math.ceil(length / 3.8));
+  for (const edge of perimeter.edges) {
+    const ax = (edge.b.x - edge.a.x) / edge.length;
+    const az = (edge.b.z - edge.a.z) / edge.length;
+    const count = Math.max(1, Math.ceil(edge.length / 3.8));
     for (let i = 0; i < count; i++) {
       const t = (i + 0.5) / count;
-      const baseX = a.x + dx * t;
-      const baseZ = a.z + dz * t;
-      for (let row = 0; row < 2; row++) {
+      const baseX = edge.a.x + (edge.b.x - edge.a.x) * t;
+      const baseZ = edge.a.z + (edge.b.z - edge.a.z) * t;
+      const s = edge.start + edge.length * t;
+      const revealShoulder = cliffShoulder(baseX, baseZ, revealZ);
+      const wall =
+        cliffHeight(seed, s, perimeter.length) * (revealShoulder ? CLIFF_SHOULDER_BOOST : 1);
+      const place = (
+        along: number,
+        depth: number,
+        centerY: number,
+        scaleX: number,
+        scaleY: number,
+        scaleZ: number,
+      ): void => {
         const index = serial++;
-        const stagger = (hash(seed, index, 11) - 0.5) * 1.6;
-        const revealShoulder =
-          Math.abs(baseZ - revealZ) < 4.8 && Math.abs(baseX) > 5 && Math.abs(baseX) < 38;
-        const heightBoost = revealShoulder ? 1.35 : 1;
-        const scale = 1.8 + hash(seed, index, 12) * 1.75;
         rocks.push({
-          x: baseX + nx * (row * 2.7 + stagger * 0.25) + (dx / length) * stagger,
-          y: 1.5 + hash(seed, index, 13) * 1.1,
-          z: baseZ + nz * (row * 2.7 + stagger * 0.25) + (dz / length) * stagger,
-          scaleX: scale * (0.9 + hash(seed, index, 14) * 0.65),
-          scaleY: scale * (2.3 + hash(seed, index, 15) * 1.3) * heightBoost,
-          scaleZ: scale * (0.8 + hash(seed, index, 16) * 0.55),
+          x: baseX + edge.nx * depth + ax * along,
+          y: centerY,
+          centerY,
+          z: baseZ + edge.nz * depth + az * along,
+          scaleX,
+          scaleY,
+          scaleZ,
           yaw: hash(seed, index, 17) * Math.PI * 2,
           color: mixColor(zone.cliff, zone.cliffLight, 0.08 + hash(seed, index, 18) * 0.4),
           revealShoulder,
         });
-      }
+      };
+      const index = serial;
+      // Primary: tall, its foot under the floor, its back half inside the face.
+      const reach = 0.62 + hash(seed, index, 12) * 0.34;
+      const primaryHalf = (wall * reach + 1.4) / 2;
+      const girth = 2.2 + hash(seed, index, 14) * 1.7;
+      place(
+        (hash(seed, index, 11) - 0.5) * 1.6,
+        cliffFaceDepth(seed, s, perimeter.length, reach * 0.5) + girth * 0.42,
+        primaryHalf - 1.4,
+        girth,
+        primaryHalf,
+        girth * (0.8 + hash(seed, index, 16) * 0.4),
+      );
+      // Crown: two thirds of it inside the plateau, the rest is the skyline.
+      const crownHalf = 1.6 + hash(seed, index, 21) * 2.4;
+      const crownGirth = 2.4 + hash(seed, index, 22) * 2.2;
+      place(
+        (hash(seed, index, 23) - 0.5) * 2.4,
+        4.2 + hash(seed, index, 24) * 3.2,
+        wall - crownHalf * 0.34,
+        crownGirth,
+        crownHalf,
+        crownGirth * (0.8 + hash(seed, index, 25) * 0.5),
+      );
+      // Seam filler: small, pressed into the face at mid height.
+      const seamAt = 0.22 + hash(seed, index, 31) * 0.5;
+      const seamSize = 1.0 + hash(seed, index, 32) * 1.1;
+      place(
+        1.9 + (hash(seed, index, 33) - 0.5) * 1.2,
+        cliffFaceDepth(seed, s, perimeter.length, seamAt) + seamSize * 0.3,
+        wall * seamAt,
+        seamSize * 1.25,
+        seamSize,
+        seamSize * 1.1,
+      );
     }
   }
   return rocks;
@@ -427,6 +483,8 @@ export function buildHoardValleyPlan(input: {
   const centerClearHalfWidth = 8;
   return {
     zone,
+    outline: polygonFor(input.layout),
+    seed: input.seed,
     ground: buildGround(input.layout, zone, input.seed),
     cliffs: buildCliffs(input.layout, zone, input.seed, revealZ),
     dressing: buildDressing(input.layout, zone, input.seed, input.low, centerClearHalfWidth),

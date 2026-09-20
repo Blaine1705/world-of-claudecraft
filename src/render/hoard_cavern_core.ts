@@ -62,22 +62,25 @@ export function buildHoardCavernShellPlan(
   const roots: CavernRoot[] = [];
   const entryRoof: HoardValleyRockPlacement[] = [];
   const roofEndZ = Math.min(layout.zMin + 19, valley.revealZ - 15);
-  // The inner row anchors the cornice to the existing collision-hiding cliff.
-  for (let i = 0; i < valley.cliffs.length; i += 2) {
+  // The cornice rides the wall's primaries (every third placement), as shelves
+  // pressed into the cliff body rather than slabs hanging over the room.
+  for (let i = 0; i < valley.cliffs.length; i += 3) {
     const rock = valley.cliffs[i];
     const span = hoardValleySpanAtZ(layout, Math.min(layout.zMax - 0.01, rock.z));
     const side = rock.x < (span.minX + span.maxX) / 2 ? -1 : 1;
-    const y = rock.scaleY * 1.42;
+    // Just under the top of its primary, so the rock below always carries it.
+    const y = (rock.centerY ?? rock.scaleY * 0.74 - 0.7) + rock.scaleY * 0.78;
     ledges.push({
       ...rock,
-      x: rock.x - side * 1.2,
+      centerY: undefined,
+      x: rock.x + side * 0.3,
       y,
-      scaleX: rock.scaleX * 1.55,
-      scaleY: 1.4 + rock.scaleX * 0.24,
-      scaleZ: rock.scaleZ * 1.4,
+      scaleX: rock.scaleX * 1.3,
+      scaleY: 1.1 + rock.scaleX * 0.2,
+      scaleZ: rock.scaleZ * 1.25,
       yaw: rock.yaw * 0.2,
     });
-    if (i % 6 !== 0 || rock.z < roofEndZ || Math.abs(rock.x) < 12 || y < 10) continue;
+    if (i % 9 !== 0 || rock.z < roofEndZ || Math.abs(rock.x) < 12 || y < 10) continue;
     const x = rock.x - side * rock.scaleX * 0.85;
     const bend = x - side * 0.6;
     const length = 2.8 + rock.scaleX * 0.65;

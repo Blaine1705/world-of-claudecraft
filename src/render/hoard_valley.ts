@@ -14,6 +14,7 @@ import { buildHoardCavernCutaway } from './hoard_cavern_cutaway';
 import { buildHoardCavernFoliage, updateHoardCavernFoliageTint } from './hoard_cavern_foliage';
 import { buildHoardCavernGround } from './hoard_cavern_ground';
 import { buildHoardCavernShell, hoardCavernRockGeometry } from './hoard_cavern_shell';
+import { buildHoardCliffMassView, type HoardCliffMassView } from './hoard_cliff_mass';
 import {
   buildHoardValleyPlan,
   type HoardValleyDressingKind,
@@ -192,7 +193,7 @@ function buildCliffs(plan: HoardValleyPlan, shadows: boolean, boulders: boolean)
       writeInstance(
         mesh,
         slot,
-        position.set(rock.x, rock.scaleY * 0.74 - 0.7, rock.z),
+        position.set(rock.x, rock.centerY ?? rock.scaleY * 0.74 - 0.7, rock.z),
         rotation.set(0, rock.yaw, (i % 2 ? -1 : 1) * 0.08),
         scale.set(rock.scaleX, rock.scaleY, rock.scaleZ),
         rock.color,
@@ -376,6 +377,7 @@ class HoardValleyViewImpl implements HoardValleyView {
   readonly readyForEntry: Promise<void>;
   private disposed = false;
   private readonly disposeGround: () => void;
+  private readonly cliffMass: HoardCliffMassView;
   private readonly roof: THREE.InstancedMesh | undefined;
   private readonly updateSceneryCamera: (camera: THREE.Vector3, target: THREE.Vector3) => void;
 
@@ -404,6 +406,9 @@ class HoardValleyViewImpl implements HoardValleyView {
     );
     this.disposeGround = ground.dispose;
     this.group.add(ground.group);
+    // The wall is ONE continuous body; the rocks are detail embedded in it.
+    this.cliffMass = buildHoardCliffMassView(visualPlan, coloredMaterial('HoardValleyCliffMass'));
+    this.group.add(this.cliffMass.mesh);
     this.group.add(buildCliffs(visualPlan, shadows, !low));
     this.group.add(
       buildHoardCavernShell(
@@ -440,6 +445,7 @@ class HoardValleyViewImpl implements HoardValleyView {
 
   updateCamera(camera: THREE.Vector3, target: THREE.Vector3): void {
     this.updateSceneryCamera(camera, target);
+    this.cliffMass.updateCamera(camera, target, this.group.position);
     if (this.roof?.boundingBox)
       this.roof.visible = hoardCavernSceneryVisible(
         camera,
@@ -458,6 +464,7 @@ class HoardValleyViewImpl implements HoardValleyView {
       if (object instanceof THREE.InstancedMesh) object.dispose();
     });
     this.disposeGround();
+    this.cliffMass.dispose();
     this.group.clear();
     valleyOwners.delete(this.group);
   }
