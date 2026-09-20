@@ -253,7 +253,19 @@ export function bindActionBarBindBannerDrag(el: HTMLElement, uiRoot: HTMLElement
     }
     if (!moved) placeActionBarBindBanner(el, uiRoot);
   };
-  win?.addEventListener('resize', onResize);
+  if (!win) return;
+  const Controller = win.AbortController;
+  const resizeAbort = Controller ? new Controller() : null;
+  win.addEventListener('resize', onResize, resizeAbort ? { signal: resizeAbort.signal } : undefined);
+  const Observer = win.MutationObserver;
+  if (!Observer) return;
+  const observer = new Observer(() => {
+    if (el.isConnected) return;
+    if (resizeAbort) resizeAbort.abort();
+    else win.removeEventListener('resize', onResize);
+    observer.disconnect();
+  });
+  observer.observe(uiRoot.ownerDocument, { childList: true, subtree: true });
 }
 
 /** Paint the status line for the mode's current state. */

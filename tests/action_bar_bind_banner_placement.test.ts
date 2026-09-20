@@ -258,6 +258,13 @@ describe('bindActionBarBindBannerDrag', () => {
     expect(el.style.top).toBe('478px');
   });
 
+  it('removes its resize listener when the banner is removed', async () => {
+    const abortSpy = vi.spyOn(window.AbortController.prototype, 'abort');
+    el.remove();
+    await Promise.resolve();
+    expect(abortSpy).toHaveBeenCalled();
+  });
+
   it('drags by the plate, converting visual px to author px under the UI zoom', () => {
     pointer('pointerdown', 1260, 1166);
     pointer('pointermove', 1460, 966);
