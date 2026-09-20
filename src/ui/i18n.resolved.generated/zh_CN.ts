@@ -1846,7 +1846,8 @@ export const zh_CN: EnTranslations = {
       "crossHotbarEditHelp": "按住左肩键并按上方面键，即可用手柄整理十字热键栏。"
     },
     "perf": {
-      "title": "性能监视器",
+      "title": "性能",
+      "overlaySection": "性能监视器",
       "enable": "显示性能监视器",
       "description": "选择要显示的信息、监视器的位置及其外观。",
       "sectionPosition": "位置",
@@ -2522,26 +2523,12 @@ export const zh_CN: EnTranslations = {
     },
     "hostDiag": {
       "title": "系统报告",
-      "intro": "如果游戏在这台电脑上运行不流畅，请创建一份系统报告并发送给支持团队。报告会说明这台电脑的配置和游戏的设置，帮助我们找出拖慢帧率的原因。",
-      "containsTitle": "报告包含的内容",
-      "containsHardware": "硬件和驱动程序：电脑品牌和型号、处理器、内存、显卡以及可用磁盘空间。",
-      "containsWindows": "Windows 版本、电源和电池状态以及图形设置。",
-      "containsNvidia": "NVIDIA 控制面板设置（如果已安装该软件）。",
-      "containsDisplays": "显示器配置：屏幕数量、分辨率和刷新率。",
-      "containsPrograms": "占用处理器和内存最多的程序的名称。",
-      "containsBrowsers": "已安装的网页浏览器及其版本，以及是否开启了硬件加速。",
-      "containsGame": "游戏和启动器版本、当前的图形设置和区域，以及一个会话代码，用于将这份报告与游戏已经发送的性能数据对应起来。",
-      "privacy": "报告不包含你的文件、用户名或账号信息。你的电脑名称也不会包含在内，而是由一个随机代码代替。不会自动发送任何内容：报告是保存在你电脑上的一个文件，由你决定发给谁。",
-      "create": "创建报告",
-      "running": "正在收集系统信息... 需要几秒钟。",
+      "intro": "将这台电脑的详细信息收集到一个文件中，帮助诊断性能问题。不会发送任何内容：该文件只保存在你的电脑上。",
+      "create": "生成系统报告",
+      "running": "正在收集系统信息...",
       "saved": "报告已保存为 {fileName}。",
       "savedNoName": "报告已保存。",
-      "detailPartial": "部分信息未能收集。这份报告仍然有用。",
-      "detailUnavailable": "Windows 系统扫描工具缺失或已被更改，因此只包含了基本信息。重新安装游戏即可恢复。",
-      "detailNativeError": "Windows 系统扫描无法运行，因此只包含了基本信息。",
-      "busy": "报告正在创建中。",
-      "failed": "无法创建报告。请重试。",
-      "sendHint": "请通过 Discord 将保存的文件发送给支持团队，或将其附加到你的支持请求中。"
+      "failed": "无法创建报告。请重试。"
     },
     "paperdoll": {
       "unequipAria": "卸下 {item}",

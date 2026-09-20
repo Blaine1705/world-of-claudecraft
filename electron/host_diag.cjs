@@ -558,6 +558,13 @@ function withTimeout(promise, ms, deps = {}) {
   });
 }
 
+/** One reduced app.getAppMetrics() reading, guarded like every other getter.
+ *  Its own function because runHostDiag takes this reading itself, on its own
+ *  schedule (see the deferAppMetrics note below). */
+function readAppMetrics(app) {
+  return reduceAppMetrics(safeRead(() => app?.getAppMetrics?.()));
+}
+
 /**
  * The Electron-side snapshot: a whitelisted, privacy-safe reading of this
  * machine and this process. Every getter is individually guarded, so a wedged
@@ -594,7 +601,12 @@ async function collectElectronHostInfo(deps = {}) {
       logicalCores: Array.isArray(cpus) ? cpus.length : null,
     },
     memory: numericFields(safeRead(() => proc.getSystemMemoryInfo?.())),
-    appMetrics: reduceAppMetrics(safeRead(() => app?.getAppMetrics?.())),
+    // app.getAppMetrics() reports percentCPUUsage SINCE THE PREVIOUS CALL, so a
+    // lone call always reads 0. runHostDiag primes it and then takes the real
+    // reading after the slow native half has settled, which makes the figure the
+    // app's average over the whole collection window; it asks for that by
+    // passing deferAppMetrics and attaches the field itself (readAppMetrics).
+    appMetrics: deps.deferAppMetrics === true ? null : readAppMetrics(app),
     onBatteryPower: safeRead(() => powerMonitor?.isOnBatteryPower?.()) === true,
     displays: reduceDisplays(
       safeRead(() => screen?.getAllDisplays?.()),
@@ -708,6 +720,13 @@ let runInFlight = false;
  * The two halves run in PARALLEL: the Windows layer is about 5 s of waiting on
  * other processes, and the Electron readings are instant except getGPUInfo,
  * which has its own bound.
+ *
+ * The ONE reading that is deliberately not parallel is app.getAppMetrics():
+ * percentCPUUsage is measured since the PREVIOUS call, so a single call always
+ * reports 0. A discarded priming call here opens the window, the Electron
+ * snapshot skips the field (deferAppMetrics), and the real reading is taken
+ * once BOTH halves have settled, which makes the CPU figures the app's average
+ * over the roughly 5 s collection rather than a row of zeros.
  */
 async function runHostDiag(deps = {}) {
   const now = deps.now ?? (() => Date.now());
@@ -719,6 +738,9 @@ async function runHostDiag(deps = {}) {
   try {
     const app = deps.app;
     const platform = deps.platform ?? process.platform;
+    // Prime the CPU window (see the note above); the result is deliberately
+    // discarded, and a wedged or missing API must not fail the run.
+    safeRead(() => app?.getAppMetrics?.());
     const [native, electron] = await Promise.all([
       runNativeHostDiag({
         ...deps,
@@ -729,8 +751,10 @@ async function runHostDiag(deps = {}) {
           appPath: safeRead(() => app?.getAppPath?.()) ?? '',
         },
       }),
-      collectElectronHostInfo(deps),
+      collectElectronHostInfo({ ...deps, deferAppMetrics: true }),
     ]);
+    // Both halves have settled, so this reading spans the whole collection.
+    if (electron && typeof electron === 'object') electron.appMetrics = readAppMetrics(app);
     const report = assembleHostDiagReport({
       game: deps.game,
       electron,

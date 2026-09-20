@@ -9974,7 +9974,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Ngọc Bích',
   'hudChrome.perf.themes.mono': 'Đơn Sắc',
   'hudChrome.perf.thresholds': 'Cảnh Báo Theo Màu',
-  'hudChrome.perf.title': 'Lớp Phủ Hiệu Năng',
+  'hudChrome.perf.overlaySection': 'Lớp Phủ Hiệu Năng',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',

@@ -1654,7 +1654,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.notes.baseChance': '全ての冒険者が共有する5%の基本確率を含みます。',
   'hudChrome.statInfo.notes.dpsApprox':
     '推定値であり、クリティカルやアビリティによるダメージは含みません。',
-  'hudChrome.perf.title': 'パフォーマンスオーバーレイ',
+  'hudChrome.perf.title': 'パフォーマンス',
+  'hudChrome.perf.overlaySection': 'パフォーマンスオーバーレイ',
   'hudChrome.perf.enable': 'パフォーマンスオーバーレイを表示',
   'hudChrome.perf.description': '表示する統計、オーバーレイの位置、外観を設定します。',
   'hudChrome.perf.sectionPosition': '位置',
@@ -1735,37 +1736,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.failed': 'バグ報告を送信できませんでした。もう一度お試しください。',
   'hudChrome.hostDiag.title': 'システムレポート',
   'hudChrome.hostDiag.intro':
-    'このコンピューターでゲームの動作が重い場合は、システムレポートを作成してサポートチームに送ってください。レポートにはこのコンピューターの構成とゲームの設定が記録されるため、フレームレートが下がる原因を調べるのに役立ちます。',
-  'hudChrome.hostDiag.containsTitle': 'レポートに含まれる内容',
-  'hudChrome.hostDiag.containsHardware':
-    'ハードウェアとドライバー: コンピューターのメーカーと機種、プロセッサー、メモリ、グラフィックカード、ディスクの空き容量。',
-  'hudChrome.hostDiag.containsWindows':
-    'Windows のバージョン、電源とバッテリーの状態、グラフィック設定。',
-  'hudChrome.hostDiag.containsNvidia':
-    'NVIDIA コントロールパネルの設定 (インストールされている場合)。',
-  'hudChrome.hostDiag.containsDisplays': 'ディスプレイ構成: 画面の数、解像度、リフレッシュレート。',
-  'hudChrome.hostDiag.containsPrograms':
-    'プロセッサーとメモリを最も多く使用しているプログラムの名前。',
-  'hudChrome.hostDiag.containsBrowsers':
-    'インストールされているウェブブラウザーとそのバージョン、ハードウェアアクセラレーションが有効かどうか。',
-  'hudChrome.hostDiag.containsGame':
-    'ゲームとランチャーのバージョン、現在のグラフィック設定とゾーン、そしてこのレポートをゲームがすでに送信しているパフォーマンスデータと照合するためのセッションコード。',
-  'hudChrome.hostDiag.privacy':
-    'あなたのファイル、ユーザー名、アカウント情報は含まれません。コンピューター名も含まれず、代わりにランダムなコードが使われます。自動的に送信されるものはありません。レポートはお使いのコンピューターに保存されるファイルで、誰に渡すかはあなたが決めます。',
-  'hudChrome.hostDiag.create': 'レポートを作成',
-  'hudChrome.hostDiag.running': 'システム情報を収集しています... 数秒かかります。',
+    'このコンピューターの詳細情報をファイルにまとめ、パフォーマンスの問題の診断に役立てます。送信は一切行われません。ファイルはお使いのコンピューターに保存されるだけです。',
+  'hudChrome.hostDiag.create': 'システムレポートを作成',
+  'hudChrome.hostDiag.running': 'システム情報を収集しています...',
   'hudChrome.hostDiag.saved': 'レポートを {fileName} として保存しました。',
   'hudChrome.hostDiag.savedNoName': 'レポートを保存しました。',
-  'hudChrome.hostDiag.detailPartial':
-    '一部の情報を収集できませんでした。それでもレポートは役に立ちます。',
-  'hudChrome.hostDiag.detailUnavailable':
-    'Windows のシステムスキャンが見つからないか変更されているため、基本情報のみが含まれています。ゲームを再インストールすると復元されます。',
-  'hudChrome.hostDiag.detailNativeError':
-    'Windows のシステムスキャンを実行できなかったため、基本情報のみが含まれています。',
-  'hudChrome.hostDiag.busy': 'レポートはすでに作成中です。',
   'hudChrome.hostDiag.failed': 'レポートを作成できませんでした。もう一度お試しください。',
-  'hudChrome.hostDiag.sendHint':
-    '保存したファイルを Discord でサポートチームに送るか、サポートへの問い合わせに添付してください。',
   'hudChrome.keybinds.emoteWheel': 'エモートホイール',
   'hudChrome.keybinds.sheathe': '武器を納刀/抜刀',
   'hudChrome.keybinds.hideInterface': 'インターフェースを隠す',

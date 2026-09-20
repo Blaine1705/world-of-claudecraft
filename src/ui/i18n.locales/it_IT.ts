@@ -5283,7 +5283,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Include una probabilità di base del 5% condivisa da tutti gli avventurieri.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Una stima, esclude i colpi critici e i danni delle abilità.',
-  'hudChrome.perf.title': 'Pannello prestazioni',
+  'hudChrome.perf.overlaySection': 'Pannello prestazioni',
   'hudChrome.perf.enable': 'Mostra pannello prestazioni',
   'hudChrome.perf.description':
     'Scegli quali statistiche mostrare, dove posizionare il pannello e il suo aspetto.',

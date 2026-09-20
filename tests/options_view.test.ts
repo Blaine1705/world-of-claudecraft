@@ -1285,9 +1285,6 @@ describe('options_view: interface tab taxonomy', () => {
 // interfaceUnlockAvailable off, see the touch case below).
 const DESKTOP_MENU = {
   bugReportAvailable: false,
-  // Desktop-SHELL only: a browser session (and an older installed shell without
-  // runHostDiag) omits the row, which is what this default stands for.
-  hostDiagAvailable: false,
   interfaceUnlockAvailable: true,
   interfaceUnlocked: false,
 };
@@ -1369,23 +1366,19 @@ describe('options_view: main menu routing', () => {
     }
   });
 
-  it('adds the System Report row directly after Performance, desktop shell only', () => {
-    // It belongs with Performance (a player hunting a frame-rate problem is
-    // already there), and unlike Report a Bug it is NOT online-gated: the file is
-    // saved locally and mailed by the player, so an offline session can make one.
-    const browser = buildOptionsMenu(DESKTOP_MENU);
-    expect(browser.some((e) => e.labelKey === 'hudChrome.hostDiag.title')).toBe(false);
-    const shell = buildOptionsMenu({ ...DESKTOP_MENU, hostDiagAvailable: true });
-    const at = shell.findIndex((e) => e.labelKey === 'hudChrome.hostDiag.title');
-    expect(shell[at]?.action).toEqual({ kind: 'goto', view: 'hostdiag' });
-    expect(shell[at - 1]?.labelKey, 'sits directly after Performance').toBe('hudChrome.perf.title');
-    expect(shell[at + 1]?.labelKey, 'and before the transfer row').toBe(
+  it('carries NO System Report row: it is a section inside the Performance view', () => {
+    // The owner's decision: the feature was a whole menu row and a whole
+    // sub-panel, which was more room than it deserves. Performance is followed
+    // straight by the transfer row on every host, with nothing between them.
+    const rows = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
+    expect(rows.some((e) => e.labelKey === 'hudChrome.hostDiag.title')).toBe(false);
+    expect(rows.some((e) => e.action.kind === 'goto' && e.action.view === 'performance')).toBe(
+      true,
+    );
+    const perfAt = rows.findIndex((e) => e.labelKey === 'hudChrome.perf.title');
+    expect(rows[perfAt + 1]?.labelKey, 'nothing sits between them now').toBe(
       'hudChrome.fullTransfer.menu',
     );
-    // Offline availability is the point: the row is here with bug reporting off.
-    expect(shell.some((e) => e.labelKey === 'hudChrome.bugReport.menuButton')).toBe(false);
-    // Adding it changes nothing else about the list.
-    expect(shell.filter((e) => e.labelKey !== 'hudChrome.hostDiag.title')).toEqual(browser);
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {

@@ -1846,7 +1846,8 @@ export const fr_CA: EnTranslations = {
       "crossHotbarEditHelp": "Maintenez le pare-chocs gauche et appuyez sur le bouton supérieur pour organiser la barre avec le contrôleur."
     },
     "perf": {
-      "title": "Surcouche de performance",
+      "title": "Performance",
+      "overlaySection": "Surcouche de performance",
       "enable": "Afficher la surcouche de performance",
       "description": "Choisissez les statistiques à afficher, l'emplacement de la surcouche et son apparence.",
       "sectionPosition": "Position",
@@ -2522,26 +2523,12 @@ export const fr_CA: EnTranslations = {
     },
     "hostDiag": {
       "title": "System Report",
-      "intro": "If the game runs badly on this computer, create a system report and send it to the support team. It describes this computer and how the game is set up, so we can see what is holding the frame rate back.",
-      "containsTitle": "What the report contains",
-      "containsHardware": "Hardware and drivers: computer make and model, processor, memory, graphics cards, and free disk space.",
-      "containsWindows": "Windows version, power and battery state, and graphics settings.",
-      "containsNvidia": "NVIDIA Control Panel settings, when that software is installed.",
-      "containsDisplays": "Your display setup: how many screens, their size, and their refresh rate.",
-      "containsPrograms": "The names of the programs using the most processor time and memory.",
-      "containsBrowsers": "Which web browsers are installed, their version, and whether hardware acceleration is turned on.",
-      "containsGame": "Game and launcher versions, your current graphics settings and zone, and a session code that lets us match this report with the performance data the game already sends.",
-      "privacy": "It does not include your files, your user name, or your account details. Your computer name is not included: a random code takes its place. Nothing is sent automatically: the report is a file saved on your computer, and you choose who gets it.",
-      "create": "Create report",
-      "running": "Collecting system details... this takes a few seconds.",
+      "intro": "Collects details about this computer into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
       "saved": "Report saved as {fileName}.",
       "savedNoName": "Report saved.",
-      "detailPartial": "Some details could not be collected. The report is still useful.",
-      "detailUnavailable": "The Windows system scan is missing or was changed, so only basic details were included. Reinstalling the game restores it.",
-      "detailNativeError": "The Windows system scan could not run, so only basic details were included.",
-      "busy": "A report is already being created.",
-      "failed": "The report could not be created. Please try again.",
-      "sendHint": "Send the saved file to the support team on Discord or attach it to your support request."
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Déséquiper {item}",

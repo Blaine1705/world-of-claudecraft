@@ -1846,7 +1846,8 @@ export const zh_TW: EnTranslations = {
       "crossHotbarEditHelp": "按住左肩鍵並按上方面鍵，即可用手把整理十字熱鍵列。"
     },
     "perf": {
-      "title": "效能監視器",
+      "title": "效能",
+      "overlaySection": "效能監視器",
       "enable": "顯示效能監視器",
       "description": "選擇要顯示的數據、監視器的位置及其外觀。",
       "sectionPosition": "位置",
@@ -2522,26 +2523,12 @@ export const zh_TW: EnTranslations = {
     },
     "hostDiag": {
       "title": "系統報告",
-      "intro": "如果遊戲在這台電腦上執行不順暢，請建立一份系統報告並傳送給支援團隊。報告會說明這台電腦的配置和遊戲的設定，協助我們找出拖慢影格率的原因。",
-      "containsTitle": "報告包含的內容",
-      "containsHardware": "硬體和驅動程式：電腦品牌和型號、處理器、記憶體、顯示卡以及可用磁碟空間。",
-      "containsWindows": "Windows 版本、電源和電池狀態以及圖形設定。",
-      "containsNvidia": "NVIDIA 控制面板設定（如果已安裝該軟體）。",
-      "containsDisplays": "顯示器配置：螢幕數量、解析度和更新率。",
-      "containsPrograms": "佔用處理器和記憶體最多的程式名稱。",
-      "containsBrowsers": "已安裝的網頁瀏覽器及其版本，以及是否開啟了硬體加速。",
-      "containsGame": "遊戲和啟動器版本、目前的圖形設定和區域，以及一組工作階段代碼，用來將這份報告與遊戲已經傳送的效能資料對應起來。",
-      "privacy": "報告不包含你的檔案、使用者名稱或帳號資訊。你的電腦名稱也不會包含在內，而是由一組隨機代碼取代。不會自動傳送任何內容：報告是儲存在你電腦上的一個檔案，由你決定要給誰。",
-      "create": "建立報告",
-      "running": "正在收集系統資訊... 需要幾秒鐘。",
+      "intro": "將這台電腦的詳細資訊收集到一個檔案中，協助診斷效能問題。不會傳送任何內容：該檔案只保存在你的電腦上。",
+      "create": "產生系統報告",
+      "running": "正在收集系統資訊...",
       "saved": "報告已儲存為 {fileName}。",
       "savedNoName": "報告已儲存。",
-      "detailPartial": "部分資訊未能收集。這份報告仍然有用。",
-      "detailUnavailable": "Windows 系統掃描工具遺失或已遭變更，因此只包含了基本資訊。重新安裝遊戲即可復原。",
-      "detailNativeError": "Windows 系統掃描無法執行，因此只包含了基本資訊。",
-      "busy": "報告正在建立中。",
-      "failed": "無法建立報告。請再試一次。",
-      "sendHint": "請透過 Discord 將儲存的檔案傳送給支援團隊，或將其附加到你的支援請求中。"
+      "failed": "無法建立報告。請再試一次。"
     },
     "paperdoll": {
       "unequipAria": "卸下 {item}",

@@ -937,6 +937,71 @@ describe('runHostDiag (the IPC handler is wiring only)', () => {
     // The guard releases: a later run works.
     await expect(runHostDiag(runDeps().deps)).resolves.toMatchObject({ status: 'saved' });
   });
+
+  it('primes app.getAppMetrics() and reads it only AFTER the native half settles', async () => {
+    // app.getAppMetrics() reports percentCPUUsage since the PREVIOUS call, so a
+    // lone call always reads 0. That is the whole point of the priming call and
+    // of deferring the real read: the figure that reaches the file must be the
+    // app's average over the roughly 5 s collection, not a row of zeros.
+    const native = harness();
+    let nativeSettled = false;
+    const readsAfterNative: boolean[] = [];
+    // Call 1 is the prime (a fresh process reads 0); every later call reports a
+    // real figure, exactly as Electron behaves.
+    let calls = 0;
+    const app = {
+      getVersion: () => '0.43.2',
+      getPath: () => 'C:\\out',
+      getAppMetrics: () => {
+        calls += 1;
+        readsAfterNative.push(nativeSettled);
+        return [
+          {
+            type: 'Browser',
+            memory: { workingSetSize: 1_000 },
+            cpu: { percentCPUUsage: calls === 1 ? 0 : 37.5 },
+          },
+        ];
+      },
+    };
+    let written = '';
+    const run = runHostDiag({
+      ...native.deps,
+      app,
+      process: { platform: 'win32', arch: 'x64', versions: {} },
+      os: { cpus: () => [], release: () => '10.0.26200' },
+      dialog: {
+        showSaveDialog: () => Promise.resolve({ canceled: false, filePath: 'C:\\out\\d.json' }),
+      },
+      shell: { showItemInFolder: () => {} },
+      writeFileSync: (_path: string, text: string) => {
+        written = text;
+      },
+      strings: DEFAULT_SHELL_STRINGS,
+    });
+
+    // The prime happened before either half was started, and nothing else has
+    // asked yet: the Electron snapshot skipped the field.
+    expect(calls, 'exactly one priming call, before the halves start').toBe(1);
+    expect(readsAfterNative).toEqual([false]);
+
+    // Settle the native half, which is the slow one.
+    native.child.stdout.emit('data', Buffer.from(JSON.stringify(REPORT)));
+    nativeSettled = true;
+    native.child.emit('close', 0);
+    await run;
+
+    // The second (real) read came after the native half had settled.
+    expect(calls).toBe(2);
+    expect(readsAfterNative, 'the reading spans the whole collection').toEqual([false, true]);
+    const report = JSON.parse(written) as {
+      electron: { appMetrics: { processes: { cpuPercent: number }[] } };
+    };
+    expect(
+      report.electron.appMetrics.processes[0]?.cpuPercent,
+      'the primed figure, not the 0 a single call always yields',
+    ).toBe(37.5);
+  });
 });
 
 describe('the committed bundle verifies against the committed manifest (real bytes)', () => {

@@ -1,6 +1,7 @@
-// The System Report panel's result table (src/ui/host_diag_view.ts). The panel
-// itself is a handful of nodes; the whole judgement is here, so every arm of the
-// shell's (status, nativeStatus) matrix gets its own decisive assertion.
+// The System Report section's result table (src/ui/host_diag_view.ts). The
+// section itself is a handful of nodes; the whole judgement is here, so every
+// arm of the shell's (status, nativeStatus) matrix gets its own decisive
+// assertion.
 //
 // Pure, so no DOM environment: the core returns KEYS, which is exactly what makes
 // the table assertable as data rather than as rendered English.
@@ -14,6 +15,15 @@ import {
   hostDiagRunning,
   hostDiagSettled,
 } from '../src/ui/host_diag_view';
+
+const NATIVE_STATUSES: DesktopHostDiagResult['nativeStatus'][] = [
+  'ok',
+  'partial',
+  'unsupported-platform',
+  'unavailable',
+  'error',
+  null,
+];
 
 function saved(
   nativeStatus: DesktopHostDiagResult['nativeStatus'],
@@ -32,7 +42,7 @@ describe('host_diag_view: phases', () => {
   it('starts idle with no result and mints a fresh object each time', () => {
     expect(hostDiagIdle()).toEqual({ phase: 'idle', result: null });
     expect(hostDiagRunning()).toEqual({ phase: 'running', result: null });
-    // Fresh objects, so one panel's state can never be reached through another's.
+    // Fresh objects, so one section's state can never be reached through another's.
     expect(hostDiagIdle()).not.toBe(hostDiagIdle());
     expect(hostDiagRunning()).not.toBe(hostDiagRunning());
   });
@@ -50,7 +60,6 @@ describe('host_diag_view: saved', () => {
     expect(m.tone).toBe('success');
     expect(m.messageKey).toBe('hudChrome.hostDiag.saved');
     expect(m.messageValues).toEqual({ fileName: 'report.json' });
-    expect(m.detailKey, 'a clean native run says nothing extra').toBeUndefined();
   });
 
   it('falls back to the nameless line rather than an empty placeholder', () => {
@@ -61,38 +70,17 @@ describe('host_diag_view: saved', () => {
     expect(blank.messageKey).toBe('hudChrome.hostDiag.savedNoName');
   });
 
-  it('keeps the success tone and adds one detail line when the native half fell short', () => {
-    const arms: [DesktopHostDiagResult['nativeStatus'], string][] = [
-      ['partial', 'hudChrome.hostDiag.detailPartial'],
-      ['unavailable', 'hudChrome.hostDiag.detailUnavailable'],
-      ['error', 'hudChrome.hostDiag.detailNativeError'],
-    ];
-    for (const [nativeStatus, detailKey] of arms) {
-      const m = model(saved(nativeStatus));
-      expect(m.tone, `${nativeStatus} is still a saved file`).toBe('success');
-      expect(m.messageKey).toBe('hudChrome.hostDiag.saved');
-      expect(m.detailKey).toBe(detailKey);
+  it('renders the SAME plain saved line for every native status, shortfalls included', () => {
+    // The owner's decision: a saved file is a saved file. A partial, missing or
+    // wedged Windows half still leaves something support can read, and none of
+    // those are anything the player can act on, so the section says none of it.
+    for (const nativeStatus of NATIVE_STATUSES) {
+      expect(model(saved(nativeStatus)), `nativeStatus ${String(nativeStatus)}`).toEqual({
+        tone: 'success',
+        messageKey: 'hudChrome.hostDiag.saved',
+        messageValues: { fileName: 'woc-host-diag-20260919.json' },
+      });
     }
-    // Each arm gets its OWN line: nothing collapses two shortfalls into one.
-    const keys = arms.map(([nativeStatus]) => model(saved(nativeStatus)).detailKey);
-    expect(new Set(keys).size).toBe(arms.length);
-  });
-
-  it('says NOTHING extra on unsupported-platform: macOS and Linux are expected, not broken', () => {
-    // The one arm that must not warn. Off Windows there is no PowerShell half to
-    // run, so the Electron-only report is exactly the intended output there and a
-    // warning would send the player hunting a problem that does not exist.
-    const m = model(saved('unsupported-platform'));
-    expect(m.tone).toBe('success');
-    expect(m.messageKey).toBe('hudChrome.hostDiag.saved');
-    expect(m.detailKey).toBeUndefined();
-    expect(Object.keys(m).includes('detailKey')).toBe(false);
-  });
-
-  it('says nothing extra when the shell reports no native status at all', () => {
-    expect(model({ status: 'saved', nativeStatus: null, fileName: 'x.json' }).detailKey).toBe(
-      undefined,
-    );
   });
 });
 
@@ -108,20 +96,14 @@ describe('host_diag_view: the non-saved arms', () => {
     expect(hostDiagResultModel({ status: 'cancelled', nativeStatus: 'ok' })).toBeNull();
   });
 
-  it('reports a second request as info, not as a failure', () => {
-    const m = model({ status: 'busy', nativeStatus: null });
-    expect(m.tone).toBe('info');
-    expect(m.messageKey).toBe('hudChrome.hostDiag.busy');
-    expect(m.detailKey).toBeUndefined();
-  });
-
-  it('maps a reported error, a missing result and an unknown status to one error line', () => {
+  it('maps every non-saved outcome to the one try-again failure line', () => {
     // The glue already folds a missing bridge and a rejected promise into the
-    // 'error' verdict; this pins that a null or unrecognized answer lands there
-    // too, so no shell can ever leave the panel with nothing on screen.
+    // 'error' verdict; this pins that busy, a null answer and an unrecognized
+    // status land on the same line, so no shell can leave the section silent.
     const expected = { tone: 'error', messageKey: 'hudChrome.hostDiag.failed' };
     expect(hostDiagResultModel({ status: 'error', nativeStatus: null })).toEqual(expected);
     expect(hostDiagResultModel({ status: 'error', nativeStatus: 'error' })).toEqual(expected);
+    expect(hostDiagResultModel({ status: 'busy', nativeStatus: null })).toEqual(expected);
     expect(hostDiagResultModel(null)).toEqual(expected);
     expect(hostDiagResultModel(undefined)).toEqual(expected);
     expect(hostDiagResultModel({ status: 'exploded' } as unknown as DesktopHostDiagResult)).toEqual(

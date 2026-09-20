@@ -9343,7 +9343,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Jadeit',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Ostrzeżenia kodowane kolorami',
-  'hudChrome.perf.title': 'Nakładka wydajności',
+  'hudChrome.perf.overlaySection': 'Nakładka wydajności',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',

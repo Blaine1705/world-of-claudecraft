@@ -6638,7 +6638,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Nefritová',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Barevně značená varování',
-  'hudChrome.perf.title': 'Performance overlay',
+  'hudChrome.perf.overlaySection': 'Performance overlay',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',

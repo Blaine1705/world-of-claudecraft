@@ -5155,39 +5155,10 @@
     border-radius: var(--radius-sm);
   }
 
-  /* ---------- system report (options sub-view) ----------
-     Options > System Report (src/ui/host_diag_window.ts). Prose plus one bullet
-     list, one primary button and one live region; the tone classes ride the
-     region so a verdict reads at a glance without a second element per tone. */
-  .hostdiag-options .set-note {
-    max-width: 100%;
-  }
-  .hostdiag-privacy {
-    border-left: 2px solid var(--color-border-showcase);
-    padding-left: 8px;
-  }
-  .hostdiag-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .hostdiag-list li {
-    position: relative;
-    padding-left: 12px;
-    font-size: 12px;
-    line-height: 1.4;
-    color: var(--color-text-light);
-  }
-  .hostdiag-list li::before {
-    content: "";
-    position: absolute;
-    left: 2px;
-    top: 7px;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--color-accent);
-  }
+  /* ---------- system report (Options > Performance section) ----------
+     src/ui/host_diag_section_controller.ts: one sentence, one primary button and
+     one live region; the tone classes ride the region so a verdict reads at a
+     glance without a second element per tone. */
   .hostdiag-action {
     display: flex;
     margin-top: 10px;
@@ -5214,13 +5185,6 @@
   }
   .hostdiag-live.is-error .hostdiag-message {
     color: var(--color-text-error);
-  }
-  .hostdiag-detail {
-    color: var(--color-text-muted);
-    margin-top: 2px;
-  }
-  .hostdiag-detail:empty {
-    display: none;
   }
 
   /* ---------- right tracker stack (quest tracker + delve tracker) ----------

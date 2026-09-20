@@ -791,6 +791,23 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(state).toContain('distribution: desktopConfig.distribution,');
     expect(state).toContain('gpuForceOptOut: desktopPrefs.gpuForceOptOut === true,');
     expect(state).toContain('gpuBackendLaunchRung: gpuBackendLaunch.rung,');
+    // The gpuBackend* ladder is the LINUX ANGLE backend choice. Off Linux it
+    // describes nothing and reads as "opengl / platform default", which misleads
+    // whoever opens the report (on Windows the real backend is D3D11, which the
+    // report already carries in gpu.auxAttributes.displayType), so the whole
+    // group rides behind one platform gate. Everything else is unconditional.
+    const gpuGroupAt = state.indexOf('gpuBackendSetting: backend.setting,');
+    const linuxGateAt = state.indexOf("...(process.platform === 'linux'");
+    expect(linuxGateAt).toBeGreaterThan(-1);
+    expect(linuxGateAt, 'the gate opens before the whole group').toBeLessThan(gpuGroupAt);
+    expect(state.indexOf('gpuVulkanSwitches:')).toBeGreaterThan(linuxGateAt);
+    expect(
+      state.indexOf('distribution: desktopConfig.distribution,'),
+      'the identity fields stay unconditional',
+    ).toBeLessThan(linuxGateAt);
+    expect(state.indexOf('displayMode: desktopPrefs.displayMode,')).toBeGreaterThan(
+      state.indexOf('      : {}),'),
+    );
 
     // The preload pre-sanitizes to the same whitelist and invokes THIS channel.
     expect(preload).toContain("ipcRenderer.invoke('desktop-host-diag-run', clean);");

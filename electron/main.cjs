@@ -1326,15 +1326,27 @@ function hostDiagShellState() {
     // which case neither of its switches (HIGH_PERF_GPU_SWITCHES) was appended.
     gpuForceOptOut: desktopPrefs.gpuForceOptOut === true,
     gpuForceDisabledByEnv,
-    gpuBackendSetting: backend.setting,
-    gpuBackendActive: backend.active,
-    gpuBackendRequestedUnavailable: backend.requestedUnavailable,
-    gpuBackendAutoCapped: backend.autoCapped,
-    gpuBackendLaunchRung: gpuBackendLaunch.rung,
-    gpuBackendLaunchReason: gpuBackendLaunch.reason,
-    gpuBackendPolicyWhy: gpuPolicy.why,
-    gpuVulkanSwitches:
-      gpuBackendLaunch.backend === 'vulkan' ? flattenSwitchPairs(gpuPolicy.vulkanSwitches) : '',
+    // The gpuBackend* ladder is the LINUX-only ANGLE backend choice (gl /
+    // vulkan and the rungs between). Off Linux it describes nothing and reads
+    // as "opengl / platform default", which misleads whoever opens the report:
+    // on Windows the real backend is D3D11, which the report already carries in
+    // gpu.auxAttributes.displayType. So these fields ride only where they mean
+    // something.
+    ...(process.platform === 'linux'
+      ? {
+          gpuBackendSetting: backend.setting,
+          gpuBackendActive: backend.active,
+          gpuBackendRequestedUnavailable: backend.requestedUnavailable,
+          gpuBackendAutoCapped: backend.autoCapped,
+          gpuBackendLaunchRung: gpuBackendLaunch.rung,
+          gpuBackendLaunchReason: gpuBackendLaunch.reason,
+          gpuBackendPolicyWhy: gpuPolicy.why,
+          gpuVulkanSwitches:
+            gpuBackendLaunch.backend === 'vulkan'
+              ? flattenSwitchPairs(gpuPolicy.vulkanSwitches)
+              : '',
+        }
+      : {}),
     displayMode: desktopPrefs.displayMode,
   };
 }

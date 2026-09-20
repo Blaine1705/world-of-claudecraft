@@ -2381,7 +2381,11 @@ export const hudChromeStrings = {
   // the older dev `?perf` trace output, which stays English like console.*. The real-DOM
   // `?diagnostics=1` panel below is localized because its chrome is user-visible.
   perf: {
-    title: 'Performance Overlay',
+    // The sub-view now holds more than the overlay (the desktop shell's System
+    // Report section sits under it), so the view is "Performance" and the
+    // overlay controls carry their own section heading inside it.
+    title: 'Performance',
+    overlaySection: 'Performance Overlay',
     enable: 'Show Performance Overlay',
     description: 'Choose which stats to show, where the overlay sits, and how it looks.',
     sectionPosition: 'Position',
@@ -3238,42 +3242,22 @@ export const hudChromeStrings = {
     rateLimited: "You've sent several reports recently. Please wait a bit before sending another.",
     failed: 'Could not send the bug report. Please try again.',
   },
-  // Options > System Report (src/ui/host_diag_window.ts): the desktop-shell-only
-  // panel that writes one host diagnostic file for support. Nothing is uploaded,
-  // which the privacy line says outright, because the panel's whole job is asking
+  // The System Report section at the foot of Options > Performance
+  // (src/ui/host_diag_section_controller.ts), desktop shell only. Deliberately
+  // small: one sentence, one button, one status line. Nothing is uploaded,
+  // which the sentence says outright, because the section's whole job is asking
   // a player to hand over a description of their own computer.
   hostDiag: {
     title: 'System Report',
     intro:
-      'If the game runs badly on this computer, create a system report and send it to the support team. It describes this computer and how the game is set up, so we can see what is holding the frame rate back.',
-    containsTitle: 'What the report contains',
-    containsHardware:
-      'Hardware and drivers: computer make and model, processor, memory, graphics cards, and free disk space.',
-    containsWindows: 'Windows version, power and battery state, and graphics settings.',
-    containsNvidia: 'NVIDIA Control Panel settings, when that software is installed.',
-    containsDisplays: 'Your display setup: how many screens, their size, and their refresh rate.',
-    containsPrograms: 'The names of the programs using the most processor time and memory.',
-    containsBrowsers:
-      'Which web browsers are installed, their version, and whether hardware acceleration is turned on.',
-    containsGame:
-      'Game and launcher versions, your current graphics settings and zone, and a session code that lets us match this report with the performance data the game already sends.',
-    privacy:
-      'It does not include your files, your user name, or your account details. Your computer name is not included: a random code takes its place. Nothing is sent automatically: the report is a file saved on your computer, and you choose who gets it.',
-    create: 'Create report',
-    running: 'Collecting system details... this takes a few seconds.',
+      'Collects details about this computer into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.',
+    create: 'Generate system report',
+    running: 'Collecting system details...',
     saved: 'Report saved as {fileName}.',
     // Defensive twin of the line above, for a shell that saved a file without
     // naming it back: never expected, and better than an empty file name.
     savedNoName: 'Report saved.',
-    detailPartial: 'Some details could not be collected. The report is still useful.',
-    detailUnavailable:
-      'The Windows system scan is missing or was changed, so only basic details were included. Reinstalling the game restores it.',
-    detailNativeError:
-      'The Windows system scan could not run, so only basic details were included.',
-    busy: 'A report is already being created.',
     failed: 'The report could not be created. Please try again.',
-    sendHint:
-      'Send the saved file to the support team on Discord or attach it to your support request.',
   },
   // Character window (paperdoll) controls.
   paperdoll: {
