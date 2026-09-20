@@ -9514,6 +9514,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.crafting.masterworkToast'
   | 'hudChrome.crafting.masterworkZoneLine'
   | 'hudChrome.crafting.materialsFooter'
+  | 'hudChrome.crafting.mobileStationTitle'
   | 'hudChrome.crafting.noBagSpace'
   | 'hudChrome.crafting.noProfessionChoice'
   | 'hudChrome.crafting.oncePerDay'

@@ -4672,6 +4672,7 @@ export const cs_CZ: EnTranslations = {
         "dormantKnowledge": "Znalosti {craft} jsou zachovány, ale dočasně neaktivní, dokud nebude aktivní jejich pár nebo koníček."
       },
       "stationRequired": "Abyste to mohli vytvořit, musíte být na {station}.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "Kovárna",
         "kitchens": "Kuchyně",

@@ -4672,6 +4672,7 @@ export const tr_TR: EnTranslations = {
         "dormantKnowledge": "{craft} bilgisi korunuyor ancak çifti veya hobisi etkin olana kadar eylemsiz kalacak."
       },
       "stationRequired": "Bunu yapmak için {station}'de olmanız gerekir.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "Demirhane",
         "kitchens": "Mutfaklar",

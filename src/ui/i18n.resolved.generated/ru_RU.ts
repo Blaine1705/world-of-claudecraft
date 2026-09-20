@@ -4672,6 +4672,7 @@ export const ru_RU: EnTranslations = {
         "dormantKnowledge": "Знания ремесла {craft} сохранены, но неактивны, пока не выбрана его пара или увлечение."
       },
       "stationRequired": "Для изготовления нужно находиться у станции \"{station}\".",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "Кузница",
         "kitchens": "Кухни",

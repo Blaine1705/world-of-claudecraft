@@ -4672,6 +4672,7 @@ export const en_XA: EnTranslations = {
         "dormantKnowledge": "[{craft} ķñóŵļéðĝé íš ŕéţáíñéð ƀúţ ðóŕɱáñţ úñţíļ íţš þáíŕ óŕ ĥóƀƀý íš áçţíʋé.]"
       },
       "stationRequired": "[Ýóú ɱúšţ ƀé áţ ţĥé {station} ţó çŕáƒţ ţĥáţ.]",
+      "mobileStationTitle": "[{name}'š {station}]",
       "stationName": {
         "forge": "[Ƒóŕĝé]",
         "kitchens": "[Ķíţçĥéñš]",

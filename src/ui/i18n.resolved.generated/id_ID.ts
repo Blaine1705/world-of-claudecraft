@@ -4672,6 +4672,7 @@ export const id_ID: EnTranslations = {
         "dormantKnowledge": "Pengetahuan {craft} tersimpan namun tidak aktif hingga pasangan atau hobinya aktif."
       },
       "stationRequired": "Anda harus berada di {station} untuk membuatnya.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "Bengkel Tempa",
         "kitchens": "Dapur",

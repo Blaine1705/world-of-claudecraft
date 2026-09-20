@@ -4672,6 +4672,7 @@ export const nl_NL: EnTranslations = {
         "dormantKnowledge": "{craft}-kennis wordt behouden maar is slapend tot zijn paar of liefhebberij actief is."
       },
       "stationRequired": "Je moet bij de {station} zijn om dat te kunnen maken.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "Smederij",
         "kitchens": "Keukens",

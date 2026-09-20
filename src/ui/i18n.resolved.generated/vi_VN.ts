@@ -4672,6 +4672,7 @@ export const vi_VN: EnTranslations = {
         "dormantKnowledge": "Kiến thức {craft} được giữ lại nhưng không hoạt động cho đến khi đôi hoặc sở thích của nó được kích hoạt."
       },
       "stationRequired": "Bạn phải có mặt tại {station} để chế tạo món đồ đó.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "lò rèn",
         "kitchens": "Bếp",

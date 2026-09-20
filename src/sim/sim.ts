@@ -362,6 +362,7 @@ import {
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
 import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
 import { canFlee } from './mob/flee_rules';
+import { forgetLeavingPlayer } from './mob/forget_leaver';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
 import {
@@ -556,6 +557,7 @@ import {
   type MobileCraftingStation,
   placeMobileStationForPlayer,
 } from './professions/mobile_station';
+import { dropMobileStationObject } from './professions/mobile_station_object';
 import {
   applyNodeReadiness,
   isLiveGatherNodeId,
@@ -3796,6 +3798,8 @@ export class Sim {
     const leaving = this.entities.get(pid);
     if (leaving) clearShamanTalentState(this.ctx, leaving);
     despawnMobsForDev(this.ctx, pid, 'spawned');
+    // The slot dies with the meta; its world object must not outlive it.
+    dropMobileStationObject(this.ctx, meta.mobileStation);
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
     // teardown position (must run while the leaver is still in players/entities).
@@ -3831,23 +3835,7 @@ export class Sim {
     clearAfflictionState(this.ctx, pid);
     const pet = this.petOf(pid, true);
     if (pet) this.despawnPersistentPet(pet);
-    for (const m of this.entities.values()) {
-      if (m.kind !== 'mob') continue;
-      m.threat.delete(pid);
-      if (m.forcedTargetId === pid) {
-        m.forcedTargetId = null;
-        m.forcedTargetTimer = 0;
-      }
-      if (m.aggroTargetId === pid) {
-        m.aggroTargetId = null;
-        if (!m.dead && m.aiState !== 'dead' && m.ownerId === null) this.retargetMob(m);
-      }
-      if (m.tappedById === pid && !m.dead) m.tappedById = null;
-    }
-    for (const other of this.players.values()) {
-      const e = this.entities.get(other.entityId);
-      if (e && e.targetId === pid) e.targetId = null;
-    }
+    forgetLeavingPlayer(this.ctx, pid);
     resurrectionOfferMod.dropResurrectionOffer(this.ctx, pid);
     this.dropEntity(pid);
     this.players.delete(pid);

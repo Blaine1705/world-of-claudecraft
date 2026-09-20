@@ -6961,6 +6961,15 @@ export const hudChromeStrings = {
     // because the recipe is station-bound and the player is not at a station
     // of its type. {station} is the localized stationName.* value below.
     stationRequired: 'You must be at the {station} to craft that.',
+    // THE PLACED MOBILE-STATION TITLE (professions/mobile_station_object.ts),
+    // composed client-side off the entity's templateId by
+    // src/ui/hud/professions/mobile_station_title.ts, the ONE leaf both the
+    // target frame and the floating world label read. {name} is the PLACER'S
+    // raw player name, a VALUE never translated (the feastTitle precedent);
+    // {station} is the localized noun of what stands there: the placing item
+    // (Grand Cauldron, Laden Hearth, Master's Field Forge) or, for a
+    // specialization placement with no item, the stationName.* type noun.
+    mobileStationTitle: "{name}'s {station}",
     // The six station display names (stations.ts StationType), resolved via
     // crafting_window.ts stationNameText, the craftName-table idiom.
     stationName: {

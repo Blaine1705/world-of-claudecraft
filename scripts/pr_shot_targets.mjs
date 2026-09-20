@@ -15453,6 +15453,56 @@ export const TARGETS = [
     },
   },
   {
+    key: 'mobile-station',
+    label: 'Placed mobile crafting station beside the Eastbrook garden beds (the visible prop)',
+    when: [
+      'sim/professions/mobile_station',
+      'render/mobile_stations',
+      'ui/hud/professions/mobile_station_title',
+    ],
+    variants: [
+      { key: 'desktop-cauldron', item: 'grand_cauldron', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop-hearth', item: 'laden_hearth', beforeLoad: seedLowGraphicsPreset },
+      {
+        key: 'mobile-hearth',
+        item: 'laden_hearth',
+        mobile: true,
+        beforeLoad: seedLowGraphicsPreset,
+      },
+    ],
+    async capture(page, variant) {
+      await stageEastbrookBeds(page);
+      // Grant and use the capstone tool: the sim places the station at the
+      // player's feet, and (after this change) spawns its world object. Then
+      // target the object so the target frame reads its title, and step back
+      // so the cluster sits in frame. Optional-chained on purpose: on the BASE
+      // build the station has no entity, so the target stays empty and the
+      // ground stays bare at identical framing, the honest BEFORE.
+      await page.evaluate((item) => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player?.pos) return;
+        sim.addItem?.(item, 1);
+        sim.useItem?.(item);
+        const station = sim.players?.get?.(sim.playerId)?.mobileStation;
+        const id = station?.entityId;
+        if (id !== undefined) player.targetId = id;
+        player.pos.x -= 0.4;
+        player.pos.z -= 3.2;
+        player.prevPos = { ...player.pos };
+      }, variant.item);
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'harvest-journal',
     label: 'Harvest Journal window with staged growth ladder (Eastbrook beds)',
     when: ['ui/hud/professions/harvest_journal'],

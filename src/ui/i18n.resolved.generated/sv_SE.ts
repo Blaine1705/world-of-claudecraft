@@ -4672,6 +4672,7 @@ export const sv_SE: EnTranslations = {
         "dormantKnowledge": "{craft}-kunskap bibehålls men är vilande tills dess par eller hobby är aktivt."
       },
       "stationRequired": "Du måste vara vid {station} för att skapa det.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "Smedja",
         "kitchens": "Kök",

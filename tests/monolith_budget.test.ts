@@ -1085,7 +1085,13 @@ const MONOLITHS: MonolithRow[] = [
     // updateTownFocusRespec retired, and the per-cast ResolvedAbility interface
     // moved to src/sim/resolved_ability.ts. Exact merged count
     // (wc -l < src/sim/sim.ts), zero slack.
-    ceiling: 11779,
+    // Composed with the placed mobile-station object (v0.44.0): the
+    // "mobs forget the leaving player" sweep of removePlayer moved verbatim to
+    // src/sim/mob/forget_leaver.ts, paying for the one station-object drop
+    // call the leave path now needs. The merged file measures 11767, below
+    // both parent pins, so the ceiling follows it down. Exact count, zero
+    // slack.
+    ceiling: 11767,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
