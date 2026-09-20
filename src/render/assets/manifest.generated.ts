@@ -1749,6 +1749,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "vfx/light_02.png": "/media/vfx/light_02.9ec3befd7a9f.png",
   "vfx/magic_01.png": "/media/vfx/magic_01.ba25d57c52ba.png",
   "vfx/magic_04.png": "/media/vfx/magic_04.db52cb9014be.png",
+  "vfx/orbital-lightning/impact.glb": "/media/vfx/orbital-lightning/impact.22e946c4d546.glb",
+  "vfx/orbital-lightning/orb.glb": "/media/vfx/orbital-lightning/orb.6200d962d97f.glb",
   "vfx/slash_02.png": "/media/vfx/slash_02.4c226fe5bcc4.png",
   "vfx/smoke_05.png": "/media/vfx/smoke_05.d45c9fb99de9.png",
   "vfx/spark_04.png": "/media/vfx/spark_04.542198dcb07a.png",

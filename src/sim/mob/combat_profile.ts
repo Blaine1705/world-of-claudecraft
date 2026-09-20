@@ -7,6 +7,7 @@ import {
   releasePin,
 } from '../instances/instance_combat_hold';
 import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from '../mob_combat';
+import { holdHoardOrbitalLightning } from '../rift/hoard_orbital_lightning';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import {
@@ -27,7 +28,7 @@ import { retargetMob, updateMobTarget } from './targeting';
 
 export type MobCombatProfileResult = 'done' | 'runAttackMechanics';
 
-type EngagedTickHook = () => void;
+type EngagedTickHook = (mode: 'normal' | 'stationary') => void;
 
 // Drop the pull and walk home: the shared evade entry used by the leash breaks
 // and the unreachable-target stall. The evade arm in locomotion.ts handles the
@@ -154,7 +155,13 @@ export function updateMobCombatProfile(
     return 'done';
   }
 
-  onEngagedTick?.();
+  if (holdHoardOrbitalLightning(ctx, mob)) {
+    onEngagedTick?.('stationary');
+    mob.swingTimer = Math.max(0, mob.swingTimer - DT);
+    tryMobMeleeSwingInRange(ctx, mob, target);
+    return 'done';
+  }
+  onEngagedTick?.('normal');
 
   // Dragonkin engage shout: the brood bellows BEFORE it walks. Fires once per
   // pull (shoutFired resets on evade/respawn with the other pull state); for

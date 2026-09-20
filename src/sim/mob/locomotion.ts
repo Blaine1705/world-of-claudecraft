@@ -682,7 +682,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // countdown itself ticks inside runMobAttackMechanics with the other
       // boss mechanics (melee-gated), so a kited boss does not bank channels.
       if (updateInfernoChannel(ctx, mob)) break;
-      const result = updateMobCombatProfile(ctx, mob, () => {
+      const result = updateMobCombatProfile(ctx, mob, (mode) => {
         // The anti-kite snare, loud battle cries, and the heroic charge trigger
         // fire once per engaged tick, from either engaged state (mid-chase is
         // the kite case they exist for). The windup ticker runs AFTER the
@@ -690,7 +690,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         // holds, so a slow can never land the same instant as the blast.
         pulseAntiKiteSnare(ctx, mob);
         pulseLoudYell(ctx, mob);
-        tryStartMobCharge(ctx, mob);
+        if (mode === 'normal') tryStartMobCharge(ctx, mob);
         tickRiftMechanicWindups(ctx, mob);
       });
       if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);

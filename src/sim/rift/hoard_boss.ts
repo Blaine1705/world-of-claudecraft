@@ -18,6 +18,7 @@ import {
   pointInHoardTideWave,
 } from './hoard_boss_kits';
 import { hoardLightningStrikeCues } from './hoard_lightning_strike';
+import { startHoardOrbitalLightning, tickHoardOrbitalCarrier } from './hoard_orbital_lightning';
 import {
   resolveHoardStormStaticTargets,
   startHoardStormStatic,
@@ -63,6 +64,7 @@ const FROST_GUST_EVERY_SEC = 10;
 const FROST_ICE_EVERY_SEC = 8;
 const BRUTE_COMBO_EVERY_SEC = 11;
 const ARCANE_EVERY_SEC = 8;
+const STORM_FIRST_SEC = 2;
 const STORM_EVERY_SEC = 11;
 const TIDE_WAVE_EVERY_SEC = 10;
 const BONE_WAVE_THRESHOLDS = [0.7, 0.35] as const;
@@ -249,14 +251,14 @@ function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   }
 }
 
-function createState(): HoardBossState {
+function createState(kit: HoardBossKit): HoardBossState {
   return {
     sweepTimer: SWEEP_FIRST_SEC,
-    markTimer: MARK_FIRST_SEC,
+    markTimer: kit === 'storm' ? STORM_FIRST_SEC : MARK_FIRST_SEC,
     targetCursor: 0,
     nextCueId: 1,
     cues: [],
-    sequenceStep: 0,
+    sequenceStep: kit === 'storm' ? 2 : 0,
     sequenceTimer: 0,
     sequenceFacing: 0,
     specialTriggered: false,
@@ -633,7 +635,12 @@ function hitPlayersInMark(
       ctx.dealDamage(
         boss,
         player,
-        Math.max(1, Math.round(player.maxHp * fraction)),
+        cue.variant === 'storm-orbital-impact'
+          ? capRiftNonLethalMechanicDamage(
+              Math.max(1, Math.round(player.maxHp * fraction)),
+              player.maxHp,
+            )
+          : Math.max(1, Math.round(player.maxHp * fraction)),
         false,
         spec.school,
         spec.ability,
@@ -753,6 +760,7 @@ function finishSequence(
 
 function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: HoardBossState): void {
   const live: HoardBossCue[] = [];
+  const spawned: HoardBossCue[] = [];
   const staticPlayers = state.cues.some((c) => c.variant === 'storm-static')
     ? instancePlayers(ctx, inst).filter((p) => !p.dead)
     : [];
@@ -761,6 +769,14 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     : undefined;
   for (const cue of state.cues) {
     cue.remaining = Math.max(0, cue.remaining - DT);
+    if (cue.variant === 'storm-orbital') {
+      if (cue.kind === 'sweep')
+        spawned.push(...tickHoardOrbitalCarrier(ctx, inst, state, cue, emitCue));
+      if (cue.remaining > 1e-8) live.push(cue);
+      continue;
+    }
+    // Decimal second timers must fire on their exact fixed-step boundary.
+    if (cue.variant === 'storm-orbital-impact' && cue.remaining < 1e-8) cue.remaining = 0;
     if (cue.kind === 'mark' && cue.variant === 'storm-static') {
       tickHoardStormStaticCue(ctx, boss, cue, staticPlayers, staticTargets);
       if (cue.remaining > 0) live.push(cue);
@@ -827,6 +843,7 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     emitHazardVisual(ctx, boss, cue);
     live.push(cue);
   }
+  live.push(...spawned);
   state.cues = live;
 }
 
@@ -994,8 +1011,9 @@ function tickKit(
     state.markTimer -= DT;
     if (state.markTimer <= 0) {
       if (state.sequenceStep === 0) startCenteredMark(ctx, inst, boss, state, 'storm-charge');
-      else startHoardStormStatic(ctx, inst, state, living, emitCue);
-      state.sequenceStep = 1 - state.sequenceStep;
+      else if (state.sequenceStep === 1) startHoardStormStatic(ctx, inst, state, living, emitCue);
+      else startHoardOrbitalLightning(ctx, inst, boss, state, emitCue);
+      state.sequenceStep = (state.sequenceStep + 1) % 3;
       state.markTimer = STORM_EVERY_SEC;
     }
     return;
@@ -1067,7 +1085,7 @@ export function tickHoardBossMechanics(ctx: SimContext): void {
       clearState(ctx, inst, boss);
       continue;
     }
-    if (!inst.hoardBoss) inst.hoardBoss = createState();
+    if (!inst.hoardBoss) inst.hoardBoss = createState(kit);
     const state = inst.hoardBoss;
     tickCues(ctx, inst, boss, state);
     tickSpecialKit(ctx, inst, boss, state);

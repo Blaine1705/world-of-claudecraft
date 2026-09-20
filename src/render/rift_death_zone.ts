@@ -23,6 +23,7 @@ import { HoardBossDressing } from './hoard_boss_dressing';
 import { HoardBossFx } from './hoard_boss_fx';
 import { HoardBossPresentation } from './hoard_boss_presentation';
 import { HoardEncounterAccents } from './hoard_encounter_accents';
+import { HoardOrbitalLightning } from './hoard_orbital_lightning';
 import { HoardSpellFx } from './hoard_spell_fx';
 import {
   deathZonePlan,
@@ -68,6 +69,7 @@ export class RiftDeathZoneVisuals {
   private readonly hoardDressing: HoardBossDressing;
   private readonly hoardAccents: HoardEncounterAccents;
   private readonly hoardSpells: HoardSpellFx;
+  private readonly hoardOrbital: HoardOrbitalLightning;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -88,6 +90,7 @@ export class RiftDeathZoneVisuals {
       reducedMotion,
     );
     this.hoardSpells = new HoardSpellFx(scene, groundY, compileGate, reducedMotion);
+    this.hoardOrbital = new HoardOrbitalLightning(scene, groundY, compileGate, reducedMotion);
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -101,6 +104,7 @@ export class RiftDeathZoneVisuals {
     this.hoardDressing.sync(hoardCues);
     this.hoardAccents.sync(hoardCues);
     this.hoardSpells.sync(hoardCues);
+    this.hoardOrbital.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
       const key = `${z.x.toFixed(1)}:${z.z.toFixed(1)}:${z.radius.toFixed(1)}`;
@@ -131,6 +135,7 @@ export class RiftDeathZoneVisuals {
     this.hoardDressing.update(dt);
     this.hoardAccents.update(dt);
     this.hoardSpells.update(dt);
+    this.hoardOrbital.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -151,6 +156,7 @@ export class RiftDeathZoneVisuals {
     this.hoardDressing.dispose();
     this.hoardAccents.dispose();
     this.hoardSpells.dispose();
+    this.hoardOrbital.dispose();
     this.hoardPresentation.dispose();
   }
 

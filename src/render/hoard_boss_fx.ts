@@ -532,6 +532,7 @@ export class HoardBossFx {
     const seen = new Set<string>();
     const now = performance.now();
     for (const cue of cues) {
+      if (cue.variant === 'storm-orbital') continue;
       const key = `${cue.instanceId}:${cue.cueId}`;
       seen.add(key);
       let slot = this.slots.find((candidate) => candidate.key === key);
@@ -698,7 +699,7 @@ export class HoardBossFx {
     const warningChildren = slot.markWarning.children as THREE.Mesh[];
     const hazardChildren = slot.markHazard.children as THREE.Mesh[];
     warningChildren[0].material = palette[0];
-    warningChildren[1].material = palette[2];
+    warningChildren[1].material = cue.variant === 'storm-orbital-impact' ? palette[0] : palette[2];
     warningChildren[2].material = palette[1];
     hazardChildren[0].material = palette[0];
     hazardChildren[1].material = palette[2];

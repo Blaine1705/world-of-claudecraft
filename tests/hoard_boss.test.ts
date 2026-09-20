@@ -675,6 +675,7 @@ describe('Buried Hoard boss encounter', () => {
     const { sim, inst } = makeEncounter('rift_boss_storm');
     tickHoardBossMechanics(sim.ctx);
     sim.drainEvents();
+    hoardState(inst).sequenceStep = 0;
     hoardState(inst).markTimer = 0;
     tickHoardBossMechanics(sim.ctx);
     const warning = sim
@@ -702,6 +703,7 @@ describe('Buried Hoard boss encounter', () => {
     tickHoardBossMechanics(sim.ctx);
     sim.drainEvents();
     const baseScale = boss.scale;
+    hoardState(inst).sequenceStep = 0;
     hoardState(inst).markTimer = 0;
     tickMechanic(sim, hoardMarkSpec('storm-charge').windup + 0.1);
     const state = hoardState(inst);
@@ -739,6 +741,7 @@ describe('Buried Hoard boss encounter', () => {
     const { sim, inst, boss } = makeEncounter('rift_boss_storm');
     tickHoardBossMechanics(sim.ctx);
     const baseScale = boss.scale;
+    hoardState(inst).sequenceStep = 0;
     hoardState(inst).markTimer = 0;
     tickMechanic(sim, hoardMarkSpec('storm-charge').windup + 0.1);
     // Keep the field alive under him well past the cap (the player stands clear

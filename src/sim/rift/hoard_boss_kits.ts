@@ -1,3 +1,4 @@
+import { ORBITAL_LIGHTNING } from './hoard_orbital_lightning_core';
 import type { HoardBossCueVariant } from './types';
 
 /** Broodmother Vysska's clutch: encounter scenery, never an enemy. Lives here
@@ -298,6 +299,18 @@ export function hoardMarkSpec(variant: HoardBossCueVariant): HoardMarkSpec {
         pulseEvery: 0.75,
         school: 'nature',
         ability: 'Tempest Judgment',
+      };
+    case 'storm-orbital-impact':
+      return {
+        variant,
+        radius: ORBITAL_LIGHTNING.impactRadius,
+        windup: ORBITAL_LIGHTNING.summonDuration + ORBITAL_LIGHTNING.chargeDuration,
+        impactFraction: ORBITAL_LIGHTNING.damageFraction,
+        hazardDuration: ORBITAL_LIGHTNING.residualDuration,
+        pulseFraction: 0,
+        pulseEvery: 1,
+        school: 'nature',
+        ability: 'Orbital Lightning',
       };
     case 'storm-field':
       return {

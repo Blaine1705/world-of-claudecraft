@@ -395,6 +395,13 @@ If you are unsure whether you may use an asset, or you want permission for
 something this file marks as restricted, ask first: tony@levystreet.com.
 | Ley Beam Alignment celestial frame and crystal heart (`public/ui/minigames/ley-*-v1.webp`) | World of ClaudeCraft | Project art generated with OpenAI built-in image generation, optimized to WebP; [provenance and prompts](docs/screenshots/ley-beam-v1/art-provenance.md) | Project asset | With the project only |
 
+### Orbital Lightning
+
+- `public/vfx/orbital-lightning/{orb,impact}.glb`: original procedural Blender art
+  authored for World of ClaudeCraft from the user's Orbital Lightning brief.
+  No third-party models or textures. Project asset, with the project only.
+  Source and provenance: `docs/design/orbital-lightning/shipping-assets.md`.
+
 ### Buried Hoard entrance
 
 - `public/models/props/hoard_entrance.glb`: original procedural model authored for

@@ -380,6 +380,8 @@ export type HoardBossCueVariant =
   | 'storm-field'
   | 'storm-static'
   | 'storm-strike'
+  | 'storm-orbital'
+  | 'storm-orbital-impact'
   | 'tide-wave'
   | 'tide-tether';
 
@@ -400,6 +402,8 @@ export type HoardBossCue =
       waveGap?: number;
       waveSpan?: number;
       waveLead?: number;
+      /** Runtime-only next Orbital Lightning wave to telegraph. */
+      orbitalNextWave?: number;
     }
   | {
       id: number;
