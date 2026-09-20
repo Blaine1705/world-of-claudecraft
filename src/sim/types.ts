@@ -5,7 +5,6 @@ import type { MaterialComposition } from './material_sources';
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
-import type { HoardControlCast } from './rift/hoard_control_casts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
 import type { TreasureMapRarity } from './content/treasure_maps';
@@ -19,6 +18,7 @@ import type {
   PerfectingSwapRequest,
 } from './professions/perfecting_swap';
 import type { RespawnWindow } from './respawn_policy';
+import type { HoardControlCast } from './rift/hoard_control_casts';
 import type {
   VarkhulAssemblyDifficulty,
   VarkhulAssemblyPhase,
@@ -1192,6 +1192,11 @@ interface BaseItemDef {
   // key of its own and the heroic distinction shows as the separate "[HEROIC]"
   // tag instead (the item tooltip's quality line, the Apply Enchant target row).
   heroicOf?: string;
+  // Collection identity only: this item is another TIER of `relicOf` (the Buried
+  // Hoard pieces, content/hoard_loot.ts), so obtaining it also discovers that
+  // item and fills its Reliquary slot. Unlike heroicOf it changes nothing else:
+  // the tier keeps its own name, art, item level and unique-equip family.
+  relicOf?: string;
   // Marks a bespoke heroic-tier item (e.g. the Heroic Nythraxis raid epics) for
   // tooltip chrome; these keep their own name key, unlike heroicOf variants.
   heroic?: boolean;

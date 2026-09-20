@@ -12368,6 +12368,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.shelfRecent'
   | 'hudChrome.reliquary.shelvesAria'
   | 'hudChrome.reliquary.sigilCaption'
+  | 'hudChrome.reliquary.sourceActivityBuriedHoard'
   | 'hudChrome.reliquary.sourceActivityCorpseHarvest'
   | 'hudChrome.reliquary.sourceActivityMasterworkCraft'
   | 'hudChrome.reliquary.sourceActivityRiftFirstClear'

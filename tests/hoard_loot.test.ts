@@ -18,6 +18,7 @@ import {
   hoardLootVariantId,
   rollHoardBossDrop,
 } from '../src/sim/content/hoard_loot';
+import { RELIQUARY_ITEM_TO_PAGES } from '../src/sim/content/reliquary';
 import { RIFT_EPIC_ITEM_IDS } from '../src/sim/content/rift/items';
 import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import {
@@ -343,5 +344,40 @@ describe('the payout', () => {
     }
     expect(paid / runs).toBeGreaterThan(0.05);
     expect(paid / runs).toBeLessThan(0.16);
+  });
+});
+
+describe('the Reliquary slot', () => {
+  it('any tier of a piece discovers the piece, so any tier fills its slot', () => {
+    for (const base of HOARD_BASE_ITEM_IDS) {
+      expect(ITEMS[base].relicOf, base).toBeUndefined();
+      expect(ITEMS[hoardLootVariantId(base, 'rare')].relicOf).toBe(base);
+      expect(ITEMS[hoardLootVariantId(base, 'legendary')].relicOf).toBe(base);
+      expect(RELIQUARY_ITEM_TO_PAGES.get(base), base).toEqual(['conquerors_buried_hoards']);
+      // One slot per piece: the tiers are never catalogued on their own.
+      expect(RELIQUARY_ITEM_TO_PAGES.has(hoardLootVariantId(base, 'rare'))).toBe(false);
+      expect(RELIQUARY_ITEM_TO_PAGES.has(hoardLootVariantId(base, 'legendary'))).toBe(false);
+    }
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', autoEquip: false });
+    const found = sim.players.get(sim.playerId)?.deedStats.itemsDiscovered;
+    if (!found) throw new Error('missing discovery ledger');
+    sim.addItem('legendary_permafrost_legguards', 1);
+    expect(found.has('legendary_permafrost_legguards')).toBe(true);
+    expect(found.has('permafrost_legguards')).toBe(true);
+    expect(found.has('rare_permafrost_legguards')).toBe(false);
+  });
+
+  it('a Tarnished piece is a rare find: it never claims the epic its piece is', () => {
+    const sim = new Sim({ seed: 6, playerClass: 'warrior', autoEquip: false });
+    const stats = sim.players.get(sim.playerId)?.deedStats;
+    if (!stats) throw new Error('missing deed stats');
+    expect(stats.visited.has('quality:epic')).toBe(false);
+    sim.addItem('rare_permafrost_legguards', 1);
+    expect(stats.itemsDiscovered.has('permafrost_legguards')).toBe(true);
+    expect(stats.visited.has('quality:rare')).toBe(true);
+    expect(stats.visited.has('quality:epic')).toBe(false);
+    // The plain tier is an epic and says so.
+    sim.addItem('permafrost_legguards', 1);
+    expect(stats.visited.has('quality:epic')).toBe(true);
   });
 });

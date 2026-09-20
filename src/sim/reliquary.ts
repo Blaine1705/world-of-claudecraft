@@ -630,7 +630,8 @@ export function noteRelicObtain(meta: PlayerMeta, itemId: string, copies = 1): v
       if (state.firstFind[id] === undefined) state.firstFind[id] = {};
       wrote = true;
     }
-    id = def.heroicOf;
+    // A relicOf tier (content/hoard_loot.ts) tallies on its piece the same way.
+    id = def.heroicOf ?? def.relicOf;
   }
   if (wrote) bumpReliquaryWireRev(state);
 }

@@ -271,6 +271,9 @@ function buildPiece(piece: HoardPiece, tier: HoardLootTier): ItemDef {
     requiredLevel: 20,
     sellValue: Math.round(piece.sellValue * spec.sellMult),
     ...(piece.requiredClass ? { requiredClass: [...piece.requiredClass] } : {}),
+    // The Reliquary keeps one slot per PIECE (the plain id): the other two tiers
+    // discover it, so any tier fills the slot.
+    ...(tier === 'epic' ? {} : { relicOf: piece.id }),
   };
   const draft = (
     held

@@ -14794,6 +14794,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceActivityCorpseHarvest':
     'Recuperada al recolectar cadáveres de criaturas',
   'hudChrome.reliquary.sourceActivityMasterworkCraft': 'Se consigue creando una obra maestra',
+  'hudChrome.reliquary.sourceActivityBuriedHoard':
+    'Se encuentra en el cofre de recompensa de un tesoro enterrado, la cámara a la que lleva un mapa del tesoro',
   'hudChrome.reliquary.sourceActivityRiftFirstClear':
     'Se otorga a todos los miembros del grupo que logra la primera conquista de una Brecha clasificada',
   'hudChrome.reliquary.sourceBoss': 'La suelta {boss}',

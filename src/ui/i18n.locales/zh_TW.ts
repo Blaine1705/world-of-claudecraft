@@ -12591,6 +12591,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceStore': '在 WOC 商店購買',
   'hudChrome.reliquary.sourceActivityCorpseHarvest': '採集生物屍體時獲得',
   'hudChrome.reliquary.sourceActivityMasterworkCraft': '製作傑作時獲得',
+  'hudChrome.reliquary.sourceActivityBuriedHoard':
+    '在埋藏寶藏的獎勵寶箱中找到，即藏寶圖所指引的寶庫',
   'hudChrome.reliquary.sourceActivityRiftFirstClear': '授予率先通關分級裂隙的隊伍全體成員',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}，尚未獲得，{source}',
   'hudChrome.reliquary.cellOwnedClearsAria': '{name}，已收錄，首次獲得於第 {count} 次通關',

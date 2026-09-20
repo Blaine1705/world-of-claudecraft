@@ -13241,6 +13241,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceStore': 'WOCストアで購入',
   'hudChrome.reliquary.sourceActivityCorpseHarvest': '敵の死体の採取で入手',
   'hudChrome.reliquary.sourceActivityMasterworkCraft': '傑作の製作で入手',
+  'hudChrome.reliquary.sourceActivityBuriedHoard':
+    '宝の地図が導く「埋もれた財宝」の報酬の宝箱から手に入る',
   'hudChrome.reliquary.sourceActivityRiftFirstClear':
     'ランク付きリフトの初回クリアを制したパーティーの全員に授与',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}、未発見、{source}',

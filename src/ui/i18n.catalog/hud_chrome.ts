@@ -8111,6 +8111,10 @@ export const hudChromeStrings = {
     // the old fills carried the race reading but not those qualifiers).
     sourceActivityRiftFirstClear:
       "Awarded to every member of the party that wins a ranked Rift's first clear",
+    // The Buried Hoard pieces (content/hoard_loot.ts): rolled from the reward
+    // chest, never from the keeper's own loot, and at the tier the map buys.
+    sourceActivityBuriedHoard:
+      'Found in the reward chest of a Buried Hoard, the vault a treasure map leads to',
     // The aria label folds the lines through formatList (Intl.ListFormat), so
     // there is no join key to translate: CLDR owns the separators per locale,
     // including the final-conjunction shapes a pairwise key cannot express.

@@ -13398,6 +13398,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceStore': 'Покупается в магазине WOC',
   'hudChrome.reliquary.sourceActivityCorpseHarvest': 'Находится при сборе с трупов существ',
   'hudChrome.reliquary.sourceActivityMasterworkCraft': 'Даётся за создание шедевра',
+  'hudChrome.reliquary.sourceActivityBuriedHoard':
+    'Находится в наградном сундуке зарытого клада, к которому ведёт карта сокровищ',
   'hudChrome.reliquary.sourceActivityRiftFirstClear':
     'Вручается каждому участнику группы, первой прошедшей ранговый разлом',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}, ещё не найдено, {source}',

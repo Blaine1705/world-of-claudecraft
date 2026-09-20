@@ -7382,6 +7382,141 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
     ]
   },
   {
+    "id": "conquerors_buried_hoards",
+    "shelf": "conquerors",
+    "name": "The Buried Hoards",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Collapsar Band of Nyxaris"
+      },
+      {
+        "kind": "item",
+        "name": "Orb of Collapsing Void"
+      },
+      {
+        "kind": "item",
+        "name": "Cowl of the Event Horizon"
+      },
+      {
+        "kind": "item",
+        "name": "Mantle of Singularity"
+      },
+      {
+        "kind": "item",
+        "name": "Glacier-Hewn Bulwark"
+      },
+      {
+        "kind": "item",
+        "name": "Permafrost Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Frostbitten Rime Slippers"
+      },
+      {
+        "kind": "item",
+        "name": "Rime-Crusted Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Ember-Wrought Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Cinder-Stitched Robes"
+      },
+      {
+        "kind": "item",
+        "name": "Chained Ember Choker"
+      },
+      {
+        "kind": "item",
+        "name": "Molten Clinker Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Storm-Tuned Buckler"
+      },
+      {
+        "kind": "item",
+        "name": "Hauberk of the Tempest Gale"
+      },
+      {
+        "kind": "item",
+        "name": "Gale-Strider Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Tempest-Strike Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Breastplate of Tectonic Might"
+      },
+      {
+        "kind": "item",
+        "name": "Band of the Mountain's Weight"
+      },
+      {
+        "kind": "item",
+        "name": "Monolithic Shoulderguards"
+      },
+      {
+        "kind": "item",
+        "name": "Earthshaker Warboots"
+      },
+      {
+        "kind": "item",
+        "name": "Woven Vest of the Silkstalker"
+      },
+      {
+        "kind": "item",
+        "name": "Spun-Venom Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Chitin Cowl of the Broodmother"
+      },
+      {
+        "kind": "item",
+        "name": "Venom-Etched Waistcord"
+      },
+      {
+        "kind": "item",
+        "name": "Bone-Studded Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Legguards of the Ossuary"
+      },
+      {
+        "kind": "item",
+        "name": "Seal of the Cryptwalker"
+      },
+      {
+        "kind": "item",
+        "name": "Ossuary Bone Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Chalice of the Living Tides"
+      },
+      {
+        "kind": "item",
+        "name": "Pendant of Continuous Flow"
+      },
+      {
+        "kind": "item",
+        "name": "Coral-Encrusted Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Riptide Handwraps"
+      }
+    ]
+  },
+  {
     "id": "conquerors_rares_of_the_realm",
     "shelf": "conquerors",
     "name": "Rares of the Realm",

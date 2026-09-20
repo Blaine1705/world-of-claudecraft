@@ -625,6 +625,62 @@ parses at a glance, and the register already offers the cogwheel).
   (recipe_<output item id>, the shipped derived contract; ids are never
   player-visible anyway).
 
+### Buried Hoard boss loot (web-verified 2026-09-20)
+
+Scope: the 32 item names `src/sim/content/hoard_loot.ts` mints (each also ships
+as "Tarnished X" and "Sovereign X", the rare-map and legendary-map tiers), plus
+the two tier words themselves. Method per the standing bar: quoted exact-phrase
+search for every name, the coined or distinctive token alone, and an adversarial
+pass against WoW, Diablo, GW2, FFXIV, PoE, RuneScape, EverQuest, Dota and the
+Souls family. No name was an exact full-name match to an item in another game.
+
+Renamed before shipping (ids were never released, so both the id and the display
+name moved):
+
+- **Singularity Band of Nyxaris** became **Collapsar Band of Nyxaris**
+  (collapsar_band_of_nyxaris). "Singularity Band" is an exact Risk of Rain 2 item,
+  a void ring that spawns black holes: same slot word, same theme. "Collapsar" is
+  an astronomy term; nothing surveyed is named "Collapsar Band".
+- **Emberforged Crown** became **Ember-Wrought Crown** (ember_wrought_crown).
+  "Emberforged" as an item word surfaced only in WoW (Emberforged Elementium
+  Boots, Light Emberforged Hammer): the single-game fused token this audit
+  renames. "-wrought" joins our own Masterwrought register.
+- **Silk-Woven Vest of the Venomstalker** became **Woven Vest of the Silkstalker**
+  (silkstalker_woven_vest). WoW has the Naxxramas spider Venom Stalker and the
+  armor piece Venom Stalker's Strap: same spider theme, same armor role.
+- **Bone-Inlaid Pauldrons** became **Bone-Studded Pauldrons**
+  (bone_studded_pauldrons). WoW uses the exact modifier on armor (Bone-Inlaid
+  Legguards, Bone-Inlaid Bracers) and no other game surfaced with it.
+- **Glacial Bulwark of Hoarfrost** became **Glacier-Hewn Bulwark**
+  (glacier_hewn_bulwark). "Glacial Bulwark" is a current WoW Frost mage talent;
+  it is also a Breach Wanderers and a Dulst card, so it was borderline rather
+  than a collision, and it moved anyway. "Glacier-Hewn Bulwark" is zero-hit.
+
+Kept under the bar, recorded as borderline (shared vocabulary across several
+properties, different role from every neighbour):
+
+- **Gale-Strider Boots**: "Galestrider" is a WoW mount family, a Century: Age of
+  Ashes creature and a Prodigy NPC. Ours is a hyphenated adjective on footwear.
+- **Earthshaker Warboots**: "Earthshaker" is Poseidon's epithet, used by WoW PvP
+  shaman sets, a Diablo II unique hammer and a Dota 2 hero. No surveyed item is
+  named "Earthshaker Warboots", "Boots" or "Greaves".
+- **Seal of the Cryptwalker**: EverQuest has Cryptwalker's Ring of Protection;
+  the token is also a Sea of Stars character, an itch.io game and a band. WoW's
+  near neighbours are "Cryptstalker" and the NPC "Crypt Walker", not this token.
+
+Clear with no recorded neighbour worth keeping: the other 24 names.
+
+The tier words: **Tarnished** is an ordinary adjective (Elden Ring uses it as a
+noun for the player character, never as an item prefix; Old School RuneScape
+ships "Tarnished" as an item prefix, so it is shared vocabulary). **Sovereign**
+is generic English and already names our own legendary treasure map, which is
+why the legendary tier uses it. The tier was first drafted as "Gilded" and moved
+for an in-repo reason, not an outside one: "Gilded Treasure Map" is our EPIC
+map, so a Gilded piece from a Sovereign map would have read wrong. One standing
+caution from the sweep: never add "Weathered", "Carved" or "Runed" as further
+tier words beside "Gilded", which would reproduce WoW's upgrade-crest ladder
+(our common map is already "Weathered Treasure Map"; keep it at that).
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

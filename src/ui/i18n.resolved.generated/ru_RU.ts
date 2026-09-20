@@ -5442,6 +5442,7 @@ export const ru_RU: EnTranslations = {
       "sourceActivityCorpseHarvest": "Находится при сборе с трупов существ",
       "sourceActivityMasterworkCraft": "Даётся за создание шедевра",
       "sourceActivityRiftFirstClear": "Вручается каждому участнику группы, первой прошедшей ранговый разлом",
+      "sourceActivityBuriedHoard": "Находится в наградном сундуке зарытого клада, к которому ведёт карта сокровищ",
       "cellMissingSourceAria": "{name}, ещё не найдено, {source}",
       "cellOwnedClearsAria": "{name}, каталогизировано, впервые найдено на прохождении {count}",
       "searchPlaceholder": "Поиск реликвий",

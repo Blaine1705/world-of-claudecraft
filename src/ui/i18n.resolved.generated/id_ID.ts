@@ -5442,6 +5442,7 @@ export const id_ID: EnTranslations = {
       "sourceActivityCorpseHarvest": "Didapat saat memanen bangkai makhluk",
       "sourceActivityMasterworkCraft": "Diraih dengan membuat sebuah karya besar",
       "sourceActivityRiftFirstClear": "Diberikan kepada setiap anggota kelompok yang meraih penyelesaian pertama sebuah Rift berperingkat",
+      "sourceActivityBuriedHoard": "Found in the reward chest of a Buried Hoard, the vault a treasure map leads to",
       "cellMissingSourceAria": "{name}, belum ditemukan, {source}",
       "cellOwnedClearsAria": "{name}, terkatalog, pertama ditemukan pada penyelesaian ke-{count}",
       "searchPlaceholder": "Cari relik",
