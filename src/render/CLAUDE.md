@@ -504,6 +504,21 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   the Yumi maze walls, the battleground placements) decides through
   `occluderKeepsInstances` before `acquire`. Pinned by
   `tests/occluder_fade_gate.test.ts` and `tests/occluder_fade_core.test.ts`.
+  On the DITHERED style (`occluder_dither_fade.ts` `ditherFadeEnabled`, the
+  `GFX.ditheredGhostFade` setting) none of the above runs: a hideable material
+  stays opaque and drops fragments on one Bayer pattern, so there is no second
+  program, no twin, no gate consult and no ghost prewarm, and the restore is
+  one step. Structures read a uniform; ONE instance of a batch reads a
+  per-instance HIDE attribute (`instanced_dither_fade.ts`, 0 = drawn, so a
+  geometry without the attribute draws fully) that `InstancedOccluderGhosts`
+  writes instead of swapping in a stand-in. The layer is attached where the
+  batch material is MADE (`withInstancedDitherFade` for a material the module
+  owns, `ghostFadeBatchMaterial` for a borrowed one), never at the first
+  occlusion, and each hideable batch draws a geometry SHELL
+  (`ghostHideGeometry`: the source's attribute objects plus its own hide
+  buffer) that leaves only through `disposeGhostHideGeometry`, because three's
+  geometry dispose deletes the buffer of every attribute still attached.
+  Pinned by `tests/instanced_dither_fade.test.ts`.
 - **The Proving Shore coach's guidance is prewarmed AND gated.** The golden
   ribbon, target ring, body aura, objective beam and camp ring
   (`coach_trail.ts`) used to mint their materials and canvas textures on the
