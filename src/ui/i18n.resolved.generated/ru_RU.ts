@@ -3573,13 +3573,13 @@ export const ru_RU: EnTranslations = {
       }
     },
     "lootQuality": {
-      "ordinary": "Ordinary",
-      "superior": "Superior",
-      "exceptional": "Exceptional",
-      "magnificent": "Magnificent",
-      "transcendent": "Transcendent",
+      "ordinary": "Обычный",
+      "superior": "Превосходный",
+      "exceptional": "Исключительный",
+      "magnificent": "Великолепный",
+      "transcendent": "Запредельный",
       "itemName": "{item}, {quality}",
-      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+      "tooltip": "{quality}: +{levels} к уровню предмета. Сохраняется при улучшениях."
     },
     "itemTooltip": {
       "requiresLevel": "Требуется уровень {level}",

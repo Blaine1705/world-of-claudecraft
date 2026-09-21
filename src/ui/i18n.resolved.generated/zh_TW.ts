@@ -3573,13 +3573,13 @@ export const zh_TW: EnTranslations = {
       }
     },
     "lootQuality": {
-      "ordinary": "Ordinary",
-      "superior": "Superior",
-      "exceptional": "Exceptional",
-      "magnificent": "Magnificent",
-      "transcendent": "Transcendent",
+      "ordinary": "普通",
+      "superior": "優良",
+      "exceptional": "卓越",
+      "magnificent": "華麗",
+      "transcendent": "超凡",
       "itemName": "{item}, {quality}",
-      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+      "tooltip": "{quality}：+{levels} 物品等級。強化後仍會保留。"
     },
     "itemTooltip": {
       "requiresLevel": "需要等級 {level}",

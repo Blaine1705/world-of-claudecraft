@@ -884,6 +884,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': '拾取后绑定',
   'hudChrome.loot.bindConfirmBody':
     '这批战利品中有一件物品在拾取后将与你绑定。绑定的物品只能在限定时间内交易给共同获得该掉落的玩家。',
+  'hudChrome.lootQuality.ordinary': '普通',
+  'hudChrome.lootQuality.superior': '优良',
+  'hudChrome.lootQuality.exceptional': '卓越',
+  'hudChrome.lootQuality.magnificent': '华丽',
+  'hudChrome.lootQuality.transcendent': '超凡',
+  'hudChrome.lootQuality.tooltip': '{quality}：+{levels} 物品等级。强化后仍会保留。',
   'hudChrome.itemTooltip.requiresLevel': '需要等级 {level}',
   'hudChrome.spellbook.addToBarAria': '将{name}添加到动作条',
   'hudChrome.spellbook.removeFromBarAria': '从动作条移除{name}',

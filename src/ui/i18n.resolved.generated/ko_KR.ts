@@ -3573,13 +3573,13 @@ export const ko_KR: EnTranslations = {
       }
     },
     "lootQuality": {
-      "ordinary": "Ordinary",
-      "superior": "Superior",
-      "exceptional": "Exceptional",
-      "magnificent": "Magnificent",
-      "transcendent": "Transcendent",
+      "ordinary": "일반",
+      "superior": "상급",
+      "exceptional": "특급",
+      "magnificent": "걸작",
+      "transcendent": "초월",
       "itemName": "{item}, {quality}",
-      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+      "tooltip": "{quality}: 아이템 레벨 +{levels}. 강화 후에도 유지됩니다."
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",

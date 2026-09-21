@@ -915,6 +915,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': '拾うと魂縛される',
   'hudChrome.loot.bindConfirmBody':
     'この戦利品には、取得すると自分に魂縛されるアイテムが含まれています。魂縛されたアイテムは、同じドロップを分かち合ったプレイヤーとの間でのみ、限られた時間だけ取引できます。',
+  'hudChrome.lootQuality.ordinary': '通常',
+  'hudChrome.lootQuality.superior': '上質',
+  'hudChrome.lootQuality.exceptional': '卓越',
+  'hudChrome.lootQuality.magnificent': '壮麗',
+  'hudChrome.lootQuality.transcendent': '超越',
+  'hudChrome.lootQuality.tooltip': '{quality}：アイテムレベル +{levels}。強化後も維持されます。',
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',

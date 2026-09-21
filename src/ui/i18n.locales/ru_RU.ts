@@ -914,6 +914,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': 'Персональный при получении',
   'hudChrome.loot.bindConfirmBody':
     'Среди этой добычи есть предмет, который станет персональным, когда вы его возьмёте. Персональный предмет можно передать только игрокам, разделившим эту добычу, и только в течение ограниченного времени.',
+  'hudChrome.lootQuality.ordinary': 'Обычный',
+  'hudChrome.lootQuality.superior': 'Превосходный',
+  'hudChrome.lootQuality.exceptional': 'Исключительный',
+  'hudChrome.lootQuality.magnificent': 'Великолепный',
+  'hudChrome.lootQuality.transcendent': 'Запредельный',
+  'hudChrome.lootQuality.tooltip': '{quality}: +{levels} к уровню предмета. Сохраняется при улучшениях.',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
   'hudChrome.spellbook.removeFromBarAria': 'Убрать {name} с панели действий',

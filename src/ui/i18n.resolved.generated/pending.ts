@@ -137,46 +137,22 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "zh_CN": [
-    "hudChrome.lootQuality.exceptional",
     "hudChrome.lootQuality.itemName",
-    "hudChrome.lootQuality.magnificent",
-    "hudChrome.lootQuality.ordinary",
-    "hudChrome.lootQuality.superior",
-    "hudChrome.lootQuality.tooltip",
-    "hudChrome.lootQuality.transcendent",
     "hudChrome.options.frameRateCapSixty",
     "hudChrome.options.frameRateCapThirty"
   ],
   "zh_TW": [
-    "hudChrome.lootQuality.exceptional",
     "hudChrome.lootQuality.itemName",
-    "hudChrome.lootQuality.magnificent",
-    "hudChrome.lootQuality.ordinary",
-    "hudChrome.lootQuality.superior",
-    "hudChrome.lootQuality.tooltip",
-    "hudChrome.lootQuality.transcendent",
     "hudChrome.options.frameRateCapSixty",
     "hudChrome.options.frameRateCapThirty"
   ],
   "ko_KR": [
-    "hudChrome.lootQuality.exceptional",
     "hudChrome.lootQuality.itemName",
-    "hudChrome.lootQuality.magnificent",
-    "hudChrome.lootQuality.ordinary",
-    "hudChrome.lootQuality.superior",
-    "hudChrome.lootQuality.tooltip",
-    "hudChrome.lootQuality.transcendent",
     "hudChrome.options.frameRateCapSixty",
     "hudChrome.options.frameRateCapThirty"
   ],
   "ja_JP": [
-    "hudChrome.lootQuality.exceptional",
     "hudChrome.lootQuality.itemName",
-    "hudChrome.lootQuality.magnificent",
-    "hudChrome.lootQuality.ordinary",
-    "hudChrome.lootQuality.superior",
-    "hudChrome.lootQuality.tooltip",
-    "hudChrome.lootQuality.transcendent",
     "hudChrome.options.frameRateCapSixty",
     "hudChrome.options.frameRateCapThirty"
   ],
@@ -202,13 +178,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "ru_RU": [
-    "hudChrome.lootQuality.exceptional",
     "hudChrome.lootQuality.itemName",
-    "hudChrome.lootQuality.magnificent",
-    "hudChrome.lootQuality.ordinary",
-    "hudChrome.lootQuality.superior",
-    "hudChrome.lootQuality.tooltip",
-    "hudChrome.lootQuality.transcendent",
     "hudChrome.options.frameRateCapSixty",
     "hudChrome.options.frameRateCapThirty"
   ],

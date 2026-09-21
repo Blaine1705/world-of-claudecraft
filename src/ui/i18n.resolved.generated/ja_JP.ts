@@ -3573,13 +3573,13 @@ export const ja_JP: EnTranslations = {
       }
     },
     "lootQuality": {
-      "ordinary": "Ordinary",
-      "superior": "Superior",
-      "exceptional": "Exceptional",
-      "magnificent": "Magnificent",
-      "transcendent": "Transcendent",
+      "ordinary": "通常",
+      "superior": "上質",
+      "exceptional": "卓越",
+      "magnificent": "壮麗",
+      "transcendent": "超越",
       "itemName": "{item}, {quality}",
-      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+      "tooltip": "{quality}：アイテムレベル +{levels}。強化後も維持されます。"
     },
     "itemTooltip": {
       "requiresLevel": "必要レベル {level}",
