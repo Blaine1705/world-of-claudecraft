@@ -28,6 +28,20 @@ export function lootQualityReceiptText(
   return localize(event.text);
 }
 
+/** The whole receipt body for the hud's one guarded log() call: the localized
+ *  text for an ordinary line, or, when the event names a quality-rolled copy,
+ *  the nodes whose matching item link carries that exact copy. */
+export function lootQualityReceiptBody(
+  doc: Document,
+  event: Extract<SimEvent, { type: 'loot' }>,
+  localize: (text: string) => string,
+  appendLink: (parent: HTMLElement, id: string, copy?: ItemInstancePayload) => void,
+): string | Node[] {
+  const text = lootQualityReceiptText(event, localize);
+  if (!event.itemId || !event.instance?.lootQuality) return text;
+  return lootQualityReceiptNodes(doc, text, event.itemId, event.instance, appendLink);
+}
+
 export function lootQualityReceiptNodes(
   doc: Document,
   text: string,

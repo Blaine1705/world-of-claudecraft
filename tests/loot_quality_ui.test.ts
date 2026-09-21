@@ -10,7 +10,11 @@ import { t } from '../src/ui/i18n';
 import { itemCombatTooltipLines } from '../src/ui/item_combat_tooltip_view';
 import { itemStatDeltas, sameItemCopy, shouldCompareCopies } from '../src/ui/item_compare';
 import { itemNumber, itemStatName, wornTooltipInstance } from '../src/ui/item_instance_tooltip';
-import { lootQualityReceiptNodes, lootQualityReceiptText } from '../src/ui/loot_quality_receipt';
+import {
+  lootQualityReceiptBody,
+  lootQualityReceiptNodes,
+  lootQualityReceiptText,
+} from '../src/ui/loot_quality_receipt';
 import {
   lootQualityBadgeHtml,
   lootQualityName,
@@ -73,6 +77,39 @@ describe('permanent loot quality presentation', () => {
     });
     expect(links).toHaveLength(1);
     expect(lootQualityName(links[0])).toBe('Magnificent');
+  });
+  it('hands the hud a plain string for an ordinary line and nodes for a quality-rolled copy', () => {
+    // The hud's loot arm is ONE guarded log() call (#2430); this is the whole
+    // string-or-nodes decision behind it, so both arms are pinned here.
+    const appended: Array<{ id: string; instance?: ItemInstancePayload }> = [];
+    const doc = {
+      createElement: () => ({ append: () => {} }),
+      createTextNode: () => ({}),
+    } as unknown as Document;
+    const appendLink = (_parent: HTMLElement, id: string, instance?: ItemInstancePayload) => {
+      appended.push({ id, instance });
+    };
+    const ordinary = { type: 'loot' as const, pid: 7, text: 'You receive: Plain Ring.' };
+    expect(lootQualityReceiptBody(doc, ordinary, (value) => `t:${value}`, appendLink)).toBe(
+      't:You receive: Plain Ring.',
+    );
+    // An event that names an item but whose copy carries no quality descriptor
+    // stays on the string path too: only a rolled copy earns an exact-copy link.
+    const plainCopy = { ...ordinary, itemId: 'ring', instance: {}, count: 1 };
+    expect(typeof lootQualityReceiptBody(doc, plainCopy, (value) => value, appendLink)).toBe(
+      'string',
+    );
+    expect(appended).toHaveLength(0);
+    const rolled = {
+      ...ordinary,
+      text: 'You receive: [[i:ring]].',
+      itemId: 'ring',
+      instance: copy(2),
+      count: 1,
+    };
+    const body = lootQualityReceiptBody(doc, rolled, (value) => value, appendLink);
+    expect(Array.isArray(body)).toBe(true);
+    expect(appended).toEqual([{ id: 'ring', instance: rolled.instance }]);
   });
   it('maps Healing Power from the combat bonus lane into final tooltip and compare values', () => {
     const instance = copy(4);

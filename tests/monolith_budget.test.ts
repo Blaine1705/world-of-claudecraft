@@ -486,7 +486,13 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18291 -> 18289 at the PR 4100 review round: the Inspect look now
     // travels as an openInspect parameter (no InspectEntity cast dep), and
     // the target-of-target key reads targetPortraitKey. Exact count, zero slack.
-    ceiling: 18289,
+    // LOWERED 18289 -> 18279 at the permanent loot quality (PR 4054) base
+    // merge: the item tooltip column composition moved to
+    // item_combat_tooltip_view.ts and the loot receipt body decision to
+    // loot_quality_receipt.ts (the loot arm keeps its one guarded log()
+    // call through a thin lootReceiptBody adapter). Exact merged count,
+    // zero slack.
+    ceiling: 18279,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -650,7 +650,7 @@ import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
-import { lootQualityReceiptNodes, lootQualityReceiptText } from './loot_quality_receipt';
+import { lootQualityReceiptBody } from './loot_quality_receipt';
 import { lootQualityAriaName } from './loot_quality_view';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
@@ -11613,21 +11613,9 @@ export class Hud {
           // (#2430). Everything else in this arm still runs for those grants:
           // the loot-roll close below, the bag refresh, and the independent
           // audio guard.
-          if (!ev.callerLogs) {
-            const text = lootQualityReceiptText(ev, (value) => this.localizeLootText(value));
-            if (ev.itemId && ev.instance?.lootQuality)
-              this.logNodes(
-                lootQualityReceiptNodes(
-                  document,
-                  text,
-                  ev.itemId,
-                  ev.instance,
-                  (parent, id, copy) => this.appendChatItemLink(parent, id, copy),
-                ),
-                HUD_LOG.GOOD,
-              );
-            else this.log(text, HUD_LOG.GOOD);
-          }
+          // The body is the localized line, or, for a quality-rolled copy, the
+          // nodes whose item link carries that exact copy (lootReceiptBody).
+          if (!ev.callerLogs) this.log(this.lootReceiptBody(ev), HUD_LOG.GOOD);
           if (
             / wins .+ \(\d+\)$/.test(ev.text) ||
             /^Everyone passed on .+\.$/.test(ev.text) ||
@@ -13974,7 +13962,9 @@ export class Hud {
   }
 
   log(
-    text: string,
+    // A string body, or a caller-assembled NODE body (the exact-copy loot
+    // receipt link) that rides the same chrome and channel as a text line.
+    text: string | readonly Node[],
     color = 'var(--color-accent)',
     decorativeIconUrl?: string,
     channel = ERROR_LOG_CHAN,
@@ -13985,13 +13975,13 @@ export class Hud {
   ): void {
     this.appendLog(
       this.chatLogEl,
-      text,
+      typeof text === 'string' ? text : '',
       color,
       true,
       channel,
       decorativeIconUrl,
       plainText,
-      undefined,
+      typeof text === 'string' ? undefined : text,
       announceWhenFiltered,
     );
   }
@@ -14002,6 +13992,18 @@ export class Hud {
    *  text node. */
   private logNodes(nodes: readonly Node[], color: string): void {
     this.appendLog(this.chatLogEl, '', color, true, 'system', undefined, false, nodes);
+  }
+
+  /** The generic grant line's body (src/ui/loot_quality_receipt.ts): the
+   *  localized text, or for a quality-rolled copy the nodes whose item link
+   *  opens that exact copy rather than the catalogue definition. */
+  private lootReceiptBody(ev: Extract<SimEvent, { type: 'loot' }>): string | Node[] {
+    return lootQualityReceiptBody(
+      document,
+      ev,
+      (value) => this.localizeLootText(value),
+      (parent, id, copy) => this.appendChatItemLink(parent, id, copy),
+    );
   }
 
   private noteProcAuraGain(name: string): void {
