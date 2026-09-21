@@ -513,7 +513,7 @@ describe("the vault prompt's stepper wiring", () => {
     expect(steps[1]?.disabled).toBe(true);
     expect(steps[3]?.disabled).toBe(false);
     steps[3]?.click();
-    expect((prompt?.querySelector('input') as HTMLInputElement).value).toBe('7');
+    expect(prompt?.querySelector<HTMLInputElement>('input')?.value).toBe('7');
     expect(steps[3]?.disabled).toBe(true);
     expect(h.calls).toEqual([]);
   });

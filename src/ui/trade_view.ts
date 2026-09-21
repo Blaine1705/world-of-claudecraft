@@ -16,8 +16,8 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 import { ITEMS } from '../sim/data';
 import { countRawInSlots } from '../sim/item_lock';
-import { TRADE_OFFER_MAX_LINES } from '../sim/social/trade';
 import type { MaterialComposition } from '../sim/material_sources';
+import { TRADE_OFFER_MAX_LINES } from '../sim/social/trade';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import { itemDisplayName } from './entity_i18n';
 import { formatNumber, t } from './i18n';
