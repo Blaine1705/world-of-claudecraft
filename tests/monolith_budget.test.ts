@@ -488,11 +488,16 @@ const MONOLITHS: MonolithRow[] = [
     // measured that branch at 18291 against this pin, so its tradeOfferHeadroom
     // wrapper folded into the bags binding (the trade-open gate plus the pure
     // core read on one dependency line). Exact count, zero slack.
-    // LOWERED 18286 -> 18273 with the character-select raid lockouts: the
+    // LOWERED 18286 -> 18276 at the release/v0.44.0 sync of the Pale Keeper
+    // revive change: the Keeper dialog copy moved out to
+    // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
+    // per-frame healer-range scan (the Keeper is talked to). wc -l on the
+    // merged tree. Exact count, zero slack.
+    // LOWERED 18276 -> 18263 with the character-select raid lockouts: the
     // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
     // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
     // and the minimap badge name a lockout identically. Exact count, zero slack.
-    ceiling: 18273,
+    ceiling: 18263,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

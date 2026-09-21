@@ -645,6 +645,7 @@ import {
   itemSetTooltipModel,
 } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
+import { keeperReviveConfirm, keeperReviveDialogue } from './keeper_revive_dialog_core';
 import { bindActionDisplayName } from './keybind_action_names_core';
 import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
@@ -1087,11 +1088,11 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
-// Ghost-mode display thresholds, mirroring src/sim/spirit.ts (CORPSE_REZ_RANGE and
-// SPIRIT_HEALER_RANGE). The server re-validates both ranges; these only decide whether
-// the death-overlay resurrect buttons are shown, so keep them in sync.
+// Ghost-mode display threshold, mirroring src/sim/spirit.ts CORPSE_REZ_RANGE. The
+// server re-validates the range; this only decides whether the ghost prompt's corpse
+// button is shown, so keep it in sync. (The Pale Keeper's raise is reached by talking
+// to the Keeper, so no healer range is mirrored here any more.)
 const GHOST_CORPSE_REZ_RANGE = 35;
-const GHOST_HEALER_RANGE = 8;
 
 const STAT_VIEW_DEPS: StatTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
@@ -1617,7 +1618,8 @@ export class Hud {
   private guildInvitePromptEl: HTMLElement | null = null;
   private promptSequence = 0;
   private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
-  private resurrectHealerBtnEl = $('#resurrect-healer-btn');
+  // The standing top-of-screen ghost line (both ways back); shown for a ghost only.
+  private ghostHintEl = $('#ghost-hint');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
   private hotWriteCache: SingleSlotCache = new WeakMap(); // WeakMap rationale: painter_host.ts
@@ -2683,7 +2685,6 @@ export class Hud {
       this.sim.releaseSpirit();
     });
     bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
-    bindTouchTap(this.resurrectHealerBtnEl, () => this.requestSpiritHealerResurrect());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;
@@ -9471,7 +9472,9 @@ export class Hud {
     // Death UI. A fresh corpse (dead, spirit not yet released) gets the full-screen
     // Release overlay (a corpse cannot move, so a modal is fine; suppressed in arena).
     // A ghost runs FREELY (no blocking overlay) and the world drains to greyscale; a
-    // A small prompt appears only in corpse/Healer reach; the server re-checks both ranges.
+    // A small prompt appears only in corpse reach (the server re-checks the range); the
+    // Pale Keeper's raise is reached by talking to the Keeper, and a standing top line
+    // names both ways back for the whole ghost run.
     const ghost = p.dead && p.ghost;
     const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
     // A battleground corpse releases like the open world, so the Release modal shows;
@@ -9482,22 +9485,10 @@ export class Hud {
     if (!p.dead) this.closeResurrectionPrompt();
     document.body.classList.toggle('spirit-mode', ghost);
     this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
+    this.setDisplay(this.ghostHintEl, ghost && !ghostInBgMatch ? 'block' : 'none');
     if (ghost && !ghostInBgMatch) {
       const corpseInRange = !!p.corpsePos && dist2d(p.pos, p.corpsePos) <= GHOST_CORPSE_REZ_RANGE;
-      let healerNearby = false;
-      for (const ent of this.sim.entities.values()) {
-        if (
-          ent.kind === 'npc' &&
-          ent.templateId === 'spirit_healer' &&
-          dist2d(ent.pos, p.pos) <= GHOST_HEALER_RANGE
-        ) {
-          healerNearby = true;
-          break;
-        }
-      }
-      this.setDisplay(this.ghostPromptEl, corpseInRange || healerNearby ? 'flex' : 'none');
-      this.setDisplay(this.resurrectCorpseBtnEl, corpseInRange ? '' : 'none');
-      this.setDisplay(this.resurrectHealerBtnEl, healerNearby ? '' : 'none');
+      this.setDisplay(this.ghostPromptEl, corpseInRange ? 'flex' : 'none');
     } else {
       this.setDisplay(this.ghostPromptEl, 'none');
     }
@@ -13387,7 +13378,9 @@ export class Hud {
           break;
         }
         case 'respawn':
-          this.log(t('hud.system.respawn'), HUD_LOG.GOOD);
+          if (ev.sickness === 'resurrection')
+            this.log(t('hud.system.respawnKeeperToll'), HUD_LOG.NOTICE);
+          else this.log(t('hud.system.respawn'), HUD_LOG.GOOD);
           break;
         case 'unstuck': {
           const feedback = unstuckFeedback(ev);
@@ -16613,21 +16606,18 @@ export class Hud {
     );
   }
 
-  // The Pale Keeper revive is irreversible and applies The Keeper's Toll (all
-  // attributes -75%, level-scaled up to 10 minutes), so it confirms first; the
-  // penalty-free corpse run stays one tap. OK sends the exact pre-existing
-  // command; cancel/Escape sends nothing. Public because every entry point to
-  // the revive routes through this one gate: the ghost-prompt button, the
-  // world-click on the Pale Keeper (game/interactions.ts), and the interact
-  // key (game/nearby_interaction.ts).
+  // Talking to the Pale Keeper (world click, interact key) opens its dialogue, and
+  // Revive Me there opens a level-aware confirmation (keeper_revive_dialog_core.ts):
+  // the raise is irreversible and charges The Keeper's Toll from level 10 up. Only
+  // the second OK sends the command; cancel/Escape at either step sends nothing.
   requestSpiritHealerResurrect(): void {
-    this.confirmDialog(
-      t('hudChrome.death.healerConfirmTitle'),
-      t('hudChrome.death.healerConfirmBody'),
-      t('hudChrome.death.healerConfirmAccept'),
-      t('hudChrome.death.healerConfirmCancel'),
-      () => this.onResurrectAtSpiritHealer?.(),
-    );
+    const talk = keeperReviveDialogue(this.sim.player.level);
+    this.confirmDialog(t(talk.titleKey), t(talk.bodyKey), t(talk.okKey), t(talk.cancelKey), () => {
+      const sure = keeperReviveConfirm(this.sim.player.level);
+      this.confirmDialog(t(sure.titleKey), t(sure.bodyKey), t(sure.okKey), t(sure.cancelKey), () =>
+        this.onResurrectAtSpiritHealer?.(),
+      );
+    });
   }
 
   // Heroic Quartermaster purchases debit Heroic Marks with no buyback recorded

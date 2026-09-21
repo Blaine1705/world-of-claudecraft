@@ -212,6 +212,9 @@ const UI_PURE_CORES = [
   // The zone-entry chat line (welcome hint vs the town-done line); the
   // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
   'src/ui/zone_entry_line_core.ts',
+  // The Pale Keeper's two-step revive copy (dialogue, then a level-aware confirm);
+  // hud.ts resolves the keys and owns the dialog DOM.
+  'src/ui/keeper_revive_dialog_core.ts',
   // The one clamp and disabled rule the source picker's row steppers and the
   // bank quantity prompt share (quantity_stepper.ts is their DOM consumer).
   'src/ui/quantity_step_core.ts',
