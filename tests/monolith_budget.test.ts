@@ -486,7 +486,21 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at this release/v0.44.0 merge: the feral Wildfang pass composes
     // with that integrated release tree at 18309 by wc -l. Exact count,
     // zero slack.
-    ceiling: 18309,
+    // LOWERED 18309 -> 18284 by the composed player portraits change: the
+    // "which body does this player's frame show" rule moved out to
+    // src/ui/player_portrait_core.ts, so the three frame draws and the
+    // portrait update listener each became one call. Exact count, zero slack.
+    // Re-measured at the release/v0.44.0 sync of that change (the release's
+    // frame-rate-limit wiring plus the per-call portrait lookups compose to
+    // 18291 by wc -l on the merged tree, still under the 18309 the branch
+    // started from). Exact count, zero slack.
+    // LOWERED 18291 -> 18289 at the PR 4100 review round: the Inspect look now
+    // travels as an openInspect parameter (no InspectEntity cast dep), and
+    // the target-of-target key reads targetPortraitKey. Exact count, zero slack.
+    // Re-pinned at this v0.44 release-line reconciliation: the batch-side HUD
+    // state and Wildfang pass compose with the release-side player portrait
+    // extraction at 18292 by wc -l on the merged tree. Exact count, zero slack.
+    ceiling: 18292,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
