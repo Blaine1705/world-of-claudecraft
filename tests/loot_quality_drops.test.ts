@@ -97,7 +97,13 @@ describe('enemy quality copies through authoritative loot distribution', () => {
     const toLoser = carried(resolved.filter((ev) => 'pid' in ev && ev.pid === b));
     expect(toLoser.length).toBeGreaterThan(0);
     for (const instance of toLoser) expect(instance).toEqual(quality);
-    expect(copy(sim, a)?.lootQuality).toEqual(quality.lootQuality);
+    // The winner's grant is the custody copy, not the projection: the private
+    // fields the corpse copy carried arrive with it (the decisive negative for
+    // a grant path accidentally switched to publicInstanceView).
+    const won = copy(sim, a);
+    expect(won?.lootQuality).toEqual(quality.lootQuality);
+    expect(won?.bindOnTrade).toBe(true);
+    expect(won?.charges).toEqual({ private: 2 });
   });
 
   it('directly loots every solo copy without rerolling quality', () => {

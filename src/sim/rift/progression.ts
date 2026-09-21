@@ -473,8 +473,9 @@ export function addRiftProgressionLoot(
     // Both gates the sibling rollers apply: the source AND the item. Bands are
     // epic armor today, so the item gate is inert, but a shell def change must
     // never stamp a descriptor that reads as enhanced with zero bonus.
+    const shell = ITEMS[gear.itemId];
     const lootQuality =
-      isEligibleEnemyQualitySource(boss) && isEligibleLootQualityItem(ITEMS[gear.itemId])
+      isEligibleEnemyQualitySource(boss) && shell !== undefined && isEligibleLootQualityItem(shell)
         ? createLootQuality(ctx.rng)
         : undefined;
     if (lootQuality) gear.instance.lootQuality = lootQuality;

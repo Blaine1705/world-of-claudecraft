@@ -11,12 +11,6 @@ import type { LootQualityDescriptor } from './types';
 
 type Line = Record<string, number>;
 
-/** Resolved ladders by shell, rank and descriptor. The search is pure, so the
- * memo only spares recalcPlayerStats the walk on every aura change for a worn
- * quality band; bounded because weights are per copy and open-ended. */
-const LADDER_MEMO_LIMIT = 512;
-const ladderMemo = new Map<string, readonly Line[]>();
-
 function candidates(shell: RiftBandShell, level: number, quality: LootQualityDescriptor): Line[] {
   const guaranteedLevel = level + 2 * (quality.tier - 1);
   const finalLevel = level + 2 * quality.tier;
@@ -55,21 +49,10 @@ export function riftQualityPrimaryStats(
   upgrade: number,
   quality: LootQualityDescriptor,
 ): Line {
-  const key = `${shell.primary}|${shell.secondary}|${tier}|${quality.tier}|${quality.weights.join(',')}`;
-  let ladder = ladderMemo.get(key);
-  if (!ladder) {
-    ladder = resolveLadder(shell, tier, quality);
-    if (ladderMemo.size >= LADDER_MEMO_LIMIT) ladderMemo.clear();
-    ladderMemo.set(key, ladder);
-  }
-  return { ...ladder[Math.max(0, Math.min(RIFT_BAND_MAX_UPGRADE, Math.floor(upgrade)))] };
-}
-
-function resolveLadder(
-  shell: RiftBandShell,
-  tier: RiftTier,
-  quality: LootQualityDescriptor,
-): readonly Line[] {
+  // Resolved on every call, deliberately unmemoized: sim state stays on Sim
+  // (src/sim/CLAUDE.md, Adding a mechanic step 1), and the walk is small (a
+  // handful of candidates per step over six steps, first monotone path wins),
+  // so recalcPlayerStats pays a bounded constant per worn quality band.
   // Priced at the same capped level the ordinary line uses (riftBandItemLevel),
   // so a cap change can never split the ladder from its baseline.
   const rows = Array.from({ length: RIFT_BAND_MAX_UPGRADE + 1 }, (_, i) =>
@@ -92,5 +75,5 @@ function resolveLadder(
   // future shell or budget change that breaks monotonicity fails loudly in
   // that suite rather than pricing a worn band silently.
   if (!result) throw new Error('Rift loot-quality ladder has no monotone allocation');
-  return result;
+  return result[Math.max(0, Math.min(RIFT_BAND_MAX_UPGRADE, Math.floor(upgrade)))];
 }
