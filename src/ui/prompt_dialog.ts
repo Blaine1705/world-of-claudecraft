@@ -123,16 +123,15 @@ export function installPromptDialog(
     inertRoot.inert = false;
     close();
   };
-  // The opener can be gone by the time Cancel / Escape runs (the trade window
-  // repaints its offer rows wholesale on every partner change): fall back to
-  // the window's own close button so focus stays inside the surface rather
-  // than dropping to <body>.
+  // Deliberately no detached-opener fallback here: a window with its own
+  // landing ladder (the vendor buy prompt re-lands by row key AFTER this
+  // return, treating focus already inside the window as settled) would be
+  // pre-empted by a recipe-level landing on Close, which its ladder ranks
+  // last on purpose. A window whose rows can be repainted under an open
+  // prompt owns its own landing.
   const dismissAndReturn = (): void => {
     dismiss();
-    const target = opener?.isConnected
-      ? opener
-      : inertRoot.querySelector<HTMLElement>('[data-close]');
-    target?.focus();
+    opener?.focus();
   };
   HANDLES.set(prompt, { dismiss, dismissAndReturn });
   prompt.addEventListener('keydown', (e) => {

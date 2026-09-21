@@ -168,10 +168,8 @@ describe('bank_window: modal prompt a11y contract', () => {
       painter.match(/querySelector\('\[data-close\]'\) as HTMLElement \| null\)\?\.focus\(\)/g) ??
       [];
     expect(landings.length).toBeGreaterThanOrEqual(3);
-    // The return now falls back to the root's close button when the opener
-    // was repainted away (tests/prompt_dialog.test.ts drives both arms).
     expect(promptDialog).toMatch(
-      /const dismissAndReturn = \(\): void => \{\s*dismiss\(\);\s*const target = opener\?\.isConnected\s*\? opener\s*: inertRoot\.querySelector<HTMLElement>\('\[data-close\]'\);\s*target\?\.focus\(\);/,
+      /const dismissAndReturn = \(\): void => \{\s*dismiss\(\);\s*opener\?\.focus\(\);/,
     );
   });
 

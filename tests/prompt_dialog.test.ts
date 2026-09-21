@@ -236,32 +236,3 @@ describe('dismissInstalledPrompt: the element-keyed teardown registry', () => {
     expect(stray.isConnected).toBe(false);
   });
 });
-
-describe('dismissAndReturn: the focus return when the opener is gone', () => {
-  it('returns focus to a still-connected opener', () => {
-    const r = rig();
-    try {
-      r.handle.dismissAndReturn();
-      expect(document.activeElement).toBe(r.opener);
-    } finally {
-      r.cleanup();
-    }
-  });
-
-  it("falls back to the root's close button when the opener was repainted away", () => {
-    const r = rig();
-    try {
-      const close = document.createElement('button');
-      close.setAttribute('data-close', '');
-      r.root.appendChild(close);
-      // The trade window rebuilds its offer rows wholesale on every partner
-      // change, so the row that opened the prompt can be detached by Cancel.
-      r.opener.remove();
-      r.handle.dismissAndReturn();
-      expect(r.root.inert).toBe(false);
-      expect(document.activeElement).toBe(close);
-    } finally {
-      r.cleanup();
-    }
-  });
-});
