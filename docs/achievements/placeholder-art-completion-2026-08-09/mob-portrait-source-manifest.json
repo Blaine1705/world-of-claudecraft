@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "621177026ce85bac7255720d83b5e273714cbf9546cb5e4f666a44b3174b486f",
+  "rendererFingerprint": "e6b0d5b03122b3f8919a6cce7a56aa8bbbb60d9eedc76a355b3edec22e21d21b",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5008411,
-      "sha256": "dbf16b6f7462d6ecbf776a6f1bac7b9a21563505df451631d1d1e6e71b8c9c8e",
+      "sha256": "c766a6d8bf41456d8fa5100554b8b6683c0038f13eae48b66aa74d621b49930f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6105,8 +6105,8 @@
             "asset": {
               "url": "models/weapons/hoard_forge_maul.glb",
               "path": "public/models/weapons/hoard_forge_maul.glb",
-              "bytes": 16260,
-              "sha256": "31c58870df731dc06f8edcc164a31fb3a06268e7b45ecea85fb51eaab986833c"
+              "bytes": 22144,
+              "sha256": "a9a66eae6d457a74041bf932675e775b9f8b9b18bed181e3f1a7b9654f061fb8"
             },
             "bone": "handslot.r",
             "position": null,
@@ -6123,7 +6123,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "00f23a6e692ff3b1667a10f9d637927be085034766e35ef4e1e33c4dc55b2c6b",
+      "sourceFingerprint": "1b4ce3b14ad58b80ffe4da9ae6cd5cc2f970e3f1e22b7c351b5cbfd26d93abb6",
       "output": {
         "path": "public/ui/mobs/rift_boss_ember.webp",
         "bytes": 2484,

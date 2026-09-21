@@ -3829,8 +3829,10 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 2.5,
     clips: {
       // He fights bare-clawed: a two-handed weapon chop with empty hands read as a
-      // broken swing (playtest), so he rakes with both claws, swipes and punches.
-      ...kaykit(['Dualwield_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Punch_A']),
+      // broken swing, and the dual-wield chop CROSSES the arms, which his long
+      // clawed arms turn into a tangle (both playtest). One arm at a time: a
+      // diagonal rake, a level swipe, a punch.
+      ...kaykit(['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Slice_Horizontal', 'Punch_A']),
       hit: ['Hit_A'],
       // He throws both claws at the sky to call the orbital storm (authored).
       attackByAbility: { [HOARD_GESTURE_CALL_STORM]: 'CallStorm' },

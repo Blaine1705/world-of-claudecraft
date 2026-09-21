@@ -1444,7 +1444,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/weapons/hammer_c.glb": "/media/models/weapons/hammer_c.e107d6cfa524.glb",
   "models/weapons/hammer_d.glb": "/media/models/weapons/hammer_d.6d3cf3ededad.glb",
   "models/weapons/hammer_varkhul.glb": "/media/models/weapons/hammer_varkhul.455c74ed5ed1.glb",
-  "models/weapons/hoard_forge_maul.glb": "/media/models/weapons/hoard_forge_maul.31c58870df73.glb",
+  "models/weapons/hoard_forge_maul.glb": "/media/models/weapons/hoard_forge_maul.a9a66eae6d45.glb",
   "models/weapons/hoarfrost_vigil.glb": "/media/models/weapons/hoarfrost_vigil.a04e5d20f098.glb",
   "models/weapons/ice_fang.glb": "/media/models/weapons/ice_fang.414177cdd100.glb",
   "models/weapons/iron_field_hammer.glb": "/media/models/weapons/iron_field_hammer.e76bc1b62d5d.glb",

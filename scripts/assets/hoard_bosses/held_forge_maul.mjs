@@ -3,11 +3,13 @@
 // modelled to FALL: head down, origin under the striking face, thirteen yards
 // tall. This writes the HELD variant of the same model: head up, origin on the
 // grip, sized for his fist, in its own authored black iron, molten face and
-// leather (the stock KayKit hammer it replaces rendered pale pink on him).
+// leather (the stock KayKit hammer it replaces rendered pale pink on him). With no
+// weapon-family row it attaches at its own origin: the grip.
 //
 //   node scripts/assets/hoard_bosses/held_forge_maul.mjs
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { dequantize, transformMesh } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 
 const SOURCE = 'public/vfx/forge-hammer/hammer.glb';
@@ -24,6 +26,9 @@ const io = new NodeIO()
   .registerExtensions(ALL_EXTENSIONS)
   .registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
 const doc = await io.read(SOURCE);
+// The shipped arena model is quantized; vertices are baked below, so go back to
+// floats first (a quantized accessor cannot take an arbitrary transform).
+await doc.transform(dequantize());
 const root = doc.getRoot();
 const scene = root.listScenes()[0];
 const scale = LENGTH / SOURCE_LENGTH;
@@ -37,6 +42,21 @@ for (const child of scene.listChildren()) {
   held.addChild(child);
 }
 scene.addChild(held);
+// BAKE the pose into the vertices. The game's held-prop loader keeps a single
+// root's scale but drops its position and rotation (flattenWeaponScene), so a
+// flip left on the node would be lost and he would hold it by the head. Each
+// part is baked by its WORLD matrix (its own scale is not uniform, so pushing a
+// rotated parent down through it as a TRS would shear), then every node is reset.
+const parts = root
+  .listNodes()
+  .filter((node) => node.getMesh())
+  .map((node) => ({ node, world: node.getWorldMatrix() }));
+for (const { node, world } of parts) transformMesh(node.getMesh(), world);
+for (const node of root.listNodes()) {
+  node.setTranslation([0, 0, 0]);
+  node.setRotation([0, 0, 0, 1]);
+  node.setScale([1, 1, 1]);
+}
 await io.write(TARGET, doc);
 console.log(
   `wrote ${TARGET}: ${LENGTH} long, grip ${(GRIP_Y * scale).toFixed(2)} from the face end`,
