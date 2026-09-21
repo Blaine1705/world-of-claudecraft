@@ -50,7 +50,7 @@ molten channels at the foot of the walls, firelight) reach the
 fight, and they are dark or dim so every telegraph out-reads them. Nothing here
 collides: the walls already do.
 
-The zone's generic spires are NOT drawn in a kitted room: the kit is the room's
+The zone's generic spires and hero trees are NOT drawn in a kitted room: the kit is the room's
 dressing, and the floor it keeps clear stays clear.
 
 ## Tiers

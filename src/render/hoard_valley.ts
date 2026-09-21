@@ -429,7 +429,8 @@ class HoardValleyViewImpl implements HoardValleyView {
     const boss = options.plan.spawns.find((spawn) => spawn.boss);
     const kitted = roomKitFor(boss?.templateId) === 'forge';
     if (!kitted) this.group.add(buildDressing(visualPlan, shadows));
-    this.group.add(buildHoardCavernFoliage(visualPlan, shadows));
+    // The zone's hero trees go the same way: bare trees do not belong in a forge.
+    if (!kitted) this.group.add(buildHoardCavernFoliage(visualPlan, shadows));
     if (kitted) {
       const tier: RoomKitTier =
         options.effectsProfile.tier === 'low'
