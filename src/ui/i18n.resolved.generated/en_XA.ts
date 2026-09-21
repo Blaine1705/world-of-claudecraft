@@ -518,6 +518,15 @@ export const en_XA: EnTranslations = {
     },
     "trade": {
       "windowClosed": "[Ţŕáðé ŵíñðóŵ çļóšéð.]",
+      "offerQuantityHint": "[Ýóú ŵíļļ ƀé ášķéð ĥóŵ ɱáñý ţó óƒƒéŕ]",
+      "offerQuantityTitle": "[Óƒƒéŕ {item}]",
+      "offerQuantityInput": "[Ɋúáñţíţý ţó óƒƒéŕ]",
+      "offerQuantityConfirm": "[Óƒƒéŕ]",
+      "offerQuantityAll": "[Óƒƒéŕ áļļ]",
+      "offerRemoveTitle": "[Ŕéɱóʋé {item}]",
+      "offerRemoveInput": "[Ɋúáñţíţý ţó ŕéɱóʋé]",
+      "offerRemove": "[Ŕéɱóʋé]",
+      "offerRemoveAll": "[Ŕéɱóʋé áļļ]",
       "woc": {
         "tabGold": "[Ĝóļð]",
         "tabWoc": "[$ŴÓÇ]",
@@ -10751,7 +10760,7 @@ export const en_XA: EnTranslations = {
       "emptyTheirs": "[Ñóţĥíñĝ óƒƒéŕéð ýéţ]",
       "money": "[Ɱóñéý]",
       "copper": "[çóþþéŕ]",
-      "hint": "[Çļíçķ áñ óƒƒéŕéð íţéɱ ţó ŕéɱóʋé íţ. Ɓóţĥ šíðéš ɱúšţ þŕéšš Áççéþţ Ţŕáðé.]",
+      "hint": "[Çļíçķ áñ óƒƒéŕéð íţéɱ ţó ŕéɱóʋé šóɱé óŕ áļļ óƒ íţ. Ɓóţĥ šíðéš ɱúšţ þŕéšš Áççéþţ Ţŕáðé.]",
       "accept": "[Áççéþţ Ţŕáðé]",
       "waiting": "[Ŵáíţíñĝ...]",
       "cancel": "[Çáñçéļ]"

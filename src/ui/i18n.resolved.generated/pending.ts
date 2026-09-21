@@ -31,7 +31,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "es_ES": [
     "abilityUi.forms.bearOrCat",
@@ -55,7 +64,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "fr_FR": [
     "abilityUi.forms.bearOrCat",
@@ -79,7 +97,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "fr_CA": [
     "abilityUi.forms.bearOrCat",
@@ -103,7 +130,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "en_CA": [],
   "it_IT": [
@@ -128,7 +164,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "de_DE": [
     "abilityUi.forms.bearOrCat",
@@ -152,7 +197,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "zh_CN": [
     "hudChrome.lootQuality.itemName",
@@ -196,7 +250,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "ru_RU": [
     "hudChrome.lootQuality.itemName",
@@ -225,7 +288,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "nl_NL": [
     "abilityUi.forms.bearOrCat",
@@ -249,7 +321,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "pl_PL": [
     "abilityUi.forms.bearOrCat",
@@ -273,7 +354,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "id_ID": [
     "abilityUi.forms.bearOrCat",
@@ -297,7 +387,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "tr_TR": [
     "abilityUi.forms.bearOrCat",
@@ -321,7 +420,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "sv_SE": [
     "abilityUi.forms.bearOrCat",
@@ -345,7 +453,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "vi_VN": [
     "abilityUi.forms.bearOrCat",
@@ -369,7 +486,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ],
   "da_DK": [
     "abilityUi.forms.bearOrCat",
@@ -393,6 +519,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trade.offerQuantityAll",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityHint",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle",
+    "hudChrome.trade.offerRemove",
+    "hudChrome.trade.offerRemoveAll",
+    "hudChrome.trade.offerRemoveInput",
+    "hudChrome.trade.offerRemoveTitle"
   ]
 };
