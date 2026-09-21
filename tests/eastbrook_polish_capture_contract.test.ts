@@ -689,7 +689,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  '1cf4f4eddc48d0f0657276dde04f003d8e5d720b1bee784488c7f8d1344b56d4';
+  // Re-minted for the World PvP flag: the renderer leaf's hostile-player verdict
+  // moved to the shared pvp_hostile_core (renderer.ts edit only). No capture was retaken.
+  '1e5c52b5af63977d41c2dc93a5a6c39f28cf9cafe5fb3325eb3ec1c4055a968d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

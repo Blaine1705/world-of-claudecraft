@@ -1383,7 +1383,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  '82ae53a5d0974ea5c446ac6bcd9d0a608140eaa44c3180dcccb4af0a1feb278a';
+  // Re-minted for the World PvP flag: the renderer leaf's hostile-player verdict
+  // moved to the shared pvp_hostile_core (renderer.ts edit only). No capture was retaken.
+  '9201964cf7dc91718a2d39c1f715224d348bc1e8b5590e45a7e626bb13a124cc';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1395,7 +1397,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  '1cf4f4eddc48d0f0657276dde04f003d8e5d720b1bee784488c7f8d1344b56d4';
+  // Re-minted for the World PvP flag: the renderer leaf's hostile-player verdict
+  // moved to the shared pvp_hostile_core (renderer.ts edit only). No capture was retaken.
+  '1e5c52b5af63977d41c2dc93a5a6c39f28cf9cafe5fb3325eb3ec1c4055a968d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2772,7 +2776,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // devalue audit floor: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-    ).toBe('05563425f6d9d299a64d21dfc3ff40436830d8f72c69ba0f344a349b2e39a996');
+      // World PvP flag: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+    ).toBe('c1e0be71ed944716e484d7415afde86ae25cc50febb67eac56f3c370220db8ad');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
