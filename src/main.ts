@@ -452,7 +452,7 @@ import { assembleBugReportMeta } from './ui/bug_report';
 import { cameraPromptOpen, dismissCameraPrompt } from './ui/camera_prompt';
 import { deleteCharButtonHtml, normalizeDeleteConfirmation } from './ui/char_delete_button';
 import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
-import { charselectHintsHtml } from './ui/charselect_hints';
+import { charselectHintsHtml, isolateLockoutDisclosure } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -6673,8 +6673,6 @@ async function refreshCharacters(): Promise<void> {
       row.dataset.skin = String(c.skin ?? 0);
       const className = classDisplayName(c.class);
       const statusText = c.online ? '' : c.forceRename ? ` (${t('character.renameRequired')})` : '';
-      // Zone line plus the in-world notice (src/ui/charselect_hints.ts).
-      const hintsHtml = charselectHintsHtml(c, Date.now());
       // One-shot redesign token (server-decided: pre-creator character, token
       // unspent). Rendered on every action arm; gone for good once spent.
       const rerollBtn = c.appearanceRerollAvailable
@@ -6699,7 +6697,7 @@ async function refreshCharacters(): Promise<void> {
         <div class="char-id">
           <span class="char-name">${esc(c.name)}</span>
           <span class="char-sub">${esc(t('character.levelClass', { level: c.level, className }))}${esc(statusText)}</span>
-          ${hintsHtml}
+          ${charselectHintsHtml(c, Date.now())}
         </div>
         ${
           c.forceRename
@@ -6708,6 +6706,7 @@ async function refreshCharacters(): Promise<void> {
               ? `<span class="char-actions"><button class="btn take-over-btn" title="${esc(t('character.takeOverConfirm'))}" aria-label="${esc(t('character.takeOverConfirm'))}">${esc(t('character.takeOver'))}</button>${rerollBtn}${deleteCharButtonHtml(true)}</span>`
               : `<span class="char-actions"><button class="btn enter-world-btn">${esc(t('auth.enterWorld'))}</button>${rerollBtn}${deleteCharButtonHtml(false)}</span>`
         }`;
+      isolateLockoutDisclosure(row);
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -6766,7 +6765,7 @@ async function refreshCharacters(): Promise<void> {
 
       row.addEventListener('click', selectRow);
       row.addEventListener('keydown', (e) => {
-        if ((e.key === 'Enter' || e.key === ' ') && !(e.target as Element).closest('summary')) {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           selectRow();
         }

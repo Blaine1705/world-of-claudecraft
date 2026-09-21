@@ -2422,7 +2422,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'character.takeOver': '넘겨받기',
   'character.inWorldHint': '이미 세계에 있습니다. 다른 곳에서 로그아웃하거나 넘겨받으세요.',
   'character.currentLocation': '현재 위치: {zone}',
-  'character.raidLockouts': '공격대 잠금',
+  'character.lockouts': '잠금',
+  'character.lockoutRaids': '공격대',
+  'character.lockoutDungeons': '던전',
+  'character.lockoutWorldBosses': '월드 보스',
   'character.takeOverConfirm':
     '이 캐릭터를 다른 세션에서 연결 해제하고 여기로 가져옵니다. 계속하시겠습니까?',
   'character.renameRequired': '이름 변경 필요',

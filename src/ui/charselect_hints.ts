@@ -11,6 +11,7 @@
 // per roster paint (refreshCharacters); a player parked on character select
 // keeps that reading until the roster refetches (realm, sort or language
 // change, or re-entry), which the minute granularity makes harmless.
+import { LOCKOUT_KIND_ORDER, lockoutKind, type RaidLockoutKind } from '../sim/raid_lockout_state';
 import { zoneDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
@@ -30,10 +31,22 @@ export interface CharselectHintSource {
  *  countdown text for the time left at `nowMs`. */
 export interface CharselectLockoutRow {
   id: string;
+  kind: RaidLockoutKind;
   name: string;
   time: string;
   msRemaining: number;
 }
+
+/** The group heading key for each lockout kind, in the order the list shows
+ *  them: raids, then dungeons, then world bosses. */
+const LOCKOUT_GROUP_KEY: Record<
+  RaidLockoutKind,
+  'character.lockoutRaids' | 'character.lockoutDungeons' | 'character.lockoutWorldBosses'
+> = {
+  raid: 'character.lockoutRaids',
+  dungeon: 'character.lockoutDungeons',
+  worldBoss: 'character.lockoutWorldBosses',
+};
 
 /** The localized zone name for a roster row, or null when the server sent no
  *  zone (an older server, or a save that resumes at the world start). */
@@ -58,6 +71,7 @@ export function charselectLockoutRows(
     if (msRemaining <= 0) continue;
     rows.push({
       id,
+      kind: lockoutKind(id),
       name: raidLockoutDisplayName(id),
       time: formatLockoutDuration(msRemaining),
       msRemaining,
@@ -70,22 +84,54 @@ export function charselectLockoutRows(
 
 /** The lockout block: a native details/summary disclosure (closed by default,
  *  the news panel's pattern, so no JS wiring) whose summary carries the label
- *  and the locked-raid count, and whose body lists one row per locked raid
- *  (name and countdown, the in-world "locked to" sentence as its tooltip).
- *  '' when none are locked. */
+ *  and the locked count, and whose body groups the rows under Raids, Dungeons
+ *  and World bosses (a group renders only when it has a row), one row per
+ *  lockout (name and countdown, the in-world "locked to" sentence as its
+ *  tooltip). '' when none are locked. */
 export function charselectLockoutsHtml(c: CharselectHintSource, nowMs: number): string {
   const rows = charselectLockoutRows(c, nowMs);
   if (rows.length === 0) return '';
   const count = formatNumber(rows.length, { maximumFractionDigits: 0, useGrouping: false });
-  const items = rows
-    .map(
-      (r) =>
-        `<span class="char-lockout-item" title="${esc(
-          t('hudChrome.raidLockout.lockedToast', { raid: r.name, time: r.time }),
-        )}"><span class="char-lockout-name">${esc(r.name)}</span> <span class="char-lockout-time ui-num">${esc(r.time)}</span></span>`,
-    )
-    .join('');
-  return `<details class="char-lockout-hint"><summary class="char-lockout-label">${esc(t('character.raidLockouts'))} <span class="char-lockout-count ui-num">${esc(count)}</span></summary>${items}</details>`;
+  const item = (r: CharselectLockoutRow) =>
+    `<span class="char-lockout-item" title="${esc(
+      t('hudChrome.raidLockout.lockedToast', { raid: r.name, time: r.time }),
+    )}"><span class="char-lockout-name">${esc(r.name)}</span> <span class="char-lockout-time ui-num">${esc(r.time)}</span></span>`;
+  const groups = LOCKOUT_KIND_ORDER.map((kind) => {
+    const inKind = rows.filter((r) => r.kind === kind);
+    if (inKind.length === 0) return '';
+    return `<span class="char-lockout-group" data-kind="${kind}"><span class="char-lockout-group-name">${esc(t(LOCKOUT_GROUP_KEY[kind]))}</span>${inKind.map(item).join('')}</span>`;
+  }).join('');
+  return `<details class="char-lockout-hint"><summary class="char-lockout-label">${esc(t('character.lockouts'))} <span class="char-lockout-count ui-num">${esc(count)}</span></summary>${groups}</details>`;
+}
+
+/** The structural slice of a roster row this module wires: the row's own
+ *  querySelector and the disclosure's addEventListener. Duck-typed so this
+ *  module stays host-agnostic (no DOM globals; a test passes a fake). */
+export interface LockoutDisclosureRow {
+  querySelector(selector: string): {
+    addEventListener(type: string, listener: (e: LockoutDisclosureEvent) => void): void;
+  } | null;
+}
+export interface LockoutDisclosureEvent {
+  key?: string;
+  stopPropagation(): void;
+}
+
+/** The row's listeners select it on click and Enter/Space and enter the world
+ *  on double click, and the disclosure sits inside the row. Stop those three
+ *  events at the disclosure so toggling it (mouse or keyboard) never selects
+ *  the character, never enters the world, and never has its native Enter/Space
+ *  activation swallowed by the row's preventDefault. Every other key (Tab,
+ *  Escape) still bubbles. A row without a disclosure is a no-op. */
+export function isolateLockoutDisclosure(row: LockoutDisclosureRow): void {
+  const disclosure = row.querySelector('.char-lockout-hint');
+  if (!disclosure) return;
+  const stop = (e: LockoutDisclosureEvent) => e.stopPropagation();
+  disclosure.addEventListener('click', stop);
+  disclosure.addEventListener('dblclick', stop);
+  disclosure.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+  });
 }
 
 /** `nowMs` is the caller's wall clock (main.ts passes Date.now()): this module

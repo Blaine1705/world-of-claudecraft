@@ -1291,7 +1291,10 @@ const MONOLITHS: MonolithRow[] = [
     // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
     // composed with the release's game_renderer.ts extraction. Exact merged
     // count, zero slack.
-    ceiling: 11281,
+    // LOWERED 11281 -> 11280 with the character-select lockout disclosure:
+    // the roster row hint markup call is inlined into its template and the
+    // disclosure event isolation lives in src/ui/charselect_hints.ts.
+    ceiling: 11280,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

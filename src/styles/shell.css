@@ -2686,11 +2686,22 @@
   .char-row .char-lockout-count {
     color: var(--color-text-muted);
   }
+  .char-row .char-lockout-group {
+    display: block;
+    padding-left: 10px;
+  }
+  .char-row .char-lockout-group-name {
+    display: block;
+    margin-top: 2px;
+    color: var(--color-text-muted);
+    font-variant: small-caps;
+    letter-spacing: 0.04em;
+  }
   .char-row .char-lockout-item {
     display: flex;
     align-items: baseline;
     gap: 6px;
-    padding-left: 10px;
+    padding-left: 6px;
   }
   .char-row .char-lockout-item::before {
     content: "\00b7";

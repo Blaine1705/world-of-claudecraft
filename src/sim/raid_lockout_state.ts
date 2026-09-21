@@ -10,7 +10,26 @@
 // final-boss lock, `<dungeon>:heroic` for the heroic daily, and
 // `worldboss:<mobId>` for a looted world boss (src/sim/world_boss.ts). The
 // roster ships them verbatim; the client resolves display names
-// (src/ui/raid_lockout_format.ts raidLockoutDisplayName).
+// (src/ui/raid_lockout_format.ts raidLockoutDisplayName) and groups them by
+// lockoutKind below.
+
+import { isRaidRoom } from './raid_rooms';
+import { worldBossIdFromLockout } from './world_boss';
+
+/** What a lockout id locks: a raid boss room (either reset boundary), an
+ *  ordinary dungeon (a heroic daily under `<dungeon>:heroic`), or a looted
+ *  world boss (`worldboss:<mobId>`). */
+export type RaidLockoutKind = 'raid' | 'dungeon' | 'worldBoss';
+
+export const LOCKOUT_KIND_ORDER: readonly RaidLockoutKind[] = ['raid', 'dungeon', 'worldBoss'];
+
+export function lockoutKind(lockoutId: string): RaidLockoutKind {
+  if (worldBossIdFromLockout(lockoutId) !== null) return 'worldBoss';
+  const dungeonId = lockoutId.endsWith(':heroic')
+    ? lockoutId.slice(0, -':heroic'.length)
+    : lockoutId;
+  return isRaidRoom(dungeonId) ? 'raid' : 'dungeon';
+}
 
 /** The subset of a saved `raidLockouts` map that is still locked at `nowMs`:
  *  finite expiries strictly in the future, keys sorted so the wire shape is
