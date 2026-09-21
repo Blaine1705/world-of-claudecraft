@@ -25,6 +25,14 @@ import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX, type GfxTier, surfaceMat } from './gfx';
+import { HoardForgeGate } from './hoard_forge_gate';
+import {
+  FORGE_GATE_LOOK,
+  type ForgeGateFrame,
+  forgeGateFrame,
+  forgeGateRadius,
+  writeRingEdge,
+} from './hoard_forge_gate_core';
 import {
   type HammerPose,
   hammerPose,
@@ -80,6 +88,8 @@ interface StrikeRig {
   wall: ReturnType<typeof strip> & { mesh: THREE.Mesh; material: THREE.ShaderMaterial };
   doors: Array<ReturnType<typeof strip> & { mesh: THREE.Mesh; material: THREE.ShaderMaterial }>;
   mask: Float32Array;
+  /** Per column, how near a door the fire burns: it climbs toward the post. */
+  edge: Float32Array;
   pose: HammerPose;
 }
 
@@ -93,6 +103,18 @@ export class HoardForgeHammerFx {
   private time = 0;
   private seed = 11;
   private readonly rigs: StrikeRig[] = [];
+  /** Every door's posts and marked way through (hoard_forge_gate.ts). */
+  private readonly gate: HoardForgeGate;
+  private readonly gateFrame: ForgeGateFrame = {
+    middle: 0,
+    radialX: 0,
+    radialZ: 1,
+    postA: 0,
+    postB: 0,
+    edgeA: 0,
+    edgeB: 0,
+    halfWidth: 1,
+  };
   /** The model baked once and shared by every rig (and the stand-in likewise). */
   private bakedFor: THREE.Group | undefined;
   private readonly baked: Array<{ geometry: THREE.BufferGeometry; material: string }> = [];
@@ -135,6 +157,7 @@ export class HoardForgeHammerFx {
     const disc = this.own(new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2));
     const ring = this.own(new THREE.RingGeometry(0.88, 1, 64).rotateX(-Math.PI / 2));
     for (let i = 0; i < RIGS; i++) this.rigs.push(this.makeRig(initial, card, disc, ring));
+    this.gate = new HoardForgeGate(this.root, RIGS, !this.low);
 
     if (!this.low) {
       const geometry = this.own(new THREE.BufferGeometry());
@@ -261,6 +284,7 @@ export class HoardForgeHammerFx {
       wall: this.ribbon(SEGMENTS, LOOK.fireHot, 'ForgeWall', 22),
       doors,
       mask: new Float32Array(SEGMENTS + 1),
+      edge: new Float32Array(SEGMENTS + 1),
       pose: {
         shadow: 0,
         shadowScale: 1,
@@ -419,7 +443,8 @@ export class HoardForgeHammerFx {
   update(dt: number): void {
     if (this.disposed) return;
     this.time += dt;
-    for (let i = 0; i < this.rigs.length; i++) this.updateRig(this.rigs[i], dt);
+    for (let i = 0; i < this.rigs.length; i++) this.updateRig(this.rigs[i], i, dt);
+    this.gate.commit();
     this.updateEmbers(dt);
   }
 
@@ -436,9 +461,10 @@ export class HoardForgeHammerFx {
     for (let d = 0; d < rig.doors.length; d++) rig.doors[d].mesh.visible = false;
   }
 
-  private updateRig(rig: StrikeRig, dt: number): void {
+  private updateRig(rig: StrikeRig, slot: number, dt: number): void {
     if (!rig.seen || rig.cueId === -1) {
       this.hideRig(rig);
+      this.gate.hide(slot);
       return;
     }
     rig.shown = true;
@@ -510,6 +536,7 @@ export class HoardForgeHammerFx {
     if (rig.maskFor !== rig.cueId) {
       rig.maskFor = rig.cueId;
       writeRingMask(rig.cueId, rig.mask);
+      writeRingEdge(rig.mask, rig.edge);
     }
     const burning = pose.ring > 0.01 && pose.ringRadius > FORGE_HAMMER.ringSafeRadius * 0.6;
     rig.band.mesh.visible = burning;
@@ -520,6 +547,33 @@ export class HoardForgeHammerFx {
     for (let d = 0; d < rig.doors.length; d++) {
       rig.doors[d].mesh.visible = doorsShown;
       if (doorsShown) rig.doors[d].material.uniforms.gain.value = 0.45 * pose.doors;
+    }
+    this.gate.write(
+      slot,
+      rig.cueId,
+      rig.x,
+      rig.z,
+      ground,
+      pose.ringRadius,
+      pose.doors,
+      still ? 0 : this.time,
+    );
+    // Sparks off a post's hot head: richness only, the posts themselves are solid.
+    if (this.embers && doorsShown && !still && this.random() < 0.3) {
+      const radius = forgeGateRadius(pose.ringRadius);
+      const gap = Math.floor(this.random() * FORGE_HAMMER.gaps);
+      const frame = forgeGateFrame(rig.cueId, gap, radius, this.gateFrame);
+      const bearing = this.random() < 0.5 ? frame.postA : frame.postB;
+      this.emit(
+        rig.x + Math.sin(bearing) * radius,
+        ground + 2.3 * FORGE_GATE_LOOK.postScale,
+        rig.z + Math.cos(bearing) * radius,
+        (this.random() - 0.5) * 1.5,
+        2 + this.random() * 3,
+        (this.random() - 0.5) * 1.5,
+        0.14,
+        0.6,
+      );
     }
   }
 
@@ -543,7 +597,9 @@ export class HoardForgeHammerFx {
       band.alpha.setX(column * 2, lit * 0.95);
       band.alpha.setX(column * 2 + 1, lit * 0.55);
       const lick = still || this.low ? 1 : 0.75 + 0.35 * Math.sin(this.time * 13 + column * 1.7);
-      const top = y + LOOK.wallHeight * lick;
+      // Beside a door the fire climbs toward the post that ends it.
+      const climb = 1 + FORGE_GATE_LOOK.edgeLift * rig.edge[column];
+      const top = y + LOOK.wallHeight * lick * climb;
       const wx = rig.x + sx * pose.ringRadius;
       const wz = rig.z + sz * pose.ringRadius;
       wall.position.setXYZ(column * 2, wx, y, wz);
@@ -674,6 +730,7 @@ export class HoardForgeHammerFx {
     if (this.disposed) return;
     this.disposed = true;
     this.root.removeFromParent();
+    this.gate.dispose();
     for (const geometry of this.geometries) geometry.dispose();
     for (const material of this.materials) material.dispose();
     this.geometries.clear();

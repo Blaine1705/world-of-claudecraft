@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "b6885a83051e428838cb9f4854464d75dbb044fc638e00fd04a3af88f1f25948",
+  "rendererFingerprint": "4aa092067f83872b2472fb4ff45e9a2055cf9a6398868e6b6f213544c14ff5b6",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5008309,
-      "sha256": "34158ebc81791066e590f2b817d5ea97b3dbaddca9da62dc3efd0db49d81e5b9",
+      "sha256": "2833cca254e19c9198ffef0b9c6bc15d51bb6c129f0f466ac9909235b64765c9",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6024,11 +6024,11 @@
         "model": {
           "url": "models/creatures/hoard_archon_nyxaris.glb",
           "path": "public/models/creatures/hoard_archon_nyxaris.glb",
-          "bytes": 581908,
-          "sha256": "705c40e0f29dd9ab1125387e993ce57976f628abec6259680d2d56cba9d5f68b"
+          "bytes": 580460,
+          "sha256": "3955c0ed3f5c86d1d3d24bef8750dfe04c042d49ee14260fb41bf20d2aa3a9f0"
         },
         "idle": "Idle",
-        "height": 1.9,
+        "height": 2.4,
         "yaw": null,
         "hover": 0.45,
         "show": null,
@@ -6042,11 +6042,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "baa4626c76990c5a7d6f56a17e2ec0930bef8ce7f59b268730696abc206e0a2f",
+      "sourceFingerprint": "009d1bba538bd2b7df0ba6fe8bbf19ee1d0c4a13d3fbdb4f9a9118574f5ddda2",
       "output": {
         "path": "public/ui/mobs/rift_boss_arcane.webp",
-        "bytes": 1928,
-        "sha256": "71953284aedaac76b0aad9213b4daa02ec0af204268b2b802aeb2691e9ad85f0"
+        "bytes": 1890,
+        "sha256": "d0529c5cf7bc0dfb7746768cb104ea671c1fd5596af1996d21a7df9cc4298642"
       }
     },
     {
@@ -6092,11 +6092,11 @@
         "model": {
           "url": "models/creatures/hoard_emberforge_tyrant.glb",
           "path": "public/models/creatures/hoard_emberforge_tyrant.glb",
-          "bytes": 770620,
-          "sha256": "6d815d29c2d3e38e4dd8bd73bfdb5b57e274fc3c9b28ba98849af95fe01cf2f0"
+          "bytes": 806500,
+          "sha256": "b85d1cf931934388831eb7361f6f63d310f53425001bb6e2fa415881a0761416"
         },
         "idle": "Idle",
-        "height": 2,
+        "height": 2.6,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -6123,11 +6123,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "1066ebeae50365d3e8953fc8cf5cec994592b5bfeba844e901dc6a8879940a4d",
+      "sourceFingerprint": "b5cde901432c4c95a56cd28ce04a09cb0cb2991765a36096ec437457099294f3",
       "output": {
         "path": "public/ui/mobs/rift_boss_ember.webp",
-        "bytes": 2128,
-        "sha256": "1204a58c70a75cb3016370c521e3190a9184dd267ac06280ae8f1d42619c7fb2"
+        "bytes": 2870,
+        "sha256": "aa5fe9590141476ebc2fafc358b574374b1a0be84773d572e6f29b5cc39b04ad"
       }
     },
     {
@@ -6139,11 +6139,11 @@
         "model": {
           "url": "models/creatures/hoard_hoarfrost_warden.glb",
           "path": "public/models/creatures/hoard_hoarfrost_warden.glb",
-          "bytes": 1405768,
-          "sha256": "00114608fa92544a9d1cf3ebc9c065e01bfd50320d34397fe9d186ebc85435e5"
+          "bytes": 1523784,
+          "sha256": "ae692a4161fc410f9cacabe8b59cf1362fe8b859ed79e8f1c1b91df831eb9187"
         },
         "idle": "Idle",
-        "height": 2,
+        "height": 2.6,
         "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
@@ -6157,7 +6157,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "b78513efe05a75ef609d7f014ec87b4be5f8dde753080d4f1eb8e258ee8e1d54",
+      "sourceFingerprint": "60f3581154544c3631fb633b38e66b3e888b19a017ac62d3e0a9ddd767c1208a",
       "output": {
         "path": "public/ui/mobs/rift_boss_frost.webp",
         "bytes": 3220,
@@ -6275,11 +6275,11 @@
         "model": {
           "url": "models/creatures/hoard_tempest_vharok.glb",
           "path": "public/models/creatures/hoard_tempest_vharok.glb",
-          "bytes": 740600,
-          "sha256": "daa62d90237746a45f5817e9e42347474ff36f95b3ea4bea18d56f8a6bd87913"
+          "bytes": 739840,
+          "sha256": "2f37e8d5ef862fd375f020267e56023d115d9ecf76879b3d851c02a667ad64d5"
         },
         "idle": "Idle",
-        "height": 1.9,
+        "height": 2.5,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -6293,11 +6293,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9d94efbf42f38e288bac1f8e3b0d747a59c6b00f9256038f3d85dd1bacd29382",
+      "sourceFingerprint": "8f464372de92d553fa790ef35972ac8cfffe5f432caedf9ecf51981a716940d4",
       "output": {
         "path": "public/ui/mobs/rift_boss_storm.webp",
-        "bytes": 2472,
-        "sha256": "76a58c677f63341a0e1c21305ea992c2a625f9e876dc99b25bc52fbf725a1a9f"
+        "bytes": 2470,
+        "sha256": "77e8356ea24084e342f68f51c17d8d7655d87d6f58d921d8b5361a52b955f3d3"
       }
     },
     {
@@ -6313,7 +6313,7 @@
           "sha256": "92421142d9617b834ea3b123b4cae76a279794dbd0304466b00b1a7e20bd818e"
         },
         "idle": "Idle",
-        "height": 1.7,
+        "height": 2.3,
         "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
@@ -6327,7 +6327,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "0536f9bf3e9c40ab48aea4b44ea7b33ca5f422ccdf0a80cf1687a471da95b672",
+      "sourceFingerprint": "15cc23395d8c5765375622d5752d17b8b7669789e4a0e464e0d45f5c3fa90467",
       "output": {
         "path": "public/ui/mobs/rift_boss_tide.webp",
         "bytes": 2264,

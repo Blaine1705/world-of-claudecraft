@@ -406,7 +406,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/hoard_abyssal_maw.glb": "/media/models/creatures/hoard_abyssal_maw.92421142d961.glb",
   "models/creatures/hoard_archon_nyxaris.glb": "/media/models/creatures/hoard_archon_nyxaris.3955c0ed3f5c.glb",
   "models/creatures/hoard_brood_cocoon.glb": "/media/models/creatures/hoard_brood_cocoon.b99488a9a932.glb",
-  "models/creatures/hoard_emberforge_tyrant.glb": "/media/models/creatures/hoard_emberforge_tyrant.6d815d29c2d3.glb",
+  "models/creatures/hoard_emberforge_tyrant.glb": "/media/models/creatures/hoard_emberforge_tyrant.b85d1cf93193.glb",
   "models/creatures/hoard_hoarfrost_warden.glb": "/media/models/creatures/hoard_hoarfrost_warden.ae692a4161fc.glb",
   "models/creatures/hoard_pulsar_core.glb": "/media/models/creatures/hoard_pulsar_core.524194701edb.glb",
   "models/creatures/hoard_silk_cocoon.glb": "/media/models/creatures/hoard_silk_cocoon.6aa49e593e78.glb",
