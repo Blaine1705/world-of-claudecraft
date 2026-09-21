@@ -1,6 +1,7 @@
 import { NPCS } from '../data';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
+import { WEEKLY_BOSS_TABLES } from '../weekly_reward_tables';
 import { emptyWeeklyRewards, WEEKLY_KEEPER_ID, type WeeklyPoolId } from '../weekly_rewards';
 
 /** Explicit local/dev-only fixture. Never called by normal gameplay or reset. */
@@ -21,6 +22,7 @@ export function prepareWeeklyVaultPlaytest(ctx: SimContext, pid: number, rollove
   state.pvp = 3;
   state.world = 4;
   state.raidUnlocks = [2, 2, 2];
+  state.bossUnlocks = Object.fromEntries(WEEKLY_BOSS_TABLES.map(({ bossId }) => [bossId, 2]));
   // The rollover fixture leaves earning progress for the real reset path to roll
   // on the next read. It must not open the window before the tester interacts.
   state.vaults = rollover
@@ -29,6 +31,7 @@ export function prepareWeeklyVaultPlaytest(ctx: SimContext, pid: number, rollove
         {
           resetAtMs: Math.max(1, state.resetAtMs - 604800000),
           raidUnlocks: [2, 2, 2],
+          bossUnlocks: { ...state.bossUnlocks },
           choices: (
             ['raid', 'raid_heroic', 'dungeon', 'dungeon_heroic', 'world', 'pvp'] as WeeklyPoolId[]
           ).map((pool) => ({ pool })),

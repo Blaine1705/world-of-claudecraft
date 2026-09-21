@@ -1,9 +1,26 @@
 import { describe, expect, it } from 'vitest';
-import { decodeWeeklyRewardInfo } from '../src/net/weekly_rewards_wire';
+import { decodeWeeklyRewardInfo, sendWeekly } from '../src/net/weekly_rewards_wire';
 import { emptyWeeklyRewards } from '../src/sim/weekly_rewards';
 import { bareClient } from './helpers/bare_client';
 
 describe('weekly reward wire', () => {
+  it('sends the chosen table with the current open token, never with a claim', () => {
+    const info = {
+      state: emptyWeeklyRewards(604800000),
+      nowMs: 1000,
+      playerLevel: 20,
+      canClaim: true,
+      worldQuestsAvailable: false,
+      readyWeeks: 1,
+    };
+    const messages: unknown[] = [];
+    sendWeekly(info, '1000:0', 'open', (message) => messages.push(message), 'ysolei');
+    sendWeekly(info, '1000:0', 'claim', (message) => messages.push(message), 'ysolei');
+    expect(messages).toEqual([
+      { cmd: 'weekly_reward_open', choice: '1000:0', token: '604800000:0', tables: ['ysolei'] },
+      { cmd: 'weekly_reward_claim', choice: '1000:0', token: '604800000:0' },
+    ]);
+  });
   it('preserves concealed slots and opening status without accepting unopened item details', () => {
     const state = emptyWeeklyRewards(604800000);
     state.vaults = [
@@ -20,6 +37,7 @@ describe('weekly reward wire', () => {
     const info = decodeWeeklyRewardInfo({
       state,
       nowMs: 2000,
+      playerLevel: 20,
       canClaim: true,
       worldQuestsAvailable: false,
       readyWeeks: 1,
@@ -35,6 +53,7 @@ describe('weekly reward wire', () => {
     const info = {
       state: emptyWeeklyRewards(604800000),
       nowMs: 1000,
+      playerLevel: 20,
       canClaim: true,
       worldQuestsAvailable: false,
       readyWeeks: 0,
@@ -49,6 +68,7 @@ describe('weekly reward wire', () => {
     const info = {
       state: emptyWeeklyRewards(604800000),
       nowMs: 1000,
+      playerLevel: 20,
       canClaim: true,
       worldQuestsAvailable: false,
       readyWeeks: 0,

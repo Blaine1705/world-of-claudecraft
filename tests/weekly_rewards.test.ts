@@ -14,12 +14,15 @@ import { freshInstanceSlot } from '../src/sim/instances/instance_slot';
 import { Sim } from '../src/sim/sim';
 import { endArenaMatch, startArenaMatch } from '../src/sim/social/arena';
 import { endBgMatch, startBgMatch } from '../src/sim/social/battleground';
+import { ALL_CLASSES, IGNIVAR_BOSS_ID, type PlayerClass } from '../src/sim/types';
+import { weeklyChoiceExhausted } from '../src/sim/weekly_reward_availability';
+import { weeklyRewardTableOptions } from '../src/sim/weekly_reward_options';
 import {
   advanceWeeklyRewards,
   earnedWeeklyRolls,
   emptyWeeklyRewards,
   finishWeeklyRewardOpen,
-  prepareWeeklyRewardOpen,
+  prepareWeeklyRewardOpen as prepareOpen,
   sanitizeWeeklyRewards,
   WEEKLY_BACKLOG_LIMIT,
   WEEKLY_KEEPER_ENTITY_ID,
@@ -36,19 +39,20 @@ const WORLD = {
   npcs: { [WEEKLY_KEEPER_ID]: NPCS[WEEKLY_KEEPER_ID] },
   groundObjects: [],
 };
-function make(seed = 42, devCommands = true) {
+function make(seed = 42, devCommands = true, cls: PlayerClass = 'mage') {
   let now = 1000;
   const sim = new Sim({
     seed,
-    playerClass: 'mage',
+    playerClass: cls,
     noPlayer: true,
     devCommands,
     world: WORLD,
     lockoutNowMs: () => now,
     weeklyRaidResetMs: (n) => (Math.floor(n / WEEK) + 1) * WEEK,
   });
-  const pid = sim.addPlayer('mage', 'Collector');
+  const pid = sim.addPlayer(cls, 'Collector');
   const player = sim.entities.get(pid)!;
+  player.level = 20;
   const keeper = [...sim.entities.values()].find((e) => e.templateId === WEEKLY_KEEPER_ID)!;
   player.pos = { ...keeper.pos, x: keeper.pos.x - 1 };
   player.prevPos = { ...player.pos };
@@ -65,7 +69,311 @@ function make(seed = 42, devCommands = true) {
   };
 }
 
+function prepareWeeklyRewardOpen(ctx: Sim['ctx'], key: string, pid: number) {
+  const r = ctx.resolve(pid)!;
+  const state = r.meta.weeklyRewards!;
+  const batch = state.vaults[0];
+  const choice = batch?.choices[Number(key.split(':')[1])];
+  const tables = choice
+    ? weeklyRewardTableOptions(
+        { ...batch, bossUnlocks: batch.bossUnlocks ?? state.bossUnlocks },
+        choice,
+        r.meta.cls,
+        r.e.level,
+      ).map((table) => table.id)
+    : [];
+  return prepareOpen(ctx, key, pid, undefined, tables);
+}
+function openSelected(sim: Sim, key: string, pid: number) {
+  const opening = prepareWeeklyRewardOpen(sim.ctx, key, pid);
+  if (opening) finishWeeklyRewardOpen(opening, true);
+}
+
 describe('weekly vault choices', () => {
+  it.each(ALL_CLASSES)(
+    'can claim %s rewards when raid and world rolls exhaust their shared pool in either order',
+    (cls) => {
+      for (const worldFirst of [false, true]) {
+        const { sim, pid, meta } = make(42, true, cls);
+        const state = emptyWeeklyRewards(WEEK);
+        state.bossUnlocks = { nythraxis_scourge_of_thornpeak: 1 };
+        const pools = worldFirst ? (['world', 'raid'] as const) : (['raid', 'world'] as const);
+        state.vaults = [
+          {
+            resetAtMs: 1000,
+            bossUnlocks: { ...state.bossUnlocks },
+            choices: pools.flatMap((pool) => Array.from({ length: 3 }, () => ({ pool }))),
+          },
+        ];
+        meta.weeklyRewards = state;
+        const batch = state.vaults[0];
+        for (let i = 0; i < 6; i++) openSelected(sim, `1000:${i}`, pid);
+        const rolled = batch.choices.flatMap((choice) => (choice.itemId ? [choice.itemId] : []));
+        expect(rolled.length).toBeGreaterThanOrEqual(3);
+        expect(new Set(rolled).size).toBe(rolled.length);
+        for (const choice of batch.choices) {
+          if (choice.itemId) expect(weeklyLootPool('world', cls)).toContain(choice.itemId);
+          else expect(weeklyChoiceExhausted(batch, choice, cls)).toBe(true);
+        }
+        const index = batch.choices.findIndex((choice) => choice.itemId);
+        const itemId = batch.choices[index].itemId!;
+        const before = sim.ctx.countItem(itemId, pid);
+        sim.claimWeeklyReward(`1000:${index}`, pid);
+        expect(state.vaults).toHaveLength(0);
+        expect(sim.ctx.countItem(itemId, pid)).toBe(before + 1);
+      }
+    },
+  );
+
+  it('keeps a concealed legacy world reward openable even when its pool is fully reserved', () => {
+    const { sim, pid, meta } = make();
+    meta.weeklyRewards = emptyWeeklyRewards(WEEK);
+    const ids = weeklyLootPool('world', 'mage');
+    meta.weeklyRewards.vaults = [
+      {
+        resetAtMs: 1000,
+        choices: ids.map((itemId, index) => ({
+          pool: 'world',
+          itemId,
+          ...(index ? { opened: true as const } : {}),
+        })),
+      },
+    ];
+    const publicBatch = weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0];
+    expect(publicBatch.choices[0]).toEqual({ pool: 'world', fixed: true });
+    expect(weeklyChoiceExhausted(publicBatch, publicBatch.choices[0], 'mage')).toBe(false);
+    const pick = vi.spyOn(sim.ctx.rng, 'pick');
+    openSelected(sim, '1000:0', pid);
+    expect(pick).not.toHaveBeenCalled();
+    expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0].itemId).toBe(ids[0]);
+    sim.claimWeeklyReward('1000:0', pid);
+    expect(meta.weeklyRewards.vaults).toHaveLength(0);
+  });
+
+  it.each(['raid', 'world'] as const)(
+    'avoids overlapping Nythraxis items when opening %s first, including an unacknowledged roll',
+    (firstPool) => {
+      const { sim, pid, meta } = make();
+      meta.weeklyRewards = emptyWeeklyRewards(WEEK);
+      meta.weeklyRewards.bossUnlocks = { nythraxis_scourge_of_thornpeak: 1 };
+      meta.weeklyRewards.vaults = [
+        {
+          resetAtMs: 1000,
+          bossUnlocks: { ...meta.weeklyRewards.bossUnlocks },
+          choices: [{ pool: firstPool }, { pool: firstPool === 'raid' ? 'world' : 'raid' }],
+        },
+      ];
+      const pick = vi.spyOn(sim.ctx.rng, 'pick').mockImplementation((items) => items[0]);
+      const first = prepareWeeklyRewardOpen(sim.ctx, '1000:0', pid)!;
+      expect(first).not.toBeNull();
+      expect(weeklyLootPool('world', 'mage')).toContain(first.itemId);
+      finishWeeklyRewardOpen(first, false);
+      expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0].itemId).toBeUndefined();
+      const second = prepareWeeklyRewardOpen(sim.ctx, '1000:1', pid)!;
+      expect(second).not.toBeNull();
+      expect(weeklyLootPool('world', 'mage')).toContain(second.itemId);
+      expect(second.itemId).not.toBe(first.itemId);
+      finishWeeklyRewardOpen(second, true);
+      sim.claimWeeklyReward('1000:1', pid);
+      expect(meta.weeklyRewards.vaults).toHaveLength(1);
+      const retry = prepareWeeklyRewardOpen(sim.ctx, '1000:0', pid)!;
+      expect(retry.itemId).toBe(first.itemId);
+      expect(pick).toHaveBeenCalledTimes(2);
+      finishWeeklyRewardOpen(retry, true);
+      const saved = sim.serializeCharacter(pid)!;
+      const restored = sim.addPlayer('mage', 'AfterCrash', { state: saved });
+      expect(
+        sim.players.get(restored)!.weeklyRewards!.vaults[0].choices.map((choice) => choice.itemId),
+      ).toEqual([first.itemId, second.itemId]);
+      sim.claimWeeklyReward('1000:1', pid);
+      expect(meta.weeklyRewards.vaults).toHaveLength(0);
+    },
+  );
+
+  it('rolls distinct items within a week even when every draw picks the first candidate', () => {
+    const { sim, pid, meta } = make();
+    meta.weeklyRewards = emptyWeeklyRewards(WEEK);
+    const batch = {
+      resetAtMs: 1000,
+      choices: [{ pool: 'pvp' as const }, { pool: 'pvp' as const }, { pool: 'pvp' as const }],
+    };
+    meta.weeklyRewards.vaults = [batch];
+    const pick = vi.spyOn(sim.ctx.rng, 'pick').mockImplementation((items) => items[0]);
+    for (let index = 0; index < batch.choices.length; index++)
+      openSelected(sim, `1000:${index}`, pid);
+    expect(meta.weeklyRewards.vaults[0].choices.map((choice) => choice.itemId)).toEqual(
+      weeklyLootPool('pvp', 'mage').slice(0, 3),
+    );
+    expect(pick).toHaveBeenCalledTimes(3);
+  });
+
+  it('reserves hidden legacy and unacknowledged items across the whole week', () => {
+    const { sim, pid, meta } = make();
+    const ids = weeklyLootPool('pvp', 'mage');
+    meta.weeklyRewards = emptyWeeklyRewards(WEEK);
+    meta.weeklyRewards.vaults = [
+      {
+        resetAtMs: 1000,
+        choices: [
+          { pool: 'raid', itemId: ids[0] },
+          { pool: 'dungeon', itemId: ids[1], opened: true, pendingSave: true },
+          { pool: 'pvp' },
+        ],
+      },
+    ];
+    vi.spyOn(sim.ctx.rng, 'pick').mockImplementation((items) => items[0]);
+    openSelected(sim, '1000:2', pid);
+    expect(meta.weeklyRewards.vaults[0].choices.map((choice) => choice.itemId)).toEqual(
+      ids.slice(0, 3),
+    );
+    expect(
+      weeklyRewardInfoFor(sim.ctx, pid)!
+        .state.vaults[0].choices.slice(0, 2)
+        .every((choice) => !choice.itemId),
+    ).toBe(true);
+  });
+
+  it('keeps a failed-save roll on retry while excluding it from later rolls', () => {
+    const { sim, pid, meta } = make();
+    meta.weeklyRewards = emptyWeeklyRewards(WEEK);
+    meta.weeklyRewards.vaults = [{ resetAtMs: 1000, choices: [{ pool: 'pvp' }, { pool: 'pvp' }] }];
+    const pick = vi.spyOn(sim.ctx.rng, 'pick').mockImplementation((items) => items[0]);
+    const first = prepareWeeklyRewardOpen(sim.ctx, '1000:0', pid)!;
+    finishWeeklyRewardOpen(first, false);
+    openSelected(sim, '1000:1', pid);
+    const retry = prepareWeeklyRewardOpen(sim.ctx, '1000:0', pid)!;
+    expect(retry.itemId).toBe(first.itemId);
+    expect(meta.weeklyRewards.vaults[0].choices[1].itemId).not.toBe(first.itemId);
+    expect(pick).toHaveBeenCalledTimes(2);
+  });
+
+  it('excludes committed rolls after restoring a character without rewriting existing rewards', () => {
+    const { sim, pid, meta } = make();
+    const ids = weeklyLootPool('pvp', 'mage');
+    meta.weeklyRewards = emptyWeeklyRewards(WEEK);
+    meta.weeklyRewards.vaults = [
+      {
+        resetAtMs: 1000,
+        choices: [
+          { pool: 'pvp', itemId: ids[0], opened: true },
+          { pool: 'pvp', itemId: ids[0] },
+          { pool: 'pvp' },
+        ],
+      },
+    ];
+    const saved = sim.serializeCharacter(pid)!;
+    const restored = sim.addPlayer('mage', 'Restored', { state: saved });
+    vi.spyOn(sim.ctx.rng, 'pick').mockImplementation((items) => items[0]);
+    openSelected(sim, '1000:1', restored);
+    openSelected(sim, '1000:2', restored);
+    expect(
+      sim.players.get(restored)!.weeklyRewards!.vaults[0].choices.map((choice) => choice.itemId),
+    ).toEqual([ids[0], ids[0], ids[1]]);
+  });
+
+  it('allows an item again in a different week', () => {
+    const { sim, pid, meta } = make();
+    meta.weeklyRewards = emptyWeeklyRewards(WEEK);
+    meta.weeklyRewards.vaults = [
+      { resetAtMs: 999, choices: [{ pool: 'pvp' }] },
+      { resetAtMs: 1000, choices: [{ pool: 'pvp' }] },
+    ];
+    vi.spyOn(sim.ctx.rng, 'pick').mockImplementation((items) => items[0]);
+    openSelected(sim, '999:0', pid);
+    const first = meta.weeklyRewards.vaults[0].choices[0].itemId;
+    sim.claimWeeklyReward('999:0', pid);
+    openSelected(sim, '1000:0', pid);
+    expect(meta.weeklyRewards.vaults[0].choices[0].itemId).toBe(first);
+  });
+
+  it('never falls back to a duplicate if an eligible pool is exhausted', () => {
+    const { sim, pid, meta } = make();
+    meta.weeklyRewards = emptyWeeklyRewards(WEEK);
+    meta.weeklyRewards.vaults = [
+      {
+        resetAtMs: 1000,
+        choices: [
+          ...weeklyLootPool('pvp', 'mage').map((itemId) => ({ pool: 'pvp' as const, itemId })),
+          { pool: 'pvp' },
+        ],
+      },
+    ];
+    const choices = meta.weeklyRewards.vaults[0].choices;
+    const pick = vi.spyOn(sim.ctx.rng, 'pick');
+    expect(prepareWeeklyRewardOpen(sim.ctx, `1000:${choices.length - 1}`, pid)).toBeNull();
+    expect(choices.at(-1)).toEqual({ pool: 'pvp' });
+    expect(pick).not.toHaveBeenCalled();
+  });
+
+  it('has enough distinct catalog items except shared shelves and filtered Warlock heroic raids', () => {
+    for (const cls of ALL_CLASSES)
+      for (let mask = 0; mask < 27; mask++) {
+        const unlocks = [mask % 3, Math.floor(mask / 3) % 3, Math.floor(mask / 9)];
+        const pools = WEEKLY_POOL_IDS.map((pool) => ({
+          pool,
+          group: pool.split('_')[0],
+          maximum: pool.startsWith('raid')
+            ? unlocks.filter((tier) => tier >= (pool.endsWith('_heroic') ? 2 : 1)).length
+            : 3,
+          ids: weeklyLootPool(pool, cls, unlocks),
+        })).filter((pool) => pool.ids.length);
+        for (const pool of pools) {
+          // Cover this pool's maximum earned slots plus overlapping items that
+          // other pools could consume first. Raid caps follow unlocked bosses.
+          let needed = pool.maximum;
+          for (const group of new Set(pools.map((other) => other.group))) {
+            const maximum = group === 'raid' ? unlocks.filter(Boolean).length : 3;
+            const competing = new Set(
+              pools
+                .filter((other) => other.group === group && other !== pool)
+                .flatMap((other) => other.ids),
+            );
+            needed += Math.min(
+              group === pool.group ? maximum - pool.maximum : maximum,
+              pool.ids.filter((id) => competing.has(id)).length,
+            );
+          }
+          // World shares Nythraxis with chosen raid tables. The all-class opening
+          // test above proves that exhausting this shelf still permits a claim.
+          // Warlocks exclude Healing Power gear, leaving fewer heroic raid items;
+          // the regression below pins a successful claim after that pool exhausts.
+          expect(pool.ids.length, `${cls} ${unlocks} ${pool.pool}`).toBeGreaterThanOrEqual(
+            cls === 'warlock' && pool.pool === 'raid_heroic'
+              ? 1
+              : pool.pool === 'world' || pool.pool === 'raid'
+                ? pool.maximum
+                : needed,
+          );
+        }
+      }
+  });
+
+  it('can claim a Warlock heroic raid reward after class filtering exhausts another slot', () => {
+    const { sim, pid, meta } = make(42, true, 'warlock');
+    const state = emptyWeeklyRewards(WEEK);
+    state.bossUnlocks = { [IGNIVAR_BOSS_ID]: 2, varkhul_forgefather_of_the_last_flame: 2 };
+    state.vaults = [
+      {
+        resetAtMs: 1000,
+        bossUnlocks: { ...state.bossUnlocks },
+        choices: [{ pool: 'raid_heroic' }, { pool: 'raid_heroic' }],
+      },
+    ];
+    meta.weeklyRewards = state;
+    const batch = state.vaults[0];
+    openSelected(sim, '1000:0', pid);
+    const itemId = batch.choices[0].itemId;
+    expect(itemId).toBeDefined();
+    if (!itemId) throw new Error('Missing filtered Warlock reward');
+    openSelected(sim, '1000:1', pid);
+    expect(batch.choices[1].itemId).toBeUndefined();
+    expect(weeklyChoiceExhausted(batch, batch.choices[1], 'warlock')).toBe(true);
+    const before = sim.ctx.countItem(itemId, pid);
+    sim.claimWeeklyReward('1000:0', pid);
+    expect(state.vaults).toHaveLength(0);
+    expect(sim.ctx.countItem(itemId, pid)).toBe(before + 1);
+  });
+
   it('rolls only on opening and conceals pending items until the host acknowledges durability', () => {
     const { sim, pid, meta } = make();
     const roll = vi.spyOn(sim.ctx.rng, 'pick');
@@ -80,6 +388,7 @@ describe('weekly vault choices', () => {
     const saved = sim.serializeCharacter(pid)!;
     expect(saved.weeklyRewards!.vaults[0].choices[0]).toEqual({
       pool: opening.choice.pool,
+      tableId: opening.choice.tableId,
       itemId: opening.itemId,
       opened: true,
     });
@@ -116,11 +425,14 @@ describe('weekly vault choices', () => {
       resetAtMs: 9000,
       vaults: [{ resetAtMs: 1000, choices: [{ pool: 'raid', itemId: fixed }] }],
     });
-    expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0]).toEqual({ pool: 'raid' });
+    expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0]).toEqual({
+      pool: 'raid',
+      fixed: true,
+    });
     const roll = vi.spyOn(sim.ctx.rng, 'pick');
     sim.claimWeeklyReward('1000:0', pid);
     expect(meta.weeklyRewards!.vaults).toHaveLength(1);
-    sim.openWeeklyReward('1000:0', pid);
+    openSelected(sim, '1000:0', pid);
     expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0].itemId).toBe(fixed);
     expect(roll).not.toHaveBeenCalled();
   });
@@ -186,7 +498,7 @@ describe('weekly vault choices', () => {
       const state = meta.weeklyRewards!;
       const batch = state.vaults[0];
       batch.choices.forEach((_, index) => {
-        sim.openWeeklyReward(`${batch.resetAtMs}:${index}`, pid);
+        openSelected(sim, `${batch.resetAtMs}:${index}`, pid);
       });
       const token = `${state.resetAtMs}:${state.claimSequence}`;
       const itemId = batch.choices[1].itemId;
@@ -207,7 +519,7 @@ describe('weekly vault choices', () => {
     prepareWeeklyVaultPlaytest(sim.ctx, pid);
     const state = meta.weeklyRewards!;
     state.vaults[0].choices.forEach((_, index) => {
-      sim.openWeeklyReward(`${state.vaults[0].resetAtMs}:${index}`, pid);
+      openSelected(sim, `${state.vaults[0].resetAtMs}:${index}`, pid);
     });
     const key = `${state.vaults[0].resetAtMs}:0`;
     const before = JSON.stringify(state);
@@ -230,7 +542,7 @@ describe('weekly vault choices', () => {
     const { sim, pid, meta, setNow } = make();
     prepareWeeklyVaultPlaytest(sim.ctx, pid);
     meta.weeklyRewards!.vaults[0].choices.forEach((_, index) => {
-      sim.openWeeklyReward(`${meta.weeklyRewards!.vaults[0].resetAtMs}:${index}`, pid);
+      openSelected(sim, `${meta.weeklyRewards!.vaults[0].resetAtMs}:${index}`, pid);
     });
     const first = structuredClone(meta.weeklyRewards!.vaults[0]);
     setNow(WEEK * 2);

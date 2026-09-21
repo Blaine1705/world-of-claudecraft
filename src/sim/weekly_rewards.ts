@@ -6,7 +6,6 @@ import { HEROIC_BOSS_LOOT } from './content/heroic_loot';
 import { FURY_STOCK } from './content/pvp_honor';
 import { DUNGEONS, ITEMS, MOBS } from './data';
 import { createNpc } from './entity';
-import { canEquipItem } from './equipment_rules';
 import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
 import { instanceLockoutMetas } from './instances/dungeons';
 import { RAID_MIN_PLAYERS } from './item_level';
@@ -22,6 +21,17 @@ import {
   NYTHRAXIS_BOSS_ID,
   type PlayerClass,
 } from './types';
+import { weeklyChoiceExhausted } from './weekly_reward_availability';
+import { weeklyRewardFitsClass } from './weekly_reward_eligibility';
+import { weeklyTableSource } from './weekly_reward_options';
+import {
+  historicalWeeklyBossUnlocks,
+  needsWeeklyBossTable,
+  sanitizeWeeklyBossUnlocks,
+  type WeeklyBossUnlocks,
+  weeklyAvailableBossTables,
+  weeklyBossTable,
+} from './weekly_reward_tables';
 
 // Reserved singleton id (the 1_000_000_x band; see STATIC_WORLD_SERVICE_ENTITY_ID_MIN
 // in types.ts): 1_000_000_004 went to the Last Keep spirit healer while this branch was
@@ -55,6 +65,9 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 export const WEEKLY_BACKLOG_LIMIT = 520;
 export interface WeeklyChoice {
   pool: WeeklyPoolId;
+  tableId?: string;
+  /** Owner-view hint for a legacy fixed roll whose boss source was not recorded. */
+  fixed?: true;
   itemId?: string;
   opened?: true;
   /** Runtime only. Never serialized; an unacknowledged item stays off the wire. */
@@ -65,6 +78,7 @@ export interface WeeklyVaultBatch {
   resetAtMs: number;
   choices: WeeklyChoice[];
   raidUnlocks?: number[];
+  bossUnlocks?: WeeklyBossUnlocks;
 }
 export interface WeeklyRewardState {
   resetAtMs: number;
@@ -74,6 +88,7 @@ export interface WeeklyRewardState {
   world: number;
   pvp: number;
   raidUnlocks: number[];
+  bossUnlocks?: WeeklyBossUnlocks;
   vaults: WeeklyVaultBatch[];
   overflowed: boolean;
   legacyPending?: number[];
@@ -81,6 +96,7 @@ export interface WeeklyRewardState {
 export interface WeeklyRewardInfo {
   state: WeeklyRewardState;
   nowMs: number;
+  playerLevel?: number;
   canClaim: boolean;
   worldQuestsAvailable: boolean;
   readyWeeks: number;
@@ -123,6 +139,7 @@ export function sanitizeWeeklyRewards(
     Math.max(tier, bounded(Array.isArray(r.raidUnlocks) ? r.raidUnlocks[i] : 0, 2)),
   );
   state.overflowed = r.overflowed === true;
+  state.bossUnlocks = sanitizeWeeklyBossUnlocks(r.bossUnlocks);
   const legacy = r.legacyPending ?? (!Array.isArray(r.vaults) ? r.pending : undefined);
   if (Array.isArray(legacy))
     state.legacyPending = WEEKLY_POOL_IDS.map((_, i) => bounded(legacy[i], 3));
@@ -134,9 +151,14 @@ export function sanitizeWeeklyRewards(
       const choices: WeeklyChoice[] = [];
       for (const choice of rawBatch.choices.slice(0, 12)) {
         if (!choice || !WEEKLY_POOL_IDS.includes(choice.pool)) continue;
+        const table = weeklyTableSource(choice.tableId);
+        const tableFields = table ? { tableId: table.id } : {};
+        const fixedFields = publicView && choice.fixed === true ? { fixed: true as const } : {};
         if (choice.itemId === undefined || (publicView && choice.opened !== true)) {
           choices.push({
             pool: choice.pool,
+            ...tableFields,
+            ...fixedFields,
             ...(publicView && choice.opening === true ? { opening: true } : {}),
           });
           continue;
@@ -146,18 +168,22 @@ export function sanitizeWeeklyRewards(
         if (
           item &&
           ['weapon', 'armor', 'held_offhand'].includes(item.kind) &&
-          (item.quality === 'rare' || item.quality === 'epic')
+          (item.quality === 'uncommon' || item.quality === 'rare' || item.quality === 'epic')
         )
           choices.push({
             pool: choice.pool,
+            ...tableFields,
+            ...fixedFields,
             itemId: choice.itemId,
             ...(choice.opened === true ? { opened: true as const } : {}),
           });
       }
+      const bossUnlocks = sanitizeWeeklyBossUnlocks(rawBatch.bossUnlocks);
       if (choices.length && !state.vaults.some((batch) => batch.resetAtMs === resetAtMs))
         state.vaults.push({
           resetAtMs,
           choices,
+          ...(bossUnlocks !== undefined ? { bossUnlocks } : {}),
           ...(Array.isArray(rawBatch.raidUnlocks)
             ? { raidUnlocks: WEEKLY_RAID_BOSSES.map((_, i) => bounded(rawBatch.raidUnlocks[i], 2)) }
             : {}),
@@ -203,6 +229,7 @@ export function advanceWeeklyRewards(
           resetAtMs: state.resetAtMs,
           choices,
           raidUnlocks: [...state.raidUnlocks],
+          bossUnlocks: { ...state.bossUnlocks },
         });
     } else if (earned.some(Boolean)) state.overflowed = true;
     state.raids.fill(0);
@@ -215,6 +242,13 @@ export function advanceWeeklyRewards(
 export function stateFor(ctx: SimContext, meta: PlayerMeta): WeeklyRewardState {
   meta.weeklyRewards ??= emptyWeeklyRewards();
   const state = meta.weeklyRewards;
+  if (!state.bossUnlocks) {
+    state.bossUnlocks = historicalWeeklyBossUnlocks(meta);
+    for (const [index, bossId] of WEEKLY_RAID_BOSSES.entries()) {
+      const tier = state.raidUnlocks[index];
+      if (tier) state.bossUnlocks[bossId] = Math.max(state.bossUnlocks[bossId] ?? 0, tier);
+    }
+  }
   if (state.legacyPending) {
     const choices: WeeklyChoice[] = [];
     for (const [i, count] of state.legacyPending.entries()) {
@@ -227,11 +261,14 @@ export function stateFor(ctx: SimContext, meta: PlayerMeta): WeeklyRewardState {
       state.vaults.push({ resetAtMs: Math.max(1, state.resetAtMs - WEEK_MS), choices });
     delete state.legacyPending;
   }
-  advanceWeeklyRewards(
-    state,
-    ctx.lockoutNowMs(),
-    ctx.weeklyRaidResetMs,
-    (pool) => weeklyLootPool(pool, meta.cls, state.raidUnlocks).length > 0,
+  advanceWeeklyRewards(state, ctx.lockoutNowMs(), ctx.weeklyRaidResetMs, (pool) =>
+    needsWeeklyBossTable(pool)
+      ? weeklyAvailableBossTables(
+          { resetAtMs: state.resetAtMs, choices: [], bossUnlocks: state.bossUnlocks },
+          { pool },
+          meta.cls,
+        ).length > 0
+      : weeklyLootPool(pool, meta.cls, state.raidUnlocks).length > 0,
   );
   return state;
 }
@@ -265,10 +302,18 @@ export function weeklyRewardInfoFor(ctx: SimContext, pid: number): WeeklyRewardI
       raids: [...state.raids],
       dungeons: [...state.dungeons],
       raidUnlocks: [...state.raidUnlocks],
+      bossUnlocks: { ...state.bossUnlocks },
       vaults: state.vaults.slice(0, 1).map((batch) => ({
         resetAtMs: batch.resetAtMs,
+        // Legacy weeks have no historical snapshot. Use proven lifetime clears
+        // until the first new roll freezes them; never infer intermediate kills.
+        bossUnlocks: { ...(batch.bossUnlocks ?? state.bossUnlocks) },
         choices: batch.choices.map((choice) => ({
           pool: choice.pool,
+          ...(choice.tableId ? { tableId: choice.tableId } : {}),
+          ...(!choice.tableId && choice.itemId && (!choice.opened || choice.pendingSave)
+            ? { fixed: true as const }
+            : {}),
           ...(choice.opened && !choice.pendingSave && choice.itemId
             ? { itemId: choice.itemId, opened: true as const }
             : {}),
@@ -276,6 +321,7 @@ export function weeklyRewardInfoFor(ctx: SimContext, pid: number): WeeklyRewardI
         })),
       })),
     },
+    playerLevel: r.e.level,
     nowMs: Math.floor(ctx.lockoutNowMs() / 1000) * 1000,
     canClaim: true,
     // Live whenever the previous raid tier holds something this class can wear
@@ -308,7 +354,15 @@ export function recordWeeklyBossKill(
   if (!inst || recipients.length === 0) return;
   const dungeon = DUNGEONS[inst.dungeonId];
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
-  if (!dungeon || !tuning || tuning.finalBossId !== boss.templateId) return;
+  const table = weeklyBossTable(boss.templateId);
+  if (!dungeon || !tuning || table?.dungeonId !== inst.dungeonId) return;
+  // Some named encounters share a template with trash. Only the authored
+  // miniboss spawn counts when that encounter uses spawn-level miniboss tuning.
+  if (
+    dungeon.spawns.some((spawn) => spawn.mobId === boss.templateId && spawn.miniboss) &&
+    !boss.dungeonSpawnMiniboss
+  )
+    return;
   const raid = (dungeon.suggestedPlayers ?? 0) >= RAID_MIN_PLAYERS;
   const eligible = new Map(recipients.map((meta) => [meta.entityId, meta]));
   for (const meta of instanceLockoutMetas(ctx, inst)) eligible.set(meta.entityId, meta);
@@ -317,6 +371,8 @@ export function recordWeeklyBossKill(
       continue;
     const state = stateFor(ctx, meta);
     const tier = inst.difficulty === 'heroic' ? 2 : 1;
+    state.bossUnlocks![boss.templateId] = Math.max(state.bossUnlocks![boss.templateId] ?? 0, tier);
+    if (tuning.finalBossId !== boss.templateId) continue;
     if (raid) {
       const i = WEEKLY_RAID_BOSSES.indexOf(boss.templateId);
       if (i >= 0) {
@@ -392,8 +448,7 @@ export function weeklyLootPool(
         item &&
         (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'held_offhand') &&
         (item.quality === 'rare' || item.quality === 'epic') &&
-        canEquipItem(playerClass, item) &&
-        (!item.requiredClass || item.requiredClass.includes(playerClass))
+        weeklyRewardFitsClass(playerClass, item)
       );
     })
     .sort();
@@ -414,7 +469,15 @@ export function claimWeeklyReward(
     state.claimSequence >= Number.MAX_SAFE_INTEGER
   )
     return;
-  if (batch.choices.some((choice) => !choice.opened || choice.pendingSave || !choice.itemId))
+  const eligibleBatch = { ...batch, bossUnlocks: batch.bossUnlocks ?? state.bossUnlocks };
+  if (
+    batch.choices.some(
+      (choice) =>
+        choice.pendingSave ||
+        ((!choice.opened || !choice.itemId) &&
+          !weeklyChoiceExhausted(eligibleBatch, choice, r.meta.cls, r.e.level)),
+    )
+  )
     return;
   if (expectedToken !== undefined && expectedToken !== `${state.resetAtMs}:${state.claimSequence}`)
     return;

@@ -23,7 +23,10 @@ import {
   weeklyVaultBurstLayout,
 } from '../src/ui/weekly_vault_burst_core';
 
-const css = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+const css = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
 const banner = css.indexOf('/* ---------- weekly rewards ---------- */');
 const nextBanner = css.indexOf('/* ---------- ', banner + 1);
 const section = css.slice(banner, nextBanner < 0 ? undefined : nextBanner);

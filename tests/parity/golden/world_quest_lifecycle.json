@@ -679,7 +679,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "ee2dacea",
+      "state": "efa7d93c",
       "events": "2e9e090a",
       "rng": {
         "draws": 0,
@@ -770,6 +770,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "raidUnlocks": [
               0,
               0,
@@ -869,7 +870,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "a761d62d",
+      "state": "74d644a3",
       "events": "0de17699",
       "rng": {
         "draws": 0,
@@ -971,6 +972,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "raidUnlocks": [
               0,
               0,
@@ -1086,7 +1088,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "93c48bea",
+      "state": "bb9dcf22",
       "events": "f061f193",
       "rng": {
         "draws": 0,
@@ -1183,6 +1185,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "raidUnlocks": [
               0,
               0,
@@ -1281,7 +1284,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "93c48bea",
+      "state": "bb9dcf22",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1378,6 +1381,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "raidUnlocks": [
               0,
               0,

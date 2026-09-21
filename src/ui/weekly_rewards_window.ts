@@ -1,15 +1,14 @@
 // Bank pane: rebuild only for ledger changes. Its cached countdown node receives
 // one elided text update from the existing bank slow-band refresh, no own driver.
-import { ITEMS } from '../sim/data';
 import { WEEKLY_BACKLOG_LIMIT } from '../sim/weekly_rewards';
 import type { IWorld } from '../world_api';
 import { chromeIconUrl } from './chrome_icon_art';
-import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
 import { WeeklyRewardClaimController } from './weekly_reward_claim_controller';
+import { appendWeeklyLootCategory } from './weekly_reward_loot_catalog';
 import { buildWeeklyRewardsView, weeklyCountdown } from './weekly_rewards_view';
 
 export const WEEKLY_TAB_ID = 'weekly-rewards-tab';
@@ -61,6 +60,7 @@ export class WeeklyRewardsTab {
       info.readyWeeks,
       info.canClaim,
       info.worldQuestsAvailable,
+      info.playerLevel,
       !!info.state.vaults[0] && info.state.vaults[0].resetAtMs <= info.nowMs,
     ]);
     if (signature !== this.lastSignature) {
@@ -104,6 +104,7 @@ export class WeeklyRewardsTab {
       info.readyWeeks,
       info.canClaim,
       info.worldQuestsAvailable,
+      info.playerLevel,
       !!info.state.vaults[0] && info.state.vaults[0].resetAtMs <= info.nowMs,
     ]);
     const rows = buildWeeklyRewardsView(info, world.cfg.playerClass);
@@ -184,37 +185,7 @@ export class WeeklyRewardsTab {
           },
         )
         .join('')}</div></div>`;
-      for (const pool of row.pools) {
-        const details = document.createElement('div');
-        details.className = 'weekly-pool ui-card';
-        details.id = `weekly-pool-${pool.pool}`;
-        const qualities = pool.qualities
-          .map((q) =>
-            t(q === 'epic' ? 'hudChrome.weeklyRewards.epic' : 'hudChrome.weeklyRewards.rare'),
-          )
-          .join(' / ');
-        details.innerHTML = `<h4 id="weekly-pool-title-${pool.pool}">${esc(t(`hudChrome.weeklyRewards.pool.${pool.pool}`))}</h4><p>${esc(qualities || t('hudChrome.weeklyRewards.unavailable'))}</p><p>${esc(t('hudChrome.weeklyRewards.poolRule'))}</p><div class="weekly-loot-list"></div>`;
-        const list = details.querySelector('.weekly-loot-list')!;
-        for (const id of pool.items) {
-          const item = ITEMS[id];
-          const cell = document.createElement('button');
-          cell.type = 'button';
-          cell.className = `weekly-loot ui-btn quality-${item.quality}`;
-          cell.setAttribute(FOCUS_KEY_ATTR, `weekly-item:${pool.pool}:${id}`);
-          cell.innerHTML = `${this.deps.presentation.itemIcon(item)}<span>${esc(itemDisplayName(item))}</span>`;
-          this.deps.presentation.attachTooltip(cell, () =>
-            this.deps.presentation.itemTooltip(item),
-          );
-          list.appendChild(cell);
-        }
-        allPools.appendChild(details);
-        const actions = document.createElement('div');
-        actions.className = 'weekly-pool-actions';
-        actions.textContent = t('hudChrome.weeklyRewards.earned', {
-          count: formatNumber(pool.earned),
-        });
-        details.appendChild(actions);
-      }
+      appendWeeklyLootCategory(allPools, row, this.deps.presentation, this.expanded);
 
       tracks.appendChild(section);
     }

@@ -1,11 +1,11 @@
 import { ITEMS } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
+import { weeklyRewardTableOptions } from '../sim/weekly_reward_options';
 import {
   earnedWeeklyRolls,
   WEEKLY_POOL_IDS,
   WEEKLY_THRESHOLDS,
   type WeeklyRewardInfo,
-  weeklyLootPool,
 } from '../sim/weekly_rewards';
 import { formatNumber, t } from './i18n';
 
@@ -50,10 +50,22 @@ export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: Play
     }),
     pools: WEEKLY_POOL_IDS.flatMap((pool, poolIndex) => {
       if (pool !== category && pool !== `${category}_heroic`) return [];
-      const items = weeklyLootPool(pool, playerClass, info.state.raidUnlocks);
+      const tables = weeklyRewardTableOptions(
+        {
+          resetAtMs: 0,
+          choices: [],
+          bossUnlocks: info.state.bossUnlocks,
+          raidUnlocks: info.state.raidUnlocks,
+        },
+        { pool },
+        playerClass,
+        info.playerLevel ?? 1,
+      );
+      const items = [...new Set(tables.flatMap((table) => table.items))].sort();
       return [
         {
           pool,
+          tables,
           items,
           earned: earned[poolIndex],
           qualities: [...new Set(items.map((id) => ITEMS[id].quality))].sort(),

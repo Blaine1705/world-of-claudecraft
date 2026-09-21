@@ -17,13 +17,12 @@ import {
 
 /** The host marks the reveal complete once the whole show has settled. */
 export const WEEKLY_REVEAL_DURATION_MS = VAULT_TIMELINE.revealMs;
-/** Wall-clock start of each in-flight opening, keyed by slot and item, so a
- *  repaint mid-show (the bank's slow-band refresh once the ledger records the
- *  opened item) resumes the choreography at its elapsed time instead of
- *  restarting it: the stage carries --vault-elapsed and every open-state
- *  animation offsets its delay by it. Entries leave on completion and expire
- *  after the reveal duration, so a later opening of the same slot starts fresh. */
-const inFlight = new Map<string, number>();
+/** Owned by one claim session and reward slot, surviving tile repaints.
+ *  A finished or overdue opening settles immediately instead of starting over. */
+export interface WeeklyVaultRevealProgress {
+  startedAt?: number;
+  completed?: boolean;
+}
 export function attachWeeklyVaultReveal(
   stage: HTMLElement,
   item: ItemDef | undefined,
@@ -36,9 +35,12 @@ export function attachWeeklyVaultReveal(
   onSelect?: () => void,
   requestOpen?: () => void,
   saving = false,
-): { dispose(): void; animate(): void } {
+  progress: WeeklyVaultRevealProgress = {},
+): { dispose(): void; animate(): void; syncAvailability(): void } {
   const itemName = item ? itemDisplayName(item) : '';
   const original = stage.querySelector<HTMLImageElement>('img')!;
+  stage.classList.remove('vault-is-open', 'vault-is-revealed');
+  stage.style.removeProperty('--vault-elapsed');
   const trigger = document.createElement('button');
   trigger.type = 'button';
   trigger.className = 'vault-reveal-trigger';
@@ -144,6 +146,8 @@ export function attachWeeklyVaultReveal(
   let timer: ReturnType<typeof setTimeout> | undefined;
   let disposed = false;
   let opening = false;
+  let finished = false;
+  let requested = false;
   // Cosmetic only: the seam glows on the click while the host saves the
   // opening; aria-busy and the announcement carry the state.
   stage.classList.toggle('vault-is-charging', saving);
@@ -156,13 +160,10 @@ export function attachWeeklyVaultReveal(
   loot.addEventListener('click', () => {
     if (!disposed && !loot.disabled && canOpen()) onSelect?.();
   });
-  const flightKey = item ? `${index}:${item.id}` : '';
   const finish = () => {
-    // A torn-down tile keeps its entry for the rebuilt one to resume; any
-    // other outcome (done, or the session went stale) ends the flight.
-    if (disposed) return;
-    inFlight.delete(flightKey);
-    if (!item || !canOpen()) return;
+    if (disposed || finished || !item || !canOpen()) return;
+    finished = true;
+    progress.completed = true;
     const hadFocus = captureFocusKey(stage) === `weekly-open:${index}`;
     stage.classList.add('vault-is-revealed');
     trigger.disabled = true;
@@ -172,6 +173,7 @@ export function attachWeeklyVaultReveal(
     onReveal();
   };
   if (revealed && item) {
+    progress.completed = true;
     stage.classList.add('vault-is-open', 'vault-is-revealed');
     trigger.setAttribute('aria-expanded', 'true');
     trigger.disabled = true;
@@ -180,29 +182,41 @@ export function attachWeeklyVaultReveal(
   const animate = () => {
     if (disposed || opening || revealed || !item || !canOpen()) return;
     opening = true;
-    const now = Date.now();
-    // Sweep flights that can no longer be resumed (closed mid-show and never
-    // reopened), so the map only ever holds what is actually in progress.
-    for (const [key, startedAt] of inFlight)
-      if (now - startedAt >= WEEKLY_REVEAL_DURATION_MS) inFlight.delete(key);
-    const startedAt = inFlight.get(flightKey);
-    const elapsed = startedAt === undefined ? 0 : now - startedAt;
-    if (!elapsed) inFlight.set(flightKey, now);
-    mintBurst();
+    const now = performance.now();
+    progress.startedAt ??= now;
+    const elapsed = Math.min(WEEKLY_REVEAL_DURATION_MS, Math.max(0, now - progress.startedAt));
     stage.style.setProperty('--vault-elapsed', `${elapsed}ms`);
+    stage.classList.remove('vault-is-charging');
     stage.classList.add('vault-is-open');
     trigger.setAttribute('aria-expanded', 'true');
     trigger.setAttribute('aria-disabled', 'true');
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) finish();
-    else timer = setTimeout(finish, WEEKLY_REVEAL_DURATION_MS - elapsed);
+    trigger.removeAttribute('aria-busy');
+    if (
+      progress.completed ||
+      elapsed >= WEEKLY_REVEAL_DURATION_MS ||
+      matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+      finish();
+    else {
+      mintBurst();
+      timer = setTimeout(finish, WEEKLY_REVEAL_DURATION_MS - elapsed);
+    }
   };
   trigger.addEventListener('click', () => {
-    if (disposed || opening || saving || !canOpen()) return;
+    if (disposed || opening || saving || requested || !canOpen()) return;
     if (item) animate();
-    else requestOpen?.();
+    else if (requestOpen) {
+      requested = true;
+      requestOpen();
+    }
   });
+  const syncAvailability = () => {
+    if (!opening && !finished && !revealed && !saving) trigger.disabled = !canOpen();
+  };
+  syncAvailability();
   return {
     animate,
+    syncAvailability,
     dispose: () => {
       disposed = true;
       clearTimeout(timer);

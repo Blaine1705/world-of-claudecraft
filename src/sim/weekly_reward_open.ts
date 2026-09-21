@@ -1,12 +1,16 @@
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
+  parseWeeklyTableSelection,
+  selectedWeeklyRewardTables,
+  weeklyRewardTableOptions,
+} from './weekly_reward_options';
+import {
   nearWeeklyKeeper,
   stateFor,
   type WeeklyChoice,
   type WeeklyRewardState,
   type WeeklyVaultBatch,
-  weeklyLootPool,
 } from './weekly_rewards';
 
 export interface WeeklyRewardOpening {
@@ -23,6 +27,7 @@ export function prepareWeeklyRewardOpen(
   choiceKey: string,
   pid?: number,
   expectedToken?: string,
+  tableIds?: string | readonly string[],
 ): WeeklyRewardOpening | null {
   const r = ctx.resolve(pid);
   if (!r || r.meta.leaving || !nearWeeklyKeeper(ctx, r.e)) return null;
@@ -34,9 +39,18 @@ export function prepareWeeklyRewardOpen(
   const choice = batch.choices.find((_, i) => choiceKey === `${batch.resetAtMs}:${i}`);
   if (!choice || choice.opening || (choice.opened && !choice.pendingSave)) return null;
   if (!choice.itemId) {
-    const items = weeklyLootPool(choice.pool, r.meta.cls, batch.raidUnlocks);
+    const ids = parseWeeklyTableSelection(tableIds);
+    if (!ids) return null;
+    const candidateBatch = { ...batch, bossUnlocks: batch.bossUnlocks ?? state.bossUnlocks };
+    const options = weeklyRewardTableOptions(candidateBatch, choice, r.meta.cls, r.e.level);
+    const selected = selectedWeeklyRewardTables(options, ids);
+    if (!selected) return null;
+    const items = [...new Set(selected.flatMap((table) => table.items))].sort();
     if (!items.length) return null;
     choice.itemId = ctx.rng.pick(items);
+    // Persist only the attributed source, not the transient multi-selection.
+    choice.tableId = selected.find((table) => table.items.includes(choice.itemId!))!.id;
+    batch.bossUnlocks ??= { ...state.bossUnlocks };
   }
   // Persist opened:true with the item. Runtime flags conceal it until save success.
   // Never clear the item on failure: an ambiguous commit must not permit a reroll.
@@ -69,7 +83,18 @@ export function finishWeeklyRewardOpen(opening: WeeklyRewardOpening, saved: bool
 }
 
 /** Offline/headless have no remote persistence barrier; snapshots retain the roll. */
-export function openWeeklyReward(ctx: SimContext, choiceKey: string, pid?: number): void {
-  const opening = prepareWeeklyRewardOpen(ctx, choiceKey, pid);
+export function openWeeklyReward(
+  ctx: SimContext,
+  choiceKey: string,
+  tableOrPid?: string | readonly string[] | number,
+  pid?: number,
+): void {
+  const opening = prepareWeeklyRewardOpen(
+    ctx,
+    choiceKey,
+    typeof tableOrPid === 'number' ? tableOrPid : pid,
+    undefined,
+    typeof tableOrPid === 'number' ? undefined : tableOrPid,
+  );
   if (opening) finishWeeklyRewardOpen(opening, true);
 }

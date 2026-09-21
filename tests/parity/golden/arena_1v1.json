@@ -73,7 +73,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1012,
-      "state": "58ba7ddd",
+      "state": "c850bdf5",
       "events": "7b881f5b",
       "rng": {
         "draws": 781,
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1012,
-      "state": "62df2278",
+      "state": "85bb1f2a",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -203,6 +203,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "pvp": 1,
             "raidUnlocks": [
               0,

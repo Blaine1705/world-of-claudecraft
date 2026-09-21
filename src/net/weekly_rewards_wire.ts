@@ -11,12 +11,20 @@ export function sendWeekly(
     cmd: 'weekly_reward_open' | 'weekly_reward_claim';
     choice: string;
     token: string;
+    tables?: readonly string[];
   }) => void,
+  table?: string | readonly string[],
 ): void {
   const state = info?.state;
   if (!state) return;
   const token = `${state.resetAtMs}:${state.claimSequence}`;
-  if (action === 'open') send({ cmd: 'weekly_reward_open', choice, token });
+  if (action === 'open')
+    send({
+      cmd: 'weekly_reward_open',
+      choice,
+      token,
+      ...(table ? { tables: typeof table === 'string' ? [table] : [...table] } : {}),
+    });
   else send({ cmd: 'weekly_reward_claim', choice, token });
 }
 
@@ -37,6 +45,12 @@ export function decodeWeeklyRewardInfo(raw: unknown): WeeklyRewardInfo | null {
   return {
     state,
     nowMs: value.nowMs,
+    playerLevel:
+      typeof value.playerLevel === 'number' &&
+      Number.isSafeInteger(value.playerLevel) &&
+      value.playerLevel >= 1
+        ? value.playerLevel
+        : 1,
     canClaim: value.canClaim,
     worldQuestsAvailable: value.worldQuestsAvailable,
     readyWeeks:

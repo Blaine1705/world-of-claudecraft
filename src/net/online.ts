@@ -4730,8 +4730,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   claimWeeklyReward(choice: string): void {
     sendWeekly(this.weeklyRewardInfo, choice, 'claim', (m) => this.cmd(m));
   }
-  openWeeklyReward(choice: string): void {
-    sendWeekly(this.weeklyRewardInfo, choice, 'open', (m) => this.cmd(m));
+  openWeeklyReward(choice: string, table?: string | readonly string[]): void {
+    sendWeekly(this.weeklyRewardInfo, choice, 'open', (m) => this.cmd(m), table);
   }
   vaultBuyUpgrade(): void {
     this.cmd({ cmd: 'vault_buy_upgrade' });

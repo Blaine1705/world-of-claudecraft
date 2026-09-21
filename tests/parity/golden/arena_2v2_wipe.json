@@ -1309,7 +1309,7 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 1014,
-      "state": "652febfd",
+      "state": "48537c0b",
       "events": "a350758b",
       "rng": {
         "draws": 541,
@@ -1428,6 +1428,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "pvp": 1,
             "raidUnlocks": [
               0,
@@ -1556,6 +1557,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "pvp": 1,
             "raidUnlocks": [
               0,
@@ -2032,7 +2034,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1014,
-      "state": "1a00b1b3",
+      "state": "b3dfa369",
       "events": "741638a5",
       "rng": {
         "draws": 758,
@@ -2043,7 +2045,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1014,
-      "state": "72e338b7",
+      "state": "a28ee80d",
       "events": "741638a5",
       "rng": {
         "draws": 1029,
@@ -2054,7 +2056,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 1014,
-      "state": "d9391a62",
+      "state": "a0609be4",
       "events": "741638a5",
       "rng": {
         "draws": 1339,
@@ -2065,7 +2067,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1014,
-      "state": "6cbbf060",
+      "state": "8faf390a",
       "events": "741638a5",
       "rng": {
         "draws": 1673,
@@ -2076,7 +2078,7 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 1014,
-      "state": "91b21d4a",
+      "state": "3bf5292c",
       "events": "3e6cf595",
       "rng": {
         "draws": 1865,
@@ -2087,7 +2089,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 1014,
-      "state": "d009909b",
+      "state": "650b95b1",
       "events": "741638a5",
       "rng": {
         "draws": 2009,
@@ -2206,6 +2208,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "pvp": 1,
             "raidUnlocks": [
               0,
@@ -2334,6 +2337,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "pvp": 1,
             "raidUnlocks": [
               0,
@@ -2815,7 +2819,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 1014,
-      "state": "d009909b",
+      "state": "650b95b1",
       "events": "741638a5",
       "rng": {
         "draws": 2009,
@@ -2934,6 +2938,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "pvp": 1,
             "raidUnlocks": [
               0,
@@ -3062,6 +3067,7 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {},
             "pvp": 1,
             "raidUnlocks": [
               0,
