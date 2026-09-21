@@ -5304,6 +5304,7 @@ const ALL_DELTA_KEYS = [
   'tslot',
   'vault',
   'weapon',
+  'wpvp',
   'xp',
 ] as const;
 
@@ -5416,6 +5417,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   tfocus: 'townFocus',
   tslot: 'toolEffectSlots',
   vault: 'vaultInfo',
+  wpvp: 'worldPvpInfo',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
@@ -6516,7 +6518,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 95 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 96 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6559,9 +6561,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // for 92. Intentional Gathering PR4 adds the owner-only tracked-goal
     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
     // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
-    // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95.
-    expect(ALL_DELTA_KEYS).toHaveLength(95);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(95);
+    // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95. The
+    // World PvP flag readout wpvp (src/sim/pvp/world_pvp.ts) makes it 96.
+    expect(ALL_DELTA_KEYS).toHaveLength(96);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(96);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6723,8 +6726,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Gathering PR4's ggoal (emitted from the new gathering_goal_wire.ts
     // sibling, likewise inside the recursive scrape) makes 93.
     // The candidate self in-combat key cbt brings the combined inventory to 94;
-    // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
-    expect(scraped.size).toBe(95);
+    // the account ledger's acct key (server/deeds_wire.ts) makes it 95; the
+    // World PvP readout wpvp makes it 96.
+    expect(scraped.size).toBe(96);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

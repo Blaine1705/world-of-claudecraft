@@ -423,6 +423,14 @@ import {
   StableSelfTimerWireCache,
   wireAura,
 } from './snapshot_timer_wire';
+import {
+  emptyWireVariant,
+  type EntityWireCache,
+  type EntityWireVariantCache,
+  type EntityWireView,
+  fullEntityJson,
+  liteEntityJson,
+} from './entity_wire_cache';
 import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
@@ -1398,6 +1406,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
   if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
+  if (e.pvpFlag) out.pvp = 1; // /pvp flag bit: nameplate + target-frame hostility colour
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
   // three and the frame hides its bar). The rounded res keeps an idle entity's
@@ -1502,53 +1511,6 @@ export function wireEntity(e: Entity, includeAuras = true): Record<string, unkno
   return { id: e.id, ...identityFields(e), ...dynamicFields(e, includeAuras) };
 }
 
-// Per-entity wire fragments, refreshed lazily at most once per tick and
-// shared by every recipient. The version counters bump only when the
-// serialized form actually changes, making per-session diffing O(1).
-interface EntityWireVariantCache {
-  tick: number;
-  idVer: number;
-  dynJson: string;
-  dynVer: number;
-  auraVer: number;
-  builtIdVer: number;
-  builtDynVer: number;
-  builtAuraVer: number;
-  fullJson: string;
-  liteJson: string;
-  fullAuraJson: string;
-  liteAuraJson: string;
-}
-
-interface EntityWireCache {
-  tick: number;
-  /** identityFields() as JSON, WITHOUT the authored look: the string actually
-   *  diffed for identity changes. Kept beside idJson so the appearance splice
-   *  below only re-runs when the rest of the identity moves. */
-  baseIdJson: string;
-  idJson: string;
-  /** The authored modular look, serialized ONCE for this entity (null when it
-   *  has none). Immutable for the session, so it is minted on first use and
-   *  spliced, never re-stringified. */
-  appJson: string | null;
-  baseDynJson: string;
-  idVer: number;
-  baseDynVer: number;
-  auraCache: StableAuraWireCache;
-  legacy: EntityWireVariantCache;
-  stable: EntityWireVariantCache;
-}
-
-interface EntityWireView {
-  idVer: number;
-  dynVer: number;
-  auraVer: number;
-  fullJson: string;
-  liteJson: string;
-  fullAuraJson: string;
-  liteAuraJson: string;
-}
-
 // One session's resolved interest anchor for a broadcast pass: the entity whose
 // position seeds the interest scan (self, or the spectated target), plus the
 // meta/session the self payload is built from. Resolved once up front so a
@@ -1562,31 +1524,6 @@ interface SnapshotAnchor {
   anchorMeta: PlayerMeta;
   anchorSession: ClientSession;
   stableTimerWire: boolean;
-}
-
-function emptyWireVariant(): EntityWireVariantCache {
-  return {
-    tick: -1,
-    idVer: 0,
-    dynJson: '',
-    dynVer: 0,
-    auraVer: 0,
-    builtIdVer: -1,
-    builtDynVer: -1,
-    builtAuraVer: -1,
-    fullJson: '',
-    liteJson: '',
-    fullAuraJson: '',
-    liteAuraJson: '',
-  };
-}
-
-function fullEntityJson(id: number, idJson: string, dynJson: string): string {
-  return `{"id":${id},${idJson.slice(1, -1)},${dynJson.slice(1, -1)}}`;
-}
-
-function liteEntityJson(id: number, dynJson: string): string {
-  return `{"id":${id},${dynJson.slice(1, -1)}}`;
 }
 
 function logSocialErr(err: unknown): void {
@@ -7424,6 +7361,11 @@ export class GameServer {
         sim.bgFlagAction(pid);
         session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
         break;
+      // World PvP: raise or lower the /pvp flag (src/sim/pvp/world_pvp.ts owns
+      // every rule; a non-boolean payload is a malformed frame and is ignored).
+      case 'pvp_flag':
+        if (typeof msg.on === 'boolean') sim.setWorldPvpFlag(msg.on, pid);
+        break;
       case 'dev_bg_start': {
         if (process.env.ALLOW_DEV_COMMANDS === '1') sim.devStartBg();
         break;
@@ -8625,6 +8567,7 @@ export class GameServer {
     // session receives both, then they ride only on earn/spend changes.
     maybe('honor', meta.honor);
     maybe('lhonor', meta.lifetimeHonor);
+    maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));

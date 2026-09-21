@@ -197,6 +197,7 @@ import { apiErrorFromBody } from './api_error';
 import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
 import { computeBackoffDelay } from './backoff';
 import { applyBankSelfWire } from './bank_snapshot_wire';
+import { applySocialSelfWire } from './social_self_wire';
 import { blankEntity } from './blank_entity';
 import { applyBookOfDeedsWire } from './book_wire';
 import {
@@ -1276,6 +1277,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // the snapshot self (`s.bg`, delta-omitted); flag/score dynamics also ride
   // the events queue for banners and the combat log. ---
   bgInfo: import('../world_api').BgInfo | null = null;
+  // --- IWorldWorldPvp: the /pvp flag readout (`s.wpvp`, delta-omitted). ---
+  worldPvpInfo: import('../world_api').WorldPvpInfo | null = null;
   // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
   // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
   // missing key keeps the prior mirror, an explicit null clears it). ---
@@ -2912,6 +2915,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.leaping = !!w.lp;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
+      e.pvpFlag = !!w.pvp; // /pvp flag bit: nameplate + target-frame hostility colour
       e.weaponStowed = !!w.ws;
       e.helmHidden = !!w.hh;
       e.aggroTargetId = w.aggro ?? null;
@@ -3259,23 +3263,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
-      // --- IWorldTrade / IWorldDuelArena: trade/duel/arena delta self-decode
-      // (W0a-covered; keep the prior mirror value when the field is omitted).
-      // IWorldSocialGraph.socialInfo has NO snapshot key - it is set only by the
-      // social/socialpos frames. ---
-      if (s.trade !== undefined) this.tradeInfo = s.trade;
-      if (s.duel !== undefined) this.duelInfo = s.duel;
-      if (s.arena !== undefined) this.arenaInfo = s.arena;
-      if (s.bg !== undefined) this.bgInfo = s.bg;
-      if (s.df !== undefined) this.dungeonFinderInfo = s.df;
-      if (s.dfb !== undefined) this.dungeonFinderBoard = s.dfb;
-      if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
-      if (s.honor !== undefined) this.honor = s.honor ?? 0;
-      if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
-      if (s.market !== undefined) this.marketInfo = s.market;
-      if (s.mktU !== undefined) this.marketCollectPending = !!s.mktU;
-      if (s.mail !== undefined) this.mailInfo = s.mail;
-      if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
+      // --- Trade / duel / arena / battleground / finder / card duel / honor /
+      // market / mail / world PvP self-decode (W0a-covered, delta-omitted): the
+      // sibling module owns the cohort and its adopt-by-reference contract. ---
+      applySocialSelfWire(this, s);
       // The four owner-only bank/vault self keys (`bank`, `vault`, `cvault`,
       // `bpsl`): all delta-omitted, strictly decoded and applied by the sibling
       // module, where the delta contract, the by-reference adoption rationale,
@@ -4381,6 +4372,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   bgFlagAction(): void {
     this.cmd({ cmd: 'bg_flag' });
+  }
+  // --- IWorldWorldPvp: raise/lower the /pvp flag (worldPvpInfo is a snapshot read). ---
+  setWorldPvpFlag(enabled: boolean): void {
+    this.cmd({ cmd: 'pvp_flag', on: enabled });
   }
   // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
   // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---

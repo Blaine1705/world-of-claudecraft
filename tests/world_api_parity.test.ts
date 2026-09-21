@@ -60,6 +60,7 @@ import type { IWorldDungeonFinder } from '../src/world_api/dungeon_finder';
 import type { IWorldDungeons } from '../src/world_api/dungeons';
 import type { IWorldEntityRoster } from '../src/world_api/entity_roster';
 import type { IWorldFarming } from '../src/world_api/farming';
+import type { IWorldWorldPvp } from '../src/world_api/world_pvp';
 import type { IWorldGuildBank } from '../src/world_api/guild_bank';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
@@ -539,6 +540,9 @@ export const IWORLD_MEMBERS = [
   // data member exists for it.
   { name: 'placeFeast', kind: 'method' },
   { name: 'consumeFeast', kind: 'method' },
+  // IWorldWorldPvp (world_pvp.ts): the /pvp flag readout + raise/lower.
+  { name: 'worldPvpInfo', kind: 'data' },
+  { name: 'setWorldPvpFlag', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -865,9 +869,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // methods, the Who tab data and method, CPU-hygiene entityRosterVersion,
     // and the account-wide Book of Deeds / Reliquary read halves. Counted
     // directly off the resolved IWORLD_MEMBERS literal.
-    expect(IWORLD_MEMBERS.length).toBe(378);
-    expect(DATA_MEMBERS.length).toBe(107);
-    expect(METHOD_MEMBERS.length).toBe(271);
+    // World PvP (the /pvp flag) adds worldPvpInfo (data) and setWorldPvpFlag
+    // (method) on its own IWorldWorldPvp facet: 380 members, 108 data, 272 method.
+    expect(IWORLD_MEMBERS.length).toBe(380);
+    expect(DATA_MEMBERS.length).toBe(108);
+    expect(METHOD_MEMBERS.length).toBe(272);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1203,6 +1209,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'setWorldPvpFlag',
       'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
@@ -1255,6 +1262,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vendorBuyback',
       'whoInfo',
       'whoRequest',
+      'worldPvpInfo',
       'xp',
     ]);
   });
@@ -1367,6 +1375,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vaultInfo',
       'vendorBuyback',
       'whoInfo',
+      'worldPvpInfo',
       'xp',
     ]);
   });
@@ -1605,6 +1614,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'setWorldPvpFlag',
       'slotToolEffect',
       'socketRiftGem',
       'sortInventory',
@@ -2263,6 +2273,11 @@ const FACET_FARMING = [
 ] as const satisfies readonly (keyof IWorldFarming)[];
 type _ExhaustFarming = AssertNever<Exclude<keyof IWorldFarming, (typeof FACET_FARMING)[number]>>;
 
+const FACET_WORLD_PVP = ['worldPvpInfo', 'setWorldPvpFlag'] as const satisfies readonly (keyof IWorldWorldPvp)[];
+type _ExhaustWorldPvp = AssertNever<
+  Exclude<keyof IWorldWorldPvp, (typeof FACET_WORLD_PVP)[number]>
+>;
+
 // The facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   entityRoster: FACET_ENTITY_ROSTER,
@@ -2298,6 +2313,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   reliquary: FACET_RELIQUARY,
   actionBar: FACET_ACTION_BAR,
   farming: FACET_FARMING,
+  worldPvp: FACET_WORLD_PVP,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
@@ -2309,8 +2325,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // own count: +1 Reliquary facet, 33 total; -1 for the New Eastbrook
     // program's Vale Cup retirement, 32 total. The v0.41.0 sync carries both
     // arms (farming in, vale_cup out): 33 total, measured as the facet files
-    // on disk minus appearance.ts (the sweep below).
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
+    // on disk minus appearance.ts (the sweep below). World PvP (the /pvp
+    // flag) adds its own facet, world_pvp.ts: 34 total.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(34);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2391,8 +2408,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(378);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(378);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(380);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(380);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

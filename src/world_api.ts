@@ -52,6 +52,7 @@
 //   farming.ts          IWorldFarming        the static garden-bed geography + the caller's own
 //                                            plot rows (reads only in the patches-and-plots phase)
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
+//   world_pvp.ts        IWorldWorldPvp       the /pvp flag: self readout + raise/lower command
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -94,6 +95,7 @@ import type { IWorldQuests } from './world_api/quests';
 import type { IWorldReliquary } from './world_api/reliquary';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
+import type { IWorldWorldPvp } from './world_api/world_pvp';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
@@ -376,6 +378,7 @@ export type {
   ReliquaryPageCompletion,
   ReliquaryRarity,
 } from './world_api/reliquary';
+export type { WorldPvpInfo } from './world_api/world_pvp';
 export type {
   CharacterProfile,
   CharacterSearchResult,
@@ -430,7 +433,8 @@ export interface IWorld
     IWorldDeeds,
     IWorldReliquary,
     IWorldMounts,
-    IWorldFarming {}
+    IWorldFarming,
+    IWorldWorldPvp {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -840,6 +844,9 @@ export const COMMAND_NAMES = [
   // The Social window's Who tab: ask for the realm roster (answered by the
   // `who` frame, mirrored as IWorldSocialGraph.whoInfo).
   'who',
+  // World PvP: raise or lower the /pvp flag (IWorldWorldPvp.setWorldPvpFlag;
+  // the bare /pvp chat line toggles through the sim's own chat router).
+  'pvp_flag',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -928,7 +935,8 @@ export type WorldFacet =
   | 'IWorldDeeds'
   | 'IWorldReliquary'
   | 'IWorldMounts'
-  | 'IWorldFarming';
+  | 'IWorldFarming'
+  | 'IWorldWorldPvp';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -1195,4 +1203,7 @@ export const COMMAND_FACETS = {
   convert_husks: 'IWorldFarming',
   place_feast: 'IWorldFarming',
   consume_feast: 'IWorldFarming',
+  // IWorldWorldPvp: the /pvp flag raise/lower. worldPvpInfo (the `wpvp`
+  // self-delta mirror) carries no wire command and stays untagged.
+  pvp_flag: 'IWorldWorldPvp',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;
