@@ -6503,7 +6503,9 @@ export type SimEvent = { pid?: number } & (
   // (e.g. 'Falling' for environmental damage), the client localizes it via
   // abilityDisplayNameFromSource like every other ability-name event field.
   | { type: 'playerDeath'; killerId?: number; killerAbility?: string }
-  | { type: 'respawn' }
+  // sickness names the penalty the revive charged, so the client can say so; a
+  // penalty-free revive (corpse run, instance re-entry, delve reset) omits it.
+  | { type: 'respawn'; sickness?: 'resurrection' }
   | UnstuckEvent
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.

@@ -490,13 +490,19 @@ const MONOLITHS: MonolithRow[] = [
     // measured that branch at 18291 against this pin, so its tradeOfferHeadroom
     // wrapper folded into the bags binding (the trade-open gate plus the pure
     // core read on one dependency line). Exact count, zero slack.
-    // LOWERED 18286 -> 18276 at the permanent loot quality (PR 4054) sync:
-    // the item tooltip column composition moved to item_combat_tooltip_view.ts
-    // and the loot receipt body decision to loot_quality_receipt.ts (the
-    // loot arm keeps its one guarded log() call through a thin
-    // lootReceiptBody adapter), composed with the trade quantity prompt
-    // fold above (18289 - 3 - 10). Exact merged count, zero slack.
-    ceiling: 18276,
+    // LOWERED 18286 -> 18276 at the release/v0.44.0 sync of the Pale Keeper
+    // revive change: the Keeper dialog copy moved out to
+    // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
+    // per-frame healer-range scan (the Keeper is talked to). wc -l on the
+    // merged tree. Exact count, zero slack.
+    // LOWERED 18276 -> 18266 at the permanent loot quality (PR 4054) sync on
+    // top of the Keeper revive landing: the item tooltip column composition
+    // moved to item_combat_tooltip_view.ts and the loot receipt body decision
+    // to loot_quality_receipt.ts (the loot arm keeps its one guarded log()
+    // call through a thin lootReceiptBody adapter), composed with the trade
+    // quantity prompt fold (18276 - 10). wc -l on the merged tree. Exact
+    // count, zero slack.
+    ceiling: 18266,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
