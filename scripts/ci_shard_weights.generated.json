@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4063,
+    "files": 4064,
     "harvestedFiles": 3948,
     "carried": {
       "tests/active_kit_prewarm.test.ts": {
@@ -765,6 +765,15 @@
           10
         ]
       },
+      "tests/warrior_kit_assets.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "PR 4139 review-fix round: the Warrior kit texture demand-loading suite, absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
+        "runs": [
+          22
+        ]
+      },
       "tests/warrior_leap_effects.test.ts": {
         "ms": 117,
         "method": "local-median",
@@ -1067,7 +1076,7 @@
       "tests/server/store_mount_grants.test.ts": "Replaced by store_mount_skin_grants.test.ts in PR3941; new suite uses the existing heuristic until measured."
     },
     "mergedLocal": "2026-09-21",
-    "mergedFiles": 4
+    "mergedFiles": 5
   },
   "tests/abilities_command.test.ts": 2213,
   "tests/ability_audio_defers_to_recordings.test.ts": 66,
@@ -4977,6 +4986,7 @@
   "tests/warrior_insult_core.test.ts": 4,
   "tests/warrior_intervene.test.ts": 1436,
   "tests/warrior_intervene_visual.test.ts": 10,
+  "tests/warrior_kit_assets.test.ts": 22,
   "tests/warrior_leap_effects.test.ts": 117,
   "tests/warrior_leap_performance.test.ts": 123,
   "tests/warrior_leap_phases.test.ts": 76,

@@ -53,7 +53,7 @@ import {
 import { type AbilityVfx, type AbilityVfxFx, abilityVfxTexturePrewarmSteps } from './ability_vfx';
 import { activeKitPrewarmEntry, resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
-import { abilityVfxBootTextureDependencies } from './ability_vfx/prewarm';
+import { ensureWarriorKitAssets } from './ability_vfx/production_assets';
 import { isWarriorFuryAuraEvent } from './ability_vfx/warrior_fury_feedback';
 import { warriorInsultCue } from './ability_vfx/warrior_insult_core';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
@@ -6431,6 +6431,7 @@ export class Renderer {
       },
       activeKitPrewarmEntry(this.scene, this.sim.cfg.playerClass, {
         queue: this.backgroundGpuWork,
+        assets: () => ensureWarriorKitAssets(GFX.constrainedMemory),
         geometry: (kinds) =>
           this.abilityVfxFx.authoredPrewarmUnits(
             {
@@ -6464,7 +6465,6 @@ export class Renderer {
           })),
         resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],
         run: async () => {
-          for (const texture of abilityVfxBootTextureDependencies()) this.prewarmTexture(texture);
           this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
           abilityMaterialSlot.run();
           this.scene.traverse((child) => {
@@ -6897,8 +6897,7 @@ export class Renderer {
     } finally {
       cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication });
     }
-    // Other players can be Warriors even when the local player is another class.
-    resumeActiveAbilityKit(this.scene, options.resumeAfterFirstPaint, 'warrior');
+    resumeActiveAbilityKit(this.scene, options.resumeAfterFirstPaint, this.sim.cfg.playerClass);
 
     // Deferred compile-submit units whose owner never drained them (the
     // compile entry itself was dropped, or its drain hit the deadline again):

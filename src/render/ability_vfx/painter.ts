@@ -131,6 +131,9 @@ export interface AbilityVfxDeps {
   localPlayerId?: () => number;
   isLivingWarrior?: (entityId: number) => boolean;
   isWarrior?: (entityId: number) => boolean;
+  // First sighting of a class whose kit loads on demand (a remote Warrior for
+  // a non-Warrior local player): the host starts that kit's assets and prewarm.
+  requestClassKit?: (cls: string) => void;
   warriorSpecOf?: (entityId: number) => string | null;
   visualVariantOf?: (abilityId: string, casterId: number) => string;
   // True when the entity's rig authors a per-ability one-shot clip
@@ -483,6 +486,8 @@ export class AbilityVfx {
   private readonly gestureAt = new Map<string, number>();
   private semanticFrame = 0;
 
+  // Class kits requested from the host on first sighting (see syncEntity).
+  private readonly kitsRequested = new Set<string>();
   private readonly harvestDetonations = new HarvestDetonations();
 
   /** A preview take can replace its world while keeping warmed primitives. */
@@ -1669,6 +1674,10 @@ export class AbilityVfx {
     // The held state below is kept either way; only the draws wait.
     const gateHeld = renderEffects && !this.ready();
     const fx = this.deps.fx;
+    if (e.kind === 'player' && e.templateId === 'warrior' && !this.kitsRequested.has('warrior')) {
+      this.kitsRequested.add('warrior');
+      this.deps.requestClassKit?.('warrior');
+    }
     if (isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) fx.cancelWarriorHammer?.(e.id);
     let held = this.heldSemantic.get(e.id);
     if (!held) {

@@ -921,8 +921,11 @@ const MONOLITHS: MonolithRow[] = [
     // Warrior integration moves painter wiring and prewarm types to sibling modules.
     // PR 4139 review-fix round: endDraw gained the matching
     // refreshFrozenWorldMatrix guard (one line), paid for by moving the Fiesta
-    // shake math into camera_impact_core.ts (fiestaShakeX/Y). Exact count.
-    ceiling: 12790,
+    // shake math into camera_impact_core.ts (fiestaShakeX/Y); then LOWERED
+    // 12790 -> 12789 when the Warrior kit textures moved to demand loading
+    // (the boot-time sheet upload loop and its comment went, the kit host
+    // gained its assets line). Exact count.
+    ceiling: 12789,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

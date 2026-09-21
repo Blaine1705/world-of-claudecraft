@@ -2,6 +2,7 @@ import type * as THREE from 'three';
 import { ABILITIES, ITEMS } from '../sim/data';
 import type { IWorld } from '../world_api';
 import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
+import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
@@ -106,6 +107,9 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
         const entity = h.world().entities.get(id);
         return entity?.kind === 'player' && entity.templateId === 'warrior';
       },
+      // A remote Warrior's kit (textures, contact sheets, crests) loads the first
+      // time the painter sees one; a local Warrior's is resumed by the renderer.
+      requestClassKit: (cls) => resumeActiveAbilityKit(h.scene, undefined, cls),
       hasGestureClip: (id, abilityId) => visual(id)?.hasAttackClipOverride(abilityId) ?? false,
       isInstantAbility: (id) => {
         const def = ABILITIES[id];

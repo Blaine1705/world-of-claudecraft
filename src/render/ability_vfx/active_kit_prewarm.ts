@@ -37,6 +37,10 @@ export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
 ];
 interface ActiveKitHost {
   queue: Pick<BackgroundGpuQueue, 'run'>;
+  /** Start (or join) the kit's demand-loaded assets before any unit runs;
+   *  false means the device declined them, so the kit stays cold and no unit
+   *  runs. Absent in tests that inject textures directly. */
+  assets?(): Promise<boolean>;
   geometry(kinds: readonly CrestKind[]): readonly PrewarmResumeUnit[];
   texture(texture: THREE.Texture): void;
 }
@@ -188,6 +192,8 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
   const units = recipe(state, selected);
   if (!units.length) return Promise.resolve();
   const task = (async () => {
+    if (state.host.assets && !(await state.host.assets())) return;
+    if (state.cancelled) return;
     for (const unit of units) {
       if (state.cancelled) return;
       await state.host.queue.run(

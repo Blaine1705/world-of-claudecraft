@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { loadKtx2Texture } from '../assets/loader';
-import { registerDeferredPreload } from '../assets/preload';
 
 export const CONTACT_SHEETS = ['contact_cut', 'contact_crush', 'contact_pierce'] as const;
 export type ContactSheet = (typeof CONTACT_SHEETS)[number];
@@ -10,8 +9,16 @@ export const CONTACT_URLS: Record<ContactSheet, string> = {
   contact_pierce: '/textures/vfx/contact/pierce.ktx2',
 };
 const textures = new Map<ContactSheet, THREE.Texture>();
-registerDeferredPreload(async () => {
-  await Promise.all(
+let pending: Promise<void> | null = null;
+
+/** The three contact sheets load with the rest of the Warrior kit, on demand
+ *  (production_assets.ts ensureWarriorKitAssets), never on the deferred
+ *  preload lane: only the authored Warrior contacts draw them, so a page with
+ *  no Warrior in sight never pays for them. One load per page; a failure
+ *  resets so the next request can retry. */
+export function ensureContactSheets(): Promise<void> {
+  if (pending) return pending;
+  pending = Promise.all(
     CONTACT_SHEETS.map(async (kind) => {
       const texture = (await loadKtx2Texture(CONTACT_URLS[kind], { large: true })).clone();
       texture.generateMipmaps = false;
@@ -19,9 +26,22 @@ registerDeferredPreload(async () => {
       texture.needsUpdate = true;
       textures.set(kind, texture);
     }),
+  ).then(
+    () => undefined,
+    (error: unknown) => {
+      pending = null;
+      throw error;
+    },
   );
-});
-export const contactPreloadInternalsForTest = { urls: Object.values(CONTACT_URLS) };
+  return pending;
+}
+export const contactAssetInternalsForTest = {
+  urls: Object.values(CONTACT_URLS),
+  reset(): void {
+    textures.clear();
+    pending = null;
+  },
+};
 export function isContactSheet(value: string): value is ContactSheet {
   return (CONTACT_SHEETS as readonly string[]).includes(value);
 }

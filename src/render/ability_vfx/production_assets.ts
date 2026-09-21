@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { loadGltf, loadKtx2Texture, loadTexture, releaseGltf } from '../assets/loader';
-import { registerDeferredPreload } from '../assets/preload';
+import { ensureContactSheets } from './contact_assets';
 
 export type BakedKind =
   | 'smoke'
@@ -47,28 +47,75 @@ export function warriorPressureTexture(): THREE.Texture | null {
   return pressureTexture;
 }
 const geometry = new Map<FragmentKind, THREE.BufferGeometry>();
-registerDeferredPreload(async () => {
-  await Promise.all(
-    Object.entries(BAKED_URLS).map(async ([kind, url]) => {
+
+// The kit's sheets are big (2048px and one 4096px) and decode to full RGBA
+// bitmaps, so nothing here rides the deferred preload lane any more: the
+// whole set is loaded ON DEMAND, once per page, when the active Warrior kit is
+// requested (a local Warrior at entry, or the first remote Warrior the painter
+// sees), and DECLINED outright on constrained-memory devices, where every
+// getter stays null, the kit stays cold and the generic presentation runs.
+export type WarriorKitAssetsState = 'idle' | 'declined' | 'loading' | 'ready' | 'failed';
+let assetsState: WarriorKitAssetsState = 'idle';
+let assetsTask: Promise<boolean> | null = null;
+export function warriorKitAssetsState(): WarriorKitAssetsState {
+  return assetsState;
+}
+
+/** Start (or join) the one load of the Warrior kit's textures, fragments and
+ *  contact sheets. Resolves true once every asset is resident, false when the
+ *  device declined them. A failed load resets so a later request can retry. */
+export function ensureWarriorKitAssets(constrainedMemory: boolean): Promise<boolean> {
+  if (assetsTask) return assetsTask;
+  if (constrainedMemory) {
+    assetsState = 'declined';
+    return Promise.resolve(false);
+  }
+  assetsState = 'loading';
+  assetsTask = loadWarriorKitAssets().then(
+    () => {
+      assetsState = 'ready';
+      return true;
+    },
+    (error: unknown) => {
+      assetsState = 'failed';
+      assetsTask = null;
+      throw error;
+    },
+  );
+  return assetsTask;
+}
+
+async function loadWarriorKitAssets(): Promise<void> {
+  await Promise.all([
+    ensureContactSheets(),
+    ...Object.entries(BAKED_URLS).map(async ([kind, url]) => {
+      const compressed = url.endsWith('.ktx2');
       const texture = (
-        await (url.endsWith('.ktx2')
+        await (compressed
           ? loadKtx2Texture(url, { large: true })
           : loadTexture(url, { srgb: true }))
       ).clone();
-      // No mip cross-contamination between cells. Fixed framing has baked gutters.
-      texture.generateMipmaps = false;
-      texture.minFilter = THREE.LinearFilter;
+      // The authored cells carry baked gutters, so a mip chain cannot bleed
+      // between them, and it is what keeps a 2048px sheet cheap to sample once
+      // the contact is a few yards away (no chain means every distant texel
+      // walk misses the cache and shimmers). A KTX2 sheet ships whatever chain
+      // its encoder wrote, so its filters stay as loaded.
+      texture.generateMipmaps = !compressed;
+      texture.minFilter = compressed ? THREE.LinearFilter : THREE.LinearMipmapLinearFilter;
       texture.magFilter = THREE.LinearFilter;
+      texture.needsUpdate = true;
       textures.set(kind as BakedKind, texture);
     }),
-  );
+  ]);
+  // Grain data map: sampled at a fixed screen scale, so no chain.
   pressureTexture = (await loadTexture(PRESSURE_URL, { srgb: false })).clone();
   pressureTexture.colorSpace = THREE.NoColorSpace;
   pressureTexture.generateMipmaps = false;
   pressureTexture.minFilter = pressureTexture.magFilter = THREE.LinearFilter;
   bloodTexture = (await loadTexture(BLOOD_URL, { srgb: true })).clone();
-  bloodTexture.generateMipmaps = false;
-  bloodTexture.minFilter = bloodTexture.magFilter = THREE.LinearFilter;
+  bloodTexture.generateMipmaps = true;
+  bloodTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  bloodTexture.magFilter = THREE.LinearFilter;
   steelTexture = (await loadTexture(STEEL_URL, { srgb: true })).clone();
   steelTexture.generateMipmaps = true;
   steelTexture.minFilter = THREE.LinearMipmapLinearFilter;
@@ -86,9 +133,17 @@ registerDeferredPreload(async () => {
     geometry.set(name, mesh.geometry.clone().applyMatrix4(mesh.matrixWorld));
   }
   releaseGltf(FRAGMENT_URL);
-});
-export const productionPreloadInternalsForTest = {
+}
+
+export const productionAssetInternalsForTest = {
   urls: [...Object.values(BAKED_URLS), PRESSURE_URL, BLOOD_URL, STEEL_URL, ROCK_URL, FRAGMENT_URL],
+  reset(): void {
+    textures.clear();
+    geometry.clear();
+    rockTexture = steelTexture = bloodTexture = pressureTexture = null;
+    assetsState = 'idle';
+    assetsTask = null;
+  },
 };
 export function bakedTexture(kind: BakedKind): THREE.Texture | null {
   return textures.get(kind) ?? null;

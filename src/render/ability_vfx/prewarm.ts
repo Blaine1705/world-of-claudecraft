@@ -161,20 +161,3 @@ export function collectAbilityVfxCompileTargets(root: THREE.Object3D): AbilityVf
   });
   return targets;
 }
-
-export function abilityVfxBootTextureDependencies(): THREE.Texture[] {
-  const power = bakedTexture('warrior_power');
-  const fervor = bakedTexture('warrior_fervor');
-  const harvest = bakedTexture('harvest_impact');
-  const bite = bakedTexture('warrior_bite');
-  const shear = bakedTexture('warrior_shear');
-  const crush = bakedTexture('warrior_crush');
-  return [
-    ...(power ? [power] : []),
-    ...(fervor ? [fervor] : []),
-    ...(harvest ? [harvest] : []),
-    ...(bite ? [bite] : []),
-    ...(shear ? [shear] : []),
-    ...(crush ? [crush] : []),
-  ];
-}

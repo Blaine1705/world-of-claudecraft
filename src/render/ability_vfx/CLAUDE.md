@@ -144,9 +144,17 @@ selected by ability id only:
   readouts (`warrior_fury_states.ts`, `warrior_readiness*.ts`,
   `warrior_attention*.ts`, `warrior_control*.ts`), and prewarm
   (`active_kit_prewarm.ts`, `crest_prewarm.ts`, `guard_prewarm.ts`,
-  `baked_pool_prewarm.ts`) registered through the renderer's manifest entry so
-  a remote warrior's kit is warm for a non-warrior local player
-  (`tests/active_kit_prewarm.test.ts`).
+  `baked_pool_prewarm.ts`) registered through the renderer's manifest entry.
+  The kit's textures (`production_assets.ts`, `contact_assets.ts`: nine baked
+  sheets, three contact sheets, the material maps, the fragment GLB) never ride
+  the deferred preload lane: `ensureWarriorKitAssets` loads them once, on
+  demand, when a local Warrior enters or the painter first sees a remote one
+  (`requestClassKit`), keeps a mip chain on the WebP sheets, and DECLINES them
+  on constrained-memory devices, where the kit stays cold and the generic
+  presentation runs (`tests/warrior_kit_assets.test.ts`,
+  `tests/active_kit_prewarm.test.ts`). Generic sheets (smoke, dust,
+  shockwave, the harvest splash) ship at 1024px; only signature sheets earn
+  2048px, and a new sheet needs the same justification.
 - **Cost rules still apply.** The shared families it extends (`ribbons.ts`
   vertex budget, `flipbooks.ts` blending, `fx_textures.ts` overlay atlas) are
   drawn by every class, so a change there is a change for every class: state
