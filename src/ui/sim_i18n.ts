@@ -596,6 +596,16 @@ const baseEnTable = {
   // kill/defeat lines. Money goes through the client money formatter.
   'worldPvp.enabled': 'World PvP enabled: other flagged players can attack you.',
   'worldPvp.enabledAiding': 'World PvP enabled: you aided a flagged player in combat.',
+  // The free-for-all marking notice and the two zone-crossing notices
+  // (src/sim/pvp/world_pvp.ts WORLD_PVP_MARKED_LINE, WORLD_PVP_FFA_ENTER_LINE,
+  // WORLD_PVP_FFA_LEAVE_LINE, WORLD_PVP_SANCTUARY_LINE; the ground policy is
+  // src/sim/pvp/world_pvp_zones.ts). All four are placeholder-free, so the
+  // auto-built EXACT map below registers them from these rows and they need no
+  // RULES entry of their own.
+  'worldPvp.enabledMarked': 'World PvP enabled: you attacked an unflagged player.',
+  'worldPvp.ffaEntered': 'You have entered a free-for-all PvP zone: anyone here can attack you.',
+  'worldPvp.ffaLeft': 'You have left the free-for-all PvP zone.',
+  'worldPvp.sanctuary': 'This is a sanctuary: World PvP is off here.',
   'worldPvp.realmDisabled': 'World PvP is disabled on this realm.',
   'worldPvp.tooSoon': 'World PvP: wait a moment before switching again.',
   'worldPvp.disabled': 'World PvP disabled.',

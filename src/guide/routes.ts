@@ -191,7 +191,7 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     sub: 'world-pvp',
     navKey: 'guide.nav.worldPvp',
     group: 'compete',
-    descKey: 'guide.worldPvpPage.intro',
+    descKey: 'guide.worldPvpPage.introZones',
   },
   {
     id: 'deeds',

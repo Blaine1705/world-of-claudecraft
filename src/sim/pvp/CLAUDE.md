@@ -24,12 +24,30 @@ ratings.
 - `honor_persist.ts` owns the persisted form of the honor ledger and its daily
   DR window (`savedHonorState` / `loadHonorState`), moved out of the Sim
   coordinator's serialize/load so a new honor field lands here, not in `sim.ts`.
-- `world_pvp_rules.ts` owns the World PvP (`/pvp` flag) PURE rules: the
-  mutual-flag pair verdict with its party and guild exemptions
-  (`worldPvpPairHostile`, also read by the renderer and the HUD through
-  `src/ui/pvp_hostile_core.ts`), the gold stake, the equal split with the
-  killing blow taking the remainder, the grey-level rule, and the per-pair DR
-  multiplier (shared `HONOR_REPEAT_DR`). No ctx, no rng, no clock.
+- `world_pvp_rules.ts` owns the World PvP (`/pvp` flag) PURE rules: the pair
+  verdict over the two flags AND the two zone policies (`worldPvpPairHostile`,
+  also read by the renderer and the HUD through `src/ui/pvp_hostile_core.ts`)
+  with its same-player, party/raid and guild exemptions (`worldPvpPairExempt`,
+  which cuts through every zone, free-for-all ground included), the marking rule
+  (`worldPvpHitMarksAttacker`: only a hit that needed NO flag marks, so hitting
+  a flagged player never does), the gold stake, the equal split with the killing
+  blow taking the remainder, the grey-level rule, and the per-pair DR multiplier
+  (shared `HONOR_REPEAT_DR`) over its own `WORLD_PVP_DR_WINDOW_SECONDS` (one
+  hour) window. It also declares `WorldPvpZonePolicy`, the three-answer type the
+  next bullet resolves. No ctx, no rng, no clock.
+- `world_pvp_zones.ts` owns the ground policy: which of `'sanctuary'`,
+  `'contested'` and `'ffa'` applies at a position (`worldPvpZonePolicyAt`) or to
+  a zone record (`worldPvpZonePolicyOf`), read off `ZoneDef.worldPvp`
+  (data-as-code in `src/sim/content/`, absent meaning contested). A sanctuary
+  under EITHER player switches the world off (the Proving Shore and Eastbrook
+  Vale, so a new character cannot be fought); both players on free-for-all
+  ground are hostile with no flag at all (the Wraithwood, the Evergarden and the
+  Nightbloom); everything else is the mutual-flag rule. The lookup is the strict
+  rectangle containment (`zoneContaining`, never the clamping `zoneAt`), so the
+  instance plane reads as contested and the open-world policy cannot leak into a
+  dungeon, delve, arena or battleground floor. Pure and host-agnostic: the sim's
+  hostility arm, the nameplate colour and the target frame read the same verdict
+  for the same coordinates.
 - `world_pvp.ts` owns the World PvP SYSTEM behind the `SimContext` seam: the
   flag state (`PlayerMeta.worldPvp`, absent until first raised; `Entity.pvpFlag`
   is its display mirror and the ONLY writer is this module, the away.ts
@@ -40,21 +58,40 @@ ratings.
   `WORLD_PVP_DISABLED=1`), the session books (`Sim.worldPvpBooks`, a live
   `ctx.worldPvpBooks` view: the assist recency rows, the paid-death guard, the
   watermark; swept once a minute so a player who leaves without dying leaves no
-  row), the damage / heal / death hooks the combat hub calls directly (the heal
-  hook also raises an unflagged healer's flag when they aid a flagged fighter,
-  the classic rule), the kill resolution (stake + honor pool, integer copper and
-  integer honor, zero rng, paid exactly once per death), the IWorld readout
+  row), the twice-a-second zone pass that announces a crossing once
+  (`WORLD_PVP_FFA_ENTER_LINE` / `WORLD_PVP_FFA_LEAVE_LINE`, plus
+  `WORLD_PVP_SANCTUARY_LINE` for a FLAGGED player entering a sanctuary; the
+  hostility arm never waits on it, it re-reads the ground live), the damage /
+  aid / death hooks the combat hub calls directly (the damage hook marks an
+  unflagged aggressor who opens on an unflagged player, `WORLD_PVP_MARKED_LINE`;
+  the SHARED aid hook `worldPvpOnPlayerAided` raises an unflagged caster's flag
+  when they heal, shield or buff a FLAGGED player who is in a world fight, the
+  classic rule, and is called from `combat/heal.ts` plus the `absorb` and
+  `buffTarget` sites in `combat/effect_dispatch.ts`; aid to an UNFLAGGED player
+  or given or received inside a sanctuary marks nobody), the kill resolution
+  (stake + honor pool, integer copper and integer honor, zero rng, paid exactly
+  once per death; gold is staked by a FLAGGED victim and taken by FLAGGED
+  contributors only; two players mid-duel with each other are the duel's
+  business, never the world's), the IWorld readout
   (`worldPvpInfoFor`, whole-second countdown so the self wire elides it), the
   `/pvp` chat arms' entry points, and the persisted record (`savedWorldPvpFields`
   / `loadWorldPvpState`, the countdown stored as remaining seconds and
   re-anchored on load; the level gate and the kill switch hold on restore). The
-  per-victim diminishing returns are NOT a book: they ride the persisted UTC-day
-  honor window (`honor.ts` `worldKillRepeats` / `noteWorldKill`,
-  `HonorArenaDailyState.worldKillsByVictim`) so a restart cannot reset them.
-  Every player notice is sim English with a matcher RULE in `src/ui/sim_i18n.ts`
-  (S3). Numbers and rules: `docs/design/warfare.md`, "World PvP income"; tests:
-  `tests/world_pvp.test.ts`, `tests/world_pvp_rules.test.ts`,
-  `tests/world_pvp_server_dispatch.test.ts`.
+  diminishing returns are per PAIR and live in the session books
+  (`WorldPvpBooks.killsByPair`, `worldPvpPairRepeats` / `notePairKill`), keyed by
+  both characters' rename-proof identities over a rolling
+  `WORLD_PVP_DR_WINDOW_SECONDS` window that opens at the first kill of that
+  victim: a relog cannot reset them (the identity survives it) and a realm
+  restart does, which is the owner's hour-window tuning. The persisted UTC-day
+  counter is GONE (`honor.ts` no longer carries `worldKillRepeats` /
+  `noteWorldKill` / `HonorArenaDailyState.worldKillsByVictim`); do not
+  reintroduce a calendar-day window here. Every player notice is sim English
+  with a matcher row in `src/ui/sim_i18n.ts` (the `worldPvp.*` block; the
+  placeholder-free lines register in the auto-built EXACT map, the parametrized
+  ones need a RULE). Numbers and rules: `docs/design/warfare.md`, "World PvP
+  income"; tests: `tests/world_pvp.test.ts`, `tests/world_pvp_rules.test.ts`,
+  `tests/world_pvp_zones.test.ts`, `tests/world_pvp_server_dispatch.test.ts`,
+  and the matcher round trip in `tests/world_pvp_view.test.ts`.
 - `warfare_quartermaster.ts` spawns Warmarshal Draven Kole, the Highwatch
   WARFARE honor vendor, under his RESERVED entity id
   (`WARFARE_QUARTERMASTER_ENTITY_ID`, `1_000_000_002`, the singleton band

@@ -101,7 +101,7 @@ const GROUPS: Group[] = [
       { cmds: ['/completed', '/questsdone', '/qdone'], desc: 'guide.commandsPage.completed' },
       { cmds: ['/session', '/sess', '/sessionstats'], desc: 'guide.commandsPage.session' },
       { cmds: ['/arena', '/rating'], desc: 'guide.commandsPage.arena' },
-      { cmds: ['/pvp', '/pvp on', '/pvp off'], desc: 'guide.commandsPage.pvp' },
+      { cmds: ['/pvp', '/pvp on', '/pvp off'], desc: 'guide.commandsPage.pvpZones' },
       { cmds: ['/listings', '/mylistings', '/auctions'], desc: 'guide.commandsPage.listings' },
       { cmds: ['/buyback', '/bb', '/repurchase'], desc: 'guide.commandsPage.buyback' },
     ],

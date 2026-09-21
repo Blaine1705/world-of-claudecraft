@@ -1,8 +1,10 @@
 // World PvP: a spoiler-safe overview of the /pvp flag. Concepts only (opt-in,
-// the flag and its countdown, who counts as an enemy, the stakes shape, the
-// fair-play rules); no honor amounts, gold caps or tuning constants (guide
-// spoiler policy). The Honor currency itself is explained once, on the arena
-// page, which is the PvP hub.
+// the flag and its countdown, the three kinds of ground and what marks you on
+// each, who counts as an enemy, the stakes shape, the fair-play rules); no
+// honor amounts, gold caps or tuning constants (guide spoiler policy). The
+// Honor currency itself is explained once, on the arena page, which is the PvP
+// hub. The rules this page states come from src/sim/pvp/world_pvp_rules.ts and
+// src/sim/pvp/world_pvp_zones.ts.
 
 import { esc } from '../../ui/esc';
 import { t } from '../../ui/i18n';
@@ -15,10 +17,14 @@ export const worldPvp: GuidePage = {
   render() {
     return `
       <article class="guide-article guide-world-pvp">
-        ${pageHeader('guide.worldPvpPage.heading', 'guide.worldPvpPage.intro')}
-        ${section('guide.worldPvpPage.flagHeading', `<p>${esc(t('guide.worldPvpPage.flagBody'))}</p>`)}
-        ${section('guide.worldPvpPage.stakesHeading', `<p>${esc(t('guide.worldPvpPage.stakesBody'))}</p>`)}
-        ${section('guide.worldPvpPage.limitsHeading', `<p>${esc(t('guide.worldPvpPage.limitsBody'))}</p>`)}
+        ${pageHeader('guide.worldPvpPage.heading', 'guide.worldPvpPage.introZones')}
+        ${section('guide.worldPvpPage.flagHeading', `<p>${esc(t('guide.worldPvpPage.flagBodyAid'))}</p>`)}
+        ${section('guide.worldPvpPage.zonesHeading', `<p>${esc(t('guide.worldPvpPage.zonesBody'))}</p>`)}
+        ${section(
+          'guide.worldPvpPage.stakesHeading',
+          `<p>${esc(t('guide.worldPvpPage.stakesBodyFlagged'))}</p><p>${esc(t('guide.worldPvpPage.stakesUnflaggedTake'))}</p>`,
+        )}
+        ${section('guide.worldPvpPage.limitsHeading', `<p>${esc(t('guide.worldPvpPage.limitsBodyHour'))}</p>`)}
         ${related([
           { href: hrefFor('arena'), key: 'guide.nav.arena' },
           { href: hrefFor('thornhollow-fields'), key: 'guide.nav.thornhollow' },

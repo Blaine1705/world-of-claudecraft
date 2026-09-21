@@ -1434,6 +1434,25 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.levelReq': '需要 {level} 級。',
   'hudChrome.worldPvp.pending': '正在等待伺服器回傳你的 PvP 狀態。',
   'hudChrome.worldPvp.commandHint': '聊天：/pvp 切換旗幟，/pvp on 與 /pvp off 直接設定。',
+  'hudChrome.worldPvp.statusOffFfa':
+    '你的 PvP 旗幟已降下，但在自由混戰地帶你仍然可以攻擊他人，也會被攻擊。',
+  'hudChrome.worldPvp.zoneSanctuary': '聖域：此處沒有世界 PvP。',
+  'hudChrome.worldPvp.zoneContested': '爭奪地帶：此處只有已開啟旗幟的玩家才能交戰。',
+  'hudChrome.worldPvp.zoneFfa': '自由混戰地帶：此處的每個人都可以被攻擊。',
+  'hudChrome.worldPvp.realmDisabled': '本伺服器已關閉世界 PvP。',
+  'hudChrome.worldPvp.groundSanctuary': '試煉之濱與東溪谷是聖域：完全沒有世界 PvP。',
+  'hudChrome.worldPvp.groundContested':
+    '其餘各處都是爭奪地帶：只有兩名都已開啟旗幟的玩家才能交戰。',
+  'hudChrome.worldPvp.groundFfa':
+    '怨靈林、常青園與夜綻花野是自由混戰地帶：無論是否開啟旗幟，那裡的每個人都能交戰。',
+  'hudChrome.worldPvp.markLine':
+    '在那裡攻擊未開啟旗幟的玩家會升起你自己的旗幟；攻擊已開啟旗幟的玩家則永遠不會。',
+  'hudChrome.worldPvp.aidLine': '在世界戰鬥中為已開啟旗幟的玩家治療、護盾或增益，會升起你的旗幟。',
+  'hudChrome.worldPvp.noStakeLine': '未開啟旗幟的玩家在自由混戰地帶被擊殺時不會損失金幣。',
+  'hudChrome.worldPvp.noTakeLine':
+    '未開啟旗幟的戰鬥者同樣拿不到金幣：金幣只在兩名開啟旗幟的玩家之間轉移。',
+  'hudChrome.worldPvp.repeatLine':
+    '反覆擊殺同一名玩家，收益為 {second}，隨後為 {third}，之後歸零；計數在首次擊殺後 {reset} 重置。',
   'hudChrome.warfare.reasons.worldKill': '世界擊殺',
   'hudChrome.warfare.reasons.worldAssist': '世界擊殺助攻',
   'hudChrome.warfare.honorFloat': '+{amount} 榮譽',
@@ -1542,6 +1561,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.nav.thornhollow': '荊谷原野',
   'guide.commandsPage.pvp':
     '世界 PvP 旗幟：/pvp 切換，/pvp on 與 /pvp off 直接設定。已開啟旗幟的玩家可以在任何地方互相作戰；關閉需要 5 分鐘。',
+  'guide.commandsPage.pvpZones':
+    '世界 PvP 旗幟：/pvp 切換，/pvp on 與 /pvp off 直接設定。已開啟旗幟的玩家可以在爭奪地帶互相作戰，聖域完全不允許世界戰鬥，而自由混戰地帶無論是否開啟旗幟都允許作戰；關閉需要 5 分鐘。',
   'guide.nav.worldPvp': '世界 PvP',
   'guide.worldPvpPage.heading': '世界 PvP',
   'guide.worldPvpPage.intro':
@@ -1555,6 +1576,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.limitsHeading': '公平規則',
   'guide.worldPvpPage.limitsBody':
     '反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，計數會隨每日重置而重置。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。',
+  'guide.worldPvpPage.introZones':
+    '開放世界的玩家對戰需要主動開啟，而你腳下的土地決定了這意味著什麼。升起你的 PvP 旗幟後，所有不在你的隊伍、團隊或公會中且同樣開啟了旗幟的玩家都會在爭奪地帶成為敵人；降下旗幟後，稍作等待你就會重新成為旁觀者。有兩座區域是完全不會發生世界戰鬥的聖域，而三座滿級區域是自由混戰地帶，無論是否開啟旗幟，身處其中的每個人都可以被攻擊。隊伍、團隊和公會的夥伴在任何地方都不會成為你的敵人。',
+  'guide.worldPvpPage.zonesHeading': '世界 PvP 發生在哪裡',
+  'guide.worldPvpPage.zonesBody':
+    '世界上的土地分為三種。試煉之濱與東溪谷是聖域：無論是否開啟旗幟，那裡都完全不會發生世界 PvP，所以新角色絕不會在弄清旗幟是什麼之前就被人挑戰。世界的大部分是爭奪地帶，上面那條旗幟規則就是全部。怨靈林、常青園與夜綻花野是自由混戰地帶：站在其中的每個人都可以攻擊站在其中的其他任何人，無論是否開啟旗幟，而且你跨入時會收到提示，離開時同樣會。在那裡攻擊未開啟旗幟的玩家會升起你自己的旗幟，所以挑起戰鬥的一方始終承擔風險。攻擊已經開啟旗幟的玩家則永遠不會升起你的旗幟，這意味著自衛，或是保護未開啟旗幟的人，都不會讓你付出任何代價。',
+  'guide.worldPvpPage.flagBodyAid':
+    '在聊天中輸入 /pvp，或按 G 開啟 PvP 視窗並使用世界 PvP 分頁，那裡還會顯示你的戰績和賭注。度過起始等級後，升起旗幟是即時的。降下旗幟會開始幾分鐘的倒數，而且在你仍在戰鬥時旗幟不會降下，所以關閉永遠不是逃離你挑起的戰鬥的手段。為正在戰鬥的已開啟旗幟的玩家治療、護盾或增益，同樣會升起你自己的旗幟，所以沒有人能不掛旗幟就在背後支撐一名戰鬥者；而援助未開啟旗幟的玩家不會升起任何旗幟。',
+  'guide.worldPvpPage.stakesBodyFlagged':
+    '當一名已開啟旗幟的玩家被另一名玩家擊敗時，敗者會支付錢袋中一小部分金幣（有一個不高的上限），而勝者獲得用於兌換 PvP 裝備的榮譽。未開啟旗幟的玩家則完全不必支付金幣，即便是在自由混戰區域中倒下也一樣。所有出過力的人共同分享這兩者：最後一擊者、不久前對目標造成過傷害的人，以及讓這些戰士站穩腳跟的治療者。乾淨的一對一可獨得全部獎勵；團隊則平分。',
+  'guide.worldPvpPage.stakesUnflaggedTake':
+    '未開啟旗幟的戰鬥者同樣拿不到金幣：金幣只在兩名開啟旗幟的玩家之間轉移，但所有出過力的人仍能獲得榮譽。',
+  'guide.worldPvpPage.limitsBodyHour':
+    '反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。',
   'guide.thornhollowPage.heading': '荊谷原野',
   'guide.thornhollowPage.intro':
     '一場排位 5v5 奪旗戰場，戰場位於棘峰之下老林中的圍牆山谷：兩座廢棄要塞沿著峽谷兩端遙遙相對，中間是一座更古老的庭院，誰都不曾真正佔據。每方五人，兩座要塞，一個目標：奪走敵方戰旗並趕在對方之前帶回家。',

@@ -52,6 +52,17 @@ export const RETIRED_KEYS = [
   'guide.professions.harvestBodyChoice', // folded into the harvest section's body copy
   // -> guide.profPages.gatherDeeds.farmingSown (farming gained its own deeds at D13)
   'guide.profPages.gatherDeeds.farming',
+  // The World PvP zone layer (src/sim/pvp/world_pvp_zones.ts): the flag is no
+  // longer the whole story, so each of these states a rule the game has stopped
+  // following. Sanctuaries allow no world fighting at all, the free-for-all
+  // zones need no flag and mark whoever opens on an unflagged player, an
+  // unflagged victim stakes no gold, and the repeat-kill counter runs on its own
+  // hour rather than the daily reset.
+  'guide.worldPvpPage.intro', // -> guide.worldPvpPage.introZones
+  'guide.worldPvpPage.flagBody', // -> guide.worldPvpPage.flagBodyAid (shields and buffs are aid)
+  'guide.worldPvpPage.stakesBody', // -> guide.worldPvpPage.stakesBodyFlagged
+  'guide.worldPvpPage.limitsBody', // -> guide.worldPvpPage.limitsBodyHour
+  'guide.commandsPage.pvp', // -> guide.commandsPage.pvpZones
 
   // -- Content the game no longer has, so the wiki must not define it.
   // The glossary defined Augment as a draft pick in a two-on-two Fiesta match.

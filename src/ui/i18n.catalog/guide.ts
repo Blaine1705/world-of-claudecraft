@@ -979,6 +979,11 @@ export const guideStrings = {
     arena:
       'Your Ashen Coliseum standing in both brackets: rating, wins, losses and win rate for 1v1 and for 2v2.',
     pvp: 'World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.',
+    // The zone layer retired the "anywhere" claim above (sanctuaries allow no
+    // world PvP and free-for-all zones need no flag), so this row is its
+    // reworded successor and `pvp` is retired in scripts/i18n_retired_keys.mjs.
+    pvpZones:
+      'World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.',
     listings:
       'Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.',
     buyback: 'What you sold to a vendor recently and could still buy back.',
@@ -2255,6 +2260,25 @@ export const guideStrings = {
     limitsHeading: 'Fair play rules',
     limitsBody:
       'Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.',
+    // The zone layer (src/sim/pvp/world_pvp_zones.ts, ZoneDef.worldPvp) changed
+    // four of the five paragraphs above from "true" to "true only on contested
+    // ground", so each gained a reworded SUCCESSOR key and the original is
+    // retired in scripts/i18n_retired_keys.mjs rather than edited in place: every
+    // non-Latin overlay already carries a reviewed translation of the old claim,
+    // and rewording an already-translated value never marks it pending again.
+    introZones:
+      'Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and three of the level-cap zones are free-for-all ground where everyone present is fair game, flag or no flag. Party, raid and guild mates are never enemies of yours anywhere.',
+    zonesHeading: 'Where world PvP happens',
+    zonesBody:
+      'The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Wraithwood, the Evergarden and the Nightbloom are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.',
+    flagBodyAid:
+      'Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.',
+    stakesUnflaggedTake:
+      'Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.',
+    stakesBodyFlagged:
+      'When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.',
+    limitsBodyHour:
+      'Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.',
   },
   thornhollowPage: {
     heading: 'Thornhollow Fields',

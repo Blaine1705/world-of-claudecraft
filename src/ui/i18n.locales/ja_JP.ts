@@ -1491,6 +1491,28 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.pending': 'レルムからのPvP状態を待っています。',
   'hudChrome.worldPvp.commandHint':
     'チャット: /pvp でフラグを切り替え、/pvp on と /pvp off で直接設定します。',
+  'hudChrome.worldPvp.statusOffFfa':
+    'PvPフラグは下りていますが、無差別戦闘地帯では攻撃することも攻撃されることもあります。',
+  'hudChrome.worldPvp.zoneSanctuary': '聖域: ここではワールドPvPは行われません。',
+  'hudChrome.worldPvp.zoneContested': '係争地: ここで戦えるのはフラグを立てたプレイヤーだけです。',
+  'hudChrome.worldPvp.zoneFfa': '無差別戦闘地帯: ここにいる全員が攻撃対象です。',
+  'hudChrome.worldPvp.realmDisabled': 'このレルムではワールドPvPは無効です。',
+  'hudChrome.worldPvp.groundSanctuary':
+    '修練の浜とイーストブルック渓谷は聖域で、ワールドPvPは一切行われません。',
+  'hudChrome.worldPvp.groundContested':
+    'それ以外の場所はすべて係争地で、フラグを立てた者同士だけが戦えます。',
+  'hudChrome.worldPvp.groundFfa':
+    'レイスウッド、エバーガーデン、ナイトブルームは無差別戦闘地帯で、フラグの有無に関わらず誰でも戦えます。',
+  'hudChrome.worldPvp.markLine':
+    'そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立ちます。フラグを立てた相手を攻撃しても立ちません。',
+  'hudChrome.worldPvp.aidLine':
+    'ワールドの戦闘中のフラグを立てたプレイヤーを回復、シールド、強化すると自分のフラグが立ちます。',
+  'hudChrome.worldPvp.noStakeLine':
+    '無差別戦闘地帯でフラグを立てていないプレイヤーが倒されても、所持金は失われません。',
+  'hudChrome.worldPvp.noTakeLine':
+    'フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きます。',
+  'hudChrome.worldPvp.repeatLine':
+    '同じプレイヤーを繰り返し倒すと報酬は {second}、次に {third}、その後はゼロになります。カウントは最初の撃破から {reset} でリセットされます。',
   'hudChrome.warfare.reasons.worldKill': 'ワールド撃破',
   'hudChrome.warfare.reasons.worldAssist': 'ワールド撃破アシスト',
   'hudChrome.warfare.honorFloat': '名誉 +{amount}',
@@ -1605,6 +1627,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.nav.thornhollow': 'ソーンホロウ平原',
   'guide.commandsPage.pvp':
     'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士はどこでも戦えます。解除には5分かかります。',
+  'guide.commandsPage.pvpZones':
+    'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士は係争地で戦え、聖域ではワールドの戦闘は一切行われず、無差別戦闘地帯ではフラグの有無に関わらず戦えます。解除には5分かかります。',
   'guide.nav.worldPvp': 'ワールドPvP',
   'guide.worldPvpPage.heading': 'ワールドPvP',
   'guide.worldPvpPage.intro':
@@ -1618,6 +1642,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.limitsHeading': 'フェアプレイのルール',
   'guide.worldPvpPage.limitsBody':
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。カウントは日次リセットで元に戻ります。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
+  'guide.worldPvpPage.introZones':
+    'オープンワールドの対人戦は任意参加で、その意味は足元の土地が決めます。PvPフラグを立てると、パーティ、レイド、ギルドに属さないフラグを立てた全プレイヤーが係争地で敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。2つのゾーンはワールドの戦闘が一切起こらない聖域で、レベル上限のゾーンのうち3つは、フラグの有無に関わらずその場の全員が攻撃対象となる無差別戦闘地帯です。パーティ、レイド、ギルドの仲間はどこでも敵になりません。',
+  'guide.worldPvpPage.zonesHeading': 'ワールドPvPが起こる場所',
+  'guide.worldPvpPage.zonesBody':
+    '世界の土地は3種類に分かれます。修練の浜とイーストブルック渓谷は聖域で、フラグの有無に関わらずワールドPvPは一切起こらないため、新しいキャラクターがフラグとは何かを知る前に戦いを挑まれることはありません。世界の大半は係争地で、そこでは上記のフラグの規則がすべてです。レイスウッド、エバーガーデン、ナイトブルームは無差別戦闘地帯で、そこにいる全員がフラグの有無に関わらず、そこにいる他の全員を攻撃できます。境界を越えて入るときにも、出るときにも通知されます。そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立つので、仕掛けた側が必ずリスクを背負います。すでにフラグを立てている相手を攻撃しても自分のフラグは立たないため、自衛や、フラグを立てていない誰かを守ることには何の代償もありません。',
+  'guide.worldPvpPage.flagBodyAid':
+    'チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復、シールド、強化した場合も自分のフラグが立つため、自分はフラグを立てないまま戦う者を背後から支え続けることはできません。フラグを立てていないプレイヤーを支援しても、フラグは立ちません。',
+  'guide.worldPvpPage.stakesBodyFlagged':
+    'フラグを立てたプレイヤーが他のプレイヤーに倒されると、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。フラグを立てていなかったプレイヤーは、無差別戦闘地帯で倒れても金貨を一切支払いません。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。',
+  'guide.worldPvpPage.stakesUnflaggedTake':
+    'フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きますが、貢献した全員が名誉は得られます。',
+  'guide.worldPvpPage.limitsBodyHour':
+    '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
   'guide.thornhollowPage.heading': 'ソーンホロウ平原',
   'guide.thornhollowPage.intro':
     'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',

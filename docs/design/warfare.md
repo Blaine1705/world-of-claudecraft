@@ -370,15 +370,51 @@ follow-up.
 
 ## World PvP income
 
-The `/pvp` flag (`src/sim/pvp/world_pvp.ts`, rules in `world_pvp_rules.ts`) is the
-open road to the same Warfare vendor: no queue, no rating, no match clock. Two
-flagged players who share neither a party, a raid nor a guild are mutually
-hostile anywhere in the open world; everyone else is exactly as safe as before
-(the #96 griefing invariant holds for every unflagged character, and a flagged
-player can never touch an unflagged one either way). A flag takes
-`WORLD_PVP_DISARM_SECONDS` (300, the classic five minutes) to come down and the
-drop waits for combat to end, so switching off can never fizzle the blow already
-on its way. Raising it needs `WORLD_PVP_MIN_LEVEL` (10).
+The `/pvp` flag (`src/sim/pvp/world_pvp.ts`, rules in `world_pvp_rules.ts`, the
+ground policy in `world_pvp_zones.ts`) is the open road to the same Warfare
+vendor: no queue, no rating, no match clock. The verdict for a pair of players is
+`worldPvpPairHostile`, and it reads the two flags AND the ground under each of
+them. A flag takes `WORLD_PVP_DISARM_SECONDS` (300, the classic five minutes) to
+come down and the drop waits for combat to end, so switching off can never fizzle
+the blow already on its way. Raising it needs `WORLD_PVP_MIN_LEVEL` (10).
+
+Three kinds of ground, declared per zone as `ZoneDef.worldPvp` (data-as-code in
+`src/sim/content/`) and resolved by `worldPvpZonePolicyAt` through the strict
+rectangle containment, so the instance plane reads as contested rather than as
+whichever overworld zone a clamping lookup would misreport:
+
+- `'sanctuary'`: no world PvP at all, flagged or not, under EITHER player. The
+  Proving Shore (`content/proving_shore.ts`) and Eastbrook Vale
+  (`content/zone1.ts`), so a new character can never be fought before they know
+  what the flag is.
+- `'ffa'`: free-for-all. Everyone standing there is hostile to everyone else
+  standing there, flag or no flag. The Wraithwood, the Evergarden and the
+  Nightbloom (`content/wraithwood.ts`, `content/evergarden.ts`,
+  `content/nightbloom.ts`), the level-20 zones with the heaviest S-tier rift
+  weight and the furthest north: the richest ground carries the most risk.
+- `'contested'`: everywhere else, and the default for a zone record with no
+  `worldPvp` field. Two flagged players and nothing more.
+
+The one exemption cuts through all three (`worldPvpPairExempt`): the same
+player, two members of one party or raid, and two members of one guild are never
+hostile, in a free-for-all zone as much as anywhere. Outside a free-for-all zone
+every unflagged character is exactly as safe as before (the #96 griefing
+invariant), and a flagged player can never touch an unflagged one.
+
+Marking (`worldPvpHitMarksAttacker`): landing a hostile hit that needed NO flag
+raises the attacker's own flag, which is only ever the free-for-all arm, an
+unflagged attacker on an unflagged victim (`WORLD_PVP_MARKED_LINE`). Hitting a
+player who is already flagged never marks anyone, so the victim, and anyone
+defending them or defending a third party who is not marked, fights for free
+while the aggressor ends up carrying the stake. Crossing into and out of a
+free-for-all zone is announced, and a FLAGGED player entering a sanctuary is told
+the flag is idle there (`WORLD_PVP_FFA_ENTER_LINE`, `WORLD_PVP_FFA_LEAVE_LINE`,
+`WORLD_PVP_SANCTUARY_LINE`; the zone pass in `updateWorldPvp`).
+
+Two players mid-duel with each other are the duel's business, never the
+world's: `isWorldPvpHostile` steps aside for that pair, so a duel fought on
+free-for-all ground marks neither duelist and books no blow as a world kill; a
+live battleground or arena does the same for everyone inside it.
 
 A world kill moves a GOLD stake and pays an HONOR pool, both split across every
 contributor: the killing blow, everyone who damaged the victim inside
@@ -389,27 +425,38 @@ five-player gank pays each of them a fifth: more honor and more gold for fightin
 alone is the owner's stated shape.
 
 - Gold: the smaller of `WORLD_PVP_STAKE_CAP_COPPER` (5 gold) and
-  `WORLD_PVP_STAKE_FRACTION` (10 percent) of the victim's purse. The victim is
-  charged exactly what was paid out, never more.
+  `WORLD_PVP_STAKE_FRACTION` (10 percent) of the victim's purse, staked by a
+  FLAGGED victim only. An unflagged player killed in a free-for-all zone loses
+  nothing: they never opted in, so the ground may cost them a corpse run but
+  never their purse. The victim is charged exactly what was paid out, never more.
+  Only a FLAGGED contributor takes gold: an unflagged player who opens on
+  flagged strangers in a free-for-all zone earns the honor and nothing else, so
+  gold only ever moves between two players who both carry the stake, and
+  hunting flags from behind no flag is never the best play.
 - Honor: `WORLD_PVP_KILL_HONOR` (10) per kill, the whole pool, split as above.
   Deliberately BELOW the instanced faucets: a Thornhollow Fields win pays 60 plus
   its drip and a ranked 1v1 win pays 25, so a player who wants Warfare gear
   fastest still queues. Battleground and arena pay more; world PvP pays for
   being out in the world. The Double Honor Weekend does not apply to it (that
   event is battleground-only by design).
-- Anti-farm: the per-victim diminishing returns ride `HONOR_REPEAT_DR` (100, 50,
-  25, then 0 percent) for honor AND gold alike, keyed by the victim's character
-  identity and counted on the PERSISTED UTC-day honor window
-  (`HonorArenaDailyState.worldKillsByVictim`, the arena's own precedent), so
-  neither a relog nor a realm restart resets them: camping one player pays three
-  times a day and then nothing, a fully decayed kill is not counted, and the
-  victim is not charged for a fully decayed contributor.
-- The healer rule: an unflagged healer who heals a flagged player who is in a
-  world fight (hit by an enemy, or hitting one, inside the assist window) raises
-  their own flag first, the classic rule, so nobody sustains a killer from behind
-  a flag they do not wear. Under `WORLD_PVP_MIN_LEVEL` the raise is refused like
-  every other and the heal earns nothing. Shields and buffs are not yet aid (a
-  documented follow-up).
+- Anti-farm: the per-PAIR diminishing returns ride `HONOR_REPEAT_DR` (100, 50,
+  25, then 0 percent) for honor AND gold alike, counted by `worldPvpPairRepeats`
+  on a rolling `WORLD_PVP_DR_WINDOW_SECONDS` (one hour) window that opens at the
+  FIRST kill of that victim by that contributor, not on a calendar day. The book
+  is the session one (`WorldPvpBooks.killsByPair`, keyed by both characters'
+  rename-proof identities), so a relog cannot reset it and a realm restart does:
+  camping one player pays three times an hour and then nothing, a fully decayed
+  kill is not counted, and the victim is not charged for a fully decayed
+  contributor. The old persisted UTC-day counter is gone.
+- The aid rule: an unflagged player who heals, shields or buffs a FLAGGED player
+  who is in a world fight (hit by an enemy, or hitting one, inside the assist
+  window) raises their own flag first, the classic rule, so nobody sustains a
+  killer from behind a flag they do not wear. One shared hook,
+  `worldPvpOnPlayerAided`, carries all three: `combat/heal.ts` for heals and
+  `combat/effect_dispatch.ts` at the `absorb` and `buffTarget` sites. Aid to an
+  UNFLAGGED player marks nobody, so keeping a bystander alive stays free. Under
+  `WORLD_PVP_MIN_LEVEL` the raise is refused like every other and the aid earns
+  nothing.
 - The flag cannot be flapped: accepted changes are `WORLD_PVP_TOGGLE_COOLDOWN`
   (2 s) apart, refused with a notice in between.
 - Operator kill switch: `WORLD_PVP_DISABLED=1` on the realm refuses every raise
@@ -420,12 +467,13 @@ alone is the owner's stated shape.
   classic grey-kill rule and the reason a capped character cannot farm flagged
   low-level purses.
 
-Deaths to a mob or the environment stake nothing, whatever the flag says. A
-flagged player inside a live battleground or arena is under that mode's rules,
-never the open world's. Every amount is integer copper and integer honor, the
-arithmetic is on the sim clock, and nothing here draws rng, so the offline Sim,
-the server and the headless env resolve every kill identically
-(`tests/world_pvp.test.ts`, `tests/world_pvp_rules.test.ts`).
+Deaths to a mob or the environment stake nothing, whatever the flag or the
+ground says. A flagged player inside a live battleground or arena is under that
+mode's rules, never the open world's, and the jail has its own brawl rule. Every
+amount is integer copper and integer honor, the arithmetic is on the sim clock,
+and nothing here draws rng, so the offline Sim, the server and the headless env
+resolve every kill identically (`tests/world_pvp.test.ts`,
+`tests/world_pvp_rules.test.ts`, `tests/world_pvp_zones.test.ts`).
 
 ## FURY prices
 
