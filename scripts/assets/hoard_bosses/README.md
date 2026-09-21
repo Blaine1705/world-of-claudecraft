@@ -42,7 +42,7 @@ node scripts/assets/hoard_bosses/rigid_hands.mjs <rigged.glb> <shipped.glb> --wr
 
 Shipped values: Nyxaris `--neck 0.27 --band 0.1 --radius 0.9`; Vharok `--neck 0.0
 --band 0.1 --radius 1.35 --width 0.62 --behind -0.3 --lateral 0.4 --above 0.62`;
-Emberforge `--wrist 1.62 --band 0.05`.
+Emberforge `--wrist 1.62 --band 0.05 --joint wrist`.
 
 The relax shares used for the Warden: idle 0.8, walk 0.7, run 0.65, hit 0.6,
 jump 0.5, cast 0.45, death 0.35.

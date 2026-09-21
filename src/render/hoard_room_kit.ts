@@ -37,7 +37,6 @@ const LOOK = Object.freeze({
   /** Dim beside the hammer's fire: decoration never out-glows a telegraph. */
   channel: 0xb6501d,
   ring: 0x1c1919,
-  scar: 0x221d1c,
   spark: 0xffa64a,
   glow: 0xff6a1e,
 });
@@ -195,27 +194,6 @@ function pushRing(
   }
 }
 
-function pushScar(
-  positions: number[],
-  colors: number[],
-  mark: RoomKitFloorMark,
-  y: number,
-  color: THREE.Color,
-): void {
-  const points = 10;
-  for (let i = 0; i < points; i++) {
-    const a0 = mark.yaw + (i / points) * Math.PI * 2;
-    const a1 = mark.yaw + ((i + 1) / points) * Math.PI * 2;
-    // A ragged star: alternate long and short reaches.
-    const r0 = i % 2 ? mark.halfLength : mark.halfWidth * 0.55;
-    const r1 = (i + 1) % 2 ? mark.halfLength : mark.halfWidth * 0.55;
-    positions.push(mark.x, y, mark.z);
-    positions.push(mark.x + Math.sin(a0) * r0, y, mark.z + Math.cos(a0) * r0);
-    positions.push(mark.x + Math.sin(a1) * r1, y, mark.z + Math.cos(a1) * r1);
-    for (let k = 0; k < 3; k++) colors.push(color.r, color.g, color.b);
-  }
-}
-
 function floorMesh(
   marks: readonly RoomKitFloorMark[],
   molten: boolean,
@@ -232,9 +210,7 @@ function floorMesh(
       pushQuad(positions, colors, mark, 0.04, color.setHex(LOOK.channelEdge));
     else if (mark.kind === 'plate')
       pushQuad(positions, colors, mark, 0.03, color.setHex(index % 2 ? LOOK.plate : LOOK.plateAlt));
-    else if (mark.kind === 'ring')
-      pushRing(positions, colors, mark, 0.035, color.setHex(LOOK.ring));
-    else pushScar(positions, colors, mark, 0.02, color.setHex(LOOK.scar));
+    else pushRing(positions, colors, mark, 0.035, color.setHex(LOOK.ring));
   });
   if (positions.length === 0) return null;
   const geometry = new THREE.BufferGeometry();

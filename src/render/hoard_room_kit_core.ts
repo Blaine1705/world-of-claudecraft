@@ -55,7 +55,7 @@ export interface RoomKitPlacement {
 
 /** A flat mark on the floor: an oriented rectangle, or a ring segment. */
 export interface RoomKitFloorMark {
-  kind: 'plate' | 'channel' | 'channel-edge' | 'ring' | 'scar' | 'glow';
+  kind: 'plate' | 'channel' | 'channel-edge' | 'ring' | 'glow';
   x: number;
   z: number;
   /** Half extents along its own axes, in yards. */
@@ -274,7 +274,8 @@ export function buildForgeRoomKitPlan(
     yaw: Math.PI / 2,
   });
 
-  // ---- the engraved forge ring round the boss's ground, and old hammer scars
+  // ---- the engraved forge ring round the boss's ground. (The fight's own floor
+  // carries nothing else: dark hammer marks were tried and read as stray stars.)
   floor.push({
     kind: 'ring',
     x: dais.x,
@@ -293,20 +294,6 @@ export function buildForgeRoomKitPlan(
     yaw: 0,
     radius: dais.r + 4.1,
   });
-  for (let scar = 0; scar < 6; scar++) {
-    const z = start + 8 + hash(seed, scar, 51) * Math.max(1, back - start - 40);
-    const span = hoardValleySpanAtZ(layout, z);
-    const reach = (span.maxX - span.minX) / 2 - ROOM_KIT_WALL_BAND - 2;
-    floor.push({
-      kind: 'scar',
-      x: (span.minX + span.maxX) / 2 + (hash(seed, scar, 52) - 0.5) * 2 * Math.max(0, reach),
-      z,
-      halfLength: 1.6 + hash(seed, scar, 53) * 1.5,
-      halfWidth: 1.6 + hash(seed, scar, 54) * 1.5,
-      yaw: hash(seed, scar, 55) * Math.PI,
-    });
-  }
-
   // ---- the tier keeps a prefix of one plan, so every tier agrees on where things are
   const keep = KEPT[tier];
   let larges = 0;
@@ -319,9 +306,7 @@ export function buildForgeRoomKitPlan(
     placements,
     floor:
       tier === 'low'
-        ? floor.filter(
-            (mark) => mark.kind !== 'scar' && !(mark.kind === 'glow' && (mark.radius ?? 0) < 10),
-          )
+        ? floor.filter((mark) => !(mark.kind === 'glow' && (mark.radius ?? 0) < 10))
         : floor,
   };
 }

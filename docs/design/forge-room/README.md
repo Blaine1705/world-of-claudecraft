@@ -46,9 +46,12 @@ end wall; CLUSTERS (a smelter, a bellows bank, a braced wall, a stockpile) are
 pressed against the side walls with bare wall left between them, never mirrored
 across the room. Every prop stands within `ROOM_KIT_WALL_BAND` of a wall and off
 the boss's ground; only flat floor marks (the hearth plates, an engraved ring,
-old hammer scars, molten channels at the foot of the walls, firelight) reach the
+molten channels at the foot of the walls, firelight) reach the
 fight, and they are dark or dim so every telegraph out-reads them. Nothing here
 collides: the walls already do.
+
+The zone's generic spires are NOT drawn in a kitted room: the kit is the room's
+dressing, and the floor it keeps clear stays clear.
 
 ## Tiers
 

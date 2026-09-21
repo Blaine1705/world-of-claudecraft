@@ -424,10 +424,13 @@ class HoardValleyViewImpl implements HoardValleyView {
         low ? null : hoardValleyRockVariants(),
       ),
     );
-    this.group.add(buildDressing(visualPlan, shadows));
-    this.group.add(buildHoardCavernFoliage(visualPlan, shadows));
+    // A room with a kit of its own is dressed by it: the zone's generic spires would
+    // only litter the floor the kit keeps clear (playtest).
     const boss = options.plan.spawns.find((spawn) => spawn.boss);
-    if (roomKitFor(boss?.templateId) === 'forge') {
+    const kitted = roomKitFor(boss?.templateId) === 'forge';
+    if (!kitted) this.group.add(buildDressing(visualPlan, shadows));
+    this.group.add(buildHoardCavernFoliage(visualPlan, shadows));
+    if (kitted) {
       const tier: RoomKitTier =
         options.effectsProfile.tier === 'low'
           ? 'low'

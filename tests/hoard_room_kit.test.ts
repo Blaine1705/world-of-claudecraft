@@ -129,7 +129,11 @@ describe('forge room kit plan', () => {
     expect(low.placements.every((p) => p.category === 'hero' || p.category === 'large')).toBe(true);
     expect(low.placements.some((p) => p.piece === 'GreatForge')).toBe(true);
     expect(low.floor.some((m) => m.kind === 'channel')).toBe(true);
-    expect(low.floor.some((m) => m.kind === 'scar')).toBe(false);
+    // Nothing dark is scattered over the floor of the fight, on any tier.
+    const kinds = ['plate', 'channel', 'channel-edge', 'ring', 'glow'];
+    for (const plan of [high, medium, low]) {
+      expect(plan.floor.every((m) => kinds.includes(m.kind))).toBe(true);
+    }
     expect(medium.placements.some((p) => p.category === 'filler')).toBe(false);
   });
 

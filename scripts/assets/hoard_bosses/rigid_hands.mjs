@@ -6,9 +6,14 @@
 // short blend band so the cuff still follows the forearm.
 //
 //   node scripts/assets/hoard_bosses/rigid_hands.mjs <in.glb> <out.glb> --wrist <x> [--band <x>]
+//        [--joint hand|wrist]
 //
 // --wrist is the distance from the body's centre line, in the GLB's bind space
-// (rig-manual's scale times the raw model's wrist offset).
+// (rig-manual's scale times the raw model's wrist offset). --joint picks the bone:
+// the KayKit clips hold the HAND joint turned some 55 degrees off the forearm (a
+// grip pose its own hand meshes are modelled around), so a gauntlet modelled
+// straight reads as a bent wrist on it (playtest); the WRIST joint stays in line
+// with the forearm.
 import { openGlb, saveGlb } from '../../asset_pipeline/lib/glb.mjs';
 
 const args = process.argv.slice(2);
@@ -31,7 +36,9 @@ const index = (name) => {
   return i;
 };
 // rig-manual's laterality: .l bones own +X of the centre line.
-const hands = { 1: index('hand.l'), [-1]: index('hand.r') };
+const jointArg = args.indexOf('--joint');
+const bone = jointArg >= 0 ? args[jointArg + 1] : 'hand';
+const hands = { 1: index(`${bone}.l`), [-1]: index(`${bone}.r`) };
 // The centre line is the hips joint's bind X (see rigid_head.mjs for the algebra).
 const ibm = skin.getInverseBindMatrices().getElement(index('hips'), new Array(16).fill(0));
 const centre = -ibm[12] / Math.hypot(ibm[0], ibm[1], ibm[2]);
