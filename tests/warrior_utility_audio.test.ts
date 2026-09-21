@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest';
-import { furyAudioClaimed, WARRIOR_UTILITY_AUDIO } from '../src/fury_audio_core';
+import { furyAudioClaimed, WARRIOR_UTILITY_AUDIO } from '../src/game/fury_audio_core';
 import { FuryAudioQueue } from '../src/render/ability_vfx/fury_audio';
 import { AbilityVfx, type AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import type { SequencerHost } from '../src/render/ability_vfx/sequencer';
@@ -41,6 +41,7 @@ it.each(Object.keys(WARRIOR_UTILITY_AUDIO) as (keyof typeof WARRIOR_UTILITY_AUDI
         localPlayerId: () => 1,
         hasGestureClip: () => true,
         triggerAttack: vi.fn(),
+        spawnAoeRing: vi.fn(),
       } as unknown as AbilityVfxDeps,
       () => 0,
     );

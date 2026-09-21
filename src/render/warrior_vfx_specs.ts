@@ -1,5 +1,6 @@
 import type { PhysicalChoreography, PhysicalShape } from './ability_vfx/physical_choreography_core';
 import type { AbilityVfxFullSpec, AbilityVfxSpec } from './ability_vfx_core';
+import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { WARRIOR_BASE_PROFILES } from './warrior_base_profiles';
 
 const one = [0] as const;
@@ -128,7 +129,12 @@ for (const [id, physical] of Object.entries(WARRIOR_CHOREOGRAPHY)) {
     p: base.palette,
     pw: base.power ?? 1,
     a: base.archetype,
-    rg: 0,
+    // The terrain-draped area ring is the actionable telegraph (the blast area
+    // a player steps out of): ability_vfx_core.ts, "NO tier drops the ring".
+    // It keeps the generated gallery scale for every warrior AoE and shout;
+    // the authored ground figures are an addition to that read, never its
+    // substitute (they yield to pools, tiers and a closed cast gate).
+    rg: ABILITY_VFX_SPECS[id]?.rg ?? 0,
     sp: 5,
     li: 0.25,
     bo: 'none',

@@ -1,6 +1,7 @@
 import { Vector3 } from 'three';
 import { expect, it, vi } from 'vitest';
-import { furyAudioClaimed } from '../src/fury_audio_core';
+import { furyAudioClaimed } from '../src/game/fury_audio_core';
+import { WARRIOR_CONTROL_AUDIO } from '../src/game/warrior_control_audio_core';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import { AbilityVfx, type AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import type { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
@@ -9,7 +10,6 @@ import { launchWarriorHammer } from '../src/render/ability_vfx/warrior_hammer';
 import { ABILITIES } from '../src/sim/data';
 import type { SimEvent } from '../src/sim/types';
 import { impactCueForDamage, playerSwingCueForDamage, spellFxCue } from '../src/ui/combat_sfx';
-import { WARRIOR_CONTROL_AUDIO } from '../src/warrior_control_audio';
 import { createWarriorVfxSim } from './helpers/warrior_vfx_sim';
 
 // Minimal SequencerHost for drawWarriorHammerContact: fills anchor scratch
@@ -96,7 +96,8 @@ it('storm_bolt projectile with ready source claims original event and suppresses
   expect(furyAudioClaimed(event)).toBe(true);
   // Shared cue function yields null: no melee_bow double-fire.
   expect(spellFxCue(event)).toBeNull();
-  // The optional tenth argument is the hammerAudio flag.
+  // The tenth argument is the hammerAudio flag.
+  expect(sequenceBolt.mock.calls[0]).toHaveLength(10);
   expect(sequenceBolt.mock.calls[0]?.[9]).toBe(true);
   expect(fx.abilityAudio).toHaveBeenCalledExactlyOnceWith(
     'release',
@@ -144,9 +145,9 @@ it('storm_bolt projectile cold (audioReady false) stays unclaimed and preserves 
   expect(furyAudioClaimed(event)).toBe(false);
   // Generic projectile cue is preserved when authored audio is unavailable.
   expect(spellFxCue(event)).toEqual({ key: 'melee_bow', anchorId: source.id });
-  // Omitted optional audio flag defaults to false in the real entry point.
-  expect(sequenceBolt.mock.calls[0]).toHaveLength(9);
-  expect(sequenceBolt.mock.calls[0]?.[9]).toBeUndefined();
+  // The tenth argument is always passed; a cold kit hands it false.
+  expect(sequenceBolt.mock.calls[0]).toHaveLength(10);
+  expect(sequenceBolt.mock.calls[0]?.[9]).toBe(false);
   expect(fx.abilityAudio).not.toHaveBeenCalled();
 });
 
@@ -184,9 +185,9 @@ it('storm_bolt projectile missing source anchor stays unclaimed and preserves me
 
   expect(furyAudioClaimed(event)).toBe(false);
   expect(spellFxCue(event)).toEqual({ key: 'melee_bow', anchorId: source.id });
-  // Omitted optional audio flag defaults to false in the real entry point.
-  expect(sequenceBolt.mock.calls[0]).toHaveLength(9);
-  expect(sequenceBolt.mock.calls[0]?.[9]).toBeUndefined();
+  // The tenth argument is always passed; a cold kit hands it false.
+  expect(sequenceBolt.mock.calls[0]).toHaveLength(10);
+  expect(sequenceBolt.mock.calls[0]?.[9]).toBe(false);
   expect(fx.abilityAudio).not.toHaveBeenCalled();
 });
 

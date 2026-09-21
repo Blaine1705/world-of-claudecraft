@@ -549,7 +549,7 @@ export class ArchetypeSequencer {
     componentOutcome?: 0 | 1 | 2,
     recipientOnly = false,
   ): SeqSlot | null {
-    if (tier >= 2 || spec.presentation) return null;
+    if (tier >= 2) return null;
     // One simulation cast can emit several damage components or hit several
     // victims in the same tick. Weapon motion belongs to that cast once.
     const owned = !!spec.physical;
@@ -1025,7 +1025,6 @@ export class ArchetypeSequencer {
   // Release: the 100ms hot flash at the caster plus per-archetype openers.
   private release(host: SequencerHost, slot: SeqSlot): void {
     const spec = slot.spec;
-    if (spec.presentation) return;
     if (spec.physical) {
       physicalRelease(host, slot);
       return;
@@ -1118,10 +1117,6 @@ export class ArchetypeSequencer {
   // The full impact stack at (ix, iy, iz), honoring every spec impact flag.
   private impact(host: SequencerHost, slot: SeqSlot): void {
     const spec = slot.spec;
-    if (spec.presentation) {
-      slot.active = false;
-      return;
-    }
     if (spec.physical) {
       physicalImpact(host, slot);
       const feedback = slot.contactFeedback;

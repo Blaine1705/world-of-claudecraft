@@ -6,9 +6,9 @@ import {
   WARRIOR_GUARD_AUDIO,
   WARRIOR_POWER_AUDIO,
   WARRIOR_UTILITY_AUDIO,
-} from '../../fury_audio_core';
+} from '../../game/fury_audio_core';
+import { WARRIOR_CONTROL_AUDIO } from '../../game/warrior_control_audio_core';
 import type { SimEvent } from '../../sim/types';
-import { WARRIOR_CONTROL_AUDIO } from '../../warrior_control_audio';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { warriorFuryStateKind } from '../warrior_fury_state_core';
 import { warriorPowerIntent, warriorPowerKind } from '../warrior_power_core';
@@ -629,6 +629,9 @@ export class AbilityVfx {
       if (!full) return false;
       // Network catch-up may deliver a second cast before the next frame.
       this.harvestDetonations.flush(this.deps.fx, ev.sourceId);
+      // The sim resolves the whole cast on the cast tick, so this cue is what
+      // dates the authored contact the damage batch detonates on.
+      this.harvestDetonations.noteOpening(ev.sourceId);
       this.releaseGesture(ev.sourceId, ability);
       // Keep the approved opening. Zero component outcomes mean that blade
       // gathering/trails play, but no wound or false hit is predicted.
@@ -661,13 +664,6 @@ export class AbilityVfx {
       return true;
     }
     const full = authored;
-    if (full?.presentation) {
-      // Live-state and dedicated event painters remain the sole visual owner.
-      if (ev.fx === 'windup') this.deps.triggerAttack(ev.sourceId, ability);
-      else if (ev.fx === 'selfCast' || ev.fx === 'projectile')
-        this.releaseGesture(ev.sourceId, ability);
-      return true;
-    }
     // Beam-archetype channels (mind rays, drains) never fly a projectile:
     // every tick's cast-fx event feeds the channel tracker, which draws the
     // crescendoing cord and lands the full impact stack once, on the last tick.
@@ -725,32 +721,18 @@ export class AbilityVfx {
           // forks, tracer, leader, volley) drives the styled trail system,
           // whose head sprite IS the projectile - the generic Vfx comet would
           // shadow it at the wrong speed, so it stays off entirely.
-          if (hammerAudio) {
-            fx.sequenceBolt(
-              ability,
-              full,
-              ev.sourceId,
-              ev.targetId,
-              plan.color,
-              0.16 * scale,
-              tier,
-              plan.volley,
-              scale,
-              hammerAudio,
-            );
-          } else {
-            fx.sequenceBolt(
-              ability,
-              full,
-              ev.sourceId,
-              ev.targetId,
-              plan.color,
-              0.16 * scale,
-              tier,
-              plan.volley,
-              scale,
-            );
-          }
+          fx.sequenceBolt(
+            ability,
+            full,
+            ev.sourceId,
+            ev.targetId,
+            plan.color,
+            0.16 * scale,
+            tier,
+            plan.volley,
+            scale,
+            hammerAudio,
+          );
           if (hammerAudio) claimFuryAudio(originalEvent);
           this.spawned += plan.volley;
         } else if (plan.jagged) {
@@ -1131,15 +1113,24 @@ export class AbilityVfx {
     const gy = fx.groundYAt(ev.x, ev.z);
     const nowSec = this.now();
     this.spawned = 0;
+    // Both authored point arms below return before the shared ring draw, so
+    // each spawns the area telegraph itself. The authored landing figures are
+    // pooled primitives that yield under contention, while the ring is the
+    // read a player acts on (see the refusedTelegraphs contract below).
     if (ev.ability === 'heroic_leap' && ev.fx === 'nova') {
       const tier = this.biasFor(casterId, this.budget.peek(casterId, nowSec));
       this.spawned = drawWarriorLeapLanding(fx, ev.x, ev.z, ev.radius ?? 6, tier);
+      this.spawned += this.areaTelegraph(ev, planCast(spec, this.quality, tier).color);
       this.recordStat('heroic_leap', true);
       return true;
     }
     if (ev.ability === 'bladestorm') {
       const tier = this.biasFor(casterId, this.budget.peek(casterId, nowSec));
       this.spawned = drawWarriorStormPulse(fx, ev.x, ev.z, ev.radius ?? 6, tier);
+      // A zone pulse is follow-through, never the cast: only the cast moment
+      // (nova/burst) carries the telegraph, exactly as the generic arm does.
+      if (ev.fx !== 'tick')
+        this.spawned += this.areaTelegraph(ev, planCast(spec, this.quality, tier).color);
       this.deps.abilityAudio?.('impact', 'physical', 1.35, ev.x, gy, ev.z, {
         abilityId: 'bladestorm',
         lite: tier > 0,
@@ -1187,14 +1178,7 @@ export class AbilityVfx {
       : this.castTier(casterId, ev.ability);
     const plan = planCast(spec, this.quality, tier);
     // the terrain-draped area ring is an actionable telegraph: always instant
-    if (
-      ev.radius &&
-      (!full?.physical || full?.areaTelegraph || full?.impact?.ring !== false) &&
-      !full?.presentation
-    ) {
-      this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, plan.color);
-      this.spawned++;
-    }
+    this.spawned += this.areaTelegraph(ev, plan.color);
     if (repeat) {
       if (this.budget.admitAccent(nowSec)) {
         this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, plan, tier, ev.ability);
@@ -1541,7 +1525,6 @@ export class AbilityVfx {
     const spec = appearance ? abilityVfxSpecFor(appearance) : undefined;
     if (!spec || !abilityId || !appearance) return;
     const full = abilityVfxFullSpecFor(appearance);
-    if (full?.presentation) return;
     const arch = full?.archetype ?? spec.a ?? 'strike';
     const def = ABILITIES[abilityId];
     const physicalProjectile =
@@ -1550,7 +1533,7 @@ export class AbilityVfx {
       !!full &&
       !physicalProjectile &&
       abilityId !== 'heroic_leap' &&
-      (arch === 'strike' || arch === 'dash' || arch === 'buff' || full.damageCue === true);
+      (arch === 'strike' || arch === 'dash' || arch === 'buff');
     const authoredWarriorContact =
       appearance === abilityId &&
       !!full?.physical &&
@@ -1668,7 +1651,7 @@ export class AbilityVfx {
     const spec = abilityVfxSpecFor(abilityId);
     if (!spec) return;
     const full = abilityVfxFullSpecFor(abilityId);
-    if (full?.physical || full?.presentation) return;
+    if (full?.physical) return;
     this.deps.vfx.buffSwirl(ev.targetId, planCast(spec, this.quality, 0).swirlColor);
   }
 
@@ -1752,7 +1735,7 @@ export class AbilityVfx {
         glowColor = rimColorOf(full, spec);
         // Preserve armour and skin detail throughout the cast. Physical
         // channels carry weapon motion, never an emissive whole-body wash.
-        glowStrength = full?.physical || full?.presentation ? 0 : 1.2 * (full?.power ?? 1);
+        glowStrength = full?.physical ? 0 : 1.2 * (full?.power ?? 1);
         // the local player is priority: guaranteed a windup slot even when
         // a crowded hub saturates the pool
         const windupStarted = fx.windup(
@@ -1866,9 +1849,6 @@ export class AbilityVfx {
       // maintenance passives (stances, spellbook traits): no read at all
       if (isPassiveAura(auraId)) continue;
       const full = abilityVfxFullSpecFor(auraId);
-      // Physical auras live on the rig/weapon. Their cast owns the transition;
-      // adding generic buff discs and heartbeat rings would obscure the kit.
-      if (full?.presentation) continue;
       if (
         aura.kind === 'dot' &&
         ABILITIES[aura.id]?.class === 'warrior' &&
@@ -1877,6 +1857,8 @@ export class AbilityVfx {
         fx.orbit(e.id, 'leaves', 0x9b1425, PHYSICAL_WOUND_DNA, 0);
         continue;
       }
+      // Physical auras live on the rig/weapon. Their cast owns the transition;
+      // adding generic buff discs and heartbeat rings would obscure the kit.
       if (full?.physical) {
         if (
           aura.kind === 'dot' &&
@@ -1926,10 +1908,7 @@ export class AbilityVfx {
             glowColor = rimColorOf(full, spec);
             glowSlow = false;
           }
-        } else if (
-          full.buff?.style !== 'veil' &&
-          (!full.castIdentity || full.castIdentity === 'runes')
-        ) {
+        } else if (full.buff?.style !== 'veil') {
           const spin = full.palette !== 'physical' && full.palette !== 'blood';
           discStarted = fx.holdGroundAura(e.id, discs, rimColorOf(full, spec), spin);
           discs++;
@@ -2040,7 +2019,7 @@ export class AbilityVfx {
 
   // Advances the primitive engine (ribbons, rings, decals, orbit/windup draw).
   update(dt: number, reducedMotion = false): void {
-    this.harvestDetonations.flush(this.deps.fx);
+    this.harvestDetonations.advance(this.deps.fx, dt);
     this.deps.fx.update(dt, reducedMotion);
     for (const [entityId, held] of this.heldSemantic) {
       if (held.frameSeen !== this.semanticFrame) this.heldSemantic.delete(entityId);
@@ -2197,5 +2176,18 @@ export class AbilityVfx {
     const at = this.deps.anchor(entityId, 0);
     if (!at) return;
     this.deps.spawnAoeRing(at.x, at.z, RING_RADIUS_PER_SCALE * plan.ringScale, school, plan.color);
+  }
+
+  /** The world-anchored area telegraph of a point cast, at the event's own
+   *  authoritative radius. NO spec flag, degrade tier, quality dial or kit
+   *  gates it: it is the blast area a player steps out of, so every arm of
+   *  handleSpellfxAt that claims a radius-carrying cast draws it. The colour
+   *  comes off the plan (tier-independent by construction), so the same cast
+   *  never reads one colour on a held gate and another on an open one.
+   *  Returns the primitive count for the dev probe. */
+  private areaTelegraph(ev: AbilityVfxSpellfxAtEvent, colorHex: number): number {
+    if (!ev.radius) return 0;
+    this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, colorHex);
+    return 1;
   }
 }

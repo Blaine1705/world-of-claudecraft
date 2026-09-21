@@ -179,10 +179,6 @@ export interface AbilityVfxBuffSpec {
 
 export interface AbilityVfxFullSpec {
   physical?: PhysicalChoreography;
-  presentation?: 'dedicated' | 'passive';
-  castIdentity?: AbilityVfxWindupStyle;
-  areaTelegraph?: boolean;
-  damageCue?: boolean;
   archetype: AbilityVfxArchetype;
   palette: string;
   power?: number;

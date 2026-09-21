@@ -136,6 +136,7 @@ describe('Ruinbolt premium VFX chain', () => {
       0,
       1,
       2,
+      false,
     );
     expect(RUINBOLT_VFX_FULL_SPEC.bolt).toMatchObject({
       style: 'felLance',

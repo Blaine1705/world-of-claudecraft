@@ -167,6 +167,7 @@ describe('Essence Reap premium filler VFX', () => {
       0,
       1,
       expect.any(Number),
+      false,
     );
     const sequenceCall = h.sequenceBolt.mock.calls[0];
     expect(sequenceCall[5]).toBeCloseTo(0.15424, 6);
