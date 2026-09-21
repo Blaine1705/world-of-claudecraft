@@ -123,9 +123,16 @@ export function installPromptDialog(
     inertRoot.inert = false;
     close();
   };
+  // The opener can be gone by the time Cancel / Escape runs (the trade window
+  // repaints its offer rows wholesale on every partner change): fall back to
+  // the window's own close button so focus stays inside the surface rather
+  // than dropping to <body>.
   const dismissAndReturn = (): void => {
     dismiss();
-    opener?.focus();
+    const target = opener?.isConnected
+      ? opener
+      : inertRoot.querySelector<HTMLElement>('[data-close]');
+    target?.focus();
   };
   HANDLES.set(prompt, { dismiss, dismissAndReturn });
   prompt.addEventListener('keydown', (e) => {

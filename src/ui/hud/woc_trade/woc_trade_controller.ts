@@ -42,6 +42,7 @@ import {
   buildTradeItemRow,
   removeTradeOfferUnits,
   resolveTradeOfferRemove,
+  tradeOfferRemoveOpensPrompt,
   tradeRowTooltipTarget,
 } from '../../trade_view';
 import {
@@ -86,11 +87,18 @@ import {
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 
-/** Tear down every offer-quantity prompt (this window's adjust prompt and
- *  the bags' add prompt share the class) through each one's own dismiss(),
- *  so whichever root it made inert is cleared. */
+/** The remove prompt's own class: NOT in the bags window's teardown selector,
+ *  so a bags close or mobile cluster-close cannot sweep a modal that belongs
+ *  to the trade window (only the trade window is inert under it). */
+const TRADE_REMOVE_PROMPT_CLASS = 'trade-remove-prompt';
+
+/** Tear down every trade quantity prompt, this window's remove prompt AND the
+ *  bags' offer prompt (a trade that closes takes both with it), through each
+ *  one's own dismiss() so whichever root it made inert is cleared. */
 function dismissTradeOfferPrompts(): void {
-  for (const p of document.querySelectorAll('.trade-offer-prompt')) dismissInstalledPrompt(p);
+  for (const p of document.querySelectorAll(`.trade-offer-prompt, .${TRADE_REMOVE_PROMPT_CLASS}`)) {
+    dismissInstalledPrompt(p);
+  }
 }
 
 /** How often the trade window re-reads the standing $WOC offer. Slow on
@@ -1241,12 +1249,17 @@ export class WocTradeController {
    *  bags open (bank_quantity_prompt.ts), in REMOVE mode. The number is how
    *  many units to take off the line (capped at the line's count, with the
    *  vault's unit and whole-stack step pairs), Remove takes that many, Remove
-   *  all takes the whole line. The window is the inert root; the submit
-   *  re-resolves the live line so a prompt left open across a vanished line
-   *  refuses. */
+   *  all takes the whole line. A one-unit line has no quantity to choose and
+   *  unstages directly (tradeOfferRemoveOpensPrompt, the bags gate's twin).
+   *  The window is the inert root; the submit re-resolves the live line so a
+   *  prompt left open across a vanished line refuses. */
   private showOfferRemovePrompt(itemId: string): void {
     const line = this.stagedTrade.items.find((s) => s.itemId === itemId);
     if (!line) return;
+    if (!tradeOfferRemoveOpensPrompt(line)) {
+      if (removeTradeOfferUnits(this.stagedTrade.items, itemId, 1)) this.pushTradeOffer();
+      return;
+    }
     const el = this.tradeWindow();
     const item = knownItemDef(ITEMS, itemId);
     const itemName = item ? itemDisplayName(item) : itemId;
@@ -1262,7 +1275,7 @@ export class WocTradeController {
         dismissSiblings: dismissTradeOfferPrompts,
       },
       {
-        className: 'trade-offer-prompt',
+        className: TRADE_REMOVE_PROMPT_CLASS,
         step: {
           size: stepSize,
           downAriaText: t('hudChrome.bank.quantityStepDownAria', { count: count(stepSize) }),

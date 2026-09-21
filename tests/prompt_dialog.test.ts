@@ -6,7 +6,7 @@
 // drive); this suite pins the recipe itself, so a semantic break that keeps
 // the source tokens still fails somewhere.
 import { describe, expect, it } from 'vitest';
-import { installPromptDialog } from '../src/ui/prompt_dialog';
+import { dismissInstalledPrompt, installPromptDialog } from '../src/ui/prompt_dialog';
 
 function rig(withInputAriaLabel = false) {
   const root = document.createElement('div');
@@ -208,6 +208,58 @@ describe('installPromptDialog: the shared modal recipe', () => {
       r.cancel.dispatchEvent(forward);
       expect(forward.defaultPrevented).toBe(true);
       expect(document.activeElement).toBe(r.input);
+    } finally {
+      r.cleanup();
+    }
+  });
+});
+
+describe('dismissInstalledPrompt: the element-keyed teardown registry', () => {
+  it('routes a registered prompt through its own dismiss (inert cleared, close run)', () => {
+    const r = rig();
+    try {
+      expect(r.root.inert).toBe(true);
+      dismissInstalledPrompt(r.prompt);
+      expect(r.root.inert).toBe(false);
+      expect(r.closedCount()).toBe(1);
+      expect(r.prompt.isConnected).toBe(false);
+    } finally {
+      r.cleanup();
+    }
+  });
+
+  it('plainly removes an element this recipe never installed', () => {
+    const stray = document.createElement('div');
+    stray.className = 'prompt';
+    document.body.appendChild(stray);
+    dismissInstalledPrompt(stray);
+    expect(stray.isConnected).toBe(false);
+  });
+});
+
+describe('dismissAndReturn: the focus return when the opener is gone', () => {
+  it('returns focus to a still-connected opener', () => {
+    const r = rig();
+    try {
+      r.handle.dismissAndReturn();
+      expect(document.activeElement).toBe(r.opener);
+    } finally {
+      r.cleanup();
+    }
+  });
+
+  it("falls back to the root's close button when the opener was repainted away", () => {
+    const r = rig();
+    try {
+      const close = document.createElement('button');
+      close.setAttribute('data-close', '');
+      r.root.appendChild(close);
+      // The trade window rebuilds its offer rows wholesale on every partner
+      // change, so the row that opened the prompt can be detached by Cancel.
+      r.opener.remove();
+      r.handle.dismissAndReturn();
+      expect(r.root.inert).toBe(false);
+      expect(document.activeElement).toBe(close);
     } finally {
       r.cleanup();
     }

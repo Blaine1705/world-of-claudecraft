@@ -10,8 +10,10 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WocOfferView } from '../src/net/woc_market_sdk';
+import { stackSizeOf } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import { bagQualityKey } from '../src/ui/bags_view';
+import { dismissBagPrompts } from '../src/ui/bags_window';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import {
   WocTradeController,
@@ -19,6 +21,7 @@ import {
 } from '../src/ui/hud/woc_trade/woc_trade_controller';
 import { formatDateTime, t } from '../src/ui/i18n';
 import { QUALITY_COLOR } from '../src/ui/icons';
+import { installPromptDialog } from '../src/ui/prompt_dialog';
 import type { WocPendingOffer } from '../src/ui/trade_woc_view';
 import { usdText } from '../src/ui/usd_text';
 import type { WocMarketHooks } from '../src/ui/woc_market_window';
@@ -506,7 +509,7 @@ describe('a staged item renders its name in the quality colour', () => {
 
 describe('the offered-row click opens the remove prompt over the LIVE staged object', () => {
   const prompt = (): HTMLElement | null =>
-    document.querySelector('#prompt-stack .trade-offer-prompt');
+    document.querySelector('#prompt-stack .trade-remove-prompt');
   const actions = (): HTMLButtonElement[] => [
     ...(prompt()?.querySelectorAll<HTMLButtonElement>(':scope > button') ?? []),
   ];
@@ -530,14 +533,87 @@ describe('the offered-row click opens the remove prompt over the LIVE staged obj
     const r = openWithLine(5);
     const p = prompt();
     expect(p).not.toBeNull();
+    // Its OWN class, never the bags prompt's: the bags teardown selector must
+    // not be able to reach a modal that belongs to this window.
+    expect(p?.classList.contains('trade-offer-prompt')).toBe(false);
     const input = p?.querySelector<HTMLInputElement>('input.prompt-number');
     expect(input?.value).toBe('1');
     expect(input?.max).toBe('5');
     expect(actions().map((b) => b.textContent)).toEqual(['Remove', 'Remove all', 'Cancel']);
-    expect(p?.querySelectorAll('.prompt-steps button')).toHaveLength(4);
+    // The vault-style step row: a unit pair inside a whole-stack pair, the
+    // big pair labelled with the item's OWN stack size (the sim's rule, not a
+    // hardcoded 20).
+    const size = stackSizeOf(ITEMS.wolf_fang);
+    const steps = [...(p?.querySelectorAll<HTMLButtonElement>('.prompt-steps button') ?? [])];
+    expect(steps.map((b) => b.textContent)).toEqual([`-${size}`, '\u2212', '+', `+${size}`]);
+    expect(steps.map((b) => b.classList.contains('prompt-step-big'))).toEqual([
+      true,
+      false,
+      false,
+      true,
+    ]);
     // The window is the inert root while the prompt is up; nothing pushed yet.
     expect(document.querySelector<HTMLElement>('#trade-window')?.inert).toBe(true);
     expect(r.host.pushed).toBe(0);
+  });
+
+  it('labels the big step pair from an explicit non-default stack size', () => {
+    // soul_stone declares stackSize 3, so DEFAULT_STACK cannot satisfy this pin.
+    const r = rig();
+    openTrade(r, [{ itemId: 'soul_stone', count: 3 }]);
+    r.host.staged.items.push({ itemId: 'soul_stone', count: 3 });
+    r.controller.updateTradeWindow();
+    document.querySelector<HTMLElement>('#trade-window .trade-item.mine')?.click();
+    const steps = [
+      ...(prompt()?.querySelectorAll<HTMLButtonElement>('.prompt-steps button') ?? []),
+    ];
+    expect(stackSizeOf(ITEMS.soul_stone)).toBe(3);
+    expect(steps.map((b) => b.textContent)).toEqual(['-3', '\u2212', '+', '+3']);
+  });
+
+  it("a one-unit line unstages directly, with no prompt (the bags gate's twin)", () => {
+    const r = openWithLine(1);
+    expect(prompt()).toBeNull();
+    expect(r.host.staged.items).toEqual([]);
+    expect(r.host.pushed).toBe(1);
+    expect(document.querySelector<HTMLElement>('#trade-window')?.inert).toBe(false);
+  });
+
+  it("survives the bags window's own prompt sweep (ownership stays with this window)", () => {
+    const r = openWithLine(5);
+    expect(prompt()).not.toBeNull();
+    // BagsWindow.close() and the mobile cluster-close paths sweep the bags
+    // family's prompts; the remove prompt is not one of them.
+    dismissBagPrompts();
+    expect(prompt()).not.toBeNull();
+    expect(document.querySelector<HTMLElement>('#trade-window')?.inert).toBe(true);
+    expect(r.host.pushed).toBe(0);
+  });
+
+  it('the close transition sweeps the bags-owned offer prompt through its OWN dismiss', () => {
+    // A bags offer prompt (bank_quantity_prompt.ts over #bags) is open when
+    // the trade closes: the sweep only knows the element, so it must route
+    // through the registry (prompt_dialog.ts dismissInstalledPrompt) to clear
+    // the root that prompt made inert. A plain remove() would strand #bags
+    // inert with nothing left to clear it.
+    const r = rig();
+    openTrade(r);
+    const bags = document.querySelector<HTMLElement>('#bags');
+    expect(bags).not.toBeNull();
+    if (!bags) return;
+    const offerPrompt = document.createElement('div');
+    offerPrompt.className = 'prompt panel trade-offer-prompt';
+    offerPrompt.innerHTML = '<div class="prompt-text">Offer</div><button type="button">Ok</button>';
+    document.querySelector('#prompt-stack')?.appendChild(offerPrompt);
+    installPromptDialog(offerPrompt, null, () => offerPrompt.remove(), {
+      inertRoot: bags,
+      idPrefix: 'bags-prompt-title',
+    });
+    expect(bags.inert).toBe(true);
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    expect(document.querySelector('#prompt-stack .trade-offer-prompt')).toBeNull();
+    expect(bags.inert).toBe(false);
   });
 
   it('Remove takes the typed count off the very array the host holds', () => {

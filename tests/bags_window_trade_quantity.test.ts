@@ -8,6 +8,8 @@
 // The prompt re-resolves the LIVE headroom at submit and refuses (stages
 // nothing) when the trade closed or the stack left the bags underneath it.
 import { afterEach, describe, expect, it } from 'vitest';
+import { stackSizeOf } from '../src/sim/bags';
+import { ITEMS } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
@@ -18,12 +20,14 @@ interface Harness {
   staged: Array<{ itemId: string; count: number | undefined }>;
   links: string[];
   headroom: { value: number };
+  tooltips: Array<() => string>;
 }
 
 function harness(inventory: InvSlot[], headroom: number): Harness {
   document.body.innerHTML = '<div id="prompt-stack"></div>';
   const staged: Harness['staged'] = [];
   const links: string[] = [];
+  const tooltips: Array<() => string> = [];
   const room = { value: headroom };
   const root = document.createElement('div');
   root.id = 'bags';
@@ -41,8 +45,10 @@ function harness(inventory: InvSlot[], headroom: number): Harness {
   const deps: BagsWindowDeps = {
     itemIcon: () => '<span class="item-icon"></span>',
     moneyHtml: () => '',
-    itemTooltip: () => '',
-    attachTooltip: noop,
+    itemTooltip: () => '<div class="tt-name">item</div>',
+    attachTooltip: (_el, html) => {
+      tooltips.push(html);
+    },
     root: () => root,
     world: () => world,
     wocBalanceHtml: () => '',
@@ -89,7 +95,7 @@ function harness(inventory: InvSlot[], headroom: number): Harness {
     openItemActionMenu: noop,
   };
   new BagsWindow(deps).render();
-  return { root, staged, links, headroom: room };
+  return { root, staged, links, headroom: room, tooltips };
 }
 
 function clickFirstCell(root: HTMLElement, shiftKey: boolean): void {
@@ -142,8 +148,12 @@ describe('bags trade-mode offer quantity', () => {
     clickFirstCell(h.root, false);
     const p = prompt();
     const steps = [...(p?.querySelectorAll<HTMLButtonElement>('.prompt-steps button') ?? [])];
-    // Reading order: -stack, -1, (input), +1, +stack; linen scrap stacks at 20.
-    expect(steps.map((b) => b.textContent)).toEqual(['-20', '−', '+', '+20']);
+    // Reading order: -stack, -1, (input), +1, +stack; the big pair carries the
+    // item's OWN stack size (stackSizeOf, the sim's rule), which for linen
+    // scrap is the 20 the arithmetic below steps by.
+    const size = stackSizeOf(ITEMS.linen_scrap);
+    expect(size).toBe(20);
+    expect(steps.map((b) => b.textContent)).toEqual([`-${size}`, '−', '+', `+${size}`]);
     expect(steps.map((b) => b.classList.contains('prompt-step-big'))).toEqual([
       true,
       false,
@@ -239,6 +249,26 @@ describe('bags trade-mode offer quantity', () => {
     expect(prompt()).toBeNull();
     expect(h.staged).toEqual([]);
     expect(h.links).toEqual(['linen_scrap']);
+  });
+
+  it('the tooltip says the click will ask for a quantity, only where the prompt opens', () => {
+    const hint = 'You will be asked how many to offer';
+    // The bag slots register tooltips too; the item row's is the one that
+    // wraps the (faked) item tooltip body.
+    const rowTooltip = (h: Harness): string => {
+      const html = h.tooltips.map((f) => f()).find((t) => t.includes('class="tt-name"'));
+      expect(html).toBeDefined();
+      return html ?? '';
+    };
+    expect(rowTooltip(harness([HIDE], 20))).toContain(hint);
+    // One unit of room: the click stages directly, so no hint line.
+    expect(rowTooltip(harness([HIDE], 1))).not.toContain(hint);
+    // An instanced copy stages as itself whatever the room.
+    expect(
+      rowTooltip(
+        harness([{ itemId: 'worn_sword', count: 1, instance: { enchant: 'x' } as never }], 3),
+      ),
+    ).not.toContain(hint);
   });
 
   it('cancel closes the prompt and stages nothing', () => {

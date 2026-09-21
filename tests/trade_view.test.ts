@@ -19,6 +19,7 @@ import {
   TRADE_OFFER_MAX_LINES,
   tradeOfferCeiling,
   tradeOfferHeadroom,
+  tradeOfferRemoveOpensPrompt,
   tradeRowTooltipTarget,
 } from '../src/ui/trade_view';
 
@@ -154,14 +155,61 @@ describe('removeTradeOfferUnits (the trade window remove prompt)', () => {
 describe('resolveTradeOfferRemove (the remove prompt stale guard)', () => {
   const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 12 }];
 
-  it('refuses when the line left the table', () => {
+  it('refuses when the line left the table, or is staged at zero', () => {
     expect(resolveTradeOfferRemove([], 'mat_linen_cloth', 5)).toBeNull();
+    expect(
+      resolveTradeOfferRemove([{ itemId: 'mat_linen_cloth', count: 0 }], 'mat_linen_cloth', 5),
+    ).toBeNull();
   });
 
   it('clamps the typed count into [1, the line count]', () => {
     expect(resolveTradeOfferRemove(staged, 'mat_linen_cloth', 5)).toBe(5);
     expect(resolveTradeOfferRemove(staged, 'mat_linen_cloth', 50)).toBe(12);
     expect(resolveTradeOfferRemove(staged, 'mat_linen_cloth', 0)).toBe(1);
+  });
+});
+
+describe('tradeOfferRemoveOpensPrompt (the remove prompt gate)', () => {
+  it('opens only for a line with more than one unit', () => {
+    expect(tradeOfferRemoveOpensPrompt({ itemId: 'mat_linen_cloth', count: 2 })).toBe(true);
+    expect(tradeOfferRemoveOpensPrompt({ itemId: 'mat_linen_cloth', count: 12 })).toBe(true);
+    expect(tradeOfferRemoveOpensPrompt({ itemId: 'worn_sword', count: 1 })).toBe(false);
+    expect(tradeOfferRemoveOpensPrompt({ itemId: 'mat_linen_cloth', count: 0 })).toBe(false);
+  });
+});
+
+describe("the offer line cap is the sim's own constant", () => {
+  it('is the sim export, pinned at the historical literal, and the sim slices by it', () => {
+    // The UI re-exports src/sim/social/trade.ts TRADE_OFFER_MAX_LINES, so a
+    // client cannot let a player stage a line the server silently drops; the
+    // literal pin keeps a cap change a deliberate, visible edit.
+    expect(TRADE_OFFER_MAX_LINES).toBe(6);
+    const sim = readFileSync(new URL('../src/sim/social/trade.ts', import.meta.url), 'utf8');
+    expect(sim).toContain('export const TRADE_OFFER_MAX_LINES = 6;');
+    expect(sim).toContain('items.slice(0, TRADE_OFFER_MAX_LINES)');
+    expect(sim).not.toMatch(/items\.slice\(0, \d/);
+  });
+});
+
+describe('the counted stage on the HUD (source pins, hud.ts addItemToTrade)', () => {
+  // Hud is not instantiable in a unit harness (every bags harness fakes the
+  // dep), so the thin consumer is pinned at the source: the plain click's
+  // default of one unit, the pure-core clamp, and the skipped push when the
+  // stage added nothing (the old one-unit click always pushed).
+  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+
+  it('defaults to one unit, stages through the pure core, and skips a no-op push', () => {
+    expect(hud).toContain('addItemToTrade(itemId: string, count = 1): void {');
+    expect(hud).toMatch(
+      /if \(stageTradeOffer\(this\.stagedTrade\.items, this\.sim\.inventory, itemId, count\) < 1\) return;\s*this\.pushTradeOffer\(\);/,
+    );
+  });
+
+  it('reports the headroom the bags prompt caps on from the same pure core', () => {
+    expect(hud).toContain(
+      'return tradeOfferHeadroom(this.stagedTrade.items, this.sim.inventory, itemId);',
+    );
+    expect(hud).toContain('tradeOfferHeadroom: (itemId) => this.tradeOfferHeadroom(itemId),');
   });
 });
 

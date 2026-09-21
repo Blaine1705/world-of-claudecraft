@@ -16,6 +16,7 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 import { ITEMS } from '../sim/data';
 import { countRawInSlots } from '../sim/item_lock';
+import { TRADE_OFFER_MAX_LINES } from '../sim/social/trade';
 import type { MaterialComposition } from '../sim/material_sources';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import { itemDisplayName } from './entity_i18n';
@@ -31,9 +32,9 @@ export function tradeOfferCeiling(inventory: InvSlot[], itemId: string): number 
   return countRawInSlots(inventory, itemId);
 }
 
-/** The most offer LINES one side of a gold trade may stage (the sim's own
- *  `items.slice(0, 6)` cap in src/sim/social/trade.ts tradeSetOffer). */
-export const TRADE_OFFER_MAX_LINES = 6;
+/** The sim's own line cap (src/sim/social/trade.ts tradeSetOffer), re-exported
+ *  so the UI and the server can never disagree about how many lines fit. */
+export { TRADE_OFFER_MAX_LINES };
 
 /** How many more units of `itemId` the player may still stage into the
  *  offer: the summed held total (tradeOfferCeiling) minus what the offer
@@ -67,6 +68,14 @@ export function stageTradeOffer(
   if (existing) existing.count += added;
   else staged.push({ itemId, count: added });
   return added;
+}
+
+/** Whether a click on an offered row opens the remove-quantity prompt: only
+ *  a line with MORE than one unit has a quantity to choose. A one-unit line
+ *  (every weapon and armour piece) unstages directly, the way it always did;
+ *  the offer side's twin is bags_view.ts tradeOfferOpensPrompt. */
+export function tradeOfferRemoveOpensPrompt(line: InvSlot): boolean {
+  return Math.floor(line.count) > 1;
 }
 
 /** Take `count` units off one staged line (the trade window's remove

@@ -148,9 +148,10 @@ export function dismissBagPrompts(
   owner: HTMLElement | null = document.getElementById('bags'),
 ): void {
   if (owner) closeMaterialSourcesDialogForOwner(owner);
-  // Through each prompt's own dismiss() (prompt_dialog.ts registry), so a
-  // prompt another window installed over its own root (the trade window's
-  // adjust prompt shares the trade-offer-prompt class) clears that root too.
+  // Through each prompt's own dismiss() (prompt_dialog.ts registry), so the
+  // root a prompt made inert is cleared by the sweep, never left behind. The
+  // selector names only prompts THIS window owns: the trade window's remove
+  // prompt carries its own class and is never swept from here.
   for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) dismissInstalledPrompt(p);
 }
 
@@ -2657,9 +2658,10 @@ export class BagsWindow {
     const item = knownItemDef(ITEMS, itemId);
     const itemName = item ? itemDisplayName(item) : itemId;
     // The clicked row SURVIVES a stage (nothing rebuilds the grid), so focus
-    // can go back to it; the always-present close button is the fallback for
-    // a row that left the bags under the prompt.
-    const opener = document.activeElement as HTMLElement | null;
+    // can go back to it after a submit; the always-present close button is
+    // the fallback for a row that left the bags under the prompt. (The dialog
+    // recipe captures its own opener for the Cancel / Escape return.)
+    const clickedRow = document.activeElement as HTMLElement | null;
     // One big press moves a whole bag stack (the item's stack size), the
     // vault withdraw prompt's rule, so 45 held is two presses and a nudge.
     const stepSize = stackSizeOf(item);
@@ -2696,8 +2698,8 @@ export class BagsWindow {
         },
         afterClose: () => {
           const landing =
-            opener?.isConnected && this.deps.root().contains(opener)
-              ? opener
+            clickedRow?.isConnected && this.deps.root().contains(clickedRow)
+              ? clickedRow
               : (this.deps.root().querySelector('[data-close]') as HTMLElement | null);
           landing?.focus();
         },
