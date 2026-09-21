@@ -22,6 +22,7 @@ import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dunge
 import { HoardBoneReaperFx } from './hoard_bone_reaper';
 import { HoardBossDressing } from './hoard_boss_dressing';
 import { HoardBossFx } from './hoard_boss_fx';
+import { HoardBossGestures } from './hoard_boss_gestures';
 import { HoardBossPresentation } from './hoard_boss_presentation';
 import { HoardBoulderFx } from './hoard_boulder';
 import { HoardCocoonFx } from './hoard_cocoon';
@@ -73,6 +74,7 @@ export class RiftDeathZoneVisuals {
   private readonly zones = new Map<string, ZoneVisual>();
   private readonly hoardBossFx: HoardBossFx;
   private readonly hoardPresentation: HoardBossPresentation;
+  private readonly hoardGestures: HoardBossGestures;
   private readonly hoardDressing: HoardBossDressing;
   private readonly hoardAccents: HoardEncounterAccents;
   private readonly hoardSpells: HoardSpellFx;
@@ -92,7 +94,9 @@ export class RiftDeathZoneVisuals {
     private readonly world?: IWorld,
     shake?: (amount: number) => void,
     reducedMotion?: () => boolean,
+    playGesture?: (entityId: number, gesture: string) => void,
   ) {
+    this.hoardGestures = new HoardBossGestures(world, playGesture);
     this.hoardBossFx = new HoardBossFx(scene, groundY, compileGate);
     this.hoardPresentation = new HoardBossPresentation(world, shake);
     this.hoardDressing = new HoardBossDressing(scene, groundY, world, compileGate, reducedMotion);
@@ -133,6 +137,7 @@ export class RiftDeathZoneVisuals {
    * fine for gameplay). */
   sync(zones: readonly RiftBossDeathZoneView[], hoardCues: readonly HoardBossCueView[] = []): void {
     this.hoardPresentation.sync(hoardCues);
+    this.hoardGestures.sync(hoardCues);
     this.hoardBossFx.setTheme(this.world?.riftFloor?.seed);
     this.hoardBossFx.sync(hoardCues);
     this.hoardDressing.sync(hoardCues);

@@ -20,7 +20,15 @@ const PLANS = {
     ['defeat_02', 'Death'],
     ['cast_a_spell', 'Cast'],
     ['jump', 'Jump'],
-  ].map(([preset, game]) => ({ file: `anim_preset_biped_${preset}.glb`, game })),
+  ]
+    .map(([preset, game]) => ({ file: `anim_preset_biped_${preset}.glb`, game }))
+    // Authored whole by frost_fix.py --author: the Ice Age channel, its blast, and
+    // the Whiteout Gust frontal.
+    .concat([
+      { file: 'authored_iceage.glb', game: 'IceAge' },
+      { file: 'authored_release.glb', game: 'IceAgeRelease' },
+      { file: 'authored_frontal.glb', game: 'FrostFrontal' },
+    ]),
 };
 
 const [which, dir, out] = process.argv.slice(2);

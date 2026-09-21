@@ -345,6 +345,7 @@ os.makedirs(OUT, exist_ok=True)
 arm.animation_data_create()
 for clip, (fn, seconds) in CLIPS.items():
     action = bpy.data.actions.new(clip)
+    action.use_fake_user = True  # keep every clip in the saved .blend
     arm.animation_data.action = action
     frames = max(2, round(seconds * FPS))
     for f in range(frames + 1):

@@ -21,6 +21,7 @@ import {
 import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_miniboss_stomp';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../../sim/nythraxis_bone_spike';
+import { HOARD_CAST_ICE_AGE } from '../../sim/rift/hoard_control_cast_ids';
 import {
   ALL_CLASSES,
   type Entity,
@@ -34,6 +35,10 @@ import {
 } from '../../sim/varkhul_cinder_artificer';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
+import {
+  HOARD_GESTURE_FROST_GUST,
+  HOARD_GESTURE_ICE_AGE_RELEASE,
+} from '../hoard_boss_gestures_core';
 import type { LocoGaitThresholds } from '../locomotion';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
@@ -3698,13 +3703,15 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Buried Hoard (and rift) bosses with a body of their own, generated with
   // the asset pipeline (scripts/asset_pipeline/, see CREDITS.md) instead of their
   // family's shared model. Each atlas is authored, so none takes the entity tint.
+  // Their heights are a boss's: about a third over the family models they replace
+  // (playtest), which is a look only, the templates' scale and reach are untouched.
   // The Abyssal Maw: a four-legged abyssal angler. Tripo's quadruped auto-rig
   // folded his head under his chest and ships one walk preset, so his skeleton
   // (with a jaw, a tail, chin tentacles and the lure) and every clip are authored
   // in Blender: scripts/assets/hoard_bosses/maw_rig.py. Cast is his roar.
   mob_hoard_abyssal_maw: {
     url: `${CREATURES}/hoard_abyssal_maw.glb`,
-    height: 1.7,
+    height: 2.3,
     // The generated model faces +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {
@@ -3725,7 +3732,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // authored two-fisted slam: see CREDITS.md.
   mob_hoard_hoarfrost_warden: {
     url: `${CREATURES}/hoard_hoarfrost_warden.glb`,
-    height: 2,
+    height: 2.6,
     // The Tripo rig rests facing +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {
@@ -3737,6 +3744,20 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
       jump: 'Jump',
+      // Authored in Blender (scripts/assets/hoard_bosses/frost_fix.py). Ice Age is
+      // his held channel for the whole cast bar; the blast and the Whiteout Gust
+      // frontal are one-shots the cue clock starts (hoard_boss_gestures_core.ts),
+      // played at their authored speed so the key frame meets the hit.
+      castByAbility: { [HOARD_CAST_ICE_AGE]: 'IceAge' },
+      castTimeScaleByAbility: { [HOARD_CAST_ICE_AGE]: 1 },
+      attackByAbility: {
+        [HOARD_GESTURE_FROST_GUST]: 'FrostFrontal',
+        [HOARD_GESTURE_ICE_AGE_RELEASE]: 'IceAgeRelease',
+      },
+      attackTimeScaleByAbility: {
+        [HOARD_GESTURE_FROST_GUST]: 1,
+        [HOARD_GESTURE_ICE_AGE_RELEASE]: 1,
+      },
     },
     authoredAtlas: true,
     selfIllumination: 0.2,
@@ -3746,7 +3767,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // the full KayKit clip vocabulary and real handslot bones.
   mob_hoard_emberforge_tyrant: {
     url: `${CREATURES}/hoard_emberforge_tyrant.glb`,
-    height: 2,
+    height: 2.6,
     // (The locally rigged bodies carry the knight's clip library: one hit clip.)
     clips: { ...kaykit(['2H_Melee_Attack_Chop']), hit: ['Hit_A'] },
     attach: [{ url: `${WEAPONS}/hammer_d.glb`, bone: 'handslot.r' }],
@@ -3757,7 +3778,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // he hovers, and glides on his idle instead of running on legs he does not have.
   mob_hoard_archon_nyxaris: {
     url: `${CREATURES}/hoard_archon_nyxaris.glb`,
-    height: 1.9,
+    height: 2.4,
     hover: 0.45,
     clips: {
       ...kaykit(['Spellcast_Shoot']),
@@ -3771,7 +3792,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_hoard_tempest_vharok: {
     url: `${CREATURES}/hoard_tempest_vharok.glb`,
-    height: 1.9,
+    height: 2.5,
     clips: {
       // He fights bare-clawed: a two-handed weapon chop with empty hands read as a
       // broken swing (playtest), so he rakes with both claws, swipes and punches.
