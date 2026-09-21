@@ -8721,7 +8721,8 @@
   /* Ghost hint: the standing top-center line for the whole ghost run ("run to
      your body or talk to the Pale Keeper"). Sits under the compass strip in the
      #arena-status band and reads like the zone banner (light text, no plate),
-     pointer-inert so it never eats a click meant for the world. */
+     pointer-inert so it never eats a click meant for the world. The letter
+     spacing and title shadow come from the ui-cin primitive on the element. */
   #ghost-hint {
     --color-text-light: var(--color-white);
     position: absolute;
@@ -8737,10 +8738,6 @@
     font-weight: bold;
     line-height: 1.2;
     text-align: center;
-    letter-spacing: 0.5px;
-    text-shadow:
-      0 0 14px color-mix(in srgb, var(--color-keyline) 53%, transparent),
-      1px 1px 4px var(--color-keyline);
     pointer-events: none;
     z-index: 30;
   }

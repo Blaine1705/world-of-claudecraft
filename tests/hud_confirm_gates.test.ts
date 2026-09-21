@@ -19,6 +19,7 @@ interface ConfirmCall {
   ok: string;
   cancel: string;
   onOk: () => void;
+  onCancel?: () => void;
 }
 
 interface GateHarness {
@@ -30,6 +31,7 @@ interface GateHarness {
     okText: string,
     cancelText: string,
     onOk: () => void,
+    onCancel?: () => void,
   ): void;
   requestSpiritHealerResurrect(): void;
   requestHeroicVendorPurchase(itemId: string): void;
@@ -38,8 +40,8 @@ interface GateHarness {
 function harness() {
   const confirmations: ConfirmCall[] = [];
   const hud = Object.create(Hud.prototype) as unknown as GateHarness;
-  hud.confirmDialog = (title, body, ok, cancel, onOk) => {
-    confirmations.push({ title, body, ok, cancel, onOk });
+  hud.confirmDialog = (title, body, ok, cancel, onOk, onCancel) => {
+    confirmations.push({ title, body, ok, cancel, onOk, onCancel });
   };
   return { hud, confirmations };
 }
@@ -101,19 +103,27 @@ describe('spirit healer revive confirmation', () => {
   });
 
   it('sends nothing when either dialog is dismissed', () => {
-    const { hud, confirmations } = withLevel(20);
-    const revive = vi.fn();
-    hud.onResurrectAtSpiritHealer = revive;
+    // cancel/Escape tear the dialog down and run only the no-choice callback
+    // (see Hud.confirmDialog); dismissing must leave the command unsent at
+    // either step and open nothing further.
+    const first = withLevel(20);
+    const reviveA = vi.fn();
+    first.hud.onResurrectAtSpiritHealer = reviveA;
+    first.hud.requestSpiritHealerResurrect();
+    expect(first.confirmations).toHaveLength(1);
+    first.confirmations[0].onCancel?.();
+    expect(first.confirmations).toHaveLength(1);
+    expect(reviveA).not.toHaveBeenCalled();
 
-    // cancel/Escape tear the dialog down without running onOk (see
-    // Hud.confirmDialog); dismissing must leave the command unsent at either step.
-    hud.requestSpiritHealerResurrect();
-    expect(confirmations).toHaveLength(1);
-    expect(revive).not.toHaveBeenCalled();
-
-    confirmations[0].onOk();
-    expect(confirmations).toHaveLength(2);
-    expect(revive).not.toHaveBeenCalled();
+    const second = withLevel(20);
+    const reviveB = vi.fn();
+    second.hud.onResurrectAtSpiritHealer = reviveB;
+    second.hud.requestSpiritHealerResurrect();
+    second.confirmations[0].onOk();
+    expect(second.confirmations).toHaveLength(2);
+    second.confirmations[1].onCancel?.();
+    expect(second.confirmations).toHaveLength(2);
+    expect(reviveB).not.toHaveBeenCalled();
   });
 });
 
