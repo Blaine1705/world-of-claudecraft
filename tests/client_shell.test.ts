@@ -1907,7 +1907,7 @@ describe('client HTML shell', () => {
       'hud.onResurrectAtSpiritHealer = () => {\n    void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);\n  };',
     );
     expect(hudTs).not.toMatch(
-      /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl|resurrectHealerBtnEl)\.addEventListener\('click'/,
+      /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl)\.addEventListener\('click'/,
     );
   });
 

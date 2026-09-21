@@ -13285,7 +13285,9 @@ export const TARGETS = [
           }
         });
         await wait(600);
-        await page.evaluate(() => document.querySelector('#resurrect-healer-btn')?.click());
+        // The Keeper's raise is a conversation now (no ghost-prompt button): open the
+        // same gate the world click and the interact key reach.
+        await page.evaluate(() => window.__game?.hud.requestSpiritHealerResurrect());
       } else if (variant.scene === 'heroic') {
         await page.evaluate(() => {
           const game = window.__game;

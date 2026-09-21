@@ -6251,7 +6251,7 @@
     top: 52px;
     font-size: 14px;
     letter-spacing: 0.3px;
-    max-width: calc(100vw - 96px);
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 96px);
   }
   body.mobile-touch .death-panel,
   body.mobile-touch .ghost-panel {

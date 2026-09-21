@@ -37,7 +37,7 @@ describe('the Keeper revive respawn event', () => {
     expect(sim.resurrectAtSpiritHealer()).toBe(true);
     expect(hasResurrectionSickness(p)).toBe(true);
     const respawns = respawnEvents(sim.drainEvents());
-    expect(respawns).toEqual([{ type: 'respawn', pid: p.id, sickness: 'resurrection' }]);
+    expect(respawns).toStrictEqual([{ type: 'respawn', pid: p.id, sickness: 'resurrection' }]);
   });
 
   it('stays plain below the Toll level, where the Keeper charges nothing', () => {
@@ -47,7 +47,7 @@ describe('the Keeper revive respawn event', () => {
     sim.drainEvents();
     expect(sim.resurrectAtSpiritHealer()).toBe(true);
     expect(hasResurrectionSickness(p)).toBe(false);
-    expect(respawnEvents(sim.drainEvents())).toEqual([{ type: 'respawn', pid: p.id }]);
+    expect(respawnEvents(sim.drainEvents())).toStrictEqual([{ type: 'respawn', pid: p.id }]);
   });
 
   it('stays plain on the penalty-free corpse run', () => {
@@ -61,6 +61,6 @@ describe('the Keeper revive respawn event', () => {
     sim.resurrectAtCorpse();
     expect(p.dead).toBe(false);
     expect(hasResurrectionSickness(p)).toBe(false);
-    expect(respawnEvents(sim.drainEvents())).toEqual([{ type: 'respawn', pid: p.id }]);
+    expect(respawnEvents(sim.drainEvents())).toStrictEqual([{ type: 'respawn', pid: p.id }]);
   });
 });

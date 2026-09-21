@@ -472,8 +472,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-measured while reconciling the latest v0.43.0 base: the release-side
     // screenshot and HUD extractions compose with aura overlay wiring and the
     // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
-    // merged tree. Exact count, zero slack.
-    ceiling: 18309,
+    // merged tree. Exact count, zero slack. Lowered to 18296 when the Pale
+    // Keeper revive's dialog copy moved out to keeper_revive_dialog_core.ts and
+    // the ghost prompt lost its healer-range scan (the Keeper is talked to).
+    ceiling: 18296,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

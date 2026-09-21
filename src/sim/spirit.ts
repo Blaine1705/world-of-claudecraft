@@ -343,12 +343,12 @@ export function resurrectAtCorpse(ctx: SimContext, pid?: number): void {
   creditDeathLesson(ctx, meta, true);
 }
 
-// Resurrect at the Spirit Healer: instant, in place, but with Resurrection Sickness.
 /** Whether The Keeper's Toll is on the player (nothing is charged below level 10). */
 export function hasResurrectionSickness(p: Entity): boolean {
   return p.auras.some((a) => a.id === RESURRECTION_SICKNESS_ID);
 }
 
+// Resurrect at the Spirit Healer: instant, in place, but with Resurrection Sickness.
 export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
