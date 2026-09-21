@@ -256,7 +256,7 @@ describe('host_diag_section_controller: a run', () => {
     expect(btn.disabled).toBe(false);
   });
 
-  it('reports one try-again line for a failure, a busy shell and a rejected promise', async () => {
+  it('reports one try-again line for a failure and a rejected promise, and the running line for a busy shell', async () => {
     const failure = t('hudChrome.hostDiag.failed');
     const errored = deferredBridge();
     const a = mount();
@@ -269,7 +269,10 @@ describe('host_diag_section_controller: a run', () => {
     const b = mount();
     createButton(b).click();
     await busy.settle({ status: 'busy', nativeStatus: null });
-    expect(live(b).textContent, 'a second request is not a special case any more').toBe(failure);
+    // The first run is still open and will write its file: not a failure.
+    expect(live(b).textContent).toBe(t('hudChrome.hostDiag.running'));
+    expect(live(b).classList.contains('is-info')).toBe(true);
+    expect(live(b).classList.contains('is-error')).toBe(false);
 
     const wedged = deferredBridge();
     const c = mount();

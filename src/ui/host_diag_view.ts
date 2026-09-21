@@ -14,7 +14,7 @@ import type { TranslationKey } from './i18n.catalog';
 export type HostDiagPhase = 'idle' | 'running' | 'result';
 
 /** The render-model's tone vocabulary, which the painter maps to a CSS class. */
-export type HostDiagTone = 'success' | 'error';
+export type HostDiagTone = 'success' | 'info' | 'error';
 
 export interface HostDiagResultModel {
   tone: HostDiagTone;
@@ -43,10 +43,12 @@ export function hostDiagRunning(): HostDiagState {
  * player closed the save dialog, which is a decision, not a failure, so the
  * section returns to idle silently.
  *
- * Everything that is not a saved file and not a cancel is ONE failure line: a
- * rejected promise, a missing bridge, a second request while one is in flight,
- * a shell answering something unknown. From the player's side those are one
- * event, "no file was written", and the answer to all of them is to try again.
+ * Every failure is ONE line: a rejected promise, a missing bridge, a shell
+ * answering something unknown. From the player's side those are one event, "no
+ * file was written", and the answer to all of them is to try again.
+ *
+ * `busy` is NOT a failure: a run is already open and will still write its file,
+ * so it renders the running line.
  *
  * Every nativeStatus of a SAVED report renders the same plain saved line: the
  * Windows half falling short still leaves a file support can read, and the
@@ -57,6 +59,9 @@ export function hostDiagResultModel(
 ): HostDiagResultModel | null {
   if (!result) return { tone: 'error', messageKey: 'hudChrome.hostDiag.failed' };
   if (result.status === 'cancelled') return null;
+  // A run is already open (the section was rebuilt mid-collection and clicked
+  // again): that first run will still write its file, so "failed" would be false.
+  if (result.status === 'busy') return { tone: 'info', messageKey: 'hudChrome.hostDiag.running' };
   if (result.status !== 'saved') return { tone: 'error', messageKey: 'hudChrome.hostDiag.failed' };
   const fileName = result.fileName ?? '';
   // The shell always names the file it wrote; the nameless arm is the defensive

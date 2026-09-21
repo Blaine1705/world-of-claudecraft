@@ -64,11 +64,24 @@ function Get-DiagBrowsers {
         }
     })
 
+    # The ProgId is FOLDED to a browser name, never emitted: Firefox's is 'FirefoxURL-<16 hex>', a
+    # hash of the install path, and it has no backslash so the scrubber would not touch it.
+    # null = unreadable, 'other' = a browser outside the table above.
     $default = $null
-    try { $default = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice' -ErrorAction Stop).ProgId } catch { }
+    try {
+        $progId = "$((Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice' -ErrorAction Stop).ProgId)"
+        $default = switch -Regex ($progId) {
+            '^ChromeHTML'  { 'chrome'; break }
+            '^MSEdge'      { 'edge'; break }
+            '^Brave'       { 'brave'; break }
+            '^Opera'       { 'opera'; break }
+            '^Firefox'     { 'firefox'; break }
+            default        { 'other' }
+        }
+    } catch { }
 
     [ordered]@{
-        defaultBrowserProgId = $default
+        defaultBrowser = $default
         browsers             = $browsers
     }
 }

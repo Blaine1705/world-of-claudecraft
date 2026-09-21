@@ -869,7 +869,7 @@ function Format-DiagSummary {
     if ($d) {
         $out.Add("SYSTEM   $($d.os.caption) build $($d.os.build), uptime $($d.os.uptimeHours) h")
         $out.Add("         $($d.cpu.name) ($($d.cpu.cores)C/$($d.cpu.threads)T)")
-        $out.Add("         $($d.machine.manufacturer) $($d.machine.model) - laptop: $($d.isLaptop)")
+        $out.Add("         laptop: $($d.isLaptop)")
     }
     $d = Sect 'power'
     if ($d) {
@@ -993,11 +993,24 @@ function Get-DiagBrowsers {
         }
     })
 
+    # The ProgId is FOLDED to a browser name, never emitted: Firefox's is 'FirefoxURL-<16 hex>', a
+    # hash of the install path, and it has no backslash so the scrubber would not touch it.
+    # null = unreadable, 'other' = a browser outside the table above.
     $default = $null
-    try { $default = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice' -ErrorAction Stop).ProgId } catch { }
+    try {
+        $progId = "$((Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice' -ErrorAction Stop).ProgId)"
+        $default = switch -Regex ($progId) {
+            '^ChromeHTML'  { 'chrome'; break }
+            '^MSEdge'      { 'edge'; break }
+            '^Brave'       { 'brave'; break }
+            '^Opera'       { 'opera'; break }
+            '^Firefox'     { 'firefox'; break }
+            default        { 'other' }
+        }
+    } catch { }
 
     [ordered]@{
-        defaultBrowserProgId = $default
+        defaultBrowser = $default
         browsers             = $browsers
     }
 }
@@ -1555,10 +1568,6 @@ function Get-DiagSystem {
             cores        = [int]$cpu.NumberOfCores
             threads      = [int]$cpu.NumberOfLogicalProcessors
             maxClockMHz  = [int]$cpu.MaxClockSpeed
-        }
-        machine = [ordered]@{
-            manufacturer = $cs.Manufacturer
-            model        = $cs.Model
         }
         isLaptop = $votes -ge 2
         laptopHints = [ordered]@{

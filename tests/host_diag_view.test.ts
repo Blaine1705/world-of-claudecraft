@@ -96,14 +96,22 @@ describe('host_diag_view: the non-saved arms', () => {
     expect(hostDiagResultModel({ status: 'cancelled', nativeStatus: 'ok' })).toBeNull();
   });
 
-  it('maps every non-saved outcome to the one try-again failure line', () => {
+  it('renders busy as the running line, never as a failure', () => {
+    // The first run is still open and will write its file, so "could not be
+    // created" would be false.
+    expect(hostDiagResultModel({ status: 'busy', nativeStatus: null })).toEqual({
+      tone: 'info',
+      messageKey: 'hudChrome.hostDiag.running',
+    });
+  });
+
+  it('maps every failed outcome to the one try-again failure line', () => {
     // The glue already folds a missing bridge and a rejected promise into the
-    // 'error' verdict; this pins that busy, a null answer and an unrecognized
-    // status land on the same line, so no shell can leave the section silent.
+    // 'error' verdict; this pins that a null answer and an unrecognized status
+    // land on the same line, so no shell can leave the section silent.
     const expected = { tone: 'error', messageKey: 'hudChrome.hostDiag.failed' };
     expect(hostDiagResultModel({ status: 'error', nativeStatus: null })).toEqual(expected);
     expect(hostDiagResultModel({ status: 'error', nativeStatus: 'error' })).toEqual(expected);
-    expect(hostDiagResultModel({ status: 'busy', nativeStatus: null })).toEqual(expected);
     expect(hostDiagResultModel(null)).toEqual(expected);
     expect(hostDiagResultModel(undefined)).toEqual(expected);
     expect(hostDiagResultModel({ status: 'exploded' } as unknown as DesktopHostDiagResult)).toEqual(

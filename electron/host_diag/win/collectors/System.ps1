@@ -41,10 +41,6 @@ function Get-DiagSystem {
             threads      = [int]$cpu.NumberOfLogicalProcessors
             maxClockMHz  = [int]$cpu.MaxClockSpeed
         }
-        machine = [ordered]@{
-            manufacturer = $cs.Manufacturer
-            model        = $cs.Model
-        }
         isLaptop = $votes -ge 2
         laptopHints = [ordered]@{
             chassisTypes      = $chassis

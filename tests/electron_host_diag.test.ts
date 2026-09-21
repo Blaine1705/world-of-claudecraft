@@ -313,6 +313,9 @@ describe('runNativeHostDiag', () => {
   });
 
   it('kills the child on the timeout and answers a stable reason', async () => {
+    // The literal, not only the constant against itself: this is how long the
+    // main process may hold a spawned PowerShell.
+    expect(HOST_DIAG_TIMEOUT_MS).toBe(120_000);
     const h = harness();
     const run = runNativeHostDiag(h.deps);
     expect(h.timers[0]?.ms).toBe(HOST_DIAG_TIMEOUT_MS);
@@ -464,6 +467,22 @@ describe('sanitizeGameInfo (the renderer is untrusted here)', () => {
     expect('userName' in clean).toBe(false);
     expect('savePath' in clean).toBe(false);
     expect(Object.keys(clean).every((key) => GAME_INFO_KEYS.includes(key))).toBe(true);
+  });
+
+  it('pins the whole key list, so a key dropped from main AND preload is caught', () => {
+    expect([...GAME_INFO_KEYS]).toEqual([
+      'sessionId',
+      'releaseVersion',
+      'buildId',
+      'graphicsPreset',
+      'gfxTier',
+      'glRenderer',
+      'glVendor',
+      'renderScale',
+      'targetFps',
+      'zone',
+      'locale',
+    ]);
   });
 
   it('clamps strings to 128 and flattens control characters through the shell clamp', () => {

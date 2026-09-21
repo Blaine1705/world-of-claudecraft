@@ -18,7 +18,7 @@ function Format-DiagSummary {
     if ($d) {
         $out.Add("SYSTEM   $($d.os.caption) build $($d.os.build), uptime $($d.os.uptimeHours) h")
         $out.Add("         $($d.cpu.name) ($($d.cpu.cores)C/$($d.cpu.threads)T)")
-        $out.Add("         $($d.machine.manufacturer) $($d.machine.model) - laptop: $($d.isLaptop)")
+        $out.Add("         laptop: $($d.isLaptop)")
     }
     $d = Sect 'power'
     if ($d) {
