@@ -583,7 +583,8 @@ walls, the battleground placements), so no second program exists.
 
 Why it is fair: both styles ghost the SAME occluders on the same frame test, at the same
 rest level, so what a player can see through a wall or a trunk is the same information on
-every tier; only the look of the ghost differs. The dithered style never waits on a fade
+every tier. Two cosmetic things differ: the look of the ghost, and its shadow (a dithered
+instance stays in its batch and keeps casting, where the blended stand-in casts none). The dithered style never waits on a fade
 gate (there is no program to link), so its ghost is never later than the blended one, and
 it moves in one step both ways where the blended one eases over a few frames (a partly
 dense stipple reads as noise, so the dithered style takes the reduced-motion path). The

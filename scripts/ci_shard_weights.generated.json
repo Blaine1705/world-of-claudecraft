@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 3959,
+    "files": 3961,
     "harvestedFiles": 3948,
     "carried": {
       "tests/hub_dummy_drill.test.ts": {
@@ -91,6 +91,28 @@
           801,
           843,
           805
+        ]
+      },
+      "tests/instanced_dither_fade.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          12,
+          14,
+          15
+        ]
+      },
+      "tests/occluder_dither_fade.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          6,
+          8,
+          7
         ]
       },
       "tests/practice_dps_controller.test.ts": {
@@ -1798,6 +1820,7 @@
   "tests/inspect_window.test.ts": 128,
   "tests/instance_music.test.ts": 8,
   "tests/instance_provenance_boundaries.test.ts": 13372,
+  "tests/instanced_dither_fade.test.ts": 14,
   "tests/instanced_occluder_ghosts.test.ts": 11,
   "tests/interact_loot_only.test.ts": 2278,
   "tests/interact_object_credit.test.ts": 2378,
@@ -2419,6 +2442,7 @@
   "tests/oauth.test.ts": 28,
   "tests/objective_glow_view.test.ts": 8,
   "tests/obs_interaction.test.ts": 3746,
+  "tests/occluder_dither_fade.test.ts": 7,
   "tests/occluder_fade.test.ts": 4,
   "tests/occluder_fade_core.test.ts": 10,
   "tests/occluder_fade_gate.test.ts": 83,
