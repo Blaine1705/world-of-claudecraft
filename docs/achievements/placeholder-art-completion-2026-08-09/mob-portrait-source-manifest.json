@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "f63f7a726cee19045949de612441831e504da3aca53998b2f9d3d1e424fc6d64",
+  "rendererFingerprint": "09da72835503624cf207dab4a6ce6ecd60c53ecc561ce13c924cdf86c07f5345",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5009395,
-      "sha256": "00aef2dba09e40579cd125511fcf04cf52f6284686fd6a594799aebf32e3e518",
+      "bytes": 5010293,
+      "sha256": "c2cd9578ae1be888ed57d1834caecba7c85f5bc9f10187a0513b85d8b1028db7",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6659,34 +6659,34 @@
       "id": "rift_rime_elemental",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_elemental",
+      "visualKey": "mob_hoard_rime_elemental",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/hoard_rime_elemental.glb",
+          "path": "public/models/creatures/hoard_rime_elemental.glb",
+          "bytes": 476484,
+          "sha256": "8fde6dd73f24c91dbfbceb1fe42e0477b51069da914123327d63d72b44e28089"
         },
-        "idle": "Flying_Idle",
-        "height": 2.2,
-        "yaw": null,
-        "hover": 0.3,
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": -1.5707963267948966,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": 0.35
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#8fd8ff",
-        "strength": 0.4
+        "strength": 0.35
       },
-      "sourceFingerprint": "a24d147d79420a7a5e1f7694b847e11fa11a02ba2bba5fc992b0e3dcd49ab1e6",
+      "sourceFingerprint": "199c94e5ef5c38a68238da031e5504fa98bdb4b6b15c3df3e16a523b71f3566a",
       "output": {
         "path": "public/ui/mobs/rift_rime_elemental.webp",
-        "bytes": 2108,
-        "sha256": "a72bb51456d61b2970d0b96b719e96224b151697b3fa24636dbc095bac7772e8"
+        "bytes": 1960,
+        "sha256": "a5c4619a7140943029a9092cc797e6d80987c39b97629683f90c45ebe904ec75"
       }
     },
     {
@@ -6829,34 +6829,34 @@
       "id": "rift_thornback",
       "family": "beast",
       "finderEncounter": false,
-      "visualKey": "mob_wolf",
+      "visualKey": "mob_hoard_thornback_stalker",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/wolf_basic.glb",
-          "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
+          "url": "models/creatures/hoard_thornback_stalker.glb",
+          "path": "public/models/creatures/hoard_thornback_stalker.glb",
+          "bytes": 598376,
+          "sha256": "407ee606e0a5272c90487dd31b109314ceb1876d001028801313b49e9142433c"
         },
         "idle": "Idle",
-        "height": 1.6,
-        "yaw": null,
+        "height": 2.3,
+        "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#6b8e23",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "2f5d7e88dbc099b817d5918bf27372f499ec921e86ec0258cbcaa9f77206136e",
+      "sourceFingerprint": "ba29cbba6c7900b508cff91dbb81ad8b77ddc4d30c834e3c8b58dc81a7cb915b",
       "output": {
         "path": "public/ui/mobs/rift_thornback.webp",
-        "bytes": 1846,
-        "sha256": "06cb7ad45bd93344e6a3c9088fc6fc6c5e85cc4078c5be4153317d5414b30db5"
+        "bytes": 2666,
+        "sha256": "9898605a2b1337c33f0c81c71bbc9c65bef4f9ac81556c6c94e5d41d552614a5"
       }
     },
     {
@@ -6897,34 +6897,34 @@
       "id": "rift_venom_weaver",
       "family": "spider",
       "finderEncounter": false,
-      "visualKey": "mob_spider",
+      "visualKey": "mob_hoard_venom_weaver",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/spider.glb",
-          "path": "public/models/creatures/spider.glb",
-          "bytes": 130436,
-          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+          "url": "models/creatures/hoard_venom_weaver.glb",
+          "path": "public/models/creatures/hoard_venom_weaver.glb",
+          "bytes": 450320,
+          "sha256": "155815584c4b4b478aae6b7fe4e6cbdb5101a9368364ea7ebf83e3e50e762509"
         },
-        "idle": "Spider_Idle",
-        "height": 1.4,
-        "yaw": null,
+        "idle": "Idle",
+        "height": 1.5,
+        "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9acd32",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "302f479b67ff4220308f4836992b9baf96f26eec8c8fddd618132a278b7b5749",
+      "sourceFingerprint": "19f1ae34a06cb6c891d1b28d64eaf256c18b1ba5ebf96353239eb9f7e7c33584",
       "output": {
         "path": "public/ui/mobs/rift_venom_weaver.webp",
-        "bytes": 1834,
-        "sha256": "e8543f2792d143751ab2f81007717de9f99fe4220d74dac6ec453b81aa2f736c"
+        "bytes": 1816,
+        "sha256": "55b8aafb0147a64a9aba65910b2ba31f3f5eb721cb4c0e55389a58b0189d05c3"
       }
     },
     {

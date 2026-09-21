@@ -3976,6 +3976,64 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.25,
   },
+  // Vysska's web-spinner: eight found legs on the side-limb rig (scripts/assets/hoard_mobs/spider_spec.py).
+  mob_hoard_venom_weaver: {
+    url: `${CREATURES}/hoard_venom_weaver.glb`,
+    height: 1.5,
+    // The rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Vysska's nest beast, a fan of thorns down its back. Own Blender rig and clips.
+  mob_hoard_thornback_stalker: {
+    url: `${CREATURES}/hoard_thornback_stalker.glb`,
+    height: 2.3,
+    // The rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The Warden's frost elemental: it floats, and its arms are its only limbs. Tripo read the ice as
+  // steel, so the shipped body is made matte (scripts/assets/hoard_mobs/matte.mjs) and leans on its
+  // entity colour for the blue.
+  mob_hoard_rime_elemental: {
+    url: `${CREATURES}/hoard_rime_elemental.glb`,
+    height: 2.6,
+    // The rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.35,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
   // Vysska's cocoons (src/sim/rift/hoard_cocoon.ts): the silk cocoon a wrapped
   // player stands inside, and the brood cocoon she spins for a lone player. Each
   // is the whole body of its attackable mob, so targeting, the nameplate and the
@@ -4354,6 +4412,9 @@ const MOB_KEYS: Record<string, string> = {
   rift_boss_storm: 'mob_hoard_tempest_vharok',
   rift_tide_thrall: 'mob_hoard_tide_thrall',
   rift_deep_lurker: 'mob_hoard_deep_lurker',
+  rift_venom_weaver: 'mob_hoard_venom_weaver',
+  rift_thornback: 'mob_hoard_thornback_stalker',
+  rift_rime_elemental: 'mob_hoard_rime_elemental',
   rift_frost_revenant: 'mob_hoard_frost_revenant',
   rift_ember_fiend: 'mob_hoard_ember_fiend',
   rift_magma_brute: 'mob_hoard_magma_brute',

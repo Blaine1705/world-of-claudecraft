@@ -24,6 +24,21 @@ and then takes one of two roads:
 
   The generated model faces +X, so its `VISUALS` row carries `yaw: -Math.PI / 2`.
 
+  Tripo does not always lay a creature along +X: look at it from above first and set
+  the spec's `rotateZ` so it does. Limbs that stand OUT from the body instead of under
+  it go in the spec's `sideLimbs` and walk the creature instead of the four legs: the
+  Rime Elemental's two arms are written by hand, and a spider's eight legs are FOUND
+  (`spider_spec.py` welds the mesh, drops the body, and takes each long thin piece
+  that is left as a leg: hub end, knee, tip):
+
+  ```
+  blender --background --python scripts/assets/hoard_mobs/spider_spec.py -- <raw.glb> scripts/assets/hoard_mobs/specs/<mob>.json --name Name --key <mob> --rotate-z 90
+  ```
+
+- **Ice, glass, anything translucent** comes out of Tripo as polished metal, which the
+  game lights as dark steel. `node scripts/assets/hoard_mobs/matte.mjs <model.glb>`
+  makes the shipped body matte; a `tint: 'entity'` on its `VISUALS` row brings the colour back.
+
 After shipping a body: re-render its portrait
 (`PORTRAIT_RECEIPT=tmp/portrait-receipt.json ONLY=<mob ids> node scripts/render_finder_portraits.mjs`,
 then `node scripts/build_mob_portrait_source_manifest.mjs --write --receipt tmp/portrait-receipt.json`)

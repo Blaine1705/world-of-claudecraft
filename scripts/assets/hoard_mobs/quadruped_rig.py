@@ -11,6 +11,8 @@ rigged here from a small JSON spec instead:
     never posed;
   * weights by distance to each bone's segment over that bone's radius, smoothed
     over the welded surface; small loose shells (teeth, spines, studs) are rigid;
+  * limbs that stand out from the body instead of under it (a spider's legs, an
+    elemental's arms) are listed in the spec's "sideLimbs" and walk it instead;
   * clips keyed procedurally from world-axis turns: Idle, Walk, Run, Attack (a
     lunging bite), Cast, Hit, Death, tuned by the spec's "motion" numbers.
 
@@ -182,7 +184,9 @@ def apply_pose(pose):
         spec = pose.get(name, {})
         rot = Matrix.Identity(4)
         for axis, degrees in spec.get('turn', []):
-            rot = Matrix.Rotation(math.radians(degrees), 4, AXES[axis]) @ rot
+            # A world axis by name, or any axis as a vector (a leg that points sideways).
+            about = AXES[axis] if isinstance(axis, str) else Vector(axis)
+            rot = Matrix.Rotation(math.radians(degrees), 4, about) @ rot
         pivot = base.to_translation()
         final = Matrix.Translation(pivot) @ rot @ Matrix.Translation(-pivot) @ base
         final = Matrix.Translation(Vector(spec.get('move', (0, 0, 0)))) @ final
@@ -238,11 +242,41 @@ def leg(pose, kind, side, swing, lift):
     pose['%s.%s' % (foot, side)] = {'turn': [('Y', swing * 0.6 - fold * 16 * lift)]}
 
 
+# Limbs that stand OUT from the body instead of under it (a spider's legs, a
+# floating elemental's arms), from the spec: {"upper", "lower", "dir": [x, y],
+# "side": 1 | -1, "phase": 0..1}. They swing about the vertical and lift about the
+# horizontal axis square to the way they point. When a spec lists them, they walk
+# the creature instead of the four legs underneath.
+SIDE_LIMBS = SPEC.get('sideLimbs', [])
+
+
+def side_limb(pose, limb, swing, lift):
+    out = Vector((limb['dir'][0], limb['dir'][1], 0)).normalized()
+    hinge = tuple(out.cross(Vector((0, 0, 1))))
+    pose[limb['upper']] = {'turn': [('Z', -swing * limb['side']), (hinge, 16 * lift)]}
+    pose[limb['lower']] = {'turn': [(hinge, -22 * lift)]}
+
+
+def step_limbs(pose, t, stride):
+    for limb in SIDE_LIMBS:
+        phase = limb.get('phase', 0.0)
+        side_limb(pose, limb, stride * wave(t, 1, phase), max(0.0, math.cos(2 * math.pi * (t - phase))))
+
+
+def hold_limbs(pose, swing=0.0, lift=0.0, fore_only=False):
+    for limb in SIDE_LIMBS:
+        if fore_only and limb['dir'][0] <= 0:
+            continue
+        side_limb(pose, limb, swing, lift)
+
+
 def clip_idle(t):
     pose = stance(chest=1.5 * wave(t), head=2.5 * wave(t, 1, 0.15), head_yaw=4 * wave(t, 1, 0.4),
                   jaw=3 + 3 * wave(t, 1, 0.3))
-    pose['Hips'] = {'move': (0, 0, -0.006 * (1 + wave(t)))}
+    pose['Hips'] = {'move': (0, 0, -MOTION.get('idleBob', 0.006) * (1 + wave(t)))}
     soft_parts(pose, t)
+    for k, limb in enumerate(SIDE_LIMBS):
+        side_limb(pose, limb, 2.5 * wave(t, 1, 0.13 * k), 0.12 * (1 + wave(t, 1, 0.21 * k)))
     return pose
 
 
@@ -253,6 +287,7 @@ def gait(t, stride, bob, lean, tail):
     pose['Spine'] = {'turn': [('Z', -3 * wave(t))]}
     for kind, side, phase in (('fore', 'L', 0.0), ('hind', 'R', 0.0), ('fore', 'R', 0.5), ('hind', 'L', 0.5)):
         leg(pose, kind, side, stride * wave(t, 1, phase), max(0.0, math.cos(2 * math.pi * (t - phase))))
+    step_limbs(pose, t, stride)
     soft_parts(pose, t, tail=tail, tent=1.6)
     return pose
 
@@ -275,6 +310,7 @@ def clip_attack(t):
         leg(pose, 'fore', side, -10 * back + 16 * bite, 0.0)
         leg(pose, 'hind', side, 8 * back - 14 * bite, 0.0)
     soft_parts(pose, t, tail=1.5, tent=1.0 + 2.0 * bite, freq=2.0)
+    hold_limbs(pose, swing=-14 * back + 26 * bite, lift=1.6 * back, fore_only=True)
     return pose
 
 
@@ -289,6 +325,7 @@ def clip_cast(t):
             pose['%s1.%s' % (chain, side)]['turn'].append(('X', -s * flare * up))
             pose['%s2.%s' % (chain, side)]['turn'].append(('X', -s * flare * 0.6 * up))
         leg(pose, 'fore', side, -6 * up, 0.0)
+    hold_limbs(pose, swing=-8 * up, lift=1.3 * up)
     pose['Lure1']['turn'].append(('Y', 30 * up))
     pose['Lure2']['turn'].append(('Y', 25 * up + 8 * shake))
     return pose
@@ -299,6 +336,7 @@ def clip_hit(t):
     pose = stance(chest=-7 * jolt, head=-16 * jolt, head_yaw=9 * jolt, jaw=12 * jolt)
     pose['Hips'] = {'move': (-0.04 * jolt, 0, -0.01 * jolt), 'turn': [('Y', -4 * jolt)]}
     soft_parts(pose, t, tail=2.0, tent=2.5, freq=2.0)
+    hold_limbs(pose, swing=-10 * jolt, lift=0.8 * jolt)
     for side in ('L', 'R'):
         leg(pose, 'fore', side, -8 * jolt, 0.0)
         leg(pose, 'hind', side, 6 * jolt, 0.0)
@@ -316,6 +354,7 @@ def clip_death(t):
     for side, s in (('L', 1), ('R', -1)):
         leg(pose, 'fore', side, 12 * fall * s, 0.55 * fall)
         leg(pose, 'hind', side, -10 * fall * s, 0.5 * fall)
+    hold_limbs(pose, swing=0.0, lift=MOTION.get('deathCurl', 2.2) * fall)
     live = 1 - fall
     soft_parts(pose, t, tail=2.0 * live, tent=2.0 * live, freq=3.0)
     for i in (1, 2, 3):
