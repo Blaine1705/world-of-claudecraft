@@ -9973,7 +9973,7 @@ export const it_IT: EnTranslations = {
     "takeOver": "Prendi il controllo",
     "inWorldHint": "Già nel mondo. Esci altrove, oppure prendine il controllo.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",
