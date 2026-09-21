@@ -39,8 +39,14 @@ export function setDitherFadeEnabledForTest(value: boolean | null): void {
   enabled = value;
 }
 
-const DITHER_GLSL = `${ANCHOR}
-  if ( uGhostFade < 1.0 ) {
+/**
+ * The one screen-door pattern every dithered ghost drops fragments on. `fade`
+ * is a GLSL float expression, 1 = fully drawn; the per-instance arm
+ * (instanced_dither_fade.ts) splices the same block on its own varying.
+ */
+export function ghostDitherDiscardGlsl(fade: string): string {
+  return `
+  if ( ${fade} < 1.0 ) {
     // 4x4 Bayer matrix, thresholds centred in their cells so a fade of 0 drops
     // every fragment and a fade of 1 (guarded above) keeps them all.
     ivec2 ghostCell = ivec2( mod( gl_FragCoord.xy, 4.0 ) );
@@ -51,8 +57,13 @@ const DITHER_GLSL = `${ANCHOR}
       3.0, 11.0, 1.0, 9.0,
       15.0, 7.0, 13.0, 5.0
     );
-    if ( uGhostFade <= ( ghostBayer[ ghostIndex ] + 0.5 ) / 16.0 ) discard;
+    if ( ${fade} <= ( ghostBayer[ ghostIndex ] + 0.5 ) / 16.0 ) discard;
   }`;
+}
+
+export const GHOST_DITHER_ANCHOR = ANCHOR;
+
+const DITHER_GLSL = `${ANCHOR}${ghostDitherDiscardGlsl('uGhostFade')}`;
 
 interface FadeUniform {
   value: number;

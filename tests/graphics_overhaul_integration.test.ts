@@ -65,12 +65,19 @@ describe('graphics-overhaul integration', () => {
     ];
     for (const file of consumers) {
       const text = source(file);
-      // Either the core's step (the instanced-ghost consumers and the raid
-      // backface cull, whose trailing argument is the fade floor) or the
-      // gated stepper over it (occluder_fade.ts advanceOccluderFade, the
-      // fade painters); both take the flag after dt.
-      expect(text, file).toMatch(/(?:step|advance)OccluderFade\([^)]+,\s*reducedMotion\s*[,)]/s);
+      // The core's step (the raid backface cull, whose trailing argument is
+      // the fade floor), the gated stepper over it (occluder_fade.ts
+      // advanceOccluderFade, the fade painters), or the ghost pool's step (the
+      // instanced-ghost consumers); all take the flag after dt.
+      expect(text, file).toMatch(
+        /(?:(?:step|advance)OccluderFade|[gG]hosts\.step)\([^)]+,\s*reducedMotion\s*[,)]/s,
+      );
     }
+    // The pool's step is the core's, and the dithered style restores in one
+    // step the way reduced motion does.
+    expect(source('src/render/instanced_occluder_ghosts.ts')).toContain(
+      'stepOccluderFade(alpha, occluded, dt, reducedMotion || this.dithered)',
+    );
   });
 
   it('invalidates the scree placement grid after terrain and water rebuilds', () => {
