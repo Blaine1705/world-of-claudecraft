@@ -1,3 +1,11 @@
+import { CONTACT_SHEETS, contactTexture } from './contact_assets';
+import {
+  bakedTexture,
+  warriorBloodTexture,
+  warriorPressureTexture,
+  warriorRockTexture,
+  warriorSteelTexture,
+} from './production_assets';
 // The SAFE half of the ability-VFX boot warm-up, expressed as explicit small
 // units the renderer can run outside its world-entry window.
 //
@@ -50,6 +58,45 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
     // unit rather than eight that would each re-enter the same builder.
     build: () => Object.values(abilityVfxTextures()),
   });
+  for (const kind of CONTACT_SHEETS)
+    steps.push({
+      id: kind,
+      build: () => {
+        const texture = contactTexture(kind);
+        return texture ? [texture] : [];
+      },
+    });
+  for (const kind of [
+    'smoke',
+    'shockwave',
+    'shout_dust',
+    'warrior_power',
+    'warrior_fervor',
+    'harvest_impact',
+    'warrior_bite',
+    'warrior_shear',
+    'warrior_crush',
+  ] as const)
+    steps.push({
+      id: kind,
+      build: () => {
+        const texture = bakedTexture(kind);
+        return texture ? [texture] : [];
+      },
+    });
+  for (const [id, load] of [
+    ['warrior-blood', warriorBloodTexture],
+    ['warrior-pressure', warriorPressureTexture],
+    ['warrior-rock', warriorRockTexture],
+    ['warrior-steel', warriorSteelTexture],
+  ] as const)
+    steps.push({
+      id,
+      build: () => {
+        const texture = load();
+        return texture ? [texture] : [];
+      },
+    });
   return steps;
 }
 
@@ -113,4 +160,21 @@ export function collectAbilityVfxCompileTargets(root: THREE.Object3D): AbilityVf
     targets.push({ id: `${child.name || child.type}:${targets.length}`, object: child });
   });
   return targets;
+}
+
+export function abilityVfxBootTextureDependencies(): THREE.Texture[] {
+  const power = bakedTexture('warrior_power');
+  const fervor = bakedTexture('warrior_fervor');
+  const harvest = bakedTexture('harvest_impact');
+  const bite = bakedTexture('warrior_bite');
+  const shear = bakedTexture('warrior_shear');
+  const crush = bakedTexture('warrior_crush');
+  return [
+    ...(power ? [power] : []),
+    ...(fervor ? [fervor] : []),
+    ...(harvest ? [harvest] : []),
+    ...(bite ? [bite] : []),
+    ...(shear ? [shear] : []),
+    ...(crush ? [crush] : []),
+  ];
 }

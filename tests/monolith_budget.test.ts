@@ -493,7 +493,8 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
     // per-frame healer-range scan (the Keeper is talked to). wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 18276,
+    // Warrior recovery audio policy moved to combat_sfx.healAudioPlan.
+    ceiling: 18258,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -900,7 +901,8 @@ const MONOLITHS: MonolithRow[] = [
     // CPU-hygiene review: the ranked and required view candidates share the
     // scan module's liveViewCandidate check (present, view-less, admitted),
     // which drops the coordinator's own admission call. Exact count.
-    ceiling: 12850,
+    // Warrior integration moves painter wiring and prewarm types to sibling modules.
+    ceiling: 12791,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

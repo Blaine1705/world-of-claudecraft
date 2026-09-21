@@ -151,7 +151,7 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
       1,
       'rgba16f',
       composerSamples,
-      scenePass === 'render' ? 'depth-renderbuffer' : 'none',
+      scenePass === 'render' ? 'depth32ui-texture' : 'none',
     ),
   ];
   if (!singleComposerBuffer) {
@@ -161,7 +161,7 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
         1,
         'rgba16f',
         composerSamples,
-        scenePass === 'render' ? 'depth-renderbuffer' : 'none',
+        scenePass === 'render' ? 'depth32ui-texture' : 'none',
       ),
     );
   }
@@ -261,7 +261,10 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
     supportsDynamicResolution,
     composerSamples,
     resolveCount: composerSamples > 0 ? 1 + Number(useScreenFx) + Number(useSmaa) : 0,
-    renderTargets,
+    renderTargets: [
+      ...renderTargets,
+      target('vfx-opaque-copy', 1, 'rgba16f', 0, 'depth32ui-texture'),
+    ],
     fullscreenStages,
   };
 }

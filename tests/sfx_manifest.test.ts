@@ -164,14 +164,21 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the merged catalog, all 34 mount cues, and all 92 UI cues in one 319-key inventory', () => {
+  it('keeps release mount/UI cues and Warrior recordings in one 381-key inventory', () => {
     // Combine the release farming/crafting cues with the candidate mount cues.
-    // Counts measured from SFX: 319 total, 92 UI, 34 mount. A mount may share
+    // Release inventory: 319 total, 92 UI, 34 mount. A mount may share
     // player footfalls or have several cues, so this is not a mount count.
     // 319 = the 299-key release inventory plus the 20 player-selectable aura
     // proc alerts (src/game/aura_cue_catalog.ts), which are all ui_aura_ keys.
+    // 381 adds 61 Warrior cues and one existing Warrior cold-contact fallback.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(319);
+    expect(keys.size).toBe(381);
+    expect([...keys].filter((key) => key.includes('_warrior_'))).toHaveLength(60);
+    expect([...keys].filter((key) => key.includes('_masterwork_'))).toEqual([
+      'impact_masterwork_execution',
+    ]);
+    expect([...keys].filter((key) => key.startsWith('signature_'))).toHaveLength(0);
+    expect(keys.has('piercing_howl')).toBe(true);
     expect([...keys].filter((key) => key.startsWith('ui_aura_'))).toHaveLength(20);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(92);
     expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(34);
@@ -267,7 +274,8 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(319);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(381);
+    expect([...SFX_FIXED_CATALOG_KEYS].sort()).toEqual([...keys].sort());
   });
 });
 

@@ -32,7 +32,7 @@ const mediumInput: PostPlanInput = {
 };
 
 describe('post pipeline plan', () => {
-  it('pins the insane chain to eighteen targets and twenty-one fullscreen stages', () => {
+  it('pins the insane chain including its potential lazy capture target', () => {
     const plan = postPipelinePlan(insaneInput);
 
     expect(plan.scene).toEqual({
@@ -44,7 +44,7 @@ describe('post pipeline plan', () => {
     expect(plan.singleComposerBuffer).toBe(false);
     expect(plan.supportsDynamicResolution).toBe(false);
     expect(plan.resolveCount).toBe(0);
-    expect(plan.renderTargets).toHaveLength(18);
+    expect(plan.renderTargets).toHaveLength(19);
     expect(plan.fullscreenStages).toHaveLength(21);
     expect(plan.fullscreenStages.map((stage) => stage.id)).toEqual([
       'n8ao-evaluate',
@@ -112,7 +112,16 @@ describe('post pipeline plan', () => {
       { id: 'smaa-weights', scale: 1, format: 'rgba8', samples: 0, depth: 'none' },
     ];
 
-    expect(plan.renderTargets).toEqual(expected);
+    expect(plan.renderTargets).toEqual([
+      ...expected,
+      {
+        id: 'vfx-opaque-copy',
+        scale: 1,
+        format: 'rgba16f',
+        samples: 0,
+        depth: 'depth32ui-texture',
+      },
+    ]);
   });
 
   it('pins distinct bloom-bright ownership and every intentional multi-writer target', () => {
@@ -186,7 +195,14 @@ describe('post pipeline plan', () => {
         scale: 1,
         format: 'rgba16f',
         samples: 0,
-        depth: 'depth-renderbuffer',
+        depth: 'depth32ui-texture',
+      },
+      {
+        id: 'vfx-opaque-copy',
+        scale: 1,
+        format: 'rgba16f',
+        samples: 0,
+        depth: 'depth32ui-texture',
       },
     ]);
     expect(plan.fullscreenStages).toEqual([
@@ -259,7 +275,7 @@ describe('post pipeline plan', () => {
       samples: 0,
       depth: 'none',
     });
-    expect(plan.renderTargets).toHaveLength(19);
+    expect(plan.renderTargets).toHaveLength(20);
     expect(plan.fullscreenStages).toHaveLength(22);
     expect(plan.resolveCount).toBe(0);
   });
