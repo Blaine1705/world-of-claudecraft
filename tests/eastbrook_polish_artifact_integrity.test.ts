@@ -1,5 +1,8 @@
 // Warrior release-44 renderer integration: reminted runtime provenance through
 // the owning script. Eastbrook geometry, assets and original captures unchanged.
+// PR 4139 review-fix round: reminted again after the renderer.ts encoding repair,
+// the Fiesta shake extraction and the endDraw matrix refresh (renderer.ts is a
+// hashed runtime input). Geometry, assets and original captures still unchanged.
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -1384,7 +1387,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  '51be6f3532028d11c678a6f1593ac528829140bb5d1ae45084d1df57e44cebb4';
+  '5bd66cd9205d9d0afb9bf634720c3c812a94c4bb72df4985c703537ca083f895';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1395,7 +1398,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  'd85f5d6f84948635bf78a733a27e9be7b4232cd1f61e2015ab70591b2f2eff4c';
+  '43499bb2cd345731c2b6259af113fe31936909ef75be6a36916a42c66f04a631';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2770,7 +2773,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // again over the re-swept evidence. No capture was retaken.
       // Frame Rate Limit: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-    ).toBe('87351bfc79ec4bdf6e9fbc31f56d001d5a0e3815e89536b9048f50901f7b87ba');
+    ).toBe('18f0b449bb4e9c11f71756e90624427493761cc59f51864e68f01226aea72420');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
