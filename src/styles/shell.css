@@ -2697,22 +2697,20 @@
     font-variant: small-caps;
     letter-spacing: 0.04em;
   }
+  /* Inline flow (name, then the countdown) rather than a two-column row: the
+     roster's text column is narrow, so a right-aligned timer left most of a
+     wrapped raid name's lines empty. */
   .char-row .char-lockout-item {
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-    padding-left: 6px;
+    display: block;
+    padding-left: 12px;
+    text-indent: -6px;
   }
   .char-row .char-lockout-item::before {
     content: "\00b7";
+    margin-right: 3px;
     opacity: 0.6;
   }
-  .char-row .char-lockout-name {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
   .char-row .char-lockout-time {
-    flex: 0 0 auto;
     white-space: nowrap;
     color: var(--color-warning);
   }
@@ -3441,6 +3439,12 @@
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-name {
       overflow-wrap: anywhere;
+    }
+    /* The grid track (minmax(0, 1fr)) is the text column's true width: the
+       flex layout's 150px floor overflowed it under the action buttons, which
+       only showed once the lockout rows right-aligned their countdowns. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-id {
+      min-width: 0;
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions {
       display: grid;
