@@ -19,6 +19,7 @@ function plan(): HoardTideVisualPlan {
     rightStart: 0,
     rightWidth: 0,
     gap: 0,
+    solid: false,
     depth: 0,
     height: 0,
     leadProgress: 0,

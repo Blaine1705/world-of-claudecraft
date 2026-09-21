@@ -5,10 +5,14 @@
 // nothing outlives the fight. Counts, clocks, hitboxes and the escape check are
 // pure and shared with the renderer (hoard_tentacles_core.ts).
 //
+// A tentacle STANDS UNTIL IT IS KILLED: there is no waiting one out. So, unlike
+// every other hoard mechanic, its cues are exempt from the boss engine's busy
+// gate (hoard_boss.ts): his Crashing Tide keeps coming while they stand, and the
+// party has to choose what to deal with.
+//
 // State rides HoardBossState.tentacles; what the client needs rides ordinary
-// hoard cues (the variants are listed in the core). Every tentacle cue is a
-// SWEEP, so the boss engine's busy gate holds his Crashing Tide back while a
-// tentacle stands: the floor asks one thing of the party at a time. Draws no rng.
+// hoard cues (the variants are listed in the core). Its grasp is its own module
+// (hoard_tentacle_grasp.ts). Draws no rng.
 
 import { MOBS } from '../data';
 import { createMob } from '../entity';
@@ -22,9 +26,19 @@ import {
   hoardPressure,
 } from './hoard_scaling';
 import {
+  beginGrasp,
+  HOARD_TENTACLE_GRASP_AURA_ID,
+  isHeldByTentacle,
+  releaseGrasp,
+  type TentacleGrasp,
+  tickGrasp,
+} from './hoard_tentacle_grasp';
+import {
+  grabReaches,
   HOARD_TENTACLE_TEMPLATE,
   hasEscape,
   isTentacleVariant,
+  maxGrabbed,
   pointInWhip,
   SWEEP_TOTAL_SEC,
   sweepPasses,
@@ -46,14 +60,14 @@ export const HOARD_TENTACLES_ABILITY = 'Tentacles of the Abyss';
 export const HOARD_TENTACLE_WHIP_ABILITY = 'Abyssal Lash';
 export const HOARD_TENTACLE_SWEEP_ABILITY = 'Drowning Sweep';
 
-/** Cadence, counted from when the last set is gone. The hoard's rarity presses
+/** Cadence, counted from when the last of a set is KILLED. The hoard's rarity presses
  *  it like every other boss's clock. */
 export const TENTACLES_FIRST_SEC = 16;
-export const TENTACLES_EVERY_SEC = 26;
+export const TENTACLES_EVERY_SEC = 20;
 
 interface LiveAttack {
   cueId: number;
-  kind: TentacleAttack;
+  kind: 'whip' | 'sweep';
   facing: number;
   direction: 1 | -1;
   struck: boolean;
@@ -72,6 +86,9 @@ interface Tentacle {
   attackTimer: number;
   attacks: number;
   attack: LiveAttack | null;
+  grasp: TentacleGrasp | null;
+  /** Ticks until its standing cue is next re-sent. */
+  heartbeat: number;
 }
 
 export interface HoardTentacleState {
@@ -157,6 +174,8 @@ function rise(
       attackTimer: TENTACLES.firstAttackSec + index * TENTACLES.doubleStaggerSec,
       attacks: 0,
       attack: null,
+      grasp: null,
+      heartbeat: 0,
     });
   }
   ctx.emit({
@@ -263,6 +282,7 @@ function fall(
   emit: Emit,
 ): void {
   tentacle.falling = true;
+  releaseGrasp(ctx, inst, state, tentacle, emit);
   const attack = tentacle.attack;
   if (attack && !attack.struck) {
     const cue = findCue(state, attack.cueId);
@@ -301,6 +321,8 @@ function nearest(tentacle: Tentacle, living: readonly Entity[]): Entity | undefi
   let bestD = Number.POSITIVE_INFINITY;
   // `living` is id-sorted (instancePlayers sorts): a tie goes to the lower id.
   for (const player of living) {
+    // A held player is lifted clear: nothing else is aimed at them.
+    if (isHeldByTentacle(player)) continue;
     const d = Math.hypot(player.pos.x - tentacle.x, player.pos.z - tentacle.z);
     if (d < bestD) {
       bestD = d;
@@ -329,19 +351,42 @@ function beginAttack(
     if (other.attack && findCue(state, other.attack.cueId))
       live.push({ tentacle: other, attack: other.attack });
   }
-  const double = hoardIntensity(inst.vault, living.length) >= HOARD_DOUBLE_MECHANIC_INTENSITY;
-  if (live.length >= (double ? 2 : 1)) return false;
-  if (live.length === 1 && held.stagger > 0) return false;
-  let kind = tentacleAttackKind(tentacle.index, tentacle.attacks);
-  // A double pattern is one of each, never two of the same.
-  if (live.length === 1) kind = live[0].attack.kind === 'whip' ? 'sweep' : 'whip';
-  // A sweep with nobody near is a wasted turn: it lashes out instead (unless the
-  // double rule forbids it, in which case it waits).
-  if (kind === 'sweep' && range > TENTACLES.sweepRadius + 1.5) {
-    if (live.length === 1) return false;
-    kind = 'whip';
+  // A grasp under way counts as a live attack of its own kind.
+  let grasping = 0;
+  let holding = 0;
+  for (const other of held.tentacles) {
+    if (!other.grasp) continue;
+    grasping++;
+    if (other.grasp.holding) holding++;
   }
-  if (kind === 'whip' && range > TENTACLES.whipLength + 3) return false;
+  const double = hoardIntensity(inst.vault, living.length) >= HOARD_DOUBLE_MECHANIC_INTENSITY;
+  if (live.length + grasping >= (double ? 2 : 1)) return false;
+  if (live.length + grasping === 1 && held.stagger > 0) return false;
+  const taken: TentacleAttack | null = grasping > 0 ? 'grab' : (live[0]?.attack.kind ?? null);
+  // Its own turn first, then the rest of its cycle: the first one that is not
+  // already being made by another (two together are never the same) and that has
+  // someone to hit.
+  let kind: TentacleAttack | null = null;
+  for (let step = 0; step < 3 && kind === null; step++) {
+    const want = tentacleAttackKind(tentacle.index, tentacle.attacks + step);
+    if (want === taken) continue;
+    if (want === 'whip' && range > TENTACLES.whipLength + 3) continue;
+    if (want === 'sweep' && range > TENTACLES.sweepRadius + 1.5) continue;
+    if (
+      want === 'grab' &&
+      (holding >= maxGrabbed(living.length) ||
+        !grabReaches(tentacle.x, tentacle.z, target.pos.x, target.pos.z))
+    )
+      continue;
+    kind = want;
+  }
+  if (kind === null) return false;
+  if (kind === 'grab') {
+    beginGrasp(ctx, inst, boss, state, tentacle, target, emit);
+    tentacle.attacks++;
+    held.stagger = TENTACLES.doubleStaggerSec;
+    return true;
+  }
   const facing = Math.atan2(target.pos.x - tentacle.x, target.pos.z - tentacle.z);
   const attack: LiveAttack = {
     cueId: -1,
@@ -357,6 +402,8 @@ function beginAttack(
   const telegraphs = live.map((entry) => telegraphOf(entry.tentacle, entry.attack));
   telegraphs.push(telegraphOf(tentacle, attack));
   for (const player of living) {
+    // (A held player is lifted clear of the floor: no telegraph concerns them.)
+    if (isHeldByTentacle(player)) continue;
     if (!hasEscape(player.pos.x, player.pos.z, telegraphs)) return false;
   }
   const total = kind === 'whip' ? WHIP_TOTAL_SEC : SWEEP_TOTAL_SEC;
@@ -397,7 +444,7 @@ function strike(
   boss: Entity,
   tentacle: Tentacle,
   player: Entity,
-  kind: TentacleAttack,
+  kind: 'whip' | 'sweep',
 ): void {
   ctx.dealDamage(
     boss,
@@ -454,6 +501,7 @@ function tickAttack(
       sourceId: boss.id,
     });
     for (const player of living) {
+      if (isHeldByTentacle(player)) continue;
       if (pointInWhip(tentacle.x, tentacle.z, attack.facing, player.pos.x, player.pos.z))
         strike(ctx, inst, boss, tentacle, player, 'whip');
     }
@@ -462,7 +510,7 @@ function tickAttack(
   const progress = sweepProgress(elapsed);
   if (progress <= attack.progress) return;
   for (const player of living) {
-    if (attack.hit.has(player.id)) continue;
+    if (attack.hit.has(player.id) || isHeldByTentacle(player)) continue;
     if (
       !sweepPasses(
         tentacle.x,
@@ -527,18 +575,36 @@ export function tickHoardTentacles(
       fall(ctx, inst, boss, state, tentacle, true, emit);
       continue;
     }
-    tickAttack(ctx, inst, boss, state, tentacle, living);
-    if (cue.remaining <= DT + 1e-8) {
-      // Left standing too long: it goes back under on its own. No attack can
-      // still be live (none may begin that late); if one ever were, it goes too.
-      fall(ctx, inst, boss, state, tentacle, false, emit);
+    // It stands until it is KILLED. Its rise cue becomes the standing cue, which
+    // is a heartbeat: never allowed to run out here, re-sent every so often so a
+    // client that joins late (or whose mirror lapsed) still sees it.
+    if (cue.kind === 'sweep') {
+      if (cue.variant === 'tide-tentacle' && cue.remaining <= DT + 1e-8) {
+        cue.variant = 'tide-tentacle-up';
+        tentacle.heartbeat = 0;
+      }
+      if (cue.variant === 'tide-tentacle-up') {
+        cue.remaining = TENTACLES.upLifeSec;
+        cue.total = TENTACLES.upLifeSec;
+        if (tentacle.heartbeat <= 0) {
+          tentacle.heartbeat = TENTACLES.upHeartbeatTicks;
+          emit(ctx, inst, cue);
+        }
+        tentacle.heartbeat--;
+      }
+    }
+    if (tentacle.grasp) {
+      let holding = 0;
+      for (const other of held.tentacles) if (other.grasp?.holding) holding++;
+      if (tickGrasp(ctx, inst, boss, state, tentacle, holding, maxGrabbed(living.length), emit))
+        continue;
+      tentacle.attackTimer = interval;
       continue;
     }
+    tickAttack(ctx, inst, boss, state, tentacle, living);
     if (tentacle.attack) continue;
     tentacle.attackTimer -= DT;
     if (tentacle.attackTimer > 0) continue;
-    // No new attack it could not finish before it goes under.
-    if (cue.remaining < SWEEP_TOTAL_SEC + 0.5) continue;
     tentacle.attackTimer = beginAttack(ctx, inst, boss, state, held, tentacle, living, emit)
       ? interval
       : TENTACLES.retrySec;
@@ -561,6 +627,15 @@ export function clearHoardTentacles(
   state: HoardBossState,
 ): void {
   const held = state.tentacles;
-  if (held) for (const tentacle of held.tentacles) dropTentacleEntity(ctx, inst, boss, tentacle);
+  if (held) {
+    for (const tentacle of held.tentacles) {
+      // (The cues already went: only the hold itself is left to take off.)
+      const victim = tentacle.grasp ? ctx.entities.get(tentacle.grasp.victimId) : undefined;
+      if (victim)
+        victim.auras = victim.auras.filter((aura) => aura.id !== HOARD_TENTACLE_GRASP_AURA_ID);
+      tentacle.grasp = null;
+      dropTentacleEntity(ctx, inst, boss, tentacle);
+    }
+  }
   delete state.tentacles;
 }

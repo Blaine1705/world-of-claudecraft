@@ -58,9 +58,12 @@ whoever the blow itself crushed is spared its own ring.
 ring so they are never side by side, and different for every blow. The painter
 builds its ring with `writeRingMask`, which is the sim's own `forgeBearingInGap`
 sampled per column, so the fire is lit exactly where it burns and open exactly
-where it is safe (`tests/hoard_forge_hammer_render.test.ts` pins both ways). The
-door lanes are drawn on the floor from the first of the MARKER, before any fire
-exists.
+where it is safe (`tests/hoard_forge_hammer_render.test.ts` pins both ways). Each
+door is also marked by a short, warm gate (`doorReach` long) that TRAVELS WITH
+THE RING and fades out ahead of it, from the first of the MARKER, before any fire
+exists: the way through is marked where it matters and the rest of the floor
+stays clean. (An earlier version painted pale blue lanes the whole length of the
+room; in the forge they read as a hazard of their own.)
 
 Fairness is pinned, not hoped for: `ringSpeed` is under a player's run, and
 `tests/hoard_forge_hammer.test.ts` walks every radius and bearing of the ring's

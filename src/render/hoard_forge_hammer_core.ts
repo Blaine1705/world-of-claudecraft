@@ -18,7 +18,10 @@ export const FORGE_HAMMER_LOOK = Object.freeze({
   molten: 0xff6a14,
   fire: 0xff8a2a,
   fireHot: 0xffd27a,
-  door: 0x7fd8ff,
+  /** Warm and pale: it belongs to the forge, and never reads as a hazard of its own. */
+  door: 0xffe2a0,
+  /** How far ahead of the ring a door's gate reaches before it has faded out. */
+  doorReach: 7,
   shadow: 0x050302,
   scorch: 0x0c0604,
   /** How high above the floor the hammer is when it first comes into view. */

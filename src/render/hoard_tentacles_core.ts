@@ -70,12 +70,16 @@ export interface TentacleInput {
   elapsed: number;
   /** Its resting heading (the cue's facing: toward the boss). */
   facing: number;
-  /** A live attack: 0 none, 1 whip, 2 sweep; its cue's elapsed seconds, the
-   *  facing it was aimed along, and which way a sweep turns. */
-  attack: 0 | 1 | 2;
+  /** A live attack: 0 none, 1 whip, 2 sweep, 3 grasp; its cue's elapsed seconds,
+   *  the facing it was aimed along, and which way a sweep turns. */
+  attack: 0 | 1 | 2 | 3;
   attackElapsed: number;
   attackFacing: number;
   direction: number;
+  /** A grasp: how far away whoever it reaches for (or holds) is, and whether it
+   *  has closed on them yet. */
+  reachDistance: number;
+  holding: boolean;
   /** The `tide-tentacle-fall` cue's elapsed seconds (-1 while it stands), and
    *  whether it was killed (it thrashes and drops) or only left (it withdraws). */
   fall: number;
@@ -95,6 +99,9 @@ export interface TentaclePose {
   rear: number;
   slam: number;
   low: number;
+  /** A grasp: how far it has reached out (0 to 1), and how hard it has closed. */
+  reach: number;
+  clench: number;
   /** 1 on the frame the lash lands, decaying: the splash and the shake. */
   impact: number;
   /** How far the death has dissolved it, tip first (0 whole, 1 gone). */
@@ -112,6 +119,8 @@ export function makeTentaclePose(): TentaclePose {
     rear: 0,
     slam: 0,
     low: 0,
+    reach: 0,
+    clench: 0,
     impact: 0,
     dissolve: 0,
     warning: 0,
@@ -131,6 +140,8 @@ export function tentaclePose(input: TentacleInput, out: TentaclePose): TentacleP
   out.rear = 0;
   out.slam = 0;
   out.low = 0;
+  out.reach = 0;
+  out.clench = 0;
   out.impact = 0;
   out.dissolve = 0;
   if (falling) {
@@ -183,8 +194,41 @@ export function tentaclePose(input: TentacleInput, out: TentaclePose): TentacleP
       out.heading = shortestArc(input.attackFacing, input.facing, back);
     }
     out.stretch = 1 - 0.17 * out.low;
+  } else if (input.attack === 3) {
+    const a = input.attackElapsed;
+    out.heading = shortestArc(input.facing, input.attackFacing, smooth(a / 0.5));
+    if (input.holding) {
+      out.reach = 1;
+      out.clench = smooth(a / 0.3);
+    } else {
+      // It arches out over them and hangs there, then comes down as it closes.
+      out.reach = 0.85 * smooth(a / (TENTACLES.grabTelegraphSec * 0.7));
+      out.clench = 0;
+    }
+    // Stretched (or drawn in) so its end is over whoever it wants.
+    const solved = reachStretch(input.reachDistance, out.clench);
+    out.stretch = 1 + (solved - 1) * out.reach;
   }
   return out;
+}
+
+/** The pitch of a grasp: arched out over them, its end coming DOWN on them the
+ *  harder it has closed. */
+function reachPitch(s: number, clench: number): number {
+  return (HALF_PI + 0.1 + 0.5 * clench) * smooth(s / 0.5);
+}
+
+/** How far the chain must stretch for a grasp's end to be `distance` away. The
+ *  horizontal run of a pose is linear in its stretch, so this is one division. */
+export function reachStretch(distance: number, clench: number): number {
+  const links = TENTACLE_LOOK.links;
+  let run = 0;
+  for (let link = 0; link < links; link++) {
+    run += Math.sin(Math.min(HALF_PI, reachPitch((link + 0.5) / links, clench)));
+  }
+  const perUnit = (run * TENTACLE_LOOK.length) / links;
+  const wanted = Math.max(0.5, distance - TENTACLE_LOOK.tipLength * TENTACLE_LOOK.tipRadius * 0.5);
+  return Math.max(0.3, Math.min(1.6, wanted / perUnit));
 }
 
 /** How hard the arm is turning (0 to 1) `elapsed` seconds into a sweep cue: the
@@ -224,7 +268,7 @@ export function writeTentacleChain(
   const links = TENTACLE_LOOK.links;
   const swaying = input.still ? 0 : 1;
   const phase = input.index * 1.93;
-  const calm = 1 - Math.max(pose.rear, pose.slam, pose.low);
+  const calm = 1 - Math.max(pose.rear, pose.slam, pose.low, pose.reach);
   const lag = input.attack === 2 ? sweepSpeed(input.attackElapsed) : 0;
   const falling = input.fall >= 0 && input.killed;
   const thrash =
@@ -242,7 +286,8 @@ export function writeTentacleChain(
       idlePitch(s) * calm +
       rearPitch(s) * pose.rear +
       flatPitch(s, 0.24, 0.5) * pose.slam +
-      flatPitch(s, 0.3, 0.2) * pose.low;
+      flatPitch(s, 0.3, 0.2) * pose.low +
+      reachPitch(s, pose.clench) * pose.reach;
     let heading = pose.heading;
     if (swaying) {
       pitch += calm * 0.12 * Math.sin(input.time * 1.3 + s * 2.6 + phase);

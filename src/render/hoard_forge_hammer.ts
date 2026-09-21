@@ -510,16 +510,16 @@ export class HoardForgeHammerFx {
     if (rig.maskFor !== rig.cueId) {
       rig.maskFor = rig.cueId;
       writeRingMask(rig.cueId, rig.mask);
-      this.writeDoors(rig);
     }
     const burning = pose.ring > 0.01 && pose.ringRadius > FORGE_HAMMER.ringSafeRadius * 0.6;
     rig.band.mesh.visible = burning;
     rig.wall.mesh.visible = burning;
     if (burning) this.writeRing(rig, pose, still);
     const doorsShown = pose.doors > 0.01;
+    if (doorsShown) this.writeDoors(rig, pose.ringRadius);
     for (let d = 0; d < rig.doors.length; d++) {
       rig.doors[d].mesh.visible = doorsShown;
-      if (doorsShown) rig.doors[d].material.uniforms.gain.value = 0.62 * pose.doors;
+      if (doorsShown) rig.doors[d].material.uniforms.gain.value = 0.45 * pose.doors;
     }
   }
 
@@ -573,11 +573,14 @@ export class HoardForgeHammerFx {
     }
   }
 
-  /** The doors: pale lanes out from the blow along each gap, shown from the first
-   *  of the marker, so where to stand is known before the fire exists. Written
-   *  once per strike. */
-  private writeDoors(rig: StrikeRig): void {
+  /** The doors: a short warm gate in each gap that TRAVELS WITH THE RING, fading
+   *  out ahead of it, so the way through is marked where it matters and the rest
+   *  of the floor stays clean. Through the marker it sits at the blow's edge: where
+   *  to head is known before the fire exists. Written every frame it shows. */
+  private writeDoors(rig: StrikeRig, ringRadius: number): void {
     const y = rig.ground + 0.07;
+    const from = Math.max(FORGE_HAMMER.ringSafeRadius, ringRadius - 0.6);
+    const to = Math.min(FORGE_HAMMER.ringMaxRadius, from + LOOK.doorReach);
     for (let d = 0; d < rig.doors.length; d++) {
       const door = rig.doors[d];
       const middle = forgeGapAngle(rig.cueId, d);
@@ -585,12 +588,10 @@ export class HoardForgeHammerFx {
       const b = middle + FORGE_HAMMER.gapHalfAngle;
       for (let row = 0; row <= DOOR_SEGMENTS; row++) {
         const t = row / DOOR_SEGMENTS;
-        const r =
-          FORGE_HAMMER.ringSafeRadius +
-          (FORGE_HAMMER.ringMaxRadius - FORGE_HAMMER.ringSafeRadius) * t;
+        const r = from + (to - from) * t;
         door.position.setXYZ(row * 2, rig.x + Math.sin(a) * r, y, rig.z + Math.cos(a) * r);
         door.position.setXYZ(row * 2 + 1, rig.x + Math.sin(b) * r, y, rig.z + Math.cos(b) * r);
-        const fade = 0.9 - 0.6 * t;
+        const fade = (1 - t) * (1 - t);
         door.alpha.setX(row * 2, fade);
         door.alpha.setX(row * 2 + 1, fade);
       }

@@ -22,6 +22,8 @@ export interface HoardTideVisualPlan {
   rightStart: number;
   rightWidth: number;
   gap: number;
+  /** The gap lies outside the lane: one solid crest, and no gap rails to draw. */
+  solid: boolean;
   depth: number;
   height: number;
   leadProgress: number;
@@ -47,9 +49,12 @@ export function hoardTideVisualPlanInto(out: HoardTideVisualPlan, cue: HoardTide
   const age = Math.max(0, cue.total - cue.remaining);
   const span = cue.waveSpan ?? HOARD_TIDE_WAVE_HALF_SPAN;
   out.gap = cue.waveGap ?? 0;
+  out.solid = Math.abs(out.gap) - HOARD_TIDE_WAVE_HALF_GAP >= span;
   out.leftStart = -span;
-  out.leftWidth = Math.max(0, out.gap - HOARD_TIDE_WAVE_HALF_GAP + span);
-  out.rightStart = out.gap + HOARD_TIDE_WAVE_HALF_GAP;
+  // Clamped to the lane: a gap laid outside the span (a SOLID lane) draws one
+  // full-width crest and nothing beyond it.
+  out.leftWidth = Math.max(0, Math.min(span * 2, out.gap - HOARD_TIDE_WAVE_HALF_GAP + span));
+  out.rightStart = Math.min(span, out.gap + HOARD_TIDE_WAVE_HALF_GAP);
   out.rightWidth = Math.max(0, span - out.rightStart);
   out.center = hoardTideWaveCenter(cue.radius, cue.remaining, cue.total, lead);
   out.depth = HOARD_TIDE_WAVE_HALF_DEPTH * 2;
@@ -66,7 +71,8 @@ export function hoardTideVisualPlanInto(out: HoardTideVisualPlan, cue: HoardTide
 /** Stable pooled spray placement never enters the actionable calm corridor. */
 export function hoardTideSprayLateral(index: number, plan: HoardTideVisualPlan): number {
   const fraction = ((index * 0.61803398875) % 1) * 0.92 + 0.04;
-  return index % 2 === 0
+  // A solid lane has one side only: all of its spray rides that one crest.
+  return index % 2 === 0 || plan.rightWidth <= 0
     ? plan.leftStart + fraction * plan.leftWidth
     : plan.rightStart + fraction * plan.rightWidth;
 }

@@ -58,6 +58,7 @@ import {
   tickHoardStormStaticCue,
 } from './hoard_storm_static';
 import { clearHoardStormSurge, tickHoardStormSurge } from './hoard_storm_surge';
+import { isHeldByTentacle } from './hoard_tentacle_grasp';
 import {
   clearHoardTentacles,
   isTentacleCue,
@@ -108,7 +109,7 @@ const BRUTE_COMBO_EVERY_SEC = 11;
 const ARCANE_EVERY_SEC = 8;
 const STORM_FIRST_SEC = 2;
 const STORM_EVERY_SEC = 11;
-const TIDE_WAVE_EVERY_SEC = 10;
+const TIDE_WAVE_EVERY_SEC = 6;
 const BONE_WAVE_THRESHOLDS = [0.7, 0.35] as const;
 
 const EMBER_SWEEP: HoardSweepSpec = {
@@ -525,7 +526,10 @@ function tickSpecialKit(
     return;
   }
   if (kit === 'tide') {
-    const wavesClear = state.sequenceStep === 0 && !state.cues.some((cue) => cue.kind === 'sweep');
+    // His tentacles stand until they are killed: they never count as his waves.
+    const wavesClear =
+      state.sequenceStep === 0 &&
+      !state.cues.some((cue) => cue.kind === 'sweep' && !isTentacleCue(cue));
     if (!state.specialTriggered && hpFraction <= HOARD_TOTEM_TRIGGER_HP && wavesClear) {
       spawnHealingTideTotem(ctx, inst, boss, state);
     }
@@ -557,6 +561,8 @@ function hitPlayersInTideWave(
     if (
       player.dead ||
       cue.hitIds.has(player.id) ||
+      // Held aloft by a tentacle: the wave passes beneath them.
+      isHeldByTentacle(player) ||
       !pointInHoardTideWave(
         cue,
         cue.facing,
@@ -1107,7 +1113,7 @@ function tickKit(
     return;
   }
   if (kit === 'tide') {
-    tickHoardTidePattern(ctx, inst, boss, state, emitCue);
+    tickHoardTidePattern(ctx, inst, boss, state, living, emitCue);
     return;
   }
   if (
@@ -1202,7 +1208,15 @@ export function tickHoardBossMechanics(ctx: SimContext): void {
     const state = inst.hoardBoss;
     tickCues(ctx, inst, boss, state);
     tickSpecialKit(ctx, inst, boss, state);
-    if (state.cues.some((cue) => cue.kind === 'sweep' || cue.phase === 'warning')) continue;
+    // The busy gate: one thing asked of the party at a time. His tentacles are the
+    // exception (hoard_tentacles.ts): they stand until killed, and his tide keeps
+    // coming while they do.
+    if (
+      state.cues.some(
+        (cue) => (cue.kind === 'sweep' || cue.phase === 'warning') && !isTentacleCue(cue),
+      )
+    )
+      continue;
     const sweepBefore = state.sweepTimer;
     const markBefore = state.markTimer;
     tickKit(ctx, inst, boss, state, kit);

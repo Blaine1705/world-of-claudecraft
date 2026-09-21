@@ -238,6 +238,41 @@ describe('the adapter', () => {
     fx.dispose();
   });
 
+  it('marks each door with a short warm gate that travels with the ring, inside the gap', async () => {
+    const scene = new THREE.Scene();
+    const fx = make(scene);
+    await fx.readyForEntry;
+    const reach = (elapsed: number) => {
+      fx.sync([strike(elapsed)]);
+      fx.update(0.016);
+      const door = named(scene, 'ForgeDoor').find((node) => node.visible) as THREE.Mesh;
+      const position = door.geometry.getAttribute('position');
+      const alpha = door.geometry.getAttribute('alpha');
+      const radius = (i: number) => Math.hypot(position.getX(i) - 10, position.getZ(i) + 20);
+      // Both edges of every row sit on the gap's own edges: inside it is safe.
+      for (let i = 0; i < position.count; i++) {
+        const bearing = Math.atan2(position.getX(i) - 10, position.getZ(i) + 20);
+        const inside = bearing + (i % 2 === 0 ? 0.01 : -0.01);
+        expect(forgeBearingInGap(5, inside)).toBe(true);
+      }
+      expect(alpha.getX(position.count - 1)).toBe(0);
+      return { from: radius(0), to: radius(position.count - 1) };
+    };
+    // Through the marker: at the edge of the blow, a few yards long, never the whole room.
+    const early = reach(0.8);
+    expect(early.from).toBeCloseTo(FORGE_HAMMER.ringSafeRadius, 3);
+    expect(early.to - early.from).toBeCloseTo(FORGE_HAMMER_LOOK.doorReach, 3);
+    // Later it has moved out with the fire.
+    const late = reach(WARN + 2);
+    expect(late.from).toBeCloseTo(forgeRingRadius(2) - 0.6, 3);
+    expect(late.to).toBeLessThanOrEqual(FORGE_HAMMER.ringMaxRadius + 1e-6);
+    // Warm, never the cold blue of a hazard from another room.
+    const tint = ((named(scene, 'ForgeDoor')[0] as THREE.Mesh).material as THREE.ShaderMaterial)
+      .uniforms.tint.value as THREE.Color;
+    expect(tint.r).toBeGreaterThan(tint.b);
+    fx.dispose();
+  });
+
   it('never reuses the last strike on a rig: a new run gets its own doors', async () => {
     const scene = new THREE.Scene();
     const fx = make(scene);

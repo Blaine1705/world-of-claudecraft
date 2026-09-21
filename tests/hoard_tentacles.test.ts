@@ -8,11 +8,17 @@ import {
   tickHoardBossMechanics,
 } from '../src/sim/rift/hoard_boss';
 import { HOARD_RARITY_PRESSURE } from '../src/sim/rift/hoard_scaling';
+import {
+  HOARD_TENTACLE_GRASP_AURA_ID,
+  isHeldByTentacle,
+} from '../src/sim/rift/hoard_tentacle_grasp';
 import { TENTACLES_EVERY_SEC } from '../src/sim/rift/hoard_tentacles';
 import {
+  grabReaches,
   HOARD_TENTACLE_TEMPLATE,
   hasEscape,
   isTentacleVariant,
+  maxGrabbed,
   pointInTelegraph,
   pointInWhip,
   SWEEP_TOTAL_SEC,
@@ -168,11 +174,28 @@ describe('the tentacle numbers (pure, shared with the renderer)', () => {
     }
   });
 
-  it('alternates each tentacle between its two attacks, neighbours out of step', () => {
+  it('cycles each tentacle through lash, sweep and grasp, neighbours out of step', () => {
     expect(tentacleAttackKind(0, 0)).toBe('whip');
     expect(tentacleAttackKind(0, 1)).toBe('sweep');
+    expect(tentacleAttackKind(0, 2)).toBe('grab');
+    expect(tentacleAttackKind(0, 3)).toBe('whip');
     expect(tentacleAttackKind(1, 0)).toBe('sweep');
-    expect(tentacleAttackKind(1, 1)).toBe('whip');
+    expect(tentacleAttackKind(2, 0)).toBe('grab');
+  });
+
+  it('never lets them hold the whole party, and reaches only so far', () => {
+    expect(maxGrabbed(1)).toBe(1); // alone they can still strike what holds them
+    expect(maxGrabbed(2)).toBe(1);
+    expect(maxGrabbed(4)).toBe(1);
+    expect(maxGrabbed(5)).toBe(2);
+    for (let living = 2; living <= 12; living++)
+      expect(living - maxGrabbed(living)).toBeGreaterThanOrEqual(maxGrabbed(living));
+    expect(grabReaches(0, 0, TENTACLES.grabRange - 0.1, 0)).toBe(true);
+    expect(grabReaches(0, 0, TENTACLES.grabRange + 0.1, 0)).toBe(false);
+    // A readable reach: time to run out of it from well inside.
+    expect(TENTACLES.grabTelegraphSec).toBeGreaterThanOrEqual(1.2);
+    // Held inside the ground its own sweep never touches.
+    expect(TENTACLES.grabHoldDistance).toBeLessThan(TENTACLES.sweepInnerRadius);
   });
 
   it('whips a rectangle out from the trunk along its facing, and nothing else', () => {
@@ -263,7 +286,15 @@ describe('the tentacle numbers (pure, shared with the renderer)', () => {
   });
 
   it('names its cue variants', () => {
-    for (const v of ['tide-tentacle', 'tide-tentacle-fall', 'tide-whip', 'tide-sweep'])
+    for (const v of [
+      'tide-tentacle',
+      'tide-tentacle-up',
+      'tide-tentacle-fall',
+      'tide-whip',
+      'tide-sweep',
+      'tide-grab',
+      'tide-grab-hold',
+    ])
       expect(isTentacleVariant(v)).toBe(true);
     expect(isTentacleVariant('tide-wave')).toBe(false);
     expect(isTentacleVariant(undefined)).toBe(false);
@@ -415,7 +446,11 @@ describe('the tentacles in the fight', () => {
     let most = 0;
     run(entry.sim, entry.boss, 16, () => {
       heal(entry)();
-      const live = cuesOf(entry.inst, 'tide-whip').length + cuesOf(entry.inst, 'tide-sweep').length;
+      const live =
+        cuesOf(entry.inst, 'tide-whip').length +
+        cuesOf(entry.inst, 'tide-sweep').length +
+        cuesOf(entry.inst, 'tide-grab').length +
+        cuesOf(entry.inst, 'tide-grab-hold').length;
       most = Math.max(most, live);
     });
     expect(most).toBe(1);
@@ -444,9 +479,10 @@ describe('the tentacles in the fight', () => {
       heal(entry)();
       const whips = cuesOf(entry.inst, 'tide-whip');
       const sweeps = cuesOf(entry.inst, 'tide-sweep');
-      most = Math.max(most, whips.length + sweeps.length);
-      if (whips.length > 1 || sweeps.length > 1) sameKind = true;
-      for (const cue of [...whips, ...sweeps]) {
+      const grabs = [...cuesOf(entry.inst, 'tide-grab'), ...cuesOf(entry.inst, 'tide-grab-hold')];
+      most = Math.max(most, whips.length + sweeps.length + grabs.length);
+      if (whips.length > 1 || sweeps.length > 1 || grabs.length > 1) sameKind = true;
+      for (const cue of [...whips, ...sweeps, ...grabs]) {
         if (seen.has(cue.cueId)) continue;
         seen.add(cue.cueId);
         starts.push(clock);
@@ -505,31 +541,46 @@ describe('the tentacles in the fight', () => {
     );
   });
 
-  it('goes back under on its own if nobody kills it', () => {
+  it('STANDS until it is killed: there is no waiting a tentacle out', () => {
     const entry = encounter();
     rise(entry);
-    const events = run(entry.sim, entry.boss, TENTACLE_TOTAL_SEC + SWEEP_TOTAL_SEC, heal(entry));
-    const falls = events.filter(
+    const events = run(entry.sim, entry.boss, 45, () => {
+      heal(entry)();
+      // Far from it: nothing to hit, nothing to grasp.
+      entry.sim.player.pos = { ...entry.boss.pos, x: entry.boss.pos.x + 2 };
+    });
+    expect(tentacleMobs(entry)).toHaveLength(1);
+    expect(held(entry).tentacles).toHaveLength(1);
+    expect(
+      events.some((e) => e.type === 'hoardBossCue' && e.variant === 'tide-tentacle-fall'),
+    ).toBe(false);
+    // Its standing cue is a heartbeat: re-sent again and again, never left to lapse.
+    const beats = events.filter(
       (e) =>
         e.type === 'hoardBossCue' &&
-        e.variant === 'tide-tentacle-fall' &&
+        e.variant === 'tide-tentacle-up' &&
         e.pid === entry.sim.player.id,
     );
-    expect(falls).toHaveLength(1);
-    expect(falls[0].type === 'hoardBossCue' && falls[0].halfAngle).toBe(0);
-    run(entry.sim, entry.boss, TENTACLES.retractSec + DT * 2, heal(entry));
-    expect(tentacleMobs(entry)).toHaveLength(0);
-    expect(held(entry).tentacles).toHaveLength(0);
+    expect(beats.length).toBeGreaterThan(40);
+    for (const beat of beats) {
+      if (beat.type !== 'hoardBossCue') continue;
+      expect(beat.durationSecs).toBeCloseTo(TENTACLES.upLifeSec, 9);
+      // Longer than the gap between beats, so a client never sees it blink out.
+      expect(beat.durationSecs).toBeGreaterThan(TENTACLES.upHeartbeatTicks * DT * 1.5);
+    }
+    expect(cuesOf(entry.inst, 'tide-tentacle-up')).toHaveLength(1);
   });
 
-  it('holds his waves back while a tentacle stands', () => {
+  it('his waves keep coming while tentacles stand', () => {
     const entry = encounter();
     rise(entry);
+    run(entry.sim, entry.boss, TENTACLE_TOTAL_SEC + 0.5, heal(entry));
     const state = entry.inst.hoardBoss;
     if (!state) throw new Error('missing state');
     state.sweepTimer = 0.1;
-    run(entry.sim, entry.boss, 3, heal(entry));
-    expect(cuesOf(entry.inst, 'tide-wave')).toHaveLength(0);
+    run(entry.sim, entry.boss, 1, heal(entry));
+    expect(cuesOf(entry.inst, 'tide-wave').length).toBeGreaterThan(0);
+    expect(tentacleMobs(entry)).toHaveLength(1);
   });
 
   it('leaves nothing behind when the fight resets', () => {
@@ -602,6 +653,155 @@ describe('the tentacles in the fight', () => {
     // No experience and no loot: it is a mechanic, never a kill to farm.
     expect(events.some((event) => event.type === 'xp' || event.type === 'loot')).toBe(false);
     expect(cuesOf(entry.inst, 'tide-tentacle-fall')).toHaveLength(1);
+  });
+
+  describe('the grasp', () => {
+    /** A risen tentacle whose next attack is its grasp, and a player in its reach. */
+    function reaching(allies = 0) {
+      const entry = encounter();
+      const friends = allies > 0 ? addAllies(entry, allies) : [];
+      rise(entry);
+      const trunk = cuesOf(entry.inst, 'tide-tentacle')[0];
+      const at = { x: trunk.x, z: trunk.z - 8 };
+      const place = () => {
+        heal(entry)();
+        if (!isHeldByTentacle(entry.sim.player))
+          entry.sim.player.pos = { ...entry.sim.player.pos, ...at };
+        // Friends wait well out of its reach, so it is the player it wants.
+        friends.forEach((friend, n) => {
+          friend.pos = { ...friend.pos, x: trunk.x + 30 + n * 3, z: trunk.z };
+        });
+      };
+      run(entry.sim, entry.boss, TENTACLES.spawnWarningSec + DT, place);
+      held(entry).tentacles[0].attacks = 2;
+      held(entry).tentacles[0].attackTimer = 0;
+      run(entry.sim, entry.boss, DT * 2, place);
+      const [grab] = cuesOf(entry.inst, 'tide-grab');
+      return { entry, friends, trunk, place, grab };
+    }
+
+    it('reaches for a player with a mark that rides THEM, then holds them by the trunk', () => {
+      const { entry, trunk, place, grab } = reaching();
+      expect(grab).toBeDefined();
+      expect(grab.targetId).toBe(entry.sim.player.id);
+      expect(grab.innerRadius).toBe(0);
+      expect(grab.total).toBeCloseTo(TENTACLES.grabTelegraphSec, 9);
+      expect(isHeldByTentacle(entry.sim.player)).toBe(false);
+      const events = run(entry.sim, entry.boss, TENTACLES.grabTelegraphSec + DT, place);
+      expect(isHeldByTentacle(entry.sim.player)).toBe(true);
+      const aura = entry.sim.player.auras.find((a) => a.id === HOARD_TENTACLE_GRASP_AURA_ID);
+      // A root, never a stun: a held player can still strike what holds them.
+      expect(aura?.kind).toBe('root');
+      expect(aura?.unbreakableControl).toBe(true);
+      const away = Math.hypot(entry.sim.player.pos.x - trunk.x, entry.sim.player.pos.z - trunk.z);
+      expect(away).toBeCloseTo(TENTACLES.grabHoldDistance, 3);
+      const [hold] = cuesOf(entry.inst, 'tide-grab-hold');
+      expect(hold.cueId).toBe(grab.cueId);
+      expect(hold.total).toBeCloseTo(TENTACLES.grabHoldSec, 9);
+      expect(events.some((e) => e.type === 'log' && /seizes a player/.test(e.text))).toBe(true);
+    });
+
+    it('closes on nothing if they ran out of its reach', () => {
+      const { entry, trunk, grab } = reaching();
+      expect(grab).toBeDefined();
+      run(entry.sim, entry.boss, TENTACLES.grabTelegraphSec + DT * 2, () => {
+        heal(entry)();
+        entry.sim.player.pos = { ...entry.sim.player.pos, x: trunk.x, z: trunk.z - 20 };
+      });
+      expect(isHeldByTentacle(entry.sim.player)).toBe(false);
+      expect(cuesOf(entry.inst, 'tide-grab-hold')).toHaveLength(0);
+      expect(held(entry).tentacles[0].grasp).toBeNull();
+    });
+
+    it('squeezes but never kills, and hurting it enough breaks its grip', () => {
+      const { entry } = reaching();
+      run(entry.sim, entry.boss, TENTACLES.grabTelegraphSec + DT);
+      expect(isHeldByTentacle(entry.sim.player)).toBe(true);
+      const hp = entry.sim.player.hp;
+      const events = run(entry.sim, entry.boss, TENTACLES.grabEverySec * 2 + DT);
+      const squeezes = events.filter(
+        (e) =>
+          e.type === 'damage' &&
+          e.ability === 'Crushing Coil' &&
+          e.targetId === entry.sim.player.id,
+      );
+      expect(squeezes).toHaveLength(2);
+      expect(entry.sim.player.hp).toBeLessThan(hp);
+      entry.sim.player.hp = 2;
+      run(entry.sim, entry.boss, TENTACLES.grabEverySec * 2);
+      expect(entry.sim.player.dead).toBe(false);
+      // Alone, the held player breaks it themselves.
+      const [mob] = tentacleMobs(entry);
+      mob.hp -= Math.ceil(mob.maxHp * TENTACLES.grabBreakFraction);
+      const freed = run(entry.sim, entry.boss, DT);
+      expect(isHeldByTentacle(entry.sim.player)).toBe(false);
+      expect(
+        freed.some(
+          (e) =>
+            e.type === 'hoardBossCue' && e.variant === 'tide-grab-hold' && e.durationSecs === 0,
+        ),
+      ).toBe(true);
+      expect(mob.dead).toBe(false);
+    });
+
+    it('tires of them in the end: a last squeeze, and it throws them clear', () => {
+      const { entry, trunk } = reaching();
+      run(entry.sim, entry.boss, TENTACLES.grabTelegraphSec + DT);
+      run(entry.sim, entry.boss, TENTACLES.grabHoldSec + DT, heal(entry));
+      expect(isHeldByTentacle(entry.sim.player)).toBe(false);
+      expect(entry.sim.player.dead).toBe(false);
+      expect(held(entry).tentacles[0].grasp).toBeNull();
+      // (applyKnockback moves them over the following ticks.)
+      run(entry.sim, entry.boss, 0.5, heal(entry));
+      expect(
+        Math.hypot(entry.sim.player.pos.x - trunk.x, entry.sim.player.pos.z - trunk.z),
+      ).toBeGreaterThanOrEqual(TENTACLES.grabHoldDistance - 1e-6);
+    });
+
+    it('killing the tentacle lets them go at once', () => {
+      const { entry } = reaching(1);
+      run(entry.sim, entry.boss, TENTACLES.grabTelegraphSec + DT);
+      expect(isHeldByTentacle(entry.sim.player)).toBe(true);
+      const [mob] = tentacleMobs(entry);
+      mob.hp = 0;
+      mob.dead = true;
+      run(entry.sim, entry.boss, DT);
+      expect(isHeldByTentacle(entry.sim.player)).toBe(false);
+      // (A withdrawn cue lingers at zero for the rest of the tick it was withdrawn.)
+      expect(cuesOf(entry.inst, 'tide-grab-hold').filter((c) => c.remaining > 0)).toHaveLength(0);
+    });
+
+    it('lifts them clear: his waves and the other tentacles pass them by', () => {
+      const { entry } = reaching();
+      run(entry.sim, entry.boss, TENTACLES.grabTelegraphSec + DT);
+      expect(isHeldByTentacle(entry.sim.player)).toBe(true);
+      const state = entry.inst.hoardBoss;
+      if (!state) throw new Error('missing state');
+      state.sweepTimer = 0;
+      const events = run(entry.sim, entry.boss, 5.5);
+      expect(
+        cuesOf(entry.inst, 'tide-wave').length +
+          events.filter((e) => e.type === 'hoardBossCue' && e.variant === 'tide-wave').length,
+      ).toBeGreaterThan(0);
+      expect(
+        events.some(
+          (e) =>
+            e.type === 'damage' &&
+            e.ability === 'Crashing Tide' &&
+            e.targetId === entry.sim.player.id,
+        ),
+      ).toBe(false);
+    });
+
+    it('never leaves anyone held when the fight resets', () => {
+      const { entry } = reaching(1);
+      run(entry.sim, entry.boss, TENTACLES.grabTelegraphSec + DT);
+      expect(isHeldByTentacle(entry.sim.player)).toBe(true);
+      entry.boss.aiState = 'idle';
+      tickHoardBossMechanics(entry.sim.ctx);
+      expect(entry.inst.hoardBoss).toBeUndefined();
+      expect(isHeldByTentacle(entry.sim.player)).toBe(false);
+    });
   });
 
   it('is the same fight for the same seed', () => {

@@ -15,6 +15,7 @@ import {
   LINK_STRIDE,
   linkBasis,
   makeTentaclePose,
+  reachStretch,
   sweepSpeed,
   sweepTelegraph,
   TENTACLE_LOOK,
@@ -48,6 +49,8 @@ function input(more: Partial<TentacleInput> = {}): TentacleInput {
     attackElapsed: 0,
     attackFacing: 0,
     direction: 1,
+    reachDistance: 0,
+    holding: false,
     fall: -1,
     killed: false,
     still: true,
@@ -207,6 +210,46 @@ describe('the tentacle pose (pure)', () => {
     ).toBe(0);
   });
 
+  it('reaches out over whoever it wants, wherever they stand, then closes down on them', () => {
+    const tipModel = TENTACLE_LOOK.tipLength * TENTACLE_LOOK.tipRadius;
+    for (const distance of [3, 6, 9, TENTACLES.grabRange]) {
+      const facing = 0.9;
+      const held = chainOf(
+        input({
+          attack: 3,
+          attackFacing: facing,
+          attackElapsed: 1,
+          reachDistance: distance,
+          holding: true,
+        }),
+      );
+      expect(held.pose.reach).toBe(1);
+      expect(held.pose.clench).toBeCloseTo(1, 6);
+      // Its end is ON them: along the line to them, at their distance, down low.
+      const along = held.tip[0] * Math.sin(facing) + held.tip[2] * Math.cos(facing);
+      expect(along + tipModel).toBeGreaterThan(distance - 1.6);
+      expect(along).toBeLessThan(distance + 1);
+      expect(held.tip[1]).toBeLessThan(2.6);
+    }
+    // While it only reaches, it hangs over them higher than once it has closed.
+    const reaching = chainOf(
+      input({
+        attack: 3,
+        attackFacing: 0.9,
+        attackElapsed: TENTACLES.grabTelegraphSec * 0.9,
+        reachDistance: 8,
+        holding: false,
+      }),
+    );
+    const closed = chainOf(
+      input({ attack: 3, attackFacing: 0.9, attackElapsed: 1, reachDistance: 8, holding: true }),
+    );
+    expect(reaching.pose.reach).toBeGreaterThan(0.6);
+    expect(reaching.pose.clench).toBe(0);
+    expect(reaching.tip[1]).toBeGreaterThan(closed.tip[1]);
+    expect(reachStretch(20, 1)).toBeGreaterThan(reachStretch(4, 1));
+  });
+
   it('keeps every link basis square and unit, belly inside the lean', () => {
     const axis = new Float32Array(3);
     const belly = new Float32Array(3);
@@ -266,8 +309,16 @@ function cue(partial: Partial<HoardBossCueView> & { variant: HoardBossCueView['v
   } as HoardBossCueView;
 }
 const CALM_OFF = () => false;
+/** Its rise cue while it is rising; once risen, its standing heartbeat cue. */
 const trunk = (elapsed: number, more: Partial<HoardBossCueView> = {}) =>
-  cue({ variant: 'tide-tentacle', remaining: TENTACLE_TOTAL_SEC - elapsed, ...more });
+  elapsed < TENTACLE_TOTAL_SEC
+    ? cue({ variant: 'tide-tentacle', remaining: TENTACLE_TOTAL_SEC - elapsed, ...more })
+    : cue({
+        variant: 'tide-tentacle-up',
+        total: TENTACLES.upLifeSec,
+        remaining: TENTACLES.upLifeSec,
+        ...more,
+      });
 const whip = (elapsed: number, more: Partial<HoardBossCueView> = {}) =>
   cue({
     variant: 'tide-whip',
@@ -441,6 +492,80 @@ describe('the adapter', () => {
       ).toBe(false);
       fx.dispose();
     }
+  });
+
+  it('stands on its heartbeat cue without ever replaying the rise', async () => {
+    const scene = new THREE.Scene();
+    const shakes: number[] = [];
+    const fx = make(scene, 'high', (n) => shakes.push(n));
+    await fx.readyForEntry;
+    // A client that joins late sees only the standing cue, its clock near zero.
+    fx.sync([trunk(STANDING)]);
+    fx.update(0.016);
+    expect(shown(scene, 'TentacleWarning')).toBe(0);
+    expect(instances(scene, 'TentacleChain_AbyssSkin')).toBe(LINKS);
+    // Every heartbeat restarts the cue: it must change nothing on screen.
+    const skin = named(scene, 'TentacleChain_AbyssSkin')[0] as THREE.InstancedMesh;
+    const before = new THREE.Matrix4();
+    skin.getMatrixAt(LINKS - 1, before);
+    fx.sync([trunk(STANDING, { remaining: TENTACLES.upLifeSec - 0.6 })]);
+    fx.update(0);
+    const after = new THREE.Matrix4();
+    skin.getMatrixAt(LINKS - 1, after);
+    expect(after.elements[13]).toBeCloseTo(before.elements[13], 6);
+    expect(instances(scene, 'TentacleChain_AbyssSkin')).toBe(LINKS);
+    fx.dispose();
+  });
+
+  it('marks whoever a grasp wants, and bends THAT tentacle of the set toward them', async () => {
+    const scene = new THREE.Scene();
+    const fx = make(scene);
+    await fx.readyForEntry;
+    const victim = { x: 10, z: -28 };
+    const grab = (variant: 'tide-grab' | 'tide-grab-hold', elapsed: number, total: number) =>
+      cue({
+        variant,
+        kind: 'mark',
+        cueId: 40,
+        ...victim,
+        radius: TENTACLES.grabRange,
+        innerRadius: 1,
+        targetId: 77,
+        total,
+        remaining: total - elapsed,
+      });
+    fx.sync([
+      trunk(STANDING, { cueId: 5, halfAngle: 0 }),
+      trunk(STANDING, { cueId: 6, x: 40, halfAngle: 1 }),
+      grab('tide-grab', 0.8, TENTACLES.grabTelegraphSec),
+    ]);
+    fx.update(0.016);
+    // One mark, under the victim, in the danger colour.
+    expect(shown(scene, 'TentacleWarning')).toBe(1);
+    const mark = named(scene, 'TentacleWarning').find((n) => n.visible) as THREE.Mesh;
+    expect(mark.position.x).toBe(victim.x);
+    expect(mark.position.z).toBe(victim.z);
+    // No lane and no sweep ring: a grasp is not a floor hazard.
+    expect(shown(scene, 'TentacleLane') + shown(scene, 'TentacleSweepRing')).toBe(0);
+    // Held: the mark stays on them, tighter.
+    const wide = mark.scale.x;
+    fx.sync([
+      trunk(STANDING, { cueId: 5, halfAngle: 0 }),
+      trunk(STANDING, { cueId: 6, x: 40, halfAngle: 1 }),
+      grab('tide-grab-hold', 1, TENTACLES.grabHoldSec),
+    ]);
+    fx.update(0.016);
+    expect(shown(scene, 'TentacleWarning')).toBe(1);
+    expect(
+      (named(scene, 'TentacleWarning').find((n) => n.visible) as THREE.Mesh).scale.x,
+    ).toBeLessThan(wide);
+    fx.sync([
+      trunk(STANDING, { cueId: 5, halfAngle: 0 }),
+      trunk(STANDING, { cueId: 6, x: 40, halfAngle: 1 }),
+    ]);
+    fx.update(0.016);
+    expect(shown(scene, 'TentacleWarning')).toBe(0);
+    fx.dispose();
   });
 
   it('plays the fall on the SAME rig when the cue becomes it, and clears after', async () => {

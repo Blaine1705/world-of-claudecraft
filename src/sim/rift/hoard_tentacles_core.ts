@@ -7,21 +7,29 @@
 // A tentacle is a real, attackable mob once it has erupted; what the client
 // needs rides ordinary hoard cues:
 //   tide-tentacle   one per tentacle, at its place: the eruption's warning and
-//                   its life (`halfAngle` is which tentacle of the set it is)
-//   tide-tentacle-fall  the SAME id, once it is killed (`halfAngle` 1) or its
-//                   time is up (0): the death throes, or its going back under
+//                   its rise (`halfAngle` is which tentacle of the set it is)
+//   tide-tentacle-up  the SAME id, standing. It stands until it is KILLED, so
+//                   this one is a heartbeat: a short life, re-sent while it lives
+//   tide-tentacle-fall  the SAME id, once it is killed (`halfAngle` 1) or the
+//                   fight lets it go (0): the death throes, or its going under
 //   tide-whip       a LINE WHIP: a rectangle from the tentacle along `facing`
 //                   (`radius` is its length, `halfAngle` its HALF WIDTH in yards)
 //   tide-sweep      a CIRCULAR SWEEP: an arm turning about the tentacle from
 //                   `facing` (`radius` its reach, `halfAngle` its half angle; a
 //                   NEGATIVE radius turns it the other way, so the wire carries
 //                   nothing new)
+//   tide-grab       a GRASP reaching for a player: a mark that rides them
+//                   (`targetId`), `innerRadius` which tentacle is reaching
+//   tide-grab-hold  the SAME id, once it has them: until its grip is broken
 
 export const TENTACLE_CUE_VARIANTS = [
   'tide-tentacle',
+  'tide-tentacle-up',
   'tide-tentacle-fall',
   'tide-whip',
   'tide-sweep',
+  'tide-grab',
+  'tide-grab-hold',
 ] as const;
 export function isTentacleVariant(variant: string | undefined): boolean {
   return (TENTACLE_CUE_VARIANTS as readonly string[]).includes(variant ?? '');
@@ -55,9 +63,14 @@ export const TENTACLES = Object.freeze({
   eruptRadius: 3.2,
   eruptDamageFraction: 0.18,
   eruptKnockback: 4,
-  /** How long an unkilled tentacle stays, and how long its going under takes. */
-  lifeSec: 24,
+  /** Out of the floor in this long once the warning ends. After that it STANDS
+   *  until it is killed: there is no waiting a tentacle out. */
+  riseSec: 1,
+  /** Its death throes (or its going under, if the fight lets it go). */
   retractSec: 1,
+  /** The standing cue is a heartbeat: re-sent this often, living this long. */
+  upHeartbeatTicks: 12,
+  upLifeSec: 1.4,
   // ---- where
   minBossDistance: 9,
   maxBossDistance: 25,
@@ -89,6 +102,24 @@ export const TENTACLES = Object.freeze({
   /** SWEEP_DAMAGE. */
   sweepDamageFraction: 0.26,
   sweepKnockback: 5,
+  // GRASP: it reaches for a player, and if they are still in reach when it
+  // closes, it holds them where it stands and squeezes until its grip is broken.
+  /** GRAB_TELEGRAPH_DURATION, and how far it can reach (run out of it to escape). */
+  grabTelegraphSec: 1.5,
+  grabRange: 13,
+  /** Held this far from the trunk: inside the ground its own sweep never touches. */
+  grabHoldDistance: 2,
+  /** GRAB_MAX_DURATION: left unbroken it squeezes this long, then throws them. */
+  grabHoldSec: 8,
+  grabEverySec: 1,
+  grabDamageFraction: 0.06,
+  grabThrowDamageFraction: 0.2,
+  grabThrowKnockback: 7,
+  /** GRAB_BREAK_DAMAGE: this share of the tentacle's health, dealt while it holds
+   *  someone, breaks its grip (killing it always does). The held player can strike
+   *  it too, so a lone player is never stuck. */
+  grabBreakFraction: 0.25,
+  grabMissSec: 0.6,
   // ---- pressure
   /** DOUBLE_PATTERN_INTENSITY_THRESHOLD is HOARD_DOUBLE_MECHANIC_INTENSITY
    *  (hoard_scaling.ts); the partner's attack follows this long after. */
@@ -99,7 +130,9 @@ export const TENTACLES = Object.freeze({
   retrySec: 0.5,
 });
 
-export const TENTACLE_TOTAL_SEC = TENTACLES.spawnWarningSec + TENTACLES.lifeSec;
+/** The rise cue: the warning, then the rise. Standing is its own cue after that. */
+export const TENTACLE_TOTAL_SEC = TENTACLES.spawnWarningSec + TENTACLES.riseSec;
+export const GRAB_TELEGRAPH_TOTAL_SEC = TENTACLES.grabTelegraphSec;
 export const WHIP_TOTAL_SEC =
   TENTACLES.whipTelegraphSec + TENTACLES.whipStrikeSec + TENTACLES.whipLingerSec;
 export const SWEEP_TOTAL_SEC =
@@ -174,12 +207,30 @@ export function tentacleOffsets(
   return out;
 }
 
-export type TentacleAttack = 'whip' | 'sweep';
+export type TentacleAttack = 'whip' | 'sweep' | 'grab';
+const ATTACK_ORDER: readonly TentacleAttack[] = ['whip', 'sweep', 'grab'];
 
-/** Which attack a tentacle makes: they alternate, and neighbours are out of step,
- *  so a double pattern is always one of each, never two of the same. */
+/** Which attack a tentacle makes: each cycles lash, sweep, grasp, and neighbours
+ *  are out of step, so two attacking together are never making the same one. */
 export function tentacleAttackKind(tentacleIndex: number, attackNumber: number): TentacleAttack {
-  return (tentacleIndex + attackNumber) % 2 === 0 ? 'whip' : 'sweep';
+  return ATTACK_ORDER[(tentacleIndex + attackNumber) % ATTACK_ORDER.length];
+}
+
+/** How many players may be held at once: never the whole party. A lone player may
+ *  be held (they can strike the tentacle that holds them). */
+export function maxGrabbed(living: number): number {
+  if (living <= 1) return 1;
+  return Math.max(1, Math.min(2, Math.floor((living - 1) / 2)));
+}
+
+/** Whether a grasp that closes now still has its target: they must be in reach. */
+export function grabReaches(
+  originX: number,
+  originZ: number,
+  pointX: number,
+  pointZ: number,
+): boolean {
+  return Math.hypot(pointX - originX, pointZ - originZ) <= TENTACLES.grabRange;
 }
 
 /** Whether a point is under the whip: a rectangle from the trunk out along
@@ -247,7 +298,7 @@ export function sweepPasses(
 }
 
 export interface TentacleTelegraph {
-  kind: TentacleAttack;
+  kind: 'whip' | 'sweep';
   x: number;
   z: number;
   facing: number;

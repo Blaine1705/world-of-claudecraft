@@ -183,6 +183,7 @@ export class HoardTideWaveView {
     rightStart: 0,
     rightWidth: 0,
     gap: 0,
+    solid: false,
     depth: 0,
     height: 0,
     leadProgress: 0,
@@ -269,17 +270,17 @@ export class HoardTideWaveView {
       const crest = this.crests[side];
       crest.position.set(start, 0.05, p.center);
       crest.scale.set(width, p.height, 1);
-      crest.visible = p.tail > 0;
+      crest.visible = p.tail > 0 && width > 0;
       this.lanes[side].position.set(start + width / 2, 0.16, 0);
       this.lanes[side].scale.set(width, 1, length);
-      this.lanes[side].visible = cue.remaining >= 0;
+      this.lanes[side].visible = cue.remaining >= 0 && width > 0;
       this.edges[side].position.set(start + width / 2, 0.065, p.center);
       this.edges[side].scale.set(width, 1, p.depth);
-      this.edges[side].visible = cue.remaining >= 0;
+      this.edges[side].visible = cue.remaining >= 0 && width > 0;
       const gapEdge = p.gap + (side === 0 ? -HOARD_TIDE_WAVE_HALF_GAP : HOARD_TIDE_WAVE_HALF_GAP);
       this.rails[side].position.set(gapEdge + (side === 0 ? -0.08 : 0.08), 0.08, 0);
       this.rails[side].scale.set(0.12, 1, length);
-      this.rails[side].visible = cue.remaining >= 0;
+      this.rails[side].visible = cue.remaining >= 0 && !p.solid;
       const body = crest.children[0] as THREE.InstancedMesh;
       const lip = crest.children[1] as THREE.InstancedMesh;
       for (let i = 0; i < 16; i++) {

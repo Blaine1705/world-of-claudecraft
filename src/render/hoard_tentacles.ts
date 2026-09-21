@@ -64,6 +64,10 @@ const SPRAY = 320;
 const RING_SEGMENTS = 48;
 const ARM_SEGMENTS = 6;
 const WAKE_SEGMENTS = 12;
+/** Any moment well past the rise: what a standing tentacle's clock reads. */
+const STANDING_ELAPSED = TENTACLES.spawnWarningSec + TENTACLES.riseSec + 60;
+/** The mark under whoever a grasp wants. */
+const GRAB_MARK_RADIUS = 1.9;
 
 type Ribbon = ReturnType<typeof strip> & { mesh: THREE.Mesh; material: THREE.ShaderMaterial };
 
@@ -92,6 +96,11 @@ interface TentacleRig {
   remaining: number;
   elapsed: number;
   falling: boolean;
+  /** Risen and standing (its heartbeat cue): the rise clock no longer matters. */
+  standing: boolean;
+  /** A grasp: where whoever it wants is. */
+  grabX: number;
+  grabZ: number;
   /** The live attack cue on this trunk, its clock and what was written for it. */
   attackCueId: number;
   attackSeen: boolean;
@@ -426,6 +435,9 @@ export class HoardTentaclesFx {
       remaining: -1,
       elapsed: 0,
       falling: false,
+      standing: false,
+      grabX: 0,
+      grabZ: 0,
       attackCueId: -1,
       attackSeen: false,
       attackFresh: false,
@@ -444,6 +456,8 @@ export class HoardTentaclesFx {
         attackElapsed: 0,
         attackFacing: 0,
         direction: 1,
+        reachDistance: 0,
+        holding: false,
         fall: -1,
         killed: false,
         still: false,
@@ -480,7 +494,8 @@ export class HoardTentaclesFx {
       const cue = cues[c];
       if (cue.remaining <= 0) continue;
       const fall = cue.variant === 'tide-tentacle-fall';
-      if (!fall && cue.variant !== 'tide-tentacle') continue;
+      const up = cue.variant === 'tide-tentacle-up';
+      if (!fall && !up && cue.variant !== 'tide-tentacle') continue;
       let rig: TentacleRig | undefined;
       let free: TentacleRig | undefined;
       for (let i = 0; i < this.rigs.length; i++) {
@@ -499,6 +514,7 @@ export class HoardTentaclesFx {
         rig.instanceId = cue.instanceId;
         rig.remaining = -1;
         rig.falling = false;
+        rig.standing = false;
         rig.attackCueId = -1;
         rig.attackRemaining = -1;
         rig.laneFor = -1;
@@ -518,6 +534,8 @@ export class HoardTentaclesFx {
         rig.falling = fall;
         rig.remaining = -1;
       }
+      // A client that first sees it standing (it joined late) never replays the rise.
+      if (up) rig.standing = true;
       if (fall) rig.input.killed = (cue.halfAngle ?? 0) >= 0.5;
       else {
         rig.input.facing = cue.facing ?? 0;
@@ -534,20 +552,34 @@ export class HoardTentaclesFx {
       const cue = cues[c];
       if (cue.remaining <= 0) continue;
       const whip = cue.variant === 'tide-whip';
-      if (!whip && cue.variant !== 'tide-sweep') continue;
+      const hold = cue.variant === 'tide-grab-hold';
+      const grab = hold || cue.variant === 'tide-grab';
+      if (!whip && !grab && cue.variant !== 'tide-sweep') continue;
       for (let i = 0; i < this.rigs.length; i++) {
         const rig = this.rigs[i];
         if (!rig.seen || rig.instanceId !== cue.instanceId) continue;
-        if (Math.abs(rig.x - cue.x) > 0.05 || Math.abs(rig.z - cue.z) > 0.05) continue;
+        // A lash or a sweep sits ON its trunk; a grasp rides its victim and says
+        // which tentacle of the set is reaching.
+        if (grab) {
+          if (Math.round(cue.innerRadius ?? -1) !== rig.input.index) continue;
+        } else if (Math.abs(rig.x - cue.x) > 0.05 || Math.abs(rig.z - cue.z) > 0.05) continue;
         if (rig.attackCueId !== cue.cueId) {
           rig.attackCueId = cue.cueId;
           rig.attackRemaining = -1;
           rig.landed = false;
         }
         rig.attackSeen = true;
-        rig.input.attack = whip ? 1 : 2;
-        rig.input.attackFacing = cue.facing ?? 0;
-        rig.input.direction = cue.radius < 0 ? -1 : 1;
+        rig.input.attack = grab ? 3 : whip ? 1 : 2;
+        if (grab) {
+          rig.grabX = cue.x;
+          rig.grabZ = cue.z;
+          rig.input.holding = hold;
+          rig.input.reachDistance = Math.hypot(cue.x - rig.x, cue.z - rig.z);
+          rig.input.attackFacing = Math.atan2(cue.x - rig.x, cue.z - rig.z);
+        } else {
+          rig.input.attackFacing = cue.facing ?? 0;
+          rig.input.direction = cue.radius < 0 ? -1 : 1;
+        }
         rig.attackTotal = cue.total;
         if (rig.attackRemaining !== cue.remaining) {
           rig.attackRemaining = cue.remaining;
@@ -592,7 +624,7 @@ export class HoardTentaclesFx {
       const input = rig.input;
       input.time = this.time;
       input.still = still;
-      input.elapsed = rig.falling ? -1 : rig.elapsed;
+      input.elapsed = rig.falling ? -1 : rig.standing ? STANDING_ELAPSED : rig.elapsed;
       input.fall = rig.falling ? rig.elapsed : -1;
       const pose = tentaclePose(input, rig.pose);
       this.drawFloor(rig, pose, still);
@@ -600,7 +632,7 @@ export class HoardTentaclesFx {
       if (pose.grow <= 0.01 || pose.dissolve >= 0.99) continue;
       writeTentacleChain(input, pose, rig.chain, rig.tip);
       // Its suckers burn angrier the closer it is to striking.
-      const anger = Math.max(pose.rear, pose.low, pose.slam);
+      const anger = Math.max(pose.rear, pose.low, pose.slam, pose.reach);
       this.color.copy(this.calm).lerp(this.angry, anger);
       for (let link = 0; link < LINKS; link++) {
         const o = link * LINK_STRIDE;
@@ -724,9 +756,25 @@ export class HoardTentaclesFx {
    *  lash, the ring it will sweep and the arm sweeping it. */
   private drawFloor(rig: TentacleRig, pose: TentaclePose, still: boolean): void {
     const warned = pose.warning > 0.01;
-    rig.warnDisc.visible = warned;
-    rig.warnRing.visible = warned;
-    if (warned) {
+    const grabbing = rig.input.attack === 3;
+    rig.warnDisc.visible = warned || grabbing;
+    rig.warnRing.visible = warned || grabbing;
+    if (grabbing) {
+      // The mark under whoever it wants: it closes in as the grasp does, then
+      // beats while they are held.
+      const closing = rig.input.holding
+        ? 0.75 + (still ? 0 : 0.12 * Math.sin(this.time * 9))
+        : 1.5 - 0.75 * Math.min(1, rig.input.attackElapsed / TENTACLES.grabTelegraphSec);
+      const ground = this.groundY(rig.grabX, rig.grabZ);
+      rig.warnDisc.position.set(rig.grabX, ground + 0.05, rig.grabZ);
+      rig.warnDisc.scale.setScalar(GRAB_MARK_RADIUS * closing);
+      rig.warnDisc.material.opacity = 0.45;
+      rig.warnRing.position.set(rig.grabX, ground + 0.08, rig.grabZ);
+      rig.warnRing.scale.setScalar(GRAB_MARK_RADIUS * closing);
+      rig.warnRing.material.color.setHex(LOOK.danger);
+      rig.warnRing.material.opacity = 0.95;
+    } else if (warned) {
+      rig.warnRing.material.color.setHex(LOOK.warn);
       const pulse = still ? 1 : 1 + 0.05 * Math.sin(this.time * 15);
       rig.warnDisc.position.set(rig.x, rig.ground + 0.05, rig.z);
       rig.warnDisc.scale.setScalar(TENTACLES.eruptRadius * pulse);
