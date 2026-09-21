@@ -7,7 +7,7 @@ import { itemInstancePayloadsEqual } from './item_instance_merge';
 import { activeItemInstanceStats } from './item_instance_stats';
 import { itemInstanceLevel } from './item_level';
 import { meetsLevelRequirement } from './item_level_req';
-import { equipItem } from './items';
+import { desiredEquipSlot, equipItem } from './items';
 import { lootQualityWeapon } from './loot_quality';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -52,14 +52,23 @@ export function maybeAutoEquip(
   if (autoEquipFamilyConflict(def, itemId, meta, (id) => ITEMS[id], index)) return;
   const incoming = equipCandidateInstance(meta.inventory, itemId, index);
   if (def.kind === 'weapon') {
-    const wornId = meta.equipment.mainhand;
-    const worn = wornId ? ITEMS[wornId] : undefined;
-    const current = worn ? lootQualityWeapon(worn, meta.equipmentInstance.mainhand) : undefined;
-    const next = lootQualityWeapon(def, incoming);
     // No aimed slot on either arm: equipItem routes the hand from the committed
     // spec (items.ts desiredEquipSlot), so a one-hander lands in the offhand of
     // a dual-wielder with a full mainhand whether or not it carries a descriptor.
-    // Only the exact-copy index is new here.
+    // Compare against the copy that hand actually wears: judging against the
+    // mainhand while the grant lands in the offhand let a copy that beat the
+    // mainhand replace a BETTER offhand weapon. A non-weapon in the routed hand
+    // (a shield or held offhand) keeps the mainhand comparison, the existing
+    // displacement rule. Only the exact-copy index is new here.
+    const routed = desiredEquipSlot(meta, itemId);
+    if (!routed) return;
+    const routedWornId = meta.equipment[routed];
+    const routedWorn = routedWornId ? ITEMS[routedWornId] : undefined;
+    const hand = routedWorn && routedWorn.kind !== 'weapon' ? 'mainhand' : routed;
+    const wornId = meta.equipment[hand];
+    const worn = wornId ? ITEMS[wornId] : undefined;
+    const current = worn ? lootQualityWeapon(worn, meta.equipmentInstance[hand]) : undefined;
+    const next = lootQualityWeapon(def, incoming);
     if (next && (!current || next.min + next.max > current.min + current.max))
       equipItem(ctx, itemId, meta.entityId, undefined, index);
     return;

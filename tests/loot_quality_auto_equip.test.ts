@@ -63,6 +63,17 @@ describe('quality loot auto equip', () => {
     sim.addItem('duskwhisper', 1);
     expect(sim.player.equippedInstances.offhand?.lootQuality?.tier).toBe(4);
     expect(sim.player.equippedInstances.mainhand?.lootQuality?.tier).toBe(1);
+    // Never a downgrade: a tier II copy beats the tier I mainhand, but the spec
+    // routes it to the offhand, which wears tier IV, so it stays in the bags
+    // (the comparison is against the hand the grant would displace).
+    sim.addItemInstance('duskwhisper', quality(2));
+    expect(sim.player.equippedInstances.offhand?.lootQuality?.tier).toBe(4);
+    expect(sim.player.equippedInstances.mainhand?.lootQuality?.tier).toBe(1);
+    expect(
+      sim.inventory
+        .filter((s) => s.itemId === 'duskwhisper' && s.instance?.lootQuality?.tier === 2)
+        .reduce((sum, s) => sum + s.count, 0),
+    ).toBe(2);
   });
 
   it('routes a quality one-hander by spec like an ordinary grant: full mainhand, empty offhand', () => {
