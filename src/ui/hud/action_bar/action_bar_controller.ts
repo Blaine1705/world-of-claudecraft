@@ -1,3 +1,7 @@
+import { DRUID_FORM_ENTRY } from '../../../sim/combat/druid_form_entry';
+import { NATURES_BOON_ABILITIES } from '../../../sim/combat/druid_natures_boon';
+import { abilityBelongsToForm, hasFormRequirement } from '../../../sim/combat/form_requirement';
+import { classTalentChoiceAbilityGroups } from '../../../sim/content/talents';
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
 import {
@@ -47,6 +51,20 @@ export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth';
 
 const FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']);
+// Buttons that seed onto EVERY form kit bar:
+//   - the three form toggles,
+//   - the form-entry buttons (Stalk, Lunge, Bruin Rush), which since v0.43
+//     enter their form from any form and so are reachable (and wanted) on
+//     every form bar, even though none of them is a toggle,
+//   - the two spells an armed Nature's Boon pays for (sim/combat/
+//     druid_natures_boon.ts). The window's whole point is that they are
+//     castable without leaving the form, which is unreachable on a default
+//     bar if the form kit never seeds a button for them.
+const FORM_BAR_ALWAYS_IDS = new Set([
+  ...FORM_TOGGLE_IDS,
+  ...Object.keys(DRUID_FORM_ENTRY),
+  ...NATURES_BOON_ABILITIES,
+]);
 
 export interface ActionBarControllerDeps {
   storage: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
@@ -75,6 +93,7 @@ export interface ActionBarControllerDeps {
 /** Owns action-bar pages, migrations, persistence, and attack-slot assignment. */
 export class ActionBarController {
   private activeFormState: HotbarForm = 'normal';
+  private activeSpecState: string | null = null;
   private actionState: HotbarAction[] = Array.from(
     { length: ACTION_BAR_ABILITY_SLOTS },
     () => null,
@@ -108,9 +127,11 @@ export class ActionBarController {
 
   constructor(private readonly deps: ActionBarControllerDeps) {
     this.activeProfile = this.resolveProfile();
+    this.activeSpecState = this.deps.talentSpec();
   }
 
   init(): void {
+    this.activeSpecState = this.deps.talentSpec();
     this.loadActions();
     this.loadAttackAction();
     this.ready = true;
@@ -121,6 +142,7 @@ export class ActionBarController {
    *  reloading so restoring a server copy never bounces straight back up. */
   reload(): void {
     this.ready = false;
+    this.activeSpecState = this.deps.talentSpec();
     this.loadActions();
     this.loadAttackAction();
     this.unsavedChanges = false;
@@ -252,6 +274,7 @@ export class ActionBarController {
     actions: HotbarAction[],
     targetKnownAbilityIds: ReadonlySet<string>,
   ): void {
+    this.activeSpecState = this.deps.talentSpec();
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
     this.unsavedChanges = true;
     this.pendingLoadoutKnownAbilityIds = new Set(targetKnownAbilityIds);
@@ -292,6 +315,22 @@ export class ActionBarController {
     this.activeFormState = next;
     this.loadActions();
     this.loadAttackAction();
+    return true;
+  }
+
+  get activeSpec(): string | null {
+    return this.activeSpecState;
+  }
+
+  syncSpec(): boolean {
+    const next = this.deps.talentSpec();
+    if (next === this.activeSpecState) return false;
+    this.saveActions();
+    this.saveAttackAction();
+    this.activeSpecState = next;
+    this.loadActions();
+    this.loadAttackAction();
+    this.knownAbilityIdsAtLastSync = null;
     return true;
   }
 
@@ -345,11 +384,13 @@ export class ActionBarController {
     }
     const formToggle = this.formToggleAbilityId();
     if (formToggle && knownAbilityIds.includes(formToggle)) autoPlaceAbilityIds.add(formToggle);
+    const choiceGroups = classTalentChoiceAbilityGroups(this.deps.playerClass);
     const synced = syncHotbarActions(
       this.actionState,
       knownAbilityIds,
       autoPlaceAbilityIds,
       (id) => !this.isAbilityPlacementAllowed(id),
+      choiceGroups,
     );
     this.actionState = synced.actions;
     if (synced.changed) this.saveActions();
@@ -434,7 +475,7 @@ export class ActionBarController {
       this.activeFormState === 'normal'
         ? ownedClassSpecDefaultAbilityIds(
             this.deps.playerClass,
-            this.deps.talentSpec(),
+            this.activeSpecState,
             this.deps.playerLevel(),
             new Set(knownAbilityIds),
           )
@@ -471,13 +512,17 @@ export class ActionBarController {
     // are the precedent that riding useItem does not imply a slot, though their
     // reason differs): a pattern is a one-shot unlock consumed on its first
     // successful use, so a hotbar slot would hold a dead button from the first
-    // press on; the bags are its home. Elixirs, scrolls, and flasks live on the
-    // mobile consumable tray instead.
+    // press on; the bags are its home. Scrolls and flasks live on the mobile
+    // consumable tray instead.
+    // Elixirs: same useItem dispatch (kind 'elixir' -> applyAura), usable in
+    // combat with no shared potion cooldown, so they are placeable exactly
+    // like a potion; the view paints no cooldown swipe on their slot.
     const item = ITEMS[itemId];
     return (
       item?.kind === 'food' ||
       item?.kind === 'drink' ||
       item?.kind === 'potion' ||
+      item?.kind === 'elixir' ||
       item?.kind === 'mount' ||
       item?.use?.type === 'fishing' ||
       item?.use?.type === 'gatherTool' ||
@@ -548,18 +593,28 @@ export class ActionBarController {
     }
   }
 
-  private slotMapKey(form: HotbarForm = this.activeFormState): string {
-    return actionBarSlotMapKey(this.deps.playerClass, this.deps.playerName, this.profile, form);
+  private slotMapKey(
+    form: HotbarForm = this.activeFormState,
+    spec: string | null = this.activeSpecState,
+  ): string {
+    return actionBarSlotMapKey(
+      this.deps.playerClass,
+      this.deps.playerName,
+      this.profile,
+      form,
+      spec,
+    );
   }
 
   private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {
     // Passives never castable: keep them off every seeded/form kit bar too.
     if (!this.isAbilityPlacementAllowed(id)) return false;
     if (this.isStealthForm(form)) return false;
+    const def = ABILITIES[id];
     if (form === 'bear' || form === 'cat') {
-      return ABILITIES[id]?.requiresForm === form || FORM_TOGGLE_IDS.has(id);
+      return (def !== undefined && abilityBelongsToForm(def, form)) || FORM_BAR_ALWAYS_IDS.has(id);
     }
-    return !ABILITIES[id]?.requiresForm;
+    return def === undefined || !hasFormRequirement(def);
   }
 
   private isFormKitBar(form: HotbarForm = this.activeFormState): boolean {
@@ -685,15 +740,31 @@ export class ActionBarController {
   }
 
   private loadActions(): void {
+    const currentKey = this.slotMapKey();
     let raw: unknown = null;
     let stored = false;
     let storedRaw: string | null = null;
     try {
-      storedRaw = this.deps.storage.getItem(this.slotMapKey());
+      storedRaw = this.deps.storage.getItem(currentKey);
       raw = JSON.parse(storedRaw ?? 'null');
       stored = Array.isArray(raw);
     } catch {
       // Corrupt state is treated as an empty bar.
+    }
+    if (!stored && this.activeFormState === 'normal' && this.activeSpecState !== null) {
+      const legacyKey = this.slotMapKey(this.activeFormState, null);
+      try {
+        const legacyRaw = this.deps.storage.getItem(legacyKey);
+        const parsedLegacy = JSON.parse(legacyRaw ?? 'null');
+        if (Array.isArray(parsedLegacy) && legacyRaw !== null) {
+          storedRaw = legacyRaw;
+          raw = parsedLegacy;
+          stored = true;
+          this.deps.storage.setItem(currentKey, legacyRaw);
+        }
+      } catch {
+        // Fall through
+      }
     }
     const parsed = parseHotbarActions(
       raw,
@@ -703,7 +774,7 @@ export class ActionBarController {
     );
     if (stored && storedHotbarHasIneligibleAbility(raw, (id) => this.isStoredAbilityEligible(id))) {
       try {
-        this.deps.storage.setItem(this.slotMapKey(), JSON.stringify(parsed));
+        this.deps.storage.setItem(currentKey, JSON.stringify(parsed));
       } catch {
         // Storage can be unavailable in private browsing modes.
       }
@@ -735,6 +806,18 @@ export class ActionBarController {
     let storedRaw: string | null = null;
     try {
       storedRaw = this.deps.storage.getItem(key);
+      if (
+        storedRaw === null &&
+        this.activeFormState === 'normal' &&
+        this.activeSpecState !== null
+      ) {
+        const legacyKey = attackSlotStorageKey(this.slotMapKey(this.activeFormState, null));
+        const legacyRaw = this.deps.storage.getItem(legacyKey);
+        if (legacyRaw !== null) {
+          storedRaw = legacyRaw;
+          this.deps.storage.setItem(key, legacyRaw);
+        }
+      }
       // The freed attack slot is not scoped to any one build (unlike the 33
       // configurable slots, a SavedLoadout never captures it), so its
       // eligibility check must not require the ability to be granted by the

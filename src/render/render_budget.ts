@@ -1,3 +1,4 @@
+import { chosenCadenceFrameMs, NO_CHOSEN_CADENCE } from './chosen_cadence_pressure_core';
 import { GFX_BUCKET_BANDS, type GfxBucketBands, type GfxRuntimeBudget, type GfxTier } from './gfx';
 import {
   type PostShedChain,
@@ -25,7 +26,11 @@ export type RenderBudgetReason =
   | 'submit-stall'
   | 'draw'
   | 'grass'
-  | 'recover';
+  | 'recover'
+  /** Everything the governor owns sits at its floor and the frame is still
+   *  over budget: the terminal state on a GPU-bound machine (the fleet used
+   *  to read it as a healthy 'stable'). */
+  | 'floored';
 
 export interface RenderBudgetLevels {
   grass: number;
@@ -61,6 +66,13 @@ export interface RenderBudgetCaps {
   minLightingLevel: number;
 }
 
+/** Where the external-frame-cap probe stands (see RenderBudgetGovernor.update):
+ *  'idle' (no probe, no verdict), the three phases of a probe in flight, or
+ *  'refused' (the last probe showed that shedding moves the cadence). Rides
+ *  the perf beacon's rendererBudget block so a floored fleet row can be told
+ *  from a probe caught mid-flight. */
+export type RenderBudgetFrameCapProbe = 'idle' | 'shed' | 'floor' | 'restored' | 'refused';
+
 export interface RenderBudgetState {
   enabled: boolean;
   mode: RenderBudgetMode;
@@ -69,6 +81,7 @@ export interface RenderBudgetState {
   frameMsEma: number;
   submitMsEma: number;
   externalFrameCap: boolean;
+  frameCapProbe?: RenderBudgetFrameCapProbe;
   stallPressure: number;
   recentSubmitStalls: number;
   lastSubmitStallMs: number;
@@ -92,6 +105,14 @@ export interface RenderBudgetSample {
   createdViews: number;
   minRenderScale: number;
   maxRenderScale: number;
+  /** Share of frames missing the client's own chosen cadence (the frame rate
+   *  ceiling), or NO_CHOSEN_CADENCE. While set it replaces the wall interval on
+   *  the frame axis, and no external cap is looked for: the cadence is known. */
+  chosenCadenceMissShare?: number;
+  /** The automatic frame rate ceiling is in force: recovery is held, so new
+   *  headroom goes to the cadence and not to quality that would fail its next
+   *  return trial (frame_cadence_auto_core.ts owns the hierarchy). */
+  holdRecovery?: boolean;
 }
 
 export interface RenderBudgetGovernorOptions {
@@ -119,6 +140,19 @@ export interface RenderBudgetGovernorOptions {
    *  level exactly here, with or without an enabled governor, and keeps the
    *  ladder's own steps off it. */
   pinnedPostLevel?: number | null;
+}
+
+interface ExternalFrameCapProbe {
+  /** shed: the ladder is being spent (degrade with every rung eligible);
+   *  floor: dwelling at the floors; restored: dwelling at the levels the
+   *  probe started from. */
+  phase: 'shed' | 'floor' | 'restored';
+  settleS: number;
+  emaFloor: number;
+  /** Whether the shed phase moved any rung: a probe that found the session
+   *  already at the floors has no low/high pair of its own and tries the
+   *  band baselines as its high state instead of the origin. */
+  shedMoved: boolean;
 }
 
 const CAPS_BY_TIER: Record<GfxTier, RenderBudgetCaps> = {
@@ -281,6 +315,22 @@ const SUBMIT_STALL_URGENT_HOLD_SECONDS: Record<GfxTier, number> = {
 const SUBMIT_STALL_RECOVERY_CEILING_MS = 42;
 const EXTERNAL_FRAME_CAP_MIN_MS = 28;
 const EXTERNAL_FRAME_CAP_MAX_MS = 48;
+/** Consecutive frames the cap candidate may fail before a latched cap or a
+ *  running probe is dropped: one hitch frame (a view build, a GPU spike) is
+ *  not a cadence change. */
+const EXTERNAL_FRAME_CAP_LAPSE_FRAMES = 3;
+/** Dwell at each end of the cap probe (floors, then the restored levels)
+ *  before its cadence is read: the frame EMA (alpha 0.08) is within a few
+ *  percent of a steady input after two seconds at 24 fps. */
+const EXTERNAL_FRAME_CAP_PROBE_SETTLE_S = 2;
+/** The restored cadence must exceed the floored cadence by this share for
+ *  the probe to conclude that shedding does move the frame. Under vsync one
+ *  step change in the pattern (a 33 / 50 mix losing its 50s) is far larger. */
+const EXTERNAL_FRAME_CAP_PROBE_HELPED = 0.1;
+/** A refusal younger than this survives an upward lapse: walking into a
+ *  heavier zone on a GPU-bound machine must not buy a fresh probe (and its
+ *  restored-baseline dwell) every time, so at most one probe per minute. */
+const EXTERNAL_FRAME_CAP_REFUSAL_HOLD_S = 60;
 
 export class RenderBudgetGovernor {
   private readonly tier: GfxTier;
@@ -294,6 +344,27 @@ export class RenderBudgetGovernor {
   private frameMsEma = 16.7;
   private submitMsEma = 0;
   private externalFrameCap = false;
+  /** Consecutive frames the cap candidate has failed (see update()). */
+  private capMissFrames = 0;
+  /** The cap probe in flight, if any (see update()). */
+  private capProbe: ExternalFrameCapProbe | null = null;
+  /** The levels the probe episode started from, restored after the floor
+   *  dwell. Held outside the probe so a probe interrupted by a lapse (a
+   *  multi-frame hitch) and resumed from the floors still restores what the
+   *  session had before, never the floors; dropped once a verdict is in or
+   *  the ordinary ladder or recovery reshapes the levels. */
+  private capProbeOrigin: RenderBudgetLevels | null = null;
+  /** A probe concluded that shedding moves the cadence: no cap. Sticky
+   *  until the candidate lapses upward (the workload changed) after the
+   *  hold below, so the floored session is not re-probed forever. */
+  private capRefused = false;
+  private capRefusedAgeS = 0;
+  /** True from an over-budget degrade() attempt in which every eligible rung
+   *  already sat at its floor, until the next level change in either
+   *  direction: the ladder has nothing left to shed under the current
+   *  pressure (a mild frame band that engages no rung clears it). Backs the
+   *  'floored' reason. */
+  private ladderExhausted = false;
   private stallPressure = 0;
   private recentSubmitStalls = 0;
   private lastSubmitStallMs = 0;
@@ -379,6 +450,12 @@ export class RenderBudgetGovernor {
     this.frameMsEma = 16.7;
     this.submitMsEma = 0;
     this.externalFrameCap = false;
+    this.capMissFrames = 0;
+    this.capProbe = null;
+    this.capProbeOrigin = null;
+    this.capRefused = false;
+    this.capRefusedAgeS = 0;
+    this.ladderExhausted = false;
     this.stallPressure = 0;
     this.recentSubmitStalls = 0;
     this.lastSubmitStallMs = 0;
@@ -418,6 +495,11 @@ export class RenderBudgetGovernor {
     state.frameMsEma = round2(this.frameMsEma);
     state.submitMsEma = round2(this.submitMsEma);
     state.externalFrameCap = this.externalFrameCap;
+    state.frameCapProbe = this.capProbe
+      ? this.capProbe.phase
+      : this.capRefused
+        ? 'refused'
+        : 'idle';
     state.stallPressure = round2(this.stallPressure);
     state.recentSubmitStalls = round2(this.recentSubmitStalls);
     state.lastSubmitStallMs = round2(this.lastSubmitStallMs);
@@ -446,7 +528,11 @@ export class RenderBudgetGovernor {
 
   update(sample: RenderBudgetSample, out?: RenderBudgetState): RenderBudgetState {
     if (!Number.isFinite(sample.dt) || sample.dt <= 0) return this.state(out);
-    const frameMs = Math.min(250, Math.max(0, sample.frameMs));
+    const chosenMissShare = sample.chosenCadenceMissShare ?? NO_CHOSEN_CADENCE;
+    const chosenCadence = chosenMissShare >= 0;
+    const frameMs = chosenCadence
+      ? chosenCadenceFrameMs(chosenMissShare, this.budget.dropFrameMs, this.budget.recoverFrameMs)
+      : Math.min(250, Math.max(0, sample.frameMs));
     const totalMs = Math.min(250, Math.max(0, sample.totalMs));
     const rawSubmitMs = Math.max(0, sample.submitMs);
     const submitMs = Math.min(250, rawSubmitMs);
@@ -463,6 +549,7 @@ export class RenderBudgetGovernor {
       this.reason = 'disabled';
       this.pressure = 0;
       this.externalFrameCap = false;
+      this.capProbe = null;
       this.updateDetailShed(sample.dt, 0);
       return this.state(out);
     }
@@ -474,6 +561,7 @@ export class RenderBudgetGovernor {
       Math.max(minRenderScale, this.levels.resolution),
     );
 
+    if (this.capRefused) this.capRefusedAgeS += sample.dt;
     if (this.cooldownSeconds > 0) {
       this.cooldownSeconds = Math.max(0, this.cooldownSeconds - sample.dt);
     }
@@ -503,11 +591,65 @@ export class RenderBudgetGovernor {
       this.stallPressure < 0.5 &&
       drawPressure < 1 &&
       grassPressure < 1;
-    this.externalFrameCap =
+    // Every reading here is CPU-side, so a GPU-bound frame stepping at 33 ms
+    // under vsync with an idle main thread is indistinguishable from a 30 Hz
+    // display cap. The candidate alone therefore never asserts the cap: it
+    // opens a PROBE (advanceCapProbe) that sheds every rung the governor
+    // owns, dwells at the floors, restores the levels it started from and
+    // dwells again, and reads the cadence at both ends. A cadence that did
+    // not move is the cap, latched here and behaving as before (frame
+    // pressure suppressed, recovery on measured headroom); a cadence that
+    // shedding does move is a GPU-bound frame, refused as a cap and shed
+    // again under the normal rules. A latched cap, a probe or a refusal
+    // lapses once the candidate has failed for a few consecutive frames.
+    // A ceiling that engages while a probe is in flight ends the probe without
+    // a verdict: the question it was asking (is a cap pacing these frames) is
+    // now answered by the client itself. The levels it shed come back; left to
+    // lapse, the probe would read the synthetic held reading as "shedding
+    // moved the cadence", refuse a cap nobody tested, and leave quality at the
+    // probe floors, which an automatic ceiling's recovery hold then freezes.
+    if (chosenCadence && this.capProbe) this.abandonCapProbe(sample);
+    const externalFrameCapCandidate =
+      !chosenCadence &&
       rawFramePressure >= 1 &&
       cadenceMs >= EXTERNAL_FRAME_CAP_MIN_MS &&
       cadenceMs <= EXTERNAL_FRAME_CAP_MAX_MS &&
       renderWorkHasHeadroom;
+    this.capMissFrames = externalFrameCapCandidate ? 0 : this.capMissFrames + 1;
+    if (this.capMissFrames >= EXTERNAL_FRAME_CAP_LAPSE_FRAMES) {
+      // A lapse DOWNWARD (the frame fell under budget or under the window)
+      // during a probe is the probe's answer: shedding moved the cadence, no
+      // cap. Only a lapse upward or a lost CPU headroom (the workload changed)
+      // clears a refusal; a downward one never does, or a session whose
+      // floors run fast would climb, flip back into the window, and be shed
+      // to the floors again on every cycle.
+      const downward = rawFramePressure < 1 || cadenceMs < EXTERNAL_FRAME_CAP_MIN_MS;
+      if (this.capProbe && downward) {
+        this.capRefused = true;
+        this.capRefusedAgeS = 0;
+        this.capProbeOrigin = null;
+      } else if (!downward && this.capRefusedAgeS >= EXTERNAL_FRAME_CAP_REFUSAL_HOLD_S) {
+        this.capRefused = false;
+      }
+      this.externalFrameCap = false;
+      this.capProbe = null;
+    }
+    if (
+      externalFrameCapCandidate &&
+      this.capRefused &&
+      this.capRefusedAgeS >= EXTERNAL_FRAME_CAP_REFUSAL_HOLD_S
+    ) {
+      this.capRefused = false;
+    }
+    if (
+      externalFrameCapCandidate &&
+      !this.externalFrameCap &&
+      !this.capRefused &&
+      this.capProbe === null
+    ) {
+      this.capProbe = { phase: 'shed', settleS: 0, emaFloor: 0, shedMoved: false };
+      if (this.capProbeOrigin === null) this.capProbeOrigin = copyLevels(this.levels);
+    }
     const framePressure = this.externalFrameCap ? 0 : rawFramePressure;
     this.pressure = Math.max(
       framePressure,
@@ -551,14 +693,36 @@ export class RenderBudgetGovernor {
       totalMs >= this.budget.dropFrameMs ||
       submitMs >= Math.max(8, this.budget.dropFrameMs * 0.58);
 
-    if ((submitStall || overBudget) && (submitStall || this.cooldownSeconds <= 0)) {
-      const changed = this.degrade(urgent, minRenderScale, {
-        frame: framePressure,
-        submit: submitStall ? Math.max(submitPressure, this.stallPressure) : submitPressure,
-        draw: drawPressure,
-        grass: grassPressure,
-      });
-      if (changed) {
+    // The probe's two dwells hold the ladder still (the restored levels
+    // would be shed on the spot otherwise); a real submit stall still wins.
+    const probeDwell = this.advanceCapProbe(sample.dt, minRenderScale, maxRenderScale);
+    if (
+      (submitStall || overBudget) &&
+      (submitStall || this.cooldownSeconds <= 0) &&
+      (submitStall || !probeDwell)
+    ) {
+      const probing = this.capProbe?.phase === 'shed';
+      const step = this.degrade(
+        urgent,
+        minRenderScale,
+        {
+          frame: framePressure,
+          submit: submitStall ? Math.max(submitPressure, this.stallPressure) : submitPressure,
+          draw: drawPressure,
+          grass: grassPressure,
+        },
+        probing,
+      );
+      this.ladderExhausted = step === 'exhausted';
+      if (step === 'exhausted' && probing && this.capProbe) {
+        // The probe's dwells are not the terminal state: no 'floored' there.
+        this.ladderExhausted = false;
+        this.capProbe.phase = 'floor';
+        this.capProbe.settleS = 0;
+      }
+      if (step === 'changed') {
+        if (probing && this.capProbe) this.capProbe.shedMoved = true;
+        else this.capProbeOrigin = null;
         this.stableSeconds = 0;
         this.mode = 'degrading';
         this.reason = submitStall
@@ -575,7 +739,7 @@ export class RenderBudgetGovernor {
               this.cooldownSeconds,
               this.budget.cooldownSeconds * (rawSubmitMs >= SUBMIT_STALL_URGENT_MS ? 4 : 2.5),
             )
-          : urgent
+          : urgent || probing
             ? this.budget.cooldownSeconds * 0.55
             : this.budget.cooldownSeconds;
         return this.state(out);
@@ -592,6 +756,7 @@ export class RenderBudgetGovernor {
     // Measured headroom, the gate on ALL recovery: every clause is a real cost
     // reading, never inferred from wall cadence.
     const canRecover =
+      sample.holdRecovery !== true &&
       (this.externalFrameCap || this.frameMsEma <= this.budget.recoverFrameMs) &&
       totalMs <= this.budget.recoverFrameMs &&
       submitMs <= Math.max(8, this.budget.recoverFrameMs * 0.7) &&
@@ -618,6 +783,9 @@ export class RenderBudgetGovernor {
       if (this.stableSeconds >= this.budget.recoverStableSeconds && this.cooldownSeconds <= 0) {
         const changed = this.recover(maxRenderScale, canEnrich);
         if (changed) {
+          this.ladderExhausted = false;
+          this.capProbe = null;
+          this.capProbeOrigin = null;
           this.mode = 'recovering';
           this.reason = 'recover';
           this.stableSeconds = 0;
@@ -630,8 +798,110 @@ export class RenderBudgetGovernor {
     }
 
     this.mode = 'stable';
-    this.reason = this.externalFrameCap ? 'frame-cap' : 'stable';
+    this.reason = this.externalFrameCap
+      ? 'frame-cap'
+      : overBudget && this.ladderExhausted
+        ? 'floored'
+        : 'stable';
     return this.state(out);
+  }
+
+  /** A chosen cadence engaged while a cap probe was in flight: the probe is
+   *  dropped and what it shed comes back. A probe that lost its origin (a
+   *  submit stall during a dwell sheds for real and clears it) or that shed
+   *  nothing (the session was already at the floors) gets the band baselines,
+   *  as it does in advanceCapProbe. */
+  private abandonCapProbe(sample: RenderBudgetSample): void {
+    // The same choice advanceCapProbe makes for the same state: a probe that
+    // shed nothing (the session was already at the floors) has an origin equal to
+    // the floors, and the baselines are what a paced session holds.
+    const origin =
+      this.capProbeOrigin && this.capProbe?.shedMoved
+        ? this.capProbeOrigin
+        : this.capProbeBaselines(sample.maxRenderScale);
+    if (this.capProbe) {
+      this.levels.grass = origin.grass;
+      this.levels.foliage = origin.foliage;
+      this.levels.vfx = origin.vfx;
+      this.levels.lighting = origin.lighting;
+      this.levels.resolution = Math.min(
+        sample.maxRenderScale,
+        Math.max(sample.minRenderScale, origin.resolution),
+      );
+      this.restoreDetailAfterCapProbe(origin.detail);
+      if (this.pinnedPostLevel == null) this.levels.post = origin.post;
+    }
+    this.capProbe = null;
+    this.capProbeOrigin = null;
+    this.capMissFrames = 0;
+  }
+
+  private capProbeBaselines(maxRenderScale: number): RenderBudgetLevels {
+    return {
+      grass: this.bands.grass.baseline,
+      foliage: this.bands.foliage.baseline,
+      vfx: this.bands.vfx.baseline,
+      lighting: this.bands.lighting.baseline,
+      resolution: maxRenderScale,
+      detail: this.bands.detail.baseline,
+      post: this.bands.post.baseline,
+    };
+  }
+
+  /** Advances the cap probe's two dwells. Returns true while a dwell holds
+   *  the ladder still. The 'shed' phase is driven by degrade() itself. At
+   *  the end of the floor dwell the levels the probe started from come back
+   *  at once (a probe that proves a cap must not cost a capped display a
+   *  minute of climbing); at the end of the restored dwell the two cadences
+   *  decide: moved means shedding works (no cap, refused until the candidate
+   *  lapses, the normal rules shed again), unmoved means the cap. */
+  private advanceCapProbe(dt: number, minRenderScale: number, maxRenderScale: number): boolean {
+    const probe = this.capProbe;
+    if (!probe || probe.phase === 'shed') return false;
+    probe.settleS += dt;
+    if (probe.settleS < EXTERNAL_FRAME_CAP_PROBE_SETTLE_S) return true;
+    if (probe.phase === 'floor') {
+      probe.emaFloor = this.frameMsEma;
+      probe.phase = 'restored';
+      probe.settleS = 0;
+      // A probe that shed nothing (the session was already at the floors,
+      // after a real disaster or an interrupted probe) still needs a high
+      // state to compare against: the band baselines, the levels a capped
+      // session would hold.
+      const high: RenderBudgetLevels =
+        this.capProbeOrigin && probe.shedMoved
+          ? this.capProbeOrigin
+          : this.capProbeBaselines(maxRenderScale);
+      this.levels.grass = high.grass;
+      this.levels.foliage = high.foliage;
+      this.levels.vfx = high.vfx;
+      this.levels.lighting = high.lighting;
+      this.levels.resolution = Math.min(maxRenderScale, Math.max(minRenderScale, high.resolution));
+      this.restoreDetailAfterCapProbe(high.detail);
+      if (this.pinnedPostLevel == null) this.levels.post = high.post;
+      return true;
+    }
+    const helped = this.frameMsEma > probe.emaFloor * (1 + EXTERNAL_FRAME_CAP_PROBE_HELPED);
+    this.capProbe = null;
+    this.capProbeOrigin = null;
+    if (helped) {
+      this.capRefused = true;
+      this.capRefusedAgeS = 0;
+      return false;
+    }
+    // The latch frame's pressures were read before the verdict: hold the
+    // ladder once more so the restored levels are not shed on the spot.
+    this.externalFrameCap = true;
+    return true;
+  }
+
+  private restoreDetailAfterCapProbe(level: number): void {
+    if (this.pinnedDetailLevel != null) return;
+    this.detailShed.level = level;
+    this.detailShed.target = level;
+    this.detailShed.overSeconds = 0;
+    this.detailShed.calmSeconds = 0;
+    this.levels.detail = level;
   }
 
   /** Runs on every update, the disabled branch included, so the dev pin holds
@@ -672,55 +942,61 @@ export class RenderBudgetGovernor {
     return true;
   }
 
+  /** One over-budget step down the ladder. 'idle' means no rung was even
+   *  eligible under this pressure (the mild frame band below the severe
+   *  line engages nothing by design); 'exhausted' means every eligible rung
+   *  already sat at its floor: the governor has nothing left to shed here.
+   *  `exhaustive` (the cap probe) makes every rung eligible at the ordinary
+   *  step sizes, so the probe reaches the floors in a few cooldowns. */
   private degrade(
     urgent: boolean,
     minRenderScale: number,
     pressure: { frame: number; submit: number; draw: number; grass: number },
-  ): boolean {
+    exhaustive = false,
+  ): 'changed' | 'exhausted' | 'idle' {
     let changed = false;
+    let eligible = false;
 
     const drawDominant = pressure.draw >= pressure.frame && pressure.draw >= pressure.submit;
     const foliageStep = urgent ? URGENT_FOLIAGE_STEP : 0.08;
-    if (
-      (urgent || drawDominant || pressure.draw >= 1.08) &&
-      this.reduceLevel('foliage', this.caps.minFoliageLevel, foliageStep)
-    ) {
-      changed = true;
+    if (exhaustive || urgent || drawDominant || pressure.draw >= 1.08) {
+      eligible = true;
+      if (this.reduceLevel('foliage', this.caps.minFoliageLevel, foliageStep)) changed = true;
     }
 
     const grassStep = urgent ? URGENT_GRASS_STEP : 0.08;
     if (
-      (urgent ||
-        pressure.grass >= 1 ||
-        (drawDominant && this.levels.foliage <= this.caps.minFoliageLevel + 0.001)) &&
-      this.reduceLevel('grass', this.caps.minGrassLevel, grassStep)
+      exhaustive ||
+      urgent ||
+      pressure.grass >= 1 ||
+      (drawDominant && this.levels.foliage <= this.caps.minFoliageLevel + 0.001)
     ) {
-      changed = true;
+      eligible = true;
+      if (this.reduceLevel('grass', this.caps.minGrassLevel, grassStep)) changed = true;
     }
 
     const lightingStep = urgent ? URGENT_LIGHTING_STEP : 0.07;
     const environmentFloored =
       this.levels.foliage <= this.caps.minFoliageLevel + 0.001 &&
       this.levels.grass <= this.caps.minGrassLevel + 0.001;
-    if (
-      (urgent || pressure.submit >= 1 || environmentFloored) &&
-      this.reduceLevel('lighting', this.caps.minLightingLevel, lightingStep)
-    ) {
-      changed = true;
+    if (exhaustive || urgent || pressure.submit >= 1 || environmentFloored) {
+      eligible = true;
+      if (this.reduceLevel('lighting', this.caps.minLightingLevel, lightingStep)) changed = true;
     }
 
     const vfxStep = urgent ? URGENT_VFX_STEP : 0.05;
     const lightingDone = this.levels.lighting <= this.caps.minLightingLevel + 0.001;
     const severeFramePressure = pressure.frame >= 1.25 || pressure.submit >= 1.25;
     if (
-      (severeFramePressure ||
-        (!urgent &&
-          environmentFloored &&
-          lightingDone &&
-          (pressure.frame >= 1 || pressure.submit >= 1))) &&
-      this.reduceLevel('vfx', this.caps.minVfxLevel, vfxStep)
+      exhaustive ||
+      severeFramePressure ||
+      (!urgent &&
+        environmentFloored &&
+        lightingDone &&
+        (pressure.frame >= 1 || pressure.submit >= 1))
     ) {
-      changed = true;
+      eligible = true;
+      if (this.reduceLevel('vfx', this.caps.minVfxLevel, vfxStep)) changed = true;
     }
 
     // The post shed takes the resolution rung's place on the composer tiers,
@@ -732,14 +1008,37 @@ export class RenderBudgetGovernor {
     // the frame is severely over, so a fight sheds grass and lights before it
     // loses its edge AA, its bloom and its occlusion.
     const vfxDone = this.levels.vfx <= this.caps.minVfxLevel + 0.001;
-    const lastResort = severeFramePressure || (environmentFloored && lightingDone && vfxDone);
-    if (lastResort && this.pinnedPostLevel == null && this.stepPostShed(-1)) changed = true;
-
-    const resolutionStep = urgent ? this.budget.urgentDropStep : this.budget.dropStep;
-    if (lastResort && this.reduceLevel('resolution', minRenderScale, resolutionStep)) {
-      changed = true;
+    const lastResort =
+      exhaustive || severeFramePressure || (environmentFloored && lightingDone && vfxDone);
+    if (lastResort) {
+      eligible = true;
+      if (this.pinnedPostLevel == null && this.stepPostShed(-1)) changed = true;
+      const resolutionStep = urgent ? this.budget.urgentDropStep : this.budget.dropStep;
+      if (this.reduceLevel('resolution', minRenderScale, resolutionStep)) changed = true;
     }
-    return changed;
+    return changed ? 'changed' : eligible ? 'exhausted' : 'idle';
+  }
+
+  /** Everything pressure took is back and nothing is moving: what recover()'s
+   *  first phase restores sits at its baseline, render scale at its maximum.
+   *  The automatic frame rate ceiling reads it as its headroom evidence. A
+   *  disabled governor never took anything. */
+  atBaseline(maxRenderScale: number): boolean {
+    if (!this.enabled) return true;
+    // A recover step is a one-frame reading of a governor that is doing well.
+    if (this.mode === 'degrading') return false;
+    if (this.reason !== 'stable' && this.reason !== 'recover') return false;
+    const eps = 0.001;
+    return (
+      this.levels.grass >= this.bands.grass.baseline - eps &&
+      this.levels.lighting >= this.bands.lighting.baseline - eps &&
+      this.levels.vfx >= this.bands.vfx.baseline - eps &&
+      this.levels.foliage >= this.bands.foliage.baseline - eps &&
+      (this.pinnedPostLevel != null ||
+        !this.postShedChain ||
+        this.levels.post >= this.bands.post.baseline - eps) &&
+      this.levels.resolution >= maxRenderScale - eps
+    );
   }
 
   /** Phase A restores what pressure took, quality buckets before render scale, and runs on

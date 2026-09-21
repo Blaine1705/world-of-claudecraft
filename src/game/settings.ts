@@ -62,6 +62,10 @@ export const SETTING_RANGES = {
   // The shader warm-up worker (src/game/shader_warm_setting.ts): 0 auto
   // (follows the GPU backend), 1 off, 2 on. Read at the next start.
   shaderWarm: { min: 0, max: 2, def: 0 },
+  // The frame rate ceiling (src/game/frame_rate_cap_setting.ts): 0 auto,
+  // 1 display (no ceiling), 2 about 60, 3 about 30. An intent, never a display
+  // rate: the divisor is re-derived from the measured display every session.
+  frameRateCap: { min: 0, max: 3, def: 0 },
   // The desktop shell's graphics backend on Linux
   // (src/game/desktop_gpu_backend_sync.ts): 0 auto (one Vulkan trial),
   // 1 Vulkan, 2 OpenGL. Mirrors the shell prefs store; next launch.
@@ -235,10 +239,19 @@ export const SETTING_RANGES = {
   partyFrameSpacing: { min: 0, max: 12, def: 4 },
   partyFrameColumns: { min: 1, max: 5, def: 1 },
   partyFrameHealthText: { min: 0, max: 4, def: 1 },
+  // The lowest item quality a vendor sale still confirms for, as a
+  // QUALITY_RANK value (1 common ... 5 legendary; see
+  // src/ui/vendor_sell_confirm_policy.ts). Anything below sells instantly, a
+  // mis-sold item being recoverable from Buyback. def 1 keeps today's
+  // behavior (everything beyond true junk confirms). Only read while the
+  // confirmVendorSell master switch below is on.
+  confirmVendorSellMinQuality: { min: 1, max: 5, def: 1 },
   partyFrameSort: { min: 0, max: 2, def: 0 },
 } as const;
 
 export const BOOL_SETTINGS = {
+  // Optional mainland directions, independent of quest tracking and graphics quality.
+  eastbrookGuidance: { def: true },
   // Icon flow of the standalone buff/debuff rows (the Frames Settings menu in
   // edit mode). Off = the stock right-to-left growth (the rows anchor beside
   // the minimap and fill toward the screen centre); on = left to right, via
@@ -383,6 +396,8 @@ export const BOOL_SETTINGS = {
   // Party/raid frame display profile. Health is always visible; these switches
   // choose the supporting information layered around it.
   partyFrameShowResource: { def: true },
+  // Also gates the player / target frame shield hatch (absorb_overlay_gate.ts);
+  // the key keeps its historical name so a saved preference survives.
   partyFrameShowAbsorbs: { def: true },
   partyFrameShowAuras: { def: true },
   // on by default: a thin pet health sliver on the row of any party member who has a
@@ -512,6 +527,10 @@ export const BOOL_SETTINGS = {
   // collapsed to just its header. Toggled by clicking the tracker header (the
   // quest-tracker convention); kept here so the choice persists.
   reliquaryTrackerCollapsed: { def: false },
+  // off by default (expanded): when on, the on-screen pinned-recipe tracker is
+  // collapsed to just its header. Toggled by clicking the tracker header (the
+  // quest-tracker convention); kept here so the choice persists.
+  recipeTrackerCollapsed: { def: false },
   // on by default: the on-screen Reliquary tracker (pinned pages, or the
   // nearly-complete default before any pin) is shown at all. The master
   // switch above the collapse: off removes the strip entirely. Flipped from

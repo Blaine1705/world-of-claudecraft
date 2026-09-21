@@ -996,6 +996,41 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(first).toContain(
       "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS shader_warm_refusal TEXT NOT NULL DEFAULT ''",
     );
+    // The desktop-shell marker: FALSE by default, which is also the honest
+    // answer for every row older than the column.
+    expect(first).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS desktop_shell BOOLEAN NOT NULL DEFAULT FALSE',
+    );
+    // The frame rate ceiling columns: a pre-column row reads as no ceiling.
+    expect(first).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS frame_cap_intent INT NOT NULL DEFAULT 0;',
+    );
+    expect(first).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS cadence_divisor INT NOT NULL DEFAULT 1;',
+    );
+    expect(first).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS refresh_hz INT NOT NULL DEFAULT 0;',
+    );
+    // The host-essentials block (desktop shell only). The five megabyte
+    // columns and the three booleans are NULLABLE on purpose: "not collected"
+    // and "could not be read" must stay apart from a zero and from FALSE. The
+    // two power columns are TEXT NOT NULL DEFAULT '' so a future grouped read
+    // keeps the GROUPING-bits contract, with '' as the unknown member of the
+    // closed vocabulary.
+    for (const ddl of [
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_mem_total_mb INT;',
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_mem_free_mb INT;',
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS app_working_set_mb INT;',
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS app_renderer_ws_mb INT;',
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS app_gpu_ws_mb INT;',
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_on_battery BOOLEAN;',
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_power_plan TEXT NOT NULL DEFAULT '';",
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_power_mode TEXT NOT NULL DEFAULT '';",
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_hags BOOLEAN;',
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_game_mode BOOLEAN;',
+    ]) {
+      expect(first).toContain(ddl);
+    }
     // Never a rewrite of the existing rows' meaning: no DROP, no NOT NULL
     // added without a default, no type change on a shipped column.
     expect(first).not.toContain('ALTER TABLE client_perf_reports DROP COLUMN');

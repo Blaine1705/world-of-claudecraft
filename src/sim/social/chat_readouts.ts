@@ -45,7 +45,6 @@ import {
   ENCHANT_CAST_ID,
   type Entity,
   type EquipSlot,
-  FARMING_CAST_ID,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   isFormAuraKind,
@@ -57,7 +56,7 @@ import {
   TOOL_RECHARGE_CAST_ID,
   xpForLevel,
 } from '../types';
-import { UNSTUCK_COOLDOWN_ID } from '../unstuck_cooldown';
+import { isUnstuckSystemCooldown } from '../unstuck_cooldown';
 import { groundHeight } from '../world';
 
 const NEARBY_RANGE = 40; // /nearby scan radius — wider than say, tighter than yell
@@ -436,7 +435,7 @@ function auraLabel(a: Aura): string {
 //
 export function cooldownsReadout(e: Entity): string {
   const parts = [...e.cooldowns]
-    .filter(([id]) => id !== UNSTUCK_COOLDOWN_ID)
+    .filter(([id]) => !isUnstuckSystemCooldown(id))
     .sort((a, b) => a[1] - b[1])
     .map(([id, remaining]) => `${ABILITIES[id]?.name ?? id} (${Math.ceil(remaining)}s)`);
   if (parts.length === 0) return 'No abilities are on cooldown.';
@@ -613,13 +612,6 @@ export function castingReadout(e: Entity): string {
   }
   if (e.castingAbility === TOOL_RECHARGE_CAST_ID) {
     return `You are recharging a tool effect: ${remaining}s of ${total}s remaining.`;
-  }
-  if (e.castingAbility === FARMING_CAST_ID) {
-    // No countdown, and for a different reason than fishing's: the plant
-    // already RESOLVED at command time, so the seconds left on this cast
-    // decide nothing a player could act on. Naming the state is the whole
-    // truth there is to tell.
-    return 'You are planting.';
   }
   const name = ABILITIES[e.castingAbility]?.name ?? e.castingAbility;
   const verb = e.channeling ? 'Channeling' : 'Casting';

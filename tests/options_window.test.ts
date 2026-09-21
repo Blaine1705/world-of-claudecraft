@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { keybindDeviceNoteKeys } from '../src/ui/keybind_device_notes_core';
 import { OptionsWindow } from '../src/ui/options_window';
 
 // Source-level guards for the options painter. The pure control descriptors +
@@ -9,6 +10,11 @@ import { OptionsWindow } from '../src/ui/options_window';
 // roles/aria, the bug-report + keybind dispatch, and that the window stays cold
 // (never wired into the per-frame Hud.update path).
 const painter = readFileSync(new URL('../src/ui/options_window.ts', import.meta.url), 'utf8');
+// The main menu's button list is the sibling painter the window composes.
+const mainMenu = readFileSync(
+  new URL('../src/ui/options_main_menu_controller.ts', import.meta.url),
+  'utf8',
+);
 const settingsControls = readFileSync(
   new URL('../src/ui/settings_controls.ts', import.meta.url),
   'utf8',
@@ -26,10 +32,10 @@ describe('options_window: interface-redesign primitive adoption', () => {
   it('keeps legacy hooks while adopting the shared window and control primitives', () => {
     expect(painter).toContain('panel-title ui-win-head');
     expect(painter).toContain('ui-win-art');
-    expect(painter).toContain('btn ui-btn opt-btn');
-    expect(painter).toContain("b.classList.add('ui-btn--red', 'ui-btn--lg')");
-    expect(painter).toContain("b.classList.add('opt-btn-hostile')");
-    expect(painter).toContain("status.textContent = t('hudChrome.bugReport.online')");
+    expect(mainMenu).toContain('btn ui-btn opt-btn');
+    expect(mainMenu).toContain("b.classList.add('ui-btn--red', 'ui-btn--lg')");
+    expect(mainMenu).toContain("b.classList.add('opt-btn-hostile')");
+    expect(mainMenu).toContain("status.textContent = t('hudChrome.bugReport.online')");
     expect(painter).toContain('set-choice ui-seg');
     expect(painter).toContain('btn ui-seg-tab set-choice-btn');
     expect(painter).toContain('btn ui-keycap kb-key');
@@ -448,12 +454,14 @@ describe('options_window: interface tab split', () => {
     expect(painter).toMatch(
       /if \(tab === 'general'\) \{\s*this\.languageSelect\(body\);\s*this\.renderThemeControls\(body\);/,
     );
-    // the Edit Frames entry and the layout transfer lead the Frames tab,
-    // with the remaining declarative rows under the Party Frame Options
-    // subhead (the unit-frames reset row was retired with the per-frame
-    // Reset size buttons in the editor's Show or Hide Frames list)
+    // the Edit Frames entry and the layout transfer lead the Frames tab, BOTH
+    // behind the touch gate (the editor is desktop-only and the layout code
+    // carries only its saved spots, so the touch HUD offers neither), with the
+    // remaining declarative rows under the Party Frame Options subhead (the
+    // unit-frames reset row was retired with the per-frame Reset size buttons
+    // in the editor's Show or Hide Frames list)
     expect(painter).toMatch(
-      /if \(tab === 'frames'\) \{[\s\S]*?if \(!env\.touch\) buildInterfaceUnlockRow\(body, this\.deps\);\s*this\.transferRows\(body, 'frames'\);\s*subhead\(body, t\('hudChrome\.partyFrames\.optionsSection'\), 'set-subhead'\);/,
+      /if \(tab === 'frames'\) \{[\s\S]*?if \(!env\.touch && !env\.nativeShell\) buildInterfaceUnlockRow\(body, this\.deps\);\s*if \(!env\.touch && !env\.nativeShell\) this\.transferRows\(body, 'frames'\);\s*subhead\(body, t\('hudChrome\.partyFrames\.optionsSection'\), 'set-subhead'\);/,
     );
     expect(painter).not.toContain('unitFramesResetRow');
     // the chat-timestamp / chat-reset / deed-broadcast rows live in the Chat tab
@@ -552,7 +560,7 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
   it('preserves the submit action and the no-text / in-flight / failure states', () => {
     const bug = painter.slice(
       painter.indexOf('private renderBugReport'),
-      painter.indexOf('private localizeBugReportError'),
+      painter.indexOf('// Controller (cluster 5)'),
     );
     // no-text guard short-circuits with the describe-first message
     expect(bug).toContain("error.textContent = t('hudChrome.bugReport.describeFirst')");
@@ -567,13 +575,13 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
     expect(bug).toContain('hudChrome.bugReport.submittedNoShot');
     // failure: re-enable + localized error
     expect(bug).toContain('submit.disabled = false');
-    expect(bug).toContain('this.localizeBugReportError(err)');
+    expect(bug).toContain('bugReportErrorText(err)');
   });
 
   it('paints the form before the deferred screenshot capture and gates submit on it', () => {
     const bug = painter.slice(
       painter.indexOf('private renderBugReport'),
-      painter.indexOf('private localizeBugReportError'),
+      painter.indexOf('// Controller (cluster 5)'),
     );
     expect(bug).toContain('const capturePromise = new Promise<string | null>');
     expect(bug).toContain('requestIdleCallback(capture, { timeout: 500 })');
@@ -619,17 +627,23 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
     expect(painter).toContain('this.deps.refreshKeybindLabels()');
   });
 
-  it('notes the bindable mouse buttons through t(), on pointer devices only', () => {
-    // The hint is the one place the panel tells the player a mouse button binds
-    // like a key; it must be localized and hidden on touch, which has no mouse.
+  it('notes the bindable mouse buttons and wheel through t(), on pointer devices only', () => {
+    // The notes are the one place the panel tells the player a mouse button or a
+    // wheel notch binds like a key; keybind_device_notes_core.ts owns the list
+    // (localized keys, none on touch, which has no mouse) and the painter loops
+    // it through t() under the same touch gate the desktop-only rows use.
     const keybinds = painter.slice(
       painter.indexOf('private renderKeybinds(): void {'),
       painter.indexOf('private beginCapture('),
     );
-    expect(keybinds).toContain("t('hudChrome.keybinds.mouseHint')");
-    const hintIdx = keybinds.indexOf("t('hudChrome.keybinds.mouseHint')");
-    const gateIdx = keybinds.lastIndexOf('if (!useTouchInterface()) {', hintIdx);
-    expect(gateIdx).toBeGreaterThan(-1);
+    expect(keybinds).toContain('keybindDeviceNoteKeys(useTouchInterface())');
+    const loopIdx = keybinds.indexOf('keybindDeviceNoteKeys(useTouchInterface())');
+    expect(keybinds.indexOf('deviceNote.textContent = t(key)', loopIdx)).toBeGreaterThan(loopIdx);
+    expect(keybindDeviceNoteKeys(false)).toEqual([
+      'hudChrome.keybinds.mouseHint',
+      'hudChrome.keybinds.wheelHint',
+    ]);
+    expect(keybindDeviceNoteKeys(true)).toEqual([]);
   });
 
   it('removes dead slot choices from controller remaps while the cross hotbar is on', () => {
@@ -816,7 +830,9 @@ describe('options_window: settings shows the running version (#1541)', () => {
     expect(body).toContain("t('hudChrome.options.version', { version, build })");
     // Rendered as the .opt-version secondary line appended after the button list.
     expect(body).toContain("'opt-version'");
-    expect(body.indexOf("'opt-version'")).toBeGreaterThan(body.indexOf('el.appendChild(list)'));
+    const listAppend = body.indexOf('scroll.appendChild(list)');
+    expect(listAppend).toBeGreaterThanOrEqual(0);
+    expect(body.indexOf("'opt-version'")).toBeGreaterThan(listAppend);
   });
 });
 
@@ -1057,7 +1073,20 @@ describe('options_window: frame editing is locked out on touch', () => {
     // Every frame-editing gesture refuses touch layouts, so the touch HUD
     // never renders the entry row (the reviewer found the floating lock bar
     // and inert previews still reachable there).
-    expect(painter).toContain('if (!env.touch) buildInterfaceUnlockRow(body, this.deps);');
+    expect(painter).toContain(
+      'if (!env.touch && !env.nativeShell) buildInterfaceUnlockRow(body, this.deps);',
+    );
+  });
+
+  it('the Frames tab offers the layout export / import rows only off the touch HUD', () => {
+    // The layout code carries only the editor's saved spots, which the touch
+    // HUD can neither make nor apply (the engine indicators keep their own
+    // touch drag, touch_frame_drag.ts), so the rows are withheld with the row.
+    expect(painter).toContain(
+      "if (!env.touch && !env.nativeShell) this.transferRows(body, 'frames');",
+    );
+    // The General tab's whole-settings transfer stays on every layout.
+    expect(painter).toContain("if (tab === 'general') this.transferRows(body, 'settings');");
   });
 
   it('Hud.toggleInterfaceUnlock refuses on the mobile layout as the backstop', () => {

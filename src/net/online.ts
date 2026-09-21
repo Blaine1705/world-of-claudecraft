@@ -14,6 +14,7 @@ import {
   type PlayerFlair,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { type AccountEarner, type AccountLedger, freshAccountLedger } from '../sim/account_ledger';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
@@ -33,7 +34,7 @@ import {
   type TalentModifiers,
   type TalentRowLevel,
 } from '../sim/content/talents';
-import { resolveActiveWeaponSkin, withWeaponSkinApplied } from '../sim/content/weapon_skin_rules';
+import { resolveEntityWeaponSkin } from '../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import {
   ALL_RECIPES,
@@ -59,20 +60,17 @@ import type { HarvestPreference } from '../sim/professions/harvest_preference';
 import type { PerfectingSwapRequest } from '../sim/professions/perfecting_swap';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import {
+  accountReliquaryOwnershipOpts,
   catalogRankOwned,
   catalogRelicCompletion,
   clearCountForSource,
   curatorRankFromOwned,
   pageCompletion,
   RELIQUARY_PAGES_BY_ID,
-  reliquaryOwnershipOpts,
-  restoreReliquaryState,
-  type SavedReliquaryState,
 } from '../sim/reliquary';
 import { riftFloorColliders } from '../sim/rift/rift_gen';
 import type { ResolvedAbility } from '../sim/sim';
 import {
-  type Aura,
   cloneItemInstancePayload,
   type DeedStats,
   type DungeonDifficulty,
@@ -142,7 +140,9 @@ import {
   type GuildBankInfo,
   type GuildBankLogKind,
   type GuildBankLogView,
+  type GuildBoardCategory,
   type GuildLeaderboardPage,
+  type GuildPledgeSettings,
   type GuildRosterInfo,
   type IWorld,
   isOverheadEmoteId,
@@ -169,6 +169,7 @@ import {
   type ToolEffectSlotView,
   type TradeInfo,
   type VaultInfo,
+  type WhoRosterInfo,
 } from '../world_api';
 import {
   type ActionBarLayout,
@@ -191,11 +192,13 @@ import type {
 import { buildClientAbilityPresentation } from './ability_presentation';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { ActionBarLayoutUploader } from './action_bar_upload';
+import { anchorFields } from './anchor_fields';
 import { apiErrorFromBody } from './api_error';
 import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
 import { computeBackoffDelay } from './backoff';
 import { applyBankSelfWire } from './bank_snapshot_wire';
 import { blankEntity } from './blank_entity';
+import { applyBookOfDeedsWire } from './book_wire';
 import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
@@ -207,11 +210,13 @@ import {
   type DesktopWalletStatus,
   parseDesktopWalletHandoffStatus,
 } from './desktop_wallet_handoff';
+import { pruneMissingEntities } from './despawn_grace';
 import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
 import { decodeEntityFlairWire } from './entity_flair_wire';
 import { reanchorDecision } from './entity_reanchor';
 import { applyGroundTelegraphSnapshot } from './ground_telegraph_wire';
 import { GuildBankLogMirror } from './guild_bank_log_mirror';
+import { decodeGuildBoardPage, emptyGuildBoardPage, guildBoardPath } from './guild_board_wire';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { inputSignature } from './input_signature';
@@ -249,8 +254,11 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+import { socialInfoFromFrame } from './social_frame_wire';
+import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './target_echo';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
+import { whoRosterFromFrame } from './who_frame_wire';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 import { WorldInteractionRequests } from './world_interaction_requests';
 
@@ -276,40 +284,9 @@ interface PendingTransientInput {
 // REST
 // ---------------------------------------------------------------------------
 
-export interface CharacterSummary {
-  id: number;
-  name: string;
-  class: PlayerClass;
-  level: number;
-  skin: number;
-  online: boolean;
-  forceRename: boolean;
-  lastPlayed?: string | null;
-  playtimeSeconds?: number;
-  // Real, in-world appearance so the char-select preview matches the game. Both
-  // optional for back-compat with an older server that omits them: absent
-  // skinCatalog defaults to the class rig, absent hand fields show no item.
-  skinCatalog?: 'class' | 'mech';
-  mainhandItemId?: string | null;
-  offhandItemId?: string | null;
-  /** The account's active Armory weapon skin for this character (server-resolved
-   *  per class + mainhand). Optional for back-compat like the fields above. */
-  weaponSkinId?: string | null;
-  /** THIS character's authored modular look (characters.appearance). Untrusted
-   *  wire JSON: consumers normalize (normalizeAppearance) before composing.
-   *  Null/absent = pre-creator character; the legacy class rig renders. */
-  appearance?: Record<string, unknown> | null;
-  /** Mirror of the character's saved helm-visibility preference, so the roster
-   *  preview wears (or bares) the kit helm exactly as the world last saw them. */
-  helmHidden?: boolean;
-  /** ISO creation timestamp (server clock), for display; eligibility for the
-   *  redesign token is decided server-side (appearanceRerollAvailable). */
-  createdAt?: string | null;
-  /** Server-decided: this character still holds its one-shot appearance
-   *  redesign (created before the modular creator shipped, token unspent).
-   *  Drives the roster's reroll button; flips false after a successful spend. */
-  appearanceRerollAvailable?: boolean;
-}
+export type { CharacterSummary } from './character_summary';
+
+import type { CharacterSummary } from './character_summary';
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
   return runtimeWebSocketUrl(protocol, host, DESKTOP_API_ORIGIN);
@@ -1223,25 +1200,6 @@ const INCOMPATIBLE_WORLD_VERSION_ERROR = ONLINE_WORLD_INCOMPATIBLE_MESSAGE;
 // DESPAWN_GRACE_MS before vanishing — acceptable, since you can only see a
 // stealthed unit at that range when far out-leveling it.
 const DESPAWN_GRACE_MIN_DIST_SQ = 70 * 70;
-// How many self snapshots a pending target echo may hold the optimistic value
-// before the server's value wins regardless (the reconcile valve: a server
-// REFUSAL, an invalid, dead, or out-of-interest target, must still win). Self
-// snapshots broadcast once per 50 ms server loop callback, so 3 spans ~150 ms,
-// comfortably past the typical command round trip; on a slower link the worst
-// case degrades to the pre-fix one-snapshot blink, never a stuck target. A
-// snapshot COUNT rather than wall-clock keeps the valve deterministic in tests
-// (and needs no clock at all in the decode path).
-const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
-
-// The two wire fields a per-copy selection's ANCHOR rides on (`ord`/`n`), or
-// nothing at all when the caller named no anchor. Spread into the frame so an
-// unanchored command is byte-identical to what it always sent, which is what
-// keeps the golden traces still and an older server working unchanged; the
-// server re-derives the anchor against its own bags and refuses a mismatch
-// (src/sim/item_copy_anchor.ts).
-function anchorFields(target: NamedSlotTarget): { ord?: number; n?: number } {
-  return target.anchor ? { ord: target.anchor.ordinal, n: target.anchor.count } : {};
-}
 
 export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
@@ -1250,6 +1208,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // of the roster data. ---
   cfg: { seed: number; playerClass: PlayerClass };
   entities = new Map<number, Entity>();
+  entityRosterVersion = 0;
   playerId = -1;
   private ownPlayerId = -1;
   private readonly ownPlayerClass: PlayerClass;
@@ -1330,6 +1289,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
   // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
   socialInfo: SocialInfo | null = null;
+  // The Who tab's roster, set ONLY by the `who` frame (answer to `whoRequest`).
+  whoInfo: WhoRosterInfo | null = null;
   // Operator-set account flair (cosmetic), keyed by LOWERCASED character name and
   // read back by `accountFlair`. Fed from BOTH wire sources: the entity identity
   // record (players inside the ~120yd interest scope) and the `flair` on a chat
@@ -1407,6 +1368,18 @@ export class ClientWorld extends ReconWireState implements IWorld {
   reliquaryMarks: Set<string> = new Set();
   reliquaryRecent: string[] = [];
   reliquaryObtainCounts: Record<string, number> = {};
+  // --- The account ledger (src/sim/account_ledger.ts), from the heavy-gated
+  // `acct` self key: which characters on the account earned each deed and
+  // found each relic. Both books and the ownership union below read it. The
+  // `relicRecorded` event is NOT presentation and never touches this mirror:
+  // the snapshot is the single authority (the deedUnlocked doctrine). ---
+  accountLedger: AccountLedger = freshAccountLedger();
+  get accountDeeds(): ReadonlyMap<string, readonly AccountEarner[]> {
+    return this.accountLedger.deeds;
+  }
+  get reliquaryAccountFinds(): ReadonlyMap<string, readonly AccountEarner[]> {
+    return this.accountLedger.relics;
+  }
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -1741,13 +1714,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // idiom as pendingQuestCommands / quest_state_optimistic.ts. targetEntity
   // writes the optimistic targetId locally, but a snapshot the server generated
   // BEFORE processing the 'target' command is nearly always already in flight
-  // and still carries the OLD target; applying it blanks the target frame for
-  // one snapshot (and re-toggles the party-frames below-target push), the
-  // select flicker. While set, every self targetId write routes through
-  // applySelfTargetFromServer, which keeps displaying the optimistic id until
-  // the server echoes it or the snapshot budget runs out (server authority is
-  // untouched: a refusal still wins via that valve).
-  private pendingTargetEcho: { id: number | null; snapshotsLeft: number } | null = null;
+  // and still carries the OLD target; applying it shows the previous target
+  // (or blanks the frame) until the echo lands, the select bounce. While set,
+  // every self targetId write routes through applySelfTargetFromServer, which
+  // keeps displaying the optimistic id until a snapshot whose input ack covers
+  // the command's seq (the decision core is the pure target_echo.ts; server
+  // authority is untouched: that snapshot's value wins, refusal included).
+  private pendingTargetEcho: PendingTargetEcho | null = null;
   // Lazy holder (the bareClient idiom): requests() below creates this on first use.
   private worldInteractionRequests: WorldInteractionRequests | undefined;
   private mouselookFacing: number | null = null;
@@ -2335,6 +2308,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.pendingDungeonEntryFacing = null;
         this.missingSince.clear();
         this.lastSnapAt = 0;
+        this.whoInfo = null; // the old transport's roster is stale; the tab re-asks
         // any in-flight target echo died with the old transport; the resent
         // world's value must apply from the first snapshot
         this.pendingTargetEcho = null;
@@ -2468,26 +2442,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return;
     }
     if (msg.t === 'social') {
-      // The pledge-board fields are normalized with defaults so an older
-      // server's frame (no pledge board) still yields a fully-shaped mirror:
-      // settings read as accepting (the feature's default), no open pledges,
-      // tier 0, no standing pledge.
-      const guild = msg.guild
-        ? {
-            ...msg.guild,
-            pledgeSettings: msg.guild.pledgeSettings ?? { enabled: true, minLevel: 1, note: '' },
-            pledges: msg.guild.pledges ?? [],
-            tier: msg.guild.tier ?? 0,
-          }
-        : null;
-      this.socialInfo = {
-        friends: msg.friends ?? [],
-        blocks: msg.blocks ?? [],
-        ignores: msg.ignores ?? [],
-        guild,
-        myPledge: msg.myPledge ?? null,
-      };
+      this.socialInfo = socialInfoFromFrame(msg);
       this.socialDirty = true;
+      return;
+    }
+    if (msg.t === 'who') {
+      // The Who tab's roster answer; a frame with no usable roster keeps the last.
+      const roster = whoRosterFromFrame(msg);
+      if (roster) this.whoInfo = roster;
       return;
     }
     if (msg.t === 'socialpos') {
@@ -2729,6 +2691,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.facing = w.f;
         e.prevFacing = w.f;
         this.entities.set(w.id, e);
+        this.entityRosterVersion++;
       }
       if (hasIdentity) {
         e.kind = w.k;
@@ -2945,9 +2908,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.sitting = !!w.sit;
       e.riftSliding = !!w.sld;
       e.climbing = !!w.cl;
-      // Quantized 1..99 progress through the pull (see server snapshot);
-      // undefined when not climbing so the visual falls back to its own clock.
+      // Quantized 1..99 pull progress; undefined when idle so the visual falls back to its own clock.
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
+      e.leaping = !!w.lp;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
       e.helmHidden = !!w.hh;
@@ -3338,42 +3301,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.guildBankInfo = s.guildBank;
         if (hadGate !== (this.guildBankInfo !== null)) this.guildBankLogMirror.reset();
       }
-      // --- IWorldDeeds self-decode: `deeds`/`dstats` are heavy-gated,
-      // `renown`/`atitle`/`aborder` per-tick diffed (all five delta-omitted: a
-      // missing key keeps the prior mirror). The wire carries plain objects/arrays
-      // (Maps and Sets do not survive JSON.stringify), so the earned Map and
-      // both stat Sets rebuild here. `deedUnlocked` events are presentation
-      // only and never touch these mirrors. ---
-      if (s.deeds !== undefined) this.deedsEarned = new Map(Object.entries(s.deeds ?? {}));
-      if (s.dstats !== undefined && s.dstats) {
-        this.deedStats = {
-          counters: { ...freshDeedStats().counters, ...(s.dstats.counters ?? {}) },
-          itemsDiscovered: new Set(s.dstats.itemsDiscovered ?? []),
-          visited: new Set(s.dstats.visited ?? []),
-          dungeonClears: s.dstats.dungeonClears ?? {},
-        };
-      }
-      if (s.renown !== undefined) this.renown = s.renown ?? 0;
-      if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
-      if (s.aborder !== undefined) this.activeBorder = s.aborder ?? null;
-      // --- IWorldReliquary self-decode: `reliq` is heavy-gated and delta-omitted
-      // (a missing key keeps the prior mirror). Payload is the omit-empty
-      // SavedReliquaryState shape; never a second full itemsDiscovered array.
-      // `reliquaryUnlock` events are presentation only and never touch these. ---
-      if (s.reliq !== undefined) {
-        const restored = restoreReliquaryState((s.reliq ?? {}) as SavedReliquaryState | undefined);
-        this.reliquaryFirstFind = restored.firstFind;
-        this.reliquaryMarks = restored.marks;
-        this.reliquaryRecent = restored.recent;
-        // The obtain tally rides folded into the firstFind entries on the wire;
-        // restore splits it back out, so the mirror reads it the same way the
-        // offline Sim reads the live state.
-        this.reliquaryObtainCounts = restored.counts;
-        // restored.illuminatedPages is DELIBERATELY not mirrored: the sticky
-        // illumination record is sim/server-authoritative with no IWorld
-        // consumer (the client banner and the guild marquee both key off
-        // events). It rides the blob only because wire shape is save shape.
-      }
+      // --- IWorldDeeds / IWorldReliquary / account-ledger self-decode
+      // (`deeds`/`dstats`/`reliq`/`acct` heavy-gated, `renown`/`atitle`/
+      // `aborder` per-tick diffed, all delta-omitted): src/net/book_wire.ts. ---
+      applyBookOfDeedsWire(this, s);
       if (s.ptime !== undefined) this.playtimeSeconds = s.ptime ?? 0;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
@@ -3434,37 +3365,17 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // grace applies only near/beyond the interest boundary; a close-range
     // disappearance (an enemy going stealth) still hides immediately.
     // (A `keep`-listed entity counts as seen above, so its timer is cleared.)
-    const self = this.entities.get(this.playerId);
-    const missingSince = this.missingSince;
-    for (const [id, e] of this.entities) {
-      if (id === this.playerId) continue;
-      // Keep the moderator's last own-self record while a different player is
-      // presented as self. The spectate-clear frame can then restore the original
-      // identity immediately instead of exposing a blank entity before the next
-      // server snapshot arrives.
-      if (typeof this.spectating === 'string' && id === this.ownPlayerId) {
-        missingSince.delete(id);
-        continue;
-      }
-      if (seen.has(id)) {
-        missingSince.delete(id);
-        continue;
-      }
-      const dx = self ? e.pos.x - self.pos.x : 0;
-      const dz = self ? e.pos.z - self.pos.z : 0;
-      if (dx * dx + dz * dz < DESPAWN_GRACE_MIN_DIST_SQ) {
-        this.entities.delete(id);
-        missingSince.delete(id);
-        continue;
-      }
-      const since = missingSince.get(id);
-      if (since === undefined) {
-        missingSince.set(id, now);
-      } else if (now - since >= DESPAWN_GRACE_MS) {
-        this.entities.delete(id);
-        missingSince.delete(id);
-      }
-    }
+    this.entityRosterVersion += pruneMissingEntities({
+      entities: this.entities,
+      seen,
+      missingSince: this.missingSince,
+      playerId: this.playerId,
+      ownPlayerId: this.ownPlayerId,
+      spectating: this.spectating,
+      now,
+      graceMs: DESPAWN_GRACE_MS,
+      immediateDropDistSq: DESPAWN_GRACE_MIN_DIST_SQ,
+    });
   }
 
   // -----------------------------------------------------------------------
@@ -3603,38 +3514,22 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // applyWire and the precise `target` self-decode, same server-side value per
   // server/game.ts selfWireJson) and both must apply the same echo protection,
   // else the unguarded one re-introduces the clobber. `countStale` is true only
-  // for the self-decode, so one snapshot never burns two units of the budget.
+  // for the self-decode, so one snapshot never burns two units of the valve
+  // budget; the self-decode also runs after the snapshot's ack has been folded
+  // into ackedInputSeq, so it is the write that sees the release.
   private applySelfTargetFromServer(
     e: Entity,
     serverTarget: number | null,
     countStale: boolean,
   ): void {
-    const pending = this.pendingTargetEcho;
-    if (!pending) {
-      e.targetId = serverTarget;
-      return;
-    }
-    if (serverTarget === pending.id) {
-      // The echo landed: the server agrees, resume normal mirroring so a LATER
-      // server-initiated change (target death, out of interest) applies again.
-      this.pendingTargetEcho = null;
-      e.targetId = serverTarget;
-      return;
-    }
-    if (countStale) {
-      pending.snapshotsLeft -= 1;
-      if (pending.snapshotsLeft <= 0) {
-        // Reconciliation valve: the server never echoed the command (it refused
-        // an invalid, dead, or out-of-interest target). Server authority wins.
-        this.pendingTargetEcho = null;
-        e.targetId = serverTarget;
-        return;
-      }
-    }
-    // A stale pre-command snapshot: keep displaying the optimistic value.
-    // Assigned (not merely skipped) so the applyWire write earlier in the same
-    // snapshot pass cannot leave the clobbered value behind.
-    e.targetId = pending.id;
+    const r = resolveSelfTarget(
+      this.pendingTargetEcho,
+      serverTarget,
+      this.ackedInputSeq,
+      countStale,
+    );
+    this.pendingTargetEcho = r.pending;
+    e.targetId = r.targetId;
   }
 
   // --- IWorldTargeting: target selection + tab cycling ---
@@ -3644,25 +3539,29 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // Armed only when the optimistic write actually happened, and never while
     // spectating: cmd() drops non-chat commands in spectate, so no echo would
     // ever arrive to release the hold on the spectated player's mirror.
+    // The command rides the input seq stream (server/game.ts folds a command's
+    // seq into the same lastInputSeq the self snapshot acks), so the mirror can
+    // tell a snapshot built after the command from a stale in-flight one. Not
+    // drawn in spectate, where cmd() drops the command: a hole in the seq stream
+    // reads server-side as a lost frame. (A send rawCmd drops on a closed socket
+    // burns a seq harmlessly: the input frames behind it drop the same way, and
+    // the reconnect hello restarts both counters.)
+    const seq = typeof this.spectating === 'string' ? null : ++this.inputSeq;
     const p = this.entities.get(this.playerId);
     if (p) {
       if (id === null) {
         p.targetId = null;
-        if (typeof this.spectating !== 'string') {
-          // last write wins: a newer call replaces any older pending record
-          this.pendingTargetEcho = { id: null, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
-        }
+        // last write wins: a newer call replaces any older pending record
+        if (seq !== null) this.pendingTargetEcho = armTargetEcho(null, seq);
       } else {
         const e = this.entities.get(id);
         if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) {
           p.targetId = id;
-          if (typeof this.spectating !== 'string') {
-            this.pendingTargetEcho = { id, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
-          }
+          if (seq !== null) this.pendingTargetEcho = armTargetEcho(id, seq);
         }
       }
     }
-    this.cmd({ cmd: 'target', id });
+    this.cmd(seq === null ? { cmd: 'target', id } : { cmd: 'target', id, seq });
   }
   tabTarget(): void {
     // Server-resolved retarget: its result must apply from the very next
@@ -4104,12 +4003,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // Same re-resolve the offline Sim does (setPlayerSkin): the body decides
       // which skin types apply, so the optimistic local view must swap the
       // displayed skin with the body rather than wait for the next snapshot.
-      p.weaponSkinId = resolveActiveWeaponSkin(
-        p.templateId,
-        p.mainhandItemId,
-        p.weaponSkinLoadout,
-        catalog,
-      );
+      p.weaponSkinId = resolveEntityWeaponSkin(p);
     }
     this.cmd({ cmd: 'change_skin', skin: idx, catalog });
   }
@@ -4216,12 +4110,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // body change and re-resolves like changeSkin and Sim.setPlayerSkin do.
         // Without it a mech hunter's sword skin stayed displayed on a class rig
         // that cannot render one, until the next authoritative snapshot.
-        current.weaponSkinId = resolveActiveWeaponSkin(
-          current.templateId,
-          current.mainhandItemId,
-          current.weaponSkinLoadout,
-          current.skinCatalog,
-        );
+        current.weaponSkinId = resolveEntityWeaponSkin(current);
         this.cosmeticsChanged = true;
       }
     }
@@ -4578,8 +4467,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   guildPledgeDecide(name: string, accept: boolean): void {
     this.cmd({ cmd: 'guild_pledge_decide', name, accept });
   }
-  setGuildPledgeSettings(enabled: boolean, minLevel: number, note: string): void {
-    this.cmd({ cmd: 'guild_pledge_settings', enabled, minLevel, note });
+  setGuildPledgeSettings(settings: GuildPledgeSettings): void {
+    this.cmd({ cmd: 'guild_pledge_settings', ...settings });
   }
   guildDecline(): void {
     this.cmd({ cmd: 'guild_decline' });
@@ -4613,6 +4502,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   guildBuyRosterPage(): void {
     this.cmd({ cmd: 'guild_buy_roster_page' });
+  }
+  whoRequest(filter: string): void {
+    this.cmd({ cmd: 'who', filter });
   }
   async searchCharacters(query: string): Promise<CharacterSearchResult[]> {
     const q = query.trim();
@@ -4745,6 +4637,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   marketBuy(listingId: number): void {
     this.cmd({ cmd: 'market_buy', id: listingId });
+  }
+  marketSweepQuote(itemId: string, count: number): void {
+    this.cmd({ cmd: 'market_sweep_quote', item: itemId, count });
+  }
+  marketSweep(itemId: string, count: number, maxCopper: number): void {
+    // `max` is the quoted total the player agreed to; the server re-plans on the
+    // live book and refuses past it, so nothing here can fix a price.
+    this.cmd({ cmd: 'market_sweep', item: itemId, count, max: maxCopper });
   }
   marketCancel(listingId: number): void {
     this.cmd({ cmd: 'market_cancel', id: listingId });
@@ -4889,7 +4789,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // Identical offline Sim formulas so online/offline answer the same for
   // scripted state. ---
   private reliquaryOwnershipSurfaces() {
-    return reliquaryOwnershipOpts({
+    // ACCOUNT-WIDE through the one shared union helper the Sim uses too.
+    return accountReliquaryOwnershipOpts(this.accountLedger, {
       itemsDiscovered: this.deedStats.itemsDiscovered,
       marks: this.reliquaryMarks,
       ownedMounts: this.ownedMounts(),
@@ -5300,34 +5201,19 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
   }
   // Guild high-score board (REST GET, no wire command): ?board=guilds ranks
-  // guilds by summed member lifetime XP. Realm-scoped (default), paged exactly
-  // like the player board above.
+  // guilds by summed member lifetime XP, realm-scoped and paged like the player
+  // board above; `category` narrows it server-side (guild_board_wire.ts).
   async guildLeaderboard(
     page = 0,
     pageSize = LEADERBOARD_PAGE_SIZE,
+    category: GuildBoardCategory | null = null,
   ): Promise<GuildLeaderboardPage> {
-    const empty: GuildLeaderboardPage = {
-      leaders: [],
-      page: 0,
-      pageCount: 1,
-      total: 0,
-      pageSize,
-    };
     try {
-      const res = await fetch(
-        apiUrl(`/api/leaderboard?board=guilds&page=${page}&pageSize=${pageSize}`, this.base),
-      );
-      if (!res.ok) return empty;
-      const data = await res.json();
-      return {
-        leaders: data.leaders ?? [],
-        page: data.page ?? page,
-        pageCount: data.pageCount ?? 1,
-        total: data.total ?? data.leaders?.length ?? 0,
-        pageSize: data.pageSize ?? pageSize,
-      };
+      const res = await fetch(apiUrl(guildBoardPath(page, pageSize, category), this.base));
+      if (!res.ok) return emptyGuildBoardPage(pageSize, category);
+      return decodeGuildBoardPage(await res.json(), page, pageSize);
     } catch {
-      return empty;
+      return emptyGuildBoardPage(pageSize, category);
     }
   }
   // The signpost guild board's roster drill-in (REST GET, no wire command):

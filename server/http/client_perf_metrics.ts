@@ -47,6 +47,9 @@ import { Counter, Histogram, type Registry } from 'prom-client';
 // suggestion-id catalog (which would cycle perf_report <-> this module) the
 // real vocabulary can be the one source here.
 import { GL_BACKEND_LABELS, type GlBackend } from '../gl_backend';
+// Same rule: perf_report_shed.ts imports nothing, so the rung vocabulary is
+// imported rather than copied.
+import { RAW_SUMMARY_SHED_RUNG_IDS } from '../perf_report_shed';
 
 /** The five graphics tiers the ingest allowlist admits (perf_report.ts gfxTier). */
 export const CLIENT_PERF_GFX_TIERS = ['low', 'medium', 'high', 'ultra', 'insane'] as const;
@@ -74,6 +77,16 @@ export const CLIENT_PERF_GPU_FAMILIES = [
   'other',
 ] as const;
 export type ClientPerfGpuFamily = (typeof CLIENT_PERF_GPU_FAMILIES)[number];
+
+/**
+ * The host runtime: a browser tab, or the Electron desktop shell. The shell is
+ * Chromium loading the same bundle, so no other label can tell the two apart,
+ * and "is the desktop client slower than Chrome on the same hardware" was an
+ * unanswerable fleet question until this. Derived from the stored
+ * desktop_shell boolean, so a beacon can never mint a third value.
+ */
+export const CLIENT_PERF_RUNTIMES = ['web', 'desktop-shell'] as const;
+export type ClientPerfRuntime = (typeof CLIENT_PERF_RUNTIMES)[number];
 
 /** The OS families the ingest allowlist admits (perf_report.ts osFamily). */
 export const CLIENT_PERF_OS_FAMILIES = [
@@ -141,10 +154,15 @@ export type ClientPerfSuggestionId = (typeof CLIENT_PERF_SUGGESTION_IDS)[number]
  */
 export const CLIENT_PERF_SHADER_WARM_REFUSALS = [
   'none',
+  // Not a refusal: the D3D11 experiment's off arm (shader_warm_client_core.ts
+  // SHADER_WARM_AB_REFUSAL), removed with the experiment.
+  'ab:off',
   'cannot-serve:hold-cap',
+  'cannot-serve:hold-cap:censored',
   'context-lost',
   'extension-drift',
   'extension-mismatch',
+  'hold-failures:wedged',
   'hold-timeouts:expired-share',
   'hold-timeouts:wedged',
   'ios-webkit',
@@ -153,6 +171,7 @@ export const CLIENT_PERF_SHADER_WARM_REFUSALS = [
   'no-worker',
   'pagehide',
   'ready-timeout',
+  'standing-down:silent',
   'worker-error',
   'other',
 ] as const;
@@ -176,11 +195,44 @@ export const WOC_CLIENT_LONG_TASK_P95_SECONDS = 'woc_client_long_task_p95_second
 export const WOC_CLIENT_EFFECTIVE_RENDER_SCALE = 'woc_client_effective_render_scale';
 export const WOC_CLIENT_CONTEXT_LOSSES_TOTAL = 'woc_client_context_losses_total';
 export const WOC_CLIENT_SUGGESTIONS_TOTAL = 'woc_client_suggestions_total';
+// How far the raw_summary shed ladder went on each stored gameplay report,
+// labeled by the DEEPEST rung reached ('none' when the blob fit). The only
+// fleet-wide readout of the ladder: it says whether a client shape started
+// blowing the cap, and how much of a raise a rung would buy.
+export const WOC_CLIENT_RAW_SUMMARY_SHED_TOTAL = 'woc_client_raw_summary_shed_total';
+
+/** The shed-depth label vocabulary: 'none' plus every rung id, in ladder
+ *  order, plus 'other' for a stored row whose marker this server's ladder
+ *  does not know (a newer binary's rung, read by an older exporter). */
+export const CLIENT_PERF_SHED_RUNGS = ['none', ...RAW_SUMMARY_SHED_RUNG_IDS, 'other'] as const;
+export type ClientPerfShedRung = (typeof CLIENT_PERF_SHED_RUNGS)[number];
+
+/** The deepest rung a stored raw_summary records, folded to the vocabulary. */
+export function shedRungLabel(rawSummary: unknown): ClientPerfShedRung {
+  if (!rawSummary || typeof rawSummary !== 'object') return 'none';
+  const dropped = (rawSummary as { dropped?: unknown }).dropped;
+  if (!Array.isArray(dropped) || dropped.length === 0) return 'none';
+  const deepest = dropped[dropped.length - 1];
+  return typeof deepest === 'string' &&
+    (RAW_SUMMARY_SHED_RUNG_IDS as readonly string[]).includes(deepest)
+    ? (deepest as ClientPerfShedRung)
+    : 'other';
+}
 // The shader-warm cut of the SAME stored reports woc_client_reports_total
 // counts, under its own name because its labels are a different question
 // (is the warm-up worker alive on this client, and why not) rather than a
 // different population.
 export const WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL = 'woc_client_shader_warm_reports_total';
+
+// The frame rate ceiling cut of the same stored reports. Its own counter, never
+// a label on the fps or p95 series (their label sets are a pinned contract): it
+// says what share of the fleet renders slowly ON PURPOSE, so a rise in slow
+// frames can be read against it.
+export const WOC_CLIENT_CADENCE_REPORTS_TOTAL = 'woc_client_cadence_reports_total';
+export const CLIENT_PERF_FRAME_CAPS = ['none', '30', '60'] as const;
+export type ClientPerfFrameCap = (typeof CLIENT_PERF_FRAME_CAPS)[number];
+export const CLIENT_PERF_CADENCES = ['full', 'reduced'] as const;
+export type ClientPerfCadence = (typeof CLIENT_PERF_CADENCES)[number];
 
 // Bucket edges are part of the exporter's public contract (a bucket edit
 // silently rewrites every dashboard quantile), so they are exported and pinned
@@ -215,6 +267,7 @@ export interface ClientPerfSample {
   source: string;
   gfxTier: string;
   mobileTouch: boolean;
+  desktopShell: boolean;
   osFamily: string;
   glRendererBucket: string;
   glBackend: string;
@@ -228,6 +281,10 @@ export interface ClientPerfSample {
   suggestionIds: string[];
   shaderWarmWorkerActive: boolean;
   shaderWarmRefusal: string;
+  frameCapIntent: number;
+  cadenceDivisor: number;
+  refreshHz: number;
+  rawSummary: Record<string, unknown>;
 }
 
 /**
@@ -312,6 +369,28 @@ export function shaderWarmRefusalLabel(refusal: string): ClientPerfShaderWarmRef
     : 'other';
 }
 
+export function frameCapLabel(frameCapIntent: number): ClientPerfFrameCap {
+  if (frameCapIntent === 30) return '30';
+  if (frameCapIntent === 60) return '60';
+  return 'none';
+}
+
+/**
+ * 'reduced' when the client renders fewer frames than the display offers: a
+ * divisor above one (the paced ceiling), or a ceiling with no display reading,
+ * which is the unpaced limiter (it holds the divisor at one and sleeps instead).
+ */
+export function cadenceLabel(sample: {
+  frameCapIntent: number;
+  cadenceDivisor: number;
+  refreshHz: number;
+}): ClientPerfCadence {
+  if (sample.cadenceDivisor > 1) return 'reduced';
+  return frameCapLabel(sample.frameCapIntent) !== 'none' && !(sample.refreshHz > 0)
+    ? 'reduced'
+    : 'full';
+}
+
 function tierIn(value: string): ClientPerfGfxTier {
   // The ingest allowlist already guarantees membership with a 'low' fallback;
   // this mirrors that fallback so a direct caller cannot widen the label.
@@ -351,8 +430,8 @@ function observedOrZero(value: number): number {
 export function registerClientPerfMetrics(registry: Registry): ClientPerfMetricsSink {
   const reports = new Counter({
     name: WOC_CLIENT_REPORTS_TOTAL,
-    help: 'Stored gameplay perf reports, by graphics tier, device class, and GPU family.',
-    labelNames: ['gfx_tier', 'device', 'gpu_family'] as const,
+    help: 'Stored gameplay perf reports, by graphics tier, device class, GPU family, and host runtime.',
+    labelNames: ['gfx_tier', 'device', 'gpu_family', 'runtime'] as const,
     registers: [registry],
   });
   const jankReports = new Counter({
@@ -370,8 +449,8 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
   // cross product for a denominator this histogram already exposes.
   const frameP95 = new Histogram({
     name: WOC_CLIENT_FRAME_P95_SECONDS,
-    help: 'Reported frame-time p95 per report window, by graphics tier, device class, and graphics backend.',
-    labelNames: ['gfx_tier', 'device', 'backend'] as const,
+    help: 'Reported frame-time p95 per report window, by graphics tier, device class, graphics backend, and host runtime.',
+    labelNames: ['gfx_tier', 'device', 'backend', 'runtime'] as const,
     buckets: [...CLIENT_PERF_FRAME_P95_BUCKETS_SECONDS],
     registers: [registry],
   });
@@ -418,10 +497,22 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     labelNames: ['shader_warm_active', 'shader_warm_refusal'] as const,
     registers: [registry],
   });
+  const cadenceReports = new Counter({
+    name: WOC_CLIENT_CADENCE_REPORTS_TOTAL,
+    help: 'Stored gameplay perf reports by the frame rate ceiling the player chose (none, 30, 60) and whether the client renders every display refresh (full) or fewer on purpose (reduced).',
+    labelNames: ['frame_cap', 'cadence'] as const,
+    registers: [registry],
+  });
   const suggestions = new Counter({
     name: WOC_CLIENT_SUGGESTIONS_TOTAL,
     help: 'Perf-doctor suggestion ids carried by stored gameplay perf reports.',
     labelNames: ['suggestion'] as const,
+    registers: [registry],
+  });
+  const shed = new Counter({
+    name: WOC_CLIENT_RAW_SUMMARY_SHED_TOTAL,
+    help: 'Stored gameplay perf reports by the deepest raw_summary shed-ladder rung reached (none when the blob fit the cap).',
+    labelNames: ['rung'] as const,
     registers: [registry],
   });
 
@@ -435,21 +526,27 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
   //
   // CARDINALITY, since pre-seeding means every cross product exists whether or
   // not a client ever reports it: the backend label multiplies exactly two
-  // series families and nothing else. frame_p95 is 5 tiers x 2 devices x 7
-  // backends = 70 series, and context_losses is 6 os x 7 backends = 42. Both
-  // vocabularies are closed and neither grows with fleet size, players, or
-  // hardware; adding a backend value is a source edit in gl_backend.ts, not a
-  // thing a beacon can mint.
+  // series families and the runtime label the same two plus the reports
+  // counter. frame_p95 is 5 tiers x 2 devices x 7 backends x 2 runtimes = 140
+  // label sets (a histogram exports its buckets, sum and count per label set,
+  // so about twelve lines each), reports is 5 x 2 x 6 families x 2 runtimes
+  // = 120, context_losses is 6 os x 7 backends = 42, and the shed counter is
+  // one series per rung. Every vocabulary is closed and none grows with fleet
+  // size, players, or hardware; adding a backend value is a source edit in
+  // gl_backend.ts, a rung is a source edit in perf_report_shed.ts, and the
+  // runtime is a stored boolean, never a thing a beacon can mint.
   for (const gfxTier of CLIENT_PERF_GFX_TIERS) {
     for (const device of CLIENT_PERF_DEVICE_CLASSES) {
       const tierDevice = { gfx_tier: gfxTier, device };
       jankReports.inc(tierDevice, 0);
       fpsAvg.zero(tierDevice);
-      for (const backend of GL_BACKEND_LABELS) {
-        frameP95.zero({ ...tierDevice, backend });
-      }
-      for (const gpuFamily of CLIENT_PERF_GPU_FAMILIES) {
-        reports.inc({ ...tierDevice, gpu_family: gpuFamily }, 0);
+      for (const runtime of CLIENT_PERF_RUNTIMES) {
+        for (const backend of GL_BACKEND_LABELS) {
+          frameP95.zero({ ...tierDevice, backend, runtime });
+        }
+        for (const gpuFamily of CLIENT_PERF_GPU_FAMILIES) {
+          reports.inc({ ...tierDevice, gpu_family: gpuFamily, runtime }, 0);
+        }
       }
     }
     longTask.zero({ gfx_tier: gfxTier });
@@ -466,7 +563,13 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
       shaderWarmReports.inc({ shader_warm_active: active, shader_warm_refusal: refusal }, 0);
     }
   }
+  for (const frameCap of CLIENT_PERF_FRAME_CAPS) {
+    for (const cadence of CLIENT_PERF_CADENCES) {
+      cadenceReports.inc({ frame_cap: frameCap, cadence }, 0);
+    }
+  }
   for (const suggestion of CLIENT_PERF_SUGGESTION_IDS) suggestions.inc({ suggestion }, 0);
+  for (const rung of CLIENT_PERF_SHED_RUNGS) shed.inc({ rung }, 0);
 
   return {
     perfReportStored(sample: ClientPerfSample): void {
@@ -480,17 +583,23 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
         const device: ClientPerfDeviceClass = sample.mobileTouch ? 'mobile' : 'desktop';
         const tierDevice = { gfx_tier: gfxTier, device };
         const backend = backendIn(sample.glBackend);
+        const runtime: ClientPerfRuntime = sample.desktopShell ? 'desktop-shell' : 'web';
 
         reports.inc({
           ...tierDevice,
           gpu_family: classifyClientPerfGpuFamily(sample.glRendererBucket),
+          runtime,
         });
         shaderWarmReports.inc({
           shader_warm_active: sample.shaderWarmWorkerActive ? 'true' : 'false',
           shader_warm_refusal: shaderWarmRefusalLabel(sample.shaderWarmRefusal),
         });
+        cadenceReports.inc({
+          frame_cap: frameCapLabel(sample.frameCapIntent),
+          cadence: cadenceLabel(sample),
+        });
         frameP95.observe(
-          { ...tierDevice, backend },
+          { ...tierDevice, backend, runtime },
           observedOrZero(sample.frameP95Ms) / MS_PER_SECOND,
         );
         fpsAvg.observe(tierDevice, observedOrZero(sample.fpsAvg));
@@ -507,6 +616,7 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
         renderScale.observe({ gfx_tier: gfxTier }, observedOrZero(sample.effectiveRenderScale));
         const lost = Math.floor(observedOrZero(sample.contextLostCount));
         if (lost > 0) contextLosses.inc({ os: osIn(sample.osFamily), backend }, lost);
+        shed.inc({ rung: shedRungLabel(sample.rawSummary) });
         for (const id of sample.suggestionIds) {
           // The ingest allowlist already filtered these; membership is re-checked
           // so a direct caller cannot mint a label value.

@@ -1484,7 +1484,7 @@ describe('hunter pets', () => {
 });
 
 describe('druid forms', () => {
-  it('wolf form runs on energy, bear on rage, and mana is restored on shift-out', () => {
+  it('cat form runs on energy, bear on rage, and mana is restored on shift-out', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(12);
     const manaBefore = sim.player.resource;
@@ -1528,7 +1528,7 @@ describe('druid forms', () => {
     expect(sim.player.attackPower).toBeGreaterThan(apBefore + 15);
   });
 
-  it('wolf form raises attack power', () => {
+  it('cat form raises attack power', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(20);
     sim.tick();
@@ -1554,7 +1554,12 @@ describe('druid forms', () => {
     expect(sim.player.resource).toBeCloseTo(1, 5);
   });
 
-  it('bear charge is learned with Bruin Form and only works while shifted', () => {
+  // v0.43: Bruin Rush no longer REFUSES out of form, it ENTERS Bruin Form as
+  // part of the press (combat/druid_form_entry.ts). The old arm of this test
+  // asserted the refusal, which is the behavior the change deliberately
+  // removed; what still has to hold is that the rush itself is unchanged once
+  // the druid is a bear, by either route.
+  it('bear charge is learned with Bruin Form and enters it on use', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(10);
     expect(abilitiesKnownAt('druid', 10).some((a) => a.def.id === 'bear_charge')).toBe(true);
@@ -1562,10 +1567,27 @@ describe('druid forms', () => {
     beefUp(wolf);
     teleport(sim, sim.player, wolf.pos.x + 12, wolf.pos.z);
     sim.targetEntity(wolf.id);
+    expect(sim.player.auras.some((a) => a.kind === 'form_bear')).toBe(false);
 
     sim.castAbility('bear_charge');
-    expect(sim.tick().some((e) => e.type === 'error' && /Bruin Form/.test(e.text))).toBe(true);
-    expect(sim.player.chargeTargetId).toBe(null);
+    expect(sim.tick().some((e) => e.type === 'error' && /Bruin Form/.test(e.text))).toBe(false);
+
+    // The press shifted the druid AND ran the rush.
+    expect(sim.player.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+    expect(sim.player.resourceType).toBe('rage');
+    expect(sim.player.chargeTargetId).toBe(wolf.id);
+    expect(sim.player.resource).toBe(9);
+    expect(sim.player.cooldowns.get('bear_charge') ?? 0).toBeGreaterThan(0);
+    expect(wolf.auras.some((a) => a.kind === 'stun')).toBe(true);
+  });
+
+  it('bear charge from inside Bruin Form is unchanged', () => {
+    const sim = makeSim('druid');
+    sim.setPlayerLevel(10);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    beefUp(wolf);
+    teleport(sim, sim.player, wolf.pos.x + 12, wolf.pos.z);
+    sim.targetEntity(wolf.id);
 
     sim.castAbility('bear_form');
     sim.tick();
@@ -1574,13 +1596,14 @@ describe('druid forms', () => {
     sim.player.gcdRemaining = 0;
     sim.castAbility('bear_charge');
 
+    expect(sim.player.auras.filter((a) => a.kind === 'form_bear')).toHaveLength(1);
     expect(sim.player.chargeTargetId).toBe(wolf.id);
     expect(sim.player.resource).toBe(9);
     expect(sim.player.cooldowns.get('bear_charge') ?? 0).toBeGreaterThan(0);
     expect(wolf.auras.some((a) => a.kind === 'stun')).toBe(true);
   });
 
-  it('claw needs wolf form, builds combo points, and ferocious bite spends them', () => {
+  it('claw needs cat form, builds combo points, and ferocious bite spends them', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(14);
     const wolf = nearestMob(sim, 'forest_wolf');
@@ -1590,7 +1613,7 @@ describe('druid forms', () => {
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.castAbility('claw');
     const events = sim.tick();
-    expect(events.some((e) => e.type === 'error' && /Wolf Form/.test(e.text))).toBe(true);
+    expect(events.some((e) => e.type === 'error' && /Cat Form/.test(e.text))).toBe(true);
     sim.castAbility('cat_form');
     sim.tick();
     let guard = 0;
@@ -1630,7 +1653,7 @@ describe('druid forms', () => {
     expect(events.some((e) => e.type === 'error' && /shapeshifted/.test(e.text))).toBe(true);
   });
 
-  it('bear and wolf forms can only use their own form kits', () => {
+  it('bear and cat forms can only use their own form kits', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(14);
     const wolf = nearestMob(sim, 'forest_wolf');
@@ -1657,7 +1680,7 @@ describe('druid forms', () => {
     sim.player.resource = 100;
     sim.castAbility('claw');
     events = sim.tick();
-    expect(events.some((e) => e.type === 'error' && /Wolf Form/.test(e.text))).toBe(true);
+    expect(events.some((e) => e.type === 'error' && /Cat Form/.test(e.text))).toBe(true);
   });
 
   it('bear form learns demoralizing roar at level 10 and lowers nearby mob attack power', () => {
@@ -1678,7 +1701,7 @@ describe('druid forms', () => {
     expect(wolf.threat.get(sim.playerId)).toBeGreaterThan(0);
   });
 
-  it('wolf form gains agility/AP and can build with Flense outside stealth', () => {
+  it('cat form gains agility/AP and can build with Flense outside stealth', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(12);
     expect(sim.known.map((k) => k.def.id)).toEqual(

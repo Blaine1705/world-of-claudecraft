@@ -193,7 +193,12 @@ export function bagItemAction(
    *  by the bank socket arm (bank sockets store bare ids, so a marked bag
    *  deposits instead). The vault preserves it, so it never blocks there. */
   craftedRecipeId?: string,
+  /** Host-clock verdict for the copy's bind-on-pickup marker. The server still
+   *  authorizes the recipient; this only prevents an expired client affordance. */
+  partyTradeWindowActive = instance?.partyTrade !== undefined,
 ): BagAction {
+  if (item.soulbound && mode.tradeOpen && instance?.partyTrade && partyTradeWindowActive)
+    return 'trade';
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'transferBlockedSoulbound';
   if (mode.tradeOpen) return 'trade';
@@ -346,6 +351,17 @@ export function bagShiftLinks(mode: BagMode): boolean {
   return !mode.vendorOpen && !mode.bankDeposit && !mode.guildBankDeposit && !mode.vaultDeposit;
 }
 
+/** Whether a click in trade mode opens the offer-quantity prompt (the bank
+ *  withdraw prompt's trade twin, with the vault's stack step buttons) rather
+ *  than staging one unit. Only a fungible stack with room for MORE than one
+ *  further unit earns the prompt (`headroom` is the live tradeOfferHeadroom:
+ *  held total minus already staged); an instanced copy stages as itself,
+ *  exactly like the deposit rule (bankDepositOpensPrompt), and a single
+ *  remaining unit just stages. Shift-click keeps its chat link here. */
+export function tradeOfferOpensPrompt(slot: InvSlot, headroom: number): boolean {
+  return !slot.instance && headroom > 1;
+}
+
 /** Resolve the exact inventory index of a clicked bag stack by REFERENCE identity,
  *  never a first-match-by-itemId: duplicate fungible stacks and distinct instanced
  *  copies share an itemId, so only reference identity targets the stack the player
@@ -469,7 +485,10 @@ export function bagTooltipHintKey(
   /** The slot's crafting provenance marker, the bagItemAction twin: read only
    *  by the vaultDeposit arm. */
   craftedRecipeId?: string,
+  partyTradeWindowActive = instance?.partyTrade !== undefined,
 ): BagTooltipHintKey {
+  if (item.soulbound && mode.tradeOpen && instance?.partyTrade && partyTradeWindowActive)
+    return 'itemUi.tooltip.clickTradeOffer';
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'hudChrome.itemSoulbound';
   if (mode.tradeOpen) return 'itemUi.tooltip.clickTradeOffer';

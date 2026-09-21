@@ -20,16 +20,21 @@
 import { bagPools, countFit } from '../bags';
 import { ITEMS } from '../data';
 import type { SimContext } from '../sim_context';
-import type { ItemInstancePayload, LootSlot } from '../types';
+import { cloneItemInstancePayload, type ItemInstancePayload, type LootSlot } from '../types';
 import { bopPartyTradeInstance } from './bop_trade_window';
 
-// Sim-seconds a corpse keeps at least once an award is held on it: the same
-// bounded window a fresh kill gets (CORPSE_DURATION in combat/damage.ts,
-// restated here rather than imported so the loot layer stays downstream of
-// the damage layer). A roll can resolve with only seconds left on the corpse,
-// which would otherwise decay the item before the winner could even react to
-// the "waiting on the corpse" line.
-export const HELD_LOOT_CORPSE_SECONDS = 60;
+// Sim-seconds a corpse keeps at least once an award is held on it. A held
+// award is UNLOOTED loot, and a classic corpse with loot still on it persists
+// about five minutes, not the one-minute trash window (CORPSE_DURATION in
+// combat/damage.ts). The first cut reused that 60s window, and a winner who
+// was still running back to a rare the party dropped, or dead from the fight
+// and walking from the graveyard, found the corpse gone with the item on it
+// (the "Corpse disappeared with loot on it" report). Five minutes is the
+// classic loot window; the item still decays with the corpse after it, so
+// bag space still has to be managed, and there is still no mailbox fallback.
+// Stated as a literal rather than derived from CORPSE_DURATION so the loot
+// layer stays downstream of the damage layer.
+export const HELD_LOOT_CORPSE_SECONDS = 5 * 60;
 
 export interface AwardEligibility {
   names: readonly string[];
@@ -38,16 +43,21 @@ export interface AwardEligibility {
 
 // The instance payload a loot award carries: a soulbound item gets the
 // bind-on-pickup party trade window over the kill-time eligible roster, a
-// plain item none. The ONE statement of that rule, shared by the direct
+// plain item no new window. Existing quality and previously stamped windows
+// survive unchanged. The ONE statement of that rule, shared by the direct
 // grant below, the hold, and the openToAll corpse pickup in interaction.ts.
 function awardInstanceFor(
   ctx: SimContext,
   itemId: string,
   eligibility: AwardEligibility,
+  sourceInstance?: ItemInstancePayload,
 ): ItemInstancePayload | undefined {
-  return ITEMS[itemId]?.soulbound
+  const instance = sourceInstance ? cloneItemInstancePayload(sourceInstance) : undefined;
+  if (instance?.partyTrade) return instance;
+  const window = ITEMS[itemId]?.soulbound
     ? bopPartyTradeInstance(ctx.lockoutNowMs(), eligibility.names, eligibility.characterIds)
     : undefined;
+  return window ? { ...instance, ...window } : instance;
 }
 
 // The one shared grant for a loot award (a roll win, a master-loot assignment,
@@ -59,8 +69,9 @@ export function grantAwardedLootItem(
   itemId: string,
   pid: number,
   eligibility: AwardEligibility,
+  sourceInstance?: ItemInstancePayload,
 ): void {
-  const instance = awardInstanceFor(ctx, itemId, eligibility);
+  const instance = awardInstanceFor(ctx, itemId, eligibility, sourceInstance);
   if (instance) ctx.addItemInstance(itemId, instance, pid, 1);
   else ctx.addItem(itemId, 1, pid);
 }
@@ -77,16 +88,17 @@ export function grantOrHoldAwardedLoot(
   itemId: string,
   pid: number,
   eligibility: AwardEligibility,
+  sourceInstance?: ItemInstancePayload,
 ): void {
   const mob = ctx.entities.get(mobId);
   const meta = ctx.players.get(pid);
-  const instance = awardInstanceFor(ctx, itemId, eligibility);
+  const instance = awardInstanceFor(ctx, itemId, eligibility, sourceInstance);
   if (
     !mob?.dead ||
     !meta ||
     countFit(meta.inventory, bagPools(meta.bags), itemId, 1, instance) >= 1
   ) {
-    grantAwardedLootItem(ctx, itemId, pid, eligibility);
+    grantAwardedLootItem(ctx, itemId, pid, eligibility, instance);
     return;
   }
   const slot: LootSlot = {
@@ -101,6 +113,8 @@ export function grantOrHoldAwardedLoot(
   mob.corpseTimer = Math.max(mob.corpseTimer, HELD_LOOT_CORPSE_SECONDS);
   ctx.emit({
     type: 'loot',
+    itemId,
+    ...(instance ? { instance: cloneItemInstancePayload(instance) } : {}),
     text: `Your bags are full; [[i:${itemId}]] is waiting on the corpse for you.`,
     pid,
   });

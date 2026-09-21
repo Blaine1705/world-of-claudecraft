@@ -712,7 +712,7 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     const view = createActionBarView(
       descriptor(
         slot(1, {
-          ability: ability('hour_of_judgment', { requiresTarget: true, range: 30 }),
+          ability: ability('coven', { requiresTarget: true, range: 30, cost: 0 }),
         }),
       ),
       fakeDeps(),
@@ -738,6 +738,24 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
         }),
       ).slots[0].usable,
     ).toBe(true);
+  });
+
+  it('leaves Possess and Hour of Judgment usable without targeting the primary Eye', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('hour_of_judgment', { requiresTarget: false, cost: 0 }),
+        }),
+        slot(2, {
+          ability: ability('possess_evil_eye', { requiresTarget: false, cost: 75 }),
+        }),
+      ),
+      fakeDeps(),
+    );
+
+    const withoutTarget = view.tick(world({ playerId: 7, resource: 100 }));
+    expect(withoutTarget.slots[0].usable).toBe(true);
+    expect(withoutTarget.slots[1].usable).toBe(true);
   });
 
   it('dims duplicate and over-cap Dominion summons without hiding valid composition choices', () => {
@@ -1575,6 +1593,23 @@ describe('actionBarView: attack + item slots', () => {
     expect(ready.cdText).toBe('');
   });
 
+  it('paints no potion swipe on an elixir slot: elixirs have no shared cooldown', () => {
+    // src/sim/items.ts kind 'elixir' applies its aura with no potionCd write, so a
+    // placed elixir must stay usable while the potion timer runs.
+    const view = createActionBarView(
+      descriptor(slot(1, { item: item('elixir_of_the_bear', 'elixir') })),
+      fakeDeps(),
+    );
+    const s = view.tick(
+      world({ potionCdRemaining: 60, inventory: [{ itemId: 'elixir_of_the_bear', count: 1 }] }),
+    ).slots[0];
+    expect(s.kind).toBe('item');
+    expect(s.cooldownRemaining).toBe(0);
+    expect(s.cooldownPercent).toBe(0);
+    expect(s.cdText).toBe('');
+    expect(s.usable).toBe(true);
+  });
+
   it('does not paint a cooldown on a non-potion item even while the potion timer runs', () => {
     const view = createActionBarView(
       descriptor(slot(1, { item: item('iron_dagger', 'weapon') })),
@@ -1812,5 +1847,107 @@ describe('actionBarView: an auto-unshifting cast is affordable against parked ma
         world({ auras: [], resourceType: 'mana', resource: 5, savedMana: 500 }),
       ).slots[0].usable,
     ).toBe(false);
+  });
+});
+
+describe('actionBarView: watched proc glow from the Auras panel', () => {
+  // The Auras panel's Hotbar Glow channel (src/ui/proc_ready_glow_core.ts) hands
+  // the bar a set of ability ids to light; the view ORs it in after every
+  // authored predicate, so it can only ever ADD a glow.
+  it('lights the button a watched proc names, and no other', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(0, { ability: ability('stormstrike') }),
+        slot(1, { ability: ability('earth_shock') }),
+      ),
+      { ...fakeDeps(), watchedGlowAbilityIds: () => new Set(['stormstrike']) },
+    );
+    const slots = view.tick(world()).slots;
+    expect(slots[0].procGlow).toBe(true);
+    expect(slots[1].procGlow).toBe(false);
+  });
+
+  it('is additive only: an authored glow survives an empty set, and no dep at all', () => {
+    // Divine Ascension at full devotion is an AUTHORED glow (the paladin
+    // predicate in the view), so it stays lit whether the Auras panel contributes
+    // nothing this frame or the host never wired the dep.
+    const ready = world({
+      paladinSpec: 'retribution',
+      paladinDevotion: { value: 20, ascensionCharges: 0, ascensionRemaining: 0 },
+    });
+    const withEmptySet = createActionBarView(
+      descriptor(slot(0, { ability: ability('divine_ascension') })),
+      { ...fakeDeps(), watchedGlowAbilityIds: () => new Set() },
+    );
+    expect(withEmptySet.tick(ready).slots[0].procGlow).toBe(true);
+    const withoutDep = createActionBarView(
+      descriptor(slot(0, { ability: ability('divine_ascension') })),
+      fakeDeps(),
+    );
+    expect(withoutDep.tick(ready).slots[0].procGlow).toBe(true);
+  });
+
+  it('follows the set frame by frame, so the glow drops when the aura does', () => {
+    let lit: ReadonlySet<string> = new Set(['stormstrike']);
+    const view = createActionBarView(descriptor(slot(0, { ability: ability('stormstrike') })), {
+      ...fakeDeps(),
+      watchedGlowAbilityIds: () => lit,
+    });
+    expect(view.tick(world()).slots[0].procGlow).toBe(true);
+    lit = new Set();
+    expect(view.tick(world()).slots[0].procGlow).toBe(false);
+  });
+});
+
+describe("actionBarView: Nature's Boon is form-scoped in every highlight", () => {
+  // Regression (v0.44 feral pass): the rim asked naturesBoonFormAllows but the
+  // generic `empowered` highlight did not, so a Cat Form druid holding an armed
+  // window saw Oakhide lit as a free cast that combat/empower_next.ts then
+  // refused. Both flags must answer the same question, in both forms, or the bar
+  // promises something the sim will not honour.
+  const boonAura = {
+    id: 'natures_boon',
+    kind: 'next_cast_free',
+    empowerAbilities: ['rejuvenation', 'barkskin'],
+  } as const;
+  const oakhide = () => slot(4, { ability: ability('barkskin', { cost: 120 }) });
+  const wildbloom = () => slot(5, { ability: ability('rejuvenation', { cost: 100 }) });
+
+  it('refuses both highlights on the bear-only member out of Bruin Form', () => {
+    const view = createActionBarView(descriptor(oakhide(), wildbloom()), fakeDeps());
+    const slots = view.tick(world({ auras: [{ ...boonAura }, { kind: 'form_cat' }] })).slots;
+    // Oakhide: dark on BOTH flags, because the window will not pay for it here.
+    expect(slots[0].naturesBoonGlow).toBe(false);
+    expect(slots[0].empowered).toBe(false);
+    // Wildbloom is not bear-scoped, so the same window still lights it in Cat
+    // Form. Without this arm the test would pass on a gate that darkens the
+    // whole window rather than just its bear-only member.
+    expect(slots[1].naturesBoonGlow).toBe(true);
+    expect(slots[1].empowered).toBe(true);
+  });
+
+  it('lights both highlights on the bear-only member in Bruin Form', () => {
+    const view = createActionBarView(descriptor(oakhide(), wildbloom()), fakeDeps());
+    const slots = view.tick(world({ auras: [{ ...boonAura }, { kind: 'form_bear' }] })).slots;
+    expect(slots[0].naturesBoonGlow).toBe(true);
+    expect(slots[0].empowered).toBe(true);
+    expect(slots[1].naturesBoonGlow).toBe(true);
+    expect(slots[1].empowered).toBe(true);
+  });
+
+  it('leaves an unrelated empower aura alone', () => {
+    // The fix is keyed on the Nature's Boon aura id, so an ordinary scoped
+    // empower aura over the same ability still empowers in any form.
+    const view = createActionBarView(descriptor(oakhide()), fakeDeps());
+    const slots = view.tick(
+      world({
+        auras: [
+          { id: 'clearcasting', kind: 'next_cast_free', empowerAbilities: ['barkskin'] },
+          { kind: 'form_cat' },
+        ],
+      }),
+    ).slots;
+    expect(slots[0].empowered).toBe(true);
+    expect(slots[0].naturesBoonGlow).toBe(false);
   });
 });

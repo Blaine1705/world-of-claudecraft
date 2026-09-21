@@ -3,6 +3,7 @@
 // shells; everything a band grants lives in ItemInstancePayload.rift, and the
 // ladder that prices it is rift/band_ladder.ts.
 
+import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import {
   RIFT_ESSENCE_ITEM_ID,
   RIFT_GEM_IDS,
@@ -12,13 +13,16 @@ import {
 import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
 import { selectedInventorySlot } from '../item_copy_ref';
+import { isEligibleEnemyQualitySource, rollEnemyLootQuality } from '../loot/enemy_quality';
+import { createLootQuality, isEligibleLootQualityItem } from '../loot_quality/core';
+import { cloneLootQuality } from '../loot_quality/types';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload, PlayerClass, RiftTier } from '../types';
 import {
   RIFT_BAND_GEM_SLOTS,
   RIFT_BAND_MAX_UPGRADE,
-  type RiftBandShell,
+  RIFT_BAND_SHELLS,
   riftBandRolledStats,
 } from './band_ladder';
 import { nearRiftForge, RIFT_FORGE_TOO_FAR_TEXT } from './forge_gate';
@@ -63,13 +67,10 @@ export interface RiftForgeResult {
 }
 
 /** The three class shells, each a stat-free ItemDef; the copy's rift record
- *  prices the ring (band_ladder.ts). Bands are forge-only: the enchanting
- *  profession refuses them by id (professions/enchanting.ts). */
-const SHELL_STATS: Readonly<Record<string, RiftBandShell>> = {
-  riftbound_band_of_might: { primary: 'str', secondary: 'sta' },
-  riftbound_band_of_insight: { primary: 'int', secondary: 'spi' },
-  riftbound_band_of_guile: { primary: 'agi', secondary: 'sta' },
-};
+ *  prices the ring (band_ladder.ts). A band also takes an ordinary ring
+ *  enchant (professions/enchanting.ts) at any rung: the marker rides the
+ *  rebuild and its bonus is re-added on top of the ladder line every time. */
+const SHELL_STATS = RIFT_BAND_SHELLS;
 
 function shellItemIdForClass(cls: PlayerClass): string {
   if (MELEE_CLASSES.has(cls)) return 'riftbound_band_of_might';
@@ -77,15 +78,45 @@ function shellItemIdForClass(cls: PlayerClass): string {
   return 'riftbound_band_of_insight';
 }
 
+/** The enchant a band copy may carry: a known enchant whose slot kind is the
+ *  shell's own (a ring enchant) and that the apply could have admitted on a
+ *  band (never a requiresPerfected enchant: a band is never Perfected), read
+ *  off the copy's top-level marker, the same field every other enchanted copy
+ *  carries (isEnchantedInstance). Any other marker (unknown id, an enchant for
+ *  another slot, a Perfected-only enchant) is not a band enchant and is
+ *  dropped by the rebuild. The bonus is re-priced from the live ENCHANTS table
+ *  at every rebuild, the same way the ladder line is (docs/design/rift-mode.md). */
+function riftBandEnchant(itemId: string, instance: ItemInstancePayload): EnchantDef | undefined {
+  if (instance.enchant === undefined) return undefined;
+  const enchant = ENCHANTS[instance.enchant];
+  if (!enchant || enchant.itemSlot !== ITEMS[itemId]?.slot) return undefined;
+  return enchant.requiresPerfected === true ? undefined : enchant;
+}
+
 /** Rebuild the copy's rolled aggregate from its bounded progression inputs
- *  (tier, upgradeLevel, gems). The rolled block is never trusted from JSONB or
- *  the wire; this is the ONLY writer, so a band's stats can never drift from
- *  what the ladder prices for its item level. */
+ *  (tier, upgradeLevel, gems) plus the enchant marker's bonus, summed
+ *  additively on top of the ladder line exactly as enchantedPayloadFor sums it
+ *  on any other copy. The rolled block is never trusted from JSONB or the
+ *  wire; this is the ONLY writer, so a band's stats can never drift from what
+ *  the ladder prices for its item level, and an apply's additive mint equals
+ *  this rebuild by construction (pinned in tests/professions_enchanting.test.ts). */
 function rebuildRolledStats(itemId: string, instance: ItemInstancePayload): void {
   const rift = instance.rift;
   const shell = SHELL_STATS[itemId];
   if (!rift || !shell) return;
-  const stats = riftBandRolledStats(shell, rift.tier, rift.upgradeLevel, rift.gems);
+  const stats: Record<string, number> = riftBandRolledStats(
+    shell,
+    rift.tier,
+    rift.upgradeLevel,
+    rift.gems,
+  );
+  const enchant = riftBandEnchant(itemId, instance);
+  if (enchant) {
+    for (const [stat, value] of Object.entries(enchant.statBonus)) {
+      if (value === undefined) continue;
+      stats[stat] = (stats[stat] ?? 0) + value;
+    }
+  }
   instance.rolled = { ...(instance.rolled ?? {}), quality: 'epic', stats };
 }
 
@@ -93,9 +124,11 @@ const RIFT_TIERS: readonly RiftTier[] = ['C', 'B', 'A', 'S'];
 
 /** Rebuild a persisted copy from bounded progression inputs; rolled stats are
  *  never trusted from JSONB. Every band a player has ever been handed loads
- *  (tier, upgrade level, and socketed gems are all that is read; the legacy
- *  `baseStats` and `enchant` fields of the pre-ladder payload are ignored and
- *  dropped, and an over-socketed gem list is truncated to the rank's sockets),
+ *  (tier, upgrade level, socketed gems, and a valid top-level ring-enchant
+ *  marker are all that is read; the legacy `baseStats` and `rift.enchant`
+ *  fields of the pre-ladder payload are ignored and dropped, an unknown or
+ *  wrong-slot enchant marker is dropped, and an over-socketed gem list is
+ *  truncated to the rank's sockets),
  *  so a ladder retune resizes existing bands at load instead of voiding them.
  *  Null is reserved for a copy that is not a band at all: an unknown shell id,
  *  a tier or upgrade level outside the ladder, or no source event. */
@@ -122,11 +155,19 @@ export function sanitizeRiftGearInstance(
   const gems = (Array.isArray(source.gems) ? source.gems : [])
     .filter((gem): gem is RiftGemId => (RIFT_GEM_IDS as readonly string[]).includes(gem))
     .slice(-gemSlots);
+  // The permanent per-copy `lootQuality` descriptor (docs/design/loot-quality.md)
+  // rides the rebuild VALIDATED, below the record: this supersedes the
+  // release's unread pass-through (PR 4138, the rollback safety net for a
+  // binary without this feature), so a malformed descriptor is dropped here
+  // exactly as the load bound drops it, never carried by reference.
   const clean: ItemInstancePayload = {
     boundTo: ownerId,
     // The player item lock (item_lock.ts) is the owner's own safety mark and
     // rides the rebuild; every other per-copy field is re-derived below.
     ...(input.locked === true && { locked: true }),
+    // The ring enchant (if any) rides the rebuild; its bonus is re-priced on
+    // top of the ladder line by rebuildRolledStats below.
+    ...(riftBandEnchant(itemId, input) && { enchant: input.enchant }),
     rolled: { quality: 'epic', stats: {} },
     rift: {
       sourceEventId: source.sourceEventId,
@@ -138,6 +179,8 @@ export function sanitizeRiftGearInstance(
       gems,
     },
   };
+  const lootQuality = cloneLootQuality(input.lootQuality);
+  if (lootQuality) clean.lootQuality = lootQuality;
   rebuildRolledStats(itemId, clean);
   return clean;
 }
@@ -313,12 +356,14 @@ export const FARM_RIFT_DROP_CHANCE = RIFT_PATTERN_CHANCE;
 export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: number): void {
   const rank = riftRankForBaseLevel(baseLevel);
   const loot = boss.loot ?? { copper: 0, items: [] };
+  const firstNewSlot = loot.items.length;
 
   // --- Draw 0: C-rank guaranteed normal-dungeon drop + coin (exits here) ---
   if (rank === 'C') {
     const pool = riftNormalClearPool();
     loot.items.push({ itemId: pool[ctx.rng.int(0, pool.length - 1)], count: 1 });
     loot.copper = (loot.copper ?? 0) + RIFT_COIN_BONUS_C;
+    loot.items = rollRiftClearQualities(ctx, boss, loot.items, firstNewSlot);
     boss.loot = loot;
     boss.lootable = true;
     return;
@@ -389,9 +434,23 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
   const coinBonus =
     rank === 'B' ? RIFT_COIN_BONUS_B : rank === 'A' ? RIFT_COIN_BONUS_A : RIFT_COIN_BONUS_S;
   loot.copper = (loot.copper ?? 0) + coinBonus;
+  loot.items = rollRiftClearQualities(ctx, boss, loot.items, firstNewSlot);
 
   boss.loot = loot;
   if (loot.items.length > 0 || loot.copper > 0) boss.lootable = true;
+}
+
+/** Only newly selected clear rewards draw quality; static corpse gear is already
+ * rolled. The roller itself is the enemy one (loot/enemy_quality.ts): one draw
+ * per copy, a stack split per copy, a deep-cloned payload, and the source gate,
+ * so a clear reward and a corpse drop can never diverge in how they mint. */
+function rollRiftClearQualities(
+  ctx: SimContext,
+  boss: Entity,
+  items: NonNullable<Entity['loot']>['items'],
+  start: number,
+): NonNullable<Entity['loot']>['items'] {
+  return [...items.slice(0, start), ...rollEnemyLootQuality(ctx.rng, boss, items.slice(start))];
 }
 
 /** First-clear personal loot. Every winner gets a class-appropriate non-fungible
@@ -416,6 +475,15 @@ export function addRiftProgressionLoot(
     const meta = ctx.players.get(pid);
     if (!meta) continue;
     const gear = createRiftGearInstance(eventId, tier, meta.cls, pid);
+    // Both gates the sibling rollers apply: the source AND the item. Bands are
+    // epic armor today, so the item gate is inert, but a shell def change must
+    // never stamp a descriptor that reads as enhanced with zero bonus.
+    const shell = ITEMS[gear.itemId];
+    const lootQuality =
+      isEligibleEnemyQualitySource(boss) && shell !== undefined && isEligibleLootQualityItem(shell)
+        ? createLootQuality(ctx.rng)
+        : undefined;
+    if (lootQuality) gear.instance.lootQuality = lootQuality;
     loot.items.push({
       itemId: gear.itemId,
       count: 1,

@@ -27,6 +27,7 @@ import {
 } from '../../server/character_delete_db';
 import {
   APPEARANCE_REROLL_CUTOFF,
+  buildCharacterList,
   type CharactersRuntime,
   configureCharactersRuntime,
   purgeDeletedCharacterWorldState,
@@ -77,6 +78,9 @@ function setCharactersDbForTests(overrides: DbOverrides): void {
 // ---------------------------------------------------------------------------
 
 /** A persisted characters row with sane defaults; override any field. */
+/** A raid-lockout expiry no test clock reaches (the year 2100). */
+const FAR_FUTURE_MS = 4_102_444_800_000;
+
 function charRow(overrides: Partial<CharacterRow> = {}): CharacterRow {
   return {
     id: 1,
@@ -357,6 +361,12 @@ describe('character list handlers', () => {
         skin: 3,
         skinCatalog: 'mech',
         equipment: { mainhand: 'worn_sword', offhand: 'eastbrook_buckler' },
+        // Saved inside Hollow Crypt (dungeon 0 of the instance plane): the list
+        // reports the DOOR's zone, exactly where addPlayer will put the character.
+        pos: { x: 100100, z: 0 },
+        // One live raid lockout and one that lapsed: the list ships only the
+        // live one (the sim's own load filter), keys sorted.
+        raidLockouts: { nythraxis_boss_arena: FAR_FUTURE_MS, 'worldboss:thunzharr_waking_peak': 1 },
       }),
       force_rename: false,
       last_played: new Date('2026-01-02T03:04:05.000Z'),
@@ -411,6 +421,8 @@ describe('character list handlers', () => {
           // player one free design (created_at is null in this fixture, so it
           // is the never-designed arm carrying it, not the window).
           appearanceRerollAvailable: true,
+          zoneId: 'eastbrook_vale',
+          raidLockouts: { nythraxis_boss_arena: FAR_FUTURE_MS },
         },
         {
           id: 2,
@@ -433,6 +445,8 @@ describe('character list handlers', () => {
           // player one free design (created_at is null in this fixture, so it
           // is the never-designed arm carrying it, not the window).
           appearanceRerollAvailable: true,
+          zoneId: 'eastbrook_vale', // state null -> no position -> the world start's zone
+          raidLockouts: {}, // state null -> no lockouts
         },
       ],
     };
@@ -449,6 +463,96 @@ describe('character list handlers', () => {
     expect(me.body).toEqual(expected);
     // Byte-identical: the two arms share buildCharacterList, so the serialized JSON matches.
     expect(JSON.stringify(me.body)).toBe(JSON.stringify(full.body));
+  });
+});
+
+describe('buildCharacterList weapon skin resolution', () => {
+  it('resolves an Armory skin whose weapon type is held in the offhand', () => {
+    // A rogue with a dagger mainhand and a mace offhand owning the legendary
+    // mace skin: the roster turntable shows it, like the world does.
+    const rows = [
+      charRow({
+        class: 'rogue',
+        state: {
+          equipment: { mainhand: 'rusty_dagger', offhand: 'forgefathers_warhammer' },
+        } as never,
+      }),
+    ];
+    const list = buildCharacterList(rows, () => false, { mace: 'starfall_mace' }) as {
+      characters: { weaponSkinId: string | null; offhandItemId: string | null }[];
+    };
+    expect(list.characters[0].offhandItemId).toBe('forgefathers_warhammer');
+    expect(list.characters[0].weaponSkinId).toBe('starfall_mace');
+    // Without the offhand the mace skin stays parked, exactly as before.
+    const bare = buildCharacterList(
+      [charRow({ class: 'rogue', state: { equipment: { mainhand: 'rusty_dagger' } } as never })],
+      () => false,
+      { mace: 'starfall_mace' },
+    ) as { characters: { weaponSkinId: string | null }[] };
+    expect(bare.characters[0].weaponSkinId).toBeNull();
+  });
+});
+
+describe('buildCharacterList raidLockouts', () => {
+  it('ships the still-locked raids against the injected clock, sorted by id', () => {
+    const now = 1_800_000_000_000;
+    const rows = [
+      charRow({
+        id: 4,
+        state: st({
+          raidLockouts: {
+            'nythraxis_boss_arena:heroic': now + 5 * 3_600_000,
+            nythraxis_boss_arena: now + 2 * 86_400_000,
+            'worldboss:thunzharr_waking_peak': now, // expires exactly now: unlocked
+            stale: now - 1,
+            junk: 'soon',
+          },
+        }),
+      }),
+      charRow({ id: 5, state: st({}) }),
+    ];
+    const list = buildCharacterList(rows, () => false, {}, now) as {
+      characters: { id: number; raidLockouts: Record<string, number> }[];
+    };
+    expect(list.characters.map((c) => [c.id, c.raidLockouts])).toEqual([
+      [
+        4,
+        {
+          nythraxis_boss_arena: now + 2 * 86_400_000,
+          'nythraxis_boss_arena:heroic': now + 5 * 3_600_000,
+        },
+      ],
+      [5, {}],
+    ]);
+    // toEqual ignores key order; the wire order is part of the contract.
+    expect(Object.keys(list.characters[0].raidLockouts)).toEqual([
+      'nythraxis_boss_arena',
+      'nythraxis_boss_arena:heroic',
+    ]);
+  });
+});
+
+describe('buildCharacterList zoneId', () => {
+  it('reports the world-start zone for a mid-match battleground save, not the band', async () => {
+    // Distinct from the state-null arm above: this row HAS a position, and the
+    // rule (not a missing field) is what sends it to the world start.
+    setCharactersDbForTests({
+      listCharacters: async () => [charRow({ id: 3, state: st({ pos: { x: 129410, z: 0 } }) })],
+      loadAccountCosmetics: async () => ({
+        completedQuestIds: [],
+        mechChromaIds: [],
+        weaponSkinIds: [],
+        weaponSkinLoadout: {},
+        mountSkinIds: [],
+      }),
+    });
+    installRuntime({ isCharacterOnline: () => false });
+    const res = await callHandler('GET', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+    });
+    expect(res.status).toBe(200);
+    const body = res.body as { characters: { id: number; zoneId: string | null }[] };
+    expect(body.characters.map((c) => [c.id, c.zoneId])).toEqual([[3, 'eastbrook_vale']]);
   });
 });
 

@@ -27,7 +27,13 @@ import {
 import { partyTradeWindowAllows } from '../loot/bop_trade_window';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
-import { cloneItemInstancePayload, dist2d, type InvSlot, type ItemInstancePayload } from '../types';
+import {
+  cloneItemInstancePayload,
+  dist2d,
+  type InvSlot,
+  type ItemInstancePayload,
+  TICK_RATE,
+} from '../types';
 import {
   carriersReadable,
   mergedUnitSources,
@@ -40,6 +46,11 @@ import {
 // A trade is only offered/kept while both parties are within this many yards;
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
 const TRADE_RANGE = 10;
+
+/** The most offer LINES one side of a trade may stage. The UI's offer
+ *  headroom (src/ui/trade_view.ts) imports this same constant, so the client
+ *  can never let a player stage a line the server silently drops. */
+export const TRADE_OFFER_MAX_LINES = 6;
 
 // The one trade-locked predicate (Professions 2.0). A copy is
 // trade-locked once its payload carries boundTo: a bound instance stays with
@@ -295,7 +306,7 @@ export function tradeSetOffer(
   // validate the offer against the player's bags; merge duplicate slots so
   // the offered total per item is checked, not each slot in isolation
   const merged = new Map<string, number>();
-  for (const slot of items.slice(0, 6)) {
+  for (const slot of items.slice(0, TRADE_OFFER_MAX_LINES)) {
     // slots come straight off the wire — reject anything malformed
     if (!slot || typeof slot.itemId !== 'string' || !Number.isFinite(slot.count)) continue;
     const count = Math.max(1, Math.floor(slot.count));
@@ -991,6 +1002,10 @@ export function updateTradesAndInvites(ctx: SimContext): void {
   }
   // cancel trades when the parties drift apart
   const seen = new Set<TradeSession>();
+  // Once a second, re-check every staged bind-on-pickup copy against the
+  // lockout clock: a window can expire while the offer sits on the table.
+  const revalidatePartyTradeOffers = ctx.tickCount % TICK_RATE === 0;
+  const nowMs = revalidatePartyTradeOffers ? ctx.lockoutNowMs() : 0;
   for (const session of ctx.trades.values()) {
     if (seen.has(session)) continue;
     seen.add(session);
@@ -998,6 +1013,19 @@ export function updateTradesAndInvites(ctx: SimContext): void {
     const eb = ctx.entities.get(session.b);
     if (!ea || !eb || dist2d(ea.pos, eb.pos) > TRADE_RANGE + 4 || ea.dead || eb.dead) {
       tradeCancel(ctx, session.a);
+      continue;
+    }
+    if (!revalidatePartyTradeOffers) continue;
+    for (const [pid, otherPid, offer] of [
+      [session.a, session.b, session.offerA],
+      [session.b, session.a, session.offerB],
+    ] as const) {
+      if (!offer.items.some((slot) => ITEMS[slot.itemId]?.soulbound)) continue;
+      if (offerCovered(ctx, offer.items, pid, otherPid, () => nowMs)) continue;
+      // Re-run the authoritative staging walk to remove only copies that are
+      // no longer valid. This also resets both acceptances, so a reconnecting
+      // client never sees an expired line as already agreed.
+      tradeSetOffer(ctx, offer.items, offer.copper, pid);
     }
   }
 }

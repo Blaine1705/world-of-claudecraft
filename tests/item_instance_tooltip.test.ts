@@ -698,7 +698,7 @@ describe('hud.itemTooltip composition order (source pins)', () => {
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
   const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
   const badges = hud.indexOf('instanceBadgeLines(instance)');
-  const bonus = hud.indexOf('instanceBonusStatLines(instance)');
+  const bonus = hud.indexOf('itemCombatTooltipLines(item, instance)');
   // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site, now
   // wrapped in materialMakersMarkLines alongside the per-unit material
@@ -712,7 +712,7 @@ describe('hud.itemTooltip composition order (source pins)', () => {
     expect(bonus).toBeGreaterThan(-1);
     expect(mark).toBeGreaterThan(-1);
     expect(hud.indexOf('instanceBadgeLines(instance)', badges + 1)).toBe(-1);
-    expect(hud.indexOf('instanceBonusStatLines(instance)', bonus + 1)).toBe(-1);
+    expect(hud.indexOf('itemCombatTooltipLines(item, instance)', bonus + 1)).toBe(-1);
     expect(hud.indexOf('materialMakersMarkLines(', mark + 1)).toBe(-1);
   });
 
@@ -757,15 +757,28 @@ describe('instancePartyTradeLine (the BoP party trade window line)', () => {
     ).toBe('');
   });
 
-  it('composes in hud.itemTooltip right after the Soulbound line, before the bond lines', () => {
+  it('composes in hud.itemTooltip inside the Soulbound block, before the bond lines', () => {
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
     const partyTrade = hud.indexOf('instancePartyTradeLine(instance,');
     const binding = hud.indexOf('instanceBindingLines(instance, item.kind)');
+    // The window line rides INSIDE the def-level `if (item.soulbound)` block,
+    // so a legacy marker on a drop that has since become freely tradable (the
+    // Crucible boss drops, PR #3789) renders nothing. Pinned by braces, not
+    // whitespace, so a reformat of the block cannot break it: no `}` between
+    // the block's open and the Soulbound line, and none between the end of the
+    // Soulbound statement and the call (the template's `${...}` sits inside
+    // that statement, which is why the second span starts after it).
+    const blockOpen = hud.lastIndexOf('if (item.soulbound)', soulbound);
+    expect(blockOpen).toBeGreaterThan(-1);
+    expect(hud.slice(blockOpen, soulbound)).not.toContain('}');
+    const soulboundEnd = hud.indexOf('`;', soulbound);
+    expect(soulboundEnd).toBeGreaterThan(soulbound);
+    expect(hud.slice(soulboundEnd, partyTrade)).not.toContain('}');
     expect(partyTrade).toBeGreaterThan(soulbound);
     expect(binding).toBeGreaterThan(partyTrade);
     expect(hud.indexOf('instancePartyTradeLine(', partyTrade + 1)).toBe(-1);
     // The remaining span resolves through the IWorld clock, never Date.now().
-    expect(hud).toContain('this.sim.partyTradeMsRemaining(untilMs)');
+    expect(hud).toContain('this.sim.partyTradeMsRemaining(ms)');
   });
 });

@@ -489,6 +489,86 @@ player acts on, but the tree one deserves its reasoning written down rather than
   surviving leaf fragment, 0 below ultra, 3 on ultra (the AO half), 6 on insane. Fragment shading
   only, no displacement and no silhouette change, so it cannot move what a canopy occludes.
 
+### Zone-feature dressing sheds by apparent size, on every profile (2026-09-08)
+
+The bespoke biome dressing (the Willowfen's lily rafts, reeds, mushroom and log
+patches) is culled per registered group against the session's cull distance, and on
+several profiles that distance is far enough to draw clutter nobody can resolve: the
+far-vista arm culls at the detail horizon (700 to 850 yd) with the scene fog parked past
+924, and the constrained-memory profiles run the classic arm with a fog that eases out
+to 700 yd. On both, a 6,000-triangle raft five yards across was drawn at 500 yd as a
+blob a few pixels wide. The sweep (`src/render/zone_feature_sweep.ts` over
+`zone_feature_visibility_core.ts`) now also sheds a DRESSING group once its largest
+instance would span under `ZONE_FEATURE_MIN_APPARENT_PX` (8) at a fixed reference view
+(720 px tall, the 60 degree base FOV), with a 10 percent hysteresis band. The reach is
+derived from the group's real instance size, never a per-family distance table, so a
+one-off giant model keeps its whole group to the horizon with nothing written anywhere.
+
+It applies on EVERY profile, not only where the far vista runs, and the cull distance
+still applies on top, so the stricter of the two decides. At low (fog 340 yd) the fog is
+stricter for the lily rafts, whose reach is 406 yd, and the reach is stricter for the
+reeds, mushrooms and logs, whose shipped models put theirs at 224 to 287 yd. Gating it
+to the far-vista arm was the first shape and it was wrong: measured on an Iris Xe at
+medium under the constrained-memory profile, the cells without the reach cost 19 draws
+in the Eastbrook view for 2 percent fewer triangles, where the reach turns the same view
+into 1 draw and 91,152 triangles against 5 and 2,335,276.
+
+Why it is fair: the families it applies to carry no collider and no interaction (the
+Willowfen's collider family, the willows, is never sized and keeps the distance rule
+alone), so a shed only ever removes a few-pixel blob, never something a player walks into
+or acts on; the reference view is a constant, so what is drawn never depends on the
+window or on the FPS governor; and the reach for the smallest shipped scale sits far
+outside the range a player acts in (past 180 yd on a unit model at the fen's smallest
+scale). The cost is a pop at the reach, larger on a 1440p or 2160p client than at the reference
+view; the band keeps it from flapping. Where the reach fires inside the fog (at low a
+reed, mushroom or log cell goes at 224 to 287 yd against a 340 yd fog) the object was
+already 48 to 76 percent blended into it, so the pop is fainter there than on the vista
+tiers, where it happens in clear air.
+
+### The Frame Rate Limit is a pacing choice, not a tier knob (2026-09-18)
+
+The Frame Rate Limit (`src/game/frame_cadence_core.ts`, the System card's `frameRateCap`
+option) renders on a divisor of the display's measured refresh rate: about 30 on a 60 Hz
+display is every second refresh. It is a new class in this document. It is not a tier
+knob (no ceiling is ever decided from the preset, and the preset never reads the limit;
+the preset only SCOPES what the automatic mode remembers, in
+`src/game/frame_cadence_auto_memory.ts`, because a verdict learned on Ultra must not be
+reused on Low) and it is not a governor
+bucket (it removes no richness itself; while the automatic mode is still forming a
+verdict it does hold the governor's RECOVERY, so richness the governor already shed
+stays shed a little longer, cosmetic only and bounded: a provisional hold ends within
+300 s of readable play, a probe within 90 frames, a probation within 120 s of
+readable play); it changes how often the whole picture is
+redrawn, exactly as a slower display would.
+
+Why it is fair. Nothing a player reads is hidden, thinned or delayed relative to the
+picture: the cast bar, the debuff strips, target and party health are all painted on
+every rendered frame, so they are as current as the world they sit on. The price is
+presentation latency, and it is bounded and stated: at most one chosen interval, 33 ms
+at a ceiling of 30 on a 60 Hz display, which is what a 30 Hz display costs and well
+inside the redraw tolerance above (about 200 ms). The limit never paces under 24 images
+per second (`MIN_CEILING_FPS`), which also keeps a rendered interval under the 50 ms
+input tick. Most of what a player DOES is not frame-paced at all: keyboard and mouse
+ability presses fire from the key event, and movement reaches the server as 50 ms wall-clock input ticks whatever the
+frame rate, so movement speed is identical on every machine and at every limit; only
+how soon a change of movement intent is noticed follows the rendered frame, which is
+the same one-interval bound. A gamepad is the exception: it has no events, its buttons
+are polled once per rendered frame (`gamepad.poll` in `frame()`), so a pad press is also
+noticed up to one chosen interval later, again what a slower display costs. A machine the limit is meant for already runs at that
+rhythm, unevenly; the limit makes it even.
+
+The automatic mode is measurement-driven by design, like the governor's sheds: it
+lowers the limit only on a machine that demonstrably misses its display's slots, and a
+player's explicit choice always wins over it. Once it has settled it holds: the limit
+then changes only on something the player did (a preset, the render scale, the display,
+the window's size class, choosing Auto again), downward when the rhythm in force is
+demonstrably missed, or through a small per-session budget of probes that last a few
+frames. The one gameplay reading it takes, `player.inCombat`, only ever POSTPONES or
+ABORTS a probe: a fight never changes what is drawn or when, it only keeps the automatic mode
+from spending frames during one (`src/game/frame_cadence_calm_core.ts`). The static-preset rule still holds in
+full for the HUD: the limit is never an input of `src/game/ui_effects_profile.ts` or
+`src/game/ui_tier_knobs.ts`, so no HUD knob can ever move with it.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -591,6 +671,16 @@ player acts on, but the tree one deserves its reasoning written down rather than
   session's OWN chain carries (a chain with only AO steps 1 to 0 in one step, spending no
   cooldown on a dead rung; a governor handed no chain holds 1 until the built pipeline hands
   it one), the `?postshed=off` kill switch and the `?postshed=` pin with the governor on or off.
+- `tests/zone_feature_sweep.test.ts` and `tests/fen_features_cells.test.ts`: the
+  apparent-size reach. The reach formula and its 8 px threshold are pinned to literals at
+  the fixed reference view, a missing extent fails open, both hysteresis edges hold, the
+  sweep shows only what is inside the fog AND the reach; on the fen build the willow
+  (collider) group carries no extent while every dressing cell carries its largest
+  instance's on every profile while the willow (collider) group carries none on any, and
+  the smallest reach the shipped models and placement scales can produce stays outside
+  the radius at which the server will even tell a client another player exists
+  (PLAYER_INTEREST_DROP_RADIUS, 100 yd; the real minimum is about 183 yd, the mushroom
+  clump at its smallest authored scale).
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed
@@ -661,6 +751,12 @@ player acts on, but the tree one deserves its reasoning written down rather than
   burst's length. Each band is also separated from the others on two axes at once, colour and
   motion signature (ring position, sprite shape, and the fear band's vertical bob), so the
   distinction survives for a colourblind player rather than resting on hue alone.
+
+- `tests/frame_cadence.test.ts`: the divisor tables, the 24 images per second floor and the
+  one-input-tick bound on every display rate, and that the limit yields to a loading cover,
+  a held world draw and a hidden desktop shell. `tests/frame_cadence_fairness.test.ts`: the
+  limit is never an input of the HUD tier resolvers, and the tier resolvers are never an
+  input of the limit.
 
 ## Resolved: negative-value stat-sap auras now classify as debuffs in both worlds
 
