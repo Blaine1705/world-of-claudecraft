@@ -272,7 +272,8 @@ describe('world quest content', () => {
       } else if (quest.objective.type === 'salvage') {
         expect(quest.objective.layouts).toHaveLength(1);
         for (const layout of quest.objective.layouts) {
-          expect(layout).toHaveLength(12);
+          // The shipwreck hull is scenery; eleven authored pickups remain.
+          expect(layout).toHaveLength(11);
           expect(layout.length).toBeGreaterThanOrEqual(quest.count);
           for (const entityId of layout) {
             const object = sim.entities.get(entityId);
