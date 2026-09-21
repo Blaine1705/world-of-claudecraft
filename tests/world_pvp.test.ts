@@ -729,8 +729,9 @@ describe('kill resolution: the stake and the honor pool', () => {
     const pid = sim.addPlayer('warrior', 'Loaded', { state: withOldCounter as never });
     expect(ent(sim, pid).pvpFlag).toBeFalsy();
     const saved = sim.serializeCharacter(pid)! as unknown as { honorArenaDaily?: object };
-    expect(saved.honorArenaDaily === undefined || !('worldKillsByVictim' in saved.honorArenaDaily))
-      .toBe(true);
+    expect(
+      saved.honorArenaDaily === undefined || !('worldKillsByVictim' in saved.honorArenaDaily),
+    ).toBe(true);
     // And the old count never reaches the new book: the first kill pays in full.
     const b = addFighter(sim, 'Bet', 20, 1002);
     standTogether(sim, [pid, b]);
