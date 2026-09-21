@@ -37,6 +37,9 @@ export function summarizePrograms(results) {
     const later = runs.slice(1).map((run) => run.ms);
     const repeatMs = later.length ? median(later) : firstMs;
     rows.push({
+      base: r.base,
+      variant: r.variant,
+      group: r.group,
       hash: r.hash,
       name: r.name,
       kind: r.kind,
@@ -76,6 +79,41 @@ export function concentration(rows) {
   };
 }
 
+/**
+ * Ablation runs: every variant row paired with the baseline row of the SAME
+ * program, so the saving is a per-program difference, never a difference of
+ * group medians over different programs.
+ */
+export function pairedAblation(rows) {
+  const baseline = new Map();
+  for (const r of rows) if (r.variant === 'baseline') baseline.set(r.base, r);
+  const byVariant = new Map();
+  for (const r of rows) {
+    if (!r.variant || r.variant === 'baseline') continue;
+    const b = baseline.get(r.base);
+    if (!b) continue;
+    const key = `${r.variant}|${r.group ?? ''}`;
+    const list = byVariant.get(key) ?? [];
+    list.push({ baseMs: b.costMs, variantMs: r.costMs, savedMs: b.costMs - r.costMs });
+    byVariant.set(key, list);
+  }
+  return [...byVariant]
+    .map(([key, pairs]) => {
+      const [variant, group] = key.split('|');
+      return {
+        variant,
+        group,
+        pairs: pairs.length,
+        baseMedianMs: median(pairs.map((p) => p.baseMs)),
+        variantMedianMs: median(pairs.map((p) => p.variantMs)),
+        savedMedianMs: median(pairs.map((p) => p.savedMs)),
+        savedMinMs: Math.min(...pairs.map((p) => p.savedMs)),
+        savedMaxMs: Math.max(...pairs.map((p) => p.savedMs)),
+      };
+    })
+    .sort((a, b) => a.group.localeCompare(b.group) || b.savedMedianMs - a.savedMedianMs);
+}
+
 const ms = (v) => v.toFixed(1);
 const pct = (v) => `${(v * 100).toFixed(1)} %`;
 
@@ -107,6 +145,19 @@ export function renderLinkBenchReport(payload) {
   lines.push(
     `| share held by the dearest 10 percent | ${pct(c.top10PercentShare)} (flat would be 10.0 %) |`,
   );
+  const paired = pairedAblation(rows);
+  if (paired.length) {
+    lines.push('', '## Paired ablation (each variant against its own baseline)', '');
+    lines.push(
+      '| group | variant | pairs | baseline median ms | variant median ms | saved median ms | saved min..max ms |',
+      '|---|---|---|---|---|---|---|',
+    );
+    for (const a of paired) {
+      lines.push(
+        `| ${a.group} | ${a.variant} | ${a.pairs} | ${ms(a.baseMedianMs)} | ${ms(a.variantMedianMs)} | ${ms(a.savedMedianMs)} | ${ms(a.savedMinMs)}..${ms(a.savedMaxMs)} |`,
+      );
+    }
+  }
   lines.push('', '## The 40 dearest programs', '');
   lines.push('| rank | cost ms | first ms | kind | name | first met | profiles | program |');
   lines.push('|---|---|---|---|---|---|---|---|');

@@ -5,6 +5,9 @@ export interface LinkRun {
 }
 
 export interface LinkResult {
+  base?: string;
+  variant?: string;
+  group?: string;
   hash: string;
   name: string;
   kind: string;
@@ -14,6 +17,9 @@ export interface LinkResult {
 }
 
 export interface LinkRow {
+  base?: string;
+  variant?: string;
+  group?: string;
   hash: string;
   name: string;
   kind: string;
@@ -43,6 +49,17 @@ export function summarizePrograms(results: LinkResult[]): {
   rows: LinkRow[];
   failures: { hash: string; name: string; log: string }[];
 };
+export interface AblationPairing {
+  variant: string;
+  group: string;
+  pairs: number;
+  baseMedianMs: number;
+  variantMedianMs: number;
+  savedMedianMs: number;
+  savedMinMs: number;
+  savedMaxMs: number;
+}
+export function pairedAblation(rows: LinkRow[]): AblationPairing[];
 export function concentration(rows: LinkRow[]): Concentration;
 export function renderLinkBenchReport(payload: {
   results: LinkResult[];

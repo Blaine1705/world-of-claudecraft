@@ -214,6 +214,9 @@ async function main() {
       });
       results.push({
         hash: program.hash,
+        base: program.base,
+        variant: program.variant,
+        group: program.group,
         name: program.name,
         kind: program.kind,
         vertexHash: program.vertexHash,

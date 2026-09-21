@@ -3,6 +3,7 @@ import {
   concentration,
   type LinkResult,
   median,
+  pairedAblation,
   quantile,
   renderLinkBenchReport,
   summarizePrograms,
@@ -82,5 +83,28 @@ describe('shader link bench report', () => {
     expect(report).toContain('ANGLE (Test GPU Direct3D11)');
     expect(report.indexOf('| 1 | 700.0 |')).toBeGreaterThan(0);
     expect(report.indexOf('dear')).toBeLessThan(report.indexOf('cheap'));
+  });
+
+  it('pairs each ablation variant with the baseline of the same program', () => {
+    const variant = (base: string, name: string, group: string, timings: number[]) => ({
+      ...result(`${base}-${name}`, timings),
+      base,
+      variant: name,
+      group,
+    });
+    const { rows } = summarizePrograms([
+      variant('p1', 'baseline', 'worn', [500, 500, 500]),
+      variant('p1', 'worn-flat', 'worn', [300, 300, 300]),
+      variant('p2', 'baseline', 'worn', [900, 900, 900]),
+      variant('p2', 'worn-flat', 'worn', [800, 800, 800]),
+      // No baseline for p3: it must not be paired with someone else's.
+      variant('p3', 'worn-flat', 'worn', [1, 1, 1]),
+    ]);
+    const [flat] = pairedAblation(rows);
+    expect(flat).toMatchObject({ variant: 'worn-flat', group: 'worn', pairs: 2 });
+    // Savings are per program (200 and 100), not a difference of medians.
+    expect(flat.savedMedianMs).toBe(150);
+    expect(flat.savedMinMs).toBe(100);
+    expect(flat.savedMaxMs).toBe(200);
   });
 });
