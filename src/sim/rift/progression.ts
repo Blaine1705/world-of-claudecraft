@@ -155,6 +155,11 @@ export function sanitizeRiftGearInstance(
   const gems = (Array.isArray(source.gems) ? source.gems : [])
     .filter((gem): gem is RiftGemId => (RIFT_GEM_IDS as readonly string[]).includes(gem))
     .slice(-gemSlots);
+  // The permanent per-copy `lootQuality` descriptor (docs/design/loot-quality.md)
+  // rides the rebuild VALIDATED, below the record: this supersedes the
+  // release's unread pass-through (PR 4138, the rollback safety net for a
+  // binary without this feature), so a malformed descriptor is dropped here
+  // exactly as the load bound drops it, never carried by reference.
   const clean: ItemInstancePayload = {
     boundTo: ownerId,
     // The player item lock (item_lock.ts) is the owner's own safety mark and

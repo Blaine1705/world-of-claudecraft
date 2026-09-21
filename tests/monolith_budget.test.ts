@@ -495,14 +495,18 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
     // per-frame healer-range scan (the Keeper is talked to). wc -l on the
     // merged tree. Exact count, zero slack.
-    // LOWERED 18276 -> 18266 at the permanent loot quality (PR 4054) sync on
-    // top of the Keeper revive landing: the item tooltip column composition
-    // moved to item_combat_tooltip_view.ts and the loot receipt body decision
-    // to loot_quality_receipt.ts (the loot arm keeps its one guarded log()
-    // call through a thin lootReceiptBody adapter), composed with the trade
-    // quantity prompt fold (18276 - 10). wc -l on the merged tree. Exact
-    // count, zero slack.
-    ceiling: 18266,
+    // LOWERED 18276 -> 18263 with the character-select raid lockouts: the
+    // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
+    // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
+    // and the minimap badge name a lockout identically. Exact count, zero slack.
+    // LOWERED 18263 -> 18253 at the permanent loot quality (PR 4054) sync
+    // on top of the character-select lockouts landing: the item tooltip column
+    // composition moved to item_combat_tooltip_view.ts and the loot receipt
+    // body decision to loot_quality_receipt.ts (the loot arm keeps its one
+    // guarded log() call through a thin lootReceiptBody adapter), composed
+    // with the trade quantity prompt fold (18263 - 10). wc -l on the merged
+    // tree. Exact count, zero slack.
+    ceiling: 18253,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1308,7 +1312,10 @@ const MONOLITHS: MonolithRow[] = [
     // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
     // composed with the release's game_renderer.ts extraction. Exact merged
     // count, zero slack.
-    ceiling: 11281,
+    // LOWERED 11281 -> 11280 with the character-select lockout disclosure:
+    // the roster row hint markup call is inlined into its template and the
+    // disclosure event isolation lives in src/ui/charselect_hints.ts.
+    ceiling: 11280,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

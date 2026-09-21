@@ -6,7 +6,8 @@
 // ungrouped however long the lockout.
 
 import { describe, expect, it } from 'vitest';
-import { formatLockoutDuration } from '../src/ui/raid_lockout_format';
+import { setLanguage } from '../src/ui/i18n';
+import { formatLockoutDuration, raidLockoutDisplayName } from '../src/ui/raid_lockout_format';
 
 const MIN = 60_000;
 const HOUR = 60 * MIN;
@@ -32,5 +33,28 @@ describe('formatLockoutDuration', () => {
 
   it('keeps the digits ungrouped so a long lockout never gains a thousands separator', () => {
     expect(formatLockoutDuration(1200 * DAY)).toBe('1200d 0h');
+  });
+});
+
+// The lockout-id -> raid-name rule shared by the minimap badge panel and the
+// character-select roster: the three id shapes the sim writes.
+describe('raidLockoutDisplayName', () => {
+  it('names a bare dungeon id as the dungeon', () => {
+    setLanguage('en');
+    expect(raidLockoutDisplayName('nythraxis_boss_arena')).toBe('Nythraxis Raid Arena');
+  });
+
+  it('names a heroic daily lockout with the Heroic prefix', () => {
+    setLanguage('en');
+    expect(raidLockoutDisplayName('nythraxis_boss_arena:heroic')).toBe(
+      'Heroic Nythraxis Raid Arena',
+    );
+  });
+
+  it('names a world-boss loot lockout as the boss mob', () => {
+    setLanguage('en');
+    expect(raidLockoutDisplayName('worldboss:thunzharr_waking_peak')).toBe(
+      'Thunzharr, the Waking Peak',
+    );
   });
 });
