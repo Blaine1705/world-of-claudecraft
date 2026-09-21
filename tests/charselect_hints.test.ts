@@ -1,7 +1,9 @@
 // src/ui/charselect_hints.ts: the hint lines under a character-select roster
 // row. The zone line is what lets an account owner see where every character
 // is without logging each one in; it renders through tEntity so it follows the
-// active language like every other zone name in the client.
+// active language like every other zone name in the client. The raid-lockout
+// rows below it name and time each lockout through the same rule as the
+// minimap badge, against a clock the caller passes.
 import { describe, expect, it } from 'vitest';
 import {
   charselectHintsHtml,

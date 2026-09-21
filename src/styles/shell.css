@@ -2659,9 +2659,6 @@
     display: block;
     color: var(--color-accent);
   }
-  .char-row .char-lockout-label::after {
-    content: ":";
-  }
   .char-row .char-lockout-item {
     display: flex;
     align-items: baseline;

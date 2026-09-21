@@ -4,6 +4,13 @@
 // timed through the same rule as the in-world minimap badge), and the in-world
 // notice for a character another session holds. Pure string builder, no DOM:
 // main.ts drops the markup into the row it composes.
+//
+// The countdown subtracts the caller's clock from the server's absolute unlock
+// epoch, exactly as the in-world badge does (online.ts raidLockouts()), so a
+// skewed client clock misreads both surfaces identically. It is stamped once
+// per roster paint (refreshCharacters); a player parked on character select
+// keeps that reading until the roster refetches (realm, sort or language
+// change, or re-entry), which the minute granularity makes harmless.
 import { zoneDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { t } from './i18n';

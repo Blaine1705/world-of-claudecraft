@@ -369,7 +369,8 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
  * scan). The retained legacy arm (main.ts characterListPayload) DELEGATES here, so the
  * two dispatch modes share one implementation and cannot diverge in payload shape.
  * `nowMs` is the wall clock the raid lockouts are filtered against (the live
- * lockout gate's clock, server/main.ts lockoutNowMs); injectable for tests.
+ * Sim's lockoutNowMs in server/sim_boot_config.ts is Date.now() too); injectable
+ * for tests.
  */
 export function buildCharacterList(
   chars: CharacterRow[],

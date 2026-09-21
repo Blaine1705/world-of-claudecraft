@@ -524,6 +524,11 @@ describe('buildCharacterList raidLockouts', () => {
       ],
       [5, {}],
     ]);
+    // toEqual ignores key order; the wire order is part of the contract.
+    expect(Object.keys(list.characters[0].raidLockouts)).toEqual([
+      'nythraxis_boss_arena',
+      'nythraxis_boss_arena:heroic',
+    ]);
   });
 });
 
