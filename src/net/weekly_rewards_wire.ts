@@ -38,6 +38,9 @@ export function decodeWeeklyRewardInfo(raw: unknown): WeeklyRewardInfo | null {
     typeof value.nowMs !== 'number' ||
     !Number.isSafeInteger(value.nowMs) ||
     value.nowMs < 0 ||
+    typeof value.playerLevel !== 'number' ||
+    !Number.isSafeInteger(value.playerLevel) ||
+    value.playerLevel < 1 ||
     typeof value.canClaim !== 'boolean' ||
     typeof value.worldQuestsAvailable !== 'boolean'
   )
@@ -45,12 +48,7 @@ export function decodeWeeklyRewardInfo(raw: unknown): WeeklyRewardInfo | null {
   return {
     state,
     nowMs: value.nowMs,
-    playerLevel:
-      typeof value.playerLevel === 'number' &&
-      Number.isSafeInteger(value.playerLevel) &&
-      value.playerLevel >= 1
-        ? value.playerLevel
-        : 1,
+    playerLevel: value.playerLevel,
     canClaim: value.canClaim,
     worldQuestsAvailable: value.worldQuestsAvailable,
     readyWeeks:

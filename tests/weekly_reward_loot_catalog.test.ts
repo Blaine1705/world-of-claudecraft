@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { weeklyBossLootPool } from '../src/sim/weekly_reward_tables';
 import { emptyWeeklyRewards } from '../src/sim/weekly_rewards';
 import type { PainterHostPresentation } from '../src/ui/painter_host';
-import { appendWeeklyLootCategory } from '../src/ui/weekly_reward_loot_catalog';
+import { appendWeeklyLootCategory } from '../src/ui/weekly_reward_loot_catalog_controller';
 import { buildWeeklyRewardsView } from '../src/ui/weekly_rewards_view';
 
 describe('possible loot catalog', () => {

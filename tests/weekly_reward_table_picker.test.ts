@@ -1,12 +1,14 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { weeklyRewardTableOptions } from '../src/sim/weekly_reward_options';
 import type { WeeklyVaultBatch } from '../src/sim/weekly_rewards';
-import { appendWeeklyRewardTablePicker } from '../src/ui/weekly_reward_table_picker';
+import { appendWeeklyRewardTablePicker } from '../src/ui/weekly_reward_table_picker_controller';
 
 const disposers: Array<() => void> = [];
 afterEach(() => {
   for (const dispose of disposers.splice(0)) dispose();
   document.body.replaceChildren();
+  vi.restoreAllMocks();
 });
 
 describe('weekly table picker', () => {
@@ -24,18 +26,16 @@ describe('weekly table picker', () => {
     let previous: ReturnType<typeof appendWeeklyRewardTablePicker> | undefined;
     const render = (saving = false, level = 20) => {
       previous?.dispose();
-      const picker = appendWeeklyRewardTablePicker(
+      const picker = appendWeeklyRewardTablePicker({
         footer,
-        batch,
-        batch.choices[0],
-        'mage',
-        0,
+        choice: batch.choices[0],
+        tables: weeklyRewardTableOptions(batch, batch.choices[0], 'mage', level),
+        index: 0,
         selections,
         saving,
-        level,
-        changed,
+        onChange: changed,
         expanded,
-      );
+      });
       previous = picker;
       disposers.push(picker.dispose);
       return picker;
@@ -50,6 +50,10 @@ describe('weekly table picker', () => {
     expect(picker.canOpen()).toBe(false);
     expect(s.inputs()).toHaveLength(3);
     s.inputs()[1].click();
+    expect(s.footer.querySelector('summary')!.textContent).toBe('1 table selected');
+    expect(s.footer.querySelector('[role="group"]')!.getAttribute('aria-label')).toBe(
+      'Select which table to roll off',
+    );
     expect(picker.selected()).toEqual(['sunken_bastion']);
     expect(picker.canOpen()).toBe(true);
     expect(s.inputs()[0].indeterminate).toBe(true);
@@ -59,6 +63,45 @@ describe('weekly table picker', () => {
     s.inputs()[0].click();
     expect(picker.canOpen()).toBe(false);
     expect(s.changed).toHaveBeenCalledTimes(4);
+  });
+  it('reuses clipping styles on scroll but follows a moving clip rectangle and stops when disposed', () => {
+    const s = make();
+    s.footer.style.overflowY = 'hidden';
+    const picker = s.render();
+    const details = s.footer.querySelector('details')!;
+    const summary = s.footer.querySelector('summary')!;
+    const list = s.footer.querySelector<HTMLElement>('.weekly-table-options')!;
+    const styles = vi.spyOn(globalThis, 'getComputedStyle');
+    const rect = (top: number, bottom: number) => ({
+      top,
+      bottom,
+      left: 0,
+      right: 100,
+      width: 100,
+      height: bottom - top,
+      x: 0,
+      y: top,
+      toJSON: () => ({}),
+    });
+    const anchor = vi.spyOn(summary, 'getBoundingClientRect').mockReturnValue(rect(300, 340));
+    const clip = vi.spyOn(s.footer, 'getBoundingClientRect').mockReturnValue(rect(0, 500));
+    details.open = true;
+    details.dispatchEvent(new Event('toggle'));
+    expect(details.classList.contains('weekly-table-opens-up')).toBe(true);
+    const styleCount = styles.mock.calls.length;
+    expect(styleCount).toBeGreaterThan(0);
+    clip.mockReturnValue(rect(280, 720));
+    s.footer.dispatchEvent(new Event('scroll'));
+    expect(details.classList.contains('weekly-table-opens-up')).toBe(false);
+    expect(styles).toHaveBeenCalledTimes(styleCount);
+    expect(list.style.maxHeight).toBe('220px');
+    window.dispatchEvent(new Event('resize'));
+    expect(styles.mock.calls.length).toBeGreaterThan(styleCount);
+    picker.dispose();
+    const reads = anchor.mock.calls.length;
+    s.footer.dispatchEvent(new Event('scroll'));
+    window.dispatchEvent(new Event('resize'));
+    expect(anchor).toHaveBeenCalledTimes(reads);
   });
   it('retains selections and expanded state across repaint and prunes ineligible choices', () => {
     const s = make();

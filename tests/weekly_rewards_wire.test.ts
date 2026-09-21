@@ -61,6 +61,8 @@ describe('weekly reward wire', () => {
     expect(decodeWeeklyRewardInfo(JSON.parse(JSON.stringify(info)))).toEqual(info);
     expect(decodeWeeklyRewardInfo({ ...info, nowMs: NaN })).toBeNull();
     expect(decodeWeeklyRewardInfo({ ...info, canClaim: 'yes' })).toBeNull();
+    for (const playerLevel of [undefined, 0, -1, NaN, 1.5, '20'])
+      expect(decodeWeeklyRewardInfo({ ...info, playerLevel })).toBeNull();
     expect(decodeWeeklyRewardInfo(null)).toBeNull();
   });
   it('preserves a delta-omitted ledger and clears it when the keeper gate closes', () => {

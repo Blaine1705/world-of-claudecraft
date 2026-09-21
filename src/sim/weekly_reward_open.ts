@@ -86,15 +86,9 @@ export function finishWeeklyRewardOpen(opening: WeeklyRewardOpening, saved: bool
 export function openWeeklyReward(
   ctx: SimContext,
   choiceKey: string,
-  tableOrPid?: string | readonly string[] | number,
+  table?: string | readonly string[],
   pid?: number,
 ): void {
-  const opening = prepareWeeklyRewardOpen(
-    ctx,
-    choiceKey,
-    typeof tableOrPid === 'number' ? tableOrPid : pid,
-    undefined,
-    typeof tableOrPid === 'number' ? undefined : tableOrPid,
-  );
+  const opening = prepareWeeklyRewardOpen(ctx, choiceKey, pid, undefined, table);
   if (opening) finishWeeklyRewardOpen(opening, true);
 }

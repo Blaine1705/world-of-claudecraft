@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { BUILTIN_WORLD, ITEMS, MOBS, NPCS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { enterDungeon } from '../src/sim/instances/dungeons';
@@ -58,6 +59,17 @@ function setup() {
 }
 
 describe('weekly boss-table eligibility', () => {
+  it('registers every final boss that pays dungeon and raid clear credit exactly once', () => {
+    for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
+      expect(
+        WEEKLY_BOSS_TABLES.filter((table) => table.bossId === tuning.finalBossId),
+      ).toHaveLength(1);
+    }
+  });
+
+  it.each([0, 3, 1.5, -1, 99, '2', null])('rejects invalid boss unlock tier %j', (tier) => {
+    expect(sanitizeWeeklyBossUnlocks({ morthen: tier })).toEqual({});
+  });
   it('registers named mid-bosses, actual raid rooms and no trash tables', () => {
     expect(weeklyBossTable('sexton_marrow')?.dungeonId).toBe('hollow_crypt');
     expect(weeklyBossTable('varkhul_forgefather_of_the_last_flame')?.dungeonId).toBe(

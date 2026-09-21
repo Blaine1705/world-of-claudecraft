@@ -13,6 +13,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.weeklyRewards.chooseTable': '보상을 추첨할 전리품 목록 선택',
+  'hudChrome.weeklyRewards.selectAllTables': '모두 선택',
+  'hudChrome.weeklyRewards.selectedTable': '전리품 목록 {count}개 선택됨',
+  'hudChrome.weeklyRewards.selectedTables': '전리품 목록 {count}개 선택됨',
+  'hudChrome.weeklyRewards.noLevelLoot': '현재 레벨에 맞는 전리품이 없습니다.',
+  'hudChrome.weeklyRewards.tableItem': '아이템 {count}개',
+  'hudChrome.weeklyRewards.tableItemCount': '아이템 {count}개',
+  'hudChrome.weeklyRewards.previouslyRolled': '이미 추첨된 보상',
+  'hudChrome.weeklyRewards.noTables':
+    '이 난이도에서 기록된 우두머리 처치로 얻을 수 있는 적격 장비가 없습니다.',
+  'hudChrome.weeklyRewards.tablesExhausted':
+    '적격 아이템이 모두 추첨되었습니다. 공개된 보상을 선택하세요.',
+  'hudChrome.weeklyRewards.worldPoolRule':
+    '일반 난이도 Nythraxis 장비입니다. 공격대 완료는 필요하지 않습니다.',
+  'hudChrome.weeklyRewards.selectionPoolRule':
+    '공격대와 던전 보상은 열기 전에 전리품 목록을 하나 이상 선택하세요. 던전 전리품 목록에는 해당 난이도에서 처치한 우두머리의 전리품이 합쳐집니다. 중복 아이템, 전설 아이템, 요구 레벨이 자신의 레벨보다 {maxLevelOffset}레벨을 초과하여 높은 장비는 추첨에서 제외됩니다.',
   'questUi.worldQuest.puzzleRetry': '다시 시도',
   'questUi.worldQuest.puzzleTimerAria': '남은 시간: {seconds}초',
   'questUi.worldQuest.startQuest': '전역 퀘스트 시작',

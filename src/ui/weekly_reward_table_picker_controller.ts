@@ -1,6 +1,5 @@
-import type { PlayerClass } from '../sim/types';
-import { weeklyRewardTableOptions, weeklyTableSource } from '../sim/weekly_reward_options';
-import type { WeeklyChoice, WeeklyVaultBatch } from '../sim/weekly_rewards';
+import { type WeeklyRewardTableOption, weeklyTableSource } from '../sim/weekly_reward_options';
+import type { WeeklyChoice } from '../sim/weekly_rewards';
 import { tEntity } from './entity_i18n';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import { formatNumber, t } from './i18n';
@@ -18,19 +17,36 @@ export function weeklyRewardTableName(source: {
     : tEntity({ kind: source.kind, id: source.id, field: 'name' });
 }
 
+const MENU_MAX_HEIGHT = 220;
+const MENU_MARGIN = 8;
+const MENU_TOUCH_HEIGHT = 44;
+
+interface WeeklyRewardTablePickerOptions {
+  footer: HTMLElement;
+  choice: WeeklyChoice;
+  tables: WeeklyRewardTableOption[];
+  index: number;
+  selections: Map<number, string[]>;
+  saving: boolean;
+  onChange(): void;
+  expanded: Set<number>;
+}
+
 /** Selection is presentation state only; every submitted table is revalidated. */
-export function appendWeeklyRewardTablePicker(
-  footer: HTMLElement,
-  batch: WeeklyVaultBatch,
-  choice: WeeklyChoice,
-  cls: PlayerClass,
-  index: number,
-  selections: Map<number, string[]>,
-  saving: boolean,
-  level = 1,
-  onChange: () => void = () => {},
-  expanded = new Set<number>(),
-): { canOpen(): boolean; selected(): string[] | undefined; dispose(): void } {
+export function appendWeeklyRewardTablePicker({
+  footer,
+  choice,
+  tables,
+  index,
+  selections,
+  saving,
+  onChange,
+  expanded,
+}: WeeklyRewardTablePickerOptions): {
+  canOpen(): boolean;
+  selected(): string[] | undefined;
+  dispose(): void;
+} {
   if (choice.fixed || choice.tableId || (choice.opened && choice.itemId)) {
     const source = weeklyTableSource(choice.tableId);
     footer.textContent = source
@@ -38,7 +54,6 @@ export function appendWeeklyRewardTablePicker(
       : t('hudChrome.weeklyRewards.previouslyRolled');
     return { canOpen: () => true, selected: () => undefined, dispose: () => {} };
   }
-  const tables = weeklyRewardTableOptions(batch, choice, cls, level);
   if (choice.pool === 'world' || choice.pool === 'pvp') {
     selections.delete(index);
     expanded.delete(index);
@@ -68,25 +83,38 @@ export function appendWeeklyRewardTablePicker(
   const list = document.createElement('div');
   list.id = `weekly-table-options-${index}`;
   list.className = 'weekly-table-options ui-well';
+  list.setAttribute('role', 'group');
+  list.setAttribute('aria-label', t('hudChrome.weeklyRewards.chooseTable'));
   summary.setAttribute('aria-controls', list.id);
   const tile = footer.closest('.weekly-milestone');
   let listeners: AbortController | undefined;
   let disposed = false;
+  let clipAncestors: HTMLElement[] = [];
+  const findClipAncestors = () => {
+    clipAncestors = [];
+    for (let parent = details.parentElement; parent; parent = parent.parentElement) {
+      if (/(auto|scroll|hidden|clip)/.test(getComputedStyle(parent).overflowY))
+        clipAncestors.push(parent);
+    }
+  };
   const position = () => {
+    if (disposed || !details.open || !details.isConnected) return;
     const rect = summary.getBoundingClientRect();
     let top = 0;
     let bottom = window.innerHeight;
-    for (let parent = details.parentElement; parent; parent = parent.parentElement) {
-      if (!/(auto|scroll|hidden|clip)/.test(getComputedStyle(parent).overflowY)) continue;
+    // Ancestors may themselves move inside outer scrollers, so refresh their
+    // rectangles while reusing the style-based clipping classification.
+    for (const parent of clipAncestors) {
       const bounds = parent.getBoundingClientRect();
       top = Math.max(top, bounds.top);
       bottom = Math.min(bottom, bounds.bottom);
     }
-    const below = bottom - rect.bottom - 8;
-    const above = rect.top - top - 8;
-    const up = below < 220 && above > below;
+    const below = bottom - rect.bottom - MENU_MARGIN;
+    const above = rect.top - top - MENU_MARGIN;
+    const up = below < MENU_MAX_HEIGHT && above > below;
     details.classList.toggle('weekly-table-opens-up', up);
-    list.style.maxHeight = `${Math.max(44, Math.min(220, up ? above : below))}px`;
+    const maxHeight = `${Math.max(MENU_TOUCH_HEIGHT, Math.min(MENU_MAX_HEIGHT, up ? above : below))}px`;
+    if (list.style.maxHeight !== maxHeight) list.style.maxHeight = maxHeight;
   };
   const close = () => {
     details.open = false;
@@ -103,6 +131,7 @@ export function appendWeeklyRewardTablePicker(
       return;
     }
     expanded.add(index);
+    findClipAncestors();
     position();
     listeners = new AbortController();
     const options = { signal: listeners.signal };
@@ -120,7 +149,15 @@ export function appendWeeklyRewardTablePicker(
       },
       options,
     );
-    window.addEventListener('resize', position, options);
+    window.addEventListener(
+      'resize',
+      () => {
+        if (disposed || !details.open) return;
+        findClipAncestors();
+        position();
+      },
+      options,
+    );
     document.addEventListener(
       'scroll',
       (event) => {
@@ -174,7 +211,12 @@ export function appendWeeklyRewardTablePicker(
     all.checked = !!inputs.length && ids.length === inputs.length;
     all.indeterminate = ids.length > 0 && ids.length < inputs.length;
     summary.textContent = ids.length
-      ? t('hudChrome.weeklyRewards.selectedTables', { count: formatNumber(ids.length) })
+      ? t(
+          ids.length === 1
+            ? 'hudChrome.weeklyRewards.selectedTable'
+            : 'hudChrome.weeklyRewards.selectedTables',
+          { count: formatNumber(ids.length) },
+        )
       : t('hudChrome.weeklyRewards.chooseTable');
     onChange();
   };

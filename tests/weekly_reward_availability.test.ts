@@ -1,5 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { weeklyChoiceExhausted } from '../src/sim/weekly_reward_availability';
+import { weeklyRewardTableOptions } from '../src/sim/weekly_reward_options';
+import * as rewards from '../src/sim/weekly_rewards';
 import {
   type WeeklyChoice,
   type WeeklyVaultBatch,
@@ -7,15 +9,27 @@ import {
 } from '../src/sim/weekly_rewards';
 
 describe('weekly reward availability', () => {
+  afterEach(() => vi.restoreAllMocks());
+  it.each(['world', 'pvp'] as const)(
+    'treats an empty %s pool as exhausted without losing fixed rewards',
+    (pool) => {
+      vi.spyOn(rewards, 'weeklyLootPool').mockReturnValue([]);
+      const batch: WeeklyVaultBatch = { resetAtMs: 1000, choices: [{ pool }] };
+      const choice = batch.choices[0];
+      expect(weeklyRewardTableOptions(batch, choice, 'mage', 20)).toEqual([]);
+      expect(weeklyChoiceExhausted(batch, choice, 'mage', 20)).toBe(true);
+      expect(weeklyChoiceExhausted(batch, { ...choice, fixed: true }, 'mage', 20)).toBe(false);
+    },
+  );
   it.each(['world', 'pvp'] as const)('recognizes a fully reserved %s pool only', (pool) => {
     const batch: WeeklyVaultBatch = {
       resetAtMs: 1000,
       choices: weeklyLootPool(pool, 'mage').map((itemId) => ({ pool, itemId })),
     };
     const choice: WeeklyChoice = { pool };
-    expect(weeklyChoiceExhausted(batch, choice, 'mage')).toBe(true);
+    expect(weeklyChoiceExhausted(batch, choice, 'mage', 20)).toBe(true);
     batch.choices.pop();
-    expect(weeklyChoiceExhausted(batch, choice, 'mage')).toBe(false);
+    expect(weeklyChoiceExhausted(batch, choice, 'mage', 20)).toBe(false);
   });
 
   it.each([
@@ -28,6 +42,6 @@ describe('weekly reward availability', () => {
       resetAtMs: 1000,
       choices: weeklyLootPool('world', 'mage').map((itemId) => ({ pool: 'world', itemId })),
     };
-    expect(weeklyChoiceExhausted(batch, { pool: 'world', ...flags }, 'mage')).toBe(false);
+    expect(weeklyChoiceExhausted(batch, { pool: 'world', ...flags }, 'mage', 20)).toBe(false);
   });
 });

@@ -1,34 +1,49 @@
 import type { PlayerClass } from './types';
-import { weeklyItemWithinLevel, weeklyRewardTableOptions } from './weekly_reward_options';
 import {
-  needsWeeklyBossTable,
-  weeklyAvailableBossTables,
-  weeklyBossChoiceExhausted,
-} from './weekly_reward_tables';
-import { type WeeklyChoice, type WeeklyVaultBatch, weeklyLootPool } from './weekly_rewards';
+  type WeeklyRewardTableOption,
+  weeklyFilterTablesByLevel,
+  weeklyRewardTableCandidates,
+} from './weekly_reward_options';
+import { needsWeeklyBossTable } from './weekly_reward_tables';
+import type { WeeklyChoice, WeeklyVaultBatch } from './weekly_rewards';
+
+export interface WeeklyRewardAvailability {
+  tables: WeeklyRewardTableOption[];
+  exhausted: boolean;
+  reason: 'level' | 'exhausted' | 'noTables';
+}
+
+/** One content scan per tile projection; callers reuse the options and explanation. */
+export function weeklyRewardAvailability(
+  batch: WeeklyVaultBatch,
+  choice: WeeklyChoice,
+  cls: PlayerClass,
+  level: number,
+): WeeklyRewardAvailability {
+  if (choice.itemId || choice.fixed) return { tables: [], exhausted: false, reason: 'noTables' };
+  const candidates = weeklyRewardTableCandidates(batch, choice, cls);
+  const tables = weeklyFilterTablesByLevel(candidates, level);
+  return {
+    tables,
+    exhausted:
+      !choice.opening &&
+      !choice.pendingSave &&
+      !tables.length &&
+      (!needsWeeklyBossTable(choice.pool) || !!batch.bossUnlocks || candidates.length > 0),
+    reason: candidates.length
+      ? 'level'
+      : batch.choices.some((entry) => entry.itemId)
+        ? 'exhausted'
+        : 'noTables',
+  };
+}
 
 /** Reserved or over-level equipment must not block claiming another revealed reward. */
 export function weeklyChoiceExhausted(
   batch: WeeklyVaultBatch,
   choice: WeeklyChoice,
   cls: PlayerClass,
-  level?: number,
+  level: number,
 ): boolean {
-  if (choice.itemId || choice.fixed || choice.opening || choice.pendingSave) return false;
-  if (needsWeeklyBossTable(choice.pool)) {
-    if (weeklyBossChoiceExhausted(batch, choice, cls)) return true;
-    return (
-      level !== undefined &&
-      weeklyAvailableBossTables(batch, choice, cls).length > 0 &&
-      weeklyRewardTableOptions(batch, choice, cls, level).length === 0
-    );
-  }
-  const reserved = new Set(batch.choices.map((candidate) => candidate.itemId));
-  const pool = weeklyLootPool(choice.pool, cls, batch.raidUnlocks);
-  return (
-    pool.length > 0 &&
-    pool.every(
-      (id) => reserved.has(id) || (level !== undefined && !weeklyItemWithinLevel(id, level)),
-    )
-  );
+  return weeklyRewardAvailability(batch, choice, cls, level).exhausted;
 }

@@ -8,7 +8,7 @@ import { FOCUS_KEY_ATTR } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
 import { WeeklyRewardClaimController } from './weekly_reward_claim_controller';
-import { appendWeeklyLootCategory } from './weekly_reward_loot_catalog';
+import { appendWeeklyLootCategory } from './weekly_reward_loot_catalog_controller';
 import { buildWeeklyRewardsView, weeklyCountdown } from './weekly_rewards_view';
 
 export const WEEKLY_TAB_ID = 'weekly-rewards-tab';

@@ -1,10 +1,11 @@
 import { ITEMS } from '../sim/data';
+import { WEEKLY_REWARD_MAX_LEVEL_OFFSET } from '../sim/weekly_reward_options';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
-import { weeklyRewardTableName } from './weekly_reward_table_picker';
+import { weeklyRewardTableName } from './weekly_reward_table_picker_controller';
 import type { buildWeeklyRewardsView } from './weekly_rewards_view';
 
 /** Content categories contain difficulty sections and collapsible loot tables. */
@@ -29,7 +30,8 @@ export function appendWeeklyLootCategory(
     rule.textContent = t(
       pool.pool === 'world'
         ? 'hudChrome.weeklyRewards.worldPoolRule'
-        : 'hudChrome.weeklyRewards.poolRule',
+        : 'hudChrome.weeklyRewards.selectionPoolRule',
+      { maxLevelOffset: formatNumber(WEEKLY_REWARD_MAX_LEVEL_OFFSET) },
     );
     group.append(title, rule);
     if (!pool.tables.length) {
@@ -53,9 +55,14 @@ export function appendWeeklyLootCategory(
       name.textContent = weeklyRewardTableName(table);
       const count = document.createElement('span');
       count.className = 'ui-num';
-      count.textContent = t('hudChrome.weeklyRewards.tableItemCount', {
-        count: formatNumber(table.items.length),
-      });
+      count.textContent = t(
+        table.items.length === 1
+          ? 'hudChrome.weeklyRewards.tableItem'
+          : 'hudChrome.weeklyRewards.tableItemCount',
+        {
+          count: formatNumber(table.items.length),
+        },
+      );
       summary.append(name, count);
       details.addEventListener('toggle', () => {
         if (details.open) expanded.add(key);

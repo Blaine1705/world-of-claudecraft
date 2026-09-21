@@ -96,7 +96,7 @@ export interface WeeklyRewardState {
 export interface WeeklyRewardInfo {
   state: WeeklyRewardState;
   nowMs: number;
-  playerLevel?: number;
+  playerLevel: number;
   canClaim: boolean;
   worldQuestsAvailable: boolean;
   readyWeeks: number;
@@ -310,12 +310,15 @@ export function weeklyRewardInfoFor(ctx: SimContext, pid: number): WeeklyRewardI
         bossUnlocks: { ...(batch.bossUnlocks ?? state.bossUnlocks) },
         choices: batch.choices.map((choice) => ({
           pool: choice.pool,
-          ...(choice.tableId ? { tableId: choice.tableId } : {}),
-          ...(!choice.tableId && choice.itemId && (!choice.opened || choice.pendingSave)
+          ...(choice.itemId && (!choice.opened || choice.pendingSave)
             ? { fixed: true as const }
             : {}),
           ...(choice.opened && !choice.pendingSave && choice.itemId
-            ? { itemId: choice.itemId, opened: true as const }
+            ? {
+                itemId: choice.itemId,
+                opened: true as const,
+                ...(choice.tableId ? { tableId: choice.tableId } : {}),
+              }
             : {}),
           ...(choice.opening ? { opening: true } : {}),
         })),
@@ -356,13 +359,6 @@ export function recordWeeklyBossKill(
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   const table = weeklyBossTable(boss.templateId);
   if (!dungeon || !tuning || table?.dungeonId !== inst.dungeonId) return;
-  // Some named encounters share a template with trash. Only the authored
-  // miniboss spawn counts when that encounter uses spawn-level miniboss tuning.
-  if (
-    dungeon.spawns.some((spawn) => spawn.mobId === boss.templateId && spawn.miniboss) &&
-    !boss.dungeonSpawnMiniboss
-  )
-    return;
   const raid = (dungeon.suggestedPlayers ?? 0) >= RAID_MIN_PLAYERS;
   const eligible = new Map(recipients.map((meta) => [meta.entityId, meta]));
   for (const meta of instanceLockoutMetas(ctx, inst)) eligible.set(meta.entityId, meta);

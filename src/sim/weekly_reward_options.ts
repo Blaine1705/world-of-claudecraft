@@ -15,6 +15,7 @@ export interface WeeklyRewardTableOption {
 }
 
 export const WEEKLY_TABLE_SELECTION_LIMIT = WEEKLY_BOSS_TABLES.length + 2;
+export const WEEKLY_REWARD_MAX_LEVEL_OFFSET = 3;
 
 /** Validate the bounded request before building collections or reading loot. */
 export function parseWeeklyTableSelection(raw: unknown): string[] | null {
@@ -43,7 +44,7 @@ export function weeklyItemWithinLevel(itemId: string, level: number): boolean {
     Number.isSafeInteger(level) &&
     level >= 1 &&
     !!ITEMS[itemId] &&
-    requiredLevelFor(ITEMS[itemId]) <= level + 3
+    requiredLevelFor(ITEMS[itemId]) <= level + WEEKLY_REWARD_MAX_LEVEL_OFFSET
   );
 }
 
@@ -54,16 +55,32 @@ export function weeklyRewardTableOptions(
   cls: PlayerClass,
   level: number,
 ): WeeklyRewardTableOption[] {
+  return weeklyFilterTablesByLevel(weeklyRewardTableCandidates(batch, choice, cls), level);
+}
+
+export function weeklyFilterTablesByLevel(tables: WeeklyRewardTableOption[], level: number) {
+  return tables.flatMap((table) => {
+    const items = table.items.filter((id) => weeklyItemWithinLevel(id, level));
+    return items.length ? [{ ...table, items }] : [];
+  });
+}
+
+/** Unreserved, class-compatible candidates before the current equip-level boundary. */
+export function weeklyRewardTableCandidates(
+  batch: WeeklyVaultBatch,
+  choice: WeeklyChoice,
+  cls: PlayerClass,
+): WeeklyRewardTableOption[] {
   if (!needsWeeklyBossTable(choice.pool)) {
     const reserved = new Set(batch.choices.map((entry) => entry.itemId));
     const items = weeklyLootPool(choice.pool, cls, batch.raidUnlocks).filter(
-      (id) => !reserved.has(id) && weeklyItemWithinLevel(id, level),
+      (id) => !reserved.has(id),
     );
     return items.length ? [{ id: choice.pool, kind: 'pool', items }] : [];
   }
   const groups = new Map<string, WeeklyRewardTableOption>();
   for (const table of weeklyAvailableBossTables(batch, choice, cls)) {
-    const items = table.items.filter((id) => weeklyItemWithinLevel(id, level));
+    const items = table.items;
     if (!items.length) continue;
     const id = table.category === 'dungeon' ? table.dungeonId : table.bossId;
     const group = groups.get(id) ?? {

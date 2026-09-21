@@ -113,7 +113,7 @@ describe('weekly vault choices', () => {
         expect(new Set(rolled).size).toBe(rolled.length);
         for (const choice of batch.choices) {
           if (choice.itemId) expect(weeklyLootPool('world', cls)).toContain(choice.itemId);
-          else expect(weeklyChoiceExhausted(batch, choice, cls)).toBe(true);
+          else expect(weeklyChoiceExhausted(batch, choice, cls, 20)).toBe(true);
         }
         const index = batch.choices.findIndex((choice) => choice.itemId);
         const itemId = batch.choices[index].itemId!;
@@ -141,7 +141,7 @@ describe('weekly vault choices', () => {
     ];
     const publicBatch = weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0];
     expect(publicBatch.choices[0]).toEqual({ pool: 'world', fixed: true });
-    expect(weeklyChoiceExhausted(publicBatch, publicBatch.choices[0], 'mage')).toBe(false);
+    expect(weeklyChoiceExhausted(publicBatch, publicBatch.choices[0], 'mage', 20)).toBe(false);
     const pick = vi.spyOn(sim.ctx.rng, 'pick');
     openSelected(sim, '1000:0', pid);
     expect(pick).not.toHaveBeenCalled();
@@ -367,7 +367,7 @@ describe('weekly vault choices', () => {
     if (!itemId) throw new Error('Missing filtered Warlock reward');
     openSelected(sim, '1000:1', pid);
     expect(batch.choices[1].itemId).toBeUndefined();
-    expect(weeklyChoiceExhausted(batch, batch.choices[1], 'warlock')).toBe(true);
+    expect(weeklyChoiceExhausted(batch, batch.choices[1], 'warlock', 20)).toBe(true);
     const before = sim.ctx.countItem(itemId, pid);
     sim.claimWeeklyReward('1000:0', pid);
     expect(state.vaults).toHaveLength(0);
@@ -382,13 +382,15 @@ describe('weekly vault choices', () => {
     const batch = meta.weeklyRewards!.vaults[0];
     expect(roll).not.toHaveBeenCalled();
     expect(info.state.vaults[0].choices.every((choice) => !choice.itemId)).toBe(true);
+    roll.mockReturnValueOnce('orb_of_the_last_spring');
     const opening = prepareWeeklyRewardOpen(sim.ctx, `${batch.resetAtMs}:0`, pid)!;
     expect(roll).toHaveBeenCalledOnce();
+    expect(roll.mock.calls[0][0]).toContain('orb_of_the_last_spring');
     expect(JSON.stringify(weeklyRewardInfoFor(sim.ctx, pid))).not.toContain(opening.itemId);
     const saved = sim.serializeCharacter(pid)!;
     expect(saved.weeklyRewards!.vaults[0].choices[0]).toEqual({
       pool: opening.choice.pool,
-      tableId: opening.choice.tableId,
+      tableId: 'varkhul_forgefather_of_the_last_flame',
       itemId: opening.itemId,
       opened: true,
     });
@@ -423,7 +425,14 @@ describe('weekly vault choices', () => {
     const fixed = 'orb_of_the_last_spring';
     meta.weeklyRewards = sanitizeWeeklyRewards({
       resetAtMs: 9000,
-      vaults: [{ resetAtMs: 1000, choices: [{ pool: 'raid', itemId: fixed }] }],
+      vaults: [
+        {
+          resetAtMs: 1000,
+          choices: [
+            { pool: 'raid', itemId: fixed, tableId: 'varkhul_forgefather_of_the_last_flame' },
+          ],
+        },
+      ],
     });
     expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0]).toEqual({
       pool: 'raid',
@@ -434,6 +443,9 @@ describe('weekly vault choices', () => {
     expect(meta.weeklyRewards!.vaults).toHaveLength(1);
     openSelected(sim, '1000:0', pid);
     expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0].itemId).toBe(fixed);
+    expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0].tableId).toBe(
+      'varkhul_forgefather_of_the_last_flame',
+    );
     expect(roll).not.toHaveBeenCalled();
   });
 

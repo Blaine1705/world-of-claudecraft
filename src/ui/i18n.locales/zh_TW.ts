@@ -13,6 +13,19 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.weeklyRewards.chooseTable': '選擇用於抽取獎勵的戰利品表',
+  'hudChrome.weeklyRewards.selectAllTables': '全選',
+  'hudChrome.weeklyRewards.selectedTable': '已選擇 {count} 個戰利品表',
+  'hudChrome.weeklyRewards.selectedTables': '已選擇 {count} 個戰利品表',
+  'hudChrome.weeklyRewards.noLevelLoot': '目前等級沒有符合條件的戰利品。',
+  'hudChrome.weeklyRewards.tableItem': '{count} 件物品',
+  'hudChrome.weeklyRewards.tableItemCount': '{count} 件物品',
+  'hudChrome.weeklyRewards.previouslyRolled': '先前抽取的獎勵',
+  'hudChrome.weeklyRewards.noTables': '在此難度下已記錄的首領擊殺中，沒有符合條件的裝備。',
+  'hudChrome.weeklyRewards.tablesExhausted': '所有符合條件的物品均已抽取。請選擇一件已揭曉的獎勵。',
+  'hudChrome.weeklyRewards.worldPoolRule': '普通難度 Nythraxis 裝備。無需通關團隊副本。',
+  'hudChrome.weeklyRewards.selectionPoolRule':
+    '團隊副本和地城獎勵需在開啟前選擇一個或多個戰利品表。地城戰利品表彙整了你在此難度下擊敗的首領的戰利品。抽取時排除重複物品、傳說物品，以及所需等級比你的等級高出超過 {maxLevelOffset} 級的裝備。',
   'questUi.worldQuest.puzzleRetry': '重試',
   'questUi.worldQuest.puzzleTimerAria': '剩餘時間：{seconds} 秒',
   'questUi.worldQuest.startQuest': '開始世界任務',

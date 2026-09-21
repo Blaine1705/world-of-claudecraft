@@ -23366,7 +23366,6 @@
     position: absolute;
     inset: calc(100% + 4px) 0 auto;
     z-index: 1;
-    max-height: 220px;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 4px;
@@ -23427,9 +23426,6 @@
   }
   .weekly-loot-table .weekly-loot-list {
     padding: 8px;
-  }
-  .weekly-table-source {
-    overflow-wrap: anywhere;
   }
   .weekly-table-exhausted .weekly-vault-illustration {
     opacity: 0.45;

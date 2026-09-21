@@ -1,4 +1,3 @@
-import { ITEMS } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import { weeklyRewardTableOptions } from '../sim/weekly_reward_options';
 import {
@@ -59,7 +58,7 @@ export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: Play
         },
         { pool },
         playerClass,
-        info.playerLevel ?? 1,
+        info.playerLevel,
       );
       const items = [...new Set(tables.flatMap((table) => table.items))].sort();
       return [
@@ -68,7 +67,6 @@ export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: Play
           tables,
           items,
           earned: earned[poolIndex],
-          qualities: [...new Set(items.map((id) => ITEMS[id].quality))].sort(),
         },
       ];
     }),

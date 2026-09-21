@@ -1,7 +1,10 @@
 // Completed-week presentation only. The host owns reset timing, rolls and claims.
 import { ITEMS } from '../sim/data';
 import { itemLevel } from '../sim/item_level';
-import { weeklyChoiceExhausted } from '../sim/weekly_reward_availability';
+import {
+  type WeeklyRewardAvailability,
+  weeklyRewardAvailability,
+} from '../sim/weekly_reward_availability';
 import type { WeeklyVaultBatch } from '../sim/weekly_rewards';
 import type { IWorld } from '../world_api';
 import { itemDisplayName } from './entity_i18n';
@@ -9,7 +12,7 @@ import { esc } from './esc';
 import { captureFocusKey, FOCUS_KEY_ATTR, findFocusKey } from './focus_restore';
 import { formatDateTime, formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
-import { appendWeeklyRewardTablePicker } from './weekly_reward_table_picker';
+import { appendWeeklyRewardTablePicker } from './weekly_reward_table_picker_controller';
 import { showWeeklyRewardsReadyPrompt } from './weekly_rewards_ready_prompt';
 import {
   attachWeeklyVaultReveal,
@@ -97,19 +100,22 @@ export class WeeklyRewardClaimController {
       : '';
   }
 
-  private allOpened(): boolean {
+  private allOpened(availability?: WeeklyRewardAvailability[]): boolean {
     const batch = this.batch();
+    const world = this.deps.world();
+    const info = world.weeklyRewardInfo;
+    if (!batch || !info) return false;
+    const available =
+      availability ??
+      batch.choices.map((choice) =>
+        weeklyRewardAvailability(batch, choice, world.cfg.playerClass, info.playerLevel),
+      );
     return (
       !!batch &&
       batch.choices.some((choice) => choice.opened && choice.itemId) &&
       batch.choices.every(
         (choice, index) =>
-          weeklyChoiceExhausted(
-            batch,
-            choice,
-            this.deps.world().cfg.playerClass,
-            this.deps.world().weeklyRewardInfo?.playerLevel ?? 1,
-          ) ||
+          available[index].exhausted ||
           (choice.opened === true &&
             !!choice.itemId &&
             !!ITEMS[choice.itemId] &&
@@ -123,6 +129,13 @@ export class WeeklyRewardClaimController {
     const focusKey = captureFocusKey(host);
     const world = this.deps.world();
     const batch = this.batch();
+    const info = world.weeklyRewardInfo;
+    const availability =
+      batch && info
+        ? batch.choices.map((choice) =>
+            weeklyRewardAvailability(batch, choice, world.cfg.playerClass, info.playerLevel),
+          )
+        : [];
     const key = this.identity();
     if (world !== this.owner || key !== this.batchKey) {
       this.resetFlow();
@@ -141,7 +154,7 @@ export class WeeklyRewardClaimController {
           if (!this.pending.has(index)) this.revealed.add(index);
         } else this.revealed.delete(index);
       }
-      if (!this.allOpened()) this.selected = null;
+      if (!this.allOpened(availability)) this.selected = null;
     }
     this.deps.hideTooltip?.();
     host.replaceChildren();
@@ -214,7 +227,7 @@ export class WeeklyRewardClaimController {
     const heading = document.createElement('h3');
     heading.tabIndex = -1;
     heading.setAttribute(FOCUS_KEY_ATTR, 'weekly-claim-heading');
-    const allRevealed = this.allOpened();
+    const allRevealed = this.allOpened(availability);
     heading.textContent = t(
       allRevealed ? 'hudChrome.weeklyRewards.chooseReward' : 'hudChrome.weeklyRewards.openRewards',
     );
@@ -241,17 +254,7 @@ export class WeeklyRewardClaimController {
           ? t('hudChrome.weeklyRewards.chooseOne')
           : t('hudChrome.weeklyRewards.openedCount', {
               count: formatNumber(this.revealed.size),
-              total: formatNumber(
-                batch.choices.filter(
-                  (choice) =>
-                    !weeklyChoiceExhausted(
-                      batch,
-                      choice,
-                      world.cfg.playerClass,
-                      world.weeklyRewardInfo?.playerLevel ?? 1,
-                    ),
-                ).length,
-              ),
+              total: formatNumber(availability.filter((entry) => !entry.exhausted).length),
             });
       };
       updateCount();
@@ -280,19 +283,12 @@ export class WeeklyRewardClaimController {
           tile.innerHTML = `<div class="weekly-milestone-heading"><span class="weekly-milestone-label">${esc(title)}</span>${category === 'raid' || category === 'dungeon' ? `<span class="weekly-difficulty weekly-difficulty-${art}">${esc(t(`hudChrome.weeklyRewards.${art}`))}</span>` : ''}</div><div class="weekly-vault-illustration"><img class="weekly-vault-art" src="/ui/weekly-vault/${art}.webp" alt="" draggable="false"></div><div class="weekly-milestone-footer">${esc(t(`hudChrome.weeklyRewards.pool.${choice.pool}`))}</div>`;
           tiles.append(tile);
           const footer = tile.querySelector<HTMLElement>('.weekly-milestone-footer')!;
-          if (
-            weeklyChoiceExhausted(
-              batch,
-              choice,
-              world.cfg.playerClass,
-              world.weeklyRewardInfo?.playerLevel ?? 1,
-            )
-          ) {
+          if (availability[index].exhausted) {
             const message = document.createElement('span');
             message.textContent = t(
-              !weeklyChoiceExhausted(batch, choice, world.cfg.playerClass)
+              availability[index].reason === 'level'
                 ? 'hudChrome.weeklyRewards.noLevelLoot'
-                : batch.choices.some((candidate) => candidate.itemId)
+                : availability[index].reason === 'exhausted'
                   ? 'hudChrome.weeklyRewards.tablesExhausted'
                   : 'hudChrome.weeklyRewards.noTables',
             );
@@ -301,18 +297,16 @@ export class WeeklyRewardClaimController {
             continue;
           }
           let syncAvailability = () => {};
-          const picker = appendWeeklyRewardTablePicker(
+          const picker = appendWeeklyRewardTablePicker({
             footer,
-            batch,
             choice,
-            world.cfg.playerClass,
             index,
-            this.tableSelections,
-            this.awaitingOpen.has(index),
-            world.weeklyRewardInfo?.playerLevel ?? 1,
-            () => syncAvailability(),
-            this.tableExpanded,
-          );
+            tables: availability[index].tables,
+            selections: this.tableSelections,
+            saving: this.awaitingOpen.has(index),
+            onChange: () => syncAvailability(),
+            expanded: this.tableExpanded,
+          });
           this.disposers.push(picker.dispose);
           const item = choice.opened && choice.itemId ? ITEMS[choice.itemId] : undefined;
           let revealProgress = this.revealProgress.get(index);

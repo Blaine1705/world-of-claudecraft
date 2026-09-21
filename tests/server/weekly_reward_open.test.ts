@@ -96,6 +96,44 @@ afterEach(() => {
 });
 
 describe('weekly vault durable opening', () => {
+  it('rejects simultaneous table and tables fields without rolling or saving', async () => {
+    const h = setup();
+    const pick = vi.spyOn(h.sim.ctx.rng, 'pick');
+    await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_reward_open', {
+      choice: '1000:0',
+      token: '604800000:0',
+      table: 'sunken_bastion',
+      tables: ['sunken_bastion'],
+    });
+    expect(pick).not.toHaveBeenCalled();
+    expect(h.saveCharacter).not.toHaveBeenCalled();
+  });
+
+  it('conceals the selected source during a failed save and reveals it only after retry succeeds', async () => {
+    vi.useFakeTimers();
+    const h = setup();
+    const pick = vi.spyOn(h.sim.ctx.rng, 'pick');
+    const command = { choice: '1000:0', token: '604800000:0', tables: ['sunken_bastion'] };
+    const work = dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_reward_open', command);
+    expect(h.choices()[0]).toEqual({ pool: 'dungeon', fixed: true, opening: true });
+    h.resolve(false);
+    await work;
+    expect(h.choices()[0]).toEqual({ pool: 'dungeon', fixed: true });
+    const fixedItem = h.meta.weeklyRewards!.vaults[0].choices[0].itemId;
+    h.saveCharacter.mockResolvedValue(true);
+    vi.advanceTimersByTime(WEEKLY_OPEN_RETRY_MS);
+    await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_reward_open', {
+      choice: '1000:0',
+      token: '604800000:0',
+    });
+    expect(h.choices()[0]).toEqual({
+      pool: 'dungeon',
+      itemId: fixedItem,
+      tableId: 'sunken_bastion',
+      opened: true,
+    });
+    expect(pick).toHaveBeenCalledOnce();
+  });
   it('rejects boss selection on a world vault and conceals its roll until saved', async () => {
     const h = setup();
     h.meta.weeklyRewards!.vaults[0].choices = [{ pool: 'world' }];

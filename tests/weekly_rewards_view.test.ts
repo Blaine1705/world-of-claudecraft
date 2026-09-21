@@ -40,7 +40,6 @@ describe('weekly reward presentation', () => {
     );
     expect(live[2].available).toBe(true);
     expect(live[2].milestones.map((m) => m.completed)).toEqual([true, false, false]);
-    expect(rows[0].pools[0].qualities).not.toHaveLength(0);
   });
   it('shows days, hours, minutes and seconds and clamps expired resets to zero', () => {
     expect(weeklyCountdown(90061000, 0)).toBe('01d 01h 01m 01s');
