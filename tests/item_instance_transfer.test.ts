@@ -100,11 +100,8 @@ describe('publicInstanceView: the display trim', () => {
       new URL('../server/equipped_instance_wire.ts', import.meta.url),
       'utf8',
     );
-    // `lootQuality` is assigned from its validated clone rather than `inst.`
-    // directly (the same shape publicInstanceView uses), so the scrape keys on
-    // the projected field name alone, as the transfer scrape below does.
-    const projected = [...game.matchAll(/pub\.(\w+) = /g)].map((m) => m[1]);
-    expect([...new Set(projected)].sort()).toEqual([
+    const projected = [...game.matchAll(/pub\.(\w+) = inst\.(\w+);/g)].map((m) => m[1]);
+    expect(projected.sort()).toEqual([
       'enchant',
       'lootQuality',
       'name',
