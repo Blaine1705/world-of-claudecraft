@@ -15,6 +15,8 @@ import { buildHoardCavernFoliage, updateHoardCavernFoliageTint } from './hoard_c
 import { buildHoardCavernGround } from './hoard_cavern_ground';
 import { buildHoardCavernShell, hoardCavernRockGeometry } from './hoard_cavern_shell';
 import { buildHoardCliffMassView, type HoardCliffMassView } from './hoard_cliff_mass';
+import { buildHoardRoomKit, type HoardRoomKitView, updateHoardRoomKitTint } from './hoard_room_kit';
+import { buildForgeRoomKitPlan, type RoomKitTier, roomKitFor } from './hoard_room_kit_core';
 import {
   buildHoardValleyPlan,
   type HoardValleyDressingKind,
@@ -114,6 +116,7 @@ export function updateHoardValleyDayNight(
   const tint = hoardValleySurfaceTint(grade);
   valleyMaterial?.color.setRGB(tint[0], tint[1], tint[2]);
   updateHoardCavernFoliageTint(tint);
+  updateHoardRoomKitTint(tint);
   if (camera && target) for (const view of activeValleys) view.updateCamera(camera, target);
 }
 
@@ -379,6 +382,8 @@ class HoardValleyViewImpl implements HoardValleyView {
   private readonly disposeGround: () => void;
   private readonly cliffMass: HoardCliffMassView;
   private readonly roof: THREE.InstancedMesh | undefined;
+  /** The boss room's own dressing (the Emberforge forge kit), when it has one. */
+  private readonly roomKit: HoardRoomKitView | undefined;
   private readonly updateSceneryCamera: (camera: THREE.Vector3, target: THREE.Vector3) => void;
 
   constructor(options: HoardValleyBuildOptions) {
@@ -421,6 +426,21 @@ class HoardValleyViewImpl implements HoardValleyView {
     );
     this.group.add(buildDressing(visualPlan, shadows));
     this.group.add(buildHoardCavernFoliage(visualPlan, shadows));
+    const boss = options.plan.spawns.find((spawn) => spawn.boss);
+    if (roomKitFor(boss?.templateId) === 'forge') {
+      const tier: RoomKitTier =
+        options.effectsProfile.tier === 'low'
+          ? 'low'
+          : options.effectsProfile.tier === 'medium'
+            ? 'medium'
+            : 'high';
+      this.roomKit = buildHoardRoomKit(
+        buildForgeRoomKitPlan(options.plan.layout, options.plan.seed, tier),
+        tier,
+        shadows,
+      );
+      this.group.add(this.roomKit.group);
+    }
     this.roof = this.group.getObjectByName('HoardCavernEntryRoof') as THREE.InstancedMesh;
     this.updateSceneryCamera = buildHoardCavernCutaway(this.group);
     activeValleys.add(this);
@@ -445,6 +465,7 @@ class HoardValleyViewImpl implements HoardValleyView {
 
   updateCamera(camera: THREE.Vector3, target: THREE.Vector3): void {
     this.updateSceneryCamera(camera, target);
+    this.roomKit?.update(performance.now() / 1000);
     this.cliffMass.updateCamera(camera, target, this.group.position);
     if (this.roof?.boundingBox)
       this.roof.visible = hoardCavernSceneryVisible(
@@ -464,6 +485,7 @@ class HoardValleyViewImpl implements HoardValleyView {
       if (object instanceof THREE.InstancedMesh) object.dispose();
     });
     this.disposeGround();
+    this.roomKit?.dispose();
     this.cliffMass.dispose();
     this.group.clear();
     valleyOwners.delete(this.group);

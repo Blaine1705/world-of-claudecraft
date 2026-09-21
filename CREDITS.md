@@ -447,6 +447,15 @@ something this file marks as restricted, ask first: tony@levystreet.com.
   breaks into). No third-party mesh, texture or reference image.
   Source and provenance: `docs/design/boulder/README.md`.
 
+### Emberforge room kit (the Emberforge Tyrant's hoard room)
+
+- `public/models/props/hoard_forge_kit.glb`: original procedural Blender art authored
+  for this project (the Great Forge, an anvil, a crucible, an ingot stack, a vent, a
+  forge post, a chain and hook, an iron brace). No third-party mesh, texture or
+  reference image. Source and provenance: `docs/design/forge-room/README.md`.
+- `public/models/weapons/hoard_forge_maul.glb`: the held variant of the project's own
+  Hammer of the Forge model (`scripts/assets/hoard_bosses/held_forge_maul.mjs`).
+
 ### Cocoon (Broodmother Vysska's cocoons)
 
 - `public/models/creatures/hoard_{silk,brood}_cocoon.glb`: original procedural Blender art authored

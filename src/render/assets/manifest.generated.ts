@@ -1077,6 +1077,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/hell_forge.glb": "/media/models/props/hell_forge.65f086560fa1.glb",
   "models/props/herbalism_drying_rack.glb": "/media/models/props/herbalism_drying_rack.2733d17f9180.glb",
   "models/props/hoard_entrance.glb": "/media/models/props/hoard_entrance.0b2eb0554a9b.glb",
+  "models/props/hoard_forge_kit.glb": "/media/models/props/hoard_forge_kit.2e0d5407343c.glb",
   "models/props/hoard_reward_chest.glb": "/media/models/props/hoard_reward_chest.939ad4330c6c.glb",
   "models/props/hollow_gate_crystal.glb": "/media/models/props/hollow_gate_crystal.db1c41999e77.glb",
   "models/props/hollow_gate_tree.glb": "/media/models/props/hollow_gate_tree.34c21bb4fa12.glb",
