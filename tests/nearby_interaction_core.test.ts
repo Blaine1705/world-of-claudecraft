@@ -1,10 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { resolveNearbyInteractionCandidate } from '../src/game/nearby_interaction_core';
+import { ESCORTS } from '../src/sim/data';
 import { feastTemplateIds } from '../src/sim/professions/feast';
-import type { Entity, QuestProgress } from '../src/sim/types';
+import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
 import type { FarmPatchDef } from '../src/world_api/farming';
 
 const FEAST_TEMPLATE_ID = feastTemplateIds()[0];
+
+// The node the press is offered (the live call site passes GATHER_NODES);
+// one yard off the player, so it is in reach unless a case moves it.
+const ORE_NODE = {
+  id: 'ore_1',
+  zoneId: 'zone',
+  type: 'ore',
+  pos: { x: 1, z: 0 },
+  level: 1,
+  tier: 1,
+} as const satisfies GatherNodeDef;
 
 const BED_PATCH: readonly FarmPatchDef[] = [
   {
@@ -32,7 +44,11 @@ function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entit
   } as Entity;
 }
 
-function scan(targets: Entity[] = [], farmPatches: readonly FarmPatchDef[] = []) {
+function scan(
+  targets: Entity[] = [],
+  farmPatches: readonly FarmPatchDef[] = [],
+  inventory?: readonly { itemId: string; count: number }[],
+) {
   const player = entity({ id: 1, kind: 'player', name: 'Adventurer' });
   return {
     world: {
@@ -44,15 +60,83 @@ function scan(targets: Entity[] = [], farmPatches: readonly FarmPatchDef[] = [])
       ]),
       questLog: new Map<string, QuestProgress>(),
       farmPatches,
+      ...(inventory ? { inventory } : {}),
     },
   };
 }
 
+const FIELD_KIT = [{ itemId: 'field_kit', count: 1 }];
+
 describe('resolveNearbyInteractionCandidate', () => {
   // The ladder IS the press ladder in nearby_interaction.ts, arm for arm. Note
   // what is absent: intentional gathering made the generic press ordinary
-  // interaction only, so no gather node and no corpse harvest ever resolves
-  // here.
+  // interaction for bodies and crops, so no corpse harvest ever resolves here;
+  // a gather NODE is the one exception, and only when the caller offers nodes.
+  it('slots an offered gather node below npc and escort start and above feast and bed', () => {
+    const npc = entity({ id: 5, kind: 'npc', templateId: 'elder_maren', name: 'Elder Maren' });
+    const feast = entity({
+      id: 6,
+      kind: 'object',
+      templateId: FEAST_TEMPLATE_ID,
+      name: 'Harvest Feast',
+    });
+    const nodes = [ORE_NODE];
+    // An npc in reach still wins the press over the node.
+    expect(
+      resolveNearbyInteractionCandidate(
+        scan([npc, feast], BED_PATCH).world,
+        true,
+        undefined,
+        nodes,
+      ),
+    ).toMatchObject({ kind: 'npc', id: 5 });
+    // The node beats the placed feast and the bed behind it.
+    expect(
+      resolveNearbyInteractionCandidate(scan([feast], BED_PATCH).world, true, undefined, nodes),
+    ).toMatchObject({ kind: 'node', id: 'ore_1', node: ORE_NODE });
+    expect(
+      resolveNearbyInteractionCandidate(scan([], BED_PATCH).world, true, undefined, nodes),
+    ).toMatchObject({ kind: 'node', id: 'ore_1' });
+    // An idle escortee at its post (quest active) beats the node beside it:
+    // escort start sits above the node arm. With the quest inactive the same
+    // escortee is no candidate at all, and the node beside it wins.
+    const escortDef = Object.values(ESCORTS)[0];
+    const post = escortDef.start;
+    const escortee = entity({
+      id: 7,
+      kind: 'mob',
+      templateId: escortDef.npcMobId,
+      name: 'Escortee',
+      pos: { x: post.x, y: 0, z: post.z },
+    });
+    const atPost = scan([escortee]);
+    atPost.world.player.pos = { x: post.x + 1, y: 0, z: post.z };
+    const postNode = { ...ORE_NODE, id: 'ore_post', pos: { x: post.x + 2, z: post.z } };
+    atPost.world.questLog.set(escortDef.questId, { state: 'active' } as unknown as QuestProgress);
+    expect(
+      resolveNearbyInteractionCandidate(atPost.world, true, undefined, [postNode]),
+    ).toMatchObject({ kind: 'escort', id: 7 });
+    atPost.world.questLog.clear();
+    expect(
+      resolveNearbyInteractionCandidate(atPost.world, true, undefined, [postNode]),
+    ).toMatchObject({ kind: 'node', id: 'ore_post' });
+    // Nearest node wins among several in reach.
+    const nearer = { ...ORE_NODE, id: 'ore_near', pos: { x: 0.5, z: 0 } };
+    expect(
+      resolveNearbyInteractionCandidate(scan([]).world, true, undefined, [ORE_NODE, nearer]),
+    ).toMatchObject({ kind: 'node', id: 'ore_near' });
+    // Out of reach, the ladder falls through to the bed; a dead player never
+    // gathers; no offered list means no node arm at all.
+    const far = { ...ORE_NODE, id: 'ore_far', pos: { x: 40, z: 0 } };
+    expect(
+      resolveNearbyInteractionCandidate(scan([], BED_PATCH).world, true, undefined, [far]),
+    ).toMatchObject({ kind: 'bed', id: 'bed_test_1' });
+    const dead = scan([]);
+    dead.world.player.dead = true;
+    expect(resolveNearbyInteractionCandidate(dead.world, true, undefined, nodes)).toBeNull();
+    expect(resolveNearbyInteractionCandidate(scan([]).world)).toBeNull();
+  });
+
   it('returns the same stable corpse, delve, object, npc, feast, bed priority used by dispatch', () => {
     const corpse = entity({
       id: 2,
@@ -142,6 +226,67 @@ describe('resolveNearbyInteractionCandidate', () => {
     expect(resolveNearbyInteractionCandidate(scan([corpse, banker]).world)).toMatchObject({
       kind: 'npc',
       id: 3,
+    });
+    // The harvest-choice arm is the LAST rung, so a Field Kit never promotes
+    // the corpse above the npc behind it either.
+    expect(
+      resolveNearbyInteractionCandidate(scan([corpse, banker], [], FIELD_KIT).world),
+    ).toMatchObject({ kind: 'npc', id: 3 });
+  });
+
+  describe('the corpse harvest-choice arm (the keyboard, pad and touch route)', () => {
+    function harvestOnlyCorpse(overrides: Partial<Entity> = {}): Entity {
+      return entity({
+        id: 2,
+        kind: 'mob',
+        templateId: 'forest_wolf',
+        name: 'Forest Wolf',
+        dead: true,
+        lootable: true,
+        loot: null,
+        corpseTimer: 60,
+        ...overrides,
+      });
+    }
+
+    it('resolves a harvest-only corpse for a Field Kit carrier when nothing else is in reach', () => {
+      expect(
+        resolveNearbyInteractionCandidate(scan([harvestOnlyCorpse()], [], FIELD_KIT).world),
+      ).toEqual({ kind: 'harvest', id: 2, entity: expect.objectContaining({ id: 2 }) });
+    });
+
+    it('is no candidate without a carried Field Kit, exactly as before', () => {
+      expect(resolveNearbyInteractionCandidate(scan([harvestOnlyCorpse()]).world)).toBeNull();
+      expect(
+        resolveNearbyInteractionCandidate(scan([harvestOnlyCorpse()], [], []).world),
+      ).toBeNull();
+      expect(
+        resolveNearbyInteractionCandidate(
+          scan([harvestOnlyCorpse()], [], [{ itemId: 'field_kit', count: 0 }]).world,
+        ),
+      ).toBeNull();
+    });
+
+    it('is no candidate once the harvest claim is spent, out of reach, or for a dead viewer', () => {
+      expect(
+        resolveNearbyInteractionCandidate(
+          scan([harvestOnlyCorpse({ harvestClaimedBy: 9 })], [], FIELD_KIT).world,
+        ),
+      ).toBeNull();
+      expect(
+        resolveNearbyInteractionCandidate(
+          scan([harvestOnlyCorpse({ pos: { x: 6, y: 0, z: 0 } })], [], FIELD_KIT).world,
+        ),
+      ).toBeNull();
+      const dead = scan([harvestOnlyCorpse()], [], FIELD_KIT);
+      dead.world.player.dead = true;
+      expect(resolveNearbyInteractionCandidate(dead.world)).toBeNull();
+    });
+
+    it('sits below the garden bed and above the escort-away line', () => {
+      expect(
+        resolveNearbyInteractionCandidate(scan([harvestOnlyCorpse()], BED_PATCH, FIELD_KIT).world),
+      ).toEqual({ kind: 'bed', id: 'bed_test_1' });
     });
   });
 });

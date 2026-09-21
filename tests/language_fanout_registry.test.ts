@@ -148,6 +148,10 @@ const FANOUT_ARMS: readonly string[] = [
   // would fail as stale rather than as unclassified.
   'this.gatheringGoalController.relocalize|',
   'this.partyFramesPainter.relocalize|',
+  // The leader's ready-check window caches only its bottom status line, since
+  // the roster itself is player names plus icons and the static title/close
+  // chrome rides data-i18n on the page shell.
+  'this.readyCheckLeaderWindow.relocalize|',
   'this.raidBossGuideWindow.relocalize|',
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
@@ -218,6 +222,7 @@ const FANOUT_ARMS: readonly string[] = [
   // and per-row page names all resolve at paint, so one forced repaint here
   // keeps the strip from showing the previous language for up to a slow tick.
   'this.updateReliquaryTracker|',
+  'this.updateRecipeTracker|',
   'this.charWindow.renderIfOpen|',
   'this.arenaWindow.relocalize|',
   'this.dungeonFinderWindow.relocalize|',
@@ -228,6 +233,10 @@ const FANOUT_ARMS: readonly string[] = [
   'this.mailboxWindow.relocalize|',
   'this.socialWindow.relocalize|',
   'this.cosmeticsWindow.relocalize|',
+  // the WOC Store's mount-skin preview overlay: its codex side (name, rarity,
+  // scope line, mode and scene toggles, the action row) is painted once per
+  // open, so the store window forwards the switch to the open panel.
+  'this.dailyRewardsWindow.relocalize|',
   'this.cardDuelWindow.relocalize|',
   'this.spellbookWindow.relocalize|',
   'this.barEditorWindow.relocalize|',
@@ -465,6 +474,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the tab, the open letter id and the mail mirror (#2529)',
   },
   {
+    file: 'market_sweep_panel.ts',
+    memos: ['lastQuoteSig'],
+    answer: 'this.marketWindow.render',
+    why: 'the Market Sweep card is rebuilt by the Browse list repaint (MarketSweepPanel.mount, reached from the market window render via renderContent), which resets lastQuoteSig and paints the quote line with the CURRENT language; the memo only elides same-language re-paints of an unchanged quote between list repaints',
+  },
+  {
     file: 'market_window.ts',
     memos: ['lastSig', 'lastSellPriceRefSig', 'searchEcho'],
     answer: 'this.marketWindow.render',
@@ -515,7 +530,7 @@ const ANSWERED: readonly AnsweredSurface[] = [
     file: 'social_window.ts',
     memos: ['lastContent', 'lastStruct'],
     answer: 'this.socialWindow.relocalize',
-    why: 'the tab plus the friend/guild/raid rosters, split structural and content (#2529)',
+    why: 'the tab plus the friend/guild/who/raid rosters, split structural and content (#2529)',
   },
   {
     file: 'spellbook_window.ts',
@@ -751,7 +766,7 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     file: 'hud.ts',
     memos: ['lastClockText'],
     reason:
-      "lastClockText retains the RESOLVED minimap clock readout and is compared against a freshly built formatClockTime(new Date(), this.clock24), which routes through formatDateTime to Intl.DateTimeFormat(languageTag(currentLanguage)), so the hour cycle, the day-period marker and the digit system are re-resolved in the ACTIVE locale on the very next comparison. updateClock() runs unconditionally on the fastHud band of the frame loop, so it needs no data motion at all: a locale switch that changes the string moves the freshly built side within one fastHud tick and the write happens by itself. Write-elision on resolved text, not a data signature; the only other store, the `this.lastClockText = ''` in the clock click handler, is the 12h/24h toggle forcing that same self-repaint.",
+      "lastClockText retains the RESOLVED minimap clock readout and is compared against formatClockTimeMemo(Date.now(), this.clock24), whose memo is keyed on the displayed minute, the format AND the active language (clock.ts), so a locale switch re-routes through formatDateTime to Intl.DateTimeFormat(languageTag(currentLanguage)) and the hour cycle, the day-period marker and the digit system are re-resolved in the ACTIVE locale on the very next comparison. updateClock() runs unconditionally on the fastHud band of the frame loop, so it needs no data motion at all: a locale switch that changes the string moves the freshly built side within one fastHud tick and the write happens by itself. Write-elision on resolved text, not a data signature; the only other store, the `this.lastClockText = ''` in the clock click handler, is the 12h/24h toggle forcing that same self-repaint.",
   },
   {
     file: 'hud.ts',

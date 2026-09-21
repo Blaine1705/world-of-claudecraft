@@ -409,7 +409,7 @@ describe('client HTML shell', () => {
     const build = mainTs.slice(buildAt, prepareAt);
     expect(buildAt).toBeGreaterThan(-1);
     expect(prepareAt).toBeGreaterThan(buildAt);
-    expect(build).toContain('new Renderer(world, recycled.canvas, nameplates, {');
+    expect(build).toContain('createGameRenderer(world, recycled.canvas, nameplates, settings, {');
     expect(mainTs).toContain('online?.neutralizeInputForClientPause();');
   });
 
@@ -856,9 +856,17 @@ describe('client HTML shell', () => {
     // character-bound) through toggleClass. No raw classList/style write on either
     // frame survives (those silently collapse the hot-DOM skip rate).
     expect(hudTs).toContain('const targetRank = targetRankView(targetTemplate);');
-    // Written into the reused target descriptor rather than a per-frame object
+    // Written into the reused target descriptor by the extracted fill
+    // (src/ui/target_frame_descriptor.ts) rather than a per-frame object
     // literal; the routing this test guards is unchanged.
-    expect(hudTs).toContain('targetFrame.levelText = String(target.level);');
+    expect(hudTs).toContain('const targetFrame = fillTargetFrameDescriptor(');
+    // The party raid marker rides the fill as its fourth argument; the field is
+    // optional downstream (raidMarker ?? null), so a dropped argument would
+    // silently read "never marked" with every unit test green.
+    expect(hudTs).toContain('sim.markerFor(target.id),');
+    expect(
+      readFileSync(new URL('../src/ui/target_frame_descriptor.ts', import.meta.url), 'utf8'),
+    ).toContain('d.levelText = String(target.level);');
     expect(hudTs).toContain(
       "this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));",
     );
@@ -2952,15 +2960,16 @@ describe('client HTML shell', () => {
     // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
     // corpse-claim mirror online); it stays an explicit `undefined` (the
-    // default), never a live override. Intentional gathering: the generic
-    // press takes no node list, tool gate, or R40 confirm gate any more (it
-    // never gathers; those stay on the explicit node/tool entry points).
-    // preferNpcId trails: the pad names the npc the player SELECTED, so a
-    // talk press cannot answer whoever happens to stand closer.
+    // default), never a live override. preferNpcId follows: the pad names the
+    // npc the player SELECTED, so a talk press cannot answer whoever happens
+    // to stand closer. The gather-node bundle trails it: the interact key
+    // harvests the nearest node in reach through the node click's core, with
+    // the live node list, the tool gate and the R40 confirm gate all wired
+    // (intentional gathering keeps corpse components and crops explicit; a
+    // node has no ordinary half to protect, so the press IS the intent).
     expect(mainTs).toContain(
-      "t('errors.nothingInteract'),\n        undefined,\n        preferNpcId,\n      ),",
+      "t('errors.nothingInteract'),\n        undefined,\n        preferNpcId,\n        interactKeyGatherOptions(world, gatherEffectConfirm),\n      ),",
     );
-    expect(mainTs).not.toContain('GATHER_NODES,\n        (node) => gatherNodeToolGateFor');
     // The escort away line sits immediately before it (escort_interact.ts): an
     // escort run has no other client entry point, so an unwired argument here
     // would silently make those quests uncompletable again.
@@ -3440,8 +3449,10 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain(
       "if (this.vendorOpen && document.body.classList.contains('mobile-touch')) this.closeVendor();",
     );
-    expect(hudTs).toMatch(
-      /const closeMobileBags =\s*document\.body\.classList\.contains\('mobile-touch'\) &&\s*\$\('#bags'\)\.style\.display !== 'none';/,
+    // The predicate itself lives in src/ui/mobile_hud_layout.ts (touchBagsShown):
+    // the vendor close reads the touch mode and the bags sheet's display through it.
+    expect(hudTs).toContain(
+      "const closeMobileBags = touchBagsShown(document.body.classList, $('#bags').style.display);",
     );
   });
 

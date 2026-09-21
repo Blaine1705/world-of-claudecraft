@@ -58,8 +58,10 @@ import { drawWeapon } from '../weapon_stow';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { druidEngineOnLandedStrike } from './druid_engines';
+import { naturesBoonOnAutoAttack } from './druid_natures_boon';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
+import { meleeReachActor } from './feral_reach';
 import {
   baseSwingSpeed,
   catAutoWeaponRollMult,
@@ -167,7 +169,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // bug, #1324). The toggle still arms autoAttack above; once the cast resolves, the
   // first landed swing (or the spell's own damage) aggros the target legitimately.
   if (
-    d <= effectivePlayerAttackRange(t, MELEE_RANGE) &&
+    d <= effectivePlayerAttackRange(t, MELEE_RANGE, meleeReachActor(ctx, p)) &&
     !p.castingAbility &&
     t.kind === 'mob' &&
     t.hostile &&
@@ -265,7 +267,7 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
     p.swingTimer = shot.speed * ctx.swingIntervalMult(p, 'ranged');
     return;
   }
-  if (d > effectivePlayerAttackRange(t, MELEE_RANGE)) return;
+  if (d > effectivePlayerAttackRange(t, MELEE_RANGE, meleeReachActor(ctx, p))) return;
   // Melee normally skips line of sight (it's always point-blank), but the
   // arena's thin enclosing walls sit inside MELEE_RANGE: without this a
   // combatant pressed against a wall could swing through it. See sibling
@@ -340,7 +342,7 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
     }
     maybeProcBattleTrance(ctx, p, meta, connected);
     maybeProcSuddenDeath(ctx, p, meta, connected);
-    // Wolf Form swings at the fixed fast cat cadence, not the carried weapon's
+    // Cat Form swings at the fixed fast cat cadence, not the carried weapon's
     // speed (see combat/form_swing.ts); everyone else uses their weapon speed.
     // Melee haste (item sets + Enrage + haste buffs) lives in the ONE additive
     // bucket inside swingIntervalMult (v0.27.1); only the stance-mastery auto
@@ -601,7 +603,7 @@ export function meleeSwing(
     opts.normalizedInstant && opts.autoAttackHand === undefined
       ? normalizedInstantSpeed(weapon)
       : undefined;
-  // The cat mainhand auto is the one REAL auto attack that normalizes: Wolf
+  // The cat mainhand auto is the one REAL auto attack that normalizes: Cat
   // Form swings its claws at the fixed cat cadence, so the carried weapon's
   // roll is rescaled to that cadence (catAutoWeaponRollMult, the same shape as
   // the instant rescale above) and white DPS equals the weapon's authored dps
@@ -620,7 +622,7 @@ export function meleeSwing(
   let dmg =
     (ctx.rng.range(weapon.min, weapon.max) * weaponRollMult +
       // Normalize the attack-power contribution to the SAME cadence the swing
-      // fires at: Wolf Form swings at the fixed cat speed (baseSwingSpeed), so
+      // fires at: Cat Form swings at the fixed cat speed (baseSwingSpeed), so
       // its AP-per-swing must use that speed too, not the slow staff's, or
       // feral would double-dip (fast swings AND heavy slow-weapon AP weighting).
       (ctx.effectiveAttackPower(attacker) / 14) * apSwingSpeed) *
@@ -706,6 +708,12 @@ export function meleeSwing(
       triggerWardCycle(ctx, attacker);
     }
     onMeleeSwing(ctx, attacker);
+    // Nature's Boon (combat/druid_natures_boon.ts): a landed AUTO-attack, and
+    // only an auto-attack, can arm the Wildfang free-spell window. The
+    // opts.autoAttack gate is what keeps a weaponStrike ability (which
+    // resolves through this same shell) from rolling it. Feral-gated inside,
+    // so no other player draws rng here.
+    if (opts.autoAttack) naturesBoonOnAutoAttack(ctx, attacker);
     // Weapon coats (the rogue poisons) land their rider on the struck target
     // here, on the LANDED arm only: a miss, dodge or parry returned above, so
     // a whiffed swing carries no poison. Draws no rng.

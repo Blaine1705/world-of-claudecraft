@@ -200,10 +200,48 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       // System card (full width).
       'browserEffects',
       'note:hudChrome.options.browserEffectsNote',
+      'frameRateCap',
+      'note:hudChrome.options.frameRateCapNote',
       'shaderWarm',
       'note:hudChrome.options.shaderWarmNote',
       'interfaceMode',
       'note:hudChrome.options.interfaceModeNote',
+    ]);
+  });
+
+  it('states under the frame rate limit what it really does on this display', () => {
+    const capRow = (reading: ReturnType<NonNullable<OptionsEnv['frameRateCapReadingFor']>>) => {
+      const seen: number[] = [];
+      const row = flattenGraphicsSections(
+        buildGraphicsSections(makeSource({ graphicsPreset: 4, frameRateCap: 3 }), {
+          ...WEB_ENV,
+          frameRateCapReadingFor: (value) => {
+            seen.push(value);
+            return reading;
+          },
+        }),
+      ).find((c) => c.control === 'choice' && c.key === 'frameRateCap');
+      expect(seen).toEqual([3]);
+      if (row?.control !== 'choice') throw new Error('no frame rate limit row');
+      return row;
+    };
+    const paced = capRow({ kind: 'paced', fps: 36, refreshHz: 144 });
+    expect(paced.statusKey).toBe('hudChrome.options.frameRateCapStatusPaced');
+    expect(paced.statusNumbers).toEqual({ fps: 36, hz: 144 });
+    expect(paced.rerender).toBe(true);
+    const unpaced = capRow({ kind: 'unpaced', fps: 30 });
+    expect(unpaced.statusKey).toBe('hudChrome.options.frameRateCapStatusUnpaced');
+    expect(unpaced.statusNumbers).toEqual({ fps: 30 });
+    expect(capRow({ kind: 'inert' }).statusKey).toBe('hudChrome.options.frameRateCapStatusInert');
+    expect(capRow({ kind: 'none' }).statusKey).toBeUndefined();
+    // The stored value each label stands for is what the game resolves
+    // (src/game/frame_rate_cap_setting.ts FRAME_RATE_CAP_VALUES): a swap here
+    // would make the 60 button ask for 30.
+    expect(capRow({ kind: 'none' }).options).toEqual([
+      { value: 0, labelKey: 'hudChrome.options.frameRateCapAuto' },
+      { value: 1, labelKey: 'hudChrome.options.frameRateCapDisplay' },
+      { value: 2, labelKey: 'hudChrome.options.frameRateCapSixty' },
+      { value: 3, labelKey: 'hudChrome.options.frameRateCapThirty' },
     ]);
   });
 
@@ -777,6 +815,8 @@ const GENERAL_KEYS = [
   'showPlayerNameplates',
   'confirmVendorSell',
   'note:hudChrome.options.confirmVendorSellNote',
+  'confirmVendorSellMinQuality',
+  'note:hudChrome.options.confirmVendorSellMinQualityNote',
 ];
 const FRAMES_KEYS = [
   'partyFrameStyle',
@@ -801,6 +841,7 @@ const FRAMES_KEYS = [
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat', 'filterProfanity'];
 const COMBAT_KEYS = [
+  'eastbrookGuidance',
   'startAttackOnAbilityUse',
   'stopAutoAttackOnTargetSwitch',
   'showAttackButton',
@@ -926,6 +967,11 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     });
     expect(desktop.filter((c) => c.control === 'note')).toEqual([
       { control: 'note', textKey: 'hudChrome.options.confirmVendorSellNote', category: 'general' },
+      {
+        control: 'note',
+        textKey: 'hudChrome.options.confirmVendorSellMinQualityNote',
+        category: 'general',
+      },
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
     ]);
 
@@ -1234,10 +1280,20 @@ describe('options_view: interface tab taxonomy', () => {
 // ---------------------------------------------------------------------------
 // Main menu routing (cluster 5)
 // ---------------------------------------------------------------------------
+// The desktop menu with the frames locked: what the painter asks for on a
+// mouse-and-keyboard HUD with nothing loose (the touch HUD flips
+// interfaceUnlockAvailable off, see the touch case below).
+const DESKTOP_MENU = {
+  bugReportAvailable: false,
+  interfaceUnlockAvailable: true,
+  interfaceUnlocked: false,
+};
+
 describe('options_view: main menu routing', () => {
   it('routes each row to its sub-view, with unstuck before logout + close, omitting bug report offline', () => {
-    const offline = buildOptionsMenu({ bugReportAvailable: false });
+    const offline = buildOptionsMenu(DESKTOP_MENU);
     expect(offline.map((e) => e.labelKey)).toEqual([
+      'hudChrome.interfaceUnlock.unlock',
       'hud.options.keyBindings',
       'hudChrome.controller.title',
       'hud.options.graphics',
@@ -1274,8 +1330,44 @@ describe('options_view: main menu routing', () => {
     });
   });
 
+  it('leads with Unlock Interface, relabelled Lock Interface while the frames are loose', () => {
+    // Owner request for the frame lock-down: arranging frames is one press
+    // from Esc, not three levels into Interface > Frames. The row is the
+    // same action the Frames tab's row fires, so its label follows the same
+    // rule (interfaceUnlockLabelKey), and only the label changes with state.
+    const locked = buildOptionsMenu(DESKTOP_MENU);
+    expect(locked[0]).toEqual({
+      labelKey: 'hudChrome.interfaceUnlock.unlock',
+      action: { kind: 'interfaceUnlock', unlocked: false },
+    });
+    expect(locked.filter((e) => e.action.kind === 'interfaceUnlock')).toHaveLength(1);
+    const unlocked = buildOptionsMenu({ ...DESKTOP_MENU, interfaceUnlocked: true });
+    expect(unlocked[0]).toEqual({
+      labelKey: 'hudChrome.interfaceUnlock.lock',
+      action: { kind: 'interfaceUnlock', unlocked: true },
+    });
+    expect(unlocked.slice(1)).toEqual(locked.slice(1));
+  });
+
+  it('omits the Unlock Interface row on the touch HUD, where Key Bindings leads again', () => {
+    // Frame editing is desktop-only (every gesture refuses touch layouts), the
+    // same gate the Frames tab's row sits behind. Unavailable wins even if the
+    // state somehow reads unlocked: the row must never appear on touch.
+    const locked = buildOptionsMenu(DESKTOP_MENU);
+    for (const interfaceUnlocked of [false, true]) {
+      const touch = buildOptionsMenu({
+        ...DESKTOP_MENU,
+        interfaceUnlockAvailable: false,
+        interfaceUnlocked,
+      });
+      expect(touch.some((e) => e.action.kind === 'interfaceUnlock')).toBe(false);
+      expect(touch[0]?.labelKey).toBe('hud.options.keyBindings');
+      expect(touch).toEqual(locked.slice(1));
+    }
+  });
+
   it('adds the online-only Report a Bug row when bug reporting is available', () => {
-    const online = buildOptionsMenu({ bugReportAvailable: true });
+    const online = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
     const bug = online.find((e) => e.labelKey === 'hudChrome.bugReport.menuButton');
     expect(bug?.action).toEqual({ kind: 'goto', view: 'bugreport' });
     // The Wiki row keeps its place above the report row in both modes.
@@ -1364,9 +1456,8 @@ describe('options_view: determinism', () => {
       buildInterfaceControls(src, DESKTOP_ENV),
     );
     expect(buildControllerControls(src)).toEqual(buildControllerControls(src));
-    expect(buildOptionsMenu({ bugReportAvailable: true })).toEqual(
-      buildOptionsMenu({ bugReportAvailable: true }),
-    );
+    const menuOpts = { ...DESKTOP_MENU, bugReportAvailable: true };
+    expect(buildOptionsMenu(menuOpts)).toEqual(buildOptionsMenu(menuOpts));
   });
 });
 

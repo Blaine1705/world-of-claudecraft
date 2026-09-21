@@ -15,7 +15,10 @@
 // narrows them against the real GameSettings), label keys are t() keys the
 // painter resolves. Registered in tests/architecture.test.ts UI_PURE_CORES.
 
+import { QUALITY_RANK } from '../sim/loot_master';
 import type { TranslationKey } from './i18n.catalog';
+import { interfaceUnlockLabelKey } from './interface_unlock_core';
+import { VENDOR_SELL_CONFIRM_QUALITIES } from './vendor_sell_confirm_policy';
 
 /** Copy at the ownership boundary so a caller can never mutate the applied
  *  renderer snapshot while editing its local options draft. */
@@ -136,6 +139,9 @@ export interface ChoiceControl {
    *  cell. Placeholders are KEYS the painter resolves, like NoteControl's. */
   statusKey?: TranslationKey;
   statusValueKeys?: Record<string, TranslationKey>;
+  /** Numeric placeholders of the same line; the painter formats them for the
+   *  active locale (formatNumber), so the view stays string-free. */
+  statusNumbers?: Record<string, number>;
   /** Render that line as an ASSERTIVE live region (role="alert") rather than a
    *  polite one: the reading is a verdict a player has to act on (their choice
    *  did not take), and it arrives long after the panel was built, so assistive
@@ -248,6 +254,12 @@ export interface OptionsEnv {
    *  phone-class WebKit), so the row and its note would both be lies. Absent
    *  means yes, which is what every non-iOS caller wants. */
   shaderWarmChoice?: boolean;
+  /** What a stored frame rate ceiling does on the display as it reads right
+   *  now (src/game/frame_rate_cap_setting.ts frameRateCapReading): the rate is
+   *  a divisor of the measured refresh, so "about 30" is 36 on a 144 Hz display
+   *  and nothing at all on a 30 Hz one, and the row owes the player that
+   *  number. Absent (the offline callers, tests) means no reading line. */
+  frameRateCapReadingFor?: (storedValue: number) => FrameRateCapRowReading;
   /** desktopDisplayModeSupported(): the shell owns the window, so the Display
    *  card shows a windowed/borderless picker INSTEAD of the browser Fullscreen
    *  toggle (asking the browser for fullscreen inside an already-fullscreen
@@ -314,6 +326,16 @@ const HEALTH_TEXT_CHOICES: ChoiceOption[] = [
   { value: 4, labelKey: 'hudChrome.partyFrames.healthCurrentMaxPercent' },
 ];
 
+/** The vendor sell-confirm quality ladder (vendor_sell_confirm_policy.ts): the
+ *  choice values ARE the stored QUALITY_RANK values, labeled by the item
+ *  quality names the tooltips already use. */
+const SELL_CONFIRM_QUALITY_CHOICES: ChoiceOption[] = VENDOR_SELL_CONFIRM_QUALITIES.map(
+  (quality) => ({
+    value: QUALITY_RANK[quality],
+    labelKey: `itemUi.quality.${quality}` as TranslationKey,
+  }),
+);
+
 const choice = (
   s: OptionsSettingsSource,
   key: string,
@@ -346,6 +368,23 @@ function gpuBackendActiveNameKey(active: string): TranslationKey {
     ? 'hudChrome.options.gpuBackendActiveNameVulkan'
     : 'hudChrome.options.gpuBackendActiveNameOpenGL';
 }
+
+/** The options row's copy of the game-side reading, so the view imports no
+ *  game module (the shape is structural on purpose). */
+export type FrameRateCapRowReading =
+  | { kind: 'none' }
+  | { kind: 'inert' }
+  | { kind: 'paced'; fps: number; refreshHz: number }
+  | { kind: 'unpaced'; fps: number };
+
+// The frame rate ceiling; the stored numbers are
+// src/game/frame_rate_cap_setting.ts FRAME_RATE_CAP_VALUES.
+const frameRateCapOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.options.frameRateCapAuto' },
+  { value: 1, labelKey: 'hudChrome.options.frameRateCapDisplay' },
+  { value: 2, labelKey: 'hudChrome.options.frameRateCapSixty' },
+  { value: 3, labelKey: 'hudChrome.options.frameRateCapThirty' },
+];
 
 // The shader warm-up worker: auto follows the GPU backend (on where the
 // compile runs off the presenting thread, off on OpenGL); the stored numbers
@@ -440,6 +479,10 @@ export type OptionsPanelId =
 
 export type OptionsMenuAction =
   | { kind: 'goto'; view: OptionsPanelId }
+  /** The Unlock Interface action, carrying the state it was built from so the
+   *  painter's establishing paint has ONE source (the core); a press then
+   *  repaints from the seam's answer. */
+  | { kind: 'interfaceUnlock'; unlocked: boolean }
   | { kind: 'wiki' }
   | { kind: 'unstuck' }
   | { kind: 'logout' }
@@ -450,10 +493,32 @@ export interface OptionsMenuEntry {
   action: OptionsMenuAction;
 }
 
-/** The main Esc-menu button list. The "Report a Bug" row is online-only (it needs
- *  an authoritative server to receive the report). */
-export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): OptionsMenuEntry[] {
-  const entries: OptionsMenuEntry[] = [
+export interface OptionsMenuOpts {
+  /** The "Report a Bug" row is online-only (it needs an authoritative server
+   *  to receive the report). */
+  bugReportAvailable: boolean;
+  /** Frame editing is desktop-only (every gesture refuses touch layouts), so
+   *  the touch HUD omits the Unlock Interface row: the same gate the Frames
+   *  tab's row sits behind, and the predicate Hud.toggleInterfaceUnlock
+   *  refuses on (the touch HUD is active), so the row never paints inert. */
+  interfaceUnlockAvailable: boolean;
+  /** Whether the frames are loose right now. The row labels itself "Lock
+   *  interface" while they are, exactly as the Frames tab's row does. */
+  interfaceUnlocked: boolean;
+}
+
+/** The main Esc-menu button list. Unlock Interface leads (owner request: the
+ *  frames lock down by default, so the way to arrange them is one press from
+ *  Esc rather than three levels into Interface > Frames); it is an ACTION the
+ *  painter repaints in place, not a sub-view. */
+export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
+  const entries: OptionsMenuEntry[] = [];
+  if (opts.interfaceUnlockAvailable)
+    entries.push({
+      labelKey: interfaceUnlockLabelKey(opts.interfaceUnlocked),
+      action: { kind: 'interfaceUnlock', unlocked: opts.interfaceUnlocked },
+    });
+  entries.push(
     { labelKey: 'hud.options.keyBindings', action: { kind: 'goto', view: 'keybinds' } },
     { labelKey: 'hudChrome.controller.title', action: { kind: 'goto', view: 'controller' } },
     { labelKey: 'hud.options.graphics', action: { kind: 'goto', view: 'graphics' } },
@@ -467,7 +532,7 @@ export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): Options
     // The wiki row sits with the help-shaped entries (above Report a Bug /
     // Unstuck); it opens the confirm-first external hop, never a sub-panel.
     { labelKey: 'nav.wiki', action: { kind: 'wiki' } },
-  ];
+  );
   if (opts.bugReportAvailable)
     entries.push({
       labelKey: 'hudChrome.bugReport.menuButton',
@@ -622,6 +687,25 @@ export function buildGraphicsSections(
     ]),
     note('hudChrome.options.browserEffectsNote'),
   ];
+  // Re-renders on a pick: the reading under the buttons belongs to the value.
+  const capRow = choice(
+    s,
+    'frameRateCap',
+    'hudChrome.options.frameRateCap',
+    frameRateCapOptions,
+    true,
+  );
+  const capReading = env.frameRateCapReadingFor?.(capRow.current);
+  if (capReading?.kind === 'paced') {
+    capRow.statusKey = 'hudChrome.options.frameRateCapStatusPaced';
+    capRow.statusNumbers = { fps: capReading.fps, hz: capReading.refreshHz };
+  } else if (capReading?.kind === 'unpaced') {
+    capRow.statusKey = 'hudChrome.options.frameRateCapStatusUnpaced';
+    capRow.statusNumbers = { fps: capReading.fps };
+  } else if (capReading?.kind === 'inert') {
+    capRow.statusKey = 'hudChrome.options.frameRateCapStatusInert';
+  }
+  system.push(capRow, note('hudChrome.options.frameRateCapNote'));
   // iOS forces the worker off whatever the setting says, so the row would be a
   // control that changes nothing under a note promising On is forced
   // everywhere. Absent means yes: every other host keeps the pair byte for byte.
@@ -852,6 +936,13 @@ export function buildInterfaceControls(
     boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
     boolToggle(s, 'confirmVendorSell', 'hudChrome.options.confirmVendorSell'),
     note('hudChrome.options.confirmVendorSellNote'),
+    choice(
+      s,
+      'confirmVendorSellMinQuality',
+      'hudChrome.options.confirmVendorSellMinQuality',
+      SELL_CONFIRM_QUALITY_CHOICES,
+    ),
+    note('hudChrome.options.confirmVendorSellMinQualityNote'),
   ];
   // The desktop shell's GPU preference, last in the tab so the web arm's row
   // order is untouched. Gated on the bridge CAPABILITY, so it renders only in a
@@ -925,6 +1016,7 @@ export function buildInterfaceControls(
       boolToggle(s, 'filterProfanity', 'hud.options.filterProfanity'),
     ]),
     ...tag('combat', [
+      boolToggle(s, 'eastbrookGuidance', 'hudChrome.tutorialGreeting.guidanceSetting'),
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
       boolToggle(
         s,

@@ -1473,6 +1473,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // literal added in any of them fails here instead of shipping English.
   const serverSrc = [
     'server/game.ts',
+    'server/who_roster.ts',
     'server/social.ts',
     'server/activity_detect.ts',
     'server/farming_commands.ts',
@@ -1690,6 +1691,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'fiesta.ts',
       'fiesta_bots.ts',
       'party.ts',
+      'pull_timer.ts',
       'ready_check.ts',
       'trade.ts',
       'trade_offer_sources.ts',

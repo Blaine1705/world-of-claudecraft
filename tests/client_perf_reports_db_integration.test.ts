@@ -89,6 +89,9 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       deviceMemory: 8.5,
       hardwareConcurrency: 12,
       mobileTouch: false,
+      // TRUE beside mobile_touch false and gl_laptop false, so a positional
+      // slip between the boolean columns flips an assertion.
+      desktopShell: true,
       browserFamily: 'safari',
       osFamily: 'macos',
       glVendor: 'RoundtripVendor',
@@ -113,6 +116,9 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       rawSummary: { roundtrip: true, seconds: 77 },
       shaderWarmWorkerActive: true,
       shaderWarmRefusal: 'extension-drift:ext_roundtrip',
+      frameCapIntent: 30,
+      cadenceDivisor: 4,
+      refreshHz: 144,
     });
 
     const res = await db.pool.query('SELECT * FROM client_perf_reports WHERE session_id = $1', [
@@ -171,6 +177,11 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(r.raw_summary).toEqual({ roundtrip: true, seconds: 77 });
     expect(r.shader_warm_worker_active).toBe(true);
     expect(r.shader_warm_refusal).toBe('extension-drift:ext_roundtrip');
+    expect(r.desktop_shell).toBe(true);
+    // Last in the column list: a slipped placeholder would land them elsewhere.
+    expect(r.frame_cap_intent).toBe(30);
+    expect(r.cadence_divisor).toBe(4);
+    expect(r.refresh_hz).toBe(144);
   });
 
   it('serves the row back through clientPerfRaw with the dimensions and suggestion ids mapped', async () => {
@@ -193,6 +204,10 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(row?.glModel).toBe('roundtrip-model');
     expect(row?.glLaptop).toBe(false);
     expect(row?.gpuHpAdapter).toBe('roundtrip-hp-adapter');
+    expect(row?.targetFps).toBe(61);
+    expect(row?.frameCapIntent).toBe(30);
+    expect(row?.cadenceDivisor).toBe(4);
+    expect(row?.refreshHz).toBe(144);
   });
 
   it('aggregates suggestionCounts through clientPerfSummary from the live rows', async () => {
@@ -277,7 +292,8 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     const res = await db.pool.query(
       `SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
               suggestion_ids, gl_backend, gl_renderer_raw, gl_model, gl_laptop, gpu_hp_adapter,
-              shader_warm_worker_active, shader_warm_refusal
+              shader_warm_worker_active, shader_warm_refusal, desktop_shell,
+              frame_cap_intent, cadence_divisor, refresh_hz
          FROM client_perf_reports WHERE session_id = $1`,
       [`${MARKER}-legacy`],
     );
@@ -298,6 +314,12 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       gpu_hp_adapter: '',
       shader_warm_worker_active: false,
       shader_warm_refusal: '',
+      desktop_shell: false,
+      // A row older than the frame rate ceiling had none: no intent, every
+      // refresh rendered, display rate never read.
+      frame_cap_intent: 0,
+      cadence_divisor: 1,
+      refresh_hz: 0,
     });
   });
 

@@ -9,8 +9,10 @@
 
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 import { cosmeticsStrings } from './cosmetics';
+import { professionTrainerStrings } from './profession_trainers';
 
 export const hudChromeStrings = {
+  professionTrainers: professionTrainerStrings,
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
   warlock: {
     doomLabel: 'Condemnation',
@@ -46,12 +48,25 @@ export const hudChromeStrings = {
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
   readyCheck: {
+    title: 'Ready Check',
+    close: 'Close',
     prompt: '{name} has started a ready check. Are you ready?',
     ready: 'Ready',
     notReady: 'Not Ready',
+    status: 'Ready: {ready}/{total}',
+    waiting: 'Waiting for responses...',
+    memberReady: '{name} is ready.',
+    memberNotReady: '{name} is not ready.',
+    memberPending: '{name} has not responded yet.',
     result: 'Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.',
     notInPartyError: 'You must be in a party to start a ready check.',
     inProgressError: 'A ready check is already in progress.',
+  },
+  pullTimer: {
+    start: 'Pull in {seconds} sec!',
+    cancel: 'Pull cancelled.',
+    countdown: '{seconds}',
+    pull: 'PULL!',
   },
   // WoW-style death loop overlay (release -> ghost run -> resurrect). The release
   // button and "You have died." title reuse the hud.core.* keys; these are the
@@ -388,6 +403,14 @@ export const hudChromeStrings = {
     mountsTitle: 'Machine Stable',
     mountBuyAria: 'Purchase {item}',
     mountSkinType: 'Mount skin',
+    // The mount skin inspect panel (src/ui/mount_inspect_controller.ts): a live preview of
+    // the player's own character riding the skin, opened from a store card or
+    // the Cosmetics window, so nobody buys a look they have not seen.
+    mountInspectAria: 'Preview {item}',
+    mountRideIt: 'Ride it',
+    mountOnly: 'Mount only',
+    mountBuy: 'Purchase Mount Skin',
+    mountScopeLine: 'Account-wide skin. Worn by one character at a time.',
     loading: 'Loading WOC Store...',
     error: 'The WOC Store is unavailable right now. Please try again shortly.',
     balance: 'Claudium Balance',
@@ -932,8 +955,11 @@ export const hudChromeStrings = {
   // tutorial_greeting_window.ts): the town-bell homecoming, the island
   // welcome from Ferryman Odo, and the close button they share.
   tutorialGreeting: {
-    // The first bell homecoming: the ride may have been a misclick, so the
-    // town's twin bell is pointed out once.
+    eastbrookGuidanceNote:
+      'Welcome to Eastbrook! Marshal Redbrook has work for you in the town square. Turn on golden guidance to find him and follow Wolves at the Door, or explore on your own. You can change this later in Options, Interface, Combat.',
+    guidanceOn: 'Turn guidance on',
+    guidanceOff: 'Turn guidance off',
+    guidanceSetting: 'Eastbrook golden guidance',
     bellHomeNote:
       'Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
     // Ferryman Odo's island welcome, shown once for a character's first
@@ -1313,6 +1339,13 @@ export const hudChromeStrings = {
     devTierCol: 'Badge',
     mergedPrs: 'Merged PRs',
     devEmpty: 'No ranked contributors yet.',
+    // The top-three podium every tab shows on its first page: its list label and
+    // the stand-in name on a place nobody holds yet.
+    podiumLabel: 'Top three',
+    unclaimed: 'Unclaimed',
+    // The prestige star's tooltip on a ladder row and on a podium card: one key
+    // with the rank interpolated, never a translated word glued to a number.
+    prestigeTitle: 'Prestige {rank}',
   },
   // Guild pledge board (docs/prd/guild-pledge-board.md): shared strings for the
   // guild high-score tab's pledge affordances AND the social window's Pledges
@@ -1348,6 +1381,10 @@ export const hudChromeStrings = {
     noteLabel: 'Board note',
     notePlaceholder: 'Tell aspiring members what your guild is looking for',
     save: 'Save',
+    // Guild board categories (src/sim/guild_board_category.ts): the
+    // new-player-friendly opt-in in the same editor, and its helper line.
+    newPlayerFriendlyLabel: 'New player friendly',
+    newPlayerFriendlyHint: "Shown on the recruits' board at the Proving Shore signpost.",
     // The unguilded viewer's own standing pledge (social window guild tab).
     yourPledge: 'Your pledge: {guild}',
     since: 'Pledged {date}',
@@ -1617,7 +1654,13 @@ export const hudChromeStrings = {
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
     bgFlag: 'Battleground Flag Action',
+    // The friendly half of the `hud` catalog's existing `nameplates` row: that
+    // key (V) hides every mob nameplate, this one (Ctrl+V) hides only the
+    // friendly ones and leaves the enemies you are fighting alone.
+    friendlyNameplates: 'Toggle Friendly Nameplates',
     sheathe: 'Sheathe/Unsheathe Weapon',
+    // Hides the whole HUD for a clean screenshot or video (Alt+Z by default).
+    hideInterface: 'Hide Interface',
     // Swimming: Jump swims up, this swims down.
     dive: 'Swim Down',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
@@ -1631,6 +1674,19 @@ export const hudChromeStrings = {
     // "Mark" is this catalog's own term for the target (unitFrame.targetLabel,
     // targetAnnounce), which also keeps the value NON-WORDY for the M16 guard.
     targetPet: 'Pet: Mark',
+    // The party target hotkeys (F1..F10 by default): yourself, then the party
+    // frame rows top to bottom. Wordy (M16): the five non-Latin fills land in
+    // this same change.
+    targetSelf: 'Target Self',
+    targetParty1: 'Target Party Member 1',
+    targetParty2: 'Target Party Member 2',
+    targetParty3: 'Target Party Member 3',
+    targetParty4: 'Target Party Member 4',
+    targetParty5: 'Target Party Member 5',
+    targetParty6: 'Target Party Member 6',
+    targetParty7: 'Target Party Member 7',
+    targetParty8: 'Target Party Member 8',
+    targetParty9: 'Target Party Member 9',
     // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
     mount: 'Mount / Dismount',
     // Mouse buttons are bindable pseudo-keys (src/game/mouse_binds.ts). The note
@@ -1640,6 +1696,16 @@ export const hudChromeStrings = {
     // this same change.
     mouseHint:
       'Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world.',
+    // The wheel is a pair of bindable pseudo-keys too (src/game/wheel_binds.ts):
+    // the two zoom rows below hold it by default. Wordy (M16): the five
+    // non-Latin fills land in this same change.
+    zoomIn: 'Zoom Camera In',
+    zoomOut: 'Zoom Camera Out',
+    wheelHint:
+      'The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.',
+    // A wheel notch has no release, so bind() refuses it on a held action.
+    wheelHeldRefused:
+      'A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it.',
   },
   // On-bar action-bar key-binding mode (issue #1238): the Key Bindings menu's
   // single "Edit action bar keys" entry (replacing the wall of per-slot rebind
@@ -2012,6 +2078,21 @@ export const hudChromeStrings = {
     shaderWarmOn: 'On',
     shaderWarmNote:
       'Pre-warm shader cache in the background to prevent in-game stuttering. Auto: Enabled only when supported by your graphics system. (Recommended). On: Forced everywhere. May worsen performance on some setups. Off: Disabled.',
+    // Graphics System card: the frame rate ceiling. The rate is a divisor of the
+    // measured display refresh, so the status line under the buttons states
+    // the rate actually obtained. Wordy values, M16: the five non-Latin fills
+    // land in this same change.
+    frameRateCap: 'Frame Rate Limit',
+    frameRateCapAuto: 'Auto',
+    frameRateCapDisplay: 'Display',
+    frameRateCapSixty: '60',
+    frameRateCapThirty: '30',
+    frameRateCapNote:
+      'Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.',
+    frameRateCapStatusPaced: 'Drawing {fps} images per second on a {hz} Hz display.',
+    frameRateCapStatusUnpaced: 'Limiting to {fps} images per second.',
+    frameRateCapStatusInert:
+      'This display already runs at or under this limit, so the limit changes nothing.',
     gpuBackend: 'Graphics Backend',
     gpuBackendAuto: 'Auto',
     gpuBackendVulkan: 'Vulkan',
@@ -2117,6 +2198,12 @@ export const hudChromeStrings = {
     confirmVendorSell: 'Confirm Before Selling',
     confirmVendorSellNote:
       'Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.',
+    // Interface panel choice row under the toggle: the lowest item quality a
+    // vendor sale still confirms for; anything below sells instantly (wordy,
+    // M16: the five non-Latin fills land in the same change).
+    confirmVendorSellMinQuality: 'Confirm Sales From Quality',
+    confirmVendorSellMinQualityNote:
+      'Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
     // Interface panel toggle that reveals the optional second action bar row (off
@@ -2595,6 +2682,62 @@ export const hudChromeStrings = {
     spellOrder: 'Spell Order',
     reset: 'Reset Position',
     spellPosition: 'Spell order {position} / {count}',
+    // The watchlist picker: any known spell that puts a buff on you can be given
+    // its own aura vision, on top of the curated class procs above.
+    watchlist: 'Watched Spells',
+    watchlistHint:
+      'Pick any spell that buffs you to give it its own aura. Picked spells get a full card below, with their own icon, color, position and ground ring.',
+    watchlistEmpty: 'No other spell in your spellbook puts a buff on you.',
+    watchlistWatch: 'Watch {spell}',
+    watchlistUnwatch: 'Stop watching {spell}',
+    watchlistCount: '{count} watched',
+    // Sound cues attachable to any proc (src/game/aura_cue_catalog.ts). Named for
+    // what the player hears, not for the class or proc, since any cue can go on
+    // any spell.
+    sound: 'Alert Sound',
+    soundNone: 'No sound',
+    soundVolume: 'Sound Volume',
+    soundPreview: 'Play',
+    soundPreviewAria: 'Preview the {sound} alert sound',
+    soundHint:
+      'A sound plays each time this spell procs. Turn the icon, crescents and ground ring off to have the sound alone announce it.',
+    // The alternative notification channels a proc can be routed to, alongside or
+    // instead of the on-screen aura.
+    readyGlow: 'Hotbar Glow',
+    readyGlowHint: 'Lights this spell on your action bar while its buff is up.',
+    reticleTick: 'Reticle Tick',
+    reticleTickHint: 'Adds a mark near the centre of the screen that lights when this spell procs.',
+    haptic: 'Rumble',
+    hapticNone: 'Off',
+    hapticHint:
+      'Vibrates a connected controller, or your phone. Ignored where the device has no haptics.',
+    haptics: {
+      tap: 'Tap',
+      double: 'Double',
+      long: 'Long',
+    },
+    cues: {
+      softChime: 'Soft Chime',
+      musicBox: 'Music Box',
+      glassPing: 'Glass Ping',
+      waterDrop: 'Water Drop',
+      bubblePop: 'Bubble Pop',
+      hardBell: 'Hard Bell',
+      templeGong: 'Temple Gong',
+      anvilStrike: 'Anvil Strike',
+      coinDrop: 'Coin Drop',
+      swordDraw: 'Sword Draw',
+      blaringHorn: 'Blaring Horn',
+      carKlaxon: 'Car Klaxon',
+      sonarPing: 'Sonar Ping',
+      electricZap: 'Electric Zap',
+      catMeow: 'Cat Meow',
+      owlHoot: 'Owl Hoot',
+      wolfHowl: 'Wolf Howl',
+      frogCroak: 'Frog Croak',
+      windWhoosh: 'Wind Whoosh',
+      steamHiss: 'Steam Hiss',
+    },
     procs: {
       revenge: 'Revenge!',
       battleTrance: 'Battle Trance',
@@ -2911,6 +3054,14 @@ export const hudChromeStrings = {
   // carry the real distinct forms only in the locales that need them (ru_RU). The
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
+    // The signpost guild board's live count line ({count} pre-formatted): a
+    // screen reader hears how many guilds a read (or a filter flip) produced.
+    guildBoardShown: {
+      one: '{count} guild shown',
+      few: '{count} guilds shown',
+      many: '{count} guilds shown',
+      other: '{count} guilds shown',
+    },
     // The commission board's crafter's-record counts (Masterwrought phase
     // 14): lifetime masterworks crafted and legendaries forged, off the
     // accepter's deed stat counters.
@@ -3996,7 +4147,7 @@ export const hudChromeStrings = {
         'At {health} health, Shuddering Stomp holds the raid still while Brother Aldric arrives and lights the wardstones. Every spike shatters and the floor stops burning, then Soul Rend and Deathless Rage join the Throne mechanics.',
       phaseKingsWrathName: "The King's Wrath",
       phaseKingsWrathSummary:
-        "At {health} health, Nythraxis roars in The King's Wrath and gains {bonusNormal} damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption tightens to every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic) and Gravefire to every {gravefireEveryNormal} sec ({gravefireEveryHeroic} on Heroic). Every other mechanic keeps its cadence.",
+        "At {health} health, Nythraxis roars in The King's Wrath and gains {bonusNormal} damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption tightens to every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic). Every other mechanic keeps its cadence.",
       gravebreakerName: 'Gravebreaker',
       gravebreakerSummary:
         'Every {seconds} sec, Nythraxis charges his next landed swing. His target takes only the swing itself, but everyone else within {range} yd inside the {arc} degree cone in front of him takes {splash} of that swing as Physical damage, reduced by their own armor.',
@@ -4011,11 +4162,11 @@ export const hudChromeStrings = {
         'Tanks swap at {stacks} stacks: the other tank taunts and the cursed tank stays out of the Gravebreaker cone while the stacks fade. Healers prepare the incoming tank before the swap.',
       boneSpikeName: 'Bone Spike',
       boneSpikeSummary:
-        'Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is destroyed.',
+        'Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is shattered. A spike shatters after {hitsNormal} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
       boneSpikeHeroicSummary:
-        'Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is destroyed.',
+        'Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is shattered. A spike shatters after {hitsHeroic} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
       boneSpikeResponse:
-        'Damage dealers switch to the Bone Spikes at once and destroy them to free the impaled raiders. Healers keep the impaled alive while the spikes fall.',
+        'Whoever is nearest hits the Bone Spike: a few hits from anyone shatter it, whatever they deal. Healers keep the impaled alive while the spikes fall.',
       graveEruptionName: 'Grave Eruption',
       graveEruptionSummary:
         'Every {everyNormal} sec, skeletal hands mark {countNormal} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstNormal} of maximum health as Shadow damage, then burns as Grave Flame for {flameNormal} sec, dealing {tickNormal} of maximum health every second to anyone standing in it.',
@@ -4025,9 +4176,9 @@ export const hudChromeStrings = {
         'Step out of every warning circle before it erupts and stay off the burning ground. Tanks pull Nythraxis clear of the flames so melee keeps room to work.',
       bindingSigilName: 'Binding Sigil',
       bindingSigilSummary:
-        'Every {everyNormal} sec, a sigil of the old wards flares on the floor {minDist} to {maxDist} yd from Nythraxis and he begins Deathless Ascension, gaining {ascensionNormal} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindNormal} sec he is Bound: the Ascension is purged, he is stunned for {stunNormal} sec, and he takes {vulnerability} more damage for {boundNormal} sec. Otherwise every raider takes {unboundHitNormal} of maximum health as Shadow damage and he keeps {unboundBonusNormal} more damage until the next binding.',
+        "Every {everyNormal} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionNormal} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindNormal} sec he is Bound: the Ascension is purged, he is stunned for {stunNormal} sec, and he takes {vulnerability} more damage for {boundNormal} sec. Otherwise every raider takes {unboundHitNormal} of maximum health as Shadow damage and he keeps {unboundBonusNormal} more damage until the next binding.",
       bindingSigilHeroicSummary:
-        'Every {everyHeroic} sec, a sigil of the old wards flares on the floor {minDist} to {maxDist} yd from Nythraxis and he begins Deathless Ascension, gaining {ascensionHeroic} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindHeroic} sec he is Bound: the Ascension is purged, he is stunned for {stunHeroic} sec, and he takes {vulnerability} more damage for {boundHeroic} sec. Otherwise every raider takes {unboundHitHeroic} of maximum health as Shadow damage and he keeps {unboundBonusHeroic} more damage until the next binding.',
+        "Every {everyHeroic} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionHeroic} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindHeroic} sec he is Bound: the Ascension is purged, he is stunned for {stunHeroic} sec, and he takes {vulnerability} more damage for {boundHeroic} sec. Otherwise every raider takes {unboundHitHeroic} of maximum health as Shadow damage and he keeps {unboundBonusHeroic} more damage until the next binding.",
       bindingSigilResponse:
         'The tank drags Nythraxis onto the sigil at once, through whatever fire the raid left behind. Melee follow the drag and ranged stay out of the new Gravebreaker cone. Everyone burns him while he is Bound.',
       raiseFallenName: 'Raise Fallen',
@@ -4042,20 +4193,6 @@ export const hudChromeStrings = {
         "Nythraxis marks {marksHeroic} raiders other than his current target with Soul Rend. After {fuse} sec each mark deals {damageHeroic} of its bearer's maximum health as Shadow damage, divided by the number of marked raiders within {range} yd of them. A mark that resolves alone is lethal.",
       soulRendResponse:
         'Every marked raider runs to one stack point and stands within {range} yd of the other marks before the {fuse} sec fuse ends. Healers top the group off as the marks resolve.',
-      soulfireName: 'Soulfire',
-      soulfireSummary:
-        'Every Soul Rend detonation leaves a pool of purple fire with a {radius} yd radius where each mark stood, burning for {seconds} sec at {tickNormal} of maximum health every second. Standing where pools overlap takes a tick from each one. Pools never form within {clearance} yd of a wardstone.',
-      soulfireHeroicSummary:
-        'Every Soul Rend detonation leaves one pool of purple fire with a {radius} yd radius per stacked group of marks, burning for {secondsHeroic} sec at {tickHeroic} of maximum health every second. Standing where pools overlap takes only one tick, never stacked copies. Pools never form within {clearance} yd of a wardstone.',
-      soulfireResponse:
-        'Move out of the purple pool as soon as the marks detonate. Keep the next stack point clear of active fire.',
-      gravefireName: 'Gravefire',
-      gravefireSummary:
-        'Every {everyNormal} sec, a line of violet grave-fire runs from Nythraxis toward a raider, growing {speed} yd every second to {length} yd. Each yard burns for {burnNormal} sec and deals {tickNormal} of maximum health every second to anyone standing in it.',
-      gravefireHeroicSummary:
-        'Every {everyHeroic} sec, a line of violet grave-fire runs from Nythraxis toward a raider, growing {speed} yd every second to {length} yd. Each yard burns for {burnHeroic} sec and deals {tickHeroic} of maximum health every second to anyone standing in it.',
-      gravefireResponse:
-        'Sidestep the line as it comes: it is narrow and never turns. Ranged raiders keep moving instead of standing in one spot.',
       deathlessRageName: 'Deathless Rage',
       deathlessRageSummary:
         'Every {every} sec, Nythraxis casts Deathless Rage for {cast} sec. While he casts, each lit wardstone can be channeled by one raider for {channel} sec. If three different raiders each complete a wardstone before the cast ends, the Rage is interrupted and Nythraxis is stunned for {stun} sec. Otherwise every raider takes {damageNormal} of maximum health as Shadow damage.',
@@ -4070,14 +4207,14 @@ export const hudChromeStrings = {
         "Tanks pick up Aldren and turn his cleave away from the raid. Stun or silence Malric the moment Malric's Mending begins and kill him first, then root or stun Voss off the healers, since he cannot be taunted, and finish him next.",
       kingsWrathName: "King's Wrath",
       kingsWrathSummary:
-        'Nythraxis deals {bonusNormal} more damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption occurs every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic) and Gravefire every {gravefireEveryNormal} sec ({gravefireEveryHeroic} on Heroic).',
+        'Nythraxis deals {bonusNormal} more damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption occurs every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic).',
       kingsWrathResponse:
         'Use remaining defensive cooldowns for unavoidable damage. Keep every earlier mechanic clean while the raid finishes the fight.',
       boneStormName: 'Bone Storm',
       boneStormSummary:
-        "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. He casts Bone Spike {spikeAt} sec into the storm, then Gravebreaker re-arms {rearm} sec after it ends.",
+        "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. The first slam of each storm hits for {openingSlamNormal} instead. Gravebreaker re-arms {rearm} sec after the storm ends.",
       boneStormHeroicSummary:
-        "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. He casts Bone Spike {spikeAt} sec into the storm, then Gravebreaker re-arms {rearm} sec after it ends.",
+        "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. The first slam of each storm hits for {openingSlamHeroic} instead. Gravebreaker re-arms {rearm} sec after the storm ends.",
       boneStormResponse:
         'Spread out and keep running from Nythraxis. The charged raider runs away while everyone else leaves room around the charge path, then tanks pick him up when the storm ends.',
       crownEnduresName: 'The Crown Endures',
@@ -4150,6 +4287,9 @@ export const hudChromeStrings = {
       'Your next spell from the other elemental school grants Elemental Convergence',
     hunterFerocity: '{stacks} Pack Ferocity: your pet deals {pct}% more damage',
     cooldownCap: '{used} of {cap} sec of cooldown reduction used in this window',
+    // wordy (M16): filled in the five non-Latin locales in this change.
+    bruinRushWindow:
+      'Cat Form costs no mana and Pins your Bruin Rush target, slowing it by {pct}% for {sec} sec',
     funeralHarvestLock: 'Funeral Harvest cannot create another Soul Fragment yet',
     leadenHexLock: 'Leaden Hex cannot root this target again yet',
     forbiddenReflectionReady: 'Your next eligible Warlock cooldown can be cast again',
@@ -4223,7 +4363,7 @@ export const hudChromeStrings = {
     moontide:
       'Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3',
     oldBlood:
-      'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form',
+      'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
     verdance:
       'Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom',
     freeExecute: 'Your next eligible execute ability costs nothing',
@@ -4294,7 +4434,11 @@ export const hudChromeStrings = {
       'Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana',
     stealth: 'Concealed; movement speed reduced by {pct}%',
     formBear: 'Bruin Form: increased health and armor',
-    formCat: 'Wolf Form: melee damage and energy',
+    // wolfForm replaced formCat when the Cat Form mobility pass added the
+    // resolved {pct} (a reword is a new key: the old rows were retired). The
+    // key name predates the Cat Form rename; the English follows the rename
+    // and the overlays are on the release-time fill list.
+    wolfForm: 'Cat Form: melee damage and energy; movement speed increased by {pct}%',
     formTravel: 'Fleet Form: movement speed increased by {pct}%',
     formFireball: 'Ember Form: movement speed increased by {pct}%; attacks and spells are disabled',
     formMoonkin:
@@ -4453,6 +4597,35 @@ export const hudChromeStrings = {
     // is the VALUE (no wrapper added in code), so a locale owns its own shape.
     // Wordy (M16), so the five non-Latin fills ship in this same change.
     pledgeTag: 'Pledge of {guild}',
+    // The functional role line under an NPC's name (src/sim/npc_role.ts): the
+    // classic `<Weapon Vendor>` tag that says what the NPC DOES, drawn on the
+    // same line a player's `<Guild>` uses. The wrapper is the VALUE (the
+    // cheaterTag precedent) so a locale owns its own brackets; {role} is one of
+    // the npcRole.* labels below, or the authored flavor title when an NPC has
+    // no functional role. Wordy (M16): the five non-Latin fills ship here too.
+    npcRoleTag: '<{role}>',
+    npcRole: {
+      auctioneer: 'Auctioneer',
+      banker: 'Banker',
+      riftForgemaster: 'Rift Forgemaster',
+      cardMaster: 'Card Master',
+      crucibleQuartermaster: 'Crucible Quartermaster',
+      heroicQuartermaster: 'Heroic Quartermaster',
+      pvpVendor: 'PvP Vendor',
+      weaponsmithTrainer: 'Blacksmithing Trainer',
+      cookingTrainer: 'Cooking Trainer',
+      tailoringTrainer: 'Tailoring Trainer',
+      engineeringTrainer: 'Engineering Trainer',
+      leatherworkingTrainer: 'Leatherworking Trainer',
+      alchemyTrainer: 'Alchemy Trainer',
+      weaponVendor: 'Weapon Vendor',
+      armorVendor: 'Armor Vendor',
+      armsDealer: 'Arms Dealer',
+      foodVendor: 'Food & Drink Vendor',
+      potionVendor: 'Potion Vendor',
+      stableMaster: 'Stable Master',
+      generalGoods: 'General Goods',
+    },
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}
@@ -4888,6 +5061,16 @@ export const hudChromeStrings = {
     quantityAria: 'Units from {source}, up to {count}',
     decreaseAria: 'Decrease units from {source}',
     increaseAria: 'Increase units from {source}',
+    // The bag-stack step buttons beside each row's +/- pair ({count} is the
+    // stack size, twenty for every material today).
+    decreaseByAria: 'Decrease units from {source} by {count}',
+    increaseByAria: 'Increase units from {source} by {count}',
+    // The picker's one-press whole-stack move (every row to its full count,
+    // then the same confirm as "Move selected units").
+    moveAll: 'Move all units',
+    // Second summary line when the destination's live ceiling (the vault's
+    // per-material headroom) is below the stack; the rows cap their total at it.
+    fits: 'Up to {units} fit right now',
   },
   // Purpose hints for the eight enchanting materials
   // (src/ui/hud/professions/material_hint_view.ts), keyed by item id there. Each says what the
@@ -4903,6 +5086,15 @@ export const hudChromeStrings = {
     // One key shared by every raw fishing catch (RAW_COOKING_CATCH_IDS): cooking
     // reagents only; never edible raw. Painted via createTooltipLine, not the
     // materialHintLine HTML-string path.
+    // One key shared by the twelve farm fine twins (content/farm_crops.ts
+    // fineProduceItemId), the farming counterpart of fineGrade above. Written
+    // from the live mechanic (src/sim/professions/farming.ts harvest roll:
+    // FARM_FINE_CHANCE_BASE plus the skill scale, and the charged Artisan's
+    // Eye bump). The second sentence is the rule stated beside fine_vale_wheat
+    // in content/items.ts: no substitution in either direction, unlike the
+    // node grades.
+    fineFarmGrade:
+      "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
     cookingCatch: 'Cooking ingredient. Must be cooked before eating.',
     // Profession affinity for honest materials (material_profession_hint_view.ts).
     // {crafts} is a locale-aware conjunction list of localized craft names
@@ -5310,6 +5502,23 @@ export const hudChromeStrings = {
     subtitle: 'Guilds of the realm',
     rosterTitle: 'View the roster of {guild}',
     back: 'Back',
+    // The category filter strip above the ranking (one tick box per
+    // category, src/sim/guild_board_category.ts) and the row chip a guild
+    // that opted in wears; the Proving Shore signpost opens with the box
+    // ticked. filterEmpty + showAll are the filtered board's empty state.
+    filters: 'Board filters',
+    newPlayerFriendly: 'New player friendly',
+    newPlayerFriendlyTitle: 'This guild welcomes new players',
+    filterNewPlayersTitle: 'Show only guilds that welcome new players',
+    filterEmpty: 'No guild has opened its doors to new players yet.',
+    showAll: 'Show all guilds',
+    // The live "officers online" dot beside a guild name: the legend in the
+    // filter strip, the tooltip title, and the dot's accessible name
+    // ({names} is a localized list of "Name (Rank)" entries).
+    officersOnline: 'Officers online',
+    officersOnlineLabel: 'Officers online: {names}',
+    // One entry of that list: the officer's name and localized rank.
+    officerEntry: '{name} ({rank})',
     // The 'listings' arm of the noticeboard event opens the signpost popup
     // (src/ui/noticeboard_popup.ts). Guild names and notes are world data,
     // spliced verbatim like player names, never translated.
@@ -5409,6 +5618,10 @@ export const hudChromeStrings = {
     withdrawQuantityTitle: 'Withdraw {item}',
     withdrawQuantityInput: 'Quantity to withdraw',
     withdrawQuantityConfirm: 'Withdraw',
+    // The vault withdraw prompt's bag-stack step buttons ({count} is the
+    // item's stack size); their visible text is the signed number itself.
+    quantityStepDownAria: 'Decrease the quantity by {count}',
+    quantityStepUpAria: 'Increase the quantity by {count}',
     // The vault row's accessible ACTION name (its aria-label). Same English as
     // withdrawQuantityTitle on purpose, but a distinct key: that one titles the
     // quantity PROMPT, and rewording a dialog title must not silently rename
@@ -5731,6 +5944,31 @@ export const hudChromeStrings = {
     // Blocked also stops whispers, invites and mail. (Neither is the admin mute.)
     ignoredTab: 'Ignored',
     blockedTab: 'Blocked',
+    // The Who tab: the realm's online roster as a searchable, sortable table
+    // (the classic /who command's home in the UI; typing /who opens it). The
+    // search runs server-side over name, zone, and guild; the class chip and
+    // the column sort are local. {total} is the uncapped match count, {shown}
+    // the rows on screen after the class chip, {delivered} the server's cap.
+    // Wordy, M16: the five non-Latin fills land in this same change.
+    who: {
+      tab: 'Who',
+      searchPlaceholder: 'Name, zone, or guild',
+      search: 'Search',
+      loading: 'Asking the realm who is online...',
+      empty: 'No players match.',
+      count: '{total} online',
+      countFiltered: '{shown} of {total} online',
+      capped: 'Showing the first {delivered}. Narrow the search to see the rest.',
+      classFilter: 'Filter by class',
+      allClasses: 'All classes',
+      colStatus: 'Status',
+      colName: 'Name',
+      colLevel: 'Level',
+      colClass: 'Class',
+      colZone: 'Zone',
+      colGuild: 'Guild',
+      sortTitle: 'Sort by {column}',
+    },
     ignoredEmpty: 'You are not ignoring anyone.',
     blockedEmpty: 'You have not blocked anyone.',
     blockSearchPlaceholder: 'Player name',
@@ -5974,6 +6212,10 @@ export const hudChromeStrings = {
         farming: 'Works from your bags when you plant a crop bed.',
       },
       speed: 'Gathers faster at nodes below tier {tier}.',
+      // Rides directly under the "Requires {craft} {skill}" line on every
+      // land tool above tier 1: the wield gate degrades an unearned tool to
+      // the best tier the counter allows rather than refusing it outright.
+      wieldDegrade: 'Below that skill it still works as a lower-tier tool.',
       rodRequired: 'Required to fish.',
       rodBite: 'Fish bite up to {seconds}s sooner.',
       rodReel: 'Extends the reel window by {seconds}s.',
@@ -6361,7 +6603,7 @@ export const hudChromeStrings = {
   },
   enchantDescription: {
     enchant_weapon_lastflame_zeal:
-      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Each hand has its own buff; repeated triggers refresh that hand. Ranged attacks do not trigger this effect. Wolf Form uses its 1 sec base swing speed instead.",
+      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
   },
   // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair
@@ -6540,6 +6782,20 @@ export const hudChromeStrings = {
   },
   // Crafting window (#1127): the minimal common-tier crafting action, one row
   // per known recipe, a Craft button enabled only when every reagent is held.
+  // The pinned-recipe HUD tracker (#recipe-tracker) and the crafting window's
+  // pin chip that fills it. The collapsed tally reuses hudChrome.questTracker.count.
+  recipeTracker: {
+    trackerLabel: 'Recipes',
+    collapseHint: 'Collapse recipe tracker',
+    expandHint: 'Expand recipe tracker',
+    pin: 'Pin',
+    unpin: 'Unpin',
+    pinFull: 'The recipe tracker is full (up to {cap} recipes)',
+    pinAria: 'Pin {name} to the HUD tracker',
+    unpinAria: 'Unpin {name} from the HUD tracker',
+    haveNeed: '{have}/{need}',
+    resultCount: '{name} x{count}',
+  },
   crafting: {
     title: 'Crafting',
     close: 'Close crafting',
@@ -6595,6 +6851,13 @@ export const hudChromeStrings = {
     // fine-substitution suffix above. Rendered only while the world reports
     // vault draw available here (craftVaultStock non-null).
     reagentVaultDraw: '(draws {count} from your vault)',
+    // The ordinary-grade note (the Bronze Hoe report, "doesn't recognize
+    // that I am holding wheat"): appended to an UNSATISFIED reagent line when
+    // the recipe asks for a fine grade and the player holds its plain twin.
+    // A fine reagent is never met by the ordinary grade (one-directional for
+    // node grades, no substitution at all for farm produce), and the bare
+    // 0/4 said nothing about why. {name} is the ordinary twin's localized name.
+    reagentOrdinaryHeld: '({name} held: {count}, but only the fine grade counts here)',
     // The place-blocked note (Phase 04 QA): rendered once at the top of the
     // recipe list when the world reports vault draw BLOCKED here
     // (craftVaultStock null: an instanced context) AND some reagent row is
@@ -6983,8 +7246,8 @@ export const hudChromeStrings = {
     // it: how a piece becomes Perfected is the Perfecting stage's own copy.
     notPerfected: 'Only a Perfected item can bear that enchant.',
     enchantSkillTooLow: 'Your Enchanting skill is too low for that enchant.',
-    // Riftbound bands are forge-only (rift/band_ladder.ts); the enchanting
-    // profession refuses them by id.
+    // Retired deny: bands take ring enchants now (rift/progression.ts). The
+    // string stays so an older server's rift_gear reply still renders.
     riftGear: 'Riftbound bands take Rift gems, not enchants.',
     replaceTag: 'Replaces {enchant}',
     sameEnchantTag: 'Already applied',
@@ -7324,6 +7587,9 @@ export const hudChromeStrings = {
     roleDps: 'Damage',
     freeRoles: 'Any roles welcome',
     lockoutDaily: 'Daily lockout on the final boss',
+    // The Ignivar raid rooms lock on the weekly reset, one lock per boss room
+    // (wordy, M16: the five non-Latin fills land in this same change).
+    lockoutWeekly: 'Weekly lockout on each boss',
     lockoutNone: 'No lockout',
     lockedFor: 'Locked for about {minutes} min',
     attunement: 'Requires attunement: {quest}',
@@ -7337,6 +7603,8 @@ export const hudChromeStrings = {
     lootMaybe: 'At most one of these may drop:',
     lootChance: 'Additional chance drops:',
     lootHeroic: 'Heroic bonus, one of these always drops:',
+    lootHeroicMaybe: 'Heroic bonus, at most one of these may drop:',
+    lootHeroicChance: 'Heroic bonus, additional chance drops:',
     pct: '{pct}%',
     blockedLevel: 'Levels {min} to {max} only',
     blockedSpec: 'Requires a specialization',
@@ -7401,22 +7669,49 @@ export const hudChromeStrings = {
       sealbreak_shockwave: 'Sealbreak Shockwave (area burst)',
       gravebreaker: 'Gravebreaker (frontal cone, face it away from the raid)',
       raise_fallen: 'Raise Fallen (periodic waves of adds)',
-      soul_rend: 'Soul Rend (marked players stack together, then leave the fire)',
+      soul_rend: 'Soul Rend (marked players stack together to split the damage)',
       deathless_rage: 'Deathless Rage (interrupted at the wardstones)',
       wardstones: 'Wardstone channels (phase transition)',
       // The swap point spelled here is pinned to NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS
       // by tests/nythraxis_callout.test.ts (the finder chips take no values).
       dread_curse: 'Dread Curse (stacking tank-swap debuff, swap at 2 stacks)',
-      bone_spike: 'Bone Spike (impaled raiders drain until the spike is destroyed)',
+      bone_spike:
+        'Bone Spike (impaled raiders drain until anyone shatters the spike with a few hits)',
       grave_eruption: 'Grave Eruption (warning circles that leave burning ground)',
       binding_sigil: 'Binding Sigil (drag the boss onto the sigil or the raid pays)',
-      gravefire: 'Gravefire (a traveling line of fire to sidestep)',
-      soulfire: 'Soulfire (Soul Rend detonations leave burning pools)',
       kings_wrath: "King's Wrath (30%: permanent damage bonus, faster floor hazards)",
       bone_storm: 'Bone Storm (he ignores threat, whirls, and charges the raid)',
       crown_endures: 'The Crown Endures (hard enrage at 6:00, heroic 5:00)',
       deathless_court:
         'The Deathless Court (heroic only, the royal court rises after Deathless Rage)',
+      bloodmane_rend: 'Bloodmane Rend (bleed, watch for target swaps)',
+      tusk_sweep: 'Tusk Sweep (frontal cleave)',
+      ancestral_sap: 'Ancestral Sap (heals its allies)',
+      call_of_the_hunt: 'Call of the Hunt (hastens nearby allies)',
+      thickhide_ward: 'Thickhide Ward (shields nearby allies)',
+      beast_pit_quake: 'Beast Pit Quake (area damage)',
+      wildheart_pulse: 'Wildheart Pulse (pulsing area damage)',
+      jaguar_roar: 'Jaguar Roar (knockback)',
+      // Crucible of the Last Spring (docs/prd/ignivar-raid.md), Ignivar then
+      // Varkhul; each names the live mechanic and the one response it asks for.
+      brand_of_the_pyre: 'Brand of the Pyre (stacking fire mark, wash it off in conduit water)',
+      forge_strike: 'Forge Strike (stacking tank-swap debuff)',
+      rain_of_cinders: 'Rain of Cinders (three fire cones, stand between them)',
+      falling_cinders: 'Falling Cinders (meteor circles on players, move out)',
+      revolving_inferno: 'Revolving Inferno (rotating fire rays, move through the gaps)',
+      forge_wave: 'Forge Wave (expanding fire wall, use the two safe lanes)',
+      apocalypse_add: 'Ignivar Ashcaller (priority add casting Apocalypse, kill it fast)',
+      judgment_of_the_forge: 'Judgment of the Forge (intermission, share the one safe refuge)',
+      last_inferno: 'Last Inferno (45-second burn at 20% health)',
+      chains_of_the_forge: 'Chains of the Forge (heroic only, stay close to your linked partner)',
+      makers_brand: "Maker's Brand (stacking tank-swap debuff)",
+      forgefathers_sweep: "Forgefather's Sweep (wide frontal cone at a non-tank)",
+      tempering_ray: 'Tempering Ray (line to a marked player, intercept it)',
+      cinder_orbs: 'Cinder Orbs (marked players spread to the room edges)',
+      forgestorm: 'Forgestorm (falling meteor circles, move out)',
+      shared_pyre: 'Shared Pyre (gathering circle, split the damage)',
+      anvils_decree: "Anvil's Decree (three raid-wide hammer strikes, heal through)",
+      masters_assembly: "The Master's Assembly (block the forge beams, rotate blockers)",
     },
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,
@@ -7494,6 +7789,14 @@ export const hudChromeStrings = {
     // slot would invalidate every shipped overlay fill, so the two meanings
     // coexist and this note is the guard.
     firstFindClears: 'First found on clear {count}',
+    // The account-wide Reliquary (src/sim/account_ledger.ts): which characters
+    // on the account found the relic (owned-cell tooltip), and the summary
+    // band's scope disclosure beside the count.
+    foundBy: 'Found by {names}',
+    finderWithDate: '{name} ({date})',
+    sharedScopeNote: 'Shared by every character on your account',
+    // The note's tooltip (the wording is jgyy's accountWideHint from PR #3933).
+    sharedScopeHint: 'A relic found by any character on your account fills the page here too.',
     unlockToast: 'Relic catalogued: {name}',
     illuminateBanner: 'Page illuminated: {name}',
     illuminateToast: 'Every relic on {name} is filled.',
@@ -7709,6 +8012,15 @@ export const hudChromeStrings = {
     progressAria: 'Progress: {current} of {target}',
     renownChip: '{renown} Renown',
     earnedDate: 'Earned {date}',
+    // The account-wide Book (src/sim/account_ledger.ts): which characters on
+    // the account earned the deed, each with its earn date where one is
+    // recorded (deeds_window.ts card foot), and the summary band's scope
+    // disclosure (the ranked-surface rule: a re-scoped count names its scope).
+    earnedBy: 'Earned by {names}',
+    earnerWithDate: '{name} ({date})',
+    accountScopeNote: 'Shared by every character on your account',
+    accountScopeHint:
+      'A deed any character on your account accomplishes is earned here too, and the Book names who earned it.',
     featRibbon: 'Feat',
     hiddenBadge: 'Hidden',
     titleChip: 'Title reward',
