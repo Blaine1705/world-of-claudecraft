@@ -158,14 +158,13 @@ export function renderLinkBenchReport(payload) {
     lines.push(
       'Unequal repetitions mean the backend returns from the link before its work is done; read the cost column with care.',
       '',
-      '| repetition | sum ms | Standard median ms |',
+      '| repetition | sum ms | median ms (Standard programs when the corpus names them, else all) |',
       '|---|---|---|',
     );
     for (let rep = 0; rep < repCount; rep++) {
       const all = rows.map((r) => r.linkMsByRep[rep] ?? 0);
-      const standard = rows
-        .filter((r) => r.kind === 'STANDARD')
-        .map((r) => r.linkMsByRep[rep] ?? 0);
+      const named = rows.filter((r) => r.kind === 'STANDARD');
+      const standard = (named.length ? named : rows).map((r) => r.linkMsByRep[rep] ?? 0);
       lines.push(`| ${rep} | ${ms(all.reduce((a, b) => a + b, 0))} | ${ms(median(standard))} |`);
     }
   }
