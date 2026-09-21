@@ -40,8 +40,13 @@ export function lootQualityWeapon(
   item: ItemDef,
   instance?: ItemInstancePayload,
 ): WeaponInfo | undefined {
+  // Tier first: recalcPlayerStats asks this for both hands on every aura
+  // change, and an ordinary copy (no descriptor) is the authored weapon line,
+  // so it never pays for the item-level lookup (the lootQualityBonuses order).
+  const tier = lootQualityTier(instance);
+  if (!tier) return item.weapon;
   const level = itemLevel(item);
   return level && isEligibleLootQualityItem(item)
-    ? qualityWeaponAtLevel(item, lootQualityTier(instance), level)
+    ? qualityWeaponAtLevel(item, tier, level)
     : item.weapon;
 }
