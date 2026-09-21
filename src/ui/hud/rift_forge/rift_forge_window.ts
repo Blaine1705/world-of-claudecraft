@@ -1,4 +1,3 @@
-import { lootQualityAriaName, lootQualityBadgeHtml } from '../../loot_quality_view';
 // The Rift Forge window: the Riftwright's service (upgrade / socket a
 // Riftbound band) as a thin cold painter over rift_forge_view.ts. Opened by
 // the sim's riftForge interaction event, never a menu button: the forge lives
@@ -29,6 +28,7 @@ import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { iconDataUrl } from '../../icons';
 import { compareStatLabelKey } from '../../item_affix_tooltip';
 import { itemNameColor } from '../../item_name_color';
+import { lootQualityAriaName, lootQualityBadgeHtml } from '../../loot_quality_view';
 import { svgIcon } from '../../ui_icons';
 import { buildRiftForgeView, type RiftForgeRingRow } from './rift_forge_view';
 

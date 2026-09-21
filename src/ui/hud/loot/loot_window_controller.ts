@@ -1,6 +1,7 @@
 import type { corpseLootAvailability } from '../../../game/corpse_loot_availability';
 import { HARVEST_BODY_RANGE, pickHarvestBody } from '../../../game/harvest_body_pick';
 import { ITEMS } from '../../../sim/data';
+import { lootQualityTier } from '../../../sim/loot_quality';
 import type { ItemInstancePayload } from '../../../sim/types';
 import { dist2d, type Entity, type ItemDef } from '../../../sim/types';
 import type { CorpseHarvestInfo, IWorld, WorldInteractionOutcome } from '../../../world_api';
@@ -120,10 +121,12 @@ type CorpseFocus =
  *  the loot rows. Two snapshots with the same digest paint the same body, so the
  *  per-frame refresh compares this and rewrites nothing while it holds. Text is
  *  deliberately NOT part of it (the repaint-signature idiom); a language switch
- *  reaches the body through relocalize() instead. */
+ *  reaches the body through relocalize() instead. A copy's payload contributes
+ *  only its quality tier, the one per-copy fact a row renders, so an incidental
+ *  payload change never forces a body rebuild mid-refresh. */
 function corpseAvailabilitySignature(availability: CorpseAvailability): string {
   const items = availability.visibleItems.map(
-    (stack) => `${stack.itemId}:${stack.count}:${JSON.stringify(stack.instance ?? null)}`,
+    (stack) => `${stack.itemId}:${stack.count}:${lootQualityTier(stack.instance)}`,
   );
   return `${availability.hasLoot ? 'L' : '-'}${availability.harvestable ? 'H' : '-'}|${availability.visibleCopper}|${items.join(',')}`;
 }
@@ -774,7 +777,7 @@ export class LootWindowController {
         ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(stack.count, { maximumFractionDigits: 0 }) }))}`
         : '';
     const qualityClass = item?.kind === 'quest' ? 'q-quest' : `q-${item?.quality ?? 'common'}`;
-    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}${lootQualityBadgeHtml(stack.instance)}<span class="loot-item-name ${qualityClass}">${esc(item ? itemDisplayName(item) : stack.itemId)}${count}</span></div>`;
+    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}${lootQualityBadgeHtml(stack.instance, { labelled: true })}<span class="loot-item-name ${qualityClass}">${esc(item ? itemDisplayName(item) : stack.itemId)}${count}</span></div>`;
   }
 
   private attachItemTooltips(items: readonly LootWindowItemStack[]): void {

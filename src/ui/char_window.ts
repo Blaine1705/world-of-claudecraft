@@ -568,7 +568,7 @@ export class CharWindow {
     const mwChip = item?.masterwrought
       ? ` <span class="equip-mw-chip" role="img" aria-label="${esc(t('hudChrome.masterwrought.pieceMark'))}"></span>`
       : '';
-    row.innerHTML = `<span class="equip-quality-socket">${icon}${parts?.qualityBadge ?? ''}</span>
+    row.innerHTML = `<span class="equip-quality-socket">${icon}${parts?.qualityBadgeLabelled ?? ''}</span>
         <div><div class="slot-name">${esc(this.deps.slotName(slot))}${mwChip}</div><div class="slot-item" style="color:${qColor}">${wornName !== null ? esc(wornName) : esc(t('itemUi.equipment.empty'))}</div></div>`;
     // The helmet-visibility eye (head socket only): a standing wardrobe control,
     // so unlike the corner x it is always visible, and it rides the socket

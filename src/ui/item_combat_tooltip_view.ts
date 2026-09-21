@@ -14,12 +14,16 @@ export function itemCombatTooltipLines(item: ItemDef, instance?: ItemInstancePay
     if (bonuses[key]) stats[key] = (stats[key] ?? 0) + bonuses[key];
   }
   const resolved = { ...item, stats };
+  // Every lane qualityBonusesAtLevel emits, so the Warfare line (the lower of
+  // the two PvP ratings) resolves like combat does in recalcPlayerStats.
   for (const key of [
     'spellPower',
     'healPower',
     'hitRating',
     'critRating',
     'hasteRating',
+    'pvpOffenseRating',
+    'pvpDefenseRating',
   ] as const) {
     const bonus = bonuses[key === 'healPower' ? 'healingPower' : key];
     if (bonus) resolved[key] = (item[key] ?? 0) + bonus;

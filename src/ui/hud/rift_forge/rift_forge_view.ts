@@ -1,4 +1,3 @@
-import { lootQualityItemLevelBonus } from '../../../sim/loot_quality';
 // The Rift Forge window's pure view-core: the player's bags and worn slots in,
 // one row per Riftbound band out, with every affordance already decided (the
 // band's item level now and after the next essence upgrade, whether that
@@ -20,6 +19,7 @@ import {
   type RiftGemId,
 } from '../../../sim/content/rift/items';
 import type { PlayerEquipmentInstances } from '../../../sim/entity';
+import { lootQualityItemLevelBonus } from '../../../sim/loot_quality';
 import {
   RIFT_GEM_RATING,
   RIFT_GEM_RATING_STAT,

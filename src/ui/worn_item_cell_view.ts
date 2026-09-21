@@ -22,7 +22,13 @@ export interface WornItemCellParts {
   /** The chosen legendary name when the copy carries one, else the def's
    *  localized display name. Player-authored when it is the former: esc it. */
   name: string;
+  /** Decorative (aria-hidden) quality badge for a cell whose accessible name
+   *  is `ariaName` (bags, banks, vendor, market rows): one channel per surface. */
   qualityBadge: string;
+  /** The same badge carrying its own accessible label, for a standalone chip
+   *  (mail, trade, market pick and collect rows, paperdoll and inspect rows)
+   *  where nothing else names the quality. */
+  qualityBadgeLabelled: string;
   ariaName: string;
   /** The copy's effective quality (the rolled override narrowed to a known
    *  tier, else the def's), the value the icon rim and the label share. */
@@ -42,6 +48,7 @@ export function wornItemCellParts(
   return {
     name: instance?.name ?? itemDisplayName(item),
     qualityBadge: lootQualityBadgeHtml(instance ?? undefined),
+    qualityBadgeLabelled: lootQualityBadgeHtml(instance ?? undefined, { labelled: true }),
     ariaName: lootQualityAriaName(instance?.name ?? itemDisplayName(item), instance ?? undefined),
     quality,
     color: QUALITY_COLOR[quality ?? 'common'] ?? QUALITY_COLOR.common,

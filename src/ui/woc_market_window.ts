@@ -1,4 +1,3 @@
-import { lootQualityAriaName } from './loot_quality_view';
 // The $WOC Exchange window (docs/prd/woc/marketplace.md): a COLD window on
 // the leaderboard pattern (async data behind a renderSeq epoch, no driver of
 // its own; Hud.update()'s slow band polls refreshIfChanged, which rebuilds
@@ -38,6 +37,7 @@ import type { TranslationKey } from './i18n';
 import { formatDateTime, formatDuration, formatNumber, t, tPlural } from './i18n';
 import { iconDataUrl } from './icons';
 import { itemNameColor } from './item_name_color';
+import { lootQualityAriaName } from './loot_quality_view';
 import { createNativeSelectHold, type NativeSelectHold } from './native_select_hold';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';

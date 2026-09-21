@@ -4,7 +4,7 @@ import { emitInventoryReceipt } from '../src/sim/inventory_receipt';
 import { activeItemInstanceStats } from '../src/sim/item_instance_stats';
 import { lootQualityBonuses, lootQualityWeapon } from '../src/sim/loot_quality';
 import { createRiftGearInstance } from '../src/sim/rift/progression';
-import type { ItemInstancePayload, SimEvent } from '../src/sim/types';
+import type { ItemDef, ItemInstancePayload, SimEvent } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { t } from '../src/ui/i18n';
 import { itemCombatTooltipLines } from '../src/ui/item_combat_tooltip_view';
@@ -21,6 +21,7 @@ import {
   lootQualityTooltipLine,
 } from '../src/ui/loot_quality_view';
 import { itemLevelReadout } from '../src/ui/rift_band_tooltip';
+import { statNameKey } from '../src/ui/stat_tooltip_view';
 import { wornItemCellParts } from '../src/ui/worn_item_cell_view';
 
 const copy = (tier: 1 | 2 | 3 | 4): ItemInstancePayload => ({
@@ -164,13 +165,25 @@ describe('permanent loot quality presentation', () => {
     ] as const) {
       const instance = copy(tier);
       expect(lootQualityName(instance)).toBe(name);
-      expect(lootQualityBadgeHtml(instance)).toContain(`aria-label="${name}"`);
-      expect(lootQualityBadgeHtml(instance)).toContain(`>${mark}</span>`);
+      // One accessible channel per surface: the labelled badge names the
+      // quality itself; the default badge is decorative and the cell's
+      // accessible name (ariaName) carries the word instead.
+      const labelled = lootQualityBadgeHtml(instance, { labelled: true });
+      expect(labelled).toContain(`role="img" aria-label="${name}"`);
+      expect(labelled).toContain(`>${mark}</span>`);
+      expect(labelled).not.toContain('ui-badge');
+      const decorative = lootQualityBadgeHtml(instance);
+      expect(decorative).toContain('aria-hidden="true"');
+      expect(decorative).not.toContain('aria-label');
+      expect(decorative).not.toContain('role=');
+      expect(decorative).toContain(`>${mark}</span>`);
       expect(lootQualityTooltipLine(instance)).toContain(`+${tier * 2} item levels`);
       const cell = wornItemCellParts(item, instance);
       expect(cell.name).toBe(itemDisplayName(item));
       expect(cell.quality).toBe(item.quality);
       expect(cell.ariaName).toContain(name);
+      expect(cell.qualityBadge).toBe(decorative);
+      expect(cell.qualityBadgeLabelled).toBe(labelled);
       expect(wornTooltipInstance(instance)?.lootQuality).toEqual(instance.lootQuality);
     }
   });
@@ -226,6 +239,42 @@ describe('permanent loot quality presentation', () => {
           (item.weapon!.min + item.weapon!.max) / 2 / item.weapon!.speed,
       );
     }
+  });
+
+  it('resolves Warfare (the lower PvP rating) per copy in the tooltip and the compare', () => {
+    // qualityBonusesAtLevel emits both PvP ratings and recalcPlayerStats applies
+    // them; the tooltip's Warfare line and the compare row must read the same
+    // resolved pair, or combat and the tooltip disagree on a rated copy. No
+    // droppable item carries the pair today, so a droppable def is given one.
+    const base = Object.values(ITEMS).find(
+      (entry) =>
+        entry.kind === 'armor' &&
+        (entry.quality === 'rare' || entry.quality === 'epic') &&
+        Object.keys(lootQualityBonuses(entry, copy(4))).length > 0,
+    )!;
+    const item = { ...base, pvpOffenseRating: 24, pvpDefenseRating: 18 } as ItemDef;
+    const instance = copy(4);
+    const bonuses = lootQualityBonuses(item, instance);
+    expect(bonuses.pvpOffenseRating).toBeGreaterThan(0);
+    expect(bonuses.pvpDefenseRating).toBeGreaterThan(0);
+    const resolvedWarfare = Math.min(24 + bonuses.pvpOffenseRating, 18 + bonuses.pvpDefenseRating);
+    expect(resolvedWarfare).toBeGreaterThan(18);
+    const warfareLine = (value: number) =>
+      t('itemUi.tooltip.stat', {
+        value: itemNumber(value),
+        stat: t(statNameKey('warfare') as never),
+      });
+    const html = itemCombatTooltipLines(item, instance);
+    expect(html).toContain(warfareLine(resolvedWarfare));
+    expect(html).not.toContain(warfareLine(18));
+    expect(itemCombatTooltipLines(item)).toContain(warfareLine(18));
+    const delta = itemStatDeltas(item, item, instance).find((row) => row.stat === 'warfare');
+    expect(delta?.delta).toBe(resolvedWarfare - 18);
+    expect(itemStatDeltas(item, item).find((row) => row.stat === 'warfare')).toBeUndefined();
+    // Combat reads the same pair through the shared stat projection.
+    const active = activeItemInstanceStats(instance, item);
+    expect(active?.pvpOffenseRating).toBe(bonuses.pvpOffenseRating);
+    expect(active?.pvpDefenseRating).toBe(bonuses.pvpDefenseRating);
   });
 
   it('keeps Rift quality separate from Essence and gem lines, with final totals', () => {

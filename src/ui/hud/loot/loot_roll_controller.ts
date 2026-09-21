@@ -498,7 +498,7 @@ export class LootRollController {
           <div class="loot-roll-copy">
             <div class="loot-roll-title ui-cin ui-muted">${esc(t('itemUi.lootRoll.title'))}</div>
             <div class="loot-roll-name ui-outline ${nameClass}" style="color:${nameColor}">${esc(itemName)}</div>
-            ${lootQualityBadgeHtml(event.instance)}
+            ${lootQualityBadgeHtml(event.instance, { labelled: true })}
             ${bindsOnPickupNoteHtml(item)}
           </div>
         </div>
@@ -544,7 +544,7 @@ export class LootRollController {
           <div class="loot-roll-copy">
             <div class="loot-roll-title ui-cin ui-muted">${esc(t('itemUi.lootRoll.title'))}</div>
             <div class="loot-roll-name ui-outline ${nameClass}" style="color:${nameColor}">${esc(itemName)}</div>
-            ${lootQualityBadgeHtml(status.instance)}
+            ${lootQualityBadgeHtml(status.instance, { labelled: true })}
           </div>
         </div>
         <div class="loot-roll-timer ui-bar" aria-hidden="true"><span class="ui-bar-fill"></span></div>
@@ -585,7 +585,7 @@ export class LootRollController {
         <div class="loot-roll-copy">
           <div class="loot-roll-title ui-cin ui-muted">${esc(t('hudChrome.masterLoot.assignPrompt', { item: itemName }))}</div>
           <div class="loot-roll-name ui-outline ${nameClass}" style="color:${nameColor}">${esc(itemName)}</div>
-          ${lootQualityBadgeHtml(event.instance)}
+          ${lootQualityBadgeHtml(event.instance, { labelled: true })}
             ${bindsOnPickupNoteHtml(item)}
         </div>
       </div>

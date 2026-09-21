@@ -6494,12 +6494,12 @@ export class Hud {
     }
     // Optional item-level readout (off by default; src/sim/item_level.ts derives it
     // from where the item drops). Read live, so toggling it takes effect on the next
-    // hover. Combat gear only: sourceless items (vendor/starter) have no level,
-    // and non-combat items never get an item-level line. A Riftbound band copy
-    // has no drop-source itemLevel (it is priced by its rift record, not its
-    // stat-free ItemDef shell), so its level/score come from itemLevelReadout
-    // (rift_band_tooltip.ts) instead of itemInstanceLevel/itemScore, which stay
-    // the source for every other piece so Crucible Perfecting's bonus level holds.
+    // hover. Combat gear only: sourceless items (vendor/starter) have no level, and
+    // non-combat items never get the line. A quality-rolled copy ALWAYS shows it
+    // (deliberate: its badge means "+N item levels", so the readout is the badge's
+    // legend, not the optional setting). A Riftbound band or quality copy is priced
+    // by its payload, not its stat-free shell, so its level/score come from
+    // itemLevelReadout; itemInstanceLevel/itemScore stay the source for the rest.
     if (
       isItemLevelEligible(item) &&
       (instance?.lootQuality || this.optionsHooks?.settings.get('showItemLevel'))

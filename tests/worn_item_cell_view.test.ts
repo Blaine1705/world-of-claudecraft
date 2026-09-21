@@ -19,6 +19,7 @@ describe('wornItemCellParts', () => {
         name: itemDisplayName(def),
         ariaName: itemDisplayName(def),
         qualityBadge: '',
+        qualityBadgeLabelled: '',
         quality: 'epic',
         color: QUALITY_COLOR.epic,
       });
@@ -36,6 +37,7 @@ describe('wornItemCellParts', () => {
       name: "Vel'tara's Oath",
       ariaName: "Vel'tara's Oath",
       qualityBadge: '',
+      qualityBadgeLabelled: '',
       quality: 'legendary',
       color: QUALITY_COLOR.legendary,
     });
@@ -49,6 +51,7 @@ describe('wornItemCellParts', () => {
       name: itemDisplayName(def),
       ariaName: itemDisplayName(def),
       qualityBadge: '',
+      qualityBadgeLabelled: '',
       quality: 'legendary',
       color: QUALITY_COLOR.legendary,
     });

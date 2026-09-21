@@ -1,4 +1,3 @@
-import { lootQualityBadgeHtml } from './loot_quality_view';
 // The Materials Vault tab of the bank window: the third pane BankWindow
 // composes, the GuildBankTab shape (a pane class with model() + renderInto(),
 // never mounted on its own and never owning a repaint decision: BankWindow's
@@ -48,6 +47,7 @@ import {
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
+import { lootQualityBadgeHtml } from './loot_quality_view';
 import { vaultMaterialWithdrawSelection } from './material_source_storage_actions';
 import {
   appendMaterialSourcesActionAfter,
@@ -384,7 +384,9 @@ export class VaultTab {
         : '';
     row.innerHTML =
       `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(itemId)}` +
-      lootQualityBadgeHtml(model.kind === 'special' ? model.instance : undefined) +
+      lootQualityBadgeHtml(model.kind === 'special' ? model.instance : undefined, {
+        labelled: true,
+      }) +
       cornerMarkHtml(cornerMark) +
       lockMarkHtml(locked) +
       `<span class="vault-row-name">${esc(name)}</span>` +

@@ -1,5 +1,3 @@
-import { itemNameColor } from './item_name_color';
-import { lootQualityBadgeHtml } from './loot_quality_view';
 // The Exchange window's small status chrome, as pure builders.
 //
 // A spinner, a loading line, a failed-reach line, the browse faces' control
@@ -20,7 +18,9 @@ import { FOCUS_KEY_ATTR } from './focus_restore';
 import { guildTagHtml } from './guild_tag';
 import { formatDateTime, formatDuration, formatNumber, t } from './i18n';
 import { ITEM_QUALITY_LABEL_KEYS, itemQualityLabel } from './item_kind_label';
+import { itemNameColor } from './item_name_color';
 import { itemSlotLabel } from './item_slot_labels';
+import { lootQualityBadgeHtml } from './loot_quality_view';
 import { svgIcon } from './ui_icons';
 import { usdDollarsText } from './usd_text';
 import { walletCardKeys } from './wallet_card_keys';
@@ -639,7 +639,7 @@ export function wocItemCellHtml(
   return (
     '<span class="wm-item">' +
     `<img class="wm-icon item-icon q-${rung}"${tag} src="${esc(icon)}" alt="" draggable="false" />` +
-    `${lootQualityBadgeHtml(instance)}<span class="wm-name"${tag} style="color: ${color}">${esc(name)}</span>` +
+    `${lootQualityBadgeHtml(instance, { labelled: true })}<span class="wm-name"${tag} style="color: ${color}">${esc(name)}</span>` +
     '</span>'
   );
 }
