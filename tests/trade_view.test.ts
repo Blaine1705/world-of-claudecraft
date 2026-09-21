@@ -206,10 +206,13 @@ describe('the counted stage on the HUD (source pins, hud.ts addItemToTrade)', ()
   });
 
   it('reports the headroom the bags prompt caps on from the same pure core', () => {
-    expect(hud).toContain(
-      'return tradeOfferHeadroom(this.stagedTrade.items, this.sim.inventory, itemId);',
+    // The bags binding reads the pure core directly (no Hud wrapper method): the
+    // coordinator sits at its monolith ceiling, so the trade-open gate and the
+    // headroom read live in the one dependency line.
+    expect(hud).toMatch(
+      /tradeOfferHeadroom: \(itemId\) =>\s*this\.tradeOpen \? tradeOfferHeadroom\(this\.stagedTrade\.items, this\.sim\.inventory, itemId\) : 0,/,
     );
-    expect(hud).toContain('tradeOfferHeadroom: (itemId) => this.tradeOfferHeadroom(itemId),');
+    expect(hud).not.toContain('tradeOfferHeadroom(itemId: string): number {');
   });
 });
 

@@ -5206,7 +5206,8 @@ export class Hud {
     closeBank: () => this.closeBank(),
     onClosed: () => this.onBagsClosed(),
     addItemToTrade: (itemId, count) => this.addItemToTrade(itemId, count),
-    tradeOfferHeadroom: (itemId) => this.tradeOfferHeadroom(itemId),
+    tradeOfferHeadroom: (itemId) =>
+      this.tradeOpen ? tradeOfferHeadroom(this.stagedTrade.items, this.sim.inventory, itemId) : 0,
     stageMarketSell: (itemId, instance) => this.marketWindow.stageSell(itemId, instance),
     stageMailParcel: (itemId, instance) => this.mailboxWindow.stageParcel(itemId, instance),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
@@ -18073,12 +18074,6 @@ export class Hud {
 
   get tradeOpen(): boolean {
     return this.sim.tradeInfo !== null;
-  }
-
-  /** The bags window's shift-click offer prompt ceiling and stale guard. */
-  tradeOfferHeadroom(itemId: string): number {
-    if (!this.tradeOpen) return 0;
-    return tradeOfferHeadroom(this.stagedTrade.items, this.sim.inventory, itemId);
   }
 
   /** Stage `count` (default 1) units; trade_view.ts clamps to the headroom. */
