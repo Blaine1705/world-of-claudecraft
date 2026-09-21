@@ -3695,6 +3695,78 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.12,
     clickRadius: 2.2,
   },
+  // The Buried Hoard (and rift) bosses with a body of their own, generated with
+  // the asset pipeline (scripts/asset_pipeline/, see CREDITS.md) instead of their
+  // family's shared model. Each atlas is authored, so none takes the entity tint.
+  // The Abyssal Maw: a four-legged abyssal angler. Tripo's quadruped rig ships a
+  // walk preset only, reused for the other slots until it gets clips of its own.
+  mob_hoard_abyssal_maw: {
+    url: `${CREATURES}/hoard_abyssal_maw.glb`,
+    height: 1.7,
+    // The Tripo rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: { idle: 'Idle', walk: 'Walk', run: 'Run', attack: ['Attack'], death: 'Death' },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Hoarfrost Warden: generated arms-down, so it rides Tripo's biped rig and its
+  // retargeted presets rather than the local KayKit rig.
+  mob_hoard_hoarfrost_warden: {
+    url: `${CREATURES}/hoard_hoarfrost_warden.glb`,
+    height: 2,
+    // The Tripo rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.2,
+  },
+  // Emberforge Tyrant, Archon Nyxaris and Tempest Vharok were generated in a
+  // T-pose and rigged locally onto the KayKit skeleton (rig-manual), so they carry
+  // the full KayKit clip vocabulary and real handslot bones.
+  mob_hoard_emberforge_tyrant: {
+    url: `${CREATURES}/hoard_emberforge_tyrant.glb`,
+    height: 2,
+    // (The locally rigged bodies carry the knight's clip library: one hit clip.)
+    clips: { ...kaykit(['2H_Melee_Attack_Chop']), hit: ['Hit_A'] },
+    attach: [{ url: `${WEAPONS}/hammer_d.glb`, bone: 'handslot.r' }],
+    authoredAtlas: true,
+    selfIllumination: 0.45,
+  },
+  // He FLOATS (the generated legs were taken out from under the robe in Blender):
+  // he hovers, and glides on his idle instead of running on legs he does not have.
+  mob_hoard_archon_nyxaris: {
+    url: `${CREATURES}/hoard_archon_nyxaris.glb`,
+    height: 1.9,
+    hover: 0.45,
+    clips: {
+      ...kaykit(['Spellcast_Shoot']),
+      hit: ['Hit_A'],
+      walk: 'Idle',
+      run: 'Idle',
+      walkBack: 'Idle',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  mob_hoard_tempest_vharok: {
+    url: `${CREATURES}/hoard_tempest_vharok.glb`,
+    height: 1.9,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Horizontal']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
   // Vysska's cocoons (src/sim/rift/hoard_cocoon.ts): the silk cocoon a wrapped
   // player stands inside, and the brood cocoon she spins for a lone player. Each
   // is the whole body of its attackable mob, so targeting, the nameplate and the
@@ -4066,6 +4138,11 @@ const MOB_KEYS: Record<string, string> = {
   // (mob_demonalt), re-tinted deep red by the templates.
   rift_pact_acolyte: 'mob_dark_caster',
   rift_boss_ritualist: 'rift_ritualist',
+  rift_boss_tide: 'mob_hoard_abyssal_maw',
+  rift_boss_frost: 'mob_hoard_hoarfrost_warden',
+  rift_boss_ember: 'mob_hoard_emberforge_tyrant',
+  rift_boss_arcane: 'mob_hoard_archon_nyxaris',
+  rift_boss_storm: 'mob_hoard_tempest_vharok',
 };
 
 const FAMILY_KEYS: Record<string, string> = {
