@@ -889,7 +889,7 @@ import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_fo
 import { renderTownFocusWindow } from './town_focus_window';
 import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
-import { tradeOfferCeiling } from './trade_view';
+import { stageTradeOffer, tradeOfferHeadroom } from './trade_view';
 import { TutorialOverlay } from './tutorial';
 import { buildFerryIslandArrivalNote, type TutorialGreetingNote } from './tutorial_greeting_view';
 import { renderTutorialGreetingNote } from './tutorial_greeting_window';
@@ -5205,7 +5205,9 @@ export class Hud {
     closeVendor: () => this.closeVendor(),
     closeBank: () => this.closeBank(),
     onClosed: () => this.onBagsClosed(),
-    addItemToTrade: (itemId) => this.addItemToTrade(itemId),
+    addItemToTrade: (itemId, count) => this.addItemToTrade(itemId, count),
+    tradeOfferHeadroom: (itemId) =>
+      this.tradeOpen ? tradeOfferHeadroom(this.stagedTrade.items, this.sim.inventory, itemId) : 0,
     stageMarketSell: (itemId, instance) => this.marketWindow.stageSell(itemId, instance),
     stageMailParcel: (itemId, instance) => this.mailboxWindow.stageParcel(itemId, instance),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
@@ -18074,15 +18076,10 @@ export class Hud {
     return this.sim.tradeInfo !== null;
   }
 
-  addItemToTrade(itemId: string): void {
-    if (!this.tradeOpen || this.stagedTrade.items.length >= 6) return;
-    const existing = this.stagedTrade.items.find((s) => s.itemId === itemId);
-    const have = tradeOfferCeiling(this.sim.inventory, itemId);
-    if (existing) {
-      if (existing.count < have) existing.count++;
-    } else {
-      this.stagedTrade.items.push({ itemId, count: 1 });
-    }
+  /** Stage `count` (default 1) units; trade_view.ts clamps to the headroom. */
+  addItemToTrade(itemId: string, count = 1): void {
+    if (!this.tradeOpen) return;
+    if (stageTradeOffer(this.stagedTrade.items, this.sim.inventory, itemId, count) < 1) return;
     this.pushTradeOffer();
   }
 
