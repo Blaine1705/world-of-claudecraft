@@ -1532,15 +1532,13 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the guild_pledge_settings dispatch arm's field
     // validation moved to server/guild_pledge_settings_cmd.ts. Merged with the
     // account-wide books extraction above; exact merged count, zero slack.
-    // LOWERED 10076 -> 9959 at the guild-bank autosave stall fix (PR #4057,
-    // the release/v0.44.0 sync): the branch's own surface was net growth (the
-    // writer-selection comments around the dirty-book autosave), paid by
-    // moving the per-session chat token bucket (consumeChatToken and
-    // refundChatToken plus their constants and session fields) to
-    // server/chat_rate_limit.ts, and the 80 lines of pre-existing slack were
-    // banked in the same step. Exact merged count, zero slack: any further
-    // growth reds again, and the fix is extraction.
-    ceiling: 9959,
+    // LOWERED 10076 -> 9948 at the v0.44 release-line reconciliation: both
+    // parents' budget reductions land together. The guild-bank autosave stall
+    // fix pinned its side at 9959 after moving the chat token bucket to
+    // server/chat_rate_limit.ts, and the target-echo fix pinned its side at
+    // 9993 after moving the input seq fold to server/input_seq.ts. Measured
+    // with wc -l < server/game.ts on the merged tree. Exact count, zero slack.
+    ceiling: 9948,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1690,7 +1688,14 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the board path builder, the page decode and the
     // pledge-settings frame decode moved to src/net/guild_board_wire.ts. Merged
     // with the book_wire extraction above; exact merged count, zero slack.
-    ceiling: 5498,
+    // LOWERED 5498 -> 5426 at the target-echo fix: the pending-target echo
+    // decision (the hold, its ack release, the valve) moved to
+    // src/net/target_echo.ts, banking the 52 lines of slack the row already
+    // carried with it. Measured with wc -l < src/net/online.ts after biome.
+    // RE-CONFIRMED at the v0.44 release-line reconciliation after trimming
+    // duplicated coordinator prose. Exact formatted count remains 5426.
+    // Exact count, zero slack.
+    ceiling: 5426,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
