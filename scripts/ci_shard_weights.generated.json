@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 3959,
+    "files": 3963,
     "harvestedFiles": 3948,
     "carried": {
       "tests/hub_dummy_drill.test.ts": {
@@ -93,6 +93,33 @@
           805
         ]
       },
+      "tests/hunter_trailbreak_arc.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          10
+        ]
+      },
+      "tests/hunter_trailbreak_terrain.test.ts": {
+        "ms": 2800,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          2800
+        ]
+      },
+      "tests/input_seq_fold.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          7
+        ]
+      },
       "tests/practice_dps_controller.test.ts": {
         "ms": 13,
         "method": "local-median",
@@ -123,6 +150,15 @@
         "runs": [
           11,
           11,
+          11
+        ]
+      },
+      "tests/target_echo_core.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
           11
         ]
       }
@@ -1683,6 +1719,8 @@
   "tests/hunter_quivers.test.ts": 2658,
   "tests/hunter_spec_loops.test.ts": 13117,
   "tests/hunter_talents.test.ts": 19344,
+  "tests/hunter_trailbreak_arc.test.ts": 10,
+  "tests/hunter_trailbreak_terrain.test.ts": 2800,
   "tests/hunter_trap.test.ts": 3458,
   "tests/hybrid_gpu_detect.test.ts": 10,
   "tests/i18n_admin_catalog.test.ts": 1054,
@@ -1786,6 +1824,7 @@
   "tests/input_controller.test.ts": 49,
   "tests/input_echo_tracker.test.ts": 7,
   "tests/input_hint_mode.test.ts": 3,
+  "tests/input_seq_fold.test.ts": 7,
   "tests/input_tick_sampler.test.ts": 14,
   "tests/inscription_catalog.test.ts": 80,
   "tests/inscription_flow.test.ts": 3934,
@@ -3690,6 +3729,7 @@
   "tests/target_dots_refresh.test.ts": 13009,
   "tests/target_dots_view.test.ts": 18,
   "tests/target_echo_client.test.ts": 50,
+  "tests/target_echo_core.test.ts": 11,
   "tests/target_flair_line_view.test.ts": 12,
   "tests/target_frame.test.ts": 14,
   "tests/target_frame_pos.test.ts": 30,
