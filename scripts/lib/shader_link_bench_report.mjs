@@ -36,6 +36,7 @@ export function summarizePrograms(results) {
     const firstMs = runs[0].ms;
     const later = runs.slice(1).map((run) => run.ms);
     const repeatMs = later.length ? median(later) : firstMs;
+    const draws = runs.map((run) => run.drawMs).filter((v) => typeof v === 'number');
     rows.push({
       base: r.base,
       variant: r.variant,
@@ -48,6 +49,12 @@ export function summarizePrograms(results) {
       firstMs,
       repeatMs,
       costMs: repeatMs,
+      // Per-repetition figures, kept because a backend that defers work makes
+      // repetitions unequal and a median would hide it.
+      linkMsByRep: runs.map((run) => run.ms),
+      firstDrawMs: draws.length ? draws[0] : null,
+      drawMedianMs: draws.length ? median(draws) : null,
+      drawErrors: runs.filter((run) => run.drawError).length,
     });
   }
   rows.sort((a, b) => b.costMs - a.costMs);
@@ -145,6 +152,43 @@ export function renderLinkBenchReport(payload) {
   lines.push(
     `| share held by the dearest 10 percent | ${pct(c.top10PercentShare)} (flat would be 10.0 %) |`,
   );
+  const repCount = Math.max(0, ...rows.map((r) => r.linkMsByRep.length));
+  if (repCount > 1) {
+    lines.push('', '## Link time per repetition (sum over the corpus)', '');
+    lines.push(
+      'Unequal repetitions mean the backend returns from the link before its work is done; read the cost column with care.',
+      '',
+      '| repetition | sum ms | Standard median ms |',
+      '|---|---|---|',
+    );
+    for (let rep = 0; rep < repCount; rep++) {
+      const all = rows.map((r) => r.linkMsByRep[rep] ?? 0);
+      const standard = rows
+        .filter((r) => r.kind === 'STANDARD')
+        .map((r) => r.linkMsByRep[rep] ?? 0);
+      lines.push(`| ${rep} | ${ms(all.reduce((a, b) => a + b, 0))} | ${ms(median(standard))} |`);
+    }
+  }
+  const drawn = rows.filter((r) => r.drawMedianMs !== null);
+  if (drawn.length) {
+    lines.push('', '## First draw after the link', '');
+    lines.push(
+      '| kind | programs | link median ms | draw median ms | link + draw sum ms | draws with a GL error |',
+      '|---|---|---|---|---|---|',
+    );
+    const drawKinds = new Map();
+    for (const r of drawn) {
+      const list = drawKinds.get(r.kind || '(other)') ?? [];
+      list.push(r);
+      drawKinds.set(r.kind || '(other)', list);
+    }
+    for (const [kind, list] of [...drawKinds].sort((a, b) => b[1].length - a[1].length)) {
+      const sum = list.reduce((a, r) => a + r.costMs + r.drawMedianMs, 0);
+      lines.push(
+        `| ${kind} | ${list.length} | ${ms(median(list.map((r) => r.costMs)))} | ${ms(median(list.map((r) => r.drawMedianMs)))} | ${ms(sum)} | ${list.reduce((a, r) => a + r.drawErrors, 0)} |`,
+      );
+    }
+  }
   const paired = pairedAblation(rows);
   if (paired.length) {
     lines.push('', '## Paired ablation (each variant against its own baseline)', '');

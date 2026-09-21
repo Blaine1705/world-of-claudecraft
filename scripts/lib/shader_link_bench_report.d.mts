@@ -2,6 +2,8 @@ export interface LinkRun {
   ms: number;
   ok: boolean;
   log?: string;
+  drawMs?: number;
+  drawError?: number;
 }
 
 export interface LinkResult {
@@ -28,6 +30,10 @@ export interface LinkRow {
   firstMs: number;
   repeatMs: number;
   costMs: number;
+  linkMsByRep: number[];
+  firstDrawMs: number | null;
+  drawMedianMs: number | null;
+  drawErrors: number;
 }
 
 export interface Concentration {

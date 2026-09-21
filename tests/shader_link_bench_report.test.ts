@@ -107,4 +107,29 @@ describe('shader link bench report', () => {
     expect(flat.savedMinMs).toBe(100);
     expect(flat.savedMaxMs).toBe(200);
   });
+
+  it('shows unequal repetitions and the draw cost a link-only figure would hide', () => {
+    const deferred = (hash: string): LinkResult => ({
+      hash,
+      name: hash,
+      kind: 'STANDARD',
+      runs: [
+        { ms: 8, ok: true, drawMs: 40, drawError: 0 },
+        { ms: 92, ok: true, drawMs: 42, drawError: 0 },
+        { ms: 8, ok: true, drawMs: 44, drawError: 1280 },
+      ],
+    });
+    const { rows } = summarizePrograms([deferred('a'), deferred('b')]);
+    expect(rows[0].linkMsByRep).toEqual([8, 92, 8]);
+    expect(rows[0]).toMatchObject({ firstDrawMs: 40, drawMedianMs: 42, drawErrors: 1 });
+    const report = renderLinkBenchReport({ results: [deferred('a'), deferred('b')], reps: 3 });
+    expect(report).toContain('| 1 | 184.0 | 92.0 |');
+    expect(report).toContain('## First draw after the link');
+    expect(report).toContain('| STANDARD | 2 | 50.0 | 42.0 | 184.0 | 2 |');
+  });
+
+  it('leaves the draw section out of a link-only run', () => {
+    const report = renderLinkBenchReport({ results: [result('a', [5, 5, 5])], reps: 3 });
+    expect(report).not.toContain('## First draw after the link');
+  });
 });

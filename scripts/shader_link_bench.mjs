@@ -22,7 +22,10 @@
 //
 // Flags: --corpus <dir> (required), --reps <n> (default 3), --limit <n> (first n
 // programs, a smoke), --angle <backend>, --headless, --port <n> (default 5189),
-// --out <dir> (default <corpus>/link-bench-<id>). BROWSER_PATH overrides the
+// --out <dir> (default <corpus>/link-bench-<id>), --draw (after each link, draw
+// one triangle with the program and read a pixel back, timed apart: a backend
+// that defers work past LINK_STATUS, ANGLE Vulkan's pipeline creation or ANGLE
+// D3D11's draw-time variants, pays it there, and a link-only figure hides it). BROWSER_PATH overrides the
 // browser. Runs on Windows, Linux and macOS; no dev server, no game.
 //
 // Output: results.json (every timing, link status, the GL strings of the
@@ -45,6 +48,7 @@ function parseArgs(argv) {
     headless: false,
     port: 5189,
     out: null,
+    draw: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -56,6 +60,7 @@ function parseArgs(argv) {
     else if (a === '--headless') args.headless = true;
     else if (a === '--port') args.port = Number(next());
     else if (a === '--out') args.out = next();
+    else if (a === '--draw') args.draw = true;
     else throw new Error(`unknown flag ${a}`);
   }
   if (!args.corpus) throw new Error('--corpus <dir> is required');
@@ -87,7 +92,7 @@ function serveCorpus(corpusDir, port) {
 
 // Runs in the page. One program, `reps` salted cold links, each on the shared
 // scratch context.
-async function benchProgram({ program, reps, runId, contextAttributes, extensions }) {
+async function benchProgram({ program, reps, runId, contextAttributes, extensions, draw }) {
   if (!window.__linkBench) window.__linkBench = {};
   const state = window.__linkBench;
   if (!state.gl) {
@@ -99,6 +104,24 @@ async function benchProgram({ program, reps, runId, contextAttributes, extension
     for (const name of extensions ?? []) gl.getExtension(name);
     state.gl = gl;
     state.texts = new Map();
+    state.pixel = new Uint8Array(4);
+    state.samplerTypes = new Set([
+      gl.SAMPLER_2D,
+      gl.SAMPLER_3D,
+      gl.SAMPLER_CUBE,
+      gl.SAMPLER_2D_SHADOW,
+      gl.SAMPLER_2D_ARRAY,
+      gl.SAMPLER_2D_ARRAY_SHADOW,
+      gl.SAMPLER_CUBE_SHADOW,
+      gl.INT_SAMPLER_2D,
+      gl.INT_SAMPLER_3D,
+      gl.INT_SAMPLER_CUBE,
+      gl.INT_SAMPLER_2D_ARRAY,
+      gl.UNSIGNED_INT_SAMPLER_2D,
+      gl.UNSIGNED_INT_SAMPLER_3D,
+      gl.UNSIGNED_INT_SAMPLER_CUBE,
+      gl.UNSIGNED_INT_SAMPLER_2D_ARRAY,
+    ]);
   }
   const gl = state.gl;
   if (gl.isContextLost()) return { error: 'context lost' };
@@ -134,6 +157,30 @@ async function benchProgram({ program, reps, runId, contextAttributes, extension
       run.log = String(
         gl.getProgramInfoLog(prog) || gl.getShaderInfoLog(vs) || gl.getShaderInfoLog(fs) || '',
       ).slice(0, 400);
+    }
+    if (ok && draw) {
+      // No buffers, no textures: constant attributes and incomplete samplers
+      // are legal, and the point is only to make the backend build whatever it
+      // postponed. readPixels blocks until the GPU process has done it.
+      // WebGL refuses a draw when two sampler TYPES share a texture unit, and
+      // every sampler defaults to unit 0: give each type its own unit.
+      gl.useProgram(prog);
+      const unitOfType = new Map();
+      const uniformCount = gl.getProgramParameter(prog, gl.ACTIVE_UNIFORMS);
+      for (let u = 0; u < uniformCount; u++) {
+        const info = gl.getActiveUniform(prog, u);
+        if (!info || !state.samplerTypes.has(info.type)) continue;
+        if (!unitOfType.has(info.type)) unitOfType.set(info.type, unitOfType.size);
+        const location = gl.getUniformLocation(prog, info.name);
+        if (location)
+          gl.uniform1iv(location, new Int32Array(info.size).fill(unitOfType.get(info.type)));
+      }
+      const t1 = performance.now();
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, state.pixel);
+      run.drawMs = performance.now() - t1;
+      run.drawError = gl.getError();
+      gl.useProgram(null);
     }
     runs.push(run);
     gl.deleteProgram(prog);
@@ -211,6 +258,7 @@ async function main() {
         runId,
         contextAttributes: context?.attributes ?? null,
         extensions: context?.extensions ?? [],
+        draw: args.draw,
       });
       results.push({
         hash: program.hash,
@@ -251,6 +299,7 @@ async function main() {
       browser: await browser.version().catch(() => 'unknown'),
       angle: args.angle ?? 'default',
       reps: args.reps,
+      draw: args.draw,
       seconds: Math.round((Date.now() - startedAt) / 1000),
       machine,
       context: context ? { attributes: context.attributes, extensions: context.extensions } : null,
