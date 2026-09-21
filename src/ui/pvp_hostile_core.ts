@@ -3,10 +3,13 @@
 // frame's colour, the auto-attack-on-ability gate). The instanced arms (duel,
 // ranked arena, Thornhollow Fields) come from isPvpHostileTarget, which reads
 // the IWorld readouts those modes publish; the open-world arm reads the two
-// entities' /pvp flags through the sim's own pair rule
-// (src/sim/pvp/world_pvp_rules.ts worldPvpPairHostile) with the party check
+// entities' /pvp flags and the zone policy under each of them through the
+// sim's own pair rule (src/sim/pvp/world_pvp_rules.ts worldPvpPairHostile,
+// src/sim/pvp/world_pvp_zones.ts worldPvpZonePolicyAt) with the party check
 // answered by the party readout, so the client can never colour a player red
-// whom the sim would refuse to let it hit.
+// whom the sim would refuse to let it hit: a sanctuary is grey for everyone,
+// a free-for-all zone is red for every stranger in it, and a realm whose
+// World PvP switch is off (the self readout's `enabled`) has no world arm.
 //
 // Extracted the day the third copy of the verdict appeared (the renderer's
 // private isHostilePlayer and the action bar's isPvpHostileTarget were the
@@ -18,6 +21,7 @@
 // (the renderer's isOwnedPetHostile), never here.
 
 import { worldPvpPairHostile } from '../sim/pvp/world_pvp_rules';
+import { worldPvpZonePolicyAt } from '../sim/pvp/world_pvp_zones';
 import type { Entity } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { isPvpHostileTarget } from './hud/action_bar/attack_on_ability';
@@ -26,7 +30,7 @@ import { isPvpHostileTarget } from './hud/action_bar/attack_on_ability';
  *  both satisfy it structurally. */
 export type PvpHostileWorld = Pick<
   IWorld,
-  'playerId' | 'entities' | 'duelInfo' | 'arenaInfo' | 'bgInfo' | 'partyInfo'
+  'playerId' | 'entities' | 'duelInfo' | 'arenaInfo' | 'bgInfo' | 'partyInfo' | 'worldPvpInfo'
 >;
 
 /** Is `target` (an entity record) a player the local player may attack? Never
@@ -39,13 +43,28 @@ export function isPvpHostilePlayer(world: PvpHostileWorld, target: Entity): bool
   // too: a flagged teammate is never red.
   if (world.bgInfo?.match?.state === 'active' || world.arenaInfo?.match?.state === 'active')
     return false;
+  // The realm switch (null before the first self snapshot reads as open).
+  const info = world.worldPvpInfo;
+  if (info?.enabled === false) return false;
   const self = world.entities.get(world.playerId);
   if (!self) return false;
   // A plain loop: this runs on the per-frame target-frame path.
   let sameParty = false;
   const members = world.partyInfo?.members;
   if (members) for (const member of members) if (member.pid === target.id) sameParty = true;
-  return worldPvpPairHostile(self, target, sameParty);
+  // Both grounds are read off the entity positions, the local player's
+  // included, rather than the readout's `zone`: the readout lags the local
+  // player's own movement by a snapshot, and a stranger who can already open
+  // on you the moment you step over a free-for-all line must read red that
+  // frame, not the next. The World PvP tab paints the readout, so the two can
+  // disagree for one snapshot after a crossing, never longer.
+  return worldPvpPairHostile(
+    self,
+    target,
+    sameParty,
+    worldPvpZonePolicyAt(self.pos.x, self.pos.z),
+    worldPvpZonePolicyAt(target.pos.x, target.pos.z),
+  );
 }
 
 /** The id-taking twin for callers that hold a target id (the action bar). */

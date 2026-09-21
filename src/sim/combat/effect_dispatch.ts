@@ -43,6 +43,7 @@ import {
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { scalePrimaryHealing } from '../primary_healing';
 import { scheduleProjectile } from '../projectile_travel';
+import { worldPvpOnPlayerAided } from '../pvp';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
@@ -1575,6 +1576,9 @@ export function runEffects(
       }
       case 'absorb': {
         const shieldTarget = target ?? p;
+        // World PvP: a shield on a flagged ally mid-fight is aid (the heal rule).
+        if (shieldTarget.kind === 'player' && shieldTarget.id !== p.id)
+          worldPvpOnPlayerAided(ctx, shieldTarget, p);
         ctx.applyAura(shieldTarget, {
           id: absorbAuraId(ability, eff),
           name: ability.name,
@@ -1911,6 +1915,8 @@ export function runEffects(
         targetBuffIndex += 1;
         const applyBuff = (e: Entity) => {
           const lifetime = eff.permanent ? Number.POSITIVE_INFINITY : eff.duration;
+          // World PvP: a buff on a flagged ally mid-fight is aid (the heal rule).
+          if (e.kind === 'player' && e.id !== p.id) worldPvpOnPlayerAided(ctx, e, p);
           ctx.applyAura(e, {
             id: auraId,
             name: ability.name,

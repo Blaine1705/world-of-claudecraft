@@ -1,15 +1,22 @@
 // Pins for the World PvP pure rules (src/sim/pvp/world_pvp_rules.ts): the
-// mutual-flag pair verdict with its party and guild exemptions, the gold stake
-// (the smaller of the cap and the purse fraction), the equal split with the
-// killing blow taking the remainder, the grey-level rule, and the per-pair
-// diminishing-returns curve it shares with the battleground drip.
+// pair verdict over the two flags and the two zone policies (a sanctuary on
+// either end, a free-for-all zone under both, the mutual flag elsewhere) with
+// its party and guild exemptions, the marking rule for a hit that needed no
+// flag, the gold stake (the smaller of the cap and the purse fraction), the
+// equal split with the killing blow taking the remainder, the grey-level rule,
+// and the per-pair diminishing-returns curve it shares with the battleground
+// drip, on its hour-long window.
 import { describe, expect, it } from 'vitest';
 import { HONOR_REPEAT_DR } from '../src/sim/pvp';
 import {
+  WORLD_PVP_DR_WINDOW_SECONDS,
   WORLD_PVP_GREY_LEVEL_GAP,
   WORLD_PVP_KILL_HONOR,
   WORLD_PVP_STAKE_CAP_COPPER,
   WORLD_PVP_STAKE_FRACTION,
+  type WorldPvpZonePolicy,
+  worldPvpHitMarksAttacker,
+  worldPvpPairExempt,
   worldPvpPairHostile,
   worldPvpPairMultiplier,
   worldPvpSplit,
@@ -21,44 +28,118 @@ import type { Entity } from '../src/sim/types';
 const player = (id: number, extra: Partial<Entity> = {}): Entity =>
   ({ id, kind: 'player', guild: '', pvpFlag: true, ...extra }) as Entity;
 
-describe('worldPvpPairHostile', () => {
+const POLICIES: WorldPvpZonePolicy[] = ['sanctuary', 'contested', 'ffa'];
+
+/** Contested ground on both ends: the shipped mutual-flag rule. */
+const contested = (a: Entity, b: Entity, inSameParty = false) =>
+  worldPvpPairHostile(a, b, inSameParty, 'contested', 'contested');
+
+describe('worldPvpPairHostile on contested ground', () => {
   it('two flagged strangers are hostile, symmetrically', () => {
     const a = player(1);
     const b = player(2);
-    expect(worldPvpPairHostile(a, b, false)).toBe(true);
-    expect(worldPvpPairHostile(b, a, false)).toBe(true);
+    expect(contested(a, b)).toBe(true);
+    expect(contested(b, a)).toBe(true);
   });
 
   it('an unflagged side on EITHER end refuses', () => {
-    expect(worldPvpPairHostile(player(1, { pvpFlag: false }), player(2), false)).toBe(false);
-    expect(worldPvpPairHostile(player(1), player(2, { pvpFlag: false }), false)).toBe(false);
-    expect(worldPvpPairHostile(player(1, { pvpFlag: undefined }), player(2), false)).toBe(false);
+    expect(contested(player(1, { pvpFlag: false }), player(2))).toBe(false);
+    expect(contested(player(1), player(2, { pvpFlag: false }))).toBe(false);
+    expect(contested(player(1, { pvpFlag: undefined }), player(2))).toBe(false);
   });
 
   it('never hostile to yourself', () => {
     const a = player(7);
-    expect(worldPvpPairHostile(a, a, false)).toBe(false);
+    expect(contested(a, a)).toBe(false);
   });
 
   it('party or raid mates are never hostile', () => {
-    expect(worldPvpPairHostile(player(1), player(2), true)).toBe(false);
+    expect(contested(player(1), player(2), true)).toBe(false);
   });
 
   it('guildmates are never hostile; different guilds and no guild are', () => {
-    expect(
-      worldPvpPairHostile(player(1, { guild: 'Ravens' }), player(2, { guild: 'Ravens' }), false),
-    ).toBe(false);
-    expect(
-      worldPvpPairHostile(player(1, { guild: 'Ravens' }), player(2, { guild: 'Crows' }), false),
-    ).toBe(true);
+    expect(contested(player(1, { guild: 'Ravens' }), player(2, { guild: 'Ravens' }))).toBe(false);
+    expect(contested(player(1, { guild: 'Ravens' }), player(2, { guild: 'Crows' }))).toBe(true);
     // Two guildless players share the empty string and must NOT read as one guild,
     // and neither may an undefined guild on both sides (a bare test entity).
-    expect(worldPvpPairHostile(player(1, { guild: '' }), player(2, { guild: '' }), false)).toBe(
+    expect(contested(player(1, { guild: '' }), player(2, { guild: '' }))).toBe(true);
+    expect(contested(player(1, { guild: undefined }), player(2, { guild: undefined }))).toBe(true);
+  });
+});
+
+describe('worldPvpPairHostile on the other ground', () => {
+  it('a sanctuary under EITHER player switches the world off, flags or not', () => {
+    const a = player(1);
+    const b = player(2);
+    for (const other of POLICIES) {
+      expect(worldPvpPairHostile(a, b, false, 'sanctuary', other)).toBe(false);
+      expect(worldPvpPairHostile(a, b, false, other, 'sanctuary')).toBe(false);
+    }
+  });
+
+  it('both in a free-for-all zone are hostile with no flag at all', () => {
+    const a = player(1, { pvpFlag: false });
+    const b = player(2, { pvpFlag: undefined });
+    expect(worldPvpPairHostile(a, b, false, 'ffa', 'ffa')).toBe(true);
+    expect(worldPvpPairHostile(b, a, false, 'ffa', 'ffa')).toBe(true);
+  });
+
+  it('one side in a free-for-all zone and the other outside it falls back to the flags', () => {
+    const flaggedA = player(1);
+    const flaggedB = player(2);
+    const bareB = player(3, { pvpFlag: false });
+    expect(worldPvpPairHostile(flaggedA, flaggedB, false, 'ffa', 'contested')).toBe(true);
+    expect(worldPvpPairHostile(flaggedA, bareB, false, 'ffa', 'contested')).toBe(false);
+    expect(worldPvpPairHostile(bareB, flaggedA, false, 'contested', 'ffa')).toBe(false);
+  });
+
+  it('the exemptions hold on free-for-all ground: self, party, guild', () => {
+    const a = player(1, { guild: 'Ravens' });
+    expect(worldPvpPairHostile(a, a, false, 'ffa', 'ffa')).toBe(false);
+    expect(worldPvpPairHostile(a, player(2), true, 'ffa', 'ffa')).toBe(false);
+    expect(worldPvpPairHostile(a, player(2, { guild: 'Ravens' }), false, 'ffa', 'ffa')).toBe(false);
+    expect(worldPvpPairHostile(a, player(2, { guild: 'Crows' }), false, 'ffa', 'ffa')).toBe(true);
+  });
+
+  it('is symmetric over every policy pair and flag pair', () => {
+    for (const za of POLICIES) {
+      for (const zb of POLICIES) {
+        for (const fa of [true, false]) {
+          for (const fb of [true, false]) {
+            const a = player(1, { pvpFlag: fa });
+            const b = player(2, { pvpFlag: fb });
+            expect(worldPvpPairHostile(a, b, false, za, zb)).toBe(
+              worldPvpPairHostile(b, a, false, zb, za),
+            );
+          }
+        }
+      }
+    }
+  });
+});
+
+describe('worldPvpPairExempt', () => {
+  it('names the three exemptions and nothing else', () => {
+    expect(worldPvpPairExempt(player(1), player(1), false)).toBe(true);
+    expect(worldPvpPairExempt(player(1), player(2), true)).toBe(true);
+    expect(worldPvpPairExempt(player(1, { guild: 'R' }), player(2, { guild: 'R' }), false)).toBe(
       true,
     );
-    expect(
-      worldPvpPairHostile(player(1, { guild: undefined }), player(2, { guild: undefined }), false),
-    ).toBe(true);
+    expect(worldPvpPairExempt(player(1), player(2), false)).toBe(false);
+    expect(worldPvpPairExempt(player(1, { pvpFlag: false }), player(2), false)).toBe(false);
+  });
+});
+
+describe('worldPvpHitMarksAttacker', () => {
+  it('marks only an unflagged attacker hitting an unflagged victim', () => {
+    const bare = (id: number) => player(id, { pvpFlag: false });
+    expect(worldPvpHitMarksAttacker(bare(1), bare(2))).toBe(true);
+    // Hitting a flagged player never marks you (self-defence, defending a
+    // stranger, and piling onto a flagged brawler all read as this case).
+    expect(worldPvpHitMarksAttacker(bare(1), player(2))).toBe(false);
+    // An attacker who already carries the flag has nothing to raise.
+    expect(worldPvpHitMarksAttacker(player(1), bare(2))).toBe(false);
+    expect(worldPvpHitMarksAttacker(player(1), player(2))).toBe(false);
   });
 });
 
@@ -116,5 +197,9 @@ describe('worldPvpPairMultiplier', () => {
   it('rides the shared HONOR_REPEAT_DR curve: 100, 50, 25, then 0 percent', () => {
     expect(HONOR_REPEAT_DR).toEqual([1, 0.5, 0.25, 0]);
     expect([0, 1, 2, 3, 9].map(worldPvpPairMultiplier)).toEqual([1, 0.5, 0.25, 0, 0]);
+  });
+
+  it('pins the hour-long window the copy and the docs quote', () => {
+    expect(WORLD_PVP_DR_WINDOW_SECONDS).toBe(3_600);
   });
 });

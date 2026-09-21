@@ -26,6 +26,7 @@ import { emptyZoneProps } from '../types';
 
 export const WRAITHWOOD_ZONE: ZoneDef = {
   id: 'wraithwood',
+  worldPvp: 'ffa',
   name: 'The Wraithwood',
   riftPortalEligible: true,
   riftTierWeights: { A: 0.35, S: 0.65 },

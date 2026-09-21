@@ -9,15 +9,21 @@
 // persistence round trip, and the determinism guarantees.
 import { describe, expect, it } from 'vitest';
 import { applyHeal } from '../src/sim/combat/heal';
-import { BUILTIN_WORLD } from '../src/sim/data';
+import { BUILTIN_WORLD, PLAYER_START, ZONES } from '../src/sim/data';
 import {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
+  WORLD_PVP_DR_WINDOW_SECONDS,
   WORLD_PVP_KILL_HONOR,
   WORLD_PVP_MIN_LEVEL,
   WORLD_PVP_STAKE_CAP_COPPER,
 } from '../src/sim/pvp';
 import {
+  WORLD_PVP_AIDED_LINE,
+  WORLD_PVP_FFA_ENTER_LINE,
+  WORLD_PVP_FFA_LEAVE_LINE,
+  WORLD_PVP_MARKED_LINE,
+  WORLD_PVP_SANCTUARY_LINE,
   WORLD_PVP_TOGGLE_COOLDOWN,
   worldPvpDefeatLine,
   worldPvpKillLine,
@@ -27,6 +33,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimConfig, SimEvent, WorldContent } from '../src/sim/types';
 import { DT } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 // Two-or-more-player fights need no ambient world: strip the camps, NPCs and
 // ground objects (the pvp_safety.test.ts precedent) so a minute of sim time is
@@ -53,11 +60,49 @@ function world(extra: Partial<SimConfig> = {}): Sim {
   return sim;
 }
 
-function addFighter(sim: Sim, name: string, level = 20, characterId?: number): number {
-  const pid = sim.addPlayer('warrior', name, { autoEquip: true, characterId });
+const SEED = 7;
+/** Contested ground (the mutual-flag rule), a free-for-all zone, and the two
+ *  sanctuaries, by zone id; placeIn stands a player on the zone's graveyard
+ *  (open ground, no hub colliders). Every fighter starts on contested ground:
+ *  the default spawn is Eastbrook Vale, a sanctuary, where nobody is hostile. */
+const CONTESTED_ZONE = 'thornpeak_heights';
+const FFA_ZONE = 'wraithwood';
+const STARTER_ZONE = 'eastbrook_vale';
+const TUTORIAL_ZONE = 'proving_shore';
+
+/** Open ground with a clear line of sight inside the two zones that host
+ *  casts (a graveyard's stones block a shield); the sanctuaries use their
+ *  graveyards, which only ever host a hostility check. */
+const OPEN_GROUND: Record<string, { x: number; z: number }> = {
+  [CONTESTED_ZONE]: { x: 60, z: 700 },
+  [FFA_ZONE]: { x: 360, z: 1540 },
+  [STARTER_ZONE]: { x: PLAYER_START.x, z: PLAYER_START.z },
+};
+
+function placeIn(sim: Sim, pid: number, zoneId: string, dx = 0): void {
+  const zone = ZONES.find((z) => z.id === zoneId);
+  if (!zone) throw new Error(`no zone ${zoneId}`);
+  const spot = OPEN_GROUND[zoneId] ?? zone.graveyard;
+  const e = sim.entities.get(pid)!;
+  const x = spot.x + dx;
+  const z = spot.z;
+  e.pos = { x, y: groundHeight(x, z, SEED), z };
+  e.prevPos = { ...e.pos };
+}
+
+function addFighter(
+  sim: Sim,
+  name: string,
+  level = 20,
+  characterId?: number,
+  cls: 'warrior' | 'priest' | 'mage' = 'warrior',
+): number {
+  const pid = sim.addPlayer(cls, name, { autoEquip: true, characterId });
   sim.setPlayerLevel(level, pid);
   const e = sim.entities.get(pid)!;
   e.hp = e.maxHp;
+  e.resource = e.maxResource;
+  placeIn(sim, pid, CONTESTED_ZONE);
   return pid;
 }
 
@@ -179,6 +224,8 @@ describe('the /pvp flag lifecycle', () => {
       kills: 0,
       deaths: 0,
       levelLocked: false,
+      zone: 'contested',
+      enabled: true,
     });
     sim.setWorldPvpFlag(true, a);
     expect(ent(sim, a).pvpFlag).toBe(true);
@@ -598,44 +645,98 @@ describe('kill resolution: the stake and the honor pool', () => {
     expect(sim.meta(low)!.copper).toBe(9_000);
   });
 
-  it('repeated kills of the same victim decay 100/50/25/0 today and reset with the day', () => {
+  function killAgain(sim: Sim, a: number, b: number) {
+    sim.meta(b)!.copper = 10_000;
+    const before = sim.meta(a)!.copper;
+    const honorBefore = sim.meta(a)!.honor;
+    revive(sim, b);
+    hit(sim, a, b);
+    slay(sim, a, b);
+    return { gold: sim.meta(a)!.copper - before, honor: sim.meta(a)!.honor - honorBefore };
+  }
+
+  it('repeated kills of the same victim decay 100/50/25/0 inside the hour and start over after it', () => {
     const { sim, a, b } = duel();
-    const kill = () => {
-      sim.meta(b)!.copper = 10_000;
-      const before = sim.meta(a)!.copper;
-      const honorBefore = sim.meta(a)!.honor;
-      revive(sim, b);
-      hit(sim, a, b);
-      slay(sim, a, b);
-      return { gold: sim.meta(a)!.copper - before, honor: sim.meta(a)!.honor - honorBefore };
-    };
-    expect(kill()).toEqual({ gold: 1_000, honor: 10 });
-    expect(kill()).toEqual({ gold: 500, honor: 5 });
-    expect(kill()).toEqual({ gold: 250, honor: 2 });
-    expect(kill()).toEqual({ gold: 0, honor: 0 });
+    expect(killAgain(sim, a, b)).toEqual({ gold: 1_000, honor: 10 });
+    expect(killAgain(sim, a, b)).toEqual({ gold: 500, honor: 5 });
+    expect(killAgain(sim, a, b)).toEqual({ gold: 250, honor: 2 });
+    expect(killAgain(sim, a, b)).toEqual({ gold: 0, honor: 0 });
     expect(sim.meta(b)!.copper).toBe(10_000); // the fully decayed kill charged nothing
     // The fully decayed fourth kill paid nothing and is not counted.
-    expect(sim.meta(a)!.honorArenaDaily?.worldKillsByVictim).toEqual({ 'character:1002': 3 });
+    expect(sim.worldPvpBooks.killsByPair.get('character:1001>character:1002')).toMatchObject({
+      count: 3,
+    });
+    // A calendar rollover changes nothing: the window is an hour of sim time
+    // from the first kill, not a day.
     sim.resetDay = DAY_TWO;
-    expect(kill()).toEqual({ gold: 1_000, honor: 10 });
+    expect(killAgain(sim, a, b)).toEqual({ gold: 0, honor: 0 });
+    expect(sim.serializeCharacter(a)!.honorArenaDaily).toBeUndefined();
+    advanceClock(sim, WORLD_PVP_DR_WINDOW_SECONDS);
+    expect(killAgain(sim, a, b)).toEqual({ gold: 1_000, honor: 10 });
   });
 
-  it('persists the per-victim counter with the character, so neither a relog nor a restart resets it', () => {
+  it('keys the window by character identity, so a relog cannot reset it; the sweep drops a closed window', () => {
     const { sim, a, b } = duel();
     slay(sim, a, b);
-    const state = sim.serializeCharacter(a)!;
-    expect(state.honorArenaDaily?.worldKillsByVictim).toEqual({ 'character:1002': 1 });
-    // A fresh realm process (a new Sim on the same day) loads the counter back.
-    const next = world();
-    const a2 = next.addPlayer('warrior', 'Aleph', { state, characterId: 1001 });
-    const b2 = addFighter(next, 'Bet', 20, 1002);
-    standTogether(next, [a2, b2]);
-    flag(next, a2);
-    flag(next, b2);
-    next.meta(b2)!.copper = 10_000;
-    const before = next.meta(a2)!.copper;
-    slay(next, a2, b2);
-    expect(next.meta(a2)!.copper - before).toBe(500);
+    sim.removePlayer(a);
+    const back = addFighter(sim, 'Aleph', 20, 1001);
+    standTogether(sim, [b, back]);
+    flag(sim, back);
+    expect(killAgain(sim, back, b)).toEqual({ gold: 500, honor: 5 });
+    expect(sim.worldPvpBooks.killsByPair.size).toBe(1);
+    // A closed window reads as zero at once and is dropped by the next sweep.
+    advanceClock(sim, WORLD_PVP_DR_WINDOW_SECONDS);
+    tickSeconds(sim, 61);
+    expect(sim.worldPvpBooks.killsByPair.size).toBe(0);
+    expect(killAgain(sim, back, b)).toEqual({ gold: 1_000, honor: 10 });
+  });
+
+  it('the window is per contributor AND per victim: a second victim, a second killer, or the tables turned all pay in full', () => {
+    const { sim, a, b } = duel();
+    const c = addFighter(sim, 'Gimel', 20, 1003);
+    const d = addFighter(sim, 'Dalet', 20, 1004);
+    standTogether(sim, [a, c, d]);
+    flag(sim, c);
+    flag(sim, d);
+    expect(killAgain(sim, a, b)).toEqual({ gold: 1_000, honor: 10 });
+    expect(killAgain(sim, a, b)).toEqual({ gold: 500, honor: 5 });
+    // A second victim for the same killer.
+    expect(killAgain(sim, a, c)).toEqual({ gold: 1_000, honor: 10 });
+    // A second killer for the same victim (a swapped or victim-only key
+    // would read Aleph's two kills here and pay half).
+    revive(sim, b);
+    expect(killAgain(sim, d, b)).toEqual({ gold: 1_000, honor: 10 });
+    // The tables turned: Bet's first kill of Aleph is Bet's own window.
+    revive(sim, a);
+    revive(sim, b);
+    expect(killAgain(sim, b, a)).toEqual({ gold: 1_000, honor: 10 });
+  });
+
+  it('a blob saved with the retired UTC-day counter loads, and the counter is dropped on the next save', () => {
+    const sim = world();
+    const seed = addFighter(sim, 'Seed', 20, 1001);
+    const state = sim.serializeCharacter(seed)! as unknown as Record<string, unknown>;
+    const withOldCounter = {
+      ...state,
+      honorArenaDaily: {
+        date: DAY_ONE,
+        winsByOpponent: {},
+        fiestaCompletionsByOpponent: {},
+        totalWins: 0,
+        worldKillsByVictim: { 'character:1002': 2 },
+      },
+    };
+    const pid = sim.addPlayer('warrior', 'Loaded', { state: withOldCounter as never });
+    expect(ent(sim, pid).pvpFlag).toBeFalsy();
+    const saved = sim.serializeCharacter(pid)! as unknown as { honorArenaDaily?: object };
+    expect(saved.honorArenaDaily === undefined || !('worldKillsByVictim' in saved.honorArenaDaily))
+      .toBe(true);
+    // And the old count never reaches the new book: the first kill pays in full.
+    const b = addFighter(sim, 'Bet', 20, 1002);
+    standTogether(sim, [pid, b]);
+    flag(sim, pid);
+    flag(sim, b);
+    expect(killAgain(sim, pid, b)).toEqual({ gold: 1_000, honor: 10 });
   });
 });
 
@@ -781,6 +882,306 @@ describe('persistence', () => {
     const pid = sim.addPlayer('warrior', 'Shrunk', { state });
     expect(ent(sim, pid).pvpFlag).toBeFalsy();
     expect(sim.worldPvpInfoFor(pid)!.flagged).toBe(false);
+  });
+});
+
+describe('the ground: sanctuaries', () => {
+  it('a sanctuary under either player keeps two flagged strangers apart', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph');
+    const b = addFighter(sim, 'Bet');
+    flag(sim, a);
+    flag(sim, b);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true);
+    for (const zone of [STARTER_ZONE, TUTORIAL_ZONE]) {
+      placeIn(sim, a, zone);
+      placeIn(sim, b, zone, 2);
+      expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
+      expect(sim.isHostileTo(ent(sim, b), ent(sim, a))).toBe(false);
+      // One foot in: still off (the sanctuary side wins).
+      placeIn(sim, b, CONTESTED_ZONE);
+      expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
+      expect(sim.isHostileTo(ent(sim, b), ent(sim, a))).toBe(false);
+      placeIn(sim, a, CONTESTED_ZONE, 2);
+      expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true);
+    }
+  });
+
+  it('tells a FLAGGED player on entering a sanctuary, and an unflagged one nothing', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph');
+    const c = addFighter(sim, 'Gimel');
+    flag(sim, a);
+    tickSeconds(sim, 1);
+    placeIn(sim, a, STARTER_ZONE);
+    placeIn(sim, c, STARTER_ZONE, 2);
+    expect(tickCollecting(sim, 1, a)).toContain(WORLD_PVP_SANCTUARY_LINE);
+    placeIn(sim, c, CONTESTED_ZONE);
+    expect(tickCollecting(sim, 1, c)).toEqual([]);
+    placeIn(sim, c, TUTORIAL_ZONE);
+    expect(tickCollecting(sim, 1, c)).toEqual([]);
+    expect(sim.worldPvpInfoFor(a)!.zone).toBe('sanctuary');
+  });
+
+  it('aid given or received inside a sanctuary never marks the helper', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const victim = addFighter(sim, 'Victim', 20, 2);
+    const priest = addFighter(sim, 'Priest', 20, 3, 'priest');
+    standTogether(sim, [victim, a, priest]);
+    flag(sim, a);
+    flag(sim, victim);
+    hit(sim, a, victim);
+    hit(sim, victim, a);
+    // The fighter is kited to the starter zone's edge with the priest inside it.
+    placeIn(sim, priest, STARTER_ZONE);
+    placeIn(sim, a, STARTER_ZONE, 2);
+    sim.castAbilityOn('power_word_shield', a, priest);
+    sim.tick();
+    expect(ent(sim, a).auras.some((aura) => aura.kind === 'absorb')).toBe(true);
+    expect(ent(sim, priest).pvpFlag).toBeUndefined();
+    expect(sim.worldPvpBooks.recentSupport.has(a)).toBe(false);
+  });
+});
+
+describe('the ground: free-for-all zones', () => {
+  function brawl(): { sim: Sim; a: number; b: number } {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1001);
+    const b = addFighter(sim, 'Bet', 20, 1002);
+    placeIn(sim, a, FFA_ZONE);
+    standTogether(sim, [a, b]);
+    tickSeconds(sim, 1);
+    sim.events = [];
+    return { sim, a, b };
+  }
+
+  it('two unflagged strangers are hostile both ways; party and guild mates stay exempt', () => {
+    const { sim, a, b } = brawl();
+    expect(ent(sim, a).pvpFlag).toBeUndefined();
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true);
+    expect(sim.isHostileTo(ent(sim, b), ent(sim, a))).toBe(true);
+    expect(sim.worldPvpInfoFor(a)!.zone).toBe('ffa');
+    // Standing outside the zone, only the flags count again: nothing without
+    // them, the ordinary mutual rule with them.
+    placeIn(sim, b, CONTESTED_ZONE);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
+    expect(sim.isHostileTo(ent(sim, b), ent(sim, a))).toBe(false);
+    flag(sim, a);
+    flag(sim, b);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true);
+    expect(sim.isHostileTo(ent(sim, b), ent(sim, a))).toBe(true);
+    flag(sim, a, false);
+    flag(sim, b, false);
+    tickSeconds(sim, WORLD_PVP_DISARM_SECONDS + 1);
+    expect(ent(sim, a).pvpFlag).toBe(false);
+    standTogether(sim, [a, b]);
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
+    sim.partyLeave(b);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true);
+    sim.setPlayerGuild(a, 'Ravens');
+    sim.setPlayerGuild(b, 'Ravens');
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
+  });
+
+  it('the first hit on an unflagged player marks the attacker; hitting a flagged player never does', () => {
+    const { sim, a, b } = brawl();
+    const c = addFighter(sim, 'Gimel', 20, 1003);
+    const d = addFighter(sim, 'Dalet', 20, 1004);
+    standTogether(sim, [a, c, d]);
+    // The aggressor is marked by their own first blow.
+    hit(sim, a, b);
+    expect(ent(sim, a).pvpFlag).toBe(true);
+    expect(ent(sim, b).pvpFlag).toBeUndefined();
+    expect(logLines(sim, a)).toContain(WORLD_PVP_MARKED_LINE);
+    // Self-defence: the victim hits a flagged player and stays unflagged.
+    hit(sim, b, a);
+    expect(ent(sim, b).pvpFlag).toBeUndefined();
+    // Defending someone who is not marked: same thing.
+    hit(sim, c, a);
+    expect(ent(sim, c).pvpFlag).toBeUndefined();
+    // A flagged player hitting an unflagged one has nothing left to raise, and
+    // the unflagged one hitting back is hitting a flag.
+    hit(sim, a, d);
+    hit(sim, d, a);
+    expect(ent(sim, d).pvpFlag).toBeUndefined();
+    // The hits were booked either way (the kill they lead to pays).
+    expect(sim.worldPvpBooks.recentDamage.get(a)?.has(d)).toBe(true);
+  });
+
+  it('marking honours the level gate and the toggle cooldown like any other raise', () => {
+    const { sim, a } = brawl();
+    const novice = addFighter(sim, 'Novice', 9, 1005);
+    standTogether(sim, [a, novice]);
+    hit(sim, novice, a);
+    expect(ent(sim, novice).pvpFlag).toBeUndefined();
+    expect(sim.worldPvpBooks.recentDamage.get(a)?.has(novice)).toBe(true);
+    // A freshly marked player cannot drop the flag the same instant.
+    hit(sim, a, novice);
+    expect(ent(sim, a).pvpFlag).toBe(true);
+    sim.setWorldPvpFlag(false, a);
+    expect(errorLines(sim, a)).toContain('World PvP: wait a moment before switching again.');
+  });
+
+  it('killing an unflagged player pays honor but takes no gold; a flagged victim stakes as anywhere', () => {
+    const { sim, a, b } = brawl();
+    sim.meta(b)!.copper = 10_000;
+    sim.meta(a)!.copper = 0;
+    slay(sim, a, b);
+    expect(ent(sim, b).dead).toBe(true);
+    expect(sim.meta(b)!.copper).toBe(10_000);
+    expect(sim.meta(a)!.copper).toBe(0);
+    expect(sim.meta(a)!.honor).toBe(10);
+    expect(logLines(sim, a)).toContain('You defeat Bet.');
+    expect(logLines(sim, b)).toContain('Aleph defeats you.');
+    expect(sim.worldPvpInfoFor(a)).toMatchObject({ kills: 1, deaths: 0, flagged: true });
+    expect(sim.worldPvpInfoFor(b)).toMatchObject({ kills: 0, deaths: 1, flagged: false });
+    // The victim flags up and stands again: the second kill inside the hour
+    // stakes gold, decayed like the honor.
+    revive(sim, b);
+    flag(sim, b);
+    sim.meta(b)!.copper = 10_000;
+    hit(sim, a, b);
+    slay(sim, a, b);
+    expect(sim.meta(a)!.copper).toBe(500);
+    expect(sim.meta(b)!.copper).toBe(9_500);
+    expect(sim.meta(a)!.honor).toBe(15);
+  });
+
+  it('entering and leaving are announced once per crossing, and on logging in inside', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph');
+    tickSeconds(sim, 1);
+    placeIn(sim, a, FFA_ZONE);
+    const entered = tickCollecting(sim, 2, a);
+    expect(entered.filter((line) => line === WORLD_PVP_FFA_ENTER_LINE)).toHaveLength(1);
+    expect(tickCollecting(sim, 1, a)).toEqual([]);
+    placeIn(sim, a, CONTESTED_ZONE);
+    const left = tickCollecting(sim, 2, a);
+    expect(left.filter((line) => line === WORLD_PVP_FFA_LEAVE_LINE)).toHaveLength(1);
+    expect(left).not.toContain(WORLD_PVP_FFA_ENTER_LINE);
+    // A player whose first pass finds them inside the zone is told too.
+    const b = addFighter(sim, 'Bet');
+    placeIn(sim, b, FFA_ZONE);
+    expect(tickCollecting(sim, 1, b)).toContain(WORLD_PVP_FFA_ENTER_LINE);
+  });
+
+  it('an unflagged hunter of flagged strangers earns the honor but never the gold', () => {
+    const { sim, a, b } = brawl();
+    flag(sim, b);
+    sim.meta(b)!.copper = 10_000;
+    sim.meta(a)!.copper = 0;
+    slay(sim, a, b);
+    // Hitting a flagged player never marks the attacker, and gold only moves
+    // between two players who both carry the stake.
+    expect(ent(sim, a).pvpFlag).toBeUndefined();
+    expect(sim.meta(a)!.copper).toBe(0);
+    expect(sim.meta(b)!.copper).toBe(10_000);
+    expect(sim.meta(a)!.honor).toBe(10);
+    expect(logLines(sim, a)).toContain('You defeat Bet.');
+    expect(logLines(sim, b)).toContain('Aleph defeats you.');
+  });
+
+  it('a duel fought on free-for-all ground marks nobody and books nothing', () => {
+    const { sim, a, b } = brawl();
+    sim.duelRequest(b, a);
+    sim.duelAccept(b);
+    tickSeconds(sim, 4); // the duel's countdown
+    expect(sim.duels.get(a)?.state).toBe('active');
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true); // the duel arm
+    hit(sim, a, b);
+    hit(sim, b, a);
+    expect(ent(sim, a).pvpFlag).toBeUndefined();
+    expect(ent(sim, b).pvpFlag).toBeUndefined();
+    expect(sim.worldPvpBooks.recentDamage.size).toBe(0);
+  });
+
+  it('the sweep drops the zone row of a player who logged out', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph');
+    tickSeconds(sim, 1);
+    expect(sim.worldPvpBooks.zoneOf.has(a)).toBe(true);
+    sim.removePlayer(a);
+    tickSeconds(sim, 61);
+    expect(sim.worldPvpBooks.zoneOf.has(a)).toBe(false);
+  });
+
+  it('the realm kill switch turns the free-for-all arm and its notices off too', () => {
+    const sim = world({ worldPvpDisabled: true });
+    const a = addFighter(sim, 'Aleph');
+    const b = addFighter(sim, 'Bet');
+    placeIn(sim, a, FFA_ZONE);
+    standTogether(sim, [a, b]);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
+    expect(tickCollecting(sim, 2, a)).toEqual([]);
+    expect(sim.worldPvpInfoFor(a)).toMatchObject({ zone: 'ffa', enabled: false });
+  });
+});
+
+describe('aid: shields and buffs count like heals', () => {
+  function fight(): { sim: Sim; a: number; victim: number; priest: number } {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const victim = addFighter(sim, 'Victim', 20, 2);
+    const priest = addFighter(sim, 'Priest', 20, 3, 'priest');
+    standTogether(sim, [victim, a, priest]);
+    flag(sim, a);
+    flag(sim, victim);
+    sim.meta(victim)!.copper = 10_000;
+    hit(sim, a, victim);
+    hit(sim, victim, a);
+    sim.events = [];
+    return { sim, a, victim, priest };
+  }
+
+  it('an unflagged priest who shields a flagged fighter mid-fight is flagged and credited', () => {
+    const { sim, a, victim, priest } = fight();
+    sim.castAbilityOn('power_word_shield', a, priest);
+    // An instant cast resolves at once; the notice sits in this tick's window.
+    const told = logLines(sim, priest);
+    sim.tick();
+    expect(ent(sim, a).auras.some((aura) => aura.kind === 'absorb')).toBe(true);
+    expect(ent(sim, priest).pvpFlag).toBe(true);
+    expect(told).toContain(WORLD_PVP_AIDED_LINE);
+    slay(sim, a, victim);
+    expect(sim.meta(priest)!.copper).toBe(500);
+    expect(sim.meta(a)!.copper).toBe(500);
+  });
+
+  it('a buff does the same, and the caster is credited on the kill', () => {
+    const { sim, a, victim, priest } = fight();
+    sim.castAbilityOn('power_word_fortitude', a, priest);
+    sim.tick();
+    expect(ent(sim, a).auras.some((aura) => aura.kind === 'buff_sta_pct')).toBe(true);
+    expect(ent(sim, priest).pvpFlag).toBe(true);
+    slay(sim, a, victim);
+    expect(sim.meta(priest)!.copper).toBe(500);
+  });
+
+  it('aid to an UNFLAGGED fighter in a free-for-all brawl marks nobody', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    const priest = addFighter(sim, 'Priest', 20, 3, 'priest');
+    placeIn(sim, a, FFA_ZONE);
+    standTogether(sim, [a, b, priest]);
+    // Strangers in a free-for-all zone are enemies, so a stranger's shield
+    // would be refused as a hostile target: the priest is the defender's
+    // party mate (the one exemption that makes them friendly here).
+    sim.partyInvite(priest, b);
+    sim.partyAccept(priest);
+    expect(sim.isHostileTo(ent(sim, priest), ent(sim, b))).toBe(false);
+    hit(sim, a, b); // a is marked; b is the unmarked defender
+    sim.castAbilityOn('power_word_shield', b, priest);
+    tickSeconds(sim, 2); // past the global cooldown; inside the assist window
+    sim.castAbilityOn('power_word_fortitude', b, priest);
+    sim.tick();
+    expect(ent(sim, b).auras.some((aura) => aura.kind === 'absorb')).toBe(true);
+    expect(ent(sim, b).auras.some((aura) => aura.kind === 'buff_sta_pct')).toBe(true);
+    expect(ent(sim, priest).pvpFlag).toBeUndefined();
+    expect(sim.worldPvpBooks.recentSupport.has(b)).toBe(false);
   });
 });
 

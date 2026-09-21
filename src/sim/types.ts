@@ -150,12 +150,6 @@ export interface HonorArenaDailyState {
   // It rides THIS window rather than a state of its own because the window already
   // owns the UTC date string and the one rollover that clears every daily counter.
   bgFirstWinClaimed?: boolean;
-  // World PvP (pvp/world_pvp.ts): kills of each victim identity this UTC day,
-  // the per-pair diminishing-returns counter for the /pvp kill pool. Optional
-  // and absent until the first paid world kill, like the counters above, so
-  // every earlier save round-trips byte-equal. Persisted here rather than in
-  // process memory so a realm restart cannot reset the anti-farm curve.
-  worldKillsByVictim?: Record<string, number>;
   totalWins: number;
 }
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
@@ -4172,6 +4166,15 @@ export interface ZoneDef {
   westPassZ?: number;
   zMax: number;
   levelRange: [number, number];
+  /**
+   * World PvP policy of the ground (src/sim/pvp/world_pvp_zones.ts). 'sanctuary':
+   * no world PvP at all, flagged or not. 'ffa': free-for-all, everyone standing
+   * here is fair game with no flag. Absent: contested, the mutual-flag rule.
+   * Owner tuning: the tutorial island and the starter zone are sanctuaries, the
+   * three highest-level zones are free-for-all (tests/world_pvp_zones.test.ts
+   * pins the set; flip one word here to move a zone).
+   */
+  worldPvp?: 'sanctuary' | 'ffa';
   biome: BiomeId;
   hub: { x: number; z: number; radius: number; name: string };
   graveyard: { x: number; z: number };

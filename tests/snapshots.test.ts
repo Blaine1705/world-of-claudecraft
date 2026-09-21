@@ -5949,7 +5949,13 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.lifetimeHonor).toBe(654); // lhonor -> lifetimeHonor
     // wpvp -> worldPvpInfo (social_self_wire.ts), and the entity-record pvp bit
     // -> e.pvpFlag on the self record (a full record) for the flagged leader.
-    expect(client.worldPvpInfo).toMatchObject({ flagged: true, kills: 2, deaths: 1 });
+    expect(client.worldPvpInfo).toMatchObject({
+      flagged: true,
+      kills: 2,
+      deaths: 1,
+      zone: 'contested', // the fixture leader stands on contested ground
+      enabled: true,
+    });
     expect(client.player.pvpFlag).toBe(true);
     expect(client.restedXp).toBe(222); // rxp -> restedXp
     expect(client.prestigeRank).toBe(3); // prk -> prestigeRank

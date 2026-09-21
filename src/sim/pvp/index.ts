@@ -27,11 +27,9 @@ export {
   honorTeamIdentity,
   normalizeHonorCounter,
   normalizeHonorDailyState,
-  noteWorldKill,
   RANKED_ARENA_LOSS_HONOR,
   RANKED_ARENA_WIN_HONOR,
   repeatHonorMultiplier,
-  worldKillRepeats,
 } from './honor';
 export {
   DOUBLE_HONOR_LEAD_HOURS,
@@ -80,21 +78,27 @@ export {
   worldPvpDisarmRemaining,
   worldPvpInfoFor,
   worldPvpKillLine,
+  worldPvpOnPlayerAided,
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
-  worldPvpOnPlayerHealed,
+  worldPvpPairRepeats,
 } from './world_pvp';
 export {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
+  WORLD_PVP_DR_WINDOW_SECONDS,
   WORLD_PVP_GREY_LEVEL_GAP,
   WORLD_PVP_KILL_HONOR,
   WORLD_PVP_MIN_LEVEL,
   WORLD_PVP_STAKE_CAP_COPPER,
   WORLD_PVP_STAKE_FRACTION,
+  type WorldPvpZonePolicy,
+  worldPvpHitMarksAttacker,
+  worldPvpPairExempt,
   worldPvpPairHostile,
   worldPvpPairMultiplier,
   worldPvpSplit,
   worldPvpStake,
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
+export { worldPvpZonePolicyAt, worldPvpZonePolicyOf } from './world_pvp_zones';
