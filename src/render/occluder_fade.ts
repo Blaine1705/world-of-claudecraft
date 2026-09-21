@@ -11,6 +11,7 @@
 // second program on `transparent`, so a record's first flip asks the gate for
 // its program's twin and keeps drawing opaque until that link settles.
 import type * as THREE from 'three';
+import { attachDitherFade, ditherFadeEnabled, ditherFadeUniform } from './occluder_dither_fade';
 import {
   occluderFadeSettled,
   stepOccluderFade,
@@ -64,6 +65,7 @@ export function occluderFadeMat(mat: THREE.Material, mesh: THREE.Mesh): Occluder
   // surface owns each pixel either way and one pass draws the same ghost. Set
   // here, before any twin is cloned from the material: inert while it is opaque.
   mat.forceSinglePass = true;
+  if (ditherFadeEnabled()) attachDitherFade(mat);
   const target = occluderGhostTargetOf(mat, mesh);
   return {
     mat,
@@ -120,6 +122,13 @@ export function occluderFadeRecordFor(
 export function applyOccluderFade(mats: OccluderFadeMat[], alpha: number): void {
   for (let i = 0; i < mats.length; i++) {
     const f = mats[i];
+    const dither = ditherFadeUniform(f.mat);
+    if (dither) {
+      // Prototype arm: the material stays opaque and drops fragments instead.
+      dither.value = alpha;
+      f.applied = alpha;
+      continue;
+    }
     if (alpha >= 1) {
       if (f.mat.transparent !== f.transparent) f.mat.needsUpdate = true;
       f.mat.transparent = f.transparent;
@@ -165,6 +174,8 @@ export function occluderFadeReady(
   mats: readonly OccluderFadeMat[],
   consult: OccluderFadeConsult,
 ): boolean {
+  // The dithered prototype links no second program, so nothing can be held.
+  if (ditherFadeEnabled()) return true;
   let ready = true;
   for (let i = 0; i < mats.length; i++) {
     const f = mats[i];
