@@ -64,6 +64,11 @@ Golden changes were reviewed individually. Party/master messages change only
 event identity digests. Rift quality rolls and eligible boss drops add shared-RNG
 draws after ordinary item selection; later material counts and combat outcomes
 can therefore differ for the same seed. No scenario or trace harness was changed.
+One golden delta reads like a behavior change and is not: `heroic_five_man_clear`'s
+`wyrmfall_core` count moving from 1 to 2 is stream re-seating (that count is itself
+an rng draw, and the scenario went from 62 to 63 draws), not the personal-loot
+`count` change in `interaction.ts` landing (every `personalFor` producer is still
+`count: 1`, so that change is a no-op today).
 
 ## Visual verification
 
