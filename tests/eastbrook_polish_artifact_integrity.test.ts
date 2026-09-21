@@ -1383,7 +1383,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  '82ae53a5d0974ea5c446ac6bcd9d0a608140eaa44c3180dcccb4af0a1feb278a';
+  'dd7ca3e7b2049df087ca1973bf7c3405054dd18b523972074624bb74f37cb639';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1395,7 +1395,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  '1cf4f4eddc48d0f0657276dde04f003d8e5d720b1bee784488c7f8d1344b56d4';
+  '82666144eb721dbce9c5710b2442c52b65836f8e2414dff1da41b81a83c1f6d4';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2772,7 +2772,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // devalue audit floor: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-    ).toBe('05563425f6d9d299a64d21dfc3ff40436830d8f72c69ba0f344a349b2e39a996');
+    ).toBe('e140ac60694c79e0555a9ed4c85208e861efe83ba7af3db4ca0b2193f3c67475');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
