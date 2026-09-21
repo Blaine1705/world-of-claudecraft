@@ -388,9 +388,18 @@ export const zh_TW: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",
+      "ghostHint": "跑回你死亡的地點，或與靈魂醫者交談以復活",
       "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。",
+      "keeperTalkTitle": "靈魂醫者",
+      "keeperTalkBody": "我可以讓你就地復活，但代價隨之而來：復活後遺症會使你的所有屬性降低75%，等級越高持續越久，最長10分鐘。讓你的靈魂跑回倒下的地方復活則沒有任何懲罰。",
+      "keeperTalkSparedBody": "我可以讓你就地復活。通常這會附帶復活後遺症，讓你的一切在一段時間內變得虛弱，但你初來乍到，所以我會免去你的代價。無論如何，讓你的靈魂跑回倒下的地方復活都沒有任何懲罰。",
+      "keeperTalkAccept": "復活",
+      "keeperTalkLeave": "離開",
       "healerConfirmTitle": "接受復活虛弱？",
       "healerConfirmBody": "靈魂醫者可以就地復活你，但復活虛弱會使你的全部屬性降低75%，高等級時最長持續10分鐘。讓靈魂返回屍體復活則沒有任何懲罰。",
+      "keeperConfirmBody": "確定嗎？靈魂醫者會復活你，但你會因此變得虛弱：復活後遺症會使你的所有屬性降低75%，直到它消退，等級越高持續越久，最長10分鐘。",
+      "keeperConfirmSparedTitle": "讓靈魂醫者復活你？",
+      "keeperConfirmSparedBody": "確定嗎？靈魂醫者會在此復活你。你還不到10級，所以這次復活後遺症不會削弱你。",
       "healerConfirmAccept": "復活",
       "healerConfirmCancel": "取消"
     },
@@ -518,6 +527,15 @@ export const zh_TW: EnTranslations = {
     },
     "trade": {
       "windowClosed": "交易視窗已關閉。",
+      "offerQuantityHint": "將詢問你要提供的數量",
+      "offerQuantityTitle": "提供 {item}",
+      "offerQuantityInput": "要提供的數量",
+      "offerQuantityConfirm": "提供",
+      "offerQuantityAll": "全部提供",
+      "offerRemoveTitle": "移除 {item}",
+      "offerRemoveInput": "要移除的數量",
+      "offerRemove": "移除",
+      "offerRemoveAll": "全部移除",
       "woc": {
         "tabGold": "金幣",
         "tabWoc": "$WOC",
@@ -10483,6 +10501,7 @@ export const zh_TW: EnTranslations = {
       "deathRecapDrowned": "你已經死亡。你溺死了。",
       "deathRecapCauterized": "你已經死亡。灼燒術的烈焰吞噬了你。",
       "respawn": "你再次感到精力恢復、身體完整。",
+      "respawnKeeperToll": "靈魂醫者復活了你，但你因此變得虛弱：在復活後遺症消退之前，你的所有屬性都會被削弱。",
       "ignoringChat": "已封鎖來自 {name} 的聊天。",
       "noLongerIgnoring": "不再封鎖 {name}。",
       "playerNotNearby": "該玩家不在附近。",
@@ -20286,6 +20305,7 @@ export const zh_TW: EnTranslations = {
       "eastbrook_vale": {
         "name": "東溪谷",
         "welcome": "去鎮上找雷德布魯克元帥，他有任務交給你。",
+        "welcomeDone": "雷德布魯克元帥已沒有任務交給你了 - 這座你踏上旅途的古樸海濱小鎮因你而安寧。",
         "pois": {
           "0": {
             "label": "東溪"
@@ -20331,6 +20351,7 @@ export const zh_TW: EnTranslations = {
       "mirefen_marsh": {
         "name": "泥沼濕地",
         "welcome": "到芬橋大門向守望者芬威克報到。",
+        "welcomeDone": "守望者芬威克已沒有命令交給你了 - 這處沼澤濕地深處的聚落因你而更加安全。",
         "pois": {
           "0": {
             "label": "芬橋"
@@ -20361,6 +20382,7 @@ export const zh_TW: EnTranslations = {
       "thornpeak_heights": {
         "name": "荊峰高地",
         "welcome": "瑟薩莉隊長勉強守住高望城牆。",
+        "welcomeDone": "瑟薩莉隊長守衛著高望城牆 - 從來都不輕鬆，但有了像你這樣的冒險者相助，如今總算應付得來。",
         "pois": {
           "0": {
             "label": "高望"

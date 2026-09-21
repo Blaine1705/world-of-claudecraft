@@ -388,9 +388,18 @@ export const vi_VN: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
       "resurrectAtHealer": "Người Canh Giữ Nhợt Nhạt (Cái Giá của Người Canh Giữ)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Người Canh Giữ Nhợt Nhạt trông nom kẻ chết. Bạn vẫn còn ở giữa cõi sống.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "Chấp nhận Cái Giá của Người Canh Giữ?",
       "healerConfirmBody": "Người Canh Giữ Nhợt Nhạt sẽ hồi sinh bạn tại đây, nhưng Cái Giá của Người Canh Giữ sẽ giảm 75% tất cả thuộc tính của bạn trong tối đa 10 phút ở cấp độ cao hơn. Đưa linh hồn của bạn trở lại xác chết sẽ hồi sinh bạn mà không bị phạt.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Hồi sinh tôi",
       "healerConfirmCancel": "Hủy bỏ"
     },
@@ -518,6 +527,15 @@ export const vi_VN: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Cửa sổ giao dịch đã đóng.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Vàng",
         "tabWoc": "$WOC",
@@ -10483,6 +10501,7 @@ export const vi_VN: EnTranslations = {
       "deathRecapDrowned": "Bạn đã chết. Bạn đã chết đuối.",
       "deathRecapCauterized": "Bạn đã chết. Vết bỏng của Thiêu Đốt đã áp đảo bạn.",
       "respawn": "Bạn cảm thấy đã được nghỉ ngơi và hồi phục hoàn toàn.",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "Đang bỏ qua tin nhắn từ {name}.",
       "noLongerIgnoring": "Không còn bỏ qua {name} nữa.",
       "playerNotNearby": "Người chơi đó không ở gần đây.",
@@ -20286,6 +20305,7 @@ export const vi_VN: EnTranslations = {
       "eastbrook_vale": {
         "name": "Thung Lũng Đông Khê",
         "welcome": "Hãy tìm Thống Chế Redbrook trong thị trấn, ông ấy có việc cho ngươi.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Đông Khê"
@@ -20331,6 +20351,7 @@ export const vi_VN: EnTranslations = {
       "mirefen_marsh": {
         "name": "Đầm Lầy Bùn Sâu",
         "welcome": "Hãy trình diện Hộ Vệ Fenwick tại cổng Cầu Đầm.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Cầu Đầm"
@@ -20361,6 +20382,7 @@ export const vi_VN: EnTranslations = {
       "thornpeak_heights": {
         "name": "Cao Nguyên Đỉnh Gai",
         "welcome": "Đội Trưởng Thessaly đang trấn giữ bức tường ở Vọng Đài Cao, vất vả lắm mới giữ nổi.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Vọng Đài Cao"

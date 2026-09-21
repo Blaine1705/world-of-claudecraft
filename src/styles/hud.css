@@ -862,13 +862,6 @@
         rgba(255, 184, 68, 0) 100%
       );
   }
-  /* The death lesson dims the Keeper's paid revive so the free corpse walk
-     it is teaching is the obvious one. Still clickable: a player who wants
-     to pay may, this only takes it out of the eye's path. */
-  .bc-dimmed {
-    opacity: 0.35;
-    filter: grayscale(0.8);
-  }
   /* The interface lessons (bags, character sheet) have no world direction:
      the answer is the row of buttons along the bottom, so the bloom sits
      there instead of past a side edge. */
@@ -8737,8 +8730,9 @@
     gap: 12px;
   }
   /* Ghost resurrect prompt: a small, NON-BLOCKING panel shown only when a spirit is in
-     reach of its corpse or a Spirit Healer. pointer-events:none on the panel so a ghost
-     moves and clicks the world freely; only the buttons themselves are clickable. */
+     reach of its corpse (the Pale Keeper's raise is a conversation, not a button here).
+     pointer-events:none on the panel so a ghost moves and clicks the world freely; only
+     the button itself is clickable. */
   #ghost-prompt {
     position: absolute;
     left: 50%;
@@ -8755,6 +8749,29 @@
   }
   #ghost-prompt .btn {
     pointer-events: auto;
+  }
+  /* Ghost hint: the standing top-center line for the whole ghost run ("run to
+     your body or talk to the Pale Keeper"). Sits under the compass strip in the
+     #arena-status band and reads like the zone banner (light text, no plate),
+     pointer-inert so it never eats a click meant for the world. The letter
+     spacing and title shadow come from the ui-cin primitive on the element. */
+  #ghost-hint {
+    --color-text-light: var(--color-white);
+    position: absolute;
+    left: 50%;
+    top: 74px;
+    transform: translateX(-50%);
+    display: none;
+    width: max-content;
+    max-width: calc(100vw - 48px);
+    box-sizing: border-box;
+    color: var(--color-text-light);
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.2;
+    text-align: center;
+    pointer-events: none;
+    z-index: 30;
   }
   /* Interact affordance: a small, NON-BLOCKING line shown only while an interact
      press is ambiguous between two farming targets in reach (a placed feast over

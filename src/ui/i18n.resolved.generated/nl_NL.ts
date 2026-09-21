@@ -388,9 +388,18 @@ export const nl_NL: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Herrijs bij je lijk",
       "resurrectAtHealer": "De Bleke Hoeder (Tol van de Hoeder)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "De Bleke Hoeder waakt over de doden. Jij bent nog onder de levenden.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "De Tol van de Hoeder accepteren?",
       "healerConfirmBody": "De Bleke Hoeder wekt je hier tot leven, maar de Tol van de Hoeder vermindert al je eigenschappen met 75%, op hogere niveaus tot wel 10 minuten lang. Loop je als geest terug naar je lichaam, dan herleef je zonder straf.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Breng mij weer tot leven",
       "healerConfirmCancel": "Annuleren"
     },
@@ -518,6 +527,15 @@ export const nl_NL: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Ruilvenster gesloten.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Goud",
         "tabWoc": "$WOC",
@@ -10483,6 +10501,7 @@ export const nl_NL: EnTranslations = {
       "deathRecapDrowned": "Je bent gestorven. Je bent verdronken.",
       "deathRecapCauterized": "Je bent gestorven. De verbranding van Cauteriseren overweldigde je.",
       "respawn": "Je voelt je uitgerust en weer heel.",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "Chat van {name} wordt genegeerd.",
       "noLongerIgnoring": "{name} wordt niet langer genegeerd.",
       "playerNotNearby": "Die speler is niet in de buurt.",
@@ -20286,6 +20305,7 @@ export const nl_NL: EnTranslations = {
       "eastbrook_vale": {
         "name": "Oostbeekdal",
         "welcome": "Zoek Maarschalk Redbrook in de stad, hij heeft werk voor je.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Oostbeek"
@@ -20331,6 +20351,7 @@ export const nl_NL: EnTranslations = {
       "mirefen_marsh": {
         "name": "Slijkveenmoeras",
         "welcome": "Meld je bij Wachter Fenwick bij de poort van Veenbrug.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Veenbrug"
@@ -20361,6 +20382,7 @@ export const nl_NL: EnTranslations = {
       "thornpeak_heights": {
         "name": "Doorntop-Hoogten",
         "welcome": "Kapitein Thessaly houdt de muur bij Hoogwacht, ternauwernood.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Hoogwacht"

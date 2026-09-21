@@ -388,9 +388,18 @@ export const cs_CZ: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "Přijmout strážcovo mýto?",
       "healerConfirmBody": "Bledý strážce tě zde oživí, ale Strážcovo mýto sníží všechny tvé vlastnosti o 75 %, na vyšších úrovních až na 10 minut. Když se jako duch vrátíš ke svému tělu, oživíš se bez postihu.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Oživ mě",
       "healerConfirmCancel": "Zrušit"
     },
@@ -518,6 +527,15 @@ export const cs_CZ: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Okno výměny bylo zavřeno.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Zlato",
         "tabWoc": "$WOC",
@@ -10483,6 +10501,7 @@ export const cs_CZ: EnTranslations = {
       "deathRecapDrowned": "Tvá postava zemřela. Utopila se.",
       "deathRecapCauterized": "Tvá postava zemřela. Přemohl tě žár Vypálení.",
       "respawn": "Cítíš se odpočatě a znovu celý(á).",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "Ignoruješ chat od {name}.",
       "noLongerIgnoring": "Už neignoruješ {name}.",
       "playerNotNearby": "Tento hráč není poblíž.",
@@ -20286,6 +20305,7 @@ export const cs_CZ: EnTranslations = {
       "eastbrook_vale": {
         "name": "Eastbrookské údolí",
         "welcome": "Najdi ve městě maršála Redbrooka, má pro tebe práci.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20331,6 +20351,7 @@ export const cs_CZ: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefenský močál",
         "welcome": "Ohlas se u strážce Fenwicka u brány Fenbridge.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20361,6 +20382,7 @@ export const cs_CZ: EnTranslations = {
       "thornpeak_heights": {
         "name": "Thornpeakské výšiny",
         "welcome": "Kapitánka Thessaly drží zeď u Highwatche, ale sotva.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"

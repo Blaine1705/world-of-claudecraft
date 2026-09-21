@@ -388,9 +388,18 @@ export const de_DE: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Am Leichnam wiederbeleben",
       "resurrectAtHealer": "Der Bleiche Hüter (Zoll des Hüters)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Der Bleiche Hüter wacht über die Toten. Du weilst noch unter den Lebenden.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "Den Hüterzoll annehmen?",
       "healerConfirmBody": "Der Bleiche Hüter belebt dich hier wieder, doch der Hüterzoll verringert alle deine Attribute um 75 %, auf höheren Stufen bis zu 10 Minuten lang. Kehrst du als Geist zu deinem Leichnam zurück, wirst du ohne Strafe wiederbelebt.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Belebe mich wieder",
       "healerConfirmCancel": "Abbrechen"
     },
@@ -518,6 +527,15 @@ export const de_DE: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Handelsfenster geschlossen.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",
@@ -10483,6 +10501,7 @@ export const de_DE: EnTranslations = {
       "deathRecapDrowned": "Ihr seid gestorben. Ihr seid ertrunken.",
       "deathRecapCauterized": "Ihr seid gestorben. Die Verbrennung von Kauterisieren hat Euch überwältigt.",
       "respawn": "Ihr fühlt Euch wieder ausgeruht und unversehrt.",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "Chat von {name} wird ignoriert.",
       "noLongerIgnoring": "{name} wird nicht mehr ignoriert.",
       "playerNotNearby": "Dieser Spieler ist nicht in der Nähe.",
@@ -20286,6 +20305,7 @@ export const de_DE: EnTranslations = {
       "eastbrook_vale": {
         "name": "Eastbrook-Tal",
         "welcome": "Suche Marschall Redbrook in der Stadt: Er hat Arbeit für dich.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20331,6 +20351,7 @@ export const de_DE: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefen-Moor",
         "welcome": "Melde dich bei Wärter Fenwick am Tor von Fenbridge.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20361,6 +20382,7 @@ export const de_DE: EnTranslations = {
       "thornpeak_heights": {
         "name": "Thornpeak-Höhen",
         "welcome": "Hauptmann Thessaly hält die Mauer von Highwatch, gerade so.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"

@@ -388,9 +388,18 @@ export const da_DK: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
       "resurrectAtHealer": "Den Blege Vogter (Vogterens Klokke)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Den Blege Vogter våger over de døde. Du er stadig blandt de levende.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "Vil du acceptere Vogterens Klokke?",
       "healerConfirmBody": "Den Blege Vogter genopliver dig her, men Vogterens Klokke reducerer alle dine egenskaber med 75 % i op til 10 minutter på højere niveauer. Går du som ånd tilbage til dit lig, genoplives du uden straf.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Genopliv mig",
       "healerConfirmCancel": "Annuller"
     },
@@ -518,6 +527,15 @@ export const da_DK: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Handelsvinduet er lukket.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Guld",
         "tabWoc": "$WOC",
@@ -10483,6 +10501,7 @@ export const da_DK: EnTranslations = {
       "deathRecapDrowned": "Du er død. Du druknede.",
       "deathRecapCauterized": "Du er død. Kauteriseringens forbrænding overvældede dig.",
       "respawn": "Du føler dig udhvilet og hel igen.",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "Ignorerer chat fra {name}.",
       "noLongerIgnoring": "Ignorerer ikke længere {name}.",
       "playerNotNearby": "Den spiller er ikke i nærheden.",
@@ -20286,6 +20305,7 @@ export const da_DK: EnTranslations = {
       "eastbrook_vale": {
         "name": "Østbæk Dal",
         "welcome": "Find Marskal Redbrook i byen, han har arbejde til dig.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Østbæk"
@@ -20331,6 +20351,7 @@ export const da_DK: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mosekær Sump",
         "welcome": "Meld dig til Vogter Fenwick ved Sumpbroens port.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Sumpbroen"
@@ -20361,6 +20382,7 @@ export const da_DK: EnTranslations = {
       "thornpeak_heights": {
         "name": "Tornetop Højder",
         "welcome": "Kaptajn Thessaly holder muren ved Højvagten, knap nok.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Højvagten"

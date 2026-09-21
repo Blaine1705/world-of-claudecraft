@@ -209,6 +209,12 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  // The zone-entry chat line (welcome hint vs the town-done line); the
+  // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
+  'src/ui/zone_entry_line_core.ts',
+  // The Pale Keeper's two-step revive copy (dialogue, then a level-aware confirm);
+  // hud.ts resolves the keys and owns the dialog DOM.
+  'src/ui/keeper_revive_dialog_core.ts',
   // The one clamp and disabled rule the source picker's row steppers and the
   // bank quantity prompt share (quantity_stepper.ts is their DOM consumer).
   'src/ui/quantity_step_core.ts',
@@ -262,6 +268,9 @@ const UI_PURE_CORES = [
   'src/ui/log_event_route.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/unit_portrait.ts',
+  // Which body a player entity's frame shows (mech, composed, stock) and the
+  // matching rule for a landed portrait; unit_portrait_painter.ts draws it.
+  'src/ui/player_portrait_core.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',

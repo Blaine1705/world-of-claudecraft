@@ -388,9 +388,18 @@ export const id_ID: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Bangkit di Jasad",
       "resurrectAtHealer": "Sang Penjaga Pucat (Upeti Sang Penjaga)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Sang Penjaga Pucat mengawasi para mati. Kamu masih termasuk yang hidup.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "Terima Upeti Sang Penjaga?",
       "healerConfirmBody": "Sang Penjaga Pucat akan menghidupkan Anda kembali di sini, tetapi Upeti Sang Penjaga mengurangi semua atribut Anda sebesar 75%, hingga 10 menit pada level yang lebih tinggi. Membawa roh Anda kembali ke mayat Anda akan menghidupkan Anda kembali tanpa penalti.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Bangkitkan Aku",
       "healerConfirmCancel": "Membatalkan"
     },
@@ -518,6 +527,15 @@ export const id_ID: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Jendela perdagangan ditutup.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Emas",
         "tabWoc": "$WOC",
@@ -10483,6 +10501,7 @@ export const id_ID: EnTranslations = {
       "deathRecapDrowned": "Kamu telah tewas. Kamu tenggelam.",
       "deathRecapCauterized": "Kamu telah tewas. Bakaran Kauterisasi mengalahkanmu.",
       "respawn": "Kamu merasa segar dan pulih kembali.",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "Mengabaikan obrolan dari {name}.",
       "noLongerIgnoring": "Tidak lagi mengabaikan {name}.",
       "playerNotNearby": "Pemain itu tidak berada di dekatmu.",
@@ -20286,6 +20305,7 @@ export const id_ID: EnTranslations = {
       "eastbrook_vale": {
         "name": "Lembah Eastbrook",
         "welcome": "Temui Marsekal Redbrook di kota, ia punya tugas untukmu.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20331,6 +20351,7 @@ export const id_ID: EnTranslations = {
       "mirefen_marsh": {
         "name": "Rawa Mirefen",
         "welcome": "Lapor pada Warden Fenwick di gerbang Jembatan Rawa.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Jembatan Rawa"
@@ -20361,6 +20382,7 @@ export const id_ID: EnTranslations = {
       "thornpeak_heights": {
         "name": "Dataran Tinggi Thornpeak",
         "welcome": "Kapten Thessaly mempertahankan tembok di Menara Pengawas, nyaris saja.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Menara Pengawas"

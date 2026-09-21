@@ -388,9 +388,18 @@ export const ja_JP: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "亡骸で復活",
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
+      "ghostHint": "死亡した場所まで走るか、霊魂の癒し手に話しかけて復活しよう",
       "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。",
+      "keeperTalkTitle": "霊魂の癒し手",
+      "keeperTalkBody": "その場で蘇らせることはできるが、代償が伴う。復活の後遺症により、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。倒れた場所まで魂を走らせて復活すれば、代償は何もない。",
+      "keeperTalkSparedBody": "その場で蘇らせることはできる。本来なら復活の後遺症が伴い、しばらくのあいだ力のすべてが弱まるのだが、おまえはこの世界に来たばかりだ。だから今回は免じてやろう。倒れた場所まで魂を走らせて復活すれば、いずれにせよ代償は何もない。",
+      "keeperTalkAccept": "復活する",
+      "keeperTalkLeave": "立ち去る",
       "healerConfirmTitle": "復活の後遺症を受けますか？",
       "healerConfirmBody": "霊魂の癒し手はこの場で復活させてくれますが、復活の後遺症により全属性が75%低下します。高レベルでは最長10分間続きます。魂を遺体まで戻せばペナルティなしで復活できます。",
+      "keeperConfirmBody": "本当によいか？霊魂の癒し手はあなたを蘇らせるが、その代償として弱くなる。復活の後遺症が消えるまで、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。",
+      "keeperConfirmSparedTitle": "霊魂の癒し手に蘇らせてもらうか？",
+      "keeperConfirmSparedBody": "本当によいか？霊魂の癒し手はここであなたを蘇らせる。あなたはレベル10未満なので、今回は復活の後遺症で弱ることはない。",
       "healerConfirmAccept": "復活する",
       "healerConfirmCancel": "キャンセル"
     },
@@ -518,6 +527,15 @@ export const ja_JP: EnTranslations = {
     },
     "trade": {
       "windowClosed": "取引ウィンドウを閉じました。",
+      "offerQuantityHint": "差し出す数量を選べます",
+      "offerQuantityTitle": "{item}を差し出す",
+      "offerQuantityInput": "差し出す数量",
+      "offerQuantityConfirm": "差し出す",
+      "offerQuantityAll": "すべて差し出す",
+      "offerRemoveTitle": "{item}を取り除く",
+      "offerRemoveInput": "取り除く数量",
+      "offerRemove": "取り除く",
+      "offerRemoveAll": "すべて取り除く",
       "woc": {
         "tabGold": "金貨",
         "tabWoc": "$WOC",
@@ -10483,6 +10501,7 @@ export const ja_JP: EnTranslations = {
       "deathRecapDrowned": "死亡しました。溺死しました。",
       "deathRecapCauterized": "死亡しました。焼灼の炎に飲み込まれました。",
       "respawn": "再び休まり、完全な状態になりました。",
+      "respawnKeeperToll": "霊魂の癒し手があなたを復活させたが、その代償として弱っている。復活の後遺症が消えるまで、すべての能力値が下がる。",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
       "playerNotNearby": "そのプレイヤーは近くにいません。",
@@ -20286,6 +20305,7 @@ export const ja_JP: EnTranslations = {
       "eastbrook_vale": {
         "name": "イーストブルック渓谷",
         "welcome": "町のレッドブルック元帥を訪ねてください。あなたに頼みたい仕事があります。",
+        "welcomeDone": "レッドブルック元帥からの仕事はもうありません - あなたの旅が始まった趣のある海辺の町は、おかげで安らかです。",
         "pois": {
           "0": {
             "label": "イーストブルック"
@@ -20331,6 +20351,7 @@ export const ja_JP: EnTranslations = {
       "mirefen_marsh": {
         "name": "マイアフェン湿地",
         "welcome": "フェンブリッジの門で番人フェンウィックに報告してください。",
+        "welcomeDone": "番人フェンウィックからの命令はもうありません - 沼地の湿原の奥深くにたたずむ集落は、おかげでより安全になりました。",
         "pois": {
           "0": {
             "label": "フェンブリッジ"
@@ -20361,6 +20382,7 @@ export const ja_JP: EnTranslations = {
       "thornpeak_heights": {
         "name": "ソーンピーク高地",
         "welcome": "テサリー隊長がかろうじてハイウォッチの壁を保っています。",
+        "welcomeDone": "テサリー隊長がハイウォッチの壁を守っています - 決して楽ではありませんが、あなたのような冒険者たちの助けで今は何とか持ちこたえています。",
         "pois": {
           "0": {
             "label": "ハイウォッチ"

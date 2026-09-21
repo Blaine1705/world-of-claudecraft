@@ -473,7 +473,27 @@ const MONOLITHS: MonolithRow[] = [
     // screenshot and HUD extractions compose with aura overlay wiring and the
     // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 18309,
+    // LOWERED 18309 -> 18284 by the composed player portraits change: the
+    // "which body does this player's frame show" rule moved out to
+    // src/ui/player_portrait_core.ts, so the three frame draws and the
+    // portrait update listener each became one call. Exact count, zero slack.
+    // Re-measured at the release/v0.44.0 sync of that change (the release's
+    // frame-rate-limit wiring plus the per-call portrait lookups compose to
+    // 18291 by wc -l on the merged tree, still under the 18309 the branch
+    // started from). Exact count, zero slack.
+    // LOWERED 18291 -> 18289 at the PR 4100 review round: the Inspect look now
+    // travels as an openInspect parameter (no InspectEntity cast dep), and
+    // the target-of-target key reads targetPortraitKey. Exact count, zero slack.
+    // LOWERED 18289 -> 18286 at the trade quantity prompt sync: the merge queue
+    // measured that branch at 18291 against this pin, so its tradeOfferHeadroom
+    // wrapper folded into the bags binding (the trade-open gate plus the pure
+    // core read on one dependency line). Exact count, zero slack.
+    // LOWERED 18286 -> 18276 at the release/v0.44.0 sync of the Pale Keeper
+    // revive change: the Keeper dialog copy moved out to
+    // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
+    // per-frame healer-range scan (the Keeper is talked to). wc -l on the
+    // merged tree. Exact count, zero slack.
+    ceiling: 18276,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1503,7 +1523,11 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the guild_pledge_settings dispatch arm's field
     // validation moved to server/guild_pledge_settings_cmd.ts. Merged with the
     // account-wide books extraction above; exact merged count, zero slack.
-    ceiling: 10076,
+    // LOWERED 10076 -> 9993 at the target-echo fix: the input seq fold (the R9
+    // gap booking plus the ack high-water) moved to server/input_seq.ts, now
+    // shared by the input frame and the seq-bearing 'target' command. Measured
+    // with wc -l < server/game.ts after biome. Exact count, zero slack.
+    ceiling: 9993,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1653,7 +1677,12 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the board path builder, the page decode and the
     // pledge-settings frame decode moved to src/net/guild_board_wire.ts. Merged
     // with the book_wire extraction above; exact merged count, zero slack.
-    ceiling: 5498,
+    // LOWERED 5498 -> 5426 at the target-echo fix: the pending-target echo
+    // decision (the hold, its ack release, the valve) moved to
+    // src/net/target_echo.ts, banking the 52 lines of slack the row already
+    // carried with it. Measured with wc -l < src/net/online.ts after biome.
+    // Exact count, zero slack.
+    ceiling: 5426,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

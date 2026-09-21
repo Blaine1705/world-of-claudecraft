@@ -2820,6 +2820,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapDrowned': '死亡しました。溺死しました。',
   'hud.system.deathRecapCauterized': '死亡しました。焼灼の炎に飲み込まれました。',
   'hud.system.respawn': '再び休まり、完全な状態になりました。',
+  'hud.system.respawnKeeperToll':
+    '霊魂の癒し手があなたを復活させたが、その代償として弱っている。復活の後遺症が消えるまで、すべての能力値が下がる。',
   'hud.system.ignoringChat': '{name}のチャットを無視します。',
   'hud.system.noLongerIgnoring': '{name}の無視を解除しました。',
   'hud.system.playerNotNearby': 'そのプレイヤーは近くにいません。',
@@ -4444,7 +4446,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '霊魂の癒し手はこの場で復活させてくれますが、復活の後遺症により全属性が75%低下します。高レベルでは最長10分間続きます。魂を遺体まで戻せばペナルティなしで復活できます。',
   'hudChrome.death.healerConfirmAccept': '復活する',
   'hudChrome.death.healerConfirmCancel': 'キャンセル',
+  'hudChrome.death.keeperTalkTitle': '霊魂の癒し手',
+  'hudChrome.death.keeperTalkAccept': '復活する',
+  'hudChrome.death.keeperTalkLeave': '立ち去る',
+  'hudChrome.death.keeperConfirmSparedTitle': '霊魂の癒し手に蘇らせてもらうか？',
+  'hudChrome.death.keeperTalkBody':
+    'その場で蘇らせることはできるが、代償が伴う。復活の後遺症により、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。倒れた場所まで魂を走らせて復活すれば、代償は何もない。',
+  'hudChrome.death.keeperTalkSparedBody':
+    'その場で蘇らせることはできる。本来なら復活の後遺症が伴い、しばらくのあいだ力のすべてが弱まるのだが、おまえはこの世界に来たばかりだ。だから今回は免じてやろう。倒れた場所まで魂を走らせて復活すれば、いずれにせよ代償は何もない。',
+  'hudChrome.death.keeperConfirmBody':
+    '本当によいか？霊魂の癒し手はあなたを蘇らせるが、その代償として弱くなる。復活の後遺症が消えるまで、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。',
+  'hudChrome.death.keeperConfirmSparedBody':
+    '本当によいか？霊魂の癒し手はここであなたを蘇らせる。あなたはレベル10未満なので、今回は復活の後遺症で弱ることはない。',
   'hudChrome.death.spiritHealerAlive': '霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。',
+  'hudChrome.death.ghostHint': '死亡した場所まで走るか、霊魂の癒し手に話しかけて復活しよう',
   'entities.npcs.spirit_healer.name': '霊魂の癒し手',
   'entities.npcs.spirit_healer.title': '死者の番人',
   'entities.npcs.spirit_healer.greeting':
@@ -5028,6 +5043,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.name': 'イーストブルック渓谷',
   'entities.zones.eastbrook_vale.welcome':
     '町のレッドブルック元帥を訪ねてください。あなたに頼みたい仕事があります。',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    'レッドブルック元帥からの仕事はもうありません - あなたの旅が始まった趣のある海辺の町は、おかげで安らかです。',
   'entities.zones.eastbrook_vale.pois.0.label': 'イーストブルック',
   'entities.zones.eastbrook_vale.pois.1.label': '狼の道',
   'entities.zones.eastbrook_vale.pois.2.label': '猪の草地',
@@ -5039,6 +5056,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.name': 'マイアフェン湿地',
   'entities.zones.mirefen_marsh.welcome':
     'フェンブリッジの門で番人フェンウィックに報告してください。',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    '番人フェンウィックからの命令はもうありません - 沼地の湿原の奥深くにたたずむ集落は、おかげでより安全になりました。',
   'entities.zones.mirefen_marsh.pois.0.label': 'フェンブリッジ',
   'entities.zones.mirefen_marsh.pois.1.label': '徘徊者の葦原',
   'entities.zones.mirefen_marsh.pois.2.label': 'ディープフェンの浅瀬',
@@ -5050,6 +5069,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.name': 'ソーンピーク高地',
   'entities.zones.thornpeak_heights.welcome':
     'テサリー隊長がかろうじてハイウォッチの壁を保っています。',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    'テサリー隊長がハイウォッチの壁を守っています - 決して楽ではありませんが、あなたのような冒険者たちの助けで今は何とか持ちこたえています。',
   'entities.zones.thornpeak_heights.pois.0.label': 'ハイウォッチ',
   'entities.zones.thornpeak_heights.pois.1.label': '追跡者の尾根',
   'entities.zones.thornpeak_heights.pois.2.label': 'ディープロックの巣穴',
@@ -16199,6 +16220,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '補充の席は意図的に危険のないものになっています。あなたが飛び込むのは自分が関わっていない戦況なので、勝っても負けてもこの試合があなたの戦場レーティングに触れることはなく、途中で抜けても何も負いません。試合が終わりに近づき、来たところで結果を変えられない頃合いになると誘い自体が届かなくなるので、他人の幕引きに座らされることはありません。',
   'hudChrome.trade.windowClosed': '取引ウィンドウを閉じました。',
+  'hudChrome.trade.offerQuantityHint': '差し出す数量を選べます',
+  'hudChrome.trade.offerQuantityTitle': '{item}を差し出す',
+  'hudChrome.trade.offerQuantityInput': '差し出す数量',
+  'hudChrome.trade.offerQuantityConfirm': '差し出す',
+  'hudChrome.trade.offerQuantityAll': 'すべて差し出す',
+  'hudChrome.trade.offerRemoveTitle': '{item}を取り除く',
+  'hudChrome.trade.offerRemoveInput': '取り除く数量',
+  'hudChrome.trade.offerRemove': '取り除く',
+  'hudChrome.trade.offerRemoveAll': 'すべて取り除く',
   'hudChrome.trade.woc.hintInsufficientBalance': '接続中のウォレットの $WOC 残高を超えています。',
   'hudChrome.trade.woc.priceLabel': '価格（USD）',
   'hudChrome.trade.woc.equivalent': '現在のレートで約 {tokens} $WOC',

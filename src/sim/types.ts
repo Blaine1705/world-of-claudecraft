@@ -4165,6 +4165,9 @@ export interface ZoneDef {
   pois: { x: number; z: number; label: string; id?: string; hideOnMap?: boolean }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
+  // Replaces the welcome hint on entry once every town quest of the zone is
+  // turned in (sim/town_quests.ts). Zones without it keep the welcome rule only.
+  welcomeDone?: string;
   // The zone's southern border ridge has NO road pass and is raised past the
   // climbable slope: the zone is reachable only by portal (see world.ts).
   sealedSouthBorder?: boolean;
@@ -6479,7 +6482,9 @@ export type SimEvent = { pid?: number } & (
   // (e.g. 'Falling' for environmental damage), the client localizes it via
   // abilityDisplayNameFromSource like every other ability-name event field.
   | { type: 'playerDeath'; killerId?: number; killerAbility?: string }
-  | { type: 'respawn' }
+  // sickness names the penalty the revive charged, so the client can say so; a
+  // penalty-free revive (corpse run, instance re-entry, delve reset) omits it.
+  | { type: 'respawn'; sickness?: 'resurrection' }
   | UnstuckEvent
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.

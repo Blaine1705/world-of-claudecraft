@@ -388,9 +388,18 @@ export const ko_KR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "시신에서 부활",
       "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
+      "ghostHint": "죽은 장소로 달려가거나 영혼 치유사에게 말을 걸어 부활하세요",
       "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다.",
+      "keeperTalkTitle": "영혼 치유사",
+      "keeperTalkBody": "그 자리에서 되살려 줄 수 있지만 대가가 따릅니다. 부활 후유증으로 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다. 영혼이 쓰러진 곳으로 달려가 부활하면 아무런 대가가 없습니다.",
+      "keeperTalkSparedBody": "그 자리에서 되살려 줄 수 있습니다. 본래라면 부활 후유증이 따라 한동안 당신의 모든 것이 약해지지만, 당신은 이 세계에 갓 발을 들였으니 이번에는 면해 주겠습니다. 영혼이 쓰러진 곳으로 달려가 부활하면 어느 쪽이든 아무런 대가가 없습니다.",
+      "keeperTalkAccept": "부활",
+      "keeperTalkLeave": "떠나기",
       "healerConfirmTitle": "부활의 후유증을 감수하시겠습니까?",
       "healerConfirmBody": "영혼 치유사가 이 자리에서 부활시켜 주지만, 부활의 후유증으로 모든 능력치가 75% 감소하며 높은 레벨에서는 최대 10분간 지속됩니다. 영혼이 시신까지 걸어가서 부활하면 아무런 불이익이 없습니다.",
+      "keeperConfirmBody": "정말입니까? 영혼 치유사가 당신을 부활시키지만 그 대가로 약해집니다. 부활 후유증이 사라질 때까지 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다.",
+      "keeperConfirmSparedTitle": "영혼 치유사에게 부활을 맡기시겠습니까?",
+      "keeperConfirmSparedBody": "정말입니까? 영혼 치유사가 여기서 당신을 부활시킵니다. 당신은 10레벨 미만이므로 이번에는 부활 후유증으로 약해지지 않습니다.",
       "healerConfirmAccept": "부활",
       "healerConfirmCancel": "취소"
     },
@@ -518,6 +527,15 @@ export const ko_KR: EnTranslations = {
     },
     "trade": {
       "windowClosed": "거래 창이 닫혔습니다.",
+      "offerQuantityHint": "내놓을 수량을 묻습니다",
+      "offerQuantityTitle": "{item} 내놓기",
+      "offerQuantityInput": "내놓을 수량",
+      "offerQuantityConfirm": "내놓기",
+      "offerQuantityAll": "모두 내놓기",
+      "offerRemoveTitle": "{item} 제거",
+      "offerRemoveInput": "제거할 수량",
+      "offerRemove": "제거",
+      "offerRemoveAll": "모두 제거",
       "woc": {
         "tabGold": "금화",
         "tabWoc": "$WOC",
@@ -10483,6 +10501,7 @@ export const ko_KR: EnTranslations = {
       "deathRecapDrowned": "사망했습니다. 익사했습니다.",
       "deathRecapCauterized": "사망했습니다. 소작의 화염이 당신을 집어삼켰습니다.",
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
+      "respawnKeeperToll": "영혼 치유사가 당신을 부활시켰지만 그 대가로 약해졌습니다. 부활 후유증이 사라질 때까지 모든 능력치가 감소합니다.",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
       "playerNotNearby": "그 플레이어는 근처에 없습니다.",
@@ -20286,6 +20305,7 @@ export const ko_KR: EnTranslations = {
       "eastbrook_vale": {
         "name": "이스트브룩 골짜기",
         "welcome": "마을의 레드브룩 원수를 찾아가십시오. 그가 당신에게 맡길 일이 있습니다.",
+        "welcomeDone": "레드브룩 원수가 맡길 일은 더 이상 없습니다 - 당신의 여정이 시작된 아담한 바닷가 마을은 그 덕분에 한결 평온합니다.",
         "pois": {
           "0": {
             "label": "이스트브룩"
@@ -20331,6 +20351,7 @@ export const ko_KR: EnTranslations = {
       "mirefen_marsh": {
         "name": "마이어펜 습지",
         "welcome": "펜브리지 문에서 감시관 펜윅에게 보고하십시오.",
+        "welcomeDone": "감시관 펜윅의 명령은 더 이상 없습니다 - 질퍽한 늪지대 깊숙이 자리한 정착지는 그 덕분에 더 안전해졌습니다.",
         "pois": {
           "0": {
             "label": "펜브리지"
@@ -20361,6 +20382,7 @@ export const ko_KR: EnTranslations = {
       "thornpeak_heights": {
         "name": "쏜피크 고지",
         "welcome": "테살리 대장이 간신히 하이워치 성벽을 지키고 있습니다.",
+        "welcomeDone": "테살리 대장이 하이워치 성벽을 지키고 있습니다 - 결코 쉽지 않지만, 당신 같은 모험가들의 도움으로 이제는 감당할 만합니다.",
         "pois": {
           "0": {
             "label": "하이워치"

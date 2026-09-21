@@ -2693,6 +2693,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapDrowned': '你已经死亡。你淹死了。',
   'hud.system.deathRecapCauterized': '你已经死亡。灼烧术的烈焰吞噬了你。',
   'hud.system.respawn': '你再次感到精力恢复、身体完整。',
+  'hud.system.respawnKeeperToll':
+    '灵魂医者复活了你，但你因此变得虚弱：在复活后遗症消退之前，你的所有属性都会被削弱。',
   'hud.system.ignoringChat': '已屏蔽来自 {name} 的聊天。',
   'hud.system.noLongerIgnoring': '不再屏蔽 {name}。',
   'hud.system.playerNotNearby': '该玩家不在附近。',
@@ -4270,7 +4272,20 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '灵魂医者可以就地复活你，但复活后遗症会使你的全部属性降低75%，高等级时最长持续10分钟。让灵魂返回尸体复活则没有任何惩罚。',
   'hudChrome.death.healerConfirmAccept': '复活',
   'hudChrome.death.healerConfirmCancel': '取消',
+  'hudChrome.death.keeperTalkTitle': '灵魂医者',
+  'hudChrome.death.keeperTalkAccept': '复活',
+  'hudChrome.death.keeperTalkLeave': '离开',
+  'hudChrome.death.keeperConfirmSparedTitle': '让灵魂医者复活你？',
+  'hudChrome.death.keeperTalkBody':
+    '我可以让你就地复活，但代价随之而来：复活后遗症会使你的所有属性降低75%，等级越高持续越久，最长10分钟。让你的灵魂跑回倒下的地方复活则没有任何惩罚。',
+  'hudChrome.death.keeperTalkSparedBody':
+    '我可以让你就地复活。通常这会附带复活后遗症，让你的一切在一段时间内变得虚弱，但你初来乍到，所以我会免去你的代价。无论如何，让你的灵魂跑回倒下的地方复活都没有任何惩罚。',
+  'hudChrome.death.keeperConfirmBody':
+    '确定吗？灵魂医者会复活你，但你会因此变得虚弱：复活后遗症会使你的所有属性降低75%，直到它消退，等级越高持续越久，最长10分钟。',
+  'hudChrome.death.keeperConfirmSparedBody':
+    '确定吗？灵魂医者会在此复活你。你还不到10级，所以这次复活后遗症不会削弱你。',
   'hudChrome.death.spiritHealerAlive': '灵魂医者只看护逝者。你仍是生者。',
+  'hudChrome.death.ghostHint': '跑回你死亡的地点，或与灵魂医者交谈以复活',
   'entities.npcs.spirit_healer.name': '灵魂医者',
   'entities.npcs.spirit_healer.title': '亡者的守护者',
   'entities.npcs.spirit_healer.greeting':
@@ -4829,6 +4844,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_tarn_waders.objectives.0.label': '微光潭涉行者已被消灭',
   'entities.zones.eastbrook_vale.name': '东溪谷',
   'entities.zones.eastbrook_vale.welcome': '去镇上找雷德布鲁克元帅，他有任务交给你。',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    '雷德布鲁克元帅已没有任务交给你了 - 这座你踏上旅途的古朴海滨小镇因你而安宁。',
   'entities.zones.eastbrook_vale.pois.0.label': '东溪',
   'entities.zones.eastbrook_vale.pois.1.label': '狼径',
   'entities.zones.eastbrook_vale.pois.2.label': '野猪草地',
@@ -4839,6 +4856,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': '倒塌礼拜堂',
   'entities.zones.mirefen_marsh.name': '泥沼湿地',
   'entities.zones.mirefen_marsh.welcome': '到芬桥大门向守望者芬威克报到。',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    '守望者芬威克已没有命令交给你了 - 这处沼泽湿地深处的聚落因你而更加安全。',
   'entities.zones.mirefen_marsh.pois.0.label': '芬桥',
   'entities.zones.mirefen_marsh.pois.1.label': '潜伏者芦苇地',
   'entities.zones.mirefen_marsh.pois.2.label': '深沼浅滩',
@@ -4849,6 +4868,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.7.label': '沉没堡垒',
   'entities.zones.thornpeak_heights.name': '荆峰高地',
   'entities.zones.thornpeak_heights.welcome': '瑟萨莉队长勉强守住高望城墙。',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    '瑟萨莉队长守卫着高望城墙 - 从来都不轻松，但有了像你这样的冒险者相助，如今总算应付得来。',
   'entities.zones.thornpeak_heights.pois.0.label': '高望',
   'entities.zones.thornpeak_heights.pois.1.label': '潜猎者山脊',
   'entities.zones.thornpeak_heights.pois.2.label': '深岩洞穴',
@@ -15392,6 +15413,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '接下补位的席位是刻意不带风险的：你落入的是一份与你无关的比分，因此无论胜负，这场比赛都不会触动你的战场评分，中途离开也不欠任何代价。当一场比赛已接近尾声、新来者再也无法改变结果时，邀请也就不再发出，所以你绝不会被安置进别人的结局里。',
   'hudChrome.trade.windowClosed': '交易窗口已关闭。',
+  'hudChrome.trade.offerQuantityHint': '将询问你要提供的数量',
+  'hudChrome.trade.offerQuantityTitle': '提供 {item}',
+  'hudChrome.trade.offerQuantityInput': '要提供的数量',
+  'hudChrome.trade.offerQuantityConfirm': '提供',
+  'hudChrome.trade.offerQuantityAll': '全部提供',
+  'hudChrome.trade.offerRemoveTitle': '移除 {item}',
+  'hudChrome.trade.offerRemoveInput': '要移除的数量',
+  'hudChrome.trade.offerRemove': '移除',
+  'hudChrome.trade.offerRemoveAll': '全部移除',
   'hudChrome.trade.woc.hintInsufficientBalance': '这超出了你已连接钱包持有的 $WOC 数量。',
   'hudChrome.trade.woc.priceLabel': '价格（美元）',
   'hudChrome.trade.woc.equivalent': '按当前汇率约为 {tokens} $WOC',
