@@ -20281,6 +20281,7 @@ export const sv_SE: EnTranslations = {
       "eastbrook_vale": {
         "name": "Östbäcksdalen",
         "welcome": "Hitta marskalk Redbrook i staden - han har arbete åt dig.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Östbäck"
@@ -20326,6 +20327,7 @@ export const sv_SE: EnTranslations = {
       "mirefen_marsh": {
         "name": "Dykärrsträsket",
         "welcome": "Anmäl dig hos väktare Fenwick vid Kärrbrons port.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Kärrbron"
@@ -20356,6 +20358,7 @@ export const sv_SE: EnTranslations = {
       "thornpeak_heights": {
         "name": "Törntoppshöjderna",
         "welcome": "Kapten Thessaly håller muren vid Högvakten - knappt.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Högvakten"

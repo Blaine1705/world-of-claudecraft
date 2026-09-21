@@ -11,6 +11,9 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -35,6 +38,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -59,6 +65,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -83,6 +92,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -108,6 +120,9 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -132,6 +147,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -172,6 +190,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -200,6 +221,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "cs_CZ": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -224,6 +248,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -248,6 +275,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -272,6 +302,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -296,6 +329,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -320,6 +356,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -344,6 +383,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -368,6 +410,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "abilityUi.forms.bearOrCat",
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",

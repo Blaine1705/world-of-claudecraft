@@ -209,6 +209,9 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  // The zone-entry chat line (welcome hint vs the town-done line); the
+  // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
+  'src/ui/zone_entry_line_core.ts',
   // The Pale Keeper's two-step revive copy (dialogue, then a level-aware confirm);
   // hud.ts resolves the keys and owns the dialog DOM.
   'src/ui/keeper_revive_dialog_core.ts',
