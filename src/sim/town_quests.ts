@@ -2,7 +2,8 @@
 //
 // UI-ONLY sim leaf: consumed by src/ui/zone_entry_line_core.ts and its tests;
 // no src/sim file may import it, so it never joins the tick (the
-// material_taxonomy.ts precedent). Pure: no Sim, no SimContext; the quest
+// material_taxonomy.ts precedent, pinned by the GUARDED_MODULES walk in
+// tests/material_taxonomy.test.ts). Pure: no Sim, no SimContext; the quest
 // state comes in as a callback so the offline Sim and the online mirror
 // resolve it the same way.
 //
