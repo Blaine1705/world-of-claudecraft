@@ -674,6 +674,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/cross_hotbar/cross_hotbar_view.ts',
   'src/ui/dpad_nav_core.ts',
   'src/game/graphics_rebuild_core.ts',
+  'src/game/hoard_mechanic_audio_core.ts',
   'src/game/presentation_gate.ts',
   'src/game/stale_chrome_focus.ts',
   'src/game/perf_diagnosis_core.ts',

@@ -1,3 +1,4 @@
+import { HoardMechanicAudio } from '../game/hoard_mechanic_audio';
 import { HoardTideAudio } from '../game/hoard_tide_audio';
 import { sfx } from '../game/sfx';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
@@ -10,6 +11,8 @@ import { GFX } from './gfx';
 /** Local presentation only. Cues and damage always come from the authoritative world. */
 export class HoardBossPresentation {
   private readonly audio = new HoardTideAudio(sfx);
+  /** The hammer, the boulder, the tentacles and the cocoon, told in sound. */
+  private readonly mechanics = new HoardMechanicAudio(sfx);
   private lastNearCue = -1;
   private lastNearInstance = -1;
   private readonly cosmeticShake =
@@ -61,6 +64,7 @@ export class HoardBossPresentation {
       }
     }
     this.audio.sync(cues, player?.pos.y ?? 0);
+    this.mechanics.sync(cues, player?.pos.y ?? 0);
   }
 
   handleEvent(event: SimEvent): void {
@@ -72,5 +76,6 @@ export class HoardBossPresentation {
 
   dispose(): void {
     this.audio.dispose();
+    this.mechanics.dispose();
   }
 }
