@@ -2,7 +2,6 @@ import { expect, it, vi } from 'vitest';
 import { AbilityVfx, type AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import { ArchetypeSequencer, type SequencerHost } from '../src/render/ability_vfx/sequencer';
 import type { AbilityVfxFullSpec } from '../src/render/ability_vfx_core';
-import { meleeContactHeight, meleeImpactProfile } from '../src/render/melee_impact_core';
 import { ABILITIES } from '../src/sim/data';
 
 const abilities = [
@@ -15,6 +14,23 @@ const abilities = [
   'victory_rush',
   'breachmaker',
 ] as const;
+// Literal expected contact heights (src/render/melee_impact_core.ts
+// MELEE_IMPACTS[id].height), one per authored id. meleeContactHeight(profile,
+// 0) always resolves to profile.height unchanged (beat 0 zeroes out both the
+// 'reap' and 'cross' style offsets), so these are the exact receiving-sprite
+// heights this suite expects; comparing the recorded call against a second
+// call to meleeContactHeight built from the SAME profile it is meant to
+// check would only ever equal itself.
+const EXPECTED_CONTACT_HEIGHT: Record<(typeof abilities)[number], number> = {
+  slam: 0.56,
+  overpower: 0.57,
+  shield_slam: 0.55,
+  mortal_strike: 0.63,
+  execute: 0.7,
+  bloodthirst: 0.56,
+  victory_rush: 0.61,
+  breachmaker: 0.57,
+};
 const outcomes = ['hit', 'absorbed', 'miss', 'dodge', 'parry'] as const;
 it.each(
   abilities.flatMap((id) =>
@@ -128,10 +144,8 @@ it.each(
       expect(vi.mocked(host.contact!).mock.calls.filter((call) => call[1] === 3)).toHaveLength(1);
       expect(host.shakeAt).toHaveBeenCalledTimes(1);
     }
-    const profile = meleeImpactProfile(id);
-    if (!profile) throw new Error(`Missing tested contact profile: ${id}`);
     for (const call of receivingSprites) {
-      expect(call[1]).toBe(meleeContactHeight(profile, 0) * 2);
+      expect(call[1]).toBe(EXPECTED_CONTACT_HEIGHT[id] * 2);
       // sin(pi/2) gives the exact X offset; cos(pi/2) leaves only roundoff in Z.
       expect(call[2]).toBeCloseTo(0, 12);
     }

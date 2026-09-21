@@ -170,7 +170,9 @@ describe('buildManifest', () => {
     // player footfalls or have several cues, so this is not a mount count.
     // 319 = the 299-key release inventory plus the 20 player-selectable aura
     // proc alerts (src/game/aura_cue_catalog.ts), which are all ui_aura_ keys.
-    // 381 adds 61 Warrior cues and one existing Warrior cold-contact fallback.
+    // 381 adds 62 new keys on top of that 319: 60 whose name contains
+    // "_warrior_" (asserted below), plus two that do not, piercing_howl and
+    // impact_masterwork_execution (also asserted below).
     const keys = new Set(SFX.map((entry) => entry.key));
     expect(keys.size).toBe(381);
     expect([...keys].filter((key) => key.includes('_warrior_'))).toHaveLength(60);

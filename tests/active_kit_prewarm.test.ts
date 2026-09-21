@@ -141,21 +141,41 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     expect(f.upload).toHaveBeenNthCalledWith(10, f.crush);
     expect(f.crush).not.toBe(f.shear);
     expect(f.host.draw).toHaveBeenCalledTimes(27);
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('harvest_cut');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('harvest_eruption');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('twinstrike_cut');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('bloodletting_pull');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('bark_pressure');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_chop');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_counter');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_execution');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('leap_rupture');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_storm');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_reap');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('iron_counter');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('iron_quake');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('iron_fault');
-    expect(ACTIVE_WARRIOR_CRESTS).toContain('breach_wedge');
+    // The full, ordered 27-name crest list (20 authored kinds + the 7
+    // WARRIOR_PRESSURE_KINDS spread in), pinned as one literal instead of 15
+    // scattered toContain checks: those covered barely half the list (missing
+    // blood_cut, shield_contact, steel_cut, avatar_rupture, blood_gyre, and
+    // every pressure kind) and none of them could catch a reorder or an
+    // unintended addition/removal.
+    expect(ACTIVE_WARRIOR_CRESTS).toEqual([
+      'blood_cut',
+      'harvest_cut',
+      'harvest_eruption',
+      'twinstrike_cut',
+      'bloodletting_pull',
+      'bark_pressure',
+      'shield_contact',
+      'steel_cut',
+      'steel_chop',
+      'steel_counter',
+      'steel_execution',
+      'steel_storm',
+      'steel_reap',
+      'iron_counter',
+      'iron_quake',
+      'iron_fault',
+      'breach_wedge',
+      'avatar_rupture',
+      'blood_gyre',
+      'leap_rupture',
+      'rally_pressure',
+      'dread_pressure',
+      'challenge_pressure',
+      'battle_pressure',
+      'embolden_pressure',
+      'fear_pressure',
+      'piercing_pressure',
+    ]);
     for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind)).toBe(true);
     expect(f.prep.ready('fire')).toBe(false);
     await ensureActiveAbilityKit(f.scene);
@@ -293,9 +313,17 @@ it('surfaces a failed compile without blessing its buffers and retries only unpa
   try {
     f.host.compile.mockRejectedValueOnce(new Error('driver link failed'));
     await expect(ensureActiveAbilityKit(f.scene)).rejects.toThrow('driver link failed');
+    // The 10 texture uploads are earlier, synchronous units in the same
+    // recipe array and every one of them already ran (and was marked done)
+    // before the loop ever reached the first crest geometry unit whose
+    // compile rejected: paid work, already spent by the time this failed.
+    expect(f.upload).toHaveBeenCalledTimes(10);
     expect(f.prep.ready('blood_cut')).toBe(false);
     expect(f.host.draw).not.toHaveBeenCalled();
     await ensureActiveAbilityKit(f.scene);
+    // The retry's recipe filters out every id already in state.done, so it
+    // replays only the unpaid geometry work; the texture upload count must
+    // stay at 10, the proof that the paid uploads were not repeated.
     expect(f.upload).toHaveBeenCalledTimes(10);
     expect(f.prep.ready('blood_cut')).toBe(true);
   } finally {

@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4059,
+    "files": 4063,
     "harvestedFiles": 3948,
     "carried": {
       "tests/active_kit_prewarm.test.ts": {
@@ -59,6 +59,15 @@
           9
         ]
       },
+      "tests/fct_stage_core.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
+        "runs": [
+          15
+        ]
+      },
       "tests/fury_audio_integration.test.ts": {
         "ms": 359,
         "method": "local-median",
@@ -93,6 +102,15 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           9
+        ]
+      },
+      "tests/harvest_detonation_staging.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
+        "runs": [
+          15
         ]
       },
       "tests/harvest_fallback_anchor.test.ts": {
@@ -358,6 +376,15 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           9
+        ]
+      },
+      "tests/warrior_area_telegraph.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
+        "runs": [
+          13
         ]
       },
       "tests/warrior_attention.test.ts": {
@@ -810,6 +837,15 @@
           51
         ]
       },
+      "tests/warrior_onrush_cue.test.ts": {
+        "ms": 3515,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
+        "runs": [
+          3515
+        ]
+      },
       "tests/warrior_onrush_visual.test.ts": {
         "ms": 1164,
         "method": "local-median",
@@ -1029,7 +1065,9 @@
     },
     "removed": {
       "tests/server/store_mount_grants.test.ts": "Replaced by store_mount_skin_grants.test.ts in PR3941; new suite uses the existing heuristic until measured."
-    }
+    },
+    "mergedLocal": "2026-09-21",
+    "mergedFiles": 4
   },
   "tests/abilities_command.test.ts": 2213,
   "tests/ability_audio_defers_to_recordings.test.ts": 66,
@@ -2224,6 +2262,7 @@
   "tests/fct_event.test.ts": 14,
   "tests/fct_mobile_css.test.ts": 15,
   "tests/fct_painter.test.ts": 27,
+  "tests/fct_stage_core.test.ts": 15,
   "tests/fear_break_chance.test.ts": 6414,
   "tests/fear_standable_support.test.ts": 2526,
   "tests/fear_wall_guard.test.ts": 2355,
@@ -2501,6 +2540,7 @@
   "tests/harvest_body_pick.test.ts": 11,
   "tests/harvest_choreography.test.ts": 9,
   "tests/harvest_component_materials.test.ts": 7078,
+  "tests/harvest_detonation_staging.test.ts": 15,
   "tests/harvest_fallback_anchor.test.ts": 9,
   "tests/harvest_geography.test.ts": 16,
   "tests/harvest_journal_view.test.ts": 16,
@@ -4890,6 +4930,7 @@
   "tests/warrior_ability_clips.test.ts": 6,
   "tests/warrior_action_props.test.ts": 5,
   "tests/warrior_area_receiving_contact.test.ts": 9,
+  "tests/warrior_area_telegraph.test.ts": 13,
   "tests/warrior_attention.test.ts": 9,
   "tests/warrior_attention_core.test.ts": 12,
   "tests/warrior_authored_assets.test.ts": 52,
@@ -4944,6 +4985,7 @@
   "tests/warrior_motion_phasing.test.ts": 40,
   "tests/warrior_native_spin_dispatch.test.ts": 1879,
   "tests/warrior_onrush_asset.test.ts": 51,
+  "tests/warrior_onrush_cue.test.ts": 3515,
   "tests/warrior_onrush_visual.test.ts": 1164,
   "tests/warrior_power_anchor.test.ts": 7,
   "tests/warrior_power_audio.test.ts": 8,

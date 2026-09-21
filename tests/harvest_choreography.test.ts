@@ -20,10 +20,31 @@ function fixture(available = true) {
           return true;
         },
       ),
+      // Every other SequencerHost member harvestBeat/harvestFallback (or this
+      // suite's own assertions) actually reach, declared explicitly rather
+      // than auto-vivified. An auto-vivifying Proxy silently mints a fresh,
+      // always-passing vi.fn() for ANY key it is asked for, so a host method
+      // renamed out from under this fixture would still resolve (to a new
+      // mock nobody ever configured) instead of failing the test: the get
+      // trap below throws on an undeclared string key instead.
+      flipbookAt: vi.fn(),
+      countPrimitive: vi.fn(),
+      groundYAt: vi.fn(() => 0),
+      facingAt: vi.fn(),
+      burstAt: vi.fn(),
+      fragmentsAt: vi.fn(),
+      contact: vi.fn(),
+      abilityAudio: vi.fn(),
+      pulseLight: vi.fn(),
+      shakeAt: vi.fn(),
+      // Read directly by the saturated-pools case below to assert it is
+      // never called; harvestBeat itself never reaches it.
+      ringAt: vi.fn(),
     },
     {
       get(target, key) {
-        if (!(key in target)) Reflect.set(target, key, vi.fn());
+        if (typeof key === 'string' && !(key in target))
+          throw new Error(`harvest_choreography fixture: unmocked SequencerHost member "${key}"`);
         return Reflect.get(target, key);
       },
     },
