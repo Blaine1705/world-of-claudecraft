@@ -156,6 +156,14 @@ export function sanitizeRiftGearInstance(
   const gems = (Array.isArray(source.gems) ? source.gems : [])
     .filter((gem): gem is RiftGemId => (RIFT_GEM_IDS as readonly string[]).includes(gem))
     .slice(-gemSlots);
+  // Forward-compatibility pass-through: a later release stamps a permanent
+  // per-copy `lootQuality` descriptor on bands (docs/design/loot-quality.md).
+  // This binary reads nothing from it (rebuildRolledStats prices the ladder
+  // line alone, so it is inert here), but a rollback to this binary must not
+  // strip it from every band it loads and autosaves. The load bound
+  // (item_instance_load.ts) already admits the unknown key; this keeps the
+  // rebuild from being the one place that drops it.
+  const carriedLootQuality = (input as { lootQuality?: unknown }).lootQuality;
   const clean: ItemInstancePayload = {
     boundTo: ownerId,
     // The player item lock (item_lock.ts) is the owner's own safety mark and
@@ -164,6 +172,7 @@ export function sanitizeRiftGearInstance(
     // The ring enchant (if any) rides the rebuild; its bonus is re-priced on
     // top of the ladder line by rebuildRolledStats below.
     ...(riftBandEnchant(itemId, input) && { enchant: input.enchant }),
+    ...(carriedLootQuality !== undefined && { lootQuality: carriedLootQuality }),
     rolled: { quality: 'epic', stats: {} },
     rift: {
       sourceEventId: source.sourceEventId,
