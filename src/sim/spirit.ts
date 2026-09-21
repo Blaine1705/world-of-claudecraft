@@ -191,16 +191,29 @@ export function releasePlayerSpirit(
 }
 
 /**
+ * Which charge a /unstuck outcome applies: the level-scaled Unstuck Sickness, or nothing.
+ * The unstuck system (./unstuck) decides it from the sickness window: the first
+ * completion in an hour passes 'none', a repeat inside the window passes 'unstuck'. The
+ * outcome functions below default to 'unstuck' so a direct caller keeps the historical
+ * "never free" contract unless it says otherwise.
+ */
+export type UnstuckSicknessCharge = 'unstuck' | 'none';
+
+/**
  * Finish Unstuck for a LIVING player: move them to the nearest graveyard and leave them
- * alive. No death and no corpse; the whole price is Unstuck Sickness. The graveyard (rather
- * than a nearby safe spot) is the destination because it is the one point in every zone
- * guaranteed to be reachable open ground.
+ * alive. No death and no corpse; the whole price, when one is owed, is Unstuck Sickness.
+ * The graveyard (rather than a nearby safe spot) is the destination because it is the one
+ * point in every zone guaranteed to be reachable open ground.
  *
  * The countdown's own gates (blockedReason/cancelReason in ./unstuck) guarantee that a
  * player who reaches this point is out of combat, standing still, and not casting, eating,
  * sitting, charging, or following, so none of that state needs unwinding here.
  */
-export function moveToGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
+export function moveToGraveyardForUnstuck(
+  ctx: SimContext,
+  pid?: number,
+  sickness: UnstuckSicknessCharge = 'unstuck',
+): void {
   const r = ctx.resolve(pid);
   if (!r || r.e.dead || r.e.ghost) return;
   const { meta, e: p } = r;
@@ -241,23 +254,28 @@ export function moveToGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
   // Applied last: the sickness drains stamina, so recalcPlayerStats (via applyAura) rebuilds
   // the pools and carries the current hp/mana FRACTIONS into the reduced maxima. A player at
   // full health arrives at full health of a smaller bar rather than over the top of it.
-  applyUnstuckSickness(ctx, p);
+  if (sickness === 'unstuck') applyUnstuckSickness(ctx, p);
 }
 
 /**
  * Finish Unstuck for a player who was dead or a released ghost: pull them to the nearest
  * graveyard and raise them there at RES_HEALER_HP_FRACTION of their pools. This is the
- * escape hatch for a spirit that cannot reach its corpse or an angel. It charges Unstuck
- * Sickness, not The Keeper's Toll, so it is a shorter penalty than walking to the Pale
- * Keeper would have been but it is never free.
+ * escape hatch for a spirit that cannot reach its corpse or an angel. When a charge is
+ * owed it is Unstuck Sickness, not The Keeper's Toll, so a repeat is still a shorter
+ * penalty than walking to the Pale Keeper would have been; the first use in an hour
+ * charges nothing (see UnstuckSicknessCharge).
  */
-export function reviveAtGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
+export function reviveAtGraveyardForUnstuck(
+  ctx: SimContext,
+  pid?: number,
+  sickness: UnstuckSicknessCharge = 'unstuck',
+): void {
   const r = ctx.resolve(pid);
   if (!r?.e.dead) return;
   const { meta, e: p } = r;
   // Resolve the graveyard before the revive moves the body out of its instance band.
   const gy = ghostGraveyard(ctx, p);
-  reviveAt(ctx, meta, p, { x: gy.x, y: p.pos.y, z: gy.z }, RES_HEALER_HP_FRACTION, 'unstuck');
+  reviveAt(ctx, meta, p, { x: gy.x, y: p.pos.y, z: gy.z }, RES_HEALER_HP_FRACTION, sickness);
   ctx.emit({ type: 'respawn', pid: meta.entityId });
 }
 

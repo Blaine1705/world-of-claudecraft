@@ -14,6 +14,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -43,13 +46,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "es_ES": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -79,13 +88,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "fr_FR": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -115,13 +130,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "fr_CA": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -151,7 +172,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "en_CA": [],
   "it_IT": [
@@ -159,6 +183,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -188,13 +215,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "de_DE": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -224,7 +257,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "zh_CN": [
     "hudChrome.options.frameRateCapSixty",
@@ -247,6 +283,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -276,7 +315,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "ru_RU": [
     "hudChrome.options.frameRateCapSixty",
@@ -287,6 +329,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -316,13 +361,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "nl_NL": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -352,13 +403,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "pl_PL": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -388,13 +445,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "id_ID": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -424,13 +487,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "tr_TR": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -460,13 +529,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "sv_SE": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -496,13 +571,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "vi_VN": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -532,13 +613,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "da_DK": [
     "abilityUi.forms.bearOrCat",
     "entities.zones.eastbrook_vale.welcomeDone",
     "entities.zones.mirefen_marsh.welcomeDone",
     "entities.zones.thornpeak_heights.welcomeDone",
+    "guide.combat.unstuckBodyWindow",
+    "guide.commandsPage.unstuckWindow",
+    "guide.glossary.unstuckDefWindow",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hud.system.respawnKeeperToll",
@@ -568,6 +655,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemove",
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
-    "hudChrome.trade.offerRemoveTitle"
+    "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.unstuck.helpUnstuckWindow",
+    "hudChrome.unstuck.movedToGraveyardFree",
+    "hudChrome.unstuck.revivedAtGraveyardFree"
   ]
 };

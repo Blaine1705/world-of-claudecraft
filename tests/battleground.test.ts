@@ -71,6 +71,7 @@ import {
 import { addThreat } from '../src/sim/threat';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
 import { UNSTUCK_COUNTDOWN_SECONDS } from '../src/sim/unstuck';
+import { markUnstuckCompleted } from '../src/sim/unstuck_cooldown';
 import { groundHeight } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -1267,6 +1268,8 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     const e = forceIntoBgWallTrap(sim, match, pid);
     e.facing = Math.PI / 2;
     e.prevFacing = -Math.PI / 2;
+    // A repeat inside the sickness window: the battleground completion must charge it too.
+    markUnstuckCompleted(e.cooldowns);
 
     expect(sim.unstuck(pid)).toBe(true);
     sim.drainEvents();
@@ -1472,6 +1475,8 @@ describe('Thornhollow Fields: the graveyard rite', () => {
 
     const originalPlot = { ...BG_GRAVEYARDS[0] };
     Object.assign(BG_GRAVEYARDS[0], { x: 50, z: -140, hw: 0.25, hd: 0.25 });
+    // A repeat inside the sickness window, so the fallback spawn charges it as well.
+    markUnstuckCompleted(e.cooldowns);
     try {
       expect(sim.unstuck(pid)).toBe(true);
       sim.drainEvents();
@@ -1521,7 +1526,9 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expectClearPlayerPosition(sim, e);
     expect(Math.hypot(e.pos.x - before.x, e.pos.z - before.z)).toBeGreaterThan(10);
     expect(completed?.distance).toBeGreaterThan(10);
-    expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+    // The first Unstuck in an hour is free in a battleground exactly as in the overworld.
+    expect(completed?.sickness).toBe(false);
+    expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(false);
   });
 
   it('refuses Unstuck for an alive flag carrier before the completion teleport can run', () => {

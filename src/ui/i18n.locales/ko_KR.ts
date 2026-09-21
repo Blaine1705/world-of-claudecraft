@@ -11799,6 +11799,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 최대 5분 동안 탈출의 후유증이 남습니다.',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    '탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 한 시간 안의 첫 사용은 대가가 없습니다. 마지막 사용 후 한 시간 안에 다시 쓰면 최대 5분 동안 탈출의 후유증이 남습니다.',
   'hudChrome.unstuck.menuButton': '갇힘 탈출',
   'hudChrome.unstuck.help':
     '탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.',
@@ -11806,6 +11808,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 영혼을 가장 가까운 묘지로 보냅니다. 되살아나려면 영혼 치유사에게서 수호자의 대가를 받아야 합니다.',
   'hudChrome.unstuck.movedToGraveyard':
     '가장 가까운 묘지로 이동했습니다. 탈출의 후유증이 당신을 짓누릅니다.',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    '가장 가까운 묘지로 이동했습니다. 한 시간 안에 갇힘 탈출을 다시 쓰면 탈출의 후유증이 남습니다.',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    '가장 가까운 묘지로 이동해 부활했습니다. 한 시간 안에 갇힘 탈출을 다시 쓰면 탈출의 후유증이 남습니다.',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     '가장 가까운 묘지로 이동해 부활했습니다. 탈출의 후유증이 당신을 짓누릅니다.',
   'hudChrome.unstuck.started':
@@ -14708,6 +14714,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': '적은 누구를 때리는가',
   'guide.combat.unstuckBody':
     '세계가 빠져나올 수 없는 곳에 당신을 가둬 버렸다면 /unstuck을 입력하세요. 전투 중이 아니어야 하고, 제자리에 서 있어야 하며, 기절이나 속박에 걸려 있지 않고, 결투나 투기장 시합 중이 아니어야 합니다. 짧은 카운트다운이 흐르고, 움직이거나 피해를 받으면 취소됩니다. 카운트다운이 끝나면 가장 가까운 묘지에 내려놓습니다. 이 명령은 결코 당신을 죽이지 않고 시신도 남기지 않으며, 이미 쓰러져 있었다면 그 자리에서 일으켜 줍니다. 대가는 탈출의 후유증으로, 존재 전체가 잠시 약해지지만 명령을 다시 쓸 수 있게 될 무렵이면 이미 사라져 있습니다. 그리고 수호자의 대가와 마찬가지로, 갓 만든 캐릭터는 이 후유증을 전혀 겪지 않습니다.',
+  'guide.combat.unstuckBodyWindow':
+    '세계가 빠져나올 수 없는 곳에 당신을 가둬 버렸다면 /unstuck을 입력하세요. 전투 중이 아니어야 하고, 제자리에 서 있어야 하며, 기절이나 속박에 걸려 있지 않고, 결투나 투기장 시합 중이 아니어야 합니다. 짧은 카운트다운이 흐르고, 움직이거나 피해를 받으면 취소됩니다. 카운트다운이 끝나면 가장 가까운 묘지에 내려놓습니다. 이 명령은 결코 당신을 죽이지 않고 시신도 남기지 않으며, 이미 쓰러져 있었다면 그 자리에서 일으켜 줍니다. 한 시간 안의 첫 사용에는 아무 대가도 없습니다. 마지막 사용 후 한 시간 안에 다시 쓰면 대가는 탈출의 후유증으로, 존재 전체가 잠시 약해지지만 명령을 다시 쓸 수 있게 될 무렵이면 이미 사라져 있습니다. 그리고 수호자의 대가와 마찬가지로, 갓 만든 캐릭터는 이 후유증을 전혀 겪지 않습니다.',
   'guide.combat.unstuckTitle': '정말로 갇혔을 때',
   'guide.commandsPage.abilities': '지금까지 배운 능력을 보여 줍니다.',
   'guide.commandsPage.afk':
@@ -14856,6 +14864,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': '명령이 듣지 않을 때',
   'guide.commandsPage.unstuck':
     '세계에 갇혔을 때 빠져나오는 길입니다. 짧은 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지로 옮겨지고, 이미 쓰러져 있었다면 그곳에서 부활합니다. 그 뒤 한동안 탈출의 후유증으로 약해지므로, 지름길이 아니라 최후의 수단입니다.',
+  'guide.commandsPage.unstuckWindow':
+    '세계에 갇혔을 때 빠져나오는 길입니다. 짧은 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지로 옮겨지고, 이미 쓰러져 있었다면 그곳에서 부활합니다. 한 시간 안의 첫 사용은 대가가 없습니다. 마지막 사용 후 한 시간 안에 다시 쓰면 그 뒤 한동안 탈출의 후유증으로 약해지므로, 지름길이 아니라 구조 수단입니다.',
   'guide.commandsPage.where':
     '지금 서 있는 지역과 그 지역의 레벨 구간, 그리고 자신의 좌표를 알려 줍니다.',
   'guide.commandsPage.whisper':
@@ -15045,6 +15055,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': '도구 부적',
   'guide.glossary.unstuckDef':
     '게임 메뉴의 갇힘 탈출을 쓴 대가입니다. 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지에 내려놓아 주며, 그 뒤 한동안 일시적인 약화를 안고 다니게 됩니다.',
+  'guide.glossary.unstuckDefWindow':
+    '게임 메뉴의 갇힘 탈출을 한 시간 안에 두 번 이상 쓴 대가입니다. 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지에 내려놓아 줍니다. 한 시간 안의 첫 사용은 대가가 없지만, 마지막 사용 후 한 시간 안에 되풀이하면 그 뒤 한동안 일시적인 약화도 안고 다니게 됩니다.',
   'guide.glossary.unstuckTerm': '탈출의 후유증',
   'guide.glossary.warfareDef':
     '대인전의 장비 쪽 이야기입니다. 병참장교가 명예를 받고 워페어 방어구 세트를 팔며, 그 장비에 붙은 워페어 능력치는 다른 플레이어와 싸울 때에만 계산됩니다.',
