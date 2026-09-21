@@ -74,9 +74,12 @@ export function publicInstanceView(instance: ItemInstancePayload): ItemInstanceP
   }
   if (instance.name !== undefined) pub.name = instance.name;
   if (instance.perfected === true) pub.perfected = instance.perfected;
-  if (instance.lootQuality !== undefined) {
-    pub.lootQuality = cloneLootQuality(instance.lootQuality);
-  }
+  // Guard on the validated clone, not the source: a present-but-malformed
+  // descriptor must not materialize `lootQuality: undefined` as an own key,
+  // since itemInstancePayloadsEqual compares every present key and the
+  // projection would stop matching its escrowed twin.
+  const lootQuality = cloneLootQuality(instance.lootQuality);
+  if (lootQuality) pub.lootQuality = lootQuality;
   if (instance.rift !== undefined) {
     pub.rift = {
       ...instance.rift,

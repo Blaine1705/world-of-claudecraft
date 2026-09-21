@@ -41,15 +41,19 @@ describe('quality loot auto equip', () => {
   it('selects the newly granted exact tier among copies and keeps the better worn copy', () => {
     const sim = new Sim({ seed: 74, playerClass: 'rogue', autoEquip: false });
     sim.setPlayerLevel(20);
+    sim.unequipItem('offhand');
     sim.addItemInstance('duskwhisper', quality(1));
     sim.equipItem('duskwhisper', undefined, 'mainhand');
     sim.addItemInstance('duskwhisper', quality(4));
     sim.addItemInstance('duskwhisper', quality(2));
     sim.players.get(sim.playerId)!.autoEquip = true;
     // Identical descriptor coalesces with an EARLIER tier-IV row, while the
-    // newest row is tier II. Id-only equip would consume the wrong copy.
+    // newest row is tier II. Id-only equip would consume the wrong copy. The
+    // dual-wielding rogue's spec routes the one-hander to the empty offhand
+    // (the mainhand is the comparison, never a forced target).
     sim.addItemInstance('duskwhisper', quality(4));
-    expect(sim.player.equippedInstances.mainhand?.lootQuality?.tier).toBe(4);
+    expect(sim.player.equippedInstances.offhand?.lootQuality?.tier).toBe(4);
+    expect(sim.player.equippedInstances.mainhand?.lootQuality?.tier).toBe(1);
     expect(
       sim.inventory.filter(
         (s) => s.itemId === 'duskwhisper' && s.instance?.lootQuality?.tier === 2,
@@ -57,7 +61,33 @@ describe('quality loot auto equip', () => {
     ).toHaveLength(1);
     sim.addItemInstance('duskwhisper', quality(1));
     sim.addItem('duskwhisper', 1);
-    expect(sim.player.equippedInstances.mainhand?.lootQuality?.tier).toBe(4);
+    expect(sim.player.equippedInstances.offhand?.lootQuality?.tier).toBe(4);
+    expect(sim.player.equippedInstances.mainhand?.lootQuality?.tier).toBe(1);
+  });
+
+  it('routes a quality one-hander by spec like an ordinary grant: full mainhand, empty offhand', () => {
+    // A dual-wielding spec with a full mainhand and an empty offhand: equipItem
+    // with no aimed slot routes a one-hander to the offhand (items.ts
+    // desiredEquipSlot). The descriptor must not change the hand.
+    const run = (grant: (sim: Sim) => void) => {
+      const sim = new Sim({ seed: 77, playerClass: 'rogue', autoEquip: true });
+      sim.setPlayerLevel(20);
+      sim.unequipItem('offhand');
+      sim.unequipItem('mainhand');
+      sim.addItem('duskwhisper', 1);
+      expect(sim.equipment.mainhand).toBe('duskwhisper');
+      expect(sim.equipment.offhand).toBeUndefined();
+      grant(sim);
+      return sim;
+    };
+    const ordinary = run((sim) => sim.addItem('heroic_duskwhisper', 1));
+    expect(ordinary.equipment.mainhand).toBe('duskwhisper');
+    expect(ordinary.equipment.offhand).toBe('heroic_duskwhisper');
+    const enhanced = run((sim) => sim.addItemInstance('duskwhisper', quality(3)));
+    expect(enhanced.equipment.mainhand).toBe('duskwhisper');
+    expect(enhanced.player.equippedInstances.mainhand?.lootQuality).toBeUndefined();
+    expect(enhanced.equipment.offhand).toBe('duskwhisper');
+    expect(enhanced.player.equippedInstances.offhand?.lootQuality?.tier).toBe(3);
   });
 
   it('keeps ordinary auto equip and non-quality crafted grant behavior', () => {

@@ -824,7 +824,9 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     // the loop must not read as a widening, and a commented-out assignment must
     // not read as coverage either.
     const body = (block?.[0] ?? '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-    const projected = [...body.matchAll(/pub\.(\w+) = inst\.\w+/g)].map((m) => m[1]);
+    // Keyed on the projected field name: `lootQuality` is assigned from its
+    // validated clone (cloneLootQuality), not from `inst.` directly.
+    const projected = [...new Set([...body.matchAll(/pub\.(\w+) = /g)].map((m) => m[1]))];
     // Cosmetic fields plus the Perfected stamp needed for active enchants and
     // collection item levels, plus the Riftbound band payload. Nothing that
     // carries bind state or partial ranks. Confirmed against the resolved

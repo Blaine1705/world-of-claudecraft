@@ -25,6 +25,9 @@ export function maybeAutoEquip(
 ): void {
   const def = ITEMS[itemId];
   if (!def?.slot || !canEquipItem(meta.cls, def)) return;
+  // Skip silently (no error toast) if the piece is gated above the player's
+  // level: auto-equip is a convenience, the explicit equip path is where the
+  // "must be level N" message belongs.
   const e = ctx.entities.get(meta.entityId);
   if (e && !meetsLevelRequirement(e.level, def)) return;
   // Payload stacking can merge a grant into an earlier row. Name the exact
@@ -41,6 +44,11 @@ export function maybeAutoEquip(
     }
   }
   if (index === -1) return;
+  // Skip silently when an explicit equip would be refused by a worn-family
+  // rule (the unique-equipped legendary family, or the Masterwrought counted
+  // cap): the refusal toast belongs to the explicit path. Both rules and the
+  // reason auto-equip declines rather than displacing live in
+  // src/sim/auto_equip_gate.ts.
   if (autoEquipFamilyConflict(def, itemId, meta, (id) => ITEMS[id], index)) return;
   const incoming = equipCandidateInstance(meta.inventory, itemId, index);
   if (def.kind === 'weapon') {
@@ -48,8 +56,12 @@ export function maybeAutoEquip(
     const worn = wornId ? ITEMS[wornId] : undefined;
     const current = worn ? lootQualityWeapon(worn, meta.equipmentInstance.mainhand) : undefined;
     const next = lootQualityWeapon(def, incoming);
+    // No aimed slot on either arm: equipItem routes the hand from the committed
+    // spec (items.ts desiredEquipSlot), so a one-hander lands in the offhand of
+    // a dual-wielder with a full mainhand whether or not it carries a descriptor.
+    // Only the exact-copy index is new here.
     if (next && (!current || next.min + next.max > current.min + current.max))
-      equipItem(ctx, itemId, meta.entityId, granted ? 'mainhand' : undefined, index);
+      equipItem(ctx, itemId, meta.entityId, undefined, index);
     return;
   }
   const slot = resolveEquipSlot(def, meta.equipment);
