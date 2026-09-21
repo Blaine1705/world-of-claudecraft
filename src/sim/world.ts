@@ -42,6 +42,7 @@ import {
   emberLinkDistanceNorm,
   emberNearestOnLink,
 } from './ember_lava_layout';
+import { applyFarshoreShipwreckShore } from './farshore_shipwreck_shore';
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
 import { applyKeepSitePad, keepSitePadWeight } from './keep_site';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
@@ -3914,7 +3915,7 @@ export function terrainHeightSansEdits(x: number, z: number, seed: number): numb
 // walkway bed, garden/gale pads): one shared body so terrainHeight and
 // terrainHeightSansEdits can never drift.
 function applyTerrainPads(x: number, z: number, seed: number, h0: number): number {
-  let h = h0;
+  let h = calmForce === null ? applyFarshoreShipwreckShore(x, z, h0) : h0;
   // The Last Keep's site pad on the Trollmoot rise, over the FINISHED
   // height (the world-edge sea shave runs late in the unpadded chain and
   // the rise sits near the west shore shelf; the build floor must win

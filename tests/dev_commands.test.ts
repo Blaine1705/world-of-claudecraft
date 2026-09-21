@@ -25,14 +25,14 @@ function devSpawns(sim: Sim, ownerId = sim.playerId) {
 }
 
 describe('dev commands', () => {
-  // Daily cycles (wq1_<day>) select the weekly layout by calendar week; the
-  // arm lifts the tester to the world-quest floor level.
+  // Daily offer cycles retain the approved layout; the arm lifts the tester
+  // to the world-quest floor level.
   it.each([
     ['2026-09-02', 'wq1_2', 0],
-    ['2026-09-13', 'wq1_13', 1],
-    ['2026-09-15', 'wq1_15', 2],
+    ['2026-09-13', 'wq1_13', 0],
+    ['2026-09-15', 'wq1_15', 0],
   ] as const)(
-    '/dev salvage arms the weekly layout online on %s',
+    '/dev salvage arms the approved layout online on %s',
     (resetDay, expectedCycle, expectedVariant) => {
       const sim = devSim();
       sim.resetDay = resetDay;
@@ -48,6 +48,12 @@ describe('dev commands', () => {
         state: 'active',
         puzzleVariant: expectedVariant,
       });
+      expect(sim.drainEvents()).toContainEqual(
+        expect.objectContaining({
+          type: 'log',
+          text: '[dev] Shipwreck salvage armed. Use /dev tp 320 103 (beside the wreck).',
+        }),
+      );
     },
   );
 

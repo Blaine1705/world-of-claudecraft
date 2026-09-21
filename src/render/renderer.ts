@@ -313,6 +313,7 @@ import {
 } from './far_terrain_core';
 import { buildFarmPatchProps, type FarmBedSeat, FarmPatchVisuals } from './farm_patches';
 import { buildFarshoreFeatures } from './farshore_features';
+import { groundQuestObjectYaw } from './farshore_salvage_assets';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
 import {
@@ -8052,7 +8053,7 @@ export class Renderer {
       objectPoolKey = result.poolKey;
       body = result.object.group;
       height = result.object.height;
-      if (result.reused) body.rotation.y = (e.id % 7) * 0.45;
+      if (result.reused) body.rotation.y = groundQuestObjectYaw(e.objectItemId ?? '', e.id);
       objectMesh = body;
       if (!e.objectItemId?.startsWith('forge_')) {
         if (!this.sparkleMat) {
@@ -9588,7 +9589,7 @@ export class Renderer {
    *  countdown holds, and the grave ward while the player waits as a spirit.
    *  Only visibility flags, so this is cheap enough for the per-frame block. */
   /** The gate a streamed world group attaches through; none without parallel compile. */
-  private worldCompileGate(): ((target: THREE.Object3D) => Promise<unknown>) | undefined {
+  worldCompileGate(): ((target: THREE.Object3D) => Promise<unknown>) | undefined {
     return this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined;
   }
 

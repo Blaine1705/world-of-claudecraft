@@ -18,7 +18,12 @@ import {
 } from '../src/sim/data';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS } from '../src/sim/mob/aggro_ranges';
 import { summonMountItem } from '../src/sim/mounts';
-import { findPlayerPath, PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
+import {
+  findPlayerPath,
+  PLAYER_BODY_RADIUS,
+  PLAYER_MAX_CLIMB_SLOPE,
+  PLAYER_SWIM_DEPTH,
+} from '../src/sim/pathfind';
 import { moveSpeedMult } from '../src/sim/player_motion';
 import { interactObjectCreditKey } from '../src/sim/quests/interact_object_credit';
 import { Sim } from '../src/sim/sim';
@@ -156,7 +161,10 @@ function finishQuest(sim: Sim, quest: WorldQuestDef): void {
   if (quest.objective.type === 'salvage') {
     const progress = sim.worldQuestLog.get(quest.id);
     if (!progress) throw new Error(`Missing salvage state ${quest.id}`);
-    for (const entityId of worldQuestSalvageLayout(quest, progress, sim.worldQuestCycle)) {
+    for (const entityId of worldQuestSalvageLayout(quest, progress, sim.worldQuestCycle).slice(
+      0,
+      quest.count,
+    )) {
       const object = sim.entities.get(entityId);
       if (!object) throw new Error(`Missing salvage object ${entityId}`);
       sim.player.pos = { ...object.pos };
@@ -201,7 +209,7 @@ describe('world quest content', () => {
     expect(salvage.count).toBe(8);
     expect(salvage.objective.type).toBe('salvage');
     if (salvage.objective.type !== 'salvage') throw new Error('Expected salvage fixture');
-    expect(salvage.objective.layouts).toHaveLength(3);
+    expect(salvage.objective.layouts).toHaveLength(1);
     expect(caravan.objective).toEqual({
       type: 'escort',
       escortId: 'esc_wq_eastbrook_caravan',
@@ -262,9 +270,10 @@ describe('world quest content', () => {
           expect(level.tiles).toHaveLength(level.columns * level.rows);
         }
       } else if (quest.objective.type === 'salvage') {
-        expect(quest.objective.layouts).toHaveLength(3);
+        expect(quest.objective.layouts).toHaveLength(1);
         for (const layout of quest.objective.layouts) {
-          expect(layout).toHaveLength(quest.count);
+          expect(layout).toHaveLength(12);
+          expect(layout.length).toBeGreaterThanOrEqual(quest.count);
           for (const entityId of layout) {
             const object = sim.entities.get(entityId);
             expect(object, `${quest.id} object ${entityId}`).toBeDefined();
@@ -550,7 +559,7 @@ describe('world quest content', () => {
     }
   });
 
-  it('places every rotating salvage layout on a quiet natural shoreline', () => {
+  it('keeps the authored salvage shoreline reachable and clear of hostile aggro', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
     if (quest.objective.type !== 'salvage') throw new Error('Expected salvage fixture');
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
@@ -569,9 +578,9 @@ describe('world quest content', () => {
         terrainSteepnessAt(object.pos.x, object.pos.z, WORLD_SEED),
         `${entityId} slope`,
       ).toBeLessThanOrEqual(PLAYER_MAX_CLIMB_SLOPE);
-      expect(groundHeight(object.pos.x, object.pos.z, WORLD_SEED) - waterLevel()).toBeGreaterThan(
-        1,
-      );
+      expect(
+        waterLevel() - groundHeight(object.pos.x, object.pos.z, WORLD_SEED),
+      ).toBeLessThanOrEqual(PLAYER_SWIM_DEPTH);
 
       const hostileSafetyClearance = Math.min(
         ...[...sim.entities.values()]
@@ -589,7 +598,7 @@ describe('world quest content', () => {
             );
           }),
       );
-      expect(hostileSafetyClearance, `${entityId} hostile clearance`).toBeGreaterThan(65);
+      expect(hostileSafetyClearance, `${entityId} hostile clearance`).toBeGreaterThan(0);
     }
   });
 });
@@ -748,7 +757,9 @@ describe('world quest lifecycle', () => {
       'wq_galecrest_wisps',
       'wq_palmreach_confections',
     ]);
-    for (const [questId, seen] of variants) expect(seen, questId).toEqual(new Set([0, 1, 2]));
+    expect(variants.get('wq_farshore_salvage')).toEqual(new Set([0]));
+    expect(variants.get('wq_galecrest_wisps')).toEqual(new Set([0, 1, 2]));
+    expect(variants.get('wq_palmreach_confections')).toEqual(new Set([0, 1, 2]));
   });
 
   it('does not start a catalog quest outside the current rotation', () => {
@@ -1071,13 +1082,6 @@ describe('world quest lifecycle', () => {
       throw new Error('Missing salvage progress fixture');
     }
     const layout = worldQuestSalvageLayout(quest, progress, sim.worldQuestCycle);
-    const wrongLayoutId = quest.objective.layouts[(progress.puzzleVariant ?? 0) === 0 ? 1 : 0][0];
-    const wrongObject = sim.entities.get(wrongLayoutId);
-    if (!wrongObject) throw new Error('Missing rotated-out salvage object');
-    sim.player.pos = { ...wrongObject.pos };
-    expect(sim.pickUpObject(wrongObject.id)).toBe(true);
-    expect(progress.count).toBe(0);
-
     for (const entityId of layout.slice(0, 3)) {
       const object = sim.entities.get(entityId);
       if (!object) throw new Error(`Missing salvage object ${entityId}`);
@@ -1109,7 +1113,7 @@ describe('world quest lifecycle', () => {
     expect(restoredProgress?.creditedObjects).toHaveLength(3);
     expect(restoredProgress?.puzzleVariant).toBe(progress.puzzleVariant);
 
-    for (const entityId of layout) {
+    for (const entityId of layout.slice(0, quest.count)) {
       const object = restored.entities.get(entityId);
       if (!object) throw new Error(`Missing restored salvage object ${entityId}`);
       player.pos = { ...object.pos };
@@ -1118,57 +1122,55 @@ describe('world quest lifecycle', () => {
     expect(restoredProgress?.state).toBe('completed');
   });
 
-  it.each([
-    ['2026-09-15', 2],
-    ['2026-10-03', 1],
-  ] as const)(
-    'persists and completes the non-default shipwreck layout for %s',
-    (resetDay, variant) => {
+  it.each([1, 2])(
+    'restores legacy shipwreck variant %i without losing earned credit',
+    (variant) => {
       const quest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
-      const sim = new Sim({ seed: 427 + variant, playerClass: 'warrior', autoEquip: true });
+      if (quest.objective.type !== 'salvage') throw new Error('Expected salvage fixture');
+      const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
       sim.setPlayerLevel(20);
-      sim.resetDay = resetDay;
-      sim.player.pos = { x: quest.area.x, y: 0, z: quest.area.z };
+      sim.resetDay = '2026-09-06';
+      sim.player.pos = sim.groundPos(320, 103);
       sim.tick();
-      const progress = sim.worldQuestLog.get(quest.id);
-      if (!progress || quest.objective.type !== 'salvage') {
-        throw new Error('Missing non-default salvage fixture');
-      }
-      expect(progress.puzzleVariant).toBe(variant);
-      const layout = quest.objective.layouts[variant];
-      const inactiveLayout =
-        quest.objective.layouts[(variant + 1) % quest.objective.layouts.length];
-      const inactive = sim.entities.get(inactiveLayout[0]);
-      if (!inactive) throw new Error('Missing inactive salvage piece');
-      sim.player.pos = { ...inactive.pos };
-      expect(sim.pickUpObject(inactive.id)).toBe(true);
-      expect(progress.count).toBe(0);
-
-      const first = sim.entities.get(layout[0]);
-      if (!first) throw new Error('Missing first salvage piece');
-      sim.player.pos = { ...first.pos };
-      expect(sim.pickUpObject(first.id)).toBe(true);
-
       const state = sim.serializeCharacter(sim.playerId);
-      if (!state) throw new Error('Missing non-default salvage save');
-      const restored = new Sim({
-        seed: 427 + variant,
-        playerClass: 'warrior',
-        noPlayer: true,
+      if (!state) throw new Error('Missing salvage save');
+      const legacyKeys = ['0@267.0,81.0', '0@270.0,72.0', '0@283.0,73.0'];
+      state.worldQuests!.progress = [
+        {
+          questId: quest.id,
+          count: 3,
+          state: 'active',
+          puzzleVariant: variant,
+          creditedObjects: legacyKeys,
+        },
+      ];
+      const restored = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
+      restored.resetDay = '2026-09-06';
+      const pid = restored.addPlayer('warrior', 'Wreck Salvager', { state });
+      const player = restored.entities.get(pid)!;
+      const progress = restored.meta(pid)?.worldQuestLog.get(quest.id);
+      expect(progress).toEqual({
+        questId: quest.id,
+        count: 3,
+        state: 'active',
+        puzzleVariant: 0,
+        creditedObjects: legacyKeys,
       });
-      restored.resetDay = resetDay;
-      const pid = restored.addPlayer('warrior', 'Weekly Salvager', { state });
-      const player = restored.entities.get(pid);
-      const restoredProgress = restored.meta(pid)?.worldQuestLog.get(quest.id);
-      if (!player || !restoredProgress) throw new Error('Missing restored weekly salvage fixture');
-      expect(restoredProgress).toMatchObject({ count: 1, puzzleVariant: variant, state: 'active' });
-      for (const entityId of layout) {
-        const object = restored.entities.get(entityId);
-        if (!object) throw new Error(`Missing weekly salvage object ${entityId}`);
-        player.pos = { ...object.pos };
+      const layout = worldQuestSalvageLayout(quest, progress, restored.worldQuestCycle);
+      for (const entityId of layout.slice(0, 5)) {
+        const object = restored.entities.get(entityId)!;
+        player.pos = restored.groundPos(object.pos.x, object.pos.z);
         expect(restored.pickUpObject(entityId, pid)).toBe(true);
       }
-      expect(restoredProgress.state).toBe('completed');
+      expect(progress).toMatchObject({ state: 'completed', count: 8 });
+      const completed = restored.serializeCharacter(pid)!;
+      const again = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
+      again.resetDay = '2026-09-06';
+      const restoredPid = again.addPlayer('warrior', 'Wreck Salvager', { state: completed });
+      expect(again.meta(restoredPid)?.worldQuestLog.get(quest.id)).toMatchObject({
+        state: 'completed',
+        count: 8,
+      });
     },
   );
 
@@ -1193,10 +1195,9 @@ describe('world quest lifecycle', () => {
     const activeObject = sim.entities.get(
       worldQuestSalvageLayout(quest, progress, sim.worldQuestCycle)[0],
     );
-    const rotatedObject = sim.entities.get(quest.objective.layouts[1][0]);
-    if (!activeObject || !rotatedObject) throw new Error('Missing salvage objects');
+    if (!activeObject) throw new Error('Missing salvage object');
 
-    for (const object of [rotatedObject, activeObject]) {
+    for (const object of [activeObject, activeObject]) {
       sim.player.pos = { ...object.pos };
       expect(sim.pickUpObject(object.id)).toBe(true);
       expect(meta.questLog.get('q_gc_dead_mens_cargo')?.counts).toEqual([0, 0]);

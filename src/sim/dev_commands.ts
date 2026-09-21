@@ -223,11 +223,7 @@ export function handleDevChat(
     meta.wireRev++;
     ctx.setPlayerLevel(Math.max(quest.minLevel, ctx.entities.get(pid)?.level ?? 1), pid);
     ctx.emit({ type: 'worldQuestStarted', questId: quest.id, pid });
-    emitDevLog(
-      ctx,
-      pid,
-      `[dev] Shipwreck salvage weekly layout ${variant + 1} armed. Use /dev tp 284 92 (beside the wreck).`,
-    );
+    emitDevLog(ctx, pid, '[dev] Shipwreck salvage armed. Use /dev tp 320 103 (beside the wreck).');
     return null;
   }
 
