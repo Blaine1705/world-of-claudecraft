@@ -26,9 +26,9 @@ export const BAKED_URLS = {
 } as const;
 export const FRAGMENT_URL = '/models/vfx/production_fragments.glb';
 const textures = new Map<BakedKind, THREE.Texture>();
-const PRESSURE_URL = '/textures/vfx/production/warrior_pressure.png';
-const BLOOD_URL = '/textures/vfx/production/warrior_blood_blade.png';
-const STEEL_URL = '/textures/vfx/production/warrior_forged_steel.png';
+const PRESSURE_URL = '/textures/vfx/production/warrior_pressure.webp';
+const BLOOD_URL = '/textures/vfx/production/warrior_blood_blade.webp';
+const STEEL_URL = '/textures/vfx/production/warrior_forged_steel.webp';
 const ROCK_URL = '/textures/terrain/Rock051_Color.jpg';
 let rockTexture: THREE.Texture | null = null;
 export function warriorRockTexture(): THREE.Texture | null {
