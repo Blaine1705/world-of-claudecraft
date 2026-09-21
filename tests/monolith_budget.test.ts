@@ -106,7 +106,9 @@ const MONOLITHS: MonolithRow[] = [
     // the fourth tab's window glue landed under the old ceiling (net of the
     // v0.43.0 sync merge, which trimmed overlapping browse markup). Exact
     // count, zero slack.
-    ceiling: 2419,
+    // LOWERED for permanent loot quality: item-cell markup moved into
+    // woc_market_chrome.ts, keeping tooltip registration in the window.
+    ceiling: 2414,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -493,12 +495,27 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
     // per-frame healer-range scan (the Keeper is talked to). wc -l on the
     // merged tree. Exact count, zero slack.
+    // LOWERED 18276 -> 18263 with the character-select raid lockouts: the
+    // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
+    // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
+    // and the minimap badge name a lockout identically. Exact count, zero slack.
+    // LOWERED 18263 -> 18253 at the permanent loot quality (PR 4054) sync
+    // on top of the character-select lockouts landing: the item tooltip column
+    // composition moved to item_combat_tooltip_view.ts and the loot receipt
+    // body decision to loot_quality_receipt.ts (the loot arm keeps its one
+    // guarded log() call through a thin lootReceiptBody adapter), composed
+    // with the trade quantity prompt fold (18263 - 10). wc -l on the merged
+    // tree. Exact count, zero slack.
     // LOWERED 18276 -> 18271 at World PvP (the /pvp flag): the target frame's
     // hostile colour and the two auto-attack gates now read ONE shared verdict
     // (src/ui/pvp_hostile_core.ts, the third copy the action bar's comment
     // asked to extract), which collapsed the multi-line call. Measured with
     // wc -l < src/ui/hud.ts after biome. Exact count, zero slack.
-    ceiling: 18271,
+    // Re-pinned at the merge of release/v0.44.0 into feature/world-pvp-flag (the
+    // release's PR 4054 / 4137 / 4141 extractions above plus this branch's below):
+    // exact count measured on the MERGED working tree (wc -l < src/ui/hud.ts),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 18248,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1096,13 +1113,20 @@ const MONOLITHS: MonolithRow[] = [
     // cast-scoped marker, naturesBoonPower, would otherwise have grown this
     // file); sim.ts keeps the type import and the barrel re-export. Exact
     // count, zero slack.
+    // Permanent loot quality (PR 4054) base merge: the loot identity receipt
+    // and projection helpers moved to dedicated siblings, composed with the
+    // release extractions above. Exact merged count, zero slack.
     // LOWERED 11792 -> 11786 at World PvP (the /pvp flag): the honor ledger's
     // persisted form (the serialize spread and the load normalizers) moved to
     // src/sim/pvp/honor_persist.ts, paying for the flag's meta field, its live
     // ctx view, the isHostileTo world arm, the tick call, the persistence hooks
     // and the IWorld delegates. Measured with wc -l < src/sim/sim.ts after
     // biome. Exact count, zero slack.
-    ceiling: 11786,
+    // Re-pinned at the merge of release/v0.44.0 into feature/world-pvp-flag (the
+    // release's PR 4054 / 4137 / 4141 extractions above plus this branch's below):
+    // exact count measured on the MERGED working tree (wc -l < src/sim/sim.ts),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 11744,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1307,7 +1331,10 @@ const MONOLITHS: MonolithRow[] = [
     // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
     // composed with the release's game_renderer.ts extraction. Exact merged
     // count, zero slack.
-    ceiling: 11281,
+    // LOWERED 11281 -> 11280 with the character-select lockout disclosure:
+    // the roster row hint markup call is inlined into its template and the
+    // disclosure event isolation lives in src/ui/charselect_hints.ts.
+    ceiling: 11280,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1532,13 +1559,20 @@ const MONOLITHS: MonolithRow[] = [
     // gap booking plus the ack high-water) moved to server/input_seq.ts, now
     // shared by the input frame and the seq-bearing 'target' command. Measured
     // with wc -l < server/game.ts after biome. Exact count, zero slack.
+    // Permanent loot quality (PR 4054) base merge: the equipped-instance wire
+    // projection moved to server/equipped_instance_wire.ts, composed with the
+    // release extractions above. Exact merged count, zero slack.
     // LOWERED 9993 -> 9934 at World PvP (the /pvp flag): the per-entity wire
     // fragment cache shapes and the two JSON splicers moved to
     // server/entity_wire_cache.ts, paying for the flag's dispatch case, its
     // entity wire bit and the wpvp self key; the one-use delay() helper was
     // inlined to pay for the /pvp command-lane claim. Measured with
     // wc -l < server/game.ts after biome. Exact count, zero slack.
-    ceiling: 9934,
+    // Re-pinned at the merge of release/v0.44.0 into feature/world-pvp-flag (the
+    // release's PR 4054 / 4137 / 4141 extractions above plus this branch's below):
+    // exact count measured on the MERGED working tree (wc -l < server/game.ts),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 9920,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
