@@ -3593,6 +3593,15 @@ export const zh_CN: EnTranslations = {
         "socketReplaced": "已将宝石镶入{name}；{gem}已被摧毁。"
       }
     },
+    "lootQuality": {
+      "ordinary": "普通",
+      "superior": "优良",
+      "exceptional": "卓越",
+      "magnificent": "华丽",
+      "transcendent": "超凡",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}：+{levels} 物品等级。强化后仍会保留。"
+    },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}",
       "riftTier": "{tier}级裂隙物品",

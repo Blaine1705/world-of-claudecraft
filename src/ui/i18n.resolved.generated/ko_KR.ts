@@ -3593,6 +3593,15 @@ export const ko_KR: EnTranslations = {
         "socketReplaced": "{name}에 보석을 박았습니다. {gem}은(는) 파괴되었습니다."
       }
     },
+    "lootQuality": {
+      "ordinary": "일반",
+      "superior": "상급",
+      "exceptional": "특급",
+      "magnificent": "걸작",
+      "transcendent": "초월",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: 아이템 레벨 +{levels}. 강화 후에도 유지됩니다."
+    },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
       "riftTier": "{tier} 등급 균열 아이템",

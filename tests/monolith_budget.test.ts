@@ -106,7 +106,9 @@ const MONOLITHS: MonolithRow[] = [
     // the fourth tab's window glue landed under the old ceiling (net of the
     // v0.43.0 sync merge, which trimmed overlapping browse markup). Exact
     // count, zero slack.
-    ceiling: 2419,
+    // LOWERED for permanent loot quality: item-cell markup moved into
+    // woc_market_chrome.ts, keeping tooltip registration in the window.
+    ceiling: 2414,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -497,7 +499,14 @@ const MONOLITHS: MonolithRow[] = [
     // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
     // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
     // and the minimap badge name a lockout identically. Exact count, zero slack.
-    ceiling: 18263,
+    // LOWERED 18263 -> 18253 at the permanent loot quality (PR 4054) sync
+    // on top of the character-select lockouts landing: the item tooltip column
+    // composition moved to item_combat_tooltip_view.ts and the loot receipt
+    // body decision to loot_quality_receipt.ts (the loot arm keeps its one
+    // guarded log() call through a thin lootReceiptBody adapter), composed
+    // with the trade quantity prompt fold (18263 - 10). wc -l on the merged
+    // tree. Exact count, zero slack.
+    ceiling: 18253,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1095,7 +1104,10 @@ const MONOLITHS: MonolithRow[] = [
     // cast-scoped marker, naturesBoonPower, would otherwise have grown this
     // file); sim.ts keeps the type import and the barrel re-export. Exact
     // count, zero slack.
-    ceiling: 11792,
+    // Permanent loot quality (PR 4054) base merge: the loot identity receipt
+    // and projection helpers moved to dedicated siblings, composed with the
+    // release extractions above. Exact merged count, zero slack.
+    ceiling: 11750,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1528,7 +1540,10 @@ const MONOLITHS: MonolithRow[] = [
     // gap booking plus the ack high-water) moved to server/input_seq.ts, now
     // shared by the input frame and the seq-bearing 'target' command. Measured
     // with wc -l < server/game.ts after biome. Exact count, zero slack.
-    ceiling: 9993,
+    // Permanent loot quality (PR 4054) base merge: the equipped-instance wire
+    // projection moved to server/equipped_instance_wire.ts, composed with the
+    // release extractions above. Exact merged count, zero slack.
+    ceiling: 9979,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

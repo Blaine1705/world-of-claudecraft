@@ -3593,6 +3593,15 @@ export const ja_JP: EnTranslations = {
         "socketReplaced": "{name}に宝石をはめ込みました。{gem}は破壊されました。"
       }
     },
+    "lootQuality": {
+      "ordinary": "通常",
+      "superior": "上質",
+      "exceptional": "卓越",
+      "magnificent": "壮麗",
+      "transcendent": "超越",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}：アイテムレベル +{levels}。強化後も維持されます。"
+    },
     "itemTooltip": {
       "requiresLevel": "必要レベル {level}",
       "riftTier": "{tier}ランク・リフト装備",

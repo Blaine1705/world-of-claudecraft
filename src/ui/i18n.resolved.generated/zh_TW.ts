@@ -3593,6 +3593,15 @@ export const zh_TW: EnTranslations = {
         "socketReplaced": "已將寶石鑲入{name}；{gem}已被摧毀。"
       }
     },
+    "lootQuality": {
+      "ordinary": "普通",
+      "superior": "優良",
+      "exceptional": "卓越",
+      "magnificent": "華麗",
+      "transcendent": "超凡",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}：+{levels} 物品等級。強化後仍會保留。"
+    },
     "itemTooltip": {
       "requiresLevel": "需要等級 {level}",
       "riftTier": "{tier}級裂隙物品",

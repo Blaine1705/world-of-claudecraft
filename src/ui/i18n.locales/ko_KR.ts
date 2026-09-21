@@ -913,6 +913,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': '획득 시 귀속',
   'hudChrome.loot.bindConfirmBody':
     '이 전리품에는 가져가면 자신에게 귀속되는 아이템이 있습니다. 귀속된 아이템은 같은 전리품을 함께 획득한 플레이어와만, 제한된 시간 동안만 거래할 수 있습니다.',
+  'hudChrome.lootQuality.ordinary': '일반',
+  'hudChrome.lootQuality.superior': '상급',
+  'hudChrome.lootQuality.exceptional': '특급',
+  'hudChrome.lootQuality.magnificent': '걸작',
+  'hudChrome.lootQuality.transcendent': '초월',
+  'hudChrome.lootQuality.tooltip': '{quality}: 아이템 레벨 +{levels}. 강화 후에도 유지됩니다.',
   'hudChrome.itemTooltip.requiresLevel': '필요 레벨 {level}',
   'hudChrome.spellbook.addToBarAria': '{name}을(를) 행동 단축바에 추가',
   'hudChrome.spellbook.removeFromBarAria': '{name}을(를) 행동 단축바에서 제거',
