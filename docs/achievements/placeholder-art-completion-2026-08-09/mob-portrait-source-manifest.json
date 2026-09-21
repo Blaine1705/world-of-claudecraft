@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "e6b0d5b03122b3f8919a6cce7a56aa8bbbb60d9eedc76a355b3edec22e21d21b",
+  "rendererFingerprint": "d87820f62627309dd74acf75bd5f93bddf0b663a16c2eb6c097ed40ca131f3e0",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5008411,
-      "sha256": "c766a6d8bf41456d8fa5100554b8b6683c0038f13eae48b66aa74d621b49930f",
+      "bytes": 5008507,
+      "sha256": "88722ace7cc50f87f4299ab10fd1e522e59edc87d3be8ac791bdb07b207a997f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6024,8 +6024,8 @@
         "model": {
           "url": "models/creatures/hoard_archon_nyxaris.glb",
           "path": "public/models/creatures/hoard_archon_nyxaris.glb",
-          "bytes": 627480,
-          "sha256": "59bad957fd8eec08f8d0be3395fd5b9a8c4ee01c070e6456fcf256bd2d689f7c"
+          "bytes": 650712,
+          "sha256": "0c943e5d30685a86c199e8df9b1b15a584275d42ca0e076ca6c58f9204a1e7c5"
         },
         "idle": "Idle",
         "height": 2.4,
@@ -6042,7 +6042,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8fc55e5c12eee7cf814cbce99963c7667a744c071e73f0936a27b6cd267b6795",
+      "sourceFingerprint": "83aa8ab647b628279dfc00dd448183f1c0c257920dc3ba157cef29048c9cb5bf",
       "output": {
         "path": "public/ui/mobs/rift_boss_arcane.webp",
         "bytes": 1890,
@@ -6092,8 +6092,8 @@
         "model": {
           "url": "models/creatures/hoard_emberforge_tyrant.glb",
           "path": "public/models/creatures/hoard_emberforge_tyrant.glb",
-          "bytes": 845036,
-          "sha256": "4af821a5e27d2c948b9e38862289f8fe854eed40c4b013ab487bd9abc4edc7e1"
+          "bytes": 830456,
+          "sha256": "b7dd72a59a6396e695516e0a917dcc67c4f1ab5daeda46f3f85c9fc6a71e96eb"
         },
         "idle": "Idle",
         "height": 2.6,
@@ -6123,11 +6123,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "1b4ce3b14ad58b80ffe4da9ae6cd5cc2f970e3f1e22b7c351b5cbfd26d93abb6",
+      "sourceFingerprint": "ce635a79b9e687f2565c05c0d8701a451660b130a093c8c14bbb35605f534f1e",
       "output": {
         "path": "public/ui/mobs/rift_boss_ember.webp",
-        "bytes": 2484,
-        "sha256": "dd5f83c06e3d25b7eca696a00ed85e512f325f9a22dbdc91c27662c914b39fc1"
+        "bytes": 2632,
+        "sha256": "2eb5923d29d68b94e633800b3956e48c2eabf6f084d03f006126d1a1bd368363"
       }
     },
     {
@@ -6275,8 +6275,8 @@
         "model": {
           "url": "models/creatures/hoard_tempest_vharok.glb",
           "path": "public/models/creatures/hoard_tempest_vharok.glb",
-          "bytes": 779696,
-          "sha256": "c7262a2efb5a364cc9666be420e051f6ab5005d7bd01149d6adec380660285ab"
+          "bytes": 797292,
+          "sha256": "368194f3162250c51df631ff05742c668d31f7cc74fb73d3a71de62c07a212ff"
         },
         "idle": "Idle",
         "height": 2.5,
@@ -6293,7 +6293,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "876620d60691803342e06c3cf80ecf71e93fae578194affe3d14ee6c1454641e",
+      "sourceFingerprint": "00beca0d2d302ce63fdfd4acd44f9938fbf766af4cdb13e69f4fbe1401b8c6b7",
       "output": {
         "path": "public/ui/mobs/rift_boss_storm.webp",
         "bytes": 2470,
