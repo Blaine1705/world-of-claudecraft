@@ -7,7 +7,7 @@
 // material, the scene state and our onBeforeCompile patches. So this script
 // serves THIS worktree's dev client, enters the OFFLINE world by itself, walks
 // a scripted tour (every zone, every dungeon, the dev raids, the battleground,
-// every mount, every ability VFX) once per graphics profile, and records every
+// every mount ridden a few steps, a dive, every ability VFX) once per graphics profile, and records every
 // program text through the page hook in scripts/lib/shader_harvest_hook.mjs.
 // No human plays, so two runs on one checkout give the same corpus.
 //
@@ -51,7 +51,17 @@ import { installShaderHarvestHook } from './lib/shader_harvest_hook.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VIEWPORT = { width: 1600, height: 900, deviceScaleFactor: 1 };
-const STEP_IDS = ['boot', 'zones', 'dungeons', 'raids', 'battleground', 'mounts', 'vfx', 'windows'];
+const STEP_IDS = [
+  'boot',
+  'zones',
+  'dungeons',
+  'raids',
+  'battleground',
+  'mounts',
+  'dive',
+  'vfx',
+  'windows',
+];
 const SERVED_CHECK = {
   module: '/src/render/program_sources.ts',
   token: 'collectRootProgramSources',
@@ -218,6 +228,25 @@ async function keepAlive(page) {
   });
 }
 
+/**
+ * Hold the forward key for a moment. Some visuals only draw while the rider
+ * MOVES (a sled's exhaust plumes, gait dust), and a material that is never
+ * drawn never links, so a parked mount hides them from the harvest.
+ */
+async function rideForward(page, ms) {
+  const at = () =>
+    page.evaluate(() => {
+      const p = window.__game.sim.player.pos;
+      return { x: p.x, z: p.z };
+    });
+  const from = await at();
+  await page.keyboard.down('w');
+  await sleep(ms);
+  await page.keyboard.up('w');
+  const to = await at();
+  return Math.hypot(to.x - from.x, to.z - from.z);
+}
+
 const TOUR = {
   async zones(page, args, log) {
     const zones = await page.evaluate(async () => {
@@ -311,6 +340,11 @@ const TOUR = {
     await dev(page, '/dev bg');
     await keepAlive(page);
     await settle(page, args);
+    // Stay through the opening: the field's painted ground, wards and runes
+    // come with the match itself, not with the teleport.
+    await rideForward(page, 3000);
+    await sleep(8000);
+    await settle(page, args);
     await dev(page, '/dev bg end');
     await settle(page, args);
     log('battleground');
@@ -322,9 +356,12 @@ const TOUR = {
       const { MOUNT_SKINS } = await import('/src/sim/content/mount_skins.ts');
       return { keys: [...MOUNT_KEYS], skins: Object.keys(MOUNT_SKINS) };
     });
-    // Dev harness convention: write the entity fields the renderer reads, so
-    // no reins item, riding skill or cast time stands between the tour and the
-    // visual.
+    // Dev harness convention: write the entity field the renderer reads, so no
+    // reins item, riding skill or cast time stands between the tour and the
+    // visual. KNOWN GAP: a rider mounted this way does not move under the
+    // forward key, and the sim's own summon (useItem on the reins) never
+    // completed in the tour either, so visuals that only draw while the rider
+    // moves (the goblin rocket sled's exhaust plumes) are still unharvested.
     for (const key of catalog.keys) {
       await setStep(page, `mount:${key}`);
       await page.evaluate((key) => {
@@ -337,9 +374,18 @@ const TOUR = {
     for (const skin of catalog.skins) {
       await setStep(page, `mountskin:${skin}`);
       await page.evaluate((skin) => {
-        window.__game.sim.player.mountSkinId = skin;
+        // Through the sim's own setter: a skin written straight onto the entity
+        // is taken off again by the ownership reconcile before it ever draws.
+        window.__game.sim.changeMountSkin(skin);
       }, skin);
       await settle(page, args);
+      const moved = await rideForward(page, 1500);
+      await settle(page, args);
+      const state = await page.evaluate(() => {
+        const p = window.__game.sim.player;
+        return `${p.mountKey}/${p.mountSkinId}`;
+      });
+      log(`mountskin ${skin}: rode ${moved.toFixed(1)} yd as ${state}`);
     }
     await page.evaluate(() => {
       const p = window.__game.sim.player;
@@ -347,6 +393,40 @@ const TOUR = {
       p.mountKey = '';
     });
     log(`mounts: ${catalog.keys.length} keys, ${catalog.skins.length} skins`);
+  },
+
+  async dive(page, args, log) {
+    // The underwater tint and bubbles sit in a hidden group until the CAMERA is
+    // under the waterline, and the boot compile walks visible objects only.
+    // Find deep water near a zone hub, go there, and hold the swim-down key.
+    const spot = await page.evaluate(async () => {
+      const { ZONES } = await import('/src/sim/data.ts');
+      const { waterLevelAt, terrainHeight } = await import('/src/sim/world.ts');
+      const seed = window.__game.sim.cfg.seed;
+      for (const zone of ZONES) {
+        for (let radius = 0; radius <= 400; radius += 20) {
+          for (let a = 0; a < 16; a++) {
+            const x = zone.hub.x + Math.cos((a / 16) * Math.PI * 2) * radius;
+            const z = zone.hub.z + Math.sin((a / 16) * Math.PI * 2) * radius;
+            const depth = waterLevelAt(x, z, seed) - terrainHeight(x, z, seed);
+            if (Number.isFinite(depth) && depth > 6) return { x, z, depth, zone: zone.id };
+          }
+        }
+      }
+      return null;
+    });
+    if (!spot) {
+      log('dive: no deep water found near any hub');
+      return;
+    }
+    await setStep(page, `dive:${spot.zone}`);
+    await dev(page, `/dev tp ${spot.x.toFixed(1)} ${spot.z.toFixed(1)}`);
+    await settle(page, args);
+    await page.keyboard.down('ControlLeft');
+    await sleep(4000);
+    await settle(page, args);
+    await page.keyboard.up('ControlLeft');
+    log(`dive: ${spot.zone}, ${spot.depth.toFixed(1)} yd deep`);
   },
 
   async vfx(page, args, log) {
