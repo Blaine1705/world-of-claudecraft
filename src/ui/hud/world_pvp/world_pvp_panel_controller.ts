@@ -10,6 +10,7 @@
 import { audio } from '../../../game/audio';
 import type { IWorld } from '../../../world_api';
 import { clockSeconds } from '../../clock_seconds_core';
+import { durationText } from '../../duration_text';
 import { esc } from '../../esc';
 import { focusKeyAttr } from '../../focus_restore';
 import { formatMoney, formatNumber, t } from '../../i18n';
@@ -17,6 +18,10 @@ import { svgIcon } from '../../ui_icons';
 import type { WorldPvpWindowView } from './world_pvp_window_view';
 
 const num = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });
+
+/** A whole percent as the locale's percent (10 -> "10%"). */
+const pct = (whole: number): string =>
+  formatNumber(whole / 100, { style: 'percent', maximumFractionDigits: 0 });
 
 /** The disarm countdown as m:ss, every digit from the formatters (the
  *  clock_seconds_core precedent): minutes bare, seconds zero-padded. */
@@ -46,10 +51,10 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
     ? view.disarmRemaining === null
       ? t('hudChrome.worldPvp.statusOn')
       : t('hudChrome.worldPvp.statusDisarming', { time: disarmClockText(view.disarmRemaining) })
-    : t('hudChrome.worldPvp.statusOff');
+    : flagDownText(view);
   const status =
     `<div class="wpvp-status ui-card ${statusClass}"><span aria-hidden="true">${svgIcon('battleground')}</span>` +
-    `<span>${esc(statusText)}</span></div>`;
+    `<span class="wpvp-status-text"><span>${esc(statusText)}</span>${groundHtml(view)}</span></div>`;
   const stats =
     `<div class="pvp-stat-grid wpvp-stats">` +
     `<div class="ui-card">${esc(t('hudChrome.worldPvp.record', { kills: num(view.kills), deaths: num(view.deaths) }))}</div>` +
@@ -57,18 +62,29 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
     `</div>`;
   const stakes = view.stakes;
   const stakeRows = [
+    // Where you can fight at all (the three zone policies), then what raises
+    // the flag for you, then what a kill moves, then how to put it back down.
+    t('hudChrome.worldPvp.groundSanctuary'),
+    t('hudChrome.worldPvp.groundContested'),
+    t('hudChrome.worldPvp.groundFfa'),
+    t('hudChrome.worldPvp.groupLine'),
+    t('hudChrome.worldPvp.markLine'),
+    t('hudChrome.worldPvp.aidLine'),
     t('hudChrome.worldPvp.stakeLine', {
       cap: formatMoney(stakes.stakeCapCopper),
-      percent: formatNumber(stakes.stakePercent / 100, {
-        style: 'percent',
-        maximumFractionDigits: 0,
-      }),
+      percent: pct(stakes.stakePercent),
     }),
+    t('hudChrome.worldPvp.noStakeLine'),
+    t('hudChrome.worldPvp.noTakeLine'),
     t('hudChrome.worldPvp.honorLine', { honor: num(stakes.killHonor) }),
     t('hudChrome.worldPvp.splitLine'),
-    t('hudChrome.worldPvp.disarmLine', { minutes: num(stakes.disarmMinutes) }),
-    t('hudChrome.worldPvp.groupLine'),
+    t('hudChrome.worldPvp.repeatLine', {
+      second: pct(stakes.repeatSecondPercent),
+      third: pct(stakes.repeatThirdPercent),
+      reset: durationText(stakes.repeatWindowSeconds),
+    }),
     t('hudChrome.worldPvp.greyLine', { levels: num(stakes.greyLevelGap) }),
+    t('hudChrome.worldPvp.disarmLine', { minutes: num(stakes.disarmMinutes) }),
   ]
     .map((line) => `<li>${esc(line)}</li>`)
     .join('');
@@ -87,8 +103,46 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
   );
 }
 
-function actionHtml(view: Extract<WorldPvpWindowView, { kind: 'live' }>): string {
+type LiveView = Extract<WorldPvpWindowView, { kind: 'live' }>;
+
+/** The flag-down sentence. Free-for-all ground has its own, because standing
+ *  there is the consent: the generic one would promise an immunity the ground
+ *  does not grant. */
+function flagDownText(view: LiveView): string {
+  if (view.realmEnabled && view.zone === 'ffa') return t('hudChrome.worldPvp.statusOffFfa');
+  return t('hudChrome.worldPvp.statusOff');
+}
+
+/** The status card's second line: what the ground under the player says. A
+ *  realm with the kill switch set has no live ground at all, so the line is
+ *  dropped there rather than restated (the realm line sits under the disabled
+ *  button, beside the control it explains). Free-for-all is the one state that
+ *  reads hostile; the rest stay the card's muted tone (the tokens live in
+ *  src/styles/components.css). */
+function groundHtml(view: LiveView): string {
+  if (!view.realmEnabled) return '';
+  const text =
+    view.zone === 'sanctuary'
+      ? t('hudChrome.worldPvp.zoneSanctuary')
+      : view.zone === 'ffa'
+        ? t('hudChrome.worldPvp.zoneFfa')
+        : t('hudChrome.worldPvp.zoneContested');
+  // The class is chosen from the union, never interpolated from the wire.
+  const tone = view.zone === 'ffa' ? ' is-ffa' : '';
+  return `<span class="wpvp-zone${tone}">${esc(text)}</span>`;
+}
+
+function actionHtml(view: LiveView): string {
   const hint = `<div class="bg-note">${esc(t('hudChrome.worldPvp.commandHint'))}</div>`;
+  if (view.action === 'realmOff') {
+    // The reason sits under the button, where the level requirement does, so a
+    // dead control is never unexplained. No command hint: /pvp is refused on
+    // this realm too, so pointing at it would only lead to an error line.
+    return (
+      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)} disabled aria-disabled="true">${esc(t('hudChrome.worldPvp.enable'))}</button>` +
+      `<div class="bg-note bg-level-req">${esc(t('hudChrome.worldPvp.realmDisabled'))}</div></div>`
+    );
+  }
   if (view.action === 'locked') {
     return (
       `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)} disabled aria-disabled="true">${esc(t('hudChrome.worldPvp.enable'))}</button>` +

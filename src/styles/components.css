@@ -14884,6 +14884,23 @@
   .wpvp-status.is-off {
     border-left-color: var(--color-friendly);
   }
+  /* The card carries two lines beside its icon: the flag sentence and the
+     ground under the player. Grid so a long localized line wraps inside the
+     card instead of pushing the icon around. */
+  .wpvp-status-text {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+  /* The ground line. Free-for-all is the one state that reads hostile: the
+     flag is not what decides a fight there, so it must not read as calm. */
+  .wpvp-zone {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .wpvp-zone.is-ffa {
+    color: var(--color-hostile);
+  }
   /* Two cards (record, honor), so the shared three-column stat grid would leave
      a hole; the tab's own column count keeps the cards full width. */
   .wpvp-stats {

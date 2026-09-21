@@ -1625,12 +1625,32 @@ export const TARGETS = [
     variants: [
       { key: 'tab-down', scene: 'down' },
       { key: 'tab-confirm', scene: 'confirm' },
+      // Free-for-all ground: the offline character is stood in the Wraithwood
+      // first, so the ground line reads the hostile state with the flag down.
+      { key: 'tab-ffa', scene: 'ffa' },
       // Last on purpose: it raises the flag, which the earlier scenes must not see.
       { key: 'tab-up', scene: 'up' },
       { key: 'tab-mobile', scene: 'down', mobile: true },
     ],
     async capture(page, variant) {
       const scene = variant?.scene ?? 'down';
+      if (scene === 'ffa') {
+        // Open ground in the Wraithwood (a free-for-all zone, see
+        // src/sim/pvp/world_pvp_zones.ts); the sim settles the height. The
+        // window opens only once the HUD has seen the crossing (the zone pass
+        // runs twice a second and the HUD reacts to the new zone on its own),
+        // so the tab that opens is the one the ground line is read from.
+        const moved = await page.evaluate(() => {
+          const game = window.__game;
+          if (!game?.sim) return false;
+          const me = game.sim.player;
+          me.pos = { x: 360, y: me.pos.y, z: 1540 };
+          me.prevPos = { ...me.pos };
+          return true;
+        });
+        if (!moved) return { skip: 'offline world is unavailable' };
+        await wait(2_000);
+      }
       const opened = await page.evaluate(() => {
         const game = window.__game;
         if (!game?.sim) return { ok: false, reason: 'offline world is unavailable' };
@@ -1647,6 +1667,10 @@ export const TARGETS = [
       if (!ready) return { skip: 'the PvP window never became visible' };
       // The real tab button, not a debug hook: the strip is what the player uses.
       await page.click('[data-bracket="world"]');
+      if (scene === 'ffa') {
+        const ffa = await pollForSize(page, '.wpvp-zone.is-ffa');
+        if (!ffa) return { skip: 'the free-for-all ground line never appeared' };
+      }
       await pollForSize(page, '.wpvp-status, .bg-note');
       if (scene === 'confirm' || scene === 'up') {
         await page.click('[data-act="pvp-enable"]');

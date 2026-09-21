@@ -2868,13 +2868,38 @@ export const hudChromeStrings = {
       'Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.',
     statusOn: 'Your PvP flag is up. Flagged players can attack you.',
     statusOff: 'Your PvP flag is down. You cannot attack or be attacked in the open world.',
+    // The flag-down line is only true where the flag decides fights, so
+    // free-for-all ground gets its own: standing there is the consent.
+    statusOffFfa:
+      'Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.',
     statusDisarming: 'Your flag drops in {time}, or when your current fight ends.',
+    // The second line of the status card: what the ground under the player says
+    // (src/sim/pvp/world_pvp_zones.ts), or the realm line when the kill switch
+    // is set, which outranks every zone.
+    zoneSanctuary: 'Sanctuary: no world PvP here.',
+    zoneContested: 'Contested ground: only flagged players fight here.',
+    zoneFfa: 'Free-for-all ground: everyone here is fair game.',
+    realmDisabled: 'World PvP is disabled on this realm.',
+    // The stakes list, in reading order: where you can fight, what raises your
+    // flag for you, what a kill moves, and how to put the flag back down.
+    groundSanctuary: 'The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.',
+    groundContested: 'Everywhere else is contested: only two flagged players can fight.',
+    groundFfa:
+      'The Wraithwood, the Evergarden and the Nightbloom are free-for-all: everyone there can fight, flag or not.',
+    groupLine: 'Party, raid and guild members are never hostile to each other.',
+    markLine:
+      'Attacking an unflagged player there raises your own flag; attacking a flagged one never does.',
+    aidLine: 'Healing, shielding or buffing a flagged player in a world fight raises your flag.',
     stakeLine: 'The loser pays {cap} or {percent} of their purse, whichever is less.',
+    noStakeLine: 'An unflagged player killed on free-for-all ground loses no gold.',
+    noTakeLine:
+      'An unflagged fighter takes no gold either: it only moves between two flagged players.',
     honorLine: '{honor} Honor per kill, split between everyone who helped.',
     splitLine: 'A clean 1v1 pays the whole pot; helpers and their healers share it.',
-    disarmLine: 'Switching off takes {minutes} minutes and waits for combat to end.',
-    groupLine: 'Party, raid and guild members are never hostile to each other.',
+    repeatLine:
+      'Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.',
     greyLine: 'Players more than {levels} levels below you pay nothing.',
+    disarmLine: 'Switching off takes {minutes} minutes and waits for combat to end.',
     record: 'Record: {kills} kills, {deaths} deaths',
     enable: 'Enable World PvP',
     disable: 'Disable World PvP',
