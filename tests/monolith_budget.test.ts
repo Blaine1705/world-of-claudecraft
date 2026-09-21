@@ -1091,7 +1091,11 @@ const MONOLITHS: MonolithRow[] = [
     // cast-scoped marker, naturesBoonPower, would otherwise have grown this
     // file); sim.ts keeps the type import and the barrel re-export. Exact
     // count, zero slack.
-    ceiling: 11792,
+    // Down 11792 -> 11760 at the raid released-ghost loot fix: the leave-time
+    // tap re-anchor (replacementTapperForLeave) moved to
+    // src/sim/loot/kill_participation.ts beside the participation predicates
+    // it shares with the kill snapshot. Exact count, zero slack.
+    ceiling: 11760,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

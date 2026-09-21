@@ -35,6 +35,7 @@ import {
   spawnBossExitPortal,
 } from '../instances/dungeons';
 import { isImmuneInPlace } from '../instances/instance_combat_hold';
+import { isKillParticipant, killParticipationPos } from '../loot/kill_participation';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
@@ -1715,23 +1716,25 @@ export function handleDeath(
       if (party) {
         for (const mPid of party.members) {
           const mMeta = ctx.players.get(mPid);
-          const mE = ctx.entities.get(mPid);
           // A released player entity stands at the graveyard, but their body is
-          // still where they fell. Use that corpse position for the kill-time
-          // participation snapshot so releasing during the final seconds does
-          // not erase XP, loot-roll, or Heroic Mark rights.
-          const matchingInstanceCorpse =
-            mE?.ghost &&
-            mE.corpsePos &&
-            (!claimedInst || mE.corpseInstanceId === claimedInst.exitId)
-              ? mE.corpsePos
-              : null;
-          const participationPos = matchingInstanceCorpse ?? mE?.pos;
+          // still where they fell: the corpse is their participation position
+          // (loot/kill_participation.ts), so releasing during the final seconds
+          // does not erase XP, loot-roll, or Heroic Mark rights. Inside a
+          // claimed instance the whole claim footprint shares the kill.
+          const participationPos = killParticipationPos(
+            ctx.entities.get(mPid),
+            claimedInst?.exitId ?? null,
+          );
           if (
             mMeta &&
             !mMeta.leaving &&
             participationPos &&
-            dist2d(participationPos, e.pos) <= PARTY_XP_RANGE
+            isKillParticipant(
+              participationPos,
+              e.pos,
+              claimedInst !== null &&
+                ctx.instanceClaimIdAt(participationPos) === claimedInst.exitId,
+            )
           )
             eligible.push(mMeta);
         }
