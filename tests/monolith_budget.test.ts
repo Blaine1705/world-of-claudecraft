@@ -106,7 +106,9 @@ const MONOLITHS: MonolithRow[] = [
     // the fourth tab's window glue landed under the old ceiling (net of the
     // v0.43.0 sync merge, which trimmed overlapping browse markup). Exact
     // count, zero slack.
-    ceiling: 2419,
+    // LOWERED for permanent loot quality: item-cell markup moved into
+    // woc_market_chrome.ts, keeping tooltip registration in the window.
+    ceiling: 2414,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -493,8 +495,23 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
     // per-frame healer-range scan (the Keeper is talked to). wc -l on the
     // merged tree. Exact count, zero slack.
-    // Warrior recovery audio policy moved to combat_sfx.healAudioPlan.
-    ceiling: 18258,
+    // LOWERED 18276 -> 18263 with the character-select raid lockouts: the
+    // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
+    // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
+    // and the minimap badge name a lockout identically. Exact count, zero slack.
+    // LOWERED 18263 -> 18253 at the permanent loot quality (PR 4054) sync
+    // on top of the character-select lockouts landing: the item tooltip column
+    // composition moved to item_combat_tooltip_view.ts and the loot receipt
+    // body decision to loot_quality_receipt.ts (the loot arm keeps its one
+    // guarded log() call through a thin lootReceiptBody adapter), composed
+    // with the trade quantity prompt fold (18263 - 10). wc -l on the merged
+    // tree. Exact count, zero slack.
+    // LOWERED 18253 -> 18235 at the Warrior presentation (PR 4139) base sync:
+    // the heal audio policy (potion cue, HoT silence, the Frenzied
+    // Regeneration exemption) moved out of the heal2 arm into
+    // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
+    // count, zero slack.
+    ceiling: 18235,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1096,7 +1113,10 @@ const MONOLITHS: MonolithRow[] = [
     // cast-scoped marker, naturesBoonPower, would otherwise have grown this
     // file); sim.ts keeps the type import and the barrel re-export. Exact
     // count, zero slack.
-    ceiling: 11792,
+    // Permanent loot quality (PR 4054) base merge: the loot identity receipt
+    // and projection helpers moved to dedicated siblings, composed with the
+    // release extractions above. Exact merged count, zero slack.
+    ceiling: 11750,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1301,7 +1321,10 @@ const MONOLITHS: MonolithRow[] = [
     // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
     // composed with the release's game_renderer.ts extraction. Exact merged
     // count, zero slack.
-    ceiling: 11281,
+    // LOWERED 11281 -> 11280 with the character-select lockout disclosure:
+    // the roster row hint markup call is inlined into its template and the
+    // disclosure event isolation lives in src/ui/charselect_hints.ts.
+    ceiling: 11280,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1526,7 +1549,10 @@ const MONOLITHS: MonolithRow[] = [
     // gap booking plus the ack high-water) moved to server/input_seq.ts, now
     // shared by the input frame and the seq-bearing 'target' command. Measured
     // with wc -l < server/game.ts after biome. Exact count, zero slack.
-    ceiling: 9993,
+    // Permanent loot quality (PR 4054) base merge: the equipped-instance wire
+    // projection moved to server/equipped_instance_wire.ts, composed with the
+    // release extractions above. Exact merged count, zero slack.
+    ceiling: 9979,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -414,6 +414,7 @@ export const es_ES: EnTranslations = {
       "help": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria para llevarte a un punto seguro accesible cercano.",
       "helpAtGraveyard": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego envía tu espíritu al cementerio más cercano. Volver a través del Guardián Pálido requiere el Tañido del Guardián.",
       "helpUnstuckSickness": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego te traslada al cementerio más cercano, reviviéndote si habías caído. Te deja con el Mal de desatasco durante un máximo de 5 minutos.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Desatascar en {seconds} segundos. Moverte, luchar, recibir daño o iniciar otra acción lo cancela.",
       "countdown": "Desatascar: {seconds}",
       "completed": "Trasladado al punto seguro accesible más cercano.",
@@ -421,6 +422,8 @@ export const es_ES: EnTranslations = {
       "revivedAtGraveyard": "Has sido devuelto al cementerio más cercano y revivido. El Tañido del Guardián pesa sobre ti.",
       "movedToGraveyard": "Has sido trasladado al cementerio más cercano. El Mal de desatasco pesa sobre ti.",
       "revivedAtGraveyardUnstuck": "Has sido trasladado al cementerio más cercano y revivido. El Mal de desatasco pesa sobre ti.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Desatascar se canceló porque te moviste.",
       "cancelledDamaged": "Desatascar se canceló porque recibiste daño.",
       "cancelledCombat": "Desatascar se canceló porque entraste en combate.",
@@ -3590,6 +3593,15 @@ export const es_ES: EnTranslations = {
         "socketReplaced": "Engarzó una gema en {name}; {gem} fue destruido."
       }
     },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+    },
     "itemTooltip": {
       "requiresLevel": "Requiere nivel {level}",
       "riftTier": "Objeto de Brecha de rango {tier}",
@@ -6350,6 +6362,7 @@ export const es_ES: EnTranslations = {
       "allyRezBody": "No siempre tienes que volver caminando. Un aliado con un hechizo de resurrección puede alzarte en su lugar, y te llega como un aviso que aceptas o rechazas; si lo dejas sin responder, caduca, así que respóndelo mientras esté ahí. Acéptalo y te levantas junto al amigo que lo lanzó, con parte de tu salud y tu maná recuperados. Algunos sanadores pueden devolver a la vida de golpe a cuantos miembros del grupo hayan caído, aunque cada uno de vosotros sigue respondiendo a su propio aviso. Los Campos Espinosos son la excepción: ningún hechizo de resurrección te alcanza allí, y esperas a la siguiente oleada de tu equipo.",
       "unstuckTitle": "Cuando estás realmente atascado",
       "unstuckBody": "Si el mundo te atrapa en algún sitio del que no puedes salir, escribe /unstuck. Necesitas estar fuera de combate y quieto, sin un aturdimiento ni una raíz encima, y no estar en un duelo ni en un combate de arena: se inicia una breve cuenta atrás, y moverte o recibir daño la cancela. Cuando termina, te deja en el cementerio más cercano. Nunca te mata y no deja cadáver, y si ya habías caído, te revive allí en su lugar. El precio es el Mal de desatasco, un debilitamiento temporal de cuanto eres que ya se ha disipado para cuando puedas volver a usar el comando, y al igual que el Tañido del Guardián, perdona por completo a los personajes recién creados.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Subir a un saliente",
       "climbBody": "Los salientes no son muros. Salta hacia algo demasiado alto para subir de un paso y tu personaje se agarra al borde cerca de la cima del salto y se impulsa hasta arriba, sin ninguna tecla propia que pulsar. Cualquier cosa lo bastante baja como para salvarla por ti mismo pasa sin más ceremonia; el impulso completo se reserva para bordes por encima de tu cabeza. Es breve, y toma las riendas mientras dura, así que no puedes salir de él a medio camino. Un aturdimiento te sorprende a mitad del impulso y sueltas y caes, calculado desde el punto donde el salto dejó el suelo, y un aturdimiento o una raíz impiden que la subida llegue siquiera a empezar, algo que conviene recordar cuando intentas escapar de un mal trance en pleno combate."
     },
@@ -6523,6 +6536,7 @@ export const es_ES: EnTranslations = {
       "dungeonReset": "Abandona tus propias instancias vacías, que es lo que haces después de cambiar de dificultad.",
       "groupRecovery": "Recuperación y presencia",
       "unstuck": "La salida cuando el mundo te ha atrapado. Quédate quieto durante una breve cuenta atrás y te trasladas al cementerio más cercano, revivido allí si ya habías caído. Después te deja debilitado con el Mal de desatasco durante un tiempo, así que es un último recurso y no un atajo.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Márcate como Ausente, con un mensaje opcional que recibe como respuesta automática cualquiera que te susurre. Repite el comando sin mensaje para desactivarlo; cualquier otro mensaje de chat también lo desactiva.",
       "dnd": "No Molestar: como estar ausente, salvo que los susurros que te envían se retienen en lugar de entregarse.",
       "sit": "Siéntate donde estás, y vuelve a levantarte. Te levantas automáticamente en cuanto te mueves, lanzas un hechizo o recibes un golpe.",
@@ -6629,6 +6643,7 @@ export const es_ES: EnTranslations = {
       "fatigueDef": "Nada lo bastante mar adentro en aguas abiertas y el agua empieza a debilitarte: primero llega un aviso, y luego un daño creciente hasta que regreses hacia tierra.",
       "unstuckTerm": "Mal de desatasco",
       "unstuckDef": "El precio de usar Desatascar desde el menú del juego. Quédate quieto durante toda la cuenta atrás y te deposita en el cementerio más cercano, y cargas con una debilidad temporal durante un tiempo después.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Nivel de objeto",
       "itemLevelDef": "Un único número que resume la fuerza de una pieza de equipo, útil cuando quieres comparar dos piezas con rapidez. Activa Mostrar nivel de objeto en las opciones para verlo en la información emergente. Solo el equipo de origen conocido lleva uno, así que los básicos comunes de vendedor y el equipo inicial no muestran nada, y que falte la cifra es normal, no un fallo.",
       "requiredLevelTerm": "Nivel requerido",
@@ -9942,6 +9957,11 @@ export const es_ES: EnTranslations = {
     "inWorld": "en el mundo",
     "takeOver": "Tomar control",
     "inWorldHint": "Ya está en el mundo. Cierra la sesión en otro lugar, o toma el control.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Esto desconectará a este personaje de otra sesión y lo traerá aquí. ¿Continuar?",
     "renameRequired": "cambio de nombre requerido",
     "delete": "Eliminar",

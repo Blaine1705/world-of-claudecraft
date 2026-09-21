@@ -414,6 +414,7 @@ export const cs_CZ: EnTranslations = {
       "help": "Záchrana: /unstuck spustí nehybné odpočítávání, které tě přemístí na nedaleké dostupné bezpečné místo.",
       "helpAtGraveyard": "Záchrana: /unstuck spustí nehybné odpočítávání a poté pošle tvého ducha na nejbližší hřbitov. Návrat přes Bledého strážce vyžaduje Strážcovo mýtné.",
       "helpUnstuckSickness": "Záchrana: /unstuck spustí nehybné odpočítávání a poté tě přenese na nejbližší hřbitov, a pokud jsi padl, oživí tě. Nemoc z vyproštění na tobě zůstane až 5 minut.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Vyproštění za {seconds} sekund. Pohyb, boj, utrpění zranění nebo zahájení jiné akce ho zruší.",
       "countdown": "Vyproštění: {seconds}",
       "completed": "Přemístěno na nejbližší dostupné bezpečné místo.",
@@ -421,6 +422,8 @@ export const cs_CZ: EnTranslations = {
       "revivedAtGraveyard": "Byl jsi vrácen na nejbližší hřbitov a oživen. Strážcovo mýtné na tobě leží.",
       "movedToGraveyard": "Byl jsi přenesen na nejbližší hřbitov. Nemoc z vyproštění na tobě leží.",
       "revivedAtGraveyardUnstuck": "Byl jsi přenesen na nejbližší hřbitov a oživen. Nemoc z vyproštění na tobě leží.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Vyproštění zrušeno, protože ses pohnul.",
       "cancelledDamaged": "Vyproštění zrušeno, protože jsi utrpěl zranění.",
       "cancelledCombat": "Vyproštění zrušeno, protože jsi vstoupil do boje.",
@@ -3590,6 +3593,15 @@ export const cs_CZ: EnTranslations = {
         "socketReplaced": "Zasunutý drahokam do {name}; {gem} byl zničen."
       }
     },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+    },
     "itemTooltip": {
       "requiresLevel": "Vyžaduje úroveň {level}",
       "riftTier": "Trhlinový předmět stupně {tier}",
@@ -6350,6 +6362,7 @@ export const cs_CZ: EnTranslations = {
       "allyRezBody": "Nemusíš se vždycky vracet pěšky. Spojenec s vzkřisujícím kouzlem tě může místo toho vzkřísit, a přijde to k tobě jako výzva, kterou přijmeš nebo odmítneš; necháš-li ji ležet, vyprší, tak na ni odpověz, dokud tam je. Přijmi a povstaneš vedle přítele, který tě vzkřísil, s částí zdraví a many zpět. Někteří léčitelé dokážou nabídnout vzkříšení celé padlé skupině najednou, ačkoli každý z vás pak odpovídá na vlastní výzvu. Thornhollowská pole jsou výjimkou: tam k tobě žádné vzkřisující kouzlo nedosáhne a čekáš na další vlnu svého týmu.",
       "unstuckTitle": "Když jsi opravdu zaseknutý(á)",
       "unstuckBody": "Pokud tě svět někam uvězní a nemůžeš se odtamtud dostat, napiš /unstuck. Musíš být mimo boj a stát na místě, nesmíš být držen omráčením ani zakořeněním a nesmíš být v duelu ani v zápase arény: proběhne krátké odpočítávání a pohyb nebo utrpěné zranění ho zruší. Po jeho konci tě to postaví na nejbližší hřbitov. Nikdy tě to nezabije a nezanechá to žádné tělo, a pokud jsi už předtím padl(a), místo toho tě to tam oživí. Cena je Nemoc z vyproštění, dočasné oslabení všeho, čím jsi, které odezní dřív, než bys mohl(a) příkaz použít znovu, a stejně jako Strážcovo mýto se úplně vyhýbá zbrusu novým postavám.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Jak se vytáhnout na okraj",
       "climbBody": "Římsy nejsou zdi. Skoč na něco příliš vysokého na to, aby ses na to jen tak vyšplhal, a tvá postava se blízko vrcholu skoku zachytí okraje a vytáhne se nahoru, aniž bys pro to musel mačkat vlastní klávesu. Cokoli dost nízkého na to, abys to překonal sám, proběhne bez cavyků; celé vytažení je vyhrazeno pro okraje nad hlavou tvé postavy. Je krátké a po dobu, kdy probíhá, přebírá otěže, takže ho v půlce nemůžeš vyrušit. Omráčení tě zastihne uprostřed vytahování a ty pustíš a spadneš, měřeno od místa, kde skok opustil zem, a omráčení nebo zakořenění zabrání vytažení vůbec začít, což stojí za zapamatování, když se snažíš dostat ze špatného místa v boji."
     },
@@ -6523,6 +6536,7 @@ export const cs_CZ: EnTranslations = {
       "dungeonReset": "Opustí tvé vlastní prázdné instance, což uděláš po změně obtížnosti.",
       "groupRecovery": "Zotavení a stav",
       "unstuck": "Cesta ven, když tě svět uvězní. Vydrž stát nehybně po krátké odpočítávání a přemístí tě to na nejbližší hřbitov, a oživí tě tam, pokud jsi už padl(a). Poté tě na chvíli oslabí Nemoc z vyproštění, takže je to poslední záchrana, ne zkratka.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Označí tě jako nepřítomného (Pryč), s volitelnou zprávou, kterou dostane jako automatickou odpověď každý, kdo ti pošle šepot. Zopakuj příkaz bez zprávy a stav zrušíš; zruší ho i jakýkoli jiný chat.",
       "dnd": "Nerušit: podobné jako nepřítomnost, jenže šepoty poslané tobě se zadrží místo doručení.",
       "sit": "Sedni si tam, kde stojíš, a zase vstaň. Automaticky vstaneš v okamžiku, kdy se pohneš, sesíláš, nebo dostaneš zásah.",
@@ -6629,6 +6643,7 @@ export const cs_CZ: EnTranslations = {
       "fatigueDef": "Zaplavat si dost daleko na otevřené moře a voda tě začne vysávat: nejdřív přijde varování, pak rostoucí poškození, dokud se nevrátíš zpátky k pevnině.",
       "unstuckTerm": "Nemoc z vyproštění",
       "unstuckDef": "Cena za použití Vyproštění z herního menu. Vydrž stát nehybně po celé odpočítávání, a přemístí tě to na nejbližší hřbitov, kde si pak na čas poneseš dočasné oslabení.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Úroveň předmětu",
       "itemLevelDef": "Jedno číslo shrnující, jak silný je daný kus výbavy, šikovné, když chceš rychle porovnat dva kusy. V možnostech zapni Zobrazit úroveň předmětu, abys ho viděl v popiscích. Nese ho jen výbava se známým původem, takže prosté základy od obchodníků a startovní výbava neukazují nic, a chybějící číslo je normální, ne chyba.",
       "requiredLevelTerm": "Požadovaná úroveň",
@@ -9942,6 +9957,11 @@ export const cs_CZ: EnTranslations = {
     "inWorld": "ve světě",
     "takeOver": "Převzít",
     "inWorldHint": "Už je ve světě. Odhlas se jinde nebo ji převezmi.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Tímto odpojíš tuto postavu z jiné relace a přesuneš ji sem. Pokračovat?",
     "renameRequired": "vyžaduje přejmenování",
     "delete": "Smazat",

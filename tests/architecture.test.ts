@@ -209,6 +209,8 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/loot_quality_view.ts',
+  'src/ui/item_combat_tooltip_view.ts',
   // The zone-entry chat line (welcome hint vs the town-done line); the
   // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
   'src/ui/zone_entry_line_core.ts',
