@@ -16,6 +16,7 @@ they end up reading as.
 import math
 import os
 import random
+import sys
 
 import bmesh
 import bpy
@@ -31,6 +32,8 @@ class Piece:
         self.name = name
         self.bm = bmesh.new()
         self.col = self.bm.loops.layers.color.new('Col')
+        self.gen = self.bm.verts.layers.int.new('gen')
+        self.stamp = 0
         self.rng = random.Random(sum(ord(c) for c in name) * 131 + seed)
         self.warm = warm
 
@@ -158,6 +161,24 @@ class Piece:
         faces = [self.bm.faces.new((rows[i][0], rows[i][1], rows[i + 1][1], rows[i + 1][0]))
                  for i in range(len(rows) - 1)]
         self._paint(faces, color, mat)
+
+    # ---------------------------------------------------------- transforms
+    def mark(self):
+        """Everything built so far; hand it to `turn` to move only what came after."""
+        self.stamp += 1
+        for v in self.bm.verts:
+            if v[self.gen] == 0:
+                v[self.gen] = self.stamp
+        return self.stamp
+
+    def turn(self, mark, matrix):
+        """Move what was built since `mark`: build a thing upright, then lean it."""
+        # Stamped, not remembered: bmesh reuses freed slots and hands out new wrappers,
+        # so neither identity nor order says what is new. A vert made since carries no
+        # stamp yet, or a later one (a mark taken inside this one).
+        for v in self.bm.verts:
+            if v[self.gen] == 0 or v[self.gen] > mark:
+                v.co = matrix @ v.co
 
     # ------------------------------------------------------------- finish
     def finish(self, materials, parent):
@@ -290,6 +311,12 @@ def preview(parts, layout, out_png, background=(0.03, 0.035, 0.04), player=(-14,
     scene.render.filepath = out_png
     bpy.ops.render.render(write_still=True)
     print('RENDERED', out_png)
+    # `-- --preview --save file.blend` also keeps the laid-out scene, to open in the
+    # Blender window with open_kit.py.
+    if '--save' in sys.argv:
+        target = sys.argv[sys.argv.index('--save') + 1]
+        bpy.ops.wm.save_as_mainfile(filepath=target)
+        print('SAVED', target)
 
 
 def here(file):

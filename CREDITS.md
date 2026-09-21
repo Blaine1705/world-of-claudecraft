@@ -456,6 +456,15 @@ something this file marks as restricted, ask first: tony@levystreet.com.
 - `public/models/weapons/hoard_forge_maul.glb`: the held variant of the project's own
   Hammer of the Forge model (`scripts/assets/hoard_bosses/held_forge_maul.mjs`).
 
+### Buried Hoard boss room kits
+
+- `public/models/props/hoard_abyss_kit.glb`, `hoard_frost_kit.glb`, `hoard_void_kit.glb`,
+  `hoard_storm_kit.glb`, `hoard_warcamp_kit.glb`, `hoard_nest_kit.glb` and
+  `hoard_crypt_kit.glb`: original procedural Blender art authored for this project (the
+  room dressing of the Abyssal Maw, Hoarfrost Warden, Archon Nyxaris, Tempest Vharok,
+  Warlord Grask, Broodmother Vysska and Xarreth). No third-party mesh, texture or
+  reference image. Source and provenance: `docs/design/boss-rooms/README.md`.
+
 ### Cocoon (Broodmother Vysska's cocoons)
 
 - `public/models/creatures/hoard_{silk,brood}_cocoon.glb`: original procedural Blender art authored

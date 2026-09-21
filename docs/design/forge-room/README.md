@@ -5,11 +5,16 @@ chamber. The room itself is still the seeded one (outline, cliffs, floor,
 collision, all from the sim): this is a MODULAR KIT the runtime scatters over it
 from the same seed, so every player in one hoard sees one room.
 
+This was the first boss room. The engine it runs on is now shared by every hoard
+boss: see `docs/design/boss-rooms/README.md` for the theme model, the rules every
+room keeps, and the other seven rooms.
+
 ## Where everything lives
 
 | What | Where |
 |---|---|
 | Where each piece stands, the floor marks, what a tier keeps (pure) | `src/render/hoard_room_kit_core.ts` |
+| The forge's own theme record (`EMBERFORGE_THEME`) | `src/render/hoard_room_themes_core.ts` |
 | Instances, floor meshes, the sway, the molten pulse, the sparks | `src/render/hoard_room_kit.ts` |
 | Composed into the room by | `src/render/hoard_valley.ts` |
 | Blender source, review renders | `docs/design/forge-room/` |

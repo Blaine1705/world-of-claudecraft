@@ -458,10 +458,17 @@ class HoardValleyViewImpl implements HoardValleyView {
     setRenderCategory(this.group, 'dungeon');
     valleyOwners.set(this.group, this);
     const environmentReady = options.prepareEnvironment?.().catch(() => undefined);
-    const compileGate = environmentReady
-      ? (target: THREE.Object3D) =>
-          Promise.all([environmentReady, options.compileGate?.(target)]).then(() => undefined)
-      : options.compileGate;
+    // The boss room's kit loads with its room, not at boot: its props must stand in
+    // the group BEFORE the compile gate sees it, so the room still compiles whole.
+    // (A kit already baked leaves `ready` null, and the gate runs at once as before.)
+    const kitReady = this.roomKit?.ready ?? null;
+    const gateAll = (target: THREE.Object3D): Promise<void> =>
+      Promise.all([environmentReady, options.compileGate?.(target)]).then(() => undefined);
+    const compileGate = kitReady
+      ? (target: THREE.Object3D) => kitReady.then(() => gateAll(target))
+      : environmentReady
+        ? gateAll
+        : options.compileGate;
     this.readyForEntry = attachSceneGroupGated(
       options.scene,
       this.group,

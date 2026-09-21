@@ -4,17 +4,18 @@
 // touches its outline, its floor or its collision. Which kit, which colours and
 // which motion is the theme's (hoard_room_themes_core.ts): this file knows no boss.
 //
-// Performance contract (the valley's own): every theme's kit GLB is fetched once
-// behind the deferred preload and baked into shared geometry; a visit only fills
-// instance buffers, under the valley's group, so it compiles at the room's own
-// gated attach and never mid-fight. One InstancedMesh per piece per material (the
+// Performance contract (the valley's own): a theme's kit GLB is fetched the first
+// time ITS room is built (never at boot: a player who digs up no hoard pays for no
+// kit), baked once into shared geometry, and its source released. The view's
+// `ready` resolves once the props stand in the group, and the valley waits on it
+// before its gated attach, so the room compiles whole and never mid-fight. A kit
+// that fails to load costs the room its props, never the player the room. One InstancedMesh per piece per material (the
 // painted solid and the glow), three floor meshes, one particle cloud: nothing is
 // allocated per frame, and there are no lights. It is ALL cosmetic: a player reads
 // nothing here, so tiers may shed it freely.
 
 import * as THREE from 'three';
-import { loadGltf } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
+import { loadGltf, releaseGltf } from './assets/loader';
 import type { RoomKitFloorMark, RoomKitPlan, RoomKitTier } from './hoard_room_kit_core';
 import { BOSS_ROOM_THEMES } from './hoard_room_themes_core';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
@@ -91,23 +92,45 @@ function bakeNode(node: THREE.Object3D): BakedPiece {
 }
 
 function bakeKit(url: string, scene: THREE.Object3D): void {
-  const theme = BOSS_ROOM_THEMES.find((candidate) => candidate.kitUrl === url);
+  // Every theme drawing on this kit names the pieces it wants baked.
+  const pieces = new Set(
+    BOSS_ROOM_THEMES.filter((theme) => theme.kitUrl === url).flatMap((theme) => theme.pieces),
+  );
   const baked = new Map<string, BakedPiece>();
-  for (const piece of theme?.pieces ?? []) {
+  for (const piece of pieces) {
     const node = scene.getObjectByName(`Kit_${piece}`);
     if (node) baked.set(piece, bakeNode(node));
   }
   kits.set(url, baked);
 }
 
-if (typeof window !== 'undefined') {
-  for (const url of new Set(BOSS_ROOM_THEMES.map((theme) => theme.kitUrl))) {
-    registerDeferredPreload(() =>
-      loadGltf(url).then((gltf) => {
+/** A room never waits longer than this on its kit: it opens bare instead. */
+const KIT_WAIT_MS = 6000;
+const loading = new Map<string, Promise<void>>();
+
+/** Fetch and bake one kit, once. Never rejects: a lost kit is a bare room. */
+function ensureKit(url: string): Promise<void> {
+  if (kits.has(url) || typeof window === 'undefined') return Promise.resolve();
+  let pending = loading.get(url);
+  if (!pending) {
+    pending = loadGltf(url)
+      .then((gltf) => {
         if (!kits.has(url)) bakeKit(url, gltf.scene);
-      }),
-    );
+        // Every attribute was copied out: the parsed source can go.
+        releaseGltf(url);
+      })
+      .catch(() => undefined)
+      .then(() => {
+        loading.delete(url);
+      });
+    loading.set(url, pending);
   }
+  return Promise.race([
+    pending,
+    new Promise<void>((resolve) => {
+      setTimeout(resolve, KIT_WAIT_MS);
+    }),
+  ]);
 }
 
 // ------------------------------------------------------------------ the floor
@@ -259,6 +282,9 @@ interface Moving {
 
 export interface HoardRoomKitView {
   readonly group: THREE.Group;
+  /** Null when the props already stand in the group; else resolves once they do
+   *  (or the kit was given up on). */
+  ready: Promise<void> | null;
   /** Per frame: what sways, what floats, the glow's breath, the particles. */
   update(timeSec: number): void;
   dispose(): void;
@@ -284,7 +310,11 @@ export function buildHoardRoomKit(
   const ownedGeometry: THREE.BufferGeometry[] = [];
   const ownedMaterial: THREE.Material[] = [glowMaterial];
   const moving: Moving[] = [];
+  const movingMeshes = new Set<THREE.InstancedMesh>();
+  const instanced: THREE.InstancedMesh[] = [];
   const transform = new THREE.Object3D();
+  transform.rotation.order = 'YXZ';
+  let disposed = false;
 
   for (const mesh of [floorMesh(plan, false, shared.floor), floorMesh(plan, true, glowMaterial)]) {
     if (!mesh) continue;
@@ -299,107 +329,121 @@ export function buildHoardRoomKit(
   }
 
   const emitters: { x: number; y: number; z: number; spread: number }[] = [];
-  const baked = kits.get(theme.kitUrl);
-  const sways = new Set(tier === 'low' ? [] : (theme.ambient.sway ?? []));
-  const hovers = new Set(tier === 'low' ? [] : (theme.ambient.hover ?? []));
-  for (const piece of theme.pieces) {
-    const geometry = baked?.get(piece);
-    const placements = plan.placements.filter((placement) => placement.piece === piece);
-    if (!geometry || placements.length === 0) continue;
-    const meshes: THREE.InstancedMesh[] = [];
-    for (const [part, material] of [
-      [geometry.solid, shared.solid],
-      [geometry.glow, glowMaterial],
-    ] as const) {
-      if (!part) continue;
-      const mesh = new THREE.InstancedMesh(part, material, placements.length);
-      mesh.name = `HoardRoomKit:${piece}`;
-      mesh.castShadow = shadows && material === shared.solid;
-      mesh.receiveShadow = false;
-      meshes.push(mesh);
-      group.add(mesh);
-    }
-    const emit = theme.ambient.particles?.emitters?.[piece];
-    placements.forEach((placement, index) => {
-      transform.position.set(placement.x, placement.y, placement.z);
-      transform.rotation.set(0, placement.yaw, 0);
-      transform.scale.set(
-        placement.mirror ? -placement.scale : placement.scale,
-        placement.scale,
-        placement.scale,
-      );
-      transform.updateMatrix();
-      for (const mesh of meshes) mesh.setMatrixAt(index, transform.matrix);
-      if (sways.has(piece) || hovers.has(piece)) {
-        moving.push({
-          meshes,
-          index,
-          x: placement.x,
-          y: placement.y,
-          z: placement.z,
-          yaw: placement.yaw,
-          scale: placement.scale,
-          mirror: placement.mirror,
-          phase: (placement.x * 0.37 + placement.z * 0.61) % (Math.PI * 2),
-          hover: hovers.has(piece),
-        });
-      }
-      if (emit) {
-        // A piece's mouth is a little in front of it (its front is +Z, turned by yaw).
-        emitters.push({
-          x: placement.x + Math.sin(placement.yaw) * emit[1] * 0.4,
-          y: placement.y + emit[0] * placement.scale,
-          z: placement.z + Math.cos(placement.yaw) * emit[1] * 0.4,
-          spread: emit[1],
-        });
-      }
-    });
-    for (const mesh of meshes) {
-      mesh.instanceMatrix.needsUpdate = true;
-      mesh.computeBoundingSphere();
-    }
-  }
-
-  // The room's particles: high tier only, one small cloud, positions rewritten in place.
-  const spec = theme.ambient.particles;
   let cloud: { position: THREE.BufferAttribute; seeds: Float32Array; count: number } | undefined;
-  if (tier === 'high' && spec && (spec.mode !== 'rise' || emitters.length > 0)) {
-    const geometry = new THREE.BufferGeometry();
-    const position = new THREE.BufferAttribute(new Float32Array(spec.count * 3), 3);
-    position.setUsage(THREE.DynamicDrawUsage);
-    geometry.setAttribute('position', position);
-    ownedGeometry.push(geometry);
-    const material = new THREE.PointsMaterial({
-      color: spec.color,
-      size: spec.size,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0.85,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      toneMapped: false,
-      fog: true,
-    });
-    ownedMaterial.push(material);
-    const points = new THREE.Points(geometry, material);
-    points.name = 'HoardRoomKitParticles';
-    points.frustumCulled = false;
-    const seeds = new Float32Array(spec.count * 4);
-    for (let i = 0; i < spec.count; i++) {
-      seeds[i * 4] = (i * 0.6180339887) % 1;
-      seeds[i * 4 + 1] = (i * 0.7548776662) % 1;
-      seeds[i * 4 + 2] = (i * 0.5698402909) % 1;
-      seeds[i * 4 + 3] = (i * 0.4142135623) % 1;
+  const spec = theme.ambient.particles;
+  // The props and what rises off them: run once the kit is baked (at once, when it
+  // already is). Without a kit it still gives the room its drifting particles.
+  const dress = (): void => {
+    const baked = kits.get(theme.kitUrl);
+    const sways = new Set(tier === 'low' ? [] : (theme.ambient.sway ?? []));
+    const hovers = new Set(tier === 'low' ? [] : (theme.ambient.hover ?? []));
+    for (const piece of theme.pieces) {
+      const geometry = baked?.get(piece);
+      const placements = plan.placements.filter((placement) => placement.piece === piece);
+      if (!geometry || placements.length === 0) continue;
+      const meshes: THREE.InstancedMesh[] = [];
+      for (const [part, material] of [
+        [geometry.solid, shared.solid],
+        [geometry.glow, glowMaterial],
+      ] as const) {
+        if (!part) continue;
+        const mesh = new THREE.InstancedMesh(part, material, placements.length);
+        mesh.name = `HoardRoomKit:${piece}`;
+        mesh.castShadow = shadows && material === shared.solid;
+        mesh.receiveShadow = false;
+        meshes.push(mesh);
+        instanced.push(mesh);
+        group.add(mesh);
+      }
+      const emit = theme.ambient.particles?.emitters?.[piece];
+      placements.forEach((placement, index) => {
+        transform.position.set(placement.x, placement.y, placement.z);
+        transform.rotation.set(0, placement.yaw, 0);
+        transform.scale.set(
+          placement.mirror ? -placement.scale : placement.scale,
+          placement.scale,
+          placement.scale,
+        );
+        transform.updateMatrix();
+        for (const mesh of meshes) mesh.setMatrixAt(index, transform.matrix);
+        if (sways.has(piece) || hovers.has(piece)) {
+          for (const mesh of meshes) movingMeshes.add(mesh);
+          moving.push({
+            meshes,
+            index,
+            x: placement.x,
+            y: placement.y,
+            z: placement.z,
+            yaw: placement.yaw,
+            scale: placement.scale,
+            mirror: placement.mirror,
+            phase: (placement.x * 0.37 + placement.z * 0.61) % (Math.PI * 2),
+            hover: hovers.has(piece),
+          });
+        }
+        if (emit) {
+          // A piece's mouth is a little in front of it (its front is +Z, turned by yaw).
+          emitters.push({
+            x: placement.x + Math.sin(placement.yaw) * emit[1] * 0.4,
+            y: placement.y + emit[0] * placement.scale,
+            z: placement.z + Math.cos(placement.yaw) * emit[1] * 0.4,
+            spread: emit[1],
+          });
+        }
+      });
+      for (const mesh of meshes) {
+        mesh.instanceMatrix.needsUpdate = true;
+        mesh.computeBoundingSphere();
+      }
     }
-    cloud = { position, seeds, count: spec.count };
-    group.add(points);
+
+    // The room's particles: high tier only, one small cloud, positions rewritten in place.
+    if (tier === 'high' && spec && (spec.mode !== 'rise' || emitters.length > 0)) {
+      const geometry = new THREE.BufferGeometry();
+      const position = new THREE.BufferAttribute(new Float32Array(spec.count * 3), 3);
+      position.setUsage(THREE.DynamicDrawUsage);
+      geometry.setAttribute('position', position);
+      ownedGeometry.push(geometry);
+      const material = new THREE.PointsMaterial({
+        color: spec.color,
+        size: spec.size,
+        sizeAttenuation: true,
+        transparent: true,
+        opacity: 0.85,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        toneMapped: false,
+        fog: true,
+      });
+      ownedMaterial.push(material);
+      const points = new THREE.Points(geometry, material);
+      points.name = 'HoardRoomKitParticles';
+      points.frustumCulled = false;
+      const seeds = new Float32Array(spec.count * 4);
+      for (let i = 0; i < spec.count; i++) {
+        seeds[i * 4] = (i * 0.6180339887) % 1;
+        seeds[i * 4 + 1] = (i * 0.7548776662) % 1;
+        seeds[i * 4 + 2] = (i * 0.5698402909) % 1;
+        seeds[i * 4 + 3] = (i * 0.4142135623) % 1;
+      }
+      cloud = { position, seeds, count: spec.count };
+      group.add(points);
+    }
+  };
+  let ready: Promise<void> | null = null;
+  if (kits.has(theme.kitUrl) || typeof window === 'undefined') {
+    dress();
+  } else {
+    ready = ensureKit(theme.kitUrl).then(() => {
+      if (!disposed) dress();
+    });
   }
 
   const [pulseMin, pulseMax, pulseSpeed] = theme.ambient.pulse;
   const { minX, maxX, minZ, maxZ } = plan.bounds;
-  let disposed = false;
   return {
     group,
+    ready,
     update(timeSec: number): void {
       if (disposed) return;
       // What glows breathes together, slowly: a room, not an alarm.
@@ -413,7 +457,12 @@ export function buildHoardRoomKit(
             item.y + 0.22 * Math.sin(timeSec * 0.8 + item.phase),
             item.z,
           );
-          transform.rotation.set(0, item.yaw + 0.12 * Math.sin(timeSec * 0.31 + item.phase), 0);
+          transform.rotation.set(
+            0,
+            item.yaw + 0.12 * Math.sin(timeSec * 0.31 + item.phase),
+            0,
+            'YXZ',
+          );
         } else {
           transform.position.set(item.x, item.y, item.z);
           transform.rotation.set(
@@ -425,11 +474,9 @@ export function buildHoardRoomKit(
         }
         transform.scale.set(item.mirror ? -item.scale : item.scale, item.scale, item.scale);
         transform.updateMatrix();
-        for (const mesh of item.meshes) {
-          mesh.setMatrixAt(item.index, transform.matrix);
-          mesh.instanceMatrix.needsUpdate = true;
-        }
+        for (const mesh of item.meshes) mesh.setMatrixAt(item.index, transform.matrix);
       }
+      for (const mesh of movingMeshes) mesh.instanceMatrix.needsUpdate = true;
       if (cloud && spec) {
         for (let i = 0; i < cloud.count; i++) {
           const a = cloud.seeds[i * 4];
@@ -465,6 +512,8 @@ export function buildHoardRoomKit(
     dispose(): void {
       if (disposed) return;
       disposed = true;
+      // The instance buffers are this view's; the baked geometry under them is shared.
+      for (const mesh of instanced) mesh.dispose();
       for (const geometry of ownedGeometry) geometry.dispose();
       for (const material of ownedMaterial) material.dispose();
     },

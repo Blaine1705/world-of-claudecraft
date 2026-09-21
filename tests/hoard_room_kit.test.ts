@@ -4,8 +4,14 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
-import { ASSETS as ROOM_ASSETS } from '../scripts/assets/boss_rooms/build.mjs';
-import { ASSETS as FORGE_ASSETS } from '../scripts/assets/forge_room/build.mjs';
+import {
+  ASSETS as ROOM_ASSETS,
+  sourceFingerprint as roomFingerprint,
+} from '../scripts/assets/boss_rooms/build.mjs';
+import {
+  ASSETS as FORGE_ASSETS,
+  sourceFingerprint as forgeFingerprint,
+} from '../scripts/assets/forge_room/build.mjs';
 import { buildHoardRoomKit, hoardRoomKitInternalsForTest } from '../src/render/hoard_room_kit';
 import {
   type BossRoomTheme,
@@ -297,7 +303,8 @@ describe('boss room kit view', () => {
   it('sheds the particles and the motion on the low tier, and survives a kit that never loaded', () => {
     for (const { theme, layout, seed } of ROOMS) {
       const bare = buildHoardRoomKit(buildBossRoomPlan(theme, layout, seed, 'high'), 'high', false);
-      // No kit yet: only the floor is drawn, and nothing throws.
+      // No kit yet: only the floor is drawn, nothing throws, and the room is not held up.
+      expect(bare.ready).toBeNull();
       expect(bare.group.children.some((child) => child instanceof THREE.InstancedMesh)).toBe(false);
       bare.dispose();
       hoardRoomKitInternalsForTest.seedScene(theme.kitUrl, fakeKit(theme));
@@ -312,6 +319,13 @@ describe('boss room kit view', () => {
 
 describe('the shipped boss room kits', () => {
   const assets = [...FORGE_ASSETS, ...ROOM_ASSETS];
+
+  it('never load at boot: a kit is fetched with its own room', async () => {
+    const { readFileSync } = await import('node:fs');
+    const painter = readFileSync('src/render/hoard_room_kit.ts', 'utf8');
+    expect(painter).not.toMatch(/registerDeferredPreload|registerPreload/);
+    expect(painter).toMatch(/releaseGltf\(url\)/);
+  });
 
   it('are one built, committed kit per theme', () => {
     expect(assets.map((asset) => asset.target).sort()).toEqual(
@@ -347,7 +361,11 @@ describe('the shipped boss room kits', () => {
       // One painted material, one that glows: the painter tells them apart by name.
       expect(materials).toHaveLength(2);
       expect(materials.filter((name) => /molten|glow/i.test(name))).toHaveLength(1);
-      expect((shipped.getExtras() as { authoring?: string }).authoring).toBe('Blender');
+      const extras = shipped.getExtras() as { authoring?: string; sourceFingerprint?: string };
+      expect(extras.authoring).toBe('Blender');
+      // A Blender source edited without re-running the builder is caught here.
+      const fingerprint = FORGE_ASSETS.includes(asset) ? forgeFingerprint : roomFingerprint;
+      expect(extras.sourceFingerprint, asset.target).toBe(fingerprint(asset));
       expect(shipped.listTextures()).toHaveLength(0);
       let triangles = 0;
       for (const mesh of shipped.listMeshes()) {
