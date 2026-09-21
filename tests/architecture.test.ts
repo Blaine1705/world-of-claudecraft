@@ -740,6 +740,7 @@ const RENDER_PURE_CORES = [
   'src/render/hoard_boss_gestures_core.ts',
   'src/render/hoard_forge_gate_core.ts',
   'src/render/hoard_room_kit_core.ts',
+  'src/render/hoard_room_themes_core.ts',
   'src/render/hoard_tide_wave_fx_core.ts',
   'src/render/hoard_entrance_core.ts',
   'src/render/hoard_valley_core.ts',

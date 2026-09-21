@@ -6,6 +6,8 @@
 import { generateRiftFloor } from '../sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../sim/rift/types';
 import type { RiftFloorView } from '../world_api';
+import { themedRoomProfile } from './hoard_room_kit_core';
+import { bossRoomThemeFor } from './hoard_room_themes_core';
 import {
   type HoardValleyZoneProfile,
   hoardValleyProfile,
@@ -38,7 +40,9 @@ export function resolveHoardValleyEnvironment(
   const floor = generateRiftFloor(view.seed, view.baseLevel, view.floorIndex, view.upgrade);
   const zoneId = floor.outdoor?.zoneId;
   if (!zoneId || !isHoardValleyZoneId(zoneId)) return null;
-  const profile = hoardValleyProfile(zoneId);
+  // The fog is the boss room's when he has one, like the floor and the rock.
+  const theme = bossRoomThemeFor(floor.spawns.find((spawn) => spawn.boss)?.templateId);
+  const profile = themedRoomProfile(hoardValleyProfile(zoneId), theme);
   return {
     floor,
     profile,

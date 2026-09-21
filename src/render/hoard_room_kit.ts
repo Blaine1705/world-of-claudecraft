@@ -1,69 +1,40 @@
-// A boss room's modular kit, drawn: instances of the Blender forge kit
-// (docs/design/forge-room/) standing where hoard_room_kit_core.ts says, the floor
-// marks under them, and the little that moves. Composed by hoard_valley.ts, which
-// owns the room; this never touches its outline, its floor or its collision.
+// A boss room's modular kit, drawn: instances of the room theme's Blender kit
+// standing where hoard_room_kit_core.ts says, the floor marks under them, and the
+// little that moves. Composed by hoard_valley.ts, which owns the room; this never
+// touches its outline, its floor or its collision. Which kit, which colours and
+// which motion is the theme's (hoard_room_themes_core.ts): this file knows no boss.
 //
-// Performance contract (the valley's own): the kit GLB is fetched once behind the
-// deferred preload and baked into shared geometry; a visit only fills instance
-// buffers, under the valley's group, so it compiles at the room's own gated
-// attach and never mid-fight. One InstancedMesh per piece per material (the
-// painted solid and the molten glow), two floor meshes, one spark cloud on the
-// high tier: nothing is allocated per frame, and there are no lights. It is ALL
-// cosmetic: a player reads nothing here, so tiers may shed it freely.
+// Performance contract (the valley's own): every theme's kit GLB is fetched once
+// behind the deferred preload and baked into shared geometry; a visit only fills
+// instance buffers, under the valley's group, so it compiles at the room's own
+// gated attach and never mid-fight. One InstancedMesh per piece per material (the
+// painted solid and the glow), three floor meshes, one particle cloud: nothing is
+// allocated per frame, and there are no lights. It is ALL cosmetic: a player reads
+// nothing here, so tiers may shed it freely.
 
 import * as THREE from 'three';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import {
-  FORGE_KIT_PIECES,
-  type ForgeKitPiece,
-  type RoomKitFloorMark,
-  type RoomKitPlan,
-  type RoomKitTier,
-} from './hoard_room_kit_core';
+import type { RoomKitFloorMark, RoomKitPlan, RoomKitTier } from './hoard_room_kit_core';
+import { BOSS_ROOM_THEMES } from './hoard_room_themes_core';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
-
-export const FORGE_KIT_URL = '/models/props/hoard_forge_kit.glb';
 
 interface BakedPiece {
   solid: THREE.BufferGeometry | null;
-  molten: THREE.BufferGeometry | null;
+  glow: THREE.BufferGeometry | null;
 }
 
-const LOOK = Object.freeze({
-  plate: 0x262223,
-  plateAlt: 0x2e2927,
-  channelEdge: 0x181516,
-  /** Dim beside the hammer's fire: decoration never out-glows a telegraph. */
-  channel: 0xb6501d,
-  ring: 0x1c1919,
-  spark: 0xffa64a,
-  glow: 0xff6a1e,
-});
-
-const kit = new Map<ForgeKitPiece, BakedPiece>();
+/** Baked kits by URL, then by piece. */
+const kits = new Map<string, Map<string, BakedPiece>>();
 let solidMaterial: THREE.MeshBasicMaterial | null = null;
-let moltenMaterial: THREE.MeshBasicMaterial | null = null;
 let floorMaterial: THREE.MeshBasicMaterial | null = null;
 const tint = new THREE.Color(1, 1, 1);
 
-function materials(): {
-  solid: THREE.MeshBasicMaterial;
-  molten: THREE.MeshBasicMaterial;
-  floor: THREE.MeshBasicMaterial;
-} {
+function sharedMaterials(): { solid: THREE.MeshBasicMaterial; floor: THREE.MeshBasicMaterial } {
   // DoubleSide: a mirrored instance flips its winding, and one shared material
   // cannot know which instances are mirrored.
   solidMaterial ??= markSharedMaterial(
     new THREE.MeshBasicMaterial({ vertexColors: true, fog: true, side: THREE.DoubleSide }),
-  );
-  moltenMaterial ??= markSharedMaterial(
-    new THREE.MeshBasicMaterial({
-      vertexColors: true,
-      fog: true,
-      side: THREE.DoubleSide,
-      toneMapped: false,
-    }),
   );
   floorMaterial ??= markSharedMaterial(
     new THREE.MeshBasicMaterial({
@@ -76,25 +47,26 @@ function materials(): {
     }),
   );
   solidMaterial.name = 'HoardRoomKitSolid';
-  moltenMaterial.name = 'HoardRoomKitMolten';
   floorMaterial.name = 'HoardRoomKitFloor';
-  return { solid: solidMaterial, molten: moltenMaterial, floor: floorMaterial };
+  solidMaterial.color.copy(tint);
+  floorMaterial.color.copy(tint);
+  return { solid: solidMaterial, floor: floorMaterial };
 }
 
-/** Follow the valley's readable day/night grade; the molten parts keep their own light. */
+/** Follow the valley's readable day/night grade; what glows keeps its own light. */
 export function updateHoardRoomKitTint(grade: readonly [number, number, number]): void {
   tint.setRGB(grade[0], grade[1], grade[2]);
   solidMaterial?.color.copy(tint);
   floorMaterial?.color.copy(tint);
 }
 
-/** Decode (the shipped kit is quantized) and bake one node's primitives, split by material. */
+/** Decode (the shipped kits are quantized) and bake one node, split by material. */
 function bakeNode(node: THREE.Object3D): BakedPiece {
   // The node's own matrix is NOT a placement to undo: the shipped kit is quantized,
   // and that matrix is what restores its real size. The Blender nodes sit at the
   // origin, so the whole world matrix is baked in.
   node.updateWorldMatrix(true, true);
-  const out: BakedPiece = { solid: null, molten: null };
+  const out: BakedPiece = { solid: null, glow: null };
   node.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
     const geometry = new THREE.BufferGeometry();
@@ -112,136 +84,141 @@ function bakeNode(node: THREE.Object3D): BakedPiece {
     geometry.applyMatrix4(child.matrixWorld);
     geometry.computeBoundingSphere();
     const material = Array.isArray(child.material) ? child.material[0] : child.material;
-    const slot = /molten/i.test(material?.name ?? '') ? 'molten' : 'solid';
+    const slot = /molten|glow/i.test(material?.name ?? '') ? 'glow' : 'solid';
     out[slot] = markSharedGeometry(geometry);
   });
   return out;
 }
 
-function bakeKit(scene: THREE.Object3D): void {
-  for (const piece of FORGE_KIT_PIECES) {
+function bakeKit(url: string, scene: THREE.Object3D): void {
+  const theme = BOSS_ROOM_THEMES.find((candidate) => candidate.kitUrl === url);
+  const baked = new Map<string, BakedPiece>();
+  for (const piece of theme?.pieces ?? []) {
     const node = scene.getObjectByName(`Kit_${piece}`);
-    if (node) kit.set(piece, bakeNode(node));
+    if (node) baked.set(piece, bakeNode(node));
   }
+  kits.set(url, baked);
 }
 
 if (typeof window !== 'undefined') {
-  registerDeferredPreload(() =>
-    loadGltf(FORGE_KIT_URL).then((gltf) => {
-      if (kit.size === 0) bakeKit(gltf.scene);
-    }),
-  );
+  for (const url of new Set(BOSS_ROOM_THEMES.map((theme) => theme.kitUrl))) {
+    registerDeferredPreload(() =>
+      loadGltf(url).then((gltf) => {
+        if (!kits.has(url)) bakeKit(url, gltf.scene);
+      }),
+    );
+  }
 }
 
 // ------------------------------------------------------------------ the floor
-function pushQuad(
+function blotRadius(seed: number, spoke: number): number {
+  const x = Math.sin((seed + 1) * 12.9898 + spoke * 78.233) * 43758.5453;
+  return 0.72 + 0.28 * (x - Math.floor(x));
+}
+
+function pushMark(
   positions: number[],
   colors: number[],
   mark: RoomKitFloorMark,
   y: number,
-  color: THREE.Color,
+  c: THREE.Color,
 ): void {
+  const tri = (a: number[], b: number[], d: number[]): void => {
+    positions.push(a[0], y, a[1], b[0], y, b[1], d[0], y, d[1]);
+    for (let k = 0; k < 3; k++) colors.push(c.r, c.g, c.b);
+  };
+  if (mark.shape === 'ring') {
+    const radius = mark.radius ?? 1;
+    const segments = 48;
+    for (let s = 0; s < segments; s++) {
+      // A broken ring: every sixth segment is left out, like an old inlay.
+      if (s % 6 === 5) continue;
+      const a0 = (s / segments) * Math.PI * 2;
+      const a1 = ((s + 1) / segments) * Math.PI * 2;
+      const p = (angle: number, r: number): number[] => [
+        mark.x + Math.sin(angle) * r,
+        mark.z + Math.cos(angle) * r,
+      ];
+      const inner = radius - mark.halfWidth;
+      const outer = radius + mark.halfWidth;
+      tri(p(a0, inner), p(a0, outer), p(a1, outer));
+      tri(p(a0, inner), p(a1, outer), p(a1, inner));
+    }
+    return;
+  }
+  if (mark.shape === 'blot') {
+    const spokes = 11;
+    for (let i = 0; i < spokes; i++) {
+      const a0 = mark.yaw + (i / spokes) * Math.PI * 2;
+      const a1 = mark.yaw + ((i + 1) / spokes) * Math.PI * 2;
+      const r0 = blotRadius(mark.seed ?? 0, i);
+      const r1 = blotRadius(mark.seed ?? 0, (i + 1) % spokes);
+      tri(
+        [mark.x, mark.z],
+        [mark.x + Math.sin(a0) * mark.halfLength * r0, mark.z + Math.cos(a0) * mark.halfWidth * r0],
+        [mark.x + Math.sin(a1) * mark.halfLength * r1, mark.z + Math.cos(a1) * mark.halfWidth * r1],
+      );
+    }
+    return;
+  }
   const cos = Math.cos(mark.yaw);
   const sin = Math.sin(mark.yaw);
   // Its length runs along its own +Z, turned by yaw like everything else here.
-  const corner = (along: number, across: number): [number, number, number] => [
+  const corner = (along: number, across: number): number[] => [
     mark.x + sin * along + cos * across,
-    y,
     mark.z + cos * along - sin * across,
   ];
   const a = corner(-mark.halfLength, -mark.halfWidth);
   const b = corner(-mark.halfLength, mark.halfWidth);
-  const c = corner(mark.halfLength, mark.halfWidth);
-  const d = corner(mark.halfLength, -mark.halfWidth);
-  for (const p of [a, b, c, a, c, d]) {
-    positions.push(p[0], p[1], p[2]);
-    colors.push(color.r, color.g, color.b);
-  }
+  const d = corner(mark.halfLength, mark.halfWidth);
+  const e = corner(mark.halfLength, -mark.halfWidth);
+  tri(a, b, d);
+  tri(a, d, e);
 }
 
-function pushRing(
-  positions: number[],
-  colors: number[],
-  mark: RoomKitFloorMark,
-  y: number,
-  color: THREE.Color,
-): void {
-  const radius = mark.radius ?? 1;
-  const segments = 48;
-  for (let s = 0; s < segments; s++) {
-    // A broken ring: every sixth segment is left out, like an old inlay.
-    if (s % 6 === 5) continue;
-    const a0 = (s / segments) * Math.PI * 2;
-    const a1 = ((s + 1) / segments) * Math.PI * 2;
-    const inner = radius - mark.halfWidth;
-    const outer = radius + mark.halfWidth;
-    const p = (angle: number, r: number): [number, number, number] => [
-      mark.x + Math.sin(angle) * r,
-      y,
-      mark.z + Math.cos(angle) * r,
-    ];
-    for (const v of [
-      p(a0, inner),
-      p(a0, outer),
-      p(a1, outer),
-      p(a0, inner),
-      p(a1, outer),
-      p(a1, inner),
-    ]) {
-      positions.push(v[0], v[1], v[2]);
-      colors.push(color.r, color.g, color.b);
-    }
-  }
-}
-
-function floorMesh(
-  marks: readonly RoomKitFloorMark[],
-  molten: boolean,
-  material: THREE.Material,
-): THREE.Mesh | null {
+function floorMesh(plan: RoomKitPlan, lit: boolean, material: THREE.Material): THREE.Mesh | null {
   const positions: number[] = [];
   const colors: number[] = [];
   const color = new THREE.Color();
-  marks.forEach((mark, index) => {
-    if (mark.kind === 'glow' || (mark.kind === 'channel') !== molten) return;
-    if (mark.kind === 'channel')
-      pushQuad(positions, colors, mark, 0.05, color.setHex(LOOK.channel));
-    else if (mark.kind === 'channel-edge')
-      pushQuad(positions, colors, mark, 0.04, color.setHex(LOOK.channelEdge));
-    else if (mark.kind === 'plate')
-      pushQuad(positions, colors, mark, 0.03, color.setHex(index % 2 ? LOOK.plate : LOOK.plateAlt));
-    else pushRing(positions, colors, mark, 0.035, color.setHex(LOOK.ring));
-  });
+  for (const mark of plan.floor) {
+    if (mark.shape === 'fan') continue;
+    const tone = plan.theme.tones[mark.tone];
+    if (!tone || Boolean(tone.lit) !== lit) continue;
+    pushMark(positions, colors, mark, tone.lift, color.setHex(tone.color));
+  }
   if (positions.length === 0) return null;
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   geometry.computeBoundingSphere();
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.name = molten ? 'HoardRoomKitChannels' : 'HoardRoomKitFloorMarks';
+  mesh.name = lit ? 'HoardRoomKitLitMarks' : 'HoardRoomKitFloorMarks';
   mesh.receiveShadow = false;
   return mesh;
 }
 
-/** Firelight on the floor: a soft additive fan under the forge and the crucibles.
- *  A mark's halfWidth carries its strength. No light is ever added to the scene. */
-function glowMesh(marks: readonly RoomKitFloorMark[]): THREE.Mesh | null {
+/** Light on the floor: a soft additive fan under whatever glows. A fan's halfWidth
+ *  carries its strength. No light is ever added to the scene. */
+function fanMesh(plan: RoomKitPlan): THREE.Mesh | null {
   const positions: number[] = [];
   const colors: number[] = [];
-  const warm = new THREE.Color(LOOK.glow);
+  const glow = new THREE.Color();
   const spokes = 20;
-  for (const mark of marks) {
-    if (mark.kind !== 'glow') continue;
+  for (const mark of plan.floor) {
+    if (mark.shape !== 'fan') continue;
+    const tone = plan.theme.tones[mark.tone];
+    if (!tone) continue;
+    glow.setHex(tone.color);
     const radius = mark.radius ?? 1;
     const strength = mark.halfWidth;
     for (let i = 0; i < spokes; i++) {
       const a0 = (i / spokes) * Math.PI * 2;
       const a1 = ((i + 1) / spokes) * Math.PI * 2;
-      positions.push(mark.x, 0.06, mark.z);
-      positions.push(mark.x + Math.sin(a0) * radius, 0.06, mark.z + Math.cos(a0) * radius);
-      positions.push(mark.x + Math.sin(a1) * radius, 0.06, mark.z + Math.cos(a1) * radius);
-      // Additive: the colour IS the light, bright at the hearth and nothing at the rim.
-      colors.push(warm.r * strength, warm.g * strength, warm.b * strength, 0, 0, 0, 0, 0, 0);
+      positions.push(mark.x, tone.lift, mark.z);
+      positions.push(mark.x + Math.sin(a0) * radius, tone.lift, mark.z + Math.cos(a0) * radius);
+      positions.push(mark.x + Math.sin(a1) * radius, tone.lift, mark.z + Math.cos(a1) * radius);
+      // Additive: the colour IS the light, bright at its heart and nothing at the rim.
+      colors.push(glow.r * strength, glow.g * strength, glow.b * strength, 0, 0, 0, 0, 0, 0);
     }
   }
   if (positions.length === 0) return null;
@@ -261,13 +238,13 @@ function glowMesh(marks: readonly RoomKitFloorMark[]): THREE.Mesh | null {
       fog: true,
     }),
   );
-  mesh.name = 'HoardRoomKitFirelight';
+  mesh.name = 'HoardRoomKitFloorLight';
   mesh.renderOrder = 2;
   return mesh;
 }
 
 // ------------------------------------------------------------------- the view
-interface Swaying {
+interface Moving {
   meshes: THREE.InstancedMesh[];
   index: number;
   x: number;
@@ -275,14 +252,14 @@ interface Swaying {
   z: number;
   yaw: number;
   scale: number;
+  mirror: boolean;
   phase: number;
+  hover: boolean;
 }
-
-const SPARKS = 56;
 
 export interface HoardRoomKitView {
   readonly group: THREE.Group;
-  /** Per frame: the chains' sway, the molten pulse, the sparks. */
+  /** Per frame: what sways, what floats, the glow's breath, the particles. */
   update(timeSec: number): void;
   dispose(): void;
 }
@@ -292,44 +269,57 @@ export function buildHoardRoomKit(
   tier: RoomKitTier,
   shadows: boolean,
 ): HoardRoomKitView {
+  const theme = plan.theme;
   const group = new THREE.Group();
-  group.name = 'HoardRoomKit';
-  const mats = materials();
-  const owned: THREE.BufferGeometry[] = [];
-  const swaying: Swaying[] = [];
+  group.name = `HoardRoomKit:${theme.id}`;
+  const shared = sharedMaterials();
+  // The glow breathes per room, so it is this room's own material.
+  const glowMaterial = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+    fog: true,
+    side: THREE.DoubleSide,
+    toneMapped: false,
+  });
+  glowMaterial.name = 'HoardRoomKitGlow';
+  const ownedGeometry: THREE.BufferGeometry[] = [];
+  const ownedMaterial: THREE.Material[] = [glowMaterial];
+  const moving: Moving[] = [];
   const transform = new THREE.Object3D();
 
-  for (const molten of [false, true]) {
-    const mesh = floorMesh(plan.floor, molten, molten ? mats.molten : mats.floor);
+  for (const mesh of [floorMesh(plan, false, shared.floor), floorMesh(plan, true, glowMaterial)]) {
     if (!mesh) continue;
-    owned.push(mesh.geometry);
+    ownedGeometry.push(mesh.geometry);
     group.add(mesh);
   }
-
-  const firelight = glowMesh(plan.floor);
-  if (firelight) {
-    owned.push(firelight.geometry);
-    group.add(firelight);
+  const light = fanMesh(plan);
+  if (light) {
+    ownedGeometry.push(light.geometry);
+    ownedMaterial.push(light.material as THREE.Material);
+    group.add(light);
   }
 
   const emitters: { x: number; y: number; z: number; spread: number }[] = [];
-  for (const piece of FORGE_KIT_PIECES) {
-    const baked = kit.get(piece);
+  const baked = kits.get(theme.kitUrl);
+  const sways = new Set(tier === 'low' ? [] : (theme.ambient.sway ?? []));
+  const hovers = new Set(tier === 'low' ? [] : (theme.ambient.hover ?? []));
+  for (const piece of theme.pieces) {
+    const geometry = baked?.get(piece);
     const placements = plan.placements.filter((placement) => placement.piece === piece);
-    if (!baked || placements.length === 0) continue;
+    if (!geometry || placements.length === 0) continue;
     const meshes: THREE.InstancedMesh[] = [];
-    for (const [geometry, material] of [
-      [baked.solid, mats.solid],
-      [baked.molten, mats.molten],
+    for (const [part, material] of [
+      [geometry.solid, shared.solid],
+      [geometry.glow, glowMaterial],
     ] as const) {
-      if (!geometry) continue;
-      const mesh = new THREE.InstancedMesh(geometry, material, placements.length);
+      if (!part) continue;
+      const mesh = new THREE.InstancedMesh(part, material, placements.length);
       mesh.name = `HoardRoomKit:${piece}`;
-      mesh.castShadow = shadows && material === mats.solid;
+      mesh.castShadow = shadows && material === shared.solid;
       mesh.receiveShadow = false;
       meshes.push(mesh);
       group.add(mesh);
     }
+    const emit = theme.ambient.particles?.emitters?.[piece];
     placements.forEach((placement, index) => {
       transform.position.set(placement.x, placement.y, placement.z);
       transform.rotation.set(0, placement.yaw, 0);
@@ -340,8 +330,8 @@ export function buildHoardRoomKit(
       );
       transform.updateMatrix();
       for (const mesh of meshes) mesh.setMatrixAt(index, transform.matrix);
-      if (piece === 'ChainHook' && tier !== 'low') {
-        swaying.push({
+      if (sways.has(piece) || hovers.has(piece)) {
+        moving.push({
           meshes,
           index,
           x: placement.x,
@@ -349,13 +339,20 @@ export function buildHoardRoomKit(
           z: placement.z,
           yaw: placement.yaw,
           scale: placement.scale,
+          mirror: placement.mirror,
           phase: (placement.x * 0.37 + placement.z * 0.61) % (Math.PI * 2),
+          hover: hovers.has(piece),
         });
       }
-      if (piece === 'GreatForge')
-        emitters.push({ x: placement.x, y: 5, z: placement.z - 3.2, spread: 4 });
-      if (piece === 'Crucible')
-        emitters.push({ x: placement.x, y: 3.3, z: placement.z, spread: 1.1 });
+      if (emit) {
+        // A piece's mouth is a little in front of it (its front is +Z, turned by yaw).
+        emitters.push({
+          x: placement.x + Math.sin(placement.yaw) * emit[1] * 0.4,
+          y: placement.y + emit[0] * placement.scale,
+          z: placement.z + Math.cos(placement.yaw) * emit[1] * 0.4,
+          spread: emit[1],
+        });
+      }
     });
     for (const mesh of meshes) {
       mesh.instanceMatrix.needsUpdate = true;
@@ -363,19 +360,18 @@ export function buildHoardRoomKit(
     }
   }
 
-  // Sparks off the forge and the crucibles: high tier only, one small cloud.
-  let sparks:
-    | { points: THREE.Points; position: THREE.BufferAttribute; seeds: Float32Array }
-    | undefined;
-  if (tier === 'high' && emitters.length > 0) {
+  // The room's particles: high tier only, one small cloud, positions rewritten in place.
+  const spec = theme.ambient.particles;
+  let cloud: { position: THREE.BufferAttribute; seeds: Float32Array; count: number } | undefined;
+  if (tier === 'high' && spec && (spec.mode !== 'rise' || emitters.length > 0)) {
     const geometry = new THREE.BufferGeometry();
-    const position = new THREE.BufferAttribute(new Float32Array(SPARKS * 3), 3);
+    const position = new THREE.BufferAttribute(new Float32Array(spec.count * 3), 3);
     position.setUsage(THREE.DynamicDrawUsage);
     geometry.setAttribute('position', position);
-    owned.push(geometry);
+    ownedGeometry.push(geometry);
     const material = new THREE.PointsMaterial({
-      color: LOOK.spark,
-      size: 0.22,
+      color: spec.color,
+      size: spec.size,
       sizeAttenuation: true,
       transparent: true,
       opacity: 0.85,
@@ -384,83 +380,105 @@ export function buildHoardRoomKit(
       toneMapped: false,
       fog: true,
     });
+    ownedMaterial.push(material);
     const points = new THREE.Points(geometry, material);
-    points.name = 'HoardRoomKitSparks';
+    points.name = 'HoardRoomKitParticles';
     points.frustumCulled = false;
-    const seeds = new Float32Array(SPARKS * 4);
-    for (let i = 0; i < SPARKS; i++) {
-      // Most of them belong to the forge; the rest are shared by the crucibles.
-      const emitter = i < SPARKS * 0.55 ? 0 : 1 + (i % Math.max(1, emitters.length - 1));
-      seeds[i * 4] = Math.min(emitters.length - 1, emitter);
-      seeds[i * 4 + 1] = ((i * 0.6180339887) % 1) * 6.0 + 2.5; // life, seconds
-      seeds[i * 4 + 2] = (i * 0.7548776662) % 1; // phase
-      seeds[i * 4 + 3] = ((i * 0.5698402909) % 1) * Math.PI * 2; // bearing
+    const seeds = new Float32Array(spec.count * 4);
+    for (let i = 0; i < spec.count; i++) {
+      seeds[i * 4] = (i * 0.6180339887) % 1;
+      seeds[i * 4 + 1] = (i * 0.7548776662) % 1;
+      seeds[i * 4 + 2] = (i * 0.5698402909) % 1;
+      seeds[i * 4 + 3] = (i * 0.4142135623) % 1;
     }
-    sparks = { points, position, seeds };
+    cloud = { position, seeds, count: spec.count };
     group.add(points);
   }
 
+  const [pulseMin, pulseMax, pulseSpeed] = theme.ambient.pulse;
+  const { minX, maxX, minZ, maxZ } = plan.bounds;
   let disposed = false;
   return {
     group,
     update(timeSec: number): void {
       if (disposed) return;
-      // The molten parts breathe together, slowly: a forge, not an alarm.
-      mats.molten.color.setScalar(
-        0.92 + 0.1 * Math.sin(timeSec * 1.3) + 0.04 * Math.sin(timeSec * 5.1),
-      );
-      for (let i = 0; i < swaying.length; i++) {
-        const chain = swaying[i];
-        transform.position.set(chain.x, chain.y, chain.z);
-        transform.rotation.set(
-          0.055 * Math.sin(timeSec * 0.9 + chain.phase),
-          chain.yaw,
-          0.04 * Math.sin(timeSec * 0.7 + chain.phase * 1.7),
-          'YXZ',
-        );
-        transform.scale.setScalar(chain.scale);
+      // What glows breathes together, slowly: a room, not an alarm.
+      const breath = 0.5 + 0.5 * Math.sin(timeSec * pulseSpeed);
+      glowMaterial.color.setScalar(pulseMin + (pulseMax - pulseMin) * breath);
+      for (let i = 0; i < moving.length; i++) {
+        const item = moving[i];
+        if (item.hover) {
+          transform.position.set(
+            item.x,
+            item.y + 0.22 * Math.sin(timeSec * 0.8 + item.phase),
+            item.z,
+          );
+          transform.rotation.set(0, item.yaw + 0.12 * Math.sin(timeSec * 0.31 + item.phase), 0);
+        } else {
+          transform.position.set(item.x, item.y, item.z);
+          transform.rotation.set(
+            0.055 * Math.sin(timeSec * 0.9 + item.phase),
+            item.yaw,
+            0.04 * Math.sin(timeSec * 0.7 + item.phase * 1.7),
+            'YXZ',
+          );
+        }
+        transform.scale.set(item.mirror ? -item.scale : item.scale, item.scale, item.scale);
         transform.updateMatrix();
-        for (const mesh of chain.meshes) {
-          mesh.setMatrixAt(chain.index, transform.matrix);
+        for (const mesh of item.meshes) {
+          mesh.setMatrixAt(item.index, transform.matrix);
           mesh.instanceMatrix.needsUpdate = true;
         }
       }
-      if (sparks) {
-        for (let i = 0; i < SPARKS; i++) {
-          const emitter = emitters[sparks.seeds[i * 4]];
-          const life = sparks.seeds[i * 4 + 1];
-          const t = (timeSec / life + sparks.seeds[i * 4 + 2]) % 1;
-          const bearing = sparks.seeds[i * 4 + 3];
-          const drift = emitter.spread * (0.35 + 0.65 * t);
-          sparks.position.setXYZ(
-            i,
-            emitter.x + Math.sin(bearing + t * 1.7) * drift,
-            emitter.y + t * t * 9 + t * 2,
-            emitter.z + Math.cos(bearing + t * 1.7) * drift * 0.6,
-          );
+      if (cloud && spec) {
+        for (let i = 0; i < cloud.count; i++) {
+          const a = cloud.seeds[i * 4];
+          const b = cloud.seeds[i * 4 + 1];
+          const c = cloud.seeds[i * 4 + 2];
+          const d = cloud.seeds[i * 4 + 3];
+          if (spec.mode === 'rise') {
+            const emitter = emitters[Math.floor(a * emitters.length) % emitters.length];
+            const t = (timeSec / (2.5 + b * 6) + c) % 1;
+            const bearing = d * Math.PI * 2 + t * 1.7;
+            const drift = emitter.spread * (0.35 + 0.65 * t);
+            cloud.position.setXYZ(
+              i,
+              emitter.x + Math.sin(bearing) * drift,
+              emitter.y + t * t * 9 + t * 2,
+              emitter.z + Math.cos(bearing) * drift * 0.6,
+            );
+          } else {
+            const fall = spec.mode === 'fall';
+            const t = (timeSec / (fall ? 7 + b * 6 : 18 + b * 14) + c) % 1;
+            const sway = Math.sin(timeSec * 0.4 + d * 6.283) * (fall ? 1.2 : 2.4);
+            cloud.position.setXYZ(
+              i,
+              minX + a * (maxX - minX) + sway,
+              fall ? 16 * (1 - t) : 1 + d * 7 + Math.sin(timeSec * 0.3 + a * 6.283) * 0.8,
+              minZ + b * (maxZ - minZ) + (fall ? 0 : t * 6),
+            );
+          }
         }
-        sparks.position.needsUpdate = true;
+        cloud.position.needsUpdate = true;
       }
     },
     dispose(): void {
       if (disposed) return;
       disposed = true;
-      for (const geometry of owned) geometry.dispose();
-      if (sparks) (sparks.points.material as THREE.Material).dispose();
-      if (firelight) (firelight.material as THREE.Material).dispose();
+      for (const geometry of ownedGeometry) geometry.dispose();
+      for (const material of ownedMaterial) material.dispose();
     },
   };
 }
 
 export const hoardRoomKitInternalsForTest = {
-  seedScene(scene: THREE.Object3D): void {
-    kit.clear();
-    bakeKit(scene);
+  seedScene(url: string, scene: THREE.Object3D): void {
+    bakeKit(url, scene);
   },
   clear(): void {
-    kit.clear();
+    kits.clear();
   },
-  pieces(): ForgeKitPiece[] {
-    return [...kit.keys()];
+  pieces(url: string): string[] {
+    return [...(kits.get(url)?.keys() ?? [])];
   },
 };

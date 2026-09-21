@@ -477,8 +477,10 @@ export function buildHoardValleyPlan(input: {
   zoneId: HoardValleyZoneId;
   seed: number;
   low: boolean;
+  /** A boss room's own palette (hoard_room_themes_core.ts) replaces the dig site's. */
+  profile?: HoardValleyZoneProfile;
 }): HoardValleyPlan {
-  const zone = HOARD_VALLEY_ZONE_PROFILES[input.zoneId];
+  const zone = input.profile ?? HOARD_VALLEY_ZONE_PROFILES[input.zoneId];
   const revealZ = hoardValleyRevealZ(input.layout);
   const centerClearHalfWidth = 8;
   return {

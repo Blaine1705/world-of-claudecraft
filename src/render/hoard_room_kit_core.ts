@@ -1,33 +1,23 @@
-// The EMBERFORGE boss room, dressed: where each piece of the forge kit stands and
-// what is drawn on the floor. Pure: no Three.js, no DOM. The room itself (outline,
+// A Buried Hoard BOSS ROOM, dressed: the engine that turns a boss's room theme
+// (hoard_room_themes_core.ts) into where each piece of its Blender kit stands and what
+// is drawn on the floor. Pure: no Three.js, no DOM. The room itself (outline,
 // cliffs, floor, collision) stays the seeded one the sim generates; this only
 // decides what stands in it, from that same seed, so every player in one hoard
-// sees one room. The adapter (hoard_room_kit.ts) turns the plan into instances of
-// the Blender kit (docs/design/forge-room/).
+// sees one room. The adapter (hoard_room_kit.ts) turns the plan into instances.
 //
-// Composition, not scatter: a HERO forge set into the back wall behind the boss,
-// then CLUSTERS pressed against the side walls (a smelter, a bellows bank, a
-// braced wall, a stockpile) with empty wall left between them. Nothing taller than
-// a floor mark ever stands in the fight: every prop keeps within WALL_BAND of a
-// wall, and none of it collides (the walls already do).
+// Composition, not scatter: a HERO piece set against the end wall behind the boss,
+// then CLUSTERS pressed against the side walls with bare wall left between them,
+// never mirrored across the room. Nothing taller than a floor mark ever stands in
+// the fight: every prop keeps within ROOM_KIT_WALL_BAND of a wall, and none of it
+// collides (the walls already do). Floor marks that do reach the fight are dark or
+// dim by their theme's own tones, so every telegraph out-reads them.
 
 import {
   type HoardValleyLayoutInput,
+  type HoardValleyZoneProfile,
   hoardValleyRevealZ,
   hoardValleySpanAtZ,
 } from './hoard_valley_core';
-
-export const FORGE_KIT_PIECES = [
-  'GreatForge',
-  'Anvil',
-  'Crucible',
-  'IngotStack',
-  'Vent',
-  'ForgePost',
-  'ChainHook',
-  'IronBrace',
-] as const;
-export type ForgeKitPiece = (typeof FORGE_KIT_PIECES)[number];
 
 /** What a graphics tier keeps: low the room's identity, high all of it. */
 export type RoomKitCategory = 'hero' | 'large' | 'medium' | 'filler';
@@ -37,44 +27,176 @@ const KEPT: Record<RoomKitTier, readonly RoomKitCategory[]> = {
   medium: ['hero', 'large', 'medium'],
   low: ['hero', 'large'],
 };
-/** The low tier also caps its large props: the forge and a few silhouettes. */
+/** The low tier also caps its large props: the hero and a few silhouettes. */
 const LOW_LARGE_CAP = 6;
 
+/** Every prop stands within this of a wall; the floor beyond it is the fight's. */
+export const ROOM_KIT_WALL_BAND = 9;
+/** The boss's own ground: nothing but floor marks comes this close to the dais. */
+export const ROOM_KIT_DAIS_CLEAR = 4;
+
+// ------------------------------------------------------------------ the theme
+/** One flat colour a floor mark may take. `lit` tones are drawn unlit-bright and
+ *  breathe with the kit's glow; every other tone takes the room's day/night grade. */
+export interface RoomFloorTone {
+  color: number;
+  /** Height over the floor, in yards: which marks lie on which. */
+  lift: number;
+  lit?: boolean;
+}
+
+/** A prop of a cluster, measured from the wall it stands against. */
+export interface RoomKitPut {
+  piece: string;
+  category: RoomKitCategory;
+  /** Yards into the room from the wall, and along it from the cluster's middle. */
+  depth: number;
+  along: number;
+  /** 'face' looks into the room, 'side' lies along the wall; jitter is +/- radians. */
+  yaw?: 'face' | 'side';
+  yawJitter?: number;
+  scale?: number;
+  /** Height of its origin over the floor (hung and floating pieces). */
+  y?: number;
+  mirror?: boolean;
+}
+
+/** A floor mark of a cluster or of the hero, in the same wall-relative frame. */
+export interface RoomKitFloorPut {
+  shape: 'quad' | 'fan' | 'blot';
+  tone: string;
+  depth: number;
+  along: number;
+  halfLength: number;
+  halfWidth: number;
+  /** Fans and blots: their reach. A fan's halfWidth is its strength (0..1). */
+  radius?: number;
+  yaw?: 'face' | 'side';
+}
+
+export interface RoomKitCluster {
+  name: string;
+  puts: readonly RoomKitPut[];
+  floor?: readonly RoomKitFloorPut[];
+}
+
+/** Marks scattered over the floor from the seed: cracks, puddles, stars. */
+export interface RoomFloorScatter {
+  shape: 'line' | 'blot' | 'point';
+  tone: string;
+  count: number;
+  /** 'center' keeps off the wall band, 'edge' keeps inside it, 'dais' rings the boss. */
+  region: 'center' | 'edge' | 'dais';
+  size: readonly [number, number];
+  /** Lines: how thin. */
+  width?: number;
+  /** Dais region: how far from the boss it may reach. */
+  reach?: number;
+  /** Lines: this many short branches off each. */
+  branches?: number;
+}
+
+export type BossRoomPalette = Pick<
+  HoardValleyZoneProfile,
+  | 'fogColor'
+  | 'fogNear'
+  | 'fogFar'
+  | 'ground'
+  | 'groundLight'
+  | 'cliff'
+  | 'cliffLight'
+  | 'trunk'
+  | 'accent'
+>;
+
+export interface BossRoomTheme {
+  id: string;
+  /** The boss whose room this is. */
+  boss: string;
+  /** The room's own colours: they REPLACE the dig site's biome palette. */
+  palette: BossRoomPalette;
+  kitUrl: string;
+  pieces: readonly string[];
+  hero: {
+    piece: string;
+    /** How far in front of the end wall its origin stands, and its size. */
+    inset: number;
+    scale: number;
+    /** Pieces beside it on the end wall, mirrored to both sides. */
+    flank: readonly {
+      piece: string;
+      category: RoomKitCategory;
+      dx: number;
+      inset: number;
+      scale?: number;
+      y?: number;
+    }[];
+    floor?: readonly RoomKitFloorPut[];
+  };
+  clusters: readonly RoomKitCluster[];
+  /** Yards between cluster stations down a wall, and how often one is left bare. */
+  clusterSpacing: number;
+  clusterSkip: number;
+  tones: Readonly<Record<string, RoomFloorTone>>;
+  floor: {
+    /** Rings round the boss's ground: [offset past the dais, half width, tone]. */
+    rings?: readonly (readonly [number, number, string])[];
+    /** A run at the foot of every wall: [yards off the wall, half width, tone]. */
+    wallRuns?: readonly (readonly [number, number, string])[];
+    scatter?: readonly RoomFloorScatter[];
+  };
+  ambient: {
+    /** The kit's glow material breathes between these, at this speed. */
+    pulse: readonly [number, number, number];
+    /** Pieces hung from their origin, which sway; and floating ones, which bob and turn. */
+    sway?: readonly string[];
+    hover?: readonly string[];
+    particles?: {
+      color: number;
+      count: number;
+      size: number;
+      /** 'rise' climbs off the emitting pieces; 'fall' and 'drift' fill the room. */
+      mode: 'rise' | 'fall' | 'drift';
+      /** rise: which pieces emit, how high their mouth is and how wide. */
+      emitters?: Readonly<Record<string, readonly [number, number]>>;
+    };
+  };
+}
+
+// ------------------------------------------------------------------- the plan
 export interface RoomKitPlacement {
-  piece: ForgeKitPiece;
+  piece: string;
   category: RoomKitCategory;
   x: number;
   y: number;
   z: number;
-  /** Radians about +Y; the kit's front is +Z. */
+  /** Radians about +Y; a kit piece's front is +Z. */
   yaw: number;
   scale: number;
   /** Mirrored across its own front axis: a free second variant. */
   mirror: boolean;
 }
 
-/** A flat mark on the floor: an oriented rectangle, or a ring segment. */
 export interface RoomKitFloorMark {
-  kind: 'plate' | 'channel' | 'channel-edge' | 'ring' | 'glow';
+  shape: 'quad' | 'ring' | 'fan' | 'blot';
+  tone: string;
   x: number;
   z: number;
-  /** Half extents along its own axes, in yards. */
   halfLength: number;
   halfWidth: number;
   yaw: number;
-  /** Rings: the radius of the band's middle. Glows: how far the light reaches. */
   radius?: number;
+  /** Blots: a seed for their ragged edge. */
+  seed?: number;
 }
 
 export interface RoomKitPlan {
+  theme: BossRoomTheme;
   placements: RoomKitPlacement[];
   floor: RoomKitFloorMark[];
+  /** The room's extent, for ambience that fills it. */
+  bounds: { minX: number; maxX: number; minZ: number; maxZ: number };
 }
-
-/** Every prop stands within this of a wall; the floor beyond it is the fight's. */
-export const ROOM_KIT_WALL_BAND = 9;
-/** The boss's own ground: nothing but floor marks comes this close to the dais. */
-export const ROOM_KIT_DAIS_CLEAR = 4;
 
 function hash(seed: number, index: number, salt: number): number {
   let x = (seed ^ Math.imul(index + 1, 0x9e3779b1) ^ Math.imul(salt + 1, 0x85ebca6b)) | 0;
@@ -83,15 +205,16 @@ function hash(seed: number, index: number, salt: number): number {
   return ((x ^ (x >>> 16)) >>> 0) / 4294967296;
 }
 
-type Recipe = 'smelter' | 'bellows' | 'braced' | 'stockpile';
-const RECIPES: readonly Recipe[] = ['smelter', 'bellows', 'braced', 'stockpile'];
-
-/** Does this room get the forge kit? The kit is the Emberforge Tyrant's. */
-export function roomKitFor(bossTemplateId: string | undefined): 'forge' | null {
-  return bossTemplateId === 'rift_boss_ember' ? 'forge' : null;
+/** The room a boss's theme asks for, in the zone profile's own shape. */
+export function themedRoomProfile(
+  zone: HoardValleyZoneProfile,
+  theme: BossRoomTheme | null,
+): HoardValleyZoneProfile {
+  return theme ? { ...zone, ...theme.palette } : zone;
 }
 
-export function buildForgeRoomKitPlan(
+export function buildBossRoomPlan(
+  theme: BossRoomTheme,
   layout: HoardValleyLayoutInput,
   seed: number,
   tier: RoomKitTier,
@@ -102,7 +225,7 @@ export function buildForgeRoomKitPlan(
   const start = hoardValleyRevealZ(layout) + 5;
   const dais = layout.dais;
   const put = (
-    piece: ForgeKitPiece,
+    piece: string,
     category: RoomKitCategory,
     x: number,
     z: number,
@@ -111,190 +234,220 @@ export function buildForgeRoomKitPlan(
     y = 0,
     mirror = false,
   ): void => {
-    if (Math.hypot(x - dais.x, z - dais.z) < dais.r + ROOM_KIT_DAIS_CLEAR && category !== 'hero')
+    if (category !== 'hero' && Math.hypot(x - dais.x, z - dais.z) < dais.r + ROOM_KIT_DAIS_CLEAR)
       return;
     all.push({ piece, category, x, y, z, yaw, scale, mirror });
   };
 
-  // ---- the hero: the Great Forge, its back buried in the end wall
+  // ---- the hero, its back in the end wall, and what flanks it
   const backSpan = hoardValleySpanAtZ(layout, back - 0.5);
-  const forgeX = (backSpan.minX + backSpan.maxX) / 2;
-  // The cliff's face stands about on the outline, so the forge sits proud of it:
-  // its mouth a few yards into the room, its body and chimney rising out of the rock.
-  put('GreatForge', 'hero', forgeX, back - 3.6, Math.PI, 0.94);
-  floor.push({
-    kind: 'glow',
-    x: forgeX,
-    z: back - 9,
-    halfLength: 1,
-    halfWidth: 0.5,
-    yaw: 0,
-    radius: 17,
-  });
-  // Its wall: braces either side, and chains hung high between them and the forge.
-  for (const side of [-1, 1]) {
-    put('IronBrace', 'large', forgeX + side * 19.5, back - 0.6, Math.PI, 1.05, 0, side < 0);
-    put('ChainHook', 'filler', forgeX + side * 15.2, back - 1.4, Math.PI, 1.1, 11.5);
-    put('Vent', 'large', forgeX + side * 25.5, back - 2.6, Math.PI, 0.95, 0, side < 0);
-  }
-  // The hearth apron: dark plates on the floor before the mouth.
-  for (let row = 0; row < 2; row++) {
-    for (let column = -2; column <= 2; column++) {
-      floor.push({
-        kind: 'plate',
-        x: forgeX + column * 5.3 + (row ? 1.1 : -0.6),
-        z: back - 10.4 - row * 4.4,
-        halfLength: 2.45,
-        halfWidth: 2.0,
-        yaw: (hash(seed, column + 9 * row, 3) - 0.5) * 0.06,
-      });
+  const heroX = (backSpan.minX + backSpan.maxX) / 2;
+  put(theme.hero.piece, 'hero', heroX, back - theme.hero.inset, Math.PI, theme.hero.scale);
+  for (const flank of theme.hero.flank) {
+    for (const side of [-1, 1]) {
+      const x = heroX + side * flank.dx;
+      if (x < backSpan.minX + 1 || x > backSpan.maxX - 1) continue;
+      put(
+        flank.piece,
+        flank.category,
+        x,
+        back - flank.inset,
+        Math.PI,
+        flank.scale,
+        flank.y,
+        side < 0,
+      );
     }
+  }
+  for (const mark of theme.hero.floor ?? []) {
+    // The hero's frame: depth runs out from the end wall, along runs across it.
+    floor.push({
+      shape: mark.shape,
+      tone: mark.tone,
+      x: heroX + mark.along,
+      z: back - mark.depth,
+      halfLength: mark.halfLength,
+      halfWidth: mark.halfWidth,
+      yaw: mark.yaw === 'side' ? Math.PI / 2 : 0,
+      radius: mark.radius,
+      seed: floor.length,
+    });
   }
 
   // ---- clusters down the side walls, never mirrored across the room
-  const spacing = 23;
+  const spacing = theme.clusterSpacing;
   for (const side of [-1, 1]) {
-    let previous: Recipe | null = null;
+    let previous = -1;
     let kept = 0;
     const first = start + (side > 0 ? spacing * 0.5 : 2);
     for (let station = 0, z = first; z < back - 27; station++, z += spacing) {
       const index = station * 2 + (side > 0 ? 1 : 0);
       // Leave some wall bare, but never a whole side.
-      if (hash(seed, index, 11) < 0.28 && kept >= 1) continue;
+      if (hash(seed, index, 11) < theme.clusterSkip && kept >= 1) continue;
       const at = z + (hash(seed, index, 12) - 0.5) * 7;
-      const span = hoardValleySpanAtZ(layout, at);
-      const wall = side < 0 ? span.minX : span.maxX;
       const inward = -side;
       const face = Math.atan2(inward, 0);
-      let recipe = RECIPES[Math.floor(hash(seed, index, 13) * RECIPES.length)];
-      if (recipe === previous) recipe = RECIPES[(RECIPES.indexOf(recipe) + 1) % RECIPES.length];
-      previous = recipe;
+      let pick = Math.floor(hash(seed, index, 13) * theme.clusters.length);
+      if (pick === previous) pick = (pick + 1) % theme.clusters.length;
+      previous = pick;
       kept++;
-      const along = (offset: number): number => at + offset;
+      const cluster = theme.clusters[pick];
       // Each piece measures from the wall at ITS OWN depth into the room: where the
       // gorge funnels out, the wall a few yards along is not the wall here.
-      const off = (depth: number, offset = 0): number => {
-        if (offset === 0) return wall + inward * depth;
-        const there = hoardValleySpanAtZ(layout, at + offset);
-        return (side < 0 ? there.minX : there.maxX) + inward * depth;
+      const wallAt = (offset: number): number => {
+        const there = hoardValleySpanAtZ(layout, Math.min(back - 0.01, at + offset));
+        return side < 0 ? there.minX : there.maxX;
       };
-      const turn = (salt: number, amount: number): number =>
-        face + (hash(seed, index, salt) - 0.5) * amount;
-      if (recipe === 'smelter') {
-        put('Crucible', 'large', off(3.4, 0), along(0), turn(21, 0.5), 1.05);
-        floor.push({
-          kind: 'glow',
-          x: off(3.4),
-          z: along(0),
-          halfLength: 1,
-          halfWidth: 0.34,
-          yaw: 0,
-          radius: 6.5,
-        });
-        put('Anvil', 'medium', off(6.4, 5.4), along(5.4), turn(22, 1.1) + Math.PI / 2, 1);
-        put('IngotStack', 'medium', off(2.8, -5.2), along(-5.2), turn(23, 1.4), 0.95);
-        put('ChainHook', 'filler', off(1.3, 0.4), along(0.4), face, 1, 10.5);
-        floor.push({
-          kind: 'channel',
-          x: off(1.9),
-          z: along(0),
-          halfLength: 1.5,
-          halfWidth: 0.35,
-          yaw: face + Math.PI / 2,
-        });
-      } else if (recipe === 'bellows') {
-        put('Vent', 'large', off(2.4, 0), along(0), face, 1.1);
-        put('ForgePost', 'medium', off(4.6, -4.6), along(-4.6), turn(24, 3), 1);
-        put('ForgePost', 'medium', off(4.6, 4.6), along(4.6), turn(25, 3), 1);
-        put('IngotStack', 'filler', off(3.0, 8.2), along(8.2), turn(26, 1.6), 0.8, 0, true);
-      } else if (recipe === 'braced') {
-        put('IronBrace', 'large', off(0.9, -3.6), along(-3.6), face, 1);
-        put('IronBrace', 'large', off(0.9, 3.6), along(3.6), face, 0.94, 0, true);
-        put('ChainHook', 'filler', off(1.5, 0), along(0), face, 1.15, 9.2);
+      cluster.puts.forEach((item, n) => {
+        const base = item.yaw === 'side' ? face + Math.PI / 2 : face;
+        const yaw = base + (hash(seed, index, 20 + n) - 0.5) * 2 * (item.yawJitter ?? 0);
         put(
-          'Anvil',
-          'medium',
-          off(5.6, 0.6),
-          along(0.6),
-          turn(27, 1.2) + Math.PI / 2,
-          1.1,
-          0,
-          true,
+          item.piece,
+          item.category,
+          wallAt(item.along) + inward * item.depth,
+          at + item.along,
+          yaw,
+          item.scale,
+          item.y,
+          item.mirror ?? false,
         );
-      } else {
-        put('IngotStack', 'medium', off(3.0, -2.6), along(-2.6), turn(28, 1.2), 1.15);
-        put('IngotStack', 'medium', off(5.4, 2.9), along(2.9), turn(29, 2.2), 0.85, 0, true);
-        put('ForgePost', 'medium', off(2.2, 5.8), along(5.8), turn(30, 3), 1.1);
-        put('ChainHook', 'filler', off(1.4, -5.5), along(-5.5), face, 0.95, 9.8);
-      }
-      // A riveted plate or two under every cluster.
-      for (let plate = 0; plate < 2; plate++) {
+      });
+      for (const mark of cluster.floor ?? []) {
         floor.push({
-          kind: 'plate',
-          x: off(3.6 + plate * 3.1, plate ? 2.2 : -1.8),
-          z: along((plate ? 2.2 : -1.8) + (hash(seed, index, 40 + plate) - 0.5) * 2),
-          halfLength: 1.7,
-          halfWidth: 1.5,
-          yaw: (hash(seed, index, 42 + plate) - 0.5) * 0.5,
+          shape: mark.shape,
+          tone: mark.tone,
+          x: wallAt(mark.along) + inward * mark.depth,
+          z: at + mark.along,
+          halfLength: mark.halfLength,
+          halfWidth: mark.halfWidth,
+          yaw: mark.yaw === 'side' ? face + Math.PI / 2 : face,
+          radius: mark.radius,
+          seed: floor.length,
         });
       }
     }
-    // The molten channel at this wall's foot, in straight runs that follow it.
-    for (let z = start; z < back - 8; z += 6) {
-      const a = hoardValleySpanAtZ(layout, z);
-      const b = hoardValleySpanAtZ(layout, Math.min(back - 8, z + 6));
-      const ax = (side < 0 ? a.minX : a.maxX) - side * 1.7;
-      const bx = (side < 0 ? b.minX : b.maxX) - side * 1.7;
-      const length = Math.hypot(bx - ax, 6);
-      const mark = {
-        x: (ax + bx) / 2,
-        z: z + 3,
-        halfLength: length / 2 + 0.05,
-        yaw: Math.atan2(bx - ax, 6),
-      };
-      floor.push({ kind: 'channel-edge', ...mark, halfWidth: 0.72 });
-      floor.push({ kind: 'channel', ...mark, halfWidth: 0.32 });
+    // A run at this wall's foot, in straight pieces that follow it.
+    for (const [off, halfWidth, tone] of theme.floor.wallRuns ?? []) {
+      for (let z = start; z < back - 8; z += 6) {
+        const a = hoardValleySpanAtZ(layout, z);
+        const b = hoardValleySpanAtZ(layout, Math.min(back - 8, z + 6));
+        const ax = (side < 0 ? a.minX : a.maxX) - side * off;
+        const bx = (side < 0 ? b.minX : b.maxX) - side * off;
+        floor.push({
+          shape: 'quad',
+          tone,
+          x: (ax + bx) / 2,
+          z: z + 3,
+          halfLength: Math.hypot(bx - ax, 6) / 2 + 0.05,
+          halfWidth,
+          yaw: Math.atan2(bx - ax, 6),
+        });
+      }
     }
   }
-  // The channels meet along the back wall and run into the forge's slag troughs.
-  floor.push({
-    kind: 'channel-edge',
-    x: forgeX,
-    z: back - 2.4,
-    halfLength: backSpan.maxX - forgeX - 1.7,
-    halfWidth: 0.72,
-    yaw: Math.PI / 2,
-  });
-  floor.push({
-    kind: 'channel',
-    x: forgeX,
-    z: back - 2.4,
-    halfLength: backSpan.maxX - forgeX - 1.7,
-    halfWidth: 0.32,
-    yaw: Math.PI / 2,
+  // The runs meet along the end wall.
+  for (const [off, halfWidth, tone] of theme.floor.wallRuns ?? []) {
+    floor.push({
+      shape: 'quad',
+      tone,
+      x: heroX,
+      z: back - off - 0.7,
+      halfLength: Math.max(1, backSpan.maxX - heroX - off),
+      halfWidth,
+      yaw: Math.PI / 2,
+    });
+  }
+
+  // ---- rings round the boss's ground, and the floor's seeded marks
+  for (const [offset, halfWidth, tone] of theme.floor.rings ?? []) {
+    floor.push({
+      shape: 'ring',
+      tone,
+      x: dais.x,
+      z: dais.z,
+      halfLength: 0,
+      halfWidth,
+      yaw: 0,
+      radius: dais.r + offset,
+    });
+  }
+  (theme.floor.scatter ?? []).forEach((scatter, s) => {
+    const salt = 100 + s * 16;
+    for (let i = 0; i < scatter.count; i++) {
+      let x: number;
+      let z: number;
+      if (scatter.region === 'dais') {
+        const angle = hash(seed, i, salt) * Math.PI * 2;
+        const r = Math.sqrt(hash(seed, i, salt + 1)) * (scatter.reach ?? dais.r + 8);
+        x = dais.x + Math.sin(angle) * r;
+        z = dais.z + Math.cos(angle) * r;
+      } else {
+        z = start + 6 + hash(seed, i, salt) * Math.max(1, back - start - 16);
+        const span = hoardValleySpanAtZ(layout, z);
+        const middle = (span.minX + span.maxX) / 2;
+        const half = (span.maxX - span.minX) / 2;
+        if (scatter.region === 'center') {
+          x =
+            middle +
+            (hash(seed, i, salt + 1) - 0.5) * 2 * Math.max(0, half - ROOM_KIT_WALL_BAND - 1);
+        } else {
+          const sideOf = hash(seed, i, salt + 2) < 0.5 ? -1 : 1;
+          x = middle + sideOf * (half - 1.5 - hash(seed, i, salt + 1) * (ROOM_KIT_WALL_BAND - 3));
+        }
+      }
+      const size = scatter.size[0] + hash(seed, i, salt + 3) * (scatter.size[1] - scatter.size[0]);
+      const yaw = hash(seed, i, salt + 4) * Math.PI * 2;
+      if (scatter.shape === 'line') {
+        const width = scatter.width ?? 0.08;
+        floor.push({
+          shape: 'quad',
+          tone: scatter.tone,
+          x,
+          z,
+          halfLength: size,
+          halfWidth: width,
+          yaw,
+        });
+        for (let b = 0; b < (scatter.branches ?? 0); b++) {
+          const along = (hash(seed, i, salt + 5 + b) - 0.5) * 1.4 * size;
+          const turn = yaw + (b % 2 ? 1 : -1) * (0.5 + hash(seed, i, salt + 8 + b) * 0.6);
+          const length = size * (0.3 + hash(seed, i, salt + 11 + b) * 0.35);
+          floor.push({
+            shape: 'quad',
+            tone: scatter.tone,
+            x: x + Math.sin(yaw) * along + Math.sin(turn) * length,
+            z: z + Math.cos(yaw) * along + Math.cos(turn) * length,
+            halfLength: length,
+            halfWidth: width * 0.75,
+            yaw: turn,
+          });
+        }
+      } else if (scatter.shape === 'blot') {
+        floor.push({
+          shape: 'blot',
+          tone: scatter.tone,
+          x,
+          z,
+          halfLength: size,
+          halfWidth: size * (0.6 + hash(seed, i, salt + 6) * 0.4),
+          yaw,
+          seed: i + salt,
+        });
+      } else {
+        floor.push({
+          shape: 'quad',
+          tone: scatter.tone,
+          x,
+          z,
+          halfLength: size,
+          halfWidth: size,
+          yaw: Math.PI / 4,
+        });
+      }
+    }
   });
 
-  // ---- the engraved forge ring round the boss's ground. (The fight's own floor
-  // carries nothing else: dark hammer marks were tried and read as stray stars.)
-  floor.push({
-    kind: 'ring',
-    x: dais.x,
-    z: dais.z,
-    halfLength: 0,
-    halfWidth: 0.22,
-    yaw: 0,
-    radius: dais.r + 3.2,
-  });
-  floor.push({
-    kind: 'ring',
-    x: dais.x,
-    z: dais.z,
-    halfLength: 0,
-    halfWidth: 0.12,
-    yaw: 0,
-    radius: dais.r + 4.1,
-  });
-  // ---- the tier keeps a prefix of one plan, so every tier agrees on where things are
+  // ---- the tier FILTERS one plan, so every tier agrees on where things are
   const keep = KEPT[tier];
   let larges = 0;
   const placements = all.filter((placement) => {
@@ -303,10 +456,22 @@ export function buildForgeRoomKitPlan(
     return true;
   });
   return {
+    theme,
     placements,
+    // Low keeps the floor's lines; the small firelight fans and the points go.
     floor:
       tier === 'low'
-        ? floor.filter((mark) => !(mark.kind === 'glow' && (mark.radius ?? 0) < 10))
+        ? floor.filter(
+            (mark) =>
+              !(mark.shape === 'fan' && (mark.radius ?? 0) < 10) &&
+              (mark.shape !== 'quad' || mark.halfLength + mark.halfWidth > 0.5),
+          )
         : floor,
+    bounds: {
+      minX: -(layout.floorHalfX ?? 36),
+      maxX: layout.floorHalfX ?? 36,
+      minZ: start,
+      maxZ: back,
+    },
   };
 }

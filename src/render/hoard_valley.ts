@@ -16,12 +16,14 @@ import { buildHoardCavernGround } from './hoard_cavern_ground';
 import { buildHoardCavernShell, hoardCavernRockGeometry } from './hoard_cavern_shell';
 import { buildHoardCliffMassView, type HoardCliffMassView } from './hoard_cliff_mass';
 import { buildHoardRoomKit, type HoardRoomKitView, updateHoardRoomKitTint } from './hoard_room_kit';
-import { buildForgeRoomKitPlan, type RoomKitTier, roomKitFor } from './hoard_room_kit_core';
+import { buildBossRoomPlan, type RoomKitTier, themedRoomProfile } from './hoard_room_kit_core';
+import { bossRoomThemeFor } from './hoard_room_themes_core';
 import {
   buildHoardValleyPlan,
   type HoardValleyDressingKind,
   type HoardValleyDressingPlacement,
   type HoardValleyPlan,
+  hoardValleyProfile,
   hoardValleySurfaceTint,
   isHoardValleyZoneId,
 } from './hoard_valley_core';
@@ -392,11 +394,15 @@ class HoardValleyViewImpl implements HoardValleyView {
       throw new Error('Hoard valley requires a floor plan with a known outdoor zone');
     }
     const low = options.effectsProfile.tier === 'low';
+    // A boss with a room of his own brings its palette with him: the dig site's
+    // biome colours never paint over who lives here.
+    const theme = bossRoomThemeFor(options.plan.spawns.find((spawn) => spawn.boss)?.templateId);
     const visualPlan = buildHoardValleyPlan({
       layout: options.plan.layout,
       zoneId: outdoor.zoneId,
       seed: options.plan.seed,
       low,
+      profile: themedRoomProfile(hoardValleyProfile(outdoor.zoneId), theme),
     });
     const shadows = !low && options.effectsProfile.heavyShadows;
     this.group = new THREE.Group();
@@ -426,12 +432,11 @@ class HoardValleyViewImpl implements HoardValleyView {
     );
     // A room with a kit of its own is dressed by it: the zone's generic spires would
     // only litter the floor the kit keeps clear (playtest).
-    const boss = options.plan.spawns.find((spawn) => spawn.boss);
-    const kitted = roomKitFor(boss?.templateId) === 'forge';
+    const kitted = theme !== null;
     if (!kitted) this.group.add(buildDressing(visualPlan, shadows));
     // The zone's hero trees go the same way: bare trees do not belong in a forge.
     if (!kitted) this.group.add(buildHoardCavernFoliage(visualPlan, shadows));
-    if (kitted) {
+    if (theme) {
       const tier: RoomKitTier =
         options.effectsProfile.tier === 'low'
           ? 'low'
@@ -439,7 +444,7 @@ class HoardValleyViewImpl implements HoardValleyView {
             ? 'medium'
             : 'high';
       this.roomKit = buildHoardRoomKit(
-        buildForgeRoomKitPlan(options.plan.layout, options.plan.seed, tier),
+        buildBossRoomPlan(theme, options.plan.layout, options.plan.seed, tier),
         tier,
         shadows,
       );
