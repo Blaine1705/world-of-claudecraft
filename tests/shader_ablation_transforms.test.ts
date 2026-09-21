@@ -69,6 +69,21 @@ describe('shader ablation transforms', () => {
     expect(grad?.fragment).toContain('w.x >= 0.999');
   });
 
+  it('keeps every branch and read of the worn function under a single exit', () => {
+    const out = ABLATIONS['worn-single-exit']({ vertex: VERTEX, fragment: FRAGMENT });
+    const span = wornTriRSpan(out?.fragment ?? '');
+    const body = (out?.fragment ?? '').slice(span?.start, span?.end);
+    expect(body.match(/\breturn\b/g)).toHaveLength(1);
+    expect(body).toContain('w.x >= 0.999');
+    expect(body.match(/texture2D\(/g)).toHaveLength(12);
+  });
+
+  it('stacks the unbranched read and the parallax switch in one variant', () => {
+    const out = ABLATIONS['worn-flat-no-parallax']({ vertex: VERTEX, fragment: FRAGMENT });
+    expect(out?.fragment).toContain('if ( false ) {');
+    expect(out?.fragment).not.toContain('w.x >= 0.999');
+  });
+
   it('switches the parallax block off without deleting it', () => {
     const out = ABLATIONS['worn-no-parallax']({ vertex: VERTEX, fragment: FRAGMENT });
     expect(out?.fragment).toContain('if ( false ) {');

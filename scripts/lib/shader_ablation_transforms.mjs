@@ -79,6 +79,22 @@ const WORN_GRAD_BODY = `{
     + textureGrad( tex, p.xy, dxXY, dyXY ).r * w.z;
 }`;
 
+// Same branches and the same tap counts, but ONE exit: tells the early returns
+// (which ANGLE rewrites for HLSL, and which draw the X4000 "potentially
+// uninitialized" warning) apart from the branches themselves.
+const WORN_SINGLE_EXIT_BODY = `{
+  float r;
+  if ( w.x >= 0.999 ) r = texture2D( tex, p.zy ).r;
+  else if ( w.y >= 0.999 ) r = texture2D( tex, p.xz ).r;
+  else if ( w.z >= 0.999 ) r = texture2D( tex, p.xy ).r;
+  else if ( axis.x <= 0.0 ) r = texture2D( tex, p.xz ).r * w.y + texture2D( tex, p.xy ).r * w.z;
+  else if ( axis.y <= 0.0 ) r = texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xy ).r * w.z;
+  else if ( axis.z <= 0.0 ) r = texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xz ).r * w.y;
+  else r = texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xz ).r * w.y
+    + texture2D( tex, p.xy ).r * w.z;
+  return r;
+}`;
+
 const PARALLAX_GUARD = 'if ( uWornTaps > 0.0 && wornCamD < uWornParEnd ) {';
 
 export const ABLATIONS = {
@@ -110,6 +126,17 @@ export const ABLATIONS = {
   'worn-grad': ({ vertex, fragment }) => {
     const swapped = swapWornTriR(fragment, WORN_GRAD_BODY);
     return swapped ? { vertex, fragment: swapped } : null;
+  },
+  'worn-single-exit': ({ vertex, fragment }) => {
+    const swapped = swapWornTriR(fragment, WORN_SINGLE_EXIT_BODY);
+    return swapped ? { vertex, fragment: swapped } : null;
+  },
+  // Additivity check: do the two worn savings stack?
+  'worn-flat-no-parallax': ({ vertex, fragment }) => {
+    const swapped = swapWornTriR(fragment, WORN_FLAT_BODY);
+    return swapped?.includes(PARALLAX_GUARD)
+      ? { vertex, fragment: swapped.replace(PARALLAX_GUARD, 'if ( false ) {') }
+      : null;
   },
   'worn-no-parallax': ({ vertex, fragment }) =>
     fragment.includes(PARALLAX_GUARD)
