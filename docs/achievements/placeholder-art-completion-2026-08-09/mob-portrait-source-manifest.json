@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "ab8c2b83edd4dd730bfc7b51236ec56dd87baaa1a68e523efed331adae80e72f",
+  "rendererFingerprint": "f63f7a726cee19045949de612441831e504da3aca53998b2f9d3d1e424fc6d64",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5009179,
-      "sha256": "e095abc7244d2f9a8a4b96dff49f6a7f38b660e3e3c0c8b8bd3ef461cd21b675",
+      "bytes": 5009395,
+      "sha256": "00aef2dba09e40579cd125511fcf04cf52f6284686fd6a594799aebf32e3e518",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5951,34 +5951,34 @@
       "id": "rift_boneclad",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_minion",
+      "visualKey": "mob_hoard_boneclad_warrior",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/hoard_boneclad_warrior.glb",
+          "path": "public/models/creatures/hoard_boneclad_warrior.glb",
+          "bytes": 751116,
+          "sha256": "fc17f59f11c5623f81af47a66cec301967760ad6347db8a89defec7866bcdad3"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 2.9,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#cfc8b0",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "ed7f8839622b51a2454443b9008a355399aebe460c937d5c3605a0ed2098f987",
+      "sourceFingerprint": "a3da87fc52483906f632832c115f9bddbbe581fbb2d59d746706ac4faed54926",
       "output": {
         "path": "public/ui/mobs/rift_boneclad.webp",
-        "bytes": 2828,
-        "sha256": "1cfccaa8a31575d5956e130a076f23e56c1e7d761f8b7ef6178db906984d2224"
+        "bytes": 2780,
+        "sha256": "24df30e4a9adab1caa501ebb33bac30924e4ea0aeaf203ed80b891b7919af149"
       }
     },
     {
@@ -6406,102 +6406,102 @@
       "id": "rift_dread_stalker",
       "family": "demon",
       "finderEncounter": false,
-      "visualKey": "mob_demonalt",
+      "visualKey": "mob_hoard_dread_stalker",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/demonalt.glb",
-          "path": "public/models/creatures/demonalt.glb",
-          "bytes": 160088,
-          "sha256": "2ade9fc07ae9d1af93747b736669d377264fdb9e695ffa0f6fe17c93aebc6db3"
+          "url": "models/creatures/hoard_dread_stalker.glb",
+          "path": "public/models/creatures/hoard_dread_stalker.glb",
+          "bytes": 586340,
+          "sha256": "22b3a040cc09bd1b8d73f80ad9ff7e7281b3774c3a449b19d8da039a19fd62b9"
         },
         "idle": "Idle",
         "height": 2.1,
-        "yaw": null,
+        "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#5b2c6f",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "a8b03dd004ee1b4d5acd89fe057be76ca5ce71d6c60a019837c5094266f2be4c",
+      "sourceFingerprint": "f3564860aa94506ceb488cf3ec65ca28fb96220e54186985313a9396ab6742d4",
       "output": {
         "path": "public/ui/mobs/rift_dread_stalker.webp",
-        "bytes": 1738,
-        "sha256": "965e9f58f48e0521989ff21983829a2b825fac056ca13b3981c25a725866a2e7"
+        "bytes": 1744,
+        "sha256": "4a2668b7c58cd01d734444df5f945d9cda524625626dc44137d9c5c8ccc670df"
       }
     },
     {
       "id": "rift_ember_fiend",
       "family": "demon",
       "finderEncounter": false,
-      "visualKey": "mob_demonalt",
+      "visualKey": "mob_hoard_ember_fiend",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/demonalt.glb",
-          "path": "public/models/creatures/demonalt.glb",
-          "bytes": 160088,
-          "sha256": "2ade9fc07ae9d1af93747b736669d377264fdb9e695ffa0f6fe17c93aebc6db3"
+          "url": "models/creatures/hoard_ember_fiend.glb",
+          "path": "public/models/creatures/hoard_ember_fiend.glb",
+          "bytes": 653872,
+          "sha256": "b939055dee7fe374765bf1853d49a3c46a0967a94115eede8d54948bb884205d"
         },
         "idle": "Idle",
-        "height": 2.1,
+        "height": 2.4,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#ff7a3c",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "63ca42ac9628941e457aabdb911738c90075a64db0f88b0a588e8739ae4bf6f3",
+      "sourceFingerprint": "61fa7169c633b5d4270fba341d615fc48dd72b5de5efcb754c1312442e5b8cd5",
       "output": {
         "path": "public/ui/mobs/rift_ember_fiend.webp",
-        "bytes": 2084,
-        "sha256": "18a06bc4a45eb2a3ff68a6304ebf14413582475accbc71189346ea8973c40c67"
+        "bytes": 2040,
+        "sha256": "03e3fe8eb112c770c1b43a8d375344f288e94ae5bebca065009305831786161f"
       }
     },
     {
       "id": "rift_frost_revenant",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_minion",
+      "visualKey": "mob_hoard_frost_revenant",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/hoard_frost_revenant.glb",
+          "path": "public/models/creatures/hoard_frost_revenant.glb",
+          "bytes": 819492,
+          "sha256": "24545fea6a8c2b2e4070391b100a6e34ffbd59850bdd02ee874a9e192d206656"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 3,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#bfe3ff",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "26f49890790b5da18560d38f1f95d6693f9894a97705fb3ab0c7ae9225f50fe9",
+      "sourceFingerprint": "9425709adceedb81f64388013629f6c39b23def2919586ac11d3a9e49d5c3e16",
       "output": {
         "path": "public/ui/mobs/rift_frost_revenant.webp",
-        "bytes": 2782,
-        "sha256": "263382ec91250363799b5aeb66619e178e4b450cd1a07f2fa695f3c85f1e5c88"
+        "bytes": 2248,
+        "sha256": "4344a235a813ea06291e0c26847abef26fb6a08520e04817203dbe42e0c39e07"
       }
     },
     {
@@ -6542,34 +6542,34 @@
       "id": "rift_magma_brute",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_elemental",
+      "visualKey": "mob_hoard_magma_brute",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/hoard_magma_brute.glb",
+          "path": "public/models/creatures/hoard_magma_brute.glb",
+          "bytes": 638156,
+          "sha256": "ff157aa0d5c691821caa94b4a11339751ceb13b5805f581418ae391baadd4762"
         },
-        "idle": "Flying_Idle",
-        "height": 2.2,
+        "idle": "Idle",
+        "height": 3.4,
         "yaw": null,
-        "hover": 0.3,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#d84a2a",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "1ac861f46790e08eba1486feeb4f535cd97c2b285814f19aabcfe19c47eb110d",
+      "sourceFingerprint": "4d0ecde5b4cec493e39fbd2fdce600b504b5621f0f3855d55fa1da1fc6d285e9",
       "output": {
         "path": "public/ui/mobs/rift_magma_brute.webp",
-        "bytes": 2240,
-        "sha256": "9994f197b06f4e857fa57b7dc2a057cc22b21db1b0e11604fac89b9782a08cd9"
+        "bytes": 2248,
+        "sha256": "3d0a7cab9a1ceb2793239e5c593d97040a324b3da920bd3d34c775304ed9c853"
       }
     },
     {
@@ -6761,68 +6761,68 @@
       "id": "rift_storm_caller",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_elemental",
+      "visualKey": "mob_hoard_storm_caller",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/hoard_storm_caller.glb",
+          "path": "public/models/creatures/hoard_storm_caller.glb",
+          "bytes": 773008,
+          "sha256": "57e89d898ac711ac8a55a1244da162b91615402d22a1038d1fa5dd336c1adc20"
         },
-        "idle": "Flying_Idle",
-        "height": 2.2,
+        "idle": "Idle",
+        "height": 2.9,
         "yaw": null,
-        "hover": 0.3,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#48d1cc",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "33fa19ceb8ae110afd2f9631a27b028e4da9eb8e9c43e7a940b7a69ef020acd8",
+      "sourceFingerprint": "fe4180e6510347f740845e4c30d392661b0fdfb305e44bedf4d3cfe03c3ec957",
       "output": {
         "path": "public/ui/mobs/rift_storm_caller.webp",
-        "bytes": 2070,
-        "sha256": "08c825561a0fb8c21d4209ec20b7bb410de8b0233edf3a574b45ffbe4d37ad08"
+        "bytes": 2550,
+        "sha256": "39857f2a201b6d55bfbf3c7e2ccb126fb27fd580d7ed0738d744f4c94b7eafbf"
       }
     },
     {
       "id": "rift_stormscale",
       "family": "dragonkin",
       "finderEncounter": false,
-      "visualKey": "mob_dragonkin",
+      "visualKey": "mob_hoard_stormscale_drake",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/dragonevolved.glb",
-          "path": "public/models/creatures/dragonevolved.glb",
-          "bytes": 138560,
-          "sha256": "ade414f75155e43ac9de2ed3a3fd5685455d010d7161473acf016bcd18056066"
+          "url": "models/creatures/hoard_stormscale_drake.glb",
+          "path": "public/models/creatures/hoard_stormscale_drake.glb",
+          "bytes": 646028,
+          "sha256": "fe82b528ddd8bc0a278d0a980d1387641636134b5731771d5469e5b4b04504bd"
         },
-        "idle": "Flying_Idle",
-        "height": 2.4,
-        "yaw": null,
-        "hover": 0.25,
+        "idle": "Idle",
+        "height": 2.5,
+        "yaw": -1.5707963267948966,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#2e86c1",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "21f130076966a8b4b20552d2621d37e1328f27e1424f3c68afd69e54aa90ec57",
+      "sourceFingerprint": "559a8b5a3c273407350707721f5bdbc7fb1f1b0886d35a5348cce2c28e77022f",
       "output": {
         "path": "public/ui/mobs/rift_stormscale.webp",
-        "bytes": 2130,
-        "sha256": "a829fd952c5e8d745db8df793fa2779e62854f36b396cc7cead7a3b9c5899537"
+        "bytes": 2018,
+        "sha256": "3979227f9c8f27e16e8ab952d222fbc06e02f6d8b5536456b7fde80414ba4edd"
       }
     },
     {
@@ -6872,7 +6872,7 @@
           "sha256": "04a5d8f3b67baa56b5520dcf495c2bdad48e0896eaf0c2715046d56676d53384"
         },
         "idle": "Idle",
-        "height": 2.4,
+        "height": 3,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -6886,7 +6886,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "5c0b239cc76e7340007d78b06d6a910ab5e9378e3b1d4ba9d69de14840305a1a",
+      "sourceFingerprint": "c0604024d398d9013385767c3d148b60c08602fc07044a840f75d65e4209fcc9",
       "output": {
         "path": "public/ui/mobs/rift_tide_thrall.webp",
         "bytes": 2158,
@@ -6931,59 +6931,34 @@
       "id": "rift_void_acolyte",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "mob_bandit",
+      "visualKey": "mob_hoard_void_acolyte",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/rogue_hooded.glb",
-          "path": "public/models/chars/players/rogue_hooded.glb",
-          "bytes": 448736,
-          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+          "url": "models/creatures/hoard_void_acolyte.glb",
+          "path": "public/models/creatures/hoard_void_acolyte.glb",
+          "bytes": 692364,
+          "sha256": "ea78393791856f9e9e11811c62821e288b8e711618d740c162492d8247f629fe"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 2.9,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/dagger.glb",
-              "path": "public/models/weapons/dagger.glb",
-              "bytes": 35340,
-              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          },
-          {
-            "asset": {
-              "url": "models/weapons/dagger.glb",
-              "path": "public/models/weapons/dagger.glb",
-              "bytes": 35340,
-              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
-            },
-            "bone": "handslot.l",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6b3a32",
-        "resolved": "#6b3a32",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "3e0f11b1c4d7b26d328a65b7ab9ffca9cab1fee4c87c4b84ea7a0375717283b5",
       "output": {
         "path": "public/ui/mobs/rift_void_acolyte.webp",
-        "bytes": 2208,
-        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
+        "bytes": 2048,
+        "sha256": "433c8927e1265de386fc2ac502ef2ef5cc14442b951cebfcba8acfec1593aced"
       }
     },
     {

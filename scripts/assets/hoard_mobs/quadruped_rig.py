@@ -2,7 +2,8 @@
 
 The generic twin of scripts/assets/hoard_bosses/maw_rig.py. Tripo's quadruped
 auto-rig ships one walk preset and folds odd bodies, so a generated creature (raw,
-textured, facing +X, up +Z) is rigged here from a small JSON spec instead:
+textured, up +Z, turned to face +X by the spec's "rotateZ" when it does not) is
+rigged here from a small JSON spec instead:
 
   * the spec places the skeleton by hand: Hips, Spine, Chest, Head, optional Jaw,
     Tail1..3, Lure1..2, and four three-bone legs (ForeUpper/ForeLower/ForeFoot,
@@ -44,6 +45,9 @@ world = mesh_obj.matrix_world.copy()
 mesh_obj.parent = None
 mesh_obj.data.transform(world)
 mesh_obj.matrix_world = Matrix.Identity(4)
+# Tripo does not always lay a creature along +X: the spec may turn it there.
+if SPEC.get('rotateZ'):
+    mesh_obj.data.transform(Matrix.Rotation(math.radians(SPEC['rotateZ']), 4, 'Z'))
 for o in list(scene.objects):
     if o is not mesh_obj:
         bpy.data.objects.remove(o, do_unlink=True)

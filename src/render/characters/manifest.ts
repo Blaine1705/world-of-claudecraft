@@ -3846,13 +3846,13 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Abyssal Maw's drowned thrall fights with his hands.
   mob_hoard_tide_thrall: {
     url: `${CREATURES}/hoard_tide_thrall.glb`,
-    height: 2.4,
+    height: 3.0,
     clips: {
       ...kaykit(['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Chop', 'Punch_A']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,
-    selfIllumination: 0.2,
+    selfIllumination: 0.25,
   },
   // The Maw's bottom-dweller: low, wide, all mouth. Its own Blender rig and clips
   // (scripts/assets/hoard_mobs/quadruped_rig.py).
@@ -3861,6 +3861,108 @@ export const VISUALS: Record<string, VisualDef> = {
     // Height is the top of its lure; the body is about half of it.
     height: 1.7,
     // The generated model faces +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The Hoarfrost Warden's dead throne guard.
+  mob_hoard_frost_revenant: {
+    url: `${CREATURES}/hoard_frost_revenant.glb`,
+    height: 3.0,
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Punch_A']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The forge imp: small, wiry, all claws.
+  mob_hoard_ember_fiend: {
+    url: `${CREATURES}/hoard_ember_fiend.glb`,
+    height: 2.4,
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Slice_Horizontal', 'Punch_A']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The forge brute: a slab of volcanic rock that hits with its fists.
+  mob_hoard_magma_brute: {
+    url: `${CREATURES}/hoard_magma_brute.glb`,
+    height: 3.4,
+    clips: {
+      ...kaykit(['Punch_A', '1H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Nyxaris's astronomer cultist.
+  mob_hoard_void_acolyte: {
+    url: `${CREATURES}/hoard_void_acolyte.glb`,
+    height: 2.9,
+    clips: {
+      ...kaykit(['Spellcast_Shoot', 'Punch_A']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Vharok's storm shaman.
+  mob_hoard_storm_caller: {
+    url: `${CREATURES}/hoard_storm_caller.glb`,
+    height: 2.9,
+    clips: {
+      ...kaykit(['Spellcast_Shoot', '1H_Melee_Attack_Slice_Horizontal']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Xarreth's bone-armoured skeleton, shield on his arm.
+  mob_hoard_boneclad_warrior: {
+    url: `${CREATURES}/hoard_boneclad_warrior.glb`,
+    height: 2.9,
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Shield_Bash']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Nyxaris's eyeless void hound. Own Blender rig and clips (scripts/assets/hoard_mobs/).
+  mob_hoard_dread_stalker: {
+    url: `${CREATURES}/hoard_dread_stalker.glb`,
+    height: 2.1,
+    // The rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Vharok's young storm drake. Own Blender rig and clips (scripts/assets/hoard_mobs/).
+  mob_hoard_stormscale_drake: {
+    url: `${CREATURES}/hoard_stormscale_drake.glb`,
+    height: 2.5,
+    // The rig rests facing +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {
       idle: 'Idle',
@@ -4252,6 +4354,14 @@ const MOB_KEYS: Record<string, string> = {
   rift_boss_storm: 'mob_hoard_tempest_vharok',
   rift_tide_thrall: 'mob_hoard_tide_thrall',
   rift_deep_lurker: 'mob_hoard_deep_lurker',
+  rift_frost_revenant: 'mob_hoard_frost_revenant',
+  rift_ember_fiend: 'mob_hoard_ember_fiend',
+  rift_magma_brute: 'mob_hoard_magma_brute',
+  rift_void_acolyte: 'mob_hoard_void_acolyte',
+  rift_dread_stalker: 'mob_hoard_dread_stalker',
+  rift_storm_caller: 'mob_hoard_storm_caller',
+  rift_stormscale: 'mob_hoard_stormscale_drake',
+  rift_boneclad: 'mob_hoard_boneclad_warrior',
 };
 
 const FAMILY_KEYS: Record<string, string> = {
