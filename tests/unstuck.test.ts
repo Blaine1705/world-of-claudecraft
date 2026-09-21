@@ -33,6 +33,7 @@ import {
   moveToGraveyardForUnstuck,
   nearestOverworldGraveyard,
   RES_HEALER_HP_FRACTION,
+  reviveAtGraveyardForUnstuck,
 } from '../src/sim/spirit';
 import {
   type BlockerDef,
@@ -51,6 +52,7 @@ import {
 import {
   clearCooldownsPreservingUnstuck,
   markUnstuckCompleted,
+  restoreCooldownsPreservingUnstuck,
   UNSTUCK_RECENT_ID,
   UNSTUCK_SICKNESS_WINDOW_SECONDS,
 } from '../src/sim/unstuck_cooldown';
@@ -1590,12 +1592,18 @@ describe('unstuck sickness window', () => {
 
     expect(event.reason).toBe('moved_to_graveyard');
     expect(event.sickness).toBe(false);
+    // Free means free of the debuff, never free of the move itself.
+    expect(player.pos).toMatchObject(nearestOverworldGraveyard(START.x, START.z));
     expect(hasUnstuckSickness(player)).toBe(false);
     expect(player.auras.some((aura) => aura.kind === 'buff_allstats_pct')).toBe(false);
     expect(player.maxHp).toBe(maxHpBefore);
     expect(player.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(UNSTUCK_SICKNESS_WINDOW_SECONDS);
     expect(player.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
     expect(UNSTUCK_SICKNESS_WINDOW_SECONDS).toBe(60 * 60);
+    // Both ids are persisted JSONB keys (cooldowns.abilities) and restore-allowlist tokens:
+    // renaming either would orphan every in-flight timer on live characters.
+    expect(UNSTUCK_RECENT_ID).toBe('system_unstuck_recent');
+    expect(UNSTUCK_COOLDOWN_ID).toBe('system_unstuck');
   });
 
   it('charges Unstuck Sickness on a second unstuck inside the window', () => {
@@ -1683,6 +1691,78 @@ describe('unstuck sickness window', () => {
     expect(player.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(UNSTUCK_SICKNESS_WINDOW_SECONDS);
   });
 
+  it('applies the same free first use to a released ghost', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const player = sim.player;
+    sim.ctx.dealDamage(null, player, player.maxHp * 10, false, 'physical', null, 'hit');
+    sim.releaseSpirit();
+    sim.drainEvents();
+    expect(player.ghost).toBe(true);
+
+    const event = complete(sim);
+
+    expect(event.reason).toBe('revived_at_graveyard');
+    expect(event.sickness).toBe(false);
+    expect(player.dead).toBe(false);
+    expect(player.ghost).toBe(false);
+    expect(hasUnstuckSickness(player)).toBe(false);
+    expect(player.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(UNSTUCK_SICKNESS_WINDOW_SECONDS);
+  });
+
+  it("leaves an existing Keeper's Toll untouched on a free revive", () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const player = sim.player;
+    applyResurrectionSickness(sim.ctx, player);
+    const tollBefore = required(
+      player.auras.find((aura) => aura.id === RESURRECTION_SICKNESS_ID),
+      'the toll',
+    ).remaining;
+    sim.ctx.dealDamage(null, player, player.maxHp * 10, false, 'physical', null, 'hit');
+    expect(player.dead).toBe(true);
+    sim.drainEvents();
+
+    const event = complete(sim);
+
+    // A charged revive would have displaced the 10-minute Toll with the 5-minute Unstuck
+    // drain; a free one launders nothing: the Toll survives at its full remaining (auras
+    // freeze on a corpse, so the countdown burnt none of it off).
+    expect(event.sickness).toBe(false);
+    expect(player.dead).toBe(false);
+    expect(hasUnstuckSickness(player)).toBe(false);
+    const toll = required(
+      player.auras.find((aura) => aura.id === RESURRECTION_SICKNESS_ID),
+      'the toll after the free revive',
+    );
+    expect(toll.remaining).toBe(tollBefore);
+    expect(player.auras.filter((aura) => aura.kind === 'buff_allstats_pct')).toHaveLength(1);
+  });
+
+  it('charges by default when the outcome helpers are called directly', () => {
+    // The unstuck system passes the charge explicitly; a direct caller that omits it keeps
+    // the historical "never free" contract, which is what makes the default load-bearing.
+    const moved = makeWorld();
+    moved.setPlayerLevel(MAX_LEVEL);
+    expect(moveToGraveyardForUnstuck(moved.ctx, moved.player.id)).toBe(true);
+    expect(hasUnstuckSickness(moved.player)).toBe(true);
+
+    const revived = makeWorld();
+    revived.setPlayerLevel(MAX_LEVEL);
+    const body = revived.player;
+    revived.ctx.dealDamage(null, body, body.maxHp * 10, false, 'physical', null, 'hit');
+    expect(body.dead).toBe(true);
+    expect(reviveAtGraveyardForUnstuck(revived.ctx, body.id)).toBe(true);
+    expect(body.dead).toBe(false);
+    expect(hasUnstuckSickness(body)).toBe(true);
+
+    // And the return value reports what landed: nothing below the sickness floor.
+    const exempt = makeWorld();
+    exempt.setPlayerLevel(9);
+    expect(moveToGraveyardForUnstuck(exempt.ctx, exempt.player.id)).toBe(false);
+    expect(hasUnstuckSickness(exempt.player)).toBe(false);
+  });
+
   it('keeps the window through a relog, so logging out cannot reset it', () => {
     const sim = makeWorld();
     sim.setPlayerLevel(MAX_LEVEL);
@@ -1727,6 +1807,41 @@ describe('unstuck sickness window', () => {
       [UNSTUCK_COOLDOWN_ID, UNSTUCK_RETRY_SECONDS],
       [UNSTUCK_RECENT_ID, 1234],
     ]);
+  });
+
+  it('survives the match-exit pool restore that hands pre-match cooldowns back', () => {
+    // Carried in: an ability cooldown and a nearly spent retry timer. Live at match end: a
+    // window opened inside the match, a fresher retry timer, and an ability cooldown the
+    // parenthesis must NOT hand back.
+    const carriedIn = new Map<string, number>([
+      ['charge', 12],
+      [UNSTUCK_COOLDOWN_ID, 3],
+    ]);
+    const live = new Map<string, number>([
+      ['bloodrage', 20],
+      [UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS],
+      [UNSTUCK_RECENT_ID, UNSTUCK_SICKNESS_WINDOW_SECONDS - 30],
+    ]);
+
+    const restored = restoreCooldownsPreservingUnstuck(live, carriedIn);
+
+    expect([...restored].sort()).toEqual(
+      [
+        ['charge', 12],
+        [UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS],
+        [UNSTUCK_RECENT_ID, UNSTUCK_SICKNESS_WINDOW_SECONDS - 30],
+      ].sort(),
+    );
+    // Neither input is touched, and a carried-in value that is LARGER than the live one
+    // wins the other way round (the parenthesis never shortens either timer).
+    expect(live.get('bloodrage')).toBe(20);
+    expect(carriedIn.get(UNSTUCK_COOLDOWN_ID)).toBe(3);
+    expect(
+      restoreCooldownsPreservingUnstuck(
+        new Map([[UNSTUCK_RECENT_ID, 5]]),
+        new Map([[UNSTUCK_RECENT_ID, 500]]),
+      ).get(UNSTUCK_RECENT_ID),
+    ).toBe(500);
   });
 
   it('stays out of the /cooldowns readout like the retry cooldown', () => {

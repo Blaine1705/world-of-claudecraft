@@ -31,7 +31,6 @@ import {
 } from './data';
 import { delveModuleZOffset } from './delves/runs';
 import { PLAYER_BODY_RADIUS } from './pathfind';
-import { unstuckSicknessDuration } from './resurrection';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -585,18 +584,24 @@ export function cancelPendingUnstuckForDisconnect(
   return cancelUnstuck(ctx, meta, pending, 'disconnected', emitEvent);
 }
 
+interface BattlegroundUnstuckOutcome {
+  destination: UnstuckPosition;
+  /** Whether Unstuck Sickness actually landed (never for a dead body: it is only moved). */
+  charged: boolean;
+}
+
 function completeBattlegroundUnstuck(
   ctx: SimContext,
   meta: PlayerMeta,
   p: Entity,
   sickness: UnstuckSicknessCharge,
-): UnstuckPosition | null {
+): BattlegroundUnstuckOutcome | null {
   const match = ctx.bgMatches.get(p.id);
   if (!match) return null;
-  const destination = bgUnstuckDestination(ctx, p.id);
-  if (!destination) return null;
+  const target = bgUnstuckDestination(ctx, p.id);
+  if (!target) return null;
   const team = bgTeamOf(match, p.id);
-  p.pos = destination;
+  p.pos = target;
   p.prevPos = { ...p.pos };
   p.facing = team === 0 ? 0 : Math.PI;
   p.prevFacing = p.facing;
@@ -613,8 +618,9 @@ function completeBattlegroundUnstuck(
   p.queuedCastAim = null;
   p.queuedCastTargetId = null;
   settleTeleportArrival(p);
-  if (!p.dead && !p.ghost && sickness === 'unstuck') applyUnstuckSickness(ctx, p);
-  return battlegroundLocation(match, p.pos)?.point ?? null;
+  const charged = !p.dead && !p.ghost && sickness === 'unstuck' && applyUnstuckSickness(ctx, p);
+  const destination = battlegroundLocation(match, p.pos)?.point;
+  return destination ? { destination, charged } : null;
 }
 
 function completeUnstuck(
@@ -628,23 +634,25 @@ function completeUnstuck(
   // differ only in whether a revive is needed on arrival. A living player is never killed.
   // The charge itself is owed only by a repeat inside the window the previous completion
   // opened (unstuckOwesSickness); the first use in an hour is free. Decided BEFORE the
-  // window is re-opened below, and re-opened on every completion so it slides from the
-  // latest use.
+  // window is re-opened below, and re-opened on EVERY completion (a dead body merely moved
+  // inside a battleground included) so it slides from the latest use.
   const wasDead = p.dead || p.ghost;
-  const owesSickness = unstuckOwesSickness(p.cooldowns);
-  const sickness: UnstuckSicknessCharge = owesSickness ? 'unstuck' : 'none';
-  const battlegroundDestination =
+  const sickness: UnstuckSicknessCharge = unstuckOwesSickness(p.cooldowns) ? 'unstuck' : 'none';
+  const battleground =
     pending.area.kind === 'battleground'
       ? completeBattlegroundUnstuck(ctx, meta, p, sickness)
       : null;
-  if (!battlegroundDestination) {
-    if (wasDead) reviveAtGraveyardForUnstuck(ctx, p.id, sickness);
-    else moveToGraveyardForUnstuck(ctx, p.id, sickness);
-  }
+  // What the outcome ACTUALLY applied, not what was owed: a character below the sickness
+  // floor and a dead body moved inside a battleground owe a charge that never lands.
+  const charged = battleground
+    ? battleground.charged
+    : wasDead
+      ? reviveAtGraveyardForUnstuck(ctx, p.id, sickness)
+      : moveToGraveyardForUnstuck(ctx, p.id, sickness);
   markUnstuckCompleted(p.cooldowns);
   p.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
 
-  const destination = battlegroundDestination ??
+  const destination = battleground?.destination ??
     unstuckLocationAt(ctx, p.id, p.pos)?.point ?? {
       ...p.pos,
       localX: p.pos.x,
@@ -653,10 +661,8 @@ function completeUnstuck(
   ctx.emit({
     type: 'unstuck',
     phase: 'completed',
-    reason: battlegroundDestination || !wasDead ? 'moved_to_graveyard' : 'revived_at_graveyard',
-    // True only when the debuff actually landed: a repeat inside the window by a character
-    // at or above the sickness floor (below it the duration is zero and nothing applies).
-    sickness: owesSickness && unstuckSicknessDuration(p.level) > 0,
+    reason: battleground || !wasDead ? 'moved_to_graveyard' : 'revived_at_graveyard',
+    sickness: charged,
     area: pending.area,
     origin: pending.origin,
     destination,

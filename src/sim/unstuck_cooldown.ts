@@ -51,3 +51,23 @@ export function clearCooldownsPreservingUnstuck(cooldowns: Map<string, number>):
   cooldowns.clear();
   for (const [id, remaining] of preserved) cooldowns.set(id, remaining);
 }
+
+/**
+ * Hand a fighter's pre-match cooldowns back on the way out of an arena, battleground, or
+ * Vale Cup match (a match is a parenthesis, not a rest stop) WITHOUT losing either system
+ * timer that ran or opened during the match: for those two ids the larger of the live and
+ * the carried-in value wins, so a /unstuck completed inside a battleground still opens the
+ * sickness window once the fighter is home. Every ability cooldown is restored exactly as
+ * carried in. Returns the map to install; neither input is modified.
+ */
+export function restoreCooldownsPreservingUnstuck(
+  live: ReadonlyMap<string, number>,
+  carriedIn: ReadonlyMap<string, number>,
+): Map<string, number> {
+  const restored = new Map(carriedIn);
+  for (const [id, remaining] of live) {
+    if (!isUnstuckSystemCooldown(id) || remaining <= 0) continue;
+    restored.set(id, Math.max(remaining, restored.get(id) ?? 0));
+  }
+  return restored;
+}

@@ -102,6 +102,9 @@ describe('unstuck feedback', () => {
       clearBanner: true,
     });
     // No debuff landed, so the text must not claim one; it warns about the repeat instead.
+    // (The positive control: the charged copy really does carry the phrase being excluded.)
+    expect(t('hudChrome.unstuck.movedToGraveyard')).toContain('weighs on you');
+    expect(t('hudChrome.unstuck.revivedAtGraveyardUnstuck')).toContain('weighs on you');
     expect(t(moved.key)).not.toContain('weighs on you');
     expect(t(moved.key)).toContain('within the hour');
     expect(t(moved.key)).toContain('Unstuck Sickness');

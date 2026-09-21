@@ -71,7 +71,12 @@ import {
 import { addThreat } from '../src/sim/threat';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
 import { UNSTUCK_COUNTDOWN_SECONDS } from '../src/sim/unstuck';
-import { markUnstuckCompleted } from '../src/sim/unstuck_cooldown';
+import {
+  markUnstuckCompleted,
+  UNSTUCK_COOLDOWN_ID,
+  UNSTUCK_RECENT_ID,
+  UNSTUCK_SICKNESS_WINDOW_SECONDS,
+} from '../src/sim/unstuck_cooldown';
 import { groundHeight } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -1529,6 +1534,77 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     // The first Unstuck in an hour is free in a battleground exactly as in the overworld.
     expect(completed?.sickness).toBe(false);
     expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(false);
+  });
+
+  it('keeps the sickness window and cooldown opened inside the match on the way home', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = forceIntoBgWallTrap(sim, match, pid);
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) sim.tick();
+    expect(e.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(UNSTUCK_SICKNESS_WINDOW_SECONDS);
+
+    // The match is a parenthesis for everything else (pools come back as carried in), but
+    // the two hidden /unstuck timers are the one thing it must not swallow, or a recovery
+    // inside a battleground would hand out a second free use in the overworld.
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick(); // run out the hold
+    expect(sim.bgMatchFor(pid)).toBeNull();
+    expect(isBgPos(e.pos.x)).toBe(false);
+    const window = must(e.cooldowns.get(UNSTUCK_RECENT_ID), 'window marker after the match');
+    expect(window).toBeGreaterThan(0);
+    expect(window).toBeLessThanOrEqual(UNSTUCK_SICKNESS_WINDOW_SECONDS);
+    expect(must(e.cooldowns.get(UNSTUCK_COOLDOWN_ID), 'retry cooldown')).toBeGreaterThan(0);
+  });
+
+  it('moves a dead body without charging it, and says so', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = must(sim.entities.get(pid), 'entity');
+    const meta = must(sim.meta(pid), 'meta');
+    // A dead, unreleased body is the one dead state the battleground gate lets through
+    // (a ghost is refused as competitive). Emulate the frozen corpse directly: the wave
+    // clock would otherwise raise it mid-countdown, which is a different contract.
+    e.dead = true;
+    e.ghost = false;
+    e.hp = 0;
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.inCombat = false;
+    e.combatTimer = 999;
+    // A repeat inside the window: the arm where a charge is owed but cannot land, since a
+    // body is only moved (the battleground revives by wave, never here).
+    markUnstuckCompleted(e.cooldowns);
+    e.cooldowns.set(UNSTUCK_RECENT_ID, 40);
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const pending = must(meta.pendingUnstuck, 'pending unstuck');
+    expect(pending.startedDead).toBe(true);
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20 && meta.pendingUnstuck; i++) {
+      events.push(...sim.tick());
+    }
+    const completed = events.find(
+      (event): event is Extract<SimEvent, { type: 'unstuck'; phase: 'completed' }> =>
+        event.type === 'unstuck' && event.phase === 'completed' && event.pid === pid,
+    );
+
+    expect(completed?.reason).toBe('moved_to_graveyard');
+    // The event reports what landed, not what was owed.
+    expect(completed?.sickness).toBe(false);
+    expect(e.dead).toBe(true);
+    expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(false);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    // Still a completion: the window re-opens in full so the next use is a repeat.
+    expect(e.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(UNSTUCK_SICKNESS_WINDOW_SECONDS);
   });
 
   it('refuses Unstuck for an alive flag carrier before the completion teleport can run', () => {
