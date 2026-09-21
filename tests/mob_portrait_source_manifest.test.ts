@@ -96,8 +96,10 @@ describe('mob portrait source manifest', () => {
     // its own rendered portrait.
     // 254: plus the world quest branch's Fenbridge infiltrator and its three
     // regional freight caravans (Eastbrook, Willowfen, Frostveil). The Hoard
-    // Healing Tide Totem is the 255th live target portrait.
-    expect(liveIds).toHaveLength(255);
+    // Healing Tide Totem is the 255th live target portrait; the Buried Hoard
+    // mechanics add six attackable bodies (brood egg and hatchling, bound pulsar,
+    // Maw tentacle, silk and brood cocoons).
+    expect(liveIds).toHaveLength(261);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
