@@ -151,7 +151,7 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
       1,
       'rgba16f',
       composerSamples,
-      scenePass === 'render' ? 'depth32ui-texture' : 'none',
+      scenePass === 'render' ? 'depth-renderbuffer' : 'none',
     ),
   ];
   if (!singleComposerBuffer) {
@@ -161,7 +161,7 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
         1,
         'rgba16f',
         composerSamples,
-        scenePass === 'render' ? 'depth32ui-texture' : 'none',
+        scenePass === 'render' ? 'depth-renderbuffer' : 'none',
       ),
     );
   }
@@ -191,6 +191,16 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
       stage('n8ao-denoise-1', aoScale, ['n8ao-ao-b', aoDepth], 'n8ao-ao-a'),
       stage('n8ao-composite', 1, ['n8ao-beauty', 'n8ao-beauty-depth', 'n8ao-ao-a'], sceneTarget),
     );
+  }
+
+  // The opaque-scene copy the ability VFX sample (scene_sampling.ts). It exists
+  // ONLY where the scene pass already rasterizes into a sampled depth texture,
+  // which is the n8ao beauty target and so high and above. The grade-only chain
+  // (medium, the mobile target) keeps its depth renderbuffer and allocates
+  // neither this target nor a depth texture; its consumers fall back unsampled
+  // exactly as they do on low, where there is no composer at all.
+  if (useAo) {
+    renderTargets.push(target('vfx-opaque-copy', 1, 'rgba16f', 0, 'depth32ui-texture'));
   }
 
   if (useBloom) {
@@ -261,10 +271,7 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
     supportsDynamicResolution,
     composerSamples,
     resolveCount: composerSamples > 0 ? 1 + Number(useScreenFx) + Number(useSmaa) : 0,
-    renderTargets: [
-      ...renderTargets,
-      target('vfx-opaque-copy', 1, 'rgba16f', 0, 'depth32ui-texture'),
-    ],
+    renderTargets,
     fullscreenStages,
   };
 }

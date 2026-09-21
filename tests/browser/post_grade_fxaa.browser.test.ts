@@ -19,14 +19,12 @@ const gfxSettings = vi.hoisted(() => ({
   fxaa: true,
 }));
 
-vi.mock('../../src/render/gfx', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../src/render/gfx')>();
-  return {
-    ...actual,
-    GFX: gfxSettings,
-    sharedUniforms: { ...actual.sharedUniforms, uTime: { value: 0 } },
-  };
-});
+vi.mock('../../src/render/gfx', () => ({
+  GFX: gfxSettings,
+  sharedUniforms: {
+    uTime: { value: 0 },
+  },
+}));
 
 vi.mock('../../src/render/render_dev_flags', () => ({
   renderLayerDisabled: () => false,

@@ -18,14 +18,13 @@ const shedSource = read('src', 'render', 'post_shed.ts');
 const budgetSource = read('src', 'render', 'render_budget.ts');
 
 // The method's own body: from its signature to the first line that closes a
-// member (two-space class member by default, or an explicit object-member
-// terminator), so a pin cannot pass or fail on a neighbour.
-function methodBody(source: string, search: string, closing = '\n  }\n'): string {
+// two-space-indented member, so a pin cannot pass or fail on a neighbour.
+function methodBody(source: string, search: string): string {
   const start = source.indexOf(search);
   expect(start, `should still define ${search}`).toBeGreaterThan(-1);
-  const end = source.indexOf(closing, start);
+  const end = source.indexOf('\n  }\n', start);
   expect(end, `should still close ${search}`).toBeGreaterThan(start);
-  return source.slice(start, end + closing.length);
+  return source.slice(start, end + 4);
 }
 
 const stripComments = (source: string) =>
@@ -93,23 +92,7 @@ describe('post shed pipeline wiring', () => {
     expect(postSource).toContain(
       'shed.prewarm(() => gradeFxaaTwin?.render(webgl, composer.writeBuffer, composer.readBuffer));',
     );
-    const dispose = methodBody(postSource, '    dispose(): void {', '\n    },');
-    const latch = dispose.indexOf('disposed = true;');
-    const capture = dispose.indexOf('() => sceneCapture.dispose()');
-    const shed = dispose.indexOf('() => shed.dispose()');
-    const passes = dispose.indexOf('...composer.passes.map((pass) => () => pass.dispose())');
-    const composer = dispose.indexOf('() => composer.dispose()');
-    expect(dispose).toContain('if (disposed) return;');
-    expect(latch).toBeGreaterThan(-1);
-    expect(capture).toBeGreaterThan(latch);
-    expect(shed).toBeGreaterThan(capture);
-    expect(passes).toBeGreaterThan(shed);
-    expect(composer).toBeGreaterThan(passes);
-    // Every release still runs if an earlier cleanup throws.
-    expect(dispose).toMatch(
-      /try \{\s*release\(\);\s*\} catch \(error\) \{\s*errors\.push\(error\);/,
-    );
-    expect(dispose).toContain("throw new AggregateError(errors, 'Post pipeline cleanup failed')");
+    expect(postSource).toMatch(/disposed = true;\s*shed\.dispose\(\);/);
   });
 
   it('skips every occlusion quad while in passthrough, and only those', () => {

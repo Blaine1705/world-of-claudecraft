@@ -1,12 +1,17 @@
 import * as THREE from 'three';
-import { SUN_DIR } from './gfx';
 
-/** One scene-owned uniform service. Copies opaque attachments before transparent
- * draws, never samples the attachment currently being written. Direct output
- * deliberately retains the material's unsampled fallback. */
+/** One scene-owned uniform service. The capture below copies the opaque colour
+ * and depth out of the framebuffer bound at that moment into its own pair, and
+ * rebinds that framebuffer immediately; consumers therefore sample the COPY and
+ * never the attachment the frame is still writing. Direct output (no composer
+ * chain) deliberately retains the material's unsampled fallback. */
 class SceneSamples {
   readonly uniforms = {
-    uSunWorld: { value: SUN_DIR.clone() },
+    // The world's default sun direction, a placeholder only: renderer.ts
+    // overwrites this uniform from the live sun every frame through
+    // sceneKeyLightUniform. A plain vector keeps this module a host-agnostic
+    // leaf with no graphics-tier dependency.
+    uSunWorld: { value: new THREE.Vector3(90, 62, 50).normalize() },
     uOpaqueColor: { value: null as THREE.Texture | null },
     uOpaqueDepth: { value: null as THREE.Texture | null },
     uSceneReady: { value: 0 },
@@ -63,12 +68,17 @@ vec3 sceneRefract(vec3 colour,vec2 offset,float viewDepth,float amount){
   return mix(colour,texture2D(uOpaqueColor,shifted).rgb,amount);
 }`;
 
+/**
+ * Copies the opaque colour and depth of the frame into a scene-owned pair the
+ * ability VFX sample. Built ONLY on a chain whose scene pass already writes a
+ * sampled depth texture (the n8ao beauty target, high and above); post.ts does
+ * not construct it anywhere else, and its consumers then fall back unsampled
+ * exactly as they do on low.
+ */
 export class OpaqueSceneCapture {
   private readonly service: SceneSamples;
-  private target: THREE.WebGLRenderTarget | null = null;
-  private initialized = false;
-  private width: number;
-  private height: number;
+  private readonly target: THREE.WebGLRenderTarget;
+  private readonly depth: THREE.DepthTexture;
   private readonly group = new THREE.Group();
   private readonly sentinel: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   private disposed = false;
@@ -79,8 +89,20 @@ export class OpaqueSceneCapture {
     height: number,
   ) {
     this.service = samples(scene);
-    this.width = width;
-    this.height = height;
+    // Allocated and initialized HERE, at composer build time, never inside a
+    // draw: a first warrior contact mid-fight must not pay an FBO plus a
+    // full-resolution colour and depth allocation in a live frame.
+    this.depth = new THREE.DepthTexture(width, height, THREE.UnsignedIntType);
+    this.depth.name = 'vfxOpaqueDepth';
+    this.target = new THREE.WebGLRenderTarget(width, height, {
+      type: THREE.HalfFloatType,
+      depthTexture: this.depth,
+      samples: 0,
+    });
+    this.target.texture.name = 'vfxOpaqueColour';
+    renderer.initRenderTarget(this.target);
+    this.service.uniforms.uOpaqueColor.value = this.target.texture;
+    this.service.uniforms.uOpaqueDepth.value = this.depth;
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0], 3));
     geometry.setDrawRange(0, 0);
@@ -105,16 +127,17 @@ export class OpaqueSceneCapture {
   begin(): void {
     this.service.uniforms.uSceneReady.value = 0;
   }
+  /** Driven from post.ts's own resize path, which owns target sizing. The
+   *  reallocation happens here, outside any draw, for the same reason the
+   *  first one does. */
   setSize(width: number, height: number): void {
     if (this.disposed) return;
     this.begin();
-    if (this.width === width && this.height === height) return;
-    this.width = width;
-    this.height = height;
-    if (this.target) {
-      this.target.setSize(width, height);
-      this.initialized = false;
-    }
+    if (this.target.width === width && this.target.height === height) return;
+    // setSize drops the framebuffer; initRenderTarget rebuilds it (and resizes
+    // the depth attachment) now rather than at the next draw.
+    this.target.setSize(width, height);
+    this.renderer.initRenderTarget(this.target);
   }
   private capture(camera: THREE.Camera): void {
     this.begin();
@@ -134,8 +157,8 @@ export class OpaqueSceneCapture {
     if (
       !source?.depthTexture ||
       source.samples !== 0 ||
-      source.width !== this.width ||
-      source.height !== this.height
+      source.width !== this.target.width ||
+      source.height !== this.target.height
     )
       return;
     const perspective = camera as THREE.PerspectiveCamera;
@@ -148,35 +171,15 @@ export class OpaqueSceneCapture {
       source.viewport.z / source.width,
       source.viewport.w / source.height,
     );
+    // copyTextureToTexture binds its own framebuffer, so the source the frame
+    // is mid-way through writing is rebound before the draw resumes.
     try {
-      const target = this.prepareTarget();
-      this.renderer.copyTextureToTexture(source.texture, target.texture);
-      this.renderer.copyTextureToTexture(source.depthTexture, target.depthTexture!);
+      this.renderer.copyTextureToTexture(source.texture, this.target.texture);
+      this.renderer.copyTextureToTexture(source.depthTexture, this.depth);
       u.uSceneReady.value = 1;
     } finally {
       this.renderer.setRenderTarget(source);
     }
-  }
-  /** Allocate the full-resolution attachments only for an actual eligible draw.
-   * No consumers, hidden pools, direct output and invalid sources remain free of
-   * capture targets. Resizes defer GPU reallocation until the next such draw. */
-  private prepareTarget(): THREE.WebGLRenderTarget {
-    if (!this.target) {
-      this.target = new THREE.WebGLRenderTarget(this.width, this.height, {
-        type: THREE.HalfFloatType,
-        depthTexture: new THREE.DepthTexture(this.width, this.height, THREE.UnsignedIntType),
-        samples: 0,
-      });
-      this.target.texture.name = 'vfxOpaqueColour';
-      this.target.depthTexture!.name = 'vfxOpaqueDepth';
-    }
-    if (!this.initialized) {
-      this.renderer.initRenderTarget(this.target);
-      this.initialized = true;
-      this.service.uniforms.uOpaqueColor.value = this.target.texture;
-      this.service.uniforms.uOpaqueDepth.value = this.target.depthTexture;
-    }
-    return this.target;
   }
   dispose(): void {
     if (this.disposed) return;
@@ -190,7 +193,7 @@ export class OpaqueSceneCapture {
       () => this.group.removeFromParent(),
       () => this.sentinel.geometry.dispose(),
       () => this.sentinel.material.dispose(),
-      () => this.target?.dispose(),
+      () => this.target.dispose(),
     ]) {
       try {
         release();
@@ -198,8 +201,6 @@ export class OpaqueSceneCapture {
         errors.push(error);
       }
     }
-    this.target = null;
-    this.initialized = false;
     if (errors.length) throw new AggregateError(errors, 'Opaque scene capture cleanup failed');
   }
 }
