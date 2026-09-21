@@ -1,3 +1,5 @@
+// Warrior release-44 renderer integration: reminted runtime provenance through
+// the owning script. Eastbrook geometry, assets and original captures unchanged.
 import { describe, expect, it } from 'vitest';
 import { isBlocked, resolvePosition } from '../src/sim/colliders';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
@@ -688,7 +690,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  'd872e91fef162b388fd9e35249a01b6b07a299595e9e2ae8b880ef95da810edd';
+  'd85f5d6f84948635bf78a733a27e9be7b4232cd1f61e2015ab70591b2f2eff4c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

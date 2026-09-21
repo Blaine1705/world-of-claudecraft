@@ -66,8 +66,10 @@ describe('renderer CPU hot path', () => {
   it('manually updates the camera once on ordinary frames', () => {
     expect(renderer).toContain('this.camera.matrixWorldAutoUpdate = false');
     expect(renderer).toContain(
-      'if (shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera)',
+      'if (warriorShifted || shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera)',
     );
+    expect(renderer).toContain('const warriorShifted = this.warriorCameraImpact.beginDraw(');
+    expect(renderer).toContain('this.warriorCameraImpact.endDraw(this.camera);');
   });
 
   it('preserves completed submit and total timings through the reused frame-start buffers', () => {

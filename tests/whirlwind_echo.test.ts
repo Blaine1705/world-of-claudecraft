@@ -7,11 +7,12 @@
 // interaction the payload never covered.
 import { describe, expect, it } from 'vitest';
 import { AOE_ECHO_MULT } from '../src/sim/combat/area_echo';
+import { RED_HARVEST_IMPACT_DELAY } from '../src/sim/combat/warrior_harvest';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import { type Aura, DT, type Entity, type SimEvent } from '../src/sim/types';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
 
 // Bladed Echo (operator design): casting Bladed Gyre (whirlwind, the fury AoE)
@@ -167,6 +168,16 @@ describe('single-target casts echo onto enemies near the target', () => {
     expect(echoAura(p)?.charges).toBe(2);
 
     const events = recast(sim, p, 'red_harvest');
+    // The paid opening cannot consume Bladed Echo before the authored impact.
+    expect(hitsOn(events, 'Red Harvest', primary.id)).toEqual([]);
+    expect(hitsOn(events, 'Red Harvest', near.id)).toEqual([]);
+    expect(echoAura(p)?.charges).toBe(2);
+    for (let tick = 1; tick < Math.round(RED_HARVEST_IMPACT_DELAY / DT); tick++) {
+      events.push(...sim.tick());
+    }
+    expect(hitsOn(events, 'Red Harvest', primary.id)).toEqual([]);
+    expect(echoAura(p)?.charges).toBe(2);
+    events.push(...sim.tick());
     const primaryHits = hitsOn(events, 'Red Harvest', primary.id);
     expect(primaryHits).toHaveLength(3);
     // Each strike echoes its own resolved amount at the echo fraction, in order.

@@ -57,7 +57,7 @@ export function animateWarriorRage(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
         totalEmissiveRadiance*=.18+rageTip*.62;
-        totalEmissiveRadiance+=vec3(1.,.028,.045)*rageDensity*pow(rageTip,2.)*.35;`,
+        totalEmissiveRadiance+=vec3(1.,.028,.045)*rageDensity*pow(max(rageTip,0.),2.)*.35;`,
       );
   };
   material.customProgramCacheKey = () => `${cacheKey()}|warrior-rage-flame-v4`;

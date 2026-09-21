@@ -979,10 +979,14 @@ describe('the far-bake compile gate handed to character visuals', () => {
       'utf8',
     );
     // ...and one crowd bake links at a time: the gate is enqueued on the
-    // renderer's SerialGateLane, the caller's settle riding the lane's.
+    // renderer's SerialGateLane. The settle reports proven readiness to the
+    // caller, so a failed link cannot hide the articulated stand-in.
     expect(rendererSource).toContain(
       'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
-        '    this.farBakeLane.enqueue((settled) => this.gateSwapFlagOnCompile(target, settled), onSettled);',
+        '    this.farBakeLane.enqueue(\n' +
+        '      (settled) => this.gateSwapFlagOnCompile(target, settled),\n' +
+        '      () => onSettled(compileTargetPrepared(this.webgl.properties, target)),\n' +
+        '    );',
     );
     expect(rendererSource).toContain('private readonly farBakeLane = new SerialGateLane();');
     // Both live build paths install it: fresh builds and pool re-acquires.

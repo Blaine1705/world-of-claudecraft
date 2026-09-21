@@ -28,28 +28,57 @@ describe('winning Warrior attack animation routing', () => {
       dualwield: 'Dualwield_Melee_Attack_Chop',
     });
     expect(VISUALS.player_warrior.clips.attackByAbility).toMatchObject({
-      mortal_strike: '2H_Melee_Attack_Chop',
-      execute: '2H_Melee_Attack_Chop',
-      slam: '2H_Melee_Attack_Chop',
-      red_harvest: '2H_Melee_Attack_Chop',
-      breachmaker: '2H_Melee_Attack_Chop',
-      // Shieldcrack drives the offhand SHIELD arm (synthesized clip,
-      // scripts/_add_shield_bash_anim.mjs), never a sword chop.
-      shield_slam: 'Shield_Bash',
-      raging_gale: 'Dualwield_Melee_Attack_Chop',
-      bloodthirst: 'Dualwield_Melee_Attack_Chop',
-      // The two frontal-arc AoE strikes reap sideways (synthesized clip,
-      // scripts/_add_sweep_slice_anim.mjs), never the top-to-bottom chop.
-      cleave: '1H_Melee_Attack_Slice_Horizontal',
-      revenge: '1H_Melee_Attack_Slice_Horizontal',
-      thunder_clap: '1H_Melee_Attack_Chop',
-      faultline: '1H_Melee_Attack_Chop',
-      heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
-      overpower: '1H_Melee_Attack_Slice_Diagonal',
-      hamstring: '1H_Melee_Attack_Slice_Diagonal',
-      sanguine_aura: 'Spellcast_Raise',
-      raised_guard: 'Block',
+      mortal_strike: 'Warrior_Maiming_Strike',
+      execute: 'Warrior_Early_Grave',
+      slam: 'Warrior_Brute_Swing',
+      red_harvest: 'Fury_Red_Harvest',
+      breachmaker: 'Warrior_Breachmaker',
+      // Shieldcrack retains its offhand shield drive in the authored donor.
+      shield_slam: 'Warrior_Shieldcrack',
+      raging_gale: 'Fury_Twinstrike',
+      bloodthirst: 'Warrior_Bloodletting',
+      // Reaping Arc turns through the area; Revenge stays a frontal sweep.
+      cleave: 'Warrior_Reaping_Arc',
+      revenge: 'Warrior_Revenge',
+      thunder_clap: 'Warrior_Quaking_Blow',
+      faultline: 'Warrior_Faultline',
+      heroic_strike: 'Warrior_Reaver_Strike',
+      overpower: 'Warrior_Redhand',
+      hamstring: 'Warrior_Hobbling_Cut',
+      sanguine_aura: 'Warrior_Sanguine_Aura',
+      raised_guard: 'Warrior_Raised_Guard',
+      storm_bolt: 'Warrior_Storm_Bolt',
+      pummel: 'Warrior_Jawcrack',
+      avatar: 'Warrior_Avatar',
+      whirlwind: 'Warrior_Bladed_Gyre',
     });
+  });
+
+  it('resolves every authored Warrior gesture from its shipped donors on fixed and modular bodies', () => {
+    for (const key of ['player_warrior', 'player_warrior_modular']) {
+      const def = VISUALS[key];
+      const names = new Set<string>();
+      for (const url of [def.url, ...(def.animUrls ?? [])]) {
+        const bytes = readFileSync(`public/${url}`);
+        const doc = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString('utf8'));
+        for (const animation of doc.animations ?? []) names.add(animation.name);
+      }
+      for (const [id, name] of Object.entries(def.clips.attackByAbility ?? {})) {
+        expect(names.has(name), `${key}: ${id} must bind its shipped clip ${name}`).toBe(true);
+      }
+      const channel = def.clips.castByAbility?.bladestorm;
+      expect(channel).toBe('Warrior_Bladestorm_Loop');
+      expect(names.has(channel ?? '')).toBe(true);
+    }
+  });
+
+  it('does not route another class through Warrior-only authored clips', () => {
+    for (const [key, def] of Object.entries(VISUALS)) {
+      if (!key.startsWith('player_') || key.startsWith('player_warrior')) continue;
+      for (const name of Object.values(def.clips.attackByAbility ?? {})) {
+        expect(/^(Warrior_|Fury_)/.test(name), `${key}: ${name}`).toBe(false);
+      }
+    }
   });
 
   it('routes Final Edict to its dedicated one-handed Templar verdict clip at authored speed', () => {

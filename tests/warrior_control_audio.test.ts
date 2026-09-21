@@ -96,8 +96,8 @@ it('storm_bolt projectile with ready source claims original event and suppresses
   expect(furyAudioClaimed(event)).toBe(true);
   // Shared cue function yields null: no melee_bow double-fire.
   expect(spellFxCue(event)).toBeNull();
-  // Last arg to sequenceBolt is the hammerAudio flag.
-  expect(sequenceBolt.mock.calls[0]?.at(-1)).toBe(true);
+  // The optional tenth argument is the hammerAudio flag.
+  expect(sequenceBolt.mock.calls[0]?.[9]).toBe(true);
   expect(fx.abilityAudio).toHaveBeenCalledExactlyOnceWith(
     'release',
     'physical',
@@ -144,7 +144,9 @@ it('storm_bolt projectile cold (audioReady false) stays unclaimed and preserves 
   expect(furyAudioClaimed(event)).toBe(false);
   // Generic projectile cue is preserved when authored audio is unavailable.
   expect(spellFxCue(event)).toEqual({ key: 'melee_bow', anchorId: source.id });
-  expect(sequenceBolt.mock.calls[0]?.at(-1)).toBe(false);
+  // Omitted optional audio flag defaults to false in the real entry point.
+  expect(sequenceBolt.mock.calls[0]).toHaveLength(9);
+  expect(sequenceBolt.mock.calls[0]?.[9]).toBeUndefined();
   expect(fx.abilityAudio).not.toHaveBeenCalled();
 });
 
@@ -182,7 +184,9 @@ it('storm_bolt projectile missing source anchor stays unclaimed and preserves me
 
   expect(furyAudioClaimed(event)).toBe(false);
   expect(spellFxCue(event)).toEqual({ key: 'melee_bow', anchorId: source.id });
-  expect(sequenceBolt.mock.calls[0]?.at(-1)).toBe(false);
+  // Omitted optional audio flag defaults to false in the real entry point.
+  expect(sequenceBolt.mock.calls[0]).toHaveLength(9);
+  expect(sequenceBolt.mock.calls[0]?.[9]).toBeUndefined();
   expect(fx.abilityAudio).not.toHaveBeenCalled();
 });
 
@@ -244,7 +248,8 @@ it('storm_bolt positive damage: ready anchors claim event and play authored impa
   painter.onDamage(event);
 
   expect(furyAudioClaimed(event)).toBe(true);
-  expect(fx.pathRibbon).toHaveBeenCalledTimes(6);
+  // Six hammer-contact branches plus two asymmetric material exits.
+  expect(fx.pathRibbon).toHaveBeenCalledTimes(8);
   // Both shared cue functions short-circuit on the claim.
   expect(impactCueForDamage(event, target)).toBeNull();
   expect(playerSwingCueForDamage(event, source)).toBeNull();
@@ -292,7 +297,8 @@ it('storm_bolt damage cold: visible contact preserved, authored impact suppresse
   expect(furyAudioClaimed(event)).toBe(false);
   // drawWarriorHammerContact still ran: flipbook marks the visual contact.
   expect(fx.flipbookAt).toHaveBeenCalled();
-  expect(fx.pathRibbon).toHaveBeenCalledTimes(6);
+  // Six hammer-contact branches plus two asymmetric material exits.
+  expect(fx.pathRibbon).toHaveBeenCalledTimes(8);
   // playAudio=false path: the authored impact abilityAudio call is skipped.
   expect(sound.mock.calls.filter(([kind]) => kind === 'impact')).toHaveLength(0);
   // The shared cue is non-null, so the generic impact is available.
