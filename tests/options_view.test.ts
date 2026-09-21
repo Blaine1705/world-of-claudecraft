@@ -109,7 +109,7 @@ describe('options_view: control primitive dispatch (cluster 1)', () => {
 // native-shell gating preserved; the preset + interfaceMode choices re-render.
 // ---------------------------------------------------------------------------
 describe('options_view: graphics dispatch matrix (cluster 3)', () => {
-  it('stages exactly the twelve renderer-bound settings over the live projection', () => {
+  it('stages exactly the renderer-bound settings over the live projection', () => {
     expect(GRAPHICS_REBUILD_KEYS).toEqual([
       'graphicsPreset',
       'terrainDetail',
@@ -125,6 +125,7 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'characterDetail',
       'dynamicLights',
       'particleEffects',
+      'ghostFade',
     ]);
     const live = makeSource({ graphicsPreset: 2, terrainDetail: 0, renderScale: 0.75 });
     const draft = normalizeGraphicsSettingsSnapshot({ graphicsPreset: 5, terrainDetail: 2 });
@@ -176,6 +177,7 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'viewDistance',
       'waterQuality',
       'characterDetail',
+      'ghostFade',
       // Lighting & Effects card: the light and post passes.
       'effectsQuality',
       'shadowQuality',

@@ -1,5 +1,5 @@
-// PROTOTYPE, behind `?ghostfade=dither`: a camera-ghost fade that never flips
-// `transparent`.
+// The dithered camera ghost (GFX.ditheredGhostFade: the low and medium tiers,
+// and the Advanced "Camera Ghost" dial): a fade that never flips `transparent`.
 //
 // The shipped fade (occluder_fade.ts) turns a structure's materials transparent,
 // and three keys a second program on that flip, so every hideable material owns
@@ -13,6 +13,7 @@
 // program for good, faded or not, which takes early depth rejection away from
 // every hideable surface on GPUs that rely on it.
 import type * as THREE from 'three';
+import { GFX } from './gfx';
 
 const PROGRAM_CACHE_KEY = 'ghost-dither-fade-v1';
 const ANCHOR = '#include <clipping_planes_fragment>';
@@ -20,11 +21,16 @@ const UNIFORM_SLOT = 'ghostDitherFade';
 
 let enabled: boolean | null = null;
 
-/** Read once: the mode is a page-load choice, never a per-frame one. */
+/**
+ * Read once per page: the style is baked into each hideable material's program
+ * when its fade record is made, so it follows the graphics rebuild, never a
+ * frame. `?ghostfade=dither|blend` overrides the profile for an A/B.
+ */
 export function ditherFadeEnabled(): boolean {
   if (enabled === null) {
     const search = typeof location === 'undefined' ? '' : location.search;
-    enabled = new URLSearchParams(search).get('ghostfade') === 'dither';
+    const forced = new URLSearchParams(search).get('ghostfade');
+    enabled = forced === 'dither' ? true : forced === 'blend' ? false : GFX.ditheredGhostFade;
   }
   return enabled;
 }

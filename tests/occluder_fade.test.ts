@@ -1,8 +1,13 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { applyOccluderFade, occluderFadeMat } from '../src/render/occluder_fade';
 import { stepOccluderFade } from '../src/render/occluder_fade_core';
 import { buildOccluderFadeTwin } from '../src/render/occluder_fade_gate';
+
+// These suites pin the BLENDED arm (the transparent twin and its gate); the
+// dithered arm has its own suite, tests/occluder_dither_fade.test.ts.
+beforeEach(() => setDitherFadeEnabledForTest(false));
 
 describe('occluder fade material application', () => {
   it('drives the visible material to the literal ghost alpha and restores authored state', () => {
