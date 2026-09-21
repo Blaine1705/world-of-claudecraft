@@ -20280,6 +20280,7 @@ export const cs_CZ: EnTranslations = {
       "eastbrook_vale": {
         "name": "Eastbrookské údolí",
         "welcome": "Najdi ve městě maršála Redbrooka, má pro tebe práci.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20325,6 +20326,7 @@ export const cs_CZ: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefenský močál",
         "welcome": "Ohlas se u strážce Fenwicka u brány Fenbridge.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20355,6 +20357,7 @@ export const cs_CZ: EnTranslations = {
       "thornpeak_heights": {
         "name": "Thornpeakské výšiny",
         "welcome": "Kapitánka Thessaly drží zeď u Highwatche, ale sotva.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"

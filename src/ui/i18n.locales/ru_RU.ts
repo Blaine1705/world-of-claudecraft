@@ -5038,6 +5038,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.name': 'Истврукская долина',
   'entities.zones.eastbrook_vale.welcome':
     'Найдите в городе маршала Редбрука: у него есть для вас работа.',
+  'entities.zones.eastbrook_vale.welcomeDone': 'У маршала Редбрука больше нет для вас работы - уютному приморскому городку, где начался ваш путь, стало спокойнее благодаря этому.',
   'entities.zones.eastbrook_vale.pois.0.label': 'Истврук',
   'entities.zones.eastbrook_vale.pois.1.label': 'Волчья тропа',
   'entities.zones.eastbrook_vale.pois.2.label': 'Кабанья поляна',
@@ -5048,6 +5049,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': 'Павшая часовня',
   'entities.zones.mirefen_marsh.name': 'Мирефенская топь',
   'entities.zones.mirefen_marsh.welcome': 'Доложите стражу Фенвику у ворот Фенбриджа.',
+  'entities.zones.mirefen_marsh.welcomeDone': 'У стража Фенвика больше нет для вас приказов - поселению в глубине топких болот стало безопаснее благодаря этому.',
   'entities.zones.mirefen_marsh.pois.0.label': 'Фенбридж',
   'entities.zones.mirefen_marsh.pois.1.label': 'Камыши хищников',
   'entities.zones.mirefen_marsh.pois.2.label': 'Отмели Глубокой Топи',
@@ -5058,6 +5060,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.7.label': 'Затонувший бастион',
   'entities.zones.thornpeak_heights.name': 'Терновые высоты',
   'entities.zones.thornpeak_heights.welcome': 'Капитан Тессали едва удерживает стену Хайвотча.',
+  'entities.zones.thornpeak_heights.welcomeDone': 'Капитан Тессали удерживает стену Хайвотча - легко не бывает, но с помощью таких искателей приключений, как вы, теперь это по силам.',
   'entities.zones.thornpeak_heights.pois.0.label': 'Хайвотч',
   'entities.zones.thornpeak_heights.pois.1.label': 'Хребет охотника',
   'entities.zones.thornpeak_heights.pois.2.label': 'Норы Глубокоскалья',
