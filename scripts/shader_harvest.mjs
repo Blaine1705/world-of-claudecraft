@@ -18,7 +18,12 @@
 // STEP_IDS), --port <n> (default 5188), --out <dir>, --headed, --angle
 // <backend>, --quiet-ms <n> (a step is settled after that long without a new
 // link, default 2500), --max-settle-ms <n> (default 45000), --allow-dirty,
-// --recheck <dir> (re-run the static completeness check on a corpus on disk).
+// --recheck <dir> (re-run the static completeness check on a corpus on disk),
+// --live-programs (arm the client's perf diagnostics, ?perfTrace=1&perf, and
+// record every `live-program` event per tour step: a program that linked in a
+// live frame outside every compile gate, the defect the hook alone cannot see
+// because it cannot tell a held root from a drawn one. Off by default so the
+// corpus is harvested from a client in its production configuration).
 //
 // Output (tmp/shader-harvest-<id>/): corpus.json (programs, shaders, contexts,
 // provenance per profile), shaders/<hash>.<vert|frag>.glsl, report.md (programs
@@ -64,6 +69,7 @@ function parseArgs(argv) {
     maxSettleMs: 45_000,
     allowDirty: false,
     recheck: null,
+    livePrograms: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -78,6 +84,7 @@ function parseArgs(argv) {
     else if (a === '--max-settle-ms') args.maxSettleMs = Number(next());
     else if (a === '--allow-dirty') args.allowDirty = true;
     else if (a === '--recheck') args.recheck = next();
+    else if (a === '--live-programs') args.livePrograms = true;
     else throw new Error(`unknown flag ${a}`);
   }
   for (const step of args.steps) {
@@ -166,8 +173,27 @@ async function settle(page, args) {
   while (Date.now() < deadline) {
     const state = await page.evaluate(() => {
       const h = window.__shaderHarvest;
-      const queue = window.__game?.renderer?.perfStats?.().gpuQueue;
-      return { links: h.links, inflight: h.inflight, pending: queue?.pending ?? 0 };
+      const stats = window.__game?.renderer?.perfStats?.();
+      // The events ring is bounded, so new ones are lifted at every poll and
+      // tagged with the step that was running when they were first seen.
+      if (!h.liveSeen) h.liveSeen = new Set();
+      if (!h.live) h.live = [];
+      for (const e of stats?.gpuPrep?.events?.events ?? []) {
+        if (e.kind !== 'live-program') continue;
+        const id = `${e.key}|${e.atMs}`;
+        if (h.liveSeen.has(id)) continue;
+        h.liveSeen.add(id);
+        const program = (window.__game.renderer.webgl?.info?.programs ?? []).find(
+          (p) => p.cacheKey === e.key,
+        );
+        h.live.push({
+          step: h.step,
+          atMs: e.atMs,
+          name: program?.name ?? '',
+          key: String(e.key).slice(0, 160),
+        });
+      }
+      return { links: h.links, inflight: h.inflight, pending: stats?.gpuQueue?.pending ?? 0 };
     });
     const busy = state.links !== lastLinks || state.inflight > 0 || state.pending > 0;
     lastLinks = state.links;
@@ -404,7 +430,7 @@ async function harvestProfile(browser, args, profile, corpus, log) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e.message)));
   await page.evaluateOnNewDocument(installShaderHarvestHook);
-  const url = `http://localhost:${args.port}/?gfx=${profile}`;
+  const url = `http://localhost:${args.port}/?gfx=${profile}${args.livePrograms ? '&perfTrace=1&perf' : ''}`;
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60_000 });
   const booted = await enterOfflineGame(page, {
     charClass: 'warrior',
@@ -432,6 +458,7 @@ async function harvestProfile(browser, args, profile, corpus, log) {
     `[${profile}] fidelity: ${fidelity.matched} of ${fidelity.checked} world programs read back from the driver match a hooked link (${fidelity.unreadable} unreadable)`,
   );
   const drain = await page.evaluate(() => window.__shaderHarvest.drain());
+  const livePrograms = await page.evaluate(() => window.__shaderHarvest.live ?? []);
   const tier = await page.evaluate(async () => {
     const { GFX } = await import('/src/render/gfx.ts');
     return {
@@ -450,6 +477,7 @@ async function harvestProfile(browser, args, profile, corpus, log) {
     unique: drain.programs.length,
     addedToCorpus: added,
     fidelity,
+    livePrograms,
     contexts: drain.contexts,
     pageErrors: errors.slice(0, 20),
   };
@@ -477,6 +505,7 @@ function authoredShaderSites() {
 }
 
 function renderReport(meta, corpus, runs, sites) {
+  const { seen, unseen, undetermined } = classifySites(corpus, sites);
   const lines = ['# Shader harvest report', ''];
   lines.push(`- commit ${meta.gitSha}${meta.dirty ? ' (dirty)' : ''}, ${meta.browser}`);
   lines.push(`- steps: ${meta.steps.join(', ')}`);
@@ -517,6 +546,24 @@ function renderReport(meta, corpus, runs, sites) {
       lines.push(
         `- ${r.profile} context ${c.id}: ${c.canvas}, created at ${c.createdAtStep}, ${c.extensions.length} extensions`,
       );
+    }
+  }
+  if (meta.livePrograms) {
+    lines.push('', '## Programs linked in a live frame, outside every gate', '');
+    lines.push('| profile | step | programs | names |', '|---|---|---|---|');
+    for (const r of runs) {
+      const bySteps = new Map();
+      for (const e of r.livePrograms ?? []) {
+        const list = bySteps.get(e.step) ?? [];
+        list.push(e.name || '(unnamed)');
+        bySteps.set(e.step, list);
+      }
+      for (const [step, names] of bySteps) {
+        lines.push(
+          `| ${r.profile} | ${step} | ${names.length} | ${[...new Set(names)].slice(0, 8).join(', ')} |`,
+        );
+      }
+      if (!bySteps.size) lines.push(`| ${r.profile} | (none) | 0 | |`);
     }
   }
   lines.push('', `## Authored shader files never met (${unseen.length})`, '');
@@ -601,6 +648,7 @@ async function main() {
       browser: await browser.version().catch(() => 'unknown'),
       createdAt: new Date().toISOString(),
       steps: args.steps,
+      livePrograms: args.livePrograms,
       runs,
     };
     for (const shader of corpus.shaders.values()) {
