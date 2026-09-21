@@ -1867,7 +1867,8 @@ export const nl_NL: EnTranslations = {
       "crossHotbarEditHelp": "Houd de linkerbumper vast en druk op de bovenste gezichtsknop om de balk met de controller te rangschikken."
     },
     "perf": {
-      "title": "Prestatie-overlay",
+      "title": "Performance",
+      "overlaySection": "Prestatie-overlay",
       "enable": "Prestatie-overlay tonen",
       "description": "Kies welke statistieken worden getoond, waar de overlay staat en hoe deze eruitziet.",
       "sectionPosition": "Positie",
@@ -2540,6 +2541,15 @@ export const nl_NL: EnTranslations = {
       "tooLarge": "Dat rapport is te groot om te versturen. Probeer het opnieuw zonder de schermafbeelding.",
       "rateLimited": "Je hebt onlangs meerdere rapporten verstuurd. Wacht even voordat je er nog een verstuurt.",
       "failed": "Kon het bugrapport niet versturen. Probeer het opnieuw."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "{item} afdoen",
@@ -9906,6 +9916,11 @@ export const nl_NL: EnTranslations = {
       "reload": "Opnieuw laden",
       "quit": "Afsluiten",
       "fatalBody": "World of ClaudeCraft is op een onverwachte fout gestuit en moet worden afgesloten."
+    },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
     },
     "titlebar": {
       "exitGame": "Spel afsluiten"

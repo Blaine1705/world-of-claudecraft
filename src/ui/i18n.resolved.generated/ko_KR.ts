@@ -1867,7 +1867,8 @@ export const ko_KR: EnTranslations = {
       "crossHotbarEditHelp": "왼쪽 범퍼를 누른 채 위쪽 페이스 버튼을 누르면 컨트롤러로 바를 정렬할 수 있습니다."
     },
     "perf": {
-      "title": "성능 오버레이",
+      "title": "성능",
+      "overlaySection": "성능 오버레이",
       "enable": "성능 오버레이 표시",
       "description": "표시할 통계, 오버레이 위치, 모양을 선택하세요.",
       "sectionPosition": "위치",
@@ -2540,6 +2541,15 @@ export const ko_KR: EnTranslations = {
       "tooLarge": "신고가 너무 커서 보낼 수 없습니다. 스크린샷 없이 다시 시도하세요.",
       "rateLimited": "최근에 여러 건의 신고를 보냈습니다. 잠시 후 다시 보내 주세요.",
       "failed": "버그 신고를 보낼 수 없습니다. 다시 시도해 주세요."
+    },
+    "hostDiag": {
+      "title": "시스템 보고서",
+      "intro": "프로세서와 메모리를 가장 많이 사용하는 프로그램을 포함한 이 컴퓨터의 세부 정보를 파일로 모아 성능 문제를 진단하는 데 도움을 줍니다. 전송되는 것은 없습니다. 파일은 사용자의 컴퓨터에만 남습니다.",
+      "create": "시스템 보고서 만들기",
+      "running": "시스템 정보를 수집하는 중...",
+      "saved": "보고서가 {fileName}(으)로 저장되었습니다.",
+      "savedNoName": "보고서가 저장되었습니다.",
+      "failed": "보고서를 만들지 못했습니다. 다시 시도해 주세요."
     },
     "paperdoll": {
       "unequipAria": "{item} 장착 해제",
@@ -9906,6 +9916,11 @@ export const ko_KR: EnTranslations = {
       "reload": "다시 불러오기",
       "quit": "종료",
       "fatalBody": "World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다."
+    },
+    "hostDiag": {
+      "saveTitle": "시스템 보고서 저장",
+      "saveButton": "저장",
+      "fileType": "JSON 파일"
     },
     "titlebar": {
       "exitGame": "게임 종료"

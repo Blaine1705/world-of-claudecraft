@@ -1660,7 +1660,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.notes.baseChance': '全ての冒険者が共有する5%の基本確率を含みます。',
   'hudChrome.statInfo.notes.dpsApprox':
     '推定値であり、クリティカルやアビリティによるダメージは含みません。',
-  'hudChrome.perf.title': 'パフォーマンスオーバーレイ',
+  'hudChrome.perf.title': 'パフォーマンス',
+  'hudChrome.perf.overlaySection': 'パフォーマンスオーバーレイ',
   'hudChrome.perf.enable': 'パフォーマンスオーバーレイを表示',
   'hudChrome.perf.description': '表示する統計、オーバーレイの位置、外観を設定します。',
   'hudChrome.perf.sectionPosition': '位置',
@@ -1739,6 +1740,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.rateLimited':
     '最近、報告を複数回送信しています。しばらく待ってから送信してください。',
   'hudChrome.bugReport.failed': 'バグ報告を送信できませんでした。もう一度お試しください。',
+  'hudChrome.hostDiag.title': 'システムレポート',
+  'hudChrome.hostDiag.intro':
+    'このコンピューターの詳細情報(プロセッサとメモリを最も多く使用しているプログラムを含む)をファイルにまとめ、パフォーマンスの問題の診断に役立てます。送信は一切行われません。ファイルはお使いのコンピューターに保存されるだけです。',
+  'hudChrome.hostDiag.create': 'システムレポートを作成',
+  'hudChrome.hostDiag.running': 'システム情報を収集しています...',
+  'hudChrome.hostDiag.saved': 'レポートを {fileName} として保存しました。',
+  'hudChrome.hostDiag.savedNoName': 'レポートを保存しました。',
+  'hudChrome.hostDiag.failed': 'レポートを作成できませんでした。もう一度お試しください。',
   'hudChrome.keybinds.emoteWheel': 'エモートホイール',
   'hudChrome.keybinds.sheathe': '武器を納刀/抜刀',
   'hudChrome.keybinds.hideInterface': 'インターフェースを隠す',
@@ -9252,6 +9261,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '再読み込み',
   'desktop.crash.quit': '終了',
   'desktop.titlebar.exitGame': 'ゲームを終了',
+  'desktop.hostDiag.saveTitle': 'システムレポートを保存',
+  'desktop.hostDiag.saveButton': '保存',
+  'desktop.hostDiag.fileType': 'JSON ファイル',
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',

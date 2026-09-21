@@ -1867,7 +1867,8 @@ export const id_ID: EnTranslations = {
       "crossHotbarEditHelp": "Pegang bemper kiri dan tekan tombol muka atas untuk mengatur palang dengan pengontrol."
     },
     "perf": {
-      "title": "Lapisan Performa",
+      "title": "Performance",
+      "overlaySection": "Lapisan Performa",
       "enable": "Tampilkan Hamparan Kinerja",
       "description": "Pilih statistik mana yang ditampilkan, di mana hamparan berada, dan tampilannya.",
       "sectionPosition": "Posisi",
@@ -2540,6 +2541,15 @@ export const id_ID: EnTranslations = {
       "tooLarge": "Laporan itu terlalu besar untuk dikirim. Coba lagi tanpa tangkapan layar.",
       "rateLimited": "Anda baru saja mengirim beberapa laporan. Tunggu sebentar sebelum mengirim lagi.",
       "failed": "Tidak dapat mengirim laporan bug. Silakan coba lagi."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Lepas {item}",
@@ -9906,6 +9916,11 @@ export const id_ID: EnTranslations = {
       "reload": "Muat Ulang",
       "quit": "Keluar",
       "fatalBody": "World of ClaudeCraft mengalami kesalahan tak terduga dan perlu ditutup."
+    },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
     },
     "titlebar": {
       "exitGame": "Keluar dari Gim"

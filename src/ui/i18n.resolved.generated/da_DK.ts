@@ -1867,7 +1867,8 @@ export const da_DK: EnTranslations = {
       "crossHotbarEditHelp": "Hold den venstre kofanger, og tryk på den øverste knap for at arrangere stangen med controlleren."
     },
     "perf": {
-      "title": "Ydelsesoverlay",
+      "title": "Performance",
+      "overlaySection": "Ydelsesoverlay",
       "enable": "Vis ydelsesoverlay",
       "description": "Vælg hvilke statistikker der skal vises, hvor overlayet sidder, og hvordan det ser ud.",
       "sectionPosition": "Position",
@@ -2540,6 +2541,15 @@ export const da_DK: EnTranslations = {
       "tooLarge": "Den rapport er for stor til at sende. Prøv igen uden skærmbilledet.",
       "rateLimited": "Du har sendt flere rapporter for nylig. Vent venligst lidt, før du sender en ny.",
       "failed": "Kunne ikke sende fejlrapporten. Prøv venligst igen."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Fjern {item}",
@@ -9906,6 +9916,11 @@ export const da_DK: EnTranslations = {
       "reload": "Genindlæs",
       "quit": "Afslut",
       "fatalBody": "World of ClaudeCraft stødte på en uventet fejl og skal lukke."
+    },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
     },
     "titlebar": {
       "exitGame": "Afslut spillet"

@@ -1867,7 +1867,8 @@ export const es: EnTranslations = {
       "crossHotbarEditHelp": "Sostenga el parachoques izquierdo y presione el botón de la cara superior para organizar la barra con el controlador."
     },
     "perf": {
-      "title": "Superposición de rendimiento",
+      "title": "Performance",
+      "overlaySection": "Superposición de rendimiento",
       "enable": "Mostrar superposición de rendimiento",
       "description": "Elige qué estadísticas mostrar, dónde se ubica la superposición y cómo se ve.",
       "sectionPosition": "Posición",
@@ -2540,6 +2541,15 @@ export const es: EnTranslations = {
       "tooLarge": "Ese reporte es demasiado grande para enviarlo. Inténtalo de nuevo sin la captura de pantalla.",
       "rateLimited": "Has enviado varios reportes hace poco. Espera un momento antes de enviar otro.",
       "failed": "No se pudo enviar el reporte de error. Inténtalo de nuevo."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Desequipar {item}",
@@ -9906,6 +9916,11 @@ export const es: EnTranslations = {
       "reload": "Recargar",
       "quit": "Salir",
       "fatalBody": "World of ClaudeCraft tuvo un error inesperado y debe cerrarse."
+    },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
     },
     "titlebar": {
       "exitGame": "Salir del juego"

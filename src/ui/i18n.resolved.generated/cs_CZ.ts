@@ -1867,7 +1867,8 @@ export const cs_CZ: EnTranslations = {
       "crossHotbarEditHelp": "Podržte levý nárazník a stiskněte tlačítko na horní straně pro uspořádání lišty s ovladačem."
     },
     "perf": {
-      "title": "Performance overlay",
+      "title": "Performance",
+      "overlaySection": "Performance overlay",
       "enable": "Zobrazit performance overlay",
       "description": "Vyber, které statistiky zobrazit, kde bude overlay umístěný a jak bude vypadat.",
       "sectionPosition": "Pozice",
@@ -2540,6 +2541,15 @@ export const cs_CZ: EnTranslations = {
       "tooLarge": "Toto hlášení je příliš velké k odeslání. Zkus to znovu bez snímku.",
       "rateLimited": "Nedávno jsi poslal(a) několik hlášení. Před dalším chvíli počkej.",
       "failed": "Hlášení chyby se nepodařilo odeslat. Zkus to prosím znovu."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Sundat {item}",
@@ -9906,6 +9916,11 @@ export const cs_CZ: EnTranslations = {
       "reload": "Načíst znovu",
       "quit": "Ukončit",
       "fatalBody": "World of ClaudeCraft narazil na neočekávanou chybu a musí se zavřít."
+    },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
     },
     "titlebar": {
       "exitGame": "Ukončit hru"

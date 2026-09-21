@@ -1366,6 +1366,21 @@ describe('options_view: main menu routing', () => {
     }
   });
 
+  it('carries NO System Report row: it is a section inside the Performance view', () => {
+    // The owner's decision: the feature was a whole menu row and a whole
+    // sub-panel, which was more room than it deserves. Performance is followed
+    // straight by the transfer row on every host, with nothing between them.
+    const rows = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
+    expect(rows.some((e) => e.labelKey === 'hudChrome.hostDiag.title')).toBe(false);
+    expect(rows.some((e) => e.action.kind === 'goto' && e.action.view === 'performance')).toBe(
+      true,
+    );
+    const perfAt = rows.findIndex((e) => e.labelKey === 'hudChrome.perf.title');
+    expect(rows[perfAt + 1]?.labelKey, 'nothing sits between them now').toBe(
+      'hudChrome.fullTransfer.menu',
+    );
+  });
+
   it('adds the online-only Report a Bug row when bug reporting is available', () => {
     const online = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
     const bug = online.find((e) => e.labelKey === 'hudChrome.bugReport.menuButton');

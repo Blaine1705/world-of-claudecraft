@@ -9343,7 +9343,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Jade',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Kleurgecodeerde waarschuwingen',
-  'hudChrome.perf.title': 'Prestatie-overlay',
+  'hudChrome.perf.overlaySection': 'Prestatie-overlay',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',

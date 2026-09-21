@@ -1867,7 +1867,8 @@ export const pl_PL: EnTranslations = {
       "crossHotbarEditHelp": "Przytrzymaj lewy zderzak i wciśnij górny przycisk na twarzy, aby ułożyć drążek z kontrolerem."
     },
     "perf": {
-      "title": "Nakładka wydajności",
+      "title": "Performance",
+      "overlaySection": "Nakładka wydajności",
       "enable": "Pokaż nakładkę wydajności",
       "description": "Wybierz, które statystyki pokazać, gdzie umieścić nakładkę i jak ma wyglądać.",
       "sectionPosition": "Pozycja",
@@ -2540,6 +2541,15 @@ export const pl_PL: EnTranslations = {
       "tooLarge": "To zgłoszenie jest zbyt duże, aby je wysłać. Spróbuj ponownie bez zrzutu ekranu.",
       "rateLimited": "Wysłałeś ostatnio kilka zgłoszeń. Odczekaj chwilę przed wysłaniem kolejnego.",
       "failed": "Nie udało się wysłać zgłoszenia błędu. Spróbuj ponownie."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Zdejmij {item}",
@@ -9906,6 +9916,11 @@ export const pl_PL: EnTranslations = {
       "reload": "Załaduj ponownie",
       "quit": "Zakończ",
       "fatalBody": "World of ClaudeCraft napotkał nieoczekiwany błąd i musi się zamknąć."
+    },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
     },
     "titlebar": {
       "exitGame": "Zakończ grę"

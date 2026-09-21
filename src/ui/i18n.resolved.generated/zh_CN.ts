@@ -1867,7 +1867,8 @@ export const zh_CN: EnTranslations = {
       "crossHotbarEditHelp": "按住左肩键并按上方面键，即可用手柄整理十字热键栏。"
     },
     "perf": {
-      "title": "性能监视器",
+      "title": "性能",
+      "overlaySection": "性能监视器",
       "enable": "显示性能监视器",
       "description": "选择要显示的信息、监视器的位置及其外观。",
       "sectionPosition": "位置",
@@ -2540,6 +2541,15 @@ export const zh_CN: EnTranslations = {
       "tooLarge": "该报告过大，无法发送。请去掉截图后重试。",
       "rateLimited": "你最近已发送多份报告。请稍后再发送。",
       "failed": "无法发送错误报告。请重试。"
+    },
+    "hostDiag": {
+      "title": "系统报告",
+      "intro": "将这台电脑的详细信息(包括占用最多处理器和内存的程序)收集到一个文件中，帮助诊断性能问题。不会发送任何内容：该文件只保存在你的电脑上。",
+      "create": "生成系统报告",
+      "running": "正在收集系统信息...",
+      "saved": "报告已保存为 {fileName}。",
+      "savedNoName": "报告已保存。",
+      "failed": "无法创建报告。请重试。"
     },
     "paperdoll": {
       "unequipAria": "卸下 {item}",
@@ -9906,6 +9916,11 @@ export const zh_CN: EnTranslations = {
       "reload": "重新加载",
       "quit": "退出",
       "fatalBody": "World of ClaudeCraft 遇到意外错误，需要关闭。"
+    },
+    "hostDiag": {
+      "saveTitle": "保存系统报告",
+      "saveButton": "保存",
+      "fileType": "JSON 文件"
     },
     "titlebar": {
       "exitGame": "退出游戏"

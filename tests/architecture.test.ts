@@ -646,6 +646,9 @@ const UI_PURE_CORES = [
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
   'src/ui/hud/cross_hotbar/cross_hotbar_view.ts',
+  // The System Report section's phase machine and its result table: the whole
+  // shell-verdict-to-copy mapping, keys only, so the table is asserted as data.
+  'src/ui/host_diag_view.ts',
   'src/ui/dpad_nav_core.ts',
   'src/game/graphics_rebuild_core.ts',
   'src/game/presentation_gate.ts',
@@ -2512,6 +2515,11 @@ const UI_DOM_MODULES = [
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/options_window_shell.ts',
   'src/ui/options_interface_rows.ts',
+  // Options > Performance > System Report: mints its own nodes (createElement)
+  // and reads the desktop bridge for its availability gate. Decisions live in
+  // the registered pure core src/ui/host_diag_view.ts; this half is nodes, one
+  // click handler and a class.
+  'src/ui/host_diag_section_controller.ts',
   'src/ui/options_main_menu_controller.ts',
   'src/ui/hud/talking_head/talking_head_controller.ts',
   'src/ui/char_skin_window.ts',

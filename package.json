@@ -33,6 +33,7 @@
     "electron:build": "node scripts/electron-build.mjs build",
     "electron:build:steam": "node scripts/electron-build.mjs build steam",
     "electron:build:epic": "node scripts/electron-build.mjs build epic",
+    "host-diag:build": "node scripts/host_diag_build.mjs",
     "epic:bpt-upload": "node scripts/epic-bpt-upload.mjs",
     "preview": "vite preview",
     "format": "biome format --write .",
@@ -194,7 +195,16 @@
       "!dist/merch.html",
       "!dist/links.html",
       "!dist/CLAUDE.md",
-      "!dist/guide-stills/**"
+      "!dist/guide-stills/**",
+      "!electron/host_diag/win/**",
+      "!electron/host_diag/dist/HostDiag.ps1",
+      "!electron/host_diag/*.md"
+    ],
+    "extraResources": [
+      {
+        "from": "electron/host_diag/dist/HostDiag.ps1",
+        "to": "host-diag/HostDiag.ps1"
+      }
     ],
     "directories": {
       "buildResources": "build",

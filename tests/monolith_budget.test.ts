@@ -530,7 +530,13 @@ const MONOLITHS: MonolithRow[] = [
     // and the notes both carried moved to src/ui/options_text_values.ts (the
     // Frame Rate Limit row and its numeric status line arrived in the same
     // change). Exact count, zero slack.
-    ceiling: 2830,
+    // LOWERED 2830 -> 2821 when the bug report's server-message ladder moved
+    // to src/ui/bug_report_error_text.ts. System Report adds nothing here: it
+    // is a section of the Performance panel module
+    // (src/ui/host_diag_section_controller.ts over the pure
+    // src/ui/host_diag_view.ts), not a sub-view of this window. Exact count,
+    // zero slack.
+    ceiling: 2821,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
