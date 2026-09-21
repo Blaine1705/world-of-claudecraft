@@ -484,12 +484,16 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18291 -> 18289 at the PR 4100 review round: the Inspect look now
     // travels as an openInspect parameter (no InspectEntity cast dep), and
     // the target-of-target key reads targetPortraitKey. Exact count, zero slack.
-    // LOWERED 18289 -> 18279 at the release/v0.44.0 sync of the Pale Keeper
+    // LOWERED 18289 -> 18286 at the trade quantity prompt sync: the merge queue
+    // measured that branch at 18291 against this pin, so its tradeOfferHeadroom
+    // wrapper folded into the bags binding (the trade-open gate plus the pure
+    // core read on one dependency line). Exact count, zero slack.
+    // LOWERED 18286 -> 18276 at the release/v0.44.0 sync of the Pale Keeper
     // revive change: the Keeper dialog copy moved out to
     // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
     // per-frame healer-range scan (the Keeper is talked to). wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 18279,
+    ceiling: 18276,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

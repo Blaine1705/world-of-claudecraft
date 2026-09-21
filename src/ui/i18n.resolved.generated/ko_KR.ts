@@ -527,6 +527,15 @@ export const ko_KR: EnTranslations = {
     },
     "trade": {
       "windowClosed": "거래 창이 닫혔습니다.",
+      "offerQuantityHint": "내놓을 수량을 묻습니다",
+      "offerQuantityTitle": "{item} 내놓기",
+      "offerQuantityInput": "내놓을 수량",
+      "offerQuantityConfirm": "내놓기",
+      "offerQuantityAll": "모두 내놓기",
+      "offerRemoveTitle": "{item} 제거",
+      "offerRemoveInput": "제거할 수량",
+      "offerRemove": "제거",
+      "offerRemoveAll": "모두 제거",
       "woc": {
         "tabGold": "금화",
         "tabWoc": "$WOC",

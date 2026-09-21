@@ -527,6 +527,15 @@ export const pl_PL: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Okno wymiany zostało zamknięte.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Złoto",
         "tabWoc": "$WOC",

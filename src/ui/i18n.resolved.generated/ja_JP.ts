@@ -527,6 +527,15 @@ export const ja_JP: EnTranslations = {
     },
     "trade": {
       "windowClosed": "取引ウィンドウを閉じました。",
+      "offerQuantityHint": "差し出す数量を選べます",
+      "offerQuantityTitle": "{item}を差し出す",
+      "offerQuantityInput": "差し出す数量",
+      "offerQuantityConfirm": "差し出す",
+      "offerQuantityAll": "すべて差し出す",
+      "offerRemoveTitle": "{item}を取り除く",
+      "offerRemoveInput": "取り除く数量",
+      "offerRemove": "取り除く",
+      "offerRemoveAll": "すべて取り除く",
       "woc": {
         "tabGold": "金貨",
         "tabWoc": "$WOC",
