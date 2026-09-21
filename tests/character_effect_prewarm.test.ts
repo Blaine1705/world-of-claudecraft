@@ -166,11 +166,12 @@ describe('the character-effect prewarm mints the twin the live effect asks for',
     expect(group.children).toHaveLength(2); // two distinct PROGRAMS
   });
 
-  it('gets both face passes of a double-sided material', () => {
-    // A transparent DoubleSide material is compiled as two programs, one per
-    // face pass (three's WebGLRenderer prepareMaterial splits it), which is why
-    // the capture saw mod_cloth and mod_jewel link TWICE each. The twin carries
-    // the source's `side`, so the same split covers it.
+  it('draws a double-sided material in one pass, so its effect links one program', () => {
+    // three compiles a transparent DoubleSide material as two programs, one per
+    // face pass (WebGLRenderer prepareMaterial splits it), which is why a
+    // capture saw mod_cloth and mod_jewel link TWICE each. The effect clone opts
+    // out with forceSinglePass: it writes depth, so the nearest face owns the
+    // pixel either way, and the second program bought nothing.
     const source = rigMaterial('mod_cloth');
     source.side = THREE.DoubleSide;
     const root = new THREE.Group();
@@ -180,17 +181,19 @@ describe('the character-effect prewarm mints the twin the live effect asks for',
     expect(group.children).toHaveLength(1);
     const twin = (group.children[0] as THREE.Mesh).material as THREE.Material;
     expect(twin.side).toBe(THREE.DoubleSide);
-    expect(twin.forceSinglePass).toBe(false);
+    expect(twin.forceSinglePass).toBe(true);
+    // The source rig material itself is left alone: only the clone opts out.
+    expect(source.forceSinglePass).toBe(false);
 
     const path = characterEffectDrawPath(
       { material: source, geometry: (root.children[0] as THREE.Mesh).geometry, skinned: true },
       twin,
     );
-    expect(path.doubleSidedSplit).toBe(true);
-    expect(characterEffectProgramCount([path])).toBe(2);
+    expect(path.doubleSidedSplit).toBe(false);
+    expect(characterEffectProgramCount([path])).toBe(1);
 
-    // The split is three's, so pin it against three's own source: a bump that
-    // drops it would silently halve this coverage.
+    // The split is three's, and forceSinglePass is what opts out of it: pin both
+    // against three's own source, so a bump that renames either is caught.
     const renderer = readFileSync(
       new URL('../node_modules/three/src/renderers/WebGLRenderer.js', import.meta.url),
       'utf8',

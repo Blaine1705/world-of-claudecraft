@@ -58,6 +58,12 @@ export interface OccluderFadeMat {
  *  structure share): its geometry and kind are part of the program identity. */
 export function occluderFadeMat(mat: THREE.Material, mesh: THREE.Mesh): OccluderFadeMat {
   markOccluderGhostMaterial(mat);
+  // three draws a transparent double-sided material in TWO passes (back faces,
+  // then front), each with its own program, so a double-sided structure's fade
+  // linked two twins instead of one. The fade writes depth, so the nearest
+  // surface owns each pixel either way and one pass draws the same ghost. Set
+  // here, before any twin is cloned from the material: inert while it is opaque.
+  mat.forceSinglePass = true;
   const target = occluderGhostTargetOf(mat, mesh);
   return {
     mat,

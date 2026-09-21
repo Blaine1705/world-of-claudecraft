@@ -72,6 +72,10 @@ function cloneTransparent(source: THREE.Material, style: CharacterEffectStyle): 
   const clone = cloneMaterialWithHooks(source) as TintableMaterial;
   clone.transparent = true;
   clone.depthWrite = true;
+  // One pass, one program: three splits a transparent double-sided material
+  // into a back-face and a front-face pass with a program each, and with depth
+  // written the nearest face owns the pixel either way.
+  clone.forceSinglePass = true;
   (clone.userData as { [CHARACTER_EFFECT_MARKER]?: CharacterEffectStyle })[
     CHARACTER_EFFECT_MARKER
   ] = style;
