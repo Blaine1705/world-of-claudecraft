@@ -72,15 +72,19 @@ export function prepareCurrentQuestAssets(): Promise<void> {
       await Promise.all([prepareFarshoreShipwreck(), prepareFarshoreSalvageObjects()]);
       const wreck = buildFarshoreShipwreck();
       if (!wreck) throw new Error('Current shipwreck is not ready');
-      landmarks = (['ship'] as const).map((part) => {
+      landmarks = (
+        [
+          { part: 'ship', key: 'wq_existing_ship', sourceId: 'shipwreck:ship' },
+          { part: 'hull', key: 'wq_existing_debris_4', sourceId: 'salvage:2147100100' },
+        ] as const
+      ).map(({ part, key, sourceId }) => {
         const name = `farshore-broken-${part}`;
         const node = wreck.getObjectByName(name);
         if (!node) throw new Error(`Missing current shipwreck part: ${name}`);
-        const key = `wq_existing_${part}` as CurrentQuestAssetKey;
         storeModel(key, node);
         return {
           key,
-          sourceId: `shipwreck:${part}`,
+          sourceId,
           x: node.position.x,
           y: node.position.y,
           z: node.position.z,

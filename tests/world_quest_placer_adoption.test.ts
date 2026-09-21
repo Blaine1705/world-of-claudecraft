@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { adoptShippedShipwreckDraft } from '../src/game/world_quest_placer_adoption';
 import {
+  FARSHORE_HULL_FRAGMENT_PLACEMENT,
   FARSHORE_SALVAGE_PLACEMENTS,
   FARSHORE_SHIPWRECK_PLACEMENT,
 } from '../src/sim/content/farshore_shipwreck_layout';
@@ -13,7 +14,11 @@ function draft(): Array<{
   rot: number;
   scale: number;
 }> {
-  return [FARSHORE_SHIPWRECK_PLACEMENT, ...FARSHORE_SALVAGE_PLACEMENTS].map((row) => ({ ...row }));
+  return [
+    FARSHORE_SHIPWRECK_PLACEMENT,
+    FARSHORE_HULL_FRAGMENT_PLACEMENT,
+    ...FARSHORE_SALVAGE_PLACEMENTS,
+  ].map((row) => ({ ...row }));
 }
 
 describe('shipwreck draft adoption', () => {

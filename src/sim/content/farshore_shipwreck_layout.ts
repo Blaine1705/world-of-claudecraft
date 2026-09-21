@@ -10,8 +10,16 @@ export const FARSHORE_SHIPWRECK_PLACEMENT = {
   scale: 14,
 } as const;
 
+export const FARSHORE_HULL_FRAGMENT_PLACEMENT = {
+  key: 'wq_hull_fragment',
+  x: 302.7,
+  y: -6,
+  z: 117.75,
+  rot: 330,
+  scale: 6,
+} as const;
+
 export const FARSHORE_SALVAGE_PLACEMENTS = [
-  { key: 'wq_hull_fragment', x: 302.7, y: -6, z: 117.75, rot: 330, scale: 6 },
   { key: 'wq_waterlogged_barrel', x: 326.2, y: -4.5, z: 140.6, rot: 105, scale: 2 },
   { key: 'wq_damaged_crate', x: 344, y: -4.5, z: 144.7, rot: 270, scale: 1.5 },
   { key: 'wq_broken_planks', x: 369.9, y: -4, z: 136.3, rot: 270, scale: 2 },
@@ -30,6 +38,6 @@ export const FARSHORE_SALVAGE_VISUAL_KEYS = [
   'wq_waterlogged_barrel',
   'wq_damaged_crate',
   'wq_fallen_anchor',
-  'wq_hull_fragment',
+  'wq_hull_fragment', // Reserved slot: the hull is now permanent scenery.
   'wq_capsized_rowboat',
 ] as const;

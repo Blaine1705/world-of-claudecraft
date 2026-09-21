@@ -51,7 +51,7 @@ describe('Farshore salvage render assets', () => {
       /prewarmFarshoreSalvageObjects\(\s*buildGroundQuestObject,\s*\(poolKey, built\) =>\s*h\.storePooledObject\(poolKey, built\)/,
     );
 
-    const expectedPlan = WRECKAGE_ASSETS.map((_, visual) => ({
+    const expectedPlan = [0, 1, 2, 3, 5].map((visual) => ({
       visual,
       entityId: 2_147_100_100 + [3, 1, 2, 9, 0, 6][visual],
       itemId: 'wreckfield_flotsam_crate',
@@ -68,7 +68,7 @@ describe('Farshore salvage render assets', () => {
       },
       (poolKey, object) => stores.push({ poolKey, object }),
     );
-    expect(objects).toHaveLength(WRECKAGE_ASSETS.length);
+    expect(objects).toHaveLength(5);
     expect(builds).toEqual(expectedPlan.map(({ itemId, entityId }) => ({ itemId, entityId })));
     expect(stores.map(({ poolKey }) => poolKey)).toEqual(
       expectedPlan.map(({ poolKey }) => poolKey),
@@ -76,14 +76,18 @@ describe('Farshore salvage render assets', () => {
 
     WRECKAGE_ASSETS.forEach((filename, visual) => {
       const url = `/models/world_quests/shipwreck/${filename}`;
-      const entry = farshoreSalvagePrewarmPlan[visual];
-      expect(entry?.visual).toBe(visual);
-      expect(
-        questObjectPreloadInternalsForTest.visualItemIdForEntity(entry.itemId, entry.entityId),
-      ).toBe(`farshore_salvage_${visual}`);
-      expect(buildGroundQuestObject(entry.itemId, entry.entityId).group.userData).toMatchObject({
-        questObjectVisualItemId: `farshore_salvage_${visual}`,
-      });
+      const entry = farshoreSalvagePrewarmPlan.find((row) => row.visual === visual);
+      if (visual === 4) expect(entry).toBeUndefined();
+      else {
+        expect(entry?.visual).toBe(visual);
+        if (!entry) throw new Error(`Missing collectible visual ${visual}`);
+        expect(
+          questObjectPreloadInternalsForTest.visualItemIdForEntity(entry.itemId, entry.entityId),
+        ).toBe(`farshore_salvage_${visual}`);
+        expect(buildGroundQuestObject(entry.itemId, entry.entityId).group.userData).toMatchObject({
+          questObjectVisualItemId: `farshore_salvage_${visual}`,
+        });
+      }
       expect(questObjectPreloadInternalsForTest.questObjectUrl[`farshore_salvage_${visual}`]).toBe(
         url,
       );
@@ -108,7 +112,7 @@ describe('Farshore salvage render assets', () => {
   it('matches every exported model and transform without random yaw on fresh or pooled bodies', async () => {
     await prepareFarshoreSalvageObjects();
     for (const [index, placement] of FARSHORE_SALVAGE_PLACEMENTS.entries()) {
-      const id = 2147100100 + index;
+      const id = 2147100101 + index;
       const { group, height } = buildGroundQuestObject('wreckfield_flotsam_crate', id);
       expect(group.children.map((child) => child.name)).toEqual([placement.key]);
       const wrapper = new THREE.Group();

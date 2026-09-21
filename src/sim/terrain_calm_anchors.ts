@@ -20,11 +20,13 @@
 // caller-supplied probe: no Math.random, no clocks, no state. Every host
 // computes the same rings from the one shipped WORLD_SEED.
 
+import { FARSHORE_HULL_FRAGMENT_PLACEMENT } from './content/farshore_shipwreck_layout';
 import { OVERWORLD_GRAVEYARDS } from './content/graveyards';
 import { MAILBOXES } from './content/mailboxes';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
 import { TUNNELS } from './content/tunnels';
 import { WORLD_QUEST_CALLIGRAPHY_NPCS } from './content/world_quest_calligraphy';
+import { FARSHORE_SALVAGE_ENTITY_ID_START } from './content/world_quests';
 import {
   DUNGEONS,
   ESCORTS,
@@ -201,6 +203,12 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   for (const board of MUSTER_BOARDS) pad('musterBoard', board.x, board.z, 3.5, 9);
   // Quest/collectible ground objects (every authored position).
   for (const def of GROUND_OBJECTS) {
+    // Keep the hull's original pad and order when its pickup becomes scenery.
+    // Retiring an interaction must not reshape the approved shoreline.
+    if (def.entityIds?.[0] === FARSHORE_SALVAGE_ENTITY_ID_START) {
+      const hull = FARSHORE_HULL_FRAGMENT_PLACEMENT;
+      pad('groundObject', hull.x, hull.z, 3.5, 9);
+    }
     for (const p of def.positions) pad('groundObject', p.x, p.z, 3.5, 9);
   }
   // Hand-authored tunnel mouths: the terrain must meet the carved opening.

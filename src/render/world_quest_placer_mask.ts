@@ -5,6 +5,8 @@ const masks = new WeakMap<THREE.Object3D, Set<string>>();
 const hiddenLandmarks = new WeakMap<THREE.Object3D, Map<THREE.Object3D, boolean>>();
 const landmarkNames = {
   'shipwreck:ship': 'farshore-broken-ship',
+  // Preserve the hull's source ID in saved Placer drafts after retiring its pickup.
+  'salvage:2147100100': 'farshore-broken-hull',
   'shipwreck:dock': 'farshore-broken-dock',
   'shipwreck:moorings': 'farshore-mooring-lines',
 };

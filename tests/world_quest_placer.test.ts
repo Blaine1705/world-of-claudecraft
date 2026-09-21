@@ -7,6 +7,7 @@ import { WORLD_QUEST_PLACER_ASSETS } from '../src/render/world_quest_placer_cata
 import { isWorldQuestPlacerSourceHidden } from '../src/render/world_quest_placer_mask';
 import type { CurrentQuestPlacement } from '../src/render/world_quest_placer_sources';
 import {
+  FARSHORE_HULL_FRAGMENT_PLACEMENT,
   FARSHORE_SALVAGE_PLACEMENTS,
   FARSHORE_SHIPWRECK_PLACEMENT,
 } from '../src/sim/content/farshore_shipwreck_layout';
@@ -29,7 +30,7 @@ vi.mock('../src/render/farshore_shipwreck', () => ({
   prepareFarshoreShipwreck: vi.fn(async () => undefined),
   buildFarshoreShipwreck: () => {
     const root = new THREE.Group();
-    for (const name of ['farshore-broken-ship', 'farshore-broken-dock', 'farshore-mooring-lines']) {
+    for (const name of ['farshore-broken-ship', 'farshore-broken-hull']) {
       const part = new THREE.Group();
       part.name = name;
       part.add(new THREE.Mesh(new THREE.BoxGeometry(2, 1, 4), new THREE.MeshBasicMaterial()));
@@ -40,9 +41,9 @@ vi.mock('../src/render/farshore_shipwreck', () => ({
 }));
 vi.mock('../src/render/quest_objects', () => ({
   prepareFarshoreSalvageObjects: vi.fn(async () => undefined),
-  farshoreSalvagePrewarmPlan: Array.from({ length: 6 }, (_, visual) => ({
+  farshoreSalvagePrewarmPlan: [0, 1, 2, 3, 5].map((visual) => ({
     visual,
-    entityId: 2147100100 + visual,
+    entityId: [2147100103, 2147100101, 2147100102, 2147100109, 0, 2147100106][visual],
   })),
   buildGroundQuestObject: () => {
     const group = new THREE.Group();
@@ -88,7 +89,11 @@ describe('World Quests placer workflow', () => {
   });
 
   it('reopens the submitted layout with every new live source masked and no duplicate imports', async () => {
-    const entries = [FARSHORE_SHIPWRECK_PLACEMENT, ...FARSHORE_SALVAGE_PLACEMENTS];
+    const entries = [
+      FARSHORE_SHIPWRECK_PLACEMENT,
+      FARSHORE_HULL_FRAGMENT_PLACEMENT,
+      ...FARSHORE_SALVAGE_PLACEMENTS,
+    ];
     localStorage.setItem(
       questStorage,
       JSON.stringify({
@@ -104,7 +109,7 @@ describe('World Quests placer workflow', () => {
     );
     const originals = FARSHORE_SALVAGE_PLACEMENTS.map((_, i) => {
       const original = new THREE.Group();
-      original.userData.entityId = 2147100100 + i;
+      original.userData.entityId = 2147100101 + i;
       deps.scene.add(original);
       return original;
     });

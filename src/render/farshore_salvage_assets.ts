@@ -38,16 +38,18 @@ export function groundQuestObjectYaw(itemId: string, entityId: number): number {
 }
 
 export const farshoreSalvagePrewarmPlan = Object.freeze(
-  FARSHORE_SALVAGE_VISUAL_KEYS.map((key, visual) =>
-    Object.freeze({
-      visual,
-      entityId:
-        FARSHORE_SALVAGE_ENTITY_ID_START +
-        FARSHORE_SALVAGE_PLACEMENTS.findIndex((placement) => placement.key === key),
-      itemId: FARSHORE_SALVAGE_OBJECT_ITEM_ID,
-      poolKey: `object:${FARSHORE_SALVAGE_OBJECT_ITEM_ID}:salvage-${visual}`,
-    }),
-  ),
+  FARSHORE_SALVAGE_VISUAL_KEYS.flatMap((key, visual) => {
+    const index = FARSHORE_SALVAGE_PLACEMENTS.findIndex((placement) => placement.key === key);
+    if (index < 0) return []; // Reserved scenery slots have no pickup body to prewarm.
+    return [
+      Object.freeze({
+        visual,
+        entityId: FARSHORE_SALVAGE_ENTITY_ID_START + index,
+        itemId: FARSHORE_SALVAGE_OBJECT_ITEM_ID,
+        poolKey: `object:${FARSHORE_SALVAGE_OBJECT_ITEM_ID}:salvage-${visual}`,
+      }),
+    ];
+  }),
 );
 
 export const prepareFarshoreSalvageObjects = prepareWorldQuestPlacerAssets;

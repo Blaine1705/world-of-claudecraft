@@ -16,11 +16,24 @@ vi.mock('../src/render/assets/loader', () => ({
 }));
 
 describe('authored Farshore shipwreck', () => {
+  it('keeps the hull decorative at its approved transform without a salvage marker', async () => {
+    await prepareFarshoreShipwreck();
+    const hull = buildFarshoreShipwreck()!.getObjectByName('farshore-broken-hull');
+    expect(hull).toBeDefined();
+    expect(hull!.position.toArray()).toEqual([302.7, -6, 117.75]);
+    expect(hull!.rotation.y).toBeCloseTo((330 * Math.PI) / 180);
+    expect(hull!.scale.toArray()).toEqual([6, 6, 6]);
+    hull!.traverse((node) => {
+      expect(node).not.toBeInstanceOf(THREE.Sprite);
+      expect(node.userData.entityId).toBeUndefined();
+    });
+  });
+
   it('replaces the ship, dock and ropes with the supplied wreck at its exact exported transform', async () => {
     await prepareFarshoreShipwreck();
     const root = buildFarshoreShipwreck()!;
     expect(root.name).toBe('farshore-shipwreck');
-    expect(root.children).toHaveLength(1);
+    expect(root.children).toHaveLength(2);
     const ship = root.children[0];
     expect(ship.name).toBe('farshore-broken-ship');
     expect(ship.position.toArray()).toEqual([306, -4.75, 123.05]);

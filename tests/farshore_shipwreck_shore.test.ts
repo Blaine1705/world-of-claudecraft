@@ -7,10 +7,31 @@ import {
 } from '../src/render/terrain_chunk_build';
 import { FARSHORE_SALVAGE_PLACEMENTS } from '../src/sim/content/farshore_shipwreck_layout';
 import { applyFarshoreShipwreckShore } from '../src/sim/farshore_shipwreck_shore';
+import { collectCalmAnchorPads } from '../src/sim/terrain_calm_anchors';
 import { groundHeight, terrainHeight, terrainHeightSansEdits } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 describe('shipwreck anchor shoreline', () => {
+  it('retains exactly one original hull pad immediately before the remaining salvage pads', () => {
+    const pads = collectCalmAnchorPads();
+    const hulls = pads.filter((pad) => pad.x === 302.7 && pad.z === 117.75);
+    expect(hulls).toEqual([
+      {
+        category: 'groundObject',
+        x: 302.7,
+        z: 117.75,
+        rIn: 3.5,
+        baseROut: 9,
+        optional: true,
+      },
+    ]);
+    expect(pads[pads.indexOf(hulls[0]) + 1]).toMatchObject({
+      category: 'groundObject',
+      x: 326.2,
+      z: 140.6,
+    });
+  });
+
   it('keeps the beach below the approved anchor footprint without moving the asset', () => {
     const anchor = FARSHORE_SALVAGE_PLACEMENTS.find((p) => p.key === 'wq_fallen_anchor');
     expect(anchor).toEqual({

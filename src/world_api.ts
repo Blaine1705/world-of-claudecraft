@@ -252,7 +252,9 @@ export type { VehicleSession } from './world_api/vehicles';
 // 43 = The approved Farshore shipwreck replaces three eight-piece layouts with
 // twelve authored pickups, new models and a moved work area. Older clients must
 // not interpret the new stable IDs through the previous visual/layout tables.
-export const ONLINE_WORLD_LAYOUT_VERSION = 43 as const;
+// 44 = The hull is permanent scenery, not pickup 2147100100. Older clients
+// would omit it with a new server; older servers would spawn a duplicate pickup.
+export const ONLINE_WORLD_LAYOUT_VERSION = 44 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

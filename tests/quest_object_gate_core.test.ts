@@ -61,7 +61,7 @@ describe('makeQuestObjectGate', () => {
     const gate = makeQuestObjectGate({}, { worldQuestCycle: cycle, worldQuestLog });
     const piece = {
       ...crate(),
-      id: 2_147_100_100,
+      id: 2_147_100_101,
       objectItemId: 'wreckfield_flotsam_crate',
       pos: { x: 277, y: 0, z: 82 },
     };

@@ -38,7 +38,7 @@ describe('shipwreck runtime boot preload', () => {
       '/models/world_quests/shipwreck/shipwreck.glb',
       '/models/world_quests/shipwreck/waterlogged_barrel.glb',
     ]);
-    expect(ship.buildFarshoreShipwreck()?.children).toHaveLength(1);
+    expect(ship.buildFarshoreShipwreck()?.children).toHaveLength(2);
     for (const entry of salvage.farshoreSalvagePrewarmPlan) {
       expect(
         salvage.buildFarshoreSalvageObject(entry.itemId, entry.entityId)?.group.children,

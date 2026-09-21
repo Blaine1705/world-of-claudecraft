@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import {
+  FARSHORE_HULL_FRAGMENT_PLACEMENT,
   FARSHORE_SALVAGE_PLACEMENTS,
   FARSHORE_SHIPWRECK_PLACEMENT,
 } from '../src/sim/content/farshore_shipwreck_layout';
@@ -34,7 +35,11 @@ function salvageEntity(id: number, x = 302.7, z = 117.75): Entity {
 
 describe('Farshore authored shipwreck salvage', () => {
   it('pins every transform in the approved Placer export independently of the spawn code', () => {
-    expect([FARSHORE_SHIPWRECK_PLACEMENT, ...FARSHORE_SALVAGE_PLACEMENTS]).toEqual([
+    expect([
+      FARSHORE_SHIPWRECK_PLACEMENT,
+      FARSHORE_HULL_FRAGMENT_PLACEMENT,
+      ...FARSHORE_SALVAGE_PLACEMENTS,
+    ]).toEqual([
       { key: 'wq_shipwreck', x: 306, y: -4.75, z: 123.05, rot: 90, scale: 14 },
       { key: 'wq_hull_fragment', x: 302.7, y: -6, z: 117.75, rot: 330, scale: 6 },
       { key: 'wq_waterlogged_barrel', x: 326.2, y: -4.5, z: 140.6, rot: 105, scale: 2 },
@@ -51,18 +56,18 @@ describe('Farshore authored shipwreck salvage', () => {
     ]);
   });
 
-  it('offers all twelve placed debris, requiring eight, with the authored repeated models', () => {
+  it('offers all eleven smaller pieces, requiring eight, with the authored repeated models', () => {
     if (quest.objective.type !== 'salvage') throw new Error('Expected salvage fixture');
     expect(quest.count).toBe(8);
     expect(quest.objective.layouts).toHaveLength(1);
     expect(quest.objective.layouts[0]).toEqual([
-      2147100100, 2147100101, 2147100102, 2147100103, 2147100104, 2147100105, 2147100106,
-      2147100107, 2147100108, 2147100109, 2147100110, 2147100111,
+      2147100101, 2147100102, 2147100103, 2147100104, 2147100105, 2147100106, 2147100107,
+      2147100108, 2147100109, 2147100110, 2147100111,
     ]);
     expect(quest.objective.layouts[0].map(worldQuestSalvageVisualIndex)).toEqual([
-      4, 1, 2, 0, 2, 2, 5, 2, 1, 3, 2, 0,
+      1, 2, 0, 2, 2, 5, 2, 1, 3, 2, 0,
     ]);
-    for (const id of [2147100099, 2147100112, 2147100123, 2147100100.5]) {
+    for (const id of [2147100100, 2147100099, 2147100112, 2147100123, 2147100100.5]) {
       expect(worldQuestSalvageVisualIndex(id)).toBeNull();
     }
   });
@@ -114,6 +119,16 @@ describe('Farshore authored shipwreck salvage', () => {
 });
 
 describe('Farshore salvage placement', () => {
+  it('keeps the hull decorative with no pickup entity or quest credit', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
+    sim.resetDay = '2026-09-06';
+    sim.chat('/dev salvage');
+    sim.player.pos = sim.groundPos(302.7, 117.75);
+    expect(sim.entities.has(2147100100)).toBe(false);
+    expect(sim.pickUpObject(2147100100)).toBe(false);
+    expect(sim.worldQuestLog.get(quest.id)!.count).toBe(0);
+  });
+
   it('spawns the exact transforms with walkable collection spots inside the enlarged quest area', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
     expect(quest.area).toEqual({ x: 347.6, z: 126.45, radius: 54 });
@@ -137,12 +152,12 @@ describe('Farshore salvage placement', () => {
         Math.hypot(p.x - quest.area.x, p.z - quest.area.z) + INTERACT_RANGE,
       ).toBeLessThanOrEqual(quest.area.radius);
     }
-    for (let index = 12; index < 24; index++) {
+    for (let index = 11; index < 24; index++) {
       expect(sim.entities.has(FARSHORE_SALVAGE_ENTITY_ID_START + index)).toBe(false);
     }
   });
 
-  it.each([0, 4])(
+  it.each([0, 3])(
     'completes from eight unique pieces starting at index %i, never repeat clicks',
     (start) => {
       const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
@@ -168,4 +183,39 @@ describe('Farshore salvage placement', () => {
       ).toHaveLength(1);
     },
   );
+
+  it('restores earned hull credit and completes after seven other recoveries', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
+    sim.resetDay = '2026-09-06';
+    sim.chat('/dev salvage');
+    const state = sim.serializeCharacter(sim.playerId)!;
+    state.worldQuests!.progress = [
+      {
+        questId: quest.id,
+        count: 1,
+        state: 'active',
+        puzzleVariant: 0,
+        creditedObjects: ['0@302.7,117.8'],
+      },
+    ];
+    const restored = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
+    restored.resetDay = '2026-09-06';
+    const pid = restored.addPlayer('warrior', 'Salvager', { state });
+    const progress = restored.meta(pid)!.worldQuestLog.get(quest.id)!;
+    expect(progress.count).toBe(1);
+    expect(progress.creditedObjects).toEqual(['0@302.7,117.8']);
+    for (const id of [
+      2147100101, 2147100102, 2147100103, 2147100104, 2147100105, 2147100106, 2147100107,
+    ]) {
+      const object = restored.entities.get(id)!;
+      restored.entities.get(pid)!.pos = restored.groundPos(object.pos.x, object.pos.z);
+      expect(restored.pickUpObject(id, pid)).toBe(true);
+    }
+    expect(progress).toMatchObject({ count: 8, state: 'completed' });
+    expect(
+      restored
+        .drainEvents()
+        .filter((event) => event.type === 'worldQuestDone' && event.questId === quest.id),
+    ).toHaveLength(1);
+  });
 });

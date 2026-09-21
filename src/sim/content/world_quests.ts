@@ -253,7 +253,8 @@ export const WORLD_QUEST_ESCORTS: Record<string, EscortDef> = {
 };
 
 export const FARSHORE_SALVAGE_OBJECT_ITEM_ID = 'wreckfield_flotsam_crate';
-export const FARSHORE_SALVAGE_ENTITY_ID_START = 2_147_100_100;
+// Retire 2147100100 (the decorative hull), preserving every other pickup ID.
+export const FARSHORE_SALVAGE_ENTITY_ID_START = 2_147_100_101;
 
 // One approved scatter replaces the former rotating layouts. The objective
 // still requires eight distinct recoveries, with every placed debris available.

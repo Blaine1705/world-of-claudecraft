@@ -156,7 +156,7 @@ describe('tryNearbyInteraction', () => {
       pos: { x: 1, y: 0, z: 0 },
     });
     const farther = entity({
-      id: 2_147_100_100,
+      id: 2_147_100_101,
       kind: 'object',
       templateId: 'ground_wreckfield_flotsam_crate',
       objectItemId: 'wreckfield_flotsam_crate',
@@ -173,7 +173,7 @@ describe('tryNearbyInteraction', () => {
 
   it('skips a personally recovered shipwreck piece in favor of the next one', () => {
     const recovered = entity({
-      id: 2_147_100_100,
+      id: 2_147_100_101,
       kind: 'object',
       templateId: 'ground_wreckfield_flotsam_crate',
       objectItemId: 'wreckfield_flotsam_crate',
@@ -182,7 +182,7 @@ describe('tryNearbyInteraction', () => {
     });
     const visible = entity({
       ...recovered,
-      id: 2_147_100_101,
+      id: 2_147_100_102,
       pos: { x: 2, y: 0, z: 0 },
     });
     const r = rig([recovered, visible]);

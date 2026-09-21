@@ -1,5 +1,8 @@
 import * as THREE from 'three';
-import { FARSHORE_SHIPWRECK_PLACEMENT } from '../sim/content/farshore_shipwreck_layout';
+import {
+  FARSHORE_HULL_FRAGMENT_PLACEMENT,
+  FARSHORE_SHIPWRECK_PLACEMENT,
+} from '../sim/content/farshore_shipwreck_layout';
 import { registerDeferredPreload } from './assets/preload';
 import {
   createWorldQuestPlacerModel,
@@ -12,15 +15,20 @@ export const prepareFarshoreShipwreck = prepareWorldQuestPlacerAssets;
 registerDeferredPreload(prepareFarshoreShipwreck);
 
 export function buildFarshoreShipwreck(): THREE.Group | null {
-  const placement = FARSHORE_SHIPWRECK_PLACEMENT;
-  if (!isWorldQuestPlacerAssetReady(placement.key)) return null;
+  const parts = [
+    ['farshore-broken-ship', FARSHORE_SHIPWRECK_PLACEMENT],
+    ['farshore-broken-hull', FARSHORE_HULL_FRAGMENT_PLACEMENT],
+  ] as const;
+  if (parts.some(([, placement]) => !isWorldQuestPlacerAssetReady(placement.key))) return null;
   const root = new THREE.Group();
   root.name = 'farshore-shipwreck';
-  const ship = createWorldQuestPlacerModel(placement.key);
-  ship.name = 'farshore-broken-ship';
-  ship.position.set(placement.x, placement.y, placement.z);
-  ship.rotation.y = THREE.MathUtils.degToRad(placement.rot);
-  ship.scale.setScalar(placement.scale);
-  root.add(ship);
+  for (const [name, placement] of parts) {
+    const model = createWorldQuestPlacerModel(placement.key);
+    model.name = name;
+    model.position.set(placement.x, placement.y, placement.z);
+    model.rotation.y = THREE.MathUtils.degToRad(placement.rot);
+    model.scale.setScalar(placement.scale);
+    root.add(model);
+  }
   return root;
 }

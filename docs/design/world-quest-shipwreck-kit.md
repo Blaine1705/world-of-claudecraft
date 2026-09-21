@@ -1,8 +1,8 @@
 # World Quests shipwreck placement kit
 
-The approved Placer export is now the live Farshore salvage site. Its one wreck
-and twelve collectible props replace the old ship, dock, ropes and rotating debris
-layouts. Players recover any eight distinct pieces. Every position, height, yaw and
+The approved Placer export is now the live Farshore salvage site. Its wreck and hull are permanent scenery,
+and eleven collectible props replace the old ship, dock, ropes and rotating debris
+layouts. Only the eleven smaller props carry salvage markers. Players recover any eight distinct pieces. Every position, height, yaw and
 scale matches the submitted export, including the deliberately submerged parts.
 
 ## Visit or edit locally
@@ -19,7 +19,7 @@ With the local client running at `http://127.0.0.1:5173/`, enter an offline worl
 near the wreck. The quest footprint is centered at `(347.6, 126.45)` with radius 54.
 The wreck map label is at `(306, 123.05)` and the ambush opens at `(340, 100)`.
 
-Placer's **load current quest assets** imports the live wreck and all twelve
+Placer's **load current quest assets** imports the live wreck, decorative hull and all eleven
 pickups. Select a row to move it, or enable **replace selected** and choose another
 asset. The originals stay hidden while their imported preview is open and return
 when Placer closes. Editor changes remain previews until another export is baked
@@ -33,8 +33,10 @@ preserved. Deleted-source IDs remain in the import ledger until the layout chang
 ## Runtime contract
 
 - `src/sim/content/farshore_shipwreck_layout.ts` is the shared transform table.
-  Ship coordinates are static scenery; the twelve debris rows spawn authoritative
-  ground objects with stable IDs `2147100100` through `2147100111`.
+  Ship and hull coordinates are static scenery; the eleven debris rows spawn authoritative
+  ground objects with stable IDs `2147100101` through `2147100111`. The retired hull
+  ID `2147100100` remains a Placer source alias so existing drafts still mask it.
+  Its original terrain calm pad is retained to preserve the shoreline.
 - Ground-object definitions optionally carry explicit Y, facing and scale. Shared
   bootstrap preserves these in position, previous position, spawn position and
   previous facing. Existing definitions retain terrain-derived defaults.
@@ -43,11 +45,12 @@ preserved. Deleted-source IDs remain in the import ledger until the layout chang
   object-pool prewarm paths compile the live models. Shared immutable geometry and
   materials survive individual view teardown.
 - `src/render/farshore_salvage_assets.ts` maps each ID to its actual asset, selects
-  representative IDs for the six prewarm pools, and disables extra random body yaw
+  representative IDs for the five pickup prewarm pools, and disables extra random body yaw
   on both fresh and reused pickups. The entity wrapper applies scale and facing.
 - Existing progress counts and old position-credit keys survive a saved-game
-  restore. Completed quests stay completed. Online world auth advances to epoch 43
-  because epoch-42 clients interpret the old layouts, models and quest geography.
+  restore, including credit already earned from the hull. Completed quests stay completed.
+  Online world auth advances to epoch 44 because epoch-43 clients and servers
+  disagree about whether the hull is scenery or a collectible entity.
 
 ## Assets
 
@@ -149,3 +152,36 @@ Verdict for the anchor correction: **READY WITH NOTES** for local use; the full
 repository QA gate remains blocked by the dependency setup issue above. The local
 game tab was reloaded after verification. No asset transforms or quest progress
 were changed by this correction.
+
+
+## Decorative hull follow-up, 21 September 2026
+
+Against `3977aa1fe2f4b9e0d790369226c662f466121ba8`, the hull is permanent scenery
+alongside the main wreck. It has no pickup entity or salvage marker. The eleven
+smaller pieces remain collectible and marked; eight recoveries still complete
+the quest. The hull's historical Placer source alias and earned save credit survive.
+
+A scoped browser scene ran the actual `Renderer.buildView` for every spawned
+salvage entity, using the shared GLBs and production terrain. It confirmed eleven
+pickup sprites, zero sprites on the two scenery models, and all approved transforms.
+`docs/screenshots/shipwreck-decorative-hull.png` captures that scene. Its host skips
+the full-game scheduler and animation loop; it is not a complete gameplay traversal.
+The full-game verification session reached the quest but stalled behind its loading
+screen. The local client was then reloaded and the temporary verification tab closed.
+
+Validation:
+
+- `npx vitest run tests/farshore_shipwreck.test.ts tests/world_quest_salvage.test.ts tests/world_quest_salvage_assets.test.ts tests/world_quest_placer_sources.test.ts tests/world_quest_placer_adoption.test.ts tests/world_quest_placer.test.ts tests/farshore_shipwreck_shore.test.ts tests/shipwreck_preload.test.ts tests/nearby_interaction.test.ts tests/quest_object_gate_core.test.ts --maxWorkers=2`: 119/120 passed; the first real-Sim case timed out during cold terrain setup under local load. Stale fixtures found in the earlier iteration were corrected. No timeout was raised.
+- `node_modules/.bin/vitest run tests/world_quest_salvage.test.ts --maxWorkers=1 -t 'keeps the hull decorative'`: passed after typechecking finished, with the test taking 3.25 seconds. An earlier isolated retry while the machine was busy also timed out. Together the final focused checks cover all 120 cases.
+- `node_modules/.bin/vitest run tests/farshore_shipwreck_readiness.test.ts tests/bank_wire_epoch.test.ts tests/material_inventory_wire.test.ts tests/world_auth_scripts.test.ts tests/security.test.ts tests/server/ws_auth.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts --maxWorkers=1`: 327 passed.
+- `npx tsx tmp/shipwreck-terrain-probe.ts`: all 7,171 production terrain samples matched the committed shoreline baseline exactly. The single retained hull pad and its order also have a committed regression test.
+- `npx tsc --noEmit`, then `node_modules/.bin/tsc --noEmit` after the readiness tests were added: passed.
+- `GATE_SELECT_BASE=3977aa1fe2f4b9e0d790369226c662f466121ba8 npm run ci:changed`: passed but selected zero committed files; explicit `node_modules/.bin/biome ci` on all 27 changed/new source and test files passed with warnings only.
+- `node --input-type=module -e 'import { build } from "vite"; await build({build:{copyPublicDir:false,outDir:"tmp/shipwreck-hull-build"}});'`: production bundle passed in 12.11 seconds. The temporary build directory was removed to save disk space.
+- `npm run i18n:gen`: passed with generated source artifacts unchanged.
+- `npm run security:gate`: passed; 9,654 files scanned, zero high findings after priors.
+- `npm run gate`: remains blocked at the artifact step by `ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY`. No dependency reinstall or gate bypass was used.
+
+Cross-platform, render and test-coverage reviewers found no remaining blocking
+issue after the terrain-pad guard was restricted to the reserved World Quest row.
+Verdict: READY WITH NOTES for the local gate environment and scoped visual evidence.

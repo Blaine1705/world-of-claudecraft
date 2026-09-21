@@ -1,6 +1,7 @@
 // Once an exported draft is built into the world, reconnect that exact draft
 // to the new live sources so reopening it cannot draw duplicate originals.
 import {
+  FARSHORE_HULL_FRAGMENT_PLACEMENT,
   FARSHORE_SALVAGE_PLACEMENTS,
   FARSHORE_SHIPWRECK_PLACEMENT,
 } from '../sim/content/farshore_shipwreck_layout';
@@ -21,7 +22,11 @@ interface Placement {
 export function adoptShippedShipwreckDraft<T extends Placement>(
   entries: T[],
 ): { entries: T[]; importedSources: string[] } | null {
-  const shipped = [FARSHORE_SHIPWRECK_PLACEMENT, ...FARSHORE_SALVAGE_PLACEMENTS];
+  const shipped = [
+    FARSHORE_SHIPWRECK_PLACEMENT,
+    FARSHORE_HULL_FRAGMENT_PLACEMENT,
+    ...FARSHORE_SALVAGE_PLACEMENTS,
+  ];
   if (
     entries.length !== shipped.length ||
     !entries.every((entry, index) => {
@@ -37,9 +42,13 @@ export function adoptShippedShipwreckDraft<T extends Placement>(
     })
   )
     return null;
-  const importedSources = shipped.map((_, index) =>
-    index === 0 ? 'shipwreck:ship' : `salvage:${FARSHORE_SALVAGE_ENTITY_ID_START + index - 1}`,
-  );
+  const importedSources = [
+    'shipwreck:ship',
+    'salvage:2147100100', // Stable source for drafts authored while the hull was a pickup.
+    ...FARSHORE_SALVAGE_PLACEMENTS.map(
+      (_, index) => `salvage:${FARSHORE_SALVAGE_ENTITY_ID_START + index}`,
+    ),
+  ];
   return {
     entries: entries.map((entry, index) => ({ ...entry, sourceId: importedSources[index] })),
     importedSources,
