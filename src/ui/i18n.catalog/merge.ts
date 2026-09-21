@@ -696,7 +696,7 @@ const mergeStringsEn = {
       emptyTheirs: 'Nothing offered yet',
       money: 'Money',
       copper: 'copper',
-      hint: 'Click an offered item to remove it. Both sides must press Accept Trade.',
+      hint: 'Click an offered item to remove some or all of it. Both sides must press Accept Trade.',
       accept: 'Accept Trade',
       waiting: 'Waiting...',
       cancel: 'Cancel',

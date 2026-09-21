@@ -5024,6 +5024,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.name': 'イーストブルック渓谷',
   'entities.zones.eastbrook_vale.welcome':
     '町のレッドブルック元帥を訪ねてください。あなたに頼みたい仕事があります。',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    'レッドブルック元帥からの仕事はもうありません - あなたの旅が始まった趣のある海辺の町は、おかげで安らかです。',
   'entities.zones.eastbrook_vale.pois.0.label': 'イーストブルック',
   'entities.zones.eastbrook_vale.pois.1.label': '狼の道',
   'entities.zones.eastbrook_vale.pois.2.label': '猪の草地',
@@ -5035,6 +5037,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.name': 'マイアフェン湿地',
   'entities.zones.mirefen_marsh.welcome':
     'フェンブリッジの門で番人フェンウィックに報告してください。',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    '番人フェンウィックからの命令はもうありません - 沼地の湿原の奥深くにたたずむ集落は、おかげでより安全になりました。',
   'entities.zones.mirefen_marsh.pois.0.label': 'フェンブリッジ',
   'entities.zones.mirefen_marsh.pois.1.label': '徘徊者の葦原',
   'entities.zones.mirefen_marsh.pois.2.label': 'ディープフェンの浅瀬',
@@ -5046,6 +5050,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.name': 'ソーンピーク高地',
   'entities.zones.thornpeak_heights.welcome':
     'テサリー隊長がかろうじてハイウォッチの壁を保っています。',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    'テサリー隊長がハイウォッチの壁を守っています - 決して楽ではありませんが、あなたのような冒険者たちの助けで今は何とか持ちこたえています。',
   'entities.zones.thornpeak_heights.pois.0.label': 'ハイウォッチ',
   'entities.zones.thornpeak_heights.pois.1.label': '追跡者の尾根',
   'entities.zones.thornpeak_heights.pois.2.label': 'ディープロックの巣穴',
@@ -16192,6 +16198,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '補充の席は意図的に危険のないものになっています。あなたが飛び込むのは自分が関わっていない戦況なので、勝っても負けてもこの試合があなたの戦場レーティングに触れることはなく、途中で抜けても何も負いません。試合が終わりに近づき、来たところで結果を変えられない頃合いになると誘い自体が届かなくなるので、他人の幕引きに座らされることはありません。',
   'hudChrome.trade.windowClosed': '取引ウィンドウを閉じました。',
+  'hudChrome.trade.offerQuantityHint': '差し出す数量を選べます',
+  'hudChrome.trade.offerQuantityTitle': '{item}を差し出す',
+  'hudChrome.trade.offerQuantityInput': '差し出す数量',
+  'hudChrome.trade.offerQuantityConfirm': '差し出す',
+  'hudChrome.trade.offerQuantityAll': 'すべて差し出す',
+  'hudChrome.trade.offerRemoveTitle': '{item}を取り除く',
+  'hudChrome.trade.offerRemoveInput': '取り除く数量',
+  'hudChrome.trade.offerRemove': '取り除く',
+  'hudChrome.trade.offerRemoveAll': 'すべて取り除く',
   'hudChrome.trade.woc.hintInsufficientBalance': '接続中のウォレットの $WOC 残高を超えています。',
   'hudChrome.trade.woc.priceLabel': '価格（USD）',
   'hudChrome.trade.woc.equivalent': '現在のレートで約 {tokens} $WOC',

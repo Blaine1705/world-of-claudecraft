@@ -518,6 +518,15 @@ export const it_IT: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Finestra di scambio chiusa.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Oro",
         "tabWoc": "$WOC",
@@ -20276,6 +20285,7 @@ export const it_IT: EnTranslations = {
       "eastbrook_vale": {
         "name": "Valle di Eastbrook",
         "welcome": "Cerca il maresciallo Redbrook in città: ha lavoro per te.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20321,6 +20331,7 @@ export const it_IT: EnTranslations = {
       "mirefen_marsh": {
         "name": "Palude di Mirefen",
         "welcome": "Presentati al custode Fenwick al cancello di Fenbridge.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20351,6 +20362,7 @@ export const it_IT: EnTranslations = {
       "thornpeak_heights": {
         "name": "Alture di Thornpeak",
         "welcome": "Il capitano Thessaly tiene a stento il muro di Highwatch.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"

@@ -518,6 +518,15 @@ export const en_CA: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Trade window closed.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",
@@ -10747,7 +10756,7 @@ export const en_CA: EnTranslations = {
       "emptyTheirs": "Nothing offered yet",
       "money": "Money",
       "copper": "copper",
-      "hint": "Click an offered item to remove it. Both sides must press Accept Trade.",
+      "hint": "Click an offered item to remove some or all of it. Both sides must press Accept Trade.",
       "accept": "Accept Trade",
       "waiting": "Waiting...",
       "cancel": "Cancel"
@@ -20276,6 +20285,7 @@ export const en_CA: EnTranslations = {
       "eastbrook_vale": {
         "name": "Eastbrook Vale",
         "welcome": "Find Marshal Redbrook in town - he has work for you.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20321,6 +20331,7 @@ export const en_CA: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefen Marsh",
         "welcome": "Report to Warden Fenwick at the Fenbridge gate.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20351,6 +20362,7 @@ export const en_CA: EnTranslations = {
       "thornpeak_heights": {
         "name": "Thornpeak Heights",
         "welcome": "Captain Thessaly holds the wall at Highwatch - barely.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"

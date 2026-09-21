@@ -484,11 +484,15 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18291 -> 18289 at the PR 4100 review round: the Inspect look now
     // travels as an openInspect parameter (no InspectEntity cast dep), and
     // the target-of-target key reads targetPortraitKey. Exact count, zero slack.
-    // LOWERED 18289 -> 18276 with the character-select raid lockouts: the
+    // LOWERED 18289 -> 18286 at the trade quantity prompt sync: the merge queue
+    // measured that branch at 18291 against this pin, so its tradeOfferHeadroom
+    // wrapper folded into the bags binding (the trade-open gate plus the pure
+    // core read on one dependency line). Exact count, zero slack.
+    // LOWERED 18286 -> 18273 with the character-select raid lockouts: the
     // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
     // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
     // and the minimap badge name a lockout identically. Exact count, zero slack.
-    ceiling: 18276,
+    ceiling: 18273,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -518,6 +518,15 @@ export const ru_RU: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Окно обмена закрыто.",
+      "offerQuantityHint": "Вас спросят, сколько предложить",
+      "offerQuantityTitle": "Предложить {item}",
+      "offerQuantityInput": "Количество для предложения",
+      "offerQuantityConfirm": "Предложить",
+      "offerQuantityAll": "Предложить всё",
+      "offerRemoveTitle": "Убрать {item}",
+      "offerRemoveInput": "Количество для удаления",
+      "offerRemove": "Убрать",
+      "offerRemoveAll": "Убрать всё",
       "woc": {
         "tabGold": "Золото",
         "tabWoc": "$WOC",
@@ -20276,6 +20285,7 @@ export const ru_RU: EnTranslations = {
       "eastbrook_vale": {
         "name": "Истврукская долина",
         "welcome": "Найдите в городе маршала Редбрука: у него есть для вас работа.",
+        "welcomeDone": "У маршала Редбрука больше нет для вас работы - уютному приморскому городку, где начался ваш путь, стало спокойнее благодаря этому.",
         "pois": {
           "0": {
             "label": "Истврук"
@@ -20321,6 +20331,7 @@ export const ru_RU: EnTranslations = {
       "mirefen_marsh": {
         "name": "Мирефенская топь",
         "welcome": "Доложите стражу Фенвику у ворот Фенбриджа.",
+        "welcomeDone": "У стража Фенвика больше нет для вас приказов - поселению в глубине топких болот стало безопаснее благодаря этому.",
         "pois": {
           "0": {
             "label": "Фенбридж"
@@ -20351,6 +20362,7 @@ export const ru_RU: EnTranslations = {
       "thornpeak_heights": {
         "name": "Терновые высоты",
         "welcome": "Капитан Тессали едва удерживает стену Хайвотча.",
+        "welcomeDone": "Капитан Тессали удерживает стену Хайвотча - легко не бывает, но с помощью таких искателей приключений, как вы, теперь это по силам.",
         "pois": {
           "0": {
             "label": "Хайвотч"

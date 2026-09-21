@@ -4996,6 +4996,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.name': '이스트브룩 골짜기',
   'entities.zones.eastbrook_vale.welcome':
     '마을의 레드브룩 원수를 찾아가십시오. 그가 당신에게 맡길 일이 있습니다.',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    '레드브룩 원수가 맡길 일은 더 이상 없습니다 - 당신의 여정이 시작된 아담한 바닷가 마을은 그 덕분에 한결 평온합니다.',
   'entities.zones.eastbrook_vale.pois.0.label': '이스트브룩',
   'entities.zones.eastbrook_vale.pois.1.label': '늑대길',
   'entities.zones.eastbrook_vale.pois.2.label': '멧돼지 초원',
@@ -5006,6 +5008,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': '무너진 예배당',
   'entities.zones.mirefen_marsh.name': '마이어펜 습지',
   'entities.zones.mirefen_marsh.welcome': '펜브리지 문에서 감시관 펜윅에게 보고하십시오.',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    '감시관 펜윅의 명령은 더 이상 없습니다 - 질퍽한 늪지대 깊숙이 자리한 정착지는 그 덕분에 더 안전해졌습니다.',
   'entities.zones.mirefen_marsh.pois.0.label': '펜브리지',
   'entities.zones.mirefen_marsh.pois.1.label': '배회자 갈대밭',
   'entities.zones.mirefen_marsh.pois.2.label': '딥펜 얕은 물',
@@ -5017,6 +5021,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.name': '쏜피크 고지',
   'entities.zones.thornpeak_heights.welcome':
     '테살리 대장이 간신히 하이워치 성벽을 지키고 있습니다.',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    '테살리 대장이 하이워치 성벽을 지키고 있습니다 - 결코 쉽지 않지만, 당신 같은 모험가들의 도움으로 이제는 감당할 만합니다.',
   'entities.zones.thornpeak_heights.pois.0.label': '하이워치',
   'entities.zones.thornpeak_heights.pois.1.label': '추적자 산등성이',
   'entities.zones.thornpeak_heights.pois.2.label': '딥록 굴',
@@ -16149,6 +16155,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '보충 자리는 의도적으로 위험이 없습니다. 당신이 들어가는 것은 당신과 무관한 점수판이므로 이기든 지든 이 경기가 당신의 전장 레이팅을 건드리지 않으며, 도중에 떠나도 아무것도 물지 않습니다. 경기가 충분히 끝나가서 새로 온 사람이 결과를 바꿀 수 없는 시점이 되면 제안 자체가 오지 않으므로, 남의 마무리에 앉혀지는 일은 없습니다.',
   'hudChrome.trade.windowClosed': '거래 창이 닫혔습니다.',
+  'hudChrome.trade.offerQuantityHint': '내놓을 수량을 묻습니다',
+  'hudChrome.trade.offerQuantityTitle': '{item} 내놓기',
+  'hudChrome.trade.offerQuantityInput': '내놓을 수량',
+  'hudChrome.trade.offerQuantityConfirm': '내놓기',
+  'hudChrome.trade.offerQuantityAll': '모두 내놓기',
+  'hudChrome.trade.offerRemoveTitle': '{item} 제거',
+  'hudChrome.trade.offerRemoveInput': '제거할 수량',
+  'hudChrome.trade.offerRemove': '제거',
+  'hudChrome.trade.offerRemoveAll': '모두 제거',
   'hudChrome.trade.woc.hintInsufficientBalance': '연결된 지갑의 $WOC 잔액보다 많습니다.',
   'hudChrome.trade.woc.priceLabel': '가격 (USD)',
   'hudChrome.trade.woc.equivalent': '현재 환율 기준 약 {tokens} $WOC',

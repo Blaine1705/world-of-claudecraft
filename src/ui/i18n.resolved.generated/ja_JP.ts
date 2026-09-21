@@ -518,6 +518,15 @@ export const ja_JP: EnTranslations = {
     },
     "trade": {
       "windowClosed": "取引ウィンドウを閉じました。",
+      "offerQuantityHint": "差し出す数量を選べます",
+      "offerQuantityTitle": "{item}を差し出す",
+      "offerQuantityInput": "差し出す数量",
+      "offerQuantityConfirm": "差し出す",
+      "offerQuantityAll": "すべて差し出す",
+      "offerRemoveTitle": "{item}を取り除く",
+      "offerRemoveInput": "取り除く数量",
+      "offerRemove": "取り除く",
+      "offerRemoveAll": "すべて取り除く",
       "woc": {
         "tabGold": "金貨",
         "tabWoc": "$WOC",
@@ -20276,6 +20285,7 @@ export const ja_JP: EnTranslations = {
       "eastbrook_vale": {
         "name": "イーストブルック渓谷",
         "welcome": "町のレッドブルック元帥を訪ねてください。あなたに頼みたい仕事があります。",
+        "welcomeDone": "レッドブルック元帥からの仕事はもうありません - あなたの旅が始まった趣のある海辺の町は、おかげで安らかです。",
         "pois": {
           "0": {
             "label": "イーストブルック"
@@ -20321,6 +20331,7 @@ export const ja_JP: EnTranslations = {
       "mirefen_marsh": {
         "name": "マイアフェン湿地",
         "welcome": "フェンブリッジの門で番人フェンウィックに報告してください。",
+        "welcomeDone": "番人フェンウィックからの命令はもうありません - 沼地の湿原の奥深くにたたずむ集落は、おかげでより安全になりました。",
         "pois": {
           "0": {
             "label": "フェンブリッジ"
@@ -20351,6 +20362,7 @@ export const ja_JP: EnTranslations = {
       "thornpeak_heights": {
         "name": "ソーンピーク高地",
         "welcome": "テサリー隊長がかろうじてハイウォッチの壁を保っています。",
+        "welcomeDone": "テサリー隊長がハイウォッチの壁を守っています - 決して楽ではありませんが、あなたのような冒険者たちの助けで今は何とか持ちこたえています。",
         "pois": {
           "0": {
             "label": "ハイウォッチ"

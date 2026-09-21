@@ -518,6 +518,15 @@ export const id_ID: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Jendela perdagangan ditutup.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Emas",
         "tabWoc": "$WOC",
@@ -20276,6 +20285,7 @@ export const id_ID: EnTranslations = {
       "eastbrook_vale": {
         "name": "Lembah Eastbrook",
         "welcome": "Temui Marsekal Redbrook di kota, ia punya tugas untukmu.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20321,6 +20331,7 @@ export const id_ID: EnTranslations = {
       "mirefen_marsh": {
         "name": "Rawa Mirefen",
         "welcome": "Lapor pada Warden Fenwick di gerbang Jembatan Rawa.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Jembatan Rawa"
@@ -20351,6 +20362,7 @@ export const id_ID: EnTranslations = {
       "thornpeak_heights": {
         "name": "Dataran Tinggi Thornpeak",
         "welcome": "Kapten Thessaly mempertahankan tembok di Menara Pengawas, nyaris saja.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Menara Pengawas"

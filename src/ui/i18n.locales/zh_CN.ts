@@ -4825,6 +4825,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_tarn_waders.objectives.0.label': '微光潭涉行者已被消灭',
   'entities.zones.eastbrook_vale.name': '东溪谷',
   'entities.zones.eastbrook_vale.welcome': '去镇上找雷德布鲁克元帅，他有任务交给你。',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    '雷德布鲁克元帅已没有任务交给你了 - 这座你踏上旅途的古朴海滨小镇因你而安宁。',
   'entities.zones.eastbrook_vale.pois.0.label': '东溪',
   'entities.zones.eastbrook_vale.pois.1.label': '狼径',
   'entities.zones.eastbrook_vale.pois.2.label': '野猪草地',
@@ -4835,6 +4837,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': '倒塌礼拜堂',
   'entities.zones.mirefen_marsh.name': '泥沼湿地',
   'entities.zones.mirefen_marsh.welcome': '到芬桥大门向守望者芬威克报到。',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    '守望者芬威克已没有命令交给你了 - 这处沼泽湿地深处的聚落因你而更加安全。',
   'entities.zones.mirefen_marsh.pois.0.label': '芬桥',
   'entities.zones.mirefen_marsh.pois.1.label': '潜伏者芦苇地',
   'entities.zones.mirefen_marsh.pois.2.label': '深沼浅滩',
@@ -4845,6 +4849,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.7.label': '沉没堡垒',
   'entities.zones.thornpeak_heights.name': '荆峰高地',
   'entities.zones.thornpeak_heights.welcome': '瑟萨莉队长勉强守住高望城墙。',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    '瑟萨莉队长守卫着高望城墙 - 从来都不轻松，但有了像你这样的冒险者相助，如今总算应付得来。',
   'entities.zones.thornpeak_heights.pois.0.label': '高望',
   'entities.zones.thornpeak_heights.pois.1.label': '潜猎者山脊',
   'entities.zones.thornpeak_heights.pois.2.label': '深岩洞穴',
@@ -15385,6 +15391,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '接下补位的席位是刻意不带风险的：你落入的是一份与你无关的比分，因此无论胜负，这场比赛都不会触动你的战场评分，中途离开也不欠任何代价。当一场比赛已接近尾声、新来者再也无法改变结果时，邀请也就不再发出，所以你绝不会被安置进别人的结局里。',
   'hudChrome.trade.windowClosed': '交易窗口已关闭。',
+  'hudChrome.trade.offerQuantityHint': '将询问你要提供的数量',
+  'hudChrome.trade.offerQuantityTitle': '提供 {item}',
+  'hudChrome.trade.offerQuantityInput': '要提供的数量',
+  'hudChrome.trade.offerQuantityConfirm': '提供',
+  'hudChrome.trade.offerQuantityAll': '全部提供',
+  'hudChrome.trade.offerRemoveTitle': '移除 {item}',
+  'hudChrome.trade.offerRemoveInput': '要移除的数量',
+  'hudChrome.trade.offerRemove': '移除',
+  'hudChrome.trade.offerRemoveAll': '全部移除',
   'hudChrome.trade.woc.hintInsufficientBalance': '这超出了你已连接钱包持有的 $WOC 数量。',
   'hudChrome.trade.woc.priceLabel': '价格（美元）',
   'hudChrome.trade.woc.equivalent': '按当前汇率约为 {tokens} $WOC',
