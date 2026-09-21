@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { computeAbilityVfxSnapshot, readCommittedSnapshot } from '../scripts/ability_vfx_snapshot';
+import { ABILITY_VFX_FULL_SPECS } from '../src/render/ability_vfx_full_specs';
 import { abilityVfxFullSpec } from '../src/render/ability_vfx_registry';
+import { WARRIOR_BASE_PROFILES } from '../src/render/warrior_base_profiles';
 import { WARRIOR_CHOREOGRAPHY } from '../src/render/warrior_vfx_specs';
 import { ABILITIES } from '../src/sim/data';
 
@@ -63,6 +65,38 @@ describe('Warrior-only release44 integration', () => {
       expect(ABILITIES[id]?.class, id).toBe('warrior');
       expect(abilityVfxFullSpec(id)?.physical, id).toBe(physical);
       expect(abilityVfxFullSpec(id)?.windupStyle, id).toBe('none');
+    }
+  });
+});
+
+// warrior_base_profiles.ts is the generated gallery row plus one authored `filler`
+// bit per ability (it used to be a 1485-line copy of those rows). A choreography
+// id without a profile silently falls back to a dash/physical stub in
+// warrior_vfx_specs.ts, so every authored id must have a real generated base,
+// and a profile may differ from its generated row in nothing but `filler`.
+describe('warrior base profiles are the generated rows plus filler', () => {
+  it('gives every authored choreography id a profile built from its generated row', () => {
+    for (const id of Object.keys(WARRIOR_CHOREOGRAPHY)) {
+      const generated = ABILITY_VFX_FULL_SPECS[id];
+      const profile = WARRIOR_BASE_PROFILES[id];
+      if (!generated) {
+        // No gallery row at all (Intervene): the documented fallback in
+        // warrior_vfx_specs.ts applies, and no profile may invent one.
+        expect(profile, `'${id}' has a profile but no generated row`).toBeUndefined();
+        continue;
+      }
+      expect(
+        profile,
+        `'${id}' has no WARRIOR_FILLER entry (warrior_base_profiles.ts)`,
+      ).toBeDefined();
+      const { filler, ...rest } = profile;
+      expect(typeof filler).toBe('boolean');
+      expect(rest).toEqual(generated);
+    }
+  });
+  it('profiles only warrior abilities', () => {
+    for (const id of Object.keys(WARRIOR_BASE_PROFILES)) {
+      expect(ABILITIES[id]?.class, id).toBe('warrior');
     }
   });
 });

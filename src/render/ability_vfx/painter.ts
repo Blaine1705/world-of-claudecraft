@@ -1102,10 +1102,7 @@ export class AbilityVfx {
       // waits on the cast programs, so it draws even while the rest is held.
       // With the plan's colour, or the same cast would read one colour on a
       // held gate and another on an open one.
-      if (ev.radius) {
-        const held = planCast(spec, this.quality, REFUSED_CAST_TIER);
-        this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, held.color);
-      }
+      this.areaTelegraph(ev, planCast(spec, this.quality, REFUSED_CAST_TIER).color);
       return true;
     }
     const casterId = ev.sourceId ?? -1;

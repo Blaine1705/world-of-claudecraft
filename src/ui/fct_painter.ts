@@ -72,8 +72,10 @@
 //    and a behind-camera cull is decided then too.
 //  - ORDERED BY BEAT: the queue is kept in due order, so two overlapping casts still
 //    release their numbers in the order the blades actually land.
-//  - DISPOSE CLEARS: a held entry references the entity it floats over, so dispose() drops
-//    the queue rather than leaving a delayed number to arrive over a torn-down HUD.
+//  - DISPOSE CLEARS: a held entry references the entity it floats over, so dispose()
+//    drops the queue and detaches the live nodes for a host that tears its painter
+//    down (the tests, a future HUD teardown); the live HUD keeps one painter for the
+//    page's life and never calls it.
 // Only the FCT number is staged. Nothing a player reacts to (target HP, nameplates, cast
 // bars, the combat log line) is delayed by any of this.
 //
