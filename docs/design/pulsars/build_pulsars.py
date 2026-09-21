@@ -301,7 +301,10 @@ def build_orb():
 
 def build_core_only():
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    mats = make_materials(MATERIALS[:1])
+    # The mob's BODY is lit by the game (its visual's selfIllumination) and is what
+    # its target portrait renders: at the orb's own emission it blows out to a white
+    # disc, so the body keeps the colour and lets its facets shade.
+    mats = make_materials([('PulsarCore', (0.2, 0.52, 1.0), 0.1, 0.25, 0.6)])
     root = empty('PulsarCore_ROOT')
     return [build_core(mats, root)]
 

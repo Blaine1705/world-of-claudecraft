@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "4aa092067f83872b2472fb4ff45e9a2055cf9a6398868e6b6f213544c14ff5b6",
+  "rendererFingerprint": "621177026ce85bac7255720d83b5e273714cbf9546cb5e4f666a44b3174b486f",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5008309,
-      "sha256": "2833cca254e19c9198ffef0b9c6bc15d51bb6c129f0f466ac9909235b64765c9",
+      "bytes": 5008411,
+      "sha256": "dbf16b6f7462d6ecbf776a6f1bac7b9a21563505df451631d1d1e6e71b8c9c8e",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3384,8 +3384,8 @@
         "model": {
           "url": "models/creatures/hoard_tentacle_trunk.glb",
           "path": "public/models/creatures/hoard_tentacle_trunk.glb",
-          "bytes": 7728,
-          "sha256": "e7b1753abd09ee2137d535d6bd3d592bfadb2a9f89968db0fcd12b9a89a360e3"
+          "bytes": 13448,
+          "sha256": "0eac2b83378e2742e85e56253c447157a501d230590b6c7fd7995a1796c70ab1"
         },
         "idle": "Idle",
         "height": 1.5,
@@ -3402,11 +3402,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "bc6c7542a09bfc4b2d228bd453adf5ee746911e62241298d819a150d7aa291ac",
+      "sourceFingerprint": "ccd8676fdbd339a0889655bd59f7e68d3eafa7e32ff49e6ed1a50e7df80a9cde",
       "output": {
         "path": "public/ui/mobs/hoard_abyssal_tentacle.webp",
-        "bytes": 1874,
-        "sha256": "f6dfb285c89a4a564fa8538fc705ad6ad8ce642f22c407a9854dd9eaebb5301c"
+        "bytes": 2640,
+        "sha256": "297daa7db277505a98a5b9d7d17af09a0c71fb36279c31c153f2d8207ed2c914"
       }
     },
     {
@@ -3418,8 +3418,8 @@
         "model": {
           "url": "models/creatures/hoard_pulsar_core.glb",
           "path": "public/models/creatures/hoard_pulsar_core.glb",
-          "bytes": 4196,
-          "sha256": "524194701edbb7035bd5fac488f64886186990dcf7c4fcf8b2ed0a371fa22fe3"
+          "bytes": 4096,
+          "sha256": "862ee64a9ba27cb3c41056c4ff4fecff43f90418a250c469d5628eb6a9117183"
         },
         "idle": "Idle",
         "height": 1.5,
@@ -3436,11 +3436,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f57cae7eba7f109fa612a4f8731a8fa03da279b03cefefabe505d211bef51ee8",
+      "sourceFingerprint": "e5762411a85dd9d6643b6e5b57b64533acb3e7a4a23189e7bbe0d5c0cc83c67a",
       "output": {
         "path": "public/ui/mobs/hoard_bound_pulsar.webp",
-        "bytes": 1298,
-        "sha256": "321552ebfff0b94c22065b27120f08ab719346c0194f0d3e07e08fbc0f215a61"
+        "bytes": 1674,
+        "sha256": "981d4167f4072a7402e9ca349a49f5e95f88f474d8436eb8fa51f17603755cd3"
       }
     },
     {
@@ -6024,8 +6024,8 @@
         "model": {
           "url": "models/creatures/hoard_archon_nyxaris.glb",
           "path": "public/models/creatures/hoard_archon_nyxaris.glb",
-          "bytes": 580460,
-          "sha256": "3955c0ed3f5c86d1d3d24bef8750dfe04c042d49ee14260fb41bf20d2aa3a9f0"
+          "bytes": 627480,
+          "sha256": "59bad957fd8eec08f8d0be3395fd5b9a8c4ee01c070e6456fcf256bd2d689f7c"
         },
         "idle": "Idle",
         "height": 2.4,
@@ -6042,7 +6042,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "009d1bba538bd2b7df0ba6fe8bbf19ee1d0c4a13d3fbdb4f9a9118574f5ddda2",
+      "sourceFingerprint": "8fc55e5c12eee7cf814cbce99963c7667a744c071e73f0936a27b6cd267b6795",
       "output": {
         "path": "public/ui/mobs/rift_boss_arcane.webp",
         "bytes": 1890,
@@ -6092,8 +6092,8 @@
         "model": {
           "url": "models/creatures/hoard_emberforge_tyrant.glb",
           "path": "public/models/creatures/hoard_emberforge_tyrant.glb",
-          "bytes": 806500,
-          "sha256": "b85d1cf931934388831eb7361f6f63d310f53425001bb6e2fa415881a0761416"
+          "bytes": 845036,
+          "sha256": "4af821a5e27d2c948b9e38862289f8fe854eed40c4b013ab487bd9abc4edc7e1"
         },
         "idle": "Idle",
         "height": 2.6,
@@ -6103,10 +6103,10 @@
         "attach": [
           {
             "asset": {
-              "url": "models/weapons/hammer_d.glb",
-              "path": "public/models/weapons/hammer_d.glb",
-              "bytes": 99344,
-              "sha256": "6d3cf3ededad8f6741b94930110934c52798ab9c31ab2c2e32ac9a8087943dab"
+              "url": "models/weapons/hoard_forge_maul.glb",
+              "path": "public/models/weapons/hoard_forge_maul.glb",
+              "bytes": 16260,
+              "sha256": "31c58870df731dc06f8edcc164a31fb3a06268e7b45ecea85fb51eaab986833c"
             },
             "bone": "handslot.r",
             "position": null,
@@ -6123,11 +6123,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "b5cde901432c4c95a56cd28ce04a09cb0cb2991765a36096ec437457099294f3",
+      "sourceFingerprint": "00f23a6e692ff3b1667a10f9d637927be085034766e35ef4e1e33c4dc55b2c6b",
       "output": {
         "path": "public/ui/mobs/rift_boss_ember.webp",
-        "bytes": 2870,
-        "sha256": "aa5fe9590141476ebc2fafc358b574374b1a0be84773d572e6f29b5cc39b04ad"
+        "bytes": 2484,
+        "sha256": "dd5f83c06e3d25b7eca696a00ed85e512f325f9a22dbdc91c27662c914b39fc1"
       }
     },
     {
@@ -6275,8 +6275,8 @@
         "model": {
           "url": "models/creatures/hoard_tempest_vharok.glb",
           "path": "public/models/creatures/hoard_tempest_vharok.glb",
-          "bytes": 739840,
-          "sha256": "2f37e8d5ef862fd375f020267e56023d115d9ecf76879b3d851c02a667ad64d5"
+          "bytes": 779696,
+          "sha256": "c7262a2efb5a364cc9666be420e051f6ab5005d7bd01149d6adec380660285ab"
         },
         "idle": "Idle",
         "height": 2.5,
@@ -6293,7 +6293,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8f464372de92d553fa790ef35972ac8cfffe5f432caedf9ecf51981a716940d4",
+      "sourceFingerprint": "876620d60691803342e06c3cf80ecf71e93fae578194affe3d14ee6c1454641e",
       "output": {
         "path": "public/ui/mobs/rift_boss_storm.webp",
         "bytes": 2470,

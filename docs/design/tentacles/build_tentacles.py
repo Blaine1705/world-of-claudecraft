@@ -248,6 +248,36 @@ def build_pool(mats, root):
     return finish('Tentacle_Pool', bm, [mats['AbyssWater']], root)
 
 
+def feeler(bm, bearing, reach, length, radius):
+    """A small curled tentacle on the collar's rim, leaning out and hooking over:
+    the body alone then still reads as the Maw's tentacle (its target portrait is a
+    render of this body, and the living chain never covers the rim)."""
+    ux, uy = math.cos(bearing), math.sin(bearing)
+    sides = 6
+    steps = 6
+    rows = []
+    for s in range(steps + 1):
+        t = s / steps
+        out = reach + 0.75 * t * t
+        z = 0.55 + length * (t - 0.28 * t * t * t)
+        r = radius * (1 - t) ** 0.8 + 0.02
+        rows.append([
+            bm.verts.new((
+                ux * out + (math.cos(math.tau * i / sides) * ux - math.sin(math.tau * i / sides) * uy) * r,
+                uy * out + (math.cos(math.tau * i / sides) * uy + math.sin(math.tau * i / sides) * ux) * r,
+                z + math.cos(math.tau * i / sides) * r * 0.5 * t,
+            ))
+            for i in range(sides)
+        ])
+    for r in range(steps):
+        for i in range(sides):
+            face = bm.faces.new((rows[r][i], rows[r][(i + 1) % sides], rows[r + 1][(i + 1) % sides], rows[r + 1][i]))
+            # The outward face is the pale underside, with a glowing sucker band.
+            outward = math.cos(math.tau * (i + 0.5) / sides)
+            face.material_index = (2 if r % 2 == 1 else 1) if outward > 0.6 else 0
+    bmesh.ops.contextual_create(bm, geom=[e for e in bm.edges if e.is_boundary and all(v.co.z > 0.55 + length * 0.7 for v in e.verts)])
+
+
 def build_collar(mats, root):
     """The root it grows out of: a thick, folded sleeve of skin, wider than the
     chain's first link so the join is never seen."""
@@ -269,6 +299,8 @@ def build_collar(mats, root):
             v.co.y *= 1 + (rng.random() - 0.5) * 0.07
     for z in (0.45, 1.0):
         sucker(bm, z, 0.34, COLLAR_RADIUS * 1.06, squash=0.95)
+    for k in range(5):
+        feeler(bm, math.tau * (k + 0.35) / 5, COLLAR_RADIUS * 0.98, 2.3 + 0.5 * rng.random(), 0.46)
     return finish('Trunk_Collar', bm, [mats['AbyssSkin'], mats['AbyssUnder'], mats['AbyssSucker']], root)
 
 

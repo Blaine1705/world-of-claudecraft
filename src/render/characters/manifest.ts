@@ -21,7 +21,10 @@ import {
 import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_miniboss_stomp';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../../sim/nythraxis_bone_spike';
-import { HOARD_CAST_ICE_AGE } from '../../sim/rift/hoard_control_cast_ids';
+import {
+  HOARD_CAST_ICE_AGE,
+  HOARD_CAST_PULSAR_OVERLOAD,
+} from '../../sim/rift/hoard_control_cast_ids';
 import {
   ALL_CLASSES,
   type Entity,
@@ -36,6 +39,9 @@ import {
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
 import {
+  HOARD_GESTURE_CALL_HAMMER,
+  HOARD_GESTURE_CALL_STORM,
+  HOARD_GESTURE_EMBER_FRONTAL,
   HOARD_GESTURE_FROST_GUST,
   HOARD_GESTURE_ICE_AGE_RELEASE,
 } from '../hoard_boss_gestures_core';
@@ -3769,8 +3775,25 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_emberforge_tyrant.glb`,
     height: 2.6,
     // (The locally rigged bodies carry the knight's clip library: one hit clip.)
-    clips: { ...kaykit(['2H_Melee_Attack_Chop']), hit: ['Hit_A'] },
-    attach: [{ url: `${WEAPONS}/hammer_d.glb`, bone: 'handslot.r' }],
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+      // Started off the cue clock (hoard_boss_gestures_core.ts): he thrusts the
+      // maul at the sky to call the Hammer of the Forge (authored,
+      // scripts/assets/hoard_bosses/build_boss_gestures.mjs), and brings it down
+      // on his frontal.
+      attackByAbility: {
+        [HOARD_GESTURE_CALL_HAMMER]: 'CallHammer',
+        [HOARD_GESTURE_EMBER_FRONTAL]: '2H_Melee_Attack_Chop',
+      },
+      attackTimeScaleByAbility: {
+        [HOARD_GESTURE_CALL_HAMMER]: 1,
+        [HOARD_GESTURE_EMBER_FRONTAL]: 1,
+      },
+    },
+    // He carries the hammer he calls down: the held variant of the arena model
+    // (scripts/assets/hoard_bosses/held_forge_maul.mjs).
+    attach: [{ url: `${WEAPONS}/hoard_forge_maul.glb`, bone: 'handslot.r' }],
     authoredAtlas: true,
     selfIllumination: 0.45,
   },
@@ -3786,6 +3809,9 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Idle',
       run: 'Idle',
       walkBack: 'Idle',
+      // The whole Pulsar Overload bar is one held, breathing channel (authored).
+      castByAbility: { [HOARD_CAST_PULSAR_OVERLOAD]: 'PulsarChannel' },
+      castTimeScaleByAbility: { [HOARD_CAST_PULSAR_OVERLOAD]: 1 },
     },
     authoredAtlas: true,
     selfIllumination: 0.25,
@@ -3798,6 +3824,9 @@ export const VISUALS: Record<string, VisualDef> = {
       // broken swing (playtest), so he rakes with both claws, swipes and punches.
       ...kaykit(['Dualwield_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Punch_A']),
       hit: ['Hit_A'],
+      // He throws both claws at the sky to call the orbital storm (authored).
+      attackByAbility: { [HOARD_GESTURE_CALL_STORM]: 'CallStorm' },
+      attackTimeScaleByAbility: { [HOARD_GESTURE_CALL_STORM]: 1 },
     },
     authoredAtlas: true,
     selfIllumination: 0.25,
