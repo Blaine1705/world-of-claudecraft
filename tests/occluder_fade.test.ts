@@ -59,4 +59,11 @@ describe('occluder fade material application', () => {
     expect(twinMaterial.side).toBe(THREE.DoubleSide);
     expect(twinMaterial.forceSinglePass).toBe(true);
   });
+
+  it('leaves an authored transparent material on its two face passes', () => {
+    // A window pane draws transparent all the time, not only while it ghosts.
+    const pane = new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, transparent: true });
+    occluderFadeMat(pane, new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), pane));
+    expect(pane.forceSinglePass).toBe(false);
+  });
 });

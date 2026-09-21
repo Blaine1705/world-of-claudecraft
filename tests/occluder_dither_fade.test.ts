@@ -80,6 +80,31 @@ describe('dithered camera ghost', () => {
     expect(material.customProgramCacheKey()).toBe('earlier-layer|ghost-dither-fade-v1');
   });
 
+  it('keeps two hooked materials with no own cache key on two programs', () => {
+    // Three's default key is the current hook's source: once this layer is the
+    // hook, two different previous hooks would otherwise read as one program.
+    const a = new THREE.MeshStandardMaterial();
+    a.onBeforeCompile = (shader) => {
+      shader.fragmentShader = `// layer a\n${shader.fragmentShader}`;
+    };
+    const b = new THREE.MeshStandardMaterial();
+    b.onBeforeCompile = (shader) => {
+      shader.fragmentShader = `// layer b\n${shader.fragmentShader}`;
+    };
+    attachDitherFade(a);
+    attachDitherFade(b);
+    expect(a.customProgramCacheKey()).not.toBe(b.customProgramCacheKey());
+  });
+
+  it('never hands a clone a dead copy of the fade uniform', () => {
+    const { material } = structure();
+    attachDitherFade(material);
+    const clone = material.clone();
+    expect(ditherFadeUniform(clone)).toBeNull();
+    attachDitherFade(clone);
+    expect(ditherFadeUniform(clone)).not.toBe(ditherFadeUniform(material));
+  });
+
   it('has no transparent twin to wait for, and warms none at boot', () => {
     const { material, mesh } = structure();
     const fade = occluderFadeMat(material, mesh);

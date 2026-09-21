@@ -64,7 +64,9 @@ export function occluderFadeMat(mat: THREE.Material, mesh: THREE.Mesh): Occluder
   // linked two twins instead of one. The fade writes depth, so the nearest
   // surface owns each pixel either way and one pass draws the same ghost. Set
   // here, before any twin is cloned from the material: inert while it is opaque.
-  mat.forceSinglePass = true;
+  // An authored transparent (a window pane) keeps its two passes: it draws
+  // transparent all the time, not only while it ghosts.
+  if (!mat.transparent) mat.forceSinglePass = true;
   if (ditherFadeEnabled()) attachDitherFade(mat);
   const target = occluderGhostTargetOf(mat, mesh);
   return {

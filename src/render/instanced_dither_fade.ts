@@ -103,7 +103,10 @@ const shells = new WeakSet<THREE.BufferGeometry>();
  * part's geometry across every bucket), so each batch gets a SHELL: the same
  * attribute and index OBJECTS (three keys GPU buffers on the object, so
  * nothing uploads twice) plus its own hide attribute. Never `clone()`, which
- * deep-copies. Returns `source` itself on the blended style.
+ * deep-copies. Returns `source` itself on the blended style. A consumer that
+ * disposes its batches releases the shell with `disposeGhostHideGeometry`;
+ * foliage never disposes a tree batch (they live as long as the renderer), so
+ * its shells ride that lifetime too.
  */
 export function ghostHideGeometry(
   source: THREE.BufferGeometry,

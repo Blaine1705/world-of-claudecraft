@@ -17,7 +17,6 @@ import { GFX } from './gfx';
 
 const PROGRAM_CACHE_KEY = 'ghost-dither-fade-v1';
 const ANCHOR = '#include <clipping_planes_fragment>';
-const UNIFORM_SLOT = 'ghostDitherFade';
 
 let forcedForTest: boolean | null = null;
 let forcedByUrl: boolean | null | undefined;
@@ -73,18 +72,27 @@ interface FadeUniform {
   value: number;
 }
 
+// Held apart from userData: Material.copy round-trips userData through JSON,
+// so a clone would inherit a dead copy of the uniform without the hook.
+const fadeUniforms = new WeakMap<THREE.Material, FadeUniform>();
+
 /** The fade uniform a decorated material owns, or null when undecorated. */
 export function ditherFadeUniform(material: THREE.Material): FadeUniform | null {
-  return (material.userData as { [UNIFORM_SLOT]?: FadeUniform })[UNIFORM_SLOT] ?? null;
+  return fadeUniforms.get(material) ?? null;
 }
 
 /** Chain the screen-door layer onto a hideable material. Idempotent. */
 export function attachDitherFade(material: THREE.Material): void {
-  if (ditherFadeUniform(material)) return;
+  if (fadeUniforms.has(material)) return;
   const uniform: FadeUniform = { value: 1 };
-  (material.userData as { [UNIFORM_SLOT]?: FadeUniform })[UNIFORM_SLOT] = uniform;
+  fadeUniforms.set(material, uniform);
   const previousCompile = material.onBeforeCompile.bind(material);
-  const previousCacheKey = material.customProgramCacheKey.bind(material);
+  // Three's default key is the CURRENT hook's source, which is this layer's
+  // once it is installed: snapshot the previous hook's source instead.
+  const previousSource = material.onBeforeCompile.toString();
+  const previousCacheKey = Object.hasOwn(material, 'customProgramCacheKey')
+    ? material.customProgramCacheKey.bind(material)
+    : null;
   material.onBeforeCompile = (shader, renderer) => {
     previousCompile(shader, renderer);
     shader.uniforms.uGhostFade = uniform;
@@ -93,6 +101,7 @@ export function attachDitherFade(material: THREE.Material): void {
       DITHER_GLSL,
     );
   };
-  material.customProgramCacheKey = () => `${previousCacheKey()}|${PROGRAM_CACHE_KEY}`;
+  material.customProgramCacheKey = () =>
+    `${previousCacheKey ? previousCacheKey() : previousSource}|${PROGRAM_CACHE_KEY}`;
   material.needsUpdate = true;
 }
