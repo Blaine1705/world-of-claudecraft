@@ -3841,6 +3841,39 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.25,
   },
+  // The hoard rooms' own rank and file (docs/design/boss-rooms/README.md): Tripo
+  // bodies on the shared KayKit rig, so they carry its whole clip vocabulary.
+  // The Abyssal Maw's drowned thrall fights with his hands.
+  mob_hoard_tide_thrall: {
+    url: `${CREATURES}/hoard_tide_thrall.glb`,
+    height: 2.4,
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Chop', 'Punch_A']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.2,
+  },
+  // The Maw's bottom-dweller: low, wide, all mouth. Its own Blender rig and clips
+  // (scripts/assets/hoard_mobs/quadruped_rig.py).
+  mob_hoard_deep_lurker: {
+    url: `${CREATURES}/hoard_deep_lurker.glb`,
+    // Height is the top of its lure; the body is about half of it.
+    height: 1.7,
+    // The generated model faces +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
   // Vysska's cocoons (src/sim/rift/hoard_cocoon.ts): the silk cocoon a wrapped
   // player stands inside, and the brood cocoon she spins for a lone player. Each
   // is the whole body of its attackable mob, so targeting, the nameplate and the
@@ -4217,6 +4250,8 @@ const MOB_KEYS: Record<string, string> = {
   rift_boss_ember: 'mob_hoard_emberforge_tyrant',
   rift_boss_arcane: 'mob_hoard_archon_nyxaris',
   rift_boss_storm: 'mob_hoard_tempest_vharok',
+  rift_tide_thrall: 'mob_hoard_tide_thrall',
+  rift_deep_lurker: 'mob_hoard_deep_lurker',
 };
 
 const FAMILY_KEYS: Record<string, string> = {

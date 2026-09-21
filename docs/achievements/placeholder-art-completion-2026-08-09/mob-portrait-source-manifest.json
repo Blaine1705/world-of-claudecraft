@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "d87820f62627309dd74acf75bd5f93bddf0b663a16c2eb6c097ed40ca131f3e0",
+  "rendererFingerprint": "ab8c2b83edd4dd730bfc7b51236ec56dd87baaa1a68e523efed331adae80e72f",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5008507,
-      "sha256": "88722ace7cc50f87f4299ab10fd1e522e59edc87d3be8ac791bdb07b207a997f",
+      "bytes": 5009179,
+      "sha256": "e095abc7244d2f9a8a4b96dff49f6a7f38b660e3e3c0c8b8bd3ef461cd21b675",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6372,34 +6372,34 @@
       "id": "rift_deep_lurker",
       "family": "burrower",
       "finderEncounter": false,
-      "visualKey": "mob_kobold",
+      "visualKey": "mob_hoard_deep_lurker",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/goblin.glb",
-          "path": "public/models/creatures/goblin.glb",
-          "bytes": 48360,
-          "sha256": "a128051c0b5078e0f76f09ed0e15eafe102ae11ae62e984155ccfefa3b08fb92"
+          "url": "models/creatures/hoard_deep_lurker.glb",
+          "path": "public/models/creatures/hoard_deep_lurker.glb",
+          "bytes": 436596,
+          "sha256": "c898c18e443c24ca921af1e8e7cd63b834f81b55db8702c3a60da2b3c2ed3b0a"
         },
         "idle": "Idle",
-        "height": 2.1,
-        "yaw": null,
+        "height": 1.7,
+        "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#148f77",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "9e8803aad3cf616ba65b1059896b6d0178a3394cee7742a57d8d9ba0dae8b306",
+      "sourceFingerprint": "ece65491bfe2cd5e36f736be92dbefffae1c11d83ac66a6870b91e4619ec6d1c",
       "output": {
         "path": "public/ui/mobs/rift_deep_lurker.webp",
-        "bytes": 1696,
-        "sha256": "3ac367063e3870adc822f3da64ea529a797306d265c34e4a4b9c88ab502259df"
+        "bytes": 1702,
+        "sha256": "07f12acc48eda9367f5ea2939fc6acb3a932e87796b79eea1df494f852b1ff11"
       }
     },
     {
@@ -6863,34 +6863,34 @@
       "id": "rift_tide_thrall",
       "family": "mudfin",
       "finderEncounter": false,
-      "visualKey": "mob_murloc",
+      "visualKey": "mob_hoard_tide_thrall",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/frog.glb",
-          "path": "public/models/creatures/frog.glb",
-          "bytes": 140836,
-          "sha256": "0d77a9e6b9a741bca8fb231a85eab7c7f894ea38099048a4696bd6f2edf3afef"
+          "url": "models/creatures/hoard_tide_thrall.glb",
+          "path": "public/models/creatures/hoard_tide_thrall.glb",
+          "bytes": 725108,
+          "sha256": "04a5d8f3b67baa56b5520dcf495c2bdad48e0896eaf0c2715046d56676d53384"
         },
         "idle": "Idle",
-        "height": 1.7,
+        "height": 2.4,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.45
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#17a589",
-        "strength": 0.45
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "a5301db0f411c83395d44e8f42e42e5ffe9ca629abe8d0f0a0c6c658c97cd038",
+      "sourceFingerprint": "5c0b239cc76e7340007d78b06d6a910ab5e9378e3b1d4ba9d69de14840305a1a",
       "output": {
         "path": "public/ui/mobs/rift_tide_thrall.webp",
-        "bytes": 1876,
-        "sha256": "d04157b35a5951c7ad8c2b80132d16d1489b350f3d6a7805be1524240037a9be"
+        "bytes": 2158,
+        "sha256": "536e5ad89edeb03db4e10f783c0ecbc6b730259aba7249a46c73401ffecc4046"
       }
     },
     {
