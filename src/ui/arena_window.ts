@@ -36,6 +36,7 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { captureFocusKey, findFocusKey, restoreFirstEnabled } from './focus_restore';
 import {
   type BgAllTimeEntry,
   type BgAllTimeRow,
@@ -44,7 +45,12 @@ import {
   type BgWindowView,
   buildBgWindowView,
 } from './hud/battleground';
-import { buildWorldPvpWindowView, wireWorldPvpPanel, worldPvpBodyHtml } from './hud/world_pvp';
+import {
+  buildWorldPvpWindowView,
+  WORLD_PVP_ACTION_FOCUS_KEY,
+  wireWorldPvpPanel,
+  worldPvpBodyHtml,
+} from './hud/world_pvp';
 import { formatNumber, t } from './i18n';
 import { formatPvpRecord } from './pvp_record_core';
 import { buildPvpTabs, type PvpTabId, type PvpTabsModel } from './pvp_tabs_view';
@@ -142,6 +148,7 @@ export class ArenaWindow {
   /** Open on (or switch to) a specific tab; a second call on that tab closes.
    *  The Thornhollow Fields deep entry (the shot harness, legacy callers) rides this. */
   openTab(tab: PvpTabId): void {
+    this.worldConfirming = false;
     if (!this.isOpen) {
       this.tab = tab;
       this.toggle();
@@ -160,12 +167,12 @@ export class ArenaWindow {
 
   close(): void {
     const el = this.deps.root();
+    this.worldConfirming = false;
     if (el.style.display !== 'block') {
       this.openerFocus = null;
       return;
     }
     el.style.display = 'none';
-    this.worldConfirming = false;
     thornhollowPrewarm?.pausePreview();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
@@ -301,8 +308,19 @@ export class ArenaWindow {
     const sig = `${view.sig}|${strip.tabs.map((s2) => (s2.locked ? 1 : 0)).join('')}`;
     if (sig === this.lastSig) return;
     this.lastSig = sig;
+    // The disarm countdown rebuilds this panel once a second: a keyboard user
+    // on the action button must land back on it (or its successor) after the
+    // innerHTML swap, never on the body (the bags window precedent).
+    const focusKey = captureFocusKey(el);
     el.innerHTML = this.worldTitleHtml() + this.stripHtml(strip) + worldPvpBodyHtml(view);
     this.wireChrome(el);
+    if (focusKey !== null) {
+      restoreFirstEnabled([
+        findFocusKey(el, focusKey),
+        findFocusKey(el, WORLD_PVP_ACTION_FOCUS_KEY),
+        el.querySelector<HTMLElement>('[data-close]'),
+      ]);
+    }
     wireWorldPvpPanel(el, {
       world: () => this.deps.world(),
       setConfirming: (confirming) => {

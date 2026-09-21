@@ -27,9 +27,11 @@ export {
   honorTeamIdentity,
   normalizeHonorCounter,
   normalizeHonorDailyState,
+  noteWorldKill,
   RANKED_ARENA_LOSS_HONOR,
   RANKED_ARENA_WIN_HONOR,
   repeatHonorMultiplier,
+  worldKillRepeats,
 } from './honor';
 export {
   DOUBLE_HONOR_LEAD_HOURS,
@@ -88,7 +90,6 @@ export {
   WORLD_PVP_GREY_LEVEL_GAP,
   WORLD_PVP_KILL_HONOR,
   WORLD_PVP_MIN_LEVEL,
-  WORLD_PVP_PAIR_DR_WINDOW,
   WORLD_PVP_STAKE_CAP_COPPER,
   WORLD_PVP_STAKE_FRACTION,
   worldPvpPairHostile,

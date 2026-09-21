@@ -2111,6 +2111,7 @@ export class Sim {
   devMobsFrozen = false;
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
+  readonly worldPvpDisabled: boolean;
   // Entities spawned by the last /dev sandbox (dummy + practice bots), so re-running
   // the command clears the previous scenario instead of piling more on. Dev only.
   private devSandboxIds: number[] = [];
@@ -2200,6 +2201,7 @@ export class Sim {
 
   constructor(cfg: SimConfig) {
     this.devCommands = cfg.devCommands ?? false;
+    this.worldPvpDisabled = cfg.worldPvpDisabled ?? false;
     this.cfg = {
       seed: cfg.seed,
       playerClass: cfg.playerClass,
@@ -2209,6 +2211,7 @@ export class Sim {
       autoEquip: cfg.autoEquip ?? false,
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
+      worldPvpDisabled: this.worldPvpDisabled,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
       compulsoryTutorial: cfg.compulsoryTutorial ?? false,
@@ -3035,7 +3038,7 @@ export class Sim {
       // existing characters from day one.
       meta.lifetimeXp = s.lifetimeXp ?? xpToReachLevel(player.level) + Math.max(0, s.xp);
       honorMod.loadHonorState(meta, s);
-      worldPvpMod.loadWorldPvpState(meta, player, s.worldPvp, this.time);
+      worldPvpMod.loadWorldPvpState(this.ctx, meta, player, s.worldPvp);
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
       // `s.professions` is the legacy pre-rename field (#1119); `s.gatheringProficiency`
@@ -3987,8 +3990,7 @@ export class Sim {
       level: restore ? restore.level : e.level,
       xp: restore ? restore.xp : meta.xp,
       lifetimeXp: meta.lifetimeXp,
-      // Honor ledger + daily DR window (pvp/honor_persist.ts) and the World
-      // PvP flag record (pvp/world_pvp.ts): both absent-when-at-rest.
+      // Honor ledger + daily window (pvp/honor_persist.ts) and the /pvp record: absent at rest.
       ...honorMod.savedHonorState(meta),
       ...worldPvpMod.savedWorldPvpFields(meta, this.time),
       prestigeRank: meta.prestigeRank,
@@ -5283,6 +5285,9 @@ export class Sim {
       get devCommands() {
         return sim.devCommands;
       },
+      get worldPvpDisabled() {
+        return sim.worldPvpDisabled;
+      },
       get compulsoryTutorial() {
         return sim.cfg.compulsoryTutorial;
       },
@@ -6180,9 +6185,6 @@ export class Sim {
     lap?.('engaged');
 
     this.updateDuels();
-    // World PvP disarm clock + DR sweep (pvp/world_pvp.ts): zero rng, so it
-    // cannot fork the draw order; a tick with nobody disarming touches nothing.
-    worldPvpMod.updateWorldPvp(this.ctx);
     lap?.('duels');
     this.updateCardDuelQueue();
     this.updateCardDuelDeadlines();
@@ -6223,6 +6225,8 @@ export class Sim {
     // face at match START), so its tick position cannot fork the draw order
     // mid-match.
     bgMod.updateBattleground(this.ctx);
+    // World PvP clock + books sweep (pvp/world_pvp.ts), billed to the battleground lap; zero rng.
+    worldPvpMod.updateWorldPvp(this.ctx);
     lap?.('battleground');
     // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
     // matching on the sim clock), so appending it here cannot fork the draw order.
@@ -9327,8 +9331,7 @@ export class Sim {
       if (bg && bg.state === 'active' && this.bgMatches.get(target.id) === bg) {
         return bgMod.bgTeamOf(bg, attackerPlayer.id) !== bgMod.bgTeamOf(bg, target.id);
       }
-      // World PvP: two /pvp-flagged players outside a group and a guild
-      // (pvp/world_pvp.ts owns the rule; isFriendlyTo derives from this arm).
+      // World PvP: two /pvp-flagged players outside a group and a guild (pvp/world_pvp.ts).
       if (worldPvpMod.isWorldPvpHostile(this.ctx, attackerPlayer, target)) return true;
       // The jail brawl: prisoners are hostile to each other, always (pets
       // resolve to their owner via pvpController above, so a prisoner's pet
@@ -10873,8 +10876,6 @@ export class Sim {
   get lifetimeHonor(): number {
     return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.lifetimeHonor ?? 0);
   }
-
-  // IWorldWorldPvp (pvp/world_pvp.ts): the /pvp flag readout + raise/lower.
   get worldPvpInfo(): import('../world_api').WorldPvpInfo | null {
     return this.primaryId === -1 ? null : worldPvpMod.worldPvpInfoFor(this.ctx, this.primaryId);
   }
@@ -10882,7 +10883,6 @@ export class Sim {
   setWorldPvpFlag(enabled: boolean, pid = this.primaryId): void {
     worldPvpMod.setWorldPvpFlag(this.ctx, pid, enabled);
   }
-
   worldPvpInfoFor(pid: number): import('../world_api').WorldPvpInfo | null {
     return worldPvpMod.worldPvpInfoFor(this.ctx, pid);
   }

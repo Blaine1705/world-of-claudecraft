@@ -51,10 +51,14 @@ describe('worldPvpPairHostile', () => {
     expect(
       worldPvpPairHostile(player(1, { guild: 'Ravens' }), player(2, { guild: 'Crows' }), false),
     ).toBe(true);
-    // Two guildless players share the empty string and must NOT read as one guild.
+    // Two guildless players share the empty string and must NOT read as one guild,
+    // and neither may an undefined guild on both sides (a bare test entity).
     expect(worldPvpPairHostile(player(1, { guild: '' }), player(2, { guild: '' }), false)).toBe(
       true,
     );
+    expect(
+      worldPvpPairHostile(player(1, { guild: undefined }), player(2, { guild: undefined }), false),
+    ).toBe(true);
   });
 });
 

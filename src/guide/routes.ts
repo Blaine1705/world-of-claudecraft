@@ -187,6 +187,13 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.thornhollowPage.intro',
   },
   {
+    id: 'world-pvp',
+    sub: 'world-pvp',
+    navKey: 'guide.nav.worldPvp',
+    group: 'compete',
+    descKey: 'guide.worldPvpPage.intro',
+  },
+  {
     id: 'deeds',
     sub: 'deeds',
     navKey: 'guide.nav.deeds',

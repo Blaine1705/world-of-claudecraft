@@ -39,6 +39,10 @@ export function savedHonorState(meta: PlayerMeta): HonorSavedFields {
             // has not paid the first-win bonus writes nothing (back-compat +
             // parity-stable saves).
             ...(daily.bgFirstWinClaimed ? { bgFirstWinClaimed: true } : {}),
+            // World PvP per-victim kills, absent until the first paid world kill.
+            ...(daily.worldKillsByVictim && Object.keys(daily.worldKillsByVictim).length > 0
+              ? { worldKillsByVictim: { ...daily.worldKillsByVictim } }
+              : {}),
             totalWins: daily.totalWins,
           },
         }

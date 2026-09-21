@@ -397,11 +397,24 @@ alone is the owner's stated shape.
   fastest still queues. Battleground and arena pay more; world PvP pays for
   being out in the world. The Double Honor Weekend does not apply to it (that
   event is battleground-only by design).
-- Anti-farm: the per-pair diminishing returns ride `HONOR_REPEAT_DR` (100, 50,
-  25, then 0 percent) for honor AND gold alike, keyed by character id so a relog
-  cannot reset them, on a rolling `WORLD_PVP_PAIR_DR_WINDOW` (one hour) from the
-  first kill of the pair: camping one player pays three times and then nothing,
-  and the victim is not charged for a fully decayed contributor.
+- Anti-farm: the per-victim diminishing returns ride `HONOR_REPEAT_DR` (100, 50,
+  25, then 0 percent) for honor AND gold alike, keyed by the victim's character
+  identity and counted on the PERSISTED UTC-day honor window
+  (`HonorArenaDailyState.worldKillsByVictim`, the arena's own precedent), so
+  neither a relog nor a realm restart resets them: camping one player pays three
+  times a day and then nothing, a fully decayed kill is not counted, and the
+  victim is not charged for a fully decayed contributor.
+- The healer rule: an unflagged healer who heals a flagged player who is in a
+  world fight (hit by an enemy, or hitting one, inside the assist window) raises
+  their own flag first, the classic rule, so nobody sustains a killer from behind
+  a flag they do not wear. Under `WORLD_PVP_MIN_LEVEL` the raise is refused like
+  every other and the heal earns nothing. Shields and buffs are not yet aid (a
+  documented follow-up).
+- The flag cannot be flapped: accepted changes are `WORLD_PVP_TOGGLE_COOLDOWN`
+  (2 s) apart, refused with a notice in between.
+- Operator kill switch: `WORLD_PVP_DISABLED=1` on the realm refuses every raise
+  and loads every saved flag down (`SimConfig.worldPvpDisabled`); flags already
+  up keep their ordinary disarm.
 - Grey rule: a victim more than `WORLD_PVP_GREY_LEVEL_GAP` (5) levels below a
   contributor pays that contributor nothing (neither honor nor gold), the
   classic grey-kill rule and the reason a capped character cannot farm flagged

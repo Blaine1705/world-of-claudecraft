@@ -595,6 +595,9 @@ const baseEnTable = {
   // World PvP (/pvp flag, src/sim/pvp/world_pvp.ts): the flag notices and the
   // kill/defeat lines. Money goes through the client money formatter.
   'worldPvp.enabled': 'World PvP enabled: other flagged players can attack you.',
+  'worldPvp.enabledAiding': 'World PvP enabled: you aided a flagged player in combat.',
+  'worldPvp.realmDisabled': 'World PvP is disabled on this realm.',
+  'worldPvp.tooSoon': 'World PvP: wait a moment before switching again.',
   'worldPvp.disabled': 'World PvP disabled.',
   'worldPvp.staysEnabled': 'World PvP stays enabled.',
   'worldPvp.disablingIn': 'World PvP will be disabled in {minutes} minutes.',
@@ -609,6 +612,8 @@ const baseEnTable = {
     'You defeat {victim} and take {money} from their purse (split {count} ways).',
   'worldPvp.defeatedPlain': '{killer} defeats you.',
   'worldPvp.defeatedTake': '{killer} defeats you and takes {money} from your purse.',
+  'worldPvp.defeatedPairPlain': '{killer} and 1 other defeat you.',
+  'worldPvp.defeatedPairTake': '{killer} and 1 other defeat you and take {money} from your purse.',
   'worldPvp.defeatedGroupPlain': '{killer} and {others} others defeat you.',
   'worldPvp.defeatedGroupTake':
     '{killer} and {others} others defeat you and take {money} from your purse.',
@@ -16652,57 +16657,6 @@ function localizeSimMoneyText(text: string): string {
 }
 
 const RULES: Rule[] = [
-  // World PvP (/pvp flag): the parametrized notices and kill/defeat lines
-  // (src/sim/pvp/world_pvp.ts). Player names splice through verbatim; the
-  // sim's 'Ng Ns Nc' money re-formats through the locale money formatter.
-  {
-    re: /^World PvP will be disabled in (\d+) minutes\.$/,
-    build: (m) => tSim('worldPvp.disablingIn', { minutes: formatNumber(Number(m[1])) }),
-  },
-  {
-    re: /^You must be at least level (\d+) to enable World PvP\.$/,
-    build: (m) => tSim('worldPvp.minLevel', { level: formatNumber(Number(m[1])) }),
-  },
-  {
-    re: /^You defeat (.+) and take (.+) from their purse \(split (\d+) ways\)\.$/,
-    build: (m) =>
-      tSim('worldPvp.killTakeSplit', {
-        victim: m[1],
-        money: localizeSimMoneyText(m[2]),
-        count: formatNumber(Number(m[3])),
-      }),
-  },
-  {
-    re: /^You defeat (.+) and take (.+) from their purse\.$/,
-    build: (m) => tSim('worldPvp.killTake', { victim: m[1], money: localizeSimMoneyText(m[2]) }),
-  },
-  {
-    re: /^You defeat (.+)\.$/,
-    build: (m) => tSim('worldPvp.killPlain', { victim: m[1] }),
-  },
-  {
-    re: /^(.+) and (\d+) others defeat you and take (.+) from your purse\.$/,
-    build: (m) =>
-      tSim('worldPvp.defeatedGroupTake', {
-        killer: m[1],
-        others: formatNumber(Number(m[2])),
-        money: localizeSimMoneyText(m[3]),
-      }),
-  },
-  {
-    re: /^(.+) and (\d+) others defeat you\.$/,
-    build: (m) =>
-      tSim('worldPvp.defeatedGroupPlain', { killer: m[1], others: formatNumber(Number(m[2])) }),
-  },
-  {
-    re: /^(.+) defeats you and takes (.+) from your purse\.$/,
-    build: (m) =>
-      tSim('worldPvp.defeatedTake', { killer: m[1], money: localizeSimMoneyText(m[2]) }),
-  },
-  {
-    re: /^(.+) defeats you\.$/,
-    build: (m) => tSim('worldPvp.defeatedPlain', { killer: m[1] }),
-  },
   {
     re: /^Your Umbral Anchor is out of range\.$/,
     build: () =>
@@ -17902,6 +17856,68 @@ const RULES: Rule[] = [
   {
     re: /^You withdraw (.+) from the guild bank\.$/,
     build: (m) => tSim('log.guildBankWithdrawItem', { item: locItem(m[1]) }),
+  },
+  // World PvP (/pvp flag): the parametrized notices and kill/defeat lines
+  // (src/sim/pvp/world_pvp.ts). Player names splice through verbatim; the
+  // sim's 'Ng Ns Nc' money re-formats through the locale money formatter.
+  // LAST on purpose: the two broadest shapes here ('You defeat X.' and
+  // 'X defeats you.') must never shadow a more specific rule above.
+  {
+    re: /^World PvP will be disabled in (\d+) minutes\.$/,
+    build: (m) => tSim('worldPvp.disablingIn', { minutes: formatNumber(Number(m[1])) }),
+  },
+  {
+    re: /^You must be at least level (\d+) to enable World PvP\.$/,
+    build: (m) => tSim('worldPvp.minLevel', { level: formatNumber(Number(m[1])) }),
+  },
+  {
+    re: /^You defeat (.+) and take (.+) from their purse \(split (\d+) ways\)\.$/,
+    build: (m) =>
+      tSim('worldPvp.killTakeSplit', {
+        victim: m[1],
+        money: localizeSimMoneyText(m[2]),
+        count: formatNumber(Number(m[3])),
+      }),
+  },
+  {
+    re: /^You defeat (.+) and take (.+) from their purse\.$/,
+    build: (m) => tSim('worldPvp.killTake', { victim: m[1], money: localizeSimMoneyText(m[2]) }),
+  },
+  {
+    re: /^You defeat (.+)\.$/,
+    build: (m) => tSim('worldPvp.killPlain', { victim: m[1] }),
+  },
+  {
+    re: /^(.+) and 1 other defeat you and take (.+) from your purse\.$/,
+    build: (m) =>
+      tSim('worldPvp.defeatedPairTake', { killer: m[1], money: localizeSimMoneyText(m[2]) }),
+  },
+  {
+    re: /^(.+) and 1 other defeat you\.$/,
+    build: (m) => tSim('worldPvp.defeatedPairPlain', { killer: m[1] }),
+  },
+  {
+    re: /^(.+) and (\d+) others defeat you and take (.+) from your purse\.$/,
+    build: (m) =>
+      tSim('worldPvp.defeatedGroupTake', {
+        killer: m[1],
+        others: formatNumber(Number(m[2])),
+        money: localizeSimMoneyText(m[3]),
+      }),
+  },
+  {
+    re: /^(.+) and (\d+) others defeat you\.$/,
+    build: (m) =>
+      tSim('worldPvp.defeatedGroupPlain', { killer: m[1], others: formatNumber(Number(m[2])) }),
+  },
+  {
+    re: /^(.+) defeats you and takes (.+) from your purse\.$/,
+    build: (m) =>
+      tSim('worldPvp.defeatedTake', { killer: m[1], money: localizeSimMoneyText(m[2]) }),
+  },
+  {
+    re: /^(.+) defeats you\.$/,
+    build: (m) => tSim('worldPvp.defeatedPlain', { killer: m[1] }),
   },
 ];
 

@@ -1530,10 +1530,6 @@ function logSocialErr(err: unknown): void {
   console.error('social command failed:', err);
 }
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
@@ -3999,7 +3995,7 @@ export class GameServer {
           LEAVE_SAVE_RETRY_MAX_MS,
         );
         console.error(`save on leave failed for ${session.name}; retrying in ${retryMs}ms:`, err);
-        await delay(retryMs);
+        await new Promise<void>((resolve) => setTimeout(resolve, retryMs));
       }
     }
   }
@@ -6899,17 +6895,19 @@ export class GameServer {
           this.moderation.handleChatCommand(session, text);
           break;
         }
-        // Recovery is a gameplay command, not broadcast chat. Keep it usable
-        // while muted and outside the chat token bucket, then route through the
-        // same authoritative system as the dedicated Settings action. It still
-        // pays the COMMAND lane the dedicated action pays: riding the chat
-        // case skipped the top-of-dispatch draw (classifyMsgLane says 'chat'),
-        // so without this a /unstuck chat frame reached the sim with zero
-        // tokens drawn on any lane and never tallied toward the flood-kick
-        // verdict (the release-merge audit's finding).
-        if (/^\/unstuck\s*$/i.test(text)) {
+        // Recovery (/unstuck) and the World PvP flag (/pvp) are gameplay
+        // commands, not broadcast chat. Keep them usable while muted and outside
+        // the chat token bucket, then route through the same authoritative
+        // systems as the dedicated actions. They still pay the COMMAND lane the
+        // dedicated actions pay: riding the chat case skipped the top-of-dispatch
+        // draw (classifyMsgLane says 'chat'), so without this a /unstuck chat
+        // frame reached the sim with zero tokens drawn on any lane and never
+        // tallied toward the flood-kick verdict (the release-merge audit's finding).
+        const flagCommand = /^\/pvp(?:\s+\S+)?\s*$/i.test(text);
+        if (flagCommand || /^\/unstuck\s*$/i.test(text)) {
           if (!this.consumeLane(session, 'command', receivedAtMs / 1000)) break;
-          sim.unstuck(pid);
+          if (flagCommand) sim.chat(text, pid);
+          else sim.unstuck(pid);
           break;
         }
         // The player's own ignore/block commands. Deliberately BEFORE isChatMuted

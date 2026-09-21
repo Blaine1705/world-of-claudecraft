@@ -1178,9 +1178,11 @@ describe('chat module (direct, no Sim)', () => {
     const line = chatMod.inspectReadout(target, e);
     expect(line).toContain('Bet: Level 7');
     expect(line).toContain('50%');
-    // 9 lines: the original groups plus ignore/block and localized recovery help.
-    expect(chatMod.helpLines().length).toBe(9);
+    // 10 lines: the original groups plus ignore/block, localized recovery help,
+    // and the World PvP flag line (/pvp, /pvp on, /pvp off).
+    expect(chatMod.helpLines().length).toBe(10);
     expect(chatMod.helpLines().join('\n')).toContain('/ignore <name>');
+    expect(chatMod.helpLines().join('\n')).toContain('/pvp toggles your PvP flag');
   });
 
   it('handleDevChat: parses dev cheats; returns undefined for non-dev input', () => {

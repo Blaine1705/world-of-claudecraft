@@ -34,17 +34,27 @@ ratings.
   flag state (`PlayerMeta.worldPvp`, absent until first raised; `Entity.pvpFlag`
   is its display mirror and the ONLY writer is this module, the away.ts
   meta<->entity precedent), the 5-minute disarm clock (deferred while in
-  combat, ticked from `Sim.tick` beside the duels), the assist and DR books
-  (`Sim.worldPvpBooks`, a live `ctx.worldPvpBooks` view: the modules hold
-  functions, the Sim holds state), the damage / heal / death hooks the combat
-  hub calls directly, the kill resolution (stake + honor pool, integer copper
-  and integer honor, zero rng), the IWorld readout (`worldPvpInfoFor`), the
+  combat, ticked from `Sim.tick` in the battleground lap behind a
+  `nextDisarmAt` watermark so an idle realm pays one comparison), the toggle
+  cooldown, the realm kill switch (`ctx.worldPvpDisabled`, server env
+  `WORLD_PVP_DISABLED=1`), the session books (`Sim.worldPvpBooks`, a live
+  `ctx.worldPvpBooks` view: the assist recency rows, the paid-death guard, the
+  watermark; swept once a minute so a player who leaves without dying leaves no
+  row), the damage / heal / death hooks the combat hub calls directly (the heal
+  hook also raises an unflagged healer's flag when they aid a flagged fighter,
+  the classic rule), the kill resolution (stake + honor pool, integer copper and
+  integer honor, zero rng, paid exactly once per death), the IWorld readout
+  (`worldPvpInfoFor`, whole-second countdown so the self wire elides it), the
   `/pvp` chat arms' entry points, and the persisted record (`savedWorldPvpFields`
   / `loadWorldPvpState`, the countdown stored as remaining seconds and
-  re-anchored on load). Every player notice is sim English with a matcher RULE
-  in `src/ui/sim_i18n.ts` (S3). Numbers and rules: `docs/design/warfare.md`,
-  "World PvP income"; tests: `tests/world_pvp.test.ts`,
-  `tests/world_pvp_rules.test.ts`.
+  re-anchored on load; the level gate and the kill switch hold on restore). The
+  per-victim diminishing returns are NOT a book: they ride the persisted UTC-day
+  honor window (`honor.ts` `worldKillRepeats` / `noteWorldKill`,
+  `HonorArenaDailyState.worldKillsByVictim`) so a restart cannot reset them.
+  Every player notice is sim English with a matcher RULE in `src/ui/sim_i18n.ts`
+  (S3). Numbers and rules: `docs/design/warfare.md`, "World PvP income"; tests:
+  `tests/world_pvp.test.ts`, `tests/world_pvp_rules.test.ts`,
+  `tests/world_pvp_server_dispatch.test.ts`.
 - `warfare_quartermaster.ts` spawns Warmarshal Draven Kole, the Highwatch
   WARFARE honor vendor, under his RESERVED entity id
   (`WARFARE_QUARTERMASTER_ENTITY_ID`, `1_000_000_002`, the singleton band

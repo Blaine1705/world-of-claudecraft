@@ -1613,6 +1613,55 @@ export const TARGETS = [
     },
   },
   {
+    key: 'world-pvp',
+    label: 'World PvP tab of the PvP window: flag down, the raise confirm, flag up, mobile',
+    // The tab's own files plus the sim rules the copy resolves its numbers from.
+    when: [
+      'ui/hud/world_pvp/',
+      'ui/pvp_hostile_core.ts',
+      'sim/pvp/world_pvp.ts',
+      'sim/pvp/world_pvp_rules.ts',
+    ],
+    variants: [
+      { key: 'tab-down', scene: 'down' },
+      { key: 'tab-confirm', scene: 'confirm' },
+      // Last on purpose: it raises the flag, which the earlier scenes must not see.
+      { key: 'tab-up', scene: 'up' },
+      { key: 'tab-mobile', scene: 'down', mobile: true },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.scene ?? 'down';
+      const opened = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.sim) return { ok: false, reason: 'offline world is unavailable' };
+        // The raise is level-gated (WORLD_PVP_MIN_LEVEL), and the shot wants the
+        // live button, so the offline character is levelled first.
+        game.sim.setPlayerLevel(20);
+        const root = document.querySelector('#arena-window');
+        if (!(root instanceof HTMLElement)) return { ok: false, reason: 'no PvP window root' };
+        if (root.style.display !== 'block') game.hud.toggleArena();
+        return { ok: true };
+      });
+      if (!opened.ok) return { skip: opened.reason };
+      const ready = await pollForSize(page, '#arena-window');
+      if (!ready) return { skip: 'the PvP window never became visible' };
+      // The real tab button, not a debug hook: the strip is what the player uses.
+      await page.click('[data-bracket="world"]');
+      await pollForSize(page, '.wpvp-status, .bg-note');
+      if (scene === 'confirm' || scene === 'up') {
+        await page.click('[data-act="pvp-enable"]');
+        const confirm = await pollForSize(page, '[data-act="pvp-confirm"]');
+        if (!confirm) return { skip: 'the raise confirm step never appeared' };
+      }
+      if (scene === 'up') {
+        await page.click('[data-act="pvp-confirm"]');
+        const up = await pollForSize(page, '.wpvp-status.is-on');
+        if (!up) return { skip: 'the flag never came up' };
+      }
+      return { clip: '#arena-window' };
+    },
+  },
+  {
     key: 'ravenrift',
     label:
       'Thornhollow Fields 5v5 battleground: field, gatehouse, carry, queue window, mobile scoreboard',

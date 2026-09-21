@@ -152,10 +152,12 @@ function makeCtx() {
     nextArenaMatchId: 1,
     bgQueue: [],
     bgMatches: new Map(),
+    worldPvpDisabled: false,
     worldPvpBooks: {
       recentDamage: new Map(),
       recentSupport: new Map(),
-      killPairs: new Map(),
+      paidDeaths: new Set(),
+      nextDisarmAt: Number.POSITIVE_INFINITY,
       sweptAtTick: 0,
     },
     bgBusySlots: new Set(),

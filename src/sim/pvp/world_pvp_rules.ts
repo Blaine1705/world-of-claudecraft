@@ -43,13 +43,6 @@ export const WORLD_PVP_ASSIST_WINDOW = 10;
  *  reason a level-cap character cannot farm flagged low-level purses. */
 export const WORLD_PVP_GREY_LEVEL_GAP = 5;
 
-/** The rolling window (sim seconds) for the per-pair diminishing returns:
- *  repeated kills of the SAME victim by the SAME contributor inside it pay on
- *  HONOR_REPEAT_DR (100, 50, 25, then 0 percent) for honor AND gold alike, so
- *  camping one player pays out three times and then nothing. The counter
- *  resets one window after the first kill of the pair. */
-export const WORLD_PVP_PAIR_DR_WINDOW = 3600;
-
 /**
  * The mutual-flag verdict for a pair of PLAYERS (pets resolve to their owner
  * before reaching here, in the sim's pvpController and the renderer's
@@ -62,7 +55,7 @@ export function worldPvpPairHostile(a: Entity, b: Entity, inSameParty: boolean):
   if (a.id === b.id) return false;
   if (!a.pvpFlag || !b.pvpFlag) return false;
   if (inSameParty) return false;
-  if (a.guild !== '' && a.guild === b.guild) return false;
+  if (a.guild && a.guild === b.guild) return false;
   return true;
 }
 
@@ -92,7 +85,10 @@ export function worldPvpSplit(
 }
 
 /** The per-pair diminishing-returns multiplier for a contributor who has
- *  already taken `previousKills` kills of this victim inside the window. */
+ *  already been paid `previousKills` kills of this victim this UTC day (the
+ *  counter rides the persisted honor daily window, honor.ts): HONOR_REPEAT_DR,
+ *  100, 50, 25, then 0 percent, for honor AND gold alike, so camping one
+ *  player pays out three times a day and then nothing. */
 export function worldPvpPairMultiplier(previousKills: number): number {
   return repeatHonorMultiplier(previousKills);
 }

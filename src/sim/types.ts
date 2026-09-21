@@ -149,6 +149,12 @@ export interface HonorArenaDailyState {
   // It rides THIS window rather than a state of its own because the window already
   // owns the UTC date string and the one rollover that clears every daily counter.
   bgFirstWinClaimed?: boolean;
+  // World PvP (pvp/world_pvp.ts): kills of each victim identity this UTC day,
+  // the per-pair diminishing-returns counter for the /pvp kill pool. Optional
+  // and absent until the first paid world kill, like the counters above, so
+  // every earlier save round-trips byte-equal. Persisted here rather than in
+  // process memory so a realm restart cannot reset the anti-farm curve.
+  worldKillsByVictim?: Record<string, number>;
   totalWins: number;
 }
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
@@ -8339,6 +8345,7 @@ export interface SimConfig {
   playerName?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
+  worldPvpDisabled?: boolean; // realm kill switch for the /pvp flag (server env WORLD_PVP_DISABLED=1)
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
   // Live server: schedule the first world-boss rise at boot instead of one
   // interval out, so a freshly (re)started realm has Thunzharr up immediately.

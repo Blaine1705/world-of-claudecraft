@@ -1532,12 +1532,13 @@ const MONOLITHS: MonolithRow[] = [
     // gap booking plus the ack high-water) moved to server/input_seq.ts, now
     // shared by the input frame and the seq-bearing 'target' command. Measured
     // with wc -l < server/game.ts after biome. Exact count, zero slack.
-    // LOWERED 9993 -> 9936 at World PvP (the /pvp flag): the per-entity wire
+    // LOWERED 9993 -> 9934 at World PvP (the /pvp flag): the per-entity wire
     // fragment cache shapes and the two JSON splicers moved to
     // server/entity_wire_cache.ts, paying for the flag's dispatch case, its
-    // entity wire bit and the wpvp self key with room to spare. Measured with
+    // entity wire bit and the wpvp self key; the one-use delay() helper was
+    // inlined to pay for the /pvp command-lane claim. Measured with
     // wc -l < server/game.ts after biome. Exact count, zero slack.
-    ceiling: 9936,
+    ceiling: 9934,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

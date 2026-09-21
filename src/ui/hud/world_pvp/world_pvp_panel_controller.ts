@@ -9,12 +9,27 @@
 
 import { audio } from '../../../game/audio';
 import type { IWorld } from '../../../world_api';
+import { clockSeconds } from '../../clock_seconds_core';
 import { esc } from '../../esc';
+import { focusKeyAttr } from '../../focus_restore';
 import { formatMoney, formatNumber, t } from '../../i18n';
 import { svgIcon } from '../../ui_icons';
-import { formatDisarmClock, type WorldPvpWindowView } from './world_pvp_window_view';
+import type { WorldPvpWindowView } from './world_pvp_window_view';
 
 const num = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });
+
+/** The disarm countdown as m:ss, every digit from the formatters (the
+ *  clock_seconds_core precedent): minutes bare, seconds zero-padded. */
+export function disarmClockText(seconds: number): string {
+  const whole = Math.max(0, Math.floor(seconds));
+  return `${num(Math.floor(whole / 60))}:${clockSeconds(whole % 60, true)}`;
+}
+
+/** Focus keys for the one action control and the confirm's cancel, so a
+ *  countdown rebuild (once a second while disarming) hands keyboard focus
+ *  back to the same button instead of dropping it on the body. */
+export const WORLD_PVP_ACTION_FOCUS_KEY = 'wpvp-action';
+export const WORLD_PVP_CANCEL_FOCUS_KEY = 'wpvp-cancel';
 
 /** The panel body under the title and tab strip. */
 export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
@@ -30,7 +45,7 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
   const statusText = view.flagged
     ? view.disarmRemaining === null
       ? t('hudChrome.worldPvp.statusOn')
-      : t('hudChrome.worldPvp.statusDisarming', { time: formatDisarmClock(view.disarmRemaining) })
+      : t('hudChrome.worldPvp.statusDisarming', { time: disarmClockText(view.disarmRemaining) })
     : t('hudChrome.worldPvp.statusOff');
   const status =
     `<div class="wpvp-status ui-card ${statusClass}"><span aria-hidden="true">${svgIcon('battleground')}</span>` +
@@ -44,7 +59,10 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
   const stakeRows = [
     t('hudChrome.worldPvp.stakeLine', {
       cap: formatMoney(stakes.stakeCapCopper),
-      percent: `${num(stakes.stakePercent)}%`,
+      percent: formatNumber(stakes.stakePercent / 100, {
+        style: 'percent',
+        maximumFractionDigits: 0,
+      }),
     }),
     t('hudChrome.worldPvp.honorLine', { honor: num(stakes.killHonor) }),
     t('hudChrome.worldPvp.splitLine'),
@@ -71,7 +89,7 @@ function actionHtml(view: Extract<WorldPvpWindowView, { kind: 'live' }>): string
   const hint = `<div class="bg-note">${esc(t('hudChrome.worldPvp.commandHint'))}</div>`;
   if (view.action === 'locked') {
     return (
-      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable" disabled aria-disabled="true">${esc(t('hudChrome.worldPvp.enable'))}</button>` +
+      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)} disabled aria-disabled="true">${esc(t('hudChrome.worldPvp.enable'))}</button>` +
       `<div class="bg-note bg-level-req">${esc(t('hudChrome.worldPvp.levelReq', { level: num(view.stakes.minLevel) }))}</div>${hint}</div>`
     );
   }
@@ -84,17 +102,17 @@ function actionHtml(view: Extract<WorldPvpWindowView, { kind: 'live' }>): string
             minutes: num(view.stakes.disarmMinutes),
           }),
         )}</div><div class="pvp-queue-actions">` +
-        `<button class="btn leave ui-btn" data-act="pvp-cancel">${esc(t('hudChrome.worldPvp.confirmCancel'))}</button>` +
-        `<button class="btn ui-btn ui-btn--red" data-act="pvp-confirm">${esc(t('hudChrome.worldPvp.confirmAccept'))}</button>` +
+        `<button class="btn leave ui-btn" data-act="pvp-cancel"${focusKeyAttr(WORLD_PVP_CANCEL_FOCUS_KEY)}>${esc(t('hudChrome.worldPvp.confirmCancel'))}</button>` +
+        `<button class="btn ui-btn ui-btn--red" data-act="pvp-confirm"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}>${esc(t('hudChrome.worldPvp.confirmAccept'))}</button>` +
         `</div></div>`
       );
     }
-    return `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable">${esc(t('hudChrome.worldPvp.enable'))}</button>${hint}</div>`;
+    return `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}>${esc(t('hudChrome.worldPvp.enable'))}</button>${hint}</div>`;
   }
   if (view.action === 'keepUp') {
-    return `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-keep">${esc(t('hudChrome.worldPvp.keepUp'))}</button>${hint}</div>`;
+    return `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-keep"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}>${esc(t('hudChrome.worldPvp.keepUp'))}</button>${hint}</div>`;
   }
-  return `<div class="pvp-queue ui-card"><button class="btn leave ui-btn" data-act="pvp-disable">${esc(t('hudChrome.worldPvp.disable'))}</button>${hint}</div>`;
+  return `<div class="pvp-queue ui-card"><button class="btn leave ui-btn" data-act="pvp-disable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}>${esc(t('hudChrome.worldPvp.disable'))}</button>${hint}</div>`;
 }
 
 /** Window-supplied glue: the world to act on and the confirm-step setter. */

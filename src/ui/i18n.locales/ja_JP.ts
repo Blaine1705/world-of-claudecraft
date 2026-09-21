@@ -1454,6 +1454,39 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorAmount': '名誉 {amount}',
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': '名誉: {amount}',
+  'hudChrome.worldPvp.tab': 'ワールドPvP',
+  'hudChrome.worldPvp.title': 'ワールドPvP',
+  'hudChrome.worldPvp.blurb':
+    'PvPフラグを立てると、オープンワールドのどこでもフラグを立てた他のプレイヤーと戦えます。倒せば相手の所持金の一部と、PvP装備につながる名誉を得られます。バトルグラウンドとアリーナの報酬はそれより多いままです。',
+  'hudChrome.worldPvp.statusOn':
+    'PvPフラグが立っています。フラグを立てたプレイヤーはあなたを攻撃できます。',
+  'hudChrome.worldPvp.statusOff':
+    'PvPフラグは下りています。オープンワールドでは攻撃も被攻撃もありません。',
+  'hudChrome.worldPvp.statusDisarming':
+    'フラグは {time} 後、または現在の戦闘が終わったときに下ります。',
+  'hudChrome.worldPvp.stakeLine': '敗者は {cap} か所持金の {percent} のうち少ない方を支払います。',
+  'hudChrome.worldPvp.honorLine': '撃破ごとに名誉 {honor} を、貢献した全員で分配します。',
+  'hudChrome.worldPvp.splitLine':
+    '純粋な1対1なら報酬を独占できます。協力者とそのヒーラーは分け合います。',
+  'hudChrome.worldPvp.disarmLine': '解除には {minutes} 分かかり、戦闘が終わるまで待ちます。',
+  'hudChrome.worldPvp.groupLine':
+    'パーティ、レイド、ギルドのメンバー同士が敵対することはありません。',
+  'hudChrome.worldPvp.greyLine':
+    'あなたより {levels} レベル以上低いプレイヤーからは何も得られません。',
+  'hudChrome.worldPvp.record': '戦績: 撃破 {kills}、死亡 {deaths}',
+  'hudChrome.worldPvp.enable': 'ワールドPvPを有効にする',
+  'hudChrome.worldPvp.disable': 'ワールドPvPを無効にする',
+  'hudChrome.worldPvp.keepUp': 'フラグを維持',
+  'hudChrome.worldPvp.confirmBody':
+    'フラグを立てた他のプレイヤーがどこでもあなたを攻撃でき、勝てば所持金から最大 {cap} を奪えます。再び無効にはできますが、{minutes} 分かかります。',
+  'hudChrome.worldPvp.confirmAccept': 'フラグを立てる',
+  'hudChrome.worldPvp.confirmCancel': 'キャンセル',
+  'hudChrome.worldPvp.levelReq': 'レベル {level} が必要です。',
+  'hudChrome.worldPvp.pending': 'レルムからのPvP状態を待っています。',
+  'hudChrome.worldPvp.commandHint':
+    'チャット: /pvp でフラグを切り替え、/pvp on と /pvp off で直接設定します。',
+  'hudChrome.warfare.reasons.worldKill': 'ワールド撃破',
+  'hudChrome.warfare.reasons.worldAssist': 'ワールド撃破アシスト',
   'hudChrome.warfare.honorFloat': '名誉 +{amount}',
   'hudChrome.warfare.honorFloatReason': '名誉 +{amount}（{reason}）',
   'hudChrome.warfare.honorGain': '名誉を {amount} 獲得しました（{reason}）。',
@@ -1564,6 +1597,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.ruinCourtyard': '廃墟の中庭',
   'hudChrome.bg.map.graveyard': '墓地',
   'guide.nav.thornhollow': 'ソーンホロウ平原',
+  'guide.commandsPage.pvp':
+    'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士はどこでも戦えます。解除には5分かかります。',
+  'guide.nav.worldPvp': 'ワールドPvP',
+  'guide.worldPvpPage.heading': 'ワールドPvP',
+  'guide.worldPvpPage.intro':
+    'オープンワールドの対人戦は任意参加です。PvPフラグを立てると、パーティ、レイド、ギルドに属さないフラグを立てた全プレイヤーがオープンワールドのどこでも敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。フラグを立てていない人は攻撃することも攻撃されることもありません。',
+  'guide.worldPvpPage.flagHeading': 'フラグの上げ下げ',
+  'guide.worldPvpPage.flagBody':
+    'チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復すると、自分のフラグも立ちます。',
+  'guide.worldPvpPage.stakesHeading': '撃破の価値',
+  'guide.worldPvpPage.stakesBody':
+    'フラグを立てたプレイヤーがフラグを立てた相手を倒すと、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。',
+  'guide.worldPvpPage.limitsHeading': 'フェアプレイのルール',
+  'guide.worldPvpPage.limitsBody':
+    '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。カウントは日次リセットで元に戻ります。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
   'guide.thornhollowPage.heading': 'ソーンホロウ平原',
   'guide.thornhollowPage.intro':
     'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',

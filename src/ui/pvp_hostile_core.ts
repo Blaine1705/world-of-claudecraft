@@ -34,9 +34,17 @@ export type PvpHostileWorld = Pick<
 export function isPvpHostilePlayer(world: PvpHostileWorld, target: Entity): boolean {
   if (target.kind !== 'player' || target.dead || target.id === world.playerId) return false;
   if (isPvpHostileTarget(target.id, world.duelInfo, world.arenaInfo, world.bgInfo)) return true;
+  // Inside a live battleground or arena the sim's world arm is off for both
+  // sides (they are under that mode's rules), so the client verdict must be
+  // too: a flagged teammate is never red.
+  if (world.bgInfo?.match?.state === 'active' || world.arenaInfo?.match?.state === 'active')
+    return false;
   const self = world.entities.get(world.playerId);
   if (!self) return false;
-  const sameParty = !!world.partyInfo?.members.some((member) => member.pid === target.id);
+  // A plain loop: this runs on the per-frame target-frame path.
+  let sameParty = false;
+  const members = world.partyInfo?.members;
+  if (members) for (const member of members) if (member.pid === target.id) sameParty = true;
   return worldPvpPairHostile(self, target, sameParty);
 }
 

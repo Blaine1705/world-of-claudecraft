@@ -346,6 +346,9 @@ export interface SimContextPrimitives {
   // backing field stays Sim-owned (the Market instance owns it), exposed here as a live
   // read-only view (never reassigned by the readout).
   readonly devCommands: boolean;
+  // World PvP realm kill switch (server env WORLD_PVP_DISABLED=1, pvp/world_pvp.ts):
+  // raising the /pvp flag is refused and a saved flag loads down. Exactly the Sim field.
+  readonly worldPvpDisabled: boolean;
   // The compulsory-tutorial host opt-in (SimConfig.compulsoryTutorial): the
   // greeting sweep only force-ferries fresh characters where a live world
   // turned it on; tests, parity traces, and the RL env keep it off.
@@ -1495,6 +1498,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get devCommands() {
       return host.devCommands;
+    },
+    get worldPvpDisabled() {
+      return host.worldPvpDisabled;
     },
     get compulsoryTutorial() {
       return host.compulsoryTutorial;

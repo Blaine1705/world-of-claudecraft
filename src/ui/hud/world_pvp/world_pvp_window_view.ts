@@ -99,11 +99,3 @@ export function buildWorldPvpWindowView(input: WorldPvpWindowViewInput): WorldPv
     sig,
   };
 }
-
-/** m:ss for the countdown line; whole seconds in, never negative. */
-export function formatDisarmClock(seconds: number): string {
-  const s = Math.max(0, Math.floor(seconds));
-  const minutes = Math.floor(s / 60);
-  const rest = s % 60;
-  return `${minutes}:${rest < 10 ? '0' : ''}${rest}`;
-}

@@ -131,6 +131,7 @@ export function normalizeHonorDailyState(value: unknown): HonorArenaDailyState |
   const record = value as Record<string, unknown>;
   const bgResults = normalizeCountRecord(record.bgResultsByOpponent);
   const losses = normalizeCountRecord(record.lossesByOpponent);
+  const worldKills = normalizeCountRecord(record.worldKillsByVictim);
   return {
     date: typeof record.date === 'string' ? record.date : '',
     winsByOpponent: normalizeCountRecord(record.winsByOpponent),
@@ -145,6 +146,8 @@ export function normalizeHonorDailyState(value: unknown): HonorArenaDailyState |
     // written before the bonus existed (or on a day that has not paid it) is
     // byte-equal to what it was. Any truthy stored value normalizes to `true`.
     ...(record.bgFirstWinClaimed ? { bgFirstWinClaimed: true } : {}),
+    // World PvP per-victim kills: absent until the first paid world kill.
+    ...(Object.keys(worldKills).length > 0 ? { worldKillsByVictim: worldKills } : {}),
     totalWins: normalizeHonorCounter(record.totalWins),
   };
 }
@@ -213,9 +216,25 @@ function dailyWindow(ctx: SimContext, meta: PlayerMeta) {
     // The new day re-arms the first-win bonus. `undefined` rather than `false`
     // for the same byte-equality reason.
     daily.bgFirstWinClaimed = undefined;
+    // World PvP kills of each victim start over with the day, same rule.
+    daily.worldKillsByVictim = undefined;
     daily.totalWins = 0;
   }
   return daily;
+}
+
+/** World PvP (pvp/world_pvp.ts): how many kills of `victimKey` this character
+ *  has already been paid for today. Read-only on the window's counters (the
+ *  rollover itself still runs, so a stale day reads as zero). */
+export function worldKillRepeats(ctx: SimContext, meta: PlayerMeta, victimKey: string): number {
+  return dailyWindow(ctx, meta).worldKillsByVictim?.[victimKey] ?? 0;
+}
+
+/** World PvP: record one paid kill of `victimKey` on today's window. */
+export function noteWorldKill(ctx: SimContext, meta: PlayerMeta, victimKey: string): void {
+  const daily = dailyWindow(ctx, meta);
+  if (!daily.worldKillsByVictim) daily.worldKillsByVictim = {};
+  daily.worldKillsByVictim[victimKey] = (daily.worldKillsByVictim[victimKey] ?? 0) + 1;
 }
 
 /**
