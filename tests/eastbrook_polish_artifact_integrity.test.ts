@@ -1387,6 +1387,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
   // branch: the town runtime leaf composes the stone vault hall and the
   // authoritative layout gains the weeklyVault site. No capture was retaken.
+  // Re-minted for the shipwreck salvage landing: the renderer leaf moved.
+  // No Eastbrook capture or measured value changed.
   '5dec5017c73a60c491602a23bcc2bba37411b0d21d0b06a45c478ec38f3a4bdd';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1403,6 +1405,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
   // branch: the town runtime leaf composes the stone vault hall and the
   // authoritative layout gains the weeklyVault site. No capture was retaken.
+  // Re-minted for the shipwreck salvage landing: the renderer leaf moved.
+  // No Eastbrook capture or measured value changed.
   'e3f907101f39355f8a6e28e9d000d944277a582108761efa0fec54376862b7f8';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
@@ -2780,6 +2784,8 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // again over the re-swept evidence. No capture was retaken.
       // Weekly Vault (PR 4052) landing on the quests integration branch:
       // recomputed LAST again over the re-swept evidence. No capture was retaken.
+      // Re-minted for the shipwreck salvage landing over the re-sealed
+      // provenance. No capture or measured value changed.
     ).toBe('119a4c7354abf7b7c376edec7218ea29da17e1709907ffd241a760dc00081dbc');
   });
 
