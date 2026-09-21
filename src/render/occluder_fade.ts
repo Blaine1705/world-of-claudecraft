@@ -248,7 +248,11 @@ export function advanceOccluderFade(
   reducedMotion = false,
 ): number {
   if (occluderFadeSettled(alpha, occluded) && occluderFadeApplied(mats, alpha)) return alpha;
-  const next = stepOccluderFade(alpha, occluded, dt, reducedMotion);
+  // The dithered prototype restores in one step, like the snap into the ghost:
+  // an eased return walks the stipple through every density on its way back,
+  // which reads as a pattern lingering on a wall that is no longer in the way
+  // (Matthieu's play test), where the blend's eased return reads as calm.
+  const next = stepOccluderFade(alpha, occluded, dt, reducedMotion || ditherFadeEnabled());
   if (next < 1) {
     if (!occluded && occluderFadeApplied(mats, 1)) return next;
     // The edge frame is the actionable consult (the camera is inside this
