@@ -57,8 +57,13 @@ less than `minTravelSec`, so a mark at his feet still gives the party time.
 `boulderAnswerRange` is the fairness number: an ally clear across a hoard room
 reaches the ring before the boulder does (pinned, at legendary speed too).
 
-Too few: the mark takes `crushDamageFraction` (capped non-lethal) and is
-`Crushed` (stunned) for `crushStunSec`. Nobody else is hurt.
+Too few: the mark takes `crushDamageFraction` and is `Crushed` (stunned) for
+`crushStunSec`. A ROOTED mark could do nothing about it, so the boulder alone
+never kills them: it stops at a sliver. Nobody else is hurt.
+
+Thrown back, the damage is credited to whoever was marked and is worth no
+threat, so answering the mechanic never turns him on a healer; his combo waits
+exactly as long as his `Staggered` stun lasts.
 
 ALONE (`needed` 0): nobody is rooted. The boulder runs a lane from him through
 where the player stood and `soloOvershoot` beyond, so backing away along it is no
@@ -91,7 +96,7 @@ counts), and the lone player's lane. The ring is a place to stand, never a place
 to leave, so it is never red. No dynamic light is used.
 
 What a player acts on draws on every graphics tier: the boulder, the ring, its
-pips and the lane. The low tier sheds the dust and the shadow.
+pips and the lane. The low tier sheds the dust, and nothing else (the shadow says where an airborne boulder is).
 
 ## Tuning after playtests
 

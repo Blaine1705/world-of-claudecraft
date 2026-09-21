@@ -48,8 +48,10 @@ function loadSource(): Promise<THREE.Group | undefined> {
 }
 if (typeof window !== 'undefined') registerDeferredPreload(loadSource);
 
-/** Strikes alive at once: a strike outlives two and a bit beats of two hammers. */
-const RIGS = 6;
+/** Strikes alive at once: a strike outlives a few beats of two alternating
+ *  hammers. Pinned against the sim's own clocks (tests/hoard_forge_hammer_render). */
+export const FORGE_HAMMER_RIGS = 6;
+const RIGS = FORGE_HAMMER_RIGS;
 const EMBERS = 260;
 const SEGMENTS = LOOK.ringSegments;
 const DOOR_SEGMENTS = 6;
@@ -91,6 +93,10 @@ export class HoardForgeHammerFx {
   private time = 0;
   private seed = 11;
   private readonly rigs: StrikeRig[] = [];
+  /** The model baked once and shared by every rig (and the stand-in likewise). */
+  private bakedFor: THREE.Group | undefined;
+  private readonly baked: Array<{ geometry: THREE.BufferGeometry; material: string }> = [];
+  private standIn: { head: THREE.BufferGeometry; haft: THREE.BufferGeometry } | undefined;
   private readonly embers?: {
     points: THREE.Points;
     position: THREE.BufferAttribute;
@@ -316,42 +322,56 @@ export class HoardForgeHammerFx {
     if (!holder) {
       // Owned like everything else and freed once at dispose: when the late asset
       // replaces it the stand-in is only detached, never separately released.
+      // Built ONCE and shared by every rig.
+      this.standIn ??= {
+        head: this.own(new THREE.BoxGeometry(5, 3.4, 3.2).translate(0, 1.7, 0)),
+        haft: this.own(new THREE.CylinderGeometry(0.4, 0.4, 8, 8).translate(0, 7.4, 0)),
+      };
       rig.hammer.add(
-        new THREE.Mesh(this.own(new THREE.BoxGeometry(5, 3.4, 3.2).translate(0, 1.7, 0)), iron),
-        new THREE.Mesh(
-          this.own(new THREE.CylinderGeometry(0.4, 0.4, 8, 8).translate(0, 7.4, 0)),
-          worn,
-        ),
+        new THREE.Mesh(this.standIn.head, iron),
+        new THREE.Mesh(this.standIn.haft, worn),
       );
       return;
     }
-    holder.updateWorldMatrix(true, true);
-    const inverse = new THREE.Matrix4().copy(holder.matrixWorld).invert();
-    const local = new THREE.Matrix4();
-    const v = new THREE.Vector3();
-    holder.traverse((child) => {
-      const mesh = child as THREE.Mesh;
-      if (!mesh.isMesh) return;
-      // The shipped GLB is quantized: positions are normalized integers the NODE
-      // transform scales back up. Bake through fromBufferAttribute, into floats.
-      local.multiplyMatrices(inverse, mesh.matrixWorld);
-      const from = mesh.geometry.getAttribute('position');
-      const positions = new Float32Array(from.count * 3);
-      for (let i = 0; i < from.count; i++) {
-        v.fromBufferAttribute(from, i).applyMatrix4(local);
-        positions[i * 3] = v.x;
-        positions[i * 3 + 1] = v.y;
-        positions[i * 3 + 2] = v.z;
-      }
-      const geometry = this.own(new THREE.BufferGeometry());
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      const index = mesh.geometry.getIndex();
-      if (index) geometry.setIndex(Array.from(index.array));
-      const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-      const baked = new THREE.Mesh(geometry, pick(material.name));
-      baked.castShadow = material.name !== 'Molten';
-      rig.hammer.add(baked);
-    });
+    // The model is baked ONCE, whichever rig asks first: every rig draws the same
+    // geometry (position and index only: every lit material here is flatShading,
+    // which derives its normals in the shader), so the late asset costs one bake
+    // and one upload, not one per rig.
+    if (this.bakedFor !== asset) {
+      this.bakedFor = asset;
+      this.baked.length = 0;
+      holder.updateWorldMatrix(true, true);
+      const inverse = new THREE.Matrix4().copy(holder.matrixWorld).invert();
+      const local = new THREE.Matrix4();
+      const v = new THREE.Vector3();
+      holder.traverse((child) => {
+        const mesh = child as THREE.Mesh;
+        if (!mesh.isMesh) return;
+        // The shipped GLB is quantized: positions are normalized integers the NODE
+        // transform scales back up. Bake through fromBufferAttribute, into floats.
+        local.multiplyMatrices(inverse, mesh.matrixWorld);
+        const from = mesh.geometry.getAttribute('position');
+        const positions = new Float32Array(from.count * 3);
+        for (let n = 0; n < from.count; n++) {
+          v.fromBufferAttribute(from, n).applyMatrix4(local);
+          positions[n * 3] = v.x;
+          positions[n * 3 + 1] = v.y;
+          positions[n * 3 + 2] = v.z;
+        }
+        const geometry = this.own(new THREE.BufferGeometry());
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const index = mesh.geometry.getIndex();
+        if (index) geometry.setIndex(Array.from(index.array));
+        const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+        this.baked.push({ geometry, material: material.name });
+      });
+    }
+    for (let n = 0; n < this.baked.length; n++) {
+      const part = this.baked[n];
+      const made = new THREE.Mesh(part.geometry, pick(part.material));
+      made.castShadow = part.material !== 'Molten';
+      rig.hammer.add(made);
+    }
   }
 
   sync(cues: readonly HoardBossCueView[]): void {

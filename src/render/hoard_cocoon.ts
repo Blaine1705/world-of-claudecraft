@@ -307,7 +307,6 @@ export class HoardCocoonFx {
   private findBoss(dt: number): void {
     const world = this.world;
     if (!world || this.low) return;
-    this.bossPoll -= dt;
     const held = this.bossId === -1 ? undefined : world.entities.get(this.bossId);
     if (held && !held.dead) {
       this.bossX = held.pos.x;
@@ -316,12 +315,16 @@ export class HoardCocoonFx {
       return;
     }
     this.hasBoss = false;
+    this.bossPoll -= dt;
     if (this.bossPoll > 0 || !world.riftFloor) return;
     this.bossPoll = BOSS_POLL;
     this.bossId = -1;
     for (const entity of world.entities.values()) {
       if (entity.templateId !== BOSS_TEMPLATE || entity.dead) continue;
       this.bossId = entity.id;
+      this.bossX = entity.pos.x;
+      this.bossZ = entity.pos.z;
+      this.hasBoss = true;
       return;
     }
   }

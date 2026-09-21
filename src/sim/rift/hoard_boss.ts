@@ -87,6 +87,9 @@ export const HOARD_BONE_WAVE_COUNT = 4;
 export const HOARD_BROOD_EGG_COUNT = 4;
 export const HOARD_BROOD_HATCH_HP = 0.5;
 export const HOARD_TOTEM_TRIGGER_HP = 0.65;
+/** No new set of tentacles rises this close above the totem's threshold while it
+ *  is still unanswered (src/sim/rift/hoard_tentacles.ts). */
+export const HOARD_TOTEM_TENTACLE_MARGIN = 0.12;
 export const HOARD_TOTEM_HEAL_FRACTION = 0.025;
 export const HOARD_TOTEM_PULSE_SEC = 2;
 export const HOARD_FROST_RING_HP = 0.5;
@@ -529,7 +532,17 @@ function tickSpecialKit(
     tickHealingTideTotem(ctx, boss, state);
     // After the totem, so his health threshold is answered first: the tether it
     // lays keeps the tentacles down until the totem is dealt with.
-    tickHoardTentacles(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
+    tickHoardTentacles(
+      ctx,
+      inst,
+      boss,
+      state,
+      instancePlayers(ctx, inst),
+      emitCue,
+      // No new set while his health threshold is near and still unanswered: a set
+      // stands long enough that he could be burned past the totem altogether.
+      state.specialTriggered || hpFraction > HOARD_TOTEM_TRIGGER_HP + HOARD_TOTEM_TENTACLE_MARGIN,
+    );
   }
 }
 

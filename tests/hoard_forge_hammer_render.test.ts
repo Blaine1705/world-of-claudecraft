@@ -9,7 +9,11 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { ASSETS } from '../scripts/assets/forge_hammer/build.mjs';
 import { HoardBossFx } from '../src/render/hoard_boss_fx';
-import { FORGE_HAMMER_ASSET_URL, HoardForgeHammerFx } from '../src/render/hoard_forge_hammer';
+import {
+  FORGE_HAMMER_ASSET_URL,
+  FORGE_HAMMER_RIGS,
+  HoardForgeHammerFx,
+} from '../src/render/hoard_forge_hammer';
 import {
   FORGE_HAMMER_LOOK,
   type HammerPose,
@@ -21,6 +25,7 @@ import {
   FORGE_RING_LIFE_SEC,
   FORGE_STRIKE_TOTAL_SEC,
   forgeBearingInGap,
+  forgeBeatSec,
   forgeRingBurns,
   forgeRingRadius,
 } from '../src/sim/rift/hoard_forge_hammer_core';
@@ -207,6 +212,30 @@ describe('the adapter', () => {
     ).toBe(0);
     fx.dispose();
     expect(scene.children).toHaveLength(0);
+  });
+
+  it('has a rig for every strike that can be alive at once, so no telegraph is dropped', () => {
+    // A strike lives FORGE_STRIKE_TOTAL_SEC; with two alternating hammers a new
+    // one begins every half beat. However long the cast, that bounds the overlap.
+    const alive = Math.ceil(FORGE_STRIKE_TOTAL_SEC / forgeBeatSec(2));
+    expect(alive).toBeLessThanOrEqual(FORGE_HAMMER_RIGS);
+    expect(Math.ceil(FORGE_STRIKE_TOTAL_SEC / forgeBeatSec(1))).toBeLessThanOrEqual(
+      FORGE_HAMMER_RIGS,
+    );
+  });
+
+  it('bakes the model once and shares it between rigs', async () => {
+    const scene = new THREE.Scene();
+    const fx = make(scene);
+    await fx.readyForEntry;
+    const hammers = named(scene, 'ForgeHammer') as THREE.Group[];
+    expect(hammers).toHaveLength(FORGE_HAMMER_RIGS);
+    for (const hammer of hammers) {
+      expect((hammer.children[0] as THREE.Mesh).geometry).toBe(
+        (hammers[0].children[0] as THREE.Mesh).geometry,
+      );
+    }
+    fx.dispose();
   });
 
   it('never reuses the last strike on a rig: a new run gets its own doors', async () => {

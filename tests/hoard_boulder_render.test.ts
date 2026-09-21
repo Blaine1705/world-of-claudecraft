@@ -253,6 +253,42 @@ describe('the adapter', () => {
     fx.dispose();
   });
 
+  it('keeps the ring, its pips and the count on ONE circle when the mark is moved', async () => {
+    const scene = new THREE.Scene();
+    const fx = make(scene);
+    await fx.readyForEntry;
+    fx.sync([carrier(), rolling(1)]);
+    fx.update(0.016);
+    // The rooted mark is knocked aside: the cue rides them, so the ring follows.
+    fx.sync([carrier(), rolling(1.2, { x: 16, z: -23 })]);
+    fx.update(0.016);
+    const position = first(scene, 'BoulderRing').geometry.getAttribute('position');
+    for (let column = 0; column < position.count / 2; column++) {
+      const d = Math.hypot(position.getX(column * 2 + 1) - 16, position.getZ(column * 2 + 1) + 23);
+      expect(d).toBeCloseTo(BOULDER.supportRadius, 4);
+    }
+    const pip = first(scene, 'BoulderPip');
+    expect(Math.hypot(pip.position.x - 16, pip.position.z + 23)).toBeCloseTo(
+      BOULDER.supportRadius,
+      4,
+    );
+    fx.dispose();
+  });
+
+  it('bakes the model once and shares it between rigs', async () => {
+    const scene = new THREE.Scene();
+    const fx = make(scene);
+    await fx.readyForEntry;
+    const bodies = named(scene, 'Boulder') as THREE.Group[];
+    expect(bodies).toHaveLength(2);
+    expect((bodies[0].children[0] as THREE.Mesh).geometry).toBe(
+      (bodies[1].children[0] as THREE.Mesh).geometry,
+    );
+    const shards = named(scene, 'BoulderShard') as THREE.Mesh[];
+    expect(shards[0].geometry).toBe(shards[BOULDER_LOOK.shards].geometry);
+    fx.dispose();
+  });
+
   it('alone draws the lane instead, as wide as the rock, from him to its end', async () => {
     const scene = new THREE.Scene();
     const fx = make(scene);
@@ -408,12 +444,12 @@ describe('the adapter', () => {
     });
     fx.dispose();
     fx.dispose();
-    expect(owned.size).toBeGreaterThan(12);
+    expect(owned.size).toBeGreaterThan(8);
     expect([...owned.values()].every((count) => count === 1)).toBe(true);
     expect(shared.size).toBe(0);
   });
 
-  it('on the low tier sheds dust and shadow, and keeps everything a player acts on', async () => {
+  it('on the low tier sheds only the dust, and keeps everything a player acts on', async () => {
     const high = new THREE.Scene();
     const low = new THREE.Scene();
     const a = make(high, undefined, 'high');
@@ -429,7 +465,8 @@ describe('the adapter', () => {
     expect(count(high, 'Points')).toBe(1);
     expect(count(low, 'Points')).toBe(0);
     expect(named(high, 'BoulderShadow')).toHaveLength(2);
-    expect(named(low, 'BoulderShadow')).toHaveLength(0);
+    // The shadow says where an airborne boulder is: it draws on every tier.
+    expect(named(low, 'BoulderShadow')).toHaveLength(2);
     b.sync([carrier(), rolling(BOULDER.warningSec + 1)]);
     b.update(0.016);
     expect(shown(low, 'Boulder')).toBe(1);

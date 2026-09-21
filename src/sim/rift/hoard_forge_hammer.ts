@@ -55,6 +55,10 @@ export interface HoardForgeHammerState {
   /** Strikes that have landed, and whom each ring has already burned. */
   landed: Set<number>;
   burned: Map<number, Set<number>>;
+  /** Strikes begun while the engine was walking the cue list: they join it (and
+   *  reach the clients) from this module's own tick, at their full life, so the
+   *  clock a client starts is the clock the sim runs. */
+  pending: HoardBossCue[];
 }
 
 type Emit = (ctx: SimContext, inst: RiftInstance, cue: HoardBossCue) => void;
@@ -77,6 +81,7 @@ function hammerState(state: HoardBossState): HoardForgeHammerState {
     casts: 0,
     landed: new Set(),
     burned: new Map(),
+    pending: [],
   };
   return state.forgeHammer;
 }
@@ -91,6 +96,11 @@ export function tickHoardForgeHammer(
   emit: Emit,
 ): void {
   const hammer = hammerState(state);
+  for (const strike of hammer.pending) {
+    state.cues.push(strike);
+    emit(ctx, inst, strike);
+  }
+  hammer.pending.length = 0;
   hammer.timer -= DT;
   if (hammer.timer > 0) return;
   const living = players.filter((p) => !p.dead).length;
@@ -190,8 +200,7 @@ function beginBeat(
     remaining: FORGE_STRIKE_TOTAL_SEC,
     total: FORGE_STRIKE_TOTAL_SEC,
   };
-  state.cues.push(strike);
-  emit(ctx, inst, strike);
+  hammer.pending.push(strike);
 }
 
 function land(
@@ -274,12 +283,17 @@ export function tickHoardForgeHammerCue(
     const since = elapsed - FORGE_HAMMER.warningSec;
     const now = forgeRingRadius(since);
     const before = forgeRingRadius(since - DT);
-    const burned = hammer.burned.get(cue.id);
+    // Always a real ledger: a missing one would burn every tick, never skip.
+    let burned = hammer.burned.get(cue.id);
+    if (!burned) {
+      burned = new Set();
+      hammer.burned.set(cue.id, burned);
+    }
     for (const player of players) {
-      if (player.dead || burned?.has(player.id)) continue;
+      if (player.dead || burned.has(player.id)) continue;
       if (!forgeRingBurns(cue.id, cue.x, cue.z, before, now, player.pos.x, player.pos.z)) continue;
       // Once per ring: a ring that catches you has passed you.
-      burned?.add(player.id);
+      burned.add(player.id);
       ctx.dealDamage(
         boss,
         player,

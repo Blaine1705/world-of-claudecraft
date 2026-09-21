@@ -312,13 +312,69 @@ describe('the boulder in the fight', () => {
     const state = entry.inst.hoardBoss;
     if (!state) throw new Error('missing state');
     state.sweepTimer = 0.1;
-    run(entry.sim, entry.boss, BOULDER.bossStunSec - 1, gather);
+    // Only the hoard engine ticks here, so the stun is run down by hand: the hold
+    // lasts exactly as long as the aura does.
+    const reel = () => {
+      gather();
+      for (const aura of entry.boss.auras) aura.remaining -= DT;
+      entry.boss.auras = entry.boss.auras.filter((aura) => aura.remaining > 0);
+    };
+    run(entry.sim, entry.boss, BOULDER.bossStunSec - 1, reel);
     expect(hoardBossCueViews(entry.inst).some((c) => c.variant === 'brute-wide')).toBe(false);
-    run(entry.sim, entry.boss, 2.5, gather);
+    run(entry.sim, entry.boss, 2.5, reel);
     expect(held(entry).boulders).toHaveLength(0);
     expect(
       hoardBossCueViews(entry.inst).filter((c) => isBoulderVariant(c.variant) && c.remaining > 0),
     ).toHaveLength(0);
+  });
+
+  it('throwing it back is worth NO threat, and he never hits himself if the mark has died', () => {
+    const entry = encounter();
+    const allies = addAllies(entry, 2);
+    cast(entry);
+    const target = marked(entry)[0];
+    const [cue] = cuesOf(entry.inst, 'brute-boulder');
+    const group = [entry.sim.player, ...allies];
+    const gather = () => {
+      let n = 0;
+      for (const p of group)
+        if (p.id !== target.id) p.pos = { ...target.pos, x: target.pos.x + 1.5 * ++n };
+    };
+    const threatBefore = entry.boss.threat.get(target.id) ?? 0;
+    run(entry.sim, entry.boss, cue.total + DT, gather);
+    const [back] = cuesOf(entry.inst, 'brute-boulder-return');
+    // The mark dies while it is on its way back.
+    target.dead = true;
+    const events = run(entry.sim, entry.boss, back.total + DT, gather);
+    const reflect = events.find(
+      (e) => e.type === 'damage' && e.targetId === entry.boss.id && e.ability === 'Rolling Boulder',
+    );
+    expect(reflect?.type === 'damage' && reflect.sourceId).toBe(target.id);
+    expect(entry.boss.threat.get(target.id) ?? 0).toBe(threatBefore);
+  });
+
+  it('a ROOTED mark is never killed by the boulder alone, and is let go even if they died', () => {
+    const entry = encounter();
+    addAllies(entry, 2);
+    cast(entry);
+    const target = marked(entry)[0];
+    const [cue] = cuesOf(entry.inst, 'brute-boulder');
+    target.hp = 5;
+    run(entry.sim, entry.boss, cue.total + DT * 2);
+    expect(target.dead).toBe(false);
+    expect(target.hp).toBeGreaterThanOrEqual(1);
+    expect(has(target, HOARD_BOULDER_DREAD_AURA_ID)).toBe(false);
+    // Died in flight (to something else): the root, which survives death by
+    // design, still comes off the moment the boulder arrives.
+    const again = encounter();
+    addAllies(again, 2);
+    cast(again);
+    const victim = marked(again)[0];
+    const [mark] = cuesOf(again.inst, 'brute-boulder');
+    run(again.sim, again.boss, mark.total - 0.5);
+    victim.dead = true;
+    run(again.sim, again.boss, 0.5 + DT);
+    expect(has(victim, HOARD_BOULDER_DREAD_AURA_ID)).toBe(false);
   });
 
   it('the mark dying before it arrives breaks it on empty ground', () => {

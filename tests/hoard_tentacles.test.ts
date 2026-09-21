@@ -1,7 +1,12 @@
 // Abyssal Maw's Tentacles of the Abyss (src/sim/rift/hoard_tentacles.ts + its shared core).
 import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
-import { hoardBossCueViews, tickHoardBossMechanics } from '../src/sim/rift/hoard_boss';
+import {
+  HOARD_TOTEM_TENTACLE_MARGIN,
+  HOARD_TOTEM_TRIGGER_HP,
+  hoardBossCueViews,
+  tickHoardBossMechanics,
+} from '../src/sim/rift/hoard_boss';
 import { HOARD_RARITY_PRESSURE } from '../src/sim/rift/hoard_scaling';
 import { TENTACLES_EVERY_SEC } from '../src/sim/rift/hoard_tentacles';
 import {
@@ -309,6 +314,24 @@ describe('the tentacles in the fight', () => {
     rise(entry);
     expect(cuesOf(entry.inst, 'tide-tentacle')).toHaveLength(0);
     state.sequenceStep = 0;
+    run(entry.sim, entry.boss, DT * 2);
+    expect(cuesOf(entry.inst, 'tide-tentacle')).toHaveLength(1);
+  });
+
+  it('never rises just above his totem threshold while it is unanswered', () => {
+    const entry = encounter();
+    const state = entry.inst.hoardBoss;
+    if (!state) throw new Error('missing state');
+    state.specialTriggered = false;
+    // (The totem itself is kept down here by a parked wave step.)
+    state.sequenceStep = 0;
+    entry.boss.hp = Math.round(entry.boss.maxHp * (HOARD_TOTEM_TRIGGER_HP + 0.05));
+    rise(entry);
+    expect(cuesOf(entry.inst, 'tide-tentacle')).toHaveLength(0);
+    // Well above it, or once the totem has been answered, they rise as usual.
+    entry.boss.hp = Math.round(
+      entry.boss.maxHp * (HOARD_TOTEM_TRIGGER_HP + HOARD_TOTEM_TENTACLE_MARGIN + 0.05),
+    );
     run(entry.sim, entry.boss, DT * 2);
     expect(cuesOf(entry.inst, 'tide-tentacle')).toHaveLength(1);
   });

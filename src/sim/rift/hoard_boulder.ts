@@ -60,8 +60,6 @@ export interface HoardBoulderState {
   timer: number;
   carrierId: number;
   boulders: Boulder[];
-  /** Seconds Grask still reels from a boulder thrown back: his combo waits. */
-  stagger: number;
   /** Rotates whom he marks, cast to cast. */
   casts: number;
 }
@@ -79,7 +77,6 @@ function boulderState(state: HoardBossState): HoardBoulderState {
     timer: BOULDER_FIRST_SEC,
     carrierId: -1,
     boulders: [],
-    stagger: 0,
     casts: 0,
   };
   return state.boulder;
@@ -233,20 +230,23 @@ function begin(
   });
 }
 
-function crush(ctx: SimContext, inst: RiftInstance, boss: Entity, victim: Entity): void {
-  ctx.dealDamage(
-    boss,
-    victim,
-    capRiftNonLethalMechanicDamage(
-      hoardMechanicDamage(inst, victim, BOULDER.crushDamageFraction),
-      victim.maxHp,
-    ),
-    false,
-    'physical',
-    HOARD_BOULDER_ABILITY,
-    'hit',
-    true,
+function crush(
+  ctx: SimContext,
+  inst: RiftInstance,
+  boss: Entity,
+  victim: Entity,
+  helpless: boolean,
+): void {
+  let amount = capRiftNonLethalMechanicDamage(
+    hoardMechanicDamage(inst, victim, BOULDER.crushDamageFraction),
+    victim.maxHp,
   );
+  // A ROOTED mark could do nothing about it, so the boulder alone never kills
+  // them: it takes them to a sliver. A lone player who stood in its lane could
+  // have moved, and gets no such floor.
+  if (helpless) amount = Math.min(amount, Math.floor(victim.hp) - 1);
+  if (amount <= 0) return;
+  ctx.dealDamage(boss, victim, amount, false, 'physical', HOARD_BOULDER_ABILITY, 'hit', true);
   if (victim.dead) return;
   ctx.applyAura(victim, {
     id: HOARD_BOULDER_DAZE_AURA_ID,
@@ -324,18 +324,23 @@ function tickBoulder(
       unbreakableControl: true,
       encounterOwned: true,
     });
+    // Credited to whoever was marked (even if they have since died: he never
+    // hits himself), and worth NO threat: answering the mechanic must not turn
+    // him on a healer the moment he stops reeling.
     const thrower = ctx.entities.get(boulder.targetId ?? -1);
-    boulderState(state).stagger = BOULDER.bossStunSec;
-    ctx.dealDamage(
-      thrower && !thrower.dead ? thrower : boss,
-      boss,
-      Math.max(1, Math.round(boss.maxHp * BOULDER.reflectDamageFraction)),
-      false,
-      'physical',
-      HOARD_BOULDER_ABILITY,
-      'hit',
-      true,
-    );
+    if (thrower) {
+      ctx.dealDamage(
+        thrower,
+        boss,
+        Math.max(1, Math.round(boss.maxHp * BOULDER.reflectDamageFraction)),
+        false,
+        'physical',
+        HOARD_BOULDER_ABILITY,
+        'hit',
+        true,
+        { mult: 0 },
+      );
+    }
     shatter(ctx, inst, boss, state, boulder, boulder.fromX, boulder.fromZ, true, emit);
     return;
   }
@@ -358,7 +363,7 @@ function tickBoulder(
         )
       )
         continue;
-      crush(ctx, inst, boss, player);
+      crush(ctx, inst, boss, player, false);
       shatter(ctx, inst, boss, state, boulder, player.pos.x, player.pos.z, true, emit);
       return;
     }
@@ -369,8 +374,10 @@ function tickBoulder(
   }
   boulder.progress = progress;
   if (progress < 1) return;
+  // Let go whether or not they still stand: the root survives death by design
+  // (no player counter sheds it), so only this module ever takes it off.
+  release(ctx.entities.get(boulder.targetId ?? -1));
   const target = living.find((player) => player.id === boulder.targetId);
-  release(target);
   if (!target) {
     // Its mark died or left before it arrived: it breaks on empty ground.
     shatter(ctx, inst, boss, state, boulder, boulder.toX, boulder.toZ, false, emit);
@@ -382,7 +389,7 @@ function tickBoulder(
     if (standsWith(target.pos.x, target.pos.z, player.pos.x, player.pos.z)) standing++;
   }
   if (standing < boulder.needed) {
-    crush(ctx, inst, boss, target);
+    crush(ctx, inst, boss, target, true);
     shatter(ctx, inst, boss, state, boulder, target.pos.x, target.pos.z, true, emit);
     ctx.emit({
       type: 'log',
@@ -445,9 +452,9 @@ export function tickHoardBoulder(
     if (findCue(state, boulder.cueId)) open++;
   }
   if (open > 0 && carrier) return;
-  if (held.stagger > 0 && carrier) {
-    // He is reeling: the carrier stays up, so the busy gate holds his combo.
-    held.stagger -= DT;
+  if (carrier && boss.auras.some((aura) => aura.id === HOARD_BOULDER_STAGGER_AURA_ID)) {
+    // He is reeling: the carrier stays up, so the busy gate holds his combo for
+    // exactly as long as the stun itself lasts.
     carrier.remaining = Math.max(carrier.remaining, DT * 2);
     return;
   }
@@ -458,7 +465,6 @@ export function tickHoardBoulder(
     if (cue) withdraw(ctx, inst, cue, emit);
   }
   held.boulders = [];
-  held.stagger = 0;
   if (carrier) withdraw(ctx, inst, carrier, emit);
   held.carrierId = -1;
   clearCast(boss);

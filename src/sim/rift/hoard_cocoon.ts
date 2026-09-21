@@ -9,7 +9,9 @@
 // State rides HoardBossState.cocoon; the telegraphs ride the ordinary hoard cue
 // list (the variants are listed in the core). A cocoon's cue is a WARNING mark
 // for its whole life, so the boss engine's busy gate holds her venom back while
-// anyone is wrapped: the party is asked one thing at a time. Draws no rng.
+// anyone is wrapped: the party is asked one thing at a time. Draws no rng of its
+// own; a brood cocoon that HATCHES spawns her hatchlings through the shared boss
+// add spawner, which rolls each one's level exactly as her egg hatch does.
 
 import { MOBS } from '../data';
 import { createMob } from '../entity';

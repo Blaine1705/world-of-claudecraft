@@ -312,6 +312,24 @@ describe('the cast, authoritative', () => {
     expect(seen.size).toBe(4);
   });
 
+  it('starts every strike at its FULL life, so a client clock starts where the sim does', () => {
+    const entry = encounter();
+    cast(entry);
+    const seen = new Set<number>();
+    let checked = 0;
+    run(entry.sim, entry.boss, FORGE_HAMMER.beatSec * 2 + 0.5, () => {
+      entry.sim.player.hp = entry.sim.player.maxHp;
+      for (const cue of strikes(entry.inst)) {
+        if (seen.has(cue.cueId)) continue;
+        seen.add(cue.cueId);
+        // First sight of it is the tick it joined the list: nothing taken off yet.
+        expect(cue.remaining).toBeCloseTo(cue.total, 9);
+        checked++;
+      }
+    });
+    expect(checked).toBeGreaterThanOrEqual(2);
+  });
+
   it('at full pressure a SECOND hammer joins and the two ALTERNATE, never land together', () => {
     const party = encounter('legendary');
     for (const id of [7001, 7002, 7003]) {

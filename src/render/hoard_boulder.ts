@@ -12,7 +12,7 @@
 // Performance contract (the siblings' contract): every geometry and material is
 // built once here and attached through the scene gate, so nothing compiles
 // mid-fight; no dynamic lights; nothing is allocated per frame; the idle frame
-// is a few branches. The low tier sheds the dust and the shadow. It NEVER sheds
+// is a few branches. The low tier sheds the dust, and nothing else. It NEVER sheds
 // what a player acts on: the boulder, the ring, its pips and the lane draw on
 // every tier.
 
@@ -86,6 +86,10 @@ interface BoulderRig {
   hit: boolean;
   broke: boolean;
   ringFor: number;
+  laneFor: number;
+  /** Where the ring was last written: a mark that is knocked about re-writes it. */
+  ringX: number;
+  ringZ: number;
   body: THREE.Group;
   shards: THREE.Mesh[];
   glow: THREE.MeshBasicMaterial;
@@ -109,6 +113,11 @@ export class HoardBoulderFx {
   /** Where each shard sat in the whole rock (x, y, z per shard). */
   private readonly homes = new Float32Array(LOOK.shards * 3);
   private readonly axis = new THREE.Vector3();
+  /** The model baked once and shared by every rig (and the stand-in likewise). */
+  private bakedFor: THREE.Group | undefined;
+  private readonly bakedBody: Array<{ geometry: THREE.BufferGeometry; material: string }> = [];
+  private readonly bakedShards: THREE.BufferGeometry[] = [];
+  private standIn: { lump: THREE.BufferGeometry; chip: THREE.BufferGeometry } | undefined;
   private readonly flight = { x: 0, y: 0, z: 0, spin: 0, scale: 1 };
   private readonly ringLook = { ring: 0, answered: 0, pips: 0 };
   private readonly dust?: {
@@ -260,12 +269,14 @@ export class HoardBoulderFx {
       hit: false,
       broke: false,
       ringFor: -1,
+      laneFor: -1,
+      ringX: 0,
+      ringZ: 0,
       body: new THREE.Group(),
       shards: [],
       glow: this.keep(new THREE.MeshBasicMaterial({ color: LOOK.glow, toneMapped: false })),
-      shadow: this.low
-        ? undefined
-        : new THREE.Mesh(disc, this.keep(this.basic(0x000000, 0, false))),
+      // On every tier: it says where an airborne boulder is over the floor.
+      shadow: new THREE.Mesh(disc, this.keep(this.basic(0x000000, 0, false))),
       ring: this.ribbon(RING_SEGMENTS, LOOK.stand, false, 'BoulderRing'),
       lane: this.ribbon(1, LOOK.lane, false, 'BoulderLane'),
       pips: [],
@@ -294,7 +305,9 @@ export class HoardBoulderFx {
     return rig;
   }
 
-  /** One authored mesh as plain float geometry in the asset root's frame. The
+  /** One authored mesh as plain float geometry in the asset root's frame (position
+   *  and index only: every lit material here is flatShading, which derives its
+   *  normals in the shader and never reads a `normal` attribute). The
    *  shipped GLB is quantized: positions are normalized integers the NODE
    *  transform scales back up, so they are baked through fromBufferAttribute. */
   private bake(holder: THREE.Object3D, mesh: THREE.Mesh, recentre: boolean, home?: THREE.Vector3) {
@@ -345,46 +358,63 @@ export class HoardBoulderFx {
     if (!holder) {
       // Owned like everything else and freed once at dispose: when the late asset
       // replaces it the stand-in is only detached, never separately released.
-      const lump = this.own(new THREE.IcosahedronGeometry(BOULDER.boulderRadius, 1));
-      rig.body.add(new THREE.Mesh(lump, stone));
-      const chip = this.own(new THREE.IcosahedronGeometry(BOULDER.boulderRadius * 0.4, 0));
-      for (let n = 0; n < LOOK.shards; n++) {
-        const a = (n / LOOK.shards) * Math.PI * 2;
-        this.homes[n * 3] = Math.sin(a) * 1.1;
-        this.homes[n * 3 + 1] = ((n % 3) - 1) * 0.7;
-        this.homes[n * 3 + 2] = Math.cos(a) * 1.1;
-        this.addShard(rig, chip, stone);
+      // Built ONCE and shared by every rig.
+      if (!this.standIn) {
+        this.standIn = {
+          lump: this.own(new THREE.IcosahedronGeometry(BOULDER.boulderRadius, 1)),
+          chip: this.own(new THREE.IcosahedronGeometry(BOULDER.boulderRadius * 0.4, 0)),
+        };
+        for (let n = 0; n < LOOK.shards; n++) {
+          const a = (n / LOOK.shards) * Math.PI * 2;
+          this.homes[n * 3] = Math.sin(a) * 1.1;
+          this.homes[n * 3 + 1] = ((n % 3) - 1) * 0.7;
+          this.homes[n * 3 + 2] = Math.cos(a) * 1.1;
+        }
       }
+      rig.body.add(new THREE.Mesh(this.standIn.lump, stone));
+      for (let n = 0; n < LOOK.shards; n++) this.addShard(rig, this.standIn.chip, stone);
       return;
     }
-    holder.updateWorldMatrix(true, true);
-    const home = new THREE.Vector3();
-    const shards: Array<{ name: string; mesh: THREE.Mesh }> = [];
-    holder.traverse((child) => {
-      const mesh = child as THREE.Mesh;
-      if (!mesh.isMesh) return;
-      // A single-primitive mesh IS its named node; a split one hangs under it.
-      const name = mesh.name.startsWith('Boulder_') ? mesh.name : (mesh.parent?.name ?? '');
-      if (name.startsWith('Boulder_Shard_')) {
-        shards.push({ name, mesh });
-        return;
+    // The model is baked ONCE, whichever rig asks first: every rig draws the same
+    // geometry, so the late asset costs one bake and one upload, not one per rig.
+    if (this.bakedFor !== asset) {
+      this.bakedFor = asset;
+      this.bakedBody.length = 0;
+      this.bakedShards.length = 0;
+      holder.updateWorldMatrix(true, true);
+      const home = new THREE.Vector3();
+      const shards: Array<{ name: string; mesh: THREE.Mesh }> = [];
+      holder.traverse((child) => {
+        const mesh = child as THREE.Mesh;
+        if (!mesh.isMesh) return;
+        // A single-primitive mesh IS its named node; a split one hangs under it.
+        const name = mesh.name.startsWith('Boulder_') ? mesh.name : (mesh.parent?.name ?? '');
+        if (name.startsWith('Boulder_Shard_')) {
+          shards.push({ name, mesh });
+          return;
+        }
+        const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+        this.bakedBody.push({ geometry: this.bake(holder, mesh, false), material: material.name });
+      });
+      shards.sort((a, b) => (a.name < b.name ? -1 : 1));
+      for (let n = 0; n < shards.length && n < LOOK.shards; n++) {
+        this.bakedShards.push(this.bake(holder, shards[n].mesh, true, home));
+        this.homes[n * 3] = home.x;
+        this.homes[n * 3 + 1] = home.y;
+        this.homes[n * 3 + 2] = home.z;
       }
-      const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-      const baked = new THREE.Mesh(
-        this.bake(holder, mesh, false),
-        material.name === 'BoulderGlow' ? rig.glow : material.name === 'BoulderIron' ? iron : stone,
-      );
-      baked.castShadow = material.name !== 'BoulderGlow';
-      rig.body.add(baked);
-    });
-    shards.sort((a, b) => (a.name < b.name ? -1 : 1));
-    for (let n = 0; n < shards.length && n < LOOK.shards; n++) {
-      const geometry = this.bake(holder, shards[n].mesh, true, home);
-      this.homes[n * 3] = home.x;
-      this.homes[n * 3 + 1] = home.y;
-      this.homes[n * 3 + 2] = home.z;
-      this.addShard(rig, geometry, stone);
     }
+    for (let n = 0; n < this.bakedBody.length; n++) {
+      const part = this.bakedBody[n];
+      const baked = new THREE.Mesh(
+        part.geometry,
+        part.material === 'BoulderGlow' ? rig.glow : part.material === 'BoulderIron' ? iron : stone,
+      );
+      baked.castShadow = part.material !== 'BoulderGlow';
+      rig.body.add(baked);
+    }
+    for (let n = 0; n < this.bakedShards.length; n++)
+      this.addShard(rig, this.bakedShards[n], stone);
   }
 
   private addShard(
@@ -439,6 +469,10 @@ export class HoardBoulderFx {
         rig.countIn = 0;
         rig.broke = false;
         rig.ringFor = -1;
+        rig.laneFor = -1;
+        rig.hit = false;
+        rig.needed = 0;
+        rig.targetId = -1;
         rig.ground = this.groundY(cue.x, cue.z);
       }
       if (rig.phase !== phase) {
@@ -576,8 +610,12 @@ export class HoardBoulderFx {
         rig.standing = this.countStanding(rig);
       }
       supportRing(rig.elapsed, rig.needed, rig.standing, this.ringLook);
-      if (rig.ringFor !== rig.cueId) {
+      // The ring drawn, the pips drawn and the ring counted are ONE circle: it is
+      // re-written whenever the mark it rides has moved.
+      if (rig.ringFor !== rig.cueId || rig.ringX !== rig.x || rig.ringZ !== rig.z) {
         rig.ringFor = rig.cueId;
+        rig.ringX = rig.x;
+        rig.ringZ = rig.z;
         this.writeRing(rig);
       }
       const pulse = still ? 1 : 0.85 + 0.15 * Math.sin(this.time * 7);
@@ -603,8 +641,8 @@ export class HoardBoulderFx {
       for (let p = 0; p < rig.pips.length; p++) rig.pips[p].visible = false;
     }
     if (alone) {
-      if (rig.ringFor !== rig.cueId) {
-        rig.ringFor = rig.cueId;
+      if (rig.laneFor !== rig.cueId) {
+        rig.laneFor = rig.cueId;
         this.writeLane(rig);
       }
       rig.lane.material.uniforms.gain.value = Math.min(1, rig.elapsed / 0.2);

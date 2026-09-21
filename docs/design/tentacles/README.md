@@ -65,6 +65,11 @@ tide-sweep           sweepTelegraphSec, then one full turn, then the settle
 Killing a tentacle withdraws an attack it had not finished, on every client, at
 once. The timer for the next set starts when the last one is gone.
 
+His Healing Tide totem keeps its turn: it is answered before a new set in the
+same tick, and no set rises within `HOARD_TOTEM_TENTACLE_MARGIN` above the
+totem's threshold while it is still unanswered, so a set that stands for its
+whole life can never carry him past it.
+
 ## The two attacks
 
 LINE WHIP: `pointInWhip`, a rectangle `whipLength` by twice `whipHalfWidth` out
@@ -93,7 +98,8 @@ live telegraph counted at its WHOLE danger area: there is open ground within
 `escapeReach`. If not, it waits `retrySec` and tries again. Overlaps get more
 complex, never unavoidable.
 
-Damage goes through `hoardMechanicDamage` and is capped non-lethal; rarity's
+Damage goes through `hoardMechanicDamage` and is never a one-shot from full
+health (`capRiftNonLethalMechanicDamage`); rarity's
 speed presses the time between a tentacle's attacks, its cadence the time
 between sets.
 

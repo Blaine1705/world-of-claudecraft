@@ -492,12 +492,13 @@ export function tickHoardTentacles(
   state: HoardBossState,
   players: readonly Entity[],
   emit: Emit,
+  mayRise = true,
 ): void {
   const held = tentacleState(state);
   const living = players.filter((p) => !p.dead);
   if (held.tentacles.length === 0) {
     held.timer -= DT;
-    if (held.timer > 0 || living.length === 0) return;
+    if (held.timer > 0 || living.length === 0 || !mayRise) return;
     // Only into a clean room, and never into the middle of a set of his waves.
     if (state.cues.length > 0 || state.sequenceStep !== 0) return;
     rise(ctx, inst, boss, state, living.length, emit);
@@ -528,9 +529,9 @@ export function tickHoardTentacles(
     }
     tickAttack(ctx, inst, boss, state, tentacle, living);
     if (cue.remaining <= DT + 1e-8) {
-      // Left standing too long: it goes back under on its own.
-      if (!tentacle.attack) fall(ctx, inst, boss, state, tentacle, false, emit);
-      else cue.remaining = DT * 2;
+      // Left standing too long: it goes back under on its own. No attack can
+      // still be live (none may begin that late); if one ever were, it goes too.
+      fall(ctx, inst, boss, state, tentacle, false, emit);
       continue;
     }
     if (tentacle.attack) continue;
