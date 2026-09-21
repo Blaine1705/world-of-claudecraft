@@ -6674,7 +6674,7 @@ async function refreshCharacters(): Promise<void> {
       const className = classDisplayName(c.class);
       const statusText = c.online ? '' : c.forceRename ? ` (${t('character.renameRequired')})` : '';
       // Zone line plus the in-world notice (src/ui/charselect_hints.ts).
-      const hintsHtml = charselectHintsHtml(c);
+      const hintsHtml = charselectHintsHtml(c, Date.now());
       // One-shot redesign token (server-decided: pre-creator character, token
       // unspent). Rendered on every action arm; gone for good once spent.
       const rerollBtn = c.appearanceRerollAvailable

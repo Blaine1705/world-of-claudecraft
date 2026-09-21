@@ -9924,6 +9924,7 @@ export const en: EnTranslations = {
     "inWorld": "in world",
     "takeOver": "Take Over",
     "inWorldHint": "Already in world. Log out elsewhere, or take over.",
+    "raidLockouts": "Raid lockouts",
     "takeOverConfirm": "This will disconnect this character from another session and bring it here. Continue?",
     "renameRequired": "rename required",
     "delete": "Delete",

@@ -9924,6 +9924,7 @@ export const pl_PL: EnTranslations = {
     "inWorld": "w świecie",
     "takeOver": "Przejmij",
     "inWorldHint": "Już w świecie. Wyloguj się gdzie indziej lub przejmij.",
+    "raidLockouts": "Raid lockouts",
     "takeOverConfirm": "Spowoduje to rozłączenie tej postaci z inną sesją i przeniesienie jej tutaj. Kontynuować?",
     "renameRequired": "wymagana zmiana imienia",
     "delete": "Usuń",

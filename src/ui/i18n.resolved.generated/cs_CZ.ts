@@ -9924,6 +9924,7 @@ export const cs_CZ: EnTranslations = {
     "inWorld": "ve světě",
     "takeOver": "Převzít",
     "inWorldHint": "Už je ve světě. Odhlas se jinde nebo ji převezmi.",
+    "raidLockouts": "Raid lockouts",
     "takeOverConfirm": "Tímto odpojíš tuto postavu z jiné relace a přesuneš ji sem. Pokračovat?",
     "renameRequired": "vyžaduje přejmenování",
     "delete": "Smazat",

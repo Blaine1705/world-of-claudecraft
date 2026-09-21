@@ -247,6 +247,9 @@ export const shellStrings = {
       inWorld: 'in world',
       takeOver: 'Take Over',
       inWorldHint: 'Already in world. Log out elsewhere, or take over.',
+      // Label of the roster row's raid-lockout line; each locked raid follows
+      // as "<name> <countdown>" (hudChrome.raidLockout templates).
+      raidLockouts: 'Raid lockouts',
       takeOverConfirm:
         'This will disconnect this character from another session and bring it here. Continue?',
       renameRequired: 'rename required',

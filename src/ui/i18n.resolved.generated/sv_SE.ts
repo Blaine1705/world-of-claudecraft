@@ -9924,6 +9924,7 @@ export const sv_SE: EnTranslations = {
     "inWorld": "i världen",
     "takeOver": "Ta över",
     "inWorldHint": "Redan i världen. Logga ut någon annanstans, eller ta över.",
+    "raidLockouts": "Raid lockouts",
     "takeOverConfirm": "Detta kopplar bort denna karaktär från en annan session och hämtar hit den. Fortsätta?",
     "renameRequired": "namnbyte krävs",
     "delete": "Radera",

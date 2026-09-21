@@ -130,7 +130,6 @@ import {
   xpUntilNextPrestige,
 } from '../sim/types';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
-import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
   type CharacterProfile,
   type DailyRewardStatus,
@@ -789,7 +788,7 @@ import {
 import { questProgressEventText } from './quest_progress_text';
 import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { raidCalloutKey } from './raid_callout';
-import { formatLockoutDuration } from './raid_lockout_format';
+import { formatLockoutDuration, raidLockoutDisplayName } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import { RecipePinStore } from './recipe_pins_store';
@@ -9899,21 +9898,9 @@ export class Hud {
     const i18n: RaidLockoutI18n = {
       title: t('hudChrome.raidLockout.title'),
       allReady: t('hudChrome.raidLockout.allReady'),
-      // A looted world boss shows in the raid-lockout timer under a world-boss lockout id
-      // (see markWorldBossLooted in src/sim/world_boss.ts). worldBossIdFromLockout keeps
-      // the prefix convention in one place: it returns the boss mob id (localize as a mob
-      // name) or null for an ordinary dungeon/raid id.
-      raidName: (id) => {
-        const bossId = worldBossIdFromLockout(id);
-        if (bossId !== null) return tEntity({ kind: 'mob', id: bossId, field: 'name' });
-        // Heroic daily lockouts ride difficulty-scoped ids (<dungeon>:heroic).
-        if (id.endsWith(':heroic')) {
-          return t('hudChrome.raidLockout.heroicName', {
-            name: dungeonDisplayName(id.slice(0, -':heroic'.length)),
-          });
-        }
-        return dungeonDisplayName(id);
-      },
+      // World-boss, heroic and plain dungeon ids all name through the shared
+      // rule character select uses too (raid_lockout_format.ts).
+      raidName: raidLockoutDisplayName,
       duration: formatLockoutDuration,
     };
     return raidLockoutPanelHtml(this.sim.raidLockouts(), i18n);

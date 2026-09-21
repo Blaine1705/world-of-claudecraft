@@ -9924,6 +9924,7 @@ export const nl_NL: EnTranslations = {
     "inWorld": "in wereld",
     "takeOver": "Overnemen",
     "inWorldHint": "Al in de wereld. Log elders uit, of neem over.",
+    "raidLockouts": "Raid lockouts",
     "takeOverConfirm": "Hiermee wordt dit personage losgekoppeld van een andere sessie en hierheen gehaald. Doorgaan?",
     "renameRequired": "hernoemen vereist",
     "delete": "Verwijderen",

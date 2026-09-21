@@ -11,6 +11,7 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -25,6 +26,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -39,6 +41,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -53,6 +56,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -68,6 +72,7 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -82,6 +87,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -112,6 +118,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -130,6 +137,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "cs_CZ": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -144,6 +152,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -158,6 +167,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -172,6 +182,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -186,6 +197,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -200,6 +212,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -214,6 +227,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",
@@ -228,6 +242,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "abilityUi.forms.bearOrCat",
+    "character.raidLockouts",
     "guide.settingsPage.rowFrameRateCap",
     "hud.errors.bearOrCat",
     "hudChrome.options.frameRateCap",

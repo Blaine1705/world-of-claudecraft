@@ -484,7 +484,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18291 -> 18289 at the PR 4100 review round: the Inspect look now
     // travels as an openInspect parameter (no InspectEntity cast dep), and
     // the target-of-target key reads targetPortraitKey. Exact count, zero slack.
-    ceiling: 18289,
+    // LOWERED 18289 -> 18276 with the character-select raid lockouts: the
+    // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
+    // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
+    // and the minimap badge name a lockout identically. Exact count, zero slack.
+    ceiling: 18276,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

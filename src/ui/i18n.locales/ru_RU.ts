@@ -2469,6 +2469,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': 'в мире',
   'character.takeOver': 'Перехватить',
   'character.inWorldHint': 'Уже в мире. Выйдите в другом месте или перехватите сессию.',
+  'character.raidLockouts': 'Блокировки рейдов',
   'character.takeOverConfirm':
     'Это отключит персонажа от другой сессии и перенесёт его сюда. Продолжить?',
   'character.renameRequired': 'требуется переименование',

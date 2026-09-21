@@ -520,6 +520,7 @@ export type TranslationKeyFlat =
   | 'character.noneYet'
   | 'character.portraitAlt'
   | 'character.profile'
+  | 'character.raidLockouts'
   | 'character.redesign'
   | 'character.redesignCancel'
   | 'character.redesignHint'

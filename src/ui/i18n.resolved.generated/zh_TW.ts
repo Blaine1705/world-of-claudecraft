@@ -9924,6 +9924,7 @@ export const zh_TW: EnTranslations = {
     "inWorld": "在世界中",
     "takeOver": "接管",
     "inWorldHint": "已在世界中。請在別處登出，或接管工作階段。",
+    "raidLockouts": "團隊副本鎖定",
     "takeOverConfirm": "這會使該角色從另一個工作階段中斷並切換到此處。是否繼續？",
     "renameRequired": "需要更名",
     "delete": "刪除",

@@ -9924,6 +9924,7 @@ export const id_ID: EnTranslations = {
     "inWorld": "di dunia",
     "takeOver": "Ambil Alih",
     "inWorldHint": "Sudah berada di dunia. Keluar di tempat lain, atau ambil alih.",
+    "raidLockouts": "Raid lockouts",
     "takeOverConfirm": "Ini akan memutus karakter ini dari sesi lain dan membawanya ke sini. Lanjutkan?",
     "renameRequired": "wajib ganti nama",
     "delete": "Hapus",
