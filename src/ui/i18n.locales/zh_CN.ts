@@ -11247,11 +11247,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    '脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。一小时内的首次使用不付代价。若在上次使用后一小时内再次使用，你将带着脱困后遗症，最多持续 5 分钟。',
   'hudChrome.unstuck.menuButton': '脱困',
   'hudChrome.unstuck.help': '脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
     '脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。',
   'hudChrome.unstuck.movedToGraveyard': '你已被移动到最近的墓地。脱困后遗症正压在你身上。',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    '你已被移动到最近的墓地。一小时内再次使用脱困将让你带上脱困后遗症。',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    '你已被移动到最近的墓地并复活。一小时内再次使用脱困将让你带上脱困后遗症。',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     '你已被移动到最近的墓地并复活。脱困后遗症正压在你身上。',
   'hudChrome.unstuck.started':
@@ -14040,6 +14046,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': '敌人会打谁',
   'guide.combat.unstuckBody':
     '如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。代价是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。',
+  'guide.combat.unstuckBodyWindow':
+    '如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。一小时内的首次使用不付任何代价。若在上次使用后一小时内再次使用，代价便是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。',
   'guide.combat.unstuckTitle': '当你真的被困住时',
   'guide.commandsPage.abilities': '你已经学会的技能。',
   'guide.commandsPage.afk':
@@ -14165,6 +14173,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': '如果一条指令不起作用',
   'guide.commandsPage.unstuck':
     '被世界困住时的那条出路。站定不动熬过一段短暂的倒计时，你就会被移动到最近的墓地；若你已经倒下，还会在那里被复活。事后你会带着脱困后遗症虚弱一阵子，因此它是最后的手段，而不是捷径。',
+  'guide.commandsPage.unstuckWindow':
+    '被世界困住时的那条出路。站定不动熬过一段短暂的倒计时，你就会被移动到最近的墓地；若你已经倒下，还会在那里被复活。一小时内的首次使用不付代价。若在上次使用后一小时内再次使用，事后你会带着脱困后遗症虚弱一阵子，因此它是救援手段，而不是捷径。',
   'guide.commandsPage.where': '你所站的区域、它的等级范围，以及你的坐标。',
   'guide.commandsPage.whisper':
     '向一位在线玩家发送私聊消息。只要不会指向多个玩家，你把名字的大小写打成什么样都能对上。',
@@ -14350,6 +14360,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': '工具护符',
   'guide.glossary.unstuckDef':
     '从游戏菜单里使用“脱困”所要付出的代价。站着别动，等倒计时走完，它会把你放在最近的墓地，而此后一段时间里，你会带着一层临时的虚弱。',
+  'guide.glossary.unstuckDefWindow':
+    '一小时内不止一次依赖游戏菜单里的“脱困”所要付出的代价。站着别动，等倒计时走完，它会把你放在最近的墓地。一小时内的首次使用不付代价，而在上次使用后一小时内再次使用，此后一段时间里你还会带着一层临时的虚弱。',
   'guide.glossary.unstuckTerm': '脱困虚弱',
   'guide.glossary.warfareDef':
     '玩家对战的装备那一面。军需官用荣誉出售成套的战争护甲，而它们所带的战争评级，只在与其他玩家的战斗中作数。',

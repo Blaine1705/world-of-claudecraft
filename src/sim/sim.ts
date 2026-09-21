@@ -3512,7 +3512,7 @@ export class Sim {
       this.time,
       restoredAbilityCharges,
       legacyChargeCaps,
-      (id) => id === unstuckMod.UNSTUCK_COOLDOWN_ID || ABILITIES[id] !== undefined,
+      (id) => unstuckMod.isUnstuckSystemCooldown(id) || ABILITIES[id] !== undefined,
     );
     if (Object.keys(restoredAbilityCharges).length > 0) {
       player.abilityCharges = restoredAbilityCharges;
