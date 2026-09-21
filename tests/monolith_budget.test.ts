@@ -493,7 +493,11 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
     // per-frame healer-range scan (the Keeper is talked to). wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 18276,
+    // LOWERED 18276 -> 18263 with the character-select raid lockouts: the
+    // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
+    // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
+    // and the minimap badge name a lockout identically. Exact count, zero slack.
+    ceiling: 18263,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1296,7 +1300,10 @@ const MONOLITHS: MonolithRow[] = [
     // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
     // composed with the release's game_renderer.ts extraction. Exact merged
     // count, zero slack.
-    ceiling: 11281,
+    // LOWERED 11281 -> 11280 with the character-select lockout disclosure:
+    // the roster row hint markup call is inlined into its template and the
+    // disclosure event isolation lives in src/ui/charselect_hints.ts.
+    ceiling: 11280,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

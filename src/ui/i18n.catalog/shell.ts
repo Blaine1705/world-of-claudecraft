@@ -247,6 +247,15 @@ export const shellStrings = {
       inWorld: 'in world',
       takeOver: 'Take Over',
       inWorldHint: 'Already in world. Log out elsewhere, or take over.',
+      // The roster row's zone line ({zone} = the localized zone name).
+      currentLocation: 'Current location: {zone}',
+      // Summary of the roster row's collapsible lockout list, then its three
+      // group headings; each locked entry inside reads "<name> <countdown>"
+      // (hudChrome.raidLockout templates).
+      lockouts: 'Lockouts',
+      lockoutRaids: 'Raids',
+      lockoutDungeons: 'Dungeons',
+      lockoutWorldBosses: 'World bosses',
       takeOverConfirm:
         'This will disconnect this character from another session and bring it here. Continue?',
       renameRequired: 'rename required',

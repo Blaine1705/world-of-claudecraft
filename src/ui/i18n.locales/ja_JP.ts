@@ -2445,6 +2445,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': '世界にいます',
   'character.takeOver': '引き継ぐ',
   'character.inWorldHint': 'すでに世界にいます。別の場所からログアウトするか、引き継いでください。',
+  'character.currentLocation': '現在地: {zone}',
+  'character.lockouts': 'ロックアウト',
+  'character.lockoutRaids': 'レイド',
+  'character.lockoutDungeons': 'ダンジョン',
+  'character.lockoutWorldBosses': 'ワールドボス',
   'character.takeOverConfirm':
     'このキャラクターを別のセッションから切断し、こちらに移します。続けますか？',
   'character.renameRequired': '名前変更が必要',
