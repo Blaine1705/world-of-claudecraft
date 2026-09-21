@@ -682,7 +682,8 @@ export function runEffects(
         weaponMult *= trueStealthOpener ? trueStealthOpenerMultiplier(true) : veiledEdgeMult;
         bonus = trueStealthOpenerScaleBonus(trueStealthOpener, bonus);
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
-          // Harvest already began its opening performance before the delayed hit.
+          // Red Harvest emits its opening cue before the strikes (warrior_harvest.ts),
+          // so its damage events must not restart the authored clip.
           attackAnimationStarted: ability.id === 'red_harvest' && attackAnimationStarted,
           cannotBeDodged: eff.cannotBeDodged,
           normalizedInstant: eff.normalized,

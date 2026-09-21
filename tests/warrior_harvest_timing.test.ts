@@ -1,13 +1,19 @@
+// Red Harvest resolves on the cast tick like every classic instant (the sim
+// never waits on the authored contact timing, which the client owns:
+// src/render/ability_vfx/harvest_choreography.ts). These pins guard the
+// presentation handshake around that instant result: one opening cue, three
+// strikes carrying attackAnimationStarted, refunds and Enrage in the same tick,
+// and no deferred work left behind on the delayed-event queue.
 import { afterEach, expect, it, vi } from 'vitest';
-import { RED_HARVEST_IMPACT_DELAY } from '../src/sim/combat/warrior_harvest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { drainDelayedEvents } from '../src/sim/entity_roster';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, type SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 afterEach(() => vi.restoreAllMocks());
+
+const TICKS_AFTER_CAST = 10;
 
 function fixture() {
   const sim = new Sim({
@@ -33,12 +39,13 @@ function fixture() {
   p.gcdRemaining = 0;
   p.hitBonus = 1;
   sim.drainEvents();
-  const at = (time: number) => {
-    sim.time = time;
-    drainDelayedEvents(sim.ctx);
-    return sim.drainEvents();
+  // Real ticks after the cast: nothing Red Harvest related may land late.
+  const settle = () => {
+    const events: SimEvent[] = [];
+    for (let tick = 0; tick < TICKS_AFTER_CAST; tick++) events.push(...sim.tick());
+    return events;
   };
-  return { sim, p, target, at };
+  return { sim, p, target, settle };
 }
 
 function damage(events: SimEvent[]) {
@@ -48,115 +55,76 @@ function damage(events: SimEvent[]) {
   );
 }
 
-it('spends once, opens immediately and delivers exactly one three-hit batch at the deadline', () => {
-  const { sim, p, target, at } = fixture();
+it('spends, opens and delivers all three strikes on the cast tick, then nothing more', () => {
+  const { sim, p, target, settle } = fixture();
   vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.9);
   const resolve = vi.spyOn(sim.ctx, 'runEffects');
   p.abilityCharges = {
     ...p.abilityCharges,
     raging_gale: { charges: 1, maxCharges: 2, recharge: 8, rechargeLength: 8, recharges: [8] },
   };
+  const hp = target.hp;
   sim.castAbility('red_harvest');
-  const start = sim.drainEvents();
-  expect(damage(start)).toEqual([]);
-  expect(start.filter((e) => e.type === 'spellfx' && e.ability === 'red_harvest')).toEqual([
+  const cast = sim.drainEvents();
+  const opening = cast.filter((e) => e.type === 'spellfx' && e.ability === 'red_harvest');
+  expect(opening).toEqual([
     expect.objectContaining({ fx: 'selfCast', sourceId: p.id, targetId: target.id }),
   ]);
-  expect(p.resource).toBe(20);
-  expect(p.gcdRemaining).toBeGreaterThan(0);
-  expect(p.abilityCharges.raging_gale.charges).toBe(1);
-  expect(p.auras.some((a) => a.kind === 'enrage')).toBe(false);
-  const hp = target.hp;
-  expect(damage(at(RED_HARVEST_IMPACT_DELAY - 0.00001))).toEqual([]);
-  expect(target.hp).toBe(hp);
-  expect(resolve).not.toHaveBeenCalled();
-  const hits = damage(at(RED_HARVEST_IMPACT_DELAY));
+  // The opening cue precedes the strikes so the client starts the clip first.
+  expect(cast.indexOf(opening[0])).toBeLessThan(cast.indexOf(damage(cast)[0]));
+  const hits = damage(cast);
   expect(hits).toHaveLength(3);
   expect(hits.every((e) => e.amount > 0 && e.attackAnimationStarted === true)).toBe(true);
   expect(resolve).toHaveBeenCalledTimes(1);
   expect(target.hp).toBeLessThan(hp);
+  expect(p.resource).toBe(20);
+  expect(p.gcdRemaining).toBeGreaterThan(0);
+  // Cleaving Blows refund and the guaranteed Enrage land in the same tick.
   expect(p.abilityCharges.raging_gale.charges).toBe(2);
   expect(p.auras.filter((a) => a.kind === 'enrage')).toHaveLength(1);
+  // No deferred delivery is left behind for a later tick.
+  expect(sim.ctx.delayedEvents).toHaveLength(0);
   const after = target.hp;
-  expect(damage(at(2))).toEqual([]);
+  expect(damage(settle())).toEqual([]);
   expect(target.hp).toBe(after);
   expect(resolve).toHaveBeenCalledTimes(1);
 });
 
-it.each([
-  'source-death',
-  'target-death',
-  'source-removed',
-  'target-replaced',
-  'metadata-removed',
-  'friendly',
-  'escape-stealth',
-  'range',
-  'line-of-sight',
-] as const)('cancels without damage or rolls on %s', (reason) => {
-  const { sim, p, target, at } = fixture();
+it('cannot be escaped after the cast: a victim that dies or moves next tick was already hit', () => {
+  const { sim, target, settle } = fixture();
+  vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.9);
+  const hp = target.hp;
   sim.castAbility('red_harvest');
-  sim.drainEvents();
-  if (reason === 'source-death') p.dead = true;
-  if (reason === 'target-death') target.dead = true;
-  if (reason === 'source-removed') sim.entities.delete(p.id);
-  if (reason === 'target-replaced') sim.entities.set(target.id, { ...target });
-  if (reason === 'metadata-removed') sim.ctx.players.delete(p.id);
-  if (reason === 'friendly') vi.spyOn(sim.ctx, 'isHostileTo').mockReturnValue(false);
-  if (reason === 'escape-stealth') {
-    target.auras.push({
-      id: 'vanish',
-      name: 'Smokestep',
-      kind: 'stealth',
-      remaining: 5,
-      duration: 5,
-      value: 0.5,
-      sourceId: target.id,
-      school: 'physical',
-    });
-  }
-  if (reason === 'range') target.pos.z += 50;
-  if (reason === 'line-of-sight') vi.spyOn(sim.ctx, 'lineOfSightBlocked').mockReturnValue(true);
-  const rolls = vi.spyOn(sim.ctx.rng, 'next');
-  const resolve = vi.spyOn(sim.ctx, 'runEffects');
-  expect(damage(at(RED_HARVEST_IMPACT_DELAY))).toEqual([]);
-  expect(resolve).not.toHaveBeenCalled();
-  expect(rolls).not.toHaveBeenCalled();
-  expect(p.resource).toBe(20);
+  expect(damage(sim.drainEvents())).toHaveLength(3);
+  const dealt = hp - target.hp;
+  expect(dealt).toBeGreaterThan(0);
+  // Moving away or dying afterwards changes nothing: the strikes are already
+  // resolved and paid for, and no later tick delivers or refunds anything.
+  target.pos.z += 50;
+  target.dead = true;
+  // (rage keeps moving with combat and decay, so only the paid-and-delivered
+  // shape is pinned here: no late strike and nothing queued to deliver later)
+  expect(damage(settle())).toEqual([]);
   expect(sim.ctx.delayedEvents).toHaveLength(0);
 });
 
-it('keeps the committed victim when the player selects another target', () => {
-  const { sim, target, at } = fixture();
-  vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.9);
-  sim.castAbility('red_harvest');
-  const other: Entity = { ...target, id: target.id + 1, pos: { ...target.pos }, auras: [] };
-  sim.ctx.addEntity(other);
-  sim.targetEntity(other.id, sim.playerId);
-  const hits = damage(at(RED_HARVEST_IMPACT_DELAY));
-  expect(hits).toHaveLength(3);
-  expect(hits.every((e) => e.targetId === target.id)).toBe(true);
-  expect(other.hp).toBe(other.maxHp);
-});
-
 it('stops after a lethal first strike without requiring a third damage event', () => {
-  const { sim, p, target, at } = fixture();
+  const { sim, p, target } = fixture();
   vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.9);
   target.hp = 1;
   sim.castAbility('red_harvest');
-  expect(target.dead).toBe(false);
-  const hits = damage(at(RED_HARVEST_IMPACT_DELAY));
+  const hits = damage(sim.drainEvents());
   expect(hits).toHaveLength(1);
   expect(hits[0].attackAnimationStarted).toBe(true);
   expect(target.dead).toBe(true);
   expect(p.auras.filter((a) => a.kind === 'enrage')).toHaveLength(1);
-  expect(damage(at(1))).toEqual([]);
 });
 
 it.each(['miss', 'dodge', 'parry'] as const)(
-  'marks delayed %s results without restarting the gesture',
+  'marks %s results as part of the started performance without restarting the gesture',
   (kind) => {
-    const { sim, p, target, at } = fixture();
+    const { sim, target } = fixture();
+    const p = sim.player;
     p.hitBonus = 0;
     if (kind === 'parry') {
       target.kind = 'player';
@@ -170,18 +138,30 @@ it.each(['miss', 'dodge', 'parry'] as const)(
       kind === 'miss' ? 0.001 : kind === 'dodge' ? 0.075 : 0.15,
     );
     sim.castAbility('red_harvest');
-    const hits = damage(at(RED_HARVEST_IMPACT_DELAY));
+    const hits = damage(sim.drainEvents());
     expect(hits).toHaveLength(3);
     expect(hits.every((e) => e.kind === kind && e.attackAnimationStarted === true)).toBe(true);
   },
 );
 
+it('leaves every other weapon strike without the started-performance flag', () => {
+  const { sim, p } = fixture();
+  vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.9);
+  p.resource = 100;
+  sim.castAbility('bloodthirst');
+  const hits = sim
+    .drainEvents()
+    .filter((e): e is Extract<SimEvent, { type: 'damage' }> => e.type === 'damage');
+  expect(hits.length).toBeGreaterThan(0);
+  expect(hits.every((e) => e.attackAnimationStarted === undefined)).toBe(true);
+});
+
 it('repeats the same event trace and final state from the same seed', () => {
   function run() {
-    const { sim, p, target, at } = fixture();
+    const { sim, p, target, settle } = fixture();
     sim.castAbility('red_harvest');
     return {
-      events: [...sim.drainEvents(), ...at(0.5)],
+      events: [...sim.drainEvents(), ...settle()],
       hp: target.hp,
       rage: p.resource,
       auras: p.auras,
@@ -191,21 +171,25 @@ it('repeats the same event trace and final state from the same seed', () => {
   expect(run()).toEqual(run());
 });
 
-it('does not slip one tick when the real 20 Hz clock accumulates fractional seconds', () => {
-  const { sim, at } = fixture();
-  vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.9);
-  sim.castAbility('red_harvest');
-  for (let tick = 1; tick < 10; tick++) expect(damage(at(sim.time + DT))).toEqual([]);
-  expect(damage(at(sim.time + DT))).toHaveLength(3);
-});
-
 it('lets the existing damage pipeline retain full immunity without inventing positive hits', () => {
-  const { sim, target, at } = fixture();
+  const { sim, target } = fixture();
   vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.9);
-  sim.castAbility('red_harvest');
   target.damageImmune = true;
   const hp = target.hp;
-  expect(damage(at(RED_HARVEST_IMPACT_DELAY)).filter((e) => e.amount > 0)).toEqual([]);
+  sim.castAbility('red_harvest');
+  expect(damage(sim.drainEvents()).filter((e) => e.amount > 0)).toEqual([]);
   expect(target.hp).toBe(hp);
-  expect(sim.ctx.delayedEvents).toHaveLength(0);
+});
+
+it('keeps the committed victim: the strikes never follow a target change made after the cast', () => {
+  const { sim, target } = fixture();
+  vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.9);
+  const other: Entity = { ...target, id: target.id + 1, pos: { ...target.pos }, auras: [] };
+  sim.ctx.addEntity(other);
+  sim.castAbility('red_harvest');
+  sim.targetEntity(other.id, sim.playerId);
+  const hits = damage(sim.drainEvents());
+  expect(hits).toHaveLength(3);
+  expect(hits.every((e) => e.targetId === target.id)).toBe(true);
+  expect(other.hp).toBe(other.maxHp);
 });
