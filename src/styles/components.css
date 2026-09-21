@@ -23322,6 +23322,114 @@
     margin-top: 8px;
     font-size: 12px;
   }
+  .weekly-table-picker {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    text-align: left;
+  }
+  .weekly-table-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: left;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    white-space: normal;
+    cursor: pointer;
+  }
+  .weekly-table-summary::after {
+    content: "";
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+  }
+  .weekly-table-picker[open] > .weekly-table-summary::after {
+    transform: rotate(225deg);
+  }
+  .weekly-table-summary::marker {
+    content: "";
+  }
+  .weekly-table-summary::-webkit-details-marker {
+    display: none;
+  }
+  .weekly-milestone.weekly-table-expanded {
+    overflow: visible;
+    z-index: 10;
+  }
+  .weekly-table-options {
+    position: absolute;
+    inset: calc(100% + 4px) 0 auto;
+    z-index: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px;
+    box-sizing: border-box;
+  }
+  .weekly-table-opens-up > .weekly-table-options {
+    top: auto;
+    bottom: calc(100% + 4px);
+  }
+  .weekly-table-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+  .weekly-table-option input {
+    flex: 0 0 auto;
+  }
+  .weekly-loot-category {
+    min-width: 0;
+    padding: 12px;
+  }
+  .weekly-loot-table {
+    margin-top: 8px;
+  }
+  .weekly-loot-table > summary {
+    display: flex;
+    height: auto;
+    white-space: normal;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+  .weekly-loot-table > summary::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex: 0 0 auto;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+  }
+  .weekly-loot-table[open] > summary::before {
+    transform: rotate(45deg);
+  }
+  .weekly-loot-table > summary > span:first-of-type {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-align: left;
+  }
+  .weekly-loot-table > summary > .ui-num {
+    flex: 0 0 auto;
+  }
+  .weekly-loot-table .weekly-loot-list {
+    padding: 8px;
+  }
+  .weekly-table-exhausted .weekly-vault-illustration {
+    opacity: 0.45;
+  }
   .weekly-claim-flow h3 {
     color: var(--color-accent);
   }
@@ -23545,6 +23653,13 @@
       .weekly-tracks {
         gap: 8px;
       }
+    }
+  }
+  @media (max-height: 600px) {
+    .weekly-claim-active {
+      flex: none;
+      min-height: auto;
+      overflow: visible;
     }
   }
   @media (max-width: 1000px) {

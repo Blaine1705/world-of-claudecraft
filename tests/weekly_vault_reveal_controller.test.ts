@@ -39,6 +39,7 @@ it('does not publish loot or animate while awaiting a host opening', () => {
     request,
   );
   stage.querySelector<HTMLButtonElement>('.vault-reveal-trigger')!.click();
+  stage.querySelector<HTMLButtonElement>('.vault-reveal-trigger')!.click();
   view.animate();
   vi.runAllTimers();
   expect(request).toHaveBeenCalledTimes(1);
@@ -73,6 +74,7 @@ it('opens once, reveals the provided item and cancels safely on teardown', () =>
   trigger.click();
   expect(stage.classList.contains('vault-is-open')).toBe(false);
   allowed = true;
+  view.syncAvailability();
   trigger.focus();
   trigger.click();
   trigger.click();
@@ -94,8 +96,6 @@ it('mints the burst from the core: individual timing per element, the timeline o
   const stage = document.createElement('div');
   stage.innerHTML = '<img src="/ui/weekly-vault/heroic.webp" alt="">';
   document.body.append(stage);
-  // Slot 9: this test opens without finishing, and the resume map is keyed by
-  // slot and item, so it must not share a slot with the resume tests below.
   const view = attachWeeklyVaultReveal(
     stage,
     ITEMS.orb_of_the_last_spring,
@@ -213,6 +213,7 @@ it('resumes an in-flight opening across a repaint instead of restarting it', () 
     return stage;
   };
   const first = mount();
+  const progress = {};
   const firstReveal = vi.fn();
   const view = attachWeeklyVaultReveal(
     first,
@@ -223,6 +224,10 @@ it('resumes an in-flight opening across a repaint instead of restarting it', () 
     presentation,
     () => true,
     firstReveal,
+    undefined,
+    undefined,
+    false,
+    progress,
   );
   view.animate();
   expect(first.style.getPropertyValue('--vault-elapsed')).toBe('0ms');
@@ -241,6 +246,10 @@ it('resumes an in-flight opening across a repaint instead of restarting it', () 
     presentation,
     () => true,
     reveal,
+    undefined,
+    undefined,
+    false,
+    progress,
   );
   resumed.animate();
   expect(second.classList.contains('vault-is-open')).toBe(true);
@@ -253,7 +262,7 @@ it('resumes an in-flight opening across a repaint instead of restarting it', () 
   expect(second.classList.contains('vault-is-revealed')).toBe(true);
   resumed.dispose();
   second.remove();
-  // Once complete, the same slot opens fresh next time (no stale offset).
+  // A different reward session starts fresh even with the same slot and item.
   const third = mount();
   const again = attachWeeklyVaultReveal(
     third,
@@ -270,7 +279,7 @@ it('resumes an in-flight opening across a repaint instead of restarting it', () 
   again.dispose();
   third.remove();
 });
-it('lets a stale in-flight entry expire so a fresh opening never inherits an old offset', () => {
+it('keeps a fresh opening independent of an abandoned opening', () => {
   vi.useFakeTimers();
   vi.stubGlobal('matchMedia', () => ({ matches: false }));
   const presentation = {

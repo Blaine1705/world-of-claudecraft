@@ -8,6 +8,8 @@ import {
 } from '../../server/weekly_reward_open';
 import { BUILTIN_WORLD, NPCS } from '../../src/sim/data';
 import { type CharacterState, Sim } from '../../src/sim/sim';
+import { weeklyRewardTableOptions } from '../../src/sim/weekly_reward_options';
+import { weeklyBossLootPool, weeklyBossTable } from '../../src/sim/weekly_reward_tables';
 import {
   emptyWeeklyRewards,
   WEEKLY_KEEPER_ID,
@@ -30,6 +32,7 @@ function setup(state?: CharacterState) {
   });
   const pid = sim.addPlayer('mage', 'Collector', { state });
   const player = sim.entities.get(pid)!;
+  if (!state) player.level = 20;
   const keeper = [...sim.entities.values()].find(
     (entity) => entity.templateId === WEEKLY_KEEPER_ID,
   )!;
@@ -40,7 +43,11 @@ function setup(state?: CharacterState) {
   if (!state) {
     meta.weeklyRewards = emptyWeeklyRewards(604800000);
     meta.weeklyRewards.vaults = [
-      { resetAtMs: 1000, choices: [{ pool: 'dungeon' }, { pool: 'pvp' }] },
+      {
+        resetAtMs: 1000,
+        bossUnlocks: { vael_the_mistcaller: 1, ysolei: 2 },
+        choices: [{ pool: 'dungeon' }, { pool: 'pvp' }],
+      },
     ];
   }
   const session: WeeklyRewardSession = {
@@ -68,6 +75,14 @@ function setup(state?: CharacterState) {
   };
   const open = (index = 0) =>
     dispatchWeeklyRewardCommand(host, session, 'weekly_reward_open', {
+      tables: weeklyRewardTableOptions(
+        meta.weeklyRewards!.vaults[0],
+        meta.weeklyRewards!.vaults[0].choices[index],
+        'mage',
+        player.level,
+      )
+        .slice(0, 1)
+        .map((table) => table.id),
       choice: `1000:${index}`,
       token: '604800000:0',
     });
@@ -81,6 +96,102 @@ afterEach(() => {
 });
 
 describe('weekly vault durable opening', () => {
+  it('rejects simultaneous table and tables fields without rolling or saving', async () => {
+    const h = setup();
+    const pick = vi.spyOn(h.sim.ctx.rng, 'pick');
+    await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_reward_open', {
+      choice: '1000:0',
+      token: '604800000:0',
+      table: 'sunken_bastion',
+      tables: ['sunken_bastion'],
+    });
+    expect(pick).not.toHaveBeenCalled();
+    expect(h.saveCharacter).not.toHaveBeenCalled();
+  });
+
+  it('conceals the selected source during a failed save and reveals it only after retry succeeds', async () => {
+    vi.useFakeTimers();
+    const h = setup();
+    const pick = vi.spyOn(h.sim.ctx.rng, 'pick');
+    const command = { choice: '1000:0', token: '604800000:0', tables: ['sunken_bastion'] };
+    const work = dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_reward_open', command);
+    expect(h.choices()[0]).toEqual({ pool: 'dungeon', fixed: true, opening: true });
+    h.resolve(false);
+    await work;
+    expect(h.choices()[0]).toEqual({ pool: 'dungeon', fixed: true });
+    const fixedItem = h.meta.weeklyRewards!.vaults[0].choices[0].itemId;
+    h.saveCharacter.mockResolvedValue(true);
+    vi.advanceTimersByTime(WEEKLY_OPEN_RETRY_MS);
+    await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_reward_open', {
+      choice: '1000:0',
+      token: '604800000:0',
+    });
+    expect(h.choices()[0]).toEqual({
+      pool: 'dungeon',
+      itemId: fixedItem,
+      tableId: 'sunken_bastion',
+      opened: true,
+    });
+    expect(pick).toHaveBeenCalledOnce();
+  });
+  it('rejects boss selection on a world vault and conceals its roll until saved', async () => {
+    const h = setup();
+    h.meta.weeklyRewards!.vaults[0].choices = [{ pool: 'world' }];
+    const pick = vi.spyOn(h.sim.ctx.rng, 'pick');
+    await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_reward_open', {
+      choice: '1000:0',
+      token: '604800000:0',
+      table: 'nythraxis_scourge_of_thornpeak',
+    });
+    expect(pick).not.toHaveBeenCalled();
+    expect(h.saveCharacter).not.toHaveBeenCalled();
+    const work = h.open();
+    const fixed = h.meta.weeklyRewards!.vaults[0].choices[0];
+    expect(fixed.itemId).toBeTruthy();
+    expect(fixed.tableId).toBe('world');
+    expect(h.choices()[0].itemId).toBeUndefined();
+    expect(h.sim.serializeCharacter(h.pid)!.weeklyRewards!.vaults[0].choices[0].itemId).toBe(
+      fixed.itemId,
+    );
+    h.resolve(true);
+    await work;
+    expect(h.choices()[0].itemId).toBe(fixed.itemId);
+    expect(pick).toHaveBeenCalledOnce();
+  });
+
+  it('rejects uncleared or malformed selected tables with no roll or save', async () => {
+    const h = setup();
+    const pick = vi.spyOn(h.sim.ctx.rng, 'pick');
+    for (const table of ['morthen', '__proto__', 'x'.repeat(129), 3, {}])
+      await dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_reward_open', {
+        choice: '1000:0',
+        token: '604800000:0',
+        table,
+      });
+    expect(h.saveCharacter).not.toHaveBeenCalled();
+    expect(pick).not.toHaveBeenCalled();
+  });
+
+  it('saves the requested boss table and publishes its item only after success', async () => {
+    const h = setup();
+    const work = dispatchWeeklyRewardCommand(h.host, h.session, 'weekly_reward_open', {
+      choice: '1000:0',
+      token: '604800000:0',
+      tables: [weeklyBossTable('ysolei')!.dungeonId],
+    });
+    const fixed = h.meta.weeklyRewards!.vaults[0].choices[0];
+    expect(fixed.tableId).toBe(weeklyBossTable('ysolei')!.dungeonId);
+    expect(weeklyBossLootPool('ysolei', 'dungeon', 'mage')).toContain(fixed.itemId);
+    expect(h.choices()[0].itemId).toBeUndefined();
+    expect(h.sim.serializeCharacter(h.pid)!.weeklyRewards!.vaults[0].choices[0].tableId).toBe(
+      weeklyBossTable('ysolei')!.dungeonId,
+    );
+    expect(h.saveCharacter).toHaveBeenCalledOnce();
+    h.resolve(true);
+    await work;
+    expect(h.choices()[0].itemId).toBe(fixed.itemId);
+  });
+
   it('recovers the exact committed roll after a crash before acknowledgement reaches the player', async () => {
     const h = setup();
     let committed!: CharacterState;
@@ -97,7 +208,12 @@ describe('weekly vault durable opening', () => {
     expect(itemId).toBeTruthy();
     const recovered = setup(committed);
     const rolling = vi.spyOn(recovered.sim.ctx.rng, 'pick');
-    expect(recovered.choices()[0]).toEqual({ pool: 'dungeon', itemId, opened: true });
+    expect(recovered.choices()[0]).toEqual({
+      pool: 'dungeon',
+      tableId: 'sunken_bastion',
+      itemId,
+      opened: true,
+    });
     expect(recovered.choices()[1]).toEqual({ pool: 'pvp' });
     await recovered.open();
     expect(rolling).not.toHaveBeenCalled();

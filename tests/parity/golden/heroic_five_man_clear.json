@@ -756,7 +756,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1037,
-      "state": "8b6c3718",
+      "state": "7be946c4",
       "events": "ddfc942f",
       "rng": {
         "draws": 62,
@@ -943,6 +943,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
             "dungeons": [
               2
             ],
@@ -1145,6 +1148,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
             "dungeons": [
               2
             ],
@@ -1340,6 +1346,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
             "dungeons": [
               2
             ],
@@ -1535,6 +1544,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
             "dungeons": [
               2
             ],
@@ -1730,6 +1742,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
             "dungeons": [
               2
             ],
@@ -2104,7 +2119,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1037,
-      "state": "8b6c3718",
+      "state": "7be946c4",
       "events": "741638a5",
       "rng": {
         "draws": 62,
@@ -2291,6 +2306,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
             "dungeons": [
               2
             ],
@@ -2493,6 +2511,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
             "dungeons": [
               2
             ],
@@ -2688,6 +2709,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
             "dungeons": [
               2
             ],
@@ -2883,6 +2907,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
             "dungeons": [
               2
             ],
@@ -3078,6 +3105,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
             "dungeons": [
               2
             ],

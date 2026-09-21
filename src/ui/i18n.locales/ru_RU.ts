@@ -13,6 +13,18 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.weeklyRewards.chooseTable': 'Выберите таблицу добычи для розыгрыша',
+  'hudChrome.weeklyRewards.selectAllTables': 'Выбрать все',
+  'hudChrome.weeklyRewards.selectedTable': 'Выбрана {count} таблица',
+  'hudChrome.weeklyRewards.selectedTables': 'Выбрано таблиц: {count}',
+  'hudChrome.weeklyRewards.noLevelLoot': 'На вашем текущем уровне нет подходящей добычи.',
+  'hudChrome.weeklyRewards.tableItem': '{count} предмет',
+  'hudChrome.weeklyRewards.tableItemCount': 'Предметов: {count}',
+  'hudChrome.weeklyRewards.previouslyRolled': 'Ранее разыгранная награда',
+  'hudChrome.weeklyRewards.noTables': 'Среди записанных побед над боссами на этой сложности нет подходящего снаряжения.',
+  'hudChrome.weeklyRewards.tablesExhausted': 'Все подходящие предметы уже разыграны. Выберите одну из открытых наград.',
+  'hudChrome.weeklyRewards.worldPoolRule': 'Снаряжение Nythraxis обычной сложности. Прохождение рейдов не требуется.',
+  'hudChrome.weeklyRewards.selectionPoolRule': 'Для наград за рейды и подземелья перед открытием выберите одну или несколько таблиц. Таблицы подземелий объединяют добычу боссов, которых вы победили на этой сложности. Из розыгрыша исключены дубликаты, легендарные предметы и снаряжение, требуемый уровень которого превышает ваш более чем на {maxLevelOffset}.',
   'questUi.worldQuest.puzzleRetry': 'Повторить',
   'questUi.worldQuest.puzzleTimerAria': 'Осталось времени: {seconds} сек.',
   'questUi.worldQuest.startQuest': 'Начать локальное задание',

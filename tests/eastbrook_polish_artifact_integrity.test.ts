@@ -1387,7 +1387,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
   // branch: the town runtime leaf composes the stone vault hall and the
   // authoritative layout gains the weeklyVault site. No capture was retaken.
-  '352e5782b1ef3c9409ce1425019989099b21ea85f914b818eb82df77ae2cfb57';
+  // Re-minted for the shipwreck salvage landing: the renderer leaf moved.
+  // No Eastbrook capture or measured value changed.
+  '5dec5017c73a60c491602a23bcc2bba37411b0d21d0b06a45c478ec38f3a4bdd';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1403,7 +1405,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
   // branch: the town runtime leaf composes the stone vault hall and the
   // authoritative layout gains the weeklyVault site. No capture was retaken.
-  'bea0d79289e8d54b957c89ce057d6a5c3f35d523db13aba66858f6ddb50d3163';
+  // Re-minted for the shipwreck salvage landing: the renderer leaf moved.
+  // No Eastbrook capture or measured value changed.
+  'e3f907101f39355f8a6e28e9d000d944277a582108761efa0fec54376862b7f8';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2780,7 +2784,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // again over the re-swept evidence. No capture was retaken.
       // Weekly Vault (PR 4052) landing on the quests integration branch:
       // recomputed LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('690f100e8a8d6c3add4578c5efbb581207a764a4eeae01a4c37aedadb96fe375');
+      // Re-minted for the shipwreck salvage landing over the re-sealed
+      // provenance. No capture or measured value changed.
+    ).toBe('119a4c7354abf7b7c376edec7218ea29da17e1709907ffd241a760dc00081dbc');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

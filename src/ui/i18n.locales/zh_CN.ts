@@ -13,6 +13,19 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.weeklyRewards.chooseTable': '选择用于抽取奖励的战利品表',
+  'hudChrome.weeklyRewards.selectAllTables': '全选',
+  'hudChrome.weeklyRewards.selectedTable': '已选择 {count} 个战利品表',
+  'hudChrome.weeklyRewards.selectedTables': '已选择 {count} 个战利品表',
+  'hudChrome.weeklyRewards.noLevelLoot': '当前等级没有符合条件的战利品。',
+  'hudChrome.weeklyRewards.tableItem': '{count} 件物品',
+  'hudChrome.weeklyRewards.tableItemCount': '{count} 件物品',
+  'hudChrome.weeklyRewards.previouslyRolled': '先前抽取的奖励',
+  'hudChrome.weeklyRewards.noTables': '在此难度下已记录的首领击杀中，没有符合条件的装备。',
+  'hudChrome.weeklyRewards.tablesExhausted': '所有符合条件的物品均已抽取。请选择一件已揭晓的奖励。',
+  'hudChrome.weeklyRewards.worldPoolRule': '普通难度 Nythraxis 装备。无需通关团队副本。',
+  'hudChrome.weeklyRewards.selectionPoolRule':
+    '团队副本和地下城奖励需在开启前选择一个或多个战利品表。地下城战利品表汇总了你在此难度下击败的首领的战利品。抽取时排除重复物品、传说物品，以及所需等级比你的等级高出超过 {maxLevelOffset} 级的装备。',
   'questUi.worldQuest.puzzleRetry': '重试',
   'questUi.worldQuest.puzzleTimerAria': '剩余时间：{seconds} 秒',
   'questUi.worldQuest.startQuest': '开始世界任务',

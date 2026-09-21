@@ -1,11 +1,52 @@
 // @vitest-environment happy-dom
 import { describe, expect, it, vi } from 'vitest';
-import { emptyWeeklyRewards } from '../src/sim/weekly_rewards';
+import { emptyWeeklyRewards, weeklyLootPool } from '../src/sim/weekly_rewards';
 import type { PainterHostPresentation } from '../src/ui/painter_host';
 import { WeeklyRewardsTab } from '../src/ui/weekly_rewards_window';
 import type { IWorld } from '../src/world_api';
 
 describe('weekly reward pane', () => {
+  it('shows earned world vaults and their Nythraxis pool without boss unlocks', () => {
+    const state = emptyWeeklyRewards(604800000);
+    state.world = 8;
+    state.bossUnlocks = {};
+    const root = document.createElement('div');
+    const pane = new WeeklyRewardsTab({
+      world: () =>
+        ({
+          cfg: { playerClass: 'mage' },
+          weeklyRewardInfo: {
+            state,
+            nowMs: 1000,
+            playerLevel: 20,
+            canClaim: true,
+            worldQuestsAvailable: true,
+            readyWeeks: 0,
+          },
+        }) as IWorld,
+      presentation: {
+        itemIcon: () => '',
+        attachTooltip: vi.fn(),
+      } as unknown as PainterHostPresentation,
+      onInventoryChanged: vi.fn(),
+    });
+    pane.renderInto(root);
+    expect(root.querySelectorAll('.weekly-track-world .weekly-earned')).toHaveLength(3);
+    expect(root.querySelector('.weekly-track-world')?.textContent).toContain(
+      '8 World Quests Completed',
+    );
+    const pool = root.querySelector('#weekly-pool-world')!;
+    expect(pool.textContent).toContain('Normal Nythraxis equipment. No raid clears required.');
+    expect(pool.textContent).not.toContain('Choose a defeated boss');
+    expect(pool.querySelectorAll('.weekly-loot')).toHaveLength(
+      weeklyLootPool('world', 'mage').length,
+    );
+    expect(
+      pool.querySelector('[data-focus-key="weekly-item:world:world:wraithfire_orb"]'),
+    ).not.toBeNull();
+    pane.close();
+  });
+
   it('repaints after brief null info even when the restored ledger is identical', () => {
     const state = emptyWeeklyRewards(2000);
     state.vaults = [
@@ -57,6 +98,7 @@ describe('weekly reward pane', () => {
     const info = {
       state: emptyWeeklyRewards(604800000),
       nowMs: 1000,
+      playerLevel: 20,
       canClaim: true,
       worldQuestsAvailable: false,
       readyWeeks: 0,
@@ -121,6 +163,7 @@ describe('weekly reward pane', () => {
           weeklyRewardInfo: {
             state,
             nowMs: 0,
+            playerLevel: 20,
             canClaim: true,
             worldQuestsAvailable: false,
             readyWeeks: 0,

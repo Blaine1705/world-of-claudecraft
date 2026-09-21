@@ -10923,8 +10923,8 @@ export class Sim {
   claimWeeklyReward(pool: string, pid?: number, token?: string): void {
     weeklyMod.claimWeeklyReward(this.ctx, pool, pid, token);
   }
-  openWeeklyReward(choice: string, pid?: number): void {
-    weeklyMod.openWeeklyReward(this.ctx, choice, pid);
+  openWeeklyReward(choice: string, table?: string | readonly string[], pid?: number): void {
+    weeklyMod.openWeeklyReward(this.ctx, choice, table, pid);
   }
   get vaultInfo(): import('../world_api').VaultInfo | null {
     return this.primaryId === -1 ? null : this.vaultInfoFor(this.primaryId);

@@ -693,7 +693,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
   // branch: the town runtime leaf composes the stone vault hall and the
   // authoritative layout gains the weeklyVault site. No capture was retaken.
-  'bea0d79289e8d54b957c89ce057d6a5c3f35d523db13aba66858f6ddb50d3163';
+  // Re-minted for the shipwreck salvage landing: the renderer leaf moved.
+  // No Eastbrook capture or measured value changed.
+  'e3f907101f39355f8a6e28e9d000d944277a582108761efa0fec54376862b7f8';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

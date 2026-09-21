@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { WEEKLY_BOSS_TABLES } from '../src/sim/weekly_reward_tables';
 import { emptyWeeklyRewards } from '../src/sim/weekly_rewards';
 import type { PainterHostPresentation } from '../src/ui/painter_host';
 import { WeeklyRewardClaimController } from '../src/ui/weekly_reward_claim_controller';
@@ -11,10 +12,18 @@ function setup(withPrompt = false) {
   state.vaults = [
     {
       resetAtMs: 1000,
+      bossUnlocks: Object.fromEntries(WEEKLY_BOSS_TABLES.map(({ bossId }) => [bossId, 2])),
       choices: [{ pool: 'raid' }, { pool: 'dungeon' }],
     },
   ];
-  const info = { state, nowMs: 1000, canClaim: true, worldQuestsAvailable: false, readyWeeks: 1 };
+  const info = {
+    playerLevel: 20,
+    state,
+    nowMs: 1000,
+    canClaim: true,
+    worldQuestsAvailable: false,
+    readyWeeks: 1,
+  };
   const claim = vi.fn();
   const open = vi.fn((key: string) => {
     const index = Number(key.split(':')[1]);
@@ -24,6 +33,7 @@ function setup(withPrompt = false) {
     delete choice.opening;
   });
   const world = {
+    cfg: { playerClass: 'mage' },
     weeklyRewardInfo: info,
     claimWeeklyReward: claim,
     openWeeklyReward: open,
@@ -48,7 +58,17 @@ function setup(withPrompt = false) {
     onInventoryChanged: vi.fn(),
   });
   const render = () => controller.renderInto(host, progress);
-  const click = (selector: string) => host.querySelector<HTMLButtonElement>(selector)!.click();
+  const selectAll = () => {
+    for (const input of host.querySelectorAll<HTMLInputElement>(
+      '[data-focus-key^="weekly-table-all:"]',
+    )) {
+      if (!input.checked && !input.disabled) input.click();
+    }
+  };
+  const click = (selector: string) => {
+    if (selector.includes('weekly-open:') || selector.includes('vault-reveal-trigger')) selectAll();
+    host.querySelector<HTMLButtonElement>(selector)!.click();
+  };
   const openAll = () => {
     click('.weekly-start-claim');
     for (let index = 0; index < state.vaults[0].choices.length; index++)
@@ -56,7 +76,20 @@ function setup(withPrompt = false) {
     vi.advanceTimersByTime(WEEKLY_REVEAL_DURATION_MS);
   };
   render();
-  return { state, info, claim, open, host, progress, root, controller, render, click, openAll };
+  return {
+    state,
+    info,
+    claim,
+    open,
+    host,
+    progress,
+    root,
+    controller,
+    render,
+    click,
+    selectAll,
+    openAll,
+  };
 }
 
 beforeEach(() => {
@@ -73,6 +106,146 @@ afterEach(() => {
 });
 
 describe('completed-week claim flow', () => {
+  it('disables opening until selected and immediately disables again after deselecting', () => {
+    const s = setup();
+    s.click('.weekly-start-claim');
+    const trigger = s.host.querySelector<HTMLButtonElement>('[data-focus-key="weekly-open:0"]')!;
+    expect(trigger.disabled).toBe(true);
+    trigger.click();
+    expect(s.open).not.toHaveBeenCalled();
+    const all = s.host.querySelector<HTMLInputElement>('[data-focus-key="weekly-table-all:0"]')!;
+    all.click();
+    expect(trigger.disabled).toBe(false);
+    all.click();
+    expect(trigger.disabled).toBe(true);
+    all.click();
+    trigger.click();
+    expect(s.open).toHaveBeenCalledWith(
+      '1000:0',
+      expect.arrayContaining(['nythraxis_scourge_of_thornpeak']),
+    );
+    s.controller.close();
+  });
+
+  it('allows selecting revealed loot when another pool is unavailable at the current level', () => {
+    const s = setup();
+    s.info.playerLevel = 1;
+    s.state.vaults[0].choices = [
+      { pool: 'dungeon', itemId: 'orb_of_the_last_spring', opened: true },
+      { pool: 'world' },
+    ];
+    s.render();
+    s.click('.weekly-start-claim');
+    expect(s.host.querySelector('.weekly-track-world')?.textContent).toContain(
+      'No eligible loot at your current level.',
+    );
+    s.click('[data-focus-key="weekly-inspect:0"]');
+    expect(s.host.querySelector('.weekly-confirm-panel')).not.toBeNull();
+    s.controller.close();
+  });
+  it.each(['world', 'pvp'] as const)('opens the sole %s table without a dropdown', (pool) => {
+    const s = setup();
+    s.state.vaults[0].choices = [{ pool }];
+    s.render();
+    s.click('.weekly-start-claim');
+    expect(s.host.querySelector('.weekly-table-picker')).toBeNull();
+    const trigger = s.host.querySelector<HTMLButtonElement>('[data-focus-key="weekly-open:0"]')!;
+    expect(trigger.disabled).toBe(false);
+    trigger.click();
+    expect(s.open).toHaveBeenCalledExactlyOnceWith('1000:0', [pool]);
+    s.controller.close();
+  });
+
+  it('marks an exhausted world vault and permits selecting a revealed reward', () => {
+    const s = setup();
+    s.state.vaults[0].choices = [
+      { pool: 'raid', itemId: 'soulflame_cowl', opened: true },
+      { pool: 'world', itemId: 'soulflame_mantle', opened: true },
+      { pool: 'world', itemId: 'wraithfire_orb', opened: true },
+      { pool: 'world' },
+    ];
+    s.render();
+    s.click('.weekly-start-claim');
+    vi.advanceTimersByTime(WEEKLY_REVEAL_DURATION_MS);
+    expect(
+      s.host.querySelector('.weekly-track-world .weekly-table-exhausted')?.textContent,
+    ).toContain('All eligible items have already been rolled');
+    expect(s.host.querySelector('[data-focus-key="weekly-open:3"]')).toBeNull();
+    s.click('[data-focus-key="weekly-inspect:2"]');
+    expect(s.host.querySelector('.weekly-confirm-panel')?.textContent).toContain('Wraithfire Orb');
+    s.controller.close();
+  });
+
+  it('blocks repeated requests before the server acknowledges and permits a timed retry', () => {
+    const s = setup();
+    s.open.mockImplementation(() => {});
+    s.click('.weekly-start-claim');
+    s.click('[data-focus-key="weekly-open:0"]');
+    s.render();
+    s.click('[data-focus-key="weekly-open:0"]');
+    expect(s.open).toHaveBeenCalledTimes(1);
+    vi.advanceTimersByTime(2000);
+    s.click('[data-focus-key="weekly-open:0"]');
+    expect(s.open).toHaveBeenCalledTimes(2);
+    expect(s.host.querySelector('.vault-is-open')).toBeNull();
+    s.controller.close();
+    vi.advanceTimersByTime(2000);
+    expect(s.open).toHaveBeenCalledTimes(2);
+  });
+
+  it('settles an opening after a delayed repaint without replaying the burst', () => {
+    const s = setup();
+    s.click('.weekly-start-claim');
+    s.click('[data-focus-key="weekly-open:0"]');
+    s.controller.pause();
+    vi.advanceTimersByTime(WEEKLY_REVEAL_DURATION_MS + 500);
+    s.render();
+    expect(s.host.querySelectorAll('.vault-is-revealed')).toHaveLength(1);
+    expect(s.host.querySelector('.vault-light-spill')).toBeNull();
+    expect(s.open).toHaveBeenCalledTimes(1);
+    s.controller.close();
+  });
+
+  it('keeps equal slot and item openings independent between claim sessions', () => {
+    const first = setup();
+    first.click('.weekly-start-claim');
+    first.click('[data-focus-key="weekly-open:0"]');
+    vi.advanceTimersByTime(750);
+    const second = setup();
+    second.click('.weekly-start-claim');
+    second.click('[data-focus-key="weekly-open:0"]');
+    const stage = second.host.querySelector<HTMLElement>('.vault-is-open')!;
+    expect(stage.style.getPropertyValue('--vault-elapsed')).toBe('0ms');
+    first.controller.close();
+    second.controller.close();
+  });
+
+  it('resumes each tile on its own deadline when other vaults open or the screen repaints', () => {
+    const s = setup();
+    s.click('.weekly-start-claim');
+    s.click('[data-focus-key="weekly-open:0"]');
+    vi.advanceTimersByTime(700);
+    s.click('[data-focus-key="weekly-open:1"]');
+    vi.advanceTimersByTime(400);
+    s.render();
+    const stages = s.host.querySelectorAll<HTMLElement>('.vault-is-open');
+    expect([...stages].map((stage) => stage.style.getPropertyValue('--vault-elapsed'))).toEqual([
+      '1100ms',
+      '400ms',
+    ]);
+    expect(s.host.querySelectorAll('.vault-light-spill')).toHaveLength(2);
+    expect(s.host.querySelectorAll('.vault-reveal-trigger')).toHaveLength(2);
+    vi.advanceTimersByTime(WEEKLY_REVEAL_DURATION_MS - 1100);
+    expect(s.host.querySelectorAll('.vault-is-revealed')).toHaveLength(1);
+    vi.advanceTimersByTime(700);
+    expect(s.host.querySelectorAll('.vault-is-revealed')).toHaveLength(2);
+    expect(s.host.querySelector('.vault-light-spill')).toBeNull();
+    s.render();
+    expect(s.host.querySelector('.vault-light-spill')).toBeNull();
+    expect(s.open).toHaveBeenCalledTimes(2);
+    s.controller.close();
+  });
+
   it('requests unopened rewards without exposing loot and animates only after the saved item arrives', () => {
     const s = setup();
     s.open.mockImplementation(() => {
@@ -82,7 +255,11 @@ describe('completed-week claim flow', () => {
     expect(s.host.querySelector('.vault-reveal-loot strong')).toBeNull();
     expect(s.host.textContent).not.toContain('Orb of the Last Spring');
     s.click('[data-focus-key="weekly-open:0"]');
-    expect(s.open).toHaveBeenCalledExactlyOnceWith('1000:0');
+    expect(s.open).toHaveBeenCalledExactlyOnceWith('1000:0', [
+      'nythraxis_scourge_of_thornpeak',
+      'ignivar_herald_of_the_last_flame',
+      'varkhul_forgefather_of_the_last_flame',
+    ]);
     expect(s.host.querySelector('.vault-is-open')).toBeNull();
     expect(
       s.host.querySelector('[data-focus-key="weekly-open:0"]')!.getAttribute('aria-disabled'),
@@ -118,6 +295,7 @@ describe('completed-week claim flow', () => {
       s.state.vaults[0].choices[0].opening = true;
     });
     s.click('.weekly-start-claim');
+    s.selectAll();
     const stale = s.host.querySelector<HTMLButtonElement>('[data-focus-key="weekly-open:0"]')!;
     stale.click();
     s.state.vaults[0].choices[0].opening = false;
@@ -164,7 +342,7 @@ describe('completed-week claim flow', () => {
     expect(s.root.inert).toBe(false);
     expect(s.progress.hidden).toBe(true);
     expect(s.host.querySelectorAll('.vault-reveal-trigger')).toHaveLength(2);
-    expect(document.activeElement).toBe(s.host.querySelector('.vault-reveal-trigger'));
+    expect(document.activeElement).toBe(s.host.querySelector('[data-focus-key="weekly-table:0"]'));
     expect(s.claim).not.toHaveBeenCalled();
     s.click('.weekly-return-progress');
     expect(document.querySelector('.weekly-ready-prompt')).toBeNull();

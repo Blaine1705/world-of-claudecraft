@@ -13,6 +13,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.weeklyRewards.chooseTable': '報酬を抽選する戦利品テーブルを選択',
+  'hudChrome.weeklyRewards.selectAllTables': 'すべて選択',
+  'hudChrome.weeklyRewards.selectedTable': 'テーブルを{count}件選択中',
+  'hudChrome.weeklyRewards.selectedTables': 'テーブルを{count}件選択中',
+  'hudChrome.weeklyRewards.noLevelLoot': '現在のレベルで対象となる戦利品はありません。',
+  'hudChrome.weeklyRewards.tableItem': 'アイテム{count}個',
+  'hudChrome.weeklyRewards.tableItemCount': 'アイテム{count}個',
+  'hudChrome.weeklyRewards.previouslyRolled': '抽選済みの報酬',
+  'hudChrome.weeklyRewards.noTables':
+    'この難易度で記録されたボス撃破から得られる対象装備はありません。',
+  'hudChrome.weeklyRewards.tablesExhausted':
+    '対象アイテムはすべて抽選済みです。公開済みの報酬を選んでください。',
+  'hudChrome.weeklyRewards.worldPoolRule':
+    'ノーマル難易度のNythraxis装備。レイドのクリアは不要です。',
+  'hudChrome.weeklyRewards.selectionPoolRule':
+    'レイドとダンジョンの報酬は、開ける前にテーブルを1つ以上選んでください。ダンジョンのテーブルには、この難易度で撃破したボスの戦利品がまとめられています。重複アイテム、レジェンダリーアイテム、必要レベルが自分のレベルより{maxLevelOffset}を超えて高い装備は抽選から除外されます。',
   'questUi.worldQuest.puzzleRetry': 'もう一度',
   'questUi.worldQuest.puzzleTimerAria': '残り時間：{seconds}秒',
   'questUi.worldQuest.startQuest': 'ワールドクエストを開始',

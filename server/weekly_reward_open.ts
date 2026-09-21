@@ -1,6 +1,8 @@
 // Opening is a durability barrier: only a successful, still-authoritative
 // character save may publish the rolled item. Reuse the character save FIFO.
+
 import type { SimContext } from '../src/sim/sim_context';
+import { parseWeeklyTableSelection } from '../src/sim/weekly_reward_options';
 import {
   finishWeeklyRewardOpen,
   isWeeklyRewardOpeningCurrent,
@@ -44,13 +46,15 @@ export async function dispatchWeeklyRewardCommand<S extends WeeklyRewardSession>
   host: WeeklyRewardOpenHost<S>,
   session: S,
   command: string,
-  msg: { choice?: unknown; token?: unknown },
+  msg: { choice?: unknown; token?: unknown; table?: unknown; tables?: unknown },
 ): Promise<void> {
   if (
     typeof msg.choice !== 'string' ||
     msg.choice.length > 64 ||
     typeof msg.token !== 'string' ||
-    msg.token.length > 64
+    msg.token.length > 64 ||
+    (msg.table !== undefined && msg.tables !== undefined) ||
+    ((msg.tables ?? msg.table) !== undefined && !parseWeeklyTableSelection(msg.tables ?? msg.table))
   )
     return;
   const live = () =>
@@ -73,7 +77,13 @@ export async function dispatchWeeklyRewardCommand<S extends WeeklyRewardSession>
   }
   if (command !== 'weekly_reward_open' || (admission.retryAt.get(session) ?? 0) > Date.now())
     return;
-  const opening = prepareWeeklyRewardOpen(host.sim.ctx, msg.choice, session.pid, msg.token);
+  const opening = prepareWeeklyRewardOpen(
+    host.sim.ctx,
+    msg.choice,
+    session.pid,
+    msg.token,
+    (msg.tables ?? msg.table) as string | string[] | undefined,
+  );
   if (!opening) return;
   admission.active.add(session.characterId);
   const abort = new AbortController();

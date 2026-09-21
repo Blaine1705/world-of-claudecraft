@@ -745,7 +745,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "6cb819ee",
+      "state": "29b2c15a",
       "events": "c8643206",
       "rng": {
         "draws": 12,
@@ -934,6 +934,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
             "raidUnlocks": [
               2,
               0,
@@ -1125,6 +1128,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
             "raidUnlocks": [
               2,
               0,
@@ -1316,6 +1322,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
             "raidUnlocks": [
               2,
               0,
@@ -1507,6 +1516,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
             "raidUnlocks": [
               2,
               0,
@@ -1698,6 +1710,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
             "raidUnlocks": [
               2,
               0,
@@ -2066,7 +2081,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "6cb819ee",
+      "state": "29b2c15a",
       "events": "741638a5",
       "rng": {
         "draws": 12,
@@ -2255,6 +2270,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
             "raidUnlocks": [
               2,
               0,
@@ -2446,6 +2464,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
             "raidUnlocks": [
               2,
               0,
@@ -2637,6 +2658,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
             "raidUnlocks": [
               2,
               0,
@@ -2828,6 +2852,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
             "raidUnlocks": [
               2,
               0,
@@ -3019,6 +3046,9 @@
             "stock": {}
           },
           "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
             "raidUnlocks": [
               2,
               0,

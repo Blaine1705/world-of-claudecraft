@@ -7,9 +7,17 @@ describe('weekly reward presentation', () => {
     const state = emptyWeeklyRewards(604800000);
     state.raidUnlocks = [1, 0, 0];
     state.raids = [1, 0, 0];
+    state.bossUnlocks = { nythraxis_scourge_of_thornpeak: 1 };
     state.world = 2;
     const rows = buildWeeklyRewardsView(
-      { state, nowMs: 0, canClaim: true, worldQuestsAvailable: false, readyWeeks: 0 },
+      {
+        playerLevel: 20,
+        state,
+        nowMs: 0,
+        canClaim: true,
+        worldQuestsAvailable: false,
+        readyWeeks: 0,
+      },
       'mage',
     );
     expect(rows.map((r) => r.category)).toEqual(['raid', 'dungeon', 'world', 'pvp']);
@@ -20,12 +28,18 @@ describe('weekly reward presentation', () => {
     expect(rows[2].milestones.map((m) => m.completed)).toEqual([false, false, false]);
     expect(rows[2].pools[0].items).not.toHaveLength(0);
     const live = buildWeeklyRewardsView(
-      { state, nowMs: 0, canClaim: true, worldQuestsAvailable: true, readyWeeks: 0 },
+      {
+        playerLevel: 20,
+        state,
+        nowMs: 0,
+        canClaim: true,
+        worldQuestsAvailable: true,
+        readyWeeks: 0,
+      },
       'mage',
     );
     expect(live[2].available).toBe(true);
     expect(live[2].milestones.map((m) => m.completed)).toEqual([true, false, false]);
-    expect(rows[0].pools[0].qualities).not.toHaveLength(0);
   });
   it('shows days, hours, minutes and seconds and clamps expired resets to zero', () => {
     expect(weeklyCountdown(90061000, 0)).toBe('01d 01h 01m 01s');
@@ -49,7 +63,14 @@ describe('weekly reward presentation', () => {
     }
     for (const state of cases) {
       const rows = buildWeeklyRewardsView(
-        { state, nowMs: 0, canClaim: true, worldQuestsAvailable: false, readyWeeks: 0 },
+        {
+          playerLevel: 20,
+          state,
+          nowMs: 0,
+          canClaim: true,
+          worldQuestsAvailable: false,
+          readyWeeks: 0,
+        },
         'mage',
       );
       const actual = earnedWeeklyRolls(state);

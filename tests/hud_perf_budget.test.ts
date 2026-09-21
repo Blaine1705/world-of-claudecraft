@@ -888,6 +888,15 @@ interface ColdPainter {
 }
 
 const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
+  // Only an open vault dropdown measures its anchor and clipping rectangles,
+  // on open/scroll/resize. Ancestor style classification is cached until resize;
+  // no clock or ordinary HUD repaint drives positioning. Nested scrollers can
+  // move clipping rectangles, so those bounded reads remain event-driven.
+  {
+    file: 'weekly_reward_table_picker_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 2, getComputedStyle: 1 },
+    driverAllow: {},
+  },
   // One app-viewport rect when the player starts dragging an aura in setup mode. The cached
   // rect converts pointer moves to persisted normalized X/Y values; the controller owns no
   // clock and performs no layout read during ordinary combat painting.
