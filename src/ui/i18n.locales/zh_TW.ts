@@ -884,6 +884,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': '拾取後綁定',
   'hudChrome.loot.bindConfirmBody':
     '這批戰利品中有一件物品在拾取後將與你綁定。綁定的物品只能在限定時間內交易給共同獲得該掉落的玩家。',
+  'hudChrome.lootQuality.ordinary': '普通',
+  'hudChrome.lootQuality.superior': '優良',
+  'hudChrome.lootQuality.exceptional': '卓越',
+  'hudChrome.lootQuality.magnificent': '華麗',
+  'hudChrome.lootQuality.transcendent': '超凡',
+  'hudChrome.lootQuality.tooltip': '{quality}：+{levels} 物品等級。強化後仍會保留。',
   'hudChrome.itemTooltip.requiresLevel': '需要等級 {level}',
   'hudChrome.spellbook.addToBarAria': '將 {name} 加入動作列',
   'hudChrome.spellbook.removeFromBarAria': '將 {name} 從動作列移除',
@@ -11259,11 +11265,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '脫困：/unstuck 會啟動原地倒數，結束後將你移動到最近的墓地，若你已倒下則會復活你。你將帶著脫困虛弱，最多持續 5 分鐘。',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    '脫困：/unstuck 會啟動原地倒數，結束後將你移動到最近的墓地，若你已倒下則會復活你。一小時內的首次使用不付代價。若在上次使用後一小時內再次使用，你將帶著脫困虛弱，最多持續 5 分鐘。',
   'hudChrome.unstuck.menuButton': '脫困',
   'hudChrome.unstuck.help': '脫困：/unstuck 會啟動原地倒數，之後將你移動到附近可到達的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
     '脫困：/unstuck 會啟動原地倒數，結束後將你的靈魂送往最近的墓地。你必須向靈魂醫者接受守護者的代價才能復活。',
   'hudChrome.unstuck.movedToGraveyard': '你已被移動到最近的墓地。脫困虛弱正壓在你身上。',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    '你已被移動到最近的墓地。一小時內再次使用脫困將讓你帶上脫困虛弱。',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    '你已被移動到最近的墓地並復活。一小時內再次使用脫困將讓你帶上脫困虛弱。',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     '你已被移動到最近的墓地並復活。脫困虛弱正壓在你身上。',
   'hudChrome.unstuck.started':
@@ -14057,6 +14069,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': '敵人會打誰',
   'guide.combat.unstuckBody':
     '若這個世界把你困在某個出不去的地方，請輸入 /unstuck。你必須脫離戰鬥並原地站定，不能被昏迷或定身控制，也不能身處決鬥或競技場對戰中：接著會跑一段短短的倒數，移動或受到傷害都會中斷它。倒數結束後，你會被放置在最近的墓地。它從不會殺死你，也不會留下屍體，而若你當時已經倒下，它會就地將你扶起。代價是脫困虛弱：一種對你全身上下的暫時削弱，等到你能再次使用這道指令時它早已消退，而且和守護者的代價一樣，全新的角色可完全免除。',
+  'guide.combat.unstuckBodyWindow':
+    '若這個世界把你困在某個出不去的地方，請輸入 /unstuck。你必須脫離戰鬥並原地站定，不能被昏迷或定身控制，也不能身處決鬥或競技場對戰中：接著會跑一段短短的倒數，移動或受到傷害都會中斷它。倒數結束後，你會被放置在最近的墓地。它從不會殺死你，也不會留下屍體，而若你當時已經倒下，它會就地將你扶起。一小時內的首次使用不付任何代價。若在上次使用後一小時內再次使用，代價便是脫困虛弱：一種對你全身上下的暫時削弱，等到你能再次使用這道指令時它早已消退，而且和守護者的代價一樣，全新的角色可完全免除。',
   'guide.combat.unstuckTitle': '當你真的卡住時',
   'guide.commandsPage.abilities': '你已學會的技能。',
   'guide.commandsPage.afk':
@@ -14183,6 +14197,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': '如果某道指令沒有作用',
   'guide.commandsPage.unstuck':
     '當這個世界把你困住時的出路。原地站定撐過一段短短的倒數，你就會被移動到最近的墓地，若你已經倒下，還會在那裡被扶起。之後你會帶著脫困虛弱一陣子，所以它是最後手段，而不是抄近路的辦法。',
+  'guide.commandsPage.unstuckWindow':
+    '當這個世界把你困住時的出路。原地站定撐過一段短短的倒數，你就會被移動到最近的墓地，若你已經倒下，還會在那裡被扶起。一小時內的首次使用不付代價。若在上次使用後一小時內再次使用，之後你會帶著脫困虛弱一陣子，所以它是救援手段，而不是抄近路的辦法。',
   'guide.commandsPage.where': '你所站的區域、它的等級範圍，以及你的座標。',
   'guide.commandsPage.whisper':
     '向一位在線的玩家發送私訊。只要不會與別人混淆，你輸入的大小寫怎麼寫都能對上他的名字。',
@@ -14367,6 +14383,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': '工具符物',
   'guide.glossary.unstuckDef':
     '從遊戲選單使用「脫困」所付出的代價。在倒數期間站著不動，它就會把你放到最近的墓地，而此後一段時間你會帶著一份暫時的虛弱。',
+  'guide.glossary.unstuckDefWindow':
+    '一小時內不只一次倚賴遊戲選單「脫困」所付出的代價。在倒數期間站著不動，它就會把你放到最近的墓地。一小時內的首次使用不付代價，而在上次使用後一小時內再次使用，此後一段時間你還會帶著一份暫時的虛弱。',
   'guide.glossary.unstuckTerm': '脫困虛弱',
   'guide.glossary.warfareDef':
     '玩家對戰的裝備那一面。軍需官以榮譽販售整套戰爭護甲，而它們所帶的戰爭等級，只在對抗其他玩家的戰鬥中計算。',
