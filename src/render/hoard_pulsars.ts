@@ -492,8 +492,8 @@ export class HoardPulsarFx {
     return true;
   }
 
-  /** The orb: the Blender model in the game's own surface material for its dark
-   *  armour, on materials of ours wherever it glows. Plain stand-ins of the same
+  /** The orb: the Blender model in the game's own surface material for its
+   *  crystal plates, on materials of ours wherever it glows. Plain stand-ins of the same
    *  size serve until (or unless) the asset arrives. */
   private buildOrb(rig: OrbRig, asset: THREE.Group | undefined): void {
     rig.spin.clear();
@@ -501,10 +501,10 @@ export class HoardPulsarFx {
     for (const group of [rig.ringA, rig.ringB, rig.runes, rig.arcs, rig.emitter]) group.clear();
     const shell = surfaceMat({
       color: LOOK.shell,
-      roughness: 0.32,
-      metalness: 0.8,
-      emissive: LOOK.deep,
-      emissiveIntensity: 0.35,
+      roughness: 0.3,
+      metalness: 0.1,
+      emissive: LOOK.glow,
+      emissiveIntensity: 0.45,
       flatShading: true,
     });
     const rune = surfaceMat({

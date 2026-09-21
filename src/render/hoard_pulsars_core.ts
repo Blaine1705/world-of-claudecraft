@@ -11,7 +11,9 @@ export const PULSAR_LOOK = Object.freeze({
   core: 0xbfe6ff,
   glow: 0x2f8bff,
   deep: 0x0b3fd6,
-  shell: 0x1b2f63,
+  // Pale crystal, not dark armour: dark plates read in game as opaque navy
+  // blocks hiding the core (playtest).
+  shell: 0x9cc6f7,
   rune: 0x2a4d9c,
   hurt: 0xffffff,
   /** An orb riding the boss is this much of its full, activated size. */

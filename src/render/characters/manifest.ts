@@ -3698,19 +3698,31 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Buried Hoard (and rift) bosses with a body of their own, generated with
   // the asset pipeline (scripts/asset_pipeline/, see CREDITS.md) instead of their
   // family's shared model. Each atlas is authored, so none takes the entity tint.
-  // The Abyssal Maw: a four-legged abyssal angler. Tripo's quadruped rig ships a
-  // walk preset only, reused for the other slots until it gets clips of its own.
+  // The Abyssal Maw: a four-legged abyssal angler. Tripo's quadruped auto-rig
+  // folded his head under his chest and ships one walk preset, so his skeleton
+  // (with a jaw, a tail, chin tentacles and the lure) and every clip are authored
+  // in Blender: scripts/assets/hoard_bosses/maw_rig.py. Cast is his roar.
   mob_hoard_abyssal_maw: {
     url: `${CREATURES}/hoard_abyssal_maw.glb`,
     height: 1.7,
-    // The Tripo rig rests facing +x; yaw swings it onto the game's facing.
+    // The generated model faces +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
-    clips: { idle: 'Idle', walk: 'Walk', run: 'Run', attack: ['Attack'], death: 'Death' },
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
     authoredAtlas: true,
     selfIllumination: 0.25,
   },
-  // Hoarfrost Warden: generated arms-down, so it rides Tripo's biped rig and its
-  // retargeted presets rather than the local KayKit rig.
+  // Hoarfrost Warden: generated arms-down and far too top-heavy for the local
+  // KayKit rig, so he rides Tripo's biped rig. Its presets are repaired in Blender
+  // (rigid gauntlet weights, arms relaxed to his sides) and his Attack is an
+  // authored two-fisted slam: see CREDITS.md.
   mob_hoard_hoarfrost_warden: {
     url: `${CREATURES}/hoard_hoarfrost_warden.glb`,
     height: 2,
@@ -3761,7 +3773,9 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_tempest_vharok.glb`,
     height: 1.9,
     clips: {
-      ...kaykit(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Horizontal']),
+      // He fights bare-clawed: a two-handed weapon chop with empty hands read as a
+      // broken swing (playtest), so he rakes with both claws, swipes and punches.
+      ...kaykit(['Dualwield_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Punch_A']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,
