@@ -94,3 +94,58 @@ The Forge list scrolls at the smaller viewport.
 - Maximum quality raises a fully upgraded S band to item level 42. Catalogue
   budgets and upgrade monotonicity are tested; broad raid/PvP balance tuning is
   separate from those arithmetic guarantees.
+
+## Base merge and gate, 21 September 2026
+
+`release/v0.43.0` shipped on 17 September, so the branch was merged onto
+`origin/release/v0.44.0` (`chore(merge): sync release/v0.44.0 into
+feature/exceptional-loot`) and the PR retargeted there. Ten conflicts, all
+known classes: the loot drop site composes the release's kill-time
+bind-on-pickup trade-eligibility snapshot with the quality roll; the Rift band
+rebuild composes the release's ring-enchant marker with the quality descriptor
+(`sanitizeRiftGearInstance` carries both); the `sim.ts` and `server/game.ts`
+monolith ceilings re-pin to the exact merged counts; `pending.ts` regenerated
+rather than hand-merged; five parity goldens re-minted, the four this branch
+already owned plus the release's new `bop_party_trade_eligibility` scenario,
+whose diff is one extra draw per eligible kill and its digests.
+
+The first CI run (14 September, against `release/v0.43.0`) failed nine tests in
+eight files, every one a source pin the extractions had moved out from under,
+plus the M16 English-leak guard. The fix round follows the code rather than
+loosening pins: the hud loot arm is exactly `if (!ev.callerLogs) this.log(`
+again with the string-or-nodes receipt decision in
+`src/ui/loot_quality_receipt.ts` (`lootQualityReceiptBody`) and `log()`
+accepting a node body; the tooltip column-order pin reads
+`item_combat_tooltip_view.ts`; the equipped-instance wire pin reads
+`server/equipped_instance_wire.ts` (seven fields); the market and paperdoll
+aria pins read the resolved parts name; the masterwrought cap test drives
+`maybeAutoEquip` through `src/sim/auto_equip.ts`; the duplicate-block resolver
+allowlists the loot-roll controller's `itemTooltip` rig chain. `hud.ts` re-pins
+at 18279, ten lines under the release ceiling. The six wordy
+`hudChrome.lootQuality.*` values gained ja_JP, ko_KR, ru_RU, zh_CN and zh_TW
+fills. `lootQualityWeapon` now consults the tier before the item level so an
+ordinary weapon costs nothing extra on `recalcPlayerStats`.
+
+Read-only review fan-out on the merged tree (the qa-checklist gate plus the
+sim architecture, cross-platform parity, persisted-state, server-authority,
+test-coverage and frontend-seam reviewers): no blocking findings. Confirmed by
+direct reading: every draw is `ctx.rng` after ordinary selection and nothing
+re-rolls on pickup, award, transfer or load; the descriptor rides every wire
+channel generically (self snapshot, equipment mirror, bank, guild bank and
+mail through `publicInstanceView`, inspect through `equippedInstanceWire`,
+SimEvents fanned out whole), so no `IWorld` facet changed; one validator on
+the single shared load sanitizer covers every persisted container; no client
+command supplies a descriptor. Rollback consequence, confirmed against the
+release binary: an older Rift sanitizer strips a band's quality on its first
+load or save, while ordinary items keep the descriptor unvalidated.
+
+Selective gate on `c596051403` (`node scripts/gate_select.mjs`, base
+`origin/release/v0.44.0`, 136 changed paths): artifact regen and freshness,
+malware scan and changed-files Biome passed; the related test step ran 3296
+files and 53127 tests green, with one whole-tree importer scan
+(`tests/professions_admin_restore.test.ts`) timing out at the 20 s budget under
+a load average of 30 and passing standalone, alongside
+`tests/ci_workflow.test.ts`, with `--testTimeout=240000`. The remaining gate
+steps ran individually on the same tree: `npm run test:browser` 49 files and
+416 tests passed; `turbo run check:types build:env build:server build:bot
+build:bundle` 7 of 7 tasks passed.
