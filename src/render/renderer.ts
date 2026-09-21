@@ -112,7 +112,7 @@ import {
   stepCameraFeel,
   stepLandingDetector,
 } from './camera_feel_core';
-import { CameraImpact } from './camera_impact_core';
+import { CameraImpact, fiestaShakeX, fiestaShakeY } from './camera_impact_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { castVfxProgramUnits, createSceneCastVfxReadiness } from './cast_vfx_prewarm';
@@ -1017,7 +1017,7 @@ const FOOT_STRIDE_RUN = 1.55;
 const SWIM_STRIDE = 2.4;
 // Surface kick: beats per second at a standstill, quickening with swim speed,
 // and how far behind the pivot the prone body's feet trail (as a fraction of
-// stand height â€” the authored stroke lays the legs out behind the hips).
+// stand height, the authored stroke lays the legs out behind the hips).
 const SWIM_KICK_HZ = 2.6;
 const SWIM_FOOT_TRAIL = 0.19;
 // Depth below the waterline over which the underwater wash fades fully in.
@@ -1029,7 +1029,7 @@ const UNDERWATER_CAMERA_DIP = 0.5;
 const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
 // HDR boosts so the bloom pass picks these out (composer tiers only)
 const SELECTION_RING_BOOST = 1.5;
-const SELECTION_RING_SPIN = 0.6; // rad/s â€” slow classic target-reticle rotation
+const SELECTION_RING_SPIN = 0.6; // rad/s, slow classic target-reticle rotation
 
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
 const SPARKLE_BOOST = 1.5;
@@ -1155,8 +1155,8 @@ export interface EntityView extends RickshawMountViewState {
   paladinOathChainVisual: PaladinOathChainVisual | null;
   paladinAegisVisual: PaladinAegisVisual | null;
   paladinSunVerdictVisual: PaladinSunVerdictVisual | null;
-  skin: number; // last-rendered appearance skin â€” diffed each frame for live swaps
-  mainhandItemId: string | null; // last-rendered equipped weapon â€” diffed for live held-weapon swaps
+  skin: number; // last-rendered appearance skin, diffed each frame for live swaps
+  mainhandItemId: string | null; // last-rendered equipped weapon, diffed for live held-weapon swaps
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
@@ -2356,7 +2356,7 @@ export class Renderer {
     sun.shadow.mapSize.set(GFX.shadowMap, GFX.shadowMap);
     sun.shadow.camera.near = 30;
     sun.shadow.camera.far = 480;
-    // 105u BASE half-extent: the 31Â° sun throws shadows ~1.7x an object's
+    // 105u BASE half-extent: the 31° sun throws shadows ~1.7x an object's
     // height, so the frustum must reach further sunward than the old 95 to
     // catch off-screen casters (115 cost real shadow-pass draws at ultra).
     // applyShadowShed writes the LIVE box; shadow_extent_core.ts bounds it.
@@ -4825,7 +4825,7 @@ export class Renderer {
   private readonly farBakeGate: FarBakeGate = (target, onSettled) =>
     this.farBakeLane.enqueue(
       (settled) => this.gateSwapFlagOnCompile(target, settled),
-      () => onSettled(compileTargetPrepared(this.webgl.properties, target)),
+      () => onSettled(() => compileTargetPrepared(this.webgl.properties, target)),
     );
 
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot
@@ -10708,7 +10708,7 @@ export class Renderer {
 
       // Sheathe, from the Z key OR from being in the water: nobody swims with a
       // sword in their hand. Swimming is an OVERLAY on the sim's cosmetic
-      // weaponStowed bit rather than a write to it â€” the player's own sheathe
+      // weaponStowed bit rather than a write to it, the player's own sheathe
       // choice is untouched, so wading back out restores exactly what they had
       // drawn, and a peer's weapon rides their back the moment they start
       // swimming without any wire traffic. (This diff sits here, after the swim
@@ -10735,7 +10735,7 @@ export class Renderer {
         vz = az - v.lastZ;
       // Vertical travel, off the SAME displayed coordinates: how hard the body
       // noses over into its dive or its climb. Taken from motion rather than
-      // from the local camera on purpose â€” peers pitch the same way with no
+      // from the local camera on purpose, peers pitch the same way with no
       // wire traffic, and the pose can never disagree with the descent it is
       // drawn against (at the bed, or held at the line, it levels out by
       // itself). Only players ever leave the surface, so mobs skip it.
@@ -11893,10 +11893,8 @@ export class Renderer {
       shakeY = 0;
     if (this.shakeTrauma > 0) {
       this.shakeElapsed += dt;
-      const intensity = this.shakeTrauma * this.shakeTrauma;
-      const t = this.shakeElapsed * 60;
-      shakeX = Math.sin(t * 1.7) * intensity * 0.6;
-      shakeY = Math.sin(t * 2.3 + 1.1) * intensity * 0.45;
+      shakeX = fiestaShakeX(this.shakeTrauma, this.shakeElapsed);
+      shakeY = fiestaShakeY(this.shakeTrauma, this.shakeElapsed);
       this.camera.position.x += shakeX;
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
@@ -11921,6 +11919,7 @@ export class Renderer {
       this.camera.position.y -= shakeY;
     }
     this.warriorCameraImpact.endDraw(this.camera);
+    if (warriorShifted || shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera);
     phaseStart = this.markRendererPhase(framePhaseMs, 'submit', phaseStart);
     const totalMs = performance.now() - totalStart;
     framePhaseMs.total = roundMs(totalMs);

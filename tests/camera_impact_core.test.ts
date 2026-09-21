@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CameraImpact } from '../src/render/camera_impact_core';
+import { CameraImpact, fiestaShakeX, fiestaShakeY } from '../src/render/camera_impact_core';
 
 const camera = () => ({ position: { x: 0, y: 3, z: 10 }, quaternion: { x: 0, y: 0, z: 0, w: 1 } });
 describe('directional camera impact', () => {
@@ -74,5 +74,17 @@ describe('directional camera impact', () => {
     expect(a.beginDraw(c, 0.016, false)).toBe(false);
     a.add(NaN, c.position);
     expect(a.beginDraw(c, NaN, false)).toBe(false);
+  });
+});
+
+describe('fiesta screen shake offsets', () => {
+  it('squares the trauma and jitters on two incommensurate 60 Hz sines', () => {
+    // trauma 0.5 -> intensity 0.25; elapsed 0.01 s -> t = 0.6
+    expect(fiestaShakeX(0.5, 0.01)).toBeCloseTo(Math.sin(1.02) * 0.25 * 0.6, 12);
+    expect(fiestaShakeY(0.5, 0.01)).toBeCloseTo(Math.sin(1.38 + 1.1) * 0.25 * 0.45, 12);
+    // a tiny add barely registers: the square is what keeps small trauma quiet
+    expect(Math.abs(fiestaShakeX(0.1, 0.01))).toBeLessThan(Math.abs(fiestaShakeX(0.5, 0.01)) / 20);
+    expect(fiestaShakeX(0, 3)).toBeCloseTo(0, 12);
+    expect(fiestaShakeY(0, 3)).toBeCloseTo(0, 12);
   });
 });

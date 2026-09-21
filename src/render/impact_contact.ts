@@ -1,3 +1,4 @@
+import { playContactHaptic } from '../game/haptics';
 import { physicalContactSheet } from './ability_vfx/physical_choreography_core';
 import { abilityVfxFullSpec } from './ability_vfx_registry';
 import type { CharacterVisual } from './characters/visual';
@@ -5,7 +6,6 @@ import { hasWarriorContactRecoil } from './characters/warrior_contact_recoil';
 import { attackAbilityId } from './characters/weapon_attack_style_core';
 import { isBleedContinuation, meleeImpactProfile } from './melee_impact_core';
 
-let lastHaptic = -Infinity;
 /** Short contact feedback, independent of the victim's whole-body flinch lock. */
 export function impactContact(
   visual: CharacterVisual | null,
@@ -39,17 +39,10 @@ export function impactContact(
   if (abilityId === 'red_harvest' && beat !== undefined && !reducedMotion)
     visual?.receiveHarvestImpact(beat, source);
   if (!reducedMotion) visual?.holdFrame(0.18, Math.min(0.045, 0.018 + weight * 0.01));
-  if (!local || reducedMotion || typeof navigator === 'undefined' || !navigator.vibrate) return;
-  const now = performance.now();
-  if (now - lastHaptic < 90) return;
-  try {
-    if (typeof localStorage !== 'undefined' && localStorage.getItem('woc_haptics_on') === '0')
-      return;
-    navigator.vibrate(Math.round(Math.min(28, 8 + weight * 8)));
-    lastHaptic = now;
-  } catch {
-    /* Unsupported actuator or unavailable storage is silent. */
-  }
+  if (!local || reducedMotion) return;
+  // The opt-out read and the throttle are src/game/haptics.ts's, not
+  // reimplemented here: only the weight-scaled duration is this call's own.
+  playContactHaptic(Math.round(Math.min(28, 8 + weight * 8)));
 }
 
 /** Damage owns wound pulses even on the final tick after the aura expires. */

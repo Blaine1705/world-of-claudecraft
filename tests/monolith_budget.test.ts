@@ -902,7 +902,10 @@ const MONOLITHS: MonolithRow[] = [
     // scan module's liveViewCandidate check (present, view-less, admitted),
     // which drops the coordinator's own admission call. Exact count.
     // Warrior integration moves painter wiring and prewarm types to sibling modules.
-    ceiling: 12791,
+    // PR 4139 review-fix round: endDraw gained the matching
+    // refreshFrozenWorldMatrix guard (one line), paid for by moving the Fiesta
+    // shake math into camera_impact_core.ts (fiestaShakeX/Y). Exact count.
+    ceiling: 12790,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -3,7 +3,7 @@
 // still allowed to resolve underneath them.
 
 import { isBleedContinuation } from '../melee_impact_core';
-import { playerRangedAttackAlreadyStarted } from './skin_attack';
+import { playerAttackAnimationAlreadyStarted } from './skin_attack';
 import { attackAbilityId } from './weapon_attack_style_core';
 
 export interface DamageAttackAnimationContext {
@@ -19,7 +19,7 @@ export function shouldStartDamageAttackAnimation({
   castingAbility,
   authoredCastOwnsBody,
 }: DamageAttackAnimationContext): boolean {
-  if (playerRangedAttackAlreadyStarted(sourceKind, attackAnimationStarted)) return false;
+  if (playerAttackAnimationAlreadyStarted(sourceKind, attackAnimationStarted)) return false;
   return !(sourceKind === 'mob' && castingAbility !== null && authoredCastOwnsBody);
 }
 

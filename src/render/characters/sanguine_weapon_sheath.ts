@@ -76,7 +76,7 @@ export class SanguineWeaponSheath {
     // Same plain-Mesh kind and material instance as the eventual visible draw.
     const target = new THREE.Mesh(geometry, material);
     target.name = 'sanguine-weapon-sheath';
-    this.gate(target, (prepared) => {
+    this.gate(target, (isPrepared) => {
       if (!this.pending.delete(pending)) {
         // A queued compile can acquire resources after clear() disposed them.
         // Release those too; a stale completion never mounts its result.
@@ -84,7 +84,11 @@ export class SanguineWeaponSheath {
         geometry.dispose();
         return;
       }
-      if (prepared !== true || !aura.parent) {
+      // The only FarBakeGate consumer that reads the readiness proof: calling
+      // the thunk here (not before) is what keeps every other settle (the
+      // crowd's far bakes and effect swaps) from paying the full target
+      // traverse compileTargetPrepared does.
+      if (isPrepared?.() !== true || !aura.parent) {
         material.dispose();
         geometry.dispose();
         return;

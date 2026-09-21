@@ -112,8 +112,7 @@ import { createStowTransition, forceStow, requestStow, tickStow } from './stow_t
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
 import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
-import { WarriorContactRecoil } from './warrior_contact_recoil';
-import { WarriorRushPose } from './warrior_rush_pose';
+import { WarriorBodyEffects } from './warrior_body_effects';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import {
   disposeOwnedWeaponSkinMaterials,
@@ -124,9 +123,9 @@ export type { AnimState, BaseState } from './anim_state';
 
 /** The renderer's live compile gate for a far LOD minted (or re-skinned) after
  *  the view's own creation gate ran: compile `target` hidden, off-thread, and
- *  call `onSettled` once its programs are linked (or immediately when async
- *  compile is unsupported). Mirrors renderer `gateSwapFlagOnCompile`. */
-export type FarBakeGate = (target: THREE.Object3D, onSettled: (prepared?: boolean) => void) => void;
+ *  call `settle` (a lazy `ready` proof) once its programs are linked, or
+ *  immediately when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
+export type FarBakeGate = (target: THREE.Object3D, settle: (ready?: () => boolean) => void) => void;
 
 // Current canvas height in device pixels, pushed by the renderer on resolution
 // changes so newly created weapon-skin VFX rigs size their point sprites right.
@@ -682,7 +681,6 @@ export class CharacterVisual {
   private auraGlowMaterials = new Map<THREE.Material, THREE.Material>();
   private readonly surfaceResponse = new CharacterSurfaceResponse();
   private readonly harvestRecoil = new HarvestRecoil();
-  private readonly warriorContactRecoil = new WarriorContactRecoil();
   private auraGlowColor = 0xffffff;
   private auraGlowIntensity = 0;
 
@@ -712,7 +710,7 @@ export class CharacterVisual {
   /** The ability driving the cast base state, mirrored from AnimState so the
    *  aim pin can tell a drawn shot from a pet utility cast. */
   private castingAbility: string | null = null;
-  private readonly warriorRush = new WarriorRushPose();
+  private readonly warriorBody: WarriorBodyEffects;
   private actionProps: WarriorActionProps | null = null;
   /** which ability's cast clip the current cast-state base action was chosen
    *  for; lets chained casts refresh their per-ability override */
@@ -820,6 +818,7 @@ export class CharacterVisual {
         }
       : prep.def;
     this.key = key;
+    this.warriorBody = WarriorBodyEffects.forKey(key);
     this.entityColor = entityColor;
     this.skinIndex = skinIndex;
     this.weaponItemId = weaponItemId;
@@ -963,11 +962,11 @@ export class CharacterVisual {
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
       this.skeletonUpdates = new SkeletonUpdateCache(this.model);
-      for (const name of [
-        ...clipNamesOf(prep.def),
-        ...SKIN_ATTACK_CLIP_NAMES,
-        ...Array.from(prep.clips.keys()).filter((name) => name.startsWith('Signature_')),
-      ]) {
+      const isWarriorRig = key === 'player_warrior' || key === 'player_warrior_modular';
+      const signatureClips = isWarriorRig
+        ? Array.from(prep.clips.keys()).filter((n) => n.startsWith('Signature_'))
+        : [];
+      for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES, ...signatureClips]) {
         const clip = prep.clips.get(name);
         if (clip) this.actions.set(name, this.mixer.clipAction(clip));
       }
@@ -1062,18 +1061,18 @@ export class CharacterVisual {
     this.wasAirborne = s.airborne;
 
     this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
-    const rushChanged = this.warriorRush.update(dt, s);
+    const rushChanged = this.warriorBody.updateRush(dt, s);
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
       const previousBase = this.baseState;
       if (baseChanged) this.baseState = desired;
-      if (this.warriorRush.arrivalStarted && this.def.clips.rushArrival) {
+      if (this.warriorBody.rushArrivalStarted && this.def.clips.rushArrival) {
         this.playOneShot(this.def.clips.rushArrival, 1);
       } else if (
         this.currentIsOneShot &&
         this.current?.getClip().name === this.def.clips.rushArrival &&
-        !this.warriorRush.recovering
+        !this.warriorBody.rushRecovering
       ) {
         this.currentIsOneShot = false;
         this.fadeTo(this.baseAction(), 0.06, false);
@@ -1287,7 +1286,7 @@ export class CharacterVisual {
       // Compress at the start of the pull, back to neutral as the body rises.
       CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
     this.harvestRecoil.apply(this.poseWrap, dt, reducedMotion || s.dead);
-    this.warriorContactRecoil.apply(this.poseWrap, dt, reducedMotion || s.dead);
+    this.warriorBody.applyContactRecoil(this.poseWrap, dt, reducedMotion || s.dead);
 
     // distant corpses show the static idle far mesh, tip it over
     if (this.farMesh?.visible) {
@@ -1748,11 +1747,11 @@ export class CharacterVisual {
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
     if ((abilityId === 'charge' || abilityId === 'intervene') && this.action(this.def.clips.rush)) {
-      this.warriorRush.begin(abilityId);
+      this.warriorBody.beginRush(abilityId);
       return;
     }
-    if (!abilityId && this.warriorRush.ownsBody) return;
-    if (abilityId) this.warriorRush.cancel();
+    if (!abilityId && this.warriorBody.rushOwnsBody) return;
+    if (abilityId) this.warriorBody.cancelRush();
     const signature = abilityId ? `Signature_${abilityId}` : null;
     if (signature && this.action(signature)) {
       this.playOneShot(signature, 1);
@@ -1813,7 +1812,7 @@ export class CharacterVisual {
    *  held Bladestorm channel pose. Repeated AoE hits only refresh the timer. */
   playWhirl(abilityId?: string): void {
     if (this.deadLock) return;
-    this.warriorRush.cancel();
+    this.warriorBody.cancelRush();
     if (
       (abilityId === 'cleave' || abilityId === 'whirlwind') &&
       this.action(`Signature_${abilityId}`)
@@ -1832,12 +1831,12 @@ export class CharacterVisual {
 
   /** Successful Onrush arrival, validated by its travelled contact cue. */
   arriveFromOnrush(): boolean {
-    return !this.deadLock && !!this.action(this.def.clips.rushArrival) && this.warriorRush.arrive();
+    return !this.deadLock && !!this.action(this.def.clips.rushArrival) && this.warriorBody.arrive();
   }
 
   get isPerformingAbility(): boolean {
     return (
-      this.warriorRush.ownsBody ||
+      this.warriorBody.rushOwnsBody ||
       (this.currentIsOneShot && this.current?.getClip().name.startsWith('Signature_') === true)
     );
   }
@@ -2203,7 +2202,7 @@ export class CharacterVisual {
   }
   clearElementResponse(): void {
     this.harvestRecoil.clear();
-    this.warriorContactRecoil.clear();
+    this.warriorBody.clearContactRecoil();
     const active = this.surfaceResponse.active;
     this.surfaceResponse.clear();
     if (active && !this.disposed) this.applyVisualMaterials();
@@ -2215,7 +2214,7 @@ export class CharacterVisual {
 
   receiveWarriorImpact(id: string, beat: number, source?: { x: number; z: number }): void {
     if (!this.disposed && !this.deadLock)
-      this.warriorContactRecoil.trigger(id, beat, this.height, this.root, source);
+      this.warriorBody.triggerContactRecoil(id, beat, this.height, this.root, source);
   }
 
   private writeAuraGlow(material: THREE.Material): void {
@@ -3640,7 +3639,7 @@ export class CharacterVisual {
         return this.action(c.walkBack) ?? this.action(c.walk);
       case 'run':
         return (
-          (this.warriorRush.active ? this.action(c.rush) : null) ??
+          (this.warriorBody.rushActive ? this.action(c.rush) : null) ??
           this.action(c.run) ??
           this.action(c.walk)
         );

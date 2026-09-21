@@ -1,5 +1,7 @@
+// @vitest-environment happy-dom
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
+import { describe, expect, it, vi } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
 import {
   attackAbilityId,
@@ -219,5 +221,58 @@ describe('spellfx dispatch order: mob engage cue vs warrior cast plan', () => {
       expect(isMobEngageCue('shout', kind), String(kind)).toBe(false);
       expect(isMobEngageCue('flourish', kind), String(kind)).toBe(false);
     }
+  });
+});
+
+describe('Signature_ clip binding is keyed on the warrior rig, not the clip name', () => {
+  // Signature_* is a warrior-only naming convention (warrior_ability_clips.ts,
+  // warrior_action_fallbacks.ts). visual.ts used to bind ANY shipped clip
+  // whose name started with it, on every rig: a non-warrior GLB that happened
+  // to ship a same-named clip (an authored donor, a future asset) would have
+  // it silently wired up and playable through hasAttackClipOverride even
+  // though the class never authored that override.
+  function stubGltfWithSignatureClip(abilityId: string) {
+    const scene = new THREE.Group();
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
+    mesh.name = 'body';
+    scene.add(mesh);
+    return {
+      scene,
+      animations: [
+        new THREE.AnimationClip('Idle', 1, []),
+        new THREE.AnimationClip(`Signature_${abilityId}`, 1, []),
+      ],
+    };
+  }
+
+  async function buildVisual(key: string, abilityId: string) {
+    vi.resetModules();
+    vi.doMock('../src/render/assets/loader', () => ({
+      loadGltf: vi.fn(() => Promise.resolve(stubGltfWithSignatureClip(abilityId))),
+      loadHdr: vi.fn(() => new Promise(() => undefined)),
+      loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      releaseGltf: vi.fn(),
+    }));
+    const { charactersReady } = await import('../src/render/characters/assets');
+    await charactersReady();
+    const { CharacterVisual } = await import('../src/render/characters/visual');
+    const visual = new CharacterVisual(key, 0xffffff, 0);
+    vi.doUnmock('../src/render/assets/loader');
+    return visual;
+  }
+
+  it('binds a shipped Signature_ clip on the warrior rig', async () => {
+    const visual = await buildVisual('player_warrior', 'qa_probe_ability');
+    // No real attackByAbility entry for this synthetic id: true here can only
+    // come from the Signature_ clip itself resolving to a live action.
+    expect(VISUALS.player_warrior.clips.attackByAbility?.qa_probe_ability).toBeUndefined();
+    expect(visual.hasAttackClipOverride('qa_probe_ability')).toBe(true);
+  });
+
+  it('leaves the same shipped Signature_ clip unbound on a non-warrior rig', async () => {
+    const visual = await buildVisual('player_priest', 'qa_probe_ability');
+    expect(VISUALS.player_priest.clips.attackByAbility?.qa_probe_ability).toBeUndefined();
+    expect(visual.hasAttackClipOverride('qa_probe_ability')).toBe(false);
   });
 });

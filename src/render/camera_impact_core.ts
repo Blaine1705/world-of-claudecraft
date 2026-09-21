@@ -106,3 +106,15 @@ export class CameraImpact {
     this.oz = 0;
   }
 }
+
+// Fiesta screen shake (the trauma accumulator the HUD and heavy VFX moments
+// feed): trauma squared so small adds barely register and big hits really
+// kick, two incommensurate sines at 60 Hz for a jitter that never settles
+// into a loop. Draw-only offsets: the renderer adds them before the draw and
+// removes them after, so nothing persistent ever reads a shaken camera.
+export function fiestaShakeX(trauma: number, elapsedSec: number): number {
+  return Math.sin(elapsedSec * 60 * 1.7) * trauma * trauma * 0.6;
+}
+export function fiestaShakeY(trauma: number, elapsedSec: number): number {
+  return Math.sin(elapsedSec * 60 * 2.3 + 1.1) * trauma * trauma * 0.45;
+}

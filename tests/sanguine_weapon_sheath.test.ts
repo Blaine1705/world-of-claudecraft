@@ -20,7 +20,7 @@ function fixture() {
   const aura = new THREE.Mesh(source, fallback);
   scene.add(aura);
   const owner = new SanguineWeaponSheath();
-  const jobs: { target: THREE.Object3D; settle: (prepared?: boolean) => void }[] = [];
+  const jobs: { target: THREE.Object3D; settle: (prepared?: () => boolean) => void }[] = [];
   owner.setGate((target, settle) => jobs.push({ target, settle }));
   return { scene, source, fallback, aura, owner, jobs };
 }
@@ -50,7 +50,9 @@ describe('Sanguine weapon ownership', () => {
     const compiled = f.jobs[0].target as THREE.Mesh;
     expect(compiled).not.toBeInstanceOf(THREE.SkinnedMesh);
     expect(compiled.parent).toBe(null);
-    f.jobs[0].settle(true);
+    const proof = vi.fn(() => true);
+    f.jobs[0].settle(proof);
+    expect(proof).toHaveBeenCalledOnce();
     expect(f.aura.material).toBe(compiled.material);
     expect(f.aura.geometry).toBe(compiled.geometry);
     expect(f.aura.userData.ownsAuraGeometry).toBe(true);
@@ -61,35 +63,46 @@ describe('Sanguine weapon ownership', () => {
     expect(liveDisposed).not.toHaveBeenCalled();
   });
 
-  it.each([false, undefined])('does not treat fallback settlement %s as preparation', (ready) => {
+  it.each<['a thunk proving not-ready' | 'no thunk at all', (() => boolean) | undefined]>([
+    ['a thunk proving not-ready', () => false],
+    ['no thunk at all', undefined],
+  ])('does not treat %s as preparation', (_label, proof) => {
     const f = fixture();
     f.owner.stage(f.aura);
     const target = f.jobs[0].target as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
     const materialDisposed = vi.spyOn(target.material, 'dispose');
     const geometryDisposed = vi.spyOn(target.geometry, 'dispose');
-    f.jobs[0].settle(ready);
+    f.jobs[0].settle(proof);
     expect(f.aura.material).toBe(f.fallback);
     expect(materialDisposed).toHaveBeenCalledOnce();
     expect(geometryDisposed).toHaveBeenCalledOnce();
   });
 
-  it.each(['clear', 'gate replacement', 'detached weapon'])(
-    'rejects stale upgrades after %s',
-    (reason) => {
-      const f = fixture();
-      f.owner.stage(f.aura);
-      const target = f.jobs[0].target as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
-      const materialDisposed = vi.spyOn(target.material, 'dispose');
-      const textureDisposed = vi.spyOn(assets.texture!, 'dispose');
-      if (reason === 'clear') f.owner.clear();
-      else if (reason === 'gate replacement') f.owner.setGate(null);
-      else f.aura.removeFromParent();
-      f.jobs[0].settle(true);
-      expect(f.aura.material).toBe(f.fallback);
-      expect(materialDisposed).toHaveBeenCalled();
-      expect(textureDisposed).not.toHaveBeenCalled();
-    },
-  );
+  it.each<['clear' | 'gate replacement' | 'detached weapon', boolean]>([
+    // A cleared or replaced owner drops the pending upgrade outright, so the
+    // stale settle is discarded before the readiness proof is ever read:
+    // laziness holds even off the hot crowd path. A detached weapon is still
+    // the pending upgrade (only aura.parent says no), so the proof IS read;
+    // either way nothing mounts.
+    ['clear', false],
+    ['gate replacement', false],
+    ['detached weapon', true],
+  ])('rejects stale upgrades after %s', (reason, proofRead) => {
+    const f = fixture();
+    f.owner.stage(f.aura);
+    const target = f.jobs[0].target as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
+    const materialDisposed = vi.spyOn(target.material, 'dispose');
+    const textureDisposed = vi.spyOn(assets.texture!, 'dispose');
+    if (reason === 'clear') f.owner.clear();
+    else if (reason === 'gate replacement') f.owner.setGate(null);
+    else f.aura.removeFromParent();
+    const proof = vi.fn(() => true);
+    f.jobs[0].settle(proof);
+    expect(f.aura.material).toBe(f.fallback);
+    expect(materialDisposed).toHaveBeenCalled();
+    expect(textureDisposed).not.toHaveBeenCalled();
+    expect(proof).toHaveBeenCalledTimes(proofRead ? 1 : 0);
+  });
 });
 
 describe('compile target readiness proof', () => {

@@ -91,7 +91,7 @@ describe('Sanguine equipped sword coverage', () => {
     });
     f.visual.setWeaponAura(0xff4636, false, true);
     expect(jobs).toHaveLength(2);
-    for (const job of jobs) job.settle(true);
+    for (const job of jobs) job.settle(() => true);
     const overlays = [...f.state.weaponAuraMeshes];
     const ownedDisposals = overlays.map((mesh, index) => {
       expect(mesh.geometry).toBe(jobs[index].target.geometry);
