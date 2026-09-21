@@ -211,6 +211,9 @@ describe('live graphics profile architecture', () => {
 const UI_PURE_CORES = [
   'src/ui/loot_quality_view.ts',
   'src/ui/item_combat_tooltip_view.ts',
+  // The zone-entry chat line (welcome hint vs the town-done line); the
+  // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
+  'src/ui/zone_entry_line_core.ts',
   // The one clamp and disabled rule the source picker's row steppers and the
   // bank quantity prompt share (quantity_stepper.ts is their DOM consumer).
   'src/ui/quantity_step_core.ts',
