@@ -1,7 +1,7 @@
 """Review renders of the forge kit, shown the way the game draws it: unlit, the
 painted facets carrying all the shading, against the room's dark.
 
-  blender --background --python docs/design/forge-room/preview.py
+  blender --background --python docs/design/forge-room/preview.py [-- --save kit.blend]
 """
 import math
 import os
@@ -76,6 +76,13 @@ for engine in ('BLENDER_EEVEE', 'BLENDER_EEVEE_NEXT'):
         continue
 scene.render.resolution_x = 1600
 scene.render.resolution_y = 900
+# `-- --save file.blend` writes the laid-out scene instead of rendering it, for
+# opening in the Blender window (open_forge_kit.py).
+ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
+if '--save' in ARGS:
+    bpy.ops.wm.save_as_mainfile(filepath=ARGS[ARGS.index('--save') + 1])
+    print('SAVED', ARGS[ARGS.index('--save') + 1])
+    sys.exit(0)
 for tag, loc, aim in (('kit', (4, -46, 17), (1, 0, 6)), ('forge', (-9, -24, 5), (0, 6, 8))):
     cam.location = Vector(loc)
     cam.rotation_euler = (Vector(aim) - Vector(loc)).to_track_quat('-Z', 'Y').to_euler()
