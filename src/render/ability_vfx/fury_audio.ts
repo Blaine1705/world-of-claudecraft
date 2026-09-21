@@ -1,4 +1,4 @@
-import { claimFuryAudio, MELEE_AUDIO, type MeleeAudioId } from '../../fury_audio_core';
+import { claimFuryAudio, MELEE_AUDIO, type MeleeAudioId } from '../../game/fury_audio_core';
 import type { SequencerHost } from './sequencer';
 
 /** Retained audio survives visual-slot eviction and lost visual anchors. Its

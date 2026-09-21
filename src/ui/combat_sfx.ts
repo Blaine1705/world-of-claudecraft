@@ -1,8 +1,8 @@
-import { furyAudioClaimed } from '../fury_audio_core';
+import { furyAudioClaimed } from '../game/fury_audio_core';
 import type { SfxId } from '../game/sfx_manifest.generated';
+import { warriorRecoveryAudio } from '../game/warrior_recovery_core';
 import { ABILITIES, MOBS } from '../sim/data';
 import type { Aura, Entity, SimEvent } from '../sim/types';
-import { warriorRecoveryAudio } from '../warrior_recovery_core';
 import { isAuraDebuff } from './auras_view';
 
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
@@ -575,18 +575,32 @@ export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null 
 type HealEvent = Extract<SimEvent, { type: 'heal' }>;
 
 /** Sound ownership for direct heals, consumables and periodic recovery.
- * Ordinary HoTs sound on application only. Frenzied Regeneration preserves
- * its tick-only cue, while actual Warrior recovery has its own quieter take. */
+ * Extracted from the HUD heal arm (hud.ts) unchanged; the rules it carries:
+ * - A potion/eat/drink heal (items.ts / combat/auras.ts) plays its own dedicated
+ *   cue instead of the generic heal_impact; consumeHealCue returns null for every
+ *   other heal source (leech, second wind, companion heals, ...), which falls
+ *   through to heal_impact unchanged. A `heal` with a source and no cue is an
+ *   eat/drink tick that is not a sound tick.
+ * - A HoT tick fires every couple of seconds for its whole duration; the one-shot
+ *   application cue (Sim.applyAura) covers the "heal landed" moment instead, so
+ *   ticks stay silent. Frenzied Regeneration is fully exempt (a Bear Form
+ *   self-heal, never aimed at anyone else, so the repeat does not read as spammy
+ *   the way a party HoT does): it keeps its old tick-only sound, so the one-shot
+ *   application emit is skipped for it too. Confirmed in-game on Priest (Renew)
+ *   and Druid (Rejuvenation, Regrowth, Frenzied Regeneration).
+ * - Only after those gates does an actual Warrior Bloodletting recovery take its
+ *   own quieter cue (warriorRecoveryAudio), or stay silent when nothing was
+ *   restored; it never bypasses the tick rules above. */
 export function healAudioPlan(
   ev: Extract<SimEvent, { type: 'heal' | 'heal2' }>,
 ): { cue: string; gain: number } | null {
-  const recovery = ev.type === 'heal2' ? warriorRecoveryAudio(ev) : undefined;
-  if (recovery !== undefined) return recovery ? { cue: recovery, gain: 0.75 } : null;
   const cue = ev.type === 'heal' ? consumeHealCue(ev) : null;
   if (ev.type === 'heal' && ev.source && !cue) return null;
   const hot = ev.type === 'heal2' && ev.hot === true;
   const regeneration = ev.type === 'heal2' && ev.abilityId === 'frenzied_regeneration';
   if (hot ? !regeneration : regeneration) return null;
+  const recovery = ev.type === 'heal2' ? warriorRecoveryAudio(ev) : undefined;
+  if (recovery !== undefined) return recovery ? { cue: recovery, gain: 0.75 } : null;
   return { cue: cue ?? 'heal_impact', gain: 1 };
 }
 

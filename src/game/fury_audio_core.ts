@@ -1,4 +1,4 @@
-import { WARRIOR_CONTROL_AUDIO } from './warrior_control_audio';
+import { WARRIOR_CONTROL_AUDIO } from './warrior_control_audio_core';
 /** Shared cue identity and per-event ownership, without renderer/audio imports. */
 export const FURY_AUDIO = {
   raging_gale: {

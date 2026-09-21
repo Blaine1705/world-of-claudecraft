@@ -1,6 +1,6 @@
-import { FURY_AUDIO } from '../../fury_audio_core';
+import { FURY_AUDIO } from '../../game/fury_audio_core';
+import { warriorControlReleaseSample } from '../../game/warrior_control_audio_core';
 import { MELEE_RANGE } from '../../sim/types';
-import { warriorControlReleaseSample } from '../../warrior_control_audio';
 import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
 import { drawBreachmaker } from './breachmaker';
 import { furyBeat } from './fury_choreography';

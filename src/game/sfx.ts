@@ -10,11 +10,11 @@
 // pool of persistent looping sources for ambience and sustained spell casts.
 
 import { apiUrl } from '../client_origin';
-import { isMeleeAudioId, meleeAudioSample } from '../fury_audio_core';
 import { ABILITIES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
+import { isMeleeAudioId, meleeAudioSample } from './fury_audio_core';
 import {
   advanceInterruptibleMountEngine,
   advanceMountEngine,

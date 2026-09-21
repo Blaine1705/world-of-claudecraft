@@ -1,5 +1,5 @@
-import { ABILITIES } from './sim/data';
-import type { SimEvent } from './sim/types';
+import { ABILITIES } from '../sim/data';
+import type { SimEvent } from '../sim/types';
 export const WARRIOR_RECOVERY_SAMPLE = 'impact_warrior_blood_recovery';
 export function isBloodlettingRecovery(event: Extract<SimEvent, { type: 'heal2' }>): boolean {
   return (

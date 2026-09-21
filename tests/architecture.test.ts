@@ -619,6 +619,10 @@ const UI_PURE_CORES = [
   'src/ui/tooltip_line_core.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
+  // Which authored contact beat a damage floater rides, and how long it waits. The
+  // beat table is INJECTED by the painter (it lives in src/game, a layer a pure core
+  // may not import), so this core imports nothing at all.
+  'src/ui/fct_stage_core.ts',
   'src/ui/honor_float_view.ts',
   'src/ui/heal_landing_feedback_core.ts',
   'src/ui/block_landing_feedback_core.ts',
@@ -655,6 +659,11 @@ const UI_PURE_CORES = [
   'src/game/perf_shader_warm_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  // Warrior audio cue tables shared by game, render and ui (PR 4139): pure data
+  // plus event discriminators, no DOM, no Three.
+  'src/game/fury_audio_core.ts',
+  'src/game/warrior_control_audio_core.ts',
+  'src/game/warrior_recovery_core.ts',
   // The Toggle Friendly Nameplates view pref (Ctrl+V): module state the input
   // layer owns and the nameplate painter reads, so render imports it as a game
   // leaf the same way it reads the tier knobs. Pure: no DOM, no sim, no renderer.

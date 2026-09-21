@@ -1,4 +1,4 @@
-import { WARRIOR_CONTROL_AUDIO } from '../../warrior_control_audio';
+import { WARRIOR_CONTROL_AUDIO } from '../../game/warrior_control_audio_core';
 import type { AbilityVfxRibbons } from './ribbons';
 import type { SequencerHost } from './sequencer';
 import { warriorCrushContact } from './warrior_crush_contact';

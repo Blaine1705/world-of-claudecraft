@@ -11287,7 +11287,7 @@ export class Hud {
             // token (the grey vs the white FCT token); the localized word stays at the call site. A resisted
             // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,
             // not miss).
-            const shape = fctSpawnShape({
+            const shape = this.fctPainter.stagedShape(ev, now, {
               type: 'damage',
               damageKind: ev.kind,
               ability: false,
@@ -11347,7 +11347,7 @@ export class Hud {
           // through here too, but with its own damageKind so it reads with its own colour
           // and combat-log sentence instead of an indistinguishable plain hit. The amount
           // text + target entity stay at the call site.
-          const hitShape = fctSpawnShape({
+          const hitShape = this.fctPainter.stagedShape(ev, now, {
             type: 'damage',
             damageKind: ev.kind === 'block' ? 'block' : 'hit',
             ability: !!ev.ability,

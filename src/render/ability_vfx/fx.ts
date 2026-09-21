@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { MeleeAudioId } from '../../fury_audio_core';
+import type { MeleeAudioId } from '../../game/fury_audio_core';
 import type { SimEvent } from '../../sim/types';
 import {
   type AbilityVfxBuffSpec,

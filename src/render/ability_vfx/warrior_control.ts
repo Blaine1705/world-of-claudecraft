@@ -1,5 +1,5 @@
+import { WARRIOR_CONTROL_AUDIO } from '../../game/warrior_control_audio_core';
 import type { SimEvent } from '../../sim/types';
-import { WARRIOR_CONTROL_AUDIO } from '../../warrior_control_audio';
 import type { AbilityVfxFx } from './fx';
 import type { SeqSlot, SequencerHost } from './sequencer';
 

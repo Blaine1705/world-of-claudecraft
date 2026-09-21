@@ -1,12 +1,12 @@
 import { expect, it } from 'vitest';
-import { ABILITIES } from '../src/sim/data';
-import type { SimEvent } from '../src/sim/types';
-import { healAudioPlan } from '../src/ui/combat_sfx';
 import {
   isBloodlettingRecovery,
   WARRIOR_RECOVERY_SAMPLE,
   warriorRecoveryAudio,
-} from '../src/warrior_recovery_core';
+} from '../src/game/warrior_recovery_core';
+import { ABILITIES } from '../src/sim/data';
+import type { SimEvent } from '../src/sim/types';
+import { healAudioPlan } from '../src/ui/combat_sfx';
 
 const heal = (
   extra: Partial<Extract<SimEvent, { type: 'heal2' }>> = {},

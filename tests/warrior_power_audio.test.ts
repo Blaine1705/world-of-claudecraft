@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest';
-import { furyAudioClaimed, WARRIOR_POWER_AUDIO } from '../src/fury_audio_core';
+import { furyAudioClaimed, WARRIOR_POWER_AUDIO } from '../src/game/fury_audio_core';
 import { FuryAudioQueue } from '../src/render/ability_vfx/fury_audio';
 import { AbilityVfx, type AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import type { SequencerHost } from '../src/render/ability_vfx/sequencer';

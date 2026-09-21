@@ -1,5 +1,5 @@
+import { isBloodlettingRecovery } from '../../game/warrior_recovery_core';
 import type { SimEvent } from '../../sim/types';
-import { isBloodlettingRecovery } from '../../warrior_recovery_core';
 import { type WarriorFuryStateAura, warriorFuryStateKind } from '../warrior_fury_state_core';
 import type { SeqSlot, SequencerHost } from './sequencer';
 

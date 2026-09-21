@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { claimFuryAudio, clearFuryAudioClaim, FURY_AUDIO } from '../src/fury_audio_core';
+import { claimFuryAudio, clearFuryAudioClaim, FURY_AUDIO } from '../src/game/fury_audio_core';
 import { sfx } from '../src/game/sfx';
 import { FuryAudioQueue } from '../src/render/ability_vfx/fury_audio';
 import type { SequencerHost } from '../src/render/ability_vfx/sequencer';
