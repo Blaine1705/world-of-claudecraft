@@ -4,6 +4,7 @@ import { isBoneReaperVariant } from '../sim/rift/hoard_bone_reaper_core';
 import { HOARD_SWEEP_HALF_ANGLE, HOARD_SWEEP_RANGE } from '../sim/rift/hoard_boss';
 import { HOARD_BRUTE_COMBO } from '../sim/rift/hoard_boss_kits';
 import { isBoulderVariant } from '../sim/rift/hoard_boulder_core';
+import { isCocoonVariant } from '../sim/rift/hoard_cocoon_core';
 import { isForgeHammerVariant } from '../sim/rift/hoard_forge_hammer_core';
 import { isIceAgeVariant } from '../sim/rift/hoard_ice_age_core';
 import { isPulsarVariant } from '../sim/rift/hoard_pulsars_core';
@@ -547,7 +548,8 @@ export class HoardBossFx {
         isPulsarVariant(cue.variant) ||
         isForgeHammerVariant(cue.variant) ||
         isTentacleVariant(cue.variant) ||
-        isBoulderVariant(cue.variant)
+        isBoulderVariant(cue.variant) ||
+        isCocoonVariant(cue.variant)
       )
         continue;
       const key = `${cue.instanceId}:${cue.cueId}`;

@@ -18098,6 +18098,12 @@ export const en_XA: EnTranslations = {
       "hoard_abyssal_tentacle": {
         "name": "[Ţéñţáçļé óƒ ţĥé Ɱáŵ]"
       },
+      "hoard_silk_cocoon": {
+        "name": "[Šíļķ Çóçóóñ]"
+      },
+      "hoard_brood_cocoon": {
+        "name": "[Ɓŕóóð Çóçóóñ]"
+      },
       "rift_spawnling": {
         "name": "[Ŕíƒţ Šþáŵñļíñĝ]"
       },

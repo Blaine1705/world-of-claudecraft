@@ -9936,6 +9936,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.hoard_healing_tide_totem.name': '치유의 해일 토템',
   'entities.mobs.hoard_bound_pulsar.name': '속박된 펄서',
   'entities.mobs.hoard_abyssal_tentacle.name': '심연의 아가리의 촉수',
+  'entities.mobs.hoard_brood_cocoon.name': '부화 고치',
+  'entities.mobs.hoard_silk_cocoon.name': '비단 고치',
   'entities.mobs.rift_spawnling.name': '균열의 산물',
   'entities.mobs.rift_bonewalker.name': '되살아난 뼈걷는자',
   'entities.mobs.rift_frost_revenant.name': '서리에 묶인 망령',

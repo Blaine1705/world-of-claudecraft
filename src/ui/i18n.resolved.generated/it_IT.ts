@@ -18098,6 +18098,12 @@ export const it_IT: EnTranslations = {
       "hoard_abyssal_tentacle": {
         "name": "Tentacle of the Maw"
       },
+      "hoard_silk_cocoon": {
+        "name": "Silk Cocoon"
+      },
+      "hoard_brood_cocoon": {
+        "name": "Brood Cocoon"
+      },
       "rift_spawnling": {
         "name": "Progenie dello Squarcio"
       },

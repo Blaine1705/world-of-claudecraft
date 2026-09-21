@@ -18098,6 +18098,12 @@ export const ko_KR: EnTranslations = {
       "hoard_abyssal_tentacle": {
         "name": "심연의 아가리의 촉수"
       },
+      "hoard_silk_cocoon": {
+        "name": "비단 고치"
+      },
+      "hoard_brood_cocoon": {
+        "name": "부화 고치"
+      },
       "rift_spawnling": {
         "name": "균열의 산물"
       },

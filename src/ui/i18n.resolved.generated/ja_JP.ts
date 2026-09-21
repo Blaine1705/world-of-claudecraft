@@ -18098,6 +18098,12 @@ export const ja_JP: EnTranslations = {
       "hoard_abyssal_tentacle": {
         "name": "深淵の顎の触手"
       },
+      "hoard_silk_cocoon": {
+        "name": "絹の繭"
+      },
+      "hoard_brood_cocoon": {
+        "name": "孵化の繭"
+      },
       "rift_spawnling": {
         "name": "リフトの落とし子"
       },

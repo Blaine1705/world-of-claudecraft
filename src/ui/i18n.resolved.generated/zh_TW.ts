@@ -18098,6 +18098,12 @@ export const zh_TW: EnTranslations = {
       "hoard_abyssal_tentacle": {
         "name": "深淵之喉的觸手"
       },
+      "hoard_silk_cocoon": {
+        "name": "絲繭"
+      },
+      "hoard_brood_cocoon": {
+        "name": "育雛之繭"
+      },
       "rift_spawnling": {
         "name": "裂隙孽生體"
       },

@@ -18098,6 +18098,12 @@ export const ru_RU: EnTranslations = {
       "hoard_abyssal_tentacle": {
         "name": "Щупальце Пасти"
       },
+      "hoard_silk_cocoon": {
+        "name": "Шёлковый кокон"
+      },
+      "hoard_brood_cocoon": {
+        "name": "Кокон выводка"
+      },
       "rift_spawnling": {
         "name": "Отпрыск Разлома"
       },

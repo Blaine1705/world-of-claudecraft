@@ -29,6 +29,7 @@ import {
   tickHoardBoulder,
   tickHoardBoulderCue,
 } from './hoard_boulder';
+import { clearHoardCocoon, isCocoonCue, tickHoardCocoon, tickHoardCocoonCue } from './hoard_cocoon';
 import {
   clearHoardForgeHammer,
   isForgeHammerCue,
@@ -289,6 +290,7 @@ function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   clearHoardForgeHammer(inst.hoardBoss);
   clearHoardTentacles(ctx, inst, boss, inst.hoardBoss);
   clearHoardBoulder(ctx, boss, inst.hoardBoss);
+  clearHoardCocoon(ctx, inst, boss, inst.hoardBoss);
   delete inst.hoardBoss;
   for (const player of instancePlayers(ctx, inst)) {
     ctx.emit({ type: 'hoardBossCueClear', pid: player.id });
@@ -485,6 +487,7 @@ function tickSpecialKit(
     ensureBroodEggs(ctx, inst, boss);
     if (boss.firedSummons === 0 && hpFraction <= HOARD_BROOD_HATCH_HP)
       hatchBroodEggs(ctx, inst, boss);
+    tickHoardCocoon(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     return;
   }
   if (kit === 'bone-legion') {
@@ -843,6 +846,10 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     if (isForgeHammerCue(cue)) {
       if (tickHoardForgeHammerCue(ctx, inst, boss, state, cue, forgePlayers, emitCue))
         live.push(cue);
+      continue;
+    }
+    if (isCocoonCue(cue)) {
+      if (tickHoardCocoonCue(cue)) live.push(cue);
       continue;
     }
     if (isBoulderCue(cue)) {

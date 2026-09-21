@@ -168,6 +168,56 @@ export const HOARD_MOBS: Record<string, MobTemplate> = {
     // Rooted where it rose, so it can never be terrain-pinned (see the pulsar).
     phasesThroughObstacles: true,
   },
+  // Vysska's cocoons (src/sim/rift/hoard_cocoon.ts). The silk cocoon holds a
+  // wrapped player until their allies cut it open; the brood cocoon is what she
+  // spins for a lone player, and hatches if it is left. Health is set from the
+  // boss's own when it is spun, so these numbers are only a floor. Neither moves
+  // nor swings.
+  hoard_silk_cocoon: {
+    id: 'hoard_silk_cocoon',
+    name: 'Silk Cocoon',
+    minLevel: 18,
+    maxLevel: 23,
+    family: 'spider',
+    hpBase: 60,
+    hpPerLevel: 6,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 99,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0xd9dcc8,
+    xpMult: 0,
+    idleStationary: true,
+    untameable: true,
+    // Rooted, so it can never be terrain-pinned (see the pulsar).
+    phasesThroughObstacles: true,
+  },
+  hoard_brood_cocoon: {
+    id: 'hoard_brood_cocoon',
+    name: 'Brood Cocoon',
+    minLevel: 18,
+    maxLevel: 23,
+    family: 'spider',
+    hpBase: 60,
+    hpPerLevel: 6,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 99,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0xb9c48a,
+    xpMult: 0,
+    idleStationary: true,
+    untameable: true,
+    phasesThroughObstacles: true,
+  },
 };
 
 // Shared summoned adds (referenced by bosses' summonAdds.mobId). Low HP, no loot.

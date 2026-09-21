@@ -9957,6 +9957,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.hoard_healing_tide_totem.name': '癒やしの潮のトーテム',
   'entities.mobs.hoard_bound_pulsar.name': '縛られしパルサー',
   'entities.mobs.hoard_abyssal_tentacle.name': '深淵の顎の触手',
+  'entities.mobs.hoard_brood_cocoon.name': '孵化の繭',
+  'entities.mobs.hoard_silk_cocoon.name': '絹の繭',
   'entities.mobs.rift_spawnling.name': 'リフトの落とし子',
   'entities.mobs.rift_bonewalker.name': '蘇りし骨歩き',
   'entities.mobs.rift_frost_revenant.name': '氷縛の亡霊',

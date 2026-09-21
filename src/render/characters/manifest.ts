@@ -3695,6 +3695,26 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.12,
     clickRadius: 2.2,
   },
+  // Vysska's cocoons (src/sim/rift/hoard_cocoon.ts): the silk cocoon a wrapped
+  // player stands inside, and the brood cocoon she spins for a lone player. Each
+  // is the whole body of its attackable mob, so targeting, the nameplate and the
+  // health bar are the ordinary ones; the web mark, the hanging strand, the
+  // rescue ring and her feeding are drawn by src/render/hoard_cocoon.ts. Original
+  // Blender art (docs/design/cocoon/), no clips, so they use the static prop lane.
+  mob_silk_cocoon: {
+    url: 'vfx/cocoon/silk.glb',
+    height: 3.5,
+    clips: STATIC_PROP,
+    selfIllumination: 0.18,
+    clickRadius: 1.6,
+  },
+  mob_brood_cocoon: {
+    url: 'vfx/cocoon/brood.glb',
+    height: 2.5,
+    clips: STATIC_PROP,
+    selfIllumination: 0.3,
+    clickRadius: 1.7,
+  },
   // Bone Spike (the Nythraxis raid, src/sim/nythraxis_bone_spike.ts): the
   // Tripo cluster of bone spikes erupting from cracked flagstones with violet
   // tips that pins an impaled raider until the raid shatters it. A stationary
@@ -3909,6 +3929,8 @@ const MOB_KEYS: Record<string, string> = {
   hoard_healing_tide_totem: 'mob_healing_tide_totem',
   hoard_bound_pulsar: 'mob_bound_pulsar',
   hoard_abyssal_tentacle: 'mob_abyssal_tentacle',
+  hoard_silk_cocoon: 'mob_silk_cocoon',
+  hoard_brood_cocoon: 'mob_brood_cocoon',
   // Broodmother clutch (q_broodmother): the destructible eggs reuse the egg-sac
   // model (not a live spider), and the hatchling is a small spider.
   spider_egg: 'mob_spider_egg_sac',

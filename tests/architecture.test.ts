@@ -729,6 +729,7 @@ const RENDER_PURE_CORES = [
   'src/render/hoard_forge_hammer_core.ts',
   'src/render/hoard_tentacles_core.ts',
   'src/render/hoard_boulder_core.ts',
+  'src/render/hoard_cocoon_core.ts',
   'src/render/hoard_boss_dressing_core.ts',
   'src/render/hoard_cliff_mass_core.ts',
   'src/render/hoard_encounter_accents_core.ts',

@@ -143,6 +143,8 @@ const MOB_IDS = [
   'hoard_healing_tide_totem',
   'hoard_bound_pulsar',
   'hoard_abyssal_tentacle',
+  'hoard_silk_cocoon',
+  'hoard_brood_cocoon',
   'rift_spawnling',
   'rift_bonewalker',
   'rift_frost_revenant',

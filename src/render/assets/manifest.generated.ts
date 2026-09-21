@@ -1744,6 +1744,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "vfx/bone-reaper/soul.glb": "/media/vfx/bone-reaper/soul.b41ebdff4859.glb",
   "vfx/boulder/boulder.glb": "/media/vfx/boulder/boulder.dc27f902ffcd.glb",
   "vfx/circle_05.png": "/media/vfx/circle_05.05e87b80ad4e.png",
+  "vfx/cocoon/brood.glb": "/media/vfx/cocoon/brood.b99488a9a932.glb",
+  "vfx/cocoon/silk.glb": "/media/vfx/cocoon/silk.6aa49e593e78.glb",
   "vfx/dirt_02.png": "/media/vfx/dirt_02.64c4d7d7f529.png",
   "vfx/fel_meteor_impact.png": "/media/vfx/fel_meteor_impact.dd8ea4c48cc5.png",
   "vfx/fire_01.png": "/media/vfx/fire_01.35fc73c16895.png",

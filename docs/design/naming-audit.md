@@ -714,6 +714,10 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Rolling Boulder | Warlord Grask's arena cast (web-verified 2026-09-21) | KEEP. Plain descriptive English for a rolling rock, a stock hazard across games and film. One match as a named ability (Earth Spirit in Dota 2, where the hero rides it); ours is a thrown hazard a party answers, and shares nothing but the two common words. |
 | Rooted in Dread | the marked player's root | KEEP. No match. |
 | Crushed / Staggered | the fail stun, and Grask's stun when it is thrown back | KEEP. Single common English words. |
+| Silk Cocoon | the attackable cocoon round a wrapped player (web-verified 2026-09-21) | KEEP. Plain English for the real thing (a silkworm's cocoon); crafting materials of near names exist in several games, none a coined term. |
+| Brood Cocoon | the lone player's attackable cocoon | KEEP. No match. |
+| Cocoon / Cocooned | Vysska's cast and the wrapped player's stun | KEEP. Single common English words. |
+| Draining Silk | her feeding's damage line | KEEP. No match. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
