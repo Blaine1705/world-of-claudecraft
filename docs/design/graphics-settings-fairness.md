@@ -585,7 +585,11 @@ Why it is fair: both styles ghost the SAME occluders on the same frame test, at 
 rest level, so what a player can see through a wall or a trunk is the same information on
 every tier; only the look of the ghost differs. The dithered style never waits on a fade
 gate (there is no program to link), so its ghost is never later than the blended one, and
-it returns to solid in one step rather than easing, which only shortens the see-through.
+it moves in one step both ways where the blended one eases over a few frames (a partly
+dense stipple reads as noise, so the dithered style takes the reduced-motion path). The
+blended tiers therefore reach the full see-through a few frames after the dithered ones:
+a cosmetic ease on the tiers that chose it, the same one the reduced-motion setting
+already removes, and never a hidden entity.
 The choice reads the static preset or the player's own dial, never the FPS governor.
 
 ## Enforcing guards

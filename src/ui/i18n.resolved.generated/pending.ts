@@ -421,34 +421,22 @@ export const pending: Record<string, readonly string[]> = {
   "zh_CN": [
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
-    "hudChrome.options.frameRateCapThirty",
-    "hudChrome.options.gfxGhostFade",
-    "hudChrome.options.gfxGhostFadeDithered",
-    "hudChrome.options.gfxGhostFadeSmooth"
+    "hudChrome.options.frameRateCapThirty"
   ],
   "zh_TW": [
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
-    "hudChrome.options.frameRateCapThirty",
-    "hudChrome.options.gfxGhostFade",
-    "hudChrome.options.gfxGhostFadeDithered",
-    "hudChrome.options.gfxGhostFadeSmooth"
+    "hudChrome.options.frameRateCapThirty"
   ],
   "ko_KR": [
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
-    "hudChrome.options.frameRateCapThirty",
-    "hudChrome.options.gfxGhostFade",
-    "hudChrome.options.gfxGhostFadeDithered",
-    "hudChrome.options.gfxGhostFadeSmooth"
+    "hudChrome.options.frameRateCapThirty"
   ],
   "ja_JP": [
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
-    "hudChrome.options.frameRateCapThirty",
-    "hudChrome.options.gfxGhostFade",
-    "hudChrome.options.gfxGhostFadeDithered",
-    "hudChrome.options.gfxGhostFadeSmooth"
+    "hudChrome.options.frameRateCapThirty"
   ],
   "pt_BR": [
     "abilityUi.forms.bearOrCat",
@@ -521,10 +509,7 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
-    "hudChrome.options.frameRateCapThirty",
-    "hudChrome.options.gfxGhostFade",
-    "hudChrome.options.gfxGhostFadeDithered",
-    "hudChrome.options.gfxGhostFadeSmooth"
+    "hudChrome.options.frameRateCapThirty"
   ],
   "cs_CZ": [
     "abilityUi.forms.bearOrCat",

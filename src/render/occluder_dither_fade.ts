@@ -19,24 +19,28 @@ const PROGRAM_CACHE_KEY = 'ghost-dither-fade-v1';
 const ANCHOR = '#include <clipping_planes_fragment>';
 const UNIFORM_SLOT = 'ghostDitherFade';
 
-let enabled: boolean | null = null;
+let forcedForTest: boolean | null = null;
+let forcedByUrl: boolean | null | undefined;
 
 /**
- * Read once per page: the style is baked into each hideable material's program
- * when its fade record is made, so it follows the graphics rebuild, never a
- * frame. `?ghostfade=dither|blend` overrides the profile for an A/B.
+ * The page's ghost style. Read where a hideable material or batch is BUILT
+ * (the style is baked into its program), and read live off GFX: a graphics
+ * rebuild republishes the profile in the same page and rebuilds every
+ * consumer, which must then see the new style. `?ghostfade=dither|blend`
+ * overrides the profile for an A/B.
  */
 export function ditherFadeEnabled(): boolean {
-  if (enabled === null) {
+  if (forcedForTest !== null) return forcedForTest;
+  if (forcedByUrl === undefined) {
     const search = typeof location === 'undefined' ? '' : location.search;
     const forced = new URLSearchParams(search).get('ghostfade');
-    enabled = forced === 'dither' ? true : forced === 'blend' ? false : GFX.ditheredGhostFade;
+    forcedByUrl = forced === 'dither' ? true : forced === 'blend' ? false : null;
   }
-  return enabled;
+  return forcedByUrl ?? GFX.ditheredGhostFade;
 }
 
 export function setDitherFadeEnabledForTest(value: boolean | null): void {
-  enabled = value;
+  forcedForTest = value;
 }
 
 /**

@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { activateGfxProfile, GFX, type GfxProfile } from '../src/render/gfx';
 import {
   attachDitherFade,
+  ditherFadeEnabled,
   ditherFadeUniform,
   setDitherFadeEnabledForTest,
 } from '../src/render/occluder_dither_fade';
@@ -96,5 +98,24 @@ describe('dithered camera ghost', () => {
     const restored = advanceOccluderFade([fade], ghosted, false, 1 / 60);
     expect(restored).toBe(1);
     expect(ditherFadeUniform(material)?.value).toBe(1);
+  });
+});
+
+describe('dithered camera ghost style', () => {
+  afterEach(() => setDitherFadeEnabledForTest(null));
+
+  it('follows a profile activated later in the same page', () => {
+    // A graphics rebuild republishes GFX without a reload; a style memoized at
+    // first read would leave the rebuilt world on the old one.
+    setDitherFadeEnabledForTest(null);
+    const before = { settings: { ...GFX } } as GfxProfile;
+    try {
+      activateGfxProfile({ settings: { ...GFX, ditheredGhostFade: true } } as GfxProfile);
+      expect(ditherFadeEnabled()).toBe(true);
+      activateGfxProfile({ settings: { ...GFX, ditheredGhostFade: false } } as GfxProfile);
+      expect(ditherFadeEnabled()).toBe(false);
+    } finally {
+      activateGfxProfile(before);
+    }
   });
 });
