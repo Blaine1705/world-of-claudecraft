@@ -26,6 +26,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
+import { worldPvpOnPlayerHealed } from '../pvp';
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
@@ -167,7 +168,12 @@ export function applyHeal(
   // ally helps land pays the healer an assist. Only healing that actually
   // landed counts (a fully overhealed or absorbed cast is not support), and the
   // battleground module owns every other rule.
-  if (healed > 0 && target.kind === 'player') ctx.bgOnPlayerHealed(target, source);
+  if (healed > 0 && target.kind === 'player') {
+    ctx.bgOnPlayerHealed(target, source);
+    // World PvP: healing a flagged ally is support for the kills they land
+    // (src/sim/pvp/world_pvp.ts owns the flag and window rules).
+    worldPvpOnPlayerHealed(ctx, target, source);
+  }
   // Talent procs listening for critical heals (deterministic, no rng draw).
   if (crit && source.kind === 'player') onSpellCrit(ctx, source, abilityId, target);
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op

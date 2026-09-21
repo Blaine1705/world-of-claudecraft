@@ -119,7 +119,13 @@ export type HonorReason =
   | 'battleground_first_win'
   | 'battleground_complete'
   | 'battleground_kill'
-  | 'battleground_assist';
+  | 'battleground_assist'
+  // World PvP (/pvp flag, src/sim/pvp/world_pvp.ts): the killing blow's share
+  // of the kill pool, and everyone else's who damaged the victim or healed a
+  // damager inside the assist window. Two reasons so the float and the chat
+  // line can name which one just paid, like the battleground drip above.
+  | 'world_kill'
+  | 'world_assist';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
@@ -5386,6 +5392,15 @@ export interface Entity extends ClientMirroredEntityFields {
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */
   jailed?: boolean;
+  /** World PvP flag (/pvp, src/sim/pvp/world_pvp.ts): two flagged players who
+   *  share neither a party nor a guild are mutually hostile anywhere in the
+   *  open world (isHostileTo's world arm). The DISPLAY mirror of the
+   *  authoritative PlayerMeta.worldPvp state, written only by that module
+   *  (the away.ts meta<->entity precedent), and it rides the entity wire
+   *  (`pvp`) so every nearby client colours the nameplate. Absent/false is
+   *  unflagged, so an unflagged character samples and serializes exactly as
+   *  before the flag existed. */
+  pvpFlag?: boolean;
   /** Wearing the operator-applied Cheater tag (src/sim/moderation/). Server-set
    *  via setCheaterMark at join restore and when an operator applies or lifts a
    *  mark; never true offline, never user-settable. Cosmetic: nothing reads it

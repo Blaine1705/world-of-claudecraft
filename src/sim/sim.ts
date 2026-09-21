@@ -629,6 +629,7 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
+import * as worldPvpMod from './pvp/world_pvp';
 // By path, not through the pvp barrel: see the comment in src/sim/pvp/index.ts.
 import {
   spawnWarfareQuartermaster,
@@ -1436,6 +1437,8 @@ export interface PlayerMeta {
   lifetimeHonor: number;
   // Persisted per-day, per-opponent ranked-win accounting for honor DR.
   honorArenaDaily?: HonorArenaDailyState;
+  // World PvP flag state (pvp/world_pvp.ts): absent until first raised.
+  worldPvp?: worldPvpMod.WorldPvpMetaState;
   prestigeRank: number;
   unlockedMilestones: Set<string>;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
@@ -1990,6 +1993,7 @@ export class Sim {
   // the behavior; these are its ctx live views.
   bgQueue: bgMod.BgQueueGroup[] = [];
   bgMatches = new Map<number, bgMod.BgMatch>(); // pid -> shared match (all members)
+  worldPvpBooks = worldPvpMod.newWorldPvpBooks(); // /pvp assist + DR books (live ctx view)
   private bgBusySlots = new Set<number>();
   private nextBgMatchId = 1;
   // Resolved rated-match records, drained post-tick by the authoritative host
@@ -3030,12 +3034,8 @@ export class Sim {
       // plus their current bar progress, so the leaderboard is meaningful for
       // existing characters from day one.
       meta.lifetimeXp = s.lifetimeXp ?? xpToReachLevel(player.level) + Math.max(0, s.xp);
-      meta.honor = honorMod.normalizeHonorCounter(s.honor);
-      meta.lifetimeHonor = Math.max(
-        meta.honor,
-        honorMod.normalizeHonorCounter(s.lifetimeHonor ?? meta.honor),
-      );
-      meta.honorArenaDaily = honorMod.normalizeHonorDailyState(s.honorArenaDaily);
+      honorMod.loadHonorState(meta, s);
+      worldPvpMod.loadWorldPvpState(meta, player, s.worldPvp, this.time);
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
       // `s.professions` is the legacy pre-rename field (#1119); `s.gatheringProficiency`
@@ -3987,38 +3987,10 @@ export class Sim {
       level: restore ? restore.level : e.level,
       xp: restore ? restore.xp : meta.xp,
       lifetimeXp: meta.lifetimeXp,
-      ...(meta.honor || meta.lifetimeHonor
-        ? { honor: meta.honor, lifetimeHonor: meta.lifetimeHonor }
-        : {}),
-      ...(meta.honorArenaDaily
-        ? {
-            honorArenaDaily: {
-              date: meta.honorArenaDaily.date,
-              winsByOpponent: { ...meta.honorArenaDaily.winsByOpponent },
-              // Optional ranked-loss DR window, on the same absent-when-empty
-              // rule as the battleground one below: a day with no paying loss
-              // writes nothing, so pre-loss-award saves stay byte-equal.
-              ...(meta.honorArenaDaily.lossesByOpponent &&
-              Object.keys(meta.honorArenaDaily.lossesByOpponent).length > 0
-                ? { lossesByOpponent: { ...meta.honorArenaDaily.lossesByOpponent } }
-                : {}),
-              fiestaCompletionsByOpponent: {
-                ...meta.honorArenaDaily.fiestaCompletionsByOpponent,
-              },
-              // Optional Thornhollow Fields DR window: omitted when empty so pre-Thornhollow Fields
-              // saves stay byte-equal (mirrors normalizeHonorDailyState).
-              ...(meta.honorArenaDaily.bgResultsByOpponent &&
-              Object.keys(meta.honorArenaDaily.bgResultsByOpponent).length > 0
-                ? { bgResultsByOpponent: { ...meta.honorArenaDaily.bgResultsByOpponent } }
-                : {}),
-              // Same absent-until-claimed rule as the DR window above: a day that
-              // has not paid the first-win bonus writes nothing (back-compat +
-              // parity-stable saves).
-              ...(meta.honorArenaDaily.bgFirstWinClaimed ? { bgFirstWinClaimed: true } : {}),
-              totalWins: meta.honorArenaDaily.totalWins,
-            },
-          }
-        : {}),
+      // Honor ledger + daily DR window (pvp/honor_persist.ts) and the World
+      // PvP flag record (pvp/world_pvp.ts): both absent-when-at-rest.
+      ...honorMod.savedHonorState(meta),
+      ...worldPvpMod.savedWorldPvpFields(meta, this.time),
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
@@ -5225,6 +5197,9 @@ export class Sim {
       get bgMatches() {
         return sim.bgMatches;
       },
+      get worldPvpBooks() {
+        return sim.worldPvpBooks;
+      },
       get bgBusySlots() {
         return sim.bgBusySlots;
       },
@@ -6205,6 +6180,9 @@ export class Sim {
     lap?.('engaged');
 
     this.updateDuels();
+    // World PvP disarm clock + DR sweep (pvp/world_pvp.ts): zero rng, so it
+    // cannot fork the draw order; a tick with nobody disarming touches nothing.
+    worldPvpMod.updateWorldPvp(this.ctx);
     lap?.('duels');
     this.updateCardDuelQueue();
     this.updateCardDuelDeadlines();
@@ -9349,6 +9327,9 @@ export class Sim {
       if (bg && bg.state === 'active' && this.bgMatches.get(target.id) === bg) {
         return bgMod.bgTeamOf(bg, attackerPlayer.id) !== bgMod.bgTeamOf(bg, target.id);
       }
+      // World PvP: two /pvp-flagged players outside a group and a guild
+      // (pvp/world_pvp.ts owns the rule; isFriendlyTo derives from this arm).
+      if (worldPvpMod.isWorldPvpHostile(this.ctx, attackerPlayer, target)) return true;
       // The jail brawl: prisoners are hostile to each other, always (pets
       // resolve to their owner via pvpController above, so a prisoner's pet
       // fights too). A visiting moderator is never jailed, so no prisoner
@@ -10891,6 +10872,19 @@ export class Sim {
 
   get lifetimeHonor(): number {
     return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.lifetimeHonor ?? 0);
+  }
+
+  // IWorldWorldPvp (pvp/world_pvp.ts): the /pvp flag readout + raise/lower.
+  get worldPvpInfo(): import('../world_api').WorldPvpInfo | null {
+    return this.primaryId === -1 ? null : worldPvpMod.worldPvpInfoFor(this.ctx, this.primaryId);
+  }
+
+  setWorldPvpFlag(enabled: boolean, pid = this.primaryId): void {
+    worldPvpMod.setWorldPvpFlag(this.ctx, pid, enabled);
+  }
+
+  worldPvpInfoFor(pid: number): import('../world_api').WorldPvpInfo | null {
+    return worldPvpMod.worldPvpInfoFor(this.ctx, pid);
   }
 
   get marketInfo(): import('../world_api').MarketInfo | null {

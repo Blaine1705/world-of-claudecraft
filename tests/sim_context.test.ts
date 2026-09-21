@@ -341,6 +341,7 @@ function makeFakeHost() {
     nextArenaMatchId: 1,
     bgQueue: [],
     bgMatches: new Map(),
+    worldPvpBooks: { recentDamage: new Map(), recentSupport: new Map(), killPairs: new Map(), sweptAtTick: 0 },
     bgBusySlots: new Set(),
     bgOutcomes: [],
     bgProposals: [],

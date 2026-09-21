@@ -59,3 +59,41 @@ export {
 //
 // Its single consumer is the Sim coordinator during world init, so it is not
 // public API in any meaningful sense: import it by path.
+export { loadHonorState, savedHonorState } from './honor_persist';
+export {
+  isWorldPvpFlagged,
+  isWorldPvpHostile,
+  loadWorldPvpState,
+  newWorldPvpBooks,
+  savedWorldPvpFields,
+  savedWorldPvpState,
+  setWorldPvpFlag,
+  toggleWorldPvpFlag,
+  updateWorldPvp,
+  WORLD_PVP_DISARM_MINUTES,
+  type WorldPvpBooks,
+  type WorldPvpMetaState,
+  type WorldPvpSavedState,
+  worldPvpDefeatLine,
+  worldPvpDisarmRemaining,
+  worldPvpInfoFor,
+  worldPvpKillLine,
+  worldPvpOnPlayerDamaged,
+  worldPvpOnPlayerDeath,
+  worldPvpOnPlayerHealed,
+} from './world_pvp';
+export {
+  WORLD_PVP_ASSIST_WINDOW,
+  WORLD_PVP_DISARM_SECONDS,
+  WORLD_PVP_GREY_LEVEL_GAP,
+  WORLD_PVP_KILL_HONOR,
+  WORLD_PVP_MIN_LEVEL,
+  WORLD_PVP_PAIR_DR_WINDOW,
+  WORLD_PVP_STAKE_CAP_COPPER,
+  WORLD_PVP_STAKE_FRACTION,
+  worldPvpPairHostile,
+  worldPvpPairMultiplier,
+  worldPvpSplit,
+  worldPvpStake,
+  worldPvpVictimIsGrey,
+} from './world_pvp_rules';

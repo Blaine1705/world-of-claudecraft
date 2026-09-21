@@ -48,7 +48,7 @@ import {
   recordCorpseHarvestDeath,
   releaseCorpseHarvest,
 } from '../professions/corpse_harvest_session';
-import { pvpDamageMultiplier } from '../pvp';
+import { pvpDamageMultiplier, worldPvpOnPlayerDamaged, worldPvpOnPlayerDeath } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import { computeCharacterModifiers } from '../set_bonus_mods';
@@ -1167,6 +1167,9 @@ export function dealDamage(
   // assist window); this hub only reports the hit.
   if (source && amount > 0 && target.kind === 'player' && !target.dead) {
     ctx.bgOnPlayerDamaged(target, source);
+    // World PvP assists: the same idea for a flagged victim in the open world
+    // (src/sim/pvp/world_pvp.ts owns the flag, the pair, and the window rules).
+    worldPvpOnPlayerDamaged(ctx, target, source);
   }
 
   if (source && source.kind === 'player' && source.id !== target.id) {
@@ -1559,6 +1562,11 @@ export function handleDeath(
     // lies where it fell and the player's own Release press sends the spirit to
     // the warded keep graveyard, where the team wave clock raises it.
     ctx.bgOnPlayerDeath(e, killer);
+    // World PvP: a flagged player's death in the open world moves the gold
+    // stake and pays the honor pool to everyone who worked for the kill. Pure
+    // ledger arithmetic on the sim clock, zero rng; a no-op for every death
+    // that was not a flagged player's at a flagged player's hands.
+    worldPvpOnPlayerDeath(ctx, e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
         // turn on the next nearby attacker; go home only if nobody is left

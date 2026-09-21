@@ -44,6 +44,7 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
+import type { WorldPvpBooks } from './pvp/world_pvp';
 import type { BgMatch, BgQueueGroup } from './social/battleground';
 import type { BgOutcomeRecord } from './social/battleground_outcomes';
 import type { BgProposal } from './social/battleground_proposal';
@@ -263,6 +264,10 @@ export interface SimContextPrimitives {
   readonly bgMatches: Map<number, BgMatch>;
   readonly bgBusySlots: Set<number>;
   nextBgMatchId: number;
+  // World PvP (pvp/world_pvp.ts): the assist recency books and the per-pair
+  // diminishing-returns rows behind the /pvp flag's kill resolution, mutated
+  // in place by that module only. Backing field stays on Sim.
+  readonly worldPvpBooks: WorldPvpBooks;
   // Resolved-match records the authoritative host drains post-tick
   // (social/battleground_outcomes.ts). Observability only: no gameplay branch
   // reads it and nothing here draws rng. Live view; the array stays on Sim.
@@ -1406,6 +1411,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get bgBusySlots() {
       return host.bgBusySlots;
+    },
+    get worldPvpBooks() {
+      return host.worldPvpBooks;
     },
     get bgProposals() {
       return host.bgProposals;

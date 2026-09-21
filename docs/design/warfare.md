@@ -368,6 +368,52 @@ draw score. The queue is rated but NOT rating-matched: matchmaking fills
 first-come from the queue, and strict banding is an explicitly deferred
 follow-up.
 
+## World PvP income
+
+The `/pvp` flag (`src/sim/pvp/world_pvp.ts`, rules in `world_pvp_rules.ts`) is the
+open road to the same Warfare vendor: no queue, no rating, no match clock. Two
+flagged players who share neither a party, a raid nor a guild are mutually
+hostile anywhere in the open world; everyone else is exactly as safe as before
+(the #96 griefing invariant holds for every unflagged character, and a flagged
+player can never touch an unflagged one either way). A flag takes
+`WORLD_PVP_DISARM_SECONDS` (300, the classic five minutes) to come down and the
+drop waits for combat to end, so switching off can never fizzle the blow already
+on its way. Raising it needs `WORLD_PVP_MIN_LEVEL` (10).
+
+A world kill moves a GOLD stake and pays an HONOR pool, both split across every
+contributor: the killing blow, everyone who damaged the victim inside
+`WORLD_PVP_ASSIST_WINDOW` (10 s, the battleground's window), and every flagged
+healer who kept one of those damagers standing. The split is equal, with the
+integer remainder going to the blow, so a clean 1v1 pays the whole of both and a
+five-player gank pays each of them a fifth: more honor and more gold for fighting
+alone is the owner's stated shape.
+
+- Gold: the smaller of `WORLD_PVP_STAKE_CAP_COPPER` (5 gold) and
+  `WORLD_PVP_STAKE_FRACTION` (10 percent) of the victim's purse. The victim is
+  charged exactly what was paid out, never more.
+- Honor: `WORLD_PVP_KILL_HONOR` (10) per kill, the whole pool, split as above.
+  Deliberately BELOW the instanced faucets: a Thornhollow Fields win pays 60 plus
+  its drip and a ranked 1v1 win pays 25, so a player who wants Warfare gear
+  fastest still queues. Battleground and arena pay more; world PvP pays for
+  being out in the world. The Double Honor Weekend does not apply to it (that
+  event is battleground-only by design).
+- Anti-farm: the per-pair diminishing returns ride `HONOR_REPEAT_DR` (100, 50,
+  25, then 0 percent) for honor AND gold alike, keyed by character id so a relog
+  cannot reset them, on a rolling `WORLD_PVP_PAIR_DR_WINDOW` (one hour) from the
+  first kill of the pair: camping one player pays three times and then nothing,
+  and the victim is not charged for a fully decayed contributor.
+- Grey rule: a victim more than `WORLD_PVP_GREY_LEVEL_GAP` (5) levels below a
+  contributor pays that contributor nothing (neither honor nor gold), the
+  classic grey-kill rule and the reason a capped character cannot farm flagged
+  low-level purses.
+
+Deaths to a mob or the environment stake nothing, whatever the flag says. A
+flagged player inside a live battleground or arena is under that mode's rules,
+never the open world's. Every amount is integer copper and integer honor, the
+arithmetic is on the sim clock, and nothing here draws rng, so the offline Sim,
+the server and the headless env resolve every kill identically
+(`tests/world_pvp.test.ts`, `tests/world_pvp_rules.test.ts`).
+
 ## FURY prices
 
 FURY sells one item-level 31 epic tier for every equipment slot the game

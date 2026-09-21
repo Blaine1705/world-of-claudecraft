@@ -21,6 +21,30 @@ ratings.
   neither, never just one.
 - `power.ts` owns rating conversion, the independent offense/defense caps, and
   the hostile-player damage multiplier. It must stay pure and deterministic.
+- `honor_persist.ts` owns the persisted form of the honor ledger and its daily
+  DR window (`savedHonorState` / `loadHonorState`), moved out of the Sim
+  coordinator's serialize/load so a new honor field lands here, not in `sim.ts`.
+- `world_pvp_rules.ts` owns the World PvP (`/pvp` flag) PURE rules: the
+  mutual-flag pair verdict with its party and guild exemptions
+  (`worldPvpPairHostile`, also read by the renderer and the HUD through
+  `src/ui/pvp_hostile_core.ts`), the gold stake, the equal split with the
+  killing blow taking the remainder, the grey-level rule, and the per-pair DR
+  multiplier (shared `HONOR_REPEAT_DR`). No ctx, no rng, no clock.
+- `world_pvp.ts` owns the World PvP SYSTEM behind the `SimContext` seam: the
+  flag state (`PlayerMeta.worldPvp`, absent until first raised; `Entity.pvpFlag`
+  is its display mirror and the ONLY writer is this module, the away.ts
+  meta<->entity precedent), the 5-minute disarm clock (deferred while in
+  combat, ticked from `Sim.tick` beside the duels), the assist and DR books
+  (`Sim.worldPvpBooks`, a live `ctx.worldPvpBooks` view: the modules hold
+  functions, the Sim holds state), the damage / heal / death hooks the combat
+  hub calls directly, the kill resolution (stake + honor pool, integer copper
+  and integer honor, zero rng), the IWorld readout (`worldPvpInfoFor`), the
+  `/pvp` chat arms' entry points, and the persisted record (`savedWorldPvpFields`
+  / `loadWorldPvpState`, the countdown stored as remaining seconds and
+  re-anchored on load). Every player notice is sim English with a matcher RULE
+  in `src/ui/sim_i18n.ts` (S3). Numbers and rules: `docs/design/warfare.md`,
+  "World PvP income"; tests: `tests/world_pvp.test.ts`,
+  `tests/world_pvp_rules.test.ts`.
 - `warfare_quartermaster.ts` spawns Warmarshal Draven Kole, the Highwatch
   WARFARE honor vendor, under his RESERVED entity id
   (`WARFARE_QUARTERMASTER_ENTITY_ID`, `1_000_000_002`, the singleton band
