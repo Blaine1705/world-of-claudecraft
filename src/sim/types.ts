@@ -3959,10 +3959,20 @@ export interface CampDef {
 // Ground interactables (sparkle objects)
 export const STABLE_GROUND_OBJECT_ENTITY_ID_MIN = 2_147_000_000;
 
+export interface GroundObjectPosition {
+  x: number;
+  z: number;
+  /** Exact world height when authored; omitted positions sit on the terrain. */
+  y?: number;
+  /** Authored yaw in radians. */
+  facing?: number;
+  scale?: number;
+}
+
 export interface GroundObjectDef {
   itemId: string;
   name: string;
-  positions: { x: number; z: number }[];
+  positions: GroundObjectPosition[];
   /** Optional ids in the reserved high range, used without shifting the legacy roster. */
   entityIds?: readonly number[];
 }

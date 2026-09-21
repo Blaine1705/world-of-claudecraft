@@ -1,23 +1,35 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import * as THREE from 'three';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { groundQuestObjectYaw } from '../src/render/farshore_salvage_assets';
 import { gfxInternalsForTest, resetSurfaceMaterialProfileCache } from '../src/render/gfx';
 import {
   buildGroundQuestObject,
   farshoreSalvagePrewarmPlan,
+  prepareFarshoreSalvageObjects,
   prewarmFarshoreSalvageObjects,
   questObjectPreloadInternalsForTest,
   resetQuestObjectProfileCaches,
 } from '../src/render/quest_objects';
+import { createWorldQuestPlacerModel } from '../src/render/world_quest_placer_assets';
+import { FARSHORE_SALVAGE_PLACEMENTS } from '../src/sim/content/farshore_shipwreck_layout';
+
+vi.mock('../src/render/assets/loader', () => ({
+  loadGltf: vi.fn(async () => {
+    const scene = new THREE.Group();
+    scene.add(new THREE.Mesh(new THREE.BoxGeometry(2, 1, 4), new THREE.MeshStandardMaterial()));
+    return { scene };
+  }),
+}));
 
 const WRECKAGE_ASSETS = [
-  'wreckage_broken_planks.glb',
-  'wreckage_waterlogged_barrel.glb',
-  'wreckage_damaged_crate.glb',
-  'wreckage_fallen_anchor.glb',
-  'wreckage_hull_fragment.glb',
-  'wreckage_capsized_rowboat.glb',
+  'broken_planks.glb',
+  'waterlogged_barrel.glb',
+  'damaged_crate.glb',
+  'fallen_anchor.glb',
+  'hull_fragment.glb',
+  'capsized_rowboat.glb',
 ] as const;
 
 let restoreGfx: (() => void) | null = null;
@@ -30,7 +42,8 @@ afterEach(() => {
 });
 
 describe('Farshore salvage render assets', () => {
-  it('pins all six shipped GLBs to their visual slots, manifest, credits, and boot prewarm', () => {
+  it('pins all six shipped GLBs to their visual slots, manifest, credits, and boot prewarm', async () => {
+    await prepareFarshoreSalvageObjects();
     const manifest = readFileSync('src/render/assets/manifest.generated.ts', 'utf8');
     const credits = readFileSync('CREDITS.md', 'utf8');
     const renderer = readFileSync('src/render/zone_prewarm_groups.ts', 'utf8');
@@ -40,7 +53,7 @@ describe('Farshore salvage render assets', () => {
 
     const expectedPlan = WRECKAGE_ASSETS.map((_, visual) => ({
       visual,
-      entityId: 2_147_100_100 + visual,
+      entityId: 2_147_100_100 + [3, 1, 2, 9, 0, 6][visual],
       itemId: 'wreckfield_flotsam_crate',
       poolKey: `object:wreckfield_flotsam_crate:salvage-${visual}`,
     }));
@@ -62,7 +75,7 @@ describe('Farshore salvage render assets', () => {
     );
 
     WRECKAGE_ASSETS.forEach((filename, visual) => {
-      const url = `/models/props/${filename}`;
+      const url = `/models/world_quests/shipwreck/${filename}`;
       const entry = farshoreSalvagePrewarmPlan[visual];
       expect(entry?.visual).toBe(visual);
       expect(
@@ -74,14 +87,54 @@ describe('Farshore salvage render assets', () => {
       expect(questObjectPreloadInternalsForTest.questObjectUrl[`farshore_salvage_${visual}`]).toBe(
         url,
       );
-      const file = path.join(process.cwd(), 'public', 'models', 'props', filename);
+      const file = path.join(
+        process.cwd(),
+        'public',
+        'models',
+        'world_quests',
+        'shipwreck',
+        filename,
+      );
       expect(existsSync(file)).toBe(true);
       expect(statSync(file).size).toBeGreaterThan(1_000);
-      expect(manifest).toContain(`models/props/${filename}`);
-      expect(credits).toContain(`Generated prop model (${filename.replace('.glb', '')})`);
+      expect(manifest).toContain(`models/world_quests/shipwreck/${filename}`);
+      expect(credits).toContain('public/models/world_quests/shipwreck/');
     });
     expect(questObjectPreloadInternalsForTest.visualItemIdForEntity('supply_crate', 17)).toBe(
       'supply_crate',
+    );
+  });
+
+  it('matches every exported model and transform without random yaw on fresh or pooled bodies', async () => {
+    await prepareFarshoreSalvageObjects();
+    for (const [index, placement] of FARSHORE_SALVAGE_PLACEMENTS.entries()) {
+      const id = 2147100100 + index;
+      const { group, height } = buildGroundQuestObject('wreckfield_flotsam_crate', id);
+      expect(group.children.map((child) => child.name)).toEqual([placement.key]);
+      const wrapper = new THREE.Group();
+      wrapper.add(group);
+      wrapper.position.set(placement.x, placement.y, placement.z);
+      wrapper.rotation.y = THREE.MathUtils.degToRad(placement.rot);
+      wrapper.scale.setScalar(placement.scale);
+      const preview = createWorldQuestPlacerModel(placement.key);
+      preview.position.copy(wrapper.position);
+      preview.rotation.copy(wrapper.rotation);
+      preview.scale.copy(wrapper.scale);
+      expect(group.rotation.y).toBe(0);
+      group.rotation.y = 2; // pool carried a prior body rotation
+      group.rotation.y = groundQuestObjectYaw('wreckfield_flotsam_crate', id);
+      expect(group.rotation.y).toBe(0);
+      expect(new THREE.Box3().setFromObject(wrapper)).toEqual(
+        new THREE.Box3().setFromObject(preview),
+      );
+      expect(height).toBe(1); // native height, scaled only by the entity wrapper
+    }
+    expect(groundQuestObjectYaw('supply_crate', 17)).toBe((17 % 7) * 0.45);
+    expect(
+      questObjectPreloadInternalsForTest.visualItemIdForEntity('supply_crate', 2147100100),
+    ).toBe('supply_crate');
+    expect(readFileSync('src/render/renderer.ts', 'utf8')).toContain(
+      "if (result.reused) body.rotation.y = groundQuestObjectYaw(e.objectItemId ?? '', e.id);",
     );
   });
 

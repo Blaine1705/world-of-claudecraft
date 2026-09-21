@@ -146,8 +146,8 @@ function interact(r: ReturnType<typeof rig>, gather?: NearbyGatherOptions) {
 }
 
 describe('tryNearbyInteraction', () => {
-  it('skips rotated-out shipwreck debris in favor of a visible weekly piece', () => {
-    const hidden = entity({
+  it('admits the nearest authored piece beyond the previous eight-piece layout', () => {
+    const nearest = entity({
       id: 2_147_100_108,
       kind: 'object',
       templateId: 'ground_wreckfield_flotsam_crate',
@@ -155,7 +155,7 @@ describe('tryNearbyInteraction', () => {
       lootable: true,
       pos: { x: 1, y: 0, z: 0 },
     });
-    const visible = entity({
+    const farther = entity({
       id: 2_147_100_100,
       kind: 'object',
       templateId: 'ground_wreckfield_flotsam_crate',
@@ -163,12 +163,12 @@ describe('tryNearbyInteraction', () => {
       lootable: true,
       pos: { x: 2, y: 0, z: 0 },
     });
-    const r = rig([hidden, visible]);
+    const r = rig([nearest, farther]);
     r.world.worldQuestCycle = worldQuestCycleForResetDay('2026-09-06');
 
     expect(interact(r)).toBe(true);
-    expect(r.calls).toContain(`pickup:${visible.id}`);
-    expect(r.calls).not.toContain(`pickup:${hidden.id}`);
+    expect(r.calls).toContain(`pickup:${nearest.id}`);
+    expect(r.calls).not.toContain(`pickup:${farther.id}`);
   });
 
   it('skips a personally recovered shipwreck piece in favor of the next one', () => {

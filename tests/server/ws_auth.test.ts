@@ -326,6 +326,7 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
 
   it.each([
     'auth-world',
+    'auth-world-42', // previous Farshore salvage layout and model mapping
     // one epoch AHEAD of the live discriminator, derived so a layout-version
     // bump can never turn this row into the current epoch by accident (the
     // hardcoded 'auth-world-21' row did exactly that when 20 became 21)

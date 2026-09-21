@@ -6,6 +6,7 @@ import type {
   WorldQuestBeamPuzzleDef,
   WorldQuestDef,
 } from '../types';
+import { FARSHORE_SALVAGE_PLACEMENTS } from './farshore_shipwreck_layout';
 import { WORLD_QUEST_CANNON, WORLD_QUEST_LAST_KEEP_CANNON } from './vehicle_stations';
 import { WORLD_QUEST_CALLIGRAPHY_QUEST } from './world_quest_calligraphy';
 import { WORLD_QUEST_FORGING } from './world_quest_forging';
@@ -254,52 +255,14 @@ export const WORLD_QUEST_ESCORTS: Record<string, EscortDef> = {
 export const FARSHORE_SALVAGE_OBJECT_ITEM_ID = 'wreckfield_flotsam_crate';
 export const FARSHORE_SALVAGE_ENTITY_ID_START = 2_147_100_100;
 
-// Every piece lies on the dry strand (7 to 13 yd above the waterline, walkable
-// slope), at least 6 yd from any other piece and clear of every Gullhaven NPC and
-// prop, chosen by farthest-point sampling from the wreck at (270, 106) so each
-// weekly layout spans the whole beach from the hull to the town's north edge
-// (about 50 by 40 yd) instead of one tight grid. The strand is boxed by the
-// Riftfields hostiles to the east (tests/world_quests.test.ts pins a quiet
-// shoreline), so the scatter runs west and south of the hull instead.
-// tests/world_quest_salvage.test.ts pins the band, spacing and spread.
-const FARSHORE_SALVAGE_POSITIONS = [
-  // Layout 1: from the hull along the high-tide line to the town's north edge.
-  { x: 281, z: 86 },
-  { x: 252, z: 72 },
-  { x: 279, z: 67 },
-  { x: 288, z: 80 },
-  { x: 304, z: 85 },
-  { x: 303, z: 102 },
-  { x: 299, z: 108 },
-  { x: 287, z: 99 },
-  // Layout 2: debris washed farther along after a change in current.
-  { x: 267, z: 81 },
-  { x: 270, z: 72 },
-  { x: 283, z: 73 },
-  { x: 305, z: 75 },
-  { x: 304, z: 95 },
-  { x: 305, z: 112 },
-  { x: 288, z: 91 },
-  { x: 279, z: 94 },
-  // Layout 3: a broad scatter from the Landing road to the northern strand.
-  { x: 259, z: 77 },
-  { x: 277, z: 78 },
-  { x: 290, z: 69 },
-  { x: 295, z: 85 },
-  { x: 298, z: 93 },
-  { x: 295, z: 99 },
-  { x: 292, z: 105 },
-  { x: 272, z: 88 },
-] as const;
-
-const FARSHORE_SALVAGE_ENTITY_IDS = FARSHORE_SALVAGE_POSITIONS.map(
+// One approved scatter replaces the former rotating layouts. The objective
+// still requires eight distinct recoveries, with every placed debris available.
+const FARSHORE_SALVAGE_ENTITY_IDS = FARSHORE_SALVAGE_PLACEMENTS.map(
   (_, index) => FARSHORE_SALVAGE_ENTITY_ID_START + index,
 );
 
 export const FARSHORE_SALVAGE_LAYOUTS: readonly (readonly number[])[] = [
-  FARSHORE_SALVAGE_ENTITY_IDS.slice(0, 8),
-  FARSHORE_SALVAGE_ENTITY_IDS.slice(8, 16),
-  FARSHORE_SALVAGE_ENTITY_IDS.slice(16, 24),
+  FARSHORE_SALVAGE_ENTITY_IDS,
 ];
 
 export const WORLD_QUEST_ITEMS: Record<string, ItemDef> = {
@@ -372,7 +335,13 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
     // ids select the bespoke model and personal weekly visibility.
     itemId: FARSHORE_SALVAGE_OBJECT_ITEM_ID,
     name: 'Shipwreck Debris',
-    positions: [...FARSHORE_SALVAGE_POSITIONS],
+    positions: FARSHORE_SALVAGE_PLACEMENTS.map(({ x, y, z, rot, scale }) => ({
+      x,
+      y,
+      z,
+      facing: (rot * Math.PI) / 180,
+      scale,
+    })),
     entityIds: [...FARSHORE_SALVAGE_ENTITY_IDS],
   },
 ];
@@ -644,9 +613,8 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_farshore_salvage',
     zoneId: 'farshore_isle',
     minLevel: WORLD_QUEST_MIN_LEVEL,
-    // Covers every authored piece plus its interact reach (farthest 37 + 5 yd)
-    // and the wreck itself (25 yd).
-    area: { x: 286, z: 87, radius: 44 },
+    // Covers the full approved scatter and its interact reach, including the hull.
+    area: { x: 347.6, z: 126.45, radius: 54 },
     objective: {
       type: 'salvage',
       objectItemId: FARSHORE_SALVAGE_OBJECT_ITEM_ID,
