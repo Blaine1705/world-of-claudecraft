@@ -169,9 +169,9 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
 - `launch_paperdoll_slots.ts`: the FROZEN launch-era slot list, for launch-era
   completeness records ONLY: never validate a slot against it; use `isEquipSlot` from
   `types.ts`, derived from the live `ALL_EQUIP_SLOTS`.
-- `material_taxonomy.ts` + `material_profession_affinity.ts`: UI-ONLY sim leaves,
-  consumed only by `src/ui`; no `src/sim` file may import them (enforced by their
-  headers).
+- `material_taxonomy.ts` + `material_profession_affinity.ts` + `town_quests.ts`: UI-ONLY
+  sim leaves, consumed only by `src/ui`; no `src/sim` file may import them (pinned by the
+  `GUARDED_MODULES` walk in `tests/material_taxonomy.test.ts`).
 - `mob/scan_counters.ts` + `social/battleground_outcomes.ts`: the read-after-tick
   pattern: a capped, drainable tally the authoritative host reads post-tick
   (`battleground_outcomes` is written once per match, not once per fighter, because

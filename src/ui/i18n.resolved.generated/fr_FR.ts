@@ -20323,6 +20323,7 @@ export const fr_FR: EnTranslations = {
       "eastbrook_vale": {
         "name": "Val d'Eastbrook",
         "welcome": "Trouvez le maréchal Redbrook en ville: il a du travail pour vous.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20368,6 +20369,7 @@ export const fr_FR: EnTranslations = {
       "mirefen_marsh": {
         "name": "Marais de Mirefen",
         "welcome": "Présentez-vous au gardien Fenwick à la porte de Fenbridge.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20398,6 +20400,7 @@ export const fr_FR: EnTranslations = {
       "thornpeak_heights": {
         "name": "Hauteurs de Thornpeak",
         "welcome": "La capitaine Thessaly tient le mur de Highwatch, à peine.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"

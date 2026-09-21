@@ -20323,6 +20323,7 @@ export const nl_NL: EnTranslations = {
       "eastbrook_vale": {
         "name": "Oostbeekdal",
         "welcome": "Zoek Maarschalk Redbrook in de stad, hij heeft werk voor je.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Oostbeek"
@@ -20368,6 +20369,7 @@ export const nl_NL: EnTranslations = {
       "mirefen_marsh": {
         "name": "Slijkveenmoeras",
         "welcome": "Meld je bij Wachter Fenwick bij de poort van Veenbrug.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Veenbrug"
@@ -20398,6 +20400,7 @@ export const nl_NL: EnTranslations = {
       "thornpeak_heights": {
         "name": "Doorntop-Hoogten",
         "welcome": "Kapitein Thessaly houdt de muur bij Hoogwacht, ternauwernood.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Hoogwacht"
