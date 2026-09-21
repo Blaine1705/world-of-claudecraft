@@ -39,6 +39,7 @@ import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
 import { heroicVariantId } from '../content/heroic_variants';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
+import { publicInstanceView } from '../item_instance_transfer';
 import { itemLevel } from '../item_level';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
 import { isHarvestableCorpse } from '../professions/gathering';
@@ -91,6 +92,11 @@ export interface PendingLootRoll {
   mobId: number;
   itemId: string;
   itemName: string;
+  // The exact corpse copy, held for custody (granted verbatim to the winner or
+  // returned to the corpse). Every cross-player projection of it (roll prompts,
+  // status rows, loot events) goes through publicInstanceView, the same
+  // allowlist the exchange pipes use, so a future custody field on the copy
+  // never reaches the other candidates by default.
   instance?: ItemInstancePayload;
   quality: ItemDef['quality'];
   candidates: number[];
@@ -473,7 +479,7 @@ function startNeedGreedRoll(
       itemId,
       itemName,
       quality: roll.quality,
-      ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+      ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
       expiresAt: roll.expiresAt,
       pid: candidate.entityId,
     });
@@ -485,7 +491,7 @@ function startNeedGreedRoll(
       pid,
       rollId: roll.id,
       itemId,
-      ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+      ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
     });
   return true;
 }
@@ -535,7 +541,7 @@ function startMasterLootRoll(
     itemId,
     itemName,
     quality: roll.quality,
-    ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+    ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
     expiresAt: roll.expiresAt,
     candidates: candidates.map((candidate) => ({ pid: candidate.entityId, name: candidate.name })),
     pid: looterPid,
@@ -646,7 +652,7 @@ export function activeLootRolls(ctx: SimContext, pid: number): LootRollPrompt[] 
       itemId: roll.itemId,
       itemName: roll.itemName,
       quality: roll.quality,
-      ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+      ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
       expiresAt: roll.expiresAt,
     });
   }
@@ -670,7 +676,7 @@ export function lootRollGroupStatus(ctx: SimContext, pid: number): LootRollGroup
       itemId: roll.itemId,
       itemName: roll.itemName,
       quality: roll.quality,
-      ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+      ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
       expiresAt: roll.expiresAt,
       entries: roll.candidates.map((candidate) => ({
         pid: candidate,
@@ -713,7 +719,7 @@ export function activeMasterLootRolls(ctx: SimContext, pid: number): MasterLootP
       itemId: roll.itemId,
       itemName: roll.itemName,
       quality: roll.quality,
-      ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+      ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
       expiresAt: roll.expiresAt,
       // Live name first, open-time snapshot second: the same fallback chain
       // resolveLootRoll uses. Both later arms are unreachable here rather than
@@ -872,7 +878,7 @@ export function assignMasterLoot(
         type: 'loot',
         rollId: roll.id,
         itemId: roll.itemId,
-        ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+        ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
         text: `${r.meta.name} assigned [[i:${roll.itemId}]] to ${targetName}.`,
         pid,
       });
@@ -911,7 +917,7 @@ function convertMasterRollToNeedGreed(
       itemId: roll.itemId,
       itemName: roll.itemName,
       quality: roll.quality,
-      ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+      ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
       expiresAt: roll.expiresAt,
       pid,
     });
@@ -983,7 +989,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
         pid,
         rollId: roll.id,
         itemId: roll.itemId,
-        ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+        ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
       });
     return;
   }
@@ -1002,7 +1008,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
         type: 'loot',
         rollId: roll.id,
         itemId: roll.itemId,
-        ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+        ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
         text:
           entry.result.choice === 'need'
             ? `Need Roll - ${entry.result.roll ?? 0} for [[i:${roll.itemId}]] by ${rollerName}`
@@ -1022,7 +1028,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       type: 'loot',
       rollId: roll.id,
       itemId: roll.itemId,
-      ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+      ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
       text: `${winnerName} wins [[i:${roll.itemId}]] (${winner.result.roll ?? 0})`,
       pid,
     });
@@ -1040,7 +1046,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
         type: 'loot',
         rollId: roll.id,
         itemId: roll.itemId,
-        ...(roll.instance ? { instance: cloneItemInstancePayload(roll.instance) } : {}),
+        ...(roll.instance ? { instance: publicInstanceView(roll.instance) } : {}),
         text: `${winnerName} was offline; [[i:${roll.itemId}]] returned to the corpse.`,
         pid,
       });

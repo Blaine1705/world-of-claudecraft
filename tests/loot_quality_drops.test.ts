@@ -65,6 +65,41 @@ describe('enemy quality copies through authoritative loot distribution', () => {
     expect(copy(sim, a)?.partyTrade?.eligible).toEqual(['Alpha', 'Bravo']);
   });
 
+  it('projects only the public descriptor to the other candidates, never custody fields', () => {
+    // Roll prompts, status rows and the party-wide loot events go through
+    // publicInstanceView (the exchange allowlist): a corpse copy carrying
+    // private custody data reaches the winner verbatim and everyone else
+    // trimmed, so a future custody field never widens by default.
+    const { sim, a, b, mob } = setup();
+    mob.loot!.items[0].instance = {
+      ...structuredClone(quality),
+      boundTo: 99,
+      bindOnTrade: true,
+      charges: { private: 2 },
+    };
+    sim.drainEvents();
+    expect(sim.lootCorpse(mob.id, a)).toBe(true);
+    for (const pid of [a, b]) {
+      expect(activeLootRolls(sim.ctx, pid)[0].instance).toEqual(quality);
+      expect(lootRollGroupStatus(sim.ctx, pid)[0].instance).toEqual(quality);
+    }
+    const carried = (events: ReturnType<typeof sim.drainEvents>) =>
+      events
+        .filter((ev) => 'instance' in ev && ev.instance !== undefined)
+        .map((ev) => (ev as { pid?: number; instance?: unknown }).instance);
+    const opened = carried(sim.drainEvents());
+    expect(opened.length).toBeGreaterThan(0);
+    for (const instance of opened) expect(instance).toEqual(quality);
+    win(sim, a, b);
+    // The loser only ever sees the public projection; the winner's receipt is
+    // their own custody copy and may carry more.
+    const resolved = sim.drainEvents();
+    const toLoser = carried(resolved.filter((ev) => 'pid' in ev && ev.pid === b));
+    expect(toLoser.length).toBeGreaterThan(0);
+    for (const instance of toLoser) expect(instance).toEqual(quality);
+    expect(copy(sim, a)?.lootQuality).toEqual(quality.lootQuality);
+  });
+
   it('directly loots every solo copy without rerolling quality', () => {
     const { sim, a, mob, meta } = setup(false, 2);
     const int = vi.spyOn(sim.ctx.rng, 'int');
