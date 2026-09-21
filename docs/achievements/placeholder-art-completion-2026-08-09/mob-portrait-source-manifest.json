@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "9979229f0ecdd759764cd1bc269edd69c1de2465e0498edb910fca91beae7161",
+  "rendererFingerprint": "b6885a83051e428838cb9f4854464d75dbb044fc638e00fd04a3af88f1f25948",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5008161,
-      "sha256": "20330540c8569fac35731f0743ec406744a39e3821eb484077c1ba610d162e03",
+      "bytes": 5008309,
+      "sha256": "34158ebc81791066e590f2b817d5ea97b3dbaddca9da62dc3efd0db49d81e5b9",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3382,8 +3382,8 @@
       "visualKey": "mob_abyssal_tentacle",
       "renderSpec": {
         "model": {
-          "url": "vfx/tentacles/trunk.glb",
-          "path": "public/vfx/tentacles/trunk.glb",
+          "url": "models/creatures/hoard_tentacle_trunk.glb",
+          "path": "public/models/creatures/hoard_tentacle_trunk.glb",
           "bytes": 7728,
           "sha256": "e7b1753abd09ee2137d535d6bd3d592bfadb2a9f89968db0fcd12b9a89a360e3"
         },
@@ -3402,7 +3402,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3b4249d55e0d84f163f1bd77f6a13b08dfcb561e6ec9bfb7c55c08d5288d1b0e",
+      "sourceFingerprint": "bc6c7542a09bfc4b2d228bd453adf5ee746911e62241298d819a150d7aa291ac",
       "output": {
         "path": "public/ui/mobs/hoard_abyssal_tentacle.webp",
         "bytes": 1874,
@@ -3416,8 +3416,8 @@
       "visualKey": "mob_bound_pulsar",
       "renderSpec": {
         "model": {
-          "url": "vfx/pulsars/core.glb",
-          "path": "public/vfx/pulsars/core.glb",
+          "url": "models/creatures/hoard_pulsar_core.glb",
+          "path": "public/models/creatures/hoard_pulsar_core.glb",
           "bytes": 4196,
           "sha256": "524194701edbb7035bd5fac488f64886186990dcf7c4fcf8b2ed0a371fa22fe3"
         },
@@ -3436,7 +3436,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8818acd67c8e4cddd386fa83f8293050469093b0d0a45fafb738be876b395a9c",
+      "sourceFingerprint": "f57cae7eba7f109fa612a4f8731a8fa03da279b03cefefabe505d211bef51ee8",
       "output": {
         "path": "public/ui/mobs/hoard_bound_pulsar.webp",
         "bytes": 1298,
@@ -3450,8 +3450,8 @@
       "visualKey": "mob_brood_cocoon",
       "renderSpec": {
         "model": {
-          "url": "vfx/cocoon/brood.glb",
-          "path": "public/vfx/cocoon/brood.glb",
+          "url": "models/creatures/hoard_brood_cocoon.glb",
+          "path": "public/models/creatures/hoard_brood_cocoon.glb",
           "bytes": 13628,
           "sha256": "b99488a9a932008b31f60f2b56afb22ca35ed15343bd9e19cbee66c2faa8de1e"
         },
@@ -3470,7 +3470,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "43071731607d9c4c74b6155a329e5e89f14c908d50cc1b00541ee0cf6f195ed9",
+      "sourceFingerprint": "6f215e8e4088c076515f75d911754ee27cb45be14f9153ca191f9b3f6bb787c3",
       "output": {
         "path": "public/ui/mobs/hoard_brood_cocoon.webp",
         "bytes": 2410,
@@ -3586,8 +3586,8 @@
       "visualKey": "mob_silk_cocoon",
       "renderSpec": {
         "model": {
-          "url": "vfx/cocoon/silk.glb",
-          "path": "public/vfx/cocoon/silk.glb",
+          "url": "models/creatures/hoard_silk_cocoon.glb",
+          "path": "public/models/creatures/hoard_silk_cocoon.glb",
           "bytes": 12808,
           "sha256": "6aa49e593e785f85eaab8c08aaabe3086dbf04a25e2f5bbb2134ed94cb3708d0"
         },
@@ -3606,7 +3606,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "91933831215e143289211855e237a1472d28c47eb058d7e5128e37ddf319203e",
+      "sourceFingerprint": "d088b9ca5b437b0274a66beb0f866bcb4a11e222f2ac318fd7bdb6f09902522e",
       "output": {
         "path": "public/ui/mobs/hoard_silk_cocoon.webp",
         "bytes": 2044,

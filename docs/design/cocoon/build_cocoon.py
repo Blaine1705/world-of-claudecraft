@@ -10,7 +10,7 @@ It rebuilds both cocoons from the numbers below and writes, beside this file:
     brood_cocoon_components.glb   the brood cocoon she spins for a lone player
 
 which the shipping build (scripts/assets/cocoon/build.mjs) optimizes into
-public/vfx/cocoon/. Both are the BODIES of attackable mobs
+public/models/creatures/. Both are the BODIES of attackable mobs
 (src/render/characters/manifest.ts), so targeting, the nameplate and the health
 bar are the ordinary ones; the web mark, the hanging strand, the rescue ring and
 her feeding are runtime effects (src/render/hoard_cocoon.ts).

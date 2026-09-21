@@ -17,7 +17,7 @@ them out, so alone she spins a BROOD cocoon instead: kill it before it hatches.
 | The cocoons' bodies | `mob_silk_cocoon`, `mob_brood_cocoon` in `src/render/characters/manifest.ts` |
 | Blender source, review renders | `docs/design/cocoon/` |
 | Shipping build | `scripts/assets/cocoon/build.mjs` |
-| Shipped assets | `public/vfx/cocoon/{silk,brood}.glb` |
+| Shipped assets | `public/models/creatures/hoard_{silk,brood}_cocoon.glb` |
 | Tests | `tests/hoard_cocoon.test.ts`, `tests/hoard_cocoon_render.test.ts` |
 
 ## Rebuild

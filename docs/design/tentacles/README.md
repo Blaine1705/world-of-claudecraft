@@ -19,7 +19,7 @@ a player. His Crashing Tide keeps coming while they stand.
 | The mob's body (the root collar) | `mob_abyssal_tentacle` in `src/render/characters/manifest.ts` |
 | Blender source, review renders | `docs/design/tentacles/` |
 | Shipping build | `scripts/assets/tentacles/build.mjs` |
-| Shipped assets | `public/vfx/tentacles/{tentacle,trunk}.glb` |
+| Shipped assets | `public/vfx/tentacles/tentacle.glb` and `public/models/creatures/hoard_tentacle_trunk.glb` |
 | Tests | `tests/hoard_tentacles.test.ts`, `tests/hoard_tentacles_render.test.ts` |
 
 ## Rebuild

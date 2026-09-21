@@ -3675,7 +3675,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // src/render/hoard_pulsars.ts. Original Blender art (docs/design/pulsars/), no
   // clips, so it uses the static prop lane.
   mob_bound_pulsar: {
-    url: 'vfx/pulsars/core.glb',
+    url: 'models/creatures/hoard_pulsar_core.glb',
     height: 1.5,
     hover: 2.25,
     clips: STATIC_PROP,
@@ -3689,7 +3689,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // (docs/design/tentacles/), no clips, so it uses the static prop lane. The
   // click volume is the standing tentacle's, not the collar's.
   mob_abyssal_tentacle: {
-    url: 'vfx/tentacles/trunk.glb',
+    url: 'models/creatures/hoard_tentacle_trunk.glb',
     height: 1.5,
     clips: STATIC_PROP,
     selfIllumination: 0.12,
@@ -3788,14 +3788,14 @@ export const VISUALS: Record<string, VisualDef> = {
   // rescue ring and her feeding are drawn by src/render/hoard_cocoon.ts. Original
   // Blender art (docs/design/cocoon/), no clips, so they use the static prop lane.
   mob_silk_cocoon: {
-    url: 'vfx/cocoon/silk.glb',
+    url: 'models/creatures/hoard_silk_cocoon.glb',
     height: 3.5,
     clips: STATIC_PROP,
     selfIllumination: 0.18,
     clickRadius: 1.6,
   },
   mob_brood_cocoon: {
-    url: 'vfx/cocoon/brood.glb',
+    url: 'models/creatures/hoard_brood_cocoon.glb',
     height: 2.5,
     clips: STATIC_PROP,
     selfIllumination: 0.3,

@@ -434,7 +434,7 @@ something this file marks as restricted, ask first: tony@levystreet.com.
 
 ### Tentacles of the Abyss (the Abyssal Maw's tentacles)
 
-- `public/vfx/tentacles/{tentacle,trunk}.glb`: original procedural Blender art
+- `public/vfx/tentacles/tentacle.glb` and `public/models/creatures/hoard_tentacle_trunk.glb`: original procedural Blender art
   authored for this project (the Abyssal Maw's tentacle: one instanced segment, its
   tip, the heaved flagstones and pool, and the attackable mob's root collar). No
   third-party mesh, texture or reference image.
@@ -449,7 +449,7 @@ something this file marks as restricted, ask first: tony@levystreet.com.
 
 ### Cocoon (Broodmother Vysska's cocoons)
 
-- `public/vfx/cocoon/{silk,brood}.glb`: original procedural Blender art authored
+- `public/models/creatures/hoard_{silk,brood}_cocoon.glb`: original procedural Blender art authored
   for this project (the silk cocoon a wrapped player stands inside, and the brood
   cocoon spun for a lone player). No third-party mesh, texture or reference image.
   Source and provenance: `docs/design/cocoon/README.md`.
