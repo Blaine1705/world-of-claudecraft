@@ -57,7 +57,7 @@ import {
   type InspectHolderModel,
 } from './inspect_view';
 import type { PainterHostPresentation } from './painter_host';
-import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { hydratePortraits, type ModularLook, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
 import { curatorRankNameKey } from './reliquary_view';
 import { svgIcon } from './ui_icons';
@@ -129,6 +129,10 @@ export interface InspectWindowDeps extends PainterHostPresentation {
       mainhand: string | null;
       weaponSkinId: string | null;
       offhand: string | null;
+      /** The inspected player's authored look (their `app` identity field),
+       *  so the turntable shows the face they built, not the stock class rig;
+       *  null for a pre-creator character. */
+      look: ModularLook | null;
     },
   ): void;
 }
@@ -171,6 +175,12 @@ export class InspectWindow {
     // is eqi-shaped ONLINE (no perfected), so without this the self card's
     // Unique-Equipped tag would diverge between hosts (2026-08-27 ruling).
     selfEquippedInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
+    // The inspected player's authored look, resolved by the Hud from the LIVE
+    // entity through the render layer's look provider (modularLookFor). A
+    // parameter for the same reason as selfStanding: InspectEntity mirrors the
+    // wire, and a composed look is a render-layer resolution over it, not a
+    // wire field, so the window never casts the mirror back to an Entity.
+    look?: ModularLook | null,
   ): void {
     const cls = e.templateId as PlayerClass;
     const el = this.deps.root();
@@ -264,6 +274,7 @@ export class InspectWindow {
         mainhand: e.equippedItems.mainhand ?? null,
         offhand: e.equippedItems.offhand ?? null,
         weaponSkinId: e.weaponSkinId ?? null,
+        look: look ?? null,
       });
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
