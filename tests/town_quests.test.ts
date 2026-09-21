@@ -1,14 +1,17 @@
 // Pins src/sim/town_quests.ts: which quests count as a zone's TOWN quests
-// (given or turned in inside the hub circle, not a profession trainer's, not
-// repeatable), when a town reads as complete, and the zone-entry hint the HUD's
-// chat line resolves from it (welcome while the welcome quest is on offer,
-// town_done once every counted quest is turned in AND the zone authors a
-// welcomeDone line, nothing in between).
+// (given or turned in inside the hub circle and finished inside the zone, not
+// a profession trainer's, not repeatable, not a group or instance quest), when
+// a town reads as complete, and the zone-entry hint the HUD's chat line
+// resolves from it (welcome while the welcome quest is on offer, town_done
+// once every counted quest is turned in AND the zone authors a welcomeDone
+// line, nothing in between).
 import { describe, expect, it } from 'vitest';
 import { PROFESSION_TRAINERS } from '../src/sim/content/profession_trainers';
-import { NPCS, QUESTS, ZONES, zoneAt } from '../src/sim/data';
+import { DUNGEONS, NPCS, QUESTS, ZONES, zoneAt } from '../src/sim/data';
 import { isInTownZone } from '../src/sim/professions/focus';
 import {
+  instanceMobIds,
+  isGroupOrInstanceQuest,
   isProfessionTrainerNpc,
   questAnchorNpcIds,
   townQuestIds,
@@ -44,14 +47,87 @@ describe('townQuestIds', () => {
     expect(ids).not.toContain('q_mine');
     expect(ids).not.toContain('q_prof_intro');
     expect(ids).not.toContain('q_farm_intro');
+    // Mogger is a three-player quest from Redbrook: a group errand, not the town's.
+    expect(ids).not.toContain('q_mogger');
     for (const id of ids) {
       const quest = expectDefined(QUESTS[id]);
       expect(quest.repeatable ?? false).toBe(false);
+      expect(quest.suggestedPlayers).toBeUndefined();
       expect(isProfessionTrainerNpc(quest.giverNpcId)).toBe(false);
       const anchors = questAnchorNpcIds(quest).map((id) => expectDefined(NPCS[id]));
       expect(anchors.some((npc) => isInTownZone(npc.pos, eastbrook))).toBe(true);
       for (const npc of anchors) expect(zoneAt(npc.pos.x, npc.pos.z).id).toBe('eastbrook_vale');
     }
+  });
+
+  it('leaves group quests and instance quests out: Highwatch is its own errands, not the raid', () => {
+    const highwatch = zone('thornpeak_heights');
+    const ids = townQuestIds(highwatch);
+    // The open-world chains stay, the Nythraxis raid's open-world lead-in included.
+    expect(ids).toEqual(
+      expect.arrayContaining([
+        'q_stalkers',
+        'q_ogre_bounty',
+        'q_sanctum_gate',
+        'q_nythraxis_restless_dead',
+        'q_nythraxis_graves',
+        'q_nythraxis_sealed_crypt',
+      ]),
+    );
+    // Group quests (suggestedPlayers) and instance boss kills drop out.
+    for (const id of [
+      'q_old_cragmaw',
+      'q_crushers',
+      'q_drogmar',
+      'q_korgath',
+      'q_velkhar',
+      'q_gravewyrm',
+      'q_nythraxis_bound_guardian',
+      'q_nythraxis_scourges_end',
+    ]) {
+      expect(ids, id).not.toContain(id);
+    }
+    const instanceMobs = instanceMobIds(DUNGEONS);
+    expect(instanceMobs.has('korzul_the_gravewyrm')).toBe(true);
+    expect(isGroupOrInstanceQuest(expectDefined(QUESTS.q_gravewyrm), instanceMobs)).toBe(true);
+    expect(isGroupOrInstanceQuest(expectDefined(QUESTS.q_stalkers), instanceMobs)).toBe(false);
+    // Fenbridge's two Bastion bosses are group AND instance; both arms agree.
+    expect(townQuestIds(fenbridge)).not.toContain('q_olen');
+    expect(townQuestIds(fenbridge)).not.toContain('q_mistcaller');
+  });
+
+  it('a hand-off to the next town belongs to the town that receives it', () => {
+    // The Highwatch summons is handed out at Fenbridge and turned in at
+    // Highwatch: Fenbridge is finished without it, Highwatch is not.
+    const summons = expectDefined(QUESTS.q_highwatch_summons);
+    expect(zoneAt(NPCS[summons.giverNpcId]!.pos.x, NPCS[summons.giverNpcId]!.pos.z).id).toBe(
+      'mirefen_marsh',
+    );
+    expect(zoneAt(NPCS[summons.turnInNpcId]!.pos.x, NPCS[summons.turnInNpcId]!.pos.z).id).toBe(
+      'thornpeak_heights',
+    );
+    expect(townQuestIds(fenbridge)).not.toContain('q_highwatch_summons');
+    expect(townQuestIds(zone('thornpeak_heights'))).toContain('q_highwatch_summons');
+  });
+
+  it('reads every table it is given, the trainer roster included', () => {
+    // Promote Redbrook to a trainer in a substituted table: his quests leave
+    // the town set, and nothing else moves.
+    const withRedbrookTrainer = { ...PROFESSION_TRAINERS, marshal_redbrook: 'hobby' };
+    const ids = townQuestIds(eastbrook, { trainers: withRedbrookTrainer });
+    expect(ids).not.toContain('q_wolves');
+    expect(ids).toContain('q_boars');
+    expect(isProfessionTrainerNpc('marshal_redbrook', withRedbrookTrainer)).toBe(true);
+    expect(isProfessionTrainerNpc('marshal_redbrook')).toBe(false);
+    // An empty dungeon table makes an instance kill an ordinary kill again.
+    expect(townQuestIds(zone('thornpeak_heights'), { dungeons: {} })).not.toContain('q_gravewyrm');
+    const noDungeonsNoGroups = {
+      dungeons: {},
+      quests: {
+        q_gravewyrm: { ...expectDefined(QUESTS.q_gravewyrm), suggestedPlayers: undefined },
+      },
+    };
+    expect(townQuestIds(zone('thornpeak_heights'), noDungeonsNoGroups)).toContain('q_gravewyrm');
   });
 
   it('counts a border breadcrumb that is turned in at the town warden', () => {

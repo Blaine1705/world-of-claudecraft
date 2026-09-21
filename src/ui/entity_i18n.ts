@@ -325,7 +325,7 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
       const zone = ZONES.find((candidate) => candidate.id === request.id);
       if (!zone) return request.id;
       if (request.field === 'welcome') return zone.welcome;
-      if (request.field === 'welcomeDone') return zone.welcomeDone ?? zone.welcome;
+      if (request.field === 'welcomeDone') return zone.welcomeDone ?? request.id;
       return zone.name;
     }
     case 'zonePoi': {

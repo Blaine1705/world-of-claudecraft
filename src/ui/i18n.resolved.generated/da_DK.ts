@@ -20271,7 +20271,7 @@ export const da_DK: EnTranslations = {
       "eastbrook_vale": {
         "name": "Østbæk Dal",
         "welcome": "Find Marskal Redbrook i byen, han har arbejde til dig.",
-        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Østbæk"
@@ -20317,7 +20317,7 @@ export const da_DK: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mosekær Sump",
         "welcome": "Meld dig til Vogter Fenwick ved Sumpbroens port.",
-        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Sumpbroen"

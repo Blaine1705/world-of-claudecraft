@@ -20271,7 +20271,7 @@ export const ko_KR: EnTranslations = {
       "eastbrook_vale": {
         "name": "이스트브룩 골짜기",
         "welcome": "마을의 레드브룩 원수를 찾아가십시오. 그가 당신에게 맡길 일이 있습니다.",
-        "welcomeDone": "모험가들이 여정을 시작하러 찾아오는 아담한 바닷가 마을.",
+        "welcomeDone": "레드브룩 원수가 맡길 일은 더 이상 없습니다 - 당신의 여정이 시작된 아담한 바닷가 마을은 그 덕분에 한결 평온합니다.",
         "pois": {
           "0": {
             "label": "이스트브룩"
@@ -20317,7 +20317,7 @@ export const ko_KR: EnTranslations = {
       "mirefen_marsh": {
         "name": "마이어펜 습지",
         "welcome": "펜브리지 문에서 감시관 펜윅에게 보고하십시오.",
-        "welcomeDone": "질퍽한 늪지대 깊숙이 자리한 정착지.",
+        "welcomeDone": "감시관 펜윅의 명령은 더 이상 없습니다 - 질퍽한 늪지대 깊숙이 자리한 정착지는 그 덕분에 더 안전해졌습니다.",
         "pois": {
           "0": {
             "label": "펜브리지"

@@ -20271,7 +20271,7 @@ export const id_ID: EnTranslations = {
       "eastbrook_vale": {
         "name": "Lembah Eastbrook",
         "welcome": "Temui Marsekal Redbrook di kota, ia punya tugas untukmu.",
-        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20317,7 +20317,7 @@ export const id_ID: EnTranslations = {
       "mirefen_marsh": {
         "name": "Rawa Mirefen",
         "welcome": "Lapor pada Warden Fenwick di gerbang Jembatan Rawa.",
-        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Jembatan Rawa"

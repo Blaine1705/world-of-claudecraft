@@ -4823,7 +4823,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_tarn_waders.objectives.0.label': '微光湖涉者已被擊殺',
   'entities.zones.eastbrook_vale.name': '東溪谷',
   'entities.zones.eastbrook_vale.welcome': '去鎮上找雷德布魯克元帥，他有任務交給你。',
-  'entities.zones.eastbrook_vale.welcomeDone': '一座古樸的海濱小鎮，冒險者們在此踏上旅途。',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    '雷德布魯克元帥已沒有任務交給你了 - 這座你踏上旅途的古樸海濱小鎮因你而安寧。',
   'entities.zones.eastbrook_vale.pois.0.label': '東溪',
   'entities.zones.eastbrook_vale.pois.1.label': '狼徑',
   'entities.zones.eastbrook_vale.pois.2.label': '野豬草地',
@@ -4834,7 +4835,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': '倒塌禮拜堂',
   'entities.zones.mirefen_marsh.name': '泥沼濕地',
   'entities.zones.mirefen_marsh.welcome': '到芬橋大門向守望者芬威克報到。',
-  'entities.zones.mirefen_marsh.welcomeDone': '一處坐落於沼澤濕地深處的聚落。',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    '守望者芬威克已沒有命令交給你了 - 這處沼澤濕地深處的聚落因你而更加安全。',
   'entities.zones.mirefen_marsh.pois.0.label': '芬橋',
   'entities.zones.mirefen_marsh.pois.1.label': '潛伏者蘆葦地',
   'entities.zones.mirefen_marsh.pois.2.label': '深沼淺灘',

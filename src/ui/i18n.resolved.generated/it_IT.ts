@@ -20271,7 +20271,7 @@ export const it_IT: EnTranslations = {
       "eastbrook_vale": {
         "name": "Valle di Eastbrook",
         "welcome": "Cerca il maresciallo Redbrook in città: ha lavoro per te.",
-        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20317,7 +20317,7 @@ export const it_IT: EnTranslations = {
       "mirefen_marsh": {
         "name": "Palude di Mirefen",
         "welcome": "Presentati al custode Fenwick al cancello di Fenbridge.",
-        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Fenbridge"

@@ -42,7 +42,7 @@ describe('zoneEntryLine', () => {
     const allDone = world({}, 'done');
     expect(townQuestIds(eastbrook).length).toBeGreaterThan(3);
     expect(zoneEntryLine(eastbrook, allDone)).toBe(
-      'A quaint seaside town where adventurers come to start their journey.',
+      'Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.',
     );
     setLanguage('zh_CN');
     const zh = expectDefined(zoneEntryLine(eastbrook, allDone));

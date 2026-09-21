@@ -20271,7 +20271,7 @@ export const nl_NL: EnTranslations = {
       "eastbrook_vale": {
         "name": "Oostbeekdal",
         "welcome": "Zoek Maarschalk Redbrook in de stad, hij heeft werk voor je.",
-        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Oostbeek"
@@ -20317,7 +20317,7 @@ export const nl_NL: EnTranslations = {
       "mirefen_marsh": {
         "name": "Slijkveenmoeras",
         "welcome": "Meld je bij Wachter Fenwick bij de poort van Veenbrug.",
-        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Veenbrug"

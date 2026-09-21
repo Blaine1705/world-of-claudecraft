@@ -20271,7 +20271,7 @@ export const pl_PL: EnTranslations = {
       "eastbrook_vale": {
         "name": "Dolina Wschodniego Strumienia",
         "welcome": "Odszukaj Marszałka Redbrooka w mieście, ma dla ciebie zadanie.",
-        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20317,7 +20317,7 @@ export const pl_PL: EnTranslations = {
       "mirefen_marsh": {
         "name": "Trzęsawisko Mokrzawia",
         "welcome": "Zamelduj się u Strażnika Fenwicka przy bramie Mostu na Trzęsawisku.",
-        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Most na Trzęsawisku"
