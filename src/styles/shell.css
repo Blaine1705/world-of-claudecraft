@@ -2644,9 +2644,11 @@
     margin-top: 2px;
     line-height: 1.3;
   }
-  /* Raid lockouts the character still carries: a label line, then one line
-     per locked raid (name + countdown), so a narrow roster column never
-     wraps a raid name away from its timer. */
+  /* Raid lockouts the character still carries: a native <details> disclosure
+     (the news panel's pattern) whose summary is the label plus the locked
+     count behind a rotating triangle, and whose body lists one line per
+     locked raid (name + countdown), so a narrow roster column never wraps a
+     raid name away from its timer. */
   .char-row .char-lockout-hint {
     max-width: 340px;
     display: block;
@@ -2656,8 +2658,33 @@
     line-height: 1.3;
   }
   .char-row .char-lockout-label {
-    display: block;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    cursor: pointer;
+    list-style: none;
     color: var(--color-accent);
+    user-select: none;
+  }
+  .char-row .char-lockout-label::-webkit-details-marker {
+    display: none;
+  }
+  .char-row .char-lockout-label::before {
+    content: "\25b8";
+    display: inline-block;
+    width: 10px;
+    color: var(--gold-dim);
+    transition: transform 0.15s ease;
+  }
+  .char-row .char-lockout-hint[open] > .char-lockout-label::before {
+    transform: rotate(90deg);
+  }
+  .char-row .char-lockout-label:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .char-row .char-lockout-count {
+    color: var(--color-text-muted);
   }
   .char-row .char-lockout-item {
     display: flex;

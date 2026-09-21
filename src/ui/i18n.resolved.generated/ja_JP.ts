@@ -9924,6 +9924,7 @@ export const ja_JP: EnTranslations = {
     "inWorld": "世界にいます",
     "takeOver": "引き継ぐ",
     "inWorldHint": "すでに世界にいます。別の場所からログアウトするか、引き継いでください。",
+    "currentLocation": "現在地: {zone}",
     "raidLockouts": "レイドロックアウト",
     "takeOverConfirm": "このキャラクターを別のセッションから切断し、こちらに移します。続けますか？",
     "renameRequired": "名前変更が必要",

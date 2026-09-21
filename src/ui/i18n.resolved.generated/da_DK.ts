@@ -9924,6 +9924,7 @@ export const da_DK: EnTranslations = {
     "inWorld": "i verden",
     "takeOver": "Overtag",
     "inWorldHint": "Allerede i verden. Log ud et andet sted, eller overtag.",
+    "currentLocation": "Current location: {zone}",
     "raidLockouts": "Raid lockouts",
     "takeOverConfirm": "Dette afbryder denne karakter fra en anden session og henter den hertil. Fortsæt?",
     "renameRequired": "omdøbning påkrævet",

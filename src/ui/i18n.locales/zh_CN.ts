@@ -2331,6 +2331,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': '在世界中',
   'character.takeOver': '接管',
   'character.inWorldHint': '已在世界中。请在别处登出，或接管会话。',
+  'character.currentLocation': '当前位置：{zone}',
   'character.raidLockouts': '团队副本锁定',
   'character.takeOverConfirm': '这将使该角色从另一个会话断开并切换到此处。是否继续？',
   'character.renameRequired': '需要改名',

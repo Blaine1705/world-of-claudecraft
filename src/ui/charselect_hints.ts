@@ -13,7 +13,7 @@
 // change, or re-entry), which the minute granularity makes harmless.
 import { zoneDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { t } from './i18n';
+import { formatNumber, t } from './i18n';
 import { formatLockoutDuration, raidLockoutDisplayName } from './raid_lockout_format';
 
 /** Structural (the char-select `CharacterSummary` satisfies it) so this module
@@ -68,11 +68,15 @@ export function charselectLockoutRows(
   );
 }
 
-/** The lockout line: a label plus one chip per locked raid (name and countdown,
- *  the in-world "locked to" sentence as its tooltip), or '' when none. */
+/** The lockout block: a native details/summary disclosure (closed by default,
+ *  the news panel's pattern, so no JS wiring) whose summary carries the label
+ *  and the locked-raid count, and whose body lists one row per locked raid
+ *  (name and countdown, the in-world "locked to" sentence as its tooltip).
+ *  '' when none are locked. */
 export function charselectLockoutsHtml(c: CharselectHintSource, nowMs: number): string {
   const rows = charselectLockoutRows(c, nowMs);
   if (rows.length === 0) return '';
+  const count = formatNumber(rows.length, { maximumFractionDigits: 0, useGrouping: false });
   const items = rows
     .map(
       (r) =>
@@ -81,14 +85,16 @@ export function charselectLockoutsHtml(c: CharselectHintSource, nowMs: number): 
         )}"><span class="char-lockout-name">${esc(r.name)}</span> <span class="char-lockout-time ui-num">${esc(r.time)}</span></span>`,
     )
     .join('');
-  return `<span class="char-lockout-hint"><span class="char-lockout-label">${esc(t('character.raidLockouts'))}</span>${items}</span>`;
+  return `<details class="char-lockout-hint"><summary class="char-lockout-label">${esc(t('character.raidLockouts'))} <span class="char-lockout-count ui-num">${esc(count)}</span></summary>${items}</details>`;
 }
 
 /** `nowMs` is the caller's wall clock (main.ts passes Date.now()): this module
  *  stays host-agnostic so tests can pin a countdown. */
 export function charselectHintsHtml(c: CharselectHintSource, nowMs: number): string {
   const zone = charselectZoneLabel(c);
-  const zoneHint = zone ? `<span class="char-zone-hint">${esc(zone)}</span>` : '';
+  const zoneHint = zone
+    ? `<span class="char-zone-hint">${esc(t('character.currentLocation', { zone }))}</span>`
+    : '';
   // Lockouts sit between the zone and the in-world notice: both state lines
   // first, the warning that explains the Take Over button last, nearest the
   // row's actions.

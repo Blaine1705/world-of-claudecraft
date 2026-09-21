@@ -511,6 +511,7 @@ export type TranslationKeyFlat =
   | 'cardDuel.waitingOnOpponent'
   | 'cardDuel.yourTurn'
   | 'character.closeProfile'
+  | 'character.currentLocation'
   | 'character.delete'
   | 'character.inWorld'
   | 'character.inWorldHint'

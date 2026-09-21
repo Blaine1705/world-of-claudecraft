@@ -9924,6 +9924,7 @@ export const vi_VN: EnTranslations = {
     "inWorld": "trong thế giới",
     "takeOver": "Tiếp Quản",
     "inWorldHint": "Đã ở trong thế giới. Đăng xuất ở nơi khác, hoặc tiếp quản.",
+    "currentLocation": "Current location: {zone}",
     "raidLockouts": "Raid lockouts",
     "takeOverConfirm": "Thao tác này sẽ ngắt nhân vật khỏi phiên khác và đưa về đây. Tiếp tục?",
     "renameRequired": "cần đổi tên",

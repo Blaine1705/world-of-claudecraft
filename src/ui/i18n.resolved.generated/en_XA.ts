@@ -9924,6 +9924,7 @@ export const en_XA: EnTranslations = {
     "inWorld": "[íñ ŵóŕļð]",
     "takeOver": "[Ţáķé Óʋéŕ]",
     "inWorldHint": "[Áļŕéáðý íñ ŵóŕļð. Ļóĝ óúţ éļšéŵĥéŕé, óŕ ţáķé óʋéŕ.]",
+    "currentLocation": "[Çúŕŕéñţ ļóçáţíóñ: {zone}]",
     "raidLockouts": "[Ŕáíð ļóçķóúţš]",
     "takeOverConfirm": "[Ţĥíš ŵíļļ ðíšçóññéçţ ţĥíš çĥáŕáçţéŕ ƒŕóɱ áñóţĥéŕ šéššíóñ áñð ƀŕíñĝ íţ ĥéŕé. Çóñţíñúé?]",
     "renameRequired": "[ŕéñáɱé ŕéɋúíŕéð]",

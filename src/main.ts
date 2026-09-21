@@ -6766,7 +6766,7 @@ async function refreshCharacters(): Promise<void> {
 
       row.addEventListener('click', selectRow);
       row.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if ((e.key === 'Enter' || e.key === ' ') && !(e.target as Element).closest('summary')) {
           e.preventDefault();
           selectRow();
         }

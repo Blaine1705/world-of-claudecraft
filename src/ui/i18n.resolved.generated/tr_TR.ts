@@ -9924,6 +9924,7 @@ export const tr_TR: EnTranslations = {
     "inWorld": "dünyada",
     "takeOver": "Devral",
     "inWorldHint": "Zaten dünyada. Başka yerden çıkış yap ya da devral.",
+    "currentLocation": "Current location: {zone}",
     "raidLockouts": "Raid lockouts",
     "takeOverConfirm": "Bu işlem bu karakteri başka bir oturumdan koparıp buraya getirecek. Devam edilsin mi?",
     "renameRequired": "yeniden adlandırma gerekli",

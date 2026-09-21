@@ -9924,6 +9924,7 @@ export const ru_RU: EnTranslations = {
     "inWorld": "в мире",
     "takeOver": "Перехватить",
     "inWorldHint": "Уже в мире. Выйдите в другом месте или перехватите сессию.",
+    "currentLocation": "Текущее местоположение: {zone}",
     "raidLockouts": "Блокировки рейдов",
     "takeOverConfirm": "Это отключит персонажа от другой сессии и перенесёт его сюда. Продолжить?",
     "renameRequired": "требуется переименование",

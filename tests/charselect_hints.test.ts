@@ -49,15 +49,27 @@ describe('charselectHintsHtml', () => {
   it('renders the zone line for an offline character and nothing else', () => {
     setLanguage('en');
     expect(charselectHintsHtml({ online: false, zoneId: 'mirefen_marsh' }, NOW)).toBe(
-      '<span class="char-zone-hint">Mirefen Marsh</span>',
+      '<span class="char-zone-hint">Current location: Mirefen Marsh</span>',
     );
   });
 
   it('renders the zone line above the in-world notice for an online character', () => {
     setLanguage('en');
     expect(charselectHintsHtml({ online: true, zoneId: 'mirefen_marsh' }, NOW)).toBe(
-      `<span class="char-zone-hint">Mirefen Marsh</span><span class="char-inworld-hint">${t('character.inWorldHint')}</span>`,
+      `<span class="char-zone-hint">Current location: Mirefen Marsh</span><span class="char-inworld-hint">${t('character.inWorldHint')}</span>`,
     );
+  });
+
+  it('localizes the location prefix with the zone name', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    try {
+      const html = charselectHintsHtml({ online: false, zoneId: 'mirefen_marsh' }, NOW);
+      expect(html).toContain(zoneDisplayName('mirefen_marsh'));
+      expect(html).not.toContain('Current location');
+    } finally {
+      setLanguage('en');
+    }
   });
 
   it('renders only the in-world notice when there is no zone', () => {
@@ -145,14 +157,17 @@ describe('charselectLockoutsHtml', () => {
       NOW,
     );
     expect(html).toBe(
-      '<span class="char-lockout-hint"><span class="char-lockout-label">Raid lockouts</span>' +
+      '<details class="char-lockout-hint"><summary class="char-lockout-label">Raid lockouts ' +
+        '<span class="char-lockout-count ui-num">2</span></summary>' +
         '<span class="char-lockout-item" title="You are locked to Thunzharr, the Waking Peak. Unlocks in 40m.">' +
         '<span class="char-lockout-name">Thunzharr, the Waking Peak</span> ' +
         '<span class="char-lockout-time ui-num">40m</span></span>' +
         '<span class="char-lockout-item" title="You are locked to Nythraxis Raid Arena. Unlocks in 2d 3h.">' +
         '<span class="char-lockout-name">Nythraxis Raid Arena</span> ' +
-        '<span class="char-lockout-time ui-num">2d 3h</span></span></span>',
+        '<span class="char-lockout-time ui-num">2d 3h</span></span></details>',
     );
+    // Closed by default: the disclosure carries no open attribute.
+    expect(html).not.toContain('<details open');
   });
 
   it('renders nothing when no raid is locked', () => {
@@ -196,7 +211,7 @@ describe('charselectHintsHtml with lockouts', () => {
       raidLockouts: { nythraxis_boss_arena: NOW + HOUR },
     };
     expect(charselectHintsHtml(c, NOW)).toBe(
-      `<span class="char-zone-hint">Mirefen Marsh</span>${charselectLockoutsHtml(c, NOW)}<span class="char-inworld-hint">${t('character.inWorldHint')}</span>`,
+      `<span class="char-zone-hint">Current location: Mirefen Marsh</span>${charselectLockoutsHtml(c, NOW)}<span class="char-inworld-hint">${t('character.inWorldHint')}</span>`,
     );
   });
 
