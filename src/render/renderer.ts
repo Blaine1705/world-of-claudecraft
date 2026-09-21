@@ -45,6 +45,7 @@ import {
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
+import { isPvpHostilePlayer } from '../ui/pvp_hostile_core';
 import type { IWorld } from '../world_api';
 import {
   abilityMaterialPrewarmMaterials,
@@ -8704,21 +8705,10 @@ export class Renderer {
     return this.isHostilePlayer(target);
   }
 
+  // The shared client verdict (src/ui/pvp_hostile_core.ts): duel, ranked
+  // arena, Thornhollow Fields, and the open-world /pvp flag pair rule.
   private isHostilePlayer(target: Entity): boolean {
-    if (target.kind !== 'player' || target.dead || target.id === this.sim.playerId) return false;
-    if (this.sim.duelInfo?.state === 'active' && this.sim.duelInfo.otherPid === target.id)
-      return true;
-    // Thornhollow Fields: the opposing TEAM is hostile for the whole live match.
-    const bg = this.sim.bgInfo?.match;
-    if (bg?.state === 'active') {
-      const row = bg.players.find((p) => p.pid === target.id);
-      if (row && row.team !== bg.myTeam) return true;
-    }
-    const match = this.sim.arenaInfo?.match;
-    return (
-      match?.state === 'active' &&
-      (match.oppPid === target.id || match.enemies.some((e) => e.pid === target.id))
-    );
+    return isPvpHostilePlayer(this.sim, target);
   }
 
   // -------------------------------------------------------------------------

@@ -360,7 +360,6 @@ import {
   confirmPendingAutoAttackEngage,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
-  isPvpHostileTarget,
 } from './hud/action_bar/attack_on_ability';
 import { BarEditorWindow } from './hud/action_bar/bar_editor';
 import {
@@ -738,6 +737,7 @@ import {
 } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
+import { isPvpHostilePlayer, isPvpHostileTargetId } from './pvp_hostile_core';
 import {
   PET_ACTION_ICONS,
   petBarPreviewIconIds,
@@ -7576,7 +7576,7 @@ export class Hud {
             abilityStartsAutoAttack(resolved.effects) &&
             hasAutoAttackTarget(
               target,
-              isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo, this.sim.bgInfo),
+              isPvpHostileTargetId(this.sim, tid),
             )
           ) {
             // A TIMED cast must not engage yet (the aggro-before-damage bug). The
@@ -9120,10 +9120,13 @@ export class Hud {
       // Linked-Discord players get their staff-role name color (else friendly/hostile),
       // plus a Discord info line (nickname + rank + role chips) under the healthbar.
       const tfRoleColor = target.kind === 'player' ? specialRoleColor(target.discordRole) : null;
+      // A mob's template flag, or a player the sim would let us hit (duel, arena,
+      // battleground, or the /pvp flag): one shared verdict (pvp_hostile_core.ts).
+      const tfHostile = target.hostile || isPvpHostilePlayer(this.sim, target);
       this.setStyleProp(
         this.targetNameEl,
         'color',
-        tfRoleColor ?? (target.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)'),
+        tfRoleColor ?? (tfHostile ? 'var(--color-hostile)' : 'var(--color-friendly)'),
       );
       this.targetDiscord.update(target);
       // Redundant non-color cue for forced-colors (high-contrast) mode, where the OS
@@ -9131,7 +9134,7 @@ export class Hud {
       // The base.css forced-colors block underlines #tf-name.hostile; routed through the
       // elided toggleClass writer so the per-frame hot path stays write-elided. Normal
       // mode is unaffected (the rule lives only inside @media (forced-colors: active)).
-      this.toggleClass(this.targetNameEl, 'hostile', target.hostile);
+      this.toggleClass(this.targetNameEl, 'hostile', tfHostile);
       // Every target aura is actionable: hostile buffs can be purged, allied buffs
       // can be maintained, and foreign debuffs coordinate a group. Keep this strip
       // complete and full-rate on every graphics tier; the painter and window both
@@ -13466,12 +13469,7 @@ export class Hud {
             if (ev.success) {
               const castTid = sim.player.targetId;
               const castTarget = castTid !== null ? (sim.entities.get(castTid) ?? null) : null;
-              const castPvpHostile = isPvpHostileTarget(
-                castTid,
-                sim.duelInfo,
-                sim.arenaInfo,
-                sim.bgInfo,
-              );
+              const castPvpHostile = isPvpHostileTargetId(sim, castTid);
               if (hasAutoAttackTarget(castTarget, castPvpHostile)) this.sim.startAutoAttack();
             }
           }

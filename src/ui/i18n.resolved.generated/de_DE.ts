@@ -2229,13 +2229,39 @@ export const de_DE: EnTranslations = {
         "battlegroundFirstWin": "erster heutiger Sieg in den Thornhollow-Feldern",
         "battlegroundComplete": "Kampf um die Thornhollow-Felder ausgetragen",
         "battlegroundKill": "ehrenhafte Ausschaltung",
-        "battlegroundAssist": "Unterstützung beim Todesstoß"
+        "battlegroundAssist": "Unterstützung beim Todesstoß",
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted"
       },
       "floatReasons": {
         "kill": "Ausschaltung",
         "assist": "Unterstützung",
         "firstWin": "Erster Sieg"
       }
+    },
+    "worldPvp": {
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "groupLine": "Party, raid and guild members are never hostile to each other.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
     },
     "warfareShop": {
       "gossipOption": "Kriegsführungs-Sets durchsuchen",
@@ -6486,6 +6512,7 @@ export const de_DE: EnTranslations = {
       "completed": "Die Quests, die du bereits abgegeben hast, in der Reihenfolge, in der du sie beendet hast.",
       "session": "Was du seit deinem Einloggen getan hast: Tötungen, Tode, Schaden und Erfahrung.",
       "arena": "Dein Stand im Aschenen Kolosseum in beiden Wertungsklassen: Wertung, Siege, Niederlagen und Gewinnrate für 1v1 und für 2v2.",
+      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
       "listings": "Deine eigenen Angebote auf dem Weltmarkt, mit dem geforderten Preis, der verbleibenden Zeit für jedes und wie viel Platz du für weitere hast.",
       "buyback": "Was du kürzlich an einen Händler verkauft hast und noch zurückkaufen könntest.",
       "groupState": "Wie es dir gerade geht",

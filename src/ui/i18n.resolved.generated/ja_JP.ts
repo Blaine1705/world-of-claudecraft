@@ -2229,13 +2229,39 @@ export const ja_JP: EnTranslations = {
         "battlegroundFirstWin": "本日のソーンホロウ平原初勝利",
         "battlegroundComplete": "ソーンホロウ平原参戦",
         "battlegroundKill": "名誉ある撃破",
-        "battlegroundAssist": "撃破アシスト"
+        "battlegroundAssist": "撃破アシスト",
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted"
       },
       "floatReasons": {
         "kill": "撃破",
         "assist": "アシスト",
         "firstWin": "初勝利"
       }
+    },
+    "worldPvp": {
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "groupLine": "Party, raid and guild members are never hostile to each other.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
     },
     "warfareShop": {
       "gossipOption": "ウォーフェアセットを見る",
@@ -6486,6 +6512,7 @@ export const ja_JP: EnTranslations = {
       "completed": "すでに納品したクエストを、終えた順に表示します。",
       "session": "ログインしてからの成果です。撃破数、死亡数、ダメージ、経験値が表示されます。",
       "arena": "灰の闘技場での両ブラケットの戦績です。1対1と2対2それぞれのレーティング、勝敗数、勝率が表示されます。",
+      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
       "listings": "世界市場に出している自分の出品を、希望価格、それぞれの残り時間、そしてあとどれだけ出せるかとあわせて表示します。",
       "buyback": "最近商人に売った品のうち、まだ買い戻せるものを表示します。",
       "groupState": "今のあなたの状態",

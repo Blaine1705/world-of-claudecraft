@@ -2229,13 +2229,39 @@ export const zh_CN: EnTranslations = {
         "battlegroundFirstWin": "荆谷原野每日首胜",
         "battlegroundComplete": "荆谷原野参战",
         "battlegroundKill": "荣誉击杀",
-        "battlegroundAssist": "助攻击杀"
+        "battlegroundAssist": "助攻击杀",
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted"
       },
       "floatReasons": {
         "kill": "击杀",
         "assist": "助攻",
         "firstWin": "首胜"
       }
+    },
+    "worldPvp": {
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "groupLine": "Party, raid and guild members are never hostile to each other.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
     },
     "warfareShop": {
       "gossipOption": "浏览战争套装",
@@ -6486,6 +6512,7 @@ export const zh_CN: EnTranslations = {
       "completed": "你已经交付的任务，按你完成它们的先后顺序排列。",
       "session": "你登录以来做过的事：击杀、死亡、伤害与经验。",
       "arena": "你在灰烬角斗场两个组别中的战绩：1v1 与 2v2 各自的评分、胜场、负场与胜率。",
+      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
       "listings": "你自己在世界市场上的挂单，包括要价、每一件还剩多久，以及你还能再挂多少。",
       "buyback": "你最近卖给商人、目前仍能买回来的东西。",
       "groupState": "你此刻如何",

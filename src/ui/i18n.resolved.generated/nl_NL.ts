@@ -2229,13 +2229,39 @@ export const nl_NL: EnTranslations = {
         "battlegroundFirstWin": "eerste overwinning van vandaag in Doornholte-Velden",
         "battlegroundComplete": "gevecht in Doornholte-Velden uitgevochten",
         "battlegroundKill": "eervolle overwinning",
-        "battlegroundAssist": "hulp bij een fatale klap"
+        "battlegroundAssist": "hulp bij een fatale klap",
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted"
       },
       "floatReasons": {
         "kill": "Kill",
         "assist": "Hulp",
         "firstWin": "Eerste Overwinning"
       }
+    },
+    "worldPvp": {
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "groupLine": "Party, raid and guild members are never hostile to each other.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
     },
     "warfareShop": {
       "gossipOption": "Bekijk Oorlogvoering-Sets",
@@ -6486,6 +6512,7 @@ export const nl_NL: EnTranslations = {
       "completed": "De quests die je al hebt ingeleverd, in de volgorde waarin je ze voltooide.",
       "session": "Wat je hebt gedaan sinds je bent ingelogd: kills, doden, schade en ervaring.",
       "arena": "Je status in het Asgrauwe Colosseum in beide categorieën: waardering, winsten, verliezen en winstpercentage voor 1v1 en voor 2v2.",
+      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
       "listings": "Je eigen plaatsingen op de Wereldmarkt, met de vraagprijs, de resterende tijd van elk, en hoeveel ruimte je nog hebt voor meer.",
       "buyback": "Wat je onlangs aan een handelaar hebt verkocht en nog kunt terugkopen.",
       "groupState": "Hoe je er nu voor staat",

@@ -2229,13 +2229,39 @@ export const vi_VN: EnTranslations = {
         "battlegroundFirstWin": "chiến thắng Cánh Đồng Trũng Gai đầu tiên hôm nay",
         "battlegroundComplete": "trận Cánh Đồng Trũng Gai đã đấu",
         "battlegroundKill": "hạ gục vinh dự",
-        "battlegroundAssist": "hỗ trợ đòn hạ gục"
+        "battlegroundAssist": "hỗ trợ đòn hạ gục",
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted"
       },
       "floatReasons": {
         "kill": "Hạ Gục",
         "assist": "Hỗ Trợ",
         "firstWin": "Chiến Thắng Đầu Tiên"
       }
+    },
+    "worldPvp": {
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "groupLine": "Party, raid and guild members are never hostile to each other.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
     },
     "warfareShop": {
       "gossipOption": "Duyệt Bộ Chiến Tranh",
@@ -6486,6 +6512,7 @@ export const vi_VN: EnTranslations = {
       "completed": "Những nhiệm vụ bạn đã nộp trả, theo đúng thứ tự bạn đã hoàn thành chúng.",
       "session": "Những gì bạn đã làm kể từ khi đăng nhập: số lần hạ gục, số lần chết, sát thương và kinh nghiệm.",
       "arena": "Vị thế của bạn tại Đấu Trường Tro Tàn ở cả hai hạng đấu: điểm xếp hạng, số trận thắng, số trận thua và tỷ lệ thắng cho 1v1 và cho 2v2.",
+      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
       "listings": "Những món hàng bạn đang rao bán trên Chợ Thế Giới, cùng giá chào bán, thời gian còn lại của mỗi món, và bạn còn bao nhiêu chỗ trống để rao thêm.",
       "buyback": "Những gì bạn vừa bán cho người bán gần đây và vẫn có thể mua lại.",
       "groupState": "Bạn Đang Ra Sao",

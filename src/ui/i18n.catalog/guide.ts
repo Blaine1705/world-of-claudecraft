@@ -972,6 +972,7 @@ export const guideStrings = {
     session: 'What you have done since you logged in: kills, deaths, damage and experience.',
     arena:
       'Your Ashen Coliseum standing in both brackets: rating, wins, losses and win rate for 1v1 and for 2v2.',
+    pvp: 'World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.',
     listings:
       'Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.',
     buyback: 'What you sold to a vendor recently and could still buy back.',

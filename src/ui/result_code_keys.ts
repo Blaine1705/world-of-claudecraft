@@ -86,5 +86,7 @@ export const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   battleground_complete: 'hudChrome.warfare.reasons.battlegroundComplete',
   battleground_kill: 'hudChrome.warfare.reasons.battlegroundKill',
   battleground_assist: 'hudChrome.warfare.reasons.battlegroundAssist',
+  world_kill: 'hudChrome.warfare.reasons.worldKill',
+  world_assist: 'hudChrome.warfare.reasons.worldAssist',
 };
 export const HONOR_REASON_FALLBACK_KEY: TranslationKey = 'hudChrome.warfare.reasons.arenaWin';

@@ -16,6 +16,7 @@ import { DELVE_MODULE_NAMES } from '../sim/sim';
 import type { EntityKind, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import {
+  formatMoney,
   formatNumber,
   getLanguage,
   type InterpolationValues,
@@ -591,6 +592,26 @@ const baseEnTable = {
   'presence.noLongerAway': 'You are no longer marked as away.',
   'presence.afkDefault': 'Away From Keyboard',
   'presence.dndDefault': 'Do Not Disturb',
+  // World PvP (/pvp flag, src/sim/pvp/world_pvp.ts): the flag notices and the
+  // kill/defeat lines. Money goes through the client money formatter.
+  'worldPvp.enabled': 'World PvP enabled: other flagged players can attack you.',
+  'worldPvp.disabled': 'World PvP disabled.',
+  'worldPvp.staysEnabled': 'World PvP stays enabled.',
+  'worldPvp.disablingIn': 'World PvP will be disabled in {minutes} minutes.',
+  'worldPvp.alreadyEnabled': 'World PvP is already enabled.',
+  'worldPvp.alreadyDisabled': 'World PvP is already disabled.',
+  'worldPvp.alreadySwitchingOff': 'World PvP is already switching off.',
+  'worldPvp.minLevel': 'You must be at least level {level} to enable World PvP.',
+  'worldPvp.usage': 'Usage: /pvp, /pvp on, or /pvp off.',
+  'worldPvp.killPlain': 'You defeat {victim}.',
+  'worldPvp.killTake': 'You defeat {victim} and take {money} from their purse.',
+  'worldPvp.killTakeSplit':
+    'You defeat {victim} and take {money} from their purse (split {count} ways).',
+  'worldPvp.defeatedPlain': '{killer} defeats you.',
+  'worldPvp.defeatedTake': '{killer} defeats you and takes {money} from your purse.',
+  'worldPvp.defeatedGroupPlain': '{killer} and {others} others defeat you.',
+  'worldPvp.defeatedGroupTake':
+    '{killer} and {others} others defeat you and take {money} from your purse.',
   'log.channelJoined': 'Joined the {channel} channel. Type /{channel} <message> to talk.',
   'log.channelLeft': 'Left the {channel} channel.',
   'log.dungeonDifficultyHeroic': 'Dungeon difficulty set to Heroic.',
@@ -16620,7 +16641,67 @@ function locTalentTail(s: string): string {
 }
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
+// The sim's language-agnostic money text ('3g 5s 7c', src/sim/format_money.ts)
+// re-rendered through the locale money formatter; unparseable text passes
+// through untouched so a matcher never eats a value it did not understand.
+function localizeSimMoneyText(text: string): string {
+  const m = /^(?:(\d+)g)?\s*(?:(\d+)s)?\s*(?:(\d+)c)?$/.exec(text.trim());
+  if (!m || (m[1] === undefined && m[2] === undefined && m[3] === undefined)) return text;
+  const copper = Number(m[1] ?? 0) * 10_000 + Number(m[2] ?? 0) * 100 + Number(m[3] ?? 0);
+  return formatMoney(copper);
+}
+
 const RULES: Rule[] = [
+  // World PvP (/pvp flag): the parametrized notices and kill/defeat lines
+  // (src/sim/pvp/world_pvp.ts). Player names splice through verbatim; the
+  // sim's 'Ng Ns Nc' money re-formats through the locale money formatter.
+  {
+    re: /^World PvP will be disabled in (\d+) minutes\.$/,
+    build: (m) => tSim('worldPvp.disablingIn', { minutes: formatNumber(Number(m[1])) }),
+  },
+  {
+    re: /^You must be at least level (\d+) to enable World PvP\.$/,
+    build: (m) => tSim('worldPvp.minLevel', { level: formatNumber(Number(m[1])) }),
+  },
+  {
+    re: /^You defeat (.+) and take (.+) from their purse \(split (\d+) ways\)\.$/,
+    build: (m) =>
+      tSim('worldPvp.killTakeSplit', {
+        victim: m[1],
+        money: localizeSimMoneyText(m[2]),
+        count: formatNumber(Number(m[3])),
+      }),
+  },
+  {
+    re: /^You defeat (.+) and take (.+) from their purse\.$/,
+    build: (m) => tSim('worldPvp.killTake', { victim: m[1], money: localizeSimMoneyText(m[2]) }),
+  },
+  {
+    re: /^You defeat (.+)\.$/,
+    build: (m) => tSim('worldPvp.killPlain', { victim: m[1] }),
+  },
+  {
+    re: /^(.+) and (\d+) others defeat you and take (.+) from your purse\.$/,
+    build: (m) =>
+      tSim('worldPvp.defeatedGroupTake', {
+        killer: m[1],
+        others: formatNumber(Number(m[2])),
+        money: localizeSimMoneyText(m[3]),
+      }),
+  },
+  {
+    re: /^(.+) and (\d+) others defeat you\.$/,
+    build: (m) =>
+      tSim('worldPvp.defeatedGroupPlain', { killer: m[1], others: formatNumber(Number(m[2])) }),
+  },
+  {
+    re: /^(.+) defeats you and takes (.+) from your purse\.$/,
+    build: (m) => tSim('worldPvp.defeatedTake', { killer: m[1], money: localizeSimMoneyText(m[2]) }),
+  },
+  {
+    re: /^(.+) defeats you\.$/,
+    build: (m) => tSim('worldPvp.defeatedPlain', { killer: m[1] }),
+  },
   {
     re: /^Your Umbral Anchor is out of range\.$/,
     build: () =>

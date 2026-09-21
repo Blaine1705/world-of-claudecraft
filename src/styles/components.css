@@ -14053,6 +14053,33 @@
     display: flex;
     gap: 8px;
   }
+  /* World PvP tab (src/ui/hud/world_pvp/): the flag status card and the
+     stakes list. Same card / note families as the Thornhollow Fields panel. */
+  .wpvp-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    padding: 8px 10px;
+    border-left: 3px solid var(--color-border-showcase);
+  }
+  .wpvp-status.is-on {
+    border-left-color: var(--color-hostile);
+  }
+  .wpvp-status.is-disarming {
+    border-left-color: var(--color-warning);
+  }
+  .wpvp-status.is-off {
+    border-left-color: var(--color-friendly);
+  }
+  .wpvp-stakes {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
   .arena-rank {
     display: flex;
     align-items: baseline;
