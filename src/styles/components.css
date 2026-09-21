@@ -14819,6 +14819,11 @@
   .wpvp-status.is-off {
     border-left-color: var(--color-friendly);
   }
+  /* Two cards (record, honor), so the shared three-column stat grid would leave
+     a hole; the tab's own column count keeps the cards full width. */
+  .wpvp-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .wpvp-stakes {
     margin: 6px 0 0;
     padding-left: 18px;

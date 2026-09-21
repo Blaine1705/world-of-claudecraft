@@ -9,10 +9,15 @@ import type { CharacterState } from '../character_state';
 import type { PlayerMeta } from '../sim';
 import { normalizeHonorCounter, normalizeHonorDailyState } from './honor';
 
-type HonorSavedFields = Pick<CharacterState, 'honor' | 'lifetimeHonor' | 'honorArenaDaily'>;
-
-/** The honor keys to spread into a CharacterState (absent when at rest). */
-export function savedHonorState(meta: PlayerMeta): HonorSavedFields {
+/** The honor keys to spread into a CharacterState (absent when at rest). The
+ *  return type is an inline literal on purpose: the character-blob growth
+ *  guard (tests/professions_blob_growth.test.ts) reads a save-fragment helper's
+ *  keys off its declared return shape. */
+export function savedHonorState(meta: PlayerMeta): {
+  honor?: number;
+  lifetimeHonor?: number;
+  honorArenaDaily?: CharacterState['honorArenaDaily'];
+} {
   const daily = meta.honorArenaDaily;
   return {
     ...(meta.honor || meta.lifetimeHonor

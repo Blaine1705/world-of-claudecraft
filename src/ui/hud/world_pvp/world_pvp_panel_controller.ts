@@ -51,7 +51,7 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
     `<div class="wpvp-status ui-card ${statusClass}"><span aria-hidden="true">${svgIcon('battleground')}</span>` +
     `<span>${esc(statusText)}</span></div>`;
   const stats =
-    `<div class="pvp-stat-grid">` +
+    `<div class="pvp-stat-grid wpvp-stats">` +
     `<div class="ui-card">${esc(t('hudChrome.worldPvp.record', { kills: num(view.kills), deaths: num(view.deaths) }))}</div>` +
     `<div class="ui-card">${esc(t('hudChrome.warfare.balance', { amount: num(view.honor) }))}</div>` +
     `</div>`;
@@ -76,8 +76,10 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
     `<div class="arena-layout"><section class="arena-overview">` +
     blurb +
     status +
-    stats +
+    // The action sits right under the status it acts on, and above the record,
+    // so it is on screen without scrolling on a landscape phone.
     actionHtml(view) +
+    stats +
     `</section><section class="arena-ladders">` +
     `<div class="bg-sub">${esc(t('hudChrome.worldPvp.title'))}</div>` +
     `<ul class="wpvp-stakes">${stakeRows}</ul>` +
