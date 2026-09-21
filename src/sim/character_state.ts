@@ -11,11 +11,11 @@ import type { PlayerEquipment } from './entity';
 import type { JailState } from './jail';
 import type { LocalGathererIdentity } from './material_gatherer';
 import type { SavedMaterialsVaultState } from './materials_vault';
-import type { WorldPvpSavedState } from './pvp/world_pvp';
 import type { ArchetypeState } from './professions/archetype';
 import type { PersistedFarmPlot } from './professions/farm_persist';
 import type { SavedGatheringGoal } from './professions/gathering_goal_persist';
 import type { ToolEffectSlot } from './professions/tools';
+import type { WorldPvpSavedState } from './pvp/world_pvp';
 import type { SavedReliquaryState } from './reliquary';
 import type {
   EquipSlot,

@@ -40,14 +40,6 @@ export {
   honorEventMultiplier,
   weekdayOfDayKey,
 } from './honor_event';
-export {
-  PVP_DEFENSE_CAP,
-  PVP_OFFENSE_CAP,
-  PVP_RATING_PER_PCT,
-  type PvpCaps,
-  pvpDamageMultiplier,
-  pvpFractionsFromRatings,
-} from './power';
 // warfare_quartermaster.ts is DELIBERATELY not re-exported here. It needs
 // createNpc from '../entity' at runtime, and entity.ts imports this barrel for
 // pvpFractionsFromRatings, so re-exporting it would close a value-level ESM
@@ -60,6 +52,14 @@ export {
 // Its single consumer is the Sim coordinator during world init, so it is not
 // public API in any meaningful sense: import it by path.
 export { loadHonorState, savedHonorState } from './honor_persist';
+export {
+  PVP_DEFENSE_CAP,
+  PVP_OFFENSE_CAP,
+  PVP_RATING_PER_PCT,
+  type PvpCaps,
+  pvpDamageMultiplier,
+  pvpFractionsFromRatings,
+} from './power';
 export {
   isWorldPvpFlagged,
   isWorldPvpHostile,

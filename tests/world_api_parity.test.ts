@@ -60,7 +60,6 @@ import type { IWorldDungeonFinder } from '../src/world_api/dungeon_finder';
 import type { IWorldDungeons } from '../src/world_api/dungeons';
 import type { IWorldEntityRoster } from '../src/world_api/entity_roster';
 import type { IWorldFarming } from '../src/world_api/farming';
-import type { IWorldWorldPvp } from '../src/world_api/world_pvp';
 import type { IWorldGuildBank } from '../src/world_api/guild_bank';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
@@ -79,6 +78,7 @@ import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
+import type { IWorldWorldPvp } from '../src/world_api/world_pvp';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
@@ -2273,7 +2273,10 @@ const FACET_FARMING = [
 ] as const satisfies readonly (keyof IWorldFarming)[];
 type _ExhaustFarming = AssertNever<Exclude<keyof IWorldFarming, (typeof FACET_FARMING)[number]>>;
 
-const FACET_WORLD_PVP = ['worldPvpInfo', 'setWorldPvpFlag'] as const satisfies readonly (keyof IWorldWorldPvp)[];
+const FACET_WORLD_PVP = [
+  'worldPvpInfo',
+  'setWorldPvpFlag',
+] as const satisfies readonly (keyof IWorldWorldPvp)[];
 type _ExhaustWorldPvp = AssertNever<
   Exclude<keyof IWorldWorldPvp, (typeof FACET_WORLD_PVP)[number]>
 >;

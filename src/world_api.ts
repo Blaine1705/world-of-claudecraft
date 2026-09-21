@@ -95,10 +95,10 @@ import type { IWorldQuests } from './world_api/quests';
 import type { IWorldReliquary } from './world_api/reliquary';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
-import type { IWorldWorldPvp } from './world_api/world_pvp';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
+import type { IWorldWorldPvp } from './world_api/world_pvp';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
 // Account flair is defined in the host-agnostic sim core (src/sim/account_flair.ts)
@@ -378,7 +378,6 @@ export type {
   ReliquaryPageCompletion,
   ReliquaryRarity,
 } from './world_api/reliquary';
-export type { WorldPvpInfo } from './world_api/world_pvp';
 export type {
   CharacterProfile,
   CharacterSearchResult,
@@ -396,6 +395,7 @@ export type {
   WhoRosterInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
+export type { WorldPvpInfo } from './world_api/world_pvp';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,
 // so `IWorld` is byte-identical to the pre-split flat interface and both the

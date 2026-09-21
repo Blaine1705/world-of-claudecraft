@@ -493,12 +493,12 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
     // per-frame healer-range scan (the Keeper is talked to). wc -l on the
     // merged tree. Exact count, zero slack.
-    // LOWERED 18276 -> 18274 at World PvP (the /pvp flag): the target frame's
+    // LOWERED 18276 -> 18271 at World PvP (the /pvp flag): the target frame's
     // hostile colour and the two auto-attack gates now read ONE shared verdict
     // (src/ui/pvp_hostile_core.ts, the third copy the action bar's comment
     // asked to extract), which collapsed the multi-line call. Measured with
     // wc -l < src/ui/hud.ts after biome. Exact count, zero slack.
-    ceiling: 18274,
+    ceiling: 18271,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

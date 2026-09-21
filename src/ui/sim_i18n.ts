@@ -16696,7 +16696,8 @@ const RULES: Rule[] = [
   },
   {
     re: /^(.+) defeats you and takes (.+) from your purse\.$/,
-    build: (m) => tSim('worldPvp.defeatedTake', { killer: m[1], money: localizeSimMoneyText(m[2]) }),
+    build: (m) =>
+      tSim('worldPvp.defeatedTake', { killer: m[1], money: localizeSimMoneyText(m[2]) }),
   },
   {
     re: /^(.+) defeats you\.$/,

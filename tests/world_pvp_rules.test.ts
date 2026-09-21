@@ -45,14 +45,16 @@ describe('worldPvpPairHostile', () => {
   });
 
   it('guildmates are never hostile; different guilds and no guild are', () => {
-    expect(worldPvpPairHostile(player(1, { guild: 'Ravens' }), player(2, { guild: 'Ravens' }), false)).toBe(
-      false,
-    );
-    expect(worldPvpPairHostile(player(1, { guild: 'Ravens' }), player(2, { guild: 'Crows' }), false)).toBe(
+    expect(
+      worldPvpPairHostile(player(1, { guild: 'Ravens' }), player(2, { guild: 'Ravens' }), false),
+    ).toBe(false);
+    expect(
+      worldPvpPairHostile(player(1, { guild: 'Ravens' }), player(2, { guild: 'Crows' }), false),
+    ).toBe(true);
+    // Two guildless players share the empty string and must NOT read as one guild.
+    expect(worldPvpPairHostile(player(1, { guild: '' }), player(2, { guild: '' }), false)).toBe(
       true,
     );
-    // Two guildless players share the empty string and must NOT read as one guild.
-    expect(worldPvpPairHostile(player(1, { guild: '' }), player(2, { guild: '' }), false)).toBe(true);
   });
 });
 

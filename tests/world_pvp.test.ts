@@ -65,7 +65,9 @@ function logLines(sim: Sim, pid: number): string[] {
 
 function errorLines(sim: Sim, pid: number): string[] {
   return sim.events
-    .filter((ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error' && ev.pid === pid)
+    .filter(
+      (ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error' && ev.pid === pid,
+    )
     .map((ev) => ev.text);
 }
 
@@ -105,7 +107,15 @@ function slay(sim: Sim, killerPid: number, victimPid: number): void {
 }
 
 function hit(sim: Sim, attackerPid: number, victimPid: number, amount = 5): void {
-  sim.ctx.dealDamage(ent(sim, attackerPid), ent(sim, victimPid), amount, false, 'physical', 'Slam', 'hit');
+  sim.ctx.dealDamage(
+    ent(sim, attackerPid),
+    ent(sim, victimPid),
+    amount,
+    false,
+    'physical',
+    'Slam',
+    'hit',
+  );
 }
 
 describe('the /pvp flag lifecycle', () => {
@@ -533,12 +543,16 @@ describe('determinism', () => {
 
   it('formats the kill and defeat lines the client matcher pins', () => {
     expect(worldPvpKillLine('Bet', 0, 1)).toBe('You defeat Bet.');
-    expect(worldPvpKillLine('Bet', 1_234, 1)).toBe('You defeat Bet and take 12s 34c from their purse.');
+    expect(worldPvpKillLine('Bet', 1_234, 1)).toBe(
+      'You defeat Bet and take 12s 34c from their purse.',
+    );
     expect(worldPvpKillLine('Bet', 50_000, 3)).toBe(
       'You defeat Bet and take 5g from their purse (split 3 ways).',
     );
     expect(worldPvpDefeatLine('Aleph', 0, 1)).toBe('Aleph defeats you.');
-    expect(worldPvpDefeatLine('Aleph', 700, 1)).toBe('Aleph defeats you and takes 7s from your purse.');
+    expect(worldPvpDefeatLine('Aleph', 700, 1)).toBe(
+      'Aleph defeats you and takes 7s from your purse.',
+    );
     expect(worldPvpDefeatLine('Aleph', 0, 3)).toBe('Aleph and 2 others defeat you.');
     expect(worldPvpDefeatLine('Aleph', 700, 3)).toBe(
       'Aleph and 2 others defeat you and take 7s from your purse.',

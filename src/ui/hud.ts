@@ -737,7 +737,6 @@ import {
 } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
-import { isPvpHostilePlayer, isPvpHostileTargetId } from './pvp_hostile_core';
 import {
   PET_ACTION_ICONS,
   petBarPreviewIconIds,
@@ -780,6 +779,7 @@ import {
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { createPromptTimeoutBar, PROMPT_TIMEOUT_MS } from './prompt_dialog';
+import { isPvpHostilePlayer, isPvpHostileTargetId } from './pvp_hostile_core';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipModel,
@@ -7574,10 +7574,7 @@ export class Hud {
           if (
             this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
             abilityStartsAutoAttack(resolved.effects) &&
-            hasAutoAttackTarget(
-              target,
-              isPvpHostileTargetId(this.sim, tid),
-            )
+            hasAutoAttackTarget(target, isPvpHostileTargetId(this.sim, tid))
           ) {
             // A TIMED cast must not engage yet (the aggro-before-damage bug). The
             // recorded id only ARMS once castStart below confirms this exact cast

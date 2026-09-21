@@ -78,7 +78,12 @@ export interface WorldPvpBooks {
 }
 
 export function newWorldPvpBooks(): WorldPvpBooks {
-  return { recentDamage: new Map(), recentSupport: new Map(), killPairs: new Map(), sweptAtTick: 0 };
+  return {
+    recentDamage: new Map(),
+    recentSupport: new Map(),
+    killPairs: new Map(),
+    sweptAtTick: 0,
+  };
 }
 
 const PAIR_SWEEP_TICKS = 20 * 60;
@@ -218,7 +223,8 @@ function inSameParty(ctx: SimContext, a: number, b: number): boolean {
 export function isWorldPvpHostile(ctx: SimContext, attacker: Entity, target: Entity): boolean {
   if (attacker.kind !== 'player' || target.kind !== 'player') return false;
   if (attacker.jailed || target.jailed) return false;
-  if (!worldPvpPairHostile(attacker, target, inSameParty(ctx, attacker.id, target.id))) return false;
+  if (!worldPvpPairHostile(attacker, target, inSameParty(ctx, attacker.id, target.id)))
+    return false;
   return !inInstancedPvp(ctx, attacker.id) && !inInstancedPvp(ctx, target.id);
 }
 
@@ -310,7 +316,11 @@ export function worldPvpKillLine(victimName: string, copper: number, contributor
 }
 
 /** What the victim is told. */
-export function worldPvpDefeatLine(killerName: string, copper: number, contributors: number): string {
+export function worldPvpDefeatLine(
+  killerName: string,
+  copper: number,
+  contributors: number,
+): string {
   const who = contributors > 1 ? `${killerName} and ${contributors - 1} others` : killerName;
   const verb = contributors > 1 ? 'defeat' : 'defeats';
   if (copper <= 0) return `${who} ${verb} you.`;
@@ -325,7 +335,11 @@ export function worldPvpDefeatLine(killerName: string, copper: number, contribut
  * honor; the victim is charged exactly what was paid out, never the full stake
  * when a contributor was grey or fully decayed.
  */
-export function worldPvpOnPlayerDeath(ctx: SimContext, victim: Entity, killer: Entity | null): void {
+export function worldPvpOnPlayerDeath(
+  ctx: SimContext,
+  victim: Entity,
+  killer: Entity | null,
+): void {
   const books = ctx.worldPvpBooks;
   const helpers = books.recentDamage.get(victim.id);
   books.recentDamage.delete(victim.id);

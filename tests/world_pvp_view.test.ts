@@ -19,7 +19,11 @@ import {
   worldPvpBodyHtml,
 } from '../src/ui/hud/world_pvp';
 import { setLanguage } from '../src/ui/i18n';
-import { isPvpHostilePlayer, isPvpHostileTargetId, type PvpHostileWorld } from '../src/ui/pvp_hostile_core';
+import {
+  isPvpHostilePlayer,
+  isPvpHostileTargetId,
+  type PvpHostileWorld,
+} from '../src/ui/pvp_hostile_core';
 import { localizeSimText } from '../src/ui/sim_i18n';
 import type { WorldPvpInfo } from '../src/world_api';
 
@@ -80,8 +84,14 @@ describe('buildWorldPvpWindowView', () => {
     );
     expect(sigs.size).toBe(8);
     // The countdown is whole seconds (ceil) so the strip does not rebuild 20x a second.
-    const a = buildWorldPvpWindowView({ ...base, info: info({ flagged: true, disarmRemaining: 10.2 }) });
-    const b = buildWorldPvpWindowView({ ...base, info: info({ flagged: true, disarmRemaining: 10.9 }) });
+    const a = buildWorldPvpWindowView({
+      ...base,
+      info: info({ flagged: true, disarmRemaining: 10.2 }),
+    });
+    const b = buildWorldPvpWindowView({
+      ...base,
+      info: info({ flagged: true, disarmRemaining: 10.9 }),
+    });
     expect(a.sig).toBe(b.sig);
     expect(a.kind === 'live' && a.disarmRemaining).toBe(11);
   });
@@ -97,8 +107,12 @@ describe('buildWorldPvpWindowView', () => {
 describe('worldPvpBodyHtml', () => {
   it('renders the pending note, then the live panel with the right action button', () => {
     setLanguage('en');
-    expect(worldPvpBodyHtml({ kind: 'pending', sig: 'x' })).toContain('Waiting for your PvP status');
-    const down = worldPvpBodyHtml(buildWorldPvpWindowView({ info: info(), honor: 3, confirming: false }));
+    expect(worldPvpBodyHtml({ kind: 'pending', sig: 'x' })).toContain(
+      'Waiting for your PvP status',
+    );
+    const down = worldPvpBodyHtml(
+      buildWorldPvpWindowView({ info: info(), honor: 3, confirming: false }),
+    );
     expect(down).toContain('data-act="pvp-enable"');
     expect(down).not.toContain('data-act="pvp-disable"');
     expect(down).toContain('Your PvP flag is down.');
@@ -136,7 +150,9 @@ describe('worldPvpBodyHtml', () => {
 
   it('escapes nothing it did not author (no raw player text reaches the markup)', () => {
     setLanguage('en');
-    const html = worldPvpBodyHtml(buildWorldPvpWindowView({ info: info(), honor: 0, confirming: false }));
+    const html = worldPvpBodyHtml(
+      buildWorldPvpWindowView({ info: info(), honor: 0, confirming: false }),
+    );
     expect(html).not.toContain('<script');
   });
 });
@@ -144,7 +160,11 @@ describe('worldPvpBodyHtml', () => {
 describe('isPvpHostilePlayer (the shared client verdict)', () => {
   const player = (id: number, extra: Partial<Entity> = {}): Entity =>
     ({ id, kind: 'player', dead: false, guild: '', ...extra }) as Entity;
-  const worldOf = (self: Entity, others: Entity[], over: Partial<PvpHostileWorld> = {}): PvpHostileWorld => ({
+  const worldOf = (
+    self: Entity,
+    others: Entity[],
+    over: Partial<PvpHostileWorld> = {},
+  ): PvpHostileWorld => ({
     playerId: self.id,
     entities: new Map([self, ...others].map((e) => [e.id, e])),
     duelInfo: null,

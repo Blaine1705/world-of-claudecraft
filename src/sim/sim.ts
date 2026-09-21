@@ -629,12 +629,12 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
-import * as worldPvpMod from './pvp/world_pvp';
 // By path, not through the pvp barrel: see the comment in src/sim/pvp/index.ts.
 import {
   spawnWarfareQuartermaster,
   WARFARE_QUARTERMASTER_NPC_ID,
 } from './pvp/warfare_quartermaster';
+import * as worldPvpMod from './pvp/world_pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
 import {

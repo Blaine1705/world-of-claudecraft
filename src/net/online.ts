@@ -197,7 +197,6 @@ import { apiErrorFromBody } from './api_error';
 import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
 import { computeBackoffDelay } from './backoff';
 import { applyBankSelfWire } from './bank_snapshot_wire';
-import { applySocialSelfWire } from './social_self_wire';
 import { blankEntity } from './blank_entity';
 import { applyBookOfDeedsWire } from './book_wire';
 import {
@@ -256,6 +255,7 @@ import {
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
 import { socialInfoFromFrame } from './social_frame_wire';
+import { applySocialSelfWire } from './social_self_wire';
 import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './target_echo';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';

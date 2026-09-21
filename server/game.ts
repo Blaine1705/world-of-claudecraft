@@ -400,6 +400,14 @@ import { runPeriodicSaveFlush } from './periodic_save_flush';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
+import {
+  type EntityWireCache,
+  type EntityWireVariantCache,
+  type EntityWireView,
+  emptyWireVariant,
+  fullEntityJson,
+  liteEntityJson,
+} from './entity_wire_cache';
 import { parseGuildPledgeSettingsCommand } from './guild_pledge_settings_cmd';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -423,14 +431,6 @@ import {
   StableSelfTimerWireCache,
   wireAura,
 } from './snapshot_timer_wire';
-import {
-  emptyWireVariant,
-  type EntityWireCache,
-  type EntityWireVariantCache,
-  type EntityWireView,
-  fullEntityJson,
-  liteEntityJson,
-} from './entity_wire_cache';
 import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';

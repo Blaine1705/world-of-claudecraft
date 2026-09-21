@@ -26,6 +26,7 @@ import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
+import type { WorldPvpBooks } from './pvp/world_pvp';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
@@ -44,7 +45,6 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
-import type { WorldPvpBooks } from './pvp/world_pvp';
 import type { BgMatch, BgQueueGroup } from './social/battleground';
 import type { BgOutcomeRecord } from './social/battleground_outcomes';
 import type { BgProposal } from './social/battleground_proposal';
