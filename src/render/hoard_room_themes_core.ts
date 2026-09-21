@@ -714,13 +714,13 @@ export const VHAROK_THEME: BossRoomTheme = {
   id: 'storm',
   boss: 'rift_boss_storm',
   palette: {
-    fogColor: 0x565c64,
-    fogNear: 62,
-    fogFar: 188,
-    ground: 0x313538,
-    groundLight: 0x474c4d,
-    cliff: 0x26282c,
-    cliffLight: 0x4d525a,
+    fogColor: 0x5a6878,
+    fogNear: 64,
+    fogFar: 192,
+    ground: 0x3b424b,
+    groundLight: 0x525c69,
+    cliff: 0x30363f,
+    cliffLight: 0x63707f,
     trunk: 0x1c1d20,
     accent: 0x56e6f0,
   },
@@ -736,14 +736,25 @@ export const VHAROK_THEME: BossRoomTheme = {
   ],
   hero: {
     piece: 'LightningSpire',
-    inset: 5.2,
-    scale: 1,
+    inset: 5.4,
+    scale: 1.05,
     flank: [
-      { piece: 'SplitMenhir', category: 'large', dx: 19.5, inset: 3.2, scale: 1.2 },
-      { piece: 'LightningRod', category: 'medium', dx: 24, inset: 3.4 },
-      { piece: 'TornBanner', category: 'medium', dx: 28, inset: 2.6 },
+      { piece: 'LightningRod', category: 'large', dx: 21.5, inset: 4.0, scale: 1.15 },
+      { piece: 'SplitMenhir', category: 'large', dx: 26, inset: 3.0, scale: 1.2 },
+      { piece: 'TornBanner', category: 'medium', dx: 30, inset: 2.6 },
     ],
     floor: [
+      // The storm's light at the tower's foot: dim, additive, and against the wall.
+      {
+        shape: 'fan',
+        tone: 'arc',
+        depth: 8,
+        along: 0,
+        halfLength: 1,
+        halfWidth: 0.24,
+        radius: 13,
+      },
+      ...apron('slab', 'slabAlt', 12),
       { shape: 'blot', tone: 'scorch', depth: 9, along: -5, halfLength: 3.2, halfWidth: 2.0 },
       { shape: 'blot', tone: 'scorch', depth: 8, along: 6.5, halfLength: 2.6, halfWidth: 1.8 },
     ],
@@ -752,10 +763,21 @@ export const VHAROK_THEME: BossRoomTheme = {
     {
       name: 'rods',
       puts: [
-        at('LightningRod', 'large', 2.8, 0, { yawJitter: 1.5 }),
-        at('GroundingChain', 'medium', 0.5, 4.4),
-        at('LightningRod', 'medium', 3.6, -4.8, { yawJitter: 1.5, scale: 0.8 }),
-        at('SplitMenhir', 'filler', 2.6, 8.2, { yawJitter: 0.5, scale: 0.75 }),
+        at('LightningRod', 'large', 3.0, 0, { yawJitter: 1.5 }),
+        at('GroundingChain', 'medium', 0.5, 4.6),
+        at('LightningRod', 'medium', 3.8, -5.2, { yawJitter: 1.5, scale: 0.78 }),
+        at('SplitMenhir', 'filler', 2.8, 8.6, { yawJitter: 0.5, scale: 0.75 }),
+      ],
+      floor: [
+        {
+          shape: 'fan',
+          tone: 'arc',
+          depth: 3.0,
+          along: 0,
+          halfLength: 1,
+          halfWidth: 0.2,
+          radius: 5,
+        },
       ],
     },
     {
@@ -791,15 +813,18 @@ export const VHAROK_THEME: BossRoomTheme = {
   clusterSpacing: 19,
   clusterSkip: 0.2,
   tones: {
-    scorch: { color: 0x16181b, lift: 0.035 },
-    crackle: { color: 0x1d2024, lift: 0.04 },
-    /** What grass the wind has left: grey-green, nothing cheerful. */
-    grass: { color: 0x39423a, lift: 0.03 },
+    slab: { color: 0x333941, lift: 0.03 },
+    slabAlt: { color: 0x424a55, lift: 0.03 },
+    scorch: { color: 0x1b1e23, lift: 0.035 },
+    crackle: { color: 0x242930, lift: 0.04 },
+    /** What grass the wind has left: grey, barely green, and only by the walls. */
+    grass: { color: 0x3d4744, lift: 0.03 },
+    /** Storm light on the stone: dim, and only at the walls. His circles are far brighter. */
+    arc: { color: 0x3fd6e6, lift: 0.06, lit: true },
   },
   floor: {
     scatter: [
-      { shape: 'blot', tone: 'grass', count: 12, region: 'edge', size: [1.6, 3.4] },
-      { shape: 'blot', tone: 'grass', count: 4, region: 'center', size: [1.0, 2.0] },
+      { shape: 'blot', tone: 'grass', count: 9, region: 'edge', size: [1.6, 3.2] },
       {
         shape: 'line',
         tone: 'scorch',
@@ -821,9 +846,16 @@ export const VHAROK_THEME: BossRoomTheme = {
     ],
   },
   ambient: {
-    pulse: [0.45, 1.0, 2.4],
+    // The caught lightning flickers; sparks climb off every conductor.
+    pulse: [0.5, 1.15, 3.4],
     sway: ['TornBanner'],
-    particles: { color: 0xb8c4c8, count: 60, size: 0.11, mode: 'drift' },
+    particles: {
+      color: 0x9ff6ff,
+      count: 54,
+      size: 0.17,
+      mode: 'rise',
+      emitters: { LightningSpire: [33, 2.4], LightningRod: [8.4, 0.7], SplitMenhir: [5.5, 0.6] },
+    },
   },
 };
 

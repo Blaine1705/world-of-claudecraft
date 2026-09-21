@@ -19,22 +19,22 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 from kitlib import GLOW, Piece, build_kit, export_kit, here, preview  # noqa: E402
 from mathutils import Matrix, Vector  # noqa: E402
 
-GRANITE = (0.56, 0.58, 0.63)
-GRANITE_DARK = (0.4, 0.42, 0.47)
-GRANITE_DEEP = (0.28, 0.3, 0.34)
-COPPER = (0.78, 0.5, 0.33)
-VERDIGRIS = (0.4, 0.68, 0.6)
-IRON = (0.36, 0.37, 0.41)
-IRON_DARK = (0.24, 0.25, 0.28)
+GRANITE = (0.78, 0.81, 0.88)
+GRANITE_DARK = (0.6, 0.63, 0.72)
+GRANITE_DEEP = (0.43, 0.46, 0.55)
+COPPER = (0.6, 0.47, 0.35)
+VERDIGRIS = (0.46, 0.78, 0.68)
+IRON = (0.5, 0.52, 0.58)
+IRON_DARK = (0.36, 0.38, 0.44)
 BONE = (0.84, 0.82, 0.73)
 BONE_OLD = (0.66, 0.65, 0.58)
-CLOTH = (0.34, 0.46, 0.58)
-CLOTH_DARK = (0.24, 0.32, 0.44)
-TRIM = (0.7, 0.62, 0.4)
-WOOD = (0.4, 0.34, 0.3)
-SCORCH = (0.1, 0.1, 0.12)
-ARC = (0.5, 0.96, 1.0)
-ARC_DIM = (0.24, 0.58, 0.66)
+CLOTH = (0.3, 0.52, 0.8)
+CLOTH_DARK = (0.22, 0.38, 0.62)
+TRIM = (0.86, 0.74, 0.4)
+WOOD = (0.5, 0.42, 0.36)
+SCORCH = (0.16, 0.16, 0.2)
+ARC = (0.6, 1.0, 1.0)
+ARC_DIM = (0.3, 0.72, 0.82)
 COLD = (0.02, 0.05, 0.07)
 
 
@@ -84,80 +84,129 @@ def torn_cloth(p, x0, z_top, width, drops, y=0.0, pitch=0.12):
               pitch=pitch + 0.05 * i, taper=0.55 if i % 2 else 0.85)
 
 
+def bolt(p, a, b, width=0.16, tone=ARC, kinks=4, wander=0.6):
+    """A frozen fork of lightning from a to b: a jagged run of thin lit bars, any way up."""
+    a, b = Vector(a), Vector(b)
+    points = [a]
+    for i in range(1, kinks):
+        t = i / kinks
+        points.append(a.lerp(b, t) + Vector(((p.rng.random() - 0.5) * 2 * wander, 0, (p.rng.random() - 0.5) * wander)))
+    points.append(b)
+    for here_, there in zip(points, points[1:]):
+        along = there - here_
+        p.box((here_ + there) / 2, (width, 0.1, along.length * 1.05), tone, mat=GLOW, roll=math.atan2(along.x, along.z))
+
+
+def coil(p, at, r, rings, rise=0.62, shrink=0.86):
+    """Stacked copper rings, each smaller than the one under it: a storm conductor's coil."""
+    z = at[2]
+    for i in range(rings):
+        p.prism((at[0], at[1], z), 10, r, r, rise * 0.45, COPPER if i % 2 == 0 else VERDIGRIS)
+        z += rise
+        r *= shrink
+    return z
+
+
 # --------------------------------------------------------------------- hero
 def lightning_spire():
-    """The Great Lightning Spire: a monolith banded in copper, chained to the mountain,
-    what is left of its storm hall fallen round its foot. Back at y = +4."""
+    """The Great Lightning Spire: a storm tower split to its core by an age of strikes,
+    crowned with a copper coil that holds a captive bolt, the ruin of its hall round
+    its feet. Back at y = +4."""
     p = piece('Kit_LightningSpire')
-    for i, (w, d, h) in enumerate(((17, 9, 1.0), (13, 7, 1.0), (9.5, 5.4, 1.1))):
-        p.box((0, 1.0, 0.5 + i * 1.0), (w, d, h), GRANITE if i % 2 == 0 else GRANITE_DARK, bevel=0.14)
-    # The monolith, split down its face by an age of strikes.
-    p.box((0, 1.6, 12.6), (5.6, 4.0, 19.4), GRANITE_DARK, taper=0.5, bevel=0.25)
-    p.box((-0.2, 1.4, 23.2), (2.9, 2.2, 3.4), GRANITE, taper=0.7, bevel=0.15, roll=0.04)
-    crack(p, 0.0, -0.46, 3.4, 8.0, width=0.2, tone=ARC, wander=0.5)
-    crack(p, 0.2, -0.1, 8.0, 13.5, width=0.16, tone=ARC_DIM, wander=0.4)
-    # Copper: bands round it, a crown of prongs, the rod that draws the sky down.
-    for z, w, d in ((6.0, 5.3, 4.0), (11.5, 4.5, 3.4), (17.0, 3.7, 2.9), (21.4, 3.2, 2.5)):
-        p.box((0, 1.6, z), (w, d, 0.55), COPPER if z != 11.5 else VERDIGRIS, bevel=0.06)
-    p.prism((0, 1.5, 24.8), 6, 0.34, 0.2, 6.0, COPPER)
+    for i, (w, d, h) in enumerate(((21, 10, 1.1), (16, 8, 1.1), (11.5, 6, 1.2))):
+        p.box((0, 0.6, 0.55 + i * 1.1), (w, d, h), GRANITE if i % 2 == 0 else GRANITE_DARK, bevel=0.16)
+    # The tower: two halves of one great stone, the light of the storm in the split.
+    for side in (-1, 1):
+        p.box((side * 2.35, 1.6, 13.4), (3.9, 5.2, 20.0), GRANITE if side < 0 else GRANITE_DARK, taper=0.6, roll=-side * 0.03, bevel=0.3)
+        p.box((side * 5.2, 2.2, 7.0), (2.4, 3.4, 8.0), GRANITE_DARK if side < 0 else GRANITE_DEEP, taper=0.4, roll=-side * 0.2, bevel=0.25)
+        p.box((side * 1.0, -0.9, 9.6), (0.7, 0.5, 12.0), GRANITE_DEEP, taper=0.5)
+    p.box((0, -0.6, 10.2), (1.0, 0.3, 13.2), ARC, mat=GLOW, taper=0.35)
+    p.box((0, -0.7, 10.2), (0.36, 0.3, 12.4), (0.9, 1.0, 1.0), mat=GLOW, taper=0.3)
+    bolt(p, (-0.4, -1.12, 12.0), (-3.2, -1.12, 16.4), width=0.18, tone=ARC_DIM, kinks=3)
+    bolt(p, (0.4, -1.12, 8.0), (3.4, -1.12, 11.6), width=0.18, tone=ARC_DIM, kinks=3)
+    # Bands of copper hold the halves together.
+    for z, w in ((5.4, 9.0), (11.0, 7.6), (16.6, 6.4)):
+        p.box((0, 1.6, z), (w, 5.6, 0.7), COPPER if z != 11.0 else VERDIGRIS, bevel=0.08)
+        for side in (-1, 1):
+            p.prism((side * (w / 2 - 0.5), -1.25, z), 6, 0.3, 0.2, 0.25, IRON_DARK, axis='Y')
+    # The crown: a coil of copper, a mast, and the bolt it caught.
+    p.box((0, 1.6, 23.7), (5.6, 5.0, 0.9), GRANITE_DEEP, bevel=0.15)
+    top = coil(p, (0, 1.6, 24.2), 3.6, 5, rise=0.95, shrink=0.8)
+    p.prism((0, 1.6, top), 8, 0.5, 0.3, 4.6, COPPER)
+    orb = (0, 1.6, top + 5.6)
     for k in range(4):
-        a = k * math.tau / 4 + 0.4
-        p.sweep(p.bezier((math.cos(a) * 0.8, 1.5 + math.sin(a) * 0.8, 24.6), (math.cos(a) * 2.4, 1.5 + math.sin(a) * 2.4, 25.6),
-                         (math.cos(a) * 1.9, 1.5 + math.sin(a) * 1.9, 28.2), steps=4), 0.18, 0.06, VERDIGRIS if k % 2 else COPPER, sides=4)
-    p.rock((0, 1.5, 31.0), (0.5, 0.5, 0.7), ARC, jitter=0.1, mat=GLOW)
-    # The hall that stood round it: two broken piers and a span that did not fall.
-    for side, h in ((-1, 12.0), (1, 8.0)):
-        p.box((side * 12.0, 2.4, h / 2), (3.4, 3.2, h), GRANITE_DARK, taper=0.86, bevel=0.2)
-        p.box((side * 12.0, 2.4, h + 0.3), (4.2, 3.8, 0.8), GRANITE if side < 0 else GRANITE_DEEP, bevel=0.12, roll=0.0 if side < 0 else 0.22)
-        p.box((side * 12.0, 0.72, h * 0.55), (2.2, 0.2, 0.5), VERDIGRIS)
-    p.box((-9.2, 2.4, 13.3), (4.4, 2.6, 1.3), GRANITE, roll=-0.16, bevel=0.15)
-    for x, y, z, w, yaw, roll in ((8.4, -2.6, 0.7, 3.2, 0.5, 0.2), (5.0, -3.4, 0.5, 2.0, -0.4, -0.1), (-6.6, -3.0, 0.5, 2.4, 0.9, 0.12),
-                                  (14.6, -1.4, 0.6, 2.4, 0.2, 0.3)):
-        p.box((x, y, z), (w, w * 0.7, 1.1), GRANITE_DEEP if w < 2.2 else GRANITE, yaw=yaw, roll=roll, bevel=0.15)
+        a = k * math.tau / 4 + 0.6
+        tip = (math.cos(a) * 2.2, 1.6 + math.sin(a) * 2.2, top + 5.0)
+        p.sweep(p.bezier((math.cos(a) * 1.2, 1.6 + math.sin(a) * 1.2, top - 0.4), (math.cos(a) * 3.4, 1.6 + math.sin(a) * 3.4, top + 1.6), tip, steps=5),
+                0.26, 0.08, VERDIGRIS if k % 2 else COPPER, sides=5)
+        bolt(p, orb, (tip[0], 0.9, tip[2]), width=0.13, tone=ARC_DIM, kinks=3, wander=0.4)
+    p.rock(orb, (2.0, 2.0, 2.2), ARC, jitter=0.1, subdivisions=2, mat=GLOW)
+    p.rock(orb, (1.1, 1.1, 1.2), (0.92, 1.0, 1.0), jitter=0.06, mat=GLOW)
+    # Its hall: on the left a span still stands to the tower, on the right it has fallen.
+    for side, h in ((-1, 11.0), (1, 6.5)):
+        p.box((side * 14.0, 2.6, h / 2), (3.6, 3.4, h), GRANITE_DARK, taper=0.88, bevel=0.2)
+        p.box((side * 14.0, 2.6, h + 0.35), (4.4, 4.0, 0.9), GRANITE, bevel=0.14, roll=0.0 if side < 0 else 0.2)
+        p.box((side * 14.0, 0.82, h * 0.5), (2.4, 0.2, 0.6), VERDIGRIS)
+        p.prism((side * 14.0, 2.6, h + 0.8), 8, 0.22, 0.12, 3.4, COPPER)
+        p.rock((side * 14.0, 2.6, h + 4.5), (0.6, 0.6, 0.7), ARC, jitter=0.1, mat=GLOW)
+    p.ring((-9.0, 2.6, 11.0), 4.4, 1.1, GRANITE, segments=14, arc=(0.0, math.pi), width=2.2)
+    p.ring((9.0, 2.6, 6.5), 4.4, 1.1, GRANITE_DARK, segments=14, arc=(0.0, 0.9), width=2.2)
+    for x, y, z, w, yaw, roll in ((8.0, -2.8, 0.8, 3.4, 0.5, 0.2), (4.6, -3.8, 0.55, 2.2, -0.4, -0.1), (-7.4, -3.4, 0.6, 2.6, 0.9, 0.12),
+                                  (11.6, -1.0, 0.7, 2.8, 0.2, 0.3), (16.6, -2.2, 0.6, 2.2, -0.6, 0.15)):
+        p.box((x, y, z), (w, w * 0.7, 1.2), GRANITE_DEEP if w < 2.4 else GRANITE, yaw=yaw, roll=roll, bevel=0.15)
     # Grounded: heavy chain from the copper down to ringbolts set in the floor.
     for side in (-1, 1):
-        chain_run(p, (side * 2.4, 0.4, 16.6), (side * 9.2, -2.4, 0.9), size=0.8, sag=2.2)
-        anchor_ring(p, (side * 9.4, -2.5, 0.0), r=0.7)
+        chain_run(p, (side * 3.4, -0.6, 16.4), (side * 10.0, -3.4, 0.9), size=1.0, sag=2.4)
+        anchor_ring(p, (side * 10.2, -3.5, 0.0), r=0.8)
     return p
 
 
 # ------------------------------------------------------------------- props
 def split_menhir():
-    """A standing stone the lightning keeps finding: split, scorched, a glow in the wound."""
+    """A standing stone the lightning keeps finding: split, scorched, the storm still in the wound."""
     p = piece('Kit_SplitMenhir')
-    p.rock((0, 0.3, 0.3), (3.6, 2.8, 1.1), GRANITE_DEEP, jitter=0.18)
-    p.box((-0.72, 0.2, 3.3), (1.5, 1.5, 6.6), GRANITE, taper=0.6, roll=-0.07, bevel=0.2)
-    p.box((0.74, 0.2, 2.8), (1.4, 1.4, 5.6), GRANITE_DARK, taper=0.5, roll=0.1, bevel=0.2)
-    p.box((0.02, 0.1, 2.6), (0.22, 1.0, 4.6), ARC_DIM, mat=GLOW, taper=0.4)
-    p.box((-0.75, -0.57, 5.4), (1.0, 0.1, 1.6), SCORCH, roll=-0.07)
-    p.box((0.72, -0.5, 4.4), (0.8, 0.1, 1.3), SCORCH, roll=0.1)
+    p.rock((0, 0.3, 0.35), (4.4, 3.2, 1.3), GRANITE_DEEP, jitter=0.18)
+    p.box((-0.95, 0.2, 3.6), (1.9, 1.8, 7.2), GRANITE, taper=0.6, roll=-0.08, bevel=0.22)
+    p.box((0.95, 0.2, 3.0), (1.8, 1.7, 6.0), GRANITE_DARK, taper=0.5, roll=0.11, bevel=0.22)
+    p.box((0.02, -0.2, 2.9), (0.5, 0.9, 5.2), ARC, mat=GLOW, taper=0.3)
+    bolt(p, (-0.3, -0.76, 4.2), (-1.5, -0.76, 6.2), width=0.11, tone=ARC_DIM, kinks=3, wander=0.3)
+    bolt(p, (0.3, -0.72, 3.0), (1.4, -0.72, 4.6), width=0.11, tone=ARC_DIM, kinks=3, wander=0.3)
+    p.box((-1.0, -0.72, 1.4), (1.2, 0.1, 1.6), SCORCH, roll=-0.08)
+    p.box((0.95, -0.66, 1.2), (1.0, 0.1, 1.3), SCORCH, roll=0.11)
+    p.box((-0.95, 0.2, 5.4), (1.7, 1.75, 0.3), VERDIGRIS, roll=-0.08)
     return p
 
 
 def lightning_rod():
-    """A conductor of copper on an iron foot. A spark lives at its tip."""
+    """A storm conductor: a copper coil on a drum of stone, a caught spark held at its head."""
     p = piece('Kit_LightningRod')
+    p.prism((0, 0, 0), 8, 1.7, 1.45, 1.0, GRANITE_DARK, phase=0.3)
+    p.prism((0, 0, 1.0), 8, 1.2, 1.05, 0.7, GRANITE)
+    p.prism((0, 0, 1.7), 8, 0.42, 0.3, 5.4, COPPER)
+    coil(p, (0, 0, 2.3), 1.3, 5, rise=0.78, shrink=0.84)
+    p.prism((0, 0, 7.0), 8, 0.3, 0.8, 0.5, VERDIGRIS)
     for k in range(3):
-        a = k * math.tau / 3 + 0.3
-        p.sweep([(math.cos(a) * 1.1, math.sin(a) * 1.1, 0), (math.cos(a) * 0.2, math.sin(a) * 0.2, 2.2)], 0.1, 0.1, IRON_DARK, sides=4)
-    p.prism((0, 0, 1.8), 6, 0.2, 0.12, 6.4, COPPER)
-    for z, r in ((3.0, 0.5), (4.2, 0.42), (5.4, 0.34)):
-        p.prism((0, 0, z), 8, r, r, 0.16, VERDIGRIS)
-    p.prism((0, 0, 8.2), 6, 0.3, 0.06, 0.8, COPPER)
-    p.rock((0, 0, 9.2), (0.3, 0.3, 0.4), ARC, jitter=0.1, mat=GLOW)
+        a = k * math.tau / 3 + 0.5
+        p.sweep(p.bezier((math.cos(a) * 0.6, math.sin(a) * 0.6, 7.3), (math.cos(a) * 1.4, math.sin(a) * 1.4, 7.8),
+                         (math.cos(a) * 1.0, math.sin(a) * 1.0, 9.0), steps=4), 0.13, 0.05, COPPER, sides=4)
+    p.rock((0, 0, 8.4), (1.0, 1.0, 1.1), ARC, jitter=0.1, subdivisions=2, mat=GLOW)
+    p.rock((0, 0, 8.4), (0.55, 0.55, 0.6), (0.92, 1.0, 1.0), jitter=0.06, mat=GLOW)
+    bolt(p, (0.2, -0.5, 8.2), (0.9, -0.9, 6.0), width=0.08, tone=ARC_DIM, kinks=3, wander=0.3)
     return p
 
 
 def torn_banner():
-    """A war banner the wind has been at for years. It rocks on its pole."""
+    """A war banner the wind has been at for years, the storm's mark still on it. It rocks on its pole."""
     p = piece('Kit_TornBanner')
-    p.rock((0, 0, 0.2), (1.6, 1.5, 0.8), GRANITE_DEEP, jitter=0.18)
+    p.rock((0, 0, 0.25), (2.0, 1.8, 1.0), GRANITE_DEEP, jitter=0.18)
     start = p.mark()
-    p.prism((0, 0, 0), 6, 0.15, 0.11, 9.4, WOOD)
-    p.spike((0, 0, 9.4), 0.24, 0.8, IRON, sides=4)
-    p.box((1.3, 0, 8.6), (3.0, 0.14, 0.14), WOOD)
-    torn_cloth(p, 0.0, 8.5, 2.7, (4.4, 2.6, 3.8, 1.9, 3.1))
-    p.box((1.35, -0.12, 7.4), (0.8, 0.08, 0.8), TRIM, roll=math.pi / 4, pitch=0.14)
+    p.prism((0, 0, 0), 6, 0.2, 0.15, 10.4, WOOD)
+    p.spike((0, 0, 10.4), 0.32, 1.0, COPPER, sides=4)
+    p.box((1.9, 0, 9.6), (4.2, 0.18, 0.18), WOOD)
+    torn_cloth(p, 0.1, 9.5, 3.8, (5.4, 3.2, 4.6, 2.4, 3.8))
+    # The storm's mark, in gold: a bolt.
+    for x, z, angle in ((1.7, 8.4, 0.55), (2.1, 7.6, -0.55), (1.8, 6.8, 0.55)):
+        p.box((x, -0.2, z), (0.28, 0.08, 1.2), TRIM, roll=angle, pitch=0.14)
     p.turn(start, Matrix.Rotation(0.07, 4, 'Y'))
     return p
 

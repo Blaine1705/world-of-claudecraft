@@ -1083,7 +1083,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/hoard_frost_kit.glb": "/media/models/props/hoard_frost_kit.ed995ab6efa1.glb",
   "models/props/hoard_nest_kit.glb": "/media/models/props/hoard_nest_kit.ee5c8db64539.glb",
   "models/props/hoard_reward_chest.glb": "/media/models/props/hoard_reward_chest.939ad4330c6c.glb",
-  "models/props/hoard_storm_kit.glb": "/media/models/props/hoard_storm_kit.2ebc69e4124a.glb",
+  "models/props/hoard_storm_kit.glb": "/media/models/props/hoard_storm_kit.deab50fd1f8e.glb",
   "models/props/hoard_void_kit.glb": "/media/models/props/hoard_void_kit.656d670e53c0.glb",
   "models/props/hoard_warcamp_kit.glb": "/media/models/props/hoard_warcamp_kit.4dd3ae7eb685.glb",
   "models/props/hollow_gate_crystal.glb": "/media/models/props/hollow_gate_crystal.db1c41999e77.glb",
