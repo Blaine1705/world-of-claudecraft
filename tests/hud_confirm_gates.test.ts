@@ -23,7 +23,7 @@ interface ConfirmCall {
 
 interface GateHarness {
   onResurrectAtSpiritHealer: (() => void) | null;
-  sim: { player: { level: number }; buyHeroicVendorItem(itemId: string): void };
+  sim: { player?: { level: number }; buyHeroicVendorItem(itemId: string): void };
   confirmDialog(
     title: string,
     body: string,
