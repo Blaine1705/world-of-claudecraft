@@ -1157,6 +1157,14 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   bonewrought_bulwark: 'shield_square',
   duskforged_bulwark: 'shield_square', // crafted apex tower shield (masterwrought); bulwarks share shield_square
   pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
+  // The Buried Hoard shields, one row per map-rarity tier (the tier clones are
+  // their own items, not heroicOf copies, so none inherits a row).
+  glacier_hewn_bulwark: 'shield_square',
+  rare_glacier_hewn_bulwark: 'shield_square',
+  legendary_glacier_hewn_bulwark: 'shield_square',
+  storm_tuned_buckler: 'shield_round',
+  rare_storm_tuned_buckler: 'shield_round',
+  legendary_storm_tuned_buckler: 'shield_round',
   // The inscription tomes: the first held_offhand item models, procedural GLBs
   // from scripts/assets/inscription_tomes (VAR_BOOK grips). The phase 09 apex
   // grimoire joined the family at phase 18, and with it left the conscious
