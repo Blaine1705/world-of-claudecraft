@@ -5,6 +5,12 @@ import { createLootQuality, isEligibleLootQualityItem } from '../loot_quality';
 import type { Rng } from '../rng';
 import { cloneItemInstancePayload, type Entity, type LootSlot } from '../types';
 
+/** Which kills may mint quality: wild, player-independent mobs only. Pets and
+ * dev spawns are excluded as owned, training dummies as farmable, and an
+ * affix-spawned add (`affixSpawned`, the Restless Graves delve affix raising
+ * an ordinary kill as a second corpse) because it is a free extra kill of a
+ * template the party already killed, so the raised add never rolls; the
+ * original kill still does. */
 export function isEligibleEnemyQualitySource(mob: Entity): boolean {
   return (
     mob.kind === 'mob' &&

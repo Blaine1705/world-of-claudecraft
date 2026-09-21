@@ -1103,7 +1103,7 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the loot identity receipt
     // and projection helpers moved to dedicated siblings, composed with the
     // release extractions above. Exact merged count, zero slack.
-    ceiling: 11751,
+    ceiling: 11750,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

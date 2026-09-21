@@ -13,7 +13,7 @@ import {
 import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
 import { selectedInventorySlot } from '../item_copy_ref';
-import { isEligibleEnemyQualitySource } from '../loot/enemy_quality';
+import { isEligibleEnemyQualitySource, rollEnemyLootQuality } from '../loot/enemy_quality';
 import { createLootQuality, isEligibleLootQualityItem } from '../loot_quality/core';
 import { cloneLootQuality } from '../loot_quality/types';
 import type { PlayerMeta } from '../sim';
@@ -358,7 +358,7 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
     const pool = riftNormalClearPool();
     loot.items.push({ itemId: pool[ctx.rng.int(0, pool.length - 1)], count: 1 });
     loot.copper = (loot.copper ?? 0) + RIFT_COIN_BONUS_C;
-    if (isEligibleEnemyQualitySource(boss)) rollRiftClearQualities(ctx, loot.items, firstNewSlot);
+    loot.items = rollRiftClearQualities(ctx, boss, loot.items, firstNewSlot);
     boss.loot = loot;
     boss.lootable = true;
     return;
@@ -429,25 +429,23 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
   const coinBonus =
     rank === 'B' ? RIFT_COIN_BONUS_B : rank === 'A' ? RIFT_COIN_BONUS_A : RIFT_COIN_BONUS_S;
   loot.copper = (loot.copper ?? 0) + coinBonus;
-  if (isEligibleEnemyQualitySource(boss)) rollRiftClearQualities(ctx, loot.items, firstNewSlot);
+  loot.items = rollRiftClearQualities(ctx, boss, loot.items, firstNewSlot);
 
   boss.loot = loot;
   if (loot.items.length > 0 || loot.copper > 0) boss.lootable = true;
 }
 
-/** Only newly selected clear rewards draw quality; static corpse gear is already rolled. */
+/** Only newly selected clear rewards draw quality; static corpse gear is already
+ * rolled. The roller itself is the enemy one (loot/enemy_quality.ts): one draw
+ * per copy, a stack split per copy, a deep-cloned payload, and the source gate,
+ * so a clear reward and a corpse drop can never diverge in how they mint. */
 function rollRiftClearQualities(
   ctx: SimContext,
+  boss: Entity,
   items: NonNullable<Entity['loot']>['items'],
   start: number,
-): void {
-  for (let index = start; index < items.length; index++) {
-    const slot = items[index];
-    const item = ITEMS[slot.itemId];
-    if (!item || !isEligibleLootQualityItem(item)) continue;
-    const lootQuality = createLootQuality(ctx.rng);
-    if (lootQuality) items[index] = { ...slot, instance: { ...slot.instance, lootQuality } };
-  }
+): NonNullable<Entity['loot']>['items'] {
+  return [...items.slice(0, start), ...rollEnemyLootQuality(ctx.rng, boss, items.slice(start))];
 }
 
 /** First-clear personal loot. Every winner gets a class-appropriate non-fungible
@@ -472,7 +470,13 @@ export function addRiftProgressionLoot(
     const meta = ctx.players.get(pid);
     if (!meta) continue;
     const gear = createRiftGearInstance(eventId, tier, meta.cls, pid);
-    const lootQuality = isEligibleEnemyQualitySource(boss) ? createLootQuality(ctx.rng) : undefined;
+    // Both gates the sibling rollers apply: the source AND the item. Bands are
+    // epic armor today, so the item gate is inert, but a shell def change must
+    // never stamp a descriptor that reads as enhanced with zero bonus.
+    const lootQuality =
+      isEligibleEnemyQualitySource(boss) && isEligibleLootQualityItem(ITEMS[gear.itemId])
+        ? createLootQuality(ctx.rng)
+        : undefined;
     if (lootQuality) gear.instance.lootQuality = lootQuality;
     loot.items.push({
       itemId: gear.itemId,

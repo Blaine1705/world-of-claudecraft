@@ -24,7 +24,6 @@ import type {
 } from '../world_api';
 import type { GroundAimPointXZ } from '../world_api/combat';
 import { abilityNeedsLineOfSight } from './ability_line_of_sight';
-import type { AbilityOutputScaling } from './ability_output_scaling';
 import { maybeAutoEquip } from './auto_equip';
 import * as bagsMod from './bags';
 import {

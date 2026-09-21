@@ -1,8 +1,8 @@
 import { PRIMARY_STATS, staminaBaseline } from '../item_budget';
 import {
   RIFT_BAND_MAX_UPGRADE,
-  RIFT_BAND_TIER_BASE_ILVL,
   type RiftBandShell,
+  riftBandItemLevel,
   riftBandPrimaryStats,
   riftBandStatBudget,
 } from '../rift/band_ladder';
@@ -10,6 +10,12 @@ import type { RiftTier } from '../types';
 import type { LootQualityDescriptor } from './types';
 
 type Line = Record<string, number>;
+
+/** Resolved ladders by shell, rank and descriptor. The search is pure, so the
+ * memo only spares recalcPlayerStats the walk on every aura change for a worn
+ * quality band; bounded because weights are per copy and open-ended. */
+const LADDER_MEMO_LIMIT = 512;
+const ladderMemo = new Map<string, readonly Line[]>();
 
 function candidates(shell: RiftBandShell, level: number, quality: LootQualityDescriptor): Line[] {
   const guaranteedLevel = level + 2 * (quality.tier - 1);
@@ -49,9 +55,25 @@ export function riftQualityPrimaryStats(
   upgrade: number,
   quality: LootQualityDescriptor,
 ): Line {
-  const start = RIFT_BAND_TIER_BASE_ILVL[tier];
+  const key = `${shell.primary}|${shell.secondary}|${tier}|${quality.tier}|${quality.weights.join(',')}`;
+  let ladder = ladderMemo.get(key);
+  if (!ladder) {
+    ladder = resolveLadder(shell, tier, quality);
+    if (ladderMemo.size >= LADDER_MEMO_LIMIT) ladderMemo.clear();
+    ladderMemo.set(key, ladder);
+  }
+  return { ...ladder[Math.max(0, Math.min(RIFT_BAND_MAX_UPGRADE, Math.floor(upgrade)))] };
+}
+
+function resolveLadder(
+  shell: RiftBandShell,
+  tier: RiftTier,
+  quality: LootQualityDescriptor,
+): readonly Line[] {
+  // Priced at the same capped level the ordinary line uses (riftBandItemLevel),
+  // so a cap change can never split the ladder from its baseline.
   const rows = Array.from({ length: RIFT_BAND_MAX_UPGRADE + 1 }, (_, i) =>
-    candidates(shell, start + i, quality),
+    candidates(shell, riftBandItemLevel(tier, i), quality),
   );
   function path(step: number, previous?: Line): Line[] | undefined {
     if (step === rows.length) return [];
@@ -63,7 +85,12 @@ export function riftQualityPrimaryStats(
     return undefined;
   }
   const result = path(0);
-  // Every supported shell/rank/quality has a feasible path, exhaustively pinned.
+  // Unreachable from persisted data: feasibility does not depend on the weights
+  // (they only order the candidates and the search is exhaustive),
+  // sanitizeRiftGearInstance constrains rift.tier to a real rank, and the
+  // ladder suite pins every shell/rank/tier combination. Kept as a throw so a
+  // future shell or budget change that breaks monotonicity fails loudly in
+  // that suite rather than pricing a worn band silently.
   if (!result) throw new Error('Rift loot-quality ladder has no monotone allocation');
-  return result[Math.max(0, Math.min(RIFT_BAND_MAX_UPGRADE, Math.floor(upgrade)))];
+  return result;
 }
