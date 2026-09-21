@@ -302,6 +302,7 @@ import {
   type ErrorTextLockoutDeps,
   localizeErrorText as localizeErrorTextCore,
 } from './error_text_i18n_core';
+import { ErrorToastController } from './error_toast_controller';
 import { ERROR_LOG_CHAN, ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
 import { blockFctAmountText } from './fct_core';
@@ -327,6 +328,7 @@ import {
   shouldFloatHealLanding,
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
+import { heldLootWarningText } from './held_loot_warning_view';
 import { honorFloatText } from './honor_float_view';
 import { ActionBarBindController } from './hud/action_bar/action_bar_bind_controller';
 import {
@@ -652,6 +654,7 @@ import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
+import { lootRollWinBanner } from './loot_roll_win_view';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
@@ -1450,7 +1453,7 @@ export class Hud {
   // outside-click closer can defer to that opener's own toggle click. Cleared on
   // every close path (closeContextMenu + item activation).
   private ctxMenuOpener: HTMLElement | null = null;
-  private errorEl = $('#error-msg');
+  private errorToast = new ErrorToastController($('#error-msg'));
   private bannerEl = $('#banner');
   // The WoW-style quest-progress flash (quest_progress_banner.ts): yellow
   // top-center lines fed by the questProgress event, aria-hidden decoration
@@ -1472,7 +1475,6 @@ export class Hud {
   // The world entity whose hover tooltip is currently shown, so main.ts can call
   // its show method every frame without rebuilding unchanged HTML.
   private lastHoverTooltipId: string | null = null;
-  private errorTimer: number | undefined;
   private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
   // The hideBannerImmediately re-arm's own handle, kept so repeat hides
@@ -11628,6 +11630,10 @@ export class Hud {
         case 'comboPoint':
           break;
         case 'loot': {
+          const heldWarning = heldLootWarningText(ev.text);
+          if (heldWarning) this.errorToast.show(heldWarning, 7500, true);
+          const wonBanner = lootRollWinBanner(ev.text, sim.player?.name);
+          if (wonBanner) this.showBanner(...wonBanner);
           // callerLogs: a professions grant whose own result event (gatherResult
           // / fishingResult / craftResult / disenchantResult / salvageResult /
           // enchantResult) renders the player-visible line for this same grant,
@@ -11637,13 +11643,7 @@ export class Hud {
           // the loot-roll close below, the bag refresh, and the independent
           // audio guard.
           if (!ev.callerLogs) this.log(this.localizeLootText(ev.text), HUD_LOG.GOOD);
-          if (
-            / wins .+ \(\d+\)$/.test(ev.text) ||
-            /^Everyone passed on .+\.$/.test(ev.text) ||
-            / assigned .+ to .+\.$/.test(ev.text) ||
-            /^.+ was not assigned and is free for all\.$/.test(ev.text)
-          )
-            this.lootRolls.closeForItem(ev.text);
+          this.lootRolls.closeForItem(ev.text);
           // silent: the audio half of the same idea, and independent of it (a
           // caller can own the cue without owning the line). A professions
           // grant sets this when it owns the cue for the same grant: it has a
@@ -14492,12 +14492,7 @@ export class Hud {
     logChannel = ERROR_LOG_CHAN,
     announceWhenFiltered = false,
   ): void {
-    this.errorEl.textContent = localized;
-    this.errorEl.style.opacity = '1';
-    clearTimeout(this.errorTimer);
-    this.errorTimer = window.setTimeout(() => {
-      this.errorEl.style.opacity = '0';
-    }, 1600);
+    this.errorToast.show(localized);
     audio.error();
     // Mirror into the chat log's system channel (the same one loot/level-up/death
     // lines use) so the toast is not lost once it fades: WoW-style error/system
@@ -14636,6 +14631,7 @@ export class Hud {
     // would otherwise inherit the previous one's visual language.
     this.bannerEl.classList.toggle('banner-deed', variant === 'deed');
     this.bannerEl.classList.toggle('banner-skill', variant === 'skill');
+    this.bannerEl.classList.toggle('banner-loot', payload.bannerClass === 'loot');
     // Reduced-motion celebrations (craft plan.motion) show and hide the
     // banner without the fade transition: identical text and duration, no
     // animation. Motion-trimming only; information always survives.

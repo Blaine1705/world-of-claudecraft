@@ -4266,6 +4266,14 @@
     white-space: normal;
     overflow-wrap: anywhere;
   }
+  body.mobile-touch #banner.banner-loot {
+    top: 21%;
+    font-size: calc(18px * var(--mobile-chrome-scale, 1));
+    z-index: 96;
+  }
+  body.mobile-touch #error-msg.held-loot-warning {
+    top: max(28%, calc(21% + 72px));
+  }
   /* The secondary lines scale with the title. Without this they stay at the
      desktop 18px while the verdict drops to 26px, so on a phone a three-line
      battleground result reads as four near-equal lines instead of one headline

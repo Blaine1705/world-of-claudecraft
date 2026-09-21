@@ -8279,6 +8279,10 @@
   /* ---------- center messages ---------- */
   #error-msg {
     position: absolute;
+    width: max-content;
+    max-width: calc(100vw - 48px);
+    text-align: center;
+    overflow-wrap: anywhere;
     left: 50%;
     top: 21%;
     transform: translateX(-50%);
@@ -8324,6 +8328,15 @@
     letter-spacing: 1px;
     white-space: normal;
     overflow-wrap: anywhere;
+  }
+  /* Loot wins carry a sentence and may share the screen with a full-bag warning. */
+  #banner.banner-loot {
+    top: 21%;
+    font-size: clamp(18px, 2.1vw, 30px);
+    z-index: 90;
+  }
+  #error-msg.held-loot-warning {
+    top: max(28%, calc(21% + 72px));
   }
   #banner.has-subtext {
     display: flex;

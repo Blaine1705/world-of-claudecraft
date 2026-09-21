@@ -3356,6 +3356,7 @@ export const pt_BR: EnTranslations = {
       "resetErrInvalid": "Este link de redefinição é inválido ou expirou. Solicite um novo."
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "Baú",
       "takeLootButton": "Pegar Saque",
       "takeLootTooltip": "Pega as moedas e os itens largados. Não usa a coleta.",

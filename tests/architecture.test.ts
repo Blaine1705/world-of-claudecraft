@@ -262,6 +262,8 @@ const UI_PURE_CORES = [
   'src/ui/empower_hold_core.ts',
   'src/ui/equip_drop_core.ts',
   'src/ui/error_text_i18n_core.ts',
+  'src/ui/held_loot_warning_view.ts',
+  'src/ui/loot_roll_win_view.ts',
   'src/ui/system_text_i18n.ts',
   'src/ui/general_chat_quota_view.ts',
   'src/ui/known_item.ts',
@@ -2473,6 +2475,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/error_toast_controller.ts',
   // Mints the shared unit and bag-stack step buttons around a number input and
   // writes the input on a press; the rules are quantity_step_core.ts.
   'src/ui/quantity_stepper.ts',

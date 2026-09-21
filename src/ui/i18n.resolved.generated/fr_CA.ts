@@ -3356,6 +3356,7 @@ export const fr_CA: EnTranslations = {
       "resetErrInvalid": "Ce lien de réinitialisation est invalide ou a expiré. Demandez-en un nouveau."
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "Coffre",
       "takeLootButton": "Prendre le butin",
       "takeLootTooltip": "Prend les pièces et les objets lâchés. N'utilise pas la récolte.",

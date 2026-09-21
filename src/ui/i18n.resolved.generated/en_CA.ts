@@ -3356,6 +3356,7 @@ export const en_CA: EnTranslations = {
       "resetErrInvalid": "This reset link is invalid or has expired. Request a new one."
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "Chest",
       "takeLootButton": "Take Loot",
       "takeLootTooltip": "Takes the coins and dropped items. Does not use up the harvest.",
