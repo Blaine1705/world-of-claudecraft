@@ -869,7 +869,7 @@ export class AbilityVfxRibbons {
     slot.age = 0;
     slot.life = life;
     slot.width = width;
-    slot.core.setHex(colorHex).lerp(WHITE, brushed ? 0.28 : 0.5);
+    slot.core.setHex(colorHex).lerp(WHITE, 0.5);
     slot.glow.setHex(colorHex);
     // side axis perpendicular to the camera ray on XZ, so the arc always shows
     // its face
