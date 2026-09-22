@@ -5325,7 +5325,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Incluye un 5% de probabilidad base que comparten todos los aventureros.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Es una estimación, no incluye los golpes críticos ni el daño de habilidades.',
-  'hudChrome.perf.title': 'Superposición de rendimiento',
+  'hudChrome.perf.overlaySection': 'Superposición de rendimiento',
   'hudChrome.perf.enable': 'Mostrar superposición de rendimiento',
   'hudChrome.perf.description':
     'Elige qué estadísticas mostrar, dónde se ubica la superposición y cómo se ve.',

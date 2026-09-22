@@ -915,6 +915,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': '拾うと魂縛される',
   'hudChrome.loot.bindConfirmBody':
     'この戦利品には、取得すると自分に魂縛されるアイテムが含まれています。魂縛されたアイテムは、同じドロップを分かち合ったプレイヤーとの間でのみ、限られた時間だけ取引できます。',
+  'hudChrome.lootQuality.ordinary': '通常',
+  'hudChrome.lootQuality.superior': '上質',
+  'hudChrome.lootQuality.exceptional': '卓越',
+  'hudChrome.lootQuality.magnificent': '壮麗',
+  'hudChrome.lootQuality.transcendent': '超越',
+  'hudChrome.lootQuality.tooltip': '{quality}：アイテムレベル +{levels}。強化後も維持されます。',
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
@@ -1657,7 +1663,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.notes.baseChance': '全ての冒険者が共有する5%の基本確率を含みます。',
   'hudChrome.statInfo.notes.dpsApprox':
     '推定値であり、クリティカルやアビリティによるダメージは含みません。',
-  'hudChrome.perf.title': 'パフォーマンスオーバーレイ',
+  'hudChrome.perf.title': 'パフォーマンス',
+  'hudChrome.perf.overlaySection': 'パフォーマンスオーバーレイ',
   'hudChrome.perf.enable': 'パフォーマンスオーバーレイを表示',
   'hudChrome.perf.description': '表示する統計、オーバーレイの位置、外観を設定します。',
   'hudChrome.perf.sectionPosition': '位置',
@@ -1736,6 +1743,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.rateLimited':
     '最近、報告を複数回送信しています。しばらく待ってから送信してください。',
   'hudChrome.bugReport.failed': 'バグ報告を送信できませんでした。もう一度お試しください。',
+  'hudChrome.hostDiag.title': 'システムレポート',
+  'hudChrome.hostDiag.intro':
+    'このコンピューターの詳細情報(プロセッサとメモリを最も多く使用しているプログラムを含む)をファイルにまとめ、パフォーマンスの問題の診断に役立てます。送信は一切行われません。ファイルはお使いのコンピューターに保存されるだけです。',
+  'hudChrome.hostDiag.create': 'システムレポートを作成',
+  'hudChrome.hostDiag.running': 'システム情報を収集しています...',
+  'hudChrome.hostDiag.saved': 'レポートを {fileName} として保存しました。',
+  'hudChrome.hostDiag.savedNoName': 'レポートを保存しました。',
+  'hudChrome.hostDiag.failed': 'レポートを作成できませんでした。もう一度お試しください。',
   'hudChrome.keybinds.emoteWheel': 'エモートホイール',
   'hudChrome.keybinds.sheathe': '武器を納刀/抜刀',
   'hudChrome.keybinds.hideInterface': 'インターフェースを隠す',
@@ -2448,6 +2463,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': '世界にいます',
   'character.takeOver': '引き継ぐ',
   'character.inWorldHint': 'すでに世界にいます。別の場所からログアウトするか、引き継いでください。',
+  'character.currentLocation': '現在地: {zone}',
+  'character.lockouts': 'ロックアウト（{count}）',
+  'character.lockoutRaids': 'レイド',
+  'character.lockoutDungeons': 'ダンジョン',
+  'character.lockoutWorldBosses': 'ワールドボス',
   'character.takeOverConfirm':
     'このキャラクターを別のセッションから切断し、こちらに移します。続けますか？',
   'character.renameRequired': '名前変更が必要',
@@ -2814,6 +2834,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapDrowned': '死亡しました。溺死しました。',
   'hud.system.deathRecapCauterized': '死亡しました。焼灼の炎に飲み込まれました。',
   'hud.system.respawn': '再び休まり、完全な状態になりました。',
+  'hud.system.respawnKeeperToll':
+    '霊魂の癒し手があなたを復活させたが、その代償として弱っている。復活の後遺症が消えるまで、すべての能力値が下がる。',
   'hud.system.ignoringChat': '{name}のチャットを無視します。',
   'hud.system.noLongerIgnoring': '{name}の無視を解除しました。',
   'hud.system.playerNotNearby': 'そのプレイヤーは近くにいません。',
@@ -4492,7 +4514,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '霊魂の癒し手はこの場で復活させてくれますが、復活の後遺症により全属性が75%低下します。高レベルでは最長10分間続きます。魂を遺体まで戻せばペナルティなしで復活できます。',
   'hudChrome.death.healerConfirmAccept': '復活する',
   'hudChrome.death.healerConfirmCancel': 'キャンセル',
+  'hudChrome.death.keeperTalkTitle': '霊魂の癒し手',
+  'hudChrome.death.keeperTalkAccept': '復活する',
+  'hudChrome.death.keeperTalkLeave': '立ち去る',
+  'hudChrome.death.keeperConfirmSparedTitle': '霊魂の癒し手に蘇らせてもらうか？',
+  'hudChrome.death.keeperTalkBody':
+    'その場で蘇らせることはできるが、代償が伴う。復活の後遺症により、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。倒れた場所まで魂を走らせて復活すれば、代償は何もない。',
+  'hudChrome.death.keeperTalkSparedBody':
+    'その場で蘇らせることはできる。本来なら復活の後遺症が伴い、しばらくのあいだ力のすべてが弱まるのだが、おまえはこの世界に来たばかりだ。だから今回は免じてやろう。倒れた場所まで魂を走らせて復活すれば、いずれにせよ代償は何もない。',
+  'hudChrome.death.keeperConfirmBody':
+    '本当によいか？霊魂の癒し手はあなたを蘇らせるが、その代償として弱くなる。復活の後遺症が消えるまで、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。',
+  'hudChrome.death.keeperConfirmSparedBody':
+    '本当によいか？霊魂の癒し手はここであなたを蘇らせる。あなたはレベル10未満なので、今回は復活の後遺症で弱ることはない。',
   'hudChrome.death.spiritHealerAlive': '霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。',
+  'hudChrome.death.ghostHint': '死亡した場所まで走るか、霊魂の癒し手に話しかけて復活しよう',
   'entities.npcs.spirit_healer.name': '霊魂の癒し手',
   'entities.npcs.spirit_healer.title': '死者の番人',
   'entities.npcs.spirit_healer.greeting':
@@ -9283,6 +9318,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '再読み込み',
   'desktop.crash.quit': '終了',
   'desktop.titlebar.exitGame': 'ゲームを終了',
+  'desktop.hostDiag.saveTitle': 'システムレポートを保存',
+  'desktop.hostDiag.saveButton': '保存',
+  'desktop.hostDiag.fileType': 'JSON ファイル',
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
@@ -11874,6 +11912,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。スタック解除の後遺症が最大5分間残ります。',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    '復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。1時間以内の初回使用は無償です。前回の使用から1時間以内に再び使うと、スタック解除の後遺症が最大5分間残ります。',
   'hudChrome.unstuck.menuButton': 'スタック解除',
   'hudChrome.unstuck.help':
     '復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。',
@@ -11881,6 +11921,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。',
   'hudChrome.unstuck.movedToGraveyard':
     '最寄りの墓地へ移動しました。スタック解除の後遺症があなたにのしかかっています。',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    '最寄りの墓地へ移動しました。1時間以内にもう一度スタック解除を使うと、スタック解除の後遺症が残ります。',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    '最寄りの墓地へ移動し、蘇生しました。1時間以内にもう一度スタック解除を使うと、スタック解除の後遺症が残ります。',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     '最寄りの墓地へ移動し、蘇生しました。スタック解除の後遺症があなたにのしかかっています。',
   'hudChrome.unstuck.started':
@@ -14776,6 +14820,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': '敵は誰を殴るのか',
   'guide.combat.unstuckBody':
     '世界に閉じ込められて抜け出せなくなったら、/unstuck と入力しましょう。戦闘外で静止していること、スタンや根縛りで拘束されていないこと、決闘中でもアリーナ試合中でもないことが条件です。短いカウントダウンが走り、移動するかダメージを受けると中断されます。終われば最寄りの墓地に下ろされます。これで死ぬことはなく、亡骸も残りません。すでに倒れていた場合は、そこで蘇生されます。代償はスタック解除の後遺症です。あなたのすべてが一時的に弱まる効果ですが、次にこのコマンドを使えるようになる頃には切れています。そして復活の後遺症と同じく、生まれたてのキャラクターは完全に免除されます。',
+  'guide.combat.unstuckBodyWindow':
+    '世界に閉じ込められて抜け出せなくなったら、/unstuck と入力しましょう。戦闘外で静止していること、スタンや根縛りで拘束されていないこと、決闘中でもアリーナ試合中でもないことが条件です。短いカウントダウンが走り、移動するかダメージを受けると中断されます。終われば最寄りの墓地に下ろされます。これで死ぬことはなく、亡骸も残りません。すでに倒れていた場合は、そこで蘇生されます。1時間以内の初回使用には何の代償もありません。前回の使用から1時間以内に再び使うと、代償はスタック解除の後遺症です。あなたのすべてが一時的に弱まる効果ですが、次にこのコマンドを使えるようになる頃には切れています。そして復活の後遺症と同じく、生まれたてのキャラクターは完全に免除されます。',
   'guide.combat.unstuckTitle': '本当に動けなくなったとき',
   'guide.commandsPage.abilities': '習得済みのアビリティを表示します。',
   'guide.commandsPage.afk':
@@ -14927,6 +14973,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': 'コマンドが働かないとき',
   'guide.commandsPage.unstuck':
     '世界に閉じ込められたときの出口です。短いカウントダウンのあいだ静止していれば最寄りの墓地へ移され、すでに倒れていた場合はそこで蘇生されます。その後しばらくスタック解除の後遺症で弱ったままになるので、近道ではなく最後の手段と考えましょう。',
+  'guide.commandsPage.unstuckWindow':
+    '世界に閉じ込められたときの出口です。短いカウントダウンのあいだ静止していれば最寄りの墓地へ移され、すでに倒れていた場合はそこで蘇生されます。1時間以内の初回使用は無償です。前回の使用から1時間以内に再び使うと、その後しばらくスタック解除の後遺症で弱ったままになるので、近道ではなく救助手段と考えましょう。',
   'guide.commandsPage.where': '今立っている地方、そのレベル帯、そしてあなたの座標を表示します。',
   'guide.commandsPage.whisper':
     'オンラインのプレイヤー1人に非公開のメッセージを送ります。該当する人が1人しかいなければ、名前の大文字小文字は入力したとおりで一致します。',
@@ -15116,6 +15164,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': '道具の護符',
   'guide.glossary.unstuckDef':
     'ゲームメニューのスタック解除を使った代償です。カウントダウンのあいだ動かずにいると最寄りの墓地へ降ろされ、その後しばらく一時的な衰弱を背負います。',
+  'guide.glossary.unstuckDefWindow':
+    'ゲームメニューのスタック解除に1時間のうち二度以上頼った代償です。カウントダウンのあいだ動かずにいると最寄りの墓地へ降ろされます。1時間以内の初回使用は無償ですが、前回の使用から1時間以内に繰り返すと、その後しばらく一時的な衰弱も背負います。',
   'guide.glossary.unstuckTerm': 'スタック解除の後遺症',
   'guide.glossary.warfareDef':
     '対人戦の装備側の仕組みです。需品係が名誉と引き換えにウォーフェアの防具セットを売り、それらが持つウォーフェアレーティングは、ほかのプレイヤーとの戦いでのみ効果があります。',
@@ -16250,6 +16300,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '補充の席は意図的に危険のないものになっています。あなたが飛び込むのは自分が関わっていない戦況なので、勝っても負けてもこの試合があなたの戦場レーティングに触れることはなく、途中で抜けても何も負いません。試合が終わりに近づき、来たところで結果を変えられない頃合いになると誘い自体が届かなくなるので、他人の幕引きに座らされることはありません。',
   'hudChrome.trade.windowClosed': '取引ウィンドウを閉じました。',
+  'hudChrome.trade.offerQuantityHint': '差し出す数量を選べます',
+  'hudChrome.trade.offerQuantityTitle': '{item}を差し出す',
+  'hudChrome.trade.offerQuantityInput': '差し出す数量',
+  'hudChrome.trade.offerQuantityConfirm': '差し出す',
+  'hudChrome.trade.offerQuantityAll': 'すべて差し出す',
+  'hudChrome.trade.offerRemoveTitle': '{item}を取り除く',
+  'hudChrome.trade.offerRemoveInput': '取り除く数量',
+  'hudChrome.trade.offerRemove': '取り除く',
+  'hudChrome.trade.offerRemoveAll': 'すべて取り除く',
   'hudChrome.trade.woc.hintInsufficientBalance': '接続中のウォレットの $WOC 残高を超えています。',
   'hudChrome.trade.woc.priceLabel': '価格（USD）',
   'hudChrome.trade.woc.equivalent': '現在のレートで約 {tokens} $WOC',

@@ -12,8 +12,15 @@ import type { InvSlot } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import {
   buildTradeItemRow,
+  removeTradeOfferUnits,
+  resolveTradeOfferRemove,
+  resolveTradeOfferSubmit,
+  stageTradeOffer,
+  TRADE_OFFER_MAX_LINES,
   tradeOfferAmount,
   tradeOfferCeiling,
+  tradeOfferHeadroom,
+  tradeOfferRemoveOpensPrompt,
   tradeRowTooltipTarget,
 } from '../src/ui/trade_view';
 
@@ -47,6 +54,207 @@ describe('tradeOfferCeiling (trade offer stepper cap)', () => {
   it('returns 0 when the item is not held at all', () => {
     const inventory: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 20 }];
     expect(tradeOfferCeiling(inventory, 'mat_wool_cloth')).toBe(0);
+  });
+});
+
+describe('tradeOfferHeadroom (offer-quantity prompt ceiling)', () => {
+  const inventory: InvSlot[] = [
+    { itemId: 'mat_linen_cloth', count: 20 },
+    { itemId: 'mat_linen_cloth', count: 5 },
+    { itemId: 'mat_wool_cloth', count: 3 },
+  ];
+
+  it('is the summed held total minus what the offer already carries', () => {
+    expect(tradeOfferHeadroom([], inventory, 'mat_linen_cloth')).toBe(25);
+    expect(
+      tradeOfferHeadroom([{ itemId: 'mat_linen_cloth', count: 10 }], inventory, 'mat_linen_cloth'),
+    ).toBe(15);
+    expect(
+      tradeOfferHeadroom([{ itemId: 'mat_linen_cloth', count: 25 }], inventory, 'mat_linen_cloth'),
+    ).toBe(0);
+  });
+
+  it('never goes negative when the bags shrank under a staged line', () => {
+    expect(
+      tradeOfferHeadroom([{ itemId: 'mat_wool_cloth', count: 9 }], inventory, 'mat_wool_cloth'),
+    ).toBe(0);
+  });
+
+  it('is 0 for a NEW line once the offer holds the sim line cap', () => {
+    const full: InvSlot[] = Array.from({ length: TRADE_OFFER_MAX_LINES }, (_, i) => ({
+      itemId: `filler_${i}`,
+      count: 1,
+    }));
+    expect(tradeOfferHeadroom(full, inventory, 'mat_linen_cloth')).toBe(0);
+    // An EXISTING line can still grow at the cap.
+    full[0] = { itemId: 'mat_linen_cloth', count: 1 };
+    expect(tradeOfferHeadroom(full, inventory, 'mat_linen_cloth')).toBe(24);
+  });
+});
+
+describe('stageTradeOffer (counted stage, the plain click and the prompt)', () => {
+  const inventory: InvSlot[] = [
+    { itemId: 'mat_linen_cloth', count: 20 },
+    { itemId: 'mat_linen_cloth', count: 5 },
+  ];
+
+  it('stages a new line with the requested count and reports it', () => {
+    const staged: InvSlot[] = [];
+    expect(stageTradeOffer(staged, inventory, 'mat_linen_cloth', 12)).toBe(12);
+    expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 12 }]);
+  });
+
+  it('grows an existing line in place (the Hud-owned live object)', () => {
+    const line = { itemId: 'mat_linen_cloth', count: 3 };
+    const staged: InvSlot[] = [line];
+    expect(stageTradeOffer(staged, inventory, 'mat_linen_cloth', 1)).toBe(1);
+    expect(staged[0]).toBe(line);
+    expect(line.count).toBe(4);
+  });
+
+  it('clamps to the summed held total and reports only what fit', () => {
+    const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 20 }];
+    expect(stageTradeOffer(staged, inventory, 'mat_linen_cloth', 50)).toBe(5);
+    expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 25 }]);
+  });
+
+  it('stages nothing (and says so) when no room is left or the count is empty', () => {
+    const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 25 }];
+    expect(stageTradeOffer(staged, inventory, 'mat_linen_cloth', 1)).toBe(0);
+    expect(stageTradeOffer([], inventory, 'mat_linen_cloth', 0)).toBe(0);
+    expect(stageTradeOffer([], inventory, 'mat_wool_cloth', 4)).toBe(0);
+    expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 25 }]);
+  });
+});
+
+describe('removeTradeOfferUnits (the trade window remove prompt)', () => {
+  it('takes the units off the line in place', () => {
+    const line = { itemId: 'mat_linen_cloth', count: 12 };
+    const staged: InvSlot[] = [{ itemId: 'other', count: 1 }, line];
+    expect(removeTradeOfferUnits(staged, 'mat_linen_cloth', 5)).toBe(true);
+    expect(staged[1]).toBe(line);
+    expect(line.count).toBe(7);
+  });
+
+  it('drops the whole line once nothing is left (or more was asked than staged)', () => {
+    const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
+    expect(removeTradeOfferUnits(staged, 'mat_linen_cloth', 3)).toBe(true);
+    expect(staged).toEqual([]);
+    const again: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
+    expect(removeTradeOfferUnits(again, 'mat_linen_cloth', 50)).toBe(true);
+    expect(again).toEqual([]);
+  });
+
+  it('is a no-op for a missing line or an empty count', () => {
+    const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 3 }];
+    expect(removeTradeOfferUnits(staged, 'mat_wool_cloth', 1)).toBe(false);
+    expect(removeTradeOfferUnits(staged, 'mat_linen_cloth', 0)).toBe(false);
+    expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 3 }]);
+  });
+});
+
+describe('resolveTradeOfferRemove (the remove prompt stale guard)', () => {
+  const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 12 }];
+
+  it('refuses when the line left the table, or is staged at zero', () => {
+    expect(resolveTradeOfferRemove([], 'mat_linen_cloth', 5)).toBeNull();
+    expect(
+      resolveTradeOfferRemove([{ itemId: 'mat_linen_cloth', count: 0 }], 'mat_linen_cloth', 5),
+    ).toBeNull();
+  });
+
+  it('clamps the typed count into [1, the line count]', () => {
+    expect(resolveTradeOfferRemove(staged, 'mat_linen_cloth', 5)).toBe(5);
+    expect(resolveTradeOfferRemove(staged, 'mat_linen_cloth', 50)).toBe(12);
+    expect(resolveTradeOfferRemove(staged, 'mat_linen_cloth', 0)).toBe(1);
+  });
+});
+
+describe('tradeOfferRemoveOpensPrompt (the remove prompt gate)', () => {
+  it('opens only for a line with more than one unit', () => {
+    expect(tradeOfferRemoveOpensPrompt({ itemId: 'mat_linen_cloth', count: 2 })).toBe(true);
+    expect(tradeOfferRemoveOpensPrompt({ itemId: 'mat_linen_cloth', count: 12 })).toBe(true);
+    expect(tradeOfferRemoveOpensPrompt({ itemId: 'worn_sword', count: 1 })).toBe(false);
+    expect(tradeOfferRemoveOpensPrompt({ itemId: 'mat_linen_cloth', count: 0 })).toBe(false);
+  });
+});
+
+describe("the offer line cap is the sim's own constant", () => {
+  it('is the sim export, pinned at the historical literal, and the sim slices by it', () => {
+    // The UI re-exports src/sim/social/trade.ts TRADE_OFFER_MAX_LINES, so a
+    // client cannot let a player stage a line the server silently drops; the
+    // literal pin keeps a cap change a deliberate, visible edit.
+    expect(TRADE_OFFER_MAX_LINES).toBe(6);
+    const sim = readFileSync(new URL('../src/sim/social/trade.ts', import.meta.url), 'utf8');
+    expect(sim).toContain('export const TRADE_OFFER_MAX_LINES = 6;');
+    expect(sim).toContain('items.slice(0, TRADE_OFFER_MAX_LINES)');
+    expect(sim).not.toMatch(/items\.slice\(0, \d/);
+  });
+});
+
+describe('the counted stage on the HUD (source pins, hud.ts addItemToTrade)', () => {
+  // Hud is not instantiable in a unit harness (every bags harness fakes the
+  // dep), so the thin consumer is pinned at the source: the plain click's
+  // default of one unit, the pure-core clamp, and the skipped push when the
+  // stage added nothing (the old one-unit click always pushed).
+  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+
+  it('defaults to one unit, stages through the pure core, and skips a no-op push', () => {
+    expect(hud).toContain('addItemToTrade(itemId: string, count = 1): void {');
+    expect(hud).toMatch(
+      /if \(stageTradeOffer\(this\.stagedTrade\.items, this\.sim\.inventory, itemId, count\) < 1\) return;\s*this\.pushTradeOffer\(\);/,
+    );
+  });
+
+  it('reports the headroom the bags prompt caps on from the same pure core', () => {
+    // The bags binding reads the pure core directly (no Hud wrapper method): the
+    // coordinator sits at its monolith ceiling, so the trade-open gate and the
+    // headroom read live in the one dependency line.
+    expect(hud).toMatch(
+      /tradeOfferHeadroom: \(itemId\) =>\s*this\.tradeOpen \? tradeOfferHeadroom\(this\.stagedTrade\.items, this\.sim\.inventory, itemId\) : 0,/,
+    );
+    expect(hud).not.toContain('tradeOfferHeadroom(itemId: string): number {');
+  });
+});
+
+describe('resolveTradeOfferSubmit (the prompt stale guard)', () => {
+  it('refuses when nothing fits any more (trade closed, stack gone, line full)', () => {
+    expect(resolveTradeOfferSubmit(0, 5)).toBeNull();
+    expect(resolveTradeOfferSubmit(-1, 5)).toBeNull();
+  });
+
+  it('clamps the typed count into [1, live headroom]', () => {
+    expect(resolveTradeOfferSubmit(10, 4)).toBe(4);
+    expect(resolveTradeOfferSubmit(10, 40)).toBe(10);
+    expect(resolveTradeOfferSubmit(10, 0)).toBe(1);
+    expect(resolveTradeOfferSubmit(10, Number.NaN)).toBe(1);
+    expect(resolveTradeOfferSubmit(10, 2.9)).toBe(2);
+  });
+});
+
+describe('tradeOfferAmount (the offered-amount box on a staged row)', () => {
+  // The reported bug: the only way to offer a whole stack was one bag click
+  // per unit (112 clicks for a 112-stack). The row's amount box resolves a
+  // typed figure against the held ceiling in one step.
+  it('accepts a typed amount within the held ceiling', () => {
+    expect(tradeOfferAmount('112', 112, 1)).toBe(112);
+    expect(tradeOfferAmount('40', 112, 1)).toBe(40);
+  });
+
+  it('clamps above the ceiling and below one', () => {
+    expect(tradeOfferAmount('500', 112, 1)).toBe(112);
+    expect(tradeOfferAmount('0', 112, 5)).toBe(1);
+    expect(tradeOfferAmount('-3', 112, 5)).toBe(1);
+  });
+
+  it('keeps the current amount on unparsable input and floors fractions', () => {
+    expect(tradeOfferAmount('', 112, 7)).toBe(7);
+    expect(tradeOfferAmount('abc', 112, 7)).toBe(7);
+    expect(tradeOfferAmount('3.9', 112, 7)).toBe(3);
+  });
+
+  it('never returns below one even for an empty ceiling', () => {
+    expect(tradeOfferAmount('4', 0, 1)).toBe(1);
   });
 });
 

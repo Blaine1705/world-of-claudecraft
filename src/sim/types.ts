@@ -1,3 +1,4 @@
+import { cloneLootQuality, type LootQualityDescriptor } from './loot_quality/types';
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
 import type { MaterialComposition } from './material_sources';
@@ -1553,6 +1554,8 @@ export type ItemDef =
 // time, see market.ts marketList); #1146 wires real market handling for
 // instanced items later.
 export interface ItemInstancePayload {
+  /** Permanent enemy-drop quality, independent of rarity, enchants and upgrades. */
+  lootQuality?: LootQualityDescriptor;
   /** Player name that signed/crafted this specific copy, if any. */
   signer?: string;
   /** Remaining charges for a per-effect-limited item, keyed by effect id. */
@@ -1680,6 +1683,10 @@ export interface ItemInstancePayload {
 // piece's, src/sim/rift/progression.ts), so all copy through the exact same rules.
 export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
   const instance: ItemInstancePayload = { ...src };
+  // Invalid descriptors remain untouched until the atomic load-bound arm drops
+  // them. Never iterate or clone an unbounded corrupt weights subtree here.
+  const lootQuality = cloneLootQuality(src.lootQuality);
+  if (lootQuality) instance.lootQuality = lootQuality;
   if (src.charges) instance.charges = { ...src.charges };
   if (
     src.perfectingBonus &&
@@ -1806,6 +1813,7 @@ export type ItemLootStrategy = 'looter-takes-all' | 'need-greed' | 'round-robin'
 export interface LootRollPrompt {
   rollId: number;
   itemId: string;
+  instance?: ItemInstancePayload;
   itemName: string;
   quality: ItemDef['quality'];
   expiresAt: number;
@@ -1827,6 +1835,7 @@ export interface LootRollStatusEntry {
 export interface LootRollGroupStatus {
   rollId: number;
   itemId: string;
+  instance?: ItemInstancePayload;
   itemName: string;
   quality: ItemDef['quality'];
   expiresAt: number;
@@ -1855,6 +1864,7 @@ export interface MasterLootSettings {
 export interface MasterLootPrompt {
   rollId: number;
   itemId: string;
+  instance?: ItemInstancePayload;
   itemName: string;
   quality: ItemDef['quality'];
   expiresAt: number;
@@ -6206,17 +6216,23 @@ export type UnstuckEvent =
       // 'moved_to_graveyard': a living player was moved there and left alive.
       // 'revived_at_graveyard': an already dead or released player was pulled to
       // the graveyard and raised there.
-      // Both charge Unstuck Sickness. The two retired reasons stay in the union so
-      // the client renders them rather than t(undefined): 'nearest_safe_position'
-      // (the short-range teleport) survives in historical telemetry, and
-      // 'nearest_graveyard' (the pre-0.32.1 kill-and-release outcome) can still
-      // arrive from a not-yet-updated server under an OTA bundle that agrees on
-      // the layout epoch.
+      // Both charge Unstuck Sickness on a repeat inside the hour window (see
+      // `sickness`). The two retired reasons stay in the union so the client renders
+      // them rather than t(undefined): 'nearest_safe_position' (the short-range
+      // teleport) survives in historical telemetry, and 'nearest_graveyard' (the
+      // pre-0.32.1 kill-and-release outcome) can still arrive from a not-yet-updated
+      // server under an OTA bundle that agrees on the layout epoch.
       reason:
         | 'nearest_safe_position'
         | 'nearest_graveyard'
         | 'moved_to_graveyard'
         | 'revived_at_graveyard';
+      // Whether Unstuck Sickness was applied by this completion: false for the first
+      // use in an hour (and for a character below the sickness floor), true for a
+      // repeat inside the window. Optional only for wire skew: a not-yet-updated
+      // server (pre-window) omits it, and it always charged, so an absent value reads
+      // as charged.
+      sickness?: boolean;
       area: UnstuckArea;
       origin: UnstuckPosition;
       destination: UnstuckPosition;
@@ -6355,11 +6371,21 @@ export type SimEvent = { pid?: number } & (
   //   link) off its own result event. Without it a profession action printed
   //   two lines for one grant (#2430). Everything else the client does on a
   //   loot event (bag refresh, loot-roll close) still runs.
-  | { type: 'loot'; text: string; silent?: boolean; callerLogs?: boolean }
+  | {
+      type: 'loot';
+      text: string;
+      rollId?: number;
+      silent?: boolean;
+      callerLogs?: boolean;
+      itemId?: string;
+      instance?: ItemInstancePayload;
+      count?: number;
+    }
   | {
       type: 'lootRoll';
       rollId: number;
       itemId: string;
+      instance?: ItemInstancePayload;
       itemName: string;
       quality: ItemDef['quality'];
       expiresAt: number;
@@ -6369,6 +6395,7 @@ export type SimEvent = { pid?: number } & (
       type: 'masterLoot';
       rollId: number;
       itemId: string;
+      instance?: ItemInstancePayload;
       itemName: string;
       quality: ItemDef['quality'];
       expiresAt: number;
@@ -6496,7 +6523,9 @@ export type SimEvent = { pid?: number } & (
   // (e.g. 'Falling' for environmental damage), the client localizes it via
   // abilityDisplayNameFromSource like every other ability-name event field.
   | { type: 'playerDeath'; killerId?: number; killerAbility?: string }
-  | { type: 'respawn' }
+  // sickness names the penalty the revive charged, so the client can say so; a
+  // penalty-free revive (corpse run, instance re-entry, delve reset) omits it.
+  | { type: 'respawn'; sickness?: 'resurrection' }
   | UnstuckEvent
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.

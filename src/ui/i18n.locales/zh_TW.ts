@@ -884,6 +884,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': '拾取後綁定',
   'hudChrome.loot.bindConfirmBody':
     '這批戰利品中有一件物品在拾取後將與你綁定。綁定的物品只能在限定時間內交易給共同獲得該掉落的玩家。',
+  'hudChrome.lootQuality.ordinary': '普通',
+  'hudChrome.lootQuality.superior': '優良',
+  'hudChrome.lootQuality.exceptional': '卓越',
+  'hudChrome.lootQuality.magnificent': '華麗',
+  'hudChrome.lootQuality.transcendent': '超凡',
+  'hudChrome.lootQuality.tooltip': '{quality}：+{levels} 物品等級。強化後仍會保留。',
   'hudChrome.itemTooltip.requiresLevel': '需要等級 {level}',
   'hudChrome.spellbook.addToBarAria': '將 {name} 加入動作列',
   'hudChrome.spellbook.removeFromBarAria': '將 {name} 從動作列移除',
@@ -1599,7 +1605,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.notes.minorForClass': '對你的職業助益甚微。',
   'hudChrome.statInfo.notes.baseChance': '包含所有冒險者共享的 5% 基礎機率。',
   'hudChrome.statInfo.notes.dpsApprox': '此為估計值，不計入暴擊與技能傷害。',
-  'hudChrome.perf.title': '效能監視器',
+  'hudChrome.perf.title': '效能',
+  'hudChrome.perf.overlaySection': '效能監視器',
   'hudChrome.perf.enable': '顯示效能監視器',
   'hudChrome.perf.description': '選擇要顯示的數據、監視器的位置及其外觀。',
   'hudChrome.perf.sectionPosition': '位置',
@@ -1675,6 +1682,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.tooLarge': '此回報過大，無法傳送。請移除截圖後重試。',
   'hudChrome.bugReport.rateLimited': '你最近已傳送多份回報。請稍候再傳送。',
   'hudChrome.bugReport.failed': '無法傳送錯誤回報。請重試。',
+  'hudChrome.hostDiag.title': '系統報告',
+  'hudChrome.hostDiag.intro':
+    '將這台電腦的詳細資訊(包括占用最多處理器與記憶體的程式)收集到一個檔案中，協助診斷效能問題。不會傳送任何內容：該檔案只保存在你的電腦上。',
+  'hudChrome.hostDiag.create': '產生系統報告',
+  'hudChrome.hostDiag.running': '正在收集系統資訊...',
+  'hudChrome.hostDiag.saved': '報告已儲存為 {fileName}。',
+  'hudChrome.hostDiag.savedNoName': '報告已儲存。',
+  'hudChrome.hostDiag.failed': '無法建立報告。請再試一次。',
   'hudChrome.keybinds.emoteWheel': '表情輪盤',
   'hudChrome.keybinds.sheathe': '收起/拔出武器',
   'hudChrome.keybinds.hideInterface': '隱藏介面',
@@ -2335,6 +2350,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': '在世界中',
   'character.takeOver': '接管',
   'character.inWorldHint': '已在世界中。請在別處登出，或接管工作階段。',
+  'character.currentLocation': '目前位置：{zone}',
+  'character.lockouts': '鎖定（{count}）',
+  'character.lockoutRaids': '團隊副本',
+  'character.lockoutDungeons': '地城',
+  'character.lockoutWorldBosses': '世界首領',
   'character.takeOverConfirm': '這會使該角色從另一個工作階段中斷並切換到此處。是否繼續？',
   'character.renameRequired': '需要更名',
   'character.delete': '刪除',
@@ -2689,6 +2709,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapDrowned': '你已經死亡。你溺死了。',
   'hud.system.deathRecapCauterized': '你已經死亡。灼燒術的烈焰吞噬了你。',
   'hud.system.respawn': '你再次感到精力恢復、身體完整。',
+  'hud.system.respawnKeeperToll':
+    '靈魂醫者復活了你，但你因此變得虛弱：在復活後遺症消退之前，你的所有屬性都會被削弱。',
   'hud.system.ignoringChat': '已封鎖來自 {name} 的聊天。',
   'hud.system.noLongerIgnoring': '不再封鎖 {name}。',
   'hud.system.playerNotNearby': '該玩家不在附近。',
@@ -4318,7 +4340,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '靈魂醫者可以就地復活你，但復活虛弱會使你的全部屬性降低75%，高等級時最長持續10分鐘。讓靈魂返回屍體復活則沒有任何懲罰。',
   'hudChrome.death.healerConfirmAccept': '復活',
   'hudChrome.death.healerConfirmCancel': '取消',
+  'hudChrome.death.keeperTalkTitle': '靈魂醫者',
+  'hudChrome.death.keeperTalkAccept': '復活',
+  'hudChrome.death.keeperTalkLeave': '離開',
+  'hudChrome.death.keeperConfirmSparedTitle': '讓靈魂醫者復活你？',
+  'hudChrome.death.keeperTalkBody':
+    '我可以讓你就地復活，但代價隨之而來：復活後遺症會使你的所有屬性降低75%，等級越高持續越久，最長10分鐘。讓你的靈魂跑回倒下的地方復活則沒有任何懲罰。',
+  'hudChrome.death.keeperTalkSparedBody':
+    '我可以讓你就地復活。通常這會附帶復活後遺症，讓你的一切在一段時間內變得虛弱，但你初來乍到，所以我會免去你的代價。無論如何，讓你的靈魂跑回倒下的地方復活都沒有任何懲罰。',
+  'hudChrome.death.keeperConfirmBody':
+    '確定嗎？靈魂醫者會復活你，但你會因此變得虛弱：復活後遺症會使你的所有屬性降低75%，直到它消退，等級越高持續越久，最長10分鐘。',
+  'hudChrome.death.keeperConfirmSparedBody':
+    '確定嗎？靈魂醫者會在此復活你。你還不到10級，所以這次復活後遺症不會削弱你。',
   'hudChrome.death.spiritHealerAlive': '靈魂醫者只看護逝者。你仍是生者。',
+  'hudChrome.death.ghostHint': '跑回你死亡的地點，或與靈魂醫者交談以復活',
   'entities.npcs.spirit_healer.name': '靈魂醫者',
   'entities.npcs.spirit_healer.title': '亡者的守護者',
   'entities.npcs.spirit_healer.greeting':
@@ -8909,6 +8944,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '重新載入',
   'desktop.crash.quit': '離開',
   'desktop.titlebar.exitGame': '離開遊戲',
+  'desktop.hostDiag.saveTitle': '儲存系統報告',
+  'desktop.hostDiag.saveButton': '儲存',
+  'desktop.hostDiag.fileType': 'JSON 檔案',
   'desktop.crash.fatalBody': 'World of ClaudeCraft 發生未預期的錯誤，必須關閉。',
   'gpuNotice.bodyDesktop':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
@@ -11281,11 +11319,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '脫困：/unstuck 會啟動原地倒數，結束後將你移動到最近的墓地，若你已倒下則會復活你。你將帶著脫困虛弱，最多持續 5 分鐘。',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    '脫困：/unstuck 會啟動原地倒數，結束後將你移動到最近的墓地，若你已倒下則會復活你。一小時內的首次使用不付代價。若在上次使用後一小時內再次使用，你將帶著脫困虛弱，最多持續 5 分鐘。',
   'hudChrome.unstuck.menuButton': '脫困',
   'hudChrome.unstuck.help': '脫困：/unstuck 會啟動原地倒數，之後將你移動到附近可到達的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
     '脫困：/unstuck 會啟動原地倒數，結束後將你的靈魂送往最近的墓地。你必須向靈魂醫者接受守護者的代價才能復活。',
   'hudChrome.unstuck.movedToGraveyard': '你已被移動到最近的墓地。脫困虛弱正壓在你身上。',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    '你已被移動到最近的墓地。一小時內再次使用脫困將讓你帶上脫困虛弱。',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    '你已被移動到最近的墓地並復活。一小時內再次使用脫困將讓你帶上脫困虛弱。',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     '你已被移動到最近的墓地並復活。脫困虛弱正壓在你身上。',
   'hudChrome.unstuck.started':
@@ -14079,6 +14123,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': '敵人會打誰',
   'guide.combat.unstuckBody':
     '若這個世界把你困在某個出不去的地方，請輸入 /unstuck。你必須脫離戰鬥並原地站定，不能被昏迷或定身控制，也不能身處決鬥或競技場對戰中：接著會跑一段短短的倒數，移動或受到傷害都會中斷它。倒數結束後，你會被放置在最近的墓地。它從不會殺死你，也不會留下屍體，而若你當時已經倒下，它會就地將你扶起。代價是脫困虛弱：一種對你全身上下的暫時削弱，等到你能再次使用這道指令時它早已消退，而且和守護者的代價一樣，全新的角色可完全免除。',
+  'guide.combat.unstuckBodyWindow':
+    '若這個世界把你困在某個出不去的地方，請輸入 /unstuck。你必須脫離戰鬥並原地站定，不能被昏迷或定身控制，也不能身處決鬥或競技場對戰中：接著會跑一段短短的倒數，移動或受到傷害都會中斷它。倒數結束後，你會被放置在最近的墓地。它從不會殺死你，也不會留下屍體，而若你當時已經倒下，它會就地將你扶起。一小時內的首次使用不付任何代價。若在上次使用後一小時內再次使用，代價便是脫困虛弱：一種對你全身上下的暫時削弱，等到你能再次使用這道指令時它早已消退，而且和守護者的代價一樣，全新的角色可完全免除。',
   'guide.combat.unstuckTitle': '當你真的卡住時',
   'guide.commandsPage.abilities': '你已學會的技能。',
   'guide.commandsPage.afk':
@@ -14205,6 +14251,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': '如果某道指令沒有作用',
   'guide.commandsPage.unstuck':
     '當這個世界把你困住時的出路。原地站定撐過一段短短的倒數，你就會被移動到最近的墓地，若你已經倒下，還會在那裡被扶起。之後你會帶著脫困虛弱一陣子，所以它是最後手段，而不是抄近路的辦法。',
+  'guide.commandsPage.unstuckWindow':
+    '當這個世界把你困住時的出路。原地站定撐過一段短短的倒數，你就會被移動到最近的墓地，若你已經倒下，還會在那裡被扶起。一小時內的首次使用不付代價。若在上次使用後一小時內再次使用，之後你會帶著脫困虛弱一陣子，所以它是救援手段，而不是抄近路的辦法。',
   'guide.commandsPage.where': '你所站的區域、它的等級範圍，以及你的座標。',
   'guide.commandsPage.whisper':
     '向一位在線的玩家發送私訊。只要不會與別人混淆，你輸入的大小寫怎麼寫都能對上他的名字。',
@@ -14389,6 +14437,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': '工具符物',
   'guide.glossary.unstuckDef':
     '從遊戲選單使用「脫困」所付出的代價。在倒數期間站著不動，它就會把你放到最近的墓地，而此後一段時間你會帶著一份暫時的虛弱。',
+  'guide.glossary.unstuckDefWindow':
+    '一小時內不只一次倚賴遊戲選單「脫困」所付出的代價。在倒數期間站著不動，它就會把你放到最近的墓地。一小時內的首次使用不付代價，而在上次使用後一小時內再次使用，此後一段時間你還會帶著一份暫時的虛弱。',
   'guide.glossary.unstuckTerm': '脫困虛弱',
   'guide.glossary.warfareDef':
     '玩家對戰的裝備那一面。軍需官以榮譽販售整套戰爭護甲，而它們所帶的戰爭等級，只在對抗其他玩家的戰鬥中計算。',
@@ -15447,6 +15497,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '接下遞補的席位是刻意不帶風險的：你落入的是一份與你無關的比分，因此無論勝負，這場比賽都不會觸動你的戰場評分，中途離開也不欠任何代價。當一場比賽已接近尾聲、新來者再也無法改變結果時，邀請也就不再發出，所以你絕不會被安置進別人的結局裡。',
   'hudChrome.trade.windowClosed': '交易視窗已關閉。',
+  'hudChrome.trade.offerQuantityHint': '將詢問你要提供的數量',
+  'hudChrome.trade.offerQuantityTitle': '提供 {item}',
+  'hudChrome.trade.offerQuantityInput': '要提供的數量',
+  'hudChrome.trade.offerQuantityConfirm': '提供',
+  'hudChrome.trade.offerQuantityAll': '全部提供',
+  'hudChrome.trade.offerRemoveTitle': '移除 {item}',
+  'hudChrome.trade.offerRemoveInput': '要移除的數量',
+  'hudChrome.trade.offerRemove': '移除',
+  'hudChrome.trade.offerRemoveAll': '全部移除',
   'hudChrome.trade.woc.hintInsufficientBalance': '這超出了你已連接錢包持有的 $WOC 數量。',
   'hudChrome.trade.woc.priceLabel': '價格（美元）',
   'hudChrome.trade.woc.equivalent': '按目前匯率約為 {tokens} $WOC',

@@ -388,9 +388,18 @@ export const id_ID: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Bangkit di Jasad",
       "resurrectAtHealer": "Sang Penjaga Pucat (Upeti Sang Penjaga)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Sang Penjaga Pucat mengawasi para mati. Kamu masih termasuk yang hidup.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "Terima Upeti Sang Penjaga?",
       "healerConfirmBody": "Sang Penjaga Pucat akan menghidupkan Anda kembali di sini, tetapi Upeti Sang Penjaga mengurangi semua atribut Anda sebesar 75%, hingga 10 menit pada level yang lebih tinggi. Membawa roh Anda kembali ke mayat Anda akan menghidupkan Anda kembali tanpa penalti.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Bangkitkan Aku",
       "healerConfirmCancel": "Membatalkan"
     },
@@ -405,6 +414,7 @@ export const id_ID: EnTranslations = {
       "help": "Pemulihan: /unstuck memulai hitung mundur diam di tempat untuk memindahkanmu ke titik aman terjangkau terdekat.",
       "helpAtGraveyard": "Pemulihan: /unstuck memulai hitung mundur diam di tempat, lalu mengirim rohmu ke kuburan terdekat. Kembali lewat Sang Penjaga Pucat membutuhkan Upeti Sang Penjaga.",
       "helpUnstuckSickness": "Pemulihan: /unstuck memulai hitung mundur diam di tempat, lalu memindahkanmu ke kuburan terdekat dan menghidupkanmu kembali jika kamu telah tumbang. Penyakit Pelepasan tetap membebanimu hingga 5 menit.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Lepaskan Diri dalam {seconds} detik. Bergerak, bertarung, menerima kerusakan, atau memulai tindakan lain akan membatalkannya.",
       "countdown": "Lepaskan Diri: {seconds}",
       "completed": "Dipindahkan ke titik aman terjangkau terdekat.",
@@ -412,6 +422,8 @@ export const id_ID: EnTranslations = {
       "revivedAtGraveyard": "Kamu telah dikembalikan ke kuburan terdekat dan dihidupkan kembali. Upeti Sang Penjaga membebanimu.",
       "movedToGraveyard": "Kamu telah dipindahkan ke kuburan terdekat. Penyakit Pelepasan membebanimu.",
       "revivedAtGraveyardUnstuck": "Kamu telah dipindahkan ke kuburan terdekat dan dihidupkan kembali. Penyakit Pelepasan membebanimu.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Lepaskan Diri dibatalkan karena kamu bergerak.",
       "cancelledDamaged": "Lepaskan Diri dibatalkan karena kamu menerima kerusakan.",
       "cancelledCombat": "Lepaskan Diri dibatalkan karena kamu memasuki pertempuran.",
@@ -518,6 +530,15 @@ export const id_ID: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Jendela perdagangan ditutup.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Emas",
         "tabWoc": "$WOC",
@@ -1846,7 +1867,8 @@ export const id_ID: EnTranslations = {
       "crossHotbarEditHelp": "Pegang bemper kiri dan tekan tombol muka atas untuk mengatur palang dengan pengontrol."
     },
     "perf": {
-      "title": "Lapisan Performa",
+      "title": "Performance",
+      "overlaySection": "Lapisan Performa",
       "enable": "Tampilkan Hamparan Kinerja",
       "description": "Pilih statistik mana yang ditampilkan, di mana hamparan berada, dan tampilannya.",
       "sectionPosition": "Posisi",
@@ -2519,6 +2541,15 @@ export const id_ID: EnTranslations = {
       "tooLarge": "Laporan itu terlalu besar untuk dikirim. Coba lagi tanpa tangkapan layar.",
       "rateLimited": "Anda baru saja mengirim beberapa laporan. Tunggu sebentar sebelum mengirim lagi.",
       "failed": "Tidak dapat mengirim laporan bug. Silakan coba lagi."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Lepas {item}",
@@ -3573,6 +3604,15 @@ export const id_ID: EnTranslations = {
         "socket": "Memasang permata ke {name}.",
         "socketReplaced": "Memasang permata ke {name}; {gem} hancur."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Membutuhkan Level {level}",
@@ -6337,6 +6377,7 @@ export const id_ID: EnTranslations = {
       "allyRezBody": "Kamu tak selalu harus lari balik. Seorang sekutu dengan mantra kebangkitan bisa membangkitkanmu sebagai gantinya, dan itu datang kepadamu sebagai permintaan yang bisa kamu terima atau tolak; biarkan tak terjawab dan permintaan itu kedaluwarsa, jadi jawablah selagi masih ada. Terima, dan kamu bangkit di sisi teman yang merapalkannya dengan sebagian nyawa dan mana pulih. Sebagian penyembuh bisa menawarkan kebangkitan bagi seluruh party yang tumbang sekaligus, meski kalian masing-masing tetap menjawab permintaan kalian sendiri. Medan Thornhollow adalah pengecualiannya: tak ada mantra kebangkitan yang menjangkaumu di sana, dan kamu menunggu gelombang berikutnya timmu.",
       "unstuckTitle": "Saat kamu benar-benar terjebak",
       "unstuckBody": "Jika dunia menjebakmu di suatu tempat yang tak bisa kamu keluar darinya, ketik /unstuck. Kamu harus berada di luar pertempuran dan berdiri diam, tidak sedang terkena pingsan atau akar, dan tidak sedang dalam duel atau pertandingan arena: hitung mundur singkat pun berjalan, dan bergerak atau menerima kerusakan akan membatalkannya. Setelah selesai, kamu diturunkan di kuburan terdekat. Ia tak pernah membunuhmu dan tak meninggalkan mayat, dan jika kamu sudah tumbang sebelumnya, ia justru membangkitkanmu di sana. Harganya adalah Penyakit Pelepasan, pelemahan sementara atas seluruh dirimu yang sudah pudar pada saat kamu bisa menggunakan perintah itu lagi, dan seperti Upeti Sang Penjaga, ia sepenuhnya membebaskan karakter yang baru dibuat.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Menarik dirimu naik ke tepian",
       "climbBody": "Tepian bukanlah tembok. Melompat ke arah sesuatu yang terlalu tinggi untuk dipijak membuat karaktermu menangkap bibirnya di dekat puncak lompatan dan menariknya naik ke atasnya, tanpa tombol tersendiri untuk ditekan. Apa pun yang cukup rendah untuk dilewati sendiri akan terlewati tanpa basa-basi; tarikan penuh itu disediakan untuk bibir yang berada di atas kepalamu. Gerakan ini singkat, dan ia mengambil alih kendali selama berlangsung, sehingga kamu tak bisa mengarahkannya di tengah jalan. Sebuah pingsan yang mengenaimu di tengah tarikan membuatmu melepas pegangan dan jatuh, diukur dari tempat lompatan itu meninggalkan tanah, dan sebuah pingsan atau akar mencegah panjatan itu dimulai sama sekali, hal yang patut diingat saat kamu berusaha keluar dari posisi buruk dalam sebuah pertarungan."
     },
@@ -6510,6 +6551,7 @@ export const id_ID: EnTranslations = {
       "dungeonReset": "Tinggalkan instansi-instansi kosong milikmu sendiri, yang kamu lakukan setelah mengganti kesulitan.",
       "groupRecovery": "Pemulihan dan kehadiran",
       "unstuck": "Jalan keluar saat dunia menjebakmu. Berdirilah diam selama hitung mundur singkat dan kamu akan dipindahkan ke kuburan terdekat, serta dibangkitkan di sana jika kamu sudah tumbang. Perintah ini membuatmu lemah karena Penyakit Pelepasan untuk sementara waktu setelahnya, jadi ini adalah pilihan terakhir, bukan jalan pintas.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Tandai dirimu sebagai Pergi Sebentar (AFK), dengan pesan opsional yang akan diterima secara otomatis oleh siapa pun yang membisikimu. Ulangi tanpa pesan untuk menghapusnya; obrolan lain apa pun juga akan menghapusnya.",
       "dnd": "Jangan Ganggu: seperti status pergi, hanya saja bisikan yang dikirim kepadamu ditahan, bukan disampaikan.",
       "sit": "Duduk di tempatmu berada, lalu berdiri kembali. Kamu akan otomatis berdiri begitu kamu bergerak, merapal, atau terkena pukulan.",
@@ -6616,6 +6658,7 @@ export const id_ID: EnTranslations = {
       "fatigueDef": "Berenanglah cukup jauh ke laut lepas dan air mulai menguras tenagamu: sebuah peringatan datang lebih dulu, lalu kerusakan yang meningkat hingga kamu berbalik menuju daratan.",
       "unstuckTerm": "Penyakit Pelepasan",
       "unstuckDef": "Harga yang harus dibayar karena menggunakan Lepaskan Diri dari menu permainan. Diam saja selama hitung mundur dan itu akan menurunkanmu di kuburan terdekat, dan kamu membawa kelemahan sementara untuk beberapa saat setelahnya.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Level item",
       "itemLevelDef": "Satu angka yang merangkum seberapa kuat sebuah perlengkapan, berguna saat kamu ingin membandingkan dua potongan dengan cepat. Aktifkan Tampilkan Level Item di opsi untuk melihatnya pada tooltip. Hanya perlengkapan yang sumbernya diketahui yang membawa satu angka, sehingga barang dasar pedagang dan perlengkapan awal tidak menampilkan apa pun, dan angka yang tidak ada adalah hal normal, bukan sebuah cacat.",
       "requiredLevelTerm": "Level yang Dibutuhkan",
@@ -9879,6 +9922,11 @@ export const id_ID: EnTranslations = {
       "quit": "Keluar",
       "fatalBody": "World of ClaudeCraft mengalami kesalahan tak terduga dan perlu ditutup."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Keluar dari Gim"
     }
@@ -9929,6 +9977,11 @@ export const id_ID: EnTranslations = {
     "inWorld": "di dunia",
     "takeOver": "Ambil Alih",
     "inWorldHint": "Sudah berada di dunia. Keluar di tempat lain, atau ambil alih.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Ini akan memutus karakter ini dari sesi lain dan membawanya ke sini. Lanjutkan?",
     "renameRequired": "wajib ganti nama",
     "delete": "Hapus",
@@ -10473,6 +10526,7 @@ export const id_ID: EnTranslations = {
       "deathRecapDrowned": "Kamu telah tewas. Kamu tenggelam.",
       "deathRecapCauterized": "Kamu telah tewas. Bakaran Kauterisasi mengalahkanmu.",
       "respawn": "Kamu merasa segar dan pulih kembali.",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "Mengabaikan obrolan dari {name}.",
       "noLongerIgnoring": "Tidak lagi mengabaikan {name}.",
       "playerNotNearby": "Pemain itu tidak berada di dekatmu.",
@@ -10751,7 +10805,7 @@ export const id_ID: EnTranslations = {
       "amountLabel": "Amount of {name} to trade",
       "max": "Max",
       "maxLabel": "Offer all of {name}",
-      "removeLabel": "Remove one {name}",
+      "removeLabel": "Remove {name}",
       "accept": "Terima Tukar",
       "waiting": "Menunggu...",
       "cancel": "Batal"

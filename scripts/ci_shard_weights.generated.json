@@ -2,9 +2,63 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 3967,
+    "files": 4072,
     "harvestedFiles": 3948,
     "carried": {
+      "tests/active_kit_prewarm.test.ts": {
+        "ms": 69,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          69
+        ]
+      },
+      "tests/baked_pool_prewarm.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          22
+        ]
+      },
+      "tests/bloodletting_choreography.test.ts": {
+        "ms": 23,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          23
+        ]
+      },
+      "tests/camera_impact_core.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          12
+        ]
+      },
+      "tests/crest_prewarm.test.ts": {
+        "ms": 116,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          116
+        ]
+      },
+      "tests/deferred_contact_bursts.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          9
+        ]
+      },
       "tests/far_bake_uv_pad.test.ts": {
         "ms": 1589,
         "method": "local-median",
@@ -12,6 +66,87 @@
         "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
         "runs": [
           1589
+        ]
+      },
+      "tests/fct_stage_core.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
+        "runs": [
+          15
+        ]
+      },
+      "tests/fury_audio_integration.test.ts": {
+        "ms": 359,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          359
+        ]
+      },
+      "tests/fury_audio_queue.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          10
+        ]
+      },
+      "tests/fury_component_contacts.test.ts": {
+        "ms": 37,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          37
+        ]
+      },
+      "tests/harvest_choreography.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          9
+        ]
+      },
+      "tests/harvest_detonation_staging.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
+        "runs": [
+          15
+        ]
+      },
+      "tests/harvest_fallback_anchor.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          9
+        ]
+      },
+      "tests/harvest_recoil.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          12
+        ]
+      },
+      "tests/harvest_shapes.test.ts": {
+        "ms": 1625,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          1625
         ]
       },
       "tests/hub_dummy_drill.test.ts": {
@@ -120,6 +255,15 @@
           2800
         ]
       },
+      "tests/impact_contact.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          7
+        ]
+      },
       "tests/input_seq_fold.test.ts": {
         "ms": 7,
         "method": "local-median",
@@ -127,6 +271,15 @@
         "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
         "runs": [
           7
+        ]
+      },
+      "tests/ironguard_audio.test.ts": {
+        "ms": 402,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          402
         ]
       },
       "tests/player_portrait_core.test.ts": {
@@ -180,6 +333,69 @@
           11
         ]
       },
+      "tests/ribbon_contact_admission.test.ts": {
+        "ms": 35,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          35
+        ]
+      },
+      "tests/sanguine_weapon_hands.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          13
+        ]
+      },
+      "tests/sanguine_weapon_sheath.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          12
+        ]
+      },
+      "tests/scene_sampling.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          16
+        ]
+      },
+      "tests/shield_contact_outcomes.test.ts": {
+        "ms": 69,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          69
+        ]
+      },
+      "tests/steel_sweep.test.ts": {
+        "ms": 28,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          28
+        ]
+      },
+      "tests/surface_response.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          5
+        ]
+      },
       "tests/target_echo_core.test.ts": {
         "ms": 11,
         "method": "local-median",
@@ -197,11 +413,742 @@
         "runs": [
           15
         ]
+      },
+      "tests/twinstrike_choreography.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          18
+        ]
+      },
+      "tests/warrior_ability_clips.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          6
+        ]
+      },
+      "tests/warrior_action_props.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          5
+        ]
+      },
+      "tests/warrior_area_receiving_contact.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          9
+        ]
+      },
+      "tests/warrior_area_telegraph.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
+        "runs": [
+          13
+        ]
+      },
+      "tests/warrior_attention.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          9
+        ]
+      },
+      "tests/warrior_attention_core.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          12
+        ]
+      },
+      "tests/warrior_avatar_assembly.test.ts": {
+        "ms": 23,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          23
+        ]
+      },
+      "tests/warrior_avatar_bracer.test.ts": {
+        "ms": 63,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          63
+        ]
+      },
+      "tests/warrior_avatar_rupture.test.ts": {
+        "ms": 65,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          65
+        ]
+      },
+      "tests/warrior_avatar_shape.test.ts": {
+        "ms": 47,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          47
+        ]
+      },
+      "tests/warrior_baked_prewarm_integration.test.ts": {
+        "ms": 45,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          45
+        ]
+      },
+      "tests/warrior_blade_contact_ownership.test.ts": {
+        "ms": 29,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          29
+        ]
+      },
+      "tests/warrior_blade_shape.test.ts": {
+        "ms": 89,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          89
+        ]
+      },
+      "tests/warrior_blood_contact_follow.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          44
+        ]
+      },
+      "tests/warrior_blood_impact_hierarchy.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          11
+        ]
+      },
+      "tests/warrior_contact_audio.test.ts": {
+        "ms": 415,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          415
+        ]
+      },
+      "tests/warrior_contact_recoil.test.ts": {
+        "ms": 25,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          25
+        ]
+      },
+      "tests/warrior_control.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          16
+        ]
+      },
+      "tests/warrior_control_audio.test.ts": {
+        "ms": 515,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          515
+        ]
+      },
+      "tests/warrior_control_marks.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          8
+        ]
+      },
+      "tests/warrior_control_performance.test.ts": {
+        "ms": 1426,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          1426
+        ]
+      },
+      "tests/warrior_control_surface.test.ts": {
+        "ms": 33,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          33
+        ]
+      },
+      "tests/warrior_crush_contact.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          15
+        ]
+      },
+      "tests/warrior_crush_contention.test.ts": {
+        "ms": 77,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          77
+        ]
+      },
+      "tests/warrior_equipment_prepare.test.ts": {
+        "ms": 32,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          32
+        ]
+      },
+      "tests/warrior_flash.test.ts": {
+        "ms": 30,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          30
+        ]
+      },
+      "tests/warrior_fracture_atlas.test.ts": {
+        "ms": 56,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          56
+        ]
+      },
+      "tests/warrior_fragment_shape.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          8
+        ]
+      },
+      "tests/warrior_fury_feedback.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          9
+        ]
+      },
+      "tests/warrior_fury_state_core.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          7
+        ]
+      },
+      "tests/warrior_fury_state_shapes.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          11
+        ]
+      },
+      "tests/warrior_fury_states.test.ts": {
+        "ms": 46,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          46
+        ]
+      },
+      "tests/warrior_ground_phases.test.ts": {
+        "ms": 153,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          153
+        ]
+      },
+      "tests/warrior_ground_receiving_contact.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          44
+        ]
+      },
+      "tests/warrior_guard_audio.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          7
+        ]
+      },
+      "tests/warrior_guard_cast.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          14
+        ]
+      },
+      "tests/warrior_guard_plates.test.ts": {
+        "ms": 309,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          309
+        ]
+      },
+      "tests/warrior_gyre_ownership.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          13
+        ]
+      },
+      "tests/warrior_gyre_shape.test.ts": {
+        "ms": 29,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          29
+        ]
+      },
+      "tests/warrior_hammer.test.ts": {
+        "ms": 30,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          30
+        ]
+      },
+      "tests/warrior_hammer_painter.test.ts": {
+        "ms": 942,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          942
+        ]
+      },
+      "tests/warrior_harvest_timing.test.ts": {
+        "ms": 1197,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          1197
+        ]
+      },
+      "tests/warrior_heavy_shapes.test.ts": {
+        "ms": 143,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          143
+        ]
+      },
+      "tests/warrior_impact_polish.test.ts": {
+        "ms": 34,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          34
+        ]
+      },
+      "tests/warrior_insult_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          4
+        ]
+      },
+      "tests/warrior_intervene_visual.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          10
+        ]
+      },
+      "tests/warrior_kit_assets.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "PR 4139 review-fix round: the Warrior kit texture demand-loading suite, absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
+        "runs": [
+          22
+        ]
+      },
+      "tests/warrior_leap_effects.test.ts": {
+        "ms": 117,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          117
+        ]
+      },
+      "tests/warrior_leap_performance.test.ts": {
+        "ms": 123,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          123
+        ]
+      },
+      "tests/warrior_leap_phases.test.ts": {
+        "ms": 76,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          76
+        ]
+      },
+      "tests/warrior_leap_pressure.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          15
+        ]
+      },
+      "tests/warrior_mobility_animation.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          5
+        ]
+      },
+      "tests/warrior_motion_phasing.test.ts": {
+        "ms": 40,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          40
+        ]
+      },
+      "tests/warrior_native_spin_dispatch.test.ts": {
+        "ms": 1879,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          1879
+        ]
+      },
+      "tests/warrior_onrush_asset.test.ts": {
+        "ms": 51,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          51
+        ]
+      },
+      "tests/warrior_onrush_cue.test.ts": {
+        "ms": 3515,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
+        "runs": [
+          3515
+        ]
+      },
+      "tests/warrior_onrush_visual.test.ts": {
+        "ms": 1164,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          1164
+        ]
+      },
+      "tests/warrior_power_anchor.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          7
+        ]
+      },
+      "tests/warrior_power_audio.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          8
+        ]
+      },
+      "tests/warrior_power_core.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          9
+        ]
+      },
+      "tests/warrior_power_crowd.test.ts": {
+        "ms": 265,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          265
+        ]
+      },
+      "tests/warrior_power_forms.test.ts": {
+        "ms": 73,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          73
+        ]
+      },
+      "tests/warrior_power_geometry.test.ts": {
+        "ms": 42,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          42
+        ]
+      },
+      "tests/warrior_power_sprite.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          13
+        ]
+      },
+      "tests/warrior_rage_material.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          16
+        ]
+      },
+      "tests/warrior_readiness.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          15
+        ]
+      },
+      "tests/warrior_readiness_sheen.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          9
+        ]
+      },
+      "tests/warrior_recovery_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          4
+        ]
+      },
+      "tests/warrior_release_scope.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          16
+        ]
+      },
+      "tests/warrior_resource_presentation.test.ts": {
+        "ms": 17,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          17
+        ]
+      },
+      "tests/warrior_rock_material.test.ts": {
+        "ms": 40,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          40
+        ]
+      },
+      "tests/warrior_rush_pose.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          9
+        ]
+      },
+      "tests/warrior_shield.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          21
+        ]
+      },
+      "tests/warrior_shouts.test.ts": {
+        "ms": 380,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          380
+        ]
+      },
+      "tests/warrior_spirit_hammers.test.ts": {
+        "ms": 37,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          37
+        ]
+      },
+      "tests/warrior_steel_contact.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          44
+        ]
+      },
+      "tests/warrior_steel_material.test.ts": {
+        "ms": 603,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          603
+        ]
+      },
+      "tests/warrior_storm_anchor.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          11
+        ]
+      },
+      "tests/warrior_utility_audio.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          8
+        ]
+      },
+      "tests/warrior_widening_arc.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
+        "runs": [
+          10
+        ]
       }
     },
     "removed": {
       "tests/server/store_mount_grants.test.ts": "Replaced by store_mount_skin_grants.test.ts in PR3941; new suite uses the existing heuristic until measured."
-    }
+    },
+    "mergedLocal": "2026-09-22",
+    "mergedFiles": 124
   },
   "tests/abilities_command.test.ts": 2213,
   "tests/ability_audio_defers_to_recordings.test.ts": 66,
@@ -259,6 +1206,7 @@
   "tests/action_bar_visibility_core.test.ts": 5,
   "tests/action_replacement.test.ts": 16,
   "tests/active_animation_timer.test.ts": 8,
+  "tests/active_kit_prewarm.test.ts": 69,
   "tests/adaptive_link_budget_core.test.ts": 18,
   "tests/admin.test.ts": 190,
   "tests/admin/account_flair.test.ts": 18,
@@ -515,6 +1463,7 @@
   "tests/bags_window_unknown_cell.test.ts": 63,
   "tests/bags_window_use_routing.test.ts": 74,
   "tests/bags_window_vendor_sell_menu.test.ts": 48,
+  "tests/baked_pool_prewarm.test.ts": 22,
   "tests/balance_diet.test.ts": 6,
   "tests/bandwidth.test.ts": 5647,
   "tests/bank.test.ts": 5092,
@@ -587,6 +1536,7 @@
   "tests/block_invites.test.ts": 3088,
   "tests/block_landing_feedback_core.test.ts": 6,
   "tests/blocker_colliders.test.ts": 3415,
+  "tests/bloodletting_choreography.test.ts": 23,
   "tests/bloodrift_combo_scaling.test.ts": 2632,
   "tests/boar_asset.test.ts": 53,
   "tests/bootcamp_disengage.test.ts": 2970,
@@ -625,6 +1575,7 @@
   "tests/camera_driven_facing.test.ts": 9,
   "tests/camera_feel_core.test.ts": 12,
   "tests/camera_follow.test.ts": 9,
+  "tests/camera_impact_core.test.ts": 12,
   "tests/camp_brazier_placement_core.test.ts": 14,
   "tests/camp_braziers.test.ts": 2314,
   "tests/camp_density.test.ts": 47,
@@ -922,6 +1873,7 @@
   "tests/creature_glb_skin_skeleton.test.ts": 5,
   "tests/crest_icon_art.test.ts": 8699,
   "tests/crest_image_fallback.test.ts": 19,
+  "tests/crest_prewarm.test.ts": 116,
   "tests/cross_hotbar.test.ts": 20,
   "tests/cross_hotbar_bindings.test.ts": 17,
   "tests/cross_hotbar_cast_dispatch.test.ts": 40,
@@ -1020,6 +1972,7 @@
   "tests/deeds_window_focus.test.ts": 664,
   "tests/deeds_window_jump.test.ts": 1282,
   "tests/defer_launcher_preloads.test.ts": 266,
+  "tests/deferred_contact_bursts.test.ts": 9,
   "tests/deferred_face_decals.test.ts": 1518,
   "tests/delve_affix_art.test.ts": 14,
   "tests/delve_board_controller.test.ts": 96,
@@ -1391,6 +2344,7 @@
   "tests/fct_event.test.ts": 14,
   "tests/fct_mobile_css.test.ts": 15,
   "tests/fct_painter.test.ts": 27,
+  "tests/fct_stage_core.test.ts": 15,
   "tests/fear_break_chance.test.ts": 6414,
   "tests/fear_standable_support.test.ts": 2526,
   "tests/fear_wall_guard.test.ts": 2355,
@@ -1482,6 +2436,9 @@
   "tests/frostbrand.test.ts": 10,
   "tests/frostveil_pit_escape.test.ts": 5700,
   "tests/frozen_orb_fx.test.ts": 39,
+  "tests/fury_audio_integration.test.ts": 359,
+  "tests/fury_audio_queue.test.ts": 10,
+  "tests/fury_component_contacts.test.ts": 37,
   "tests/gale_harbor.test.ts": 2326,
   "tests/galecrest.test.ts": 428,
   "tests/game_audio.test.ts": 35,
@@ -1663,7 +2620,10 @@
   "tests/hallowed_wall_bounce.test.ts": 2173,
   "tests/harvest_admission.test.ts": 14,
   "tests/harvest_body_pick.test.ts": 11,
+  "tests/harvest_choreography.test.ts": 9,
   "tests/harvest_component_materials.test.ts": 7078,
+  "tests/harvest_detonation_staging.test.ts": 15,
+  "tests/harvest_fallback_anchor.test.ts": 9,
   "tests/harvest_geography.test.ts": 16,
   "tests/harvest_journal_view.test.ts": 16,
   "tests/harvest_journal_window.test.ts": 110,
@@ -1674,6 +2634,8 @@
   "tests/harvest_preference_source_details.test.ts": 552,
   "tests/harvest_preference_window.test.ts": 61,
   "tests/harvest_preference_wire.test.ts": 4380,
+  "tests/harvest_recoil.test.ts": 12,
+  "tests/harvest_shapes.test.ts": 1625,
   "tests/harvest_yields.test.ts": 9,
   "tests/haste_set_bonus.test.ts": 3303,
   "tests/headless_gathering_commands.test.ts": 2465,
@@ -1850,6 +2812,7 @@
   "tests/ignivar_weekly_lockout.test.ts": 4312,
   "tests/ignore_chat.test.ts": 4105,
   "tests/imbue_exclusive.test.ts": 3455,
+  "tests/impact_contact.test.ts": 7,
   "tests/impact_site.test.ts": 74,
   "tests/inert_instance_corpse.test.ts": 1675,
   "tests/initial_frame_core.test.ts": 14,
@@ -1905,6 +2868,7 @@
   "tests/ip_block.test.ts": 15,
   "tests/ip_block_kick.test.ts": 1556,
   "tests/ip_scrub.test.ts": 4207,
+  "tests/ironguard_audio.test.ts": 402,
   "tests/island_isolation_core.test.ts": 3822,
   "tests/item_affix_tooltip.test.ts": 222,
   "tests/item_armor_type.test.ts": 6,
@@ -3118,6 +4082,7 @@
   "tests/reveal_gate_wiring.test.ts": 22,
   "tests/reward_counters.test.ts": 2192,
   "tests/rewind.test.ts": 4890,
+  "tests/ribbon_contact_admission.test.ts": 35,
   "tests/rickshaw_mount.test.ts": 20,
   "tests/rickshaw_mount_asset.test.ts": 97,
   "tests/ride_height.test.ts": 78,
@@ -3193,9 +4158,12 @@
   "tests/salvage_copy_selection.test.ts": 2691,
   "tests/sample_ring.test.ts": 8,
   "tests/sanctum_approach.test.ts": 6,
+  "tests/sanguine_weapon_hands.test.ts": 13,
+  "tests/sanguine_weapon_sheath.test.ts": 12,
   "tests/save_character_and_market.test.ts": 10,
   "tests/savedmana_command.test.ts": 1491,
   "tests/scene_census_core.test.ts": 48,
+  "tests/scene_sampling.test.ts": 16,
   "tests/scenery_flame.test.ts": 10,
   "tests/schema_wiring.test.ts": 91,
   "tests/scree.test.ts": 7905,
@@ -3567,6 +4535,7 @@
   "tests/shapeshift_resource_persist.test.ts": 2607,
   "tests/sheathe_toggle.test.ts": 5,
   "tests/shield_block.test.ts": 3613,
+  "tests/shield_contact_outcomes.test.ts": 69,
   "tests/shipped_item_ids.test.ts": 7,
   "tests/shore_water_gate_core.test.ts": 187,
   "tests/sickness_undispellable.test.ts": 2527,
@@ -3668,6 +4637,7 @@
   "tests/steam_link.test.ts": 578,
   "tests/steam_link_markup.test.ts": 7,
   "tests/steam_wishlist.test.ts": 37,
+  "tests/steel_sweep.test.ts": 28,
   "tests/steep_ground_freeze.test.ts": 2005,
   "tests/step_smooth_core.test.ts": 16,
   "tests/storage_charters.test.ts": 6236,
@@ -3703,6 +4673,7 @@
   "tests/summon_threat_seed.test.ts": 6448,
   "tests/summoned_add_respawn.test.ts": 2675,
   "tests/surface_detail_fade.test.ts": 5,
+  "tests/surface_response.test.ts": 5,
   "tests/surface_texture_ktx2.test.ts": 79,
   "tests/suspicion_flag_list.test.ts": 12,
   "tests/suspicion_flag_workflow.test.ts": 7,
@@ -3873,6 +4844,7 @@
   "tests/tutorial_graduation_deed.test.ts": 3518,
   "tests/tutorial_greeting.test.ts": 5256,
   "tests/tutorial_greeting_view.test.ts": 3,
+  "tests/twinstrike_choreography.test.ts": 18,
   "tests/two_factor_setup.test.ts": 12,
   "tests/twohand_itemization_v026.test.ts": 21,
   "tests/twohand_rebudget.test.ts": 12,
@@ -4044,14 +5016,94 @@
   "tests/warlock_pets.test.ts": 14891,
   "tests/warlock_utility.test.ts": 1786,
   "tests/warlock_viability_fixes.test.ts": 2440,
+  "tests/warrior_ability_clips.test.ts": 6,
+  "tests/warrior_action_props.test.ts": 5,
+  "tests/warrior_area_receiving_contact.test.ts": 9,
+  "tests/warrior_area_telegraph.test.ts": 13,
+  "tests/warrior_attention.test.ts": 9,
+  "tests/warrior_attention_core.test.ts": 12,
   "tests/warrior_authored_assets.test.ts": 52,
+  "tests/warrior_avatar_assembly.test.ts": 23,
+  "tests/warrior_avatar_bracer.test.ts": 63,
+  "tests/warrior_avatar_rupture.test.ts": 65,
+  "tests/warrior_avatar_shape.test.ts": 47,
+  "tests/warrior_baked_prewarm_integration.test.ts": 45,
+  "tests/warrior_blade_contact_ownership.test.ts": 29,
+  "tests/warrior_blade_shape.test.ts": 89,
+  "tests/warrior_blood_contact_follow.test.ts": 44,
+  "tests/warrior_blood_impact_hierarchy.test.ts": 11,
   "tests/warrior_charge_refund.test.ts": 933,
   "tests/warrior_combat_mastery_v026.test.ts": 2741,
+  "tests/warrior_contact_audio.test.ts": 415,
+  "tests/warrior_contact_recoil.test.ts": 25,
+  "tests/warrior_control.test.ts": 16,
+  "tests/warrior_control_audio.test.ts": 515,
+  "tests/warrior_control_marks.test.ts": 8,
+  "tests/warrior_control_performance.test.ts": 1426,
+  "tests/warrior_control_surface.test.ts": 33,
+  "tests/warrior_crush_contact.test.ts": 15,
+  "tests/warrior_crush_contention.test.ts": 77,
+  "tests/warrior_equipment_prepare.test.ts": 32,
+  "tests/warrior_flash.test.ts": 30,
+  "tests/warrior_fracture_atlas.test.ts": 56,
+  "tests/warrior_fragment_shape.test.ts": 8,
+  "tests/warrior_fury_feedback.test.ts": 9,
+  "tests/warrior_fury_state_core.test.ts": 7,
+  "tests/warrior_fury_state_shapes.test.ts": 11,
+  "tests/warrior_fury_states.test.ts": 46,
+  "tests/warrior_ground_phases.test.ts": 153,
+  "tests/warrior_ground_receiving_contact.test.ts": 44,
+  "tests/warrior_guard_audio.test.ts": 7,
+  "tests/warrior_guard_cast.test.ts": 14,
+  "tests/warrior_guard_plates.test.ts": 309,
+  "tests/warrior_gyre_ownership.test.ts": 13,
+  "tests/warrior_gyre_shape.test.ts": 29,
+  "tests/warrior_hammer.test.ts": 30,
+  "tests/warrior_hammer_painter.test.ts": 942,
+  "tests/warrior_harvest_timing.test.ts": 1197,
+  "tests/warrior_heavy_shapes.test.ts": 143,
+  "tests/warrior_impact_polish.test.ts": 34,
+  "tests/warrior_insult_core.test.ts": 4,
   "tests/warrior_intervene.test.ts": 1436,
+  "tests/warrior_intervene_visual.test.ts": 10,
+  "tests/warrior_kit_assets.test.ts": 22,
+  "tests/warrior_leap_effects.test.ts": 117,
+  "tests/warrior_leap_performance.test.ts": 123,
+  "tests/warrior_leap_phases.test.ts": 76,
+  "tests/warrior_leap_pressure.test.ts": 15,
+  "tests/warrior_mobility_animation.test.ts": 5,
+  "tests/warrior_motion_phasing.test.ts": 40,
+  "tests/warrior_native_spin_dispatch.test.ts": 1879,
+  "tests/warrior_onrush_asset.test.ts": 51,
+  "tests/warrior_onrush_cue.test.ts": 3515,
+  "tests/warrior_onrush_visual.test.ts": 1164,
+  "tests/warrior_power_anchor.test.ts": 7,
+  "tests/warrior_power_audio.test.ts": 8,
+  "tests/warrior_power_core.test.ts": 9,
+  "tests/warrior_power_crowd.test.ts": 265,
+  "tests/warrior_power_forms.test.ts": 73,
+  "tests/warrior_power_geometry.test.ts": 42,
+  "tests/warrior_power_sprite.test.ts": 13,
   "tests/warrior_rage_economy.test.ts": 1591,
+  "tests/warrior_rage_material.test.ts": 16,
+  "tests/warrior_readiness.test.ts": 15,
+  "tests/warrior_readiness_sheen.test.ts": 9,
+  "tests/warrior_recovery_core.test.ts": 4,
+  "tests/warrior_release_scope.test.ts": 16,
   "tests/warrior_render_contract.test.ts": 13,
+  "tests/warrior_resource_presentation.test.ts": 17,
+  "tests/warrior_rock_material.test.ts": 40,
   "tests/warrior_row_runtime_v026.test.ts": 7750,
+  "tests/warrior_rush_pose.test.ts": 9,
+  "tests/warrior_shield.test.ts": 21,
+  "tests/warrior_shouts.test.ts": 380,
+  "tests/warrior_spirit_hammers.test.ts": 37,
   "tests/warrior_stances.test.ts": 1698,
+  "tests/warrior_steel_contact.test.ts": 44,
+  "tests/warrior_steel_material.test.ts": 603,
+  "tests/warrior_storm_anchor.test.ts": 11,
+  "tests/warrior_utility_audio.test.ts": 8,
+  "tests/warrior_widening_arc.test.ts": 10,
   "tests/water_apron_bathymetry.test.ts": 7025,
   "tests/water_coverage_core.test.ts": 121,
   "tests/water_elemental_audio.test.ts": 30,

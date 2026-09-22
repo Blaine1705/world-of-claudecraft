@@ -5310,7 +5310,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Beinhaltet eine Grundchance von 5%, die allen Abenteurern gemein ist.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Ein Schätzwert, kritische Treffer und Fähigkeitsschaden sind ausgenommen.',
-  'hudChrome.perf.title': 'Leistungsanzeige',
+  'hudChrome.perf.overlaySection': 'Leistungsanzeige',
   'hudChrome.perf.enable': 'Leistungsanzeige anzeigen',
   'hudChrome.perf.description':
     'Wähle, welche Werte angezeigt werden, wo die Anzeige sitzt und wie sie aussieht.',

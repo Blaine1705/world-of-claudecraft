@@ -130,7 +130,6 @@ import {
   xpUntilNextPrestige,
 } from '../sim/types';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
-import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
   type CharacterProfile,
   type DailyRewardStatus,
@@ -215,9 +214,9 @@ import { CombatAnnouncer } from './combat_announcer';
 import {
   auraApplyCue,
   castCueForAbility,
-  consumeHealCue,
   dispatchRaidCalloutSfx,
   groundTickAbilityCue,
+  healAudioPlan,
   impactCueForDamage,
   mobVoiceActionForDamage,
   mobVoiceCueWithFallback,
@@ -619,21 +618,19 @@ import {
 } from './interface_unlock_menu_core';
 import { InterfaceUnlockPreview } from './interface_unlock_preview';
 import { InteriorMapController } from './interior_map_controller';
-import { itemAffixTooltipLines, itemRatingTooltipLines } from './item_affix_tooltip';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
+import { itemCombatTooltipLines } from './item_combat_tooltip_view';
 import { itemCompareBlocksHtml } from './item_compare_view';
 import { ItemDragState } from './item_drag_state';
 import {
   instanceBadgeLines,
   instanceBindingLines,
-  instanceBonusStatLines,
   instanceLockLine,
   instancePartyTradeLine,
   instanceTitleHtml,
   itemNumber,
   itemRequiredLevelLine,
-  itemStatName,
   materialMakersMarkLines,
   tooltipEffectiveQuality,
   vendorSellTooltipLine,
@@ -646,11 +643,14 @@ import {
   itemSetTooltipModel,
 } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
+import { keeperReviveConfirm, keeperReviveDialogue } from './keeper_revive_dialog_core';
 import { bindActionDisplayName } from './keybind_action_names_core';
 import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
+import { lootQualityReceiptBody } from './loot_quality_receipt';
+import { lootQualityAriaName } from './loot_quality_view';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
@@ -788,7 +788,7 @@ import {
 import { questProgressEventText } from './quest_progress_text';
 import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { raidCalloutKey } from './raid_callout';
-import { formatLockoutDuration } from './raid_lockout_format';
+import { formatLockoutDuration, raidLockoutDisplayName } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import { RecipePinStore } from './recipe_pins_store';
@@ -836,7 +836,7 @@ import {
   MOTD_RESULT_FALLBACK_KEY,
   MOTD_RESULT_KEYS,
 } from './result_code_keys';
-import { itemLevelReadout, riftBandTooltipLines, riftGemTooltipLines } from './rift_band_tooltip';
+import { itemLevelReadout } from './rift_band_tooltip';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import {
@@ -890,7 +890,7 @@ import { renderTownFocusWindow } from './town_focus_window';
 import { trackerCollapseSettings } from './tracker_collapse_settings';
 import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
-import { tradeOfferCeiling } from './trade_view';
+import { stageTradeOffer, tradeOfferHeadroom } from './trade_view';
 import { TutorialOverlay } from './tutorial';
 import { buildFerryIslandArrivalNote, type TutorialGreetingNote } from './tutorial_greeting_view';
 import { renderTutorialGreetingNote } from './tutorial_greeting_window';
@@ -1035,7 +1035,7 @@ export interface BugReportPayload {
 export interface BugReportHooks {
   // Submit a captured bug report to the server. Resolves on success (screenshotStored
   // is false when the server dropped the screenshot), rejects with a server error
-  // message the hud maps via localizeBugReportError.
+  // message the ui maps via bugReportErrorText.
   submit(payload: BugReportPayload): Promise<{ screenshotStored: boolean }>;
   // Grab a JPEG data URL of the current frame asynchronously, or null if capture
   // failed/unavailable. Encoding must not block the options window's main thread.
@@ -1089,11 +1089,11 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
-// Ghost-mode display thresholds, mirroring src/sim/spirit.ts (CORPSE_REZ_RANGE and
-// SPIRIT_HEALER_RANGE). The server re-validates both ranges; these only decide whether
-// the death-overlay resurrect buttons are shown, so keep them in sync.
+// Ghost-mode display threshold, mirroring src/sim/spirit.ts CORPSE_REZ_RANGE. The
+// server re-validates the range; this only decides whether the ghost prompt's corpse
+// button is shown, so keep it in sync. (The Pale Keeper's raise is reached by talking
+// to the Keeper, so no healer range is mirrored here any more.)
 const GHOST_CORPSE_REZ_RANGE = 35;
-const GHOST_HEALER_RANGE = 8;
 
 const STAT_VIEW_DEPS: StatTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
@@ -1619,7 +1619,8 @@ export class Hud {
   private guildInvitePromptEl: HTMLElement | null = null;
   private promptSequence = 0;
   private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
-  private resurrectHealerBtnEl = $('#resurrect-healer-btn');
+  // The standing top-of-screen ghost line (both ways back); shown for a ghost only.
+  private ghostHintEl = $('#ghost-hint');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
   private hotWriteCache: SingleSlotCache = new WeakMap(); // WeakMap rationale: painter_host.ts
@@ -2681,7 +2682,6 @@ export class Hud {
       this.sim.releaseSpirit();
     });
     bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
-    bindTouchTap(this.resurrectHealerBtnEl, () => this.requestSpiritHealerResurrect());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;
@@ -5202,7 +5202,9 @@ export class Hud {
     closeVendor: () => this.closeVendor(),
     closeBank: () => this.closeBank(),
     onClosed: () => this.onBagsClosed(),
-    addItemToTrade: (itemId) => this.addItemToTrade(itemId),
+    addItemToTrade: (itemId, count) => this.addItemToTrade(itemId, count),
+    tradeOfferHeadroom: (itemId) =>
+      this.tradeOpen ? tradeOfferHeadroom(this.stagedTrade.items, this.sim.inventory, itemId) : 0,
     stageMarketSell: (itemId, instance) => this.marketWindow.stageSell(itemId, instance),
     stageMailParcel: (itemId, instance) => this.mailboxWindow.stageParcel(itemId, instance),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
@@ -6488,15 +6490,18 @@ export class Hud {
     }
     // Optional item-level readout (off by default; src/sim/item_level.ts derives it
     // from where the item drops). Read live, so toggling it takes effect on the next
-    // hover. Combat gear only: sourceless items (vendor/starter) have no level,
-    // and non-combat items never get an item-level line. A Riftbound band copy
-    // has no drop-source itemLevel (it is priced by its rift record, not its
-    // stat-free ItemDef shell), so its level/score come from itemLevelReadout
-    // (rift_band_tooltip.ts) instead of itemInstanceLevel/itemScore, which stay
-    // the source for every other piece so Crucible Perfecting's bonus level holds.
-    if (isItemLevelEligible(item) && this.optionsHooks?.settings.get('showItemLevel')) {
+    // hover. Combat gear only: sourceless items (vendor/starter) have no level, and
+    // non-combat items never get the line. A quality-rolled copy ALWAYS shows it
+    // (deliberate: its badge means "+N item levels", so the readout is the badge's
+    // legend, not the optional setting). A Riftbound band or quality copy is priced
+    // by its payload, not its stat-free shell, so its level/score come from
+    // itemLevelReadout; itemInstanceLevel/itemScore stay the source for the rest.
+    if (
+      isItemLevelEligible(item) &&
+      (instance?.lootQuality || this.optionsHooks?.settings.get('showItemLevel'))
+    ) {
       let readout: { level: number; score: number } | undefined;
-      if (instance?.rift) {
+      if (instance?.rift || instance?.lootQuality) {
         readout = itemLevelReadout(item, instance);
       } else {
         const level = itemInstanceLevel(item, instance);
@@ -6534,40 +6539,7 @@ export class Hud {
     // seal and the enchanted marker (item_instance_tooltip.ts owns the copy
     // rules, incl. never claiming a quality-rank upgrade).
     html += instanceBadgeLines(instance);
-    if (item.weapon) {
-      const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
-      html += `<div class="tt-stat">${esc(
-        t('itemUi.tooltip.damageSpeed', {
-          min: itemNumber(item.weapon.min),
-          max: itemNumber(item.weapon.max),
-          speed: itemNumber(item.weapon.speed, 1),
-        }),
-      )}</div>`;
-      html += `<div class="tt-stat">${esc(t('itemUi.tooltip.dps', { dps: itemNumber(dps, 1) }))}</div>`;
-      // The weapon type (incl. Dagger) now appears on the slot line above like
-      // every other weapon, so the old standalone "Dagger" sub-line is gone. The
-      // item.weapon.dagger DATA field still drives Backstab; only this line went.
-    }
-    if (item.stats) {
-      for (const [k, v] of Object.entries(item.stats)) {
-        if (v === undefined) continue;
-        if (k === 'armor') {
-          html += `<div class="tt-stat">${esc(t('itemUi.tooltip.armorStat', { value: itemNumber(v) }))}</div>`;
-        } else {
-          html += `<div class="tt-green">${esc(
-            t('itemUi.tooltip.stat', {
-              value: itemNumber(v),
-              stat: itemStatName(k),
-            }),
-          )}</div>`;
-        }
-      }
-    }
-    html += instanceBonusStatLines(instance);
-    html += riftBandTooltipLines(instance);
-    html += itemAffixTooltipLines(item);
-    html += riftGemTooltipLines(item);
-    html += itemRatingTooltipLines(item);
+    html += itemCombatTooltipLines(item, instance);
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
@@ -9468,7 +9440,9 @@ export class Hud {
     // Death UI. A fresh corpse (dead, spirit not yet released) gets the full-screen
     // Release overlay (a corpse cannot move, so a modal is fine; suppressed in arena).
     // A ghost runs FREELY (no blocking overlay) and the world drains to greyscale; a
-    // A small prompt appears only in corpse/Healer reach; the server re-checks both ranges.
+    // A small prompt appears only in corpse reach (the server re-checks the range); the
+    // Pale Keeper's raise is reached by talking to the Keeper, and a standing top line
+    // names both ways back for the whole ghost run.
     const ghost = p.dead && p.ghost;
     const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
     // A battleground corpse releases like the open world, so the Release modal shows;
@@ -9479,22 +9453,10 @@ export class Hud {
     if (!p.dead) this.closeResurrectionPrompt();
     document.body.classList.toggle('spirit-mode', ghost);
     this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
+    this.setDisplay(this.ghostHintEl, ghost && !ghostInBgMatch ? 'block' : 'none');
     if (ghost && !ghostInBgMatch) {
       const corpseInRange = !!p.corpsePos && dist2d(p.pos, p.corpsePos) <= GHOST_CORPSE_REZ_RANGE;
-      let healerNearby = false;
-      for (const ent of this.sim.entities.values()) {
-        if (
-          ent.kind === 'npc' &&
-          ent.templateId === 'spirit_healer' &&
-          dist2d(ent.pos, p.pos) <= GHOST_HEALER_RANGE
-        ) {
-          healerNearby = true;
-          break;
-        }
-      }
-      this.setDisplay(this.ghostPromptEl, corpseInRange || healerNearby ? 'flex' : 'none');
-      this.setDisplay(this.resurrectCorpseBtnEl, corpseInRange ? '' : 'none');
-      this.setDisplay(this.resurrectHealerBtnEl, healerNearby ? '' : 'none');
+      this.setDisplay(this.ghostPromptEl, corpseInRange ? 'flex' : 'none');
     } else {
       this.setDisplay(this.ghostPromptEl, 'none');
     }
@@ -9897,21 +9859,9 @@ export class Hud {
     const i18n: RaidLockoutI18n = {
       title: t('hudChrome.raidLockout.title'),
       allReady: t('hudChrome.raidLockout.allReady'),
-      // A looted world boss shows in the raid-lockout timer under a world-boss lockout id
-      // (see markWorldBossLooted in src/sim/world_boss.ts). worldBossIdFromLockout keeps
-      // the prefix convention in one place: it returns the boss mob id (localize as a mob
-      // name) or null for an ordinary dungeon/raid id.
-      raidName: (id) => {
-        const bossId = worldBossIdFromLockout(id);
-        if (bossId !== null) return tEntity({ kind: 'mob', id: bossId, field: 'name' });
-        // Heroic daily lockouts ride difficulty-scoped ids (<dungeon>:heroic).
-        if (id.endsWith(':heroic')) {
-          return t('hudChrome.raidLockout.heroicName', {
-            name: dungeonDisplayName(id.slice(0, -':heroic'.length)),
-          });
-        }
-        return dungeonDisplayName(id);
-      },
+      // World-boss, heroic and plain dungeon ids all name through the shared
+      // rule character select uses too (raid_lockout_format.ts).
+      raidName: raidLockoutDisplayName,
       duration: formatLockoutDuration,
     };
     return raidLockoutPanelHtml(this.sim.raidLockouts(), i18n);
@@ -11122,27 +11072,9 @@ export class Hud {
       case 'heal2': {
         const tgt = sim.entities.get(ev.targetId);
         if (!tgt) return;
-        // A potion/eat/drink heal (items.ts / combat/auras.ts) plays its own
-        // dedicated cue instead of the generic heal_impact; consumeHealCue
-        // returns null for every other heal source (leech, second wind,
-        // companion heals, ...), which falls through to heal_impact unchanged.
-        const cue = ev.type === 'heal' ? consumeHealCue(ev) : null;
-        if (ev.type === 'heal' && ev.source && !cue) return; // eat/drink tick, not a sound tick
-        // A HoT tick fires this every couple seconds for its whole duration; the
-        // one-shot application cue (Sim.applyAura) now covers the "heal landed"
-        // moment instead, so ticks stay silent. Frenzied Regeneration is fully
-        // exempt from this change (a Bear Form self-heal, never aimed at anyone
-        // else, so the repeat doesn't read as spammy the way a party HoT does):
-        // it keeps its old, unchanged tick-only sound, so the one-shot
-        // application emit is skipped for it too, or it would gain an extra pop
-        // on top of its untouched ticking. Confirmed in-game on Priest (Renew)
-        // and Druid (Rejuvenation, Regrowth, Frenzied Regeneration): the others
-        // land once on application and stay silent for the rest of their
-        // duration; Frenzied Regeneration keeps ticking exactly as before.
-        const isHot = ev.type === 'heal2' && ev.hot === true;
-        const isFrenziedRegen = ev.type === 'heal2' && ev.abilityId === 'frenzied_regeneration';
-        if (isHot ? !isFrenziedRegen : isFrenziedRegen) return;
-        this.combat(cue ?? 'heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
+        const plan = healAudioPlan(ev);
+        if (!plan) return;
+        this.combat(plan.cue, tgt.pos.x, tgt.pos.y, tgt.pos.z, plan.gain, { cooldown: 0.1 });
         return;
       }
       case 'aura': {
@@ -11310,7 +11242,7 @@ export class Hud {
             // token (the grey vs the white FCT token); the localized word stays at the call site. A resisted
             // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,
             // not miss).
-            const shape = fctSpawnShape({
+            const shape = this.fctPainter.stagedShape(ev, now, {
               type: 'damage',
               damageKind: ev.kind,
               ability: false,
@@ -11370,7 +11302,7 @@ export class Hud {
           // through here too, but with its own damageKind so it reads with its own colour
           // and combat-log sentence instead of an indistinguishable plain hit. The amount
           // text + target entity stay at the call site.
-          const hitShape = fctSpawnShape({
+          const hitShape = this.fctPainter.stagedShape(ev, now, {
             type: 'damage',
             damageKind: ev.kind === 'block' ? 'block' : 'hit',
             ability: !!ev.ability,
@@ -11641,14 +11573,16 @@ export class Hud {
           // (#2430). Everything else in this arm still runs for those grants:
           // the loot-roll close below, the bag refresh, and the independent
           // audio guard.
-          if (!ev.callerLogs) this.log(this.localizeLootText(ev.text), HUD_LOG.GOOD);
+          // The body is the localized line, or, for a quality-rolled copy, the
+          // nodes whose item link carries that exact copy (lootReceiptBody).
+          if (!ev.callerLogs) this.log(this.lootReceiptBody(ev), HUD_LOG.GOOD);
           if (
             / wins .+ \(\d+\)$/.test(ev.text) ||
             /^Everyone passed on .+\.$/.test(ev.text) ||
             / assigned .+ to .+\.$/.test(ev.text) ||
             /^.+ was not assigned and is free for all\.$/.test(ev.text)
           )
-            this.lootRolls.closeForItem(ev.text);
+            this.lootRolls.closeForItem(ev.text, ev.rollId);
           // silent: the audio half of the same idea, and independent of it (a
           // caller can own the cue without owning the line). A professions
           // grant sets this when it owns the cue for the same grant: it has a
@@ -13396,7 +13330,9 @@ export class Hud {
           break;
         }
         case 'respawn':
-          this.log(t('hud.system.respawn'), HUD_LOG.GOOD);
+          if (ev.sickness === 'resurrection')
+            this.log(t('hud.system.respawnKeeperToll'), HUD_LOG.NOTICE);
+          else this.log(t('hud.system.respawn'), HUD_LOG.GOOD);
           break;
         case 'unstuck': {
           const feedback = unstuckFeedback(ev);
@@ -13988,7 +13924,9 @@ export class Hud {
   }
 
   log(
-    text: string,
+    // A string body, or a caller-assembled NODE body (the exact-copy loot
+    // receipt link) that rides the same chrome and channel as a text line.
+    text: string | readonly Node[],
     color = 'var(--color-accent)',
     decorativeIconUrl?: string,
     channel = ERROR_LOG_CHAN,
@@ -13999,13 +13937,13 @@ export class Hud {
   ): void {
     this.appendLog(
       this.chatLogEl,
-      text,
+      typeof text === 'string' ? text : '',
       color,
       true,
       channel,
       decorativeIconUrl,
       plainText,
-      undefined,
+      typeof text === 'string' ? undefined : text,
       announceWhenFiltered,
     );
   }
@@ -14016,6 +13954,18 @@ export class Hud {
    *  text node. */
   private logNodes(nodes: readonly Node[], color: string): void {
     this.appendLog(this.chatLogEl, '', color, true, 'system', undefined, false, nodes);
+  }
+
+  /** The generic grant line's body (src/ui/loot_quality_receipt.ts): the
+   *  localized text, or for a quality-rolled copy the nodes whose item link
+   *  opens that exact copy rather than the catalogue definition. */
+  private lootReceiptBody(ev: Extract<SimEvent, { type: 'loot' }>): string | Node[] {
+    return lootQualityReceiptBody(
+      document,
+      ev,
+      (value) => this.localizeLootText(value),
+      (parent, id, copy) => this.appendChatItemLink(parent, id, copy),
+    );
   }
 
   private noteProcAuraGain(name: string): void {
@@ -14194,7 +14144,11 @@ export class Hud {
   // bag / tooltip / loot name language. Hover/focus shows the same item tooltip
   // the bags window uses; an unknown id (e.g. content drift between players)
   // degrades to a plain [?].
-  private appendChatItemLink(parent: HTMLElement, itemId: string): void {
+  private appendChatItemLink(
+    parent: HTMLElement,
+    itemId: string,
+    instance?: ItemInstancePayload,
+  ): void {
     // knownItemDef, not bare truthiness: the token charset admits prototype
     // keys ([[i:constructor]] is peer-typed text), and the bare read sent
     // them down the known arm to throw inside the event batch.
@@ -14206,9 +14160,9 @@ export class Hud {
     const link = document.createElement('span');
     link.className = 'chat-item-link';
     link.style.color = itemNameColor(item);
-    link.textContent = `[${itemDisplayName(item)}]`;
+    link.textContent = `[${lootQualityAriaName(itemDisplayName(item), instance)}]`;
     link.tabIndex = 0;
-    this.attachTooltip(link, () => this.itemTooltip(item));
+    this.attachTooltip(link, () => this.itemTooltip(item, true, instance));
     parent.append(link);
   }
 
@@ -16625,21 +16579,18 @@ export class Hud {
     );
   }
 
-  // The Pale Keeper revive is irreversible and applies The Keeper's Toll (all
-  // attributes -75%, level-scaled up to 10 minutes), so it confirms first; the
-  // penalty-free corpse run stays one tap. OK sends the exact pre-existing
-  // command; cancel/Escape sends nothing. Public because every entry point to
-  // the revive routes through this one gate: the ghost-prompt button, the
-  // world-click on the Pale Keeper (game/interactions.ts), and the interact
-  // key (game/nearby_interaction.ts).
+  // Talking to the Pale Keeper (world click, interact key) opens its dialogue, and
+  // Revive Me there opens a level-aware confirmation (keeper_revive_dialog_core.ts):
+  // the raise is irreversible and charges The Keeper's Toll from level 10 up. Only
+  // the second OK sends the command; cancel/Escape at either step sends nothing.
   requestSpiritHealerResurrect(): void {
-    this.confirmDialog(
-      t('hudChrome.death.healerConfirmTitle'),
-      t('hudChrome.death.healerConfirmBody'),
-      t('hudChrome.death.healerConfirmAccept'),
-      t('hudChrome.death.healerConfirmCancel'),
-      () => this.onResurrectAtSpiritHealer?.(),
-    );
+    const talk = keeperReviveDialogue(this.sim.player.level);
+    this.confirmDialog(t(talk.titleKey), t(talk.bodyKey), t(talk.okKey), t(talk.cancelKey), () => {
+      const sure = keeperReviveConfirm(this.sim.player.level);
+      this.confirmDialog(t(sure.titleKey), t(sure.bodyKey), t(sure.okKey), t(sure.cancelKey), () =>
+        this.onResurrectAtSpiritHealer?.(),
+      );
+    });
   }
 
   // Heroic Quartermaster purchases debit Heroic Marks with no buyback recorded
@@ -18075,15 +18026,10 @@ export class Hud {
     return this.sim.tradeInfo !== null;
   }
 
-  addItemToTrade(itemId: string): void {
-    if (!this.tradeOpen || this.stagedTrade.items.length >= 6) return;
-    const existing = this.stagedTrade.items.find((s) => s.itemId === itemId);
-    const have = tradeOfferCeiling(this.sim.inventory, itemId);
-    if (existing) {
-      if (existing.count < have) existing.count++;
-    } else {
-      this.stagedTrade.items.push({ itemId, count: 1 });
-    }
+  /** Stage `count` (default 1) units; trade_view.ts clamps to the headroom. */
+  addItemToTrade(itemId: string, count = 1): void {
+    if (!this.tradeOpen) return;
+    if (stageTradeOffer(this.stagedTrade.items, this.sim.inventory, itemId, count) < 1) return;
     this.pushTradeOffer();
   }
 
