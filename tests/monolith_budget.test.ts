@@ -528,7 +528,11 @@ const MONOLITHS: MonolithRow[] = [
     // state composes with the release extractions and trade quantity surface
     // at 18238 by wc -l, still below the batch parent pin. Exact merged count,
     // zero slack.
-    ceiling: 18238,
+    // Re-pinned 18238 -> 18240 after #4140's full-bag loot warning and roll-win
+    // banner merged into that reconciled tree: the PR's error-toast timer and
+    // loot notification formatting compose with the quality receipt arm and
+    // roll-id close guard. wc -l on the merged tree. Exact count, zero slack.
+    ceiling: 18240,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

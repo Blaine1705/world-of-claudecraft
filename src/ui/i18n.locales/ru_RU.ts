@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.loot.rollWon': 'Поздравляем! Вы выиграли {item}, выбросив {roll}',
   'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
   'hudChrome.professionTrainers.nameplate': '<{title}>',
   'guide.professions.endgameBodyRaidCollections':

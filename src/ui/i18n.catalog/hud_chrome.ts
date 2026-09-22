@@ -4618,6 +4618,7 @@ export const hudChromeStrings = {
   // Loot window title shown only when the chest entity is missing (the normal path
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
   loot: {
+    rollWon: 'Congratulations! You won {item} with a roll of {roll}',
     chestTitle: 'Chest',
     // Loot-window legibility reword: the corpse arm's button is
     // "Take Loot" (the old "Take All" label promised the harvest too); the

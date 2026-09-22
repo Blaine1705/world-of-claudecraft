@@ -3371,6 +3371,7 @@ export const cs_CZ: EnTranslations = {
       "resetErrInvalid": "Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový."
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "Truhla",
       "takeLootButton": "Sebrat kořist",
       "takeLootTooltip": "Sebrat veškerou kořist",

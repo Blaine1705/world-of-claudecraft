@@ -3371,6 +3371,7 @@ export const es: EnTranslations = {
       "resetErrInvalid": "Este enlace de restablecimiento no es válido o ha caducado. Solicita uno nuevo."
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "Cofre",
       "takeLootButton": "Tomar botín",
       "takeLootTooltip": "Toma las monedas y los objetos caídos. No consume la recolección.",

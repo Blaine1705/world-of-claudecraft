@@ -3371,6 +3371,7 @@ export const zh_TW: EnTranslations = {
       "resetErrInvalid": "此重設連結無效或已過期。請重新申請一個。"
     },
     "loot": {
+      "rollWon": "恭喜！你以 {roll} 點贏得了 {item}",
       "chestTitle": "寶箱",
       "takeLootButton": "拾取戰利品",
       "takeLootTooltip": "收取金幣和掉落的物品。不會用掉採集機會。",

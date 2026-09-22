@@ -3371,6 +3371,7 @@ export const da_DK: EnTranslations = {
       "resetErrInvalid": "Dette nulstillingslink er ugyldigt eller udløbet. Anmod om et nyt."
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "Kiste",
       "takeLootButton": "Tag bytte",
       "takeLootTooltip": "Tager mønterne og droppede genstande. Bruger ikke høsten op.",

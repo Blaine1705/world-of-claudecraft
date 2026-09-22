@@ -10595,6 +10595,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.loot.bindConfirmBody'
   | 'hudChrome.loot.bindConfirmTitle'
   | 'hudChrome.loot.chestTitle'
+  | 'hudChrome.loot.rollWon'
   | 'hudChrome.loot.takeLootButton'
   | 'hudChrome.loot.takeLootTooltip'
   | 'hudChrome.loot.unifiedPressHint'

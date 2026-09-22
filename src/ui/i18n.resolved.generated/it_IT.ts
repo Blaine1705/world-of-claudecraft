@@ -3371,6 +3371,7 @@ export const it_IT: EnTranslations = {
       "resetErrInvalid": "Questo link di reimpostazione non è valido o è scaduto. Richiedine uno nuovo."
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "Scrigno",
       "takeLootButton": "Prendi il bottino",
       "takeLootTooltip": "Prende le monete e gli oggetti caduti. Non consuma la raccolta.",

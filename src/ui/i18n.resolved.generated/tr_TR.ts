@@ -3371,6 +3371,7 @@ export const tr_TR: EnTranslations = {
       "resetErrInvalid": "Bu sıfırlama bağlantısı geçersiz veya süresi dolmuş. Yeni bir tane iste."
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "Sandık",
       "takeLootButton": "Yağmayı Al",
       "takeLootTooltip": "Altınları ve düşen eşyaları alır. Toplama hakkını kullanmaz.",

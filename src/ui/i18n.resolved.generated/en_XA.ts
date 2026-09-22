@@ -3371,6 +3371,7 @@ export const en_XA: EnTranslations = {
       "resetErrInvalid": "[Ţĥíš ŕéšéţ ļíñķ íš íñʋáļíð óŕ ĥáš éẋþíŕéð. Ŕéɋúéšţ á ñéŵ óñé.]"
     },
     "loot": {
+      "rollWon": "[Çóñĝŕáţúļáţíóñš! Ýóú ŵóñ {item} ŵíţĥ á ŕóļļ óƒ {roll}]",
       "chestTitle": "[Çĥéšţ]",
       "takeLootButton": "[Ţáķé Ļóóţ]",
       "takeLootTooltip": "[Ţáķéš ţĥé çóíñš áñð ðŕóþþéð íţéɱš. Ðóéš ñóţ úšé úþ ţĥé ĥáŕʋéšţ.]",
