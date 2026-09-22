@@ -3073,7 +3073,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.
-  conquerors_the_rift: 29,
+  conquerors_the_rift: 30,
   // The one reward-chest activity door, on all 32 pieces.
   conquerors_buried_hoards: 1,
   // The one first-clear activity door, on all three bands (Phase 21).

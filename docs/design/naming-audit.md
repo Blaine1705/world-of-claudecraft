@@ -2421,6 +2421,7 @@ frozen).
 | Marrow and Ash | GENERIC |  | quest:q_dk_marrow_and_ash |
 | Marrow Harvest | GENERIC |  | mobMechanic:rift_boss_necro.bigCast |
 | Marrow Rot | GENERIC |  | mobMechanic:marrowlord_varkas.aoePulse |
+| Marrow Golem | GENERIC |  | mob:rift_marrow_golem |
 | Marrow Troll | GENERIC |  | mob:rift_marrow_troll |
 | Marrowlord Boneboots | GENERIC |  | item:marrowlord_boneboots |
 | Marrowtread Boots | GENERIC |  | item:marrowtread_boots |

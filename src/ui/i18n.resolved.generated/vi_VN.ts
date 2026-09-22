@@ -18134,6 +18134,9 @@ export const vi_VN: EnTranslations = {
       "rift_marrow_troll": {
         "name": "Troll Tủy"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "Tu Đồ Sẹo Hư Không"
       },

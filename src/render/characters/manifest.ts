@@ -4423,6 +4423,7 @@ const MOB_KEYS: Record<string, string> = {
   rift_storm_caller: 'mob_hoard_storm_caller',
   rift_stormscale: 'mob_hoard_stormscale_drake',
   rift_boneclad: 'mob_hoard_boneclad_warrior',
+  rift_marrow_golem: 'skel_golem',
 };
 
 const FAMILY_KEYS: Record<string, string> = {

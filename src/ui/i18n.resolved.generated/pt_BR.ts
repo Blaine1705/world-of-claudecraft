@@ -18134,6 +18134,9 @@ export const pt_BR: EnTranslations = {
       "rift_marrow_troll": {
         "name": "Troll da Medula"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "Acólito da Cicatriz do Vazio"
       },

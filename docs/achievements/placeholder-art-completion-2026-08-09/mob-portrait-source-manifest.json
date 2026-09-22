@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "09da72835503624cf207dab4a6ce6ecd60c53ecc561ce13c924cdf86c07f5345",
+  "rendererFingerprint": "2063f8bb279f51430c5814cfb2348cd06b068c115c8e0faae6ac578fb4633484",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5010293,
-      "sha256": "c2cd9578ae1be888ed57d1834caecba7c85f5bc9f10187a0513b85d8b1028db7",
+      "bytes": 5011361,
+      "sha256": "174bd32c1e882b8487659373907c2bb6a841bcd527a6a9dd7adc8a4602bc5e87",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 261,
+  "portraitCount": 262,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -6570,6 +6570,45 @@
         "path": "public/ui/mobs/rift_magma_brute.webp",
         "bytes": 2248,
         "sha256": "3d0a7cab9a1ceb2793239e5c593d97040a324b3da920bd3d34c775304ed9c853"
+      }
+    },
+    {
+      "id": "rift_marrow_golem",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_golem",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_golem.glb",
+          "path": "public/models/chars/enemies/skeleton_golem.glb",
+          "bytes": 292776,
+          "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
+        },
+        "idle": "Idle",
+        "height": 3.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": [
+          {
+            "node": "Skeleton_Golem_Axe",
+            "rotY": 3.141592653589793
+          }
+        ],
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d8d2bf",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "b49110e86826d341287a330f8f3a09a6beb784a4e18d794327a4b8e5e67ac44e",
+      "output": {
+        "path": "public/ui/mobs/rift_marrow_golem.webp",
+        "bytes": 2944,
+        "sha256": "d30619668bdbd928ddbff07c89fb6805a901d38d9381ff4df59aed9de6db4035"
       }
     },
     {

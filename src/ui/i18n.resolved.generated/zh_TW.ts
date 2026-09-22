@@ -18134,6 +18134,9 @@ export const zh_TW: EnTranslations = {
       "rift_marrow_troll": {
         "name": "骨髓巨魔"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "虛空侍僧"
       },

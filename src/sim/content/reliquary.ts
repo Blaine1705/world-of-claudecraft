@@ -828,7 +828,8 @@ export const RELIQUARY_HEROIC_GEAR = {
 // src/sim/content/rift/themes.ts, loot rows src/sim/content/rift/mobs.ts):
 // the theme boss's fat roll first, then its trash's slim ones in mobs.ts
 // table order. graskbreaker_girdle has one trash carrier (the Warcamp theme
-// shares rift_marrow_troll with Boneyard, whose loot stays bonelord_mantle),
+// keeps rift_marrow_troll, whose loot still carries bonelord_mantle beside the
+// Boneyard's own rift_marrow_golem),
 // pactbound_vestments spans both citadel bosses plus both citadel trash, and
 // pitlords_cleaver is the pit lord's alone.
 const RIFT_RARE_SOURCES = {
@@ -850,6 +851,7 @@ const RIFT_RARE_SOURCES = {
   bonelord_mantle: [
     fromBoss('rift_boss_necro'),
     fromBoss('rift_boneclad'),
+    fromBoss('rift_marrow_golem'),
     fromBoss('rift_marrow_troll'),
   ],
   graskbreaker_girdle: [fromBoss('rift_boss_brute'), fromBoss('rift_stone_ogre')],

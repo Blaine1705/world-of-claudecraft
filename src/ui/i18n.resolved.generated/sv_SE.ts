@@ -18134,6 +18134,9 @@ export const sv_SE: EnTranslations = {
       "rift_marrow_troll": {
         "name": "Märgtroll"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "Tomrumsärrets akolyt"
       },

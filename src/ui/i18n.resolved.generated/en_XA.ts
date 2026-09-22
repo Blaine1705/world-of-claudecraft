@@ -18134,6 +18134,9 @@ export const en_XA: EnTranslations = {
       "rift_marrow_troll": {
         "name": "[Ɱáŕŕóŵ Ţŕóļļ]"
       },
+      "rift_marrow_golem": {
+        "name": "[Ɱáŕŕóŵ Ĝóļéɱ]"
+      },
       "rift_void_acolyte": {
         "name": "[Ʋóíðšçáŕ Áçóļýţé]"
       },

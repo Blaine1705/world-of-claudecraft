@@ -430,6 +430,29 @@ const TRASH: Record<string, MobTemplate> = {
     color: 0x8a9a5b,
     frenzyOnHit: { chance: 0.3, hasteMult: 1.35, duration: 6 },
   },
+  // The Boneyard's heavy: the Marrow Troll's numbers, loot and frenzy to the digit,
+  // in a body of bound bones, so the bone cathedral is not patrolled by a swamp
+  // troll. The troll itself stays the Warcamp's.
+  rift_marrow_golem: {
+    id: 'rift_marrow_golem',
+    name: 'Marrow Golem',
+    minLevel: 18,
+    maxLevel: 23,
+    family: 'undead',
+    elite: true,
+    hpBase: 62,
+    hpPerLevel: 23,
+    dmgBase: 11,
+    dmgPerLevel: 2.6,
+    attackSpeed: 2.7,
+    armorPerLevel: 18,
+    moveSpeed: 7,
+    aggroRadius: 12,
+    loot: trashLoot(160, 'bonelord_mantle'),
+    scale: 1.2,
+    color: 0xd8d2bf,
+    frenzyOnHit: { chance: 0.3, hasteMult: 1.35, duration: 6 },
+  },
   // Voidscar (demon + humanoid caster, violet)
   rift_void_acolyte: {
     id: 'rift_void_acolyte',

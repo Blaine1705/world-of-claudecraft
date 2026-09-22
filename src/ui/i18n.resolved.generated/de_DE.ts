@@ -18134,6 +18134,9 @@ export const de_DE: EnTranslations = {
       "rift_marrow_troll": {
         "name": "Knochenmark-Troll"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "Leerennarbe-Akolyth"
       },

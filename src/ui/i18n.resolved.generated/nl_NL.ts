@@ -18134,6 +18134,9 @@ export const nl_NL: EnTranslations = {
       "rift_marrow_troll": {
         "name": "Mergtrol"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "Leegtelitteken-Acoliet"
       },

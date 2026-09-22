@@ -18134,6 +18134,9 @@ export const ja_JP: EnTranslations = {
       "rift_marrow_troll": {
         "name": "髄のトロル"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "虚空傷の侍祭"
       },

@@ -18134,6 +18134,9 @@ export const da_DK: EnTranslations = {
       "rift_marrow_troll": {
         "name": "Margtrold"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "Tomrumsar-Acolyt"
       },

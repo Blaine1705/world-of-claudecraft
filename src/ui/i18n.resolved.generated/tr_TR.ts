@@ -18134,6 +18134,9 @@ export const tr_TR: EnTranslations = {
       "rift_marrow_troll": {
         "name": "İlik Trolü"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "Hiçlik Yarası Çırağı"
       },

@@ -18134,6 +18134,9 @@ export const id_ID: EnTranslations = {
       "rift_marrow_troll": {
         "name": "Troll Sumsum"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "Akolit Voidscar"
       },

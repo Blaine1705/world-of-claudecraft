@@ -18134,6 +18134,9 @@ export const ru_RU: EnTranslations = {
       "rift_marrow_troll": {
         "name": "Костномозговой Тролль"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "Аколит Пустотного Шрама"
       },

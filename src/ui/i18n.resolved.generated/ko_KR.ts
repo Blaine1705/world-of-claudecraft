@@ -18134,6 +18134,9 @@ export const ko_KR: EnTranslations = {
       "rift_marrow_troll": {
         "name": "골수 트롤"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "공허상흔 시종"
       },

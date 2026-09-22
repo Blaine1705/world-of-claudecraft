@@ -18134,6 +18134,9 @@ export const fr_FR: EnTranslations = {
       "rift_marrow_troll": {
         "name": "Troll de moelle"
       },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
+      },
       "rift_void_acolyte": {
         "name": "Acolyte de la Cicatrice du Vide"
       },

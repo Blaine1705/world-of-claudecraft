@@ -4069,6 +4069,7 @@ export type TranslationKeyFlat =
   | 'entities.mobs.rift_frost_revenant.name'
   | 'entities.mobs.rift_hellguard.name'
   | 'entities.mobs.rift_magma_brute.name'
+  | 'entities.mobs.rift_marrow_golem.name'
   | 'entities.mobs.rift_marrow_troll.name'
   | 'entities.mobs.rift_pact_acolyte.name'
   | 'entities.mobs.rift_rime_elemental.name'

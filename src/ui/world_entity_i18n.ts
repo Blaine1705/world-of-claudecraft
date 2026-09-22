@@ -155,6 +155,7 @@ const MOB_IDS = [
   'rift_thornback',
   'rift_boneclad',
   'rift_marrow_troll',
+  'rift_marrow_golem',
   'rift_void_acolyte',
   'rift_dread_stalker',
   'rift_storm_caller',
