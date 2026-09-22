@@ -1150,7 +1150,13 @@ const MONOLITHS: MonolithRow[] = [
     // profession, spirit-run and Wanted-board extractions compose with the
     // release loot-quality helpers below both parent pins. wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 11719,
+    // LOWERED 11719 -> 11683 after #4143's released-raider instanced-kill
+    // sharing merged into the reconciled tree: the leave-time
+    // tap re-anchor (replacementTapperForLeave) moved to
+    // src/sim/loot/kill_participation.ts beside the participation predicates
+    // it shares with the kill snapshot. wc -l on the merged tree. Exact
+    // count, zero slack.
+    ceiling: 11683,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

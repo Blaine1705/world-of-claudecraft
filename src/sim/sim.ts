@@ -312,6 +312,7 @@ import { entityLineOfSightClear } from './line_of_sight_elevation';
 import type { Ante, PickAction } from './lockpick';
 import { retirePartyTradeOnLoad, retirePartyTradeOnSave } from './loot/bop_trade_persistence';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
+import { replacementTapperForLeave } from './loot/kill_participation';
 // L1: the loot-distribution layer (party-loot strategy, the rollLoot roller, copper
 // split, need-greed roll lifecycle, corpse-loot helpers) moved to ./loot/loot_roll.ts;
 // Sim keeps thin same-named delegates that call these.
@@ -869,7 +870,6 @@ import {
   mobArmorReduction,
   type NoticeboardDef,
   type OverheadEmoteId,
-  PARTY_XP_RANGE,
   type PendingResurrection,
   type PetMode,
   type PlayerClass,
@@ -3901,41 +3901,9 @@ export class Sim {
     // member, clearing the tap mirrors immediate removal.
     for (const entity of this.entities.values()) {
       if (entity.kind === 'mob' && entity.tappedById === pid) {
-        entity.tappedById = this.replacementTapperForLeave(entity, pid, party?.members ?? []);
+        entity.tappedById = replacementTapperForLeave(this.ctx, entity, pid, party?.members ?? []);
       }
     }
-  }
-
-  private replacementTapperForLeave(
-    mob: Entity,
-    leavingPid: number,
-    partyPids: number[],
-  ): number | null {
-    const instance = this.instances.find(
-      (slot) => slot.partyKey !== null && slot.mobIds.includes(mob.id),
-    );
-    for (const candidatePid of partyPids) {
-      if (candidatePid === leavingPid) continue;
-      const candidate = this.players.get(candidatePid);
-      const entity = this.entities.get(candidatePid);
-      if (!candidate || candidate.leaving || !entity) continue;
-      // A corpse already owns an authoritative death-time recipient snapshot.
-      // Re-anchor only to someone in that snapshot, irrespective of where they
-      // moved after the kill.
-      if (mob.lootRecipientIds && mob.lootRecipientIds.length > 0) {
-        if (mob.lootRecipientIds.includes(candidatePid)) return candidatePid;
-        continue;
-      }
-      const matchingInstanceCorpse =
-        entity.ghost &&
-        entity.corpsePos &&
-        (!instance || entity.corpseInstanceId === instance.exitId)
-          ? entity.corpsePos
-          : null;
-      const participationPos = matchingInstanceCorpse ?? entity.pos;
-      if (dist2d(participationPos, mob.pos) <= PARTY_XP_RANGE) return candidatePid;
-    }
-    return null;
   }
 
   serializeCharacter(pid: number): CharacterState | null {
