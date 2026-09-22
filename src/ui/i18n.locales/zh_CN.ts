@@ -5308,6 +5308,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_mender.name': '唤墓者医者',
   'questUi.dialog.discussQuest': '谈论{name}。',
   'questUi.dialog.discussQuestAria': '谈论任务：{name}',
+  'questUi.dialog.clueTalk': '询问线索。',
+  'questUi.dialog.clueTalkAria': '询问线索：{name}',
+  'questUi.dialog.clueDeliver': '交出{count}个{item}。',
+  'questUi.dialog.clueDeliverAria': '把{count}个{item}交给{name}',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '三件遗物讲述着同一个故事：奥德伦为守护国王而战，马尔里克打破了死亡的界限，沃斯试图阻止随后发生的一切。封印正在减弱，废弃墓穴就是通往地下的道路。',
   'entities.items.runed_bone_shard.name': '符文骨片',

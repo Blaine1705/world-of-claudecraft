@@ -578,6 +578,27 @@ describe('the deliver step (Sim.talkToNpc)', () => {
     expect(sim.countItem('baked_bread')).toBe(1);
     expect(ofType(evs, 'clueHuntStep').map((ev) => ev.step)).toEqual([3]);
   });
+
+  it('the interact command path (target the NPC, Sim.interact) reaches the hand-over', () => {
+    // What the client actually sends: the gossip menu's clue row targets the
+    // NPC and sends interact (online, the interact command), never talkToNpc
+    // directly. Pinned so the hand-over stays reachable from the wire path.
+    const sim = huntSim();
+    const meta = metaOf(sim);
+    startHunt(sim);
+    advanceTo(sim, 3);
+    sim.removeItem('baked_bread', sim.countItem('baked_bread'));
+    sim.addItem('baked_bread', 2);
+    const sela = npcByTemplate(sim, 'quartermaster_sela');
+    placeAt(sim, sela.pos.x + 1, sela.pos.z + 1);
+    sim.drainEvents();
+    sim.targetEntity(sela.id);
+    sim.interact();
+    const evs = sim.drainEvents();
+    expect(meta.clueHunt?.step).toBe(4);
+    expect(sim.countItem('baked_bread')).toBe(0);
+    expect(ofType(evs, 'clueHuntStep').map((ev) => ev.step)).toEqual([3]);
+  });
 });
 
 describe('the dig step (using the scroll on the spot)', () => {

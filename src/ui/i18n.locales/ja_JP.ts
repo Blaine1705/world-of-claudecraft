@@ -5524,6 +5524,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_mender.name': 'グレイブコーラーの癒し手',
   'questUi.dialog.discussQuest': '{name}について話す。',
   'questUi.dialog.discussQuestAria': 'クエストについて話す: {name}',
+  'questUi.dialog.clueTalk': '手がかりについて尋ねる。',
+  'questUi.dialog.clueTalkAria': '手がかりについて尋ねる：{name}',
+  'questUi.dialog.clueDeliver': '{item}を{count}個渡す。',
+  'questUi.dialog.clueDeliverAria': '{name}に{item}を{count}個渡す',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '三つの遺物は同じ物語を語っています。オルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、廃棄された墓所こそ地下への道です。',
   'entities.items.runed_bone_shard.name': 'ルーン刻みの骨片',

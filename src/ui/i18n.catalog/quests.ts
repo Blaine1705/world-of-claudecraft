@@ -56,6 +56,14 @@ const questStringsEn = {
       repeatableQuestAria: 'Repeatable quest: {name}',
       discussQuest: 'Discuss {name}.',
       discussQuestAria: 'Discuss quest: {name}',
+      // The Clue Scroll rows (clue_step_row.ts): the active hunt's current
+      // step is a talk or a hand-over at this NPC. The click sends the same
+      // authoritative interact the discuss row does; the sim's own log line
+      // ("Clue N of M solved") or refusal is the feedback.
+      clueTalk: 'Ask about the clue.',
+      clueTalkAria: 'Ask about the clue: {name}',
+      clueDeliver: 'Hand over {count} {item}.',
+      clueDeliverAria: 'Hand over {count} {item} to {name}',
       // The profession masters' locked-quest hint row. Deliberately terse:
       // both {placeholders} resolve to already
       // localized leaves (the giver NPC's name, the intro quest's title), and
