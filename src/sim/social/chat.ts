@@ -21,7 +21,7 @@ import * as deedsMod from '../deeds';
 import { handleDevChat } from '../dev_commands';
 import { graveyardReadout } from '../entity_roster';
 import { livePlaytimeSeconds } from '../playtime';
-import { setWorldPvpFlag, toggleWorldPvpFlag } from '../pvp';
+import { hillReadoutLine, setWorldPvpFlag, toggleWorldPvpFlag } from '../pvp';
 import {
   type AwayStatus,
   JOINABLE_CHANNELS,
@@ -585,6 +585,11 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     else ctx.error(r.meta.entityId, 'Usage: /pvp, /pvp on, or /pvp off.');
     return null;
   }
+  // King of the Hill: where the hill stands, who holds it, when it moves.
+  if (/^\/hill\s*$/i.test(raw)) {
+    ctx.error(r.meta.entityId, hillReadoutLine(ctx, r.meta.entityId));
+    return null;
+  }
   if (/^\/(?:arena|rating)(?:\s|$)/i.test(raw)) {
     ctx.error(r.meta.entityId, readouts.arenaReadout(r.meta));
     return null;
@@ -1133,6 +1138,7 @@ export function helpLines(): string[] {
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /pull <sec>, /afk, /dnd, /who.',
     'World PvP: /pvp toggles your PvP flag (/pvp on, /pvp off). Flagged players can fight each other anywhere; switching off takes 5 minutes.',
+    'King of the Hill: /hill says where the hill stands and who holds it. Hold a majority inside its circle for 60 seconds to take it; holders inside earn Honor every minute.',
     'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.',
     'Hide a player: /ignore <name> hides their public chat only. /block <name> also stops their whispers, invites and mail. Also /unignore, /unblock, /ignorelist, /blocklist.',
     'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',

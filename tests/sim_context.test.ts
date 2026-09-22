@@ -342,6 +342,8 @@ function makeFakeHost() {
     bgQueue: [],
     bgMatches: new Map(),
     worldPvpDisabled: false,
+    hillState: { active: null, risen: 0, nextAt: 120 },
+    hillProbe: { wet: () => false, steep: () => false, blocked: () => false, zoneIdAt: () => null },
     worldPvpBooks: {
       recentDamage: new Map(),
       recentSupport: new Map(),

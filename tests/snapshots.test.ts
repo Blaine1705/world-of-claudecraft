@@ -67,6 +67,7 @@ import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
+import { spawnHillNow } from '../src/sim/pvp';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
 import {
@@ -5260,6 +5261,7 @@ const ALL_DELTA_KEYS = [
   'gprof',
   'guildBank',
   'hbl',
+  'hill',
   'hirat',
   'honor',
   'hpref',
@@ -5380,6 +5382,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   ggoal: 'gatheringGoal',
   gprof: 'gatheringProficiency',
   guildBank: 'guildBankInfo',
+  hill: 'hillInfo',
   hirat: 'hitRating',
   hpref: 'harvestPreference',
   hrat: 'hasteRating',
@@ -5545,6 +5548,9 @@ function dirtyEveryDeltaField(): {
   // World PvP: the wpvp self readout (meta) and the pvp entity bit (entity).
   meta.worldPvp = { flagged: true, disarmAt: null, kills: 2, deaths: 1 };
   sim.entities.get(lp)!.pvpFlag = true;
+  // King of the Hill: a hill stands (in a free-for-all zone the leader is not
+  // in), so the hill self readout rides the snapshot.
+  spawnHillNow(sim.ctx);
   meta.restedXp = 222;
   meta.prestigeRank = 3;
   meta.delveMarks = 7;
@@ -5957,6 +5963,16 @@ describe('full self-state snapshot delta fixture', () => {
       enabled: true,
     });
     expect(client.player.pvpFlag).toBe(true);
+    // hill -> hillInfo (social_self_wire.ts): the standing hill from the
+    // leader's seat (outside its zone, so the live fields are zero).
+    expect(client.hillInfo).toMatchObject({
+      radius: 50,
+      holder: 'none',
+      inZone: false,
+      inside: false,
+      minutesLeft: 60,
+    });
+    expect(['wraithwood', 'evergarden', 'nightbloom']).toContain(client.hillInfo?.zoneId);
     expect(client.restedXp).toBe(222); // rxp -> restedXp
     expect(client.prestigeRank).toBe(3); // prk -> prestigeRank
 
@@ -6531,7 +6547,8 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 96 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 97 unique keys in sorted order', () => {
+    // 96 plus the King of the Hill readout hill (src/sim/pvp/hill.ts).
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6575,9 +6592,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
     // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
     // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95. The
-    // World PvP flag readout wpvp (src/sim/pvp/world_pvp.ts) makes it 96.
-    expect(ALL_DELTA_KEYS).toHaveLength(96);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(96);
+    // World PvP flag readout wpvp (src/sim/pvp/world_pvp.ts) makes it 97, and
+    // the King of the Hill readout hill (src/sim/pvp/hill.ts) makes it 97.
+    expect(ALL_DELTA_KEYS).toHaveLength(97);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(97);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6740,8 +6758,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // sibling, likewise inside the recursive scrape) makes 93.
     // The candidate self in-combat key cbt brings the combined inventory to 94;
     // the account ledger's acct key (server/deeds_wire.ts) makes it 95; the
-    // World PvP readout wpvp makes it 96.
-    expect(scraped.size).toBe(96);
+    // World PvP readout wpvp makes it 96; the King of the Hill readout hill
+    // makes it 97.
+    expect(scraped.size).toBe(97);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

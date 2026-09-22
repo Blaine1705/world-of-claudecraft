@@ -1163,13 +1163,12 @@ export class Api {
 
 // Despawn grace (anti-flicker, entity-map churn). The server keeps known
 // entities in interest out to a drop radius (100yd players / 130yd npcs) that is
-// wider than the add radius, but a wandering entity riding that boundary — or a
-// single late/dropped frame — can still fall out of one snapshot without truly
+// wider than the add radius, but a wandering entity riding that boundary, or a
+// single late/dropped frame, can still fall out of one snapshot without truly
 // leaving. (Distance-tier-throttled entities are NOT a source here: the server
 // lists them in `keep`, so they count as seen and are never missing.) Deleting a
-// briefly-absent entity that frame, then re-creating it the next, churns the
-// entity map; hold it at its last pose for this window instead. Kept short so a
-// genuine leaver (logout, corpse cleanup) lingers only momentarily.
+// briefly-absent entity that frame, then re-creating it the next, churns the map;
+// hold it at its last pose for this window. Short, so a genuine leaver barely lingers.
 const DESPAWN_GRACE_MS = 600;
 
 // Auto-reconnect backoff for an unexpectedly dropped game socket. The server
@@ -1277,8 +1276,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // the snapshot self (`s.bg`, delta-omitted); flag/score dynamics also ride
   // the events queue for banners and the combat log. ---
   bgInfo: import('../world_api').BgInfo | null = null;
-  // --- IWorldWorldPvp: the /pvp flag readout (`s.wpvp`, delta-omitted). ---
+  // --- IWorldWorldPvp: the /pvp readout (`s.wpvp`) + the hill (`s.hill`), delta-omitted. ---
   worldPvpInfo: import('../world_api').WorldPvpInfo | null = null;
+  hillInfo: import('../world_api').HillInfo | null = null;
   // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
   // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
   // missing key keeps the prior mirror, an explicit null clears it). ---

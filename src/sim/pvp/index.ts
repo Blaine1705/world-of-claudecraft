@@ -1,4 +1,39 @@
 export {
+  type ActiveHill,
+  HILL_CYCLE_MINUTES,
+  HILL_LOST_LINE,
+  HILL_READOUT_NONE_LINE,
+  HILL_TAKEN_LINE,
+  type HillState,
+  hillInfoFor,
+  hillReadoutLine,
+  hillRiseLine,
+  newHillState,
+  pickHillSpot,
+  spawnHill,
+  spawnHillNow,
+  updateHill,
+} from './hill';
+export {
+  HILL_ACCRUAL_SECONDS,
+  HILL_CAPTURE_SECONDS,
+  HILL_CYCLE_SECONDS,
+  HILL_FIRST_AT_SECONDS,
+  HILL_HONOR_PER_PAYOUT,
+  HILL_MAX_PAYEES,
+  HILL_RADIUS,
+  type HillSpotProbe,
+  hillChallengeStands,
+  hillContains,
+  hillContestStep,
+  hillGroupKey,
+  hillLeader,
+  hillOrdinalAt,
+  hillPayees,
+  hillRiseTime,
+  hillSpotIsOpen,
+} from './hill_rules';
+export {
   ARENA_DAILY_TAPER_FLOOR_START,
   ARENA_DAILY_TAPER_START,
   ARENA_LOSS_HONOR_SHARE,
@@ -101,4 +136,4 @@ export {
   worldPvpStake,
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
-export { worldPvpZonePolicyAt, worldPvpZonePolicyOf } from './world_pvp_zones';
+export { worldPvpFfaZones, worldPvpZonePolicyAt, worldPvpZonePolicyOf } from './world_pvp_zones';

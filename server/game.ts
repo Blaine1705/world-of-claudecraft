@@ -8547,11 +8547,11 @@ export class GameServer {
     maybe('trade', tradeWire(this.sim, anchorSession.pid));
     maybe('duel', duelWire(this.sim, anchorSession.pid));
     maybe('cardDuel', this.sim.cardMinigameInfoFor(anchorSession.pid));
-    // Small PvP-ledger scalars. Delta-guarded like delve marks: a fresh
-    // session receives both, then they ride only on earn/spend changes.
+    // Small PvP-ledger scalars, delta-guarded like delve marks (a fresh session gets both).
     maybe('honor', meta.honor);
     maybe('lhonor', meta.lifetimeHonor);
     maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));
+    maybe('hill', this.sim.hillInfoFor(anchorSession.pid));
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));
