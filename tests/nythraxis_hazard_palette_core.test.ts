@@ -159,10 +159,7 @@ describe('Colorblind Mode hazard palette', () => {
   it('keeps the Soul Rend alone/stacked pair apart under every simulation', () => {
     for (const m of Object.values(CVD)) {
       const alone = project(srgbToLinear(NYTHRAXIS_SOUL_REND_ALONE_PALETTE_COLORBLIND.ring), m);
-      const stacked = project(
-        srgbToLinear(NYTHRAXIS_SOUL_REND_STACKED_PALETTE_COLORBLIND.ring),
-        m,
-      );
+      const stacked = project(srgbToLinear(NYTHRAXIS_SOUL_REND_STACKED_PALETTE_COLORBLIND.ring), m);
       expect(distance(alone, stacked)).toBeGreaterThan(SEPARATION_FLOOR);
     }
     // The classic pair is a red/green hue pair, the textbook deuteranope
