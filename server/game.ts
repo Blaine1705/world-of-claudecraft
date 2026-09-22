@@ -602,6 +602,7 @@ export const SIM_LAP_PHASES = [
   'valecup',
   'battleground',
   'worldPvp',
+  'hill',
   'dfinder',
   'market',
   'postOffice',
@@ -613,9 +614,8 @@ export const SIM_LAP_PHASES = [
   'farming',
   'deeds',
   'gridRefresh',
-  // Per-family mob.update buckets, appended after the base lap names so those
-  // stay byte-identical and first. The `sim.${n}` map turns each into the registered
-  // `sim.mob.update|<family>` the perfLap probe adds to.
+  // Per-family mob.update buckets, appended after the base lap names so those stay
+  // byte-identical and first; the `sim.${n}` map yields the registered `sim.mob.update|<family>`.
   ...MOB_UPDATE_BUCKETS.map((b) => `mob.update|${b}`),
 ].map((n) => `sim.${n}`);
 
