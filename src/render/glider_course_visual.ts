@@ -6,6 +6,8 @@ import { GLIDER_COURSE, GLIDER_QUEST_ID } from '../sim/content/world_quest_glide
 import { GLIDER_COURSES } from '../sim/content/world_quest_glider_levels';
 import { gliderCourseForCycle } from '../sim/world_quest_glider_generation';
 import type { IWorld } from '../world_api';
+import { loadGltf } from './assets/loader';
+import { registerDeferredPreload } from './assets/preload';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { gliderCourseVisible } from './glider_course_core';
 import { gliderApparatusPitch } from './glider_flight_pose_core';
@@ -195,6 +197,57 @@ export class GliderCourseVisual {
   }
 }
 
+// The airborne glider itself: a Tripo-built GLB (world quests round 2 replaced
+// the procedural wing-and-spars mesh). Loaded once through the deferred preload
+// arm like every other GLB feature, then cloned per visual and fitted to the
+// span the flight pose was tuned for: nose along +z (the flight facing), the
+// wing above the pilot's chest, the control bar below.
+const GLIDER_APPARATUS_URL = '/models/props/windrider_glider_flight.glb';
+/** Tip-to-tip span in yards; the procedural apparatus this replaces spanned 4.8. */
+const GLIDER_APPARATUS_WINGSPAN = 4.8;
+/** How far the wing's top sits above the pilot's chest (the apparatus origin). */
+const GLIDER_APPARATUS_TOP_Y = 0.42;
+/** The built prop's keel runs along its own x axis, nose at +x, wing tips at
+ *  +/-z (the pipeline's front render shows it side-on); the flight nose is +z
+ *  and the span is x, so the clone turns a quarter turn about y. */
+const GLIDER_APPARATUS_YAW = -Math.PI / 2;
+
+let apparatusScene: THREE.Group | null = null;
+const apparatusReady: Promise<THREE.Group | null> = new Promise((resolve) => {
+  registerDeferredPreload(() =>
+    loadGltf(GLIDER_APPARATUS_URL)
+      .then((gltf) => {
+        apparatusScene = gltf.scene;
+        resolve(gltf.scene);
+      })
+      .catch(() => resolve(null)),
+  );
+});
+
+export const gliderCourseVisualPreloadInternalsForTest = {
+  apparatusAssetUrl: GLIDER_APPARATUS_URL,
+  apparatusWingspan: GLIDER_APPARATUS_WINGSPAN,
+};
+
+/** A clone of the loaded prop, scaled to the wingspan, centred, nose to +z. */
+export function fitGliderApparatus(source: THREE.Object3D): THREE.Object3D {
+  const clone = source.clone(true);
+  clone.rotation.y = GLIDER_APPARATUS_YAW;
+  clone.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(clone);
+  const span = box.max.x - box.min.x || 1;
+  const scale = GLIDER_APPARATUS_WINGSPAN / span;
+  const holder = new THREE.Group();
+  holder.name = 'glider-apparatus-model';
+  holder.add(clone);
+  holder.scale.setScalar(scale);
+  holder.updateMatrixWorld(true);
+  const fitted = new THREE.Box3().setFromObject(holder);
+  const center = fitted.getCenter(new THREE.Vector3());
+  holder.position.set(-center.x, GLIDER_APPARATUS_TOP_Y - fitted.max.y, -center.z);
+  return holder;
+}
+
 function createGliderApparatusMesh(): {
   group: THREE.Group;
   dispose: () => void;
@@ -202,91 +255,20 @@ function createGliderApparatusMesh(): {
   const group = new THREE.Group();
   group.name = 'glider-apparatus';
   group.visible = false;
-
-  const wingGeo = new THREE.BufferGeometry();
-  const positions = new Float32Array([
-    // Left wing
-    0, 0.1, 0.9, -2.4, 0.28, -0.45, -0.4, 0.05, -0.85,
-
-    0, 0.1, 0.9, -0.4, 0.05, -0.85, 0, 0.05, -0.9,
-
-    // Right wing
-    0, 0.1, 0.9, 0.4, 0.05, -0.85, 2.4, 0.28, -0.45,
-
-    0, 0.1, 0.9, 0, 0.05, -0.9, 0.4, 0.05, -0.85,
-  ]);
-  wingGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  wingGeo.computeVertexNormals();
-
-  const wingMat = new THREE.MeshBasicMaterial({
-    color: 0x38bdf8,
-    transparent: true,
-    opacity: 0.85,
-    side: THREE.DoubleSide,
-    depthWrite: false,
-  });
-  const wingMesh = new THREE.Mesh(wingGeo, wingMat);
-  group.add(wingMesh);
-
-  const metalMat = new THREE.MeshBasicMaterial({ color: 0xd97706 });
-  const keelGeo = new THREE.BoxGeometry(0.1, 0.08, 1.9);
-  const keelMesh = new THREE.Mesh(keelGeo, metalMat);
-  keelMesh.position.set(0, 0.05, 0);
-  group.add(keelMesh);
-
-  const crossbarGeo = new THREE.CylinderGeometry(0.04, 0.04, 2.2, 8);
-  const crossbar = new THREE.Mesh(crossbarGeo, metalMat);
-  crossbar.rotation.z = Math.PI / 2;
-  crossbar.position.set(0, 0.12, -0.15);
-  group.add(crossbar);
-
-  const harnessGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.9, 8);
-  const harnessLeft = new THREE.Mesh(harnessGeo, metalMat);
-  harnessLeft.position.set(-0.35, -0.35, 0);
-  harnessLeft.rotation.z = -0.35;
-  group.add(harnessLeft);
-
-  const harnessRight = new THREE.Mesh(harnessGeo, metalMat);
-  harnessRight.position.set(0.35, -0.35, 0);
-  harnessRight.rotation.z = 0.35;
-  group.add(harnessRight);
-
-  const handleBarGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.8, 8);
-  const handleBar = new THREE.Mesh(handleBarGeo, metalMat);
-  handleBar.rotation.z = Math.PI / 2;
-  handleBar.position.set(0, -0.7, 0);
-  group.add(handleBar);
-
-  const finGeo = new THREE.BoxGeometry(0.04, 0.45, 0.45);
-  const finMesh = new THREE.Mesh(finGeo, wingMat);
-  finMesh.position.set(0, 0.28, -0.7);
-  group.add(finMesh);
-
-  const emitterGeo = new THREE.TorusGeometry(0.14, 0.03, 8, 16);
-  const emitterMat = new THREE.MeshBasicMaterial({ color: 0x67e8f9 });
-  const leftEmitter = new THREE.Mesh(emitterGeo, emitterMat);
-  leftEmitter.position.set(-2.38, 0.28, -0.45);
-  leftEmitter.rotation.y = Math.PI / 2;
-  group.add(leftEmitter);
-
-  const rightEmitter = new THREE.Mesh(emitterGeo, emitterMat);
-  rightEmitter.position.set(2.38, 0.28, -0.45);
-  rightEmitter.rotation.y = Math.PI / 2;
-  group.add(rightEmitter);
-
+  let disposed = false;
+  const attach = (scene: THREE.Group | null): void => {
+    if (disposed || !scene || group.children.length > 0) return;
+    group.add(fitGliderApparatus(scene));
+  };
+  if (apparatusScene) attach(apparatusScene);
+  else apparatusReady.then(attach);
   return {
     group,
     dispose: () => {
-      wingGeo.dispose();
-      wingMat.dispose();
-      keelGeo.dispose();
-      crossbarGeo.dispose();
-      harnessGeo.dispose();
-      handleBarGeo.dispose();
-      finGeo.dispose();
-      emitterGeo.dispose();
-      metalMat.dispose();
-      emitterMat.dispose();
+      disposed = true;
+      // The clone shares its geometry and materials with the cached prop scene,
+      // which other visuals still clone: detach only.
+      group.clear();
     },
   };
 }
