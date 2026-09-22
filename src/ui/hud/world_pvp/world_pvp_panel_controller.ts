@@ -30,11 +30,21 @@ export function disarmClockText(seconds: number): string {
   return `${num(Math.floor(whole / 60))}:${clockSeconds(whole % 60, true)}`;
 }
 
-/** Focus keys for the one action control and the confirm's cancel, so a
- *  countdown rebuild (once a second while disarming) hands keyboard focus
- *  back to the same button instead of dropping it on the body. */
+/** Focus keys, so a rebuild (once a second while disarming, and the flip into
+ *  and out of the confirm step) hands keyboard focus back to a button instead
+ *  of dropping it on the body. The action key rides the one-press controls AND
+ *  the confirm step's Cancel: a press on Enable rebuilds the panel into the
+ *  confirm step, and focus must land on the safe button there, never on Raise
+ *  Flag, or a second Enter would raise the flag before the confirm text was
+ *  read. Raise Flag carries its own key. */
 export const WORLD_PVP_ACTION_FOCUS_KEY = 'wpvp-action';
-export const WORLD_PVP_CANCEL_FOCUS_KEY = 'wpvp-cancel';
+export const WORLD_PVP_CONFIRM_FOCUS_KEY = 'wpvp-confirm';
+
+/** A button that must stay in the tab order (a keyboard or screen-reader user
+ *  finds the reason under it) but never act: aria-disabled, never the native
+ *  attribute, which would drop it out of the focus order; wireWorldPvpPanel
+ *  refuses its clicks. Styled by the shared .ui-btn[aria-disabled] rule. */
+const INERT_ATTR = ' aria-disabled="true"';
 
 /** The panel body under the title and tab strip. */
 export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
@@ -107,9 +117,12 @@ type LiveView = Extract<WorldPvpWindowView, { kind: 'live' }>;
 
 /** The flag-down sentence. Free-for-all ground has its own, because standing
  *  there is the consent: the generic one would promise an immunity the ground
- *  does not grant. */
+ *  does not grant. A player under the level gate is outside the free-for-all
+ *  arm (the sim's pair rule), so for them the generic sentence is the true one. */
 function flagDownText(view: LiveView): string {
-  if (view.realmEnabled && view.zone === 'ffa') return t('hudChrome.worldPvp.statusOffFfa');
+  if (view.realmEnabled && view.zone === 'ffa' && view.action !== 'locked') {
+    return t('hudChrome.worldPvp.statusOffFfa');
+  }
   return t('hudChrome.worldPvp.statusOff');
 }
 
@@ -139,13 +152,13 @@ function actionHtml(view: LiveView): string {
     // dead control is never unexplained. No command hint: /pvp is refused on
     // this realm too, so pointing at it would only lead to an error line.
     return (
-      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)} disabled aria-disabled="true">${esc(t('hudChrome.worldPvp.enable'))}</button>` +
+      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}${INERT_ATTR}>${esc(t('hudChrome.worldPvp.enable'))}</button>` +
       `<div class="bg-note bg-level-req">${esc(t('hudChrome.worldPvp.realmDisabled'))}</div></div>`
     );
   }
   if (view.action === 'locked') {
     return (
-      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)} disabled aria-disabled="true">${esc(t('hudChrome.worldPvp.enable'))}</button>` +
+      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}${INERT_ATTR}>${esc(t('hudChrome.worldPvp.enable'))}</button>` +
       `<div class="bg-note bg-level-req">${esc(t('hudChrome.worldPvp.levelReq', { level: num(view.stakes.minLevel) }))}</div>${hint}</div>`
     );
   }
@@ -158,8 +171,8 @@ function actionHtml(view: LiveView): string {
             minutes: num(view.stakes.disarmMinutes),
           }),
         )}</div><div class="pvp-queue-actions">` +
-        `<button class="btn leave ui-btn" data-act="pvp-cancel"${focusKeyAttr(WORLD_PVP_CANCEL_FOCUS_KEY)}>${esc(t('hudChrome.worldPvp.confirmCancel'))}</button>` +
-        `<button class="btn ui-btn ui-btn--red" data-act="pvp-confirm"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}>${esc(t('hudChrome.worldPvp.confirmAccept'))}</button>` +
+        `<button class="btn leave ui-btn" data-act="pvp-cancel"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}>${esc(t('hudChrome.worldPvp.confirmCancel'))}</button>` +
+        `<button class="btn ui-btn ui-btn--red" data-act="pvp-confirm"${focusKeyAttr(WORLD_PVP_CONFIRM_FOCUS_KEY)}>${esc(t('hudChrome.worldPvp.confirmAccept'))}</button>` +
         `</div></div>`
       );
     }
@@ -181,10 +194,14 @@ export interface WorldPvpPanelDeps {
  *  press flips it and the window re-renders (its signature carries the flag). */
 export function wireWorldPvpPanel(el: HTMLElement, deps: WorldPvpPanelDeps): void {
   const on = (act: string, fn: () => void) => {
-    el.querySelector(`[data-act="${act}"]:not([disabled])`)?.addEventListener('click', () => {
-      fn();
-      audio.click();
-    });
+    // The click guard for the inert (aria-disabled) arms: no listener at all.
+    el.querySelector(`[data-act="${act}"]:not([aria-disabled="true"])`)?.addEventListener(
+      'click',
+      () => {
+        fn();
+        audio.click();
+      },
+    );
   };
   on('pvp-enable', () => deps.setConfirming(true));
   on('pvp-cancel', () => deps.setConfirming(false));

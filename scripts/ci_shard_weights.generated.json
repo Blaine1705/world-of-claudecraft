@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4069,
+    "files": 4070,
     "harvestedFiles": 3948,
     "carried": {
       "tests/active_kit_prewarm.test.ts": {
@@ -244,6 +244,17 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           402
+        ]
+      },
+      "tests/nameplate_pvp_tag.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "PR 4146 review round: the nameplate PvP tag pin (tests/nameplate_pvp_tag.test.ts), local carry pending the branch's first full-mode harvest",
+        "runs": [
+          10,
+          11,
+          12
         ]
       },
       "tests/practice_dps_controller.test.ts": {
@@ -3347,6 +3358,7 @@
   "tests/nameplate_pick_integration.test.ts": 45,
   "tests/nameplate_pledge.test.ts": 3263,
   "tests/nameplate_projection.test.ts": 7,
+  "tests/nameplate_pvp_tag.test.ts": 11,
   "tests/nameplate_quest_marker.test.ts": 31,
   "tests/nameplate_threat.test.ts": 6,
   "tests/nameplate_view.test.ts": 21,

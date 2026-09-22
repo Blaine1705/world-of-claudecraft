@@ -2,7 +2,7 @@
 export {
   disarmClockText,
   WORLD_PVP_ACTION_FOCUS_KEY,
-  WORLD_PVP_CANCEL_FOCUS_KEY,
+  WORLD_PVP_CONFIRM_FOCUS_KEY,
   type WorldPvpPanelDeps,
   wireWorldPvpPanel,
   worldPvpBodyHtml,
