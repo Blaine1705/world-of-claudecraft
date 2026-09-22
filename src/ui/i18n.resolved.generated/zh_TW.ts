@@ -1867,7 +1867,8 @@ export const zh_TW: EnTranslations = {
       "crossHotbarEditHelp": "按住左肩鍵並按上方面鍵，即可用手把整理十字熱鍵列。"
     },
     "perf": {
-      "title": "效能監視器",
+      "title": "效能",
+      "overlaySection": "效能監視器",
       "enable": "顯示效能監視器",
       "description": "選擇要顯示的數據、監視器的位置及其外觀。",
       "sectionPosition": "位置",
@@ -2579,6 +2580,15 @@ export const zh_TW: EnTranslations = {
       "tooLarge": "此回報過大，無法傳送。請移除截圖後重試。",
       "rateLimited": "你最近已傳送多份回報。請稍候再傳送。",
       "failed": "無法傳送錯誤回報。請重試。"
+    },
+    "hostDiag": {
+      "title": "系統報告",
+      "intro": "將這台電腦的詳細資訊(包括占用最多處理器與記憶體的程式)收集到一個檔案中，協助診斷效能問題。不會傳送任何內容：該檔案只保存在你的電腦上。",
+      "create": "產生系統報告",
+      "running": "正在收集系統資訊...",
+      "saved": "報告已儲存為 {fileName}。",
+      "savedNoName": "報告已儲存。",
+      "failed": "無法建立報告。請再試一次。"
     },
     "paperdoll": {
       "unequipAria": "卸下 {item}",
@@ -9967,6 +9977,11 @@ export const zh_TW: EnTranslations = {
       "quit": "離開",
       "fatalBody": "World of ClaudeCraft 發生未預期的錯誤，必須關閉。"
     },
+    "hostDiag": {
+      "saveTitle": "儲存系統報告",
+      "saveButton": "儲存",
+      "fileType": "JSON 檔案"
+    },
     "titlebar": {
       "exitGame": "離開遊戲"
     }
@@ -10018,7 +10033,7 @@ export const zh_TW: EnTranslations = {
     "takeOver": "接管",
     "inWorldHint": "已在世界中。請在別處登出，或接管工作階段。",
     "currentLocation": "目前位置：{zone}",
-    "lockouts": "鎖定",
+    "lockouts": "鎖定（{count}）",
     "lockoutRaids": "團隊副本",
     "lockoutDungeons": "地城",
     "lockoutWorldBosses": "世界首領",

@@ -1867,7 +1867,8 @@ export const fr_CA: EnTranslations = {
       "crossHotbarEditHelp": "Maintenez le pare-chocs gauche et appuyez sur le bouton supérieur pour organiser la barre avec le contrôleur."
     },
     "perf": {
-      "title": "Surcouche de performance",
+      "title": "Performance",
+      "overlaySection": "Surcouche de performance",
       "enable": "Afficher la surcouche de performance",
       "description": "Choisissez les statistiques à afficher, l'emplacement de la surcouche et son apparence.",
       "sectionPosition": "Position",
@@ -2579,6 +2580,15 @@ export const fr_CA: EnTranslations = {
       "tooLarge": "Ce rapport est trop volumineux pour être envoyé. Réessayez sans la capture d'écran.",
       "rateLimited": "Vous avez envoyé plusieurs rapports récemment. Veuillez patienter un peu avant d'en envoyer un autre.",
       "failed": "Impossible d'envoyer le rapport de bug. Veuillez réessayer."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Déséquiper {item}",
@@ -9967,6 +9977,11 @@ export const fr_CA: EnTranslations = {
       "quit": "Quitter",
       "fatalBody": "World of ClaudeCraft a rencontré une erreur inattendue et doit se fermer."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Quitter le jeu"
     }
@@ -10018,7 +10033,7 @@ export const fr_CA: EnTranslations = {
     "takeOver": "Prendre le contrôle",
     "inWorldHint": "Déjà en jeu. Déconnectez-vous ailleurs, ou prenez le contrôle.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

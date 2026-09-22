@@ -17,6 +17,7 @@ import {
   sanitizeShaderWarm,
   shaderWarmToken,
 } from './perf_report_entry_blocks';
+import { hostEssentialsRow } from './perf_report_host';
 import { shedRawSummaryToFit, stripReservedRawSummaryKeys } from './perf_report_shed';
 import { stripControlChars, stripJsonControlChars } from './perf_report_text';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
@@ -865,6 +866,11 @@ export async function handlePerfReport(
   const releaseVersion = textIn(body.releaseVersion, 40);
   const buildId = textIn(body.buildId, 40);
   const source = choiceIn(body.source, ['gameplay', 'benchmark'], 'gameplay');
+  // Chromium shell, same bundle, same build id: browser_family stays 'chrome'
+  // for it, and this is what tells the shell from a tab. Resolved before the
+  // row because the host-essentials block is gated on it (a web client has no
+  // business claiming a Windows power plan).
+  const desktopShell = Boolean(body.desktopShell) || isElectronUserAgent(userAgent);
 
   const row: ClientPerfReportInsert = {
     schemaVersion: intIn(
@@ -915,9 +921,7 @@ export async function handlePerfReport(
     deviceMemory: nullableNumberIn(body.deviceMemory, 0, 1024),
     hardwareConcurrency: intIn(body.hardwareConcurrency, 0, 1024, 0),
     mobileTouch: Boolean(body.mobileTouch),
-    // Chromium shell, same bundle, same build id: browser_family stays
-    // 'chrome' for it, and this column is what tells the shell from a tab.
-    desktopShell: Boolean(body.desktopShell) || isElectronUserAgent(userAgent),
+    desktopShell,
     browserFamily: choiceIn(
       body.browserFamily,
       ['chrome', 'safari', 'firefox', 'edge', 'other'],
@@ -959,6 +963,12 @@ export async function handlePerfReport(
     worst10sFrameP95Ms: numberIn(body.worst10sFrameP95Ms, 0, 1000, 0),
     suggestionIds: suggestionIdsIn(body.suggestionIds),
     rawSummary: rawSummary(body.rawSummary, devTraceAllowed),
+    // The desktop shell's host facts, as TOP-LEVEL payload fields rather than
+    // raw_summary keys (that block is over its byte budget and its lower rungs
+    // are shed). Ignored entirely unless this same report is a shell report;
+    // the closed vocabularies and the strict nullable booleans live in
+    // server/perf_report_host.ts.
+    ...hostEssentialsRow(body, desktopShell),
   };
 
   await insertClientPerfReport(row);

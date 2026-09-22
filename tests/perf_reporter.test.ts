@@ -2349,3 +2349,306 @@ describe('perf reporter world-entry blocks', () => {
     });
   });
 });
+
+describe('perf reporter host essentials', () => {
+  const HOST = {
+    hostMemTotalMb: 16384,
+    hostMemFreeMb: 4992,
+    appWorkingSetMb: 1550,
+    appRendererWsMb: 900,
+    appGpuWsMb: 300,
+    hostOnBattery: false,
+    hostPowerPlan: 'high_performance' as const,
+    hostPowerMode: 'better_performance' as const,
+    hostHags: true,
+    hostGameMode: false,
+  };
+
+  beforeEach(() => {
+    installBrowserGlobals();
+  });
+
+  it('spreads the shell fields as TOP-LEVEL scalars, never inside rawSummary', () => {
+    const settings = new Settings();
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+      null,
+      true,
+      null,
+      null,
+      HOST,
+    )!;
+    for (const [key, value] of Object.entries(HOST)) {
+      expect(body[key]).toBe(value);
+      // rawSummary is over its byte budget and its lower rungs are shed
+      // server-side, so a column's value must never live there.
+      expect((body.rawSummary as Record<string, unknown>)[key]).toBeUndefined();
+    }
+  });
+
+  it('omits every host field when the probe has no value (web payload unchanged)', () => {
+    const settings = new Settings();
+    const withHost = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+      null,
+      false,
+      null,
+      null,
+      null,
+    )!;
+    const legacy = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+    // Byte-identical to a payload built the way every web client builds one:
+    // not merely "the fields are null", but "the keys are not there".
+    expect(JSON.stringify(withHost)).toBe(JSON.stringify(legacy));
+    for (const key of Object.keys(HOST)) expect(key in withHost).toBe(false);
+  });
+
+  it('omits an individually absent field rather than sending null', () => {
+    const settings = new Settings();
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+      null,
+      true,
+      null,
+      null,
+      { ...HOST, hostHags: null, appGpuWsMb: null },
+    )!;
+    expect('hostHags' in body).toBe(false);
+    expect('appGpuWsMb' in body).toBe(false);
+    expect(body.hostMemTotalMb).toBe(16384);
+  });
+
+  // Three claims about the probe's LIFECYCLE, each asserted from BEHAVIOR
+  // through the hostEssentialsProbeFactory seam rather than from a grep of
+  // perf_reporter.ts: a source-text pin passes just as happily when the line it
+  // matched has been commented out or moved into dead code.
+  describe('probe lifecycle', () => {
+    function fakeProbe() {
+      const starts = vi.fn();
+      const stops = vi.fn();
+      // Readable only AFTER settle(): a reporter that awaited the bridge on the
+      // unload path would still find a value here, but one that reads the CACHE
+      // cannot invent one, which is the difference the unload tests need.
+      let value: typeof HOST | null = null;
+      const factory = vi.fn(() => ({
+        start: () => {
+          starts();
+        },
+        stop: () => {
+          stops();
+        },
+        value: () => value,
+      }));
+      return {
+        factory,
+        starts,
+        stops,
+        settle: () => {
+          value = HOST;
+        },
+      };
+    }
+
+    function installGlobals(fetchImpl: unknown) {
+      const listeners = new Map<string, (() => void)[]>();
+      const add = (type: string, fn: () => void) => {
+        listeners.set(type, [...(listeners.get(type) ?? []), fn]);
+      };
+      const remove = (type: string, fn: () => void) => {
+        listeners.set(
+          type,
+          (listeners.get(type) ?? []).filter((f) => f !== fn),
+        );
+      };
+      const setTimeoutSpy = vi.fn((fn: () => void, ms: number) => setTimeout(fn, ms));
+      (globalThis as any).location = { search: '' };
+      (globalThis as any).window = {
+        innerWidth: 1440,
+        innerHeight: 900,
+        setTimeout: setTimeoutSpy,
+        clearTimeout: (id: ReturnType<typeof setTimeout>) => clearTimeout(id),
+        addEventListener: add,
+        removeEventListener: remove,
+      };
+      (globalThis as any).document = {
+        visibilityState: 'visible',
+        addEventListener: add,
+        removeEventListener: remove,
+      };
+      (globalThis as any).sessionStorage = {
+        getItem: () => 'probe-lifecycle-session',
+        setItem: () => {},
+      };
+      (globalThis as any).fetch = fetchImpl;
+      return {
+        setTimeoutSpy,
+        fire: (type: string) => {
+          for (const fn of [...(listeners.get(type) ?? [])]) fn();
+        },
+        listenerCount: (type: string) => (listeners.get(type) ?? []).length,
+      };
+    }
+
+    function okFetch() {
+      return vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    }
+
+    function bodyOf(fetchImpl: ReturnType<typeof okFetch>, index = 0) {
+      const call = fetchImpl.mock.calls[index] as unknown as unknown[];
+      const init = call[1] as { body: string; keepalive: boolean };
+      return { init, body: JSON.parse(init.body) as Record<string, unknown> };
+    }
+
+    function start(opts: {
+      desktopShell?: boolean;
+      factory: ReturnType<typeof fakeProbe>['factory'];
+    }) {
+      return startPerfReporter({
+        perf: { report: () => snapshot(), drainWorstWindow: vi.fn() } as unknown as PerfMonitor,
+        settings: new Settings(),
+        tokenProvider: () => null,
+        characterIdProvider: () => null,
+        ...(opts.desktopShell === undefined ? {} : { desktopShell: opts.desktopShell }),
+        hostEssentialsProbeFactory: opts.factory,
+      });
+    }
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      delete (globalThis as any).fetch;
+      delete (globalThis as any).sessionStorage;
+      delete (globalThis as any).document;
+      delete (globalThis as any).window;
+      delete (globalThis as any).location;
+    });
+
+    it('never CONSTRUCTS the probe, nor arms a second timer, for a non-desktop session', () => {
+      const env = installGlobals(okFetch());
+      const probe = fakeProbe();
+      const stop = start({ desktopShell: false, factory: probe.factory });
+      try {
+        // Not merely "not started": never built, so a browser tab never reaches
+        // for a shell bridge that is not there.
+        expect(probe.factory).not.toHaveBeenCalled();
+        expect(probe.starts).not.toHaveBeenCalled();
+        // The only timer armed is the reporter's own first-beacon schedule.
+        expect(env.setTimeoutSpy).toHaveBeenCalledTimes(1);
+        expect(env.setTimeoutSpy.mock.calls[0][1]).toBe(
+          jitteredPerfReportDelay(75_000, 'probe-lifecycle-session', 0),
+        );
+      } finally {
+        stop();
+      }
+      // A teardown with no probe must not reach for stop() either.
+      expect(probe.stops).not.toHaveBeenCalled();
+    });
+
+    it('omits desktopShell entirely and still never constructs the probe', () => {
+      installGlobals(okFetch());
+      const probe = fakeProbe();
+      const stop = start({ factory: probe.factory });
+      try {
+        expect(probe.factory).not.toHaveBeenCalled();
+      } finally {
+        stop();
+      }
+    });
+
+    it('constructs and starts the probe for a desktop session, and STOPS it in teardown', () => {
+      installGlobals(okFetch());
+      const probe = fakeProbe();
+      const stop = start({ desktopShell: true, factory: probe.factory });
+      expect(probe.factory).toHaveBeenCalledTimes(1);
+      expect(probe.starts).toHaveBeenCalledTimes(1);
+      expect(probe.stops).not.toHaveBeenCalled();
+      stop();
+      // The leak this guards: a probe left running re-arms its own refresh
+      // timer for the life of the page after the reporter is gone.
+      expect(probe.stops).toHaveBeenCalledTimes(1);
+    });
+
+    it('sends the CACHED host values SYNCHRONOUSLY on the pagehide flush', () => {
+      const fetchImpl = okFetch();
+      const env = installGlobals(fetchImpl);
+      const probe = fakeProbe();
+      const stop = start({ desktopShell: true, factory: probe.factory });
+      try {
+        probe.settle();
+        // The beacon must already be in flight when the handler returns: an
+        // awaited bridge call between the event and the fetch is exactly what a
+        // browser does not wait for on unload. No await anywhere in this test.
+        env.fire('pagehide');
+        expect(fetchImpl).toHaveBeenCalledTimes(1);
+        const { init, body } = bodyOf(fetchImpl);
+        expect(init.keepalive).toBe(true);
+        for (const [key, value] of Object.entries(HOST)) expect(body[key], key).toBe(value);
+      } finally {
+        stop();
+      }
+    });
+
+    it('takes the same synchronous path on the visibilitychange hidden flush', () => {
+      const fetchImpl = okFetch();
+      const env = installGlobals(fetchImpl);
+      const probe = fakeProbe();
+      const stop = start({ desktopShell: true, factory: probe.factory });
+      try {
+        probe.settle();
+        (globalThis as any).document.visibilityState = 'hidden';
+        env.fire('visibilitychange');
+        expect(fetchImpl).toHaveBeenCalledTimes(1);
+        const { body } = bodyOf(fetchImpl);
+        expect(body.hostPowerPlan).toBe(HOST.hostPowerPlan);
+        expect(body.hostMemTotalMb).toBe(HOST.hostMemTotalMb);
+      } finally {
+        stop();
+      }
+    });
+
+    it('sends NO host fields when the probe has not settled by the unload flush', () => {
+      const fetchImpl = okFetch();
+      const env = installGlobals(fetchImpl);
+      const probe = fakeProbe();
+      const stop = start({ desktopShell: true, factory: probe.factory });
+      try {
+        // No settle(): the negative arm, so the two tests above are not passing
+        // on a payload that would carry these keys either way.
+        env.fire('pagehide');
+        expect(fetchImpl).toHaveBeenCalledTimes(1);
+        const { body } = bodyOf(fetchImpl);
+        for (const key of Object.keys(HOST)) expect(key in body, key).toBe(false);
+      } finally {
+        stop();
+      }
+    });
+
+    it('unhooks both unload listeners in teardown', () => {
+      const env = installGlobals(okFetch());
+      const probe = fakeProbe();
+      const stop = start({ desktopShell: true, factory: probe.factory });
+      expect(env.listenerCount('pagehide')).toBe(1);
+      expect(env.listenerCount('visibilitychange')).toBe(1);
+      stop();
+      expect(env.listenerCount('pagehide')).toBe(0);
+      expect(env.listenerCount('visibilitychange')).toBe(0);
+    });
+  });
+});

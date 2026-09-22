@@ -5176,6 +5176,38 @@
     border-radius: var(--radius-sm);
   }
 
+  /* ---------- system report (Options > Performance section) ----------
+     src/ui/host_diag_section_controller.ts: one sentence, one primary button and
+     one live region; the tone classes ride the region so a verdict reads at a
+     glance without a second element per tone. */
+  .hostdiag-action {
+    display: flex;
+    margin-top: 10px;
+  }
+  /* Busy state is aria-disabled (keyboard focus survives a run), so it borrows
+     the .btn:disabled family look explicitly. The #options-menu prefix is load
+     bearing: that window resets its buttons with an ID-specific
+     `all: revert-layer`, which would erase a class-only filter. */
+  #options-menu .hostdiag-action .btn[aria-disabled="true"] {
+    filter: grayscale(1) brightness(0.7);
+    cursor: default;
+  }
+  .hostdiag-live {
+    min-height: 18px;
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .hostdiag-live.is-success .hostdiag-message {
+    color: var(--color-text-success);
+  }
+  .hostdiag-live.is-info .hostdiag-message {
+    color: var(--color-text-light);
+  }
+  .hostdiag-live.is-error .hostdiag-message {
+    color: var(--color-text-error);
+  }
+
   /* ---------- right tracker stack (quest tracker + delve tracker) ----------
      One absolutely-positioned flex column so the delve tracker always stacks
      BELOW the quest tracker's actual rendered height instead of a hardcoded

@@ -1733,7 +1733,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.notes.baseChance':
     '모든 모험가가 공유하는 5%의 기본 확률이 포함되어 있습니다.',
   'hudChrome.statInfo.notes.dpsApprox': '추정치이며, 치명타와 기술 피해는 제외됩니다.',
-  'hudChrome.perf.title': '성능 오버레이',
+  'hudChrome.perf.title': '성능',
+  'hudChrome.perf.overlaySection': '성능 오버레이',
   'hudChrome.perf.enable': '성능 오버레이 표시',
   'hudChrome.perf.description': '표시할 통계, 오버레이 위치, 모양을 선택하세요.',
   'hudChrome.perf.sectionPosition': '위치',
@@ -1812,6 +1813,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.rateLimited':
     '최근에 여러 건의 신고를 보냈습니다. 잠시 후 다시 보내 주세요.',
   'hudChrome.bugReport.failed': '버그 신고를 보낼 수 없습니다. 다시 시도해 주세요.',
+  'hudChrome.hostDiag.title': '시스템 보고서',
+  'hudChrome.hostDiag.intro':
+    '프로세서와 메모리를 가장 많이 사용하는 프로그램을 포함한 이 컴퓨터의 세부 정보를 파일로 모아 성능 문제를 진단하는 데 도움을 줍니다. 전송되는 것은 없습니다. 파일은 사용자의 컴퓨터에만 남습니다.',
+  'hudChrome.hostDiag.create': '시스템 보고서 만들기',
+  'hudChrome.hostDiag.running': '시스템 정보를 수집하는 중...',
+  'hudChrome.hostDiag.saved': '보고서가 {fileName}(으)로 저장되었습니다.',
+  'hudChrome.hostDiag.savedNoName': '보고서가 저장되었습니다.',
+  'hudChrome.hostDiag.failed': '보고서를 만들지 못했습니다. 다시 시도해 주세요.',
   'hudChrome.keybinds.emoteWheel': '감정 표현 휠',
   'hudChrome.keybinds.sheathe': '무기 넣기/빼기',
   'hudChrome.keybinds.hideInterface': '인터페이스 숨기기',
@@ -2511,7 +2520,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'character.takeOver': '넘겨받기',
   'character.inWorldHint': '이미 세계에 있습니다. 다른 곳에서 로그아웃하거나 넘겨받으세요.',
   'character.currentLocation': '현재 위치: {zone}',
-  'character.lockouts': '잠금',
+  'character.lockouts': '잠금 ({count})',
   'character.lockoutRaids': '공격대',
   'character.lockoutDungeons': '던전',
   'character.lockoutWorldBosses': '월드 보스',
@@ -9326,6 +9335,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '다시 불러오기',
   'desktop.crash.quit': '종료',
   'desktop.titlebar.exitGame': '게임 종료',
+  'desktop.hostDiag.saveTitle': '시스템 보고서 저장',
+  'desktop.hostDiag.saveButton': '저장',
+  'desktop.hostDiag.fileType': 'JSON 파일',
   'desktop.crash.fatalBody': 'World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다.',
   'gpuNotice.bodyDesktop':
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',

@@ -1867,7 +1867,8 @@ export const vi_VN: EnTranslations = {
       "crossHotbarEditHelp": "Giữ cản trái và nhấn nút mặt trên để sắp xếp thanh với bộ điều khiển."
     },
     "perf": {
-      "title": "Lớp Phủ Hiệu Năng",
+      "title": "Performance",
+      "overlaySection": "Lớp Phủ Hiệu Năng",
       "enable": "Hiện Lớp Phủ Hiệu Suất",
       "description": "Chọn các chỉ số muốn hiển thị, vị trí đặt lớp phủ, và cách nó hiển thị.",
       "sectionPosition": "Vị Trí",
@@ -2579,6 +2580,15 @@ export const vi_VN: EnTranslations = {
       "tooLarge": "Báo cáo đó quá lớn để gửi. Hãy thử lại mà không kèm ảnh chụp màn hình.",
       "rateLimited": "Bạn đã gửi khá nhiều báo cáo gần đây. Vui lòng chờ một chút trước khi gửi tiếp.",
       "failed": "Không thể gửi báo cáo lỗi. Vui lòng thử lại."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Tháo {item}",
@@ -9967,6 +9977,11 @@ export const vi_VN: EnTranslations = {
       "quit": "Thoát",
       "fatalBody": "World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Thoát trò chơi"
     }
@@ -10018,7 +10033,7 @@ export const vi_VN: EnTranslations = {
     "takeOver": "Tiếp Quản",
     "inWorldHint": "Đã ở trong thế giới. Đăng xuất ở nơi khác, hoặc tiếp quản.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

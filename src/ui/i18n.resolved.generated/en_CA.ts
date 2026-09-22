@@ -1867,7 +1867,8 @@ export const en_CA: EnTranslations = {
       "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."
     },
     "perf": {
-      "title": "Performance Overlay",
+      "title": "Performance",
+      "overlaySection": "Performance Overlay",
       "enable": "Show Performance Overlay",
       "description": "Choose which stats to show, where the overlay sits, and how it looks.",
       "sectionPosition": "Position",
@@ -2579,6 +2580,15 @@ export const en_CA: EnTranslations = {
       "tooLarge": "That report is too large to send. Try again without the screenshot.",
       "rateLimited": "You've sent several reports recently. Please wait a bit before sending another.",
       "failed": "Could not send the bug report. Please try again."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Unequip {item}",
@@ -9967,6 +9977,11 @@ export const en_CA: EnTranslations = {
       "quit": "Quit",
       "fatalBody": "World of ClaudeCraft hit an unexpected error and needs to close."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Exit Game"
     }
@@ -10018,7 +10033,7 @@ export const en_CA: EnTranslations = {
     "takeOver": "Take Over",
     "inWorldHint": "Already in world. Log out elsewhere, or take over.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",
