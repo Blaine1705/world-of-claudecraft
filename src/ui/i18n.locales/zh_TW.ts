@@ -16651,6 +16651,30 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '沿大路向南越過邊界進入疾風崖，一直走到海岸。老燈塔的守護者守燈人布蘭姆掌握著最後一句話。',
   'clues.hunt_evergarden_beacon_road.3':
     '老燈塔西北方，就在從燈塔下來的小路旁，草皮被切開又鋪了回去。在那裡使用卷軸並挖掘。',
+  'clues.hunt_drakelands_gate_ashes.reply.1':
+    '風從東邊的沙丘吹來，帶著灰燼，而空蕩蕩的沙地不會吹出灰燼。駐軍倉庫的塞拉記著每一次巡邏。只要有人給她帶點吃的，她就會開口。',
+  'clues.hunt_drakelands_gate_ashes.reply.2':
+    '總算有麵包了，謝天謝地。巡邏隊發誓，他們看見沙丘以東略偏南的光禿沙地上冒起了煙，那裡早已沒有可燒的東西。',
+  'clues.hunt_frostveil_aurora_vigil.reply.1':
+    '你一跪下，光便回應了你。昨夜它們越過台地向東彎去，直直指向雪地。',
+  'clues.hunt_amberfall_lantern_ferry.reply.0':
+    '昨夜有一盞燈滅了，就是朝著水對岸那塊古石的那盞。我的船夫們都不敢靠近。也許你敢。',
+  'clues.hunt_amberfall_lantern_ferry.reply.2':
+    '冰涼的井水，正是果樹想要的。紅楓坡那邊，落葉圍成一個圈落下，我的樹可從不會把葉子落得那麼整齊。',
+  'clues.hunt_willowfen_fenwitch_salt.reply.0':
+    '鹽。好，你肯聽話。蘆葦那邊的淺灘讓每個人都昏昏欲睡。去那裡真心實意地嘆口氣，沼澤會告訴你剩下的事。',
+  'clues.hunt_nightbloom_sleepless_vigil.reply.1':
+    '三天前的夜裡有顆星墜落了，落向鎮子北邊的古塚。那裡的死者從不安眠。像士兵那樣向他們致意吧。',
+  'clues.hunt_wraithwood_mournstone_candles.reply.0':
+    '牧師訂了那支蠟燭，卻一直沒付錢。從那以後他就只靠禱告，什麼也不吃。給他帶點能嚼的東西，問問他為什麼。',
+  'clues.hunt_wraithwood_mournstone_candles.reply.1':
+    '謝謝你，朋友。那支蠟燭我從沒點過。夜裡有東西在烏鴉那邊的林地裡遊蕩，我不敢面對它。如果你敢，就去那裡站一站。',
+  'clues.hunt_palmreach_sunken_idol.reply.1':
+    '潛水者們在藤蔓下面找到了一尊神像，而神像不喜歡他們。在它面前挺直身子的人都沒能回來。在它面前把自己放低些。',
+  'clues.hunt_evergarden_beacon_road.reply.0':
+    '像樣的堆肥，花床有救了。老磨坊主離開前埋了些東西。他的磨坊還在花園最遠的角落裡轉著。去它旁邊站一站吧。',
+  'clues.hunt_evergarden_beacon_road.reply.2':
+    '原來是磨坊把你一路送到了海岸路上。燈塔還藏著最後一個秘密：在它西北方，就在小路旁，草皮被切開又鋪了回去。就在那裡挖。',
   'hudChrome.questLog.completed': '已完成',
   'hudChrome.questLog.zoneSummary': '{count}個（{ready}個可交付）',
   'hudChrome.questLog.shiftHint': '按住 Shift 點擊任務可將其連結到聊天中。',

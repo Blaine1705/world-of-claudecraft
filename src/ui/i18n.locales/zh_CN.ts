@@ -16643,6 +16643,30 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '沿大路向南越过边界进入疾风崖，一直走到海岸。老灯塔的守护者守灯人布拉姆掌握着最后一句话。',
   'clues.hunt_evergarden_beacon_road.3':
     '老灯塔西北方，就在从灯塔下来的小路旁，草皮被切开又铺了回去。在那里使用卷轴并挖掘。',
+  'clues.hunt_drakelands_gate_ashes.reply.1':
+    '风从东边的沙丘吹来，带着灰烬，而空荡荡的沙地不会吹出灰烬。驻军仓库的塞拉记着每一次巡逻。只要有人给她带点吃的，她就会开口。',
+  'clues.hunt_drakelands_gate_ashes.reply.2':
+    '总算有面包了，谢天谢地。巡逻队发誓，他们看见沙丘以东略偏南的光秃沙地上冒起了烟，那里早已没有可烧的东西。',
+  'clues.hunt_frostveil_aurora_vigil.reply.1':
+    '你一跪下，光便回应了你。昨夜它们越过台地向东弯去，直直指向雪地。',
+  'clues.hunt_amberfall_lantern_ferry.reply.0':
+    '昨夜有一盏灯灭了，就是朝着水对岸那块古石的那盏。我的船夫们都不敢靠近。也许你敢。',
+  'clues.hunt_amberfall_lantern_ferry.reply.2':
+    '冰凉的井水，正是果树想要的。红枫坡那边，落叶围成一个圈落下，我的树可从不会把叶子落得那么整齐。',
+  'clues.hunt_willowfen_fenwitch_salt.reply.0':
+    '盐。好，你肯听话。芦苇那边的浅滩让每个人都昏昏欲睡。去那里真心实意地叹口气，沼泽会告诉你剩下的事。',
+  'clues.hunt_nightbloom_sleepless_vigil.reply.1':
+    '三天前的夜里有颗星坠落了，落向镇子北边的古冢。那里的死者从不安眠。像士兵那样向他们致意吧。',
+  'clues.hunt_wraithwood_mournstone_candles.reply.0':
+    '牧师订了那支蜡烛，却一直没付钱。从那以后他就只靠祷告，什么也不吃。给他带点能嚼的东西，问问他为什么。',
+  'clues.hunt_wraithwood_mournstone_candles.reply.1':
+    '谢谢你，朋友。那支蜡烛我从没点过。夜里有东西在乌鸦那边的林地里游荡，我不敢面对它。如果你敢，就去那里站一站。',
+  'clues.hunt_palmreach_sunken_idol.reply.1':
+    '潜水者们在藤蔓下面找到了一尊神像，而神像不喜欢他们。在它面前挺直身子的人都没能回来。在它面前把自己放低些。',
+  'clues.hunt_evergarden_beacon_road.reply.0':
+    '像样的堆肥，花床有救了。老磨坊主离开前埋了些东西。他的磨坊还在花园最远的角落里转着。去它旁边站一站吧。',
+  'clues.hunt_evergarden_beacon_road.reply.2':
+    '原来是磨坊把你一路送到了海岸路上。灯塔还藏着最后一个秘密：在它西北方，就在小路旁，草皮被切开又铺了回去。就在那里挖。',
   'hudChrome.questLog.completed': '已完成',
   'hudChrome.questLog.zoneSummary': '{count}个（{ready}个可交付）',
   'hudChrome.questLog.shiftHint': '按住 Shift 点击任务可将其链接到聊天中。',

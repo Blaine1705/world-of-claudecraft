@@ -17508,6 +17508,30 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '道を南へ、境を越えてゲイルクレストへ入り、海岸まで出よ。古い灯台の番人、灯台守ブラムが最後の言葉を持っている。',
   'clues.hunt_evergarden_beacon_road.3':
     'オールドビーコンの北西、灯りから下る小道のすぐ脇で、芝が切り取られて元に戻されている。そこで巻物を使い、掘れ。',
+  'clues.hunt_drakelands_gate_ashes.reply.1':
+    '風は東の砂丘から灰を運んできた。何もない砂から灰は飛んでこない。駐屯地の倉庫のセラが巡回をすべて記録している。誰かが食べ物を持っていけば話してくれるだろう。',
+  'clues.hunt_drakelands_gate_ashes.reply.2':
+    'やっとパンだ、ありがたい。巡回兵たちは、砂丘の東、やや南の何もない砂地から煙が上がるのを見たと言っている。燃えるものなど何も残っていない場所だ。',
+  'clues.hunt_frostveil_aurora_vigil.reply.1':
+    'あなたがひざまずくと、光が応えた。昨夜、光はテラスを越えて東へ曲がり、雪の上をまっすぐ指し示した。',
+  'clues.hunt_amberfall_lantern_ferry.reply.0':
+    '昨夜、灯りがひとつ消えた。水の向こうの古い石に面した灯りだ。うちの渡し守たちは近づこうとしない。あなたなら行けるかもしれない。',
+  'clues.hunt_amberfall_lantern_ferry.reply.2':
+    '冷たい井戸水、木々が欲しがっていたものだ。赤いカエデの丘の向こうで、落ち葉が輪を描いて落ちている。うちの木はあんなにきれいに葉を落とさない。',
+  'clues.hunt_willowfen_fenwitch_salt.reply.0':
+    '塩だね。よし、話を聞く気はあるようだ。葦の向こうの浅瀬は誰でも眠たくさせる。そこで心からため息をつけば、沼が残りを教えてくれる。',
+  'clues.hunt_nightbloom_sleepless_vigil.reply.1':
+    '三晩前に星がひとつ落ちた。町の北の古い塚のほうへ。あそこの死者は決して眠らない。兵士のように挨拶してやれ。',
+  'clues.hunt_wraithwood_mournstone_candles.reply.0':
+    '司祭さまはあの蝋燭を注文して、代金を払わなかった。それからずっと祈るだけで断食している。何か噛めるものを持っていって、わけを聞いてごらん。',
+  'clues.hunt_wraithwood_mournstone_candles.reply.1':
+    'ありがとう、友よ。私はあの蝋燭を灯さなかった。夜になると鴉の先の林間地を何かが歩く。私には向き合えなかった。行けるなら、そこに立ってみなさい。',
+  'clues.hunt_palmreach_sunken_idol.reply.1':
+    '蔓の下で、潜り手たちは神像を見つけた。そして神像は彼らを嫌った。その前で胸を張った者は戻らなかった。あれの前では小さくなれ。',
+  'clues.hunt_evergarden_beacon_road.reply.0':
+    'ちゃんとした堆肥だね、これで花壇は生き返る。昔の粉屋は去る前に何かを埋めていった。庭園の奥の隅で、あの風車はまだ回っている。そのそばに立ってごらん。',
+  'clues.hunt_evergarden_beacon_road.reply.2':
+    '風車があなたを海沿いの道へ送ったか。灯台には最後の秘密がひとつある。北西、小道のすぐ脇で、芝が切られて元に戻されている。そこを掘れ。',
   'hudChrome.questLog.completed': '完了済み',
   'hudChrome.questLog.zoneSummary': '{count}件（{ready}件完了）',
   'hudChrome.questLog.shiftHint':

@@ -17475,6 +17475,30 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '길을 따라 남쪽으로 경계를 넘어 게일크레스트로 들어가 해안까지 나가세요. 오래된 등대를 지키는 등불지기 브람이 마지막 말을 쥐고 있습니다.',
   'clues.hunt_evergarden_beacon_road.3':
     '올드 비컨의 북서쪽, 등대에서 내려오는 오솔길 바로 옆에 잔디가 잘렸다가 다시 덮여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_drakelands_gate_ashes.reply.1':
+    '바람이 동쪽 모래언덕에서 재를 싣고 왔어. 텅 빈 모래에서는 재가 날아오지 않아. 주둔지 창고지기가 순찰을 전부 기록해 두지. 누가 먹을 걸 가져다주면 입을 열 거야.',
+  'clues.hunt_drakelands_gate_ashes.reply.2':
+    '드디어 빵이군, 고맙네. 순찰대는 모래언덕 동쪽, 약간 남쪽의 맨 모래에서 연기가 피어오르는 걸 봤다고 맹세했어. 더는 탈 것도 남지 않은 곳인데.',
+  'clues.hunt_frostveil_aurora_vigil.reply.1':
+    '당신이 무릎을 꿇자 빛이 응답했어요. 어젯밤 빛은 테라스 너머 동쪽으로 휘더니 눈밭을 똑바로 가리켰죠.',
+  'clues.hunt_amberfall_lantern_ferry.reply.0':
+    '어젯밤 등불 하나가 꺼졌소. 물 건너 오래된 돌을 마주한 등불이지. 내 뱃사공들은 근처에도 가지 않으려 하오. 당신이라면 갈지도 모르겠군.',
+  'clues.hunt_amberfall_lantern_ferry.reply.2':
+    '차가운 우물물, 나무들이 바라던 거예요. 붉은 단풍 언덕 너머에서 낙엽이 동그랗게 떨어지고 있어요. 우리 나무는 그렇게 가지런히 잎을 떨구지 않아요.',
+  'clues.hunt_willowfen_fenwitch_salt.reply.0':
+    '소금이군. 좋아, 말은 듣는구나. 갈대 너머 여울은 누구든 졸리게 만들지. 거기 가서 진심으로 한숨을 쉬어 봐. 나머지는 늪이 알려 줄 거야.',
+  'clues.hunt_nightbloom_sleepless_vigil.reply.1':
+    '사흘 전 밤에 별 하나가 떨어졌소. 마을 북쪽의 오래된 무덤 쪽으로. 그곳의 망자들은 결코 잠들지 않지. 병사답게 경례하시오.',
+  'clues.hunt_wraithwood_mournstone_candles.reply.0':
+    '신부님은 그 초를 주문하고 값을 치르지 않았어요. 그 뒤로는 기도만 하며 굶고 계시죠. 씹을 거라도 가져가서 이유를 물어보세요.',
+  'clues.hunt_wraithwood_mournstone_candles.reply.1':
+    '고맙네, 친구. 나는 그 초에 불을 붙인 적이 없네. 밤이면 까마귀들 너머 숲속 공터를 무언가가 걸어 다니지. 나는 마주할 수 없었네. 할 수 있다면 그곳에 서 보게.',
+  'clues.hunt_palmreach_sunken_idol.reply.1':
+    '덩굴 아래에서 잠수부들이 신상을 찾았지. 그리고 신상은 그들을 싫어했어. 그 앞에서 꼿꼿이 선 자들은 돌아오지 못했지. 그 앞에서는 몸을 낮춰.',
+  'clues.hunt_evergarden_beacon_road.reply.0':
+    '제대로 된 퇴비네요, 화단이 살겠어요. 옛 방앗간 주인이 떠나기 전에 뭔가를 묻어 두었어요. 정원 가장 먼 구석에서 그 풍차는 아직 돌고 있죠. 그 옆에 서 보세요.',
+  'clues.hunt_evergarden_beacon_road.reply.2':
+    '방앗간이 당신을 해안 길로 보냈군. 등대에는 마지막 비밀이 하나 있지. 북서쪽, 오솔길 바로 옆에 잔디를 잘라 냈다가 다시 덮은 자리가 있어. 거기를 파게.',
   'hudChrome.questLog.completed': '완료됨',
   'hudChrome.questLog.zoneSummary': '{count}개（완료 {ready}개）',
   'hudChrome.questLog.shiftHint': 'Shift를 누른 채 퀘스트를 클릭하면 채팅에 링크됩니다.',
