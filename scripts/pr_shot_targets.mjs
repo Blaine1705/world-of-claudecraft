@@ -1164,6 +1164,148 @@ async function stageWheelBinds(page) {
 }
 
 export const TARGETS = [
+  // World quests round 2: the forge workshop panel moved off the bottom-pinned
+  // vehicle-bar family into the centred window family, so it no longer covers
+  // the unit frames and the action bar. /dev forge arms the quest beside Smith
+  // Mara; talking to her starts the workshop and the panel appears.
+  {
+    key: 'forge-workshop-window',
+    label: 'The forge workshop panel (A Helping Hammer) over the HUD',
+    when: ['ui/hud/vehicle/forge_action_bar_controller'],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'compact', mobile: true, tier: 'compact', beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      if (variant.mobile) await enterTouchTier(page, variant.tier);
+      const staged = await page.evaluate(async () => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        world.chat('/dev forge');
+        await sleep(600);
+        let smith = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'npc' && e.templateId === 'forge_instructor') smith = e;
+        }
+        if (!smith) return { ok: false, reason: 'Smith Mara is not in the roster' };
+        const player = sim.player;
+        player.pos = sim.groundPos(smith.pos.x + 1, smith.pos.z);
+        player.prevPos = { ...player.pos };
+        sim.rebucket?.(player);
+        world.targetEntity(smith.id);
+        world.interact();
+        await sleep(400);
+        game.hud.closeAll?.();
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 4);
+      if (!(await pollForSize(page, '#forge-action-bar', 20, 500)))
+        throw new Error('the forge workshop panel never appeared');
+      await wait(1500);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  // World quests round 2: the Shear is a real headland with Zephyr's launch
+  // wharf on its crest (the stone flight tower is gone). One frame from the road
+  // at the knoll's south-western foot looking up at the wharf, one on the planks
+  // looking out along the launch line.
+  {
+    key: 'shear-launch-wharf',
+    label: "The Shear's launch knoll and Zephyr's wharf",
+    when: ['sim/gale_launch_knoll', 'sim/glider_wharf_layout', 'render/gale_features'],
+    variants: [
+      {
+        key: 'from-the-road',
+        beforeLoad: lowGraphicsSeed,
+        spot: { x: 426, z: 582, facing: Math.atan2(450 - 426, 520 - 582), pitch: 0.55, dist: 14 },
+      },
+      {
+        key: 'on-the-planks',
+        beforeLoad: lowGraphicsSeed,
+        spot: { x: 450, z: 512, facing: -0.235, pitch: 0.3, dist: 12 },
+      },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      const staged = await page.evaluate(async (spot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        world.chat('/dev level 20');
+        await sleep(300);
+        world.chat(`/dev tp ${spot.x} ${spot.z}`);
+        await sleep(600);
+        const player = sim.player;
+        player.pos = sim.groundPos(spot.x, spot.z);
+        player.prevPos = { ...player.pos };
+        player.facing = spot.facing;
+        game.input.camYaw = spot.facing;
+        game.input.camPitch = spot.pitch;
+        game.input.camDist = spot.dist;
+        sim.rebucket?.(player);
+        game.hud.closeAll?.();
+        return { ok: true };
+      }, variant.spot);
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 8);
+      await wait(8000);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  // World quests round 2: the airborne glider is a built GLB now. /dev glider
+  // start launches at once; three seconds of countdown, then the pilot is in
+  // the air with the apparatus overhead and the chase camera behind.
+  {
+    key: 'windrider-glider-in-flight',
+    label: 'The Windrider glider apparatus in flight',
+    when: ['render/glider_course_visual'],
+    variants: [{ key: 'desktop', beforeLoad: lowGraphicsSeed }],
+    async capture(page) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      const staged = await page.evaluate(async () => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        world.chat('/dev glider start');
+        await sleep(300);
+        game.input.camPitch = 0.25;
+        game.input.camDist = 11;
+        game.hud.closeAll?.();
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 6);
+      // Past the countdown and a second into the glide.
+      await wait(5000);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
   {
     key: 'fen-features-cull',
     label:
