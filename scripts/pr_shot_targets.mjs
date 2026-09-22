@@ -122,6 +122,37 @@ const forcedColorsThemeSeed = async (page) => {
 // over the seed. A window/HUD shot is evidence about the DOM, never about render
 // fidelity, so tier 1 is what it should cost: less to software-render under
 // SwiftShader on a host that usually has other work on it.
+/** The report's state: the target frame dragged off its stock seat (a
+ *  persisted position, the same key a real drag writes) with the
+ *  targetAurasBelowFrame setting on. On the base branch the setting is unknown
+ *  and ignored, so the same seed shoots the before leg: strip above the frame.
+ *  The layout-reset epoch is stamped too, or the one-shot reset
+ *  (src/ui/frame_pos_reset.ts) wipes the seeded position on first boot. */
+const targetAurasBelowSeed = async (page) => {
+  await lowGraphicsSeed(page);
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.targetAurasBelowFrame = true; localStorage.setItem(k, JSON.stringify(s)); localStorage.setItem('woc_layout_reset_epoch', '1'); localStorage.setItem('woc_target_frame_pos', JSON.stringify({ left: 320, top: 140 })); } catch {}`,
+  );
+};
+
+/** Wait until #loading-screen has stayed hidden for `streakMs` straight (the
+ *  curtain can rise again a beat after a scripted teleport, and a single
+ *  hidden read races the compositor). */
+async function waitForCurtainStreak(page, streakMs = 3000, timeoutMs = 90000) {
+  const start = Date.now();
+  let hiddenSince = null;
+  while (Date.now() - start < timeoutMs) {
+    const hidden = await page.evaluate(
+      () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+    );
+    if (!hidden) hiddenSince = null;
+    else if (hiddenSince === null) hiddenSince = Date.now();
+    else if (Date.now() - hiddenSince >= streakMs) return;
+    await wait(250);
+  }
+  throw new Error('loading curtain never settled');
+}
+
 const lowGraphicsSeed = async (page) => {
   await page.evaluateOnNewDocument(
     `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
@@ -3016,6 +3047,93 @@ export const TARGETS = [
         throw new Error(`target aura proof failed: ${JSON.stringify(proof)}`);
       }
       return {};
+    },
+  },
+  {
+    key: 'target-aura-side',
+    label: 'Target frame moved off its stock seat, aura strip below it (targetAurasBelowFrame)',
+    when: ['ui/aura_bar_side', 'ui/target_frame_pos'],
+    variants: [
+      { key: 'desktop', beforeLoad: targetAurasBelowSeed },
+      { key: 'mobile', mobile: true, beforeLoad: targetAurasBelowSeed },
+    ],
+    async capture(page) {
+      await awaitWorldPainted(page);
+      // SEEDS the target's auras rather than casting, for the same reason the
+      // aura-strip target does: the claim is about where the strip HANGS, not
+      // how an aura came to exist, and a moved frame with a wrapped strip is
+      // the state the report describes.
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        const dummy = [...sim.entities.values()].find(
+          (e) => e.templateId === 'training_dummy' && !e.dead && e.hostile,
+        );
+        if (!dummy) return { ok: false, reason: 'hostile training dummy is unavailable' };
+        player.pos.x = dummy.pos.x - 4;
+        player.pos.y = dummy.pos.y;
+        player.pos.z = dummy.pos.z;
+        player.prevPos = { ...player.pos };
+        sim.rebucket?.(player);
+        const auras = [
+          ['rend', 'Rend', 'dot', 12, 20, 'physical'],
+          ['sunder', 'Sunder Armor', 'debuff_armor', 30, 450, 'physical'],
+          ['curse_weak', 'Curse of Weakness', 'debuff_ap', 110, 30, 'shadow'],
+          ['crippling_poison', 'Crippling Poison', 'slow', 8, 50, 'nature'],
+          ['frostbite', 'Frostbite', 'slow', 5, 60, 'frost'],
+          ['moonfire', 'Moonfire', 'dot', 12, 30, 'arcane'],
+          ['enrage', 'Enrage', 'buff_ap', 20, 25, 'physical'],
+        ];
+        dummy.auras.length = 0;
+        for (const [id, name, kind, remaining, value, school] of auras) {
+          dummy.auras.push({
+            id,
+            name,
+            kind,
+            remaining,
+            duration: remaining,
+            value,
+            sourceId: kind.startsWith('buff') ? dummy.id : player.id,
+            school,
+          });
+        }
+        sim.targetEntity(dummy.id, player.id);
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Moving beside the dummy can raise the zone-streaming curtain a beat
+      // later, and it can rise more than once: wait until it has stayed down
+      // for a full 3s streak, since a same-tick "hidden" read is not proof the
+      // compositor caught up.
+      await waitForCurtainStreak(page);
+      await page.waitForFunction(
+        () => {
+          const strip = document.getElementById('tf-debuffs');
+          const frame = document.getElementById('target-frame');
+          if (!strip || !frame) return false;
+          return getComputedStyle(frame).display !== 'none' && strip.children.length > 0;
+        },
+        { timeout: 30000, polling: 200 },
+      );
+      await wait(900);
+      // Union of the frame and its strip, so the same region frames both legs of
+      // the pair whichever side the strip hangs on.
+      const region = await page.evaluate(() => {
+        const f = document.getElementById('target-frame').getBoundingClientRect();
+        const s = document.getElementById('tf-debuffs').getBoundingClientRect();
+        const pad = 24;
+        const x = Math.max(0, Math.min(f.x, s.x) - pad);
+        const y = Math.max(0, Math.min(f.y, s.y) - pad);
+        return {
+          x,
+          y,
+          width: Math.min(window.innerWidth - x, Math.max(f.right, s.right) - x + pad),
+          height: Math.min(window.innerHeight - y, Math.max(f.bottom, s.bottom) - y + pad + 14),
+        };
+      });
+      return { clip: region };
     },
   },
   {
