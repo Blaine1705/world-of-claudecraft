@@ -775,6 +775,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceIntro': '创建新帐户，或将 Apple 关联到现有帐户。',
   'hudChrome.auth.appleChoiceExpired': 'Apple 登录已过期。请再次使用 Apple 登录。',
   'hudChrome.discord.roleTag.coredevs': '核心开发者',
+  'hudChrome.options.targetAurasBelowFrame':
+    '目标光环显示在框体下方',
   'hudChrome.options.version': 'v{version}（{build}）',
   'auth.emailPlaceholder': 'you@example.com',
   'auth.recovery.logOut': '退出登录',
@@ -6796,6 +6798,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mobileBody':
     '在手机和平板上会自动出现触控操作：左侧是移动摇杆，在其他任意位置拖动即可环顾四周，用两根手指捏合可缩放镜头，屏幕上还有用于使用技能和打开菜单的按钮。左上角的一个小箭头可以显示或隐藏菜单按钮，那里的“更多”按钮则收纳着你其余的窗口。',
   'guide.settingsPage.heading': '设置和性能',
+  'guide.settingsPage.ifTargetAurasBelowFrame':
+    '把目标框体的增益和减益条挂在框体下方而不是上方（经典布局）。默认关闭，因为默认的目标框体紧贴在动作条上方；把框体移到下方有空间的位置后再开启。',
   'guide.settingsPage.intro':
     '把画面调到最美，或把帧数拉到最高。三套现成方案，外加每个图形选项的真实作用。',
   'guide.settingsPage.wherePath':

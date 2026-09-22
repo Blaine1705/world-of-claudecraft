@@ -834,6 +834,7 @@ const FRAMES_KEYS = [
   'targetFrameHealthText',
   'aurasOnPlayerFrame',
   'auraBarBelowFrame',
+  'targetAurasBelowFrame',
   'alwaysShowAllBuffs',
   'showTargetOfTarget',
   'showTargetSwingTimer',
@@ -1154,6 +1155,21 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       makeSource({}, { aurasOnPlayerFrame: true, auraBarBelowFrame: false }),
     );
     expect(find(off, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: false });
+  });
+
+  // The target strip's side is the player's own choice, ungated (the strip is
+  // always anchored to the target frame, unlike the player buff row).
+  it('offers the target-auras-below toggle ungated and reads the stored choice through', () => {
+    expect(find(buildInterfaceControls(makeSource()), 'targetAurasBelowFrame')).toMatchObject({
+      control: 'boolToggle',
+      on: false,
+    });
+    expect(find(buildInterfaceControls(makeSource()), 'targetAurasBelowFrame')).not.toHaveProperty(
+      'disabled',
+      true,
+    );
+    const on = buildInterfaceControls(makeSource({}, { targetAurasBelowFrame: true }));
+    expect(find(on, 'targetAurasBelowFrame')).toMatchObject({ control: 'boolToggle', on: true });
   });
 
   it('renders NO uiScale row (owner request); the comfort sliders stay live', () => {

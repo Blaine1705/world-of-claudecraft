@@ -1337,7 +1337,11 @@ const MONOLITHS: MonolithRow[] = [
     // click / Enter-Space / double-click wiring moved into wireCharselectRow
     // (src/ui/charselect_hints.ts), which skips activations from inside the
     // lockout disclosure instead of stopping propagation there.
-    ceiling: 11276,
+    // Lowered from 11276: the buff/debuff row direction cases moved out to
+    // src/ui/aura_bar_side.ts (with the new targetAurasBelowFrame side case
+    // riding the same helper), so the coordinator ends smaller (extract, then
+    // lower).
+    ceiling: 11267,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

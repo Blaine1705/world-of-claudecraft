@@ -796,6 +796,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceExpired':
     'Appleでのサインインの有効期限が切れました。もう一度お試しください。',
   'hudChrome.discord.roleTag.coredevs': 'コア開発者',
+  'hudChrome.options.targetAurasBelowFrame':
+    'ターゲットのオーラをフレームの下に表示',
   'hudChrome.options.version': 'v{version} ({build})',
   'auth.emailPlaceholder': 'mail@example.com',
   'auth.recovery.logOut': 'ログアウト',
@@ -7065,6 +7067,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mobileBody':
     'スマートフォンやタブレットでは、タッチ操作が自動で表示されます。左側に移動用スティック、それ以外の場所はどこでもドラッグして視点操作、二本指でつまむとカメラをズームでき、そしてアビリティやメニュー用の画面上ボタンが現れます。左上隅の小さな矢印でメニューボタンの表示と非表示を切り替えられ、そこにある「その他」ボタンに残りのウィンドウがまとめられています。',
   'guide.settingsPage.heading': '設定とパフォーマンス',
+  'guide.settingsPage.ifTargetAurasBelowFrame':
+    'ターゲットフレームのバフ・デバフ列を、フレームの上ではなく下に表示します（クラシックな配置）。標準のターゲットフレームはアクションバーのすぐ上にあるため、既定ではオフです。フレームを下に余裕のある場所へ移動したら有効にしてください。',
   'guide.settingsPage.intro':
     '見た目を最高にするのも、動作を最速にするのも自由自在。すぐに使える3つの構成と、各グラフィックオプションの本当の働きを紹介します。',
   'guide.settingsPage.wherePath':

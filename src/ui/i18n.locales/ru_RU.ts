@@ -797,6 +797,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Создайте новую учётную запись или привяжите Apple к существующей.',
   'hudChrome.auth.appleChoiceExpired': 'Вход через Apple истёк. Войдите через Apple ещё раз.',
   'hudChrome.discord.roleTag.coredevs': 'Ведущий разработчик',
+  'hudChrome.options.targetAurasBelowFrame':
+    'Ауры цели под рамкой',
   'hudChrome.options.version': 'v{version} ({build})',
   'auth.emailPlaceholder': 'ivan@example.com',
   'auth.recovery.logOut': 'Выйти',
@@ -7156,6 +7158,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mobileBody':
     'На телефонах и планшетах сенсорное управление появляется автоматически: джойстик передвижения слева, перетаскивание в любой другой точке для обзора, щипок двумя пальцами для приближения камеры и экранные кнопки для способностей и меню. Маленькая стрелка в верхнем левом углу показывает или скрывает кнопки меню, а кнопка «Ещё» рядом хранит остальные ваши окна.',
   'guide.settingsPage.heading': 'Настройки и производительность',
+  'guide.settingsPage.ifTargetAurasBelowFrame':
+    'Размещает полосу баффов и дебаффов цели под рамкой, а не над ней (классическая раскладка). По умолчанию выключено, так как стандартная рамка цели стоит прямо над панелью действий; включите, когда переместите рамку туда, где под ней есть место.',
   'guide.settingsPage.intro':
     'Настройте игру на максимум красоты или на максимум скорости. Три готовых набора настроек, а также объяснение, что на самом деле делает каждый графический параметр.',
   'guide.settingsPage.wherePath':

@@ -379,6 +379,14 @@ export const BOOL_SETTINGS = {
   // silently and permanently relocated the buffs with no way back short of a
   // full frame reset. See hud.css #player-frame > #buff-bar.
   auraBarBelowFrame: { def: false },
+  // off by default (the target's aura strip sits above the frame, since the
+  // stock target seat is directly over the action bar): hangs the strip below
+  // the frame instead, the classic layout, for a frame the player has moved
+  // somewhere with room beneath it. Purely presentational (main.ts toggles
+  // body.target-auras-below-frame via src/ui/aura_bar_side.ts; hud.css keys
+  // off it) and a deliberate player choice, never inferred from the frame's
+  // move state. See hud.css #target-frame > #tf-debuffs.
+  targetAurasBelowFrame: { def: false },
   // off by default: bypass the low graphics preset's buff-icon cap
   // (AURA_VISIBLE_CAP_LOW, src/game/ui_tier_knobs.ts) so every active buff
   // always renders in #buff-bar, at the cap's per-frame cost. The cap itself

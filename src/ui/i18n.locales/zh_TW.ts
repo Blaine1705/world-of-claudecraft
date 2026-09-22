@@ -775,6 +775,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceIntro': '建立新帳戶，或將 Apple 連結到現有帳戶。',
   'hudChrome.auth.appleChoiceExpired': 'Apple 登入已過期。請再次使用 Apple 登入。',
   'hudChrome.discord.roleTag.coredevs': '核心開發者',
+  'hudChrome.options.targetAurasBelowFrame':
+    '目標光環顯示在框體下方',
   'hudChrome.options.version': 'v{version}（{build}）',
   'auth.emailPlaceholder': 'you@example.com',
   'auth.recovery.logOut': '登出',
@@ -6799,6 +6801,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mobileBody':
     '在手機與平板上會自動顯示觸控操作：左側為移動搖桿，在其他任意處拖曳即可環顧，用兩指捏合來縮放鏡頭，並有螢幕上的按鈕供你使用技能與選單。左上角的一個小箭頭可以顯示或隱藏選單按鈕，而那裡的「更多」按鈕則收納了你其餘的視窗。',
   'guide.settingsPage.heading': '設定與效能',
+  'guide.settingsPage.ifTargetAurasBelowFrame':
+    '把目標框體的增益和減益列掛在框體下方而不是上方（經典配置）。預設關閉，因為預設的目標框體緊貼在動作列上方；把框體移到下方有空間的位置後再開啟。',
   'guide.settingsPage.intro':
     '讓遊戲畫面美到極致，或跑得飛快。三套現成配置，加上每個圖形選項的真正作用。',
   'guide.settingsPage.wherePath':

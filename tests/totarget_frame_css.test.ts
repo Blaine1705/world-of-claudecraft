@@ -54,6 +54,17 @@ describe('target-of-target frame sits BESIDE the target frame', () => {
     expect(rule(hudCss, '#target-frame > #tf-debuffs')).not.toContain('top:');
   });
 
+  // Players who move the target frame off the stock seat get the classic
+  // below-frame strip back through their own setting (targetAurasBelowFrame,
+  // src/ui/aura_bar_side.ts): keyed on the setting's body class, never on the
+  // frame's move state, mirroring the player buff row's auraBarBelowFrame.
+  it('hangs the strip below the frame only via body.target-auras-below-frame', () => {
+    const below = rule(hudCss, 'body.target-auras-below-frame #target-frame > #tf-debuffs');
+    expect(below).toContain('top: calc(100% + 8px);');
+    expect(below).toContain('bottom: auto;');
+    expect(hudCss).not.toMatch(/#target-frame\.tf-detached[^{]*#tf-debuffs/);
+  });
+
   it('reads portrait-left like every other unit frame (mirror overrides dropped)', () => {
     // The #target-frame prefix outranks the LATER #target-frame .portrait-wrap /
     // .uf-bars mirror rules, which otherwise win the same-specificity tie on
