@@ -12,10 +12,16 @@ export const GLIDER_COURSE_ID = 'galecrest_windrider_slalom';
 export const GLIDER_NPC_ID = 2_146_900_030;
 export const GLIDER_APPRENTICE_NPC_ID = 2_146_900_031;
 
+// The launch perch hangs a stride past the seaward end of Zephyr's wharf
+// (glider_wharf_layout.ts), beyond the crest's southern lip, so the glider
+// starts with open air below (the knoll, gale_launch_knoll.ts, has already
+// fallen away there; glider_flight.ts ends a run on terrain contact). Y is the
+// plank plane, the old flight tower's deck height, so every course stays as
+// authored.
 export const GLIDER_LAUNCH_SITE = {
   x: 450,
   z: 520,
-  playerLaunch: { x: 448, y: 74, z: 525 },
+  playerLaunch: { x: 448, y: 74, z: 536 },
   playerFacing: -0.235,
 };
 

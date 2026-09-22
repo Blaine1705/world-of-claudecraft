@@ -69,8 +69,11 @@ export const GALECREST_ROADS: { x: number; z: number }[][] = [
   [
     { x: 420, z: 360 },
     { x: 432, z: 440 },
+    // Over the crest of the Shear (gale_launch_knoll.ts): the climb comes up
+    // the gentle north face and leaves down the south-west, never the steep
+    // launch face the pier points over.
     { x: 446, z: 512 },
-    { x: 438, z: 552 },
+    { x: 424, z: 560 },
     { x: 434, z: 610 },
     { x: 390, z: 634 },
     { x: 352, z: 636 },

@@ -41,7 +41,89 @@ function setupSim(fullWorld = false) {
   return sim;
 }
 
+/** Steers the live flight ring to ring with bounded turn and pitch inputs
+ *  through real ticks, until the flight state leaves `flying`/`countdown` or
+ *  the tick budget runs out. Returns the number of ticks flown. */
+function autopilot(sim: Sim, budget = 2600): number {
+  const progress = sim.worldQuestLog.get(GLIDER_QUEST_ID)!;
+  let ticks = 0;
+  for (; ticks < budget; ticks++) {
+    const state = progress.glider;
+    if (!state || (state.phase !== 'flying' && state.phase !== 'countdown')) break;
+    const target =
+      GLIDER_COURSE.rings.find((r) => !state.passedRings.includes(r.id)) ??
+      GLIDER_COURSE.landingPad;
+    const difference = normAngle(
+      Math.atan2(target.x - sim.player.pos.x, target.z - sim.player.pos.z) - sim.player.facing,
+    );
+    Object.assign(sim.moveInput, {
+      ...emptyMoveInput(),
+      forward: true,
+      turnLeft: difference > 0.06,
+      turnRight: difference < -0.06,
+      gliderPitch: Math.max(
+        -1,
+        Math.min(
+          1,
+          ((target.y - sim.player.pos.y) * 1.5 + 0.55) / (target.y > sim.player.pos.y ? 7 : 14),
+        ),
+      ),
+    });
+    sim.tick();
+  }
+  Object.assign(sim.moveInput, emptyMoveInput());
+  return ticks;
+}
+
 describe('World Quest Glider Integration', () => {
+  it('flies again after completion, for fun, and never pays a second time', () => {
+    // World quests round 2: the slalom is replayable without limit; only the
+    // FIRST successful run pays. The pay-once guard is the quest-state check in
+    // world_quests.ts (credit only while the quest is active) and the
+    // instructor's practice flight for a completed quest.
+    const sim = setupSim();
+    const meta = sim.meta(sim.playerId)!;
+    sim.chat('/dev glider start');
+    const progress = sim.worldQuestLog.get(GLIDER_QUEST_ID)!;
+    autopilot(sim);
+    for (let i = 0; i < 3; i++) sim.tick();
+    expect(progress.glider?.phase).toBe('won');
+    expect(progress.state).toBe('completed');
+    const paidCopper = sim.copper;
+    const paidXp = sim.lifetimeXp;
+    const paidQuests = meta.counters.questsCompleted;
+    const deeds = meta.deedsEarned.size;
+    expect(paidCopper).toBeGreaterThan(0);
+
+    // Back at Zephyr: talking to him starts a PRACTICE flight, not a reset.
+    sim.player.pos = sim.groundPos(GLIDER_NPC_DEF.pos.x + 1, GLIDER_NPC_DEF.pos.z);
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.drainEvents();
+    sim.talkToNpc(GLIDER_NPC_ID);
+    expect(progress.glider?.phase).toBe('countdown');
+    expect(progress.glider?.practiceOnly).toBe(true);
+    expect(progress.state).toBe('completed');
+
+    // A second full winning flight: the same rings, the same pad, no purse.
+    autopilot(sim);
+    for (let i = 0; i < 3; i++) sim.tick();
+    expect(progress.glider?.phase).toBe('won');
+    expect(progress.glider?.passedRings).toHaveLength(GLIDER_COURSE.rings.length);
+    expect(progress.state).toBe('completed');
+    expect(sim.copper).toBe(paidCopper);
+    expect(sim.lifetimeXp).toBe(paidXp);
+    expect(meta.counters.questsCompleted).toBe(paidQuests);
+    expect(meta.deedsEarned.size).toBe(deeds);
+    expect(sim.drainEvents().filter((ev) => ev.type === 'worldQuestDone')).toHaveLength(0);
+
+    // ...and a third time still starts (no cap on fun).
+    sim.player.pos = sim.groundPos(GLIDER_NPC_DEF.pos.x + 1, GLIDER_NPC_DEF.pos.z);
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.talkToNpc(GLIDER_NPC_ID);
+    expect(progress.glider?.phase).toBe('countdown');
+    expect(progress.glider?.practiceOnly).toBe(true);
+  });
+
   it('publishes a wind-only crossing immediately between periodic snapshot ticks', () => {
     const sim = setupSim();
     sim.chat('/dev glider start');

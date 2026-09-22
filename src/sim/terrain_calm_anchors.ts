@@ -38,6 +38,7 @@ import {
   ZONES,
 } from './data';
 import { GALE_HARBOR_DECKS } from './gale_harbor';
+import { GLIDER_WHARF_DECKS } from './glider_wharf_layout';
 import { REACH_DECKS } from './reach_decks';
 import { WORLD_BOSSES } from './world_boss';
 
@@ -252,7 +253,7 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   }
   // Deck networks: every plank run is seated from its shore-root terrain
   // samples (ax/az, ax2/az2), so those roots keep classic ground.
-  for (const deck of [...GALE_HARBOR_DECKS, ...REACH_DECKS]) {
+  for (const deck of [...GALE_HARBOR_DECKS, ...REACH_DECKS, ...GLIDER_WHARF_DECKS]) {
     pad('deckRoot', deck.ax, deck.az, 5, 12);
     if (deck.ax2 !== undefined && deck.az2 !== undefined) {
       pad('deckRoot', deck.ax2, deck.az2, 5, 12);

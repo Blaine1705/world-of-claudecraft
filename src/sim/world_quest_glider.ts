@@ -8,7 +8,7 @@ import {
 } from './content/world_quest_glider';
 import { displacePlayer } from './displacement';
 import { createNpc } from './entity';
-import { GLIDER_TOWER } from './glider_tower_layout';
+import { GLIDER_WHARF } from './glider_wharf_layout';
 import {
   createGliderFlightState,
   type GliderFlightState,
@@ -71,9 +71,9 @@ export function updateGliderLaunchUpdraft(
 ): boolean {
   if (player.dead || player.inCombat || meta.vehicle) return false;
   if (player.pos.y >= 40) return false;
-  const dx = player.pos.x - GLIDER_TOWER.updraft.x;
-  const dz = player.pos.z - GLIDER_TOWER.updraft.z;
-  if (dx * dx + dz * dz > GLIDER_TOWER.updraft.radius * GLIDER_TOWER.updraft.radius) {
+  const dx = player.pos.x - GLIDER_WHARF.updraft.x;
+  const dz = player.pos.z - GLIDER_WHARF.updraft.z;
+  if (dx * dx + dz * dz > GLIDER_WHARF.updraft.radius * GLIDER_WHARF.updraft.radius) {
     return false;
   }
   if (player.mountKey) ctx.forceDismount(player);

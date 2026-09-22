@@ -534,9 +534,14 @@ export function talkToWorldQuestInstructor(
     return true;
   }
   if (quest.objective.type === 'glider') {
+    // A completed quest launches a PRACTICE flight (world quests round 2: the
+    // slalom is replayable without limit, only the first success pays), so the
+    // state check sits beside the board check: the board still lists the quest
+    // all day after the purse is paid.
     const isQuestActive =
       player.level >= quest.minLevel &&
       progress &&
+      progress.state === 'active' &&
       inWorldQuestArea(player, quest) &&
       playerActiveWorldQuests(meta).some((active) => active.id === quest.id);
     if (isQuestActive && progress) {
