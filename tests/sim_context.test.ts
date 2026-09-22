@@ -349,6 +349,7 @@ function makeFakeHost() {
       killsByPair: new Map(),
       zoneOf: new Map(),
       nextDisarmAt: Number.POSITIVE_INFINITY,
+      zonePassTick: Number.NEGATIVE_INFINITY,
       sweptAtTick: 0,
     },
     bgBusySlots: new Set(),

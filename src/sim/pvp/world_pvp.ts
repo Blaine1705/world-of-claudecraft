@@ -117,12 +117,19 @@ export interface WorldPvpBooks {
   killsByPair: Map<string, WorldPvpPairKills>;
   /** pid -> the zone policy the player stood in at the last zone pass, so the
    *  enter/leave notices fire once per crossing. Rows of players who left the
-   *  world are dropped by the sweep. */
+   *  world, and of players under WORLD_PVP_MIN_LEVEL (told on the pass after
+   *  they reach it), are dropped. */
   zoneOf: Map<number, WorldPvpZonePolicy>;
   /** The earliest pending disarm (sim time), Infinity when nobody is switching
    *  off: the per-tick pass is skipped entirely until then, so a realm with no
    *  countdown running pays one comparison per tick, not a roster walk. */
   nextDisarmAt: number;
+  /** Ticks of the last zone pass and the last sweep: both run on the dueness
+   *  form (`tickCount - last >= interval`, the sweep's shape), never on a
+   *  modulo of the tick count, so a pass can never be skipped by a host that
+   *  does not visit every tick. Negative infinity runs the zone pass on the
+   *  first tick, so a player is told about their ground at once. */
+  zonePassTick: number;
   sweptAtTick: number;
 }
 
@@ -134,6 +141,7 @@ export function newWorldPvpBooks(): WorldPvpBooks {
     killsByPair: new Map(),
     zoneOf: new Map(),
     nextDisarmAt: Number.POSITIVE_INFINITY,
+    zonePassTick: Number.NEGATIVE_INFINITY,
     sweptAtTick: 0,
   };
 }
@@ -156,6 +164,13 @@ export const WORLD_PVP_FFA_ENTER_LINE =
   'You have entered a free-for-all PvP zone: anyone here can attack you.';
 export const WORLD_PVP_FFA_LEAVE_LINE = 'You have left the free-for-all PvP zone.';
 export const WORLD_PVP_SANCTUARY_LINE = 'This is a sanctuary: World PvP is off here.';
+/** The refusal a heal, shield or buff meets when its target is a player the
+ *  open world has made an enemy (combat/casting_lifecycle.ts): once the aid
+ *  rule has flagged a helper, that helper and the stranger they were keeping
+ *  up are two flagged strangers, and the only way to keep aiding them is the
+ *  exemption, a party. Said out loud rather than self-cast in silence. */
+export const WORLD_PVP_AID_REFUSED_LINE =
+  'You cannot aid a World PvP enemy: invite them to your party first.';
 
 export function isWorldPvpFlagged(meta: PlayerMeta): boolean {
   return meta.worldPvp?.flagged === true;
@@ -299,14 +314,21 @@ function sweepBooks(ctx: SimContext, books: WorldPvpBooks): void {
  * PvP means. Entering a free-for-all zone always says so (a player who logs
  * in inside one is told on their first pass); leaving it says so; a FLAGGED
  * player entering a sanctuary is told the flag is idle there (an unflagged
- * level-one character walking around the starter zone hears nothing). The
- * policy is re-read from the ground each pass, so a teleport or a tow across
- * a zone line is noticed the same as a walk.
+ * level-one character walking around the starter zone hears nothing). A
+ * character under WORLD_PVP_MIN_LEVEL is outside the free-for-all arm
+ * altogether (world_pvp_rules.ts), so they hear nothing either, and their row
+ * is dropped so the pass after they reach the level tells them where they
+ * stand. The policy is re-read from the ground each pass, so a teleport or a
+ * tow across a zone line is noticed the same as a walk.
  */
 function noticeZoneChanges(ctx: SimContext, books: WorldPvpBooks): void {
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e) continue;
+    if (e.level < WORLD_PVP_MIN_LEVEL) {
+      books.zoneOf.delete(e.id);
+      continue;
+    }
     const now = worldPvpZonePolicyAt(e.pos.x, e.pos.z);
     const was = books.zoneOf.get(e.id);
     if (was === now) continue;
@@ -333,8 +355,9 @@ export function updateWorldPvp(ctx: SimContext): void {
       const state = meta.worldPvp;
       if (!state || !state.flagged || state.disarmAt === null) continue;
       const e = ctx.entities.get(meta.entityId);
-      if (!e) continue;
-      if (ctx.time < state.disarmAt) {
+      // A countdown whose entity is not in the world this tick (mid-removal)
+      // stays due, so it can never fall out of `nextDisarmAt` unpaid.
+      if (!e || ctx.time < state.disarmAt) {
         next = Math.min(next, state.disarmAt);
         continue;
       }
@@ -349,7 +372,8 @@ export function updateWorldPvp(ctx: SimContext): void {
     }
     books.nextDisarmAt = next;
   }
-  if (!ctx.worldPvpDisabled && ctx.tickCount % ZONE_PASS_TICKS === 0) {
+  if (!ctx.worldPvpDisabled && ctx.tickCount - books.zonePassTick >= ZONE_PASS_TICKS) {
+    books.zonePassTick = ctx.tickCount;
     noticeZoneChanges(ctx, books);
   }
   if (ctx.tickCount - books.sweptAtTick >= SWEEP_TICKS) {
@@ -474,6 +498,25 @@ export function worldPvpOnPlayerDamaged(ctx: SimContext, victim: Entity, source:
     const meta = autoRaiseTarget(ctx, attacker);
     if (meta) raiseFlag(ctx, attacker, meta, WORLD_PVP_MARKED_LINE);
   }
+}
+
+/**
+ * Damage hook for a player's PET (combat/damage.ts, the owned-mob arm beside
+ * the player one): the hit is judged against the pet's OWNER, so opening on an
+ * unflagged stranger's pet in a free-for-all zone marks the attacker exactly as
+ * opening on the stranger would (the owner rule: attack someone who is not
+ * marked and you are marked; the pet is that someone). Marking only: the
+ * assist books key on the owner being hit, and a pet's death is no world kill.
+ */
+export function worldPvpOnOwnedPetDamaged(ctx: SimContext, pet: Entity, source: Entity): void {
+  const owner = controllerOf(ctx, pet);
+  const attacker = controllerOf(ctx, source);
+  if (!owner || !attacker || attacker.id === owner.id) return;
+  if (!isWorldPvpHostile(ctx, attacker, owner) || !worldPvpHitMarksAttacker(attacker, owner)) {
+    return;
+  }
+  const meta = autoRaiseTarget(ctx, attacker);
+  if (meta) raiseFlag(ctx, attacker, meta, WORLD_PVP_MARKED_LINE);
 }
 
 /**

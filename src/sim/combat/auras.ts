@@ -62,6 +62,7 @@ import {
   regenerateSoulFragmentsOutOfCombat,
 } from './necromancy';
 import { tickPaladinOathChainPull } from './paladin_control';
+import { periodicHarmStands } from './periodic_harm';
 import { priestOnAuraEnded } from './priest/talents';
 import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
@@ -325,6 +326,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           tickTemporalHourglassHealing(ctx, e, a);
         } else if (a.id === 'sacrilegious_march' && a.kind === 'buff_speed') {
           tickSacrilegiousMarch(ctx, e, a);
+        } else if (
+          (a.kind === 'dot' || a.kind === 'affliction_eye' || a.kind === 'affliction_violence') &&
+          !periodicHarmStands(ctx, ctx.entities.get(a.sourceId) ?? null, e)
+        ) {
+          // The verdict lapsed since the aura landed (the victim left the
+          // free-for-all ground, entered a sanctuary, or the duel ended): no
+          // tick, and the expiry below prunes the aura this pass
+          // (periodic_harm.ts).
+          a.remaining = 0;
         } else if (a.kind === 'affliction_eye') {
           tickMaledictGaze(ctx, e, a);
         } else if (a.kind === 'affliction_violence') {

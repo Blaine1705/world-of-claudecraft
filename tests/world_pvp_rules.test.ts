@@ -12,6 +12,7 @@ import {
   WORLD_PVP_DR_WINDOW_SECONDS,
   WORLD_PVP_GREY_LEVEL_GAP,
   WORLD_PVP_KILL_HONOR,
+  WORLD_PVP_MIN_LEVEL,
   WORLD_PVP_STAKE_CAP_COPPER,
   WORLD_PVP_STAKE_FRACTION,
   type WorldPvpZonePolicy,
@@ -26,7 +27,7 @@ import {
 import type { Entity } from '../src/sim/types';
 
 const player = (id: number, extra: Partial<Entity> = {}): Entity =>
-  ({ id, kind: 'player', guild: '', pvpFlag: true, ...extra }) as Entity;
+  ({ id, kind: 'player', guild: '', pvpFlag: true, level: 20, ...extra }) as Entity;
 
 const POLICIES: WorldPvpZonePolicy[] = ['sanctuary', 'contested', 'ffa'];
 
@@ -91,6 +92,22 @@ describe('worldPvpPairHostile on the other ground', () => {
     expect(worldPvpPairHostile(flaggedA, flaggedB, false, 'ffa', 'contested')).toBe(true);
     expect(worldPvpPairHostile(flaggedA, bareB, false, 'ffa', 'contested')).toBe(false);
     expect(worldPvpPairHostile(bareB, flaggedA, false, 'contested', 'ffa')).toBe(false);
+  });
+
+  it('under WORLD_PVP_MIN_LEVEL on either side, the ground is no way around the flag gate', () => {
+    const novice = player(1, { pvpFlag: false, level: WORLD_PVP_MIN_LEVEL - 1 });
+    const veteran = player(2, { pvpFlag: false });
+    const flaggedVeteran = player(3);
+    const secondNovice = player(4, { pvpFlag: false, level: 1 });
+    expect(worldPvpPairHostile(novice, veteran, false, 'ffa', 'ffa')).toBe(false);
+    expect(worldPvpPairHostile(veteran, novice, false, 'ffa', 'ffa')).toBe(false);
+    expect(worldPvpPairHostile(flaggedVeteran, novice, false, 'ffa', 'ffa')).toBe(false);
+    expect(worldPvpPairHostile(novice, flaggedVeteran, false, 'ffa', 'ffa')).toBe(false);
+    expect(worldPvpPairHostile(novice, secondNovice, false, 'ffa', 'ffa')).toBe(false);
+    // Exactly at the gate counts, on both ends.
+    const atGate = player(5, { pvpFlag: false, level: WORLD_PVP_MIN_LEVEL });
+    expect(worldPvpPairHostile(atGate, veteran, false, 'ffa', 'ffa')).toBe(true);
+    expect(worldPvpPairHostile(veteran, atGate, false, 'ffa', 'ffa')).toBe(true);
   });
 
   it('the exemptions hold on free-for-all ground: self, party, guild', () => {

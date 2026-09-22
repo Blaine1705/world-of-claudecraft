@@ -6225,9 +6225,9 @@ export class Sim {
     // face at match START), so its tick position cannot fork the draw order
     // mid-match.
     bgMod.updateBattleground(this.ctx);
-    // World PvP clock + books sweep (pvp/world_pvp.ts), billed to the battleground lap; zero rng.
-    worldPvpMod.updateWorldPvp(this.ctx);
     lap?.('battleground');
+    worldPvpMod.updateWorldPvp(this.ctx); // the /pvp clock, zone pass + books sweep; zero rng
+    lap?.('worldPvp');
     // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
     // matching on the sim clock), so appending it here cannot fork the draw order.
     this.updateDungeonFinder();

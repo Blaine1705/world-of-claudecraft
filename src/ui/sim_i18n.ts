@@ -606,6 +606,9 @@ const baseEnTable = {
   'worldPvp.ffaEntered': 'You have entered a free-for-all PvP zone: anyone here can attack you.',
   'worldPvp.ffaLeft': 'You have left the free-for-all PvP zone.',
   'worldPvp.sanctuary': 'This is a sanctuary: World PvP is off here.',
+  // The aid refusal (WORLD_PVP_AID_REFUSED_LINE, voiced by
+  // src/sim/combat/casting_lifecycle.ts): placeholder-free, EXACT-mapped too.
+  'worldPvp.aidRefused': 'You cannot aid a World PvP enemy: invite them to your party first.',
   'worldPvp.realmDisabled': 'World PvP is disabled on this realm.',
   'worldPvp.tooSoon': 'World PvP: wait a moment before switching again.',
   'worldPvp.disabled': 'World PvP disabled.',

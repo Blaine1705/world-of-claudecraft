@@ -48,7 +48,12 @@ import {
   recordCorpseHarvestDeath,
   releaseCorpseHarvest,
 } from '../professions/corpse_harvest_session';
-import { pvpDamageMultiplier, worldPvpOnPlayerDamaged, worldPvpOnPlayerDeath } from '../pvp';
+import {
+  pvpDamageMultiplier,
+  worldPvpOnOwnedPetDamaged,
+  worldPvpOnPlayerDamaged,
+  worldPvpOnPlayerDeath,
+} from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import { computeCharacterModifiers } from '../set_bonus_mods';
@@ -1170,6 +1175,9 @@ export function dealDamage(
     // World PvP assists: the same idea for a flagged victim in the open world
     // (src/sim/pvp/world_pvp.ts owns the flag, the pair, and the window rules).
     worldPvpOnPlayerDamaged(ctx, target, source);
+  } else if (source && amount > 0 && target.kind === 'mob' && target.ownerId !== null) {
+    // A hit on a player's PET marks an aggressor as a hit on the owner would.
+    worldPvpOnOwnedPetDamaged(ctx, target, source);
   }
 
   if (source && source.kind === 'player' && source.id !== target.id) {
