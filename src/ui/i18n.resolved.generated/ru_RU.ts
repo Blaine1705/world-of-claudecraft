@@ -11202,6 +11202,7 @@ export const ru_RU: EnTranslations = {
       "hoard_cast_webbing": "Webbing",
       "hoard_cast_doom_ritual": "Doom Ritual",
       "hoard_cast_charge": "Charge",
+      "hoard_cast_silk_snare": "Silk Snare",
       "hoard_cast_silence": "Заглушающий визг",
       "hoard_cast_hex": "Сглаз",
       "hoard_lightning_strike": "Удар молнии",

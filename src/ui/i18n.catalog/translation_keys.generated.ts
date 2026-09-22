@@ -38,6 +38,7 @@ export type TranslationKeyFlat =
   | 'abilityUi.cast.hoard_cast_hex'
   | 'abilityUi.cast.hoard_cast_rime_beam'
   | 'abilityUi.cast.hoard_cast_silence'
+  | 'abilityUi.cast.hoard_cast_silk_snare'
   | 'abilityUi.cast.hoard_cast_stun'
   | 'abilityUi.cast.hoard_cast_void_empower'
   | 'abilityUi.cast.hoard_cast_webbing'

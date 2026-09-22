@@ -47,6 +47,8 @@ const BEATS: Partial<Record<HoardBossCueVariant, readonly HoardMechanicBeat[]>> 
   'brute-boulder': [beat(0, 'rift_boulder_roll', 0.9, 0.9)],
   // The charge: the rumble as he goes.
   'brute-charge': [beat(0, 'rift_boulder_roll', 0.8, 0.7)],
+  // A thread of silk landing on a player.
+  'venom-silk': [beat(0, 'impact_leather', 0.5, 1.4)],
   'brute-boulder-return': [beat(0, 'rift_boulder_roll', 0.85, 1.25)],
   'brute-boulder-crush': [
     beat(0, 'rift_boulder_impact', 1, 0.7),

@@ -53,6 +53,7 @@ import {
   tickHoardPulsars,
 } from './hoard_pulsars';
 import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
+import { isSilkCue, tickHoardSilkSnare } from './hoard_silk_snare';
 import {
   resolveHoardStormStaticTargets,
   startHoardStormStatic,
@@ -493,6 +494,7 @@ function tickSpecialKit(
     if (boss.firedSummons === 0 && hpFraction <= HOARD_BROOD_HATCH_HP)
       hatchBroodEggs(ctx, inst, boss);
     tickHoardCocoon(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
+    tickHoardSilkSnare(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     return;
   }
   if (kit === 'bone-legion') {
@@ -875,6 +877,11 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     }
     if (isBoulderCue(cue)) {
       if (tickHoardBoulderCue(cue)) live.push(cue);
+      continue;
+    }
+    if (isSilkCue(cue)) {
+      // The snare module withdraws its own threads; until then they live.
+      if (cue.remaining > 1e-8) live.push(cue);
       continue;
     }
     if (isChargeCue(cue)) {

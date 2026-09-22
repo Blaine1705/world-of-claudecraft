@@ -11202,6 +11202,7 @@ export const ja_JP: EnTranslations = {
       "hoard_cast_webbing": "Webbing",
       "hoard_cast_doom_ritual": "Doom Ritual",
       "hoard_cast_charge": "Charge",
+      "hoard_cast_silk_snare": "Silk Snare",
       "hoard_cast_silence": "沈黙の金切り声",
       "hoard_cast_hex": "呪術",
       "hoard_lightning_strike": "落雷",

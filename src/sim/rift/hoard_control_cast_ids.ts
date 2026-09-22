@@ -50,6 +50,8 @@ export const HOARD_CAST_RIME_BEAM = 'hoard_cast_rime_beam';
 export const HOARD_CAST_CINDER_BOLT = 'hoard_cast_cinder_bolt';
 export const HOARD_CAST_VOID_EMPOWER = 'hoard_cast_void_empower';
 export const HOARD_CAST_WEBBING = 'hoard_cast_webbing';
+/** Vysska's Silk Snare (hoard_silk_snare.ts): a kick cancels it for good. */
+export const HOARD_CAST_SILK_SNARE = 'hoard_cast_silk_snare';
 export const HOARD_CAST_DOOM_RITUAL = 'hoard_cast_doom_ritual';
 
 export const HOARD_ADD_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['school'] }>> =
@@ -60,4 +62,5 @@ export const HOARD_ADD_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['sch
     [HOARD_CAST_VOID_EMPOWER]: { school: 'shadow' },
     [HOARD_CAST_WEBBING]: { school: 'nature' },
     [HOARD_CAST_DOOM_RITUAL]: { school: 'shadow' },
+    [HOARD_CAST_SILK_SNARE]: { school: 'nature' },
   });

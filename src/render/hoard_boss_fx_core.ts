@@ -40,6 +40,9 @@ export function hoardCueAppearance(cue: HoardBossCueView): HoardCueAppearancePla
       return { shape: 'wave', palette: 'tide', countdown: 'none', elementalRider: true };
     case 'tide-tether':
       return { shape: 'tether', palette: 'tide', countdown: 'none', elementalRider: true };
+    case 'venom-silk':
+      // A thread of silk from her to a player: the tide's tether in bone-white.
+      return { shape: 'tether', palette: 'physical', countdown: 'none', elementalRider: false };
     case 'frost-ring':
       return { shape: 'annulus', palette: 'frost', countdown: 'annulus', elementalRider: true };
     case 'arcane-horizon':

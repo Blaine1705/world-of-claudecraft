@@ -49,6 +49,7 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.hoard_cast_webbing': true,
   'abilityUi.cast.hoard_cast_doom_ritual': true,
   'abilityUi.cast.hoard_cast_charge': true,
+  'abilityUi.cast.hoard_cast_silk_snare': true,
   'abilityUi.cast.hoard_cast_silence': true,
   'abilityUi.cast.hoard_cast_hex': true,
   'abilityUi.cast.hoard_lightning_strike': true,

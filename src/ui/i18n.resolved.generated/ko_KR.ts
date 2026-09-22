@@ -11202,6 +11202,7 @@ export const ko_KR: EnTranslations = {
       "hoard_cast_webbing": "Webbing",
       "hoard_cast_doom_ritual": "Doom Ritual",
       "hoard_cast_charge": "Charge",
+      "hoard_cast_silk_snare": "Silk Snare",
       "hoard_cast_silence": "침묵의 비명",
       "hoard_cast_hex": "주술",
       "hoard_lightning_strike": "번개 강타",

@@ -25,7 +25,7 @@ function graskRoom(): { sim: Sim; inst: RiftInstance; boss: Entity; state: Hoard
   sim.chat('/dev hoard grask', sim.player.id);
   const inst = sim.riftInstances.find((candidate) => candidate.partyKey !== null);
   if (!inst) throw new Error('missing hoard');
-  const boss = sim.ctx.entities.get(inst.bossId);
+  const boss = inst.bossId === null ? undefined : sim.ctx.entities.get(inst.bossId);
   if (!boss) throw new Error('missing boss');
   expect(boss.templateId).toBe('rift_boss_brute');
   for (const id of inst.mobIds) {
@@ -65,7 +65,7 @@ describe('Grask charge', () => {
     expect(hoardCueAppearance({ variant: 'brute-charge', kind: 'sweep' } as never).shape).toBe(
       'sector',
     );
-    expect(hoardMechanicBeats('brute-charge').length).toBeGreaterThan(0);
+    expect(hoardMechanicBeats('brute-charge')?.length ?? 0).toBeGreaterThan(0);
     expect(devHoardDestination('grask')).not.toBeNull();
   });
 
