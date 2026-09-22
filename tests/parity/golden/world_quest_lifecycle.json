@@ -1088,8 +1088,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "bb9dcf22",
-      "events": "f061f193",
+      "state": "d9731182",
+      "events": "e239d8eb",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1202,9 +1202,9 @@
           "worldQuestCycle": "wq1_3",
           "worldQuestLog": [
             [
-              "wq_thornpeak_stormcrag",
+              "wq_thornpeak_zealots",
               {
-                "questId": "wq_thornpeak_stormcrag",
+                "questId": "wq_thornpeak_zealots",
                 "state": "active"
               }
             ]
@@ -1235,7 +1235,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 9.533061,
+          "fallStartY": 14.526649,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
@@ -1251,9 +1251,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 122,
-            "y": 9.533061,
-            "z": 778
+            "x": 56,
+            "y": 14.526649,
+            "z": 837
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -1284,7 +1284,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "bb9dcf22",
+      "state": "d9731182",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1398,9 +1398,9 @@
           "worldQuestCycle": "wq1_3",
           "worldQuestLog": [
             [
-              "wq_thornpeak_stormcrag",
+              "wq_thornpeak_zealots",
               {
-                "questId": "wq_thornpeak_stormcrag",
+                "questId": "wq_thornpeak_zealots",
                 "state": "active"
               }
             ]
@@ -1431,7 +1431,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 9.533061,
+          "fallStartY": 14.526649,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
@@ -1447,9 +1447,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 122,
-            "y": 9.533061,
-            "z": 778
+            "x": 56,
+            "y": 14.526649,
+            "z": 837
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
