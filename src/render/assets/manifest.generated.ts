@@ -404,7 +404,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/grix.glb": "/media/models/creatures/grix.224bc3592577.glb",
   "models/creatures/grubjaw.glb": "/media/models/creatures/grubjaw.6d109e187a99.glb",
   "models/creatures/hoard_abyssal_maw.glb": "/media/models/creatures/hoard_abyssal_maw.92421142d961.glb",
-  "models/creatures/hoard_archon_nyxaris.glb": "/media/models/creatures/hoard_archon_nyxaris.8730ba2454b0.glb",
+  "models/creatures/hoard_archon_nyxaris.glb": "/media/models/creatures/hoard_archon_nyxaris.0322aa40ba1c.glb",
   "models/creatures/hoard_boneclad_warrior.glb": "/media/models/creatures/hoard_boneclad_warrior.fc17f59f11c5.glb",
   "models/creatures/hoard_brood_cocoon.glb": "/media/models/creatures/hoard_brood_cocoon.b99488a9a932.glb",
   "models/creatures/hoard_deep_lurker.glb": "/media/models/creatures/hoard_deep_lurker.c898c18e443c.glb",

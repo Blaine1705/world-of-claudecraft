@@ -40,7 +40,7 @@ node scripts/assets/hoard_bosses/rigid_head.mjs <rigged.glb> <shipped.glb> --nec
 node scripts/assets/hoard_bosses/rigid_hands.mjs <rigged.glb> <shipped.glb> --wrist <x>
 ```
 
-Shipped values: Nyxaris `--neck 0.27 --band 0.1 --radius 0.9`; Vharok `--neck 0.0
+Shipped values: Nyxaris `--neck 0.18 --band 0.06 --radius 1.3` (the face jiggled at 0.9); Vharok `--neck 0.0
 --band 0.1 --radius 1.35 --width 0.62 --behind -0.3 --lateral 0.4 --above 0.62`;
 Emberforge `--wrist 1.62 --band 0.05 --joint wrist`.
 
