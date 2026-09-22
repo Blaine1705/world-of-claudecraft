@@ -58,10 +58,10 @@ describe('Sim.threatMod (sim.ctx.threatMod)', () => {
       const sim = makeSim('paladin');
       sim.setPlayerLevel(16);
       expect(sim.setSpec('protection')).toBe(true);
-      // Oathward: threatPct 0.4 scaled by the level-16 mastery ramp (16/20) = 0.32,
-      // giving 1.32 exactly (the same fixture tests/threat.test.ts's Burning Oath case
+      // Oathward: threatPct 1.0 scaled by the level-16 mastery ramp (16/20) = 0.8,
+      // giving 1.8 exactly (the same fixture tests/threat.test.ts's Burning Oath case
       // establishes independently). No righteous_fury bonus: school is physical.
-      const protectionMasteryThreat = 1.32;
+      const protectionMasteryThreat = 1.8;
       expect(sim.ctx.threatMod(sim.player, 'physical')).toBeCloseTo(protectionMasteryThreat, 5);
     });
 
@@ -69,7 +69,7 @@ describe('Sim.threatMod (sim.ctx.threatMod)', () => {
       const sim = makeSim('paladin');
       sim.setPlayerLevel(16);
       expect(sim.setSpec('protection')).toBe(true);
-      const protectionMasteryThreat = 1.32;
+      const protectionMasteryThreat = 1.8;
       // Arcane is neither the melee-default 'physical' nor 'holy': confirms the
       // righteous_fury branch gates on the school STRING exactly, not on "any
       // non-physical school" or any other loose match.
@@ -83,7 +83,7 @@ describe('Sim.threatMod (sim.ctx.threatMod)', () => {
       sim.setPlayerLevel(16);
       expect(sim.setSpec('protection')).toBe(true);
       expect(sim.resolvedAbility('righteous_fury')?.def.passive).toBe(true);
-      expect(sim.ctx.threatMod(sim.player, 'holy')).toBeCloseTo(1.716, 5);
+      expect(sim.ctx.threatMod(sim.player, 'holy')).toBeCloseTo(2.34, 5);
     });
 
     it('does not apply the righteous_fury bonus when the known entry is not passive (control)', () => {
@@ -99,7 +99,7 @@ describe('Sim.threatMod (sim.ctx.threatMod)', () => {
       const original = expectDefined(meta.known[idx]);
       expect(original.def.passive).toBe(true);
       meta.known[idx] = { ...original, def: { ...original.def, passive: false } };
-      const protectionMasteryThreat = 1.32;
+      const protectionMasteryThreat = 1.8;
       expect(sim.ctx.threatMod(sim.player, 'holy')).toBeCloseTo(protectionMasteryThreat, 5);
     });
 
@@ -125,8 +125,8 @@ describe('threat calculation isolation', () => {
     const source = entityStub('player', sim.playerId, ['form_bear']);
     const draws: number[] = [];
     sim.ctx.rng.setObserver((value) => draws.push(value));
-    expect(sim.ctx.threatMod(source, 'physical')).toBeCloseTo(1.716, 5);
-    expect(sim.ctx.threatMod(source, 'holy')).toBeCloseTo(2.2308, 5);
+    expect(sim.ctx.threatMod(source, 'physical')).toBeCloseTo(2.34, 5);
+    expect(sim.ctx.threatMod(source, 'holy')).toBeCloseTo(3.042, 5);
     expect(draws).toEqual([]);
   });
 
@@ -137,8 +137,8 @@ describe('threat calculation isolation', () => {
     const unspecialized = makeSim('paladin');
     unspecialized.setPlayerLevel(16);
     expect(unspecialized.playerId).toBe(protection.playerId);
-    expect(protection.ctx.threatMod(protection.player, 'holy')).toBeCloseTo(1.716, 5);
+    expect(protection.ctx.threatMod(protection.player, 'holy')).toBeCloseTo(2.34, 5);
     expect(unspecialized.ctx.threatMod(unspecialized.player, 'holy')).toBe(1);
-    expect(protection.ctx.threatMod(protection.player, 'holy')).toBeCloseTo(1.716, 5);
+    expect(protection.ctx.threatMod(protection.player, 'holy')).toBeCloseTo(2.34, 5);
   });
 });
