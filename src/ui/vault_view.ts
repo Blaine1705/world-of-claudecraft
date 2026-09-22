@@ -87,6 +87,13 @@ export interface VaultPooledRowModel extends VaultRowBase {
 export interface VaultSpecialRowModel extends VaultRowBase {
   kind: 'special';
   specialRef: VaultSpecialRef;
+  /** Whether the painter shows this row's OWN count (the x{count} chip).
+   *  The chip exists to tell one identity row from the other rows of the
+   *  same material; when this row is the material's entire stock it would
+   *  only repeat the used half of the count/cap readout (x200 beside
+   *  200/200), so it is hidden. Decided here so every painter agrees, and
+   *  the hidden aria copy still carries the row's own count regardless. */
+  ownCountShown: boolean;
   /** Snapshot of the full composition shown by the source details action. */
   materialSources?: MaterialComposition;
   instance?: ItemInstancePayload;
@@ -206,11 +213,13 @@ export function buildVaultView(info: VaultInfo | null, lookup: BankItemLookup): 
       // payloads split: a charge-bearing or locked payload is one identity per
       // unit and moves whole, so its row offers no chosen-quantity action.
       const splittable = !vaultRowMovesWhole(slot.instance) && slot.count > 0;
+      const base = common(slot.itemId, slot.count);
       const row: VaultSpecialRowModel = {
         kind: 'special',
-        ...common(slot.itemId, slot.count),
+        ...base,
         canChooseQuantity: splittable,
         partialMax: splittable ? slot.count : null,
+        ownCountShown: vaultRowOwnCountShown(base.count, base.storedTotal),
         specialRef,
         ...(materialSources === undefined ? {} : { materialSources }),
         ...(instance === undefined ? {} : { instance }),
@@ -423,6 +432,13 @@ export function vaultWithdrawFit(
 ): number {
   const fit = countFit(inventory, bagPools(bags), itemId, want, instance, craftedRecipeId);
   return vaultRowMovesWhole(instance) && fit < want ? 0 : fit;
+}
+
+/** The one rule behind VaultSpecialRowModel.ownCountShown: a row's own count
+ *  is worth a chip only when other rows of the same material exist, i.e. the
+ *  row count is not the material's stored total. */
+export function vaultRowOwnCountShown(count: number, storedTotal: number): boolean {
+  return count !== storedTotal;
 }
 
 function saneStoredCount(count: number): number {

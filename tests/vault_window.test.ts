@@ -1067,7 +1067,33 @@ describe('signature-driven repaints', () => {
 
     const fresh = h.root.querySelector('.vault-row-special') as HTMLElement;
     expect(fresh.dataset.probe).toBeUndefined();
-    expect(fresh.querySelector('.vault-row-stack-count')?.textContent).toContain('2');
+    expect(fresh.querySelector('.vault-row-count')?.textContent).toBe('2/40');
+  });
+
+  it('a special row that is the whole material stock renders no x-count chip', () => {
+    // The chip would read x2 beside 2/40: the same number twice on one row.
+    // Beside pooled stock of the same material it is the only per-row count,
+    // so it stays, and the hidden aria copy always keeps the row's own count.
+    const h = harness(
+      vaultInfo({
+        stock: { tin_ore: 5 },
+        special: [
+          { itemId: 'copper_ore', count: 2, instance: { signer: 'Ada' } },
+          { itemId: 'tin_ore', count: 3, instance: { signer: 'Ada' } },
+        ],
+      }),
+    );
+    h.window.open();
+    clickVaultTab(h);
+    h.window.refreshIfChanged();
+    const rows = Array.from(h.root.querySelectorAll<HTMLElement>('.vault-row-special'));
+    const copper = rows.find((r) => r.dataset.itemId === 'copper_ore');
+    const tin = rows.find((r) => r.dataset.itemId === 'tin_ore');
+    expect(copper?.querySelector('.vault-row-stack-count')).toBeNull();
+    expect(copper?.querySelector('.vault-row-count')?.textContent).toBe('2/40');
+    expect(copper?.textContent).toContain('2 of 40 stored');
+    expect(tin?.querySelector('.vault-row-stack-count')?.textContent).toBe('x3');
+    expect(tin?.querySelector('.vault-row-count')?.textContent).toBe('8/40');
   });
 
   it('a special-row reorder repaints exact index selectors even when fingerprints duplicate', () => {

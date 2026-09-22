@@ -196,6 +196,29 @@ describe('buildVaultView', () => {
     );
   });
 
+  it('a special row shows its own count ONLY when it is not the whole material total', () => {
+    // The row-count chip (x{count}) exists to tell one identity row from the
+    // other rows of the SAME material. When the row IS the material's entire
+    // stock, the chip repeats the total half of the count/cap readout, so the
+    // model hides it; a material split across several rows keeps it on each.
+    const alone = slot('copper_ore', 7, { instance: { signer: 'Ada' } });
+    const beside = slot('tin_ore', 2, { instance: { signer: 'Ada' } });
+    const twinA = slot('ashwood_log', 1, { instance: { signer: 'Ada' } });
+    const twinB = slot('ashwood_log', 3, { instance: { signer: 'Rin' } });
+    const model = buildVaultView(
+      vinfo({ tin_ore: 5 }, 1, 40, 50000, [alone, beside, twinA, twinB]),
+      lookup,
+    );
+    if (model.kind !== 'vault') throw new Error('expected vault');
+    const shown = (itemId: string) =>
+      model.rows
+        .filter((row) => row.kind === 'special' && row.itemId === itemId)
+        .map((row) => (row.kind === 'special' ? row.ownCountShown : null));
+    expect(shown('copper_ore')).toEqual([false]);
+    expect(shown('tin_ore')).toEqual([true]);
+    expect(shown('ashwood_log')).toEqual([true, true]);
+  });
+
   it('a fine grade sorts BESIDE its base (base first) and carries the fine flag (PIN MOVED)', () => {
     // PIN MOVED (Phase 04 QA, the v0.36.0 merge-drift repair): the release
     // made fine-beside-base the every-container rule (compareBagStacks in

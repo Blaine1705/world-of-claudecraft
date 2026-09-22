@@ -390,7 +390,7 @@ export class VaultTab {
       cornerMarkHtml(cornerMark) +
       lockMarkHtml(locked) +
       `<span class="vault-row-name">${esc(name)}</span>` +
-      (model.kind === 'special'
+      (model.kind === 'special' && model.ownCountShown
         ? `<span class="vault-row-stack-count ui-chip">${esc(t('itemUi.bags.stackCount', { count: countLabel }))}</span>`
         : '') +
       `<span class="vault-row-count">${esc(t('hudChrome.bank.capacity', { used: totalLabel, total: capLabel }))}</span>` +
