@@ -10,19 +10,18 @@
 //
 // This table closes that, and it is per RARITY on purpose. Head count keeps a
 // solo run fair; rarity is what makes a legendary hoard cost more than a common
-// one for whoever walks in, alone included. Mechanic damage is a share of the
-// victim's own health, so it needs no head count term: it is already the same
-// threat to one player as to each of five.
+// one for whoever walks in, alone included. Mechanic damage is a flat amount per
+// player hit, so it needs no head count term: it is already the same threat to
+// one player as to each of five.
 //
 // Pure data plus one lookup. Rare is the baseline (every mechanic was tuned on
 // it), so a rare hoard plays exactly as before.
 
 import type { TreasureMapRarity } from '../content/treasure_maps';
-import type { Entity } from '../types';
 import type { RiftInstance } from './types';
 
 export interface HoardPressure {
-  /** Multiplier on every boss mechanic's damage (a share of the victim's health). */
+  /** Multiplier on every boss mechanic's damage. */
   damage: number;
   /** Multiplier on the time BETWEEN a boss's mechanics: below 1 they come faster. */
   cadence: number;
@@ -65,10 +64,18 @@ export function hoardPressure(vault: RiftInstance['vault'] | undefined): HoardPr
   return vault ? HOARD_RARITY_PRESSURE[vault.rarity] : BASELINE;
 }
 
-/** What one boss mechanic does to `player`: `fraction` of their health, pressed
- *  by the rarity of the hoard `inst`. Every hoard mechanic goes through here, so
+/** The health a mechanic's `fraction` is read against: a level-20 damage dealer
+ *  in good gear (cloth tops out near 1,300 to 1,460, tanks near 2,000). Mechanics
+ *  hit a FLAT amount, not a share of the victim's own health: with a share,
+ *  stamina bought nothing against them and non-tanks dropped it (playtest). */
+export const HOARD_REFERENCE_HEALTH = 1200;
+
+/** What one boss mechanic does to whoever it hits: `fraction` of the reference
+ *  health, pressed by the rarity of the hoard `inst`. The same number lands on a
+ *  tank and a mage; more stamina means more room to take it. No cap: a mechanic
+ *  stood in on low health can kill. Every hoard mechanic goes through here, so
  *  the rarity ladder holds for all eight bosses and their casters. */
-export function hoardMechanicDamage(inst: RiftInstance, player: Entity, fraction: number): number {
+export function hoardMechanicDamage(inst: RiftInstance, fraction: number): number {
   const scale = hoardPressure(inst.vault).damage;
-  return Math.max(1, Math.round(player.maxHp * fraction * scale));
+  return Math.max(1, Math.round(HOARD_REFERENCE_HEALTH * fraction * scale));
 }

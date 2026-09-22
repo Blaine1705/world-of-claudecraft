@@ -77,7 +77,7 @@ export const PULSARS = Object.freeze({
   beamShareSec: 6,
   /** BEAM_WIDTH: the burning core's radius. The drawn core is built to it. */
   beamWidth: 0.9,
-  /** BEAM_DAMAGE per tick, as a share of the victim's health, and BEAM_DAMAGE_TICK. */
+  /** BEAM_DAMAGE per tick, as a share of the reference health, and BEAM_DAMAGE_TICK. */
   beamDamageFraction: 0.11,
   beamDamageTickSec: 0.3,
   /** The beam's cue is a heartbeat: re-sent this often, living this long, so a

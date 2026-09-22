@@ -39,7 +39,6 @@ import {
   stepBeamAim,
 } from './hoard_pulsars_core';
 import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_PULSARS_ABILITY = 'Twin Pulsars';
@@ -460,7 +459,7 @@ function tickOrb(
     ctx.dealDamage(
       boss,
       player,
-      hoardMechanicDamage(inst, player, PULSARS.beamDamageFraction),
+      hoardMechanicDamage(inst, PULSARS.beamDamageFraction),
       false,
       'arcane',
       HOARD_PULSAR_BEAM_ABILITY,
@@ -540,10 +539,7 @@ export function tickHoardPulsars(
       ctx.dealDamage(
         boss,
         player,
-        capRiftNonLethalMechanicDamage(
-          hoardMechanicDamage(inst, player, PULSARS.overloadDamageFraction),
-          player.maxHp,
-        ),
+        hoardMechanicDamage(inst, PULSARS.overloadDamageFraction),
         false,
         'arcane',
         HOARD_PULSAR_OVERLOAD_ABILITY,

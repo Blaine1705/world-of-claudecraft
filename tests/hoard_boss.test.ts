@@ -44,7 +44,7 @@ import {
   HOARD_TIDE_WAVE,
   hoardMarkSpec,
 } from '../src/sim/rift/hoard_boss_kits';
-import { HOARD_RARITY_PRESSURE } from '../src/sim/rift/hoard_scaling';
+import { HOARD_RARITY_PRESSURE, HOARD_REFERENCE_HEALTH } from '../src/sim/rift/hoard_scaling';
 import { bossInStormField, HOARD_STORM_SURGE_AURA_ID } from '../src/sim/rift/hoard_storm_surge';
 import { riftStateEventFor } from '../src/sim/rift/runs';
 import type { HoardBossState, RiftInstance } from '../src/sim/rift/types';
@@ -342,9 +342,9 @@ describe('Buried Hoard boss encounter', () => {
     ).toHaveLength(HOARD_SWEEP_METEOR_COUNT);
     expect(inst.hoardBoss?.cues).toHaveLength(1);
     const impactEvents = tickMechanic(sim, HOARD_SWEEP_WINDUP_SEC);
-    // A legendary hoard: the authored share, pressed by the map's rarity.
+    // A legendary hoard: a flat share of the reference health, pressed by rarity.
     expect(sim.player.hp).toBe(
-      hpBefore - Math.round(sim.player.maxHp * 0.24 * HOARD_RARITY_PRESSURE.legendary.damage),
+      hpBefore - Math.round(HOARD_REFERENCE_HEALTH * 0.24 * HOARD_RARITY_PRESSURE.legendary.damage),
     );
     expect(
       impactEvents.filter((event) => event.type === 'spellfxAt' && event.fx === 'meteorImpact'),
@@ -396,7 +396,7 @@ describe('Buried Hoard boss encounter', () => {
     const hpBefore = sim.player.hp;
     tickMechanic(sim, HOARD_MARK_WINDUP_SEC);
     expect(sim.player.hp).toBe(
-      hpBefore - Math.round(sim.player.maxHp * 0.18 * HOARD_RARITY_PRESSURE.legendary.damage),
+      hpBefore - Math.round(HOARD_REFERENCE_HEALTH * 0.18 * HOARD_RARITY_PRESSURE.legendary.damage),
     );
     sim.player.pos.x += 10;
     tickMechanic(sim, HOARD_MARK_HAZARD_TICK_SEC * 0.5);
@@ -404,7 +404,8 @@ describe('Buried Hoard boss encounter', () => {
     const beforePulse = sim.player.hp;
     tickMechanic(sim, HOARD_MARK_HAZARD_TICK_SEC);
     expect(sim.player.hp).toBe(
-      beforePulse - Math.round(sim.player.maxHp * 0.03 * HOARD_RARITY_PRESSURE.legendary.damage),
+      beforePulse -
+        Math.round(HOARD_REFERENCE_HEALTH * 0.03 * HOARD_RARITY_PRESSURE.legendary.damage),
     );
     sim.player.pos.x += 10;
     const afterLeaving = sim.player.hp;
@@ -721,6 +722,9 @@ describe('Buried Hoard boss encounter', () => {
 
   it('surges Vharok while he stands in his charged ground and bleeds it off outside', () => {
     const { sim, inst, boss } = makeEncounter('rift_boss_storm');
+    // The surge is under test, not the player's survival: a naked level-20
+    // body does not outlast a legendary storm's flat damage.
+    sim.chat('/dev god', sim.player.id);
     tickHoardBossMechanics(sim.ctx);
     sim.drainEvents();
     const baseScale = boss.scale;

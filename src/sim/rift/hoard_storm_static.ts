@@ -1,7 +1,6 @@
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { hoardMechanicDamage } from './hoard_scaling';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_STATIC_RADIUS = 6;
@@ -91,10 +90,7 @@ export function tickHoardStormStaticCue(
   ctx.dealDamage(
     boss,
     player,
-    capRiftNonLethalMechanicDamage(
-      hoardMechanicDamage(inst, player, HOARD_STATIC_DAMAGE_FRACTION),
-      player.maxHp,
-    ),
+    hoardMechanicDamage(inst, HOARD_STATIC_DAMAGE_FRACTION),
     false,
     'nature',
     'Chain Lightning',

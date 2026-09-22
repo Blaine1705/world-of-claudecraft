@@ -69,7 +69,6 @@ import {
 } from './hoard_tentacles';
 import { tickHoardTidePattern } from './hoard_tide_encounter';
 import { HOARD_TIDE_RECOVERY_SEC } from './hoard_tide_pattern';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossCueVariant, HoardBossState, RiftInstance } from './types';
 
 export { HOARD_BROOD_EGG_TEMPLATE, type HoardBossKit, hoardBossKit } from './hoard_boss_kits';
@@ -84,7 +83,7 @@ export const HOARD_MARK_ENRAGED_WINDUP_SEC = 1.65;
 export const HOARD_MARK_HAZARD_SEC = 2;
 export const HOARD_MARK_HAZARD_TICK_SEC = 0.5;
 export const HOARD_SWEEP_METEOR_COUNT = 5;
-/** Share of max health a scattered Emberforge meteor deals to anyone under it. */
+/** Share of the reference health a scattered Emberforge meteor deals to anyone under it. */
 export const HOARD_SWEEP_METEOR_DAMAGE_FRACTION = 0.14;
 export const HOARD_BONE_WAVE_COUNT = 4;
 export const HOARD_BROOD_EGG_COUNT = 4;
@@ -584,10 +583,7 @@ function hitPlayersInTideWave(
     ctx.dealDamage(
       boss,
       player,
-      capRiftNonLethalMechanicDamage(
-        hoardMechanicDamage(inst, player, HOARD_TIDE_WAVE.damageFraction),
-        player.maxHp,
-      ),
+      hoardMechanicDamage(inst, HOARD_TIDE_WAVE.damageFraction),
       false,
       HOARD_TIDE_WAVE.school,
       HOARD_TIDE_WAVE.ability,
@@ -635,7 +631,7 @@ function hitPlayersInSweep(
     ctx.dealDamage(
       boss,
       player,
-      hoardMechanicDamage(inst, player, spec.damageFraction),
+      hoardMechanicDamage(inst, spec.damageFraction),
       false,
       spec.school,
       spec.ability,
@@ -654,7 +650,7 @@ function hitPlayersInSweep(
         ctx.dealDamage(
           boss,
           player,
-          hoardMechanicDamage(inst, player, HOARD_SWEEP_METEOR_DAMAGE_FRACTION),
+          hoardMechanicDamage(inst, HOARD_SWEEP_METEOR_DAMAGE_FRACTION),
           false,
           'fire',
           'Emberfall',
@@ -726,11 +722,8 @@ function hitPlayersInMark(
         boss,
         player,
         cue.variant === 'storm-orbital-impact'
-          ? capRiftNonLethalMechanicDamage(
-              hoardMechanicDamage(inst, player, fraction),
-              player.maxHp,
-            )
-          : hoardMechanicDamage(inst, player, fraction),
+          ? hoardMechanicDamage(inst, fraction)
+          : hoardMechanicDamage(inst, fraction),
         false,
         spec.school,
         spec.ability,

@@ -24,7 +24,6 @@ import { HOARD_BOULDER_STAGGER_AURA_ID } from './hoard_boulder_core';
 import { HOARD_CAST_CHARGE } from './hoard_control_cast_ids';
 import { hoardMechanicDamage } from './hoard_scaling';
 import { tideFloorBlocked } from './hoard_tide_fit';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import { generateRiftFloor } from './rift_gen';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
@@ -43,7 +42,7 @@ export const CHARGE = Object.freeze({
   halfWidth: 2.2,
   /** Sector half angle the lane is drawn with (a narrow fan from him). */
   laneHalfAngle: 0.055,
-  /** A bowled player: this far along the lane, and this much of their health. */
+  /** A bowled player: this far along the lane, and this share of the reference health. */
   knockYards: 9,
   damageFraction: 0.18,
   /** He reels for this long after a wall. */
@@ -225,10 +224,7 @@ function bowl(
   ctx.dealDamage(
     boss,
     player,
-    capRiftNonLethalMechanicDamage(
-      hoardMechanicDamage(inst, player, CHARGE.damageFraction),
-      player.maxHp,
-    ),
+    hoardMechanicDamage(inst, CHARGE.damageFraction),
     false,
     'physical',
     'Charge',

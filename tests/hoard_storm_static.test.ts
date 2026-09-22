@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { runMobSwingAffixes } from '../src/sim/mob/mob_swing';
 import { tickHoardBossMechanics } from '../src/sim/rift/hoard_boss';
-import { HOARD_RARITY_PRESSURE } from '../src/sim/rift/hoard_scaling';
+import { HOARD_RARITY_PRESSURE, HOARD_REFERENCE_HEALTH } from '../src/sim/rift/hoard_scaling';
 import {
   HOARD_STATIC_DAMAGE_FRACTION,
   HOARD_STATIC_RADIUS,
@@ -116,7 +116,9 @@ describe('Hoard Tempest static', () => {
     // A legendary hoard: the authored share, pressed by the map's rarity.
     expect(damage.mock.calls[0][2]).toBe(
       Math.round(
-        sim.player.maxHp * HOARD_STATIC_DAMAGE_FRACTION * HOARD_RARITY_PRESSURE.legendary.damage,
+        HOARD_REFERENCE_HEALTH *
+          HOARD_STATIC_DAMAGE_FRACTION *
+          HOARD_RARITY_PRESSURE.legendary.damage,
       ),
     );
     expect(damage.mock.calls[0][2]).toBeLessThan(sim.player.maxHp);

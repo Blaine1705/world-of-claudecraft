@@ -26,7 +26,6 @@ import {
   HOARD_LIGHTNING_STRIKE_CAST_SCHOOL,
 } from './hoard_control_cast_ids';
 import { hoardMechanicDamage } from './hoard_scaling';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, RiftInstance } from './types';
 
 /** Every tunable in one place. */
@@ -38,7 +37,7 @@ export const HOARD_LIGHTNING_STRIKE = {
   telegraphSec: 2.2,
   /** Circle radius in yards: the telegraph AND the hitbox. */
   radius: 3.2,
-  /** Share of the victim's max health the bolt deals. */
+  /** Share of the reference health the bolt deals. */
   damageFraction: 0.22,
   /** Seconds between one caller's strikes, and before its first. */
   cooldownSec: 8,
@@ -170,10 +169,7 @@ function land(
     ctx.dealDamage(
       caster,
       player,
-      capRiftNonLethalMechanicDamage(
-        hoardMechanicDamage(inst, player, HOARD_LIGHTNING_STRIKE.damageFraction),
-        player.maxHp,
-      ),
+      hoardMechanicDamage(inst, HOARD_LIGHTNING_STRIKE.damageFraction),
       false,
       'nature',
       'Lightning Strike',

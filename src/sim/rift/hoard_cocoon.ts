@@ -36,7 +36,6 @@ import {
   hoardMechanicDamage,
   hoardPressure,
 } from './hoard_scaling';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_COCOON_ABILITY = 'Cocoon';
@@ -261,10 +260,7 @@ function feed(
   // A wrapped player can do nothing about it, so her feeding alone never kills:
   // it takes them to a sliver and no further. What it costs the party is her
   // healing, and a player one stray hit from dead.
-  const amount = Math.min(
-    capRiftNonLethalMechanicDamage(hoardMechanicDamage(inst, victim, fraction), victim.maxHp),
-    Math.floor(victim.hp) - 1,
-  );
+  const amount = Math.min(hoardMechanicDamage(inst, fraction), Math.floor(victim.hp) - 1);
   if (amount > 0)
     ctx.dealDamage(boss, victim, amount, false, 'nature', HOARD_COCOON_DRAIN_ABILITY, 'hit', true);
   const drunk = Math.max(0, before - victim.hp);

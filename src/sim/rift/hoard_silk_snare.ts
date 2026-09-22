@@ -17,7 +17,6 @@ import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
 import { HOARD_CAST_SILK_SNARE } from './hoard_control_cast_ids';
 import { hoardMechanicDamage } from './hoard_scaling';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const SILK_SNARE = Object.freeze({
@@ -206,10 +205,7 @@ export function tickHoardSilkSnare(
       ctx.dealDamage(
         boss,
         player,
-        capRiftNonLethalMechanicDamage(
-          hoardMechanicDamage(inst, player, SILK_SNARE.damagePerSec * SILK_SNARE.biteSec),
-          player.maxHp,
-        ),
+        hoardMechanicDamage(inst, SILK_SNARE.damagePerSec * SILK_SNARE.biteSec),
         false,
         'nature',
         'Silk Snare',

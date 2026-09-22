@@ -15,7 +15,6 @@ import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
 import { hoardMechanicDamage } from './hoard_scaling';
 import { GRAB_TELEGRAPH_TOTAL_SEC, grabReaches, TENTACLES } from './hoard_tentacles_core';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_TENTACLE_GRASP_ABILITY = 'Crushing Coil';
@@ -133,10 +132,7 @@ function squeeze(
   fraction: number,
 ): void {
   // Held, they can do nothing about it, so its squeeze alone never kills.
-  const amount = Math.min(
-    capRiftNonLethalMechanicDamage(hoardMechanicDamage(inst, victim, fraction), victim.maxHp),
-    Math.floor(victim.hp) - 1,
-  );
+  const amount = Math.min(hoardMechanicDamage(inst, fraction), Math.floor(victim.hp) - 1);
   if (amount <= 0) return;
   ctx.dealDamage(boss, victim, amount, false, 'shadow', HOARD_TENTACLE_GRASP_ABILITY, 'hit', true);
 }

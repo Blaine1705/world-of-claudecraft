@@ -53,7 +53,6 @@ import {
   tentacleOffsets,
   WHIP_TOTAL_SEC,
 } from './hoard_tentacles_core';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_TENTACLES_ABILITY = 'Tentacles of the Abyss';
@@ -223,10 +222,7 @@ function erupt(
     ctx.dealDamage(
       boss,
       player,
-      capRiftNonLethalMechanicDamage(
-        hoardMechanicDamage(inst, player, TENTACLES.eruptDamageFraction),
-        player.maxHp,
-      ),
+      hoardMechanicDamage(inst, TENTACLES.eruptDamageFraction),
       false,
       'shadow',
       HOARD_TENTACLES_ABILITY,
@@ -449,13 +445,9 @@ function strike(
   ctx.dealDamage(
     boss,
     player,
-    capRiftNonLethalMechanicDamage(
-      hoardMechanicDamage(
-        inst,
-        player,
-        kind === 'whip' ? TENTACLES.whipDamageFraction : TENTACLES.sweepDamageFraction,
-      ),
-      player.maxHp,
+    hoardMechanicDamage(
+      inst,
+      kind === 'whip' ? TENTACLES.whipDamageFraction : TENTACLES.sweepDamageFraction,
     ),
     false,
     'shadow',

@@ -36,7 +36,6 @@ import {
 import { hoardBossKit } from './hoard_boss_kits';
 import { measureHoardRoom } from './hoard_room';
 import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export { HOARD_HARVESTED_SOUL_AURA_ID };
@@ -296,10 +295,7 @@ function tickScythe(
     ctx.dealDamage(
       boss,
       player,
-      capRiftNonLethalMechanicDamage(
-        hoardMechanicDamage(inst, player, BONE_SCYTHE.damageFraction),
-        player.maxHp,
-      ),
+      hoardMechanicDamage(inst, BONE_SCYTHE.damageFraction),
       false,
       'shadow',
       HOARD_SCYTHE_ABILITY,

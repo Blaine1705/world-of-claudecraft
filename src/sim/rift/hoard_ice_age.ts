@@ -29,7 +29,6 @@ import {
 } from './hoard_ice_age_core';
 import { measureHoardRoom } from './hoard_room';
 import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_ICE_AGE_ABILITY = 'Ice Age';
@@ -189,10 +188,7 @@ function landIcicles(
       ctx.dealDamage(
         boss,
         player,
-        capRiftNonLethalMechanicDamage(
-          hoardMechanicDamage(inst, player, ICE_AGE.impactDamageFraction),
-          player.maxHp,
-        ),
+        hoardMechanicDamage(inst, ICE_AGE.impactDamageFraction),
         false,
         'frost',
         HOARD_ICICLE_ABILITY,

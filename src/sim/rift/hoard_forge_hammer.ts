@@ -28,7 +28,6 @@ import {
   hoardMechanicDamage,
   hoardPressure,
 } from './hoard_scaling';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_FORGE_HAMMER_ABILITY = 'Hammer of the Forge';
@@ -231,10 +230,7 @@ function land(
     ctx.dealDamage(
       boss,
       player,
-      capRiftNonLethalMechanicDamage(
-        hoardMechanicDamage(inst, player, FORGE_HAMMER.impactDamageFraction),
-        player.maxHp,
-      ),
+      hoardMechanicDamage(inst, FORGE_HAMMER.impactDamageFraction),
       false,
       'fire',
       HOARD_FORGE_HAMMER_ABILITY,
@@ -297,10 +293,7 @@ export function tickHoardForgeHammerCue(
       ctx.dealDamage(
         boss,
         player,
-        capRiftNonLethalMechanicDamage(
-          hoardMechanicDamage(inst, player, FORGE_HAMMER.ringDamageFraction),
-          player.maxHp,
-        ),
+        hoardMechanicDamage(inst, FORGE_HAMMER.ringDamageFraction),
         false,
         'fire',
         HOARD_FORGE_RING_ABILITY,

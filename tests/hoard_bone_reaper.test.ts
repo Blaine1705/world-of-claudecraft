@@ -35,6 +35,7 @@ import { hoardBossCueViews, tickHoardBossMechanics } from '../src/sim/rift/hoard
 import {
   HOARD_DOUBLE_MECHANIC_INTENSITY,
   HOARD_RARITY_PRESSURE,
+  HOARD_REFERENCE_HEALTH,
   hoardIntensity,
   hoardMechanicDamage,
   hoardPressure,
@@ -529,15 +530,16 @@ describe('the price of a soul, and pressure by party and rarity', () => {
     // Rare is the baseline every mechanic was tuned on: it changes nothing.
     expect(HOARD_RARITY_PRESSURE.rare).toEqual({ damage: 1, cadence: 1, extra: 0, speed: 1 });
     expect(hoardPressure(null)).toEqual(HOARD_RARITY_PRESSURE.rare);
-    // The same blow costs more of a lone player's health in a legendary hoard.
+    // The same blow hits harder in a legendary hoard (a flat share of the
+    // reference health, not of the victim's own).
     const entry = encounter();
     const share = 0.2;
-    expect(hoardMechanicDamage(entry.inst, entry.sim.player, share)).toBe(
-      Math.round(entry.sim.player.maxHp * share * HOARD_RARITY_PRESSURE.legendary.damage),
+    expect(hoardMechanicDamage(entry.inst, share)).toBe(
+      Math.round(HOARD_REFERENCE_HEALTH * share * HOARD_RARITY_PRESSURE.legendary.damage),
     );
     if (entry.inst.vault) entry.inst.vault.rarity = 'common';
-    expect(hoardMechanicDamage(entry.inst, entry.sim.player, share)).toBe(
-      Math.round(entry.sim.player.maxHp * share * HOARD_RARITY_PRESSURE.common.damage),
+    expect(hoardMechanicDamage(entry.inst, share)).toBe(
+      Math.round(HOARD_REFERENCE_HEALTH * share * HOARD_RARITY_PRESSURE.common.damage),
     );
   });
 

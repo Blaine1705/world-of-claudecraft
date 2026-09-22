@@ -29,7 +29,6 @@ import {
   HOARD_CAST_WEBBING,
 } from './hoard_control_cast_ids';
 import { hoardMechanicDamage } from './hoard_scaling';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { RiftInstance } from './types';
 
 export type HoardAddCastKind = 'hook' | 'beam' | 'bolt' | 'empower' | 'web' | 'ritual';
@@ -46,7 +45,7 @@ export interface HoardAddCastDef {
   rangeYards: number;
   school: Aura['school'];
   name: string;
-  /** Share of the victim's max health a hit deals (a beam deals it over its ticks). */
+  /** Share of the reference health (HOARD_REFERENCE_HEALTH) a hit deals (a beam deals it over its ticks). */
   damageFraction?: number;
   /** Web: seconds rooted. Empower: seconds of the buff and its attack power. */
   durationSec?: number;
@@ -229,7 +228,7 @@ function hit(
   ctx.dealDamage(
     caster,
     target,
-    capRiftNonLethalMechanicDamage(hoardMechanicDamage(inst, target, fraction), target.maxHp),
+    hoardMechanicDamage(inst, fraction),
     false,
     def.school,
     def.name,

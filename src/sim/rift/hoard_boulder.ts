@@ -32,7 +32,6 @@ import {
   hoardMechanicDamage,
   hoardPressure,
 } from './hoard_scaling';
-import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_BOULDER_ABILITY = 'Rolling Boulder';
@@ -237,10 +236,7 @@ function crush(
   victim: Entity,
   helpless: boolean,
 ): void {
-  let amount = capRiftNonLethalMechanicDamage(
-    hoardMechanicDamage(inst, victim, BOULDER.crushDamageFraction),
-    victim.maxHp,
-  );
+  let amount = hoardMechanicDamage(inst, BOULDER.crushDamageFraction);
   // A ROOTED mark could do nothing about it, so the boulder alone never kills
   // them: it takes them to a sliver. A lone player who stood in its lane could
   // have moved, and gets no such floor.

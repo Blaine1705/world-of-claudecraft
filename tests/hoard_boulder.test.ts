@@ -25,6 +25,8 @@ import { DT, type Entity, RUN_SPEED, type SimEvent } from '../src/sim/types';
 
 type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
 
+const GEARED_HEALTH = 1400;
+
 function encounter(rarity: Rarity = 'rare') {
   const sim = new Sim({ seed: 5150, playerClass: 'warrior', autoEquip: false, devCommands: true });
   sim.chat('/dev level 20', sim.player.id);
@@ -42,6 +44,9 @@ function encounter(rarity: Rarity = 'rare') {
   boss.aiState = 'attack';
   boss.aggroTargetId = sim.player.id;
   sim.player.pos = { ...boss.pos, z: boss.pos.z - 18 };
+  // A geared level-20 damage dealer's health: the boulder hits a flat amount,
+  // which a naked body (no gear) does not survive, and a geared one does.
+  sim.player.maxHp = GEARED_HEALTH;
   sim.player.hp = sim.player.maxHp;
   tickHoardBossMechanics(sim.ctx);
   sim.drainEvents();
@@ -223,6 +228,34 @@ describe('the boulder in the fight', () => {
       expect(held(entry).boulders).toHaveLength(0);
       expect(held(entry).timer).toBeGreaterThan(BOULDER_EVERY_SEC * 0.8);
     }
+  });
+
+  it('hits a flat amount: stamina survives it, a thin body does not', () => {
+    const lost: number[] = [];
+    for (const health of [GEARED_HEALTH, 2000, 600]) {
+      const entry = encounter();
+      entry.sim.player.maxHp = health;
+      entry.sim.player.hp = health;
+      cast(entry);
+      const [cue] = cuesOf(entry.inst, 'brute-boulder');
+      const rest = run(entry.sim, entry.boss, cue.total + BOULDER.crushSec + 0.5);
+      if (health === 600) {
+        // No safety net: a lone player who stood in its lane on thin health dies.
+        expect(entry.sim.player.dead).toBe(true);
+        continue;
+      }
+      expect(entry.sim.player.dead).toBe(false);
+      const hit = rest.find(
+        (e) =>
+          e.type === 'damage' &&
+          e.ability === 'Rolling Boulder' &&
+          e.targetId === entry.sim.player.id,
+      );
+      lost.push(hit?.type === 'damage' ? hit.amount : 0);
+    }
+    // The tank and the damage dealer took the same blow (it was never a share).
+    expect(lost[0]).toBeGreaterThan(0);
+    expect(lost[1]).toBe(lost[0]);
   });
 
   it('in a party: marks ONE player, roots them, and shows what it asks', () => {
