@@ -13,6 +13,7 @@ import { holdHoardCharge } from '../rift/hoard_charge';
 import { holdHoardIceAge } from '../rift/hoard_ice_age';
 import { holdHoardOrbitalLightning } from '../rift/hoard_orbital_lightning';
 import { holdHoardPulsars } from '../rift/hoard_pulsars';
+import { holdHoardSilkSnare } from '../rift/hoard_silk_snare';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import {
@@ -166,7 +167,8 @@ export function updateMobCombatProfile(
     holdHoardIceAge(ctx, mob) ||
     holdHoardPulsars(ctx, mob) ||
     holdHoardBoulder(ctx, mob) ||
-    holdHoardCharge(ctx, mob)
+    holdHoardCharge(ctx, mob) ||
+    holdHoardSilkSnare(ctx, mob)
   ) {
     onEngagedTick?.('stationary');
     mob.swingTimer = Math.max(0, mob.swingTimer - DT);

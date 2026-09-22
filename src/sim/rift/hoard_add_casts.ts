@@ -6,7 +6,7 @@
 //   Rime Elemental   Rime Beam       a channel that freezes its target a tick at a time
 //   Ember Fiend      Cinder Bolt     a bolt of forge fire
 //   Voidscar Acolyte Void Empowerment  the room's mobs hit harder for a while
-//   Venom Weaver, Thornback Stalker  Webbing   roots its target
+//   Venom Weaver     Webbing         roots its target
 //   Marrow Golem     Doom Ritual     two Boneclad Warriors rise, while any are dead
 //
 // Targeting is deterministic (a cursor, never the rng), the caster keeps fighting
@@ -129,7 +129,6 @@ export const HOARD_ADD_CASTS: Readonly<Record<string, HoardAddCastDef>> = Object
   rift_ember_fiend: BOLT,
   rift_void_acolyte: EMPOWER,
   rift_venom_weaver: WEB,
-  rift_thornback: WEB,
   rift_marrow_golem: RITUAL,
 });
 
@@ -138,7 +137,7 @@ const BEAM_TICK_SEC = 0.5;
 /** The empowerment reaches this far round the acolyte. */
 const EMPOWER_RADIUS = 30;
 /** Where a mob's own on-hit root is silenced: the web is its cast now. */
-export const HOARD_WEB_CASTERS: readonly string[] = ['rift_venom_weaver', 'rift_thornback'];
+export const HOARD_WEB_CASTERS: readonly string[] = ['rift_venom_weaver'];
 
 export interface HoardAddCastState {
   targetCursor: number;

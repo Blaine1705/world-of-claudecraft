@@ -35,7 +35,7 @@ export const CHARGE = Object.freeze({
   /** The aim: a cast bar he keeps turning through. */
   aimSec: 3,
   /** How far he can go before the charge dies out on open floor. */
-  maxYards: 42,
+  maxYards: 75,
   /** Yards a second, and how far ahead the lane is probed for the wall. */
   speed: 22,
   probeStep: 0.5,

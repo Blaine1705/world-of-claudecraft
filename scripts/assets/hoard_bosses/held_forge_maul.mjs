@@ -17,7 +17,7 @@ const TARGET = 'public/models/weapons/hoard_forge_maul.glb';
 /** Overall length in the character's bind units (the stock two-hander is 1.86). */
 const LENGTH = 1.8;
 /** Where his fist closes, measured up the falling model from its face. */
-const GRIP_Y = 10.4;
+const GRIP_Y = 12.1;
 const SOURCE_LENGTH = 12.85;
 
 await MeshoptDecoder.ready;

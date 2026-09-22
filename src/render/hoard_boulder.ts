@@ -245,14 +245,12 @@ export class HoardBoulderFx {
   }
 
   /** The lane is one long flat quad over uneven floor: at ground height it fought
-   *  the floor for depth and flickered as the camera moved (playtest). It sits a
-   *  little higher, its depth test biased toward the camera, and never fights. */
+   *  the floor for depth and flickered as the camera moved (playtest). */
   private lane(): Ribbon {
     const made = this.ribbon(1, LOOK.lane, false, 'BoulderLane');
-    made.material.depthTest = true;
-    made.material.polygonOffset = true;
-    made.material.polygonOffsetFactor = -4;
-    made.material.polygonOffsetUnits = -4;
+    // A flat quad over uneven floor: no depth bias stops it dipping under a rise
+    // of the ground, so it is drawn as an overlay, always on top of the floor.
+    made.material.depthTest = false;
     return made;
   }
 

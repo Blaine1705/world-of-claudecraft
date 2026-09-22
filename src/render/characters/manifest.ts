@@ -3832,7 +3832,8 @@ export const VISUALS: Record<string, VisualDef> = {
       // broken swing, and the dual-wield chop CROSSES the arms, which his long
       // clawed arms turn into a tangle (both playtest). One arm at a time: a
       // diagonal rake, a level swipe, a punch.
-      ...kaykit(['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Slice_Horizontal', 'Punch_A']),
+      // The open-handed rakes rolled his whole body (playtest): the right-hand punch alone.
+      ...kaykit(['Punch_A']),
       hit: ['Hit_A'],
       // He throws both claws at the sky to call the orbital storm (authored).
       attackByAbility: { [HOARD_GESTURE_CALL_STORM]: 'CallStorm' },
@@ -3901,8 +3902,8 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_magma_brute.glb`,
     height: 4.1,
     clips: {
-      // The chop rolled his whole slab of a body (playtest); the punch alone.
-      ...kaykit(['Punch_A']),
+      // The punch wobbled his whole slab of a body (playtest); the chop alone.
+      ...kaykit(['1H_Melee_Attack_Chop']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,

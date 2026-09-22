@@ -3,7 +3,8 @@
 // thread draws its player toward her a little every tick and hurts them as it
 // goes; it snaps the moment they get far enough from her. The room's play is to
 // walk AWAY from her, each in their own direction; standing on her means being
-// reeled in and bitten.
+// reeled in and bitten. She anchors herself to spin: while her threads hold she
+// does not move (a lone player could never outrun her otherwise, playtest).
 //
 // The beats, every one a cue the renderer draws and an event the room hears:
 //   cast    -> a bar on her (HOARD_CAST_SILK_SNARE, a kick cancels it for good);
@@ -36,12 +37,14 @@ export const SILK_SNARE = Object.freeze({
   damagePerSec: 0.035,
   /** Reeled no nearer than this. */
   stopYards: 2.5,
+  /** A thread bites this often (every tick was a drumroll of hit sounds). */
+  biteSec: 0.5,
 });
 
 export interface HoardSilkSnareState {
   timer: number;
   phase: 'idle' | 'cast' | 'threads';
-  threads: Array<{ playerId: number; cueId: number; remaining: number }>;
+  threads: Array<{ playerId: number; cueId: number; remaining: number; bite: number }>;
 }
 
 type Emit = (ctx: SimContext, inst: RiftInstance, cue: HoardBossCue) => void;
@@ -122,7 +125,12 @@ function thread(
     aim(cue, boss, player);
     state.cues.push(cue);
     emit(ctx, inst, cue);
-    held.threads.push({ playerId: player.id, cueId: cue.id, remaining: SILK_SNARE.maxSec });
+    held.threads.push({
+      playerId: player.id,
+      cueId: cue.id,
+      remaining: SILK_SNARE.maxSec,
+      bite: 0,
+    });
   }
   held.phase = held.threads.length > 0 ? 'threads' : 'idle';
   if (held.phase === 'idle') held.timer = SILK_SNARE.everySec;
@@ -192,19 +200,23 @@ export function tickHoardSilkSnare(
       ctx.grid.update(player);
       ctx.playerGrid.update(player);
     }
-    ctx.dealDamage(
-      boss,
-      player,
-      capRiftNonLethalMechanicDamage(
-        hoardMechanicDamage(inst, player, SILK_SNARE.damagePerSec * DT),
-        player.maxHp,
-      ),
-      false,
-      'nature',
-      'Silk Snare',
-      'hit',
-      true,
-    );
+    item.bite += DT;
+    if (item.bite >= SILK_SNARE.biteSec) {
+      item.bite -= SILK_SNARE.biteSec;
+      ctx.dealDamage(
+        boss,
+        player,
+        capRiftNonLethalMechanicDamage(
+          hoardMechanicDamage(inst, player, SILK_SNARE.damagePerSec * SILK_SNARE.biteSec),
+          player.maxHp,
+        ),
+        false,
+        'nature',
+        'Silk Snare',
+        'hit',
+        true,
+      );
+    }
     aim(cue, boss, player);
     live.push(item);
   }
@@ -222,4 +234,13 @@ export function isSilkCue(cue: HoardBossCue): boolean {
 /** Whether a player is on a thread right now. */
 export function silkSnared(state: HoardBossState | undefined, playerId: number): boolean {
   return state?.silkSnare?.threads.some((item) => item.playerId === playerId) ?? false;
+}
+
+/** The locomotion seam: she stands to spin and to hold her threads. */
+export function holdHoardSilkSnare(ctx: SimContext, mob: Entity): boolean {
+  for (const inst of ctx.riftInstances) {
+    if (inst.bossId !== mob.id || !inst.hoardBoss?.silkSnare) continue;
+    return inst.hoardBoss.silkSnare.phase !== 'idle';
+  }
+  return false;
 }

@@ -356,10 +356,12 @@ export class HoardTentaclesFx {
     additive: boolean,
     name: string,
     order: number,
+    depthTest = true,
   ): Ribbon {
     const made = strip(segments);
     this.own(made.geometry);
     const material = this.keep(ribbonMaterial(color, additive));
+    material.depthTest = depthTest;
     const mesh = new THREE.Mesh(made.geometry, material);
     mesh.name = name;
     mesh.visible = false;
@@ -467,8 +469,10 @@ export class HoardTentaclesFx {
       tip: new Float32Array(5),
       warnDisc: new THREE.Mesh(disc, this.keep(this.basic(LOOK.water, false))),
       warnRing: new THREE.Mesh(ring, this.keep(this.basic(LOOK.warn, true))),
-      lane: this.ribbon(1, LOOK.danger, false, 'TentacleLane', 18),
-      laneFill: this.ribbon(1, LOOK.danger, true, 'TentacleLaneFill', 19),
+      // The whip's lane is a flat quad over uneven floor: drawn as an overlay, so a
+      // rise of the ground never cuts it (it flickered as the camera moved, playtest).
+      lane: this.ribbon(1, LOOK.danger, false, 'TentacleLane', 18, false),
+      laneFill: this.ribbon(1, LOOK.danger, true, 'TentacleLaneFill', 19, false),
       ring: this.ribbon(RING_SEGMENTS, LOOK.danger, false, 'TentacleSweepRing', 18),
       arm: this.ribbon(ARM_SEGMENTS, LOOK.danger, true, 'TentacleSweepArm', 20),
       wake: this.low ? undefined : this.ribbon(WAKE_SEGMENTS, LOOK.warn, true, 'TentacleWake', 19),

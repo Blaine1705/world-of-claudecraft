@@ -10,7 +10,7 @@ export const ORBITAL_LIGHTNING = Object.freeze({
   shotDelay: 0.25,
   waveCount: 3,
   wavePeriod: 4.5,
-  waveWarningLead: 1.8,
+  waveWarningLead: 1.1,
   orbSize: 0.72,
   shotLength: 4.8,
   shotDuration: 0.125,

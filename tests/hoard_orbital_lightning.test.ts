@@ -12,6 +12,7 @@ import {
 import { HOARD_RARITY_PRESSURE } from '../src/sim/rift/hoard_scaling';
 import { makeVaultSeed } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
+import { DT } from '../src/sim/types';
 import { setLanguage } from '../src/ui/i18n';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
 
@@ -186,19 +187,16 @@ describe('Hoard Orbital Lightning authoritative choreography', () => {
         (cue) => cue.kind === 'mark' && cue.phase === 'warning',
       ).length;
       maxWarnings = Math.max(maxWarnings, warnings);
-      if ([1, 75, 103, 165, 193, 255].includes(tick)) warningSamples.set(tick, warnings);
+      // Just after each later wave's warning goes up (its first impact less the lead),
+      // and just after each wave's last impact.
+      const lead = Math.round(ORBITAL_LIGHTNING.waveWarningLead / DT);
+      if ([1, 75, 139 - lead, 165, 229 - lead, 255].includes(tick))
+        warningSamples.set(tick, warnings);
     }
     expect(timings).toEqual(impactTicks);
     expect(damage).toHaveBeenCalledTimes(18);
     expect(maxWarnings).toBe(6);
-    expect([...warningSamples]).toEqual([
-      [1, 6],
-      [75, 0],
-      [103, 6],
-      [165, 0],
-      [193, 6],
-      [255, 0],
-    ]);
+    expect([...warningSamples].map(([, warnings]) => warnings)).toEqual([6, 0, 6, 0, 6, 0]);
     expect(damage.mock.calls.every((call) => call[1].id === sim.player.id)).toBe(true);
     expect(
       damage.mock.calls.every((call) => call[4] === 'nature' && call[5] === 'Orbital Lightning'),

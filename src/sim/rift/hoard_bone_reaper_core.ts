@@ -79,6 +79,9 @@ export const BONE_SCYTHE = Object.freeze({
   pairMinLateral: 6,
   minDepth: 16,
   maxDepth: 30,
+  /** The blade's routes never run further than this from him: he is the fight,
+   *  and a blade that wandered to the far end of the room was no threat (playtest). */
+  pathDepth: 20,
 });
 
 export const BONE_SCYTHE_TOTAL_SEC =
@@ -192,7 +195,7 @@ export function scythePathPoint(
   // The nearest the PIVOT comes to the boss keeps the blade tip off his post AND
   // off the melee standing on him: whoever holds the boss is never swept for it.
   const near = BONE_SCYTHE.reach + BONE_SCYTHE.bossClearance;
-  const far = Math.max(near + 6, frame.depth);
+  const far = Math.max(near + 6, Math.min(frame.depth, BONE_SCYTHE.pathDepth));
   const mid = (near + far) / 2;
   const span = (far - near) / 2;
   const tau = Math.PI * 2;
