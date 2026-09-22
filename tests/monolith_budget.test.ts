@@ -506,6 +506,11 @@ const MONOLITHS: MonolithRow[] = [
     // guarded log() call through a thin lootReceiptBody adapter), composed
     // with the trade quantity prompt fold (18263 - 10). wc -l on the merged
     // tree. Exact count, zero slack.
+    // LOWERED 18253 -> 18235 at the Warrior presentation (PR 4139) base sync:
+    // the heal audio policy (potion cue, HoT silence, the Frenzied
+    // Regeneration exemption) moved out of the heal2 arm into
+    // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
+    // count, zero slack.
     // LOWERED 18276 -> 18271 at World PvP (the /pvp flag): the target frame's
     // hostile colour and the two auto-attack gates now read ONE shared verdict
     // (src/ui/pvp_hostile_core.ts, the third copy the action bar's comment
@@ -515,7 +520,10 @@ const MONOLITHS: MonolithRow[] = [
     // release's PR 4054 / 4137 / 4141 extractions above plus this branch's below):
     // exact count measured on the MERGED working tree (wc -l < src/ui/hud.ts),
     // never reconciled by arithmetic. Zero slack.
-    ceiling: 18248,
+    // Re-pinned at the merge of release/v0.44.0 (PR 4132's System Report) into
+    // feature/world-pvp-flag: exact count measured on the MERGED working tree
+    // (wc -l < src/ui/hud.ts), never reconciled by arithmetic. Zero slack.
+    ceiling: 18230,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -539,7 +547,13 @@ const MONOLITHS: MonolithRow[] = [
     // and the notes both carried moved to src/ui/options_text_values.ts (the
     // Frame Rate Limit row and its numeric status line arrived in the same
     // change). Exact count, zero slack.
-    ceiling: 2830,
+    // LOWERED 2830 -> 2821 when the bug report's server-message ladder moved
+    // to src/ui/bug_report_error_text.ts. System Report adds nothing here: it
+    // is a section of the Performance panel module
+    // (src/ui/host_diag_section_controller.ts over the pure
+    // src/ui/host_diag_view.ts), not a sub-view of this window. Exact count,
+    // zero slack.
+    ceiling: 2821,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -922,7 +936,14 @@ const MONOLITHS: MonolithRow[] = [
     // CPU-hygiene review: the ranked and required view candidates share the
     // scan module's liveViewCandidate check (present, view-less, admitted),
     // which drops the coordinator's own admission call. Exact count.
-    ceiling: 12850,
+    // Warrior integration moves painter wiring and prewarm types to sibling modules.
+    // PR 4139 review-fix round: endDraw gained the matching
+    // refreshFrozenWorldMatrix guard (one line), paid for by moving the Fiesta
+    // shake math into camera_impact_core.ts (fiestaShakeX/Y); then LOWERED
+    // 12790 -> 12789 when the Warrior kit textures moved to demand loading
+    // (the boot-time sheet upload loop and its comment went, the kit host
+    // gained its assets line). Exact count.
+    ceiling: 12789,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1334,7 +1355,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11281 -> 11280 with the character-select lockout disclosure:
     // the roster row hint markup call is inlined into its template and the
     // disclosure event isolation lives in src/ui/charselect_hints.ts.
-    ceiling: 11280,
+    // LOWERED 11280 -> 11276 at the PR 4137 review round: the roster row's
+    // click / Enter-Space / double-click wiring moved into wireCharselectRow
+    // (src/ui/charselect_hints.ts), which skips activations from inside the
+    // lockout disclosure instead of stopping propagation there.
+    ceiling: 11276,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

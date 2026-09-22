@@ -88,10 +88,16 @@ export interface HillState {
   risen: number;
   /** Sim time of the next spawn attempt; a failed attempt retries a minute on. */
   nextAt: number;
+  /** Tick of the last once-a-second pass: the dueness form
+   *  (`tickCount - passTick >= PASS_TICKS`, the books-sweep shape), never a
+   *  modulo of the tick count, so a pass can never be skipped by a host that
+   *  does not visit every tick. Starts at 0, so the first pass lands on the
+   *  same tick the modulo form ran (the twentieth). */
+  passTick: number;
 }
 
 export function newHillState(): HillState {
-  return { active: null, risen: 0, nextAt: hillRiseTime(0) };
+  return { active: null, risen: 0, nextAt: hillRiseTime(0), passTick: 0 };
 }
 
 const PASS_TICKS = 20;
@@ -282,8 +288,9 @@ function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
  * drops a standing one.
  */
 export function updateHill(ctx: SimContext): void {
-  if (ctx.tickCount % PASS_TICKS !== 0) return;
   const state = ctx.hillState;
+  if (ctx.tickCount - state.passTick < PASS_TICKS) return;
+  state.passTick = ctx.tickCount;
   if (ctx.worldPvpDisabled) {
     state.active = null;
     return;

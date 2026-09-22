@@ -49,6 +49,7 @@ import {
 import { effectiveFishingBand, fishReelWindowSecFor } from '../professions/fishing';
 import { bestOwnedGatherToolFor } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
+import { isWorldPvpHostile, WORLD_PVP_AID_REFUSED_LINE } from '../pvp/world_pvp';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { primaryHealingMultiplier } from '../spec_output_tuning';
@@ -242,6 +243,7 @@ import {
   tickUnbrokenRitual,
 } from './warlock_talents';
 import { hasUmbralAnchor, UMBRAL_ANCHOR_ID, umbralAnchorCastError } from './warlock_utility';
+import { castRedHarvest } from './warrior_harvest';
 
 export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'recklessness',
@@ -920,13 +922,29 @@ export function castAbilityBySlot(
 // entity's stored castTargetId at a timed cast's finish) wins while valid;
 // a stale/invalid override falls back to the classic current-friendly-target-
 // else-self rule, byte-identical to the pre-override behavior when null.
-function resolveFriendlyTarget(ctx: SimContext, p: Entity, overrideId: number | null): Entity {
+//
+// One refusal, returned as null for the caller to voice (WORLD_PVP_AID_REFUSED_LINE):
+// a live PLAYER the open world has made an enemy (src/sim/pvp/world_pvp.ts
+// isWorldPvpHostile). The aid rule flags a helper who keeps a flagged stranger
+// standing, and from that moment the two are flagged strangers whom the self
+// fallback would otherwise lock apart in silence: every later heal, shield or
+// buff would land on the helper instead, with no word about why. Only the WORLD
+// arm refuses: a duel, arena or battleground opponent on the target still self-casts,
+// the classic habit those modes' healers rely on.
+function resolveFriendlyTarget(
+  ctx: SimContext,
+  p: Entity,
+  overrideId: number | null,
+): Entity | null {
   if (overrideId !== null) {
     const o = ctx.entities.get(overrideId);
     if (o && !o.dead && ctx.isFriendlyTo(p, o)) return o;
+    if (o && !o.dead && o.kind === 'player' && isWorldPvpHostile(ctx, p, o)) return null;
   }
   const cur = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
-  return cur && !cur.dead && ctx.isFriendlyTo(p, cur) ? cur : p;
+  if (cur && !cur.dead && ctx.isFriendlyTo(p, cur)) return cur;
+  if (cur && !cur.dead && cur.kind === 'player' && isWorldPvpHostile(ctx, p, cur)) return null;
+  return p;
 }
 
 // Combat-resurrection target (Temporal Reversal): the mouseover override or current
@@ -1415,8 +1433,13 @@ export function castAbility(
     target = dead;
   } else if (ability.requiresTarget && ability.targetType === 'friendly') {
     // heals/buffs: the mouseover override when given, else the current
-    // friendly target, else yourself
-    target = resolveFriendlyTarget(ctx, p, castTargetId);
+    // friendly target, else yourself; a World PvP enemy on the target refuses
+    const friendly = resolveFriendlyTarget(ctx, p, castTargetId);
+    if (!friendly) {
+      ctx.error(p.id, WORLD_PVP_AID_REFUSED_LINE);
+      return;
+    }
+    target = friendly;
     // A RUSH has no meaning against yourself, and the self fallback above is
     // reached by an ordinary miss: no target at all, or an ENEMY targeted. Without
     // this gate Intervene resolved onto the caster and became an off-GCD personal
@@ -2758,8 +2781,14 @@ function applyAbility(
     target = dead;
   } else if (ability.requiresTarget && ability.targetType === 'friendly') {
     // Keep the branch's mouseover-cast resolution (Clique-style): the explicit
-    // override wins while valid, else current-friendly-target-else-self.
-    target = resolveFriendlyTarget(ctx, p, castTarget);
+    // override wins while valid, else current-friendly-target-else-self; a
+    // target the open world made an enemy during the cast refuses the finish.
+    const friendly = resolveFriendlyTarget(ctx, p, castTarget);
+    if (!friendly) {
+      ctx.error(p.id, WORLD_PVP_AID_REFUSED_LINE);
+      return;
+    }
+    target = friendly;
     const d = dist2d(p.pos, target.pos);
     if (d > Math.max(ability.range, 5) + 2) {
       ctx.error(p.id, 'Out of range.');
@@ -3085,7 +3114,8 @@ function applyAbility(
   if (instantResisted) {
     restoreStormcastReservation(ctx, p, stormcastReservation);
   } else {
-    ctx.runEffects(p, meta, target, res);
+    if (ability.id === 'red_harvest') castRedHarvest(ctx, p, meta, target, res);
+    else ctx.runEffects(p, meta, target, res);
     completeStormcastReservation(ctx, p, stormcastReservation);
   }
   // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a

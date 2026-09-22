@@ -2434,7 +2434,11 @@ export const hudChromeStrings = {
   // the older dev `?perf` trace output, which stays English like console.*. The real-DOM
   // `?diagnostics=1` panel below is localized because its chrome is user-visible.
   perf: {
-    title: 'Performance Overlay',
+    // The sub-view now holds more than the overlay (the desktop shell's System
+    // Report section sits under it), so the view is "Performance" and the
+    // overlay controls carry their own section heading inside it.
+    title: 'Performance',
+    overlaySection: 'Performance Overlay',
     enable: 'Show Performance Overlay',
     description: 'Choose which stats to show, where the overlay sits, and how it looks.',
     sectionPosition: 'Position',
@@ -3367,6 +3371,23 @@ export const hudChromeStrings = {
     tooLarge: 'That report is too large to send. Try again without the screenshot.',
     rateLimited: "You've sent several reports recently. Please wait a bit before sending another.",
     failed: 'Could not send the bug report. Please try again.',
+  },
+  // The System Report section at the foot of Options > Performance
+  // (src/ui/host_diag_section_controller.ts), desktop shell only. Deliberately
+  // small: one sentence, one button, one status line. Nothing is uploaded,
+  // which the sentence says outright, because the section's whole job is asking
+  // a player to hand over a description of their own computer.
+  hostDiag: {
+    title: 'System Report',
+    intro:
+      'Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.',
+    create: 'Generate system report',
+    running: 'Collecting system details...',
+    saved: 'Report saved as {fileName}.',
+    // Defensive twin of the line above, for a shell that saved a file without
+    // naming it back: never expected, and better than an empty file name.
+    savedNoName: 'Report saved.',
+    failed: 'The report could not be created. Please try again.',
   },
   // Character window (paperdoll) controls.
   paperdoll: {

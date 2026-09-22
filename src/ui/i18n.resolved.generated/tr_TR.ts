@@ -1867,7 +1867,8 @@ export const tr_TR: EnTranslations = {
       "crossHotbarEditHelp": "Çubuğu kontrol cihazıyla ayarlamak için sol tamponu tutun ve üst taraftaki düğmeye basın."
     },
     "perf": {
-      "title": "Performans Katmanı",
+      "title": "Performance",
+      "overlaySection": "Performans Katmanı",
       "enable": "Performans Kaplamasını Göster",
       "description": "Hangi istatistiklerin gösterileceğini, kaplamanın nerede duracağını ve nasıl görüneceğini seçin.",
       "sectionPosition": "Konum",
@@ -2597,6 +2598,15 @@ export const tr_TR: EnTranslations = {
       "tooLarge": "Bu bildirim gönderilemeyecek kadar büyük. Ekran görüntüsü olmadan tekrar deneyin.",
       "rateLimited": "Son zamanlarda birkaç bildirim gönderdiniz. Yenisini göndermeden önce lütfen biraz bekleyin.",
       "failed": "Hata bildirimi gönderilemedi. Lütfen tekrar deneyin."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "{item} eşyasını çıkar",
@@ -9987,6 +9997,11 @@ export const tr_TR: EnTranslations = {
       "quit": "Çık",
       "fatalBody": "World of ClaudeCraft beklenmeyen bir hatayla karşılaştı ve kapatılması gerekiyor."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Oyundan Çık"
     }
@@ -10038,7 +10053,7 @@ export const tr_TR: EnTranslations = {
     "takeOver": "Devral",
     "inWorldHint": "Zaten dünyada. Başka yerden çıkış yap ya da devral.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

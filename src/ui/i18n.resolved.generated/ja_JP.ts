@@ -1867,7 +1867,8 @@ export const ja_JP: EnTranslations = {
       "crossHotbarEditHelp": "左バンパーを押しながら上の面ボタンを押すと、コントローラーでバーを配置変更できます。"
     },
     "perf": {
-      "title": "パフォーマンスオーバーレイ",
+      "title": "パフォーマンス",
+      "overlaySection": "パフォーマンスオーバーレイ",
       "enable": "パフォーマンスオーバーレイを表示",
       "description": "表示する統計、オーバーレイの位置、外観を設定します。",
       "sectionPosition": "位置",
@@ -2597,6 +2598,15 @@ export const ja_JP: EnTranslations = {
       "tooLarge": "報告のサイズが大きすぎて送信できません。スクリーンショットを外して再試行してください。",
       "rateLimited": "最近、報告を複数回送信しています。しばらく待ってから送信してください。",
       "failed": "バグ報告を送信できませんでした。もう一度お試しください。"
+    },
+    "hostDiag": {
+      "title": "システムレポート",
+      "intro": "このコンピューターの詳細情報(プロセッサとメモリを最も多く使用しているプログラムを含む)をファイルにまとめ、パフォーマンスの問題の診断に役立てます。送信は一切行われません。ファイルはお使いのコンピューターに保存されるだけです。",
+      "create": "システムレポートを作成",
+      "running": "システム情報を収集しています...",
+      "saved": "レポートを {fileName} として保存しました。",
+      "savedNoName": "レポートを保存しました。",
+      "failed": "レポートを作成できませんでした。もう一度お試しください。"
     },
     "paperdoll": {
       "unequipAria": "{item}を外す",
@@ -9987,6 +9997,11 @@ export const ja_JP: EnTranslations = {
       "quit": "終了",
       "fatalBody": "World of ClaudeCraft で予期しないエラーが発生したため、終了します。"
     },
+    "hostDiag": {
+      "saveTitle": "システムレポートを保存",
+      "saveButton": "保存",
+      "fileType": "JSON ファイル"
+    },
     "titlebar": {
       "exitGame": "ゲームを終了"
     }
@@ -10038,7 +10053,7 @@ export const ja_JP: EnTranslations = {
     "takeOver": "引き継ぐ",
     "inWorldHint": "すでに世界にいます。別の場所からログアウトするか、引き継いでください。",
     "currentLocation": "現在地: {zone}",
-    "lockouts": "ロックアウト",
+    "lockouts": "ロックアウト（{count}）",
     "lockoutRaids": "レイド",
     "lockoutDungeons": "ダンジョン",
     "lockoutWorldBosses": "ワールドボス",

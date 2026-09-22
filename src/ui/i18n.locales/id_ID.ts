@@ -9995,7 +9995,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Giok',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Peringatan Berkode Warna',
-  'hudChrome.perf.title': 'Lapisan Performa',
+  'hudChrome.perf.overlaySection': 'Lapisan Performa',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',

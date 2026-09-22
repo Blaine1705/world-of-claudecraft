@@ -321,7 +321,11 @@
     border-color: var(--gold-dim);
     color: var(--color-text-on-medal);
   }
+  /* aria-disabled: the inert-but-focusable form (the reason for the dead
+     control sits beside it for keyboard and screen-reader users; the painter
+     refuses its clicks). Same look as the native attribute. */
   .ui-btn:disabled,
+  .ui-btn[aria-disabled="true"],
   .ui-btn--dis {
     opacity: 0.5;
     cursor: default;

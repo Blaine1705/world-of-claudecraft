@@ -113,6 +113,7 @@ export {
   worldPvpDisarmRemaining,
   worldPvpInfoFor,
   worldPvpKillLine,
+  worldPvpOnOwnedPetDamaged,
   worldPvpOnPlayerAided,
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,

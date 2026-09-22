@@ -1867,7 +1867,8 @@ export const pt_BR: EnTranslations = {
       "crossHotbarEditHelp": "Segure o pára-choque esquerdo e pressione o botão superior para organizar a barra com o controlador."
     },
     "perf": {
-      "title": "Sobreposição de Desempenho",
+      "title": "Performance",
+      "overlaySection": "Sobreposição de Desempenho",
       "enable": "Mostrar Sobreposição de Desempenho",
       "description": "Escolha quais estatísticas exibir, onde a sobreposição fica e como ela aparece.",
       "sectionPosition": "Posição",
@@ -2597,6 +2598,15 @@ export const pt_BR: EnTranslations = {
       "tooLarge": "Esse relatório é grande demais para enviar. Tente novamente sem a captura de tela.",
       "rateLimited": "Você enviou vários relatórios recentemente. Aguarde um pouco antes de enviar outro.",
       "failed": "Não foi possível enviar o relatório de erro. Tente novamente."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Desequipar {item}",
@@ -9987,6 +9997,11 @@ export const pt_BR: EnTranslations = {
       "quit": "Sair",
       "fatalBody": "O World of ClaudeCraft encontrou um erro inesperado e precisa fechar."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Sair do jogo"
     }
@@ -10038,7 +10053,7 @@ export const pt_BR: EnTranslations = {
     "takeOver": "Assumir controle",
     "inWorldHint": "Já está no mundo. Saia em outro lugar ou assuma o controle.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

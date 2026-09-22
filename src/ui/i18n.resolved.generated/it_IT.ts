@@ -1867,7 +1867,8 @@ export const it_IT: EnTranslations = {
       "crossHotbarEditHelp": "Tieni il paraurti sinistro e premi il pulsante frontale superiore per sistemare la barra con il controller."
     },
     "perf": {
-      "title": "Pannello prestazioni",
+      "title": "Performance",
+      "overlaySection": "Pannello prestazioni",
       "enable": "Mostra pannello prestazioni",
       "description": "Scegli quali statistiche mostrare, dove posizionare il pannello e il suo aspetto.",
       "sectionPosition": "Posizione",
@@ -2597,6 +2598,15 @@ export const it_IT: EnTranslations = {
       "tooLarge": "Questa segnalazione è troppo grande per essere inviata. Riprova senza la schermata.",
       "rateLimited": "Hai inviato diverse segnalazioni di recente. Attendi un momento prima di inviarne un'altra.",
       "failed": "Impossibile inviare la segnalazione del bug. Riprova."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Rimuovi {item}",
@@ -9987,6 +9997,11 @@ export const it_IT: EnTranslations = {
       "quit": "Esci",
       "fatalBody": "World of ClaudeCraft ha riscontrato un errore imprevisto e deve chiudersi."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Esci dal gioco"
     }
@@ -10038,7 +10053,7 @@ export const it_IT: EnTranslations = {
     "takeOver": "Prendi il controllo",
     "inWorldHint": "Già nel mondo. Esci altrove, oppure prendine il controllo.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

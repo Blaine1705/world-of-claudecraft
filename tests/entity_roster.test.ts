@@ -153,7 +153,7 @@ function makeCtx() {
     bgQueue: [],
     bgMatches: new Map(),
     worldPvpDisabled: false,
-    hillState: { active: null, risen: 0, nextAt: 120 },
+    hillState: { active: null, risen: 0, nextAt: 120, passTick: 0 },
     hillProbe: { wet: () => false, steep: () => false, blocked: () => false, zoneIdAt: () => null },
     worldPvpBooks: {
       recentDamage: new Map(),
@@ -162,6 +162,7 @@ function makeCtx() {
       killsByPair: new Map(),
       zoneOf: new Map(),
       nextDisarmAt: Number.POSITIVE_INFINITY,
+      zonePassTick: Number.NEGATIVE_INFINITY,
       sweptAtTick: 0,
     },
     bgBusySlots: new Set(),

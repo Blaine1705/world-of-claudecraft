@@ -169,6 +169,11 @@ describe('worldPvpBodyHtml', () => {
     expect(confirming).toContain('data-act="pvp-confirm"');
     expect(confirming).toContain('data-act="pvp-cancel"');
     expect(confirming).not.toContain('data-act="pvp-enable"');
+    // The action focus key follows the press onto the SAFE button of the
+    // confirm step (Cancel), never onto Raise Flag, which carries its own key.
+    expect(confirming).toContain('data-act="pvp-cancel" data-focus-key="wpvp-action"');
+    expect(confirming).toContain('data-act="pvp-confirm" data-focus-key="wpvp-confirm"');
+    expect(confirming).not.toContain('data-act="pvp-confirm" data-focus-key="wpvp-action"');
     const up = worldPvpBodyHtml(
       buildWorldPvpWindowView({ info: info({ flagged: true }), honor: 0, confirming: false }),
     );
@@ -186,7 +191,12 @@ describe('worldPvpBodyHtml', () => {
     const locked = worldPvpBodyHtml(
       buildWorldPvpWindowView({ info: info({ levelLocked: true }), honor: 0, confirming: false }),
     );
-    expect(locked).toContain('disabled aria-disabled="true"');
+    // Inert but still in the tab order (aria-disabled, never the native
+    // attribute), so a keyboard user can reach the reason under it.
+    expect(locked).toContain(
+      'data-act="pvp-enable" data-focus-key="wpvp-action" aria-disabled="true"',
+    );
+    expect(locked).not.toMatch(/<button[^>]* disabled[ >]/);
     expect(locked).toContain(`Requires level ${WORLD_PVP_MIN_LEVEL}.`);
     expect(locked).toContain('Requires level 10.');
   });
@@ -208,7 +218,7 @@ describe('wireWorldPvpPanel', () => {
       if (!btn) throw new Error(`no ${act} button`);
       btn.click();
     };
-    return { click, flags, confirms };
+    return { el, click, flags, confirms };
   }
 
   it('the raise is a two-step confirm; lowering and keeping are one press each', () => {
@@ -239,13 +249,18 @@ describe('wireWorldPvpPanel', () => {
     expect(disarming.flags).toEqual([true]);
   });
 
-  it('a locked raise button is inert', () => {
-    const locked = mount(
-      buildWorldPvpWindowView({ info: info({ levelLocked: true }), honor: 0, confirming: false }),
-    );
-    locked.click('pvp-enable');
-    expect(locked.confirms).toEqual([]);
-    expect(locked.flags).toEqual([]);
+  it('a locked raise button is inert, and so is the realm-off one, while both stay focusable', () => {
+    for (const over of [{ levelLocked: true }, { enabled: false }]) {
+      const locked = mount(
+        buildWorldPvpWindowView({ info: info(over), honor: 0, confirming: false }),
+      );
+      const btn = locked.el.querySelector<HTMLButtonElement>('[data-act="pvp-enable"]');
+      expect(btn?.hasAttribute('disabled')).toBe(false);
+      expect(btn?.getAttribute('aria-disabled')).toBe('true');
+      locked.click('pvp-enable');
+      expect(locked.confirms).toEqual([]);
+      expect(locked.flags).toEqual([]);
+    }
   });
 });
 
@@ -288,6 +303,7 @@ describe('isPvpHostilePlayer (the shared client verdict)', () => {
       kind: 'player',
       dead: false,
       guild: '',
+      level: 20,
       pos: { ...CONTESTED_SPOT },
       ...extra,
     }) as Entity;
@@ -404,6 +420,7 @@ describe('isPvpHostilePlayer: the ground on the client', () => {
       kind: 'player',
       dead: false,
       guild: '',
+      level: 20,
       pos: { ...CONTESTED_SPOT },
       ...extra,
     }) as Entity;
@@ -535,10 +552,20 @@ describe('the World PvP tab: the ground line and the realm switch', () => {
     expect(up).toContain('data-act="pvp-disable"');
   });
 
+  it('an under-level player on free-for-all ground reads the plain flag-down sentence', () => {
+    // The sim's pair rule keeps them outside the free-for-all arm, so the
+    // ground sentence would promise a fight they can neither start nor suffer.
+    const lockedFfa = body({ zone: 'ffa', levelLocked: true });
+    expect(lockedFfa).toContain('You cannot attack or be attacked in the open world.');
+    expect(lockedFfa).not.toContain('on free-for-all ground you can still attack and be attacked');
+    expect(lockedFfa).toContain('Requires level 10.');
+  });
+
   it('a realm with the switch set locks the action and says so, and no press lands', () => {
     const closed = body({ enabled: false });
     expect(closed).toContain('data-act="pvp-enable"');
-    expect(closed).toContain('disabled aria-disabled="true"');
+    expect(closed).toContain('aria-disabled="true"');
+    expect(closed).not.toMatch(/<button[^>]* disabled[ >]/);
     // The reason is stated ONCE, beside the control it explains.
     expect(closed.split('World PvP is disabled on this realm.').length - 1).toBe(1);
     expect(closed).toContain(

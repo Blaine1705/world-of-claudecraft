@@ -683,6 +683,9 @@ export function runEffects(
         weaponMult *= trueStealthOpener ? trueStealthOpenerMultiplier(true) : veiledEdgeMult;
         bonus = trueStealthOpenerScaleBonus(trueStealthOpener, bonus);
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
+          // Red Harvest emits its opening cue before the strikes (warrior_harvest.ts),
+          // so its damage events must not restart the authored clip.
+          attackAnimationStarted: ability.id === 'red_harvest' && attackAnimationStarted,
           cannotBeDodged: eff.cannotBeDodged,
           normalizedInstant: eff.normalized,
           weaponMult,
@@ -4149,6 +4152,16 @@ export function runEffects(
         // and it is gated on hostility rather than on the ability id so any future
         // friendly rush inherits the same rule.
         if (ctx.isFriendlyTo(p, target)) break;
+        if (meta.cls === 'warrior') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'selfCast',
+            ability: ability.id,
+          });
+        }
         if (p.resourceType === 'rage') {
           const amount = meta.cls === 'warrior' ? 9 * warriorAbilityRageMult(ctx, p, meta) : 9;
           p.resource = Math.min(p.maxResource, p.resource + amount);

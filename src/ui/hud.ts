@@ -214,9 +214,9 @@ import { CombatAnnouncer } from './combat_announcer';
 import {
   auraApplyCue,
   castCueForAbility,
-  consumeHealCue,
   dispatchRaidCalloutSfx,
   groundTickAbilityCue,
+  healAudioPlan,
   impactCueForDamage,
   mobVoiceActionForDamage,
   mobVoiceCueWithFallback,
@@ -1035,7 +1035,7 @@ export interface BugReportPayload {
 export interface BugReportHooks {
   // Submit a captured bug report to the server. Resolves on success (screenshotStored
   // is false when the server dropped the screenshot), rejects with a server error
-  // message the hud maps via localizeBugReportError.
+  // message the ui maps via bugReportErrorText.
   submit(payload: BugReportPayload): Promise<{ screenshotStored: boolean }>;
   // Grab a JPEG data URL of the current frame asynchronously, or null if capture
   // failed/unavailable. Encoding must not block the options window's main thread.
@@ -11074,27 +11074,9 @@ export class Hud {
       case 'heal2': {
         const tgt = sim.entities.get(ev.targetId);
         if (!tgt) return;
-        // A potion/eat/drink heal (items.ts / combat/auras.ts) plays its own
-        // dedicated cue instead of the generic heal_impact; consumeHealCue
-        // returns null for every other heal source (leech, second wind,
-        // companion heals, ...), which falls through to heal_impact unchanged.
-        const cue = ev.type === 'heal' ? consumeHealCue(ev) : null;
-        if (ev.type === 'heal' && ev.source && !cue) return; // eat/drink tick, not a sound tick
-        // A HoT tick fires this every couple seconds for its whole duration; the
-        // one-shot application cue (Sim.applyAura) now covers the "heal landed"
-        // moment instead, so ticks stay silent. Frenzied Regeneration is fully
-        // exempt from this change (a Bear Form self-heal, never aimed at anyone
-        // else, so the repeat doesn't read as spammy the way a party HoT does):
-        // it keeps its old, unchanged tick-only sound, so the one-shot
-        // application emit is skipped for it too, or it would gain an extra pop
-        // on top of its untouched ticking. Confirmed in-game on Priest (Renew)
-        // and Druid (Rejuvenation, Regrowth, Frenzied Regeneration): the others
-        // land once on application and stay silent for the rest of their
-        // duration; Frenzied Regeneration keeps ticking exactly as before.
-        const isHot = ev.type === 'heal2' && ev.hot === true;
-        const isFrenziedRegen = ev.type === 'heal2' && ev.abilityId === 'frenzied_regeneration';
-        if (isHot ? !isFrenziedRegen : isFrenziedRegen) return;
-        this.combat(cue ?? 'heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
+        const plan = healAudioPlan(ev);
+        if (!plan) return;
+        this.combat(plan.cue, tgt.pos.x, tgt.pos.y, tgt.pos.z, plan.gain, { cooldown: 0.1 });
         return;
       }
       case 'aura': {
@@ -11262,7 +11244,7 @@ export class Hud {
             // token (the grey vs the white FCT token); the localized word stays at the call site. A resisted
             // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,
             // not miss).
-            const shape = fctSpawnShape({
+            const shape = this.fctPainter.stagedShape(ev, now, {
               type: 'damage',
               damageKind: ev.kind,
               ability: false,
@@ -11322,7 +11304,7 @@ export class Hud {
           // through here too, but with its own damageKind so it reads with its own colour
           // and combat-log sentence instead of an indistinguishable plain hit. The amount
           // text + target entity stay at the call site.
-          const hitShape = fctSpawnShape({
+          const hitShape = this.fctPainter.stagedShape(ev, now, {
             type: 'damage',
             damageKind: ev.kind === 'block' ? 'block' : 'hit',
             ability: !!ev.ability,

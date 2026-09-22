@@ -1744,7 +1744,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Включает базовый шанс 5%, общий для всех искателей приключений.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Это приблизительная оценка, не учитывающая критические удары и урон от способностей.',
-  'hudChrome.perf.title': 'Оверлей производительности',
+  'hudChrome.perf.title': 'Производительность',
+  'hudChrome.perf.overlaySection': 'Оверлей производительности',
   'hudChrome.perf.enable': 'Показывать оверлей производительности',
   'hudChrome.perf.description':
     'Выберите, какие показатели отображать, где разместить оверлей и как он выглядит.',
@@ -1826,6 +1827,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.rateLimited':
     'Вы недавно отправили несколько отчётов. Подождите немного перед следующим.',
   'hudChrome.bugReport.failed': 'Не удалось отправить отчёт об ошибке. Попробуйте снова.',
+  'hudChrome.hostDiag.title': 'Отчет о системе',
+  'hudChrome.hostDiag.intro':
+    'Собирает сведения об этом компьютере, включая программы, которые больше всего нагружают процессор и память, в файл, который помогает выявить причины проблем с производительностью. Ничего не отправляется: файл остается на вашем компьютере.',
+  'hudChrome.hostDiag.create': 'Создать отчет о системе',
+  'hudChrome.hostDiag.running': 'Сбор сведений о системе...',
+  'hudChrome.hostDiag.saved': 'Отчет сохранен как {fileName}.',
+  'hudChrome.hostDiag.savedNoName': 'Отчет сохранен.',
+  'hudChrome.hostDiag.failed': 'Не удалось создать отчет. Повторите попытку.',
   'hudChrome.keybinds.emoteWheel': 'Колесо эмоций',
   'hudChrome.keybinds.sheathe': 'Убрать/обнажить оружие',
   'hudChrome.keybinds.hideInterface': 'Скрыть интерфейс',
@@ -2549,7 +2558,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'character.takeOver': 'Перехватить',
   'character.inWorldHint': 'Уже в мире. Выйдите в другом месте или перехватите сессию.',
   'character.currentLocation': 'Текущее местоположение: {zone}',
-  'character.lockouts': 'Блокировки',
+  'character.lockouts': 'Блокировки ({count})',
   'character.lockoutRaids': 'Рейды',
   'character.lockoutDungeons': 'Подземелья',
   'character.lockoutWorldBosses': 'Мировые боссы',
@@ -9495,6 +9504,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': 'Перезагрузить',
   'desktop.crash.quit': 'Выйти',
   'desktop.titlebar.exitGame': 'Выйти из игры',
+  'desktop.hostDiag.saveTitle': 'Сохранить отчет о системе',
+  'desktop.hostDiag.saveButton': 'Сохранить',
+  'desktop.hostDiag.fileType': 'Файл JSON',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
   'gpuNotice.bodyDesktop':

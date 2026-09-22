@@ -388,10 +388,14 @@ whichever overworld zone a clamping lookup would misreport:
   (`content/zone1.ts`), so a new character can never be fought before they know
   what the flag is.
 - `'ffa'`: free-for-all. Everyone standing there is hostile to everyone else
-  standing there, flag or no flag. The Wraithwood, the Evergarden and the
-  Nightbloom (`content/wraithwood.ts`, `content/evergarden.ts`,
-  `content/nightbloom.ts`), the level-20 zones with the heaviest S-tier rift
-  weight and the furthest north: the richest ground carries the most risk.
+  standing there, flag or no flag, provided both are at least
+  `WORLD_PVP_MIN_LEVEL`: the level gate is the flag's, and the ground is not a
+  way around it, so a character too low to opt in can neither be opened on nor
+  open on anyone there (and hears no crossing notice until they reach it). The
+  Wraithwood, the Evergarden and the Nightbloom (`content/wraithwood.ts`,
+  `content/evergarden.ts`, `content/nightbloom.ts`), the level-20 zones with the
+  heaviest S-tier rift weight and the furthest north: the richest ground
+  carries the most risk.
 - `'contested'`: everywhere else, and the default for a zone record with no
   `worldPvp` field. Two flagged players and nothing more.
 
@@ -406,10 +410,22 @@ raises the attacker's own flag, which is only ever the free-for-all arm, an
 unflagged attacker on an unflagged victim (`WORLD_PVP_MARKED_LINE`). Hitting a
 player who is already flagged never marks anyone, so the victim, and anyone
 defending them or defending a third party who is not marked, fights for free
-while the aggressor ends up carrying the stake. Crossing into and out of a
+while the aggressor ends up carrying the stake. A hit on a player's PET is
+judged against the pet's owner (`worldPvpOnOwnedPetDamaged`, marking only: the
+assist books key on the owner being hit), so opening on a stranger's pet marks
+you exactly as opening on the stranger would. Crossing into and out of a
 free-for-all zone is announced, and a FLAGGED player entering a sanctuary is told
 the flag is idle there (`WORLD_PVP_FFA_ENTER_LINE`, `WORLD_PVP_FFA_LEAVE_LINE`,
-`WORLD_PVP_SANCTUARY_LINE`; the zone pass in `updateWorldPvp`).
+`WORLD_PVP_SANCTUARY_LINE`; the zone pass in `updateWorldPvp`, on the dueness
+form like the books sweep, never a modulo of the tick count).
+
+The verdict is live, not fixed at application time: periodic harm between two
+players (a bleed, a curse, a Maledict Gaze) re-asks `isHostileTo` before every
+damaging tick (`src/sim/combat/periodic_harm.ts`), and a tick the verdict
+refuses is skipped while the aura expires on the spot. An unflagged victim who
+walks out of a free-for-all zone, or anyone who reaches a sanctuary, sheds the
+bleed at the line instead of dying to it on ground where they could not be hit;
+a source who has died keeps their ticks landing, the classic rule.
 
 Two players mid-duel with each other are the duel's business, never the
 world's: `isWorldPvpHostile` steps aside for that pair, so a duel fought on
@@ -456,7 +472,14 @@ alone is the owner's stated shape.
   `combat/effect_dispatch.ts` at the `absorb` and `buffTarget` sites. Aid to an
   UNFLAGGED player marks nobody, so keeping a bystander alive stays free. Under
   `WORLD_PVP_MIN_LEVEL` the raise is refused like every other and the aid earns
-  nothing.
+  nothing. The rule's consequence is deliberate and said out loud: once the
+  helper is flagged, they and the stranger they were keeping up are two flagged
+  strangers, enemies under the pair rule, and the next heal, shield or buff on
+  that stranger is REFUSED with `WORLD_PVP_AID_REFUSED_LINE` (the friendly
+  target resolution in `combat/casting_lifecycle.ts`) rather than self-cast in
+  silence. The way to keep aiding a flagged fighter is the exemption: a party.
+  Only the open-world arm refuses; a duel, arena or battleground opponent on
+  the target still self-casts, the habit those modes' healers rely on.
 - The flag cannot be flapped: accepted changes are `WORLD_PVP_TOGGLE_COOLDOWN`
   (2 s) apart, refused with a notice in between.
 - Operator kill switch: `WORLD_PVP_DISABLED=1` on the realm refuses every raise

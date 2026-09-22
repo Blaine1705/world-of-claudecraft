@@ -1867,7 +1867,8 @@ export const de_DE: EnTranslations = {
       "crossHotbarEditHelp": "Halten Sie den linken Stoßfänger fest und drücken Sie die Taste auf der Oberseite, um die Leiste mit dem Controller auszurichten."
     },
     "perf": {
-      "title": "Leistungsanzeige",
+      "title": "Performance",
+      "overlaySection": "Leistungsanzeige",
       "enable": "Leistungsanzeige anzeigen",
       "description": "Wähle, welche Werte angezeigt werden, wo die Anzeige sitzt und wie sie aussieht.",
       "sectionPosition": "Position",
@@ -2597,6 +2598,15 @@ export const de_DE: EnTranslations = {
       "tooLarge": "Diese Meldung ist zu groß zum Senden. Versuche es ohne den Screenshot erneut.",
       "rateLimited": "Du hast kürzlich mehrere Meldungen gesendet. Bitte warte einen Moment, bevor du eine weitere sendest.",
       "failed": "Die Fehlermeldung konnte nicht gesendet werden. Bitte versuche es erneut."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "{item} ablegen",
@@ -9987,6 +9997,11 @@ export const de_DE: EnTranslations = {
       "quit": "Beenden",
       "fatalBody": "World of ClaudeCraft ist auf einen unerwarteten Fehler gestoßen und muss geschlossen werden."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Spiel beenden"
     }
@@ -10038,7 +10053,7 @@ export const de_DE: EnTranslations = {
     "takeOver": "Übernehmen",
     "inWorldHint": "Bereits in der Welt. Melde dich anderswo ab oder übernimm den Charakter.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

@@ -9145,7 +9145,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Jade',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Farvekodede advarsler',
-  'hudChrome.perf.title': 'Ydelsesoverlay',
+  'hudChrome.perf.overlaySection': 'Ydelsesoverlay',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',

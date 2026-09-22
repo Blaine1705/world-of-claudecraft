@@ -6212,14 +6212,14 @@ export class Sim {
     this.updateDelveRuns();
     lap?.('delves');
     // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
-    // tick-math wave and rune clocks; the one seeded draw is the power-rune
-    // face at match START), so its tick position cannot fork the draw order
-    // mid-match.
+    // tick-math wave and rune clocks; the one seeded draw is the power-rune face
+    // at match START), so its tick position cannot fork the draw order mid-match.
     bgMod.updateBattleground(this.ctx);
-    // World PvP clock + books sweep (pvp/world_pvp.ts), billed to the battleground lap; zero rng.
-    worldPvpMod.updateWorldPvp(this.ctx);
-    hillMod.updateHill(this.ctx);
     lap?.('battleground');
+    worldPvpMod.updateWorldPvp(this.ctx); // the /pvp clock, zone pass + books sweep; zero rng
+    lap?.('worldPvp');
+    hillMod.updateHill(this.ctx); // King of the Hill (pvp/hill.ts): spawns draw a PRIVATE rng
+    lap?.('hill');
     // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
     // matching on the sim clock), so appending it here cannot fork the draw order.
     this.updateDungeonFinder();

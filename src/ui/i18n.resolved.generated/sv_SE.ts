@@ -1867,7 +1867,8 @@ export const sv_SE: EnTranslations = {
       "crossHotbarEditHelp": "Håll i den vänstra stötfångaren och tryck på den övre ansiktsknappen för att placera stången med kontrollen."
     },
     "perf": {
-      "title": "Prestandaöverlägg",
+      "title": "Performance",
+      "overlaySection": "Prestandaöverlägg",
       "enable": "Visa prestandaöverlägg",
       "description": "Välj vilka statistikvärden som ska visas, var överlägget ska sitta och hur det ser ut.",
       "sectionPosition": "Position",
@@ -2597,6 +2598,15 @@ export const sv_SE: EnTranslations = {
       "tooLarge": "Den rapporten är för stor för att skickas. Försök igen utan skärmbilden.",
       "rateLimited": "Du har skickat flera rapporter nyligen. Vänta en stund innan du skickar en till.",
       "failed": "Kunde inte skicka felrapporten. Försök igen."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Ta av {item}",
@@ -9987,6 +9997,11 @@ export const sv_SE: EnTranslations = {
       "quit": "Avsluta",
       "fatalBody": "World of ClaudeCraft stötte på ett oväntat fel och måste stängas."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Avsluta spelet"
     }
@@ -10038,7 +10053,7 @@ export const sv_SE: EnTranslations = {
     "takeOver": "Ta över",
     "inWorldHint": "Redan i världen. Logga ut någon annanstans, eller ta över.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",
