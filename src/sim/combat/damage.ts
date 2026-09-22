@@ -78,6 +78,7 @@ import {
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
+import { emitAbsorbCredit } from './absorb_credit';
 import {
   afflictionOnDeath,
   clearAfflictionState,
@@ -601,6 +602,7 @@ export function dealDamage(
       if (answer && source) {
         amount -= answer.soaked;
         totalAbsorbed += answer.soaked;
+        emitAbsorbCredit(ctx, armed, target, answer.soaked);
         target.auras.splice(target.auras.indexOf(armed), 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: armed.name, gained: false });
         if (target.kind === 'player') grantAbilityDevotion(target, DEBT_OF_LIGHT_DEVOTION);
@@ -622,6 +624,7 @@ export function dealDamage(
       a.value -= soaked;
       amount -= soaked;
       totalAbsorbed += soaked;
+      emitAbsorbCredit(ctx, a, target, soaked);
       // Unleash Weapon protects against one damage event only. Any unused
       // protection falls away after that hit instead of behaving like a
       // conventional multi-hit absorb shield.

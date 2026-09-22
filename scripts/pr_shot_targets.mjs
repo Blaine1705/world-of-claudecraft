@@ -8072,6 +8072,96 @@ export const TARGETS = [
     },
   },
   {
+    key: 'meters-absorb-credit',
+    label: 'Healing meter: absorbed damage credited to the shielder as healing',
+    when: ['combat/absorb_credit', 'ui/meters.ts'],
+    variants: [
+      { key: 'desktop', charClass: 'mage', charName: 'Aeliss', beforeLoad: seedLowGraphicsPreset },
+      {
+        key: 'mobile',
+        mobile: true,
+        charClass: 'mage',
+        charName: 'Aeliss',
+        beforeLoad: seedLowGraphicsPreset,
+      },
+    ],
+    // Drives the REAL sim pipeline, never a synthetic meter event: a Temporal
+    // Aegis shield goes on the mage through Sim.applyAura, then hits land
+    // through ctx.dealDamage, so the meter only shows what the shipped absorb
+    // emit actually produced. A direct heal rides along so the Healing tab has
+    // a row in the BEFORE shot too, which makes the missing shield line the
+    // visible difference.
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return;
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const meters = game?.hud?.meters;
+        if (meters === undefined) return;
+        meters.dock?.('heal');
+        meters.dock?.('threat');
+        meters.resetFrames?.();
+        sim.applyAura(player, {
+          id: 'temporal_aegis',
+          name: 'Temporal Aegis',
+          kind: 'absorb',
+          remaining: 15,
+          duration: 15,
+          value: 900,
+          sourceId: player.id,
+          school: 'arcane',
+        });
+        sim.ctx.applyHeal(player, player, 260, 'Temporal Mend', null, false);
+        player.hp = Math.max(1, player.hp - 40);
+        for (const amount of [310, 275, 240]) {
+          sim.ctx.dealDamage(null, player, amount, false, 'physical', 'Bite', 'hit');
+        }
+        const el = document.querySelector('#meters-window');
+        if (el) el.style.display = 'none';
+      });
+      // Let the drained events reach the meter through the normal frame path.
+      await wait(600);
+      await openHubMetersWindow(page, variant);
+      await wait(400);
+      const tab = await page.$('#meters-window .mt-tab[data-tab="heal"]');
+      if (tab) await clickOrTap(page, variant, '#meters-window .mt-tab[data-tab="heal"]');
+      await wait(700);
+      await page.evaluate(() => {
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+      });
+      // A REAL hover on the healer's row opens the per-ability breakdown, where
+      // the shield appears under its own name. The clip is the union of the
+      // window and the shared #tooltip box so both land in one frame.
+      const row = await page.evaluate(() => {
+        const el = document.querySelector('#meters-window .mt-row');
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      });
+      if (row) {
+        await page.mouse.move(row.x, row.y);
+        await wait(500);
+      }
+      const rect = await page.evaluate(() => {
+        const boxes = ['#meters-window', '#tooltip']
+          .map((sel) => document.querySelector(sel))
+          .filter((el) => el && el.getBoundingClientRect().width > 0)
+          .map((el) => el.getBoundingClientRect());
+        if (boxes.length === 0) return null;
+        const x0 = Math.min(...boxes.map((b) => b.left)) - 8;
+        const y0 = Math.min(...boxes.map((b) => b.top)) - 8;
+        const x1 = Math.max(...boxes.map((b) => b.right)) + 8;
+        const y1 = Math.max(...boxes.map((b) => b.bottom)) + 8;
+        return { x: Math.max(0, x0), y: Math.max(0, y0), width: x1 - x0, height: y1 - y0 };
+      });
+      return { clip: rect ?? '#meters-window' };
+    },
+  },
+  {
     key: 'meters-detached',
     label: 'Damage meters: Threat and Healing popped out into their own movable windows',
     when: ['ui/meters_frame', 'ui/meters_rows', 'meters_frame_core'],

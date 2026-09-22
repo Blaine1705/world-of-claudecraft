@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { SimEvent } from '../src/sim/types';
 import { MeterData } from '../src/ui/meters';
+import { breakdownKey } from '../src/ui/meters_breakdown_view';
 import type { IWorld } from '../src/world_api';
 
 // minimal IWorld stand-in: entity map + player + party
@@ -74,6 +75,29 @@ describe('combat meters', () => {
     // label follows the beefiest mob fought
     expect(m.current!.label).toBe('Gorrak');
     expect(m.current!.mainMobId).toBe(51);
+  });
+
+  it('credits an absorb (a shield soaking a hit) to the shielder as healing, under the shield name', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const absorb = {
+      type: 'absorb',
+      sourceId: 2,
+      targetId: 1,
+      amount: 45,
+      ability: 'Temporal Aegis',
+      abilityId: 'temporal_aegis',
+    } as SimEvent;
+    m.onEvent(absorb, w, party, 1000);
+    expect(m.current).not.toBeNull();
+    const t = m.current!.tallies.get(2)!;
+    expect(t.heal).toBe(45);
+    expect(t.healByAbility.get(breakdownKey(null, 'Temporal Aegis'))?.amount).toBe(45);
+    expect(m.allTime.tallies.get(2)!.heal).toBe(45);
+    // A mob's own shield (source outside the party) is not party healing.
+    m.onEvent({ ...(absorb as object), sourceId: 50, targetId: 50 } as SimEvent, w, party, 1500);
+    expect(m.current!.tallies.get(50)).toBeUndefined();
   });
 
   it('ignores a cueOnly heal2 (the HoT-application sound cue): no encounter opens, no tally, no lastActivity bump', () => {
