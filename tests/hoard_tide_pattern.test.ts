@@ -78,13 +78,13 @@ describe('Hoard tide volley fairness', () => {
       }
   });
 
-  it('never lets two lanes on one axis touch: a calm corridor runs between them', () => {
-    for (let seed = 1; seed <= 100; seed++) {
+  it('never lets two near-parallel lanes touch: a calm corridor runs between them', () => {
+    for (let seed = 1; seed <= 300; seed++) {
       const lanes = hoardTidePattern(seed, 'legendary', false);
       for (let i = 0; i < lanes.length; i++)
         for (let j = i + 1; j < lanes.length; j++) {
-          const sameAxis = Math.abs(Math.sin(lanes[i].facing - lanes[j].facing)) < 1e-6;
-          if (!sameAxis) continue;
+          const nearParallel = Math.abs(Math.sin(lanes[i].facing - lanes[j].facing)) < 0.35;
+          if (!nearParallel) continue;
           // Distance between the two lanes' middles, measured ACROSS them.
           const f = lanes[i].facing;
           const across =
@@ -141,10 +141,27 @@ describe('Hoard tide volley fairness', () => {
       expect(Math.hypot(wave.x - sim.player.pos.x, wave.z - sim.player.pos.z)).toBeLessThan(12);
       expect(Math.hypot(wave.x - boss.spawnPos.x, wave.z - boss.spawnPos.z)).toBeGreaterThan(10);
     }
-    // The crests leave one after another.
+    // The crests leave one after another, never all at once.
     const leads = waves.map((w) => (w.kind === 'sweep' ? (w.waveLead ?? 0) : 0));
     expect(new Set(leads).size).toBe(waves.length);
+    expect(Math.max(...leads) - Math.min(...leads)).toBeGreaterThan(0.4);
     expect(inst.hoardBoss).toBe(state);
+  });
+
+  it('gives the aim point no safe spot: over enough volleys a lane runs straight over it', () => {
+    let over = 0;
+    for (let seed = 1; seed <= 200; seed++) {
+      const lanes = hoardTidePattern(seed, 'rare', false);
+      // The aim point is inside a lane when its across-offset is under the half span.
+      if (lanes.some((lane) => Math.hypot(lane.dx, lane.dz) < lane.span)) over++;
+    }
+    expect(over).toBeGreaterThan(120);
+    // And the angles are the seed's, not four fixed compass points.
+    const facings = new Set<number>();
+    for (let seed = 1; seed <= 20; seed++)
+      for (const lane of hoardTidePattern(seed, 'rare', false))
+        facings.add(Math.round(lane.facing * 100));
+    expect(facings.size).toBeGreaterThan(20);
   });
 
   it('hits a player who stays in a lane once, never twice, and never from full to dead', () => {

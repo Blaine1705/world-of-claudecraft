@@ -30,9 +30,21 @@ export const HOARD_TIDE_ENRAGED_STAGGER_SEC = 0.45;
 /** Reaction time granted on top of the walk out of a lane. */
 const REACTION_SEC = 0.75;
 
-/** One VOLLEY: several narrow lanes laid over the fight at once, in a grid round
- *  the aim point, every telegraph visible from the first moment and the crests
- *  leaving one after another. Lanes on the same axis never touch: a calm corridor
+/** Two lanes this close to parallel must leave the calm corridor between them;
+ *  lanes that cross at an angle leave the way out along either. */
+const PARALLEL_SIN = 0.35;
+/** How far from the aim point a lane's middle may be laid, and how often one is
+ *  laid straight over it: standing still on the target is no plan. */
+const LANE_SCATTER = 8;
+const OVER_AIM_CHANCE = 0.45;
+/** Each crest leaves this much after the one before, never all at once. */
+const STAGGER_MIN_SEC = 0.5;
+const STAGGER_MAX_SEC = 1.5;
+
+/** One VOLLEY: several narrow lanes laid over the fight at once, each at its own
+ *  angle and its own place round the aim point (some straight over it), every
+ *  telegraph visible from the first moment and the crests leaving one after
+ *  another at uneven beats. Two near-parallel lanes never touch: a calm corridor
  *  always runs between them. */
 export function hoardTidePattern(
   seed: number,
@@ -43,35 +55,66 @@ export function hoardTidePattern(
   const radius = [22, 24, 26, 28][tier];
   const speed = [8, 9, 10, 11][tier];
   const count = [2, 3, 4, 4][tier];
-  const stagger = enraged ? HOARD_TIDE_ENRAGED_STAGGER_SEC : HOARD_TIDE_STAGGER_SEC;
+  const hurry = enraged ? HOARD_TIDE_ENRAGED_STAGGER_SEC / HOARD_TIDE_STAGGER_SEC : 1;
   const rng = new Rng(seed);
-  const first = rng.int(0, 3);
-  const sign = rng.chance(0.5) ? 1 : -1;
-  // The whole grid is nudged so the aim point is never reliably safe or unsafe.
-  const nudge = (rng.int(0, 8) - 4) * 0.5;
   const span = HOARD_TIDE_LANE_HALF_SPAN;
   // From the MIDDLE of a lane (the worst place in it) a straight sideways walk
   // clears it inside the warning, reaction time included.
   const lead = (span + 0.6) / HOARD_TIDE_ESCAPE_SPEED + REACTION_SEC;
-  const apart = span + HOARD_TIDE_LANE_CORRIDOR / 2;
-  return Array.from({ length: count }, (_, index) => {
-    const facing = ((first + index) % 4) * Math.PI * 0.5;
-    // Lanes 0 and 2 share an axis, as do 1 and 3: each pair sits either side of
-    // the aim point. The offset is laid along that axis's own fixed sideways
-    // direction, so opposite facings never fold onto the same strip of floor.
-    const axis = ((first + (index % 2)) % 4) * Math.PI * 0.5;
-    const side = (index < 2 ? -1 : 1) * sign;
-    const offset = side * apart + nudge;
-    const warn = lead + index * stagger;
-    return {
+  const apart = 2 * span + HOARD_TIDE_LANE_CORRIDOR;
+  const lanes: HoardTidePatternWave[] = [];
+  let warn = lead;
+  const corridorKept = (facing: number, ax: number, az: number, offset: number): boolean =>
+    lanes.every((other) => {
+      if (Math.abs(Math.sin(facing - other.facing)) >= PARALLEL_SIN) return true;
+      const ox = Math.cos(other.facing);
+      const oz = -Math.sin(other.facing);
+      return Math.abs((offset * ax - other.dx) * ox + (offset * az - other.dz) * oz) >= apart;
+    });
+  for (let index = 0; index < count; index++) {
+    let facing = 0;
+    let ax = 0;
+    let az = 0;
+    let offset = 0;
+    // A lane is laid at a seeded angle and place near the aim point. One that
+    // would touch an earlier, near-parallel lane is re-rolled; if the seed keeps
+    // finding no room it is laid square across that lane instead, which always fits.
+    for (let attempt = 0; attempt < 8; attempt++) {
+      facing = rng.range(0, Math.PI * 2);
+      if (attempt >= 5) {
+        // The angle furthest from parallel to every earlier lane: with at most three
+        // of them and this margin, one always clears the corridor outright.
+        let best = -1;
+        for (let k = 0; k < 12; k++) {
+          const candidate = facing + (k * Math.PI) / 12;
+          const clearance = Math.min(
+            ...lanes.map((other) => Math.abs(Math.sin(candidate - other.facing))),
+          );
+          if (clearance > best) {
+            best = clearance;
+            facing = candidate;
+          }
+        }
+      }
+      // Across the lane: the direction its middle is offset from the aim point.
+      ax = Math.cos(facing);
+      az = -Math.sin(facing);
+      offset = rng.chance(OVER_AIM_CHANCE)
+        ? rng.range(-span * 0.6, span * 0.6)
+        : (rng.chance(0.5) ? 1 : -1) * rng.range(span, LANE_SCATTER);
+      if (corridorKept(facing, ax, az, offset)) break;
+    }
+    if (index > 0) warn += rng.range(STAGGER_MIN_SEC, STAGGER_MAX_SEC) * hurry;
+    lanes.push({
       facing,
       gap: HOARD_TIDE_NO_GAP,
       span,
       radius,
       lead: warn,
       total: warn + radius / speed,
-      dx: Math.cos(axis) * offset,
-      dz: -Math.sin(axis) * offset,
-    };
-  });
+      dx: ax * offset,
+      dz: az * offset,
+    });
+  }
+  return lanes;
 }
