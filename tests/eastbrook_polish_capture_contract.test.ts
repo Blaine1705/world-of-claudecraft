@@ -688,7 +688,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  'd872e91fef162b388fd9e35249a01b6b07a299595e9e2ae8b880ef95da810edd';
+  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
+  'e651995fbf1ac8413176d75b35b5da91b9a241918ea183430642a9c6b51d3fd5';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -414,6 +414,7 @@ export const nl_NL: EnTranslations = {
       "help": "Herstel: /unstuck start een stilstaande aftelling die je verplaatst naar een nabije bereikbare veilige plek.",
       "helpAtGraveyard": "Herstel: /unstuck start een stilstaande aftelling en stuurt je geest daarna naar het dichtstbijzijnde kerkhof. Terugkeren via De Bleke Hoeder vereist de Tol van de Hoeder.",
       "helpUnstuckSickness": "Herstel: /unstuck start een stilstaande aftelling en verplaatst je daarna naar het dichtstbijzijnde kerkhof, waarbij je herrijst als je was gevallen. De Loskomingsziekte blijft tot 5 minuten op je.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Loskomen over {seconds} seconden. Bewegen, vechten, schade oplopen, of een andere actie beginnen annuleert dit.",
       "countdown": "Loskomen: {seconds}",
       "completed": "Verplaatst naar de dichtstbijzijnde bereikbare veilige plek.",
@@ -421,6 +422,8 @@ export const nl_NL: EnTranslations = {
       "revivedAtGraveyard": "Je bent teruggebracht naar het dichtstbijzijnde kerkhof en herrezen. De Tol van de Hoeder weegt op je.",
       "movedToGraveyard": "Je bent naar het dichtstbijzijnde kerkhof verplaatst. De Loskomingsziekte weegt op je.",
       "revivedAtGraveyardUnstuck": "Je bent naar het dichtstbijzijnde kerkhof verplaatst en herrezen. De Loskomingsziekte weegt op je.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Loskomen geannuleerd omdat je bewoog.",
       "cancelledDamaged": "Loskomen geannuleerd omdat je schade opliep.",
       "cancelledCombat": "Loskomen geannuleerd omdat je in gevecht raakte.",
@@ -1864,7 +1867,8 @@ export const nl_NL: EnTranslations = {
       "crossHotbarEditHelp": "Houd de linkerbumper vast en druk op de bovenste gezichtsknop om de balk met de controller te rangschikken."
     },
     "perf": {
-      "title": "Prestatie-overlay",
+      "title": "Performance",
+      "overlaySection": "Prestatie-overlay",
       "enable": "Prestatie-overlay tonen",
       "description": "Kies welke statistieken worden getoond, waar de overlay staat en hoe deze eruitziet.",
       "sectionPosition": "Positie",
@@ -2537,6 +2541,15 @@ export const nl_NL: EnTranslations = {
       "tooLarge": "Dat rapport is te groot om te versturen. Probeer het opnieuw zonder de schermafbeelding.",
       "rateLimited": "Je hebt onlangs meerdere rapporten verstuurd. Wacht even voordat je er nog een verstuurt.",
       "failed": "Kon het bugrapport niet versturen. Probeer het opnieuw."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "{item} afdoen",
@@ -3589,6 +3602,15 @@ export const nl_NL: EnTranslations = {
         "socket": "Een juweeltje in {name} gestopt.",
         "socketReplaced": "Een juweeltje in {name} gestopt; {gem} werd vernietigd."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Vereist niveau {level}",
@@ -6351,6 +6373,7 @@ export const nl_NL: EnTranslations = {
       "allyRezBody": "Je hoeft niet altijd terug te lopen. Een bondgenoot met een opstandingsspreuk kan je in plaats daarvan tot leven terugbrengen: het komt bij je binnen als een prompt die je accepteert of afwijst; laat je hem liggen, dan verloopt hij, dus beantwoord hem terwijl hij er nog is. Accepteer, en je herrijst naast de vriend die de spreuk uitsprak, met een deel van je gezondheid en mana terug. Sommige genezers kunnen de hele neergevallen groep tegelijk een aanbod doen, al beantwoordt ieder van jullie nog steeds zijn eigen prompt. Doornholte-Velden is de uitzondering: daar bereikt geen enkele opstandingsspreuk je, en wacht je op de volgende golf van je team.",
       "unstuckTitle": "Wanneer je echt vastzit",
       "unstuckBody": "Als de wereld je ergens vastzet waar je niet uit kunt komen, typ dan /unstuck. Je moet buiten gevecht zijn en stilstaan, niet vastgehouden door een verdoving of een wortel, en niet in een duel of een arenawedstrijd zitten: er loopt een korte aftelling, en bewegen of schade oplopen annuleert hem. Wanneer hij afloopt, word je bij de dichtstbijzijnde begraafplaats neergezet. Het doodt je nooit en laat geen lijk achter, en als je al was neergevallen, herrijst het je daar in plaats daarvan. De prijs is de Loskomingsziekte, een tijdelijke verzwakking van alles wat je bent, die is uitgewerkt tegen de tijd dat je het commando weer kunt gebruiken, en net als de Tol van de Hoeder blijft die gloednieuwe personages helemaal bespaard.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Jezelf optrekken op een richel",
       "climbBody": "Richels zijn geen muren. Spring tegen iets aan dat te hoog is om zomaar op te stappen, en je personage grijpt de rand vlak bij het hoogste punt van de sprong vast en trekt zichzelf erop, zonder dat daar een eigen toets voor nodig is. Alles wat laag genoeg is om er zelf overheen te komen, gaat zonder poespas voorbij; de volledige optrekbeweging is voorbehouden aan randen boven je hoofd. Het duurt kort, en het neemt de controle over zolang het loopt, dus je kunt er niet halverwege uit sturen. Een verdoving die je midden in de trekbeweging treft, laat je los en je valt, gemeten vanaf de plek waar de sprong de grond verliet, en een verdoving of wortel zorgt ervoor dat een klim helemaal niet begint, iets om te onthouden wanneer je in een gevecht uit een lastige positie probeert te komen."
     },
@@ -6524,6 +6547,7 @@ export const nl_NL: EnTranslations = {
       "dungeonReset": "Reset je eigen lege instanties, wat je doet na het wijzigen van de moeilijkheidsgraad.",
       "groupRecovery": "Herstel en aanwezigheid",
       "unstuck": "De uitweg wanneer de wereld je heeft vastgezet. Sta stil tijdens een korte aftelling en je wordt verplaatst naar de dichtstbijzijnde begraafplaats, en daar tot leven gewekt als je al was gevallen. Het laat je daarna een tijdje verzwakt achter door de Loskomingsziekte, dus het is een laatste redmiddel, geen kortere weg.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Markeer jezelf als afwezig (AFK), met een optioneel bericht dat iedereen die je fluistert automatisch als antwoord krijgt. Herhaal het zonder bericht om het te wissen; elke andere chat wist het ook.",
       "dnd": "Niet Storen: zoals afwezig, behalve dat fluisterberichten die naar je worden gestuurd worden vastgehouden in plaats van afgeleverd.",
       "sit": "Ga zitten waar je staat, en sta weer op. Je staat automatisch op zodra je beweegt, een spreuk bezweert, of een klap oploopt.",
@@ -6630,6 +6654,7 @@ export const nl_NL: EnTranslations = {
       "fatigueDef": "Zwem ver genoeg de open zee op en het water begint je uit te putten: eerst komt een waarschuwing, dan oplopende schade totdat je terugkeert naar het land.",
       "unstuckTerm": "Loskomingsziekte",
       "unstuckDef": "De prijs van het gebruiken van Loskomen vanuit het spelmenu. Sta stil tijdens de aftelling en het zet je neer bij het dichtstbijzijnde kerkhof, waarna je een tijdlang de Loskomingsziekte met je meedraagt.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Itemniveau",
       "itemLevelDef": "Eén getal dat samenvat hoe sterk een stuk uitrusting is, handig wanneer je snel twee stukken wilt vergelijken. Schakel Itemniveau tonen in de opties in om het op tooltips te zien. Alleen uitrusting met een bekende bron draagt er een, dus gewone verkoperbasisspullen en startuitrusting tonen niets, en een ontbrekend getal is normaal, geen fout.",
       "requiredLevelTerm": "Vereist niveau",
@@ -9893,6 +9918,11 @@ export const nl_NL: EnTranslations = {
       "quit": "Afsluiten",
       "fatalBody": "World of ClaudeCraft is op een onverwachte fout gestuit en moet worden afgesloten."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Spel afsluiten"
     }
@@ -9943,6 +9973,11 @@ export const nl_NL: EnTranslations = {
     "inWorld": "in wereld",
     "takeOver": "Overnemen",
     "inWorldHint": "Al in de wereld. Log elders uit, of neem over.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Hiermee wordt dit personage losgekoppeld van een andere sessie en hierheen gehaald. Doorgaan?",
     "renameRequired": "hernoemen vereist",
     "delete": "Verwijderen",

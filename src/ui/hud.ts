@@ -130,7 +130,6 @@ import {
   xpUntilNextPrestige,
 } from '../sim/types';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
-import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
   type CharacterProfile,
   type DailyRewardStatus,
@@ -215,9 +214,9 @@ import { CombatAnnouncer } from './combat_announcer';
 import {
   auraApplyCue,
   castCueForAbility,
-  consumeHealCue,
   dispatchRaidCalloutSfx,
   groundTickAbilityCue,
+  healAudioPlan,
   impactCueForDamage,
   mobVoiceActionForDamage,
   mobVoiceCueWithFallback,
@@ -619,21 +618,19 @@ import {
 } from './interface_unlock_menu_core';
 import { InterfaceUnlockPreview } from './interface_unlock_preview';
 import { InteriorMapController } from './interior_map_controller';
-import { itemAffixTooltipLines, itemRatingTooltipLines } from './item_affix_tooltip';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
+import { itemCombatTooltipLines } from './item_combat_tooltip_view';
 import { itemCompareBlocksHtml } from './item_compare_view';
 import { ItemDragState } from './item_drag_state';
 import {
   instanceBadgeLines,
   instanceBindingLines,
-  instanceBonusStatLines,
   instanceLockLine,
   instancePartyTradeLine,
   instanceTitleHtml,
   itemNumber,
   itemRequiredLevelLine,
-  itemStatName,
   materialMakersMarkLines,
   tooltipEffectiveQuality,
   vendorSellTooltipLine,
@@ -652,6 +649,8 @@ import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
+import { lootQualityReceiptBody } from './loot_quality_receipt';
+import { lootQualityAriaName } from './loot_quality_view';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
@@ -789,7 +788,7 @@ import {
 import { questProgressEventText } from './quest_progress_text';
 import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { raidCalloutKey } from './raid_callout';
-import { formatLockoutDuration } from './raid_lockout_format';
+import { formatLockoutDuration, raidLockoutDisplayName } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import { RecipePinStore } from './recipe_pins_store';
@@ -837,7 +836,7 @@ import {
   MOTD_RESULT_FALLBACK_KEY,
   MOTD_RESULT_KEYS,
 } from './result_code_keys';
-import { itemLevelReadout, riftBandTooltipLines, riftGemTooltipLines } from './rift_band_tooltip';
+import { itemLevelReadout } from './rift_band_tooltip';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import {
@@ -1035,7 +1034,7 @@ export interface BugReportPayload {
 export interface BugReportHooks {
   // Submit a captured bug report to the server. Resolves on success (screenshotStored
   // is false when the server dropped the screenshot), rejects with a server error
-  // message the hud maps via localizeBugReportError.
+  // message the ui maps via bugReportErrorText.
   submit(payload: BugReportPayload): Promise<{ screenshotStored: boolean }>;
   // Grab a JPEG data URL of the current frame asynchronously, or null if capture
   // failed/unavailable. Encoding must not block the options window's main thread.
@@ -6494,15 +6493,18 @@ export class Hud {
     }
     // Optional item-level readout (off by default; src/sim/item_level.ts derives it
     // from where the item drops). Read live, so toggling it takes effect on the next
-    // hover. Combat gear only: sourceless items (vendor/starter) have no level,
-    // and non-combat items never get an item-level line. A Riftbound band copy
-    // has no drop-source itemLevel (it is priced by its rift record, not its
-    // stat-free ItemDef shell), so its level/score come from itemLevelReadout
-    // (rift_band_tooltip.ts) instead of itemInstanceLevel/itemScore, which stay
-    // the source for every other piece so Crucible Perfecting's bonus level holds.
-    if (isItemLevelEligible(item) && this.optionsHooks?.settings.get('showItemLevel')) {
+    // hover. Combat gear only: sourceless items (vendor/starter) have no level, and
+    // non-combat items never get the line. A quality-rolled copy ALWAYS shows it
+    // (deliberate: its badge means "+N item levels", so the readout is the badge's
+    // legend, not the optional setting). A Riftbound band or quality copy is priced
+    // by its payload, not its stat-free shell, so its level/score come from
+    // itemLevelReadout; itemInstanceLevel/itemScore stay the source for the rest.
+    if (
+      isItemLevelEligible(item) &&
+      (instance?.lootQuality || this.optionsHooks?.settings.get('showItemLevel'))
+    ) {
       let readout: { level: number; score: number } | undefined;
-      if (instance?.rift) {
+      if (instance?.rift || instance?.lootQuality) {
         readout = itemLevelReadout(item, instance);
       } else {
         const level = itemInstanceLevel(item, instance);
@@ -6540,40 +6542,7 @@ export class Hud {
     // seal and the enchanted marker (item_instance_tooltip.ts owns the copy
     // rules, incl. never claiming a quality-rank upgrade).
     html += instanceBadgeLines(instance);
-    if (item.weapon) {
-      const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
-      html += `<div class="tt-stat">${esc(
-        t('itemUi.tooltip.damageSpeed', {
-          min: itemNumber(item.weapon.min),
-          max: itemNumber(item.weapon.max),
-          speed: itemNumber(item.weapon.speed, 1),
-        }),
-      )}</div>`;
-      html += `<div class="tt-stat">${esc(t('itemUi.tooltip.dps', { dps: itemNumber(dps, 1) }))}</div>`;
-      // The weapon type (incl. Dagger) now appears on the slot line above like
-      // every other weapon, so the old standalone "Dagger" sub-line is gone. The
-      // item.weapon.dagger DATA field still drives Backstab; only this line went.
-    }
-    if (item.stats) {
-      for (const [k, v] of Object.entries(item.stats)) {
-        if (v === undefined) continue;
-        if (k === 'armor') {
-          html += `<div class="tt-stat">${esc(t('itemUi.tooltip.armorStat', { value: itemNumber(v) }))}</div>`;
-        } else {
-          html += `<div class="tt-green">${esc(
-            t('itemUi.tooltip.stat', {
-              value: itemNumber(v),
-              stat: itemStatName(k),
-            }),
-          )}</div>`;
-        }
-      }
-    }
-    html += instanceBonusStatLines(instance);
-    html += riftBandTooltipLines(instance);
-    html += itemAffixTooltipLines(item);
-    html += riftGemTooltipLines(item);
-    html += itemRatingTooltipLines(item);
+    html += itemCombatTooltipLines(item, instance);
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
@@ -9892,21 +9861,9 @@ export class Hud {
     const i18n: RaidLockoutI18n = {
       title: t('hudChrome.raidLockout.title'),
       allReady: t('hudChrome.raidLockout.allReady'),
-      // A looted world boss shows in the raid-lockout timer under a world-boss lockout id
-      // (see markWorldBossLooted in src/sim/world_boss.ts). worldBossIdFromLockout keeps
-      // the prefix convention in one place: it returns the boss mob id (localize as a mob
-      // name) or null for an ordinary dungeon/raid id.
-      raidName: (id) => {
-        const bossId = worldBossIdFromLockout(id);
-        if (bossId !== null) return tEntity({ kind: 'mob', id: bossId, field: 'name' });
-        // Heroic daily lockouts ride difficulty-scoped ids (<dungeon>:heroic).
-        if (id.endsWith(':heroic')) {
-          return t('hudChrome.raidLockout.heroicName', {
-            name: dungeonDisplayName(id.slice(0, -':heroic'.length)),
-          });
-        }
-        return dungeonDisplayName(id);
-      },
+      // World-boss, heroic and plain dungeon ids all name through the shared
+      // rule character select uses too (raid_lockout_format.ts).
+      raidName: raidLockoutDisplayName,
       duration: formatLockoutDuration,
     };
     return raidLockoutPanelHtml(this.sim.raidLockouts(), i18n);
@@ -11117,27 +11074,9 @@ export class Hud {
       case 'heal2': {
         const tgt = sim.entities.get(ev.targetId);
         if (!tgt) return;
-        // A potion/eat/drink heal (items.ts / combat/auras.ts) plays its own
-        // dedicated cue instead of the generic heal_impact; consumeHealCue
-        // returns null for every other heal source (leech, second wind,
-        // companion heals, ...), which falls through to heal_impact unchanged.
-        const cue = ev.type === 'heal' ? consumeHealCue(ev) : null;
-        if (ev.type === 'heal' && ev.source && !cue) return; // eat/drink tick, not a sound tick
-        // A HoT tick fires this every couple seconds for its whole duration; the
-        // one-shot application cue (Sim.applyAura) now covers the "heal landed"
-        // moment instead, so ticks stay silent. Frenzied Regeneration is fully
-        // exempt from this change (a Bear Form self-heal, never aimed at anyone
-        // else, so the repeat doesn't read as spammy the way a party HoT does):
-        // it keeps its old, unchanged tick-only sound, so the one-shot
-        // application emit is skipped for it too, or it would gain an extra pop
-        // on top of its untouched ticking. Confirmed in-game on Priest (Renew)
-        // and Druid (Rejuvenation, Regrowth, Frenzied Regeneration): the others
-        // land once on application and stay silent for the rest of their
-        // duration; Frenzied Regeneration keeps ticking exactly as before.
-        const isHot = ev.type === 'heal2' && ev.hot === true;
-        const isFrenziedRegen = ev.type === 'heal2' && ev.abilityId === 'frenzied_regeneration';
-        if (isHot ? !isFrenziedRegen : isFrenziedRegen) return;
-        this.combat(cue ?? 'heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
+        const plan = healAudioPlan(ev);
+        if (!plan) return;
+        this.combat(plan.cue, tgt.pos.x, tgt.pos.y, tgt.pos.z, plan.gain, { cooldown: 0.1 });
         return;
       }
       case 'aura': {
@@ -11305,7 +11244,7 @@ export class Hud {
             // token (the grey vs the white FCT token); the localized word stays at the call site. A resisted
             // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,
             // not miss).
-            const shape = fctSpawnShape({
+            const shape = this.fctPainter.stagedShape(ev, now, {
               type: 'damage',
               damageKind: ev.kind,
               ability: false,
@@ -11365,7 +11304,7 @@ export class Hud {
           // through here too, but with its own damageKind so it reads with its own colour
           // and combat-log sentence instead of an indistinguishable plain hit. The amount
           // text + target entity stay at the call site.
-          const hitShape = fctSpawnShape({
+          const hitShape = this.fctPainter.stagedShape(ev, now, {
             type: 'damage',
             damageKind: ev.kind === 'block' ? 'block' : 'hit',
             ability: !!ev.ability,
@@ -11636,14 +11575,16 @@ export class Hud {
           // (#2430). Everything else in this arm still runs for those grants:
           // the loot-roll close below, the bag refresh, and the independent
           // audio guard.
-          if (!ev.callerLogs) this.log(this.localizeLootText(ev.text), HUD_LOG.GOOD);
+          // The body is the localized line, or, for a quality-rolled copy, the
+          // nodes whose item link carries that exact copy (lootReceiptBody).
+          if (!ev.callerLogs) this.log(this.lootReceiptBody(ev), HUD_LOG.GOOD);
           if (
             / wins .+ \(\d+\)$/.test(ev.text) ||
             /^Everyone passed on .+\.$/.test(ev.text) ||
             / assigned .+ to .+\.$/.test(ev.text) ||
             /^.+ was not assigned and is free for all\.$/.test(ev.text)
           )
-            this.lootRolls.closeForItem(ev.text);
+            this.lootRolls.closeForItem(ev.text, ev.rollId);
           // silent: the audio half of the same idea, and independent of it (a
           // caller can own the cue without owning the line). A professions
           // grant sets this when it owns the cue for the same grant: it has a
@@ -13985,7 +13926,9 @@ export class Hud {
   }
 
   log(
-    text: string,
+    // A string body, or a caller-assembled NODE body (the exact-copy loot
+    // receipt link) that rides the same chrome and channel as a text line.
+    text: string | readonly Node[],
     color = 'var(--color-accent)',
     decorativeIconUrl?: string,
     channel = ERROR_LOG_CHAN,
@@ -13996,13 +13939,13 @@ export class Hud {
   ): void {
     this.appendLog(
       this.chatLogEl,
-      text,
+      typeof text === 'string' ? text : '',
       color,
       true,
       channel,
       decorativeIconUrl,
       plainText,
-      undefined,
+      typeof text === 'string' ? undefined : text,
       announceWhenFiltered,
     );
   }
@@ -14013,6 +13956,18 @@ export class Hud {
    *  text node. */
   private logNodes(nodes: readonly Node[], color: string): void {
     this.appendLog(this.chatLogEl, '', color, true, 'system', undefined, false, nodes);
+  }
+
+  /** The generic grant line's body (src/ui/loot_quality_receipt.ts): the
+   *  localized text, or for a quality-rolled copy the nodes whose item link
+   *  opens that exact copy rather than the catalogue definition. */
+  private lootReceiptBody(ev: Extract<SimEvent, { type: 'loot' }>): string | Node[] {
+    return lootQualityReceiptBody(
+      document,
+      ev,
+      (value) => this.localizeLootText(value),
+      (parent, id, copy) => this.appendChatItemLink(parent, id, copy),
+    );
   }
 
   private noteProcAuraGain(name: string): void {
@@ -14191,7 +14146,11 @@ export class Hud {
   // bag / tooltip / loot name language. Hover/focus shows the same item tooltip
   // the bags window uses; an unknown id (e.g. content drift between players)
   // degrades to a plain [?].
-  private appendChatItemLink(parent: HTMLElement, itemId: string): void {
+  private appendChatItemLink(
+    parent: HTMLElement,
+    itemId: string,
+    instance?: ItemInstancePayload,
+  ): void {
     // knownItemDef, not bare truthiness: the token charset admits prototype
     // keys ([[i:constructor]] is peer-typed text), and the bare read sent
     // them down the known arm to throw inside the event batch.
@@ -14203,9 +14162,9 @@ export class Hud {
     const link = document.createElement('span');
     link.className = 'chat-item-link';
     link.style.color = itemNameColor(item);
-    link.textContent = `[${itemDisplayName(item)}]`;
+    link.textContent = `[${lootQualityAriaName(itemDisplayName(item), instance)}]`;
     link.tabIndex = 0;
-    this.attachTooltip(link, () => this.itemTooltip(item));
+    this.attachTooltip(link, () => this.itemTooltip(item, true, instance));
     parent.append(link);
   }
 

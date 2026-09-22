@@ -414,6 +414,7 @@ export const da_DK: EnTranslations = {
       "help": "Redning: /unstuck starter en stillestående nedtælling, der flytter dig til et nærliggende tilgængeligt sikkert sted.",
       "helpAtGraveyard": "Redning: /unstuck starter en stillestående nedtælling og sender derefter din ånd til den nærmeste kirkegård. At vende tilbage via Den Blege Vogter kræver Vogterens Klokke.",
       "helpUnstuckSickness": "Redning: /unstuck starter en stillestående nedtælling og flytter dig derefter til den nærmeste kirkegård, hvor du genoplives, hvis du var faldet. Frigørelsessyge bliver på dig i op til 5 minutter.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Frigørelse om {seconds} sekunder. At bevæge dig, kæmpe, tage skade eller begynde en anden handling annullerer den.",
       "countdown": "Frigørelse: {seconds}",
       "completed": "Flyttet til det nærmeste tilgængelige sikre sted.",
@@ -421,6 +422,8 @@ export const da_DK: EnTranslations = {
       "revivedAtGraveyard": "Du er blevet returneret til den nærmeste kirkegård og genoplivet. Vogterens Klokke tynger dig.",
       "movedToGraveyard": "Du er blevet flyttet til den nærmeste kirkegård. Frigørelsessyge tynger dig.",
       "revivedAtGraveyardUnstuck": "Du er blevet flyttet til den nærmeste kirkegård og genoplivet. Frigørelsessyge tynger dig.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Frigørelse annulleret, fordi du flyttede dig.",
       "cancelledDamaged": "Frigørelse annulleret, fordi du tog skade.",
       "cancelledCombat": "Frigørelse annulleret, fordi du kom i kamp.",
@@ -1864,7 +1867,8 @@ export const da_DK: EnTranslations = {
       "crossHotbarEditHelp": "Hold den venstre kofanger, og tryk på den øverste knap for at arrangere stangen med controlleren."
     },
     "perf": {
-      "title": "Ydelsesoverlay",
+      "title": "Performance",
+      "overlaySection": "Ydelsesoverlay",
       "enable": "Vis ydelsesoverlay",
       "description": "Vælg hvilke statistikker der skal vises, hvor overlayet sidder, og hvordan det ser ud.",
       "sectionPosition": "Position",
@@ -2537,6 +2541,15 @@ export const da_DK: EnTranslations = {
       "tooLarge": "Den rapport er for stor til at sende. Prøv igen uden skærmbilledet.",
       "rateLimited": "Du har sendt flere rapporter for nylig. Vent venligst lidt, før du sender en ny.",
       "failed": "Kunne ikke sende fejlrapporten. Prøv venligst igen."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Fjern {item}",
@@ -3589,6 +3602,15 @@ export const da_DK: EnTranslations = {
         "socket": "Socket en perle i {name}.",
         "socketReplaced": "Socket en perle i {name}; {gem} blev ødelagt."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Kræver niveau {level}",
@@ -6351,6 +6373,7 @@ export const da_DK: EnTranslations = {
       "allyRezBody": "Du behøver ikke altid at gå tilbage. En allieret med en opstandelsesbesværgelse kan rejse dig i stedet, og det kommer til dig som en forespørgsel, du accepterer eller afslår; lader du den ligge, udløber den, så svar på den, mens den er der. Accepter, og du rejser dig ved siden af den ven, der kastede den, med en del af dit helbred og din mana tilbage. Nogle helbredere kan tilbyde det til hele den faldne gruppe på én gang, men hver af jer svarer stadig på sin egen forespørgsel. Tornehulemarkerne er undtagelsen: ingen opstandelsesbesværgelse når dig der, og du venter på dit holds næste bølge.",
       "unstuckTitle": "Når du virkelig sidder fast",
       "unstuckBody": "Hvis verden fanger dig et sted, du ikke kan komme ud af, så skriv /unstuck. Du skal være ude af kamp og stå stille, ikke ramt af en lammelse eller en rod, og ikke i en duel eller en arenakamp: en kort nedtælling løber, og at bevæge dig eller tage skade annullerer den. Når den er færdig, bliver du sat af ved den nærmeste kirkegård. Den slår dig aldrig ihjel og efterlader intet lig, og var du allerede faldet, genopliver den dig der i stedet. Prisen er Frigørelsessyge, en midlertidig svækkelse af alt, hvad du er, som er ovre, når du kan bruge kommandoen igen, og ligesom Vogterens Klokke skåner den splinternye karakterer helt.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "At hive dig op på en afsats",
       "climbBody": "Afsatser er ikke mure. Hop mod noget, der er for højt til at træde op på, og din figur griber kanten nær toppen af hoppet og hiver sig op på den, uden nogen egen tast at trykke på. Alt, der er lavt nok til, at du klarer det på egen hånd, går ubemærket forbi; den fulde optrækning er forbeholdt kanter over hovedhøjde. Den er kort, og den tager tøjlerne, mens den kører, så du kan ikke styre dig ud af den midtvejs. Rammer en lammelse dig midt i optrækningen, slipper du taget og falder, målt fra der, hvor hoppet forlod jorden, og en lammelse eller en rod forhindrer en optrækning i overhovedet at starte, hvilket er værd at huske, når du prøver at komme ud af en dårlig position i en kamp."
     },
@@ -6524,6 +6547,7 @@ export const da_DK: EnTranslations = {
       "dungeonReset": "Opgiv dine egne tomme instanser, hvilket er det, du gør efter at have skiftet sværhedsgrad.",
       "groupRecovery": "Genopretning og tilstedeværelse",
       "unstuck": "Vejen ud, når verden har fanget dig. Stå stille gennem en kort nedtælling, så bliver du flyttet til den nærmeste kirkegård, og genoplivet der, hvis du allerede var faldet. Den efterlader dig svækket af Frigørelsessyge et stykke tid bagefter, så det er en sidste udvej snarere end en genvej.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Marker dig selv som Borte (AFK), med en valgfri besked, som alle, der hvisker til dig, får som automatisk svar. Gentag uden besked for at fjerne det; al anden chat fjerner det også.",
       "dnd": "Forstyr Ikke: som borte, bortset fra at hvisken sendt til dig holdes tilbage i stedet for at blive leveret.",
       "sit": "Sæt dig ned, hvor du er, og rejs dig igen. Du rejser dig automatisk, i det øjeblik du bevæger dig, kaster, eller bliver ramt.",
@@ -6630,6 +6654,7 @@ export const da_DK: EnTranslations = {
       "fatigueDef": "Svøm langt nok ud i åbent hav, og vandet begynder at tære på dig: en advarsel kommer først, derefter stigende skade, indtil du vender om mod land.",
       "unstuckTerm": "Frigørelsessyge",
       "unstuckDef": "Prisen for at bruge Frigørelse fra spilmenuen. Stå stille gennem nedtællingen, så sætter den dig af ved den nærmeste kirkegård, og du bærer en midlertidig svækkelse et stykke tid bagefter.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Genstandsniveau",
       "itemLevelDef": "Ét tal, der opsummerer, hvor stærkt et stykke udstyr er, praktisk når du hurtigt vil sammenligne to stykker. Slå Vis genstandsniveau til i indstillingerne for at se det på værktøjstip. Kun udstyr med en kendt kilde bærer et, så almindelige handelsvarer og startudstyr viser intet, og et manglende tal er normalt snarere end en fejl.",
       "requiredLevelTerm": "Krævet niveau",
@@ -9893,6 +9918,11 @@ export const da_DK: EnTranslations = {
       "quit": "Afslut",
       "fatalBody": "World of ClaudeCraft stødte på en uventet fejl og skal lukke."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Afslut spillet"
     }
@@ -9943,6 +9973,11 @@ export const da_DK: EnTranslations = {
     "inWorld": "i verden",
     "takeOver": "Overtag",
     "inWorldHint": "Allerede i verden. Log ud et andet sted, eller overtag.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Dette afbryder denne karakter fra en anden session og henter den hertil. Fortsæt?",
     "renameRequired": "omdøbning påkrævet",
     "delete": "Slet",

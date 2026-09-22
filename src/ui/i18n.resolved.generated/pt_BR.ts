@@ -414,6 +414,7 @@ export const pt_BR: EnTranslations = {
       "help": "Recuperação: /unstuck inicia uma contagem regressiva parado para movê-lo até um local seguro alcançável nas proximidades.",
       "helpAtGraveyard": "Recuperação: /unstuck inicia uma contagem regressiva parado, depois envia seu espírito ao cemitério mais próximo. Retornar pelo Guardião Pálido exige o Tributo do Guardião.",
       "helpUnstuckSickness": "Recuperação: /unstuck inicia uma contagem regressiva parado, depois leva você ao cemitério mais próximo, reanimando você se havia caído. O Mal do Desbloqueio permanece por até 5 minutos.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Desbloqueio em {seconds} segundos. Mover-se, lutar, sofrer dano ou iniciar outra ação o cancela.",
       "countdown": "Desbloqueio: {seconds}",
       "completed": "Movido para o local seguro alcançável mais próximo.",
@@ -421,6 +422,8 @@ export const pt_BR: EnTranslations = {
       "revivedAtGraveyard": "Você foi levado de volta ao cemitério mais próximo e reanimado. O Tributo do Guardião pesa sobre você.",
       "movedToGraveyard": "Você foi levado ao cemitério mais próximo. O Mal do Desbloqueio pesa sobre você.",
       "revivedAtGraveyardUnstuck": "Você foi levado ao cemitério mais próximo e reanimado. O Mal do Desbloqueio pesa sobre você.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Desbloqueio cancelado porque você se moveu.",
       "cancelledDamaged": "Desbloqueio cancelado porque você sofreu dano.",
       "cancelledCombat": "Desbloqueio cancelado porque você entrou em combate.",
@@ -1864,7 +1867,8 @@ export const pt_BR: EnTranslations = {
       "crossHotbarEditHelp": "Segure o pára-choque esquerdo e pressione o botão superior para organizar a barra com o controlador."
     },
     "perf": {
-      "title": "Sobreposição de Desempenho",
+      "title": "Performance",
+      "overlaySection": "Sobreposição de Desempenho",
       "enable": "Mostrar Sobreposição de Desempenho",
       "description": "Escolha quais estatísticas exibir, onde a sobreposição fica e como ela aparece.",
       "sectionPosition": "Posição",
@@ -2537,6 +2541,15 @@ export const pt_BR: EnTranslations = {
       "tooLarge": "Esse relatório é grande demais para enviar. Tente novamente sem a captura de tela.",
       "rateLimited": "Você enviou vários relatórios recentemente. Aguarde um pouco antes de enviar outro.",
       "failed": "Não foi possível enviar o relatório de erro. Tente novamente."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Desequipar {item}",
@@ -3589,6 +3602,15 @@ export const pt_BR: EnTranslations = {
         "socket": "Encaixou uma joia em {name}.",
         "socketReplaced": "Encaixou uma joia em {name}; {gem} foi destruído."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Requer Nível {level}",
@@ -6351,6 +6373,7 @@ export const pt_BR: EnTranslations = {
       "allyRezBody": "Você nem sempre precisa correr de volta a pé. Um aliado com uma magia de ressurreição pode reergué-lo em vez disso, e ela chega como um aviso que você aceita ou recusa; deixe-o parado e ele expira, então responda enquanto ele ainda está lá. Aceite e você se ergue ao lado do amigo que a lançou, com parte da sua vida e mana de volta. Alguns curadores podem oferecer isso ao grupo inteiro derrubado de uma vez, embora cada um ainda responda ao próprio aviso. Campos de Thornhollow é a exceção: nenhuma magia de ressurreição o alcança lá, e você espera pela próxima onda da sua equipe.",
       "unstuckTitle": "Quando você está realmente preso",
       "unstuckBody": "Se o mundo o prender em algum lugar de onde você não consegue sair, digite /unstuck. Você precisa estar fora de combate e parado, sem ser atingido por um atordoamento ou uma imobilização, e não estar em um duelo ou numa partida de arena: uma contagem regressiva curta é executada, e se mover ou sofrer dano a cancela. Quando ela termina, você é colocado no cemitério mais próximo. Isso nunca o mata e não deixa corpo algum, e se você já estava caído, ele o reergue ali mesmo. O preço é o Mal do Desbloqueio, um enfraquecimento temporário de tudo o que você é que já terá passado quando você puder usar o comando de novo, e assim como o Tributo do Guardião, ele poupa por completo os personagens recém-criados.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Subindo em uma saliência",
       "climbBody": "Saliências não são paredes. Pule em direção a algo alto demais para subir de um passo e seu personagem agarra a borda perto do topo do salto e se puxa para cima, sem precisar de uma tecla própria para isso. Qualquer coisa baixa o suficiente para passar por cima sozinho passa sem cerimônia; a escalada completa fica reservada para bordas acima da sua cabeça. Ela é breve, e assume o controle enquanto dura, então você não pode direcioná-la na metade. Um atordoamento o pega no meio da escalada e você solta e cai, medido a partir de onde o salto deixou o chão, e um atordoamento ou uma imobilização impede que a escalada sequer comece, o que vale lembrar quando você está tentando sair de uma situação ruim numa luta."
     },
@@ -6524,6 +6547,7 @@ export const pt_BR: EnTranslations = {
       "dungeonReset": "Abandona suas próprias instâncias vazias, o que você faz depois de trocar de dificuldade.",
       "groupRecovery": "Recuperação e presença",
       "unstuck": "A saída para quando o mundo o prendeu. Fique parado durante uma contagem regressiva curta e você é levado ao cemitério mais próximo, sendo reerguido ali se já tiver caído. Isso o deixa enfraquecido pelo Mal do Desbloqueio por um tempo depois, então é um último recurso, não um atalho.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Marca você como Ausente, com uma mensagem opcional que qualquer um que sussurrar para você recebe como resposta automática. Repita sem mensagem para limpá-la; qualquer outro chat também a limpa.",
       "dnd": "Não Perturbe: como ausente, exceto que sussurros enviados a você são retidos em vez de entregues.",
       "sit": "Senta onde você está, e levanta de novo. Você se levanta automaticamente no instante em que se move, conjura ou sofre um golpe.",
@@ -6630,6 +6654,7 @@ export const pt_BR: EnTranslations = {
       "fatigueDef": "Nade longe o bastante mar adentro e a água começa a te esgotar: primeiro vem um aviso, depois dano crescente até você voltar para a terra.",
       "unstuckTerm": "Mal do Desbloqueio",
       "unstuckDef": "O preço de usar Desbloqueio no menu do jogo. Fique parado durante a contagem regressiva e ele o leva até o cemitério mais próximo, e você carrega uma fraqueza passageira por um tempo depois disso.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Nível do item",
       "itemLevelDef": "Um único número que resume a força de uma peça de equipamento, útil quando você quer comparar duas peças rapidamente. Ative Mostrar nível do item nas opções para vê-lo nas dicas de item. Só o equipamento de origem conhecida carrega um, então itens básicos de vendedor e equipamento inicial não mostram nada, e um número ausente é normal, não uma falha.",
       "requiredLevelTerm": "Nível exigido",
@@ -9893,6 +9918,11 @@ export const pt_BR: EnTranslations = {
       "quit": "Sair",
       "fatalBody": "O World of ClaudeCraft encontrou um erro inesperado e precisa fechar."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Sair do jogo"
     }
@@ -9943,6 +9973,11 @@ export const pt_BR: EnTranslations = {
     "inWorld": "no mundo",
     "takeOver": "Assumir controle",
     "inWorldHint": "Já está no mundo. Saia em outro lugar ou assuma o controle.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Isto vai desconectar este personagem de outra sessão e trazê-lo para cá. Continuar?",
     "renameRequired": "renomeação necessária",
     "delete": "Excluir",

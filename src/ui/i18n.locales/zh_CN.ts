@@ -884,6 +884,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': '拾取后绑定',
   'hudChrome.loot.bindConfirmBody':
     '这批战利品中有一件物品在拾取后将与你绑定。绑定的物品只能在限定时间内交易给共同获得该掉落的玩家。',
+  'hudChrome.lootQuality.ordinary': '普通',
+  'hudChrome.lootQuality.superior': '优良',
+  'hudChrome.lootQuality.exceptional': '卓越',
+  'hudChrome.lootQuality.magnificent': '华丽',
+  'hudChrome.lootQuality.transcendent': '超凡',
+  'hudChrome.lootQuality.tooltip': '{quality}：+{levels} 物品等级。强化后仍会保留。',
   'hudChrome.itemTooltip.requiresLevel': '需要等级 {level}',
   'hudChrome.spellbook.addToBarAria': '将{name}添加到动作条',
   'hudChrome.spellbook.removeFromBarAria': '从动作条移除{name}',
@@ -1594,7 +1600,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.notes.minorForClass': '对你的职业益处不大。',
   'hudChrome.statInfo.notes.baseChance': '包含所有冒险者共享的5%基础几率。',
   'hudChrome.statInfo.notes.dpsApprox': '此为预估值，不计入暴击和技能伤害。',
-  'hudChrome.perf.title': '性能监视器',
+  'hudChrome.perf.title': '性能',
+  'hudChrome.perf.overlaySection': '性能监视器',
   'hudChrome.perf.enable': '显示性能监视器',
   'hudChrome.perf.description': '选择要显示的信息、监视器的位置及其外观。',
   'hudChrome.perf.sectionPosition': '位置',
@@ -1670,6 +1677,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.tooLarge': '该报告过大，无法发送。请去掉截图后重试。',
   'hudChrome.bugReport.rateLimited': '你最近已发送多份报告。请稍后再发送。',
   'hudChrome.bugReport.failed': '无法发送错误报告。请重试。',
+  'hudChrome.hostDiag.title': '系统报告',
+  'hudChrome.hostDiag.intro':
+    '将这台电脑的详细信息(包括占用最多处理器和内存的程序)收集到一个文件中，帮助诊断性能问题。不会发送任何内容：该文件只保存在你的电脑上。',
+  'hudChrome.hostDiag.create': '生成系统报告',
+  'hudChrome.hostDiag.running': '正在收集系统信息...',
+  'hudChrome.hostDiag.saved': '报告已保存为 {fileName}。',
+  'hudChrome.hostDiag.savedNoName': '报告已保存。',
+  'hudChrome.hostDiag.failed': '无法创建报告。请重试。',
   'hudChrome.keybinds.emoteWheel': '表情轮盘',
   'hudChrome.keybinds.sheathe': '收起/拔出武器',
   'hudChrome.keybinds.hideInterface': '隐藏界面',
@@ -2331,6 +2346,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': '在世界中',
   'character.takeOver': '接管',
   'character.inWorldHint': '已在世界中。请在别处登出，或接管会话。',
+  'character.currentLocation': '当前位置：{zone}',
+  'character.lockouts': '锁定（{count}）',
+  'character.lockoutRaids': '团队副本',
+  'character.lockoutDungeons': '地下城',
+  'character.lockoutWorldBosses': '世界首领',
   'character.takeOverConfirm': '这将使该角色从另一个会话断开并切换到此处。是否继续？',
   'character.renameRequired': '需要改名',
   'character.delete': '删除',
@@ -8870,6 +8890,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '重新加载',
   'desktop.crash.quit': '退出',
   'desktop.titlebar.exitGame': '退出游戏',
+  'desktop.hostDiag.saveTitle': '保存系统报告',
+  'desktop.hostDiag.saveButton': '保存',
+  'desktop.hostDiag.fileType': 'JSON 文件',
   'desktop.crash.fatalBody': 'World of ClaudeCraft 遇到意外错误，需要关闭。',
   'gpuNotice.bodyDesktop':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
@@ -11242,11 +11265,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    '脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。一小时内的首次使用不付代价。若在上次使用后一小时内再次使用，你将带着脱困后遗症，最多持续 5 分钟。',
   'hudChrome.unstuck.menuButton': '脱困',
   'hudChrome.unstuck.help': '脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
     '脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。',
   'hudChrome.unstuck.movedToGraveyard': '你已被移动到最近的墓地。脱困后遗症正压在你身上。',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    '你已被移动到最近的墓地。一小时内再次使用脱困将让你带上脱困后遗症。',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    '你已被移动到最近的墓地并复活。一小时内再次使用脱困将让你带上脱困后遗症。',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     '你已被移动到最近的墓地并复活。脱困后遗症正压在你身上。',
   'hudChrome.unstuck.started':
@@ -14035,6 +14064,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': '敌人会打谁',
   'guide.combat.unstuckBody':
     '如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。代价是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。',
+  'guide.combat.unstuckBodyWindow':
+    '如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。一小时内的首次使用不付任何代价。若在上次使用后一小时内再次使用，代价便是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。',
   'guide.combat.unstuckTitle': '当你真的被困住时',
   'guide.commandsPage.abilities': '你已经学会的技能。',
   'guide.commandsPage.afk':
@@ -14160,6 +14191,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': '如果一条指令不起作用',
   'guide.commandsPage.unstuck':
     '被世界困住时的那条出路。站定不动熬过一段短暂的倒计时，你就会被移动到最近的墓地；若你已经倒下，还会在那里被复活。事后你会带着脱困后遗症虚弱一阵子，因此它是最后的手段，而不是捷径。',
+  'guide.commandsPage.unstuckWindow':
+    '被世界困住时的那条出路。站定不动熬过一段短暂的倒计时，你就会被移动到最近的墓地；若你已经倒下，还会在那里被复活。一小时内的首次使用不付代价。若在上次使用后一小时内再次使用，事后你会带着脱困后遗症虚弱一阵子，因此它是救援手段，而不是捷径。',
   'guide.commandsPage.where': '你所站的区域、它的等级范围，以及你的坐标。',
   'guide.commandsPage.whisper':
     '向一位在线玩家发送私聊消息。只要不会指向多个玩家，你把名字的大小写打成什么样都能对上。',
@@ -14345,6 +14378,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': '工具护符',
   'guide.glossary.unstuckDef':
     '从游戏菜单里使用“脱困”所要付出的代价。站着别动，等倒计时走完，它会把你放在最近的墓地，而此后一段时间里，你会带着一层临时的虚弱。',
+  'guide.glossary.unstuckDefWindow':
+    '一小时内不止一次依赖游戏菜单里的“脱困”所要付出的代价。站着别动，等倒计时走完，它会把你放在最近的墓地。一小时内的首次使用不付代价，而在上次使用后一小时内再次使用，此后一段时间里你还会带着一层临时的虚弱。',
   'guide.glossary.unstuckTerm': '脱困虚弱',
   'guide.glossary.warfareDef':
     '玩家对战的装备那一面。军需官用荣誉出售成套的战争护甲，而它们所带的战争评级，只在与其他玩家的战斗中作数。',
