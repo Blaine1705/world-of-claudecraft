@@ -26,11 +26,13 @@ function devSpawns(sim: Sim, ownerId = sim.playerId) {
 
 describe('dev commands', () => {
   // Daily offer cycles retain the approved layout; the arm lifts the tester
-  // to the world-quest floor level.
+  // to the world-quest floor level. Farshore's pool is four deep since the
+  // round-2 zone hunts, so the shipwreck is the day's offer on cycles 0, 4, 8:
+  // these dates sit on it, and the arm keeps the day's own cycle.
   it.each([
-    ['2026-09-02', 'wq1_2', 0],
-    ['2026-09-13', 'wq1_13', 0],
-    ['2026-09-15', 'wq1_15', 0],
+    ['2026-08-31', 'wq1_0', 0],
+    ['2026-09-12', 'wq1_12', 0],
+    ['2026-09-16', 'wq1_16', 0],
   ] as const)(
     '/dev salvage arms the approved layout online on %s',
     (resetDay, expectedCycle, expectedVariant) => {

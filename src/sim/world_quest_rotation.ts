@@ -28,12 +28,14 @@ export const WORLD_QUEST_ZONES: readonly string[] = Object.freeze([
 export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> = Object.freeze({
   // Round 2 (2026-09): the zone hunts (content/world_quest_zone_hunts.ts) are
   // APPENDED to each pool so the earlier entries keep their day index. A pool's
-  // length is its cycle (index = day mod length); lengths are 2, 4 or 7 only:
+  // length is its cycle (index = day mod length); lengths are 1, 4 or 7 only:
   // each divides the 84-day roster period, and the legacy three-day cycle ids
-  // (wq3_N = day 3N) still reach every entry, which 3 or 6 would not. Willowfen
-  // and Palmreach stay two deep so a purse-free escort or confection quest is on
-  // the board every day (the ten-gold daily budget). tests/world_quests.test.ts
-  // pins that every quest is offered within the longest pool's cycle.
+  // (wq3_N = day 3N) still reach every entry, which 3 or 6 would not. Palmreach
+  // stays one deep: its confection board is a day-keyed puzzle that must be on
+  // the board EVERY day (tests/world_quest_daily_levels.test.ts), and as a
+  // purse-free quest it also keeps a full day under the ten-gold budget.
+  // tests/world_quests.test.ts pins that every quest is offered within the
+  // longest pool's cycle.
   eastbrook_vale: Object.freeze([
     'wq_eastbrook_bandits',
     'wq_eastbrook_caravan',
@@ -88,7 +90,12 @@ export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> =
     'wq_amberfall_sprites',
     'wq_amberfall_treants',
   ]),
-  willowfen: Object.freeze(['wq_willowfen_ore', 'wq_willowfen_caravan']),
+  willowfen: Object.freeze([
+    'wq_willowfen_ore',
+    'wq_willowfen_caravan',
+    'wq_willowfen_toads',
+    'wq_willowfen_sprites',
+  ]),
   nightbloom: Object.freeze([
     'wq_nightbloom_barrow',
     'wq_nightbloom_grazers',
@@ -101,7 +108,7 @@ export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> =
     'wq_wraithwood_shamblers',
     'wq_wraithwood_huntsman',
   ]),
-  palmreach: Object.freeze(['wq_palmreach_confections', 'wq_palmreach_scuttlers']),
+  palmreach: Object.freeze(['wq_palmreach_confections']),
   evergarden: Object.freeze([
     'wq_evergarden_watch',
     'wq_evergarden_wisp_maze',

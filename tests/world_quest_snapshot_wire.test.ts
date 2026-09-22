@@ -108,9 +108,9 @@ describe('world quest snapshot wire', () => {
   it('adopts a rollover atomically and filters rows against its active rotation', () => {
     const target = mirrors();
     applyQuestSelfWire(target, {
-      wqday: '2026-09-02',
+      wqday: '2026-09-07',
       wqlog: [
-        { questId: 'wq_eastbrook_bandits', count: 1, state: 'active' },
+        { questId: 'wq_eastbrook_caravan', count: 1, state: 'active' },
         {
           questId: 'wq_frostveil_howlers',
           count: 2,
@@ -124,7 +124,7 @@ describe('world quest snapshot wire', () => {
       ],
     });
 
-    expect(target.worldQuestCycle).toBe('wq1_2');
+    expect(target.worldQuestCycle).toBe('wq1_7');
     expect([...target.worldQuestLog.values()]).toEqual([
       {
         questId: 'wq_frostveil_howlers',
@@ -138,7 +138,7 @@ describe('world quest snapshot wire', () => {
   it('retains the forced Farshore dev offer when its projected cycle is wired online', () => {
     const target = mirrors();
     applyQuestSelfWire(target, {
-      wqday: 'wq3_2',
+      wqday: 'wq3_4',
       wqlog: [
         {
           questId: 'wq_farshore_salvage',
@@ -149,7 +149,7 @@ describe('world quest snapshot wire', () => {
       ],
     });
 
-    expect(target.worldQuestCycle).toBe('wq1_6');
+    expect(target.worldQuestCycle).toBe('wq1_12');
     expect(target.worldQuestLog.get('wq_farshore_salvage')).toEqual({
       questId: 'wq_farshore_salvage',
       count: 0,

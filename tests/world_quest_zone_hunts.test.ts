@@ -17,7 +17,7 @@ import {
 // comment.
 
 // 0 is Galecrest (its two dailies are always active, nothing rotates).
-const POOL_LENGTHS_ALLOWED = new Set([0, 1, 2, 4, 7]);
+const POOL_LENGTHS_ALLOWED = new Set([0, 1, 4, 7]);
 const LONGEST_POOL = 7;
 
 function campSpawnsInside(quest: (typeof WORLD_QUEST_ZONE_HUNTS)[number]): number {
@@ -39,8 +39,8 @@ function rotatingPool(zone: string): readonly string[] {
 }
 
 describe('world quest zone hunts', () => {
-  it('ships 38 hunts, every one a kill quest with a unique id in the merged catalog', () => {
-    expect(WORLD_QUEST_ZONE_HUNTS).toHaveLength(38);
+  it('ships 39 hunts, every one a kill quest with a unique id in the merged catalog', () => {
+    expect(WORLD_QUEST_ZONE_HUNTS).toHaveLength(39);
     const ids = new Set<string>();
     for (const quest of WORLD_QUEST_ZONE_HUNTS) {
       expect(quest.objective.type).toBe('kill');
@@ -125,16 +125,20 @@ describe('world quest zone hunts', () => {
     expect(WORLD_QUESTS_BY_ZONE.galecrest).toEqual(['wq_galecrest_wisps', 'wq_galecrest_slalom']);
   });
 
-  it('pool lengths are 2, 4 or 7: every entry reachable under legacy three-day cycle ids', () => {
+  it('pool lengths are 1, 4 or 7: every entry reachable under legacy three-day cycle ids', () => {
     // A legacy wq3_N id canonicalises to day 3N, so a pool of 3 or 6 would only
-    // ever offer two of its entries under it; 2, 4 and 7 reach them all, and
-    // each divides the 84-day roster period.
+    // ever offer two of its entries under it; 1, 4 and 7 reach them all, and
+    // each divides the 84-day roster period. Palmreach is the one pool left at
+    // a single entry (the daily confection board, below); every other zone
+    // rotates.
     let longest = 0;
     for (const zone of WORLD_QUEST_ZONES) {
       const pool = rotatingPool(zone);
       expect(POOL_LENGTHS_ALLOWED.has(pool.length), `${zone} pool of ${pool.length}`).toBe(true);
       longest = Math.max(longest, pool.length);
-      if (zone !== 'galecrest') expect(pool.length, `${zone} pool`).toBeGreaterThanOrEqual(2);
+      if (zone !== 'galecrest' && zone !== 'palmreach') {
+        expect(pool.length, `${zone} pool`).toBeGreaterThanOrEqual(4);
+      }
     }
     expect(longest).toBe(LONGEST_POOL);
     for (const zone of WORLD_QUEST_ZONES) {
@@ -154,8 +158,11 @@ describe('world quest zone hunts', () => {
   it('every day keeps at least one purse-free rotating quest on the board (the daily budget)', () => {
     // Kill, gather, interact and delivery quests all pay the champion purse
     // (world_quest_champion.ts). A day of thirteen such slots overshoots the
-    // ten-gold budget by a few hundred copper, so Willowfen's escort and
-    // Palmreach's confection board alternate to cover every day between them.
+    // ten-gold budget by a few hundred copper. Palmreach's confection board is
+    // a day-keyed puzzle (tests/world_quest_daily_levels.test.ts pins that a
+    // new board arrives with every reset), so it is the one rotating slot that
+    // never rotates, and its purse-free slot is what keeps every day under
+    // the budget.
     for (let n = 0; n < 84; n++) {
       const rotating = activeWorldQuestsForCycle(`wq1_${n}`).filter(
         (quest) => !ALWAYS_ACTIVE_WORLD_QUEST_IDS.includes(quest.id),
@@ -165,11 +172,15 @@ describe('world quest zone hunts', () => {
       );
       expect(purseFree.length, `cycle wq1_${n}`).toBeGreaterThanOrEqual(1);
     }
-    expect(WORLD_QUESTS_BY_ZONE.willowfen).toEqual(['wq_willowfen_ore', 'wq_willowfen_caravan']);
-    expect(WORLD_QUESTS_BY_ZONE.palmreach).toEqual([
-      'wq_palmreach_confections',
-      'wq_palmreach_scuttlers',
-    ]);
+    expect(WORLD_QUESTS_BY_ZONE.palmreach).toEqual(['wq_palmreach_confections']);
+    for (let n = 0; n < 84; n++) {
+      expect(
+        activeWorldQuestsForCycle(`wq1_${n}`).some(
+          (quest) => quest.id === 'wq_palmreach_confections',
+        ),
+        `confections on wq1_${n}`,
+      ).toBe(true);
+    }
   });
 
   it('across one longest-pool cycle the board never repeats and every hunt is offered', () => {

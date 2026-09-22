@@ -9,16 +9,16 @@
 // display name (world_quest_view.ts), so a record here carries no i18n, deed,
 // wiki or art obligation.
 //
-// Pool sizes (world_quest_rotation.ts) are 2, 4 or 7 deep, never 3, 5 or 6:
+// Pool sizes (world_quest_rotation.ts) are 1, 4 or 7 deep, never 3, 5 or 6:
 // every pool length divides the 84-day roster period tests/world_quests.test.ts
 // pins, and the legacy three-day cycle ids (wq3_N, canonicalised to day 3N)
-// still reach every entry, which a pool of 3 or 6 would not. Willowfen and
-// Palmreach stay two deep on purpose: their escort and confection quests pay no
-// champion purse, and one of them is on the board every day, which is what
-// keeps a full day at the cap under the ten-gold budget
-// (tests/world_quest_rewards.test.ts). Galecrest is left alone: its two dailies
-// are always active, and a rotating slot there would move the item-bearing
-// zone draw (world_quest_item_slots.ts) for every cycle.
+// still reach every entry, which a pool of 3 or 6 would not. Palmreach keeps
+// its single daily confection board on purpose: the board is a generated
+// puzzle keyed by the day (32 of them), so it must be offered EVERY day, and
+// it pays no champion purse, which is what keeps a full day at the cap under
+// the ten-gold budget (tests/world_quest_rewards.test.ts). Galecrest is left
+// alone: its two dailies are always active, and a rotating slot there would
+// move the item-bearing zone draw (world_quest_item_slots.ts) for every cycle.
 import type { WorldQuestDef } from '../types';
 
 // world_quests.ts owns the exported constant and spreads this table, so the
@@ -169,6 +169,16 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     3,
   ),
   kill('wq_frostveil_sprites', 'frostveil', 17, { x: -84, z: 1738, radius: 22 }, 'fen_sprite', 3),
+  // Willowfen (levels 19 to 20)
+  kill('wq_willowfen_toads', 'willowfen', 19, { x: -363, z: 328, radius: 132 }, 'bogtoad', 6),
+  kill(
+    'wq_willowfen_sprites',
+    'willowfen',
+    19,
+    { x: -356, z: 378, radius: 60 },
+    'willow_sprite',
+    4,
+  ),
   // Amberfall (levels 18 to 20)
   kill('wq_amberfall_stags', 'amberfall', 18, { x: -360, z: 1998, radius: 86 }, 'gilded_stag', 4),
   kill(
@@ -236,15 +246,6 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     { x: 380, z: 1680, radius: 16 },
     'pale_huntsman',
     1,
-  ),
-  // Palmreach (level 20; the confection board holds the other day)
-  kill(
-    'wq_palmreach_scuttlers',
-    'palmreach',
-    20,
-    { x: -354, z: 859, radius: 124 },
-    'tide_scuttler',
-    4,
   ),
   // Evergarden (level 20)
   kill(
