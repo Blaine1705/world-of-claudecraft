@@ -1,13 +1,13 @@
 # Tank threat parity, v0.44: Oathward 40% to 100%, Recompense 80% to 110%
 
 Owner request (Jamie, 2026-09-21): tanks were losing the boss to the top DPS in the
-Crucible and Nythraxis raids since the v0.42 DPS packages. This note records what the
+Crucible (Ignivar and Varkhul) and Nythraxis raids since the v0.42 DPS packages. This note records what the
 live parses showed, what the harness said about the fix, and the two constants that moved.
 
 ## What was measured
 
-The Parses service samples every boss's hate table once a second (`server/parse/
-threat_sampler.ts`, since v0.37). All 789 raid boss fights on Ignivar, Varkhul and
+The Parses service samples every boss's hate table once a second
+(`server/parse/threat_sampler.ts`, since v0.37). All 789 raid boss fights on Ignivar, Varkhul and
 Nythraxis for builds 0.42.x and 0.43.x were pulled with their per-fight event streams,
 and for the 458 fights with a tank-spec main tank the tank's GENERATED threat was rebuilt
 from its own events with the game formula (`src/sim/threat.ts` plus the ability tables).
@@ -46,7 +46,11 @@ under 90% of the tank (comfort) from 30 s onward, in 90% and 95% of kills:
 
 - `talents_classic.ts` Oathward `threatPct` 0.4 to 1.0 (holy threat mod 1.4 x 1.3 = 1.82
   becomes 2.0 x 1.3 = 2.6, physical 1.4 becomes 2.0; a 1.43x change). This puts the live
-  median Faithwarden near 335 threat/s, back at warrior parity.
+  median Faithwarden near 335 threat/s: level with today's warrior, and 87% of the warrior
+  once Recompense moves too (about 385), up from 71%. It sits a little under the paladin's
+  p90 comfort figure (1.48x) on purpose: the harness paladin already matched the warrior
+  at baseline (see below), so 100% is the round value that closes the live gap without
+  betting the whole band on one frame.
 - `talents_warrior.ts` Recompense `threatPct` 0.8 to 1.1 (Guarded Stance 1.3 x 1.8 = 2.34
   becomes 1.3 x 2.1 = 2.73; a 1.17x change), the comfort margin at p90 against current
   max-tilt DPS.

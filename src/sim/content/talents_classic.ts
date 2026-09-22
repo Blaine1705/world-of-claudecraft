@@ -57,12 +57,12 @@ const PALADIN_SPECS: SpecDef[] = [
     // SPEC_BASELINES: with no stamina multiplier the paladin sat at 76% of the
     // prot warrior's effective HP. The mastery is where an overhauled class
     // keeps its floor (see Recompense on the warrior), so it lands here.
-    // threatPct 0.4 -> 1.0 (v0.44 tank threat parity, docs/design/tank-threat-v044.md):
+    // threatPct 1.0 (v0.44 tank threat parity, docs/design/tank-threat-v044.md):
     // live 0.42/0.43 raid parses put the Faithwarden at 234 generated threat/s
-    // against the Ironguard's 330, so the v0.38 trim below is reversed and then
-    // some. History of the earlier trim: threatPct 0.5 -> 0.4 (v0.38): one layer of the
-    // Faithwarden triple stack (ability mult x mastery x Burning Oath) trimmed
-    // so the composed total lands near the other tanks.
+    // against the Ironguard's 330, so the composed holy multiplier now runs
+    // 2.0 x Burning Oath 1.3 = 2.6 (physical 2.0). Earlier values, for the
+    // record: 0.5 at launch, trimmed to 0.4 in the v0.38 parity pass when the
+    // triple stack (ability mult x mastery x Burning Oath) overshot the other tanks.
     { global: { threatPct: 1.0 }, stats: { armorPct: 0.2, staPct: 0.35 } },
   ),
   spec(

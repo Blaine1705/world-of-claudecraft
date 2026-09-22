@@ -142,3 +142,26 @@ describe('threat calculation isolation', () => {
     expect(protection.ctx.threatMod(protection.player, 'holy')).toBeCloseTo(2.34, 5);
   });
 });
+
+describe('level-20 composed tank threat (v0.44 parity values)', () => {
+  // The numbers docs/design/tank-threat-v044.md argues from: Oathward 1.0 gives
+  // the Faithwarden 2.0 on physical and 2.0 x Burning Oath 1.3 = 2.6 on holy;
+  // Recompense 1.1 in Guarded Stance gives the Ironguard 1.3 x 2.1 = 2.73.
+  it('Faithwarden at the cap: 2.0 physical, 2.6 holy', () => {
+    const sim = makeSim('paladin');
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('protection')).toBe(true);
+    expect(sim.ctx.threatMod(sim.player, 'physical')).toBeCloseTo(2.0, 5);
+    expect(sim.ctx.threatMod(sim.player, 'holy')).toBeCloseTo(2.6, 5);
+  });
+
+  it('Ironguard at the cap in Guarded Stance: 2.73', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('prot')).toBe(true);
+    sim.castAbility('defensive_stance');
+    sim.tick();
+    expect(sim.player.auras.some((a) => a.kind === 'defensive_stance')).toBe(true);
+    expect(sim.ctx.threatMod(sim.player, 'physical')).toBeCloseTo(2.73, 5);
+  });
+});
