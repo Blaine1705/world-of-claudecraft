@@ -226,7 +226,7 @@ export function hoardMarkSpec(variant: HoardBossCueVariant): HoardMarkSpec {
     case 'frost-blizzard':
       return {
         variant,
-        radius: 5.2,
+        radius: 7.5,
         windup: 1.8,
         impactFraction: 0.08,
         hazardDuration: 5.5,

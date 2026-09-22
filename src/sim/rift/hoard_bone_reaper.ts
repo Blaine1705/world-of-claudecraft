@@ -35,12 +35,7 @@ import {
 } from './hoard_bone_reaper_core';
 import { hoardBossKit } from './hoard_boss_kits';
 import { measureHoardRoom } from './hoard_room';
-import {
-  HOARD_DOUBLE_MECHANIC_INTENSITY,
-  hoardIntensity,
-  hoardMechanicDamage,
-  hoardPressure,
-} from './hoard_scaling';
+import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
 import { capRiftNonLethalMechanicDamage } from './ranks';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
@@ -139,9 +134,8 @@ function startScythe(
   // per-player hit cooldown on purpose: caught between them is one hit, never two.
   // Only where the room is wide enough for the mirrored routes to stay apart: cornered
   // against a wall the two would ride the same line, so he calls just the one.
-  const pair =
-    hoardIntensity(inst.vault, living) >= HOARD_DOUBLE_MECHANIC_INTENSITY &&
-    frame.radius >= BONE_SCYTHE.pairMinLateral;
+  // Three players or more, whatever the map's rarity (playtest).
+  const pair = living >= BONE_SCYTHE.pairMinPlayers && frame.radius >= BONE_SCYTHE.pairMinLateral;
   for (let blade = 0; blade < (pair ? 2 : 1); blade++) {
     const carrier: HoardBossCue = {
       id: state.nextCueId++,
@@ -337,7 +331,7 @@ function tickScythe(
  *  damage taken for a while. It is what stops one player sweeping the room, makes
  *  a party share the souls out, and gives a lone player a real choice between
  *  carrying the burden and feeding the boss. */
-function burden(ctx: SimContext, boss: Entity, player: Entity): void {
+function burden(ctx: SimContext, boss: Entity, player: Entity, alone: boolean): void {
   const held = player.auras.find((aura) => aura.id === HOARD_SOUL_BURDEN_AURA_ID);
   const stacks = Math.min(SOUL_HARVEST.burdenMaxStacks, (held?.stacks ?? 0) + 1);
   player.auras = player.auras.filter((aura) => aura.id !== HOARD_SOUL_BURDEN_AURA_ID);
@@ -347,7 +341,7 @@ function burden(ctx: SimContext, boss: Entity, player: Entity): void {
     kind: 'vulnerability',
     remaining: SOUL_HARVEST.burdenDurationSec,
     duration: SOUL_HARVEST.burdenDurationSec,
-    value: stacks * SOUL_HARVEST.burdenPerStack,
+    value: stacks * (alone ? SOUL_HARVEST.soloBurdenPerStack : SOUL_HARVEST.burdenPerStack),
     stacks,
     sourceId: boss.id,
     school: 'shadow',
@@ -405,7 +399,7 @@ function tickSoul(
         radius: 1.8,
         sourceId: catcher.id,
       });
-      burden(ctx, boss, catcher);
+      burden(ctx, boss, catcher, players.filter((p) => !p.dead).length <= 1);
       if (SOUL_HARVEST.playerRewardEnabled) {
         catcher.hp = Math.min(
           catcher.maxHp,

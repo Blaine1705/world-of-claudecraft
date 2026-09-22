@@ -177,7 +177,8 @@ export function tentaclePose(input: TentacleInput, out: TentaclePose): TentacleP
       out.impact = Math.max(0, 1 - (a - landed) / 0.45);
       out.heading = shortestArc(input.attackFacing, input.facing, back);
     }
-    out.stretch = 1 + 0.5 * out.slam + 0.06 * out.rear;
+    // Slammed, it stretches to the whip's full length (TENTACLES.whipLength).
+    out.stretch = 1 + 1.16 * out.slam + 0.06 * out.rear;
   } else if (input.attack === 2) {
     const a = input.attackElapsed;
     const tele = TENTACLES.sweepTelegraphSec;

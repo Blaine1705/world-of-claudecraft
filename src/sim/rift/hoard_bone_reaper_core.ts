@@ -42,7 +42,7 @@ export const BONE_SCYTHE = Object.freeze({
   /** The boss channels; the scythe assembles and spins up. Harmless. */
   castSec: 1.4,
   /** How long the blade wanders the room at full speed. */
-  activeSec: 12,
+  activeSec: 13,
   /** It slows, destabilises and breaks apart. Harmless. */
   endSec: 1.1,
   /** Seconds per full turn at speed. */
@@ -66,7 +66,9 @@ export const BONE_SCYTHE = Object.freeze({
   easeSec: 1.6,
   patterns: 3,
   /** Yards kept between the blade tip and the boss's post at the path's nearest. */
-  bossClearance: 5,
+  bossClearance: 2,
+  /** A second blade rides with the first from this many living players. */
+  pairMinPlayers: 3,
   /** Room the path must leave between the blade tip and the wall. */
   wallMargin: 2.5,
   minLateral: 3,
@@ -283,6 +285,8 @@ export const SOUL_HARVEST = Object.freeze({
    *  per stack. One player cannot simply sweep the room; a party shares them out,
    *  and a lone player chooses which to take and which to let him have. */
   burdenPerStack: 0.08,
+  /** Alone there is nobody to share them out with: a lone player's burden is lighter. */
+  soloBurdenPerStack: 0.03,
   burdenMaxStacks: 6,
   burdenDurationSec: 20,
   /** Releasing a soul can also repay the player (off for now; the hook is live). */

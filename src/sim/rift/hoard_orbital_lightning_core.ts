@@ -15,7 +15,7 @@ export const ORBITAL_LIGHTNING = Object.freeze({
   shotLength: 4.8,
   shotDuration: 0.125,
   prefireDuration: 0.2,
-  impactRadius: 1.65,
+  impactRadius: 2.6,
   residualDuration: 0.55,
   endDuration: 0.8,
   totalDuration: 15.15,

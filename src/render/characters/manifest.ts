@@ -3846,7 +3846,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Abyssal Maw's drowned thrall fights with his hands.
   mob_hoard_tide_thrall: {
     url: `${CREATURES}/hoard_tide_thrall.glb`,
-    height: 3.6,
+    height: 4.6,
     clips: {
       ...kaykit(['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Chop', 'Punch_A']),
       hit: ['Hit_A'],
@@ -3901,7 +3901,8 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_magma_brute.glb`,
     height: 4.1,
     clips: {
-      ...kaykit(['Punch_A', '1H_Melee_Attack_Chop']),
+      // The chop rolled his whole slab of a body (playtest); the punch alone.
+      ...kaykit(['Punch_A']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,
@@ -3910,7 +3911,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Nyxaris's astronomer cultist.
   mob_hoard_void_acolyte: {
     url: `${CREATURES}/hoard_void_acolyte.glb`,
-    height: 3.5,
+    height: 4.2,
     clips: {
       ...kaykit(['Spellcast_Shoot', 'Punch_A']),
       hit: ['Hit_A'],
@@ -3921,7 +3922,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Vharok's storm shaman.
   mob_hoard_storm_caller: {
     url: `${CREATURES}/hoard_storm_caller.glb`,
-    height: 3.5,
+    height: 4.4,
     clips: {
       ...kaykit(['Spellcast_Shoot', '1H_Melee_Attack_Slice_Horizontal']),
       hit: ['Hit_A'],
@@ -3997,7 +3998,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Vysska's nest beast, a fan of thorns down its back. Own Blender rig and clips.
   mob_hoard_thornback_stalker: {
     url: `${CREATURES}/hoard_thornback_stalker.glb`,
-    height: 2.8,
+    height: 3.4,
     // The rig rests facing +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {
@@ -4017,7 +4018,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // entity colour for the blue.
   mob_hoard_rime_elemental: {
     url: `${CREATURES}/hoard_rime_elemental.glb`,
-    height: 3.1,
+    height: 3.9,
     // The rig rests facing +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {

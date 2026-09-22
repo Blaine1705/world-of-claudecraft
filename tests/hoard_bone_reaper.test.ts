@@ -509,7 +509,7 @@ describe('the price of a soul, and pressure by party and rarity', () => {
       entry.sim.player.pos = { ...entry.sim.player.pos, x: soul.x, z: soul.z };
       run(entry.sim, entry.boss, DT * 2);
       expect(burdenOf()).toMatchObject({ kind: 'vulnerability', stacks: taken });
-      expect(burdenOf()?.value).toBeCloseTo(taken * SOUL_HARVEST.burdenPerStack, 9);
+      expect(burdenOf()?.value).toBeCloseTo(taken * SOUL_HARVEST.soloBurdenPerStack, 9);
       expect(burdenOf()?.remaining).toBeGreaterThan(SOUL_HARVEST.burdenDurationSec - 1);
     }
     expect(entry.boss.auras.some((a) => a.id === HOARD_HARVESTED_SOUL_AURA_ID)).toBe(false);

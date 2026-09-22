@@ -85,8 +85,8 @@ export const TENTACLES = Object.freeze({
   whipTelegraphSec: 1.3,
   whipStrikeSec: 0.22,
   whipLingerSec: 0.5,
-  whipLength: 15,
-  whipHalfWidth: 1.7,
+  whipLength: 22,
+  whipHalfWidth: 2.4,
   /** LINE_DAMAGE. */
   whipDamageFraction: 0.3,
   whipKnockback: 3,
