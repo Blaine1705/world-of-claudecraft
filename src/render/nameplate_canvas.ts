@@ -89,6 +89,14 @@ export interface NameplateCanvasState {
    *  CLAUDE.md, gameplay-neutral graphics). */
   dots: NameplateDotsPlan;
   aiLabel: string;
+  /** The /pvp flag the name row was last built with (resolveContent writes it
+   *  beside the `<PvP>` tag). The painter compares it with the entity's live
+   *  flag on EVERY pass and re-resolves the row the frame they differ, so the
+   *  tag flips on the next frame on every graphics tier (the tag is the
+   *  colour-blind-safe read of an actionable cue, so it must not wait on the
+   *  tier-derived full-pass interval), while a plate that merely IS flagged
+   *  stays on the ordinary cadence and costs nothing per frame. */
+  pvpFlag: boolean;
   /** The operator-applied Cheater tag, already localized AND already wrapped in
    *  its `< >` form by the painter's resolveContent (its only writer, the
    *  guildLabel precedent), '' for everyone else. An inline chip in the name row
@@ -134,6 +142,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     comboPips: 0,
     dots: newNameplateDotsPlan(),
     aiLabel: '',
+    pvpFlag: false,
     cheaterLabel: '',
     devOutline: null,
     badges: [],

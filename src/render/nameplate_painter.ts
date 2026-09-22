@@ -329,7 +329,15 @@ export class NameplatePainter {
         this.states.set(id, state);
       }
       this.updateDynamicState(state, entity, player, plan, languageChanged);
-      if (!state.initialized || fullPass || plan.urgent || languageChanged) {
+      // The /pvp flag is the one content input read every pass: a flip
+      // re-resolves the row THIS frame (state.pvpFlag), never on the tier cadence.
+      if (
+        !state.initialized ||
+        fullPass ||
+        plan.urgent ||
+        languageChanged ||
+        state.pvpFlag !== (entity.pvpFlag === true)
+      ) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
       }
 
@@ -592,7 +600,8 @@ export class NameplatePainter {
       // The /pvp flag tag is shown to EVERY viewer, flagged or not (a colour-blind
       // player and an unflagged one both need to read it); the red colour below
       // is the hostile-to-me verdict on top of it.
-      const pvpTag = entity.pvpFlag ? `<${t('hudChrome.nameplate.pvpTag')}> ` : '';
+      state.pvpFlag = entity.pvpFlag === true;
+      const pvpTag = state.pvpFlag ? `<${t('hudChrome.nameplate.pvpTag')}> ` : '';
       const afkTag = entity.afk ? `<${t('hudChrome.nameplate.afkTag')}> ` : '';
       state.name = `${pvpTag}${afkTag}${baseName}`;
       state.nameColor = roleColor ?? '#7fb8ff';
