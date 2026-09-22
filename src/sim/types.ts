@@ -6890,6 +6890,19 @@ export type SimEvent = { pid?: number } & (
       // draining a heal-absorb shield still emits nothing.
       overheal?: number;
     }
+  // One absorb shield soaking part of one hit. Emitted per shield drained
+  // (combat/absorb_credit.ts) so the Healing meter and the parse recorder can
+  // credit the SHIELDER: the damage event's aggregate `absorbed` total names
+  // nobody. `sourceId` is the shield aura's caster, `ability` its display
+  // name, `abilityId` its aura id. Never emitted for a zero soak.
+  | {
+      type: 'absorb';
+      sourceId: number;
+      targetId: number;
+      amount: number;
+      ability: string;
+      abilityId: string;
+    }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at
   // the START of a petSpell windup so the throw animation leads the release;

@@ -230,7 +230,7 @@ export class MeterData {
 
   /** party membership check is supplied by the caller (self + party pids) */
   onEvent(ev: SimEvent, world: IWorld, partyPids: ReadonlySet<number>, now: number): void {
-    if (ev.type !== 'damage' && ev.type !== 'heal2') return;
+    if (ev.type !== 'damage' && ev.type !== 'heal2' && ev.type !== 'absorb') return;
     // The HoT-application sound cue (Sim.applyAura, cueOnly:true) is audio-only
     // and must not open or keep alive an otherwise-idle encounter segment. Gated
     // on the explicit flag, not amount === 0: a genuine direct heal (applyHeal)
@@ -308,7 +308,10 @@ export class MeterData {
           this.current.mainMobId = ev.targetId;
         }
       }
-    } else if (ev.type === 'heal2' && sourceInParty && ev.amount > 0) {
+    } else if ((ev.type === 'heal2' || ev.type === 'absorb') && sourceInParty && ev.amount > 0) {
+      // An absorb credit (a shield soaking a hit) is healing done by the
+      // shielder: it lands on the Healing tab under the shield's own name, the
+      // way every classic meter reports a shield.
       const who = this.attribute(world, ev.sourceId, partyPids);
       for (const enc of [this.current, this.allTime]) {
         const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);
