@@ -1767,6 +1767,11 @@ export function liftRiftEntities(ctx: SimContext): void {
     if (inst.descentId !== null) lift(inst.descentId);
     if (inst.exitId !== null) lift(inst.exitId);
     if (inst.cacheId !== null) lift(inst.cacheId);
+    // A hoard's reward chest is not a rift object (it belongs to the vault), and
+    // it stands on the dais tier like everything else: without this it spawned
+    // at ground height, under the raised floor of a common or rare hoard, and
+    // only its prompt was reachable (playtest).
+    if (inst.vault?.chest) lift(inst.vault.chest.entityId);
   }
 }
 

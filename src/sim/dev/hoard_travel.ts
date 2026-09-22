@@ -12,6 +12,7 @@ import { generateRiftPlan } from '../rift/rift_gen';
 import {
   HOARD_ENTRANCE_TEMPLATE_ID,
   makeVaultSeed,
+  OPEN_HOARD_RARITIES,
   type VaultSizeTier,
   type VaultZoneId,
 } from '../rift/vault_seed';
@@ -50,7 +51,10 @@ export function devHoardDestination(query: string, rarity: TreasureMapRarity = '
   const tier = RARITY_TIER[rarity];
   const size = TREASURE_MAP_RARITIES.indexOf(rarity) as VaultSizeTier;
   for (let random = 0; random < 4096; random++) {
-    const seed = makeVaultSeed(size, random, { open: true, zoneId: destination.zone });
+    // The same open-air rule a real map follows: only epic and legendary dig
+    // into the open valley, so a dev room is the room that rarity really opens.
+    const open = (OPEN_HOARD_RARITIES as readonly string[]).includes(rarity);
+    const seed = makeVaultSeed(size, random, { open, zoneId: destination.zone });
     if (generateRiftPlan(seed, RIFT_RANK_BASE_LEVEL[tier]).themeId === destination.theme) {
       return { ...destination, seed, rarity, tier };
     }
