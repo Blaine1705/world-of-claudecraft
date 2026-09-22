@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4074,
+    "files": 4077,
     "harvestedFiles": 3948,
     "carried": {
       "tests/active_kit_prewarm.test.ts": {
@@ -1164,13 +1164,46 @@
           8,
           7
         ]
+      },
+      "tests/shader_ablation_transforms.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          8,
+          9,
+          9
+        ]
+      },
+      "tests/shader_harvest_corpus.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          7,
+          7,
+          7
+        ]
+      },
+      "tests/shader_link_bench_report.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          4,
+          4,
+          5
+        ]
       }
     },
     "removed": {
       "tests/server/store_mount_grants.test.ts": "Replaced by store_mount_skin_grants.test.ts in PR3941; new suite uses the existing heuristic until measured."
     },
     "mergedLocal": "2026-09-22",
-    "mergedFiles": 126
+    "mergedFiles": 129
   },
   "tests/abilities_command.test.ts": 2213,
   "tests/ability_audio_defers_to_recordings.test.ts": 66,
@@ -5245,5 +5278,8 @@
   "tests/zone_warm_tracker.test.ts": 26,
   "tests/zones_command.test.ts": 2999,
   "tests/instanced_dither_fade.test.ts": 14,
-  "tests/occluder_dither_fade.test.ts": 7
+  "tests/occluder_dither_fade.test.ts": 7,
+  "tests/shader_ablation_transforms.test.ts": 9,
+  "tests/shader_harvest_corpus.test.ts": 7,
+  "tests/shader_link_bench_report.test.ts": 4
 }
