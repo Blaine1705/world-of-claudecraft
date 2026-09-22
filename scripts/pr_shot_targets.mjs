@@ -1194,20 +1194,50 @@ export const TARGETS = [
         }
         if (!smith) return { ok: false, reason: 'Smith Mara is not in the roster' };
         const player = sim.player;
+        // The dev arm parks the player four yards south of the smith's authored
+        // spot, and the workshop only starts while the smith stands ON that spot
+        // (world_quest_forging.ts startForgeWorkshop), so snap him back before
+        // the talk in case he has drifted, and talk again until the session
+        // exists (the countdown is what the frame shows).
+        smith.pos = sim.groundPos(player.pos.x, player.pos.z - 4);
+        smith.prevPos = { ...smith.pos };
         player.pos = sim.groundPos(smith.pos.x + 1, smith.pos.z);
         player.prevPos = { ...player.pos };
         sim.rebucket?.(player);
-        world.targetEntity(smith.id);
-        world.interact();
-        await sleep(400);
+        for (let attempt = 0; attempt < 6; attempt++) {
+          world.targetEntity(smith.id);
+          world.interact();
+          await sleep(400);
+          if (world.worldQuestLog?.get('wq_evergarden_forging')?.forging) break;
+        }
         game.hud.closeAll?.();
-        return { ok: true };
+        return {
+          ok: !!world.worldQuestLog?.get('wq_evergarden_forging')?.forging,
+          reason: 'the forge workshop never started after six talks',
+        };
       });
       if (!staged.ok) throw new Error(staged.reason);
       await awaitWorldPainted(page);
       await sweepOverlays(page, 4);
-      if (!(await pollForSize(page, '#forge-action-bar', 20, 500)))
-        throw new Error('the forge workshop panel never appeared');
+      // The smith's countdown chat and the window shell arrive a beat apart on
+      // the touch tier; give the panel a full twenty seconds before giving up.
+      if (!(await pollForSize(page, '#forge-action-bar', 40, 500))) {
+        const diag = await page.evaluate(() => {
+          const el = document.getElementById('forge-action-bar');
+          const game = window.__game;
+          const progress = game?.world?.worldQuestLog?.get('wq_evergarden_forging');
+          return JSON.stringify({
+            present: !!el,
+            display: el ? getComputedStyle(el).display : null,
+            rect: el ? el.getBoundingClientRect().toJSON() : null,
+            hidden: el?.hidden ?? null,
+            body: document.body.className,
+            forging: progress?.forging ?? null,
+            state: progress?.state ?? null,
+          });
+        });
+        throw new Error(`the forge workshop panel never appeared: ${diag}`);
+      }
       await wait(1500);
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
@@ -1224,10 +1254,14 @@ export const TARGETS = [
     label: "The Shear's launch knoll and Zephyr's wharf",
     when: ['sim/gale_launch_knoll', 'sim/glider_wharf_layout', 'render/gale_features'],
     variants: [
+      // From the flats beyond Wickharbor's stables (the camera orbit tops out at
+      // 22 yd, so the 70 yd crest only fits the frame from a couple of hundred
+      // yards out); clear of the updraft ring at (426, 582), which whisks a
+      // player standing in it onto the wharf.
       {
         key: 'from-the-road',
         beforeLoad: lowGraphicsSeed,
-        spot: { x: 426, z: 582, facing: Math.atan2(450 - 426, 520 - 582), pitch: 0.55, dist: 14 },
+        spot: { x: 416, z: 720, facing: Math.atan2(449 - 416, 512 - 720), pitch: 0.12, dist: 16 },
       },
       {
         key: 'on-the-planks',
@@ -1281,25 +1315,31 @@ export const TARGETS = [
     async capture(page) {
       await awaitWorldPainted(page);
       await dismissArrivalGreeting(page);
-      const staged = await page.evaluate(async () => {
+      // Stand on the wharf first (the arm without `start` only teleports), let
+      // the crossing's veil and the overlays settle, THEN launch: an unsteered
+      // glide leaves the course corridor a few seconds after the countdown,
+      // so the frame has to be taken about a second into the flight.
+      const parked = await page.evaluate(async () => {
         const game = window.__game;
         const sim = game?.sim;
         const world = game?.world;
         if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
-        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-        world.chat('/dev glider start');
-        await sleep(300);
-        game.input.camPitch = 0.25;
-        game.input.camDist = 11;
+        world.chat('/dev glider');
         game.hud.closeAll?.();
         return { ok: true };
       });
-      if (!staged.ok) throw new Error(staged.reason);
+      if (!parked.ok) throw new Error(parked.reason);
       await wait(1500);
       await awaitWorldPainted(page);
       await sweepOverlays(page, 6);
-      // Past the countdown and a second into the glide.
-      await wait(5000);
+      await page.evaluate(() => {
+        const game = window.__game;
+        game.world.chat('/dev glider start');
+        game.input.camPitch = 0.25;
+        game.input.camDist = 11;
+      });
+      // Three seconds of countdown, then a second and a bit of glide.
+      await wait(4300);
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
