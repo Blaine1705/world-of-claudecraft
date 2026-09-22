@@ -602,6 +602,7 @@ export const SIM_LAP_PHASES = [
   'valecup',
   'battleground',
   'worldPvp',
+  'hill',
   'dfinder',
   'market',
   'postOffice',
@@ -613,9 +614,8 @@ export const SIM_LAP_PHASES = [
   'farming',
   'deeds',
   'gridRefresh',
-  // Per-family mob.update buckets, appended after the base lap names so those
-  // stay byte-identical and first. The `sim.${n}` map turns each into the registered
-  // `sim.mob.update|<family>` the perfLap probe adds to.
+  // Per-family mob.update buckets, appended after the base lap names so those stay
+  // byte-identical and first; the `sim.${n}` map yields the registered `sim.mob.update|<family>`.
   ...MOB_UPDATE_BUCKETS.map((b) => `mob.update|${b}`),
 ].map((n) => `sim.${n}`);
 
@@ -694,9 +694,9 @@ const BG_RESPAWN_EVENT = 'respawn';
 // the same cadence and only re-sends when a listing actually changes.
 const DF_WIRE_HZ = 2;
 const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
-// World PvP `wpvp` self key: 2 Hz covers the whole-second disarm countdown and
-// the ground line; the viewer's own pvp_flag command re-arms the gate so the
-// answer to a press lands on the next snapshot.
+// World PvP `wpvp` self key (and the King of the Hill `hill` key, whose 60 s
+// contest bar and whole-minute clock tolerate half-second steps): 2 Hz; the
+// viewer's own pvp_flag command re-arms the gate so a press answers at once.
 const WPVP_WIRE_HZ = 2;
 const WPVP_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * WPVP_WIRE_HZ)));
 // World Market browse readout cadence: the browse view (a filter + page over the
@@ -8544,13 +8544,13 @@ export class GameServer {
     maybe('trade', tradeWire(this.sim, anchorSession.pid));
     maybe('duel', duelWire(this.sim, anchorSession.pid));
     maybe('cardDuel', this.sim.cardMinigameInfoFor(anchorSession.pid));
-    // Small PvP-ledger scalars. Delta-guarded like delve marks: a fresh
-    // session receives both, then they ride only on earn/spend changes.
+    // Small PvP-ledger scalars, delta-guarded like delve marks (a fresh session gets both).
     maybe('honor', meta.honor);
     maybe('lhonor', meta.lifetimeHonor);
     if (this.sim.tickCount - session.lastWpvpWireTick >= WPVP_WIRE_INTERVAL_TICKS) {
       session.lastWpvpWireTick = this.sim.tickCount;
       maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));
+      maybe('hill', this.sim.hillInfoFor(anchorSession.pid));
     }
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;

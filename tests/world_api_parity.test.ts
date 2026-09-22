@@ -543,6 +543,7 @@ export const IWORLD_MEMBERS = [
   // IWorldWorldPvp (world_pvp.ts): the /pvp flag readout + raise/lower.
   { name: 'worldPvpInfo', kind: 'data' },
   { name: 'setWorldPvpFlag', kind: 'method' },
+  { name: 'hillInfo', kind: 'data' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -871,8 +872,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // directly off the resolved IWORLD_MEMBERS literal.
     // World PvP (the /pvp flag) adds worldPvpInfo (data) and setWorldPvpFlag
     // (method) on its own IWorldWorldPvp facet: 380 members, 108 data, 272 method.
-    expect(IWORLD_MEMBERS.length).toBe(380);
-    expect(DATA_MEMBERS.length).toBe(108);
+    // King of the Hill adds hillInfo (data) to that facet: 381, 109, 272.
+    expect(IWORLD_MEMBERS.length).toBe(381);
+    expect(DATA_MEMBERS.length).toBe(109);
     expect(METHOD_MEMBERS.length).toBe(272);
   });
   it('has no duplicate member names', () => {
@@ -1063,6 +1065,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'harvestNode',
       'harvestPreference',
       'healPet',
+      'hillInfo',
       'hobbyCraft',
       'honor',
       'ignoreAdd',
@@ -1323,6 +1326,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'gatheringProficiency',
       'guildBankInfo',
       'harvestPreference',
+      'hillInfo',
       'hobbyCraft',
       'honor',
       'inventory',
@@ -2276,6 +2280,7 @@ type _ExhaustFarming = AssertNever<Exclude<keyof IWorldFarming, (typeof FACET_FA
 const FACET_WORLD_PVP = [
   'worldPvpInfo',
   'setWorldPvpFlag',
+  'hillInfo',
 ] as const satisfies readonly (keyof IWorldWorldPvp)[];
 type _ExhaustWorldPvp = AssertNever<
   Exclude<keyof IWorldWorldPvp, (typeof FACET_WORLD_PVP)[number]>
@@ -2411,8 +2416,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(380);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(380);
+    // 380 plus the King of the Hill readout hillInfo on IWorldWorldPvp: 381.
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(381);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(381);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -130,6 +130,7 @@ const FANOUT_ARMS: readonly string[] = [
   // its own row below (masterwrought qr-19-hud-coordinator-fanout-exemption).
   'this.relocalizeCoordinatorMemos|',
   'this.bgScoreboard.relocalize|',
+  'this.hillBar.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
   'this.wocMarketWindow.relocalize|',
   'this.storePromoCard.relocalize|',
@@ -341,6 +342,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['corpseSig', 'harvestStatusSig'],
     answer: 'this.lootWindow.relocalize',
     why: 'the corpse signature holds action availability and loot quantities, and the harvest-status signature holds the deliberate timed-harvest cast/reservation state (Intentional Gathering PR3); locale changes rebuild once while preserving explicit choices and focus',
+  },
+  {
+    file: 'hud/hill/hill_bar_painter.ts',
+    memos: ['lastSig'],
+    answer: 'this.hillBar.relocalize',
+    why: 'one structural signature over the King of the Hill strip (zone, holder, challenger, inside), so the localized held/zone labels would sit in the old locale until a holder change moved it',
   },
   {
     file: 'hud/battleground/battleground_scoreboard_painter.ts',

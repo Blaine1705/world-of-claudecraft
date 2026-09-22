@@ -399,6 +399,7 @@ import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
+import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
@@ -1903,6 +1904,8 @@ export class Renderer {
   private abyssalRiftFx!: AbyssalRiftFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
+  // King of the Hill: the standing hill's circle (hill_ring.ts, IWorld.hillInfo).
+  private hillRingVisuals!: HillRingVisuals;
   // The viewer's OWN farm plots. Seats are sampled once with the static beds;
   // the visuals wait for the Vfx, which is built later in the same lifecycle.
   private farmBedSeats: ReadonlyMap<string, FarmBedSeat> = new Map();
@@ -2994,6 +2997,9 @@ export class Renderer {
         return base;
       });
     });
+    this.hillRingVisuals = new HillRingVisuals(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -4978,6 +4984,8 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
     }
+    this.hillRingVisuals.sync(this.sim.hillInfo);
+    this.hillRingVisuals.update(dt);
     this.farmPatchVisuals?.drive(this.sim, dt, this.sim.entities.has(this.sim.playerId));
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
@@ -11610,6 +11618,8 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
     }
+    this.hillRingVisuals.sync(this.sim.hillInfo);
+    this.hillRingVisuals.update(dt);
     this.farmPatchVisuals?.drive(this.sim, dt);
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);

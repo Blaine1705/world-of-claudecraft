@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4070,
+    "files": 4073,
     "harvestedFiles": 3948,
     "carried": {
       "tests/active_kit_prewarm.test.ts": {
@@ -138,6 +138,39 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           1625
+        ]
+      },
+      "tests/hill.test.ts": {
+        "ms": 6063,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "PR 4148 King of the Hill suites (rules, system, bar view), local carry pending the branch's first full-mode harvest",
+        "runs": [
+          5900,
+          6266,
+          6063
+        ]
+      },
+      "tests/hill_bar_view.test.ts": {
+        "ms": 27,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "PR 4148 King of the Hill suites (rules, system, bar view), local carry pending the branch's first full-mode harvest",
+        "runs": [
+          24,
+          29,
+          27
+        ]
+      },
+      "tests/hill_rules.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "PR 4148 King of the Hill suites (rules, system, bar view), local carry pending the branch's first full-mode harvest",
+        "runs": [
+          5,
+          5,
+          5
         ]
       },
       "tests/hub_dummy_drill.test.ts": {
@@ -2671,6 +2704,9 @@
   "tests/heroic_soulbound.test.ts": 1654,
   "tests/heroic_vendor.test.ts": 8788,
   "tests/highscore_board.test.ts": 25,
+  "tests/hill.test.ts": 6063,
+  "tests/hill_bar_view.test.ts": 27,
+  "tests/hill_rules.test.ts": 5,
   "tests/hitch_forensics.test.ts": 10,
   "tests/hitch_frame_align_core.test.ts": 10,
   "tests/holder_broadcast.test.ts": 1986,

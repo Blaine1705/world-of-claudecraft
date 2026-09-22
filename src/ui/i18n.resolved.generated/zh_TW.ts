@@ -2235,12 +2235,14 @@ export const zh_TW: EnTranslations = {
         "battlegroundKill": "榮譽擊殺",
         "battlegroundAssist": "助攻擊殺",
         "worldKill": "世界擊殺",
-        "worldAssist": "世界擊殺助攻"
+        "worldAssist": "世界擊殺助攻",
+        "hillHold": "佔據山丘"
       },
       "floatReasons": {
         "kill": "擊殺",
         "assist": "助攻",
-        "firstWin": "首勝"
+        "firstWin": "首勝",
+        "hill": "山丘"
       }
     },
     "worldPvp": {
@@ -2279,6 +2281,22 @@ export const zh_TW: EnTranslations = {
       "levelReq": "需要 {level} 級。",
       "pending": "正在等待伺服器回傳你的 PvP 狀態。",
       "commandHint": "聊天：/pvp 切換旗幟，/pvp on 與 /pvp off 直接設定。"
+    },
+    "hill": {
+      "title": "山丘之王",
+      "heldYou": "你的隊伍佔據著山丘",
+      "heldOther": "另一支隊伍佔據著山丘",
+      "heldNone": "無人佔據山丘",
+      "counts": "圈內：你方 {yours}，佔據方 {theirs}",
+      "countsUnheld": "圈內：你方 {yours}，最大對手 {theirs}",
+      "countsHolding": "圈內：你方 {yours}，對手 {theirs}",
+      "contestYou": "正在奪取山丘：{total} 中的 {seconds}",
+      "contestOther": "正在失去山丘：{total} 中的 {seconds}",
+      "contestNone": "在圈內保持人數優勢 {total} 即可奪取",
+      "inside": "你在圈內",
+      "distance": "距離圓圈 {yards} 碼",
+      "moves": "{minutes} 後移動",
+      "honorNote": "圈內每名佔據方成員每分鐘獲得 {honor} 點榮譽，同時最多 {max} 人"
     },
     "warfareShop": {
       "gossipOption": "瀏覽戰爭套裝",
@@ -7321,6 +7339,8 @@ export const zh_TW: EnTranslations = {
       "flagBodyAid": "在聊天中輸入 /pvp，或按 G 開啟 PvP 視窗並使用世界 PvP 分頁，那裡還會顯示你的戰績和賭注。度過起始等級後，升起旗幟是即時的。降下旗幟會開始幾分鐘的倒數，而且在你仍在戰鬥時旗幟不會降下，所以關閉永遠不是逃離你挑起的戰鬥的手段。為正在戰鬥的已開啟旗幟的玩家治療、護盾或增益，同樣會升起你自己的旗幟，所以沒有人能不掛旗幟就在背後支撐一名戰鬥者；而援助未開啟旗幟的玩家不會升起任何旗幟。",
       "stakesUnflaggedTake": "未開啟旗幟的戰鬥者同樣拿不到金幣：金幣只在兩名開啟旗幟的玩家之間轉移，但所有出過力的人仍能獲得榮譽。",
       "stakesBodyFlagged": "當一名已開啟旗幟的玩家被另一名玩家擊敗時，敗者會支付錢袋中一小部分金幣（有一個不高的上限），而勝者獲得用於兌換 PvP 裝備的榮譽。未開啟旗幟的玩家則完全不必支付金幣，即便是在自由混戰區域中倒下也一樣。所有出過力的人共同分享這兩者：最後一擊者、不久前對目標造成過傷害的人，以及讓這些戰士站穩腳跟的治療者。乾淨的一對一可獨得全部獎勵；團隊則平分。",
+      "hillHeading": "山丘之王",
+      "hillBody": "每小時會有一座山丘在某個自由混戰地帶升起：開闊地上的一個寬闊圓圈，消息通告全伺服器，並會在地面上標出它所在的位置。圈內站著玩家最多的隊伍爭奪這座山丘，連續保持人數優勢一分鐘後，山丘便歸他們所有；一支隊伍或一個團隊都算作同一支隊伍，單獨一人也自成一支隊伍。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得少量榮譽，但同時最多只有數人能拿到，因此一支滿員隊伍在整整一小時裡不受爭奪地佔據山丘，所獲榮譽大致相當於一場戰場勝利。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。",
       "limitsBodyHour": "反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。"
     },
     "thornhollowPage": {

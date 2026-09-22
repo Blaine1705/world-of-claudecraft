@@ -126,7 +126,10 @@ export type HonorReason =
   // damager inside the assist window. Two reasons so the float and the chat
   // line can name which one just paid, like the battleground drip above.
   | 'world_kill'
-  | 'world_assist';
+  | 'world_assist'
+  // King of the Hill (pvp/hill.ts): the once-a-minute trickle to a holder
+  // standing inside the circle.
+  | 'hill_hold';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives

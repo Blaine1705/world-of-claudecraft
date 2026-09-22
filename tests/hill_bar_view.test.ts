@@ -1,0 +1,291 @@
+// @vitest-environment happy-dom
+// The King of the Hill bar (src/ui/hud/hill/): the pure view core (when the bar
+// shows, the rival count, the edge distance, the contest fraction, the
+// structural sig) and the thin painter (one skeleton write per sig, every
+// per-second value through the elided writers, the tone classes chosen from
+// the union, the mount attributes, the language switch), plus the ring's pure
+// core and the sim matcher rows for the hill's lines.
+import { afterEach, describe, expect, it } from 'vitest';
+import {
+  HILL_COLOR_OTHERS,
+  HILL_COLOR_UNHELD,
+  HILL_COLOR_YOURS,
+  hillPulseSpeed,
+  hillRingKey,
+  hillRingPlan,
+} from '../src/render/hill_ring_core';
+import { HILL_CAPTURE_SECONDS } from '../src/sim/pvp';
+import { HILL_LOST_LINE, HILL_TAKEN_LINE, hillRiseLine } from '../src/sim/pvp/hill';
+import { buildHillBarView, HillBar, hillEdgeDistance, hillRivalCount } from '../src/ui/hud/hill';
+import { setLanguage } from '../src/ui/i18n';
+import type { PainterHostWriters } from '../src/ui/painter_host';
+import { localizeSimText } from '../src/ui/sim_i18n';
+import type { HillInfo } from '../src/world_api';
+
+const info = (over: Partial<HillInfo> = {}): HillInfo => ({
+  zoneId: 'wraithwood',
+  x: 360,
+  z: 1540,
+  radius: 50,
+  minutesLeft: 42,
+  inZone: true,
+  inside: false,
+  holder: 'none',
+  holderCount: 0,
+  yourCount: 0,
+  challenger: 'none',
+  challengerCount: 0,
+  contest: 0,
+  ...over,
+});
+
+afterEach(() => setLanguage('en'));
+
+describe('buildHillBarView', () => {
+  it("hides without a hill or outside the hill's zone", () => {
+    expect(buildHillBarView(null, { x: 0, z: 0 }).visible).toBe(false);
+    expect(buildHillBarView(info({ inZone: false }), { x: 360, z: 1540 }).visible).toBe(false);
+  });
+
+  it('measures you against the holder, or the largest rival while unheld', () => {
+    expect(
+      hillRivalCount(
+        info({ holder: 'other', holderCount: 3, challenger: 'you', challengerCount: 4 }),
+      ),
+    ).toBe(3);
+    expect(hillRivalCount(info({ holder: 'none', challenger: 'other', challengerCount: 2 }))).toBe(
+      2,
+    );
+    expect(
+      hillRivalCount(
+        info({ holder: 'you', holderCount: 2, challenger: 'other', challengerCount: 3 }),
+      ),
+    ).toBe(3);
+    expect(hillRivalCount(info({ holder: 'you', holderCount: 2 }))).toBe(0);
+    expect(hillRivalCount(info({ holder: 'none', challenger: 'you', challengerCount: 2 }))).toBe(0);
+  });
+
+  it('reports the whole-yard distance to the edge, zero inside', () => {
+    expect(hillEdgeDistance(info(), 360, 1540)).toBe(0);
+    expect(hillEdgeDistance(info(), 360 + 49, 1540)).toBe(0);
+    expect(hillEdgeDistance(info(), 360 + 80, 1540)).toBe(30);
+    expect(hillEdgeDistance(info(), 360, 1540 - 100.4)).toBe(50);
+  });
+
+  it('carries the contest against the capture length and a structural sig', () => {
+    const view = buildHillBarView(
+      info({
+        holder: 'other',
+        holderCount: 2,
+        yourCount: 3,
+        challenger: 'you',
+        challengerCount: 3,
+        contest: 15,
+      }),
+      { x: 400, z: 1540 },
+    );
+    expect(view.visible).toBe(true);
+    if (!view.visible) return;
+    expect(view).toMatchObject({
+      yours: 3,
+      theirs: 2,
+      contest: 15,
+      capture: HILL_CAPTURE_SECONDS,
+      contestFraction: 0.25,
+      distanceYards: 0,
+      minutesLeft: 42,
+      honorPerMinute: 1,
+      maxPayees: 5,
+    });
+    // The sig moves on the structural fields and stays put on the live ones.
+    const a = buildHillBarView(info({ contest: 3 }), null).sig;
+    const b = buildHillBarView(info({ contest: 9, yourCount: 4, minutesLeft: 1 }), null).sig;
+    expect(b).toBe(a);
+    expect(buildHillBarView(info({ holder: 'you' }), null).sig).not.toBe(a);
+    expect(buildHillBarView(info({ challenger: 'other' }), null).sig).not.toBe(a);
+    expect(buildHillBarView(info({ inside: true }), null).sig).not.toBe(a);
+    expect(buildHillBarView(info({ x: 361 }), null).sig).not.toBe(a);
+    // A contest past the capture length (a stale readout) clamps.
+    const over = buildHillBarView(info({ contest: 999 }), null);
+    expect(over.visible && over.contestFraction).toBe(1);
+  });
+});
+
+describe('HillBar (the painter)', () => {
+  function harness() {
+    const layer = document.createElement('div');
+    document.body.appendChild(layer);
+    const calls: string[] = [];
+    const writers: PainterHostWriters = {
+      setText: (el, text) => {
+        if (el.textContent !== text) {
+          el.textContent = text;
+          calls.push(`text:${text}`);
+        }
+      },
+      setDisplay: (el, display) => {
+        if (el.style.display !== display) {
+          el.style.display = display;
+          calls.push(`display:${display}`);
+        }
+      },
+      setTransform: (el, transform) => {
+        el.style.transform = transform;
+      },
+      setWidth: (el, width) => {
+        if (el.style.width !== width) {
+          el.style.width = width;
+          calls.push(`width:${width}`);
+        }
+      },
+      setStyleProp: (el, prop, value) => {
+        el.style.setProperty(prop, value);
+      },
+      toggleClass: (el, cls, on) => {
+        if (el.classList.contains(cls) !== on) {
+          el.classList.toggle(cls, on);
+          calls.push(`class:${cls}:${on}`);
+        }
+      },
+      setAttr: (el, name, value) => {
+        if (value === null) el.removeAttribute(name);
+        else el.setAttribute(name, value);
+      },
+    };
+    const bar = new HillBar({ layer: () => layer, writers });
+    return { layer, bar, calls };
+  }
+
+  it('mounts once with the status attributes and paints the unheld state', () => {
+    const { layer, bar, calls } = harness();
+    bar.update(
+      buildHillBarView(info({ challenger: 'other', challengerCount: 2, contest: 12 }), {
+        x: 460,
+        z: 1540,
+      }),
+    );
+    const root = layer.querySelector('#hill-bar') as HTMLElement;
+    expect(root).not.toBeNull();
+    expect(root.getAttribute('role')).toBe('status');
+    expect(root.getAttribute('aria-live')).toBe('polite');
+    expect(root.style.display).toBe('block');
+    expect(root.textContent).toContain('King of the Hill');
+    expect(root.textContent).toContain('The Wraithwood');
+    expect(root.textContent).toContain('Nobody holds the hill');
+    expect(root.textContent).toContain('Inside: you 0, largest rival 2');
+    expect(root.textContent).toContain('Losing the hill: 12 seconds of 1 minute');
+    expect(root.textContent).toContain('50 yd to the circle');
+    expect(root.textContent).toContain('Moves in 42 minutes');
+    expect((root.querySelector('.hill-fill') as HTMLElement).style.width).toBe('20%');
+    expect(root.classList.contains('is-contested')).toBe(true);
+    expect(root.classList.contains('is-you-contesting')).toBe(false);
+    bar.update(
+      buildHillBarView(info({ challenger: 'you', challengerCount: 1, yourCount: 1, contest: 5 }), {
+        x: 360,
+        z: 1540,
+      }),
+    );
+    expect(root.classList.contains('is-you-contesting')).toBe(true);
+    expect(root.classList.contains('is-you')).toBe(false);
+    expect(root.classList.contains('is-other')).toBe(false);
+    expect(calls.length).toBeGreaterThan(0);
+  });
+
+  it('a repeated frame writes nothing; a live change writes only its slot', () => {
+    const { bar, calls } = harness();
+    const view = buildHillBarView(
+      info({ holder: 'you', holderCount: 2, yourCount: 2, inside: true }),
+      { x: 360, z: 1540 },
+    );
+    bar.update(view);
+    calls.length = 0;
+    bar.update(view);
+    expect(calls).toEqual([]);
+    bar.update(
+      buildHillBarView(info({ holder: 'you', holderCount: 3, yourCount: 3, inside: true }), {
+        x: 360,
+        z: 1540,
+      }),
+    );
+    expect(calls).toEqual(['text:Inside: you 3, rival 0']);
+  });
+
+  it('the tone follows the holder and the sig rebuilds the skeleton on a holder change', () => {
+    const { layer, bar } = harness();
+    bar.update(
+      buildHillBarView(info({ holder: 'you', holderCount: 1, yourCount: 1, inside: true }), {
+        x: 360,
+        z: 1540,
+      }),
+    );
+    const root = layer.querySelector('#hill-bar') as HTMLElement;
+    expect(root.classList.contains('is-you')).toBe(true);
+    expect(root.textContent).toContain('Your group holds the hill');
+    expect(root.textContent).toContain('You are inside the circle');
+    expect(root.textContent).toContain('Hold a majority inside for 1 minute to take it');
+    bar.update(
+      buildHillBarView(
+        info({ holder: 'other', holderCount: 2, yourCount: 1, challenger: 'none' }),
+        { x: 360, z: 1540 },
+      ),
+    );
+    expect(root.classList.contains('is-you')).toBe(false);
+    expect(root.classList.contains('is-other')).toBe(true);
+    expect(root.textContent).toContain('Another group holds the hill');
+    expect(root.textContent).not.toContain('Your group holds the hill');
+  });
+
+  it('hides when the hill closes or the player leaves the zone, and relocalizes in place', () => {
+    const { layer, bar } = harness();
+    bar.update(buildHillBarView(info(), { x: 360, z: 1540 }));
+    const root = layer.querySelector('#hill-bar') as HTMLElement;
+    bar.update(buildHillBarView(null, null));
+    expect(root.style.display).toBe('none');
+    bar.update(buildHillBarView(info({ inZone: false }), null));
+    expect(root.style.display).toBe('none');
+    bar.update(buildHillBarView(info(), { x: 360, z: 1540 }));
+    expect(root.style.display).toBe('block');
+    // A language switch rebuilds the skeleton (fresh nodes) with the same facts.
+    const heldBefore = root.querySelector('.hill-held');
+    bar.relocalize();
+    const heldAfter = root.querySelector('.hill-held');
+    expect(heldAfter).not.toBe(heldBefore);
+    expect(root.textContent).toContain('Nobody holds the hill');
+    expect(root.style.display).toBe('block');
+    bar.dispose();
+    expect(layer.querySelector('#hill-bar')).toBeNull();
+  });
+});
+
+describe('the ring core', () => {
+  it('colours by holder, pulses only while contested, and keys by geometry', () => {
+    expect(hillRingPlan(0, { holder: 'none', challenger: 'none' }).color).toBe(HILL_COLOR_UNHELD);
+    expect(hillRingPlan(0, { holder: 'you', challenger: 'none' }).color).toBe(HILL_COLOR_YOURS);
+    expect(hillRingPlan(0, { holder: 'other', challenger: 'you' }).color).toBe(HILL_COLOR_OTHERS);
+    const calm = hillRingPlan(Math.PI * 1.5, { holder: 'none', challenger: 'none' });
+    const contested = hillRingPlan(Math.PI * 1.5, { holder: 'none', challenger: 'other' });
+    expect(calm.ringOpacity).toBeGreaterThan(contested.ringOpacity);
+    expect(hillPulseSpeed(true)).toBeGreaterThan(hillPulseSpeed(false));
+    expect(hillRingKey(info())).toBe('360,1540,50');
+    expect(hillRingKey(info({ x: 361 }))).not.toBe(hillRingKey(info()));
+  });
+});
+
+describe('the sim lines the client matcher re-localizes', () => {
+  it('matches the rise line (with the zone name), the capture notices and the /hill readouts', () => {
+    setLanguage('en');
+    expect(localizeSimText(hillRiseLine('The Wraithwood'))).toBe(
+      'A hill has risen in The Wraithwood: hold it to earn Honor.',
+    );
+    expect(localizeSimText(HILL_TAKEN_LINE)).toBe(HILL_TAKEN_LINE);
+    expect(localizeSimText(HILL_LOST_LINE)).toBe(HILL_LOST_LINE);
+    expect(
+      localizeSimText('The hill stands in The Evergarden: nobody holds it. It moves in 7 minutes.'),
+    ).toBe('The hill stands in The Evergarden: nobody holds it. It moves in 7 minutes.');
+    // Under another language the rule still matches (the zone name resolves through
+    // the entity table, whose locale chunks a unit test does not load, so only the
+    // match is asserted here).
+    setLanguage('zh_CN');
+    expect(localizeSimText(hillRiseLine('The Wraithwood'))).not.toBeNull();
+  });
+});

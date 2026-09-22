@@ -112,6 +112,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.honor = 0;
   c.lifetimeHonor = 0;
   c.worldPvpInfo = null;
+  c.hillInfo = null;
   c.cardMinigameInfo = { queued: false, available: true, match: null };
   c.socialInfo = null;
   c.whoInfo = null;

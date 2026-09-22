@@ -452,6 +452,7 @@ import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
+import { buildHillBarView, HillBar } from './hud/hill';
 import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
@@ -5567,11 +5568,8 @@ export class Hud {
   });
   // Card Duel window painter (card_duel_view.ts model + card_duel_window.ts
   // painter, the ValeCupWindow shape scaled down). The Card Master NPC's gossip
-  // menu AND the persistent #mm-cardduel micromenu button (the sim allows
-  // playing a card once matched without proximity, so the window must stay
-  // reachable away from the NPC too) both
-  // toggle it; Hud drives render() from the mediumHud band while open, and
-  // auto-opens it the moment a match starts (see the mediumHud band below).
+  // menu AND the persistent #mm-cardduel micromenu button both toggle it (a card
+  // plays without proximity once matched); rendered from the mediumHud band, auto-opened on match start.
   private readonly cardDuelWindow = new CardDuelWindow({
     root: () => $('#card-duel-window'),
     world: () => this.sim,
@@ -5579,8 +5577,7 @@ export class Hud {
     ...this.windowFocus('#card-duel-window'),
   });
 
-  // Thornhollow Fields in-match scoreboard strip + wave-respawn overlay (self-mounting,
-  // elided writers; hud/battleground/).
+  // Thornhollow Fields in-match scoreboard strip + wave-respawn overlay (self-mounting, elided writers).
   private readonly bgMapPainter = new BattlegroundMapPainter();
   private readonly bgScoreboard = new BattlegroundScoreboard({
     layer: () => document.getElementById('ui'),
@@ -5589,6 +5586,10 @@ export class Hud {
   // Top-right kill feed: event-pushed lines, expiry-pruned per frame.
   private readonly bgKillFeed = new BattlegroundKillFeed({
     layer: () => document.getElementById('ui'),
+  });
+  private readonly hillBar = new HillBar({
+    layer: () => document.getElementById('ui'),
+    writers: this.writerFacet,
   });
   // Character window painter (char_view.ts core + char_window.ts painter). It composes
   // presentation helpers with HUD-built stats/progression plus the unequip + drag
@@ -6993,11 +6994,9 @@ export class Hud {
     this.updateReliquaryTracker();
     this.updateRecipeTracker();
     this.charWindow.renderIfOpen();
-    // The arena window's render-skip signature is text-independent (offline sentinel or a
-    // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
-    // one rebuild with fresh t() (self-gated on isOpen).
     this.arenaWindow.relocalize();
     this.bgScoreboard.relocalize();
+    this.hillBar.relocalize();
     this.dungeonFinderWindow.relocalize();
     this.dungeonFinderProposalPopup.relocalize();
     this.bgProposalPopup.relocalize();
@@ -9537,6 +9536,7 @@ export class Hud {
       this.updateArenaStatus();
       this.updateFiestaHud();
       this.bgScoreboard.update(buildBgScoreboardView(this.sim.bgInfo, this.sim.playerId));
+      this.hillBar.update(buildHillBarView(this.sim.hillInfo, this.sim.player.pos));
       this.bgKillFeed.update(performance.now() / 1000);
       this.yumiPainter.update(this.sim.arenaInfo);
       if ($('#map-window').style.display === 'block') this.updateMapWindow();

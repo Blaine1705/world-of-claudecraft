@@ -26,6 +26,8 @@ import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
+import type { HillState } from './pvp/hill';
+import type { HillSpotProbe } from './pvp/hill_rules';
 import type { WorldPvpBooks } from './pvp/world_pvp';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
@@ -268,6 +270,11 @@ export interface SimContextPrimitives {
   // diminishing-returns rows behind the /pvp flag's kill resolution, mutated
   // in place by that module only. Backing field stays on Sim.
   readonly worldPvpBooks: WorldPvpBooks;
+  // King of the Hill (pvp/hill.ts): the standing hill, the schedule and the
+  // hour's accruals, one live view like the books above (session-only).
+  readonly hillState: HillState;
+  // The hill's spot probe, bound by the Sim (pvp/hill_probe.ts); tests bind fakes.
+  readonly hillProbe: HillSpotProbe;
   // Resolved-match records the authoritative host drains post-tick
   // (social/battleground_outcomes.ts). Observability only: no gameplay branch
   // reads it and nothing here draws rng. Live view; the array stays on Sim.
@@ -1415,6 +1422,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get bgBusySlots() {
       return host.bgBusySlots;
+    },
+    get hillState() {
+      return host.hillState;
+    },
+    get hillProbe() {
+      return host.hillProbe;
     },
     get worldPvpBooks() {
       return host.worldPvpBooks;

@@ -1648,7 +1648,7 @@ export const TARGETS = [
           me.prevPos = { ...me.pos };
           return true;
         });
-        if (!moved) return { skip: 'offline world is unavailable' };
+        if (!moved) throw new Error('offline world is unavailable');
         await wait(2_000);
       }
       const opened = await page.evaluate(() => {
@@ -1662,27 +1662,95 @@ export const TARGETS = [
         if (root.style.display !== 'block') game.hud.toggleArena();
         return { ok: true };
       });
-      if (!opened.ok) return { skip: opened.reason };
+      if (!opened.ok) throw new Error(opened.reason);
       const ready = await pollForSize(page, '#arena-window');
-      if (!ready) return { skip: 'the PvP window never became visible' };
+      if (!ready) throw new Error('the PvP window never became visible');
       // The real tab button, not a debug hook: the strip is what the player uses.
       await page.click('[data-bracket="world"]');
       if (scene === 'ffa') {
         const ffa = await pollForSize(page, '.wpvp-zone.is-ffa');
-        if (!ffa) return { skip: 'the free-for-all ground line never appeared' };
+        if (!ffa) throw new Error('the free-for-all ground line never appeared');
       }
       await pollForSize(page, '.wpvp-status, .bg-note');
       if (scene === 'confirm' || scene === 'up') {
         await page.click('[data-act="pvp-enable"]');
         const confirm = await pollForSize(page, '[data-act="pvp-confirm"]');
-        if (!confirm) return { skip: 'the raise confirm step never appeared' };
+        if (!confirm) throw new Error('the raise confirm step never appeared');
       }
       if (scene === 'up') {
         await page.click('[data-act="pvp-confirm"]');
         const up = await pollForSize(page, '.wpvp-status.is-on');
-        if (!up) return { skip: 'the flag never came up' };
+        if (!up) throw new Error('the flag never came up');
       }
       return { clip: '#arena-window' };
+    },
+  },
+  {
+    key: 'hill',
+    label: 'King of the Hill: the in-zone bar (desktop + mobile) and the circle on the ground',
+    when: ['ui/hud/hill/', 'sim/pvp/hill.ts', 'sim/pvp/hill_rules.ts', 'render/hill_ring'],
+    variants: [
+      // The whole viewport first (the ring drawn on the ground beside the player):
+      // the zone loading screen fades after the teleport, and the first variant on
+      // a fresh page is the one that would catch its tail.
+      { key: 'field', scene: 'field' },
+      { key: 'bar', scene: 'bar' },
+      { key: 'bar-mobile', scene: 'bar', mobile: true },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.scene ?? 'bar';
+      // The first variant on a fresh page can arrive before the world exists.
+      let worldReady = false;
+      for (let attempt = 0; attempt < 120 && !worldReady; attempt++) {
+        worldReady = await page.evaluate(() => !!window.__game?.sim?.player);
+        if (!worldReady) await wait(500);
+      }
+      if (!worldReady) throw new Error('offline world never became available');
+      // The /dev arm (offline dev commands) rises a hill in the Wraithwood now
+      // and stands the character on its rim, inside the zone, so the bar shows
+      // and the ring is at their feet. The character is levelled first so the
+      // trickle would pay them (not needed for the shot, but the honest state).
+      const risen = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.sim) return { ok: false, reason: 'offline world is unavailable' };
+        game.sim.setPlayerLevel(20);
+        game.sim.chat('/dev hill wraithwood');
+        return { ok: !!game.sim.hillInfo, reason: 'no hill rose (dev commands off?)' };
+      });
+      if (!risen.ok) throw new Error(risen.reason);
+      // The teleport into the Wraithwood shows the zone loading screen; the bar
+      // and the ring are only honest evidence once it has cleared.
+      let loaded = false;
+      for (let attempt = 0; attempt < 120 && !loaded; attempt++) {
+        loaded = await page.evaluate(() => {
+          const el = document.getElementById('loading-screen');
+          if (!el) return true;
+          const cs = getComputedStyle(el);
+          return cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0;
+        });
+        if (!loaded) await wait(500);
+      }
+      if (!loaded) throw new Error('the zone loading screen never cleared');
+      await wait(3_000);
+      const bar = await pollForSize(page, '#hill-bar');
+      if (!bar) throw new Error('the hill bar never showed');
+      if (scene === 'field') return {};
+      const rect = await page.evaluate(() => {
+        const el = document.querySelector('#hill-bar');
+        if (!(el instanceof HTMLElement)) return null;
+        const r = el.getBoundingClientRect();
+        return { x: r.left, y: r.top, width: r.width, height: r.height };
+      });
+      if (!rect) throw new Error('the hill bar has no box');
+      const pad = 12;
+      return {
+        clip: {
+          x: Math.max(0, rect.x - pad),
+          y: Math.max(0, rect.y - pad),
+          width: rect.width + pad * 2,
+          height: rect.height + pad * 2,
+        },
+      };
     },
   },
   {

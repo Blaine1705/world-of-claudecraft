@@ -1178,9 +1178,11 @@ describe('chat module (direct, no Sim)', () => {
     const line = chatMod.inspectReadout(target, e);
     expect(line).toContain('Bet: Level 7');
     expect(line).toContain('50%');
-    // 10 lines: the original groups plus ignore/block, localized recovery help,
-    // and the World PvP flag line (/pvp, /pvp on, /pvp off).
-    expect(chatMod.helpLines().length).toBe(10);
+    // 11 lines: the original groups plus ignore/block, localized recovery help,
+    // the World PvP flag line (/pvp, /pvp on, /pvp off) and the King of the Hill
+    // line (/hill).
+    expect(chatMod.helpLines().length).toBe(11);
+    expect(chatMod.helpLines().join('\n')).toContain('/hill says where the hill stands');
     expect(chatMod.helpLines().join('\n')).toContain('/ignore <name>');
     expect(chatMod.helpLines().join('\n')).toContain('/pvp toggles your PvP flag');
   });

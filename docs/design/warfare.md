@@ -498,6 +498,48 @@ and nothing here draws rng, so the offline Sim, the server and the headless env
 resolve every kill identically (`tests/world_pvp.test.ts`,
 `tests/world_pvp_rules.test.ts`, `tests/world_pvp_zones.test.ts`).
 
+## King of the Hill
+
+Once an hour a hill rises somewhere in one of the free-for-all zones
+(`src/sim/pvp/hill.ts`, rules in `hill_rules.ts`, the zone set from
+`worldPvpFfaZones`): a `HILL_RADIUS` (50 yd) circle on dry, open ground, clear
+of the hub settlement and every collider, wholly inside its zone, chosen by a
+private rng derived from the seed and the hill's ordinal (the natural rift
+portal precedent, so the world's own rng stream never moves for a hill and
+every host resolves the same spot). The first rises `HILL_FIRST_AT_SECONDS`
+after boot and one every `HILL_CYCLE_SECONDS` after; the old one closes as the
+new one rises, announced to the whole realm. The realm's `WORLD_PVP_DISABLED`
+switch turns the hill off with the rest of world PvP.
+
+Control is by headcount inside the circle, by GROUP (`hillGroupKey`): a party
+or raid is one group, a lone player a group of one. The largest group that
+beats the holder's present members by a strict majority (`hillChallengeStands`;
+a tie never moves the hill, an absent holder is beaten by anyone) is the
+challenger, and after `HILL_CAPTURE_SECONDS` (60) of unbroken majority it takes
+the hill (`hillContestStep`: a lapsed challenge starts over, a new challenger
+starts its own clock). The dead do not count. Everyone standing in the zone is
+already hostile to every stranger there (the free-for-all arm), so the hill
+needs no flag of its own.
+
+Honor is a deliberately thin trickle, so it stays scarce next to the instanced
+faucets: each holder standing inside banks a second per pass and every
+`HILL_ACCRUAL_SECONDS` (60) pays `HILL_HONOR_PER_PAYOUT` (1), to at most
+`HILL_MAX_PAYEES` (5) of them at once (ascending pid), never to a player under
+`WORLD_PVP_MIN_LEVEL`, and never to anyone outside the circle. A full party
+holding an uncontested hill for the whole hour earns 60 each, about one
+Thornhollow Fields win for an hour of standing still; a realm's whole hill
+income caps at 300 an hour. No diminishing returns: the cap and the pace are
+the limit. A capture clears the ousted holder's banked seconds.
+
+The readout (`IWorld.hillInfo`, the `hill` self key) carries the geometry, the
+holder from the viewer's seat and the minutes left for everyone, and the live
+counts and contest clock only for a viewer standing in the hill's zone, so the
+self wire elides it for everyone else between holder changes. The HUD bar
+(`src/ui/hud/hill/`) shows in that zone: who holds it, you against them, the
+contest fill, the distance to the circle; the renderer draws the circle
+(`src/render/hill_ring.ts`) in the holder's colour; `/hill` in chat says where
+it stands. The state is session-only and never persisted.
+
 ## FURY prices
 
 FURY sells one item-level 31 epic tier for every equipment slot the game

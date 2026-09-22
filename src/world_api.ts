@@ -395,7 +395,7 @@ export type {
   WhoRosterInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
-export type { WorldPvpInfo, WorldPvpZone } from './world_api/world_pvp';
+export type { HillInfo, HillSide, WorldPvpInfo, WorldPvpZone } from './world_api/world_pvp';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,
 // so `IWorld` is byte-identical to the pre-split flat interface and both the

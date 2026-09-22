@@ -22,7 +22,7 @@
 // colour and the HUD's target frame all read the same verdict for the same
 // coordinates. No SimContext, no rng, no clock.
 
-import { zoneContaining } from '../data';
+import { ZONES, zoneContaining } from '../data';
 import type { ZoneDef } from '../types';
 import type { WorldPvpZonePolicy } from './world_pvp_rules';
 
@@ -35,4 +35,10 @@ export function worldPvpZonePolicyOf(zone: ZoneDef | null | undefined): WorldPvp
 /** The policy at a world position. */
 export function worldPvpZonePolicyAt(x: number, z: number): WorldPvpZonePolicy {
   return worldPvpZonePolicyOf(zoneContaining(x, z));
+}
+
+/** The free-for-all zones, in table order (the King of the Hill picks among
+ *  them, src/sim/pvp/hill.ts). Reads the static table like the lookup above. */
+export function worldPvpFfaZones(): ZoneDef[] {
+  return ZONES.filter((zone) => zone.worldPvp === 'ffa');
 }

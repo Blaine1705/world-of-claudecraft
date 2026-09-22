@@ -2235,12 +2235,14 @@ export const fr_FR: EnTranslations = {
         "battlegroundKill": "élimination honorable",
         "battlegroundAssist": "coup fatal assisté",
         "worldKill": "world kill",
-        "worldAssist": "world kill assisted"
+        "worldAssist": "world kill assisted",
+        "hillHold": "holding the hill"
       },
       "floatReasons": {
         "kill": "Élimination",
         "assist": "Assistance",
-        "firstWin": "Première victoire"
+        "firstWin": "Première victoire",
+        "hill": "Hill"
       }
     },
     "worldPvp": {
@@ -2279,6 +2281,22 @@ export const fr_FR: EnTranslations = {
       "levelReq": "Requires level {level}.",
       "pending": "Waiting for your PvP status from the realm.",
       "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
+    },
+    "hill": {
+      "title": "King of the Hill",
+      "heldYou": "Your group holds the hill",
+      "heldOther": "Another group holds the hill",
+      "heldNone": "Nobody holds the hill",
+      "counts": "Inside: you {yours}, holder {theirs}",
+      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
+      "countsHolding": "Inside: you {yours}, rival {theirs}",
+      "contestYou": "Taking the hill: {seconds} of {total}",
+      "contestOther": "Losing the hill: {seconds} of {total}",
+      "contestNone": "Hold a majority inside for {total} to take it",
+      "inside": "You are inside the circle",
+      "distance": "{yards} yd to the circle",
+      "moves": "Moves in {minutes}",
+      "honorNote": "{honor} Honor a minute to each holder inside, up to {max} of you"
     },
     "warfareShop": {
       "gossipOption": "Parcourir les tenues de Guerre",
@@ -7321,6 +7339,8 @@ export const fr_FR: EnTranslations = {
       "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
       "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
       "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "hillHeading": "King of the Hill",
+      "hillBody": "Once an hour a hill rises somewhere in one of the free-for-all zones: a wide circle on open ground, announced to the whole realm and drawn on the ground where it stands. The group with the most players standing inside it contests the hill, and after a minute of unbroken majority the hill is theirs; a party or raid counts as one group, and a lone player is a group of one. While a group holds the hill, each of its members standing inside earns a little Honor every minute, to a handful of them at once, so a full party holding an uncontested hill for the whole hour earns about what one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor."
     },
     "thornhollowPage": {

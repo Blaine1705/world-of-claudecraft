@@ -2235,12 +2235,14 @@ export const zh_CN: EnTranslations = {
         "battlegroundKill": "荣誉击杀",
         "battlegroundAssist": "助攻击杀",
         "worldKill": "世界击杀",
-        "worldAssist": "世界击杀助攻"
+        "worldAssist": "世界击杀助攻",
+        "hillHold": "占据山丘"
       },
       "floatReasons": {
         "kill": "击杀",
         "assist": "助攻",
-        "firstWin": "首胜"
+        "firstWin": "首胜",
+        "hill": "山丘"
       }
     },
     "worldPvp": {
@@ -2279,6 +2281,22 @@ export const zh_CN: EnTranslations = {
       "levelReq": "需要 {level} 级。",
       "pending": "正在等待领域返回你的 PvP 状态。",
       "commandHint": "聊天：/pvp 切换旗帜，/pvp on 与 /pvp off 直接设置。"
+    },
+    "hill": {
+      "title": "山丘之王",
+      "heldYou": "你的队伍占据着山丘",
+      "heldOther": "另一支队伍占据着山丘",
+      "heldNone": "无人占据山丘",
+      "counts": "圈内：你方 {yours}，占据方 {theirs}",
+      "countsUnheld": "圈内：你方 {yours}，最大对手 {theirs}",
+      "countsHolding": "圈内：你方 {yours}，对手 {theirs}",
+      "contestYou": "正在夺取山丘：{total} 中的 {seconds}",
+      "contestOther": "正在失去山丘：{total} 中的 {seconds}",
+      "contestNone": "在圈内保持人数优势 {total} 即可夺取",
+      "inside": "你在圈内",
+      "distance": "距离圆圈 {yards} 码",
+      "moves": "{minutes} 后移动",
+      "honorNote": "圈内每名占据方成员每分钟获得 {honor} 点荣誉，同时最多 {max} 人"
     },
     "warfareShop": {
       "gossipOption": "浏览战争套装",
@@ -7321,6 +7339,8 @@ export const zh_CN: EnTranslations = {
       "flagBodyAid": "在聊天中输入 /pvp，或按 G 打开 PvP 窗口并使用世界 PvP 标签页，那里还会显示你的战绩和赌注。度过起始等级后，升起旗帜是即时的。降下旗帜会开始几分钟的倒计时，而且在你仍在战斗时旗帜不会降下，所以关闭永远不是逃离你挑起的战斗的手段。为正在战斗的已开启旗帜的玩家治疗、护盾或增益，同样会升起你自己的旗帜，所以没有人能不挂旗帜就在背后支撑一名战斗者；而援助未开启旗帜的玩家不会升起任何旗帜。",
       "stakesUnflaggedTake": "未开启旗帜的战斗者同样拿不到金币：金币只在两名开启旗帜的玩家之间转移，但所有出过力的人仍能获得荣誉。",
       "stakesBodyFlagged": "当一名已开启旗帜的玩家被另一名玩家击败时，败者会支付钱袋中一小部分金币（有一个不高的上限），而胜者获得用于兑换 PvP 装备的荣誉。未开启旗帜的玩家则完全不必支付金币，即便是在自由混战区域中倒下也一样。所有出过力的人共同分享这两者：最后一击者、不久前对目标造成过伤害的人，以及让这些战士站稳脚跟的治疗者。干净的一对一可独得全部奖励；团队则平分。",
+      "hillHeading": "山丘之王",
+      "hillBody": "每小时会有一座山丘在某个自由混战地带升起：开阔地上的一个宽阔圆圈，消息通告全领域，并会在地面上标出它所在的位置。圈内站着玩家最多的队伍争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；小队或团队都算作一支队伍，单独一人也是一支队伍。一支队伍占据山丘期间，站在圈内的每名成员每分钟都会获得少量荣誉，但同时最多只有数人能拿到，因此一支满员小队在整整一小时里不受争夺地占据山丘，所获荣誉大致相当于一场战场胜利。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。",
       "limitsBodyHour": "反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。"
     },
     "thornhollowPage": {

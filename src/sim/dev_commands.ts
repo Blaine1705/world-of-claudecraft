@@ -25,6 +25,7 @@ import {
 } from './nythraxis_dev_raid';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
+import { spawnHillNow } from './pvp/hill';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
@@ -168,6 +169,29 @@ export function handleDevChat(
         Number(teleportMatch[2]),
       );
       emitDevLog(ctx, pid, `[dev] Teleported to ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`);
+    }
+    return null;
+  }
+
+  // King of the Hill: rise a hill now (in the named free-for-all zone, else a
+  // random one) and stand the caller on its rim, for staging a contest.
+  const hillMatch = /^\/(?:dev\s+hill|devhill)(?:\s+([a-z_]+))?\s*$/i.exec(raw);
+  if (hillMatch) {
+    const hill = spawnHillNow(ctx, hillMatch[1]?.toLowerCase());
+    const entity = ctx.entities.get(pid);
+    if (!hill) {
+      emitDevLog(
+        ctx,
+        pid,
+        '[dev] No hill could rise there (no free-for-all zone, or no open ground).',
+      );
+    } else if (entity) {
+      const pos = displacePlayerForDev(ctx, entity, hill.x + hill.radius - 5, hill.z);
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Hill risen in ${hill.zoneId} at ${hill.x.toFixed(1)}, ${hill.z.toFixed(1)}; you stand at ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`,
+      );
     }
     return null;
   }
@@ -1125,7 +1149,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone]',
     );
     return null;
   }
