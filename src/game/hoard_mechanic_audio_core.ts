@@ -45,6 +45,8 @@ const BEATS: Partial<Record<HoardBossCueVariant, readonly HoardMechanicBeat[]>> 
     beat(Math.max(0, BOULDER.warningSec - 0.35), 'melee_swing_heavy', 0.8, 0.5),
   ],
   'brute-boulder': [beat(0, 'rift_boulder_roll', 0.9, 0.9)],
+  // The charge: the rumble as he goes.
+  'brute-charge': [beat(0, 'rift_boulder_roll', 0.8, 0.7)],
   'brute-boulder-return': [beat(0, 'rift_boulder_roll', 0.85, 1.25)],
   'brute-boulder-crush': [
     beat(0, 'rift_boulder_impact', 1, 0.7),

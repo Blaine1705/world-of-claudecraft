@@ -29,6 +29,7 @@ import {
   tickHoardBoulder,
   tickHoardBoulderCue,
 } from './hoard_boulder';
+import { isChargeCue, tickHoardCharge } from './hoard_charge';
 import { clearHoardCocoon, isCocoonCue, tickHoardCocoon, tickHoardCocoonCue } from './hoard_cocoon';
 import {
   clearHoardForgeHammer,
@@ -511,6 +512,7 @@ function tickSpecialKit(
   }
   if (kit === 'brute') {
     tickHoardBoulder(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
+    tickHoardCharge(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     return;
   }
   if (kit === 'frost') {
@@ -873,6 +875,11 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
     }
     if (isBoulderCue(cue)) {
       if (tickHoardBoulderCue(cue)) live.push(cue);
+      continue;
+    }
+    if (isChargeCue(cue)) {
+      // The charge module withdraws its own cue; until then it lives.
+      if (cue.remaining > 1e-8) live.push(cue);
       continue;
     }
     if (isTentacleCue(cue)) {

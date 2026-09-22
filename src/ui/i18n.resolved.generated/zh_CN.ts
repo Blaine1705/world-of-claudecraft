@@ -11201,6 +11201,7 @@ export const zh_CN: EnTranslations = {
       "hoard_cast_void_empower": "Void Empowerment",
       "hoard_cast_webbing": "Webbing",
       "hoard_cast_doom_ritual": "Doom Ritual",
+      "hoard_cast_charge": "Charge",
       "hoard_cast_silence": "沉默尖啸",
       "hoard_cast_hex": "妖术",
       "hoard_lightning_strike": "雷霆打击",

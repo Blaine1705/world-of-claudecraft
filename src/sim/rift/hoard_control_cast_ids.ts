@@ -33,6 +33,9 @@ export const HOARD_CAST_PULSAR_OVERLOAD = 'hoard_pulsar_overload';
 /** Grask's Rolling Boulder (hoard_boulder.ts): the wind-up of the throw, read
  *  and answered, never kicked. */
 export const HOARD_CAST_ROLLING_BOULDER = 'hoard_rolling_boulder';
+/** Grask's Charge (hoard_charge.ts): the aim at whoever holds him, read and
+ *  answered with a wall, never kicked. */
+export const HOARD_CAST_CHARGE = 'hoard_cast_charge';
 
 /** The Storm Caller's Lightning Strike (hoard_lightning_strike.ts), here for the
  *  same reason: healer_channel.ts reads its school. */

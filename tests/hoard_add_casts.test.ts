@@ -45,7 +45,6 @@ function tick(sim: Sim, mob: Entity, seconds: number): void {
   for (let elapsed = 0; elapsed < seconds - DT * 0.5; elapsed += DT) {
     mob.aiState = 'attack';
     tickHoardAddCasts(sim.ctx);
-    sim.ctx.tickAuras?.(DT);
     sim.drainEvents();
   }
 }

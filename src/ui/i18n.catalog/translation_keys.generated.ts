@@ -30,6 +30,7 @@ export type TranslationKeyFlat =
   | 'abilityUi.cast.enchanting_apply'
   | 'abilityUi.cast.fishing'
   | 'abilityUi.cast.gathering'
+  | 'abilityUi.cast.hoard_cast_charge'
   | 'abilityUi.cast.hoard_cast_cinder_bolt'
   | 'abilityUi.cast.hoard_cast_doom_ritual'
   | 'abilityUi.cast.hoard_cast_drowning_hook'

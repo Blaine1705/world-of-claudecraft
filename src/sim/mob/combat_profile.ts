@@ -9,6 +9,7 @@ import {
 import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from '../mob_combat';
 import { holdHoardBoneReaper } from '../rift/hoard_bone_reaper';
 import { holdHoardBoulder } from '../rift/hoard_boulder';
+import { holdHoardCharge } from '../rift/hoard_charge';
 import { holdHoardIceAge } from '../rift/hoard_ice_age';
 import { holdHoardOrbitalLightning } from '../rift/hoard_orbital_lightning';
 import { holdHoardPulsars } from '../rift/hoard_pulsars';
@@ -164,7 +165,8 @@ export function updateMobCombatProfile(
     holdHoardBoneReaper(ctx, mob) ||
     holdHoardIceAge(ctx, mob) ||
     holdHoardPulsars(ctx, mob) ||
-    holdHoardBoulder(ctx, mob)
+    holdHoardBoulder(ctx, mob) ||
+    holdHoardCharge(ctx, mob)
   ) {
     onEngagedTick?.('stationary');
     mob.swingTimer = Math.max(0, mob.swingTimer - DT);

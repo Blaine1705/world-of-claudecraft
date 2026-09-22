@@ -406,6 +406,7 @@ export type HoardBossCueVariant =
   | 'tide-whip'
   | 'tide-sweep'
   | 'brute-boulder-throw'
+  | 'brute-charge'
   | 'brute-boulder'
   | 'brute-boulder-return'
   | 'brute-boulder-crush'
@@ -467,6 +468,7 @@ export interface HoardBossState {
   forgeHammer?: import('./hoard_forge_hammer').HoardForgeHammerState;
   tentacles?: import('./hoard_tentacles').HoardTentacleState;
   boulder?: import('./hoard_boulder').HoardBoulderState;
+  charge?: import('./hoard_charge').HoardChargeState;
   cocoon?: import('./hoard_cocoon').HoardCocoonState;
   /** Storm Surge (src/sim/rift/hoard_storm_surge.ts): Vharok's stacks while he
    *  stands in his own charged ground, and the size he returns to. */

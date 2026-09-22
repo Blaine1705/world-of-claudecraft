@@ -11201,6 +11201,7 @@ export const en_XA: EnTranslations = {
       "hoard_cast_void_empower": "[Ʋóíð Éɱþóŵéŕɱéñţ]",
       "hoard_cast_webbing": "[Ŵéƀƀíñĝ]",
       "hoard_cast_doom_ritual": "[Ðóóɱ Ŕíţúáļ]",
+      "hoard_cast_charge": "[Çĥáŕĝé]",
       "hoard_cast_silence": "[Šíļéñçíñĝ Šĥŕíéķ]",
       "hoard_cast_hex": "[Ĥéẋ]",
       "hoard_lightning_strike": "[Ļíĝĥţñíñĝ Šţŕíķé]",

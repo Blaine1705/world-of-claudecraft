@@ -29,6 +29,9 @@ export function hoardCueAppearance(cue: HoardBossCueView): HoardCueAppearancePla
       return { shape: 'ignivar', palette: 'fire', countdown: 'none', elementalRider: false };
     case 'frost-gust':
       return { shape: 'sector', palette: 'frost', countdown: 'none', elementalRider: true };
+    case 'brute-charge':
+      // A narrow fan from him to the wall: the lane he will run.
+      return { shape: 'sector', palette: 'physical', countdown: 'none', elementalRider: false };
     case 'brute-wide':
     case 'brute-medium':
     case 'brute-long':
