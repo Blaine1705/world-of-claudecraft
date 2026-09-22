@@ -18,6 +18,7 @@ import type { SimContext } from '../src/sim/sim_context';
 import { emptyMoveInput, normAngle } from '../src/sim/types';
 import { WATER_LEVEL } from '../src/sim/world';
 import { advanceGliderMovement, startGliderFlight } from '../src/sim/world_quest_glider';
+import { gliderCourseForCycle } from '../src/sim/world_quest_glider_generation';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 function setupSim(fullWorld = false) {
@@ -41,6 +42,16 @@ function setupSim(fullWorld = false) {
   return sim;
 }
 
+/** The course the live session is flying: the day's variant of its template
+ *  (world quests round 2, world_quest_glider_generation.ts), exactly what the
+ *  authority ticks and the course visual draws. */
+function liveCourse(sim: Sim) {
+  return gliderCourseForCycle(
+    sim.worldQuestCycle,
+    sim.worldQuestLog.get(GLIDER_QUEST_ID)?.glider?.courseId,
+  );
+}
+
 /** Steers the live flight ring to ring with bounded turn and pitch inputs
  *  through real ticks, until the flight state leaves `flying`/`countdown` or
  *  the tick budget runs out. Returns the number of ticks flown. */
@@ -51,8 +62,8 @@ function autopilot(sim: Sim, budget = 2600): number {
     const state = progress.glider;
     if (!state || (state.phase !== 'flying' && state.phase !== 'countdown')) break;
     const target =
-      GLIDER_COURSE.rings.find((r) => !state.passedRings.includes(r.id)) ??
-      GLIDER_COURSE.landingPad;
+      liveCourse(sim).rings.find((r) => !state.passedRings.includes(r.id)) ??
+      liveCourse(sim).landingPad;
     const difference = normAngle(
       Math.atan2(target.x - sim.player.pos.x, target.z - sim.player.pos.z) - sim.player.facing,
     );
@@ -301,8 +312,8 @@ describe('World Quest Glider Integration', () => {
     for (let i = 0; i < 2600 && progress.state === 'active'; i++) {
       const state = progress.glider!;
       const target =
-        GLIDER_COURSE.rings.find((r) => !state.passedRings.includes(r.id)) ??
-        GLIDER_COURSE.landingPad;
+        liveCourse(sim).rings.find((r) => !state.passedRings.includes(r.id)) ??
+        liveCourse(sim).landingPad;
       const difference = normAngle(
         Math.atan2(target.x - sim.player.pos.x, target.z - sim.player.pos.z) - sim.player.facing,
       );
@@ -451,8 +462,8 @@ describe('World Quest Glider Integration', () => {
           }),
         );
       const target =
-        GLIDER_COURSE.rings.find((r) => !state.passedRings.includes(r.id)) ??
-        GLIDER_COURSE.landingPad;
+        liveCourse(sim).rings.find((r) => !state.passedRings.includes(r.id)) ??
+        liveCourse(sim).landingPad;
       const difference = normAngle(
         Math.atan2(target.x - sim.player.pos.x, target.z - sim.player.pos.z) - sim.player.facing,
       );

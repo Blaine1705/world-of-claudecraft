@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { GLIDER_COURSE, GLIDER_QUEST_ID } from '../sim/content/world_quest_glider';
 import { GLIDER_COURSES } from '../sim/content/world_quest_glider_levels';
-import { gliderCourseById } from '../sim/world_quest_glider_levels';
+import { gliderCourseForCycle } from '../sim/world_quest_glider_generation';
 import type { IWorld } from '../world_api';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { gliderCourseVisible } from './glider_course_core';
@@ -134,7 +134,11 @@ export class GliderCourseVisual {
     }
 
     this.group.visible = true;
-    const course = gliderCourseById(session?.courseId);
+    // The day's variant of the session's course (sim/world_quest_glider_generation.ts),
+    // derived from the mirrored cycle exactly as the authority ticks it; the
+    // lookup returns a stable object per (cycle, course), so the identity
+    // check below repositions the ring meshes only when the line changes.
+    const course = gliderCourseForCycle(world.worldQuestCycle, session?.courseId);
     if (course !== this.course) {
       this.course = course;
       for (let i = 0; i < this.ringMeshes.length; i++) {

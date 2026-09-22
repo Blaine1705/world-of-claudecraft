@@ -18,6 +18,7 @@ import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { clearAfkOnMove } from './social/away';
 import { type Entity, INTERACT_RANGE, type WorldQuestProgress } from './types';
+import { gliderCourseForCycle } from './world_quest_glider_generation';
 import { gliderCourseById } from './world_quest_glider_levels';
 import { emitWorldQuestScore } from './world_quest_score_events';
 
@@ -228,7 +229,15 @@ export function advanceGliderMovement(ctx: SimContext, player: Entity, meta: Pla
   const beforeRings = state.passedRings.length;
   const beforeBoosts = state.windBoosts?.length ?? 0;
 
-  tickGliderFlight(state, player, meta.moveInput, gliderCourseById(state.courseId), ctx.cfg.seed);
+  // The day's variant of the session's course (world_quest_glider_generation.ts):
+  // the same pure function the course visual draws from, keyed by the cycle.
+  tickGliderFlight(
+    state,
+    player,
+    meta.moveInput,
+    gliderCourseForCycle(meta.worldQuestCycle, state.courseId),
+    ctx.cfg.seed,
+  );
   // The tick mutates phase beyond the entry guard's countdown/flying narrowing.
   const phaseAfterTick = state.phase as GliderFlightState['phase'];
   player.onGround = phaseAfterTick === 'won' || phaseAfterTick === 'failed';
