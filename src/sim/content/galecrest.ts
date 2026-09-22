@@ -68,16 +68,29 @@ export const GALECREST_ROADS: { x: number; z: number }[][] = [
   ], // Wickharbor -> the Old Beacon
   [
     { x: 420, z: 360 },
+    // The extra point on the shelf keeps the smoothed line straight past the
+    // cove-side ore vein at (430, 379), which the band pin in
+    // tests/gather_node_placement.test.ts keeps off the road.
+    { x: 424, z: 400 },
     { x: 432, z: 440 },
-    // Over the crest of the Shear (gale_launch_knoll.ts): the climb comes up
-    // the gentle north face and leaves down the south-west, never the steep
-    // launch face the pier points over.
-    { x: 446, z: 512 },
-    { x: 424, z: 560 },
+    // Around the western foot of the Shear (gale_launch_knoll.ts) and along
+    // the paddock's north fence, back onto the old line east of the stables.
+    { x: 418, z: 446 },
+    { x: 372, z: 488 },
+    { x: 365, z: 530 },
+    { x: 395, z: 538 },
+    { x: 420, z: 540 },
+    { x: 438, z: 556 },
     { x: 434, z: 610 },
     { x: 390, z: 634 },
     { x: 352, z: 636 },
-  ], // Wickharbor -> above the Shear -> past the stables' east fence -> the Wreckfields
+  ], // Wickharbor -> around the Shear -> past the stables' east fence -> the Wreckfields
+  [
+    { x: 432, z: 440 },
+    // Up the Shear's north face to Zephyr's wharf, under the player climb
+    // limit (tests/glider_wharf_layout.test.ts walks it).
+    { x: 446, z: 512 },
+  ], // the road up to the Shear
   [
     { x: 420, z: 360 },
     { x: 352, z: 342 },

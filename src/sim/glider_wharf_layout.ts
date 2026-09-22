@@ -23,10 +23,11 @@ export const GLIDER_WHARF = {
   /** Where the wharf's plank run is centred (the deck rectangle centre). */
   x: 450,
   z: 519,
-  /** The roadside updraft at the knoll's south-western foot, where the road
-   *  comes down: a player who fell short or walked down is carried back up to
-   *  Zephyr (world_quest_glider.ts updateGliderLaunchUpdraft). */
-  updraft: { x: 426, z: 582, radius: 3 },
+  /** The roadside updraft on the shelf below the launch cliff, between the
+   *  paddock's east fence and the Wreckfields road: a player who fell short or
+   *  walked down is carried back up to Zephyr (world_quest_glider.ts
+   *  updateGliderLaunchUpdraft). */
+  updraft: { x: 431, z: 556, radius: 3 },
 } as const;
 
 export const GLIDER_WHARF_DECKS: readonly GaleDeckDef[] = Object.freeze([

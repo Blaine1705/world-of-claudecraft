@@ -1256,7 +1256,7 @@ export const TARGETS = [
     variants: [
       // From the flats beyond Wickharbor's stables (the camera orbit tops out at
       // 22 yd, so the 70 yd crest only fits the frame from a couple of hundred
-      // yards out); clear of the updraft ring at (426, 582), which whisks a
+      // yards out); clear of the updraft ring at (431, 556), which whisks a
       // player standing in it onto the wharf.
       {
         key: 'from-the-road',

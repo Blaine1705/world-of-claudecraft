@@ -85,34 +85,50 @@ describe('the launch knoll', () => {
     // A raise only: ground already above the crest is left alone.
     expect(applyGaleLaunchKnoll(x, z, 90)).toBe(90);
     // Lopsided on purpose: seaward and launch faces short, the road sides long.
-    expect(galeLaunchKnollOuterRadius(1, 0)).toBeLessThan(galeLaunchKnollOuterRadius(0, 1));
-    expect(galeLaunchKnollOuterRadius(0, 1)).toBeLessThan(galeLaunchKnollOuterRadius(0, -1));
-    expect(galeLaunchKnollOuterRadius(0, -1)).toBeLessThan(galeLaunchKnollOuterRadius(-1, 0));
+    // South (the launch cliff over the hamlet's shelf) is the shortest side,
+    // then east (the sea cliff), then west, and north (the walk up) the longest.
+    expect(galeLaunchKnollOuterRadius(0, 1)).toBeLessThan(galeLaunchKnollOuterRadius(1, 0));
+    expect(galeLaunchKnollOuterRadius(1, 0)).toBeLessThan(galeLaunchKnollOuterRadius(-1, 0));
+    expect(galeLaunchKnollOuterRadius(-1, 0)).toBeLessThan(galeLaunchKnollOuterRadius(0, -1));
+    // The quadrant ellipse keeps a short side short up to the diagonal: the
+    // south-west radius sits between the south and west sides, well under the
+    // reach the old compass blend gave that corner (the paddock's).
+    const southWest = galeLaunchKnollOuterRadius(-Math.SQRT1_2, Math.SQRT1_2);
+    expect(southWest).toBeGreaterThan(galeLaunchKnollOuterRadius(0, 1));
+    expect(southWest).toBeLessThan(galeLaunchKnollOuterRadius(-1, 0));
   });
 
-  it('the Wickharbor road climbs over the crest and down again under the player climb limit', () => {
-    // The road that passes "above the Shear" (galecrest.ts): the leg from
-    // Wickharbor south to the Wreckfields runs over the knoll's crest.
-    const road = GALECREST_ROADS.find((leg) => leg.some((p) => p.x === 446 && p.z === 512));
-    expect(road).toBeDefined();
-    if (!road) return;
-    let steepest = 0;
-    for (let i = 0; i < road.length - 1; i++) {
-      const a = road[i];
-      const b = road[i + 1];
-      const length = Math.hypot(b.x - a.x, b.z - a.z);
-      const steps = Math.ceil(length / 2);
-      for (let s = 0; s < steps; s++) {
-        const t0 = s / steps;
-        const t1 = (s + 1) / steps;
-        const h0 = groundHeight(a.x + (b.x - a.x) * t0, a.z + (b.z - a.z) * t0, WORLD_SEED);
-        const h1 = groundHeight(a.x + (b.x - a.x) * t1, a.z + (b.z - a.z) * t1, WORLD_SEED);
-        steepest = Math.max(steepest, Math.abs(h1 - h0) / (length / steps));
+  it('the spur road climbs to the crest and the Wreckfields road passes the foot, both under the climb limit', () => {
+    // galecrest.ts: the spur up the north face ends on the crest; the leg from
+    // Wickharbor to the Wreckfields goes around the western foot and along
+    // the paddock's north fence, never over the crest or down the cliff.
+    const steepestAlong = (road: readonly { x: number; z: number }[]): number => {
+      let steepest = 0;
+      for (let i = 0; i < road.length - 1; i++) {
+        const a = road[i];
+        const b = road[i + 1];
+        const length = Math.hypot(b.x - a.x, b.z - a.z);
+        const steps = Math.ceil(length / 2);
+        for (let s = 0; s < steps; s++) {
+          const t0 = s / steps;
+          const t1 = (s + 1) / steps;
+          const h0 = groundHeight(a.x + (b.x - a.x) * t0, a.z + (b.z - a.z) * t0, WORLD_SEED);
+          const h1 = groundHeight(a.x + (b.x - a.x) * t1, a.z + (b.z - a.z) * t1, WORLD_SEED);
+          steepest = Math.max(steepest, Math.abs(h1 - h0) / (length / steps));
+        }
       }
-    }
-    expect(steepest).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
-    // ...and the road does reach the crest.
+      return steepest;
+    };
+    const spur = GALECREST_ROADS.find((leg) => leg.some((p) => p.x === 446 && p.z === 512));
+    const through = GALECREST_ROADS.find((leg) => leg.some((p) => p.x === 438 && p.z === 556));
+    expect(spur).toBeDefined();
+    expect(through).toBeDefined();
+    if (!spur || !through) return;
+    expect(steepestAlong(spur)).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
+    expect(steepestAlong(through)).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
+    // ...the spur does reach the crest, and the through road never climbs it.
     expect(groundHeight(446, 512, WORLD_SEED)).toBeCloseTo(GALE_LAUNCH_KNOLL.crestHeight, 6);
+    for (const p of through) expect(groundHeight(p.x, p.z, WORLD_SEED)).toBeLessThan(30);
   });
 
   it('the seaward face is a cliff that drops to the sea, and the launch face is steeper than a climb', () => {
