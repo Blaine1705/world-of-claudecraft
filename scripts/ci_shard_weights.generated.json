@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4064,
+    "files": 4067,
     "harvestedFiles": 3948,
     "carried": {
       "tests/active_kit_prewarm.test.ts": {
@@ -313,6 +313,39 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           16
+        ]
+      },
+      "tests/shader_ablation_transforms.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          8,
+          9,
+          9
+        ]
+      },
+      "tests/shader_harvest_corpus.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          7,
+          7,
+          7
+        ]
+      },
+      "tests/shader_link_bench_report.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          4,
+          4,
+          5
         ]
       },
       "tests/shield_contact_outcomes.test.ts": {
@@ -4419,8 +4452,11 @@
   "tests/sfx_runtime_pack.test.ts": 191,
   "tests/sfx_studio.test.ts": 3330,
   "tests/sfx_studio_server_security.test.ts": 24286,
+  "tests/shader_ablation_transforms.test.ts": 9,
   "tests/shader_cache_warmup.test.ts": 120,
   "tests/shader_debug_flag.test.ts": 16,
+  "tests/shader_harvest_corpus.test.ts": 7,
+  "tests/shader_link_bench_report.test.ts": 4,
   "tests/shader_pow_domain.test.ts": 14,
   "tests/shader_warm_audit.test.ts": 93,
   "tests/shader_warm_audit_core.test.ts": 22,
