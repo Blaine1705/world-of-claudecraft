@@ -696,8 +696,7 @@ const mergeStringsEn = {
       emptyTheirs: 'Nothing offered yet',
       money: 'Money',
       copper: 'copper',
-      hint:
-        'Click an offered item to remove some or all of it. Both sides must press Accept Trade.',
+      hint: 'Click an offered item to remove some or all of it. Both sides must press Accept Trade.',
       // The staged row's amount box: whole stacks in one step instead of one
       // bag click per unit.
       amountLabel: 'Amount of {name} to trade',
