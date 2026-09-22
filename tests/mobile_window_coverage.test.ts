@@ -244,10 +244,6 @@ describe('mobile window coverage (Phase 5 parity)', () => {
       // carries the four-edge body.mobile-touch pin in hud.mobile.css.
       'hud/professions/perfecting_window.ts',
       'hud/professions/profession_tutorial_window.ts',
-      // The forge workshop panel (world quests round 2): moved off the
-      // bottom-pinned vehicle-bar family into the centred window family so it
-      // no longer covers the unit frames; its touch rule sits in hud.mobile.css.
-      'hud/vehicle/forge_action_bar_controller.ts',
       'hud.ts',
       // The extracted input modal (the other half of the shared
       // #confirm-dialog id; the exception row below covers the id).
@@ -259,7 +255,6 @@ describe('mobile window coverage (Phase 5 parity)', () => {
     expect([...dyn.ids].sort()).toEqual([
       'confirm-dialog',
       'dev-command-window',
-      'forge-action-bar',
       'keyboard-map-window',
       'perfecting-window',
       'profession-tutorial',

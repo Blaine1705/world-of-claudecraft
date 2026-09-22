@@ -55,16 +55,18 @@ export class ForgeActionBarController {
     private readonly padKind: () => GamepadKind = () => 'generic',
     private readonly now: () => number = () => performance.now(),
   ) {
-    // The centred `.window panel` family (styles/layout.css), the same shell
-    // the confection and ley puzzle windows compose: absolute, horizontally
-    // centred in the upper third, z-index above the HUD bars. It used to be a
-    // `.vehicle-bar`, the bottom-pinned family the cannon and glider bars use,
-    // which sat on the unit frames and the action bar (2026-09-22 playtest).
-    // The forge minigame is a reaction game played inside the panel, not a
-    // piloting HUD, so it belongs with the puzzle windows. (The id and the
-    // className stay adjacent: tests/mobile_window_coverage.test.ts pairs them.)
+    // A `.panel` overlay centred in the upper third of the screen (styles/hud.css
+    // owns the position), above the HUD bars. It used to be a `.vehicle-bar`,
+    // the bottom-pinned family the cannon and glider bars use, which sat on the
+    // unit frames and the action bar (2026-09-22 playtest). Deliberately NOT a
+    // `.window` family member: the HUD's Escape / closeAll and the touch
+    // chrome's backdrop scan every visible `.window.panel` (hud.ts
+    // topmostOpenWindow, window_open_state.ts), and a live workshop session
+    // hidden that way has no way back (the smith refuses a second start while
+    // one runs), nor should the touch controls drop into menu mode for a
+    // reaction game. It shows and hides with the session alone (update below).
     this.root.id = 'forge-action-bar';
-    this.root.className = 'window panel forge-action-bar';
+    this.root.className = 'panel forge-action-bar';
     this.title.className = 'vehicle-bar-title';
     this.status.className = 'vehicle-bar-status';
     this.hint.className = 'vehicle-bar-hint';

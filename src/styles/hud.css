@@ -143,12 +143,21 @@
   }
 
   /* The forge workshop panel: timing meter over a heat gauge over Strike / Stoke.
-     A `.window panel` family member (layout.css owns its position: centred in the
-     upper third, above the HUD bars), NOT a .vehicle-bar: the bottom-pinned
-     vehicle family sat it on the unit frames and the action bar. Only size and
-     look here, never position (the layout.css window contract). */
+     A `.panel` overlay centred in the upper third above the HUD bars (the
+     .window shell's placement, restated here), NOT a .vehicle-bar: the
+     bottom-pinned vehicle family sat it on the unit frames and the action bar.
+     And NOT a `.window` either: that family is scanned by Escape / closeAll and
+     the touch chrome's menu mode, which must never hide or interrupt a running
+     workshop session (forge_action_bar_controller.ts). The controller toggles
+     display between none and grid with the session. */
   .forge-action-bar {
-    --window-pad: 16px;
+    position: absolute;
+    left: 50%;
+    top: 10vh;
+    transform: translateX(-50%);
+    z-index: 20;
+    padding: 16px;
+    max-width: calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 16px);
     grid-template-columns: 1fr;
     gap: 8px 16px;
     width: min(440px, calc(100% - 24px));
