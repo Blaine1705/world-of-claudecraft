@@ -40,3 +40,21 @@ export const HOARD_CAST_LIGHTNING_STRIKE = 'hoard_lightning_strike';
 export const HOARD_LIGHTNING_STRIKE_CAST_SCHOOL: Readonly<Record<string, { school: 'nature' }>> = {
   [HOARD_CAST_LIGHTNING_STRIKE]: { school: 'nature' },
 };
+
+/** The hoard adds' own casts (hoard_add_casts.ts): every one a bar a kick cancels. */
+export const HOARD_CAST_DROWNING_HOOK = 'hoard_cast_drowning_hook';
+export const HOARD_CAST_RIME_BEAM = 'hoard_cast_rime_beam';
+export const HOARD_CAST_CINDER_BOLT = 'hoard_cast_cinder_bolt';
+export const HOARD_CAST_VOID_EMPOWER = 'hoard_cast_void_empower';
+export const HOARD_CAST_WEBBING = 'hoard_cast_webbing';
+export const HOARD_CAST_DOOM_RITUAL = 'hoard_cast_doom_ritual';
+
+export const HOARD_ADD_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['school'] }>> =
+  Object.freeze({
+    [HOARD_CAST_DROWNING_HOOK]: { school: 'nature' },
+    [HOARD_CAST_RIME_BEAM]: { school: 'frost' },
+    [HOARD_CAST_CINDER_BOLT]: { school: 'fire' },
+    [HOARD_CAST_VOID_EMPOWER]: { school: 'shadow' },
+    [HOARD_CAST_WEBBING]: { school: 'nature' },
+    [HOARD_CAST_DOOM_RITUAL]: { school: 'shadow' },
+  });

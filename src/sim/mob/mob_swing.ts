@@ -24,7 +24,8 @@ import { applyThornsReaction } from '../combat/thorns_charge';
 import { MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { nythraxisGravebreakerOnMobSwing } from '../encounters/nythraxis';
-import { deferHoardControlAura } from '../rift/hoard_control_casts';
+import { HOARD_WEB_CASTERS } from '../rift/hoard_add_casts';
+import { buriedHoardOf, deferHoardControlAura } from '../rift/hoard_control_casts';
 import { suppressHoardStormShove } from '../rift/hoard_storm_static';
 import type { SimContext } from '../sim_context';
 import {
@@ -512,7 +513,9 @@ export function runMobSwingAffixes(
     target.kind === 'player' &&
     !target.dead &&
     ctx.rng.chance(ensnare.chance) &&
-    !riftControlSuppressed(ctx, mob)
+    !riftControlSuppressed(ctx, mob) &&
+    // Inside a Buried Hoard the web is a cast (hoard_add_casts.ts), never an on-hit.
+    !(HOARD_WEB_CASTERS.includes(mob.templateId) && buriedHoardOf(ctx, mob) !== null)
   ) {
     ctx.applyRootAura(
       mob,

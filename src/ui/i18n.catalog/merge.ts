@@ -542,6 +542,12 @@ const mergeStringsEn = {
       // stun, silence or hex a hoard mob CASTS, so it can be interrupted.
       hoard_cast_fear: 'Terrifying Roar',
       hoard_cast_stun: 'Stunning Blow',
+      hoard_cast_drowning_hook: 'Drowning Hook',
+      hoard_cast_rime_beam: 'Rime Beam',
+      hoard_cast_cinder_bolt: 'Cinder Bolt',
+      hoard_cast_void_empower: 'Void Empowerment',
+      hoard_cast_webbing: 'Webbing',
+      hoard_cast_doom_ritual: 'Doom Ritual',
       hoard_cast_silence: 'Silencing Shriek',
       hoard_cast_hex: 'Hex',
       hoard_lightning_strike: 'Lightning Strike',

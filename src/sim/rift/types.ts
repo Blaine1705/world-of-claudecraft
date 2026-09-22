@@ -362,6 +362,7 @@ export interface RiftInstance {
   hoardBoss?: HoardBossState;
   /** Runtime-only Storm Caller Lightning Strikes (hoard_lightning_strike.ts). */
   hoardStrikes?: import('./hoard_lightning_strike').HoardLightningStrikeState;
+  hoardAddCasts?: import('./hoard_add_casts').HoardAddCastState;
 }
 
 export type HoardBossCueVariant =

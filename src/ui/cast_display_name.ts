@@ -42,6 +42,12 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   // Buried Hoard control casts (src/sim/rift/hoard_control_casts.ts).
   'abilityUi.cast.hoard_cast_fear': true,
   'abilityUi.cast.hoard_cast_stun': true,
+  'abilityUi.cast.hoard_cast_drowning_hook': true,
+  'abilityUi.cast.hoard_cast_rime_beam': true,
+  'abilityUi.cast.hoard_cast_cinder_bolt': true,
+  'abilityUi.cast.hoard_cast_void_empower': true,
+  'abilityUi.cast.hoard_cast_webbing': true,
+  'abilityUi.cast.hoard_cast_doom_ritual': true,
   'abilityUi.cast.hoard_cast_silence': true,
   'abilityUi.cast.hoard_cast_hex': true,
   'abilityUi.cast.hoard_lightning_strike': true,

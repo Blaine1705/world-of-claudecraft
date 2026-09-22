@@ -31,14 +31,11 @@ import {
 } from '../professions/masterwrought_materials';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
-import {
-  mayEnterVaultPortal,
-  vaultForPortal,
-  vaultScaledTuning,
-} from '../treasure_vault';
+import { mayEnterVaultPortal, vaultForPortal, vaultScaledTuning } from '../treasure_vault';
 import { DT, dist2d, type Entity, type SimEvent, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
 import { riftFx } from './fx';
+import { tickHoardAddCasts } from './hoard_add_casts';
 import { hoardBossCueViews, tickHoardBossMechanics } from './hoard_boss';
 import { tickHoardControlCasts } from './hoard_control_casts';
 import { tickHoardLightningStrikes } from './hoard_lightning_strike';
@@ -1836,6 +1833,7 @@ export function updateRiftInstances(ctx: SimContext): void {
   tickHoardBossMechanics(ctx);
   tickHoardControlCasts(ctx);
   tickHoardLightningStrikes(ctx);
+  tickHoardAddCasts(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;

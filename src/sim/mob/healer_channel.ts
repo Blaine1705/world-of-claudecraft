@@ -1,4 +1,5 @@
 import {
+  HOARD_ADD_CAST_SCHOOLS,
   HOARD_CONTROL_CAST_SCHOOLS,
   HOARD_LIGHTNING_STRIKE_CAST_SCHOOL,
 } from '../rift/hoard_control_cast_ids';
@@ -25,4 +26,5 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   // instead of landing instantly (src/sim/rift/hoard_control_casts.ts).
   ...HOARD_CONTROL_CAST_SCHOOLS,
   ...HOARD_LIGHTNING_STRIKE_CAST_SCHOOL,
+  ...HOARD_ADD_CAST_SCHOOLS,
 };

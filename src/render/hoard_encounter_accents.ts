@@ -12,6 +12,7 @@
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
+import { HOARD_ADD_CAST_SCHOOLS } from '../sim/rift/hoard_add_casts';
 import { HOARD_CONTROL_CAST_SCHOOLS } from '../sim/rift/hoard_control_casts';
 import type { IWorld } from '../world_api';
 import type { HoardBossCueView } from '../world_api/dungeons';
@@ -37,6 +38,11 @@ const SCORCH_SEGMENTS = 16;
 const CASTER_SCAN_SEC = 0.15;
 const SHADOW = 0xb26bff;
 const NATURE = 0x86ff6a;
+const FROST = 0x8fe3ff;
+const FIRE = 0xffa24a;
+/** Every hoard cast that draws the ground sigil: the controls and the adds' own. */
+const SIGIL_CASTS = { ...HOARD_CONTROL_CAST_SCHOOLS, ...HOARD_ADD_CAST_SCHOOLS };
+const SIGIL_COLOR: Readonly<Record<string, number>> = { nature: NATURE, frost: FROST, fire: FIRE };
 
 interface TrackedFrontal {
   /** -1 while free. */
@@ -419,7 +425,7 @@ export class HoardEncounterAccents {
       if (slot.casterId === -1) continue;
       const caster = world.entities.get(slot.casterId);
       const castId = caster?.castingAbility;
-      if (!caster || caster.dead || !castId || !HOARD_CONTROL_CAST_SCHOOLS[castId]) {
+      if (!caster || caster.dead || !castId || !SIGIL_CASTS[castId]) {
         slot.casterId = -1;
         slot.group.visible = false;
         this.liveSigils--;
@@ -438,7 +444,7 @@ export class HoardEncounterAccents {
   private scanCasters(world: IWorld): void {
     for (const entity of world.entities.values()) {
       if (entity.kind !== 'mob' || entity.dead || !entity.castingAbility) continue;
-      const cast = HOARD_CONTROL_CAST_SCHOOLS[entity.castingAbility];
+      const cast = SIGIL_CASTS[entity.castingAbility];
       if (!cast) continue;
       let free: SigilSlot | null = null;
       let known = false;
@@ -451,7 +457,7 @@ export class HoardEncounterAccents {
       }
       if (known || !free) continue;
       free.casterId = entity.id;
-      const color = cast.school === 'nature' ? NATURE : SHADOW;
+      const color = SIGIL_COLOR[cast.school] ?? SHADOW;
       free.ringMaterial.color.setHex(color);
       free.inner.rotation.y = 0;
       free.group.visible = true;
