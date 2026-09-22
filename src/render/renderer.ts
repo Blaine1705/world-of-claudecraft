@@ -498,6 +498,7 @@ import {
   wildGlowAmount,
 } from './night_lighting_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
+import type { HazardPaletteMode } from './nythraxis_hazard_palette_core';
 import { NythraxisMechanicVisuals } from './nythraxis_mechanic_visuals';
 import { installOccluderFadeGate } from './occluder_fade_gate';
 import { buildGhostVariantPrewarmGroup } from './occluder_ghost_prewarm';
@@ -1402,6 +1403,10 @@ export class Renderer {
   // prefers-reduced-motion query in reducedMotion(). Initialized from Settings
   // and kept live by main.ts's applySetting dispatcher (mirrors showDevBadges).
   reduceMotionSetting = false;
+  // settings-backed Colorblind Mode (Options > Interface): the Nythraxis hazard
+  // palette family. Kept live by main.ts's applySetting dispatcher, like the
+  // switch above; setHazardPaletteMode rebuilds the tinted-at-spawn painters.
+  private hazardPaletteMode: HazardPaletteMode = 'classic';
   showNameplates = true;
   // settings-backed developer-badge display toggle (nameplate glyph + outline);
   // initialized from Settings and kept live by main.ts's applySetting dispatcher.
@@ -2917,9 +2922,7 @@ export class Renderer {
     );
     const gate = this.worldCompileGate();
     this.varkhulForgestormVisuals = new VarkhulForgestormVisuals(this.scene, this.groundSample, gate);
-    this.nythraxisMechanicVisuals = new NythraxisMechanicVisuals(this.scene, (x, z) =>
-      groundHeight(x, z, this.sim.cfg.seed),
-    );
+    this.nythraxisMechanicVisuals = this.buildNythraxisMechanicVisuals();
     this.warlockMeteorFx = new WarlockMeteorFx(
       this.scene,
       (x, z) => groundHeight(x, z, this.sim.cfg.seed),
@@ -12014,6 +12017,26 @@ export class Renderer {
     }
     const target = targetIntensityFromValues(inTravelForm, speed, this.reducedMotion());
     this.travelSpeedFx.update(target, dt);
+  }
+
+  private buildNythraxisMechanicVisuals(): NythraxisMechanicVisuals {
+    return new NythraxisMechanicVisuals(
+      this.scene,
+      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      this.hazardPaletteMode,
+    );
+  }
+
+  /** Colorblind Mode (Options > Interface). Every Nythraxis hazard material is
+   *  tinted once at build, so the painters are rebuilt: the next syncWorld
+   *  repaints every live row from its authoritative state in the new palette. */
+  setHazardPaletteMode(mode: HazardPaletteMode): void {
+    if (mode === this.hazardPaletteMode) return;
+    this.hazardPaletteMode = mode;
+    this.mageGroundFx.setHazardPaletteMode(mode);
+    if (!this.nythraxisMechanicVisuals) return;
+    this.nythraxisMechanicVisuals.dispose();
+    this.nythraxisMechanicVisuals = this.buildNythraxisMechanicVisuals();
   }
 
   private reducedMotion(): boolean {

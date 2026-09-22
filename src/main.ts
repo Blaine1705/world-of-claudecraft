@@ -134,6 +134,10 @@ import {
   shouldApproachPickedEntity,
   shouldDeferPickedCorpseToGatherNode,
 } from './game/interactions';
+import {
+  applyInterfaceBodyClass,
+  isInterfaceBodyClassSetting,
+} from './game/interface_body_classes';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
 import {
@@ -373,6 +377,7 @@ import {
   resolveGfxProfile,
 } from './render/gfx';
 import { setNameplateDotScale } from './render/nameplate_dot_scale';
+import { hazardPaletteModeOf } from './render/nythraxis_hazard_palette_core';
 import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
 import type { Renderer } from './render/renderer';
 import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
@@ -2409,28 +2414,12 @@ async function startGame(
       uiEffectsApplier.applyNow();
       return;
     }
-    if (key === 'highContrastText') {
-      document.body.classList.toggle(
-        'high-contrast-text',
-        settings.set('highContrastText', !!value),
-      );
-      return;
-    }
-    if (key === 'frostedPanels') {
-      document.body.classList.toggle('frosted-panels', settings.set('frostedPanels', !!value));
-      return;
-    }
-    if (key === 'compactChat') {
-      document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
-      return;
-    }
-    if (key === 'hideUnusedActionSlots') {
-      // Purely presentational (issue 2429): a body class the action-bar CSS reads
-      // to strip the empty-slot chrome. No live subsystem to update.
-      document.body.classList.toggle(
-        'hide-unused-action-slots',
-        settings.set('hideUnusedActionSlots', !!value),
-      );
+    if (isInterfaceBodyClassSetting(key)) {
+      // Interface & Comfort body-class hooks (interface_body_classes.ts owns the
+      // table). Colorblind Mode also drives the renderer's hazard palette.
+      const on = settings.set(key, !!value);
+      applyInterfaceBodyClass(document.body, key, on);
+      if (key === 'colorblindMode') renderer.setHazardPaletteMode(hazardPaletteModeOf(on));
       return;
     }
     if (key === 'showSecondaryActionBar' || key === 'showThirdActionBar') {
@@ -2748,6 +2737,7 @@ async function startGame(
     next.showPlayerNameplates = settings.get('showPlayerNameplates');
     setNameplateDotScale(settings.nameplateDotRenderScale());
     next.reduceMotionSetting = settings.get('reduceMotion');
+    next.setHazardPaletteMode(hazardPaletteModeOf(settings.get('colorblindMode')));
     next.setBrightness(settings.get('brightness'));
     next.setCameraFov(settings.get('cameraFov'));
     next.setRenderScale(settings.get('renderScale'));

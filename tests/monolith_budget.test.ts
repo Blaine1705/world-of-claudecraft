@@ -1296,7 +1296,12 @@ const MONOLITHS: MonolithRow[] = [
     // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
     // composed with the release's game_renderer.ts extraction. Exact merged
     // count, zero slack.
-    ceiling: 11281,
+    // Lowered from 11281 by Colorblind Mode: the four Interface & Comfort
+    // body-class branches (high-contrast text, frosted panels, compact chat,
+    // hidden action slots) moved into the src/game/interface_body_classes.ts
+    // table, and the new switch rode the same consumer, so the coordinator
+    // ended SMALLER than it started. Exact count, zero slack.
+    ceiling: 11271,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

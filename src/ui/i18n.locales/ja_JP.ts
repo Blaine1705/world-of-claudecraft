@@ -15370,6 +15370,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'スタート画面とキャラクター画面の背景を、より簡素で高コントラストなものにします。',
   'guide.settingsPage.ifHighContrastText':
     'インターフェースの文字を太く、高コントラストにします。第一にはアクセシビリティのための項目ですが、明るい画面でもよく効きます。',
+  'guide.settingsPage.ifColorblindMode':
+    'Nythraxisの床の危険表示（墓所噴出の打撃リング、墓所の炎と魂火の池、墓所火の線、魂裂きの印）を、色相と明るさが互いにはっきり異なる色覚サポート配色に置き換え、重なった円でも縁が見分けられるようにします。大きさ、タイマー、位置は変わりません。',
   'guide.settingsPage.ifHudOpacity': '背後の世界に対して、HUDパネルをどれだけ濃く表示するかです。',
   'guide.settingsPage.ifInvertLookY': 'マウス視点の上下方向を反転します。',
   'guide.settingsPage.ifLockBars':

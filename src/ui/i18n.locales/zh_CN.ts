@@ -14633,6 +14633,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在起始界面和角色界面背后使用更朴素、对比度更高的背景。',
   'guide.settingsPage.ifHighContrastText':
     '更粗、对比度更高的界面文字。它首先是一项无障碍选项，在明亮的屏幕上也非常好用。',
+  'guide.settingsPage.ifColorblindMode':
+    '将 Nythraxis 的地面危险（坟墓爆发的打击环、坟焰与魂火池、坟火线，以及裂魂标记）改为色盲友好的配色，色相与亮度各不相同，重叠的圆圈也能看清边缘。范围、计时和位置完全不变。',
   'guide.settingsPage.ifHudOpacity': 'HUD 面板盖在背后的世界上时有多实。',
   'guide.settingsPage.ifInvertLookY': '翻转鼠标视角的上下方向。',
   'guide.settingsPage.ifLockBars': '锁定你的技能栏，免得不小心把技能从格子里拖出来。',

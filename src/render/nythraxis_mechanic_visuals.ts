@@ -15,6 +15,7 @@ import type { NythraxisCageBossLike } from './nythraxis_bound_cage_core';
 import { NythraxisBoundCageVisuals } from './nythraxis_bound_cage_visual';
 import { NythraxisGraveFlameVisuals } from './nythraxis_grave_flame_visual';
 import { NythraxisGravefireVisuals } from './nythraxis_gravefire_visual';
+import type { HazardPaletteMode } from './nythraxis_hazard_palette_core';
 import { NythraxisBindingSigilVisuals } from './nythraxis_sigil_visual';
 import { NythraxisSoulRendMarkers } from './nythraxis_soul_rend_marker';
 import type { NythraxisSoulRendEntityLike } from './nythraxis_soul_rend_marker_core';
@@ -57,17 +58,23 @@ export class NythraxisMechanicVisuals {
   private readonly soulRendMarkers: NythraxisSoulRendMarkers;
   private readonly painterRoster = { entities: EMPTY_ROSTER };
 
-  constructor(scene: THREE.Scene, groundY: (x: number, z: number) => number) {
+  constructor(
+    scene: THREE.Scene,
+    groundY: (x: number, z: number) => number,
+    /** The player's hazard palette (Options > Interface > Colorblind Mode);
+     *  materials are built once per row, so a flip rebuilds this facade. */
+    readonly paletteMode: HazardPaletteMode = 'classic',
+  ) {
     // Flat one-sample decals (the flame patch, the sigil, the cage) read the
     // tallest plateau under their footprint so a flanking-platform rim
     // (v0.42.2) never hides part of them; the per-vertex visuals (the
     // gravefire strips, the Soul Rend markers) drape themselves.
     const cueY = (x: number, z: number) => groundCueY(groundY, x, z, NYTHRAXIS_GROUND_CUE_RADIUS);
-    this.flames = new NythraxisGraveFlameVisuals(scene, cueY);
-    this.gravefires = new NythraxisGravefireVisuals(scene, groundY);
+    this.flames = new NythraxisGraveFlameVisuals(scene, cueY, paletteMode);
+    this.gravefires = new NythraxisGravefireVisuals(scene, groundY, paletteMode);
     this.sigils = new NythraxisBindingSigilVisuals(scene, cueY);
     this.cages = new NythraxisBoundCageVisuals(scene, cueY);
-    this.soulRendMarkers = new NythraxisSoulRendMarkers(scene, groundY);
+    this.soulRendMarkers = new NythraxisSoulRendMarkers(scene, groundY, paletteMode);
   }
 
   syncWorld(world: NythraxisMechanicWorld): void {

@@ -708,6 +708,7 @@ const RENDER_PURE_CORES = [
   'src/render/nythraxis_bound_cage_core.ts',
   'src/render/nythraxis_grave_core.ts',
   'src/render/nythraxis_gravefire_core.ts',
+  'src/render/nythraxis_hazard_palette_core.ts',
   'src/render/nythraxis_sigil_core.ts',
   'src/render/nythraxis_soft_fire_core.ts',
   'src/render/nythraxis_soul_rend_marker_core.ts',

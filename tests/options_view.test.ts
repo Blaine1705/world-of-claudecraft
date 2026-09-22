@@ -801,6 +801,7 @@ const GENERAL_KEYS = [
   'tooltipScale',
   'frostedPanels',
   'highContrastText',
+  'colorblindMode',
   'reduceMotion',
   'invertLookY',
   'landingHighContrast',

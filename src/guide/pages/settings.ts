@@ -321,6 +321,7 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
       { setting: 'hud.options.tooltipScale', body: 'guide.settingsPage.ifTooltipScale' },
       { setting: 'hud.options.frostedPanels', body: 'guide.settingsPage.rowFrostedPanels' },
       { setting: 'hud.options.highContrastText', body: 'guide.settingsPage.ifHighContrastText' },
+      { setting: 'hud.options.colorblindMode', body: 'guide.settingsPage.ifColorblindMode' },
       {
         setting: 'hudChrome.options.highContrastBackground',
         body: 'guide.settingsPage.ifHighContrastBackground',
