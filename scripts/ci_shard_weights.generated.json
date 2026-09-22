@@ -2,9 +2,42 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 3964,
+    "files": 3967,
     "harvestedFiles": 3948,
     "carried": {
+      "tests/hill.test.ts": {
+        "ms": 6063,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "King of the Hill suites (rules, sim, bar view), local carry pending the branch's first full-mode harvest",
+        "runs": [
+          5900,
+          6266,
+          6063
+        ]
+      },
+      "tests/hill_bar_view.test.ts": {
+        "ms": 27,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "King of the Hill suites (rules, sim, bar view), local carry pending the branch's first full-mode harvest",
+        "runs": [
+          24,
+          29,
+          27
+        ]
+      },
+      "tests/hill_rules.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "King of the Hill suites (rules, sim, bar view), local carry pending the branch's first full-mode harvest",
+        "runs": [
+          5,
+          5,
+          5
+        ]
+      },
       "tests/hub_dummy_drill.test.ts": {
         "ms": 3069,
         "method": "local-median",
@@ -1698,6 +1731,9 @@
   "tests/heroic_soulbound.test.ts": 1654,
   "tests/heroic_vendor.test.ts": 8788,
   "tests/highscore_board.test.ts": 25,
+  "tests/hill.test.ts": 6063,
+  "tests/hill_bar_view.test.ts": 27,
+  "tests/hill_rules.test.ts": 5,
   "tests/hitch_forensics.test.ts": 10,
   "tests/hitch_frame_align_core.test.ts": 10,
   "tests/holder_broadcast.test.ts": 1986,

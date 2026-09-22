@@ -115,3 +115,29 @@ ratings.
 - Cover changes in `tests/honor.test.ts` and `tests/pvp_honor_gear.test.ts`,
   including host parity, PvE non-interference, cap behavior, and exact reward
   accounting.
+
+## King of the Hill
+
+- `hill_rules.ts` owns the PURE rules: the group key (`hillGroupKey`, a party or
+  raid is one group), the strict-maximum leader (`hillLeader`, null on a tie),
+  the majority verdict (`hillChallengeStands`), the contest clock
+  (`hillContestStep`), the payee cap (`hillPayees`), the spot probe
+  (`hillSpotIsOpen` over a `HillSpotProbe` the sim binds to the terrain, the
+  water bodies, the collider grid and the static zones), the hourly schedule
+  (`hillOrdinalAt` / `hillRiseTime`) and the circle test. No ctx, no rng, no
+  clock. Every tuning literal (`HILL_RADIUS`, `HILL_CYCLE_SECONDS`,
+  `HILL_CAPTURE_SECONDS`, `HILL_ACCRUAL_SECONDS`, `HILL_HONOR_PER_PAYOUT`,
+  `HILL_MAX_PAYEES`) lives here and the copy resolves from it.
+- `hill.ts` owns the SYSTEM behind the `SimContext` seam: the session state as
+  ONE live view (`Sim.hillState`, `ctx.hillState`: the standing hill, the
+  schedule, the presence counts, the contest clock, the hour's accruals; never
+  persisted), the spawn (`spawnHill` from a PRIVATE rng derived from the seed
+  and the ordinal, the rift portal precedent, so the world stream never moves;
+  `spawnHillNow` for the `/dev hill` arm), the once-a-second `updateHill` pass
+  (schedule, presence by group, contest, payouts through `grantHonor` with
+  reason `hill_hold`), the readout (`hillInfoFor`, live fields only for a
+  viewer in the hill's zone so the self wire elides it elsewhere), the `/hill`
+  readout line, and the notice lines the client matcher re-localizes
+  (`hillRiseLine` with the zone name, `HILL_TAKEN_LINE`, `HILL_LOST_LINE`).
+  The realm switch (`ctx.worldPvpDisabled`) drops a standing hill and rises
+  none. Pinned by `tests/hill.test.ts` and `tests/hill_rules.test.ts`.

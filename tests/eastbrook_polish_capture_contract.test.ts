@@ -691,7 +691,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the World PvP flag: the renderer leaf's hostile-player verdict
   // moved to the shared pvp_hostile_core (renderer.ts edit only). No capture was retaken.
-  '1e5c52b5af63977d41c2dc93a5a6c39f28cf9cafe5fb3325eb3ec1c4055a968d';
+  // Re-minted for King of the Hill: the renderer leaf gained the hill ring sync
+  // (renderer.ts edit only). No capture was retaken.
+  'fc4cb4bee2956ca13ff360a0bd3751cc3cef7162e33102bcedda96f2b628b890';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

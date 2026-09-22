@@ -1385,7 +1385,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the World PvP flag: the renderer leaf's hostile-player verdict
   // moved to the shared pvp_hostile_core (renderer.ts edit only). No capture was retaken.
-  '9201964cf7dc91718a2d39c1f715224d348bc1e8b5590e45a7e626bb13a124cc';
+  // Re-minted for King of the Hill: the renderer leaf gained the hill ring sync
+  // (renderer.ts edit only). No capture was retaken.
+  '2a894b3d7676189dbeef678e7a100d315b3a3070f310e0c474bbc38e362482bb';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1399,7 +1401,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the World PvP flag: the renderer leaf's hostile-player verdict
   // moved to the shared pvp_hostile_core (renderer.ts edit only). No capture was retaken.
-  '1e5c52b5af63977d41c2dc93a5a6c39f28cf9cafe5fb3325eb3ec1c4055a968d';
+  // Re-minted for King of the Hill: the renderer leaf gained the hill ring sync
+  // (renderer.ts edit only). No capture was retaken.
+  'fc4cb4bee2956ca13ff360a0bd3751cc3cef7162e33102bcedda96f2b628b890';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2778,7 +2782,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // World PvP flag: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-    ).toBe('c1e0be71ed944716e484d7415afde86ae25cc50febb67eac56f3c370220db8ad');
+      // King of the Hill: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+    ).toBe('ef7ba73a1d695b9f9518e99b74f3b9671e9e804da10ac7c38d96e6157f4891d4');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
