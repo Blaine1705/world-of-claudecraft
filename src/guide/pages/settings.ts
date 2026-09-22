@@ -384,6 +384,10 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
         body: 'guide.settingsPage.ifAuraBarBelowFrame',
       },
       {
+        setting: 'hudChrome.options.targetAurasBelowFrame',
+        body: 'guide.settingsPage.ifTargetAurasBelowFrame',
+      },
+      {
         setting: 'hudChrome.options.alwaysShowAllBuffs',
         body: 'guide.settingsPage.ifAlwaysShowAllBuffs',
       },

@@ -443,7 +443,7 @@ import {
   relocalizeAppearancePanels,
 } from './ui/appearance_panel_locale';
 import { setThornhollowPrewarmHooks } from './ui/arena_window';
-import { applyAuraBarSide } from './ui/aura_bar_side';
+import { applyAuraBarDirection, applyAuraBarSide } from './ui/aura_bar_side';
 import {
   handleKeyboardActivation,
   syncInputAriaState,
@@ -2683,27 +2683,17 @@ async function startGame(
         hud.setAurasOnPlayerFrame(!!v);
         break;
       case 'auraBarBelowFrame':
-        applyAuraBarSide(document.body, !!v);
+      case 'targetAurasBelowFrame':
+        applyAuraBarSide(document.body, key, !!v);
         break;
       case 'alwaysShowAllBuffs':
         hud.setAlwaysShowAllBuffs(!!v);
         break;
       // Icon flow of the standalone buff/debuff rows (Frames Settings menu):
-      // the stock layout grows right-to-left from its anchor beside the
-      // minimap; 'row' flips a row to read left to right. Vars rather than
-      // classes so the stylesheet's aurasOnPlayerFrame override (a docked
-      // buff row always reads left to right) keeps winning by specificity.
+      // a CSS var per row, owned by src/ui/aura_bar_side.ts.
       case 'buffsLeftToRight':
-        document.documentElement.style.setProperty(
-          '--buff-bar-direction',
-          v ? 'row' : 'row-reverse',
-        );
-        break;
       case 'debuffsLeftToRight':
-        document.documentElement.style.setProperty(
-          '--debuff-bar-direction',
-          v ? 'row' : 'row-reverse',
-        );
+        applyAuraBarDirection(document.documentElement, key, !!v);
         break;
       case 'lockPlayerFrameToActionBar':
         hud.setLockPlayerFrameToActionBar(!!v);

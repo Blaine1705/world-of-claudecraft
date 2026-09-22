@@ -1372,7 +1372,12 @@ const MONOLITHS: MonolithRow[] = [
     // OAuth flow and delve self-motion wiring compose with the character-select
     // lockout extraction below both parent pins. wc -l on the merged tree.
     // Exact count, zero slack.
-    ceiling: 11176,
+    // LOWERED 11176 -> 11166 after #4158's target-aura placement merge:
+    // the buff/debuff row direction cases moved out to src/ui/aura_bar_side.ts
+    // (with the targetAurasBelowFrame side case riding the same helper), so
+    // the coordinator ends smaller. wc -l on the merged tree. Exact count,
+    // zero slack.
+    ceiling: 11166,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

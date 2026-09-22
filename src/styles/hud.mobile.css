@@ -3285,6 +3285,15 @@
     transform: scale(calc(var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1)));
     transform-origin: left top;
   }
+  /* The touch seat pins the target frame to the top edge, so the desktop
+     default of hanging the aura strip ABOVE the frame (hud.css, stock seat
+     over the action bar) puts every target debuff timer off screen here. The
+     strip hangs BELOW the frame on touch regardless of targetAurasBelowFrame:
+     actionable information a device may never shed. */
+  body.mobile-touch #target-frame > #tf-debuffs {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
   /* The desktop interface editor's frame-dimension settings
      (playerFrame/targetFrame Width/Height, movable_frame.ts 'dimensions'
      mode) stay desktop: this sheet hand-tunes the compact placements around

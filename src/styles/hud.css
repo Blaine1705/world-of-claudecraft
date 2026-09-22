@@ -1464,6 +1464,16 @@
     max-width: 100%;
     pointer-events: auto;
   }
+  /* Target Auras Below the Frame (targetAurasBelowFrame, main.ts via
+     src/ui/aura_bar_side.ts): hangs the strip BELOW the frame instead, the
+     classic layout, for a frame the player has moved off the stock seat to
+     somewhere with room beneath it. Keyed on the setting's own body class,
+     NEVER on the frame's move state, so dragging the frame never silently
+     flips the strip (the same rule the player buff row follows). */
+  body.target-auras-below-frame #target-frame > #tf-debuffs {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
   /* Target of Target (showTargetOfTarget option): a smaller twin of the target
      frame, a #target-frame child anchored BESIDE the frame's right edge, top
      aligned, so the whole below-frame band belongs to the #tf-debuffs strip (the

@@ -797,6 +797,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceExpired':
     'Apple 로그인이 만료되었습니다. Apple로 다시 로그인해 주세요.',
   'hudChrome.discord.roleTag.coredevs': '핵심 개발자',
+  'hudChrome.options.targetAurasBelowFrame': '대상 오라를 프레임 아래에 표시',
   'hudChrome.options.version': 'v{version} ({build})',
   'auth.emailPlaceholder': 'you@example.com',
   'auth.recovery.logOut': '로그아웃',
@@ -7100,6 +7101,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mobileBody':
     '휴대전화와 태블릿에서는 터치 조작이 자동으로 나타납니다. 왼쪽에는 이동 스틱, 그 밖의 아무 곳이나 끌면 시점 전환, 두 손가락으로 오므리면 카메라 확대, 그리고 능력과 메뉴를 위한 화면 버튼이 표시됩니다. 왼쪽 위 구석의 작은 화살표로 메뉴 버튼을 보이거나 숨길 수 있고, 그곳의 더 보기 버튼에 나머지 창들이 담겨 있습니다.',
   'guide.settingsPage.heading': '설정 및 성능',
+  'guide.settingsPage.ifTargetAurasBelowFrame':
+    '대상 프레임의 강화 및 약화 효과 줄을 프레임 위가 아니라 아래에 표시합니다(클래식 배치). 기본 대상 프레임은 행동 단축바 바로 위에 있으므로 기본값은 꺼짐입니다. 프레임을 아래에 여유가 있는 곳으로 옮긴 뒤 켜세요.',
   'guide.settingsPage.intro':
     '화면을 가장 아름답게, 혹은 게임을 가장 빠르게. 바로 쓸 수 있는 세 가지 추천 설정과 함께, 모든 그래픽 옵션이 실제로 하는 일을 정리했습니다.',
   'guide.settingsPage.wherePath':
