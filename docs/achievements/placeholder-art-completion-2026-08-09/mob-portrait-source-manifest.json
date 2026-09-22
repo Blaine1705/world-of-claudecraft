@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "dca80606c25cc2e758301c5aeecc73dc29e3290a7576af9ea6741033ea08a27a",
+  "rendererFingerprint": "3bf0a3c5ac9a52cf07ec146339b0a083bfee93707eaee1e89986d743ea40289e",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5011363,
-      "sha256": "1767792796593172aa256d39512ab7c0362442c447f6b5081fff03646f19f8d1",
+      "bytes": 5011728,
+      "sha256": "a32096948eefbfe67764b242766db2327bf96943fd15a3f23e0bd1df80bbbc34",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6024,8 +6024,8 @@
         "model": {
           "url": "models/creatures/hoard_archon_nyxaris.glb",
           "path": "public/models/creatures/hoard_archon_nyxaris.glb",
-          "bytes": 674076,
-          "sha256": "8730ba2454b0f63f128c5ead303a0d7ae32363e495375b66888340115e7eaa48"
+          "bytes": 670452,
+          "sha256": "0322aa40ba1c29cbac1fa06eb1574e4e1068403df144ebfc6c5ebc54b4686499"
         },
         "idle": "Idle",
         "height": 2.4,
@@ -6042,11 +6042,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "86846b974ca1bfb1d89ea474f93dcb0c0c9b5f825b8312b54fbcc72206bbfdd6",
+      "sourceFingerprint": "a99e6a54ae3e0d4d1a295b0c5f075da72dca7868f0bb3dbb491bac11c04d1f6f",
       "output": {
         "path": "public/ui/mobs/rift_boss_arcane.webp",
-        "bytes": 1890,
-        "sha256": "d0529c5cf7bc0dfb7746768cb104ea671c1fd5596af1996d21a7df9cc4298642"
+        "bytes": 1892,
+        "sha256": "5e346bb6591dcac45c0f44ffed1b691dcb65095f560071afe0f10bada6e405b5"
       }
     },
     {
@@ -6707,7 +6707,7 @@
           "sha256": "8fde6dd73f24c91dbfbceb1fe42e0477b51069da914123327d63d72b44e28089"
         },
         "idle": "Idle",
-        "height": 3.1,
+        "height": 3.9,
         "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
@@ -6721,7 +6721,7 @@
         "resolved": "#8fd8ff",
         "strength": 0.35
       },
-      "sourceFingerprint": "a1a46be4a9b7c76a3ff8bfdc5c425f14b1dc593420fc5993864569569f6d780b",
+      "sourceFingerprint": "b835f1f746ffe8c45c9db925fce6f0d56a06debd8613a6a939c21b22c3b0f77c",
       "output": {
         "path": "public/ui/mobs/rift_rime_elemental.webp",
         "bytes": 1960,
@@ -6792,8 +6792,8 @@
       "sourceFingerprint": "0ba29760cd0032d555eae8cbc0865bf72c7e449915880cc1ab1ae1f82763c2de",
       "output": {
         "path": "public/ui/mobs/rift_stone_ogre.webp",
-        "bytes": 2432,
-        "sha256": "5daf34a2380743a275deea54aff057d02c8cf2cb8cc922b3538956649ade765b"
+        "bytes": 2438,
+        "sha256": "7bab858d2f88dc9138cdd150d0ee4a919dce34271dc5f140614d84e2698bf1fc"
       }
     },
     {
@@ -6809,7 +6809,7 @@
           "sha256": "57e89d898ac711ac8a55a1244da162b91615402d22a1038d1fa5dd336c1adc20"
         },
         "idle": "Idle",
-        "height": 3.5,
+        "height": 4.4,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -6823,7 +6823,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "1fd2026bf61cead828958596e532076ef384fd2fa76f487b7266f096471fc951",
+      "sourceFingerprint": "94dcc4726eab27a3928b687330728def0f16ad052a2c2bfa862d2a031a87149e",
       "output": {
         "path": "public/ui/mobs/rift_storm_caller.webp",
         "bytes": 2550,
@@ -6877,7 +6877,7 @@
           "sha256": "407ee606e0a5272c90487dd31b109314ceb1876d001028801313b49e9142433c"
         },
         "idle": "Idle",
-        "height": 2.8,
+        "height": 3.4,
         "yaw": -1.5707963267948966,
         "hover": null,
         "show": null,
@@ -6891,7 +6891,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "5605e72e43622ecfcfe57f39a0e4968b8618f76bb477d8d1e1f9d65f1bda0e03",
+      "sourceFingerprint": "f755c43c4e0864e157a3e9086f2c91548a7f84b6174d57c37c04230e7c258322",
       "output": {
         "path": "public/ui/mobs/rift_thornback.webp",
         "bytes": 2666,
@@ -6911,7 +6911,7 @@
           "sha256": "04a5d8f3b67baa56b5520dcf495c2bdad48e0896eaf0c2715046d56676d53384"
         },
         "idle": "Idle",
-        "height": 3.6,
+        "height": 4.6,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -6925,7 +6925,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "a4574833e715dbd8636739ce523762c8343817898f06a20a75f40d495c206b0e",
+      "sourceFingerprint": "0778adb457814054f8348d708a182c1c975c720dbc8c5b02ad387e1b83c53aea",
       "output": {
         "path": "public/ui/mobs/rift_tide_thrall.webp",
         "bytes": 2158,
@@ -6979,7 +6979,7 @@
           "sha256": "ea78393791856f9e9e11811c62821e288b8e711618d740c162492d8247f629fe"
         },
         "idle": "Idle",
-        "height": 3.5,
+        "height": 4.2,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -6993,7 +6993,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "2d0af317fb590169685a7350e1f6000a5331e33fe0c40a5ddbdc4f98598be96a",
+      "sourceFingerprint": "ea9acdf9a716c6092588f29c8b1acbd56fb0a3d3353ca29a64123cab21c25076",
       "output": {
         "path": "public/ui/mobs/rift_void_acolyte.webp",
         "bytes": 2048,
