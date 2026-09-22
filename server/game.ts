@@ -601,15 +601,15 @@ export const SIM_LAP_PHASES = [
   'delves',
   'valecup',
   'battleground',
+  'worldPvp',
   'dfinder',
   'market',
   'postOffice',
   'delayedEv',
-  // Farming's per-tick sweep (src/sim/professions/farming.ts updateFarming),
-  // appended in Sim.tick between delayedEv and deeds. Registered here in the
-  // SAME order the tick runs them: without the marker the profiler silently
-  // drops the phase's timing instead of erroring, so a regression in it would
-  // be invisible in the capture.
+  // Farming's per-tick sweep (professions/farming.ts updateFarming), appended in
+  // Sim.tick between delayedEv and deeds. Registered in the SAME order the tick
+  // runs them: an unregistered lap is silently dropped by the profiler, not an
+  // error, so a regression in it would be invisible in the capture.
   'farming',
   'deeds',
   'gridRefresh',

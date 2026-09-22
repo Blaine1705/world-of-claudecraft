@@ -295,7 +295,7 @@ describe('tick perf capture lifecycle', () => {
     }
   });
 
-  it('registers the 32 base lap names first, then the 13 mob-family buckets', () => {
+  it('registers the 33 base lap names first, then the 13 mob-family buckets', () => {
     // Literal pins: the registry is built by mapping the base names plus the buckets
     // through `sim.${n}`, so comparing these literals against the derived array proves
     // the mapping, not a constant against itself.
@@ -326,6 +326,7 @@ describe('tick perf capture lifecycle', () => {
       'sim.delves',
       'sim.valecup',
       'sim.battleground',
+      'sim.worldPvp',
       'sim.dfinder',
       'sim.market',
       'sim.postOffice',
