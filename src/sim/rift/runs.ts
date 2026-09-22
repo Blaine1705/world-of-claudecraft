@@ -39,6 +39,7 @@ import { tickHoardAddCasts } from './hoard_add_casts';
 import { hoardBossCueViews, tickHoardBossMechanics } from './hoard_boss';
 import { tickHoardControlCasts } from './hoard_control_casts';
 import { tickHoardLightningStrikes } from './hoard_lightning_strike';
+import { rescaleVaultForEntrants } from './hoard_rescale';
 import {
   clearHoardRewardChest,
   HOARD_REWARD_CHEST_DAIS_GAP,
@@ -802,6 +803,9 @@ export function enterRift(
   }
 
   inst.memberIds.add(r.meta.entityId);
+  // A player who joined the owner's party after the door opened walks into a
+  // room scaled for fewer: scale it up to everyone who has entered.
+  rescaleVaultForEntrants(ctx, inst);
 
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const floor = floorForInstance(inst);
