@@ -694,16 +694,17 @@ const BG_RESPAWN_EVENT = 'respawn';
 // the same cadence and only re-sends when a listing actually changes.
 const DF_WIRE_HZ = 2;
 const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
-// World Market browse readout cadence. The browse view is a filter + page over
-// the whole listing book, the single most expensive per-viewer read in
-// selfWireJson on a grown book, and nothing in it carries a sub-second clock,
-// so 4 Hz keeps the window feeling live while capping the rebuild rate. The
-// viewer's OWN market commands re-arm the gate (MARKET_WIRE_PROMPT_CMDS) so
-// their search/buy/cancel feedback still lands on the next snapshot. On top of
-// the cadence, a rebuild-only-on-change gate (sim.marketBrowseRevFor plus the
-// query object identity) skips the rebuild entirely while nothing changed;
-// MARKET_BROWSE_REFRESH_TICKS is its staleness backstop, the heavy-gate
-// refresh idea applied here.
+// World PvP `wpvp` self key: 2 Hz covers the whole-second disarm countdown and
+// the ground line; the viewer's own pvp_flag command re-arms the gate so the
+// answer to a press lands on the next snapshot.
+const WPVP_WIRE_HZ = 2;
+const WPVP_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * WPVP_WIRE_HZ)));
+// World Market browse readout cadence: the browse view (a filter + page over the
+// whole listing book) is the most expensive per-viewer read in selfWireJson and
+// carries no sub-second clock, so 4 Hz caps the rebuild rate; the viewer's OWN
+// market commands re-arm the gate (MARKET_WIRE_PROMPT_CMDS). On top, a
+// rebuild-only-on-change gate (sim.marketBrowseRevFor + query identity) skips
+// unchanged rebuilds; MARKET_BROWSE_REFRESH_TICKS is its staleness backstop.
 const MARKET_WIRE_HZ = 4;
 const MARKET_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MARKET_WIRE_HZ)));
 const MARKET_BROWSE_REFRESH_TICKS = 40;
@@ -738,15 +739,11 @@ const CORDER_WIRE_PROMPT_CMDS = new Set<string>([
 ]);
 // Known residual, named on purpose: the board revision is realm-global and
 // corder has no proximity gate, so ONE board mutation anywhere re-triggers an
-// O(board) rebuild for every online session at its next due tick. Under
-// sustained churn (~4 mutations per second) the change gate degenerates to
-// the plain 5x cadence win. If that rate ever materializes, the next lever is
-// the bg readout's sharedMatchView memo shape: build the viewer-identical
-// open-scope subset once per board revision and splice the per-viewer rows.
-// The mail gate below shares the realm-global-revision half of this residual
-// (any letter booked anywhere rebuilds every at-pillar viewer's inbox at up
-// to 4 Hz); cheap now that mailInfoFor is bucket-based, and the
-// per-recipient buckets make a per-recipient revision the natural follow-up.
+// O(board) rebuild for every online session at its next due tick; under
+// sustained churn (~4 mutations/s) the change gate degenerates to the plain 5x
+// cadence win. Next lever if that materializes: the bg readout's sharedMatchView
+// memo shape (open-scope subset once per revision, per-viewer rows spliced). The
+// mail gate below shares the realm-global-revision half (bucket-based, cheap).
 
 // Ravenpost mailbox readout cadence, the market gate applied to `mail`: the
 // view is a full projection of the viewer's delivered letters (bodies
@@ -852,17 +849,13 @@ function isPickAction(value: unknown): value is PickAction {
 // a steady source of GC pressure, when a crowd gathers. The small/dynamic fields
 // (position, resource, target, party HP, cooldowns, ...) still diff every tick.
 const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so refreshes don't synchronize into a spike
-// Commands a jailed session may not send: everything that queues into or
-// enters instanced content (ranked arena in all formats: 1v1, 2v2, fiesta,
-// yumi3, yumi5; the Vale Cup; dungeons; delves) plus starting or accepting a
-// duel. The dungeon/delve entries are door-proximity-gated anyway (a prisoner
-// can never stand at a door), listed here as explicit policy. Leave/abort
-// commands stay allowed.
+// Commands a jailed session may not send: everything that queues into or enters
+// instanced content (ranked arena in every format, the Vale Cup, dungeons,
+// delves) plus starting or accepting a duel; leave/abort commands stay allowed
+// and the door-gated dungeon/delve entries are listed as explicit policy.
 // Runtime membership for the dispatched command vocabulary (the CommandName
-// union as data). The command-lane check consults it so a KNOWN command draws
-// its lane token before the switch, while an unknown cmd draws in the default
-// arm AFTER its protocol-anomaly observation (R5: lane drops must never mute
-// the anomaly channel).
+// union as data): a KNOWN command draws its lane token before the switch; an
+// unknown cmd draws in the default arm AFTER its protocol-anomaly observation (R5).
 const KNOWN_COMMANDS: ReadonlySet<string> = new Set(COMMAND_NAMES);
 // Lane-drop cause labels (R8): the map keeps the counter's cause vocabulary
 // closed at the seam's fixed WS_DROP_CAUSES set, never a raw lane string.
@@ -1018,6 +1011,8 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   lastBgWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
   lastDfWireTick: number;
+  // World PvP readout, same idea at its own cadence (WPVP_WIRE_HZ)
+  lastWpvpWireTick: number;
   // World Market browse readout, same idea at its own cadence (MARKET_WIRE_HZ),
   // plus the rebuild-only-on-change state: the sim browse revision and the
   // query object last built for, and the tick of the last rebuild (the
@@ -3455,6 +3450,7 @@ export class GameServer {
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastBgWireTick: -BG_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
+      lastWpvpWireTick: -WPVP_WIRE_INTERVAL_TICKS,
       lastMarketWireTick: -MARKET_WIRE_INTERVAL_TICKS,
       lastMarketBrowseRev: null,
       lastMarketQueryRef: null,
@@ -7349,6 +7345,7 @@ export class GameServer {
       // every rule; a non-boolean payload is a malformed frame and is ignored).
       case 'pvp_flag':
         if (typeof msg.on === 'boolean') sim.setWorldPvpFlag(msg.on, pid);
+        session.lastWpvpWireTick = -WPVP_WIRE_INTERVAL_TICKS;
         break;
       case 'dev_bg_start': {
         if (process.env.ALLOW_DEV_COMMANDS === '1') sim.devStartBg();
@@ -8551,7 +8548,10 @@ export class GameServer {
     // session receives both, then they ride only on earn/spend changes.
     maybe('honor', meta.honor);
     maybe('lhonor', meta.lifetimeHonor);
-    maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));
+    if (this.sim.tickCount - session.lastWpvpWireTick >= WPVP_WIRE_INTERVAL_TICKS) {
+      session.lastWpvpWireTick = this.sim.tickCount;
+      maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));
+    }
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));
