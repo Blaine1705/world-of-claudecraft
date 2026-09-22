@@ -244,6 +244,18 @@ export class HoardBoulderFx {
     return { ...made, mesh, material };
   }
 
+  /** The lane is one long flat quad over uneven floor: at ground height it fought
+   *  the floor for depth and flickered as the camera moved (playtest). It sits a
+   *  little higher, its depth test biased toward the camera, and never fights. */
+  private lane(): Ribbon {
+    const made = this.ribbon(1, LOOK.lane, false, 'BoulderLane');
+    made.material.depthTest = true;
+    made.material.polygonOffset = true;
+    made.material.polygonOffsetFactor = -4;
+    made.material.polygonOffsetUnits = -4;
+    return made;
+  }
+
   private makeRig(asset: THREE.Group | undefined, disc: THREE.BufferGeometry): BoulderRig {
     const rig: BoulderRig = {
       instanceId: -1,
@@ -278,7 +290,7 @@ export class HoardBoulderFx {
       // On every tier: it says where an airborne boulder is over the floor.
       shadow: new THREE.Mesh(disc, this.keep(this.basic(0x000000, 0, false))),
       ring: this.ribbon(RING_SEGMENTS, LOOK.stand, false, 'BoulderRing'),
-      lane: this.ribbon(1, LOOK.lane, false, 'BoulderLane'),
+      lane: this.lane(),
       pips: [],
       pose: makeBoulderPose(),
     };
@@ -695,7 +707,7 @@ export class HoardBoulderFx {
     const length = Math.max(1e-6, Math.hypot(dx, dz));
     const px = (dz / length) * BOULDER.boulderRadius;
     const pz = (-dx / length) * BOULDER.boulderRadius;
-    const y = rig.ground + 0.08;
+    const y = rig.ground + 0.22;
     rig.lane.position.setXYZ(0, rig.fromX - px, y, rig.fromZ - pz);
     rig.lane.position.setXYZ(1, rig.fromX + px, y, rig.fromZ + pz);
     rig.lane.position.setXYZ(2, rig.x - px, y, rig.z - pz);

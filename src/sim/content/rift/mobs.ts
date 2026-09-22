@@ -923,20 +923,8 @@ const BOSSES: Record<string, MobTemplate> = {
       school: 'shadow',
       fx: 'nova',
     },
-    deathZoneCast: {
-      castId: 'rift_necro_execution',
-      name: 'Soul Grave',
-      // 3.5 to match the roster line (Emberforge, Grask, Nyxaris). At 2.5 the
-      // S-rank fuse (castTime * RIFT_S_ZONE_TEMPO) was 1.75s against 1.29s of
-      // run-out from the anchor at the centre, leaving 0.46s to react: the
-      // only unreactable zone in the game. See riftDeathZoneReactionBudget.
-      castTime: 3.5,
-      every: 22,
-      radius: 9,
-      school: 'shadow',
-      yell: 'Your soul is forfeit.',
-      detonateText: 'Soul Grave detonates!',
-    },
+    // No Soul Grave: the red pool under the scythe read as one more thing on a
+    // floor that must stay clean for the blade (playtest).
     deathZoneStrike: {
       castId: 'rift_necro_strike',
       name: 'Death Sentence',
@@ -950,7 +938,7 @@ const BOSSES: Record<string, MobTemplate> = {
       yell: 'DEATH CLAIMS ALL.',
       detonateText: 'Death Sentence falls!',
     },
-    rankMechanics: ['summonAdds', 'bigCast', 'deathZoneCast', 'deathZoneStrike'],
+    rankMechanics: ['summonAdds', 'bigCast', 'deathZoneStrike'],
     enrage: { belowHpPct: 0.3, dmgMult: 1.4, hasteMult: 1.25 },
     yells: { engage: 'Death is only the beginning.', summon: 'Rise!' },
   },
