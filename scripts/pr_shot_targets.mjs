@@ -614,6 +614,15 @@ export function resolveMobileViewport(variant) {
   return { width, height };
 }
 
+/** Colorblind Mode (Options > Interface) on top of the lowest preset: the
+ *  Nythraxis hazard palette comparison seeds the switch the same way the
+ *  preset is seeded, before the document loads. */
+export async function seedLowGraphicsPresetColorblind(page) {
+  await page.evaluateOnNewDocument(
+    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 1; s.graphicsDefaultApplied = true; s.colorblindMode = true; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+  );
+}
+
 export async function seedLowGraphicsPreset(page) {
   await page.evaluateOnNewDocument(
     `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
@@ -17868,6 +17877,7 @@ export const TARGETS = [
       'nythraxis_grave_core',
       'nythraxis_gravefire_core',
       'nythraxis_sigil_core',
+      'nythraxis_hazard_palette_core',
       'sim/nythraxis_',
       'sim/encounters/nythraxis',
     ],
@@ -17876,9 +17886,13 @@ export const TARGETS = [
     // ground-hazard readouts plus two bots' auras are overwritten directly so
     // every mechanic this PR touches is visible in one frame, never waiting on
     // the encounter's own cadence. See docs/screenshots/nythraxis-playtest-tuning.
+    // The colorblind variants shoot the same frame with Colorblind Mode
+    // (Options > Interface) seeded on, so the two palettes compare 1:1.
     variants: [
       { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
       { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop-colorblind', beforeLoad: seedLowGraphicsPresetColorblind },
+      { key: 'mobile-colorblind', mobile: true, beforeLoad: seedLowGraphicsPresetColorblind },
     ],
     async capture(page) {
       await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
