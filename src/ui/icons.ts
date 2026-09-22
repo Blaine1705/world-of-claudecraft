@@ -5560,6 +5560,8 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // Clue Scroll casket deeds use the exploration category crest pending art.
   'exp_clue_first_casket',
   'exp_clue_ten_caskets',
+  // The Buried Hoard goblin catch uses the combat category crest pending art.
+  'cmb_coinsack_caught',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

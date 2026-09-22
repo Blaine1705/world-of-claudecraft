@@ -1,5 +1,6 @@
 // Direct hoard playtests, behind the same dev gate as /dev map: a themed boss
-// room at any map rarity, without reading and digging a map for it.
+// room at any map rarity, without reading and digging a map for it. A trailing
+// `goblin` makes the room hold a Coinsack Scurrier (rift/hoard_goblin.ts).
 import {
   isTreasureMapRarity,
   TREASURE_MAP_RARITIES,
@@ -67,16 +68,20 @@ export function handleDevHoardTravel(
   pid: number,
   query: string,
   rarityArg = '',
+  extraArg = '',
 ): void {
   if (!ctx.devCommands) return;
   const player = ctx.entities.get(pid);
   if (!player || !ctx.players.has(pid)) return;
-  const rarity = rarityArg.trim().toLowerCase();
+  // `goblin` may stand in the rarity slot or after it.
+  const words = [rarityArg, extraArg].map((w) => w.trim().toLowerCase());
+  const goblin = words.includes('goblin');
+  const rarity = words.find((w) => w && w !== 'goblin') ?? '';
   if (rarity && !isTreasureMapRarity(rarity)) {
     ctx.emit({
       type: 'log',
       pid,
-      text: '[dev] /dev hoard <boss|zone|1-8> [common|rare|epic|legendary].',
+      text: '[dev] /dev hoard <boss|zone|1-8> [common|rare|epic|legendary] [goblin].',
     });
     return;
   }
@@ -88,7 +93,7 @@ export function handleDevHoardTravel(
     ctx.emit({
       type: 'log',
       pid,
-      text: '[dev] /dev hoard <boss|zone|1-8> [common|rare|epic|legendary]. Destinations:',
+      text: '[dev] /dev hoard <boss|zone|1-8> [common|rare|epic|legendary] [goblin]. Destinations:',
     });
     for (const [index, d] of DEV_HOARD_DESTINATIONS.entries()) {
       ctx.emit({ type: 'log', pid, text: `[dev] ${index + 1}: ${d.boss} (${d.alias}), ${d.zone}` });
@@ -109,5 +114,6 @@ export function handleDevHoardTravel(
   portal.templateId = HOARD_ENTRANCE_TEMPLATE_ID;
   portal.vaultOwnerPid = pid;
   portal.vaultRarity = destination.rarity;
+  if (goblin) portal.devForceHoardGoblin = true;
   ctx.enterRift(destination.seed, RIFT_RANK_BASE_LEVEL[destination.tier], pid, site, portal);
 }

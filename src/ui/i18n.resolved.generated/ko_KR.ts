@@ -11236,7 +11236,8 @@ export const ko_KR: EnTranslations = {
       "hoard_lightning_strike": "번개 강타",
       "hoard_ice_age": "빙하기",
       "hoard_pulsar_overload": "펄서 과부하",
-      "hoard_rolling_boulder": "구르는 바위"
+      "hoard_rolling_boulder": "구르는 바위",
+      "hoard_goblin_escape": "도주"
     }
   },
   "questUi": {
@@ -18139,6 +18140,9 @@ export const ko_KR: EnTranslations = {
       },
       "hoard_brood_cocoon": {
         "name": "부화 고치"
+      },
+      "hoard_coinsack_scurrier": {
+        "name": "동전자루 좀도둑"
       },
       "rift_spawnling": {
         "name": "균열의 산물"

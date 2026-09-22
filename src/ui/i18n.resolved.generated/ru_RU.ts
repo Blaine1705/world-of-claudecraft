@@ -11236,7 +11236,8 @@ export const ru_RU: EnTranslations = {
       "hoard_lightning_strike": "Удар молнии",
       "hoard_ice_age": "Ледниковый период",
       "hoard_pulsar_overload": "Перегрузка пульсара",
-      "hoard_rolling_boulder": "Катящийся валун"
+      "hoard_rolling_boulder": "Катящийся валун",
+      "hoard_goblin_escape": "Побег"
     }
   },
   "questUi": {
@@ -18139,6 +18140,9 @@ export const ru_RU: EnTranslations = {
       },
       "hoard_brood_cocoon": {
         "name": "Кокон выводка"
+      },
+      "hoard_coinsack_scurrier": {
+        "name": "Мешочник-непоседа"
       },
       "rift_spawnling": {
         "name": "Отпрыск Разлома"

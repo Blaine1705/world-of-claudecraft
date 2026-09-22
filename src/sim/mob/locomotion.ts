@@ -66,6 +66,7 @@ import { holdPetCorpseForBgWave } from '../pet/pet_corpse_hold';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
 import { corpseHasDecayed } from '../respawn_policy';
+import { isHoardGoblin, updateHoardGoblinMotion } from '../rift/hoard_goblin';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
@@ -301,6 +302,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   mob.combatTimer += DT;
+
+  // The Coinsack Scurrier (rift/hoard_goblin.ts) never aggroes or swings: it
+  // only runs, and its own tick owns the escape bar and the payout.
+  if (isHoardGoblin(mob)) {
+    updateHoardGoblinMotion(ctx, mob);
+    return;
+  }
 
   const dummyTemplate = MOBS[mob.templateId];
   if (dummyTemplate?.dummy) {

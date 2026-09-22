@@ -341,6 +341,9 @@ export interface RiftInstance {
     level: number;
     /** The reward chest the final boss leaves (hoard_reward_chest.ts). */
     chest?: HoardRewardChestState;
+    /** Dev only (`/dev hoard ... goblin`): the room always holds a Coinsack
+     *  Scurrier (hoard_goblin.ts). The spawn roll is drawn either way. */
+    forceGoblin?: boolean;
   } | null;
   /** The sealed reward cache the giga-boss drops (`rift_locked_chest`), opened via
    * the shared lockpicking minigame; null until the boss falls. */
@@ -363,6 +366,25 @@ export interface RiftInstance {
   /** Runtime-only Storm Caller Lightning Strikes (hoard_lightning_strike.ts). */
   hoardStrikes?: import('./hoard_lightning_strike').HoardLightningStrikeState;
   hoardAddCasts?: import('./hoard_add_casts').HoardAddCastState;
+  /** Runtime-only Coinsack Scurrier, when the room rolled one (hoard_goblin.ts). */
+  hoardGoblin?: HoardGoblinState;
+}
+
+/** The Coinsack Scurrier's run state (hoard_goblin.ts). Declared here, not in
+ *  the module, so a type reference never pulls its runtime graph along. */
+export interface HoardGoblinState {
+  id: number;
+  /** Sim time it spawned; it leaves untouched at spawnedAt + HOARD_GOBLIN_IDLE_SEC. */
+  spawnedAt: number;
+  /** Sim time the escape bar ends, once the first blow lands. */
+  escapeAt: number | null;
+  /** Floor-local run points (the room's clear spawn spots). */
+  points: Array<{ x: number; z: number }>;
+  /** Index into points it is running to, or -1 while it stands. */
+  goal: number;
+  repickIn: number;
+  /** Set once the gold has been paid (it died) or taken (it escaped). */
+  settled: boolean;
 }
 
 export type HoardBossCueVariant =

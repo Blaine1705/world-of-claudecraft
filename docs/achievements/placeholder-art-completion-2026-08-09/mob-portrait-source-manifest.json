@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "3bf0a3c5ac9a52cf07ec146339b0a083bfee93707eaee1e89986d743ea40289e",
+  "rendererFingerprint": "ce8c4b0a1a18db87d4c50c1bcbc7a9d74290f785028259c47c9648467bbebfb4",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5011728,
-      "sha256": "a32096948eefbfe67764b242766db2327bf96943fd15a3f23e0bd1df80bbbc34",
+      "bytes": 5013145,
+      "sha256": "2f1a2a3796e9d8f32294106f2d0da12dfdb3dcc46c6a2257a41f99204f56175f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 262,
+  "portraitCount": 263,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -3546,6 +3546,40 @@
       }
     },
     {
+      "id": "hoard_coinsack_scurrier",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_coinsack_scurrier",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_coinsack_scurrier.glb",
+          "path": "public/models/creatures/hoard_coinsack_scurrier.glb",
+          "bytes": 670368,
+          "sha256": "aad2199d7499d4c87756940e9758413ad52bf2e332018aeb30c7414788da37b5"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "69d4fccdae7b728baf7badcbc6a09fbc8b7a22a5ec9fae66d425950687f0e2a2",
+      "output": {
+        "path": "public/ui/mobs/hoard_coinsack_scurrier.webp",
+        "bytes": 2788,
+        "sha256": "9f843547917a91f2f391740dfc0f50cf66c4e5762909cf2b254a72bda9a453ba"
+      }
+    },
+    {
       "id": "hoard_healing_tide_totem",
       "family": "elemental",
       "finderEncounter": false,
@@ -6105,8 +6139,8 @@
             "asset": {
               "url": "models/weapons/hoard_forge_maul.glb",
               "path": "public/models/weapons/hoard_forge_maul.glb",
-              "bytes": 22144,
-              "sha256": "a9a66eae6d457a74041bf932675e775b9f8b9b18bed181e3f1a7b9654f061fb8"
+              "bytes": 22128,
+              "sha256": "2899e580c8f1df4342e5da520f18286b6f5086750b7026ecb5761600372ad6c6"
             },
             "bone": "handslot.r",
             "position": null,
@@ -6123,11 +6157,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f94edda00a6381ff1b6735a0e60bc361cba0e951f9e564d631fa21f91ceb0a61",
+      "sourceFingerprint": "cee3426d642f33800892ac0d4eae4ba95de9d5eb418ca76951fb34a16b3e7ce7",
       "output": {
         "path": "public/ui/mobs/rift_boss_ember.webp",
-        "bytes": 2632,
-        "sha256": "2eb5923d29d68b94e633800b3956e48c2eabf6f084d03f006126d1a1bd368363"
+        "bytes": 2554,
+        "sha256": "6d83039815873394a9efec8fa72800c838b1c8ca4b528645506535d4bead41af"
       }
     },
     {

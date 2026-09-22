@@ -218,6 +218,31 @@ export const HOARD_MOBS: Record<string, MobTemplate> = {
     untameable: true,
     phasesThroughObstacles: true,
   },
+  // The Coinsack Scurrier (src/sim/rift/hoard_goblin.ts): a goblin that slips
+  // into some hoards with a sack of stolen gold. It never fights, only runs, and
+  // pays out on its own death (not through this table). Its health is set at
+  // spawn from the level and head count, so hpBase/hpPerLevel are only a floor.
+  hoard_coinsack_scurrier: {
+    id: 'hoard_coinsack_scurrier',
+    name: 'Coinsack Scurrier',
+    minLevel: 16,
+    maxLevel: 23,
+    family: 'humanoid',
+    hpBase: 60,
+    hpPerLevel: 20,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 99,
+    armorPerLevel: 6,
+    // 80% of a player's run: anyone who chases it catches it.
+    moveSpeed: 5.6,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0x7fa05a,
+    xpMult: 0,
+    untameable: true,
+  },
 };
 
 // Shared summoned adds (referenced by bosses' summonAdds.mobId). Low HP, no loot.

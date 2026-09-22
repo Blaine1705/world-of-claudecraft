@@ -376,10 +376,11 @@ describe('Book of Deeds webp icons', () => {
     // the progression crest: 315 live, still 289 painted.
     // The two Clue Scroll casket exploration deeds join the pending set on the
     // exploration crest: 317 live, still 289 painted.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(317);
+    // The Coinsack Scurrier catch joins on the combat crest: 318 live, still 289.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(318);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(289);
-    expect(DEED_ART_PENDING_IDS).toHaveLength(28);
-    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('exp_clue_ten_caskets');
+    expect(DEED_ART_PENDING_IDS).toHaveLength(29);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('cmb_coinsack_caught');
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);

@@ -145,6 +145,7 @@ const MOB_IDS = [
   'hoard_abyssal_tentacle',
   'hoard_silk_cocoon',
   'hoard_brood_cocoon',
+  'hoard_coinsack_scurrier',
   'rift_spawnling',
   'rift_bonewalker',
   'rift_frost_revenant',

@@ -11236,7 +11236,8 @@ export const ja_JP: EnTranslations = {
       "hoard_lightning_strike": "落雷",
       "hoard_ice_age": "氷河期",
       "hoard_pulsar_overload": "パルサー過負荷",
-      "hoard_rolling_boulder": "転がる大岩"
+      "hoard_rolling_boulder": "転がる大岩",
+      "hoard_goblin_escape": "逃走中"
     }
   },
   "questUi": {
@@ -18139,6 +18140,9 @@ export const ja_JP: EnTranslations = {
       },
       "hoard_brood_cocoon": {
         "name": "孵化の繭"
+      },
+      "hoard_coinsack_scurrier": {
+        "name": "小銭袋のすばしっこ"
       },
       "rift_spawnling": {
         "name": "リフトの落とし子"

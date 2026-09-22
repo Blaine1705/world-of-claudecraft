@@ -5763,6 +5763,9 @@ export interface Entity extends ClientMirroredEntityFields {
   vaultOwnerPid?: number;
   vaultRarity?: TreasureMapRarity;
   vaultExpiresAt?: number;
+  // Dev only (`/dev hoard ... goblin`, src/sim/dev/hoard_travel.ts): the hoard
+  // this descriptor opens always holds a Coinsack Scurrier.
+  devForceHoardGoblin?: true;
   // Sim time of the last "level too low" rift denial shown to this player, so
   // standing inside the portal trigger radius does not spam the toast per tick.
   riftDeniedAt?: number;
@@ -9036,7 +9039,10 @@ export type DeedStatKey =
   // Orange promotions performed (Masterwrought phase 13): bumped once per
   // legendary promotion at the promotePerfectedCopy stamp site
   // (professions/perfecting.ts, reached via resolvePerfectingAttempt's internal promotion arm), feeding prog_legendmaker.
-  | 'legendariesForged';
+  | 'legendariesForged'
+  // Coinsack Scurriers caught in a Buried Hoard (rift/hoard_goblin.ts): bumped
+  // for every player paid off one, feeding cmb_coinsack_caught.
+  | 'hoardGoblinKills';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -9069,6 +9075,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'riftSRankClears',
   'tutorialGraduations',
   'legendariesForged',
+  'hoardGoblinKills',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new

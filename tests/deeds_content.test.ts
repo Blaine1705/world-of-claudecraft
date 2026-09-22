@@ -144,8 +144,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // three Champion at 25, and the all-factions meta at 50: +140).
     // 317 / 3530 with the two Clue Scroll casket deeds (the first casket at
     // 10 and the tenth at 25: +35).
-    expect(DEED_ORDER.length).toBe(317);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3530);
+    // 318 / 3540 with the Coinsack Scurrier catch (cmb_coinsack_caught, 10).
+    expect(DEED_ORDER.length).toBe(318);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3540);
   });
 
   it('ships the audited per-category counts', () => {
@@ -165,7 +166,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +7 the faction standing ladder (a Trusted and a Champion deed per
       // allied faction plus the all-factions meta).
       progression: 75,
-      combat: 10,
+      // +1 the Buried Hoard goblin catch (cmb_coinsack_caught).
+      combat: 11,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
       dungeon: 36,
@@ -400,6 +402,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // (the first casket and the tenth, which grants Treasure Hunter).
       'exp_clue_first_casket',
       'exp_clue_ten_caskets',
+      // The Buried Hoard's Coinsack Scurrier, caught once (hoardGoblinKills).
+      'cmb_coinsack_caught',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1023,7 +1027,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // clueCasketsOpened meter), re-minted THE AUDITABLE WAY: the 2b8d9d03...
   // literal rotated down into PRE_APPEND_CATALOG_SHA256 and the proof below
   // reproduces it exactly. No shipped trigger or renown value was touched.
-  const FROZEN_CATALOG_SHA256 = '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
+  // Re-baselined for the appended Coinsack Scurrier catch
+  // (cmb_coinsack_caught on the new hoardGoblinKills stat), re-minted THE
+  // AUDITABLE WAY: the 0d91bc68... literal rotated down into
+  // PRE_APPEND_CATALOG_SHA256 and the proof below reproduces it exactly.
+  const FROZEN_CATALOG_SHA256 = '34fe6e4f7198203099d588651d75dc9aa50c1bcc40f8402fc4bcf5d7a9e2745c';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1085,22 +1093,26 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // prog_faction_champion_all; the previous mint is the faction ladder's
   // 2b8d9d03... literal (rotated down here), and stripping the two must
   // reproduce it exactly.
+  //
+  // The Coinsack Scurrier catch appends one deed after exp_clue_ten_caskets;
+  // the previous mint is the casket pair's 0d91bc68... literal (rotated down
+  // here), and stripping it must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '2b8d9d03740487fde602cfb2c610880747113a59c98539eab242e498840c422a';
-  const APPENDED_SINCE: readonly string[] = ['exp_clue_first_casket', 'exp_clue_ten_caskets'];
+    '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
+  const APPENDED_SINCE: readonly string[] = ['cmb_coinsack_caught'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The Clue Scroll casket pair sits at the true tail after the faction
-    // standing ladder. Pin its two predecessors too: this is an append into a
-    // known seat, never a scattered insert or a retro-edit (the digest below
+    // The goblin catch sits at the true tail after the Clue Scroll casket
+    // pair. Pin its two predecessors too: this is an append into a known
+    // seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'prog_automatons_champion',
-      'prog_faction_champion_all',
+      'exp_clue_first_casket',
+      'exp_clue_ten_caskets',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1319,8 +1331,9 @@ describe('table shape', () => {
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
-    // Clue Scroll casket pair whose tenth casket title deed is the final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_clue_ten_caskets');
+    // Clue Scroll casket pair, then the Buried Hoard goblin catch as the final
+    // entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('cmb_coinsack_caught');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

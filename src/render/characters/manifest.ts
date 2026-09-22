@@ -24,6 +24,7 @@ import { NYTHRAXIS_BONE_SPIKE_ID } from '../../sim/nythraxis_bone_spike';
 import {
   HOARD_CAST_ICE_AGE,
   HOARD_CAST_PULSAR_OVERLOAD,
+  HOARD_GOBLIN_ESCAPE_CAST,
 } from '../../sim/rift/hoard_control_cast_ids';
 import {
   ALL_CLASSES,
@@ -3855,6 +3856,22 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.25,
   },
+  // The Coinsack Scurrier (src/sim/rift/hoard_goblin.ts): a small goblin under a
+  // huge sack of stolen gold, on the shared KayKit rig. The sack and the face
+  // are made rigid by scripts/assets/hoard_mobs/rigid_pack.mjs. It never
+  // fights; its escape bar keeps it running, so the bar plays the run clip.
+  mob_hoard_coinsack_scurrier: {
+    url: `${CREATURES}/hoard_coinsack_scurrier.glb`,
+    height: 2.0,
+    clips: {
+      ...kaykit(['Punch_A']),
+      hit: ['Hit_A'],
+      castByAbility: { [HOARD_GOBLIN_ESCAPE_CAST]: 'Running_A' },
+      castTimeScaleByAbility: { [HOARD_GOBLIN_ESCAPE_CAST]: 1 },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
   // The Maw's bottom-dweller: low, wide, all mouth. Its own Blender rig and clips
   // (scripts/assets/hoard_mobs/quadruped_rig.py).
   mob_hoard_deep_lurker: {
@@ -4272,6 +4289,7 @@ const MOB_KEYS: Record<string, string> = {
   hoard_abyssal_tentacle: 'mob_abyssal_tentacle',
   hoard_silk_cocoon: 'mob_silk_cocoon',
   hoard_brood_cocoon: 'mob_brood_cocoon',
+  hoard_coinsack_scurrier: 'mob_hoard_coinsack_scurrier',
   // Broodmother clutch (q_broodmother): the destructible eggs reuse the egg-sac
   // model (not a live spider), and the hatchling is a small spider.
   spider_egg: 'mob_spider_egg_sac',

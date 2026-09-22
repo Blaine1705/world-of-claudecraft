@@ -226,6 +226,7 @@ export function vaultForPortal(ctx: SimContext, portal: Entity | null): RiftInst
     ownerPid: portal.vaultOwnerPid,
     headCount: Math.max(1, Math.min(5, party?.members.length ?? 1)),
     level: ctx.entities.get(portal.vaultOwnerPid)?.level ?? RIFT_RANK_BASE_LEVEL.C,
+    ...(portal.devForceHoardGoblin ? { forceGoblin: true } : {}),
   };
 }
 

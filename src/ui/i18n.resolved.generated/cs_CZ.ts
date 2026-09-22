@@ -11236,7 +11236,8 @@ export const cs_CZ: EnTranslations = {
       "hoard_lightning_strike": "Lightning Strike",
       "hoard_ice_age": "Ice Age",
       "hoard_pulsar_overload": "Pulsar Overload",
-      "hoard_rolling_boulder": "Rolling Boulder"
+      "hoard_rolling_boulder": "Rolling Boulder",
+      "hoard_goblin_escape": "Escaping"
     }
   },
   "questUi": {
@@ -18139,6 +18140,9 @@ export const cs_CZ: EnTranslations = {
       },
       "hoard_brood_cocoon": {
         "name": "Brood Cocoon"
+      },
+      "hoard_coinsack_scurrier": {
+        "name": "Coinsack Scurrier"
       },
       "rift_spawnling": {
         "name": "Trhlinové plůdě"

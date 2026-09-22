@@ -5978,6 +5978,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 25,
     "feat": false,
     "rewardTitle": "Treasure Hunter"
+  },
+  {
+    "id": "cmb_coinsack_caught",
+    "name": "Caught Red-Handed",
+    "category": "combat",
+    "renown": 10,
+    "feat": false
   }
 ];
 

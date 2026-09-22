@@ -11236,7 +11236,8 @@ export const zh_CN: EnTranslations = {
       "hoard_lightning_strike": "雷霆打击",
       "hoard_ice_age": "冰河时代",
       "hoard_pulsar_overload": "脉冲星过载",
-      "hoard_rolling_boulder": "滚石"
+      "hoard_rolling_boulder": "滚石",
+      "hoard_goblin_escape": "逃跑"
     }
   },
   "questUi": {
@@ -18139,6 +18140,9 @@ export const zh_CN: EnTranslations = {
       },
       "hoard_brood_cocoon": {
         "name": "育雏之茧"
+      },
+      "hoard_coinsack_scurrier": {
+        "name": "钱袋窜贼"
       },
       "rift_spawnling": {
         "name": "裂隙孽生体"

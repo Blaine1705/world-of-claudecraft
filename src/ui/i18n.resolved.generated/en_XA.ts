@@ -11236,7 +11236,8 @@ export const en_XA: EnTranslations = {
       "hoard_lightning_strike": "[Ļíĝĥţñíñĝ Šţŕíķé]",
       "hoard_ice_age": "[Íçé Áĝé]",
       "hoard_pulsar_overload": "[Þúļšáŕ Óʋéŕļóáð]",
-      "hoard_rolling_boulder": "[Ŕóļļíñĝ Ɓóúļðéŕ]"
+      "hoard_rolling_boulder": "[Ŕóļļíñĝ Ɓóúļðéŕ]",
+      "hoard_goblin_escape": "[Éšçáþíñĝ]"
     }
   },
   "questUi": {
@@ -18139,6 +18140,9 @@ export const en_XA: EnTranslations = {
       },
       "hoard_brood_cocoon": {
         "name": "[Ɓŕóóð Çóçóóñ]"
+      },
+      "hoard_coinsack_scurrier": {
+        "name": "[Çóíñšáçķ Šçúŕŕíéŕ]"
       },
       "rift_spawnling": {
         "name": "[Ŕíƒţ Šþáŵñļíñĝ]"

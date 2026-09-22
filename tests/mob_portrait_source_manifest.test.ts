@@ -98,8 +98,9 @@ describe('mob portrait source manifest', () => {
     // regional freight caravans (Eastbrook, Willowfen, Frostveil). The Hoard
     // Healing Tide Totem is the 255th live target portrait; the Buried Hoard
     // mechanics add six attackable bodies (brood egg and hatchling, bound pulsar,
-    // Maw tentacle, silk and brood cocoons).
-    expect(liveIds).toHaveLength(262);
+    // Maw tentacle, silk and brood cocoons). 263: the Coinsack Scurrier, the
+    // goblin that sometimes runs through a hoard with a sack of gold.
+    expect(liveIds).toHaveLength(263);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

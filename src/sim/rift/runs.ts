@@ -38,6 +38,7 @@ import { riftFx } from './fx';
 import { tickHoardAddCasts } from './hoard_add_casts';
 import { hoardBossCueViews, tickHoardBossMechanics } from './hoard_boss';
 import { tickHoardControlCasts } from './hoard_control_casts';
+import { dropHoardGoblin, maybeSpawnHoardGoblin, tickHoardGoblins } from './hoard_goblin';
 import { tickHoardLightningStrikes } from './hoard_lightning_strike';
 import { rescaleVaultForEntrants } from './hoard_rescale';
 import {
@@ -480,6 +481,13 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
     inst.rollerIds.push(spawnObj('rift_roller', 'Rolling Boulder', roller.x, z));
   }
 
+  // A hoard sometimes holds a Coinsack Scurrier; it runs between the pack spots.
+  maybeSpawnHoardGoblin(
+    ctx,
+    inst,
+    floor.spawns.filter((spawn) => !spawn.boss && !spawn.miniboss),
+  );
+
   inst.emptyFor = 0;
 }
 
@@ -513,6 +521,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
     ctx.dropEntity(id);
   }
   clearHoardRewardChest(ctx, inst);
+  dropHoardGoblin(ctx, inst);
   dropObjects(ctx, inst.objectIds);
   if (inst.descentId !== null) dropObjects(ctx, [inst.descentId]);
   if (inst.exitId !== null) dropObjects(ctx, [inst.exitId]);
@@ -1843,6 +1852,7 @@ export function updateRiftInstances(ctx: SimContext): void {
   tickHoardControlCasts(ctx);
   tickHoardLightningStrikes(ctx);
   tickHoardAddCasts(ctx);
+  tickHoardGoblins(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;

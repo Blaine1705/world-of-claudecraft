@@ -37,6 +37,10 @@ export const HOARD_CAST_ROLLING_BOULDER = 'hoard_rolling_boulder';
  *  answered with a wall, never kicked. */
 export const HOARD_CAST_CHARGE = 'hoard_cast_charge';
 
+/** The Coinsack Scurrier's escape (hoard_goblin.ts): a bar it runs from its
+ *  first wound, never kicked; at the end it is gone with the gold. */
+export const HOARD_GOBLIN_ESCAPE_CAST = 'hoard_goblin_escape';
+
 /** The Storm Caller's Lightning Strike (hoard_lightning_strike.ts), here for the
  *  same reason: healer_channel.ts reads its school. */
 export const HOARD_CAST_LIGHTNING_STRIKE = 'hoard_lightning_strike';

@@ -560,6 +560,9 @@ const mergeStringsEn = {
       hoard_pulsar_overload: 'Pulsar Overload',
       // Grask's throw (src/sim/rift/hoard_boulder.ts): read and answered, never kicked.
       hoard_rolling_boulder: 'Rolling Boulder',
+      // The Coinsack Scurrier's bar (src/sim/rift/hoard_goblin.ts): when it ends,
+      // the goblin is gone with the gold. Never kicked.
+      hoard_goblin_escape: 'Escaping',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
