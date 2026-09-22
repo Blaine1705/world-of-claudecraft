@@ -160,7 +160,9 @@ export const HOARD_STORM_SURGE_SCALE_PER_STACK = 0.05;
 
 /** Event Horizon burns everything out to this radius except the eye; the
  *  Collapse that follows is wider than the eye, so standing still is never safe. */
-export const HOARD_EVENT_HORIZON_RADIUS = 30;
+/** Small enough that a player anywhere in it can run clear in the windup, out or
+ *  into the eye: at 30 the far edge was 24 yards from the eye (playtest). */
+export const HOARD_EVENT_HORIZON_RADIUS = 16;
 export const HOARD_EVENT_HORIZON_EYE_RADIUS = 5.5;
 export const HOARD_COLLAPSE_RADIUS = 9.5;
 

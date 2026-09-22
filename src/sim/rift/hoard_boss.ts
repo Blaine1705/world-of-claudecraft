@@ -1189,6 +1189,11 @@ function tickKit(
     }
     return;
   }
+  // Vysska and Xarreth carry their own kits (cocoons, eggs, the silk snare; the
+  // scythe and the souls): the generic red marks under the players were one more
+  // red thing on floors that must stay clean, and read as a mechanic of theirs
+  // that was not (playtest).
+  if (kit === 'brood' || kit === 'bone-legion') return;
   state.markTimer -= DT;
   if (state.markTimer <= 0 && living.length > 0) {
     startMarks(ctx, inst, living, state, 'buried-mark', 3, enraged);

@@ -11,10 +11,19 @@ type MarkCue = Extract<HoardBossCue, { kind: 'mark' }>;
 
 /** Only the Hoard version trades its unannounced melee shove for a spread check. */
 export function suppressHoardStormShove(ctx: SimContext, mob: Entity): boolean {
-  return (
-    mob.templateId === 'rift_boss_storm' &&
-    ctx.riftInstances.some((inst) => inst.vault && inst.partyKey !== null && inst.bossId === mob.id)
-  );
+  if (mob.templateId === 'rift_boss_storm') {
+    return ctx.riftInstances.some(
+      (inst) => inst.vault && inst.partyKey !== null && inst.bossId === mob.id,
+    );
+  }
+  // Nor do his drakes: their Tail Sweep threw players across a room already full
+  // of strikes and surges (playtest). Ordinary Rifts keep it.
+  if (mob.templateId === 'rift_stormscale') {
+    return ctx.riftInstances.some(
+      (inst) => inst.vault && inst.partyKey !== null && inst.mobIds.includes(mob.id),
+    );
+  }
+  return false;
 }
 
 /** The player is safe alone, or with every living teammate outside their ring. */

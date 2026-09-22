@@ -535,6 +535,7 @@ const TRASH: Record<string, MobTemplate> = {
     loot: trashLoot(160, 'stormscale_treads'),
     scale: 1.35,
     color: 0x2e86c1,
+    knockback: { chance: 0.2, distance: 6, name: 'Tail Sweep' },
   },
   // Sunken (mudfin + beast, teal)
   rift_tide_thrall: {
@@ -852,7 +853,27 @@ const BOSSES: Record<string, MobTemplate> = {
       school: 'nature',
       yell: 'Drown in venom!',
     },
-    rankMechanics: ['summonAdds', 'aoeSlow'],
+    deathZoneCast: {
+      castId: 'rift_venom_execution',
+      name: 'Venom Pool',
+      castTime: 4.5,
+      every: 22,
+      radius: 9,
+      school: 'nature',
+      yell: 'Drown in poison.',
+      detonateText: 'Venom Pool erupts!',
+    },
+    deathZoneStrike: {
+      castId: 'rift_venom_strike',
+      name: "Broodmother's Mark",
+      castTime: 5.0,
+      every: 26,
+      radius: 11,
+      school: 'nature',
+      yell: 'YOU CANNOT FLEE MY CHILDREN.',
+      detonateText: "Broodmother's Mark detonates!",
+    },
+    rankMechanics: ['summonAdds', 'aoeSlow', 'deathZoneCast', 'deathZoneStrike'],
     enrage: { belowHpPct: 0.3, dmgMult: 1.4, hasteMult: 1.25 },
     yells: { engage: 'My children are always hungry.', summon: 'Feast, little ones!' },
   },
@@ -902,9 +923,34 @@ const BOSSES: Record<string, MobTemplate> = {
       school: 'shadow',
       fx: 'nova',
     },
-    // No Soul Grave: the red pool under the scythe read as one more thing on a
-    // floor that must stay clean for the blade (playtest).
-    rankMechanics: ['summonAdds', 'bigCast'],
+    deathZoneCast: {
+      castId: 'rift_necro_execution',
+      name: 'Soul Grave',
+      // 3.5 to match the roster line (Emberforge, Grask, Nyxaris). At 2.5 the
+      // S-rank fuse (castTime * RIFT_S_ZONE_TEMPO) was 1.75s against 1.29s of
+      // run-out from the anchor at the centre, leaving 0.46s to react: the
+      // only unreactable zone in the game. See riftDeathZoneReactionBudget.
+      castTime: 3.5,
+      every: 22,
+      radius: 9,
+      school: 'shadow',
+      yell: 'Your soul is forfeit.',
+      detonateText: 'Soul Grave detonates!',
+    },
+    deathZoneStrike: {
+      castId: 'rift_necro_strike',
+      name: 'Death Sentence',
+      // 4.0 for the same reason as Soul Grave above: at 3.0 the S-rank fuse was
+      // 2.10s against 1.57s of run-out, and at S this one is the barrage (a
+      // zone under EVERY living member), so nobody had a safe anchor to read.
+      castTime: 4.0,
+      every: 26,
+      radius: 11,
+      school: 'shadow',
+      yell: 'DEATH CLAIMS ALL.',
+      detonateText: 'Death Sentence falls!',
+    },
+    rankMechanics: ['summonAdds', 'bigCast', 'deathZoneCast', 'deathZoneStrike'],
     enrage: { belowHpPct: 0.3, dmgMult: 1.4, hasteMult: 1.25 },
     yells: { engage: 'Death is only the beginning.', summon: 'Rise!' },
   },
@@ -997,7 +1043,7 @@ const BOSSES: Record<string, MobTemplate> = {
       name: 'Arcane Detonation',
       castTime: 2.2,
       every: 12,
-      radius: 6.5,
+      radius: 13,
       min: 28,
       max: 40,
       school: 'arcane',
