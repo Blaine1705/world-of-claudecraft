@@ -1341,7 +1341,7 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/aura_bar_side.ts (with the new targetAurasBelowFrame side case
     // riding the same helper), so the coordinator ends smaller (extract, then
     // lower).
-    ceiling: 11267,
+    ceiling: 11266,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

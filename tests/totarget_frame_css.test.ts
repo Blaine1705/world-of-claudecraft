@@ -58,11 +58,23 @@ describe('target-of-target frame sits BESIDE the target frame', () => {
   // below-frame strip back through their own setting (targetAurasBelowFrame,
   // src/ui/aura_bar_side.ts): keyed on the setting's body class, never on the
   // frame's move state, mirroring the player buff row's auraBarBelowFrame.
+  // NOTE: rule() matches the FIRST occurrence of the selector text, and the
+  // base '#target-frame > #tf-debuffs {' rule must stay authored ABOVE the
+  // body-class override, or the base pin above silently reads the override.
   it('hangs the strip below the frame only via body.target-auras-below-frame', () => {
     const below = rule(hudCss, 'body.target-auras-below-frame #target-frame > #tf-debuffs');
     expect(below).toContain('top: calc(100% + 8px);');
     expect(below).toContain('bottom: auto;');
     expect(hudCss).not.toMatch(/#target-frame\.tf-detached[^{]*#tf-debuffs/);
+  });
+
+  // The touch seat pins the target frame to the top edge, so an above-frame
+  // strip is off screen there: the mobile sheet hangs it below unconditionally
+  // (a device never sheds target debuff timers, a signal a player reacts to).
+  it('mobile hangs the strip below the frame regardless of the setting', () => {
+    const touch = rule(hudMobileCss, 'body.mobile-touch #target-frame > #tf-debuffs');
+    expect(touch).toContain('top: calc(100% + 8px);');
+    expect(touch).toContain('bottom: auto;');
   });
 
   it('reads portrait-left like every other unit frame (mirror overrides dropped)', () => {

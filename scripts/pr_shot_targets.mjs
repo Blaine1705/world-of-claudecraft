@@ -135,6 +135,12 @@ const targetAurasBelowSeed = async (page) => {
   );
 };
 
+const lowGraphicsSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+
 /** Wait until #loading-screen has stayed hidden for `streakMs` straight (the
  *  curtain can rise again a beat after a scripted teleport, and a single
  *  hidden read races the compositor). */
@@ -152,12 +158,6 @@ async function waitForCurtainStreak(page, streakMs = 3000, timeoutMs = 90000) {
   }
   throw new Error('loading curtain never settled');
 }
-
-const lowGraphicsSeed = async (page) => {
-  await page.evaluateOnNewDocument(
-    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
-  );
-};
 
 // A stored Advanced mix that a Low player lands on by flipping one dial (Character
 // Detail to High): the Low seed (every ladder dial at its floor, Dynamic Lights and
@@ -3055,7 +3055,10 @@ export const TARGETS = [
     when: ['ui/aura_bar_side', 'ui/target_frame_pos'],
     variants: [
       { key: 'desktop', beforeLoad: targetAurasBelowSeed },
-      { key: 'mobile', mobile: true, beforeLoad: targetAurasBelowSeed },
+      // The touch leg seeds NO setting: the mobile sheet hangs the strip below
+      // unconditionally (the touch seat pins the frame to the top edge), so
+      // the shot proves the device default, not the toggle.
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed },
     ],
     async capture(page) {
       await awaitWorldPainted(page);
@@ -3079,7 +3082,7 @@ export const TARGETS = [
         sim.rebucket?.(player);
         const auras = [
           ['rend', 'Rend', 'dot', 12, 20, 'physical'],
-          ['sunder', 'Sunder Armor', 'debuff_armor', 30, 450, 'physical'],
+          ['sunder', 'Sunder Armor', 'attackspeed', 30, 450, 'physical'],
           ['curse_weak', 'Curse of Weakness', 'debuff_ap', 110, 30, 'shadow'],
           ['crippling_poison', 'Crippling Poison', 'slow', 8, 50, 'nature'],
           ['frostbite', 'Frostbite', 'slow', 5, 60, 'frost'],
