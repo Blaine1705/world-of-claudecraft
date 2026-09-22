@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CLUE_HUNTS_BY_ID, type ClueHuntDef } from '../src/sim/content/clue_hunts';
-import { clueStepRowFor, clueStepRowSig } from '../src/ui/hud/quest/clue_step_row';
+import { clueStepRowFor, clueStepRowSig } from '../src/ui/hud/quest/clue_step_row_view';
 
 // The playtest bug (2026-09-22): the fenwitch salt hunt's first step is a
 // hand-over at Mother Sedge, an ordinary quest giver, and the gossip menu had

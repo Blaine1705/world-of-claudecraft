@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { WORLD_QUEST_ZONE_HUNTS } from '../src/sim/content/world_quest_zone_hunts';
 import { WORLD_QUEST_MIN_LEVEL, WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
 import { CAMPS, MOBS, ZONES } from '../src/sim/data';
+import { MAX_WANDER_RADIUS } from '../src/sim/mob/aggro_ranges';
 import { WORLD_QUEST_CHAMPION_TYPES } from '../src/sim/world_quest_champion';
 import {
   ALWAYS_ACTIVE_WORLD_QUEST_IDS,
@@ -26,10 +27,11 @@ function campSpawnsInside(quest: (typeof WORLD_QUEST_ZONE_HUNTS)[number]): numbe
   let inside = 0;
   for (const camp of CAMPS) {
     if (camp.mobId !== target) continue;
-    // The whole camp (centre plus wander radius) must sit inside the ring, or
-    // a mob pulled at the camp's edge dies outside the credit area.
+    // The whole camp (centre plus spawn radius plus the idle wander every camp
+    // mob is allowed, mob/aggro_ranges.ts) must sit inside the ring, or a mob
+    // pulled at the camp's edge dies outside the credit area.
     const reach = Math.hypot(camp.center.x - quest.area.x, camp.center.z - quest.area.z);
-    if (reach + camp.radius <= quest.area.radius) inside += camp.count;
+    if (reach + camp.radius + MAX_WANDER_RADIUS <= quest.area.radius) inside += camp.count;
   }
   return inside;
 }

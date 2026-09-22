@@ -28,7 +28,9 @@ export const WORLD_QUEST_ZONES: readonly string[] = Object.freeze([
 export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> = Object.freeze({
   // Round 2 (2026-09): the zone hunts (content/world_quest_zone_hunts.ts) are
   // APPENDED to each pool so the earlier entries keep their day index. A pool's
-  // length is its cycle (index = day mod length); lengths are 1, 4 or 7 only:
+  // ROTATING entries (the ALWAYS_ACTIVE ids below are filtered out first, so
+  // Evergarden rotates four of its five and Galecrest none) form its cycle
+  // (index = day mod count); rotating counts are 1, 4 or 7 only:
   // each divides the 84-day roster period, and the legacy three-day cycle ids
   // (wq3_N = day 3N) still reach every entry, which 3 or 6 would not. Palmreach
   // stays one deep: its confection board is a day-keyed puzzle that must be on
@@ -106,7 +108,7 @@ export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> =
     'wq_wraithwood_restless',
     'wq_wraithwood_spinners',
     'wq_wraithwood_shamblers',
-    'wq_wraithwood_huntsman',
+    'wq_wraithwood_wraiths',
   ]),
   palmreach: Object.freeze(['wq_palmreach_confections']),
   evergarden: Object.freeze([

@@ -5498,9 +5498,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.discussQuest': '{name}에 대해 이야기합니다.',
   'questUi.dialog.discussQuestAria': '퀘스트 논의: {name}',
   'questUi.dialog.clueTalk': '단서에 대해 묻는다.',
-  'questUi.dialog.clueTalkAria': '단서에 대해 묻기: {name}',
+  'questUi.dialog.clueTalkAria': '단서에 대해 묻는다: {name}',
   'questUi.dialog.clueDeliver': '{item} {count}개를 건넨다.',
-  'questUi.dialog.clueDeliverAria': '{name}에게 {item} {count}개 건네기',
+  'questUi.dialog.clueDeliverAria': '{item} {count}개를 건넨다: {name}',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '세 유물은 같은 이야기를 전합니다. 알드렌은 왕을 지키기 위해 싸웠고, 말릭은 죽음의 경계를 깨뜨렸으며, 보스는 그 뒤에 일어난 일을 막으려 했습니다. 봉인은 약해지고 있고, 버려진 묘실이 아래로 향하는 길입니다.',
   'entities.items.runed_bone_shard.name': '룬 새긴 뼈 조각',

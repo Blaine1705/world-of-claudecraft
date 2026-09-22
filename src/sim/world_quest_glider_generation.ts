@@ -24,6 +24,13 @@
 // Both hosts derive the variant from (cycle, courseId) alone, the same way the
 // puzzle boards do (world_quest_daily_generation.ts): the sim ticks the flight
 // against it and the course visual draws it, with nothing new on the wire.
+//
+// The certification flies the SHIPPED world (WORLD_SEED and the built-in
+// content): the shipped client, the realms and the RL env all run it. A host
+// on another seed or content (the editor viewport can compose one) would fly
+// the same line uncertified; none of those hosts offers the slalom today.
+
+import { GLIDER_COURSES } from './content/world_quest_glider_levels';
 import type { GliderCourseDef, GliderRingDef } from './minigames/glider_flight';
 import { Rng } from './rng';
 import { groundHeight } from './world';
@@ -182,7 +189,9 @@ export function generateGliderCourseVariant(
   return template;
 }
 
-const VARIANT_CACHE = new Map<string, GliderCourseDef>();
+// Keyed by the template object and indexed by variant: no key string is built
+// on the per-tick and per-frame lookups below.
+const VARIANT_CACHE = new Map<GliderCourseDef, (GliderCourseDef | undefined)[]>();
 
 /** The course a session flies this cycle: stable identity per (cycle, course),
  *  so the course visual can compare by reference the way it always has. */
@@ -190,11 +199,22 @@ export function gliderCourseForCycle(cycle: unknown, courseId?: string): GliderC
   const template = gliderCourseById(courseId);
   const variant = gliderVariantForCycle(cycle);
   if (variant === 0) return template;
-  const key = `${template.id}:${variant}`;
-  let course = VARIANT_CACHE.get(key);
+  let slots = VARIANT_CACHE.get(template);
+  if (!slots) {
+    slots = [];
+    VARIANT_CACHE.set(template, slots);
+  }
+  let course = slots[variant];
   if (!course) {
     course = generateGliderCourseVariant(template, variant);
-    VARIANT_CACHE.set(key, course);
+    slots[variant] = course;
   }
   return course;
+}
+
+/** Generate (and cache) every template's line for a cycle ahead of the first
+ *  launch, so the certification's cost lands at the daily rollover instead of
+ *  inside a pilot's launch tick or the course visual's first frame. */
+export function warmGliderCourseVariants(cycle: unknown): void {
+  for (const template of GLIDER_COURSES) gliderCourseForCycle(cycle, template.id);
 }

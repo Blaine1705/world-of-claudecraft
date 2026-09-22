@@ -153,9 +153,14 @@
   .forge-action-bar {
     position: absolute;
     left: 50%;
-    top: 10vh;
+    /* The app-box height over the #ui zoom, the .window shell's own clamp
+       (never a bare vh: #ui zooms every length in its subtree). */
+    top: calc(var(--app-vh, 100dvh) * 0.1 / var(--ui-scale, 1));
     transform: translateX(-50%);
     z-index: 20;
+    /* The controller toggles display between none and grid; the grid is
+       declared here too so the stylesheet alone describes the layout. */
+    display: grid;
     padding: 16px;
     max-width: calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 16px);
     grid-template-columns: 1fr;

@@ -213,16 +213,52 @@ const GLIDER_APPARATUS_TOP_Y = 0.42;
 const GLIDER_APPARATUS_YAW = -Math.PI / 2;
 
 let apparatusScene: THREE.Group | null = null;
-const apparatusReady: Promise<THREE.Group | null> = new Promise((resolve) => {
+let apparatusSettled = false;
+const apparatusWaiters: Array<() => void> = [];
+const settleApparatus = (): void => {
+  apparatusSettled = true;
+  for (const waiter of apparatusWaiters.splice(0)) waiter();
+};
+if (typeof window !== 'undefined') {
+  // Deferred, never eager (the affliction_familiar precedent): a module-import
+  // registerPreload joins the launch fetch burst the deferred gate exists to
+  // spread out. A failed load settles too, so the fallback wing below is fitted
+  // instead of leaving the pilot on an invisible glider.
   registerDeferredPreload(() =>
     loadGltf(GLIDER_APPARATUS_URL)
       .then((gltf) => {
         apparatusScene = gltf.scene;
-        resolve(gltf.scene);
       })
-      .catch(() => resolve(null)),
+      .catch(() => {})
+      .then(settleApparatus),
   );
-});
+}
+
+/** A plain wing and keel, fitted only when the prop fails to load: the pilot
+ *  still reads the pitch feedback (gliderApparatusPitch) off something. */
+function buildFallbackApparatus(): { object: THREE.Object3D; dispose: () => void } {
+  const wingGeo = new THREE.PlaneGeometry(GLIDER_APPARATUS_WINGSPAN, 1.6);
+  const wingMat = new THREE.MeshLambertMaterial({ color: 0xd8c8a0, side: THREE.DoubleSide });
+  const wing = new THREE.Mesh(wingGeo, wingMat);
+  wing.rotation.x = -Math.PI / 2;
+  wing.position.y = GLIDER_APPARATUS_TOP_Y;
+  const keelGeo = new THREE.BoxGeometry(0.08, 0.08, 1.6);
+  const keelMat = new THREE.MeshLambertMaterial({ color: 0x5a4632 });
+  const keel = new THREE.Mesh(keelGeo, keelMat);
+  keel.position.y = GLIDER_APPARATUS_TOP_Y - 0.06;
+  const object = new THREE.Group();
+  object.name = 'glider-apparatus-fallback';
+  object.add(wing, keel);
+  return {
+    object,
+    dispose: () => {
+      wingGeo.dispose();
+      wingMat.dispose();
+      keelGeo.dispose();
+      keelMat.dispose();
+    },
+  };
+}
 
 export const gliderCourseVisualPreloadInternalsForTest = {
   apparatusAssetUrl: GLIDER_APPARATUS_URL,
@@ -256,19 +292,28 @@ function createGliderApparatusMesh(): {
   group.name = 'glider-apparatus';
   group.visible = false;
   let disposed = false;
-  const attach = (scene: THREE.Group | null): void => {
-    if (disposed || !scene || group.children.length > 0) return;
-    group.add(fitGliderApparatus(scene));
+  let fallback: { object: THREE.Object3D; dispose: () => void } | null = null;
+  const attach = (): void => {
+    if (disposed || group.children.length > 0) return;
+    if (apparatusScene) {
+      group.add(fitGliderApparatus(apparatusScene));
+      return;
+    }
+    fallback = buildFallbackApparatus();
+    group.add(fallback.object);
   };
-  if (apparatusScene) attach(apparatusScene);
-  else apparatusReady.then(attach);
+  if (apparatusSettled) attach();
+  else apparatusWaiters.push(attach);
   return {
     group,
     dispose: () => {
       disposed = true;
       // The clone shares its geometry and materials with the cached prop scene,
-      // which other visuals still clone: detach only.
+      // which other visuals still clone: detach only. The fallback is this
+      // visual's own and goes with it.
       group.clear();
+      fallback?.dispose();
+      fallback = null;
     },
   };
 }

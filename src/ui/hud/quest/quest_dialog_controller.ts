@@ -32,7 +32,7 @@ import { archetypeImageUrl } from '../professions/profession_art';
 import { buildAttunementPreview } from '../professions/profession_identity_view';
 import { isStationMasterNpc } from '../vendor/train_view';
 import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
-import { clueStepRowFor, clueStepRowSig } from './clue_step_row';
+import { clueStepRowFor, clueStepRowSig } from './clue_step_row_view';
 import { gossipMenuIsEmpty } from './gossip_menu';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
@@ -121,7 +121,7 @@ export class QuestDialogController {
   // tick-threshold crossing, with NO quest event to repaint through).
   private lastIntroHintVisible: boolean | null = null;
   private lastGossipRowSig: string | null = null;
-  // The Clue Scroll row's staleness signature (clue_step_row.ts): the row reads
+  // The Clue Scroll row's staleness signature (clue_step_row_view.ts): the row reads
   // LIVE hunt state, so it joins the refreshIfChanged watch (a step can advance
   // or the hunt end while the dialog is open).
   private lastClueRowSig = '';
@@ -386,11 +386,14 @@ export class QuestDialogController {
       )
       .map((progress) => progress.questId);
     // The Clue Scroll talk or hand-over row: the active hunt's current step
-    // targets this NPC (clue_step_row.ts). The sim resolves it first inside
+    // targets this NPC (clue_step_row_view.ts). The sim resolves it first inside
     // talkToNpc on every host; this row is what makes the client SEND that
     // interact for an ordinary quest giver, which the gossip menu never did.
-    const clueRow = clueStepRowFor(world.clueHunt, npc.templateId);
-    this.lastClueRowSig = clueStepRowSig(clueRow);
+    const clueRowRaw = clueStepRowFor(world.clueHunt, npc.templateId);
+    this.lastClueRowSig = clueStepRowSig(clueRowRaw);
+    // A hand-over of an item the catalog does not know draws no row: its id is
+    // never player-visible text, and the row could not be acted on anyway.
+    const clueRow = clueRowRaw?.kind === 'deliver' && !ITEMS[clueRowRaw.itemId] ? null : clueRowRaw;
     // The WARFARE quartermaster REPLACES the generic goods row with its sectioned
     // window (gated on the NpcDef flag, never a hard-coded id).
     //
@@ -515,14 +518,14 @@ export class QuestDialogController {
           ? t('questUi.dialog.clueTalk')
           : t('questUi.dialog.clueDeliver', {
               count: this.deps.text.number(clueRow.count),
-              item: ITEMS[clueRow.itemId] ? itemDisplayName(ITEMS[clueRow.itemId]) : clueRow.itemId,
+              item: itemDisplayName(ITEMS[clueRow.itemId]),
             });
       const clueAria =
         clueRow.kind === 'talk'
           ? t('questUi.dialog.clueTalkAria', { name: npcName })
           : t('questUi.dialog.clueDeliverAria', {
               count: this.deps.text.number(clueRow.count),
-              item: ITEMS[clueRow.itemId] ? itemDisplayName(ITEMS[clueRow.itemId]) : clueRow.itemId,
+              item: itemDisplayName(ITEMS[clueRow.itemId]),
               name: npcName,
             });
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-clue-step="1" aria-label="${esc(clueAria)}"><span class="gold">${svgIcon('questlog')}</span> ${esc(clueLabel)}</button>`;

@@ -9,6 +9,7 @@ import {
   GLIDER_QUEST_ID,
   GLIDER_WIND_TUNNELS,
 } from '../src/sim/content/world_quest_glider';
+import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { gliderActionsLocked } from '../src/sim/glider_action_lock';
@@ -133,6 +134,44 @@ describe('World Quest Glider Integration', () => {
     sim.talkToNpc(GLIDER_NPC_ID);
     expect(progress.glider?.phase).toBe('countdown');
     expect(progress.glider?.practiceOnly).toBe(true);
+  });
+
+  it('never opens the practice door on an unearned row: under the gate or without a row nothing launches', () => {
+    // The practice landing stamps the row completed (world_quest_glider.ts), so
+    // the door must only open on a row the player has already EARNED; a player
+    // under the level gate, or one whose row the rotation has not minted yet,
+    // gets no practice flight and keeps a payable day.
+    const minLevel = WORLD_QUESTS_BY_ID[GLIDER_QUEST_ID].minLevel;
+    const talk = (sim: Sim) => {
+      sim.player.pos = sim.groundPos(GLIDER_NPC_DEF.pos.x + 1, GLIDER_NPC_DEF.pos.z);
+      sim.player.prevPos = { ...sim.player.pos };
+      sim.talkToNpc(GLIDER_NPC_ID);
+      return sim.meta(sim.playerId)!.worldQuestLog.get(GLIDER_QUEST_ID);
+    };
+
+    // The control: the dev arm (level, row, cycle) and a talk is the real launch.
+    const armed = setupSim();
+    armed.chat('/dev glider');
+    const launched = talk(armed);
+    expect(launched?.glider?.phase).toBe('countdown');
+    expect(launched?.glider?.practiceOnly).toBeFalsy();
+
+    // Under the level gate with an active row: nothing, and the row stays active.
+    const gated = setupSim();
+    gated.chat('/dev glider');
+    gated.setPlayerLevel(minLevel - 1);
+    const stillActive = talk(gated);
+    expect(stillActive?.glider).toBeUndefined();
+    expect(stillActive?.state).toBe('active');
+
+    // Without a row at all: whatever the talk does, it is never a practice
+    // flight and never a completion.
+    const unminted = setupSim();
+    unminted.chat('/dev glider');
+    unminted.meta(unminted.playerId)!.worldQuestLog.delete(GLIDER_QUEST_ID);
+    const row = talk(unminted);
+    expect(row?.glider?.practiceOnly).toBeFalsy();
+    expect(row?.state).not.toBe('completed');
   });
 
   it('publishes a wind-only crossing immediately between periodic snapshot ticks', () => {

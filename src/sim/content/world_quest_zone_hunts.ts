@@ -64,7 +64,7 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     'wq_eastbrook_spiders',
     'eastbrook_vale',
     WORLD_QUEST_MIN_LEVEL,
-    { x: -70, z: 2, radius: 36 },
+    { x: -70, z: 2, radius: 38 },
     'webwood_spider',
     5,
   ),
@@ -240,12 +240,12 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     2,
   ),
   kill(
-    'wq_wraithwood_huntsman',
+    'wq_wraithwood_wraiths',
     'wraithwood',
     20,
-    { x: 380, z: 1680, radius: 16 },
-    'pale_huntsman',
-    1,
+    { x: 362, z: 1592, radius: 82 },
+    'wood_wraith',
+    4,
   ),
   // Evergarden (level 20)
   kill(

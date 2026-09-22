@@ -72,6 +72,7 @@ import {
   updateGliderEncounter,
   updateGliderLaunchUpdraft,
 } from './world_quest_glider';
+import { warmGliderCourseVariants } from './world_quest_glider_generation';
 import { sanitizeGliderResult } from './world_quest_glider_wire';
 import {
   accuseInvestigationSuspect,
@@ -262,6 +263,9 @@ function resetCycleIfNeeded(ctx: SimContext, meta: PlayerMeta, resolvedCycle?: s
   clearShadowEncounter(ctx, meta);
   clearInvestigationEncounter(ctx, meta);
   meta.worldQuestCycle = cycle;
+  // The day's slalom lines are certified once here, at the rollover, never
+  // inside a launch tick (world_quest_glider_generation.ts).
+  warmGliderCourseVariants(cycle);
   meta.worldQuestLog.clear();
   meta.worldQuestAreas.clear();
   meta.openWorldQuestPuzzleId = null;
@@ -534,26 +538,24 @@ export function talkToWorldQuestInstructor(
     return true;
   }
   if (quest.objective.type === 'glider') {
-    // A completed quest launches a PRACTICE flight (world quests round 2: the
+    // A COMPLETED quest launches a PRACTICE flight (world quests round 2: the
     // slalom is replayable without limit, only the first success pays), so the
     // state check sits beside the board check: the board still lists the quest
-    // all day after the purse is paid.
-    const isQuestActive =
-      player.level >= quest.minLevel &&
-      progress &&
+    // all day after the purse is paid. Only an earned completion opens the
+    // practice door: a player under the level gate, or one whose row the
+    // rotation has not minted yet, gets nothing, because a practice landing
+    // stamps the row completed (world_quest_glider.ts) and would burn the
+    // day's purse before it was ever payable.
+    const eligible =
+      player.level >= quest.minLevel && !!progress && inWorldQuestArea(player, quest);
+    if (
+      eligible &&
       progress.state === 'active' &&
-      inWorldQuestArea(player, quest) &&
-      playerActiveWorldQuests(meta).some((active) => active.id === quest.id);
-    if (isQuestActive && progress) {
+      playerActiveWorldQuests(meta).some((active) => active.id === quest.id)
+    ) {
       startGliderFlight(ctx, meta, player, npc, progress);
-    } else {
-      const practice = meta.worldQuestLog.get(GLIDER_QUEST_ID) ?? {
-        questId: GLIDER_QUEST_ID,
-        count: 0,
-        state: 'active',
-      };
-      meta.worldQuestLog.set(GLIDER_QUEST_ID, practice);
-      startGliderFlight(ctx, meta, player, npc, practice, true);
+    } else if (eligible && progress.state === 'completed') {
+      startGliderFlight(ctx, meta, player, npc, progress, true);
     }
     return true;
   }

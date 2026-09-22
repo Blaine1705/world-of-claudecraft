@@ -36,7 +36,7 @@ export interface GossipMenuContent {
    *  route to the map's world-quest rail. Its own field so the taskmaster,
    *  who has no quest and no stock, keeps the dialog open for it. */
   hasWorldQuestBoard: boolean;
-  /** The Clue Scroll talk or hand-over row (clue_step_row.ts): the active
+  /** The Clue Scroll talk or hand-over row (clue_step_row_view.ts): the active
    *  hunt's current step targets this NPC. Its own field so a plain quest
    *  giver with nothing else to offer still keeps the dialog open for it. */
   hasClueStep: boolean;

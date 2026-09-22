@@ -146,8 +146,11 @@ export class ForgeActionBarController {
     if (active !== this.active) {
       this.active = active;
       if (active) for (const controller of this.cancelOnEnter) controller.cancel();
-      this.writers.setDisplay(this.root, active ? 'grid' : 'none');
     }
+    // Level-triggered, not edge-triggered: the writer facet elides a repeat to
+    // zero DOM work, and a stale edge could never re-establish the display if
+    // another writer ever hid the panel.
+    this.writers.setDisplay(this.root, active ? 'grid' : 'none');
     if (!active) return;
     const progress = this.world.worldQuestLog.get(FORGE_QUEST_ID);
     const session = progress?.forging;
