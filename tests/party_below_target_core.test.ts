@@ -227,9 +227,11 @@ describe('PartyBelowTargetPainter (measure gating + property write)', () => {
     expect(painter.update(true, 5, false)).toBe(true);
     expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('240.0px');
     expect(frame.rectReads).toBe(2);
-    // An unrelated body class is not a key input: no layout read for it.
+    // An unrelated body class is not a key input: the push stands (update
+    // returns the ACTIVE state, not whether it measured) and the unchanged
+    // rect-read count is what proves no layout read happened for it.
     root.attrs['body:class'] = 'game-active target-auras-below-frame something-else';
-    expect(painter.update(true, 5, false)).toBe(false);
+    expect(painter.update(true, 5, false)).toBe(true);
     expect(frame.rectReads).toBe(2);
   });
 
