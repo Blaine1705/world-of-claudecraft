@@ -31,7 +31,12 @@ import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
 import { padMissingUv } from './far_bake_uv_pad';
-import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
+import {
+  type HandGrip,
+  KAYKIT_ONE_HAND_SWORD_GRIP,
+  KAYKIT_SHIELD_ACCESSORIES,
+  KAYKIT_SHIELD_GRIPS,
+} from './held_item_grips';
 import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
 import { composedLookReady } from './look_pieces';
 import { buildMakeupDecal } from './makeup';
@@ -101,6 +106,8 @@ import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { buildStubbleDecal, headNodeName } from './stubble';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
+import { prepareWarriorAbilityClips } from './warrior_ability_clips';
+import { prepareWarriorActionFallbacks } from './warrior_action_fallbacks';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
@@ -276,10 +283,7 @@ const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
       scale: 0.7204,
     },
   },
-  '1H_Sword': {
-    r: { position: [0, 0.555174, 0], quaternion: [0, 1, 0, 0], scale: 0.8876 },
-    l: { position: [0, 0.555174, 0], quaternion: [0, 0, 0, 1], scale: 0.8876 },
-  },
+  '1H_Sword': KAYKIT_ONE_HAND_SWORD_GRIP,
   '2H_Sword': {
     r: { position: [0, 0.8148, 0], quaternion: [0, 1, 0, 0], scale: 1.1829 },
   },
@@ -2469,6 +2473,8 @@ export function prepareVisual(key: string): PreparedVisual {
     clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
+  prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
+  prepareWarriorActionFallbacks(key, clips, gltf.scene);
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No
   // face decals on a modular throwaway: the flatten drops them (farBakeMeshes),
   // and the default look's scalp decal would otherwise be minted and thrown

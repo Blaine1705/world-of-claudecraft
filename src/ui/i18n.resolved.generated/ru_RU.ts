@@ -9976,7 +9976,7 @@ export const ru_RU: EnTranslations = {
     "takeOver": "Перехватить",
     "inWorldHint": "Уже в мире. Выйдите в другом месте или перехватите сессию.",
     "currentLocation": "Текущее местоположение: {zone}",
-    "lockouts": "Блокировки",
+    "lockouts": "Блокировки ({count})",
     "lockoutRaids": "Рейды",
     "lockoutDungeons": "Подземелья",
     "lockoutWorldBosses": "Мировые боссы",

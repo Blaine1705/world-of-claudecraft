@@ -9976,7 +9976,7 @@ export const cs_CZ: EnTranslations = {
     "takeOver": "Převzít",
     "inWorldHint": "Už je ve světě. Odhlas se jinde nebo ji převezmi.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

@@ -506,7 +506,12 @@ const MONOLITHS: MonolithRow[] = [
     // guarded log() call through a thin lootReceiptBody adapter), composed
     // with the trade quantity prompt fold (18263 - 10). wc -l on the merged
     // tree. Exact count, zero slack.
-    ceiling: 18253,
+    // LOWERED 18253 -> 18235 at the Warrior presentation (PR 4139) base sync:
+    // the heal audio policy (potion cue, HoT silence, the Frenzied
+    // Regeneration exemption) moved out of the heal2 arm into
+    // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
+    // count, zero slack.
+    ceiling: 18235,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -919,7 +924,14 @@ const MONOLITHS: MonolithRow[] = [
     // CPU-hygiene review: the ranked and required view candidates share the
     // scan module's liveViewCandidate check (present, view-less, admitted),
     // which drops the coordinator's own admission call. Exact count.
-    ceiling: 12850,
+    // Warrior integration moves painter wiring and prewarm types to sibling modules.
+    // PR 4139 review-fix round: endDraw gained the matching
+    // refreshFrozenWorldMatrix guard (one line), paid for by moving the Fiesta
+    // shake math into camera_impact_core.ts (fiestaShakeX/Y); then LOWERED
+    // 12790 -> 12789 when the Warrior kit textures moved to demand loading
+    // (the boot-time sheet upload loop and its comment went, the kit host
+    // gained its assets line). Exact count.
+    ceiling: 12789,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1321,7 +1333,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11281 -> 11280 with the character-select lockout disclosure:
     // the roster row hint markup call is inlined into its template and the
     // disclosure event isolation lives in src/ui/charselect_hints.ts.
-    ceiling: 11280,
+    // LOWERED 11280 -> 11276 at the PR 4137 review round: the roster row's
+    // click / Enter-Space / double-click wiring moved into wireCharselectRow
+    // (src/ui/charselect_hints.ts), which skips activations from inside the
+    // lockout disclosure instead of stopping propagation there.
+    ceiling: 11276,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
