@@ -331,13 +331,8 @@ export class NameplatePainter {
       this.updateDynamicState(state, entity, player, plan, languageChanged);
       // The /pvp flag is the one content input read every pass: a flip
       // re-resolves the row THIS frame (state.pvpFlag), never on the tier cadence.
-      if (
-        !state.initialized ||
-        fullPass ||
-        plan.urgent ||
-        languageChanged ||
-        state.pvpFlag !== (entity.pvpFlag === true)
-      ) {
+      const pvpFlipped = state.pvpFlag !== (entity.pvpFlag === true);
+      if (!state.initialized || fullPass || plan.urgent || languageChanged || pvpFlipped) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
       }
 
