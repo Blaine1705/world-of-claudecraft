@@ -1100,9 +1100,7 @@ describe('signature-driven repaints', () => {
     expect(tinPooled?.querySelector('.vault-row-stack-count')?.textContent).toBe('x5');
     expect(tinSigned?.querySelector('.vault-row-stack-count')?.textContent).toBe('x3');
     expect(tinSigned?.querySelector('.vault-row-count')?.textContent).toBe('8/40');
-    expect(tinSigned?.querySelector('.visually-hidden')?.textContent).toContain(
-      ': 8 of 40 stored',
-    );
+    expect(tinSigned?.querySelector('.visually-hidden')?.textContent).toContain(': 8 of 40 stored');
   });
 
   it('a special-row reorder repaints exact index selectors even when fingerprints duplicate', () => {
