@@ -93,8 +93,6 @@ export interface HoardControlSigilPlan {
   inner: number;
   opacity: number;
   /** Column height multiplier and opacity: it swells as the cast nears its end. */
-  column: number;
-  columnOpacity: number;
   spin: number;
 }
 
@@ -114,8 +112,6 @@ export function hoardControlSigil(
     outer,
     inner: outer * (1 - p * 0.82),
     opacity: 0.55 + 0.4 * pulse * (0.4 + 0.6 * p),
-    column: 0.6 + p * 0.9,
-    columnOpacity: 0.1 + p * 0.22 + pulse * 0.06,
     spin: calm ? 0 : 1.4 + p * 3.2,
   };
 }

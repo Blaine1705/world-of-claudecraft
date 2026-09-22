@@ -90,7 +90,6 @@ describe('control cast sigil plan', () => {
     expect(start.inner).toBeCloseTo(start.outer);
     expect(late.inner).toBeLessThan(start.inner * 0.4);
     expect(late.outer).toBe(start.outer);
-    expect(late.columnOpacity).toBeGreaterThan(start.columnOpacity);
     expect(hoardControlSigil(3, 0, 1).inner).toBe(hoardControlSigil(1, 0, 1).inner);
     // A bigger caster wears a bigger ring.
     expect(hoardControlSigil(0, 0, 3).outer).toBeGreaterThan(start.outer);
@@ -185,12 +184,12 @@ describe('Buried Hoard encounter accents adapter', () => {
     expect(shown(scene, isSigil)).toBe(1);
     const sigil = scene.getObjectByName(ROOT)?.children.find((c) => c.visible && isSigil(c));
     expect(sigil?.position.x).toBe(2);
-    const ring = sigil?.children[1] as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
+    const ring = sigil?.children[0] as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
     const nature = ring.material.color.getHex();
 
     caster.castRemaining = 0.2;
     accents.update(0.05);
-    const inner = sigil?.children[2] as THREE.Mesh;
+    const inner = sigil?.children[1] as THREE.Mesh;
     expect(inner.scale.x).toBeLessThan(ring.scale.x * 0.5);
 
     // Interrupted: the sigil drops at once.
@@ -203,7 +202,7 @@ describe('Buried Hoard encounter accents adapter', () => {
     accents.update(0.2);
     expect(shown(scene, isSigil)).toBe(1);
     const shadowSigil = scene.getObjectByName(ROOT)?.children.find((c) => c.visible && isSigil(c));
-    const shadowRing = shadowSigil?.children[1] as THREE.Mesh<
+    const shadowRing = shadowSigil?.children[0] as THREE.Mesh<
       THREE.BufferGeometry,
       THREE.MeshBasicMaterial
     >;

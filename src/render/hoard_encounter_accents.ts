@@ -73,9 +73,7 @@ interface SigilSlot {
   group: THREE.Group;
   outer: THREE.Mesh;
   inner: THREE.Mesh;
-  column: THREE.Mesh;
   ringMaterial: THREE.MeshBasicMaterial;
-  columnMaterial: THREE.MeshBasicMaterial;
 }
 
 function additive(color: number, opacity: number): THREE.MeshBasicMaterial {
@@ -245,25 +243,23 @@ export class HoardEncounterAccents {
     // Four sides make the inner ring read as a closing reticle, not a disc.
     const reticle = this.own(new THREE.RingGeometry(0.78, 1, 4, 1));
     reticle.rotateX(-Math.PI / 2);
-    const columnGeometry = this.own(new THREE.CylinderGeometry(0.55, 1, 1, 24, 1, true));
-    columnGeometry.translate(0, 0.5, 0);
     for (let index = 0; index < SIGIL_SLOTS; index++) {
       const group = new THREE.Group();
       group.visible = false;
+      // The ground ring is the whole tell: a column of light up the caster painted
+      // the mob's own body its school's colour, which read as a glitch (playtest).
       const ringMaterial = this.keep(additive(SHADOW, 0.8));
-      const columnMaterial = this.keep(additive(SHADOW, 0.2));
       const outer = new THREE.Mesh(ring, ringMaterial);
       const inner = new THREE.Mesh(reticle, ringMaterial);
-      const column = new THREE.Mesh(columnGeometry, columnMaterial);
-      for (const mesh of [outer, inner, column]) {
+      for (const mesh of [outer, inner]) {
         mesh.frustumCulled = false;
         mesh.renderOrder = 22;
       }
       outer.position.y = 0.2;
       inner.position.y = 0.24;
-      group.add(column, outer, inner);
+      group.add(outer, inner);
       this.root.add(group);
-      this.sigils.push({ casterId: -1, group, outer, inner, column, ringMaterial, columnMaterial });
+      this.sigils.push({ casterId: -1, group, outer, inner, ringMaterial });
     }
   }
 
@@ -435,9 +431,7 @@ export class HoardEncounterAccents {
       slot.outer.scale.setScalar(plan.outer);
       slot.inner.scale.setScalar(plan.inner);
       slot.inner.rotation.y += dt * plan.spin;
-      slot.column.scale.set(plan.inner, caster.scale * 2.4 * plan.column, plan.inner);
       slot.ringMaterial.opacity = plan.opacity;
-      slot.columnMaterial.opacity = plan.columnOpacity;
     }
   }
 
@@ -459,7 +453,6 @@ export class HoardEncounterAccents {
       free.casterId = entity.id;
       const color = cast.school === 'nature' ? NATURE : SHADOW;
       free.ringMaterial.color.setHex(color);
-      free.columnMaterial.color.setHex(color);
       free.inner.rotation.y = 0;
       free.group.visible = true;
       this.liveSigils++;

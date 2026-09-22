@@ -31,12 +31,13 @@ export {
 } from './hoard_control_cast_ids';
 
 /** Bar length for a single-target control and for a room-wide one. */
-/** Owner rule: no hoard caster bar is shorter than two seconds. */
-export const HOARD_CONTROL_CAST_SEC = 2.2;
+/** Owner rule: no hoard caster bar is shorter than two seconds. Three gives a
+ *  player who is mid-swing time to find the caster and kick (playtest). */
+export const HOARD_CONTROL_CAST_SEC = 3.0;
 /** A fear takes a player out of the fight outright, so it is the slowest bar to
  *  land: the single-target Dread and, slower still, the room-wide terrify. */
-export const HOARD_CONTROL_FEAR_CAST_SEC = 2.6;
-export const HOARD_CONTROL_AOE_CAST_SEC = 3.4;
+export const HOARD_CONTROL_FEAR_CAST_SEC = 3.5;
+export const HOARD_CONTROL_AOE_CAST_SEC = 4.2;
 
 /** On-hit controls a hoard boss simply does not have. Tempest Vharok already
  *  asks a lot (Tempest Judgment, Storm Surge, static, his casters' Lightning
