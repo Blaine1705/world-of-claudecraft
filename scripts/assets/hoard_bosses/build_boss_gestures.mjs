@@ -74,22 +74,21 @@ function callStorm(t) {
   const slam = ease(1.3, 1.5, t);
   const live = 1 - ease(1.7, 2.2, t);
   const hold = up * (1 - slam);
-  const shake = hold * wave(t, 8);
+  // Arms and head only: the torso lean, the crouch and the tremor made his whole
+  // body wobble in play. He plants his feet and throws his claws up.
   const arm = (side) => [
-    ['Z', side * (112 * hold + 24 * slam + 2.5 * shake) * live],
+    ['Z', side * (112 * hold + 24 * slam) * live],
     ['X', -(26 * hold + 66 * slam) * live],
   ];
   return {
     turns: {
-      spine: [['X', (-10 * hold + 22 * slam) * live]],
-      chest: [['X', (-8 * hold + 12 * slam) * live]],
-      head: [['X', (-24 * hold + 10 * slam) * live]],
+      head: [['X', (-20 * hold + 8 * slam) * live]],
       'upperarm.l': arm(1),
       'upperarm.r': arm(-1),
       'lowerarm.l': [['Z', 26 * hold * live]],
       'lowerarm.r': [['Z', -26 * hold * live]],
     },
-    drop: (0.03 * hold + 0.07 * slam) * live,
+    drop: 0,
   };
 }
 

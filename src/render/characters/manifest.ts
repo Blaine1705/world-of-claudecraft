@@ -3846,7 +3846,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Abyssal Maw's drowned thrall fights with his hands.
   mob_hoard_tide_thrall: {
     url: `${CREATURES}/hoard_tide_thrall.glb`,
-    height: 3.0,
+    height: 3.6,
     clips: {
       ...kaykit(['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Chop', 'Punch_A']),
       hit: ['Hit_A'],
@@ -3859,7 +3859,7 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_hoard_deep_lurker: {
     url: `${CREATURES}/hoard_deep_lurker.glb`,
     // Height is the top of its lure; the body is about half of it.
-    height: 1.7,
+    height: 2.0,
     // The generated model faces +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {
@@ -3877,7 +3877,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Hoarfrost Warden's dead throne guard.
   mob_hoard_frost_revenant: {
     url: `${CREATURES}/hoard_frost_revenant.glb`,
-    height: 3.0,
+    height: 3.6,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Punch_A']),
       hit: ['Hit_A'],
@@ -3888,7 +3888,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // The forge imp: small, wiry, all claws.
   mob_hoard_ember_fiend: {
     url: `${CREATURES}/hoard_ember_fiend.glb`,
-    height: 2.4,
+    height: 2.9,
     clips: {
       ...kaykit(['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Slice_Horizontal', 'Punch_A']),
       hit: ['Hit_A'],
@@ -3899,7 +3899,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // The forge brute: a slab of volcanic rock that hits with its fists.
   mob_hoard_magma_brute: {
     url: `${CREATURES}/hoard_magma_brute.glb`,
-    height: 3.4,
+    height: 4.1,
     clips: {
       ...kaykit(['Punch_A', '1H_Melee_Attack_Chop']),
       hit: ['Hit_A'],
@@ -3910,7 +3910,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Nyxaris's astronomer cultist.
   mob_hoard_void_acolyte: {
     url: `${CREATURES}/hoard_void_acolyte.glb`,
-    height: 2.9,
+    height: 3.5,
     clips: {
       ...kaykit(['Spellcast_Shoot', 'Punch_A']),
       hit: ['Hit_A'],
@@ -3921,7 +3921,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Vharok's storm shaman.
   mob_hoard_storm_caller: {
     url: `${CREATURES}/hoard_storm_caller.glb`,
-    height: 2.9,
+    height: 3.5,
     clips: {
       ...kaykit(['Spellcast_Shoot', '1H_Melee_Attack_Slice_Horizontal']),
       hit: ['Hit_A'],
@@ -3932,7 +3932,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Xarreth's bone-armoured skeleton, shield on his arm.
   mob_hoard_boneclad_warrior: {
     url: `${CREATURES}/hoard_boneclad_warrior.glb`,
-    height: 2.9,
+    height: 3.5,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Shield_Bash']),
       hit: ['Hit_A'],
@@ -3943,7 +3943,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Nyxaris's eyeless void hound. Own Blender rig and clips (scripts/assets/hoard_mobs/).
   mob_hoard_dread_stalker: {
     url: `${CREATURES}/hoard_dread_stalker.glb`,
-    height: 2.1,
+    height: 2.5,
     // The rig rests facing +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {
@@ -3961,7 +3961,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Vharok's young storm drake. Own Blender rig and clips (scripts/assets/hoard_mobs/).
   mob_hoard_stormscale_drake: {
     url: `${CREATURES}/hoard_stormscale_drake.glb`,
-    height: 2.5,
+    height: 3.0,
     // The rig rests facing +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {
@@ -3979,7 +3979,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Vysska's web-spinner: eight found legs on the side-limb rig (scripts/assets/hoard_mobs/spider_spec.py).
   mob_hoard_venom_weaver: {
     url: `${CREATURES}/hoard_venom_weaver.glb`,
-    height: 1.5,
+    height: 1.8,
     // The rig rests facing +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {
@@ -3997,7 +3997,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Vysska's nest beast, a fan of thorns down its back. Own Blender rig and clips.
   mob_hoard_thornback_stalker: {
     url: `${CREATURES}/hoard_thornback_stalker.glb`,
-    height: 2.3,
+    height: 2.8,
     // The rig rests facing +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {
@@ -4017,7 +4017,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // entity colour for the blue.
   mob_hoard_rime_elemental: {
     url: `${CREATURES}/hoard_rime_elemental.glb`,
-    height: 2.6,
+    height: 3.1,
     // The rig rests facing +x; yaw swings it onto the game's facing.
     yaw: -Math.PI / 2,
     clips: {
