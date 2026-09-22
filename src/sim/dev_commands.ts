@@ -301,9 +301,9 @@ export function handleDevChat(
     return null;
   }
 
-  const hoardMatch = /^\/dev\s+hoard(?:\s+(\S+))?\s*$/i.exec(raw);
+  const hoardMatch = /^\/dev\s+hoard(?:\s+(\S+))?(?:\s+(\S+))?\s*$/i.exec(raw);
   if (hoardMatch) {
-    handleDevHoardTravel(ctx, pid, hoardMatch[1] ?? 'list');
+    handleDevHoardTravel(ctx, pid, hoardMatch[1] ?? 'list', hoardMatch[2] ?? '');
     return null;
   }
 

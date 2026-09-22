@@ -27,6 +27,28 @@ describe('direct legendary hoard travel', () => {
     expect(devHoardDestination('unknown')).toBeNull();
   });
 
+  it('opens the same themed room at any map rarity, legendary by default', () => {
+    const sizes: Record<string, number> = { common: 0, rare: 1, epic: 2, legendary: 3 };
+    for (const [rarity, size] of Object.entries(sizes)) {
+      const at = devHoardDestination('grask', rarity as 'common')!;
+      expect(vaultSeedTier(at.seed)).toBe(size);
+      expect(at.rarity).toBe(rarity);
+      // Still Warlord Grask's room, at the rank that rarity of map opens.
+      const level = { common: 20, rare: 22, epic: 25, legendary: 28 }[rarity as 'common'];
+      expect(generateRiftFloor(at.seed, level, 0).spawns.find((sp) => sp.boss)?.templateId).toBe(
+        'rift_boss_brute',
+      );
+    }
+    const sim = makeSim();
+    sim.chat('/dev hoard grask epic');
+    const room = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    expect(room.vault?.rarity).toBe('epic');
+    expect(sim.entities.get(room.bossId!)?.templateId).toBe('rift_boss_brute');
+    // A rarity that is not one refuses rather than silently opening a legendary.
+    sim.chat('/dev hoard grask nonsense');
+    expect(sim.riftInstances.find((i) => i.partyKey !== null)).toBe(room);
+  });
+
   it('enters real legendary instances and switches bosses without spending a map', () => {
     const sim = makeSim();
     sim.chat('/dev hoard frost');
