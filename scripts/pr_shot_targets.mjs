@@ -4614,6 +4614,115 @@ export const TARGETS = [
     },
   },
   {
+    key: 'vault-search',
+    label: 'Materials Vault: the name search box narrowing a stocked list, and the no-match line',
+    // The vault_search core is the filter itself; the window mounts the box.
+    when: ['ui/vault_search', 'ui/vault_window'],
+    // Clipped to the bank window (the Vault tab is inside it): the search row
+    // and the narrowed list are the whole subject; the bags companion adds
+    // nothing here.
+    variants: [
+      { key: 'all', beforeLoad: seedClassicOnLowPreset },
+      { key: 'query', query: 'ore', beforeLoad: seedClassicOnLowPreset },
+      { key: 'nomatch', query: 'wyvern', beforeLoad: seedClassicOnLowPreset },
+      { key: 'query-mobile', query: 'ore', mobile: true, beforeLoad: seedClassicOnLowPreset },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        let rows = 0;
+        try {
+          // Stand beside the banker FIRST (the bank-vault idiom): the vault
+          // ops and the proximity snapshot are both nearBanker-gated.
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'npc' && e.templateId === 'bursar_fernando') {
+              const p = sim.entities.get(sim.playerId);
+              p.pos = { ...e.pos };
+              p.prevPos = { ...p.pos };
+              sim.rebucket(p);
+              break;
+            }
+          }
+          const meta = sim.players.get(sim.playerId);
+          meta.copper = 200000;
+          // A LONG stocked list, the report's shape ("with this many items
+          // it is hard to find my ore"): enough distinct materials that the
+          // list scrolls and a name search earns its place.
+          for (const id of [
+            'copper_ore',
+            'iron_ore',
+            'thorium_ore',
+            'rough_hide',
+            'boar_hide',
+            'homespun_cloth',
+            'spider_silk',
+            'goldleaf_herb',
+            'silverleaf_herb',
+            'sunpetal_herb',
+            'arcane_essence',
+            'arcane_dust',
+            'game_meat',
+            'venom_gland',
+          ]) {
+            try {
+              sim.addItem(id, 5);
+            } catch {}
+          }
+          sim.vaultBuyUpgrade(); // rung 0: the unlock, ceiling 40
+          sim.vaultDepositAll(); // the one batched sweep stocks the rows
+          rows = Object.keys(meta.vault.stock).length;
+        } catch {}
+        game?.hud?.openBank?.();
+        return { rows };
+      });
+      if (staged.rows < 6) throw new Error(`vault staging incomplete: ${staged.rows} rows`);
+      if (!(await pollForSize(page, '#bank-window'))) throw new Error('bank window did not open');
+      if (!(await pollForSize(page, '#bank-window .bank-tab[data-tab="vault"]'))) {
+        throw new Error('vault tab did not render');
+      }
+      await page.evaluate(() =>
+        document.querySelector('#bank-window .bank-tab[data-tab="vault"]')?.click(),
+      );
+      if (!(await pollForSize(page, '#bank-window .vault-row'))) {
+        throw new Error('vault rows did not mount');
+      }
+      await awaitWorldPainted(page);
+      await dismissEntryOverlays(page);
+      await dismissTutorialGreetingUntilSettled(page);
+      if (variant?.query) {
+        // Drive the REAL input through the keyboard (not a value poke) so the
+        // shot proves the keystroke rebuild keeps the box focused and typed.
+        const box = await page.$('#bank-window .vault-search');
+        if (!box) {
+          // The BEFORE tree has no box; shoot the unfiltered list so the
+          // pair reads as "no search here" vs "search here".
+          await wait(500);
+          return { clip: '#bank-window' };
+        }
+        await box.click();
+        await page.keyboard.type(variant.query, { delay: 60 });
+        await wait(400);
+        const state = await page.evaluate(() => ({
+          focused: document.activeElement?.classList.contains('vault-search') ?? false,
+          value: document.querySelector('#bank-window .vault-search')?.value ?? '',
+          rows: document.querySelectorAll('#bank-window .vault-row').length,
+          none: !!document.querySelector('#bank-window .vault-search-empty'),
+        }));
+        if (!state.focused || state.value !== variant.query) {
+          throw new Error(`search box lost the typed query: ${JSON.stringify(state)}`);
+        }
+        if (variant.key.startsWith('nomatch') ? !state.none : state.rows === 0) {
+          throw new Error(`search did not narrow as expected: ${JSON.stringify(state)}`);
+        }
+      }
+      await wait(500);
+      return { clip: '#bank-window' };
+    },
+  },
+  {
     key: 'bank-vault',
     label: 'Materials Vault tab: the locked unlock offer and the stocked per-material rows',
     // bank_buy_prompt is the shared confirm chrome all three bank panes

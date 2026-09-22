@@ -4054,6 +4054,8 @@ export const cs_CZ: EnTranslations = {
       "vaultTab": "Trezor",
       "vaultCapacityNote": "Každý materiál pojme až {cap}.",
       "vaultEmpty": "Tvůj trezor je prázdný. Klikni na materiál ve svých batozích, ať ho uložíš.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: uloženo {count} z {cap}",
       "vaultLockedIntro": "Odemkni Trezor materiálů a hromaď řemeslné suroviny vedle své banky. Každý materiál dostane vlastní prostor s kapacitou až {cap} kusů.",
       "vaultUnlockButton": "Odemknout Trezor materiálů",

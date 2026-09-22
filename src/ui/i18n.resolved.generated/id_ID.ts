@@ -4054,6 +4054,8 @@ export const id_ID: EnTranslations = {
       "vaultTab": "Brankas",
       "vaultCapacityNote": "Setiap material menampung hingga {cap}.",
       "vaultEmpty": "Brankasmu kosong. Klik sebuah material di tasmu untuk menyetorkannya.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count} dari {cap} tersimpan",
       "vaultLockedIntro": "Buka kunci Brankas Material untuk menimbun material kerajinan di samping bankmu. Setiap material mendapat ruangnya sendiri, hingga {cap} per jenis.",
       "vaultUnlockButton": "Buka Kunci Brankas Material",

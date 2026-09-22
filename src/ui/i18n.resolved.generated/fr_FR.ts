@@ -4054,6 +4054,8 @@ export const fr_FR: EnTranslations = {
       "vaultTab": "Réserve",
       "vaultCapacityNote": "Chaque matériau peut contenir jusqu'à {cap}.",
       "vaultEmpty": "Votre réserve est vide. Cliquez sur un matériau dans vos sacs pour le déposer.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item} : {count} sur {cap} stockés",
       "vaultLockedIntro": "Déverrouillez la Réserve de matériaux pour stocker vos matériaux d'artisanat à côté de votre banque. Chaque matériau dispose de son propre espace, jusqu'à {cap} chacun.",
       "vaultUnlockButton": "Déverrouiller la Réserve de matériaux",

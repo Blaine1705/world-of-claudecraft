@@ -4054,6 +4054,8 @@ export const pl_PL: EnTranslations = {
       "vaultTab": "Skarbiec",
       "vaultCapacityNote": "Każdy materiał mieści do {cap}.",
       "vaultEmpty": "Twój skarbiec jest pusty. Kliknij materiał w swoich torbach, aby go zdeponować.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: przechowywane {count} z {cap}",
       "vaultLockedIntro": "Odblokuj Skarbiec Materiałów, aby gromadzić materiały rzemieślnicze obok swojego banku. Każdy materiał ma swoje własne miejsce, aż do {cap} sztuk każdy.",
       "vaultUnlockButton": "Odblokuj Skarbiec Materiałów",

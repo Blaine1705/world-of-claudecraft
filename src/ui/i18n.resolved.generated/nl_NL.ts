@@ -4054,6 +4054,8 @@ export const nl_NL: EnTranslations = {
       "vaultTab": "Materialenkluis",
       "vaultCapacityNote": "Elk materiaal heeft een plafond van {cap}.",
       "vaultEmpty": "Je Materialenkluis is leeg. Klik op een materiaal in je tassen om het te storten.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count} van {cap} opgeslagen",
       "vaultLockedIntro": "Ontgrendel de Materialenkluis om ambachtsmaterialen naast je bank op te slaan. Elk materiaal krijgt zijn eigen ruimte, tot {cap} per stuk.",
       "vaultUnlockButton": "Ontgrendel de Materialenkluis",

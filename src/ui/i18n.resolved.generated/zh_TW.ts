@@ -4054,6 +4054,8 @@ export const zh_TW: EnTranslations = {
       "vaultTab": "倉庫",
       "vaultCapacityNote": "每種材料最多可存放{cap}個。",
       "vaultEmpty": "你的材料倉庫是空的。點擊背包中的材料即可存入。",
+      "vaultSearchAria": "依名稱搜尋倉庫材料",
+      "vaultSearchNoMatch": "倉庫中沒有符合搜尋的材料。",
       "vaultRowAria": "{item}：已存{count}/{cap}",
       "vaultLockedIntro": "解鎖材料倉庫，在銀行旁囤積製造材料。每種材料都有自己的空間，最多可存{cap}個。",
       "vaultUnlockButton": "解鎖材料倉庫",

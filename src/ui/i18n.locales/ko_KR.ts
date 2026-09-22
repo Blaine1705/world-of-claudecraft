@@ -11269,6 +11269,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultEmpty':
     '재료 보관소가 비어 있습니다. 가방의 재료를 클릭하면 보관할 수 있습니다.',
   'hudChrome.bank.vaultRowAria': '{item}: {count}/{cap}개 보관 중',
+  'hudChrome.bank.vaultSearchAria': '보관소 재료를 이름으로 검색',
+  'hudChrome.bank.vaultSearchNoMatch': '검색과 일치하는 재료가 보관소에 없습니다.',
   'hudChrome.bank.vaultLockedIntro':
     '재료 보관소를 개방하면 은행 옆에 제작 재료를 쌓아 둘 수 있습니다. 재료마다 전용 공간이 있으며 각각 최대 {cap}개까지 보관됩니다.',
   'hudChrome.bank.vaultUnlockButton': '재료 보관소 개방',

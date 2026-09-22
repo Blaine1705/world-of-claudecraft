@@ -10741,6 +10741,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultCapacityNote': '每种材料最多可存放{cap}个。',
   'hudChrome.bank.vaultEmpty': '你的材料仓库是空的。点击背包中的材料即可存入。',
   'hudChrome.bank.vaultRowAria': '{item}：已存{count}/{cap}',
+  'hudChrome.bank.vaultSearchAria': '按名称搜索仓库材料',
+  'hudChrome.bank.vaultSearchNoMatch': '仓库中没有与搜索匹配的材料。',
   'hudChrome.bank.vaultLockedIntro':
     '解锁材料仓库，在银行旁囤积制造材料。每种材料都有自己的空间，最多可存{cap}个。',
   'hudChrome.bank.vaultUnlockButton': '解锁材料仓库',

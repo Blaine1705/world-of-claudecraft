@@ -4054,6 +4054,8 @@ export const da_DK: EnTranslations = {
       "vaultTab": "Hvælv",
       "vaultCapacityNote": "Hvert materiale rummer op til {cap}.",
       "vaultEmpty": "Dit hvælv er tomt. Klik på et materiale i dine tasker for at indsætte det.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count} af {cap} opbevaret",
       "vaultLockedIntro": "Lås Materialehvælvet op for at oplagre håndværksmaterialer ved siden af din bank. Hvert materiale får sit eget rum, op til {cap} stykker hver.",
       "vaultUnlockButton": "Lås Materialehvælvet op",

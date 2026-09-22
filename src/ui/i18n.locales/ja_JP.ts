@@ -11297,6 +11297,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultCapacityNote': '各素材は最大{cap}個まで保管できます。',
   'hudChrome.bank.vaultEmpty': '素材保管庫は空です。バッグの素材をクリックすると預けられます。',
   'hudChrome.bank.vaultRowAria': '{item}：{count}/{cap}個保管中',
+  'hudChrome.bank.vaultSearchAria': '保管庫の素材を名前で検索',
+  'hudChrome.bank.vaultSearchNoMatch': '検索に一致する素材は保管庫にありません。',
   'hudChrome.bank.vaultLockedIntro':
     '素材保管庫を開放すると、銀行のそばに製作素材を蓄えられます。素材ごとに専用の枠があり、それぞれ最大{cap}個まで保管できます。',
   'hudChrome.bank.vaultUnlockButton': '素材保管庫を開放する',

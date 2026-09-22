@@ -4054,6 +4054,8 @@ export const pt_BR: EnTranslations = {
       "vaultTab": "Depósito",
       "vaultCapacityNote": "Cada material comporta até {cap}.",
       "vaultEmpty": "Seu depósito está vazio. Clique em um material nas suas bolsas para depositá-lo.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count} de {cap} armazenado",
       "vaultLockedIntro": "Desbloqueie o Depósito de Materiais para estocar materiais de criação ao lado do seu banco. Cada material ganha seu próprio espaço, até {cap} cada.",
       "vaultUnlockButton": "Desbloquear o Depósito de Materiais",
