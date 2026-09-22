@@ -2033,7 +2033,10 @@ const MONOLITHS: MonolithRow[] = [
     // merged count, zero slack: any further growth reds again.
     // OSSBrain integration: canvas drawing primitives moved to nameplate_paint_primitives.ts.
     // Measured after formatting; lower the ratchet with the extraction.
-    ceiling: 827,
+    // LOWERED 827 -> 826 at World PvP (PR 4146 review): the state gained the pvpFlag
+    // the name row was built with, paid for by three comment trims. Exact count
+    // (wc -l < src/render/nameplate_canvas.ts), zero slack.
+    ceiling: 826,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

@@ -79,23 +79,15 @@ export interface NameplateCanvasState {
   opacity: number;
   frame: NameplateFrame;
   comboPips: number;
-  /** The local player's OWN debuffs on this entity, filled by the painter through
-   *  nameplateDotsInto. Drawn as an icon row between the name row and the health
-   *  bar while the showNameplateDots setting is on. One plan PER PLATE (never a
-   *  shared scratch): the plan is also where a recycled slot's artwork is
-   *  invalidated, which only works when it belongs to one entity. Its slots keep
-   *  their high-water capacity, so a plate that loses a dot allocates nothing.
-   *  These are actionable timers, so no graphics tier ever sheds them (root
-   *  CLAUDE.md, gameplay-neutral graphics). */
+  /** The local player's OWN debuffs on this entity (nameplateDotsInto), an icon
+   *  row between the name row and the health bar while showNameplateDots is on.
+   *  One plan PER PLATE, never a shared scratch: a recycled slot's artwork is
+   *  invalidated here, which only works when the plan belongs to one entity; the
+   *  slots keep their high-water capacity. Actionable timers: no tier sheds them. */
   dots: NameplateDotsPlan;
   aiLabel: string;
-  /** The /pvp flag the name row was last built with (resolveContent writes it
-   *  beside the `<PvP>` tag). The painter compares it with the entity's live
-   *  flag on EVERY pass and re-resolves the row the frame they differ, so the
-   *  tag flips on the next frame on every graphics tier (the tag is the
-   *  colour-blind-safe read of an actionable cue, so it must not wait on the
-   *  tier-derived full-pass interval), while a plate that merely IS flagged
-   *  stays on the ordinary cadence and costs nothing per frame. */
+  /** The /pvp flag the name row was built with: the painter re-resolves the row
+   *  the frame the live flag differs, so the `<PvP>` tag never waits on the tier cadence. */
   pvpFlag: boolean;
   /** The operator-applied Cheater tag, already localized AND already wrapped in
    *  its `< >` form by the painter's resolveContent (its only writer, the
@@ -153,14 +145,12 @@ export function createNameplateCanvasState(): NameplateCanvasState {
 }
 
 export const NAMEPLATE_MARKER_ROW_HEIGHT = 26;
-// The surface's own defensive clamp on the backing-store ratio it is handed.
-// The POLICY that picks that ratio lives in the pure knob module under
-// src/game (nameplatePixelRatio, bounded by the renderer's effective ratio) and
-// is applied by nameplate_painter.ts; this file deliberately imports nothing
-// from there, because the deed-accent fairness guard
-// (tests/deed_border_accent.test.ts) requires every module on the plate-drawing
-// path to be free of quality-knob and governor reads. The two bounds are pinned
-// equal in tests/nameplate_paint_gate.test.ts.
+// The surface's own defensive clamp on the backing-store ratio it is handed. The
+// POLICY lives in the pure knob module under src/game (nameplatePixelRatio) and
+// is applied by nameplate_painter.ts; this file imports nothing from there, as
+// the deed-accent fairness guard (tests/deed_border_accent.test.ts) requires every
+// plate-drawing module to be free of knob and governor reads. Bounds pinned equal
+// in tests/nameplate_paint_gate.test.ts.
 export const NAMEPLATE_MAX_PIXEL_RATIO = 2;
 export const NAMEPLATE_MIN_PIXEL_RATIO = 1;
 // Nameplate labels scale their backing stores with DPR. The count remains a
