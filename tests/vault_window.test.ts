@@ -1070,10 +1070,11 @@ describe('signature-driven repaints', () => {
     expect(fresh.querySelector('.vault-row-count')?.textContent).toBe('2/40');
   });
 
-  it('a special row that is the whole material stock renders no x-count chip', () => {
+  it('a row that is the whole material stock renders no x-count chip; a split material chips every row', () => {
     // The chip would read x2 beside 2/40: the same number twice on one row.
-    // Beside pooled stock of the same material it is the only per-row count,
-    // so it stays, and the hidden aria copy always keeps the row's own count.
+    // When pooled and signed stock share a material, both rows print their
+    // own count beside the shared total. The readout and the hidden aria
+    // copy always carry the MATERIAL total, on every row, chip or not.
     const h = harness(
       vaultInfo({
         stock: { tin_ore: 5 },
@@ -1086,14 +1087,22 @@ describe('signature-driven repaints', () => {
     h.window.open();
     clickVaultTab(h);
     h.window.refreshIfChanged();
-    const rows = Array.from(h.root.querySelectorAll<HTMLElement>('.vault-row-special'));
+    const rows = Array.from(h.root.querySelectorAll<HTMLElement>('.vault-row'));
     const copper = rows.find((r) => r.dataset.itemId === 'copper_ore');
-    const tin = rows.find((r) => r.dataset.itemId === 'tin_ore');
+    const tinPooled = rows.find(
+      (r) => r.dataset.itemId === 'tin_ore' && !r.dataset.vaultSpecialIndex,
+    );
+    const tinSigned = rows.find(
+      (r) => r.dataset.itemId === 'tin_ore' && r.dataset.vaultSpecialIndex,
+    );
     expect(copper?.querySelector('.vault-row-stack-count')).toBeNull();
     expect(copper?.querySelector('.vault-row-count')?.textContent).toBe('2/40');
-    expect(copper?.textContent).toContain('2 of 40 stored');
-    expect(tin?.querySelector('.vault-row-stack-count')?.textContent).toBe('x3');
-    expect(tin?.querySelector('.vault-row-count')?.textContent).toBe('8/40');
+    expect(tinPooled?.querySelector('.vault-row-stack-count')?.textContent).toBe('x5');
+    expect(tinSigned?.querySelector('.vault-row-stack-count')?.textContent).toBe('x3');
+    expect(tinSigned?.querySelector('.vault-row-count')?.textContent).toBe('8/40');
+    expect(tinSigned?.querySelector('.visually-hidden')?.textContent).toContain(
+      ': 8 of 40 stored',
+    );
   });
 
   it('a special-row reorder repaints exact index selectors even when fingerprints duplicate', () => {
