@@ -506,7 +506,12 @@ const MONOLITHS: MonolithRow[] = [
     // guarded log() call through a thin lootReceiptBody adapter), composed
     // with the trade quantity prompt fold (18263 - 10). wc -l on the merged
     // tree. Exact count, zero slack.
-    ceiling: 18253,
+    // LOWERED 18253 -> 18235 at the Warrior presentation (PR 4139) base sync:
+    // the heal audio policy (potion cue, HoT silence, the Frenzied
+    // Regeneration exemption) moved out of the heal2 arm into
+    // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
+    // count, zero slack.
+    ceiling: 18235,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -919,7 +924,14 @@ const MONOLITHS: MonolithRow[] = [
     // CPU-hygiene review: the ranked and required view candidates share the
     // scan module's liveViewCandidate check (present, view-less, admitted),
     // which drops the coordinator's own admission call. Exact count.
-    ceiling: 12850,
+    // Warrior integration moves painter wiring and prewarm types to sibling modules.
+    // PR 4139 review-fix round: endDraw gained the matching
+    // refreshFrozenWorldMatrix guard (one line), paid for by moving the Fiesta
+    // shake math into camera_impact_core.ts (fiestaShakeX/Y); then LOWERED
+    // 12790 -> 12789 when the Warrior kit textures moved to demand loading
+    // (the boot-time sheet upload loop and its comment went, the kit host
+    // gained its assets line). Exact count.
+    ceiling: 12789,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

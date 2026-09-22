@@ -529,6 +529,8 @@ export function meleeSwing(
     // #2861: this is what left Ambush/Backstab/Sinister Strike's dedicated
     // impact cues unreachable).
     abilityId?: string | null;
+    /** An explicit cast-start cue already began this ability's performance. */
+    attackAnimationStarted?: boolean;
     // Classic instant-attack normalization (weaponStrike effect `normalized`):
     // scale the weapon-damage portion to a fixed normalized speed by weapon
     // class instead of the weapon's real speed. Only meaningful for an ability
@@ -557,6 +559,7 @@ export function meleeSwing(
       school: 'physical',
       ability: abilityName,
       kind: 'miss',
+      ...(opts.attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
     });
     ctx.enterCombat(attacker, target);
     return false;
@@ -571,6 +574,7 @@ export function meleeSwing(
       school: 'physical',
       ability: abilityName,
       kind: 'dodge',
+      ...(opts.attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
     });
     ctx.enterCombat(attacker, target);
     if (attacker.kind === 'player') attacker.overpowerUntil = ctx.time + 5;
@@ -586,6 +590,7 @@ export function meleeSwing(
       school: 'physical',
       ability: abilityName,
       kind: 'parry',
+      ...(opts.attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
     });
     ctx.enterCombat(attacker, target);
     return false;
@@ -673,7 +678,7 @@ export function meleeSwing(
       mult: (opts.threatMult ?? 1) * stoneboundThreatMultiplier(ctx, attacker),
     },
     true,
-    false,
+    opts.attackAnimationStarted ?? false,
     false,
     // Cue-presentation only on this path: onSpellCrit skips the physical
     // school, so the id can never newly arm an ability-filtered proc here.

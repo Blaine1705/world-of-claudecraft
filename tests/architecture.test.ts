@@ -621,6 +621,10 @@ const UI_PURE_CORES = [
   'src/ui/tooltip_line_core.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
+  // Which authored contact beat a damage floater rides, and how long it waits. The
+  // beat table is INJECTED by the painter (it lives in src/game, a layer a pure core
+  // may not import), so this core imports nothing at all.
+  'src/ui/fct_stage_core.ts',
   'src/ui/honor_float_view.ts',
   'src/ui/heal_landing_feedback_core.ts',
   'src/ui/block_landing_feedback_core.ts',
@@ -660,6 +664,11 @@ const UI_PURE_CORES = [
   'src/game/perf_shader_warm_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  // Warrior audio cue tables shared by game, render and ui (PR 4139): pure data
+  // plus event discriminators, no DOM, no Three.
+  'src/game/fury_audio_core.ts',
+  'src/game/warrior_control_audio_core.ts',
+  'src/game/warrior_recovery_core.ts',
   // The Toggle Friendly Nameplates view pref (Ctrl+V): module state the input
   // layer owns and the nameplate painter reads, so render imports it as a game
   // leaf the same way it reads the tier knobs. Pure: no DOM, no sim, no renderer.
@@ -700,6 +709,15 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/ability_vfx/physical_choreography_core.ts',
+  'src/render/ability_vfx/signature_core.ts',
+  'src/render/ability_vfx/warrior_attention_core.ts',
+  'src/render/ability_vfx/warrior_insult_core.ts',
+  'src/render/camera_impact_core.ts',
+  'src/render/melee_impact_core.ts',
+  'src/render/warrior_fury_state_core.ts',
+  'src/render/warrior_power_core.ts',
+  'src/render/warrior_readiness_core.ts',
   'src/render/tree_hide_index_core.ts',
   'src/render/view_candidate_scan_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
