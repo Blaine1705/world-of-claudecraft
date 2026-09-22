@@ -43,8 +43,11 @@ export const WORLD_PVP_CONFIRM_FOCUS_KEY = 'wpvp-confirm';
 /** A button that must stay in the tab order (a keyboard or screen-reader user
  *  finds the reason under it) but never act: aria-disabled, never the native
  *  attribute, which would drop it out of the focus order; wireWorldPvpPanel
- *  refuses its clicks. Styled by the shared .ui-btn[aria-disabled] rule. */
+ *  refuses its clicks. The look is the shared ui-btn--dis class, deliberately
+ *  NOT a global aria-disabled rule: the Harvest button carries aria-disabled
+ *  during its background polls while keeping its admitted appearance. */
 const INERT_ATTR = ' aria-disabled="true"';
+const INERT_CLASS = ' ui-btn--dis';
 
 /** The panel body under the title and tab strip. */
 export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
@@ -152,13 +155,13 @@ function actionHtml(view: LiveView): string {
     // dead control is never unexplained. No command hint: /pvp is refused on
     // this realm too, so pointing at it would only lead to an error line.
     return (
-      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}${INERT_ATTR}>${esc(t('hudChrome.worldPvp.enable'))}</button>` +
+      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red${INERT_CLASS}" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}${INERT_ATTR}>${esc(t('hudChrome.worldPvp.enable'))}</button>` +
       `<div class="bg-note bg-level-req">${esc(t('hudChrome.worldPvp.realmDisabled'))}</div></div>`
     );
   }
   if (view.action === 'locked') {
     return (
-      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}${INERT_ATTR}>${esc(t('hudChrome.worldPvp.enable'))}</button>` +
+      `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red${INERT_CLASS}" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}${INERT_ATTR}>${esc(t('hudChrome.worldPvp.enable'))}</button>` +
       `<div class="bg-note bg-level-req">${esc(t('hudChrome.worldPvp.levelReq', { level: num(view.stakes.minLevel) }))}</div>${hint}</div>`
     );
   }

@@ -197,6 +197,9 @@ describe('worldPvpBodyHtml', () => {
       'data-act="pvp-enable" data-focus-key="wpvp-action" aria-disabled="true"',
     );
     expect(locked).not.toMatch(/<button[^>]* disabled[ >]/);
+    // The inert look is the shared class, never a global aria-disabled rule
+    // (the Harvest button keeps its appearance under aria-disabled on purpose).
+    expect(locked).toContain('ui-btn--red ui-btn--dis');
     expect(locked).toContain(`Requires level ${WORLD_PVP_MIN_LEVEL}.`);
     expect(locked).toContain('Requires level 10.');
   });
