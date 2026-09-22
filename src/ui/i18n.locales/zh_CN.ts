@@ -775,8 +775,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceIntro': '创建新帐户，或将 Apple 关联到现有帐户。',
   'hudChrome.auth.appleChoiceExpired': 'Apple 登录已过期。请再次使用 Apple 登录。',
   'hudChrome.discord.roleTag.coredevs': '核心开发者',
-  'hudChrome.options.targetAurasBelowFrame':
-    '目标光环显示在框体下方',
+  'hudChrome.options.targetAurasBelowFrame': '目标光环显示在框体下方',
   'hudChrome.options.version': 'v{version}（{build}）',
   'auth.emailPlaceholder': 'you@example.com',
   'auth.recovery.logOut': '退出登录',

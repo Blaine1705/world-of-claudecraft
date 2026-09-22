@@ -796,8 +796,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceExpired':
     'Apple 로그인이 만료되었습니다. Apple로 다시 로그인해 주세요.',
   'hudChrome.discord.roleTag.coredevs': '핵심 개발자',
-  'hudChrome.options.targetAurasBelowFrame':
-    '대상 오라를 프레임 아래에 표시',
+  'hudChrome.options.targetAurasBelowFrame': '대상 오라를 프레임 아래에 표시',
   'hudChrome.options.version': 'v{version} ({build})',
   'auth.emailPlaceholder': 'you@example.com',
   'auth.recovery.logOut': '로그아웃',

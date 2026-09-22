@@ -796,8 +796,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceExpired':
     'Appleでのサインインの有効期限が切れました。もう一度お試しください。',
   'hudChrome.discord.roleTag.coredevs': 'コア開発者',
-  'hudChrome.options.targetAurasBelowFrame':
-    'ターゲットのオーラをフレームの下に表示',
+  'hudChrome.options.targetAurasBelowFrame': 'ターゲットのオーラをフレームの下に表示',
   'hudChrome.options.version': 'v{version} ({build})',
   'auth.emailPlaceholder': 'mail@example.com',
   'auth.recovery.logOut': 'ログアウト',
