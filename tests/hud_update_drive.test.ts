@@ -991,6 +991,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Thornhollow Fields in-match strip, the wave-respawn overlay and the spawn-protection line; the view core short-circuits an inactive match',
   },
   {
+    call: 'this.hillBar.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the King of the Hill strip while the player stands in the hill zone; the view core short-circuits to hidden with no hill or out of the zone, and the painter elides every repeat',
+  },
+  {
     call: 'this.bgKillFeed.update',
     band: 'medium',
     gate: '',
