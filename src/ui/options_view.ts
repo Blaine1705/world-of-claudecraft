@@ -562,6 +562,11 @@ export interface GraphicsSection {
   controls: OptionsControl[];
 }
 
+// Camera Ghost: how a structure in front of the camera is seen through.
+const ghostFadeOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.options.gfxGhostFadeDithered' },
+  { value: 1, labelKey: 'hudChrome.options.gfxGhostFadeSmooth' },
+];
 // The two-option Off/On ladder the per-effect binaries render with.
 const offOnOptions: ChoiceOption[] = [
   { value: 0, labelKey: 'hud.options.off' },
@@ -626,6 +631,7 @@ export function buildGraphicsSections(
     choice(s, 'viewDistance', 'hudChrome.options.gfxViewDistance', qualityLadderOptions, true),
     choice(s, 'waterQuality', 'hudChrome.options.gfxWaterQuality', qualityLadderOptions, true),
     choice(s, 'characterDetail', 'hudChrome.options.gfxCharacterDetail', lowHighOptions, true),
+    choice(s, 'ghostFade', 'hudChrome.options.gfxGhostFade', ghostFadeOptions, true),
   ];
   const lighting: OptionsControl[] = [
     choice(s, 'effectsQuality', 'hud.options.effectsQuality', highCapLadderOptions, true),

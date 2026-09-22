@@ -42,6 +42,7 @@ const mediumPreferences: GraphicsSettingsSnapshot = {
   characterDetail: 1,
   dynamicLights: 1,
   particleEffects: 1,
+  ghostFade: 1,
 };
 
 describe('GfxProfile resolution and activation', () => {

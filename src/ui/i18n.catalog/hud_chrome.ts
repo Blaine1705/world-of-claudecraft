@@ -2078,6 +2078,9 @@ export const hudChromeStrings = {
     gfxBloom: 'Bloom',
     gfxAntiAliasing: 'Anti-Aliasing',
     gfxDynamicLights: 'Dynamic Lights',
+    gfxGhostFade: 'Camera Ghost',
+    gfxGhostFadeDithered: 'Dithered',
+    gfxGhostFadeSmooth: 'Smooth',
     gfxParticleEffects: 'Particle Effects',
     gfxHalf: 'Half',
     gfxCustomNote:

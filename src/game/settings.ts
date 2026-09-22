@@ -92,6 +92,10 @@ export const SETTING_RANGES = {
   characterDetail: { min: 0, max: 1, def: 1 },
   dynamicLights: { min: 0, max: 1, def: 1 },
   particleEffects: { min: 0, max: 1, def: 1 },
+  // How a structure between the camera and the player is seen through: 0 drops
+  // pixels on a fixed pattern (the material stays opaque, so it needs no second
+  // shader program), 1 blends it translucent. Both show the same 20 percent.
+  ghostFade: { min: 0, max: 1, def: 1 },
   // vertical camera field of view in degrees. def 60 keeps the shipped look;
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.

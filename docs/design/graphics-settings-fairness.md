@@ -568,6 +568,30 @@ from spending frames during one (`src/game/frame_cadence_calm_core.ts`). The sta
 full for the HUD: the limit is never an input of `src/game/ui_effects_profile.ts` or
 `src/game/ui_tier_knobs.ts`, so no HUD knob can ever move with it.
 
+### The camera ghost is dithered on low and medium (2026-09-22)
+
+A structure or a tree that stands between the chase camera and the player turns into a
+see-through ghost. On the high tiers the ghost is a smooth blend: the material flips
+`transparent`, which three keys as a second program per hideable material, and those twin
+programs are a large share of the cold shader compile cost on Windows. On low and medium
+(`GFX.ditheredGhostFade`, the Advanced "Camera Ghost" dial `ghostFade`) the ghost is a
+screen-door stipple instead: the material stays opaque and drops fragments on a 4x4 ordered
+pattern (`src/render/occluder_dither_fade.ts` for structures,
+`src/render/instanced_dither_fade.ts` for one instance of a batch: trees, the Yumi maze
+walls, the battleground placements), so no second program exists.
+
+Why it is fair: both styles ghost the SAME occluders on the same frame test, at the same
+rest level, so what a player can see through a wall or a trunk is the same information on
+every tier. Two cosmetic things differ: the look of the ghost, and its shadow (a dithered
+instance stays in its batch and keeps casting, where the blended stand-in casts none). The dithered style never waits on a fade
+gate (there is no program to link), so its ghost is never later than the blended one, and
+it moves in one step both ways where the blended one eases over a few frames (a partly
+dense stipple reads as noise, so the dithered style takes the reduced-motion path). The
+blended tiers therefore reach the full see-through a few frames after the dithered ones:
+a cosmetic ease on the tiers that chose it, the same one the reduced-motion setting
+already removes, and never a hidden entity.
+The choice reads the static preset or the player's own dial, never the FPS governor.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
