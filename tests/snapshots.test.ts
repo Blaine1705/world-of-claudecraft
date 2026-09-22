@@ -2280,7 +2280,11 @@ describe('delta snapshots', () => {
       creditedObjects,
       puzzleVariant: 0,
     };
-    meta.worldQuestCycle = 'wq3_2';
+    // A later cycle than the first half, and one that OFFERS the salvage quest:
+    // Farshore's pool is four deep since the round-2 zone hunts, so the
+    // shipwreck sits on cycles 0, 4, 8 (an inactive quest's progress is
+    // filtered out of the self snapshot).
+    meta.worldQuestCycle = 'wq3_4';
     meta.worldQuestLog.clear();
     meta.worldQuestLog.set(salvageQuest.id, salvageProgress);
     session.selfHeavyDirty = true;

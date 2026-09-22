@@ -5,7 +5,7 @@ import {
   playerActiveWorldQuests,
   rerollWorldQuest,
 } from '../src/sim/world_quest_reroll';
-import { activeWorldQuestsForCycle } from '../src/sim/world_quest_rotation';
+import { activeWorldQuestsForCycle, WORLD_QUESTS_BY_ZONE } from '../src/sim/world_quest_rotation';
 import { restoreWorldQuestState, savedWorldQuestState } from '../src/sim/world_quest_state';
 import { awardWorldQuest } from '../src/sim/world_quests';
 
@@ -50,9 +50,15 @@ describe('World Quest Reroll Mechanism', () => {
     expect(checkCompleted.canReroll).toBe(false);
     expect(checkCompleted.reason).toBe('Completed world quests cannot be rerolled.');
 
-    // Single-quest zone without replacements reports honest unavailable state
+    // A zone with no alternative left reports the honest unavailable state.
+    // Thornpeak's pool is four deep since the round-2 zone hunts, so the other
+    // three are turned in first (a completed quest is never a reroll target).
     const thornpeakQuest = active.find((q) => q.zoneId === 'thornpeak_heights');
     if (!thornpeakQuest) throw new Error('Expected Thornpeak quest');
+    for (const id of WORLD_QUESTS_BY_ZONE.thornpeak_heights) {
+      if (id === thornpeakQuest.id) continue;
+      meta.worldQuestLog.set(id, { questId: id, count: 0, state: 'completed' });
+    }
     const checkSingle = canRerollWorldQuest(meta, thornpeakQuest.id, cycle, 20);
     expect(checkSingle.canReroll).toBe(false);
     expect(checkSingle.reason).toBe('No alternative assignments available in this zone today.');

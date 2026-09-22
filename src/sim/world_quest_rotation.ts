@@ -26,30 +26,96 @@ export const WORLD_QUEST_ZONES: readonly string[] = Object.freeze([
 ]);
 
 export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> = Object.freeze({
+  // Round 2 (2026-09): the zone hunts (content/world_quest_zone_hunts.ts) are
+  // APPENDED to each pool so the earlier entries keep their day index. A pool's
+  // length is its cycle (index = day mod length); lengths are 2, 4 or 7 only:
+  // each divides the 84-day roster period, and the legacy three-day cycle ids
+  // (wq3_N = day 3N) still reach every entry, which 3 or 6 would not. Willowfen
+  // and Palmreach stay two deep so a purse-free escort or confection quest is on
+  // the board every day (the ten-gold daily budget). tests/world_quests.test.ts
+  // pins that every quest is offered within the longest pool's cycle.
   eastbrook_vale: Object.freeze([
     'wq_eastbrook_bandits',
     'wq_eastbrook_caravan',
     'wq_eastbrook_calligraphy',
     'wq_eastbrook_shadow',
+    'wq_eastbrook_boars',
+    'wq_eastbrook_bones',
+    'wq_eastbrook_spiders',
   ]),
-  mirefen_marsh: Object.freeze(['wq_mirefen_gravecallers', 'wq_mirefen_infiltrator']),
-  thornpeak_heights: Object.freeze(['wq_thornpeak_stormcrag']),
-  veiled_hollow: Object.freeze(['wq_hollow_sporelings']),
+  mirefen_marsh: Object.freeze([
+    'wq_mirefen_gravecallers',
+    'wq_mirefen_infiltrator',
+    'wq_mirefen_widows',
+    'wq_mirefen_drowned',
+    'wq_mirefen_trolls',
+    'wq_mirefen_prowlers',
+    'wq_mirefen_murlocs',
+  ]),
+  thornpeak_heights: Object.freeze([
+    'wq_thornpeak_stormcrag',
+    'wq_thornpeak_kobolds',
+    'wq_thornpeak_ogres',
+    'wq_thornpeak_zealots',
+  ]),
+  veiled_hollow: Object.freeze([
+    'wq_hollow_sporelings',
+    'wq_hollow_glimmerwisps',
+    'wq_hollow_stags',
+    'wq_hollow_guardians',
+  ]),
   drakelands: Object.freeze([
     'wq_drakelands_brood',
     'wq_evergarden_forging',
     'wq_evergarden_cannon',
     'wq_last_keep_cannon',
+    'wq_drakelands_raiders',
+    'wq_drakelands_trolls',
+    'wq_drakelands_warcallers',
   ]),
-  frostveil: Object.freeze(['wq_frostveil_howlers', 'wq_frostveil_caravan']),
-  amberfall: Object.freeze(['wq_amberfall_lurkers']),
+  frostveil: Object.freeze([
+    'wq_frostveil_howlers',
+    'wq_frostveil_caravan',
+    'wq_frostveil_wolves',
+    'wq_frostveil_terraces',
+    'wq_frostveil_wisps',
+    'wq_frostveil_elementals',
+    'wq_frostveil_sprites',
+  ]),
+  amberfall: Object.freeze([
+    'wq_amberfall_lurkers',
+    'wq_amberfall_stags',
+    'wq_amberfall_sprites',
+    'wq_amberfall_treants',
+  ]),
   willowfen: Object.freeze(['wq_willowfen_ore', 'wq_willowfen_caravan']),
-  nightbloom: Object.freeze(['wq_nightbloom_barrow']),
-  wraithwood: Object.freeze(['wq_wraithwood_restless']),
-  palmreach: Object.freeze(['wq_palmreach_confections']),
-  evergarden: Object.freeze(['wq_evergarden_watch', 'wq_evergarden_wisp_maze']),
+  nightbloom: Object.freeze([
+    'wq_nightbloom_barrow',
+    'wq_nightbloom_grazers',
+    'wq_nightbloom_striders',
+    'wq_nightbloom_stargazers',
+  ]),
+  wraithwood: Object.freeze([
+    'wq_wraithwood_restless',
+    'wq_wraithwood_spinners',
+    'wq_wraithwood_shamblers',
+    'wq_wraithwood_huntsman',
+  ]),
+  palmreach: Object.freeze(['wq_palmreach_confections', 'wq_palmreach_scuttlers']),
+  evergarden: Object.freeze([
+    'wq_evergarden_watch',
+    'wq_evergarden_wisp_maze',
+    'wq_evergarden_wolves',
+    'wq_evergarden_gnomes',
+    'wq_evergarden_stags',
+  ]),
   galecrest: Object.freeze(['wq_galecrest_wisps', 'wq_galecrest_slalom']),
-  farshore_isle: Object.freeze(['wq_farshore_salvage']),
+  farshore_isle: Object.freeze([
+    'wq_farshore_salvage',
+    'wq_farshore_wretches',
+    'wq_farshore_riftspawn',
+    'wq_farshore_stalkers',
+  ]),
 });
 
 /** Daily activities offered alongside the ordinary zone rotation. */

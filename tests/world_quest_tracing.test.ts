@@ -348,7 +348,9 @@ describe('authoritative calligraphy world quest', () => {
 describe('calligraphy content placement and rotation', () => {
   it('offers calligraphy in its zone rotation cycle', () => {
     expect(activeWorldQuestsForCycle('wq1_2').some((q) => q.id === ID)).toBe(true);
-    expect(activeWorldQuestsForCycle('wq3_6').some((q) => q.id === ID)).toBe(true);
+    // A legacy three-day id canonicalises to day 3N: wq3_3 is day 9, and the
+    // round-2 Eastbrook pool is seven deep, so day 9 is slot 2 (calligraphy).
+    expect(activeWorldQuestsForCycle('wq3_3').some((q) => q.id === ID)).toBe(true);
     expect(activeWorldQuestsForCycle('wq1_1').some((q) => q.id === 'wq_willowfen_caravan')).toBe(
       true,
     );

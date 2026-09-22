@@ -262,9 +262,13 @@ function slateSim(level: number, seed = 4711): Sim {
   return sim;
 }
 
-/** Turns Thornpeak in through the real kill-credit path. */
+/** Turns the Thornpeak slot in through the real kill-credit path. On the
+ *  fixture day that is the Stormcrag quest; on a later cycle the zone's pool
+ *  (round 2 widened it) rotates to another Thornpeak kill quest, so the helper
+ *  completes whichever one the board offers that day. */
 function completeThornpeak(sim: Sim): SimEvent[] {
-  const quest = WORLD_QUESTS_BY_ID[THORNPEAK];
+  const active = rotatingSlots(metaOf(sim), 20).find((slot) => slot.zoneId === 'thornpeak_heights');
+  const quest = WORLD_QUESTS_BY_ID[active?.id ?? THORNPEAK];
   if (quest.objective.type !== 'kill') throw new Error('Expected a kill objective');
   const targetMobId = quest.objective.targetMobId;
   const target = [...sim.entities.values()].find(
@@ -274,8 +278,15 @@ function completeThornpeak(sim: Sim): SimEvent[] {
   target.pos.x = quest.area.x;
   target.pos.z = quest.area.z;
   const meta = metaOf(sim);
+  // Stand in the quest's own ring first: a world quest only takes credit once
+  // the player has entered it (updateWorldQuests on the tick), and the day's
+  // Thornpeak slot may sit in a different ring from the fixture's.
+  placeAt(sim, quest.area.x, quest.area.z);
+  sim.tick();
+  sim.drainEvents();
+  expect(meta.worldQuestLog.get(quest.id)?.state).toBe('active');
   for (let i = 0; i < quest.count; i++) onMobKilledForWorldQuests(sim.ctx, target, meta);
-  expect(meta.worldQuestLog.get(THORNPEAK)?.state).toBe('completed');
+  expect(meta.worldQuestLog.get(quest.id)?.state).toBe('completed');
   return sim.drainEvents();
 }
 
@@ -324,8 +335,10 @@ describe('the scroll entitlement (creditWorldQuest completion arm)', () => {
     sim.tick();
     expect(meta.worldQuestCycle).toBe(worldQuestCycleForResetDay('2026-09-01'));
     expect(meta.clueScrollCycle).toBe(firstCycle);
+    // The next day's Thornpeak slot is a different pool entry (round 2 widened
+    // the pool), so leave the ZONE's slot open, whichever quest fills it.
     for (const slot of rotatingSlots(meta, 20)) {
-      if (slot.id === THORNPEAK) continue;
+      if (slot.zoneId === 'thornpeak_heights') continue;
       meta.worldQuestLog.set(slot.id, { questId: slot.id, count: slot.count, state: 'completed' });
     }
     sim.drainEvents();
