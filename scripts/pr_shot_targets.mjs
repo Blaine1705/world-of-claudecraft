@@ -8589,6 +8589,51 @@ export const TARGETS = [
     },
   },
   {
+    key: 'reliquary-clears-heroic',
+    label: 'The Reliquary: Hollow Crypt page meter after four Heroic clears',
+    when: ['sim/content/reliquary', 'sim/reliquary'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      // The player report: a Heroic-farmed five-man page whose relics all
+      // drop on Heroic. Seed four Heroic clears and no Normal clear, plus
+      // four of the five relics, then open the page so the "N clears" meter
+      // is the shot. BEFORE reads 0 (the Normal-only filter); AFTER reads 4.
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const meta = sim?.primary;
+        if (meta?.deedStats) {
+          meta.deedStats.dungeonClears['hollow_crypt:heroic'] = 4;
+          for (const id of [
+            'cryptbone_greaves',
+            'cryptbone_pauldrons',
+            'greyjaw_hide_boots',
+            'gravewoven_bag',
+          ]) {
+            meta.deedStats.itemsDiscovered.add(id);
+          }
+        }
+        game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        document.querySelector('#reliquary-window [data-nav="conquerors"]')?.click();
+      });
+      await wait(300);
+      await page.evaluate(() => {
+        document.querySelector('#reliquary-window [data-page="conquerors_hollow_crypt"]')?.click();
+      });
+      await wait(400);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
     key: 'reliquary-overview-fresh',
     label: 'The Reliquary: fresh-character Overview (strip hints + shelf cards)',
     when: ['ui/reliquary_view', 'ui/reliquary_window'],

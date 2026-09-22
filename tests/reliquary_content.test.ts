@@ -626,7 +626,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(page.clearSource).toEqual({
       kind: 'dungeon',
       dungeonId: 'hollow_crypt',
-      difficulty: 'normal',
+      difficulty: 'any',
     });
     const relics = itemRelicIds(page);
     expect(relics).toContain('cryptbone_helm');
@@ -836,6 +836,89 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
   });
 });
 
+describe('Reliquary dungeon clear meters count every difficulty that pays the page', () => {
+  // A page's clear meter is a count of runs at the page's spoils. A Normal-only
+  // filter is honest only where Heroic cannot pay the whole page (a normalOnly
+  // row with no heroic counterpart); everywhere Heroic drops every relic, a
+  // Heroic run IS a run at the page and the meter counts both difficulties.
+  // Player report: Heroic Hollow Crypt runs left "N clears" unmoved while
+  // filling the five relics. Derived from the live tables, so a new page or a
+  // new normalOnly row re-decides its own filter here.
+  const heroicPaid = new Set<string>();
+  for (const rows of Object.values(HEROIC_BOSS_LOOT)) {
+    for (const row of rows) {
+      if (!row.itemId) continue;
+      heroicPaid.add(row.itemId);
+      const base = ITEMS[row.itemId]?.heroicOf;
+      if (base) heroicPaid.add(base);
+    }
+  }
+  function heroicPays(itemId: string): boolean {
+    if (heroicPaid.has(itemId) || heroicPaid.has(`heroic_${itemId}`)) return true;
+    // A base-table row that is not normalOnly rolls on a heroic claim too.
+    for (const mob of Object.values(MOBS)) {
+      for (const row of mob.loot ?? []) {
+        if (row.itemId === itemId && row.normalOnly !== true) return true;
+      }
+    }
+    return false;
+  }
+  function normalPays(itemId: string): boolean {
+    for (const mob of Object.values(MOBS)) {
+      for (const row of mob.loot ?? []) if (row.itemId === itemId) return true;
+    }
+    return false;
+  }
+  const dungeonPages = RELIQUARY_PAGES.filter(
+    (p) => p.clearSource?.kind === 'dungeon' && p.clearSource.difficulty !== 'heroic',
+  );
+
+  it('sweeps at least the five five-man pages and the three raid pages', () => {
+    expect(dungeonPages.length).toBeGreaterThanOrEqual(8);
+  });
+
+  it("an 'any' meter is only authored where Heroic and Normal both pay every relic", () => {
+    for (const page of dungeonPages) {
+      if (page.clearSource?.kind !== 'dungeon' || page.clearSource.difficulty !== 'any') continue;
+      for (const id of itemRelicIds(page)) {
+        expect(heroicPays(id), `${page.id}: Heroic never pays ${id}`).toBe(true);
+        expect(normalPays(id), `${page.id}: Normal never pays ${id}`).toBe(true);
+      }
+    }
+  });
+
+  it("a 'normal' meter is only authored where Heroic cannot pay the whole page", () => {
+    for (const page of dungeonPages) {
+      if (page.clearSource?.kind !== 'dungeon' || page.clearSource.difficulty !== 'normal') {
+        continue;
+      }
+      const unpaid = itemRelicIds(page).filter((id) => !heroicPays(id));
+      expect(
+        unpaid.length,
+        `${page.id}: Heroic pays every relic, so its Heroic runs must count on the meter (difficulty 'any')`,
+      ).toBeGreaterThan(0);
+    }
+  });
+
+  it('the five-man and Nythraxis pages count both difficulties; the Crucible raid pages keep the Normal filter', () => {
+    const byId = Object.fromEntries(
+      dungeonPages.map((p) => [
+        p.id,
+        p.clearSource?.kind === 'dungeon' ? p.clearSource.difficulty : undefined,
+      ]),
+    );
+    expect(byId.conquerors_hollow_crypt).toBe('any');
+    expect(byId.conquerors_sunken_bastion).toBe('any');
+    expect(byId.conquerors_drowned_temple).toBe('any');
+    expect(byId.conquerors_gravewyrm_sanctum).toBe('any');
+    expect(byId.conquerors_wildheart_basin).toBe('any');
+    // The raid shares its first pool across both difficulties, so it counts both.
+    expect(byId.conquerors_nythraxis).toBe('any');
+    expect(byId.conquerors_ignivar).toBe('normal');
+    expect(byId.conquerors_varkhul).toBe('normal');
+  });
+});
+
 describe('Reliquary clear sources map to live content', () => {
   it('dungeon clear sources reference real DUNGEONS ids', () => {
     for (const page of RELIQUARY_PAGES) {
@@ -902,11 +985,13 @@ describe('Reliquary clear sources map to live content', () => {
       'nythraxis_boss_arena',
     ];
     for (const dungeonId of required) {
+      // The base-spoils page: 'normal' on the raids, 'any' on the five-mans
+      // whose Heroic claim pays the same relics (the clear-meter rule below).
       const normal = RELIQUARY_PAGES.filter(
         (p) =>
           p.clearSource?.kind === 'dungeon' &&
           p.clearSource.dungeonId === dungeonId &&
-          p.clearSource.difficulty === 'normal',
+          p.clearSource.difficulty !== 'heroic',
       );
       const heroic = RELIQUARY_PAGES.filter(
         (p) =>
@@ -2020,7 +2105,7 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
 });
 
 describe('Reliquary growth sweeps (new content must page or opt out)', () => {
-  it('every dungeon whose mobs carry rare+ loot maps to a normal-difficulty page', () => {
+  it('every dungeon whose mobs carry rare+ loot maps to a base-spoils page', () => {
     // Add a `dungeonId: 'rationale'` row here only when a dungeon's rare+
     // drops deliberately stay out of the museum. Empty since the Crucible
     // raid pages landed (the PRD obligations closeout); the mechanism stays
@@ -2029,7 +2114,8 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
     const pageByDungeon = new Map<string, string>();
     for (const page of RELIQUARY_PAGES) {
       const src = page.clearSource;
-      if (src?.kind === 'dungeon' && src.difficulty === 'normal') {
+      // The base-spoils page ('normal' or 'any'), never the heroic-only page.
+      if (src?.kind === 'dungeon' && src.difficulty !== 'heroic') {
         pageByDungeon.set(src.dungeonId, page.id);
       }
     }
