@@ -8885,6 +8885,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.bank.vaultLockedIntro'
   | 'hudChrome.bank.vaultRowAria'
   | 'hudChrome.bank.vaultRowWithdrawName'
+  | 'hudChrome.bank.vaultSearchAria'
+  | 'hudChrome.bank.vaultSearchNoMatch'
   | 'hudChrome.bank.vaultTab'
   | 'hudChrome.bank.vaultUnlockButton'
   | 'hudChrome.bank.vaultUnlockConfirm'

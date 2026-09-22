@@ -4048,6 +4048,8 @@ export const vi_VN: EnTranslations = {
       "vaultTab": "Kho",
       "vaultCapacityNote": "Mỗi loại nguyên liệu chứa tối đa {cap}.",
       "vaultEmpty": "Kho của bạn đang trống. Nhấp vào một nguyên liệu trong túi đồ để gửi nó vào.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count} trên {cap} đã lưu trữ",
       "vaultLockedIntro": "Mở khóa Kho Nguyên Liệu để tích trữ nguyên liệu chế tác bên cạnh ngân hàng của bạn. Mỗi loại nguyên liệu có không gian riêng, tối đa {cap} mỗi loại.",
       "vaultUnlockButton": "Mở Khóa Kho Nguyên Liệu",

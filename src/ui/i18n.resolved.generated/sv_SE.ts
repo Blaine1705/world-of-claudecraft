@@ -4048,6 +4048,8 @@ export const sv_SE: EnTranslations = {
       "vaultTab": "Valv",
       "vaultCapacityNote": "Varje material rymmer upp till {cap}.",
       "vaultEmpty": "Ditt valv är tomt. Klicka på ett material i dina väskor för att sätta in det.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count} av {cap} förvarade",
       "vaultLockedIntro": "Lås upp Materialvalvet för att lagra hantverksmaterial vid sidan av din bank. Varje material får sitt eget utrymme, upp till {cap} styck.",
       "vaultUnlockButton": "Lås upp Materialvalvet",

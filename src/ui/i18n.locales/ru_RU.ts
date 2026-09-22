@@ -11367,6 +11367,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultEmpty':
     'Ваше хранилище пусто. Щелкните по материалу в сумке, чтобы поместить его сюда.',
   'hudChrome.bank.vaultRowAria': '{item}: хранится {count} из {cap}',
+  'hudChrome.bank.vaultSearchAria': 'Искать материалы в хранилище по названию',
+  'hudChrome.bank.vaultSearchNoMatch': 'В вашем хранилище нет материалов, соответствующих запросу.',
   'hudChrome.bank.vaultLockedIntro':
     'Откройте хранилище материалов, чтобы запасать ремесленные материалы рядом с банком. У каждого материала свое место, до {cap} шт.',
   'hudChrome.bank.vaultUnlockButton': 'Открыть хранилище материалов',

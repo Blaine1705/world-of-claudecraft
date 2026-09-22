@@ -5788,6 +5788,11 @@ export const hudChromeStrings = {
     vaultTab: 'Vault',
     vaultCapacityNote: 'Each material holds up to {cap}.',
     vaultEmpty: 'Your vault is empty. Click a material in your bags to deposit it.',
+    // The Materials Vault tab's name search (vault_window.ts): the box reuses
+    // the bags' searchPlaceholder, so only its own aria and the filtered-out
+    // line are minted here. (The five non-Latin fills land in this change.)
+    vaultSearchAria: 'Search vault materials by name',
+    vaultSearchNoMatch: 'No material in your vault matches your search.',
     vaultRowAria: '{item}: {count} of {cap} stored',
     vaultLockedIntro:
       'Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to {cap} apiece.',

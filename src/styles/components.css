@@ -9556,6 +9556,15 @@
   .vault-cap-note {
     text-align: left;
   }
+  /* The vault's name search (vault_window.ts): one `.bag-search` input in the
+     shared .bag-tools row, the personal bank's toolbar shape minus chips and
+     sort, so the family CSS above (and #bank-window's revert-layer rules) carry
+     its look, and BankWindow's search focus carry reaches it. Sits between the
+     cap note and the scroller as a rigid band; the list still scrolls. */
+  .vault-tools {
+    flex: none;
+    margin-bottom: 6px;
+  }
   .vault-list {
     display: flex;
     flex-direction: column;

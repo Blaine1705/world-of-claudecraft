@@ -4048,6 +4048,8 @@ export const it_IT: EnTranslations = {
       "vaultTab": "Caveau",
       "vaultCapacityNote": "Ogni materiale può contenerne fino a {cap}.",
       "vaultEmpty": "Il tuo caveau è vuoto. Clicca su un materiale nelle tue borse per depositarlo.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count} di {cap} conservati",
       "vaultLockedIntro": "Sblocca il Caveau dei Materiali per accumulare materiali da lavorazione accanto alla tua banca. Ogni materiale ha il proprio spazio, fino a {cap} ciascuno.",
       "vaultUnlockButton": "Sblocca il Caveau dei Materiali",

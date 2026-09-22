@@ -4048,6 +4048,8 @@ export const ja_JP: EnTranslations = {
       "vaultTab": "保管庫",
       "vaultCapacityNote": "各素材は最大{cap}個まで保管できます。",
       "vaultEmpty": "素材保管庫は空です。バッグの素材をクリックすると預けられます。",
+      "vaultSearchAria": "保管庫の素材を名前で検索",
+      "vaultSearchNoMatch": "検索に一致する素材は保管庫にありません。",
       "vaultRowAria": "{item}：{count}/{cap}個保管中",
       "vaultLockedIntro": "素材保管庫を開放すると、銀行のそばに製作素材を蓄えられます。素材ごとに専用の枠があり、それぞれ最大{cap}個まで保管できます。",
       "vaultUnlockButton": "素材保管庫を開放する",

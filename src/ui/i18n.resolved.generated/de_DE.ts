@@ -4048,6 +4048,8 @@ export const de_DE: EnTranslations = {
       "vaultTab": "Tresor",
       "vaultCapacityNote": "Jedes Material fasst bis zu {cap}.",
       "vaultEmpty": "Dein Tresor ist leer. Klicke ein Material in deinen Taschen an, um es einzulagern.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count} von {cap} eingelagert",
       "vaultLockedIntro": "Schalte den Materialtresor frei, um Handwerksmaterialien neben deiner Bank zu horten. Jedes Material erhält einen eigenen Platz, mit bis zu {cap} Stück je Material.",
       "vaultUnlockButton": "Materialtresor freischalten",

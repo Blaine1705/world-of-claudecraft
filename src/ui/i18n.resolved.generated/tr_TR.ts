@@ -4048,6 +4048,8 @@ export const tr_TR: EnTranslations = {
       "vaultTab": "Kasa",
       "vaultCapacityNote": "Her malzeme en fazla {cap} adet tutar.",
       "vaultEmpty": "Kasan boş. Yatırmak için çantalarındaki bir malzemeye tıkla.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}, {cap} üzerinden {count} depolandı",
       "vaultLockedIntro": "Zanaat malzemelerini bankanın yanında biriktirmek için Malzeme Kasasının kilidini aç. Her malzeme, kendi başına {cap} adede kadar kendi bölmesini alır.",
       "vaultUnlockButton": "Malzeme Kasasının Kilidini Aç",

@@ -4048,6 +4048,8 @@ export const es_ES: EnTranslations = {
       "vaultTab": "Bóveda",
       "vaultCapacityNote": "Cada material admite hasta {cap}.",
       "vaultEmpty": "Tu bóveda está vacía. Haz clic en un material de tus bolsas para depositarlo.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count} de {cap} almacenados",
       "vaultLockedIntro": "Desbloquea la Bóveda de Materiales para acumular materiales de elaboración junto a tu banco. Cada material tiene su propio espacio, hasta {cap} de cada uno.",
       "vaultUnlockButton": "Desbloquear la Bóveda de Materiales",
