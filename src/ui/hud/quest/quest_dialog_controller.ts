@@ -17,6 +17,7 @@ import { t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
 import type { PainterHostPresentation } from '../../painter_host';
+import { clueHuntTitle } from '../../quest_event_view';
 import { svgIcon } from '../../ui_icons';
 import {
   isWorldQuestInstructorOrEscort,
@@ -31,6 +32,7 @@ import { archetypeImageUrl } from '../professions/profession_art';
 import { buildAttunementPreview } from '../professions/profession_identity_view';
 import { isStationMasterNpc } from '../vendor/train_view';
 import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
+import { clueTalkHuntFor } from './clue_talk_row_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
@@ -371,6 +373,9 @@ export class QuestDialogController {
         ),
       )
       .map((progress) => progress.questId);
+    // An active Clue Scroll step that names this NPC (a talk or a delivery):
+    // its own discuss row, since opening this window never reaches the sim.
+    const clueTalkHunt = clueTalkHuntFor(world.clueHunt, npc.templateId);
     // The WARFARE quartermaster REPLACES the generic goods row with its sectioned
     // window (gated on the NpcDef flag, never a hard-coded id).
     //
@@ -424,7 +429,7 @@ export class QuestDialogController {
       closeIfEmpty &&
       gossipMenuIsEmpty({
         questCount: interesting.length,
-        discussionCount: discussionQuests.length,
+        discussionCount: discussionQuests.length + (clueTalkHunt ? 1 : 0),
         hasVendor,
         hasMarket,
         hasHeroicVendor,
@@ -487,6 +492,10 @@ export class QuestDialogController {
     for (const questId of discussionQuests) {
       const title = this.deps.text.questTitle(questId);
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-discuss="${esc(questId)}" aria-label="${esc(t('questUi.dialog.discussQuestAria', { name: title }))}"><span class="gold">?</span> ${esc(t('questUi.dialog.discussQuest', { name: title }))}</button>`;
+    }
+    if (clueTalkHunt) {
+      const title = clueHuntTitle(clueTalkHunt);
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-clue-talk="${esc(clueTalkHunt)}" aria-label="${esc(t('questUi.dialog.discussQuestAria', { name: title }))}"><span class="gold">?</span> ${esc(t('questUi.dialog.discussQuest', { name: title }))}</button>`;
     }
     if (hasVendor) {
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${currencyIconHtml('coin_gold')} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
@@ -554,14 +563,17 @@ export class QuestDialogController {
     this.deps.element.querySelectorAll<HTMLElement>('[data-quest]').forEach((item) => {
       item.addEventListener('click', () => this.renderQuestDetail(npc, item.dataset.quest ?? ''));
     });
-    this.deps.element.querySelectorAll<HTMLButtonElement>('[data-discuss]').forEach((item) => {
-      item.addEventListener('click', () => {
-        const liveWorld = this.deps.world();
-        liveWorld.targetEntity(npc.id);
-        liveWorld.interact();
-        item.disabled = true;
+    // The clue talk and the quest discussion send the same sim talk.
+    this.deps.element
+      .querySelectorAll<HTMLButtonElement>('[data-discuss], [data-clue-talk]')
+      .forEach((item) => {
+        item.addEventListener('click', () => {
+          const liveWorld = this.deps.world();
+          liveWorld.targetEntity(npc.id);
+          liveWorld.interact();
+          item.disabled = true;
+        });
       });
-    });
     this.bindRoute('[data-vendor]', (opener) => this.deps.openVendor(npc.id, opener));
     this.bindRoute('[data-heroic-shop]', (opener) => this.deps.openHeroicVendor(npc.id, opener));
     this.bindRoute('[data-crucible-shop]', (opener) =>
