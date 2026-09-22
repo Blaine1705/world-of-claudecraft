@@ -24,6 +24,7 @@ const ALL_REASONS: HonorReason[] = [
   'battleground_assist',
   'world_kill',
   'world_assist',
+  'hill_hold',
 ];
 
 // The two the drip pays plus the once-a-day bonus (which lands in the same
@@ -37,6 +38,7 @@ const NAMED: HonorReason[] = [
   'battleground_first_win',
   'world_kill',
   'world_assist',
+  'hill_hold',
 ];
 const PLAIN = ALL_REASONS.filter((r) => !NAMED.includes(r));
 

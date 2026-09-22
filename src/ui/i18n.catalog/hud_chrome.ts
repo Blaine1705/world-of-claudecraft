@@ -2848,6 +2848,7 @@ export const hudChromeStrings = {
       battlegroundAssist: 'killing blow assisted',
       worldKill: 'world kill',
       worldAssist: 'world kill assisted',
+      hillHold: 'holding the hill',
     },
     // Short labels for the floating text over your own character. Kept apart from
     // `reasons` above, which are mid-sentence fragments for the chat line.
@@ -2855,6 +2856,7 @@ export const hudChromeStrings = {
       kill: 'Kill',
       assist: 'Assist',
       firstWin: 'First Win',
+      hill: 'Hill',
     },
   },
   // The World PvP tab of the merged PvP window (src/ui/hud/world_pvp/): the
@@ -2911,6 +2913,24 @@ export const hudChromeStrings = {
     levelReq: 'Requires level {level}.',
     pending: 'Waiting for your PvP status from the realm.',
     commandHint: 'Chat: /pvp toggles the flag, /pvp on and /pvp off set it.',
+  },
+  // King of the Hill (src/ui/hud/hill/): the in-zone bar over the standing
+  // hill. Every number is a resolved value from src/sim/pvp/hill_rules.ts.
+  hill: {
+    title: 'King of the Hill',
+    heldYou: 'Your group holds the hill',
+    heldOther: 'Another group holds the hill',
+    heldNone: 'Nobody holds the hill',
+    counts: 'Inside: you {yours}, holder {theirs}',
+    countsUnheld: 'Inside: you {yours}, largest rival {theirs}',
+    countsHolding: 'Inside: you {yours}, rival {theirs}',
+    contestYou: 'Taking the hill: {seconds} of {total}',
+    contestOther: 'Losing the hill: {seconds} of {total}',
+    contestNone: 'Hold a majority inside for {total} to take it',
+    inside: 'You are inside the circle',
+    distance: '{yards} yd to the circle',
+    moves: 'Moves in {minutes}',
+    honorNote: '{honor} Honor a minute to each holder inside, up to {max} of you',
   },
   // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
   // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings

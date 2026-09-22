@@ -32,6 +32,8 @@ export const HONOR_FLOAT_REASON_KEYS: Partial<Record<HonorReason, TranslationKey
   // with the same two short labels.
   world_kill: 'hudChrome.warfare.floatReasons.kill',
   world_assist: 'hudChrome.warfare.floatReasons.assist',
+  // King of the Hill: the once-a-minute trickle names the hill.
+  hill_hold: 'hudChrome.warfare.floatReasons.hill',
 };
 
 /** The float's short reason label key, or null when this gain floats plain. */
