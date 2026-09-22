@@ -844,33 +844,43 @@ describe('Reliquary dungeon clear meters count every difficulty that pays the pa
   // Player report: Heroic Hollow Crypt runs left "N clears" unmoved while
   // filling the five relics. Derived from the live tables, so a new page or a
   // new normalOnly row re-decides its own filter here.
-  const heroicPaid = new Set<string>();
-  for (const rows of Object.values(HEROIC_BOSS_LOOT)) {
-    for (const row of rows) {
-      if (!row.itemId) continue;
-      heroicPaid.add(row.itemId);
-      const base = ITEMS[row.itemId]?.heroicOf;
-      if (base) heroicPaid.add(base);
-    }
-  }
-  function heroicPays(itemId: string): boolean {
-    if (heroicPaid.has(itemId) || heroicPaid.has(`heroic_${itemId}`)) return true;
-    // A base-table row that is not normalOnly rolls on a heroic claim too.
-    for (const mob of Object.values(MOBS)) {
-      for (const row of mob.loot ?? []) {
+  // Scoped to the PAGE'S OWN dungeon: a Heroic claim in this dungeon pays a
+  // relic when one of its mobs carries a non-normalOnly base row, or its
+  // HEROIC_BOSS_LOOT append carries the id (or a heroic_<base> variant that
+  // folds back to it), or a ground object of the dungeon yields it. An
+  // unrelated outdoor mob or another boss's heroic table says nothing here.
+  function heroicPays(dungeonId: string, itemId: string): boolean {
+    if (dungeonObjectItemIds(dungeonId).includes(itemId)) return true;
+    for (const mobId of dungeonMobIds(dungeonId)) {
+      for (const row of MOBS[mobId]?.loot ?? []) {
         if (row.itemId === itemId && row.normalOnly !== true) return true;
+      }
+      for (const row of HEROIC_BOSS_LOOT[mobId] ?? []) {
+        if (!row.itemId) continue;
+        if (row.itemId === itemId || ITEMS[row.itemId]?.heroicOf === itemId) return true;
       }
     }
     return false;
   }
-  function normalPays(itemId: string): boolean {
-    for (const mob of Object.values(MOBS)) {
-      for (const row of mob.loot ?? []) if (row.itemId === itemId) return true;
+  function normalPays(dungeonId: string, itemId: string): boolean {
+    if (dungeonObjectItemIds(dungeonId).includes(itemId)) return true;
+    for (const mobId of dungeonMobIds(dungeonId)) {
+      for (const row of MOBS[mobId]?.loot ?? []) if (row.itemId === itemId) return true;
     }
     return false;
   }
-  const dungeonPages = RELIQUARY_PAGES.filter(
-    (p) => p.clearSource?.kind === 'dungeon' && p.clearSource.difficulty !== 'heroic',
+  // An omitted difficulty reads as 'any' at runtime (dungeonClearCount sums
+  // both keys), so the arms normalize it rather than skipping the page.
+  const dungeonPages = RELIQUARY_PAGES.flatMap((p) =>
+    p.clearSource?.kind === 'dungeon' && p.clearSource.difficulty !== 'heroic'
+      ? [
+          {
+            page: p,
+            dungeonId: p.clearSource.dungeonId,
+            difficulty: p.clearSource.difficulty ?? ('any' as const),
+          },
+        ]
+      : [],
   );
 
   it('sweeps at least the five five-man pages and the three raid pages', () => {
@@ -878,21 +888,19 @@ describe('Reliquary dungeon clear meters count every difficulty that pays the pa
   });
 
   it("an 'any' meter is only authored where Heroic and Normal both pay every relic", () => {
-    for (const page of dungeonPages) {
-      if (page.clearSource?.kind !== 'dungeon' || page.clearSource.difficulty !== 'any') continue;
+    for (const { page, dungeonId, difficulty } of dungeonPages) {
+      if (difficulty !== 'any') continue;
       for (const id of itemRelicIds(page)) {
-        expect(heroicPays(id), `${page.id}: Heroic never pays ${id}`).toBe(true);
-        expect(normalPays(id), `${page.id}: Normal never pays ${id}`).toBe(true);
+        expect(heroicPays(dungeonId, id), `${page.id}: Heroic never pays ${id}`).toBe(true);
+        expect(normalPays(dungeonId, id), `${page.id}: Normal never pays ${id}`).toBe(true);
       }
     }
   });
 
   it("a 'normal' meter is only authored where Heroic cannot pay the whole page", () => {
-    for (const page of dungeonPages) {
-      if (page.clearSource?.kind !== 'dungeon' || page.clearSource.difficulty !== 'normal') {
-        continue;
-      }
-      const unpaid = itemRelicIds(page).filter((id) => !heroicPays(id));
+    for (const { page, dungeonId, difficulty } of dungeonPages) {
+      if (difficulty !== 'normal') continue;
+      const unpaid = itemRelicIds(page).filter((id) => !heroicPays(dungeonId, id));
       expect(
         unpaid.length,
         `${page.id}: Heroic pays every relic, so its Heroic runs must count on the meter (difficulty 'any')`,
@@ -901,12 +909,7 @@ describe('Reliquary dungeon clear meters count every difficulty that pays the pa
   });
 
   it('the five-man and Nythraxis pages count both difficulties; the Crucible raid pages keep the Normal filter', () => {
-    const byId = Object.fromEntries(
-      dungeonPages.map((p) => [
-        p.id,
-        p.clearSource?.kind === 'dungeon' ? p.clearSource.difficulty : undefined,
-      ]),
-    );
+    const byId = Object.fromEntries(dungeonPages.map((d) => [d.page.id, d.difficulty]));
     expect(byId.conquerors_hollow_crypt).toBe('any');
     expect(byId.conquerors_sunken_bastion).toBe('any');
     expect(byId.conquerors_drowned_temple).toBe('any');
