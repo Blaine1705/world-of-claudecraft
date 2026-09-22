@@ -295,7 +295,7 @@ describe('tick perf capture lifecycle', () => {
     }
   });
 
-  it('registers the 32 base lap names first, then the 13 mob-family buckets', () => {
+  it('registers the 34 base lap names first, then the 13 mob-family buckets', () => {
     // Literal pins: the registry is built by mapping the base names plus the buckets
     // through `sim.${n}`, so comparing these literals against the derived array proves
     // the mapping, not a constant against itself.
@@ -326,6 +326,7 @@ describe('tick perf capture lifecycle', () => {
       'sim.delves',
       'sim.valecup',
       'sim.battleground',
+      'sim.worldPvp',
       'sim.dfinder',
       'sim.market',
       'sim.postOffice',
@@ -349,12 +350,12 @@ describe('tick perf capture lifecycle', () => {
       'sim.mob.update|reptile',
       'sim.mob.update|other',
     ];
-    expect(base).toHaveLength(33);
+    expect(base).toHaveLength(34);
     expect(buckets).toHaveLength(13);
     // Base names are byte-identical and first; the buckets are appended after and
     // nothing else, so every registered name still reaches the TickProfiler ctor.
-    expect(SIM_LAP_PHASES.slice(0, 33)).toEqual(base);
-    expect(SIM_LAP_PHASES.slice(33)).toEqual(buckets);
+    expect(SIM_LAP_PHASES.slice(0, 34)).toEqual(base);
+    expect(SIM_LAP_PHASES.slice(34)).toEqual(buckets);
     // Each bucket is registered (present in the set the ctor pre-registers).
     const registered = new Set(SIM_LAP_PHASES);
     for (const name of buckets) {
