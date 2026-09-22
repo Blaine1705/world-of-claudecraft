@@ -1067,7 +1067,40 @@ describe('signature-driven repaints', () => {
 
     const fresh = h.root.querySelector('.vault-row-special') as HTMLElement;
     expect(fresh.dataset.probe).toBeUndefined();
-    expect(fresh.querySelector('.vault-row-stack-count')?.textContent).toContain('2');
+    expect(fresh.querySelector('.vault-row-count')?.textContent).toBe('2/40');
+  });
+
+  it('a row that is the whole material stock renders no x-count chip; a split material chips every row', () => {
+    // The chip would read x2 beside 2/40: the same number twice on one row.
+    // When pooled and signed stock share a material, both rows print their
+    // own count beside the shared total. The readout and the hidden aria
+    // copy always carry the MATERIAL total, on every row, chip or not.
+    const h = harness(
+      vaultInfo({
+        stock: { tin_ore: 5 },
+        special: [
+          { itemId: 'copper_ore', count: 2, instance: { signer: 'Ada' } },
+          { itemId: 'tin_ore', count: 3, instance: { signer: 'Ada' } },
+        ],
+      }),
+    );
+    h.window.open();
+    clickVaultTab(h);
+    h.window.refreshIfChanged();
+    const rows = Array.from(h.root.querySelectorAll<HTMLElement>('.vault-row'));
+    const copper = rows.find((r) => r.dataset.itemId === 'copper_ore');
+    const tinPooled = rows.find(
+      (r) => r.dataset.itemId === 'tin_ore' && !r.dataset.vaultSpecialIndex,
+    );
+    const tinSigned = rows.find(
+      (r) => r.dataset.itemId === 'tin_ore' && r.dataset.vaultSpecialIndex,
+    );
+    expect(copper?.querySelector('.vault-row-stack-count')).toBeNull();
+    expect(copper?.querySelector('.vault-row-count')?.textContent).toBe('2/40');
+    expect(tinPooled?.querySelector('.vault-row-stack-count')?.textContent).toBe('x5');
+    expect(tinSigned?.querySelector('.vault-row-stack-count')?.textContent).toBe('x3');
+    expect(tinSigned?.querySelector('.vault-row-count')?.textContent).toBe('8/40');
+    expect(tinSigned?.querySelector('.visually-hidden')?.textContent).toContain(': 8 of 40 stored');
   });
 
   it('a special-row reorder repaints exact index selectors even when fingerprints duplicate', () => {
