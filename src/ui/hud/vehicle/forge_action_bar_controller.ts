@@ -55,8 +55,16 @@ export class ForgeActionBarController {
     private readonly padKind: () => GamepadKind = () => 'generic',
     private readonly now: () => number = () => performance.now(),
   ) {
+    // The centred `.window panel` family (styles/layout.css), the same shell
+    // the confection and ley puzzle windows compose: absolute, horizontally
+    // centred in the upper third, z-index above the HUD bars. It used to be a
+    // `.vehicle-bar`, the bottom-pinned family the cannon and glider bars use,
+    // which sat on the unit frames and the action bar (2026-09-22 playtest).
+    // The forge minigame is a reaction game played inside the panel, not a
+    // piloting HUD, so it belongs with the puzzle windows. (The id and the
+    // className stay adjacent: tests/mobile_window_coverage.test.ts pairs them.)
     this.root.id = 'forge-action-bar';
-    this.root.className = 'vehicle-bar forge-action-bar';
+    this.root.className = 'window panel forge-action-bar';
     this.title.className = 'vehicle-bar-title';
     this.status.className = 'vehicle-bar-status';
     this.hint.className = 'vehicle-bar-hint';
@@ -136,7 +144,6 @@ export class ForgeActionBarController {
     if (active !== this.active) {
       this.active = active;
       if (active) for (const controller of this.cancelOnEnter) controller.cancel();
-      this.writers.toggleClass(document.body, 'working-forge', active);
       this.writers.setDisplay(this.root, active ? 'grid' : 'none');
     }
     if (!active) return;

@@ -42,6 +42,16 @@
   body.mobile-touch .vehicle-action-slots {
     gap: 6px;
   }
+  /* The forge workshop panel (a .window family member, not a vehicle bar): on
+     touch it sits at the top like the puzzle window, clear of the action ring
+     and the move zone, with tighter padding and gap; the shared .window clamp
+     keeps it inside the app box. */
+  body.mobile-touch #forge-action-bar {
+    --window-pad: 10px;
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    gap: 6px 10px;
+    width: min(440px, calc(100% - 20px));
+  }
   body.mobile-touch .vehicle-bar.glider-action-bar {
     grid-template-columns: 64px minmax(0, 1fr);
     gap: 8px 12px;

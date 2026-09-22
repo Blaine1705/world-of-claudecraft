@@ -142,12 +142,19 @@
     justify-content: center;
   }
 
-  /* The forge workshop bar: timing meter over a heat gauge over Strike / Stoke. */
-  .vehicle-bar.forge-action-bar {
+  /* The forge workshop panel: timing meter over a heat gauge over Strike / Stoke.
+     A `.window panel` family member (layout.css owns its position: centred in the
+     upper third, above the HUD bars), NOT a .vehicle-bar: the bottom-pinned
+     vehicle family sat it on the unit frames and the action bar. Only size and
+     look here, never position (the layout.css window contract). */
+  .forge-action-bar {
+    --window-pad: 16px;
     grid-template-columns: 1fr;
+    gap: 8px 16px;
     width: min(440px, calc(100% - 24px));
+    color: var(--gold);
   }
-  .vehicle-bar.forge-action-bar > * {
+  .forge-action-bar > * {
     grid-column: 1 / -1;
   }
   .forge-action-bar .vehicle-action-slots {
