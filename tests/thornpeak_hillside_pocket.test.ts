@@ -10,6 +10,7 @@
 // and only a narrow groove out. This suite walks a real player out of the
 // reported spot and pins the graded ground.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { TERRAIN_APPLIER, TERRAIN_APPLIER_BOUNDS } from '../src/sim/terrain_region_index';
@@ -90,14 +91,40 @@ describe('the Thornpeak hillside pocket west of the Highwatch practice row', () 
     // lattice over the whole knot: the sliver ridge, the pit, and the crag
     // face beside the boulder all read past 1.5 on the ungraded ground
     const steep: string[] = [];
+    let n = 0;
     for (let x = KNOT.x - KNOT.r; x <= KNOT.x + KNOT.r; x += 0.5) {
       for (let z = KNOT.z - KNOT.r; z <= KNOT.z + KNOT.r; z += 0.5) {
         if (Math.hypot(x - KNOT.x, z - KNOT.z) > KNOT.r) continue;
+        n++;
         const s = terrainSteepness(x, z, SEED);
         if (s > 1.3) steep.push(`(${x}, ${z}) ${s.toFixed(2)}`);
       }
     }
+    // the whole r <= 7 half-yard lattice, so the sweep can never pass empty
+    expect(n).toBe(613);
     expect(steep, 'every sample in the knot must be comfortably walkable').toEqual([]);
+  });
+
+  it('eases back onto the natural hillside without a steep rim of its own', () => {
+    // the fade band (rIn to just past rOut) blends the fitted surface into
+    // ground that differs from it (the crag rising west, the terrace step to
+    // the north), the place a fade can build a lip. The only samples here
+    // past the 1.5 gate are on that natural terrace step (ungraded it read
+    // up to 1.81; the fade already softens it), never a new rim elsewhere
+    const g = THORNPEAK_POCKET_GRADE;
+    let worst = 0;
+    const offTerrace: string[] = [];
+    for (let x = g.x - g.rOut - 0.5; x <= g.x + g.rOut + 0.5; x += 0.5) {
+      for (let z = g.z - g.rOut - 0.5; z <= g.z + g.rOut + 0.5; z += 0.5) {
+        const d = Math.hypot(x - g.x, z - g.z);
+        if (d < g.rIn || d > g.rOut + 0.5) continue;
+        const s = terrainSteepness(x, z, SEED);
+        worst = Math.max(worst, s);
+        if (s > 1.5 && z < 638) offTerrace.push(`(${x}, ${z}) ${s.toFixed(2)}`);
+      }
+    }
+    expect(offTerrace, 'no steep rim anywhere off the natural terrace').toEqual([]);
+    expect(worst, 'the terrace step stays softened').toBeLessThan(1.6);
   });
 
   it('leaves no sliver crest across the downhill line out of the pit', () => {
@@ -132,6 +159,12 @@ describe('the pocket grade (thornpeak_walk_grades.ts)', () => {
     expect(TERRAIN_APPLIER_BOUNDS[TERRAIN_APPLIER.thornpeakPocketGrade]).toEqual([
       THORNPEAK_POCKET_GRADE_BOUNDS,
     ]);
+    // ...and the production height chain calls it behind that bit, with the
+    // seed (the gate that keeps every other seed's ground untouched)
+    const world = readFileSync(new URL('../src/sim/world.ts', import.meta.url), 'utf8');
+    expect(world).toContain(
+      'if (terrainRegionHas(region, TERRAIN_APPLIER.thornpeakPocketGrade)) {\n    h = applyThornpeakPocketGrade(x, z, h, seed);',
+    );
   });
 
   it('is the identity on every other seed and outside its window', () => {
@@ -140,13 +173,28 @@ describe('the pocket grade (thornpeak_walk_grades.ts)', () => {
     }
     expect(applyThornpeakPocketGrade(g.x + g.rOut, g.z, 7.25, WORLD_SEED)).toBe(7.25);
     expect(applyThornpeakPocketGrade(g.x, g.z - g.rOut - 0.01, 7.25, WORLD_SEED)).toBe(7.25);
-    // inside rIn the ground is the fitted surface outright, whatever came in
-    for (const h of [-5, 24, 60]) {
-      expect(applyThornpeakPocketGrade(g.x + 3, g.z - 2, h, WORLD_SEED)).toBeCloseTo(
-        thornpeakPocketSurface(g.x + 3, g.z - 2),
-        9,
-      );
+    // inside rIn (including just inside it) the applier returns the fitted
+    // surface outright, whatever came in
+    for (const [x, z] of [
+      [g.x + 3, g.z - 2],
+      [g.x - (g.rIn - 0.1), g.z],
+    ]) {
+      for (const h of [-5, 24, 60]) {
+        expect(applyThornpeakPocketGrade(x, z, h, WORLD_SEED)).toBeCloseTo(
+          thornpeakPocketSurface(x, z),
+          9,
+        );
+      }
     }
+    // halfway through the fade the smoothstep weighs exactly one half
+    const mid = (g.rIn + g.rOut) / 2;
+    const s = thornpeakPocketSurface(g.x, g.z + mid);
+    expect(applyThornpeakPocketGrade(g.x, g.z + mid, 10, WORLD_SEED)).toBeCloseTo((10 + s) / 2, 9);
+    // and just past rIn it no longer does
+    expect(applyThornpeakPocketGrade(g.x, g.z + g.rIn + 0.5, 10, WORLD_SEED)).not.toBeCloseTo(
+      thornpeakPocketSurface(g.x, g.z + g.rIn + 0.5),
+      3,
+    );
   });
 
   it('still fits the natural hillside around its window (re-fit if this drifts)', () => {
@@ -166,7 +214,9 @@ describe('the pocket grade (thornpeak_walk_grades.ts)', () => {
         n++;
       }
     }
-    expect(worst, 'worst ring residual (yd)').toBeLessThan(1.5);
-    expect(Math.abs(sum / n), 'mean ring residual (yd)').toBeLessThan(0.35);
+    // measured at the fit: worst 0.90, mean -0.03 (the ring's own crag
+    // texture swings about 0.6 either way, so the worst arm cannot go tight)
+    expect(worst, 'worst ring residual (yd)').toBeLessThan(1.1);
+    expect(Math.abs(sum / n), 'mean ring residual (yd)').toBeLessThan(0.2);
   });
 });

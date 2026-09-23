@@ -58,11 +58,16 @@ export function applyGardenwalkWestPass(x: number, z: number, h: number): number
 //
 // The grade blends the whole knot (crest, pit, and crag face) onto the
 // hillside's own smooth surface: a quadratic least-squares fitted to the
-// finished shipped-seed ground on the ring just outside the window (a plane
-// could not follow the slope's curvature, so its fade added a steep rim of
-// its own). Full surface inside rIn, the untouched hillside past rOut. The
-// surface falls east toward the practice row and rises north, under 1.0
-// rise/run everywhere inside rIn, well below the 1.5 climb gate.
+// finished shipped-seed terrainHeight on the ring just outside the window (a
+// plane could not follow the slope's curvature, so its fade added a steep
+// rim of its own). This applier returns the surface outright inside rIn and
+// leaves the hillside untouched past rOut; the chain's later universal
+// altitude roughening still rides on top, so the finished ground inside rIn
+// sits within about 0.6yd of the surface (low frequency, and already part
+// of the ring the fit saw). To re-fit, fit finished terrainHeight on that
+// ring again. The surface falls east toward the practice row and rises
+// north, under 1.0 rise/run everywhere inside rIn, well below the 1.5 climb
+// gate.
 //
 // SHIPPED SEED ONLY: the crest is an artifact of the WORLD_SEED noise, and on
 // any other seed (the RL env accepts arbitrary seeds) the same hillside sits
