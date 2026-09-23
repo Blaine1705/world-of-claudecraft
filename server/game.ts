@@ -1359,7 +1359,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.guild) out.gd = e.guild;
   if (e.pledgeGuild) out.pg = e.pledgeGuild; // guild pledge (display only; '' for members)
   if (e.guildTier) out.gt = e.guildTier; // guild colour tier (sim/guild_tier.ts)
-  if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
+  if (e.title) out.title = e.title; // active title (a deed or 'dev:<rung>' id; the client localizes)
   if (e.border) out.border = e.border; // Book of Deeds nameplate border (a deed id; the client resolves the slug)
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)

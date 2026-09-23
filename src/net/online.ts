@@ -2768,7 +2768,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.guild = w.gd ?? '';
         e.pledgeGuild = w.pg ?? '';
         e.guildTier = w.gt ?? 0;
-        e.title = w.title ?? null; // Book of Deeds active title (a deed id)
+        e.title = w.title ?? null; // active title (a deed or 'dev:<rung>' id)
         e.border = w.border ?? null; // Book of Deeds nameplate border (a deed id)
         if (e.kind === 'npc') {
           const def = NPCS[e.templateId];

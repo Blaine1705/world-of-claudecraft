@@ -10,10 +10,14 @@
 //
 // The title re-check runs every refresh, not only on a tier change: a rung
 // title restored at join is taken as saved (the tier resolves after join), so
-// the first refresh is what confirms or clears it.
+// the first refresh is what confirms or clears it. It only CLEARS on an
+// authoritative answer: no GitHub link at all, or a loaded contributor
+// snapshot. A cold GitHub failure after a restart reads every login as 0 merged
+// PRs; clearing then would erase a worn title for good over a transient outage.
 import { reconcileDevBadgeTitle } from '../src/sim/dev_badge_titles';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { contributorsSnapshotLoaded } from './github_contributors';
 
 /** Stamp the resolved rung on the entity; returns true when the flair changed. */
 export function stampDevBadge(
@@ -34,6 +38,6 @@ export function stampDevBadge(
     e.devMergedPrs = devMergedPrs;
     e.githubLogin = githubLogin;
   }
-  if (meta) reconcileDevBadgeTitle(meta, e);
+  if (meta && (login === null || contributorsSnapshotLoaded())) reconcileDevBadgeTitle(meta, e);
   return changed;
 }

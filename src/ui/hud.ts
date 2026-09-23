@@ -9055,7 +9055,7 @@ export class Hud {
       ) {
         this.lastTargetFramePaintAt = now;
         this.lastTargetFrameId = target.id;
-        // entity.title is the Book of Deeds deed id on the identity wire
+        // entity.title is the title id (deed or 'dev:<rung>') on the identity wire
         // (players only; always null/absent for mobs and NPCs).
         const titleSig = `${getLanguage()}|${target.title ?? ''}`;
         if (titleSig !== this.lastTargetTitleSig) {

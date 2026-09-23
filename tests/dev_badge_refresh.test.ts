@@ -230,6 +230,33 @@ describe('GameServer.refreshDevBadge (real DB + contributor-cache resolution)', 
     expect(e.title).toBe('prog_veteran');
   });
 
+  it('a cold GitHub outage (no snapshot loaded yet) never clears a worn rung title', async () => {
+    const { server, session, meta, e } = await joinWith('jgyy', 15);
+    vi.restoreAllMocks();
+    vi.spyOn(globalThis, 'fetch' as any).mockResolvedValue({
+      ok: false,
+      status: 503,
+      headers: { get: () => null },
+      json: () => Promise.resolve({}),
+    } as any);
+    setActiveTitle(meta, e, 'dev:runesmith', { restore: true });
+
+    await (server as any).refreshDevBadge(session);
+
+    // The failure reads as 0 merged PRs (the badge hides, as before), but that
+    // is "unknown", not "zero": the worn title survives for the next refresh.
+    expect(e.devTier ?? 0).toBe(0);
+    expect(meta.activeTitle).toBe('dev:runesmith');
+    expect(e.title).toBe('dev:runesmith');
+
+    // Once a real snapshot loads and still says the rung is out of reach, it clears.
+    resetContributorsCache();
+    vi.restoreAllMocks();
+    mockMergedPrsFetch('jgyy', 5); // Artificer only
+    await (server as any).refreshDevBadge(session);
+    expect(meta.activeTitle).toBe(null);
+  });
+
   it('a cleared rung title reaches the owner over the self wire', async () => {
     const { server, session, meta, e, fc } = await joinWith(null, 0);
     setActiveTitle(meta, e, 'dev:runesmith', { restore: true });
