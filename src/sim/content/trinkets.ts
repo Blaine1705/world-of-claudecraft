@@ -161,12 +161,12 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   wayfarers_lodestone: trinket('wayfarers_lodestone', "Wayfarer's Lodestone", { spi: 11 }),
   medallion_of_defiance: {
     ...trinket('medallion_of_defiance', 'Medallion of Defiance', { sta: 13 }),
-    priceHonor: 400,
+    priceHonor: 800,
     sellValue: 0,
   },
   duelists_brand: {
     ...trinket('duelists_brand', "Duelist's Brand", { agi: 13 }),
-    priceHonor: 400,
+    priceHonor: 800,
     sellValue: 0,
   },
 };

@@ -465,12 +465,14 @@ describe('honor trinkets sold beside the WARFARE kit', () => {
     }
   });
 
-  it('prices each at the neck price, soulbound, no gold value, full item-level-31 budget', () => {
+  it('prices each at 800 honor, soulbound, no gold value, full item-level-31 budget', () => {
     for (const id of WARFARE_TRINKET_STOCK) {
       const item = ITEMS[id];
       expect(item.slot, id).toBe('trinket');
       expect(item.quality, id).toBe('epic');
-      expect(item.priceHonor, id).toBe(SLOT_PRICES.neck);
+      // The crowd-control break is the key PvP purchase: priced like a helmet
+      // band, not like jewelry (owner call).
+      expect(item.priceHonor, id).toBe(800);
       expect(item.soulbound, id).toBe(true);
       expect(item.sellValue, id).toBe(0);
       expect(item.buyValue, id).toBeUndefined();
