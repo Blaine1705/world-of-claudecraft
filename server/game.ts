@@ -14,10 +14,8 @@ import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
-import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
-import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   DELVES,
   DUNGEON_X_THRESHOLD,
@@ -196,8 +194,6 @@ import {
   closePlaySession,
   GUILD_BANK_ROW_MAX_BYTES,
   grantAccountMechChroma,
-  grantAccountMountSkins,
-  grantAccountWeaponSkins,
   heartbeatCharacterLeases,
   insertChatLogs,
   loadAccountFlair,
@@ -206,7 +202,6 @@ import {
   loadMailState,
   loadMarketState,
   loadRiftState,
-  markAccountQuestComplete,
   openPlaySession,
   pool,
   releaseCharacterLease,
@@ -215,7 +210,6 @@ import {
   saveCharacterState,
   saveMarketState,
   saveRiftState,
-  setAccountWeaponSkinLoadout,
   touchCharacterLogin,
   walletForAccount,
 } from './db';

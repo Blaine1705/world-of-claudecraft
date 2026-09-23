@@ -13,11 +13,8 @@ import {
   getActiveProfileName,
   importProfileString,
   loadMetersSettings,
-  loadProfiles,
   type MetersSettings,
   saveMetersSettings,
-  saveProfiles,
-  setActiveProfileName,
 } from '../src/ui/meters_settings';
 import type { IWorld } from '../src/world_api';
 
@@ -350,7 +347,7 @@ describe('Meters Chat Reporting', () => {
   });
 
   it('handles empty encounters gracefully', () => {
-    const w = fakeWorld();
+    const _w = fakeWorld();
     const m = new MeterData(0);
     // Force empty encounter
     m.resetAll(0);
@@ -385,17 +382,17 @@ describe('Details! Options Dialog', () => {
     expect(tabButtons?.length).toBe(7);
 
     // Switch to Barras
-    (tabButtons![1] as HTMLElement).click();
+    (tabButtons?.[1] as HTMLElement | undefined)?.click();
     const groupTitle = modal?.querySelector('.mt-opts-group-title');
     expect(groupTitle?.textContent).toContain('Barras');
 
     // Switch to Presets
-    (tabButtons![5] as HTMLElement).click();
+    (tabButtons?.[5] as HTMLElement | undefined)?.click();
     const presetCards = modal?.querySelectorAll('.mt-opts-preset-card');
     expect(presetCards?.length).toBe(4);
 
     // Switch to Profiles
-    (tabButtons![6] as HTMLElement).click();
+    (tabButtons?.[6] as HTMLElement | undefined)?.click();
     const profileSections = modal?.querySelectorAll('.mt-opts-profile-section');
     expect(profileSections?.length).toBe(3);
 
@@ -416,18 +413,18 @@ describe('Details! Options Dialog', () => {
 
     // Switch to text tab
     const tabButtons = modal?.querySelectorAll('.mt-opts-tab-btn');
-    (tabButtons![2] as HTMLElement).click();
+    (tabButtons?.[2] as HTMLElement | undefined)?.click();
 
     // Verify all font cards are rendered
     const fontCards = modal?.querySelectorAll('.mt-opts-font-card');
     expect(fontCards?.length).toBe(FONT_OPTIONS.length);
 
     // Select Cinzel font (index 3)
-    (fontCards![3] as HTMLElement).click();
+    (fontCards?.[3] as HTMLElement | undefined)?.click();
     expect(currentSettings.fontFamily).toBe('cinzel');
 
     // Select Monospace font (index 4)
-    (fontCards![4] as HTMLElement).click();
+    (fontCards?.[4] as HTMLElement | undefined)?.click();
     expect(currentSettings.fontFamily).toBe('monospace');
 
     dialog.close();
@@ -493,7 +490,7 @@ describe('Details! Options Dialog', () => {
 
     // Switch to Profiles tab (index 6)
     const tabButtons = modal?.querySelectorAll('.mt-opts-tab-btn');
-    (tabButtons![6] as HTMLElement).click();
+    (tabButtons?.[6] as HTMLElement | undefined)?.click();
 
     // Verify select has default profiles
     const select = modal?.querySelector('.mt-opts-select') as HTMLSelectElement;
@@ -547,14 +544,18 @@ describe('Details! Options Dialog', () => {
 
     // Switch to bars tab
     const tabButtons = modal?.querySelectorAll('.mt-opts-tab-btn');
-    (tabButtons![1] as HTMLElement).click();
+    (tabButtons?.[1] as HTMLElement | undefined)?.click();
 
     // Toggle alwaysShowMe checkbox
     const checkboxes = modal?.querySelectorAll('input[type="checkbox"]');
     expect(checkboxes && checkboxes.length > 0).toBe(true);
-    const lastCheckbox = checkboxes![checkboxes!.length - 1] as HTMLInputElement;
-    lastCheckbox.checked = true;
-    lastCheckbox.dispatchEvent(new Event('change'));
+    const lastCheckbox = checkboxes?.[(checkboxes?.length ?? 1) - 1] as
+      | HTMLInputElement
+      | undefined;
+    if (lastCheckbox) {
+      lastCheckbox.checked = true;
+      lastCheckbox.dispatchEvent(new Event('change'));
+    }
 
     expect(currentSettings.alwaysShowMe).toBe(true);
 
@@ -575,12 +576,12 @@ describe('Details! Options Dialog', () => {
 
     // Switch to presets tab
     const tabButtons = modal?.querySelectorAll('.mt-opts-tab-btn');
-    (tabButtons![5] as HTMLElement).click();
+    (tabButtons?.[5] as HTMLElement | undefined)?.click();
 
     // Click Apply on Classic WoW preset (second card)
     const applyButtons = modal?.querySelectorAll('.mt-opts-btn-apply');
     expect(applyButtons && applyButtons.length >= 2).toBe(true);
-    (applyButtons![1] as HTMLElement).click();
+    (applyButtons?.[1] as HTMLElement | undefined)?.click();
 
     expect(currentSettings.themePreset).toBe('classic');
     expect(currentSettings.barTexture).toBe('smooth');

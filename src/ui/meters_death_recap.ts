@@ -13,6 +13,9 @@ export interface DeathRecapEvent {
   hpAfter?: number;
   maxHp?: number;
   lethal?: boolean;
+  abilityId?: string | null;
+  school?: string;
+  crit?: boolean;
 }
 
 export interface DeathRecapRecord {
@@ -27,11 +30,16 @@ export interface DeathRecapRecord {
 export interface DeathRecapRowView {
   timeRel: string; // e.g. "-3.1s" or " 0.0s"
   ability: string;
+  abilityId?: string | null;
   sourceName: string;
+  amount: number;
   amountStr: string; // e.g. "-412" or "+182"
   hpStr: string; // e.g. "210 -> 0 HP"
+  hpPercent: number; // e.g. 0 to 100
   lethal: boolean;
   type: 'damage' | 'heal' | 'absorb';
+  school?: string;
+  crit?: boolean;
 }
 
 export const DEATH_RECAP_BUFFER_CAP = 25;
@@ -95,14 +103,26 @@ export function buildDeathRecapRows(record: DeathRecapRecord): DeathRecapRowView
       hpStr = `${Math.round(ev.hpAfter)} HP`;
     }
 
+    let hpPercent = 0;
+    if (ev.hpAfter !== undefined && ev.maxHp !== undefined && ev.maxHp > 0) {
+      hpPercent = Math.max(0, Math.min(100, Math.round((ev.hpAfter / ev.maxHp) * 100)));
+    } else if (ev.hpAfter !== undefined) {
+      hpPercent = Math.max(0, Math.min(100, Math.round(ev.hpAfter)));
+    }
+
     rows.push({
       timeRel,
       ability: ev.ability || 'Attack',
+      abilityId: ev.abilityId ?? null,
       sourceName: ev.sourceName || 'Unknown',
+      amount: ev.amount,
       amountStr,
       hpStr,
+      hpPercent,
       lethal: isLethal,
       type: ev.type,
+      school: ev.school,
+      crit: ev.crit,
     });
   }
 

@@ -3,7 +3,7 @@
 // and per-player contributions.
 
 import type { Encounter, MemberTally } from './meters';
-import { fmtDuration, fmtNum, fmtPercent, fmtPerSecond } from './meters_format';
+import { fmtDuration, fmtNum, fmtPerSecond } from './meters_format';
 
 export interface ComparisonMetricDiff {
   name: string;
@@ -91,7 +91,7 @@ export function compareEncounters(encA: Encounter, encB: Encounter): FightCompar
     raidDmgA += t.dmg;
     raidHealA += t.heal;
     raidTakenA += t.dmgTaken;
-    raidAvoidableA += (t as any).avoidableDmg ?? 0;
+    raidAvoidableA += t.avoidableDmg ?? 0;
     raidDeathsA += t.deaths;
   }
 
@@ -105,7 +105,7 @@ export function compareEncounters(encA: Encounter, encB: Encounter): FightCompar
     raidDmgB += t.dmg;
     raidHealB += t.heal;
     raidTakenB += t.dmgTaken;
-    raidAvoidableB += (t as any).avoidableDmg ?? 0;
+    raidAvoidableB += t.avoidableDmg ?? 0;
     raidDeathsB += t.deaths;
   }
 
@@ -163,8 +163,8 @@ export function compareEncounters(encA: Encounter, encB: Encounter): FightCompar
       hpsB: (data.tallyB?.heal ?? 0) / durB,
       deathsA: data.tallyA?.deaths ?? 0,
       deathsB: data.tallyB?.deaths ?? 0,
-      avoidableA: (data.tallyA as any)?.avoidableDmg ?? 0,
-      avoidableB: (data.tallyB as any)?.avoidableDmg ?? 0,
+      avoidableA: data.tallyA?.avoidableDmg ?? 0,
+      avoidableB: data.tallyB?.avoidableDmg ?? 0,
     });
   }
 

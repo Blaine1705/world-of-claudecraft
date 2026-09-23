@@ -246,6 +246,7 @@ import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
+import { DeathRecapDialog } from './death_recap_dialog';
 import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
 import { deedBorderSlug, deedTargetBorderSlug } from './deed_border_view';
@@ -1590,6 +1591,8 @@ export class Hud {
   private partyFramesEl = $('#party-frames');
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
+  private deathRecapBtnEl = $('#death-recap-btn');
+  private deathRecapDialog!: DeathRecapDialog;
   private ghostPromptEl = $('#ghost-prompt');
   private resurrectionPromptEl: HTMLElement | null = null;
   private guildInvitePromptEl: HTMLElement | null = null;
@@ -2219,6 +2222,14 @@ export class Hud {
         this.tooltipOwner.current() === el && this.tooltipEl.style.display !== 'none',
       worldToScreen: (x, y, z) => this.renderer.worldToScreen(x, y, z),
     });
+    this.deathRecapDialog = new DeathRecapDialog({
+      root: () => $('#death-recap-dialog'),
+      getLatestRecap: () => this.meters.getLatestDeathRecap(this.sim.playerId),
+      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      hideTooltip: () => this.hideTooltip(),
+      previewResolvedAbility: (id) => this.previewResolvedAbility(id),
+      abilityTooltip: (res) => this.abilityTooltip(res),
+    });
     this.targetAurasWindow = new TargetAurasWindow({
       root: $('#target-auras-window'),
       writers: this.writerFacet,
@@ -2666,6 +2677,9 @@ export class Hud {
       // Thornhollow Fields releases like the open world: the spirit rises in the keep
       // graveyard and waits for the wave (the sim routes the destination).
       this.sim.releaseSpirit();
+    });
+    bindTouchTap(this.deathRecapBtnEl, () => {
+      this.deathRecapDialog.toggle();
     });
     bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
     bindTouchTap(this.resurrectHealerBtnEl, () => this.requestSpiritHealerResurrect());
@@ -3561,6 +3575,9 @@ export class Hud {
         // Route through closeTutorialGreeting so the focus trap is released
         // and the modal is removed (the profession-tutorial precedent).
         this.closeTutorialGreeting();
+        break;
+      case 'death-recap-dialog':
+        this.deathRecapDialog.close();
         break;
       case 'options-menu':
         this.closeOptions();
@@ -9556,7 +9573,10 @@ export class Hud {
     // (the wave is the one way back, enforced server-side too).
     const ghostInBgMatch = !!this.sim.bgInfo?.match;
     if (p.dead) syncDeathControllerHints(this.optionsHooks?.gamepad ?? null);
-    if (!p.dead) this.closeResurrectionPrompt();
+    if (!p.dead) {
+      this.closeResurrectionPrompt();
+      if (this.deathRecapDialog.isOpen()) this.deathRecapDialog.close();
+    }
     document.body.classList.toggle('spirit-mode', ghost);
     this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
     if (ghost && !ghostInBgMatch) {

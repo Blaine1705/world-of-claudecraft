@@ -8900,4 +8900,8 @@
     width: min(460px, calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 20px));
     max-height: calc(var(--app-vh, 100dvh) / var(--ui-scale, 1) - 20px);
   }
+
+  body.mobile-touch #death-recap-dialog {
+    max-height: 85vh;
+  }
 }

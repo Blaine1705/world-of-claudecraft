@@ -50,22 +50,10 @@ import {
   buildMeterBreakdown,
 } from './meters_breakdown_view';
 import { compareEncounters } from './meters_comparison';
-import {
-  buildDeathRecapRows,
-  DeathRecapBuffer,
-  type DeathRecapEvent,
-  type DeathRecapRecord,
-} from './meters_death_recap';
+import { buildDeathRecapRows, DeathRecapBuffer, type DeathRecapRecord } from './meters_death_recap';
 import { buildAbilityBalanceStats } from './meters_dev_view';
 import { exportEncounterAsJson, exportEncounterAsText } from './meters_export';
-import {
-  fmtCountRow,
-  fmtDuration,
-  fmtNum,
-  fmtPercent,
-  fmtPerSecond,
-  fmtPerSecondRow,
-} from './meters_format';
+import { fmtDuration, fmtNum, fmtPercent, fmtPerSecond, fmtPerSecondRow } from './meters_format';
 import { MeterFrame } from './meters_frame';
 import { METER_FRAME_LIMITS } from './meters_frame_core';
 import { buildMeterTabMenu, type MeterMenuRow } from './meters_menu_view';
@@ -83,7 +71,7 @@ import {
   type MetersSettings,
   saveMetersSettings,
 } from './meters_settings';
-import { buildTimelineRows, EncounterTimeline, type TimelineEvent } from './meters_timeline';
+import { buildTimelineRows, EncounterTimeline } from './meters_timeline';
 import type { SimpleMenuItem } from './simple_context_menu';
 import { specIconUrl } from './spec_icon_art';
 import { resolveThreatSubject, resolveThreatValues } from './threat_subject_core';
@@ -125,6 +113,7 @@ export interface MemberTally {
   absorbed: number;
   interrupts: number;
   deaths: number;
+  avoidableDmg?: number;
   hits: number;
   crits: number;
   /** damage per mob entity id (current/previous encounters only) */
@@ -161,7 +150,10 @@ interface Attribution {
 export function meterIconUrl(cls: string | null, spec?: string | null): string | null {
   if (!cls) return null;
   if (spec) {
-    const sUrl = specIconUrl({ class: cls as any, id: spec });
+    const sUrl = specIconUrl({
+      class: cls as Parameters<typeof specIconUrl>[0]['class'],
+      id: spec,
+    });
     if (sUrl) return sUrl;
   }
   return classIconUrl(cls);
@@ -616,14 +608,13 @@ export class MeterData {
     // real cast should still count as party activity.
     if (ev.type === 'heal2' && ev.cueOnly) return;
 
+    const evRecord = ev as Record<string, unknown>;
     const sourceInParty =
-      'sourceId' in ev && typeof (ev as any).sourceId === 'number'
-        ? this.threatEntryBelongsToParty(world, (ev as any).sourceId, partyPids)
+      typeof evRecord.sourceId === 'number'
+        ? this.threatEntryBelongsToParty(world, evRecord.sourceId, partyPids)
         : false;
     const targetInParty =
-      'targetId' in ev && typeof (ev as any).targetId === 'number'
-        ? partyPids.has((ev as any).targetId)
-        : false;
+      typeof evRecord.targetId === 'number' ? partyPids.has(evRecord.targetId) : false;
     const pidInParty = 'pid' in ev && typeof ev.pid === 'number' ? partyPids.has(ev.pid) : false;
 
     if (ev.type === 'damage' || ev.type === 'heal2' || ev.type === 'absorb') {
@@ -743,7 +734,8 @@ export class MeterData {
         const whoTarget = this.attribute(world, ev.targetId, partyPids);
         const targetEntity = world.entities.get(ev.targetId);
         const srcEntity = world.entities.get(ev.sourceId);
-        const sourceName = srcEntity?.name ?? `#${ev.sourceId}`;
+        const fallbackName = typeof evRecord.sourceName === 'string' ? evRecord.sourceName : null;
+        const sourceName = srcEntity?.name ?? fallbackName ?? `#${ev.sourceId}`;
         const hpBefore = targetEntity?.hp;
         const maxHp = targetEntity?.maxHp;
         const hpAfter = Math.max(0, (hpBefore ?? 0) - ev.amount);
@@ -760,6 +752,9 @@ export class MeterData {
           hpAfter,
           maxHp,
           lethal,
+          abilityId: ev.abilityId,
+          school: ev.school,
+          crit: ev.crit,
         });
 
         if (ev.absorbed && ev.absorbed > 0) {
@@ -816,9 +811,11 @@ export class MeterData {
         const maxHp = targetEntity?.maxHp;
         const hpAfter = Math.min(maxHp ?? (hpBefore ?? 0) + ev.amount, (hpBefore ?? 0) + ev.amount);
         const srcEntity = world.entities.get(ev.sourceId);
-        const sourceName = srcEntity?.name ?? `#${ev.sourceId}`;
+        const fallbackName = typeof evRecord.sourceName === 'string' ? evRecord.sourceName : null;
+        const sourceName = srcEntity?.name ?? fallbackName ?? `#${ev.sourceId}`;
 
-        this.deathRecapBuffer.push(ev.targetId, {
+        const whoTarget = this.attribute(world, ev.targetId, partyPids);
+        this.deathRecapBuffer.push(whoTarget.pid, {
           timestamp: now,
           type: ev.type === 'absorb' ? 'absorb' : 'heal',
           ability: ev.ability || (ev.type === 'absorb' ? 'Shield Absorbed' : 'Heal'),
@@ -828,6 +825,8 @@ export class MeterData {
           hpBefore,
           hpAfter,
           maxHp,
+          abilityId: typeof evRecord.abilityId === 'string' ? evRecord.abilityId : undefined,
+          crit: evRecord.crit === true,
         });
       }
 
@@ -1075,6 +1074,8 @@ interface MeterRowNodes {
   petName: string | null;
   /** the entity whose hate this bar represents (member pid, or the pet's) */
   threatPid: number;
+  abilityKey?: string | null;
+  targetName?: string | null;
 }
 
 /** What a panel needs from its owner: the shared data and the live world. */
@@ -1192,8 +1193,6 @@ export class MetersPanel {
   private readonly modeTrigger: HTMLElement;
   private readonly backTrigger: HTMLElement;
   private readonly segTrigger: HTMLElement;
-  private readonly backBtn: HTMLElement;
-  private readonly modeBtn: HTMLElement | null = null;
   private rowPool: MeterRowNodes[] = [];
   private frame: MeterFrame | null = null;
   private settings: MetersSettings;
@@ -1242,7 +1241,6 @@ export class MetersPanel {
       this.titleEl.appendChild(modeTrigger);
     }
     this.modeTrigger = modeTrigger;
-    this.modeBtn = modeTrigger;
     this.modeTrigger.addEventListener('click', (ev) => {
       ev.stopPropagation();
       const rect = this.modeTrigger.getBoundingClientRect();
@@ -1258,7 +1256,6 @@ export class MetersPanel {
       this.titleEl.appendChild(backTrigger);
     }
     this.backTrigger = backTrigger;
-    this.backBtn = backTrigger;
     this.backTrigger.style.display = 'none';
     this.backTrigger.addEventListener('click', (ev) => {
       ev.stopPropagation();
@@ -2056,8 +2053,8 @@ export class MetersPanel {
         row.name = tally.name;
         row.petName = petName;
         row.threatPid = threatPid;
-        (row as any).abilityKey = undefined;
-        (row as any).targetName = undefined;
+        row.abilityKey = undefined;
+        row.targetName = undefined;
         row.el.style.display = 'block';
         row.fill.style.width = `${Math.max(4, fill * 100)}%`;
         const hex = getClassColor(tally.cls);
@@ -2160,8 +2157,8 @@ export class MetersPanel {
       const label = r.petName ? `${r.petName}: ${abilityName}` : abilityName;
       row.name = label;
       row.petName = r.petName;
-      (row as any).abilityKey = r.ability;
-      (row as any).targetName = undefined;
+      row.abilityKey = r.ability;
+      row.targetName = undefined;
       row.threatPid = -1;
       row.el.style.display = 'block';
       row.el.classList.remove('aggro');
@@ -2273,8 +2270,8 @@ export class MetersPanel {
       row.pid = tally.pid;
       row.name = it.label;
       row.petName = null;
-      (row as any).abilityKey = undefined;
-      (row as any).targetName = it.isTarget ? it.label : undefined;
+      row.abilityKey = undefined;
+      row.targetName = it.isTarget ? it.label : undefined;
       row.threatPid = -1;
       row.el.style.display = 'block';
       row.el.classList.remove('aggro');
@@ -2335,8 +2332,8 @@ export class MetersPanel {
       row.pid = pid;
       row.name = `${r.sourceName}: ${r.ability}`;
       row.petName = null;
-      (row as any).abilityKey = undefined;
-      (row as any).targetName = undefined;
+      row.abilityKey = undefined;
+      row.targetName = undefined;
       row.threatPid = -1;
       row.el.style.display = 'block';
       row.icon.style.display = 'none';
@@ -2416,8 +2413,8 @@ export class MetersPanel {
       row.pid = -1;
       row.name = r.label;
       row.petName = null;
-      (row as any).abilityKey = undefined;
-      (row as any).targetName = undefined;
+      row.abilityKey = undefined;
+      row.targetName = undefined;
       row.threatPid = -1;
       row.el.style.display = 'block';
       row.icon.style.display = 'none';
@@ -2460,8 +2457,8 @@ export class MetersPanel {
       row.pid = -1;
       row.name = r.label;
       row.petName = null;
-      (row as any).abilityKey = undefined;
-      (row as any).targetName = undefined;
+      row.abilityKey = undefined;
+      row.targetName = undefined;
       row.threatPid = -1;
       row.el.style.display = 'block';
       row.icon.style.display = 'none';
@@ -2510,8 +2507,8 @@ export class MetersPanel {
       row.pid = -1;
       row.name = s.ability;
       row.petName = null;
-      (row as any).abilityKey = undefined;
-      (row as any).targetName = undefined;
+      row.abilityKey = undefined;
+      row.targetName = undefined;
       row.threatPid = -1;
       row.el.style.display = 'block';
       row.icon.style.display = 'none';
@@ -2578,8 +2575,8 @@ export class MetersPanel {
       row.pid = e.pid;
       row.name = e.name;
       row.petName = null;
-      (row as any).abilityKey = undefined;
-      (row as any).targetName = undefined;
+      row.abilityKey = undefined;
+      row.targetName = undefined;
       row.threatPid = -1;
       row.el.style.display = 'block';
       row.el.classList.remove('aggro');
@@ -2617,12 +2614,12 @@ export class MetersPanel {
         this.render(true);
       }
     } else if (this.viewMode === 'player_breakdown') {
-      const abilityKey = (row as any).abilityKey;
-      if (abilityKey !== undefined) {
+      const abilityKey = row.abilityKey;
+      if (abilityKey) {
         this.showAbilityDetail(abilityKey, row.petName, row.name);
       }
     } else if (this.viewMode === 'ability_detail') {
-      const targetName = (row as any).targetName;
+      const targetName = row.targetName;
       if (targetName) {
         this.showTargetPlayers(targetName);
       }
@@ -2740,10 +2737,10 @@ export class MetersPanel {
       else if (this.tab === 'interrupts') source = tally.interruptsByAbility;
       else source = tally.dmgByAbility;
 
-      const abilityKey = (row as any).abilityKey;
+      const abilityKey = row.abilityKey;
       let entry: BreakdownEntry | undefined;
       if (source) {
-        entry = source.get(breakdownKey(row.petName, abilityKey));
+        entry = source.get(breakdownKey(row.petName, abilityKey ?? null));
         if (!entry) {
           entry = [...source.values()].find((e) => {
             const aName = e.ability
@@ -3311,6 +3308,26 @@ export class Meters {
 
   exportJson(): string {
     return this.main.exportJson();
+  }
+
+  getLatestDeathRecap(pid: number): DeathRecapRecord | null {
+    for (const enc of [this.data.current, this.data.allTime]) {
+      const recaps = enc?.deathRecaps.get(pid);
+      if (recaps && recaps.length > 0) {
+        return recaps[recaps.length - 1];
+      }
+    }
+    const recent = this.data.deathRecapBuffer.getRecentEvents(pid);
+    if (recent.length > 0) {
+      const targetEntity = this.world.entities.get(pid);
+      return {
+        pid,
+        playerName: targetEntity?.name ?? `#${pid}`,
+        deathTime: recent[recent.length - 1].timestamp,
+        events: recent,
+      };
+    }
+    return null;
   }
 }
 

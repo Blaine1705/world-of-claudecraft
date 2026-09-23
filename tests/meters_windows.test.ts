@@ -57,7 +57,7 @@ const MARKUP = `
   </div>`;
 
 function fakeWorld(): IWorld {
-  const entities = new Map<number, any>();
+  const entities = new Map<number, unknown>();
   entities.set(1, { id: 1, kind: 'player', name: 'Hero', templateId: 'warlock' });
   entities.set(2, { id: 2, kind: 'player', name: 'Pal', templateId: 'priest' });
   entities.set(51, {

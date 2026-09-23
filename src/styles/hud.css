@@ -6045,8 +6045,8 @@
     border: 1px solid rgba(255, 255, 255, 0.09);
     border-radius: 4px;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     container-type: inline-size;
     padding: 3px 5px 4px 5px;
     outline: none;
@@ -6055,23 +6055,23 @@
   }
   .mt-panel.mt-opacity-solid {
     background: rgba(12, 14, 18, var(--mt-bg-alpha, 0.98)) !important;
-    backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
   .mt-panel.mt-opacity-glass {
     background: rgba(12, 14, 18, var(--mt-bg-alpha, 0.76)) !important;
-    backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
   }
   .mt-panel.mt-opacity-minimal {
     background: rgba(12, 14, 18, var(--mt-bg-alpha, 0.45)) !important;
-    backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
   }
   .mt-panel.mt-opacity-transparent {
     background: transparent !important;
-    backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     border-color: transparent !important;
     box-shadow: none !important;
   }
@@ -6492,8 +6492,8 @@
     inset: 0;
     z-index: 12000;
     background: rgba(0, 0, 0, 0.72);
-    backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -9551,6 +9551,308 @@
     flex-direction: column;
     gap: 18px;
     z-index: 30;
+  }
+  #death-overlay .death-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- death recap dialog (WoW-style) ---------- */
+  #death-recap-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 480px;
+    max-width: calc(100vw - 24px);
+    max-height: min(600px, calc(100vh - 40px));
+    display: none;
+    flex-direction: column;
+    z-index: 35;
+    padding: 0;
+    overflow: hidden;
+    background: #11141a;
+    border: 1px solid #4a3c28;
+    border-radius: 6px;
+    box-shadow:
+      0 12px 40px #000c,
+      0 0 0 1px #d4af3722,
+      inset 0 1px 0 #ffffff18;
+  }
+  .death-recap-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, #222630 0%, #161a22 100%);
+    border-bottom: 1px solid #3d3222;
+  }
+  .death-recap-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #e5c158;
+    font-family: var(--title-font);
+    text-shadow: 0 1px 2px #000;
+  }
+  .death-recap-header .x-btn {
+    position: static;
+    margin: 0;
+  }
+  .death-recap-subbar {
+    padding: 8px 14px;
+    background: #151820;
+    border-bottom: 1px solid #28241c;
+    font-size: 12px;
+  }
+  .death-recap-summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ffb8b8;
+    font-weight: 600;
+  }
+  .death-recap-skull-icon {
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    color: #ff4444;
+  }
+  .death-recap-skull-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+  .death-recap-totals {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #a0a6b2;
+  }
+  .recap-total-dmg {
+    color: #ff6b6b;
+  }
+  .recap-total-heal {
+    color: #4ade80;
+  }
+  .death-recap-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 14px;
+    min-height: 120px;
+  }
+  .death-recap-empty {
+    text-align: center;
+    padding: 30px 10px;
+    color: #7d8594;
+    font-style: italic;
+    font-size: 13px;
+  }
+  .death-recap-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .recap-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: #181d26;
+    border: 1px solid #2d3340;
+    border-radius: 4px;
+    transition:
+      background 0.15s,
+      border-color 0.15s;
+    cursor: default;
+  }
+  .recap-card:hover {
+    background: #202733;
+    border-color: #4d576a;
+  }
+  .recap-card-lethal {
+    background: linear-gradient(90deg, #2b1214 0%, #1e1518 100%);
+    border-color: #8a2424;
+    box-shadow: inset 0 0 12px #ff000018;
+  }
+  .recap-card-lethal:hover {
+    background: linear-gradient(90deg, #361719 0%, #261a1e 100%);
+    border-color: #b53232;
+  }
+  .recap-card-heal {
+    border-left: 3px solid #3cd070;
+  }
+  .recap-card-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+  .recap-icon-frame {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #4a3c28;
+    box-shadow: 0 1px 4px #0008;
+    flex-shrink: 0;
+  }
+  .recap-card-lethal .recap-icon-frame {
+    border-color: #b03030;
+    box-shadow: 0 0 6px #ff202044;
+  }
+  .recap-details {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .recap-name-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .recap-ability {
+    font-weight: 700;
+    font-size: 13px;
+    color: #e2e8f0;
+  }
+  .recap-source {
+    font-size: 11px;
+    color: #8c96a8;
+  }
+  .recap-amount-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+  }
+  .recap-amount {
+    font-weight: 700;
+  }
+  .recap-amount.recap-damage {
+    color: #ff6b6b;
+  }
+  .recap-amount.recap-heal {
+    color: #4ade80;
+  }
+  .recap-amount.recap-absorb {
+    color: #7dd3fc;
+  }
+  .recap-crit {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #ffd166;
+  }
+  .recap-school {
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: #0006;
+    text-transform: capitalize;
+  }
+  .recap-school.school-fire {
+    color: var(--color-debuff-fire, #e8722a);
+  }
+  .recap-school.school-frost {
+    color: var(--color-debuff-frost, #4aa3df);
+  }
+  .recap-school.school-shadow {
+    color: var(--color-debuff-shadow, #9b59d0);
+  }
+  .recap-school.school-holy {
+    color: var(--color-debuff-holy, #d8b56b);
+  }
+  .recap-school.school-nature {
+    color: var(--color-debuff-nature, #35a835);
+  }
+  .recap-school.school-arcane {
+    color: var(--color-debuff-arcane, #3f8cff);
+  }
+  .recap-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    margin-left: 12px;
+    flex-shrink: 0;
+  }
+  .recap-hp-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .recap-hp-bar {
+    width: 80px;
+    height: 6px;
+    background: #0f1217;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #282f3d;
+  }
+  .recap-hp-fill {
+    height: 100%;
+    transition: width 0.2s;
+  }
+  .recap-hp-fill.hp-healthy {
+    background: #3cd070;
+  }
+  .recap-hp-fill.hp-warning {
+    background: #eab308;
+  }
+  .recap-hp-fill.hp-danger {
+    background: #ef4444;
+  }
+  .recap-hp-label {
+    font-size: 10px;
+    color: #8c96a8;
+    font-family: var(--ui-font);
+  }
+  .recap-time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #8c96a8;
+  }
+  .recap-time-lethal {
+    color: #ff5252;
+    font-weight: 700;
+  }
+  .recap-skull {
+    display: inline-flex;
+    width: 12px;
+    height: 12px;
+  }
+  .recap-skull svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+  .recap-lethal-badge {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .death-recap-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 14px;
+    background: #14171f;
+    border-top: 1px solid #2d261e;
+  }
+  .death-recap-footer-close {
+    min-width: 80px;
+    padding: 4px 12px;
   }
   /* Ghost resurrect prompt: a small, NON-BLOCKING panel shown only when a spirit is in
      reach of its corpse or a Spirit Healer. pointer-events:none on the panel so a ghost

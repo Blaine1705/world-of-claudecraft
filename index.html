@@ -645,8 +645,12 @@
 
     <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <h2 data-i18n="hud.core.deathTitle">You have died.</h2>
-      <button type="button" class="btn" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+      <div class="death-actions">
+        <button type="button" class="btn" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+        <button type="button" class="btn" id="death-recap-btn" data-i18n="hud.core.deathRecap">Recap</button>
+      </div>
     </div>
+    <div id="death-recap-dialog" class="window panel" role="dialog" aria-modal="true" aria-labelledby="death-recap-title" style="display: none"></div>
     <!-- Ghost (spirit released): runs freely; this small non-blocking prompt appears
          only when in reach of the corpse or the Pale Keeper. -->
     <div id="ghost-prompt" data-pad-nav-root>
