@@ -183,7 +183,11 @@ export function buildHoardRewardChest(
   const glowing: THREE.MeshStandardMaterial[] = [];
   model.traverse((node) => {
     if (!(node instanceof THREE.Mesh)) return;
-    node.castShadow = node.receiveShadow = true;
+    // It casts its shadow on the floor but never takes shadows itself: the lid's
+    // broad flat faces self-shadowed into stripes that crawled as the camera (and
+    // the shadow map that follows it) moved (playtest).
+    node.castShadow = true;
+    node.receiveShadow = false;
     if (asset) markSharedGeometry(node.geometry);
     const convert = (material: THREE.Material) => {
       const original = material as THREE.MeshStandardMaterial;

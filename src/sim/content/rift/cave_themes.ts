@@ -15,7 +15,9 @@ export const CAVE_THEMES: readonly RiftTheme[] = [
     id: 'spore',
     name: 'Spore Hollow',
     nouns: ['Spore', 'Toadstool', 'Mould', 'Mycelium'],
-    kit: 'temple',
+    // Crypt stone, never the temple kit: the temple floods its floor with water
+    // and caustics, which read as a garish teal floor in a cave (playtest).
+    kit: 'crypt',
     torch: { flame: 0xd8f07a, emissive: 0x8aa82a, light: 0xc6e06a },
     fog: { color: 0x10120a, near: 14, far: 76 },
     wallTint: 0x9a8a6a,
