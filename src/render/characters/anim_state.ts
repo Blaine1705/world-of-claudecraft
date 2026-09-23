@@ -523,11 +523,7 @@ export function locomotionTimeScale(
     return s.backwards ? -stalkScale : stalkScale;
   }
   if (baseState === 'walk' || baseState === 'walkBack') {
-    timeScale = clamp(
-      s.speed / (baseState === 'walkBack' ? walkBackRef : walkRef),
-      0.6,
-      walkMax,
-    );
+    timeScale = clamp(s.speed / (baseState === 'walkBack' ? walkBackRef : walkRef), 0.6, walkMax);
   } else if (baseState === 'wade') {
     // One cycle covers the whole wade band, and the band is slow by
     // construction (the sim drags the body down to ~0.7 run), so the clip is

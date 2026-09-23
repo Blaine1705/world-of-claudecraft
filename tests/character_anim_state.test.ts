@@ -313,8 +313,32 @@ describe('locomotionTimeScale', () => {
     expect(locomotionTimeScale('run', fast, undefined, 7.64)).toBeCloseTo(1.6);
     expect(locomotionTimeScale('run', fast, undefined, 7.16)).toBeCloseTo(1.6);
     // raised ceiling: the reference is live again and the two differ
-    expect(locomotionTimeScale('run', fast, undefined, 7.64, undefined, undefined, undefined, undefined, 2)).toBeCloseTo(1.649);
-    expect(locomotionTimeScale('run', fast, undefined, 7.16, undefined, undefined, undefined, undefined, 2)).toBeCloseTo(1.76);
+    expect(
+      locomotionTimeScale(
+        'run',
+        fast,
+        undefined,
+        7.64,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        2,
+      ),
+    ).toBeCloseTo(1.649);
+    expect(
+      locomotionTimeScale(
+        'run',
+        fast,
+        undefined,
+        7.16,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        2,
+      ),
+    ).toBeCloseTo(1.76);
     // reverse: 12.6 * BACKPEDAL_MULT 0.65 = 8.19 against the walk band
     expect(locomotionTimeScale('walkBack', { speed: 8.19, backwards: true }, 5.52)).toBeCloseTo(
       1.484,
