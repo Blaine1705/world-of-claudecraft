@@ -2552,6 +2552,7 @@ export const vi_VN: EnTranslations = {
       "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "Tháo {item}",
       "unequipHint": "Nhấp ×, nhấp chuột phải, hoặc kéo vào túi để tháo trang bị",
       "hideHelmAria": "Ẩn mũ giáp",

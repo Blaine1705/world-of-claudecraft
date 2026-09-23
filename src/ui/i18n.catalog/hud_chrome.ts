@@ -3314,6 +3314,7 @@ export const hudChromeStrings = {
   },
   // Character window (paperdoll) controls.
   paperdoll: {
+    trinketSlot: 'Trinket',
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
     // The helmet-visibility eye on the head socket: each string is the action

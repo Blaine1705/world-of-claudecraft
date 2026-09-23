@@ -2552,6 +2552,7 @@ export const nl_NL: EnTranslations = {
       "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "{item} afdoen",
       "unequipHint": "Klik op ×, klik met rechts, of sleep naar tassen om af te doen",
       "hideHelmAria": "Helm verbergen",

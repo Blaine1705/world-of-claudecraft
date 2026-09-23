@@ -11136,6 +11136,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.paladin.devotionValue'
   | 'hudChrome.paperdoll.hideHelmAria'
   | 'hudChrome.paperdoll.showHelmAria'
+  | 'hudChrome.paperdoll.trinketSlot'
   | 'hudChrome.paperdoll.unequipAria'
   | 'hudChrome.paperdoll.unequipHint'
   | 'hudChrome.party.inviteUsage'

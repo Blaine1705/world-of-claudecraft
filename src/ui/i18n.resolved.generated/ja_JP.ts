@@ -2552,6 +2552,7 @@ export const ja_JP: EnTranslations = {
       "failed": "レポートを作成できませんでした。もう一度お試しください。"
     },
     "paperdoll": {
+      "trinketSlot": "装飾品",
       "unequipAria": "{item}を外す",
       "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す",
       "hideHelmAria": "兜を隠す",

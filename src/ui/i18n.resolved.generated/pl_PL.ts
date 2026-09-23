@@ -2552,6 +2552,7 @@ export const pl_PL: EnTranslations = {
       "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "Zdejmij {item}",
       "unequipHint": "Kliknij ×, kliknij prawym przyciskiem lub przeciągnij do toreb, aby zdjąć",
       "hideHelmAria": "Ukryj hełm",

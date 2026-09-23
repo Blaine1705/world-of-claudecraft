@@ -2552,6 +2552,7 @@ export const ru_RU: EnTranslations = {
       "failed": "Не удалось создать отчет. Повторите попытку."
     },
     "paperdoll": {
+      "trinketSlot": "Аксессуар",
       "unequipAria": "Снять {item}",
       "unequipHint": "Нажмите ×, ПКМ или перетащите в сумку, чтобы снять",
       "hideHelmAria": "Скрыть шлем",

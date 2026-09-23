@@ -2552,6 +2552,7 @@ export const zh_TW: EnTranslations = {
       "failed": "無法建立報告。請再試一次。"
     },
     "paperdoll": {
+      "trinketSlot": "飾品",
       "unequipAria": "卸下 {item}",
       "unequipHint": "點擊 ×、右鍵點擊或拖曳至背包以卸下",
       "hideHelmAria": "隱藏頭盔",

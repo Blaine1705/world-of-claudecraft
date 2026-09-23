@@ -2552,6 +2552,7 @@ export const da_DK: EnTranslations = {
       "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "Fjern {item}",
       "unequipHint": "Klik ×, højreklik, eller træk til tasker for at fjerne udstyr",
       "hideHelmAria": "Skjul hjelm",

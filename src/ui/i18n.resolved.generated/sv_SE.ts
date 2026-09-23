@@ -2552,6 +2552,7 @@ export const sv_SE: EnTranslations = {
       "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "Ta av {item}",
       "unequipHint": "Klicka på ×, högerklicka, eller dra till väskor för att ta av",
       "hideHelmAria": "Dölj hjälm",
