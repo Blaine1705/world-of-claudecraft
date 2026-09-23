@@ -9,6 +9,7 @@ import { DEV_BADGE_TITLE_DEEDS, grantDevBadgeTitles } from '../src/sim/dev_badge
 import { DEV_TIER_DEFS } from '../src/sim/dev_tier';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { DEV_TIERS } from '../src/ui/dev_tier';
 
 function fixture() {
   const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
@@ -25,14 +26,11 @@ function unlocks(events: SimEvent[]): { deedId: string; retro: boolean }[] {
 }
 
 describe('developer-badge title deeds', () => {
+  // The title text MUST stay the badge rung's own public English name: that is
+  // what licenses the scoped hidden-prose exemption in tests/guide.test.ts.
   it('maps every badge rung to a hidden, zero-Renown title deed named for the rung', () => {
-    const names: Record<string, string> = {
-      tinkerer: 'Tinkerer',
-      artificer: 'Artificer',
-      runesmith: 'Runesmith',
-      architect: 'Architect',
-      worldwright: 'Worldwright',
-    };
+    const names = Object.fromEntries(DEV_TIERS.map((t) => [t.key, t.name]));
+    expect(names.artificer).toBe('Artificer');
     expect(Object.keys(DEV_BADGE_TITLE_DEEDS)).toEqual(DEV_TIER_DEFS.map((t) => t.key));
     for (const tier of DEV_TIER_DEFS) {
       const def = DEEDS[DEV_BADGE_TITLE_DEEDS[tier.key]];

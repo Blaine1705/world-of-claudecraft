@@ -130,6 +130,13 @@ server store always canonical.
    earned, and stripped from every public surface (the wiki generator, the
    rarity endpoint, third-party character sheets). Everything else shows its
    criteria and progress.
+   One named exception: the developer-badge title deeds (`hid_dev_*`, granted
+   by `src/sim/dev_badge_deeds.ts` from the server-resolved GitHub merged-PR
+   tier) are hidden because nothing in play can earn them, not because they
+   spoil anything. A deed only a few accounts can ever earn stays out of
+   everyone else's Book (a visible-but-unearnable deed is worse than none);
+   it is zero-Renown cosmetic flair, never a precedent for hiding an ordinary
+   earnable deed.
 9. **Never retro-edit an existing trigger.** Widening a trigger list changes
    mid-progress fractions and re-scopes what an earned deed meant; new
    coverage lands as NEW deeds. Earned records are append-only.

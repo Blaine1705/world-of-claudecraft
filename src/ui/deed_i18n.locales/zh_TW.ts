@@ -867,4 +867,29 @@ export const table: DeedLocaleTable = {
 
     name: '傳奇締造者',
   },
+  hid_dev_tinkerer: {
+    desc: '向遊戲的開源儲存庫合併了一個拉取請求。',
+    name: '原始碼修補匠',
+    title: '修補匠',
+  },
+  hid_dev_artificer: {
+    desc: '向遊戲的開源儲存庫合併了 5 個拉取請求。',
+    name: '原始碼工巧師',
+    title: '工巧師',
+  },
+  hid_dev_runesmith: {
+    desc: '向遊戲的開源儲存庫合併了 15 個拉取請求。',
+    name: '原始碼符文匠',
+    title: '符文匠',
+  },
+  hid_dev_architect: {
+    desc: '向遊戲的開源儲存庫合併了 30 個拉取請求。',
+    name: '原始碼架構師',
+    title: '架構師',
+  },
+  hid_dev_worldwright: {
+    desc: '向遊戲的開源儲存庫合併了 70 個拉取請求。',
+    name: '原始碼世界鑄造者',
+    title: '世界鑄造者',
+  },
 };

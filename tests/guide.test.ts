@@ -246,7 +246,8 @@ const generatedSource = readFileSync(
 // One scoped exemption: the developer-badge title deeds reward the badge rung's own name
 // ("Artificer", "Runesmith"), which is already public flair (hudChrome.devBadge.tiers, shown on
 // every contributor's nameplate and card), so that title text spoils nothing. Their deed name and
-// criteria stay in scope like any hidden deed's.
+// criteria stay in scope like any hidden deed's. tests/dev_badge_deeds.test.ts pins each exempted
+// title text to the public rung name, so a spoilery rename cannot ride this exemption.
 const PUBLIC_TITLE_TEXT_DEEDS = new Set<string>(Object.values(DEV_BADGE_TITLE_DEEDS));
 const hiddenDeedProse = (d: DeedDef): string[] => [
   d.name,

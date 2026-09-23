@@ -1078,4 +1078,29 @@ export const table: DeedLocaleTable = {
 
     name: '전설을 빚는 자',
   },
+  hid_dev_tinkerer: {
+    desc: '게임의 오픈 소스 저장소에 풀 리퀘스트가 병합되었다.',
+    name: '소스의 수선공',
+    title: '수선공',
+  },
+  hid_dev_artificer: {
+    desc: '게임의 오픈 소스 저장소에 풀 리퀘스트 5건이 병합되었다.',
+    name: '소스의 장인',
+    title: '장인',
+  },
+  hid_dev_runesmith: {
+    desc: '게임의 오픈 소스 저장소에 풀 리퀘스트 15건이 병합되었다.',
+    name: '소스의 룬 대장장이',
+    title: '룬 대장장이',
+  },
+  hid_dev_architect: {
+    desc: '게임의 오픈 소스 저장소에 풀 리퀘스트 30건이 병합되었다.',
+    name: '소스의 설계자',
+    title: '설계자',
+  },
+  hid_dev_worldwright: {
+    desc: '게임의 오픈 소스 저장소에 풀 리퀘스트 70건이 병합되었다.',
+    name: '소스의 세계 창조자',
+    title: '세계 창조자',
+  },
 };
