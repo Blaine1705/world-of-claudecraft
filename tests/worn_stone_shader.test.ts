@@ -23,6 +23,7 @@ async function compileWornObject(
   preset: string,
   family: SurfaceFamily,
   opts?: SurfaceDetailOpts,
+  withMap = false,
 ): Promise<CompiledWorn> {
   const pending: Promise<unknown>[] = [];
   vi.resetModules();
@@ -43,6 +44,8 @@ async function compileWornObject(
   const { applySurfaceDetail } = await import('../src/render/worn_stone');
   await Promise.all(pending);
   const material = new THREE.MeshStandardMaterial();
+  // The cell mask reads the material's own map UV, so it only compiles with a bound map.
+  if (withMap) material.map = new THREE.Texture();
   applySurfaceDetail(material, family, opts);
   const shader: FakeShader = {
     uniforms: {},
@@ -54,6 +57,14 @@ async function compileWornObject(
     null as unknown as THREE.WebGLRenderer,
   );
   return { shader, key: material.customProgramCacheKey() };
+}
+
+/** Everything spliced after the sampling block: the roughness, metalness and
+ *  normal chunks, which only apply the sampled locals. */
+function wornTail(frag: string): string {
+  const start = frag.indexOf('#include <roughnessmap_fragment>');
+  const end = frag.indexOf('#include <emissivemap_fragment>', start);
+  return frag.slice(start, end === -1 ? undefined : end).replace(/\/\/.*$/gm, '');
 }
 
 async function compileWornShader(
@@ -161,15 +172,28 @@ describe('insane worn-surface fragment shader', () => {
 
   it('keeps a flat, axis-aligned facet at one fetch per map and a corner at three', () => {
     const { flat, corner } = planeArms(fragmentShader);
+    const block = injectedWorn(fragmentShader);
     for (const map of ['uWornDisp', 'uWornAo', 'uWornRough', 'uWornNormal']) {
       expect(count(flat, new RegExp(`texture2D\\( ${map}, wornUv \\)`, 'g')), map).toBe(1);
     }
     // Four maps at the (offset) UV plus the one refining height read.
     expect(count(flat, /texture2D\(/g)).toBe(5);
-    for (const map of ['uWornDisp', 'uWornAo', 'uWornRough']) {
-      expect(corner).toContain(`wornTri3( ${map}, wornUvX, wornUvY, wornUvZ, wornW )`);
+    for (const map of ['uWornAo', 'uWornRough']) {
+      expect(
+        count(corner, new RegExp(`wornTri3\\( ${map}, wornUvX, wornUvY, wornUvZ, wornW \\)`, 'g')),
+        map,
+      ).toBe(1);
     }
     expect(count(corner, /texture2D\( uWornNormal, wornUv[XYZ] \)/g)).toBe(3);
+    // The corner helper is three weighted fetches with one exit, nothing else.
+    const helperAt = fragmentShader.indexOf('float wornTri3(');
+    const helper = fragmentShader.slice(helperAt, fragmentShader.indexOf('}', helperAt) + 1);
+    expect(count(helper, /texture2D\(/g)).toBe(3);
+    expect(count(helper, /\breturn\b/g)).toBe(1);
+    expect(helper).not.toMatch(/\bif\b|\?/);
+    // The arm predicate and the snap share the 0.999 threshold: the dominant
+    // weight is one-hot exactly where the flat arm takes over.
+    expect(block).toContain('bool wornFlat = max( wornW.x, max( wornW.y, wornW.z ) ) >= 0.999;');
     // The one-hot weight selects the plane's UV, view ray, and reorientation
     // without a second selector.
     expect(flat).toContain('wornW = step( vec3( 0.999 ), wornW );');
@@ -193,6 +217,8 @@ describe('insane worn-surface fragment shader', () => {
     // behind the fade gate.
     const mainAt = block.indexOf('vec3 wornP = ');
     const fadeAt = block.indexOf('if ( wornDetK > 0.0 ) {', mainAt);
+    expect(mainAt).toBeGreaterThan(-1);
+    expect(fadeAt).toBeGreaterThan(mainAt);
     expect(block.indexOf('texture2D(', mainAt)).toBeGreaterThan(fadeAt);
     expect(block).toContain('smoothstep( uWornParStart, uWornParEnd, wornCamD )');
     expect(block).toContain('smoothstep( uWornDetStart, uWornDetEnd, wornCamD )');
@@ -203,23 +229,34 @@ describe('insane worn-surface fragment shader', () => {
     expect(fragmentShader).toContain(
       'normal = normalize( mix( normal, wornViewN, uWornStrength * wornDetK ) );',
     );
-    // The roughness and normal chunks carry no branch of their own.
-    const tail = fragmentShader.slice(fragmentShader.indexOf('#include <roughnessmap_fragment>'));
-    expect(tail).not.toContain('wornDetK > 0.0');
+    // The roughness, metalness and normal chunks carry no branch, short-circuit
+    // or ternary of their own: they only apply the sampled locals.
+    const tail = wornTail(fragmentShader);
+    expect(tail).toContain('wornRoughV');
+    expect(tail).not.toMatch(/\bif \(|&&|\|\||\?/);
   });
 
   it.each([
-    ['high', 'high', 0, 2],
-    ['ultra', 'ultra', 2, 4],
-    ['advanced basic', 'high&gfxo=surfaceDetail:1,surfaceDetailTaps:0,surfaceDetailClampK:0', 0, 2],
+    ['high', 'high', 0, 2, 3],
+    ['ultra', 'ultra', 2, 4, 5],
+    [
+      'advanced basic',
+      'high&gfxo=surfaceDetail:1,surfaceDetailTaps:0,surfaceDetailClampK:0',
+      0,
+      2,
+      3,
+    ],
   ] as const)(
     'emits a balanced %s worn shader',
-    async (_name, search, heightReadsPerPath, branches) => {
+    async (_name, search, heightReadsPerPath, branches, flatFetches) => {
       const shader = await compileWornShader(search);
       const block = injectedWorn(shader);
       expect(count(block, /texture2D\( uWornDisp/g)).toBe(heightReadsPerPath);
       expect(count(block, /\bif \(/g)).toBe(branches);
       expect(block).toContain('if ( wornFlat )');
+      // Flat arm: one fetch per map (normal, AO, rough) plus the height reads.
+      expect(count(planeArms(shader).flat, /texture2D\(/g)).toBe(flatFetches);
+      expect(wornTail(shader)).not.toMatch(/\bif \(|&&|\|\||\?/);
       expect(count(shader, /{/g)).toBe(count(shader, /}/g));
     },
   );
@@ -231,8 +268,10 @@ describe('insane worn-surface fragment shader', () => {
     expect(corner).toContain(
       'wornMetalV = wornTri3( uWornMetal, wornUvX, wornUvY, wornUvZ, wornW );',
     );
+    expect(shader).toContain('float wornMetalV = uWornMetalMean;');
     expect(shader).toContain('mix( uWornMetalMean, wornMetalV, wornDetK )');
     expect(shader).not.toContain('uniform sampler2D uWornAo;');
+    expect(wornTail(shader)).not.toMatch(/\bif \(|&&|\|\||\?/);
   });
 
   it('object space samples AO and roughness only, with the plane split as its one branch', async () => {
@@ -246,6 +285,26 @@ describe('insane worn-surface fragment shader', () => {
     expect(block).not.toContain('uWornNormal, wornUv');
     expect(block).not.toContain('uWornDisp');
     expect(block).not.toContain('gl_FrontFacing');
+    const { flat, corner } = planeArms(shader.fragmentShader);
+    expect(flat).toContain('texture2D( uWornAo, wornUv )');
+    expect(flat).toContain('texture2D( uWornRough, wornUv )');
+    expect(corner).toContain('wornTri3( uWornAo, wornUvX, wornUvY, wornUvZ, wornW )');
+    expect(corner).toContain('wornTri3( uWornRough, wornUvX, wornUvY, wornUvZ, wornW )');
+  });
+
+  it('bakes the cell mask as a constant array inside the same branch budget and keys it', async () => {
+    const cellMask = [1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0, 0, 0, 0];
+    const masked = await compileWornObject('ultra', 'stone', { cellMask }, true);
+    const plain = await compileWornObject('ultra', 'stone', undefined, true);
+    const block = injectedWorn(masked.shader.fragmentShader);
+    expect(block).toContain(
+      'const float wornCellMask[16] = float[16]( 1.000, 1.000, 1.000, 1.000, 0.500, 0.500, 0.500, 0.500, 0.250, 0.250, 0.250, 0.250, 0.000, 0.000, 0.000, 0.000 );',
+    );
+    expect(block).toContain('wornCellK = wornCellMask[ wornRow * 4 + wornCol ];');
+    expect(count(block, /\bif \(/g)).toBe(4);
+    expect(masked.key).toContain('|m1,1,1,1,0.5,0.5,0.5,0.5,0.25,0.25,0.25,0.25,0,0,0,0|');
+    expect(masked.key).not.toBe(plain.key);
+    expect(plain.key).not.toContain('|m');
   });
 });
 
@@ -399,7 +458,26 @@ describe('worn-surface program collapse across families', () => {
     for (const family of STRUCTURAL_TWINS) {
       expect(first.key).not.toContain(family);
     }
-    expect(first.key.startsWith('surface-detail|on|')).toBe(true);
+    expect(first.key.startsWith('surface-detail|on|p3c0.85|-|-|ao|w|')).toBe(true);
+  });
+
+  it('pins the structural key prefix per mode', async () => {
+    const prefix = (key: string): string => key.split('|').slice(0, 7).join('|');
+    expect(prefix((await compileWornObject('ultra', 'stone')).key)).toBe(
+      'surface-detail|on|p3c0.85|-|-|ao|w',
+    );
+    expect(prefix((await compileWornObject('insane', 'stone')).key)).toBe(
+      'surface-detail|on|p4c1|-|-|ao|w',
+    );
+    expect(prefix((await compileWornObject('high', 'stone')).key)).toBe(
+      'surface-detail|on|-|-|-|ao|w',
+    );
+    expect(prefix((await compileWornObject('ultra', 'metal')).key)).toBe(
+      'surface-detail|on|p3c0.85|-|met|-|w',
+    );
+    expect(
+      prefix((await compileWornObject('ultra', 'stone', { strength: 0.2, objectSpace: true })).key),
+    ).toBe('surface-detail|on|-|-|-|ao|o');
   });
 
   it('keeps STRUCTURALLY different families on distinct keys and source', async () => {
