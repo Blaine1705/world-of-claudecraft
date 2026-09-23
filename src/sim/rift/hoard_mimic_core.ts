@@ -18,7 +18,7 @@ export const MIMIC = Object.freeze({
   // ---- Bite
   biteFirstSec: 3,
   biteEverySec: 7.5,
-  biteWindupSec: 1.1,
+  biteWindupSec: 1.6,
   biteRadius: 6,
   biteHalfAngle: Math.PI * 0.3,
   biteDamageFraction: 0.17,
@@ -40,7 +40,8 @@ export const MIMIC = Object.freeze({
   coinEverySec: 20,
   coinCastSec: 1.2,
   coinRadius: 1.9,
-  coinWindupSec: 0.9,
+  /** Long enough to watch the coins arc out of its mouth to where they land. */
+  coinWindupSec: 1.1,
   coinImpactFraction: 0.05,
   coinHazardSec: 6,
   coinPulseFraction: 0.03,

@@ -18,7 +18,7 @@ export const MOLE = Object.freeze({
   // ---- Claw Rake
   swipeRadius: 7,
   swipeHalfAngle: Math.PI * 0.33,
-  swipeWindupSec: 1.3,
+  swipeWindupSec: 1.8,
   swipeDamageFraction: 0.14,
   swipeFirstSec: 4,
   swipeEverySec: 9,

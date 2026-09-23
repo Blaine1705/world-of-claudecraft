@@ -30,6 +30,7 @@ import { HoardEncounterAccents } from './hoard_encounter_accents';
 import { HoardForgeHammerFx } from './hoard_forge_hammer';
 import { HoardGoblinCoinsFx } from './hoard_goblin_coins';
 import { HoardIceAgeFx } from './hoard_ice_age';
+import { HoardMimicCoinsFx } from './hoard_mimic_coins';
 import { HoardOrbitalLightning } from './hoard_orbital_lightning';
 import { HoardPulsarFx } from './hoard_pulsars';
 import { HoardSpellFx } from './hoard_spell_fx';
@@ -88,6 +89,7 @@ export class RiftDeathZoneVisuals {
   private readonly hoardBoulder: HoardBoulderFx;
   private readonly hoardCocoon: HoardCocoonFx;
   private readonly hoardGoblinCoins: HoardGoblinCoinsFx;
+  private readonly hoardMimicCoins: HoardMimicCoinsFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -131,6 +133,7 @@ export class RiftDeathZoneVisuals {
       shake,
     );
     this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
+    this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
     this.hoardGoblinCoins = new HoardGoblinCoinsFx(
       scene,
       groundY,
@@ -160,6 +163,7 @@ export class RiftDeathZoneVisuals {
     this.hoardTentacles.sync(hoardCues);
     this.hoardBoulder.sync(hoardCues);
     this.hoardCocoon.sync(hoardCues);
+    this.hoardMimicCoins.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
       const key = `${z.x.toFixed(1)}:${z.z.toFixed(1)}:${z.radius.toFixed(1)}`;
@@ -199,6 +203,7 @@ export class RiftDeathZoneVisuals {
     this.hoardBoulder.update(dt);
     this.hoardCocoon.update(dt);
     this.hoardGoblinCoins.update(dt);
+    this.hoardMimicCoins.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -228,6 +233,7 @@ export class RiftDeathZoneVisuals {
     this.hoardBoulder.dispose();
     this.hoardCocoon.dispose();
     this.hoardGoblinCoins.dispose();
+    this.hoardMimicCoins.dispose();
     this.hoardPresentation.dispose();
   }
 

@@ -3926,7 +3926,8 @@ export const VISUALS: Record<string, VisualDef> = {
         [HOARD_CAST_COLLAPSE]: 'Cast',
       },
       castTimeScaleByAbility: {
-        [HOARD_CAST_MOLE_RAKE]: 0.3,
+        // The strike (40% into the 0.96 s clip) lands as the 1.8 s telegraph ends.
+        [HOARD_CAST_MOLE_RAKE]: 0.21,
         [HOARD_CAST_BURROW]: 0.94,
         [HOARD_CAST_TUNNEL]: 1,
         [HOARD_CAST_EMERGE]: 1,
@@ -4013,7 +4014,8 @@ export const VISUALS: Record<string, VisualDef> = {
         [HOARD_CAST_COIN_SPIT]: 'Cast',
       },
       castTimeScaleByAbility: {
-        [HOARD_CAST_MIMIC_BITE]: 0.52,
+        // The snap (55% into the 1.04 s clip) lands as the 1.6 s telegraph ends.
+        [HOARD_CAST_MIMIC_BITE]: 0.36,
         [HOARD_CAST_MIMIC_LEAP]: 0.55,
         [HOARD_CAST_COIN_SPIT]: 1,
       },

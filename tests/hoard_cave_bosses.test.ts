@@ -340,3 +340,64 @@ describe('the cave bosses online', () => {
     expect(melee).toHaveLength(0);
   });
 });
+
+describe('the Voracious Chest coins on screen', () => {
+  it('flies each handful out of the mouth in an arc and lands it in its puddle', async () => {
+    const { MIMIC_COIN_LOOK, mimicCoinArc, mimicCoinProgress, planMimicCoins } = await import(
+      '../src/render/hoard_mimic_coins_core'
+    );
+    const coins = planMimicCoins(7, MIMIC_COIN_LOOK.perPuddle, MIMIC.coinRadius);
+    expect(coins).toHaveLength(MIMIC_COIN_LOOK.perPuddle);
+    for (const coin of coins) {
+      expect(Math.hypot(coin.dx, coin.dz)).toBeLessThanOrEqual(
+        MIMIC.coinRadius * MIMIC_COIN_LOOK.spread + 1e-9,
+      );
+    }
+    expect(planMimicCoins(7, 6, 2)).toEqual(planMimicCoins(7, 6, 2));
+    const from = { x: 0, y: 2, z: 0 };
+    const to = { x: 10, y: 0, z: 0 };
+    const out = { x: 0, y: 0, z: 0 };
+    expect(mimicCoinArc(from, to, 0, out)).toEqual({ x: 0, y: 2, z: 0 });
+    expect(mimicCoinArc(from, to, 1, out)).toEqual({ x: 10, y: 0, z: 0 });
+    expect(mimicCoinArc(from, to, 0.5, out).y).toBeGreaterThan(1 + MIMIC_COIN_LOOK.arcPeak - 1e-9);
+    // It leaves after its delay and lands exactly as the warning ends.
+    expect(mimicCoinProgress(0.05, 1.1, 0.1)).toBe(0);
+    expect(mimicCoinProgress(1.1, 1.1, 0.1)).toBe(1);
+  });
+
+  it('draws the coins while a puddle stands and lets them sink when it goes', async () => {
+    const THREE = await import('three');
+    const { HoardMimicCoinsFx } = await import('../src/render/hoard_mimic_coins');
+    const scene = new THREE.Scene();
+    const fx = new HoardMimicCoinsFx(
+      scene,
+      () => 0,
+      undefined,
+      undefined,
+      () => false,
+      'high',
+    );
+    await fx.readyForEntry;
+    const mesh = scene.getObjectByName('MimicCoins') as InstanceType<typeof THREE.InstancedMesh>;
+    const cue = {
+      instanceId: 1,
+      cueId: 3,
+      kind: 'mark' as const,
+      variant: 'mimic-coins' as const,
+      phase: 'warning' as const,
+      x: 4,
+      z: 4,
+      radius: MIMIC.coinRadius,
+      remaining: MIMIC.coinWindupSec,
+      total: MIMIC.coinWindupSec,
+    };
+    fx.sync([cue]);
+    fx.update(MIMIC.coinWindupSec + 0.1);
+    expect(mesh.visible).toBe(true);
+    fx.sync([]);
+    fx.update(1);
+    expect(mesh.visible).toBe(false);
+    fx.dispose();
+    expect(scene.children).toHaveLength(0);
+  });
+});

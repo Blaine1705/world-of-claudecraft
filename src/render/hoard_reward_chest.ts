@@ -203,6 +203,14 @@ export function buildHoardRewardChest(
         emissiveIntensity: glow ? 1 : CHEST_TUNING.BOUNCE_LIGHT,
       });
       if (!converted.name) converted.name = `HoardRewardChest:${material.name || 'Surface'}`;
+      // The glow faces sit flush on the wood inside the lid; pulled a hair toward
+      // the camera they always win, instead of fighting the wood in stripes that
+      // shift as the camera moves (playtest).
+      if (glow) {
+        converted.polygonOffset = true;
+        converted.polygonOffsetFactor = -1;
+        converted.polygonOffsetUnits = -2;
+      }
       if (glow && 'emissiveIntensity' in converted) {
         converted.userData.chestInner = material.name === 'InnerGlow';
         glowing.push(converted as THREE.MeshStandardMaterial);
