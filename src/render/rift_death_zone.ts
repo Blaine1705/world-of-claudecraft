@@ -28,6 +28,7 @@ import { HoardBoulderFx } from './hoard_boulder';
 import { HoardCocoonFx } from './hoard_cocoon';
 import { HoardEncounterAccents } from './hoard_encounter_accents';
 import { HoardForgeHammerFx } from './hoard_forge_hammer';
+import { HoardGoblinCoinsFx } from './hoard_goblin_coins';
 import { HoardIceAgeFx } from './hoard_ice_age';
 import { HoardOrbitalLightning } from './hoard_orbital_lightning';
 import { HoardPulsarFx } from './hoard_pulsars';
@@ -86,6 +87,7 @@ export class RiftDeathZoneVisuals {
   private readonly hoardTentacles: HoardTentaclesFx;
   private readonly hoardBoulder: HoardBoulderFx;
   private readonly hoardCocoon: HoardCocoonFx;
+  private readonly hoardGoblinCoins: HoardGoblinCoinsFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -129,6 +131,13 @@ export class RiftDeathZoneVisuals {
       shake,
     );
     this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
+    this.hoardGoblinCoins = new HoardGoblinCoinsFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+    );
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -189,6 +198,7 @@ export class RiftDeathZoneVisuals {
     this.hoardTentacles.update(dt);
     this.hoardBoulder.update(dt);
     this.hoardCocoon.update(dt);
+    this.hoardGoblinCoins.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -217,6 +227,7 @@ export class RiftDeathZoneVisuals {
     this.hoardTentacles.dispose();
     this.hoardBoulder.dispose();
     this.hoardCocoon.dispose();
+    this.hoardGoblinCoins.dispose();
     this.hoardPresentation.dispose();
   }
 
