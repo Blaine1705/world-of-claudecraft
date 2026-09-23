@@ -322,6 +322,15 @@ const NON_FINITE: { name: string; a: number; b: number }[] = [
   { name: '-Inf', a: -1, b: 0 },
 ];
 const FAMILY_SIZE = 4;
+const FLT_MAX = 3.4028234663852886e38;
+
+// Unscrubbed, the injection arrives non-finite (a driver may also turn an
+// infinity into NaN), except on the blended sprite, which ANGLE D3D11 and
+// ANGLE Vulkan (NVIDIA) store as +/-FLT_MAX. None of these is the 0 a missed
+// draw would leave.
+function reachesTargetUnscrubbed(component: number): boolean {
+  return !Number.isFinite(component) || Math.abs(component) >= FLT_MAX;
+}
 
 function familyMaterial(family: Family): THREE.Material {
   const color = 0x336633;
@@ -448,7 +457,7 @@ describe('final color NaN guard alone scrubs every opaque_fragment family', () =
   // Per family, so a draw that misses the sampled texel (the target clears to
   // 0, the expected value) cannot pass the case above vacuously.
   it.each(FAMILIES)(
-    '%s control: without the guard the same injection comes out non-finite',
+    '%s control: without the guard the same injection reaches the target unscrubbed',
     (family) => {
       const guarded = THREE.ShaderChunk.opaque_fragment;
       THREE.ShaderChunk.opaque_fragment = guarded.replace(
@@ -461,7 +470,7 @@ describe('final color NaN guard alone scrubs every opaque_fragment family', () =
           const { rgb } = renderFamily(family, value, `control:${value.name}`);
           expect(shaderError, `${family} ${value.name}`).toBeNull();
           expect(
-            rgb.every((component) => !Number.isFinite(component)),
+            rgb.every((component) => reachesTargetUnscrubbed(component)),
             `${family} ${value.name}: ${rgb.join(',')}`,
           ).toBe(true);
         }
