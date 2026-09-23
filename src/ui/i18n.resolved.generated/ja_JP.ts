@@ -10036,6 +10036,19 @@ export const ja_JP: EnTranslations = {
       "threat": "脅威",
       "damageShort": "ダメ",
       "healingShort": "回復",
+      "damageTaken": "被ダメージ",
+      "damageTakenShort": "被ダメ",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "妨害",
+      "interruptsShort": "妨害",
+      "dispels": "解除",
+      "dispelsShort": "解除",
+      "deaths": "死亡",
+      "deathsShort": "死亡",
+      "reset": "メーターリセット",
+      "resetHint": "戦闘データをリセット",
+      "groupTotal": "合計: {total} ({rate})",
       "current": "現在",
       "lastFight": "前回の戦闘",
       "fightIndex": "戦闘 -{index}",
@@ -10047,6 +10060,16 @@ export const ja_JP: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "前の区間",
       "newerSegment": "次の区間",
+      "selectSegment": "戦闘区間を選択",
+      "selectMode": "メーターモードを選択",
+      "back": "戻る",
+      "resetFight": "現在の戦闘をリセット",
+      "resetAll": "すべてのデータをリセット",
+      "criticals": "クリティカル: {count}",
+      "hits": "ヒット数: {count}",
+      "topAbility": "最多: {name}",
+      "activity": "アクティビティ: {pct}",
+      "newWindow": "新規ウィンドウ",
       "close": "メーターを閉じる"
     },
     "chat": {
@@ -16404,6 +16427,21 @@ export const ja_JP: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "治療用ダミー"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "尾根の追跡者"

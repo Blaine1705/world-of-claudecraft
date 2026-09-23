@@ -3161,7 +3161,7 @@ export const en_CA: EnTranslations = {
       "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
       "duskfireClaim": "Death grants {value} Wrack",
       "pyreGuardian": "Generates {ruin} Wrack every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
-      "perfectMoment": "Aether Darts does not consume Arcane Charges",
+      "perfectMoment": "Aether Darts does not consume Arcane Charges and deals 20% increased damage",
       "scale": "Size increased by {pct}%",
       "jump": "Jump height increased by {pct}%",
       "school": {
@@ -10036,6 +10036,19 @@ export const en_CA: EnTranslations = {
       "threat": "Threat",
       "damageShort": "Dmg",
       "healingShort": "Heal",
+      "damageTaken": "Damage Taken",
+      "damageTakenShort": "Taken",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "Interrupts",
+      "interruptsShort": "Int",
+      "dispels": "Dispels",
+      "dispelsShort": "Disp",
+      "deaths": "Deaths",
+      "deathsShort": "Dead",
+      "reset": "Reset meters",
+      "resetHint": "Reset combat data",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "Current",
       "lastFight": "Last fight",
       "fightIndex": "Fight -{index}",
@@ -10047,6 +10060,16 @@ export const en_CA: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Older segment",
       "newerSegment": "Newer segment",
+      "selectSegment": "Select fight segment",
+      "selectMode": "Select meter mode",
+      "back": "Back",
+      "resetFight": "Reset current fight",
+      "resetAll": "Reset all data",
+      "criticals": "Criticals: {count}",
+      "hits": "Hits: {count}",
+      "topAbility": "Top: {name}",
+      "activity": "Activity: {pct}",
+      "newWindow": "New window",
       "close": "Close meters"
     },
     "chat": {
@@ -12495,7 +12518,7 @@ export const en_CA: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Perfect Moment",
-        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them and deals 20% increased damage. (Chronomancy)"
       },
       "arcane_surge": {
         "name": "Aether Surge",
@@ -16404,6 +16427,21 @@ export const en_CA: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Healing Dummy"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Ridge Stalker"

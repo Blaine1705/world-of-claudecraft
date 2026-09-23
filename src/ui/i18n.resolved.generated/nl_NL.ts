@@ -10036,6 +10036,19 @@ export const nl_NL: EnTranslations = {
       "threat": "Dreiging",
       "damageShort": "Sch",
       "healingShort": "Gen",
+      "damageTaken": "Damage Taken",
+      "damageTakenShort": "Taken",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "Interrupts",
+      "interruptsShort": "Int",
+      "dispels": "Dispels",
+      "dispelsShort": "Disp",
+      "deaths": "Deaths",
+      "deathsShort": "Dead",
+      "reset": "Reset meters",
+      "resetHint": "Reset combat data",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "Huidig",
       "lastFight": "Laatste gevecht",
       "fightIndex": "Gevecht -{index}",
@@ -10047,6 +10060,16 @@ export const nl_NL: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Ouder segment",
       "newerSegment": "Nieuwer segment",
+      "selectSegment": "Select fight segment",
+      "selectMode": "Select meter mode",
+      "back": "Back",
+      "resetFight": "Reset current fight",
+      "resetAll": "Reset all data",
+      "criticals": "Criticals: {count}",
+      "hits": "Hits: {count}",
+      "topAbility": "Top: {name}",
+      "activity": "Activity: {pct}",
+      "newWindow": "New window",
       "close": "Meters sluiten"
     },
     "chat": {
@@ -16404,6 +16427,21 @@ export const nl_NL: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Genezingspop"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Bergkam-Sluiper"

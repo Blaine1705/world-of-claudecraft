@@ -10036,6 +10036,19 @@ export const de_DE: EnTranslations = {
       "threat": "Bedrohung",
       "damageShort": "Schad.",
       "healingShort": "Heil.",
+      "damageTaken": "Damage Taken",
+      "damageTakenShort": "Taken",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "Interrupts",
+      "interruptsShort": "Int",
+      "dispels": "Dispels",
+      "dispelsShort": "Disp",
+      "deaths": "Deaths",
+      "deathsShort": "Dead",
+      "reset": "Reset meters",
+      "resetHint": "Reset combat data",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "Aktuell",
       "lastFight": "Letzter Kampf",
       "fightIndex": "Kampf -{index}",
@@ -10047,6 +10060,16 @@ export const de_DE: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Älteres Segment",
       "newerSegment": "Neueres Segment",
+      "selectSegment": "Select fight segment",
+      "selectMode": "Select meter mode",
+      "back": "Back",
+      "resetFight": "Reset current fight",
+      "resetAll": "Reset all data",
+      "criticals": "Criticals: {count}",
+      "hits": "Hits: {count}",
+      "topAbility": "Top: {name}",
+      "activity": "Activity: {pct}",
+      "newWindow": "New window",
       "close": "Anzeigen schließen"
     },
     "chat": {
@@ -16404,6 +16427,21 @@ export const de_DE: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Heilungsattrappe"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Gratpirscher"

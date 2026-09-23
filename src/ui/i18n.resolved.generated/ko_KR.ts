@@ -10036,6 +10036,19 @@ export const ko_KR: EnTranslations = {
       "threat": "위협",
       "damageShort": "피해",
       "healingShort": "치유",
+      "damageTaken": "받은 피해",
+      "damageTakenShort": "받은피해",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "차단",
+      "interruptsShort": "차단",
+      "dispels": "해제",
+      "dispelsShort": "해제",
+      "deaths": "사망",
+      "deathsShort": "사망",
+      "reset": "미터 초기화",
+      "resetHint": "전투 데이터 초기화",
+      "groupTotal": "총합: {total} ({rate})",
       "current": "현재",
       "lastFight": "지난 전투",
       "fightIndex": "전투 -{index}",
@@ -10047,6 +10060,16 @@ export const ko_KR: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "이전 구간",
       "newerSegment": "다음 구간",
+      "selectSegment": "전투 구간 선택",
+      "selectMode": "미터 모드 선택",
+      "back": "뒤로",
+      "resetFight": "현재 전투 초기화",
+      "resetAll": "모든 데이터 초기화",
+      "criticals": "치명타: {count}",
+      "hits": "적중: {count}",
+      "topAbility": "최고: {name}",
+      "activity": "활동량: {pct}",
+      "newWindow": "새 창",
       "close": "미터 닫기"
     },
     "chat": {
@@ -16404,6 +16427,21 @@ export const ko_KR: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "치유용 허수아비"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "산등성이 추적자"

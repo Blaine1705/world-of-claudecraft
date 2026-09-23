@@ -10036,6 +10036,19 @@ export const es: EnTranslations = {
       "threat": "Amenaza",
       "damageShort": "Daño",
       "healingShort": "Sanar",
+      "damageTaken": "Daño Recibido",
+      "damageTakenShort": "Recib.",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "Cortes",
+      "interruptsShort": "Cortes",
+      "dispels": "Disipaciones",
+      "dispelsShort": "Disip.",
+      "deaths": "Muertes",
+      "deathsShort": "Bajas",
+      "reset": "Reiniciar medidores",
+      "resetHint": "Reiniciar datos de combate",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "Actual",
       "lastFight": "Último combate",
       "fightIndex": "Combate -{index}",
@@ -10047,6 +10060,16 @@ export const es: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Segmento anterior",
       "newerSegment": "Segmento siguiente",
+      "selectSegment": "Select fight segment",
+      "selectMode": "Select meter mode",
+      "back": "Back",
+      "resetFight": "Reset current fight",
+      "resetAll": "Reset all data",
+      "criticals": "Criticals: {count}",
+      "hits": "Hits: {count}",
+      "topAbility": "Top: {name}",
+      "activity": "Activity: {pct}",
+      "newWindow": "New window",
       "close": "Cerrar medidores"
     },
     "chat": {
@@ -16404,6 +16427,21 @@ export const es: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Muñeco de sanación"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Acechador de la cresta"

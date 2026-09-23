@@ -2191,6 +2191,7 @@ export class Hud {
       uiScale: getUiScale,
       isMobileLayout: () => this.isMobileLayout(),
       storage: localStorage,
+      sendChat: (line) => this.sim.chat(line),
       // The meters' tab menu paints into the ONE shared #ctx-menu box through
       // the same seat/clamp/bind helpers every other HUD popup uses.
       openMenu: (items, x, y, onSelect) =>

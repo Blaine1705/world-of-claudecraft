@@ -17288,4 +17288,15 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'guide.worldPage.peaksPlaceNotes':
     'Highwatch sostiene la muralla. Stalker Ridge y las Madrigueras de Roca Profunda pertenecen a felinos y excavadores; las Estribaciones de Ogro y el Campamento de guerra de Drogmar a mercenarios. Stormcrag chisporrotea de elementales y bajo él brilla Glimmermere, cuya orilla guarda la puerta de luz pálida al Templo Ahogado. Las Tiendas de los Juramentados y los Campos de los Renacidos rodean las alturas del culto, con el Santuario del Gravewyrm en la cima.',
   'worldContent.farmPatchName': 'Bancales de jardín',
+  'hud.meters.damageTaken': 'Daño Recibido',
+  'hud.meters.damageTakenShort': 'Recib.',
+  'hud.meters.interrupts': 'Cortes',
+  'hud.meters.interruptsShort': 'Cortes',
+  'hud.meters.dispels': 'Disipaciones',
+  'hud.meters.dispelsShort': 'Disip.',
+  'hud.meters.deaths': 'Muertes',
+  'hud.meters.deathsShort': 'Bajas',
+  'hud.meters.reset': 'Reiniciar medidores',
+  'hud.meters.resetHint': 'Reiniciar datos de combate',
+  'hud.meters.groupTotal': 'Total: {total} ({rate})',
 };

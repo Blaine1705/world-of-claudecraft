@@ -3161,7 +3161,7 @@ export const en_XA: EnTranslations = {
       "ruinousBrand": "[{charges} çóþíéš ŕéɱáíñ: ðíŕéçţ šþéļļš çóþý {otherPct}% ðáɱáĝé ĥéŕé, óŕ {selfPct}% ŵĥéñ ţĥíš íš ţĥéíŕ ţáŕĝéţ]",
       "duskfireClaim": "[Ðéáţĥ ĝŕáñţš {value} Ŵŕáçķ]",
       "pyreGuardian": "[Ĝéñéŕáţéš {ruin} Ŵŕáçķ éʋéŕý {ruinInterval} šéç áñð ðéáļš {damage} Ƒíŕé ðáɱáĝé ŵíţĥíñ {radius} ýð éʋéŕý {damageInterval} šéç]",
-      "perfectMoment": "[Áéţĥéŕ Ðáŕţš ðóéš ñóţ çóñšúɱé Áŕçáñé Çĥáŕĝéš]",
+      "perfectMoment": "[Áéţĥéŕ Ðáŕţš ðóéš ñóţ çóñšúɱé Áŕçáñé Çĥáŕĝéš áñð ðéáļš 20% íñçŕéášéð ðáɱáĝé]",
       "scale": "[Šížé íñçŕéášéð ƀý {pct}%]",
       "jump": "[Ĵúɱþ ĥéíĝĥţ íñçŕéášéð ƀý {pct}%]",
       "school": {
@@ -10036,6 +10036,19 @@ export const en_XA: EnTranslations = {
       "threat": "[Ţĥŕéáţ]",
       "damageShort": "[Ðɱĝ]",
       "healingShort": "[Ĥéáļ]",
+      "damageTaken": "[Ðáɱáĝé Ţáķéñ]",
+      "damageTakenShort": "[Ţáķéñ]",
+      "avoidableDmg": "[Áʋóíðáƀļé Ðáɱáĝé]",
+      "avoidableDmgShort": "[Áʋóíð.]",
+      "interrupts": "[Íñţéŕŕúþţš]",
+      "interruptsShort": "[Íñţ]",
+      "dispels": "[Ðíšþéļš]",
+      "dispelsShort": "[Ðíšþ]",
+      "deaths": "[Ðéáţĥš]",
+      "deathsShort": "[Ðéáð]",
+      "reset": "[Ŕéšéţ ɱéţéŕš]",
+      "resetHint": "[Ŕéšéţ çóɱƀáţ ðáţá]",
+      "groupTotal": "[Ţóţáļ: {total} ({rate})]",
       "current": "[Çúŕŕéñţ]",
       "lastFight": "[Ļášţ ƒíĝĥţ]",
       "fightIndex": "[Ƒíĝĥţ -{index}]",
@@ -10047,6 +10060,16 @@ export const en_XA: EnTranslations = {
       "segmentSummary": "[{label} - {duration}]",
       "olderSegment": "[Óļðéŕ šéĝɱéñţ]",
       "newerSegment": "[Ñéŵéŕ šéĝɱéñţ]",
+      "selectSegment": "[Šéļéçţ ƒíĝĥţ šéĝɱéñţ]",
+      "selectMode": "[Šéļéçţ ɱéţéŕ ɱóðé]",
+      "back": "[Ɓáçķ]",
+      "resetFight": "[Ŕéšéţ çúŕŕéñţ ƒíĝĥţ]",
+      "resetAll": "[Ŕéšéţ áļļ ðáţá]",
+      "criticals": "[Çŕíţíçáļš: {count}]",
+      "hits": "[Ĥíţš: {count}]",
+      "topAbility": "[Ţóþ: {name}]",
+      "activity": "[Áçţíʋíţý: {pct}]",
+      "newWindow": "[Ñéŵ ŵíñðóŵ]",
       "close": "[Çļóšé ɱéţéŕš]"
     },
     "chat": {
@@ -12495,7 +12518,7 @@ export const en_XA: EnTranslations = {
       },
       "perfect_moment": {
         "name": "[Þéŕƒéçţ Ɱóɱéñţ]",
-        "description": "[Šéížé ýóúŕ þéŕƒéçţ ɱóɱéñţ: íñšţáñţļý ĝáíñ 4 Áŕçáñé Çĥáŕĝéš, áñð ƒóŕ 10 šéç Áéţĥéŕ Ðáŕţš ðóéš ñóţ çóñšúɱé ţĥéɱ. (Çĥŕóñóɱáñçý)]"
+        "description": "[Šéížé ýóúŕ þéŕƒéçţ ɱóɱéñţ: íñšţáñţļý ĝáíñ 4 Áŕçáñé Çĥáŕĝéš, áñð ƒóŕ 10 šéç Áéţĥéŕ Ðáŕţš ðóéš ñóţ çóñšúɱé ţĥéɱ áñð ðéáļš 20% íñçŕéášéð ðáɱáĝé. (Çĥŕóñóɱáñçý)]"
       },
       "arcane_surge": {
         "name": "[Áéţĥéŕ Šúŕĝé]",
@@ -16404,6 +16427,21 @@ export const en_XA: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "[Ĥéáļíñĝ Ðúɱɱý]"
+      },
+      "healing_dummy_tank": {
+        "name": "[Íñĵúŕéð Ʋáñĝúáŕð Ðúɱɱý]"
+      },
+      "healing_dummy_soldier": {
+        "name": "[Íñĵúŕéð Šóļðíéŕ Ðúɱɱý]"
+      },
+      "healing_dummy_scout": {
+        "name": "[Çŕíţíçáļ Šçóúţ Ðúɱɱý]"
+      },
+      "healing_dummy_caster": {
+        "name": "[Ŵóúñðéð Šþéļļçášţéŕ Ðúɱɱý]"
+      },
+      "healing_dummy_ranger": {
+        "name": "[Ɓáţţéŕéð Ŕáñĝéŕ Ðúɱɱý]"
       },
       "ridge_stalker": {
         "name": "[Ŕíðĝé Šţáļķéŕ]"

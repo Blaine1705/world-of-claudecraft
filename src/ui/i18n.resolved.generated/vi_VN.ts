@@ -10036,6 +10036,19 @@ export const vi_VN: EnTranslations = {
       "threat": "Đe dọa",
       "damageShort": "ST",
       "healingShort": "Trị",
+      "damageTaken": "Damage Taken",
+      "damageTakenShort": "Taken",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "Interrupts",
+      "interruptsShort": "Int",
+      "dispels": "Dispels",
+      "dispelsShort": "Disp",
+      "deaths": "Deaths",
+      "deathsShort": "Dead",
+      "reset": "Reset meters",
+      "resetHint": "Reset combat data",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "Hiện tại",
       "lastFight": "Trận cuối",
       "fightIndex": "Trận -{index}",
@@ -10047,6 +10060,16 @@ export const vi_VN: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Đoạn cũ hơn",
       "newerSegment": "Đoạn mới hơn",
+      "selectSegment": "Select fight segment",
+      "selectMode": "Select meter mode",
+      "back": "Back",
+      "resetFight": "Reset current fight",
+      "resetAll": "Reset all data",
+      "criticals": "Criticals: {count}",
+      "hits": "Hits: {count}",
+      "topAbility": "Top: {name}",
+      "activity": "Activity: {pct}",
+      "newWindow": "New window",
       "close": "Đóng thước đo"
     },
     "chat": {
@@ -16404,6 +16427,21 @@ export const vi_VN: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Hình Nhân Hồi Máu"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"

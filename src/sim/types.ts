@@ -2027,6 +2027,8 @@ export interface MobTemplate {
   // (mob/practice_dummies.ts) so a healer always has something real to heal and
   // the target resets itself for the next player.
   friendlyPracticeTarget?: boolean;
+  // Custom resting health fraction for friendly practice targets (default: 0.35).
+  restHpFraction?: number;
   // Take PASSIVE idle draws off the shared world stream (Entity.offStreamRng).
   // CampDef.offStream covers a wholly new camp; this covers a template that
   // REPLACED shipped content in an existing camp slot, where the spawn draws
@@ -6792,6 +6794,19 @@ export type SimEvent = { pid?: number } & (
       // clamped heal2 emit site; a tick whose heal fully overheals without
       // draining a heal-absorb shield still emits nothing.
       overheal?: number;
+    }
+  // One absorb shield soaking part of one hit. Emitted per shield drained
+  // (combat/absorb_credit.ts) so the Healing meter and the parse recorder can
+  // credit the SHIELDER: the damage event's aggregate `absorbed` total names
+  // nobody. `sourceId` is the shield aura's caster, `ability` its display
+  // name, `abilityId` its aura id. Never emitted for a zero soak.
+  | {
+      type: 'absorb';
+      sourceId: number;
+      targetId: number;
+      amount: number;
+      ability: string;
+      abilityId: string;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at

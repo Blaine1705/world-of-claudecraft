@@ -10036,6 +10036,19 @@ export const ru_RU: EnTranslations = {
       "threat": "Угроза",
       "damageShort": "Урон",
       "healingShort": "Исц.",
+      "damageTaken": "Полученный урон",
+      "damageTakenShort": "Получен.",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "Прерывания",
+      "interruptsShort": "Прерыв.",
+      "dispels": "Рассеивания",
+      "dispelsShort": "Рассеян.",
+      "deaths": "Смерти",
+      "deathsShort": "Смерти",
+      "reset": "Сброс счетчиков",
+      "resetHint": "Сбросить данные боя",
+      "groupTotal": "Всего: {total} ({rate})",
       "current": "Текущий",
       "lastFight": "Последний бой",
       "fightIndex": "Бой -{index}",
@@ -10047,6 +10060,16 @@ export const ru_RU: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Предыдущий сегмент",
       "newerSegment": "Следующий сегмент",
+      "selectSegment": "Выбрать сегмент боя",
+      "selectMode": "Выбрать режим счетчика",
+      "back": "Назад",
+      "resetFight": "Сбросить текущий бой",
+      "resetAll": "Сбросить все данные",
+      "criticals": "Криты: {count}",
+      "hits": "Удары: {count}",
+      "topAbility": "Лучшее: {name}",
+      "activity": "Активность: {pct}",
+      "newWindow": "Новое окно",
       "close": "Закрыть счетчики"
     },
     "chat": {
@@ -16404,6 +16427,21 @@ export const ru_RU: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Лечебный манекен"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Хребтовый охотник"

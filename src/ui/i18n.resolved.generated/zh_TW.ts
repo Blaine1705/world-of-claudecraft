@@ -10036,6 +10036,19 @@ export const zh_TW: EnTranslations = {
       "threat": "仇恨",
       "damageShort": "傷害",
       "healingShort": "治療",
+      "damageTaken": "承受傷害",
+      "damageTakenShort": "承傷",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "斷法",
+      "interruptsShort": "斷法",
+      "dispels": "驅散",
+      "dispelsShort": "驅散",
+      "deaths": "死亡",
+      "deathsShort": "死亡",
+      "reset": "重設統計",
+      "resetHint": "重設戰鬥資料",
+      "groupTotal": "總量：{total}（{rate}）",
       "current": "目前",
       "lastFight": "上一場戰鬥",
       "fightIndex": "戰鬥 -{index}",
@@ -10047,6 +10060,16 @@ export const zh_TW: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "較早片段",
       "newerSegment": "較新片段",
+      "selectSegment": "選擇戰鬥片段",
+      "selectMode": "選擇統計模式",
+      "back": "返回",
+      "resetFight": "重設目前戰鬥",
+      "resetAll": "重設所有資料",
+      "criticals": "致命一擊：{count}",
+      "hits": "命中：{count}",
+      "topAbility": "主要：{name}",
+      "activity": "活躍度：{pct}",
+      "newWindow": "新建視窗",
       "close": "關閉統計"
     },
     "chat": {
@@ -16404,6 +16427,21 @@ export const zh_TW: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "治療假人"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "山脊潛獵者"

@@ -10036,6 +10036,19 @@ export const sv_SE: EnTranslations = {
       "threat": "Hot",
       "damageShort": "Ska",
       "healingShort": "Läk",
+      "damageTaken": "Damage Taken",
+      "damageTakenShort": "Taken",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "Interrupts",
+      "interruptsShort": "Int",
+      "dispels": "Dispels",
+      "dispelsShort": "Disp",
+      "deaths": "Deaths",
+      "deathsShort": "Dead",
+      "reset": "Reset meters",
+      "resetHint": "Reset combat data",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "Nuvarande",
       "lastFight": "Senaste strid",
       "fightIndex": "Strid -{index}",
@@ -10047,6 +10060,16 @@ export const sv_SE: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Äldre segment",
       "newerSegment": "Nyare segment",
+      "selectSegment": "Select fight segment",
+      "selectMode": "Select meter mode",
+      "back": "Back",
+      "resetFight": "Reset current fight",
+      "resetAll": "Reset all data",
+      "criticals": "Criticals: {count}",
+      "hits": "Hits: {count}",
+      "topAbility": "Top: {name}",
+      "activity": "Activity: {pct}",
+      "newWindow": "New window",
       "close": "Stäng mätare"
     },
     "chat": {
@@ -16404,6 +16427,21 @@ export const sv_SE: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Läkningsdocka"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Åssmygare"
