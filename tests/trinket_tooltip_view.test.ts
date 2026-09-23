@@ -1,5 +1,5 @@
 // The trinkets' item-tooltip lines (src/ui/trinket_tooltip_view.ts): every one
-// of the thirteen trinkets renders a Use line with its exact resolved numbers
+// of the eighteen trinkets renders a Use line with its exact resolved numbers
 // and cooldown, the ones with a passive render an Equip line first, the
 // power-scaled numbers move with the viewer's power exactly as combat does, and
 // the fortune notice names each Gambler's Die roll. The combat proofs drive a
@@ -31,6 +31,7 @@ import {
 
 const VIEWER: TrinketTooltipViewer = {
   attackPower: 500,
+  rangedPower: 0,
   spellPower: 300,
   healPower: 400,
   maxHp: 5000,
@@ -89,6 +90,27 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
   duelists_brand: {
     use: 'Use: Brand an enemy player within 30 yd, reducing the healing they receive by 50% for 8 sec. (1 min cooldown)',
   },
+  forgefathers_temper: {
+    equip:
+      'Equip: Your melee and ranged weapon hits each add a heat stack, up to 5. Heat lasts 20 sec, refreshed whenever you gain a stack.',
+    use: 'Use: Spend all heat stacks to temper your weapon for 10 sec. Your melee and ranged weapon hits deal 46 extra Fire damage, increased by 15% for each heat stack spent (up to 75% at 5 stacks). Each killing blow adds 2 sec, up to 20 sec in total. Damage increases with Attack Power or Ranged Attack Power, whichever is higher. (90 sec cooldown)',
+  },
+  kindling_orb: {
+    use: 'Use: Summon an ember orb beside you for 12 sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for 48 Fire damage. Damage increases with Spell Power. (2 min cooldown)',
+  },
+  molten_fletching: {
+    equip:
+      'Equip: Your melee and ranged weapon critical hits set the target alight, dealing 19 Fire damage every 2 sec for 6 sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
+    use: 'Use: For 10 sec, your direct Physical damage hits also strike the enemy nearest your target within 8 yd for 40% of the damage dealt. (90 sec cooldown)',
+  },
+  last_flame_lantern: {
+    use: 'Use: Set a lantern at your feet for 12 sec. A direct heal from anyone on you or a party member within 12 yd of it also heals the most wounded other party member in its light for 25% of the heal. (2 min cooldown)',
+  },
+  heart_of_the_crucible: {
+    equip:
+      'Equip: Each attack you parry, dodge or block adds a heat stack, up to 10. Heat lasts 30 sec, refreshed whenever you gain a stack.',
+    use: 'Use: Spend all heat stacks on a fire nova that deals 33 Fire damage per stack (330 at 10 stacks) to each enemy within 10 yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack. (1 min cooldown)',
+  },
 };
 
 function wearing(itemId: string, seed = 11): Sim {
@@ -106,7 +128,7 @@ const aura = (e: Entity, id: string) => e.auras.find((a) => a.id === id);
 afterEach(() => setLanguage('en'));
 
 describe('trinket tooltip lines', () => {
-  it('covers exactly the thirteen trinkets', () => {
+  it('covers exactly the eighteen trinkets', () => {
     expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
     expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
   });
@@ -165,6 +187,39 @@ describe('trinket tooltip lines', () => {
       `absorbs ${n(1200)} damage`,
     );
     expect(use('gamblers_die', bigger)).toContain(`absorbs ${n(1600)} damage`);
+  });
+
+  it('moves the raid trinket numbers with the power combat reads', () => {
+    const low = { ...VIEWER, attackPower: 100, spellPower: 100 };
+    const high = { ...VIEWER, attackPower: 900, spellPower: 700 };
+    const use = (id: string, v: TrinketTooltipViewer) =>
+      trinketTooltipLineTexts(id, v).at(-1)?.text;
+    const equip = (id: string, v: TrinketTooltipViewer) => trinketTooltipLineTexts(id, v)[0].text;
+    // Forgefather's Temper: 6 + 8% of weapon power per hit before heat.
+    expect(use('forgefathers_temper', low)).toContain('hits deal 14 extra Fire damage');
+    expect(use('forgefathers_temper', high)).toContain('hits deal 78 extra Fire damage');
+    // Molten Ignite: 4 + 3% of weapon power per tick.
+    expect(equip('molten_fletching', low)).toContain('dealing 7 Fire damage every 2 sec');
+    expect(equip('molten_fletching', high)).toContain('dealing 31 Fire damage every 2 sec');
+    // Weapon power is the higher of melee and Ranged Attack Power (a hunter's shots).
+    const hunter = { ...low, rangedPower: 900 };
+    expect(use('forgefathers_temper', hunter)).toContain('hits deal 78 extra Fire damage');
+    expect(equip('molten_fletching', hunter)).toContain('dealing 31 Fire damage');
+    // Kindling Orb: 12 + 12% of Spell Power per bolt.
+    expect(use('kindling_orb', low)).toContain('for 24 Fire damage');
+    expect(use('kindling_orb', high)).toContain('for 96 Fire damage');
+    // Heart of the Crucible: 8 + 5% of melee Attack Power per heat stack (ranged
+    // power does not count), rounded once over the stacks.
+    expect(use('heart_of_the_crucible', low)).toContain(
+      'deals 13 Fire damage per stack (130 at 10 stacks)',
+    );
+    expect(use('heart_of_the_crucible', high)).toContain(
+      'deals 53 Fire damage per stack (530 at 10 stacks)',
+    );
+    expect(use('heart_of_the_crucible', hunter)).toContain('deals 13 Fire damage per stack');
+    expect(use('heart_of_the_crucible', { ...VIEWER, attackPower: 110 })).toContain(
+      'deals 13.5 Fire damage per stack (135 at 10 stacks)',
+    );
   });
 });
 
@@ -234,6 +289,37 @@ describe('trinket tooltip numbers match combat', () => {
   });
 });
 
+describe('raid trinket numbers match combat', () => {
+  it('Molten Fletching ignites a crit target for the tick its Equip line prints', () => {
+    for (const attackPower of [100, 600]) {
+      const sim = wearing('molten_fletching');
+      const p = sim.player;
+      p.attackPower = attackPower;
+      p.rangedPower = 0;
+      const text = trinketTooltipLineTexts('molten_fletching', p)[0].text;
+      const mob = createMob(sim.nextId++, MOBS.forest_wolf, 20, { ...p.pos, z: p.pos.z + 3 });
+      mob.hostile = true;
+      sim.addEntity(mob);
+      sim.ctx.applySetProcs(p, mob, 'weaponCrit');
+      const ignite = aura(mob, TRINKET_AURA.ignite);
+      expect(ignite?.kind).toBe('dot');
+      expect(ignite?.tickInterval).toBe(2);
+      expect(text).toContain(`dealing ${n(ignite?.value ?? -1)} Fire damage every 2 sec`);
+      expect(text).toContain(`for ${n(ignite?.duration ?? -1)} sec`);
+    }
+  });
+
+  it('Heart of the Crucible refuses with no heat, in the words the refusal key holds', () => {
+    const sim = wearing('heart_of_the_crucible');
+    sim.useItem('heart_of_the_crucible');
+    const errors = sim
+      .drainEvents()
+      .filter((ev) => ev.type === 'error')
+      .map((ev) => (ev as { text: string }).text);
+    expect(errors).toContain(tSim('error.trinketNoHeat'));
+  });
+});
+
 describe('trinket aura names and refusals localize', () => {
   it('names every aura and damage label the trinkets apply', () => {
     for (const name of [
@@ -255,6 +341,15 @@ describe('trinket aura names and refusals localize', () => {
       'Last Bastion',
       'Retaliation',
       'Bastion Sigil',
+      'Tempered',
+      'Forge Heat',
+      "Forgefather's Temper",
+      'Kindling Orb',
+      'Molten Ignite',
+      'Molten Fletching',
+      'Last Flame Lantern',
+      'Crucible Heat',
+      'Heart of the Crucible',
     ]) {
       expect(localizeSimAuraName(name), name).toBe(name);
     }
@@ -268,6 +363,9 @@ describe('trinket aura names and refusals localize', () => {
     expect(localizeSimText('The hourglass is empty.')).toBe('El reloj de arena está vacío.');
     expect(localizeSimText('That item is not ready yet.')).toBe(tSim('error.trinketNotReady'));
     expect(trinketGambleText('snakeEyes')).toBe('Dado del apostador: ¡Ojos de serpiente!');
+    expect(localizeSimAuraName('Crucible Heat')).toBe('Calor del crisol');
+    expect(localizeSimAuraName('Kindling Orb')).toBe('Orbe de brasas');
+    expect(localizeSimText('Your heart holds no heat.')).toBe('Tu corazón no guarda calor.');
     expect(trinketTooltipLineTexts('sundered_prism', VIEWER)[0].text).toBe(
       'Uso: Avanza 12 m y luego recibe un 30% menos de daño durante 3 s. (reutilización de 90 s)',
     );

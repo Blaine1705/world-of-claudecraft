@@ -5491,6 +5491,12 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'wayfarers_lodestone',
   'medallion_of_defiance',
   'duelists_brand',
+  // raid trinkets (Crucible of the Last Spring), same batch
+  'forgefathers_temper',
+  'kindling_orb',
+  'molten_fletching',
+  'last_flame_lantern',
+  'heart_of_the_crucible',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the

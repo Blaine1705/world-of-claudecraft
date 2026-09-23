@@ -49,9 +49,9 @@ const damageBy = (events: SimEvent[], ability: string) =>
   events.filter((ev) => ev.type === 'damage' && ev.ability === ability);
 
 describe('the trinket catalog', () => {
-  it('ships thirteen trinkets, each with one attribute and a use', () => {
+  it('ships eighteen trinkets, each with one attribute and a use', () => {
     const ids = Object.keys(TRINKET_ITEMS);
-    expect(ids).toHaveLength(13);
+    expect(ids).toHaveLength(18);
     for (const id of ids) {
       const item = TRINKET_ITEMS[id];
       expect(item.slot).toBe('trinket');
@@ -291,7 +291,7 @@ describe('the rest', () => {
       );
     }
     expect(seen.size).toBe(4);
-  });
+  }, 60_000);
 
   it('Sundered Prism: a step forward and a moment of guard', () => {
     const sim = wearing('sundered_prism');

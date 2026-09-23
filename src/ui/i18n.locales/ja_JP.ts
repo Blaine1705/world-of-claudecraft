@@ -17194,6 +17194,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.wayfarers_lodestone.name': '旅人の磁石',
   'entities.items.medallion_of_defiance.name': '抵抗のメダリオン',
   'entities.items.duelists_brand.name': '決闘者の烙印',
+  'entities.items.forgefathers_temper.name': '鍛冶父の焼き入れ',
+  'entities.items.kindling_orb.name': '点火のオーブ',
+  'entities.items.molten_fletching.name': '溶岩の矢羽',
+  'entities.items.last_flame_lantern.name': '最後の炎のランタン',
+  'entities.items.heart_of_the_crucible.name': 'るつぼの心臓',
   'hudChrome.trinkets.equipLine': '装備時: {effect}',
   'hudChrome.trinkets.useLine': '使用: {effect}（クールダウン{cooldown}）',
   'hudChrome.trinkets.cooldownMinutes': '{minutes}分',
@@ -17211,6 +17216,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自動攻撃のクリティカルヒットととどめの一撃ごとに集計の印を1つ得る（最大{max}）。印は{duration}秒持続し、得るたびに更新される。',
   'hudChrome.trinkets.equip.storm':
     '呪文を唱えるたびにチャージを1つ得る（最大{max}）。チャージは{duration}秒持続し、得るたびに更新される。',
+  'hudChrome.trinkets.equip.heat':
+    '近接および遠隔武器の命中ごとに熱を1スタック得る（最大{max}）。熱は{duration}秒持続し、スタックを得るたびに更新される。',
+  'hudChrome.trinkets.equip.ignite':
+    '近接および遠隔武器のクリティカルヒットがターゲットに火をつけ、{every}秒ごとに{tick}の火炎ダメージを{duration}秒間与える。新たなクリティカルヒットで更新される。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。',
+  'hudChrome.trinkets.equip.guardHeat':
+    '攻撃を受け流し、回避、またはブロックするたびに熱を1スタック得る（最大{max}）。熱は{duration}秒持続し、スタックを得るたびに更新される。',
   'hudChrome.trinkets.use.retaliate':
     '{duration}秒間、あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。',
   'hudChrome.trinkets.use.anchor':
@@ -17237,4 +17248,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自身のスタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果をすべて解除する。スタン中でも使用可能。',
   'hudChrome.trinkets.use.brand':
     '{range}ヤード以内の敵プレイヤー1人に烙印を押し、受ける回復量を{duration}秒間{cut}%減少させる。',
+  'hudChrome.trinkets.use.temper':
+    '熱をすべて消費し、{duration}秒間武器に焼き入れをする。近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与え、消費した熱1スタックにつき{perHeat}%増加する（{maxHeat}スタックで最大{maxBonus}%）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。',
+  'hudChrome.trinkets.use.kindlingOrb':
+    '{duration}秒間、残り火のオーブを自分のそばに呼び出す。敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。ダメージは呪文力で増加する。',
+  'hudChrome.trinkets.use.pierce':
+    '{duration}秒間、直接の物理ダメージの命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。',
+  'hudChrome.trinkets.use.lantern':
+    '{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。',
+  'hudChrome.trinkets.use.heartNova':
+    '熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。',
 };

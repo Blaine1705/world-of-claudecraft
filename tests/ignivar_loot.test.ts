@@ -612,24 +612,42 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
     expect([...varkhulGroups.keys()]).toEqual(['varkhul_h_exclusive']);
     const robes = ['sigil_anvil_chest', 'sigil_ember_chest', 'sigil_tempest_chest'];
     const ignivarWeapons = ['forgefathers_warhammer', 'anvilguard_blade', 'springtouched_crozier'];
-    expect(ignivarGroups.get('ignivar_h_exclusive')?.ids).toEqual([...robes, ...ignivarWeapons]);
-    expect(shareOf(ignivar, robes)).toBeCloseTo(0.5, 6);
-    expect(shareOf(ignivar, ignivarWeapons)).toBeCloseTo(0.5, 6);
-    expect(familyShares(ignivar, robes)).toEqual([0.17, 0.17, 0.16]);
+    // The Crucible raid trinkets (content/trinkets.ts) are heroic exclusives,
+    // appended at the tail of each boss's group at 0.12 each.
+    const ignivarTrinkets = ['kindling_orb', 'molten_fletching', 'last_flame_lantern'];
+    expect(ignivarGroups.get('ignivar_h_exclusive')?.ids).toEqual([
+      ...robes,
+      ...ignivarWeapons,
+      ...ignivarTrinkets,
+    ]);
+    expect(shareOf(ignivar, robes)).toBeCloseTo(0.32, 6);
+    expect(shareOf(ignivar, ignivarWeapons)).toBeCloseTo(0.32, 6);
+    expect(shareOf(ignivar, ignivarTrinkets)).toBeCloseTo(0.36, 6);
+    expect(familyShares(ignivar, robes)).toEqual([0.11, 0.11, 0.1]);
     const shields = ['bulwark_of_the_inner_crucible', 'ember_wardens_barrier', 'varkhul_emberward'];
     const varkhulWeapons = [
       'heart_of_the_end_greatblade',
       'forgefire_spire',
       'staff_of_the_last_spring',
     ];
+    const varkhulTrinkets = ['forgefathers_temper', 'heart_of_the_crucible'];
     expect(varkhulGroups.get('varkhul_h_exclusive')?.ids).toEqual([
       ...robes,
       ...shields,
       ...varkhulWeapons,
+      ...varkhulTrinkets,
     ]);
-    expect(shareOf(varkhul, robes)).toBeCloseTo(0.35, 6);
-    expect(shareOf(varkhul, shields)).toBeCloseTo(0.3, 6);
-    expect(shareOf(varkhul, varkhulWeapons)).toBeCloseTo(0.35, 6);
+    expect(shareOf(varkhul, robes)).toBeCloseTo(0.26, 6);
+    expect(shareOf(varkhul, shields)).toBeCloseTo(0.24, 6);
+    expect(shareOf(varkhul, varkhulWeapons)).toBeCloseTo(0.26, 6);
+    expect(shareOf(varkhul, varkhulTrinkets)).toBeCloseTo(0.24, 6);
+    for (const id of [...ignivarTrinkets, ...varkhulTrinkets]) {
+      expect(ITEMS[id].slot, id).toBe('trinket');
+      expect(itemLevel(ITEMS[id]), `${id} ilvl`).toBe(35);
+      // Heroic-only: never on either boss's Normal table.
+      for (const bossId of [IGNIVAR_BOSS_ID, VARKHUL_BOSS_ID])
+        expect(chanceOf(MOBS[bossId].loot ?? [], id), `${id} on Normal ${bossId}`).toBe(0);
+    }
     // The legendary's odds did not move with the re-cut: 3 percent per heroic
     // Varkhul kill, exactly what the shipped shield group paid.
     expect(varkhul.find((entry) => entry.itemId === 'varkhul_emberward')).toMatchObject({
@@ -685,12 +703,15 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
       ['wand_of_quenched_sparks', 0.0625],
     ]);
     expect(rowsOf(ignivarHeroic, 'ignivar_h_exclusive')).toEqual([
-      ['sigil_anvil_chest', 0.17],
-      ['sigil_ember_chest', 0.17],
-      ['sigil_tempest_chest', 0.16],
-      ['forgefathers_warhammer', 0.17],
-      ['anvilguard_blade', 0.17],
-      ['springtouched_crozier', 0.16],
+      ['sigil_anvil_chest', 0.11],
+      ['sigil_ember_chest', 0.11],
+      ['sigil_tempest_chest', 0.1],
+      ['forgefathers_warhammer', 0.11],
+      ['anvilguard_blade', 0.11],
+      ['springtouched_crozier', 0.1],
+      ['kindling_orb', 0.12],
+      ['molten_fletching', 0.12],
+      ['last_flame_lantern', 0.12],
     ]);
     expect(rowsOf(varkhul, 'varkhul_sigils')).toEqual([
       ['sigil_anvil_legs', 0.17],
@@ -719,15 +740,17 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
       ['loop_of_quiet_springs', 0.125],
     ]);
     expect(rowsOf(varkhulHeroic, 'varkhul_h_exclusive')).toEqual([
-      ['sigil_anvil_chest', 0.12],
-      ['sigil_ember_chest', 0.12],
-      ['sigil_tempest_chest', 0.11],
-      ['bulwark_of_the_inner_crucible', 0.135],
-      ['ember_wardens_barrier', 0.135],
+      ['sigil_anvil_chest', 0.09],
+      ['sigil_ember_chest', 0.09],
+      ['sigil_tempest_chest', 0.08],
+      ['bulwark_of_the_inner_crucible', 0.105],
+      ['ember_wardens_barrier', 0.105],
       ['varkhul_emberward', 0.03],
-      ['heart_of_the_end_greatblade', 0.12],
-      ['forgefire_spire', 0.12],
-      ['staff_of_the_last_spring', 0.11],
+      ['heart_of_the_end_greatblade', 0.09],
+      ['forgefire_spire', 0.09],
+      ['staff_of_the_last_spring', 0.08],
+      ['forgefathers_temper', 0.12],
+      ['heart_of_the_crucible', 0.12],
     ]);
     // Profession knowledge is its own 30% roll on both difficulties. It never
     // displaces either gear slot, changes an old weight, or joins the heroic pool.

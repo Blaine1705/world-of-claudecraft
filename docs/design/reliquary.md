@@ -151,6 +151,12 @@ lowers the live read for players who had finished it, so a completed page
 shows as incomplete again until they find the new relic. This is inherent to
 a growing catalog (earned deeds stay sticky, live page reads do not) and will
 repeat at every growth. It owes a release-note line whenever a growth ships.
+The trinket wave (`src/sim/content/trinkets.ts`) is one such growth: every
+trinket is catalogued on the page of the place it comes from (its five-man
+heroic boss page, the Heroic Nythraxis page, The Rift, the Warfare Armory, or
+the Crucible's two Heroic pages for the raid trinkets, which are heroic
+exclusives), one page each, pinned in
+`tests/reliquary_content.test.ts`.
 
 ## Adding a page (the recipe)
 

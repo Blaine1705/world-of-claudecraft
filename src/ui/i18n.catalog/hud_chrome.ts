@@ -3113,6 +3113,11 @@ export const hudChromeStrings = {
         'Your auto-attack critical hits and your killing blows each add a tally mark, up to {max}. Marks last {duration} sec, refreshed whenever you gain one.',
       storm:
         'Each spell you cast adds a charge, up to {max}. Charges last {duration} sec, refreshed whenever you gain one.',
+      heat: 'Your melee and ranged weapon hits each add a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.',
+      ignite:
+        'Your melee and ranged weapon critical hits set the target alight, dealing {tick} Fire damage every {every} sec for {duration} sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
+      guardHeat:
+        'Each attack you parry, dodge or block adds a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.',
     },
     use: {
       retaliate:
@@ -3139,6 +3144,16 @@ export const hudChromeStrings = {
         'Remove all stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you. Usable while stunned.',
       brand:
         'Brand an enemy player within {range} yd, reducing the healing they receive by {cut}% for {duration} sec.',
+      temper:
+        'Spend all heat stacks to temper your weapon for {duration} sec. Your melee and ranged weapon hits deal {damage} extra Fire damage, increased by {perHeat}% for each heat stack spent (up to {maxBonus}% at {maxHeat} stacks). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
+      kindlingOrb:
+        'Summon an ember orb beside you for {duration} sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for {damage} Fire damage. Damage increases with Spell Power.',
+      pierce:
+        'For {duration} sec, your direct Physical damage hits also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.',
+      lantern:
+        'Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.',
+      heartNova:
+        'Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack.',
     },
   },
   // Quest-link sharing: the chat-link affordance and its sim-emitted notices

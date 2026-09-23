@@ -2387,7 +2387,10 @@ export const es_ES: EnTranslations = {
         "hourglass": "La sanación excesiva de tus sanaciones directas se almacena en el reloj de arena, hasta {cap} ({capPct}% de tu salud máxima). La sanación almacenada se desvanece {fade} s después de su último aumento.",
         "twinStrike": "Tus golpes de ataque automático tienen un {chance}% de probabilidad de realizar un golpe cuerpo a cuerpo adicional con la mano principal. Puede ocurrir una vez cada {icd} s.",
         "tally": "Tus golpes críticos de ataque automático y tus golpes de gracia añaden una marca de cuenta cada uno, hasta {max}. Las marcas duran {duration} s y se renuevan cada vez que ganas una.",
-        "storm": "Cada hechizo que lanzas añade una carga, hasta {max}. Las cargas duran {duration} s y se renuevan cada vez que ganas una."
+        "storm": "Cada hechizo que lanzas añade una carga, hasta {max}. Las cargas duran {duration} s y se renuevan cada vez que ganas una.",
+        "heat": "Tus golpes de arma cuerpo a cuerpo y a distancia añaden una acumulación de calor cada uno, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación.",
+        "ignite": "Tus golpes críticos de arma cuerpo a cuerpo y a distancia prenden fuego al objetivo, infligiendo {tick} de daño de fuego cada {every} s durante {duration} s. Un nuevo golpe crítico lo renueva. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.",
+        "guardHeat": "Cada ataque que paras, esquivas o bloqueas añade una acumulación de calor, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación."
       },
       "use": {
         "retaliate": "Durante {duration} s, un enemigo que te golpee directamente recibe daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.",
@@ -2402,7 +2405,12 @@ export const es_ES: EnTranslations = {
         "blink": "Avanza {yards} m y luego recibe un {reduction}% menos de daño durante {guard} s.",
         "sprint": "Aumenta tu velocidad de movimiento un {speed}% durante {duration} s. No se acumula con otros aumentos de velocidad.",
         "defiance": "Elimina todos los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas. Se puede usar mientras estás aturdido.",
-        "brand": "Marca a un jugador enemigo a {range} m o menos, reduciendo la sanación que recibe un {cut}% durante {duration} s."
+        "brand": "Marca a un jugador enemigo a {range} m o menos, reduciendo la sanación que recibe un {cut}% durante {duration} s.",
+        "temper": "Gasta todas las acumulaciones de calor para templar tu arma durante {duration} s. Tus golpes de arma cuerpo a cuerpo y a distancia infligen {damage} de daño de fuego adicional, aumentado un {perHeat}% por cada acumulación de calor gastada (hasta un {maxBonus}% con {maxHeat} acumulaciones). Cada golpe de gracia añade {killExtend} s, hasta {maxDuration} s en total. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.",
+        "kindlingOrb": "Invoca un orbe de brasas a tu lado durante {duration} s. Cada hechizo que lanzas a un enemigo le hace disparar un proyectil a ese enemigo que inflige {damage} de daño de fuego. El daño aumenta con el poder con hechizos.",
+        "pierce": "Durante {duration} s, tus golpes directos de daño físico también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {share}% del daño infligido.",
+        "lantern": "Coloca un farol a tus pies durante {duration} s. Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos de él también sana al otro miembro del grupo más herido bajo su luz por el {share}% de la sanación.",
+        "heartNova": "Gasta todas las acumulaciones de calor en una nova de fuego que inflige {perHeat} de daño de fuego por acumulación ({max} con {maxHeat} acumulaciones) a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza. El daño aumenta con el poder de ataque. Requiere una acumulación de calor."
       }
     },
     "questShare": {
@@ -16770,6 +16778,21 @@ export const es_ES: EnTranslations = {
       },
       "duelists_brand": {
         "name": "Marca del duelista"
+      },
+      "forgefathers_temper": {
+        "name": "Temple del Padre de la Forja"
+      },
+      "kindling_orb": {
+        "name": "Orbe de brasas"
+      },
+      "molten_fletching": {
+        "name": "Emplumado fundido"
+      },
+      "last_flame_lantern": {
+        "name": "Farol de la última llama"
+      },
+      "heart_of_the_crucible": {
+        "name": "Corazón del Crisol"
       }
     },
     "mobs": {

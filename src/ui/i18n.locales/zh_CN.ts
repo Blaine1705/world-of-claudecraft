@@ -16335,6 +16335,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.wayfarers_lodestone.name': '旅者磁石',
   'entities.items.medallion_of_defiance.name': '反抗勋章',
   'entities.items.duelists_brand.name': '决斗者烙印',
+  'entities.items.forgefathers_temper.name': '熔铸之父的淬火',
+  'entities.items.kindling_orb.name': '引燃宝珠',
+  'entities.items.molten_fletching.name': '熔火箭羽',
+  'entities.items.last_flame_lantern.name': '最后之焰提灯',
+  'entities.items.heart_of_the_crucible.name': '熔炉之心',
   'hudChrome.trinkets.equipLine': '装备：{effect}',
   'hudChrome.trinkets.useLine': '使用：{effect}（{cooldown}冷却）',
   'hudChrome.trinkets.cooldownMinutes': '{minutes} 分钟',
@@ -16352,6 +16357,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你的自动攻击暴击和你的致命一击各增加一个计数标记，最多 {max} 个。标记持续 {duration} 秒，每获得一个便会刷新。',
   'hudChrome.trinkets.equip.storm':
     '你每施放一个法术便增加一层充能，最多 {max} 层。充能持续 {duration} 秒，每获得一层便会刷新。',
+  'hudChrome.trinkets.equip.heat':
+    '你的近战和远程武器每次命中增加一层热量，最多 {max} 层。热量持续 {duration} 秒，每获得一层便会刷新。',
+  'hudChrome.trinkets.equip.ignite':
+    '你的近战和远程武器暴击会点燃目标，每 {every} 秒造成 {tick} 点火焰伤害，持续 {duration} 秒。新的暴击会刷新该效果。伤害随攻击强度或远程攻击强度中较高者提高。',
+  'hudChrome.trinkets.equip.guardHeat':
+    '你每招架、躲闪或格挡一次攻击，便增加一层热量，最多 {max} 层。热量持续 {duration} 秒，每获得一层便会刷新。',
   'hudChrome.trinkets.use.retaliate':
     '在 {duration} 秒内，直接击中你的敌人会受到相当于该次攻击令你损失生命值 {pct}% 的物理伤害。周期性伤害不会触发此效果。',
   'hudChrome.trinkets.use.anchor':
@@ -16378,4 +16389,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '移除你身上所有的昏迷、定身、减速、恐惧、变形、沉默、致盲、妖术、缴械和失去行动能力效果。昏迷时可用。',
   'hudChrome.trinkets.use.brand':
     '为 {range} 码内的一名敌对玩家打上烙印，使其受到的治疗效果降低 {cut}%，持续 {duration} 秒。',
+  'hudChrome.trinkets.use.temper':
+    '消耗所有热量为你的武器淬火，持续 {duration} 秒。你的近战和远程武器命中额外造成 {damage} 点火焰伤害，每消耗一层热量提高 {perHeat}%（{maxHeat} 层时最多提高 {maxBonus}%）。每次致命一击延长 {killExtend} 秒，总计最多 {maxDuration} 秒。伤害随攻击强度或远程攻击强度中较高者提高。',
+  'hudChrome.trinkets.use.kindlingOrb':
+    '在你身旁召唤一颗余烬宝珠，持续 {duration} 秒。你每对敌人施放一个法术，它便向该敌人射出一道火焰弹，造成 {damage} 点火焰伤害。伤害随法术强度提高。',
+  'hudChrome.trinkets.use.pierce':
+    '在 {duration} 秒内，你的直接物理伤害命中还会打击距离你的目标最近的、{reach} 码内的一个敌人，造成所造成伤害的 {share}%。',
+  'hudChrome.trinkets.use.lantern':
+    '在你脚下放置一盏提灯，持续 {duration} 秒。任何人对提灯 {radius} 码内的你或队伍成员施放的直接治疗，还会以该治疗量的 {share}% 治疗灯光中受伤最重的另一名队伍成员。',
+  'hudChrome.trinkets.use.heartNova':
+    '消耗所有热量释放一道火焰新星，对 {radius} 码内的每个敌人每层热量造成 {perHeat} 点火焰伤害（{maxHeat} 层时为 {max} 点），并嘲讽其命中的每个生物。伤害随攻击强度提高。需要至少一层热量。',
 };

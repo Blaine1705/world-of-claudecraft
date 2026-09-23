@@ -13,8 +13,10 @@ import type { AbilityVfxFullSpec, AbilityVfxSpec } from './ability_vfx_core';
 //
 // Tiers shed richness only. What a player acts on from a trinket (the ward,
 // shield, brand and speed auras themselves) reads from the aura frames; the
-// one area a trinket covers (the Wellspring Seed radius) is the draped
-// telegraph ring the painter draws on every tier from the event's own radius.
+// areas a trinket covers (the Wellspring Seed, Heart of the Crucible and Last
+// Flame Lantern radii) are the draped telegraph ring the painter draws on
+// every tier from the event's own radius, and the lantern's standing light
+// circle is trinket_relics.ts's, also on every tier.
 
 interface TrinketVfx {
   spec: AbilityVfxSpec;
@@ -428,6 +430,223 @@ const TRINKET_VFX: Readonly<Record<string, TrinketVfx>> = {
         smoke: true,
         light: 1,
         focused: true,
+      },
+    },
+  },
+  // ---- The Crucible of the Last Spring raid trinkets ----------------------
+  // Their bespoke scene objects (the spectral hammer, the floating Kindling
+  // Orb and its bolts, the Last Flame Lantern and its light) are painted by
+  // trinket_relics.ts over these ceremonies; the rows below stay pure data.
+  //
+  // Forgefather's Temper: the forge's heat is spent into the weapon. A
+  // white-hot spectral hammer (trinket_relics.ts) comes down in front of the
+  // wearer; this row is the strike's fire: a scorch, a flame ring and sparks.
+  trinket_forgefathers_temper: {
+    spec: {
+      c: '#ff6a1e',
+      p: 'fire',
+      pw: 1.05,
+      sp: 22,
+      vr: 1,
+      db: 1,
+      sm: 1,
+      li: 1.4,
+      lg: 1.5,
+      a: 'buff',
+    },
+    full: {
+      archetype: 'buff',
+      palette: 'fire',
+      power: 1.05,
+      buff: { style: 'raise', orbit: 'none', shellDur: 0.9 },
+      motifAt: 'caster',
+      windupStyle: 'none',
+      decal: 'scorch',
+      linger: 1.5,
+      rim: '#ffb060',
+      accent: '#ffd9a0',
+      impact: {
+        flipbook: true,
+        ring: 1.1,
+        vRing: true,
+        sparks: 22,
+        debris: true,
+        smoke: true,
+        light: 1.4,
+      },
+    },
+  },
+  // Kindling Orb: the orb kindles beside the wearer. A molten flare wheels in
+  // (the orbitals) and settles at the shoulder, where trinket_relics.ts keeps
+  // the Blender-modelled orb floating for the aura's whole life.
+  trinket_kindling_orb: {
+    spec: { c: '#ff8a2a', p: 'fire', pw: 0.9, sp: 14, li: 1.2, lg: 1.5, a: 'buff' },
+    full: {
+      archetype: 'buff',
+      palette: 'fire',
+      power: 0.9,
+      buff: { style: 'raise', orbit: 'none', shellDur: 0.8 },
+      motifs: ['orbitals'],
+      motifAt: 'caster',
+      windupStyle: 'none',
+      linger: 1.5,
+      rim: '#ffb870',
+      accent: '#ffe0a8',
+      impact: {
+        flipbook: false,
+        ring: false,
+        vRing: 1,
+        sparks: 14,
+        debris: false,
+        smoke: false,
+        light: 1.2,
+        liteAudio: true,
+      },
+    },
+  },
+  // Kindling Orb bolt: a small ember comet at the spell's target. While the
+  // wearer's orb is on screen trinket_relics.ts flies it FROM the orb and
+  // claims the cue; this row is the fallback read (orb off screen, cold cast
+  // gate) and flies it from the wearer.
+  trinket_kindling_orb_bolt: {
+    spec: { c: '#ff9a3c', p: 'fire', pw: 0.6, sp: 10, b: { v: 26, h: 0.7 }, lg: 0.8, a: 'bolt' },
+    full: {
+      archetype: 'bolt',
+      palette: 'fire',
+      power: 0.6,
+      filler: true,
+      bolt: { speed: 26, headScale: 0.7, coils: false, jagged: false, forkEvery: 0 },
+      windupStyle: 'none',
+      linger: 0.8,
+      impact: {
+        flipbook: false,
+        ring: false,
+        vRing: false,
+        sparks: 10,
+        debris: false,
+        smoke: false,
+        light: 0.6,
+        liteAudio: true,
+      },
+    },
+  },
+  // Molten Fletching: molten sparks spit off the wearer's weapon hand as the
+  // piercing edge takes; trinket_relics.ts keeps a thin spark trickle at the
+  // hand while the buff lasts.
+  trinket_molten_fletching: {
+    spec: { c: '#ff5a1a', p: 'fire', pw: 0.85, sp: 18, db: 1, li: 0.8, lg: 1.2, a: 'buff' },
+    full: {
+      archetype: 'buff',
+      palette: 'fire',
+      power: 0.85,
+      buff: { style: 'raise', orbit: 'none', shellDur: 0.6 },
+      motifs: ['crescents'],
+      motifAt: 'caster',
+      windupStyle: 'none',
+      linger: 1.2,
+      rim: '#ff9448',
+      accent: '#ffc070',
+      impact: {
+        flipbook: false,
+        ring: false,
+        vRing: false,
+        sparks: 18,
+        debris: true,
+        smoke: false,
+        light: 0.8,
+      },
+    },
+  },
+  // Last Flame Lantern: set down at the wearer's feet. A warm golden bloom
+  // rises and the painter's draped ring marks the light's exact radius; the
+  // lantern and its standing light circle are trinket_relics.ts's, for the
+  // aura's whole life, on every tier.
+  trinket_last_flame_lantern: {
+    spec: { c: '#ffc861', p: 'gold', pw: 0.9, sp: 12, li: 1.3, lg: 2.5, a: 'heal' },
+    full: {
+      archetype: 'heal',
+      palette: 'gold',
+      power: 0.9,
+      shaft: 0.4,
+      motifs: ['fountain'],
+      windupStyle: 'none',
+      decal: 'rune',
+      linger: 2.5,
+      rim: '#ffe0a0',
+      accent: '#fff2cc',
+      impact: {
+        flipbook: false,
+        ring: 1,
+        vRing: false,
+        sparks: 12,
+        debris: false,
+        smoke: false,
+        light: 1.3,
+        liteAudio: true,
+      },
+    },
+  },
+  // Last Flame Lantern splash: the share of a heal leaps from the healed ally
+  // to the most wounded one in the light, a small golden flame arc.
+  trinket_last_flame_lantern_splash: {
+    spec: { c: '#ffd98a', p: 'gold', pw: 0.55, sp: 8, b: { v: 20, h: 0.6 }, lg: 1, a: 'bolt' },
+    full: {
+      archetype: 'bolt',
+      palette: 'gold',
+      power: 0.55,
+      filler: true,
+      bolt: { speed: 20, headScale: 0.6, style: 'wisp', coils: false, jagged: false, forkEvery: 0 },
+      windupStyle: 'none',
+      linger: 1,
+      impact: {
+        flipbook: false,
+        ring: false,
+        vRing: false,
+        sparks: 8,
+        debris: false,
+        smoke: false,
+        light: 0.8,
+        liteAudio: true,
+      },
+    },
+  },
+  // Heart of the Crucible: every stored heat stack bursts out as a fire nova.
+  // The painter's draped ring is the sim's exact radius (the event carries
+  // it); the nova ring, cracked-earth decal and ember spray are the blast.
+  trinket_heart_of_the_crucible: {
+    spec: {
+      c: '#ff4a12',
+      p: 'fire',
+      pw: 1.2,
+      sp: 30,
+      rg: 2.5,
+      vr: 1,
+      db: 1,
+      sm: 1,
+      li: 1.6,
+      lg: 1.5,
+      a: 'nova',
+    },
+    full: {
+      archetype: 'nova',
+      palette: 'fire',
+      power: 1.2,
+      nova: { radius: 10 },
+      windupStyle: 'none',
+      motifs: ['fissure'],
+      motifAt: 'caster',
+      decal: 'scorch',
+      linger: 1.5,
+      rim: '#ff9a4a',
+      accent: '#ffd08a',
+      impact: {
+        flipbook: true,
+        ring: 2.5,
+        vRing: true,
+        sparks: 30,
+        debris: true,
+        smoke: true,
+        light: 1.6,
       },
     },
   },

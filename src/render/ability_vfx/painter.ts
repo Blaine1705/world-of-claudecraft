@@ -189,6 +189,15 @@ export interface AbilityVfxDeps {
     z: number,
     opts?: AbilityAudioOpts,
   ) => void;
+  // The Crucible trinket relics' scene objects (../trinket_relics.ts): offered
+  // every trinket cue first, ticked and tiered with this painter.
+  trinketRelics?: TrinketRelicsHook;
+}
+
+export interface TrinketRelicsHook {
+  handleSpellfx(ev: AbilityVfxSpellfxEvent, admitted: boolean): boolean;
+  update(dt: number, reducedMotion: boolean): void;
+  setQuality(q: number): void;
 }
 
 // Structural slices of the SimEvent members this painter consumes.
@@ -550,6 +559,7 @@ export class AbilityVfx {
   setQuality(q: number): void {
     this.quality = Math.min(1, Math.max(0, Number.isFinite(q) ? q : 1));
     this.deps.fx.setQuality(this.quality);
+    this.deps.trinketRelics?.setQuality(this.quality);
   }
 
   // Dev probe surface: per-ability claim/primitive counters (copied out).
@@ -616,6 +626,11 @@ export class AbilityVfx {
         this.deps.fx.burstAt(at.x, at.y, at.z, 0xa9152d, 9, 0.65, 'blood', 0.23);
       return true;
     }
+    if (
+      ev.ability?.startsWith('trinket_') &&
+      this.deps.trinketRelics?.handleSpellfx(ev, this.admitted())
+    )
+      return true;
     // A trinket teleport (Sundered Prism) draws its departure ceremony but is
     // never CLAIMED: the renderer's blinkStep arm still owns the self position
     // snap and its pulse. A closed cast gate draws nothing extra.
@@ -2038,6 +2053,7 @@ export class AbilityVfx {
   update(dt: number, reducedMotion = false): void {
     this.harvestDetonations.advance(this.deps.fx, dt);
     this.deps.fx.update(dt, reducedMotion);
+    this.deps.trinketRelics?.update(dt, reducedMotion);
     for (const [entityId, held] of this.heldSemantic) {
       if (held.frameSeen !== this.semanticFrame) this.heldSemantic.delete(entityId);
     }

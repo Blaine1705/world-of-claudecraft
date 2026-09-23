@@ -2387,7 +2387,10 @@ export const nl_NL: EnTranslations = {
         "hourglass": "Overhealing from your direct heals is stored in the hourglass, up to {cap} ({capPct}% of your maximum health). Stored healing fades {fade} sec after it last grew.",
         "twinStrike": "Your auto-attack hits have a {chance}% chance to make an extra main-hand melee swing. Can occur once every {icd} sec.",
         "tally": "Your auto-attack critical hits and your killing blows each add a tally mark, up to {max}. Marks last {duration} sec, refreshed whenever you gain one.",
-        "storm": "Each spell you cast adds a charge, up to {max}. Charges last {duration} sec, refreshed whenever you gain one."
+        "storm": "Each spell you cast adds a charge, up to {max}. Charges last {duration} sec, refreshed whenever you gain one.",
+        "heat": "Your melee and ranged weapon hits each add a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.",
+        "ignite": "Your melee and ranged weapon critical hits set the target alight, dealing {tick} Fire damage every {every} sec for {duration} sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
+        "guardHeat": "Each attack you parry, dodge or block adds a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack."
       },
       "use": {
         "retaliate": "For {duration} sec, an enemy that hits you directly takes Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.",
@@ -2402,7 +2405,12 @@ export const nl_NL: EnTranslations = {
         "blink": "Step {yards} yd forward, then take {reduction}% less damage for {guard} sec.",
         "sprint": "Increase your movement speed by {speed}% for {duration} sec. Does not stack with other speed increases.",
         "defiance": "Remove all stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you. Usable while stunned.",
-        "brand": "Brand an enemy player within {range} yd, reducing the healing they receive by {cut}% for {duration} sec."
+        "brand": "Brand an enemy player within {range} yd, reducing the healing they receive by {cut}% for {duration} sec.",
+        "temper": "Spend all heat stacks to temper your weapon for {duration} sec. Your melee and ranged weapon hits deal {damage} extra Fire damage, increased by {perHeat}% for each heat stack spent (up to {maxBonus}% at {maxHeat} stacks). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
+        "kindlingOrb": "Summon an ember orb beside you for {duration} sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for {damage} Fire damage. Damage increases with Spell Power.",
+        "pierce": "For {duration} sec, your direct Physical damage hits also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.",
+        "lantern": "Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.",
+        "heartNova": "Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack."
       }
     },
     "questShare": {
@@ -16770,6 +16778,21 @@ export const nl_NL: EnTranslations = {
       },
       "duelists_brand": {
         "name": "Duelist's Brand"
+      },
+      "forgefathers_temper": {
+        "name": "Forgefather's Temper"
+      },
+      "kindling_orb": {
+        "name": "Kindling Orb"
+      },
+      "molten_fletching": {
+        "name": "Molten Fletching"
+      },
+      "last_flame_lantern": {
+        "name": "Last Flame Lantern"
+      },
+      "heart_of_the_crucible": {
+        "name": "Heart of the Crucible"
       }
     },
     "mobs": {

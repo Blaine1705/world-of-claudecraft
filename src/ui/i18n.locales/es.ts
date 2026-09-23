@@ -17625,6 +17625,11 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'entities.items.wayfarers_lodestone.name': 'Piedra imán del caminante',
   'entities.items.medallion_of_defiance.name': 'Medallón de desafío',
   'entities.items.duelists_brand.name': 'Marca del duelista',
+  'entities.items.forgefathers_temper.name': 'Temple del Padre de la Forja',
+  'entities.items.kindling_orb.name': 'Orbe de brasas',
+  'entities.items.molten_fletching.name': 'Emplumado fundido',
+  'entities.items.last_flame_lantern.name': 'Farol de la última llama',
+  'entities.items.heart_of_the_crucible.name': 'Corazón del Crisol',
   'hudChrome.trinkets.equipLine': 'Equipar: {effect}',
   'hudChrome.trinkets.useLine': 'Uso: {effect} (reutilización de {cooldown})',
   'hudChrome.trinkets.cooldownMinutes': '{minutes} min',
@@ -17642,6 +17647,12 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Tus golpes críticos de ataque automático y tus golpes de gracia añaden una marca de cuenta cada uno, hasta {max}. Las marcas duran {duration} s y se renuevan cada vez que ganas una.',
   'hudChrome.trinkets.equip.storm':
     'Cada hechizo que lanzas añade una carga, hasta {max}. Las cargas duran {duration} s y se renuevan cada vez que ganas una.',
+  'hudChrome.trinkets.equip.heat':
+    'Tus golpes de arma cuerpo a cuerpo y a distancia añaden una acumulación de calor cada uno, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación.',
+  'hudChrome.trinkets.equip.ignite':
+    'Tus golpes críticos de arma cuerpo a cuerpo y a distancia prenden fuego al objetivo, infligiendo {tick} de daño de fuego cada {every} s durante {duration} s. Un nuevo golpe crítico lo renueva. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.',
+  'hudChrome.trinkets.equip.guardHeat':
+    'Cada ataque que paras, esquivas o bloqueas añade una acumulación de calor, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación.',
   'hudChrome.trinkets.use.retaliate':
     'Durante {duration} s, un enemigo que te golpee directamente recibe daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.',
   'hudChrome.trinkets.use.anchor':
@@ -17668,4 +17679,14 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Elimina todos los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas. Se puede usar mientras estás aturdido.',
   'hudChrome.trinkets.use.brand':
     'Marca a un jugador enemigo a {range} m o menos, reduciendo la sanación que recibe un {cut}% durante {duration} s.',
+  'hudChrome.trinkets.use.temper':
+    'Gasta todas las acumulaciones de calor para templar tu arma durante {duration} s. Tus golpes de arma cuerpo a cuerpo y a distancia infligen {damage} de daño de fuego adicional, aumentado un {perHeat}% por cada acumulación de calor gastada (hasta un {maxBonus}% con {maxHeat} acumulaciones). Cada golpe de gracia añade {killExtend} s, hasta {maxDuration} s en total. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.',
+  'hudChrome.trinkets.use.kindlingOrb':
+    'Invoca un orbe de brasas a tu lado durante {duration} s. Cada hechizo que lanzas a un enemigo le hace disparar un proyectil a ese enemigo que inflige {damage} de daño de fuego. El daño aumenta con el poder con hechizos.',
+  'hudChrome.trinkets.use.pierce':
+    'Durante {duration} s, tus golpes directos de daño físico también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {share}% del daño infligido.',
+  'hudChrome.trinkets.use.lantern':
+    'Coloca un farol a tus pies durante {duration} s. Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos de él también sana al otro miembro del grupo más herido bajo su luz por el {share}% de la sanación.',
+  'hudChrome.trinkets.use.heartNova':
+    'Gasta todas las acumulaciones de calor en una nova de fuego que inflige {perHeat} de daño de fuego por acumulación ({max} con {maxHeat} acumulaciones) a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza. El daño aumenta con el poder de ataque. Requiere una acumulación de calor.',
 };

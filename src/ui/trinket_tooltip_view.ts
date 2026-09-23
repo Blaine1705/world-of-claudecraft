@@ -30,6 +30,8 @@ import { tSim } from './sim_i18n';
  *  the player Entity both worlds mirror). */
 export interface TrinketTooltipViewer {
   attackPower: number;
+  /** Ranged Attack Power (hunters); 0 for everyone else. */
+  rangedPower: number;
   spellPower: number;
   healPower: number;
   maxHp: number;
@@ -45,6 +47,16 @@ export const TALON_WOUND = Object.freeze({ every: 2, duration: 6 });
 /** How long the hourglass keeps stored healing after it last grew
  *  (combat/trinkets.ts onTrinketHeal marker duration). */
 export const HOURGLASS_STORE_SEC = 60;
+
+/** Molten Ignite's fixed tick cadence (combat/trinkets.ts applyIgnite). */
+export const MOLTEN_IGNITE_EVERY = 2;
+
+/** The power a weapon-driven trinket (Forgefather's Temper, Molten Fletching)
+ *  scales with: melee Attack Power, or Ranged Attack Power when that is higher
+ *  (combat/trinkets.ts weaponPower). */
+export function trinketWeaponPower(viewer: TrinketTooltipViewer): number {
+  return Math.max(viewer.attackPower, viewer.rangedPower);
+}
 
 /** Lucky Streak's heal-over-time cadence (combat/trinkets.ts gamble arm). */
 const LUCKY_STREAK_EVERY = 3;
@@ -127,6 +139,22 @@ function passiveLine(p: TrinketPassive, viewer: TrinketTooltipViewer): TrinketTo
       key = 'hudChrome.trinkets.equip.storm';
       values = { max: n(p.max), duration: n(p.duration) };
       break;
+    case 'heat':
+      key = 'hudChrome.trinkets.equip.heat';
+      values = { max: n(p.max), duration: n(p.duration) };
+      break;
+    case 'ignite':
+      key = 'hudChrome.trinkets.equip.ignite';
+      values = {
+        tick: n(Math.max(1, Math.round(p.flat + p.coef * trinketWeaponPower(viewer)))),
+        every: n(MOLTEN_IGNITE_EVERY),
+        duration: n(p.ticks * MOLTEN_IGNITE_EVERY),
+      };
+      break;
+    case 'guardHeat':
+      key = 'hudChrome.trinkets.equip.guardHeat';
+      values = { max: n(p.max), duration: n(p.duration) };
+      break;
   }
   return {
     kind: 'equip',
@@ -134,10 +162,14 @@ function passiveLine(p: TrinketPassive, viewer: TrinketTooltipViewer): TrinketTo
   };
 }
 
-/** The stack cap of the worn passive a use spends (tally marks, storm charges). */
+/** The stack cap of the worn passive a use spends (tally marks, storm charges,
+ *  heat stacks). */
 function passiveMax(spec: TrinketSpec): number {
   const p = spec.passive;
-  return p && (p.kind === 'tally' || p.kind === 'storm') ? p.max : 1;
+  return p &&
+    (p.kind === 'tally' || p.kind === 'storm' || p.kind === 'heat' || p.kind === 'guardHeat')
+    ? p.max
+    : 1;
 }
 
 function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewer): string {
@@ -231,6 +263,45 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
         cut: pct(u.cut),
         duration: n(u.duration),
       });
+    case 'temper': {
+      const maxHeat = passiveMax(spec);
+      return t('hudChrome.trinkets.use.temper', {
+        duration: n(u.duration),
+        damage: n(Math.max(1, Math.round(u.flat + u.coef * trinketWeaponPower(viewer)))),
+        perHeat: pct(u.perHeat),
+        maxBonus: pct(u.perHeat * maxHeat),
+        maxHeat: n(maxHeat),
+        killExtend: n(u.killExtend),
+        maxDuration: n(u.maxDuration),
+      });
+    }
+    case 'kindlingOrb':
+      return t('hudChrome.trinkets.use.kindlingOrb', {
+        duration: n(u.duration),
+        damage: n(Math.max(1, Math.round(u.flat + u.coef * viewer.spellPower))),
+      });
+    case 'pierce':
+      return t('hudChrome.trinkets.use.pierce', {
+        duration: n(u.duration),
+        reach: n(u.reach),
+        share: pct(u.share),
+      });
+    case 'lantern':
+      return t('hudChrome.trinkets.use.lantern', {
+        duration: n(u.duration),
+        radius: n(u.radius),
+        share: pct(u.share),
+      });
+    case 'heartNova': {
+      const perHeat = u.flat + u.coef * viewer.attackPower;
+      const maxHeat = passiveMax(spec);
+      return t('hudChrome.trinkets.use.heartNova', {
+        perHeat: formatNumber(perHeat, { maximumFractionDigits: 1 }),
+        max: n(Math.round(maxHeat * perHeat)),
+        maxHeat: n(maxHeat),
+        radius: n(u.radius),
+      });
+    }
   }
 }
 

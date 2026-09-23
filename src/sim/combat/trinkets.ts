@@ -22,6 +22,7 @@ import {
   GAMBLE,
   GAMBLE_FORTUNES,
   TRINKET_AURA,
+  TRINKET_SPECS,
   type TrinketPassive,
   type TrinketSpec,
   trinketCooldownKey,
@@ -434,6 +435,40 @@ export function useWornTrinket(
       fxOn(ctx, p, target, 'shadow', 'trinket_duelists_brand');
       break;
     }
+    case 'temper': {
+      // Every heat stack the forge holds is spent into the temper; the count
+      // rides the temper aura's value for the whole burn.
+      const heat = findAura(p, TRINKET_AURA.heat)?.stacks ?? 0;
+      if (heat > 0) removeAura(ctx, p, TRINKET_AURA.heat);
+      ctx.applyAura(p, marker(p, TRINKET_AURA.temper, 'Tempered', use.duration, heat));
+      fx(ctx, p, 'fire', 'trinket_forgefathers_temper');
+      break;
+    }
+    case 'kindlingOrb': {
+      // The renderer draws the floating orb while this aura is up: keep its id.
+      ctx.applyAura(p, marker(p, TRINKET_AURA.kindlingOrb, 'Kindling Orb', use.duration));
+      fx(ctx, p, 'fire', 'trinket_kindling_orb');
+      break;
+    }
+    case 'pierce': {
+      ctx.applyAura(p, marker(p, TRINKET_AURA.pierce, 'Molten Fletching', use.duration, use.share));
+      fx(ctx, p, 'fire', 'trinket_molten_fletching');
+      break;
+    }
+    case 'lantern': {
+      placeLantern(ctx, p, use);
+      break;
+    }
+    case 'heartNova': {
+      const stacks = findAura(p, TRINKET_AURA.guardHeat)?.stacks ?? 0;
+      if (stacks <= 0) {
+        ctx.error(meta.entityId, 'Your heart holds no heat.');
+        return false;
+      }
+      removeAura(ctx, p, TRINKET_AURA.guardHeat);
+      heartNova(ctx, p, use, stacks);
+      break;
+    }
   }
   p.cooldowns.set(key, cooldown);
   return true;
@@ -519,12 +554,233 @@ export function runTrinketTrigger(
     const edge = findAura(source, TRINKET_AURA.bleedEdge);
     if (edge && worn.spec.use.kind === 'bleedEdge') applyBleed(ctx, source, target, worn.spec.use);
     if (passive?.kind === 'twinStrike') twinStrike(ctx, source, target, passive);
+    // Last, so an earlier rider never lands on a target the fire just killed.
+    if (worn.spec.use.kind === 'temper') temperStrike(ctx, source, target, worn.spec.use);
   }
+  if (trigger === 'weaponHit' && passive?.kind === 'heat') {
+    addStack(ctx, source, TRINKET_AURA.heat, 'Forge Heat', passive.max, passive.duration);
+  }
+  if (
+    trigger === 'weaponCrit' &&
+    passive?.kind === 'ignite' &&
+    target &&
+    !target.dead &&
+    !duelJustEndedBetween(ctx, target, source)
+  ) {
+    applyIgnite(ctx, source, target, passive);
+  }
+  if (trigger === 'kill' && worn.spec.use.kind === 'temper') extendTemper(source, worn.spec.use);
   if ((trigger === 'weaponCrit' || trigger === 'kill') && passive?.kind === 'tally') {
     addStack(ctx, source, TRINKET_AURA.tally, "Hunter's Tally", passive.max, passive.duration);
   }
   if (trigger === 'spellCast' && passive?.kind === 'storm') {
     addStack(ctx, source, TRINKET_AURA.storm, 'Stormjar', passive.max, passive.duration);
+  }
+  if (trigger === 'spellCast' && target && worn.spec.use.kind === 'kindlingOrb') {
+    kindlingBolt(ctx, source, target, worn.spec.use);
+  }
+}
+
+/** The power a weapon-driven trinket scales with: melee Attack Power, or a
+ *  hunter's ranged Attack Power when that is the higher (their shots count). */
+function weaponPower(p: Entity): number {
+  return Math.max(p.attackPower, p.rangedPower);
+}
+
+type UseOf<K extends TrinketSpec['use']['kind']> = Extract<TrinketSpec['use'], { kind: K }>;
+
+/** Forgefather's Temper: while it burns, a weapon hit adds its fire. Dealt as
+ *  incidental (non-direct) damage, so it never echoes, reflects, or re-enters a
+ *  weapon hook. */
+function temperStrike(ctx: SimContext, p: Entity, target: Entity, use: UseOf<'temper'>): void {
+  const temper = findAura(p, TRINKET_AURA.temper);
+  if (!temper) return;
+  const damage = Math.round(
+    (use.flat + use.coef * weaponPower(p)) * (1 + use.perHeat * temper.value),
+  );
+  ctx.dealDamage(
+    p,
+    target,
+    Math.max(1, damage),
+    false,
+    'fire',
+    "Forgefather's Temper",
+    'hit',
+    true,
+    undefined,
+    false,
+  );
+}
+
+/** A kill while the temper burns stretches it by `killExtend`, never past
+ *  `maxDuration` from the use: the aura's duration is its whole life so far. */
+function extendTemper(p: Entity, use: UseOf<'temper'>): void {
+  const temper = findAura(p, TRINKET_AURA.temper);
+  if (!temper) return;
+  const total = Math.min(use.maxDuration, temper.duration + use.killExtend);
+  temper.remaining += total - temper.duration;
+  temper.duration = total;
+}
+
+/** Molten Fletching: a weapon crit sets the target alight (refreshed, never stacked). */
+function applyIgnite(
+  ctx: SimContext,
+  p: Entity,
+  target: Entity,
+  passive: Extract<TrinketPassive, { kind: 'ignite' }>,
+): void {
+  const every = 2;
+  ctx.applyAura(target, {
+    id: TRINKET_AURA.ignite,
+    name: 'Molten Ignite',
+    kind: 'dot',
+    remaining: passive.ticks * every,
+    duration: passive.ticks * every,
+    value: Math.max(1, Math.round(passive.flat + passive.coef * weaponPower(p))),
+    tickInterval: every,
+    tickTimer: every,
+    sourceId: p.id,
+    school: 'fire',
+  });
+}
+
+/** The control kinds a stray bolt must not break on a hostile target. */
+const DAMAGE_BREAKS: ReadonlySet<string> = new Set(['polymorph', 'incapacitate', 'blind']);
+
+/** Kindling Orb: a spell cast at a hostile target looses the orb's bolt at it.
+ *  Incidental (non-direct) damage: it never counts as a cast or echoes. */
+function kindlingBolt(ctx: SimContext, p: Entity, target: Entity, use: UseOf<'kindlingOrb'>): void {
+  if (!findAura(p, TRINKET_AURA.kindlingOrb)) return;
+  if (target.dead || target.id === p.id || !ctx.isHostileTo(p, target)) return;
+  // A crowd-control spell on a hostile is still a cast: the orb holds its fire
+  // rather than break a polymorph, sap or blind the target is under.
+  if (target.auras.some((aura) => DAMAGE_BREAKS.has(aura.kind))) return;
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: p.id,
+    targetId: target.id,
+    school: 'fire',
+    fx: 'projectile',
+    ability: 'trinket_kindling_orb_bolt',
+  });
+  ctx.dealDamage(
+    p,
+    target,
+    Math.max(1, Math.round(use.flat + use.coef * p.spellPower)),
+    false,
+    'fire',
+    'Kindling Orb',
+    'hit',
+    true,
+    undefined,
+    false,
+  );
+}
+
+// ---- Heart of the Crucible ----------------------------------------------------
+
+/** A parry, dodge or block the wearer makes as the defender (the mob swing shell
+ *  on Sim and the player melee shell in auto_attack.ts). Draws no rng. */
+export function onTrinketAvoidance(ctx: SimContext, defender: Entity): void {
+  if (defender.kind !== 'player' || defender.dead) return;
+  const passive = passiveOf(ctx, defender);
+  if (passive?.kind !== 'guardHeat') return;
+  addStack(ctx, defender, TRINKET_AURA.guardHeat, 'Crucible Heat', passive.max, passive.duration);
+}
+
+function heartNova(ctx: SimContext, p: Entity, use: UseOf<'heartNova'>, stacks: number): void {
+  const damage = Math.max(1, Math.round((use.flat + use.coef * p.attackPower) * stacks));
+  ctx.emit({
+    type: 'spellfxAt',
+    x: p.pos.x,
+    z: p.pos.z,
+    school: 'fire',
+    fx: 'nova',
+    ability: 'trinket_heart_of_the_crucible',
+    radius: use.radius,
+    sourceId: p.id,
+  });
+  for (const hostile of ctx.hostilesInRadius(p, p.pos, use.radius)) {
+    if (hostile.dead) continue;
+    ctx.dealDamage(p, hostile, damage, false, 'fire', 'Heart of the Crucible', 'hit');
+    // The same shared taunt as an area taunt (effect_dispatch.ts aoeTaunt).
+    if (hostile.kind === 'mob' && !hostile.dead) ctx.applyTaunt(p, hostile);
+  }
+}
+
+// ---- Last Flame Lantern -------------------------------------------------------
+
+/** The lantern is an aura on the wearer carrying where it stands: value is the
+ *  splash share, value2/value3 the x/z it was set at (both ride the aura wire).
+ *  It burns out with the aura (its timer, or the wearer's death). */
+function placeLantern(ctx: SimContext, p: Entity, use: UseOf<'lantern'>): void {
+  ctx.applyAura(p, {
+    ...marker(p, TRINKET_AURA.lantern, 'Last Flame Lantern', use.duration, use.share),
+    value2: p.pos.x,
+    value3: p.pos.z,
+    school: 'fire',
+  });
+  ctx.emit({
+    type: 'spellfxAt',
+    x: p.pos.x,
+    z: p.pos.z,
+    school: 'fire',
+    fx: 'nova',
+    ability: 'trinket_last_flame_lantern',
+    radius: use.radius,
+    sourceId: p.id,
+  });
+}
+
+/** A cast heal on an ally in a lantern's light splashes a share of it onto the
+ *  most wounded other party member in that light. The lantern is looked for in
+ *  the healed ally's own party (its wearer is that ally's ally); the first lit
+ *  lantern in party order splashes, once per heal. */
+function lanternSplash(ctx: SimContext, healer: Entity, target: Entity, effective: number): void {
+  const use = TRINKET_SPECS.last_flame_lantern?.use;
+  if (use?.kind !== 'lantern') return;
+  const party = ctx.partyOf(target.id)?.members ?? [target.id];
+  for (const wearerId of party) {
+    const wearer = ctx.entities.get(wearerId);
+    const lantern = wearer ? findAura(wearer, TRINKET_AURA.lantern) : undefined;
+    if (!lantern || lantern.value2 === undefined || lantern.value3 === undefined) continue;
+    const lx = lantern.value2;
+    const lz = lantern.value3;
+    const lit = (e: Entity) => Math.hypot(e.pos.x - lx, e.pos.z - lz) <= use.radius;
+    if (!lit(target)) continue;
+    let mostWounded: Entity | null = null;
+    for (const id of party) {
+      const ally = ctx.entities.get(id);
+      if (!ally || ally.dead || ally.id === target.id || ally.hp >= ally.maxHp) continue;
+      if (!lit(ally)) continue;
+      if (!mostWounded || ally.hp / ally.maxHp < mostWounded.hp / mostWounded.maxHp) {
+        mostWounded = ally;
+      }
+    }
+    if (!mostWounded) return;
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: target.id,
+      targetId: mostWounded.id,
+      school: 'fire',
+      fx: 'projectile',
+      ability: 'trinket_last_flame_lantern_splash',
+    });
+    // An already-resolved copy: no crit, no multipliers, and it never comes
+    // back through onTrinketHeal, so it cannot splash again.
+    applyHeal(
+      ctx,
+      healer,
+      mostWounded,
+      Math.max(1, Math.round(effective * lantern.value)),
+      'Last Flame Lantern',
+      'trinket_last_flame_lantern',
+      false,
+      false,
+      false,
+      true,
+    );
+    return;
   }
 }
 
@@ -633,6 +889,30 @@ export function onTrinketDamage(
       );
     }
   }
+  // Molten Fletching's pierce: a direct physical hit (a weapon swing, a shot, a
+  // weapon strike) carries on into the next enemy. The carried share is dealt
+  // non-direct, so it never comes back here and never chains.
+  if (source && source.kind === 'player' && school === 'physical' && direct) {
+    const pierce = findAura(source, TRINKET_AURA.pierce);
+    const use = pierce ? wornTrinket(ctx, source)?.spec.use : undefined;
+    if (pierce && use?.kind === 'pierce' && source.id !== target.id) {
+      const next = nearestHostile(ctx, source, target, use.reach, new Set([target.id]));
+      if (next) {
+        ctx.dealDamage(
+          source,
+          next,
+          Math.max(1, Math.round(hpLoss * pierce.value)),
+          false,
+          'physical',
+          'Molten Fletching',
+          'hit',
+          true,
+          undefined,
+          false,
+        );
+      }
+    }
+  }
   if (
     source &&
     source.kind === 'player' &&
@@ -701,6 +981,9 @@ export function onTrinketHeal(
       false,
       true,
     );
+  }
+  if (castHeal && healed + overheal > 0 && !target.dead) {
+    lanternSplash(ctx, source, target, healed + overheal);
   }
 }
 

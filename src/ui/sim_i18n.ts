@@ -1116,6 +1116,11 @@ const baseEnTable = {
   'error.trinketNoTallyMarks': 'You have no tally marks to spend.',
   'error.trinketJarEmpty': 'The jar holds no charge.',
   'error.trinketNeedEnemyPlayer': 'You need an enemy player as your target.',
+  'aura.trinketTempered': 'Tempered',
+  'aura.trinketForgeHeat': 'Forge Heat',
+  'aura.trinketMoltenIgnite': 'Molten Ignite',
+  'aura.trinketCrucibleHeat': 'Crucible Heat',
+  'error.trinketNoHeat': 'Your heart holds no heat.',
 } as const;
 
 const petEnTable = {
@@ -2211,6 +2216,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.trinketNoTallyMarks': 'No tienes marcas de cuenta que gastar.',
     'error.trinketJarEmpty': 'La jarra no tiene ninguna carga.',
     'error.trinketNeedEnemyPlayer': 'Necesitas un jugador enemigo como objetivo.',
+    'aura.trinketTempered': 'Templado',
+    'aura.trinketForgeHeat': 'Calor de la forja',
+    'aura.trinketMoltenIgnite': 'Ignición fundida',
+    'aura.trinketCrucibleHeat': 'Calor del crisol',
+    'error.trinketNoHeat': 'Tu corazón no guarda calor.',
   },
   es_ES: {
     'log.passingStoneKneel':
@@ -3051,6 +3061,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.trinketNoTallyMarks': 'No tienes marcas de cuenta que gastar.',
     'error.trinketJarEmpty': 'La jarra no tiene ninguna carga.',
     'error.trinketNeedEnemyPlayer': 'Necesitas un jugador enemigo como objetivo.',
+    'aura.trinketTempered': 'Templado',
+    'aura.trinketForgeHeat': 'Calor de la forja',
+    'aura.trinketMoltenIgnite': 'Ignición fundida',
+    'aura.trinketCrucibleHeat': 'Calor del crisol',
+    'error.trinketNoHeat': 'Tu corazón no guarda calor.',
   },
   fr_FR: {
     'log.passingStoneKneel':
@@ -7486,6 +7501,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.trinketNoTallyMarks': '你没有可消耗的计数标记。',
     'error.trinketJarEmpty': '罐中没有任何充能。',
     'error.trinketNeedEnemyPlayer': '你需要以一名敌对玩家为目标。',
+    'aura.trinketTempered': '淬火',
+    'aura.trinketForgeHeat': '锻炉之热',
+    'aura.trinketMoltenIgnite': '熔火点燃',
+    'aura.trinketCrucibleHeat': '熔炉之热',
+    'error.trinketNoHeat': '你的心中没有热量。',
   },
   zh_TW: {
     'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
@@ -8251,6 +8271,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.trinketNoTallyMarks': '你沒有可消耗的計數標記。',
     'error.trinketJarEmpty': '罐中沒有任何充能。',
     'error.trinketNeedEnemyPlayer': '你需要以一名敵對玩家為目標。',
+    'aura.trinketTempered': '淬火',
+    'aura.trinketForgeHeat': '鍛爐之熱',
+    'aura.trinketMoltenIgnite': '熔火點燃',
+    'aura.trinketCrucibleHeat': '熔爐之熱',
+    'error.trinketNoHeat': '你的心中沒有熱量。',
   },
   ko_KR: {
     'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
@@ -9056,6 +9081,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.trinketNoTallyMarks': '소모할 집계 표식이 없습니다.',
     'error.trinketJarEmpty': '항아리에 충전이 없습니다.',
     'error.trinketNeedEnemyPlayer': '적 플레이어를 대상으로 지정해야 합니다.',
+    'aura.trinketTempered': '담금질됨',
+    'aura.trinketForgeHeat': '용광로의 열기',
+    'aura.trinketMoltenIgnite': '용융 점화',
+    'aura.trinketCrucibleHeat': '도가니의 열기',
+    'error.trinketNoHeat': '심장에 열기가 없습니다.',
   },
   ja_JP: {
     'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
@@ -9865,6 +9895,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.trinketNoTallyMarks': '消費できる集計の印がありません。',
     'error.trinketJarEmpty': '壺にチャージがありません。',
     'error.trinketNeedEnemyPlayer': '敵対プレイヤーをターゲットにする必要があります。',
+    'aura.trinketTempered': '焼き入れ',
+    'aura.trinketForgeHeat': '炉の熱',
+    'aura.trinketMoltenIgnite': '溶岩の発火',
+    'aura.trinketCrucibleHeat': 'るつぼの熱',
+    'error.trinketNoHeat': '心臓に熱がありません。',
   },
   pt_BR: {
     'log.passingStoneKneel':
@@ -11533,6 +11568,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.trinketNoTallyMarks': 'У вас нет меток счета, которые можно потратить.',
     'error.trinketJarEmpty': 'В сосуде нет заряда.',
     'error.trinketNeedEnemyPlayer': 'Нужно выбрать целью вражеского игрока.',
+    'aura.trinketTempered': 'Закаленное оружие',
+    'aura.trinketForgeHeat': 'Жар кузни',
+    'aura.trinketMoltenIgnite': 'Расплавленный поджог',
+    'aura.trinketCrucibleHeat': 'Жар горнила',
+    'error.trinketNoHeat': 'В вашем сердце нет жара.',
   },
   ...BASE_NEW,
   cs_CZ: {
@@ -14140,6 +14180,10 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   "Wayfarer's Stride": 'aura.trinketWayfarersStride',
   'Last Bastion': 'aura.trinketLastBastion',
   Retaliation: 'aura.trinketRetaliation',
+  Tempered: 'aura.trinketTempered',
+  'Forge Heat': 'aura.trinketForgeHeat',
+  'Molten Ignite': 'aura.trinketMoltenIgnite',
+  'Crucible Heat': 'aura.trinketCrucibleHeat',
   'Crafted Momentum': 'aura.craftedMomentum',
   'Crafted Shelter': 'aura.craftedShelter',
   'Crafted Preservation': 'aura.craftedPreservation',
@@ -14543,6 +14587,11 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
   'Echoing Lens': 'echoing_lens',
   'Sundered Prism': 'sundered_prism',
   "Duelist's Brand": 'duelists_brand',
+  "Forgefather's Temper": 'forgefathers_temper',
+  'Kindling Orb': 'kindling_orb',
+  'Molten Fletching': 'molten_fletching',
+  'Last Flame Lantern': 'last_flame_lantern',
+  'Heart of the Crucible': 'heart_of_the_crucible',
 };
 
 export function localizeSimAuraName(name: string): string | null {

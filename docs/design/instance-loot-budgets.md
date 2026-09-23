@@ -31,6 +31,18 @@ one of the three bespoke weapons (half the group) or one of the four raid
 trinkets (the other half, `content/trinkets.ts`). The first slot still upgrades eligible base equipment to its existing
 heroic variant.
 
+## Ignivar and Varkhul
+
+The Crucible keeps its two slots per kill (`docs/prd/ignivar-raid-loot.md`,
+"Boss loot tables"). Its five raid trinkets (`content/trinkets.ts`, item level
+35) are heroic exclusives: they sit inside each boss's Heroic exclusive
+partition beside the Robe sigils, the marquee weapons and Varkhul's shields,
+as weighted entries rather than an extra drop. Ignivar carries three and
+Varkhul two, at 0.12 each; the older rows scaled down together so each group
+still sums to 1.0, and Emberward keeps its absolute 3 percent. The Normal
+tables are unchanged: this raid has no heroic item-level layer or heroic
+variants, so the trinkets read item level 35 like every other exclusive.
+
 ## Five-player heroics
 
 Each named dungeon boss replaces its Normal equipment rolls with one combined

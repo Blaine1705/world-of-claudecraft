@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
-import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { AbilityVfx, type TrinketRelicsHook } from '../src/render/ability_vfx/painter';
 import { abilityVfxFullSpec, abilityVfxSpec } from '../src/render/ability_vfx_registry';
 import {
   TRINKET_VFX_FULL_SPECS,
@@ -27,10 +27,14 @@ const SELF_CUES = [
   'trinket_gamblers_die',
   'trinket_wayfarers_lodestone',
   'trinket_medallion_of_defiance',
+  'trinket_forgefathers_temper',
+  'trinket_kindling_orb',
+  'trinket_molten_fletching',
 ] as const;
 
-function harness(admit = true) {
+function harness(admit = true, trinketRelics?: TrinketRelicsHook) {
   const sequenceInstant = vi.fn();
+  const sequenceBolt = vi.fn();
   const sequenceInstantAt = vi.fn();
   const spawnAoeRing = vi.fn();
   const lightningProjectile = vi.fn();
@@ -39,6 +43,9 @@ function harness(admit = true) {
     setDelegates: vi.fn(),
     sequenceInstant,
     sequenceInstantAt,
+    sequenceBolt,
+    update: vi.fn(),
+    setQuality: vi.fn(),
     jaggedBolt: vi.fn(),
     windup: vi.fn(() => true),
     warmSpiritsForClass: vi.fn(),
@@ -63,15 +70,24 @@ function harness(admit = true) {
       triggerAttack: vi.fn(),
       localPlayerId: () => 1,
       castVfxAdmit: () => admit,
+      trinketRelics,
     },
     () => 0,
   );
-  return { painter, sequenceInstant, sequenceInstantAt, spawnAoeRing, lightningProjectile, nova };
+  return {
+    painter,
+    sequenceInstant,
+    sequenceInstantAt,
+    sequenceBolt,
+    spawnAoeRing,
+    lightningProjectile,
+    nova,
+  };
 }
 
 describe('trinket VFX specs', () => {
   it('gives every sim trinket cue id its own authored spec through the registry', () => {
-    expect(EMITTED_IDS).toHaveLength(14);
+    expect(EMITTED_IDS).toHaveLength(21);
     expect(Object.keys(TRINKET_VFX_SPECS).sort()).toEqual(EMITTED_IDS);
     for (const id of EMITTED_IDS) {
       const spec = abilityVfxSpec(id);
@@ -234,4 +250,122 @@ describe('trinket VFX routing through the ability painter', () => {
       }
     },
   );
+
+  it.each([
+    ['trinket_heart_of_the_crucible', 10, 0xff4a12],
+    ['trinket_last_flame_lantern', 12, 0xffc861],
+  ] as const)(
+    'draws the %s area ring at the exact sim radius on a cold gate too',
+    (ability, radius, color) => {
+      for (const admit of [true, false]) {
+        const h = harness(admit);
+        expect(
+          h.painter.handleSpellfxAt({
+            sourceId: 1,
+            x: 3,
+            z: 4,
+            radius,
+            school: 'fire',
+            fx: 'nova',
+            ability,
+          }),
+        ).toBe(true);
+        expect(h.spawnAoeRing).toHaveBeenCalledWith(3, 4, radius, 'fire', color);
+      }
+    },
+  );
+
+  it.each(['trinket_kindling_orb_bolt', 'trinket_last_flame_lantern_splash'] as const)(
+    'flies the %s projectile cue as its own authored bolt between the two bodies',
+    (ability) => {
+      const h = harness();
+      expect(
+        h.painter.handleSpellfx({
+          sourceId: 1,
+          targetId: 7,
+          school: 'fire',
+          fx: 'projectile',
+          ability,
+        }),
+      ).toBe(true);
+      expect(h.sequenceBolt).toHaveBeenCalledTimes(1);
+      expect(h.sequenceBolt.mock.calls[0].slice(0, 4)).toEqual([
+        ability,
+        TRINKET_VFX_FULL_SPECS[ability],
+        1,
+        7,
+      ]);
+    },
+  );
+});
+
+describe('trinket relic hook in the ability painter', () => {
+  function relics(claims: boolean) {
+    return {
+      handleSpellfx: vi.fn<TrinketRelicsHook['handleSpellfx']>(() => claims),
+      update: vi.fn(),
+      setQuality: vi.fn(),
+    } satisfies TrinketRelicsHook;
+  }
+
+  it('lets the relics claim the Kindling bolt leaving a live orb, so no second bolt flies', () => {
+    const hook = relics(true);
+    const h = harness(true, hook);
+    const ev = {
+      sourceId: 1,
+      targetId: 7,
+      school: 'fire',
+      fx: 'projectile',
+      ability: 'trinket_kindling_orb_bolt',
+    };
+    expect(h.painter.handleSpellfx(ev)).toBe(true);
+    expect(hook.handleSpellfx).toHaveBeenCalledWith(ev, true);
+    expect(h.sequenceBolt).not.toHaveBeenCalled();
+  });
+
+  it('still plays the authored ceremony when the relics only observe the cue', () => {
+    const hook = relics(false);
+    const h = harness(true, hook);
+    expect(
+      h.painter.handleSpellfx({
+        sourceId: 1,
+        targetId: 1,
+        school: 'fire',
+        fx: 'selfCast',
+        ability: 'trinket_forgefathers_temper',
+      }),
+    ).toBe(true);
+    expect(hook.handleSpellfx).toHaveBeenCalledTimes(1);
+    expect(h.sequenceInstant.mock.calls[0][0]).toBe('trinket_forgefathers_temper');
+  });
+
+  it('hands the relics the closed cast gate and never offers them a class ability', () => {
+    const hook = relics(false);
+    const h = harness(false, hook);
+    h.painter.handleSpellfx({
+      sourceId: 1,
+      targetId: 7,
+      school: 'fire',
+      fx: 'projectile',
+      ability: 'trinket_kindling_orb_bolt',
+    });
+    expect(hook.handleSpellfx.mock.calls[0][1]).toBe(false);
+    h.painter.handleSpellfx({
+      sourceId: 1,
+      targetId: 7,
+      school: 'fire',
+      fx: 'projectile',
+      ability: 'fireball',
+    });
+    expect(hook.handleSpellfx).toHaveBeenCalledTimes(1);
+  });
+
+  it('ticks and tiers the relics with the painter', () => {
+    const hook = relics(false);
+    const h = harness(true, hook);
+    h.painter.update(0.05, true);
+    expect(hook.update).toHaveBeenCalledWith(0.05, true);
+    h.painter.setQuality(0.25);
+    expect(hook.setQuality).toHaveBeenCalledWith(0.25);
+  });
 });

@@ -65,7 +65,34 @@ export type TrinketUse =
   | { kind: 'defiance' }
   /** Duelist's Brand: brand an enemy player within `range`: healing they
    *  receive is cut by `cut` for `duration`. */
-  | { kind: 'brand'; range: number; duration: number; cut: number };
+  | { kind: 'brand'; range: number; duration: number; cut: number }
+  /** Forgefather's Temper: for `duration`, every weapon hit adds `flat` (+ `coef`
+   *  of Attack Power) fire damage, `perHeat` more for each heat stack the use
+   *  spent; a kill while it burns adds `killExtend` seconds, up to `maxDuration`. */
+  | {
+      kind: 'temper';
+      duration: number;
+      flat: number;
+      coef: number;
+      perHeat: number;
+      killExtend: number;
+      maxDuration: number;
+    }
+  /** Kindling Orb: an ember orb floats beside you for `duration`; every damage
+   *  spell you cast makes it loose a bolt of `flat` (+ `coef` of Spell Power)
+   *  fire damage at the same target. */
+  | { kind: 'kindlingOrb'; duration: number; flat: number; coef: number }
+  /** Molten Fletching: for `duration`, every weapon hit also strikes the enemy
+   *  nearest your target (within `reach`) for `share` of the damage. */
+  | { kind: 'pierce'; duration: number; reach: number; share: number }
+  /** Last Flame Lantern: set a lantern at your feet for `duration`. A heal that
+   *  lands on an ally within `radius` of it splashes `share` onto the most
+   *  wounded other ally in its light. */
+  | { kind: 'lantern'; duration: number; radius: number; share: number }
+  /** Heart of the Crucible: spend every heat stack on a fire nova within
+   *  `radius`, `flat` (+ `coef` of Attack Power) fire damage per stack, that
+   *  taunts every creature it hits. */
+  | { kind: 'heartNova'; radius: number; flat: number; coef: number };
 
 /** What a trinket does on its own while worn. */
 export type TrinketPassive =
@@ -83,7 +110,16 @@ export type TrinketPassive =
   | { kind: 'tally'; max: number; duration: number }
   /** Stormjar: every spell you cast adds a charge, up to `max`, kept for
    *  `duration`. */
-  | { kind: 'storm'; max: number; duration: number };
+  | { kind: 'storm'; max: number; duration: number }
+  /** Forgefather's Temper: each weapon hit adds a heat stack, up to `max`, kept
+   *  for `duration`. */
+  | { kind: 'heat'; max: number; duration: number }
+  /** Molten Fletching: a weapon crit sets the target alight for `ticks` ticks of
+   *  `flat` (+ `coef` of Attack Power) fire damage every 2 s. */
+  | { kind: 'ignite'; ticks: number; flat: number; coef: number }
+  /** Heart of the Crucible: each parry, dodge or block you make adds a heat
+   *  stack, up to `max`, kept for `duration`. */
+  | { kind: 'guardHeat'; max: number; duration: number };
 
 export interface TrinketSpec {
   /** Seconds between uses. */
@@ -112,6 +148,13 @@ export const TRINKET_AURA = Object.freeze({
   riftGuard: 'trinket_rift_guard',
   sprint: 'trinket_sprint',
   brand: 'trinket_brand',
+  heat: 'trinket_forge_heat',
+  temper: 'trinket_temper',
+  kindlingOrb: 'trinket_kindling_orb',
+  ignite: 'trinket_molten_ignite',
+  pierce: 'trinket_pierce',
+  lantern: 'trinket_lantern',
+  guardHeat: 'trinket_crucible_heat',
 });
 
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
@@ -169,7 +212,27 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
     priceHonor: 800,
     sellValue: 0,
   },
+  // The Crucible of the Last Spring raid trinkets (Ignivar and Varkhul), the
+  // item level 35 tier. Stat values are set to the raid tier's line budget.
+  forgefathers_temper: trinket('forgefathers_temper', "Forgefather's Temper", { str: 15 }),
+  kindling_orb: trinket('kindling_orb', 'Kindling Orb', { int: 15 }),
+  molten_fletching: trinket('molten_fletching', 'Molten Fletching', { agi: 15 }),
+  last_flame_lantern: trinket('last_flame_lantern', 'Last Flame Lantern', { spi: 15 }),
+  heart_of_the_crucible: trinket('heart_of_the_crucible', 'Heart of the Crucible', { sta: 15 }),
 };
+
+// The Crucible of the Last Spring raid trinkets, in the order they sit in their
+// bosses' Heroic exclusive partitions (HEROIC_BOSS_LOOT in heroic_loot.ts;
+// heroic-only, like the marquee weapons): Ignivar pays the first three,
+// Varkhul the last two. item_level.ts registers them at the
+// Crucible raid tier (IGNIVAR_RAID_LOOT_SOURCE_LEVEL, item level 35).
+export const CRUCIBLE_TRINKET_ITEM_IDS: readonly string[] = [
+  'kindling_orb',
+  'molten_fletching',
+  'last_flame_lantern',
+  'forgefathers_temper',
+  'heart_of_the_crucible',
+];
 
 export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freeze({
   bastion_sigil: {
@@ -228,6 +291,37 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
   duelists_brand: {
     cooldown: 60,
     use: { kind: 'brand', range: 30, duration: 8, cut: 0.5 },
+  },
+  forgefathers_temper: {
+    cooldown: 90,
+    use: {
+      kind: 'temper',
+      duration: 10,
+      flat: 6,
+      coef: 0.08,
+      perHeat: 0.15,
+      killExtend: 2,
+      maxDuration: 20,
+    },
+    passive: { kind: 'heat', max: 5, duration: 20 },
+  },
+  kindling_orb: {
+    cooldown: 120,
+    use: { kind: 'kindlingOrb', duration: 12, flat: 12, coef: 0.12 },
+  },
+  molten_fletching: {
+    cooldown: 90,
+    use: { kind: 'pierce', duration: 10, reach: 8, share: 0.4 },
+    passive: { kind: 'ignite', ticks: 3, flat: 4, coef: 0.03 },
+  },
+  last_flame_lantern: {
+    cooldown: 120,
+    use: { kind: 'lantern', duration: 12, radius: 12, share: 0.25 },
+  },
+  heart_of_the_crucible: {
+    cooldown: 60,
+    use: { kind: 'heartNova', radius: 10, flat: 8, coef: 0.05 },
+    passive: { kind: 'guardHeat', max: 10, duration: 30 },
   },
 });
 

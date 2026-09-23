@@ -1,7 +1,7 @@
-// The two places the Sim coordinator consults a worn trinket, kept here so the
+// The places the Sim coordinator consults a worn trinket, kept here so the
 // coordinator carries one call each (src/sim/sim.ts is a monolith at its ceiling):
-// which auras a player's own guards keep off them, and which saved cooldowns a
-// relog restores.
+// which auras a player's own guards keep off them, which saved cooldowns a relog
+// restores, and the dodge, parry or block a mob swing lands on a wearer.
 
 import { isTrinketCooldownKey } from '../content/trinkets';
 import { ABILITIES } from '../data';
@@ -9,6 +9,8 @@ import type { Aura, Entity } from '../types';
 import { isUnstuckSystemCooldown } from '../unstuck_cooldown';
 import { veilboundMarchBlocksAura } from './paladin_veilbound_march';
 import { mooringBlocksAura } from './trinkets';
+
+export { onTrinketAvoidance } from './trinkets';
 
 /** Whether one of a player's own guards keeps this aura off them: the paladin's
  *  Veilbound March (roots and slows) or the Mooring Stone (every control). */

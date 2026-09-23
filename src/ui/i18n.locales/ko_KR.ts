@@ -17155,6 +17155,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wayfarers_lodestone.name': '방랑자의 자철석',
   'entities.items.medallion_of_defiance.name': '저항의 메달',
   'entities.items.duelists_brand.name': '결투가의 낙인',
+  'entities.items.forgefathers_temper.name': '대장장이 아버지의 담금질',
+  'entities.items.kindling_orb.name': '불씨 구슬',
+  'entities.items.molten_fletching.name': '용융 화살깃',
+  'entities.items.last_flame_lantern.name': '마지막 불꽃의 등불',
+  'entities.items.heart_of_the_crucible.name': '도가니의 심장',
   'hudChrome.trinkets.equipLine': '착용 효과: {effect}',
   'hudChrome.trinkets.useLine': '사용 효과: {effect} (재사용 대기시간 {cooldown})',
   'hudChrome.trinkets.cooldownMinutes': '{minutes}분',
@@ -17172,6 +17177,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '자동 공격 치명타와 결정타마다 집계 표식을 하나씩 얻으며, 최대 {max}개까지 쌓입니다. 표식은 {duration}초 동안 지속되며, 새로 얻을 때마다 갱신됩니다.',
   'hudChrome.trinkets.equip.storm':
     '주문을 시전할 때마다 충전을 하나 얻으며, 최대 {max}개까지 쌓입니다. 충전은 {duration}초 동안 지속되며, 새로 얻을 때마다 갱신됩니다.',
+  'hudChrome.trinkets.equip.heat':
+    '근접 및 원거리 무기가 적중할 때마다 열기를 1중첩 얻으며, 최대 {max}중첩까지 쌓입니다. 열기는 {duration}초 동안 지속되며, 중첩을 얻을 때마다 갱신됩니다.',
+  'hudChrome.trinkets.equip.ignite':
+    '근접 및 원거리 무기의 치명타가 대상에 불을 붙여 {every}초마다 {tick}의 화염 피해를 {duration}초 동안 입힙니다. 새로운 치명타가 효과를 갱신합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.',
+  'hudChrome.trinkets.equip.guardHeat':
+    '공격을 무기 막기, 회피 또는 방패 막기할 때마다 열기를 1중첩 얻으며, 최대 {max}중첩까지 쌓입니다. 열기는 {duration}초 동안 지속되며, 중첩을 얻을 때마다 갱신됩니다.',
   'hudChrome.trinkets.use.retaliate':
     '{duration}초 동안 당신을 직접 공격한 적은 그 공격으로 잃은 생명력의 {pct}%에 해당하는 물리 피해를 받습니다. 지속 피해로는 발동하지 않습니다.',
   'hudChrome.trinkets.use.anchor':
@@ -17198,4 +17209,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '자신에게 걸린 모든 기절, 이동 불가, 감속, 공포, 변이, 침묵, 실명, 주술, 무장 해제, 행동 불가 효과를 제거합니다. 기절 중에도 사용할 수 있습니다.',
   'hudChrome.trinkets.use.brand':
     '{range}미터 이내의 적 플레이어 한 명에게 낙인을 찍어 {duration}초 동안 받는 치유량을 {cut}% 감소시킵니다.',
+  'hudChrome.trinkets.use.temper':
+    '열기를 모두 소모하여 {duration}초 동안 무기를 담금질합니다. 근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입히며, 소모한 열기 1중첩당 {perHeat}% 증가합니다({maxHeat}중첩일 때 최대 {maxBonus}%). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.',
+  'hudChrome.trinkets.use.kindlingOrb':
+    '{duration}초 동안 곁에 잉걸불 구슬을 소환합니다. 적에게 주문을 시전할 때마다 구슬이 그 적에게 화염구를 발사하여 {damage}의 화염 피해를 입힙니다. 피해량은 주문력으로 증가합니다.',
+  'hudChrome.trinkets.use.pierce':
+    '{duration}초 동안 직접 물리 피해가 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.',
+  'hudChrome.trinkets.use.lantern':
+    '{duration}초 동안 발밑에 등불을 놓습니다. 누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {share}%만큼 치유됩니다.',
+  'hudChrome.trinkets.use.heartNova':
+    '열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다.',
 };

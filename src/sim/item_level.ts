@@ -36,6 +36,7 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from './content/rift/items';
+import { CRUCIBLE_TRINKET_ITEM_IDS } from './content/trinkets';
 import { ALL_RECIPES, DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
 // The pure budget primitives live in the leaf module ./item_budget (no ./data
 // import, so content/heroic_variants.ts can share them at data-eval time without a
@@ -270,6 +271,10 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // boss mobs (bump() is highest-level-wins, so this overrides that). Sigils
   // are kind 'tool' with no slot and stay item-level ineligible.
   for (const id of IGNIVAR_LOOT_ITEM_IDS) bump(id, IGNIVAR_RAID_LOOT_SOURCE_LEVEL, true);
+  // The Crucible raid trinkets (content/trinkets.ts) are heroic exclusives of
+  // the same two bosses, so like the other exclusives they read the Crucible
+  // tier (35), out-ranking the heroic-table default source above.
+  for (const id of CRUCIBLE_TRINKET_ITEM_IDS) bump(id, IGNIVAR_RAID_LOOT_SOURCE_LEVEL, true);
   // Rift-only clear-time epics and legendaries: gated behind B+/A/S final-boss
   // kills (addRiftClearGearLoot), they never appear on static mob loot tables, so
   // the mob-loot block above never registers them. The epics register at

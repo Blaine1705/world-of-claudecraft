@@ -2387,7 +2387,10 @@ export const zh_TW: EnTranslations = {
         "hourglass": "你的直接治療產生的過量治療會儲存在沙漏中，最多 {cap} 點（你最大生命值的 {capPct}%）。儲存的治療量在最後一次增加後 {fade} 秒消散。",
         "twinStrike": "你的自動攻擊命中有 {chance}% 的機率額外進行一次主手近戰揮擊。每 {icd} 秒只能觸發一次。",
         "tally": "你的自動攻擊致命一擊和你的最後一擊各增加一個計數標記，最多 {max} 個。標記持續 {duration} 秒，每獲得一個便會刷新。",
-        "storm": "你每施放一個法術便增加一層充能，最多 {max} 層。充能持續 {duration} 秒，每獲得一層便會刷新。"
+        "storm": "你每施放一個法術便增加一層充能，最多 {max} 層。充能持續 {duration} 秒，每獲得一層便會刷新。",
+        "heat": "你的近戰和遠程武器每次命中增加一層熱量，最多 {max} 層。熱量持續 {duration} 秒，每獲得一層便會刷新。",
+        "ignite": "你的近戰和遠程武器致命一擊會點燃目標，每 {every} 秒造成 {tick} 點火焰傷害，持續 {duration} 秒。新的致命一擊會刷新該效果。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
+        "guardHeat": "你每招架、閃躲或格擋一次攻擊，便增加一層熱量，最多 {max} 層。熱量持續 {duration} 秒，每獲得一層便會刷新。"
       },
       "use": {
         "retaliate": "在 {duration} 秒內，直接擊中你的敵人會受到相當於該次攻擊令你損失生命值 {pct}% 的物理傷害。週期性傷害不會觸發此效果。",
@@ -2402,7 +2405,12 @@ export const zh_TW: EnTranslations = {
         "blink": "向前跨越 {yards} 碼，然後在 {guard} 秒內受到的傷害降低 {reduction}%。",
         "sprint": "使你的移動速度提高 {speed}%，持續 {duration} 秒。不與其他速度提高效果疊加。",
         "defiance": "移除你身上所有的昏迷、定身、緩速、恐懼、變形、沉默、致盲、妖術、繳械和失去行動能力效果。昏迷時可用。",
-        "brand": "為 {range} 碼內的一名敵對玩家打上烙印，使其受到的治療效果降低 {cut}%，持續 {duration} 秒。"
+        "brand": "為 {range} 碼內的一名敵對玩家打上烙印，使其受到的治療效果降低 {cut}%，持續 {duration} 秒。",
+        "temper": "消耗所有熱量為你的武器淬火，持續 {duration} 秒。你的近戰和遠程武器命中額外造成 {damage} 點火焰傷害，每消耗一層熱量提高 {perHeat}%（{maxHeat} 層時最多提高 {maxBonus}%）。每次最後一擊延長 {killExtend} 秒，總計最多 {maxDuration} 秒。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
+        "kindlingOrb": "在你身旁召喚一顆餘燼寶珠，持續 {duration} 秒。你每對敵人施放一個法術，它便向該敵人射出一道火焰彈，造成 {damage} 點火焰傷害。傷害隨法術強度提高。",
+        "pierce": "在 {duration} 秒內，你的直接物理傷害命中還會打擊距離你的目標最近的、{reach} 碼內的一個敵人，造成所造成傷害的 {share}%。",
+        "lantern": "在你腳下放置一盞提燈，持續 {duration} 秒。任何人對提燈 {radius} 碼內的你或隊伍成員施放的直接治療，還會以該治療量的 {share}% 治療燈光中受傷最重的另一名隊伍成員。",
+        "heartNova": "消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人每層熱量造成 {perHeat} 點火焰傷害（{maxHeat} 層時為 {max} 點），並嘲諷其命中的每個生物。傷害隨攻擊強度提高。需要至少一層熱量。"
       }
     },
     "questShare": {
@@ -16770,6 +16778,21 @@ export const zh_TW: EnTranslations = {
       },
       "duelists_brand": {
         "name": "決鬥者烙印"
+      },
+      "forgefathers_temper": {
+        "name": "熔鑄之父的淬火"
+      },
+      "kindling_orb": {
+        "name": "引燃寶珠"
+      },
+      "molten_fletching": {
+        "name": "熔火箭羽"
+      },
+      "last_flame_lantern": {
+        "name": "最後之焰提燈"
+      },
+      "heart_of_the_crucible": {
+        "name": "熔爐之心"
       }
     },
     "mobs": {

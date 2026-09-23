@@ -1757,6 +1757,12 @@ export const en = {
       wayfarers_lodestone: { name: "Wayfarer's Lodestone" },
       medallion_of_defiance: { name: 'Medallion of Defiance' },
       duelists_brand: { name: "Duelist's Brand" },
+      // The Crucible of the Last Spring raid trinkets (Ignivar and Varkhul).
+      forgefathers_temper: { name: "Forgefather's Temper" },
+      kindling_orb: { name: 'Kindling Orb' },
+      molten_fletching: { name: 'Molten Fletching' },
+      last_flame_lantern: { name: 'Last Flame Lantern' },
+      heart_of_the_crucible: { name: 'Heart of the Crucible' },
     },
     itemSets: itemSetEntityText,
     mobs: {
