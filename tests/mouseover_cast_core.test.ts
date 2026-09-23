@@ -128,7 +128,7 @@ describe('mouseoverCastTargetPid', () => {
       expect(ABILITIES[id].targetType, id).toBe('any');
       expect(mouseoverCastTargetPid(7, ABILITIES[id], inScope), id).toBe(7);
     }
-    // A released member outside interest scope rides the roster, as for a heal.
+    // A live member outside interest scope rides the roster, as for a friendly heal.
     expect(
       mouseoverCastTargetPid(7, ABILITIES.solar_invocation, {
         enabled: true,

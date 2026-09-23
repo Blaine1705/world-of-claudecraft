@@ -11,10 +11,14 @@
 // standing on the body. When the press names no fallen ally, an out-of-combat rez
 // now picks one itself: the current target when that is a fallen member (a
 // deliberate selection is never swapped, even out of reach), else the nearest
-// fallen member whose body is within resurrection reach.
+// fallen member whose body is within resurrection reach. Two rules keep the pick
+// from wasting the shared five-minute cooldown: a Thornhollow Fields fighter is
+// never picked (the battleground revives on its team wave, so offerResurrection
+// refuses them), and a body still holding a live offer from another healer ranks
+// behind every body without one.
 //
-// Pure SimContext reads, no rng: roster order breaks an exact distance tie, so the
-// pick is identical on every host.
+// Pure SimContext reads, no rng: roster order breaks an exact tie, so the pick is
+// identical on every host.
 
 import type { SimContext } from '../sim_context';
 import { type AbilityDef, dist2d, type Entity } from '../types';
@@ -38,19 +42,24 @@ export function pickFallenAlly(ctx: SimContext, caster: Entity, maxRange: number
   if (current && isFallenGroupMember(ctx, caster, current)) return current;
   const party = ctx.partyOf(caster.id);
   if (!party) return null;
-  let nearest: Entity | null = null;
-  let nearestDist = Infinity;
+  let best: Entity | null = null;
+  let bestOffered = true;
+  let bestDist = Infinity;
   for (const memberId of party.members) {
     const member = ctx.entities.get(memberId);
     if (member?.kind !== 'player' || !member.dead) continue;
+    if (ctx.bgMatches.has(member.id)) continue;
     if (resurrectionReachError(ctx, caster, member, maxRange) !== null) continue;
+    const offer = ctx.pendingResurrections.get(member.id);
+    const offered = offer !== undefined && ctx.time < offer.expiresAt;
     // Reach is measured to the body, so the ranking is too: a released ghost
     // waits at the graveyard, but the rite raises the corpse.
     const d = dist2d(caster.pos, member.corpsePos ?? member.pos);
-    if (d < nearestDist) {
-      nearest = member;
-      nearestDist = d;
+    if (offered === bestOffered ? d < bestDist : !offered) {
+      best = member;
+      bestOffered = offered;
+      bestDist = d;
     }
   }
-  return nearest;
+  return best;
 }

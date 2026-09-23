@@ -6,6 +6,7 @@
 // order and, through live casts, that the instant finish lands on the unit the
 // press resolved rather than re-reading the raw override.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { isDualPurposeHeal, resolveDualPurposeTarget } from '../src/sim/combat/dual_purpose_target';
 import { ABILITIES, BUILTIN_WORLD, MOBS } from '../src/sim/data';
@@ -63,6 +64,27 @@ describe('isDualPurposeHeal', () => {
     for (const id of ['solar_invocation', 'scouring_mercy', 'holy_shock']) {
       expect(isDualPurposeHeal(ABILITIES[id]), id).toBe(true);
     }
+  });
+
+  it('covers exactly the shipped dual-purpose heals', () => {
+    // Derived from the live table, so a new 'any' heal has to be looked at here.
+    const heals = Object.values(ABILITIES)
+      .filter((def) => isDualPurposeHeal(def))
+      .map((def) => def.id)
+      .sort();
+    expect(heals).toEqual(['holy_shock', 'scouring_mercy', 'solar_invocation']);
+  });
+
+  it('keeps the client-shared module free of runtime imports', () => {
+    // The mouseover core and the pad auto-target import this file into the client
+    // bundle; a runtime import here would drag casting code along with it.
+    const source = readFileSync(
+      new URL('../src/sim/combat/dual_purpose_target.ts', import.meta.url),
+      'utf8',
+    );
+    const imports = source.split('\n').filter((line) => line.startsWith('import '));
+    expect(imports.length).toBeGreaterThan(0);
+    for (const line of imports) expect(line, line).toMatch(/^import type /);
   });
 
   it('leaves out the dual-purpose abilities that never heal, and every other target type', () => {
@@ -126,6 +148,53 @@ describe('resolveDualPurposeTarget', () => {
     // A dual-purpose ability that cannot heal has no sensible self fallback.
     expect(resolveDualPurposeTarget(sim.ctx, p, null, ABILITIES.shadowstep, noAttacker)).toBe(null);
   });
+
+  it('lets a hovered ally win over a mob that is hitting you', () => {
+    const { sim, p } = healer('paladin', 'holy');
+    const ally = hurtAlly(sim, p, 'Tank', 5);
+    const attacker = wolf(sim, p, 8, true);
+    const def = ABILITIES.solar_invocation;
+    expect(resolveDualPurposeTarget(sim.ctx, p, ally.id, def, () => attacker)).toBe(ally);
+  });
+
+  it('turns a stale hover into a self heal, never a strike on the attacker', () => {
+    const { sim, p } = healer('paladin', 'holy');
+    const died = hurtAlly(sim, p, 'Died', 5);
+    died.dead = true;
+    const attacker = wolf(sim, p, 8, true);
+    let acquired = false;
+    const acquire = () => {
+      acquired = true;
+      return attacker;
+    };
+    expect(resolveDualPurposeTarget(sim.ctx, p, died.id, ABILITIES.solar_invocation, acquire)).toBe(
+      p,
+    );
+    expect(acquired, 'a hover press is a heal press').toBe(false);
+  });
+
+  it('keeps a dead ally selection for the caller to refuse', () => {
+    const { sim, p } = healer('paladin', 'holy');
+    const dead = hurtAlly(sim, p, 'Dead', 5);
+    dead.dead = true;
+    sim.targetEntity(dead.id);
+    expect(resolveDualPurposeTarget(sim.ctx, p, null, ABILITIES.solar_invocation, noAttacker)).toBe(
+      dead,
+    );
+  });
+
+  it('gives a dual-purpose ability that cannot heal no override at all', () => {
+    // The client never sends one for these, and the sim does not honor one: the
+    // selection and the attacker auto-acquire decide, exactly as before.
+    const { sim, p } = healer('paladin', 'holy');
+    const ally = hurtAlly(sim, p, 'Tank', 5);
+    const enemy = wolf(sim, p, 6, false);
+    const attacker = wolf(sim, p, 8, true);
+    const shadeslip = ABILITIES.shadowstep;
+    expect(resolveDualPurposeTarget(sim.ctx, p, ally.id, shadeslip, () => attacker)).toBe(attacker);
+    sim.targetEntity(enemy.id);
+    expect(resolveDualPurposeTarget(sim.ctx, p, ally.id, shadeslip, noAttacker)).toBe(enemy);
+  });
 });
 
 describe('Solar Invocation live casts', () => {
@@ -139,6 +208,37 @@ describe('Solar Invocation live casts', () => {
     expect(errorsOf(sim.tick())).toEqual([]);
     expect(ally.hp).toBeGreaterThan(before);
     // A mouseover heal must not grab a target of its own.
+    expect(p.targetId).toBeNull();
+  });
+
+  it('heals the hovered member even while a mob is hitting the paladin', () => {
+    const { sim, p } = healer('paladin', 'holy');
+    const ally = hurtAlly(sim, p, 'Tank', 5);
+    const attacker = wolf(sim, p, 8, true);
+    const before = ally.hp;
+    sim.targetEntity(null);
+
+    sim.castAbilityOn('solar_invocation', ally.id);
+    expect(errorsOf(sim.tick())).toEqual([]);
+    expect(ally.hp).toBeGreaterThan(before);
+    expect(attacker.hp).toBe(attacker.maxHp);
+    expect(p.targetId).toBeNull();
+  });
+
+  it('self-heals rather than striking the attacker when the hovered member has died', () => {
+    const { sim, p } = healer('paladin', 'holy');
+    const died = hurtAlly(sim, p, 'Died', 5);
+    died.dead = true;
+    died.hp = 0;
+    const attacker = wolf(sim, p, 8, true);
+    p.hp = Math.floor(p.maxHp / 2);
+    const before = p.hp;
+    sim.targetEntity(null);
+
+    sim.castAbilityOn('solar_invocation', died.id);
+    expect(errorsOf(sim.tick())).toEqual([]);
+    expect(p.hp).toBeGreaterThan(before);
+    expect(attacker.hp).toBe(attacker.maxHp);
     expect(p.targetId).toBeNull();
   });
 
@@ -188,6 +288,24 @@ describe('Solar Invocation live casts', () => {
     sim.castAbility('solar_invocation');
     expect(p.targetId).toBe(attacker.id);
     expect(attacker.hp).toBeLessThan(attacker.maxHp);
+  });
+});
+
+describe('the instant finish lands on the unit the press resolved', () => {
+  it('strikes the selected enemy even when a stray override rides the press', () => {
+    // The press validated the selection; the finish used to re-read the raw
+    // override and refuse ("You have no target.") on a friendly id.
+    const { sim, p } = healer('paladin', 'holy');
+    const ally = hurtAlly(sim, p, 'Tank', 5);
+    const enemy = wolf(sim, p, 6, false);
+    p.facing = Math.atan2(enemy.pos.x - p.pos.x, enemy.pos.z - p.pos.z);
+    sim.targetEntity(enemy.id);
+
+    sim.castAbilityOn('hammer_of_grace', ally.id);
+    const events: SimEvent[] = [];
+    for (let tick = 0; tick < 40; tick++) events.push(...sim.tick());
+    expect(errorsOf(events)).toEqual([]);
+    expect(enemy.hp).toBeLessThan(enemy.maxHp);
   });
 });
 

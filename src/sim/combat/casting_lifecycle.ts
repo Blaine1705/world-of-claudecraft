@@ -1471,8 +1471,8 @@ export function castAbility(
       }
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
-    // A live friendly party-frame override first, then the current target, then
-    // (dual_purpose_target.ts) the auto-acquire below, then self for a heal.
+    // A heal's live friendly party-frame override first, then the current target,
+    // then the auto-acquire below, then self for a heal (dual_purpose_target.ts).
     target = resolveDualPurposeTarget(ctx, p, castTargetId, ability, () => {
       // Auto-acquire (issue #2787): only when nothing is targeted at all, never
       // overriding an existing (even stale/invalid) selection.

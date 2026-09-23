@@ -69,6 +69,17 @@ function finishOffers(sim: Sim): Set<number> {
 }
 
 describe('autoPicksFallenAlly', () => {
+  it('knows every single-target rez in the table', () => {
+    // Derived from the live table, so a new dead-target ability has to be sorted
+    // into combat (explicit target) or out of combat (auto-pick) here.
+    const deadTargeted = Object.values(ABILITIES)
+      .filter((def) => def.targetsDead)
+      .map((def) => def.id)
+      .sort();
+    expect(deadTargeted).toEqual(['recall_the_fallen', 'temporal_reversal', 'wildwake']);
+    expect(deadTargeted.filter((id) => autoPicksFallenAlly(ABILITIES[id]))).toEqual([REZ]);
+  });
+
   it('covers the out-of-combat single rez and nothing else', () => {
     expect(autoPicksFallenAlly(ABILITIES[REZ])).toBe(true);
     // The combat rezzes keep the explicit dead target.
@@ -121,6 +132,64 @@ describe('pickFallenAlly', () => {
     placePlayerInOpenField(sim, strangerPid, { x: 3 });
     const stranger = fall(sim.entities.get(strangerPid) as Entity);
     expect(isFallenGroupMember(sim.ctx, p, stranger)).toBe(false);
+    expect(pickFallenAlly(sim.ctx, p, 30)).toBeNull();
+  });
+
+  it('keeps a selected fallen member even beyond reach', () => {
+    const { sim, p } = caster('paladin', 'protection', 12);
+    const chosen = fall(member(sim, p, 'Chosen Far', 35));
+    fall(member(sim, p, 'In Reach', 4));
+    sim.targetEntity(chosen.id);
+    expect(pickFallenAlly(sim.ctx, p, 30)).toBe(chosen);
+  });
+
+  it('ranks released members by the body, not the ghost', () => {
+    const { sim, p } = caster('paladin', 'protection', 12);
+    const nearBody = fall(member(sim, p, 'Near Body', 6));
+    nearBody.ghost = true;
+    nearBody.pos = { x: nearBody.pos.x + 500, y: nearBody.pos.y, z: nearBody.pos.z };
+    const farBody = fall(member(sim, p, 'Far Body', 12));
+    farBody.ghost = true;
+    farBody.pos = { x: p.pos.x + 1, y: farBody.pos.y, z: p.pos.z };
+    expect(pickFallenAlly(sim.ctx, p, 30)).toBe(nearBody);
+  });
+
+  it('ranks a body already holding a live offer behind every body without one', () => {
+    const { sim, p } = caster('paladin', 'protection', 12);
+    const offeredNear = fall(member(sim, p, 'Offered Near', 3));
+    const freeFar = fall(member(sim, p, 'Free Far', 12));
+    const offer = (e: Entity, expiresAt: number) =>
+      sim.ctx.pendingResurrections.set(e.id, {
+        casterId: 999,
+        hpFrac: 0.3,
+        fallbackDestination: { ...p.pos },
+        expiresAt,
+        maxRange: 40,
+      });
+    offer(offeredNear, sim.ctx.time + 20);
+    expect(pickFallenAlly(sim.ctx, p, 30)).toBe(freeFar);
+    // An expired offer no longer counts: nearest wins again.
+    offer(offeredNear, sim.ctx.time);
+    expect(pickFallenAlly(sim.ctx, p, 30)).toBe(offeredNear);
+    // Every body offered: still the nearest, rather than nobody.
+    offer(offeredNear, sim.ctx.time + 20);
+    offer(freeFar, sim.ctx.time + 20);
+    expect(pickFallenAlly(sim.ctx, p, 30)).toBe(offeredNear);
+  });
+
+  it('never picks a Thornhollow Fields fighter, who revives on the team wave', () => {
+    const { sim, p } = caster('paladin', 'protection', 12);
+    const fighter = fall(member(sim, p, 'Fighter', 3));
+    const other = fall(member(sim, p, 'Other', 9));
+    // Presence in bgMatches is the whole rule offerResurrection applies.
+    sim.ctx.bgMatches.set(fighter.id, {} as never);
+    expect(pickFallenAlly(sim.ctx, p, 30)).toBe(other);
+    sim.ctx.bgMatches.set(other.id, {} as never);
+    expect(pickFallenAlly(sim.ctx, p, 30)).toBeNull();
+  });
+
+  it('picks nobody for a caster with no group', () => {
+    const { sim, p } = caster('paladin', 'protection', 12);
     expect(pickFallenAlly(sim.ctx, p, 30)).toBeNull();
   });
 });
@@ -183,18 +252,48 @@ describe('Recall the Fallen with no dead target selected', () => {
     sim.castAbility(REZ);
     expect(errorsOf(sim.tick())).toEqual(['There are no dead group members to resurrect.']);
     expect(p.castingAbility).toBeNull();
+    // A cast that starts arms the global cooldown at once; mana and the rez
+    // cooldown bill at the finish, so the whole cast time must pass clean too.
+    expect(p.gcdRemaining).toBe(0);
+    finishOffers(sim);
     expect(p.resource).toBe(mana);
     expect(p.cooldowns.has(REZ)).toBe(false);
+  });
+
+  it('refuses the same way for a paladin with no group at all', () => {
+    const { sim, p } = caster('paladin', 'protection', 12);
+    sim.castAbility(REZ);
+    expect(errorsOf(sim.tick())).toEqual(['There are no dead group members to resurrect.']);
+    expect(p.castingAbility).toBeNull();
   });
 
   it('refuses out of range when every body is beyond reach', () => {
     const { sim, p } = caster('paladin', 'protection', 12);
     fall(member(sim, p, 'Beyond Reach', 35));
+    const mana = p.resource;
 
     sim.castAbility(REZ);
     expect(errorsOf(sim.tick())).toEqual(['Out of range.']);
     expect(p.castingAbility).toBeNull();
+    expect(p.gcdRemaining).toBe(0);
+    finishOffers(sim);
+    expect(p.resource).toBe(mana);
     expect(p.cooldowns.has(REZ)).toBe(false);
+  });
+
+  it('keeps a selected body beyond reach when a hover over a living frame rides the press', () => {
+    // The auto-pick's own current-target arm: the hover (a living member) fails
+    // the explicit resolution, and the selected body must still win over a
+    // nearer one in reach.
+    const { sim, p } = caster('paladin', 'protection', 12);
+    const tank = member(sim, p, 'Living Tank', 3);
+    const chosen = fall(member(sim, p, 'Chosen Far', 35));
+    fall(member(sim, p, 'In Reach', 4));
+    sim.targetEntity(chosen.id);
+
+    sim.castAbilityOn(REZ, tank.id);
+    expect(errorsOf(sim.tick())).toEqual(['Out of range.']);
+    expect(p.castingAbility).toBeNull();
   });
 
   it('keeps an explicitly selected body out of range rather than swapping it', () => {

@@ -3472,10 +3472,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // Ground-targeted: no entity target involved, so no dead-target guard.
     this.cmd({ cmd: 'castAt', ability: abilityId, x: aim.x, z: aim.z });
   }
-  // Mouseover cast: the friendly-target override rides the existing 'cast'
-  // token as an extra field; the server routes it to sim.castAbilityOn. No
-  // dead-target pre-reject here: friendly casts never take that path, and a
-  // stale override falls back to current-target-else-self server-side.
+  // Mouseover cast: the party-frame override (a friendly ability or a dual-purpose
+  // heal) rides the existing 'cast' token as an extra field; the server routes it
+  // to sim.castAbilityOn. No dead-target pre-reject here: the sim resolves a stale
+  // override back to the current target or self, and refuses there if it must.
   castAbilityOn(abilityId: string, targetId: number): void {
     this.cmd({ cmd: 'cast', ability: abilityId, target: targetId });
   }
