@@ -1,3 +1,4 @@
+import { buildBenisonPrayer, consumeBenisonPrayers } from './priest/benison_dawnweave';
 // Effect dispatch (C4b): the per-effect switch that fans a RESOLVED ability's
 // `effects[]` into damage, auras, CC, threat, combo, pets, healing, ground-AoE,
 // charge, and stat-recalc. Lifted verbatim out of the 17.5k-line `Sim` monolith
@@ -468,6 +469,8 @@ export function runEffects(
   facingOverride?: number,
 ): void {
   const ability = res.def;
+  const benisonChoirMult = consumeBenisonPrayers(ctx, p, ability.id);
+  let benisonPrayerBuilt = false;
   // The cast-scoped heal multiplier the heal and hot arms below apply to the
   // WHOLE resolved amount: the caller's mark times the Nature's Boon power the
   // resolved copy carries (combat/druid_natures_boon.ts, stamped in
@@ -1373,6 +1376,8 @@ export function runEffects(
         // other derived/chained/procced applyHeal call, none of which run
         // through this case) from ever double-crediting a single real cast.
         creditHubHealingDrill(ctx, p, healTarget, healed, ability.id);
+        if (!benisonPrayerBuilt)
+          benisonPrayerBuilt = buildBenisonPrayer(ctx, p, ability.id, healed);
         if (ability.id === 'scouring_mercy') {
           doctrineScouringMercyRescue(ctx, p, meta, healTarget, healed);
         }
@@ -2771,8 +2776,9 @@ export function runEffects(
         for (const m of friendliesInRadius(ctx, center, eff.radius)) {
           if (eff.playersOnly && m.kind !== 'player') continue;
           if (!ctx.hasLineOfSight(center, m)) continue;
+          const rolledHeal = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
           const healAmount = scalePrimaryHealing(
-            ctx.rng.range(eff.min, eff.max) + aoeHealBonus,
+            benisonChoirMult === 1 ? rolledHeal : Math.round(rolledHeal * benisonChoirMult),
             primaryHealMult,
           );
           const missingBefore = m.maxHp - m.hp;

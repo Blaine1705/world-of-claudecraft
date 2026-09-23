@@ -15264,9 +15264,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu golpe de Filo Velado inflige el triple de daño, en lugar del doble.',
   'entities.itemSets.ashveil.name': 'Atuendo del Velo de Ceniza',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'El rescate de Vigilancia Seráfica cura 270, en lugar de 180. El daño recibido ya no retrasa tus hechizos.',
+    'Restaurar salud con Plegaria Susurrada, Plegaria Solemne o Plegaria Urgente aumenta la sanación de tu próximo Coro Sanador un 10 %, hasta 3 acumulaciones. Cada lanzamiento otorga como máximo una acumulación. Coro Sanador consume todas las acumulaciones al terminar de lanzarse. El daño recibido ya no retrasa tus lanzamientos.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Cuando se activa Vigilancia Seráfica, su aliado también recupera un 15% de su salud máxima durante 10 s.',
+    'Completar Coro Sanador con 3 acumulaciones hace que tu próxima Plegaria Susurrada en un plazo de 60 s sea instantánea y sane un 100 % más. Este beneficio no se acumula; obtenerlo de nuevo renueva su duración.',
   'entities.itemSets.benison_dawnweave.name': 'Trama del Alba Benévola',
   'entities.itemSets.chronoweave.bonus2':
     'Eco Temporal convierte un 50% de tu daño Arcano a un solo objetivo en sanación. El daño recibido ya no retrasa tus hechizos.',

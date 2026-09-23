@@ -3219,6 +3219,8 @@ export const de_DE: EnTranslations = {
       "iceFloesCasts": "Deine nächsten {n} Zauber mit Zauberzeit können beim Bewegen gewirkt werden",
       "freeCast": "Dein nächster Zauber ist kostenlos",
       "instantCast": "Dein nächster Zauber mit Zauberzeit ist sofort",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Dein nächster Zauber kostet {pct}% weniger",
       "radiantResonance": "Euer nächstes Heilendes Licht wird sofort gewirkt, oder Eure nächste Umarmung der Morgenröte kostet {pct}% weniger Mana und wird in {castTime} Sek. gewirkt",
       "solarReprisal": "Eure nächste Sonnenscheibe kostet kein Mana, ignoriert ihre Abklingzeit und verursacht {pct}% mehr Schaden; der Hammer der Gnade ignoriert seine Abklingzeit und heilt Euch um 100% des verursachten Schadens; oder Heilendes Licht wird sofort gewirkt",
@@ -21046,8 +21048,8 @@ export const de_DE: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Gewand der Morgengewebten Gunst",
-        "bonus2": "Die Rettungsheilung von Seraphischer Wacht steigt von 180 auf 270. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
-        "bonus4": "Wenn Seraphische Wacht ausgelöst wird, wird der Verbündete zusätzlich 10 Sek. lang um 15 Prozent seiner maximalen Gesundheit geheilt."
+        "bonus2": "Wenn Geflüstertes Gebet, Feierliches Gebet oder Dringendes Gebet Gesundheit wiederherstellt, erhöht sich die Heilung deiner nächsten Chorheilung um 10 %, bis zu 3 Stapel. Jeder Zauber gewährt höchstens einen Stapel. Chorheilung verbraucht bei Abschluss des Wirkens alle Stapel. Erlittener Schaden verzögert deine Zauber nicht mehr.",
+        "bonus4": "Wenn du Chorheilung mit 3 Stapeln abschließt, wird dein nächstes Geflüstertes Gebet innerhalb von 60 Sek. sofort gewirkt und heilt 100 % mehr. Dieser Effekt ist nicht stapelbar; erneutes Erhalten erneuert seine Dauer."
       },
       "boundstone_vanguard": {
         "name": "Gebundstein-Vorhut",

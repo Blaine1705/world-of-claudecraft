@@ -15762,9 +15762,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Seu golpe de Lâmina Velada causa o triplo do dano, em vez do dobro.',
   'entities.itemSets.ashveil.name': 'Traje do Véu de Cinzas',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'A cura de resgate da Vigilância Seráfica sobe para 270, em vez de 180. Dano sofrido não atrasa mais suas conjurações.',
+    'Restaurar vida com Prece Sussurrada, Prece Solene ou Prece Urgente aumenta a cura da sua próxima Cura do Coro em 10%, até 3 acúmulos. Cada lançamento concede no máximo um acúmulo. Cura do Coro consome todos os acúmulos ao concluir o lançamento. O dano recebido não atrasa mais o lançamento dos seus feitiços.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Quando a Vigilância Seráfica é ativada, seu aliado também é curado em 15% da vida máxima dele ao longo de 10 s.',
+    'Concluir Cura do Coro com 3 acúmulos torna sua próxima Prece Sussurrada usada em até 60 s instantânea e aumenta sua cura em 100%. Este benefício não acumula; recebê-lo novamente renova sua duração.',
   'entities.itemSets.benison_dawnweave.name': 'Trama do Alvorecer Benévolo',
   'entities.itemSets.chronoweave.bonus2':
     'Eco Temporal converte 50% do seu dano Arcano de alvo único em cura. Dano sofrido não atrasa mais suas conjurações.',

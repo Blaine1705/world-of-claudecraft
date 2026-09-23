@@ -3219,6 +3219,8 @@ export const sv_SE: EnTranslations = {
       "iceFloesCasts": "Dina nästa {n} besvärjelser med kasttid kan kastas under rörelse",
       "freeCast": "Ditt nästa kast kostar ingenting",
       "instantCast": "Din nästa besvärjelse med kasttid är omedelbar",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Din nästa besvärjelse kostar {pct}% mindre",
       "radiantResonance": "Ditt nästa Lagande ljus blir omedelbart, eller din nästa Gryningens famn kostar {pct}% mindre mana och kastas på {castTime} sek",
       "solarReprisal": "Din nästa Solskiva kostar ingen mana, ignorerar nedkylningen och gör {pct}% mer skada; Nådens hammare ignorerar sin nedkylning och läker dig för 100% av skadan; eller Lagande ljus blir omedelbart",
@@ -21046,8 +21048,8 @@ export const sv_SE: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Välsignelsens gryningsväv",
-        "bonus2": "Serafisk vaksamhets räddning helar 270 i stället för 180. Skada du tar fördröjer inte längre dina besvärjelser.",
-        "bonus4": "När Serafisk vaksamhet utlöses helas dess allierade också med 15 procent av sin maximala hälsa under 10 sek."
+        "bonus2": "När Viskad bön, Högtidlig bön eller Brådskande bön återställer hälsa ökar läkningen från nästa Körläkning med 10 %, upp till 3 staplar. Varje kast ger högst en stapel. Körläkning förbrukar alla staplar när kastet slutförs. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Om Körläkning slutförs med 3 staplar blir nästa Viskad bön som används inom 60 sek. omedelbar och läker 100 % mer. Effekten staplas inte; om du får den igen förnyas varaktigheten."
       },
       "boundstone_vanguard": {
         "name": "Bundstens-förtrupp",

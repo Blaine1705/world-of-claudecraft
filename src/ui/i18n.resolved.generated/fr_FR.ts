@@ -3219,6 +3219,8 @@ export const fr_FR: EnTranslations = {
       "iceFloesCasts": "Vos {n} prochains sorts avec un temps d'incantation peuvent être lancés en mouvement",
       "freeCast": "Votre prochaine incantation ne coûte rien",
       "instantCast": "Votre prochain sort avec un temps d'incantation est instantané",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Votre prochain sort coûte {pct} % de mana en moins",
       "radiantResonance": "Votre prochaine Lumière guérisseuse est instantanée, ou votre prochaine Étreinte de l'aube coûte {pct}% de mana en moins et s'incante en {castTime} s",
       "solarReprisal": "Votre prochain Disque solaire ne coûte pas de mana, ignore son temps de recharge et inflige {pct}% de dégâts en plus ; le Marteau de grâce ignore son temps de recharge et vous soigne de 100% des dégâts infligés ; ou la Lumière guérisseuse est instantanée",
@@ -21046,8 +21048,8 @@ export const fr_FR: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Bénédiction tissée d’aurore",
-        "bonus2": "Le sauvetage de Vigilance séraphique rend 270 points de vie au lieu de 180. Les dégâts subis ne retardent plus vos incantations.",
-        "bonus4": "Quand Vigilance séraphique se déclenche, son allié récupère aussi 15 % de ses points de vie maximum en 10 s."
+        "bonus2": "Restaurer des points de vie avec Prière murmurée, Prière solennelle ou Prière urgente augmente les soins de votre prochain Soin du chœur de 10 %, jusqu’à 3 cumuls. Chaque incantation accorde au maximum un cumul. Soin du chœur consomme tous les cumuls à la fin de son incantation. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Terminer Soin du chœur avec 3 cumuls rend votre prochaine Prière murmurée utilisée dans les 60 s instantanée et augmente ses soins de 100 %. Cet effet ne se cumule pas ; l’obtenir à nouveau renouvelle sa durée."
       },
       "boundstone_vanguard": {
         "name": "Avant-garde de pierre-liée",

@@ -15146,9 +15146,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je Veiled Edge-aanval treft driemaal zo hard, in plaats van tweemaal.',
   'entities.itemSets.ashveil.name': 'Ashveil-kledij',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'De redding van Seraphic Vigil geneest 270, in plaats van 180. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',
+    'Als Gefluisterd Gebed, Plechtig Gebed of Dringend Gebed gezondheid herstelt, geneest je volgende Koorherstel 10% meer, tot 3 stapels. Elke spreuk levert hoogstens één stapel op. Koorherstel verbruikt alle stapels zodra het uitspreken voltooid is. Ontvangen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Wanneer Seraphic Vigil wordt geactiveerd, wordt zijn bondgenoot ook gedurende 10 sec. genezen voor 15 procent van diens maximale gezondheid.',
+    'Als je Koorherstel met 3 stapels voltooit, wordt je volgende Gefluisterd Gebed binnen 60 sec. onmiddellijk uitgesproken en geneest het 100% meer. Dit effect stapelt niet; als je het opnieuw krijgt, wordt de duur vernieuwd.',
   'entities.itemSets.benison_dawnweave.name': 'Benison Dageraadweefsel',
   'entities.itemSets.chronoweave.bonus2':
     'Temporal Echo zet 50 procent van je Arcane-schade tegen één doel om in genezing. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',

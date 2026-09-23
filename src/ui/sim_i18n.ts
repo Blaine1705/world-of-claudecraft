@@ -14380,6 +14380,7 @@ const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
 const ABILITY_NAMED_AURA_IDS: Readonly<Record<string, string>> = {
   'Bruin Rush': 'bear_charge',
   Lunge: 'lunge',
+  'Whispered Prayer': 'lesser_heal',
 };
 
 export function localizeSimAuraName(name: string): string | null {

@@ -3219,6 +3219,8 @@ export const tr_TR: EnTranslations = {
       "iceFloesCasts": "Bir sonraki {n} çeviri süreli büyün hareket ederken atılabilir",
       "freeCast": "Bir sonraki büyün hiçbir şeye mal olmaz",
       "instantCast": "Çeviri süresi olan bir sonraki büyün anlık olur",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Bir sonraki büyün {pct}% daha az mana harcar",
       "radiantResonance": "Sonraki Onaran Işığın anında olur veya sonraki Şafağın Kucaklaması {pct}% daha az mana harcar ve {castTime} sn içinde okunur",
       "solarReprisal": "Sonraki Güneş Diskin mana harcamaz, bekleme süresini yok sayar ve {pct}% daha fazla hasar verir; Lütuf Çekici bekleme süresini yok sayar ve verdiği hasarın 100% kadarını sana iyileştirir; ya da Onaran Işık anında olur",
@@ -21046,8 +21048,8 @@ export const tr_TR: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Lütuflu Şafak Dokuması",
-        "bonus2": "Serafik Nöbet’in kurtarma iyileştirmesi 180 yerine 270 olur. Alınan hasar artık büyü yapmanı geciktirmez.",
-        "bonus4": "Serafik Nöbet tetiklendiğinde müttefiki de 10 saniye boyunca azami sağlığının %15’i kadar iyileştirilir."
+        "bonus2": "Fısıldanan Dua, Vakur Dua veya Acil Dua ile sağlık yenilemek, sonraki Koro Şifası iyileştirmesini %10 artırır; en fazla 3 kez birikir. Her kullanım en fazla bir birikim kazandırır. Koro Şifası tamamlandığında tüm birikimleri tüketir. Alınan hasar artık büyü yapmayı geciktirmez.",
+        "bonus4": "Koro Şifası 3 birikimle tamamlandığında, 60 saniye içinde kullanılan sonraki Fısıldanan Dua anında gerçekleşir ve %100 daha fazla iyileştirir. Bu etki birikmez; yeniden kazanılması süresini yeniler."
       },
       "boundstone_vanguard": {
         "name": "Bağlıtaş Öncüsü",

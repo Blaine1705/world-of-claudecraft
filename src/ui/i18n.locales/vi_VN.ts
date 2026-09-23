@@ -15142,9 +15142,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đòn đánh Lưỡi Kiếm Che Mạng gây sát thương gấp ba thay vì gấp đôi.',
   'entities.itemSets.ashveil.name': 'Trang Phục Tro Mờ',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Lần cứu viện của Cảnh Giác Seraph hồi 270 thay vì 180. Sát thương nhận vào không còn trì hoãn việc niệm phép.',
+    'Hồi phục máu bằng Lời Nguyện Thì Thầm, Lời Nguyện Trang Nghiêm hoặc Lời Nguyện Khẩn Cấp tăng lượng hồi máu của Hồi Phục Hợp Xướng kế tiếp thêm 10%, cộng dồn tối đa 3 lần. Mỗi lần niệm chỉ tạo tối đa một cộng dồn. Hồi Phục Hợp Xướng tiêu hao tất cả cộng dồn khi niệm xong. Sát thương nhận vào không còn làm chậm việc niệm phép.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Khi Cảnh Giác Seraph kích hoạt, đồng minh của bạn cũng được hồi 15% máu tối đa trong 10 giây.',
+    'Hoàn tất Hồi Phục Hợp Xướng với 3 cộng dồn khiến Lời Nguyện Thì Thầm tiếp theo dùng trong vòng 60 giây trở thành tức thì và hồi thêm 100% máu. Hiệu ứng này không cộng dồn; nhận lại hiệu ứng sẽ làm mới thời gian tồn tại.',
   'entities.itemSets.benison_dawnweave.name': 'Phúc Lành Dệt Bình Minh',
   'entities.itemSets.chronoweave.bonus2':
     'Vọng Âm Thời Gian chuyển 50% sát thương Arcane đơn mục tiêu của bạn thành hồi máu. Sát thương nhận vào không còn trì hoãn việc niệm phép.',

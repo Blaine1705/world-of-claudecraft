@@ -15014,9 +15014,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ditt Slöjade egg träffar tre gånger så hårt i stället för dubbelt.',
   'entities.itemSets.ashveil.name': 'Askslöjans dräkt',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Serafisk vaksamhets räddning helar 270 i stället för 180. Skada du tar fördröjer inte längre dina besvärjelser.',
+    'När Viskad bön, Högtidlig bön eller Brådskande bön återställer hälsa ökar läkningen från nästa Körläkning med 10 %, upp till 3 staplar. Varje kast ger högst en stapel. Körläkning förbrukar alla staplar när kastet slutförs. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'När Serafisk vaksamhet utlöses helas dess allierade också med 15 procent av sin maximala hälsa under 10 sek.',
+    'Om Körläkning slutförs med 3 staplar blir nästa Viskad bön som används inom 60 sek. omedelbar och läker 100 % mer. Effekten staplas inte; om du får den igen förnyas varaktigheten.',
   'entities.itemSets.benison_dawnweave.name': 'Välsignelsens gryningsväv',
   'entities.itemSets.chronoweave.bonus2':
     'Tidsmässigt eko omvandlar 50 procent av din mystiska skada mot ett mål till läkning. Skada du tar fördröjer inte längre dina besvärjelser.',

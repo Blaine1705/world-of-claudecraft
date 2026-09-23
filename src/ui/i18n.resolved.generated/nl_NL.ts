@@ -3219,6 +3219,8 @@ export const nl_NL: EnTranslations = {
       "iceFloesCasts": "Je volgende {n} spreuken met een bezweringstijd kunnen worden uitgesproken terwijl je beweegt",
       "freeCast": "Je volgende bezwering kost niets",
       "instantCast": "Je volgende spreuk met een bezweringstijd is direct",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Je volgende spreuk kost {pct}% minder",
       "radiantResonance": "Je volgende Helend Licht is direct, of je volgende Omhelzing van de Dageraad kost {pct}% minder mana en wordt in {castTime} sec. gespreukt",
       "solarReprisal": "Je volgende Zonneschijf kost geen mana, negeert de afkoeling en richt {pct}% meer schade aan; de Hamer der Genade negeert zijn afkoeling en geneest je voor 100% van de aangerichte schade; of Helend Licht is direct",
@@ -21046,8 +21048,8 @@ export const nl_NL: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Benison Dageraadweefsel",
-        "bonus2": "De redding van Seraphic Vigil geneest 270, in plaats van 180. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
-        "bonus4": "Wanneer Seraphic Vigil wordt geactiveerd, wordt zijn bondgenoot ook gedurende 10 sec. genezen voor 15 procent van diens maximale gezondheid."
+        "bonus2": "Als Gefluisterd Gebed, Plechtig Gebed of Dringend Gebed gezondheid herstelt, geneest je volgende Koorherstel 10% meer, tot 3 stapels. Elke spreuk levert hoogstens één stapel op. Koorherstel verbruikt alle stapels zodra het uitspreken voltooid is. Ontvangen schade vertraagt je spreuken niet meer.",
+        "bonus4": "Als je Koorherstel met 3 stapels voltooit, wordt je volgende Gefluisterd Gebed binnen 60 sec. onmiddellijk uitgesproken en geneest het 100% meer. Dit effect stapelt niet; als je het opnieuw krijgt, wordt de duur vernieuwd."
       },
       "boundstone_vanguard": {
         "name": "Bandsteen-voorhoede",

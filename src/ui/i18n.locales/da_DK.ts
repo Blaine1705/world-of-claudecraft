@@ -14933,9 +14933,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Dit Veiled Edge-angreb rammer tredobbelt så hårdt i stedet for dobbelt.',
   'entities.itemSets.ashveil.name': 'Ashveil-dragt',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Seraphic Vigils redning heler 270 i stedet for 180. Modtaget skade forsinker ikke længere din besværgelse.',
+    'Når Hvisket Bøn, Højtidelig Bøn eller Hastende Bøn genopretter helbred, øges helbredelsen fra din næste Korhelbredelse med 10 %, op til 3 stakke. Hver kastning giver højst én stak. Korhelbredelse bruger alle stakke, når kastningen fuldføres. Modtaget skade forsinker ikke længere dine besværgelser.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Når Seraphic Vigil udløses, helbredes dens allierede også for 15 procent af deres maksimale helbred over 10 sek.',
+    'Når Korhelbredelse fuldføres med 3 stakke, bliver din næste Hvisket Bøn inden for 60 sek. øjeblikkelig og helbreder 100 % mere. Effekten kan ikke stables; hvis du opnår den igen, fornyes varigheden.',
   'entities.itemSets.benison_dawnweave.name': 'Benison-daggryvæv',
   'entities.itemSets.chronoweave.bonus2':
     'Temporal Echo omdanner 50 procent af din Arcane-skade mod ét mål til heling. Modtaget skade forsinker ikke længere din besværgelse.',

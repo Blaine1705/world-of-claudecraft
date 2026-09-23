@@ -8485,9 +8485,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你的守護聖詠被完全消耗後，你在 10 秒內的下一次滌淨聖歌變為立即施放。該效果每 15 秒最多觸發一次。',
   'entities.itemSets.benison_dawnweave.name': '賜福晨織法衣',
   'entities.itemSets.benison_dawnweave.bonus2':
-    '熾天使守望的救援治療量提高至 270（原為 180）。受到傷害不再延遲你的施法。',
+    '使用低語祈禱、肅穆祈禱或急切祈禱恢復生命值後，下一次聖歌癒療的治療量提高10%，最多堆疊3層。每次施法最多獲得一層。聖歌癒療完成施法時消耗所有層數。受到傷害不再延遲施法。',
   'entities.itemSets.benison_dawnweave.bonus4':
-    '熾天使守望觸發時，其守護的盟友還會在 10 秒內獲得相當於其最大生命值 15% 的治療。',
+    '在3層效果下完成聖歌癒療施法後，60秒內使用的下一次低語祈禱變為瞬發，治療量提高100%。此效果不堆疊；再次獲得時刷新持續時間。',
   'entities.itemSets.vesperash.name': '晚禱燼灰罩袍',
   'entities.itemSets.vesperash.bonus2': '召喚什一魔的冷卻時間縮短 6 秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.vesperash.bonus4':
@@ -11395,6 +11395,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.iceFloesCasts': '接下來{n}個有施法時間的法術可在移動中施放',
   'hudChrome.auraEffect.freeCast': '下一次施法不消耗任何資源',
   'hudChrome.auraEffect.instantCast': '下一個有施法時間的法術變為瞬發',
+  'hudChrome.auraEffect.benisonPrayers': '下一次聖歌癒療的治療量提高{pct}%，並消耗所有層數。',
+  'hudChrome.auraEffect.benisonWhisper':
+    '下一次低語祈禱變為瞬發，治療量提高{pct}%。請在此效果結束前使用。',
   'hudChrome.auraEffect.cheapCast': '下一個法術消耗降低{pct}%',
   'hudChrome.auraEffect.increase.sp': '法術強度提高 {value}',
   'hudChrome.specPanel.specUnlockBanner': '專精已解鎖！',

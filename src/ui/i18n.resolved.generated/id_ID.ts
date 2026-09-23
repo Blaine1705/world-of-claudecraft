@@ -3219,6 +3219,8 @@ export const id_ID: EnTranslations = {
       "iceFloesCasts": "{n} mantra berikutmu yang memiliki waktu rapalan dapat dirafalkan saat bergerak",
       "freeCast": "Rapalan berikutmu tidak membutuhkan biaya",
       "instantCast": "Mantra berikutmu yang memiliki waktu rapalan menjadi seketika",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Mantra berikutmu menghabiskan {pct}% lebih sedikit mana",
       "radiantResonance": "Cahaya Pemulih berikutnya menjadi seketika, atau Pelukan Fajar berikutnya menghabiskan {pct}% lebih sedikit mana dan dirapal dalam {castTime} dtk",
       "solarReprisal": "Cakram Surya berikutnya tidak menghabiskan mana, mengabaikan jeda, dan memberi {pct}% lebih banyak kerusakan; Palu Karunia mengabaikan jedanya dan menyembuhkanmu sebesar 100% kerusakan yang diberikan; atau Cahaya Pemulih menjadi seketika",
@@ -21046,8 +21048,8 @@ export const id_ID: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Tenunan Fajar Berkah",
-        "bonus2": "Penyelamatan Kewaspadaan Serafim menyembuhkan 270, naik dari 180. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
-        "bonus4": "Saat Kewaspadaan Serafim terpicu, sekutunya juga dipulihkan sebesar 15 persen dari kesehatan maksimum mereka selama 10 detik."
+        "bonus2": "Memulihkan kesehatan dengan Doa Berbisik, Doa Khidmat, atau Doa Mendesak meningkatkan penyembuhan Penyembuhan Koor berikutnya sebesar 10%, hingga 3 tumpukan. Setiap perapalan memberikan paling banyak satu tumpukan. Penyembuhan Koor menghabiskan semua tumpukan setelah selesai dirapal. Kerusakan yang diterima tidak lagi menunda perapalan mantra.",
+        "bonus4": "Menyelesaikan Penyembuhan Koor dengan 3 tumpukan membuat Doa Berbisik berikutnya yang digunakan dalam 60 detik menjadi instan dan meningkatkan penyembuhannya sebesar 100%. Efek ini tidak dapat ditumpuk; memperolehnya lagi memperbarui durasinya."
       },
       "boundstone_vanguard": {
         "name": "Garda Depan Batu Terikat",

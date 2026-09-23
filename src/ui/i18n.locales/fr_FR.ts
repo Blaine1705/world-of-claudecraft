@@ -15400,9 +15400,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Votre coup de Lame voilée inflige trois fois plus de dégâts au lieu de deux fois.',
   'entities.itemSets.ashveil.name': 'Tenue du Voile cendré',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Le sauvetage de Vigilance séraphique rend 270 points de vie au lieu de 180. Les dégâts subis ne retardent plus vos incantations.',
+    'Restaurer des points de vie avec Prière murmurée, Prière solennelle ou Prière urgente augmente les soins de votre prochain Soin du chœur de 10 %, jusqu’à 3 cumuls. Chaque incantation accorde au maximum un cumul. Soin du chœur consomme tous les cumuls à la fin de son incantation. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Quand Vigilance séraphique se déclenche, son allié récupère aussi 15 % de ses points de vie maximum en 10 s.',
+    'Terminer Soin du chœur avec 3 cumuls rend votre prochaine Prière murmurée utilisée dans les 60 s instantanée et augmente ses soins de 100 %. Cet effet ne se cumule pas ; l’obtenir à nouveau renouvelle sa durée.',
   'entities.itemSets.benison_dawnweave.name': 'Bénédiction tissée d’aurore',
   'entities.itemSets.chronoweave.bonus2':
     'Écho temporel convertit 50 % de vos dégâts des Arcanes à cible unique en soins. Les dégâts subis ne retardent plus vos incantations.',

@@ -1,4 +1,5 @@
 import { resetCraftedCollectionState } from './combat/crafted_collection_effects';
+import { clearUnequippedBenisonPrayers } from './combat/priest/benison_dawnweave';
 import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
 import { crucibleCollectionFamilyForSet } from './content/crucible_collections';
 import type { TalentModifiers } from './content/talents';
@@ -394,6 +395,7 @@ export function recalcPlayerStats(
   // totals so they feed every derivation below; AP/crit/pushback fold in at
   // their own steps (bonusAp, critChance, castPushbackReduction, knockbackResistance).
   const setEff = aggregateSetBonuses(setCounts);
+  clearUnequippedBenisonPrayers(e, setCounts.get('benison_dawnweave') ?? 0);
   resetCraftedCollectionState(
     e,
     [...setCounts].find(([id, count]) => count >= 2 && crucibleCollectionFamilyForSet(id))?.[0],

@@ -3219,6 +3219,8 @@ export const pl_PL: EnTranslations = {
       "iceFloesCasts": "Twoje następne {n} czarów z czasem rzucania można rzucać podczas ruchu",
       "freeCast": "Twoje następne rzucenie czaru nic nie kosztuje",
       "instantCast": "Twój następny czar z czasem rzucania jest natychmiastowy",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Twój następny czar kosztuje {pct}% many mniej",
       "radiantResonance": "Twoje następne Kojące Światło jest natychmiastowe albo twój następny Uścisk Świtu kosztuje o {pct}% mniej many i rzuca się w {castTime} s",
       "solarReprisal": "Twój następny Słoneczny Dysk nie kosztuje many, ignoruje odnowienie i zadaje o {pct}% więcej obrażeń; Młot Łaski ignoruje odnowienie i leczy cię za 100% zadanych obrażeń; albo Kojące Światło jest natychmiastowe",
@@ -21046,8 +21048,8 @@ export const pl_PL: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Błogosławiona Tkanina Świtu",
-        "bonus2": "Ratunek Seraficznej Warty leczy za 270 zamiast 180. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
-        "bonus4": "Po aktywowaniu Seraficznej Warty jej sojusznik zostaje uleczony o 15 procent maksymalnego zdrowia w ciągu 10 sek."
+        "bonus2": "Przywrócenie zdrowia zaklęciami Szeptana modlitwa, Uroczysta modlitwa lub Pilna modlitwa zwiększa leczenie następnego zaklęcia Chóralne Uzdrowienie o 10%, do 3 kumulacji. Każde rzucenie przyznaje najwyżej jedną kumulację. Chóralne Uzdrowienie zużywa wszystkie kumulacje po zakończeniu rzucania. Otrzymane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Ukończenie zaklęcia Chóralne Uzdrowienie z 3 kumulacjami sprawia, że następna Szeptana modlitwa użyta w ciągu 60 s staje się natychmiastowa i leczy o 100% więcej. Efekt nie kumuluje się; ponowne uzyskanie odnawia czas jego trwania."
       },
       "boundstone_vanguard": {
         "name": "Straż przednia spętanego kamienia",

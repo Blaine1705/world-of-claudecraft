@@ -15038,9 +15038,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.ashveil.bonus4': 'Örtülü Keskinlik vuruşun iki yerine üç kat hasar verir.',
   'entities.itemSets.ashveil.name': 'Kül Örtüsü Kuşamı',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Serafik Nöbet’in kurtarma iyileştirmesi 180 yerine 270 olur. Alınan hasar artık büyü yapmanı geciktirmez.',
+    'Fısıldanan Dua, Vakur Dua veya Acil Dua ile sağlık yenilemek, sonraki Koro Şifası iyileştirmesini %10 artırır; en fazla 3 kez birikir. Her kullanım en fazla bir birikim kazandırır. Koro Şifası tamamlandığında tüm birikimleri tüketir. Alınan hasar artık büyü yapmayı geciktirmez.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Serafik Nöbet tetiklendiğinde müttefiki de 10 saniye boyunca azami sağlığının %15’i kadar iyileştirilir.',
+    'Koro Şifası 3 birikimle tamamlandığında, 60 saniye içinde kullanılan sonraki Fısıldanan Dua anında gerçekleşir ve %100 daha fazla iyileştirir. Bu etki birikmez; yeniden kazanılması süresini yeniler.',
   'entities.itemSets.benison_dawnweave.name': 'Lütuflu Şafak Dokuması',
   'entities.itemSets.chronoweave.bonus2':
     'Zamansal Yankı, tek hedefli Gizemli hasarının %50’sini iyileştirmeye dönüştürür. Alınan hasar artık büyü yapmanı geciktirmez.',

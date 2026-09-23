@@ -3219,6 +3219,8 @@ export const cs_CZ: EnTranslations = {
       "iceFloesCasts": "Tvoje příštích {n} kouzel s dobou sesílání lze sesílat za pohybu",
       "freeCast": "Tvoje příští seslání nestojí nic",
       "instantCast": "Tvoje příští kouzlo s dobou sesílání je okamžité",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Tvoje příští kouzlo stojí o {pct} % méně",
       "radiantResonance": "Tvé další Léčivé světlo bude okamžité, nebo tvé další Objetí úsvitu stojí o {pct}% méně many a sesílá se za {castTime} s",
       "solarReprisal": "Tvůj další Sluneční disk nestojí manu, ignoruje obnovu a způsobí o {pct}% větší poškození; Kladivo milosti ignoruje svou obnovu a vyléčí tě za 100% způsobeného poškození; nebo je Léčivé světlo okamžité",
@@ -21046,8 +21048,8 @@ export const cs_CZ: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Požehnaná úsvitová tkanina",
-        "bonus2": "Záchrana Serafínské bdělosti léčí za 270 místo 180. Utržené poškození již nezpožďuje sesílání kouzel.",
-        "bonus4": "Po spuštění Serafínské bdělosti je její spojenec po dobu 10 s léčen za 15 procent svého maximálního zdraví."
+        "bonus2": "Obnovení zdraví kouzly Šeptaná modlitba, Slavnostní modlitba nebo Naléhavá modlitba zvýší léčení příštího kouzla Sborové zacelení o 10 %, až na 3 vrstvy. Každé seslání přidá nejvýše jednu vrstvu. Sborové zacelení po dokončení sesílání spotřebuje všechny vrstvy. Utrpěné poškození již nezdržuje sesílání kouzel.",
+        "bonus4": "Dokončení kouzla Sborové zacelení se 3 vrstvami způsobí, že příští Šeptaná modlitba použitá do 60 sekund bude okamžitá a vyléčí o 100 % více. Tento účinek se nesčítá; opětovné získání obnoví jeho trvání."
       },
       "boundstone_vanguard": {
         "name": "Předvoj spoutaného kamene",
