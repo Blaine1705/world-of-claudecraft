@@ -1070,6 +1070,27 @@ export function resolveCraftForRecipe(
     !!def?.masterwrought &&
     bumped !== null &&
     bumped.tier <= ceilingTier;
+  // The craft_roll_events audit record (types.ts craftRoll): every player
+  // craft whose output could EVER proc (a def that bakes a bonus record, or
+  // an apex def) reports the one proc draw above against its EFFECTIVE
+  // chance, 0 when the effect gate (ceiling, ladder bound, worse Jack
+  // variance) shut the effect off regardless of the roll. Emitted from the
+  // same values the two gates just read, so `success === roll < chance` holds
+  // by construction; draws nothing, moves no draw.
+  if (meta && (bonusStats !== null || def?.masterwrought === true)) {
+    const effectGateOpen =
+      jackVariance !== 'worse' && bumped !== null && bumped.tier <= ceilingTier;
+    ctx.emit({
+      type: 'craftRoll',
+      kind: 'masterwork',
+      recipeId: recipe.id,
+      itemId: recipe.resultItemId,
+      roll: procRoll,
+      chance: effectGateOpen ? procChance : 0,
+      success: masterwork || perfectingHeadStart,
+      pid: meta.entityId,
+    });
+  }
   // Deterministic grant: every successful craft yields recipe.resultItemId.
   // #1149 signing rule preserved on the DEF quality: an output whose def is
   // rare-or-better is a signed instance so it carries an attribution target
