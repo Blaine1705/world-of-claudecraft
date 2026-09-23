@@ -5968,7 +5968,8 @@ export const zh_TW: EnTranslations = {
       "taken_over": "你的角色已被另一個工作階段接管。",
       "rename_required": "此角色必須先更名才能進入世界。",
       "invalid_appearance": "無法儲存該外觀。請調整設計後再試一次。",
-      "reroll_unavailable": "此角色沒有可用的免費重新設計。"
+      "reroll_unavailable": "此角色沒有可用的免費重新設計。",
+      "vault_mail_recovering": "寶庫獎勵郵件正在恢復中。請稍後再試。"
     },
     "moderation": {
       "suspended_until": "此帳號停權至 {date}。",
@@ -9469,6 +9470,7 @@ export const zh_TW: EnTranslations = {
       "hoardExitOpens": "寶藏已經屬於你。返回入口並爬出去。",
       "hoardStepBack": "你從寶藏入口爬回了地面。",
       "hoardNotYours": "這處寶藏是另一支隊伍挖出的。",
+      "hoardEntrantsFull": "這處寶藏已經接納了五名冒險者。",
       "portalOpens": "一道{tier}級裂隙在{zone}撕裂而開！",
       "portalSealed": "{zone}的{tier}級裂隙已被封印。",
       "portalCollapses": "{zone}的{tier}級裂隙坍塌了。",
@@ -22326,6 +22328,11 @@ export const zh_TW: EnTranslations = {
         "sender": "交易所經紀人",
         "subject": "你的交易所掛單已售出",
         "body": "你的掛單已售出，買家已足額付款。所得款項在結算交易中直接匯入你綁定的錢包（已扣除交易所費用）；交易所從未經手你的錢款。\n\n這筆交易的紀錄已存入交易所帳冊。\n\n- 交易所經紀人"
+      },
+      "hoard_vault_reward": {
+        "sender": "渡鴉郵局",
+        "subject": "你的寶藏獎勵",
+        "body": "寶藏已被攻克，但你沒有從寶箱領取自己的那份獎勵。渡鴉已將你獲得的物品和金幣送到這裡。\n\n- 渡鴉郵局"
       }
     },
     "itemSets": {

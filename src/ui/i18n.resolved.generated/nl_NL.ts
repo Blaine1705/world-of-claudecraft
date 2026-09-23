@@ -5968,7 +5968,8 @@ export const nl_NL: EnTranslations = {
       "taken_over": "Je personage is overgenomen door een andere sessie.",
       "rename_required": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",
       "invalid_appearance": "Dat uiterlijk kon niet worden opgeslagen. Pas het ontwerp aan en probeer het opnieuw.",
-      "reroll_unavailable": "Dit personage heeft geen gratis herontwerp beschikbaar."
+      "reroll_unavailable": "Dit personage heeft geen gratis herontwerp beschikbaar.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Dit account is geschorst tot {date}.",
@@ -9469,6 +9470,7 @@ export const nl_NL: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "Een {tier}-rangs rift scheurt open in {zone}!",
       "portalSealed": "De {tier}-rangs rift in {zone} is verzegeld.",
       "portalCollapses": "De {tier}-rangs rift in {zone} stort in.",
@@ -22326,6 +22328,11 @@ export const nl_NL: EnTranslations = {
         "sender": "De Beursmakelaar",
         "subject": "Je aanbieding op de Beurs is verkocht",
         "body": "Je aanbieding is verkocht en de koper heeft volledig afgerekend. Het beursregister bevat het verslag van de verkoop, en je beursactiviteit toont het afgerekende bedrag met de bijbehorende uitsplitsing.\n\n- De Beursmakelaar"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

@@ -907,6 +907,7 @@ export const en = {
       hoardExitOpens: 'The hoard is yours. Return to the entrance to climb out.',
       hoardStepBack: 'You climb back out through the hoard entrance.',
       hoardNotYours: 'This hoard was dug up by another party.',
+      hoardEntrantsFull: 'This hoard has already admitted five adventurers.',
       portalOpens: 'A {tier}-rank rift tears open in {zone}!',
       portalSealed: 'The {tier}-rank rift in {zone} has been sealed.',
       portalCollapses: 'The {tier}-rank rift in {zone} collapses.',

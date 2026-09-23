@@ -5968,7 +5968,8 @@ export const da_DK: EnTranslations = {
       "taken_over": "Din karakter blev overtaget af en anden session.",
       "rename_required": "Denne karakter skal omdøbes, før den kan komme ind i verdenen.",
       "invalid_appearance": "Det udseende kunne ikke gemmes. Juster designet, og prøv igen.",
-      "reroll_unavailable": "Denne karakter har ikke et gratis omdesign til rådighed."
+      "reroll_unavailable": "Denne karakter har ikke et gratis omdesign til rådighed.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Denne konto er suspenderet indtil {date}.",
@@ -9469,6 +9470,7 @@ export const da_DK: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "En {tier}-rangs rift river sig åben i {zone}!",
       "portalSealed": "{tier}-rangs riften i {zone} er blevet forseglet.",
       "portalCollapses": "{tier}-rangs riften i {zone} kollapser.",
@@ -22326,6 +22328,11 @@ export const da_DK: EnTranslations = {
         "sender": "Børsmægleren",
         "subject": "Din notering på Børsen blev solgt",
         "body": "Din notering blev solgt, og køberen har betalt fuldt ud. Børsens hovedbog bærer regnskabet for salget, og din Børs-aktivitet viser det afregnede beløb og dets opdeling.\n\n- Børsmægleren"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

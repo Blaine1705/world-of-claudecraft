@@ -9691,6 +9691,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.character.rename_required': '此角色必须先改名才能进入世界。',
   'apiError.character.invalid_appearance': '无法保存该外观。请调整设计后重试。',
   'apiError.character.reroll_unavailable': '此角色没有可用的免费重新设计。',
+  'apiError.character.vault_mail_recovering': '宝库奖励邮件正在恢复中。请稍后重试。',
   'apiError.moderation.suspended_until': '此账号被停用至 {date}。',
   'apiError.moderation.suspended': '该账号已被暂停。',
   'apiError.moderation.banned': '此账号已被封禁。',
@@ -17147,4 +17148,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '按名字传送到城镇中心。',
   'devCommand.actions.town.label': '城镇中心',
   'devCommand.fields.town': '镇',
+  'sim.rift.hoardEntrantsFull': '这处宝藏已经接纳了五名冒险者。',
+  'entities.letters.hoard_vault_reward.sender': '渡鸦邮局',
+  'entities.letters.hoard_vault_reward.subject': '你的宝藏奖励',
+  'entities.letters.hoard_vault_reward.body':
+    '宝藏已被攻克，但你没有从宝箱领取自己的那份奖励。渡鸦已将你获得的物品和金币送到这里。\n\n- 渡鸦邮局',
 };

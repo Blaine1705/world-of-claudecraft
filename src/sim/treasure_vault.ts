@@ -14,9 +14,6 @@
 // State lives on PlayerMeta (treasureMap, vaultGuestCycle, vaultGuestPayouts)
 // behind the world-quest save. Every roll draws from ctx.rng in a fixed order.
 
-import { treasureCasketCopper } from './clue_casket';
-import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
-import { rollHoardBossDrop } from './content/hoard_loot';
 import {
   CARTOGRAPHERS_INK_ITEM_ID,
   isTreasureMapRarity,
@@ -31,10 +28,7 @@ import {
   TREASURE_SITES_BY_ID,
   type TreasureMapProgress,
   type TreasureMapRarity,
-  VAULT_GUEST_GEAR_CHANCE,
   VAULT_GUEST_PAYOUTS_PER_CYCLE,
-  VAULT_OWNER_COPPER_BONUS,
-  VAULT_PAYOUTS,
   VAULT_PORTAL_LIFETIME,
   vaultDamageFactor,
   vaultHealthFactor,
@@ -42,6 +36,8 @@ import {
 import { zoneAt } from './data';
 import { createGroundObject } from './entity';
 import { mountOwned } from './mounts';
+import { grantHoardReward } from './rift/hoard_reward_grant';
+import { rollHoardReward } from './rift/hoard_reward_roll';
 import { RIFT_RANK_BASE_LEVEL, type RiftRankTuning } from './rift/ranks';
 import { generateRiftPlan } from './rift/rift_gen';
 import type { RiftInstance } from './rift/types';
@@ -58,9 +54,14 @@ import { findHoardEntrancePosition } from './treasure_vault_placement';
 import type { Entity } from './types';
 import { waterLevelAt } from './world';
 
-const CASKET_MATERIAL_POOL = ['thorium_ore', 'elderwood_log', 'sunpetal_herb'] as const;
-const VAULT_MOUNT_REINS_ITEM_ID = 'reins_lanternback_troll';
-const VAULT_MOUNT_KEY = 'lanternback_troll';
+export const VAULT_MOUNT_KEY = 'lanternback_troll';
+
+/** One consumed map that has not yet been completed. The id is stable across
+ * reconnects and restarts; the sequence never goes backwards in a character
+ * save, so a later map cannot reuse a completed attempt's reward claim. */
+export interface VaultAttempt extends TreasureMapProgress {
+  id: string;
+}
 // ---------------------------------------------------------------------------
 // Save boundary
 
@@ -71,6 +72,21 @@ export function sanitizeTreasureMap(raw: unknown): TreasureMapProgress | null {
   if (typeof obj.siteId !== 'string' || !TREASURE_SITES_BY_ID[obj.siteId]) return null;
   const seed = typeof obj.seed === 'number' && Number.isFinite(obj.seed) ? obj.seed >>> 0 : 0;
   return { rarity: obj.rarity, siteId: obj.siteId, seed };
+}
+
+export function sanitizeVaultAttempt(raw: unknown, characterId?: number): VaultAttempt | null {
+  const map = sanitizeTreasureMap(raw);
+  if (!map || !raw || typeof raw !== 'object') return null;
+  const id = (raw as Record<string, unknown>).id;
+  if (typeof id !== 'string' || !/^(0|[1-9]\d*):[1-9]\d*$/.test(id)) return null;
+  const [owner, sequence] = id.split(':').map(Number);
+  if (
+    !Number.isSafeInteger(owner) ||
+    !Number.isSafeInteger(sequence) ||
+    (characterId !== undefined && owner !== characterId)
+  )
+    return null;
+  return { ...map, id };
 }
 
 export function sanitizeVaultGuestPayouts(raw: unknown): number {
@@ -129,6 +145,10 @@ export function useTreasureMap(
 ): void {
   const pid = meta.entityId;
   const active = meta.treasureMap;
+  if (meta.vaultAttempt) {
+    ctx.error(pid, 'You are already following another treasure map.');
+    return;
+  }
   if (!active) {
     const site = TREASURE_SITES[ctx.rng.int(0, TREASURE_SITES.length - 1)];
     meta.treasureMap = { rarity, siteId: site.id, seed: pickVaultSeed(ctx, rarity, site.zoneId) };
@@ -144,12 +164,18 @@ export function useTreasureMap(
     ctx.emit({ type: 'treasureMapRead', rarity, siteId: active.siteId, fresh: false, pid });
     return;
   }
-  if (!spawnVaultPortal(ctx, player, pid, active)) {
+  const nextSeq = meta.vaultAttemptSeq + 1;
+  if (!Number.isSafeInteger(nextSeq)) return;
+  const attempt: VaultAttempt = { ...active, id: `${meta.characterId ?? 0}:${nextSeq}` };
+  if (!spawnVaultPortal(ctx, player, pid, attempt, meta.characterId, ctx.cfg.vaultOpenNeedsSave)) {
     ctx.emit({ type: 'treasureMapRead', rarity, siteId: active.siteId, fresh: false, pid });
     return;
   }
   consumeOneUnit();
   meta.treasureMap = null;
+  meta.vaultAttempt = attempt;
+  meta.vaultAttemptSeq = nextSeq;
+  meta.vaultAttemptDurable = !ctx.cfg.vaultOpenNeedsSave;
   meta.wireRev++;
   ctx.emit({ type: 'treasureVaultOpened', rarity, pid });
 }
@@ -159,6 +185,8 @@ function spawnVaultPortal(
   player: Entity,
   ownerPid: number,
   map: TreasureMapProgress,
+  ownerCharacterId?: number,
+  pendingSave = false,
 ): boolean {
   const position = findHoardEntrancePosition(player.pos, player.facing, ctx.groundPos, (x, z) =>
     waterLevelAt(x, z, ctx.cfg.seed),
@@ -175,6 +203,24 @@ function spawnVaultPortal(
   portal.riftBaseLevel = baseLevel;
   portal.riftTier = tier;
   portal.vaultOwnerPid = ownerPid;
+  if ('id' in map && typeof map.id === 'string') portal.vaultAttemptId = map.id;
+  if (portal.vaultAttemptId && pendingSave) portal.vaultOpenPending = true;
+  if (ownerCharacterId !== undefined) portal.vaultOwnerCharacterId = ownerCharacterId;
+  const ownerMeta = ctx.players.get(ownerPid);
+  if (ownerCharacterId !== undefined && ownerMeta) {
+    portal.vaultOwnerRewardSnapshot = {
+      characterId: ownerCharacterId,
+      name: ownerMeta.name,
+      cls: ownerMeta.cls,
+      level: player.level,
+      mountOwned: mountOwned(ownerMeta, VAULT_MOUNT_KEY),
+      guestCapped: false,
+      guestCycle: ownerMeta.worldQuestCycle,
+    };
+    portal.vaultInitialPartyCharacterIds = (ctx.partyOf(ownerPid)?.members ?? [ownerPid])
+      .map((memberPid) => ctx.players.get(memberPid)?.characterId)
+      .filter((id): id is number => id !== undefined);
+  }
   portal.vaultRarity = map.rarity;
   portal.vaultExpiresAt = ctx.time + VAULT_PORTAL_LIFETIME;
   portal.facing = Math.atan2(player.pos.x - position.x, player.pos.z - position.z);
@@ -190,6 +236,35 @@ function spawnVaultPortal(
   return true;
 }
 
+/** Unlock only the portal for the exact attempt whose consumed-map save landed. */
+export function confirmVaultAttemptDurable(
+  ctx: SimContext,
+  pid: number,
+  attemptId: string,
+): boolean {
+  const meta = ctx.players.get(pid);
+  if (meta?.vaultAttempt?.id !== attemptId) return false;
+  meta.vaultAttemptDurable = true;
+  for (const portal of ctx.entities.values()) {
+    if (portal.vaultAttemptId === attemptId) portal.vaultOpenPending = false;
+  }
+  return true;
+}
+
+/** A committed outcome, not the boss's in-memory death, ends the retry right. */
+export function finishVaultAttempt(
+  ctx: SimContext,
+  ownerCharacterId: number,
+  attemptId: string,
+): number | null {
+  const owner = [...ctx.players.values()].find((meta) => meta.characterId === ownerCharacterId);
+  if (owner?.vaultAttempt?.id !== attemptId) return null;
+  owner.vaultAttempt = null;
+  owner.vaultAttemptDurable = true;
+  owner.wireRev++;
+  return owner.entityId;
+}
+
 /** Once a second: an unentered vault portal past its lifetime closes. A portal
  *  a run is bound to is left to the Rift's own cleanup. Reads the Rift portal
  *  registry (entity_roster keeps it), so vaults add no list of their own. */
@@ -202,6 +277,21 @@ export function updateVaultPortals(ctx: SimContext): void {
     if (ctx.riftInstances.some((inst) => inst.partyKey !== null && inst.portalId === id)) continue;
     ctx.dropEntity(id);
   }
+  for (const meta of ctx.players.values()) {
+    const attempt = meta.vaultAttempt;
+    const player = ctx.entities.get(meta.entityId);
+    if (!attempt || !meta.vaultAttemptDurable || !player || !atTreasureSite(player, attempt))
+      continue;
+    if (
+      ctx.riftInstances.some(
+        (inst) => inst.vault?.attemptId === attempt.id && inst.outcome !== 'active',
+      )
+    )
+      continue;
+    if ([...ctx.riftPortalIds].some((id) => ctx.entities.get(id)?.vaultAttemptId === attempt.id))
+      continue;
+    spawnVaultPortal(ctx, player, meta.entityId, attempt, meta.characterId);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -209,23 +299,65 @@ export function updateVaultPortals(ctx: SimContext): void {
 
 /** Whether `pid` may walk through `portal`: always for an ordinary rift; for a
  *  vault, the map's owner and whoever shares the owner's party. */
+function currentVaultOwnerPid(ctx: SimContext, portal: Entity): number | undefined {
+  const ownerCharacterId = portal.vaultOwnerCharacterId;
+  if (ownerCharacterId === undefined) return portal.vaultOwnerPid;
+  return (
+    [...ctx.players.values()].find((meta) => meta.characterId === ownerCharacterId)?.entityId ??
+    portal.vaultOwnerPid
+  );
+}
+
 export function mayEnterVaultPortal(ctx: SimContext, portal: Entity, pid: number): boolean {
   const owner = portal.vaultOwnerPid;
   if (owner === undefined || owner === pid) return true;
-  const party = ctx.partyOf(owner);
-  return party?.members.includes(pid) ?? false;
+  const entrantCharacterId = ctx.players.get(pid)?.characterId;
+  const ownerCharacterId = portal.vaultOwnerCharacterId;
+  if (ownerCharacterId !== undefined && entrantCharacterId === ownerCharacterId) return true;
+  if (
+    entrantCharacterId !== undefined &&
+    portal.vaultInitialPartyCharacterIds?.includes(entrantCharacterId)
+  )
+    return true;
+  const currentOwnerPid = currentVaultOwnerPid(ctx, portal) ?? owner;
+  if (ctx.partyOf(currentOwnerPid)?.members.includes(pid)) return true;
+  // An entrant already bound to this run keeps access even when the owner's
+  // disconnect removes them from the current party.
+  return (
+    entrantCharacterId !== undefined &&
+    ctx.riftInstances.some(
+      (inst) =>
+        inst.vault?.ownerCharacterId === ownerCharacterId &&
+        inst.portalId === portal.id &&
+        inst.seed === portal.riftSeed &&
+        [...(inst.vault?.memberCharacterIds?.values() ?? [])].includes(entrantCharacterId),
+    )
+  );
 }
 
 /** The vault record for a fresh run entered through `portal` (null for an
  *  ordinary rift). The head count is the owner's party size at that moment. */
 export function vaultForPortal(ctx: SimContext, portal: Entity | null): RiftInstance['vault'] {
   if (portal?.vaultOwnerPid === undefined || !portal.vaultRarity) return null;
-  const party = ctx.partyOf(portal.vaultOwnerPid);
+  const ownerPid = currentVaultOwnerPid(ctx, portal) ?? portal.vaultOwnerPid;
+  const party = ctx.partyOf(ownerPid);
+  const ownerCharacterId =
+    portal.vaultOwnerCharacterId ?? ctx.players.get(portal.vaultOwnerPid)?.characterId;
   return {
     rarity: portal.vaultRarity,
-    ownerPid: portal.vaultOwnerPid,
+    ...(portal.vaultAttemptId ? { attemptId: portal.vaultAttemptId } : {}),
+    ownerPid,
+    ...(ownerCharacterId === undefined
+      ? {}
+      : {
+          ownerCharacterId,
+          memberCharacterIds: new Map<number, number>(),
+          ...(portal.vaultOwnerRewardSnapshot
+            ? { entrantSnapshots: new Map([[ownerCharacterId, portal.vaultOwnerRewardSnapshot]]) }
+            : {}),
+        }),
     headCount: Math.max(1, Math.min(5, party?.members.length ?? 1)),
-    level: ctx.entities.get(portal.vaultOwnerPid)?.level ?? RIFT_RANK_BASE_LEVEL.C,
+    level: ctx.entities.get(ownerPid)?.level ?? RIFT_RANK_BASE_LEVEL.C,
     ...(portal.devForceHoardGoblin ? { forceGoblin: true } : {}),
   };
 }
@@ -261,61 +393,23 @@ export function payTreasureVault(
     const meta = ctx.players.get(pid);
     const player = ctx.entities.get(pid);
     if (!meta || !player || meta.leaving) continue;
-    const owner = pid === vault.ownerPid;
-    if (!owner) {
-      if (meta.vaultGuestCycle !== meta.worldQuestCycle) {
-        meta.vaultGuestCycle = meta.worldQuestCycle;
-        meta.vaultGuestPayouts = 0;
-      }
-      if ((meta.vaultGuestPayouts ?? 0) >= VAULT_GUEST_PAYOUTS_PER_CYCLE) {
-        ctx.emit({ type: 'treasureVaultLooted', rarity: vault.rarity, capped: true, pid });
-        continue;
-      }
-      meta.vaultGuestPayouts = (meta.vaultGuestPayouts ?? 0) + 1;
-    }
-    payOne(ctx, meta, player, vault.rarity, owner, bossTemplateId);
+    const owner =
+      pid === vault.ownerPid ||
+      (vault.ownerCharacterId !== undefined && meta.characterId === vault.ownerCharacterId);
+    const reward = rollHoardReward(ctx.rng, {
+      rarity: vault.rarity,
+      bossTemplateId,
+      cls: meta.cls,
+      level: player.level,
+      owner,
+      guestCapped:
+        !owner &&
+        meta.vaultGuestCycle === meta.worldQuestCycle &&
+        (meta.vaultGuestPayouts ?? 0) >= VAULT_GUEST_PAYOUTS_PER_CYCLE,
+      mountOwned: mountOwned(meta, VAULT_MOUNT_KEY),
+    });
+    grantHoardReward(ctx, pid, vault.rarity, reward, owner);
   }
-}
-
-function payOne(
-  ctx: SimContext,
-  meta: PlayerMeta,
-  player: Entity,
-  rarity: TreasureMapRarity,
-  owner: boolean,
-  bossTemplateId: string | undefined,
-): void {
-  const pid = meta.entityId;
-  const def = VAULT_PAYOUTS[rarity];
-  const itemIds: string[] = [];
-  const material = CASKET_MATERIAL_POOL[ctx.rng.int(0, CASKET_MATERIAL_POOL.length - 1)];
-  ctx.addItem(material, def.materials, pid);
-  itemIds.push(material);
-  if (ctx.rng.chance(owner ? def.gearChance : VAULT_GUEST_GEAR_CHANCE[rarity])) {
-    const itemId = rollHoardBossDrop(ctx.rng, bossTemplateId, rarity, meta.cls);
-    ctx.addItem(itemId, 1, pid);
-    itemIds.push(itemId);
-  }
-  if (ctx.rng.chance(def.markChance)) {
-    ctx.addItem(HEROIC_MARK_ITEM_ID, def.marks, pid);
-    itemIds.push(HEROIC_MARK_ITEM_ID);
-  }
-  // Always drawn, so the rng sequence never depends on the collection.
-  if (ctx.rng.chance(def.mountChance) && !mountOwned(meta, VAULT_MOUNT_KEY)) {
-    ctx.addItem(VAULT_MOUNT_REINS_ITEM_ID, 1, pid);
-    itemIds.push(VAULT_MOUNT_REINS_ITEM_ID);
-  }
-  const next = nextTreasureMapRarity(rarity);
-  if (ctx.rng.chance(def.nextMapChance) && next) {
-    ctx.addItem(TREASURE_MAP_ITEM_IDS[next], 1, pid);
-    itemIds.push(TREASURE_MAP_ITEM_IDS[next]);
-  }
-  const base = treasureCasketCopper(player.level) * def.copperMult;
-  const copper = Math.round(owner ? base * (1 + VAULT_OWNER_COPPER_BONUS) : base);
-  meta.copper += copper;
-  meta.clueCasketsOpened = (meta.clueCasketsOpened ?? 0) + 1;
-  ctx.markDeedsDirty(pid);
-  ctx.emit({ type: 'treasureVaultLooted', rarity, capped: false, itemIds, copper, pid });
 }
 
 // ---------------------------------------------------------------------------

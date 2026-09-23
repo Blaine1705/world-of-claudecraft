@@ -10136,6 +10136,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.character.invalid_appearance':
     'この外見は保存できませんでした。デザインを調整してもう一度お試しください。',
   'apiError.character.reroll_unavailable': 'このキャラクターには無料の再デザインがありません。',
+  'apiError.character.vault_mail_recovering':
+    '宝物庫の報酬メールを復旧しています。少し待ってからもう一度お試しください。',
   'apiError.moderation.suspended_until': 'このアカウントは {date} まで停止されています。',
   'apiError.moderation.suspended': 'このアカウントは停止されています。',
   'apiError.moderation.banned': 'このアカウントは利用停止されています。',
@@ -18043,4 +18045,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
   'devCommand.actions.town.label': 'タウンハブ',
   'devCommand.fields.town': '町',
+  'sim.rift.hoardEntrantsFull': 'この秘宝の間には、すでに5人の冒険者が入っています。',
+  'entities.letters.hoard_vault_reward.sender': 'カラス便',
+  'entities.letters.hoard_vault_reward.subject': '宝物庫の報酬',
+  'entities.letters.hoard_vault_reward.body':
+    '宝物庫は攻略されましたが、あなたの取り分は宝箱から受け取られていません。獲得した品とお金をカラス便がお届けします。\n\n- カラス便',
 };

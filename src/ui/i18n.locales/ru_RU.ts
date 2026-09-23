@@ -10297,6 +10297,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Не удалось сохранить этот облик. Измените дизайн и попробуйте снова.',
   'apiError.character.reroll_unavailable':
     'У этого персонажа нет доступного бесплатного редизайна.',
+  'apiError.character.vault_mail_recovering':
+    'Письмо с наградой хранилища восстанавливается. Повторите попытку чуть позже.',
   'apiError.moderation.suspended_until': 'Эта учетная запись заблокирована до {date}.',
   'apiError.moderation.suspended': 'Эта учетная запись заблокирована.',
   'apiError.moderation.banned': 'Эта учетная запись заблокирована.',
@@ -18141,4 +18143,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   "devCommand.actions.town.description": "Телепортируйтесь в центр города по имени.",
   "devCommand.actions.town.label": "Городской центр",
   "devCommand.fields.town": "Город",
+  'sim.rift.hoardEntrantsFull': 'В это хранилище уже вошли пять искателей приключений.',
+  'entities.letters.hoard_vault_reward.sender': 'Воронья почта',
+  'entities.letters.hoard_vault_reward.subject': 'Ваша награда из хранилища',
+  'entities.letters.hoard_vault_reward.body':
+    'Хранилище пройдено, но вы не забрали свою долю из сундука. Вороны доставили вам заработанные предметы и монеты.\n\n- Воронья почта',
 };

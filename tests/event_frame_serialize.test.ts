@@ -532,7 +532,7 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
     expect(typeof spy.mock.calls[0][2]).toBe('number');
   });
 
-  it('prefilters consumer-less vaultCraftConsume before serialization: never stringified, never delivered', () => {
+  it('prefilters internal vault events before serialization: never stringified or delivered', () => {
     const server = new GameServer();
     const sessions: ClientSession[] = [];
     for (let i = 0; i < 3; i++) {
@@ -556,6 +556,18 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
         upgrades: 1,
       } as SimEvent,
       {
+        type: 'treasureVaultOutcomePending',
+        attemptId: 'secret-attempt',
+        ownerCharacterId: 1,
+        claims: [{ characterId: 1, recipientName: 'Secret', items: [], copper: 987654 }],
+      } as SimEvent,
+      {
+        type: 'treasureVaultClaimRequested',
+        attemptId: 'secret-attempt',
+        characterId: 1,
+        pid: speaker.pid,
+      } as SimEvent,
+      {
         type: 'chat',
         fromPid: speaker.pid,
         from: 'Vaulter0',
@@ -575,6 +587,10 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
       const fc = (session as unknown as { fc: FakeClient }).fc;
       for (const frame of fc.sent) {
         expect(frame).not.toContain('vaultCraftConsume');
+        expect(frame).not.toContain('treasureVaultOutcomePending');
+        expect(frame).not.toContain('treasureVaultClaimRequested');
+        expect(frame).not.toContain('secret-attempt');
+        expect(frame).not.toContain('987654');
       }
       // The surrounding chat still arrives: the filter removed one event, not
       // the batch.

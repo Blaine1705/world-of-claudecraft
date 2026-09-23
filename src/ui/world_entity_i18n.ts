@@ -740,6 +740,7 @@ const LETTER_IDS = [
   'woc_market_delivery',
   'woc_market_return',
   'woc_market_sold',
+  'hoard_vault_reward',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];

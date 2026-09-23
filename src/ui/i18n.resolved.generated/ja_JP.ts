@@ -5968,7 +5968,8 @@ export const ja_JP: EnTranslations = {
       "taken_over": "あなたのキャラクターは別のセッションに引き継がれました。",
       "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。",
       "invalid_appearance": "この外見は保存できませんでした。デザインを調整してもう一度お試しください。",
-      "reroll_unavailable": "このキャラクターには無料の再デザインがありません。"
+      "reroll_unavailable": "このキャラクターには無料の再デザインがありません。",
+      "vault_mail_recovering": "宝物庫の報酬メールを復旧しています。少し待ってからもう一度お試しください。"
     },
     "moderation": {
       "suspended_until": "このアカウントは {date} まで停止されています。",
@@ -9469,6 +9470,7 @@ export const ja_JP: EnTranslations = {
       "hoardExitOpens": "財宝はあなたのものです。入口に戻って外へ登ってください。",
       "hoardStepBack": "財宝庫の入口から地上へ戻った。",
       "hoardNotYours": "この財宝は別のパーティーが掘り当てたものです。",
+      "hoardEntrantsFull": "この秘宝の間には、すでに5人の冒険者が入っています。",
       "portalOpens": "{zone}に{tier}ランクの裂け目が裂け開いた！",
       "portalSealed": "{zone}の{tier}ランクの裂け目が封印された。",
       "portalCollapses": "{zone}の{tier}ランクの裂け目が崩れ落ちた。",
@@ -22326,6 +22328,11 @@ export const ja_JP: EnTranslations = {
         "sender": "取引所仲買人",
         "subject": "取引所への出品が売れました",
         "body": "出品した品が売れ、買い手が全額を支払いました。取引所手数料を差し引いた売上金は、決済トランザクションの中で直接あなたの連携ウォレットへ送られました。取引所があなたのお金を預かることは一度もありません。\n\nこの取引の記録は取引所の台帳に残ります。\n\n- 取引所仲買人"
+      },
+      "hoard_vault_reward": {
+        "sender": "カラス便",
+        "subject": "宝物庫の報酬",
+        "body": "宝物庫は攻略されましたが、あなたの取り分は宝箱から受け取られていません。獲得した品とお金をカラス便がお届けします。\n\n- カラス便"
       }
     },
     "itemSets": {

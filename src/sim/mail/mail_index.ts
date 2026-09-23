@@ -152,6 +152,10 @@ export class MailIndex<M extends IndexedLetter> {
     return out;
   }
 
+  takeDirtyKey(key: string): boolean {
+    return this.dirty.delete(key);
+  }
+
   // Per-tick: land any in-flight letter whose delivery time has arrived,
   // moving it from `undelivered` into the unread count and dirtying only the
   // recipients whose persisted deliverIn must now be 0. Draws no rng and emits

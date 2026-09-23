@@ -5968,7 +5968,8 @@ export const vi_VN: EnTranslations = {
       "taken_over": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
       "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới.",
       "invalid_appearance": "Không thể lưu ngoại hình đó. Hãy chỉnh sửa thiết kế rồi thử lại.",
-      "reroll_unavailable": "Nhân vật này hiện không có lượt làm lại ngoại hình miễn phí nào."
+      "reroll_unavailable": "Nhân vật này hiện không có lượt làm lại ngoại hình miễn phí nào.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Tài khoản này bị đình chỉ đến {date}.",
@@ -9469,6 +9470,7 @@ export const vi_VN: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "Một Rạn Nứt hạng {tier} xé toạc mở ra tại {zone}!",
       "portalSealed": "Rạn Nứt hạng {tier} tại {zone} đã bị niêm phong.",
       "portalCollapses": "Rạn Nứt hạng {tier} tại {zone} sụp đổ.",
@@ -22326,6 +22328,11 @@ export const vi_VN: EnTranslations = {
         "sender": "Nhà Môi Giới Sàn Giao Dịch",
         "subject": "Tin rao của bạn trên Sàn Giao Dịch đã bán được",
         "body": "Tin rao của bạn đã bán được và người mua đã thanh toán đầy đủ. Sổ cái của Sàn Giao Dịch lưu lại bản ghi giao dịch, và mục hoạt động Sàn Giao Dịch của bạn hiển thị số tiền đã thanh toán cùng phần chi tiết của nó.\n\n- Nhà Môi Giới Sàn Giao Dịch"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

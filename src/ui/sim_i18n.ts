@@ -18101,6 +18101,7 @@ const RULES: Rule[] = [
   },
   // The Buried Hoard's own entry and clear lines (src/sim/rift/runs.ts, vault arm).
   { re: /^This hoard was dug up by another party\.$/, build: () => t('sim.rift.hoardNotYours') },
+  { re: /^This hoard has already admitted five adventurers\.$/, build: () => t('sim.rift.hoardEntrantsFull') },
   {
     re: /^You climb down into (.+)\.$/,
     build: (m) => t('sim.rift.hoardEnter', { name: m[1] }),

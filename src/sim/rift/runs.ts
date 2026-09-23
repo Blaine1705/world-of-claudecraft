@@ -44,6 +44,7 @@ import {
   maybeSpawnHoardGoblin,
   tickHoardGoblins,
 } from './hoard_goblin';
+import { rebindVaultEntrant, rememberVaultEntrant } from './hoard_identity';
 import { tickHoardLightningStrikes } from './hoard_lightning_strike';
 import { rescaleVaultForEntrants } from './hoard_rescale';
 import {
@@ -52,6 +53,7 @@ import {
   settleHoardRewardChest,
   spawnHoardRewardChest,
 } from './hoard_reward_chest';
+import { rollHoardReward } from './hoard_reward_roll';
 import {
   RIFT_LOOT_RECOVERY_GRACE,
   RIFT_MIN_LEVEL,
@@ -623,6 +625,13 @@ export function enterRift(
     }
     return;
   }
+  if (portal?.vaultOpenPending) {
+    if (ctx.time >= (r.e.riftDeniedAt ?? -Infinity) + 4) {
+      r.e.riftDeniedAt = ctx.time;
+      ctx.error(r.meta.entityId, 'All rifts are unstable right now. Try again soon.');
+    }
+    return;
+  }
   // A treasure vault is private: only the map's owner and their party may
   // step through (src/sim/treasure_vault.ts). Portal path only, like the gate above.
   if (portal && !mayEnterVaultPortal(ctx, portal, r.meta.entityId)) {
@@ -632,6 +641,7 @@ export function enterRift(
     }
     return;
   }
+  rebindVaultEntrant(ctx, portal ?? null, r.meta.entityId);
   const key = riftKeyFor(ctx, r.meta.entityId);
   const eventId = portal?.riftEventId ?? null;
   // Death rules (2026-07-21 S-raid playtest): a dead player (ghost) may enter
@@ -716,12 +726,51 @@ export function enterRift(
       ) ?? null;
     if (!inst) return; // a ghost never allocates a fresh run
   } else {
-    // 1. Binding wins over everything, including the entrant's current party.
-    inst =
-      ctx.riftInstances.find(
+    // A won vault is bound to its frozen reward roster, not the current party
+    // or an old entity id. The owner may be entitled without ever entering.
+    // Never allocate a second run for the same completed attempt.
+    if (portal?.vaultAttemptId) {
+      const won = ctx.riftInstances.find(
         (candidate) =>
-          liveMatch(candidate) && candidate.progressed && candidate.memberIds.has(r.meta.entityId),
-      ) ?? null;
+          candidate.partyKey !== null &&
+          candidate.outcome === 'won' &&
+          candidate.portalId === portal.id &&
+          candidate.vault?.attemptId === portal.vaultAttemptId,
+      );
+      if (won) {
+        if (
+          r.meta.characterId === undefined ||
+          !won.vault?.entrantSnapshots?.has(r.meta.characterId)
+        ) {
+          ctx.error(r.meta.entityId, 'This hoard was dug up by another party.');
+          return;
+        }
+        inst = won;
+      }
+    }
+    // 1. Binding wins over everything, including the entrant's current party.
+    if (inst === null)
+      inst =
+        ctx.riftInstances.find(
+          (candidate) =>
+            liveMatch(candidate) &&
+            candidate.progressed &&
+            candidate.memberIds.has(r.meta.entityId),
+        ) ?? null;
+    // A reconnecting vault entrant has already been rebound by durable
+    // character identity. Preserve even an unprogressed room: party teardown
+    // during disconnect must not recycle their still-live vault underneath
+    // the other entrants.
+    if (inst === null && portal?.vaultOwnerCharacterId !== undefined) {
+      inst =
+        ctx.riftInstances.find(
+          (candidate) =>
+            liveMatch(candidate) &&
+            candidate.vault?.ownerCharacterId === portal.vaultOwnerCharacterId &&
+            candidate.memberIds.has(r.meta.entityId),
+        ) ?? null;
+      if (inst) inst.partyKey = key;
+    }
     // 2. The current group's run: exact key match first, then any live run a
     //    CURRENT party member is inside of or bound to (covers party-id churn
     //    and mid-run replacement invites). Entering a progressed run binds the
@@ -816,7 +865,32 @@ export function enterRift(
     spawnRiftFloor(ctx, inst);
   }
 
+  // A five-person party can rotate members while a run remains open. Freeze
+  // eligibility to five distinct characters, not five simultaneous pids:
+  // otherwise a sixth reward claim would make the durable outcome invalid and
+  // leave the whole group's chest sealed forever.
+  const entrantId = r.meta.characterId;
+  const snapshots = inst.vault?.entrantSnapshots;
+  if (
+    inst.vault &&
+    entrantId !== undefined &&
+    !snapshots?.has(entrantId) &&
+    (snapshots?.size ?? 0) >= 5
+  ) {
+    ctx.error(r.meta.entityId, 'This hoard has already admitted five adventurers.');
+    return;
+  }
   inst.memberIds.add(r.meta.entityId);
+  rememberVaultEntrant(ctx, inst, r.meta.entityId);
+  // The map owner can have a frozen claim without ever stepping into the
+  // room. On a post-clear return, make that already-entitled share clickable.
+  if (inst.outcome === 'won' && inst.vault?.chest) {
+    const chest = inst.vault.chest;
+    if (!chest.eligible.includes(r.meta.entityId)) chest.eligible.push(r.meta.entityId);
+    const object = ctx.entities.get(chest.entityId);
+    if (object && !chest.pendingSave && !chest.claimed.includes(r.meta.entityId))
+      object.lootable = true;
+  }
   // A player who joined the owner's party after the door opened walks into a
   // room scaled for fewer: scale it up to everyone who has entered.
   rescaleVaultForEntrants(ctx, inst);
@@ -1494,7 +1568,14 @@ function hoardRewardChestPos(inst: RiftInstance): { x: number; z: number } {
 function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | null): boolean {
   if (inst.rewarded) return inst.outcome !== 'active';
   const present = instancePlayerIds(ctx, inst);
-  const participants = present.length > 0 ? present : [...inst.memberIds];
+  // A hoard belongs to everyone who entered it, including the map's owner
+  // after they have stepped outside. The remaining party may finish the run
+  // without silently dropping an earlier entrant from the reward chest.
+  const participants = inst.vault
+    ? [...inst.memberIds]
+    : present.length > 0
+      ? present
+      : [...inst.memberIds];
   creditRiftClearDeeds(ctx, inst, participants);
   const claim = claimRiftFirstClear(ctx, inst, participants);
   if (!claim.won) {
@@ -1509,6 +1590,36 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   inst.rewarded = true;
   inst.outcome = 'won';
   inst.finishedAt = ctx.time;
+  if (inst.vault?.attemptId && inst.vault.ownerCharacterId && ctx.cfg.vaultRewardNeedsSave) {
+    const claims = [...(inst.vault.entrantSnapshots?.values() ?? [])].map((entrant) => {
+      const reward = rollHoardReward(ctx.rng, {
+        rarity: inst.vault!.rarity,
+        bossTemplateId: boss?.templateId,
+        cls: entrant.cls,
+        level: entrant.level,
+        owner: entrant.characterId === inst.vault!.ownerCharacterId,
+        guestCapped: entrant.guestCapped,
+        mountOwned: entrant.mountOwned,
+      });
+      inst.vault!.rewardClaims ??= new Map();
+      inst.vault!.rewardClaims.set(entrant.characterId, reward);
+      return {
+        characterId: entrant.characterId,
+        recipientName: entrant.name,
+        items: reward.items.map((item) => ({ ...item })),
+        copper: reward.copper,
+        ...(entrant.characterId === inst.vault!.ownerCharacterId
+          ? {}
+          : { guestCycle: entrant.guestCycle }),
+      };
+    });
+    ctx.emit({
+      type: 'treasureVaultOutcomePending',
+      attemptId: inst.vault.attemptId,
+      ownerCharacterId: inst.vault.ownerCharacterId,
+      claims,
+    });
+  }
   // Rank-gated payout on the corpse (every winning clear, ranked or dev): C a
   // guaranteed themed rare + coin, B/A/S the epic ladder. No Heroic Marks.
   // A treasure vault pays its own table to every entrant instead (the rank
@@ -1516,7 +1627,14 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   // The hoard pays through a chest the entrants open (hoard_reward_chest.ts);
   // an unopened share is settled the moment its owner leaves.
   if (inst.vault)
-    spawnHoardRewardChest(ctx, inst, participants, hoardRewardChestPos(inst), boss?.templateId);
+    spawnHoardRewardChest(
+      ctx,
+      inst,
+      participants,
+      hoardRewardChestPos(inst),
+      boss?.templateId,
+      !!ctx.cfg.vaultRewardNeedsSave && !!inst.vault.attemptId,
+    );
   else if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
 
   // A cleared rift seals its way in: no LIVING entrant may ever walk into a
@@ -1527,7 +1645,7 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   // in for their corpse loot; this arm covers portals outside the race (dev
   // portals), which carry no such recovery window and whose entity would
   // otherwise stay open forever.
-  if (!claim.event && inst.portalId !== null) {
+  if (!claim.event && !inst.vault && inst.portalId !== null) {
     if (ctx.entities.has(inst.portalId)) ctx.dropEntity(inst.portalId);
     inst.portalId = null;
   }

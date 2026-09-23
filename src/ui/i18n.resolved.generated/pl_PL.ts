@@ -5968,7 +5968,8 @@ export const pl_PL: EnTranslations = {
       "taken_over": "Twoją postać przejęła inna sesja.",
       "rename_required": "Tę postać trzeba przemianować przed wejściem do świata.",
       "invalid_appearance": "Nie udało się zapisać tego wyglądu. Popraw projekt i spróbuj ponownie.",
-      "reroll_unavailable": "Ta postać nie ma już dostępnego darmowego przeprojektowania."
+      "reroll_unavailable": "Ta postać nie ma już dostępnego darmowego przeprojektowania.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "To konto jest zawieszone do {date}.",
@@ -9469,6 +9470,7 @@ export const pl_PL: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "Szczelina rangi {tier} rozdziera się w {zone}!",
       "portalSealed": "Szczelina rangi {tier} w {zone} została zapieczętowana.",
       "portalCollapses": "Szczelina rangi {tier} w {zone} zapada się.",
@@ -22326,6 +22328,11 @@ export const pl_PL: EnTranslations = {
         "sender": "Makler Giełdy $WOC",
         "subject": "Twoje wystawienie na Giełdzie zostało sprzedane",
         "body": "Twoje wystawienie zostało sprzedane, a kupujący rozliczył się w całości. Rejestr Giełdy niesie zapis tej sprzedaży, a twoja aktywność na Giełdzie pokazuje rozliczoną kwotę i jej podział.\n\n- Makler Giełdy $WOC"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

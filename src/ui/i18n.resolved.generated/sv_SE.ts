@@ -5968,7 +5968,8 @@ export const sv_SE: EnTranslations = {
       "taken_over": "Din karaktär togs över av en annan session.",
       "rename_required": "Denna karaktär måste byta namn innan den går in i världen.",
       "invalid_appearance": "Det utseendet kunde inte sparas. Justera designen och försök igen.",
-      "reroll_unavailable": "Den här karaktären har ingen gratis omformning tillgänglig."
+      "reroll_unavailable": "Den här karaktären har ingen gratis omformning tillgänglig.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Detta konto är avstängt till {date}.",
@@ -9469,6 +9470,7 @@ export const sv_SE: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "En reva av grad {tier} rivs upp i {zone}!",
       "portalSealed": "Revan av grad {tier} i {zone} har förseglats.",
       "portalCollapses": "Revan av grad {tier} i {zone} kollapsar.",
@@ -22326,6 +22328,11 @@ export const sv_SE: EnTranslations = {
         "sender": "Börsmäklaren",
         "subject": "Din annons på börsen såldes",
         "body": "Din annons såldes och köparen betalade fullt ut. Börsens liggare bär uppgiften om försäljningen, och din börsaktivitet visar det slutförda beloppet och dess uppdelning.\n\n- Börsmäklaren"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

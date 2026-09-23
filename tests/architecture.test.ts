@@ -1399,15 +1399,15 @@ describe('Reliquary sparse-state writes stay inside their owning module', () => 
     ).toEqual([]);
   });
 
-  it('noteRelicObtain is called from exactly the two grant hubs (caller-set pin)', () => {
+  it('noteRelicObtain is called from the grant hubs and the atomic vault-save projector', () => {
     // The tally writer takes `meta` directly (no SimContext hop), so a NEW
     // caller adopts whatever movement policy it likes with no seam forcing
     // the question, and the line-regex ban above cannot see it (the write
     // happens inside the owning module on the caller's behalf). Pin the
-    // caller set AND the call text: both call sites must be the hub line
-    // with its movement gate intact, so a dropped `!opts?.movement` prefix,
-    // a changed copies argument, or a replacement arm elsewhere in sim.ts
-    // all red here, not just a third file. A new caller is not banned, it is
+    // caller set AND call text: both grant hubs keep their movement gate.
+    // The vault projector is the third approved caller: it commits world-sourced
+    // finds in the same transaction as the immutable direct claim marker.
+    // A new caller is not banned, it is
     // a REVIEW ITEM: extend this pin only after classifying the new site
     // against the movement rule. Scope: all of src/ (ClientWorld and the UI
     // import from the owning module already, so a caller there is one import
@@ -1424,10 +1424,15 @@ describe('Reliquary sparse-state writes stay inside their owning module', () => 
     const callers = scanLines(callerScanned, /\bnoteRelicObtain\s*\(/);
     const files = [...new Set(callers.map((v) => v.split(':')[0]))].sort();
     expect(files, `unexpected noteRelicObtain callers:\n${callers.join('\n')}`).toEqual([
+      relative(repoRoot, join(simRoot, 'rift', 'hoard_reward_save.ts')),
       relative(repoRoot, join(simRoot, 'sim.ts')),
     ]);
     const texts = callers.map((v) => v.slice(v.indexOf('  ') + 2));
-    expect(texts, 'both hub arms carry the movement gate and per-copy count').toEqual([
+    expect(
+      texts,
+      'the projector is world-sourced; both hub arms retain their movement gate',
+    ).toEqual([
+      'noteRelicObtain(meta, item.itemId, item.count);',
       'if (!opts?.movement) noteRelicObtain(meta, itemId, count);',
       'if (!opts?.movement) noteRelicObtain(meta, itemId, count);',
     ]);

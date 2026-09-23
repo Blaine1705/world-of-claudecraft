@@ -5968,7 +5968,8 @@ export const pt_BR: EnTranslations = {
       "taken_over": "Seu personagem foi assumido por outra sessão.",
       "rename_required": "Este personagem precisa ser renomeado antes de entrar no mundo.",
       "invalid_appearance": "Não foi possível salvar essa aparência. Ajuste o visual e tente novamente.",
-      "reroll_unavailable": "Este personagem não tem um redesenho gratuito disponível."
+      "reroll_unavailable": "Este personagem não tem um redesenho gratuito disponível.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Esta conta está suspensa até {date}.",
@@ -9469,6 +9470,7 @@ export const pt_BR: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "Uma fenda de nível {tier} se abre em {zone}!",
       "portalSealed": "A fenda de nível {tier} em {zone} foi selada.",
       "portalCollapses": "A fenda de nível {tier} em {zone} entra em colapso.",
@@ -22326,6 +22328,11 @@ export const pt_BR: EnTranslations = {
         "sender": "O Corretor da Bolsa",
         "subject": "Seu anúncio na Bolsa foi vendido",
         "body": "Seu anúncio foi vendido e o comprador pagou o valor total. O livro-razão da Bolsa traz o registro da venda, e sua atividade na Bolsa mostra o valor recebido e seu detalhamento.\n\n- O Corretor da Bolsa"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

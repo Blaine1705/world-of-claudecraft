@@ -66,6 +66,53 @@ function livingTrash(sim: Sim, inst: RiftInstance): Entity[] {
 }
 
 describe('hoard vault rescale', () => {
+  it('reconnects owner and guest by character identity without counting phantom entrants', () => {
+    const sim = new Sim({ seed: 9323, playerClass: 'warrior', noPlayer: true });
+    const owner = sim.addPlayer('warrior', 'Owner', { characterId: 101 });
+    const guest = sim.addPlayer('warrior', 'Guest', { characterId: 202 });
+    sim.setPlayerLevel(20, owner);
+    sim.setPlayerLevel(20, guest);
+    sim.partyInvite(guest, owner);
+    sim.partyAccept(guest);
+    const ownerEntity = sim.entities.get(owner);
+    if (!ownerEntity) throw new Error('owner missing');
+    const portal = {
+      ...ownerEntity,
+      id: -1,
+      vaultOwnerPid: owner,
+      vaultOwnerCharacterId: 101,
+      vaultRarity: 'epic' as const,
+      riftSeed: SEED,
+    } as Entity;
+    sim.enterRift(SEED, 23, owner, undefined, portal);
+    sim.enterRift(SEED, 23, guest, undefined, portal);
+    const inst = sim.riftInstances.find((candidate) => candidate.partyKey !== null);
+    if (!inst || inst.bossId === null) throw new Error('vault instance missing');
+    expect(inst.memberIds.size).toBe(2);
+    const boss = sim.entities.get(inst.bossId);
+    if (!boss) throw new Error('vault boss missing');
+    const scaledHp = boss.maxHp;
+
+    sim.removePlayer(guest);
+    const guestAgain = sim.addPlayer('warrior', 'Guest', { characterId: 202 });
+    sim.setPlayerLevel(20, guestAgain);
+    sim.enterRift(SEED, 23, guestAgain, undefined, portal);
+    expect(inst.memberIds.has(guest)).toBe(false);
+    expect(inst.memberIds.has(guestAgain)).toBe(true);
+    expect(inst.memberIds.size).toBe(2);
+    expect(boss.maxHp).toBe(scaledHp);
+
+    sim.removePlayer(owner);
+    const ownerAgain = sim.addPlayer('warrior', 'Owner', { characterId: 101 });
+    sim.setPlayerLevel(20, ownerAgain);
+    sim.enterRift(SEED, 23, ownerAgain, undefined, portal);
+    expect(inst.memberIds.has(owner)).toBe(false);
+    expect(inst.memberIds.has(ownerAgain)).toBe(true);
+    expect(inst.vault?.ownerPid).toBe(ownerAgain);
+    expect(inst.memberIds.size).toBe(2);
+    expect(boss.maxHp).toBe(scaledHp);
+  });
+
   it('scales to the players who have entered, never down, capped at five', () => {
     expect(vaultHeadCountFor(1, 1)).toBe(1);
     expect(vaultHeadCountFor(1, 2)).toBe(2);

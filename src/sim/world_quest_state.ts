@@ -13,7 +13,12 @@ import {
   sanitizeFactionReputation,
 } from './factions';
 import type { PlayerMeta } from './sim';
-import { sanitizeTreasureMap, sanitizeVaultGuestPayouts } from './treasure_vault';
+import {
+  sanitizeTreasureMap,
+  sanitizeVaultAttempt,
+  sanitizeVaultGuestPayouts,
+  type VaultAttempt,
+} from './treasure_vault';
 import type { Entity, WorldQuestDef, WorldQuestProgress } from './types';
 import { WORLD_BOSSES } from './world_boss';
 import { sanitizeWorldQuestReplacements } from './world_quest_reroll';
@@ -61,6 +66,10 @@ export interface WorldQuestPlayerState {
    * (the owner's own vaults never count). Cycle-independent like the hunt.
    */
   treasureMap: TreasureMapProgress | null;
+  vaultAttempt: VaultAttempt | null;
+  vaultAttemptSeq: number;
+  /** This process has persisted the dug map; not serialized. */
+  vaultAttemptDurable: boolean;
   vaultGuestCycle: string;
   vaultGuestPayouts: number;
 }
@@ -85,6 +94,9 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     clueScrollCycle: '',
     clueCasketsOpened: 0,
     treasureMap: null,
+    vaultAttempt: null,
+    vaultAttemptSeq: 0,
+    vaultAttemptDurable: true,
     vaultGuestCycle: '',
     vaultGuestPayouts: 0,
   };
@@ -137,6 +149,14 @@ export function restoreWorldQuestState(
   meta.clueScrollCycle = sanitizeWorldQuestCycle(saved?.clueScrollCycle);
   meta.clueCasketsOpened = sanitizeClueCasketsOpened(saved?.clueCasketsOpened);
   meta.treasureMap = sanitizeTreasureMap(saved?.treasureMap);
+  meta.vaultAttempt = sanitizeVaultAttempt(saved?.vaultAttempt, meta.characterId);
+  meta.vaultAttemptSeq = Math.max(
+    meta.vaultAttempt ? Number(meta.vaultAttempt.id.split(':')[1]) : 0,
+    typeof saved?.vaultAttemptSeq === 'number' && Number.isSafeInteger(saved.vaultAttemptSeq)
+      ? Math.max(0, saved.vaultAttemptSeq)
+      : 0,
+  );
+  meta.vaultAttemptDurable = true;
   meta.vaultGuestCycle = sanitizeWorldQuestCycle(saved?.vaultGuestCycle);
   meta.vaultGuestPayouts = sanitizeVaultGuestPayouts(saved?.vaultGuestPayouts);
   if (saved) {
@@ -176,6 +196,8 @@ export function savedWorldQuestState(meta: PlayerMeta): {
   const hasClueCycle = typeof meta.clueScrollCycle === 'string' && meta.clueScrollCycle !== '';
   const hasCaskets = (meta.clueCasketsOpened ?? 0) > 0;
   const hasTreasureMap = meta.treasureMap !== null && meta.treasureMap !== undefined;
+  const hasVaultAttempt = meta.vaultAttempt !== null && meta.vaultAttempt !== undefined;
+  const hasVaultAttemptSeq = meta.vaultAttemptSeq > 0;
   const hasVaultGuest = (meta.vaultGuestPayouts ?? 0) > 0 && !!meta.vaultGuestCycle;
   if (
     !meta.worldQuestCycle &&
@@ -187,6 +209,8 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     !hasClueCycle &&
     !hasCaskets &&
     !hasTreasureMap &&
+    !hasVaultAttempt &&
+    !hasVaultAttemptSeq &&
     !hasVaultGuest
   ) {
     return {};
@@ -237,6 +261,8 @@ export function savedWorldQuestState(meta: PlayerMeta): {
       ...(hasClueCycle ? { clueScrollCycle: meta.clueScrollCycle } : {}),
       ...(hasCaskets ? { clueCasketsOpened: meta.clueCasketsOpened } : {}),
       ...(hasTreasureMap && meta.treasureMap ? { treasureMap: { ...meta.treasureMap } } : {}),
+      ...(hasVaultAttempt && meta.vaultAttempt ? { vaultAttempt: { ...meta.vaultAttempt } } : {}),
+      ...(hasVaultAttemptSeq ? { vaultAttemptSeq: meta.vaultAttemptSeq } : {}),
       ...(hasVaultGuest
         ? { vaultGuestCycle: meta.vaultGuestCycle, vaultGuestPayouts: meta.vaultGuestPayouts }
         : {}),

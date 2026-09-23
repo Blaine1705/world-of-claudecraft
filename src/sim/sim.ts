@@ -10662,7 +10662,6 @@ export class Sim {
   hasCustodyParcel(custodyRef: string): boolean {
     return this.postOffice.hasCustodyParcel(custodyRef);
   }
-
   mailUnreadFor(pid: number): number {
     return this.postOffice.mailUnreadFor(pid);
   }

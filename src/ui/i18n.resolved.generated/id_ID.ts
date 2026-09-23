@@ -5968,7 +5968,8 @@ export const id_ID: EnTranslations = {
       "taken_over": "Karakter Anda telah diambil alih oleh sesi lain.",
       "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
       "invalid_appearance": "Tampilan itu tidak dapat disimpan. Sesuaikan desainnya, lalu coba lagi.",
-      "reroll_unavailable": "Karakter ini tidak memiliki desain ulang gratis yang tersedia."
+      "reroll_unavailable": "Karakter ini tidak memiliki desain ulang gratis yang tersedia.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Akun ini ditangguhkan hingga {date}.",
@@ -9469,6 +9470,7 @@ export const id_ID: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "Sebuah rift peringkat {tier} terkoyak terbuka di {zone}!",
       "portalSealed": "Rift peringkat {tier} di {zone} telah tersegel.",
       "portalCollapses": "Rift peringkat {tier} di {zone} runtuh.",
@@ -22326,6 +22328,11 @@ export const id_ID: EnTranslations = {
         "sender": "Perantara Bursa",
         "subject": "Daftar Bursa Anda terjual",
         "body": "Daftar Anda terjual dan pembeli telah melunasi seluruhnya. Buku besar Bursa menyimpan catatan penjualan ini, dan aktivitas Bursa Anda menampilkan jumlah yang dilunasi beserta rinciannya.\n\n- Perantara Bursa"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

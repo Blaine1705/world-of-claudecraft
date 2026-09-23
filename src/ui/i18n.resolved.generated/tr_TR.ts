@@ -5968,7 +5968,8 @@ export const tr_TR: EnTranslations = {
       "taken_over": "Karakteriniz başka bir oturum tarafından devralındı.",
       "rename_required": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.",
       "invalid_appearance": "Bu görünüm kaydedilemedi. Tasarımı düzenleyip tekrar deneyin.",
-      "reroll_unavailable": "Bu karakterin kullanılabilir bir ücretsiz yeniden tasarım hakkı yok."
+      "reroll_unavailable": "Bu karakterin kullanılabilir bir ücretsiz yeniden tasarım hakkı yok.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Bu hesap {date} tarihine kadar askıya alındı.",
@@ -9469,6 +9470,7 @@ export const tr_TR: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "{zone} bölgesinde {tier} dereceli bir Yarık açılıyor!",
       "portalSealed": "{zone} bölgesindeki {tier} dereceli Yarık mühürlendi.",
       "portalCollapses": "{zone} bölgesindeki {tier} dereceli Yarık çöküyor.",
@@ -22326,6 +22328,11 @@ export const tr_TR: EnTranslations = {
         "sender": "Borsa Komisyoncusu",
         "subject": "Borsa ilanınız satıldı",
         "body": "İlanınız satıldı ve alıcı ödemenin tamamını gerçekleştirdi. Satışın kaydı Borsa defterinde tutulur ve Borsa etkinliğiniz, ödenen tutarı ve dökümünü gösterir.\n\n- Borsa Komisyoncusu"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

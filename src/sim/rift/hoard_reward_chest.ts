@@ -40,12 +40,14 @@ export function spawnHoardRewardChest(
   participants: readonly number[],
   pos: { x: number; z: number },
   bossTemplateId?: string,
+  pendingSave = false,
 ): void {
   if (!inst.vault || inst.vault.chest) return;
   const chest = createGroundObject(ctx.nextId++, '', 'Hoard Chest', ctx.groundPos(pos.x, pos.z));
   chest.templateId = HOARD_REWARD_CHEST_TEMPLATE;
   chest.objectItemId = null;
-  chest.lootable = true;
+  chest.lootable = !pendingSave;
+  if (pendingSave) chest.respawnTimer = Number.MAX_SAFE_INTEGER;
   // Its clasp faces back down the room, toward the players walking up to it
   // (a hoard runs from its entrance at low z to the dais at high z).
   chest.facing = Math.PI;
@@ -57,8 +59,45 @@ export function spawnHoardRewardChest(
     entityId: chest.id,
     eligible: [...participants],
     claimed: [],
+    ...(pendingSave ? { pendingSave: true, claiming: [] } : {}),
     bossTemplateId,
   };
+}
+
+/** The host has durably frozen every reward claim; only now may the chest open. */
+export function confirmHoardRewardChest(ctx: SimContext, attemptId: string): boolean {
+  const inst = ctx.riftInstances.find((candidate) => candidate.vault?.attemptId === attemptId);
+  const state = inst?.vault?.chest;
+  if (!state || !state.pendingSave) return false;
+  state.pendingSave = false;
+  const chest = ctx.entities.get(state.entityId);
+  if (chest) {
+    chest.lootable = true;
+    chest.respawnTimer = 0;
+  }
+  return true;
+}
+
+/** Release a failed in-flight direct claim so the player can click again. */
+export function releaseHoardRewardClaim(ctx: SimContext, attemptId: string, pid: number): void {
+  const state = ctx.riftInstances.find((candidate) => candidate.vault?.attemptId === attemptId)
+    ?.vault?.chest;
+  if (state?.claiming) state.claiming = state.claiming.filter((candidate) => candidate !== pid);
+}
+
+/** Mark a committed direct claim in the runtime chest, without rolling again. */
+export function confirmHoardRewardClaim(ctx: SimContext, attemptId: string, pid: number): void {
+  const state = ctx.riftInstances.find((candidate) => candidate.vault?.attemptId === attemptId)
+    ?.vault?.chest;
+  if (!state) return;
+  releaseHoardRewardClaim(ctx, attemptId, pid);
+  if (!state.claimed.includes(pid)) state.claimed.push(pid);
+  const chest = ctx.entities.get(state.entityId);
+  if (chest?.templateId === HOARD_REWARD_CHEST_TEMPLATE) {
+    chest.templateId = HOARD_REWARD_CHEST_OPEN_TEMPLATE;
+    chest.name = 'Opened Hoard Chest';
+  }
+  closeIfSpent(ctx, state);
 }
 
 function unclaimed(state: HoardRewardChestState, pid: number): boolean {
@@ -90,6 +129,19 @@ export function openHoardRewardChest(ctx: SimContext, objectId: number, pid?: nu
     ctx.error(player, 'There is nothing left to take.');
     return;
   }
+  if (state.pendingSave) return;
+  if (ctx.cfg.vaultRewardNeedsSave && inst.vault.attemptId && r.meta.characterId) {
+    if (state.claiming?.includes(player)) return;
+    if (!state.claiming) state.claiming = [];
+    state.claiming.push(player);
+    ctx.emit({
+      type: 'treasureVaultClaimRequested',
+      attemptId: inst.vault.attemptId,
+      characterId: r.meta.characterId,
+      pid: player,
+    });
+    return;
+  }
   state.claimed.push(player);
   payTreasureVault(ctx, inst.vault, [player], state.bossTemplateId);
   // The first hand on it swings the lid open for everyone in the room.
@@ -105,6 +157,7 @@ export function openHoardRewardChest(ctx: SimContext, objectId: number, pid?: nu
 export function settleHoardRewardChest(ctx: SimContext, inst: RiftInstance, pid: number): void {
   const state = inst.vault?.chest;
   if (!inst.vault || !state || !unclaimed(state, pid)) return;
+  if (ctx.cfg.vaultRewardNeedsSave && inst.vault.attemptId) return;
   state.claimed.push(pid);
   payTreasureVault(ctx, inst.vault, [pid], state.bossTemplateId);
   closeIfSpent(ctx, state);

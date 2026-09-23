@@ -10110,6 +10110,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.character.invalid_appearance':
     '해당 외형을 저장할 수 없습니다. 디자인을 조정한 뒤 다시 시도하세요.',
   'apiError.character.reroll_unavailable': '이 캐릭터는 무료 재디자인을 사용할 수 없습니다.',
+  'apiError.character.vault_mail_recovering':
+    '보물고 보상 우편을 복구하고 있습니다. 잠시 후 다시 시도해 주세요.',
   'apiError.moderation.suspended_until': '이 계정은 {date}까지 정지되었습니다.',
   'apiError.moderation.suspended': '이 계정은 정지되었습니다.',
   'apiError.moderation.banned': '이 계정은 이용 정지되었습니다.',
@@ -18016,4 +18018,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '이름을 사용하여 타운 허브로 순간이동합니다.',
   'devCommand.actions.town.label': '타운 허브',
   'devCommand.fields.town': '도시',
+  'sim.rift.hoardEntrantsFull': '이 보물 창고에는 이미 모험가 다섯 명이 입장했습니다.',
+  'entities.letters.hoard_vault_reward.sender': '까마귀 우편국',
+  'entities.letters.hoard_vault_reward.subject': '보물 창고 보상',
+  'entities.letters.hoard_vault_reward.body':
+    '보물 창고가 공략되었지만 보물 상자에서 당신의 몫을 받지 않았습니다. 획득한 물품과 동전을 까마귀가 이곳으로 배달했습니다.\n\n- 까마귀 우편국',
 };

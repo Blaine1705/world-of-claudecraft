@@ -5968,7 +5968,8 @@ export const de_DE: EnTranslations = {
       "taken_over": "Dein Charakter wurde von einer anderen Sitzung übernommen.",
       "rename_required": "Dieser Charakter muss vor dem Betreten der Welt umbenannt werden.",
       "invalid_appearance": "Dieses Aussehen konnte nicht gespeichert werden. Passe das Design an und versuche es erneut.",
-      "reroll_unavailable": "Für diesen Charakter ist keine kostenlose Umgestaltung mehr verfügbar."
+      "reroll_unavailable": "Für diesen Charakter ist keine kostenlose Umgestaltung mehr verfügbar.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Dieses Konto ist bis {date} suspendiert.",
@@ -9469,6 +9470,7 @@ export const de_DE: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "Ein Riss vom Rang {tier} reißt in {zone} auf!",
       "portalSealed": "Der Riss vom Rang {tier} in {zone} wurde versiegelt.",
       "portalCollapses": "Der Riss vom Rang {tier} in {zone} bricht zusammen.",
@@ -22326,6 +22328,11 @@ export const de_DE: EnTranslations = {
         "sender": "Der Börsenmakler",
         "subject": "Euer Angebot an der Börse wurde verkauft",
         "body": "Euer Angebot wurde verkauft, und der Käufer hat vollständig bezahlt. Das Hauptbuch der Börse führt den Eintrag über den Verkauf, und Eure Börsenaktivität zeigt den abgerechneten Betrag samt Aufschlüsselung.\n\n- Der Börsenmakler"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

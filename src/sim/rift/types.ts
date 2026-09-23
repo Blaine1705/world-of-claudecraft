@@ -10,7 +10,8 @@
 import type { TreasureMapRarity } from '../content/treasure_maps';
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
 import type { LockSession } from '../lockpick';
-import type { DelveHazardZone, RiftTier } from '../types';
+import type { DelveHazardZone, PlayerClass, RiftTier } from '../types';
+import type { HoardReward } from './hoard_reward_roll';
 import type { VaultZoneId } from './vault_seed';
 
 export type RiftEventStatus = 'open' | 'active' | 'cleared' | 'collapsed';
@@ -335,7 +336,17 @@ export interface RiftInstance {
    *  every ordinary rift. */
   vault: {
     rarity: TreasureMapRarity;
+    /** Stable consumed-map attempt identity, absent on dev portals. */
+    attemptId?: string;
     ownerPid: number;
+    /** Stable identity used to rebind the owner after a reconnect. */
+    ownerCharacterId?: number;
+    /** Runtime pid -> durable character id for entrants with saved characters. */
+    memberCharacterIds?: Map<number, number>;
+    /** Character-keyed reward inputs survive a member's disconnect. */
+    entrantSnapshots?: Map<number, HoardEntrantSnapshot>;
+    /** Rolled once at victory, then persisted before the online chest unlocks. */
+    rewardClaims?: Map<number, HoardReward>;
     headCount: number;
     /** The owner's level on entry: the hoard's mobs never exceed it. */
     level: number;
@@ -541,6 +552,20 @@ export interface HoardRewardChestState {
   /** Frozen at the kill: the entrants this run pays. */
   eligible: number[];
   claimed: number[];
+  /** Online chests remain sealed until the outcome and claims commit. */
+  pendingSave?: boolean;
+  /** At most one DB claim attempt per entrant is live at once. */
+  claiming?: number[];
   /** The boss that fell: its template picks the hoard's own loot table. */
   bossTemplateId?: string;
+}
+
+export interface HoardEntrantSnapshot {
+  characterId: number;
+  name: string;
+  cls: PlayerClass;
+  level: number;
+  mountOwned: boolean;
+  guestCapped: boolean;
+  guestCycle: string;
 }

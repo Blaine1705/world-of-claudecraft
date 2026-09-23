@@ -16,12 +16,17 @@ import {
   vaultHealthFactor,
 } from '../src/sim/content/treasure_maps';
 import { isRiftPos } from '../src/sim/data';
-import { openHoardRewardChest } from '../src/sim/rift/hoard_reward_chest';
+import {
+  clearHoardRewardChest,
+  confirmHoardRewardChest,
+  openHoardRewardChest,
+} from '../src/sim/rift/hoard_reward_chest';
 import { RIFT_RANK_BASE_LEVEL, riftRankTuningFor } from '../src/sim/rift/ranks';
 import { riftFloorCount } from '../src/sim/rift/rift_gen';
+import { leaveRift } from '../src/sim/rift/runs';
 import { vaultSeedOpen, vaultSeedTier, vaultSeedZone } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
-import { vaultScaledTuning } from '../src/sim/treasure_vault';
+import { confirmVaultAttemptDurable, vaultScaledTuning } from '../src/sim/treasure_vault';
 import type { SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
@@ -98,6 +103,28 @@ describe('reading a treasure map', () => {
 });
 
 describe('digging on the X', () => {
+  it('keeps an online vault sealed until the consumed map is durably saved', () => {
+    const sim = new Sim({
+      seed: 4242,
+      playerClass: 'warrior',
+      autoEquip: false,
+      devCommands: true,
+    });
+    sim.cfg.vaultOpenNeedsSave = true;
+    sim.chat('/dev level 20', sim.player.id);
+    sim.meta(sim.playerId)!.characterId = 8101;
+    const { map } = readAndDig(sim, 'rare');
+    const portal = [...sim.entities.values()].find((e) => e.vaultAttemptId === '8101:1');
+    if (!portal) throw new Error('pending portal missing');
+    expect(portal.vaultOpenPending).toBe(true);
+    sim.enterRift(map.seed, portal.riftBaseLevel!, sim.playerId, undefined, portal);
+    expect(sim.riftInstances.some((inst) => inst.partyKey !== null)).toBe(false);
+    expect(confirmVaultAttemptDurable(sim.ctx, sim.playerId, '8101:1')).toBe(true);
+    expect(portal.vaultOpenPending).toBe(false);
+    sim.enterRift(map.seed, portal.riftBaseLevel!, sim.playerId, undefined, portal);
+    expect(sim.riftInstances.some((inst) => inst.partyKey !== null)).toBe(true);
+  });
+
   it('spends the map and opens a private vault portal at the rarity rank', () => {
     const sim = makeSim();
     const { map, evs } = readAndDig(sim, 'epic');
@@ -133,6 +160,22 @@ describe('digging on the X', () => {
     for (let i = 0; i < 80; i++) sim.tick();
     expect(sim.entities.has(portal.id)).toBe(false);
   });
+
+  it('opens the same paid-for attempt again at its site after the portal expires', () => {
+    const sim = makeSim();
+    const { map, site } = readAndDig(sim, 'common');
+    const portal = [...sim.entities.values()].find((e) => e.vaultAttemptId === '0:1')!;
+    portal.vaultExpiresAt = sim.time + 1;
+    placeAt(sim, site.x + 60, site.z);
+    for (let i = 0; i < 80; i++) sim.tick();
+    expect(sim.entities.has(portal.id)).toBe(false);
+    placeAt(sim, site.x + 2, site.z - 2);
+    for (let i = 0; i < 25; i++) sim.tick();
+    const retry = [...sim.entities.values()].find((e) => e.vaultAttemptId === '0:1');
+    expect(retry?.id).not.toBe(portal.id);
+    expect(retry?.riftSeed).toBe(map.seed);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.common)).toBe(0);
+  });
 });
 
 describe('the vault run', () => {
@@ -148,12 +191,165 @@ describe('the vault run', () => {
     return sim.riftInstances.find((i) => i.partyKey !== null)!;
   }
 
+  it('keeps the owner eligible when a guest defeats the boss after the owner exits', () => {
+    const sim = makeSim();
+    const owner = sim.playerId;
+    readAndDig(sim, 'common');
+    const portal = [...sim.entities.values()].find((e) => e.vaultOwnerPid === owner)!;
+    const guest = sim.addPlayer('warrior', 'Guest');
+    sim.setPlayerLevel(20, guest);
+    sim.partyInvite(guest, owner);
+    sim.partyAccept(guest);
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, owner, undefined, portal);
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, guest, undefined, portal);
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    const ownerMeta = sim.meta(owner)!;
+    const copperBefore = ownerMeta.copper;
+    leaveRift(sim.ctx, owner);
+    for (const id of inst.mobIds) {
+      const mob = sim.entities.get(id);
+      if (mob) {
+        mob.hp = 0;
+        mob.dead = true;
+      }
+    }
+    for (let i = 0; i < 45; i++) sim.tick();
+    expect(inst.outcome).toBe('won');
+    expect(inst.vault?.chest?.eligible).toContain(owner);
+    expect(inst.vault?.chest?.eligible).toContain(guest);
+    clearHoardRewardChest(sim.ctx, inst);
+    expect(ownerMeta.copper).toBeGreaterThan(copperBefore);
+  });
+
+  it('freezes three rewards and seals the online chest when the owner disconnects', () => {
+    const sim = makeSim();
+    sim.cfg.vaultRewardNeedsSave = true;
+    const owner = sim.playerId;
+    sim.meta(owner)!.characterId = 701;
+    readAndDig(sim, 'common');
+    const portal = [...sim.entities.values()].find((e) => e.vaultOwnerCharacterId === 701)!;
+    const guests = [
+      sim.addPlayer('warrior', 'First', { characterId: 702 }),
+      sim.addPlayer('mage', 'Second', { characterId: 703 }),
+    ];
+    for (const guest of guests) {
+      sim.setPlayerLevel(20, guest);
+      sim.partyInvite(guest, owner);
+      sim.partyAccept(guest);
+    }
+    for (const pid of [owner, ...guests])
+      sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, pid, undefined, portal);
+    const inst = sim.riftInstances.find((i) => i.vault?.attemptId === '701:1')!;
+    sim.removePlayer(owner);
+    for (const id of inst.mobIds) {
+      const mob = sim.entities.get(id);
+      if (mob) {
+        mob.hp = 0;
+        mob.dead = true;
+      }
+    }
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 45; i++) events.push(...sim.tick());
+    const pending = ofType(events, 'treasureVaultOutcomePending');
+    expect(pending).toHaveLength(1);
+    expect(pending[0].claims.map((claim) => claim.characterId).sort()).toEqual([701, 702, 703]);
+    expect(pending[0].claims.every((claim) => claim.items.length > 0)).toBe(true);
+    const chest = sim.entities.get(inst.vault!.chest!.entityId)!;
+    expect(chest.lootable).toBe(false);
+    expect(confirmHoardRewardChest(sim.ctx, '701:1')).toBe(true);
+    expect(chest.lootable).toBe(true);
+    const returningOwner = sim.addPlayer('warrior', 'OwnerReturned', { characterId: 701 });
+    sim.setPlayerLevel(20, returningOwner);
+    const before = sim.riftInstances.filter((run) => run.partyKey !== null).length;
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, returningOwner, undefined, portal);
+    expect(sim.riftInstances.filter((run) => run.partyKey !== null)).toHaveLength(before);
+    expect(inst.memberIds.has(returningOwner)).toBe(true);
+    expect(inst.vault?.chest?.eligible).toContain(returningOwner);
+    expect(inst.outcome).toBe('won');
+  });
+
+  it('keeps the original party authorized and pays the owner if they disconnect before anyone enters', () => {
+    const sim = makeSim();
+    sim.cfg.vaultRewardNeedsSave = true;
+    const owner = sim.playerId;
+    sim.meta(owner)!.characterId = 711;
+    const guest = sim.addPlayer('mage', 'Guest', { characterId: 712 });
+    const late = sim.addPlayer('warrior', 'Late', { characterId: 713 });
+    sim.setPlayerLevel(20, guest);
+    sim.setPlayerLevel(20, late);
+    sim.partyInvite(guest, owner);
+    sim.partyAccept(guest);
+    sim.partyInvite(late, owner);
+    sim.partyAccept(late);
+    readAndDig(sim, 'common');
+    const portal = [...sim.entities.values()].find((e) => e.vaultOwnerCharacterId === 711)!;
+    expect(portal.vaultInitialPartyCharacterIds).toEqual([711, 712, 713]);
+    sim.removePlayer(owner);
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, guest, undefined, portal);
+    const inst = sim.riftInstances.find((run) => run.vault?.attemptId === '711:1')!;
+    expect(inst.memberIds.has(guest)).toBe(true);
+    for (const id of inst.mobIds) {
+      const mob = sim.entities.get(id);
+      if (mob) {
+        mob.hp = 0;
+        mob.dead = true;
+      }
+    }
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 45; i++) events.push(...sim.tick());
+    const pending = ofType(events, 'treasureVaultOutcomePending');
+    expect(pending).toHaveLength(1);
+    expect(pending[0].claims.map((claim) => claim.characterId).sort()).toEqual([711, 712]);
+    expect(confirmHoardRewardChest(sim.ctx, '711:1')).toBe(true);
+    const before = sim.riftInstances.filter((run) => run.partyKey !== null).length;
+    const returningOwner = sim.addPlayer('warrior', 'OwnerReturned', { characterId: 711 });
+    sim.setPlayerLevel(20, returningOwner);
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, returningOwner, undefined, portal);
+    expect(inst.memberIds.has(returningOwner)).toBe(true);
+    expect(inst.vault?.chest?.eligible).toContain(returningOwner);
+    expect(sim.entities.get(inst.vault!.chest!.entityId)?.lootable).toBe(true);
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, late, undefined, portal);
+    expect(inst.memberIds.has(late)).toBe(false);
+    expect(sim.riftInstances.filter((run) => run.partyKey !== null)).toHaveLength(before);
+  });
+
+  it('does not admit a sixth distinct claimant after a five-person party rotates', () => {
+    const sim = makeSim();
+    sim.meta(sim.playerId)!.characterId = 801;
+    const guests = [802, 803, 804, 805].map((characterId) => {
+      const pid = sim.addPlayer('warrior', `Guest${characterId}`, { characterId });
+      sim.setPlayerLevel(20, pid);
+      sim.partyInvite(pid, sim.playerId);
+      sim.partyAccept(pid);
+      return pid;
+    });
+    readAndDig(sim, 'common');
+    const portal = [...sim.entities.values()].find((e) => e.vaultOwnerCharacterId === 801)!;
+    for (const pid of [sim.playerId, ...guests])
+      sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, pid, undefined, portal);
+    const inst = sim.riftInstances.find((run) => run.vault?.attemptId === '801:1')!;
+    expect(inst.vault?.entrantSnapshots?.size).toBe(5);
+    sim.partyKick(guests[0], sim.playerId);
+    const replacement = sim.addPlayer('mage', 'Replacement', { characterId: 806 });
+    sim.setPlayerLevel(20, replacement);
+    sim.partyInvite(replacement, sim.playerId);
+    sim.partyAccept(replacement);
+    sim.drainEvents();
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, replacement, undefined, portal);
+    expect(inst.memberIds.has(replacement)).toBe(false);
+    expect(inst.vault?.entrantSnapshots?.size).toBe(5);
+    expect(
+      ofType(sim.drainEvents(), 'error').some((event) => event.text.includes('five adventurers')),
+    ).toBe(true);
+  });
+
   it('flags the run, scales the mobs for a solo reader and pays the table on the boss kill', () => {
     const sim = makeSim();
     readAndDig(sim, 'common');
     const inst = enterVault(sim);
     expect(inst.vault).toEqual({
       rarity: 'common',
+      attemptId: '0:1',
       ownerPid: sim.playerId,
       headCount: 1,
       level: sim.player.level,
@@ -313,6 +509,36 @@ describe("redrawing a map with Cartographer's Ink", () => {
 });
 
 describe('the character save', () => {
+  it('restores a dug but uncleared vault after a restart without another map', () => {
+    const sim = makeSim();
+    metaOf(sim).characterId = 8001;
+    const { map, site } = readAndDig(sim, 'rare');
+    const state = sim.serializeCharacter(sim.playerId);
+    if (!state) throw new Error('Missing serialized character');
+    expect(state.worldQuests?.vaultAttempt).toMatchObject({
+      rarity: 'rare',
+      siteId: map.siteId,
+      seed: map.seed,
+    });
+
+    const restored = new Sim({ seed: 4242, playerClass: 'warrior', noPlayer: true });
+    const pid = restored.addPlayer('warrior', 'Digger', { state, characterId: 8001 });
+    const player = restored.entities.get(pid);
+    if (!player) throw new Error('restored player missing');
+    player.pos = {
+      x: site.x + 2,
+      y: terrainHeight(site.x + 2, site.z - 2, restored.cfg.seed),
+      z: site.z - 2,
+    };
+    player.prevPos = { ...player.pos };
+    restored.rebucket(player);
+    for (let i = 0; i < 25; i++) restored.tick();
+    const portal = [...restored.entities.values()].find((e) => e.vaultAttemptId === '8001:1');
+    expect(portal?.riftSeed).toBe(map.seed);
+    expect(portal?.vaultOwnerCharacterId).toBe(8001);
+    expect(restored.countItem(TREASURE_MAP_ITEM_IDS.rare, pid)).toBe(0);
+  });
+
   it('round-trips a read map and drops junk', () => {
     const sim = makeSim();
     sim.addItem(TREASURE_MAP_ITEM_IDS.rare, 1);

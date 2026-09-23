@@ -5968,7 +5968,8 @@ export const en_CA: EnTranslations = {
       "taken_over": "Your character was taken over by another session.",
       "rename_required": "This character must be renamed before entering the world.",
       "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
-      "reroll_unavailable": "This character does not have a free redesign available."
+      "reroll_unavailable": "This character does not have a free redesign available.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "This account is suspended until {date}.",
@@ -9469,6 +9470,7 @@ export const en_CA: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "A {tier}-rank rift tears open in {zone}!",
       "portalSealed": "The {tier}-rank rift in {zone} has been sealed.",
       "portalCollapses": "The {tier}-rank rift in {zone} collapses.",
@@ -22326,6 +22328,11 @@ export const en_CA: EnTranslations = {
         "sender": "The Exchange Broker",
         "subject": "Your Exchange listing sold",
         "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

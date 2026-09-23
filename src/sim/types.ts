@@ -5761,6 +5761,24 @@ export interface Entity extends ClientMirroredEntityFields {
   // opened it (only they and their party may enter), the map's rarity, and the
   // sim time the unentered portal closes.
   vaultOwnerPid?: number;
+  /** Stable owner identity across disconnect/reconnect; runtime pid may change. */
+  vaultOwnerCharacterId?: number;
+  /** Frozen before map consumption, so an owner who disconnects before the
+   * first party entrant still has a reward claim when the boss falls. */
+  vaultOwnerRewardSnapshot?: {
+    characterId: number;
+    name: string;
+    cls: PlayerClass;
+    level: number;
+    mountOwned: boolean;
+    guestCapped: boolean;
+    guestCycle: string;
+  };
+  /** Party members already with the owner when the map was consumed remain
+   * authorized if the owner's connection drops before the first entry. */
+  vaultInitialPartyCharacterIds?: number[];
+  vaultAttemptId?: string;
+  vaultOpenPending?: boolean;
   vaultRarity?: TreasureMapRarity;
   vaultExpiresAt?: number;
   // Dev only (`/dev hoard ... goblin`, src/sim/dev/hoard_travel.ts): the hoard
@@ -6743,6 +6761,21 @@ export type SimEvent = { pid?: number } & (
   | { type: 'treasureMapRead'; rarity: TreasureMapRarity; siteId: string; fresh: boolean }
   | { type: 'treasureMapUpgraded'; rarity: TreasureMapRarity; inks: number }
   | { type: 'treasureVaultOpened'; rarity: TreasureMapRarity }
+  /** Server-only durable settlement input, never forwarded to clients. */
+  | {
+      type: 'treasureVaultOutcomePending';
+      attemptId: string;
+      ownerCharacterId: number;
+      claims: {
+        characterId: number;
+        recipientName: string;
+        items: { itemId: string; count: number }[];
+        copper: number;
+        guestCycle?: string;
+      }[];
+    }
+  /** Server-only request; the chest grants nothing until the fenced save commits. */
+  | { type: 'treasureVaultClaimRequested'; attemptId: string; characterId: number }
   | {
       type: 'treasureVaultLooted';
       rarity: TreasureMapRarity;

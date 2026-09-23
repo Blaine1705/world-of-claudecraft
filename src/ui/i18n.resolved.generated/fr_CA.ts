@@ -5968,7 +5968,8 @@ export const fr_CA: EnTranslations = {
       "taken_over": "Votre personnage a été pris en main par une autre session.",
       "rename_required": "Ce personnage doit être renommé avant d'entrer dans le monde.",
       "invalid_appearance": "Cette apparence n'a pas pu être enregistrée. Modifiez-la et réessayez.",
-      "reroll_unavailable": "Ce personnage ne dispose pas d'un remodelage gratuit."
+      "reroll_unavailable": "Ce personnage ne dispose pas d'un remodelage gratuit.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Ce compte est suspendu jusqu'au {date}.",
@@ -9469,6 +9470,7 @@ export const fr_CA: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "Une faille de rang {tier} se déchire dans {zone} !",
       "portalSealed": "La faille de rang {tier} dans {zone} a été scellée.",
       "portalCollapses": "La faille de rang {tier} dans {zone} s'effondre.",
@@ -22326,6 +22328,11 @@ export const fr_CA: EnTranslations = {
         "sender": "Le Courtier de la Bourse",
         "subject": "Votre annonce à la Bourse s'est vendue",
         "body": "Votre annonce s'est vendue et l'acheteur a réglé l'intégralité de la somme. Le grand livre de la Bourse conserve la trace de la vente, et votre activité sur la Bourse indique le montant réglé ainsi que son détail.\n\n- Le Courtier de la Bourse"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

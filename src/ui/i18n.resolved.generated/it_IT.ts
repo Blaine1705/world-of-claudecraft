@@ -5968,7 +5968,8 @@ export const it_IT: EnTranslations = {
       "taken_over": "Il tuo personaggio è stato preso in controllo da un'altra sessione.",
       "rename_required": "Questo personaggio deve essere rinominato prima di entrare nel mondo.",
       "invalid_appearance": "Non è stato possibile salvare questo aspetto. Modifica il design e riprova.",
-      "reroll_unavailable": "Questo personaggio non ha un ridisegno gratuito disponibile."
+      "reroll_unavailable": "Questo personaggio non ha un ridisegno gratuito disponibile.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Questo account è sospeso fino al {date}.",
@@ -9469,6 +9470,7 @@ export const it_IT: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "Uno squarcio di rango {tier} si apre in {zone}!",
       "portalSealed": "Lo squarcio di rango {tier} in {zone} è stato sigillato.",
       "portalCollapses": "Lo squarcio di rango {tier} in {zone} collassa.",
@@ -22326,6 +22328,11 @@ export const it_IT: EnTranslations = {
         "sender": "Il Sensale della Borsa",
         "subject": "La tua inserzione sulla Borsa è stata venduta",
         "body": "La tua inserzione è stata venduta e l'acquirente ha saldato per intero. Il registro della Borsa conserva la traccia della vendita, e la tua attività sulla Borsa mostra l'importo saldato e la sua ripartizione.\n\n- Il Sensale della Borsa"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

@@ -5968,7 +5968,8 @@ export const ko_KR: EnTranslations = {
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
       "invalid_appearance": "해당 외형을 저장할 수 없습니다. 디자인을 조정한 뒤 다시 시도하세요.",
-      "reroll_unavailable": "이 캐릭터는 무료 재디자인을 사용할 수 없습니다."
+      "reroll_unavailable": "이 캐릭터는 무료 재디자인을 사용할 수 없습니다.",
+      "vault_mail_recovering": "보물고 보상 우편을 복구하고 있습니다. 잠시 후 다시 시도해 주세요."
     },
     "moderation": {
       "suspended_until": "이 계정은 {date}까지 정지되었습니다.",
@@ -9469,6 +9470,7 @@ export const ko_KR: EnTranslations = {
       "hoardExitOpens": "보물은 당신의 것입니다. 입구로 돌아가 밖으로 올라가세요.",
       "hoardStepBack": "보물 입구를 통해 지상으로 올라왔습니다.",
       "hoardNotYours": "이 보물은 다른 파티가 파낸 것입니다.",
+      "hoardEntrantsFull": "이 보물 창고에는 이미 모험가 다섯 명이 입장했습니다.",
       "portalOpens": "{zone}에 {tier}등급 균열이 찢어져 열렸습니다!",
       "portalSealed": "{zone}의 {tier}등급 균열이 봉인되었습니다.",
       "portalCollapses": "{zone}의 {tier}등급 균열이 무너졌습니다.",
@@ -22326,6 +22328,11 @@ export const ko_KR: EnTranslations = {
         "sender": "거래소 중개인",
         "subject": "거래소 등록 물품이 판매되었습니다",
         "body": "등록하신 물품이 판매되었고 구매자가 대금을 전액 치렀습니다. 거래소 수수료를 제한 판매 대금은 정산 트랜잭션 안에서 곧바로 연동된 지갑으로 전송되었습니다. 거래소는 당신의 돈을 결코 보관하지 않습니다.\n\n이 거래의 기록은 거래소 장부에 남습니다.\n\n- 거래소 중개인"
+      },
+      "hoard_vault_reward": {
+        "sender": "까마귀 우편국",
+        "subject": "보물 창고 보상",
+        "body": "보물 창고가 공략되었지만 보물 상자에서 당신의 몫을 받지 않았습니다. 획득한 물품과 동전을 까마귀가 이곳으로 배달했습니다.\n\n- 까마귀 우편국"
       }
     },
     "itemSets": {

@@ -5968,7 +5968,8 @@ export const cs_CZ: EnTranslations = {
       "taken_over": "Tvoje postava byla převzata jinou relací.",
       "rename_required": "Tato postava musí být před vstupem do světa přejmenována.",
       "invalid_appearance": "Tento vzhled se nepodařilo uložit. Uprav návrh a zkus to znovu.",
-      "reroll_unavailable": "Tato postava nemá k dispozici žádnou volnou změnu vzhledu."
+      "reroll_unavailable": "Tato postava nemá k dispozici žádnou volnou změnu vzhledu.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "Tento účet je pozastavený do {date}.",
@@ -9469,6 +9470,7 @@ export const cs_CZ: EnTranslations = {
       "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
       "hoardStepBack": "You climb back out through the hoard entrance.",
       "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "Trhlina stupně {tier} se protrhává v {zone}!",
       "portalSealed": "Trhlina stupně {tier} v {zone} byla zapečetěna.",
       "portalCollapses": "Trhlina stupně {tier} v {zone} se hroutí.",
@@ -22326,6 +22328,11 @@ export const cs_CZ: EnTranslations = {
         "sender": "Burzovní makléř",
         "subject": "Tvá nabídka na Burze se prodala",
         "body": "Tvá nabídka se prodala a kupující platbu vyrovnal v plné výši. Kniha Burzy nese záznam o prodeji a tvá aktivita na Burze ukazuje vyrovnanou částku i její rozpis.\n\n- Burzovní makléř"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

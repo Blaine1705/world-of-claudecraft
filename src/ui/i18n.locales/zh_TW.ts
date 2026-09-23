@@ -9692,6 +9692,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.character.rename_required': '此角色必須先更名才能進入世界。',
   'apiError.character.invalid_appearance': '無法儲存該外觀。請調整設計後再試一次。',
   'apiError.character.reroll_unavailable': '此角色沒有可用的免費重新設計。',
+  'apiError.character.vault_mail_recovering': '寶庫獎勵郵件正在恢復中。請稍後再試。',
   'apiError.moderation.suspended_until': '此帳號停權至 {date}。',
   'apiError.moderation.suspended': '此帳號已被停權。',
   'apiError.moderation.banned': '此帳號已被封鎖。',
@@ -17156,4 +17157,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '按名字傳送到城鎮中心。',
   'devCommand.actions.town.label': '城鎮中心',
   'devCommand.fields.town': '鎮',
+  'sim.rift.hoardEntrantsFull': '這處寶藏已經接納了五名冒險者。',
+  'entities.letters.hoard_vault_reward.sender': '渡鴉郵局',
+  'entities.letters.hoard_vault_reward.subject': '你的寶藏獎勵',
+  'entities.letters.hoard_vault_reward.body':
+    '寶藏已被攻克，但你沒有從寶箱領取自己的那份獎勵。渡鴉已將你獲得的物品和金幣送到這裡。\n\n- 渡鴉郵局',
 };

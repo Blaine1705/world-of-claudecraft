@@ -20,9 +20,11 @@ import type { SimEvent } from '../src/sim/types';
 // of a craft the detector already observes through the craft command itself.
 // The some() guard keeps the common no-craft tick allocation-free.
 export function filterRoutableEvents(events: readonly SimEvent[]): readonly SimEvent[] {
-  return events.some((ev) => ev.type === 'vaultCraftConsume')
-    ? events.filter((ev) => ev.type !== 'vaultCraftConsume')
-    : events;
+  const serverOnly = (ev: SimEvent): boolean =>
+    ev.type === 'vaultCraftConsume' ||
+    ev.type === 'treasureVaultOutcomePending' ||
+    ev.type === 'treasureVaultClaimRequested';
+  return events.some(serverOnly) ? events.filter((ev) => !serverOnly(ev)) : events;
 }
 
 // JSON-stringify each event in a batch exactly once. The returned array is
