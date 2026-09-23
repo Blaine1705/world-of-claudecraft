@@ -2412,8 +2412,14 @@ export async function exportAccountData(
        FROM ftue_events WHERE account_id = $1 ORDER BY occurred_at`,
     [accountId],
   );
+  // The raw `roll` is deliberately NOT exported: the world rng is mulberry32
+  // (src/sim/rng.ts), whose 32-bit state is recoverable from one exact
+  // output, so handing a player their own draws at full precision would be
+  // an rng oracle (the account_export_state.ts farm-plot roll strip is the
+  // same rule). The verdict, the chance and the rank walked are the player's
+  // record; the draw itself is the operator's evidence.
   const craftRollEvents = await pool.query(
-    `SELECT character_id, kind, recipe_id, item_id, roll, chance, success,
+    `SELECT character_id, kind, recipe_id, item_id, chance, success,
             rank_before, rank_after, rolled_at
        FROM craft_roll_events WHERE account_id = $1 ORDER BY rolled_at, id`,
     [accountId],

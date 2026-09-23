@@ -1075,8 +1075,12 @@ export function resolveCraftForRecipe(
   // an apex def) reports the one proc draw above against its EFFECTIVE
   // chance, 0 when the effect gate (ceiling, ladder bound, worse Jack
   // variance) shut the effect off regardless of the roll. Emitted from the
-  // same values the two gates just read, so `success === roll < chance` holds
-  // by construction; draws nothing, moves no draw.
+  // same values the two gates just read, so `success === roll < chance`
+  // holds: the one gate term the apex arm lacks (the Jack 'worse' term) is
+  // covered by the ceiling term on every reachable path (a Jack's ceiling is
+  // rare, every apex def bumps to legendary; pinned in tests/perfecting.test.ts),
+  // which is also why perfectingHeadStart omits it. Draws nothing, moves no
+  // draw.
   if (meta && (bonusStats !== null || def?.masterwrought === true)) {
     const effectGateOpen =
       jackVariance !== 'worse' && bumped !== null && bumped.tier <= ceilingTier;

@@ -108,8 +108,9 @@ describe('Perfecting attempts emit one craftRoll audit record per resolved roll'
     const ranks: Array<[number, number]> = [];
     for (let i = 0; i < PERFECTING_RANKS; i++) {
       sim.perfectItemAs(pid, bagRefOf(meta, APEX_NECK));
-      const [ev] = craftRollsOf(sim);
-      ranks.push([ev.rankBefore as number, ev.rankAfter as number]);
+      const rolls = craftRollsOf(sim);
+      expect(rolls, 'exactly one record per attempt').toHaveLength(1);
+      ranks.push([rolls[0].rankBefore as number, rolls[0].rankAfter as number]);
     }
     expect(ranks).toEqual([
       [0, 1],
@@ -200,6 +201,50 @@ describe('masterwork proc draws emit one craftRoll audit record per eligible cra
     expect(ev).toMatchObject({ kind: 'masterwork', roll: 0.999, success: false });
     expect(ev.chance).toBeGreaterThan(0);
     expect(ev.success).toBe(ev.roll < ev.chance);
+  });
+
+  it('a non-apex craft that bakes a bonus record (the quality-bump proc) records its roll too', () => {
+    // The bonusStats arm of the emit guard, distinct from the apex arm above:
+    // dropping it would silently stop recording every ordinary masterwork.
+    const sim = new Sim({ seed: 53, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid) as PlayerMeta;
+    for (let i = 0; i < 3; i++) sim.addItem('linen_scrap', 1, pid);
+    sim.addItem('spider_leg', 1, pid);
+    sim.addItem('homespun_cloth', 3, pid);
+    sim.addItem('spool_of_thread', 5, pid);
+    sim.drainEvents();
+    const draws = forceRoll(sim, 0);
+    runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
+    expect(draws()).toBe(1);
+    const rolls = craftRollsOf(sim);
+    expect(rolls).toHaveLength(1);
+    expect(rolls[0]).toMatchObject({
+      kind: 'masterwork',
+      recipeId: 'recipe_eastbrook_ritual_vestments',
+      itemId: 'eastbrook_ritual_vestments',
+      roll: 0,
+      success: true,
+      pid,
+    });
+    expect(rolls[0].chance).toBeGreaterThan(0);
+    const slot = meta.inventory.find((s) => s.itemId === 'eastbrook_ritual_vestments');
+    expect(slot?.instance?.rolled?.masterwork, 'the record and the piece agree').toBe(true);
+  });
+
+  it('a craft whose output can never proc (a statless consumable) records nothing', () => {
+    const sim = new Sim({ seed: 54, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid) as PlayerMeta;
+    sim.addItem('linen_scrap', 1, pid);
+    sim.addItem('spider_leg', 1, pid);
+    sim.addItem('silverleaf_herb', 2, pid);
+    sim.drainEvents();
+    const draws = forceRoll(sim, 0);
+    runCraft(sim, 'recipe_minor_healing_potion', false, pid);
+    expect(meta.lastCraftResult?.ok, 'the craft itself succeeded').toBe(true);
+    expect(draws(), 'the proc draw is unconditional on the success path').toBe(1);
+    expect(craftRollsOf(sim)).toEqual([]);
   });
 
   it('an effect-gated craft (under the rare ceiling) records chance 0 and success false', () => {
