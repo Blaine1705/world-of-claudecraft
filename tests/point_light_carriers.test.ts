@@ -367,7 +367,9 @@ describe('a one-shot scene without carriers', () => {
 // marked on adoption and on every rank rebuild), `viewLights` (marked when an
 // entity view is reconciled, or when an fx or a placed GLB registers), and the
 // pulses. A new producer is a light three would gather in its traversal slot,
-// after a black carrier the lit programs have already stopped at.
+// after a black carrier the lit programs have already stopped at. This scan
+// sees constructors only: a glTF punctual light is built inside three's loader,
+// which tests/glb_punctual_lights.test.ts covers for every shipped GLB.
 const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   'render/battleground.ts':
     'field lights, born hidden, handed to the fireLights registry through the battleground host',
