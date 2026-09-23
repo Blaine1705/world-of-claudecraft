@@ -1758,7 +1758,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the castle pad chain and the Last Spring bank left with the castle (keep_site.ts holds the new pad). Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    ceiling: 5216,
+    // LOWERED 5216 -> 5194: the Gardenwalk west pass moved to its Thornpeak
+    // sibling leaf thornpeak_walk_grades.ts, paying for the hillside pocket
+    // grade's region-gated call beside it. Exact count, zero slack.
+    ceiling: 5194,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
