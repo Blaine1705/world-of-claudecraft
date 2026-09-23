@@ -858,29 +858,4 @@ export const table: DeedLocaleTable = {
 
     name: '传奇缔造者',
   },
-  hid_dev_tinkerer: {
-    desc: '向游戏的开源仓库合并了一个拉取请求。',
-    name: '源码修补匠',
-    title: '修补匠',
-  },
-  hid_dev_artificer: {
-    desc: '向游戏的开源仓库合并了 5 个拉取请求。',
-    name: '源码工巧师',
-    title: '工巧师',
-  },
-  hid_dev_runesmith: {
-    desc: '向游戏的开源仓库合并了 15 个拉取请求。',
-    name: '源码符文匠',
-    title: '符文匠',
-  },
-  hid_dev_architect: {
-    desc: '向游戏的开源仓库合并了 30 个拉取请求。',
-    name: '源码架构师',
-    title: '架构师',
-  },
-  hid_dev_worldwright: {
-    desc: '向游戏的开源仓库合并了 70 个拉取请求。',
-    name: '源码世界铸造者',
-    title: '世界铸造者',
-  },
 };

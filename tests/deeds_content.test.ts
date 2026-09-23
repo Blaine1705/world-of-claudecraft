@@ -93,7 +93,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 305 deeds worth 3310 total Renown', () => {
+  it('ships exactly 300 deeds worth 3310 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -138,11 +138,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // MEASURED on the merged tree, which is the value that wins per this
     // file's own convention: the id COUNT stays 300 (a pure append), only the
     // Renown SUM moves.
-    //
-    // The developer-badge title deeds (hid_dev_*, one per contributor rung,
-    // src/sim/dev_badge_deeds.ts) append five hidden rows at zero Renown:
-    // 305 / 3310.
-    expect(DEED_ORDER.length).toBe(305);
+    expect(DEED_ORDER.length).toBe(300);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3310);
   });
 
@@ -180,8 +176,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       social: 20,
       exploration: 11,
       feat: 3,
-      // +5 developer-badge title deeds (hid_dev_*).
-      hidden: 15,
+      hidden: 10,
     });
   });
 
@@ -374,12 +369,6 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // first here rather than appending it behind the branch's tail).
       'col_set_bramblehide',
       'hid_forgebreaker',
-      // The developer-badge rungs as titles, in rung order.
-      'hid_dev_tinkerer',
-      'hid_dev_artificer',
-      'hid_dev_runesmith',
-      'hid_dev_architect',
-      'hid_dev_worldwright',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -763,7 +752,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
   });
 
-  it('ships exactly 51 titles and 4 borders', () => {
+  it('ships exactly 46 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
@@ -773,13 +762,12 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // (phase 06) the tenth, closing the family across the whole ring,
     // prog_farming_100's Harvestmaster (the absorbed packet's D13 title
     // mandate), and the Crucible raid's flawless title (dgn_varkhul_flawless,
-    // the 2026-08-30 release/v0.41.0 sync merge) one more. The five
-    // developer-badge rungs (hid_dev_*) add one title each.
-    expect(titles.length).toBe(51);
+    // the 2026-08-30 release/v0.41.0 sync merge) one more.
+    expect(titles.length).toBe(46);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(51);
+    expect(new Set(titleTexts).size).toBe(46);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -990,10 +978,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // reproduces a prior hash); the frozen literal below is MEASURED directly
   // off the merged DEED_ORDER/DEEDS table instead. No shipped TRIGGER changed
   // on either side; only those eighteen renown values moved.
-  // Re-baselined for the developer-badge title deeds: five appended hidden,
-  // zero-Renown rows (hid_dev_*); no shipped trigger or renown changed, which
-  // the pre-append proof below reproduces against the previous literal.
-  const FROZEN_CATALOG_SHA256 = 'f1e746722b3aa3b1af2a9849fb43e01e3a46309c5bb3cb303d64d091aaa48974';
+  const FROZEN_CATALOG_SHA256 = '931a05935481f4014b21a20357f363bcaf52c4025c0d88512e2d60895b5cb2ef';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1041,19 +1026,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // merged table with the two new ids removed, folding the eighteen-value
   // retune into the new checkpoint; every append AFTER this merge is once
   // again provable the auditable way against it.
-  //
-  // The developer-badge title deeds then re-minted the usual way: the
-  // previous frozen literal (931a0593...) moved down here and the five
-  // hid_dev_* rows are the append set, so the proof is auditable again.
   const PRE_APPEND_CATALOG_SHA256 =
-    '931a05935481f4014b21a20357f363bcaf52c4025c0d88512e2d60895b5cb2ef';
-  const APPENDED_SINCE: readonly string[] = [
-    'hid_dev_tinkerer',
-    'hid_dev_artificer',
-    'hid_dev_runesmith',
-    'hid_dev_architect',
-    'hid_dev_worldwright',
-  ];
+    '516adb010bf37c91076b9a16bdf0e4dc22c72506fcb64e237468d1ee197d1358';
+  const APPENDED_SINCE: readonly string[] = ['col_set_bramblehide', 'hid_forgebreaker'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1064,8 +1039,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // Pin its two predecessors too: this is an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'col_set_bramblehide',
-      'hid_forgebreaker',
+      'dgn_varkhul_heroic',
+      'dgn_varkhul_flawless',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1282,9 +1257,8 @@ describe('table shape', () => {
     // that (appended behind the branch's rows; the flawless task is its
     // final entry). The Roots' Bramblehide set collection appends behind the
     // raid block (whose flawless task was the previous final entry).
-    // The one-time Forgebreaker quest's hidden celebration appends after it,
-    // and the five developer-badge title deeds after that.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('hid_dev_worldwright');
+    // The one-time Forgebreaker quest's hidden celebration appends after it.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('hid_forgebreaker');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

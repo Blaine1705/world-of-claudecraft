@@ -3123,9 +3123,9 @@ export class GameServer {
     if (this.clients.get(session.pid) !== session) return;
     const e = this.sim.entities.get(session.pid);
     if (!e) return;
-    // identity diff re-broadcasts the flair; the stamp also grants the rung titles
+    // identity diff re-broadcasts the flair; the stamp re-checks a worn rung title
     const meta = this.sim.meta(session.pid);
-    if (stampDevBadge(this.sim.ctx, e, meta, tier, login, mergedPrs) && tier > 0) {
+    if (stampDevBadge(e, meta, tier, login, mergedPrs) && tier > 0) {
       console.log(`[dev] ${session.name} dev tier → ${tier} (${mergedPrs} merged PRs, @${login})`);
     }
   }

@@ -1030,29 +1030,4 @@ export const table: DeedLocaleTable = {
 
     name: '伝説を生む者',
   },
-  hid_dev_tinkerer: {
-    desc: 'ゲームのオープンソースリポジトリでプルリクエストがマージされた。',
-    name: 'ソースの修繕屋',
-    title: '修繕屋',
-  },
-  hid_dev_artificer: {
-    desc: 'ゲームのオープンソースリポジトリでプルリクエストが5件マージされた。',
-    name: 'ソースの工匠',
-    title: '工匠',
-  },
-  hid_dev_runesmith: {
-    desc: 'ゲームのオープンソースリポジトリでプルリクエストが15件マージされた。',
-    name: 'ソースのルーン鍛冶',
-    title: 'ルーン鍛冶',
-  },
-  hid_dev_architect: {
-    desc: 'ゲームのオープンソースリポジトリでプルリクエストが30件マージされた。',
-    name: 'ソースの設計者',
-    title: '設計者',
-  },
-  hid_dev_worldwright: {
-    desc: 'ゲームのオープンソースリポジトリでプルリクエストが70件マージされた。',
-    name: 'ソースの世界の造り手',
-    title: '世界の造り手',
-  },
 };

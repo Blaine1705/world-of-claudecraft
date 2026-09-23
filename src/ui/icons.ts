@@ -5534,12 +5534,6 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_varkhul_flawless',
   // Hidden self-craft celebration; 512px RGBA commission brief in docs/achievements/icon-brief.md.
   'hid_forgebreaker',
-  // Developer-badge title deeds; commission crests echoing each rung's banner-shield badge.
-  'hid_dev_tinkerer',
-  'hid_dev_artificer',
-  'hid_dev_runesmith',
-  'hid_dev_architect',
-  'hid_dev_worldwright',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

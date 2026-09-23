@@ -156,98 +156,91 @@ describe('GameServer.refreshDevBadge (real DB + contributor-cache resolution)', 
     expect(sent.self.dgl).toBe('jgyy');
   });
 
-  it('unlocks every rung title at or below the resolved tier, and the picker accepts them', async () => {
-    dbMock.query.mockImplementation(githubLinksRouter('jgyy'));
-    mockMergedPrsFetch('jgyy', 15); // Runesmith (rung 3)
+  // The rung titles are NOT deeds (src/sim/dev_badge_titles.ts): wearability is
+  // the live resolved tier, checked by the one title validator and re-checked on
+  // every refresh.
+  async function joinWith(login: string | null, mergedPrs: number) {
+    dbMock.query.mockImplementation(githubLinksRouter(login));
+    mockMergedPrsFetch(login ?? 'nobody', mergedPrs);
     const server = new GameServer();
     const fc = fakeWs();
     const session = server.join(fc.ws, 1, 1, 'Devvy', 'warrior', null);
     if ('error' in session) throw new Error(session.error);
     session.blockListLoaded = true;
-
-    await (server as any).refreshDevBadge(session);
-
     const meta = server.sim.meta(session.pid)!;
     const e = server.sim.entities.get(session.pid)!;
-    expect(meta.deedsEarned.has('hid_dev_tinkerer')).toBe(true);
-    expect(meta.deedsEarned.has('hid_dev_artificer')).toBe(true);
-    expect(meta.deedsEarned.has('hid_dev_runesmith')).toBe(true);
-    expect(meta.deedsEarned.has('hid_dev_architect')).toBe(false);
-    expect(meta.deedsEarned.has('hid_dev_worldwright')).toBe(false);
-    // The ONE title validator both worlds reach takes the lower rung too...
-    setActiveTitle(meta, e, 'hid_dev_artificer');
-    expect(e.title).toBe('hid_dev_artificer');
-    setActiveTitle(meta, e, 'hid_dev_runesmith');
-    expect(e.title).toBe('hid_dev_runesmith');
-    // ...and still refuses a rung above the resolved tier.
-    setActiveTitle(meta, e, 'hid_dev_architect');
-    expect(e.title).toBe('hid_dev_runesmith');
-  });
+    return { server, session, meta, e, fc };
+  }
 
-  it('grants the rung titles on a refresh even when the flair itself did not change', async () => {
-    dbMock.query.mockImplementation(githubLinksRouter('jgyy'));
-    mockMergedPrsFetch('jgyy', 5); // Artificer (rung 2)
-    const server = new GameServer();
-    const fc = fakeWs();
-    const session = server.join(fc.ws, 1, 1, 'Devvy', 'warrior', null);
-    if ('error' in session) throw new Error(session.error);
-    session.blockListLoaded = true;
-    // A veteran whose flair was stamped before the title deeds shipped.
-    const e = server.sim.entities.get(session.pid)!;
-    e.devTier = 2;
-    e.devMergedPrs = 5;
-    e.githubLogin = 'jgyy';
+  it('the title validator offers every rung up to the resolved tier and refuses above it', async () => {
+    const { server, session, meta, e } = await joinWith('jgyy', 15); // Runesmith (rung 3)
+    // Before the tier resolves, no rung title can be picked.
+    setActiveTitle(meta, e, 'dev:tinkerer');
+    expect(e.title ?? null).toBe(null);
 
     await (server as any).refreshDevBadge(session);
 
-    const meta = server.sim.meta(session.pid)!;
-    expect(meta.deedsEarned.has('hid_dev_artificer')).toBe(true);
-    expect(meta.deedsEarned.has('hid_dev_tinkerer')).toBe(true);
+    setActiveTitle(meta, e, 'dev:artificer');
+    expect(e.title).toBe('dev:artificer');
+    expect(meta.activeTitle).toBe('dev:artificer');
+    setActiveTitle(meta, e, 'dev:runesmith');
+    expect(e.title).toBe('dev:runesmith');
+    setActiveTitle(meta, e, 'dev:architect'); // above the tier: silent no-op
+    expect(e.title).toBe('dev:runesmith');
+    setActiveTitle(meta, e, 'dev:not_a_rung');
+    expect(e.title).toBe('dev:runesmith');
+    // Nothing touched the Book of Deeds.
+    expect([...meta.deedsEarned.keys()].some((id) => id.includes('dev'))).toBe(false);
   });
 
-  it('grants no rung title to a linked non-contributor', async () => {
-    dbMock.query.mockImplementation(githubLinksRouter('newdev'));
-    mockMergedPrsFetch('someoneelse', 70);
-    const server = new GameServer();
-    const fc = fakeWs();
-    const session = server.join(fc.ws, 1, 1, 'Devvy', 'warrior', null);
-    if ('error' in session) throw new Error(session.error);
-    session.blockListLoaded = true;
+  it('keeps a restored rung title the resolved tier still reaches', async () => {
+    const { server, session, meta, e } = await joinWith('jgyy', 15);
+    // The join restore takes the persisted id as saved (the tier is unknown yet).
+    setActiveTitle(meta, e, 'dev:artificer', { restore: true });
+    expect(e.title).toBe('dev:artificer');
 
     await (server as any).refreshDevBadge(session);
 
-    const meta = server.sim.meta(session.pid)!;
-    expect([...meta.deedsEarned.keys()].filter((id) => id.startsWith('hid_dev_'))).toEqual([]);
+    expect(e.title).toBe('dev:artificer');
+    expect(meta.activeTitle).toBe('dev:artificer');
   });
 
-  it('the out-of-tick grant rides the next tick to the observer: queued for the deed index, no marquee', async () => {
-    dbMock.query.mockImplementation(githubLinksRouter('jgyy'));
-    mockMergedPrsFetch('jgyy', 15); // Runesmith (rung 3)
-    const server = new GameServer();
-    const fc = fakeWs();
-    const session = server.join(fc.ws, 1, 1, 'Devvy', 'warrior', null);
-    if ('error' in session) throw new Error(session.error);
-    session.blockListLoaded = true;
-    const marquee = vi.spyOn(server.social, 'broadcastDeedUnlock').mockResolvedValue(undefined);
-    (server as any).detectActivity(server.sim.tick()); // settle the fresh join
-    session.pendingDeedRecords.length = 0;
+  it('clears a restored rung title above the resolved tier', async () => {
+    const { server, session, meta, e } = await joinWith('jgyy', 15);
+    setActiveTitle(meta, e, 'dev:worldwright', { restore: true });
 
     await (server as any).refreshDevBadge(session);
-    // The grant happened between ticks: its events wait for the next tick.
-    const events = server.sim.tick();
-    const unlocks = events
-      .filter((ev: any) => ev.type === 'deedUnlocked' && ev.deedId.startsWith('hid_dev_'))
-      .map((ev: any) => [ev.deedId, ev.retro === true]);
-    expect(unlocks).toEqual([
-      ['hid_dev_tinkerer', true],
-      ['hid_dev_artificer', true],
-      ['hid_dev_runesmith', false],
-    ]);
-    (server as any).detectActivity(events);
-    expect(session.pendingDeedRecords).toEqual(
-      expect.arrayContaining(['hid_dev_tinkerer', 'hid_dev_artificer', 'hid_dev_runesmith']),
-    );
-    // Hidden deeds never reach the guild marquee, even the live top rung.
-    expect(marquee).not.toHaveBeenCalled();
+
+    expect(e.title ?? null).toBe(null);
+    expect(meta.activeTitle).toBe(null);
+  });
+
+  it('clears a worn rung title once the GitHub link is gone, and leaves a deed title alone', async () => {
+    const { server, session, meta, e } = await joinWith(null, 0);
+    setActiveTitle(meta, e, 'dev:tinkerer', { restore: true });
+    await (server as any).refreshDevBadge(session);
+    expect(meta.activeTitle).toBe(null);
+    expect(e.title ?? null).toBe(null);
+
+    // A deed title is never the badge refresh's business.
+    meta.activeTitle = 'prog_veteran';
+    e.title = 'prog_veteran';
+    await (server as any).refreshDevBadge(session);
+    expect(meta.activeTitle).toBe('prog_veteran');
+    expect(e.title).toBe('prog_veteran');
+  });
+
+  it('a cleared rung title reaches the owner over the self wire', async () => {
+    const { server, session, meta, e, fc } = await joinWith(null, 0);
+    setActiveTitle(meta, e, 'dev:runesmith', { restore: true });
+    (server as any).broadcastSnapshots();
+    const before = fc.sent.filter((m) => m.t === 'snap').at(-1);
+    expect(before.self.atitle).toBe('dev:runesmith');
+
+    await (server as any).refreshDevBadge(session);
+    (server as any).broadcastSnapshots();
+
+    const after = fc.sent.filter((m) => m.t === 'snap').at(-1);
+    expect(after.self.atitle).toBe(null);
   });
 });

@@ -157,13 +157,6 @@ describe('the real catalog', () => {
       'col_seven_regalia',
       'col_true_colors',
       'hid_bountiful_coffer',
-      // Developer-badge title deeds: out-of-game contributor flair, never a
-      // Renown score.
-      'hid_dev_architect',
-      'hid_dev_artificer',
-      'hid_dev_runesmith',
-      'hid_dev_tinkerer',
-      'hid_dev_worldwright',
       'hid_forgebreaker',
       'hid_roll_hundred',
     ]);

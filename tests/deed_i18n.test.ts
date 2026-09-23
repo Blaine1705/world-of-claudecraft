@@ -89,17 +89,10 @@ describe('deed_i18n English resolution', () => {
     // set collection (col_set_bramblehide, no title reward; the release's own
     // chain read 282 * 2 + 43), so the title count stays at 46.
     // Retired Vale Cup and Fiesta deeds keep names but drop 19 descriptions.
-    // The five developer-badge title deeds (hid_dev_*) add a name, a desc, and
-    // a title each: 305 * 2 - 19 + 51 = 642.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(305);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(286);
-    expect(manifest.length).toBe(642);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(51);
-    expect(manifest).toContainEqual({
-      id: 'hid_dev_artificer',
-      field: 'title',
-      source: 'Artificer',
-    });
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(300);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(281);
+    expect(manifest.length).toBe(627);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(46);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([
       { id: 'hid_forgebreaker', field: 'name', source: 'A Spring Unchained' },
       {
