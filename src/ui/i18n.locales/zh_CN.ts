@@ -13,6 +13,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.practiceRewards': '练习：可以再次游玩，但不会额外获得钱币、经验或声望。',
+  'questUi.worldQuest.replay': '再玩一次',
+  'questUi.worldQuest.glider.replay': '再次飞行',
+  'questUi.worldQuest.glider.practiceRewards':
+    '练习飞行：可以刷新用时，但不会再次获得钱币、经验或声望。',
+  'hudChrome.leaderboard.gliderPersonalRules':
+    '离线纪录随此角色保存。请按顺序穿过所有圆环。每日纪录每天重置。',
   'hudChrome.weeklyRewards.chooseTable': '选择用于抽取奖励的战利品表',
   'hudChrome.weeklyRewards.selectAllTables': '全选',
   'hudChrome.weeklyRewards.selectedTable': '已选择 {count} 个战利品表',
@@ -5308,6 +5315,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_mender.name': '唤墓者医者',
   'questUi.dialog.discussQuest': '谈论{name}。',
   'questUi.dialog.discussQuestAria': '谈论任务：{name}',
+  'questUi.dialog.clueTalk': '询问线索。',
+  'questUi.dialog.clueTalkAria': '询问线索：{name}',
+  'questUi.dialog.clueDeliver': '交出{count}个{item}。',
+  'questUi.dialog.clueDeliverAria': '交出{count}个{item}给{name}',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '三件遗物讲述着同一个故事：奥德伦为守护国王而战，马尔里克打破了死亡的界限，沃斯试图阻止随后发生的一切。封印正在减弱，废弃墓穴就是通往地下的道路。',
   'entities.items.runed_bone_shard.name': '符文骨片',
@@ -16871,7 +16882,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.wispMaze.finished': '所有钱袋都已找回！',
   'questUi.worldQuest.wispMaze.retry': '三条生命已恢复。再次挑战迷宫吧。',
   'questUi.worldQuest.wispMaze.startNormal': '进入迷宫：普通（{shadows} 个暗影）',
-  'questUi.worldQuest.wispMaze.startHard': '进入迷宫：困难（{shadows} 个暗影，额外钱袋）',
+  'questUi.worldQuest.wispMaze.startHard': '进入迷宫：困难（{shadows}个暗影）',
   'questUi.worldQuest.forge.title': '援手之锤',
   'questUi.worldQuest.forge.objective': '帮助铁匠玛拉锻造一面盾牌',
   'questUi.worldQuest.forge.ready': '与铁匠玛拉交谈以开始。',
@@ -16943,9 +16954,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.traceShape.cross': '十字符文',
   'questUi.worldQuest.puzzleBonusLevel': '奖励关卡 {level}/{total}',
   'questUi.worldQuest.puzzleBonusCharged':
-    '秘藏因奖励充能而嗡鸣：奖励关卡 {level}/{total} 正等着你。再次触碰魔网秘藏即可获得额外金币。',
-  'questUi.worldQuest.puzzleBonusPaid': '获得奖励钱袋！',
-  'questUi.worldQuest.puzzleBonusDone': '所有奖励关卡均已通关。秘藏将静候下一次机会。',
+    '练习关卡 {level}/{total} 已就绪。再次触碰地脉宝箱即可游玩，后续挑战没有额外奖励。',
+  'questUi.worldQuest.puzzleBonusPaid': '练习关卡已完成！',
+  'questUi.worldQuest.puzzleBonusDone': '所有练习关卡均已完成。触碰地脉宝箱即可再次游玩。',
   'entities.mobs.fenbridge_infiltrator.name': '借面者',
   'entities.npcs.glider_instructor.name': '飞行管理员泽菲尔',
   'entities.npcs.glider_instructor.title': '御风者教官',
@@ -17116,4 +17127,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '{name}（物品等级{itemLevel}，{requiredLevel}级可装备）',
   'questUi.worldQuest.factionLine': '阵营：{faction}',
   'questUi.worldQuest.standingReward': '{faction}声望 +{amount}',
+  'hudChrome.leaderboard.gliderCourseNames.downs': '海岸环线',
+  'hudChrome.leaderboard.gliderCourseNames.valleys': '山谷环线',
+  'hudChrome.leaderboard.gliderCourseNames.switchbacks': '山脊折返线',
+  'hudChrome.leaderboard.gliderDaily': '{course}：今日',
+  'hudChrome.leaderboard.gliderLifetime': '{course}：历史',
+  'hudChrome.leaderboard.gliderStart': '飞行此路线',
+  'hudChrome.leaderboard.gliderRankings': '滑翔路线纪录',
+  'hudChrome.leaderboard.gliderRules':
+    '完整飞行用时最短者获胜。穿过每个圆环。每日纪录随服务器重置。纪录会在30秒内更新。',
 };

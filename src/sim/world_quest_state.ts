@@ -4,8 +4,10 @@
 
 import type { CharacterState } from './character_state';
 import { type ClueHuntProgress, sanitizeClueCasketsOpened, sanitizeClueHunt } from './clue_scrolls';
+import { WORLD_QUESTS_BY_ID } from './content/world_quests';
 import type { FactionId } from './factions';
 import { freshFactionReputation, sanitizeFactionReputation } from './factions';
+import { type PersonalGliderRecords, sanitizeGliderRecords } from './glider_personal_records';
 import type { PlayerMeta } from './sim';
 import type { Entity, WeeklyQuestProgress, WorldQuestDef, WorldQuestProgress } from './types';
 import { sanitizeWeeklyQuestProgress, savedWeeklyQuestProgress } from './weekly_quests';
@@ -22,6 +24,7 @@ import {
 export { nearbyWorldQuestTraces } from './world_quest_trace_public';
 
 export interface WorldQuestPlayerState {
+  gliderRecords: PersonalGliderRecords;
   worldQuestCycle: string;
   worldQuestLog: Map<string, WorldQuestProgress>;
   /** Session-only cycle override used by focused dev commands; never persisted. */
@@ -58,6 +61,7 @@ export interface WorldQuestRotationCache {
 
 export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
   return {
+    gliderRecords: {},
     worldQuestCycle: '',
     worldQuestLog: new Map(),
     devWorldQuestCycle: null,
@@ -99,6 +103,7 @@ export function restoreWorldQuestState(
   characterFactions?: CharacterState['factions'],
   savedWeekly?: CharacterState['weeklyQuest'],
 ): void {
+  meta.gliderRecords = sanitizeGliderRecords(saved?.gliderRecords);
   meta.factions = freshFactionReputation();
   const rawFactions = characterFactions ?? saved?.factions;
   if (rawFactions) {
@@ -151,6 +156,8 @@ export function savedWorldQuestState(meta: PlayerMeta): {
   const hasClueHunt = meta.clueHunt !== null && meta.clueHunt !== undefined;
   const hasClueCycle = typeof meta.clueScrollCycle === 'string' && meta.clueScrollCycle !== '';
   const hasCaskets = (meta.clueCasketsOpened ?? 0) > 0;
+  const gliderRecords = sanitizeGliderRecords(meta.gliderRecords);
+  const hasGliderRecords = Object.keys(gliderRecords).length > 0;
   if (
     !meta.worldQuestCycle &&
     meta.worldQuestLog.size === 0 &&
@@ -158,7 +165,8 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     !hasReroll &&
     !hasClueHunt &&
     !hasClueCycle &&
-    !hasCaskets
+    !hasCaskets &&
+    !hasGliderRecords
   ) {
     return weeklyPart;
   }
@@ -166,6 +174,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
   return {
     ...weeklyPart,
     worldQuests: {
+      ...(hasGliderRecords ? { gliderRecords } : {}),
       cycle: meta.worldQuestCycle,
       progress: [...meta.worldQuestLog.values()].map(
         ({
@@ -175,10 +184,16 @@ export function savedWorldQuestState(meta: PlayerMeta): {
           investigation: _investigation,
           shadow: _shadow,
           glider: _glider,
+          practiceOnly: _practiceOnly,
+          practiceTraceScores: _practiceTraceScores,
           puzzleExpiresAt: _puzzleExpiresAt,
           ...progress
         }) => ({
           ...progress,
+          ...(_practiceOnly
+            ? { state: 'completed' as const, count: WORLD_QUESTS_BY_ID[progress.questId].count }
+            : {}),
+          ...(_glider?.practiceOnly ? { state: 'completed' as const, count: 1 } : {}),
           ...(progress.gliderResult === undefined
             ? {}
             : { gliderResult: { ...progress.gliderResult } }),
@@ -198,6 +213,9 @@ export function savedWorldQuestState(meta: PlayerMeta): {
           ...(progress.traceResult === undefined
             ? {}
             : { traceResult: { ...progress.traceResult } }),
+          ...(_practiceOnly && progress.state === 'active' && _practiceTraceScores
+            ? { traceScores: _practiceTraceScores.map((score) => ({ ...score })) }
+            : {}),
         }),
       ),
       ...(factionsObj ? { factions: factionsObj } : {}),

@@ -46,7 +46,9 @@ import { resolveWorldQuestMatch3Level } from '../src/sim/world_quest_daily_level
 import { hasWorldQuestDeliveryCargo } from '../src/sim/world_quest_delivery';
 import { applyWorldQuestMatch3Move } from '../src/sim/world_quest_match3';
 import {
+  ALWAYS_ACTIVE_WORLD_QUEST_IDS,
   WORLD_QUEST_ZONES,
+  WORLD_QUESTS_BY_ZONE,
   worldQuestPuzzleVariantForCycle,
 } from '../src/sim/world_quest_rotation';
 import { worldQuestSalvageLayout } from '../src/sim/world_quest_salvage';
@@ -379,7 +381,9 @@ describe('world quest content', () => {
       }
     }
     expect([...zoneFrequency.values()].every((count) => count >= 1)).toBe(true);
-    expect(zoneFrequency.get('eastbrook_vale')).toBe(4);
+    // Eastbrook: freight, caravan, calligraphy, shadow, plus the three round-2
+    // hunts (boars, restless bones, webwood spiders).
+    expect(zoneFrequency.get('eastbrook_vale')).toBe(7);
   });
 
   it('places both minigame activators on safe, walkable ground outside hostile aggro', () => {
@@ -712,9 +716,21 @@ describe('world quest lifecycle', () => {
       expect(nextQuests.filter((quest) => quest.zoneId === zone)).toHaveLength(count);
     }
 
-    // Every world quest across all zones is offered within the first 4 days
+    // Every world quest across all zones is offered within one cycle of the
+    // LONGEST rotation pool (a zone's pool length is its cycle: index = day mod
+    // length). Derived, not a literal, so growing a pool (the round-2 zone
+    // hunts) keeps the guard honest instead of forcing a magic-number bump;
+    // the cycle itself is pinned below so it cannot drift silently.
+    const longestPool = Math.max(
+      ...WORLD_QUEST_ZONES.map(
+        (zone) =>
+          WORLD_QUESTS_BY_ZONE[zone].filter((id) => !ALWAYS_ACTIVE_WORLD_QUEST_IDS.includes(id))
+            .length,
+      ),
+    );
+    expect(longestPool).toBe(7);
     const allRotatedIds = new Set<string>();
-    for (let day = 0; day < 4; day++) {
+    for (let day = 0; day < longestPool; day++) {
       for (const quest of activeWorldQuestsForCycle(`wq1_${day}`)) {
         allRotatedIds.add(quest.id);
       }
@@ -832,8 +848,11 @@ describe('world quest lifecycle', () => {
     const nodeType = quest.objective.nodeType;
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(quest.minLevel);
-    sim.utcDay = '2026-09-06';
-    sim.resetDay = '2026-09-06';
+    // Day 28: with the round-2 pools (lengths 2, 4 and 7) cycle 28 repeats the
+    // cycle-0 board, so the fixed-day fixtures below still land on the ore
+    // and salvage quests they were written against.
+    sim.utcDay = '2026-09-28';
+    sim.resetDay = '2026-09-28';
     sim.player.pos.x = quest.area.x;
     sim.player.pos.z = quest.area.z;
     sim.player.pos.y = terrainHeight(quest.area.x, quest.area.z, sim.cfg.seed);
@@ -1074,7 +1093,7 @@ describe('world quest lifecycle', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
     const sim = new Sim({ seed: 425, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
-    sim.resetDay = '2026-09-06';
+    sim.resetDay = '2026-09-28';
     sim.player.pos.x = quest.area.x;
     sim.player.pos.z = quest.area.z;
     sim.tick();
@@ -1104,7 +1123,7 @@ describe('world quest lifecycle', () => {
     const state = sim.serializeCharacter(sim.playerId);
     if (!state) throw new Error('Missing salvage save');
     const restored = new Sim({ seed: 425, playerClass: 'warrior', noPlayer: true });
-    restored.resetDay = '2026-09-06';
+    restored.resetDay = '2026-09-28';
     const pid = restored.addPlayer('warrior', 'Wreck Salvager', { state });
     const restoredMeta = restored.meta(pid);
     const player = restored.entities.get(pid);
@@ -1130,7 +1149,7 @@ describe('world quest lifecycle', () => {
       if (quest.objective.type !== 'salvage') throw new Error('Expected salvage fixture');
       const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
       sim.setPlayerLevel(20);
-      sim.resetDay = '2026-09-06';
+      sim.resetDay = '2026-09-28';
       sim.player.pos = sim.groundPos(320, 103);
       sim.tick();
       const state = sim.serializeCharacter(sim.playerId);
@@ -1146,7 +1165,7 @@ describe('world quest lifecycle', () => {
         },
       ];
       const restored = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
-      restored.resetDay = '2026-09-06';
+      restored.resetDay = '2026-09-28';
       const pid = restored.addPlayer('warrior', 'Wreck Salvager', { state });
       const player = restored.entities.get(pid)!;
       const progress = restored.meta(pid)?.worldQuestLog.get(quest.id);
@@ -1166,7 +1185,7 @@ describe('world quest lifecycle', () => {
       expect(progress).toMatchObject({ state: 'completed', count: 8 });
       const completed = restored.serializeCharacter(pid)!;
       const again = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
-      again.resetDay = '2026-09-06';
+      again.resetDay = '2026-09-28';
       const restoredPid = again.addPlayer('warrior', 'Wreck Salvager', { state: completed });
       expect(again.meta(restoredPid)?.worldQuestLog.get(quest.id)).toMatchObject({
         state: 'completed',
@@ -1179,7 +1198,7 @@ describe('world quest lifecycle', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
     const sim = new Sim({ seed: 426, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
-    sim.resetDay = '2026-09-06';
+    sim.resetDay = '2026-09-28';
     sim.player.pos.x = quest.area.x;
     sim.player.pos.z = quest.area.z;
     sim.tick();

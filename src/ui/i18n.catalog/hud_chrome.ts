@@ -1392,6 +1392,19 @@ export const hudChromeStrings = {
     wqMedal: 'Medal',
     wqWaves: 'Waves held',
     wqTime: 'Time',
+    gliderCourseNames: {
+      downs: 'Coastal Circuit',
+      valleys: 'Valley Circuit',
+      switchbacks: 'Ridge Switchbacks',
+    },
+    gliderDaily: '{course}: Today',
+    gliderLifetime: '{course}: All time',
+    gliderStart: 'Fly this course',
+    gliderRankings: 'Glider course records',
+    gliderPersonalRules:
+      'Your offline records, saved with this character. Pass every ring in order. Daily records reset each day.',
+    gliderRules:
+      'Fastest complete flight wins. Pass every ring. Daily records reset with the realm. Records refresh within 30 seconds.',
     wqPoints: 'Score',
     wqSeconds: '{seconds}s',
     wqNoMedal: 'None',

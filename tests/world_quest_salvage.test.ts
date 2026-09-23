@@ -72,7 +72,7 @@ describe('Farshore authored shipwreck salvage', () => {
     }
   });
 
-  it.each(['2026-09-06', '2026-09-15', '2026-10-03'])(
+  it.each(['2026-09-04', '2026-09-16', '2026-10-02'])(
     'keeps the approved layout on offer %s, including legacy variant progress',
     (resetDay) => {
       if (quest.objective.type !== 'salvage') throw new Error('Expected salvage fixture');
@@ -93,7 +93,7 @@ describe('Farshore authored shipwreck salvage', () => {
   );
 
   it('hides recovered debris per viewer and all remaining debris after completion', () => {
-    const cycle = worldQuestCycleForResetDay('2026-09-06');
+    const cycle = worldQuestCycleForResetDay('2026-09-04');
     const layout = worldQuestSalvageLayout(quest, undefined, cycle);
     const visible = salvageEntity(layout[0]);
     expect(isWorldQuestSalvageObject(visible, quest)).toBe(true);
@@ -121,7 +121,7 @@ describe('Farshore authored shipwreck salvage', () => {
 describe('Farshore salvage placement', () => {
   it('keeps the hull decorative with no pickup entity or quest credit', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
-    sim.resetDay = '2026-09-06';
+    sim.resetDay = '2026-09-04';
     sim.chat('/dev salvage');
     sim.player.pos = sim.groundPos(302.7, 117.75);
     expect(sim.entities.has(2147100100)).toBe(false);
@@ -161,7 +161,7 @@ describe('Farshore salvage placement', () => {
     'completes from eight unique pieces starting at index %i, never repeat clicks',
     (start) => {
       const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
-      sim.resetDay = '2026-09-06';
+      sim.resetDay = '2026-09-04';
       sim.chat('/dev salvage');
       const progress = sim.worldQuestLog.get(quest.id)!;
       for (let index = start; index < start + 8; index++) {
@@ -186,7 +186,7 @@ describe('Farshore salvage placement', () => {
 
   it('restores earned hull credit and completes after seven other recoveries', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
-    sim.resetDay = '2026-09-06';
+    sim.resetDay = '2026-09-04';
     sim.chat('/dev salvage');
     const state = sim.serializeCharacter(sim.playerId)!;
     state.worldQuests!.progress = [
@@ -199,7 +199,7 @@ describe('Farshore salvage placement', () => {
       },
     ];
     const restored = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
-    restored.resetDay = '2026-09-06';
+    restored.resetDay = '2026-09-04';
     const pid = restored.addPlayer('warrior', 'Salvager', { state });
     const progress = restored.meta(pid)!.worldQuestLog.get(quest.id)!;
     expect(progress.count).toBe(1);

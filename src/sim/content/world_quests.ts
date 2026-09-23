@@ -14,6 +14,7 @@ import { WORLD_QUEST_GLIDER } from './world_quest_glider';
 import { WORLD_QUEST_INVESTIGATION } from './world_quest_investigation';
 import { WORLD_QUEST_SHADOW } from './world_quest_shadow';
 import { WORLD_QUEST_WISP_MAZE } from './world_quest_wisp_maze';
+import { WORLD_QUEST_ZONE_HUNTS } from './world_quest_zone_hunts';
 
 export const WORLD_QUEST_MIN_LEVEL = 5;
 export const WORLD_QUEST_DEFAULT_MIN_LEVEL = 10;
@@ -520,9 +521,10 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_frostveil_howlers',
     zoneId: 'frostveil',
     minLevel: 17,
-    // Covers Brosk's four authored traps plus their interact reach: the west
-    // trap stands up the bank at (-116, 1756), 24 yd from this centre, so the
-    // ring reaches it with 5 yd to spare and never counts the Shiverfen pool
+    // Covers Brosk's four authored traps plus their interact reach: the traps
+    // ring the Shiverfen pool on its flat reed shelves (frostveil.ts), the
+    // farthest the north one at (-90, 1733), 25 yd from this centre, so the
+    // ring reaches every trap with 5 yd to spare and never counts the pool
     // floor as a trap site.
     area: { x: -92, z: 1758, radius: 30 },
     objective: { type: 'interact', targetObjectItemId: 'sprung_trap' },
@@ -623,6 +625,9 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     },
     count: 8,
   },
+  // The round-2 zone hunts: kill quests against each zone's existing camps
+  // (world_quest_zone_hunts.ts), so every rotation pool holds real variety.
+  ...WORLD_QUEST_ZONE_HUNTS,
   WORLD_QUEST_CALLIGRAPHY_QUEST,
   WORLD_QUEST_CANNON,
   WORLD_QUEST_LAST_KEEP_CANNON,

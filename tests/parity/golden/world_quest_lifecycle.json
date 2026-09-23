@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "a415789c",
+      "state": "3b28d21f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,6 +72,7 @@
           "equipmentInstance": {},
           "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -171,7 +172,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "05571970",
+      "state": "694fcbdb",
       "events": "8c718819",
       "rng": {
         "draws": 0,
@@ -226,6 +227,7 @@
           "equipmentInstance": {},
           "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -336,7 +338,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "a6761c16",
+      "state": "da157599",
       "events": "0bddbfcf",
       "rng": {
         "draws": 0,
@@ -391,6 +393,7 @@
           "equipmentInstance": {},
           "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -511,7 +514,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "39f7f71f",
+      "state": "b15d7a66",
       "events": "b148b641",
       "rng": {
         "draws": 0,
@@ -568,6 +571,7 @@
           "equipmentInstance": {},
           "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -679,7 +683,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "efa7d93c",
+      "state": "8d3b0603",
       "events": "2e9e090a",
       "rng": {
         "draws": 0,
@@ -741,6 +745,7 @@
             "church_order": 80
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -870,7 +875,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "74d644a3",
+      "state": "e5bc45a2",
       "events": "0de17699",
       "rng": {
         "draws": 0,
@@ -937,6 +942,7 @@
             "rift_watch": 80
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1088,8 +1094,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "bb9dcf22",
-      "events": "f061f193",
+      "state": "03444adf",
+      "events": "bf18640f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1155,6 +1161,7 @@
             "rift_watch": 80
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1202,9 +1209,9 @@
           "worldQuestCycle": "wq1_3",
           "worldQuestLog": [
             [
-              "wq_thornpeak_stormcrag",
+              "wq_thornpeak_zealots",
               {
-                "questId": "wq_thornpeak_stormcrag",
+                "questId": "wq_thornpeak_zealots",
                 "state": "active"
               }
             ]
@@ -1235,7 +1242,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 9.533061,
+          "fallStartY": 14.526649,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
@@ -1251,9 +1258,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 122,
-            "y": 9.533061,
-            "z": 778
+            "x": 56,
+            "y": 14.526649,
+            "z": 837
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -1284,7 +1291,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "bb9dcf22",
+      "state": "03444adf",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1351,6 +1358,7 @@
             "rift_watch": 80
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1398,9 +1406,9 @@
           "worldQuestCycle": "wq1_3",
           "worldQuestLog": [
             [
-              "wq_thornpeak_stormcrag",
+              "wq_thornpeak_zealots",
               {
-                "questId": "wq_thornpeak_stormcrag",
+                "questId": "wq_thornpeak_zealots",
                 "state": "active"
               }
             ]
@@ -1431,7 +1439,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 9.533061,
+          "fallStartY": 14.526649,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
@@ -1447,9 +1455,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 122,
-            "y": 9.533061,
-            "z": 778
+            "x": 56,
+            "y": 14.526649,
+            "z": 837
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

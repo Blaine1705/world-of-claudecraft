@@ -36,7 +36,6 @@ import {
   worldQuestItemRewardFor,
   worldQuestItemZonesForCycle,
 } from '../src/sim/world_quest_item_slots';
-import { LEY_BONUS_PURSES } from '../src/sim/world_quest_ley_bonus';
 import { playerActiveWorldQuests } from '../src/sim/world_quest_reroll';
 import {
   ALWAYS_ACTIVE_WORLD_QUEST_IDS,
@@ -288,14 +287,12 @@ describe('the daily budget', () => {
           );
       }
       // Purses a day can pay at most once, counted whether or not the board
-      // offers them: the hard wisp maze and both ley bonus boards.
+      // offers them: the hard wisp maze's first completion.
       copper += worldQuestBonusCopper(
         WISP_MAZE_HARD_BONUS.base,
         WISP_MAZE_HARD_BONUS.perLevel,
         MAX_LEVEL,
       );
-      for (const purse of LEY_BONUS_PURSES)
-        copper += worldQuestBonusCopper(purse.base, purse.perLevel, MAX_LEVEL);
       expect(copper, `cycle ${cycle}`).toBeLessThanOrEqual(WORLD_QUEST_DAILY_COPPER_BUDGET);
     }
   });

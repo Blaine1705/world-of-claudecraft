@@ -164,7 +164,7 @@ describe('tryNearbyInteraction', () => {
       pos: { x: 2, y: 0, z: 0 },
     });
     const r = rig([nearest, farther]);
-    r.world.worldQuestCycle = worldQuestCycleForResetDay('2026-09-06');
+    r.world.worldQuestCycle = worldQuestCycleForResetDay('2026-09-04');
 
     expect(interact(r)).toBe(true);
     expect(r.calls).toContain(`pickup:${nearest.id}`);
@@ -186,7 +186,7 @@ describe('tryNearbyInteraction', () => {
       pos: { x: 2, y: 0, z: 0 },
     });
     const r = rig([recovered, visible]);
-    r.world.worldQuestCycle = worldQuestCycleForResetDay('2026-09-06');
+    r.world.worldQuestCycle = worldQuestCycleForResetDay('2026-09-04');
     r.world.worldQuestLog.set('wq_farshore_salvage', {
       questId: 'wq_farshore_salvage',
       count: 1,

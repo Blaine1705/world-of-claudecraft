@@ -1164,6 +1164,181 @@ async function stageWheelBinds(page) {
 }
 
 export const TARGETS = [
+  // World quests round 2: the forge workshop panel moved off the bottom-pinned
+  // vehicle-bar family into the centred window family, so it no longer covers
+  // the unit frames and the action bar. /dev forge arms the quest beside Smith
+  // Mara; talking to her starts the workshop and the panel appears.
+  {
+    key: 'forge-workshop-window',
+    label: 'The forge workshop panel (A Helping Hammer) over the HUD',
+    when: ['ui/hud/vehicle/forge_action_bar_controller'],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'compact', mobile: true, tier: 'compact', beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      if (variant.mobile) await enterTouchTier(page, variant.tier);
+      const staged = await page.evaluate(async () => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        world.chat('/dev forge');
+        await sleep(600);
+        let smith = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'npc' && e.templateId === 'forge_instructor') smith = e;
+        }
+        if (!smith) return { ok: false, reason: 'Smith Mara is not in the roster' };
+        const player = sim.player;
+        // The dev arm parks the player four yards south of the smith's authored
+        // spot, and the workshop only starts while the smith stands ON that spot
+        // (world_quest_forging.ts startForgeWorkshop), so snap him back before
+        // the talk in case he has drifted, and talk again until the session
+        // exists (the countdown is what the frame shows).
+        smith.pos = sim.groundPos(player.pos.x, player.pos.z - 4);
+        smith.prevPos = { ...smith.pos };
+        player.pos = sim.groundPos(smith.pos.x + 1, smith.pos.z);
+        player.prevPos = { ...player.pos };
+        sim.rebucket?.(player);
+        for (let attempt = 0; attempt < 6; attempt++) {
+          world.targetEntity(smith.id);
+          world.interact();
+          await sleep(400);
+          if (world.worldQuestLog?.get('wq_evergarden_forging')?.forging) break;
+        }
+        game.hud.closeAll?.();
+        return {
+          ok: !!world.worldQuestLog?.get('wq_evergarden_forging')?.forging,
+          reason: 'the forge workshop never started after six talks',
+        };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 4);
+      // The smith's countdown chat and the window shell arrive a beat apart on
+      // the touch tier; give the panel a full twenty seconds before giving up.
+      if (!(await pollForSize(page, '#forge-action-bar', 40, 500))) {
+        const diag = await page.evaluate(() => {
+          const el = document.getElementById('forge-action-bar');
+          const game = window.__game;
+          const progress = game?.world?.worldQuestLog?.get('wq_evergarden_forging');
+          return JSON.stringify({
+            present: !!el,
+            display: el ? getComputedStyle(el).display : null,
+            rect: el ? el.getBoundingClientRect().toJSON() : null,
+            hidden: el?.hidden ?? null,
+            body: document.body.className,
+            forging: progress?.forging ?? null,
+            state: progress?.state ?? null,
+          });
+        });
+        throw new Error(`the forge workshop panel never appeared: ${diag}`);
+      }
+      await wait(1500);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  // Existing western mountain: the approach trail and the east-facing launch wharf.
+  {
+    key: 'shear-launch-wharf',
+    label: 'Mountain trail and glider launch wharf',
+    when: ['sim/glider_approach_path', 'sim/glider_wharf_layout', 'render/gale_features'],
+    variants: [
+      {
+        key: 'from-the-road',
+        beforeLoad: lowGraphicsSeed,
+        spot: { x: 222, z: 605, facing: Math.atan2(183 - 222, 610 - 605), pitch: 0.25, dist: 18 },
+      },
+      {
+        key: 'on-the-planks',
+        beforeLoad: lowGraphicsSeed,
+        spot: { x: 194, z: 557, facing: Math.PI / 2, pitch: 0.3, dist: 12 },
+      },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      const staged = await page.evaluate(async (spot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        world.chat('/dev level 20');
+        await sleep(300);
+        world.chat(`/dev tp ${spot.x} ${spot.z}`);
+        await sleep(600);
+        const player = sim.player;
+        player.pos = sim.groundPos(spot.x, spot.z);
+        player.prevPos = { ...player.pos };
+        player.facing = spot.facing;
+        game.input.camYaw = spot.facing;
+        game.input.camPitch = spot.pitch;
+        game.input.camDist = spot.dist;
+        sim.rebucket?.(player);
+        game.hud.closeAll?.();
+        return { ok: true };
+      }, variant.spot);
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 8);
+      await wait(8000);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  // World quests round 2: the airborne glider is a built GLB now. /dev glider
+  // start launches at once; three seconds of countdown, then the pilot is in
+  // the air with the apparatus overhead and the chase camera behind.
+  {
+    key: 'windrider-glider-in-flight',
+    label: 'The Windrider glider apparatus in flight',
+    when: ['render/glider_course_visual'],
+    variants: [{ key: 'desktop', beforeLoad: lowGraphicsSeed }],
+    async capture(page) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      // Stand on the wharf first (the arm without `start` only teleports), let
+      // the crossing's veil and the overlays settle, THEN launch: an unsteered
+      // glide leaves the course corridor a few seconds after the countdown,
+      // so the frame has to be taken about a second into the flight.
+      const parked = await page.evaluate(async () => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        world.chat('/dev glider');
+        game.hud.closeAll?.();
+        return { ok: true };
+      });
+      if (!parked.ok) throw new Error(parked.reason);
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 6);
+      await page.evaluate(() => {
+        const game = window.__game;
+        game.world.chat('/dev glider start');
+        game.input.camPitch = 0.25;
+        game.input.camDist = 11;
+      });
+      // Three seconds of countdown, then a second and a bit of glide.
+      await wait(4300);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
   {
     key: 'fen-features-cull',
     label:

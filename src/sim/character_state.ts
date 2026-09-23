@@ -105,6 +105,7 @@ export interface CharacterState {
   // Daily world-quest state. Optional so every pre-feature save loads as an
   // untouched empty cycle; available quests are implicit and are not stored.
   worldQuests?: {
+    gliderRecords?: import('./glider_personal_records').PersonalGliderRecords;
     cycle: string;
     progress: WorldQuestProgress[];
     factions?: Partial<Record<string, number>>;

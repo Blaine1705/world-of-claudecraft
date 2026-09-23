@@ -142,12 +142,33 @@
     justify-content: center;
   }
 
-  /* The forge workshop bar: timing meter over a heat gauge over Strike / Stoke. */
-  .vehicle-bar.forge-action-bar {
+  /* The forge workshop panel: timing meter over a heat gauge over Strike / Stoke.
+     A `.panel` overlay centred in the upper third above the HUD bars (the
+     .window shell's placement, restated here), NOT a .vehicle-bar: the
+     bottom-pinned vehicle family sat it on the unit frames and the action bar.
+     And NOT a `.window` either: that family is scanned by Escape / closeAll and
+     the touch chrome's menu mode, which must never hide or interrupt a running
+     workshop session (forge_action_bar_controller.ts). The controller toggles
+     display between none and grid with the session. */
+  .forge-action-bar {
+    position: absolute;
+    left: 50%;
+    /* The app-box height over the #ui zoom, the .window shell's own clamp
+       (never a bare vh: #ui zooms every length in its subtree). */
+    top: calc(var(--app-vh, 100dvh) * 0.1 / var(--ui-scale, 1));
+    transform: translateX(-50%);
+    z-index: 20;
+    /* The controller toggles display between none and grid; the grid is
+       declared here too so the stylesheet alone describes the layout. */
+    display: grid;
+    padding: 16px;
+    max-width: calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 16px);
     grid-template-columns: 1fr;
+    gap: 8px 16px;
     width: min(440px, calc(100% - 24px));
+    color: var(--gold);
   }
-  .vehicle-bar.forge-action-bar > * {
+  .forge-action-bar > * {
     grid-column: 1 / -1;
   }
   .forge-action-bar .vehicle-action-slots {
@@ -271,11 +292,8 @@
     left: 2px;
     z-index: 2;
     min-width: 20px;
+    height: auto;
     padding: 1px 4px;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    background: var(--panel-base);
-    color: var(--color-vehicle-text);
     font-size: 16px;
     font-weight: bold;
     line-height: 1.2;
@@ -326,17 +344,6 @@
     width: 64px;
     height: 64px;
     flex: 0 0 64px;
-    position: relative;
-    background-size: cover;
-    border: 2px ridge var(--border);
-    border-radius: 7px;
-  }
-  .vehicle-action .keybind {
-    position: absolute;
-    top: 2px;
-    left: 4px;
-    color: var(--color-vehicle-text);
-    text-shadow: 0 1px 3px var(--panel-base);
   }
   .vehicle-exit {
     align-self: center;

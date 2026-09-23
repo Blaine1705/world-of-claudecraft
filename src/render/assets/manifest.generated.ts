@@ -1164,6 +1164,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/wildheart_ritual_pyramid.glb": "/media/models/props/wildheart_ritual_pyramid.5ce35a978eb9.glb",
   "models/props/wildheart_rope_bridge.glb": "/media/models/props/wildheart_rope_bridge.7ba7be6452c8.glb",
   "models/props/willow_tree.glb": "/media/models/props/willow_tree.ee7452dc3b3c.glb",
+  "models/props/windrider_glider_flight.glb": "/media/models/props/windrider_glider_flight.26919ce0c151.glb",
   "models/props/wreckage_broken_planks.glb": "/media/models/props/wreckage_broken_planks.6f5c3b3bf260.glb",
   "models/props/wreckage_capsized_rowboat.glb": "/media/models/props/wreckage_capsized_rowboat.9306dec6e571.glb",
   "models/props/wreckage_damaged_crate.glb": "/media/models/props/wreckage_damaged_crate.3e461b2ab1e9.glb",

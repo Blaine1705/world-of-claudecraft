@@ -13,6 +13,14 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.practiceRewards':
+    '연습: 다시 플레이할 수 있지만 동전, 경험치, 평판은 추가로 얻지 못합니다.',
+  'questUi.worldQuest.replay': '다시 플레이',
+  'questUi.worldQuest.glider.replay': '다시 비행',
+  'questUi.worldQuest.glider.practiceRewards':
+    '연습 비행: 기록을 단축할 수 있지만 화폐, 경험치, 평판은 추가로 받지 않습니다.',
+  'hudChrome.leaderboard.gliderPersonalRules':
+    '이 캐릭터에 저장된 오프라인 기록입니다. 모든 고리를 순서대로 통과하세요. 일일 기록은 매일 초기화됩니다.',
   'hudChrome.weeklyRewards.chooseTable': '보상을 추첨할 전리품 목록 선택',
   'hudChrome.weeklyRewards.selectAllTables': '모두 선택',
   'hudChrome.weeklyRewards.selectedTable': '전리품 목록 {count}개 선택됨',
@@ -5497,6 +5505,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_mender.name': '무덤부름 치유사',
   'questUi.dialog.discussQuest': '{name}에 대해 이야기합니다.',
   'questUi.dialog.discussQuestAria': '퀘스트 논의: {name}',
+  'questUi.dialog.clueTalk': '단서에 대해 묻는다.',
+  'questUi.dialog.clueTalkAria': '단서에 대해 묻는다: {name}',
+  'questUi.dialog.clueDeliver': '{item} {count}개를 건넨다.',
+  'questUi.dialog.clueDeliverAria': '{item} {count}개를 건넨다: {name}',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '세 유물은 같은 이야기를 전합니다. 알드렌은 왕을 지키기 위해 싸웠고, 말릭은 죽음의 경계를 깨뜨렸으며, 보스는 그 뒤에 일어난 일을 막으려 했습니다. 봉인은 약해지고 있고, 버려진 묘실이 아래로 향하는 길입니다.',
   'entities.items.runed_bone_shard.name': '룬 새긴 뼈 조각',
@@ -17731,7 +17743,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.wispMaze.finished': '동전 주머니를 모두 되찾았습니다!',
   'questUi.worldQuest.wispMaze.retry': '생명 세 개가 회복됐습니다. 미로에 다시 도전하세요.',
   'questUi.worldQuest.wispMaze.startNormal': '미로 입장: 보통 (그림자 {shadows})',
-  'questUi.worldQuest.wispMaze.startHard': '미로 입장: 어려움 (그림자 {shadows}, 보너스 주머니)',
+  'questUi.worldQuest.wispMaze.startHard': '미로 입장: 어려움 (그림자 {shadows}마리)',
   'questUi.worldQuest.forge.title': '돕는 망치',
   'questUi.worldQuest.forge.objective': '대장장이 마라를 도와 방패 벼리기',
   'questUi.worldQuest.forge.ready': '대장장이 마라에게 말을 걸어 시작하세요.',
@@ -17809,10 +17821,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.traceShape.cross': '십자 룬',
   'questUi.worldQuest.puzzleBonusLevel': '보너스 레벨 {level}/{total}',
   'questUi.worldQuest.puzzleBonusCharged':
-    '저장고가 보너스 기운으로 웅웅거립니다: 레벨 {level}/{total}이(가) 기다립니다. 지맥 저장고를 다시 만져 추가 금화를 받으세요.',
-  'questUi.worldQuest.puzzleBonusPaid': '보너스 주머니 획득!',
+    '연습 단계 {level}/{total}이 기다립니다. 지맥 보관함을 다시 만지세요. 추가 보상은 없습니다.',
+  'questUi.worldQuest.puzzleBonusPaid': '연습 단계 완료!',
   'questUi.worldQuest.puzzleBonusDone':
-    '보너스 레벨을 모두 완료했습니다. 다음 제안까지 저장고가 휴식합니다.',
+    '모든 연습 단계를 완료했습니다. 지맥 보관함을 만지면 다시 플레이할 수 있습니다.',
   'entities.mobs.fenbridge_infiltrator.name': '빌린 얼굴',
   'entities.npcs.glider_instructor.name': '비행 조련사 제피르',
   'entities.npcs.glider_instructor.title': '바람기수 교관',
@@ -17996,4 +18008,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{name} (아이템 레벨 {itemLevel}, {requiredLevel}레벨부터 착용 가능)',
   'questUi.worldQuest.factionLine': '세력: {faction}',
   'questUi.worldQuest.standingReward': '{faction} 평판 +{amount}',
+  'hudChrome.leaderboard.gliderCourseNames.downs': '해안 순환 코스',
+  'hudChrome.leaderboard.gliderCourseNames.valleys': '계곡 순환 코스',
+  'hudChrome.leaderboard.gliderCourseNames.switchbacks': '능선 굽이 코스',
+  'hudChrome.leaderboard.gliderDaily': '{course}: 오늘',
+  'hudChrome.leaderboard.gliderLifetime': '{course}: 역대',
+  'hudChrome.leaderboard.gliderStart': '이 코스 비행',
+  'hudChrome.leaderboard.gliderRankings': '활공 코스 기록',
+  'hudChrome.leaderboard.gliderRules':
+    '모든 고리를 통과한 완주 기록 중 가장 빠른 시간이 승리합니다. 일일 기록은 서버 초기화 때 갱신됩니다. 기록은 30초 이내에 반영됩니다.',
 };

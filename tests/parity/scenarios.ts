@@ -7752,7 +7752,10 @@ function worldQuestLifecycle(): Scenario {
       updateWorldQuests(sim.ctx, meta, sim.player);
       rec.notes.sameCycleAfterOneDay = meta.worldQuestCycle === firstCycle;
       sim.resetDay = '2026-09-03';
-      const nextQuest = WORLD_QUESTS_BY_ID.wq_thornpeak_stormcrag;
+      // Day 3 of the rotation: Thornpeak's pool is four deep since the round-2
+      // zone hunts (stormcrag, kobolds, ogres, zealots), so the third day's
+      // Thornpeak slot is the Wyrmcult zealots, not the Stormcrag elementals.
+      const nextQuest = WORLD_QUESTS_BY_ID.wq_thornpeak_zealots;
       teleport(sim, sim.player as AnyEntity, nextQuest.area.x, nextQuest.area.z);
       updateWorldQuests(sim.ctx, meta, sim.player);
       rec.notes.rotationChanged = meta.worldQuestCycle !== firstCycle;

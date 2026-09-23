@@ -13,6 +13,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.practiceRewards': '練習：可以再次遊玩，但不會額外獲得錢幣、經驗或聲望。',
+  'questUi.worldQuest.replay': '再玩一次',
+  'questUi.worldQuest.glider.replay': '再次飛行',
+  'questUi.worldQuest.glider.practiceRewards':
+    '練習飛行：可以刷新用時，但不會再次獲得錢幣、經驗或聲望。',
+  'hudChrome.leaderboard.gliderPersonalRules':
+    '離線紀錄隨此角色儲存。請按順序穿過所有圓環。每日紀錄每天重設。',
   'hudChrome.weeklyRewards.chooseTable': '選擇用於抽取獎勵的戰利品表',
   'hudChrome.weeklyRewards.selectAllTables': '全選',
   'hudChrome.weeklyRewards.selectedTable': '已選擇 {count} 個戰利品表',
@@ -5311,6 +5318,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_mender.name': '喚墓者醫者',
   'questUi.dialog.discussQuest': '談論{name}。',
   'questUi.dialog.discussQuestAria': '談論任務：{name}',
+  'questUi.dialog.clueTalk': '詢問線索。',
+  'questUi.dialog.clueTalkAria': '詢問線索：{name}',
+  'questUi.dialog.clueDeliver': '交出{count}個{item}。',
+  'questUi.dialog.clueDeliverAria': '交出{count}個{item}給{name}',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '三件遺物講述著同一個故事：阿爾德倫為守護國王而戰，馬爾里克打破了死亡的界限，沃斯試圖阻止隨後發生的一切。封印正在減弱，廢棄墓穴就是通往地下的道路。',
   'entities.items.runed_bone_shard.name': '符文骨片',
@@ -16879,7 +16890,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.wispMaze.finished': '所有錢袋都找回來了！',
   'questUi.worldQuest.wispMaze.retry': '三條生命已恢復。再挑戰一次迷宮吧。',
   'questUi.worldQuest.wispMaze.startNormal': '進入迷宮：普通（{shadows} 個暗影）',
-  'questUi.worldQuest.wispMaze.startHard': '進入迷宮：困難（{shadows} 個暗影，額外錢袋）',
+  'questUi.worldQuest.wispMaze.startHard': '進入迷宮：困難（{shadows}個暗影）',
   'questUi.worldQuest.forge.title': '助一臂之鎚',
   'questUi.worldQuest.forge.objective': '協助鐵匠瑪拉鍛造一面盾牌',
   'questUi.worldQuest.forge.ready': '與鐵匠瑪拉交談以開始。',
@@ -16951,9 +16962,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.traceShape.cross': '十字符文',
   'questUi.worldQuest.puzzleBonusLevel': '額外關卡 {level}/{total}',
   'questUi.worldQuest.puzzleBonusCharged':
-    '秘藏嗡嗡作響，蓄滿了額外能量：第 {level}/{total} 個額外關卡正等著你。再次觸碰魔網秘藏以獲得額外金幣。',
-  'questUi.worldQuest.puzzleBonusPaid': '獲得額外錢袋！',
-  'questUi.worldQuest.puzzleBonusDone': '所有額外關卡都已完成。秘藏將沉寂到下一次開放。',
+    '練習關卡 {level}/{total} 已就緒。再次觸碰地脈寶箱即可遊玩，後續挑戰沒有額外獎勵。',
+  'questUi.worldQuest.puzzleBonusPaid': '練習關卡已完成！',
+  'questUi.worldQuest.puzzleBonusDone': '所有練習關卡均已完成。觸碰地脈寶箱即可再次遊玩。',
   'entities.mobs.fenbridge_infiltrator.name': '借臉者',
   'entities.npcs.glider_instructor.name': '飛行管理員澤菲爾',
   'entities.npcs.glider_instructor.title': '御風者教官',
@@ -17125,4 +17136,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '{name}（物品等級{itemLevel}，{requiredLevel}級可裝備）',
   'questUi.worldQuest.factionLine': '陣營：{faction}',
   'questUi.worldQuest.standingReward': '{faction}聲望 +{amount}',
+  'hudChrome.leaderboard.gliderCourseNames.downs': '海岸環線',
+  'hudChrome.leaderboard.gliderCourseNames.valleys': '山谷環線',
+  'hudChrome.leaderboard.gliderCourseNames.switchbacks': '山脊折返線',
+  'hudChrome.leaderboard.gliderDaily': '{course}：今日',
+  'hudChrome.leaderboard.gliderLifetime': '{course}：歷史',
+  'hudChrome.leaderboard.gliderStart': '飛行此路線',
+  'hudChrome.leaderboard.gliderRankings': '滑翔路線紀錄',
+  'hudChrome.leaderboard.gliderRules':
+    '完整飛行用時最短者獲勝。穿過每個圓環。每日紀錄隨伺服器重置。紀錄會在30秒內更新。',
 };

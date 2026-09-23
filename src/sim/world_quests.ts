@@ -95,6 +95,7 @@ import {
   worldQuestMatch3InitialBoard,
 } from './world_quest_match3';
 import { dismountForWorldQuestInstructor } from './world_quest_mount_gate';
+import { beginWorldQuestPractice } from './world_quest_practice';
 import {
   sanitizeWorldQuestPuzzleRotations,
   traceWorldQuestPuzzle,
@@ -527,28 +528,31 @@ export function talkToWorldQuestInstructor(
     if (
       player.level >= quest.minLevel &&
       progress &&
-      hasActiveWorldQuest(meta, quest.id) &&
+      (hasActiveWorldQuest(meta, quest.id) || progress.state === 'completed') &&
       inWorldQuestArea(player, quest)
     )
       startShadowEncounter(ctx, meta, player, npc, progress);
     return true;
   }
   if (quest.objective.type === 'glider') {
-    const isQuestActive =
-      player.level >= quest.minLevel &&
-      progress &&
-      inWorldQuestArea(player, quest) &&
-      playerActiveWorldQuests(meta).some((active) => active.id === quest.id);
-    if (isQuestActive && progress) {
+    // A COMPLETED quest launches a PRACTICE flight (world quests round 2: the
+    // slalom is replayable without limit, only the first success pays), so the
+    // state check sits beside the board check: the board still lists the quest
+    // all day after the purse is paid. Only an earned completion opens the
+    // practice door: a player under the level gate, or one whose row the
+    // rotation has not minted yet, gets nothing, because a practice landing
+    // stamps the row completed (world_quest_glider.ts) and would burn the
+    // day's purse before it was ever payable.
+    const eligible =
+      player.level >= quest.minLevel && !!progress && inWorldQuestArea(player, quest);
+    if (
+      eligible &&
+      progress.state === 'active' &&
+      playerActiveWorldQuests(meta).some((active) => active.id === quest.id)
+    ) {
       startGliderFlight(ctx, meta, player, npc, progress);
-    } else {
-      const practice = meta.worldQuestLog.get(GLIDER_QUEST_ID) ?? {
-        questId: GLIDER_QUEST_ID,
-        count: 0,
-        state: 'active',
-      };
-      meta.worldQuestLog.set(GLIDER_QUEST_ID, practice);
-      startGliderFlight(ctx, meta, player, npc, practice, true);
+    } else if (eligible && progress.state === 'completed') {
+      startGliderFlight(ctx, meta, player, npc, progress, true);
     }
     return true;
   }
@@ -570,8 +574,8 @@ export function talkToWorldQuestInstructor(
   }
   if (
     player.level >= quest.minLevel &&
-    hasActiveWorldQuest(meta, quest.id) &&
     progress &&
+    (hasActiveWorldQuest(meta, quest.id) || progress.state === 'completed') &&
     inWorldQuestArea(player, quest)
   )
     startWorldQuestTracing(ctx, meta, player, npc, quest, progress);
@@ -635,7 +639,10 @@ function creditWorldQuest(
   amount = 1,
 ): void {
   progress.count = Math.min(quest.count, progress.count + amount);
-  meta.counters.questProgress++;
+  const practice =
+    progress.practiceOnly ||
+    meta.unlockedMilestones.has(claimToken(meta.worldQuestCycle, quest.id));
+  if (!practice) meta.counters.questProgress++;
   if (progress.count < quest.count) {
     ctx.emit({
       type: 'worldQuestProgress',
@@ -658,6 +665,13 @@ function creditWorldQuest(
   delete progress.match3RefillIndex;
   if (meta.openWorldQuestPuzzleId === quest.id) meta.openWorldQuestPuzzleId = null;
   meta.worldQuestAreas.delete(quest.id);
+  if (practice) {
+    if (quest.id === SHADOW_QUEST_ID) clearShadowEncounter(ctx, meta);
+    if (quest.id === WORLD_QUEST_CALLIGRAPHY_ID && progress.traceResult?.rating === 'gold')
+      grantDeed(ctx, meta, 'exp_arcane_calligraphy_gold');
+    meta.wireRev++;
+    return;
+  }
   meta.counters.questsCompleted++;
   meta.unlockedMilestones.add(claimToken(meta.worldQuestCycle, quest.id));
   // The Weekly Vault's world row counts this completion once: the claim token
@@ -852,11 +866,20 @@ export function onObjectInteractedForWorldQuests(
   if (handled) return true;
   for (const progress of meta.worldQuestLog.values()) {
     // A completed ley quest still answers its cache while a bonus board is charged.
-    if (progress.state !== 'active' && !leyBonusPending(progress)) continue;
     const quest = worldQuestById(progress.questId);
     if (!quest || !inWorldQuestArea(player, quest) || !inWorldQuestArea(obj, quest)) continue;
     if (quest.objective.type === 'puzzle' || quest.objective.type === 'match3') {
       if (quest.objective.activationObjectItemId !== obj.objectItemId) continue;
+      if (player.level < quest.minLevel) continue;
+      const pendingBonus: boolean = leyBonusPending(progress);
+      if (progress.state === 'completed' && !pendingBonus) {
+        if (quest.objective.type === 'puzzle') unlockLeyBonus(progress, progress.puzzleDay);
+        else {
+          beginWorldQuestPractice(progress);
+          const level = match3Level(quest, progress);
+          if (level) progress.match3Board = worldQuestMatch3InitialBoard(level);
+        }
+      }
       handled = true;
       meta.openWorldQuestPuzzleId = quest.id;
       if (quest.objective.type === 'puzzle') {
@@ -880,6 +903,7 @@ export function onObjectInteractedForWorldQuests(
       });
       continue;
     }
+    if (progress.state !== 'active') continue;
     if (quest.objective.type === 'delivery') {
       if (
         obj.objectItemId !== quest.objective.pickupObjectItemId &&
@@ -1119,6 +1143,7 @@ export function sanitizeWorldQuestProgress(
       count,
       state: raw.state,
     };
+    if (includeSessionDeadlines && raw.practiceOnly === true) normalized.practiceOnly = true;
     if (quest.objective.type === 'shadow' && raw.state === 'active') {
       normalized.creditedObjects = sanitizeShadowCreditedObjects(raw.creditedObjects).slice(
         0,

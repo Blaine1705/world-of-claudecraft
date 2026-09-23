@@ -56,7 +56,7 @@ describe('makeQuestObjectGate', () => {
   });
 
   it('admits only the current personal shipwreck-salvage pieces', () => {
-    const cycle = worldQuestCycleForResetDay('2026-09-06');
+    const cycle = worldQuestCycleForResetDay('2026-09-04');
     const worldQuestLog = new Map<string, WorldQuestProgress>();
     const gate = makeQuestObjectGate({}, { worldQuestCycle: cycle, worldQuestLog });
     const piece = {

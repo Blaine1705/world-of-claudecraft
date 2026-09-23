@@ -1844,7 +1844,8 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(rec.notes.questsCompleted).toBe(3);
     expect(rec.notes.sameCycleAfterOneDay).toBe(false);
     expect(rec.notes.rotationChanged).toBe(true);
-    expect(rec.notes.rotatedQuestIds).toEqual(['wq_thornpeak_stormcrag']);
+    // Day 3's Thornpeak slot since the round-2 zone hunts widened the pool.
+    expect(rec.notes.rotatedQuestIds).toEqual(['wq_thornpeak_zealots']);
     expect(trace.draws).toBe(0);
     expect(trace.drawDigest).toBe('811c9dc5');
   });

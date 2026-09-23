@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4106,
+    "files": 4114,
     "harvestedFiles": 3948,
     "carried": {
       "tests/cannon_emplacement.test.ts": {
@@ -123,6 +123,17 @@
         "runs": [
           6,
           6,
+          6
+        ]
+      },
+      "tests/clue_step_row.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "world quests round 2 adds four test files (clue step row, glider wharf layout, glider course generation, zone hunts); PR-tier CI runs are selective so the rows are measured locally",
+        "runs": [
+          6,
+          5,
           6
         ]
       },
@@ -280,6 +291,17 @@
           11
         ]
       },
+      "tests/glider_approach_path.test.ts": {
+        "ms": 380,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Existing-mountain glider routes and daily/lifetime records",
+        "runs": [
+          388,
+          380,
+          209
+        ]
+      },
       "tests/glider_boost.test.ts": {
         "ms": 6,
         "method": "local-median",
@@ -368,15 +390,15 @@
           7
         ]
       },
-      "tests/glider_tower_layout.test.ts": {
-        "ms": 1258,
+      "tests/glider_wharf_layout.test.ts": {
+        "ms": 728,
         "method": "local-median",
-        "measured": "2026-09-16",
-        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "measured": "2026-09-22",
+        "reason": "world quests round 2 adds four test files (clue step row, glider wharf layout, glider course generation, zone hunts); PR-tier CI runs are selective so the rows are measured locally",
         "runs": [
-          1258,
-          1256,
-          1260
+          728,
+          729,
+          711
         ]
       },
       "tests/glider_wind.test.ts": {
@@ -544,6 +566,17 @@
           8
         ]
       },
+      "tests/noticeboard_event.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Existing-mountain glider routes and daily/lifetime records",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
       "tests/player_movement_modes.test.ts": {
         "ms": 5,
         "method": "local-median",
@@ -641,6 +674,39 @@
           1962,
           1916,
           1956
+        ]
+      },
+      "tests/server/glider_leaderboard.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Existing-mountain glider routes and daily/lifetime records",
+        "runs": [
+          7,
+          7,
+          9
+        ]
+      },
+      "tests/server/glider_score_timeout.test.ts": {
+        "ms": 6025,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Existing-mountain glider routes and daily/lifetime records",
+        "runs": [
+          8224,
+          6025,
+          5446
+        ]
+      },
+      "tests/server/glider_scores_db_integration.test.ts": {
+        "ms": 202,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Existing-mountain glider routes and daily/lifetime records",
+        "runs": [
+          234,
+          202,
+          33
         ]
       },
       "tests/server/world_quest_leaderboard.test.ts": {
@@ -1136,6 +1202,17 @@
           1594,
           1598,
           1575
+        ]
+      },
+      "tests/world_quest_glider_generation.test.ts": {
+        "ms": 2474,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "world quests round 2 adds four test files (clue step row, glider wharf layout, glider course generation, zone hunts); PR-tier CI runs are selective so the rows are measured locally",
+        "runs": [
+          2448,
+          2474,
+          2536
         ]
       },
       "tests/world_quest_glider_levels.test.ts": {
@@ -1730,6 +1807,17 @@
           9,
           10,
           9
+        ]
+      },
+      "tests/world_quest_zone_hunts.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "world quests round 2 adds four test files (clue step row, glider wharf layout, glider course generation, zone hunts); PR-tier CI runs are selective so the rows are measured locally",
+        "runs": [
+          10,
+          10,
+          11
         ]
       },
       "tests/world_quests.test.ts": {
@@ -2359,6 +2447,7 @@
   "tests/climb_slope.test.ts": 3379,
   "tests/clock_format.test.ts": 23,
   "tests/clock_seconds_core.test.ts": 23,
+  "tests/clue_step_row.test.ts": 6,
   "tests/coach_prompt_view.test.ts": 40,
   "tests/coach_trail_core.test.ts": 14,
   "tests/coach_trail_materials.test.ts": 26,
@@ -3140,6 +3229,7 @@
   "tests/glb_instanced_props.test.ts": 18,
   "tests/glb_texture_compression.test.ts": 254,
   "tests/glider_action_bar_view.test.ts": 10,
+  "tests/glider_approach_path.test.ts": 380,
   "tests/glider_boost.test.ts": 6,
   "tests/glider_controls.test.ts": 8,
   "tests/glider_course_core.test.ts": 5,
@@ -3148,7 +3238,7 @@
   "tests/glider_flight.test.ts": 231,
   "tests/glider_flight_pose_core.test.ts": 4,
   "tests/glider_pitch_input.test.ts": 7,
-  "tests/glider_tower_layout.test.ts": 1258,
+  "tests/glider_wharf_layout.test.ts": 728,
   "tests/glider_wind.test.ts": 6,
   "tests/glider_wind_visual.test.ts": 17,
   "tests/global_invite.test.ts": 1758,
@@ -4027,6 +4117,7 @@
   "tests/nightly_plan.test.ts": 19,
   "tests/nightly_workflow.test.ts": 15,
   "tests/node_material_table.test.ts": 28,
+  "tests/noticeboard_event.test.ts": 3,
   "tests/noticeboard_interaction.test.ts": 2583,
   "tests/noticeboard_placements.test.ts": 13,
   "tests/noticeboard_popup.test.ts": 19,
@@ -4912,6 +5003,9 @@
   "tests/server/gathering_goal_commands.test.ts": 1686,
   "tests/server/general_chat_quota_connections.test.ts": 23,
   "tests/server/github.test.ts": 38,
+  "tests/server/glider_leaderboard.test.ts": 7,
+  "tests/server/glider_score_timeout.test.ts": 6025,
+  "tests/server/glider_scores_db_integration.test.ts": 202,
   "tests/server/guild_bank_lazy_loader.test.ts": 42,
   "tests/server/guild_bank_log.test.ts": 22,
   "tests/server/guild_bank_op_coordinator.test.ts": 27,
@@ -5771,6 +5865,7 @@
   "tests/world_quest_freight_visual.test.ts": 22,
   "tests/world_quest_glider.test.ts": 8216,
   "tests/world_quest_glider_boost.test.ts": 1594,
+  "tests/world_quest_glider_generation.test.ts": 2474,
   "tests/world_quest_glider_levels.test.ts": 1294,
   "tests/world_quest_glider_projection.test.ts": 5,
   "tests/world_quest_glider_view.test.ts": 19,
@@ -5825,6 +5920,7 @@
   "tests/world_quest_wisp_maze_placement.test.ts": 40,
   "tests/world_quest_wisp_maze_view.test.ts": 18,
   "tests/world_quest_wisp_registry.test.ts": 9,
+  "tests/world_quest_zone_hunts.test.ts": 10,
   "tests/world_quests.test.ts": 30540,
   "tests/world_telemetry.test.ts": 5,
   "tests/worn_item_cell_view.test.ts": 7,

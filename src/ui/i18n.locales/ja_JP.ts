@@ -13,6 +13,14 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.practiceRewards':
+    '練習：何度でも遊べますが、通貨、経験値、評判は追加で獲得できません。',
+  'questUi.worldQuest.replay': 'もう一度遊ぶ',
+  'questUi.worldQuest.glider.replay': 'もう一度飛ぶ',
+  'questUi.worldQuest.glider.practiceRewards':
+    '練習飛行：タイムを更新できますが、通貨、経験値、評判は追加で獲得できません。',
+  'hudChrome.leaderboard.gliderPersonalRules':
+    'このキャラクターに保存されたオフライン記録です。すべてのリングを順番に通過してください。日別記録は毎日リセットされます。',
   'hudChrome.weeklyRewards.chooseTable': '報酬を抽選する戦利品テーブルを選択',
   'hudChrome.weeklyRewards.selectAllTables': 'すべて選択',
   'hudChrome.weeklyRewards.selectedTable': 'テーブルを{count}件選択中',
@@ -5524,6 +5532,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_mender.name': 'グレイブコーラーの癒し手',
   'questUi.dialog.discussQuest': '{name}について話す。',
   'questUi.dialog.discussQuestAria': 'クエストについて話す: {name}',
+  'questUi.dialog.clueTalk': '手がかりについて尋ねる。',
+  'questUi.dialog.clueTalkAria': '手がかりについて尋ねる：{name}',
+  'questUi.dialog.clueDeliver': '{item}を{count}個渡す。',
+  'questUi.dialog.clueDeliverAria': '{name}に{item}を{count}個渡す',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '三つの遺物は同じ物語を語っています。オルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、廃棄された墓所こそ地下への道です。',
   'entities.items.runed_bone_shard.name': 'ルーン刻みの骨片',
@@ -17763,7 +17775,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.wispMaze.finished': '財布をすべて取り戻した！',
   'questUi.worldQuest.wispMaze.retry': 'ライフが3つに回復した。もう一度迷宮に挑もう。',
   'questUi.worldQuest.wispMaze.startNormal': '迷宮に入る：ノーマル（影{shadows}体）',
-  'questUi.worldQuest.wispMaze.startHard': '迷宮に入る：ハード（影{shadows}体、ボーナスの財布）',
+  'questUi.worldQuest.wispMaze.startHard': '迷宮に入る：ハード（影{shadows}体）',
   'questUi.worldQuest.forge.title': '手助けのハンマー',
   'questUi.worldQuest.forge.objective': '鍛冶師マーラの盾作りを手伝う',
   'questUi.worldQuest.forge.ready': '鍛冶師マーラに話しかけて開始しよう。',
@@ -17838,10 +17850,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.traceShape.cross': '十字のルーン',
   'questUi.worldQuest.puzzleBonusLevel': 'ボーナスレベル {level}/{total}',
   'questUi.worldQuest.puzzleBonusCharged':
-    '宝箱にボーナスの力が満ちている。レベル{level}/{total}が待っている。レイライン宝箱にもう一度触れて、追加のゴールドを手に入れよう。',
-  'questUi.worldQuest.puzzleBonusPaid': 'ボーナスの財布を獲得！',
+    '練習レベル{level}/{total}が待っています。レイの箱にもう一度触れてください。追加の報酬はありません。',
+  'questUi.worldQuest.puzzleBonusPaid': '練習レベルをクリア！',
   'questUi.worldQuest.puzzleBonusDone':
-    'ボーナスレベルをすべてクリア。次の機会まで宝箱は眠りにつく。',
+    'すべての練習レベルをクリアしました。レイの箱に触れるともう一度遊べます。',
   'entities.mobs.fenbridge_infiltrator.name': '借り物の顔',
   'entities.npcs.glider_instructor.name': 'フライトマスター・ゼファー',
   'entities.npcs.glider_instructor.title': 'ウィンドライダー教官',
@@ -18024,4 +18036,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{name}（アイテムレベル{itemLevel}、レベル{requiredLevel}で装備可能）',
   'questUi.worldQuest.factionLine': '勢力：{faction}',
   'questUi.worldQuest.standingReward': '{faction}の評判 +{amount}',
+  'hudChrome.leaderboard.gliderCourseNames.downs': '海岸周回コース',
+  'hudChrome.leaderboard.gliderCourseNames.valleys': '谷の周回コース',
+  'hudChrome.leaderboard.gliderCourseNames.switchbacks': '尾根の折り返しコース',
+  'hudChrome.leaderboard.gliderDaily': '{course}：今日',
+  'hudChrome.leaderboard.gliderLifetime': '{course}：歴代',
+  'hudChrome.leaderboard.gliderStart': 'このコースを飛ぶ',
+  'hudChrome.leaderboard.gliderRankings': '滑空コース記録',
+  'hudChrome.leaderboard.gliderRules':
+    '全ての輪を通過し、最速で完走した飛行が勝利します。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。',
 };

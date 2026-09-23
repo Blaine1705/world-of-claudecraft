@@ -5,7 +5,7 @@ import type {
   WeeklyQuestProgress,
   WorldQuestProgress,
 } from '../sim/types';
-import type { WorldQuestDifficulty } from '../sim/world_quest_activity';
+import type { ActivityChoice } from '../sim/world_quest_activity';
 import type { WorldQuestMedal, WorldQuestScoreboardId } from '../sim/world_quest_scoreboards';
 import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
 
@@ -19,6 +19,8 @@ export interface WorldQuestLeaderboardEntry {
 }
 
 export interface WorldQuestLeaderboardPage {
+  /** Offline records belonging only to this character. */
+  personal?: boolean;
   board: WorldQuestScoreboardId;
   leaders: WorldQuestLeaderboardEntry[];
   page: number;
@@ -74,7 +76,7 @@ export interface IWorldQuests {
   shadowWorldQuestAction(action: 'pickpocket' | 'leave', targetId?: number): void;
   /** The instructor dialog's explicit-difficulty start (Normal / Hard) for an
    *  activity that offers the choice; the plain talk keeps its default profile. */
-  startWorldQuestActivity(questId: string, difficulty: WorldQuestDifficulty): void;
+  startWorldQuestActivity(questId: string, difficulty: ActivityChoice): void;
   /** Take one of the emissary's weekly charges (server-validated: beside him, none taken). */
   chooseWeeklyQuest(questId: string): void;
   /** Claim the finished weekly charge's commendation for one faction. */
