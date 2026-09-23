@@ -125,12 +125,10 @@ describe('character sheet desktop geometry', () => {
       root.querySelectorAll<HTMLElement>('#equip-row-weapons [data-equip-slot]'),
       (slot) => slot.dataset.equipSlot,
     );
-    expect(slots).toEqual(['mainhand', 'offhand', 'trinket']);
-    const offhand = element(root, '#equip-slot-offhand').getBoundingClientRect();
-    const trinket = element(root, '#equip-slot-trinket').getBoundingClientRect();
-    expect(trinket.left).toBeGreaterThanOrEqual(offhand.right);
-    expect(Math.abs(trinket.top - offhand.top)).toBeLessThanOrEqual(1);
-    expect(trinket.bottom).toBeLessThanOrEqual(footerBounds.top);
+    expect(slots).toEqual(['mainhand', 'offhand']);
+    expect(element(root, '#equip-slot-offhand').getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      footerBounds.top,
+    );
   });
 });
 
@@ -147,7 +145,6 @@ describe('mobile paperdoll geometry', () => {
     const character = mountCharacter();
     await document.fonts.ready;
     assertReachableSlots(character, '.equip-slot', size.width, size.height);
-    expect(element(character, '#equip-slot-trinket').textContent).toContain('trinket');
     character.remove();
 
     const inspect = host('inspect-window');
@@ -173,7 +170,7 @@ describe('mobile paperdoll geometry', () => {
         inspect.querySelectorAll('#inspect-equip-weapons .slot-name'),
         (el) => el.textContent,
       ),
-    ).toEqual(['mainhand', 'offhand', 'trinket']);
+    ).toEqual(['mainhand', 'offhand']);
     assertReachableSlots(inspect, '.equip-slot', size.width, size.height);
   });
 });
@@ -188,7 +185,7 @@ function assertReachableSlots(
     .soft(root.scrollWidth, `${root.id} horizontal overflow`)
     .toBeLessThanOrEqual(root.clientWidth + 1);
   const slots = root.querySelectorAll<HTMLElement>(selector);
-  expect(slots).toHaveLength(13);
+  expect(slots).toHaveLength(12);
   for (const slot of slots) {
     slot.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
     const bounds = root.getBoundingClientRect();

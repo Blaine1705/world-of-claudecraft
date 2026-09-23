@@ -2296,9 +2296,6 @@
       margin-bottom: var(--spacing-xs);
     }
   }
-  #char-window #equip-slot-trinket {
-    margin-left: var(--spacing-sm);
-  }
   #char-window .stat-panels {
     margin-top: var(--spacing-sm);
     gap: var(--spacing-sm);

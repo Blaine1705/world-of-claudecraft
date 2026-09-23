@@ -2777,7 +2777,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // Third release/v0.43.0 merge into feature/world-quests: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
     ).toBe('3af7704995ec5cdd5ce5cb8463c65e7dc7c9951bf7c0d69d8f28ba70d9cada63');
-
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

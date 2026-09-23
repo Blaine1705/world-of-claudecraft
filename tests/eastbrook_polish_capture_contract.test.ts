@@ -693,7 +693,6 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   '51673f7f01f650a4532b8a7936a54e1794efa1fa579bc82a4db0adb19aee9dee';
 
-
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
     {
