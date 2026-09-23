@@ -184,10 +184,14 @@ export function tickHoardBat(
       }
       boss.facing = held.facing;
       if (cue && cue.kind === 'sweep') {
+        const turned =
+          Math.abs(cue.facing - held.facing) > 0.02 || Math.abs(cue.radius - held.reach) > 0.5;
         cue.facing = held.facing;
         cue.radius = held.reach;
         cue.x = boss.pos.x;
         cue.z = boss.pos.z;
+        // Online clients draw the lane from the events: tell them when it turns.
+        if (turned) emit(ctx, inst, cue);
       }
       if (held.phaseTimer > 0) return;
       caveClearCast(boss, HOARD_CAST_BAT_DIVE_AIM);
@@ -208,10 +212,8 @@ export function tickHoardBat(
       ctx.grid.update(boss);
       for (const player of living) {
         if (held.hitIds.includes(player.id)) continue;
+        // Hit once it has passed them, only inside the lane it drew.
         if (!pointInBatDive(held.origin, held.facing, held.travelled, player.pos)) continue;
-        const dx = player.pos.x - boss.pos.x;
-        const dz = player.pos.z - boss.pos.z;
-        if (Math.hypot(dx, dz) > BAT.diveHalfWidth + 0.8) continue;
         held.hitIds.push(player.id);
         ctx.dealDamage(
           boss,

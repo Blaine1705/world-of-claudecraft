@@ -22,8 +22,10 @@ export const BAT = Object.freeze({
   diveSpeed: 26,
   /** A cave is small: the dive never runs further than this. */
   diveMaxYards: 30,
-  diveHalfWidth: 2.2,
-  diveLaneHalfAngle: 0.06,
+  /** The lane is drawn as a narrow fan from it (this half angle); what it hits is
+   *  exactly that fan, never narrower than its own body next to it. */
+  diveLaneHalfAngle: 0.075,
+  diveBodyYards: 1.2,
   diveDamageFraction: 0.18,
   diveKnockback: 5,
   /** It hangs where it stopped for a breath after the dive. */
@@ -46,7 +48,8 @@ export const BAT = Object.freeze({
   swarmCap: 6,
 });
 
-/** Is a point in the dive lane: within half a width of the line, ahead, inside reach. */
+/** Is a point in the dive lane: the drawn fan (ahead of it, inside its reach,
+ *  within the half angle), never narrower than its body right next to it. */
 export function pointInBatDive(
   from: { x: number; z: number },
   facing: number,
@@ -57,5 +60,7 @@ export function pointInBatDive(
   const dz = point.z - from.z;
   const along = dx * Math.sin(facing) + dz * Math.cos(facing);
   const across = dx * Math.cos(facing) - dz * Math.sin(facing);
-  return along >= -0.5 && along <= reach + 0.5 && Math.abs(across) <= BAT.diveHalfWidth;
+  if (along < -0.5 || along > reach + 0.5) return false;
+  const half = Math.max(BAT.diveBodyYards, Math.max(0, along) * Math.tan(BAT.diveLaneHalfAngle));
+  return Math.abs(across) <= half;
 }

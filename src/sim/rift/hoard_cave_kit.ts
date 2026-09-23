@@ -93,7 +93,10 @@ export function caveWithdraw(
   cue: HoardBossCue,
   emit: CaveEmit,
 ): void {
+  // A zero-length cue clears its mirror on every client, now (a zero remaining
+  // with its old total would re-arm the online mirror for the full length).
   cue.remaining = 0;
+  cue.total = 0;
   state.cues = state.cues.filter((other) => other.id !== cue.id);
   emit(ctx, inst, cue);
 }

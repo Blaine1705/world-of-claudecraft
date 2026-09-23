@@ -168,6 +168,7 @@ export function tickHoardMimic(
     const cue = caveFindCue(state, held.leapCueId);
     if (!cue || boss.dead) {
       if (cue) caveWithdraw(ctx, inst, state, cue, emit);
+      boss.pos.y = ctx.groundPos(boss.pos.x, boss.pos.z).y;
       held.phase = 'idle';
       state.caveHeld = false;
       caveClearCast(boss, HOARD_CAST_MIMIC_LEAP);

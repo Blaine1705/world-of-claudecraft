@@ -309,3 +309,34 @@ describe('the Voracious Chest', () => {
     expect(cues(inst, 'mimic-coins').length).toBeGreaterThanOrEqual(MIMIC.coinCount);
   });
 });
+
+describe('the cave bosses online', () => {
+  it('clears a withdrawn telegraph at once: a zero-length cue, never its old length', () => {
+    const { sim, inst, boss } = encounter('deeprake', 'common');
+    ally(sim, inst, 10, -4);
+    runUntil(sim, boss, 40, () => cues(inst, 'mole-burrow').length > 0);
+    const events = runUntil(sim, boss, 5, () => cues(inst, 'mole-burrow').length === 0);
+    const last = events.filter((ev) => ev.type === 'hoardBossCue').at(-1) as
+      | { durationSecs?: number; remainingSecs?: number }
+      | undefined;
+    expect(last).toBeDefined();
+    expect(last?.durationSecs ?? 0).toBe(0);
+  });
+
+  it('keeps no melee swing going while a module holds the boss underground', () => {
+    const { sim, inst, boss } = encounter('deeprake', 'common');
+    runUntil(sim, boss, 40, () => cues(inst, 'mole-burrow').length > 0);
+    // Solo: the circle is under the tank, who stands right on top of him.
+    const events: SimEvent[] = [];
+    for (let t = 0; t < 1.5; t += DT) {
+      boss.aiState = 'attack';
+      sim.player.hp = sim.player.maxHp;
+      events.push(...sim.tick());
+    }
+    const melee = events.filter(
+      (ev) => ev.type === 'damage' && ev.sourceId === boss.id && ev.targetId === sim.player.id,
+    );
+    expect(boss.damageImmune).toBe(true);
+    expect(melee).toHaveLength(0);
+  });
+});

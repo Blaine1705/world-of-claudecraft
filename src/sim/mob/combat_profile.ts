@@ -169,12 +169,17 @@ export function updateMobCombatProfile(
     holdHoardPulsars(ctx, mob) ||
     holdHoardBoulder(ctx, mob) ||
     holdHoardCharge(ctx, mob) ||
-    holdHoardSilkSnare(ctx, mob) ||
-    holdHoardCaveBoss(ctx, mob)
+    holdHoardSilkSnare(ctx, mob)
   ) {
     onEngagedTick?.('stationary');
     mob.swingTimer = Math.max(0, mob.swingTimer - DT);
     tryMobMeleeSwingInRange(ctx, mob, target);
+    return 'done';
+  }
+  // A cave boss its module is moving (a leap, a dive) or has underground swings
+  // at nobody: it is in the air or under the floor (src/sim/rift/hoard_cave_kit.ts).
+  if (holdHoardCaveBoss(ctx, mob)) {
+    onEngagedTick?.('stationary');
     return 'done';
   }
   onEngagedTick?.('normal');

@@ -86,7 +86,9 @@ function findCue(state: HoardBossState, id: number): HoardBossCue | undefined {
 }
 
 function withdraw(ctx: SimContext, inst: RiftInstance, cue: HoardBossCue, emit: Emit): void {
+  // A zero-length cue clears its mirror on every client, now.
   cue.remaining = 0;
+  cue.total = 0;
   state_cues_drop(inst, cue);
   emit(ctx, inst, cue);
 }
