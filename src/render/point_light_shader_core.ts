@@ -3,6 +3,7 @@ const LOOP_MARKER = 'WOC_POINT_LIGHT_LOOP';
 const POINT_SECTION_ANCHOR = '#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )';
 const POINT_LOOP_START_ANCHOR =
   '\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n';
+const POINT_LOOP_HEAD = '\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n';
 const UNROLL_START_LINE = '\t#pragma unroll_loop_start\n';
 const UNROLL_END_LINE = '\t#pragma unroll_loop_end\n';
 const POINT_SHADOW_ANCHOR =
@@ -88,6 +89,13 @@ function guardPointLightBody(source: string, spotLights: number): string {
  * UNROLLED_LOOP_INDEX, which only three's JS unroller defines, so the plain
  * loop drops it and serves only programs without point shadows; the unrolled
  * arm keeps shadow-casting point lights working.
+ *
+ * A dynamic loop pays for every idle slot it walks (0.23 ms per slot and
+ * full-screen lit layer on an Intel HD 530), so it stops at the first black
+ * slot. That is exact only while no live light follows a black one in three's
+ * light array: the world scene packs its live lights into the leading
+ * carriers (point_light_carriers.ts). The break shares the pad skip's
+ * material guard.
  */
 function loopPointLights(guarded: string): string {
   const pointSection = pinnedAnchor(guarded, POINT_SECTION_ANCHOR, 'point-section');
@@ -109,10 +117,15 @@ function loopPointLights(guarded: string): string {
   if (shadowEnd < 0 || shadowBlock.slice(POINT_SHADOW_ANCHOR.length).includes('#')) {
     throw new Error('Three r165 point-light chunk point-shadow block changed');
   }
-  const loop = body.slice(0, shadowStart) + body.slice(shadowEnd + POINT_SHADOW_END.length);
-  if (loop.includes('UNROLLED_LOOP_INDEX') || loop.includes('#pragma')) {
+  const loopBody = body.slice(0, shadowStart) + body.slice(shadowEnd + POINT_SHADOW_END.length);
+  if (loopBody.includes('UNROLLED_LOOP_INDEX') || loopBody.includes('#pragma')) {
     throw new Error('Three r165 point-light chunk loop body still needs the unroller');
   }
+  const loop = `${POINT_LOOP_HEAD}
+\t\t${SUPPORTED_MATERIAL_GUARD}
+\t\tif ( pointLights[ i ].color == vec3( 0.0 ) ) break;
+\t\t#endif
+${loopBody.slice(POINT_LOOP_HEAD.length)}`;
 
   return (
     guarded.slice(0, loopStart) +

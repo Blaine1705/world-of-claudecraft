@@ -6,11 +6,16 @@
 //
 // The unrolled baseline is the same patched chunk with its point-shadow arm
 // forced on, which the Node suite pins as the previous guarded unrolled block,
-// so the two renders differ only in loop versus unrolled copies.
+// drawn with the scattered lights three gathers directly (dark slots between
+// live ones, as the game's pads and idle pulses sat). The loop arm breaks at
+// the first black slot, so it draws the same lights through the carriers
+// (point_light_carriers.ts), which pack the live ones first.
 
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { installPbrPointLightShaderPruning } from '../../src/render/pbr_fragment_shader';
+import { attachPointLightCarriers } from '../../src/render/point_light_carriers';
+import { markPointLightSource } from '../../src/render/point_light_carriers_core';
 import { isSoftwareRendererName } from '../../src/render/software_renderer';
 
 interface ChunkOverride {
@@ -19,6 +24,7 @@ interface ChunkOverride {
 }
 
 type Kind = 'standard' | 'lambert' | 'phong' | 'toon';
+type Lighting = 'direct' | 'carriers';
 
 interface MintedProgram {
   cacheKey: string;
@@ -34,12 +40,14 @@ const LIVE_SLOTS = new Set([0, 3, 6, 9]);
 const WIDTH = 128;
 const HEIGHT = 32;
 const PARITY_TOLERANCE = 1e-4;
+const BREAK_FLOOR = 10 * PARITY_TOLERANCE;
 const SPACING = 3.6;
 const UNROLLED_KEY = 'point-light-loop-test:unrolled';
 const SHADOW_ARM_OPEN =
   '\t#if defined( USE_SHADOWMAP ) && NUM_POINT_LIGHT_SHADOWS > 0\n\t#pragma unroll_loop_start\n';
 const LOOP_MARKER_LINE = '\t// WOC_POINT_LIGHT_LOOP';
-const LOOP_HEAD_LINKED = 'for ( int i = 0; i < 10; i ++ ) {\n\t\tpointLight = pointLights[ i ];';
+const LOOP_HEAD_LINKED =
+  'for ( int i = 0; i < 10; i ++ ) {\n\n\t\t#if defined( STANDARD ) || defined( LAMBERT ) || defined( PHONG )\n\t\tif ( pointLights[ i ].color == vec3( 0.0 ) ) break;\n\t\t#endif\n\t\tpointLight = pointLights[ i ];';
 
 let renderer: THREE.WebGLRenderer;
 let shaderErrors: string[] = [];
@@ -117,6 +125,7 @@ function buildScene(
   override: ChunkOverride | null,
   liveLights: boolean,
   kinds: readonly Kind[] = KINDS,
+  lighting: Lighting = 'direct',
 ): THREE.Scene {
   const scene = new THREE.Scene();
   scene.add(new THREE.HemisphereLight(0x8899aa, 0x332211, 0.4));
@@ -125,7 +134,12 @@ function buildScene(
   sun.castShadow = true;
   sun.shadow.mapSize.set(256, 256);
   scene.add(sun);
-  for (const light of pointLights(liveLights)) scene.add(light);
+  const sources = pointLights(liveLights);
+  if (lighting === 'carriers') {
+    attachPointLightCarriers(scene, POINT_LIGHT_COUNT, [() => sources]);
+    for (const light of sources) markPointLightSource(light);
+  }
+  for (const light of sources) scene.add(light);
   kinds.forEach((kind, k) => {
     const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.2, 24, 16), material(kind, override));
     sphere.position.set((k - 1.5) * SPACING, 0, 0);
@@ -165,6 +179,18 @@ function lightPrograms(): MintedProgram[] {
   );
 }
 
+/** The point lights three gathers for a default-layer camera, in slot order. */
+function gatheredPointLights(scene: THREE.Scene): THREE.PointLight[] {
+  const cameraLayers = new THREE.Layers();
+  const out: THREE.PointLight[] = [];
+  scene.traverseVisible((object) => {
+    if ((object as THREE.PointLight).isPointLight && object.layers.test(cameraLayers)) {
+      out.push(object as THREE.PointLight);
+    }
+  });
+  return out;
+}
+
 function maxAbsDiff(a: Float32Array, b: Float32Array, column?: number): number {
   let max = 0;
   const band = WIDTH / KINDS.length;
@@ -179,8 +205,15 @@ function maxAbsDiff(a: Float32Array, b: Float32Array, column?: number): number {
 }
 
 describe('the point-light loop on a real WebGL2 driver', () => {
-  it('links Standard, Lambert, Phong and Toon as one loop and lights them like the unrolled form', () => {
-    const loopPixels = renderFloat(buildScene(null, true));
+  it('links Standard, Lambert, Phong and Toon as one loop and, through the carriers, lights them like the unrolled form', () => {
+    const carrierScene = buildScene(null, true, KINDS, 'carriers');
+    expect(gatheredPointLights(carrierScene)).toHaveLength(POINT_LIGHT_COUNT);
+    expect(
+      gatheredPointLights(carrierScene).every((light) =>
+        light.name.startsWith('point-light-carrier-'),
+      ),
+    ).toBe(true);
+    const loopPixels = renderFloat(carrierScene);
     const unrolledPixels = renderFloat(
       buildScene({ key: UNROLLED_KEY, chunk: unrolledChunk }, true),
     );
@@ -201,7 +234,7 @@ describe('the point-light loop on a real WebGL2 driver', () => {
       expect(fragment.includes('\t#if 1\n'), program.type).toBe(unrolled);
     }
 
-    const darkPixels = renderFloat(buildScene(null, false));
+    const darkPixels = renderFloat(buildScene(null, false, KINDS, 'carriers'));
     KINDS.forEach((kind, column) => {
       expect(
         maxAbsDiff(loopPixels, darkPixels, column),
@@ -209,6 +242,17 @@ describe('the point-light loop on a real WebGL2 driver', () => {
       ).toBeGreaterThan(0.05);
     });
     expect(maxAbsDiff(loopPixels, unrolledPixels)).toBeLessThanOrEqual(PARITY_TOLERANCE);
+
+    // The control: the same scattered lights gathered directly. The guarded
+    // materials stop at the first dark slot and lose every later light.
+    const scatteredPixels = renderFloat(buildScene(null, true));
+    KINDS.forEach((kind, column) => {
+      if (kind === 'toon') return;
+      expect(
+        maxAbsDiff(scatteredPixels, unrolledPixels, column),
+        `${kind} breaks at the first dark slot`,
+      ).toBeGreaterThan(BREAK_FLOOR);
+    });
     expect(lightPrograms()).toHaveLength(KINDS.length * 2);
     expect(shaderErrors).toEqual([]);
   });

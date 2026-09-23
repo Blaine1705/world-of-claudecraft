@@ -20,6 +20,12 @@ const POINT_SHADOW_BLOCK =
 const SUPPORTED_MATERIAL_GUARD =
   '#if defined( STANDARD ) || defined( LAMBERT ) || defined( PHONG )';
 const PAD_GUARD = 'if ( pointLight.color != vec3( 0.0 ) ) {';
+const DARK_BREAK = 'if ( pointLights[ i ].color == vec3( 0.0 ) ) break;';
+const DARK_BREAK_BLOCK = `
+\t\t${SUPPORTED_MATERIAL_GUARD}
+\t\t${DARK_BREAK}
+\t\t#endif
+`;
 const VISIBLE_GUARD = 'if ( directLight.visible ) {';
 const POINT_PAD_GUARD = `\t\t${SUPPORTED_MATERIAL_GUARD}
 \t\t// ${PATCH_MARKER}: uniform-coherent pad-light fast path.
@@ -49,11 +55,17 @@ function count(text: string, needle: string): number {
 
 function stripGuards(text: string): string {
   const stripped = text
+    .replace(`${POINT_LOOP_HEAD}${DARK_BREAK_BLOCK}`, POINT_LOOP_HEAD)
     .replace(POINT_PAD_GUARD, '')
     .replace(POINT_DIRECT_GUARD, '')
     .replace(POINT_GUARD_CLOSE, '');
+  const breakLength = text.includes(DARK_BREAK) ? DARK_BREAK_BLOCK.length : 0;
   expect(stripped.length).toBe(
-    text.length - POINT_PAD_GUARD.length - POINT_DIRECT_GUARD.length - POINT_GUARD_CLOSE.length,
+    text.length -
+      breakLength -
+      POINT_PAD_GUARD.length -
+      POINT_DIRECT_GUARD.length -
+      POINT_GUARD_CLOSE.length,
   );
   return stripped;
 }
@@ -102,6 +114,7 @@ describe('shared point-light shader core', () => {
 
     expect(loopArm.startsWith(`${LOOP_MARKER_LINE}${POINT_LOOP_HEAD}`)).toBe(true);
     expect(count(loopArm, 'for (')).toBe(1);
+    expect(count(loopArm, DARK_BREAK)).toBe(1);
     expect(loopArm).not.toContain('#pragma');
     expect(loopArm).not.toContain('UNROLLED_LOOP_INDEX');
     expect(loopArm).not.toContain('pointLightShadow');
@@ -114,7 +127,6 @@ describe('shared point-light shader core', () => {
     const order = [
       POINT_LOOP_HEAD,
       'pointLight = pointLights[ i ];',
-      SUPPORTED_MATERIAL_GUARD,
       PAD_GUARD,
       POINT_INFO,
       '#ifdef STANDARD',
@@ -123,6 +135,20 @@ describe('shared point-light shader core', () => {
     ].map((needle) => loopArm.indexOf(needle));
     expect(order.every((at, k) => at >= 0 && (k === 0 || at > order[k - 1]))).toBe(true);
     expect(loopArm.endsWith('\t\t}\n\t\t#endif\n\t}\n')).toBe(true);
+  });
+
+  it('breaks at the first black slot, first thing in the loop body, under the pad-skip guard', () => {
+    const { loopArm, shadowArm } = patchedArms(patched);
+
+    expect(
+      loopArm.startsWith(
+        `${LOOP_MARKER_LINE}${POINT_LOOP_HEAD}${DARK_BREAK_BLOCK}\t\tpointLight = pointLights[ i ];\n`,
+      ),
+    ).toBe(true);
+    expect(count(loopArm, 'break;')).toBe(1);
+    expect(count(loopArm, SUPPORTED_MATERIAL_GUARD)).toBe(3);
+    expect(shadowArm).not.toContain('break;');
+    expect(count(patched, 'break;')).toBe(1);
   });
 
   it('keeps the per-light body of the unrolled form, minus only the point-shadow block', () => {
