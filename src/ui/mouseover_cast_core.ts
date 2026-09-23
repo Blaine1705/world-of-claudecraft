@@ -14,13 +14,22 @@
 // member whether or not this client can currently see them. Interest scope is a
 // rendering budget, never a targeting rule.
 //
+// A dual-purpose heal (targetType 'any' with a heal effect: the paladin's Solar
+// Invocation, Scouring Mercy) redirects too. Leaving it off sent a raid-frame
+// mouseover heal to the current target, which with nothing selected answered "You
+// have no target."; the sim honors the override for it (src/sim/combat/
+// dual_purpose_target.ts, whose isDualPurposeHeal both sides read).
+//
 // Pure core: no DOM, no world type, both hosts drive it through the two callbacks
 // (the offline Sim knows every entity; ClientWorld knows the ones in scope).
 
-/** The only two ability fields the redirect decision reads. */
+import { isDualPurposeHeal } from '../sim/combat/dual_purpose_target';
+
+/** The only ability fields the redirect decision reads. */
 export interface MouseoverCastAbility {
   requiresTarget?: boolean;
   targetType?: string;
+  effects?: readonly { readonly type: string }[];
 }
 
 export interface MouseoverCastInputs {
@@ -39,9 +48,10 @@ export interface MouseoverCastInputs {
  * The pid a mouseover cast should be redirected to, or null to leave the press on
  * the classic current-target-else-self path.
  *
- * Only friendly targeted abilities redirect (a hostile cast never rides a party
- * frame), and only to a hovered unit this client can still vouch for: one it holds
- * an entity for, or one the party wire still lists as a member.
+ * Only friendly targeted abilities and dual-purpose heals redirect (a hostile cast
+ * never rides a party frame), and only to a hovered unit this client can still
+ * vouch for: one it holds an entity for, or one the party wire still lists as a
+ * member.
  */
 export function mouseoverCastTargetPid(
   hoveredPid: number | null,
@@ -49,7 +59,8 @@ export function mouseoverCastTargetPid(
   inputs: MouseoverCastInputs,
 ): number | null {
   if (hoveredPid === null || !inputs.enabled) return null;
-  if (!ability?.requiresTarget || ability.targetType !== 'friendly') return null;
+  if (!ability?.requiresTarget) return null;
+  if (ability.targetType !== 'friendly' && !isDualPurposeHeal(ability)) return null;
   if (inputs.hasEntity(hoveredPid)) return hoveredPid;
   return inputs.partyMemberPids()?.includes(hoveredPid) ? hoveredPid : null;
 }
