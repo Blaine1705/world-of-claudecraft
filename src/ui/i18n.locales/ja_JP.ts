@@ -17181,4 +17181,60 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
   'devCommand.actions.town.label': 'タウンハブ',
   'devCommand.fields.town': '町',
+  'entities.items.bastion_sigil.name': '砦の印章',
+  'entities.items.mooring_stone.name': '係留石',
+  'entities.items.menders_hourglass.name': '癒し手の砂時計',
+  'entities.items.wellspring_seed.name': '湧き泉の種',
+  'entities.items.paired_talons.name': '対の鉤爪',
+  'entities.items.hunters_tally.name': '狩人の集計',
+  'entities.items.stormjar.name': '嵐の壺',
+  'entities.items.echoing_lens.name': '反響のレンズ',
+  'entities.items.gamblers_die.name': '博徒のサイコロ',
+  'entities.items.sundered_prism.name': '砕けたプリズム',
+  'entities.items.wayfarers_lodestone.name': '旅人の磁石',
+  'entities.items.medallion_of_defiance.name': '抵抗のメダリオン',
+  'entities.items.duelists_brand.name': '決闘者の烙印',
+  'hudChrome.trinkets.equipLine': '装備時: {effect}',
+  'hudChrome.trinkets.useLine': '使用: {effect}（クールダウン{cooldown}）',
+  'hudChrome.trinkets.cooldownMinutes': '{minutes}分',
+  'hudChrome.trinkets.cooldownSeconds': '{seconds}秒',
+  'hudChrome.trinkets.gambleResult': '{item}: {fortune}！',
+  'hudChrome.trinkets.snakeEyes': 'スネークアイズ',
+  'hudChrome.trinkets.equippedLine': '装備中',
+  'hudChrome.trinkets.equip.lastStand':
+    '体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージ（最大体力の{absorbPct}%）を吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。',
+  'hudChrome.trinkets.equip.hourglass':
+    '直接回復による過剰回復は砂時計に蓄えられる（最大{cap}、最大体力の{capPct}%）。蓄えた回復量は最後に増えてから{fade}秒後に消える。',
+  'hudChrome.trinkets.equip.twinStrike':
+    '自動攻撃が命中すると、{chance}%の確率でメインハンドの近接攻撃をもう1回行う。{icd}秒に1回まで発動する。',
+  'hudChrome.trinkets.equip.tally':
+    '自動攻撃のクリティカルヒットととどめの一撃ごとに集計の印を1つ得る（最大{max}）。印は{duration}秒持続し、得るたびに更新される。',
+  'hudChrome.trinkets.equip.storm':
+    '呪文を唱えるたびにチャージを1つ得る（最大{max}）。チャージは{duration}秒持続し、得るたびに更新される。',
+  'hudChrome.trinkets.use.retaliate':
+    '{duration}秒間、あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。',
+  'hudChrome.trinkets.use.anchor':
+    '{duration}秒間、受けるダメージが{reduction}%減少するが、移動速度が{speed}%になる。自身のスタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果を解除し、効果中は新たなそれらとノックバックを無視する。',
+  'hudChrome.trinkets.use.hourglass':
+    '蓄えた回復量をすべて、{range}ヤード以内で体力の割合が最も低いパーティメンバー（自分を含む）へのシールドに変える。シールドは{duration}秒持続する。蓄えた回復量が必要。',
+  'hudChrome.trinkets.use.wellspring':
+    '{duration}秒間、{every}秒ごとに自分と{radius}ヤード以内のパーティメンバーの体力を{tick}回復する。回復量は回復力で増加する。',
+  'hudChrome.trinkets.use.bleedEdge':
+    '{duration}秒間、自動攻撃の命中が鉤爪の傷を与える。鉤爪の傷はスタックごとに{every}秒ごと{tick}の物理ダメージを{bleedDuration}秒間与え、最大{stacks}回までスタックする。ダメージは攻撃力で増加する。',
+  'hudChrome.trinkets.use.tallyStrike':
+    '集計の印をすべて消費し、{range}ヤード以内のターゲットに印1つにつき{perMark}の物理ダメージを与える（印{maxMarks}つで{max}）。ダメージは攻撃力で増加する。集計の印が必要。',
+  'hudChrome.trinkets.use.stormjar':
+    'すべてのチャージを雷として{range}ヤード以内のターゲットに放つ。雷は{jumpRange}ヤード以内の敵に最大{extra}体まで跳ね移る。各敵はチャージ1つにつき{perCharge}の自然ダメージを受ける（チャージ{maxCharges}つで{max}）。ダメージは呪文力で増加する。チャージが必要。',
+  'hudChrome.trinkets.use.echo':
+    '{duration}秒間、次の{casts}回の直接回復または物理以外の直接ダメージが、その量の{pct}%で繰り返される。',
+  'hudChrome.trinkets.use.gamble':
+    '4つの運勢のうち1つを{duration}秒間引く: {keenEdge}（与えるダメージが{keenPct}%増加）、{luckyStreak}（効果時間中に{heal}回復）、{gildedGuard}（{absorb}ダメージを吸収するシールド）、{snakeEyes}（効果なし、ただしこのクールダウンが半分になる）。',
+  'hudChrome.trinkets.use.blink':
+    '前方に{yards}ヤード移動し、その後{guard}秒間受けるダメージが{reduction}%減少する。',
+  'hudChrome.trinkets.use.sprint':
+    '{duration}秒間、移動速度が{speed}%上昇する。他の速度上昇効果とは重複しない。',
+  'hudChrome.trinkets.use.defiance':
+    '自身のスタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果をすべて解除する。スタン中でも使用可能。',
+  'hudChrome.trinkets.use.brand':
+    '{range}ヤード以内の敵プレイヤー1人に烙印を押し、受ける回復量を{duration}秒間{cut}%減少させる。',
 };

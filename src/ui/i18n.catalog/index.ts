@@ -1743,6 +1743,20 @@ export const en = {
       // until the raid loot pass wires them.
       varkhul_forgebreaker: { name: 'Forgebreaker, Engine of Varkhul' },
       varkhul_emberward: { name: 'Emberward, Bulwark of Varkhul' },
+      // The trinket slot's items (src/sim/content/trinkets.ts TRINKET_ITEMS).
+      bastion_sigil: { name: 'Bastion Sigil' },
+      mooring_stone: { name: 'Mooring Stone' },
+      menders_hourglass: { name: "Mender's Hourglass" },
+      wellspring_seed: { name: 'Wellspring Seed' },
+      paired_talons: { name: 'Paired Talons' },
+      hunters_tally: { name: "Hunter's Tally" },
+      stormjar: { name: 'Stormjar' },
+      echoing_lens: { name: 'Echoing Lens' },
+      gamblers_die: { name: "Gambler's Die" },
+      sundered_prism: { name: 'Sundered Prism' },
+      wayfarers_lodestone: { name: "Wayfarer's Lodestone" },
+      medallion_of_defiance: { name: 'Medallion of Defiance' },
+      duelists_brand: { name: "Duelist's Brand" },
     },
     itemSets: itemSetEntityText,
     mobs: {

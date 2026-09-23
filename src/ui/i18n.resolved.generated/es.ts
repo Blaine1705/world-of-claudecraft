@@ -2374,6 +2374,37 @@ export const es: EnTranslations = {
       "dot": "provoca {name}, un daño en el tiempo de {school} que inflige {total} durante {duration} s",
       "hot": "florece {name}, una sanación en el tiempo que restaura {total} durante {duration} s"
     },
+    "trinkets": {
+      "equipLine": "Equipar: {effect}",
+      "useLine": "Uso: {effect} (reutilización de {cooldown})",
+      "cooldownMinutes": "{minutes} min",
+      "cooldownSeconds": "{seconds} s",
+      "gambleResult": "{item}: ¡{fortune}!",
+      "snakeEyes": "Ojos de serpiente",
+      "equippedLine": "Equipado",
+      "equip": {
+        "lastStand": "Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño ({absorbPct}% de tu salud máxima) durante {duration} s. Puede ocurrir una vez cada {icd} s.",
+        "hourglass": "La sanación excesiva de tus sanaciones directas se almacena en el reloj de arena, hasta {cap} ({capPct}% de tu salud máxima). La sanación almacenada se desvanece {fade} s después de su último aumento.",
+        "twinStrike": "Tus golpes de ataque automático tienen un {chance}% de probabilidad de realizar un golpe cuerpo a cuerpo adicional con la mano principal. Puede ocurrir una vez cada {icd} s.",
+        "tally": "Tus golpes críticos de ataque automático y tus golpes de gracia añaden una marca de cuenta cada uno, hasta {max}. Las marcas duran {duration} s y se renuevan cada vez que ganas una.",
+        "storm": "Cada hechizo que lanzas añade una carga, hasta {max}. Las cargas duran {duration} s y se renuevan cada vez que ganas una."
+      },
+      "use": {
+        "retaliate": "Durante {duration} s, un enemigo que te golpee directamente recibe daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.",
+        "anchor": "Durante {duration} s, recibes un {reduction}% menos de daño pero te mueves al {speed}% de velocidad. Elimina los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas, e ignoras los nuevos y los derribos mientras dura.",
+        "hourglass": "Convierte toda la sanación almacenada en un escudo sobre el miembro del grupo a {range} m o menos con el menor porcentaje de salud, tú incluido. El escudo dura {duration} s. Requiere sanación almacenada.",
+        "wellspring": "Te sana a ti y a los miembros del grupo a {radius} m o menos {tick} cada {every} s durante {duration} s. La sanación aumenta con el poder de sanación.",
+        "bleedEdge": "Durante {duration} s, tus golpes de ataque automático aplican Herida de garra, que inflige {tick} de daño físico por acumulación cada {every} s durante {bleedDuration} s y se acumula hasta {stacks} veces. El daño aumenta con el poder de ataque.",
+        "tallyStrike": "Gasta todas las marcas de cuenta para golpear a tu objetivo a {range} m o menos, infligiendo {perMark} de daño físico por marca ({max} con {maxMarks} marcas). El daño aumenta con el poder de ataque. Requiere una marca de cuenta.",
+        "stormjar": "Libera todas las cargas como un rayo sobre tu objetivo a {range} m o menos que salta hasta {extra} enemigos más a {jumpRange} m o menos. Cada enemigo recibe {perCharge} de daño de naturaleza por carga ({max} con {maxCharges} cargas). El daño aumenta con el poder con hechizos. Requiere una carga.",
+        "echo": "Durante {duration} s, tus siguientes {casts} sanaciones directas o golpes directos de daño no físico se repiten por el {pct}% de su cantidad.",
+        "gamble": "Tira una de cuatro fortunas durante {duration} s: {keenEdge} (infliges un {keenPct}% más de daño), {luckyStreak} (te sana {heal} a lo largo de la duración), {gildedGuard} (un escudo que absorbe {absorb} de daño) o {snakeEyes} (sin efecto, pero esta reutilización se reduce a la mitad).",
+        "blink": "Avanza {yards} m y luego recibe un {reduction}% menos de daño durante {guard} s.",
+        "sprint": "Aumenta tu velocidad de movimiento un {speed}% durante {duration} s. No se acumula con otros aumentos de velocidad.",
+        "defiance": "Elimina todos los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas. Se puede usar mientras estás aturdido.",
+        "brand": "Marca a un jugador enemigo a {range} m o menos, reduciendo la sanación que recibe un {cut}% durante {duration} s."
+      }
+    },
     "questShare": {
       "notShareable": "Esta misión no se puede compartir.",
       "notInSharerParty": "Debes estar en el grupo de {name} para aceptar esa misión.",
@@ -16700,6 +16731,45 @@ export const es: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "Guardia de Brasas, Baluarte de Varkhul"
+      },
+      "bastion_sigil": {
+        "name": "Sello del Bastión"
+      },
+      "mooring_stone": {
+        "name": "Piedra de amarre"
+      },
+      "menders_hourglass": {
+        "name": "Reloj de arena del sanador"
+      },
+      "wellspring_seed": {
+        "name": "Semilla de manantial"
+      },
+      "paired_talons": {
+        "name": "Garras gemelas"
+      },
+      "hunters_tally": {
+        "name": "Cuenta del cazador"
+      },
+      "stormjar": {
+        "name": "Jarra de tormenta"
+      },
+      "echoing_lens": {
+        "name": "Lente resonante"
+      },
+      "gamblers_die": {
+        "name": "Dado del apostador"
+      },
+      "sundered_prism": {
+        "name": "Prisma fracturado"
+      },
+      "wayfarers_lodestone": {
+        "name": "Piedra imán del caminante"
+      },
+      "medallion_of_defiance": {
+        "name": "Medallón de desafío"
+      },
+      "duelists_brand": {
+        "name": "Marca del duelista"
       }
     },
     "mobs": {

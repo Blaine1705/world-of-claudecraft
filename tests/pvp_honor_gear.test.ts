@@ -3,16 +3,19 @@ import {
   FURY_ENTITY_ID,
   FURY_NPC,
   FURY_STOCK,
+  HONOR_VENDOR_STOCK,
   WARFARE_ITEMS,
   WARFARE_JEWELRY_STAT_FRACTION,
   WARFARE_SOURCE_LEVEL,
   WARFARE_STAT_FRACTION,
+  WARFARE_TRINKET_STOCK,
 } from '../src/sim/content/pvp_honor';
 import { ITEMS, NPCS } from '../src/sim/data';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { weaponDpsBudget } from '../src/sim/item_budget';
 import {
+  expectedLineBudget,
   itemLevel,
   itemScore,
   itemSourceLevel,
@@ -201,7 +204,9 @@ describe('FURY WARFARE stock', () => {
     expect(NPCS.fury.pos).toEqual({ x: 16, z: -78 });
     expect(NPCS.fury.facing).toBe(-2.2455372690184494);
     expect(NPCS.fury.dynamic).toBe(true);
-    expect(NPCS.fury.vendorItems).toEqual(FURY_STOCK);
+    // FURY sells the WARFARE kit followed by the two honor trinkets.
+    expect(NPCS.fury.vendorItems).toEqual([...FURY_STOCK, ...WARFARE_TRINKET_STOCK]);
+    expect(HONOR_VENDOR_STOCK).toEqual(NPCS.fury.vendorItems);
   });
 
   it('covers every supported item slot with two distinct rings per role profile', () => {
@@ -447,6 +452,36 @@ describe('FURY WARFARE class and role coverage', () => {
           );
         }
       }
+    }
+  });
+});
+
+describe('honor trinkets sold beside the WARFARE kit', () => {
+  it('sells exactly the two PvP trinkets, outside the WARFARE kit', () => {
+    expect([...WARFARE_TRINKET_STOCK]).toEqual(['medallion_of_defiance', 'duelists_brand']);
+    for (const id of WARFARE_TRINKET_STOCK) {
+      expect(FURY_STOCK, id).not.toContain(id);
+      expect(WARFARE_ITEMS[id], id).toBeUndefined();
+    }
+  });
+
+  it('prices each at the neck price, soulbound, no gold value, full item-level-31 budget', () => {
+    for (const id of WARFARE_TRINKET_STOCK) {
+      const item = ITEMS[id];
+      expect(item.slot, id).toBe('trinket');
+      expect(item.quality, id).toBe('epic');
+      expect(item.priceHonor, id).toBe(SLOT_PRICES.neck);
+      expect(item.soulbound, id).toBe(true);
+      expect(item.sellValue, id).toBe(0);
+      expect(item.buyValue, id).toBeUndefined();
+      expect(itemSourceLevel(id), id).toBe(WARFARE_SOURCE_LEVEL);
+      expect(itemLevel(item), id).toBe(WARFARE_ILVL);
+      // Not a WARFARE piece: no WARFARE rating and no fraction discount; the
+      // one attribute carries the whole trinket line.
+      expect(item.pvpOffenseRating, id).toBeUndefined();
+      expect(item.pvpDefenseRating, id).toBeUndefined();
+      expect(primaryStatSum(item), id).toBe(expectedLineBudget(item));
+      expect(primaryStatSum(item), id).toBe(13);
     }
   });
 });

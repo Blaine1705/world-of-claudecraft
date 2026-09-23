@@ -18,7 +18,7 @@
 // catalogued: markItemDiscovered already credits the base id, so listing both
 // would double-count completion.
 
-import { FURY_STOCK, WARFARE_ITEMS } from './pvp_honor';
+import { FURY_STOCK, WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from './pvp_honor';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_GEAR_ITEM_IDS,
@@ -734,6 +734,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'cryptplate_helm',
     'shadowpulse_slippers',
     'bonechill_cord',
+    'bastion_sigil',
   ],
   vael_the_mistcaller: [
     'mistcallers_fang',
@@ -743,6 +744,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'tideguard_faceguard',
     'sunken_court_mantle',
     'dreamroot_boots',
+    'stormjar',
   ],
   ysolei: [
     'lunar_tide_greatstaff',
@@ -752,6 +754,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'lunar_choir_leggings',
     'choir_blessed_spaulders',
     'tideworn_warboots',
+    'menders_hourglass',
   ],
   korzul_the_gravewyrm: [
     'gravewyrm_cleaver',
@@ -769,11 +772,16 @@ export const RELIQUARY_HEROIC_GEAR = {
     'greatfang_of_the_basin',
     'sunbone_oracles_crown',
     'bloodmane_war_legguards',
+    'paired_talons',
   ],
   nythraxis_scourge_of_thornpeak: [
     'deathless_greatblade',
     'scepter_of_the_deathless_court',
     'stormcallers_focus',
+    'mooring_stone',
+    'wellspring_seed',
+    'hunters_tally',
+    'echoing_lens',
   ],
   // Crucible of the Last Spring: the heroic-only weapon and shield appends.
   // The sigil redemption tokens that share both bosses' heroic tables are
@@ -898,7 +906,7 @@ const REALM_RARE_ZONES = [
 // Both quartermasters front the SAME canonical honor stock: FURY at the
 // Eastbrook arena (FURY_NPC in content/pvp_honor.ts) and Warmarshal Draven
 // Kole at the Highwatch hub (content/zone3.ts, spawned under a reserved id by
-// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = FURY_STOCK.
+// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = HONOR_VENDOR_STOCK.
 // Every slot therefore names both counters through one shared tuple. Honor
 // purchases flow through the ordinary buyItem discovery path
 // (markItemDiscovered + noteRelicObtain), so ownership needs no new state.
@@ -911,8 +919,14 @@ const WARFARE_VENDOR_HINTS = [fromVendor('fury'), fromVendor('warmarshal_draven_
 // concern), and the set-less jewelry and weapons fill the armory. Deriving
 // from FURY_STOCK keeps membership and order from ever trailing the content;
 // the partition and both floors are pinned in tests/reliquary_content.test.ts.
+// The two honor trinkets (WARFARE_TRINKET_STOCK) are set-less honor purchases
+// from the same two counters, so they close the armory after the kit's
+// jewelry and weapons.
 const WARFARE_GALLERY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
-const WARFARE_ARMORY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined);
+const WARFARE_ARMORY_ITEM_IDS = [
+  ...FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined),
+  ...WARFARE_TRINKET_STOCK,
+];
 
 /**
  * Freeze the whole page table at its one construction site: the top-level

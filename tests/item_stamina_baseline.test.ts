@@ -18,8 +18,10 @@ import {
   primaryStatSum,
   realizedLineBudget,
   STAMINA_BASELINE_SHARE,
+  STAMINA_MODEL_EXEMPT_SLOTS,
   slotStatMultForItem,
   staminaBaseline,
+  staminaModelExempt,
   statIdentity,
 } from '../src/sim/item_level';
 import { craftBonusStatsFor } from '../src/sim/professions/crafting';
@@ -167,7 +169,11 @@ function proxyBaseline(item: ItemDef): number {
     : Math.round(((s.str ?? 0) + (s.agi ?? 0)) / 2);
 }
 
-const eligible = (Object.values(ITEMS) as ItemDef[]).filter(isItemLevelEligible);
+// The model-exempt slots (STAMINA_MODEL_EXEMPT_SLOTS: the trinket, one attribute
+// by owner decision) are pinned by their own block at the bottom of this file.
+const eligible = (Object.values(ITEMS) as ItemDef[]).filter(
+  (item) => isItemLevelEligible(item) && !staminaModelExempt(item),
+);
 const tiered = eligible.filter((item) => expectedLineBudget(item) !== undefined);
 const untiered = eligible.filter((item) => expectedLineBudget(item) === undefined);
 
@@ -473,5 +479,31 @@ describe('stamina baseline model: the merged catalog', () => {
     }
     expect(checked).toBeGreaterThanOrEqual(40);
     expect(failures).toEqual([]);
+  });
+});
+
+describe('stamina baseline model: the exempt trinket slot', () => {
+  const trinkets = (Object.values(ITEMS) as ItemDef[]).filter(
+    (item) => isItemLevelEligible(item) && item.slot === 'trinket',
+  );
+
+  it('exempts exactly the trinket slot', () => {
+    expect([...STAMINA_MODEL_EXEMPT_SLOTS]).toEqual(['trinket']);
+    expect(trinkets.length).toBeGreaterThan(0);
+    for (const item of trinkets) expect(staminaModelExempt(item), item.id).toBe(true);
+  });
+
+  it('every trinket carries exactly one attribute, the whole line budget, no baseline on top', () => {
+    for (const item of trinkets) {
+      const line = expectedLineBudget(item);
+      expect(line, `${item.id} has a tier`).toBeGreaterThan(0);
+      const attrs = Object.entries(item.stats ?? {}).filter(
+        ([k, v]) => k !== 'armor' && (v ?? 0) > 0,
+      );
+      expect(attrs, `${item.id} one attribute`).toHaveLength(1);
+      expect(attrs[0][1], `${item.id} attribute == line`).toBe(line);
+      expect(expectedStatBudget(item), item.id).toBe(line);
+      expect(primaryStatSum(item), item.id).toBe(line);
+    }
   });
 });

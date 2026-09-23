@@ -26,8 +26,9 @@ items compete within this budget instead of creating bonus equipment drops.
 
 Normal's second slot draws from the epic pool. The existing duplicate resolver
 falls forward within that pool if it selects the first slot's item.
-Heroic skips this Normal-only slot and pays one existing heroic-exclusive weapon
-instead. The first slot still upgrades eligible base equipment to its existing
+Heroic skips this Normal-only slot and pays one heroic-exclusive item instead:
+one of the three bespoke weapons (half the group) or one of the four raid
+trinkets (the other half, `content/trinkets.ts`). The first slot still upgrades eligible base equipment to its existing
 heroic variant.
 
 ## Five-player heroics
@@ -38,6 +39,10 @@ upgraded base drops and bespoke Heroic drops. Relative weights are normalized
 within the combined partition. Optional rare encounters, including the Fanglord
 Beastmaster, keep their existing bonus-drop rules. Newly moved base-path entries retain their
 existing source tier, so changing the loot table does not increase item stats.
+
+The trinket slot added one trinket to four final bosses' partitions (Morthen,
+Vael the Mistcaller, Ysolei and the Wildheart High Priest), each in a different
+dungeon, as a weighted entry rather than an extra drop.
 
 Normal-only flags apply to entire exclusive groups. Where a Normal group mixes
 equipment and a bag, its Heroic bag chance remains separate from the equipment

@@ -302,6 +302,15 @@ function reportShipping(record: Record<string, unknown>): Record<string, unknown
   return shipping as Record<string, unknown>;
 }
 
+/** The trinket slot's icon batch: additive beyond the whole historical chain,
+ *  like the Field Kit and the reins icons. */
+const TRINKET_ICON_BATCH_ID = 'trinket-slot-icons-2026-09-23';
+function trinketIconIds(batches: Array<{ batchId?: unknown; itemIds: string[] }>): string[] {
+  const ids = batches.find(({ batchId }) => batchId === TRINKET_ICON_BATCH_ID)?.itemIds ?? [];
+  expect(ids).toHaveLength(13);
+  return ids;
+}
+
 describe('item-art consistency accepted-art provenance', () => {
   it('pins the exact scope, style contract, and byte-identical generation reports', () => {
     const value = manifest();
@@ -838,8 +847,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // plus the release's 28 Nythraxis gap-fill and Bramblehide item definitions
     // (14 base pieces + their 14 auto-generated heroic variants) = 1,299. The
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
-    // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
-    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301. The
+    // trinket slot's 13 trinkets (src/sim/content/trinkets.ts) bring it to 1,314.
+    expect(Object.keys(ITEMS)).toHaveLength(1314);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -993,10 +1003,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // release's 25 Nythraxis gap-fill and Bramblehide mapping owners
     // (nythraxis-gap-weapon-renders-2026-09-04 + roots-bramblehide-icons-2026-09-07)
     // = 1,281. The OSSBrain PR #3781 reconcile's two disjoint reins owners
-    // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283.
-    expect(new Set(currentOwnerIds).size).toBe(1283);
-    expect(shippingIds).toHaveLength(1283);
-    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283. The
+    // trinket-slot-icons-2026-09-23 batch owns the 13 trinkets: 1,296.
+    expect(new Set(currentOwnerIds).size).toBe(1296);
+    expect(shippingIds).toHaveLength(1296);
+    expect(Object.keys(ITEMS)).toHaveLength(1314);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1028,6 +1039,7 @@ describe('item-art consistency accepted-art provenance', () => {
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        ...trinketIconIds(mapping.generatedBatches),
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1186,7 +1198,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04, roots-bramblehide-icons-2026-09-07) = 29.
     // OSSBrain PR #3781 reconcile adds its own 2 disjoint batches
     // (goblin-rocket-sled-icon-2026-08-12, rallycart-rxt-icon-2026-08-20) = 31.
-    expect(mapping.generatedBatches).toHaveLength(31);
+    // The trinket slot's icon batch (trinket-slot-icons-2026-09-23) = 32.
+    expect(mapping.generatedBatches).toHaveLength(32);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1247,14 +1260,15 @@ describe('item-art consistency accepted-art provenance', () => {
     // Nythraxis gap-fill weapon renders and 22 Bramblehide wave paintings
     // (+25) = 753. OSSBrain PR #3781 reconcile adds its own two disjoint
     // batches (goblin-rocket-sled-icon-2026-08-12,
-    // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755.
-    expect(priorGeneratedIds).toHaveLength(755);
+    // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755. The
+    // trinket-slot-icons-2026-09-23 batch adds its 13 trinkets: 768.
+    expect(priorGeneratedIds).toHaveLength(768);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1283);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1283);
+    expect(allCurrentOwnerIds).toHaveLength(1296);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1296);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1263,7 +1277,7 @@ describe('item-art consistency accepted-art provenance', () => {
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
       entries: 43,
-      priorGenerated: 755,
+      priorGenerated: 768,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1326,8 +1340,9 @@ describe('item-art consistency accepted-art provenance', () => {
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        ...trinketIconIds(mapping.generatedBatches),
       ]),
-      'the dated catalog plus the release batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
+      'the dated catalog plus the release batches, the Field Kit, the OSSBrain reins icons, and the trinket icons is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1455,10 +1470,10 @@ describe('item-art consistency accepted-art provenance', () => {
     const violations: string[] = [];
     // Matches the mapping-owner sum above: 43 entries + 755 prior-generated
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
-    // batch ids + 46 Crucible-professions batch ids = 1283.
-    if (ownerIds.length !== 1283)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1283`);
-    if (fileIds.length !== 1283) violations.push(`shipping WebP count: ${fileIds.length} != 1283`);
+    // batch ids + 46 Crucible-professions batch ids = 1283, + 13 trinkets = 1296.
+    if (ownerIds.length !== 1296)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1296`);
+    if (fileIds.length !== 1296) violations.push(`shipping WebP count: ${fileIds.length} != 1296`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

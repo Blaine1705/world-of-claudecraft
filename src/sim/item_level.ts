@@ -29,7 +29,7 @@ import {
 } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { IGNIVAR_LOOT_ITEM_IDS, IGNIVAR_RAID_LOOT_SOURCE_LEVEL } from './content/ignivar_loot';
-import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
+import { FURY_STOCK, WARFARE_SOURCE_LEVEL, WARFARE_TRINKET_STOCK } from './content/pvp_honor';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_GEAR_ITEM_IDS,
@@ -55,12 +55,14 @@ import {
   realizedLineBudget,
   SLOT_STAT_MULT,
   STAMINA_BASELINE_SHARE,
+  STAMINA_MODEL_EXEMPT_SLOTS,
   STAMINA_PREMIUM,
   STAT_PER_ILVL,
   type StaminaModelCheck,
   type StatIdentity,
   slotStatMultForItem,
   staminaBaseline,
+  staminaModelExempt,
   statIdentity,
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
@@ -85,12 +87,14 @@ export {
   realizedLineBudget,
   SLOT_STAT_MULT,
   STAMINA_BASELINE_SHARE,
+  STAMINA_MODEL_EXEMPT_SLOTS,
   STAMINA_PREMIUM,
   STAT_PER_ILVL,
   type StaminaModelCheck,
   type StatIdentity,
   slotStatMultForItem,
   staminaBaseline,
+  staminaModelExempt,
   statIdentity,
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
@@ -224,6 +228,8 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // FURY's WARFARE stock is level-22 PvP content. The epic quality bump puts
   // every piece at item level 28, including vendor-only necks and rings.
   for (const itemId of FURY_STOCK) bump(itemId, WARFARE_SOURCE_LEVEL, false);
+  // The two honor trinkets sold beside the kit read the same PvP tier.
+  for (const itemId of WARFARE_TRINKET_STOCK) bump(itemId, WARFARE_SOURCE_LEVEL, false);
   // Heroic boss drops: level-20 content one tier up (the heroic bump), so the
   // five-man epic pieces read item level 31 (25 + the epic bump). The 10-player
   // raid (Heroic Nythraxis) is one tier ABOVE the five-mans: its heroic-only
@@ -432,6 +438,9 @@ export function expectedLineBudget(item: ItemDef): number | undefined {
 export function expectedStatBudget(item: ItemDef): number | undefined {
   const line = expectedLineBudget(item);
   if (line === undefined) return undefined;
+  // A stamina-model-exempt slot (the trinket) spends the plain line on its one
+  // attribute, with no caster baseline on top.
+  if (staminaModelExempt(item)) return line;
   return expectedStatTotal(line, statIdentity(item.stats));
 }
 

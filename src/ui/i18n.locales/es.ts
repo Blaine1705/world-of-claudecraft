@@ -17612,4 +17612,60 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.',
   'guide.settingsPage.keybindsWheelBody':
     'La rueda misma también se atasca. Zoom Camera In y Zoom Camera Out son enlaces comunes que se ubican en la rueda desnuda de forma predeterminada, por lo que puedes moverlos a Ctrl más la rueda, o a las teclas, y luego girar la rueda liberada para activar las ranuras de la barra de acción. Una muesca de rueda no tiene liberación, por lo que no puede impulsar una acción retenida como avanzar.',
+  'entities.items.bastion_sigil.name': 'Sello del Bastión',
+  'entities.items.mooring_stone.name': 'Piedra de amarre',
+  'entities.items.menders_hourglass.name': 'Reloj de arena del sanador',
+  'entities.items.wellspring_seed.name': 'Semilla de manantial',
+  'entities.items.paired_talons.name': 'Garras gemelas',
+  'entities.items.hunters_tally.name': 'Cuenta del cazador',
+  'entities.items.stormjar.name': 'Jarra de tormenta',
+  'entities.items.echoing_lens.name': 'Lente resonante',
+  'entities.items.gamblers_die.name': 'Dado del apostador',
+  'entities.items.sundered_prism.name': 'Prisma fracturado',
+  'entities.items.wayfarers_lodestone.name': 'Piedra imán del caminante',
+  'entities.items.medallion_of_defiance.name': 'Medallón de desafío',
+  'entities.items.duelists_brand.name': 'Marca del duelista',
+  'hudChrome.trinkets.equipLine': 'Equipar: {effect}',
+  'hudChrome.trinkets.useLine': 'Uso: {effect} (reutilización de {cooldown})',
+  'hudChrome.trinkets.cooldownMinutes': '{minutes} min',
+  'hudChrome.trinkets.cooldownSeconds': '{seconds} s',
+  'hudChrome.trinkets.gambleResult': '{item}: ¡{fortune}!',
+  'hudChrome.trinkets.snakeEyes': 'Ojos de serpiente',
+  'hudChrome.trinkets.equippedLine': 'Equipado',
+  'hudChrome.trinkets.equip.lastStand':
+    'Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño ({absorbPct}% de tu salud máxima) durante {duration} s. Puede ocurrir una vez cada {icd} s.',
+  'hudChrome.trinkets.equip.hourglass':
+    'La sanación excesiva de tus sanaciones directas se almacena en el reloj de arena, hasta {cap} ({capPct}% de tu salud máxima). La sanación almacenada se desvanece {fade} s después de su último aumento.',
+  'hudChrome.trinkets.equip.twinStrike':
+    'Tus golpes de ataque automático tienen un {chance}% de probabilidad de realizar un golpe cuerpo a cuerpo adicional con la mano principal. Puede ocurrir una vez cada {icd} s.',
+  'hudChrome.trinkets.equip.tally':
+    'Tus golpes críticos de ataque automático y tus golpes de gracia añaden una marca de cuenta cada uno, hasta {max}. Las marcas duran {duration} s y se renuevan cada vez que ganas una.',
+  'hudChrome.trinkets.equip.storm':
+    'Cada hechizo que lanzas añade una carga, hasta {max}. Las cargas duran {duration} s y se renuevan cada vez que ganas una.',
+  'hudChrome.trinkets.use.retaliate':
+    'Durante {duration} s, un enemigo que te golpee directamente recibe daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.',
+  'hudChrome.trinkets.use.anchor':
+    'Durante {duration} s, recibes un {reduction}% menos de daño pero te mueves al {speed}% de velocidad. Elimina los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas, e ignoras los nuevos y los derribos mientras dura.',
+  'hudChrome.trinkets.use.hourglass':
+    'Convierte toda la sanación almacenada en un escudo sobre el miembro del grupo a {range} m o menos con el menor porcentaje de salud, tú incluido. El escudo dura {duration} s. Requiere sanación almacenada.',
+  'hudChrome.trinkets.use.wellspring':
+    'Te sana a ti y a los miembros del grupo a {radius} m o menos {tick} cada {every} s durante {duration} s. La sanación aumenta con el poder de sanación.',
+  'hudChrome.trinkets.use.bleedEdge':
+    'Durante {duration} s, tus golpes de ataque automático aplican Herida de garra, que inflige {tick} de daño físico por acumulación cada {every} s durante {bleedDuration} s y se acumula hasta {stacks} veces. El daño aumenta con el poder de ataque.',
+  'hudChrome.trinkets.use.tallyStrike':
+    'Gasta todas las marcas de cuenta para golpear a tu objetivo a {range} m o menos, infligiendo {perMark} de daño físico por marca ({max} con {maxMarks} marcas). El daño aumenta con el poder de ataque. Requiere una marca de cuenta.',
+  'hudChrome.trinkets.use.stormjar':
+    'Libera todas las cargas como un rayo sobre tu objetivo a {range} m o menos que salta hasta {extra} enemigos más a {jumpRange} m o menos. Cada enemigo recibe {perCharge} de daño de naturaleza por carga ({max} con {maxCharges} cargas). El daño aumenta con el poder con hechizos. Requiere una carga.',
+  'hudChrome.trinkets.use.echo':
+    'Durante {duration} s, tus siguientes {casts} sanaciones directas o golpes directos de daño no físico se repiten por el {pct}% de su cantidad.',
+  'hudChrome.trinkets.use.gamble':
+    'Tira una de cuatro fortunas durante {duration} s: {keenEdge} (infliges un {keenPct}% más de daño), {luckyStreak} (te sana {heal} a lo largo de la duración), {gildedGuard} (un escudo que absorbe {absorb} de daño) o {snakeEyes} (sin efecto, pero esta reutilización se reduce a la mitad).',
+  'hudChrome.trinkets.use.blink':
+    'Avanza {yards} m y luego recibe un {reduction}% menos de daño durante {guard} s.',
+  'hudChrome.trinkets.use.sprint':
+    'Aumenta tu velocidad de movimiento un {speed}% durante {duration} s. No se acumula con otros aumentos de velocidad.',
+  'hudChrome.trinkets.use.defiance':
+    'Elimina todos los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas. Se puede usar mientras estás aturdido.',
+  'hudChrome.trinkets.use.brand':
+    'Marca a un jugador enemigo a {range} m o menos, reduciendo la sanación que recibe un {cut}% durante {duration} s.',
 };

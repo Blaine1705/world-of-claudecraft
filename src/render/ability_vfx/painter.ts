@@ -55,6 +55,7 @@ import { isVisuallyDead } from '../anim_state';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
 import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
+import { trinketCueReadsAsSelfCast } from '../trinket_vfx_specs';
 import { abilityVfxFullSpecFor, abilityVfxSpecFor } from './encounter_specs';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
 
@@ -615,6 +616,13 @@ export class AbilityVfx {
         this.deps.fx.burstAt(at.x, at.y, at.z, 0xa9152d, 9, 0.65, 'blood', 0.23);
       return true;
     }
+    // A trinket teleport (Sundered Prism) draws its departure ceremony but is
+    // never CLAIMED: the renderer's blinkStep arm still owns the self position
+    // snap and its pulse. A closed cast gate draws nothing extra.
+    if (ev.fx === 'blinkStep' && ev.ability && trinketCueReadsAsSelfCast(ev.ability, ev.fx)) {
+      if (this.admitted()) this.handleSpellfx({ ...ev, fx: 'selfCast' });
+      return false;
+    }
     if (ev.ability && !this.admitted()) {
       const refused = abilityVfxSpecFor(ev.ability);
       if (refused) {
@@ -657,6 +665,9 @@ export class AbilityVfx {
     if (!CAST_FX.has(ev.fx)) {
       if (authored?.physical && (ev.fx === 'flourish' || ev.fx === 'weaponAura'))
         ev = { ...ev, fx: 'selfCast' };
+      // Targeted trinket cues (Hunter's Tally, Duelist's Brand) ride
+      // 'dotApply' on the wire; their authored read is the selfCast utility.
+      else if (trinketCueReadsAsSelfCast(ability, ev.fx)) ev = { ...ev, fx: 'selfCast' };
       else return false;
     }
     const spec = abilityVfxSpecFor(appearance);

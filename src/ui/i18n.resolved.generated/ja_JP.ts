@@ -2374,6 +2374,37 @@ export const ja_JP: EnTranslations = {
       "dot": "{name}を植え付け、{school}の継続ダメージで{duration}秒かけて{total}を与える",
       "hot": "{name}を咲かせ、継続回復で{duration}秒かけて{total}を回復する"
     },
+    "trinkets": {
+      "equipLine": "装備時: {effect}",
+      "useLine": "使用: {effect}（クールダウン{cooldown}）",
+      "cooldownMinutes": "{minutes}分",
+      "cooldownSeconds": "{seconds}秒",
+      "gambleResult": "{item}: {fortune}！",
+      "snakeEyes": "スネークアイズ",
+      "equippedLine": "装備中",
+      "equip": {
+        "lastStand": "体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージ（最大体力の{absorbPct}%）を吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。",
+        "hourglass": "直接回復による過剰回復は砂時計に蓄えられる（最大{cap}、最大体力の{capPct}%）。蓄えた回復量は最後に増えてから{fade}秒後に消える。",
+        "twinStrike": "自動攻撃が命中すると、{chance}%の確率でメインハンドの近接攻撃をもう1回行う。{icd}秒に1回まで発動する。",
+        "tally": "自動攻撃のクリティカルヒットととどめの一撃ごとに集計の印を1つ得る（最大{max}）。印は{duration}秒持続し、得るたびに更新される。",
+        "storm": "呪文を唱えるたびにチャージを1つ得る（最大{max}）。チャージは{duration}秒持続し、得るたびに更新される。"
+      },
+      "use": {
+        "retaliate": "{duration}秒間、あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。",
+        "anchor": "{duration}秒間、受けるダメージが{reduction}%減少するが、移動速度が{speed}%になる。自身のスタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果を解除し、効果中は新たなそれらとノックバックを無視する。",
+        "hourglass": "蓄えた回復量をすべて、{range}ヤード以内で体力の割合が最も低いパーティメンバー（自分を含む）へのシールドに変える。シールドは{duration}秒持続する。蓄えた回復量が必要。",
+        "wellspring": "{duration}秒間、{every}秒ごとに自分と{radius}ヤード以内のパーティメンバーの体力を{tick}回復する。回復量は回復力で増加する。",
+        "bleedEdge": "{duration}秒間、自動攻撃の命中が鉤爪の傷を与える。鉤爪の傷はスタックごとに{every}秒ごと{tick}の物理ダメージを{bleedDuration}秒間与え、最大{stacks}回までスタックする。ダメージは攻撃力で増加する。",
+        "tallyStrike": "集計の印をすべて消費し、{range}ヤード以内のターゲットに印1つにつき{perMark}の物理ダメージを与える（印{maxMarks}つで{max}）。ダメージは攻撃力で増加する。集計の印が必要。",
+        "stormjar": "すべてのチャージを雷として{range}ヤード以内のターゲットに放つ。雷は{jumpRange}ヤード以内の敵に最大{extra}体まで跳ね移る。各敵はチャージ1つにつき{perCharge}の自然ダメージを受ける（チャージ{maxCharges}つで{max}）。ダメージは呪文力で増加する。チャージが必要。",
+        "echo": "{duration}秒間、次の{casts}回の直接回復または物理以外の直接ダメージが、その量の{pct}%で繰り返される。",
+        "gamble": "4つの運勢のうち1つを{duration}秒間引く: {keenEdge}（与えるダメージが{keenPct}%増加）、{luckyStreak}（効果時間中に{heal}回復）、{gildedGuard}（{absorb}ダメージを吸収するシールド）、{snakeEyes}（効果なし、ただしこのクールダウンが半分になる）。",
+        "blink": "前方に{yards}ヤード移動し、その後{guard}秒間受けるダメージが{reduction}%減少する。",
+        "sprint": "{duration}秒間、移動速度が{speed}%上昇する。他の速度上昇効果とは重複しない。",
+        "defiance": "自身のスタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果をすべて解除する。スタン中でも使用可能。",
+        "brand": "{range}ヤード以内の敵プレイヤー1人に烙印を押し、受ける回復量を{duration}秒間{cut}%減少させる。"
+      }
+    },
     "questShare": {
       "notShareable": "このクエストは共有できません。",
       "notInSharerParty": "{name} のパーティに参加していないと、このクエストを受諾できません。",
@@ -16700,6 +16731,45 @@ export const ja_JP: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "エンバーウォード、ヴァルクールの大盾"
+      },
+      "bastion_sigil": {
+        "name": "砦の印章"
+      },
+      "mooring_stone": {
+        "name": "係留石"
+      },
+      "menders_hourglass": {
+        "name": "癒し手の砂時計"
+      },
+      "wellspring_seed": {
+        "name": "湧き泉の種"
+      },
+      "paired_talons": {
+        "name": "対の鉤爪"
+      },
+      "hunters_tally": {
+        "name": "狩人の集計"
+      },
+      "stormjar": {
+        "name": "嵐の壺"
+      },
+      "echoing_lens": {
+        "name": "反響のレンズ"
+      },
+      "gamblers_die": {
+        "name": "博徒のサイコロ"
+      },
+      "sundered_prism": {
+        "name": "砕けたプリズム"
+      },
+      "wayfarers_lodestone": {
+        "name": "旅人の磁石"
+      },
+      "medallion_of_defiance": {
+        "name": "抵抗のメダリオン"
+      },
+      "duelists_brand": {
+        "name": "決闘者の烙印"
       }
     },
     "mobs": {

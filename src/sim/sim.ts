@@ -134,7 +134,6 @@ import { advanceValkyrsCalling } from './combat/paladin_valkyrs_calling';
 import {
   completeVeilboundMarch,
   updateVeilboundMarchMovement,
-  veilboundMarchBlocksAura,
 } from './combat/paladin_veilbound_march';
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
@@ -147,6 +146,7 @@ import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spel
 import { isMobSpellResisted } from './combat/spell_resist';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { threatMod as threatModImpl } from './combat/threat_modifiers';
+import { playerAuraGuarded, restorableCooldown } from './combat/trinket_seams';
 import { warriorMeleeDefense } from './combat/warrior_hit_table';
 import { ensureWarriorStance } from './combat/warrior_stances';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
@@ -3511,7 +3511,7 @@ export class Sim {
       this.time,
       restoredAbilityCharges,
       legacyChargeCaps,
-      (id) => unstuckMod.isUnstuckSystemCooldown(id) || ABILITIES[id] !== undefined,
+      restorableCooldown,
     );
     if (Object.keys(restoredAbilityCharges).length > 0) {
       player.abilityCharges = restoredAbilityCharges;
@@ -7072,7 +7072,7 @@ export class Sim {
 
   private applyAura(target: Entity, aura: Aura): void {
     if (target.kind === 'npc' && isRejectedFriendlyNpcAura(aura)) return;
-    if (veilboundMarchBlocksAura(target, aura)) return;
+    if (playerAuraGuarded(target, aura)) return;
     if (aura.kind === 'slow' && target.auras.some((active) => active.kind === 'slow_immunity')) {
       return;
     }

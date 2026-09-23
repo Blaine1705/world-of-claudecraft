@@ -701,7 +701,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1050,
-      "state": "407597aa",
+      "state": "2c84aa47",
       "events": "b9a9b045",
       "rng": {
         "draws": 312,
@@ -712,7 +712,7 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1050,
-      "state": "2d83d6f3",
+      "state": "0b463f0c",
       "events": "741638a5",
       "rng": {
         "draws": 352,
@@ -915,7 +915,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "mistforged_pauldrons"
+                "itemId": "mistcallers_fang"
               },
               {
                 "count": 1,
@@ -968,7 +968,7 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1050,
-      "state": "2d83d6f3",
+      "state": "0b463f0c",
       "events": "741638a5",
       "rng": {
         "draws": 352,
@@ -1171,7 +1171,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "mistforged_pauldrons"
+                "itemId": "mistcallers_fang"
               },
               {
                 "count": 1,

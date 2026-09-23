@@ -5476,6 +5476,21 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_thunderstrut_gobbler',
   'reins_terrorspark_groundshaker',
   'reins_lanternback_troll',
+  // trinkets (src/sim/content/trinkets.ts; opaque woc-item-icon-v1 paintings from the
+  // trinket-slot-icons-2026-09-23 batch in mapping.json)
+  'bastion_sigil',
+  'mooring_stone',
+  'menders_hourglass',
+  'wellspring_seed',
+  'paired_talons',
+  'hunters_tally',
+  'stormjar',
+  'echoing_lens',
+  'gamblers_die',
+  'sundered_prism',
+  'wayfarers_lodestone',
+  'medallion_of_defiance',
+  'duelists_brand',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the

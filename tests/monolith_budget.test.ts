@@ -511,7 +511,12 @@ const MONOLITHS: MonolithRow[] = [
     // Regeneration exemption) moved out of the heal2 arm into
     // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
     // count, zero slack.
-    ceiling: 18235,
+    // LOWERED 18235 -> 18231 with the usable trinkets: the action-bar drag
+    // payload read/write moved to hotbar.ts (writeHotbarDragData /
+    // readHotbarDragData, shared with the paperdoll's trinket drag), which
+    // paid for the trinket tooltip, slot-state and fortune-notice wiring.
+    // wc -l < src/ui/hud.ts. Exact count, zero slack.
+    ceiling: 18231,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

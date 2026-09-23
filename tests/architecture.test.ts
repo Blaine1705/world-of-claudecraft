@@ -211,6 +211,7 @@ describe('live graphics profile architecture', () => {
 const UI_PURE_CORES = [
   'src/ui/loot_quality_view.ts',
   'src/ui/item_combat_tooltip_view.ts',
+  'src/ui/trinket_tooltip_view.ts',
   // The zone-entry chat line (welcome hint vs the town-done line); the
   // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
   'src/ui/zone_entry_line_core.ts',
@@ -290,6 +291,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/quest_strip_core.ts',
   'src/ui/hud/action_bar/item_bags_line_core.ts',
+  'src/ui/hud/action_bar/trinket_slot_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/pet_bar_core.ts',
   'src/ui/hud/warlock/doom_meter_view.ts',

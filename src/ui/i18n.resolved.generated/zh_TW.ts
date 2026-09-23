@@ -2374,6 +2374,37 @@ export const zh_TW: EnTranslations = {
       "dot": "引發{name}，一種{school}持續傷害效果，在{duration}秒內造成{total}點傷害",
       "hot": "綻放{name}，一種持續治療效果，在{duration}秒內恢復{total}點生命"
     },
+    "trinkets": {
+      "equipLine": "裝備：{effect}",
+      "useLine": "使用：{effect}（{cooldown}冷卻）",
+      "cooldownMinutes": "{minutes} 分鐘",
+      "cooldownSeconds": "{seconds} 秒",
+      "gambleResult": "{item}：{fortune}！",
+      "snakeEyes": "蛇眼",
+      "equippedLine": "已裝備",
+      "equip": {
+        "lastStand": "在生命值低於 {threshold}% 時受到傷害，會獲得一個吸收 {absorb} 點傷害（你最大生命值的 {absorbPct}%）的護盾，持續 {duration} 秒。每 {icd} 秒只能觸發一次。",
+        "hourglass": "你的直接治療產生的過量治療會儲存在沙漏中，最多 {cap} 點（你最大生命值的 {capPct}%）。儲存的治療量在最後一次增加後 {fade} 秒消散。",
+        "twinStrike": "你的自動攻擊命中有 {chance}% 的機率額外進行一次主手近戰揮擊。每 {icd} 秒只能觸發一次。",
+        "tally": "你的自動攻擊致命一擊和你的最後一擊各增加一個計數標記，最多 {max} 個。標記持續 {duration} 秒，每獲得一個便會刷新。",
+        "storm": "你每施放一個法術便增加一層充能，最多 {max} 層。充能持續 {duration} 秒，每獲得一層便會刷新。"
+      },
+      "use": {
+        "retaliate": "在 {duration} 秒內，直接擊中你的敵人會受到相當於該次攻擊令你損失生命值 {pct}% 的物理傷害。週期性傷害不會觸發此效果。",
+        "anchor": "在 {duration} 秒內，受到的傷害降低 {reduction}%，但移動速度變為 {speed}%。移除你身上的昏迷、定身、緩速、恐懼、變形、沉默、致盲、妖術、繳械和失去行動能力效果，並在持續期間無視新的此類效果和擊退。",
+        "hourglass": "將所有儲存的治療量轉化為護盾，施加於 {range} 碼內生命值百分比最低的隊伍成員（包括你自己）。護盾持續 {duration} 秒。需要有儲存的治療量。",
+        "wellspring": "在 {duration} 秒內，每 {every} 秒為你和 {radius} 碼內的隊伍成員恢復 {tick} 點生命值。治療量隨治療強度提高。",
+        "bleedEdge": "在 {duration} 秒內，你的自動攻擊命中會施加利爪之傷，每層每 {every} 秒造成 {tick} 點物理傷害，持續 {bleedDuration} 秒，最多疊加 {stacks} 層。傷害隨攻擊強度提高。",
+        "tallyStrike": "消耗所有計數標記，打擊 {range} 碼內的目標，每個標記造成 {perMark} 點物理傷害（{maxMarks} 個標記時為 {max} 點）。傷害隨攻擊強度提高。需要至少一個計數標記。",
+        "stormjar": "將所有充能化為一道閃電射向 {range} 碼內的目標，並在 {jumpRange} 碼內跳躍至最多 {extra} 個其他敵人。每個敵人每層充能受到 {perCharge} 點自然傷害（{maxCharges} 層充能時為 {max} 點）。傷害隨法術強度提高。需要至少一層充能。",
+        "echo": "在 {duration} 秒內，你接下來的 {casts} 次直接治療或直接非物理傷害命中會以其數值的 {pct}% 重複一次。",
+        "gamble": "擲出四種運勢之一，持續 {duration} 秒：{keenEdge}（造成的傷害提高 {keenPct}%）、{luckyStreak}（在持續時間內恢復 {heal} 點生命值）、{gildedGuard}（一個吸收 {absorb} 點傷害的護盾）或{snakeEyes}（無效果，但此冷卻時間減半）。",
+        "blink": "向前跨越 {yards} 碼，然後在 {guard} 秒內受到的傷害降低 {reduction}%。",
+        "sprint": "使你的移動速度提高 {speed}%，持續 {duration} 秒。不與其他速度提高效果疊加。",
+        "defiance": "移除你身上所有的昏迷、定身、緩速、恐懼、變形、沉默、致盲、妖術、繳械和失去行動能力效果。昏迷時可用。",
+        "brand": "為 {range} 碼內的一名敵對玩家打上烙印，使其受到的治療效果降低 {cut}%，持續 {duration} 秒。"
+      }
+    },
     "questShare": {
       "notShareable": "該任務無法分享。",
       "notInSharerParty": "你必須在 {name} 的隊伍中才能接受該任務。",
@@ -16700,6 +16731,45 @@ export const zh_TW: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "燼衛，瓦庫爾的壁壘"
+      },
+      "bastion_sigil": {
+        "name": "堡壘徽印"
+      },
+      "mooring_stone": {
+        "name": "繫泊之石"
+      },
+      "menders_hourglass": {
+        "name": "癒者沙漏"
+      },
+      "wellspring_seed": {
+        "name": "湧泉之種"
+      },
+      "paired_talons": {
+        "name": "雙生利爪"
+      },
+      "hunters_tally": {
+        "name": "獵手計數"
+      },
+      "stormjar": {
+        "name": "風暴之罐"
+      },
+      "echoing_lens": {
+        "name": "迴響透鏡"
+      },
+      "gamblers_die": {
+        "name": "賭徒之骰"
+      },
+      "sundered_prism": {
+        "name": "碎裂稜鏡"
+      },
+      "wayfarers_lodestone": {
+        "name": "旅者磁石"
+      },
+      "medallion_of_defiance": {
+        "name": "反抗勳章"
+      },
+      "duelists_brand": {
+        "name": "決鬥者烙印"
       }
     },
     "mobs": {

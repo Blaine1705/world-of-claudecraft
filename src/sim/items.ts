@@ -25,6 +25,7 @@ import {
   equipBag as equipBagCmd,
   stackSizeOf,
 } from './bags';
+import { isWornTrinket, useWornTrinket } from './combat/trinkets';
 import { buildConsuming } from './consuming';
 import { isRawCookingCatch } from './content/items';
 import { ITEMS, NPCS } from './data';
@@ -836,6 +837,11 @@ export function useItem(
     return taken.instance;
   };
   if (!def) return;
+  // The worn trinket is used where it sits, not from the bags (combat/trinkets.ts).
+  if (isWornTrinket(meta, itemId)) {
+    useWornTrinket(ctx, meta, p, itemId);
+    return;
+  }
   if (ctx.countItem(itemId, meta.entityId) <= 0) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;

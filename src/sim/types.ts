@@ -6426,6 +6426,9 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
+  /** The Gambler's Die landed (src/sim/combat/trinkets.ts): the client names the
+   *  fortune it rolled. */
+  | { type: 'trinketGamble'; fortune: 'keenEdge' | 'luckyHeal' | 'gildedGuard' | 'snakeEyes' }
   | {
       type: 'varkhulCallout';
       sourceId: number;

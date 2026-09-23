@@ -2374,6 +2374,37 @@ export const zh_CN: EnTranslations = {
       "dot": "引发{name}，一种{school}持续伤害效果，在{duration}秒内造成{total}点伤害",
       "hot": "绽放{name}，一种持续治疗效果，在{duration}秒内恢复{total}点生命"
     },
+    "trinkets": {
+      "equipLine": "装备：{effect}",
+      "useLine": "使用：{effect}（{cooldown}冷却）",
+      "cooldownMinutes": "{minutes} 分钟",
+      "cooldownSeconds": "{seconds} 秒",
+      "gambleResult": "{item}：{fortune}！",
+      "snakeEyes": "蛇眼",
+      "equippedLine": "已装备",
+      "equip": {
+        "lastStand": "在生命值低于 {threshold}% 时受到伤害，会获得一个吸收 {absorb} 点伤害（你最大生命值的 {absorbPct}%）的护盾，持续 {duration} 秒。每 {icd} 秒只能触发一次。",
+        "hourglass": "你的直接治疗产生的过量治疗会储存在沙漏中，最多 {cap} 点（你最大生命值的 {capPct}%）。储存的治疗量在最后一次增加后 {fade} 秒消散。",
+        "twinStrike": "你的自动攻击命中有 {chance}% 的几率额外进行一次主手近战挥击。每 {icd} 秒只能触发一次。",
+        "tally": "你的自动攻击暴击和你的致命一击各增加一个计数标记，最多 {max} 个。标记持续 {duration} 秒，每获得一个便会刷新。",
+        "storm": "你每施放一个法术便增加一层充能，最多 {max} 层。充能持续 {duration} 秒，每获得一层便会刷新。"
+      },
+      "use": {
+        "retaliate": "在 {duration} 秒内，直接击中你的敌人会受到相当于该次攻击令你损失生命值 {pct}% 的物理伤害。周期性伤害不会触发此效果。",
+        "anchor": "在 {duration} 秒内，受到的伤害降低 {reduction}%，但移动速度变为 {speed}%。移除你身上的昏迷、定身、减速、恐惧、变形、沉默、致盲、妖术、缴械和失去行动能力效果，并在持续期间无视新的此类效果和击退。",
+        "hourglass": "将所有储存的治疗量转化为护盾，施加于 {range} 码内生命值百分比最低的队伍成员（包括你自己）。护盾持续 {duration} 秒。需要有储存的治疗量。",
+        "wellspring": "在 {duration} 秒内，每 {every} 秒为你和 {radius} 码内的队伍成员恢复 {tick} 点生命值。治疗量随治疗强度提高。",
+        "bleedEdge": "在 {duration} 秒内，你的自动攻击命中会施加利爪之伤，每层每 {every} 秒造成 {tick} 点物理伤害，持续 {bleedDuration} 秒，最多叠加 {stacks} 层。伤害随攻击强度提高。",
+        "tallyStrike": "消耗所有计数标记，打击 {range} 码内的目标，每个标记造成 {perMark} 点物理伤害（{maxMarks} 个标记时为 {max} 点）。伤害随攻击强度提高。需要至少一个计数标记。",
+        "stormjar": "将所有充能化为一道闪电射向 {range} 码内的目标，并在 {jumpRange} 码内跳跃至最多 {extra} 个其他敌人。每个敌人每层充能受到 {perCharge} 点自然伤害（{maxCharges} 层充能时为 {max} 点）。伤害随法术强度提高。需要至少一层充能。",
+        "echo": "在 {duration} 秒内，你接下来的 {casts} 次直接治疗或直接非物理伤害命中会以其数值的 {pct}% 重复一次。",
+        "gamble": "掷出四种运势之一，持续 {duration} 秒：{keenEdge}（造成的伤害提高 {keenPct}%）、{luckyStreak}（在持续时间内恢复 {heal} 点生命值）、{gildedGuard}（一个吸收 {absorb} 点伤害的护盾）或{snakeEyes}（无效果，但此冷却时间减半）。",
+        "blink": "向前跨越 {yards} 码，然后在 {guard} 秒内受到的伤害降低 {reduction}%。",
+        "sprint": "使你的移动速度提高 {speed}%，持续 {duration} 秒。不与其他速度提高效果叠加。",
+        "defiance": "移除你身上所有的昏迷、定身、减速、恐惧、变形、沉默、致盲、妖术、缴械和失去行动能力效果。昏迷时可用。",
+        "brand": "为 {range} 码内的一名敌对玩家打上烙印，使其受到的治疗效果降低 {cut}%，持续 {duration} 秒。"
+      }
+    },
     "questShare": {
       "notShareable": "该任务无法分享。",
       "notInSharerParty": "你必须在 {name} 的队伍中才能接受该任务。",
@@ -16700,6 +16731,45 @@ export const zh_CN: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "烬卫，瓦库尔的壁垒"
+      },
+      "bastion_sigil": {
+        "name": "堡垒徽印"
+      },
+      "mooring_stone": {
+        "name": "系泊之石"
+      },
+      "menders_hourglass": {
+        "name": "愈者沙漏"
+      },
+      "wellspring_seed": {
+        "name": "涌泉之种"
+      },
+      "paired_talons": {
+        "name": "双生利爪"
+      },
+      "hunters_tally": {
+        "name": "猎手计数"
+      },
+      "stormjar": {
+        "name": "风暴之罐"
+      },
+      "echoing_lens": {
+        "name": "回响透镜"
+      },
+      "gamblers_die": {
+        "name": "赌徒之骰"
+      },
+      "sundered_prism": {
+        "name": "碎裂棱镜"
+      },
+      "wayfarers_lodestone": {
+        "name": "旅者磁石"
+      },
+      "medallion_of_defiance": {
+        "name": "反抗勋章"
+      },
+      "duelists_brand": {
+        "name": "决斗者烙印"
       }
     },
     "mobs": {

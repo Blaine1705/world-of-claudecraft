@@ -5916,6 +5916,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Bonechill Cord"
+      },
+      {
+        "kind": "item",
+        "name": "Bastion Sigil"
       }
     ]
   },
@@ -5990,6 +5994,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Dreamroot Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Stormjar"
       }
     ]
   },
@@ -6052,6 +6060,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Tideworn Warboots"
+      },
+      {
+        "kind": "item",
+        "name": "Mender's Hourglass"
       }
     ]
   },
@@ -6280,6 +6292,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Bloodmane War-Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Paired Talons"
       }
     ]
   },
@@ -6426,6 +6442,22 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Stormcaller's Focus"
+      },
+      {
+        "kind": "item",
+        "name": "Mooring Stone"
+      },
+      {
+        "kind": "item",
+        "name": "Wellspring Seed"
+      },
+      {
+        "kind": "item",
+        "name": "Hunter's Tally"
+      },
+      {
+        "kind": "item",
+        "name": "Echoing Lens"
       }
     ]
   },
@@ -7228,6 +7260,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
+        "name": "Sundered Prism"
+      },
+      {
+        "kind": "item",
+        "name": "Gambler's Die"
+      },
+      {
+        "kind": "item",
         "name": "Heart of the Rift"
       },
       {
@@ -7657,6 +7697,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Emberglass Warstaff"
+      },
+      {
+        "kind": "item",
+        "name": "Medallion of Defiance"
+      },
+      {
+        "kind": "item",
+        "name": "Duelist's Brand"
       }
     ]
   },

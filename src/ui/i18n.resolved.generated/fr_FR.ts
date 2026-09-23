@@ -2374,6 +2374,37 @@ export const fr_FR: EnTranslations = {
       "dot": "provoque {name}, des dégâts de {school} sur la durée infligeant {total} sur {duration} s",
       "hot": "fait éclore {name}, un soin sur la durée restaurant {total} sur {duration} s"
     },
+    "trinkets": {
+      "equipLine": "Equip: {effect}",
+      "useLine": "Use: {effect} ({cooldown} cooldown)",
+      "cooldownMinutes": "{minutes} min",
+      "cooldownSeconds": "{seconds} sec",
+      "gambleResult": "{item}: {fortune}!",
+      "snakeEyes": "Snake Eyes",
+      "equippedLine": "Equipped",
+      "equip": {
+        "lastStand": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage ({absorbPct}% of your maximum health) for {duration} sec. Can occur once every {icd} sec.",
+        "hourglass": "Overhealing from your direct heals is stored in the hourglass, up to {cap} ({capPct}% of your maximum health). Stored healing fades {fade} sec after it last grew.",
+        "twinStrike": "Your auto-attack hits have a {chance}% chance to make an extra main-hand melee swing. Can occur once every {icd} sec.",
+        "tally": "Your auto-attack critical hits and your killing blows each add a tally mark, up to {max}. Marks last {duration} sec, refreshed whenever you gain one.",
+        "storm": "Each spell you cast adds a charge, up to {max}. Charges last {duration} sec, refreshed whenever you gain one."
+      },
+      "use": {
+        "retaliate": "For {duration} sec, an enemy that hits you directly takes Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.",
+        "anchor": "For {duration} sec, take {reduction}% less damage but move at {speed}% speed. Removes stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you, and you ignore new ones and knockbacks while it lasts.",
+        "hourglass": "Turn all stored healing into a shield on the party member within {range} yd with the lowest health percentage, you included. The shield lasts {duration} sec. Requires stored healing.",
+        "wellspring": "Heal you and party members within {radius} yd for {tick} every {every} sec for {duration} sec. Healing increases with Healing Power.",
+        "bleedEdge": "For {duration} sec, your auto-attack hits apply Talon Wound, which deals {tick} Physical damage per stack every {every} sec for {bleedDuration} sec and stacks up to {stacks} times. Damage increases with Attack Power.",
+        "tallyStrike": "Spend all tally marks to strike your target within {range} yd for {perMark} Physical damage per mark ({max} at {maxMarks} marks). Damage increases with Attack Power. Requires a tally mark.",
+        "stormjar": "Release all charges as a bolt at your target within {range} yd that jumps to up to {extra} more enemies within {jumpRange} yd. Each enemy takes {perCharge} Nature damage per charge ({max} at {maxCharges} charges). Damage increases with Spell Power. Requires a charge.",
+        "echo": "For {duration} sec, your next {casts} direct heals or direct non-Physical damage hits repeat for {pct}% of their amount.",
+        "gamble": "Roll one of four fortunes for {duration} sec: {keenEdge} (deal {keenPct}% more damage), {luckyStreak} (heal {heal} over the duration), {gildedGuard} (a shield that absorbs {absorb} damage), or {snakeEyes} (no effect, but this cooldown is halved).",
+        "blink": "Step {yards} yd forward, then take {reduction}% less damage for {guard} sec.",
+        "sprint": "Increase your movement speed by {speed}% for {duration} sec. Does not stack with other speed increases.",
+        "defiance": "Remove all stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you. Usable while stunned.",
+        "brand": "Brand an enemy player within {range} yd, reducing the healing they receive by {cut}% for {duration} sec."
+      }
+    },
     "questShare": {
       "notShareable": "Cette quête ne peut pas être partagée.",
       "notInSharerParty": "Vous devez être dans le groupe de {name} pour accepter cette quête.",
@@ -16700,6 +16731,45 @@ export const fr_FR: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "Garde-braise, rempart de Varkhul"
+      },
+      "bastion_sigil": {
+        "name": "Bastion Sigil"
+      },
+      "mooring_stone": {
+        "name": "Mooring Stone"
+      },
+      "menders_hourglass": {
+        "name": "Mender's Hourglass"
+      },
+      "wellspring_seed": {
+        "name": "Wellspring Seed"
+      },
+      "paired_talons": {
+        "name": "Paired Talons"
+      },
+      "hunters_tally": {
+        "name": "Hunter's Tally"
+      },
+      "stormjar": {
+        "name": "Stormjar"
+      },
+      "echoing_lens": {
+        "name": "Echoing Lens"
+      },
+      "gamblers_die": {
+        "name": "Gambler's Die"
+      },
+      "sundered_prism": {
+        "name": "Sundered Prism"
+      },
+      "wayfarers_lodestone": {
+        "name": "Wayfarer's Lodestone"
+      },
+      "medallion_of_defiance": {
+        "name": "Medallion of Defiance"
+      },
+      "duelists_brand": {
+        "name": "Duelist's Brand"
       }
     },
     "mobs": {

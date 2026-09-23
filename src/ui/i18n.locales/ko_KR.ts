@@ -17142,4 +17142,60 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '이름을 사용하여 타운 허브로 순간이동합니다.',
   'devCommand.actions.town.label': '타운 허브',
   'devCommand.fields.town': '도시',
+  'entities.items.bastion_sigil.name': '보루의 인장',
+  'entities.items.mooring_stone.name': '정박석',
+  'entities.items.menders_hourglass.name': '치유사의 모래시계',
+  'entities.items.wellspring_seed.name': '샘물의 씨앗',
+  'entities.items.paired_talons.name': '한 쌍의 발톱',
+  'entities.items.hunters_tally.name': '사냥꾼의 집계',
+  'entities.items.stormjar.name': '폭풍 항아리',
+  'entities.items.echoing_lens.name': '메아리 렌즈',
+  'entities.items.gamblers_die.name': '도박꾼의 주사위',
+  'entities.items.sundered_prism.name': '갈라진 프리즘',
+  'entities.items.wayfarers_lodestone.name': '방랑자의 자철석',
+  'entities.items.medallion_of_defiance.name': '저항의 메달',
+  'entities.items.duelists_brand.name': '결투가의 낙인',
+  'hudChrome.trinkets.equipLine': '착용 효과: {effect}',
+  'hudChrome.trinkets.useLine': '사용 효과: {effect} (재사용 대기시간 {cooldown})',
+  'hudChrome.trinkets.cooldownMinutes': '{minutes}분',
+  'hudChrome.trinkets.cooldownSeconds': '{seconds}초',
+  'hudChrome.trinkets.gambleResult': '{item}: {fortune}!',
+  'hudChrome.trinkets.snakeEyes': '스네이크 아이즈',
+  'hudChrome.trinkets.equippedLine': '착용 중',
+  'hudChrome.trinkets.equip.lastStand':
+    '생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해(최대 생명력의 {absorbPct}%)를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.',
+  'hudChrome.trinkets.equip.hourglass':
+    '직접 치유로 발생한 초과 치유량이 모래시계에 저장되며, 최대 {cap}(최대 생명력의 {capPct}%)까지 저장됩니다. 저장된 치유량은 마지막으로 늘어난 뒤 {fade}초가 지나면 사라집니다.',
+  'hudChrome.trinkets.equip.twinStrike':
+    '자동 공격이 적중하면 {chance}% 확률로 주무기 근접 공격을 한 번 더 합니다. {icd}초마다 한 번만 발동합니다.',
+  'hudChrome.trinkets.equip.tally':
+    '자동 공격 치명타와 결정타마다 집계 표식을 하나씩 얻으며, 최대 {max}개까지 쌓입니다. 표식은 {duration}초 동안 지속되며, 새로 얻을 때마다 갱신됩니다.',
+  'hudChrome.trinkets.equip.storm':
+    '주문을 시전할 때마다 충전을 하나 얻으며, 최대 {max}개까지 쌓입니다. 충전은 {duration}초 동안 지속되며, 새로 얻을 때마다 갱신됩니다.',
+  'hudChrome.trinkets.use.retaliate':
+    '{duration}초 동안 당신을 직접 공격한 적은 그 공격으로 잃은 생명력의 {pct}%에 해당하는 물리 피해를 받습니다. 지속 피해로는 발동하지 않습니다.',
+  'hudChrome.trinkets.use.anchor':
+    '{duration}초 동안 받는 피해가 {reduction}% 감소하지만 이동 속도가 {speed}%가 됩니다. 자신에게 걸린 기절, 이동 불가, 감속, 공포, 변이, 침묵, 실명, 주술, 무장 해제, 행동 불가 효과를 제거하고, 지속되는 동안 새로운 효과와 밀쳐내기를 무시합니다.',
+  'hudChrome.trinkets.use.hourglass':
+    '저장된 치유량을 모두 {range}미터 이내에서 생명력 비율이 가장 낮은 파티원(자신 포함)에게 보호막으로 바꿉니다. 보호막은 {duration}초 동안 지속됩니다. 저장된 치유량이 필요합니다.',
+  'hudChrome.trinkets.use.wellspring':
+    '{duration}초 동안 {every}초마다 자신과 {radius}미터 이내의 파티원의 생명력을 {tick} 회복시킵니다. 치유량은 치유 강화로 증가합니다.',
+  'hudChrome.trinkets.use.bleedEdge':
+    '{duration}초 동안 자동 공격이 적중하면 발톱 상처를 입힙니다. 발톱 상처는 중첩당 {every}초마다 {tick}의 물리 피해를 {bleedDuration}초 동안 입히며 최대 {stacks}번까지 중첩됩니다. 피해량은 전투력으로 증가합니다.',
+  'hudChrome.trinkets.use.tallyStrike':
+    '집계 표식을 모두 소모하여 {range}미터 이내의 대상을 공격하고, 표식당 {perMark}의 물리 피해를 입힙니다(표식 {maxMarks}개일 때 {max}). 피해량은 전투력으로 증가합니다. 집계 표식이 필요합니다.',
+  'hudChrome.trinkets.use.stormjar':
+    '충전을 모두 번개로 바꿔 {range}미터 이내의 대상에게 발사하며, 번개는 {jumpRange}미터 이내의 적에게 최대 {extra}번 더 튑니다. 각 적은 충전당 {perCharge}의 자연 피해를 받습니다(충전 {maxCharges}개일 때 {max}). 피해량은 주문력으로 증가합니다. 충전이 필요합니다.',
+  'hudChrome.trinkets.use.echo':
+    '{duration}초 동안 다음 {casts}번의 직접 치유 또는 물리가 아닌 직접 피해가 그 양의 {pct}%로 한 번 더 반복됩니다.',
+  'hudChrome.trinkets.use.gamble':
+    '{duration}초 동안 네 가지 운세 중 하나를 굴립니다: {keenEdge}(주는 피해 {keenPct}% 증가), {luckyStreak}(지속시간 동안 {heal} 치유), {gildedGuard}({absorb}의 피해를 흡수하는 보호막), {snakeEyes}(효과 없음, 대신 이 재사용 대기시간이 절반이 됨).',
+  'hudChrome.trinkets.use.blink':
+    '앞으로 {yards}미터 이동한 뒤 {guard}초 동안 받는 피해가 {reduction}% 감소합니다.',
+  'hudChrome.trinkets.use.sprint':
+    '{duration}초 동안 이동 속도가 {speed}% 증가합니다. 다른 속도 증가 효과와 중첩되지 않습니다.',
+  'hudChrome.trinkets.use.defiance':
+    '자신에게 걸린 모든 기절, 이동 불가, 감속, 공포, 변이, 침묵, 실명, 주술, 무장 해제, 행동 불가 효과를 제거합니다. 기절 중에도 사용할 수 있습니다.',
+  'hudChrome.trinkets.use.brand':
+    '{range}미터 이내의 적 플레이어 한 명에게 낙인을 찍어 {duration}초 동안 받는 치유량을 {cut}% 감소시킵니다.',
 };

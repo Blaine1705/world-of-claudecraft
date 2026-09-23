@@ -837,6 +837,9 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['cryptplate_helm', 0.34],
       ['shadowpulse_slippers', 0.33],
       ['bonechill_cord', 0.33],
+      // Trinkets (content/trinkets.ts): one per heroic final boss, each in a
+      // different dungeon, inside the one guaranteed equipment slot.
+      ['bastion_sigil', 0.25],
     ]).map(preserveBaseLootSource),
     { itemId: 'gravewoven_bag', chance: 0.2, preserveSourceTier: true },
     { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
@@ -861,6 +864,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['tideguard_faceguard', 0.25],
       ['sunken_court_mantle', 0.25],
       ['dreamroot_boots', 0.25],
+      ['stormjar', 0.25],
     ]).map(preserveBaseLootSource),
     { itemId: 'mistcallers_duffel', chance: 0.1, preserveSourceTier: true },
     { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
@@ -879,6 +883,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['lunar_choir_leggings', 0.34],
       ['choir_blessed_spaulders', 0.33],
       ['tideworn_warboots', 0.33],
+      ['menders_hourglass', 0.25],
     ]).map(preserveBaseLootSource),
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
     ...heroicFarmPatternRows(),
@@ -933,6 +938,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['greatfang_of_the_basin', 0.34],
       ['sunbone_oracles_crown', 0.33],
       ['bloodmane_war_legguards', 0.33],
+      ['paired_talons', 0.25],
     ]).map(preserveBaseLootSource),
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
@@ -944,16 +950,22 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // raid-tier (item level 33/37) heroic variants in a heroic claim
     // (loot/loot_roll.ts + heroic_variants.ts). This table adds only the
     // heroic-ONLY extras the normal table never carries: the three bespoke raid
-    // weapons, one of which drops per heroic kill (chances sum to 1.0), plus the
+    // weapons and the four raid trinkets (content/trinkets.ts), one of which
+    // drops per heroic kill (chances sum to 1.0; weapons half, trinkets half,
+    // so the kill still pays exactly two equipment items), plus the
     // blue and green mount secondary paths (same per-mount rate as their five-man
     // sources; the raid offers both of each so every heroic raider has a path).
-    { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'deathless_greatblade', chance: 0.17, rollGroup: 'nythraxis_heroic_weapon' },
     {
       itemId: 'scepter_of_the_deathless_court',
-      chance: 0.33,
+      chance: 0.17,
       rollGroup: 'nythraxis_heroic_weapon',
     },
-    { itemId: 'stormcallers_focus', chance: 0.33, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'stormcallers_focus', chance: 0.16, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'mooring_stone', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'wellspring_seed', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'hunters_tally', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'echoing_lens', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
     // Blue mount secondary paths on the heroic raid (0.1% each, equal per-mount
     // to the five-man rate; both blues available so aggregate ~0.2%); the primary
     // path for each is its five-man heroic boss. Epic mounts are rift S-only.
