@@ -408,7 +408,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/hoard_bloat_cap.glb": "/media/models/creatures/hoard_bloat_cap.75a8a2e89cc7.glb",
   "models/creatures/hoard_boneclad_warrior.glb": "/media/models/creatures/hoard_boneclad_warrior.fc17f59f11c5.glb",
   "models/creatures/hoard_boss_bat.glb": "/media/models/creatures/hoard_boss_bat.97a53873e49e.glb",
-  "models/creatures/hoard_boss_mimic.glb": "/media/models/creatures/hoard_boss_mimic.f531472448b4.glb",
+  "models/creatures/hoard_boss_mimic.glb": "/media/models/creatures/hoard_boss_mimic.847ead1bc5a3.glb",
   "models/creatures/hoard_boss_mole.glb": "/media/models/creatures/hoard_boss_mole.f2df8e3e874c.glb",
   "models/creatures/hoard_boss_mushroom.glb": "/media/models/creatures/hoard_boss_mushroom.09b5e7d30324.glb",
   "models/creatures/hoard_brood_cocoon.glb": "/media/models/creatures/hoard_brood_cocoon.b99488a9a932.glb",

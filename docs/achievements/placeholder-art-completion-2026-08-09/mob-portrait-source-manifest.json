@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "91ee79483fb638bef73cb7eddbe24b66d7b8f2b82ff40cd194b92da711aff3e9",
+  "rendererFingerprint": "a4ecbfb8c53e75abb861725371705a9efea1ad30dafc9fb80d3deef4c7d160f3",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5019144,
-      "sha256": "70ddceafed40dbe800a5553d19fa1c649e67fa8b03634abda427134eb532b868",
+      "bytes": 5019142,
+      "sha256": "cf26f512d0c61f9be458533cf07f8c02cfb7a58bb3bd3e35f384673d27391343",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3520,8 +3520,8 @@
         "model": {
           "url": "models/creatures/hoard_boss_mimic.glb",
           "path": "public/models/creatures/hoard_boss_mimic.glb",
-          "bytes": 608776,
-          "sha256": "f531472448b48d95690ea5f1788c67c110d29fc5c95eba2c75800b4badf46c8d"
+          "bytes": 682248,
+          "sha256": "847ead1bc5a3e73b4ec7f486ba9f6cf32793ef27dc2f115922b4ef0fdd848331"
         },
         "idle": "Idle",
         "height": 1.6,
@@ -3538,11 +3538,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6cc6e14c47ef4b8dca4d87b550845f07855b049191b3c8f63fef11ff1654c661",
+      "sourceFingerprint": "438307bb11ff64661a6fb4f78091bb54a31220de3dd5234de5a87305fa364aef",
       "output": {
         "path": "public/ui/mobs/hoard_boss_mimic.webp",
-        "bytes": 2480,
-        "sha256": "0a883646c4d4d6a2530d81556d02a801e3eb792fbbefe5feb8ddad0b72352b8d"
+        "bytes": 2498,
+        "sha256": "199037e2e736b8ce2a7a04ab491629e5bf9107c7b30c05b05da025536e914a0b"
       }
     },
     {
