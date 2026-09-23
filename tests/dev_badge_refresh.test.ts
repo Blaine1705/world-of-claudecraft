@@ -219,4 +219,35 @@ describe('GameServer.refreshDevBadge (real DB + contributor-cache resolution)', 
     const meta = server.sim.meta(session.pid)!;
     expect([...meta.deedsEarned.keys()].filter((id) => id.startsWith('hid_dev_'))).toEqual([]);
   });
+
+  it('the out-of-tick grant rides the next tick to the observer: queued for the deed index, no marquee', async () => {
+    dbMock.query.mockImplementation(githubLinksRouter('jgyy'));
+    mockMergedPrsFetch('jgyy', 15); // Runesmith (rung 3)
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = server.join(fc.ws, 1, 1, 'Devvy', 'warrior', null);
+    if ('error' in session) throw new Error(session.error);
+    session.blockListLoaded = true;
+    const marquee = vi.spyOn(server.social, 'broadcastDeedUnlock').mockResolvedValue(undefined);
+    (server as any).detectActivity(server.sim.tick()); // settle the fresh join
+    session.pendingDeedRecords.length = 0;
+
+    await (server as any).refreshDevBadge(session);
+    // The grant happened between ticks: its events wait for the next tick.
+    const events = server.sim.tick();
+    const unlocks = events
+      .filter((ev: any) => ev.type === 'deedUnlocked' && ev.deedId.startsWith('hid_dev_'))
+      .map((ev: any) => [ev.deedId, ev.retro === true]);
+    expect(unlocks).toEqual([
+      ['hid_dev_tinkerer', true],
+      ['hid_dev_artificer', true],
+      ['hid_dev_runesmith', false],
+    ]);
+    (server as any).detectActivity(events);
+    expect(session.pendingDeedRecords).toEqual(
+      expect.arrayContaining(['hid_dev_tinkerer', 'hid_dev_artificer', 'hid_dev_runesmith']),
+    );
+    // Hidden deeds never reach the guild marquee, even the live top rung.
+    expect(marquee).not.toHaveBeenCalled();
+  });
 });

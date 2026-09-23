@@ -3396,7 +3396,8 @@ export const DEEDS: Record<string, DeedDef> = {
   // The developer-badge rungs as selectable titles (src/sim/dev_tier.ts). The
   // server grants every rung at or below a player's resolved GitHub merged-PR
   // tier (src/sim/dev_badge_deeds.ts); nothing in play can earn them, so they
-  // stay hidden and zero-Renown: a contributor's flair, never a Book step.
+  // stay hidden (invisible until earned, then counted like any earned hidden
+  // deed) and zero-Renown: a contributor's flair, never a Renown score.
   hid_dev_tinkerer: {
     id: 'hid_dev_tinkerer',
     name: 'Tinkerer of the Source',
