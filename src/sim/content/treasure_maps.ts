@@ -34,7 +34,7 @@ export const TREASURE_MAP_RIFT_TIER: Readonly<Record<TreasureMapRarity, RiftTier
 
 /** Odds (out of 100) of each rarity when the daily board pays a map. */
 export const TREASURE_MAP_DROP_WEIGHTS: Readonly<Record<TreasureMapRarity, number>> = Object.freeze(
-  { common: 60, rare: 30, epic: 9, legendary: 1 },
+  { common: 40, rare: 35, epic: 20, legendary: 5 },
 );
 
 /** The next rarity up, or null at the top. */

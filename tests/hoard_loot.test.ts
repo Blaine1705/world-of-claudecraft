@@ -45,8 +45,8 @@ const primarySum = (item: ItemDef): number =>
   Object.entries(item.stats ?? {}).reduce((n, [k, v]) => (k === 'armor' ? n : n + (v ?? 0)), 0);
 
 describe('the three tiers', () => {
-  it('land on item level 26, 29 and 32, the top one still an epic below the raids', () => {
-    expect(TIERS.map(hoardLootItemLevel)).toEqual([26, 29, 32]);
+  it('land on item level 28, 31 and 33, the top one still an epic below the raids', () => {
+    expect(TIERS.map(hoardLootItemLevel)).toEqual([28, 31, 33]);
     expect(TIERS.map((tier) => HOARD_LOOT_TIERS[tier].quality)).toEqual(['rare', 'epic', 'epic']);
     for (const base of HOARD_BASE_ITEM_IDS) {
       for (const tier of TIERS) {
@@ -57,7 +57,7 @@ describe('the three tiers', () => {
       }
     }
     // Above every rift epic (the best gear outside a raid), below the first raid tier.
-    for (const id of RIFT_EPIC_ITEM_IDS) expect(itemLevel(ITEMS[id]), id).toBeLessThan(32);
+    for (const id of RIFT_EPIC_ITEM_IDS) expect(itemLevel(ITEMS[id]), id).toBeLessThan(33);
   });
 
   it('a map buys its own tier, and a common map rolls the rare one', () => {
@@ -319,7 +319,7 @@ describe('the payout', () => {
       const gear = lootedGear(sim.drainEvents());
       expect(gear, `run ${run}`).toHaveLength(1);
       expect(table).toContain(gear[0]);
-      expect(itemLevel(ITEMS[gear[0]])).toBe(32);
+      expect(itemLevel(ITEMS[gear[0]])).toBe(33);
       expect(ITEMS[gear[0]].name.startsWith('Sovereign ')).toBe(true);
       seen.add(gear[0]);
     }
@@ -338,7 +338,7 @@ describe('the payout', () => {
       const gear = lootedGear(sim.drainEvents());
       for (const id of gear) {
         expect(ITEMS[id].quality, id).toBe('rare');
-        expect(itemLevel(ITEMS[id]), id).toBe(26);
+        expect(itemLevel(ITEMS[id]), id).toBe(28);
       }
       paid += gear.length;
     }

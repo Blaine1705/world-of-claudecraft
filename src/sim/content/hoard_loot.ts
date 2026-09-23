@@ -5,10 +5,10 @@
 // One PIECE, three tiers, by the map that led to the hoard:
 //
 //   map         item level   quality   stands beside
-//   rare            26        rare      the rift rares
-//   epic            29        epic      the first raid tier, the Weekly Vault
-//   legendary       32        epic      above the heroic five-mans and rift
-//                                       epics (31), below the raids (33, 35)
+//   rare            28        rare      the PvP Warfare tier
+//   epic            31        epic      heroic five-mans and rift epics
+//   legendary       33        epic      beside the first heroic raid tier,
+//                                       below Crucible of Ignivar (35)
 //
 // A legendary map is the hardest thing the treasure maps offer (one map in a
 // hundred, or days of reputation currency poured into Cartographer's Ink), which
@@ -76,14 +76,14 @@ interface TierSpec {
 }
 
 /** Ratings follow the game's rating ladder (tests/combat_rating.test.ts): an
- *  ilvl-26 rare carries none, every ilvl-29 piece carries exactly 20, and the
- *  ilvl-31 rung is 40 on armour, 25 on jewellery, 20 held in the off hand. The
- *  legendary tier keeps that ilvl-31 allowance: two ratings on one piece is the
- *  raid tier's identity, from ilvl 33 up. */
+ *  ilvl-28 rare carries none, every ilvl-31 piece carries exactly 20, and the
+ *  ilvl-33 rung keeps the ilvl-31 allowance (40 on armour, 25 on jewellery, 20
+ *  held in the off hand): two ratings on one piece stays the raid tier's
+ *  identity. */
 export const HOARD_LOOT_TIERS: Readonly<Record<HoardLootTier, TierSpec>> = Object.freeze({
   rare: {
     quality: 'rare',
-    sourceLevel: 23,
+    sourceLevel: 25,
     armorRating: 0,
     jewelryRating: 0,
     offhandRating: 0,
@@ -92,7 +92,7 @@ export const HOARD_LOOT_TIERS: Readonly<Record<HoardLootTier, TierSpec>> = Objec
   },
   epic: {
     quality: 'epic',
-    sourceLevel: 23,
+    sourceLevel: 25,
     armorRating: 20,
     jewelryRating: 20,
     offhandRating: 20,
@@ -101,7 +101,7 @@ export const HOARD_LOOT_TIERS: Readonly<Record<HoardLootTier, TierSpec>> = Objec
   },
   legendary: {
     quality: 'epic',
-    sourceLevel: 26,
+    sourceLevel: 27,
     armorRating: 40,
     jewelryRating: 25,
     offhandRating: 20,

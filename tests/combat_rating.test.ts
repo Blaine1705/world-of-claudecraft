@@ -231,21 +231,21 @@ describe('combat-rating tier ladder', () => {
     // (maul_of_the_scourged_wilds), and the seven Roots' Bramblehide pieces
     // (the feral druid's Strength leather family), and the seven Nythraxis
     // gap-fill drops (three one-handers, the healer shield, the leather caster
-    // helm, the mail caster gloves and feet), and the 32 epic-tier Buried Hoard
-    // boss pieces (content/hoard_loot.ts), jewellery included.
+    // helm, the mail caster gloves and feet).
     const ilvl29 = allGear.filter((item) => itemLevel(item) === 29);
-    expect(ilvl29).toHaveLength(60);
+    expect(ilvl29).toHaveLength(28);
     for (const item of ilvl29) expect(ratingValues(item), item.id).toEqual([20]);
 
     // ilvl-31: heroic five-man boss pieces (40 rating) + rift clear-time epics
-    // (armor pieces 40, ring 25). Every ilvl-31 PvE gear piece carries exactly one
-    // rating, and the WARFARE honor tier is the one deliberate hole in the ladder:
-    // it sits at ilvl 31 carrying ZERO combat ratings. That is load-bearing rather
-    // than an oversight. It is what stops a complete honor kit from substituting
-    // for the heroic tier: same item level, a 10 percent primary-stat discount,
-    // no ratings at all, and set bonuses that contribute nothing outside PvP.
-    // Carved out by id rather than filtered by "has no rating", which would
-    // silently absorb any future PvE piece that lost its rating by accident.
+    // (armor pieces 40, ring 25) + the 32 epic-tier Buried Hoard pieces (20 rating).
+    // Every ilvl-31 PvE gear piece carries exactly one rating, and the WARFARE
+    // honor tier is the one deliberate hole in the ladder: it sits at ilvl 31
+    // carrying ZERO combat ratings. That is load-bearing rather than an oversight.
+    // It is what stops a complete honor kit from substituting for the heroic
+    // tier: same item level, a 10 percent primary-stat discount, no ratings at all,
+    // and set bonuses that contribute nothing outside PvP. Carved out by id rather
+    // than filtered by "has no rating", which would silently absorb any future
+    // PvE piece that lost its rating by accident.
     const warfareIds = new Set<string>(FURY_STOCK);
     const ilvl31 = allGear.filter((item) => itemLevel(item) === 31);
     expect(ilvl31.length).toBeGreaterThan(0);
@@ -264,13 +264,16 @@ describe('combat-rating tier ladder', () => {
       'ilvl-31 PvE epics still carry their ratings',
     ).toBeGreaterThan(0);
 
-    // ilvl-32: the legendary-map tier of the Buried Hoard pieces, the one rung
-    // between the ilvl-31 epics and the raids. It keeps the ilvl-31 allowance,
-    // exactly one rating: two on a piece stays the raid tier's identity.
-    const ilvl32 = allGear.filter((item) => itemLevel(item) === 32);
-    expect(ilvl32).toHaveLength(32);
-    for (const item of ilvl32) {
-      expect(ratingCount(item), `${item.id} (ilvl 32) carries one rating`).toBe(1);
+    // ilvl-33: the legendary-map tier of the Buried Hoard pieces (Sovereign) sits
+    // beside the heroic raid tier, keeping the ilvl-31 rating allowance (40 on
+    // armour, 25 on jewellery, 20 offhand) with exactly one rating: two on a
+    // piece stays the heroic raid tier's identity.
+    const hoardLegendary = allGear.filter(
+      (item) => itemLevel(item) === 33 && item.id.startsWith('legendary_'),
+    );
+    expect(hoardLegendary).toHaveLength(32);
+    for (const item of hoardLegendary) {
+      expect(ratingCount(item), `${item.id} (ilvl 33) carries one rating`).toBe(1);
       expect(Math.max(...ratingValues(item)), item.id).toBeLessThanOrEqual(40);
     }
 
