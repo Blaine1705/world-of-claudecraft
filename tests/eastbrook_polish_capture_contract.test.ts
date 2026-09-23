@@ -689,7 +689,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  'e651995fbf1ac8413176d75b35b5da91b9a241918ea183430642a9c6b51d3fd5';
+  // Re-minted for dropping the three patch's opaque_fragment NaN scrub: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
+  '82e70d2c46bd1620978ce0be08f151a1ec9748038f30d4e67fe367064e1953bb';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

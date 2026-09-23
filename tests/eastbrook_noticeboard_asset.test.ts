@@ -22,8 +22,8 @@ import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resourc
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/eastbrook_noticeboard.glb');
 const ASSET_BYTES = 24_684;
-const ASSET_SHA256 = '0413aeef12e0e2e3bcb14a6534723b432ceb91a6244c7f58bdaf307ffc20f994';
-const SOURCE_FINGERPRINT = '0c4510ad0cf2d86e0d76a595e04c0936214663974e12619b91805c4c23614c33';
+const ASSET_SHA256 = '4755ce4e6e879c7ae329e613867b8d77acea6343779909ef67212521fcc9c0a6';
+const SOURCE_FINGERPRINT = '364ca43dd64203c5450ce473323f8af66f3e76d9c08a9a84af727e1d0af9dc35';
 let restoreGfx: (() => void) | null = null;
 
 function setStandardMaterials(value: boolean): void {

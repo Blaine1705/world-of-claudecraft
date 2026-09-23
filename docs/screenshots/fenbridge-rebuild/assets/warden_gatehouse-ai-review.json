@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "assetId": "warden_gatehouse",
-  "sourceFingerprint": "4fcbb95033ac321383ed2796e619437f3879a8632e13dffd02ed856ae0b32698",
+  "sourceFingerprint": "eee19b5c2518de2cb1125943db7f8eb9e0ca08455b050337ac0da837c1e2a470",
   "reference": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
   "minimumOverallScore": 0.7,
   "requiredViews": [

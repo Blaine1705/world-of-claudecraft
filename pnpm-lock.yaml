@@ -24,7 +24,7 @@ overrides:
 
 patchedDependencies:
   three@0.185.1:
-    hash: cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e
+    hash: 021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341
     path: patches/three@0.185.1.patch
 
 importers:
@@ -78,7 +78,7 @@ importers:
         version: 6.8.9
       n8ao:
         specifier: ^2.0.0
-        version: 2.0.0(postprocessing@6.39.4(three@0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e)))(three@0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e))
+        version: 2.0.0(postprocessing@6.39.4(three@0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341)))(three@0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341))
       obscenity:
         specifier: ^0.4.6
         version: 0.4.6
@@ -87,13 +87,13 @@ importers:
         version: 8.22.0
       postprocessing:
         specifier: 6.39.4
-        version: 6.39.4(three@0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e))
+        version: 6.39.4(three@0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341))
       prom-client:
         specifier: 15.1.3
         version: 15.1.3
       three:
         specifier: 0.185.1
-        version: 0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e)
+        version: 0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341)
       tweetnacl:
         specifier: 1.0.3
         version: 1.0.3
@@ -9205,10 +9205,10 @@ snapshots:
 
   multiformats@9.9.0: {}
 
-  n8ao@2.0.0(postprocessing@6.39.4(three@0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e)))(three@0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e)):
+  n8ao@2.0.0(postprocessing@6.39.4(three@0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341)))(three@0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341)):
     dependencies:
-      postprocessing: 6.39.4(three@0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e))
-      three: 0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e)
+      postprocessing: 6.39.4(three@0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341))
+      three: 0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341)
 
   nanoid@3.3.18: {}
 
@@ -9555,9 +9555,9 @@ snapshots:
       commander: 9.5.0
     optional: true
 
-  postprocessing@6.39.4(three@0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e)):
+  postprocessing@6.39.4(three@0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341)):
     dependencies:
-      three: 0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e)
+      three: 0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341)
 
   preact@10.24.2:
     optional: true
@@ -10050,7 +10050,7 @@ snapshots:
     dependencies:
       real-require: 0.2.0
 
-  three@0.185.1(patch_hash=cb3331eddca23ca70eb9a074b6aa2bc9acbd1698bc7addea8b177a0bf00fd45e): {}
+  three@0.185.1(patch_hash=021668343d12a22082d98c33e2514409d68dfd69ecb6691f4e86214a029ab341): {}
 
   through2@4.0.2:
     dependencies:
