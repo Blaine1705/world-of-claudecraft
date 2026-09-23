@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.paperdoll.trinketSlot': '装飾品',
   'questUi.worldQuest.puzzleRetry': 'もう一度',
   'questUi.worldQuest.puzzleTimerAria': '残り時間：{seconds}秒',
   'questUi.worldQuest.startQuest': 'ワールドクエストを開始',

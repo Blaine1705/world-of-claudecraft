@@ -59,6 +59,8 @@ export const SLOT_STAT_MULT: Record<ItemSlot, number> = {
   ring: 0.6,
   ring1: 0.6,
   ring2: 0.6,
+  // Trinkets use the existing unarmored accessory budget, like rings.
+  trinket: 0.6,
 };
 
 // Primary-stat points granted per item level at full (rare-mult x chest-mult = 1).

@@ -2670,6 +2670,7 @@ export const ko_KR: EnTranslations = {
       "failed": "버그 신고를 보낼 수 없습니다. 다시 시도해 주세요."
     },
     "paperdoll": {
+      "trinketSlot": "장신구",
       "unequipAria": "{item} 장착 해제",
       "unequipHint": "× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제",
       "hideHelmAria": "투구 숨기기",

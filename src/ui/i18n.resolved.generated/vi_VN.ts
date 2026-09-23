@@ -2670,6 +2670,7 @@ export const vi_VN: EnTranslations = {
       "failed": "Không thể gửi báo cáo lỗi. Vui lòng thử lại."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "Tháo {item}",
       "unequipHint": "Nhấp ×, nhấp chuột phải, hoặc kéo vào túi để tháo trang bị",
       "hideHelmAria": "Ẩn mũ giáp",

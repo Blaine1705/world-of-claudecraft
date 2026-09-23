@@ -2670,6 +2670,7 @@ export const ru_RU: EnTranslations = {
       "failed": "Не удалось отправить отчёт об ошибке. Попробуйте снова."
     },
     "paperdoll": {
+      "trinketSlot": "Аксессуар",
       "unequipAria": "Снять {item}",
       "unequipHint": "Нажмите ×, ПКМ или перетащите в сумку, чтобы снять",
       "hideHelmAria": "Скрыть шлем",

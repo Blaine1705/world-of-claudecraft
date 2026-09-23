@@ -2670,6 +2670,7 @@ export const id_ID: EnTranslations = {
       "failed": "Tidak dapat mengirim laporan bug. Silakan coba lagi."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "Lepas {item}",
       "unequipHint": "Klik ×, klik kanan, atau seret ke tas untuk melepas",
       "hideHelmAria": "Sembunyikan helm",

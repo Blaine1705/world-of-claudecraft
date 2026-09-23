@@ -2670,6 +2670,7 @@ export const fr_CA: EnTranslations = {
       "failed": "Impossible d'envoyer le rapport de bug. Veuillez réessayer."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "Déséquiper {item}",
       "unequipHint": "Cliquez sur ×, faites un clic droit ou glissez vers les sacs pour déséquiper",
       "hideHelmAria": "Masquer le casque",

@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.paperdoll.trinketSlot': 'Abalorio',
   'hud.errors.cannotCastWhileMoving': 'No puedes lanzar hechizos mientras te mueves.',
   'hudChrome.auraEffect.wolfForm':
     'Forma de gato: daño cuerpo a cuerpo y energía; velocidad de movimiento aumentada un {pct}%',

@@ -2670,6 +2670,7 @@ export const en_XA: EnTranslations = {
       "failed": "[Çóúļð ñóţ šéñð ţĥé ƀúĝ ŕéþóŕţ. Þļéášé ţŕý áĝáíñ.]"
     },
     "paperdoll": {
+      "trinketSlot": "[Ţŕíñķéţ]",
       "unequipAria": "[Úñéɋúíþ {item}]",
       "unequipHint": "[Çļíçķ ×, ŕíĝĥţ-çļíçķ, óŕ ðŕáĝ ţó ƀáĝš ţó úñéɋúíþ]",
       "hideHelmAria": "[Ĥíðé ĥéļɱéţ]",

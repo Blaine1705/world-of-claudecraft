@@ -2670,6 +2670,7 @@ export const da_DK: EnTranslations = {
       "failed": "Kunne ikke sende fejlrapporten. Prøv venligst igen."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "Fjern {item}",
       "unequipHint": "Klik ×, højreklik, eller træk til tasker for at fjerne udstyr",
       "hideHelmAria": "Skjul hjelm",

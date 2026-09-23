@@ -2670,6 +2670,7 @@ export const de_DE: EnTranslations = {
       "failed": "Die Fehlermeldung konnte nicht gesendet werden. Bitte versuche es erneut."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "{item} ablegen",
       "unequipHint": "Klicke auf ×, Rechtsklick oder in die Taschen ziehen zum Ablegen",
       "hideHelmAria": "Helm verbergen",

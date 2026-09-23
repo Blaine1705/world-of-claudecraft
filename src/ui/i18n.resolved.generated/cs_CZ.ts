@@ -2670,6 +2670,7 @@ export const cs_CZ: EnTranslations = {
       "failed": "Hlášení chyby se nepodařilo odeslat. Zkus to prosím znovu."
     },
     "paperdoll": {
+      "trinketSlot": "Trinket",
       "unequipAria": "Sundat {item}",
       "unequipHint": "Klikni na x, pravé kliknutí, nebo přetáhni do batohů pro sundání",
       "hideHelmAria": "Skrýt přilbu",
