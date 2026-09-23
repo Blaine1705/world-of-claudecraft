@@ -1,4 +1,14 @@
 const PATCH_MARKER = 'WOC_SKIP_ZERO_POINT_LIGHT';
+const LOOP_MARKER = 'WOC_POINT_LIGHT_LOOP';
+const POINT_SECTION_ANCHOR = '#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )';
+const POINT_LOOP_START_ANCHOR =
+  '\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n';
+const UNROLL_START_LINE = '\t#pragma unroll_loop_start\n';
+const UNROLL_END_LINE = '\t#pragma unroll_loop_end\n';
+const POINT_SHADOW_ANCHOR =
+  '\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_POINT_LIGHT_SHADOWS )';
+const POINT_SHADOW_END = '\t\t#endif\n';
+const POINT_SHADOW_ARM = '\t#if defined( USE_SHADOWMAP ) && NUM_POINT_LIGHT_SHADOWS > 0\n';
 const POINT_INFO_ANCHOR = 'getPointLightInfo( pointLight, geometryPosition, directLight );';
 const POINT_DIRECT_ANCHOR =
   'RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );';
@@ -31,10 +41,7 @@ function pinnedAnchor(
  * uniform. The existing Standard-only attenuation guard stays Standard-only:
  * directLight.visible depends on fragment position near a light cutoff.
  */
-export function patchPointLightFragmentChunk(source: string): string {
-  if (source.includes(PATCH_MARKER)) return source;
-
-  const spotLights = pinnedAnchor(source, SPOT_LIGHT_ANCHOR, 'spot-boundary');
+function guardPointLightBody(source: string, spotLights: number): string {
   const pointInfo = pinnedAnchor(source, POINT_INFO_ANCHOR, 'point-info', 0, spotLights);
   const pointDirect = pinnedAnchor(
     source,
@@ -73,4 +80,54 @@ export function patchPointLightFragmentChunk(source: string): string {
     guardedPointDirect +
     source.slice(pointDirect + POINT_DIRECT_ANCHOR.length)
   );
+}
+
+/**
+ * The unrolled form inlines one BRDF call chain per light, and fxc under ANGLE
+ * D3D11 prices every copy at link time. The point-shadow sub-block reads
+ * UNROLLED_LOOP_INDEX, which only three's JS unroller defines, so the plain
+ * loop drops it and serves only programs without point shadows; the unrolled
+ * arm keeps shadow-casting point lights working.
+ */
+function loopPointLights(guarded: string): string {
+  const pointSection = pinnedAnchor(guarded, POINT_SECTION_ANCHOR, 'point-section');
+  const spotLights = pinnedAnchor(guarded, SPOT_LIGHT_ANCHOR, 'spot-boundary');
+  const loopStart = pinnedAnchor(
+    guarded,
+    POINT_LOOP_START_ANCHOR,
+    'point-loop-start',
+    pointSection,
+    spotLights,
+  );
+  const loopEnd = pinnedAnchor(guarded, UNROLL_END_LINE, 'point-loop-end', loopStart, spotLights);
+  const unrolled = guarded.slice(loopStart, loopEnd + UNROLL_END_LINE.length);
+
+  const body = unrolled.slice(UNROLL_START_LINE.length, -UNROLL_END_LINE.length);
+  const shadowStart = pinnedAnchor(body, POINT_SHADOW_ANCHOR, 'point-shadow');
+  const shadowEnd = body.indexOf(POINT_SHADOW_END, shadowStart);
+  const shadowBlock = shadowEnd < 0 ? '' : body.slice(shadowStart, shadowEnd);
+  if (shadowEnd < 0 || shadowBlock.slice(POINT_SHADOW_ANCHOR.length).includes('#')) {
+    throw new Error('Three r165 point-light chunk point-shadow block changed');
+  }
+  const loop = body.slice(0, shadowStart) + body.slice(shadowEnd + POINT_SHADOW_END.length);
+  if (loop.includes('UNROLLED_LOOP_INDEX') || loop.includes('#pragma')) {
+    throw new Error('Three r165 point-light chunk loop body still needs the unroller');
+  }
+
+  return (
+    guarded.slice(0, loopStart) +
+    POINT_SHADOW_ARM +
+    unrolled +
+    '\t#else\n' +
+    `\t// ${LOOP_MARKER}: one loop body instead of an inlined copy per light.\n` +
+    loop +
+    '\t#endif\n' +
+    guarded.slice(loopEnd + UNROLL_END_LINE.length)
+  );
+}
+
+export function patchPointLightFragmentChunk(source: string): string {
+  if (source.includes(PATCH_MARKER)) return source;
+  const spotLights = pinnedAnchor(source, SPOT_LIGHT_ANCHOR, 'spot-boundary');
+  return loopPointLights(guardPointLightBody(source, spotLights));
 }
