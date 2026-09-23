@@ -18,7 +18,7 @@
 // (not a literal white hex).
 
 import { audio } from '../game/audio';
-import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
+import { BACKPACK_SLOTS, bagSlotsOf, stackSizeOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import { baggedCopyAnchor } from '../sim/item_copy_anchor';
@@ -69,7 +69,7 @@ import {
   carriedPools,
   materialsOnlyEmptyCells,
   resolveDepositSubmit,
-  vendorSellIsInstant,
+  tradeOfferOpensPrompt,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { hasOpenBankSocket } from './bank_view';
@@ -105,18 +105,23 @@ import {
   appendMaterialSourcesActionAfter,
   closeMaterialSourcesDialogForOwner,
   type MaterialSourcesSelectionFactory,
+  materialSourcesButtonShown,
+  openMaterialSourcesForRow,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
 import { BAG_ITEM_ROW_ATTR } from './panel_key_guard';
 import {
+  dismissInstalledPrompt,
   installPromptDialog as installModalPromptDialog,
   type PromptDialogHandle,
 } from './prompt_dialog';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
+import { resolveTradeOfferSubmit } from './trade_view';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
+import { type VendorSellConfirmPolicy, vendorSaleNeedsConfirm } from './vendor_sell_confirm_policy';
 import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
 import { wornItemCellParts } from './worn_item_cell_view';
@@ -135,7 +140,7 @@ const SORT_SETTLE_STAGGER_CAP = 20;
 // an orphaned aria-modal dialog floating over the closed window (the show* paths
 // already clear a prior same-type prompt with these classes).
 const BAG_PROMPT_SELECTOR =
-  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt';
+  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt, .trade-offer-prompt';
 // Exported for the HUD's mobile cluster-close paths (closeVendor / onBankClosed),
 // which hide #bags without running close(): they must not strand a still-visible
 // prompt in #prompt-stack (promptModalOpen() would keep gating game keys on it).
@@ -143,7 +148,11 @@ export function dismissBagPrompts(
   owner: HTMLElement | null = document.getElementById('bags'),
 ): void {
   if (owner) closeMaterialSourcesDialogForOwner(owner);
-  for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) p.remove();
+  // Through each prompt's own dismiss() (prompt_dialog.ts registry), so the
+  // root a prompt made inert is cleared by the sweep, never left behind. The
+  // selector names only prompts THIS window owns: the trade window's remove
+  // prompt carries its own class and is never swept from here.
+  for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) dismissInstalledPrompt(p);
 }
 
 // An item row runs a GAME action (use / summon / equip / sell / deposit), so it
@@ -263,7 +272,14 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  closing the bank; dropping the docking class lets the mobile standalone
    *  full-screen rule take over instead of leaving a half-width orphan). */
   onClosed(): void;
-  addItemToTrade(itemId: string): void;
+  /** Stage `count` (default 1) units of a bag item into the open trade's
+   *  offer; the HUD clamps to tradeOfferHeadroom and skips a no-op. */
+  addItemToTrade(itemId: string, count?: number): void;
+  /** How many more units of the item the open trade can still take (the live
+   *  held total minus what is already staged; 0 when no trade is open or a
+   *  new line would exceed the offer's line cap). The shift-click quantity
+   *  prompt's ceiling AND its submit-time stale guard. */
+  tradeOfferHeadroom(itemId: string): number;
   /** Stage a bag item for a Market listing (selects it + repaints the market).
    *  `instance` is the clicked slot's payload (issue 1165): an instanced copy stages
    *  as ITSELF (single-copy listing), a plain stack stages fungibly. */
@@ -290,10 +306,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   dragState: ItemDragState;
   /** True on the touch HUD: the pointer drag replaces HTML5 drag-and-drop there. */
   isTouchHud(): boolean;
-  /** The confirmVendorSell setting (on by default): whether a vendor sale of
-   *  anything beyond true junk (vendorSellIsInstant) should confirm first.
-   *  False restores the classic one-click instant sale for every item. */
-  confirmVendorSell(): boolean;
+  /** The vendor sell-confirm policy (vendor_sell_confirm_policy.ts): the
+   *  confirmVendorSell master switch plus the lowest quality that confirms.
+   *  Read per click, never cached, so an Options change applies at once. */
+  sellConfirmPolicy(): VendorSellConfirmPolicy;
   /** Light up (or clear) the paperdoll sockets that accept the stack in flight, so
    *  the drag advertises where it can land. Cleared on every drag teardown.
    *  `slotIndex` names the drag source's bag cell, so the lit set judges the
@@ -430,6 +446,12 @@ export class BagsWindow {
    *  target-nearest, which means keyboard focus never lands in here to begin with. */
   private paintMoneyRow(row: HTMLElement, copper: number): void {
     row.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(copper)}`;
+    row
+      .querySelectorAll<HTMLElement>('[data-wallet-action], [data-claudium-launcher]')
+      .forEach((control) => {
+        control.classList.add('ui-btn');
+      });
+    row.querySelector<HTMLElement>('.woc-balance:not(button)')?.classList.add('ui-chip');
     row.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
       this.deps.openClaudium();
     });
@@ -528,7 +550,7 @@ export class BagsWindow {
     // one on its own (that is a separate opt-in, see prompt_dialog.ts for the modal
     // recipe this window's own prompts use).
     markDialogRoot(el, { label: t('itemUi.bags.title') });
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
+    el.innerHTML = `<div class="panel-title ui-win-head"><img class="ui-win-art" src="/ui/chrome/bags.webp" alt="" draggable="false"><span class="ui-win-title">${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
     el.appendChild(this.buildBagBar());
     // Skip the chip/search row entirely when the bag is empty: a full filter bar
     // above a grid of empty squares is just noise.
@@ -539,7 +561,7 @@ export class BagsWindow {
     el.appendChild(grid);
     grid.scrollTop = prevScrollTop;
     const moneyRow = document.createElement('div');
-    moneyRow.className = 'money';
+    moneyRow.className = 'money ui-money';
     el.appendChild(moneyRow);
     this.paintMoneyRow(moneyRow, world.copper);
     // The restore ladder (the vendor contract): the exact control when it
@@ -622,7 +644,7 @@ export class BagsWindow {
     // focusable no-op buttons (aria-disabled, cursor default via CSS).
     const backpack = document.createElement('button');
     backpack.type = 'button';
-    backpack.className = 'bag-socket backpack';
+    backpack.className = 'bag-socket backpack ui-socket ui-socket--bag';
     backpack.dataset.focusKey = 'bagsocket:backpack';
     backpack.setAttribute('aria-disabled', 'true');
     backpack.innerHTML = `<img class="item-icon q-common" src="${iconDataUrl('item', 'backpack')}" alt="" draggable="false">`;
@@ -646,7 +668,7 @@ export class BagsWindow {
       if (item) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `bag-socket q-${bagQualityKey(item)}`;
+        btn.className = `bag-socket ui-socket ui-socket--bag q-${bagQualityKey(item)}`;
         btn.dataset.focusKey = `bagsocket:${socket.socket}`;
         btn.innerHTML = this.deps.itemIcon(item);
         btn.setAttribute(
@@ -672,7 +694,7 @@ export class BagsWindow {
       } else {
         const emptySocket = document.createElement('button');
         emptySocket.type = 'button';
-        emptySocket.className = 'bag-socket empty';
+        emptySocket.className = 'bag-socket empty ui-socket ui-socket--bag';
         emptySocket.dataset.focusKey = `bagsocket:${socket.socket}`;
         emptySocket.setAttribute('aria-disabled', 'true');
         emptySocket.setAttribute('aria-label', t('hudChrome.bags.socketEmpty'));
@@ -779,7 +801,7 @@ export class BagsWindow {
     for (const category of BAG_CATEGORIES) {
       const chip = document.createElement('button');
       chip.type = 'button';
-      chip.className = `bag-chip${this.filter.category === category ? ' active' : ''}`;
+      chip.className = `bag-chip ui-chip${this.filter.category === category ? ' active' : ''}`;
       chip.dataset.focusKey = `bagchip:${category}`;
       const label = t(BAG_CATEGORY_LABEL_KEYS[category]);
       if (category === 'quest' && questCount > 0) {
@@ -809,7 +831,7 @@ export class BagsWindow {
 
     const search = document.createElement('input');
     search.type = 'search';
-    search.className = 'bag-search';
+    search.className = 'bag-search ui-input';
     search.dataset.focusKey = 'bag-search';
     search.placeholder = t('hudChrome.bags.searchPlaceholder');
     search.setAttribute('aria-label', t('hudChrome.bags.searchAria'));
@@ -822,7 +844,7 @@ export class BagsWindow {
     tools.appendChild(search);
 
     const sort = document.createElement('select');
-    sort.className = 'bag-sort';
+    sort.className = 'bag-sort ui-btn';
     // The one filter-bar control the ladder missed (the phase 14 QA): its
     // change handler rebuilds the window, and keyless it fell to <body>
     // mid-interaction (a closed select fires change per arrow press).
@@ -850,7 +872,7 @@ export class BagsWindow {
     // the press is seeing the tidied bag, and a derived list would hide it.
     const sortBtn = document.createElement('button');
     sortBtn.type = 'button';
-    sortBtn.className = 'bag-sort-btn';
+    sortBtn.className = 'bag-sort-btn ui-btn';
     sortBtn.dataset.focusKey = 'bag-sort-btn';
     sortBtn.innerHTML = `${svgIcon('sort')}<span>${esc(t('hudChrome.bags.sortButton'))}</span>`;
     sortBtn.setAttribute('aria-label', t('hudChrome.bags.sortButtonAria'));
@@ -1031,7 +1053,7 @@ export class BagsWindow {
       const questMark = bagQuestMarkKind(item, this.questMarkProgress(item));
       const questReady = questMark === 'questReady';
       const fineMark = bagFineMark(item.id);
-      row.className = `bag-item q-${bagQualityKey(item, s.instance)}${bagRimClasses(questMark, fineMark)}`;
+      row.className = `bag-item ui-socket ui-socket--bag q-${bagQualityKey(item, s.instance)}${bagRimClasses(questMark, fineMark)}`;
       // Item identity for the island coach's press-this-next glow
       // (bootcamp.ts; distinct from the focus-key namespace).
       row.dataset.coachItem = item.id;
@@ -1083,7 +1105,7 @@ export class BagsWindow {
       row.setAttribute(
         'aria-label',
         t(itemAriaKey, {
-          item: itemName,
+          item: parts.ariaName,
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
@@ -1098,7 +1120,7 @@ export class BagsWindow {
       // .bi-quest-seal-ready (static; optional pulse is CSS-only).
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
       const lockSeal = lockMarkHtml(locked);
-      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${parts.qualityBadge}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
       // 5s throw pacing is visible in the bag. The bag is a cold window with no
       // per-frame driver, so the sweep is a self-contained CSS animation seeded from
@@ -1225,6 +1247,25 @@ export class BagsWindow {
           }
           return;
         }
+        // At an open storage pane (bank, guild bank, vault) a sourced material
+        // stack's right-click opens the exact-source deposit picker: the same
+        // session the touch-only Sources button opens, captured now, so the
+        // stack pin is fixed the moment the gesture fires. A sourceless stack
+        // keeps the whole-stack deposit the classic action runs below.
+        const storageSources = materialSourcesForDisplay(s);
+        const storageSelection = this.storageSourceSelection(s);
+        if (storageSources && storageSelection && this.deps.openMaterialSources) {
+          ev.preventDefault();
+          this.deps.hideTooltip();
+          openMaterialSourcesForRow(
+            this.deps.openMaterialSources,
+            itemName,
+            storageSources,
+            row,
+            storageSelection,
+          );
+          return;
+        }
         ev.preventDefault();
         // The action menu opens, whose FIRST row is the classic left-click
         // action so that binding survives (right-click never destroys;
@@ -1335,7 +1376,16 @@ export class BagsWindow {
       this.attachRowTooltip(row, item, s);
       const displayedSources = materialSourcesForDisplay(s);
       const sourceSelection = this.storageSourceSelection(s);
-      if (displayedSources && sourceSelection && this.deps.openMaterialSources) {
+      // Touch only (materialSourcesButtonShown): the per-cell button doubled
+      // every material cell's height at an open storage pane. Desktop reaches
+      // the same exact-source deposit picker through the cell's right-click
+      // (the contextmenu arm above), so it grows no button.
+      if (
+        displayedSources &&
+        sourceSelection &&
+        this.deps.openMaterialSources &&
+        materialSourcesButtonShown()
+      ) {
         const wrapper = document.createElement('div');
         wrapper.className = 'material-source-item material-source-item-cell';
         wrapper.appendChild(row);
@@ -1357,7 +1407,7 @@ export class BagsWindow {
   // list view it is decorative padding. Never focusable either way.
   private buildEmptyCell(cell: number | null, materialsOnly = false): HTMLElement {
     const el = document.createElement('div');
-    el.className = `bag-item empty${materialsOnly ? ' materials-only' : ''}`;
+    el.className = `bag-item empty ui-socket ui-socket--bag${materialsOnly ? ' materials-only' : ''}`;
     el.setAttribute('aria-hidden', 'true');
     if (materialsOnly) {
       // A square only a material may take (issue #3795): tinted by CSS and
@@ -1415,7 +1465,7 @@ export class BagsWindow {
   private buildUnknownStackCell(s: InvSlot, cell: number | null): HTMLElement {
     const row = document.createElement('button');
     row.type = 'button';
-    row.className = 'bag-item q-common';
+    row.className = 'bag-item ui-socket ui-socket--bag q-common';
     row.dataset.focusKey = `bagu:${s.itemId}:${
       cell ?? this.stackOrdinal(this.deps.world().inventory, s)
     }`;
@@ -1703,14 +1753,24 @@ export class BagsWindow {
       this.bagMode(),
       s.instance,
       s.craftedRecipeId,
+      this.partyTradeWindowActive(s.instance),
     );
     switch (action) {
       case 'transferBlockedSoulbound':
         this.deps.showError(t('hudChrome.itemSoulbound'));
         return;
-      case 'trade':
+      case 'trade': {
+        // A click on a splittable stack opens the offer-quantity prompt (the
+        // bank withdraw prompt's trade twin) instead of staging one unit per
+        // click; a single unit or an instanced copy stages directly.
+        const headroom = this.deps.tradeOfferHeadroom(s.itemId);
+        if (tradeOfferOpensPrompt(s, headroom)) {
+          this.showTradeQuantityPrompt(s.itemId, headroom);
+          break;
+        }
         this.deps.addItemToTrade(s.itemId);
         break;
+      }
       case 'mailAttachBlocked':
         this.deps.showError(t('hudChrome.mailbox.cannotMail'));
         return;
@@ -1903,6 +1963,7 @@ export class BagsWindow {
         mode,
         s.instance,
         s.craftedRecipeId,
+        this.partyTradeWindowActive(s.instance),
       );
       const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
       // Advertise the shift-click partial deposit on a splittable stack, the bank
@@ -1931,6 +1992,14 @@ export class BagsWindow {
       const link = bagShiftLinks(mode)
         ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
         : '';
+      // Say that the click will ask for a quantity, on the trade-offer hint
+      // arm only (a blocked soulbound copy never shows it) and only when the
+      // prompt would actually open (a splittable stack with room left).
+      const tradePartial =
+        key === 'itemUi.tooltip.clickTradeOffer' &&
+        tradeOfferOpensPrompt(s, this.deps.tradeOfferHeadroom(s.itemId))
+          ? `<div class="tt-sub">${esc(t('hudChrome.trade.offerQuantityHint'))}</div>`
+          : '';
       // The stack's own per-unit provenance travels with it: the card lists
       // each contributor and how many of their units are in THIS stack. Through
       // the shared projection, so a LEGACY signed material stack reads as
@@ -1941,7 +2010,8 @@ export class BagsWindow {
         partial +
         equipDrag +
         destroy +
-        link
+        link +
+        tradePartial
       );
     });
   }
@@ -2031,6 +2101,19 @@ export class BagsWindow {
       vaultDeposit: this.deps.isVaultBankTab(),
       petFeed: this.deps.pendingPetFeed(),
     };
+  }
+
+  // Whether a bind-on-pickup party-trade marker on this copy is still live
+  // on the host clock (the world owns which clock stamped `untilMs`), so the
+  // bag click and hint stage a still-tradable soulbound copy instead of
+  // refusing it before the authoritative trade path ever sees it.
+  private partyTradeWindowActive(instance: ItemInstancePayload | undefined): boolean {
+    const untilMs = instance?.partyTrade?.untilMs;
+    return (
+      typeof untilMs === 'number' &&
+      Number.isFinite(untilMs) &&
+      this.deps.world().partyTradeMsRemaining(untilMs) > 0
+    );
   }
 
   // Whether the action menu should open for this item. Offered ONLY in
@@ -2186,15 +2269,18 @@ export class BagsWindow {
 
   private sellBagItem(item: ItemDef, slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
-    // The confirmVendorSell setting folds into the same instant gate
-    // vendorSellIsInstant already uses: turning it off (a player accepting the
-    // risk in exchange for speed) treats every item as instant for
-    // CONFIRMATION purposes, restoring the classic one-click sale. HOW MUCH
-    // sells is still decided below exactly as it already is for true junk
-    // (one unit on a plain click, the whole stack on ctrl/meta).
-    const instant =
-      !this.deps.confirmVendorSell() ||
-      vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
+    // The sell-confirm policy (the confirmVendorSell switch and the quality
+    // threshold) folds into the same instant gate vendorSellIsInstant already
+    // draws around true junk: a sale the policy does not confirm is instant for
+    // CONFIRMATION purposes, the classic one-click sale. HOW MUCH sells is
+    // still decided below exactly as it already is for true junk (one unit on
+    // a plain click, the whole stack on ctrl/meta).
+    const instant = !vendorSaleNeedsConfirm(
+      item,
+      slot.instance,
+      slot.craftedRecipeId,
+      this.deps.sellConfirmPolicy(),
+    );
     if (ev.ctrlKey || ev.metaKey) {
       if (instant) {
         this.deps.world().sellItem(slot.itemId, count);
@@ -2258,7 +2344,15 @@ export class BagsWindow {
     for (const slot of this.deps.world().inventory) {
       if (slot.itemId !== itemId) continue;
       matched = true;
-      if (!vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId)) return false;
+      if (
+        vendorSaleNeedsConfirm(
+          item,
+          slot.instance,
+          slot.craftedRecipeId,
+          this.deps.sellConfirmPolicy(),
+        )
+      )
+        return false;
     }
     return matched;
   }
@@ -2545,6 +2639,69 @@ export class BagsWindow {
           // Land focus on the always-present close button rather than letting
           // it drop to <body> (the opener slot is gone on both arms).
           (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        },
+      },
+    );
+  }
+
+  // The offer-quantity prompt (click a splittable stack while a trade is
+  // open): the bank withdraw prompt's trade twin, with the vault's whole-stack
+  // step pair around the unit pair. The shared builder (bank_quantity_prompt.ts)
+  // owns the chrome; this owns the trade closures:
+  // the ceiling is the LIVE headroom the HUD reports (held total minus what the
+  // offer already carries), the submit re-resolves that headroom so a prompt
+  // left open across a closed trade or a spent stack refuses instead of staging
+  // a phantom, and the send is the same addItemToTrade a plain click uses.
+  private showTradeQuantityPrompt(itemId: string, maxCount: number): void {
+    // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
+    // made every bags item read tolerate an id this client does not know.
+    const item = knownItemDef(ITEMS, itemId);
+    const itemName = item ? itemDisplayName(item) : itemId;
+    // The clicked row SURVIVES a stage (nothing rebuilds the grid), so focus
+    // can go back to it after a submit; the always-present close button is
+    // the fallback for a row that left the bags under the prompt. (The dialog
+    // recipe captures its own opener for the Cancel / Escape return.)
+    const clickedRow = document.activeElement as HTMLElement | null;
+    // One big press moves a whole bag stack (the item's stack size), the
+    // vault withdraw prompt's rule, so 45 held is two presses and a nudge.
+    const stepSize = stackSizeOf(item);
+    const stepCount = formatNumber(stepSize, { maximumFractionDigits: 0 });
+    const unitCount = formatNumber(1, { maximumFractionDigits: 0 });
+    showQuantityPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.installPromptDialog(prompt, opener, close),
+        dismissSiblings: dismissBagPrompts,
+      },
+      {
+        className: 'trade-offer-prompt',
+        step: {
+          size: stepSize,
+          downAriaText: t('hudChrome.bank.quantityStepDownAria', { count: stepCount }),
+          upAriaText: t('hudChrome.bank.quantityStepUpAria', { count: stepCount }),
+          unitDownAriaText: t('hudChrome.bank.quantityStepDownAria', { count: unitCount }),
+          unitUpAriaText: t('hudChrome.bank.quantityStepUpAria', { count: unitCount }),
+        },
+        titleText: t('hudChrome.trade.offerQuantityTitle', { item: itemName }),
+        inputAriaText: t('hudChrome.trade.offerQuantityInput'),
+        confirmText: t('hudChrome.trade.offerQuantityConfirm'),
+        // One press stages every unit the offer can take (the prompt's own
+        // ceiling, clamped again to the live headroom at submit).
+        confirmAllText: t('hudChrome.trade.offerQuantityAll'),
+        cancelText: t('itemUi.vendor.sellQuantityCancel'),
+        maxCount,
+        resolveCount: (requested) =>
+          resolveTradeOfferSubmit(this.deps.tradeOfferHeadroom(itemId), requested),
+        send: (count) => {
+          this.deps.addItemToTrade(itemId, count);
+          this.deps.hideTooltip();
+        },
+        afterClose: () => {
+          const landing =
+            clickedRow?.isConnected && this.deps.root().contains(clickedRow)
+              ? clickedRow
+              : (this.deps.root().querySelector('[data-close]') as HTMLElement | null);
+          landing?.focus();
         },
       },
     );

@@ -334,6 +334,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the unspent-talent-points glow on the desktop and mobile talent buttons',
   },
   {
+    call: 'this.microMenuStatePainter.paint',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: "the micro-menu rail's open-window ring and unspent-point badge; every write goes through the elided facet, so a steady rail costs no DOM mutation",
+  },
+  {
     call: 'this.isInTown',
     band: 'slow',
     gate: '',
@@ -563,7 +570,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the target name color (staff role, else hostile/friendly)',
   },
   {
-    call: 'this.updateTargetDiscordLine',
+    call: 'this.targetDiscord.update',
     band: 'frame',
     gate: "target && target.kind !== 'object'",
     surface: 'chrome',
@@ -808,16 +815,16 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     call: 'this.setDisplay',
     band: 'frame',
     gate: '',
+    sites: 2,
     surface: 'chrome',
-    why: 'the full-screen death overlay, through the elided writer',
+    why: 'the full-screen death overlay and the standing ghost hint line, through the elided writer',
   },
   {
     call: 'this.setDisplay',
     band: 'frame',
     gate: 'ghost && !ghostInBgMatch',
-    sites: 3,
     surface: 'chrome',
-    why: 'the ghost prompt and its two resurrect buttons; a battleground spirit is exempt because the respawn wave is its only way back',
+    why: 'the ghost prompt (its one corpse button) while the spirit is in reach of its body; a battleground spirit is exempt because the respawn wave is its only way back',
   },
   {
     call: 'this.setDisplay',
@@ -1187,11 +1194,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the minimap clock text, value-diffed',
   },
   {
-    call: 'this.updateDayNightDial',
+    call: 'this.dayNightDial.paint',
     band: 'fast',
     gate: '',
     surface: 'chrome',
-    why: 'the decorative day/night ring beside the minimap, repainted from the same world clock',
+    why: 'the decorative day/night ring beside the minimap; the canvas painter self-throttles to ~1Hz off the passed clock',
   },
   {
     call: 'this.updateMinimapCoords',
@@ -1419,6 +1426,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'the always-on gathering goal tracker (Intentional Gathering PR4, not gated on a window): a projection change has no dedicated event, so it rides the same slow poll; the module itself signature-gates the rebuild so an unchanged goal touches no DOM (a chrome row carries no guard field, same as updateDeedTracker/updateReliquaryTracker beside it)',
+  },
+  {
+    call: 'this.updateRecipeTracker',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'the always-on pinned-recipe tracker (not gated on a window): reagents arrive from gathering and loot with no craft event to repaint on',
   },
   {
     call: 'this.trackerStackAnchor.apply',
@@ -1779,7 +1793,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 88 -> 89 at the aura-tracks sync (PR #3925): this branch adds
       // the aura tracks' one chrome call on top of the release's 88; the
       // release's window 48 carries over untouched.
-    ).toEqual({ window: 49, chrome: 89, none: 17 });
+      // chrome 90 -> 91: the always-on pinned-recipe tracker
+      // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
+      // tracker's exact slow-band row shape.
+    ).toEqual({ window: 49, chrome: 91, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

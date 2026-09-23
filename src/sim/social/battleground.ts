@@ -48,6 +48,7 @@ import type { ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
 import { settleTeleportArrival } from '../teleport_arrival';
 import { type Aura, DT, type Entity, type Vec3 } from '../types';
+import { restoreCooldownsPreservingUnstuck } from '../unstuck_cooldown';
 import { eloDelta, snapshotArenaReturnPools } from './arena';
 import { bgBackfillSeat, pickBgBackfillGroup } from './battleground_backfill';
 import { recordBgOutcome } from './battleground_outcomes';
@@ -2085,7 +2086,9 @@ function releaseBgFighters(ctx: SimContext, match: BgMatch): void {
       ctx.readyArenaFighter(e, { clearPrep: true });
       const pools = match.preMatchPools.get(pid);
       if (pools) {
-        e.cooldowns = new Map(pools.cooldowns);
+        // Same carve-out as restoreArenaReturnPools: a /unstuck completed inside the
+        // match keeps its cooldown and its sickness window on the way home.
+        e.cooldowns = restoreCooldownsPreservingUnstuck(e.cooldowns, pools.cooldowns);
         e.abilityCharges =
           Object.keys(pools.abilityCharges).length > 0
             ? clonePools(pools.abilityCharges)

@@ -47,6 +47,12 @@ const MOB_IDS = [
   // The Eastbrook hub's own level-5 practice targets (sim/content/practice_dummies.ts).
   'hub_training_dummy',
   'hub_healing_dummy',
+  // Eastbrook Healing Training Ground allies (sim/content/healing_training.ts).
+  'healing_dummy_tank',
+  'healing_dummy_soldier',
+  'healing_dummy_scout',
+  'healing_dummy_caster',
+  'healing_dummy_ranger',
   'ridge_stalker',
   'deeprock_kobold',
   'thornpeak_ogre',
@@ -708,7 +714,12 @@ type QuestTranslation = {
 type QuestTranslations = Record<QuestId, QuestTranslation>;
 type ZoneTranslations = Record<
   ZoneId,
-  { name: string; welcome: string; pois: Record<number, { label: string }> }
+  {
+    name: string;
+    welcome: string;
+    welcomeDone?: string;
+    pois: Record<number, { label: string }>;
+  }
 >;
 type DungeonTranslations = Record<
   DungeonId,
@@ -800,6 +811,9 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     zones[zone.id as ZoneId] = {
       name: zone.name,
       welcome: normalizeSourceText(zone.welcome),
+      ...(zone.welcomeDone !== undefined
+        ? { welcomeDone: normalizeSourceText(zone.welcomeDone) }
+        : {}),
       pois: poiRecord,
     };
   });

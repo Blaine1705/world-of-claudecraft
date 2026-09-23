@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CADENCE_VERDICTS,
   sanitizeBootPhases,
+  sanitizeCadence,
   sanitizePostRevealLinks,
   sanitizeShaderWarm,
   shaderWarmToken,
@@ -132,6 +134,7 @@ describe('shaderWarmToken', () => {
       'hold-timeouts:expired-share',
       'cannot-serve:hold-cap',
       'extension-drift:ext_color_buffer_float',
+      'ab:off',
     ]) {
       expect(shaderWarmToken(token)).toBe(token);
     }
@@ -212,6 +215,10 @@ describe('sanitizeShaderWarm', () => {
         warmed: 137,
         held: 42,
         heldTimedOut: 3,
+        holdMs: 18_250,
+        holdWallMs: 4_100,
+        releases: 1,
+        abArm: 'on',
         planted: 'x'.repeat(4000),
         links: [1, 2, 3],
       }),
@@ -225,6 +232,10 @@ describe('sanitizeShaderWarm', () => {
       warmed: 137,
       held: 42,
       heldTimedOut: 3,
+      holdMs: 18_250,
+      holdWallMs: 4_100,
+      releases: 1,
+      abArm: 'on',
     });
   });
 
@@ -240,6 +251,10 @@ describe('sanitizeShaderWarm', () => {
         warmed: 1e9,
         held: -5,
         heldTimedOut: 2.9,
+        holdMs: 1e12,
+        holdWallMs: -3,
+        releases: 1e9,
+        abArm: 'ON',
       }),
     ).toEqual({
       active: false,
@@ -251,6 +266,126 @@ describe('sanitizeShaderWarm', () => {
       warmed: 100_000,
       held: 0,
       heldTimedOut: 2,
+      holdMs: 24 * 60 * 60_000,
+      holdWallMs: 0,
+      releases: 100_000,
+      abArm: 'on',
+    });
+  });
+
+  it('bounds each hold field on its own, by the session and not the phase', () => {
+    const SESSION = 24 * 60 * 60_000;
+    expect(sanitizeShaderWarm({ mode: 'all', holdWallMs: 1e12 })?.holdWallMs).toBe(SESSION);
+    expect(sanitizeShaderWarm({ mode: 'all', holdMs: -40 })?.holdMs).toBe(0);
+    // An hour is past a phase bound and well inside a session.
+    expect(sanitizeShaderWarm({ mode: 'all', holdMs: 3_600_000 })?.holdMs).toBe(3_600_000);
+    expect(sanitizeShaderWarm({ mode: 'all', holdWallMs: 3_600_000 })?.holdWallMs).toBe(3_600_000);
+  });
+
+  it('keeps the A/B arm only as on or off, and zeroes hold fields that are missing', () => {
+    for (const hostile of ['maybe', 'off-ish', 'ab:off', 7, null, { arm: 'on' }]) {
+      expect(sanitizeShaderWarm({ mode: 'all', abArm: hostile })?.abArm).toBe('');
+    }
+    expect(sanitizeShaderWarm({ mode: 'off', abArm: 'off' })?.abArm).toBe('off');
+    // A block from a client that predates the A/B fields still sanitizes.
+    expect(sanitizeShaderWarm({ mode: 'all' })).toMatchObject({
+      holdMs: 0,
+      holdWallMs: 0,
+      releases: 0,
+      abArm: '',
+    });
+  });
+});
+
+describe('sanitizeCadence', () => {
+  const block = {
+    mode: 'auto',
+    verdict: 'paced',
+    intent: 30,
+    refreshHz: 60,
+    divisor: 2,
+    targetIntervalMs: 33,
+    missShare: 0.0123,
+    autoPhase: 'held',
+    autoConfirmed: 1,
+    autoFailStreak: 2,
+    autoLateShare: 0.4,
+    autoDescents: 1,
+    autoProbes: 1,
+    autoProbesFailed: 1,
+    autoProbesInconclusive: 0,
+    autoFirstCeilingS: 6,
+    rendered: 1800,
+    skipped: 1800,
+  };
+
+  it('is undefined without a known mode', () => {
+    expect(sanitizeCadence(null)).toBeUndefined();
+    expect(sanitizeCadence([])).toBeUndefined();
+    expect(sanitizeCadence({ ...block, mode: 'turbo' })).toBeUndefined();
+    expect(sanitizeCadence({ ...block, mode: 7 })).toBeUndefined();
+  });
+
+  it('keeps a well-formed block, shares at three decimals', () => {
+    expect(sanitizeCadence(block)).toEqual({ ...block, missShare: 0.012 });
+  });
+
+  it('keeps the closed vocabulary of display verdicts', () => {
+    // `unknown` is also the fallback, so only the literal list pins it.
+    expect(CADENCE_VERDICTS).toEqual(['unknown', 'paced', 'unpaced']);
+    for (const verdict of ['paced', 'unpaced']) {
+      expect(sanitizeCadence({ ...block, verdict })?.verdict).toBe(verdict);
+    }
+  });
+
+  it.each(['off', 'observe', 'held', 'probe', 'probation'])(
+    'keeps the automatic phase %s',
+    (phase) => {
+      expect(sanitizeCadence({ ...block, autoPhase: phase })?.autoPhase).toBe(phase);
+    },
+  );
+
+  it('lets no client text or extra key through, and bounds every number', () => {
+    const out = sanitizeCadence({
+      mode: 'manual',
+      verdict: '<script>alert(1)</script>',
+      intent: 45,
+      refreshHz: 1e9,
+      divisor: 0,
+      targetIntervalMs: -5,
+      missShare: 7,
+      autoPhase: '<img src=x>',
+      autoConfirmed: 'yes',
+      autoFailStreak: 1e9,
+      autoLateShare: 'NaN',
+      autoDescents: 1e9,
+      autoProbes: -4,
+      autoProbesFailed: 2.9,
+      autoProbesInconclusive: {},
+      autoFirstCeilingS: -1,
+      rendered: 1e12,
+      skipped: {},
+      note: 'x'.repeat(10_000),
+    });
+    expect(out).toEqual({
+      mode: 'manual',
+      verdict: 'unknown',
+      intent: 0,
+      refreshHz: 1000,
+      divisor: 1,
+      targetIntervalMs: 0,
+      missShare: 1,
+      autoPhase: 'off',
+      autoConfirmed: 0,
+      autoFailStreak: 16,
+      autoLateShare: 0,
+      autoDescents: 1000,
+      autoProbes: 0,
+      autoProbesFailed: 2,
+      autoProbesInconclusive: 0,
+      autoFirstCeilingS: 0,
+      rendered: 50_000_000,
+      skipped: 0,
     });
   });
 });

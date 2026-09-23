@@ -24,6 +24,7 @@ import {
   appendMaterialSourcesActionAfter,
   attachMaterialSourcesContextMenu,
   type MaterialSourcesDialogOpener,
+  materialSourcesButtonShown,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
 import { unknownItemIconHtml } from './unknown_item_icon';
@@ -57,7 +58,7 @@ export function buildPersonalBankItemCell(
   const cell = document.createElement('button');
   cell.type = 'button';
   const fineMark = bagFineMark(slot.itemId);
-  cell.className = `bank-item q-${slot.qualityKey}${bagRimClasses(null, fineMark)}`;
+  cell.className = `bank-item ui-socket ui-socket--bag q-${slot.qualityKey}${bagRimClasses(null, fineMark)}`;
   cell.style.setProperty(
     '--bank-slot-quality',
     QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR,
@@ -76,7 +77,7 @@ export function buildPersonalBankItemCell(
             : glyphKind
               ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
               : 'itemUi.bags.itemAria',
-          { item: parts.name, count: countLabel },
+          { item: parts.ariaName, count: countLabel },
         )
       : t(glyphKind ? UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.unknownItemAria', {
           id: slot.itemId,
@@ -85,7 +86,7 @@ export function buildPersonalBankItemCell(
   );
   cell.innerHTML =
     `${item && parts ? deps.itemIcon(item, parts.quality) : unknownItemIconHtml(slot.itemId)}` +
-    `${cornerMarkHtml(cornerMark)}${lockMarkHtml(locked)}` +
+    `${parts?.qualityBadge ?? ''}${cornerMarkHtml(cornerMark)}${lockMarkHtml(locked)}` +
     `<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
   cell.addEventListener('click', (event) => {
     if (deps.consumePeek()) {
@@ -104,8 +105,27 @@ export function buildPersonalBankItemCell(
     return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
   });
   const itemName = parts?.name ?? slot.itemId;
-  attachMaterialSourcesContextMenu(cell, itemName, displayedSources, deps.openMaterialSources);
-  if (!displayedSources || !deps.openMaterialSources) return cell;
+  // The exact-source withdraw session is captured the moment the affordance
+  // fires (right-click on desktop, the touch-only Sources button otherwise),
+  // never from a later render.
+  const withdrawSelection = bankMaterialWithdrawSelection(
+    deps.world(),
+    slot.itemId,
+    slot.slotIndex,
+    () => {
+      deps.hideTooltip();
+      deps.onInventoryChanged();
+      render();
+    },
+  );
+  attachMaterialSourcesContextMenu(
+    cell,
+    itemName,
+    displayedSources,
+    deps.openMaterialSources,
+    withdrawSelection,
+  );
+  if (!displayedSources || !deps.openMaterialSources || !materialSourcesButtonShown()) return cell;
   const wrapper = document.createElement('div');
   wrapper.className = 'material-source-item material-source-item-cell';
   wrapper.appendChild(cell);
@@ -114,11 +134,7 @@ export function buildPersonalBankItemCell(
     itemName,
     displayedSources,
     deps.openMaterialSources,
-    bankMaterialWithdrawSelection(deps.world(), slot.itemId, slot.slotIndex, () => {
-      deps.hideTooltip();
-      deps.onInventoryChanged();
-      render();
-    }),
+    withdrawSelection,
   );
   return wrapper;
 }

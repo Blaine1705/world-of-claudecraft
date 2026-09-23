@@ -62,6 +62,7 @@ export const ko_KR: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "던전",
+      "town": "도시",
       "difficulty": "난이도",
       "name": "이름",
       "spec": "전문화",
@@ -159,6 +160,10 @@ export const ko_KR: EnTranslations = {
       "teleport": {
         "label": "순간이동",
         "description": "정확한 세계 좌표로 이동합니다."
+      },
+      "town": {
+        "label": "타운 허브",
+        "description": "이름을 사용하여 타운 허브로 순간이동합니다."
       },
       "dungeon": {
         "label": "던전 입장",
@@ -326,6 +331,18 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "professionTrainers": {
+      "blacksmithing": "대장기술 전문가",
+      "cooking": "요리 전문가",
+      "tailoring": "재봉술 전문가",
+      "engineering": "기계공학 전문가",
+      "leatherworking": "가죽세공 전문가",
+      "alchemy": "연금술 전문가",
+      "farming": "농사 전문가",
+      "mining": "채광 전문가",
+      "hobby": "취미 전문가",
+      "nameplate": "＜{title}＞"
+    },
     "materialStackSelectionUnavailable": "해당 재료 선택을 더 이상 사용할 수 없습니다.",
     "warlock": {
       "doomLabel": "단죄",
@@ -348,19 +365,41 @@ export const ko_KR: EnTranslations = {
       "banner": "{name} 관전 중"
     },
     "readyCheck": {
+      "title": "준비 확인",
+      "close": "닫기",
       "prompt": "{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?",
       "ready": "준비 완료",
       "notReady": "준비 안 됨",
+      "status": "준비 완료: {ready}/{total}",
+      "waiting": "응답을 기다리는 중...",
+      "memberReady": "{name} 님은 준비되었습니다.",
+      "memberNotReady": "{name} 님은 준비되지 않았습니다.",
+      "memberPending": "{name} 님은 아직 응답하지 않았습니다.",
       "result": "준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답.",
       "notInPartyError": "준비 확인을 시작하려면 파티에 속해 있어야 합니다.",
       "inProgressError": "준비 확인이 이미 진행 중입니다."
     },
+    "pullTimer": {
+      "start": "{seconds}초 동안 당겨보세요!",
+      "cancel": "풀 카운트다운이 취소되었습니다.",
+      "countdown": "{seconds}",
+      "pull": "당기다!"
+    },
     "death": {
       "resurrectAtCorpse": "시신에서 부활",
       "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
+      "ghostHint": "죽은 장소로 달려가거나 영혼 치유사에게 말을 걸어 부활하세요",
       "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다.",
+      "keeperTalkTitle": "영혼 치유사",
+      "keeperTalkBody": "그 자리에서 되살려 줄 수 있지만 대가가 따릅니다. 부활 후유증으로 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다. 영혼이 쓰러진 곳으로 달려가 부활하면 아무런 대가가 없습니다.",
+      "keeperTalkSparedBody": "그 자리에서 되살려 줄 수 있습니다. 본래라면 부활 후유증이 따라 한동안 당신의 모든 것이 약해지지만, 당신은 이 세계에 갓 발을 들였으니 이번에는 면해 주겠습니다. 영혼이 쓰러진 곳으로 달려가 부활하면 어느 쪽이든 아무런 대가가 없습니다.",
+      "keeperTalkAccept": "부활",
+      "keeperTalkLeave": "떠나기",
       "healerConfirmTitle": "부활의 후유증을 감수하시겠습니까?",
       "healerConfirmBody": "영혼 치유사가 이 자리에서 부활시켜 주지만, 부활의 후유증으로 모든 능력치가 75% 감소하며 높은 레벨에서는 최대 10분간 지속됩니다. 영혼이 시신까지 걸어가서 부활하면 아무런 불이익이 없습니다.",
+      "keeperConfirmBody": "정말입니까? 영혼 치유사가 당신을 부활시키지만 그 대가로 약해집니다. 부활 후유증이 사라질 때까지 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다.",
+      "keeperConfirmSparedTitle": "영혼 치유사에게 부활을 맡기시겠습니까?",
+      "keeperConfirmSparedBody": "정말입니까? 영혼 치유사가 여기서 당신을 부활시킵니다. 당신은 10레벨 미만이므로 이번에는 부활 후유증으로 약해지지 않습니다.",
       "healerConfirmAccept": "부활",
       "healerConfirmCancel": "취소"
     },
@@ -375,6 +414,7 @@ export const ko_KR: EnTranslations = {
       "help": "탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.",
       "helpAtGraveyard": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 영혼을 가장 가까운 묘지로 보냅니다. 되살아나려면 영혼 치유사에게서 수호자의 대가를 받아야 합니다.",
       "helpUnstuckSickness": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 최대 5분 동안 탈출의 후유증이 남습니다.",
+      "helpUnstuckWindow": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 한 시간 안의 첫 사용은 대가가 없습니다. 마지막 사용 후 한 시간 안에 다시 쓰면 최대 5분 동안 탈출의 후유증이 남습니다.",
       "started": "{seconds}초 후 탈출합니다. 이동, 전투, 피해를 받거나 다른 행동을 시작하면 취소됩니다.",
       "countdown": "갇힘 탈출: {seconds}",
       "completed": "도달할 수 있는 가장 가까운 안전한 위치로 이동했습니다.",
@@ -382,6 +422,8 @@ export const ko_KR: EnTranslations = {
       "revivedAtGraveyard": "가장 가까운 묘지로 옮겨져 부활했습니다. 수호자의 대가가 당신을 짓누릅니다.",
       "movedToGraveyard": "가장 가까운 묘지로 이동했습니다. 탈출의 후유증이 당신을 짓누릅니다.",
       "revivedAtGraveyardUnstuck": "가장 가까운 묘지로 이동해 부활했습니다. 탈출의 후유증이 당신을 짓누릅니다.",
+      "movedToGraveyardFree": "가장 가까운 묘지로 이동했습니다. 한 시간 안에 갇힘 탈출을 다시 쓰면 탈출의 후유증이 남습니다.",
+      "revivedAtGraveyardFree": "가장 가까운 묘지로 이동해 부활했습니다. 한 시간 안에 갇힘 탈출을 다시 쓰면 탈출의 후유증이 남습니다.",
       "cancelledMoved": "이동해서 갇힘 탈출이 취소되었습니다.",
       "cancelledDamaged": "피해를 받아 갇힘 탈출이 취소되었습니다.",
       "cancelledCombat": "전투에 진입해 갇힘 탈출이 취소되었습니다.",
@@ -488,6 +530,15 @@ export const ko_KR: EnTranslations = {
     },
     "trade": {
       "windowClosed": "거래 창이 닫혔습니다.",
+      "offerQuantityHint": "내놓을 수량을 묻습니다",
+      "offerQuantityTitle": "{item} 내놓기",
+      "offerQuantityInput": "내놓을 수량",
+      "offerQuantityConfirm": "내놓기",
+      "offerQuantityAll": "모두 내놓기",
+      "offerRemoveTitle": "{item} 제거",
+      "offerRemoveInput": "제거할 수량",
+      "offerRemove": "제거",
+      "offerRemoveAll": "모두 제거",
       "woc": {
         "tabGold": "금화",
         "tabWoc": "$WOC",
@@ -578,6 +629,11 @@ export const ko_KR: EnTranslations = {
       "mountsTitle": "기계 마구간",
       "mountBuyAria": "{item} 구매",
       "mountSkinType": "탈것 스킨",
+      "mountInspectAria": "{item} 미리 보기",
+      "mountRideIt": "타 보기",
+      "mountOnly": "탈것만 보기",
+      "mountBuy": "탈것 스킨 구매",
+      "mountScopeLine": "계정 공용 스킨입니다. 한 번에 한 캐릭터만 착용할 수 있습니다.",
       "loading": "WOC 상점 불러오는 중…",
       "error": "현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
       "balance": "Claudium 잔액",
@@ -902,6 +958,7 @@ export const ko_KR: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "퀘스트 추적기 접기",
       "expandHint": "퀘스트 추적기 펼치기"
     },
@@ -1041,6 +1098,10 @@ export const ko_KR: EnTranslations = {
       "clearArmed": "슬롯을 탭하면 비워집니다."
     },
     "tutorialGreeting": {
+      "eastbrookGuidanceNote": "이스트브룩에 오신 것을 환영합니다! 마을 광장의 레드브룩 원수가 일을 맡기려고 기다립니다. 황금빛 안내를 켜고 원수를 찾아가 문 앞의 늑대들 퀘스트를 진행하거나 자유롭게 탐험하세요. 나중에 옵션의 인터페이스, 전투에서 설정을 바꿀 수 있습니다.",
+      "guidanceOn": "안내 켜기",
+      "guidanceOff": "안내 끄기",
+      "guidanceSetting": "이스트브룩 황금빛 안내",
       "bellHomeNote": "벌써 해안에서 돌아오셨나요? 방금 울리신 것이 나룻배 종입니다. 그 쌍둥이가 바로 저기 레이븐포스트 우편함 옆에 걸려 있죠. 언제든 울리면 건너기가 수련의 해안으로 다시 데려다줍니다. 실수로 울리셨더라도 손해 볼 것 없어요.",
       "islandArrivalNote": "방금 건너오셨나요? 수련의 해안에 온 것을 환영합니다. 바로 앞 바닷가에서 워든 탐이 건틀릿을 지키고 있어요. 이름이 보일 때까지 바짝 다가가 F를 누르거나 왼쪽 클릭하면, 그의 길이 몸 쓰는 법을 전부 가르쳐 줄 겁니다. 그리고 떠날 준비가 되면 제 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩의 집으로 데려다줄 겁니다.",
       "noteClose": "알겠어요"
@@ -1220,7 +1281,10 @@ export const ko_KR: EnTranslations = {
       "devName": "기여자",
       "devTierCol": "배지",
       "mergedPrs": "병합된 PR",
-      "devEmpty": "아직 순위에 오른 기여자가 없습니다."
+      "devEmpty": "아직 순위에 오른 기여자가 없습니다.",
+      "podiumLabel": "상위 3명",
+      "unclaimed": "비어 있음",
+      "prestigeTitle": "명예 {rank}"
     },
     "pledge": {
       "open": "서약 받는 중",
@@ -1243,6 +1307,8 @@ export const ko_KR: EnTranslations = {
       "noteLabel": "게시판 메모",
       "notePlaceholder": "길드가 어떤 동료를 찾는지 알려 주세요",
       "save": "저장",
+      "newPlayerFriendlyLabel": "신규 플레이어 환영",
+      "newPlayerFriendlyHint": "수련의 해안 게시판의 신입 목록에 표시됩니다.",
       "yourPledge": "내 서약: {guild}",
       "since": "{date}에 서약",
       "withdraw": "서약 철회"
@@ -1266,6 +1332,9 @@ export const ko_KR: EnTranslations = {
       "previous": "이전 측정",
       "runLabel": "{index}번째 연습",
       "runSummary": "{time} 동안 {total}"
+    },
+    "talkingHead": {
+      "label": "대화"
     },
     "hubLesson": {
       "target": "먼저 허수아비를 대상으로 삼으세요.",
@@ -1395,7 +1464,9 @@ export const ko_KR: EnTranslations = {
       "targetPrev": "대상 역방향 순환",
       "discord": "Discord",
       "bgFlag": "전장 깃발 행동",
+      "friendlyNameplates": "우호 이름표 전환",
       "sheathe": "무기 넣기/빼기",
+      "hideInterface": "인터페이스 숨기기",
       "dive": "아래로 수영",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
@@ -1404,8 +1475,22 @@ export const ko_KR: EnTranslations = {
       "petDefensive": "펫: 방어",
       "petAggressive": "펫: 공격적",
       "targetPet": "펫: 대상 지정",
+      "targetSelf": "자신 대상 지정",
+      "targetParty1": "파티원 1 대상 지정",
+      "targetParty2": "파티원 2 대상 지정",
+      "targetParty3": "파티원 3 대상 지정",
+      "targetParty4": "파티원 4 대상 지정",
+      "targetParty5": "파티원 5 대상 지정",
+      "targetParty6": "파티원 6 대상 지정",
+      "targetParty7": "파티원 7 대상 지정",
+      "targetParty8": "파티원 8 대상 지정",
+      "targetParty9": "파티원 9 대상 지정",
       "mount": "탑승 / 하차",
-      "mouseHint": "마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다."
+      "mouseHint": "마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다.",
+      "zoomIn": "카메라 확대",
+      "zoomOut": "카메라 축소",
+      "wheelHint": "마우스 휠도 지정할 수 있습니다. 지정 중에 휠을 위나 아래로 굴리세요. Ctrl, Alt, Shift를 누른 채로도 됩니다. 카메라 확대와 카메라 축소는 기본적으로 휠 단독에 놓여 있습니다. Ctrl+휠 같은 조합으로 옮기면 휠을 기술에 쓸 수 있습니다.",
+      "wheelHeldRefused": "휠 한 칸으로는 이동처럼 누르고 있어야 하는 동작을 실행할 수 없습니다. 키나 마우스 버튼을 선택하세요."
     },
     "actionBar": {
       "editKeys": "액션 바 키 편집",
@@ -1639,6 +1724,15 @@ export const ko_KR: EnTranslations = {
       "shaderWarmOff": "끄기",
       "shaderWarmOn": "켜기",
       "shaderWarmNote": "게임 중 끊김을 막기 위해 백그라운드에서 셰이더 캐시를 미리 준비합니다. 자동: 그래픽 시스템이 지원하는 경우에만 켜집니다(권장). 켜기: 모든 환경에서 강제로 사용하며, 일부 환경에서는 성능이 나빠질 수 있습니다. 끄기: 사용하지 않습니다.",
+      "frameRateCap": "프레임 속도 제한",
+      "frameRateCapAuto": "자동",
+      "frameRateCapDisplay": "디스플레이",
+      "frameRateCapSixty": "60",
+      "frameRateCapThirty": "30",
+      "frameRateCapNote": "게임이 초당 그리는 이미지 수를 제한합니다. 디스플레이 속도를 따라가지 못하는 컴퓨터에서는 제한을 낮추면 화면이 더 안정되고 컴퓨터 발열도 줄어듭니다. 제한은 디스플레이에 맞춰지므로 실제 값은 숫자와 조금 다를 수 있습니다. 자동: 이 컴퓨터가 디스플레이를 따라가지 못할 때만 제한을 낮추고, 그 뒤로는 안정적으로 유지합니다(권장). 디스플레이: 제한 없음.",
+      "frameRateCapStatusPaced": "{hz} Hz 디스플레이에서 초당 {fps}장을 그리고 있습니다.",
+      "frameRateCapStatusUnpaced": "초당 {fps}장으로 제한하고 있습니다.",
+      "frameRateCapStatusInert": "이 디스플레이는 이미 이 제한 이하로 동작하므로 제한을 걸어도 달라지는 것이 없습니다.",
       "gpuBackend": "그래픽 백엔드",
       "gpuBackendAuto": "자동",
       "gpuBackendVulkan": "Vulkan",
@@ -1678,6 +1772,8 @@ export const ko_KR: EnTranslations = {
       "showReliquaryTracker": "성물고 추적기 표시",
       "confirmVendorSell": "판매 전 확인",
       "confirmVendorSellNote": "이 설정을 끄면 확인 없이 한 번의 클릭으로 아이템을 판매하므로, 가방 칸이 바뀌면 잘못된 아이템이 팔릴 수 있습니다.",
+      "confirmVendorSellMinQuality": "판매 확인 최소 품질",
+      "confirmVendorSellMinQualityNote": "이 품질 미만의 아이템은 한 번의 클릭으로 판매됩니다. 잘못 판매한 아이템은 상인에게서 되살 수 있습니다.",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
@@ -1731,6 +1827,9 @@ export const ko_KR: EnTranslations = {
     },
     "controller": {
       "title": "컨트롤러",
+      "device": "연결된 장치",
+      "deviceConnected": "연결됨",
+      "deviceDisconnected": "컨트롤러가 감지되지 않음",
       "glyphStyle": "버튼 표시",
       "glyphStyleAuto": "자동",
       "glyphStyleXbox": "Xbox",
@@ -1755,7 +1854,7 @@ export const ko_KR: EnTranslations = {
       "crossHotbarHelp": "트리거를 누르고 있으면 방향키와 페이스 버튼에 여덟 개의 액션 바 슬롯이 표시됩니다. 다른 트리거를 짧게 누르면 두 번째 세트로 전환됩니다.",
       "crossHotbarResetLayout": "크로스 핫바 초기화",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "크로스 핫바가 켜져 있는 동안에는 트리거와 방향키를 크로스 핫바가 사용합니다. 여기가 아니라 아래에서 설정하세요.",
+      "crossHotbarOwnsButtons": "크로스 핫바가 켜져 있는 동안에는 트리거가 크로스 핫바를 조작합니다. 방향키는 메뉴 이동과 캐릭터 이동을 위해 여기에서 계속 설정할 수 있습니다.",
       "cancelAction": "취소 / 뒤로",
       "subcommandsAction": "하위 명령 / 지도",
       "cycleHudAction": "인터페이스 전환",
@@ -1766,11 +1865,12 @@ export const ko_KR: EnTranslations = {
       "crossHotbarDisplayMinimal": "누르고 있을 때만",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "{action} 을(를) 들고 있습니다. 칸에서 확인을 누르면 놓고, 취소하면 되돌립니다.",
-      "crossHotbarEditHint": "정렬 중: 확인으로 칸이나 마법서에서 액션을 집어 칸에 놓고, 취소로 칸을 비웁니다.",
+      "crossHotbarEditHint": "정렬 중 · 방향키로 이동 · 확인으로 집어 놓기 · 취소로 칸 비우기",
       "crossHotbarEditHelp": "왼쪽 범퍼를 누른 채 위쪽 페이스 버튼을 누르면 컨트롤러로 바를 정렬할 수 있습니다."
     },
     "perf": {
-      "title": "성능 오버레이",
+      "title": "성능",
+      "overlaySection": "성능 오버레이",
       "enable": "성능 오버레이 표시",
       "description": "표시할 통계, 오버레이 위치, 모양을 선택하세요.",
       "sectionPosition": "위치",
@@ -2045,6 +2145,52 @@ export const ko_KR: EnTranslations = {
       "spellOrder": "주문 순서",
       "reset": "위치 초기화",
       "spellPosition": "주문 순서 {position} / {count}",
+      "watchlist": "감시할 주문",
+      "watchlistHint": "자신에게 효과를 거는 주문을 선택하면 해당 주문 전용 오라가 생깁니다. 선택한 주문은 아래에 전용 카드가 생겨 아이콘, 색상, 위치, 지면 고리를 따로 설정할 수 있습니다.",
+      "watchlistEmpty": "주문서에 자신에게 효과를 거는 다른 주문이 없습니다.",
+      "watchlistWatch": "{spell} 감시",
+      "watchlistUnwatch": "{spell} 감시 해제",
+      "watchlistCount": "{count}개 감시 중",
+      "sound": "알림음",
+      "soundNone": "소리 없음",
+      "soundVolume": "음량",
+      "soundPreview": "재생",
+      "soundPreviewAria": "{sound} 알림음 미리 듣기",
+      "soundHint": "이 주문이 발동할 때마다 소리가 재생됩니다. 아이콘, 초승달, 지면 고리를 끄면 소리만으로 알려줍니다.",
+      "readyGlow": "단축바 강조",
+      "readyGlowHint": "이 주문의 효과가 지속되는 동안 액션 바에서 강조합니다.",
+      "reticleTick": "조준선 눈금",
+      "reticleTickHint": "화면 중앙 근처에 눈금을 추가하고, 이 주문이 발동하면 켜집니다.",
+      "haptic": "진동",
+      "hapticNone": "끄기",
+      "hapticHint": "연결된 컨트롤러나 휴대폰을 진동시킵니다. 진동 기능이 없는 기기에서는 무시됩니다.",
+      "haptics": {
+        "tap": "탭",
+        "double": "더블",
+        "long": "롱"
+      },
+      "cues": {
+        "softChime": "부드러운 차임",
+        "musicBox": "오르골",
+        "glassPing": "유리 소리",
+        "waterDrop": "물방울",
+        "bubblePop": "거품 터지는 소리",
+        "hardBell": "날카로운 종",
+        "templeGong": "사원 종",
+        "anvilStrike": "모루 타격",
+        "coinDrop": "동전 소리",
+        "swordDraw": "검 뽑는 소리",
+        "blaringHorn": "요란한 나팔",
+        "carKlaxon": "자동차 경적",
+        "sonarPing": "소나 음",
+        "electricZap": "전기 방전음",
+        "catMeow": "고양이 울음",
+        "owlHoot": "부엉이 울음",
+        "wolfHowl": "늑대 울음",
+        "frogCroak": "개구리 울음",
+        "windWhoosh": "바람 소리",
+        "steamHiss": "증기 소리"
+      },
       "procs": {
         "revenge": "복수!",
         "battleTrance": "전투 명상",
@@ -2116,6 +2262,22 @@ export const ko_KR: EnTranslations = {
       "playtimeHidden": "숨김",
       "showPlaytimeAria": "플레이 시간 표시",
       "hidePlaytimeAria": "플레이 시간 숨기기"
+    },
+    "charSidebar": {
+      "label": "캐릭터 세부 정보",
+      "subtitle": "레벨 {level} {className} . {archetype} . 취미: {hobby}",
+      "subtitleNoHobby": "레벨 {level} {className} . {archetype}",
+      "stats": "능력치",
+      "progression": "진행도",
+      "skills": "기술",
+      "gathering": "채집",
+      "crafting": "제작",
+      "openProfessions": "전문 기술 열기"
+    },
+    "questLog": {
+      "completed": "완료됨",
+      "zoneSummary": "{count}개（완료 {ready}개）",
+      "shiftHint": "Shift를 누른 채 퀘스트를 클릭하면 채팅에 링크됩니다."
     },
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
@@ -2230,6 +2392,12 @@ export const ko_KR: EnTranslations = {
       "linkHint": "Shift + 클릭하면 이 아이템을 채팅에 연결합니다."
     },
     "plurals": {
+      "guildBoardShown": {
+        "one": "길드 {count}개 표시 중",
+        "few": "길드 {count}개 표시 중",
+        "many": "길드 {count}개 표시 중",
+        "other": "길드 {count}개 표시 중"
+      },
       "commissionMasterworks": {
         "one": "걸작 {count}점",
         "few": "걸작 {count}점",
@@ -2359,6 +2527,7 @@ export const ko_KR: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "버그 신고",
+      "online": "온라인",
       "realm": "월드",
       "character": "캐릭터",
       "position": "좌표",
@@ -2374,6 +2543,15 @@ export const ko_KR: EnTranslations = {
       "tooLarge": "신고가 너무 커서 보낼 수 없습니다. 스크린샷 없이 다시 시도하세요.",
       "rateLimited": "최근에 여러 건의 신고를 보냈습니다. 잠시 후 다시 보내 주세요.",
       "failed": "버그 신고를 보낼 수 없습니다. 다시 시도해 주세요."
+    },
+    "hostDiag": {
+      "title": "시스템 보고서",
+      "intro": "프로세서와 메모리를 가장 많이 사용하는 프로그램을 포함한 이 컴퓨터의 세부 정보를 파일로 모아 성능 문제를 진단하는 데 도움을 줍니다. 전송되는 것은 없습니다. 파일은 사용자의 컴퓨터에만 남습니다.",
+      "create": "시스템 보고서 만들기",
+      "running": "시스템 정보를 수집하는 중...",
+      "saved": "보고서가 {fileName}(으)로 저장되었습니다.",
+      "savedNoName": "보고서가 저장되었습니다.",
+      "failed": "보고서를 만들지 못했습니다. 다시 시도해 주세요."
     },
     "paperdoll": {
       "unequipAria": "{item} 장착 해제",
@@ -2918,7 +3096,7 @@ export const ko_KR: EnTranslations = {
         "phaseWardstonesName": "수호석",
         "phaseWardstonesSummary": "생명력이{health}가 되면 전율의 발구르기가 공격대를 그 자리에 묶어 두는 동안 알드릭 수사가 도착해 수호석에 불을 밝힙니다. 모든 가시가 부서지고 바닥의 불길이 꺼지며, 이후 영혼 가르기와 불사의 격노가 왕좌의 메커니즘에 더해집니다.",
         "phaseKingsWrathName": "왕의 분노",
-        "phaseKingsWrathSummary": "생명력이{health}가 되면 나이트락시스가 왕의 분노로 포효하며, 이후 전투가 끝날 때까지 일반 난이도에서 {bonusNormal}, 영웅 난이도에서 {bonusHeroic}의 피해를 추가로 입힙니다. 무덤 분출 주기가 {eruptionEveryNormal}초(영웅 {eruptionEveryHeroic}초)로, 무덤불길 주기가 {gravefireEveryNormal}초(영웅 {gravefireEveryHeroic}초)로 짧아집니다. 다른 모든 메커니즘의 주기는 그대로 유지됩니다.",
+        "phaseKingsWrathSummary": "생명력이{health}가 되면 나이트락시스가 왕의 분노로 포효하며, 이후 전투가 끝날 때까지 일반 난이도에서 {bonusNormal}, 영웅 난이도에서 {bonusHeroic}의 피해를 추가로 입힙니다. 무덤 분출 주기가 {eruptionEveryNormal}초(영웅 {eruptionEveryHeroic}초)로 짧아집니다. 다른 모든 메커니즘의 주기는 그대로 유지됩니다.",
         "gravebreakerName": "무덤파괴자",
         "gravebreakerSummary": "{seconds}초마다 나이트락시스가 다음 공격을 충전합니다. 대상은 그 공격만 받지만, 그의 전방 {arc}도 부채꼴 안 {range}야드 이내에 있는 다른 모든 플레이어는 그 공격의 {splash}만큼을 각자의 방어도로 감소한 물리 피해로 받습니다.",
         "gravebreakerResponse": "방어 담당은 나이트락시스가 계속 공격대 반대쪽을 향하게 합니다. 나머지 인원은 그의 뒤나 옆에 머물며 절대 부채꼴 범위를 가로지르지 않습니다.",
@@ -2927,16 +3105,16 @@ export const ko_KR: EnTranslations = {
         "dreadCurseHeroicSummary": "{every}초마다 나이트락시스가 현재 방어 담당을 공격해 최대 생명력의 {hitHeroic}만큼 암흑 피해를 입히고 공포의 저주를 1중첩 추가합니다. {duration}초 동안 중첩당 그 방어 담당이 나이트락시스에게 받는 피해가 {perStackHeroic}만큼 증가하며, 최대 {max}중첩까지 쌓입니다.",
         "dreadCurseResponse": "방어 담당은 {stacks}중첩에서 교대합니다: 다른 방어 담당이 도발하고, 저주에 걸린 방어 담당은 중첩이 사라질 때까지 무덤파괴자의 부채꼴 밖에 머뭅니다. 치유 담당은 교대 전에 새로 들어올 방어 담당의 생명력을 채워 둡니다.",
         "boneSpikeName": "뼈가시",
-        "boneSpikeSummary": "{everyNormal}초마다 나이트락시스가 현재 대상을 제외한 플레이어 {victimsNormal}명을 뼈가시에 꿰뚫습니다. 꿰뚫린 플레이어는 행동할 수 없으며 자신의 가시가 파괴될 때까지 매초 최대 생명력의 {drainNormal}만큼 잃습니다.",
-        "boneSpikeHeroicSummary": "{everyHeroic}초마다 나이트락시스가 현재 대상을 제외한 플레이어 {victimsHeroic}명을 뼈가시에 꿰뚫습니다. 꿰뚫린 플레이어는 행동할 수 없으며 자신의 가시가 파괴될 때까지 매초 최대 생명력의 {drainHeroic}만큼 잃습니다.",
-        "boneSpikeResponse": "공격 담당은 즉시 뼈가시로 전환해 파괴하고 꿰뚫린 플레이어를 구합니다. 치유 담당은 가시가 파괴되는 동안 꿰뚫린 플레이어를 살려 둡니다.",
+        "boneSpikeSummary": "{everyNormal}초마다 나이트락시스가 현재 대상을 제외한 플레이어 {victimsNormal}명을 뼈가시에 꿰뚫습니다. 꿰뚫린 플레이어는 행동할 수 없으며 자신의 가시가 파괴될 때까지 매초 최대 생명력의 {drainNormal}만큼 잃습니다. 뼈가시는 누구의 공격이든 {hitsNormal}회 맞으면 부서지며, 피해량은 상관없습니다. 이미 꿰뚫린 플레이어는 {cooldown}초 동안 다시 선택되지 않으므로 뼈가시가 공격대 전체에 고르게 분산됩니다.",
+        "boneSpikeHeroicSummary": "{everyHeroic}초마다 나이트락시스가 현재 대상을 제외한 플레이어 {victimsHeroic}명을 뼈가시에 꿰뚫습니다. 꿰뚫린 플레이어는 행동할 수 없으며 자신의 가시가 파괴될 때까지 매초 최대 생명력의 {drainHeroic}만큼 잃습니다. 뼈가시는 누구의 공격이든 {hitsHeroic}회 맞으면 부서지며, 피해량은 상관없습니다. 이미 꿰뚫린 플레이어는 {cooldown}초 동안 다시 선택되지 않으므로 뼈가시가 공격대 전체에 고르게 분산됩니다.",
+        "boneSpikeResponse": "가장 가까운 사람이 뼈가시를 공격합니다. 누구의 공격이든 몇 번만 맞으면 부서지며 피해량은 상관없습니다. 치유사는 가시가 부서질 때까지 꿰뚫린 아군을 살려 둡니다.",
         "graveEruptionName": "무덤 분출",
         "graveEruptionSummary": "{everyNormal}초마다 해골 손이 플레이어 발밑에 반경 {radius}야드의 원 {countNormal}개를 표시합니다. {warning}초 후 각 원이 폭발해 최대 생명력의 {burstNormal}만큼 암흑 피해를 입힌 뒤, {flameNormal}초 동안 무덤 화염으로 타올라 그 안에 서 있는 대상에게 매초 최대 생명력의 {tickNormal}만큼 피해를 입힙니다.",
         "graveEruptionHeroicSummary": "{everyHeroic}초마다 해골 손이 플레이어 발밑에 반경 {radius}야드의 원 {countHeroic}개를 표시합니다. {warning}초 후 각 원이 폭발해 최대 생명력의 {burstHeroic}만큼 암흑 피해를 입힌 뒤, {flameHeroic}초 동안 무덤 화염으로 타오르며 그 안에 서 있는 대상에게 매초 최대 생명력의 {tickHeroic}만큼 피해를 입힙니다.",
         "graveEruptionResponse": "폭발하기 전에 모든 경고 원 밖으로 나가고 불타는 바닥을 피하세요. 방어 담당은 근접 딜러가 움직일 공간을 확보할 수 있도록 나이트락시스를 화염에서 멀리 끌어냅니다.",
         "bindingSigilName": "결속의 인장",
-        "bindingSigilSummary": "{everyNormal}초마다 나이트락시스로부터 {minDist}에서 {maxDist}야드 떨어진 바닥에 옛 결계의 인장이 타오르며, 그가 불사의 상승을 시작해 {ascensionEvery}초마다 피해량과 공격 속도가 {ascensionNormal}씩 증가합니다. {bindNormal}초 안에 그가 인장 위에 서면 결속됩니다: 상승 효과가 정화되고 {stunNormal}초 동안 기절하며, {boundNormal}초 동안 {vulnerability}만큼 더 큰 피해를 받습니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {unboundHitNormal}만큼 암흑 피해를 입고, 그는 다음 결속까지 {unboundBonusNormal}만큼 더 큰 피해를 유지합니다.",
-        "bindingSigilHeroicSummary": "{everyHeroic}초마다 나이트락시스로부터 {minDist}에서 {maxDist}야드 떨어진 바닥에 옛 결계의 인장이 타오르며, 그가 불사의 상승을 시작해 {ascensionEvery}초마다 피해량과 공격 속도가 {ascensionHeroic}씩 증가합니다. {bindHeroic}초 안에 그가 인장 위에 서면 결속됩니다: 상승 효과가 정화되고 {stunHeroic}초 동안 기절하며, {boundHeroic}초 동안 {vulnerability}만큼 더 큰 피해를 받습니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {unboundHitHeroic}만큼 암흑 피해를 입고, 그는 다음 결속까지 {unboundBonusHeroic}만큼 더 큰 피해를 유지합니다.",
+        "bindingSigilSummary": "{everyNormal}초마다 왕좌 양옆의 두 발판 중 하나(전투 시작 시 나이트락시스가 서 있던 자리에서 공격대 기준 왼쪽 또는 오른쪽 {sideOffset}야드, 시전마다 좌우를 번갈아)에 옛 결계의 인장이 타오르며, 그가 불사의 상승을 시작해 {ascensionEvery}초마다 피해량과 공격 속도가 {ascensionNormal}씩 증가합니다. {bindNormal}초 안에 그가 인장 위에 서면 결속됩니다: 상승 효과가 정화되고 {stunNormal}초 동안 기절하며, {boundNormal}초 동안 {vulnerability}만큼 더 큰 피해를 받습니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {unboundHitNormal}만큼 암흑 피해를 입고, 그는 다음 결속까지 {unboundBonusNormal}만큼 더 큰 피해를 유지합니다.",
+        "bindingSigilHeroicSummary": "{everyHeroic}초마다 왕좌 양옆의 두 발판 중 하나(전투 시작 시 나이트락시스가 서 있던 자리에서 공격대 기준 왼쪽 또는 오른쪽 {sideOffset}야드, 시전마다 좌우를 번갈아)에 옛 결계의 인장이 타오르며, 그가 불사의 상승을 시작해 {ascensionEvery}초마다 피해량과 공격 속도가 {ascensionHeroic}씩 증가합니다. {bindHeroic}초 안에 그가 인장 위에 서면 결속됩니다: 상승 효과가 정화되고 {stunHeroic}초 동안 기절하며, {boundHeroic}초 동안 {vulnerability}만큼 더 큰 피해를 받습니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {unboundHitHeroic}만큼 암흑 피해를 입고, 그는 다음 결속까지 {unboundBonusHeroic}만큼 더 큰 피해를 유지합니다.",
         "bindingSigilResponse": "방어 담당은 공격대가 남긴 불길이 있더라도 즉시 나이트락시스를 인장 위로 끌고 갑니다. 근접 딜러는 끌려가는 경로를 따라가고 원거리 딜러는 새로 생긴 무덤파괴자의 부채꼴을 피합니다. 그가 결속된 동안 모두 화력을 집중합니다.",
         "raiseFallenName": "망자 소생",
         "raiseFallenSummary": "왕좌 단계 동안 {every}초마다 나이트락시스가 자신의 뒤에서 되살아난 왕실 근위병을 일으킵니다. 그들은 현재 대상에게 돌진해 파괴될 때까지 싸웁니다.",
@@ -2945,14 +3123,6 @@ export const ko_KR: EnTranslations = {
         "soulRendSummary": "나이트락시스가 현재 대상을 제외한 플레이어 {marksNormal}명에게 영혼 가르기 표식을 남깁니다. {fuse}초 후 각 표식은 대상자의 최대 생명력 전체에 해당하는 암흑 피해를 입히며, 이 피해는 그 대상자로부터 {range}야드 이내에 있는 표식 보유자 수만큼 나뉩니다.",
         "soulRendHeroicSummary": "나이트락시스가 현재 대상을 제외한 플레이어 {marksHeroic}명에게 영혼 가르기 표식을 남깁니다. {fuse}초 후 각 표식은 대상자의 최대 생명력의 {damageHeroic}만큼 암흑 피해를 입히며, 이 피해는 그 대상자로부터 {range}야드 이내에 있는 표식 보유자 수만큼 나뉩니다. 표식이 혼자 터지면 치명적입니다.",
         "soulRendResponse": "표식을 받은 모든 플레이어는 {fuse}초의 시간이 끝나기 전에 한 집결 지점으로 달려가 다른 표식 보유자로부터 {range}야드 이내에 섭니다. 치유 담당은 표식이 터지는 동안 그룹의 생명력을 채웁니다.",
-        "soulfireName": "영혼불길",
-        "soulfireSummary": "영혼 가르기가 터질 때마다 각 표식이 있던 자리에 반경 {radius}야드의 보라색 불웅덩이가 남아 {seconds}초 동안 타오르며 매초 최대 생명력의 {tickNormal}만큼 피해를 입힙니다. 웅덩이가 겹치는 곳에서는 각 웅덩이의 피해를 모두 받습니다. 웅덩이는 수호석 {clearance}야드 이내에는 절대 생기지 않습니다.",
-        "soulfireHeroicSummary": "영혼 가르기가 터질 때마다 겹쳐진 표식 무리마다 반경 {radius}야드의 보라색 불웅덩이가 하나만 남아 {secondsHeroic}초 동안 타오르며 매초 최대 생명력의 {tickHeroic}만큼 피해를 입힙니다. 웅덩이가 겹쳐도 피해는 한 번만 적용되며 중첩되지 않습니다. 웅덩이는 수호석 {clearance}야드 이내에는 절대 생기지 않습니다.",
-        "soulfireResponse": "표식이 터지면 곧바로 보라색 웅덩이에서 벗어나세요. 다음 집결 지점은 불타는 곳과 겹치지 않게 정하세요.",
-        "gravefireName": "무덤불길",
-        "gravefireSummary": "{everyNormal}초마다 보랏빛 무덤불길이 나이트락시스에게서 플레이어 한 명을 향해 뻗어나가며, 매초 {speed}야드씩 자라 최대 {length}야드까지 이어집니다. 지나간 자리마다 {burnNormal}초 동안 타오르며 그 안에 서 있는 대상에게 매초 최대 생명력의 {tickNormal}만큼 피해를 입힙니다.",
-        "gravefireHeroicSummary": "{everyHeroic}초마다 보랏빛 무덤불길이 나이트락시스에게서 플레이어 한 명을 향해 뻗어나가며, 매초 {speed}야드씩 자라 최대 {length}야드까지 이어집니다. 지나간 자리마다 {burnHeroic}초 동안 타오르며 그 안에 서 있는 대상에게 매초 최대 생명력의 {tickHeroic}만큼 피해를 입힙니다.",
-        "gravefireResponse": "다가오는 줄기를 옆으로 피하세요: 폭이 좁고 절대 방향을 바꾸지 않습니다. 원거리 플레이어는 한 자리에 머물지 말고 계속 움직입니다.",
         "deathlessRageName": "불사의 격노",
         "deathlessRageSummary": "{every}초마다 나이트락시스가 {cast}초에 걸쳐 불사의 격노를 시전합니다. 시전하는 동안 불이 켜진 수호석마다 플레이어 한 명이 {channel}초 동안 정신을 집중할 수 있습니다. 시전이 끝나기 전에 서로 다른 플레이어 셋이 각자 수호석을 완료하면 격노가 차단되고 나이트락시스가 {stun}초 동안 기절합니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {damageNormal}만큼 암흑 피해를 입습니다.",
         "deathlessRageHeroicSummary": "{every}초마다 나이트락시스가 {cast}초에 걸쳐 불사의 격노를 시전합니다. 시전하는 동안 불이 켜진 수호석마다 플레이어 한 명이 {channel}초 동안 정신을 집중할 수 있습니다. 시전이 끝나기 전에 서로 다른 플레이어 셋이 각자 수호석을 완료하면 격노가 차단되고 나이트락시스가 {stun}초 동안 기절합니다. 그러지 못하면 모든 플레이어가 최대 생명력의 {damageHeroic}만큼 암흑 피해를 입으며, 이는 어떤 생명력으로도 버틸 수 없습니다.",
@@ -2961,11 +3131,11 @@ export const ko_KR: EnTranslations = {
         "courtSummary": "영웅 난이도에서는 이전 궁정이 쓰러지고 나면 불사의 격노가 차단되었든 아니든 매번 나이트락시스가 자신의 궁정을 새로 일으킵니다. 알드렌의 영혼은 왕실 참격으로 자신의 대상 근처에 있는 모두를 베어냅니다. 말릭의 영혼은 말릭의 치유를 정신 집중으로 시전하며, 시전할 때마다 나이트락시스를 더 많이 치유합니다. 보스의 영혼은 도발을 무시하고 공격대를 사냥합니다.",
         "courtResponse": "방어 담당은 알드렌의 대상을 확보해 참격이 공격대 반대편을 향하게 합니다. 말릭의 치유가 시작되는 순간 말릭을 기절시키거나 침묵시켜 가장 먼저 처치하고, 도발이 통하지 않는 보스는 치유 담당에게서 떼어 내도록 속박하거나 기절시켜 그다음으로 처치합니다.",
         "kingsWrathName": "왕의 분노",
-        "kingsWrathSummary": "나이트락시스가 이후 전투가 끝날 때까지 일반 난이도에서 {bonusNormal}, 영웅 난이도에서 {bonusHeroic}의 피해를 추가로 입힙니다. 무덤 분출이 {eruptionEveryNormal}초(영웅 {eruptionEveryHeroic}초)마다, 무덤불길이 {gravefireEveryNormal}초(영웅 {gravefireEveryHeroic}초)마다 발생합니다.",
+        "kingsWrathSummary": "나이트락시스가 이후 전투가 끝날 때까지 일반 난이도에서 {bonusNormal}, 영웅 난이도에서 {bonusHeroic}의 피해를 추가로 입힙니다. 무덤 분출이 {eruptionEveryNormal}초(영웅 {eruptionEveryHeroic}초)마다 발생합니다.",
         "kingsWrathResponse": "피할 수 없는 피해에 남은 방어 재사용 기술을 사용하세요. 공격대가 전투를 마무리하는 동안 앞선 모든 메커니즘을 깔끔하게 처리하세요.",
         "boneStormName": "뼈 폭풍",
-        "boneStormSummary": "왕의 분노 시작 {first}초 후부터 이후 {everyNormal}초마다 나이트락시스가 {duration}초 동안 뼈 폭풍을 시작합니다. 그는 위협 수준을 무시하고 평소의 {speed}배 속도로 이동하며, 각각 {chargeSeconds}초씩 지속되는 돌진을 {charges}회 합니다. 회전 공격은 {radius}야드 이내에 매초 최대 생명력의 {whirlNormal}만큼 피해를 입힙니다. 각 돌진은 같은 범위 안에서 뼈 강타로 끝나 최대 생명력의 {slamNormal}만큼 피해를 입힙니다. 폭풍이 시작되고 {spikeAt}초 후 뼈가시를 시전하며, 폭풍이 끝난 {rearm}초 후 무덤파괴자가 다시 준비됩니다.",
-        "boneStormHeroicSummary": "왕의 분노 시작 {first}초 후부터 이후 {everyHeroic}초마다 나이트락시스가 {duration}초 동안 뼈 폭풍을 시작합니다. 그는 위협 수준을 무시하고 평소의 {speed}배 속도로 이동하며, 각각 {chargeSeconds}초씩 지속되는 돌진을 {charges}회 합니다. 회전 공격은 {radius}야드 이내에 매초 최대 생명력의 {whirlHeroic}만큼 피해를 입힙니다. 각 돌진은 같은 범위 안에서 뼈 강타로 끝나 최대 생명력의 {slamHeroic}만큼 피해를 입힙니다. 폭풍이 시작되고 {spikeAt}초 후 뼈가시를 시전하며, 폭풍이 끝난 {rearm}초 후 무덤파괴자가 다시 준비됩니다.",
+        "boneStormSummary": "왕의 분노 시작 {first}초 후부터 이후 {everyNormal}초마다 나이트락시스가 {duration}초 동안 뼈 폭풍을 시작합니다. 그는 위협 수준을 무시하고 평소의 {speed}배 속도로 이동하며, 각각 {chargeSeconds}초씩 지속되는 돌진을 {charges}회 합니다. 회전 공격은 {radius}야드 이내에 매초 최대 생명력의 {whirlNormal}만큼 피해를 입힙니다. 각 돌진은 같은 범위 안에서 뼈 강타로 끝나 최대 생명력의 {slamNormal}만큼 피해를 입힙니다. 각 폭풍의 첫 번째 강타는 대신 {openingSlamNormal}만큼 피해를 입힙니다. 폭풍이 끝난 {rearm}초 후 무덤파괴자가 다시 준비됩니다.",
+        "boneStormHeroicSummary": "왕의 분노 시작 {first}초 후부터 이후 {everyHeroic}초마다 나이트락시스가 {duration}초 동안 뼈 폭풍을 시작합니다. 그는 위협 수준을 무시하고 평소의 {speed}배 속도로 이동하며, 각각 {chargeSeconds}초씩 지속되는 돌진을 {charges}회 합니다. 회전 공격은 {radius}야드 이내에 매초 최대 생명력의 {whirlHeroic}만큼 피해를 입힙니다. 각 돌진은 같은 범위 안에서 뼈 강타로 끝나 최대 생명력의 {slamHeroic}만큼 피해를 입힙니다. 각 폭풍의 첫 번째 강타는 대신 {openingSlamHeroic}만큼 피해를 입힙니다. 폭풍이 끝난 {rearm}초 후 무덤파괴자가 다시 준비됩니다.",
         "boneStormResponse": "흩어져서 나이트락시스로부터 계속 도망치세요. 돌진 대상으로 지목된 플레이어는 멀리 달아나고 나머지는 돌진 경로 주변에 공간을 남겨 두며, 폭풍이 끝나면 방어 담당이 대상을 확보합니다.",
         "crownEnduresName": "굴하지 않는 왕관",
         "crownEnduresSummary": "전투 시작 {enrageNormal}초 후(생명력 70%에서 알드릭 수사가 등장하는 동안 시간이 멈춥니다) 굴하지 않는 왕관이 강제 격노로 발동합니다. 나이트락시스는 피해량이 {damage}, 공격 속도가 {haste} 늘어나며, 이후 {rampEveryNormal}초마다 피해량이 {rampStep}씩 더 늘어납니다. 타이머 표시줄은 없습니다. 남은 시간이 {warn60}초, {warn30}초, {warn10}초일 때 외침으로 경고합니다.",
@@ -3016,6 +3186,7 @@ export const ko_KR: EnTranslations = {
       "elementalConvergencePrimed": "다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다",
       "hunterFerocity": "무리의 흉포함 {stacks}중첩: 야수가 입히는 피해가 {pct}% 증가합니다",
       "cooldownCap": "이 구간에서 재사용 대기시간 감소 {used}/{cap}초를 사용했습니다",
+      "bruinRushWindow": "늑대 변신이 마나를 소모하지 않으며 큰곰 돌진 대상을 고정하여 {sec}초 동안 이동 속도를 {pct}% 감소시킵니다",
       "funeralHarvestLock": "장례 수확이 아직 다음 영혼 조각을 생성할 수 없습니다",
       "leadenHexLock": "납빛 주술이 아직 이 대상을 다시 이동 불가로 만들 수 없습니다",
       "forbiddenReflectionReady": "다음 적용 가능한 흑마법사 재사용 기술을 다시 사용할 수 있습니다",
@@ -3063,7 +3234,7 @@ export const ko_KR: EnTranslations = {
       "coldsightRead": "다음 긴 시위가 입히는 피해가 {longDrawPct}% 증가하거나, 다음 사악한 사격이 입히는 피해가 {fellShotPct}% 증가합니다",
       "duskEconomy": "기술의 기력 소모가 {pct}% 감소합니다",
       "moontide": "달물결: {stacks}/{max}단계. 달날개 형상에서 야생 벼락, 창공 낙하, 달씨앗 시전이 각각 1단계를 쌓습니다. {max}단계에서 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변하며, 어느 쪽을 써도 3단계를 모두 소모합니다",
-      "oldBlood": "오랜 피: {stacks}/{max}단계. 가르는 발톱, 저미기, 피의 균열, 유혈 물어뜯기, 휩쓰는 발톱, 뼈 분쇄의 적중한 공격이 각각 1단계를 쌓습니다. {max}단계에서 늑대 변신의 유혈 물어뜯기는 피의 수확으로, 큰곰 변신의 뼈 분쇄는 골수분쇄로 변합니다",
+      "oldBlood": "오랜 피: {stacks}/{max}단계. 가르는 발톱, 저미기, 피의 균열, 유혈 물어뜯기, 휩쓰는 발톱, 뼈 분쇄의 적중한 공격이 각각 1단계를 쌓습니다. {max}단계에서 표범 변신의 유혈 물어뜯기는 피의 수확으로, 큰곰 변신의 뼈 분쇄는 골수분쇄로 변합니다",
       "verdance": "푸른 생장: {stacks}/{max}단계. 새로 심는 야생 개화와 두 번째 개화가 각각 1단계를 쌓으며, {max}단계에서 신속한 치유가 만개로 변합니다",
       "freeExecute": "다음 적용 가능한 처형 기술이 자원을 소모하지 않습니다",
       "resourceSap": "{interval}초마다 현재 자원을 {value} 회복합니다",
@@ -3128,7 +3299,7 @@ export const ko_KR: EnTranslations = {
       "elementalTrance": "받는 피해가 {pct}% 감소합니다. 입힌 모든 피해의 {mana}%가 마나로 전환됩니다",
       "stealth": "은폐 상태, 이동 속도가 {pct}% 감소합니다",
       "formBear": "큰곰 변신: 생명력과 방어도 증가",
-      "formCat": "표범 변신: 근접 피해와 기력",
+      "wolfForm": "늑대 변신: 근접 피해와 기력, 이동 속도가 {pct}% 증가합니다",
       "formTravel": "쾌속 형태: 이동 속도가 {pct}% 증가합니다",
       "formFireball": "화염구 형상: 이동 속도 {pct}% 증가, 공격 및 주문 사용 불가",
       "formMoonkin": "달날개 변신: 주문 공격력이 {pct}%, 방어도가 {armorPct}% 증가합니다",
@@ -3217,7 +3388,30 @@ export const ko_KR: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "자리비움",
       "cheaterTag": "< 부정행위자 >",
-      "pledgeTag": "{guild} 서약자"
+      "pledgeTag": "{guild} 서약자",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "경매인",
+        "banker": "은행원",
+        "riftForgemaster": "균열 대장장이",
+        "cardMaster": "카드 마스터",
+        "crucibleQuartermaster": "도가니 병참장교",
+        "heroicQuartermaster": "영웅 병참장교",
+        "pvpVendor": "PvP 상인",
+        "weaponsmithTrainer": "대장기술 교관",
+        "cookingTrainer": "요리 교관",
+        "tailoringTrainer": "재봉 교관",
+        "engineeringTrainer": "기계공학 교관",
+        "leatherworkingTrainer": "가죽세공 교관",
+        "alchemyTrainer": "연금술 교관",
+        "weaponVendor": "무기 상인",
+        "armorVendor": "방어구 상인",
+        "armsDealer": "무구 상인",
+        "foodVendor": "음식 및 음료 상인",
+        "potionVendor": "물약 상인",
+        "stableMaster": "마구간지기",
+        "generalGoods": "잡화 상인"
+      }
     },
     "mobTooltip": {
       "levelFamily": "{level}레벨 {family}",
@@ -3236,6 +3430,7 @@ export const ko_KR: EnTranslations = {
       "lock": "플레이어 프레임 고정"
     },
     "partyFrames": {
+      "header": "파티",
       "section": "파티 및 공격대 프레임",
       "optionsSection": "파티 프레임 옵션",
       "unlock": "파티 및 공격대 프레임 이동",
@@ -3410,6 +3605,15 @@ export const ko_KR: EnTranslations = {
         "socketReplaced": "{name}에 보석을 박았습니다. {gem}은(는) 파괴되었습니다."
       }
     },
+    "lootQuality": {
+      "ordinary": "일반",
+      "superior": "상급",
+      "exceptional": "특급",
+      "magnificent": "걸작",
+      "transcendent": "초월",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: 아이템 레벨 +{levels}. 강화 후에도 유지됩니다."
+    },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
       "riftTier": "{tier} 등급 균열 아이템",
@@ -3446,10 +3650,15 @@ export const ko_KR: EnTranslations = {
       "unrecordedSigned": "채집자 기록 없음, {name} 서명",
       "quantityAria": "{source} 출처 수량, 최대 {count}개",
       "decreaseAria": "{source} 출처 수량 줄이기",
-      "increaseAria": "{source} 출처 수량 늘리기"
+      "increaseAria": "{source} 출처 수량 늘리기",
+      "decreaseByAria": "{source}의 개수를 {count} 줄이기",
+      "increaseByAria": "{source}의 개수를 {count} 늘리기",
+      "moveAll": "모든 개수 이동",
+      "fits": "지금은 최대 {units}개까지 들어갑니다"
     },
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
+      "fineFarmGrade": "상급 등급. 수확물 일부가 상급으로 나오며, 농사 숙련도가 높거나 충전된 장인의 눈이 있으면 더 자주 나옵니다. 상급 등급이 필요한 곳에서는 일반 농산물이 절대 인정되지 않고, 일반 농산물이 필요한 곳에서는 상급 등급도 절대 인정되지 않습니다.",
       "cookingCatch": "요리 재료. 먹기 전에 먼저 요리해야 합니다.",
       "usedBy": "{crafts}에 사용됩니다.",
       "arcaneDust": "제작 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
@@ -3734,6 +3943,15 @@ export const ko_KR: EnTranslations = {
       "subtitle": "월드의 길드",
       "rosterTitle": "{guild}의 명단 보기",
       "back": "뒤로",
+      "filters": "게시판 필터",
+      "newPlayerFriendly": "신규 플레이어 환영",
+      "newPlayerFriendlyTitle": "이 길드는 신규 플레이어를 환영합니다",
+      "filterNewPlayersTitle": "신규 플레이어를 환영하는 길드만 표시",
+      "filterEmpty": "아직 신규 플레이어에게 문을 연 길드가 없습니다.",
+      "showAll": "모든 길드 보기",
+      "officersOnline": "임원 접속 중",
+      "officersOnlineLabel": "접속 중인 임원: {names}",
+      "officerEntry": "{name}({rank})",
       "popupTitle": "길드 게시 기둥",
       "close": "닫기"
     },
@@ -3790,6 +4008,8 @@ export const ko_KR: EnTranslations = {
       "withdrawQuantityTitle": "{item} 꺼내기",
       "withdrawQuantityInput": "꺼낼 수량",
       "withdrawQuantityConfirm": "꺼내기",
+      "quantityStepDownAria": "수량을 {count} 줄이기",
+      "quantityStepUpAria": "수량을 {count} 늘리기",
       "vaultRowWithdrawName": "{item} 꺼내기",
       "priceChanged": "구매가 완료되기 전에 가격이 변경되었습니다. 갱신된 가격을 확인한 후 다시 승인해 주세요.",
       "withdrawQuantityAction": "{item} 꺼낼 수량 선택",
@@ -3981,6 +4201,25 @@ export const ko_KR: EnTranslations = {
       "lastSeenNever": "없음",
       "ignoredTab": "무시됨",
       "blockedTab": "차단",
+      "who": {
+        "tab": "WHO",
+        "searchPlaceholder": "이름, 지역 또는 길드",
+        "search": "검색",
+        "loading": "접속 중인 플레이어를 확인하는 중...",
+        "empty": "일치하는 플레이어가 없습니다.",
+        "count": "{total}명 접속 중",
+        "countFiltered": "{total}명 중 {shown}명 접속 중",
+        "capped": "처음 {delivered}명만 표시됩니다. 나머지를 보려면 검색 범위를 좁히세요.",
+        "classFilter": "직업으로 필터",
+        "allClasses": "모든 직업",
+        "colStatus": "상태",
+        "colName": "이름",
+        "colLevel": "레벨",
+        "colClass": "직업",
+        "colZone": "존",
+        "colGuild": "길드",
+        "sortTitle": "{column} 기준 정렬"
+      },
       "ignoredEmpty": "아무도 무시하고 있지 않습니다.",
       "blockedEmpty": "아무도 차단하지 않았습니다.",
       "blockSearchPlaceholder": "플레이어 이름",
@@ -4020,7 +4259,6 @@ export const ko_KR: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "채집",
       "mining": "채광",
       "logging": "벌목",
       "herbalism": "약초학",
@@ -4103,6 +4341,7 @@ export const ko_KR: EnTranslations = {
           "farming": "가방에 넣어 두면 작물밭에 심을 때 사용됩니다."
         },
         "speed": "{tier}티어 미만 채집지에서 더 빠르게 채집합니다.",
+        "wieldDegrade": "그 숙련도에 못 미쳐도 낮은 티어 도구로는 계속 쓸 수 있습니다.",
         "rodRequired": "낚시에 필요합니다.",
         "rodBite": "물고기가 최대 {seconds}초 더 빨리 입질합니다.",
         "rodReel": "릴 감기 시간이 {seconds}초 늘어납니다.",
@@ -4204,9 +4443,7 @@ export const ko_KR: EnTranslations = {
       "noviceBody": "작물을 수확할 때마다 농사 숙련도가 올라갑니다. 아무 작물밭에나 씨앗을 심어 시작하세요."
     },
     "archetypeTitle": {
-      "label": "칭호",
-      "none": "없음",
-      "hobbyLabel": "취미"
+      "none": "없음"
     },
     "archetypePair": {
       "engineering+alchemy": "폭격수",
@@ -4283,7 +4520,7 @@ export const ko_KR: EnTranslations = {
       "enchant_lucent_infusion": "광휘 주입"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "적중한 근접 공격은 일정 확률로 15초 동안 힘을 50 증가시키고 자신의 생명력을 200 회복합니다. 치유량 보정이 적용됩니다. 적중마다 공격한 무기의 기본 속도 0.6초당 1%의 확률로 발동합니다. 내부 재사용 대기시간이 없습니다. 양손에 각각 별도의 강화 효과가 있으며, 같은 손으로 다시 발동하면 해당 효과의 지속시간이 갱신됩니다. 원거리 공격은 이 효과를 발동시키지 않습니다. 늑대 형상에서는 대신 1초의 기본 공격 속도를 사용합니다."
+      "enchant_weapon_lastflame_zeal": "적중한 근접 공격은 일정 확률로 15초 동안 힘을 50 증가시키고 자신의 생명력을 200 회복합니다. 치유량 보정이 적용됩니다. 적중마다 공격한 무기의 기본 속도 0.6초당 1%의 확률로 발동합니다. 내부 재사용 대기시간이 없습니다. 강화 효과는 양손이 하나를 공유하며, 어느 손으로 발동하든 지속시간이 갱신되고 중첩되지 않습니다. 원거리 공격은 이 효과를 발동시키지 않습니다. 늑대 형상에서는 대신 1초의 기본 공격 속도를 사용합니다."
     },
     "professions": {
       "title": "전문 기술",
@@ -4376,7 +4613,21 @@ export const ko_KR: EnTranslations = {
       "hobbyLabel": "취미: {craft}",
       "majorsLabel": "주 전공: {a}, {b}",
       "pairsHeld": "보유한 조합: {count}",
-      "returnsLabel": "복귀: {count}"
+      "returnsLabel": "복귀: {count}",
+      "retentionFooter": "전문 기술 재설정 시 숙련도의 60%가 유지됩니다.",
+      "tutorialLink": "전문 기술 튜토리얼"
+    },
+    "recipeTracker": {
+      "trackerLabel": "제작법",
+      "collapseHint": "제작법 추적기 접기",
+      "expandHint": "제작법 추적기 펼치기",
+      "pin": "고정",
+      "unpin": "고정 해제",
+      "pinFull": "제작법 추적기가 가득 찼습니다 (최대 {cap}개)",
+      "pinAria": "{name} HUD 추적기에 고정",
+      "unpinAria": "{name} HUD 추적기에서 고정 해제",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "제작",
@@ -4408,9 +4659,11 @@ export const ko_KR: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(상급 등급 {count}개 소모)",
       "reagentVaultDraw": "(재료 보관소에서 {count}개 사용)",
+      "reagentOrdinaryHeld": "({name} {count}개 보유 중이지만 여기서는 상급 등급만 인정됩니다)",
       "vaultUnreachable": "여기에서는 재료 보관소를 사용할 수 없습니다.",
       "craftFeeLine": "제작 수수료: 개당 {fee}",
       "empty": "알려진 제작법이 없습니다.",
+      "materialsFooter": "보관함의 재료는 자동으로 사용됩니다. 작업대에서 더 많은 제작법을 배우세요.",
       "resultAria": "{name} 제작",
       "craftedToast": "제작 완료:{name}",
       "craftedToastQty": "제작 완료:{name} x{qty}",
@@ -4500,8 +4753,8 @@ export const ko_KR: EnTranslations = {
       "attunedBanner": "조율 완료: {title}",
       "tierTutorial": {
         "title": "첫 티어",
-        "tierCap": "기술은 숙련도 {skill}에서 첫 티어에 도달하며, 티어가 오를수록 만들 수 있는 것이 좋아집니다. 하지만 기술이 희귀 이상의 작품을 만들 수 있는 것은 그것이 당신의 두 주 전공 중 하나일 때뿐입니다.",
-        "radar": "당신의 전문 기술은 바퀴를 이룹니다. 인접한 한 쌍에 조율하면 그 두 기술은 상한 없는 주 전공이 되고, 바퀴 반대편의 한 기술은 희귀 상한의 취미가 되며, 나머지는 비활성 상태가 됩니다. 그 지식은 유지되지만 다시 택하기 전까지는 일반 상한이 적용됩니다.",
+        "tierCap": "전문 기술은 숙련도 {skill}에서 첫 티어에 도달하며, 티어가 오를수록 얻는 산출물이나 만들 수 있는 것이 좋아집니다. 다만 제작 전문 기술의 경우, 그 기술이 당신의 두 주 전공 중 하나가 되어야 희귀 등급을 넘어서는 작업으로 올라갈 수 있습니다.",
+        "radar": "당신의 제작 전문 기술은 바퀴를 이룹니다. 인접한 한 쌍에 조율하면 그 두 기술은 상한 없는 주 전공이 되고, 바퀴 반대편의 한 기술은 희귀 상한의 취미가 되며, 나머지는 비활성 상태가 됩니다. 그 지식은 유지되지만 다시 택하기 전까지는 일반 상한이 적용됩니다.",
         "masters": "마을의 공예 명인들이 조율 임무를 제공합니다. 준비가 되면 찾아가 당신의 조합을 선택하세요. 배운 것은 결코 사라지지 않습니다.",
         "dismiss": "알겠습니다"
       },
@@ -4512,6 +4765,9 @@ export const ko_KR: EnTranslations = {
       "commissionToggleHint": "거래로 처음 받는 캐릭터에게 귀속됩니다.",
       "commissionUnbound": "주문 제작품: 첫 수령인에게 귀속됩니다",
       "commissionBound": "주문 제작품: 수령인에게 귀속되어 있습니다"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "상인은 일반 상품을 보충하며, 플레이어 매물은 판매자가 정한 가격으로 함께 표시됩니다."
     },
     "itemMenu": {
       "use": "사용",
@@ -4792,6 +5048,7 @@ export const ko_KR: EnTranslations = {
       "roleDps": "공격 전담",
       "freeRoles": "역할 제한 없음",
       "lockoutDaily": "최종 우두머리 일일 귀속",
+      "lockoutWeekly": "각 우두머리 주간 귀속",
       "lockoutNone": "귀속 없음",
       "lockedFor": "약 {minutes}분 동안 귀속됨",
       "attunement": "선행 퀘스트 필요: {quest}",
@@ -4805,6 +5062,8 @@ export const ko_KR: EnTranslations = {
       "lootMaybe": "다음 중 최대 하나가 드롭:",
       "lootChance": "추가 확률 드롭:",
       "lootHeroic": "영웅 보상, 다음 중 하나가 반드시 드롭:",
+      "lootHeroicMaybe": "영웅 보상, 다음 중 최대 하나가 드롭:",
+      "lootHeroicChance": "영웅 보상, 추가 확률 드롭:",
       "pct": "{pct}%",
       "blockedLevel": "레벨 {min} ~ {max} 전용",
       "blockedSpec": "전문화 선택 필요",
@@ -4866,19 +5125,43 @@ export const ko_KR: EnTranslations = {
         "sealbreak_shockwave": "봉인 파괴 충격파(광역 폭발)",
         "gravebreaker": "무덤파괴자(전방 부채꼴, 공격대 반대편으로)",
         "raise_fallen": "망자 소생(주기적 증원)",
-        "soul_rend": "영혼 가르기(표식 대상은 뭉쳤다가 불을 벗어남)",
+        "soul_rend": "영혼 가르기(표식 대상은 뭉쳐서 피해를 나눔)",
         "deathless_rage": "불사의 격노(수호석에서 저지)",
         "wardstones": "수호석 정신집중(단계 전환)",
         "dread_curse": "공포의 저주(누적되는 탱커 교대 디버프, 2중첩에서 교대)",
-        "bone_spike": "뼈가시(꿰뚫린 대상은 가시가 파괴될 때까지 생명력 소모)",
+        "bone_spike": "뼈가시(꿰뚫린 플레이어는 누군가 몇 번의 공격으로 가시를 부술 때까지 생명력을 잃음)",
         "grave_eruption": "무덤 분출(불타는 바닥을 남기는 경고 원)",
         "binding_sigil": "결속의 인장(나이트락시스를 인장 위로 끌지 못하면 공격대가 대가를 치름)",
-        "gravefire": "무덤불길(옆으로 피해야 하는 이동하는 불줄기)",
-        "soulfire": "영혼불길(영혼 가르기가 터지며 남기는 불웅덩이)",
         "kings_wrath": "왕의 분노(30%: 영구 피해 증가, 바닥 위험 요소 가속)",
         "bone_storm": "뼈 폭풍(위협 수준 무시, 회전 공격, 공격대에게 돌진)",
         "crown_endures": "굴하지 않는 왕관(6:00에 강제 격노, 영웅 5:00)",
-        "deathless_court": "불사의 궁정(영웅 전용, 불사의 격노 이후 왕실 궁정이 일어남)"
+        "deathless_court": "불사의 궁정(영웅 전용, 불사의 격노 이후 왕실 궁정이 일어남)",
+        "bloodmane_rend": "블러드메인 렌드(출혈, 대상 교체 주의)",
+        "tusk_sweep": "터스크 스윕(전방 휩쓸기)",
+        "ancestral_sap": "조상의 수액(아군 치유)",
+        "call_of_the_hunt": "사냥의 부름(주변 아군 가속)",
+        "thickhide_ward": "두꺼운 가죽 결계(주변 아군 보호막)",
+        "beast_pit_quake": "야수 구덩이 진동(광역 피해)",
+        "wildheart_pulse": "와일드하트 펄스(주기적 광역 피해)",
+        "jaguar_roar": "재규어의 포효(넉백)",
+        "brand_of_the_pyre": "화장단의 낙인(중첩되는 화염 표식, 수로의 물로 씻어내기)",
+        "forge_strike": "대장간 강타(중첩되는 방어 전담 교체 약화)",
+        "rain_of_cinders": "잉걸불의 비(세 갈래 화염 원뿔, 그 사이에 서기)",
+        "falling_cinders": "떨어지는 잉걸불(플레이어 위 운석 원, 밖으로 이동)",
+        "revolving_inferno": "회전하는 지옥불(회전하는 화염 광선, 틈으로 통과)",
+        "forge_wave": "대장간 파동(확장되는 불의 벽, 두 안전 통로 이용)",
+        "apocalypse_add": "이그니바르의 잿불 소환사(종말을 시전하는 우선 처치 대상, 빠르게 처치)",
+        "judgment_of_the_forge": "대장간의 심판(중간 단계, 유일한 안전 지대에 모이기)",
+        "last_inferno": "마지막 지옥불(생명력 20%에서 45초 폭주)",
+        "chains_of_the_forge": "대장간의 사슬(영웅 전용, 연결된 상대 가까이 머물기)",
+        "makers_brand": "창조주의 낙인(중첩되는 방어 전담 교체 약화)",
+        "forgefathers_sweep": "대장장이 아버지의 휩쓸기(비방어 전담 대상 넓은 전방 원뿔)",
+        "tempering_ray": "담금질 광선(표식된 플레이어를 향한 직선, 가로막기)",
+        "cinder_orbs": "잉걸불 구슬(표식된 플레이어는 방 가장자리로 산개)",
+        "forgestorm": "대장간 폭풍(떨어지는 운석 원, 밖으로 이동)",
+        "shared_pyre": "공유 화장단(집결 원, 피해 분담)",
+        "anvils_decree": "모루의 칙령(공격대 전체 망치 강타 세 번, 치유로 버티기)",
+        "masters_assembly": "장인의 조립(대장간 광선 막기, 막는 사람 교대)"
       }
     },
     "cosmetics": {
@@ -4899,6 +5182,8 @@ export const ko_KR: EnTranslations = {
       "applied": "적용됨",
       "owned": "보유 중",
       "storeOnly": "WOC 상점에서 구매 가능",
+      "preview": "미리 보기",
+      "previewAria": "{name} 미리 보기",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "탈것 스킨은 이 캐릭터가 타는 어떤 탈것 위에도 덧입혀집니다. 속도는 바뀌지 않습니다.",
       "mountsNoMount": "먼저 탈것을 얻으세요. 스킨에는 탈 대상이 필요합니다.",
@@ -4947,6 +5232,10 @@ export const ko_KR: EnTranslations = {
       "ownedTooltipStatus": "성물고에 수록됨",
       "missingTooltipStatus": "아직 찾지 못함",
       "firstFindClears": "첫 획득: 클리어 {count}회차",
+      "foundBy": "{names} 발견",
+      "finderWithDate": "{name} ({date})",
+      "sharedScopeNote": "계정의 모든 캐릭터가 공유",
+      "sharedScopeHint": "계정의 어떤 캐릭터가 찾은 성유물이든 여기서도 페이지를 채웁니다.",
       "unlockToast": "성물 수록: {name}",
       "illuminateBanner": "페이지 조명됨: {name}",
       "illuminateToast": "{name}의 모든 성물이 채워졌습니다.",
@@ -5080,6 +5369,10 @@ export const ko_KR: EnTranslations = {
       "progressAria": "진행도: {current}/{target}",
       "renownChip": "명성 {renown}",
       "earnedDate": "{date} 획득",
+      "earnedBy": "{names} 획득",
+      "earnerWithDate": "{name} ({date})",
+      "accountScopeNote": "계정의 모든 캐릭터가 공유",
+      "accountScopeHint": "계정의 어떤 캐릭터가 이룬 업적이든 여기서도 달성으로 기록되며, 서에는 누가 달성했는지가 남습니다.",
       "featRibbon": "위업",
       "hiddenBadge": "숨김",
       "titleChip": "칭호 보상",
@@ -5129,6 +5422,33 @@ export const ko_KR: EnTranslations = {
       "toggleAria": "세계 지도, 지역 지도, 인스턴스 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     },
+    "mapAtlas": {
+      "level": "레벨 {level}",
+      "landmarkCount": "랜드마크 {count}개",
+      "filtersAria": "지도 레이어",
+      "filters": {
+        "quests": "퀘스트",
+        "gather": "채집",
+        "dungeons": "던전",
+        "services": "시설",
+        "players": "플레이어"
+      },
+      "trackedQuests": "추적 중인 퀘스트",
+      "noTrackedQuests": "추적 중인 퀘스트 없음",
+      "availableNearby": "근처에서 받을 수 있음",
+      "noNearbyQuests": "근처에 받을 수 있는 퀘스트 없음",
+      "distance": "{distance}야드",
+      "showRoute": "경로 표시",
+      "untrack": "추적 해제",
+      "track": "추적",
+      "legend": {
+        "dungeon": "던전",
+        "ore": "광석",
+        "herb": "약초",
+        "mail": "우편",
+        "passage": "통로"
+      }
+    },
     "arenaGate": {
       "minLevelNote": "레벨 {level} 필요"
     },
@@ -5147,6 +5467,7 @@ export const ko_KR: EnTranslations = {
       "tabBrowse": "둘러보기",
       "tabSell": "판매",
       "tabActivity": "내 활동",
+      "tabHistory": "판매 내역",
       "tabsLabel": "$WOC 거래소 섹션",
       "loading": "거래소를 불러오는 중...",
       "loadFailed": "거래소에 연결할 수 없습니다. 잠시 후 다시 시도하세요.",
@@ -5171,6 +5492,16 @@ export const ko_KR: EnTranslations = {
       "colCurrentBid": "현재 입찰가",
       "colBuyNow": "즉시 구매가",
       "colTimeLeft": "남은 시간",
+      "colBuyer": "구매자",
+      "colSoldAt": "판매된",
+      "colSalePrice": "판매 가격",
+      "colSaleType": "유형",
+      "saleTypeAuction": "경매",
+      "saleTypeBuyNow": "지금 구매",
+      "saleTypeDirected": "지정 판매",
+      "saleTypeUnknown": "알 수 없음",
+      "historyEmpty": "아직 판매 기록이 없습니다.",
+      "historyError": "판매 내역을 불러올 수 없습니다.",
       "reserveMet": "최저가 도달",
       "reserveNotMet": "최저가 미달",
       "yourListing": "내 등록",
@@ -5843,6 +6174,7 @@ export const ko_KR: EnTranslations = {
       "deeds": "업적의 서",
       "reliquary": "성물고",
       "sheathe": "무기 넣기/빼기",
+      "hideInterface": "인터페이스 숨기기 (스크린샷과 영상용)",
       "crafting": "제작",
       "mount": "탑승 / 하차",
       "calendar": "이벤트 달력",
@@ -5872,6 +6204,8 @@ export const ko_KR: EnTranslations = {
       "attackMove": "공격 이동 (옵션을 켠 뒤에만)",
       "meters": "피해량 미터 (피해, 치유, 위협)",
       "petMark": "펫: 지정, 자신의 펫을 선택합니다 (펫 정보창을 클릭하는 것과 같습니다)",
+      "targetSelf": "자신을 대상으로 지정",
+      "targetParty": "파티원 1~9 대상 지정 (파티 창에 표시되는 순서대로 위에서 아래로)",
       "onBarBinding": "단축바에서 곧바로 설정할 수도 있습니다. 키 설정 창에서 행동 단축바 키 편집을 고른 다음, 화면의 단축바에서 칸을 클릭하고 원하는 키를 누르세요. 다 끝냈으면 완료를 클릭하면 됩니다. 이 방법은 실제 키보드가 필요하므로 데스크톱에서만 쓸 수 있습니다.",
       "clickMoveNote": "클릭하여 이동은 직접 켜기 전까지 꺼져 있습니다. 게임 메뉴에서 키 설정 창을 열고 클릭하여 이동을 켠 다음, 그 아래의 클릭 이동 버튼 줄에서 어느 마우스 버튼이 걸음을 맡을지 고르세요(기본값은 왼쪽 클릭이며 오른쪽 클릭도 쓸 수 있습니다). 켜 두면 땅 위의 한 지점을 클릭할 때 그곳으로 걸어가며, 바닥에 남는 표식이 어디로 향하는지 알려 줍니다. 생물이나 다른 플레이어를 클릭하면 그쪽으로 걸어가 사거리 안에서 멈추고, 그 클릭은 대상 지정이나 상호작용이라는 본래 역할도 그대로 해냅니다. 클릭한 것에 이미 닿을 만큼 가까이 있다면 제자리에 선 채로 상호작용만 하게 됩니다. 이동 키를 아무거나 누르면 조작이 곧바로 돌아오며 가던 길이 끝나고, 마우스 버튼을 누른 채 주위를 둘러보아도 마찬가지입니다. 점프는 길을 끊지 않으므로 뛰어오르는 동안에도 계속 나아가며, 게임 메뉴를 여는 것은 가던 길을 잠시 멈출 뿐이어서 메뉴를 닫으면 다시 이어집니다."
     },
@@ -5926,6 +6260,7 @@ export const ko_KR: EnTranslations = {
       "rowBrightness": "장면의 노출을 어둡게 또는 밝게 조절합니다. 순전히 취향의 영역입니다.",
       "rowWeather": "은은하게 내리는 비와 눈입니다. 분위기 연출일 뿐이며, 꺼 두면 폭풍이 칠 때 성능을 조금 아낄 수 있습니다.",
       "rowBrowserEffects": "인터페이스 자체를 얼마나 화려하게 꾸밀지 정합니다. 유리 흐림, 글로우, 메뉴 애니메이션이 여기에 해당합니다. 자동은 사용 중인 브라우저에 맞춰 조절하며, 어느 쪽을 골라도 3D 세계에는 영향이 없습니다.",
+      "rowFrameRateCap": "게임이 초당 그리는 이미지 수의 상한입니다. 디스플레이를 따라가지 못하는 컴퓨터는 고르지 않은 리듬에 머물게 되는데, 안정적인 30이 그보다 더 부드럽게 보이고 작업량을 절반으로 줄이며 컴퓨터 발열도 낮춥니다. 디스플레이는 제한 없음을 뜻합니다.",
       "rowTerrainDetail": "여러 질감이 어우러진 풍부한 지면 표현과 더 단순하고 빠른 지형 표현 사이에서 선택합니다.",
       "rowFoliageDensity": "캐릭터 주변에 풀이 자라는 거리와 밀도를 정합니다.",
       "rowEffectsQuality": "블룸, 주변광 차폐, 그리고 얼마나 많은 횃불과 주문이 진짜 빛을 드리우는지. 세부 조절기 가운데 단일 항목으로 가장 큰 절약이며, 다른 조명 조절기들이 기대고 있는 스위치이기도 합니다.",
@@ -5933,7 +6268,7 @@ export const ko_KR: EnTranslations = {
       "rowFrostedPanels": "창 뒤로 젖빛 유리 같은 흐림을 더합니다. 아름답지만 성능이 낮은 브라우저에는 부담이 되기 쉬운 효과이기도 하니, 클래식한 또렷함을 원한다면 꺼 두세요.",
       "rowReduceMotion": "인터페이스 애니메이션을 없애 창이 즉시 나타나게 합니다. 접근성을 위한 옵션이 우선이지만, 성능에도 약간의 보너스가 있습니다.",
       "rowPerfOverlay": "FPS, 프레임 시간 등을 화면 위에 실시간으로 보여 줍니다. 이 페이지를 참고해 설정을 조정하는 동안 켜 두었다가 다시 숨기면 됩니다.",
-      "tableFoot": "FPS 상한을 찾고 계신가요? 찾을 것이 없습니다. 프레임의 박자는 당신의 화면을 따릅니다. 그리기 거리는 세계 디테일 카드에 있는 '시야 거리'라는 독립된 조절기이며, 당신이 직접 옮기기 전까지는 각 사전 설정이 대신 정해 줍니다.",
+      "tableFoot": "그리기 거리는 세계 디테일 카드에 있는 '시야 거리'라는 독립된 조절기이며, 당신이 직접 옮기기 전까지는 각 사전 설정이 대신 정해 줍니다.",
       "mobileTitle": "휴대폰과 태블릿에서",
       "mobileBody": "휴대폰이나 태블릿에서는 게임이 Low로 시작하게 합니다. 모든 터치 기기는 처음 실행할 때 그곳에 내려앉는데, 이는 당신이 세계에 들어와 플레이할 수 있도록 일부러 그렇게 한 것입니다. 언제든 그래픽 창에서 직접 올리세요. 안드로이드 브라우저에서는 사다리 전체가 열려 있고 선택도 그대로 유지됩니다. 아이폰과 아이패드에서도 최상위 사전 설정을 고를 수 있고 '적용'을 누르는 즉시 적용되지만, 다음에 실행할 때 게임이 당신을 High로 되돌립니다. 그만큼 큰 장면을 세우는 동안 iOS가 탭을 끝내 버릴 수 있기 때문입니다. 내려받은 앱은 한층 더 좁습니다. 사전 설정 목록이 High에서 멈추고 개별 시스템 조절기는 숨겨져 있는데, 앱이 그것들을 스스로 관리하기 때문입니다.",
       "touchBody": "터치 화면에서는 그래픽 창에 전용 '터치 조작' 카드가 생깁니다. 조이스틱 크기와 무반응 구역, 화면 버튼 크기, 조작의 불투명도, 선택 사항인 시점 스틱, 왼손잡이를 위한 좌우 반전 배치, 그리고 반전된 터치 시점까지, 화면이 당신의 손에 맞추도록 하지 그 반대가 아닙니다.",
@@ -6009,7 +6344,8 @@ export const ko_KR: EnTranslations = {
       "ifLockBars": "단축바를 잠가 실수로 슬롯에서 능력을 끌어내지 않도록 합니다.",
       "keybindsHeading": "키 설정 패널",
       "keybindsBody": "그 패널에서 키 목록은 절반에 지나지 않습니다. 그 위에는 마우스가 게임을 어떻게 조종할지 정하는 스위치들이 놓여 있습니다. 마우스 카메라, 회전하는 동안 커서를 고정할지, 클릭 이동과 그것을 실행할 마우스 버튼, 공격 이동, 왼손잡이용 터치 배치, 그리고 채팅 비속어 필터까지 있습니다.",
-      "keybindsMouseBody": "그중 놓치기 쉬운 것이 둘 있습니다. 마우스 버튼도 키처럼 지정할 수 있어 휠 클릭과 엄지 버튼에 능력을 올릴 수 있으며, 왼쪽과 오른쪽 클릭은 카메라와 세계 클릭용으로 남습니다. 그리고 행동 단축바에서 곧바로 지정할 수도 있습니다. 여기서 단축바 지정 모드를 켠 뒤, 슬롯을 클릭하고 원하는 키를 누르면 됩니다."
+      "keybindsMouseBody": "그중 놓치기 쉬운 것이 둘 있습니다. 마우스 버튼도 키처럼 지정할 수 있어 휠 클릭과 엄지 버튼에 능력을 올릴 수 있으며, 왼쪽과 오른쪽 클릭은 카메라와 세계 클릭용으로 남습니다. 그리고 행동 단축바에서 곧바로 지정할 수도 있습니다. 여기서 단축바 지정 모드를 켠 뒤, 슬롯을 클릭하고 원하는 키를 누르면 됩니다.",
+      "keybindsWheelBody": "휠 자체도 지정할 수 있습니다. 카메라 확대와 카메라 축소는 일반 지정으로, 기본적으로 휠 단독에 놓여 있습니다. Ctrl+휠이나 키로 옮긴 뒤 비어 있는 휠을 굴려 행동 단축바 칸을 발동할 수 있습니다. 휠 한 칸에는 놓는 동작이 없어서 앞으로 이동 같은 누르고 있는 동작에는 쓸 수 없습니다."
     },
     "combat": {
       "intro": "전투는 익숙한 클래식 MMO 규칙을 따릅니다. 잘 플레이하기 위해 이를 공부할 필요는 전혀 없으며, 그저 전투가 어떻게 돌아가는지에 대한 개요일 뿐입니다.",
@@ -6030,7 +6366,7 @@ export const ko_KR: EnTranslations = {
       "deathTitle": "쓰러졌을 때",
       "deathBody": "생명력이 0에 이르면 그 자리에서 쓰러지고, 몸은 그곳에 남습니다. 영혼을 풀어내면 가장 가까운 묘지에서 유령으로 일어납니다. 유령은 산 자보다 발이 빠르고 적의 손이 닿지 않지만, 싸우거나 전리품을 줍거나 묘석 위를 맴도는 영혼 치유사 말고는 누구와도 말을 나눌 수 없습니다. 거기서 길을 고릅니다. 유령을 이끌고 몸이 있는 곳으로 돌아가면 생명력과 마나 일부를 회복한 채 아무 불이익 없이 그 자리에서 되살아납니다. 아니면 영혼 치유사에게 그 자리에서의 즉시 부활을 맡길 수도 있는데, 그 값이 부활의 후유증입니다. 존재 전체가 일시적으로 약해지고, 노련한 캐릭터일수록 더 오래 이어지며, 갓 만든 캐릭터는 완전히 면제됩니다. 던전 안에서 쓰러지면 영혼은 바깥 묘지에서 기다립니다. 유령을 이끌고 다시 문을 지나면 입구에서 되살아납니다. 탐굴은 예외입니다. 그곳에서 쓰러지면 그저 탐굴 입구에서 다시 일어서지만, 두 번째로 쓰러지면 공략이 끝납니다. 어느 길을 택하든 경험치도 장비도 동전도 잃지 않습니다. 전투 사이에는 앉아서 먹고 마시며 온전한 상태로 다음 싸움을 시작하세요.",
       "threatTitle": "적은 누구를 때리는가",
-      "threatBody": "모든 적은 누가 자신을 가장 성가시게 했는지 속으로 셈합니다. 피해도 거기에 쌓이고, 치유도 마찬가지입니다. 치유는 치유받은 사람과 이미 싸우고 있는 적들에게 나뉘어 위협 수준으로 얹히므로, 가장 안전한 치유는 탱커가 이미 붙잡아 둔 사람에게 거는 치유입니다. 탱커는 자신이 만들어 내는 모든 위협 수준을 몇 배로 불려 주는 방어 태세나 보호 형태를 켜고, 반대로 드루이드의 늑대 변신은 위협 수준을 덜어 냅니다. 도발은 시전자를 단숨에 셈의 맨 위로 올리고 몇 초 동안 적을 그에게 붙들어 둡니다. 적은 누군가가 탱커를 앞지르는 순간 곧바로 돌아서지는 않습니다. 하나를 떼어 내려면 뚜렷한 차이가 필요하고, 근접보다 원거리에서 더 큰 차이가 필요합니다. 그러니 몰이 초반에 조금만 참으면 싸움은 있어야 할 자리에 머무릅니다.",
+      "threatBody": "모든 적은 누가 자신을 가장 성가시게 했는지 속으로 셈합니다. 피해도 거기에 쌓이고, 치유도 마찬가지입니다. 치유는 치유받은 사람과 이미 싸우고 있는 적들에게 나뉘어 위협 수준으로 얹히므로, 가장 안전한 치유는 탱커가 이미 붙잡아 둔 사람에게 거는 치유입니다. 탱커는 자신이 만들어 내는 모든 위협 수준을 몇 배로 불려 주는 방어 태세나 보호 형태를 켜고, 반대로 드루이드의 표범 변신은 위협 수준을 덜어 냅니다. 도발은 시전자를 단숨에 셈의 맨 위로 올리고 몇 초 동안 적을 그에게 붙들어 둡니다. 적은 누군가가 탱커를 앞지르는 순간 곧바로 돌아서지는 않습니다. 하나를 떼어 내려면 뚜렷한 차이가 필요하고, 근접보다 원거리에서 더 큰 차이가 필요합니다. 그러니 몰이 초반에 조금만 참으면 싸움은 있어야 할 자리에 머무릅니다.",
       "hazardsTitle": "물은 당신을 죽일 수 있습니다",
       "breathBody": "깊은 물에서는 헤엄칠 수 있고, 잠수해 들어갈 수도 있습니다. 머리가 물속에 잠겨 있는 동안에는 화면 위쪽에 파란 숨 막대가 나타나 줄어들고, 수면 위로 올라오면 줄어들 때보다 훨씬 빠르게 다시 찹니다. 물속에서 막대가 다 비면 익사하기 시작해 공기에 닿을 때까지 매초 생명력이 큰 폭으로 깎이므로, 오래 잠수할 때는 막대에서 눈을 떼지 마세요. 죽으면 막대는 초기화되니, 시신을 찾아가는 길은 언제나 한 숨 가득한 채로 시작됩니다.",
       "fatigueBody": "바다에는 벽이 없습니다. 세계가 헤엄쳐 건너라고 마련해 둔 물길, 즉 땅과 땅 사이의 해협과 못, 그리고 내륙의 호수는 아무리 오래 걸려도 안전하게 건널 수 있습니다. 하지만 해안을 지나 진짜 먼바다로 나아가면 바다가 기운을 앗아 가기 시작합니다. 먼저 경고가 뜨고 돌아설 여유가 넉넉히 주어지며, 그 뒤로는 뭍을 향해 돌아설 때까지 무엇으로도 막을 수 없는 피해가 점점 무겁게 쌓입니다. 그렇게 멀리서 익사하거나 기운이 다하면 다른 죽음과 마찬가지로 영혼을 풀어내야 하니, 수평선은 목적지가 아니라 풍경으로 여기세요.",
@@ -6038,6 +6374,7 @@ export const ko_KR: EnTranslations = {
       "allyRezBody": "언제나 걸어서 돌아가야 하는 것은 아닙니다. 부활 주문을 가진 아군이 대신 일으켜 줄 수 있는데, 이는 수락하거나 거절하는 알림으로 도착합니다. 그대로 두면 시간이 지나 사라지니, 떠 있을 때 답하세요. 수락하면 주문을 건 친구 곁에서 생명력과 마나를 일부 되찾은 채 일어납니다. 일부 힐러는 쓰러진 파티 전원에게 한 번에 제안할 수 있지만, 그래도 각자 자기 알림에 답해야 합니다. 쏜할로우 평원만은 예외로, 그곳에서는 어떤 부활 주문도 닿지 않으며 팀의 다음 물결을 기다리게 됩니다.",
       "unstuckTitle": "정말로 갇혔을 때",
       "unstuckBody": "세계가 빠져나올 수 없는 곳에 당신을 가둬 버렸다면 /unstuck을 입력하세요. 전투 중이 아니어야 하고, 제자리에 서 있어야 하며, 기절이나 속박에 걸려 있지 않고, 결투나 투기장 시합 중이 아니어야 합니다. 짧은 카운트다운이 흐르고, 움직이거나 피해를 받으면 취소됩니다. 카운트다운이 끝나면 가장 가까운 묘지에 내려놓습니다. 이 명령은 결코 당신을 죽이지 않고 시신도 남기지 않으며, 이미 쓰러져 있었다면 그 자리에서 일으켜 줍니다. 대가는 탈출의 후유증으로, 존재 전체가 잠시 약해지지만 명령을 다시 쓸 수 있게 될 무렵이면 이미 사라져 있습니다. 그리고 수호자의 대가와 마찬가지로, 갓 만든 캐릭터는 이 후유증을 전혀 겪지 않습니다.",
+      "unstuckBodyWindow": "세계가 빠져나올 수 없는 곳에 당신을 가둬 버렸다면 /unstuck을 입력하세요. 전투 중이 아니어야 하고, 제자리에 서 있어야 하며, 기절이나 속박에 걸려 있지 않고, 결투나 투기장 시합 중이 아니어야 합니다. 짧은 카운트다운이 흐르고, 움직이거나 피해를 받으면 취소됩니다. 카운트다운이 끝나면 가장 가까운 묘지에 내려놓습니다. 이 명령은 결코 당신을 죽이지 않고 시신도 남기지 않으며, 이미 쓰러져 있었다면 그 자리에서 일으켜 줍니다. 한 시간 안의 첫 사용에는 아무 대가도 없습니다. 마지막 사용 후 한 시간 안에 다시 쓰면 대가는 탈출의 후유증으로, 존재 전체가 잠시 약해지지만 명령을 다시 쓸 수 있게 될 무렵이면 이미 사라져 있습니다. 그리고 수호자의 대가와 마찬가지로, 갓 만든 캐릭터는 이 후유증을 전혀 겪지 않습니다.",
       "climbTitle": "난간을 붙잡고 올라서기",
       "climbBody": "난간은 벽이 아닙니다. 그냥 올라서기에는 너무 높은 곳을 향해 뛰면, 점프가 가장 높이 오르는 즈음에 캐릭터가 턱을 붙잡고 그 위로 몸을 끌어올립니다. 따로 누를 키는 없습니다. 스스로 넘어설 만큼 낮은 것은 아무 일 없이 지나가고, 제대로 된 끌어올리기는 머리 위의 턱에만 쓰입니다. 순식간에 끝나지만 진행되는 동안에는 조작을 가져가므로, 도중에 방향을 틀 수는 없습니다. 끌어올리는 중에 기절당하면 손을 놓고 떨어지며, 낙하 거리는 점프가 시작된 지면에서부터 잽니다. 기절이나 속박은 끌어올리기가 시작되는 것 자체를 막으니, 싸우다 곤경에서 빠져나오려 할 때 기억해 둘 만합니다."
     },
@@ -6061,8 +6398,9 @@ export const ko_KR: EnTranslations = {
       "framePetBody": "사냥꾼과 흑마법사를 비롯해 소환수를 부리고 있는 사람은 자기 프레임 옆에 소환수용 작은 프레임을 하나 얻으며, 이름과 레벨, 생명력이 표시됩니다. 그 프레임을 클릭하면 소환수가 대상으로 잡히고, 키보드에서는 Ctrl+6이 같은 일을 합니다.",
       "framesMoveBody": "내 프레임과 대상 프레임, 파티 프레임은 모두 옮길 수 있습니다. 각 프레임 모서리에는 작은 이동 버튼이 하나씩 있습니다. 잠금을 풀고 원하는 자리로 끌어다 놓은 다음 다시 잠그면, 잘못 누른 클릭에 프레임이 밀려나지 않습니다. 자리가 마음에 들지 않게 되었다면 옵션의 프레임 위치 초기화로 전부 처음 자리로 되돌릴 수 있습니다.",
       "framesMoveBodyEditFrames": "내 프레임과 대상 프레임, 파티 프레임은 모두 옮길 수 있습니다. 각 프레임 모서리에는 작은 이동 버튼이 하나씩 있습니다. 잠금을 풀고 원하는 자리로 끌어다 놓은 다음 다시 잠그면, 잘못 누른 클릭에 프레임이 밀려나지 않습니다. 인터페이스 옵션의 프레임 탭 맨 위에 있는 프레임 편집은 그 세 프레임과 함께 나머지 인터페이스도 한 번에 풀어 줍니다. 행동 단축바와 시전 바, 공격 속도 바, 경험치 바, 미니맵, 버튼 열, 소환수 프레임, 태세 바, 강화 효과와 약화 효과 줄, 그리고 찜 목록 알림 칩까지, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다. 자리가 마음에 들지 않게 되었다면 같은 프레임 탭 맨 아래의 기본값 복원으로 전부 처음 자리로 되돌릴 수 있습니다.",
-      "framesGovernedExtra": "\"프레임 편집\"은 그 아래 쌓이는 추적기 무리(추적 중인 퀘스트와 그 목표, 업적 진행도, 성물고 페이지, 지금 들어와 있는 탐굴, 참여 중인 균열, 그리고 추적 중인 제작법이나 의뢰)와 소환수 프레임 옆 소환수 행동 단축바, 주변 적에게 건 약화 효과를 모아 보여주는 \"대상 디버프\" 프레임, 성기사의 \"헌신\" 메달, 흑마법사의 \"고통 자원 막대\", 주문 발동 오버레이, 이도류일 때의 보조 무기 공격 속도 바, 그리고 탭으로 나뉜 피해 측정기 창까지 함께 풀어 주며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
+      "framesGovernedExtra": "\"프레임 편집\"은 그 아래 쌓이는 추적기 무리(추적 중인 퀘스트와 그 목표, 업적 진행도, 성물고 페이지, 제작에서 고정해 둔 제작법, 지금 들어와 있는 탐굴, 참여 중인 균열, 그리고 추적 중인 제작법이나 의뢰)와 소환수 프레임 옆 소환수 행동 단축바, 주변 적에게 건 약화 효과를 모아 보여주는 \"대상 디버프\" 프레임, 성기사의 \"헌신\" 메달, 흑마법사의 \"고통 자원 막대\", 주문 발동 오버레이, 이도류일 때의 보조 무기 공격 속도 바, 그리고 탭으로 나뉜 피해 측정기 창까지 함께 풀어 주며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
       "framesGovernedAuraTracks": "\"프레임 편집\"은 같은 인터페이스 옵션의 전투 탭에서 켠 선택형 오라 트랙 여섯 개, 곧 \"내 버프\" 트랙, \"방어 재사용 대기시간\" 트랙, \"내 보호막\" 트랙, \"공격 재사용 대기시간\" 트랙, \"이동 및 은신\" 트랙, \"아군에게 건 내 버프\" 트랙도 함께 풀어 줍니다. 모든 트랙은 기본적으로 꺼져 있으며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
+      "framesGovernedTalkingHead": "프레임 편집은 대화 패널도 해제합니다. 대화 패널은 말하는 NPC가 시야 밖에 있을 때 그 NPC의 대사를 담으며, 해제된 동안에는 자신의 이름 칩을 표시합니다.",
       "barsTitle": "바와 시간 표시, 전투 문자",
       "barsBody": "주문을 시전하거나 정신을 집중할 때마다 화면 한가운데, 행동 단축바 바로 위에 시전 바가 나타나 주문 이름과 남은 시간을 알려 줍니다. 대상도 자기 프레임에 시전 바를 가지므로, 무엇이 날아오는지 보고 답할 수 있습니다.\n\n시전 바 아래에는 가느다란 공격 속도 바가 있어 무기를 휘두르는 사이를 채웁니다. 근접이나 원거리 공격자는 다음 자동 공격이 언제 들어가는지 볼 수 있습니다.\n\n경험치 바는 행동 단축바 아래를 가로질러 화면 전체 폭으로 이어지며 눈금으로 나뉘어 있고, 밝게 표시된 구간이 쌓아 둔 휴식 경험치를 보여 줍니다.\n\n물속으로 헤엄쳐 들어가면 화면 위쪽에 파란 호흡 바가 나타납니다. 머리가 잠겨 있는 동안 줄어들고, 다 떨어져 익사가 시작되면 붉게 깜빡이며, 물 위로 올라오는 순간 빠르게 다시 찹니다. 스페이스로 위로 헤엄치고, 기본값이 Ctrl인 아래로 헤엄치기 키로 더 깊이 내려갑니다.\n\n피해와 치유는 맞은 대상 위로 작은 숫자가 되어 떠오르므로, 글을 읽지 않고도 전투를 읽어 낼 수 있습니다. 채팅창의 전투 탭에는 온전한 기록이 글로 남습니다.",
       "aurasTitle": "강화 효과와 약화 효과",
@@ -6073,7 +6411,7 @@ export const ko_KR: EnTranslations = {
       "minimapBody": "오른쪽 위에 있습니다. 둥근 미니맵 위에는 지역 이름이, 아래에는 좌표가 놓이고, 하루의 시각을 그려 내는 눈금테가 그 둘레를 감쌉니다.\n\n알릴 것이 있을 때는 작은 표시가 미니맵에 나타납니다. 읽지 않은 편지가 기다리면 봉투가, 판매 대금이나 되돌아온 물건이 상인에게 남아 있으면 동전이, 그리고 공격대 입장 제한을 보여 주는 버튼이 붙습니다.",
       "mapTitle": "세계 지도와 추적기",
       "mapBody": "M을 누르면 세계 지도가 열립니다. 대륙 전체가 그려지고 그 위에 내 화살표가, 지역과 그 이름이, 주변의 명소가, 이동 차원문이, 그리고 지금까지 찾아낸 채집 노드가 표시됩니다. 파티원도 함께 나타납니다. 탐굴 안에서는 지도가 지금까지 탐험한 방들의 도면으로 바뀝니다.\n\n오른쪽 가장자리 미니맵 아래로는 추적기들이 쌓여, 창을 열지 않고도 지금 하는 일을 눈앞에 붙들어 둡니다. 추적 중인 퀘스트와 그 목표, 업적 진행도, 지금 들어와 있는 탐굴, 참여 중인 균열이 여기에 놓입니다. 화면을 되찾고 싶을 때는 퀘스트 추적기를 접을 수 있습니다.",
-      "mapBodyZoneFirst": "M을 누르면 세계 지도가 지금 서 있는 지역에 맞춰 열립니다. 그 위에 내 화살표가, 주변의 명소가, 표식을 단 퀘스트 제공자와 퀘스트 목표가 놓인 구역이, 작업대와 우편함, 게시판, 텃밭이, 던전 입구가, 그리고 그 지역의 모든 채집 노드가 표시됩니다. 노드는 다시 자라는 동안에는 회색으로 흐려지고, 도구가 아직 감당하지 못하는 노드에는 표시가 붙습니다. 파티원도 함께 나타납니다. 지도를 오른쪽 클릭하거나 세계 지도 버튼을 누르면 대륙으로 물러나 모든 지역이 이름과 함께 그려지며, 거기서 지역을 클릭하면 그 지역의 지도가 열립니다. 탐굴이나 던전, 균열, 성채 안으로 들어서면 지도는 지금 서 있는 곳의 도면으로 바뀌고, 쏜할로우 평원 전장은 저만의 전장 지도를 가집니다.\n\n오른쪽 가장자리 미니맵 아래로는 추적기들이 쌓여, 창을 열지 않고도 지금 하는 일을 눈앞에 붙들어 둡니다. 추적 중인 퀘스트와 그 목표, 업적 진행도, 성물고 페이지, 지금 들어와 있는 탐굴, 참여 중인 균열이 여기에 놓입니다. 화면을 되찾고 싶을 때는 퀘스트 추적기를 접을 수 있습니다.",
+      "mapBodyZoneFirst": "M을 누르면 세계 지도가 지금 서 있는 지역에 맞춰 열립니다. 그 위에 내 화살표가, 주변의 명소가, 표식을 단 퀘스트 제공자와 퀘스트 목표가 놓인 구역이, 작업대와 우편함, 게시판, 텃밭이, 던전 입구가, 그리고 그 지역의 모든 채집 노드가 표시됩니다. 노드는 다시 자라는 동안에는 회색으로 흐려지고, 도구가 아직 감당하지 못하는 노드에는 표시가 붙습니다. 파티원도 함께 나타납니다. 지도를 오른쪽 클릭하거나 세계 지도 버튼을 누르면 대륙으로 물러나 모든 지역이 이름과 함께 그려지며, 거기서 지역을 클릭하면 그 지역의 지도가 열립니다. 탐굴이나 던전, 균열, 성채 안으로 들어서면 지도는 지금 서 있는 곳의 도면으로 바뀌고, 쏜할로우 평원 전장은 저만의 전장 지도를 가집니다.\n\n오른쪽 가장자리 미니맵 아래로는 추적기들이 쌓여, 창을 열지 않고도 지금 하는 일을 눈앞에 붙들어 둡니다. 추적 중인 퀘스트와 그 목표, 업적 진행도, 성물고 페이지, 제작에서 고정해 둔 제작법, 지금 들어와 있는 탐굴, 참여 중인 균열이 여기에 놓입니다. 화면을 되찾고 싶을 때는 퀘스트 추적기를 접을 수 있습니다.",
       "gatheringGoalTrackerBody": "제작 창에서 제작법을, 또는 의뢰 게시판에서 의뢰를 \"추적\"하면 채집 목표 트래커가 이 스택에 추가됩니다. 추적 중인 제작법이나 의뢰의 이름, 목표 수량, 그리고 소지 중이거나 보관 중인 재료로 얼마나 채울 수 있는지를 보여줍니다. \"추적\"은 현재 목표를 대체하고, \"지우기\"는 명시적으로 해제합니다. 둘 다 채집 설정을 바꾸지 않습니다.",
       "hubPracticeTrackerBody": "Eastbrook 거점 근처에서 그곳의 안내형 연습 레슨을 받으면 연습 트래커가 스택에 추가되어, 연습용 허수아비를 상대로 한 최고 기록을 계속 보여줍니다. 레슨이 진행 중일 때는 옆의 코칭 스트립이 피해량 미터 열기부터 두 번째 실행 비교까지, 현재 단계를 안내해 줍니다.",
       "chatTitle": "채팅창",
@@ -6210,6 +6548,7 @@ export const ko_KR: EnTranslations = {
       "dungeonReset": "비어 있는 자신의 인스턴스를 버립니다. 난이도를 바꾼 뒤에 하는 일입니다.",
       "groupRecovery": "복귀와 상태 표시",
       "unstuck": "세계에 갇혔을 때 빠져나오는 길입니다. 짧은 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지로 옮겨지고, 이미 쓰러져 있었다면 그곳에서 부활합니다. 그 뒤 한동안 탈출의 후유증으로 약해지므로, 지름길이 아니라 최후의 수단입니다.",
+      "unstuckWindow": "세계에 갇혔을 때 빠져나오는 길입니다. 짧은 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지로 옮겨지고, 이미 쓰러져 있었다면 그곳에서 부활합니다. 한 시간 안의 첫 사용은 대가가 없습니다. 마지막 사용 후 한 시간 안에 다시 쓰면 그 뒤 한동안 탈출의 후유증으로 약해지므로, 지름길이 아니라 구조 수단입니다.",
       "afk": "자리 비움으로 표시합니다. 메시지를 함께 남기면 귓속말을 보낸 사람에게 자동 답장으로 전해집니다. 메시지 없이 다시 입력하면 해제되고, 다른 채팅을 해도 해제됩니다.",
       "dnd": "다른 용무 중입니다. 자리 비움과 비슷하지만, 당신에게 온 귓속말이 전달되는 대신 보류됩니다.",
       "sit": "그 자리에 앉고, 다시 일어섭니다. 움직이거나 시전하거나 한 대 맞으면 곧바로 일어납니다.",
@@ -6316,6 +6655,7 @@ export const ko_KR: EnTranslations = {
       "fatigueDef": "트인 바다로 충분히 멀리 헤엄쳐 나가면 물이 여러분을 갉아먹기 시작합니다. 먼저 경고가 오고, 뭍으로 돌아설 때까지 피해가 점점 커집니다.",
       "unstuckTerm": "탈출의 후유증",
       "unstuckDef": "게임 메뉴의 갇힘 탈출을 쓴 대가입니다. 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지에 내려놓아 주며, 그 뒤 한동안 일시적인 약화를 안고 다니게 됩니다.",
+      "unstuckDefWindow": "게임 메뉴의 갇힘 탈출을 한 시간 안에 두 번 이상 쓴 대가입니다. 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지에 내려놓아 줍니다. 한 시간 안의 첫 사용은 대가가 없지만, 마지막 사용 후 한 시간 안에 되풀이하면 그 뒤 한동안 일시적인 약화도 안고 다니게 됩니다.",
       "itemLevelTerm": "아이템 레벨",
       "itemLevelDef": "장비 한 점이 얼마나 강한지를 하나의 숫자로 정리한 값으로, 두 장비를 빠르게 견주고 싶을 때 편리합니다. 옵션에서 아이템 레벨 표시를 켜면 툴팁에서 볼 수 있습니다. 출처가 분명한 장비에만 붙으므로 평범한 상인 기본품이나 초보용 장비에는 아무것도 표시되지 않으며, 숫자가 없는 것은 결함이 아니라 정상입니다.",
       "requiredLevelTerm": "필요 레벨",
@@ -6420,6 +6760,7 @@ export const ko_KR: EnTranslations = {
       "formsNote": "드루이드는 형태를 바꾸며 싸웁니다. 드루이드의 능력은 대부분 특정 형태에 속하므로, 지금 어떤 형태인지가 무엇을 쓸 수 있는지를 결정하며, 변신에는 약간의 마나가 듭니다. 전투 중이든 아니든 원하는 만큼 자주 변신할 수 있습니다.",
       "formsAutoUnshift": "변신한 채로 치유 주문이나 공격 주문을 시전하면 형태가 알아서 풀립니다. 이렇게 형태를 벗는 데에는 마나가 들지 않고 공용 재사용 대기시간도 쓰지 않으므로, 즉시 시전 주문은 누른 그 순간에 나갑니다. 다시 변신하는 것은 평범한 능력이라 여전히 마나와 공용 재사용 대기시간이 듭니다.",
       "formsMoonwing": "조화 전문화 드루이드는 형태를 하나 더 얻습니다. 조화 드루이드가 싸울 때 쓰는 시전자 형태인 달빛야수 변신입니다. 주문을 그대로 쓸 수 있는 유일한 동물 형태이며, 마법봉은 이 형태나 평범한 시전자 모습에서만 쓸 수 있습니다.",
+      "formsWolfEngage": "늑대는 큰곰 돌진으로 싸움을 열고, 곧바로 늑대 변신으로 바꿔 대상을 고정하며, 은신하지 않을 때는 도약 습격으로 거리를 좁히고, 쓰러뜨리기로 적을 붙잡아 둡니다.",
       "formLine": {
         "form_bear": "방어를 맡는 형태입니다. 두꺼운 가죽을 두르고, 마나 대신 분노를 쓰며, 위협 수준을 더 쌓아 적이 계속 당신을 때리게 합니다.",
         "form_cat": "근접 피해를 맡는 형태입니다. 도적처럼 기력과 연계 점수를 쓰고, 위협 수준은 훨씬 적게 쌓습니다.",
@@ -6428,7 +6769,7 @@ export const ko_KR: EnTranslations = {
       "mageEleSummon": "정령을 곁으로 불러내 대상에게 달려들게 하는 냉기 주문입니다.",
       "formName": {
         "form_bear": "큰곰 변신",
-        "form_cat": "늑대 변신",
+        "form_cat": "표범 변신",
         "form_travel": "쾌속 형태"
       }
     },
@@ -6949,7 +7290,7 @@ export const ko_KR: EnTranslations = {
     "deedsPage": {
       "intro": "업적의 서는 시작의 골짜기를 벗어나는 첫걸음부터 왕국이 내놓을 수 있는 가장 힘든 싸움까지, 당신이 이룬 모든 것을 세계가 기록해 두는 곳입니다. 플레이하며 업적을 얻고, 그것이 주는 칭호를 걸치고, 명성이 오르는 것을 지켜보세요.",
       "howHeading": "업적의 작동 방식",
-      "howBody": "업적은 캐릭터 한 명 한 명이 따로 얻고 그 캐릭터에 간직되므로, 당신이 플레이하는 모든 영웅이 저마다 자기만의 업적의 서를 채워 갑니다. 당신의 모든 캐릭터에 걸쳐 명성을 한데 모으는 것은 오직 왕국의 순위표뿐이며, 그곳에서는 각 업적을 한 번씩만 셉니다. 각 업적은 게임 내 업적의 서에서 무엇을 요구하는지 분명히 알려 주므로 무엇을 좇아야 할지 언제나 알 수 있고, 노리는 업적에 추적을 걸어 두면 플레이하는 동안 눈앞에서 놓치지 않을 수 있습니다. 소수의 업적은 비밀로 남아 있다가 당신이 얻은 뒤에야 모습을 드러냅니다. 업적의 서는 스스로 정직함도 지킵니다. 지난 기록이 증명할 수 있는 것은 그 자리에서 바로 인정해 주므로, 노장이 빈 페이지를 펼치는 일은 없습니다. 오직 횟수를 세는 업적만이 처음부터 새로 셉니다.",
+      "howBody": "업적은 캐릭터마다 달성하지만, 업적의 서는 계정의 모든 캐릭터가 공유합니다. 어느 캐릭터가 이룬 업적이든 모두의 것으로 기록되고, 서에는 누가 언제 달성했는지가 남으며, 보상인 칭호나 테두리는 어떤 캐릭터라도 착용할 수 있습니다. 서버 순위표도 같은 방식으로 명성을 모아 각 업적을 한 번만 셉니다. 각 업적은 게임 속 업적의 서에 요구 사항을 분명히 적어 두어 무엇을 좇을지 늘 알 수 있고, 노리는 업적을 감시에 올려 플레이하는 동안 시야에 둘 수 있습니다. 극소수는 비밀로 남아 달성했을 때만 드러납니다. 서는 스스로도 정직함을 지킵니다. 과거 기록으로 증명할 수 있는 것은 즉시 인정되어 베테랑이 빈 페이지를 여는 일은 없으며, 횟수를 세는 업적만 새로 집계를 시작합니다.",
       "renownHeading": "명성",
       "renownBody": "명성은 업적의 서 뒤에 있는 점수입니다. 얻어낸 업적마다 정해진 값이 있고 총합은 오르기만 하므로, 한가한 한 주가 발판을 앗아가는 일은 없습니다. 몇 가지는 실력보다 운에 달렸고, 다른 수집 업적들은 그 자체가 보상이며, 위업은 또 다른 영예이므로, 그 어느 것도 명성을 주지 않습니다. 명성이 없는 업적도 당신의 서를 채우는 데는 여전히 셈해집니다. 다만 점수가 되지 않을 뿐입니다. 위업만이 유일한 예외로, 셈에서 아예 빠져 있습니다.",
       "rewardsHeading": "칭호와 테두리",
@@ -6987,7 +7328,7 @@ export const ko_KR: EnTranslations = {
     "reliquaryPage": {
       "intro": "성물고는 목록에 올린 고유 전리품의 박물관입니다. 던전 추격 장비, 전문 기술 트로피, 탈것, 무기 스킨, 칭호. 공적 책과의 관계는 트로피 홀과 업적 책과 같습니다.",
       "howHeading": "수집 작동 방식",
-      "howBody": "게임에서 성물고를 엽니다(기본 Shift+X). 각 선반에 고유 성유물 페이지가 있습니다. 캐릭터가 그 조각을 처음 얻으면 실루엣이 채워지고, 페이지의 모든 성유물이 채워지면 페이지가 밝혀집니다. '단종' 또는 '전용'으로 표시된 일부 페이지는 달성 대상에서 제외되어 선반이나 전체 완성을 막지 않습니다. 실시간 발견은 알림과 열린 창 새로고침으로 이어집니다. 진행도는 캐릭터 단위이며 무기 스킨만 계정 장식입니다.",
+      "howBody": "게임에서 성물고를 엽니다(기본 Shift+X). 각 선반에 고유 성유물 페이지가 있습니다. 계정의 어떤 캐릭터든 그 조각을 처음 얻으면 실루엣이 채워지고, 페이지의 모든 성유물이 채워지면 페이지가 밝혀집니다. '단종' 또는 '전용'으로 표시된 일부 페이지는 달성 대상에서 제외되어 선반이나 전체 완성을 막지 않습니다. 실시간 발견은 알림과 열린 창 새로고침으로 이어집니다. 진행도는 계정의 모든 캐릭터가 공유하므로, 한 캐릭터가 찾은 성유물은 모두의 페이지를 채웁니다.",
       "ranksHeading": "큐레이터 등급",
       "ranksBody": "큐레이터 등급은 목록에 올린 고유 채움에 따라 오르며 장식 칭호와 테두리만 줍니다. 전투 능력, 드롭률, 천장 보정은 없습니다. 계정 무기 스킨은 큐레이터 등급에 들어가지 않아 명성은 캐릭터에 남습니다. 단종·전용 페이지의 성유물도 등급에 들어가지 않습니다.",
       "retiredTag": "단종",
@@ -7073,7 +7414,7 @@ export const ko_KR: EnTranslations = {
       "groupClasses": "직업",
       "groupForms": "드루이드 변신",
       "formBear": "큰곰 변신",
-      "formCat": "늑대 변신",
+      "formCat": "표범 변신",
       "formTravel": "쾌속 형태",
       "groupCreatures": "생명체",
       "groupPets": "흑마법사 악마",
@@ -7397,7 +7738,7 @@ export const ko_KR: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "마법부여는 네 단으로 나뉜다. 기본 단은 울림 가루로 돌아가고(위쪽 끝에서는 울림 정수가 조금 든다) 무기 자리와 보조 장비 자리, 모든 방어구 자리를 아우르며, 어떤 구성이든 자리마다 쓸 것을 찾을 만큼 능력치 갈래가 넉넉하다. 방패와 시전자용 보조 장비에는 저마다의 체력 마법부여가 있어, 착용 자리 가운데 마법부여가 없는 곳은 하나도 없다. 상급 단은 울림 파편 하나에 울림 정수가 더 들며, 영향이 가장 큰 자리에 더 강한 보너스를 얹는다. 파편은 그 밖에도 세 군데로 더 흘러간다. 각각 다섯 개가 드는 두 부적 제조법과, 도구 효과 재충전의 최상단과, 광휘 단이다. 광휘 단에서는 무기와 가슴 마법부여가 하나씩, 주입이 둘을 가져간다. 쓰기 전에 몇 개는 쟁여 두라.\n\n그 사이에는 다섯 가지 룬 마법부여가 있다. 종류가 정해진 보조 재료마다 소비처가 하나씩 있어, 갈아 낸 것 가운데 막다른 길로 끝나는 것은 없다. 룬 칼날(무기, 힘, 공명의 강철 소모), 룬 인장(무기, 지능, 공명의 목재), 룬 직조(가슴, 정신, 공명의 실), 룬 가죽(다리, 민첩, 공명의 가죽), 룬 사슬(투구, 체력, 공명의 사슬)이다. 각각 울림 정수도 두 개씩 든다. 같은 자리와 능력치에 기본 단과 상급 단이 모두 있는 경우 룬의 보너스는 그 둘 사이에 놓이고, 룬 직조는 가슴 정신 마법부여 가운데 가장 강하며, 룬 가죽은 다리 민첩 마법부여로는 유일하다. 정확한 수치는 모두 아래 표에 있다.\n\n그 모두의 위에 광휘 단이 있다. 이 기술의 정점이자, 숙련 자체를 요구하는 유일한 마법부여다. 넷은 마법부여 100을, 주입은 125를 요구하며, 아래 표의 기술 칸에 적혀 있다. 하나하나가 광휘 시약을 필요로 하며, 저마다 제 자리에 계단을 한 칸씩 더 올린다. 무기(위력과 주문력 두 갈래)와 가슴과 신발이다. 그 마지막인 광휘 주입은 완전해진 물건에만 깃드는데, 아직은 어떤 물건도 그렇게 될 수 없다. 그것이 기다리는, 물건을 완전하게 만드는 작업보다 먼저 쓰였기 때문이다.",
         "enchantsNoteInfusionLive": "마법부여는 네 단으로 나뉜다. 기본 단은 울림 가루로 돌아가고(위쪽 끝에서는 울림 정수가 조금 든다) 무기 자리와 보조 장비 자리, 모든 방어구 자리를 아우르며, 어떤 구성이든 자리마다 쓸 것을 찾을 만큼 능력치 갈래가 넉넉하다. 방패와 시전자용 보조 장비에는 저마다의 체력 마법부여가 있어, 착용 자리 가운데 마법부여가 없는 곳은 하나도 없다. 상급 단은 울림 파편 하나에 울림 정수가 더 들며, 영향이 가장 큰 자리에 더 강한 보너스를 얹는다. 파편은 그 밖에도 세 군데로 더 흘러간다. 각각 다섯 개가 드는 두 부적 제조법과, 도구 효과 재충전의 최상단과, 광휘 단이다. 광휘 단에서는 무기와 가슴 마법부여가 하나씩, 주입이 둘을 가져간다. 쓰기 전에 몇 개는 쟁여 두라.\n\n그 사이에는 다섯 가지 룬 마법부여가 있다. 종류가 정해진 보조 재료마다 소비처가 하나씩 있어, 갈아 낸 것 가운데 막다른 길로 끝나는 것은 없다. 룬 칼날(무기, 힘, 공명의 강철 소모), 룬 인장(무기, 지능, 공명의 목재), 룬 직조(가슴, 정신, 공명의 실), 룬 가죽(다리, 민첩, 공명의 가죽), 룬 사슬(투구, 체력, 공명의 사슬)이다. 각각 울림 정수도 두 개씩 든다. 같은 자리와 능력치에 기본 단과 상급 단이 모두 있는 경우 룬의 보너스는 그 둘 사이에 놓이고, 룬 직조는 가슴 정신 마법부여 가운데 가장 강하며, 룬 가죽은 다리 민첩 마법부여로는 유일하다. 정확한 수치는 모두 아래 표에 있다.\n\n그 모두의 위에 광휘 단이 있다. 이 기술의 정점이자, 숙련 자체를 요구하는 유일한 마법부여다. 넷은 마법부여 100을, 주입은 125를 요구하며, 아래 표의 기술 칸에 적혀 있다. 하나하나가 광휘 시약을 필요로 하며, 저마다 제 자리에 계단을 한 칸씩 더 올린다. 무기(위력과 주문력 두 갈래)와 가슴과 신발이다. 그 마지막인 광휘 주입은 완전해진 물건에만 깃든다. 물건을 완전하게 만드는 일은 마법부여사가 아니라 착용자 자신의 몫이며, 그 길은 생산 전문직 페이지가 들려준다.",
-        "enchantsNoteRaidFormula": "마법부여는 네 단으로 나뉜다. 기본 단은 울림 가루로 돌아가고(위쪽 끝에서는 울림 정수가 조금 든다) 무기 자리와 보조 장비 자리, 모든 방어구 자리를 아우르며, 어떤 구성이든 자리마다 쓸 것을 찾을 만큼 능력치 갈래가 넉넉하다. 방패와 시전자용 보조 장비에는 저마다의 체력 마법부여가 있어, 착용 자리 가운데 마법부여가 없는 곳은 하나도 없다. 상급 단은 울림 파편 하나에 울림 정수가 더 들며, 영향이 가장 큰 자리에 더 강한 보너스를 얹는다. 파편은 그 밖에도 세 군데로 더 흘러간다. 각각 다섯 개가 드는 두 부적 제조법과, 도구 효과 재충전의 최상단과, 광휘 단이다. 광휘 단에서는 무기와 가슴 마법부여가 하나씩, 주입이 둘을 가져간다. 쓰기 전에 몇 개는 쟁여 두라.\n\n그 사이에는 다섯 가지 룬 마법부여가 있다. 종류가 정해진 보조 재료마다 소비처가 하나씩 있어, 갈아 낸 것 가운데 막다른 길로 끝나는 것은 없다. 룬 칼날(무기, 힘, 공명의 강철 소모), 룬 인장(무기, 지능, 공명의 목재), 룬 직조(가슴, 정신, 공명의 실), 룬 가죽(다리, 민첩, 공명의 가죽), 룬 사슬(투구, 체력, 공명의 사슬)이다. 각각 울림 정수도 두 개씩 든다. 같은 자리와 능력치에 기본 단과 상급 단이 모두 있는 경우 룬의 보너스는 그 둘 사이에 놓이고, 룬 직조는 가슴 정신 마법부여 가운데 가장 강하며, 룬 가죽은 다리 민첩 마법부여로는 유일하다. 정확한 수치는 모두 아래 표에 있다.\n\n일반 하위 단계 위에는 광휘 단이 있다. 이 기술에서 일반 마법부여의 정점이다. 넷은 마법부여 100을, 주입은 125를 요구하며, 아래 표의 기술 칸에 적혀 있다. 하나하나가 광휘 시약을 필요로 하며, 저마다 제 자리에 계단을 한 칸씩 더 올린다. 무기(위력과 주문력 두 갈래)와 가슴과 신발이다. 그 마지막인 광휘 주입은 완전해진 물건에만 깃든다. 물건을 완전하게 만드는 일은 마법부여사가 아니라 착용자 자신의 몫이며, 그 길은 생산 전문직 페이지가 들려준다.\n\n마지막 불꽃의 열의는 별도의 공격대 공식이며, 무료로 익히는 일반 마법부여가 아니다. 적용하려면 먼저 마법부여 숙련 100에서 거래 가능한 공식을 배워야 한다. 한 번 적용할 때마다 마지막 불꽃의 핵 3개와 울림 파편 2개를 쓴다. 공식은 도가니에서 드롭되거나 그 군수관에게 핵 1개로 살 수 있다. 근접 발동 효과와 무기 속도 규칙은 아래에 모두 나와 있다.",
+        "enchantsNoteRaidFormula": "마법부여는 네 단으로 나뉜다. 기본 단은 울림 가루로 돌아가고(위쪽 끝에서는 울림 정수가 조금 든다) 무기 자리와 보조 장비 자리, 모든 방어구 자리를 아우르며, 어떤 구성이든 자리마다 쓸 것을 찾을 만큼 능력치 갈래가 넉넉하다. 방패와 시전자용 보조 장비에는 저마다의 체력 마법부여가 있어, 착용 자리 가운데 마법부여가 없는 곳은 하나도 없다. 상급 단은 울림 파편 하나에 울림 정수가 더 들며, 영향이 가장 큰 자리에 더 강한 보너스를 얹는다. 파편은 그 밖에도 세 군데로 더 흘러간다. 각각 한 개가 드는 두 부적 제조법(부적 비용의 나머지는 정수와 가루)과, 도구 효과 재충전의 최상단과, 광휘 단이다. 광휘 단에서는 무기와 가슴 마법부여가 하나씩, 주입이 둘을 가져간다. 쓰기 전에 몇 개는 쟁여 두라.\n\n그 사이에는 다섯 가지 룬 마법부여가 있다. 종류가 정해진 보조 재료마다 소비처가 하나씩 있어, 갈아 낸 것 가운데 막다른 길로 끝나는 것은 없다. 룬 칼날(무기, 힘, 공명의 강철 소모), 룬 인장(무기, 지능, 공명의 목재), 룬 직조(가슴, 정신, 공명의 실), 룬 가죽(다리, 민첩, 공명의 가죽), 룬 사슬(투구, 체력, 공명의 사슬)이다. 각각 울림 정수도 두 개씩 든다. 같은 자리와 능력치에 기본 단과 상급 단이 모두 있는 경우 룬의 보너스는 그 둘 사이에 놓이고, 룬 직조는 가슴 정신 마법부여 가운데 가장 강하며, 룬 가죽은 다리 민첩 마법부여로는 유일하다. 정확한 수치는 모두 아래 표에 있다.\n\n일반 하위 단계 위에는 광휘 단이 있다. 이 기술에서 일반 마법부여의 정점이다. 넷은 마법부여 100을, 주입은 125를 요구하며, 아래 표의 기술 칸에 적혀 있다. 하나하나가 광휘 시약을 필요로 하며, 저마다 제 자리에 계단을 한 칸씩 더 올린다. 무기(위력과 주문력 두 갈래)와 가슴과 신발이다. 그 마지막인 광휘 주입은 완전해진 물건에만 깃든다. 물건을 완전하게 만드는 일은 마법부여사가 아니라 착용자 자신의 몫이며, 그 길은 생산 전문직 페이지가 들려준다.\n\n마지막 불꽃의 열의는 별도의 공격대 공식이며, 무료로 익히는 일반 마법부여가 아니다. 적용하려면 먼저 마법부여 숙련 100에서 거래 가능한 공식을 배워야 한다. 한 번 적용할 때마다 마지막 불꽃의 핵 3개와 울림 파편 2개를 쓴다. 공식은 도가니에서 드롭되거나 그 군수관에게 핵 1개로 살 수 있다. 근접 발동 효과와 무기 속도 규칙은 아래에 모두 나와 있다.",
         "charmsHeading": "채집자의 도구에 끼우는 부적",
         "formulaRequired": "공식 필요",
         "charmsBody": "채집자의 부적도 마법부여에서 나온다. 마법부여가 25에 이르면 Tinker Gizzel이 Eastbrook 공작소에서 둘 다 가르친다. 채집 산출물을 하나 늘리는 Gatherer's Cache와, 캐 올린 것의 등급을 올리는 Artisan's Eye다. 각각 한 번 만들어 곡괭이나 도끼, 낫에 끼워 두면, 실제로 나아진 채집에만 충전을 쓴다.\n\n이 기술이 계속 벌어들이는 자리는 재충전이다. 충전은 찾아온 마법부여사가 아니라 도구의 주인이 되채우며, 그 주인이 부적에 서명한 마법부여사라면 재료가 절반만 들고, 마법부여를 주 전공으로 삼았다면 더 줄어든다. 그래서 계산대 너머로 판 부적은 한 번의 판매로 끝나지만, 자기 도구에 얹힌 부적은 계속 굴리기에 값싼 쪽이다. 충전과 재료의 전체 사다리는 어느 채집 전문직 지면에서든 도구 효과 항목에 있다."
@@ -7466,7 +7807,7 @@ export const ko_KR: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "농사의 리듬",
-        "rhythmBody": "씨를 심는 일이 눈에 보이는 짧은 시전이다. 어느 단에서나 {plant}초로 고정인데, 괭이는 속도를 사는 도구가 아니라 땅을 여는 도구이기 때문이다. 익은 작물을 뽑는 것은 즉시 끝난다. 끊길 시전도 없고 가방을 검사해 거절하는 일도 없으며, 다 자란 밭은 놔둔 만큼 기다리니, 가방이 가득 차도 농부가 치르는 값은 비우러 다녀오는 걸음뿐이다.\n\n수확이 치러 주는 것은 농작물과 농사 숙련도다. 광맥과 달리 캐릭터 경험치는 조금도 주지 않으니, 밭은 레벨을 올리는 수단이 아니라 손수 일구는 기술이다.",
+        "rhythmBody": "씨를 심는 일은 즉시 끝난다. 괭이는 속도를 사는 도구가 아니라 땅을 여는 도구이기 때문이다. 기다릴 시전이 없으니, 자리를 뜬 농부라도 심은 것은 그대로 심어진다. 익은 작물을 뽑는 것도 즉시 끝난다. 끊길 시전도 없고 가방을 검사해 거절하는 일도 없으며, 다 자란 밭은 놔둔 만큼 기다리니, 가방이 가득 차도 농부가 치르는 값은 비우러 다녀오는 걸음뿐이다.\n\n수확이 치러 주는 것은 농작물과 농사 숙련도다. 광맥과 달리 캐릭터 경험치는 조금도 주지 않으니, 밭은 레벨을 올리는 수단이 아니라 손수 일구는 기술이다.",
         "gainHeading": "수확이 가르치는 것",
         "gainBody": "숙련도 상승은 확정적이며, 작물이 아니라 자기 카운터를 기준으로 매겨진다. 숙련도 {p1} 미만은 수확당 {g1}점, {p2} 미만은 {g2}점, {p3} 미만은 {g3}점, 그 위로 상한 {cap}까지는 {g4}점이다. 기술 상승 판정 같은 것은 결코 없으니, 오르막의 길이는 산술이 정한 그대로다.\n\n작물의 단이 정하는 것은 그 밭이 당신을 어디까지 데려다주는가이다. 1단 작물은 {c1}까지 가르치고 거기서 회색이 되며, 2단 작물은 {c2}까지, 3단 이상의 작물은 상한까지 가르친다. 그러니 카운터를 계속 움직이게 하는 것은 더 높은 밭으로 올라서는 일이다.",
         "yieldsHeading": "수확이 내놓는 것",
@@ -7508,8 +7849,8 @@ export const ko_KR: EnTranslations = {
         "commissionsHeading": "주문 제작과 제작자의 서약",
         "commissionsBody": "선택형 주문 제작에는 제작자의 서약이 걸린다. 완성품은 거래로 받는 이에게 귀속되고, 어느 작업대 장인이든 단계별 수수료로 풀어 줄 수 있다.",
         "provenanceHeading": "서명된 작품",
-        "provenanceBody": "희귀 이상의 제작품과 발견물에는 제작자의 서명이 남고, 서명이 완전히 같은 물건은 여전히 겹쳐 쌓인다.",
-        "provenanceBodyUndiscounted": "어떤 물건은 이름을 지닌다. 소재의 출처 항목은 각 묶음의 단위를 채집한 사람을 밝히고, 프리미엄 서명자가 있으면 별도의 서명 표식이 그것을 나타낸다. 이 둘은 독립적인 사실이다. 평범한 채집 소재는 서명 없이 채집자만 기록할 수 있고, 오래된 서명된 재고는 채집자가 기록되지 않았다고 정직하게 밝히면서도 서명자만 이름을 남길 수 있다. 완성품은 대신 누가 제작했는지를 밝힌다. 이 기록들은 거래, 은행, 우편, 세계 시장, 심지어 상인 재구매를 거쳐도 물건에 남아 있으며 결코 흐려지지 않는다.\n\n채집은 최고의 결과물에 자동으로 서명한다. 희귀 이상으로 판정된 수확은 모두 서명되며, 희귀 발견은 다섯 배로 늘어난 추가 수확 전체에 서명한다. 시체 채집의 행운 판정은 해당 종류에 내줄 표본이 없으면 산출물 자체에 서명하고, 표본이 있으면 산출물은 서명 없이 그대로 두고 서명된 완벽한 표본을 별도로 만든다. 제작도 같은 원리를 따른다. 희귀 이상 산출물은 모든 개체가 서명되며, 걸작은 품질과 관계없이 항상 서명되므로 어떤 물건이든 최고의 개체에는 언제나 만든 이의 이름이 남는다. 평범한 소재의 서명은 단위 자체에 붙어 있으므로, 호환되는 묶음에 이미 다른 채집자나 서명자가 포함되어 있다는 이유만으로 사라지지 않는다. 별개의 완벽한 표본은 독립된 아이템이며 여전히 공간이 필요하다. 들어갈 자리가 없으면 평범한 시체 산출물은 남지만 표본은 사라진다.\n\n완성품은 하나의 엄격한 개체 정보를 유지하므로, 두 개체는 모든 표식이 완전히 일치할 때만 합쳐진다: 같은 물건, 같은 서명자, 같은 걸작 수치, 같은 마법부여, 같은 귀속. 호환되는 소재는 채집자와 서명자가 달라도 하나의 칸을 공유하며, 각 출처별 수량을 따로 유지한다. 마우스오버 툴팁은 출처를 요약해 보여 주며, 전체 목록을 보려면 \"출처\"를 연다. 채집자별 분리를 선택하면 가방 안에서 그 묶음들이 나뉜 채로 유지되며, 정렬도 그 선택을 따른다. 넘겨받은 소재는 받는 사람의 소재와 평소대로 합쳐질 수 있다.\n\n서명은 장인에게도 이득이 된다. 제작대 옆에서 필요한 재료의 서명된 개체를 하나라도 지니고 있으면, 누가 서명했든 걸작 확률이 2퍼센트포인트 오른다. 자신이 직접 서명한 재료를 지니고 있으면 그 재료의 필요량이 1개 줄지만 최소 1개는 여전히 필요하다. 다만 그 재료가 할인 불가로 지정된 경우는 예외이며, 공격대 핵은 항상 전체 비용을 유지한다. 자신이 서명한 희귀 이상의 작품은 지금은 오직 제작한 물약을 통해서만 여전히 숙련을 가르쳐 준다. 직접 빚고 서명한 희귀 음료를 마시면, 그 전문직이 활성화된 주 전공 중 하나로 남아 있는 한 그것을 만든 전문직으로 약간의 숙련이 되돌아간다. 이것은 정말로 물약에만 해당하는 효과이므로, 엘릭서나 두루마리, 최상급 플라스크는 아무리 훌륭하게 서명되었어도 숙련을 되돌려주지 않는다.",
+        "provenanceBody": "어떤 물건은 이름을 지닌다. 소재의 출처 항목은 각 묶음의 단위를 채집한 사람을 밝히고, 프리미엄 서명자가 있으면 별도의 서명 표식이 그것을 나타낸다. 이 둘은 독립적인 사실이다. 평범한 채집 소재는 서명 없이 채집자만 기록할 수 있고, 오래된 서명된 재고는 채집자가 기록되지 않았다고 정직하게 밝히면서도 서명자만 이름을 남길 수 있다. 완성품은 대신 누가 제작했는지를 밝힌다. 이 기록들은 거래, 은행, 우편, 세계 시장, 심지어 상인 재구매를 거쳐도 물건에 남아 있으며 결코 흐려지지 않는다.\n\n채집은 최고의 결과물에 자동으로 서명한다. 희귀 이상으로 판정된 수확은 모두 서명되며, 희귀 발견은 다섯 배로 늘어난 추가 수확 전체에 서명한다. 시체 채집의 행운 판정은 해당 종류에 내줄 표본이 없으면 산출물 자체에 서명하고, 표본이 있으면 산출물은 서명 없이 그대로 두고 서명된 완벽한 표본을 별도로 만든다. 제작도 같은 원리를 따른다. 희귀 이상 산출물은 모든 개체가 서명되며, 걸작은 품질과 관계없이 항상 서명되므로 어떤 물건이든 최고의 개체에는 언제나 만든 이의 이름이 남는다. 평범한 소재의 서명은 단위 자체에 붙어 있으므로, 호환되는 묶음에 이미 다른 채집자나 서명자가 포함되어 있다는 이유만으로 사라지지 않는다. 별개의 완벽한 표본은 독립된 아이템이며 여전히 공간이 필요하다. 들어갈 자리가 없으면 평범한 시체 산출물은 남지만 표본은 사라진다.\n\n완성품은 하나의 엄격한 개체 정보를 유지하므로, 두 개체는 모든 표식이 완전히 일치할 때만 합쳐진다: 같은 물건, 같은 서명자, 같은 걸작 수치, 같은 마법부여, 같은 귀속. 호환되는 소재는 채집자와 서명자가 달라도 하나의 칸을 공유하며, 각 출처별 수량을 따로 유지한다. 마우스오버 툴팁은 출처를 요약해 보여 주며, 더미를 마우스 우클릭하면 전체 목록을 볼 수 있다 (터치 환경에서는 \"출처\" 버튼을 사용한다). 채집자별 분리를 선택하면 가방 안에서 그 묶음들이 나뉜 채로 유지되며, 정렬도 그 선택을 따른다. 넘겨받은 소재는 받는 사람의 소재와 평소대로 합쳐질 수 있다.\n\n서명은 장인에게도 이득이 된다. 제작대 옆에서 필요한 재료의 서명된 개체를 하나라도 지니고 있으면, 누가 서명했든 걸작 확률이 2퍼센트포인트 오른다. 자신이 직접 서명한 재료를 지니고 있으면 그 재료의 필요량이 1개 줄지만 최소 1개는 여전히 필요하다. 자신이 서명한 희귀 이상의 작품은 지금은 오직 제작한 물약을 통해서만 여전히 숙련을 가르쳐 준다. 직접 빚고 서명한 희귀 음료를 마시면, 그 전문직이 활성화된 주 전공 중 하나로 남아 있는 한 그것을 만든 전문직으로 약간의 숙련이 되돌아간다. 이것은 정말로 물약에만 해당하는 효과이므로, 엘릭서나 두루마리, 최상급 플라스크는 아무리 훌륭하게 서명되었어도 숙련을 되돌려주지 않는다.",
+        "provenanceBodyUndiscounted": "어떤 물건은 이름을 지닌다. 소재의 출처 항목은 각 묶음의 단위를 채집한 사람을 밝히고, 프리미엄 서명자가 있으면 별도의 서명 표식이 그것을 나타낸다. 이 둘은 독립적인 사실이다. 평범한 채집 소재는 서명 없이 채집자만 기록할 수 있고, 오래된 서명된 재고는 채집자가 기록되지 않았다고 정직하게 밝히면서도 서명자만 이름을 남길 수 있다. 완성품은 대신 누가 제작했는지를 밝힌다. 이 기록들은 거래, 은행, 우편, 세계 시장, 심지어 상인 재구매를 거쳐도 물건에 남아 있으며 결코 흐려지지 않는다.\n\n채집은 최고의 결과물에 자동으로 서명한다. 희귀 이상으로 판정된 수확은 모두 서명되며, 희귀 발견은 다섯 배로 늘어난 추가 수확 전체에 서명한다. 시체 채집의 행운 판정은 해당 종류에 내줄 표본이 없으면 산출물 자체에 서명하고, 표본이 있으면 산출물은 서명 없이 그대로 두고 서명된 완벽한 표본을 별도로 만든다. 제작도 같은 원리를 따른다. 희귀 이상 산출물은 모든 개체가 서명되며, 걸작은 품질과 관계없이 항상 서명되므로 어떤 물건이든 최고의 개체에는 언제나 만든 이의 이름이 남는다. 평범한 소재의 서명은 단위 자체에 붙어 있으므로, 호환되는 묶음에 이미 다른 채집자나 서명자가 포함되어 있다는 이유만으로 사라지지 않는다. 별개의 완벽한 표본은 독립된 아이템이며 여전히 공간이 필요하다. 들어갈 자리가 없으면 평범한 시체 산출물은 남지만 표본은 사라진다.\n\n완성품은 하나의 엄격한 개체 정보를 유지하므로, 두 개체는 모든 표식이 완전히 일치할 때만 합쳐진다: 같은 물건, 같은 서명자, 같은 걸작 수치, 같은 마법부여, 같은 귀속. 호환되는 소재는 채집자와 서명자가 달라도 하나의 칸을 공유하며, 각 출처별 수량을 따로 유지한다. 마우스오버 툴팁은 출처를 요약해 보여 주며, 더미를 마우스 우클릭하면 전체 목록을 볼 수 있다 (터치 환경에서는 \"출처\" 버튼을 사용한다). 채집자별 분리를 선택하면 가방 안에서 그 묶음들이 나뉜 채로 유지되며, 정렬도 그 선택을 따른다. 넘겨받은 소재는 받는 사람의 소재와 평소대로 합쳐질 수 있다.\n\n서명은 장인에게도 이득이 된다. 제작대 옆에서 필요한 재료의 서명된 개체를 하나라도 지니고 있으면, 누가 서명했든 걸작 확률이 2퍼센트포인트 오른다. 자신이 직접 서명한 재료를 지니고 있으면 그 재료의 필요량이 1개 줄지만 최소 1개는 여전히 필요하다. 다만 그 재료가 할인 불가로 지정된 경우는 예외이며, 공격대 핵은 항상 전체 비용을 유지한다. 자신이 서명한 희귀 이상의 작품은 지금은 오직 제작한 물약을 통해서만 여전히 숙련을 가르쳐 준다. 직접 빚고 서명한 희귀 음료를 마시면, 그 전문직이 활성화된 주 전공 중 하나로 남아 있는 한 그것을 만든 전문직으로 약간의 숙련이 되돌아간다. 이것은 정말로 물약에만 해당하는 효과이므로, 엘릭서나 두루마리, 최상급 플라스크는 아무리 훌륭하게 서명되었어도 숙련을 되돌려주지 않는다.",
         "collectorsHeading": "수집가, 전리품, 이야기의 값",
         "collectorsBody": "상인은 출처를 보지 못한다. 서명된 물건도 NPC에게는 일반품 값에 팔린다. 서명의 웃돈은 플레이어 사이에만 존재하고, 바로 그래서 흥미롭다. 이름난 채집가가 서명한 횡재 광석, Prime Cut 한 점, 은퇴한 장인의 이름이 새겨진 걸작 검. 값은 누군가의 기억이 정한다. 업적의 서도 같은 본능을 좇는다. Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen, Glimmer of Hope는 모두 그 순간이 당신에게 일어났음을 증명하기 위해서만 존재하는 명성 0의 수집 표식이다. 이것은 힘이 아니다. 출처는 능력치를 사지도, 싸움을 이기지도 않는다. 좋은 날들의 영수증일 뿐이다.",
         "castPaceHeading": "시전 시간과 골드 소모",
@@ -7552,7 +7893,7 @@ export const ko_KR: EnTranslations = {
         "title": "생산 전문직 FAQ",
         "intro": "제작자들이 가장 자주 묻는 질문과 짧은 답.",
         "q1": "서명된 아이템은 왜 겹쳐 쌓이지 않나요?",
-        "a1": "서명된 아이템은 낱개로 구별되는 아이템이다. 이름 없는 사본이 아니라 자기만의 작은 기록(서명자, 굴려 나온 품질, 걸작 능력치, 마법부여, 귀속)을 따로 지닌다. 두 사본은 그 기록이 완전히 일치할 때에만 한 더미로 합쳐진다.\n\n실제로는 이렇다. 내가 직접 채집한 희귀 광석은 내가 직접 채집한 다른 희귀 광석과 겹쳐 쌓인다. 둘 다 내가 채집했다는 서명이 붙어 있고 그 밖에는 다른 점이 없기 때문이다. 친구가 서명한 같은 재료는 제 칸을 따로 차지하고, 서명 없는 평범한 사본은 서명된 더미에 절대 합쳐지지 않는다. 가방, 은행, 거래, 우편, 세계 시장이 모두 이 한 가지 규칙을 따른다.",
+        "a1": "서명된 아이템은 낱개로 구별되는 아이템이다. 이름 없는 사본이 아니라 자기만의 작은 기록(서명자, 굴려 나온 품질, 걸작 능력치, 마법부여, 귀속)을 따로 지닌다. 두 사본은 그 기록이 완전히 일치할 때에만 한 더미로 합쳐진다.\n\n실제로는 이렇다. 내가 직접 채집한 희귀 광석은 내가 직접 채집한 다른 희귀 광석과 겹쳐 쌓인다. 둘 다 내가 채집했다는 서명이 붙어 있고 그 밖에는 다른 점이 없기 때문이다. 마우스를 올리면 툴팁에 출처가 요약되어 나오고, 더미를 마우스 우클릭하면(터치 환경에서는 \"출처\" 버튼으로) 전체 목록을 볼 수 있다. 친구가 서명한 같은 재료는 제 칸을 따로 차지하고, 서명 없는 평범한 사본은 서명된 더미에 절대 합쳐지지 않는다. 가방, 은행, 거래, 우편, 세계 시장이 모두 이 한 가지 규칙을 따른다.",
         "q2": "공용 제조법으로 기술이 영원히 오르나요?",
         "a2": "아니다. 모든 제조법은 그 기술에서 당신의 현재 단계보다 얼마나 아래에 있는지로 매겨진다. 고전 그대로의 주황, 노랑, 초록, 회색 읽기다. 자기 단계 이상이면 온전한 성장, 한 단계 아래면 절반, 두 단계 아래면 4분의 1, 세 단계 이상 아래면 아무것도 없다. 단계는 기술 25점마다이니, 무료인 기술 0 제조법은 기술 75부터 아무것도 가르쳐 주지 않는다.\n\n상한도 예상할 법한 고전의 300보다 낮다. 기를 수 있는 열 제작 기술은 각각 125가 상한이고, 채광과 벌목과 약초학은 100, 낚시는 길게 200까지 간다. 오른다는 것은 가장 싼 제조법을 갈아 대는 것이 아니라 제 단계의 제조법으로 옮겨 가는 것이다.",
         "q3": "시체 전리품과 시체 채집은 무엇이 다른가요?",
@@ -9578,6 +9919,11 @@ export const ko_KR: EnTranslations = {
       "quit": "종료",
       "fatalBody": "World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다."
     },
+    "hostDiag": {
+      "saveTitle": "시스템 보고서 저장",
+      "saveButton": "저장",
+      "fileType": "JSON 파일"
+    },
     "titlebar": {
       "exitGame": "게임 종료"
     }
@@ -9628,6 +9974,11 @@ export const ko_KR: EnTranslations = {
     "inWorld": "세계에 있음",
     "takeOver": "넘겨받기",
     "inWorldHint": "이미 세계에 있습니다. 다른 곳에서 로그아웃하거나 넘겨받으세요.",
+    "currentLocation": "현재 위치: {zone}",
+    "lockouts": "잠금 ({count})",
+    "lockoutRaids": "공격대",
+    "lockoutDungeons": "던전",
+    "lockoutWorldBosses": "월드 보스",
     "takeOverConfirm": "이 캐릭터를 다른 세션에서 연결 해제하고 여기로 가져옵니다. 계속하시겠습니까?",
     "renameRequired": "이름 변경 필요",
     "delete": "삭제",
@@ -10056,6 +10407,7 @@ export const ko_KR: EnTranslations = {
       "templates": {
         "battleground": "[전장] {name}: {message}",
         "party": "[파티] {name}: {message}",
+        "raidWarning": "[공격대 경고] {name}: {message}",
         "yell": "{name} 외침: {message}",
         "whisper": "{name} 귓속말: {message}",
         "toWhisper": "{name}에게: {message}",
@@ -10171,6 +10523,7 @@ export const ko_KR: EnTranslations = {
       "deathRecapDrowned": "사망했습니다. 익사했습니다.",
       "deathRecapCauterized": "사망했습니다. 소작의 화염이 당신을 집어삼켰습니다.",
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
+      "respawnKeeperToll": "영혼 치유사가 당신을 부활시켰지만 그 대가로 약해졌습니다. 부활 후유증이 사라질 때까지 모든 능력치가 감소합니다.",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
       "playerNotNearby": "그 플레이어는 근처에 없습니다.",
@@ -10194,6 +10547,7 @@ export const ko_KR: EnTranslations = {
       "stunned": "기절했습니다!",
       "silenced": "침묵 상태입니다!",
       "busy": "현재 다른 행동 중입니다.",
+      "cannotCastWhileMoving": "이동 중에는 시전할 수 없습니다.",
       "abilityNotReady": "그 능력은 아직 준비되지 않았습니다.",
       "notEnoughRage": "분노가 부족합니다!",
       "notEnoughEnergy": "기력이 부족합니다!",
@@ -10206,7 +10560,8 @@ export const ko_KR: EnTranslations = {
       "requiresForm": "{form} 변신 상태여야 합니다.",
       "cantInForm": "{form} 변신 상태에서는 할 수 없습니다.",
       "bear": "큰곰",
-      "cat": "늑대",
+      "cat": "고양이",
+      "bearOrCat": "곰 또는 표범",
       "travel": "쾌속",
       "shapeshifted": "변신 중에는 할 수 없습니다.",
       "stealthed": "은신 상태여야 합니다.",
@@ -10538,11 +10893,11 @@ export const ko_KR: EnTranslations = {
     },
     "forms": {
       "bear": "곰",
-      "cat": "늑대"
+      "cat": "고양이",
+      "bearOrCat": "곰 또는 고양이"
     },
     "cast": {
       "fishing": "낚시",
-      "farming": "파종",
       "gathering": "채집",
       "crafting": "제작",
       "disenchanting": "마력 추출",
@@ -10886,6 +11241,19 @@ export const ko_KR: EnTranslations = {
       "buyConfirmAccept": "구매",
       "buyConfirmCancel": "취소",
       "buyChanged": "확인하기 전에 등록이 변경되었습니다. 가격을 확인한 후 다시 시도하세요.",
+      "sweep": "일괄 구매",
+      "sweepAria": "{item} 시장 일괄 구매",
+      "sweepTitle": "일괄 구매: {item}",
+      "sweepClose": "닫기",
+      "sweepNote": "다른 판매자의 등록 물품을 단가가 낮은 순으로 통째로 구매하여 원하는 수량을 채웁니다. 요청한 것보다 조금 더 받을 수 있습니다.",
+      "sweepQuantity": "원하는 수량",
+      "sweepQuoteNone": "이 아이템에 일괄 구매할 등록 물품이 없습니다.",
+      "sweepQuoteLine": "등록 {listings}건에서 {units}개, 총 {total} (개당 {each})",
+      "sweepQuoteShort": "등록 {listings}건에서 {units}개만 구매 가능, 총 {total} (개당 {each})",
+      "sweepButton": "일괄 구매",
+      "sweepConfirmTitle": "일괄 구매 확인",
+      "sweepConfirmBody": "등록 {listings}건에서 {item} x{units}을(를) 총 {total} (개당 {each})에 구매하시겠습니까?",
+      "sweepChanged": "확인하기 전에 일괄 구매 견적이 변경되었습니다. 총액을 확인하고 다시 시도하세요.",
       "sellNote": "가방의 상품을 올립니다. 아이템이 팔리면 상인이 {cut}%를 가져갑니다. 등록 칸 {used}/{max}개 사용 중입니다.",
       "sellPickEmpty": "판매할 아이템을 선택하려면 가방에서 클릭하세요.",
       "quantity": "수량",
@@ -10925,7 +11293,9 @@ export const ko_KR: EnTranslations = {
       "ownListing": "자신의 등록입니다. 취소하면 회수할 수 있습니다.",
       "cannotAfford": "그것을 살 돈이 부족합니다.",
       "notYourListing": "당신의 등록이 아닙니다.",
-      "nothingToCollect": "수령할 것이 없습니다."
+      "nothingToCollect": "수령할 것이 없습니다.",
+      "sweepNoListings": "이 아이템에 일괄 구매할 등록 물품이 없습니다.",
+      "sweepPriceChanged": "일괄 구매가 처리되기 전에 가격이 변경되었습니다. 견적을 확인하고 다시 시도하세요."
     },
     "loot": {
       "takeAll": "모두 가져가기",
@@ -11763,7 +12133,7 @@ export const ko_KR: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "폭력의 주술",
-        "description": "적을 8초 동안 저주합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 17의 암흑 피해를 되돌려 받습니다."
+        "description": "적을 8초 동안 저주해 암흑 피해를 입히고 2초마다 단죄를 2 생성합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 17의 암흑 피해를 되돌려 받습니다."
       },
       "cruel_pact": {
         "name": "잔혹한 계약",
@@ -11799,7 +12169,7 @@ export const ko_KR: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "파멸의 낙인",
-        "description": "적에게 15초 동안 낙인을 새깁니다. 다음 3회의 직접 주문은 낙인이 새겨진 적에게 25%의 피해로 메아리치며, 다른 대상에게 시전하면 그 피해의 50%를 낙인이 새겨진 적에게도 입힙니다."
+        "description": "적에게 15초 동안 낙인을 새깁니다. 다음 3회의 직접 주문은 낙인이 새겨진 적에게 25%의 피해로 메아리치며, 다른 대상에게 시전하면 그 피해의 50%를 낙인이 새겨진 적에게도 입힙니다. 파멸 화살의 메아리는 추가적인 치명타 피해 배수 없이 치명타로도 처리됩니다."
       },
       "wrath": {
         "name": "야생 벼락",
@@ -11838,7 +12208,7 @@ export const ko_KR: EnTranslations = {
       },
       "bear_form": {
         "name": "큰곰 변신",
-        "description": "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
+        "description": "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다. 다시 시전하면 시전자 형태로 돌아갑니다."
       },
       "maul": {
         "name": "뼈 분쇄",
@@ -11854,17 +12224,17 @@ export const ko_KR: EnTranslations = {
         "description": "위압적으로 포효합니다. 10미터 내의 모든 적이 도발되어 자신에 대한 위협 수준이 그 적이 가장 증오하는 대상과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용."
       },
       "cat_form": {
-        "name": "늑대 변신",
-        "description": "당신을 늑대로 바꿉니다. 민첩성이 레벨에 따라 오르고, 전투력은 +8에 레벨당 2가 더해지며, 공격은 기력과 연계 점수를 쓰고, 당신이 만드는 위협 수준이 29% 줄어듭니다. 다시 시전하면 시전자 모습으로 돌아옵니다."
+        "name": "표범 변신",
+        "description": "당신을 늑대로 바꿉니다. 민첩성이 레벨에 따라 오르고, 전투력은 +8에 레벨당 2가 더해지며, 공격은 기력과 연계 점수를 쓰고, 당신이 만드는 위협 수준이 29% 줄어듭니다. 어떤 모습으로든 변신하면 질주 보폭을 얻습니다. 3초 동안 이동 속도가 60% 증가하며, 20초에 한 번만 발동합니다. 다시 시전하면 시전자 모습으로 돌아옵니다."
       },
       "claw": {
         "name": "찢는 발톱",
-        "description": "적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용.",
+        "description": "적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 표범 변신 전용.",
         "specNote_feral": "적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계)."
       },
       "ferocious_bite": {
         "name": "유혈 물어뜯기",
-        "description": "결정타로 {damage}의 피해를 입힙니다. 늑대 변신 전용.",
+        "description": "결정타로 {damage}의 피해를 입힙니다. 표범 변신 전용.",
         "specNote_feral": "적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 피의 수확으로 변합니다: 오랜 피를 소모하는 더 강력한 물어뜯기로, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히고 기력을 회복합니다."
       },
       "swipe": {
@@ -11896,7 +12266,7 @@ export const ko_KR: EnTranslations = {
       },
       "travel_form": {
         "name": "쾌속 형태",
-        "description": "즉시 날렵한 쾌속 형태로 변신하여 이동 속도가 40% 증가합니다. 변신 중에는 다른 능력을 사용할 수 없지만 전투 중에도 자유롭게 변신할 수 있어 도주에 이상적입니다."
+        "description": "즉시 날렵한 쾌속 형태로 변신하여 이동 속도가 40% 증가하고 해제 가능한 속박과 감속 효과를 제거합니다. 변신 중에는 다른 능력을 사용할 수 없지만 전투 중에도 자유롭게 변신할 수 있어 도주에 이상적입니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다."
       },
       "enrage": {
         "name": "불지피기",
@@ -11916,23 +12286,31 @@ export const ko_KR: EnTranslations = {
       },
       "dash": {
         "name": "질주",
-        "description": "앞으로 돌진하여 이동 속도를 15초 동안 50% 증가시킵니다. 늑대 변신 전용."
+        "description": "앞으로 돌진하여 이동 속도를 15초 동안 50% 증가시킵니다. 표범 변신 전용."
       },
       "pounce": {
         "name": "살금 기습",
-        "description": "은신 상태에서 사용하는 시작 공격으로 대상을 2초 동안 기절시킵니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용."
+        "description": "은신 상태에서 사용하는 시작 공격으로 대상을 2초 동안 기절시킵니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용. 은신 상태가 아니면 이 버튼은 도약 습격이 됩니다."
+      },
+      "lunge": {
+        "name": "도약 습격",
+        "description": "최대 12yd 떨어진 적에게 달려들어 무기 공격력의 60%만큼 피해를 입히고 연계 점수 1을 얻습니다. 늑대 변신 상태에서만 사용 가능."
+      },
+      "hamstring_bite": {
+        "name": "쓰러뜨리기",
+        "description": "대상을 1초에 더해 연계 점수 하나당 1초 기절시키는 마무리 기술입니다 (연계 점수 5: 6초). 늑대 변신 상태에서만 사용 가능."
       },
       "insect_swarm": {
         "name": "쏘는 벌레 떼",
         "description": "적이 곤충 떼에 휩싸여 12초에 걸쳐 {damage}의 자연 피해를 입습니다."
       },
       "tigers_fury": {
-        "name": "늑대의 피",
-        "description": "기력을 {rage}만큼 즉시 회복하고 전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 늑대 변신 전용."
+        "name": "스라소니의 피",
+        "description": "기력을 {rage}만큼 즉시 회복하고 전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 표범 변신 전용."
       },
       "rip": {
         "name": "피의 균열",
-        "description": "대상을 24초 동안 2초마다 출혈시키는 마무리 기술. 36의 피해에 더해 소모한 연계 점수 하나당 24입니다 (연계 점수 5: 모두 {damage}). 늑대 형상 전용.",
+        "description": "대상을 24초 동안 2초마다 출혈시키는 마무리 기술. 36의 피해에 더해 소모한 연계 점수 하나당 24입니다 (연계 점수 5: 모두 {damage}). 표범 형상 전용.",
         "specNote_feral": "적중하면 오랜 피가 1단계 쌓입니다(최대 3단계)."
       },
       "mortal_strike": {
@@ -12129,11 +12507,11 @@ export const ko_KR: EnTranslations = {
       },
       "moonkin_form": {
         "name": "달빛야수 변신",
-        "description": "달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)"
+        "description": "달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)"
       },
       "feral_charge": {
         "name": "원시 쇄도",
-        "description": "원시의 힘을 폭발시킵니다. 늑대 변신 상태에서는 10초 동안 기력 회복 속도가 100% 증가합니다. 큰곰 변신 상태에서는 즉시 분노를 50 생성합니다. (야성 전문화 상징)"
+        "description": "원시의 힘을 폭발시킵니다. 표범 변신 상태에서는 10초 동안 기력 회복 속도가 100% 증가합니다. 큰곰 변신 상태에서는 즉시 분노를 50 생성합니다. (야성 전문화 상징)"
       },
       "swiftmend": {
         "name": "신속한 치유",
@@ -12353,7 +12731,7 @@ export const ko_KR: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "파멸 화살",
-        "description": "파괴력 3을 소모해 혼돈의 불로 이루어진 묵직한 화살을 던져 {damage}의 화염 피해를 입힙니다. 파멸은 그 시전 시간을 30% 줄입니다."
+        "description": "파괴력 3을 소모해 혼돈의 불로 이루어진 묵직한 화살을 던져 치명타 적용 전 기준으로 {damage}의 화염 피해를 입힙니다. 적중하면 항상 치명타로 적중합니다. 파멸은 그 시전 시간을 30% 줄입니다."
       },
       "dark_pact": {
         "name": "피의 서약",
@@ -12497,7 +12875,7 @@ export const ko_KR: EnTranslations = {
       },
       "perfect_moment": {
         "name": "완벽한 순간",
-        "description": "완벽한 순간을 붙잡아 즉시 비전 충전 4개를 얻습니다. 10초 동안 에테르 화살이 충전을 소모하지 않습니다. (시간술)"
+        "description": "완벽한 순간을 붙잡아 즉시 비전 충전 4개를 얻습니다. 10초 동안 에테르 화살이 충전을 소모하지 않고 피해가 20% 증가합니다. (시간술)"
       },
       "arcane_surge": {
         "name": "에테르 쇄도",
@@ -12634,7 +13012,7 @@ export const ko_KR: EnTranslations = {
       },
       "bear_charge": {
         "name": "큰곰 돌진",
-        "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd. 큰곰 변신 상태에서만 사용 가능."
+        "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 이후 3초 동안 늑대 변신은 무료이며 대상을 고정하여 4초 동안 이동 속도를 50% 감소시킵니다. 사거리 8-25yd. 큰곰 변신 상태에서만 사용 가능."
       },
       "demoralizing_roar": {
         "name": "비겁한 포효",
@@ -12642,11 +13020,11 @@ export const ko_KR: EnTranslations = {
       },
       "prowl": {
         "name": "몰래 접근",
-        "description": "늑대 변신 상태에서 은신하고 이동 속도가 5% 감소합니다. 전투 중에는 사용할 수 없습니다."
+        "description": "늑대 변신 상태에서 은신합니다. 전투 중에는 사용할 수 없습니다."
       },
       "rake": {
         "name": "저미기",
-        "description": "적을 찢어 무기 피해에 {damage}를 더하고 18초 동안 출혈 피해를 입힙니다. 연계 점수를 1 줍니다. 늑대 형상 전용.",
+        "description": "적을 찢어 무기 피해에 {damage}를 더하고 18초 동안 출혈 피해를 입힙니다. 연계 점수를 1 줍니다. 표범 형상 전용.",
         "specNote_feral": "적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계)."
       },
       "revive_pet": {
@@ -16410,6 +16788,21 @@ export const ko_KR: EnTranslations = {
       "hub_healing_dummy": {
         "name": "치유용 허수아비"
       },
+      "healing_dummy_tank": {
+        "name": "부상당한 선봉 허수아비"
+      },
+      "healing_dummy_soldier": {
+        "name": "부상당한 병사 허수아비"
+      },
+      "healing_dummy_scout": {
+        "name": "위급한 정찰병 허수아비"
+      },
+      "healing_dummy_caster": {
+        "name": "상처 입은 주문술사 허수아비"
+      },
+      "healing_dummy_ranger": {
+        "name": "얻어맞은 순찰자 허수아비"
+      },
       "ridge_stalker": {
         "name": "산등성이 추적자"
       },
@@ -19937,6 +20330,7 @@ export const ko_KR: EnTranslations = {
       "eastbrook_vale": {
         "name": "이스트브룩 골짜기",
         "welcome": "마을의 레드브룩 원수를 찾아가십시오. 그가 당신에게 맡길 일이 있습니다.",
+        "welcomeDone": "레드브룩 원수가 맡길 일은 더 이상 없습니다 - 당신의 여정이 시작된 아담한 바닷가 마을은 그 덕분에 한결 평온합니다.",
         "pois": {
           "0": {
             "label": "이스트브룩"
@@ -19982,6 +20376,7 @@ export const ko_KR: EnTranslations = {
       "mirefen_marsh": {
         "name": "마이어펜 습지",
         "welcome": "펜브리지 문에서 감시관 펜윅에게 보고하십시오.",
+        "welcomeDone": "감시관 펜윅의 명령은 더 이상 없습니다 - 질퍽한 늪지대 깊숙이 자리한 정착지는 그 덕분에 더 안전해졌습니다.",
         "pois": {
           "0": {
             "label": "펜브리지"
@@ -20012,6 +20407,7 @@ export const ko_KR: EnTranslations = {
       "thornpeak_heights": {
         "name": "쏜피크 고지",
         "welcome": "테살리 대장이 간신히 하이워치 성벽을 지키고 있습니다.",
+        "welcomeDone": "테살리 대장이 하이워치 성벽을 지키고 있습니다 - 결코 쉽지 않지만, 당신 같은 모험가들의 도움으로 이제는 감당할 만합니다.",
         "pois": {
           "0": {
             "label": "하이워치"

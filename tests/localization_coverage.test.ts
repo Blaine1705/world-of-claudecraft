@@ -412,6 +412,7 @@ describe('i18n Localization Key Coverage', () => {
     slots: 14,
     label: 'Wolf',
     level: 10,
+    listings: 3,
     losses: 4,
     loser: 'Mira',
     marker: 'Skull',
@@ -452,6 +453,7 @@ describe('i18n Localization Key Coverage', () => {
     wins: 9,
     winner: 'Rook',
     total: 125,
+    units: 30,
     used: 2,
     value: 9,
     xp: 450,
@@ -1088,6 +1090,8 @@ describe('i18n Localization Key Coverage', () => {
       Object.keys(QUESTS).length * 3 +
       Object.values(QUESTS).reduce((sum, quest) => sum + quest.objectives.length, 0) +
       ZONES.length * 2 +
+      // The optional town-done line (ZoneDef.welcomeDone) only where authored.
+      ZONES.filter((zone) => zone.welcomeDone !== undefined).length +
       ZONES.reduce((sum, zone) => sum + zone.pois.length, 0) +
       Object.keys(DUNGEONS).length * 3 +
       Object.keys(DELVES).length * 3 +

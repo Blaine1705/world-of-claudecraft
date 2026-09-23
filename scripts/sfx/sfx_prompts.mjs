@@ -18,7 +18,11 @@
 // single-event, "no music, no speech" where it matters. Footsteps/impacts are ONE
 // hit (the engine pitch-randomizes and alternates to avoid repetition).
 
+import { FURY_SFX } from './fury_sfx.mjs';
 import { UI_SFX_CATALOG } from './ui_sfx.mjs';
+import { WARRIOR_CONTACT_SFX } from './warrior_contact_sfx.mjs';
+import { WARRIOR_FALLBACK_SFX } from './warrior_fallback_sfx.mjs';
+import { WARRIOR_VOICE_SFX } from './warrior_voice_sfx.mjs';
 
 // UI cues in the baked-tone generator's list that already have a real
 // recording dropped in over the synth placeholder (see gen_ui_sfx.mjs's
@@ -84,6 +88,10 @@ const mob = (family, who, aggro, attack, death, hurt, idle) => {
 };
 
 export const SFX = [
+  ...FURY_SFX,
+  ...WARRIOR_CONTACT_SFX,
+  ...WARRIOR_VOICE_SFX,
+  ...WARRIOR_FALLBACK_SFX,
   // --- Movement & footsteps -------------------------------------------------
   FOOT('foot_grass', 'on soft grass and dry leaves, light leather boot'),
   FOOT('foot_dirt', 'in wet mud and soft dirt, faint squelch'),

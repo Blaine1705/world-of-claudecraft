@@ -468,6 +468,12 @@ export function runEffects(
   facingOverride?: number,
 ): void {
   const ability = res.def;
+  // The cast-scoped heal multiplier the heal and hot arms below apply to the
+  // WHOLE resolved amount: the caller's mark times the Nature's Boon power the
+  // resolved copy carries (combat/druid_natures_boon.ts, stamped in
+  // casting_lifecycle.ts scaleNaturesBoonPower). 1 on every unmarked cast, and
+  // the === 1 guards at both sites keep that arithmetic byte-identical.
+  const castScopedHealMult = castHealMult * (res.naturesBoonPower ?? 1);
   // The island's ability drill (tutorial/ability_drill.ts): the lesson is
   // "use your own button on an effigy", so it credits on DELIVERY, not on
   // damage. Here rather than in dealDamage for two reasons: this runs once
@@ -676,6 +682,9 @@ export function runEffects(
         weaponMult *= trueStealthOpener ? trueStealthOpenerMultiplier(true) : veiledEdgeMult;
         bonus = trueStealthOpenerScaleBonus(trueStealthOpener, bonus);
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
+          // Red Harvest emits its opening cue before the strikes (warrior_harvest.ts),
+          // so its damage events must not restart the authored clip.
+          attackAnimationStarted: ability.id === 'red_harvest' && attackAnimationStarted,
           cannotBeDodged: eff.cannotBeDodged,
           normalizedInstant: eff.normalized,
           weaponMult,
@@ -1337,9 +1346,9 @@ export function runEffects(
         // The cast-scoped multiplier (see the runEffects parameter note): the
         // === 1 guard keeps every unmarked cast's arithmetic byte-identical.
         const castHealAmount =
-          castHealMult === 1
+          castScopedHealMult === 1
             ? baseHealAmount
-            : Math.max(1, Math.round(baseHealAmount * castHealMult));
+            : Math.max(1, Math.round(baseHealAmount * castScopedHealMult));
         const healAmount =
           eff.casterMaxHpPct === undefined
             ? scalePrimaryHealing(castHealAmount, primaryHealMult)
@@ -1544,6 +1553,13 @@ export function runEffects(
               eff.interval,
               talentHealMult * (1 + mods.global.hotHealPct),
             );
+        // The cast-scoped multiplier reaches the WHOLE tick (base plus the Spell
+        // Power rider), the same rule as the direct heal above; === 1 guarded so
+        // every unmarked hot's arithmetic is byte-identical.
+        const hotTick =
+          castScopedHealMult === 1
+            ? hotBase + hotSp
+            : Math.max(1, Math.round((hotBase + hotSp) * castScopedHealMult));
         ctx.applyAura(hotTarget, {
           id: ability.id,
           name: ability.name,
@@ -1551,9 +1567,7 @@ export function runEffects(
           remaining: eff.duration,
           duration: eff.duration,
           value:
-            eff.pctOfMax === undefined
-              ? scalePrimaryHealing(hotBase + hotSp, primaryHealMult)
-              : hotBase + hotSp,
+            eff.pctOfMax === undefined ? scalePrimaryHealing(hotTick, primaryHealMult) : hotTick,
           tickInterval: eff.interval,
           tickTimer: eff.interval,
           sourceId: p.id,
@@ -2234,6 +2248,21 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        // A stun-only opener that awards a combo point (Slinkstrike: its stun is
+        // its whole effect list, so no strike arm above ever paid the point the
+        // tooltip promised). Paid once the stun has landed, the incapacitate
+        // arm's rule; the comboAwarded latch keeps a strike-plus-stun ability
+        // at one point per cast.
+        if (ability.awardsCombo && !comboAwarded) {
+          ctx.awardCombo(p, target, ability.awardsCombo);
+          comboAwarded = true;
+        }
+        // Same moment, same rule for the feral Old Blood bank: Slinkstrike's
+        // stun IS its landed hit (no strike arm above ever runs for it), so
+        // this is where it reports. A no-op for every other class and for any
+        // druid ability outside OLD_BLOOD_STRIKE_IDS (combat/druid_engines.ts).
+        // Draws no rng.
+        druidEngineOnLandedStrike(ctx, p, ability.id);
         // Sundering Gavel (hammer_of_justice) and Gut Punch (cheap_shot)
         // sound at the target; every other stun has no dedicated recording
         // and stays silent here.
@@ -4031,6 +4060,13 @@ export function runEffects(
       }
       case 'afflictionViolence': {
         if (target) {
+          const spBonus = dotTickBonus(
+            abilityScalingPower(p, ability),
+            ability,
+            eff.duration,
+            eff.interval ?? 2,
+            talentDmgMult * (1 + mods.global.dotDmgPct),
+          );
           applyHexOfViolence(
             ctx,
             p,
@@ -4039,6 +4075,9 @@ export function runEffects(
             eff.charges,
             eff.doomPerProc,
             eff.damage,
+            spBonus,
+            eff.interval ?? 2,
+            eff.tickDoom ?? 2,
           );
         }
         break;
@@ -4067,7 +4106,7 @@ export function runEffects(
         break;
       }
       case 'afflictionJudgment': {
-        if (target) applyHourOfJudgment(ctx, p, target, eff.duration, eff.doom, eff.refund);
+        applyHourOfJudgment(ctx, p, target, eff.duration, eff.doom, eff.refund);
         break;
       }
       case 'afflictionLitany': {
@@ -4107,6 +4146,16 @@ export function runEffects(
         // and it is gated on hostility rather than on the ability id so any future
         // friendly rush inherits the same rule.
         if (ctx.isFriendlyTo(p, target)) break;
+        if (meta.cls === 'warrior') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'selfCast',
+            ability: ability.id,
+          });
+        }
         if (p.resourceType === 'rage') {
           const amount = meta.cls === 'warrior' ? 9 * warriorAbilityRageMult(ctx, p, meta) : 9;
           p.resource = Math.min(p.maxResource, p.resource + amount);

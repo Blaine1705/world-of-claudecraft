@@ -5,6 +5,11 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import type { DynamicResolutionRect } from './dynamic_resolution_core';
 import { GFX, sharedUniforms } from './gfx';
+import {
+  GPU_TIMER_SCENE_AO_BRACKET,
+  GPU_TIMER_SCENE_BRACKET,
+  labelGpuTimerPass,
+} from './gpu_timer_probe_core';
 import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';
@@ -15,6 +20,7 @@ import { PostShed } from './post_shed';
 import type { PostShedChain, PostShedRung } from './post_shed_core';
 import { ByteTargetSMAAPass } from './post_smaa';
 import { renderLayerDisabled } from './render_dev_flags';
+import { OpaqueSceneCapture } from './scene_sampling';
 
 // Post chain: N8AO (high: half-res Low; ultra+insane: full-res Medium while the
 // drawing buffer fits the pixel budget in post_pixel_budget_core.ts, half-res
@@ -155,6 +161,21 @@ export interface PostPipeline {
   prewarmShed(): void;
 }
 
+/**
+ * The target the n8ao pass rasterizes the scene into, and so the one the VFX
+ * opaque copy reads and whose extent it must match exactly. Sizing that copy
+ * from the composer buffers instead would DRIFT: three's
+ * `EffectComposer.addPass` sizes a pass from an unfloored `width * pixelRatio`
+ * while `PostEffectComposer` floors its own targets, so on a fractional product
+ * (a capped DPR, a render scale) the two disagree until the first resize, and
+ * an extent mismatch makes the copy a silent no-op. Same accessor shape as
+ * post_n8ao.ts's `occlusionTarget`; read it fresh each time, since n8ao
+ * replaces the target on a stencil change.
+ */
+function n8aoSceneTarget(ao: StaticOpaqueN8AOPass): THREE.WebGLRenderTarget {
+  return ao.sceneTarget;
+}
+
 // The two AO arms. Medium is 16 samples plus two 8-sample denoise passes at
 // full resolution (ultra and insane, and the Advanced Effects dial's top
 // level); Low is the high tier's half-res arm, whose depth-aware upsample keeps
@@ -244,14 +265,30 @@ export function buildComposer(
     // transparent surfaces showed no visible difference in A/B shots.
     ao.configuration.transparencyAware = false;
     applyAoResolution(ao, plan.scene.aoQuality === 'Medium');
+    // GPU timer probe labels (gpu_timer_probe_core.ts): the AO pass draws the
+    // scene itself, so it carries the scene+ao bracket.
+    labelGpuTimerPass(ao, GPU_TIMER_SCENE_AO_BRACKET);
     composer.addPass(ao);
   } else {
-    composer.addPass(new RenderPass(scene, camera));
+    const scenePass = new RenderPass(scene, camera);
+    labelGpuTimerPass(scenePass, GPU_TIMER_SCENE_BRACKET);
+    composer.addPass(scenePass);
   }
+  // The opaque-scene copy the ability VFX sample (scene_sampling.ts), built only
+  // where the scene pass already rasterizes into a sampled depth texture: the
+  // n8ao beauty target, so high and above. The grade-only chain (medium, the
+  // mobile target) gets no capture, no second full-resolution target and no
+  // per-frame copies; its consumers fall back unsampled the way they already do
+  // on low. Its attachments are allocated here, at build time, never in a draw.
+  const sceneDraw = ao ? n8aoSceneTarget(ao) : null;
+  const sceneCapture = sceneDraw
+    ? new OpaqueSceneCapture(webgl, scene, sceneDraw.width, sceneDraw.height)
+    : null;
 
   let bloom: UnrealBloomPass | null = null;
   if (plan.composerPasses.includes('bloom')) {
     bloom = new PreparedBloomPass(size.clone(), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD);
+    labelGpuTimerPass(bloom, 'bloom');
     composer.addPass(bloom);
   }
   // Edge AA for the grade-only tiers lives INSIDE this pass. A tail pass would
@@ -265,6 +302,7 @@ export function buildComposer(
     bloom instanceof PreparedBloomPass ? bloom.bloomTexture : null,
     { fxaa: plan.gradeFxaa },
   );
+  labelGpuTimerPass(grade, 'grade');
   composer.addPass(grade);
   // The post shed's `smaa-to-fxaa` rung swaps the grade for this twin, the
   // same pass with the FXAA arm compiled in. Disabled until that rung, and
@@ -278,6 +316,7 @@ export function buildComposer(
     : null;
   if (gradeFxaaTwin) {
     gradeFxaaTwin.enabled = false;
+    labelGpuTimerPass(gradeFxaaTwin, 'grade-fxaa');
     composer.addPass(gradeFxaaTwin);
   }
 
@@ -290,7 +329,10 @@ export function buildComposer(
   const screenFx = plan.composerPasses.includes('screen-fx')
     ? new ShaderPass(ScreenFxShader)
     : null;
-  if (screenFx) composer.addPass(screenFx);
+  if (screenFx) {
+    labelGpuTimerPass(screenFx, 'screen-fx');
+    composer.addPass(screenFx);
+  }
   const rippleSlots = Array.from({ length: SCREEN_RIPPLE_SLOTS }, () => ({
     x: 0,
     y: 0,
@@ -316,7 +358,10 @@ export function buildComposer(
   // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
   // post-AA cost attributable while comparing the revised tier policy.
   const smaa = plan.composerPasses.includes('smaa') ? new ByteTargetSMAAPass() : null;
-  if (smaa) composer.addPass(smaa);
+  if (smaa) {
+    labelGpuTimerPass(smaa, 'smaa');
+    composer.addPass(smaa);
+  }
 
   const shed = new PostShed(
     webgl,
@@ -339,6 +384,13 @@ export function buildComposer(
     shedChain: plan.shed.chain,
     setSize(width: number, height: number, pixelRatio = webgl.getPixelRatio()): void {
       composer.setSizeAndPixelRatio(width, height, pixelRatio);
+      // Read the scene target back rather than the composer buffers: the copy
+      // has to match the extent it copies FROM, and the two are not always the
+      // same number (see n8aoSceneTarget).
+      if (ao && sceneCapture) {
+        const draw = n8aoSceneTarget(ao);
+        sceneCapture.setSize(draw.width, draw.height);
+      }
       // A resize or a render-scale change can move the buffer across the pixel
       // budget; re-resolve here so the AO arm follows the extent it draws at.
       // The arm in force goes in too: crossing rebuilds and relinks n8ao, so the
@@ -367,6 +419,7 @@ export function buildComposer(
       grade.setInputUvRect(region.uvScaleX, region.uvScaleY, region.uvMaxX, region.uvMaxY);
     },
     render(): void {
+      sceneCapture?.begin();
       composer.render();
     },
     setShedLevel(level: number): void {
@@ -387,6 +440,9 @@ export function buildComposer(
       shed.dispose();
       for (const pass of composer.passes) pass.dispose();
       composer.dispose();
+      // Last: the capture owns a scene child and its own attachments, nothing
+      // the composer teardown depends on, and a throw here cannot then skip it.
+      sceneCapture?.dispose();
     },
     screenRipple(x: number, y: number, z: number, strength: number): void {
       if (!screenFx) return;

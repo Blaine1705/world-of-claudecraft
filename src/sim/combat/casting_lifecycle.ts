@@ -71,7 +71,6 @@ import {
   dist2d,
   ENCHANT_CAST_ID,
   FACING_HOLD_DIST,
-  FARMING_CAST_ID,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   isFormAuraKind,
@@ -98,8 +97,10 @@ import {
   completeNeedleOfFateCast,
   consumeFateThreadsForDrain,
   gainDoom,
+  hasAfflictionConsumePushbackImmunity,
 } from './affliction';
 import { shouldPreserveQueuedSentence } from './affliction_sentence_queue';
+import { abilityCastSurvivesMovement, heldMovementInputWouldMove } from './cast_move_gate';
 import {
   hasUnbreakableMovementLock,
   isInStasis,
@@ -116,6 +117,8 @@ import {
   aetherDartsBoltBonus,
   aetherDartsChannelStart,
   aetherSurgeCastMult,
+  PERFECT_MOMENT_DARTS_DAMAGE_MULT,
+  perfectMomentActive,
 } from './chronomancy';
 import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import {
@@ -127,6 +130,8 @@ import {
   spendRuin,
 } from './destruction';
 import { extendOwnedDot } from './dot_mutation';
+import { applyDruidFormEntry, druidFormEntryOwed } from './druid_form_entry';
+import { naturesBoonArmedFor, naturesBoonPowerFor } from './druid_natures_boon';
 import {
   consumeAuraKind,
   consumeFreeCostFor,
@@ -140,11 +145,13 @@ import {
   iceFloesAuraForAbility,
   nextCastCheapMultiplier,
 } from './empower_next';
+import { meleeReachActor } from './feral_reach';
 import {
   applyAutoUnshift,
   isFormToggleAbility as isFormToggle,
   willAutoUnshift,
 } from './form_auto_unshift';
+import { formRequirementMet, hasFormRequirement, requiredForms } from './form_requirement';
 import { isActionLockingFormAuraKind, isResourceShiftFormAuraKind } from './forms';
 import {
   applyBrainFreezeOverride,
@@ -235,6 +242,7 @@ import {
   tickUnbrokenRitual,
 } from './warlock_talents';
 import { hasUmbralAnchor, UMBRAL_ANCHOR_ID, umbralAnchorCastError } from './warlock_utility';
+import { castRedHarvest } from './warrior_harvest';
 
 export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'recklessness',
@@ -692,17 +700,6 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       ctx.completeRechargeCast(p, meta);
       return;
     }
-    // Planting cast completion (Farming): DELIBERATELY DISPATCHES NOTHING.
-    // Every other arm above routes to the module that resolves its outcome;
-    // farming's plant resolves at COMMAND time (professions/farming.ts
-    // plantCrop writes the plot, consumes the seed and pre-rolls the growth
-    // script before the cast even starts), so the cast is pure flavor and
-    // this arm exists only to return before fireQueuedCast, exactly like its
-    // neighbours. The generic cast-field clearing above (castingAbility,
-    // castRemaining) plus the castStop already emitted is the whole
-    // completion. The consequence is the point: damage cancelling the cast
-    // leaves the plant standing, because the crop was already in the ground.
-    if (castId === FARMING_CAST_ID) return;
     // Ice Floes (mage choice row): a COMPLETED hard cast spends one protected
     // use whether or not the caster actually moved (the buff is a banked
     // window, not a refund). Fishing above never spends one. Draws no rng.
@@ -884,6 +881,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
 
 export function pushbackCast(p: Entity): void {
   if (hasCastShield(p)) return;
+  if (p.castingAbility === 'drain_life' && hasAfflictionConsumePushbackImmunity(p)) return;
   // Item-set caster bonus scales damage-driven pushback (1 = fully immune).
   const factor = 1 - p.castPushbackReduction;
   if (factor <= 0) return;
@@ -1171,7 +1169,7 @@ export function castAbility(
     return;
   }
   // Auto-unshift (see combat/form_auto_unshift.ts): a healing or damaging spell
-  // pressed in Bruin/Wolf/Fleet Form drops the form and casts. Decided HERE and
+  // pressed in Bruin/Cat/Fleet Form drops the form and casts. Decided HERE and
   // applied at the form gate below, because the two questions this answers sit
   // on either side of it: the cast is billed against the PARKED mana (the live
   // bar is rage or energy while shifted), and refusing it for cost must leave
@@ -1220,11 +1218,19 @@ export function castAbility(
     : p.resourceType === 'mana'
       ? Math.ceil(shamanAdjustedCost * paladinManaCostMultiplier(p))
       : shamanAdjustedCost;
+  // A form-entry press (Lunge from Bruin Form) is billed AFTER its shift, so
+  // the live bar here is not the one that pays: entering Cat hands over a full
+  // 100 energy, which always covers Lunge's 40. Weighing it against the rage or
+  // mana it happens to be standing in would refuse a press that is payable.
+  // Only exempt when a shift is actually owed, so a Lunge pressed already in
+  // Cat Form keeps the ordinary energy check.
+  const entersFormOnCast = druidFormEntryOwed(meta, p.auras, ability.id);
   if (
     castingPool < payableCost &&
     (!canCastFree || stormcastArmedForAbility) &&
     !freeBySolarReprisal &&
     !togglingOff &&
+    !entersFormOnCast &&
     !formShiftKind(p, ability)
   ) {
     ctx.error(
@@ -1309,13 +1315,29 @@ export function castAbility(
   // Action-locking forms gate their kit both ways: Druid form abilities need
   // their form, while travel forms lock the normal kit until toggled off.
   const form = p.auras.find((a) => isActionLockingFormAuraKind(a.kind));
-  if (ability.requiresForm) {
-    const need = ability.requiresForm === 'bear' ? 'form_bear' : 'form_cat';
-    if (!form || form.kind !== need) {
-      ctx.error(p.id, `You must be in ${ability.requiresForm === 'bear' ? 'Bruin' : 'Wolf'} Form.`);
+  if (hasFormRequirement(ability)) {
+    if (!formRequirementMet(p.auras, ability)) {
+      // The three refusals are spelled out rather than interpolated so the S3
+      // i18n drift guard (tests/localization_fixes.test.ts) can read each one
+      // as a literal, and so ui/error_text_i18n_core.ts has a fixed vocabulary
+      // to parse back into a key. Keep the three byte-identical to that matcher.
+      const forms = requiredForms(ability);
+      if (forms.length > 1) ctx.error(p.id, 'You must be in Bruin or Cat Form.');
+      else if (forms[0] === 'bear') ctx.error(p.id, 'You must be in Bruin Form.');
+      else ctx.error(p.id, 'You must be in Cat Form.');
       return;
     }
-  } else if (form && !isFormToggle(ability) && !ability.usableInForm) {
+  } else if (
+    form &&
+    !isFormToggle(ability) &&
+    !ability.usableInForm &&
+    // An armed Nature's Boon window is a form exemption for exactly the two
+    // spells it names (combat/druid_natures_boon.ts). Checked here rather than
+    // folded into usableInForm because it is aura state, not a property of the
+    // button: with no window armed, Wildbloom refuses and auto-unshifts exactly
+    // as it always has (Oakhide is usableInForm and never reaches this arm).
+    !naturesBoonArmedFor(p.auras, ability.id)
+  ) {
     // Only the DECISION is made here, so the ladder below continues for a cast
     // that will auto-unshift. The form itself is not touched until the cast
     // commits (see applyAutoUnshift further down): every refusal between here
@@ -1460,7 +1482,7 @@ export function castAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = effectivePlayerAttackRange(target, ability.range);
+    const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -1490,7 +1512,7 @@ export function castAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = effectivePlayerAttackRange(target, ability.range);
+    const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -1703,6 +1725,55 @@ export function castAbility(
     }
   }
 
+  // Brain Freeze (combat/frost_mage.ts): consumed HERE, after every gate
+  // above (so a blocked cast never eats the proc) and before the cast-time /
+  // cost / cooldown reads below: the armed Flurry goes instant, skips its
+  // cooldown and carries its 30% baked into the resolved effects.
+  res = applyBrainFreezeOverride(ctx, p, res);
+  // Solar Reprisal shares one choice across the Protection Paladin's ranged
+  // strike, self-sustain strike, and ally-capable filler heal. Consume only
+  // after all cast gates succeed, then bake the chosen override into this cast.
+  res = applySolarReprisalOverride(ctx, p, res);
+  // Dawn's Wrath is a stored extra Tolling Hammer cast, not a cooldown reset:
+  // consume it only after every cast gate succeeds, then leave any existing
+  // cooldown untouched by resolving this one cast with a zero-second cooldown.
+  res = applyDawnsWrathOverride(ctx, p, res);
+
+  // Owner 2026-07-13: spell haste shortens the global cooldown (floored at MIN_GCD),
+  // so gear/Bloodlust/Temporal Acceleration haste speeds the whole rotation, not just
+  // cast bars. spellHasteMult is 1 for anyone without spell haste, so their GCD is
+  // unchanged.
+  const gcd = Math.max(MIN_GCD, ctx.playerGcdFor(meta.cls) / spellHasteMult(p));
+  // A channel keeps its duration, so it must not eat a next_cast_instant charge.
+  let consumedInstantAura: Aura | null = null;
+  if (
+    !ability.channel &&
+    res.castTime > 0 &&
+    (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id))
+  ) {
+    consumedInstantAura = consumeNextCastInstantAura(ctx, p, ability.id);
+  }
+  const instantBaseCastTime =
+    consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id);
+  const castTime =
+    afflictionAdjustedCastTime(p, ability.id, instantBaseCastTime) *
+    destructionCastTimeMult(p, ability.id) *
+    ashenFocusCastTimeMult(ctx, p, meta, ability.id);
+  // A press that cannot survive movement (abilityCastSurvivesMovement) is denied
+  // OUTRIGHT here, before the GCD arms or any cast-commit body state is changed,
+  // when the player's held movement input would actually move this tick. A root,
+  // steep-ground control strip, or dismount lock matches player_motion's own
+  // cancellation gate: those states mean the input is held but the body is not
+  // moving, so the cast may start normally.
+  if (
+    (ability.channel || (castTime > 0 && !togglingOff)) &&
+    heldMovementInputWouldMove(p, meta.moveInput, ctx.cfg.seed) &&
+    !abilityCastSurvivesMovement(p, ability.id, res)
+  ) {
+    ctx.error(p.id, "You can't cast while moving.");
+    return;
+  }
+
   if (p.sitting) ctx.standUp(p);
   if (p.weaponStowed) drawWeapon(p);
   if (ability.id !== 'ghost_wolf' && p.auras.some((a) => a.id === 'ghost_wolf')) {
@@ -1724,6 +1795,13 @@ export function castAbility(
   // the same press and pays from the restored mana pool. Shifting back IN stays a
   // normal ability and bills both.
   if (autoUnshift) applyAutoUnshift(ctx, p, meta, ability);
+  // The form-entry buttons (Stalk, Lunge, Bruin Rush) put the druid in their
+  // form on the way in (v0.43, combat/druid_form_entry.ts). Placed HERE for the
+  // same reason as the auto-unshift above: every refusal has cleared, so the
+  // form change can no longer be spent on a press that never happens. It runs
+  // BEFORE this cast's own effects resolve, so the stealth lands on a cat and
+  // the rush leaves as a bear.
+  applyDruidFormEntry(ctx, p, meta, ability.id);
   // Auto-dismount when the player is mounted or mid-summon-channel and casts any ability.
   if (p.mountKey !== '') forceDismount(ctx, p);
   if (p.mountCastKey !== '') {
@@ -1765,41 +1843,10 @@ export function castAbility(
     return;
   }
   p.castTargetId = target?.id ?? null;
-
-  // Brain Freeze (combat/frost_mage.ts): consumed HERE, after every gate
-  // above (so a blocked cast never eats the proc) and before the cast-time /
-  // cost / cooldown reads below: the armed Flurry goes instant, skips its
-  // cooldown and carries its 30% baked into the resolved effects.
-  res = applyBrainFreezeOverride(ctx, p, res);
-  // Solar Reprisal shares one choice across the Protection Paladin's ranged
-  // strike, self-sustain strike, and ally-capable filler heal. Consume only
-  // after all cast gates succeed, then bake the chosen override into this cast.
-  res = applySolarReprisalOverride(ctx, p, res);
-  // Dawn's Wrath is a stored extra Tolling Hammer cast, not a cooldown reset:
-  // consume it only after every cast gate succeeds, then leave any existing
-  // cooldown untouched by resolving this one cast with a zero-second cooldown.
-  res = applyDawnsWrathOverride(ctx, p, res);
-
-  // Owner 2026-07-13: spell haste shortens the global cooldown (floored at MIN_GCD),
-  // so gear/Bloodlust/Temporal Acceleration haste speeds the whole rotation, not just
-  // cast bars. spellHasteMult is 1 for anyone without spell haste, so their GCD is
-  // unchanged.
-  const gcd = Math.max(MIN_GCD, ctx.playerGcdFor(meta.cls) / spellHasteMult(p));
-  // A channel keeps its duration, so it must not eat a next_cast_instant charge.
-  let consumedInstantAura: Aura | null = null;
-  if (
-    !ability.channel &&
-    res.castTime > 0 &&
-    (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id))
-  ) {
-    consumedInstantAura = consumeNextCastInstantAura(ctx, p, ability.id);
-  }
-  const instantBaseCastTime =
-    consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id);
-  const castTime =
-    afflictionAdjustedCastTime(p, ability.id, instantBaseCastTime) *
-    destructionCastTimeMult(p, ability.id) *
-    ashenFocusCastTimeMult(ctx, p, meta, ability.id);
+  // Nature's Boon makes its spell 25% stronger. Scaled on a COPY here, BEFORE
+  // the block below spends the window: the instant arm consumes the aura and
+  // only then calls applyAbility, so a multiplier read any later is always 1.
+  res = scaleNaturesBoonPower(p, res);
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
@@ -2099,6 +2146,30 @@ function overflowingPowerCdr(ctx: SimContext, p: Entity, meta: PlayerMeta, cost:
 // is never mutated. Draws no rng.
 const OVERLOAD_COST_MULT = 1.5;
 
+/** Scale a Nature's Boon cast's magnitudes by its power multiplier, returning a
+ *  NEW resolved ability: the base content arrays are shared module data and must
+ *  never be mutated (the consumeOverload rule, right below). Returns `res`
+ *  untouched when no window covers this cast, so nothing else moves. */
+function scaleNaturesBoonPower(p: Entity, res: ResolvedAbility): ResolvedAbility {
+  const amp = naturesBoonPowerFor(p.auras, res.def.id);
+  if (amp === 1) return res;
+  const effects = res.effects.map((eff) => {
+    // A heal or a HoT is NOT scaled here: those sites add a Spell Power rider
+    // on top of the authored base, so scaling the base alone would deliver
+    // less than the printed 25% at any real heal power. They take the whole
+    // multiplier in runEffects instead, through the cast-scoped heal multiplier
+    // that `naturesBoonPower` below feeds (the Stonehearth 2pc shape).
+    if (eff.type === 'heal' || eff.type === 'hot') return eff;
+    const scaled: Record<string, unknown> = { ...eff };
+    for (const key of ['min', 'max', 'amount', 'total', 'value'] as const) {
+      const v = scaled[key];
+      if (typeof v === 'number' && v > 0) scaled[key] = Math.round(v * amp);
+    }
+    return scaled as AbilityEffect;
+  });
+  return { ...res, effects, naturesBoonPower: amp };
+}
+
 function consumeOverload(ctx: SimContext, p: Entity, res: ResolvedAbility): ResolvedAbility {
   if (res.def.school === 'physical' || res.cost <= 0) return res;
   const idx = p.auras.findIndex((a) => a.kind === 'overload');
@@ -2376,7 +2447,7 @@ function applyChannelTick(
     cancelCast(ctx, p);
     return;
   }
-  const maxRange = effectivePlayerAttackRange(target, res.def.range);
+  const maxRange = effectivePlayerAttackRange(target, res.def.range, meleeReachActor(ctx, p));
   if (dist2d(p.pos, target.pos) > maxRange) {
     ctx.error(p.id, 'Out of range.');
     cancelCast(ctx, p);
@@ -2418,6 +2489,9 @@ function applyChannelTick(
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp + surgeBonus;
         dmg *= spellDamageMultFromAuras(src);
+        if (res.def.id === 'arcane_missiles' && perfectMomentActive(src)) {
+          dmg *= PERFECT_MOMENT_DARTS_DAMAGE_MULT;
+        }
         // A channeled spell tick (Arcane Missiles) is a spell crit, so it takes the
         // spell crit-damage channel of the mastery (plus the generic bonus) like
         // every other spell crit.
@@ -2723,7 +2797,7 @@ function applyAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = effectivePlayerAttackRange(target, ability.range);
+    const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -2739,7 +2813,7 @@ function applyAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = effectivePlayerAttackRange(target, ability.range);
+    const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -3012,7 +3086,8 @@ function applyAbility(
   if (instantResisted) {
     restoreStormcastReservation(ctx, p, stormcastReservation);
   } else {
-    ctx.runEffects(p, meta, target, res);
+    if (ability.id === 'red_harvest') castRedHarvest(ctx, p, meta, target, res);
+    else ctx.runEffects(p, meta, target, res);
     completeStormcastReservation(ctx, p, stormcastReservation);
   }
   // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a

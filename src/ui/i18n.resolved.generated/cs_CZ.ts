@@ -62,6 +62,7 @@ export const cs_CZ: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Dungeon",
+      "town": "Město",
       "difficulty": "Obtížnost",
       "name": "Jméno",
       "spec": "Specializace",
@@ -159,6 +160,10 @@ export const cs_CZ: EnTranslations = {
       "teleport": {
         "label": "Teleportovat",
         "description": "Přesuň se na přesné souřadnice světa."
+      },
+      "town": {
+        "label": "Městský uzel",
+        "description": "Teleportujte se do městského uzlu podle jména."
       },
       "dungeon": {
         "label": "Vstoupit do dungeonu",
@@ -326,6 +331,18 @@ export const cs_CZ: EnTranslations = {
     }
   },
   "hudChrome": {
+    "professionTrainers": {
+      "blacksmithing": "Trenér kovářství",
+      "cooking": "Trenér vaření",
+      "tailoring": "Trenér krejčovství",
+      "engineering": "Trenér strojírenství",
+      "leatherworking": "Trenér kožedělnictví",
+      "alchemy": "Trenér alchymie",
+      "farming": "Trenér zemědělství",
+      "mining": "Trenér těžby",
+      "hobby": "Trenér koníčku",
+      "nameplate": "<{title}>"
+    },
     "materialStackSelectionUnavailable": "Tento výběr materiálu už není dostupný.",
     "warlock": {
       "doomLabel": "Odsouzení",
@@ -348,19 +365,41 @@ export const cs_CZ: EnTranslations = {
       "banner": "Sleduješ {name}"
     },
     "readyCheck": {
+      "title": "Kontrola připravenosti",
+      "close": "Blízko",
       "prompt": "Hráč {name} zahájil kontrolu připravenosti. Jsi připraven(a)?",
       "ready": "Připraven(a)",
       "notReady": "Nepřipraven(a)",
+      "status": "Připraveno: {ready}/{total}",
+      "waiting": "Čekání na odpovědi...",
+      "memberReady": "{name} je připraveno.",
+      "memberNotReady": "{name} není připraveno.",
+      "memberPending": "{name} zatím neodpověděl.",
       "result": "Kontrola připravenosti: {ready} připraveno, {notReady} nepřipraveno, {noResponse} bez odpovědi.",
       "notInPartyError": "Abys mohl(a) zahájit kontrolu připravenosti, musíš být ve skupině.",
       "inProgressError": "Kontrola připravenosti už probíhá."
     },
+    "pullTimer": {
+      "start": "Zatáhněte za {seconds} s!",
+      "cancel": "Vytažení zrušeno.",
+      "countdown": "{seconds}",
+      "pull": "SEM!"
+    },
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "Přijmout strážcovo mýto?",
       "healerConfirmBody": "Bledý strážce tě zde oživí, ale Strážcovo mýto sníží všechny tvé vlastnosti o 75 %, na vyšších úrovních až na 10 minut. Když se jako duch vrátíš ke svému tělu, oživíš se bez postihu.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Oživ mě",
       "healerConfirmCancel": "Zrušit"
     },
@@ -375,6 +414,7 @@ export const cs_CZ: EnTranslations = {
       "help": "Záchrana: /unstuck spustí nehybné odpočítávání, které tě přemístí na nedaleké dostupné bezpečné místo.",
       "helpAtGraveyard": "Záchrana: /unstuck spustí nehybné odpočítávání a poté pošle tvého ducha na nejbližší hřbitov. Návrat přes Bledého strážce vyžaduje Strážcovo mýtné.",
       "helpUnstuckSickness": "Záchrana: /unstuck spustí nehybné odpočítávání a poté tě přenese na nejbližší hřbitov, a pokud jsi padl, oživí tě. Nemoc z vyproštění na tobě zůstane až 5 minut.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Vyproštění za {seconds} sekund. Pohyb, boj, utrpění zranění nebo zahájení jiné akce ho zruší.",
       "countdown": "Vyproštění: {seconds}",
       "completed": "Přemístěno na nejbližší dostupné bezpečné místo.",
@@ -382,6 +422,8 @@ export const cs_CZ: EnTranslations = {
       "revivedAtGraveyard": "Byl jsi vrácen na nejbližší hřbitov a oživen. Strážcovo mýtné na tobě leží.",
       "movedToGraveyard": "Byl jsi přenesen na nejbližší hřbitov. Nemoc z vyproštění na tobě leží.",
       "revivedAtGraveyardUnstuck": "Byl jsi přenesen na nejbližší hřbitov a oživen. Nemoc z vyproštění na tobě leží.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Vyproštění zrušeno, protože ses pohnul.",
       "cancelledDamaged": "Vyproštění zrušeno, protože jsi utrpěl zranění.",
       "cancelledCombat": "Vyproštění zrušeno, protože jsi vstoupil do boje.",
@@ -488,6 +530,15 @@ export const cs_CZ: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Okno výměny bylo zavřeno.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Zlato",
         "tabWoc": "$WOC",
@@ -578,6 +629,11 @@ export const cs_CZ: EnTranslations = {
       "mountsTitle": "Strojově stabilní",
       "mountBuyAria": "Koupit {item}",
       "mountSkinType": "Vzhled jízdního zvířete",
+      "mountInspectAria": "Náhled {item}",
+      "mountRideIt": "Jezdit na tom",
+      "mountOnly": "Pouze namontovat",
+      "mountBuy": "Kupte si Mount Skin",
+      "mountScopeLine": "Kůže celého účtu. Nošené jednou postavou po druhé.",
       "loading": "Načítání obchodu WOC…",
       "error": "Obchod WOC nyní není dostupný. Zkus to za chvíli znovu.",
       "balance": "Zůstatek Claudium",
@@ -902,6 +958,7 @@ export const cs_CZ: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Sbalit tracker úkolů",
       "expandHint": "Rozbalit tracker úkolů"
     },
@@ -1041,6 +1098,10 @@ export const cs_CZ: EnTranslations = {
       "clearArmed": "Klikni na slot a vymaž ho."
     },
     "tutorialGreeting": {
+      "eastbrookGuidanceNote": "Vítej v Eastbrooku! Maršál Redbrook má pro tebe práci na náměstí. Zapni si zlaté vedení, ať ho najdeš a splníš úkol Vlci u dveří, nebo si to prozkoumej po svém. Později to můžeš změnit v Nastavení, Rozhraní, Souboj.",
+      "guidanceOn": "Zapnout zlaté vedení",
+      "guidanceOff": "Vypnout zlaté vedení",
+      "guidanceSetting": "Eastbrookské zlaté vedení",
       "bellHomeNote": "Už jsi zpátky z pobřeží? To zvonil trajektový zvon. Jeho dvojče visí hned tamhle u schránky Havraní pošty: zazvoň na něj, kdykoli budeš chtít, a přívoz tě donese zpátky na Zkušební pobřeží. Ať se rozhodneš tak či onak, nic se tím nezkazí.",
       "islandArrivalNote": "Vítej na Zkušebním pobřeží. Strážce Tam čeká kousek odsud na pláži: zajdi za ním. Pokud chceš raději odjet, kdykoli zazvoň na zvon vedle mého mola a přenese tě do údolí.",
       "noteClose": "Rozumím"
@@ -1220,7 +1281,10 @@ export const cs_CZ: EnTranslations = {
       "devName": "Přispěvatel",
       "devTierCol": "Odznak",
       "mergedPrs": "Sloučené PR",
-      "devEmpty": "Zatím žádní hodnocení přispěvatelé."
+      "devEmpty": "Zatím žádní hodnocení přispěvatelé.",
+      "podiumLabel": "První tři",
+      "unclaimed": "Nevyzvednuto",
+      "prestigeTitle": "Prestiž {rank}"
     },
     "pledge": {
       "open": "Přijímá přihlášky",
@@ -1243,6 +1307,8 @@ export const cs_CZ: EnTranslations = {
       "noteLabel": "Poznámka na nástěnce",
       "notePlaceholder": "Napiš budoucím členům, koho tvůj cech hledá",
       "save": "Uložit",
+      "newPlayerFriendlyLabel": "Vhodné pro nové hráče",
+      "newPlayerFriendlyHint": "Zobrazeno na vývěsce pro nováčky u rozcestníku na Zkušebním pobřeží.",
       "yourPledge": "Tvoje přihláška: {guild}",
       "since": "Přihlášeno {date}",
       "withdraw": "Zrušit přihlášku"
@@ -1266,6 +1332,9 @@ export const cs_CZ: EnTranslations = {
       "previous": "Předchozí běhy",
       "runLabel": "Běh {index}",
       "runSummary": "{total} za {time}"
+    },
+    "talkingHead": {
+      "label": "Dialog"
     },
     "hubLesson": {
       "target": "Začni výběrem figuríny jako cíle.",
@@ -1395,7 +1464,9 @@ export const cs_CZ: EnTranslations = {
       "targetPrev": "Přepínat cíl zpět",
       "discord": "Discord",
       "bgFlag": "Akce s vlajkou na bojišti",
+      "friendlyNameplates": "Přepnout přátelské jmenovky",
       "sheathe": "Zasunout/Vytasit zbraň",
+      "hideInterface": "Skrýt rozhraní",
       "dive": "Potopit se",
       "categoryPet": "Mazlíček",
       "petAttack": "Mazlíček: Útok",
@@ -1404,8 +1475,22 @@ export const cs_CZ: EnTranslations = {
       "petDefensive": "Mazlíček: Obranný",
       "petAggressive": "Mazlíček: Agresivní",
       "targetPet": "Mazlíček: Zacílit",
+      "targetSelf": "Cílové Já",
+      "targetParty1": "Cílový člen strany 1",
+      "targetParty2": "Člen cílové strany 2",
+      "targetParty3": "Člen cílové strany 3",
+      "targetParty4": "Člen cílové strany 4",
+      "targetParty5": "Člen cílové strany 5",
+      "targetParty6": "Člen cílové strany 6",
+      "targetParty7": "Člen cílové strany 7",
+      "targetParty8": "Člen cílové strany 8",
+      "targetParty9": "Cílový člen strany 9",
       "mount": "Nasednout / Sesednout",
-      "mouseHint": "Fungují i tlačítka myši: při přiřazování stiskni prostřední tlačítko (M3) nebo boční tlačítko (M4, M5). Levá a pravá tlačítka zůstávají vyhrazena pro kameru, kliknutí k pohybu a klikání na věci ve světě."
+      "mouseHint": "Fungují i tlačítka myši: při přiřazování stiskni prostřední tlačítko (M3) nebo boční tlačítko (M4, M5). Levá a pravá tlačítka zůstávají vyhrazena pro kameru, kliknutí k pohybu a klikání na věci ve světě.",
+      "zoomIn": "Přiblížit kameru",
+      "zoomOut": "Oddálit fotoaparát",
+      "wheelHint": "Kolečko myši se také váže: otáčejte jím nahoru nebo dolů při vázání, pokud chcete, podržte Ctrl, Alt nebo Shift. Přiblížení a oddálení fotoaparátu je standardně umístěno na holém kolečku; přesuňte je na akord, jako je Ctrl+kolečko, abyste uvolnili kolo pro schopnosti.",
+      "wheelHeldRefused": "Zářez kola nemůže řídit zadrženou akci, jako je pohyb. Vyberte si pro něj klíč nebo tlačítko myši."
     },
     "actionBar": {
       "editKeys": "Upravit klávesy akční lišty",
@@ -1639,6 +1724,15 @@ export const cs_CZ: EnTranslations = {
       "shaderWarmOff": "Vypnuto",
       "shaderWarmOn": "Zapnuto",
       "shaderWarmNote": "Předem zahřívá mezipaměť shaderů na pozadí, aby se zabránilo zasekávání ve hře. Automaticky: zapnuto jen při podpoře grafickým systémem. (Doporučeno). Zapnuto: vynuceno všude. Na některých sestavách může zhoršit výkon. Vypnuto: zakázáno.",
+      "frameRateCap": "Frame Rate Limit",
+      "frameRateCapAuto": "Auto",
+      "frameRateCapDisplay": "Display",
+      "frameRateCapSixty": "60",
+      "frameRateCapThirty": "30",
+      "frameRateCapNote": "Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.",
+      "frameRateCapStatusPaced": "Drawing {fps} images per second on a {hz} Hz display.",
+      "frameRateCapStatusUnpaced": "Limiting to {fps} images per second.",
+      "frameRateCapStatusInert": "This display already runs at or under this limit, so the limit changes nothing.",
       "gpuBackend": "Grafické rozhraní",
       "gpuBackendAuto": "Automaticky",
       "gpuBackendVulkan": "Vulkan",
@@ -1678,6 +1772,8 @@ export const cs_CZ: EnTranslations = {
       "showReliquaryTracker": "Zobrazit Reliquary Tracker",
       "confirmVendorSell": "Potvrdit před prodejem",
       "confirmVendorSellNote": "Vypnutím této volby prodáš předměty jedním kliknutím bez potvrzení, takže přesunutý slot v batohu může obchodníkovi prodat špatný předmět.",
+      "confirmVendorSellMinQuality": "Potvrďte prodej od kvality",
+      "confirmVendorSellMinQualityNote": "Položky pod touto kvalitou se prodávají jediným kliknutím; špatně prodanou položku lze stále od prodejce koupit zpět.",
       "itemLevelLine": "Úroveň předmětu {level}",
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
@@ -1731,6 +1827,9 @@ export const cs_CZ: EnTranslations = {
     },
     "controller": {
       "title": "Ovladač",
+      "device": "Připojené zařízení",
+      "deviceConnected": "Připojeno",
+      "deviceDisconnected": "Nebyl zjištěn žádný ovladač",
       "glyphStyle": "Popisky tlačítek",
       "glyphStyleAuto": "Automaticky",
       "glyphStyleXbox": "Xbox",
@@ -1755,7 +1854,7 @@ export const cs_CZ: EnTranslations = {
       "crossHotbarHelp": "Podržte spoušť, aby se rozsvítilo osm slotů akčních lišt na d-padu a tlačítkách na obličeji. Klepnutím na další spoušť přepnete na druhou sadu.",
       "crossHotbarResetLayout": "Resetujte Cross Hotbar",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "Spouštěče a d-pad patří ke křížovému aktivnímu panelu, když je zapnutý, takže se nastavují spíše níže než zde.",
+      "crossHotbarOwnsButtons": "Spouštěče upravují křížový aktivní panel, když je zapnutý. Směry d-padu lze stále upravovat zde, pro nabídky a pohyb.",
       "cancelAction": "Storno / Zpět",
       "subcommandsAction": "Dílčí příkazy / Mapa",
       "cycleHudAction": "Rozhraní cyklu",
@@ -1766,11 +1865,12 @@ export const cs_CZ: EnTranslations = {
       "crossHotbarDisplayMinimal": "Pouze při držení",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "Přenášení {action}: potvrzením na buňce jej umístíte, zrušením jej vrátíte zpět.",
-      "crossHotbarEditHint": "Uspořádání: potvrzení zvednutí z buňky nebo knihy kouzel a upuštění na buňku, zrušení vymaže jednu.",
+      "crossHotbarEditHint": "Uspořádání · d-pad pohybuje · potvrzení zvedne a umístí · zrušení vymaže buňku",
       "crossHotbarEditHelp": "Podržte levý nárazník a stiskněte tlačítko na horní straně pro uspořádání lišty s ovladačem."
     },
     "perf": {
-      "title": "Performance overlay",
+      "title": "Performance",
+      "overlaySection": "Performance overlay",
       "enable": "Zobrazit performance overlay",
       "description": "Vyber, které statistiky zobrazit, kde bude overlay umístěný a jak bude vypadat.",
       "sectionPosition": "Pozice",
@@ -2045,6 +2145,52 @@ export const cs_CZ: EnTranslations = {
       "spellOrder": "Pořadí kouzel",
       "reset": "Resetovat pozici",
       "spellPosition": "Pořadí kouzel {position} / {count}",
+      "watchlist": "Sledovaná kouzla",
+      "watchlistHint": "Vyber libovolné kouzlo, které tě posiluje, a dej mu vlastní auru. Vybraná kouzla získají níže celou kartu s vlastní ikonou, barvou, pozicí a kruhem na zemi.",
+      "watchlistEmpty": "Žádné jiné kouzlo v tvé knize kouzel na tebe neuvaluje buff.",
+      "watchlistWatch": "Sledovat {spell}",
+      "watchlistUnwatch": "Přestat sledovat {spell}",
+      "watchlistCount": "{count} sledováno",
+      "sound": "Zvuk upozornění",
+      "soundNone": "Žádný zvuk",
+      "soundVolume": "Hlasitost zvuku",
+      "soundPreview": "Přehrát",
+      "soundPreviewAria": "Přehrát ukázku zvuku upozornění {sound}",
+      "soundHint": "Zvuk se přehraje pokaždé, když toto kouzlo procne. Vypni ikonu, půlměsíce a kruh na zemi, aby ho ohlašoval jen samotný zvuk.",
+      "readyGlow": "Zář akční lišty",
+      "readyGlowHint": "Rozzáří toto kouzlo na tvé akční liště, dokud trvá jeho buff.",
+      "reticleTick": "Značka zaměřovače",
+      "reticleTickHint": "Přidá značku poblíž středu obrazovky, která se rozsvítí, když toto kouzlo procne.",
+      "haptic": "Vibrace",
+      "hapticNone": "Vypnuto",
+      "hapticHint": "Zavibruje připojený ovladač nebo tvůj telefon. Ignorováno, pokud zařízení vibrace nepodporuje.",
+      "haptics": {
+        "tap": "Krátké",
+        "double": "Dvojité",
+        "long": "Dlouhé"
+      },
+      "cues": {
+        "softChime": "Jemný zvonek",
+        "musicBox": "Hrací skříňka",
+        "glassPing": "Cinknutí skla",
+        "waterDrop": "Kapka vody",
+        "bubblePop": "Prasknutí bubliny",
+        "hardBell": "Ostrý zvonek",
+        "templeGong": "Chrámový gong",
+        "anvilStrike": "Rána kovadliny",
+        "coinDrop": "Cinkot mince",
+        "swordDraw": "Tažení meče",
+        "blaringHorn": "Hlučný klakson",
+        "carKlaxon": "Klakson auta",
+        "sonarPing": "Sonarové pípnutí",
+        "electricZap": "Elektrický výboj",
+        "catMeow": "Kočičí mňouknutí",
+        "owlHoot": "Houkání sovy",
+        "wolfHowl": "Vlčí zavytí",
+        "frogCroak": "Kvákání žáby",
+        "windWhoosh": "Hukot větru",
+        "steamHiss": "Sykot páry"
+      },
       "procs": {
         "revenge": "Odveta!",
         "battleTrance": "Bojový trans",
@@ -2116,6 +2262,22 @@ export const cs_CZ: EnTranslations = {
       "playtimeHidden": "Skryto",
       "showPlaytimeAria": "Zobrazit odehraný čas",
       "hidePlaytimeAria": "Skrýt odehraný čas"
+    },
+    "charSidebar": {
+      "label": "Detaily postavy",
+      "subtitle": "Úroveň {level} {className}. {archetype}. Hobby: {hobby}",
+      "subtitleNoHobby": "Úroveň {level} {className}. {archetype}",
+      "stats": "Statistiky",
+      "progression": "Postup",
+      "skills": "Dovednosti",
+      "gathering": "Shromáždění",
+      "crafting": "Řemeslnictví",
+      "openProfessions": "Otevřené profese"
+    },
+    "questLog": {
+      "completed": "Dokončeno",
+      "zoneSummary": "{count} ({ready} připraveno)",
+      "shiftHint": "Kliknutím se stisknutou klávesou Shift na úkol jej propojíte v chatu."
     },
     "statInfo": {
       "fromYour": "Z tvojí hodnoty {value} {stat}:",
@@ -2230,6 +2392,12 @@ export const cs_CZ: EnTranslations = {
       "linkHint": "Shift + kliknutí vloží odkaz na tento předmět do chatu."
     },
     "plurals": {
+      "guildBoardShown": {
+        "one": "Zobrazena {count} gilda",
+        "few": "Zobrazeny {count} gildy",
+        "many": "Zobrazeno {count} gild",
+        "other": "Zobrazeno {count} gild"
+      },
       "commissionMasterworks": {
         "one": "{count} mistrovsky kovaný předmět",
         "few": "{count} mistrovsky kované předměty",
@@ -2359,6 +2527,7 @@ export const cs_CZ: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Nahlásit chybu",
+      "online": "Online",
       "realm": "Svět",
       "character": "Postava",
       "position": "Pozice",
@@ -2374,6 +2543,15 @@ export const cs_CZ: EnTranslations = {
       "tooLarge": "Toto hlášení je příliš velké k odeslání. Zkus to znovu bez snímku.",
       "rateLimited": "Nedávno jsi poslal(a) několik hlášení. Před dalším chvíli počkej.",
       "failed": "Hlášení chyby se nepodařilo odeslat. Zkus to prosím znovu."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Sundat {item}",
@@ -2918,7 +3096,7 @@ export const cs_CZ: EnTranslations = {
         "phaseWardstonesName": "Ochranné kameny",
         "phaseWardstonesSummary": "Při {health} zdraví Rozechvělý dupot zadrží raid na místě, zatímco dorazí bratr Aldric a rozsvítí ochranné kameny. Každý bodec se roztříští a podlaha přestane hořet, potom se k mechanikám Trůnu přidají Trhání duše a Nesmrtelné běsnění.",
         "phaseKingsWrathName": "Králův hněv",
-        "phaseKingsWrathSummary": "Při {health} zdraví Nythraxis zařve v Králově hněvu a získá o {bonusNormal} vyšší poškození na Normal nebo o {bonusHeroic} na Heroic po zbytek boje. Hrobová erupce se zrychlí na každých {eruptionEveryNormal} s ({eruptionEveryHeroic} na Heroic) a Hrobový oheň na každých {gravefireEveryNormal} s ({gravefireEveryHeroic} na Heroic). Všechny ostatní mechaniky drží své tempo.",
+        "phaseKingsWrathSummary": "Při {health} zdraví Nythraxis zařve v Králově hněvu a získá o {bonusNormal} vyšší poškození na Normal nebo o {bonusHeroic} na Heroic po zbytek boje. Hrobová erupce se zrychlí na každých {eruptionEveryNormal} s ({eruptionEveryHeroic} na Heroic). Všechny ostatní mechaniky drží své tempo.",
         "gravebreakerName": "Hrobobijec",
         "gravebreakerSummary": "Každých {seconds} s Nythraxis nabije svůj další dopadlý úder. Jeho cíl utrpí jen samotný úder, ale všichni ostatní v dosahu {range} yardů v kuželu {arc} stupňů před ním utrpí {splash} tohoto úderu jako fyzické poškození, snížené jejich vlastním brněním.",
         "gravebreakerResponse": "Tankové drží Nythraxise otočeného pryč od raidu. Všichni ostatní stojí za ním nebo vedle něj a nikdy nekříží kužel.",
@@ -2927,16 +3105,16 @@ export const cs_CZ: EnTranslations = {
         "dreadCurseHeroicSummary": "Každých {every} s Nythraxis zasáhne svého aktuálního tanka za {hitHeroic} maximálního zdraví jako stínové poškození a přidá sadu Děsivé kletby. Po dobu {duration} s každá sada zvyšuje poškození, které tank utrpí od Nythraxise, o {perStackHeroic}, až do {max} sad.",
         "dreadCurseResponse": "Tankové se střídají při {stacks} sadách: druhý tank provokuje a prokletý tank zůstává mimo kužel Hrobobijce, než sady vyprchají. Léčitelé připraví přebírajícího tanka před výměnou.",
         "boneSpikeName": "Kostěný bodec",
-        "boneSpikeSummary": "Každých {everyNormal} s Nythraxis nabodne {victimsNormal} raiderů mimo svůj aktuální cíl na kostěné bodce. Nabodnutý raider nemůže jednat a každou sekundu ztrácí {drainNormal} maximálního zdraví, dokud není jeho bodec zničen.",
-        "boneSpikeHeroicSummary": "Každých {everyHeroic} s Nythraxis nabodne {victimsHeroic} raiderů mimo svůj aktuální cíl na kostěné bodce. Nabodnutý raider nemůže jednat a každou sekundu ztrácí {drainHeroic} maximálního zdraví, dokud není jeho bodec zničen.",
-        "boneSpikeResponse": "Útočníci se okamžitě přepnou na kostěné bodce a zničí je, aby osvobodili nabodnuté raidery. Léčitelé drží nabodnuté naživu, než bodce padnou.",
+        "boneSpikeSummary": "Každých {everyNormal} s Nythraxis nabodne {victimsNormal} raiderů mimo svůj aktuální cíl na kostěné bodce. Nabodnutý raider nemůže jednat a každou sekundu ztrácí {drainNormal} maximálního zdraví, dokud není jeho bodec zničen. Bodec se roztříští po {hitsNormal} zásazích od kohokoli, bez ohledu na způsobené poškození. Hráč, který už byl nabodnut, nemůže být znovu vybrán po dobu {cooldown} s, takže se bodce rozloží po celé skupině.",
+        "boneSpikeHeroicSummary": "Každých {everyHeroic} s Nythraxis nabodne {victimsHeroic} raiderů mimo svůj aktuální cíl na kostěné bodce. Nabodnutý raider nemůže jednat a každou sekundu ztrácí {drainHeroic} maximálního zdraví, dokud není jeho bodec zničen. Bodec se roztříští po {hitsHeroic} zásazích od kohokoli, bez ohledu na způsobené poškození. Hráč, který už byl nabodnut, nemůže být znovu vybrán po dobu {cooldown} s, takže se bodce rozloží po celé skupině.",
+        "boneSpikeResponse": "Kdo je nejblíž, udeří do Kostěného bodce: pár zásahů od kohokoli ho roztříští, bez ohledu na poškození. Léčitelé udržují nabodnuté naživu, dokud bodce nepadnou.",
         "graveEruptionName": "Hrobová erupce",
         "graveEruptionSummary": "Každých {everyNormal} s kostlivé ruce označí {countNormal} kruhů o poloměru {radius} yardů pod raidery. Po {warning} s každý kruh vybuchne za {burstNormal} maximálního zdraví jako stínové poškození, potom hoří jako hrobový plamen po dobu {flameNormal} s a každou sekundu způsobuje {tickNormal} maximálního zdraví každému, kdo v něm stojí.",
         "graveEruptionHeroicSummary": "Každých {everyHeroic} s kostlivé ruce označí {countHeroic} kruhů o poloměru {radius} yardů pod raidery. Po {warning} s každý kruh vybuchne za {burstHeroic} maximálního zdraví jako stínové poškození, potom hoří jako hrobový plamen po dobu {flameHeroic} s a každou sekundu způsobuje {tickHeroic} maximálního zdraví každému, kdo v něm stojí.",
         "graveEruptionResponse": "Ustupte z každého varovného kruhu, než vybuchne, a nestůjte na hořící zemi. Tankové odtáhnou Nythraxise od plamenů, aby měli bojovníci nablízko prostor.",
         "bindingSigilName": "Vazebná pečeť",
-        "bindingSigilSummary": "Každých {everyNormal} s vzplane na podlaze {minDist} až {maxDist} yardů od Nythraxise pečeť starých ochran a on začne Nesmrtelný vzestup, který mu každých {ascensionEvery} s přidá {ascensionNormal} poškození a rychlost útoku. Pokud do {bindNormal} s stojí na pečeti, je spoután: Vzestup se očistí, je omráčen na {stunNormal} s a po dobu {boundNormal} s utrpí o {vulnerability} vyšší poškození. Jinak každý raider utrpí {unboundHitNormal} maximálního zdraví jako stínové poškození a on si ponechá o {unboundBonusNormal} vyšší poškození až do dalšího spoutání.",
-        "bindingSigilHeroicSummary": "Každých {everyHeroic} s vzplane na podlaze {minDist} až {maxDist} yardů od Nythraxise pečeť starých ochran a on začne Nesmrtelný vzestup, který mu každých {ascensionEvery} s přidá {ascensionHeroic} poškození a rychlost útoku. Pokud do {bindHeroic} s stojí na pečeti, je spoután: Vzestup se očistí, je omráčen na {stunHeroic} s a po dobu {boundHeroic} s utrpí o {vulnerability} vyšší poškození. Jinak každý raider utrpí {unboundHitHeroic} maximálního zdraví jako stínové poškození a on si ponechá o {unboundBonusHeroic} vyšší poškození až do dalšího spoutání.",
+        "bindingSigilSummary": "Každých {everyNormal} s vzplane pečeť starých ochran na jedné ze dvou plošin po stranách trůnu, {sideOffset} yardů vlevo nebo vpravo od místa, kde Nythraxis stál na začátku boje (z pohledu skupiny, strana se s každým sesláním střídá), a on začne Nesmrtelný vzestup, který mu každých {ascensionEvery} s přidá {ascensionNormal} poškození a rychlost útoku. Pokud do {bindNormal} s stojí na pečeti, je spoután: Vzestup se očistí, je omráčen na {stunNormal} s a po dobu {boundNormal} s utrpí o {vulnerability} vyšší poškození. Jinak každý raider utrpí {unboundHitNormal} maximálního zdraví jako stínové poškození a on si ponechá o {unboundBonusNormal} vyšší poškození až do dalšího spoutání.",
+        "bindingSigilHeroicSummary": "Každých {everyHeroic} s vzplane pečeť starých ochran na jedné ze dvou plošin po stranách trůnu, {sideOffset} yardů vlevo nebo vpravo od místa, kde Nythraxis stál na začátku boje (z pohledu skupiny, strana se s každým sesláním střídá), a on začne Nesmrtelný vzestup, který mu každých {ascensionEvery} s přidá {ascensionHeroic} poškození a rychlost útoku. Pokud do {bindHeroic} s stojí na pečeti, je spoután: Vzestup se očistí, je omráčen na {stunHeroic} s a po dobu {boundHeroic} s utrpí o {vulnerability} vyšší poškození. Jinak každý raider utrpí {unboundHitHeroic} maximálního zdraví jako stínové poškození a on si ponechá o {unboundBonusHeroic} vyšší poškození až do dalšího spoutání.",
         "bindingSigilResponse": "Tank okamžitě přetáhne Nythraxise na pečeť, i přes oheň, který raid zanechal. Bojovníci nablízko sledují přesun a bojovníci na dálku zůstávají mimo nový kužel Hrobobijce. Všichni do něj pálí, dokud je spoután.",
         "raiseFallenName": "Pozvednutí padlých",
         "raiseFallenSummary": "Každých {every} s během Trůnu Nythraxis pozvedá za sebou Povstalé královské stráže. Vrhají se na jeho aktuální cíl a bojují, dokud nejsou zničeny.",
@@ -2945,14 +3123,6 @@ export const cs_CZ: EnTranslations = {
         "soulRendSummary": "Nythraxis označí {marksNormal} raiderů mimo svůj aktuální cíl Trháním duše. Po {fuse} s každá značka způsobí plné maximální zdraví svého nositele jako stínové poškození, rozdělené počtem označených raiderů v dosahu {range} yardů od něj.",
         "soulRendHeroicSummary": "Nythraxis označí {marksHeroic} raiderů mimo svůj aktuální cíl Trháním duše. Po {fuse} s každá značka způsobí {damageHeroic} maximálního zdraví svého nositele jako stínové poškození, rozdělené počtem označených raiderů v dosahu {range} yardů od něj. Značka, která se vyhodnotí o samotě, je smrtící.",
         "soulRendResponse": "Každý označený raider běží na jedno místo ke shromáždění a postaví se do {range} yardů od ostatních značek před koncem odpočtu {fuse} s. Léčitelé doléčí skupinu, než se značky vyhodnotí.",
-        "soulfireName": "Oheň duší",
-        "soulfireSummary": "Každý výbuch Trhání duše zanechá fialovou ohnivou kaluž s poloměrem {radius} yardů na místě, kde stála každá značka, která hoří {seconds} s a každou sekundu způsobuje {tickNormal} maximálního zdraví. Stání v překryvu kaluží způsobí tik z každé z nich. Kaluže nikdy nevzniknou do {clearance} yardů od ochranného kamene.",
-        "soulfireHeroicSummary": "Každý výbuch Trhání duše zanechá jednu kaluž fialového ohně s poloměrem {radius} yardů za každou seskupenou skupinu značek, která hoří {secondsHeroic} s a každou sekundu způsobuje {tickHeroic} maximálního zdraví. Stání v překryvu kaluží způsobí jen jeden tik, nikdy nasčítané kopie. Kaluže nikdy nevzniknou do {clearance} yardů od ochranného kamene.",
-        "soulfireResponse": "Jakmile značky vybuchnou, odejdi z fialové kaluže. Udrž další místo shromáždění čisté od aktivního ohně.",
-        "gravefireName": "Hrobový oheň",
-        "gravefireSummary": "Každých {everyNormal} s vyběhne od Nythraxise k raiderovi linie fialového hrobového ohně, která každou sekundu roste o {speed} yardů až na {length} yardů. Každý yard hoří {burnNormal} s a každou sekundu způsobuje {tickNormal} maximálního zdraví každému, kdo v něm stojí.",
-        "gravefireHeroicSummary": "Každých {everyHeroic} s vyběhne od Nythraxise k raiderovi linie fialového hrobového ohně, která každou sekundu roste o {speed} yardů až na {length} yardů. Každý yard hoří {burnHeroic} s a každou sekundu způsobuje {tickHeroic} maximálního zdraví každému, kdo v něm stojí.",
-        "gravefireResponse": "Ustup stranou, jak linie přichází: je úzká a nikdy nezatáčí. Raideři na dálku se drží v pohybu místo stání na místě.",
         "deathlessRageName": "Nesmrtelné běsnění",
         "deathlessRageSummary": "Každých {every} s Nythraxis sesílá Nesmrtelné běsnění po dobu {cast} s. Během sesílání může každý rozsvícený ochranný kámen kanalizovat jeden raider po dobu {channel} s. Pokud tři různí raideři každý dokončí svůj ochranný kámen před koncem sesílání, běsnění se přeruší a Nythraxis je omráčen na {stun} s. Jinak každý raider utrpí {damageNormal} maximálního zdraví jako stínové poškození.",
         "deathlessRageHeroicSummary": "Každých {every} s Nythraxis sesílá Nesmrtelné běsnění po dobu {cast} s. Během sesílání může každý rozsvícený ochranný kámen kanalizovat jeden raider po dobu {channel} s. Pokud tři různí raideři každý dokončí svůj ochranný kámen před koncem sesílání, běsnění se přeruší a Nythraxis je omráčen na {stun} s. Jinak každý raider utrpí {damageHeroic} maximálního zdraví jako stínové poškození, což žádný fond zdraví nepřežije.",
@@ -2961,11 +3131,11 @@ export const cs_CZ: EnTranslations = {
         "courtSummary": "Na Heroic Nythraxis po každém Nesmrtelném běsnění, přerušeném i nepřerušeném, pozvedne svůj dvůr, jakmile předchozí dvůr padl. Duch Aldrena zasáhne Královským sekem vše poblíž svého cíle. Duch Malrica sesílá Malricovo léčení, které každým sesláním léčí Nythraxise víc. Duch Vosse ignoruje provokace a loví raid.",
         "courtResponse": "Tankové převezmou Aldrena a otočí jeho štěpný útok pryč od raidu. Omračte nebo umlčte Malrica hned, jak začne Malricovo léčení, a zabijte ho jako prvního; potom zakořeňte nebo omračte Vosse mimo léčitele, protože se nedá vyprovokovat, a dorazte ho jako dalšího.",
         "kingsWrathName": "Králův hněv",
-        "kingsWrathSummary": "Nythraxis způsobuje o {bonusNormal} vyšší poškození na Normal nebo o {bonusHeroic} na Heroic po zbytek boje. Hrobová erupce nastává každých {eruptionEveryNormal} s ({eruptionEveryHeroic} na Heroic) a Hrobový oheň každých {gravefireEveryNormal} s ({gravefireEveryHeroic} na Heroic).",
+        "kingsWrathSummary": "Nythraxis způsobuje o {bonusNormal} vyšší poškození na Normal nebo o {bonusHeroic} na Heroic po zbytek boje. Hrobová erupce nastává každých {eruptionEveryNormal} s ({eruptionEveryHeroic} na Heroic).",
         "kingsWrathResponse": "Použijte zbývající obranné cooldowny na nevyhnutelné poškození. Udržte všechny dřívější mechaniky čisté, zatímco raid dokončuje boj.",
         "boneStormName": "Kostěná bouře",
-        "boneStormSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyNormal} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlNormal} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamNormal} maximálního zdraví. {spikeAt} s po začátku bouře sesílá Kostěný bodec a Hrobobijec se znovu připraví {rearm} s po jejím konci.",
-        "boneStormHeroicSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyHeroic} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlHeroic} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamHeroic} maximálního zdraví. {spikeAt} s po začátku bouře sesílá Kostěný bodec a Hrobobijec se znovu připraví {rearm} s po jejím konci.",
+        "boneStormSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyNormal} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlNormal} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamNormal} maximálního zdraví. První úder každé bouře místo toho zasáhne za {openingSlamNormal}. Hrobobijec se znovu připraví {rearm} s po jejím konci.",
+        "boneStormHeroicSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyHeroic} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlHeroic} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamHeroic} maximálního zdraví. První úder každé bouře místo toho zasáhne za {openingSlamHeroic}. Hrobobijec se znovu připraví {rearm} s po jejím konci.",
         "boneStormResponse": "Rozestupte se a nepřestávejte před Nythraxisem utíkat. Označený raider běží pryč, zatímco všichni ostatní nechají kolem trasy výpadu místo; tankové ho po konci bouře znovu převezmou.",
         "crownEnduresName": "Koruna vytrvá",
         "crownEnduresSummary": "V {enrageNormal} s od začátku boje (hodiny se zastaví, když bratr Aldric vstoupí při 70%) se Koruna vytrvá spustí jako tvrdé rozzuření. Nythraxis získá o {damage} vyšší poškození a o {haste} rychlejší útoky, poté každých {rampEveryNormal} s další {rampStep} poškození. Není zde žádná časová lišta. Varování přicházejí jako výkřiky při {warn60}, {warn30} a {warn10} s do konce.",
@@ -3016,6 +3186,7 @@ export const cs_CZ: EnTranslations = {
       "elementalConvergencePrimed": "Tvoje příští kouzlo z jiné živlové školy udělí Živlovou konvergenci",
       "hunterFerocity": "{stacks} Zuřivosti smečky: tvůj společník způsobuje o {pct}% větší poškození",
       "cooldownCap": "Využito {used} z {cap} s snížení doby obnovy v tomto okně",
+      "bruinRushWindow": "Vlčí podoba nestojí manu a přišpendlí cíl tvého Medvědího výpadu, čímž ho zpomalí o {pct} % na {sec} s",
       "funeralHarvestLock": "Funeral Harvest zatím nemůže vytvořit další Úlomek duše",
       "leadenHexLock": "Olověná kletba tento cíl zatím nemůže znovu zakořenit",
       "forbiddenReflectionReady": "Tvou příští způsobilou schopnost černokněžníka lze seslat znovu i mimo dobu obnovy",
@@ -3063,7 +3234,7 @@ export const cs_CZ: EnTranslations = {
       "coldsightRead": "Tvůj příští Dlouhý nátah způsobí o {longDrawPct}% vyšší poškození, nebo tvůj příští Padlý výstřel o {fellShotPct}% vyšší",
       "duskEconomy": "Schopnosti stojí o {pct}% méně energie",
       "moontide": "Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá",
-      "oldBlood": "Stará krev: stupeň {stacks} z {max}. Zasažené vlčí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí",
+      "oldBlood": "Stará krev: stupeň {stacks} z {max}. Zasažené kočičí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí",
       "verdance": "Zeleň {stacks}/{max}. Každý NOVĚ zasazený Divoký květ nebo Druhý květ přidá 1. Při {max} se Rychlé zhojení mění v Překvět",
       "freeExecute": "Tvá příští způsobilá dorážecí schopnost nic nestojí",
       "resourceSap": "Obnoví {value} tvého aktuálního zdroje každých {interval} s",
@@ -3128,7 +3299,7 @@ export const cs_CZ: EnTranslations = {
       "elementalTrance": "Utrpěné poškození sníženo o {pct} %. {mana} % veškerého způsobeného poškození se mění v manu",
       "stealth": "Skrytí; rychlost pohybu snížena o {pct} %",
       "formBear": "Medvědí podoba: zvýšené zdraví a brnění",
-      "formCat": "Vlčí podoba: poškození na blízko a energie",
+      "wolfForm": "Kočičí podoba: poškození na blízko a energie; rychlost pohybu zvýšena o {pct} %",
       "formTravel": "Cestovní podoba: rychlost pohybu zvýšena o {pct} %",
       "formFireball": "Žárová podoba: rychlost pohybu zvýšena o {pct} %; útoky a kouzla jsou zakázány",
       "formMoonkin": "Podoba měsíčního křídla: poškození kouzel zvýšeno o {pct} % a brnění zvýšeno o {armorPct} %",
@@ -3217,7 +3388,30 @@ export const cs_CZ: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "PRYČ",
       "cheaterTag": "< Podvodník >",
-      "pledgeTag": "Přísaha cechu {guild}"
+      "pledgeTag": "Přísaha cechu {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Dražitel",
+        "banker": "Bankéř",
+        "riftForgemaster": "Rift Forgemaster",
+        "cardMaster": "Mistr karty",
+        "crucibleQuartermaster": "Ubytovatel v Crucible",
+        "heroicQuartermaster": "Hrdinný ubytovatel",
+        "pvpVendor": "Prodejce PvP",
+        "weaponsmithTrainer": "Trenér kovářství",
+        "cookingTrainer": "Trenér vaření",
+        "tailoringTrainer": "Trenér krejčovství",
+        "engineeringTrainer": "Trenér inženýrství",
+        "leatherworkingTrainer": "Trenér práce s kůží",
+        "alchemyTrainer": "Trenér alchymie",
+        "weaponVendor": "Prodejce zbraní",
+        "armorVendor": "Prodejce brnění",
+        "armsDealer": "Obchodník se zbraněmi",
+        "foodVendor": "Prodejce jídla a pití",
+        "potionVendor": "Prodejce lektvarů",
+        "stableMaster": "Mistr stáje",
+        "generalGoods": "Obecné zboží"
+      }
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -3236,6 +3430,7 @@ export const cs_CZ: EnTranslations = {
       "lock": "Zamknout rám hráče"
     },
     "partyFrames": {
+      "header": "Strana",
       "section": "Rámečky skupiny a raidu",
       "optionsSection": "Možnosti rámečků skupiny",
       "unlock": "Přesunout rámečky skupiny a raidu",
@@ -3410,6 +3605,15 @@ export const cs_CZ: EnTranslations = {
         "socketReplaced": "Zasunutý drahokam do {name}; {gem} byl zničen."
       }
     },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+    },
     "itemTooltip": {
       "requiresLevel": "Vyžaduje úroveň {level}",
       "riftTier": "Trhlinový předmět stupně {tier}",
@@ -3446,10 +3650,15 @@ export const cs_CZ: EnTranslations = {
       "unrecordedSigned": "Bez zaznamenaného sběrače, podepsal(a) {name}",
       "quantityAria": "Kusy ze zdroje {source}, až {count}",
       "decreaseAria": "Snížit počet kusů ze zdroje {source}",
-      "increaseAria": "Zvýšit počet kusů ze zdroje {source}"
+      "increaseAria": "Zvýšit počet kusů ze zdroje {source}",
+      "decreaseByAria": "Snížit počet kusů ze zdroje {source} o {count}",
+      "increaseByAria": "Zvýšit počet kusů ze zdroje {source} o {count}",
+      "moveAll": "Přesunout všechny kusy",
+      "fits": "Nyní se vejde až {units}"
     },
     "materialHint": {
       "fineGrade": "Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.",
+      "fineFarmGrade": "Dobrá známka. Některé výběry sklizně vyjdou dobře, častěji při vyšších dovednostech Farming nebo s nabitým Artisan's Eye. Běžné produkty se nikdy nepočítají tam, kde je vyžadována vysoká kvalita.",
       "cookingCatch": "Kuchařská ingredience. Před snědením ji musíš uvařit.",
       "usedBy": "Používá se v: {crafts}.",
       "arcaneDust": "Výrobní činidlo. Získává se rozčarováním běžné a neobvyklé výbavy.",
@@ -3734,6 +3943,15 @@ export const cs_CZ: EnTranslations = {
       "subtitle": "Cechy říše",
       "rosterTitle": "Zobrazit seznam členů cechu {guild}",
       "back": "Zpět",
+      "filters": "Filtry vývěsky",
+      "newPlayerFriendly": "Vhodné pro nové hráče",
+      "newPlayerFriendlyTitle": "Tato gilda vítá nové hráče",
+      "filterNewPlayersTitle": "Zobrazit jen gildy, které vítají nové hráče",
+      "filterEmpty": "Žádná gilda ještě neotevřela dveře novým hráčům.",
+      "showAll": "Zobrazit všechny gildy",
+      "officersOnline": "Důstojníci online",
+      "officersOnlineLabel": "Důstojníci online: {names}",
+      "officerEntry": "{name} ({rank})",
       "popupTitle": "Cechovní vývěska",
       "close": "Zavřít"
     },
@@ -3790,6 +4008,8 @@ export const cs_CZ: EnTranslations = {
       "withdrawQuantityTitle": "Vybrat {item}",
       "withdrawQuantityInput": "Množství k výběru",
       "withdrawQuantityConfirm": "Vybrat",
+      "quantityStepDownAria": "Snížit množství o {count}",
+      "quantityStepUpAria": "Zvýšit množství o {count}",
       "vaultRowWithdrawName": "Vybrat {item}",
       "priceChanged": "Cena se změnila, než se nákup dokončil. Zkontroluj aktualizovanou cenu a potvrď znovu.",
       "withdrawQuantityAction": "Množství k výběru: {item}",
@@ -3981,6 +4201,25 @@ export const cs_CZ: EnTranslations = {
       "lastSeenNever": "nikdy",
       "ignoredTab": "Ignorovaní",
       "blockedTab": "Zablokovaní",
+      "who": {
+        "tab": "SZO",
+        "searchPlaceholder": "Jméno, zóna nebo cech",
+        "search": "Vyhledávání",
+        "loading": "Ptát se sféry, kdo je online...",
+        "empty": "Žádný hráč neodpovídá.",
+        "count": "{total} online",
+        "countFiltered": "{shown} z {total} online",
+        "capped": "Zobrazuje se první {delivered}. Chcete-li zobrazit zbytek, zužte vyhledávání.",
+        "classFilter": "Filtrovat podle třídy",
+        "allClasses": "Všechny třídy",
+        "colStatus": "Postavení",
+        "colName": "Jméno",
+        "colLevel": "Úroveň",
+        "colClass": "Třída",
+        "colZone": "Zóna",
+        "colGuild": "Cech",
+        "sortTitle": "Seřadit podle {column}"
+      },
       "ignoredEmpty": "Nikoho neignoruješ.",
       "blockedEmpty": "Nikoho jsi nezablokoval.",
       "blockSearchPlaceholder": "Jméno hráče",
@@ -4020,7 +4259,6 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Sběr",
       "mining": "Těžba",
       "logging": "Dřevorubectví",
       "herbalism": "Bylinkářství",
@@ -4103,6 +4341,7 @@ export const cs_CZ: EnTranslations = {
           "farming": "Při sázení záhonu funguje z tvých brašen."
         },
         "speed": "Rychleji sbírá na nalezištích pod {tier}. úrovní.",
+        "wieldDegrade": "Pod touto dovedností stále funguje jako nástroj nižší úrovně.",
         "rodRequired": "Nutný k rybaření.",
         "rodBite": "Ryby zabírají až o {seconds} s dříve.",
         "rodReel": "Prodlužuje čas na navíjení o {seconds} s.",
@@ -4204,9 +4443,7 @@ export const cs_CZ: EnTranslations = {
       "noviceBody": "Dovednost Farmaření roste pokaždé, když sklidíš plodinu. Začni zasetím semene na libovolném záhonu."
     },
     "archetypeTitle": {
-      "label": "Titul",
-      "none": "Žádný",
-      "hobbyLabel": "Koníček"
+      "none": "Žádný"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardér",
@@ -4283,7 +4520,7 @@ export const cs_CZ: EnTranslations = {
       "enchant_lucent_infusion": "Zářivá infuze"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Zásahy zblízka, které zasáhnou cíl, ti mohou dát 50 Síly na 15 s a vyléčit 200 zdraví. Platí modifikátory léčení. Každý zásah má šanci 1 % za 0,6 s základní rychlosti úderu použité zbraně. Neexistuje interní cooldown. Každá ruka má vlastní bonus a opakované spuštění obnoví jeho trvání. Útoky na dálku tento efekt nespouštějí. Vlčí forma místo toho používá základní rychlost úderu 1 s."
+      "enchant_weapon_lastflame_zeal": "Zásahy zblízka, které zasáhnou cíl, ti mohou dát 50 Síly na 15 s a vyléčit 200 zdraví. Platí modifikátory léčení. Každý zásah má šanci 1 % za 0,6 s základní rychlosti úderu použité zbraně. Neexistuje interní cooldown. Obě ruce sdílejí jeden bonus; každé spuštění obnoví jeho trvání a bonus se nikdy nesčítá. Útoky na dálku tento efekt nespouštějí. Vlčí forma místo toho používá základní rychlost úderu 1 s."
     },
     "professions": {
       "title": "Profese",
@@ -4376,7 +4613,21 @@ export const cs_CZ: EnTranslations = {
       "hobbyLabel": "Hobby: {craft}",
       "majorsLabel": "Hlavní: {a} a {b}",
       "pairsHeld": "Držené páry: {count}",
-      "returnsLabel": "Vrácení: {count}"
+      "returnsLabel": "Vrácení: {count}",
+      "retentionFooter": "Návratnost: 60 % zachování dovednosti.",
+      "tutorialLink": "Profesní tutoriál"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Recepty",
+      "collapseHint": "Sbalit sledování receptů",
+      "expandHint": "Rozbalte nástroj pro sledování receptů",
+      "pin": "Kolík",
+      "unpin": "Odepnout",
+      "pinFull": "Sledovač receptů je plný (až {cap} receptů)",
+      "pinAria": "Připněte {name} k HUD trackeru",
+      "unpinAria": "Odepnout {name} z HUD trackeru",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "Výroba",
@@ -4408,9 +4659,11 @@ export const cs_CZ: EnTranslations = {
       "reagentLine": "{name} x{have}/{required}",
       "reagentFineSub": "(spotřebuje {count} jemné jakosti)",
       "reagentVaultDraw": "(čerpá {count} z tvého trezoru)",
+      "reagentOrdinaryHeld": "({name} zadrženo: {count}, ale zde se počítá pouze dobrá známka)",
       "vaultUnreachable": "Trezor materiálů je tady mimo dosah.",
       "craftFeeLine": "Poplatek za výrobu: {fee} za kus",
       "empty": "Zatím nejsou známy žádné recepty.",
+      "materialsFooter": "Materiály ve vašem trezoru se kreslí automaticky. Další recepty se dozvíte na stanici.",
       "resultAria": "Vyrobit {name}",
       "craftedToast": "Vyrobeno: {name}",
       "craftedToastQty": "Vyrobeno: {name} x{qty}",
@@ -4500,8 +4753,8 @@ export const cs_CZ: EnTranslations = {
       "attunedBanner": "Naladěno: {title}",
       "tierTutorial": {
         "title": "Tvoje první úroveň",
-        "tierCap": "Řemeslo dosáhne své první úrovně při dovednosti {skill} a každá úroveň zlepšuje, co dokáže vyrábět. Ale řemeslo překoná vzácnou práci jen tehdy, když je jedním z tvých dvou hlavních oborů.",
-        "radar": "Tvoje profese tvoří kolo. Nalaď se na sousední pár a tato dvě řemesla se stanou neomezenými hlavními obory, jedno řemeslo naproti na kole se stane koníčkem omezeným na vzácné, a ostatní leží dočasně neaktivní: jejich znalosti zachovány, ale omezeny na běžné, dokud je znovu nepoužiješ.",
+        "tierCap": "Řemeslo dosáhne své první úrovně při dovednosti {skill} a každá úroveň vylepšuje, co dokáže. Ale řemeslo proleze kolem vzácného díla pouze tehdy, když je jedním z vašich dvou majorů.",
+        "radar": "Vaše profese tvoří kolo. Nalaďte se na sousední pár a tato dvě řemesla se stanou hlavními obory bez omezení, jedno řemeslo napříč volantem se stane koníčkem se vzácnými omezeními a zbytek zůstane nečinný: jejich znalosti jsou zachovány, ale jsou omezeny na společné, dokud se o ně znovu nepustíte.",
         "masters": "Mistři řemesel ve městech nabízejí nalaďovací úkoly. Navstiv jednoho a kdykoli budeš připraven(a), zvol si svůj pár. Nic, co ses naučil(a), není nikdy ztraceno.",
         "dismiss": "Rozumím"
       },
@@ -4512,6 +4765,9 @@ export const cs_CZ: EnTranslations = {
       "commissionToggleHint": "Váže se na první postavu, která ho přijme v obchodu.",
       "commissionUnbound": "Zakázkový předmět: váže se na prvního příjemce",
       "commissionBound": "Zakázkový předmět: vázán na příjemce"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "Obchodník doplňuje zásoby běžného zboží; seznamy hráčů sedí vedle nich za jejich požadovanou cenu."
     },
     "itemMenu": {
       "use": "Použít",
@@ -4792,6 +5048,7 @@ export const cs_CZ: EnTranslations = {
       "roleDps": "Útočník",
       "freeRoles": "Vítány jsou libovolné role",
       "lockoutDaily": "Denní uzamčení na závěrečného bosse",
+      "lockoutWeekly": "Týdenní výluka na každého šéfa",
       "lockoutNone": "Žádné uzamčení",
       "lockedFor": "Uzamčeno přibližně na {minutes} min",
       "attunement": "Vyžaduje naladění: {quest}",
@@ -4805,6 +5062,8 @@ export const cs_CZ: EnTranslations = {
       "lootMaybe": "Může vypadnout nejvýše jeden z těchto předmětů:",
       "lootChance": "Dodatečné šance na kořist:",
       "lootHeroic": "Hrdinský bonus, vždy vypadne jedno z těchto:",
+      "lootHeroicMaybe": "Heroický bonus, nejvýše jeden z těchto může padnout:",
+      "lootHeroicChance": "Heroický bonus, další možné úlovky:",
       "pct": "{pct} %",
       "blockedLevel": "Pouze úrovně {min} až {max}",
       "blockedSpec": "Vyžaduje specializaci",
@@ -4866,19 +5125,43 @@ export const cs_CZ: EnTranslations = {
         "sealbreak_shockwave": "Rázová vlna zlomení pečeti (plošný výbuch)",
         "gravebreaker": "Rozbíječ hrobů (čelní kužel, otočte jej od raidu)",
         "raise_fallen": "Povstání padlých (periodické vlny přivolávek)",
-        "soul_rend": "Trhání duše (označení hráči se seskupí, pak opustí oheň)",
+        "soul_rend": "Trhání duše (označení hráči se seskupí, aby si rozdělili poškození)",
         "deathless_rage": "Nesmrtelný hněv (přerušen u ochranných kamenů)",
         "wardstones": "Kanály ochranných kamenů (přechod fáze)",
         "dread_curse": "Děsivá kletba (sčítající se oslabení pro střídání tanků, vystřídejte se při 2 stupních)",
-        "bone_spike": "Kostěný bodec (nabodnutí raideři slábnou, dokud není bodec zničen)",
+        "bone_spike": "Kostěný bodec (nabodnutí hráči ztrácejí zdraví, dokud někdo bodec pár zásahy neroztříští)",
         "grave_eruption": "Hrobová erupce (varovné kruhy, které zanechají hořící zem)",
         "binding_sigil": "Vazebná pečeť (přetáhni bosse na pečeť, jinak raid zaplatí)",
-        "gravefire": "Hrobový oheň (pohyblivá ohnivá linie, které je třeba uhnout)",
-        "soulfire": "Oheň duší (výbuchy Trhání duše zanechají hořící kaluže)",
         "kings_wrath": "Králův hněv (30%: trvalý bonus k poškození, rychlejší nebezpečí na podlaze)",
         "bone_storm": "Kostěná bouře (ignoruje hrozbu, víří a útočí na raid)",
         "crown_endures": "Koruna vytrvá (tvrdé rozzuření v 6:00, heroic 5:00)",
-        "deathless_court": "Nesmrtelný dvůr (jen heroic, královský dvůr povstane po Nesmrtelném běsnění)"
+        "deathless_court": "Nesmrtelný dvůr (jen heroic, královský dvůr povstane po Nesmrtelném běsnění)",
+        "bloodmane_rend": "Bloodmane Rend (krvácet, pozor na výměnu cíle)",
+        "tusk_sweep": "Tusk Sweep (čelní štěpení)",
+        "ancestral_sap": "Rodová míza (léčí své spojence)",
+        "call_of_the_hunt": "Call of the Hunt (urychluje blízké spojence)",
+        "thickhide_ward": "Thickhide Ward (štítí blízké spojence)",
+        "beast_pit_quake": "Beast Pit Quake (poškození oblasti)",
+        "wildheart_pulse": "Wildheart Pulse (poškození pulzující oblasti)",
+        "jaguar_roar": "Jaguar Roar (knockback)",
+        "brand_of_the_pyre": "Brand of the Pyre (skládání požární značky, smyjte ji ve vodě z potrubí)",
+        "forge_strike": "Forge Strike (stacking tank-swap debuff)",
+        "rain_of_cinders": "Rain of Cinders (tři ohnivé kužely, postavte se mezi ně)",
+        "falling_cinders": "Falling Cinders (meteorické kruhy na hráčích, jděte ven)",
+        "revolving_inferno": "Revolving Inferno (rotující ohnivé paprsky, pohyb skrz mezery)",
+        "forge_wave": "Forge Wave (rozšiřující se protipožární zeď, použijte dva bezpečné pruhy)",
+        "apocalypse_add": "Ignivar Ashcaller (prioritní přidání casting Apocalypse, zabijte to rychle)",
+        "judgment_of_the_forge": "Judgment of the Forge (přestávka, sdílejte jediné bezpečné útočiště)",
+        "last_inferno": "Last Inferno (45sekundové vypálení při 20% zdraví)",
+        "chains_of_the_forge": "Chains of the Forge (pouze hrdinské, zůstaňte blízko svého propojeného partnera)",
+        "makers_brand": "Značka výrobce (stacking tank-swap debuff)",
+        "forgefathers_sweep": "Forgefather's Sweep (široký čelní kužel u tanku bez nádrže)",
+        "tempering_ray": "Tempering Ray (čára k označenému hráči, zachyťte jej)",
+        "cinder_orbs": "Cinder Orbs (označení hráči se rozprostírají na okraje místnosti)",
+        "forgestorm": "Forgestorm (padající meteorické kruhy, jděte pryč)",
+        "shared_pyre": "Shared Pyre (sběrný kruh, rozdělení poškození)",
+        "anvils_decree": "Dekret kovadliny (tři údery kladivem po celém nájezdu, uzdravení)",
+        "masters_assembly": "Master's Assembly (zablokujte kovářské nosníky, otočte blokátory)"
       }
     },
     "cosmetics": {
@@ -4899,6 +5182,8 @@ export const cs_CZ: EnTranslations = {
       "applied": "Použito",
       "owned": "Vlastněno",
       "storeOnly": "Dostupné v obchodě WOC",
+      "preview": "Náhled",
+      "previewAria": "Náhled {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "Vzhled jezdeckého zvířete se vykreslí přes zvíře, na kterém tato postava jede. Nikdy nemění rychlost.",
       "mountsNoMount": "Nejprve si pořiď jezdecké zvíře, vzhled potřebuje něco, na čem se dá jezdit.",
@@ -4947,6 +5232,10 @@ export const cs_CZ: EnTranslations = {
       "ownedTooltipStatus": "Zkatalogizováno v Relikviáři",
       "missingTooltipStatus": "Dosud nenalezeno",
       "firstFindClears": "Poprvé nalezeno při průchodu {count}",
+      "foundBy": "Nalezli: {names}",
+      "finderWithDate": "{name} ({date})",
+      "sharedScopeNote": "Sdíleno všemi postavami na tvém účtu",
+      "sharedScopeHint": "Relikvie, kterou najde kterákoli postava na tvém účtu, vyplní stránku i zde.",
       "unlockToast": "Relikvie zkatalogizována: {name}",
       "illuminateBanner": "Stránka iluminována: {name}",
       "illuminateToast": "Všechny relikvie na stránce {name} jsou vyplněné.",
@@ -5080,6 +5369,10 @@ export const cs_CZ: EnTranslations = {
       "progressAria": "Postup: {current} z {target}",
       "renownChip": "Věhlas: {renown}",
       "earnedDate": "Vykonáno {date}",
+      "earnedBy": "Vykonali: {names}",
+      "earnerWithDate": "{name} ({date})",
+      "accountScopeNote": "Sdíleno všemi postavami na tvém účtu",
+      "accountScopeHint": "Skutek, který vykoná kterákoli postava na tvém účtu, se započítá i zde a Kniha uvádí, kdo ho vykonal.",
       "featRibbon": "Počin",
       "hiddenBadge": "Skrytý",
       "titleChip": "Odměna: titul",
@@ -5129,6 +5422,33 @@ export const cs_CZ: EnTranslations = {
       "toggleAria": "Přepnout mezi mapou světa, mapou oblasti a mapou instance",
       "levels": "Úrovně {min} až {max}"
     },
+    "mapAtlas": {
+      "level": "Úroveň {level}",
+      "landmarkCount": "{count} památek",
+      "filtersAria": "Mapové vrstvy",
+      "filters": {
+        "quests": "Úkoly",
+        "gather": "Shromáždit",
+        "dungeons": "Dungeony",
+        "services": "Služby",
+        "players": "Hráči"
+      },
+      "trackedQuests": "Sledované questy",
+      "noTrackedQuests": "Žádné sledované questy",
+      "availableNearby": "K dispozici v blízkosti",
+      "noNearbyQuests": "Žádné blízké questy",
+      "distance": "{distance} yardů",
+      "showRoute": "Zobrazit trasu",
+      "untrack": "Untrack",
+      "track": "Dráha",
+      "legend": {
+        "dungeon": "Žalář",
+        "ore": "Ruda",
+        "herb": "Bylina",
+        "mail": "Mail",
+        "passage": "Průchod"
+      }
+    },
     "arenaGate": {
       "minLevelNote": "Vyžaduje úroveň {level}"
     },
@@ -5147,6 +5467,7 @@ export const cs_CZ: EnTranslations = {
       "tabBrowse": "Procházet",
       "tabSell": "Prodat",
       "tabActivity": "Moje aktivity",
+      "tabHistory": "Historie prodeje",
       "tabsLabel": "Sekce Burzy $WOC",
       "loading": "Načítání Burzy…",
       "loadFailed": "Burzu se nepodařilo spojit. Zkus to znovu za chvíli.",
@@ -5171,6 +5492,16 @@ export const cs_CZ: EnTranslations = {
       "colCurrentBid": "Aktuální příhoz",
       "colBuyNow": "Koupit ihned",
       "colTimeLeft": "Zbývající čas",
+      "colBuyer": "Kupující",
+      "colSoldAt": "Prodáno",
+      "colSalePrice": "Prodejní cena",
+      "colSaleType": "Typ",
+      "saleTypeAuction": "Aukce",
+      "saleTypeBuyNow": "Kup teď",
+      "saleTypeDirected": "Režie",
+      "saleTypeUnknown": "Neznámý",
+      "historyEmpty": "Dosud nebyly zaznamenány žádné tržby.",
+      "historyError": "Historii prodejů nelze načíst.",
       "reserveMet": "Rezerva splněna",
       "reserveNotMet": "Rezerva nesplněna",
       "yourListing": "Tvá nabídka",
@@ -5843,6 +6174,7 @@ export const cs_CZ: EnTranslations = {
       "deeds": "Kniha skutků",
       "reliquary": "Relikviář",
       "sheathe": "Zasunout/Vytasit zbraň",
+      "hideInterface": "Skrýt rozhraní (snímky obrazovky a videa)",
       "crafting": "Výroba",
       "mount": "Nasednout / Sesednout",
       "calendar": "Kalendář událostí",
@@ -5872,6 +6204,8 @@ export const cs_CZ: EnTranslations = {
       "attackMove": "Útočný pohyb (jen po zapnutí této možnosti)",
       "meters": "Měřiče (poškození, léčení a hrozba)",
       "petMark": "Mazlíček: Zacílit, vybere tvého vlastního mazlíčka (stejné jako kliknutí na jeho rámeček)",
+      "targetSelf": "Zaměřte se na sebe",
+      "targetParty": "Zacilte na členy skupiny 1 až 9, shora dolů, jak je ukazují snímky skupiny",
       "onBarBinding": "Vazbu můžeš nastavit i přímo z lišty: zvol Upravit klávesy akční lišty v panelu Klávesové zkratky, pak klikni na slot na živé liště a stiskni klávesu, kterou chceš. Až budeš hotov(a), klikni na Hotovo. Tohle funguje jen na desktopu, protože to potřebuje fyzickou klávesnici.",
       "clickMoveNote": "Kliknutím k pohybu je vypnuté, dokud ho nezapneš: otevři panel Klávesové zkratky v herním menu, zapni Kliknutím k pohybu, a pak pomocí řádku Tlačítko pohybu kliknutím pod ním vyber, které tlačítko myši chození ovládá (výchozí je levé kliknutí, nebo pravé kliknutí). Jakmile je zapnuté, kliknutí na místo na zemi tě tam vyšle chůzí, se značkou na zemi ukazující, kam míříš. Kliknutí na bytost nebo jiného hráče tě k nim dojde a zastaví se v dosahu, přičemž kliknutí pořád plní svou obvyklou roli zacílení nebo interakce; pokud už jsi dost blízko na to, na co jsi klikl(a), prostě jen provedeš interakci a zůstaneš na místě. Kterákoli z pohybových kláves převezme kontrolu zpět a cestu ukončí, stejně jako podržení tlačítka myši pro rozhlížení. Skákání ne, takže cestou pokračuješ i přes skok, a otevření herního menu cestu jen pozastaví, a ta pokračuje po zavření menu."
     },
@@ -5926,6 +6260,7 @@ export const cs_CZ: EnTranslations = {
       "rowBrightness": "Expozice scény, tmavší nebo světlejší. Čistě podle chuti.",
       "rowWeather": "Ambientní déšť a sníh. Jen atmosféra, vypnutí při bouřích trochu ušetří.",
       "rowBrowserEffects": "Jak efektní smí být samotné rozhraní: skleněné rozmazání, záře, animovaná menu. Auto odpovídá prohlížeči; 3D svět zůstává beze změny.",
+      "rowFrameRateCap": "A ceiling on how many images the game draws each second. A computer that cannot keep up with its display lands on an uneven rhythm; a steady 30 looks smoother than that, halves the work, and keeps the computer cooler. Display means no limit.",
       "rowTerrainDetail": "Bohaté, míchané textury země oproti jednoduššímu a rychlejšímu terénu.",
       "rowFoliageDensity": "Jak daleko a jak hustě roste tráva kolem postavy.",
       "rowEffectsQuality": "Bloom, ambientní okluze a kolik pochodní a kouzel vrhá skutečné světlo. Největší jednotlivá úspora mezi detailními regulátory a spínač, na kterém ostatní regulátory osvětlení závisí.",
@@ -5933,7 +6268,7 @@ export const cs_CZ: EnTranslations = {
       "rowFrostedPanels": "Rozmazané matné sklo za okny. Hezké, a přesně ten druh efektu, který slabší prohlížeč cítí; nech vypnuto pro klasicky ostrý vzhled.",
       "rowReduceMotion": "Odstraní animace rozhraní, takže okna se objeví okamžitě. Nejdřív přístupnost, k tomu malý výkonový bonus.",
       "rowPerfOverlay": "Údaj na obrazovce s FPS, časem snímku a dalšími hodnotami. Zapni ho při ladění této stránky a potom ho zase skryj.",
-      "tableFoot": "Hledáš strop FPS? Není co hledat: tempo snímků se řídí tvým displejem. Vzdálenost vykreslování je vlastní regulátor, Dohled, v kartě Detail světa, a každé přednastavení ji za tebe nastaví, dokud s ní sám nepohneš.",
+      "tableFoot": "Vzdálenost vykreslování je vlastní regulátor, Dohled, v kartě Detail světa, a každé přednastavení ji za tebe nastaví, dokud s ní sám nepohneš.",
       "mobileTitle": "Na telefonech a tabletech",
       "mobileBody": "Na telefonu nebo tabletu tě hra spustí na Low. Každé dotykové zařízení tam při prvním spuštění přistane, záměrně, abys vstoupil do světa a hrál; zvedni si to sám z panelu Grafika, kdykoli chceš. V prohlížeči na Androidu máš celý žebřík otevřený a tvá volba drží. Na iPhonu a iPadu si nejvyšší přednastavení pořád můžeš vybrat a zaberou, jakmile stiskneš Použít, ale hra tě při příštím spuštění vrátí na High, protože iOS může kartu ukončit, zatímco se tak velká scéna staví. Stažená aplikace je ještě přísnější: její seznam přednastavení končí na High a jednotlivé systémové regulátory jsou skryté, protože si je aplikace spravuje sama.",
       "touchBody": "Na dotykové obrazovce panelu Grafika přibude vlastní karta Dotykové ovládání: velikost a mrtvá zóna joysticku, velikost tlačítek na obrazovce, průhlednost ovládání, volitelná kamerová páčka, zrcadlené rozvržení pro leváky a obrácený dotykový rozhled, aby se obrazovka přizpůsobila tvým rukám, a ne naopak.",
@@ -6009,7 +6344,8 @@ export const cs_CZ: EnTranslations = {
       "ifLockBars": "Uzamkne tvé lišty, abys omylem nevytáhl schopnost ze slotu.",
       "keybindsHeading": "Panel Klávesové zkratky",
       "keybindsBody": "Seznam kláves je jen polovina tohoto panelu. Nad ním sedí přepínače, které rozhodují, jak myš ovládá hru: kamera myší, jestli se kurzor při otáčení uzamkne, kliknutím k pohybu a které tlačítko myši ho spouští, útok pohybem, rozvržení pro leváky na dotyku a filtr vulgarit pro chat.",
-      "keybindsMouseBody": "Dvě věci se tam snadno přehlédnou. Tlačítka myši se váží jako klávesy, takže kliknutí kolečkem i palcová tlačítka mohou nést schopnosti, zatímco levé a pravé tlačítko zůstávají vyhrazená kameře a klikání do světa. A vázat můžeš rovnou z akční lišty: zapni si tu režim vázání přímo na liště, pak klikni na slot a stiskni klávesu, kterou chceš."
+      "keybindsMouseBody": "Dvě věci se tam snadno přehlédnou. Tlačítka myši se váží jako klávesy, takže kliknutí kolečkem i palcová tlačítka mohou nést schopnosti, zatímco levé a pravé tlačítko zůstávají vyhrazená kameře a klikání do světa. A vázat můžeš rovnou z akční lišty: zapni si tu režim vázání přímo na liště, pak klikni na slot a stiskni klávesu, kterou chceš.",
+      "keybindsWheelBody": "Samotné kolo také vázne. Zoom Camera In a Zoom Camera Out jsou obyčejná vázání, která ve výchozím nastavení sedí na holém kolečku, takže je můžete přesunout na Ctrl plus kolečko nebo na klávesy a pak otáčením uvolněného kolečka spouštět sloty akční lišty. Zářez kola nemá žádné uvolnění, takže nemůže řídit drženou akci, jako je pohyb vpřed."
     },
     "combat": {
       "intro": "Boj se řídí známými pravidly klasických MMO. Nemusíš je studovat, abys hrál dobře, tady je jen tvar toho, jak souboje fungují.",
@@ -6030,7 +6366,7 @@ export const cs_CZ: EnTranslations = {
       "deathTitle": "Když padneš",
       "deathBody": "Když ti zdraví klesne na nulu, padneš tam, kde stojíš, a tvé tělo tam zůstane. Propusť ducha a povstaneš jako duch na nejbližším hřbitově: rychlejší na nohou než živí, mimo dosah svých nepřátel, ale neschopný bojovat, lootovat nebo s kýmkoli mluvit, kromě Bledého strážce vznášejícího se nad kameny. Odtud se rozhoduješ. Doběhni duchem zpět ke svému tělu a oživíš se na místě s obnovenou částí zdraví a many a zcela bez postihu. Nebo přijmi od Bledého strážce okamžité vzkříšení tam, kde jsi, za cenu Strážcova mýta: dočasného oslabení všeho, čím jsi, které trvá tím déle, čím jsi zkušenější, a úplně nové postavy zcela míjí. Padneš-li uvnitř dungeonu, tvůj duch čeká na hřbitově venku; projdi duchem zpět dveřmi a oživíš se u vchodu. Výpravy jsou výjimkou: padneš-li tam, prostě tě to postaví zpět na nohy u vchodu do výpravy, druhý pád ale běh ukončí. Ať tak či onak, nepřijdeš o žádné zkušenosti, výbavu ani mince. Mezi boji si sedni k jídlu a pití, ať další začneš v plné síle.",
       "threatTitle": "Koho napadá nepřítel",
-      "threatBody": "Každý nepřítel si vede soukromý seznam toho, kdo ho nejvíc naštval. Přidává se k němu poškození, ale i léčení: léčení uvalí hrozbu na nepřátele, kteří už bojují s vyléčeným hráčem, rozdělenou mezi ně, takže nejbezpečnější je léčit toho, koho už drží tank. Tankové zapínají krytý postoj nebo ochrannou podobu, která znásobí všechnu hrozbu, kterou vytvářejí, zatímco druidova Vlčí podoba hrozbu naopak shazuje, a provokace vynese sesilatele rovnou na vrchol seznamu a připoutá k němu nepřítele na několik sekund. Nepřátelé nepřepnou cíl v okamžiku, kdy ho někdo předběhne: k odtržení je potřeba jasný náskok, a na dálku větší než na blízko, takže trocha trpělivosti na začátku pullu udrží boj tam, kam patří.",
+      "threatBody": "Každý nepřítel si vede soukromý seznam toho, kdo ho nejvíc naštval. Přidává se k němu poškození, ale i léčení: léčení uvalí hrozbu na nepřátele, kteří už bojují s vyléčeným hráčem, rozdělenou mezi ně, takže nejbezpečnější je léčit toho, koho už drží tank. Tankové zapínají krytý postoj nebo ochrannou podobu, která znásobí všechnu hrozbu, kterou vytvářejí, zatímco druidova Kočičí podoba hrozbu naopak shazuje, a provokace vynese sesilatele rovnou na vrchol seznamu a připoutá k němu nepřítele na několik sekund. Nepřátelé nepřepnou cíl v okamžiku, kdy ho někdo předběhne: k odtržení je potřeba jasný náskok, a na dálku větší než na blízko, takže trocha trpělivosti na začátku pullu udrží boj tam, kam patří.",
       "hazardsTitle": "Voda tě může zabít",
       "breathBody": "Hluboká voda se dá plavat a můžeš se pod ni potopit. Dokud máš hlavu pod hladinou, nahoře na obrazovce se objeví modrý ukazatel dechu a vyprazdňuje se; vynoř se a doplní se mnohem rychleji, než se vyprázdnil. Necháš-li ho vyprázdnit pod vodou, začneš se topit a každou sekundu ztrácíš kus zdraví, dokud se nedostaneš k vzduchu, tak na dlouhém ponoru hlídej ukazatel. Smrt ho vynuluje, takže doběh k tělu vždy začíná s plnými plícemi.",
       "fatigueBody": "Moře nemá žádnou hradbu. Přechody, které svět počítá s tím, že přeplaveš, úžiny a jezera mezi jedním kusem pevniny a druhým, i vnitrozemská jezera, jsou bezpečné přeplavat, ať trvají jakkoli dlouho. Vydej se místo toho od pobřeží do opravdu otevřeného moře a začne to podlamovat tvé síly: objeví se varování, dostaneš skutečné okno na to se otočit, a poté ti moře působí stále těžší poškození, kterému nic nezabrání, dokud nezamíříš zpátky k zemi. Utop se nebo se tak daleko od pobřeží vyčerpej a propustíš ducha stejně jako při jakékoli jiné smrti, takže obzor ber jako kulisu, ne jako cíl.",
@@ -6038,6 +6374,7 @@ export const cs_CZ: EnTranslations = {
       "allyRezBody": "Nemusíš se vždycky vracet pěšky. Spojenec s vzkřisujícím kouzlem tě může místo toho vzkřísit, a přijde to k tobě jako výzva, kterou přijmeš nebo odmítneš; necháš-li ji ležet, vyprší, tak na ni odpověz, dokud tam je. Přijmi a povstaneš vedle přítele, který tě vzkřísil, s částí zdraví a many zpět. Někteří léčitelé dokážou nabídnout vzkříšení celé padlé skupině najednou, ačkoli každý z vás pak odpovídá na vlastní výzvu. Thornhollowská pole jsou výjimkou: tam k tobě žádné vzkřisující kouzlo nedosáhne a čekáš na další vlnu svého týmu.",
       "unstuckTitle": "Když jsi opravdu zaseknutý(á)",
       "unstuckBody": "Pokud tě svět někam uvězní a nemůžeš se odtamtud dostat, napiš /unstuck. Musíš být mimo boj a stát na místě, nesmíš být držen omráčením ani zakořeněním a nesmíš být v duelu ani v zápase arény: proběhne krátké odpočítávání a pohyb nebo utrpěné zranění ho zruší. Po jeho konci tě to postaví na nejbližší hřbitov. Nikdy tě to nezabije a nezanechá to žádné tělo, a pokud jsi už předtím padl(a), místo toho tě to tam oživí. Cena je Nemoc z vyproštění, dočasné oslabení všeho, čím jsi, které odezní dřív, než bys mohl(a) příkaz použít znovu, a stejně jako Strážcovo mýto se úplně vyhýbá zbrusu novým postavám.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Jak se vytáhnout na okraj",
       "climbBody": "Římsy nejsou zdi. Skoč na něco příliš vysokého na to, aby ses na to jen tak vyšplhal, a tvá postava se blízko vrcholu skoku zachytí okraje a vytáhne se nahoru, aniž bys pro to musel mačkat vlastní klávesu. Cokoli dost nízkého na to, abys to překonal sám, proběhne bez cavyků; celé vytažení je vyhrazeno pro okraje nad hlavou tvé postavy. Je krátké a po dobu, kdy probíhá, přebírá otěže, takže ho v půlce nemůžeš vyrušit. Omráčení tě zastihne uprostřed vytahování a ty pustíš a spadneš, měřeno od místa, kde skok opustil zem, a omráčení nebo zakořenění zabrání vytažení vůbec začít, což stojí za zapamatování, když se snažíš dostat ze špatného místa v boji."
     },
@@ -6061,8 +6398,9 @@ export const cs_CZ: EnTranslations = {
       "framePetBody": "Lovci, černokněžníci a kdokoli další s venku vypuštěným mazlíčkem dostane vedle svého vlastního rámu i malý rám pro něj, se jménem, úrovní a zdravím. Kliknutím na tento rám vybereš svého mazlíčka, totéž z klávesnice udělá Ctrl+6.",
       "framesMoveBody": "Tvůj rám, rám tvého cíle i rámy tvé skupiny se dají přesouvat. Každý má v rohu malé tlačítko na přesun: odemkni ho, přetáhni rám, kam chceš, a znovu ho zamkni, aby ho náhodné kliknutí nemohlo posunout. Pokud skončí někde, čeho budeš litovat, volba Resetovat pozice rámů v nastavení je všechny vrátí zpátky tam, kde začínaly.",
       "framesMoveBodyEditFrames": "Rámeček tvé postavy, rámeček cíle i rámečky skupiny lze přesouvat. Každý má v rohu malé tlačítko přesunu: odemkni ho, přetáhni rámeček na požadované místo a znovu ho zamkni, aby ho náhodný klik neposunul. Upravit rámečky nahoře v kartě Rámečky možností Rozhraní uvolní najednou zbytek rozhraní a s ním tyto tři rámečky: akční lišty, lištu sesílání, lištu švihů, lištu zkušeností, minimapu, lištu tlačítek, rámeček mazlíčka, lištu postoje, řádky posílení a záporných účinků a štítek Připomínka přání. Když skončí někde, kde je nechceš, Obnovit výchozí nastavení dole ve stejné kartě Rámečky je všechny vrátí na původní místa.",
-      "framesGovernedExtra": "Upravit rámečky uvolní také zásobník trackerů pod nimi, tedy sledované úkoly a jejich cíle, postup skutků, stránky Reliquiáře, delve, ve kterém jsi, rift, jehož se účastníš, a sledovaný recept či zakázku, dále akční lištu mazlíčka vedle jeho rámečku, rámeček teček cíle pro tvé záporné účinky na blízkých nepřátelích, paladinův medailon Oddanosti, čarodějův Panel trápení, překryv procs kouzel, časovač švihu vedlejší ruky pro bojovníky se dvěma zbraněmi a záložkové okno měřiče poškození. Každý při uvolnění nosí vlastní štítek se jménem.",
+      "framesGovernedExtra": "Upravit rámečky uvolní také zásobník trackerů pod nimi, tedy sledované úkoly a jejich cíle, postup skutků, stránky Reliquiáře, recepty, které sis připnul(a) z řemesel, delve, ve kterém jsi, rift, jehož se účastníš, a sledovaný recept či zakázku, dále akční lištu mazlíčka vedle jeho rámečku, rámeček teček cíle pro tvé záporné účinky na blízkých nepřátelích, paladinův medailon Oddanosti, čarodějův Panel trápení, překryv procs kouzel, časovač švihu vedlejší ruky pro bojovníky se dvěma zbraněmi a záložkové okno měřiče poškození. Každý při uvolnění nosí vlastní štítek se jménem.",
       "framesGovernedAuraTracks": "Upravit rámečky po zapnutí v kartě Boj stejných možností Rozhraní uvolní také šest volitelných stop aur: stopu Mých posílení, stopu Obranných obnov, stopu Mých štítů, stopu Útočných obnov, stopu Pohybu a utajení a stopu Mých posílení na spojencích. Každá stopa je ve výchozím stavu vypnutá a po uvolnění nosí vlastní štítek se jménem.",
+      "framesGovernedTalkingHead": "Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.",
       "barsTitle": "Lišty, časovače a bojový text",
       "barsBody": "Tvá lišta sesílání se objeví uprostřed obrazovky, těsně nad tvými akčními lištami, kdykoli sesíláš nebo kanáluješ kouzlo, a nese jméno kouzla a zbývající čas. Tvůj cíl má na svém rámu vlastní lištu sesílání, takže vidíš, co přichází, a můžeš na to zareagovat.\n\nPod tvou lištou sesílání sedí tenká lišta švihu, která se plní mezi švihy tvé zbraně, takže útočník na blízko nebo na dálku vidí, kdy dopadne další automatický zásah.\n\nTvá lišta zkušeností běží přes celou šířku pod akčními lištami, rozdělená do úseků, se světlejším pruhem, který ukazuje naspořené odpočaté zkušenosti.\n\nPlav pod vodou a nahoře na obrazovce se objeví modrá lišta dechu. Vyprazdňuje se, dokud máš hlavu pod hladinou, jakmile dojde, zabliká červeně a začneš se topit, a jakmile se vynoříš, rychle se doplní. Mezerník tě žene nahoru a klávesa Plavat dolů, ve výchozím stavu Ctrl, tě táhne hlouběji.\n\nPoškození a léčení vyplouvají nad tím, co zasáhly, jako malá čísla, takže boj přečteš, aniž bys musel číst text. Záložka Bojový záznam v tvém chatu drží úplný písemný záznam.",
       "aurasTitle": "Buffy a debuffy",
@@ -6073,7 +6411,7 @@ export const cs_CZ: EnTranslations = {
       "minimapBody": "Vpravo nahoře: kulatá minimapa se jménem zóny nad ní a tvými souřadnicemi pod ní, obklopená ciferníkem, který vykresluje denní dobu.\n\nDisk nese víc než jen terén. Tvá vlastní šipka sedí uprostřed a ukazuje, kam se díváš, tvá skupina je kolem tebe jako tečky obarvené podle třídy a pro každého, kdo z ní zabloudil pryč, je tu šipka na okraji. Zadavatelé úkolů tu nesou stejné značky jako ve světě, a rozeznáš i naleziště a řemeslné stanice, cestovní portály, lootovatelná těla a bedny, jakéhokoli nepřítele, který se o tebe začal zajímat, blízké přátele a cechovníky, a vlastní tělo, zatímco k němu běžíš jako duch.\n\nObjevují se na ní malé ukazatele, kdykoli mají co říct: obálka, dokud na tebe čekají nepřečtené dopisy, mince, dokud u Obchodníka čekají výnosy z prodeje nebo vrácené zboží, a tlačítko se seznamem tvých uzamčení raidů.",
       "mapTitle": "Mapa světa a tvé trackery",
       "mapBody": "M otevře mapu světa: vykreslený kontinent s tvou vlastní šipkou, zónami a jejich jmény, zajímavými místy kolem tebe, cestovními portály a nalezišti, která jsi objevil. Zobrazuje se na ní i tvá skupina. Uvnitř výpravy se mapa přepne na schéma místností, které jsi zatím prozkoumal.\n\nDole na pravé straně, pod minimapou, drží sloupec trackerů přehled o tom, co právě řešíš, aniž bys musel cokoli otevírat: tvé sledované úkoly a jejich cíle, postup tvých skutků, výpravu, ve které jsi, a jakoukoli trhlinu, které se účastníš. Tracker úkolů se sbalí, když chceš zpátky obrazovku.",
-      "mapBodyZoneFirst": "M otevře mapu světa v zóně, kde stojíš, s tvou šipkou, body zájmu kolem tebe, zadavateli úkolů s jejich značkami a oblastmi cílů, řemeslnými stanicemi, poštovními schránkami, nástěnkami a zahradními políčky, vstupy do dungeonů a každým sběračským nalezištěm v zóně. Naleziště během obnovy zešednou a označí se, když na ně tvé nástroje nestačí. Zobrazí se i skupina. Klikni na mapu pravým tlačítkem nebo stiskni tlačítko Mapa světa a mapa se oddálí na kontinent, kde má každá zóna své jméno a kliknutí otevře její mapu. Vstup do delve, dungeonu, riftu nebo hradní pevnosti přepne mapu na půdorys místa, kde stojíš; bojiště Thornhollowských polí má vlastní mapu pole.\n\nVpravo pod minimapou zásobník trackerů udržuje přehled tvé práce bez otevírání okna: sledované úkoly a cíle, postup skutků, stránky Reliquiáře, delve, ve kterém jsi, a každý rift, jehož se účastníš. Tracker úkolů lze sbalit, když chceš obrazovku uvolnit.",
+      "mapBodyZoneFirst": "M otevře mapu světa v zóně, kde stojíš, s tvou šipkou, body zájmu kolem tebe, zadavateli úkolů s jejich značkami a oblastmi cílů, řemeslnými stanicemi, poštovními schránkami, nástěnkami a zahradními políčky, vstupy do dungeonů a každým sběračským nalezištěm v zóně. Naleziště během obnovy zešednou a označí se, když na ně tvé nástroje nestačí. Zobrazí se i skupina. Klikni na mapu pravým tlačítkem nebo stiskni tlačítko Mapa světa a mapa se oddálí na kontinent, kde má každá zóna své jméno a kliknutí otevře její mapu. Vstup do delve, dungeonu, riftu nebo hradní pevnosti přepne mapu na půdorys místa, kde stojíš; bojiště Thornhollowských polí má vlastní mapu pole.\n\nVpravo pod minimapou zásobník trackerů udržuje přehled tvé práce bez otevírání okna: sledované úkoly a cíle, postup skutků, stránky Reliquiáře, recepty, které sis připnul(a) z řemesel, delve, ve kterém jsi, a každý rift, jehož se účastníš. Tracker úkolů lze sbalit, když chceš obrazovku uvolnit.",
       "gatheringGoalTrackerBody": "Do zásobníku se přidá tracker sběračského cíle, jakmile v okně výroby zvolíš Sledovat recept nebo na nástěnce zakázku: pojmenuje sledovaný recept či zakázku, kolik kusů sbíráš a jak daleko tě k cíli dostanou držené a uložené materiály. Sledovat nahradí aktuální cíl a Vymazat ho výslovně odstraní; ani jedno nikdy nemění předvolbu sklizně.",
       "hubPracticeTrackerBody": "U eastbrookského hubu se do zásobníku přidá tracker cvičení, jakmile tam absolvuješ vedené lekce: udrží na očích tvé nejlepší běhy proti cvičným terčům. Během lekce tě koučovací pruh vedle něj provede aktuálním krokem, od otevření Měřičů poškození až po porovnání druhého běhu.",
       "chatTitle": "Okno chatu",
@@ -6210,6 +6548,7 @@ export const cs_CZ: EnTranslations = {
       "dungeonReset": "Opustí tvé vlastní prázdné instance, což uděláš po změně obtížnosti.",
       "groupRecovery": "Zotavení a stav",
       "unstuck": "Cesta ven, když tě svět uvězní. Vydrž stát nehybně po krátké odpočítávání a přemístí tě to na nejbližší hřbitov, a oživí tě tam, pokud jsi už padl(a). Poté tě na chvíli oslabí Nemoc z vyproštění, takže je to poslední záchrana, ne zkratka.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Označí tě jako nepřítomného (Pryč), s volitelnou zprávou, kterou dostane jako automatickou odpověď každý, kdo ti pošle šepot. Zopakuj příkaz bez zprávy a stav zrušíš; zruší ho i jakýkoli jiný chat.",
       "dnd": "Nerušit: podobné jako nepřítomnost, jenže šepoty poslané tobě se zadrží místo doručení.",
       "sit": "Sedni si tam, kde stojíš, a zase vstaň. Automaticky vstaneš v okamžiku, kdy se pohneš, sesíláš, nebo dostaneš zásah.",
@@ -6316,6 +6655,7 @@ export const cs_CZ: EnTranslations = {
       "fatigueDef": "Zaplavat si dost daleko na otevřené moře a voda tě začne vysávat: nejdřív přijde varování, pak rostoucí poškození, dokud se nevrátíš zpátky k pevnině.",
       "unstuckTerm": "Nemoc z vyproštění",
       "unstuckDef": "Cena za použití Vyproštění z herního menu. Vydrž stát nehybně po celé odpočítávání, a přemístí tě to na nejbližší hřbitov, kde si pak na čas poneseš dočasné oslabení.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Úroveň předmětu",
       "itemLevelDef": "Jedno číslo shrnující, jak silný je daný kus výbavy, šikovné, když chceš rychle porovnat dva kusy. V možnostech zapni Zobrazit úroveň předmětu, abys ho viděl v popiscích. Nese ho jen výbava se známým původem, takže prosté základy od obchodníků a startovní výbava neukazují nic, a chybějící číslo je normální, ne chyba.",
       "requiredLevelTerm": "Požadovaná úroveň",
@@ -6420,6 +6760,7 @@ export const cs_CZ: EnTranslations = {
       "formsNote": "Druid bojuje měněním podoby. Většina druidských schopností patří k jedné podobě, takže to, v jaké jsi právě podobě, rozhoduje, co můžeš seslat, a přeměna stojí trochu many. Měnit podobu můžeš v boji i mimo něj, tak často, jak chceš.",
       "formsAutoUnshift": "Léčení nebo útočné kouzlo seslané v podobě tě z ní samo vyvede. Opuštění podoby tímto způsobem je zdarma a nespotřebuje globální dobu obnovy, takže okamžité kouzlo vyletí hned, jak ho stiskneš. Návrat do podoby je běžná schopnost a stále stojí manu i globální dobu obnovy.",
       "formsMoonwing": "Druid Měsíčního háje získá ještě jednu podobu, Podobu měsíčního křídla, v níž bojuje jako sesilatel. Je to jediná zvířecí podoba, která si ponechá tvá kouzla, a hůlka funguje jen v ní nebo v tvé běžné sesilatelské podobě.",
+      "formsWolfEngage": "Vlk zahajuje boj Medvědím výpadem, hned se přemění do Vlčí podoby, aby cíl přišpendlil, mimo plížení se přiblíží Výpadem a nepřítele zastaví Sražením.",
       "formLine": {
         "form_bear": "Tankovací podoba: silná kůže, vztek místo many a navíc hrozba, aby po tobě nepřátelé dál sekali.",
         "form_cat": "Podoba pro poškození na blízko: energie a combo body jako u tuláka a mnohem menší hrozba.",
@@ -6428,7 +6769,7 @@ export const cs_CZ: EnTranslations = {
       "mageEleSummon": "Kouzlo Mrazivé magie, které přivolá elementála po tvůj bok a nasadí ho na tvůj cíl.",
       "formName": {
         "form_bear": "Medvědí podoba",
-        "form_cat": "Vlčí podoba",
+        "form_cat": "Kočičí podoba",
         "form_travel": "Svižná podoba"
       }
     },
@@ -6949,7 +7290,7 @@ export const cs_CZ: EnTranslations = {
     "deedsPage": {
       "intro": "Kniha skutků je místo, kde si svět počítá vše, co máš za sebou: od prvních kroků z počátečního údolí až po nejtěžší boje, jaké říše nabízí. Vykonávej skutky při hraní, nos tituly, které ti udělí, a sleduj, jak tvůj věhlas roste.",
       "howHeading": "Jak skutky fungují",
-      "howBody": "Skutky se vykonávají a uchovávají vždy za jednu postavu, takže každý hrdina, za kterého hraješ, si buduje vlastní Knihu; teprve žebříček říše shromáždí tvůj věhlas napříč všemi tvými postavami a započítá každý skutek jen jednou. Každý skutek přímo v Knize skutků ve hře jasně říká, co od tebe žádá, takže vždy víš, za čím se hnát, a ty, o které usiluješ, si můžeš označit ke sledování, aby ti při hře zůstaly na očích. Malá hrstka jich zůstává tajných a odhalí se teprve tehdy, když je vykonáš. Kniha se také drží poctivě: cokoli tvůj dosavadní záznam dokáže doložit, připíše ti okamžitě, takže veterán ji nikdy neotevře na prázdné stránce; jen počítací skutky začínají svůj součet od nuly.",
+      "howBody": "Skutky se vykonávají vždy za jednu postavu, ale Kniha skutků je sdílená všemi postavami na tvém účtu: skutek, který vykoná kterákoli z nich, je započítán všem, Kniha uvádí, kdo a kdy jej vykonal, a titul či okraj, který uděluje, může nosit kterákoli z tvých postav. Žebříček říše shromažďuje tvůj Věhlas stejným způsobem a započítá každý skutek jen jednou. Každý skutek přímo v Knize skutků ve hře jasně říká, co od tebe žádá, takže vždy víš, za čím se hnát, a ty, o které usiluješ, si můžeš označit ke sledování, aby ti při hře zůstaly na očích. Malá hrstka jich zůstává tajných a odhalí se teprve tehdy, když je vykonáš. Kniha se také drží poctivě: cokoli tvůj dosavadní záznam dokáže doložit, připíše ti okamžitě, takže veterán ji nikdy neotevře na prázdné stránce; jen počítací skutky začínají svůj součet od nuly.",
       "renownHeading": "Věhlas",
       "renownBody": "Věhlas je skóre za Knihou. Každý skutek, který získáš, má pevnou hodnotu a tvůj součet jen roste, takže klidný týden tě nikdy nestojí půdu pod nohama. Hrstka závisí spíš na štěstí než na dovednosti, jiné sběratelské skutky jsou odměnou samy o sobě a Činy jsou pocta zvlášť, takže žádný z nich nemá žádný Věhlas. Skutky bez Věhlasu se pořád počítají do dokončení tvé Knihy; jen nikdy nebodují. Činy jsou jediná výjimka, držená zcela mimo počet.",
       "rewardsHeading": "Tituly a rámečky",
@@ -6987,7 +7328,7 @@ export const cs_CZ: EnTranslations = {
     "reliquaryPage": {
       "intro": "Relikviář je muzeum jedinečné kořisti, kterou jsi zkatalogizoval: vytoužené kousky z dungeonů, profesní trofeje, jezdecká zvířata, vzhledy zbraní a tituly. Ke Knize skutků patří tak, jako patří síň trofejí k knize úspěchů.",
       "howHeading": "Jak sbírka funguje",
-      "howBody": "Otevři Relikviář ve hře (výchozí Shift+X). Každá police nese stránky jedinečných relikvií. Siluetu vyplníš, jakmile daný kus poprvé získáš na této postavě, a stránku iluminuješ, jakmile jsou vyplněné všechny její relikvie. Několik stránek nese označení Vyřazená nebo Osobní: stojí mimo dokončení, takže nikdy neblokují polici ani celý katalog. Živé nálezy se ohlásí a obnoví otevřené okno; postup je vázaný na postavu, s výjimkou vzhledů zbraní, které jsou kosmetikou účtu.",
+      "howBody": "Otevři Relikviář ve hře (výchozí Shift+X). Každá police obsahuje stránky jedinečných relikvií. Silueta se vyplní, jakmile kterákoli postava na tvém účtu ten kus poprvé získá, a stránka se rozsvítí, když jsou vyplněny všechny relikvie na ní. Několik stránek je označeno Vyřazené nebo Osobní: stojí mimo dokončení, takže nikdy neblokují polici ani celý katalog. Živé nálezy se ohlásí a obnoví otevřené okno; postup sdílejí všechny postavy na účtu, takže relikvie, kterou najde jedna postava, vyplní stránku všem.",
       "ranksHeading": "Hodnosti Kurátora",
       "ranksBody": "Hodnosti Kurátora rostou s každou zkatalogizovanou jedinečnou relikvií a udělují výhradně kosmetické tituly a rámečky. Nikdy nedávají bojovou sílu, šanci na kořist ani vyrovnání smůly. Vzhledy zbraní vázané na účet se do hodnosti Kurátora nezapočítávají, aby prestiž zůstala vázaná na postavu, a relikvie z Vyřazených či Osobních stránek se do ní nezapočítávají také.",
       "retiredTag": "Vyřazená",
@@ -7073,7 +7414,7 @@ export const cs_CZ: EnTranslations = {
       "groupClasses": "Třídy",
       "groupForms": "Podoby druida",
       "formBear": "Medvědí podoba",
-      "formCat": "Vlčí podoba",
+      "formCat": "Kočičí podoba",
       "formTravel": "Svižná podoba",
       "groupCreatures": "Bytosti",
       "groupPets": "Démoni černokněžníka",
@@ -7397,7 +7738,7 @@ export const cs_CZ: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Očarování má čtyři úrovně. Základní úroveň používá Zvonivý prach, na horním okraji s trochou Esence, a pokrývá slot zbraně, druhou ruku i každý slot zbroje; má dost možností statistických os, aby každá sestava našla pro každý slot využití. Štíty a držené kouzelnické předměty v druhé ruce mají vlastní očarování Výdrže, takže žádný vybavený slot není bez očarování. Vyšší úroveň stojí jeden Zvonivý úlomek plus Esenci a poskytuje silnější bonusy na nejdůležitějších slotech. Úlomky mají kromě toho tři další odtoky: dva recepty na amulety po pěti kusech, horní příčku dobíjení účinků nástrojů a úroveň Zářivá, kde očarování zbraně a hrudi spotřebují po jednom a Infuze dva, takže si pár kusů schovej, než je utratíš.\n\nMezi nimi leží pět runových očarování, po jednom spotřebiteli pro každý typ sekundární statistiky, aby nic, co rozemeleš, nebylo slepou uličkou: Runové ostří (zbraň, Síla, spotřebuje Rezonující ocel), Runový znak (zbraň, Intelekt, Rezonující dřevo), Runová vazba (hruď, Duch, Rezonující nit), Runová kůže (nohy, Obratnost, Rezonující kůže) a Runové články (helma, Výdrž, Rezonující články). Každé také potřebuje dvě Zvonivé esence; tam, kde má slot a statistika základní i vyšší očarování, leží runový bonus mezi nimi, zatímco Runová vazba je přímo nejsilnější očarování Ducha na hruď a Runová kůže je jediné očarování Obratnosti na nohy. Přesné bonusy jsou v tabulce níže.\n\nNad běžnými nižšími úrovněmi stojí Zářivá úroveň, vrchol běžné práce tohoto řemesla: Okouzlování 100 pro čtyři očarování a 125 pro Infuzi, jak ukazuje sloupec Dovednost níže. Každé spotřebuje Zářivé činidlo a přidává další krok na svůj slot: zbraň, s možností Síly i Síly kouzel, hruď a boty. Poslední z nich, Zářivá infuze, se uchytí pouze na kusu, který byl Zdokonalen, protože Zdokonalení provádí nositel, ne okouzlovatel, a stránka Povolání vysvětluje, jak kus tento stav získá.\n\nHorlivost Posledního plamene je samostatný raidový vzorec, nikoli bezplatné běžné očarování. Obchodovatelný vzorec se nauč při Okouzlování 100, než ho použiješ. Každá aplikace spotřebuje 3 Jádra Posledního plamene a 2 Zvonivé úlomky; vzorec může padnout v Tavicím kelímku nebo ho lze koupit od intendanta za jedno jádro. Jeho proc pro boj zblízka a pravidla rychlosti zbraně jsou níže uvedeny v plném znění.",
+        "enchantsNoteRaidFormula": "Očarování má čtyři úrovně. Základní úroveň používá Zvonivý prach, na horním okraji s trochou Esence, a pokrývá slot zbraně, druhou ruku i každý slot zbroje; má dost možností statistických os, aby každá sestava našla pro každý slot využití. Štíty a držené kouzelnické předměty v druhé ruce mají vlastní očarování Výdrže, takže žádný vybavený slot není bez očarování. Vyšší úroveň stojí jeden Zvonivý úlomek plus Esenci a poskytuje silnější bonusy na nejdůležitějších slotech. Úlomky mají kromě toho tři další odtoky: dva recepty na amulety po jednom kusu (zbytek účtu za amulet tvoří esence a prach), horní příčku dobíjení účinků nástrojů a úroveň Zářivá, kde očarování zbraně a hrudi spotřebují po jednom a Infuze dva, takže si pár kusů schovej, než je utratíš.\n\nMezi nimi leží pět runových očarování, po jednom spotřebiteli pro každý typ sekundární statistiky, aby nic, co rozemeleš, nebylo slepou uličkou: Runové ostří (zbraň, Síla, spotřebuje Rezonující ocel), Runový znak (zbraň, Intelekt, Rezonující dřevo), Runová vazba (hruď, Duch, Rezonující nit), Runová kůže (nohy, Obratnost, Rezonující kůže) a Runové články (helma, Výdrž, Rezonující články). Každé také potřebuje dvě Zvonivé esence; tam, kde má slot a statistika základní i vyšší očarování, leží runový bonus mezi nimi, zatímco Runová vazba je přímo nejsilnější očarování Ducha na hruď a Runová kůže je jediné očarování Obratnosti na nohy. Přesné bonusy jsou v tabulce níže.\n\nNad běžnými nižšími úrovněmi stojí Zářivá úroveň, vrchol běžné práce tohoto řemesla: Okouzlování 100 pro čtyři očarování a 125 pro Infuzi, jak ukazuje sloupec Dovednost níže. Každé spotřebuje Zářivé činidlo a přidává další krok na svůj slot: zbraň, s možností Síly i Síly kouzel, hruď a boty. Poslední z nich, Zářivá infuze, se uchytí pouze na kusu, který byl Zdokonalen, protože Zdokonalení provádí nositel, ne okouzlovatel, a stránka Povolání vysvětluje, jak kus tento stav získá.\n\nHorlivost Posledního plamene je samostatný raidový vzorec, nikoli bezplatné běžné očarování. Obchodovatelný vzorec se nauč při Okouzlování 100, než ho použiješ. Každá aplikace spotřebuje 3 Jádra Posledního plamene a 2 Zvonivé úlomky; vzorec může padnout v Tavicím kelímku nebo ho lze koupit od intendanta za jedno jádro. Jeho proc pro boj zblízka a pravidla rychlosti zbraně jsou níže uvedeny v plném znění.",
         "charmsHeading": "Amulety pro sběračské nástroje",
         "formulaRequired": "Vyžaduje vzorec",
         "charmsBody": "Okouzlování je taky místo, odkud pocházejí amulety pro sběrače. Kutil Gizzel naučí oba recepty v Eastbrookské nástrojárně, jakmile tvé Okouzlování dosáhne 25: Sběračovu skrýš, která přidá jednotku k výnosu ze sklizně, a Řemeslníkovo oko, které zvýší jakost toho, co se vytěží. Každý se vyrobí jednou a pak se vloží do krumpáče, sekery nebo srpu, kde spotřebuje nabití jen na sklizních, které skutečně vylepší.\n\nNa dobíjení řemeslo dál vydělává. Nabití obnovuje ten, komu nástroj patří, ne procházející okouzlovatel, a dobití stojí polovinu materiálů, pokud je tím vlastníkem právě okouzlovatel, který amulet podepsal, a ještě méně se specializací na Okouzlování. Amulet prodaný přes pult je tedy jednorázový prodej, zatímco amulety jedoucí na tvých vlastních nástrojích jsou ty levné na udržování v chodu. Celý žebříček nabití a materiálů najdeš na stránce každého sběračského povolání, pod Efekty nástrojů."
@@ -7466,7 +7807,7 @@ export const cs_CZ: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Rytmus zemědělství",
-        "rhythmBody": "Sázení je krátké viditelné seslání: přesně {plant} sekund na každé příčce, protože motyka otevírá půdu, ale nekupuje rychlost. Zralou plodinu sklidíš okamžitě. Není co přerušit a žádná kontrola brašny sklizeň neodmítne; připravený záhon čeká, jak dlouho ho necháš, takže plná brašna stojí farmáře jen cestu k vyprázdnění.\n\nSklizeň odměňuje výnosem a zemědělskou zdatností. Na rozdíl od žíly nedává vůbec žádné zkušenosti postavy, takže záhony jsou řemeslo, na kterém pracuješ, ne způsob, jak zvyšovat úroveň.",
+        "rhythmBody": "Sázení je okamžité, protože motyka otevírá půdu, ale nekupuje rychlost: není žádné seslání, které by bylo třeba vyčkat, takže farmář, který odejde, má přesto zaseto. Zralou plodinu sklidíš také okamžitě. Není co přerušit a žádná kontrola brašny sklizeň neodmítne; připravený záhon čeká, jak dlouho ho necháš, takže plná brašna stojí farmáře jen cestu k vyprázdnění.\n\nSklizeň odměňuje výnosem a zemědělskou zdatností. Na rozdíl od žíly nedává vůbec žádné zkušenosti postavy, takže záhony jsou řemeslo, na kterém pracuješ, ne způsob, jak zvyšovat úroveň.",
         "gainHeading": "Co sklizeň naučí",
         "gainBody": "Zisk je deterministický a řídí se tvým vlastním počítadlem, nikoli plodinou: {g1} zdatnosti sklizeň pod {p1}, {g2} pod {p2}, {g3} pod {p3} a {g4} po zbytek cesty ke stropu {cap}. Nikdy nejde o hod na zvýšení dovednosti, takže délka postupu je přesně taková, jakou určuje aritmetika.\n\nStupeň plodiny určuje, jak daleko tě záhon může nést. Plodina stupně 1 učí do {c1} a tam zešedne, plodina stupně 2 do {c2} a plodiny stupně 3 a výše ke stropu, takže právě přesun na vyšší záhony udrží počítadlo v pohybu.",
         "yieldsHeading": "Co sklizeň přinese",
@@ -7508,8 +7849,8 @@ export const cs_CZ: EnTranslations = {
         "commissionsHeading": "Zakázky a Výrobcovo pouto",
         "commissionsBody": "Zakázka je výrobek zhotovený pro někoho. Při výrobě zbraně, kusu zbroje nebo nošeného offhandu (lektvar nemůže nést pouto) může řemeslník označit výrobek jako zakázkový: hotový kus se v rukou výrobce chová normálně, ale v okamžiku, kdy přejde do jiných rukou při výměně, se naváže na osobu, která ho obdržela. To je Výrobcovo pouto: kupující dostane svůj kus a kus nelze dál předávat ani prodávat.\n\nPouta nejsou navždy, jen drahá. Jakýkoli správce stanice pouto zruší, pokud stojíš u jeho stanice (mobilní stanice tuto službu nikdy nenabízí), za poplatek stanovený kvalitou předmětu: 25 stříbrných za neobvyklý, 1 zlatý za vzácný, 4 zlaté za epický, přičemž legendární platí epickou sazbu a zakázkový běžný kus sazbu neobvyklého.\n\nPoplatek kupuje čistý začátek, ne trvalé vyléčení: kus je stále zakázkový, takže se při příští výměně znovu naváže na toho, kdo ho obdrží, a vše ostatní, podpis, mistrovské dílo i okouzlení, zůstává nedotčeno.",
         "provenanceHeading": "Podepsaná práce",
-        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Některé předměty nesou jméno. Řádky původu materiálu uvádějí, kdo sebral každou skupinu kusů, zatímco samostatná značka podepsáno určuje prémiového podepisujícího, pokud nějaký je. Tyto skutečnosti jsou nezávislé: běžně nasbíraný materiál zaznamená sběrače, aniž získá podpis, a staré podepsané zásoby mohou uvádět podepisujícího a poctivě zároveň říkat, že sběrač zaznamenán nebyl. Hotový kus místo toho uvádí, kdo ho vyrobil. Tyto záznamy cestují s předmětem při výměnách, v bance, poštou, přes Světový trh i při zpětném odkupu u obchodníka a nikdy nevyblednou.\n\nSběr automaticky podepisuje nejlepší práci: každá sklizeň, která padne vzácná nebo lepší, přijde podepsaná a vzácné nálezy podepíšou celý pětinásobný výnos. Šťastný hod při sběru z mrtvoly podepíše výnos tam, kde rodina nemá exemplář k vydání, a tam, kde ho má, nechá výnos obyčejný a vedle něj vytvoří podepsaný bezvadný exemplář. Výroba podepisuje stejnou cestou: každá kopie vzácného nebo lepšího výstupu vytvoří podepsanou verzi a mistrovské dílo se podepíše vždy bez ohledu na kvalitu, takže nejlepší verze každého kusu vždy uvádí svého tvůrce. Podpis běžného materiálu cestuje se samotnými kusy a nelze ho ztratit jen proto, že kompatibilní hromádka už obsahuje jiného sběrače nebo podepisujícího. Samostatný bezvadný exemplář je jiný předmět a stále potřebuje místo; pokud se nevejde, běžný výnos z mrtvoly zůstane, ale exemplář se ztratí.\n\nHotové předměty mají jednu přísnou identitu, takže dvě kopie splynou jen tehdy, když se přesně shodují všechny značky: stejný předmět, stejný podepisující, stejné statistiky mistrovského díla, stejné očarování a stejné pouto. Kompatibilní materiály sdílejí slot napříč sběrači a podepisujícími, ale udržují počet pro každý zdroj. Náhledový tooltip shrnuje zdroje; otevři Zdroje pro úplný seznam. Oddělení podle sběrače udrží tyto hromádky v brašně zvlášť a třídění toto rozhodnutí respektuje. Převedený materiál se může běžně skládat s materiálem příjemce.\n\nPodpisy vracejí řemeslníkům výhodu: držení jakékoli podepsané kopie potřebné reagencie u pracovního stolu, bez ohledu na to, kdo ji podepsal, přidá 2 procentní body k šanci na mistrovské dílo, a držení reagencie podepsané vlastní rukou sníží její požadované množství o jeden kus, nikdy pod jeden, pokud tato reagencie není označena jako neslevitelná; raidová jádra si vždy ponechají plnou cenu. Tvá vlastní podepsaná práce vzácné nebo lepší kvality tě dokonce stále učí, dnes pouze prostřednictvím vyrobených lektvarů: vypij vzácný nápoj, který jsi uvařil(a) a podepsal(a), a malý proud dovednosti se vrátí k řemeslu, které ho vytvořilo, pokud je toto řemeslo jedním z tvých aktivních hlavních oborů. Opravdu to funguje jen pro lektvarovou větev, takže elixír, svitek ani vrcholový flakón tě zpět nic nenaučí, jakkoli jemně byl podepsán.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Některé předměty nesou jméno. Řádky původu materiálu uvádějí, kdo sebral každou skupinu kusů, zatímco samostatná značka podepsáno určuje prémiového podepisujícího, pokud nějaký je. Tyto skutečnosti jsou nezávislé: běžně nasbíraný materiál zaznamená sběrače, aniž získá podpis, a staré podepsané zásoby mohou uvádět podepisujícího a poctivě zároveň říkat, že sběrač zaznamenán nebyl. Hotový kus místo toho uvádí, kdo ho vyrobil. Tyto záznamy cestují s předmětem při výměnách, v bance, poštou, přes Světový trh i při zpětném odkupu u obchodníka a nikdy nevyblednou.\n\nSběr automaticky podepisuje nejlepší práci: každá sklizeň, která padne vzácná nebo lepší, přijde podepsaná a vzácné nálezy podepíšou celý pětinásobný výnos. Šťastný hod při sběru z mrtvoly podepíše výnos tam, kde rodina nemá exemplář k vydání, a tam, kde ho má, nechá výnos obyčejný a vedle něj vytvoří podepsaný bezvadný exemplář. Výroba podepisuje stejnou cestou: každá kopie vzácného nebo lepšího výstupu vytvoří podepsanou verzi a mistrovské dílo se podepíše vždy bez ohledu na kvalitu, takže nejlepší verze každého kusu vždy uvádí svého tvůrce. Podpis běžného materiálu cestuje se samotnými kusy a nelze ho ztratit jen proto, že kompatibilní hromádka už obsahuje jiného sběrače nebo podepisujícího. Samostatný bezvadný exemplář je jiný předmět a stále potřebuje místo; pokud se nevejde, běžný výnos z mrtvoly zůstane, ale exemplář se ztratí.\n\nHotové předměty mají jednu přísnou identitu, takže dvě kopie splynou jen tehdy, když se přesně shodují všechny značky: stejný předmět, stejný podepisující, stejné statistiky mistrovského díla, stejné očarování a stejné pouto. Kompatibilní materiály sdílejí slot napříč sběrači a podepisujícími, ale udržují počet pro každý zdroj. Náhledový tooltip shrnuje zdroje; klikni pravým tlačítkem na hromádku pro úplný seznam (na dotykové obrazovce použij tlačítko Zdroje). Oddělení podle sběrače udrží tyto hromádky v brašně zvlášť a třídění toto rozhodnutí respektuje. Převedený materiál se může běžně skládat s materiálem příjemce.\n\nPodpisy vracejí řemeslníkům výhodu: držení jakékoli podepsané kopie potřebné reagencie u pracovního stolu, bez ohledu na to, kdo ji podepsal, přidá 2 procentní body k šanci na mistrovské dílo, a držení reagencie podepsané vlastní rukou sníží její požadované množství o jeden kus, nikdy pod jeden, pokud tato reagencie není označena jako neslevitelná; raidová jádra si vždy ponechají plnou cenu. Tvá vlastní podepsaná práce vzácné nebo lepší kvality tě dokonce stále učí, dnes pouze prostřednictvím vyrobených lektvarů: vypij vzácný nápoj, který jsi uvařil(a) a podepsal(a), a malý proud dovednosti se vrátí k řemeslu, které ho vytvořilo, pokud je toto řemeslo jedním z tvých aktivních hlavních oborů. Opravdu to funguje jen pro lektvarovou větev, takže elixír, svitek ani vrcholový flakón tě zpět nic nenaučí, jakkoli jemně byl podepsán.",
         "collectorsHeading": "Sběratelé, trofeje a cena příběhu",
         "collectorsBody": "Prodejci jsou slepí k původu: podepsaný předmět prodáš NPC přesně za jeho základní cenu. Příplatek za podpis existuje pouze mezi hráči, a právě to je zajímavé: hromada rudy z nečekaného nálezu podepsaná slavným sběračem, Prvotřídní výřez ze šťastné sklizně, mistrovská čepel nesoucí jméno kováře, který od té doby odešel do ústraní, všechno stojí tolik, co si paměť lidí řekne, že jsou hodné.\n\nKniha skutků vychází vstříc témuž instinktu: Nedotčená rudná žíla, Prastaré jádrové dřevo, Měsíční květ, Dokonalý exemplář a Záblesk naděje jsou sběratelské záznamy bez Věhlasu, které existují výhradně jako důkaz, že se ti něco přihodilo. Uchovej předmět, který získání skutku vynesl, a máš v rukou potvrzení. Nic z toho není výkon; původ nekupuje statistiky ani nevyhrává souboje, je to papírová stopa hry o povedených dnech.",
         "castPaceHeading": "Doba sesílání a odtok zlata",
@@ -7552,7 +7893,7 @@ export const cs_CZ: EnTranslations = {
         "title": "Profese: nejčastější dotazy",
         "intro": "Rychlé odpovědi na otázky, které řemeslníci kladou nejčastěji.",
         "q1": "Proč se mé podepsané předměty neskládají?",
-        "a1": "Hotové předměty se stále řídí přísným pravidlem identity: dvě kopie splynou jen tehdy, když se přesně shodují jejich podepisující, hozené vlastnosti, statistiky mistrovského díla, očarování, pouto a další údaje identity. Podepsaná čepel proto zůstane oddělená od obyčejné.\n\nVýjimkou jsou materiály. Kompatibilní hromádky stejného materiálu se mohou spojit, i když se jejich sběrači nebo podepisující liší, protože hromádka udržuje počet pro každý zdroj. Náhledový tooltip shrnuje zdroje; otevři Zdroje pro úplný seznam. Oddělení podle sběrače udrží hromádky v brašně zvlášť a třídění toto rozhodnutí respektuje. Převedený materiál se může běžně skládat s materiálem příjemce.",
+        "a1": "Hotové předměty se stále řídí přísným pravidlem identity: dvě kopie splynou jen tehdy, když se přesně shodují jejich podepisující, hozené vlastnosti, statistiky mistrovského díla, očarování, pouto a další údaje identity. Podepsaná čepel proto zůstane oddělená od obyčejné.\n\nVýjimkou jsou materiály. Kompatibilní hromádky stejného materiálu se mohou spojit, i když se jejich sběrači nebo podepisující liší, protože hromádka udržuje počet pro každý zdroj. Náhledový tooltip shrnuje zdroje; klikni pravým tlačítkem na hromádku pro úplný seznam (na dotykové obrazovce použij tlačítko Zdroje). Oddělení podle sběrače udrží hromádky v brašně zvlášť a třídění toto rozhodnutí respektuje. Převedený materiál se může běžně skládat s materiálem příjemce.",
         "q2": "Zvyšují běžné recepty moji dovednost donekonečna?",
         "a2": "Ne. Každý recept se hodnotí podle toho, jak hluboko leží pod tvým současným pásmem v daném řemesle, podle klasického čtení oranžová, žlutá, zelená, šedá: plný zisk na tvém pásmu nebo výše, polovina o jednu úroveň níže, čtvrtina o dvě úrovně níže a nic o tři nebo více úrovní níže. Pásma jsou po 25 dovednostech, takže bezplatné recepty dovednosti 0 tě na dovednosti 75 přestanou cokoli učit.\n\nStropy jsou také nižší než klasických 300, které možná čekáš: každé z deseti získatelných řemesel končí na 125, Těžba, Kácení a Bylinkářství na 100 a Rybaření pokračuje až na 200. Postup znamená přejít na recepty vlastního pásma, ne drtit nejlevnější recept.",
         "q3": "Jaký je rozdíl mezi sběrem kořisti a sklizením z těla?",
@@ -9578,6 +9919,11 @@ export const cs_CZ: EnTranslations = {
       "quit": "Ukončit",
       "fatalBody": "World of ClaudeCraft narazil na neočekávanou chybu a musí se zavřít."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Ukončit hru"
     }
@@ -9628,6 +9974,11 @@ export const cs_CZ: EnTranslations = {
     "inWorld": "ve světě",
     "takeOver": "Převzít",
     "inWorldHint": "Už je ve světě. Odhlas se jinde nebo ji převezmi.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Tímto odpojíš tuto postavu z jiné relace a přesuneš ji sem. Pokračovat?",
     "renameRequired": "vyžaduje přejmenování",
     "delete": "Smazat",
@@ -10056,6 +10407,7 @@ export const cs_CZ: EnTranslations = {
       "templates": {
         "battleground": "[Bitevní pole] {name}: {message}",
         "party": "[Skupina] {name}: {message}",
+        "raidWarning": "[Upozornění na nájezd] {name}: {message}",
         "yell": "{name} křičí: {message}",
         "whisper": "{name} šeptá: {message}",
         "toWhisper": "Pro {name}: {message}",
@@ -10171,6 +10523,7 @@ export const cs_CZ: EnTranslations = {
       "deathRecapDrowned": "Tvá postava zemřela. Utopila se.",
       "deathRecapCauterized": "Tvá postava zemřela. Přemohl tě žár Vypálení.",
       "respawn": "Cítíš se odpočatě a znovu celý(á).",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "Ignoruješ chat od {name}.",
       "noLongerIgnoring": "Už neignoruješ {name}.",
       "playerNotNearby": "Tento hráč není poblíž.",
@@ -10194,6 +10547,7 @@ export const cs_CZ: EnTranslations = {
       "stunned": "Jsi omráčen(a)!",
       "silenced": "Jsi umlčen(a)!",
       "busy": "Jsi zaneprázdněn(a).",
+      "cannotCastWhileMoving": "Během pohybu nemůžeš sesílat kouzla.",
       "abilityNotReady": "Tato schopnost ještě není připravená.",
       "notEnoughRage": "Nedostatek vzteku!",
       "notEnoughEnergy": "Nedostatek energie!",
@@ -10206,7 +10560,8 @@ export const cs_CZ: EnTranslations = {
       "requiresForm": "Musíš být v podobě {form}.",
       "cantInForm": "To nemůžeš dělat v podobě {form}.",
       "bear": "Medvěd",
-      "cat": "Vlk",
+      "cat": "Kočka",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Rychlost",
       "shapeshifted": "To nemůžeš dělat při změně podoby.",
       "stealthed": "Musíš být v plížení.",
@@ -10538,11 +10893,11 @@ export const cs_CZ: EnTranslations = {
     },
     "forms": {
       "bear": "Medvěd",
-      "cat": "Vlk"
+      "cat": "Kočka",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Rybaření",
-      "farming": "Sázení",
       "gathering": "Sběr",
       "crafting": "Výroba",
       "disenchanting": "Rozzačarování",
@@ -10886,6 +11241,19 @@ export const cs_CZ: EnTranslations = {
       "buyConfirmAccept": "Koupit",
       "buyConfirmCancel": "Zrušit",
       "buyChanged": "Tato nabídka se před potvrzením změnila. Zkontroluj cenu a zkus to znovu.",
+      "sweep": "Zametat",
+      "sweepAria": "Zameťte trh pro {item}",
+      "sweepTitle": "Průzkum trhu: {item}",
+      "sweepClose": "Blízko",
+      "sweepNote": "Nakupuje celé nabídky od jiných prodejců, nejprve nejlevnější za jednotku, dokud nebude pokryt váš počet. Možná dostanete o něco více, než jste požadovali.",
+      "sweepQuantity": "Hledají se jednotky",
+      "sweepQuoteNone": "Žádné záznamy této položky k zametání.",
+      "sweepQuoteLine": "{units} jednotek v {listings} výpisech pro {total} (každý {each})",
+      "sweepQuoteShort": "K dispozici je pouze {units} jednotek v {listings} výpisech pro {total} (každý {each})",
+      "sweepButton": "Zametat",
+      "sweepConfirmTitle": "Potvrďte průzkum trhu",
+      "sweepConfirmBody": "Koupit {item} x{units} napříč {listings} výpisy za {total} (každý {each})?",
+      "sweepChanged": "Nabídka zametání se změnila, než jste to potvrdili. Zkontrolujte součet a zkuste to znovu.",
       "sellNote": "Nabídni zboží ze svých batohů. Obchodník si při prodeji vezme provizi {cut} %. Používáš {used}/{max} slotů pro nabídky.",
       "sellPickEmpty": "Klikni na předmět v batozích a vyber, co chceš prodat.",
       "quantity": "Množství",
@@ -10925,7 +11293,9 @@ export const cs_CZ: EnTranslations = {
       "ownListing": "To je tvoje vlastní nabídka. Zruš ji, pokud ji chceš získat zpět.",
       "cannotAfford": "To si nemůžeš dovolit.",
       "notYourListing": "Toto není tvoje nabídka.",
-      "nothingToCollect": "Nemáš nic k vyzvednutí."
+      "nothingToCollect": "Nemáš nic k vyzvednutí.",
+      "sweepNoListings": "Nejsou k dispozici žádné záznamy této položky, které by bylo možné zamést.",
+      "sweepPriceChanged": "Ceny se změnily, než váš sweep přistál. Zkontrolujte nabídku a zkuste to znovu."
     },
     "loot": {
       "takeAll": "Vzít vše",
@@ -11763,7 +12133,7 @@ export const cs_CZ: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Uhrane nepřítele na 8 s. Jeho následující 3 poškozující akce každá vygenerují 7 Odsouzení a bičem mu způsobí 17 stínového poškození."
+        "description": "Uhrane nepřítele na 8 s, což způsobuje stínové poškození a generuje 2 Odsouzení každé 2 s. Jeho následující 3 poškozující akce každá vygenerují 7 Odsouzení a bičem mu způsobí 17 stínového poškození."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -11799,7 +12169,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Na 15 s cejchuje nepřítele. Tvá další 3 přímá kouzla se proti cejchovanému nepříteli ozvou za 25 % poškození, nebo mu při seslání na jiný cíl zkopírují 50 % poškození."
+        "description": "Na 15 s cejchuje nepřítele. Tvá další 3 přímá kouzla se proti cejchovanému nepříteli ozvou za 25 % poškození, nebo mu při seslání na jiný cíl zkopírují 50 % poškození. Ozvěny Zkázného šípu se také počítají jako kritické zásahy, bez dalšího násobiče kritického poškození."
       },
       "wrath": {
         "name": "Šíp divočiny",
@@ -11838,7 +12208,7 @@ export const cs_CZ: EnTranslations = {
       },
       "bear_form": {
         "name": "Medvědí podoba",
-        "description": "Proměníš se v medvěda: zbroj +110 %, maximální zdraví +30 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
+        "description": "Proměníš se v medvěda: zbroj +110 %, maximální zdraví +30 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Proměna do jakékoli podoby udělí Pružný krok, krátký nával rychlosti pohybu. Sesláním znovu se vrátíš do podoby sesilatele."
       },
       "maul": {
         "name": "Drcení kostí",
@@ -11854,17 +12224,17 @@ export const cs_CZ: EnTranslations = {
         "description": "Zlověstný řev: každý nepřítel do 10 yardů je vyprovokován, jeho hrozba vůči tobě se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a je nucen na tebe 3 s útočit. Pouze v medvědí podobě."
       },
       "cat_form": {
-        "name": "Vlčí podoba",
-        "description": "Promění tě ve vlka: obratnost roste s tvou úrovní, útočná síla +8 plus 2 za úroveň, tvé útoky používají energii a combo body a vytváříš o 29 % nižší hrozbu. Sešli znovu, aby ses vrátil do sesilatelské podoby."
+        "name": "Kočičí podoba",
+        "description": "Promění tě ve vlka: obratnost roste s tvou úrovní, útočná síla +8 plus 2 za úroveň, tvé útoky používají energii a combo body a vytváříš o 29 % nižší hrozbu. Přeměna do jakékoli podoby udělí Dlouhý krok: 60 % rychlosti pohybu na 3 s, jednou za 20 s. Sešli znovu, aby ses vrátil do sesilatelské podoby."
       },
       "claw": {
         "name": "Rvoucí dráp",
-        "description": "Zasáhni nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze ve vlčí podobě.",
+        "description": "Zasáhni nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze v kočičí podobě.",
         "specNote_feral": "Každý zásah přidá 1 Starou krev (max 3)."
       },
       "ferocious_bite": {
         "name": "Krvavý skus",
-        "description": "Dokončovací útok, který způsobí {damage}. Pouze ve vlčí podobě.",
+        "description": "Dokončovací útok, který způsobí {damage}. Pouze v kočičí podobě.",
         "specNote_feral": "Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k silnějšímu úderu, okamžitě způsobí veškeré poškození, které by ještě způsobilo tvé Stažení z kůže a Roztržení, a obnoví energii."
       },
       "swipe": {
@@ -11896,7 +12266,7 @@ export const cs_CZ: EnTranslations = {
       },
       "travel_form": {
         "name": "Svižná podoba",
-        "description": "Okamžitě se proměníš ve svižnou běhavou podobu a zvýšíš rychlost pohybu o 40 %. V proměně nemůžeš používat jiné schopnosti, ale můžeš se proměnit v boji i mimo něj, ideální pro únik."
+        "description": "Okamžitě se proměníš ve svižnou běhavou podobu, zvýšíš rychlost pohybu o 40 % a odstraníš přerušitelné zakořenění a zpomalení. V proměně nemůžeš používat jiné schopnosti, ale můžeš se proměnit v boji i mimo něj, ideální pro únik. Proměna do jakékoli podoby udělí Pružný krok, krátký nával rychlosti pohybu."
       },
       "enrage": {
         "name": "Rozdmýchání",
@@ -11916,23 +12286,31 @@ export const cs_CZ: EnTranslations = {
       },
       "dash": {
         "name": "Úprk",
-        "description": "Vyrazíš vpřed a zvýšíš rychlost pohybu o 50 % na 15 s. Pouze ve vlčí podobě."
+        "description": "Vyrazíš vpřed a zvýšíš rychlost pohybu o 50 % na 15 s. Pouze v kočičí podobě."
       },
       "pounce": {
         "name": "Plíživý úder",
-        "description": "Zahajovací útok z plížení, který omráčí cíl na 2 s. Udělí 1 combo bod. Pouze ve vlčí podobě."
+        "description": "Zahajovací útok z plížení, který omráčí cíl na 2 s. Udělí 1 combo bod. Pouze ve vlčí podobě. Bez plížení je toto tlačítko Výpad."
+      },
+      "lunge": {
+        "name": "Výpad",
+        "description": "Vrhni se na nepřítele až 12 yardů daleko, způsob 60 % poškození zbraní a získej 1 combo bod. Pouze ve vlčí podobě."
+      },
+      "hamstring_bite": {
+        "name": "Sražení",
+        "description": "Dokončovací útok, který omráčí cíl na 1 s plus 1 s za combo bod (5 combo bodů: 6 s). Pouze ve vlčí podobě."
       },
       "insect_swarm": {
         "name": "Bodavý roj",
         "description": "Nepřítele obklopí roj hmyzu a způsobí {damage} přírodního poškození během 12 s."
       },
       "tigers_fury": {
-        "name": "Vlčí krev",
-        "description": "Prudce obnoví {rage} energie a zvýší sílu útoku o {buff} na {duration} s. Pouze ve vlčí podobě."
+        "name": "Rysí krev",
+        "description": "Prudce obnoví {rage} energie a zvýší sílu útoku o {buff} na {duration} s. Pouze v kočičí podobě."
       },
       "rip": {
         "name": "Krvavá trhlina",
-        "description": "Dokončovací útok, po kterém cíl krvácí každé 2 s po dobu 24 s: 36 poškození plus 24 za vydaný combo bod (5 combo bodů: {damage} celkem). Pouze ve vlčí podobě.",
+        "description": "Dokončovací útok, po kterém cíl krvácí každé 2 s po dobu 24 s: 36 poškození plus 24 za vydaný combo bod (5 combo bodů: {damage} celkem). Pouze v kočičí podobě.",
         "specNote_feral": "Zasažený úder přidá 1 Starou krev (max 3)."
       },
       "mortal_strike": {
@@ -12129,11 +12507,11 @@ export const cs_CZ: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Podoba měsíčního křídla",
-        "description": "Promění tě v děsivého měsíčníka, zvýší tvoje poškození kouzly o 20 % a zbroj o 50 %. Trvá, dokud podobu neopustíš. Dalším sesláním se vrátíš do normální podoby. (klíčová schopnost Rovnováhy)"
+        "description": "Promění tě v děsivého měsíčníka, zvýší tvoje poškození kouzly o 20 % a zbroj o 50 %. Trvá, dokud podobu neopustíš. Proměna do jakékoli podoby udělí Pružný krok, krátký nával rychlosti pohybu. Dalším sesláním se vrátíš do normální podoby. (klíčová schopnost Rovnováhy)"
       },
       "feral_charge": {
         "name": "Prvotní nápor",
-        "description": "Uvolní prvotní nápor. Ve vlčí podobě zvýší obnovu energie o 100 % na 10 s. V medvědí podobě okamžitě vygeneruje 50 vzteku. (klíčová schopnost Divokosti)"
+        "description": "Uvolní prvotní nápor. V kočičí podobě zvýší obnovu energie o 100 % na 10 s. V medvědí podobě okamžitě vygeneruje 50 vzteku. (klíčová schopnost Divokosti)"
       },
       "swiftmend": {
         "name": "Rychlé zhojení",
@@ -12353,7 +12731,7 @@ export const cs_CZ: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Zkázný šíp",
-        "description": "Spotřebuje 3 Muka a vrhne těžký šíp chaotického ohně, který způsobí {damage} ohnivého poškození. Zpustošení zkrátí jeho sesílání o 30 %."
+        "description": "Spotřebuje 3 Muka a vrhne těžký šíp chaotického ohně, který způsobí {damage} ohnivého poškození před použitím kritického poškození. Při zásahu vždy kriticky zasáhne. Zpustošení zkrátí jeho sesílání o 30 %."
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
@@ -12497,7 +12875,7 @@ export const cs_CZ: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Dokonalý okamžik",
-        "description": "Popadneš svůj dokonalý okamžik: okamžitě získáš 4 Éterické náboje a po dobu 10 s Éterické šipky je nespotřebovávají. (Chronomagie)"
+        "description": "Popadneš svůj dokonalý okamžik: okamžitě získáš 4 Éterické náboje a po dobu 10 s Éterické šipky je nespotřebovávají a způsobují o 20 % větší poškození. (Chronomagie)"
       },
       "arcane_surge": {
         "name": "Příval éteru",
@@ -12634,7 +13012,7 @@ export const cs_CZ: EnTranslations = {
       },
       "bear_charge": {
         "name": "Medvědí výpad",
-        "description": "Vyrazí k nepříteli, vygeneruje 9 vzteku a omráčí ho na 1 s. Dosah 8-25 yardů. Pouze v medvědí podobě."
+        "description": "Vyrazí k nepříteli, vygeneruje 9 vzteku a omráčí ho na 1 s. Po dobu 3 s poté je Vlčí podoba zdarma a přišpendlí cíl, čímž ho zpomalí o 50 % na 4 s. Dosah 8-25 yardů. Pouze v medvědí podobě."
       },
       "demoralizing_roar": {
         "name": "Zbabělý řev",
@@ -12642,11 +13020,11 @@ export const cs_CZ: EnTranslations = {
       },
       "prowl": {
         "name": "Plížení",
-        "description": "Vstoupíš do plížení ve vlčí podobě a pohybuješ se o 5 % pomaleji. Nelze použít v boji."
+        "description": "Vstoupíš do plížení ve vlčí podobě. Nelze použít v boji."
       },
       "rake": {
         "name": "Stažení z kůže",
-        "description": "Rozpárej nepřítele za poškození zbraně plus {damage} a způsob krvácení po dobu 18 s. Udělí 1 combo bod. Pouze ve vlčí podobě.",
+        "description": "Rozpárej nepřítele za poškození zbraně plus {damage} a způsob krvácení po dobu 18 s. Udělí 1 combo bod. Pouze v kočičí podobě.",
         "specNote_feral": "Každý zásah přidá 1 Starou krev (max 3)."
       },
       "revive_pet": {
@@ -16410,6 +16788,21 @@ export const cs_CZ: EnTranslations = {
       "hub_healing_dummy": {
         "name": "Léčicí cvičný terč"
       },
+      "healing_dummy_tank": {
+        "name": "Dummy zraněného Vanguarda"
+      },
+      "healing_dummy_soldier": {
+        "name": "Dummy zraněného vojáka"
+      },
+      "healing_dummy_scout": {
+        "name": "Dummy kritického skauta"
+      },
+      "healing_dummy_caster": {
+        "name": "Dummy zraněného Spellcastera"
+      },
+      "healing_dummy_ranger": {
+        "name": "Dummy zbitého Strážce"
+      },
       "ridge_stalker": {
         "name": "Hřebenový slídil"
       },
@@ -19937,6 +20330,7 @@ export const cs_CZ: EnTranslations = {
       "eastbrook_vale": {
         "name": "Eastbrookské údolí",
         "welcome": "Najdi ve městě maršála Redbrooka, má pro tebe práci.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -19982,6 +20376,7 @@ export const cs_CZ: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefenský močál",
         "welcome": "Ohlas se u strážce Fenwicka u brány Fenbridge.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20012,6 +20407,7 @@ export const cs_CZ: EnTranslations = {
       "thornpeak_heights": {
         "name": "Thornpeakské výšiny",
         "welcome": "Kapitánka Thessaly drží zeď u Highwatche, ale sotva.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"

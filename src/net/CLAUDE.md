@@ -57,6 +57,10 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
   itself) and deliberately bucket-agnostic: `src/net` never imports `src/game`;
   `src/main.ts` is the junction that drains the digest into the perf monitor once per
   animation frame.
+- `target_echo.ts`: the pure decision behind the `pendingTargetEcho` optimism (scope in
+  Never, below): the optimistic target holds until the first snapshot whose input `ack`
+  covers the `target` command's `seq`, with a snapshot-count valve for a seq nothing ever
+  covers (`tests/target_echo_core.test.ts`; the wiring in `tests/target_echo_client.test.ts`).
 - `quest_state_optimistic.ts`: the pure resolution behind the `pendingQuestCommands`
   optimism (scope in Never, below): while a `turnin` is in flight, prerequisite checks
   treat that quest as done, so a follow-up quest appears in the same gossip re-render
@@ -102,7 +106,8 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
 - **Server to client**: the live frame list is the `msg.t` branches in `onMessage`
   (`online.ts`). Semantics worth knowing: `hello` carries pid/seed/realm and resets
   a reconnected transport; `events` push to `eventQueue` (drained by `drainEvents`);
-  `social` sets `socialInfo` and flips `socialDirty`; `censor` live-updates the
+  `social` sets `socialInfo` and flips `socialDirty`; `who` answers one `whoRequest` with
+  the roster mirror `whoInfo` (`who_frame_wire.ts`); `censor` live-updates the
   soft-profanity word list; an `error` frame ends the session (subject to
   `reconnect_policy.ts`).
 - **Client to server**: versioned world auth (`ONLINE_WORLD_AUTH_TYPE`, built by
@@ -235,12 +240,16 @@ failure, kept as stable English that `main.ts` re-localizes.
   client-side anticipation of combat, casts, resources, loot, aggro, or anything
   else the server resolves. The only sanctioned optimism inside `net/` is the
   trivial local UI nudges already present (`targetEntity` setting `targetId`,
-  shielded from stale in-flight snapshots by `pendingTargetEcho`;
-  `pendingQuestCommands`, whose resolution logic is the pure
+  shielded from stale in-flight snapshots by `pendingTargetEcho`, whose decision
+  core is the pure `target_echo.ts`: the `target` command carries a `seq` from the
+  input counter, and the hold releases on the first snapshot whose `ack` covers it,
+  never on a snapshot count, so a long round trip cannot bounce the frame back to
+  the previous target; `pendingQuestCommands`, whose resolution logic is the pure
   `quest_state_optimistic.ts`); keep that scope. Both follow the same
   reconcile-on-snapshot contract: display-only, and the server's value always
-  wins within a bounded window (`tests/target_echo_client.test.ts` pins the
-  target one).
+  wins, from the first post-command snapshot for the target (a valve bounds the
+  no-ack case) and within a bounded window for quests (`tests/target_echo_client.test.ts`
+  and `tests/target_echo_core.test.ts` pin the target one).
 - **Local-player movement prediction is the one sanctioned prediction**, and it
   lives OUTSIDE `net/` (`src/render/self_prediction.ts` + `self_prediction_core.ts`
   on movement wire v2; design authority `docs/design/movement-reconciliation.md`):
@@ -253,7 +262,9 @@ failure, kept as stable English that `main.ts` re-localizes.
   is really on the wire, never an outcome guess; (c) corrections exist only on
   server override epochs (`ovE`/`ovA`) and genuine reconcile mismatches, and
   the display absorbs them through the handoff offset bounded by
-  `MAX_SELF_REWIND_YD_PER_SEC`; (d) the feel bar is
+  `MAX_SELF_REWIND_YD_PER_SEC`, except that a gap past the shared six-yard
+  teleport rule (`SELF_MOTION_SNAP_DIST_SQ`) is an authoritative relocation
+  and snaps outright instead of gliding; (d) the feel bar is
   `tests/movement_latency_baseline.test.ts` in strict mode, and any change here
   must keep it green. Changing this model is a maintainer decision. The legacy
   display extrapolator (`src/render/self_motion.ts`, leash + servo + block

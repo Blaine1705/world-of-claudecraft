@@ -323,6 +323,7 @@ const hudStringsEn = {
       templates: {
         battleground: '[Battleground] {name}: {message}',
         party: '[Party] {name}: {message}',
+        raidWarning: '[Raid Warning] {name}: {message}',
         yell: '{name} yells: {message}',
         whisper: '{name} whispers: {message}',
         toWhisper: 'To {name}: {message}',
@@ -447,6 +448,11 @@ const hudStringsEn = {
       // "Slain by Cauterized", which sounds like an enemy landed the kill.
       deathRecapCauterized: "You have died. Cauterize's burn overwhelmed you.",
       respawn: 'You feel rested and whole again.',
+      // The Pale Keeper's revive: alive again, but under the Keeper's Toll (the
+      // respawn event carries sickness: 'resurrection'). WORDY by M16, so the five
+      // non-Latin overlays carry real fills.
+      respawnKeeperToll:
+        "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       ignoringChat: 'Ignoring chat from {name}.',
       noLongerIgnoring: 'No longer ignoring {name}.',
       playerNotNearby: 'That player is not nearby.',
@@ -470,6 +476,7 @@ const hudStringsEn = {
       stunned: 'You are stunned!',
       silenced: 'You are silenced!',
       busy: 'You are busy.',
+      cannotCastWhileMoving: "You can't cast while moving.",
       abilityNotReady: 'That ability is not ready yet.',
       notEnoughRage: 'Not enough rage!',
       notEnoughEnergy: 'Not enough energy!',
@@ -482,7 +489,8 @@ const hudStringsEn = {
       requiresForm: 'You must be in {form} Form.',
       cantInForm: "You can't do that in {form} Form.",
       bear: 'Bruin',
-      cat: 'Wolf',
+      cat: 'Cat',
+      bearOrCat: 'Bruin or Cat',
       travel: 'Fleet',
       shapeshifted: 'You cannot do that while shapeshifted.',
       stealthed: 'You must be stealthed.',

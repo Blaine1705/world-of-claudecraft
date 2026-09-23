@@ -150,6 +150,10 @@ function inRiftFloorRegion(pos: { x: number; z: number }, origin: { x: number; z
 
 /** The rift instance whose region contains `pos`, or null. */
 export function riftInstanceAtPos(ctx: SimContext, pos: Vec3): RiftInstance | null {
+  // Every floor region sits inside the rift x band (RIFT_REGION_HALF_X is
+  // aligned to its west edge), so a position outside the band is in no rift
+  // and the per-frame readers (riftFloor, riftBossDeathZones) skip the slots.
+  if (!isRiftPos(pos.x)) return null;
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;
     if (inRiftFloorRegion(pos, riftInstanceOrigin(inst.slot, inst.floorIndex))) return inst;
@@ -1441,7 +1445,7 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
     // Masterwrought (phase 04): A/S first-clear cores (daily-gated per
     // character, ruling R9) plus the weekly ember check. Deliberately outside
     // the boss guard: the grant pays the CLEAR, not the corpse, and it draws
-    // no rng, honoring addRiftProgressionLoot's draw-free contract above.
+    // no rng; only the eligible equipment rewards above roll loot quality.
     // Rank from baseLevel, the creditRiftClearDeeds precedent above, so the
     // winning and losing ember arms can never disagree on a clear's rank.
     awardRiftFirstClearMaterials(ctx, riftRankForBaseLevel(inst.baseLevel), participants);

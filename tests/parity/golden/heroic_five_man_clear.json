@@ -10,8 +10,8 @@
     "awardHeroicMarks on a five-man heroic kill: marksPerParticipant to every participant, plus the gravewyrm_sanctum:heroic daily lockout",
     "class:warrior"
   ],
-  "draws": 62,
-  "drawDigest": "86e69dc4",
+  "draws": 63,
+  "drawDigest": "2cb65480",
   "frames": [
     {
       "tick": 0,
@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1033,
-      "state": "164f5284",
+      "state": "4d9dff60",
       "events": "42cdc878",
       "rng": {
         "draws": 21,
@@ -500,12 +500,12 @@
           "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1007,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -530,7 +530,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -551,12 +551,12 @@
           "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1008,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -581,7 +581,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -602,12 +602,12 @@
           "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1009,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -632,7 +632,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -653,12 +653,12 @@
           "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1010,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -683,7 +683,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -746,11 +746,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1033,
-      "state": "b1ce9c79",
-      "events": "5fce258b",
+      "state": "35a39289",
+      "events": "cafc77c9",
       "rng": {
-        "draws": 62,
-        "digest": "86e69dc4"
+        "draws": 63,
+        "digest": "2cb65480"
       },
       "label": "death",
       "players": [
@@ -898,11 +898,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -960,7 +960,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1542,
+            "damageTaken": 1771,
             "deaths": 1,
             "xpGained": 98
           },
@@ -1083,11 +1083,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1260,11 +1260,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1437,11 +1437,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1614,11 +1614,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1734,7 +1734,7 @@
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -1758,7 +1758,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -1778,12 +1778,12 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1008,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -1807,7 +1807,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -1827,12 +1827,12 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1009,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -1856,7 +1856,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -1876,12 +1876,12 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1010,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -1905,7 +1905,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -2004,11 +2004,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1033,
-      "state": "b1ce9c79",
+      "state": "35a39289",
       "events": "741638a5",
       "rng": {
-        "draws": 62,
-        "digest": "86e69dc4"
+        "draws": 63,
+        "digest": "2cb65480"
       },
       "label": "final",
       "players": [
@@ -2156,11 +2156,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2218,7 +2218,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1542,
+            "damageTaken": 1771,
             "deaths": 1,
             "xpGained": 98
           },
@@ -2341,11 +2341,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2518,11 +2518,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2695,11 +2695,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2872,11 +2872,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2992,7 +2992,7 @@
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -3016,7 +3016,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -3036,12 +3036,12 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1008,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -3065,7 +3065,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -3085,12 +3085,12 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1009,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -3114,7 +3114,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",
@@ -3134,12 +3134,12 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
-          "hp": 418,
+          "hp": 665,
           "id": 1010,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 665,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -3163,7 +3163,7 @@
             "armor": 133,
             "int": 82,
             "spi": 60,
-            "sta": 33,
+            "sta": 52,
             "str": 10
           },
           "templateId": "mage",

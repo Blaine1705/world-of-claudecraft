@@ -23,6 +23,7 @@ import {
   buildBagListRows,
   carriedPools,
   resolveDepositSubmit,
+  tradeOfferOpensPrompt,
   vendorSellIsInstant,
 } from '../src/ui/bags_view';
 import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
@@ -108,6 +109,8 @@ const lookup: ItemLookup = (id) => ITEMS[id];
 describe('bagShiftLinks', () => {
   it('links to chat in every mode except at a vendor (split-stack owns shift there)', () => {
     expect(bagShiftLinks(NO_MODE)).toBe(true);
+    // An open trade keeps the link: its offer-quantity prompt opens on the
+    // PLAIN click (tradeOfferOpensPrompt), so shift stays free here.
     expect(bagShiftLinks({ ...NO_MODE, tradeOpen: true })).toBe(true);
     expect(bagShiftLinks({ ...NO_MODE, marketSell: true })).toBe(true);
     expect(bagShiftLinks({ ...NO_MODE, petFeed: true })).toBe(true);
@@ -121,6 +124,24 @@ describe('bagShiftLinks', () => {
     // the exception is a tested decision, not an omission (every other consumer
     // of bankOpen goes inert; this one stays live).
     expect(bagShiftLinks({ ...NO_MODE, bankOpen: true })).toBe(true);
+  });
+});
+
+describe('tradeOfferOpensPrompt', () => {
+  it('opens for a fungible stack with room for more than one further unit', () => {
+    expect(tradeOfferOpensPrompt({ itemId: 'mat_linen_cloth', count: 20 }, 20)).toBe(true);
+    expect(tradeOfferOpensPrompt({ itemId: 'mat_linen_cloth', count: 20 }, 2)).toBe(true);
+  });
+
+  it('stays closed when at most one unit fits (a plain stage covers it)', () => {
+    expect(tradeOfferOpensPrompt({ itemId: 'mat_linen_cloth', count: 20 }, 1)).toBe(false);
+    expect(tradeOfferOpensPrompt({ itemId: 'mat_linen_cloth', count: 20 }, 0)).toBe(false);
+  });
+
+  it('never opens for an instanced copy (it stages as itself, the deposit rule)', () => {
+    expect(
+      tradeOfferOpensPrompt({ itemId: 'sword', count: 1, instance: { enchant: 'x' } }, 5),
+    ).toBe(false);
   });
 });
 
@@ -505,6 +526,48 @@ describe('transfer-locked instanced copies (issue 1165)', () => {
 });
 
 describe('soulbound transfer affordances', () => {
+  const PARTY_WINDOW = {
+    partyTrade: { untilMs: 10_000, eligible: ['Alice', 'Bob'] },
+  };
+
+  it('stages a marked soulbound copy for player trade while keeping every anonymous pipe blocked', () => {
+    expect([
+      bagItemAction(ITEMS.mark, { ...NO_MODE, tradeOpen: true }, PARTY_WINDOW),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, mailAttach: true }, PARTY_WINDOW),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, marketSell: true }, PARTY_WINDOW),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, vendorOpen: true }, PARTY_WINDOW),
+    ]).toEqual([
+      'trade',
+      'transferBlockedSoulbound',
+      'transferBlockedSoulbound',
+      'transferBlockedSoulbound',
+    ]);
+  });
+
+  it('advertises player trade only for a marked soulbound copy', () => {
+    expect([
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, tradeOpen: true }, PARTY_WINDOW),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, mailAttach: true }, PARTY_WINDOW),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, marketSell: true }, PARTY_WINDOW),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, vendorOpen: true }, PARTY_WINDOW),
+    ]).toEqual([
+      'itemUi.tooltip.clickTradeOffer',
+      'hudChrome.itemSoulbound',
+      'hudChrome.itemSoulbound',
+      'hudChrome.itemSoulbound',
+    ]);
+  });
+
+  it('blocks the trade action and hint once the host clock says the marker expired', () => {
+    const tradeMode = { ...NO_MODE, tradeOpen: true };
+    expect(bagItemAction(ITEMS.mark, tradeMode, PARTY_WINDOW, undefined, false)).toBe(
+      'transferBlockedSoulbound',
+    );
+    expect(bagTooltipHintKey(ITEMS.mark, tradeMode, PARTY_WINDOW, undefined, false)).toBe(
+      'hudChrome.itemSoulbound',
+    );
+  });
+
   it('blocks trade, mail, market, and vendor clicks instead of staging a Heroic Mark transfer', () => {
     expect([
       bagItemAction(ITEMS.mark, { ...NO_MODE, tradeOpen: true }),

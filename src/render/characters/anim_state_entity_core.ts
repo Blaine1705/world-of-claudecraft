@@ -9,7 +9,23 @@
  * Node-only (RENDER_PURE_CORES): no three.js, no DOM.
  */
 import { CHARACTER_EFFECT_IMPALED, hasCharacterEffect } from '../character_effects_core';
+import { type LocoState, MOVE_ENTER_SPEED } from '../locomotion';
 import type { AnimState } from './anim_state';
+
+/** Fill the reused scratch for EACH entity; zero-time syncs never retain
+ * another entity's motion. The arrival controller preserves its clock at dt=0. */
+export function applyDisplayedAnimMotion(
+  state: AnimState,
+  loco: LocoState,
+  vx: number,
+  vz: number,
+  dt: number,
+): void {
+  state.speed = loco.speed;
+  state.moving = loco.moving;
+  state.running = loco.running;
+  state.rawMoving = dt > 0 ? Math.hypot(vx, vz) / dt > MOVE_ENTER_SPEED : undefined;
+}
 
 /** The entity facts the overrides read. A structural subset of sim `Entity`, so
  *  the live entity satisfies it directly and a test can pass a literal. */
@@ -31,6 +47,7 @@ export function applyEntityAnimOverrides(
   e: AnimOverrideFacts,
   visuallyDead: boolean,
   characterEffects = 0,
+  stealthed = false,
 ): void {
   // Engaged with someone: a rig that ships a battle stance holds it between
   // swings instead of relaxing into its idle. Reading the aggro target (rather
@@ -39,6 +56,7 @@ export function applyEntityAnimOverrides(
   // same way. Players have no stance clip today, and they carry their selection
   // in targetId rather than aggroTargetId, so they are unaffected either way.
   st.combat = e.aggroTargetId !== null && !visuallyDead;
+  st.stealthed = stealthed && !visuallyDead;
   // Ice slide: the sim glides the player at speed but they should read as FROZEN
   // (gliding stiff on the ice), not sprinting. Suppress locomotion + airborne so
   // the state machine holds a static pose while they slide. Last, so it also
@@ -49,6 +67,7 @@ export function applyEntityAnimOverrides(
     st.running = false;
     st.airborne = false;
     st.combat = false;
+    st.stealthed = false;
   }
   // Impaled on a Nythraxis Bone Spike: the body lies pinned to the floor, so
   // the rig takes the DEATH pose while alive. `dead` is a level the visual
@@ -64,5 +83,6 @@ export function applyEntityAnimOverrides(
     st.running = false;
     st.airborne = false;
     st.combat = false;
+    st.stealthed = false;
   }
 }

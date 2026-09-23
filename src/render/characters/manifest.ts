@@ -34,6 +34,7 @@ import {
 } from '../../sim/varkhul_cinder_artificer';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
+import type { LocoGaitThresholds } from '../locomotion';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
 
@@ -68,8 +69,15 @@ export interface ClipMap {
    *  Its pose should match what the rig's attack and hit one-shots open and
    *  close on, so those blend into and out of it without a snap. */
   combatIdle?: string;
+  /** Low stalking poses for a concealed quadruped. Absent = ordinary gait. */
+  prowlIdle?: string;
+  prowlWalk?: string;
   walk: string;
   run: string;
+  /** Native braced rush, selected by a cast window plus displayed movement. */
+  rush?: string;
+  /** Successful Onrush stop, separate from its looping travel pose. */
+  rushArrival?: string;
   /** one-shot swing clips, rotated per attack */
   attack: string[];
   /** Optional per-ability swing or cast-gesture override. */
@@ -183,7 +191,9 @@ export interface VisualDef {
   hover?: number;
   /** yaw applied so the model faces +Z (facing-0 convention) */
   yaw?: number;
-  /** Optional texture-aware ambient lift for exceptionally dark authored bodies. */
+  /** Optional texture-aware ambient lift for exceptionally dark authored bodies.
+   *  With a `tint` set, the lift glows in the tinted colour rather than the
+   *  atlas's own (the Bone Spike's ember recolour); untinted defs lift white. */
   selfIllumination?: number;
   /** Optional per-visual multiplier for scene environment reflections. */
   envMapIntensity?: number;
@@ -218,12 +228,19 @@ export interface VisualDef {
    *  separate from `weaponSlots` so mainhand cosmetics cannot overwrite a live
    *  shield or second weapon. */
   offhandSlot?: number;
+  /** Click-capsule radius override (world units). The default derives from
+   *  the model footprint and is capped at 2.2 (assets.ts prepareVisual); a
+   *  def sets this when the thing has to be reliably clickable in a crowd
+   *  (the Nythraxis Bone Spike, which shares its footprint with the raider
+   *  it pins). Presentation-side targeting help only: the sim never reads it. */
+  clickRadius?: number;
   /** material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
   tintStrength?: number;
   /** u/s at which the walk/run cycles look right (timeScale matching) */
   walkRef?: number;
+  walkBackRef?: number;
   runRef?: number;
   /** Cadence ceilings (defaults 1.8 walk / 1.6 run, anim_state.ts). Raise for a
    *  rig whose authored gait is slower than the body it carries: a mount runs
@@ -237,6 +254,15 @@ export interface VisualDef {
    *  time on their own review rather than all at once. Most valuable on a rig
    *  whose cadence is pushed well past 1 (see runTimeScaleMax). */
   gaitWindDown?: boolean;
+  prowlRef?: number;
+  /** Opt-in gait coverage for short quadrupeds; other rigs keep global thresholds. */
+  gait?: LocoGaitThresholds;
+  runTimeScaleMin?: number;
+  /** Pose-wrapper rise in world units for swimming and stationary paddling.
+   *  Horizontal animal rigs keep their own waterline instead of the humanoid tread sink. */
+  swimRise?: { stroke: number; tread: number };
+  /** Swimming head top above the entity pivot, including swimRise, at scale 1. */
+  swimHeadHeight?: number;
   attackTimeScale?: number;
   deathTimeScale?: number;
   /** Cut out of locomotion into idle instead of crossfading.
@@ -547,8 +573,8 @@ const WOLF_BAKED: ClipMap = {
 // (Bark, Howl, "Idle Alert", Sneak) specific to this named rare; this
 // blends Howl's rear-back windup into Attack's lunge for a howl-then-pounce,
 // more dramatic than the plain Attack every other WOLF_BAKED user (mob_wolf,
-// form_cat) still plays. WOLF_BAKED itself is untouched: both still read it,
-// and changing the shared base would change player druid/shaman form combat
+// form_ghost_wolf) still plays. WOLF_BAKED itself is untouched: both still read it,
+// and changing the shared base would change player shaman form combat
 // feel, out of scope here. greyjaw already ships and wires BOTH
 // Idle_HitReact_Left and Idle_HitReact_Right (via animal()), so no
 // hit-variety work is needed here: this override is attack-only.
@@ -580,6 +606,39 @@ const BEAR_FORM: ClipMap = {
   // a paddling walk beats the steep no-clip procedural prone on a quadruped,
   // the same call the wolf forms make
   swim: 'Walk',
+};
+
+// The cat is an in-place quadruped: world motion owns the leap trajectory,
+// Jump holds its airborne final pose, and Land fires only on real touchdown.
+// Utility spells intentionally have no gesture override, so buffs never swipe.
+const DRUID_CAT_FORM: ClipMap = {
+  // The compact 17-clip export retired Idle, CombatIdle, Sit/SitDown, Rise,
+  // Wade, SwimSurface, SwimIdle and Hit_Right: Idle_Look is the idle, Swim is
+  // the one water clip, Hit_Left the one flinch; combat idle, sit, wade and
+  // the flourish fall back to the base machine's defaults (idle / walk).
+  idle: 'Idle_Look',
+  prowlIdle: 'ProwlIdle',
+  prowlWalk: 'ProwlWalk',
+  walk: 'Walk',
+  walkBack: 'WalkBack',
+  run: 'Run',
+  attack: ['Attack_Left', 'Attack_Right'],
+  attackByAbility: {
+    claw: 'Attack_Left',
+    rake: 'Attack_Right',
+    ferocious_bite: 'Bite',
+    rip: 'Finisher',
+    pounce: 'Pounce',
+    redharvest: 'Finisher',
+  },
+  hit: ['Hit_Left'],
+  death: 'Death',
+  jump: 'Jump',
+  land: 'Land',
+  fall: 'Fall',
+  swim: 'Swim',
+  swimSurface: 'Swim',
+  swimIdle: 'Swim',
 };
 
 // Custom wild boar rig (wild_boar.glb)
@@ -1442,6 +1501,15 @@ const VELOCIRAPTOR: ClipMap = {
 // The manifest
 // ---------------------------------------------------------------------------
 
+/** The Bone Spike's ember-orange recolour (see mob_nythraxis_bone_spike below). */
+export const NYTHRAXIS_BONE_SPIKE_TINT = 0xff7a1a;
+export const NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH = 1;
+export const NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION = 0.35;
+/** The spike's click capsule, about twice the footprint-derived default
+ *  (0.88 * 2.6/1.6 * 0.9 = 1.29): a click anywhere near the spike lands on
+ *  it, not on the raider it pins (owner call, 2026-09-11). */
+export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
+
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
   player_warrior: swims({
@@ -1452,7 +1520,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
     // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
     // instead of pointed at an unused clip.
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`, `${PLAYERS}/warrior_ability_anims.glb`],
+    animUrls: [
+      `${PLAYERS}/knight_hit_variety_anims.glb`,
+      `${PLAYERS}/warrior_ability_anims.glb`,
+      `${PLAYERS}/warrior_fury_anims.glb`,
+      `${PLAYERS}/warrior_contact_anims.glb`,
+    ],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
@@ -1460,33 +1533,51 @@ export const VISUALS: Record<string, VisualDef> = {
         twohand: '2H_Melee_Attack_Chop',
         dualwield: 'Dualwield_Melee_Attack_Chop',
       },
+      castByAbility: { bladestorm: 'Warrior_Bladestorm_Loop' },
+      rush: 'Warrior_Rush_Loop',
+      rushArrival: 'Warrior_Onrush_Arrival',
+      castTimeScaleByAbility: { bladestorm: 1 },
+      attackTimeScaleByAbility: { heroic_leap: 1 },
       attackByAbility: {
-        mortal_strike: '2H_Melee_Attack_Chop',
-        execute: '2H_Melee_Attack_Chop',
-        slam: '2H_Melee_Attack_Chop',
-        red_harvest: '2H_Melee_Attack_Chop',
-        breachmaker: '2H_Melee_Attack_Chop',
-        // Shieldcrack slams the SHIELD (offhand arm), not the sword: the
-        // synthesized bash (scripts/_add_shield_bash_anim.mjs) drives the
-        // left arm carrying the handslot.l shield; the weapon hand stays back.
-        shield_slam: 'Shield_Bash',
-        raging_gale: 'Dualwield_Melee_Attack_Chop',
-        bloodthirst: 'Dualwield_Melee_Attack_Chop',
-        // Reaping Arc and Revenge hit everything in the frontal arc: the
-        // synthesized flat reap (scripts/_add_sweep_slice_anim.mjs), not the
-        // top-to-bottom chop (owner: "sideways sword sweep").
-        cleave: '1H_Melee_Attack_Slice_Horizontal',
-        revenge: '1H_Melee_Attack_Slice_Horizontal',
-        thunder_clap: '1H_Melee_Attack_Chop',
-        faultline: '1H_Melee_Attack_Chop',
-        heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
-        overpower: '1H_Melee_Attack_Slice_Diagonal',
-        hamstring: '1H_Melee_Attack_Slice_Diagonal',
-        sanguine_aura: 'Spellcast_Raise',
-        raised_guard: 'Block',
-        // Jawcrack is a bare-fist interrupt: the synthesized punch
-        // (scripts/_add_pummel_punch_anim.mjs), not a weapon swing.
-        pummel: 'Punch_A',
+        charge: 'Warrior_Rush_Loop',
+        intervene: 'Warrior_Rush_Loop',
+        mortal_strike: 'Warrior_Maiming_Strike',
+        execute: 'Warrior_Early_Grave',
+        slam: 'Warrior_Brute_Swing',
+        red_harvest: 'Fury_Red_Harvest',
+        breachmaker: 'Warrior_Breachmaker',
+        // Native shield drive with a planted lower body and a held contact.
+        // scripts/build_warrior_contact_anims.mjs bakes foot locking offline.
+        shield_slam: 'Warrior_Shieldcrack',
+        raging_gale: 'Fury_Twinstrike',
+        bloodthirst: 'Warrior_Bloodletting',
+        battle_shout: 'Warrior_Iron_Bellow',
+        demoralizing_shout: 'Warrior_Direhowl',
+        emboldening_roar: 'Warrior_Emboldening_Roar',
+        defiant_bellow: 'Warrior_Defiant_Bellow',
+        rallying_cry: 'Warrior_Valor_Roar',
+        intimidating_shout: 'Warrior_Intimidating_Shout',
+        piercing_howl: 'Warrior_Piercing_Howl',
+        // Reaping Arc turns through all surrounding enemies; Revenge is frontal.
+        cleave: 'Warrior_Reaping_Arc',
+        revenge: 'Warrior_Revenge',
+        thunder_clap: 'Warrior_Quaking_Blow',
+        faultline: 'Warrior_Faultline',
+        heroic_strike: 'Warrior_Reaver_Strike',
+        overpower: 'Warrior_Redhand',
+        hamstring: 'Warrior_Hobbling_Cut',
+        sunder_armor: 'Warrior_Armor_Shear',
+        storm_bolt: 'Warrior_Storm_Bolt',
+        sanguine_aura: 'Warrior_Sanguine_Aura',
+        sweeping_strikes: 'Warrior_Widening_Arc',
+        battle_stance: 'Warrior_Battle_Stance',
+        defensive_stance: 'Warrior_Guarded_Stance',
+        berserker_stance: 'Warrior_Berserker_Stance',
+        raised_guard: 'Warrior_Raised_Guard',
+        iron_resolve: 'Warrior_Iron_Resolve',
+        // Jawcrack drives the held weapon's guard into the interrupt:
+        // planted feet and a compact contact hold preserve both grips.
+        pummel: 'Warrior_Jawcrack',
         // Vaulting Charge is a position-targeted jump, not a swing: the bespoke
         // pose-sample-and-blend clip (coil, airborne, driven two-hand slam on
         // landing). It carries no castFx and resolves no target entity, so it
@@ -1496,32 +1587,20 @@ export const VISUALS: Record<string, VisualDef> = {
         // painter.ts's non-contact 'selfCast' branch); with no entry it plays
         // nothing at all on the body.
         heroic_leap: 'Warrior_Heroic_Leap',
-        // Victor's Surge is a real weapon strike (weaponStrike effect, not a
-        // pure buff), so it lands through the ordinary damage-event attack
-        // trigger like every entry above it: a confident decisive swing, the
-        // same clip heroic_strike/overpower/hamstring already use.
-        victory_rush: '1H_Melee_Attack_Slice_Diagonal',
-        // Seething Fury and Recklessness are both a defiant roar of rage: no
-        // castFx, no target, so (like Vaulting Charge above) the existing Cheer
-        // gesture only shows up once an attackByAbility entry exists for it.
-        berserker_rage: 'Cheer',
-        recklessness: 'Cheer',
-        // Die by the Sword braces behind the blade: the existing raised_guard
-        // donor (Block) reads the same defensive beat, reached the same way.
-        die_by_sword: 'Block',
-        // Avatar's colossus transformation gets the raised-arm flourish
-        // (the longest clip on the rig, fits a dramatic moment), same path.
-        avatar: 'Spellcast_Raise',
-        // Piercing Howl's own description calls it "a piercing shout" even
-        // though it carries no castFx (unlike the six castFx:'shout'
-        // abilities below, which the painter's 'shout' case always plays as
-        // the Cheer EMOTE and never reaches attackByAbility at all - adding
-        // an entry for any of those would be dead code, so this batch leaves
-        // them alone). Piercing Howl's own selfCast cue DOES reach the same
-        // gesture path Vaulting Charge/berserker_rage/etc use above, and the
-        // painter's shout-emote call right after it is guarded on
-        // isMidOneShot, so it does not stomp this gesture.
-        piercing_howl: 'Spellcast_Raise',
+        // A decisive cut followed by an upright, confident recovery.
+        victory_rush: 'Warrior_Victory_Rush',
+        // Native resource ceremonies: inward clench, outward pressure release,
+        // and an aggressive opening of both arms. Each recovers inside a GCD.
+        taunt: 'Warrior_Goad',
+        furious_mending: 'Warrior_Furious_Mending',
+        whirlwind: 'Warrior_Bladed_Gyre',
+        bloodrage: 'Warrior_Blood_Toll',
+        berserker_rage: 'Warrior_Seething_Fury',
+        recklessness: 'Warrior_Recklessness',
+        // The actual blade supplies its distinct defensive presentation.
+        die_by_sword: 'Warrior_Sword_Guard',
+        // A planted rise carries Avatar's physical transformation.
+        avatar: 'Warrior_Avatar',
       },
     },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
@@ -2041,10 +2120,30 @@ export const VISUALS: Record<string, VisualDef> = {
       cast: 'Cast',
     },
   },
-  // Druid Wolf Form AND shaman Shadewolf (ghost_wolf renders this visual with
-  // the ghost material on top). Same custom baked wolf as the world wolves;
-  // the tawny tint keeps the druid form readable against grey pack wolves.
   form_cat: {
+    url: `${CREATURES}/druid_cat_form.glb`,
+    // Sized a fifth above the world wolves (mob_wolf / form_ghost_wolf are 1.6)
+    // so the druid's cat reads as the bigger predator on the field.
+    height: 1.92,
+    clips: DRUID_CAT_FORM,
+    authoredAtlas: true,
+    // Measured planted-paw speeds at height 1.1 (tests/druid_cat_asset.test.ts),
+    // scaled by 1.92/1.1 with the height; clip durations retain a slower walk.
+    walkRef: 2.78992,
+    walkBackRef: 4.82101,
+    runRef: 9.13075,
+    prowlRef: 5.47846,
+    gait: { runEnter: 3.2, runExit: 2.6 },
+    // Scaled with the body: a 1.92 cat at the slowed-run band (3.2 yd/s over a
+    // 9.13 ref) sits at .35, so the floor drops to .3 to keep the feet matched.
+    runTimeScaleMin: 0.3,
+    swimRise: { stroke: 0.21, tread: 0.21 },
+    swimHeadHeight: 1.74,
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+  },
+  // Shaman Shadewolf retains the original wolf, tint and ghost-material overlay.
+  form_ghost_wolf: {
     url: `${CREATURES}/wolf_basic.glb`,
     height: 1.6,
     clips: WOLF_BAKED,
@@ -3668,12 +3767,21 @@ export const VISUALS: Record<string, VisualDef> = {
   // the nominal 'Idle' and the mesh just stands. Authored upright and
   // front-facing (footprint radius 0.88); shown at 2.6 world units so the
   // spike reads as the thing pinning a raider from across the hall (owner
-  // playtest 2026-09-04: 1.6 was too small).
+  // playtest 2026-09-04: 1.6 was too small). Recoloured ember orange with a
+  // tinted lift (v0.42.2, owner playtest: the authored bone-and-flagstone
+  // atlas read as the boss and the floor under the hall's violet torchlight);
+  // the lift follows the tint (assets.ts buildTintedClone) so the spike glows
+  // in the one hue no other Nythraxis surface uses. Pinned literally in
+  // tests/nythraxis_hazard_palette.test.ts.
   mob_nythraxis_bone_spike: {
     url: `${PROPS}/nythraxis_bone_spike.glb`,
     height: 2.6,
     yaw: 0,
     clips: STATIC_PROP,
+    tint: NYTHRAXIS_BONE_SPIKE_TINT,
+    tintStrength: NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH,
+    selfIllumination: NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION,
+    clickRadius: NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS,
   },
 };
 
@@ -3832,6 +3940,11 @@ const MOB_KEYS: Record<string, string> = {
   // the template's `hostile`/`friendlyPracticeTarget` fields.
   hub_training_dummy: 'mob_training_dummy',
   hub_healing_dummy: 'mob_training_dummy',
+  healing_dummy_tank: 'mob_training_dummy',
+  healing_dummy_soldier: 'mob_training_dummy',
+  healing_dummy_scout: 'mob_training_dummy',
+  healing_dummy_caster: 'mob_training_dummy',
+  healing_dummy_ranger: 'mob_training_dummy',
   emberkin: 'mob_emberkin',
   gloomshade: 'mob_gloomshade',
   pyre_colossus: 'mob_pyre_colossus',

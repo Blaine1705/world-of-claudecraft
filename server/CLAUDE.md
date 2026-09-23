@@ -36,6 +36,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `msg_rate_limit.ts` / `msg_lanes.ts` / `list_read_guard.ts` | the inbound WS flood defense: the pre-parse gate (frame + byte buckets and the shared abuse window that kicks), the post-parse per-class lanes, and the ignore/block list-readout meter (see "Inbound WS flood defense") |
 | `ws_backpressure.ts` | the OUTBOUND counterpart to the flood defense: terminates a session whose `ws.bufferedAmount` climbs past the hard limit. `ws.send()` never blocks and a non-draining client's socket stays OPEN, so without this one frozen tab or deliberately non-reading attacker accumulates an unbounded write buffer and can OOM the realm; `readyState` checks do not catch it |
 | `linkdead.ts` | pure session-lifecycle decision core: `planJoin` (resume/reject/join) + `LINKDEAD_GRACE_MS` (see Persistence) |
+| `input_seq.ts` | the one fold of a received `seq` into `session.lastInputSeq` (the R9 gap booking plus the ack high-water the self snapshot echoes), shared by every `input` frame and the client's seq-bearing `target` command (`src/net/target_echo.ts` reads a covering ack as "built after my command"); pure, gap sink injected (`tests/input_seq_fold.test.ts`) |
 | `keepalive_sweep.ts` | pure self-clocked keepalive-sweep decision (`keepaliveSweepDelayed`, `KEEPALIVE_STALL_FACTOR`): a sweep that fires late (an event-loop stall) re-arms every session instead of terminating them, so one stall can never mass-disconnect the realm; a genuinely dead socket still reaps one clean interval later; plus the stall-proof hard silence deadline (`WS_SILENCE_DEADLINE_MS`, `noteClientFrame`, `socketSilentPastDeadline`, `shouldReapSession`): a socket the server processed no frame from for ten minutes, measured only up to the previous sweep, is reaped however late the sweep runs, so a black-holed socket can never hold a character 'already in world' without bound |
 | `db.ts` | `pg` pool, core `SCHEMA` DDL + `ensureSchema`, character/account/token/world-state queries. Owns the timeout ladder (connect < statement default < the `runWithStatementTimeout` heavy allowance < the driver-side `query_timeout` backstop; constants + rationale at the top, relation pinned by `tests/server/tunables.test.ts`): wrap a known-long read in `runWithStatementTimeout`, never lift the session default, and remember `SET LOCAL` cannot lift the driver backstop. Boot DDL runs on a dedicated non-pool `Client` so schema setup is never capped |
 | `account.ts`, `totp.ts` | account self-service routes: password change/forgot/reset, verified email change, data export, TOTP 2FA (`totp.ts` is the pure RFC 6238 core) |
@@ -67,6 +68,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `cached_read.ts` / `deeds_board_warm.ts` / `discord_status_cache.ts` | the three shared-read cache shapes: single-key `createCachedRead` (TTL, single-flight, stale-on-error, joiner-refusing bust) / the extended `singleFlight(run, epochOf?)` for per-scope epoch-keyed board flights / the keyed bounded per-account cache behind `GET /api/discord` (see Hot paths) |
 | `auth_guard_core.ts` / `woc_auth_guard_cache.ts` | the per-request auth-guard reads' pure core (token scope/expiry verdict + the moderation status ladder, computed from raw rows at read time) and the marketplace-scoped cache over them: raw rows only, no negative caching, no stale-serve, keyed busts every projection writer calls (post-COMMIT where transactional; completeness discovered by `tests/server/auth_guard_bust_coverage.test.ts`), consumed ONLY through the woc_market_routes guard bundle via `WocMarketRuntime.authGuardDb` (the admin gate and every other guard surface stay on the direct db reads; the import boundary is pinned). `WOC_AUTH_GUARD_CACHE_TTL_MS` (5s) is the cross-process revocation/ban delay ceiling: process-per-realm shares one database and accounts/auth_tokens are not realm-scoped, so a write committed by ANOTHER realm process is invisible here until the TTL lapses |
 | `retention_sweep.ts` | the advisory-locked, self-clocked nightly sweep of batched per-table prunes; every table that grows without bound registers here (see Hot paths) |
+| `event_record_observers.ts` / `craft_roll_events.ts` / `craft_roll_events_db.ts` | the event drain's database RECORD arms (one sim event in, one fire-and-forget row out: the ftue_events quest/death rows and the `craft_roll_events` chance-based crafting outcome audit, a bounded FIFO writer over a pure schema+insert+prune module); a new "log this sim event to a table" need is a new arm here plus a `*_db.ts` sibling, never a block in game.ts |
 | `concurrent_indexes.ts` | post-boot `CREATE INDEX CONCURRENTLY` seam for new indexes on big live tables |
 | `realm_readout_memo.ts` / `event_frame.ts` / `interest_candidates.ts` | broadcast build-once seams: per-pass realm readout memo (rides `maybeRaw`), serialize-once event frames (sent via `sendRaw`), per-cell shared interest gathering (see Hot paths) |
 
@@ -139,7 +141,10 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 
 ## Hot paths: shared reads, retention, broadcast
 One process serves a whole realm, so per-request and per-tick cost is what scales.
-Three seams keep it flat; use them, never re-invent them.
+The seams below keep it flat; use them, never re-invent them. The recurring failure is
+not the seams but the SHAPE of a cost: work that looks flat on a fresh world and scales
+with a collection that grows for months in production. The last four bullets exist for
+that shape.
 
 - **Shared (viewer-identical) reads are cached with single-flight.** Three shapes:
   `createCachedRead(refresh, {ttlMs})` (`cached_read.ts`) for a single-key read (TTL,
@@ -192,6 +197,89 @@ Three seams keep it flat; use them, never re-invent them.
   Refactors here prove byte-identity with pinned tests (`tests/bandwidth.test.ts`,
   `tests/snapshots.test.ts`); cadence gates use a `>=` dueness tracker, never
   `tickCount % N` (catch-up ticks stride past a modulo and stall the gate).
+
+- **Never put an O(realm-collection) read on the per-tick self path.** The self path is
+  `selfWireJson` (`game.ts`): every `maybe(...)` key there is rebuilt for every session on
+  every broadcast pass, and the delta cache suppresses only the SEND, never the rebuild. A
+  read whose cost scales with a collection that grows with realm age or activity (the
+  World Market listing book, the Ravenpost mail book, the commission order board, any
+  future shared board or ledger) is a defect on this path even when each call looks fast
+  on a fresh world: such collections are near-empty in dev and in bot load tests, and
+  grow for months in production. Three shipped incidents, same shape: the World Market
+  browse read (gated by PR #3028), the commission order board read (the `corder` key,
+  which shipped in the very release that fixed the market and was gated by PR #3113),
+  and the mailbox read (the `mail` key, gated in that same PR #3113 on top of the
+  per-recipient `MailIndex` of PR #3052). The settled recipe (the market gate is the
+  exemplar; `corder` and `mail` copy its shape minus the query-identity arm, having no
+  query): keep the viewer-independent work out of the per-viewer rebuild (memoized
+  inside the sim per book revision, `sortedBookCache` in `src/sim/market.ts`; or, when
+  the WHOLE value is viewer-identical, built and stringified once per pass via
+  `realm_readout_memo.ts` and shipped with `maybeRaw(...)`, the `dfb` board), and
+  rebuild the per-viewer remainder only behind a revision counter bumped at EVERY
+  mutation site of the backing collection (`sim.marketBrowseRevFor`,
+  `sim.commissionOrderBoardRev`, `sim.mailRevFor`; each verb pinned by a test), a
+  per-session last-built revision plus query-identity check, a staleness backstop
+  (`*_REFRESH_TICKS`), and a `>=` cadence gate (`MARKET_WIRE_HZ`,
+  `CORDER_WIRE_HZ`, `MAIL_WIRE_HZ`) with a prompt re-arm on the viewer's own commands
+  (`*_WIRE_PROMPT_CMDS`). Pinned by `tests/market_wire_cadence.test.ts`,
+  `tests/commission_wire_cadence.test.ts`, and `tests/mail_wire_cadence.test.ts`: the
+  decisive pin is a SPY on the expensive sim read proving it is not called while nothing
+  changed. A new self key also joins a `SELF_WIRE_PHASES` bucket
+  (`tests/self_wire_phase_breakdown.test.ts`) so the next Tick Profiler capture names it
+  instead of folding it into the `bcastSelf` total, where the market and corder
+  incidents each hid for a whole diagnosis round.
+
+- **A "small read" claim needs a named bound.** A comment calling a per-tick snapshot
+  read small must say WHAT bounds it: an O(1) per-player field (a scalar or fixed-shape
+  record on the player meta: `copper`, `ddiff`, `mst`), a content table
+  (`craftingIdentityFor` is bounded by the recipe catalog), a per-player cap (bags,
+  buyback, cooldowns), a proximity gate (the mail key is built only at a raven pillar,
+  the market key only at the Merchant), or the revision plus cadence gate above. A read
+  bounded by an O(1) field or by content may stay per-tick; a
+  read bounded by nothing was how the commission board shipped. No named bound, no
+  per-tick key.
+
+- **Recurring main-thread work is O(what changed), never O(the book), and so is any
+  event-driven durability write.** The autosave
+  (`flushPeriodicSaves`, `AUTOSAVE_SECONDS`), the account-wealth sweep
+  (`account_wealth.ts`), the retention sweep, and any self-clocked loop run on the same
+  thread as the 20 Hz tick, and for a long time outside its instrument: the autosave ran
+  after `tickProfiler.commit`, so its cost sat outside every phase and outside `total`,
+  visible only as `nodejs_eventloop_lag_max_seconds`. That is how issue #3561 (the whole
+  mail book re-stringified every 30 s, ~250 ms per pass against the production 89 MB
+  row) and the v0.40.1 hotfix pair (the escrow fold that JSON-parsed the same book in
+  Node every 60 s, moved into Postgres by PR #3661 in `account_wealth_db.ts`; the
+  custody parcel that rewrote the whole book per booking, now one overlay row via
+  PR #3663 `mail_custody_overlay.ts`) stayed undiagnosed for weeks. PR #3576 closed
+  the blind spot: the shared-blob writers (the market writer, which carries the market
+  AND mail books, and the rift writer) bill their thunk's synchronous cost to the
+  `saves` phase through the serial writers' `onWrite` observer (`serial_writer.ts`),
+  and the gap BETWEEN callbacks is the `lateness` phase; both ride `woc_sim_tick_phase_seconds`
+  (read `max`, never `p95`: a 30 s stall is two samples in a 60 s ring). `saves` counts
+  ONLY those two writers: per-character blobs and DB round trips are not in it, and a
+  job that reports into no phase shows up as `lateness` with nothing to attribute it
+  to. Rules: a new realm collection never persists as one whole-book `world_state` blob
+  rewritten on the autosave cadence (the market and rift blobs are the legacy shape,
+  not the template; the mail book was the third until PR #3613 partitioned it per
+  dirty recipient, which is what the fix looks like): write per-row, overlay, or
+  dirty-bucket, so a quiet interval writes nothing; a recurring job's cost, or an
+  event-driven durability write's, must not scale with total book size, only with what
+  changed or with the bounded result it produces (aggregate inside Postgres when the
+  input is a stored blob; a handler that awaits a whole-book save "so the grant is
+  durable", the `persistMailBlob` per-parcel shape PR #3663 retired, is the same
+  defect on a different clock); and a new recurring job bills its cost to
+  a profiler phase in the same change (an observer into `saves` for a new shared-blob
+  writer, a registered phase of its own otherwise), never silently.
+
+- **Fresh-bot load tests cannot see this bug class.** Fresh characters carry empty
+  books, boards, and inboxes, so a bot fleet proves interest-scan and movement cost,
+  never grown-collection cost. Before calling a new snapshot read or recurring job cheap,
+  bench it against a grown backing collection (seed 1,000+ rows; PR #3052 benched a
+  prod-shaped 98k-letter book) and record the measured per-call cost at that size in the
+  PR. When in doubt, capture the admin Tick Profiler (`tick_profiler.ts`, the
+  `self.*` breakdown) before and after on a long-lived realm, not a fresh one, and read
+  the `saves` and `lateness` maxima (plus `nodejs_eventloop_lag_max_seconds`) for
+  anything that runs outside the tick body.
 
 ## Inbound WS flood defense (`msg_rate_limit.ts`, `msg_lanes.ts`, `list_read_guard.ts`)
 Three pure metering modules (injected `nowSec`, no `Date.now`; unit-tested without a
@@ -360,3 +448,11 @@ then drives handlers via `routes` + `configureLeaderboardRuntime` + `fakeCtx`). 
   an explicit keep-forever comment at the DDL.
 - Never serialize a realm-identical broadcast payload per session: build once per pass,
   reuse the bytes.
+- Never put a read whose cost scales with a realm collection (the listing book, the mail
+  book, the order board, any shared board or ledger) on the per-tick self path without the
+  revision plus cadence gate, and never call a per-tick read small without naming its bound.
+- Never add recurring main-thread work, or an event-driven durability write, whose cost
+  scales with a whole book instead of what changed, and never persist a new realm
+  collection as one whole-book `world_state` blob rewritten on the autosave cadence.
+- Never call a new snapshot read or recurring job cheap on the evidence of a fresh world or
+  a fresh-bot fleet alone: bench it against a grown collection and record the number.

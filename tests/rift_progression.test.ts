@@ -3,9 +3,12 @@
 // socket), what a band grants when worn, the load-time rebuild that migrates
 // every persisted band, and salvage.
 import { describe, expect, it } from 'vitest';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { ITEMS } from '../src/sim/data';
+import { sanitizeItemInstancePayloadOnLoad } from '../src/sim/item_instance_load';
 import { primaryStatSum } from '../src/sim/item_level';
+import { resolveApplyEnchant } from '../src/sim/professions/enchanting';
 import {
   RIFT_BAND_MAX_UPGRADE,
   RIFT_GEM_RATING,
@@ -199,6 +202,48 @@ describe('Rift band progression: worn', () => {
   });
 });
 
+describe('Rift band progression: a ring enchant rides every rung', () => {
+  const RING_ENCHANT = 'enchant_ring_strength';
+  const BONUS = ENCHANTS[RING_ENCHANT].statBonus.str ?? 0;
+
+  it('an enchanted band keeps its bonus through the live forge verbs and a relog', () => {
+    expect(BONUS).toBeGreaterThan(0);
+    const sim = new Sim({ seed: 738, playerClass: 'warrior', autoEquip: false });
+    moveToRiftForge(sim);
+    sim.setPlayerLevel(20);
+    const gear = createRiftGearInstance('rift-enchanted', 'S', 'warrior', sim.player.id);
+    sim.addItemInstance(gear.itemId, gear.instance);
+    sim.addItem('arcane_dust', 5);
+    expect(resolveApplyEnchant(sim.ctx, sim.player.id, gear.itemId, RING_ENCHANT).ok).toBe(true);
+    sim.addItem(RIFT_ESSENCE_ITEM_ID, 2);
+    sim.addItem(VERDANT, 1);
+    // The live forge verbs rebuild the rolled line: the marker and its bonus
+    // must ride the rebuild, not be wiped by it.
+    expect(sim.upgradeRiftItem(gear.itemId).ok).toBe(true);
+    expect(sim.socketRiftGem(gear.itemId, VERDANT).ok).toBe(true);
+    const forged = bandSlot(sim, gear.itemId).instance!;
+    expect(forged.enchant).toBe(RING_ENCHANT);
+    const bare = createRiftGearInstance('bare', 'S', 'warrior', sim.player.id, 1, [VERDANT]);
+    expect(forged.rolled?.stats).toEqual({
+      ...bare.instance.rolled?.stats,
+      str: (bare.instance.rolled?.stats?.str ?? 0) + BONUS,
+    });
+
+    // Worn, then a real save/load round trip through the anti-tamper rebuild.
+    sim.equipItem(gear.itemId);
+    expect(sim.equipment.ring1).toBe(gear.itemId);
+    const strWorn = sim.player.stats.str;
+    const state = sim.serializeCharacter(sim.player.id);
+    if (!state) throw new Error('Failed to serialize the Rift character');
+    const restored = new Sim({ seed: 738, playerClass: 'warrior', noPlayer: true });
+    const pid = restored.addPlayer('warrior', 'Restored', { state });
+    const worn = restored.players.get(pid)?.equipmentInstance?.ring1;
+    expect(worn?.enchant).toBe(RING_ENCHANT);
+    expect(worn?.rolled?.stats).toEqual(forged.rolled?.stats);
+    expect(restored.entities.get(pid)?.stats.str).toBe(strWorn);
+  });
+});
+
 describe('Rift band progression: the load-time rebuild', () => {
   /** The exact payload shape every band on the live realms carried before the
    *  ladder (an additive base line, the retired forge enchant field, the rank
@@ -267,18 +312,31 @@ describe('Rift band progression: the load-time rebuild', () => {
     expect(clean?.rolled?.stats).not.toHaveProperty(RIFT_GEM_RATING_STAT[CRIMSON]);
   });
 
-  it('carries the player item lock through the rebuild and nothing else', () => {
-    const locked = sanitizeRiftGearInstance(
-      'riftbound_band_of_might',
-      { ...legacyProdPayload(), locked: true, signer: 'nobody', charges: { x: 1 } },
-      5,
-    );
+  it('carries the player item lock and an unread lootQuality through the rebuild, nothing else', () => {
+    // Forward compatibility: a later release stamps a permanent per-copy
+    // `lootQuality` descriptor on bands. This binary prices nothing from it
+    // (the ladder line below is unchanged), but a rollback to this binary must
+    // never strip it: the load bound admits the unknown key, and the rebuild
+    // carries it through as-is.
+    const lootQuality = { version: 1, tier: 2, weights: [1, 2, 3, 4, 5] };
+    const loaded = sanitizeItemInstancePayloadOnLoad({
+      ...legacyProdPayload(),
+      locked: true,
+      signer: 'nobody',
+      charges: { x: 1 },
+      lootQuality,
+    });
+    expect(loaded.dropped).toEqual([]);
+    const locked = sanitizeRiftGearInstance('riftbound_band_of_might', loaded.payload!, 5);
     expect(locked?.locked).toBe(true);
+    expect((locked as { lootQuality?: unknown })?.lootQuality).toEqual(lootQuality);
+    expect(locked?.rolled?.stats).toEqual(riftBandPrimaryStats(MIGHT, riftBandItemLevel('S', 0)));
+    expect(JSON.parse(JSON.stringify(locked))).toHaveProperty('lootQuality', lootQuality);
     expect(locked).not.toHaveProperty('signer');
     expect(locked).not.toHaveProperty('charges');
-    expect(
-      sanitizeRiftGearInstance('riftbound_band_of_might', legacyProdPayload(), 5),
-    ).not.toHaveProperty('locked');
+    const plain = sanitizeRiftGearInstance('riftbound_band_of_might', legacyProdPayload(), 5);
+    expect(plain).not.toHaveProperty('locked');
+    expect(plain).not.toHaveProperty('lootQuality');
   });
 
   it('the forge refuses a rift record riding a non-band id, spending nothing', () => {

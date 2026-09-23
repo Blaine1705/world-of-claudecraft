@@ -42,6 +42,8 @@ export const ZONE3_ZONE: ZoneDef = {
     { x: 0, z: 880, label: 'Gravewyrm Sanctum', id: 'gravewyrm_sanctum' },
   ],
   welcome: 'Captain Thessaly holds the wall at Highwatch - barely.',
+  welcomeDone:
+    "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
 };
 
 // Mountain road from Fenbridge up to Highwatch, then spokes.
@@ -2390,7 +2392,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     weapon: { min: 17, max: 27, speed: 1.7, dagger: true },
-    stats: { agi: 7, sta: 3 },
+    stats: { agi: 7, sta: 4 },
     sellValue: 3000,
     requiredClass: ['rogue', 'hunter'],
     weaponProcs: [
@@ -2666,7 +2668,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 60, int: 5, spi: 3 },
+    stats: { armor: 60, int: 5, spi: 3, sta: 3 },
     sellValue: 800,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
@@ -2677,7 +2679,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 105, agi: 6, sta: 2 },
+    stats: { armor: 105, agi: 5, sta: 3 },
     sellValue: 800,
     requiredClass: ['rogue', 'hunter'],
   },
@@ -2688,7 +2690,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'uncommon',
     weapon: { min: 18, max: 29, speed: 2.3 },
-    stats: { str: 6, sta: 2 },
+    stats: { str: 5, sta: 3 },
     sellValue: 900,
     requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
   },
@@ -2699,7 +2701,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'uncommon',
     weapon: { min: 20, max: 33, speed: 3.0 },
-    stats: { int: 6, spi: 2 },
+    stats: { int: 6, spi: 2, sta: 3 },
     sellValue: 900,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
@@ -2710,7 +2712,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'uncommon',
     weapon: { min: 12, max: 19, speed: 1.7, dagger: true },
-    stats: { agi: 8 },
+    stats: { agi: 5, sta: 3 },
     sellValue: 900,
     requiredClass: ['rogue', 'hunter'],
   },
@@ -2743,7 +2745,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'uncommon',
     weapon: { min: 19, max: 31, speed: 3.0 },
-    stats: { int: 7, spi: 3 },
+    stats: { int: 7, spi: 3, sta: 2 },
     sellValue: 950,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
@@ -2802,7 +2804,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     weapon: { min: 26, max: 41, speed: 2.5 },
-    stats: { str: 8, sta: 3 },
+    stats: { str: 8, sta: 4 },
     sellValue: 2400,
     requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
   },
@@ -2815,7 +2817,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     weapon: { min: 24, max: 37, speed: 2.7 },
-    stats: { str: 8, sta: 3 },
+    stats: { str: 7, sta: 4 },
     sellValue: 2000,
     requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
   },
@@ -2826,7 +2828,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     weapon: { min: 23, max: 36, speed: 3.0 },
-    stats: { int: 8, spi: 4 },
+    stats: { int: 8, spi: 4, sta: 4 },
     sellValue: 2000,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
@@ -2837,7 +2839,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     weapon: { min: 15, max: 23, speed: 1.7, dagger: true },
-    stats: { agi: 8, sta: 3 },
+    stats: { agi: 7, sta: 4 },
     sellValue: 2000,
     requiredClass: ['rogue', 'hunter'],
   },
@@ -2859,7 +2861,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     weapon: { min: 24, max: 38, speed: 3.0 },
-    stats: { int: 9, spi: 4 },
+    stats: { int: 9, spi: 4, sta: 4 },
     sellValue: 2000,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
@@ -2870,7 +2872,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     weapon: { min: 14, max: 22, speed: 1.7, dagger: true },
-    stats: { agi: 8, sta: 3 },
+    stats: { agi: 7, sta: 4 },
     sellValue: 2000,
     requiredClass: ['rogue', 'hunter'],
   },
@@ -2912,7 +2914,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     weapon: { min: 27, max: 43, speed: 3.0 },
-    stats: { int: 9, spi: 4 },
+    stats: { int: 9, spi: 4, sta: 4 },
     sellValue: 2500,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
@@ -2945,7 +2947,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'rare',
-    stats: { armor: 75, int: 9, spi: 4 },
+    stats: { armor: 75, int: 9, spi: 4, sta: 4 },
     sellValue: 3000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
@@ -2989,7 +2991,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'rare',
-    stats: { armor: 68, int: 5, spi: 3 },
+    stats: { armor: 68, int: 5, spi: 3, sta: 3 },
     sellValue: 3200,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
@@ -3013,7 +3015,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'epic',
-    stats: { armor: 92, int: 11, spi: 7 },
+    stats: { armor: 92, int: 11, spi: 7, sta: 6 },
     sellValue: 9000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
@@ -3061,7 +3063,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'epic',
-    stats: { armor: 80, int: 8, spi: 4 },
+    stats: { armor: 80, int: 8, spi: 4, sta: 4 },
     sellValue: 9000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
@@ -3073,7 +3075,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'legs',
     quality: 'epic',
-    stats: { armor: 86, int: 13, spi: 7 },
+    stats: { armor: 86, int: 13, spi: 7, sta: 5 },
     sellValue: 9000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
@@ -3125,7 +3127,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     weapon: { min: 32, max: 52, speed: 3.0 },
-    stats: { int: 12, spi: 6 },
+    stats: { int: 12, spi: 6, sta: 6 },
     sellValue: 8000,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
@@ -3164,7 +3166,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'epic',
-    stats: { armor: 70, int: 9, spi: 5 },
+    stats: { armor: 70, int: 9, spi: 5, sta: 5 },
     sellValue: 9000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
@@ -3214,7 +3216,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     armorType: 'cloth',
     quality: 'epic',
-    stats: { armor: 60, int: 8, sta: 5 },
+    stats: { armor: 60, int: 8, sta: 5, spi: 4 },
     sellValue: 3600,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
     set: 'soulflame', // 3rd Wraithfire piece, unlocks the set's 3-piece bonus
@@ -3226,7 +3228,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     armorType: 'mail',
     quality: 'epic',
-    stats: { armor: 130, int: 8, sta: 5 },
+    stats: { armor: 130, int: 8, sta: 5, spi: 4 },
     sellValue: 3600,
     requiredClass: ['shaman'],
     set: 'stormcallers', // 3rd Galecall piece, unlocks the set's 3-piece bonus
@@ -3264,7 +3266,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     armorType: 'cloth',
     quality: 'epic',
-    stats: { armor: 50, int: 8, spi: 5 },
+    stats: { armor: 50, int: 8, spi: 5, sta: 4 },
     sellValue: 3600,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
     set: 'soulflame',
@@ -3276,7 +3278,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     armorType: 'mail',
     quality: 'epic',
-    stats: { armor: 110, int: 8, sta: 5 },
+    stats: { armor: 110, int: 8, sta: 5, spi: 4 },
     sellValue: 3600,
     requiredClass: ['shaman'],
     set: 'stormcallers',
@@ -3296,7 +3298,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // wearers lose real value from the swap (bear-form AP scales on agility).
     // Hunters/rogues cannot equip it. Still exactly on the 44-pt legendary
     // mainhand budget.
-    stats: { spi: 25, sta: 19, int: 21 },
+    stats: { spi: 43, sta: 23, int: 21 },
     spellPower: 25,
     sellValue: 25000,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
@@ -3343,7 +3345,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // Rebalanced into a str/agi/sta hybrid within the fixed 44-pt legendary
     // mainhand budget: 15 agi makes it a viable hunter ranged weapon (ranged AP +
     // crit) while it stays usable by its warrior/paladin owners.
-    stats: { str: 15, agi: 15, sta: 14 },
+    stats: { str: 15, agi: 15, sta: 23 },
     sellValue: 25000,
     requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
     // Thunderfury-style on-hit: a nature arc that blasts the target and chains to
@@ -3460,7 +3462,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'helmet',
     quality: 'epic',
-    stats: { armor: 105, int: 11, sta: 6 },
+    stats: { armor: 105, int: 11, sta: 6, spi: 6 },
     hasteRating: 20,
     sellValue: 12000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
@@ -3473,7 +3475,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'epic',
-    stats: { armor: 92, int: 9, sta: 6 },
+    stats: { armor: 92, int: 9, sta: 6, spi: 5 },
     hasteRating: 20,
     sellValue: 12000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
@@ -3486,7 +3488,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'epic',
-    stats: { armor: 225, int: 10, sta: 7 },
+    stats: { armor: 225, int: 10, sta: 7, spi: 6 },
     critRating: 20,
     sellValue: 12000,
     requiredClass: ['shaman'],
@@ -3499,7 +3501,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'shoulder',
     quality: 'epic',
-    stats: { armor: 190, int: 8, sta: 7 },
+    stats: { armor: 190, int: 8, sta: 7, spi: 5 },
     critRating: 20,
     sellValue: 12000,
     requiredClass: ['shaman'],
@@ -3580,7 +3582,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // Held-in-offhand caster stat stick: no weapon damage, stats on the exact
     // offhand budget, primaryStatBudget(29, epic, offhand) = 15 (the budget
     // model's 0.75x mainhand line), int/spi identity with minor sta.
-    stats: { int: 7, spi: 5, sta: 3 },
+    stats: { int: 7, spi: 8, sta: 5 },
     // Healer-inclusive spell throughput: crit like the stormcallers pieces,
     // never Hit (heals are not resisted; the Heartwood healer-facing rule).
     critRating: 20,
@@ -3709,7 +3711,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'common',
     weapon: { min: 16, max: 27, speed: 3.0 },
-    stats: { int: 2 },
+    stats: { int: 2, sta: 1 },
     sellValue: 600,
     buyValue: 6000,
   },
@@ -3837,7 +3839,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'uncommon',
     // Ridge Stalkers (level 14) -> item level 15, waist budget 4.
-    stats: { armor: 36, int: 2, spi: 2 },
+    stats: { armor: 36, int: 2, spi: 2, sta: 1 },
     sellValue: 420,
   },
   cragward_pauldrons: {
@@ -3848,7 +3850,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     // Old Cragmaw (level 14 rare elite) -> item level 15, shoulder budget 4.
-    stats: { armor: 56, int: 2, spi: 2 },
+    stats: { armor: 56, int: 2, spi: 2, sta: 1 },
     sellValue: 450,
   },
   cragthorn_greatstaff: {
@@ -3875,7 +3877,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'rare',
     // Deeprock Kobolds (level 15) -> item level 18, chest budget 10.
-    stats: { armor: 100, int: 6, spi: 4 },
+    stats: { armor: 100, int: 6, spi: 4, sta: 3 },
     sellValue: 1600,
   },
   peaksong_helm: {
@@ -3886,7 +3888,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'rare',
     // Deeprock Kobolds (level 15) -> item level 18, helmet budget 9.
-    stats: { armor: 78, int: 5, spi: 4 },
+    stats: { armor: 78, int: 5, spi: 4, sta: 3 },
     sellValue: 1500,
   },
   stormchant_gauntlets: {
@@ -3897,7 +3899,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'uncommon',
     // Ironvein Foreman (level 16 rare elite) -> item level 17, gloves budget 5.
-    stats: { armor: 50, int: 3, spi: 2 },
+    stats: { armor: 50, int: 3, spi: 2, sta: 2 },
     sellValue: 460,
   },
   cragprowl_belt: {
@@ -3920,7 +3922,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     // Brutok Skullsmasher (level 17 rare elite) -> item level 20, helmet
     // budget 10.
-    stats: { armor: 58, int: 6, spi: 4 },
+    stats: { armor: 58, int: 6, spi: 4, sta: 3 },
     sellValue: 1900,
   },
   thunderward_legguards: {
@@ -3931,7 +3933,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'rare',
     // Warlord Drogmar (level 17 elite boss) -> item level 20, legs budget 10.
-    stats: { armor: 118, int: 6, spi: 4 },
+    stats: { armor: 118, int: 6, spi: 4, sta: 3 },
     sellValue: 2000,
   },
   revenantstep_treads: {
@@ -3964,7 +3966,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'rare',
     // Broodsworn Zealots (level 19) -> item level 22, shoulder budget 9.
-    stats: { armor: 32, int: 5, spi: 4 },
+    stats: { armor: 32, int: 5, spi: 4, sta: 3 },
     sellValue: 1900,
   },
   wyrmcult_spellgrips: {
@@ -3975,7 +3977,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'rare',
     // Broodsworn Necromancers (level 19) -> item level 22, gloves budget 9.
-    stats: { armor: 36, int: 5, spi: 4 },
+    stats: { armor: 36, int: 5, spi: 4, sta: 3 },
     sellValue: 1850,
   },
   thornpeak_wildwraps: {
@@ -3986,7 +3988,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'rare',
     // Boneclad Revenants (level 19) -> item level 22, legs budget 11.
-    stats: { armor: 60, int: 7, spi: 4 },
+    stats: { armor: 60, int: 7, spi: 4, sta: 4 },
     sellValue: 2100,
   },
   stormvotive_hauberk: {
@@ -3997,7 +3999,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'rare',
     // Voskar Emberwing (level 19 rare elite) -> item level 22, chest budget 12.
-    stats: { armor: 180, int: 7, spi: 5 },
+    stats: { armor: 180, int: 7, spi: 5, sta: 4 },
     sellValue: 2400,
   },
   cryptbloom_shoulderguards: {
@@ -4009,7 +4011,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     // Corrupted Priest Malric (level 20 rare elite) -> item level 23, shoulder
     // budget 10, matching the same-tier crafted sootscale_mantle.
-    stats: { armor: 56, int: 6, spi: 4 },
+    stats: { armor: 56, int: 6, spi: 4, sta: 3 },
     sellValue: 2200,
   },
   gravewyrm_thornmaul: {
@@ -4024,7 +4026,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // 17, dps on the weaponDpsBudget(23) x TWOHAND_DPS_MULT curve (~15.64 at
     // speed 3.6).
     weapon: { min: 48, max: 65, speed: 3.6 },
-    stats: { str: 7, agi: 5, sta: 5 },
+    stats: { str: 6, agi: 5, sta: 6 },
     sellValue: 3200,
     requiredClass: FERAL,
   },
@@ -4038,7 +4040,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // Thunzharr, Waking Peak (level 20 world boss) -> item level 26, chest
     // budget 18, the caster counterpart to the wyrmshadow_harness on the same
     // boss table.
-    stats: { armor: 160, int: 9, spi: 5, sta: 4 },
+    stats: { armor: 160, int: 9, spi: 9, sta: 6 },
     sellValue: 8000,
   },
   nightfangs_greatstaff: {
@@ -4053,7 +4055,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // TWOHAND_STAT_MULT) = 23 (the wyrmfang_greatblade total), dps on the
     // weaponDpsBudget(26) x TWOHAND_DPS_MULT curve (~16.68 at speed 3.6).
     weapon: { min: 51, max: 69, speed: 3.6 },
-    stats: { str: 9, agi: 7, sta: 7 },
+    stats: { str: 8, agi: 7, sta: 8 },
     sellValue: 9000,
     requiredClass: FERAL,
   },
@@ -4070,7 +4072,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // TWOHAND_DPS_MULT curve (~17.71 at speed 3.7). The top rung of the feral
     // ladder, beside the direfang_greatblade on the same boss.
     weapon: { min: 56, max: 75, speed: 3.7 },
-    stats: { str: 10, agi: 8, sta: 8 },
+    stats: { str: 9, agi: 8, sta: 9 },
     // Every item-level-29 raid epic carries exactly one rating at 20 (the tier
     // ladder pin in tests/combat_rating.test.ts); the maul takes Hit like the
     // direfang_greatblade beside it.
@@ -4266,7 +4268,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     shield: true,
     quality: 'epic',
     blockValue: 30,
-    stats: { armor: 680, int: 8, spi: 7 },
+    stats: { armor: 680, int: 8, spi: 7, sta: 5 },
     hasteRating: 20,
     sellValue: 12000,
     requiredClass: ['paladin', 'shaman'],
@@ -4283,7 +4285,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     // helmet budget round(29 x 0.7 x 0.85) = 17
-    stats: { armor: 190, int: 10, spi: 7 },
+    stats: { armor: 190, int: 10, spi: 7, sta: 6 },
     hasteRating: 20,
     sellValue: 12000,
   },
@@ -4300,7 +4302,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'epic',
     // gloves budget round(29 x 0.7 x 0.7) = 14
-    stats: { armor: 165, int: 8, spi: 6 },
+    stats: { armor: 165, int: 8, spi: 6, sta: 5 },
     hasteRating: 20,
     sellValue: 12000,
     requiredClass: ['paladin', 'shaman'],
@@ -4313,7 +4315,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'epic',
     // feet budget round(29 x 0.7 x 0.65) = 13
-    stats: { armor: 190, int: 8, spi: 5 },
+    stats: { armor: 190, int: 8, spi: 5, sta: 4 },
     critRating: 20,
     sellValue: 12000,
     requiredClass: ['paladin', 'shaman'],
@@ -4331,7 +4333,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     // Korzul the Gravewyrm (level 20 dungeon final boss) -> item level 26,
     // legs budget 16.
-    stats: { armor: 112, int: 9, spi: 5, sta: 2 },
+    stats: { armor: 112, int: 9, spi: 7, sta: 5 },
     sellValue: 8000,
   },
   grovewardens_grips: {
@@ -4343,7 +4345,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     // Korzul the Gravewyrm (level 20 dungeon final boss) -> item level 26,
     // gloves budget 13.
-    stats: { armor: 88, int: 8, spi: 5 },
+    stats: { armor: 88, int: 8, spi: 5, sta: 4 },
     sellValue: 7500,
   },
   verdant_walkers: {
@@ -4355,7 +4357,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     // Korzul the Gravewyrm (level 20 dungeon final boss) -> item level 26,
     // feet budget 12.
-    stats: { armor: 82, int: 7, spi: 5 },
+    stats: { armor: 82, int: 7, spi: 5, sta: 4 },
     sellValue: 7200,
   },
 };

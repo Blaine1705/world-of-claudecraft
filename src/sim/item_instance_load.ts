@@ -36,6 +36,7 @@
 // inside a character load.
 
 import { isLoadablePartyTradeMarker } from './loot/bop_trade_window';
+import { isValidLootQuality } from './loot_quality/types';
 import { PERFECTING_RANKS } from './professions/perfecting';
 import { isValidPerfectingBonus } from './professions/perfecting_bonus';
 import { isLegalCrafterName } from './professions/tools';
@@ -114,6 +115,25 @@ export function boundCraftedRecipeIdOnLoad(
     delete slot.craftedRecipeId;
     dropped.push(`${containerLabel}.${slot.itemId}.craftedRecipeId`);
   }
+}
+
+/**
+ * The per-slot payload bound for a loaded container row (bags, buyback): the
+ * whole-payload sanitize below, the dropped-path report under `containerLabel`,
+ * and the empty-payload removal (an empty `{}` payload can never stack again,
+ * so the field goes rather than the copy), one arm shared by the sim.ts load
+ * loops instead of restated per container. Mutates the caller-owned clone.
+ */
+export function sanitizeSlotInstanceOnLoad(
+  slot: { itemId: string; instance?: unknown },
+  dropped: string[],
+  containerLabel: string,
+): void {
+  if (!slot.instance) return;
+  const { payload, dropped: droppedKeys } = sanitizeItemInstancePayloadOnLoad(slot.instance);
+  for (const d of droppedKeys) dropped.push(`${containerLabel}.${slot.itemId}.${d}`);
+  if (payload) slot.instance = payload;
+  else delete slot.instance;
 }
 
 export interface SanitizedItemInstancePayload {
@@ -227,6 +247,13 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
   const dropped: string[] = [];
   for (const key of keys) {
     const value = record[key];
+    if (key === 'lootQuality') {
+      if (!isValidLootQuality(value)) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
     // Key-name bound BEFORE any value rule: the key count arm alone would
     // pass one megabyte-long key carrying a short value. Reported under a
     // fixed label because echoing a corrupt key into the log is the same

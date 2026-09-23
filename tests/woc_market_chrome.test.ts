@@ -14,6 +14,7 @@ import {
   wocBrowseStripHtml,
   wocEndsAtText,
   wocErrorStatusHtml,
+  wocItemCellHtml,
   wocLoadingStatusHtml,
   wocMarketBannersHtml,
   wocSalesHistoryHtml,
@@ -219,13 +220,15 @@ describe('woc_market_chrome: the standing banners', () => {
   it('the wallet card is the Claudium card: title, state sentence, one action button', () => {
     const html = wocMarketBannersHtml({ paused: false, wallet: view(null, null) });
     expect(html).toContain('<div class="wm-strip">');
-    expect(html).toContain('class="wm-banner wm-banner-wallet" data-wallet-kind="unlinked"');
+    expect(html).toContain(
+      'class="wm-banner wm-banner-wallet ui-card" data-wallet-kind="unlinked"',
+    );
     expect(html).toContain(`<strong>${t('hudChrome.wocStore.wallet.title')}</strong>`);
     expect(html).toContain(`<p>${t('hudChrome.wocStore.wallet.unlinked')}</p>`);
     // The button keeps the window's connect-wallet click action and its focus
     // key, so the existing handler arm and the focus-restore ladder both reach it.
     expect(html).toContain(
-      `<button type="button" data-action="connect-wallet" data-focus-key="wm-connect-wallet">${t(
+      `<button type="button" class="ui-btn" data-action="connect-wallet" data-focus-key="wm-connect-wallet">${t(
         'hudChrome.wocStore.wallet.connect',
       )}</button>`,
     );
@@ -278,7 +281,7 @@ describe('woc_market_chrome: the standing banners', () => {
     expect(html).toContain('15,625 $WOC');
     expect(html).toContain('$2.00 USD');
     expect(html.indexOf('wm-wallet-balance')).toBeLessThan(
-      html.indexOf('button type="button" data-action="connect-wallet"'),
+      html.indexOf('button type="button" class="ui-btn" data-action="connect-wallet"'),
     );
   });
 
@@ -400,5 +403,25 @@ describe('woc_market_chrome: the standing banners', () => {
     expect(html.indexOf('wm-banner-paused')).toBeGreaterThan(-1);
     expect(html.indexOf('wm-banner-paused')).toBeLessThan(html.indexOf('wm-banner-wallet'));
     expect(html).toContain(t('hudChrome.wocMarket.pausedBanner'));
+  });
+});
+
+describe('Exchange exact-copy item cells', () => {
+  it('escapes names and tooltip keys while keeping enhanced tier independent of rarity', () => {
+    const instance = {
+      lootQuality: {
+        version: 1 as const,
+        tier: 3 as const,
+        weights: [900, 100, 250, 750, 500] as [number, number, number, number, number],
+      },
+    };
+    const html = wocItemCellHtml('<rare>', 'item.webp', 'rare', 'key" onclick="bad', instance);
+    expect(html).toContain('q-rare');
+    expect(html).toContain('&lt;rare&gt;');
+    expect(html).toContain('aria-label="Magnificent"');
+    expect(html).not.toContain(' onclick="bad');
+    expect(wocItemCellHtml('ordinary', 'item.webp', 'rare', 'key')).not.toContain(
+      'loot-quality-badge',
+    );
   });
 });
