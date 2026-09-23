@@ -104,9 +104,15 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
    live programs, not a PR entry bar.
 2. **Are lights, contexts, queues, and frame work safe?** A post-boot directional, hemisphere,
    spot, or rect-area light can invalidate visible programs; re-grading the constructor's one
-   sun/hemi pair through `interior_light_rig.ts` is the sanctioned shape. Point lights ride the
-   pad budget (`point_light_budget.ts`, `reparentStrandedLightsToScene`), and a root a reveal
-   gate has shown is never hidden again. A secondary context must link with `compileAsync`,
+   sun/hemi pair through `interior_light_rig.ts` is the sanctioned shape. Every point light in
+   the world scene is a carrier source: marked with `markPointLightSource` and in a registry
+   the budget ranks (`point_light_budget.ts`, `fire_light_registry.ts`, the renderer's
+   registration seam), so three gathers only the carriers of `point_light_carriers.ts`. A light
+   three gathers itself moves the count and sits behind a black carrier where the lit programs'
+   point loop has already stopped, so it never shines. The pins are
+   `tests/point_light_carriers.test.ts` (the producer allowlist) and
+   `tests/glb_punctual_lights.test.ts` (no glTF lights in shipped GLBs). A root a reveal gate
+   has shown is never hidden again. A secondary context must link with `compileAsync`,
    upload with `uploadTexturesInSlices` (`texture_prewarm.ts`) before its first draw, set
    `debug.checkShaderErrors = shaderDebugRequested()` on the renderer it just built ahead of
    that renderer's first `render()`, and carry a teardown story (`trackWebGLContext`,
