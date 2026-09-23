@@ -697,12 +697,6 @@ const mergeStringsEn = {
       money: 'Money',
       copper: 'copper',
       hint: 'Click an offered item to remove some or all of it. Both sides must press Accept Trade.',
-      // The staged row's amount box: whole stacks in one step instead of one
-      // bag click per unit.
-      amountLabel: 'Amount of {name} to trade',
-      max: 'Max',
-      maxLabel: 'Offer all of {name}',
-      removeLabel: 'Remove {name}',
       accept: 'Accept Trade',
       waiting: 'Waiting...',
       cancel: 'Cancel',

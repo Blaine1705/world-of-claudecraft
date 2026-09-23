@@ -42,8 +42,6 @@ import {
   buildTradeItemRow,
   removeTradeOfferUnits,
   resolveTradeOfferRemove,
-  tradeOfferAmount,
-  tradeOfferCeiling,
   tradeOfferRemoveOpensPrompt,
   tradeRowTooltipTarget,
 } from '../../trade_view';
@@ -1543,18 +1541,9 @@ export class WocTradeController {
             ? itemNameColor({ kind: item.kind, quality: parts.quality ?? 'common' })
             : QUALITY_DEFAULT_COLOR;
         const inner = `<span class="ui-socket ui-socket--bag">${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}${parts?.qualityBadgeLabelled ?? ''}</span><span style="color:${qColor}">${esc(label)}</span>`;
-        if (!mine) return `<div class="trade-item ui-card">${inner}</div>`;
-        // The row is a wrapper (a button cannot nest the amount box): the
-        // item face opens the remove prompt, and a line the player holds more
-        // than one of gets an amount box capped at the held total plus Max, so
-        // a whole stack is one step, not one bag click per unit.
-        const name = item ? itemDisplayName(item) : s.itemId;
-        const ceiling = Math.max(s.count, tradeOfferCeiling(this.sim.inventory, s.itemId));
-        const amount =
-          ceiling > 1
-            ? `<span class="trade-qty"><input class="ui-input trade-qty-input" type="number" min="1" max="${ceiling}" value="${s.count}" inputmode="numeric" data-item="${esc(s.itemId)}" data-focus-key="trade-qty-${esc(s.itemId)}" aria-label="${esc(t('hud.trade.amountLabel', { name }))}"><button type="button" class="ui-btn trade-qty-max" data-item="${esc(s.itemId)}" aria-label="${esc(t('hud.trade.maxLabel', { name }))}">${esc(t('hud.trade.max'))}</button></span>`
-            : '';
-        return `<div class="trade-item mine ui-card" data-item="${esc(s.itemId)}"><button type="button" class="trade-item-remove" aria-label="${esc(t('hud.trade.removeLabel', { name }))}">${inner}</button>${amount}</div>`;
+        return mine
+          ? `<button type="button" class="trade-item mine ui-card" data-item="${esc(s.itemId)}">${inner}</button>`
+          : `<div class="trade-item ui-card">${inner}</div>`;
       };
       const emptyRows = (count: number, label: string) =>
         Array.from(
@@ -1646,37 +1635,8 @@ export class WocTradeController {
       refreshWocTradeArm(el, wocTradeModelFrom(this.wocTradeDeps(info.otherName)));
       restoreWocTradeFocus(el, keptFocusKey);
       el.querySelectorAll('.trade-item.mine').forEach((row) => {
-        const rowElement = row as HTMLElement;
-        const itemId = (row as HTMLElement).dataset.item ?? '';
-        const openRemovePrompt = () => {
-          this.showOfferRemovePrompt(itemId);
-        };
-        row.querySelector('.trade-item-remove')?.addEventListener('click', (event) => {
-          event.stopPropagation();
-          openRemovePrompt();
-        });
-        rowElement.addEventListener('click', (event) => {
-          const target = event.target as Element | null;
-          if (target?.closest('.trade-qty')) return;
-          openRemovePrompt();
-        });
-        // The amount box commits on change (Enter or blur), like the money
-        // fields: the push re-renders the window, so committing per keystroke
-        // would tear the box out from under the caret.
-        const box = row.querySelector<HTMLInputElement>('.trade-qty-input');
-        const setAmount = (raw: string) => {
-          const idx = this.stagedTrade.items.findIndex((s) => s.itemId === itemId);
-          if (idx < 0) return;
-          const line = this.stagedTrade.items[idx];
-          const ceiling = tradeOfferCeiling(this.sim.inventory, itemId);
-          const next = tradeOfferAmount(raw, ceiling, line.count);
-          if (next === line.count) return;
-          line.count = next;
-          this.pushTradeOffer();
-        };
-        box?.addEventListener('change', () => setAmount(box.value));
-        row.querySelector('.trade-qty-max')?.addEventListener('click', () => {
-          setAmount(String(tradeOfferCeiling(this.sim.inventory, itemId)));
+        row.addEventListener('click', () => {
+          this.showOfferRemovePrompt((row as HTMLElement).dataset.item ?? '');
         });
       });
       // Wire the same stat tooltip bag/vendor/bank slots use onto both offer

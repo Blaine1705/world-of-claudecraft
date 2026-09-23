@@ -10810,10 +10810,6 @@ export const tr_TR: EnTranslations = {
       "money": "Para",
       "copper": "bakır",
       "hint": "Teklif edilen bir eşyayı kaldırmak için tıkla. İki taraf da Takası Kabul Et'e basmalı.",
-      "amountLabel": "Amount of {name} to trade",
-      "max": "Max",
-      "maxLabel": "Offer all of {name}",
-      "removeLabel": "Remove {name}",
       "accept": "Takası Kabul Et",
       "waiting": "Bekleniyor...",
       "cancel": "İptal"

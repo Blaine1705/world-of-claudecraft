@@ -10810,10 +10810,6 @@ export const sv_SE: EnTranslations = {
       "money": "Pengar",
       "copper": "koppar",
       "hint": "Klicka på ett erbjudet föremål för att ta bort det. Båda sidor måste trycka på Godkänn handel.",
-      "amountLabel": "Amount of {name} to trade",
-      "max": "Max",
-      "maxLabel": "Offer all of {name}",
-      "removeLabel": "Remove {name}",
       "accept": "Godkänn handel",
       "waiting": "Väntar...",
       "cancel": "Avbryt"
