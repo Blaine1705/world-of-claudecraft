@@ -182,6 +182,13 @@ function normalizeAbilityCharges(
     state.maxCharges = maxCharges;
     state.rechargeLength = ability.cooldown;
     state.charges = maxCharges - spent;
+    // One parallel timer per missing charge: a shrunk cap drops the newest
+    // spends' timers (recharges[] is sorted soonest-first), which the clamped
+    // pool no longer owes, and a full pool keeps none.
+    if (state.recharges) {
+      state.recharges = state.recharges.slice(0, spent);
+      if (spent > 0) state.recharge = state.recharges[0] ?? state.recharge;
+    }
     if (spent <= 0) {
       state.recharge = 0;
       player.cooldowns.delete(abilityId);

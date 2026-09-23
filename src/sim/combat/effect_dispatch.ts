@@ -1796,11 +1796,14 @@ export function runEffects(
       case 'clearCooldowns': {
         for (const abilityId of eff.abilities) {
           p.cooldowns.delete(abilityId);
-          // A charge-limited ability resets to a full pool (Preparation).
+          // A charge-limited ability resets to a full pool (Preparation, Winter's
+          // Recall), exactly a fresh one: the spent charges' parallel timers go
+          // too, or each would pay out another charge on top of the refill.
           const chargeState = p.abilityCharges?.[abilityId];
           if (chargeState) {
             chargeState.charges = chargeState.maxCharges;
             chargeState.recharge = 0;
+            delete chargeState.recharges;
           }
         }
         break;

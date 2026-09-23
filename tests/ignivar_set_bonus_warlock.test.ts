@@ -460,6 +460,33 @@ describe('Ruincaller 2pc: Conflagrate holds 3 charges', () => {
     expect(sim.player.abilityCharges?.conflagrate?.maxCharges).toBe(3);
     expect(sim.player.abilityCharges?.conflagrate?.charges).toBe(2);
   });
+
+  it('an unequip on an empty pool keeps one recharge timer per missing charge', () => {
+    const sim = liveWarlock(521, 'destruction');
+    equipSet(sim, 'ruincaller', 2);
+    const target = addHostileTarget(sim);
+    sim.targetEntity(target.id);
+    for (let use = 0; use < 3; use++) {
+      ensurePact(sim, target);
+      sim.player.gcdRemaining = 0;
+      sim.player.resource = sim.player.maxResource;
+      sim.castAbility('conflagrate');
+      for (let tick = 0; tick < 10; tick++) sim.tick();
+    }
+    const spent = sim.player.abilityCharges?.conflagrate;
+    expect(spent?.charges).toBe(0);
+    expect(spent?.recharges).toHaveLength(3);
+    const soonest = [...(spent?.recharges ?? [])].slice(0, 2);
+    sim.unequipItem('helmet'); // the cap drops 3 -> 2 with every use spent
+    const pool = sim.player.abilityCharges?.conflagrate;
+    expect(pool?.maxCharges).toBe(2);
+    expect(pool?.charges).toBe(0);
+    // A third timer would pay out a charge the clamped pool no longer owes
+    // (early, on top of the next spend's own timer). The two oldest spends
+    // keep their schedule.
+    expect(pool?.recharges).toEqual(soonest);
+    expect(pool?.recharge).toBe(soonest[0]);
+  });
 });
 
 describe('Ruincaller 4pc: Ruinbolt strikes 20 percent harder, delivered', () => {

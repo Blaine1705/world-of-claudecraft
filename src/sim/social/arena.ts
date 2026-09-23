@@ -74,7 +74,13 @@ export function cloneAbilityCharges(
   src: Entity['abilityCharges'],
 ): ArenaReturnPools['abilityCharges'] {
   const out: ArenaReturnPools['abilityCharges'] = {};
-  if (src) for (const [id, state] of Object.entries(src)) out[id] = { ...state };
+  // The per-charge timers are copied too: spends push onto recharges[] in place,
+  // so a shared array would let the live pool rewrite the snapshot's timers.
+  if (src) {
+    for (const [id, state] of Object.entries(src)) {
+      out[id] = state.recharges ? { ...state, recharges: [...state.recharges] } : { ...state };
+    }
+  }
   return out;
 }
 
