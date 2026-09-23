@@ -793,7 +793,8 @@ export const RELIQUARY_HEROIC_GEAR = {
     'forgefathers_warhammer',
     'anvilguard_blade',
     'springtouched_crozier',
-    // The raid trinkets (content/trinkets.ts), heroic exclusives, appended.
+    // The raid trinkets (content/trinkets.ts), heroic exclusives here and
+    // Normal off-set drops too, so also on the Normal page.
     'kindling_orb',
     'molten_fletching',
     'last_flame_lantern',
@@ -805,7 +806,8 @@ export const RELIQUARY_HEROIC_GEAR = {
     'heart_of_the_end_greatblade',
     'forgefire_spire',
     'staff_of_the_last_spring',
-    // The raid trinkets (content/trinkets.ts), heroic exclusives, appended.
+    // The raid trinkets (content/trinkets.ts), heroic exclusives here and
+    // Normal off-set drops too, so also on the Normal page.
     'forgefathers_temper',
     'heart_of_the_crucible',
   ],
@@ -1752,6 +1754,11 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'warforged_waistguard',
       'stormkindled_chain',
       'tidebinder_links',
+      // The raid trinkets (content/trinkets.ts) drop on both difficulties, so
+      // they fill this page and the heroic page (rule 5, multi-page fill).
+      'kindling_orb',
+      'molten_fletching',
+      'last_flame_lantern',
     ),
   },
   {
@@ -1790,6 +1797,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'furnace_march_greaves',
       'thundershock_treads',
       'springwarden_sabatons',
+      // The raid trinkets (content/trinkets.ts) drop on both difficulties, so
+      // they fill this page and the heroic page (rule 5, multi-page fill).
+      'forgefathers_temper',
+      'heart_of_the_crucible',
     ),
   },
   {

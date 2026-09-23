@@ -225,8 +225,11 @@ const trinket = (
 // tests/item_level.test.ts through the source index): exactly one attribute
 // each, the whole line budget on it (the trinket slot is exempt from the
 // stamina baseline model, see STAMINA_MODEL_EXEMPT_SLOTS in item_budget.ts).
-// The two honor trinkets carry their WARFARE price and, like all honor gear,
-// sell for nothing.
+// The two honor trinkets follow the WARFARE jewelry rule instead
+// (content/pvp_honor.ts): one attribute at WARFARE_JEWELRY_STAT_FRACTION of the
+// item-level-31 trinket line (13 x 0.75, rounded: 10), plus WARFARE Offense and
+// Defense Rating at WARFARE_RATING_FRACTION of that line (the full 13 each).
+// Like all honor gear they carry their honor price and sell for nothing.
 export const TRINKET_ITEMS: Record<string, ItemDef> = {
   bastion_sigil: trinket('bastion_sigil', 'Bastion Sigil', { sta: 13 }),
   mooring_stone: trinket('mooring_stone', 'Mooring Stone', { str: 14 }),
@@ -240,12 +243,16 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   sundered_prism: trinket('sundered_prism', 'Sundered Prism', { sta: 13 }),
   wayfarers_lodestone: trinket('wayfarers_lodestone', "Wayfarer's Lodestone", { spi: 11 }),
   medallion_of_defiance: {
-    ...trinket('medallion_of_defiance', 'Medallion of Defiance', { sta: 13 }),
+    ...trinket('medallion_of_defiance', 'Medallion of Defiance', { sta: 10 }),
+    pvpOffenseRating: 13,
+    pvpDefenseRating: 13,
     priceHonor: 800,
     sellValue: 0,
   },
   duelists_brand: {
-    ...trinket('duelists_brand', "Duelist's Brand", { agi: 13 }),
+    ...trinket('duelists_brand', "Duelist's Brand", { agi: 10 }),
+    pvpOffenseRating: 13,
+    pvpDefenseRating: 13,
     priceHonor: 800,
     sellValue: 0,
   },
@@ -259,9 +266,10 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
 };
 
 // The Crucible of the Last Spring raid trinkets, in the order they sit in their
-// bosses' Heroic exclusive partitions (HEROIC_BOSS_LOOT in heroic_loot.ts;
-// heroic-only, like the marquee weapons): Ignivar pays the first three,
-// Varkhul the last two. item_level.ts registers them at the
+// bosses' loot. They drop on BOTH difficulties: in each boss's Normal-only
+// off-set partition (content/dungeons.ts) and in its Heroic exclusive
+// partition (HEROIC_BOSS_LOOT in heroic_loot.ts). Ignivar pays the first
+// three, Varkhul the last two. item_level.ts registers them at the
 // Crucible raid tier (IGNIVAR_RAID_LOOT_SOURCE_LEVEL, item level 35).
 export const CRUCIBLE_TRINKET_ITEM_IDS: readonly string[] = [
   'kindling_orb',

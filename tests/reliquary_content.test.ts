@@ -467,8 +467,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // five-man heroic trinkets on their bosses' heroic pages, four on the
     // Heroic Nythraxis page, two rift trinkets on the Rift page, and the two
     // honor trinkets on the Warfare Armory: 452.
-    // The five Crucible raid trinkets (heroic exclusives) join the two
-    // Crucible Heroic pages, one page each: 457.
+    // The five Crucible raid trinkets drop on both difficulties and sit on
+    // both their boss's Normal and Heroic page (multi-page fill); completion
+    // counts distinct items, so they add five: 457.
     expect(full).toEqual({ owned: 457, total: 457 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
@@ -554,8 +555,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
       // The twelve trinket relics add one slot each: 495. The five Crucible
-      // raid trinkets add five more: 500.
-    ).toBe(500);
+      // raid trinkets add two slots each (Normal and Heroic page): 505.
+    ).toBe(505);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -786,7 +787,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // gap-fill drops: 333. UNION MERGE: base plus both deltas, see the
     // completion pair note above.
     // Plus the twelve trinkets (content/trinkets.ts), one page each: 345.
-    // Plus the five Crucible raid trinkets on the two Crucible Heroic pages: 350.
+    // Plus the five Crucible raid trinkets (each on its boss's Normal and
+    // Heroic page, one id each): 350.
     expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(350);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
@@ -1781,8 +1783,9 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   // The Crucible raid rooms (per-boss pages). The derivation excludes the
   // sigil redemption tokens by kind; the token-liveness arm below proves the
   // filter excludes something real.
-  ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 17 },
-  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 15 },
+  // The floors count the raid trinkets (three on Ignivar, two on Varkhul).
+  ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 20 },
+  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 18 },
 };
 
 describe('Reliquary dungeon and raid pages derive from live mob loot', () => {

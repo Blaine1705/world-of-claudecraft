@@ -851,13 +851,17 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
 export const FURY_STOCK: readonly string[] = Object.keys(WARFARE_ITEMS);
 
 // The two PvP trinkets (content/trinkets.ts), sold beside the WARFARE kit for
-// honor at the neck price. They are NOT WARFARE pieces: no WARFARE rating and no
-// set, so they sit outside FURY_STOCK (whose every piece is priced at a WARFARE
-// fraction and carries the full rating) and outside its exemption in
-// tests/item_stamina_baseline.test.ts. Their PvP edge is the use effect itself;
-// their stats are the full item-level-31 trinket budget, registered at
-// WARFARE_SOURCE_LEVEL by item_level.buildSourceIndex. Soulbound with no gold
-// sell value, like every honor purchase.
+// 800 honor. They carry WARFARE like the rest of the honor gear, on the jewelry
+// rule: one attribute at WARFARE_JEWELRY_STAT_FRACTION of the item-level-31
+// trinket line (10 of 13, no stamina top-up: the trinket slot is exempt from the
+// stamina model) and WARFARE Offense and Defense Rating at
+// WARFARE_RATING_FRACTION of it (13 each). They have no set tag and their defs
+// live in content/trinkets.ts, so they sit outside FURY_STOCK (and outside the
+// kit and set arithmetic, which counts the eleven kit slots); a full kit plus
+// both trinkets reads 208 of each rating before any set tier, and the set
+// capstone still clamps at the cap. Registered at WARFARE_SOURCE_LEVEL by
+// item_level.buildSourceIndex. Soulbound with no gold sell value, like every
+// honor purchase.
 export const WARFARE_TRINKET_STOCK: readonly string[] = ['medallion_of_defiance', 'duelists_brand'];
 
 // What both honor quartermasters actually sell: the WARFARE kit, then the trinkets.

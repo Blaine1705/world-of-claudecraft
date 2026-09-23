@@ -6,6 +6,7 @@ import {
   HONOR_VENDOR_STOCK,
   WARFARE_ITEMS,
   WARFARE_JEWELRY_STAT_FRACTION,
+  WARFARE_RATING_FRACTION,
   WARFARE_SOURCE_LEVEL,
   WARFARE_STAT_FRACTION,
   WARFARE_TRINKET_STOCK,
@@ -465,7 +466,7 @@ describe('honor trinkets sold beside the WARFARE kit', () => {
     }
   });
 
-  it('prices each at 800 honor, soulbound, no gold value, full item-level-31 budget', () => {
+  it('prices each at 800 honor, soulbound, no gold value, on the WARFARE jewelry rule', () => {
     for (const id of WARFARE_TRINKET_STOCK) {
       const item = ITEMS[id];
       expect(item.slot, id).toBe('trinket');
@@ -478,12 +479,20 @@ describe('honor trinkets sold beside the WARFARE kit', () => {
       expect(item.buyValue, id).toBeUndefined();
       expect(itemSourceLevel(id), id).toBe(WARFARE_SOURCE_LEVEL);
       expect(itemLevel(item), id).toBe(WARFARE_ILVL);
-      // Not a WARFARE piece: no WARFARE rating and no fraction discount; the
-      // one attribute carries the whole trinket line.
-      expect(item.pvpOffenseRating, id).toBeUndefined();
-      expect(item.pvpDefenseRating, id).toBeUndefined();
-      expect(primaryStatSum(item), id).toBe(expectedLineBudget(item));
-      expect(primaryStatSum(item), id).toBe(13);
+      // WARFARE like the rest of the honor gear, on the jewelry rule: exactly
+      // ONE attribute at the jewelry fraction of the trinket line (no stamina
+      // top-up: the trinket slot is exempt from the stamina model), and the
+      // full line as WARFARE Offense and Defense Rating. No set tag.
+      const line = expectedLineBudget(item) ?? 0;
+      expect(line, id).toBe(13);
+      const attrs = Object.entries(item.stats ?? {}).filter(([, v]) => (v ?? 0) > 0);
+      expect(attrs, `${id} one attribute`).toHaveLength(1);
+      expect(primaryStatSum(item), id).toBe(Math.round(line * WARFARE_JEWELRY_STAT_FRACTION));
+      expect(primaryStatSum(item), id).toBe(10);
+      expect(item.pvpOffenseRating, id).toBe(Math.round(line * WARFARE_RATING_FRACTION));
+      expect(item.pvpDefenseRating, id).toBe(Math.round(line * WARFARE_RATING_FRACTION));
+      expect(item.pvpOffenseRating, id).toBe(13);
+      expect(item.set, id).toBeUndefined();
     }
   });
 });

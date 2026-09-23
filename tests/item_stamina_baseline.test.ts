@@ -5,7 +5,7 @@
 // allowlist may only shrink. Measurements and the decision record:
 // docs/design/gear-stamina-baseline-2026-09-10.md.
 import { describe, expect, it } from 'vitest';
-import { FURY_STOCK } from '../src/sim/content/pvp_honor';
+import { FURY_STOCK, WARFARE_TRINKET_STOCK } from '../src/sim/content/pvp_honor';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import {
@@ -494,7 +494,13 @@ describe('stamina baseline model: the exempt trinket slot', () => {
   });
 
   it('every trinket carries exactly one attribute, the whole line budget, no baseline on top', () => {
+    // The honor trinkets (WARFARE_TRINKET_STOCK) are priced at the WARFARE
+    // jewelry fraction of the line instead, like the rest of the honor gear;
+    // tests/pvp_honor_gear.test.ts pins them.
+    const honor = new Set<string>(WARFARE_TRINKET_STOCK);
+    expect(trinkets.filter((item) => honor.has(item.id))).toHaveLength(honor.size);
     for (const item of trinkets) {
+      if (honor.has(item.id)) continue;
       const line = expectedLineBudget(item);
       expect(line, `${item.id} has a tier`).toBeGreaterThan(0);
       const attrs = Object.entries(item.stats ?? {}).filter(

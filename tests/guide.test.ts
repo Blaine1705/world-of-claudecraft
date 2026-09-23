@@ -5903,8 +5903,9 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     const stocked = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
     const honorRows = [...stocked].filter((id) => (ITEMS[id].priceHonor ?? 0) > 0);
     expect(honorRows.length).toBeGreaterThan(0);
-    // The two honor trinkets (WARFARE_TRINKET_STOCK) are the one non-Warfare
-    // honor row family, and they carry the same soulbound, no-sell-value shape.
+    // The two honor trinkets (WARFARE_TRINKET_STOCK) carry Warfare but live
+    // outside WARFARE_ITEMS (defs in content/trinkets.ts), with the same
+    // soulbound, no-sell-value shape.
     for (const id of honorRows) {
       expect(id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id), id).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);

@@ -860,7 +860,8 @@ Heroic pays in ACCESS, never in count or numbers. Each kill's two slots are:
   and this group pays instead: the Robe sigil that finishes the 5-piece, the
   marquee weapons, and on Varkhul the shields with Emberward at its
   unchanged ABSOLUTE 3 percent per heroic kill. So every Heroic kill pays one
-  item Normal can never drop, and Normal remains the only source of necks,
+  item Normal can never drop (the raid trinkets excepted: they sit in both
+  second slots, see below), and Normal remains the only source of necks,
   waists, feet, rings, held offhands and the smaller weapons: a heroic
   roster still runs its Normal lock for those.
 
@@ -877,10 +878,13 @@ Tables are authored as rollGroup entries (one rng draw per group, chances
 summing to exactly 1.0) in the listed order. Draw order is parity-sensitive
 from this re-cut on: entries append, never reorder, and future additions go
 to the end of their group. The first such addition is the raid trinkets
-(`src/sim/content/trinkets.ts`): heroic exclusives, appended to the tail of
-each boss's Heroic exclusive group at 0.12 each, with the group's other rows
-scaled down together (Emberward's absolute 3 percent untouched) so a Heroic
-kill still pays exactly one exclusive. Normal tables did not move.
+(`src/sim/content/trinkets.ts`), which drop on both difficulties. On Normal
+they are appended to the tail of each boss's off-set group at 1/8 each, with
+the group's other rows scaled down on binary fractions (5/8 on Ignivar, 3/4 on
+Varkhul). On Heroic they are appended to each boss's exclusive group at 0.12
+each, with the other rows scaled down together (Emberward's absolute 3 percent
+untouched). Either way the slot count per kill is unchanged. They are the one
+non-set drop that appears on both difficulties' second slot.
 
 ### Ignivar, Herald of the Last Flame
 
@@ -888,7 +892,7 @@ kill still pays exactly one exclusive. Normal tables did not move.
 |---|---|---|---|
 | copper | both | 150000 copper (heroic base on a heroic claim) | 1.0 |
 | ignivar_sigils | both | Mantle Sigil of the Anvil / Ember / Tempest, Grip Sigil of the Anvil / Ember / Tempest | 0.17 / 0.17 / 0.16, 0.17 / 0.16 / 0.17 |
-| ignivar_offset | Normal only | the 4 necks at 0.125 each, the 10 waist pieces at 0.03125 each, Cinderfang Kris / Slagrender Cleaver / Wand of Quenched Sparks at 0.0625 each | sums to 1.0 |
+| ignivar_offset | Normal only | the 4 necks at 0.078125 each, the 10 waist pieces at 0.01953125 each, Cinderfang Kris / Slagrender Cleaver / Wand of Quenched Sparks at 0.0390625 each, Kindling Orb / Molten Fletching / Last Flame Lantern (raid trinkets) at 0.125 each | sums to 1.0 |
 | ignivar_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Robe Sigil of the Anvil / Ember / Tempest at 0.11 / 0.11 / 0.10, Forgefather's Warhammer / Anvilguard Blade / Springtouched Crozier at 0.11 / 0.11 / 0.10, Kindling Orb / Molten Fletching / Last Flame Lantern (raid trinkets) at 0.12 each | sums to 1.0 |
 
 ### Varkhul, Forgefather of the Last Flame
@@ -897,7 +901,7 @@ kill still pays exactly one exclusive. Normal tables did not move.
 |---|---|---|---|
 | copper | both | 200000 copper (heroic base on a heroic claim) | 1.0 |
 | varkhul_sigils | both | Legging Sigil of the Anvil / Ember / Tempest, Helm Sigil of the Anvil / Ember / Tempest | 0.17 / 0.17 / 0.16, 0.17 / 0.16 / 0.17 |
-| varkhul_offset | Normal only | the 10 feet pieces at 0.03125 each, both held offhands at 0.09375 each, the 4 rings at 0.125 each | sums to 1.0 |
+| varkhul_offset | Normal only | the 10 feet pieces at 0.0234375 each, both held offhands at 0.0703125 each, the 4 rings at 0.09375 each, Forgefather's Temper / Heart of the Crucible (raid trinkets) at 0.125 each | sums to 1.0 |
 | varkhul_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Robe Sigil of the Anvil / Ember / Tempest at 0.09 / 0.09 / 0.08, Bulwark of the Inner Crucible 0.105, Ember Warden's Barrier 0.105, Varkhul's Emberward 0.03, Heart of the End Greatblade / Forgefire Spire / Staff of the Last Spring at 0.09 / 0.09 / 0.08, Forgefather's Temper / Heart of the Crucible (raid trinkets) at 0.12 each | sums to 1.0 |
 
 ## Future redistribution

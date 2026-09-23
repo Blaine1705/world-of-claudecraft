@@ -271,9 +271,10 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // boss mobs (bump() is highest-level-wins, so this overrides that). Sigils
   // are kind 'tool' with no slot and stay item-level ineligible.
   for (const id of IGNIVAR_LOOT_ITEM_IDS) bump(id, IGNIVAR_RAID_LOOT_SOURCE_LEVEL, true);
-  // The Crucible raid trinkets (content/trinkets.ts) are heroic exclusives of
-  // the same two bosses, so like the other exclusives they read the Crucible
-  // tier (35), out-ranking the heroic-table default source above.
+  // The Crucible raid trinkets (content/trinkets.ts) drop from the same two
+  // bosses on both difficulties (Normal off-set slot and Heroic exclusive
+  // slot), so they read the Crucible tier (35), out-ranking both the level-20
+  // mob-loot source and the heroic-table default source above.
   for (const id of CRUCIBLE_TRINKET_ITEM_IDS) bump(id, IGNIVAR_RAID_LOOT_SOURCE_LEVEL, true);
   // Rift-only clear-time epics and legendaries: gated behind B+/A/S final-boss
   // kills (addRiftClearGearLoot), they never appear on static mob loot tables, so
