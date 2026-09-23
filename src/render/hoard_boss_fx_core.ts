@@ -12,7 +12,7 @@ export interface HoardCueVisualPlan {
 }
 
 export type HoardCueShape = 'ignivar' | 'sector' | 'wave' | 'tether' | 'disc' | 'annulus';
-export type HoardCuePalette = 'physical' | 'fire' | 'frost' | 'arcane' | 'storm' | 'tide';
+export type HoardCuePalette = 'physical' | 'fire' | 'frost' | 'arcane' | 'storm' | 'tide' | 'spore';
 
 export interface HoardCueAppearancePlan {
   shape: HoardCueShape;
@@ -63,6 +63,11 @@ export function hoardCueAppearance(cue: HoardBossCueView): HoardCueAppearancePla
       return { shape: 'disc', palette: 'frost', countdown: 'disc', elementalRider: true };
     case 'ember-fire':
       return { shape: 'disc', palette: 'fire', countdown: 'disc', elementalRider: true };
+    // The Mother of Mushrooms: her clouds, and her Bloated Cap's burst reach
+    // whose countdown IS its fuse.
+    case 'mushroom-spore':
+    case 'mushroom-bloat':
+      return { shape: 'disc', palette: 'spore', countdown: 'disc', elementalRider: true };
     default:
       return { shape: 'disc', palette: 'physical', countdown: 'disc', elementalRider: false };
   }

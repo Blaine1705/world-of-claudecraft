@@ -18147,6 +18147,15 @@ export const ja_JP: EnTranslations = {
       "hoard_coinsack_scurrier": {
         "name": "小銭袋のすばしっこ"
       },
+      "hoard_boss_mushroom": {
+        "name": "キノコの母"
+      },
+      "hoard_sporeling": {
+        "name": "胞子っ子"
+      },
+      "hoard_bloat_cap": {
+        "name": "膨れ笠"
+      },
       "rift_spawnling": {
         "name": "リフトの落とし子"
       },

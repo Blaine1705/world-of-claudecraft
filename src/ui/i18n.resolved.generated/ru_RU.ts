@@ -18147,6 +18147,15 @@ export const ru_RU: EnTranslations = {
       "hoard_coinsack_scurrier": {
         "name": "Мешочник-непоседа"
       },
+      "hoard_boss_mushroom": {
+        "name": "Мать Грибов"
+      },
+      "hoard_sporeling": {
+        "name": "Спорыш"
+      },
+      "hoard_bloat_cap": {
+        "name": "Вздутая шляпка"
+      },
       "rift_spawnling": {
         "name": "Отпрыск Разлома"
       },

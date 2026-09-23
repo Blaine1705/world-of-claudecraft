@@ -44,6 +44,12 @@ import {
   tickHoardIceAgeCue,
 } from './hoard_ice_age';
 import { hoardLightningStrikeCues } from './hoard_lightning_strike';
+import {
+  clearHoardMushroom,
+  isMushroomCue,
+  tickHoardMushroom,
+  tickHoardMushroomCue,
+} from './hoard_mushroom';
 import { startHoardOrbitalLightning, tickHoardOrbitalCarrier } from './hoard_orbital_lightning';
 import {
   clearHoardPulsars,
@@ -296,6 +302,7 @@ function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   clearHoardTentacles(ctx, inst, boss, inst.hoardBoss);
   clearHoardBoulder(ctx, boss, inst.hoardBoss);
   clearHoardCocoon(ctx, inst, boss, inst.hoardBoss);
+  clearHoardMushroom(ctx, inst, boss, inst.hoardBoss);
   delete inst.hoardBoss;
   for (const player of instancePlayers(ctx, inst)) {
     ctx.emit({ type: 'hoardBossCueClear', pid: player.id });
@@ -509,6 +516,10 @@ function tickSpecialKit(
   }
   if (kit === 'storm') {
     tickHoardStormSurge(ctx, boss, state);
+    return;
+  }
+  if (kit === 'mushroom') {
+    tickHoardMushroom(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     return;
   }
   if (kit === 'brute') {
@@ -868,6 +879,10 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
       if (tickHoardCocoonCue(cue)) live.push(cue);
       continue;
     }
+    if (isMushroomCue(cue)) {
+      if (tickHoardMushroomCue(cue)) live.push(cue);
+      continue;
+    }
     if (isBoulderCue(cue)) {
       if (tickHoardBoulderCue(cue)) live.push(cue);
       continue;
@@ -1119,6 +1134,8 @@ function tickKit(
     tickBrute(ctx, inst, boss, state);
     return;
   }
+  // The Mother of Mushrooms runs her own clocks (hoard_mushroom.ts).
+  if (kit === 'mushroom') return;
   if (kit === 'tide') {
     tickHoardTidePattern(ctx, inst, boss, state, living, emitCue);
     return;

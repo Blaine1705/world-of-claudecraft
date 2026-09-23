@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "ce8c4b0a1a18db87d4c50c1bcbc7a9d74290f785028259c47c9648467bbebfb4",
+  "rendererFingerprint": "7a5927b7da641a2b2cb090783ad4cce501a0d129a663a9986ecea363ef01c1d0",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5013145,
-      "sha256": "2f1a2a3796e9d8f32294106f2d0da12dfdb3dcc46c6a2257a41f99204f56175f",
+      "bytes": 5015603,
+      "sha256": "90a5cc46153e006642afa043276ef75bae2c88a813d5208aaf549f6b5ca0ac51",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 263,
+  "portraitCount": 266,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -3410,6 +3410,74 @@
       }
     },
     {
+      "id": "hoard_bloat_cap",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_bloat_cap",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_bloat_cap.glb",
+          "path": "public/models/creatures/hoard_bloat_cap.glb",
+          "bytes": 46940,
+          "sha256": "75a8a2e89cc7fc89b27f4b759e27e2718cc374981a8c1d15fb19df9c479488b8"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": 0,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "b6ae40c36f1d7947e4358bd9a0a3644e67e9e9e10ced446d9835ce02929ec069",
+      "output": {
+        "path": "public/ui/mobs/hoard_bloat_cap.webp",
+        "bytes": 1888,
+        "sha256": "d1b665cd8b0c430d31f101c5d0b0a11d3d52330c2900a3af574f607986e697bf"
+      }
+    },
+    {
+      "id": "hoard_boss_mushroom",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_boss_mushroom",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_boss_mushroom.glb",
+          "path": "public/models/creatures/hoard_boss_mushroom.glb",
+          "bytes": 739212,
+          "sha256": "09b5e7d303248d035445b3d5008485c23d062df884b1ed2643149d94c0cbda79"
+        },
+        "idle": "Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "0aa25ca72bece421083adcc6d892c2c8f3962bcc9beeb0c3e293371181e52618",
+      "output": {
+        "path": "public/ui/mobs/hoard_boss_mushroom.webp",
+        "bytes": 3234,
+        "sha256": "236643bdaa2f1961996352d65d021f727f6080157a647344f4da944c3492e71f"
+      }
+    },
+    {
       "id": "hoard_bound_pulsar",
       "family": "elemental",
       "finderEncounter": false,
@@ -3645,6 +3713,40 @@
         "path": "public/ui/mobs/hoard_silk_cocoon.webp",
         "bytes": 2044,
         "sha256": "7516820e3b7395d6a191e6ad5c5158ddd19bc0f9e587c6bdcffcb808b5d40f1e"
+      }
+    },
+    {
+      "id": "hoard_sporeling",
+      "family": "burrower",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_sporeling",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_boss_mushroom.glb",
+          "path": "public/models/creatures/hoard_boss_mushroom.glb",
+          "bytes": 739212,
+          "sha256": "09b5e7d303248d035445b3d5008485c23d062df884b1ed2643149d94c0cbda79"
+        },
+        "idle": "Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.55
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#d8e08a",
+        "resolved": "#d8e08a",
+        "strength": 0.55
+      },
+      "sourceFingerprint": "4c5d717c12655a3c6512068dc8ea276833fe911f29c232cebcb1128b393ff2d8",
+      "output": {
+        "path": "public/ui/mobs/hoard_sporeling.webp",
+        "bytes": 3074,
+        "sha256": "a1a587baae765a471152da635b88c399b321e056851079b140e37d2ba6527cbc"
       }
     },
     {

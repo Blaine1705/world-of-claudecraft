@@ -18147,6 +18147,15 @@ export const ko_KR: EnTranslations = {
       "hoard_coinsack_scurrier": {
         "name": "동전자루 좀도둑"
       },
+      "hoard_boss_mushroom": {
+        "name": "버섯의 어머니"
+      },
+      "hoard_sporeling": {
+        "name": "포자둥이"
+      },
+      "hoard_bloat_cap": {
+        "name": "부푼 갓"
+      },
       "rift_spawnling": {
         "name": "균열의 산물"
       },

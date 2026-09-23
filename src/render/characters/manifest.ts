@@ -3872,6 +3872,47 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.25,
   },
+  // The Mother of Mushrooms, the first cave boss of the common and rare hoards
+  // (content/rift/cave_themes.ts). A Tripo body on the shared KayKit rig, but her
+  // arms reach nearly twice as far as the knight's: she is rigged onto a copy of
+  // the rig with longer arms (scripts/assets/hoard_mobs/stretch_arms.mjs), her cap
+  // is made rigid on the head (rigid_pack.mjs) and every loose growth on one bone
+  // (rigid_islands.mjs). She casts her spores with her arms raised.
+  mob_hoard_boss_mushroom: {
+    url: `${CREATURES}/hoard_boss_mushroom.glb`,
+    height: 2.2,
+    clips: {
+      ...kaykit(['Punch_A', '2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+      cast: 'Spellcast_Raise',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Her sporelings: little copies of her (the template scale shrinks them),
+  // washed pale and sickly so they never read as a second Mother.
+  mob_hoard_sporeling: {
+    url: `${CREATURES}/hoard_boss_mushroom.glb`,
+    height: 2.2,
+    clips: { ...kaykit(['Punch_A']), hit: ['Hit_A'] },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+    tint: 0xd8e08a,
+    tintStrength: 0.55,
+  },
+  // Her Bloated Cap (src/sim/rift/hoard_mushroom.ts): a Tripo text-to-model
+  // mushroom, a stationary prop mob with no rig and no clips (registered in
+  // CLIPLESS_RIGS, tests/character_clipmaps.test.ts). Its fuse ring is the
+  // generic hoard cue; it swells toward the burst through its own entity scale
+  // (the sim grows it on the fuse, hoard_mushroom_core.ts bloatSwell).
+  mob_hoard_bloat_cap: {
+    url: `${CREATURES}/hoard_bloat_cap.glb`,
+    height: 2.0,
+    yaw: 0,
+    clips: STATIC_PROP,
+    selfIllumination: 0.3,
+    clickRadius: 1.4,
+  },
   // The Maw's bottom-dweller: low, wide, all mouth. Its own Blender rig and clips
   // (scripts/assets/hoard_mobs/quadruped_rig.py).
   mob_hoard_deep_lurker: {
@@ -4290,6 +4331,10 @@ const MOB_KEYS: Record<string, string> = {
   hoard_silk_cocoon: 'mob_silk_cocoon',
   hoard_brood_cocoon: 'mob_brood_cocoon',
   hoard_coinsack_scurrier: 'mob_hoard_coinsack_scurrier',
+  // The Mother of Mushrooms and her brood.
+  hoard_boss_mushroom: 'mob_hoard_boss_mushroom',
+  hoard_sporeling: 'mob_hoard_sporeling',
+  hoard_bloat_cap: 'mob_hoard_bloat_cap',
   // Broodmother clutch (q_broodmother): the destructible eggs reuse the egg-sac
   // model (not a live spider), and the hatchling is a small spider.
   spider_egg: 'mob_spider_egg_sac',

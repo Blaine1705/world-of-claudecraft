@@ -10,6 +10,7 @@
 // global draw order and is reproducible anywhere.
 
 import type { Collider } from '../colliders';
+import { CAVE_THEMES } from '../content/rift/cave_themes';
 import {
   buildInfernalCitadelFloor,
   INFERNAL_FLOOR_COUNT,
@@ -42,7 +43,13 @@ import type {
   RiftUpgradeManifest,
 } from './types';
 import { applyRiftUpgrade } from './upgrade';
-import { type VaultSizeTier, vaultSeedOpen, vaultSeedTier, vaultSeedZone } from './vault_seed';
+import {
+  type VaultSizeTier,
+  vaultSeedCaveBoss,
+  vaultSeedOpen,
+  vaultSeedTier,
+  vaultSeedZone,
+} from './vault_seed';
 
 // ---- Tuning -----------------------------------------------------------------
 const MIN_FLOORS = 3;
@@ -110,6 +117,13 @@ export function riftFloorCount(seed: number, baseLevel: number = RIFT_RANK_BASE_
 
 function themeForFloor(seed: number, floorIndex: number): RiftTheme {
   const rng = new Rng(mixSeed(seed, 0x7000 + floorIndex));
+  // A common or rare hoard is a cave: its boss comes from the cave bosses, built
+  // for a room that size (content/rift/cave_themes.ts). One pick either way, on
+  // this floor's own stream, so no other stream moves. A saved legacy map keeps
+  // the boss it was dug up with.
+  if (vaultSeedCaveBoss(seed) && CAVE_THEMES.length > 0) {
+    return rng.pick(CAVE_THEMES as RiftTheme[]);
+  }
   return rng.pick(RIFT_THEMES as RiftTheme[]);
 }
 

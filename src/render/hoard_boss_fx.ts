@@ -335,6 +335,8 @@ export class HoardBossFx {
     const stormEdge = material(0x8de8ff, 0.96, true);
     const fireFill = material(0xaa250d, 0.3);
     const fireEdge = material(0xff8c2b, 0.94, true);
+    const sporeFill = material(0x6e7a18, 0.3);
+    const sporeEdge = material(0xd8f06a, 0.94, true);
     this.sweepPalettes = {
       frost: [frostFill, frostEdge],
       physical: [bruteFill, bruteEdge],
@@ -345,6 +347,7 @@ export class HoardBossFx {
       arcane: [arcaneFill, arcaneEdge, arcaneEdge],
       storm: [stormFill, stormEdge, stormEdge],
       fire: [fireFill, fireEdge, fireEdge],
+      spore: [sporeFill, sporeEdge, sporeEdge],
       physical: [markFillMaterial, markGoldMaterial, hazardEdgeMaterial],
     };
     const riderMaterial = (color: number): THREE.PointsMaterial =>
@@ -364,6 +367,7 @@ export class HoardBossFx {
       arcane: riderMaterial(0xd5b4ff),
       storm: riderMaterial(0x8de8ff),
       tide: riderMaterial(0x8ff7ff),
+      spore: riderMaterial(0xd8f06a),
     };
     this.materials = [
       markFillMaterial,
@@ -383,6 +387,8 @@ export class HoardBossFx {
       stormEdge,
       fireFill,
       fireEdge,
+      sporeFill,
+      sporeEdge,
       ...Object.values(this.riderMaterials),
     ];
 
@@ -549,7 +555,9 @@ export class HoardBossFx {
         isForgeHammerVariant(cue.variant) ||
         isTentacleVariant(cue.variant) ||
         isBoulderVariant(cue.variant) ||
-        isCocoonVariant(cue.variant)
+        isCocoonVariant(cue.variant) ||
+        // Her cap's end is only the burst (its fx): nothing to draw on the floor.
+        cue.variant === 'mushroom-burst'
       )
         continue;
       const key = `${cue.instanceId}:${cue.cueId}`;

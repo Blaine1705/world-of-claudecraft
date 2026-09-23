@@ -1,3 +1,4 @@
+import { HOARD_MUSHROOM_BOSS_TEMPLATE, MUSHROOM } from './hoard_mushroom_core';
 import { ORBITAL_LIGHTNING } from './hoard_orbital_lightning_core';
 import type { HoardBossCueVariant } from './types';
 
@@ -13,7 +14,8 @@ export type HoardBossKit =
   | 'brute'
   | 'arcane'
   | 'storm'
-  | 'tide';
+  | 'tide'
+  | 'mushroom';
 
 export interface HoardSweepSpec {
   variant: HoardBossCueVariant;
@@ -184,6 +186,8 @@ export function hoardBossKit(templateId: string): HoardBossKit {
       return 'storm';
     case 'rift_boss_tide':
       return 'tide';
+    case HOARD_MUSHROOM_BOSS_TEMPLATE:
+      return 'mushroom';
     default:
       return 'ember';
   }
@@ -325,6 +329,19 @@ export function hoardMarkSpec(variant: HoardBossCueVariant): HoardMarkSpec {
         pulseEvery: 0.75,
         school: 'nature',
         ability: 'Charged Ground',
+      };
+    // The Mother of Mushrooms' spore clouds (hoard_mushroom.ts).
+    case 'mushroom-spore':
+      return {
+        variant,
+        radius: MUSHROOM.sporeRadius,
+        windup: MUSHROOM.sporeWarningSec,
+        impactFraction: MUSHROOM.sporeImpactFraction,
+        hazardDuration: MUSHROOM.sporeHazardSec,
+        pulseFraction: MUSHROOM.sporePulseFraction,
+        pulseEvery: MUSHROOM.sporePulseEverySec,
+        school: 'nature',
+        ability: 'Spore Cloud',
       };
     default:
       return {

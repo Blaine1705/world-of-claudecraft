@@ -20,6 +20,8 @@ const NAMES = [
   'Lightning Strike',
   'Charged Ground',
   'Healing Tide',
+  'Spore Cloud',
+  'Bloated Cap',
 ] as const;
 
 afterEach(() => setLanguage('en'));

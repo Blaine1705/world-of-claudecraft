@@ -18147,6 +18147,15 @@ export const fr_FR: EnTranslations = {
       "hoard_coinsack_scurrier": {
         "name": "Coinsack Scurrier"
       },
+      "hoard_boss_mushroom": {
+        "name": "Mother of Mushrooms"
+      },
+      "hoard_sporeling": {
+        "name": "Sporeling"
+      },
+      "hoard_bloat_cap": {
+        "name": "Bloated Cap"
+      },
       "rift_spawnling": {
         "name": "Rejeton de faille"
       },

@@ -18147,6 +18147,15 @@ export const en_XA: EnTranslations = {
       "hoard_coinsack_scurrier": {
         "name": "[Çóíñšáçķ Šçúŕŕíéŕ]"
       },
+      "hoard_boss_mushroom": {
+        "name": "[Ɱóţĥéŕ óƒ Ɱúšĥŕóóɱš]"
+      },
+      "hoard_sporeling": {
+        "name": "[Šþóŕéļíñĝ]"
+      },
+      "hoard_bloat_cap": {
+        "name": "[Ɓļóáţéð Çáþ]"
+      },
       "rift_spawnling": {
         "name": "[Ŕíƒţ Šþáŵñļíñĝ]"
       },

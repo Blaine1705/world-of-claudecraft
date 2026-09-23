@@ -254,6 +254,9 @@ const CLIPLESS_RIGS = new Set([
   'mob_dragon_egg',
   // the Nythraxis Bone Spike: a stationary Tripo prop mob, no rig, no clips
   'mob_nythraxis_bone_spike',
+  // the Mother of Mushrooms' Bloated Cap: a stationary Tripo prop mob, no rig,
+  // no clips; it swells through its entity scale (src/sim/rift/hoard_mushroom.ts)
+  'mob_hoard_bloat_cap',
 ]);
 
 /** mob_yumi_cat is a single-clip objective prop: its ClipMap names the one real

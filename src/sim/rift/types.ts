@@ -434,7 +434,10 @@ export type HoardBossCueVariant =
   | 'brute-boulder-return'
   | 'brute-boulder-crush'
   | 'brood-cocoon'
-  | 'brood-cocoon-end';
+  | 'brood-cocoon-end'
+  | 'mushroom-spore'
+  | 'mushroom-bloat'
+  | 'mushroom-burst';
 
 export type HoardBossCue =
   | {
@@ -494,6 +497,8 @@ export interface HoardBossState {
   charge?: import('./hoard_charge').HoardChargeState;
   silkSnare?: import('./hoard_silk_snare').HoardSilkSnareState;
   cocoon?: import('./hoard_cocoon').HoardCocoonState;
+  /** The Mother of Mushrooms' clocks and Bloated Cap (hoard_mushroom.ts). */
+  mushroom?: import('./hoard_mushroom').HoardMushroomState;
   /** Storm Surge (src/sim/rift/hoard_storm_surge.ts): Vharok's stacks while he
    *  stands in his own charged ground, and the size he returns to. */
   stormSurgeStacks?: number;

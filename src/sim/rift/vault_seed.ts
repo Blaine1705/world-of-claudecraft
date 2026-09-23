@@ -41,6 +41,13 @@ function isMetadataSeed(seed: number): boolean {
   return ((seed >>> 0) & SEED_NAMESPACE_MASK) >>> 0 === METADATA_VAULT_FLAG;
 }
 
+/** Whether a vault seed draws its boss from the cave bosses (content/rift/
+ *  cave_themes.ts): a common or rare map minted in the current format. A saved
+ *  legacy seed keeps the boss it was dug up with. */
+export function vaultSeedCaveBoss(seed: number): boolean {
+  return isMetadataSeed(seed) && ((seed >>> 28) & 3) <= 1;
+}
+
 /** The vault size tier a seed encodes, or null for an ordinary rift seed. */
 export function vaultSeedTier(seed: number): VaultSizeTier | null {
   const s = seed >>> 0;

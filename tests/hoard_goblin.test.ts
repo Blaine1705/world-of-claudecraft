@@ -20,7 +20,7 @@ import type { RiftInstance } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
 
-function hoard(args = 'grask rare goblin'): { sim: Sim; inst: RiftInstance; goblin?: Entity } {
+function hoard(args = 'mushroom rare goblin'): { sim: Sim; inst: RiftInstance; goblin?: Entity } {
   const sim = new Sim({ seed: 4242, playerClass: 'warrior', autoEquip: true, devCommands: true });
   sim.chat('/dev level 20', sim.player.id);
   sim.chat('/dev god', sim.player.id);
@@ -77,7 +77,7 @@ describe('the Coinsack Scurrier', () => {
   });
 
   it('rolls its 15% on every hoard, and an ordinary rift never draws for it', () => {
-    const { sim, inst } = hoard('grask rare');
+    const { sim, inst } = hoard('mushroom rare');
     const spots = [{ x: 0, z: 10, level: 20 }];
     const chance = vi.spyOn(sim.ctx.rng, 'chance');
     // A losing roll: drawn once at the goblin's odds, and no goblin.

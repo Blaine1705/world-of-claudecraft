@@ -13,10 +13,12 @@
 // a hunched mob holds its face out in FRONT of the shoulders and lower than them,
 // so --chin with --front also hands the head everything above --chin that sits
 // further forward than --front. Front pieces (eyes, teeth) whose centre is head
-// by the same test go to the head whole.
+// by the same test go to the head whole. --width keeps the head rules inside
+// |x| <= width, so hands and claws held out at face height (a T-posed mob with
+// long arms) stay on the arms.
 //
 //   node scripts/assets/hoard_mobs/rigid_pack.mjs <in.glb> <out.glb> [--behind <z>]
-//        [--joint chest] [--neck <y> [--band <y>] [--chin <y> --front <z>]]
+//        [--joint chest] [--neck <y> [--band <y>] [--chin <y> --front <z>] [--width <x>]]
 //
 // Lengths are in the model's REST pose in world units: Y up, the mob facing +Z,
 // so its back is negative Z (Blender shows the same numbers as z and -y). The
@@ -38,6 +40,7 @@ const neck = Number(opt('neck', 'NaN'));
 const band = Number(opt('band', '0.12'));
 const chin = Number(opt('chin', 'NaN'));
 const front = Number(opt('front', 'NaN'));
+const width = Number(opt('width', 'Infinity'));
 
 const doc = await openGlb(src);
 const root = doc.getRoot();
@@ -56,6 +59,7 @@ const smooth = (a, b, v) => {
 };
 /** How much of a rest-pose point belongs to the head (0 to 1). */
 const headShare = (pt) => {
+  if (Math.abs(pt[0]) > width) return 0;
   const high = smooth(neck - band, neck + band, pt[1]);
   if (!Number.isFinite(chin) || !Number.isFinite(front)) return high;
   const face = smooth(chin - band, chin + band, pt[1]) * smooth(front - band, front + band, pt[2]);

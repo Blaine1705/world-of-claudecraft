@@ -18147,6 +18147,15 @@ export const zh_CN: EnTranslations = {
       "hoard_coinsack_scurrier": {
         "name": "钱袋窜贼"
       },
+      "hoard_boss_mushroom": {
+        "name": "蘑菇之母"
+      },
+      "hoard_sporeling": {
+        "name": "孢子仔"
+      },
+      "hoard_bloat_cap": {
+        "name": "膨胀菌盖"
+      },
       "rift_spawnling": {
         "name": "裂隙孽生体"
       },
