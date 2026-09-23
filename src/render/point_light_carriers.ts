@@ -10,6 +10,7 @@ import {
 } from './point_light_carriers_core';
 
 const CARRIER_KEY = 'pointLightCarrier';
+const AUDIT_MIN_INTERVAL_MS = 5000;
 
 export type PointLightSourceList = () => readonly THREE.PointLight[];
 
@@ -21,8 +22,9 @@ export function isPointLightCarrier(object: THREE.Object3D): boolean {
 
 /** Every point light three would gather from `scene` for `camera` that is not
  *  a carrier. A stray is drawn in its traversal slot, where a dark carrier in
- *  front of it makes the shader break before it. A whole-scene walk: for tests
- *  and a console session, never a frame path. */
+ *  front of it makes the shader break before it. A whole-scene walk: the DEV
+ *  audit runs it on a registry change at most every few seconds, never per
+ *  frame. A marked light (layer 31) is invisible to it, a marked clone too. */
 export function findStrayPointLights(
   scene: THREE.Object3D,
   camera: THREE.Camera,
@@ -49,10 +51,25 @@ export function hideBlackPointLights(root: THREE.Object3D): void {
   });
 }
 
+function lightPath(object: THREE.Object3D): string {
+  const parts: string[] = [];
+  for (let node: THREE.Object3D | null = object; node && parts.length < 6; node = node.parent) {
+    parts.push(node.name || node.type);
+  }
+  return parts.join(' < ');
+}
+
+/** Carriers never cast shadows: a shadow-casting source would draw unshadowed,
+ *  and the chunk's shadow arm is never selected in the world scene. */
 export class PointLightCarriers {
   readonly lights: readonly THREE.PointLight[];
   private readonly sources: readonly PointLightSourceList[];
   private overflowReported = false;
+  private auditedSignature = -1;
+  private lastAuditAt = Number.NEGATIVE_INFINITY;
+  private readonly reportedStrays = new WeakSet<THREE.Object3D>();
+  private readonly reportedTwice = new WeakSet<THREE.Object3D>();
+  private readonly reportedShadows = new WeakSet<THREE.Object3D>();
 
   constructor(scene: THREE.Object3D, count: number, sources: readonly PointLightSourceList[]) {
     const lights: THREE.PointLight[] = [];
@@ -78,13 +95,58 @@ export class PointLightCarriers {
       cursor = packPointLightSources(this.sources[i](), this.lights, cursor, scene, mask);
     }
     darkenPointLightCarriers(this.lights, cursor);
-    if (import.meta.env.DEV && cursor > this.lights.length && !this.overflowReported) {
+    if (import.meta.env.DEV) this.devChecks(scene, camera, cursor);
+    return cursor;
+  }
+
+  private devChecks(scene: THREE.Object3D, camera: THREE.Camera, live: number): void {
+    if (live > this.lights.length && !this.overflowReported) {
       this.overflowReported = true;
       console.error(
-        `PointLightCarriers: ${cursor} live point lights for ${this.lights.length} carriers; the last ones listed are dropped`,
+        `PointLightCarriers: ${live} live point lights for ${this.lights.length} carriers; the last ones listed are dropped`,
       );
     }
-    return cursor;
+    // A registry change is the rank-rebuild trigger and the moment a new
+    // producer shows up; a balanced add and remove is caught by the next one.
+    let signature = 0;
+    for (let i = 0; i < this.sources.length; i++) signature += this.sources[i]().length;
+    if (signature === this.auditedSignature) return;
+    const now = performance.now();
+    if (now - this.lastAuditAt < AUDIT_MIN_INTERVAL_MS) return;
+    this.auditedSignature = signature;
+    this.lastAuditAt = now;
+    this.audit(scene, camera);
+  }
+
+  /** Reports each problem once per light on console.error, and returns the
+   *  new reports: a light three gathers beside the carriers, a source listed
+   *  twice (packed twice, drawn at double strength), a source casting a
+   *  shadow no carrier draws. */
+  audit(scene: THREE.Object3D, camera: THREE.Camera): string[] {
+    const reports: string[] = [];
+    for (const stray of findStrayPointLights(scene, camera)) {
+      if (this.reportedStrays.has(stray)) continue;
+      this.reportedStrays.add(stray);
+      reports.push(
+        `three gathers ${lightPath(stray)} beside the carriers; mark it (markPointLightSource) and register it with the budget`,
+      );
+    }
+    const seen = new Set<THREE.PointLight>();
+    for (const list of this.sources) {
+      for (const light of list()) {
+        if (seen.has(light) && !this.reportedTwice.has(light)) {
+          this.reportedTwice.add(light);
+          reports.push(`${lightPath(light)} is listed twice as a carrier source`);
+        }
+        seen.add(light);
+        if (light.castShadow && !this.reportedShadows.has(light)) {
+          this.reportedShadows.add(light);
+          reports.push(`${lightPath(light)} casts a shadow, which no carrier draws`);
+        }
+      }
+    }
+    for (const report of reports) console.error(`PointLightCarriers: ${report}`);
+    return reports;
   }
 }
 

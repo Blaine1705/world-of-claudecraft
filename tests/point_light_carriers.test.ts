@@ -349,6 +349,91 @@ describe('the carriers in a three scene', () => {
   });
 });
 
+describe('the DEV audit of the world scene', () => {
+  function renderOnce(scene: THREE.Scene, camera: THREE.Camera): void {
+    scene.updateMatrixWorld();
+    scene.onBeforeRender(
+      {} as THREE.WebGLRenderer,
+      scene,
+      camera,
+      {} as THREE.BufferGeometry,
+      {} as THREE.Material,
+      {} as THREE.Group,
+    );
+  }
+
+  it('reports a stray, a doubly listed source and a shadow caster, once each', () => {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera();
+    const twice = source(0xffffff, 2, [0, 0, 0]);
+    const caster = source(0xffffff, 2, [0, 0, 0]);
+    caster.castShadow = true;
+    const set = attachPointLightCarriers(scene, 4, [() => [twice, caster], () => [twice]]);
+    for (const light of [twice, caster]) {
+      markPointLightSource(light);
+      scene.add(light);
+    }
+    const lamp = source(0xffffff, 3, [0, 0, 0]);
+    lamp.name = 'glb-lamp';
+    const prop = new THREE.Group();
+    prop.name = 'stray-prop';
+    prop.add(lamp);
+    scene.add(prop);
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const reports = set.audit(scene, camera);
+      expect(reports).toHaveLength(3);
+      expect(reports[0]).toContain('glb-lamp < stray-prop < Scene');
+      expect(reports.some((report) => report.includes('listed twice'))).toBe(true);
+      expect(reports.some((report) => report.includes('casts a shadow'))).toBe(true);
+      expect(errors).toHaveBeenCalledTimes(3);
+      expect(set.audit(scene, camera)).toEqual([]);
+      expect(errors).toHaveBeenCalledTimes(3);
+    } finally {
+      errors.mockRestore();
+    }
+  });
+
+  it('costs nothing in a production build: the whole audit sits behind the DEV flag', () => {
+    const carriers = sourceOf('render/point_light_carriers.ts');
+    expect(carriers).toContain('if (import.meta.env.DEV) this.devChecks(scene, camera, cursor);');
+    expect(carriers.split('this.devChecks(')).toHaveLength(2);
+    expect(carriers.split('this.audit(')).toHaveLength(2);
+  });
+
+  it('runs on a registry change, at most every few seconds, never on a steady frame', () => {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera();
+    const fire: THREE.PointLight[] = [];
+    const set = attachPointLightCarriers(scene, 2, [() => fire]);
+    const audit = vi.spyOn(set, 'audit').mockReturnValue([]);
+    let now = 1000;
+    const clock = vi.spyOn(performance, 'now').mockImplementation(() => now);
+    try {
+      renderOnce(scene, camera);
+      expect(audit).toHaveBeenCalledTimes(1);
+      now += 60_000;
+      renderOnce(scene, camera);
+      expect(audit).toHaveBeenCalledTimes(1);
+
+      fire.push(source(0xffffff, 0, [0, 0, 0]));
+      now += 1000;
+      renderOnce(scene, camera);
+      expect(audit).toHaveBeenCalledTimes(2);
+
+      fire.push(source(0xffffff, 0, [0, 0, 0]));
+      now += 1000;
+      renderOnce(scene, camera);
+      expect(audit).toHaveBeenCalledTimes(2);
+      now += 5000;
+      renderOnce(scene, camera);
+      expect(audit).toHaveBeenCalledTimes(3);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+});
+
 describe('a one-shot scene without carriers', () => {
   it('hides only its black point lights, so none can stand in front of a live one', () => {
     const model = new THREE.Group();

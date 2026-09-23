@@ -45,7 +45,9 @@ export interface PointLightCarrierLike {
 }
 
 /** Moves a source off every camera layer, remembering the mask three would
- *  have tested so liveness keeps today's layer semantics. Idempotent. */
+ *  have tested so liveness keeps today's layer semantics. Idempotent. A
+ *  `.clone()` of a marked source copies layers and userData, so the clone is
+ *  marked too: it draws only once it joins a source list. */
 export function markPointLightSource(
   source: Pick<PointLightSourceLike, 'layers' | 'userData'>,
 ): void {
