@@ -153,7 +153,8 @@ export function applyHeal(
   if (abilityId !== 'enchant_weapon_lastflame_zeal') {
     onCraftedCollectionHeal(ctx, source, target, overheal);
   }
-  if (!alreadyResolved) onTrinketHeal(ctx, source, target, healed, overheal, ability);
+  if (!alreadyResolved)
+    onTrinketHeal(ctx, source, target, healed, overheal, ability, canTriggerWeaponProcs);
   ctx.emit({
     type: 'heal2',
     sourceId: source.id,

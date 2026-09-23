@@ -95,6 +95,17 @@ describe('using a worn trinket', () => {
 });
 
 describe('the tank trinkets', () => {
+  it('Bastion Sigil: a killing hit raises no shield on the corpse and keeps the cooldown', () => {
+    const sim = wearing('bastion_sigil');
+    const mob = foe(sim);
+    const p = sim.player;
+    p.hp = Math.round(p.maxHp * 0.1);
+    sim.ctx.dealDamage(mob, p, p.maxHp * 2, false, 'physical', 'Bite', 'hit');
+    expect(p.dead).toBe(true);
+    expect(aura(p, TRINKET_AURA.lastStand)).toBeUndefined();
+    expect(aura(p, TRINKET_AURA.lastStandIcd)).toBeUndefined();
+  });
+
   it('Bastion Sigil: a last-stand shield below 35%, once per cooldown; the ward strikes back', () => {
     const sim = wearing('bastion_sigil');
     const mob = foe(sim);
@@ -187,6 +198,18 @@ describe('the physical trinkets', () => {
     const bleed = mob.auras.find((a) => a.id === TRINKET_AURA.bleed);
     expect(bleed?.kind).toBe('dot');
     expect(bleed?.stacks ?? 0).toBeGreaterThan(0);
+  });
+
+  it('Paired Talons: a dead wearer opens no bleed', () => {
+    const sim = wearing('paired_talons', 'rogue');
+    const mob = foe(sim);
+    sim.useItem('paired_talons');
+    sim.player.dead = true;
+    runTrinketTrigger(sim.ctx, sim.player, mob, 'weaponHit');
+    expect(aura(mob, TRINKET_AURA.bleed)).toBeUndefined();
+    sim.player.dead = false;
+    runTrinketTrigger(sim.ctx, sim.player, mob, 'weaponHit');
+    expect(aura(mob, TRINKET_AURA.bleed)?.kind).toBe('dot');
   });
 
   it('Paired Talons: the extra swing needs the target in melee reach', () => {

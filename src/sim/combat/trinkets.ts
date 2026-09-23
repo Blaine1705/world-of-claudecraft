@@ -30,6 +30,7 @@ import {
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { duelJustEndedBetween } from '../social/duel';
 import { type Aura, type Entity, MELEE_RANGE } from '../types';
 import { meleeSwing } from './auto_attack';
 import { isUnbreakableControlAura } from './cc';
@@ -503,11 +504,18 @@ export function runTrinketTrigger(
   target: Entity | null,
   trigger: TrinketTrigger,
 ): void {
-  if (source.kind !== 'player') return;
+  if (source.kind !== 'player' || source.dead) return;
   const worn = wornTrinket(ctx, source);
   if (!worn) return;
   const passive = worn.spec.passive;
-  if (trigger === 'weaponHit' && target && !target.dead) {
+  // The killing blow of a duel leaves no lingering bleed or extra swing behind
+  // (the same gate runWeaponProcs keeps for its persistent effects).
+  if (
+    trigger === 'weaponHit' &&
+    target &&
+    !target.dead &&
+    !duelJustEndedBetween(ctx, target, source)
+  ) {
     const edge = findAura(source, TRINKET_AURA.bleedEdge);
     if (edge && worn.spec.use.kind === 'bleedEdge') applyBleed(ctx, source, target, worn.spec.use);
     if (passive?.kind === 'twinStrike') twinStrike(ctx, source, target, passive);
@@ -577,7 +585,9 @@ export function onTrinketDamage(
   ability: string | null,
 ): void {
   if (hpLoss <= 0) return;
-  if (target.kind === 'player' && !target.dead) {
+  // A killing hit reaches here before the death block marks the wearer dead:
+  // hp <= 0 means no last stand and no reflect from the corpse.
+  if (target.kind === 'player' && !target.dead && target.hp > 0) {
     const passive = passiveOf(ctx, target);
     if (
       passive?.kind === 'lastStand' &&
@@ -660,6 +670,9 @@ export function onTrinketHeal(
   healed: number,
   overheal: number,
   ability: string,
+  // False for derived heals (a weapon enchant's proc, a copied echo): they fill
+  // the hourglass but never spend an Echoing Lens charge.
+  castHeal = true,
 ): void {
   if (source.kind !== 'player' || ability === 'Echoing Lens') return;
   const passive = passiveOf(ctx, source);
@@ -674,7 +687,7 @@ export function onTrinketHeal(
     }
   }
   const echo = findAura(source, TRINKET_AURA.echo);
-  if (echo && (echo.stacks ?? 0) > 0 && healed + overheal > 0 && !target.dead) {
+  if (castHeal && echo && (echo.stacks ?? 0) > 0 && healed + overheal > 0 && !target.dead) {
     spendEcho(ctx, source, echo);
     applyHeal(
       ctx,
