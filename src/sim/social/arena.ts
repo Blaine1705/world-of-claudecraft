@@ -1087,6 +1087,9 @@ export function readyArenaFighter(
       : e.resourceType === 'energy' || e.resourceType === 'focus'
         ? 100
         : 0;
+  // The top-off covers the druid's parked Cat Form energy too, so a fighter who
+  // walked in drained is not short on the first shift (combat/cat_form_energy.ts).
+  e.parkedEnergyDeficit = 0;
   // Target retention is a separate concern from clearPrep (clean slate vs
   // fight-start top-off): only the countdown-end call site passes
   // keepValidTargetPids, so a selection made during prep survives the gates

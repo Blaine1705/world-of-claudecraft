@@ -20,6 +20,7 @@ import {
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
+import { readyArenaFighter } from '../src/sim/social/arena';
 import type { Entity, SimEvent } from '../src/sim/types';
 
 /** Ticks per classic regen tick (updateRegen pays every 40th sim tick). */
@@ -130,12 +131,12 @@ describe('cancel-form then re-shift no longer refills Cat energy mid-fight (the 
 
     sim.castAbility('bear_form');
     expect(p.resourceType).toBe('rage');
-    // One global cooldown in Bruin: at most one regen tick can land.
-    fight(sim, 40);
+    // Any 40 consecutive sim ticks hold exactly one classic regen tick.
+    fight(sim, REGEN_TICK);
     sim.castAbility('cat_form');
 
     expect(inCat(p)).toBe(true);
-    expect(p.resource).toBeLessThanOrEqual(PARKED_ENERGY_REGEN_PER_TICK);
+    expect(p.resource).toBe(PARKED_ENERGY_REGEN_PER_TICK);
   });
 
   it('still hands a fresh druid a full bar on the first shift of a fight', () => {
@@ -171,6 +172,64 @@ describe('cancel-form then re-shift no longer refills Cat energy mid-fight (the 
       return [p.resource, p.resourceType, p.parkedEnergyDeficit ?? 0];
     };
     expect(run()).toEqual(run());
+  });
+});
+
+describe('parked Cat energy: the edges', () => {
+  it('pins the base tick at 20 and matches staying in Cat over the same window', () => {
+    expect(PARKED_ENERGY_REGEN_PER_TICK).toBe(20);
+    const stayer = feralDruid();
+    const leaver = feralDruid();
+    for (const { sim, p } of [stayer, leaver]) {
+      fight(sim, 1);
+      sim.castAbility('cat_form');
+      fight(sim, 40);
+      p.resource = 0;
+    }
+    leaver.sim.cancelAura('cat_form');
+    fight(stayer.sim, 2 * REGEN_TICK);
+    fight(leaver.sim, 2 * REGEN_TICK);
+    leaver.sim.castAbility('cat_form');
+    expect(leaver.p.resource).toBe(stayer.p.resource);
+    expect(leaver.p.resource).toBe(40);
+  });
+
+  it('never parks anything for a rogue, whose bar is energy without a form', () => {
+    const sim = new Sim({ seed: 44, playerClass: 'rogue', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const p = sim.player;
+    p.resource = 30;
+    expect(sim.selectTalentRow(8, 'rog_r8_ghostfoot_ward')).toBe(true); // a stat recalc
+    fight(sim, REGEN_TICK);
+    expect(p.parkedEnergyDeficit).toBeUndefined();
+    expect(p.resourceType).toBe('energy');
+  });
+
+  it('refills the parked pool on the arena top-off', () => {
+    const { sim, p } = feralDruid();
+    fight(sim, 1);
+    sim.castAbility('cat_form');
+    fight(sim, 40);
+    p.resource = 10;
+    sim.cancelAura('cat_form');
+    expect(p.parkedEnergyDeficit).toBe(90);
+
+    readyArenaFighter((sim as unknown as { ctx: never }).ctx, p, { clearPrep: true });
+
+    expect(p.parkedEnergyDeficit).toBe(0);
+    fight(sim, 1);
+    sim.castAbility('cat_form');
+    expect(p.resource).toBe(CAT_ENERGY_MAX);
+  });
+
+  it('still lets Bruin Rush shift a caster druid mid-fight (its 0 cost vs an empty rage bar)', () => {
+    const { sim, p } = feralDruid();
+    spawnMob(sim, 14);
+    fight(sim, 1);
+    sim.castAbility('bear_charge');
+    fight(sim, 5);
+    expect(p.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+    expect(p.resourceType).toBe('rage');
   });
 });
 

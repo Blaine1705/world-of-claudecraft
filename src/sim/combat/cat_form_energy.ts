@@ -10,8 +10,10 @@
 //   - leaving Cat Form (to caster, Bruin, Fleet, or death) PARKS the energy the
 //     druid left with, stored as its shortfall from full;
 //   - the parked pool keeps regenerating at the base energy tick while the
-//     druid is out of Cat (updateRegen), so a shift back returns exactly what
-//     staying in the form would have, never more;
+//     druid is out of Cat (updateRegen), so a shift back returns what staying
+//     in the form would have at the base rate (a Cat-only energy regen buff
+//     does not ride along), never more;
+//   - a resurrection and the arena top-off hand back a full pool;
 //   - a shift INTO Cat Form during a fight hands over the parked pool; out of
 //     combat it still hands over the full bar, the friendly opener the design
 //     chose over the classic-era zero.

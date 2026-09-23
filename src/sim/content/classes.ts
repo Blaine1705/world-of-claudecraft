@@ -6930,8 +6930,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     // No form requirement since v0.43: Lunge is pressable from ANY form and
     // from caster form, and shifts the druid into Cat Form on the way in
-    // (combat/druid_form_entry.ts). Entering Cat Form hands over a full 100
-    // energy, so the 40 this costs is always payable on the press that shifts.
+    // (combat/druid_form_entry.ts). The press that shifts is billed against
+    // the energy the shift hands over: a full bar out of combat, the parked
+    // Cat pool mid-fight (combat/cat_form_energy.ts).
     usableInForm: true,
     // The cast only starts the charge route; the 60% weapon strike and the
     // combo point land on ARRIVAL through combat/druid_lunge.ts (the
