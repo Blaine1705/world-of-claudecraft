@@ -155,6 +155,24 @@ function isStunned(p: Entity): boolean {
   );
 }
 
+/** Seconds a freshly equipped trinket waits before it can be used (the classic
+ *  on-equip lockout), so swapping trinkets can never chain two uses. */
+export const TRINKET_EQUIP_LOCKOUT = 30;
+
+/** A trinket just went into the slot (items.ts equipItem): start its use
+ *  cooldown at the longest of its own remaining wait, the equip lockout, and
+ *  the wait left on the trinket it replaced. Swapping out a trinket that was
+ *  just used therefore hands its cooldown to the new one. No rng. */
+export function onTrinketEquipped(p: Entity, itemId: string, replacedId?: string): void {
+  if (!trinketSpec(itemId)) return;
+  const key = trinketCooldownKey(itemId);
+  const inherited =
+    replacedId && replacedId !== itemId
+      ? (p.cooldowns.get(trinketCooldownKey(replacedId)) ?? 0)
+      : 0;
+  p.cooldowns.set(key, Math.max(p.cooldowns.get(key) ?? 0, TRINKET_EQUIP_LOCKOUT, inherited));
+}
+
 /** Use the worn trinket. Returns false (and says why) when it cannot be used now;
  *  a refused use costs no cooldown. */
 export function useWornTrinket(

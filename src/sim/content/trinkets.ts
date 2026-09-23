@@ -157,6 +157,43 @@ export const TRINKET_AURA = Object.freeze({
   guardHeat: 'trinket_crucible_heat',
 });
 
+/** The Mooring Stone's self-slow rides its own aura id beside the anchor
+ *  (combat/trinkets.ts applies it as `${TRINKET_AURA.anchor}_slow`). */
+export const TRINKET_ANCHOR_SLOW_AURA = `${TRINKET_AURA.anchor}_slow`;
+
+/** Which trinket owns each aura the trinkets apply, so the buff bar, the target
+ *  frame and the nameplates paint the trinket's own item icon on it (the UI's
+ *  aura art registry reads this map; src/ui/trinket_aura_art.ts). Every
+ *  TRINKET_AURA id is here, plus the Mooring Stone's slow. Data only. */
+export const TRINKET_AURA_ITEM: Readonly<Record<string, string>> = Object.freeze({
+  [TRINKET_AURA.lastStandIcd]: 'bastion_sigil',
+  [TRINKET_AURA.lastStand]: 'bastion_sigil',
+  [TRINKET_AURA.retaliate]: 'bastion_sigil',
+  [TRINKET_AURA.anchor]: 'mooring_stone',
+  [TRINKET_AURA.anchorGuard]: 'mooring_stone',
+  [TRINKET_ANCHOR_SLOW_AURA]: 'mooring_stone',
+  [TRINKET_AURA.hourglass]: 'menders_hourglass',
+  [TRINKET_AURA.hourglassShield]: 'menders_hourglass',
+  [TRINKET_AURA.wellspring]: 'wellspring_seed',
+  [TRINKET_AURA.twinStrikeIcd]: 'paired_talons',
+  [TRINKET_AURA.bleedEdge]: 'paired_talons',
+  [TRINKET_AURA.bleed]: 'paired_talons',
+  [TRINKET_AURA.tally]: 'hunters_tally',
+  [TRINKET_AURA.storm]: 'stormjar',
+  [TRINKET_AURA.echo]: 'echoing_lens',
+  [TRINKET_AURA.fortune]: 'gamblers_die',
+  [TRINKET_AURA.riftGuard]: 'sundered_prism',
+  [TRINKET_AURA.sprint]: 'wayfarers_lodestone',
+  [TRINKET_AURA.brand]: 'duelists_brand',
+  [TRINKET_AURA.heat]: 'forgefathers_temper',
+  [TRINKET_AURA.temper]: 'forgefathers_temper',
+  [TRINKET_AURA.kindlingOrb]: 'kindling_orb',
+  [TRINKET_AURA.ignite]: 'molten_fletching',
+  [TRINKET_AURA.pierce]: 'molten_fletching',
+  [TRINKET_AURA.lantern]: 'last_flame_lantern',
+  [TRINKET_AURA.guardHeat]: 'heart_of_the_crucible',
+});
+
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
  *  the client and persisted like an ability's). */
 export function trinketCooldownKey(itemId: string): string {

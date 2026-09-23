@@ -118,6 +118,8 @@ function wearing(itemId: string, seed = 11): Sim {
   sim.setPlayerLevel(20);
   sim.addItem(itemId, 1);
   sim.equipItem(itemId);
+  // Skip the 30 sec on-equip lockout: these tests exercise the use itself.
+  sim.player.cooldowns.delete(`trinket:${itemId}`);
   expect(sim.equipment.trinket).toBe(itemId);
   sim.drainEvents();
   return sim;

@@ -17167,6 +17167,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.gambleResult': '{item}: {fortune}!',
   'hudChrome.trinkets.snakeEyes': '스네이크 아이즈',
   'hudChrome.trinkets.equippedLine': '착용 중',
+  'hudChrome.trinkets.equipLockout':
+    '착용하면 사용 효과에 {seconds}초의 재사용 대기시간이 시작됩니다. 교체한 장신구의 남은 재사용 대기시간이 더 길면 그 시간이 적용됩니다.',
   'hudChrome.trinkets.equip.lastStand':
     '생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해(최대 생명력의 {absorbPct}%)를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.',
   'hudChrome.trinkets.equip.hourglass':
@@ -17219,4 +17221,63 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{duration}초 동안 발밑에 등불을 놓습니다. 누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {share}%만큼 치유됩니다.',
   'hudChrome.trinkets.use.heartNova':
     '열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다.',
+  'hudChrome.auraEffect.trinket.lastStandCooldown':
+    '보루의 인장의 최후의 보루 보호막을 이미 사용했습니다. 이 효과가 끝날 때까지 생명력이 {threshold}% 미만으로 떨어져도 다시 발동하지 않습니다.',
+  'hudChrome.auraEffect.trinket.lastBastion':
+    '{value}의 피해를 흡수합니다. 생명력이 {threshold}% 미만일 때 피해를 받아 보루의 인장이 만들어 낸 보호막입니다.',
+  'hudChrome.auraEffect.trinket.retaliate':
+    '당신을 직접 공격한 적은 그 공격으로 잃은 생명력의 {pct}%에 해당하는 물리 피해를 받습니다. 지속 피해로는 발동하지 않습니다.',
+  'hudChrome.auraEffect.trinket.moored':
+    '받는 피해가 {reduction}% 감소하지만 이동 속도가 {speed}%가 됩니다. 기절, 이동 불가, 감속, 공포, 변이, 침묵, 실명, 주술, 무장 해제, 행동 불가 효과와 밀쳐내기를 무시합니다.',
+  'hudChrome.auraEffect.trinket.hourglassStored':
+    '초과 치유로 저장한 치유량 {stored}을 담고 있습니다. 치유사의 모래시계를 사용하면 {range}미터 이내에서 생명력 비율이 가장 낮은 파티원(자신 포함)에게 보호막으로 바꿔 줍니다.',
+  'hudChrome.auraEffect.trinket.hourglassShield':
+    '{value}의 피해를 흡수합니다. 치유사의 모래시계에 저장된 치유량으로 만든 보호막입니다.',
+  'hudChrome.auraEffect.trinket.wellspring': '{every}초마다 생명력을 {tick} 회복합니다.',
+  'hudChrome.auraEffect.trinket.twinStrikeCooldown':
+    '한 쌍의 발톱이 방금 추가 공격을 했습니다. 이 효과가 끝날 때까지 다시 추가 공격을 할 수 없습니다.',
+  'hudChrome.auraEffect.trinket.bleedEdge':
+    '자동 공격이 적중하면 발톱 상처를 겁니다: 중첩당 {every}초마다 {tick}의 물리 피해를 {duration}초 동안 입히며, 최대 {max}번 중첩됩니다.',
+  'hudChrome.auraEffect.trinket.bleedEdgeOther':
+    '자동 공격이 적중하면 최대 {max}번 중첩되는 물리 출혈 효과인 발톱 상처를 겁니다. 피해량은 전투력으로 증가합니다.',
+  'hudChrome.auraEffect.trinket.talonWound':
+    '{every}초마다 {damage}의 물리 피해를 입힙니다({stacks}/{max}중첩). 새 중첩마다 피해가 늘고 지속 시간이 초기화됩니다.',
+  'hudChrome.auraEffect.trinket.tally':
+    '집계 표식: {stacks}/{max}. 사냥꾼의 집계를 사용하면 표식을 모두 소모하여 대상을 공격하고 {damage}의 물리 피해를 입힙니다(표식당 {perMark}).',
+  'hudChrome.auraEffect.trinket.tallyOther':
+    '집계 표식: {stacks}/{max}. 사냥꾼의 집계는 표식을 모두 소모하여 물리 공격을 하며, 표식마다 피해가 늘어납니다.',
+  'hudChrome.auraEffect.trinket.storm':
+    '충전: {stacks}/{max}. 폭풍 항아리를 사용하면 충전을 번개로 방출하여 대상과, 서로 {jumpRange}미터 이내에 있는 최대 {extra}명의 다른 적을 맞히고 각각 {damage}의 자연 피해를 입힙니다(충전당 {perCharge}).',
+  'hudChrome.auraEffect.trinket.stormOther':
+    '충전: {stacks}/{max}. 폭풍 항아리는 충전을 자연 번개로 방출하여 대상과 최대 {extra}명의 다른 적을 맞히며, 충전마다 피해가 늘어납니다.',
+  'hudChrome.auraEffect.trinket.echo':
+    '다음 {casts}번의 직접 치유 또는 물리가 아닌 직접 피해가 그 양의 {pct}%로 한 번 더 반복됩니다.',
+  'hudChrome.auraEffect.trinket.keenEdge': '도박꾼의 주사위 운세: 입히는 피해가 {pct}% 증가합니다.',
+  'hudChrome.auraEffect.trinket.luckyStreak':
+    '도박꾼의 주사위 운세: {every}초마다 생명력을 {tick} 회복합니다.',
+  'hudChrome.auraEffect.trinket.gildedGuard': '도박꾼의 주사위 운세: {value}의 피해를 흡수합니다.',
+  'hudChrome.auraEffect.trinket.riftGuard': '받는 피해가 {pct}% 감소합니다.',
+  'hudChrome.auraEffect.trinket.sprint':
+    '이동 속도가 {pct}% 증가합니다. 다른 이동 속도 증가 효과와 중첩되지 않습니다.',
+  'hudChrome.auraEffect.trinket.brand': '받는 치유량이 {pct}% 감소합니다.',
+  'hudChrome.auraEffect.trinket.forgeHeat':
+    '열기: {stacks}/{max}. 대장장이 아버지의 담금질을 사용하면 열기를 모두 소모하며, 그 무기 화염 피해가 {pct}% 증가합니다.',
+  'hudChrome.auraEffect.trinket.tempered':
+    '근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입힙니다(소모한 열기로 {pct}% 증가). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다.',
+  'hudChrome.auraEffect.trinket.temperedOther':
+    '근접 및 원거리 무기가 적중하면 화염 피해를 추가로 입히며, 소모한 열기로 {pct}% 증가합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.',
+  'hudChrome.auraEffect.trinket.kindlingOrb':
+    '적에게 주문을 시전할 때마다 구슬이 그 적에게 화염구를 발사하여 {damage}의 화염 피해를 입힙니다. 변이, 행동 불가, 실명 상태인 적에게는 발사하지 않습니다.',
+  'hudChrome.auraEffect.trinket.kindlingOrbOther':
+    '적에게 주문을 시전할 때마다 구슬이 그 적에게 화염 피해를 입히는 화염구를 발사합니다. 피해량은 주문력으로 증가합니다.',
+  'hudChrome.auraEffect.trinket.moltenIgnite':
+    '{every}초마다 {damage}의 화염 피해를 입힙니다. 새 무기 치명타가 적중하면 초기화됩니다.',
+  'hudChrome.auraEffect.trinket.pierce':
+    '자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {pct}%를 입힙니다.',
+  'hudChrome.auraEffect.trinket.lantern':
+    '누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {pct}%만큼 치유됩니다.',
+  'hudChrome.auraEffect.trinket.crucibleHeat':
+    '열기: {stacks}/{max}. 도가니의 심장을 사용하면 열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 {damage}의 화염 피해를 입히고, 적중한 모든 생물을 도발합니다.',
+  'hudChrome.auraEffect.trinket.crucibleHeatOther':
+    '열기: {stacks}/{max}. 도가니의 심장은 열기를 모두 소모하여 {radius}미터 이내에 화염 폭발을 일으키며, 중첩마다 화염 피해가 늘고 적중한 모든 생물을 도발합니다.',
 };

@@ -11,6 +11,7 @@
 // Power, Spell Power or Healing Power with the same rounding, and a
 // maximum-health amount uses the viewer's live maximum health.
 
+import { TRINKET_EQUIP_LOCKOUT } from '../sim/combat/trinkets';
 import {
   GAMBLE,
   type GambleFortune,
@@ -335,11 +336,22 @@ export function trinketTooltipLineTexts(
   return lines;
 }
 
-/** The lines as tooltip HTML (green, like every Equip/Use line), '' for a
- *  non-trinket. */
+/** The on-equip lockout note (combat/trinkets.ts onTrinketEquipped): putting a
+ *  trinket on starts its use cooldown at TRINKET_EQUIP_LOCKOUT, or at the
+ *  cooldown the trinket it replaces still had, whichever is longer. Null for an
+ *  item that is not a trinket with a spec. */
+export function trinketEquipLockoutText(itemId: string): string | null {
+  if (!trinketSpec(itemId)) return null;
+  return t('hudChrome.trinkets.equipLockout', { seconds: n(TRINKET_EQUIP_LOCKOUT) });
+}
+
+/** The lines as tooltip HTML (green, like every Equip/Use line), then the
+ *  on-equip lockout note as a muted sub-line; '' for a non-trinket. */
 export function trinketTooltipLines(item: ItemDef, viewer: TrinketTooltipViewer): string {
   let html = '';
   for (const line of trinketTooltipLineTexts(item.id, viewer))
     html += `<div class="tt-green">${esc(line.text)}</div>`;
+  const lockout = trinketEquipLockoutText(item.id);
+  if (lockout) html += `<div class="tt-sub">${esc(lockout)}</div>`;
   return html;
 }

@@ -6145,7 +6145,7 @@ export class Hud {
   // for current AuraKinds and safely omits an unknown mixed-release kind. Injected so
   // the view never calls t().
   private auraEffectTooltipHtml(a: AuraEffectInput & { id?: string }): string {
-    const effect = auraEffectDescriptor(a);
+    const effect = auraEffectDescriptor(a, this.sim.player);
     if (!effect) return '';
     const values: Record<string, string> = {};
     if (effect.nums) {

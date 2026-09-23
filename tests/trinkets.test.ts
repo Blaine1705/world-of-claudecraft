@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { applyHeal } from '../src/sim/combat/heal';
 import { restorableCooldown } from '../src/sim/combat/trinket_seams';
-import { runTrinketTrigger } from '../src/sim/combat/trinkets';
+import { runTrinketTrigger, TRINKET_EQUIP_LOCKOUT } from '../src/sim/combat/trinkets';
 import {
   GAMBLE,
   TRINKET_AURA,
@@ -22,6 +22,8 @@ function wearing(itemId: string, cls: PlayerClass = 'warrior', seed = 11) {
   sim.setPlayerLevel(20);
   sim.addItem(itemId, 1);
   sim.equipItem(itemId);
+  // Skip the 30 sec on-equip lockout: these tests exercise the use itself.
+  sim.player.cooldowns.delete(`trinket:${itemId}`);
   expect(sim.equipment.trinket).toBe(itemId);
   sim.drainEvents();
   return sim;
@@ -86,11 +88,40 @@ describe('using a worn trinket', () => {
     const sim = wearing('gamblers_die');
     sim.addItem('wayfarers_lodestone', 1);
     expect(sim.equipment.trinket).toBe('gamblers_die');
-    // Using gear from the bags puts it on, as ever: the swap fires no effect and
-    // starts no cooldown.
+    // Using gear from the bags puts it on, as ever: the swap fires no effect,
+    // and the freshly worn trinket starts only its on-equip lockout.
     sim.useItem('wayfarers_lodestone');
     expect(aura(sim.player, TRINKET_AURA.sprint)).toBeUndefined();
-    expect(sim.player.cooldowns.get(trinketCooldownKey('wayfarers_lodestone')) ?? 0).toBe(0);
+    expect(sim.player.cooldowns.get(trinketCooldownKey('wayfarers_lodestone'))).toBe(
+      TRINKET_EQUIP_LOCKOUT,
+    );
+  });
+});
+
+describe('the on-equip lockout', () => {
+  it('a freshly equipped trinket waits 30 sec before it can be used', () => {
+    const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.addItem('wayfarers_lodestone', 1);
+    sim.equipItem('wayfarers_lodestone');
+    const key = trinketCooldownKey('wayfarers_lodestone');
+    expect(sim.player.cooldowns.get(key)).toBe(TRINKET_EQUIP_LOCKOUT);
+    sim.useItem('wayfarers_lodestone');
+    expect(aura(sim.player, TRINKET_AURA.sprint)).toBeUndefined();
+  });
+
+  it("swapping in another trinket inherits the used one's longer wait", () => {
+    const sim = wearing('wayfarers_lodestone');
+    sim.useItem('wayfarers_lodestone');
+    const left = sim.player.cooldowns.get(trinketCooldownKey('wayfarers_lodestone')) ?? 0;
+    expect(left).toBe(TRINKET_SPECS.wayfarers_lodestone.cooldown);
+    sim.addItem('sundered_prism', 1);
+    sim.equipItem('sundered_prism');
+    expect(sim.equipment.trinket).toBe('sundered_prism');
+    expect(sim.player.cooldowns.get(trinketCooldownKey('sundered_prism'))).toBe(left);
+    // Swapping straight back keeps the original wait too: no chained uses.
+    sim.equipItem('wayfarers_lodestone');
+    expect(sim.player.cooldowns.get(trinketCooldownKey('wayfarers_lodestone'))).toBe(left);
   });
 });
 

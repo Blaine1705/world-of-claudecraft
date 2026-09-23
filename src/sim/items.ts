@@ -25,7 +25,7 @@ import {
   equipBag as equipBagCmd,
   stackSizeOf,
 } from './bags';
-import { isWornTrinket, useWornTrinket } from './combat/trinkets';
+import { isWornTrinket, onTrinketEquipped, useWornTrinket } from './combat/trinkets';
 import { buildConsuming } from './consuming';
 import { isRawCookingCatch } from './content/items';
 import { ITEMS, NPCS } from './data';
@@ -690,6 +690,7 @@ export function equipItem(
     returnEquippedItemToBags(meta, displacedId, displacedInstance);
   }
   meta.equipment[slot] = itemId;
+  if (slot === 'trinket') onTrinketEquipped(p, itemId, old);
   const equippedPayload = equipmentPayloadFor(consumed);
   if (equippedPayload) {
     meta.equipmentInstance ??= {};

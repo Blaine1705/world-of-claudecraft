@@ -17206,6 +17206,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.gambleResult': '{item}: {fortune}！',
   'hudChrome.trinkets.snakeEyes': 'スネークアイズ',
   'hudChrome.trinkets.equippedLine': '装備中',
+  'hudChrome.trinkets.equipLockout':
+    '装備すると使用効果に{seconds}秒のクールダウンが発生する。置き換えた装飾品の残りクールダウンの方が長い場合はそちらになる。',
   'hudChrome.trinkets.equip.lastStand':
     '体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージ（最大体力の{absorbPct}%）を吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。',
   'hudChrome.trinkets.equip.hourglass':
@@ -17258,4 +17260,63 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。',
   'hudChrome.trinkets.use.heartNova':
     '熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。',
+  'hudChrome.auraEffect.trinket.lastStandCooldown':
+    '砦の印章の「最後の砦」シールドは使用済み。この効果が切れるまで、体力が{threshold}%を下回っても再び発動しない。',
+  'hudChrome.auraEffect.trinket.lastBastion':
+    '{value}のダメージを吸収する。体力が{threshold}%未満でダメージを受けたときに砦の印章が張ったシールド。',
+  'hudChrome.auraEffect.trinket.retaliate':
+    'あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。',
+  'hudChrome.auraEffect.trinket.moored':
+    '受けるダメージが{reduction}%減少するが、移動速度が{speed}%になる。スタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果、ノックバックを無視する。',
+  'hudChrome.auraEffect.trinket.hourglassStored':
+    '過剰回復から蓄えた回復量{stored}を保持している。癒し手の砂時計を使うと、{range}ヤード以内で体力の割合が最も低いパーティメンバー（自分を含む）へのシールドに変える。',
+  'hudChrome.auraEffect.trinket.hourglassShield':
+    '{value}のダメージを吸収する。癒し手の砂時計が蓄えた回復量から作られたシールド。',
+  'hudChrome.auraEffect.trinket.wellspring': '{every}秒ごとに体力を{tick}回復する。',
+  'hudChrome.auraEffect.trinket.twinStrikeCooldown':
+    '対の鉤爪が追加の攻撃を行ったばかり。この効果が切れるまで次の追加攻撃は行えない。',
+  'hudChrome.auraEffect.trinket.bleedEdge':
+    'オートアタックの命中が鉤爪の傷を付与する：スタックごとに{every}秒ごとに{tick}の物理ダメージを{duration}秒間与え、最大{max}回までスタックする。',
+  'hudChrome.auraEffect.trinket.bleedEdgeOther':
+    'オートアタックの命中が鉤爪の傷を付与する。最大{max}回までスタックする物理の出血効果。ダメージは攻撃力で増加する。',
+  'hudChrome.auraEffect.trinket.talonWound':
+    '{every}秒ごとに{damage}の物理ダメージを与える（{stacks}/{max}スタック）。新たなスタックごとにダメージが増え、持続時間が更新される。',
+  'hudChrome.auraEffect.trinket.tally':
+    '集計の印：{stacks}/{max}。狩人の集計を使うと印をすべて消費してターゲットを攻撃し、{damage}の物理ダメージを与える（印1つにつき{perMark}）。',
+  'hudChrome.auraEffect.trinket.tallyOther':
+    '集計の印：{stacks}/{max}。狩人の集計は印をすべて消費して物理攻撃を行い、印1つごとにダメージが増える。',
+  'hudChrome.auraEffect.trinket.storm':
+    'チャージ：{stacks}/{max}。嵐の壺を使うとチャージを雷として放ち、ターゲットと、互いに{jumpRange}ヤード以内にいる最大{extra}体の敵に命中して、それぞれに{damage}の自然ダメージを与える（チャージ1つにつき{perCharge}）。',
+  'hudChrome.auraEffect.trinket.stormOther':
+    'チャージ：{stacks}/{max}。嵐の壺はチャージを自然の雷として放ち、ターゲットと最大{extra}体の敵に命中する。チャージ1つごとにダメージが増える。',
+  'hudChrome.auraEffect.trinket.echo':
+    '次の{casts}回の直接回復または物理以外の直接ダメージが、その量の{pct}%で繰り返される。',
+  'hudChrome.auraEffect.trinket.keenEdge': '博徒のサイコロの運勢：与えるダメージが{pct}%増加する。',
+  'hudChrome.auraEffect.trinket.luckyStreak':
+    '博徒のサイコロの運勢：{every}秒ごとに体力を{tick}回復する。',
+  'hudChrome.auraEffect.trinket.gildedGuard': '博徒のサイコロの運勢：{value}のダメージを吸収する。',
+  'hudChrome.auraEffect.trinket.riftGuard': '受けるダメージが{pct}%減少する。',
+  'hudChrome.auraEffect.trinket.sprint':
+    '移動速度が{pct}%増加する。他の移動速度上昇効果とは重複しない。',
+  'hudChrome.auraEffect.trinket.brand': '受ける回復量が{pct}%減少する。',
+  'hudChrome.auraEffect.trinket.forgeHeat':
+    '熱：{stacks}/{max}。鍛冶父の焼き入れを使うと熱をすべて消費し、その武器の炎のダメージが{pct}%増加する。',
+  'hudChrome.auraEffect.trinket.tempered':
+    '近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与える（消費した熱で{pct}%増加）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。',
+  'hudChrome.auraEffect.trinket.temperedOther':
+    '近接および遠隔武器の命中が追加の火炎ダメージを与え、消費した熱で{pct}%増加する。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。',
+  'hudChrome.auraEffect.trinket.kindlingOrb':
+    '敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。変身、行動不能、盲目状態の敵には撃たない。',
+  'hudChrome.auraEffect.trinket.kindlingOrbOther':
+    '敵に呪文を唱えるたびに、オーブがその敵に火炎ダメージの弾を放つ。ダメージは呪文力で増加する。',
+  'hudChrome.auraEffect.trinket.moltenIgnite':
+    '{every}秒ごとに{damage}の火炎ダメージを与える。新たな武器のクリティカルヒットで更新される。',
+  'hudChrome.auraEffect.trinket.pierce':
+    'オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{pct}%を与える。',
+  'hudChrome.auraEffect.trinket.lantern':
+    'ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{pct}%回復する。',
+  'hudChrome.auraEffect.trinket.crucibleHeat':
+    '熱：{stacks}/{max}。るつぼの心臓を使うと熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に{damage}の火炎ダメージを与え、命中したすべてのクリーチャーを挑発する。',
+  'hudChrome.auraEffect.trinket.crucibleHeatOther':
+    '熱：{stacks}/{max}。るつぼの心臓は熱をすべて消費して{radius}ヤード以内に炎のノヴァを放ち、スタックごとに火炎ダメージが増え、命中したすべてのクリーチャーを挑発する。',
 };

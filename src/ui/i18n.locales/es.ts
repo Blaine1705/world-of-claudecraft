@@ -17637,6 +17637,8 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.trinkets.gambleResult': '{item}: ¡{fortune}!',
   'hudChrome.trinkets.snakeEyes': 'Ojos de serpiente',
   'hudChrome.trinkets.equippedLine': 'Equipado',
+  'hudChrome.trinkets.equipLockout':
+    'Al equiparlo, su uso entra en un tiempo de reutilización de {seconds} s, o el que le quede al abalorio que sustituye si es mayor.',
   'hudChrome.trinkets.equip.lastStand':
     'Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño ({absorbPct}% de tu salud máxima) durante {duration} s. Puede ocurrir una vez cada {icd} s.',
   'hudChrome.trinkets.equip.hourglass':
@@ -17689,4 +17691,65 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Coloca un farol a tus pies durante {duration} s. Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos de él también sana al otro miembro del grupo más herido bajo su luz por el {share}% de la sanación.',
   'hudChrome.trinkets.use.heartNova':
     'Gasta todas las acumulaciones de calor en una nova de fuego que inflige {perHeat} de daño de fuego por acumulación ({max} con {maxHeat} acumulaciones) a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza. El daño aumenta con el poder de ataque. Requiere una acumulación de calor.',
+  'hudChrome.auraEffect.trinket.lastStandCooldown':
+    'El escudo Último bastión del Sello del Bastión ya se usó. Bajar del {threshold}% de salud no puede volver a levantarlo hasta que esto expire.',
+  'hudChrome.auraEffect.trinket.lastBastion':
+    'Absorbe {value} de daño. El Sello del Bastión lo levantó cuando recibiste daño por debajo del {threshold}% de salud.',
+  'hudChrome.auraEffect.trinket.retaliate':
+    'Los enemigos que te golpean directamente reciben daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.',
+  'hudChrome.auraEffect.trinket.moored':
+    'Recibes un {reduction}% menos de daño pero te mueves al {speed}% de velocidad. Ignoras aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes, efectos incapacitantes y derribos.',
+  'hudChrome.auraEffect.trinket.hourglassStored':
+    'Guarda {stored} de sanación almacenada de tu sobresanación. Usa el Reloj de arena del sanador para convertirla en un escudo sobre el miembro del grupo a {range} m o menos con el menor porcentaje de salud, tú incluido.',
+  'hudChrome.auraEffect.trinket.hourglassShield':
+    'Absorbe {value} de daño. Hecho con la sanación que almacenó un Reloj de arena del sanador.',
+  'hudChrome.auraEffect.trinket.wellspring': 'Restaura {tick} de salud cada {every} s.',
+  'hudChrome.auraEffect.trinket.twinStrikeCooldown':
+    'Garras gemelas acaba de dar un golpe extra. No puede dar otro hasta que esto expire.',
+  'hudChrome.auraEffect.trinket.bleedEdge':
+    'Tus golpes de ataque automático aplican Herida de garra: {tick} de daño físico por acumulación cada {every} s durante {duration} s, acumulable hasta {max} veces.',
+  'hudChrome.auraEffect.trinket.bleedEdgeOther':
+    'Los golpes de ataque automático aplican Herida de garra, un sangrado físico acumulable hasta {max} veces. El daño aumenta con el poder de ataque.',
+  'hudChrome.auraEffect.trinket.talonWound':
+    'Inflige {damage} de daño físico cada {every} s ({stacks}/{max} acumulaciones). Cada nueva acumulación añade daño y reinicia la duración.',
+  'hudChrome.auraEffect.trinket.tally':
+    'Marcas de cuenta: {stacks}/{max}. Usa la Cuenta del cazador para gastarlas todas en un golpe a tu objetivo que inflige {damage} de daño físico ({perMark} por marca).',
+  'hudChrome.auraEffect.trinket.tallyOther':
+    'Marcas de cuenta: {stacks}/{max}. La Cuenta del cazador las gasta todas en un golpe físico que inflige más daño por cada marca.',
+  'hudChrome.auraEffect.trinket.storm':
+    'Cargas: {stacks}/{max}. Usa la Jarra de tormenta para liberarlas como un rayo que alcanza a tu objetivo y hasta {extra} enemigos más a {jumpRange} m o menos entre sí, infligiendo {damage} de daño de naturaleza a cada uno ({perCharge} por carga).',
+  'hudChrome.auraEffect.trinket.stormOther':
+    'Cargas: {stacks}/{max}. La Jarra de tormenta las libera como un rayo de naturaleza que alcanza al objetivo y hasta {extra} enemigos más, con más daño por cada carga.',
+  'hudChrome.auraEffect.trinket.echo':
+    'Tus siguientes {casts} sanaciones directas o golpes directos de daño no físico se repiten por el {pct}% de su cantidad.',
+  'hudChrome.auraEffect.trinket.keenEdge':
+    'Fortuna del Dado del apostador: infliges un {pct}% más de daño.',
+  'hudChrome.auraEffect.trinket.luckyStreak':
+    'Fortuna del Dado del apostador: restaura {tick} de salud cada {every} s.',
+  'hudChrome.auraEffect.trinket.gildedGuard':
+    'Fortuna del Dado del apostador: absorbe {value} de daño.',
+  'hudChrome.auraEffect.trinket.riftGuard': 'Recibes un {pct}% menos de daño.',
+  'hudChrome.auraEffect.trinket.sprint':
+    'Velocidad de movimiento aumentada un {pct}%. No se acumula con otros aumentos de velocidad.',
+  'hudChrome.auraEffect.trinket.brand': 'La sanación recibida se reduce un {pct}%.',
+  'hudChrome.auraEffect.trinket.forgeHeat':
+    'Calor: {stacks}/{max}. Usar el Temple del Padre de la Forja lo gasta todo, y su fuego de arma inflige un {pct}% más de daño.',
+  'hudChrome.auraEffect.trinket.tempered':
+    'Tus golpes de arma cuerpo a cuerpo y a distancia infligen {damage} de daño de fuego adicional (un {pct}% más por el calor gastado). Cada golpe de gracia añade {killExtend} s, hasta {maxDuration} s en total.',
+  'hudChrome.auraEffect.trinket.temperedOther':
+    'Los golpes de arma cuerpo a cuerpo y a distancia infligen daño de fuego adicional, un {pct}% más por el calor gastado. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.',
+  'hudChrome.auraEffect.trinket.kindlingOrb':
+    'Cada hechizo que lanzas a un enemigo hace que el orbe dispare un proyectil a ese enemigo que inflige {damage} de daño de fuego. No dispara a un enemigo polimorfado, incapacitado o cegado.',
+  'hudChrome.auraEffect.trinket.kindlingOrbOther':
+    'Cada hechizo lanzado a un enemigo hace que el orbe dispare un proyectil de daño de fuego a ese enemigo. El daño aumenta con el poder con hechizos.',
+  'hudChrome.auraEffect.trinket.moltenIgnite':
+    'Inflige {damage} de daño de fuego cada {every} s. Otro golpe crítico de arma lo reinicia.',
+  'hudChrome.auraEffect.trinket.pierce':
+    'Tus ataques automáticos, disparos y habilidades físicas (no sangrados) también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {pct}% del daño infligido.',
+  'hudChrome.auraEffect.trinket.lantern':
+    'Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos del farol también sana al otro miembro del grupo más herido bajo su luz por el {pct}% de la sanación.',
+  'hudChrome.auraEffect.trinket.crucibleHeat':
+    'Calor: {stacks}/{max}. Usa el Corazón del Crisol para gastarlo todo en una nova de fuego que inflige {damage} de daño de fuego a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza.',
+  'hudChrome.auraEffect.trinket.crucibleHeatOther':
+    'Calor: {stacks}/{max}. El Corazón del Crisol lo gasta todo en una nova de fuego a {radius} m o menos que inflige más daño de fuego por cada acumulación y provoca a cada criatura que alcanza.',
 };
