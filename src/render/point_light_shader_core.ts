@@ -31,13 +31,13 @@ function pinnedAnchor(
     (source.indexOf(anchor, index + anchor.length) >= 0 &&
       source.indexOf(anchor, index + anchor.length) < end)
   ) {
-    throw new Error(`Three r165 point-light chunk ${label} anchor changed`);
+    throw new Error(`pinned three point-light chunk ${label} anchor changed`);
   }
   return index;
 }
 
 /**
- * Three r165 runs its compiled point-light loop for zero-intensity pad slots.
+ * three runs its compiled point-light loop for zero-intensity slots.
  * The outer guard is uniform across a draw because pointLight.color is a light
  * uniform. The existing Standard-only attenuation guard stays Standard-only:
  * directLight.visible depends on fragment position near a light cutoff.
@@ -52,7 +52,7 @@ function guardPointLightBody(source: string, spotLights: number): string {
     spotLights,
   );
   if (pointInfo >= pointDirect || pointDirect >= spotLights) {
-    throw new Error('Three r165 point-light chunk anchor order changed');
+    throw new Error('pinned three point-light chunk anchor order changed');
   }
 
   const guardedPointInfo = `${SUPPORTED_MATERIAL_GUARD}
@@ -115,11 +115,11 @@ function loopPointLights(guarded: string): string {
   const shadowEnd = body.indexOf(POINT_SHADOW_END, shadowStart);
   const shadowBlock = shadowEnd < 0 ? '' : body.slice(shadowStart, shadowEnd);
   if (shadowEnd < 0 || shadowBlock.slice(POINT_SHADOW_ANCHOR.length).includes('#')) {
-    throw new Error('Three r165 point-light chunk point-shadow block changed');
+    throw new Error('pinned three point-light chunk point-shadow block changed');
   }
   const loopBody = body.slice(0, shadowStart) + body.slice(shadowEnd + POINT_SHADOW_END.length);
   if (loopBody.includes('UNROLLED_LOOP_INDEX') || loopBody.includes('#pragma')) {
-    throw new Error('Three r165 point-light chunk loop body still needs the unroller');
+    throw new Error('pinned three point-light chunk loop body still needs the unroller');
   }
   const loop = `${POINT_LOOP_HEAD}
 \t\t${SUPPORTED_MATERIAL_GUARD}

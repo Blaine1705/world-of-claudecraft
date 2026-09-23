@@ -144,6 +144,15 @@ describe('point-light carrier packing core', () => {
     expect(slots.map((slot) => slot.intensity)).toEqual([1, 2, 3]);
   });
 
+  it('keeps a slot for every pulse while the budget holds its share', () => {
+    const budgeted = [1, 2, 3, 4, 5, 6].map((k) => source(0xffaa66, k, [k, 0, 0]));
+    const pulses = [7, 8, 9, 10].map((k) => source(0x86c9ff, k, [0, k, 0]));
+    const scene = sceneWith(...budgeted, ...pulses);
+    const slots = carriers(budgeted.length + pulses.length);
+    expect(pack([budgeted, [], pulses], slots, scene)).toBe(slots.length);
+    expect(slots.slice(6).map((slot) => slot.intensity)).toEqual([7, 8, 9, 10]);
+  });
+
   it('darkens a carrier the frame its source goes out', () => {
     const light = source(0xffffff, 4, [0, 0, 0]);
     const scene = sceneWith(light);
@@ -232,7 +241,7 @@ describe('point-light carrier packing core', () => {
     expect(isLivePointLightSource(light, scene, 1 << 2)).toBe(true);
   });
 
-  it('allocates nothing per pack', () => {
+  it("reuses the carriers' own objects on every pack", () => {
     const lights = [1, 0, 2].map((k) => source(0xffffff, k, [k, 0, 0]));
     const scene = sceneWith(...lights);
     const slots = carriers(4);
@@ -552,20 +561,45 @@ describe('every point-light producer is a carrier source', () => {
     expect(start, 'the carriers attach moved; re-anchor this pin').toBeGreaterThan(-1);
     const call = renderer.slice(start, renderer.indexOf(']);', start));
     expect(call).toContain('GFX.maxPointLights + lightPulsePoolSize()');
-    expect(call).toContain('() => this.fireLights,');
-    expect(call).toContain('() => this.viewLights,');
-    expect(call).toContain('() => this.lightPulses?.lights ?? NO_POINT_LIGHTS,');
+    // Order is the overflow priority: the budget caps fire plus view lights at
+    // GFX.maxPointLights, which is what keeps a slot for every pulse.
+    const order = [
+      '() => this.fireLights,',
+      '() => this.viewLights,',
+      '() => this.lightPulses?.lights ?? NO_POINT_LIGHTS,',
+    ].map((entry) => call.indexOf(entry));
+    expect(order.every((at, k) => at > -1 && (k === 0 || at > order[k - 1]))).toBe(true);
+    expect(call.split('() =>')).toHaveLength(4);
     expect(renderer.split('attachPointLightCarriers(')).toHaveLength(2);
     expect(renderer).not.toContain('lightPads');
 
-    const hooks = tsFilesUnder(SRC_ROOT)
-      .filter(({ full }) =>
-        /\b\w*[sS]cene\.onBeforeRender\s*=/.test(
-          codeWithoutLineComments(readFileSync(full, 'utf8')),
-        ),
-      )
-      .map(({ file }) => file);
-    expect(hooks).toEqual(['render/point_light_carriers.ts']);
+    // Any other assignment of a scene's hook replaces the pack without a
+    // word: the carriers freeze on their last state. Every onBeforeRender
+    // write in src is listed with its receiver, and none is a scene but ours.
+    const hooks: string[] = [];
+    for (const { file, full } of tsFilesUnder(SRC_ROOT)) {
+      const code = codeWithoutLineComments(readFileSync(full, 'utf8'));
+      for (const match of code.matchAll(/([\w.\][]+)\.onBeforeRender\s*=(?!=)/g)) {
+        hooks.push(`${file}: ${match[1]}`);
+      }
+      if (/\[\s*['"]onBeforeRender['"]\s*\]\s*=|onBeforeRender\s*:/.test(code)) {
+        hooks.push(`${file}: indirect`);
+      }
+      if (/extends\s+(?:THREE\.)?Scene\b/.test(code)) hooks.push(`${file}: Scene subclass`);
+    }
+    expect([...new Set(hooks)].sort()).toEqual([
+      'render/ability_vfx/decals.ts: mesh',
+      'render/ability_vfx/decals.ts: slot.mesh',
+      'render/ability_vfx/flipbooks.ts: mesh',
+      'render/ability_vfx/ground_auras.ts: mesh',
+      'render/ability_vfx/ground_auras.ts: slot.mesh',
+      'render/ability_vfx/rings.ts: mesh',
+      'render/ability_vfx/rings.ts: slot.mesh',
+      'render/gather_nodes.ts: target',
+      'render/jail_scene.ts: swirl',
+      'render/point_light_carriers.ts: scene',
+      'render/scene_sampling.ts: this.sentinel',
+    ]);
 
     expect(sourceOf('render/light_pulses.ts')).toContain('markPointLightSource(light);');
     expect(sourceOf('render/placed_assets.ts')).toContain('this.lights.register(light);');
@@ -579,8 +613,8 @@ describe('every point-light producer is a carrier source', () => {
     const maskWrites: string[] = [];
     for (const { file, full } of tsFilesUnder(SRC_ROOT)) {
       const code = codeWithoutLineComments(readFileSync(full, 'utf8'));
-      if (/\.layers\.(?:set|enable|enableAll|toggle)\s*\(/.test(code)) layerCalls.push(file);
-      if (/\.layers\.mask\s*=[^=]/.test(code)) maskWrites.push(file);
+      if (/\.layers\.(?:set|enable|enableAll|toggle|copy)\s*\(/.test(code)) layerCalls.push(file);
+      if (/\.layers\.mask\s*[|&^]?=(?!=)/.test(code)) maskWrites.push(file);
     }
     expect(layerCalls).toEqual([]);
     expect(maskWrites.sort()).toEqual([

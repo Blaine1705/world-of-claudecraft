@@ -224,10 +224,10 @@ describe('shared point-light shader core', () => {
     ['point-loop-start', `${UNROLL_START}${POINT_LOOP_HEAD}`],
     ['point-shadow', '( UNROLLED_LOOP_INDEX < NUM_POINT_LIGHT_SHADOWS )'],
     ['point-section', '#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )'],
-  ])('throws when the pinned Three r165 %s anchor changes', (_name, anchor) => {
+  ])('throws when the pinned three %s anchor changes', (_name, anchor) => {
     expect(stock).toContain(anchor);
     const changed = stock.replace(anchor, '/* changed anchor */');
-    expect(() => patchPointLightFragmentChunk(changed)).toThrow(/Three r165 point-light chunk/);
+    expect(() => patchPointLightFragmentChunk(changed)).toThrow(/pinned three point-light chunk/);
   });
 
   it('throws when the point-shadow block grows a nested directive', () => {

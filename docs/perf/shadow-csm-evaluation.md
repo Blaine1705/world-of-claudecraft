@@ -356,7 +356,7 @@ Who wins depends on ordering, and both orders are bad:
   `getPointLightInfo(...)` and the point-light `RE_Direct(...)` still resolve
   to exactly one occurrence inside their search range, and the patch applies.
   But this arm is fragile by construction: `pinnedAnchor` throws
-  `Three r165 point-light chunk ... anchor changed` and takes the whole boot
+  `pinned three point-light chunk ... anchor changed` and takes the whole boot
   down if the fork ever drifts, and the fork is a hand-copied snapshot of a
   version-specific chunk that no test in this repo pins.
 
