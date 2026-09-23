@@ -106,16 +106,18 @@ export function maybeSpawnHoardGoblin(
 
 /** Warn a player climbing into a room whose goblin is still there to catch
  *  (rift/runs.ts enterRift, after the arrival line). Nothing for a goblin
- *  already killed or gone, or for a ghost on a corpse run. */
+ *  already killed or gone, for one whose escape bar is already running (its
+ *  cast bar says it all, and "your first hit starts it" would be wrong), or
+ *  for a ghost on a corpse run. `idleSec` is the time it has LEFT untouched. */
 export function announceHoardGoblin(ctx: SimContext, inst: RiftInstance, pid: number): void {
   const state = inst.hoardGoblin;
-  if (!state || state.settled) return;
+  if (!state || state.settled || state.escapeAt !== null) return;
   const mob = ctx.entities.get(state.id);
   if (!mob || mob.dead || ctx.entities.get(pid)?.dead) return;
   ctx.emit({
     type: 'hoardGoblinSighted',
     escapeSec: HOARD_GOBLIN_ESCAPE_SEC,
-    idleSec: HOARD_GOBLIN_IDLE_SEC,
+    idleSec: Math.max(0, state.spawnedAt + HOARD_GOBLIN_IDLE_SEC - ctx.time),
     pid,
   });
 }

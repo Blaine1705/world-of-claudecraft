@@ -56,6 +56,10 @@ describe('quest event router', () => {
     const line = hud.log.mock.calls[0]?.[0] as string;
     expect(line).toContain('20-second escape bar');
     expect(line).toContain('after 2 minutes');
+    // A late arrival hears the time left, rounded up to a whole minute.
+    const late = fakeHud();
+    applyQuestEventPresentation(late, { ...ev, idleSec: 30 } as SimEvent);
+    expect(late.log.mock.calls[0]?.[0]).toContain('after 1 minutes');
     expect(playUi).toHaveBeenLastCalledWith('quest_ready');
   });
 

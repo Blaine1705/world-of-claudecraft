@@ -202,15 +202,17 @@ export interface CoinBurst {
 /** Find goblins that died since the last look. `seen` remembers every goblin by
  *  id and whether it was already dead: only a LIVING goblin seen before and
  *  dead now bursts, so one already lying dead when you walk in stays quiet,
- *  and one that escapes (it simply vanishes) never bursts at all. */
+ *  and one that escapes (it simply vanishes) never bursts at all. `present`
+ *  is scratch space a caller may pass to keep the poll allocation-free. */
 export function goblinDeaths(
   entities: Iterable<WatchedEntity>,
   templateId: string,
   seen: Map<number, boolean>,
   out: CoinBurst[],
+  present: Set<number> = new Set(),
 ): CoinBurst[] {
   out.length = 0;
-  const present = new Set<number>();
+  present.clear();
   for (const e of entities) {
     if (e.templateId !== templateId) continue;
     present.add(e.id);

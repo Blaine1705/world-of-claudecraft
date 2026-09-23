@@ -204,7 +204,9 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
         bannerDurationMs: HOARD_GOBLIN_BANNER_MS,
         logText: t('questUi.logs.hoardGoblinExplain', {
           seconds: formatNumber(event.escapeSec, { maximumFractionDigits: 0 }),
-          minutes: formatNumber(event.idleSec / 60, { maximumFractionDigits: 1 }),
+          minutes: formatNumber(Math.max(1, Math.ceil(event.idleSec / 60)), {
+            maximumFractionDigits: 0,
+          }),
         }),
         sound: 'quest_ready',
       };

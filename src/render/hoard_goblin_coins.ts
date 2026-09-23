@@ -54,6 +54,7 @@ export class HoardGoblinCoinsFx {
   private readonly slots: BurstSlot[] = [];
   private readonly seen = new Map<number, boolean>();
   private readonly deaths: CoinBurst[] = [];
+  private readonly present = new Set<number>();
   private readonly matrix = new THREE.Matrix4();
   private readonly position = new THREE.Vector3();
   private readonly rotation = new THREE.Quaternion();
@@ -183,7 +184,13 @@ export class HoardGoblinCoinsFx {
     this.poll -= dt;
     if (this.poll > 0) return;
     this.poll = POLL;
-    goblinDeaths(world.entities.values(), HOARD_GOBLIN_TEMPLATE_ID, this.seen, this.deaths);
+    goblinDeaths(
+      world.entities.values(),
+      HOARD_GOBLIN_TEMPLATE_ID,
+      this.seen,
+      this.deaths,
+      this.present,
+    );
     for (const death of this.deaths) this.burst(death);
   }
 

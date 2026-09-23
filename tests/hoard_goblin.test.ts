@@ -231,11 +231,24 @@ describe('the Coinsack Scurrier', () => {
     const { sim } = hoard();
     const sighted = run(sim, DT).filter((ev) => ev.type === 'hoardGoblinSighted');
     expect(sighted).toHaveLength(1);
-    expect(sighted[0]).toMatchObject({
-      escapeSec: HOARD_GOBLIN_ESCAPE_SEC,
-      idleSec: HOARD_GOBLIN_IDLE_SEC,
-      pid: sim.player.id,
-    });
+    expect(sighted[0]).toMatchObject({ escapeSec: HOARD_GOBLIN_ESCAPE_SEC, pid: sim.player.id });
+    const idle = (sighted[0] as { idleSec: number }).idleSec;
+    expect(idle).toBeGreaterThan(HOARD_GOBLIN_IDLE_SEC - 1);
+    expect(idle).toBeLessThanOrEqual(HOARD_GOBLIN_IDLE_SEC);
+  });
+
+  it('tells a late arrival the time it has LEFT, and stays quiet once the bar runs', () => {
+    const { sim, inst } = hoard();
+    const out: SimEvent[] = [];
+    vi.spyOn(sim.ctx, 'emit').mockImplementation((ev) => void out.push(ev));
+    const state = inst.hoardGoblin as NonNullable<typeof inst.hoardGoblin>;
+    state.spawnedAt = sim.ctx.time - (HOARD_GOBLIN_IDLE_SEC - 30);
+    announceHoardGoblin(sim.ctx, inst, sim.player.id);
+    expect((out[0] as { idleSec: number }).idleSec).toBeCloseTo(30, 6);
+    out.length = 0;
+    state.escapeAt = sim.ctx.time + 5;
+    announceHoardGoblin(sim.ctx, inst, sim.player.id);
+    expect(out).toHaveLength(0);
   });
 
   it('says nothing about a goblin already killed, already gone, or to a ghost', () => {

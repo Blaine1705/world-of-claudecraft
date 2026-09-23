@@ -6751,8 +6751,8 @@ export type SimEvent = { pid?: number } & (
       copper?: number;
     }
   /** The room this player just climbed into holds a living Coinsack Scurrier
-   *  (src/sim/rift/hoard_goblin.ts). The numbers are its live clocks, so the
-   *  client's warning and explanation never drift from the rule. */
+   *  (src/sim/rift/hoard_goblin.ts): its escape bar length and the seconds it
+   *  has left before leaving untouched, so the explanation never drifts. */
   | { type: 'hoardGoblinSighted'; escapeSec: number; idleSec: number }
   | {
       type: 'varkhulCallout';
