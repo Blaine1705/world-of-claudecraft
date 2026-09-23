@@ -3092,6 +3092,8 @@ export const hudChromeStrings = {
   // {cooldown} is cooldownMinutes or cooldownSeconds.
   trinkets: {
     equipLine: 'Equip: {effect}',
+    // A power-scaled amount: its base, then what the viewer's power adds.
+    scaled: '{base} (+{bonus})',
     useLine: 'Use: {effect} ({cooldown} cooldown)',
     cooldownMinutes: '{minutes} min',
     cooldownSeconds: '{seconds} sec',
@@ -3149,7 +3151,7 @@ export const hudChromeStrings = {
       kindlingOrb:
         'Summon an ember orb beside you for {duration} sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for {damage} Fire damage. Damage increases with Spell Power.',
       pierce:
-        'For {duration} sec, your direct Physical damage hits also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.',
+        'For {duration} sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.',
       lantern:
         'Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.',
       heartNova:

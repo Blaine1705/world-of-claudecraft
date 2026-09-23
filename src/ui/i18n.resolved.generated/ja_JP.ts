@@ -2376,6 +2376,7 @@ export const ja_JP: EnTranslations = {
     },
     "trinkets": {
       "equipLine": "装備時: {effect}",
+      "scaled": "{base} (+{bonus})",
       "useLine": "使用: {effect}（クールダウン{cooldown}）",
       "cooldownMinutes": "{minutes}分",
       "cooldownSeconds": "{seconds}秒",
@@ -2408,7 +2409,7 @@ export const ja_JP: EnTranslations = {
         "brand": "{range}ヤード以内の敵プレイヤー1人に烙印を押し、受ける回復量を{duration}秒間{cut}%減少させる。",
         "temper": "熱をすべて消費し、{duration}秒間武器に焼き入れをする。近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与え、消費した熱1スタックにつき{perHeat}%増加する（{maxHeat}スタックで最大{maxBonus}%）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
         "kindlingOrb": "{duration}秒間、残り火のオーブを自分のそばに呼び出す。敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。ダメージは呪文力で増加する。",
-        "pierce": "{duration}秒間、直接の物理ダメージの命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。",
+        "pierce": "{duration}秒間、オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。",
         "lantern": "{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。",
         "heartNova": "熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。"
       }

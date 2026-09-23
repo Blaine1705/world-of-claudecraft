@@ -146,7 +146,7 @@ function passiveLine(p: TrinketPassive, viewer: TrinketTooltipViewer): TrinketTo
     case 'ignite':
       key = 'hudChrome.trinkets.equip.ignite';
       values = {
-        tick: n(Math.max(1, Math.round(p.flat + p.coef * trinketWeaponPower(viewer)))),
+        tick: scaled(p.flat, p.coef * trinketWeaponPower(viewer)),
         every: n(MOLTEN_IGNITE_EVERY),
         duration: n(p.ticks * MOLTEN_IGNITE_EVERY),
       };
@@ -160,6 +160,16 @@ function passiveLine(p: TrinketPassive, viewer: TrinketTooltipViewer): TrinketTo
     kind: 'equip',
     text: t('hudChrome.trinkets.equipLine', { effect: t(key, values) }),
   };
+}
+
+/** A power-scaled amount as its base plus what the viewer's power adds, e.g.
+ *  "12 (+18)"; just the base while the viewer's power adds nothing. */
+function scaled(base: number, bonus: number, digits = 0): string {
+  const round = (v: number) => formatNumber(v, { maximumFractionDigits: digits });
+  const shownBonus =
+    digits > 0 ? Math.round(bonus * 10 ** digits) / 10 ** digits : Math.round(bonus);
+  if (shownBonus <= 0) return round(base);
+  return t('hudChrome.trinkets.scaled', { base: round(base), bonus: round(shownBonus) });
 }
 
 /** The stack cap of the worn passive a use spends (tally marks, storm charges,
@@ -193,14 +203,14 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
     case 'wellspring':
       return t('hudChrome.trinkets.use.wellspring', {
         radius: n(u.radius),
-        tick: n(Math.round(u.tick + u.coef * viewer.healPower)),
+        tick: scaled(u.tick, u.coef * viewer.healPower),
         every: n(u.every),
         duration: n(u.duration),
       });
     case 'bleedEdge':
       return t('hudChrome.trinkets.use.bleedEdge', {
         duration: n(u.duration),
-        tick: n(Math.round(u.tick + u.coef * viewer.attackPower)),
+        tick: scaled(u.tick, u.coef * viewer.attackPower),
         every: n(TALON_WOUND.every),
         bleedDuration: n(TALON_WOUND.duration),
         stacks: n(u.stacks),
@@ -210,7 +220,7 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
       const maxMarks = passiveMax(spec);
       return t('hudChrome.trinkets.use.tallyStrike', {
         range: n(u.range),
-        perMark: formatNumber(perMark, { maximumFractionDigits: 1 }),
+        perMark: scaled(u.perMark, u.coef * viewer.attackPower, 1),
         max: n(Math.round(maxMarks * perMark)),
         maxMarks: n(maxMarks),
       });
@@ -222,7 +232,7 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
         range: n(u.range),
         extra: n(Math.max(0, u.jumps - 1)),
         jumpRange: n(u.jumpRange),
-        perCharge: formatNumber(perCharge, { maximumFractionDigits: 1 }),
+        perCharge: scaled(u.perCharge, u.coef * viewer.spellPower, 1),
         max: n(Math.round(maxCharges * perCharge)),
         maxCharges: n(maxCharges),
       });
@@ -267,7 +277,7 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
       const maxHeat = passiveMax(spec);
       return t('hudChrome.trinkets.use.temper', {
         duration: n(u.duration),
-        damage: n(Math.max(1, Math.round(u.flat + u.coef * trinketWeaponPower(viewer)))),
+        damage: scaled(u.flat, u.coef * trinketWeaponPower(viewer)),
         perHeat: pct(u.perHeat),
         maxBonus: pct(u.perHeat * maxHeat),
         maxHeat: n(maxHeat),
@@ -278,7 +288,7 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
     case 'kindlingOrb':
       return t('hudChrome.trinkets.use.kindlingOrb', {
         duration: n(u.duration),
-        damage: n(Math.max(1, Math.round(u.flat + u.coef * viewer.spellPower))),
+        damage: scaled(u.flat, u.coef * viewer.spellPower),
       });
     case 'pierce':
       return t('hudChrome.trinkets.use.pierce', {
@@ -296,7 +306,7 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
       const perHeat = u.flat + u.coef * viewer.attackPower;
       const maxHeat = passiveMax(spec);
       return t('hudChrome.trinkets.use.heartNova', {
-        perHeat: formatNumber(perHeat, { maximumFractionDigits: 1 }),
+        perHeat: scaled(u.flat, u.coef * viewer.attackPower, 1),
         max: n(Math.round(maxHeat * perHeat)),
         maxHeat: n(maxHeat),
         radius: n(u.radius),

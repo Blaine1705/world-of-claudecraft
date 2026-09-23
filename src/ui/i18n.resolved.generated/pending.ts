@@ -70,6 +70,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
     "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.trinkets.scaled",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
     "hudChrome.unstuck.revivedAtGraveyardFree"
@@ -135,6 +136,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveAll",
     "hudChrome.trade.offerRemoveInput",
     "hudChrome.trade.offerRemoveTitle",
+    "hudChrome.trinkets.scaled",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
     "hudChrome.unstuck.revivedAtGraveyardFree"
@@ -232,6 +234,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -349,6 +352,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -467,6 +471,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -584,6 +589,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -611,22 +617,26 @@ export const pending: Record<string, readonly string[]> = {
   "zh_CN": [
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trinkets.scaled"
   ],
   "zh_TW": [
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trinkets.scaled"
   ],
   "ko_KR": [
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trinkets.scaled"
   ],
   "ja_JP": [
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trinkets.scaled"
   ],
   "pt_BR": [
     "abilityUi.forms.bearOrCat",
@@ -721,6 +731,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -748,7 +759,8 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.trinkets.scaled"
   ],
   "cs_CZ": [
     "abilityUi.forms.bearOrCat",
@@ -843,6 +855,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -960,6 +973,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -1077,6 +1091,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -1194,6 +1209,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -1311,6 +1327,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -1428,6 +1445,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -1545,6 +1563,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",
@@ -1662,6 +1681,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trinkets.equipLine",
     "hudChrome.trinkets.equippedLine",
     "hudChrome.trinkets.gambleResult",
+    "hudChrome.trinkets.scaled",
     "hudChrome.trinkets.snakeEyes",
     "hudChrome.trinkets.use.anchor",
     "hudChrome.trinkets.use.bleedEdge",

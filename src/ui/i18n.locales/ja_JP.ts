@@ -17253,7 +17253,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.kindlingOrb':
     '{duration}秒間、残り火のオーブを自分のそばに呼び出す。敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。ダメージは呪文力で増加する。',
   'hudChrome.trinkets.use.pierce':
-    '{duration}秒間、直接の物理ダメージの命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。',
+    '{duration}秒間、オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。',
   'hudChrome.trinkets.use.lantern':
     '{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。',
   'hudChrome.trinkets.use.heartNova':

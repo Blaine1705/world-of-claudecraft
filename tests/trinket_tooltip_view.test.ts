@@ -55,22 +55,22 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
     use: 'Use: Turn all stored healing into a shield on the party member within 40 yd with the lowest health percentage, you included. The shield lasts 12 sec. Requires stored healing. (90 sec cooldown)',
   },
   wellspring_seed: {
-    use: 'Use: Heal you and party members within 10 yd for 66 every 2 sec for 10 sec. Healing increases with Healing Power. (2 min cooldown)',
+    use: 'Use: Heal you and party members within 10 yd for 18 (+48) every 2 sec for 10 sec. Healing increases with Healing Power. (2 min cooldown)',
   },
   paired_talons: {
     equip:
       'Equip: Your auto-attack hits have a 6% chance to make an extra main-hand melee swing. Can occur once every 3 sec.',
-    use: 'Use: For 10 sec, your auto-attack hits apply Talon Wound, which deals 19 Physical damage per stack every 2 sec for 6 sec and stacks up to 5 times. Damage increases with Attack Power. (2 min cooldown)',
+    use: 'Use: For 10 sec, your auto-attack hits apply Talon Wound, which deals 4 (+15) Physical damage per stack every 2 sec for 6 sec and stacks up to 5 times. Damage increases with Attack Power. (2 min cooldown)',
   },
   hunters_tally: {
     equip:
       'Equip: Your auto-attack critical hits and your killing blows each add a tally mark, up to 10. Marks last 30 sec, refreshed whenever you gain one.',
-    use: 'Use: Spend all tally marks to strike your target within 30 yd for 50 Physical damage per mark (500 at 10 marks). Damage increases with Attack Power. Requires a tally mark. (1 min cooldown)',
+    use: 'Use: Spend all tally marks to strike your target within 30 yd for 10 (+40) Physical damage per mark (500 at 10 marks). Damage increases with Attack Power. Requires a tally mark. (1 min cooldown)',
   },
   stormjar: {
     equip:
       'Equip: Each spell you cast adds a charge, up to 10. Charges last 30 sec, refreshed whenever you gain one.',
-    use: 'Use: Release all charges as a bolt at your target within 30 yd that jumps to up to 3 more enemies within 12 yd. Each enemy takes 29 Nature damage per charge (290 at 10 charges). Damage increases with Spell Power. Requires a charge. (90 sec cooldown)',
+    use: 'Use: Release all charges as a bolt at your target within 30 yd that jumps to up to 3 more enemies within 12 yd. Each enemy takes 8 (+21) Nature damage per charge (290 at 10 charges). Damage increases with Spell Power. Requires a charge. (90 sec cooldown)',
   },
   echoing_lens: {
     use: 'Use: For 12 sec, your next 3 direct heals or direct non-Physical damage hits repeat for 30% of their amount. (2 min cooldown)',
@@ -93,15 +93,15 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
   forgefathers_temper: {
     equip:
       'Equip: Your melee and ranged weapon hits each add a heat stack, up to 5. Heat lasts 20 sec, refreshed whenever you gain a stack.',
-    use: 'Use: Spend all heat stacks to temper your weapon for 10 sec. Your melee and ranged weapon hits deal 46 extra Fire damage, increased by 15% for each heat stack spent (up to 75% at 5 stacks). Each killing blow adds 2 sec, up to 20 sec in total. Damage increases with Attack Power or Ranged Attack Power, whichever is higher. (90 sec cooldown)',
+    use: 'Use: Spend all heat stacks to temper your weapon for 10 sec. Your melee and ranged weapon hits deal 6 (+40) extra Fire damage, increased by 15% for each heat stack spent (up to 75% at 5 stacks). Each killing blow adds 2 sec, up to 20 sec in total. Damage increases with Attack Power or Ranged Attack Power, whichever is higher. (90 sec cooldown)',
   },
   kindling_orb: {
-    use: 'Use: Summon an ember orb beside you for 12 sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for 48 Fire damage. Damage increases with Spell Power. (2 min cooldown)',
+    use: 'Use: Summon an ember orb beside you for 12 sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for 12 (+36) Fire damage. Damage increases with Spell Power. (2 min cooldown)',
   },
   molten_fletching: {
     equip:
-      'Equip: Your melee and ranged weapon critical hits set the target alight, dealing 19 Fire damage every 2 sec for 6 sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
-    use: 'Use: For 10 sec, your direct Physical damage hits also strike the enemy nearest your target within 8 yd for 40% of the damage dealt. (90 sec cooldown)',
+      'Equip: Your melee and ranged weapon critical hits set the target alight, dealing 4 (+15) Fire damage every 2 sec for 6 sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
+    use: 'Use: For 10 sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within 8 yd for 40% of the damage dealt. (90 sec cooldown)',
   },
   last_flame_lantern: {
     use: 'Use: Set a lantern at your feet for 12 sec. A direct heal from anyone on you or a party member within 12 yd of it also heals the most wounded other party member in its light for 25% of the heal. (2 min cooldown)',
@@ -109,7 +109,7 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
   heart_of_the_crucible: {
     equip:
       'Equip: Each attack you parry, dodge or block adds a heat stack, up to 10. Heat lasts 30 sec, refreshed whenever you gain a stack.',
-    use: 'Use: Spend all heat stacks on a fire nova that deals 33 Fire damage per stack (330 at 10 stacks) to each enemy within 10 yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack. (1 min cooldown)',
+    use: 'Use: Spend all heat stacks on a fire nova that deals 8 (+25) Fire damage per stack (330 at 10 stacks) to each enemy within 10 yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack. (1 min cooldown)',
   },
 };
 
@@ -126,6 +126,17 @@ function wearing(itemId: string, seed = 11): Sim {
 const aura = (e: Entity, id: string) => e.auras.find((a) => a.id === id);
 
 afterEach(() => setLanguage('en'));
+
+/** The amount a scaled tooltip number stands for: "12 (+18)" reads 30. */
+function shownTotal(text: string, before: string, after: string): number {
+  const start = text.indexOf(before);
+  const end = start < 0 ? -1 : text.indexOf(after, start + before.length);
+  const m =
+    end < 0 ? null : /^([\d,]+)(?: \(\+([\d,]+)\))?$/.exec(text.slice(start + before.length, end));
+  if (!m) throw new Error(`no scaled number in: ${text}`);
+  const num = (v: string | undefined) => Number((v ?? '0').replace(/,/g, ''));
+  return num(m[1]) + num(m[2]);
+}
 
 describe('trinket tooltip lines', () => {
   it('covers exactly the eighteen trinkets', () => {
@@ -159,27 +170,29 @@ describe('trinket tooltip lines', () => {
     const use = (id: string, v: TrinketTooltipViewer) =>
       trinketTooltipLineTexts(id, v).at(-1)?.text;
     // Wellspring: 18 + 12% of Healing Power per tick.
-    expect(use('wellspring_seed', low)).toContain(' for 30 every 2 sec');
-    expect(use('wellspring_seed', high)).toContain(' for 114 every 2 sec');
+    expect(use('wellspring_seed', low)).toContain(' for 18 (+12) every 2 sec');
+    expect(use('wellspring_seed', high)).toContain(' for 18 (+96) every 2 sec');
     // Talon Wound: 4 + 3% of Attack Power per stack per tick.
-    expect(use('paired_talons', low)).toContain('deals 7 Physical damage per stack');
-    expect(use('paired_talons', high)).toContain('deals 31 Physical damage per stack');
+    expect(use('paired_talons', low)).toContain('deals 4 (+3) Physical damage per stack');
+    expect(use('paired_talons', high)).toContain('deals 4 (+27) Physical damage per stack');
     // Hunter's Tally: 10 + 8% of Attack Power per mark, rounded once over the marks.
     expect(use('hunters_tally', low)).toContain(
-      'for 18 Physical damage per mark (180 at 10 marks)',
+      'for 10 (+8) Physical damage per mark (180 at 10 marks)',
     );
     expect(use('hunters_tally', high)).toContain(
-      'for 82 Physical damage per mark (820 at 10 marks)',
+      'for 10 (+72) Physical damage per mark (820 at 10 marks)',
     );
     // Stormjar: 8 + 7% of Spell Power per charge.
-    expect(use('stormjar', low)).toContain('takes 15 Nature damage per charge (150 at 10 charges)');
+    expect(use('stormjar', low)).toContain(
+      'takes 8 (+7) Nature damage per charge (150 at 10 charges)',
+    );
     expect(use('stormjar', high)).toContain(
-      'takes 57 Nature damage per charge (570 at 10 charges)',
+      'takes 8 (+49) Nature damage per charge (570 at 10 charges)',
     );
     // A fractional per-mark amount keeps one decimal; the total rounds like combat.
     const odd = { ...VIEWER, attackPower: 123 };
     expect(use('hunters_tally', odd)).toContain(
-      'for 19.8 Physical damage per mark (198 at 10 marks)',
+      'for 10 (+9.8) Physical damage per mark (198 at 10 marks)',
     );
     // Max-health amounts follow the viewer's own maximum health.
     const bigger = { ...VIEWER, maxHp: 8000 };
@@ -196,29 +209,29 @@ describe('trinket tooltip lines', () => {
       trinketTooltipLineTexts(id, v).at(-1)?.text;
     const equip = (id: string, v: TrinketTooltipViewer) => trinketTooltipLineTexts(id, v)[0].text;
     // Forgefather's Temper: 6 + 8% of weapon power per hit before heat.
-    expect(use('forgefathers_temper', low)).toContain('hits deal 14 extra Fire damage');
-    expect(use('forgefathers_temper', high)).toContain('hits deal 78 extra Fire damage');
+    expect(use('forgefathers_temper', low)).toContain('hits deal 6 (+8) extra Fire damage');
+    expect(use('forgefathers_temper', high)).toContain('hits deal 6 (+72) extra Fire damage');
     // Molten Ignite: 4 + 3% of weapon power per tick.
-    expect(equip('molten_fletching', low)).toContain('dealing 7 Fire damage every 2 sec');
-    expect(equip('molten_fletching', high)).toContain('dealing 31 Fire damage every 2 sec');
+    expect(equip('molten_fletching', low)).toContain('dealing 4 (+3) Fire damage every 2 sec');
+    expect(equip('molten_fletching', high)).toContain('dealing 4 (+27) Fire damage every 2 sec');
     // Weapon power is the higher of melee and Ranged Attack Power (a hunter's shots).
     const hunter = { ...low, rangedPower: 900 };
-    expect(use('forgefathers_temper', hunter)).toContain('hits deal 78 extra Fire damage');
-    expect(equip('molten_fletching', hunter)).toContain('dealing 31 Fire damage');
+    expect(use('forgefathers_temper', hunter)).toContain('hits deal 6 (+72) extra Fire damage');
+    expect(equip('molten_fletching', hunter)).toContain('dealing 4 (+27) Fire damage');
     // Kindling Orb: 12 + 12% of Spell Power per bolt.
-    expect(use('kindling_orb', low)).toContain('for 24 Fire damage');
-    expect(use('kindling_orb', high)).toContain('for 96 Fire damage');
+    expect(use('kindling_orb', low)).toContain('for 12 (+12) Fire damage');
+    expect(use('kindling_orb', high)).toContain('for 12 (+84) Fire damage');
     // Heart of the Crucible: 8 + 5% of melee Attack Power per heat stack (ranged
     // power does not count), rounded once over the stacks.
     expect(use('heart_of_the_crucible', low)).toContain(
-      'deals 13 Fire damage per stack (130 at 10 stacks)',
+      'deals 8 (+5) Fire damage per stack (130 at 10 stacks)',
     );
     expect(use('heart_of_the_crucible', high)).toContain(
-      'deals 53 Fire damage per stack (530 at 10 stacks)',
+      'deals 8 (+45) Fire damage per stack (530 at 10 stacks)',
     );
-    expect(use('heart_of_the_crucible', hunter)).toContain('deals 13 Fire damage per stack');
+    expect(use('heart_of_the_crucible', hunter)).toContain('deals 8 (+5) Fire damage per stack');
     expect(use('heart_of_the_crucible', { ...VIEWER, attackPower: 110 })).toContain(
-      'deals 13.5 Fire damage per stack (135 at 10 stacks)',
+      'deals 8 (+5.5) Fire damage per stack (135 at 10 stacks)',
     );
   });
 });
@@ -232,7 +245,7 @@ describe('trinket tooltip numbers match combat', () => {
       sim.useItem('wellspring_seed');
       const hot = aura(sim.player, TRINKET_AURA.wellspring);
       expect(hot?.kind).toBe('hot');
-      expect(text).toContain(` for ${n(hot?.value ?? -1)} every 2 sec`);
+      expect(shownTotal(text, ' for ', ' every 2 sec')).toBe(hot?.value);
     }
   });
 
@@ -304,7 +317,7 @@ describe('raid trinket numbers match combat', () => {
       const ignite = aura(mob, TRINKET_AURA.ignite);
       expect(ignite?.kind).toBe('dot');
       expect(ignite?.tickInterval).toBe(2);
-      expect(text).toContain(`dealing ${n(ignite?.value ?? -1)} Fire damage every 2 sec`);
+      expect(shownTotal(text, 'dealing ', ' Fire damage every 2 sec')).toBe(ignite?.value);
       expect(text).toContain(`for ${n(ignite?.duration ?? -1)} sec`);
     }
   });

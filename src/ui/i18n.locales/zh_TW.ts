@@ -16402,7 +16402,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.kindlingOrb':
     '在你身旁召喚一顆餘燼寶珠，持續 {duration} 秒。你每對敵人施放一個法術，它便向該敵人射出一道火焰彈，造成 {damage} 點火焰傷害。傷害隨法術強度提高。',
   'hudChrome.trinkets.use.pierce':
-    '在 {duration} 秒內，你的直接物理傷害命中還會打擊距離你的目標最近的、{reach} 碼內的一個敵人，造成所造成傷害的 {share}%。',
+    '在 {duration} 秒內，你的自動攻擊、射擊和物理技能（流血除外）命中還會打擊距離你的目標最近的、{reach} 碼內的一個敵人，造成所造成傷害的 {share}%。',
   'hudChrome.trinkets.use.lantern':
     '在你腳下放置一盞提燈，持續 {duration} 秒。任何人對提燈 {radius} 碼內的你或隊伍成員施放的直接治療，還會以該治療量的 {share}% 治療燈光中受傷最重的另一名隊伍成員。',
   'hudChrome.trinkets.use.heartNova':

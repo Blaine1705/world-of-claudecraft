@@ -12433,6 +12433,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.trinkets.equipLine'
   | 'hudChrome.trinkets.equippedLine'
   | 'hudChrome.trinkets.gambleResult'
+  | 'hudChrome.trinkets.scaled'
   | 'hudChrome.trinkets.snakeEyes'
   | 'hudChrome.trinkets.use.anchor'
   | 'hudChrome.trinkets.use.bleedEdge'

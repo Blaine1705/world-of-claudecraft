@@ -17684,7 +17684,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.trinkets.use.kindlingOrb':
     'Invoca un orbe de brasas a tu lado durante {duration} s. Cada hechizo que lanzas a un enemigo le hace disparar un proyectil a ese enemigo que inflige {damage} de daño de fuego. El daño aumenta con el poder con hechizos.',
   'hudChrome.trinkets.use.pierce':
-    'Durante {duration} s, tus golpes directos de daño físico también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {share}% del daño infligido.',
+    'Durante {duration} s, tus ataques automáticos, disparos y habilidades físicas (no sangrados) también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {share}% del daño infligido.',
   'hudChrome.trinkets.use.lantern':
     'Coloca un farol a tus pies durante {duration} s. Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos de él también sana al otro miembro del grupo más herido bajo su luz por el {share}% de la sanación.',
   'hudChrome.trinkets.use.heartNova':

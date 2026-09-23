@@ -2376,6 +2376,7 @@ export const da_DK: EnTranslations = {
     },
     "trinkets": {
       "equipLine": "Equip: {effect}",
+      "scaled": "{base} (+{bonus})",
       "useLine": "Use: {effect} ({cooldown} cooldown)",
       "cooldownMinutes": "{minutes} min",
       "cooldownSeconds": "{seconds} sec",
@@ -2408,7 +2409,7 @@ export const da_DK: EnTranslations = {
         "brand": "Brand an enemy player within {range} yd, reducing the healing they receive by {cut}% for {duration} sec.",
         "temper": "Spend all heat stacks to temper your weapon for {duration} sec. Your melee and ranged weapon hits deal {damage} extra Fire damage, increased by {perHeat}% for each heat stack spent (up to {maxBonus}% at {maxHeat} stacks). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
         "kindlingOrb": "Summon an ember orb beside you for {duration} sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for {damage} Fire damage. Damage increases with Spell Power.",
-        "pierce": "For {duration} sec, your direct Physical damage hits also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.",
+        "pierce": "For {duration} sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.",
         "lantern": "Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.",
         "heartNova": "Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack."
       }

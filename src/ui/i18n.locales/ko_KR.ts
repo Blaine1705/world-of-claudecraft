@@ -17214,7 +17214,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.kindlingOrb':
     '{duration}초 동안 곁에 잉걸불 구슬을 소환합니다. 적에게 주문을 시전할 때마다 구슬이 그 적에게 화염구를 발사하여 {damage}의 화염 피해를 입힙니다. 피해량은 주문력으로 증가합니다.',
   'hudChrome.trinkets.use.pierce':
-    '{duration}초 동안 직접 물리 피해가 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.',
+    '{duration}초 동안 자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.',
   'hudChrome.trinkets.use.lantern':
     '{duration}초 동안 발밑에 등불을 놓습니다. 누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {share}%만큼 치유됩니다.',
   'hudChrome.trinkets.use.heartNova':

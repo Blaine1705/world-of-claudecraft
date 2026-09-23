@@ -2376,6 +2376,7 @@ export const zh_TW: EnTranslations = {
     },
     "trinkets": {
       "equipLine": "裝備：{effect}",
+      "scaled": "{base} (+{bonus})",
       "useLine": "使用：{effect}（{cooldown}冷卻）",
       "cooldownMinutes": "{minutes} 分鐘",
       "cooldownSeconds": "{seconds} 秒",
@@ -2408,7 +2409,7 @@ export const zh_TW: EnTranslations = {
         "brand": "為 {range} 碼內的一名敵對玩家打上烙印，使其受到的治療效果降低 {cut}%，持續 {duration} 秒。",
         "temper": "消耗所有熱量為你的武器淬火，持續 {duration} 秒。你的近戰和遠程武器命中額外造成 {damage} 點火焰傷害，每消耗一層熱量提高 {perHeat}%（{maxHeat} 層時最多提高 {maxBonus}%）。每次最後一擊延長 {killExtend} 秒，總計最多 {maxDuration} 秒。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
         "kindlingOrb": "在你身旁召喚一顆餘燼寶珠，持續 {duration} 秒。你每對敵人施放一個法術，它便向該敵人射出一道火焰彈，造成 {damage} 點火焰傷害。傷害隨法術強度提高。",
-        "pierce": "在 {duration} 秒內，你的直接物理傷害命中還會打擊距離你的目標最近的、{reach} 碼內的一個敵人，造成所造成傷害的 {share}%。",
+        "pierce": "在 {duration} 秒內，你的自動攻擊、射擊和物理技能（流血除外）命中還會打擊距離你的目標最近的、{reach} 碼內的一個敵人，造成所造成傷害的 {share}%。",
         "lantern": "在你腳下放置一盞提燈，持續 {duration} 秒。任何人對提燈 {radius} 碼內的你或隊伍成員施放的直接治療，還會以該治療量的 {share}% 治療燈光中受傷最重的另一名隊伍成員。",
         "heartNova": "消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人每層熱量造成 {perHeat} 點火焰傷害（{maxHeat} 層時為 {max} 點），並嘲諷其命中的每個生物。傷害隨攻擊強度提高。需要至少一層熱量。"
       }

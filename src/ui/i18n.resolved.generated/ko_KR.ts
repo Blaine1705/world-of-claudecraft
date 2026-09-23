@@ -2376,6 +2376,7 @@ export const ko_KR: EnTranslations = {
     },
     "trinkets": {
       "equipLine": "착용 효과: {effect}",
+      "scaled": "{base} (+{bonus})",
       "useLine": "사용 효과: {effect} (재사용 대기시간 {cooldown})",
       "cooldownMinutes": "{minutes}분",
       "cooldownSeconds": "{seconds}초",
@@ -2408,7 +2409,7 @@ export const ko_KR: EnTranslations = {
         "brand": "{range}미터 이내의 적 플레이어 한 명에게 낙인을 찍어 {duration}초 동안 받는 치유량을 {cut}% 감소시킵니다.",
         "temper": "열기를 모두 소모하여 {duration}초 동안 무기를 담금질합니다. 근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입히며, 소모한 열기 1중첩당 {perHeat}% 증가합니다({maxHeat}중첩일 때 최대 {maxBonus}%). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
         "kindlingOrb": "{duration}초 동안 곁에 잉걸불 구슬을 소환합니다. 적에게 주문을 시전할 때마다 구슬이 그 적에게 화염구를 발사하여 {damage}의 화염 피해를 입힙니다. 피해량은 주문력으로 증가합니다.",
-        "pierce": "{duration}초 동안 직접 물리 피해가 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.",
+        "pierce": "{duration}초 동안 자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.",
         "lantern": "{duration}초 동안 발밑에 등불을 놓습니다. 누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {share}%만큼 치유됩니다.",
         "heartNova": "열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다."
       }
