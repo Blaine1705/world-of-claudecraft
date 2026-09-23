@@ -22,6 +22,7 @@ import {
   setBonusFlag,
 } from '../content/ignivar_set_bonuses';
 import { ABILITIES, isDelvePos, MOBS } from '../data';
+import { dawnreaverDamageMultiplier } from '../dawnreaver_damage';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
@@ -489,6 +490,7 @@ export function runEffects(
   const isSpell = ability.school !== 'physical';
   const mods = ctx.playerMods(meta);
   const primaryHealMult = primaryHealingMultiplier(meta.cls, mods.spec);
+  const primaryDamageMult = dawnreaverDamageMultiplier(meta.cls, mods.spec, ability.id);
   // The resolved mastery/talent damage and heal multiplier for this ability
   // (talent_hit_mult.ts): the SAME number applyTalentMods already baked into
   // its authored base magnitudes, reused here to scale the SP/AP rider a
@@ -688,6 +690,7 @@ export function runEffects(
           cannotBeDodged: eff.cannotBeDodged,
           normalizedInstant: eff.normalized,
           weaponMult,
+          primaryDamageMult,
           threatFlat: res.threatFlat,
           threatMult: res.threatMult,
           forceCrit: sureCrit,
@@ -885,7 +888,7 @@ export function runEffects(
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
-        const finalDamage = Math.round(dmg);
+        const finalDamage = Math.round(dmg * primaryDamageMult);
         lastDirectDamage = finalDamage;
         const targetHpBefore = target.hp;
         const resolvedDamage = ctx.dealDamage(
@@ -2527,7 +2530,7 @@ export function runEffects(
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
           // Soft-cap scale (Revenge above 5 targets): applied after the roll and
           // armor so the total, not any single hit, is what the cap bounds.
-          dmg *= capScale;
+          dmg *= capScale * primaryDamageMult;
           const hpBefore = m.hp;
           ctx.dealDamage(
             p,

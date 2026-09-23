@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.tooltip.edictDamage':
+    'Наносит {weaponPercent}% урона оружия и ещё {damage} ед. физического урона. Урон оружия включает прибавку от силы атаки.',
+  'abilityUi.tooltip.verdictDamage':
+    'Взрыв от Последнего эдикта наносит {verdictSingleDamage} ед. урона от светлой магии. Взрыв от Падения рассвета наносит {verdictAreaDamage} ед. урона от светлой магии в радиусе {verdictAreaRadius} м; при числе целей больше {verdictAreaCap} урон снижается. Оба взрыва не усиливаются силой заклинаний. Ваша метка может действовать только на одном враге.',
+  'abilityUi.tooltip.edictExplosion':
+    'Во время Божественного вознесения взрыв наносит {damage} ед. урона от светлой магии врагам в радиусе {radius} м. При числе целей больше {cap} урон снижается. Этот урон увеличивается с силой атаки.',
   'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
   'hudChrome.professionTrainers.nameplate': '<{title}>',
   'guide.professions.endgameBodyRaidCollections':

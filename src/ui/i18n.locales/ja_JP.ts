@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.tooltip.edictDamage':
+    '武器ダメージの{weaponPercent}%に加え、{damage}の物理ダメージを与えます。武器ダメージには攻撃力による加算が含まれます。',
+  'abilityUi.tooltip.verdictDamage':
+    '最後の勅令で起爆すると{verdictSingleDamage}の聖なるダメージを与えます。暁落としで起爆すると半径{verdictAreaRadius}m内に{verdictAreaDamage}の聖なるダメージを与え、対象が{verdictAreaCap}体を超えるとダメージが減少します。どちらの起爆ダメージも呪文威力では増加しません。印を付けられる敵は一度に1体だけです。',
+  'abilityUi.tooltip.edictExplosion':
+    '神聖なる昇天の効果中、爆発は半径{radius}m内の敵に{damage}の聖なるダメージを与えます。対象が{cap}体を超えるとダメージが減少します。このダメージは攻撃力に応じて増加します。',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':

@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.tooltip.edictDamage':
+    '造成{weaponPercent}%武器伤害，外加{damage}点物理伤害。武器伤害包含攻击强度加成。',
+  'abilityUi.tooltip.verdictDamage':
+    '终末敕令引爆时造成{verdictSingleDamage}点神圣伤害。黎明坠击引爆时对{verdictAreaRadius}米内的敌人造成{verdictAreaDamage}点神圣伤害，超过{verdictAreaCap}个目标时伤害降低。两种引爆伤害均不随法术强度提高。你的印记同时只能标记一个敌人。',
+  'abilityUi.tooltip.edictExplosion':
+    '神圣升华期间，爆炸对{radius}米内的敌人造成{damage}点神圣伤害，超过{cap}个目标时伤害降低。此伤害随攻击强度提高。',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':

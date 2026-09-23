@@ -10880,6 +10880,9 @@ export const pt_BR: EnTranslations = {
       "anyTarget": "Alvo inimigo ou amigo",
       "selfOnly": "Apenas em si mesmo",
       "damageRange": "{min} a {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Holy damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} mais {perCombo} por ponto de combo"
     },
     "resources": {

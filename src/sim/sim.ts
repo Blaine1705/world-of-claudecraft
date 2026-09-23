@@ -7489,6 +7489,7 @@ export class Sim {
     opts: {
       cannotBeDodged?: boolean;
       weaponMult?: number;
+      primaryDamageMult?: number;
       threatFlat?: number;
       threatMult?: number;
       forceCrit?: boolean;

@@ -10880,6 +10880,9 @@ export const en_XA: EnTranslations = {
       "anyTarget": "[Éñéɱý óŕ ƒŕíéñðļý ţáŕĝéţ]",
       "selfOnly": "[Šéļƒ óñļý]",
       "damageRange": "[{min} ţó {max}]",
+      "edictExplosion": "[Ŵĥíļé Ášçéñšíóñ íš áçţíʋé, ţĥé éẋþļóšíóñ ðéáļš {damage} Ĥóļý ðáɱáĝé ŵíţĥíñ {radius} ɱ, ŕéðúçéð ƀéýóñð {cap} ţáŕĝéţš. Ţĥíš ðáɱáĝé íñçŕéášéš ŵíţĥ Áţţáçķ Þóŵéŕ.]",
+      "edictDamage": "[Šţŕíķé ƒóŕ {weaponPercent}% ŵéáþóñ ðáɱáĝé þļúš {damage} Þĥýšíçáļ ðáɱáĝé. Ŵéáþóñ ðáɱáĝé íñçļúðéš Áţţáçķ Þóŵéŕ.]",
+      "verdictDamage": "[Ƒíñáļ Éðíçţ ðéţóñáţéš ƒóŕ {verdictSingleDamage} Ĥóļý ðáɱáĝé. Ðáŵñƒáļļ ðéţóñáţéš ƒóŕ {verdictAreaDamage} Ĥóļý ðáɱáĝé ŵíţĥíñ {verdictAreaRadius} ɱ, ŕéðúçéð ƀéýóñð {verdictAreaCap} ţáŕĝéţš. Ñéíţĥéŕ ðéţóñáţíóñ šçáļéš ŵíţĥ Šþéļļ Þóŵéŕ. Óñļý óñé éñéɱý çáñ ƀéáŕ ýóúŕ ɱáŕķ.]",
       "finisherDamage": "[{base} þļúš {perCombo} þéŕ çóɱƀó þóíñţ]"
     },
     "resources": {
