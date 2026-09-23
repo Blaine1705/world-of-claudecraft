@@ -185,15 +185,16 @@ function normalizeAbilityCharges(
     // One parallel timer per missing charge: a shrunk cap drops the newest
     // spends' timers (recharges[] is sorted soonest-first), which the clamped
     // pool no longer owes, and a full pool keeps none.
-    if (state.recharges) {
-      state.recharges = state.recharges.slice(0, spent);
-      if (spent > 0) state.recharge = state.recharges[0] ?? state.recharge;
-    }
+    if (state.recharges) state.recharges = state.recharges.slice(0, spent);
     if (spent <= 0) {
       state.recharge = 0;
       player.cooldowns.delete(abilityId);
     } else if (state.charges > 0) {
       player.cooldowns.delete(abilityId);
+    } else {
+      // A shrunk cap just emptied the pool: arm the empty-pool mirror now, as
+      // updateTimers would, so the cast gate refuses before the next tick.
+      player.cooldowns.set(abilityId, state.recharge);
     }
   }
   if (Object.keys(player.abilityCharges).length === 0) player.abilityCharges = undefined;

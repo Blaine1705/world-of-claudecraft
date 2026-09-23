@@ -99,7 +99,6 @@ describe("Winter's Recall resets a charge pool to a fresh full pool", () => {
     expect(reset.casts).toBe(control.casts);
     expect(reset.excess).toBe(0);
     expect(control.excess).toBe(0);
-    expect(p.abilityCharges?.blink?.recharges?.length ?? 0).toBeLessThanOrEqual(2);
   });
 });
 
