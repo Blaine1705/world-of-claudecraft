@@ -1565,7 +1565,11 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the equipped-instance wire
     // projection moved to server/equipped_instance_wire.ts, composed with the
     // release extractions above. Exact merged count, zero slack.
-    ceiling: 9979,
+    // LOWERED 9979 -> 9965 by the craft_roll_events change: the ftue_events
+    // quest/death record arms of the event drain moved to
+    // server/event_record_observers.ts (which also hosts the new craftRoll
+    // arm), so the audit landed as a net shrink. Exact count, zero slack.
+    ceiling: 9965,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
