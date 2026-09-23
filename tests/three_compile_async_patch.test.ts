@@ -264,9 +264,14 @@ describe('three degenerate normal guard patch', () => {
   // (the sample direction through geometryNormal, and material.roughness
   // through geometryRoughness = dFdx/dFdy of nonPerturbedNormal) and the bloom
   // blur smears it frame wide, so OutputGradePass tonemapped the whole frame to
-  // black on Linux + NVIDIA + Chrome (ANGLE-GL). The guard resets the normal to
-  // a valid unit vector when its squared length is zero; it is a no-op for
-  // finite normals.
+  // black on Linux + NVIDIA + Chrome (ANGLE-GL). The guard tests the squared
+  // length of the FINITE input before normalize and takes a valid unit vector
+  // when it is zero, so no NaN is ever produced or compared (GLSL ES leaves NaN
+  // comparisons implementation-defined). The test is > 0.0, not a threshold:
+  // the flat arm's cross product scales with the pixel footprint squared, so a
+  // close-up flat normal has a legitimately tiny squared length. A squared
+  // length in the normal float range normalizes to a finite vector
+  // (inversesqrt of the smallest normal float is about 9e18).
   it('keeps the guard applied on both normal_fragment_begin arms', () => {
     const source = readFileSync(
       new URL('../node_modules/three/build/three.module.js', import.meta.url),
@@ -274,13 +279,13 @@ describe('three degenerate normal guard patch', () => {
     );
     // The smooth arm, pinned TOGETHER with the #ifdef DOUBLE_SIDED that follows
     // it: the guard has to sit BEFORE the faceDirection flip, so the fallback
-    // normal is flipped too. Guarding after the flip would still catch the NaN
-    // (dot(NaN,NaN) > 0.0 is false) but would hand a back face a front-facing
-    // fallback, so the order is the assertion, not just the presence.
+    // normal is flipped too. Guarding after the flip would hand a back face a
+    // front-facing fallback, so the order is the assertion, not just the
+    // presence.
     expect(
       source.includes(
-        'vec3 normal = normalize( vNormal ); normal = dot( normal, normal ) > 0.0 ' +
-          '? normal : vec3( 0.0, 0.0, 1.0 );\\n\\t#ifdef DOUBLE_SIDED\\n\\t\\tnormal *= faceDirection;',
+        'vec3 normal = dot( vNormal, vNormal ) > 0.0 ? normalize( vNormal ) ' +
+          ': vec3( 0.0, 0.0, 1.0 );\\n\\t#ifdef DOUBLE_SIDED\\n\\t\\tnormal *= faceDirection;',
       ),
       'the degenerate-normal guard is missing on the smooth arm, or no longer precedes the DOUBLE_SIDED flip; re-run pnpm install',
     ).toBe(true);
@@ -288,11 +293,21 @@ describe('three degenerate normal guard patch', () => {
     // vViewPosition degenerates the same way on a zero-area fragment quad.
     expect(
       source.includes(
-        'vec3 normal = normalize( cross( fdx, fdy ) ); normal = dot( normal, normal ) > 0.0 ' +
-          '? normal : vec3( 0.0, 0.0, 1.0 );\\n#else',
+        'vec3 wocFlatN = cross( fdx, fdy );\\n\\tvec3 normal = dot( wocFlatN, wocFlatN ) > 0.0 ' +
+          '? normalize( wocFlatN ) : vec3( 0.0, 0.0, 1.0 );\\n#else',
       ),
       'the degenerate-normal guard is missing on the FLAT_SHADED arm; re-run pnpm install',
     ).toBe(true);
+    // The earlier form compared the normalized (possibly NaN) result instead.
+    // Positive control: the needle matches that earlier form's literal text.
+    const earlierForm =
+      'vec3 normal = normalize( vNormal ); normal = dot( normal, normal ) > 0.0 ? normal : vec3( 0.0, 0.0, 1.0 );';
+    const earlierNeedle = 'dot( normal, normal ) > 0.0';
+    expect(earlierForm.includes(earlierNeedle)).toBe(true);
+    expect(
+      source.includes(earlierNeedle),
+      'the degenerate-normal guard compares the normalized result again; test the finite input',
+    ).toBe(false);
   });
 
   it('leaves no unguarded normalize spelling behind on either arm', () => {

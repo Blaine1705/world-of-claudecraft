@@ -1384,7 +1384,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for dropping the three patch's opaque_fragment NaN scrub: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
-  '90ba5ffd812a49fc803794fee4ba1d6fdaf809c0ea47d54b402ffb0911b8ad57';
+  // Re-minted for the three patch's finite-input degenerate-normal guard: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
+  'bafe87254bc2e903e562f69f0040ca1ff1a0a1aecf1f8effdbfb6affebe8ada9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1397,7 +1398,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for dropping the three patch's opaque_fragment NaN scrub: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
-  '82e70d2c46bd1620978ce0be08f151a1ec9748038f30d4e67fe367064e1953bb';
+  // Re-minted for the three patch's finite-input degenerate-normal guard: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
+  'aab5c056e3b0019fdc3d3dd022bbc0ae05e134e64feed841c315e5f612595745';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2776,7 +2778,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // Opaque NaN scrub drop (three patch hash): recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('e2a4c6f732d90ae2fbd586f34c25a3488c698a1c64591a90e1488409b36665ba');
+      // Finite-input normal guard (three patch hash): recomputed LAST again over
+      // the re-swept evidence. No capture was retaken.
+    ).toBe('2ba9f746c64310b0ba63ae6f71ea4e3fa49ff5c205ecca9df765043c11f63c0d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
