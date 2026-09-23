@@ -269,7 +269,7 @@ const questStringsEn = {
         finished: 'Every coin purse is recovered!',
         retry: 'Three lives restored. Try the maze again.',
         startNormal: 'Enter the maze: Normal ({shadows} shadows)',
-        startHard: 'Enter the maze: Hard ({shadows} shadows, bonus purse)',
+        startHard: 'Enter the maze: Hard ({shadows} shadows)',
       },
       forge: {
         title: 'A Helping Hammer',
@@ -321,6 +321,9 @@ const questStringsEn = {
           'Increase your flight speed by {speed} yd/s, up to {maximum} yd/s. Available while flying. Recharges in {seconds} seconds.',
         objective: 'Soar through the wind rings and land in the marked zone',
         ready: 'Speak to Flightmaster Zephyr to launch.',
+        replay: 'Fly again',
+        practiceRewards:
+          'Practice flight: improve your time without earning more coins, experience or reputation.',
         countdown: 'Launch in {count}... Hold tight!',
         flying: 'Rings: {rings}/{total} | Time: {time}s | Speed: {speed} yd/s',
         climb: 'Climb',
@@ -392,9 +395,9 @@ const questStringsEn = {
       puzzleLevel: 'Daily level {level}',
       puzzleBonusLevel: 'Bonus level {level} of {total}',
       puzzleBonusCharged:
-        'The cache hums with a bonus charge: level {level} of {total} awaits. Touch the Ley Cache again for extra gold.',
-      puzzleBonusPaid: 'Bonus purse earned!',
-      puzzleBonusDone: 'Every bonus level cleared. The cache rests until the next offer.',
+        'Practice level {level} of {total} awaits. Touch the Ley Cache again. Further rounds give no rewards.',
+      puzzleBonusPaid: 'Practice level cleared!',
+      puzzleBonusDone: 'Every practice level cleared. Touch the Ley Cache to play again.',
       puzzleInstructions: 'Rotate the tiles to carry the beam from the source to the destination.',
       puzzleRotateTile: 'Rotate tile {tile}',
       puzzleConnectors: 'Connectors: {connectors}.',
@@ -413,6 +416,8 @@ const questStringsEn = {
       startEscort: 'Start Escort',
       escortTitle: 'Caravan',
       alreadyCompleted: 'You have already completed this World Quest for this cycle.',
+      replay: 'Play again',
+      practiceRewards: 'Practice: play again without earning more coins, experience or reputation.',
       inProgress: 'This World Quest is already underway.',
       match3Title: 'Confection Cascade',
       match3Instructions:

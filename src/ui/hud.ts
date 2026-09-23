@@ -732,6 +732,7 @@ import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
 import { mouseoverCastTargetPid } from './mouseover_cast_core';
 import { type FrameDimension, MovableFrame } from './movable_frame';
+import { presentNoticeboardEvent } from './noticeboard_event';
 import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE, nearbyServiceNpc } from './npc_service_range';
 import { type AccountToggleSeam, OptionsWindow } from './options_window';
@@ -12322,20 +12323,9 @@ export class Hud {
           this.openRiftForge();
           break;
         case 'noticeboard':
-          // The structured private event keeps this feedback localized and
-          // identical offline and online. A board carrying authored listings
-          // opens the signpost popup (guild names and notes are world data,
-          // spliced verbatim like player names); every other board opens the
-          // guild board window below.
-          if (ev.state === 'listings') {
-            this.noticeboardPopup.show(ev.listings);
-          } else {
-            // A board with no authored listings IS the guild board: the
-            // signpost opens the realm's ranked pledge surface
-            // (src/ui/hud/guild_board/) on the view its board id selects.
-            // Offline the window renders its localized nothing-posted state.
-            this.openGuildBoard(ev.boardId);
-          }
+          presentNoticeboardEvent(ev, this.noticeboardPopup, this.leaderboardWindow, (id) =>
+            this.openGuildBoard(id),
+          );
           break;
         case 'realmBuilder':
           presentRealmBuilder(this.realmBuilderPopup, this.renderer, ev.current, ev.past);

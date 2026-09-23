@@ -3,10 +3,7 @@
 // slow, through the real flight tick. Pure and deterministic (no Rng, no wall
 // clock): the same course and seed always fly the same line.
 //
-// Two callers: the certification tests (every authored course and every daily
-// variant must be winnable this way), and the daily variant generator
-// (world_quest_glider_generation.ts), which flies each candidate line before
-// offering it and drops the nudges around any ring the autopilot cannot reach.
+// Certification tests use this to verify every authored ranked course.
 
 import { GLIDER_LAUNCH_SITE } from './content/world_quest_glider';
 import { createPlayer } from './entity';

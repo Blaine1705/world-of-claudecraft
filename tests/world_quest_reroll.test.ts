@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { QuestWorldWireState } from '../src/net/quest_world_wire_state';
 import { Sim } from '../src/sim/sim';
 import {
   canRerollWorldQuest,
@@ -49,6 +50,17 @@ describe('World Quest Reroll Mechanism', () => {
     const checkCompleted = canRerollWorldQuest(meta, eastbrookQuest.id, cycle, 20);
     expect(checkCompleted.canReroll).toBe(false);
     expect(checkCompleted.reason).toBe('Completed world quests cannot be rerolled.');
+    meta.worldQuestLog.set(eastbrookQuest.id, {
+      questId: eastbrookQuest.id,
+      count: 0,
+      state: 'active',
+      practiceOnly: true,
+    });
+    expect(canRerollWorldQuest(meta, eastbrookQuest.id, cycle, 20)).toEqual(checkCompleted);
+    const client = new QuestWorldWireState();
+    client.applyQuestSelfSnapshot({ wqday: cycle, wqlog: [...meta.worldQuestLog.values()] });
+    expect(client.worldQuestLog.get(eastbrookQuest.id)?.practiceOnly).toBe(true);
+    expect(client.canRerollWorldQuest(eastbrookQuest.id).canReroll).toBe(false);
 
     // A zone with no alternative left reports the honest unavailable state.
     // Thornpeak's pool is four deep since the round-2 zone hunts, so the other

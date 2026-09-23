@@ -57,6 +57,11 @@ it('uses slot 1 for flight boost only, shows cooldown and restores the bar after
   });
   bar.update();
   const buttons = [...document.querySelectorAll<HTMLButtonElement>('.vehicle-action')];
+  for (const button of buttons) {
+    expect(button.classList.contains('ui-socket')).toBe(true);
+    expect(button.querySelector('.icon-label.ui-socket-art')).not.toBeNull();
+    expect(button.querySelector('.cd-overlay.ui-socket-cd')).not.toBeNull();
+  }
   expect(buttons[0].getAttribute('aria-disabled')).toBe('true');
   // Flight keeps Climb (slot 2) and Dive (slot 3) on the bar, disabled until airborne.
   expect(buttons[1].style.display).toBe('');
@@ -174,6 +179,11 @@ it('elides unchanged frames, routes all three buttons, and restores normal contr
   controller.update();
   const buttons = [...document.querySelectorAll<HTMLButtonElement>('.vehicle-action')];
   expect(buttons).toHaveLength(3);
+  for (const button of buttons) {
+    expect(button.classList.contains('ui-socket')).toBe(true);
+    expect(button.querySelector('.icon-label.ui-socket-art')).not.toBeNull();
+    expect(button.querySelector('.cd-overlay.ui-socket-cd')).not.toBeNull();
+  }
   const meter = document.querySelector<HTMLElement>('.vehicle-integrity')!;
   expect(meter.tabIndex).toBe(0);
   meter.focus();

@@ -4883,6 +4883,10 @@ export interface WeeklyQuestProgress {
 }
 
 export interface WorldQuestProgress {
+  /** Reward-free replay cursor. Session only; saved as the earned completion. */
+  practiceOnly?: boolean;
+  /** Completed lesson scores retained while a session-only replay is in progress. */
+  practiceTraceScores?: WorldQuestTraceRoundScore[];
   /** Personal borrowed cloak and channel, omitted from saves. */
   shadow?: WorldQuestShadowState;
   /** Personal investigation clues and live summon reference, omitted from saves. */
@@ -6716,7 +6720,13 @@ export type SimEvent = { pid?: number } & (
   | ({ type: 'cannonResult' } & CannonResult)
   /** One finished scoreboard attempt (src/sim/world_quest_scoreboards.ts); the
    *  server keeps the character's best row per board. */
-  | { type: 'worldQuestScore'; board: string; medal: WorldQuestMedal | null; metric: number }
+  | {
+      type: 'worldQuestScore';
+      board: string;
+      medal: WorldQuestMedal | null;
+      metric: number;
+      resetDay?: string;
+    }
   | {
       type: 'worldQuestProgress';
       questId: string;

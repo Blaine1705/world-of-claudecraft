@@ -701,6 +701,7 @@ export type { MarketSave } from './market';
 
 import { updateBreath } from './breath';
 import { updateSwimFatigue } from './fatigue';
+import { personalGliderLeaderboard as gliderRecordsPage } from './glider_personal_records';
 import { spawnStaticWorldObjects } from './ground_object_spawns';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import { buyCrucibleVendorItem as buyCrucibleVendorItemImpl } from './instances/crucible_vendor';
@@ -763,10 +764,9 @@ import {
 } from './rift/runs';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import * as weeklyQuestMod from './weekly_quests';
-import { startWorldQuestActivity as startWorldQuestActivityImpl } from './world_quest_activity';
+import * as questActivity from './world_quest_activity';
 import { worldQuestCreditBindings } from './world_quest_context';
 import { dropWorldQuestDeliveryCargoForPlayer } from './world_quest_delivery';
-import { emptyWorldQuestLeaderboardPage } from './world_quest_leaderboard_page';
 import * as worldQuestState from './world_quest_state';
 import { savedWorldQuestState } from './world_quest_state';
 import * as worldQuestMod from './world_quests';
@@ -9175,8 +9175,8 @@ export class Sim {
   accuseWorldQuestSuspect(npcId: number, pid?: number): void {
     worldQuestMod.accuseWorldQuestSuspect(this.ctx, npcId, pid);
   }
-  startWorldQuestActivity(questId: string, difficulty: 'normal' | 'hard', pid?: number): void {
-    startWorldQuestActivityImpl(this.ctx, questId, difficulty, pid);
+  startWorldQuestActivity(id: string, choice: questActivity.ActivityChoice, pid?: number): void {
+    questActivity.startWorldQuestActivity(this.ctx, id, choice, pid);
   }
   chooseWeeklyQuest(questId: string, pid?: number): void {
     weeklyQuestMod.chooseWeeklyQuest(this.ctx, questId, pid);
@@ -9193,7 +9193,7 @@ export class Sim {
     return this.ctx.weeklyRaidResetMs(this.ctx.lockoutNowMs());
   }
   worldQuestLeaderboard(board: string, page = 0, pageSize = LEADERBOARD_PAGE_SIZE) {
-    return Promise.resolve(emptyWorldQuestLeaderboardPage(board, page, pageSize));
+    return Promise.resolve(gliderRecordsPage(this.primary, board, this.resetDay, page, pageSize));
   }
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number, pid?: number): void {
     worldQuestMod.rotateWorldQuestPuzzleTile(this.ctx, questId, tileIndex, pid);

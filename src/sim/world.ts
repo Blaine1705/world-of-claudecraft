@@ -44,7 +44,7 @@ import {
 } from './ember_lava_layout';
 import { applyFarshoreShipwreckShore } from './farshore_shipwreck_shore';
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
-import { applyGaleLaunchKnoll } from './gale_launch_knoll';
+import { applyGliderApproachPath } from './glider_approach_path';
 import { applyKeepSitePad, keepSitePadWeight } from './keep_site';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
@@ -3917,9 +3917,8 @@ export function terrainHeightSansEdits(x: number, z: number, seed: number): numb
 // terrainHeightSansEdits can never drift.
 function applyTerrainPads(x: number, z: number, seed: number, h0: number): number {
   let h = calmForce === null ? applyFarshoreShipwreckShore(x, z, h0) : h0;
-  // The Shear's launch knoll (world quests round 2): a raise the calm probes
-  // see too, so the crest's own pads seat on the crest.
-  h = applyGaleLaunchKnoll(x, z, h);
+  // Ease only the walking trail on the existing western mountain.
+  h = applyGliderApproachPath(x, z, h);
   // The Last Keep's site pad on the Trollmoot rise, over the FINISHED
   // height (the world-edge sea shave runs late in the unpadded chain and
   // the rise sits near the west shore shelf; the build floor must win

@@ -330,14 +330,8 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
     group.add(mesh);
   }
 
-  // --- The Shear: Zephyr's launch wharf on the crest of the headland ---
-  // The stone flight tower that used to stand here (world quests round 1) is
-  // gone: the sim raises a real hill under the launch (sim/gale_launch_knoll.ts,
-  // part of terrainHeight, so the terrain mesh already shows it) and a plank
-  // pier runs out over its southern lip (sim/glider_wharf_layout.ts). Drawn
-  // from the SAME GLIDER_WHARF_DECKS rectangles groundHeight walks, through the
-  // shared walkway builder, so the plank plane underfoot is the plank plane on
-  // screen. Rails on every edge: it is a launch perch seventy yards up.
+  // Zephyr's pier on the existing western mountain. Shared rectangles keep
+  // the visible planks and walkable deck aligned.
   const updraftGroup = new THREE.Group();
   {
     const wood = mat(0x8a6a4a, 0.9);
@@ -363,12 +357,12 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
     group.add(pole);
     const pennantGeo = new THREE.ConeGeometry(0.4, 2.2, 3);
     pennantGeo.rotateZ(Math.PI / 2);
-    pennantGeo.rotateY(-0.235);
+    pennantGeo.rotateY(Math.PI / 2);
     const pennant = new THREE.Mesh(pennantGeo, bannerBlue);
     pennant.position.set(poleX + 0.9, poleY + 3.9, poleZ);
     group.add(pennant);
 
-    // The roadside updraft at the knoll's southern foot (GLIDER_WHARF.updraft):
+    // The return updraft beside the landing pad (GLIDER_WHARF.updraft):
     // a stone ring on the ground and a spiralling wind funnel the update() arm
     // turns. The sim's updateGliderLaunchUpdraft carries a player standing in
     // it back up to Zephyr.

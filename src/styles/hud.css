@@ -292,11 +292,8 @@
     left: 2px;
     z-index: 2;
     min-width: 20px;
+    height: auto;
     padding: 1px 4px;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    background: var(--panel-base);
-    color: var(--color-vehicle-text);
     font-size: 16px;
     font-weight: bold;
     line-height: 1.2;
@@ -347,17 +344,6 @@
     width: 64px;
     height: 64px;
     flex: 0 0 64px;
-    position: relative;
-    background-size: cover;
-    border: 2px ridge var(--border);
-    border-radius: 7px;
-  }
-  .vehicle-action .keybind {
-    position: absolute;
-    top: 2px;
-    left: 4px;
-    color: var(--color-vehicle-text);
-    text-shadow: 0 1px 3px var(--panel-base);
   }
   .vehicle-exit {
     align-self: center;

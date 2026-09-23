@@ -8,6 +8,8 @@ import {
 } from './content/world_quest_glider';
 import { displacePlayer } from './displacement';
 import { createNpc } from './entity';
+import { recordPersonalGliderTime } from './glider_personal_records';
+import { gliderScoreboardId } from './glider_scoreboards';
 import { GLIDER_WHARF } from './glider_wharf_layout';
 import {
   createGliderFlightState,
@@ -192,6 +194,7 @@ export function startGliderFlight(
 
   const courseId = gliderCourseById(progress.glider?.courseId).id;
   const practiceOnly = practice || progress.glider?.practiceOnly;
+  if (practiceOnly) progress.state = 'active';
   progress.glider = {
     ...createGliderFlightState(true),
     courseId,
@@ -229,8 +232,7 @@ export function advanceGliderMovement(ctx: SimContext, player: Entity, meta: Pla
   const beforeRings = state.passedRings.length;
   const beforeBoosts = state.windBoosts?.length ?? 0;
 
-  // The day's variant of the session's course (world_quest_glider_generation.ts):
-  // the same pure function the course visual draws from, keyed by the cycle.
+  // The fixed ranked route shared by authority and course visuals.
   tickGliderFlight(
     state,
     player,
@@ -303,6 +305,28 @@ export function updateGliderEncounter(
   if (player.inCombat || player.mountKey || meta.vehicle)
     abortGliderFlight(ctx, meta, player, progress);
   if (state.phase !== 'won' || !state.result) return false;
+  if (!state.scoreReported) {
+    state.scoreReported = true;
+    const course = gliderCourseById(state.courseId);
+    const board = gliderScoreboardId(course.id, 'lifetime');
+    if (board && state.passedRings.length === course.rings.length) {
+      recordPersonalGliderTime(
+        meta.gliderRecords,
+        course.id,
+        ctx.resetDay,
+        state.result.elapsedSeconds,
+        state.result.rating,
+      );
+      ctx.emit({
+        type: 'worldQuestScore',
+        pid: meta.entityId,
+        board,
+        medal: state.result.rating,
+        metric: state.result.elapsedSeconds,
+        resetDay: ctx.resetDay,
+      });
+    }
+  }
   if (!progress.gliderResult || state.result.score > progress.gliderResult.score) {
     progress.gliderResult = { ...state.result };
     meta.wireRev++;

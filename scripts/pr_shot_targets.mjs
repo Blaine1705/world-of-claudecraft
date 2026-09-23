@@ -1245,28 +1245,21 @@ export const TARGETS = [
       return { clip: '#ui' };
     },
   },
-  // World quests round 2: the Shear is a real headland with Zephyr's launch
-  // wharf on its crest (the stone flight tower is gone). One frame from the road
-  // at the knoll's south-western foot looking up at the wharf, one on the planks
-  // looking out along the launch line.
+  // Existing western mountain: the approach trail and the east-facing launch wharf.
   {
     key: 'shear-launch-wharf',
-    label: "The Shear's launch knoll and Zephyr's wharf",
-    when: ['sim/gale_launch_knoll', 'sim/glider_wharf_layout', 'render/gale_features'],
+    label: 'Mountain trail and glider launch wharf',
+    when: ['sim/glider_approach_path', 'sim/glider_wharf_layout', 'render/gale_features'],
     variants: [
-      // From the flats beyond Wickharbor's stables (the camera orbit tops out at
-      // 22 yd, so the 70 yd crest only fits the frame from a couple of hundred
-      // yards out); clear of the updraft ring at (431, 556), which whisks a
-      // player standing in it onto the wharf.
       {
         key: 'from-the-road',
         beforeLoad: lowGraphicsSeed,
-        spot: { x: 416, z: 720, facing: Math.atan2(449 - 416, 512 - 720), pitch: 0.12, dist: 16 },
+        spot: { x: 222, z: 605, facing: Math.atan2(183 - 222, 610 - 605), pitch: 0.25, dist: 18 },
       },
       {
         key: 'on-the-planks',
         beforeLoad: lowGraphicsSeed,
-        spot: { x: 450, z: 512, facing: -0.235, pitch: 0.3, dist: 12 },
+        spot: { x: 194, z: 557, facing: Math.PI / 2, pitch: 0.3, dist: 12 },
       },
     ],
     async capture(page, variant) {

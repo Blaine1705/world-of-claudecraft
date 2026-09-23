@@ -1,5 +1,5 @@
 import type { Sim } from '../src/sim/sim';
-import { isWorldQuestDifficulty } from '../src/sim/world_quest_activity';
+import { isActivityChoice } from '../src/sim/world_quest_activity';
 
 type QuestWireMessage = Record<string, unknown>;
 
@@ -62,7 +62,7 @@ export function shadowWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: numbe
 }
 
 export function startWorldQuestActivityWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
-  if (typeof msg.quest !== 'string' || !isWorldQuestDifficulty(msg.difficulty)) return;
+  if (typeof msg.quest !== 'string' || !isActivityChoice(msg.difficulty)) return;
   sim.startWorldQuestActivity(msg.quest, msg.difficulty, pid);
 }
 

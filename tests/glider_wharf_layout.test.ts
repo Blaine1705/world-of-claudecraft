@@ -1,14 +1,5 @@
-// Zephyr's launch wharf on the crest of the Shear (world quests round 2): the
-// knoll (sim/gale_launch_knoll.ts) is part of terrainHeight, the wharf planks
-// (sim/glider_wharf_layout.ts) ride the deck_surfaces arm like the harbor
-// piers, and the flight tower that used to lift the launch to Y = 74 is gone.
-// Every number the courses depend on is pinned: the plank plane is still 74,
-// Zephyr still stands at 74, the launch perch still starts at 74 with open air
-// below it, and the road climbs the knoll under the climb limit while the
-// launch face and the seaward face are cliffs.
 import { describe, expect, it } from 'vitest';
 import { buildGaleFeatures } from '../src/render/gale_features';
-import { GALECREST_ROADS } from '../src/sim/content/galecrest';
 import {
   GLIDER_LAUNCH_SITE,
   GLIDER_NPC_DEF,
@@ -17,18 +8,12 @@ import {
 } from '../src/sim/content/world_quest_glider';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { GALE_DECK_LIFT } from '../src/sim/gale_harbor';
-import {
-  applyGaleLaunchKnoll,
-  GALE_LAUNCH_KNOLL,
-  GLIDER_WHARF_DECK_Y,
-  galeLaunchKnollOuterRadius,
-} from '../src/sim/gale_launch_knoll';
+import { GLIDER_TRAIL_DECK_Y as GLIDER_WHARF_DECK_Y } from '../src/sim/glider_approach_path';
 import {
   GLIDER_WHARF,
   GLIDER_WHARF_DECKS,
   gliderWharfSurface,
 } from '../src/sim/glider_wharf_layout';
-import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { overworldWalkSurface } from '../src/sim/walk_lifts';
@@ -56,101 +41,12 @@ function setupSim() {
   return sim;
 }
 
-describe('the launch knoll', () => {
-  it('is a flat crest at the plank plane less the lift, blending out to untouched shelf', () => {
-    expect(GLIDER_WHARF_DECK_Y).toBe(74);
-    expect(GALE_LAUNCH_KNOLL.crestHeight).toBeCloseTo(74 - GALE_DECK_LIFT, 9);
-    const { x, z, plateauRadius } = GALE_LAUNCH_KNOLL;
-    // Inside the plateau every sample is the crest, whatever the shelf was.
-    for (const [dx, dz] of [
-      [0, 0],
-      [plateauRadius - 0.5, 0],
-      [0, -(plateauRadius - 0.5)],
-      [-5, 6],
-    ]) {
-      expect(applyGaleLaunchKnoll(x + dx, z + dz, 3)).toBeCloseTo(GALE_LAUNCH_KNOLL.crestHeight, 9);
-      expect(terrain(x + dx, z + dz)).toBeCloseTo(GALE_LAUNCH_KNOLL.crestHeight, 6);
-    }
-    // Past the outer radius in every direction the shelf is untouched.
-    for (const [ex, ez] of [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
-      [Math.SQRT1_2, Math.SQRT1_2],
-    ]) {
-      const outer = galeLaunchKnollOuterRadius(ex, ez) + 0.5;
-      expect(applyGaleLaunchKnoll(x + ex * outer, z + ez * outer, 3)).toBe(3);
-    }
-    // A raise only: ground already above the crest is left alone.
-    expect(applyGaleLaunchKnoll(x, z, 90)).toBe(90);
-    // Lopsided on purpose: seaward and launch faces short, the road sides long.
-    // South (the launch cliff over the hamlet's shelf) is the shortest side,
-    // then east (the sea cliff), then west, and north (the walk up) the longest.
-    expect(galeLaunchKnollOuterRadius(0, 1)).toBeLessThan(galeLaunchKnollOuterRadius(1, 0));
-    expect(galeLaunchKnollOuterRadius(1, 0)).toBeLessThan(galeLaunchKnollOuterRadius(-1, 0));
-    expect(galeLaunchKnollOuterRadius(-1, 0)).toBeLessThan(galeLaunchKnollOuterRadius(0, -1));
-    // The quadrant ellipse keeps a short side short up to the diagonal: the
-    // south-west radius sits between the south and west sides, well under the
-    // reach the old compass blend gave that corner (the paddock's).
-    const southWest = galeLaunchKnollOuterRadius(-Math.SQRT1_2, Math.SQRT1_2);
-    expect(southWest).toBeGreaterThan(galeLaunchKnollOuterRadius(0, 1));
-    expect(southWest).toBeLessThan(galeLaunchKnollOuterRadius(-1, 0));
-  });
-
-  it('the spur road climbs to the crest and the Wreckfields road passes the foot, both under the climb limit', () => {
-    // galecrest.ts: the spur up the north face ends on the crest; the leg from
-    // Wickharbor to the Wreckfields goes around the western foot and along
-    // the paddock's north fence, never over the crest or down the cliff.
-    const steepestAlong = (road: readonly { x: number; z: number }[]): number => {
-      let steepest = 0;
-      for (let i = 0; i < road.length - 1; i++) {
-        const a = road[i];
-        const b = road[i + 1];
-        const length = Math.hypot(b.x - a.x, b.z - a.z);
-        const steps = Math.ceil(length / 2);
-        for (let s = 0; s < steps; s++) {
-          const t0 = s / steps;
-          const t1 = (s + 1) / steps;
-          const h0 = groundHeight(a.x + (b.x - a.x) * t0, a.z + (b.z - a.z) * t0, WORLD_SEED);
-          const h1 = groundHeight(a.x + (b.x - a.x) * t1, a.z + (b.z - a.z) * t1, WORLD_SEED);
-          steepest = Math.max(steepest, Math.abs(h1 - h0) / (length / steps));
-        }
-      }
-      return steepest;
-    };
-    const spur = GALECREST_ROADS.find((leg) => leg.some((p) => p.x === 446 && p.z === 512));
-    const through = GALECREST_ROADS.find((leg) => leg.some((p) => p.x === 438 && p.z === 556));
-    expect(spur).toBeDefined();
-    expect(through).toBeDefined();
-    if (!spur || !through) return;
-    expect(steepestAlong(spur)).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
-    expect(steepestAlong(through)).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
-    // ...the spur does reach the crest, and the through road never climbs it.
-    expect(groundHeight(446, 512, WORLD_SEED)).toBeCloseTo(GALE_LAUNCH_KNOLL.crestHeight, 6);
-    for (const p of through) expect(groundHeight(p.x, p.z, WORLD_SEED)).toBeLessThan(30);
-  });
-
-  it('the seaward face is a cliff that drops to the sea, and the launch face is steeper than a climb', () => {
-    const { x, z } = GALE_LAUNCH_KNOLL;
-    let seaward = 0;
-    let launchFace = 0;
-    for (let r = GALE_LAUNCH_KNOLL.plateauRadius; r < 60; r += 1) {
-      seaward = Math.max(seaward, terrain(x + r, z) - terrain(x + r + 1, z));
-      launchFace = Math.max(launchFace, terrain(x, z + r) - terrain(x, z + r + 1));
-    }
-    expect(seaward).toBeGreaterThan(PLAYER_MAX_CLIMB_SLOPE);
-    expect(launchFace).toBeGreaterThan(PLAYER_MAX_CLIMB_SLOPE);
-    expect(terrain(x + 62, z)).toBeLessThan(WATER_LEVEL);
-  });
-});
-
 describe('the launch wharf', () => {
   it('lays its planks at the old deck height on the crest; the perch hangs past the end', () => {
     expect(GLIDER_WHARF_DECKS).toHaveLength(1);
     const pier = GLIDER_WHARF_DECKS[0];
-    expect(terrain(pier.ax, pier.az)).toBeCloseTo(GALE_LAUNCH_KNOLL.crestHeight, 6);
-    // Zephyr's spot is on the planks, at 74.
+    expect(terrain(pier.ax, pier.az)).toBeCloseTo(GLIDER_WHARF_DECK_Y - GALE_DECK_LIFT, 6);
+    // Zephyr's spot is on the planks above the existing mountainside.
     expect(
       gliderWharfSurface(GLIDER_NPC_DEF.pos.x, GLIDER_NPC_DEF.pos.z, terrain, WATER_LEVEL),
     ).toBeCloseTo(GLIDER_WHARF_DECK_Y, 6);
@@ -158,14 +54,14 @@ describe('the launch wharf', () => {
       gliderWharfSurface(GLIDER_NPC_DEF.pos.x + 1, GLIDER_NPC_DEF.pos.z, terrain, WATER_LEVEL),
     ).toBeCloseTo(GLIDER_WHARF_DECK_Y, 6);
     // The launch perch is a stride PAST the planks' end, at the plank plane,
-    // with the knoll already well below: open air under the glider from its
+    // with the mountainside already well below: open air under the glider from its
     // first flying tick (the flight tower's perch hung off its deck the same way).
     const perch = GLIDER_LAUNCH_SITE.playerLaunch;
     expect(perch.y).toBe(GLIDER_WHARF_DECK_Y);
     expect(gliderWharfSurface(perch.x, perch.z, terrain, WATER_LEVEL)).toBe(-Infinity);
     expect(groundHeight(perch.x, perch.z, WORLD_SEED)).toBeLessThan(GLIDER_WHARF_DECK_Y - 5);
-    // Beside the planks there is only the knoll; at the updraft, only ground.
-    expect(gliderWharfSurface(pier.x + 6, pier.z, terrain, WATER_LEVEL)).toBe(-Infinity);
+    // Beside the planks there is only the mountainside; at the updraft, only ground.
+    expect(gliderWharfSurface(pier.x, pier.z + 6, terrain, WATER_LEVEL)).toBe(-Infinity);
     expect(
       gliderWharfSurface(GLIDER_WHARF.updraft.x, GLIDER_WHARF.updraft.z, terrain, WATER_LEVEL),
     ).toBe(-Infinity);
@@ -177,8 +73,8 @@ describe('the launch wharf', () => {
       6,
     );
     const pier = GLIDER_WHARF_DECKS[0];
-    expect(groundHeight(pier.x + 6, pier.z, WORLD_SEED)).toBeCloseTo(
-      terrain(pier.x + 6, pier.z),
+    expect(groundHeight(pier.x, pier.z + 6, WORLD_SEED)).toBeCloseTo(
+      terrain(pier.x, pier.z + 6),
       6,
     );
     expect(groundHeight(GLIDER_WHARF.updraft.x, GLIDER_WHARF.updraft.z, WORLD_SEED)).toBeCloseTo(
@@ -189,7 +85,7 @@ describe('the launch wharf', () => {
     expect(overworldWalkSurface(GLIDER_NPC_DEF.pos.x, GLIDER_NPC_DEF.pos.z, 10)).toBe(10);
   });
 
-  it('spawns Flightmaster Zephyr on the planks at Y = 74', () => {
+  it('spawns Flightmaster Zephyr at the wharf deck height', () => {
     const sim = setupSim();
     ensureGliderInstructor((sim as unknown as { ctx: SimContext }).ctx);
     const zephyr = sim.entities.get(GLIDER_NPC_ID);
@@ -199,7 +95,7 @@ describe('the launch wharf', () => {
     expect(zephyr?.pos.y).toBeCloseTo(GLIDER_WHARF_DECK_Y, 6);
   });
 
-  it('starts glider flight from the perch at 74 with open air below, as the tower launch did', () => {
+  it('starts glider flight from the pier tip with open air below', () => {
     const sim = setupSim();
     sim.chat('/dev glider');
     expect(sim.player.pos.y).toBeCloseTo(GLIDER_WHARF_DECK_Y, 6);

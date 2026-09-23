@@ -188,6 +188,12 @@ describe('worldQuestSlateComplete', () => {
     const slots = rotatingSlots(slateMeta([]), 20).map((quest) => quest.id);
     expect(slots.length).toBeGreaterThan(3);
     expect(worldQuestSlateComplete(slateMeta(slots), 20)).toBe(true);
+    const practice = slateMeta(slots);
+    const row = practice.worldQuestLog.get(slots[0])!;
+    row.state = 'active';
+    row.count = 0;
+    row.practiceOnly = true;
+    expect(worldQuestSlateComplete(practice, 20)).toBe(true);
     // One slot short, any slot: false.
     for (const missing of slots) {
       const rest = slots.filter((id) => id !== missing);

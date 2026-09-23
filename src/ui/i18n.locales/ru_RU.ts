@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.glider.replay': 'Лететь снова',
+  'questUi.worldQuest.glider.practiceRewards': 'Тренировочный полёт: улучшайте время без дополнительных монет, опыта и репутации.',
+  'hudChrome.leaderboard.gliderPersonalRules': 'Ваши офлайн-рекорды сохраняются с этим персонажем. Пройдите все кольца по порядку. Дневные рекорды сбрасываются каждый день.',
   'hudChrome.weeklyRewards.chooseTable': 'Выберите таблицу добычи для розыгрыша',
   'hudChrome.weeklyRewards.selectAllTables': 'Выбрать все',
   'hudChrome.weeklyRewards.selectedTable': 'Выбрана {count} таблица',
@@ -18102,4 +18105,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   "questUi.worldQuest.itemRewardWithLevels": "{name} (уровень предмета {itemLevel}, надевается с {requiredLevel} уровня)",
   "questUi.worldQuest.factionLine": "Фракция: {faction}",
   "questUi.worldQuest.standingReward": "Репутация с фракцией {faction}: +{amount}",
+  "hudChrome.leaderboard.gliderCourseNames.downs": "Прибрежный круг",
+  "hudChrome.leaderboard.gliderCourseNames.valleys": "Круг по долине",
+  "hudChrome.leaderboard.gliderCourseNames.switchbacks": "Повороты хребта",
+  "hudChrome.leaderboard.gliderDaily": "{course}: сегодня",
+  "hudChrome.leaderboard.gliderLifetime": "{course}: за всё время",
+  "hudChrome.leaderboard.gliderStart": "Лететь по этому маршруту",
+  "hudChrome.leaderboard.gliderRankings": "Рекорды полётов",
+  "hudChrome.leaderboard.gliderRules": "Побеждает самое быстрое полное прохождение. Пройдите все кольца. Дневные рекорды сбрасываются вместе с миром. Рекорды обновляются в течение 30 секунд.",
 };

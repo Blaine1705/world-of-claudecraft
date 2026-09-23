@@ -27,6 +27,14 @@ export class GliderCourseVisual {
     depthWrite: false,
   });
 
+  private readonly futureRingMat = new THREE.MeshBasicMaterial({
+    color: 0xf05252,
+    transparent: true,
+    opacity: 0.6,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  });
+
   private readonly passedRingMat = new THREE.MeshBasicMaterial({
     color: 0x75f69a,
     transparent: true,
@@ -136,15 +144,15 @@ export class GliderCourseVisual {
     }
 
     this.group.visible = true;
-    // The day's variant of the session's course (sim/world_quest_glider_generation.ts),
-    // derived from the mirrored cycle exactly as the authority ticks it; the
-    // lookup returns a stable object per (cycle, course), so the identity
-    // check below repositions the ring meshes only when the line changes.
+    // Course identity is stable across days; switching reuses warmed geometry.
     const course = gliderCourseForCycle(world.worldQuestCycle, session?.courseId);
     if (course !== this.course) {
       this.course = course;
       for (let i = 0; i < this.ringMeshes.length; i++) {
         const ring = course.rings[i];
+        this.ringMeshes[i].visible = !!ring;
+        if (!ring) continue;
+        this.ringMeshes[i].scale.setScalar(ring.radius / GLIDER_COURSE.rings[i].radius);
         const next = course.rings[i + 1] ?? course.landingPad;
         this.ringMeshes[i].position.set(ring.x, ring.y, ring.z);
         this.ringMeshes[i].lookAt(next.x, next.y, next.z);
@@ -155,12 +163,16 @@ export class GliderCourseVisual {
       if (wind.group.visible) wind.update(session?.windBoosts);
     }
 
+    const nextRing = course.rings.find((ring) => !session?.passedRings.includes(ring.id));
     for (let i = 0; i < this.ringMeshes.length; i++) {
       const ring = course.rings[i];
       const mesh = this.ringMeshes[i];
+      if (!ring) continue;
       mesh.material = session?.passedRings.includes(ring.id)
         ? this.passedRingMat
-        : this.activeRingMat;
+        : ring === nextRing
+          ? this.activeRingMat
+          : this.futureRingMat;
     }
 
     if (isGliding && session) {
@@ -193,6 +205,7 @@ export class GliderCourseVisual {
     for (const wind of this.winds.values()) wind.dispose();
     this.activeRingMat.dispose();
     this.passedRingMat.dispose();
+    this.futureRingMat.dispose();
     this.landingPadMat.dispose();
   }
 }

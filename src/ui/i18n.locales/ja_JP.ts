@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.glider.replay': 'もう一度飛ぶ',
+  'questUi.worldQuest.glider.practiceRewards':
+    '練習飛行：タイムを更新できますが、通貨、経験値、評判は追加で獲得できません。',
+  'hudChrome.leaderboard.gliderPersonalRules':
+    'このキャラクターに保存されたオフライン記録です。すべてのリングを順番に通過してください。日別記録は毎日リセットされます。',
   'hudChrome.weeklyRewards.chooseTable': '報酬を抽選する戦利品テーブルを選択',
   'hudChrome.weeklyRewards.selectAllTables': 'すべて選択',
   'hudChrome.weeklyRewards.selectedTable': 'テーブルを{count}件選択中',
@@ -18028,4 +18033,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{name}（アイテムレベル{itemLevel}、レベル{requiredLevel}で装備可能）',
   'questUi.worldQuest.factionLine': '勢力：{faction}',
   'questUi.worldQuest.standingReward': '{faction}の評判 +{amount}',
+  'hudChrome.leaderboard.gliderCourseNames.downs': '海岸周回コース',
+  'hudChrome.leaderboard.gliderCourseNames.valleys': '谷の周回コース',
+  'hudChrome.leaderboard.gliderCourseNames.switchbacks': '尾根の折り返しコース',
+  'hudChrome.leaderboard.gliderDaily': '{course}：今日',
+  'hudChrome.leaderboard.gliderLifetime': '{course}：歴代',
+  'hudChrome.leaderboard.gliderStart': 'このコースを飛ぶ',
+  'hudChrome.leaderboard.gliderRankings': '滑空コース記録',
+  'hudChrome.leaderboard.gliderRules':
+    '全ての輪を通過し、最速で完走した飛行が勝利します。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。',
 };

@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "a415789c",
+      "state": "3b28d21f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,6 +72,7 @@
           "equipmentInstance": {},
           "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -171,7 +172,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "05571970",
+      "state": "694fcbdb",
       "events": "8c718819",
       "rng": {
         "draws": 0,
@@ -226,6 +227,7 @@
           "equipmentInstance": {},
           "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -336,7 +338,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "a6761c16",
+      "state": "da157599",
       "events": "0bddbfcf",
       "rng": {
         "draws": 0,
@@ -391,6 +393,7 @@
           "equipmentInstance": {},
           "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -511,7 +514,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "39f7f71f",
+      "state": "b15d7a66",
       "events": "b148b641",
       "rng": {
         "draws": 0,
@@ -568,6 +571,7 @@
           "equipmentInstance": {},
           "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -679,7 +683,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "efa7d93c",
+      "state": "8d3b0603",
       "events": "2e9e090a",
       "rng": {
         "draws": 0,
@@ -741,6 +745,7 @@
             "church_order": 80
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -870,7 +875,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "74d644a3",
+      "state": "e5bc45a2",
       "events": "0de17699",
       "rng": {
         "draws": 0,
@@ -937,6 +942,7 @@
             "rift_watch": 80
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1088,7 +1094,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "d9731182",
+      "state": "03444adf",
       "events": "bf18640f",
       "rng": {
         "draws": 0,
@@ -1155,6 +1161,7 @@
             "rift_watch": 80
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1284,7 +1291,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "d9731182",
+      "state": "03444adf",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1351,6 +1358,7 @@
             "rift_watch": 80
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },

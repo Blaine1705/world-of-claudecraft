@@ -488,7 +488,8 @@ const MONOLITHS: MonolithRow[] = [
     // seam, and the new faction tier observer landed as a thin call on the
     // same seam (hud/reputation/faction_tier_celebration_*.ts). Exact count,
     // zero slack.
-    ceiling: 18300,
+    // Noticeboard dispatch extracted to noticeboard_event.ts for the glider sign.
+    ceiling: 18286,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

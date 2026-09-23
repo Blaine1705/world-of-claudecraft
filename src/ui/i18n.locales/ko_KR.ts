@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.glider.replay': '다시 비행',
+  'questUi.worldQuest.glider.practiceRewards':
+    '연습 비행: 기록을 단축할 수 있지만 화폐, 경험치, 평판은 추가로 받지 않습니다.',
+  'hudChrome.leaderboard.gliderPersonalRules':
+    '이 캐릭터에 저장된 오프라인 기록입니다. 모든 고리를 순서대로 통과하세요. 일일 기록은 매일 초기화됩니다.',
   'hudChrome.weeklyRewards.chooseTable': '보상을 추첨할 전리품 목록 선택',
   'hudChrome.weeklyRewards.selectAllTables': '모두 선택',
   'hudChrome.weeklyRewards.selectedTable': '전리품 목록 {count}개 선택됨',
@@ -18000,4 +18005,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{name} (아이템 레벨 {itemLevel}, {requiredLevel}레벨부터 착용 가능)',
   'questUi.worldQuest.factionLine': '세력: {faction}',
   'questUi.worldQuest.standingReward': '{faction} 평판 +{amount}',
+  'hudChrome.leaderboard.gliderCourseNames.downs': '해안 순환 코스',
+  'hudChrome.leaderboard.gliderCourseNames.valleys': '계곡 순환 코스',
+  'hudChrome.leaderboard.gliderCourseNames.switchbacks': '능선 굽이 코스',
+  'hudChrome.leaderboard.gliderDaily': '{course}: 오늘',
+  'hudChrome.leaderboard.gliderLifetime': '{course}: 역대',
+  'hudChrome.leaderboard.gliderStart': '이 코스 비행',
+  'hudChrome.leaderboard.gliderRankings': '활공 코스 기록',
+  'hudChrome.leaderboard.gliderRules':
+    '모든 고리를 통과한 완주 기록 중 가장 빠른 시간이 승리합니다. 일일 기록은 서버 초기화 때 갱신됩니다. 기록은 30초 이내에 반영됩니다.',
 };

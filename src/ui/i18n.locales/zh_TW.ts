@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.glider.replay': '再次飛行',
+  'questUi.worldQuest.glider.practiceRewards':
+    '練習飛行：可以刷新用時，但不會再次獲得錢幣、經驗或聲望。',
+  'hudChrome.leaderboard.gliderPersonalRules':
+    '離線紀錄隨此角色儲存。請按順序穿過所有圓環。每日紀錄每天重設。',
   'hudChrome.weeklyRewards.chooseTable': '選擇用於抽取獎勵的戰利品表',
   'hudChrome.weeklyRewards.selectAllTables': '全選',
   'hudChrome.weeklyRewards.selectedTable': '已選擇 {count} 個戰利品表',
@@ -17129,4 +17134,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '{name}（物品等級{itemLevel}，{requiredLevel}級可裝備）',
   'questUi.worldQuest.factionLine': '陣營：{faction}',
   'questUi.worldQuest.standingReward': '{faction}聲望 +{amount}',
+  'hudChrome.leaderboard.gliderCourseNames.downs': '海岸環線',
+  'hudChrome.leaderboard.gliderCourseNames.valleys': '山谷環線',
+  'hudChrome.leaderboard.gliderCourseNames.switchbacks': '山脊折返線',
+  'hudChrome.leaderboard.gliderDaily': '{course}：今日',
+  'hudChrome.leaderboard.gliderLifetime': '{course}：歷史',
+  'hudChrome.leaderboard.gliderStart': '飛行此路線',
+  'hudChrome.leaderboard.gliderRankings': '滑翔路線紀錄',
+  'hudChrome.leaderboard.gliderRules':
+    '完整飛行用時最短者獲勝。穿過每個圓環。每日紀錄隨伺服器重置。紀錄會在30秒內更新。',
 };
