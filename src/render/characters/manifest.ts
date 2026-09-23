@@ -3845,7 +3845,7 @@ export const VISUALS: Record<string, VisualDef> = {
       // clawed arms turn into a tangle (both playtest). One arm at a time: a
       // diagonal rake, a level swipe, a punch.
       // The open-handed rakes rolled his whole body (playtest): the right-hand punch alone.
-      ...kaykit(['Punch_A']),
+      ...kaykit(['2H_Melee_Attack_Chop']),
       hit: ['Hit_A'],
       // He throws both claws at the sky to call the orbital storm (authored).
       attackByAbility: { [HOARD_GESTURE_CALL_STORM]: 'CallStorm' },
@@ -3861,7 +3861,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_tide_thrall.glb`,
     height: 4.6,
     clips: {
-      ...kaykit(['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Chop', 'Punch_A']),
+      ...kaykit(['2H_Melee_Attack_Chop']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,
@@ -3875,7 +3875,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_coinsack_scurrier.glb`,
     height: 2.0,
     clips: {
-      ...kaykit(['Punch_A']),
+      ...kaykit(['2H_Melee_Attack_Chop']),
       hit: ['Hit_A'],
       castByAbility: { [HOARD_GOBLIN_ESCAPE_CAST]: 'Running_A' },
       castTimeScaleByAbility: { [HOARD_GOBLIN_ESCAPE_CAST]: 1 },
@@ -3893,7 +3893,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_boss_mushroom.glb`,
     height: 2.2,
     clips: {
-      ...kaykit(['Punch_A', '2H_Melee_Attack_Chop']),
+      ...kaykit(['2H_Melee_Attack_Chop']),
       hit: ['Hit_A'],
       cast: 'Spellcast_Raise',
     },
@@ -4026,7 +4026,7 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_hoard_sporeling: {
     url: `${CREATURES}/hoard_boss_mushroom.glb`,
     height: 2.2,
-    clips: { ...kaykit(['Punch_A']), hit: ['Hit_A'] },
+    clips: { ...kaykit(['2H_Melee_Attack_Chop']), hit: ['Hit_A'] },
     authoredAtlas: true,
     selfIllumination: 0.25,
     tint: 0xd8e08a,
@@ -4042,6 +4042,7 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 2.0,
     yaw: 0,
     clips: STATIC_PROP,
+    authoredAtlas: true,
     selfIllumination: 0.3,
     clickRadius: 1.4,
   },
@@ -4070,7 +4071,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_frost_revenant.glb`,
     height: 3.6,
     clips: {
-      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Punch_A']),
+      ...kaykit(['2H_Melee_Attack_Chop']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,
@@ -4081,7 +4082,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_ember_fiend.glb`,
     height: 2.9,
     clips: {
-      ...kaykit(['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Slice_Horizontal', 'Punch_A']),
+      ...kaykit(['2H_Melee_Attack_Chop']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,
@@ -4093,7 +4094,7 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 4.1,
     clips: {
       // The punch wobbled his whole slab of a body (playtest); the chop alone.
-      ...kaykit(['1H_Melee_Attack_Chop']),
+      ...kaykit(['2H_Melee_Attack_Chop']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,
@@ -4104,7 +4105,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_void_acolyte.glb`,
     height: 4.2,
     clips: {
-      ...kaykit(['Spellcast_Shoot', 'Punch_A']),
+      ...kaykit(['2H_Melee_Attack_Chop', 'Spellcast_Shoot']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,
@@ -4115,7 +4116,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_storm_caller.glb`,
     height: 4.4,
     clips: {
-      ...kaykit(['Spellcast_Shoot', '1H_Melee_Attack_Slice_Horizontal']),
+      ...kaykit(['2H_Melee_Attack_Chop', 'Spellcast_Shoot']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,
@@ -4126,7 +4127,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/hoard_boneclad_warrior.glb`,
     height: 3.5,
     clips: {
-      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Shield_Bash']),
+      ...kaykit(['2H_Melee_Attack_Chop']),
       hit: ['Hit_A'],
     },
     authoredAtlas: true,
