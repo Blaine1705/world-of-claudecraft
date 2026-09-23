@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  "questUi.worldQuest.practiceRewards": "Тренировка: играйте снова без дополнительных монет, опыта и репутации.",
+  "questUi.worldQuest.replay": "Играть снова",
   'questUi.worldQuest.glider.replay': 'Лететь снова',
   'questUi.worldQuest.glider.practiceRewards': 'Тренировочный полёт: улучшайте время без дополнительных монет, опыта и репутации.',
   'hudChrome.leaderboard.gliderPersonalRules': 'Ваши офлайн-рекорды сохраняются с этим персонажем. Пройдите все кольца по порядку. Дневные рекорды сбрасываются каждый день.',
@@ -17879,7 +17881,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.wispMaze.finished': 'Все кошели возвращены!',
   'questUi.worldQuest.wispMaze.retry': 'Три жизни восстановлены. Попробуйте пройти лабиринт снова.',
   'questUi.worldQuest.wispMaze.startNormal': 'Войти в лабиринт: обычный (теней: {shadows})',
-  'questUi.worldQuest.wispMaze.startHard': 'Войти в лабиринт: сложный (теней: {shadows}, бонусный кошель)',
+  "questUi.worldQuest.wispMaze.startHard": "Войти в лабиринт: сложно (теней: {shadows})",
   'questUi.worldQuest.forge.title': 'Молот в помощь',
   'questUi.worldQuest.forge.objective': 'Помогите кузнецу Маре выковать щит',
   'questUi.worldQuest.forge.ready': 'Поговорите с кузнецом Марой, чтобы начать.',
@@ -17943,9 +17945,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.traceShape.zigzag': 'Зигзагообразный знак',
   'questUi.worldQuest.traceShape.cross': 'Руна креста',
   'questUi.worldQuest.puzzleBonusLevel': 'Бонусный уровень {level} из {total}',
-  'questUi.worldQuest.puzzleBonusCharged': 'Тайник гудит от бонусного заряда: ждёт уровень {level} из {total}. Коснитесь тайника силовой линии снова, чтобы получить больше золота.',
-  'questUi.worldQuest.puzzleBonusPaid': 'Бонусный кошель получен!',
-  'questUi.worldQuest.puzzleBonusDone': 'Все бонусные уровни пройдены. Тайник отдыхает до следующего предложения.',
+  "questUi.worldQuest.puzzleBonusCharged": "Доступен тренировочный уровень {level} из {total}. Снова коснитесь тайника силовых линий. Повторные раунды не дают наград.",
+  "questUi.worldQuest.puzzleBonusPaid": "Тренировочный уровень пройден!",
+  "questUi.worldQuest.puzzleBonusDone": "Все тренировочные уровни пройдены. Коснитесь тайника силовых линий, чтобы сыграть снова.",
   'entities.mobs.fenbridge_infiltrator.name': 'Чужое Лицо',
   'entities.npcs.glider_instructor.name': 'Мастер полётов Зефир',
   'entities.npcs.glider_instructor.title': 'Наставник Ветрокрылых',

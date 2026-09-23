@@ -31,5 +31,22 @@ describe('noticeboard event routing', () => {
       guild,
     );
     expect(guild).toHaveBeenCalledWith('eastbrook_noticeboard');
+    guild.mockClear();
+    const listings = [{ guild: 'Guild recruitment', note: 'Join our guild' }];
+    presentNoticeboardEvent(
+      {
+        type: 'noticeboard',
+        noticeboardId: 'noticeboard_eastbrook',
+        boardId: 'eastbrook_noticeboard',
+        state: 'listings',
+        listings,
+      },
+      popup,
+      rankings,
+      guild,
+    );
+    expect(popup.show).toHaveBeenCalledWith(listings);
+    expect(guild).not.toHaveBeenCalled();
+    expect(rankings.openGliderRankings).toHaveBeenCalledTimes(1);
   });
 });

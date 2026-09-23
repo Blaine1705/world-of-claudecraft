@@ -11550,7 +11550,7 @@ export const ja_JP: EnTranslations = {
         "finished": "財布をすべて取り戻した！",
         "retry": "ライフが3つに回復した。もう一度迷宮に挑もう。",
         "startNormal": "迷宮に入る：ノーマル（影{shadows}体）",
-        "startHard": "迷宮に入る：ハード（影{shadows}体、ボーナスの財布）"
+        "startHard": "迷宮に入る：ハード（影{shadows}体）"
       },
       "forge": {
         "title": "手助けのハンマー",
@@ -11677,9 +11677,9 @@ export const ja_JP: EnTranslations = {
       "puzzleResultAnnouncement": "{title}。{detail} {reach}。",
       "puzzleLevel": "デイリーレベル {level}",
       "puzzleBonusLevel": "ボーナスレベル {level}/{total}",
-      "puzzleBonusCharged": "宝箱にボーナスの力が満ちている。レベル{level}/{total}が待っている。レイライン宝箱にもう一度触れて、追加のゴールドを手に入れよう。",
-      "puzzleBonusPaid": "ボーナスの財布を獲得！",
-      "puzzleBonusDone": "ボーナスレベルをすべてクリア。次の機会まで宝箱は眠りにつく。",
+      "puzzleBonusCharged": "練習レベル{level}/{total}が待っています。レイの箱にもう一度触れてください。追加の報酬はありません。",
+      "puzzleBonusPaid": "練習レベルをクリア！",
+      "puzzleBonusDone": "すべての練習レベルをクリアしました。レイの箱に触れるともう一度遊べます。",
       "puzzleInstructions": "タイルを回転させ、光線を始点から目的地までつなげてください。",
       "puzzleRotateTile": "タイル{tile}を回転",
       "puzzleConnectors": "接続方向: {connectors}。",
@@ -11698,8 +11698,8 @@ export const ja_JP: EnTranslations = {
       "startEscort": "護衛を開始",
       "escortTitle": "キャラバン",
       "alreadyCompleted": "このサイクルのワールドクエストは完了済みです。",
-      "replay": "Play again",
-      "practiceRewards": "Practice: play again without earning more coins, experience or reputation.",
+      "replay": "もう一度遊ぶ",
+      "practiceRewards": "練習：何度でも遊べますが、通貨、経験値、評判は追加で獲得できません。",
       "inProgress": "このワールドクエストは進行中です。",
       "match3Title": "お菓子の連鎖",
       "match3Instructions": "隣り合うお菓子を2つ選んでください。3つ以上の列ができる入れ替えだけが手数に数えられます。",

@@ -11550,7 +11550,7 @@ export const ko_KR: EnTranslations = {
         "finished": "동전 주머니를 모두 되찾았습니다!",
         "retry": "생명 세 개가 회복됐습니다. 미로에 다시 도전하세요.",
         "startNormal": "미로 입장: 보통 (그림자 {shadows})",
-        "startHard": "미로 입장: 어려움 (그림자 {shadows}, 보너스 주머니)"
+        "startHard": "미로 입장: 어려움 (그림자 {shadows}마리)"
       },
       "forge": {
         "title": "돕는 망치",
@@ -11677,9 +11677,9 @@ export const ko_KR: EnTranslations = {
       "puzzleResultAnnouncement": "{title}. {detail} {reach}.",
       "puzzleLevel": "일일 레벨 {level}",
       "puzzleBonusLevel": "보너스 레벨 {level}/{total}",
-      "puzzleBonusCharged": "저장고가 보너스 기운으로 웅웅거립니다: 레벨 {level}/{total}이(가) 기다립니다. 지맥 저장고를 다시 만져 추가 금화를 받으세요.",
-      "puzzleBonusPaid": "보너스 주머니 획득!",
-      "puzzleBonusDone": "보너스 레벨을 모두 완료했습니다. 다음 제안까지 저장고가 휴식합니다.",
+      "puzzleBonusCharged": "연습 단계 {level}/{total}이 기다립니다. 지맥 보관함을 다시 만지세요. 추가 보상은 없습니다.",
+      "puzzleBonusPaid": "연습 단계 완료!",
+      "puzzleBonusDone": "모든 연습 단계를 완료했습니다. 지맥 보관함을 만지면 다시 플레이할 수 있습니다.",
       "puzzleInstructions": "타일을 돌려 광선을 시작점에서 목적지까지 연결하세요.",
       "puzzleRotateTile": "타일 {tile} 돌리기",
       "puzzleConnectors": "연결 방향: {connectors}.",
@@ -11698,8 +11698,8 @@ export const ko_KR: EnTranslations = {
       "startEscort": "호위 시작",
       "escortTitle": "대상단",
       "alreadyCompleted": "이번 주기의 전역 퀘스트를 이미 완료했습니다.",
-      "replay": "Play again",
-      "practiceRewards": "Practice: play again without earning more coins, experience or reputation.",
+      "replay": "다시 플레이",
+      "practiceRewards": "연습: 다시 플레이할 수 있지만 동전, 경험치, 평판은 추가로 얻지 못합니다.",
       "inProgress": "이 전역 퀘스트는 이미 진행 중입니다.",
       "match3Title": "과자 연쇄",
       "match3Instructions": "서로 인접한 과자 두 개를 선택하세요. 세 개 이상 한 줄을 만드는 교환만 이동으로 계산됩니다.",

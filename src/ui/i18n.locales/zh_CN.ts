@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.practiceRewards': '练习：可以再次游玩，但不会额外获得钱币、经验或声望。',
+  'questUi.worldQuest.replay': '再玩一次',
   'questUi.worldQuest.glider.replay': '再次飞行',
   'questUi.worldQuest.glider.practiceRewards':
     '练习飞行：可以刷新用时，但不会再次获得钱币、经验或声望。',
@@ -16880,7 +16882,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.wispMaze.finished': '所有钱袋都已找回！',
   'questUi.worldQuest.wispMaze.retry': '三条生命已恢复。再次挑战迷宫吧。',
   'questUi.worldQuest.wispMaze.startNormal': '进入迷宫：普通（{shadows} 个暗影）',
-  'questUi.worldQuest.wispMaze.startHard': '进入迷宫：困难（{shadows} 个暗影，额外钱袋）',
+  'questUi.worldQuest.wispMaze.startHard': '进入迷宫：困难（{shadows}个暗影）',
   'questUi.worldQuest.forge.title': '援手之锤',
   'questUi.worldQuest.forge.objective': '帮助铁匠玛拉锻造一面盾牌',
   'questUi.worldQuest.forge.ready': '与铁匠玛拉交谈以开始。',
@@ -16952,9 +16954,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.traceShape.cross': '十字符文',
   'questUi.worldQuest.puzzleBonusLevel': '奖励关卡 {level}/{total}',
   'questUi.worldQuest.puzzleBonusCharged':
-    '秘藏因奖励充能而嗡鸣：奖励关卡 {level}/{total} 正等着你。再次触碰魔网秘藏即可获得额外金币。',
-  'questUi.worldQuest.puzzleBonusPaid': '获得奖励钱袋！',
-  'questUi.worldQuest.puzzleBonusDone': '所有奖励关卡均已通关。秘藏将静候下一次机会。',
+    '练习关卡 {level}/{total} 已就绪。再次触碰地脉宝箱即可游玩，后续挑战没有额外奖励。',
+  'questUi.worldQuest.puzzleBonusPaid': '练习关卡已完成！',
+  'questUi.worldQuest.puzzleBonusDone': '所有练习关卡均已完成。触碰地脉宝箱即可再次游玩。',
   'entities.mobs.fenbridge_infiltrator.name': '借面者',
   'entities.npcs.glider_instructor.name': '飞行管理员泽菲尔',
   'entities.npcs.glider_instructor.title': '御风者教官',

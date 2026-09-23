@@ -11550,7 +11550,7 @@ export const zh_TW: EnTranslations = {
         "finished": "所有錢袋都找回來了！",
         "retry": "三條生命已恢復。再挑戰一次迷宮吧。",
         "startNormal": "進入迷宮：普通（{shadows} 個暗影）",
-        "startHard": "進入迷宮：困難（{shadows} 個暗影，額外錢袋）"
+        "startHard": "進入迷宮：困難（{shadows}個暗影）"
       },
       "forge": {
         "title": "助一臂之鎚",
@@ -11677,9 +11677,9 @@ export const zh_TW: EnTranslations = {
       "puzzleResultAnnouncement": "{title}。{detail} {reach}。",
       "puzzleLevel": "每日關卡 {level}",
       "puzzleBonusLevel": "額外關卡 {level}/{total}",
-      "puzzleBonusCharged": "秘藏嗡嗡作響，蓄滿了額外能量：第 {level}/{total} 個額外關卡正等著你。再次觸碰魔網秘藏以獲得額外金幣。",
-      "puzzleBonusPaid": "獲得額外錢袋！",
-      "puzzleBonusDone": "所有額外關卡都已完成。秘藏將沉寂到下一次開放。",
+      "puzzleBonusCharged": "練習關卡 {level}/{total} 已就緒。再次觸碰地脈寶箱即可遊玩，後續挑戰沒有額外獎勵。",
+      "puzzleBonusPaid": "練習關卡已完成！",
+      "puzzleBonusDone": "所有練習關卡均已完成。觸碰地脈寶箱即可再次遊玩。",
       "puzzleInstructions": "旋轉拼塊，將光束從起點引導至終點。",
       "puzzleRotateTile": "旋轉拼塊{tile}",
       "puzzleConnectors": "連接方向：{connectors}。",
@@ -11698,8 +11698,8 @@ export const zh_TW: EnTranslations = {
       "startEscort": "開始護送",
       "escortTitle": "商隊",
       "alreadyCompleted": "你已完成本輪世界任務。",
-      "replay": "Play again",
-      "practiceRewards": "Practice: play again without earning more coins, experience or reputation.",
+      "replay": "再玩一次",
+      "practiceRewards": "練習：可以再次遊玩，但不會額外獲得錢幣、經驗或聲望。",
       "inProgress": "此世界任務已在進行中。",
       "match3Title": "糖果連鎖",
       "match3Instructions": "選擇兩個相鄰的糖果。只有組成三個或更多相同糖果的一排時，交換才會計入。",

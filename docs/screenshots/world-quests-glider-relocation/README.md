@@ -1,6 +1,16 @@
 # Existing mountain glider launch, 2026-09-23
 
-Local continuation of PR 4161 at `67c4498b65`, not committed or pushed.
+Published continuation of PR 4161. The PR tracks the latest head and CI result.
+
+## Publication checks
+
+The first continuation CI run found stale content/source assertions for the new
+course, board routing, minimap position, board catalog, grass exclusions and
+build-time icon classes. These are updated with behavioral routing coverage.
+Map plates were regenerated and missing non-Latin replay labels filled. The
+training/crafting UI imported name formatters through the character window,
+causing portrait model requests to outlive DOM tests; those formatters now use
+the existing pure name module. Focused reruns pass. Final CI remains on the PR.
 
 ## Reward-free minigame replays
 
@@ -22,8 +32,11 @@ with the changed world-quest suites, `tests/clue_scrolls.test.ts`,
 `tests/vehicles.test.ts`, mount/activity and monolith guards. `npm run check:types`,
 `npm run ci:changed`, `npm run build:server`, `npm run build:bundle` and
 `git diff --check` passed. Persistence and focused behavior reviews have no
-remaining findings. `node scripts/gate_select.mjs` still stops at i18n freshness
-because generated files are unstaged; no staging, commit, push or deployment.
+remaining findings. The earlier `node scripts/gate_select.mjs` stopped at i18n
+freshness before publication was authorized. Scoped staging cleared that blocker;
+the local full-suite fallback was stopped under severe memory/disk pressure,
+so it is not a local gate pass. GitHub CI verifies the published head. No merge
+or deployment.
 
 Upstream was fetched through release head `fc86d90234`. Clue Scroll PR 4110 still
 points to `542b782cd9e911b142a0f2b53e87b89c28eb5892`, already in this branch.

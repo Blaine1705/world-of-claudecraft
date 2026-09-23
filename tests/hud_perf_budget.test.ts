@@ -566,11 +566,11 @@ interface ScannedPainter {
 // the float animation on a recycled node.
 const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'micro_menu_state_painter.ts', allow: {}, reflowAllow: {} },
-  // Fifteen construction-only class assignments; all update writes use the shared facet.
-  // (Sixteen until b358c6c5ac removed the camera-shake comfort checkbox.)
+  // Sixteen construction-only class assignments; all update writes use the shared facet.
   {
     file: 'hud/vehicle/vehicle_action_bar_controller.ts',
-    allow: { '.className': 15 },
+    // Constructor-only count label now composes ui-socket-count with the shared icon skin.
+    allow: { '.className': 16 },
     reflowAllow: {},
   },
   // Both writes are build-time. The .className is the base class stamped on a tick

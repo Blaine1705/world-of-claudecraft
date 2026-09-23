@@ -278,8 +278,8 @@ describe('energy-controlled authored glider flight', () => {
     expect(player.pos).toEqual(terminal);
   });
   it('authors a long progressive course with clear rings and coherent medals', () => {
-    expect(GLIDER_COURSE.rings).toHaveLength(20);
-    expect(GLIDER_COURSE.minRings).toBe(20);
+    expect(GLIDER_COURSE.rings).toHaveLength(24);
+    expect(GLIDER_COURSE.minRings).toBe(24);
     const points = [
       GLIDER_LAUNCH_SITE.playerLaunch,
       ...GLIDER_COURSE.rings,
@@ -293,11 +293,13 @@ describe('energy-controlled authored glider flight', () => {
     for (let i = 0; i < GLIDER_COURSE.rings.length; i++) {
       const ring = GLIDER_COURSE.rings[i];
       expect(ring.y - ring.radius - groundHeight(ring.x, ring.z, WORLD_SEED)).toBeGreaterThan(2);
-      if (i) expect(ring.radius).toBeLessThanOrEqual(GLIDER_COURSE.rings[i - 1].radius);
+      expect(ring.radius).toBeGreaterThanOrEqual(4);
+      expect(ring.radius).toBeLessThanOrEqual(8);
+      if (i > 6) expect(ring.radius).toBeLessThanOrEqual(GLIDER_COURSE.rings[i - 1].radius);
     }
-    expect(scoreGliderFlight(20, 20, 51, GLIDER_COURSE.medals).rating).toBe('gold');
-    expect(scoreGliderFlight(19, 20, 60, GLIDER_COURSE.medals).rating).toBe('silver');
-    expect(scoreGliderFlight(18, 20, 80, GLIDER_COURSE.medals).rating).toBe('bronze');
+    expect(scoreGliderFlight(24, 24, 62, GLIDER_COURSE.medals).rating).toBe('gold');
+    expect(scoreGliderFlight(24, 24, 74, GLIDER_COURSE.medals).rating).toBe('silver');
+    expect(scoreGliderFlight(24, 24, 80, GLIDER_COURSE.medals).rating).toBe('bronze');
   });
 });
 

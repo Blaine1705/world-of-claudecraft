@@ -11550,7 +11550,7 @@ export const ru_RU: EnTranslations = {
         "finished": "Все кошели возвращены!",
         "retry": "Три жизни восстановлены. Попробуйте пройти лабиринт снова.",
         "startNormal": "Войти в лабиринт: обычный (теней: {shadows})",
-        "startHard": "Войти в лабиринт: сложный (теней: {shadows}, бонусный кошель)"
+        "startHard": "Войти в лабиринт: сложно (теней: {shadows})"
       },
       "forge": {
         "title": "Молот в помощь",
@@ -11677,9 +11677,9 @@ export const ru_RU: EnTranslations = {
       "puzzleResultAnnouncement": "{title}. {detail} {reach}.",
       "puzzleLevel": "Ежедневный уровень {level}",
       "puzzleBonusLevel": "Бонусный уровень {level} из {total}",
-      "puzzleBonusCharged": "Тайник гудит от бонусного заряда: ждёт уровень {level} из {total}. Коснитесь тайника силовой линии снова, чтобы получить больше золота.",
-      "puzzleBonusPaid": "Бонусный кошель получен!",
-      "puzzleBonusDone": "Все бонусные уровни пройдены. Тайник отдыхает до следующего предложения.",
+      "puzzleBonusCharged": "Доступен тренировочный уровень {level} из {total}. Снова коснитесь тайника силовых линий. Повторные раунды не дают наград.",
+      "puzzleBonusPaid": "Тренировочный уровень пройден!",
+      "puzzleBonusDone": "Все тренировочные уровни пройдены. Коснитесь тайника силовых линий, чтобы сыграть снова.",
       "puzzleInstructions": "Поворачивайте плитки, чтобы провести луч от источника к цели.",
       "puzzleRotateTile": "Повернуть плитку {tile}",
       "puzzleConnectors": "Соединения: {connectors}.",
@@ -11698,8 +11698,8 @@ export const ru_RU: EnTranslations = {
       "startEscort": "Начать сопровождение",
       "escortTitle": "Караван",
       "alreadyCompleted": "Вы уже выполнили это локальное задание в текущем цикле.",
-      "replay": "Play again",
-      "practiceRewards": "Practice: play again without earning more coins, experience or reputation.",
+      "replay": "Играть снова",
+      "practiceRewards": "Тренировка: играйте снова без дополнительных монет, опыта и репутации.",
       "inProgress": "Это локальное задание уже выполняется.",
       "match3Title": "Каскад сладостей",
       "match3Instructions": "Выберите две соседние сладости. Ход засчитывается, только если обмен создаёт ряд из трёх или более.",

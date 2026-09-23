@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.practiceRewards':
+    '연습: 다시 플레이할 수 있지만 동전, 경험치, 평판은 추가로 얻지 못합니다.',
+  'questUi.worldQuest.replay': '다시 플레이',
   'questUi.worldQuest.glider.replay': '다시 비행',
   'questUi.worldQuest.glider.practiceRewards':
     '연습 비행: 기록을 단축할 수 있지만 화폐, 경험치, 평판은 추가로 받지 않습니다.',
@@ -17740,7 +17743,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.wispMaze.finished': '동전 주머니를 모두 되찾았습니다!',
   'questUi.worldQuest.wispMaze.retry': '생명 세 개가 회복됐습니다. 미로에 다시 도전하세요.',
   'questUi.worldQuest.wispMaze.startNormal': '미로 입장: 보통 (그림자 {shadows})',
-  'questUi.worldQuest.wispMaze.startHard': '미로 입장: 어려움 (그림자 {shadows}, 보너스 주머니)',
+  'questUi.worldQuest.wispMaze.startHard': '미로 입장: 어려움 (그림자 {shadows}마리)',
   'questUi.worldQuest.forge.title': '돕는 망치',
   'questUi.worldQuest.forge.objective': '대장장이 마라를 도와 방패 벼리기',
   'questUi.worldQuest.forge.ready': '대장장이 마라에게 말을 걸어 시작하세요.',
@@ -17818,10 +17821,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.traceShape.cross': '십자 룬',
   'questUi.worldQuest.puzzleBonusLevel': '보너스 레벨 {level}/{total}',
   'questUi.worldQuest.puzzleBonusCharged':
-    '저장고가 보너스 기운으로 웅웅거립니다: 레벨 {level}/{total}이(가) 기다립니다. 지맥 저장고를 다시 만져 추가 금화를 받으세요.',
-  'questUi.worldQuest.puzzleBonusPaid': '보너스 주머니 획득!',
+    '연습 단계 {level}/{total}이 기다립니다. 지맥 보관함을 다시 만지세요. 추가 보상은 없습니다.',
+  'questUi.worldQuest.puzzleBonusPaid': '연습 단계 완료!',
   'questUi.worldQuest.puzzleBonusDone':
-    '보너스 레벨을 모두 완료했습니다. 다음 제안까지 저장고가 휴식합니다.',
+    '모든 연습 단계를 완료했습니다. 지맥 보관함을 만지면 다시 플레이할 수 있습니다.',
   'entities.mobs.fenbridge_infiltrator.name': '빌린 얼굴',
   'entities.npcs.glider_instructor.name': '비행 조련사 제피르',
   'entities.npcs.glider_instructor.title': '바람기수 교관',

@@ -11550,7 +11550,7 @@ export const zh_CN: EnTranslations = {
         "finished": "所有钱袋都已找回！",
         "retry": "三条生命已恢复。再次挑战迷宫吧。",
         "startNormal": "进入迷宫：普通（{shadows} 个暗影）",
-        "startHard": "进入迷宫：困难（{shadows} 个暗影，额外钱袋）"
+        "startHard": "进入迷宫：困难（{shadows}个暗影）"
       },
       "forge": {
         "title": "援手之锤",
@@ -11677,9 +11677,9 @@ export const zh_CN: EnTranslations = {
       "puzzleResultAnnouncement": "{title}。{detail} {reach}。",
       "puzzleLevel": "每日关卡 {level}",
       "puzzleBonusLevel": "奖励关卡 {level}/{total}",
-      "puzzleBonusCharged": "秘藏因奖励充能而嗡鸣：奖励关卡 {level}/{total} 正等着你。再次触碰魔网秘藏即可获得额外金币。",
-      "puzzleBonusPaid": "获得奖励钱袋！",
-      "puzzleBonusDone": "所有奖励关卡均已通关。秘藏将静候下一次机会。",
+      "puzzleBonusCharged": "练习关卡 {level}/{total} 已就绪。再次触碰地脉宝箱即可游玩，后续挑战没有额外奖励。",
+      "puzzleBonusPaid": "练习关卡已完成！",
+      "puzzleBonusDone": "所有练习关卡均已完成。触碰地脉宝箱即可再次游玩。",
       "puzzleInstructions": "旋转拼块，将光束从起点引导至终点。",
       "puzzleRotateTile": "旋转拼块{tile}",
       "puzzleConnectors": "连接方向：{connectors}。",
@@ -11698,8 +11698,8 @@ export const zh_CN: EnTranslations = {
       "startEscort": "开始护送",
       "escortTitle": "商队",
       "alreadyCompleted": "你已完成本轮世界任务。",
-      "replay": "Play again",
-      "practiceRewards": "Practice: play again without earning more coins, experience or reputation.",
+      "replay": "再玩一次",
+      "practiceRewards": "练习：可以再次游玩，但不会额外获得钱币、经验或声望。",
       "inProgress": "此世界任务已在进行中。",
       "match3Title": "糖果连锁",
       "match3Instructions": "选择两个相邻的糖果。只有组成三个或更多相同糖果的一排时，交换才会计入。",
