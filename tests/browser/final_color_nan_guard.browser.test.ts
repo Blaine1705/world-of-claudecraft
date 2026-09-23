@@ -445,26 +445,29 @@ describe('final color NaN guard alone scrubs every opaque_fragment family', () =
     }
   });
 
-  it('control: without the guard the same injection reaches the target as a non-finite value', () => {
-    // Proves the injection and the float readback can see what the guard
-    // removes, so the zeros above are the guard's work, not the harness's.
-    const guarded = THREE.ShaderChunk.opaque_fragment;
-    THREE.ShaderChunk.opaque_fragment = guarded.replace(
-      /\/\/ WOC_OPAQUE_NAN_GUARD\n(?:.*floatBitsToUint.*\n){4}/,
-      '',
-    );
-    try {
-      expect(THREE.ShaderChunk.opaque_fragment).not.toContain('floatBitsToUint');
-      for (const value of NON_FINITE) {
-        const { rgb } = renderFamily('standard', value, `control:${value.name}`);
-        expect(shaderError, value.name).toBeNull();
-        expect(
-          rgb.every((component) => !Number.isFinite(component)),
-          `${value.name}: ${rgb.join(',')}`,
-        ).toBe(true);
+  // Per family, so a draw that misses the sampled texel (the target clears to
+  // 0, the expected value) cannot pass the case above vacuously.
+  it.each(FAMILIES)(
+    '%s control: without the guard the same injection comes out non-finite',
+    (family) => {
+      const guarded = THREE.ShaderChunk.opaque_fragment;
+      THREE.ShaderChunk.opaque_fragment = guarded.replace(
+        /\/\/ WOC_OPAQUE_NAN_GUARD\n(?:.*floatBitsToUint.*\n){4}/,
+        '',
+      );
+      try {
+        expect(THREE.ShaderChunk.opaque_fragment).not.toContain('floatBitsToUint');
+        for (const value of NON_FINITE) {
+          const { rgb } = renderFamily(family, value, `control:${value.name}`);
+          expect(shaderError, `${family} ${value.name}`).toBeNull();
+          expect(
+            rgb.every((component) => !Number.isFinite(component)),
+            `${family} ${value.name}: ${rgb.join(',')}`,
+          ).toBe(true);
+        }
+      } finally {
+        THREE.ShaderChunk.opaque_fragment = guarded;
       }
-    } finally {
-      THREE.ShaderChunk.opaque_fragment = guarded;
-    }
-  });
+    },
+  );
 });

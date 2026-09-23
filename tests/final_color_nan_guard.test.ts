@@ -216,7 +216,7 @@ describe('patchOpaqueFragmentNanGuard coverage in stock shaders', () => {
     const naming = files
       .filter(({ full }) => {
         const text = readFileSync(full, 'utf8');
-        return text.includes('opaque_fragment') || text.includes('outgoingLight, diffuseColor.a');
+        return /opaque_fragment|outgoingLight, diffuseColor(?:\\)?\.a/.test(text);
       })
       .map(({ file }) => file);
     expect(naming).toEqual([
