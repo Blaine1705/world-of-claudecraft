@@ -11237,7 +11237,18 @@ export const ja_JP: EnTranslations = {
       "hoard_ice_age": "氷河期",
       "hoard_pulsar_overload": "パルサー過負荷",
       "hoard_rolling_boulder": "転がる大岩",
-      "hoard_goblin_escape": "逃走中"
+      "hoard_goblin_escape": "逃走中",
+      "hoard_cast_mole_rake": "爪の掻き裂き",
+      "hoard_cast_burrow": "穴掘り",
+      "hoard_cast_tunnel": "地中移動",
+      "hoard_cast_emerge": "噴出",
+      "hoard_cast_collapse": "天井崩落",
+      "hoard_cast_bat_dive_aim": "急降下",
+      "hoard_cast_bat_dive": "急降下中",
+      "hoard_cast_screech": "耳をつんざく叫び",
+      "hoard_cast_mimic_bite": "貪欲な噛みつき",
+      "hoard_cast_mimic_leap": "押し潰す跳躍",
+      "hoard_cast_coin_spit": "呪われた金貨"
     }
   },
   "questUi": {
@@ -18155,6 +18166,18 @@ export const ja_JP: EnTranslations = {
       },
       "hoard_bloat_cap": {
         "name": "膨れ笠"
+      },
+      "hoard_boss_mole": {
+        "name": "ディープレイク"
+      },
+      "hoard_boss_bat": {
+        "name": "巨大コウモリ"
+      },
+      "hoard_boss_mimic": {
+        "name": "貪欲な宝箱"
+      },
+      "hoard_bat_swarmling": {
+        "name": "洞窟の群れコウモリ"
       },
       "rift_spawnling": {
         "name": "リフトの落とし子"

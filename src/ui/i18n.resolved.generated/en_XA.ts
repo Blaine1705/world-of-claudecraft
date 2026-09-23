@@ -11237,7 +11237,18 @@ export const en_XA: EnTranslations = {
       "hoard_ice_age": "[Íçé Áĝé]",
       "hoard_pulsar_overload": "[Þúļšáŕ Óʋéŕļóáð]",
       "hoard_rolling_boulder": "[Ŕóļļíñĝ Ɓóúļðéŕ]",
-      "hoard_goblin_escape": "[Éšçáþíñĝ]"
+      "hoard_goblin_escape": "[Éšçáþíñĝ]",
+      "hoard_cast_mole_rake": "[Çļáŵ Ŕáķé]",
+      "hoard_cast_burrow": "[Ɓúŕŕóŵ]",
+      "hoard_cast_tunnel": "[Ţúññéļíñĝ]",
+      "hoard_cast_emerge": "[Éŕúþţíóñ]",
+      "hoard_cast_collapse": "[Çéíļíñĝ Çóļļáþšé]",
+      "hoard_cast_bat_dive_aim": "[Þļúñĝíñĝ Ðíʋé]",
+      "hoard_cast_bat_dive": "[Ðíʋíñĝ]",
+      "hoard_cast_screech": "[Ðéáƒéñíñĝ Šçŕééçĥ]",
+      "hoard_cast_mimic_bite": "[Ʋóŕáçíóúš Ɓíţé]",
+      "hoard_cast_mimic_leap": "[Çŕúšĥíñĝ Ļéáþ]",
+      "hoard_cast_coin_spit": "[Çúŕšéð Çóíñš]"
     }
   },
   "questUi": {
@@ -18155,6 +18166,18 @@ export const en_XA: EnTranslations = {
       },
       "hoard_bloat_cap": {
         "name": "[Ɓļóáţéð Çáþ]"
+      },
+      "hoard_boss_mole": {
+        "name": "[Ðééþŕáķé]"
+      },
+      "hoard_boss_bat": {
+        "name": "[Çóļóššáļ Ɓáţ]"
+      },
+      "hoard_boss_mimic": {
+        "name": "[Ʋóŕáçíóúš Çĥéšţ]"
+      },
+      "hoard_bat_swarmling": {
+        "name": "[Çáʋé Šŵáŕɱéŕ]"
       },
       "rift_spawnling": {
         "name": "[Ŕíƒţ Šþáŵñļíñĝ]"

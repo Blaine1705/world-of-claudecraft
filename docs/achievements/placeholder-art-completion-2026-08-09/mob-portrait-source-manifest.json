@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "7a5927b7da641a2b2cb090783ad4cce501a0d129a663a9986ecea363ef01c1d0",
+  "rendererFingerprint": "91ee79483fb638bef73cb7eddbe24b66d7b8f2b82ff40cd194b92da711aff3e9",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5015603,
-      "sha256": "90a5cc46153e006642afa043276ef75bae2c88a813d5208aaf549f6b5ca0ac51",
+      "bytes": 5019144,
+      "sha256": "70ddceafed40dbe800a5553d19fa1c649e67fa8b03634abda427134eb532b868",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 266,
+  "portraitCount": 270,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -3410,6 +3410,40 @@
       }
     },
     {
+      "id": "hoard_bat_swarmling",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_bat_swarmling",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_boss_bat.glb",
+          "path": "public/models/creatures/hoard_boss_bat.glb",
+          "bytes": 735572,
+          "sha256": "97a53873e49e593a8cb0863c429c0d6de423db7ca670a94f26b8861849ba7f9f"
+        },
+        "idle": "Idle",
+        "height": 1.5,
+        "yaw": -1.5707963267948966,
+        "hover": 0.525,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.5
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#9a8a8a",
+        "resolved": "#9a8a8a",
+        "strength": 0.5
+      },
+      "sourceFingerprint": "b41749e45a7ba67762317ee2bbb9c4138ab8f33365afd185093440cb514f3637",
+      "output": {
+        "path": "public/ui/mobs/hoard_bat_swarmling.webp",
+        "bytes": 2056,
+        "sha256": "fd6984230c1c843b42d326d36f834b496987467bdc5ed686dcc76261616cc78a"
+      }
+    },
+    {
       "id": "hoard_bloat_cap",
       "family": "elemental",
       "finderEncounter": false,
@@ -3441,6 +3475,108 @@
         "path": "public/ui/mobs/hoard_bloat_cap.webp",
         "bytes": 1888,
         "sha256": "d1b665cd8b0c430d31f101c5d0b0a11d3d52330c2900a3af574f607986e697bf"
+      }
+    },
+    {
+      "id": "hoard_boss_bat",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_boss_bat",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_boss_bat.glb",
+          "path": "public/models/creatures/hoard_boss_bat.glb",
+          "bytes": 735572,
+          "sha256": "97a53873e49e593a8cb0863c429c0d6de423db7ca670a94f26b8861849ba7f9f"
+        },
+        "idle": "Idle",
+        "height": 1.5,
+        "yaw": -1.5707963267948966,
+        "hover": 0.525,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "2c21e037b9d96f967fa8fafc756075fecdb9b98dc3a6bbfdd18c75600945dfcd",
+      "output": {
+        "path": "public/ui/mobs/hoard_boss_bat.webp",
+        "bytes": 2092,
+        "sha256": "d54de4a586473e9bf273688efeed2594194845327c6330867d099501dd8100fa"
+      }
+    },
+    {
+      "id": "hoard_boss_mimic",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_boss_mimic",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_boss_mimic.glb",
+          "path": "public/models/creatures/hoard_boss_mimic.glb",
+          "bytes": 608776,
+          "sha256": "f531472448b48d95690ea5f1788c67c110d29fc5c95eba2c75800b4badf46c8d"
+        },
+        "idle": "Idle",
+        "height": 1.6,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "6cc6e14c47ef4b8dca4d87b550845f07855b049191b3c8f63fef11ff1654c661",
+      "output": {
+        "path": "public/ui/mobs/hoard_boss_mimic.webp",
+        "bytes": 2480,
+        "sha256": "0a883646c4d4d6a2530d81556d02a801e3eb792fbbefe5feb8ddad0b72352b8d"
+      }
+    },
+    {
+      "id": "hoard_boss_mole",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_boss_mole",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_boss_mole.glb",
+          "path": "public/models/creatures/hoard_boss_mole.glb",
+          "bytes": 631836,
+          "sha256": "f2df8e3e874c492bf59d27bc6d53b1ebefec9d78b0227271adac43a9dd5bb187"
+        },
+        "idle": "Idle",
+        "height": 1.4,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "c4bb4cb50433f04ba9df66f1766db383420102caa8f13d8fc3541d0162c55a6d",
+      "output": {
+        "path": "public/ui/mobs/hoard_boss_mole.webp",
+        "bytes": 2262,
+        "sha256": "79966aaf3be53221c75c22573d1e200eac0fe45cdbaab86cf26de000986c91b3"
       }
     },
     {

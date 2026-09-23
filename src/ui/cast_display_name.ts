@@ -57,6 +57,17 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.hoard_pulsar_overload': true,
   'abilityUi.cast.hoard_rolling_boulder': true,
   'abilityUi.cast.hoard_goblin_escape': true,
+  'abilityUi.cast.hoard_cast_mole_rake': true,
+  'abilityUi.cast.hoard_cast_burrow': true,
+  'abilityUi.cast.hoard_cast_tunnel': true,
+  'abilityUi.cast.hoard_cast_emerge': true,
+  'abilityUi.cast.hoard_cast_collapse': true,
+  'abilityUi.cast.hoard_cast_bat_dive_aim': true,
+  'abilityUi.cast.hoard_cast_bat_dive': true,
+  'abilityUi.cast.hoard_cast_screech': true,
+  'abilityUi.cast.hoard_cast_mimic_bite': true,
+  'abilityUi.cast.hoard_cast_mimic_leap': true,
+  'abilityUi.cast.hoard_cast_coin_spit': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');

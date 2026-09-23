@@ -58,6 +58,21 @@ export const HOARD_CAST_WEBBING = 'hoard_cast_webbing';
 export const HOARD_CAST_SILK_SNARE = 'hoard_cast_silk_snare';
 export const HOARD_CAST_DOOM_RITUAL = 'hoard_cast_doom_ritual';
 
+// The cave bosses of the common and rare hoards (hoard_mole.ts, hoard_bat.ts,
+// hoard_mimic.ts): scripted cast bars their visuals map to clips. Only the
+// Colossal Bat's Screech is kickable (it is in HOARD_ADD_CAST_SCHOOLS below).
+export const HOARD_CAST_MOLE_RAKE = 'hoard_cast_mole_rake';
+export const HOARD_CAST_BURROW = 'hoard_cast_burrow';
+export const HOARD_CAST_TUNNEL = 'hoard_cast_tunnel';
+export const HOARD_CAST_EMERGE = 'hoard_cast_emerge';
+export const HOARD_CAST_COLLAPSE = 'hoard_cast_collapse';
+export const HOARD_CAST_BAT_DIVE_AIM = 'hoard_cast_bat_dive_aim';
+export const HOARD_CAST_BAT_DIVE = 'hoard_cast_bat_dive';
+export const HOARD_CAST_SCREECH = 'hoard_cast_screech';
+export const HOARD_CAST_MIMIC_BITE = 'hoard_cast_mimic_bite';
+export const HOARD_CAST_MIMIC_LEAP = 'hoard_cast_mimic_leap';
+export const HOARD_CAST_COIN_SPIT = 'hoard_cast_coin_spit';
+
 export const HOARD_ADD_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['school'] }>> =
   Object.freeze({
     [HOARD_CAST_DROWNING_HOOK]: { school: 'nature' },
@@ -67,4 +82,5 @@ export const HOARD_ADD_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['sch
     [HOARD_CAST_WEBBING]: { school: 'nature' },
     [HOARD_CAST_DOOM_RITUAL]: { school: 'shadow' },
     [HOARD_CAST_SILK_SNARE]: { school: 'nature' },
+    [HOARD_CAST_SCREECH]: { school: 'nature' },
   });

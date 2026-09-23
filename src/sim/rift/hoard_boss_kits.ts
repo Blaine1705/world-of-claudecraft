@@ -1,3 +1,6 @@
+import { HOARD_BAT_BOSS_TEMPLATE } from './hoard_bat_core';
+import { HOARD_MIMIC_BOSS_TEMPLATE, MIMIC } from './hoard_mimic_core';
+import { HOARD_MOLE_BOSS_TEMPLATE, MOLE } from './hoard_mole_core';
 import { HOARD_MUSHROOM_BOSS_TEMPLATE, MUSHROOM } from './hoard_mushroom_core';
 import { ORBITAL_LIGHTNING } from './hoard_orbital_lightning_core';
 import type { HoardBossCueVariant } from './types';
@@ -15,7 +18,10 @@ export type HoardBossKit =
   | 'arcane'
   | 'storm'
   | 'tide'
-  | 'mushroom';
+  | 'mushroom'
+  | 'mole'
+  | 'bat'
+  | 'mimic';
 
 export interface HoardSweepSpec {
   variant: HoardBossCueVariant;
@@ -80,6 +86,31 @@ export const HOARD_BRUTE_COMBO: readonly HoardSweepSpec[] = [
 
 /** Alternate left, right, then center around the opening aim. Each cue locks its own aim. */
 export const HOARD_BRUTE_FACING_OFFSETS = [-0.7, 0.7, 0] as const;
+
+/** The cave bosses' frontals (their modules lay them; the boss engine resolves
+ *  them like any sweep). */
+export const HOARD_CAVE_SWEEPS: readonly HoardSweepSpec[] = [
+  {
+    variant: 'mole-swipe',
+    radius: MOLE.swipeRadius,
+    halfAngle: MOLE.swipeHalfAngle,
+    windup: MOLE.swipeWindupSec,
+    damageFraction: MOLE.swipeDamageFraction,
+    school: 'physical',
+    knockback: 0,
+    ability: 'Claw Rake',
+  },
+  {
+    variant: 'mimic-bite',
+    radius: MIMIC.biteRadius,
+    halfAngle: MIMIC.biteHalfAngle,
+    windup: MIMIC.biteWindupSec,
+    damageFraction: MIMIC.biteDamageFraction,
+    school: 'physical',
+    knockback: 0,
+    ability: 'Voracious Bite',
+  },
+];
 
 export const HOARD_FROST_GUST: HoardSweepSpec = {
   variant: 'frost-gust',
@@ -188,6 +219,12 @@ export function hoardBossKit(templateId: string): HoardBossKit {
       return 'tide';
     case HOARD_MUSHROOM_BOSS_TEMPLATE:
       return 'mushroom';
+    case HOARD_MOLE_BOSS_TEMPLATE:
+      return 'mole';
+    case HOARD_BAT_BOSS_TEMPLATE:
+      return 'bat';
+    case HOARD_MIMIC_BOSS_TEMPLATE:
+      return 'mimic';
     default:
       return 'ember';
   }
@@ -342,6 +379,31 @@ export function hoardMarkSpec(variant: HoardBossCueVariant): HoardMarkSpec {
         pulseEvery: MUSHROOM.sporePulseEverySec,
         school: 'nature',
         ability: 'Spore Cloud',
+      };
+    // Deeprake's falling rocks and the Voracious Chest's cursed coins.
+    case 'mole-rock':
+      return {
+        variant,
+        radius: MOLE.rockRadius,
+        windup: MOLE.rockWindupSec,
+        impactFraction: MOLE.rockDamageFraction,
+        hazardDuration: 0,
+        pulseFraction: 0,
+        pulseEvery: 1,
+        school: 'physical',
+        ability: 'Falling Rock',
+      };
+    case 'mimic-coins':
+      return {
+        variant,
+        radius: MIMIC.coinRadius,
+        windup: MIMIC.coinWindupSec,
+        impactFraction: MIMIC.coinImpactFraction,
+        hazardDuration: MIMIC.coinHazardSec,
+        pulseFraction: MIMIC.coinPulseFraction,
+        pulseEvery: MIMIC.coinPulseEverySec,
+        school: 'fire',
+        ability: 'Cursed Coins',
       };
     default:
       return {

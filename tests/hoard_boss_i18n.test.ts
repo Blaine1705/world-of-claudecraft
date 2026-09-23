@@ -22,6 +22,14 @@ const NAMES = [
   'Healing Tide',
   'Spore Cloud',
   'Bloated Cap',
+  'Claw Rake',
+  'Eruption',
+  'Falling Rock',
+  'Plunging Dive',
+  'Deafening Screech',
+  'Voracious Bite',
+  'Crushing Leap',
+  'Cursed Coins',
 ] as const;
 
 afterEach(() => setLanguage('en'));

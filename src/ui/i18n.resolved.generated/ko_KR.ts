@@ -11237,7 +11237,18 @@ export const ko_KR: EnTranslations = {
       "hoard_ice_age": "빙하기",
       "hoard_pulsar_overload": "펄서 과부하",
       "hoard_rolling_boulder": "구르는 바위",
-      "hoard_goblin_escape": "도주"
+      "hoard_goblin_escape": "도주",
+      "hoard_cast_mole_rake": "발톱 긁기",
+      "hoard_cast_burrow": "굴 파기",
+      "hoard_cast_tunnel": "땅속 이동",
+      "hoard_cast_emerge": "분출",
+      "hoard_cast_collapse": "천장 붕괴",
+      "hoard_cast_bat_dive_aim": "급강하",
+      "hoard_cast_bat_dive": "급강하 중",
+      "hoard_cast_screech": "귀를 찢는 비명",
+      "hoard_cast_mimic_bite": "탐욕스러운 물기",
+      "hoard_cast_mimic_leap": "짓누르는 도약",
+      "hoard_cast_coin_spit": "저주받은 금화"
     }
   },
   "questUi": {
@@ -18155,6 +18166,18 @@ export const ko_KR: EnTranslations = {
       },
       "hoard_bloat_cap": {
         "name": "부푼 갓"
+      },
+      "hoard_boss_mole": {
+        "name": "딥레이크"
+      },
+      "hoard_boss_bat": {
+        "name": "거대 박쥐"
+      },
+      "hoard_boss_mimic": {
+        "name": "탐욕스러운 상자"
+      },
+      "hoard_bat_swarmling": {
+        "name": "동굴 떼박쥐"
       },
       "rift_spawnling": {
         "name": "균열의 산물"

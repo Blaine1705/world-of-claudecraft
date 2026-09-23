@@ -14,7 +14,9 @@ rigged here from a small JSON spec instead:
   * limbs that stand out from the body instead of under it (a spider's legs, an
     elemental's arms) are listed in the spec's "sideLimbs" and walk it instead;
   * clips keyed procedurally from world-axis turns: Idle, Walk, Run, Attack (a
-    lunging bite), Cast, Hit, Death, tuned by the spec's "motion" numbers.
+    lunging bite), Cast, Hit, Death, tuned by the spec's "motion" numbers. A spec
+    may opt into a clawed Attack, a rear-up Cast and a burrower's Burrow,
+    Underground and Emerge (see "opt-in styles and clips" below).
 
 One GLB per clip is written; assemble.mjs beside this file merges them into the
 shipped model.
@@ -362,16 +364,136 @@ def clip_death(t):
     return pose
 
 
+# ------------------------------------------------ opt-in styles and clips
+# A spec may ask for a clawed swipe instead of the bite ("attackStyle": "claws"),
+# a rear-up-and-slam instead of the roar ("castStyle": "rear"), and a burrower's
+# extra clips ("extraClips": ["Burrow", "Underground", "Emerge"]). The rear-up
+# and the burrow turn and sink the Root bone, whose head the spec places on the
+# floor under the hind feet: every turn of it pivots there. A spec without these
+# keys writes exactly what it always did.
+ROOT = 'Root'
+
+
+def root_pose(pose, pitch=0.0, sink=0.0):
+    """pitch: degrees nose-up about the Root head (the hind feet); sink: down."""
+    pose[ROOT] = {'turn': [('Y', -pitch)], 'move': (0, 0, -sink)}
+
+
+def fore_claw(pose, side, s, swing, lift, sweep):
+    """A front leg by leg(), plus sweep degrees swinging its paw out (+) or in (-)."""
+    leg(pose, 'fore', side, swing, lift)
+    pose['ForeUpper.%s' % side]['turn'].append(('Z', s * sweep))
+
+
+def clip_attack_claws(t):
+    # Wind up (claws raised and spread), strike at ~40%, hold, recover.
+    back = ease(0.0, 0.3, t) * (1 - ease(0.3, 0.42, t))
+    strike = ease(0.3, 0.42, t) * (1 - ease(0.6, 1.0, t))
+    pose = stance(chest=-10 * back + 9 * strike, head=-14 * back + 10 * strike)
+    pose['Hips'] = {'move': (-0.03 * back + 0.06 * strike, 0, -0.015 * strike),
+                    'turn': [('Y', -4 * back + 3 * strike)]}
+    for side, s in (('L', 1), ('R', -1)):
+        fore_claw(pose, side, s, 58 * back + 18 * strike, 1.1 * back, 16 * back - 14 * strike)
+        leg(pose, 'hind', side, 6 * back - 10 * strike, 0.0)
+    soft_parts(pose, t, tail=1.5, freq=2.0)
+    return pose
+
+
+def clip_cast_rear(t):
+    # Rears up on the hind legs, claws high, roars; slams the claws down at ~55%.
+    rear = ease(0.0, 0.34, t) * (1 - ease(0.5, 0.6, t))
+    slam = ease(0.52, 0.6, t) * (1 - ease(0.72, 1.0, t))
+    shake = rear * wave(t, 9)
+    pose = stance(chest=-8 * rear + 8 * slam, head=-18 * rear + 2 * shake + 8 * slam,
+                  head_yaw=3 * shake)
+    root_pose(pose, pitch=MOTION.get('rearPitch', 38) * rear - 3 * slam)
+    for side, s in (('L', 1), ('R', -1)):
+        fore_claw(pose, side, s, 60 * rear + 26 * slam, 1.1 * rear, 12 * rear - 6 * slam)
+        leg(pose, 'hind', side, -12 * rear, 0.0)
+    soft_parts(pose, t, tail=1.0 + rear, freq=2.0)
+    # The tail lifts as the body tips back, so it never ploughs into the floor.
+    pose['Tail1']['turn'].append(('Y', 0.8 * MOTION.get('rearPitch', 38) * rear))
+    return pose
+
+
+BURROW_DEPTH = MOTION.get('burrowDepth', 0.0)
+
+
+def sunk_pose(wobble=0.0):
+    """The fully sunk pose Burrow ends on, Underground holds and Emerge starts from."""
+    pose = stance(head=12)
+    root_pose(pose, sink=BURROW_DEPTH)
+    for side, s in (('L', 1), ('R', -1)):
+        fore_claw(pose, side, s, 30 + 6 * wobble * s, 0.6, 0.0)
+        leg(pose, 'hind', side, -10, 0.0)
+    soft_parts(pose, 0.0, tail=0.0)
+    return pose
+
+
+def clip_burrow(t):
+    # Head and claws dig in, the body sinks its full height, then holds sunk.
+    if t >= 0.9:
+        return sunk_pose()
+    dig = ease(0.0, 0.15, t) * (1 - ease(0.75, 0.9, t))
+    sink = ease(0.15, 0.85, t)
+    settle = ease(0.75, 0.9, t)
+    pose = stance(chest=14 * dig + 4 * wave(t, 5) * dig, head=(22 + 5 * wave(t, 5, 0.2)) * dig + 12 * settle,
+                  head_yaw=6 * wave(t, 2.5) * dig)
+    root_pose(pose, pitch=-10 * dig, sink=BURROW_DEPTH * sink)
+    pose['Hips'] = {'turn': [('Z', 5 * wave(t, 2.5) * dig)]}
+    for side, s in (('L', 1), ('R', -1)):
+        paddle = wave(t, 5, 0.0 if s > 0 else 0.5)
+        fore_claw(pose, side, s, (20 + 34 * paddle) * dig + 30 * settle,
+                  (0.5 + 0.5 * max(0.0, paddle)) * dig + 0.6 * settle, 10 * paddle * dig)
+        leg(pose, 'hind', side, -10 * settle + 8 * wave(t, 5, 0.25) * dig, 0.0)
+    soft_parts(pose, t, tail=2.0 * (1 - settle), freq=3.0)
+    return pose
+
+
+def clip_underground(t):
+    return sunk_pose(wobble=wave(t))
+
+
+def clip_emerge(t):
+    # Bursts up out of the ground head and claws first, lands, settles to Idle.
+    if t <= 0.0:
+        return sunk_pose()
+    rise = ease(0.0, 0.45, t)
+    burst = ease(0.0, 0.3, t) * (1 - ease(0.45, 0.65, t))
+    land = ease(0.5, 0.65, t) * (1 - ease(0.7, 1.0, t))
+    under = 1 - rise
+    pose = stance(chest=-10 * burst + 6 * land, head=12 * under - 20 * burst + 6 * land)
+    root_pose(pose, pitch=24 * burst - 2 * land, sink=BURROW_DEPTH * under - 0.03 * burst)
+    for side, s in (('L', 1), ('R', -1)):
+        fore_claw(pose, side, s, 30 * under + 55 * burst + 16 * land,
+                  0.6 * under + 1.0 * burst, 10 * burst)
+        leg(pose, 'hind', side, -10 * under - 10 * burst, 0.0)
+    soft_parts(pose, t, tail=2.0 * burst + 1.0 * land, freq=2.0)
+    return pose
+
+
 # name: (function, seconds)
 CLIPS = {
     'Idle': (clip_idle, 3.0),
     'Walk': (clip_walk, 1.0),
     'Run': (clip_run, 0.62),
-    'Attack': (clip_attack, 1.0),
-    'Cast': (clip_cast, 1.5),
+    'Attack': (clip_attack_claws if SPEC.get('attackStyle') == 'claws' else clip_attack,
+               MOTION.get('attackSeconds', 1.0)),
+    'Cast': (clip_cast_rear if SPEC.get('castStyle') == 'rear' else clip_cast,
+             MOTION.get('castSeconds', 1.5)),
     'Hit': (clip_hit, 0.55),
     'Death': (clip_death, 1.7),
 }
+EXTRA_CLIPS = {
+    'Burrow': (clip_burrow, MOTION.get('burrowSeconds', 1.1)),
+    'Underground': (clip_underground, 1.0),
+    'Emerge': (clip_emerge, MOTION.get('emergeSeconds', 0.8)),
+}
+for extra in SPEC.get('extraClips', []):
+    CLIPS[extra] = EXTRA_CLIPS[extra]
+# A few degrees nose-up on every clip seats hind feet a hair shorter than the
+# front claws (pivoting on the Root head, under the hind feet).
+GROUND_TILT = MOTION.get('groundTilt', 0.0)
 
 os.makedirs(OUT, exist_ok=True)
 arm.animation_data_create()
@@ -381,7 +503,10 @@ for clip, (fn, seconds) in CLIPS.items():
     arm.animation_data.action = action
     frames = max(2, round(seconds * FPS))
     for f in range(frames + 1):
-        apply_pose(fn(f / frames))
+        pose = fn(f / frames)
+        if GROUND_TILT:
+            pose.setdefault(ROOT, {}).setdefault('turn', []).append(('Y', -GROUND_TILT))
+        apply_pose(pose)
         for pb in arm.pose.bones:
             pb.keyframe_insert('rotation_quaternion', frame=f + 1)
             pb.keyframe_insert('location', frame=f + 1)

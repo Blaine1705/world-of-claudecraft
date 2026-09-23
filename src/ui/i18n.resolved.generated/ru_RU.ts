@@ -11237,7 +11237,18 @@ export const ru_RU: EnTranslations = {
       "hoard_ice_age": "Ледниковый период",
       "hoard_pulsar_overload": "Перегрузка пульсара",
       "hoard_rolling_boulder": "Катящийся валун",
-      "hoard_goblin_escape": "Побег"
+      "hoard_goblin_escape": "Побег",
+      "hoard_cast_mole_rake": "Удар когтями",
+      "hoard_cast_burrow": "Зарывание",
+      "hoard_cast_tunnel": "Подкоп",
+      "hoard_cast_emerge": "Извержение",
+      "hoard_cast_collapse": "Обвал свода",
+      "hoard_cast_bat_dive_aim": "Пикирование",
+      "hoard_cast_bat_dive": "Пикирует",
+      "hoard_cast_screech": "Оглушительный визг",
+      "hoard_cast_mimic_bite": "Ненасытный укус",
+      "hoard_cast_mimic_leap": "Сокрушающий прыжок",
+      "hoard_cast_coin_spit": "Проклятые монеты"
     }
   },
   "questUi": {
@@ -18155,6 +18166,18 @@ export const ru_RU: EnTranslations = {
       },
       "hoard_bloat_cap": {
         "name": "Вздутая шляпка"
+      },
+      "hoard_boss_mole": {
+        "name": "Глубокорой"
+      },
+      "hoard_boss_bat": {
+        "name": "Исполинская летучая мышь"
+      },
+      "hoard_boss_mimic": {
+        "name": "Ненасытный сундук"
+      },
+      "hoard_bat_swarmling": {
+        "name": "Пещерный роевик"
       },
       "rift_spawnling": {
         "name": "Отпрыск Разлома"

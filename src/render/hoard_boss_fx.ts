@@ -337,6 +337,8 @@ export class HoardBossFx {
     const fireEdge = material(0xff8c2b, 0.94, true);
     const sporeFill = material(0x6e7a18, 0.3);
     const sporeEdge = material(0xd8f06a, 0.94, true);
+    const goldFill = material(0x8a6410, 0.32);
+    const goldEdge = material(0xffd24a, 0.95, true);
     this.sweepPalettes = {
       frost: [frostFill, frostEdge],
       physical: [bruteFill, bruteEdge],
@@ -348,6 +350,7 @@ export class HoardBossFx {
       storm: [stormFill, stormEdge, stormEdge],
       fire: [fireFill, fireEdge, fireEdge],
       spore: [sporeFill, sporeEdge, sporeEdge],
+      gold: [goldFill, goldEdge, goldEdge],
       physical: [markFillMaterial, markGoldMaterial, hazardEdgeMaterial],
     };
     const riderMaterial = (color: number): THREE.PointsMaterial =>
@@ -368,6 +371,7 @@ export class HoardBossFx {
       storm: riderMaterial(0x8de8ff),
       tide: riderMaterial(0x8ff7ff),
       spore: riderMaterial(0xd8f06a),
+      gold: riderMaterial(0xffd24a),
     };
     this.materials = [
       markFillMaterial,
@@ -389,6 +393,8 @@ export class HoardBossFx {
       fireEdge,
       sporeFill,
       sporeEdge,
+      goldFill,
+      goldEdge,
       ...Object.values(this.riderMaterials),
     ];
 

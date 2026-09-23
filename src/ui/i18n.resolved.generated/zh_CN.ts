@@ -11237,7 +11237,18 @@ export const zh_CN: EnTranslations = {
       "hoard_ice_age": "冰河时代",
       "hoard_pulsar_overload": "脉冲星过载",
       "hoard_rolling_boulder": "滚石",
-      "hoard_goblin_escape": "逃跑"
+      "hoard_goblin_escape": "逃跑",
+      "hoard_cast_mole_rake": "利爪耙击",
+      "hoard_cast_burrow": "钻地",
+      "hoard_cast_tunnel": "地下潜行",
+      "hoard_cast_emerge": "破土而出",
+      "hoard_cast_collapse": "洞顶坍塌",
+      "hoard_cast_bat_dive_aim": "俯冲",
+      "hoard_cast_bat_dive": "俯冲中",
+      "hoard_cast_screech": "震耳尖啸",
+      "hoard_cast_mimic_bite": "贪婪撕咬",
+      "hoard_cast_mimic_leap": "碾压跳跃",
+      "hoard_cast_coin_spit": "诅咒金币"
     }
   },
   "questUi": {
@@ -18155,6 +18166,18 @@ export const zh_CN: EnTranslations = {
       },
       "hoard_bloat_cap": {
         "name": "膨胀菌盖"
+      },
+      "hoard_boss_mole": {
+        "name": "深耙"
+      },
+      "hoard_boss_bat": {
+        "name": "巨型蝙蝠"
+      },
+      "hoard_boss_mimic": {
+        "name": "贪婪宝箱"
+      },
+      "hoard_bat_swarmling": {
+        "name": "洞穴群蝠"
       },
       "rift_spawnling": {
         "name": "裂隙孽生体"

@@ -4,6 +4,7 @@ import { IGNIVAR_METEOR_RADIUS, IGNIVAR_METEOR_REVEAL_DELAY_SECONDS } from '../i
 import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
 import { riftFx } from './fx';
+import { clearHoardBat, isBatCue, tickHoardBat, tickHoardBatCue } from './hoard_bat';
 import {
   clearHoardBoneReaper,
   isBoneReaperCue,
@@ -14,6 +15,7 @@ import {
   HOARD_BROOD_EGG_TEMPLATE,
   HOARD_BRUTE_COMBO,
   HOARD_BRUTE_FACING_OFFSETS,
+  HOARD_CAVE_SWEEPS,
   HOARD_FROST_GUST,
   HOARD_TIDE_WAVE,
   type HoardBossKit,
@@ -44,6 +46,8 @@ import {
   tickHoardIceAgeCue,
 } from './hoard_ice_age';
 import { hoardLightningStrikeCues } from './hoard_lightning_strike';
+import { clearHoardMimic, isMimicCue, tickHoardMimic, tickHoardMimicCue } from './hoard_mimic';
+import { clearHoardMole, isMoleCue, tickHoardMole, tickHoardMoleCue } from './hoard_mole';
 import {
   clearHoardMushroom,
   isMushroomCue,
@@ -303,6 +307,9 @@ function clearState(ctx: SimContext, inst: RiftInstance, boss?: Entity): void {
   clearHoardBoulder(ctx, boss, inst.hoardBoss);
   clearHoardCocoon(ctx, inst, boss, inst.hoardBoss);
   clearHoardMushroom(ctx, inst, boss, inst.hoardBoss);
+  clearHoardMole(boss, inst.hoardBoss);
+  clearHoardBat(boss, inst.hoardBoss);
+  clearHoardMimic(ctx, boss, inst.hoardBoss);
   delete inst.hoardBoss;
   for (const player of instancePlayers(ctx, inst)) {
     ctx.emit({ type: 'hoardBossCueClear', pid: player.id });
@@ -522,6 +529,18 @@ function tickSpecialKit(
     tickHoardMushroom(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     return;
   }
+  if (kit === 'mole') {
+    tickHoardMole(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
+    return;
+  }
+  if (kit === 'bat') {
+    tickHoardBat(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
+    return;
+  }
+  if (kit === 'mimic') {
+    tickHoardMimic(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
+    return;
+  }
   if (kit === 'brute') {
     tickHoardBoulder(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
     tickHoardCharge(ctx, inst, boss, state, instancePlayers(ctx, inst), emitCue);
@@ -626,6 +645,8 @@ function hitPlayersInTideWave(
 function sweepSpec(cue: Extract<HoardBossCue, { kind: 'sweep' }>): HoardSweepSpec {
   if (cue.variant === 'frost-gust') return HOARD_FROST_GUST;
   if (cue.variant === 'tide-wave') return HOARD_TIDE_WAVE;
+  const cave = HOARD_CAVE_SWEEPS.find((spec) => spec.variant === cue.variant);
+  if (cave) return cave;
   return HOARD_BRUTE_COMBO.find((spec) => spec.variant === cue.variant) ?? EMBER_SWEEP;
 }
 
@@ -883,6 +904,18 @@ function tickCues(ctx: SimContext, inst: RiftInstance, boss: Entity, state: Hoar
       if (tickHoardMushroomCue(cue)) live.push(cue);
       continue;
     }
+    if (isMoleCue(cue)) {
+      if (tickHoardMoleCue(cue)) live.push(cue);
+      continue;
+    }
+    if (isBatCue(cue)) {
+      if (tickHoardBatCue(cue)) live.push(cue);
+      continue;
+    }
+    if (isMimicCue(cue)) {
+      if (tickHoardMimicCue(cue)) live.push(cue);
+      continue;
+    }
     if (isBoulderCue(cue)) {
       if (tickHoardBoulderCue(cue)) live.push(cue);
       continue;
@@ -1134,8 +1167,9 @@ function tickKit(
     tickBrute(ctx, inst, boss, state);
     return;
   }
-  // The Mother of Mushrooms runs her own clocks (hoard_mushroom.ts).
-  if (kit === 'mushroom') return;
+  // The cave bosses run their own clocks (hoard_mushroom.ts, hoard_mole.ts,
+  // hoard_bat.ts, hoard_mimic.ts).
+  if (kit === 'mushroom' || kit === 'mole' || kit === 'bat' || kit === 'mimic') return;
   if (kit === 'tide') {
     tickHoardTidePattern(ctx, inst, boss, state, living, emitCue);
     return;

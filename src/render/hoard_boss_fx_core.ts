@@ -12,7 +12,15 @@ export interface HoardCueVisualPlan {
 }
 
 export type HoardCueShape = 'ignivar' | 'sector' | 'wave' | 'tether' | 'disc' | 'annulus';
-export type HoardCuePalette = 'physical' | 'fire' | 'frost' | 'arcane' | 'storm' | 'tide' | 'spore';
+export type HoardCuePalette =
+  | 'physical'
+  | 'fire'
+  | 'frost'
+  | 'arcane'
+  | 'storm'
+  | 'tide'
+  | 'spore'
+  | 'gold';
 
 export interface HoardCueAppearancePlan {
   shape: HoardCueShape;
@@ -68,6 +76,18 @@ export function hoardCueAppearance(cue: HoardBossCueView): HoardCueAppearancePla
     case 'mushroom-spore':
     case 'mushroom-bloat':
       return { shape: 'disc', palette: 'spore', countdown: 'disc', elementalRider: true };
+    // The other cave bosses: Deeprake's rake, eruption circle and rocks; the
+    // Colossal Bat's dive lane and screech; the Voracious Chest's snap, landing
+    // circle and cursed coins.
+    case 'mole-swipe':
+    case 'mimic-bite':
+      return { shape: 'ignivar', palette: 'physical', countdown: 'none', elementalRider: false };
+    case 'bat-dive':
+      return { shape: 'sector', palette: 'physical', countdown: 'none', elementalRider: false };
+    case 'bat-screech':
+      return { shape: 'disc', palette: 'arcane', countdown: 'disc', elementalRider: true };
+    case 'mimic-coins':
+      return { shape: 'disc', palette: 'gold', countdown: 'disc', elementalRider: true };
     default:
       return { shape: 'disc', palette: 'physical', countdown: 'disc', elementalRider: false };
   }

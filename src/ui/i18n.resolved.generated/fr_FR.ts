@@ -11237,7 +11237,18 @@ export const fr_FR: EnTranslations = {
       "hoard_ice_age": "Ice Age",
       "hoard_pulsar_overload": "Pulsar Overload",
       "hoard_rolling_boulder": "Rolling Boulder",
-      "hoard_goblin_escape": "Escaping"
+      "hoard_goblin_escape": "Escaping",
+      "hoard_cast_mole_rake": "Claw Rake",
+      "hoard_cast_burrow": "Burrow",
+      "hoard_cast_tunnel": "Tunneling",
+      "hoard_cast_emerge": "Eruption",
+      "hoard_cast_collapse": "Ceiling Collapse",
+      "hoard_cast_bat_dive_aim": "Plunging Dive",
+      "hoard_cast_bat_dive": "Diving",
+      "hoard_cast_screech": "Deafening Screech",
+      "hoard_cast_mimic_bite": "Voracious Bite",
+      "hoard_cast_mimic_leap": "Crushing Leap",
+      "hoard_cast_coin_spit": "Cursed Coins"
     }
   },
   "questUi": {
@@ -18155,6 +18166,18 @@ export const fr_FR: EnTranslations = {
       },
       "hoard_bloat_cap": {
         "name": "Bloated Cap"
+      },
+      "hoard_boss_mole": {
+        "name": "Deeprake"
+      },
+      "hoard_boss_bat": {
+        "name": "Colossal Bat"
+      },
+      "hoard_boss_mimic": {
+        "name": "Voracious Chest"
+      },
+      "hoard_bat_swarmling": {
+        "name": "Cave Swarmer"
       },
       "rift_spawnling": {
         "name": "Rejeton de faille"

@@ -101,8 +101,9 @@ describe('mob portrait source manifest', () => {
     // Maw tentacle, silk and brood cocoons). 263: the Coinsack Scurrier, the
     // goblin that sometimes runs through a hoard with a sack of gold. 266: the
     // Mother of Mushrooms, the first cave boss, with her sporeling and her
-    // Bloated Cap.
-    expect(liveIds).toHaveLength(266);
+    // Bloated Cap. 270: the other three cave bosses (Deeprake, the Colossal Bat,
+    // the Voracious Chest) and the bat's swarm.
+    expect(liveIds).toHaveLength(270);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

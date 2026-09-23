@@ -22,8 +22,19 @@ import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_minibos
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../../sim/nythraxis_bone_spike';
 import {
+  HOARD_CAST_BAT_DIVE,
+  HOARD_CAST_BAT_DIVE_AIM,
+  HOARD_CAST_BURROW,
+  HOARD_CAST_COIN_SPIT,
+  HOARD_CAST_COLLAPSE,
+  HOARD_CAST_EMERGE,
   HOARD_CAST_ICE_AGE,
+  HOARD_CAST_MIMIC_BITE,
+  HOARD_CAST_MIMIC_LEAP,
+  HOARD_CAST_MOLE_RAKE,
   HOARD_CAST_PULSAR_OVERLOAD,
+  HOARD_CAST_SCREECH,
+  HOARD_CAST_TUNNEL,
   HOARD_GOBLIN_ESCAPE_CAST,
 } from '../../sim/rift/hoard_control_cast_ids';
 import {
@@ -3889,6 +3900,127 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.25,
   },
+  // Deeprake, the burrowing mole of the cave hoards (src/sim/rift/hoard_mole.ts):
+  // rigged and animated in Blender (scripts/assets/hoard_mobs/quadruped_rig.py,
+  // specs/hoard_boss_mole.json). His scripted casts play their own clips: the
+  // rake is his claw Attack slowed so the strike lands as the telegraph ends, the
+  // burrow digs in, the tunnel holds him wholly under the floor, the collapse is
+  // his rear-up slam timed to the cast.
+  mob_hoard_boss_mole: {
+    url: `${CREATURES}/hoard_boss_mole.glb`,
+    height: 1.4,
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [HOARD_CAST_MOLE_RAKE]: 'Attack',
+        [HOARD_CAST_BURROW]: 'Burrow',
+        [HOARD_CAST_TUNNEL]: 'Underground',
+        [HOARD_CAST_EMERGE]: 'Emerge',
+        [HOARD_CAST_COLLAPSE]: 'Cast',
+      },
+      castTimeScaleByAbility: {
+        [HOARD_CAST_MOLE_RAKE]: 0.3,
+        [HOARD_CAST_BURROW]: 0.94,
+        [HOARD_CAST_TUNNEL]: 1,
+        [HOARD_CAST_EMERGE]: 1,
+        [HOARD_CAST_COLLAPSE]: 0.72,
+      },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The Colossal Bat of the cave hoards (src/sim/rift/hoard_bat.ts): rigged and
+  // animated in Blender (scripts/assets/hoard_mobs/bat_rig.py,
+  // specs/hoard_boss_bat.json). It never lands: every clip is a flying pose and
+  // `hover` lifts it (the spec's hoverFrac, 0.35 of its height, which its Death
+  // clip is tuned to so the corpse drops onto the floor). It takes aim flying in
+  // place, dives with its wings folded, and screeches reared back.
+  mob_hoard_boss_bat: {
+    url: `${CREATURES}/hoard_boss_bat.glb`,
+    height: 1.5,
+    hover: 0.525,
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [HOARD_CAST_BAT_DIVE_AIM]: 'Walk',
+        [HOARD_CAST_BAT_DIVE]: 'Dive',
+        [HOARD_CAST_SCREECH]: 'Cast',
+      },
+      castTimeScaleByAbility: {
+        [HOARD_CAST_BAT_DIVE_AIM]: 1,
+        [HOARD_CAST_BAT_DIVE]: 1,
+        [HOARD_CAST_SCREECH]: 1,
+      },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Its swarm: the same body, small and dusky.
+  mob_hoard_bat_swarmling: {
+    url: `${CREATURES}/hoard_boss_bat.glb`,
+    height: 1.5,
+    hover: 0.525,
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.2,
+    tint: 0x9a8a8a,
+    tintStrength: 0.5,
+  },
+  // The Voracious Chest of the cave hoards (src/sim/rift/hoard_mimic.ts): rigged
+  // and animated in Blender (scripts/assets/hoard_mobs/mimic_rig.py, which cuts
+  // the lid free along the line of teeth and hinges it at the back). Its bite is
+  // its Attack slowed so the lid snaps shut as the telegraph ends; its leap plays
+  // the Leap clip over the whole crouch and flight (the sim carries it along the
+  // arc); it spits its coins with the lid held open.
+  mob_hoard_boss_mimic: {
+    url: `${CREATURES}/hoard_boss_mimic.glb`,
+    height: 1.6,
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [HOARD_CAST_MIMIC_BITE]: 'Attack',
+        [HOARD_CAST_MIMIC_LEAP]: 'Leap',
+        [HOARD_CAST_COIN_SPIT]: 'Cast',
+      },
+      castTimeScaleByAbility: {
+        [HOARD_CAST_MIMIC_BITE]: 0.52,
+        [HOARD_CAST_MIMIC_LEAP]: 0.55,
+        [HOARD_CAST_COIN_SPIT]: 1,
+      },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
   // Her sporelings: little copies of her (the template scale shrinks them),
   // washed pale and sickly so they never read as a second Mother.
   mob_hoard_sporeling: {
@@ -4334,6 +4466,10 @@ const MOB_KEYS: Record<string, string> = {
   // The Mother of Mushrooms and her brood.
   hoard_boss_mushroom: 'mob_hoard_boss_mushroom',
   hoard_sporeling: 'mob_hoard_sporeling',
+  hoard_boss_mole: 'mob_hoard_boss_mole',
+  hoard_boss_bat: 'mob_hoard_boss_bat',
+  hoard_bat_swarmling: 'mob_hoard_bat_swarmling',
+  hoard_boss_mimic: 'mob_hoard_boss_mimic',
   hoard_bloat_cap: 'mob_hoard_bloat_cap',
   // Broodmother clutch (q_broodmother): the destructible eggs reuse the egg-sac
   // model (not a live spider), and the hatchling is a small spider.

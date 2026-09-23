@@ -563,6 +563,19 @@ const mergeStringsEn = {
       // The Coinsack Scurrier's bar (src/sim/rift/hoard_goblin.ts): when it ends,
       // the goblin is gone with the gold. Never kicked.
       hoard_goblin_escape: 'Escaping',
+      // The cave bosses of the common and rare hoards (hoard_mole.ts, hoard_bat.ts,
+      // hoard_mimic.ts). Only the Deafening Screech can be kicked.
+      hoard_cast_mole_rake: 'Claw Rake',
+      hoard_cast_burrow: 'Burrow',
+      hoard_cast_tunnel: 'Tunneling',
+      hoard_cast_emerge: 'Eruption',
+      hoard_cast_collapse: 'Ceiling Collapse',
+      hoard_cast_bat_dive_aim: 'Plunging Dive',
+      hoard_cast_bat_dive: 'Diving',
+      hoard_cast_screech: 'Deafening Screech',
+      hoard_cast_mimic_bite: 'Voracious Bite',
+      hoard_cast_mimic_leap: 'Crushing Leap',
+      hoard_cast_coin_spit: 'Cursed Coins',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

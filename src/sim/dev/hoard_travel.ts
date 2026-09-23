@@ -33,6 +33,9 @@ export const DEV_HOARD_DESTINATIONS = [
   { boss: 'vharok', alias: 'storm', zone: 'galecrest', theme: 'storm' },
   { boss: 'maw', alias: 'tide', zone: 'palmreach', theme: 'tide' },
   { boss: 'mushroom', alias: 'spore', zone: 'willowfen', theme: 'spore', cave: true },
+  { boss: 'deeprake', alias: 'mole', zone: 'amberfall', theme: 'burrow', cave: true },
+  { boss: 'bat', alias: 'roost', zone: 'nightbloom', theme: 'roost', cave: true },
+  { boss: 'chest', alias: 'mimic', zone: 'drakelands', theme: 'mimic', cave: true },
 ] as const satisfies readonly {
   boss: string;
   alias: string;
@@ -105,7 +108,7 @@ export function handleDevHoardTravel(
     ctx.emit({
       type: 'log',
       pid,
-      text: '[dev] /dev hoard <boss|zone|1-9> [common|rare|epic|legendary] [goblin].',
+      text: '[dev] /dev hoard <boss|zone|1-12> [common|rare|epic|legendary] [goblin].',
     });
     return;
   }
@@ -122,7 +125,7 @@ export function handleDevHoardTravel(
     ctx.emit({
       type: 'log',
       pid,
-      text: '[dev] /dev hoard <boss|zone|1-9> [common|rare|epic|legendary] [goblin]. Destinations:',
+      text: '[dev] /dev hoard <boss|zone|1-12> [common|rare|epic|legendary] [goblin]. Destinations:',
     });
     for (const [index, d] of DEV_HOARD_DESTINATIONS.entries()) {
       ctx.emit({ type: 'log', pid, text: `[dev] ${index + 1}: ${d.boss} (${d.alias}), ${d.zone}` });
