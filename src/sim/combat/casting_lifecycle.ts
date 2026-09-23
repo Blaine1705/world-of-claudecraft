@@ -130,7 +130,12 @@ import {
   spendRuin,
 } from './destruction';
 import { extendOwnedDot } from './dot_mutation';
-import { applyDruidFormEntry, druidFormEntryOwed } from './druid_form_entry';
+import {
+  applyDruidFormEntry,
+  druidFormEntryOwed,
+  druidFormEntryPool,
+  druidFormEntryTarget,
+} from './druid_form_entry';
 import { naturesBoonArmedFor, naturesBoonPowerFor } from './druid_natures_boon';
 import {
   consumeAuraKind,
@@ -1219,34 +1224,40 @@ export function castAbility(
       ? Math.ceil(shamanAdjustedCost * paladinManaCostMultiplier(p))
       : shamanAdjustedCost;
   // A form-entry press (Lunge from Bruin Form) is billed AFTER its shift, so
-  // the live bar here is not the one that pays: entering Cat hands over a full
-  // 100 energy, which always covers Lunge's 40. Weighing it against the rage or
-  // mana it happens to be standing in would refuse a press that is payable.
-  // Only exempt when a shift is actually owed, so a Lunge pressed already in
-  // Cat Form keeps the ordinary energy check.
-  const entersFormOnCast = druidFormEntryOwed(meta, p.auras, ability.id);
+  // the live bar here is not the one that pays: it is weighed against the pool
+  // the shift hands over (a full Cat bar out of combat, the parked energy
+  // mid-fight), never the rage or mana it happens to be standing in. Only when
+  // a shift is actually owed, so a Lunge pressed already in Cat Form keeps the
+  // ordinary energy check.
+  const entryPool = druidFormEntryOwed(meta, p.auras, ability.id)
+    ? druidFormEntryPool(p, ability.id)
+    : null;
   if (
-    castingPool < payableCost &&
+    (entryPool ?? castingPool) < payableCost &&
     (!canCastFree || stormcastArmedForAbility) &&
     !freeBySolarReprisal &&
     !togglingOff &&
-    !entersFormOnCast &&
     !formShiftKind(p, ability)
   ) {
     ctx.error(
       p.id,
       // An auto-unshifting cast was weighed against the parked mana, so it is
-      // mana it is short of, never the rage or energy bar it never touches.
+      // mana it is short of, never the rage or energy bar it never touches; a
+      // form-entry press was weighed against the bar its shift hands over.
       // Every other arm is the ladder this always had.
-      autoUnshift
-        ? 'Not enough mana!'
-        : p.resourceType === 'rage'
-          ? 'Not enough rage!'
-          : p.resourceType === 'energy'
-            ? 'Not enough energy!'
-            : p.resourceType === 'focus'
-              ? 'Not enough Focus!'
-              : 'Not enough mana!',
+      entryPool !== null
+        ? druidFormEntryTarget(ability.id) === 'cat'
+          ? 'Not enough energy!'
+          : 'Not enough rage!'
+        : autoUnshift
+          ? 'Not enough mana!'
+          : p.resourceType === 'rage'
+            ? 'Not enough rage!'
+            : p.resourceType === 'energy'
+              ? 'Not enough energy!'
+              : p.resourceType === 'focus'
+                ? 'Not enough Focus!'
+                : 'Not enough mana!',
     );
     return;
   }
