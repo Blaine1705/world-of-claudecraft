@@ -235,10 +235,11 @@ describe('the lazy-material sweep', () => {
     const hits = sweep();
     const files = hits.map((hit) => basename(hit.file));
     for (const module of REGISTERED_MODULES) expect(files).toContain(module);
-    // Vacuity floor, kept just under the real count: the seven registered
-    // bundles (the coach trail's guidance set, the ground fire AoE anchor and
-    // the Ring of Frost stand-in among the four spell visuals), the two
-    // excluded scenery bakes, and the battleground caches.
+    // Vacuity floor, kept just under the real count: the nine registered
+    // bundles (the coach trail's guidance set, the ground fire AoE anchor, the
+    // Ring of Frost stand-in and the two form adornment kits among the four
+    // spell visuals), the two excluded scenery bakes, and the battleground
+    // caches.
     expect(hits.length).toBeGreaterThanOrEqual(10);
     expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(11);
   });

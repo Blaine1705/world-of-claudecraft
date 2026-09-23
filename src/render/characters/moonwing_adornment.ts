@@ -7,9 +7,12 @@
 // every clip, mount seat and far-LOD hide the body does with no plumbing of its
 // own. Geometry and materials are module-level kits shared by every Moonwing on
 // screen and never disposed (the halo.ts doctrine); a rig only adds and removes
-// its meshes. The glow kit is registered in ABILITY_MATERIAL_SOURCES
-// (ability_material_prewarm.ts) through `buildMoonwingStandIn`, so the first
-// shift of the session links nothing live.
+// its meshes. The glow materials follow the shared rig_fx.ts recipe. The kit
+// is registered in ABILITY_MATERIAL_SOURCES (ability_material_prewarm.ts)
+// through `buildMoonwingStandIn`, so the boot manifest links its programs and
+// uploads its maps; where that entry is deferred (a constrained device), the
+// first mount on a rig still waits behind the compile gate (form_adornments.ts)
+// instead of linking in a live frame.
 //
 // Units are raw KayKit bone space (the halo's). Placement was measured against
 // the modular head (x +-0.45, crown ~0.81, hair to ~1.04, face at +z) and the
@@ -18,8 +21,10 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { surfaceMat } from '../gfx';
+import { markSharedGeometry } from '../shared_resource';
 import type { MoonwingPose } from './form_adornment_core';
 import { crescentTexture, wingTexture } from './form_adornment_textures';
+import { markRigFx, rigGlowMaterial, tagStandInForTextureUpload } from './rig_fx';
 
 /** Moonlit violet on the wings, a shade under the moonkin_form cast VFX
  *  colour so the additive layer reads violet over the tinted body. */
@@ -135,22 +140,19 @@ function buildWraps(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
   for (const side of [1, -1] as const) {
     const [a, b] = mirror(ANTLER_BEAM.slice(0, 2), side);
-    const at: Point = [
+    const at = new THREE.Vector3(
       a[0] + (b[0] - a[0]) * WRAP.t,
       a[1] + (b[1] - a[1]) * WRAP.t,
       a[2] + (b[2] - a[2]) * WRAP.t,
-      WRAP.radius,
-    ];
+    );
     const dir = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]).normalize();
-    const half = dir.multiplyScalar(WRAP.length / 2);
-    const start: Point = [at[0] - half.x, at[1] - half.y, at[2] - half.z, WRAP.radius];
-    const end: Point = [at[0] + half.x, at[1] + half.y, at[2] + half.z, WRAP.radius * 0.94];
-    // Closed caps: the band is a short solid ring around the beam.
-    const geo = new THREE.CylinderGeometry(end[3], start[3], WRAP.length, 10, 1, false);
+    // Closed caps: the band is a short solid ring around the beam, a hair
+    // narrower at its top edge as the beam tapers.
+    const geo = new THREE.CylinderGeometry(WRAP.radius * 0.94, WRAP.radius, WRAP.length, 10);
     geo.applyMatrix4(
       new THREE.Matrix4().compose(
-        new THREE.Vector3(at[0], at[1], at[2]),
-        new THREE.Quaternion().setFromUnitVectors(UP, dir.normalize()),
+        at,
+        new THREE.Quaternion().setFromUnitVectors(UP, dir),
         new THREE.Vector3(1, 1, 1),
       ),
     );
@@ -183,29 +185,21 @@ interface MoonwingKit {
 
 let kit: MoonwingKit | null = null;
 
-/** The unlit glow recipe the priest halo uses (additive, double-sided, no
- *  depth write, unfogged), so the three glow pieces share one program. */
-function glowMaterial(map: THREE.Texture, color: number): THREE.MeshBasicMaterial {
-  return new THREE.MeshBasicMaterial({
-    map,
-    color,
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-    fog: false,
-  });
-}
-
 function moonwingKit(): MoonwingKit {
   kit ??= {
-    wing: glowMaterial(wingTexture(), WING_COLOR),
-    crescent: glowMaterial(crescentTexture(), CRESCENT_COLOR),
-    antlerGeometry: buildAntlers(),
-    wrapGeometry: buildWraps(),
-    crescentGeometry: new THREE.PlaneGeometry(CRESCENT_REST.size, CRESCENT_REST.size),
-    leftWingGeometry: buildWing(-1),
-    rightWingGeometry: buildWing(1),
+    wing: rigGlowMaterial('moonwing_adornment:wing-glow', wingTexture(), WING_COLOR),
+    crescent: rigGlowMaterial(
+      'moonwing_adornment:crescent-glow',
+      crescentTexture(),
+      CRESCENT_COLOR,
+    ),
+    antlerGeometry: markSharedGeometry(buildAntlers()),
+    wrapGeometry: markSharedGeometry(buildWraps()),
+    crescentGeometry: markSharedGeometry(
+      new THREE.PlaneGeometry(CRESCENT_REST.size, CRESCENT_REST.size),
+    ),
+    leftWingGeometry: markSharedGeometry(buildWing(-1)),
+    rightWingGeometry: markSharedGeometry(buildWing(1)),
   };
   return kit;
 }
@@ -231,26 +225,13 @@ export function moonwingMaterials(): THREE.Material[] {
   return [wing, crescent, bone, wrap];
 }
 
-/** Keep a rig-parented FX mesh out of the body's overlay cycle (the tint,
- *  ghost and Soul Rend swaps, their prewarm twins, the shadow-caster sweep):
- *  the paladin rig FX use the same marker. */
-function markAdornment<T extends THREE.Object3D>(object: T): T {
-  object.userData.weaponVfxMesh = true;
-  const mesh = object as unknown as THREE.Mesh;
-  if (mesh.isMesh) {
-    mesh.castShadow = false;
-    mesh.receiveShadow = false;
-  }
-  return object;
-}
-
 function mesh(
   geometry: THREE.BufferGeometry,
   material: THREE.Material,
   name: string,
   renderOrder = 0,
 ): THREE.Mesh {
-  const out = markAdornment(new THREE.Mesh(geometry, material));
+  const out = markRigFx(new THREE.Mesh(geometry, material));
   out.name = name;
   out.renderOrder = renderOrder;
   return out;
@@ -262,6 +243,9 @@ export class MoonwingAdornment {
   readonly crescent: THREE.Mesh | null = null;
   readonly leftWing: THREE.Group | null = null;
   readonly rightWing: THREE.Group | null = null;
+  /** Every group this set parented into the rig (form_adornments.ts holds
+   *  them hidden until their programs link, and hides them under a ghost). */
+  readonly roots: readonly THREE.Object3D[];
 
   /** `model` is the rig subtree holding the `head` and `chest` bones; a rig
    *  missing one simply goes without those pieces. */
@@ -269,7 +253,7 @@ export class MoonwingAdornment {
     const k = moonwingKit();
     const headBone = model.getObjectByName('head');
     if (headBone) {
-      const head = markAdornment(new THREE.Group());
+      const head = markRigFx(new THREE.Group());
       head.name = 'moonwing_head';
       if (antlers) {
         const lit = antlerMaterials();
@@ -288,6 +272,9 @@ export class MoonwingAdornment {
       this.leftWing = this.attachWing(chestBone, -1, k.leftWingGeometry, k.wing);
       this.rightWing = this.attachWing(chestBone, 1, k.rightWingGeometry, k.wing);
     }
+    this.roots = [this.head, this.leftWing, this.rightWing].filter(
+      (root): root is THREE.Group => root !== null,
+    );
   }
 
   private attachWing(
@@ -296,7 +283,7 @@ export class MoonwingAdornment {
     geometry: THREE.BufferGeometry,
     material: THREE.Material,
   ): THREE.Group {
-    const pivot = markAdornment(new THREE.Group());
+    const pivot = markRigFx(new THREE.Group());
     pivot.name = side > 0 ? 'moonwing_wing_right' : 'moonwing_wing_left';
     pivot.position.set(WING_ROOT.x * side, WING_ROOT.y, WING_ROOT.z);
     pivot.add(mesh(geometry, material, `${pivot.name}_feathers`, 1));
@@ -318,15 +305,16 @@ export class MoonwingAdornment {
 
   /** Detach from the rig. The kits are shared and stay alive. */
   dispose(): void {
-    this.head?.removeFromParent();
-    this.leftWing?.removeFromParent();
-    this.rightWing?.removeFromParent();
+    for (const root of this.roots) root.removeFromParent();
   }
 }
 
 /** The hidden prewarm stand-in: a bare `head` + `chest` pair wearing the full
  *  set (antlers included), so the compile lane links every program a live
- *  Moonwing draws. */
+ *  Moonwing draws. Its meshes carry the `vfx` render category, which is what
+ *  the ability-primitives manifest entry walks to upload textures, so the
+ *  painted maps are resident before the first shift too (the live pieces keep
+ *  the character's category). */
 export function buildMoonwingStandIn(): THREE.Group {
   const root = new THREE.Group();
   const chest = new THREE.Group();
@@ -342,5 +330,6 @@ export function buildMoonwingStandIn(): THREE.Group {
     crescentLift: 0,
     crescentSway: 0,
   });
+  tagStandInForTextureUpload(root);
   return root;
 }

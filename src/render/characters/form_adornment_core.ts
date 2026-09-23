@@ -12,27 +12,36 @@
 // builders (moonwing_adornment.ts, gloamveil_veil.ts) stay thin painters over
 // this math.
 
+/** What kind of body a rig is: a composed modular look, a fixed class rig
+ *  (a character authored before the creator), or a whole replacement body
+ *  (the Combat Mech skin). */
+export type AdornmentBody = 'composed' | 'classRig' | 'replacement';
+
 /** Which adornment pieces a character rig wears this frame. */
 export interface FormAdornmentPlan {
-  /** Crescent and wings: every Moonwing rig. */
+  /** Crescent and wings: every Moonwing rig (they float clear of any head). */
   moonwing: boolean;
-  /** Antlers: only a composed (modular) body. The legacy class rig
-   *  (`player_druid`, druid.glb) already wears its antlered hood, and a Combat
-   *  Mech is a whole replacement body with no druid head to crown. */
+  /** Antlers: only a composed body. The legacy class rig (`player_druid`,
+   *  druid.glb) already wears its antlered hood, and a replacement body has no
+   *  druid head to crown. */
   antlers: boolean;
-  /** The shadow veil over the face. */
+  /** The shadow veil over the face: a KayKit head (composed or class rig),
+   *  never a replacement body, whose head it was not shaped for. */
   gloamveil: boolean;
 }
 
 /** The plan for one rig, from the two form flags the renderer already derives
- *  per frame (`form_moonkin` / `form_shadow` auras) and whether the rig is a
- *  composed look. */
+ *  per frame (`form_moonkin` / `form_shadow` auras) and the rig's body kind. */
 export function formAdornmentPlan(
   moonkin: boolean,
   shadowform: boolean,
-  composed: boolean,
+  body: AdornmentBody,
 ): FormAdornmentPlan {
-  return { moonwing: moonkin, antlers: moonkin && composed, gloamveil: shadowform };
+  return {
+    moonwing: moonkin,
+    antlers: moonkin && body === 'composed',
+    gloamveil: shadowform && body !== 'replacement',
+  };
 }
 
 /** The per-frame Moonwing pose, in the painter's own units. */

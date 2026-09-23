@@ -12,33 +12,36 @@ import {
 
 describe('formAdornmentPlan', () => {
   it('grows the antlers back only on a composed Moonwing body', () => {
-    expect(formAdornmentPlan(true, false, true)).toEqual({
+    expect(formAdornmentPlan(true, false, 'composed')).toEqual({
       moonwing: true,
       antlers: true,
       gloamveil: false,
     });
     // The legacy druid.glb rig wears its own antlered hood, and a mech body is
     // a whole replacement: crescent and wings, never a second pair of antlers.
-    expect(formAdornmentPlan(true, false, false)).toEqual({
-      moonwing: true,
-      antlers: false,
-      gloamveil: false,
-    });
+    for (const body of ['classRig', 'replacement'] as const) {
+      expect(formAdornmentPlan(true, false, body)).toEqual({
+        moonwing: true,
+        antlers: false,
+        gloamveil: false,
+      });
+    }
   });
 
-  it('veils the face in Gloamveil on every body kind', () => {
-    for (const composed of [true, false]) {
-      expect(formAdornmentPlan(false, true, composed)).toEqual({
+  it('veils a KayKit face in Gloamveil, never a replacement body', () => {
+    for (const body of ['composed', 'classRig'] as const) {
+      expect(formAdornmentPlan(false, true, body)).toEqual({
         moonwing: false,
         antlers: false,
         gloamveil: true,
       });
     }
+    expect(formAdornmentPlan(false, true, 'replacement').gloamveil).toBe(false);
   });
 
   it('wears nothing outside the two forms', () => {
-    for (const composed of [true, false]) {
-      expect(formAdornmentPlan(false, false, composed)).toEqual({
+    for (const body of ['composed', 'classRig', 'replacement'] as const) {
+      expect(formAdornmentPlan(false, false, body)).toEqual({
         moonwing: false,
         antlers: false,
         gloamveil: false,

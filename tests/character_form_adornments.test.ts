@@ -6,9 +6,12 @@
 // loader (the character_halo.test.ts rig):
 //  - each edge mounts and unmounts its set, and dispose() takes it down;
 //  - antlers only on a composed body (a fixed druid rig wears its own hood);
-//  - the pieces stay out of the body's overlay cycle: a ghost swap, a weapon
-//    swap (rebuildCasters re-traverses the model) or the tint itself never
-//    mounts an effect clone on them, and they never cast shadows.
+//  - the pieces stay out of the body's overlay cycle: a ghost, stealth or Soul
+//    Rend swap, a weapon swap (rebuildCasters re-traverses the model) or the
+//    tint itself never mounts an effect clone on them, and they never cast
+//    shadows; under a ghost or stealth body they hide instead;
+//  - the veil stays off a Combat Mech body;
+//  - the first mount rides the visual's injected compile gate.
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
@@ -56,6 +59,16 @@ function adornments(visual: Visual): THREE.Mesh[] {
   return out;
 }
 
+function idleState(): Parameters<Visual['update']>[1] {
+  return {
+    moving: false,
+    running: false,
+    airborne: false,
+    casting: false,
+    dead: false,
+  } as unknown as Parameters<Visual['update']>[1];
+}
+
 function pieceNames(visual: Visual): string[] {
   return adornments(visual)
     .map((mesh) => mesh.name)
@@ -101,34 +114,91 @@ describe('CharacterVisual form adornments', () => {
     expect(pieceNames(visual)).toEqual([]);
   });
 
-  it('keeps the pieces on their own materials through every overlay and weapon swap', () => {
+  it('keeps the pieces on their kit materials through every overlay and weapon swap', async () => {
+    const { moonwingMaterials } = await import('../src/render/characters/moonwing_adornment');
+    const { gloamveilMaterials } = await import('../src/render/characters/gloamveil_veil');
+    const kit = new Set<THREE.Material>([...moonwingMaterials(), ...gloamveilMaterials()]);
+    for (const [key, shift] of [
+      ['player_druid', (v: Visual) => v.setMoonkin(true)],
+      ['player_priest', (v: Visual) => v.setShadowform(true)],
+    ] as const) {
+      const visual = new CharacterVisual(key, 0xffffff, 0);
+      shift(visual);
+      const body = visual.root.getObjectByName('body') as THREE.Mesh;
+      const bodyOriginal = body.material;
+      // Pinned to the KIT instances, not a snapshot taken after the tint ran:
+      // a tint that cloned a piece would fail here.
+      const onKit = (): void => {
+        const pieces = adornments(visual);
+        expect(pieces.length).toBeGreaterThan(0);
+        for (const mesh of pieces) {
+          expect(kit.has(mesh.material as THREE.Material)).toBe(true);
+          expect(mesh.castShadow).toBe(false);
+        }
+      };
+      onKit();
+      // The body DOES take the overlays: the checks are meaningful only
+      // because each swap really ran.
+      visual.setGhost(true);
+      expect(body.material).not.toBe(bodyOriginal);
+      onKit();
+      visual.setGhost(false);
+      visual.setSoulRend(true);
+      expect(body.material).not.toBe(bodyOriginal);
+      onKit();
+      visual.setSoulRend(false);
+      // A weapon swap re-traverses the model (rebuildCasters) and re-snapshots
+      // every mesh it meets; the pieces must not enter that snapshot.
+      visual.setShadow(true);
+      visual.setWeapon('bogoak_staff');
+      onKit();
+      visual.setGhost(true, 'stealth');
+      onKit();
+      visual.dispose();
+    }
+  });
+
+  it('hides the pieces while the body is a stealth or spirit ghost', () => {
     const visual = new CharacterVisual('player_druid', 0xffffff, 0);
     visual.setMoonkin(true);
-    const own = new Map(adornments(visual).map((mesh) => [mesh, mesh.material] as const));
-    expect(own.size).toBe(3);
-    const body = visual.root.getObjectByName('body') as THREE.Mesh;
-    const bodyOriginal = body.material;
-    const unchanged = (): void => {
-      for (const [mesh, material] of own) {
-        expect(mesh.material).toBe(material);
-        expect(mesh.castShadow).toBe(false);
-      }
-    };
-    // The body DOES take the tint and the ghost overlays: the check below is
-    // meaningful only because the swap really ran.
-    visual.setGhost(true);
-    expect(body.material).not.toBe(bodyOriginal);
-    unchanged();
-    visual.setGhost(false);
-    // A weapon swap re-traverses the model (rebuildCasters) and re-snapshots
-    // every mesh it meets; the pieces must not enter that snapshot.
-    visual.setShadow(true);
-    visual.setWeapon('bogoak_staff');
-    unchanged();
-    visual.setGhost(true);
-    unchanged();
-    visual.setGhost(false);
-    unchanged();
+    const roots = ['moonwing_head', 'moonwing_wing_left', 'moonwing_wing_right'].map(
+      (name) => visual.root.getObjectByName(name) as THREE.Object3D,
+    );
+    expect(roots.every((root) => root.visible)).toBe(true);
+    for (const style of ['stealth', 'spirit'] as const) {
+      visual.setGhost(true, style);
+      expect(roots.some((root) => root.visible)).toBe(false);
+      visual.setGhost(false);
+      expect(roots.every((root) => root.visible)).toBe(true);
+    }
+    visual.dispose();
+  });
+
+  it('leaves the veil off a Combat Mech body', async () => {
+    // The mech is fetched on demand, never at boot; ride its real preload.
+    const { preloadMechAssets } = await import('../src/render/characters/assets');
+    await preloadMechAssets();
+    const visual = new CharacterVisual('player_mech', 0xffffff, 0);
+    visual.setShadowform(true);
+    expect(pieceNames(visual)).toEqual([]);
+    visual.dispose();
+  });
+
+  it('holds the first mount behind the injected compile gate', () => {
+    const visual = new CharacterVisual('player_druid', 0xffffff, 0);
+    const settles: (() => void)[] = [];
+    // The Moonwing tint stages its transparent clones through the same gate;
+    // count only what the adornments hand it.
+    visual.setFarBakeGate((target, settle) => {
+      if (target.name.startsWith('moonwing_')) settles.push(() => settle());
+    });
+    visual.setMoonkin(true);
+    const head = visual.root.getObjectByName('moonwing_head') as THREE.Object3D;
+    expect(settles.length).toBe(3);
+    expect(head.visible).toBe(false);
+    for (const settle of settles) settle();
+    visual.update(0.01, idleState(), true, false);
+    expect(head.visible).toBe(true);
     visual.dispose();
   });
 
@@ -137,14 +207,7 @@ describe('CharacterVisual form adornments', () => {
     visual.setMoonkin(true);
     const wing = visual.root.getObjectByName('moonwing_wing_right') as THREE.Object3D;
     const folded = wing.rotation.y;
-    const state = {
-      moving: false,
-      running: false,
-      airborne: false,
-      casting: false,
-      dead: false,
-    } as unknown as Parameters<Visual['update']>[1];
-    visual.update(1, state, true, false);
+    visual.update(1, idleState(), true, false);
     expect(wing.rotation.y).toBeLessThan(folded);
     visual.dispose();
   });

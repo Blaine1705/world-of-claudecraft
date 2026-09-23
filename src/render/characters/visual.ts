@@ -2190,6 +2190,7 @@ export class CharacterVisual {
     if (on === this.ghosted && style === this.ghostStyle) return;
     this.ghosted = on;
     this.ghostStyle = style;
+    this.syncFormAdornments();
     this.applyVisualMaterials();
   }
 
@@ -2312,8 +2313,13 @@ export class CharacterVisual {
   }
 
   private syncFormAdornments(): void {
-    this.formAdornments ??= new FormAdornments(this.model, this.look !== null);
-    this.formAdornments.sync(this.moonkin, this.shadowform);
+    if (this.disposed || (!this.formAdornments && !this.moonkin && !this.shadowform)) return;
+    this.formAdornments ??= new FormAdornments(
+      this.model,
+      this.look ? 'composed' : this.key === 'player_mech' ? 'replacement' : 'classRig',
+      () => this.farBakeGate,
+    );
+    this.formAdornments.sync(this.moonkin, this.shadowform, this.ghosted);
   }
 
   pulseMetamorphosis(strength = 1): void {
