@@ -19,6 +19,7 @@ import type { PlacedAsset } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { markPointLightSource } from './point_light_carriers_core';
 
 // Height (yards) a placed model is normalized to before its per-placement scale,
 // so arbitrary catalogue GLBs (which vary wildly in source units) land sanely.
@@ -100,6 +101,9 @@ interface Entry {
 
 export class PlacedAssetsView {
   readonly group: THREE.Group;
+  /** Point lights a placed GLB carries (glTF punctual lights), handed to the
+   *  world's carriers as a source list: three never gathers them itself. */
+  readonly pointLights: THREE.PointLight[] = [];
   private readonly seed: number;
   private readonly entries = new Map<number, Entry>();
   private readonly templates = new Map<string, Promise<TemplateInfo | null>>();
@@ -151,6 +155,11 @@ export class PlacedAssetsView {
           m.castShadow = true;
           m.receiveShadow = true;
         }
+        const light = o as THREE.PointLight;
+        if (light.isPointLight) {
+          markPointLightSource(light);
+          this.pointLights.push(light);
+        }
       });
       entry.model = model;
       entry.info = info;
@@ -196,7 +205,13 @@ export class PlacedAssetsView {
     if (!entry) return;
     entry.removed = true;
     this.entries.delete(index);
-    if (entry.model) this.group.remove(entry.model);
+    if (entry.model) {
+      this.group.remove(entry.model);
+      entry.model.traverse((o) => {
+        const at = this.pointLights.indexOf(o as THREE.PointLight);
+        if (at >= 0) this.pointLights.splice(at, 1);
+      });
+    }
     // Clones share the loader-cached template geometry/materials: never dispose
     // them here. The draped rings are per-entry allocations, so those we do.
     this.dropFootprint(entry);

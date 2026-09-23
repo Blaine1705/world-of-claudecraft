@@ -607,11 +607,18 @@ GPU work signs. Each rule names its seam and its guard.
   `interior_light_rig.ts` instead. The outdoor hemisphere fill constants live in
   `outdoor_light_rig_core.ts`: the Lambert terrain derives its `uTerrainFillBoost`
   from them (`terrainFillBoostTarget`), so retune them there, never inline.
-  Point lights ride the pad budget
-  (`point_light_budget.ts`). Guards: `tests/render_light_census_pin.test.ts` (the
-  allowlist of every non-point light constructed under `src/render`) and
-  `tests/point_light_budget.test.ts`. There is no exception: the Wildheart
-  caldera rig used to add a fill pair to the world scene at interior build, and
+  Point lights ride the budget
+  (`point_light_budget.ts`) and reach three only through the carriers
+  (`point_light_carriers.ts`): a fixed set of lights, the only ones three gathers
+  in the world scene, packed each render with the live sources first because the
+  lit programs stop their point loop at the first black slot. A new point light in
+  the world scene is a carrier source (marked, and in a listed registry), never a
+  light three gathers itself. Guards: `tests/render_light_census_pin.test.ts` (the
+  allowlist of every non-point light constructed under `src/render`),
+  `tests/point_light_budget.test.ts` and `tests/point_light_carriers.test.ts` (the
+  allowlist of every point-light producer and its route to a carrier). There is
+  no exception: the Wildheart caldera rig used to add a fill pair to the world
+  scene at interior build, and
   because interiors are never removed, every material drawn after a Palm Reach
   visit relinked under the new census (132 programs at one graveyard in the
   2026-09-12 hunt). Its grade is the `wildheartField` state of the rig now.

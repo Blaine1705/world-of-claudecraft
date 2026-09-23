@@ -931,7 +931,10 @@ const MONOLITHS: MonolithRow[] = [
     // 12790 -> 12789 when the Warrior kit textures moved to demand loading
     // (the boot-time sheet upload loop and its comment went, the kit host
     // gained its assets line). Exact count.
-    ceiling: 12789,
+    // LOWERED 12789 -> 12761 when the point-light pads and the bounded prewarm
+    // pad re-pin went: the carriers (src/render/point_light_carriers.ts) pin
+    // the count now. Exact count.
+    ceiling: 12761,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

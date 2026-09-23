@@ -433,7 +433,7 @@ import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { legendaryRegaliaActive, legendaryRegaliaEmitDt } from './legendary_regalia_core';
 import { stepLichHeartbeat } from './lich_audio_state_core';
-import { LightPulses } from './light_pulses';
+import { LightPulses, lightPulsePoolSize } from './light_pulses';
 import {
   createPrewarmPacing,
   markPrewarmPacingReveal,
@@ -556,12 +556,9 @@ import { projectionScalePixels } from './perceptual_lod_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
-import {
-  countDrawnPointLights,
-  pointLightPadCount,
-  type RankedPointLight,
-  reconcileViewPointLights,
-} from './point_light_budget';
+import { type RankedPointLight, reconcileViewPointLights } from './point_light_budget';
+import { attachPointLightCarriers, NO_POINT_LIGHTS } from './point_light_carriers';
+import { markPointLightSource } from './point_light_carriers_core';
 import { buildComposer, type PostPipeline } from './post';
 import { withSceneHiddenForPresentationPrewarm } from './presentation_prewarm';
 import { createPreviewPrewarmLane } from './preview_prewarm_lane';
@@ -1691,10 +1688,6 @@ export class Renderer {
   // static fire lights - otherwise numPointLights toggles as a lit object enters or
   // leaves view and every lit material recompiles (an open-world travel hitch).
   private viewLights: THREE.PointLight[] = [];
-  // Renderer-owned pad lights (intensity 0, distance 0) that keep the VISIBLE
-  // point-light count pinned at GFX.maxPointLights from the first frame on,
-  // even when fewer real lights than the budget exist: see pointLightPadCount.
-  private lightPads: THREE.PointLight[] = [];
   private lightRankDirty = true; // viewLights set changed: rebuild the budget rank
   private effectivePointLights = 0;
 
@@ -2555,17 +2548,16 @@ export class Renderer {
     // point-light count stays constant as the player travels (constant
     // numPointLights -> materials never recompile for a light-count change).
     this.fireLights.push(this.impactSite.light);
-    // Pin numPointLights at the tier constant from the very first frame: real
-    // fire lights start hidden (budgetFireLights reveals the nearest ones) and
-    // renderer-owned pads fill the rest of the visible count, so no material
-    // ever recompiles for a light-count change - including at boot, before the
-    // first budget pass, while the boot prewarm compiles the pinned variant.
+    // Pin numPointLights from the very first frame: three gathers only the
+    // carriers, one per budget slot and pulse, and real fire lights start
+    // hidden until the budget ranks them as carrier sources.
     for (const light of this.fireLights) light.visible = false;
-    for (let i = 0; i < GFX.maxPointLights; i++) {
-      const pad = new THREE.PointLight(0xffffff, 0, 0, 2);
-      this.scene.add(pad);
-      this.lightPads.push(pad);
-    }
+    attachPointLightCarriers(this.scene, GFX.maxPointLights + lightPulsePoolSize(), [
+      () => this.fireLights,
+      () => this.viewLights,
+      () => this.lightPulses.lights,
+      () => this.placedAssetsView?.pointLights ?? NO_POINT_LIGHTS,
+    ]);
     this.propsView = props;
 
     // Eastbrook's replacement town is a distinct, stable scene subtree. Its
@@ -2640,7 +2632,7 @@ export class Renderer {
     // updateVisibility toggles this group every frame AFTER the budget pass, so
     // its light has to ride the budget rather than stand permanently visible,
     // AND has to leave the group: a counted light whose ancestor the sweep hides
-    // later in the same frame drops numPointLights for that frame.
+    // later in the same frame blinks out for that frame.
     reparentStrandedLightsToScene(this.scene, this.jailScene.group);
     for (const light of this.jailScene.glowLights) this.fireLightAdopter.adopt(light);
 
@@ -4964,9 +4956,9 @@ export class Renderer {
     this.nythraxisMechanicVisuals?.update(dt, this.reducedMotion());
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // The meteor fx registers and releases budget lights AFTER the pass (a
-    // landing frees the visible fall light), which would dip the pinned
-    // visible count for this frame, and numPointLights is in every lit
-    // material's program cache key. Re-run the budget, pads included.
+    // landing swaps the fall light for the impact light), so re-run the
+    // budget: the new light is ranked as a carrier source and shines on the
+    // very frame it lands instead of one frame late.
     if (this.lightRankDirty) this.budgetFireLights(p.pos.x, p.pos.z);
     this.necromancyGroundFx.update(dt, this.reducedMotion());
     this.necromancyArmyPortalFx.update(dt, this.reducedMotion());
@@ -5264,7 +5256,6 @@ export class Renderer {
   private renderBoundedPrewarmRoot(group: THREE.Group, childRoot: THREE.Object3D): void {
     const sceneVisibility = this.scene.children.map((entry) => entry.visible);
     const groupVisibility = group.children.map((entry) => entry.visible);
-    const previousPadVisibility = this.lightPads.map((pad) => pad.visible);
     const previousTarget = this.webgl.getRenderTarget();
     const previousShadowAutoUpdate = this.webgl.shadowMap.autoUpdate;
     const previousShadowNeedsUpdate = this.webgl.shadowMap.needsUpdate;
@@ -5276,22 +5267,6 @@ export class Renderer {
       }
       group.visible = true;
       for (const entry of group.children) entry.visible = entry === childRoot;
-
-      // The mask above hides entity views, and their nested chosen lights
-      // leave Three's counted set with them, out of band of the budget pass:
-      // NUM_POINT_LIGHTS would drift below the pinned total for THIS render
-      // only, and every first-drawn material would synchronously link a
-      // program variant the live render never draws (the measured 100-280 ms
-      // prewarm-unit stalls). Recount in the masked state and raise the pads
-      // so this render draws the exact variant the compile lane linked.
-      const boundedDrawn = countDrawnPointLights(this.lightRank, this.scene);
-      const boundedPadCount = Math.min(
-        this.lightPads.length,
-        pointLightPadCount(boundedDrawn, GFX.maxPointLights),
-      );
-      for (let i = 0; i < this.lightPads.length; i++) {
-        this.lightPads[i].visible = i < boundedPadCount;
-      }
 
       // Keep the real shadow-enabled colour-program variant, but do not rebuild
       // the ultra tiers' 4096px shadow map for every child upload. The shadow
@@ -5305,9 +5280,6 @@ export class Renderer {
       this.webgl.setRenderTarget(previousTarget);
       this.webgl.shadowMap.autoUpdate = previousShadowAutoUpdate;
       this.webgl.shadowMap.needsUpdate = previousShadowNeedsUpdate;
-      for (let i = 0; i < this.lightPads.length; i++) {
-        this.lightPads[i].visible = previousPadVisibility[i];
-      }
       for (let i = 0; i < group.children.length; i++) {
         group.children[i].visible = groupVisibility[i];
       }
@@ -11609,7 +11581,7 @@ export class Renderer {
     this.nythraxisMechanicVisuals?.update(dt, this.reducedMotion());
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // Same post-fx budget recovery as the prewarm frame path: a landing or
-    // expiry must not dip the pinned visible count for the frame it lands on.
+    // expiry is ranked on the frame it lands on.
     if (this.lightRankDirty) this.budgetFireLights(p.pos.x, p.pos.z, true);
     this.necromancyGroundFx.update(dt, this.reducedMotion());
     this.necromancyArmyPortalFx.update(dt, this.reducedMotion());
@@ -12032,6 +12004,7 @@ export class Renderer {
   private registerBudgetPointLight(light: THREE.PointLight): void {
     light.userData.budgetDynamic = true;
     light.visible = false;
+    markPointLightSource(light);
     this.viewLights.push(light);
     this.lightRankDirty = true;
   }
@@ -12055,13 +12028,12 @@ export class Renderer {
   // array while numPointLights moves, which is the stall this prevents.
   private budgetFireLights(px: number, pz: number, flicker = false): void {
     // The pass itself lives in fire_light_registry.ts; the renderer only owns
-    // the registries, the pads and the clock it reads from.
+    // the registries and the clock it reads from.
     runFireLightBudgetPass({
       rank: this.lightRank,
       rankDirty: this.lightRankDirty,
       fireLights: this.fireLights,
       viewLights: this.viewLights,
-      pads: this.lightPads,
       px,
       pz,
       // maxPointLights is the per-tier constant, so the live governor
