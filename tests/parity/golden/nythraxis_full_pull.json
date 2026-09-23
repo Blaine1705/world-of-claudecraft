@@ -17337,11 +17337,11 @@
       "tick": 1248,
       "time": 62.4,
       "nextId": 1023,
-      "state": "31ff6fbb",
-      "events": "31ced149",
+      "state": "83736314",
+      "events": "37f2b712",
       "rng": {
-        "draws": 10837,
-        "digest": "85daf398"
+        "draws": 10844,
+        "digest": "93f5b0e9"
       },
       "label": "death",
       "players": [
@@ -17478,11 +17478,11 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 3,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -17656,11 +17656,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -17830,11 +17830,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -18004,11 +18004,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -18178,11 +18178,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -18529,6 +18529,19 @@
               },
               {
                 "count": 1,
+                "instance": {
+                  "lootQuality": {
+                    "tier": 1,
+                    "version": 1,
+                    "weights": [
+                      181,
+                      90,
+                      589,
+                      661,
+                      37
+                    ]
+                  }
+                },
                 "itemId": "gravecourt_hewer"
               }
             ]
@@ -18812,73 +18825,73 @@
       "tick": 1250,
       "time": 62.5,
       "nextId": 1023,
-      "state": "b13f17e1",
+      "state": "5b787276",
       "events": "741638a5",
       "rng": {
-        "draws": 10856,
-        "digest": "e09814bf"
+        "draws": 10863,
+        "digest": "b24e3e98"
       }
     },
     {
       "tick": 1260,
       "time": 63,
       "nextId": 1023,
-      "state": "8f90ae2b",
+      "state": "d65d969c",
       "events": "741638a5",
       "rng": {
-        "draws": 10969,
-        "digest": "efed352f"
+        "draws": 10975,
+        "digest": "46dadfd2"
       }
     },
     {
       "tick": 1270,
       "time": 63.5,
       "nextId": 1023,
-      "state": "9f5752cc",
+      "state": "0e72f493",
       "events": "741638a5",
       "rng": {
-        "draws": 11051,
-        "digest": "52a680e0"
+        "draws": 11056,
+        "digest": "6bceab62"
       }
     },
     {
       "tick": 1280,
       "time": 64,
       "nextId": 1023,
-      "state": "165e9a70",
+      "state": "bd011e47",
       "events": "741638a5",
       "rng": {
-        "draws": 11141,
-        "digest": "6577ac86"
+        "draws": 11149,
+        "digest": "fdf4f7eb"
       }
     },
     {
       "tick": 1290,
       "time": 64.5,
       "nextId": 1023,
-      "state": "77951061",
+      "state": "5a7f68f6",
       "events": "741638a5",
       "rng": {
-        "draws": 11235,
-        "digest": "42d9220b"
+        "draws": 11242,
+        "digest": "e946ad09"
       }
     },
     {
       "tick": 1300,
       "time": 65,
       "nextId": 1023,
-      "state": "18cc4565",
+      "state": "c9f6183a",
       "events": "741638a5",
       "rng": {
-        "draws": 11332,
-        "digest": "1e17dbf0"
+        "draws": 11335,
+        "digest": "b360dd31"
       }
     },
     {
       "tick": 1308,
       "time": 65.4,
       "nextId": 1023,
-      "state": "70a2bdf3",
+      "state": "a03cb038",
       "events": "73c8d5ba",
       "rng": {
         "draws": 11388,
@@ -19019,11 +19032,11 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 3,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -19197,11 +19210,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -19371,11 +19384,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -19545,11 +19558,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -19719,11 +19732,11 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 1,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 1,
                   "source": {}
                 }
               ]
@@ -20069,6 +20082,19 @@
               },
               {
                 "count": 1,
+                "instance": {
+                  "lootQuality": {
+                    "tier": 1,
+                    "version": 1,
+                    "weights": [
+                      181,
+                      90,
+                      589,
+                      661,
+                      37
+                    ]
+                  }
+                },
                 "itemId": "gravecourt_hewer"
               }
             ]
