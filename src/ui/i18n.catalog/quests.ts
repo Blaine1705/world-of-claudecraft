@@ -456,6 +456,13 @@ const questStringsEn = {
       treasureVaultOpened: 'The ground gives way. A buried hoard lies open before you.',
       treasureVaultLooted: 'The hoard holds {money} and {items}.',
       treasureVaultCapped: 'You have shared in enough hoards today; this one pays you nothing.',
+      // The goblin thief (src/sim/rift/hoard_goblin.ts): a banner, its line, and
+      // the rule in the chat. {seconds} is its escape bar, {minutes} how long
+      // it lingers untouched.
+      hoardGoblinSighted: 'A goblin thief appears!',
+      hoardGoblinSightedHint: 'Kill it before it escapes with the gold!',
+      hoardGoblinExplain:
+        'A goblin thief is hiding in this hoard with a sack of stolen gold. It never fights back, it only runs. Your first hit starts a {seconds}-second escape bar: if it is still alive when the bar runs out, it opens a portal and is gone with the gold. Left alone, it slips away after {minutes} minutes. Kill it in time and everyone in the room is paid in gold.',
     },
     errors: {
       unavailable: 'That quest is not available.',

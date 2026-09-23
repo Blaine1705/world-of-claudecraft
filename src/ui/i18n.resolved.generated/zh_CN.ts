@@ -11660,7 +11660,10 @@ export const zh_CN: EnTranslations = {
       "treasureMapUpgraded": "地图以更精细的墨水重绘：现在它是一张{map}。",
       "treasureVaultOpened": "地面塌陷。一处埋藏的宝藏在你面前敞开。",
       "treasureVaultLooted": "宝藏中有{money}和{items}。",
-      "treasureVaultCapped": "你今天已经分享了足够多的宝藏；这一处不会给你任何奖励。"
+      "treasureVaultCapped": "你今天已经分享了足够多的宝藏；这一处不会给你任何奖励。",
+      "hoardGoblinSighted": "哥布林窃贼出现了！",
+      "hoardGoblinSightedHint": "在它带着金币逃走前干掉它！",
+      "hoardGoblinExplain": "一只背着一袋赃金的哥布林窃贼藏在这处宝藏里。它从不还手，只会逃跑。你的第一次攻击会开启{seconds}秒的逃跑计时条：计时条走完时它若还活着，就会打开传送门带着金币消失。如果没人碰它，它会在{minutes}分钟后自行离开。及时击杀它，房间里的所有人都能获得金币。"
     },
     "errors": {
       "unavailable": "该任务不可用。",

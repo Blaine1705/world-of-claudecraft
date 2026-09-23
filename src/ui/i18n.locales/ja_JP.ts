@@ -5574,6 +5574,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.logs.treasureVaultLooted': '財宝には{money}と{items}が入っていた。',
   'questUi.logs.treasureVaultCapped':
     '今日はもう十分な数の財宝の分け前を得ました。この財宝からは何も得られません。',
+  'questUi.logs.hoardGoblinSighted': 'ゴブリンの盗賊が現れた！',
+  'questUi.logs.hoardGoblinSightedHint': '金貨を持って逃げられる前に倒せ！',
+  'questUi.logs.hoardGoblinExplain':
+    '盗んだ金貨の袋を背負ったゴブリンの盗賊がこの財宝に潜んでいる。反撃はせず、ひたすら逃げ回る。最初の一撃で{seconds}秒の逃走バーが始まる。バーが尽きた時にまだ生きていれば、ポータルを開いて金貨ごと消えてしまう。誰も手を出さなければ{minutes}分後に立ち去る。間に合えば、部屋にいる全員が金貨を受け取れる。',
   'hudChrome.riftTracker.floor': 'フロア {current}/{total}',
   'hudChrome.riftTracker.closesIn': 'リフトは{time}後に閉じます',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',

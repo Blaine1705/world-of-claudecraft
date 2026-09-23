@@ -38,7 +38,12 @@ import { riftFx } from './fx';
 import { tickHoardAddCasts } from './hoard_add_casts';
 import { hoardBossCueViews, tickHoardBossMechanics } from './hoard_boss';
 import { tickHoardControlCasts } from './hoard_control_casts';
-import { dropHoardGoblin, maybeSpawnHoardGoblin, tickHoardGoblins } from './hoard_goblin';
+import {
+  announceHoardGoblin,
+  dropHoardGoblin,
+  maybeSpawnHoardGoblin,
+  tickHoardGoblins,
+} from './hoard_goblin';
 import { tickHoardLightningStrikes } from './hoard_lightning_strike';
 import { rescaleVaultForEntrants } from './hoard_rescale';
 import {
@@ -839,6 +844,7 @@ export function enterRift(
     color: '#b9f',
     pid: r.meta.entityId,
   });
+  announceHoardGoblin(ctx, inst, r.meta.entityId);
   if (inst.upgrade) {
     const detail = floor.isBoss
       ? inst.upgrade.boss.concept

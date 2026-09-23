@@ -14372,6 +14372,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'questUi.logs.treasureVaultLooted': 'El tesoro contiene {money} y {items}.',
   'questUi.logs.treasureVaultCapped':
     'Hoy ya has compartido suficientes tesoros; este no te da nada.',
+  'questUi.logs.hoardGoblinSighted': '¡Ha aparecido un goblin ladrón!',
+  'questUi.logs.hoardGoblinSightedHint': '¡Mátalo antes de que se escape con el oro!',
+  'questUi.logs.hoardGoblinExplain':
+    'Un goblin ladrón se esconde en este tesoro con un saco de oro robado. Nunca ataca, solo huye. Tu primer golpe activa una barra de huida de {seconds} segundos: si sigue vivo cuando se acaba, abre un portal y se escapa con el oro. Si nadie lo toca, se marcha a los {minutes} minutos. Mátalo a tiempo y todos los de la sala cobran oro.',
   'hudChrome.riftTracker.floor': 'Piso {current} de {total}',
   'hudChrome.riftTracker.closesIn': 'Se cierra en {time}',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',

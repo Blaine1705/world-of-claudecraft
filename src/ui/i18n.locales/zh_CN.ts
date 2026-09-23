@@ -5359,6 +5359,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.logs.treasureVaultOpened': '地面塌陷。一处埋藏的宝藏在你面前敞开。',
   'questUi.logs.treasureVaultLooted': '宝藏中有{money}和{items}。',
   'questUi.logs.treasureVaultCapped': '你今天已经分享了足够多的宝藏；这一处不会给你任何奖励。',
+  'questUi.logs.hoardGoblinSighted': '哥布林窃贼出现了！',
+  'questUi.logs.hoardGoblinSightedHint': '在它带着金币逃走前干掉它！',
+  'questUi.logs.hoardGoblinExplain':
+    '一只背着一袋赃金的哥布林窃贼藏在这处宝藏里。它从不还手，只会逃跑。你的第一次攻击会开启{seconds}秒的逃跑计时条：计时条走完时它若还活着，就会打开传送门带着金币消失。如果没人碰它，它会在{minutes}分钟后自行离开。及时击杀它，房间里的所有人都能获得金币。',
   'hudChrome.riftTracker.floor': '第 {current} 层，共 {total} 层',
   'hudChrome.riftTracker.closesIn': '裂隙将在 {time} 后关闭',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',

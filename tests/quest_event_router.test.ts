@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { SimEvent } from '../src/sim/types';
 import { applyQuestEventPresentation } from '../src/ui/hud/quest/quest_event_router';
 import { HUD_LOG } from '../src/ui/hud_tones';
+import { HOARD_GOBLIN_BANNER_MS } from '../src/ui/quest_event_view';
 
 const playUi = vi.hoisted(() => vi.fn());
 vi.mock('../src/game/sfx', () => ({ sfx: { playUi } }));
@@ -37,6 +38,33 @@ describe('quest event router', () => {
     expect(applyQuestEventPresentation(hud, ev)).toBe(false);
     expect(playUi).not.toHaveBeenCalled();
     expect(hud.worldQuestPuzzleWindow.applyEventPresentation).not.toHaveBeenCalled();
+  });
+
+  it('shows the goblin warning as a dressed banner and explains the rule in the chat', () => {
+    const hud = fakeHud();
+    const ev = { type: 'hoardGoblinSighted', escapeSec: 20, idleSec: 120 } as SimEvent;
+    expect(applyQuestEventPresentation(hud, ev)).toBe(true);
+    expect(hud.showBanner).toHaveBeenCalledWith(
+      'A goblin thief appears!',
+      true,
+      '/ui/mobs/hoard_coinsack_scurrier.webp',
+      'default',
+      'Kill it before it escapes with the gold!',
+      HOARD_GOBLIN_BANNER_MS,
+    );
+    expect(HOARD_GOBLIN_BANNER_MS).toBeGreaterThan(2600);
+    const line = hud.log.mock.calls[0]?.[0] as string;
+    expect(line).toContain('20-second escape bar');
+    expect(line).toContain('after 2 minutes');
+    expect(playUi).toHaveBeenLastCalledWith('quest_ready');
+  });
+
+  it('keeps an undressed banner on the plain call', () => {
+    const hud = fakeHud();
+    applyQuestEventPresentation(hud, { type: 'treasureVaultOpened', rarity: 'rare' } as SimEvent);
+    expect(hud.showBanner).toHaveBeenCalledWith(
+      'The ground gives way. A buried hoard lies open before you.',
+    );
   });
 
   it('logs progress on the progress tone', () => {

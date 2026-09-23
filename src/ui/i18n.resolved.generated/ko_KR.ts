@@ -11660,7 +11660,10 @@ export const ko_KR: EnTranslations = {
       "treasureMapUpgraded": "지도가 더 고운 잉크로 다시 그려졌습니다: 이제 {map}입니다.",
       "treasureVaultOpened": "땅이 꺼집니다. 묻힌 보물이 눈앞에 열려 있습니다.",
       "treasureVaultLooted": "보물에는 {money}와(과) {items}이(가) 들어 있습니다.",
-      "treasureVaultCapped": "오늘은 이미 충분한 보물을 나눠 받았습니다. 이번 보물에서는 아무것도 받지 못합니다."
+      "treasureVaultCapped": "오늘은 이미 충분한 보물을 나눠 받았습니다. 이번 보물에서는 아무것도 받지 못합니다.",
+      "hoardGoblinSighted": "고블린 도둑이 나타났습니다!",
+      "hoardGoblinSightedHint": "금화를 가지고 달아나기 전에 처치하세요!",
+      "hoardGoblinExplain": "훔친 금화 자루를 멘 고블린 도둑이 이 보물 안에 숨어 있습니다. 반격하지 않고 도망치기만 합니다. 첫 공격을 가하면 {seconds}초짜리 도주 막대가 시작됩니다. 막대가 다 찰 때까지 살아 있으면 차원문을 열고 금화와 함께 사라집니다. 아무도 건드리지 않으면 {minutes}분 뒤에 떠납니다. 제때 처치하면 방에 있는 모두가 금화를 받습니다."
     },
     "errors": {
       "unavailable": "그 퀘스트는 이용할 수 없습니다.",

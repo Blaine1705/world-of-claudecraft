@@ -5567,6 +5567,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.logs.treasureVaultOpened': 'Земля проваливается. Перед вами открывается зарытый клад.',
   'questUi.logs.treasureVaultLooted': 'В кладе: {money} и {items}.',
   'questUi.logs.treasureVaultCapped': 'Сегодня вы уже получили долю в достаточном числе кладов; этот ничего вам не даст.',
+  'questUi.logs.hoardGoblinSighted': 'Появился гоблин-воришка!',
+  'questUi.logs.hoardGoblinSightedHint': 'Убейте его, пока он не сбежал с золотом!',
+  'questUi.logs.hoardGoblinExplain':
+    'В этом кладе прячется гоблин-воришка с мешком краденого золота. Он не сражается, а только убегает. Ваш первый удар запускает полосу побега на {seconds} с: если к её концу он жив, он открывает портал и исчезает вместе с золотом. Если его не трогать, он уйдёт сам через {minutes} мин. Успейте убить его, и золото получат все, кто находится в зале.',
   'hudChrome.riftTracker.floor': 'Этаж {current} из {total}',
   'hudChrome.riftTracker.closesIn': 'Разлом закроется через {time}',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',

@@ -7,6 +7,7 @@ import { VAULT_GUEST_PAYOUTS_PER_CYCLE } from '../src/sim/content/treasure_maps'
 import { riftInstanceOrigin } from '../src/sim/data';
 import { HOARD_GOBLIN_ESCAPE_CAST } from '../src/sim/rift/hoard_control_cast_ids';
 import {
+  announceHoardGoblin,
   HOARD_GOBLIN_CHANCE,
   HOARD_GOBLIN_ESCAPE_SEC,
   HOARD_GOBLIN_IDLE_SEC,
@@ -224,5 +225,52 @@ describe('the Coinsack Scurrier', () => {
     inst.emptyFor = 1e6;
     run(sim, 1.1);
     expect(sim.entities.has(goblin!.id)).toBe(false);
+  });
+
+  it('warns the player climbing into its room, with its live clocks', () => {
+    const { sim } = hoard();
+    const sighted = run(sim, DT).filter((ev) => ev.type === 'hoardGoblinSighted');
+    expect(sighted).toHaveLength(1);
+    expect(sighted[0]).toMatchObject({
+      escapeSec: HOARD_GOBLIN_ESCAPE_SEC,
+      idleSec: HOARD_GOBLIN_IDLE_SEC,
+      pid: sim.player.id,
+    });
+  });
+
+  it('says nothing about a goblin already killed, already gone, or to a ghost', () => {
+    const emitted = (sim: Sim) => {
+      const out: SimEvent[] = [];
+      const emit = vi.spyOn(sim.ctx, 'emit').mockImplementation((ev) => void out.push(ev));
+      return { out, emit };
+    };
+    // Killed.
+    let { sim, inst, goblin } = hoard();
+    let spy = emitted(sim);
+    goblin!.dead = true;
+    announceHoardGoblin(sim.ctx, inst, sim.player.id);
+    expect(spy.out).toHaveLength(0);
+    // Gone (escaped or paid: settled).
+    ({ sim, inst } = hoard());
+    spy = emitted(sim);
+    inst.hoardGoblin!.settled = true;
+    announceHoardGoblin(sim.ctx, inst, sim.player.id);
+    expect(spy.out).toHaveLength(0);
+    // A ghost on a corpse run.
+    ({ sim, inst } = hoard());
+    spy = emitted(sim);
+    sim.player.dead = true;
+    announceHoardGoblin(sim.ctx, inst, sim.player.id);
+    expect(spy.out).toHaveLength(0);
+    // No goblin in the room at all.
+    delete inst.hoardGoblin;
+    sim.player.dead = false;
+    announceHoardGoblin(sim.ctx, inst, sim.player.id);
+    expect(spy.out).toHaveLength(0);
+    // And the control: the same call on a living goblin does warn.
+    ({ sim, inst } = hoard());
+    spy = emitted(sim);
+    announceHoardGoblin(sim.ctx, inst, sim.player.id);
+    expect(spy.out.map((ev) => ev.type)).toEqual(['hoardGoblinSighted']);
   });
 });

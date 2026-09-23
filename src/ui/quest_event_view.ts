@@ -9,6 +9,7 @@ import {
   type TreasureMapRarity,
 } from '../sim/content/treasure_maps';
 import { ITEMS, WORLD_QUESTS_BY_ID } from '../sim/data';
+import { HOARD_GOBLIN_TEMPLATE_ID } from '../sim/rift/hoard_goblin';
 import type { SimEvent } from '../sim/types';
 import { questTitle } from './entity_display_core';
 import { itemDisplayName, zoneDisplayName } from './entity_i18n';
@@ -16,12 +17,17 @@ import { cannonResultText } from './hud/vehicle/cannon_tactics_view';
 import { formatList, formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
 import { questProgressEventText } from './quest_progress_text';
+import { targetPortraitUrl } from './target_portrait_view';
 import type { WorldQuestLeyRotation } from './world_quest_ley_view';
 import { worldQuestTraceScoreText } from './world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from './world_quest_view';
 
 export interface QuestEventPresentation {
   bannerText?: string;
+  /** Optional dressing for the big banner: a second line, an icon, a longer hold. */
+  bannerSubtext?: string;
+  bannerIconUrl?: string;
+  bannerDurationMs?: number;
   logText?: string;
   flashText?: string;
   sound?: 'quest_accept' | 'quest_ready' | 'quest_complete';
@@ -190,6 +196,18 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
       const text = t('questUi.logs.treasureVaultOpened');
       return { bannerText: text, logText: text, sound: 'quest_complete' };
     }
+    case 'hoardGoblinSighted':
+      return {
+        bannerText: t('questUi.logs.hoardGoblinSighted'),
+        bannerSubtext: t('questUi.logs.hoardGoblinSightedHint'),
+        bannerIconUrl: targetPortraitUrl(HOARD_GOBLIN_TEMPLATE_ID, true) ?? undefined,
+        bannerDurationMs: HOARD_GOBLIN_BANNER_MS,
+        logText: t('questUi.logs.hoardGoblinExplain', {
+          seconds: formatNumber(event.escapeSec, { maximumFractionDigits: 0 }),
+          minutes: formatNumber(event.idleSec / 60, { maximumFractionDigits: 1 }),
+        }),
+        sound: 'quest_ready',
+      };
     case 'treasureVaultLooted':
       return event.capped
         ? { logText: t('questUi.logs.treasureVaultCapped') }
@@ -209,6 +227,10 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
       return null;
   }
 }
+
+/** The goblin warning holds a little longer than an ordinary banner: it is read
+ *  while the room is still being taken in. */
+export const HOARD_GOBLIN_BANNER_MS = 4500;
 
 function treasureMapName(rarity: TreasureMapRarity): string {
   const def = ownEntry(ITEMS, TREASURE_MAP_ITEM_IDS[rarity]);

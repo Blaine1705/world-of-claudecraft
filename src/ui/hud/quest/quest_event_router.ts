@@ -39,7 +39,18 @@ export function applyQuestEventPresentation(hud: object, ev: SimEvent): boolean 
   if (!questEvent) return false;
   if (questEvent.logText) h.log(questEvent.logText, HUD_LOG.PROGRESS);
   if (questEvent.flashText) h.questBanner.show(questEvent.flashText);
-  if (questEvent.bannerText) h.showBanner(questEvent.bannerText);
+  if (questEvent.bannerText) {
+    if (questEvent.bannerSubtext || questEvent.bannerIconUrl || questEvent.bannerDurationMs)
+      h.showBanner(
+        questEvent.bannerText,
+        true,
+        questEvent.bannerIconUrl,
+        'default',
+        questEvent.bannerSubtext,
+        questEvent.bannerDurationMs,
+      );
+    else h.showBanner(questEvent.bannerText);
+  }
   if (questEvent.sound) sfx.playUi(questEvent.sound);
   if (questEvent.mountOwnedPrompt)
     h.showBanner(

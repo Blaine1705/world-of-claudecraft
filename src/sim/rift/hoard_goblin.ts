@@ -104,6 +104,22 @@ export function maybeSpawnHoardGoblin(
   };
 }
 
+/** Warn a player climbing into a room whose goblin is still there to catch
+ *  (rift/runs.ts enterRift, after the arrival line). Nothing for a goblin
+ *  already killed or gone, or for a ghost on a corpse run. */
+export function announceHoardGoblin(ctx: SimContext, inst: RiftInstance, pid: number): void {
+  const state = inst.hoardGoblin;
+  if (!state || state.settled) return;
+  const mob = ctx.entities.get(state.id);
+  if (!mob || mob.dead || ctx.entities.get(pid)?.dead) return;
+  ctx.emit({
+    type: 'hoardGoblinSighted',
+    escapeSec: HOARD_GOBLIN_ESCAPE_SEC,
+    idleSec: HOARD_GOBLIN_IDLE_SEC,
+    pid,
+  });
+}
+
 export function isHoardGoblin(mob: Entity): boolean {
   return mob.templateId === HOARD_GOBLIN_TEMPLATE_ID;
 }

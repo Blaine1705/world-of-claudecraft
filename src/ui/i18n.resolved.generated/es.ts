@@ -11660,7 +11660,10 @@ export const es: EnTranslations = {
       "treasureMapUpgraded": "El mapa se ha redibujado con tinta más fina: ahora es un {map}.",
       "treasureVaultOpened": "El suelo cede. Un tesoro enterrado se abre ante ti.",
       "treasureVaultLooted": "El tesoro contiene {money} y {items}.",
-      "treasureVaultCapped": "Hoy ya has compartido suficientes tesoros; este no te da nada."
+      "treasureVaultCapped": "Hoy ya has compartido suficientes tesoros; este no te da nada.",
+      "hoardGoblinSighted": "¡Ha aparecido un goblin ladrón!",
+      "hoardGoblinSightedHint": "¡Mátalo antes de que se escape con el oro!",
+      "hoardGoblinExplain": "Un goblin ladrón se esconde en este tesoro con un saco de oro robado. Nunca ataca, solo huye. Tu primer golpe activa una barra de huida de {seconds} segundos: si sigue vivo cuando se acaba, abre un portal y se escapa con el oro. Si nadie lo toca, se marcha a los {minutes} minutos. Mátalo a tiempo y todos los de la sala cobran oro."
     },
     "errors": {
       "unavailable": "Esa misión no está disponible.",
