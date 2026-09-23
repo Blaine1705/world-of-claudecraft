@@ -390,7 +390,9 @@ describe('applyPointLightBudget', () => {
     expect(budgetStart).toBeGreaterThan(releaseStart);
 
     const register = source.slice(registerStart, releaseStart);
-    expect(register).toContain('light.userData.budgetDynamic = true;');
+    expect(register).toContain(
+      "if (typeof light.userData.budgetBase !== 'number') light.userData.budgetDynamic = true;",
+    );
     expect(register).toContain('light.visible = false;');
     expect(register).toContain('markPointLightSource(light);');
     expect(register).toContain('this.viewLights.push(light);');
@@ -401,14 +403,25 @@ describe('applyPointLightBudget', () => {
     expect(release).toContain('this.viewLights.splice(index, 1);');
     expect(release).toContain('this.lightRankDirty = true;');
 
-    // And the warlock meteor fx is actually handed that seam.
+    // The seam object, and the two owners actually handed it: the warlock
+    // meteor fx and every placed-GLB view (the editor's live one included).
+    const seamStart = source.indexOf('private readonly budgetLights = {');
+    expect(seamStart).toBeGreaterThan(-1);
+    const seam = source.slice(seamStart, source.indexOf('};', seamStart));
+    expect(seam).toContain(
+      'register: (light: THREE.PointLight) => this.registerBudgetPointLight(light),',
+    );
+    expect(seam).toContain(
+      'release: (light: THREE.PointLight) => this.releaseBudgetPointLight(light),',
+    );
     const fxStart = source.indexOf('this.warlockMeteorFx = new WarlockMeteorFx(');
     const fxEnd = source.indexOf('this.necromancyGroundFx = new NecromancyGroundFx(', fxStart);
     expect(fxStart).toBeGreaterThan(-1);
     expect(fxEnd).toBeGreaterThan(fxStart);
-    const construction = source.slice(fxStart, fxEnd);
-    expect(construction).toContain('register: (light) => this.registerBudgetPointLight(light),');
-    expect(construction).toContain('release: (light) => this.releaseBudgetPointLight(light),');
+    expect(source.slice(fxStart, fxEnd)).toContain('this.budgetLights,');
+    const placed = [...source.matchAll(/new PlacedAssetsView\(([^)]*)\)/g)].map((m) => m[1]);
+    expect(placed).toHaveLength(2);
+    for (const args of placed) expect(args).toMatch(/, this\.budgetLights$/);
   });
 
   it('a post-pass fx lifecycle re-run ranks the landing light on the frame it lands', () => {

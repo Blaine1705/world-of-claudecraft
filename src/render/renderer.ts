@@ -1695,6 +1695,10 @@ export class Renderer {
   // it hides the light AND dirties the rank, which are only correct together
   // (fire_light_registry.ts explains why). Subsystems get `sink`, which is the
   // same operation shaped like Array.push, so they cannot bypass it.
+  private readonly budgetLights = {
+    register: (light: THREE.PointLight) => this.registerBudgetPointLight(light),
+    release: (light: THREE.PointLight) => this.releaseBudgetPointLight(light),
+  };
   private readonly fireLightAdopter = createFireLightAdopter(
     () => this.fireLights,
     () => {
@@ -2555,8 +2559,7 @@ export class Renderer {
     attachPointLightCarriers(this.scene, GFX.maxPointLights + lightPulsePoolSize(), [
       () => this.fireLights,
       () => this.viewLights,
-      () => this.lightPulses.lights,
-      () => this.placedAssetsView?.pointLights ?? NO_POINT_LIGHTS,
+      () => this.lightPulses?.lights ?? NO_POINT_LIGHTS,
     ]);
     this.propsView = props;
 
@@ -2621,7 +2624,7 @@ export class Renderer {
     // `placedAssets` getter below; the shipped game only ever builds it here.
     const placements = this.sim.cfg.world?.placements;
     if (placements && placements.length > 0) {
-      this.placedAssetsView = new PlacedAssetsView(placements, this.sim.cfg.seed);
+      this.placedAssetsView = new PlacedAssetsView(placements, this.sim.cfg.seed, this.budgetLights);
       setRenderCategory(this.placedAssetsView.group, 'props');
       this.scene.add(this.placedAssetsView.group);
     }
@@ -2939,10 +2942,7 @@ export class Renderer {
         });
       },
       undefined, // keep the deferred-loaded impact texture default
-      {
-        register: (light) => this.registerBudgetPointLight(light),
-        release: (light) => this.releaseBudgetPointLight(light),
-      },
+      this.budgetLights,
     );
     this.necromancyGroundFx = new NecromancyGroundFx(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
@@ -11987,22 +11987,19 @@ export class Renderer {
     );
   }
 
-  // The registration seam for a point light an fx mints mid-session (the
-  // warlock infernal's fall and impact lights). It MUST join the same ranked
-  // budget as fire and view lights: Three counts a light into numPointLights
-  // iff `visible`, that count is part of every lit material's program cache
-  // key, and one unranked light appearing is a synchronous relink of every lit
-  // material in view (the mid-combat stall the pinned count exists to prevent).
-  // Hidden on the way in because the owning fx updates AFTER budgetFireLights
-  // in the frame, so the light must never count unranked; the post-fx recovery
-  // pass (both frame paths re-run the budget when the rank went dirty) ranks
-  // it before this frame renders, and the budget owns `visible` from then on.
-  // Dynamic means
-  // the budget only ever ZEROES the intensity and never restores it, so an fx
-  // that wants a light back must re-drive its own level from BEFORE the pass
-  // (weapon_vfx.ts is the other dynamic owner and does exactly that).
+  // The registration seam for a point light minted mid-session (the warlock
+  // infernal's fall and impact lights, a placed GLB's lamps). It joins the same
+  // ranked budget as fire and view lights and becomes a carrier source at once,
+  // so three never gathers it beside the carriers. Hidden on the way in because
+  // the owning fx updates AFTER budgetFireLights in the frame; the post-fx
+  // recovery pass (both frame paths re-run the budget when the rank went dirty)
+  // ranks it before this frame renders, and the budget owns `visible` from then
+  // on. Dynamic means the budget only ever ZEROES the intensity and never
+  // restores it, so an fx that wants a light back must re-drive its own level
+  // from BEFORE the pass (weapon_vfx.ts is the other dynamic owner and does
+  // exactly that). A light that arrives with its own `budgetBase` is static.
   private registerBudgetPointLight(light: THREE.PointLight): void {
-    light.userData.budgetDynamic = true;
+    if (typeof light.userData.budgetBase !== 'number') light.userData.budgetDynamic = true;
     light.visible = false;
     markPointLightSource(light);
     this.viewLights.push(light);
@@ -12252,7 +12249,7 @@ export class Renderer {
    */
   get placedAssets(): PlacedAssetsView {
     if (!this.placedAssetsView) {
-      this.placedAssetsView = new PlacedAssetsView([], this.sim.cfg.seed);
+      this.placedAssetsView = new PlacedAssetsView([], this.sim.cfg.seed, this.budgetLights);
       setRenderCategory(this.placedAssetsView.group, 'props');
       this.scene.add(this.placedAssetsView.group);
     }

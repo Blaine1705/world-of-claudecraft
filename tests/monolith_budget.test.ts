@@ -933,8 +933,9 @@ const MONOLITHS: MonolithRow[] = [
     // gained its assets line). Exact count.
     // LOWERED 12789 -> 12761 when the point-light pads and the bounded prewarm
     // pad re-pin went: the carriers (src/render/point_light_carriers.ts) pin
-    // the count now. Exact count.
-    ceiling: 12761,
+    // the count now; then 12761 -> 12758 when the fx and placed-GLB lights
+    // shared one registration seam object. Exact count.
+    ceiling: 12758,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

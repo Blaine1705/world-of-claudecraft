@@ -365,8 +365,8 @@ describe('a one-shot scene without carriers', () => {
 // route by which it stays out of three's light array (or is provably live).
 // The world scene's registries: `fireLights` (budget-ranked static lights,
 // marked on adoption and on every rank rebuild), `viewLights` (marked when an
-// entity view is reconciled or an fx registers), the pulses, and the placed
-// GLBs. A new producer is a light three would gather in its traversal slot,
+// entity view is reconciled, or when an fx or a placed GLB registers), and the
+// pulses. A new producer is a light three would gather in its traversal slot,
 // after a black carrier the lit programs have already stopped at.
 const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   'render/battleground.ts':
@@ -459,7 +459,7 @@ describe('every point-light producer is a carrier source', () => {
     expect(POINT_LIGHT_PATTERN.test('const l = light as THREE.PointLight;')).toBe(false);
   });
 
-  it('wires the world scene: the pinned count, the four source lists, and one scene hook', () => {
+  it('wires the world scene: the pinned count, the source lists in order, and one scene hook', () => {
     const renderer = sourceOf('render/renderer.ts');
     const start = renderer.indexOf('attachPointLightCarriers(this.scene, ');
     expect(start, 'the carriers attach moved; re-anchor this pin').toBeGreaterThan(-1);
@@ -467,8 +467,7 @@ describe('every point-light producer is a carrier source', () => {
     expect(call).toContain('GFX.maxPointLights + lightPulsePoolSize()');
     expect(call).toContain('() => this.fireLights,');
     expect(call).toContain('() => this.viewLights,');
-    expect(call).toContain('() => this.lightPulses.lights,');
-    expect(call).toContain('() => this.placedAssetsView?.pointLights ?? NO_POINT_LIGHTS,');
+    expect(call).toContain('() => this.lightPulses?.lights ?? NO_POINT_LIGHTS,');
     expect(renderer.split('attachPointLightCarriers(')).toHaveLength(2);
     expect(renderer).not.toContain('lightPads');
 
@@ -482,7 +481,7 @@ describe('every point-light producer is a carrier source', () => {
     expect(hooks).toEqual(['render/point_light_carriers.ts']);
 
     expect(sourceOf('render/light_pulses.ts')).toContain('markPointLightSource(light);');
-    expect(sourceOf('render/placed_assets.ts')).toContain('markPointLightSource(light);');
+    expect(sourceOf('render/placed_assets.ts')).toContain('this.lights.register(light);');
     expect(sourceOf('editor/asset_thumbs.ts')).toContain('hideBlackPointLights(model);');
   });
 
