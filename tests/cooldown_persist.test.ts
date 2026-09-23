@@ -322,4 +322,69 @@ describe('Sim charge-pool persistence round-trip (anti-relog-refill)', () => {
     });
     expect(e2.cooldowns.has('raging_gale')).toBe(false); // one use stored: pool open
   });
+
+  it('a LEGACY save converts the Frost second Ice Block charge (cap read from known.charges)', () => {
+    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('frost')).toBe(true);
+    const state = {
+      ...sim.serializeCharacter(sim.player.id)!,
+      cooldowns: {
+        abilities: { ice_block: 100 },
+        charges: { ice_block: { spent: 1, cdMax: 240 } },
+      },
+    };
+    const sim2 = new Sim({ seed: 7, playerClass: 'mage', noPlayer: true });
+    const e2 = sim2.entities.get(sim2.addPlayer('mage', 'Frosty', { state }))!;
+    expect(e2.abilityCharges?.ice_block).toEqual({
+      charges: 1,
+      maxCharges: 2,
+      recharge: 100,
+      rechargeLength: 240,
+    });
+    expect(e2.cooldowns.has('ice_block')).toBe(false); // one use stored: pool open
+  });
+
+  it('a restored pool whose cap grew runs one recharge timer per missing use', () => {
+    // A pool saved under a lower cap than it now resolves to (a content or kit
+    // change between the save and the load; nothing reconciles restored pools
+    // against meta.known). The cast gate reshapes it to the resolved cap of 2, and
+    // the new empty slot needs its own timer, or the pool would stick at 1 of 2
+    // once the old timer ran out. The new slot costs a full recharge (no refund).
+    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('frost')).toBe(true);
+    const state = {
+      ...sim.serializeCharacter(sim.player.id)!,
+      cooldowns: {
+        abilityCharges: {
+          ice_block: {
+            charges: 0,
+            maxCharges: 1,
+            recharge: 10,
+            rechargeLength: 240,
+            recharges: [10],
+          },
+        },
+      },
+    };
+    const sim2 = new Sim({ seed: 7, playerClass: 'mage', noPlayer: true });
+    const pid2 = sim2.addPlayer('mage', 'Frosty', { state });
+    const e2 = sim2.entities.get(pid2)!;
+    e2.gcdRemaining = 0;
+    e2.resource = e2.maxResource;
+    sim2.castAbility('ice_block', pid2); // refused (no use stored), reshapes the pool
+    expect(e2.auras.some((a) => a.kind === 'stasis')).toBe(false);
+    expect(e2.abilityCharges?.ice_block).toMatchObject({
+      charges: 0,
+      maxCharges: 2,
+      recharge: 10,
+      recharges: [10, 240],
+    });
+    for (let tick = 0; tick < 201; tick++) updateTimers(e2);
+    expect(e2.abilityCharges?.ice_block?.charges).toBe(1);
+    expect(e2.cooldowns.has('ice_block')).toBe(false);
+    for (let tick = 0; tick < 20 * 240; tick++) updateTimers(e2);
+    expect(e2.abilityCharges?.ice_block?.charges).toBe(2);
+  });
 });
