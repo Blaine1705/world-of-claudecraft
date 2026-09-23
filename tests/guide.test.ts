@@ -96,6 +96,7 @@ import {
 } from '../src/sim/content/vendor_row_gates';
 import { ABILITIES, CAMPS, DUNGEONS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { FINAL_BOSS_DUNGEONS, FLAWLESS_TASKS } from '../src/sim/deeds';
+import { DEV_BADGE_TITLE_DEEDS } from '../src/sim/dev_badge_deeds';
 import { createMob } from '../src/sim/entity';
 import { MASTERWROUGHT_EQUIP_CAP, MASTERWROUGHT_LEGENDARY_CAP } from '../src/sim/equipment_rules';
 import { itemLevel, primaryStatSum } from '../src/sim/item_level';
@@ -242,10 +243,15 @@ const generatedSource = readFileSync(
 // scope because it spoils as much as the name and it is what actually leaked: the deeds arm
 // filtered hidden defs, but a Reliquary title relic published the reward text anyway. Callers
 // that also forbid the bare id prepend it; the module scan below deliberately does not.
+// One scoped exemption: the developer-badge title deeds reward the badge rung's own name
+// ("Artificer", "Runesmith"), which is already public flair (hudChrome.devBadge.tiers, shown on
+// every contributor's nameplate and card), so that title text spoils nothing. Their deed name and
+// criteria stay in scope like any hidden deed's.
+const PUBLIC_TITLE_TEXT_DEEDS = new Set<string>(Object.values(DEV_BADGE_TITLE_DEEDS));
 const hiddenDeedProse = (d: DeedDef): string[] => [
   d.name,
   d.desc,
-  ...(d.reward?.kind === 'title' ? [d.reward.text] : []),
+  ...(d.reward?.kind === 'title' && !PUBLIC_TITLE_TEXT_DEEDS.has(d.id) ? [d.reward.text] : []),
 ];
 
 describe('Guide routes', () => {

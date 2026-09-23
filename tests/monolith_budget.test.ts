@@ -1565,7 +1565,10 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the equipped-instance wire
     // projection moved to server/equipped_instance_wire.ts, composed with the
     // release extractions above. Exact merged count, zero slack.
-    ceiling: 9979,
+    // LOWERED 9979 -> 9968: the developer-badge flair stamp (plus its new
+    // rung-title grants) moved to server/dev_badge_stamp.ts. Measured with
+    // wc -l < server/game.ts after biome. Exact count, zero slack.
+    ceiling: 9968,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -3393,6 +3393,60 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'quest', questId: 'q_requiem_at_the_forge' },
     hidden: true,
   },
+  // The developer-badge rungs as selectable titles (src/sim/dev_tier.ts). The
+  // server grants every rung at or below a player's resolved GitHub merged-PR
+  // tier (src/sim/dev_badge_deeds.ts); nothing in play can earn them, so they
+  // stay hidden and zero-Renown: a contributor's flair, never a Book step.
+  hid_dev_tinkerer: {
+    id: 'hid_dev_tinkerer',
+    name: 'Tinkerer of the Source',
+    desc: "Had a pull request merged into the game's open-source repository.",
+    category: 'hidden',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Tinkerer' },
+    hidden: true,
+  },
+  hid_dev_artificer: {
+    id: 'hid_dev_artificer',
+    name: 'Artificer of the Source',
+    desc: "Had 5 pull requests merged into the game's open-source repository.",
+    category: 'hidden',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Artificer' },
+    hidden: true,
+  },
+  hid_dev_runesmith: {
+    id: 'hid_dev_runesmith',
+    name: 'Runesmith of the Source',
+    desc: "Had 15 pull requests merged into the game's open-source repository.",
+    category: 'hidden',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Runesmith' },
+    hidden: true,
+  },
+  hid_dev_architect: {
+    id: 'hid_dev_architect',
+    name: 'Architect of the Source',
+    desc: "Had 30 pull requests merged into the game's open-source repository.",
+    category: 'hidden',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Architect' },
+    hidden: true,
+  },
+  hid_dev_worldwright: {
+    id: 'hid_dev_worldwright',
+    name: 'Worldwright of the Source',
+    desc: "Had 70 pull requests merged into the game's open-source repository.",
+    category: 'hidden',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Worldwright' },
+    hidden: true,
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

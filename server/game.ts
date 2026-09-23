@@ -234,6 +234,7 @@ import {
   recordDeedUnlocks,
 } from './deeds_records';
 import { appendBookOfDeedsWire } from './deeds_wire';
+import { stampDevBadge } from './dev_badge_stamp';
 import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
@@ -3122,22 +3123,10 @@ export class GameServer {
     if (this.clients.get(session.pid) !== session) return;
     const e = this.sim.entities.get(session.pid);
     if (!e) return;
-    const githubLogin = tier > 0 ? (login ?? undefined) : undefined;
-    const devMergedPrs = tier > 0 ? mergedPrs : undefined;
-    if (
-      (e.devTier ?? 0) !== tier ||
-      (e.devMergedPrs ?? 0) !== (devMergedPrs ?? 0) ||
-      e.githubLogin !== githubLogin
-    ) {
-      // identity diff re-broadcasts the developer-badge flair to nearby players
-      e.devTier = tier;
-      e.devMergedPrs = devMergedPrs;
-      e.githubLogin = githubLogin;
-      if (tier > 0) {
-        console.log(
-          `[dev] ${session.name} dev tier → ${tier} (${mergedPrs} merged PRs, @${login})`,
-        );
-      }
+    // identity diff re-broadcasts the flair; the stamp also grants the rung titles
+    const meta = this.sim.meta(session.pid);
+    if (stampDevBadge(this.sim.ctx, e, meta, tier, login, mergedPrs) && tier > 0) {
+      console.log(`[dev] ${session.name} dev tier → ${tier} (${mergedPrs} merged PRs, @${login})`);
     }
   }
 

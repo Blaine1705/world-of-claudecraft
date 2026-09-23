@@ -27,6 +27,7 @@ vi.mock('../server/db', () => ({
 
 import { GameServer } from '../server/game';
 import { resetContributorsCache } from '../server/github_contributors';
+import { setActiveTitle } from '../src/sim/deeds';
 
 interface FakeClient {
   sent: any[];
@@ -153,5 +154,69 @@ describe('GameServer.refreshDevBadge (real DB + contributor-cache resolution)', 
     expect(sent.self.dvt).toBe(3);
     expect(sent.self.dvc).toBe(15);
     expect(sent.self.dgl).toBe('jgyy');
+  });
+
+  it('unlocks every rung title at or below the resolved tier, and the picker accepts them', async () => {
+    dbMock.query.mockImplementation(githubLinksRouter('jgyy'));
+    mockMergedPrsFetch('jgyy', 15); // Runesmith (rung 3)
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = server.join(fc.ws, 1, 1, 'Devvy', 'warrior', null);
+    if ('error' in session) throw new Error(session.error);
+    session.blockListLoaded = true;
+
+    await (server as any).refreshDevBadge(session);
+
+    const meta = server.sim.meta(session.pid)!;
+    const e = server.sim.entities.get(session.pid)!;
+    expect(meta.deedsEarned.has('hid_dev_tinkerer')).toBe(true);
+    expect(meta.deedsEarned.has('hid_dev_artificer')).toBe(true);
+    expect(meta.deedsEarned.has('hid_dev_runesmith')).toBe(true);
+    expect(meta.deedsEarned.has('hid_dev_architect')).toBe(false);
+    expect(meta.deedsEarned.has('hid_dev_worldwright')).toBe(false);
+    // The ONE title validator both worlds reach takes the lower rung too...
+    setActiveTitle(meta, e, 'hid_dev_artificer');
+    expect(e.title).toBe('hid_dev_artificer');
+    setActiveTitle(meta, e, 'hid_dev_runesmith');
+    expect(e.title).toBe('hid_dev_runesmith');
+    // ...and still refuses a rung above the resolved tier.
+    setActiveTitle(meta, e, 'hid_dev_architect');
+    expect(e.title).toBe('hid_dev_runesmith');
+  });
+
+  it('grants the rung titles on a refresh even when the flair itself did not change', async () => {
+    dbMock.query.mockImplementation(githubLinksRouter('jgyy'));
+    mockMergedPrsFetch('jgyy', 5); // Artificer (rung 2)
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = server.join(fc.ws, 1, 1, 'Devvy', 'warrior', null);
+    if ('error' in session) throw new Error(session.error);
+    session.blockListLoaded = true;
+    // A veteran whose flair was stamped before the title deeds shipped.
+    const e = server.sim.entities.get(session.pid)!;
+    e.devTier = 2;
+    e.devMergedPrs = 5;
+    e.githubLogin = 'jgyy';
+
+    await (server as any).refreshDevBadge(session);
+
+    const meta = server.sim.meta(session.pid)!;
+    expect(meta.deedsEarned.has('hid_dev_artificer')).toBe(true);
+    expect(meta.deedsEarned.has('hid_dev_tinkerer')).toBe(true);
+  });
+
+  it('grants no rung title to a linked non-contributor', async () => {
+    dbMock.query.mockImplementation(githubLinksRouter('newdev'));
+    mockMergedPrsFetch('someoneelse', 70);
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = server.join(fc.ws, 1, 1, 'Devvy', 'warrior', null);
+    if ('error' in session) throw new Error(session.error);
+    session.blockListLoaded = true;
+
+    await (server as any).refreshDevBadge(session);
+
+    const meta = server.sim.meta(session.pid)!;
+    expect([...meta.deedsEarned.keys()].filter((id) => id.startsWith('hid_dev_'))).toEqual([]);
   });
 });
