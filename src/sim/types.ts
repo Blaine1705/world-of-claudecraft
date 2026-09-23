@@ -7434,6 +7434,30 @@ export type SimEvent = { pid?: number } & (
   // `crafter` repeats as payload). Ids only, text-free on purpose (like
   // craftResult above): the client renders its own localized copy.
   | { type: 'masterwork'; recipeId: string; itemId: string; crafter: number }
+  // Chance-based craft outcome audit record (craft_roll_events): one per
+  // resolved roll that decides a crafting outcome, carrying the draw the sim
+  // actually made, the chance it was measured against, and the verdict, so
+  // the real success rate of a system can be read back from the database
+  // after the fact. `kind` names the roll: 'masterwork' is the single
+  // output-side proc draw of a player craft whose output could ever proc
+  // (chance is the EFFECTIVE chance, 0 when an archetype ceiling or a worse
+  // Jack variance gated the effect off); 'perfecting' is the Perfecting
+  // attempt's success roll (professions/perfecting.ts), with the rank walked
+  // from and to (rank PERFECTING_RANKS meaning Perfected). Personal (pid =
+  // the crafter's entity id), SERVER-SIDE EVIDENCE ONLY: never routed to a
+  // client (server/event_frame.ts filterRoutableEvents), text-free, and emits
+  // no draw of its own (the roll it reports is the one the system drew).
+  | {
+      type: 'craftRoll';
+      kind: 'masterwork' | 'perfecting';
+      recipeId: string | null;
+      itemId: string;
+      roll: number;
+      chance: number;
+      success: boolean;
+      rankBefore?: number;
+      rankAfter?: number;
+    }
   // Masterwork zone broadcast (Professions 2.0): the soft zone-wide
   // copy of a masterwork proc, one per overworld player currently in the
   // crafter's zone INCLUDING the crafter, `pid` being the RECIPIENT (the
