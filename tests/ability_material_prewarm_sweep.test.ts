@@ -87,6 +87,8 @@ const REGISTERED_MODULES = [
   'ignivar_fire_vfx.ts',
   'ring_of_frost_visual.ts',
   'coach_trail_materials.ts',
+  'moonwing_adornment.ts',
+  'gloamveil_veil.ts',
 ];
 
 /** A module-scope lazy cache, however the formatter wrapped it. The type
@@ -238,7 +240,7 @@ describe('the lazy-material sweep', () => {
     // the Ring of Frost stand-in among the four spell visuals), the two
     // excluded scenery bakes, and the battleground caches.
     expect(hits.length).toBeGreaterThanOrEqual(10);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(9);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(11);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

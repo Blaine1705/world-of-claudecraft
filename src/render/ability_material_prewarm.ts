@@ -27,6 +27,8 @@
 // here is the one the live cast will draw with.
 
 import * as THREE from 'three';
+import { buildGloamveilStandIn, gloamveilMaterials } from './characters/gloamveil_veil';
+import { buildMoonwingStandIn, moonwingMaterials } from './characters/moonwing_adornment';
 import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
@@ -124,6 +126,23 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'coach_trail_materials.ts',
     materials: () => Object.values(coachTrailMaterials()),
     build: () => buildCoachTrailStandIn(),
+  },
+  {
+    // Not a cast visual but a form's: Moonwing Form's antlers, crescent and
+    // wings mount on the druid's rig at the shift (characters/form_adornments.ts),
+    // so the first Moonwing in view would otherwise link the glow program and
+    // the antler props program inside a live frame.
+    id: 'moonwing-adornment',
+    module: 'moonwing_adornment.ts',
+    materials: () => moonwingMaterials(),
+    build: () => buildMoonwingStandIn(),
+  },
+  {
+    // Gloamveil's veil and burning eyes, the same rig-mounted idiom as Moonwing.
+    id: 'gloamveil-veil',
+    module: 'gloamveil_veil.ts',
+    materials: () => gloamveilMaterials(),
+    build: () => buildGloamveilStandIn(),
   },
 ];
 
