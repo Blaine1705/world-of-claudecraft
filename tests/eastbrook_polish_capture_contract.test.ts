@@ -679,6 +679,7 @@ interface AttributionTargetFixture {
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
+  // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -690,7 +691,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted at the third release/v0.43.0 merge into feature/world-quests
   // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
   // No capture was retaken.
-  'cb3585ee0788cbaa3befd04c3c0971ea7a4cbd165c741e81bbb8d3391748c119';
+  '51673f7f01f650a4532b8a7936a54e1794efa1fa579bc82a4db0adb19aee9dee';
+
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -921,6 +921,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': 'Персональный при получении',
   'hudChrome.loot.bindConfirmBody':
     'Среди этой добычи есть предмет, который станет персональным, когда вы его возьмёте. Персональный предмет можно передать только игрокам, разделившим эту добычу, и только в течение ограниченного времени.',
+  'hudChrome.lootQuality.ordinary': 'Обычный',
+  'hudChrome.lootQuality.superior': 'Превосходный',
+  'hudChrome.lootQuality.exceptional': 'Исключительный',
+  'hudChrome.lootQuality.magnificent': 'Великолепный',
+  'hudChrome.lootQuality.transcendent': 'Запредельный',
+  'hudChrome.lootQuality.tooltip': '{quality}: +{levels} к уровню предмета. Сохраняется при улучшениях.',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
   'hudChrome.spellbook.removeFromBarAria': 'Убрать {name} с панели действий',
@@ -1697,7 +1703,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Включает базовый шанс 5%, общий для всех искателей приключений.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Это приблизительная оценка, не учитывающая критические удары и урон от способностей.',
-  'hudChrome.perf.title': 'Оверлей производительности',
+  'hudChrome.perf.title': 'Производительность',
+  'hudChrome.perf.overlaySection': 'Оверлей производительности',
   'hudChrome.perf.enable': 'Показывать оверлей производительности',
   'hudChrome.perf.description':
     'Выберите, какие показатели отображать, где разместить оверлей и как он выглядит.',
@@ -1779,6 +1786,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.rateLimited':
     'Вы недавно отправили несколько отчётов. Подождите немного перед следующим.',
   'hudChrome.bugReport.failed': 'Не удалось отправить отчёт об ошибке. Попробуйте снова.',
+  'hudChrome.hostDiag.title': 'Отчет о системе',
+  'hudChrome.hostDiag.intro':
+    'Собирает сведения об этом компьютере, включая программы, которые больше всего нагружают процессор и память, в файл, который помогает выявить причины проблем с производительностью. Ничего не отправляется: файл остается на вашем компьютере.',
+  'hudChrome.hostDiag.create': 'Создать отчет о системе',
+  'hudChrome.hostDiag.running': 'Сбор сведений о системе...',
+  'hudChrome.hostDiag.saved': 'Отчет сохранен как {fileName}.',
+  'hudChrome.hostDiag.savedNoName': 'Отчет сохранен.',
+  'hudChrome.hostDiag.failed': 'Не удалось создать отчет. Повторите попытку.',
   'hudChrome.keybinds.emoteWheel': 'Колесо эмоций',
   'hudChrome.keybinds.sheathe': 'Убрать/обнажить оружие',
   'hudChrome.keybinds.hideInterface': 'Скрыть интерфейс',
@@ -1843,6 +1858,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': 'Использовать дискретную игровую видеокарту',
   'hudChrome.options.forceHighPerfGpuNote':
     'Включено по умолчанию: настольное приложение запрашивает у компьютера дискретную игровую видеокарту. Отключите, если игра не запускается, показывает черный экран или экран ноутбука гаснет. Настройка применится при следующем запуске игры.',
+  'hudChrome.options.frameRateCap':
+    'Ограничение частоты кадров',
+  'hudChrome.options.frameRateCapAuto':
+    'Авто',
+  'hudChrome.options.frameRateCapDisplay':
+    'Дисплей',
+  'hudChrome.options.frameRateCapNote':
+    'Ограничивает число изображений, которые игра рисует в секунду. На компьютере, который не успевает за своим дисплеем, более низкий предел делает картинку ровнее и снижает нагрев. Предел подстраивается под дисплей, поэтому реальное значение может немного отличаться от числа. Авто: снижает предел, только когда этот компьютер не успевает за своим дисплеем, и затем держит его стабильным (рекомендуется). Дисплей: без ограничения.',
+  'hudChrome.options.frameRateCapStatusPaced':
+    'Рисуется {fps} изображений в секунду на дисплее {hz} Гц.',
+  'hudChrome.options.frameRateCapStatusUnpaced':
+    'Ограничение: {fps} изображений в секунду.',
+  'hudChrome.options.frameRateCapStatusInert':
+    'Этот дисплей уже работает на этой частоте или ниже, поэтому предел ничего не меняет.',
   'hudChrome.options.shaderWarm': 'Фоновый прогрев шейдеров',
   'hudChrome.options.shaderWarmAuto': 'Авто',
   'hudChrome.options.shaderWarmOff': 'Выкл.',
@@ -2487,6 +2516,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': 'в мире',
   'character.takeOver': 'Перехватить',
   'character.inWorldHint': 'Уже в мире. Выйдите в другом месте или перехватите сессию.',
+  'character.currentLocation': 'Текущее местоположение: {zone}',
+  'character.lockouts': 'Блокировки ({count})',
+  'character.lockoutRaids': 'Рейды',
+  'character.lockoutDungeons': 'Подземелья',
+  'character.lockoutWorldBosses': 'Мировые боссы',
   'character.takeOverConfirm':
     'Это отключит персонажа от другой сессии и перенесёт его сюда. Продолжить?',
   'character.renameRequired': 'требуется переименование',
@@ -2857,6 +2891,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapDrowned': 'Вы погибли. Вы утонули.',
   'hud.system.deathRecapCauterized': 'Вы погибли. Ожог Прижигания одолел вас.',
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
+  'hud.system.respawnKeeperToll': 'Целитель душ воскресил вас, но вы ослабли: болезнь воскрешения снижает все ваши характеристики, пока не пройдёт.',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',
   'hud.system.noLongerIgnoring': '{name} больше не игнорируется.',
   'hud.system.playerNotNearby': 'Этого игрока нет рядом.',
@@ -2892,6 +2927,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresForm': 'Вы должны быть в облике {form}.',
   'hud.errors.bear': 'бурого',
   'hud.errors.cat': 'кота',
+  'hud.errors.bearOrCat': 'бурого или кота',
   'hud.errors.travel': 'скорохода',
   'hud.errors.cantInForm': 'В облике {form} это невозможно.',
   'hud.errors.shapeshifted': 'В измененном облике это невозможно.',
@@ -3157,6 +3193,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.energy': 'энергии',
   'abilityUi.forms.bear': 'бурого',
   'abilityUi.forms.cat': 'кота',
+  'abilityUi.forms.bearOrCat': 'бурого или кота',
   'abilityUi.cast.fishing': 'Рыбная ловля',
   'abilityUi.cast.gathering': 'Сбор ресурсов',
   'abilityUi.cast.thunzharrStormcall': 'Зов бури',
@@ -4525,7 +4562,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Целитель душ воскресит вас на месте, но болезнь воскрешения снизит все ваши характеристики на 75%, на высоких уровнях до 10 минут. Если дух дойдёт до вашего тела, воскрешение будет без штрафа.',
   'hudChrome.death.healerConfirmAccept': 'Воскресить',
   'hudChrome.death.healerConfirmCancel': 'Отмена',
+  'hudChrome.death.keeperTalkTitle': 'Целитель душ',
+  'hudChrome.death.keeperTalkAccept': 'Воскресить',
+  'hudChrome.death.keeperTalkLeave': 'Уйти',
+  'hudChrome.death.keeperConfirmSparedTitle': 'Позволить Целителю душ воскресить вас?',
+  'hudChrome.death.keeperTalkBody': 'Я могу поднять вас прямо здесь, но за это придётся платить: болезнь воскрешения снижает все ваши характеристики на 75%, и чем выше уровень, тем дольше она длится, до 10 минут. Если ваш дух вернётся к месту гибели, вы воскреснете без всякого наказания.',
+  'hudChrome.death.keeperTalkSparedBody': 'Я могу поднять вас прямо здесь. Обычно за это платят болезнью воскрешения, которая на время ослабляет всё, что вы есть, но вы недавно в этом мире, поэтому я избавлю вас от неё. Если ваш дух вернётся к месту гибели, вы в любом случае воскреснете без всякого наказания.',
+  'hudChrome.death.keeperConfirmBody': 'Вы уверены? Целитель душ воскресит вас, но вы станете слабее: болезнь воскрешения снижает все ваши характеристики на 75%, пока не пройдёт, до 10 минут на высоких уровнях.',
+  'hudChrome.death.keeperConfirmSparedBody': 'Вы уверены? Целитель душ воскресит вас здесь. Ваш уровень ниже 10, поэтому на этот раз болезнь воскрешения вас не ослабит.',
   'hudChrome.death.spiritHealerAlive': 'Целитель душ оберегает мёртвых. Вы всё ещё среди живых.',
+  'hudChrome.death.ghostHint': 'Бегите к месту своей гибели или поговорите с Целителем душ, чтобы воскреснуть',
   'entities.npcs.spirit_healer.name': 'Целитель душ',
   'entities.npcs.spirit_healer.title': 'Хранитель мёртвых',
   'entities.npcs.spirit_healer.greeting':
@@ -5113,6 +5159,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.name': 'Истврукская долина',
   'entities.zones.eastbrook_vale.welcome':
     'Найдите в городе маршала Редбрука: у него есть для вас работа.',
+  'entities.zones.eastbrook_vale.welcomeDone': 'У маршала Редбрука больше нет для вас работы - уютному приморскому городку, где начался ваш путь, стало спокойнее благодаря этому.',
   'entities.zones.eastbrook_vale.pois.0.label': 'Истврук',
   'entities.zones.eastbrook_vale.pois.1.label': 'Волчья тропа',
   'entities.zones.eastbrook_vale.pois.2.label': 'Кабанья поляна',
@@ -5123,6 +5170,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': 'Павшая часовня',
   'entities.zones.mirefen_marsh.name': 'Мирефенская топь',
   'entities.zones.mirefen_marsh.welcome': 'Доложите стражу Фенвику у ворот Фенбриджа.',
+  'entities.zones.mirefen_marsh.welcomeDone': 'У стража Фенвика больше нет для вас приказов - поселению в глубине топких болот стало безопаснее благодаря этому.',
   'entities.zones.mirefen_marsh.pois.0.label': 'Фенбридж',
   'entities.zones.mirefen_marsh.pois.1.label': 'Камыши хищников',
   'entities.zones.mirefen_marsh.pois.2.label': 'Отмели Глубокой Топи',
@@ -5133,6 +5181,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.7.label': 'Затонувший бастион',
   'entities.zones.thornpeak_heights.name': 'Терновые высоты',
   'entities.zones.thornpeak_heights.welcome': 'Капитан Тессали едва удерживает стену Хайвотча.',
+  'entities.zones.thornpeak_heights.welcomeDone': 'Капитан Тессали удерживает стену Хайвотча - легко не бывает, но с помощью таких искателей приключений, как вы, теперь это по силам.',
   'entities.zones.thornpeak_heights.pois.0.label': 'Хайвотч',
   'entities.zones.thornpeak_heights.pois.1.label': 'Хребет охотника',
   'entities.zones.thornpeak_heights.pois.2.label': 'Норы Глубокоскалья',
@@ -7295,8 +7344,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Убирает анимацию интерфейса, и окна появляются мгновенно. В первую очередь это настройка специальных возможностей, но она дает и небольшой прирост производительности.',
   'guide.settingsPage.rowPerfOverlay':
     'Экранная сводка с FPS, временем кадра и другими показателями. Включите ее, пока подбираете настройки с этой страницы, а затем снова скройте.',
+  'guide.settingsPage.rowFrameRateCap':
+    'Верхний предел числа изображений, которые игра рисует в секунду. Компьютер, который не успевает за своим дисплеем, попадает в неровный ритм; ровные 30 выглядят плавнее, вдвое сокращают работу и снижают нагрев. «Дисплей» означает отсутствие ограничения.',
   'guide.settingsPage.tableFoot':
-    'Ищете ограничение FPS? Искать нечего: темп кадров следует за вашим экраном. Дальность прорисовки — отдельный регулятор, «Дальность обзора», в карточке «Детализация мира», и каждая предустановка выставляет её за вас, пока вы не сдвинете её сами.',
+    'Дальность прорисовки — отдельный регулятор, «Дальность обзора», в карточке «Детализация мира», и каждая предустановка выставляет её за вас, пока вы не сдвинете её сами.',
   'guide.settingsPage.mobileTitle': 'На телефонах и планшетах',
   'guide.settingsPage.mobileBody':
     'На телефоне или планшете игра запускает вас на Low. Любое сенсорное устройство приземляется туда при первом запуске, намеренно, чтобы вы вошли в мир и играли; поднимите ступень сами из панели «Графика» когда угодно. В браузере Android вся лестница открыта вам, и ваш выбор держится. На iPhone и iPad вы по-прежнему можете выбрать верхние предустановки, и они вступают в силу, как только вы нажмёте «Применить», но при следующем запуске игра вернёт вас на High, потому что iOS может закрыть вкладку, пока строится сцена такого размера. Загруженное приложение ещё строже: его список предустановок заканчивается на High, а отдельные системные регуляторы скрыты, потому что приложение управляет ими само.',
@@ -9491,6 +9542,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': 'Перезагрузить',
   'desktop.crash.quit': 'Выйти',
   'desktop.titlebar.exitGame': 'Выйти из игры',
+  'desktop.hostDiag.saveTitle': 'Сохранить отчет о системе',
+  'desktop.hostDiag.saveButton': 'Сохранить',
+  'desktop.hostDiag.fileType': 'Файл JSON',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
   'gpuNotice.bodyDesktop':
@@ -12058,6 +12112,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого вас перенесёт на ближайшее кладбище и воскресит, если вы пали. Болезнь спасения останется на вас до 5 минут.',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    'Спасение: /unstuck запускает неподвижный отсчёт, после которого вас перенесёт на ближайшее кладбище и воскресит, если вы пали. Первое использование за час бесплатно. Воспользуйтесь командой снова в течение часа после прошлого раза, и Болезнь спасения останется на вас до 5 минут.',
   'hudChrome.unstuck.menuButton': 'Выбраться',
   'hudChrome.unstuck.help':
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.',
@@ -12065,6 +12121,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого ваш дух отправится на ближайшее кладбище. Чтобы вернуться к жизни, примите Подать Хранителя у Целителя душ.',
   'hudChrome.unstuck.movedToGraveyard':
     'Вас перенесли на ближайшее кладбище. Болезнь спасения тяготит вас.',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    'Вас перенесли на ближайшее кладбище. Если снова выбраться в течение часа, на вас останется Болезнь спасения.',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    'Вас перенесли на ближайшее кладбище и воскресили. Если снова выбраться в течение часа, на вас останется Болезнь спасения.',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     'Вас перенесли на ближайшее кладбище и воскресили. Болезнь спасения тяготит вас.',
   'hudChrome.unstuck.started':
@@ -15033,6 +15093,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': 'Кого бьёт враг',
   'guide.combat.unstuckBody':
     'Если мир запер вас там, откуда не выбраться, введите /unstuck. Нужно быть вне боя и стоять на месте, не под оглушением и не в обездвиживании, и не на дуэли и не в матче арены: пойдёт короткий отсчёт, а движение или полученный урон его отменят. Когда он закончится, вас поставят на ближайшем кладбище. Команда никогда вас не убивает и не оставляет тела, а если вы уже пали, она вас там же и поднимет. Плата за это — Болезнь спасения, временное ослабление всего, что вы есть, которое проходит к тому времени, когда командой можно будет воспользоваться снова, и, как и Подать Хранителя, совсем новых персонажей она обходит стороной.',
+  'guide.combat.unstuckBodyWindow':
+    'Если мир запер вас там, откуда не выбраться, введите /unstuck. Нужно быть вне боя и стоять на месте, не под оглушением и не в обездвиживании, и не на дуэли и не в матче арены: пойдёт короткий отсчёт, а движение или полученный урон его отменят. Когда он закончится, вас поставят на ближайшем кладбище. Команда никогда вас не убивает и не оставляет тела, а если вы уже пали, она вас там же и поднимет. Первое использование за час ничего не стоит. Воспользуйтесь командой снова в течение часа после прошлого раза, и платой станет Болезнь спасения, временное ослабление всего, что вы есть, которое проходит к тому времени, когда командой можно будет воспользоваться снова, и, как и Подать Хранителя, совсем новых персонажей она обходит стороной.',
   'guide.combat.unstuckTitle': 'Когда вы застряли всерьёз',
   'guide.commandsPage.abilities': 'Способности, которые вы изучили.',
   'guide.commandsPage.afk':
@@ -15181,6 +15243,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': 'Если команда не работает',
   'guide.commandsPage.unstuck':
     'Выход, когда мир вас запер. Простойте неподвижно короткий отсчёт, и вас перенесут на ближайшее кладбище, а если вы уже пали, там же и поднимут. После этого вас на время тяготит Болезнь спасения, так что это крайнее средство, а не короткий путь.',
+  'guide.commandsPage.unstuckWindow':
+    'Выход, когда мир вас запер. Простойте неподвижно короткий отсчёт, и вас перенесут на ближайшее кладбище, а если вы уже пали, там же и поднимут. Первое использование за час бесплатно. Воспользуйтесь командой снова в течение часа после прошлого раза, и вас на время будет тяготить Болезнь спасения, так что это средство спасения, а не короткий путь.',
   'guide.commandsPage.where': 'Зона, в которой вы стоите, её диапазон уровней и ваши координаты.',
   'guide.commandsPage.whisper':
     'Отправить личное сообщение одному игроку, который сейчас в сети. Имя распознаётся в любом регистре, каким вы его наберёте, лишь бы подходил только один игрок.',
@@ -15370,6 +15434,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': 'Талисман для инструмента',
   'guide.glossary.unstuckDef':
     'Цена за «Выбраться» из игрового меню. Простойте неподвижно весь отсчёт, и вас опустит на ближайшем кладбище, а после вы какое-то время носите временную слабость.',
+  'guide.glossary.unstuckDefWindow':
+    'Цена за то, чтобы прибегнуть к «Выбраться» из игрового меню больше одного раза за час. Простойте неподвижно весь отсчёт, и вас опустит на ближайшем кладбище. Первое использование за час бесплатно, а повтор в течение часа после прошлого раза вдобавок оставляет на вас на какое-то время временную слабость.',
   'guide.glossary.unstuckTerm': 'Болезнь спасения',
   'guide.glossary.warfareDef':
     'Снаряжённая сторона схваток игрок против игрока. Интендант продаёт комплекты брони Боевой мощи за Честь, а рейтинг Боевой мощи, что они несут, считается только в боях против других игроков.',
@@ -16510,6 +16576,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     'Занять место по добору намеренно ничем не грозит: вы попадаете в счет, к которому не имели отношения, поэтому матч не тронет ваш рейтинг ни при победе, ни при поражении, а уход из такого матча ничего не стоит. Предложение перестает приходить и тогда, когда матч подошел к концу настолько, что новый боец уже ничего не изменит, так что вас никогда не посадят в чужую развязку.',
   'hudChrome.trade.windowClosed': 'Окно обмена закрыто.',
+  'hudChrome.trade.offerQuantityHint': 'Вас спросят, сколько предложить',
+  'hudChrome.trade.offerQuantityTitle': 'Предложить {item}',
+  'hudChrome.trade.offerQuantityInput': 'Количество для предложения',
+  'hudChrome.trade.offerQuantityConfirm': 'Предложить',
+  'hudChrome.trade.offerQuantityAll': 'Предложить всё',
+  'hudChrome.trade.offerRemoveTitle': 'Убрать {item}',
+  'hudChrome.trade.offerRemoveInput': 'Количество для удаления',
+  'hudChrome.trade.offerRemove': 'Убрать',
+  'hudChrome.trade.offerRemoveAll': 'Убрать всё',
   'hudChrome.trade.woc.hintInsufficientBalance':
     'Это больше $WOC, чем есть в подключённом кошельке.',
   'hudChrome.trade.woc.priceLabel': 'Цена в долларах',

@@ -9,8 +9,8 @@
     "openDescent + the walk-in descent trigger + spawnRiftFloor across all three floors",
     "openExit + rank coin bonus on the winning corpse (dev-entry claim, no race)"
   ],
-  "draws": 347,
-  "drawDigest": "52855f0a",
+  "draws": 348,
+  "drawDigest": "d0e4f6ad",
   "frames": [
     {
       "tick": 0,
@@ -712,8 +712,8 @@
       "state": "0be1fb98",
       "events": "66ece17b",
       "rng": {
-        "draws": 307,
-        "digest": "0a26726a"
+        "draws": 308,
+        "digest": "98e33087"
       }
     },
     {
@@ -723,8 +723,8 @@
       "state": "354eb365",
       "events": "741638a5",
       "rng": {
-        "draws": 347,
-        "digest": "52855f0a"
+        "draws": 348,
+        "digest": "d0e4f6ad"
       },
       "label": "clear-paid",
       "players": [
@@ -977,8 +977,8 @@
       "state": "354eb365",
       "events": "741638a5",
       "rng": {
-        "draws": 347,
-        "digest": "52855f0a"
+        "draws": 348,
+        "digest": "d0e4f6ad"
       },
       "label": "final",
       "players": [
