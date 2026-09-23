@@ -75,7 +75,11 @@ import { computeCharacterModifiers } from '../set_bonus_mods';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { ALL_EQUIP_SLOTS, type Entity, type EquipSlot, isFormAuraKind } from '../types';
-import { type AuraSourceAbility, orphanedAbilityAuraIds } from './talent_swap_auras';
+import {
+  type AuraSourceAbility,
+  droppedAbilityIds,
+  talentSwapOrphanMatcher,
+} from './talent_swap_auras';
 
 function cleanRemovedProcState(
   ctx: SimContext,
@@ -264,39 +268,57 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
 
 // A buff a dropped talent put up leaves with the talent (player report: channel
 // Aetherwell, swap the capstone row to Rune of Power, fight with both). Strips
-// every aura THIS player applied, on any entity, whose id only an ability the
-// new build no longer resolves can produce: a granted ability that fell out of
-// `meta.known`, or a talent rider that no longer lands on a still-known one (see
-// talent_swap_auras.ts). Copies another player applied are theirs to keep.
+// every aura THIS player applied, on any entity, that the new build could not
+// have produced (the rule lives in talent_swap_auras.ts), retires the ground
+// zones a dropped ability placed (a Rune of Power inscribed before the swap
+// stops pulsing its buff), and cancels a cast or channel of a dropped ability.
+// Copies another player applied are theirs to keep.
 function stripOrphanedTalentAuras(
   ctx: SimContext,
   meta: PlayerMeta,
   e: Entity,
   previousKnown: readonly AuraSourceAbility[],
 ): void {
-  const orphaned = orphanedAbilityAuraIds(previousKnown, meta.known);
-  if (orphaned.size === 0) return;
-  const ownAurasBefore = e.auras.length;
-  const hadStealthAura = e.auras.some((aura) => aura.kind === 'stealth');
+  const dropped = droppedAbilityIds(previousKnown, meta.known);
+  if (e.castingAbility && dropped.has(e.castingAbility)) ctx.cancelCast(e);
+  for (let index = ctx.groundAoEs.length - 1; index >= 0; index--) {
+    const zone = ctx.groundAoEs[index];
+    if (zone.sourceId === e.id && dropped.has(zone.abilityId)) ctx.groundAoEs.splice(index, 1);
+  }
+  const orphaned = talentSwapOrphanMatcher(previousKnown, meta.known);
+  if (!orphaned) return;
   for (const entity of ctx.entities.values()) {
-    if (entity.kind === 'player') {
-      // Fade event plus the stat recalc when a buff_*/form_* un-folds.
-      ctx.clearAurasFromSource(entity, e.id, (aura) => orphaned.has(aura.id));
+    if (entity.kind !== 'player') {
+      for (let index = entity.auras.length - 1; index >= 0; index--) {
+        const aura = entity.auras[index];
+        if (aura.sourceId !== e.id || !orphaned(aura)) continue;
+        ctx.applyNonPlayerStatAura(entity, aura, -1);
+        entity.auras.splice(index, 1);
+        ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
+      }
       continue;
     }
-    for (let index = entity.auras.length - 1; index >= 0; index--) {
-      const aura = entity.auras[index];
-      if (aura.sourceId !== e.id || !orphaned.has(aura.id)) continue;
-      ctx.applyNonPlayerStatAura(entity, aura, -1);
-      entity.auras.splice(index, 1);
-      ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
+    const aurasBefore = entity.auras.length;
+    const hadStealthAura = entity.auras.some((aura) => aura.kind === 'stealth');
+    // Fade event plus the stat recalc when a buff_*/form_* un-folds.
+    ctx.clearAurasFromSource(entity, e.id, orphaned);
+    if (entity.auras.length === aurasBefore) continue;
+    if (hadStealthAura && !entity.auras.some((aura) => aura.kind === 'stealth')) {
+      entity.stealthed = false;
+    }
+    // clearAurasFromSource re-folds only buff_*/form_* kinds; a stance or other
+    // stat-bearing kind the player lost must un-fold too.
+    const holder = entity.id === e.id ? meta : ctx.resolve(entity.id)?.meta;
+    if (holder) {
+      recalcPlayerStats(
+        entity,
+        holder.cls,
+        holder.equipment,
+        ctx.playerMods(holder),
+        holder.equipmentInstance,
+      );
     }
   }
-  if (e.auras.length === ownAurasBefore) return;
-  if (hadStealthAura && !e.auras.some((aura) => aura.kind === 'stealth')) e.stealthed = false;
-  // clearAurasFromSource re-folds only buff_*/form_* kinds; a stance or other
-  // stat-bearing kind the swapper lost must un-fold too.
-  recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
 }
 
 // Cancel any active form/stance aura whose granting ability fell out of `meta.known`
