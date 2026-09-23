@@ -689,7 +689,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  'e651995fbf1ac8413176d75b35b5da91b9a241918ea183430642a9c6b51d3fd5';
+  // Re-minted for the point-light carriers: renderer.ts attaches the packed carriers and drops the pads. No capture was retaken.
+  'bbef844c87457a3729293b788139e14fd3817f24811f343158ee12b1e0c45d86';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
