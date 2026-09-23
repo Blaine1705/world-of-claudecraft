@@ -1233,8 +1233,9 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     // Round-10 detail-knob defaults (see the interface comment): High takes the
     // existing Advanced-Medium profile to bound its steady cost (basic worn
-    // surface, reduced carpet, cavity-only relief). Ultra retains the full
-    // 3-tap layers; Insane remains the 4-tap everything-on showcase.
+    // surface, reduced carpet, cavity-only relief). Ultra and Insane request
+    // the parallax walk (worn_stone.ts compiles the same two-read walk for
+    // both; the request sets the clamp share and feeds the live shed).
     surfaceDetail: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     surfaceDetailTaps: tier === 'insane' ? 4 : gfxTierAtLeast(tier, 'ultra') ? 3 : 0,
     surfaceDetailClampK: tier === 'insane' ? 1 : tier === 'ultra' ? 0.85 : 0,
@@ -1437,8 +1438,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       };
     // Surface Detail (the town-cost dial): Off sheds the whole worn layer;
     // Basic keeps the detail normals + AO grime without the parallax walk;
-    // Full runs the ultra execution (3 taps, 0.85 clamp); Insane the
-    // everything-on 4-tap full-clamp walk.
+    // Full runs the ultra execution (the two-read walk at the 0.85 clamp);
+    // Insane the same walk at the full clamp.
     const surfaceLevel = levelOf(hints.surfaceDetail ?? 1);
     if (surfaceLevel === 0)
       settings = {

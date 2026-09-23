@@ -103,69 +103,149 @@ afterAll(() => {
   vi.doUnmock('../src/render/assets/preload');
 });
 
+/** The worn block only: from its first varying to the end of the AO composition. */
+function injectedWorn(frag: string): string {
+  const start = frag.indexOf('varying vec3 vWornWorldPos;');
+  const end = frag.indexOf('#include <alphamap_fragment>', start);
+  return frag.slice(start, end).replace(/\/\/.*$/gm, '');
+}
+
+/** The flat (one-hot) and corner (three-plane) sampling arms of the block. */
+function planeArms(frag: string): { flat: string; corner: string } {
+  const block = injectedWorn(frag);
+  const flatAt = block.indexOf('if ( wornFlat ) {');
+  const elseAt = block.indexOf('} else {', flatAt);
+  const endAt = block.indexOf('wornHShade = clamp(', elseAt);
+  return {
+    flat: block.slice(flatAt, elseAt),
+    corner: block.slice(
+      elseAt,
+      endAt === -1 ? block.indexOf('wornViewN = normalize', elseAt) : endAt,
+    ),
+  };
+}
+
+const count = (text: string, re: RegExp): number => (text.match(re) ?? []).length;
+
+// The layer is written for the ANGLE D3D11 compiler as much as for the GPU:
+// every branch it emits is HLSL flow the D3D compiler pays to optimize, so the
+// pins below hold the BRANCH BUDGET and the per-path fetch counts, not a
+// particular spelling.
 describe('insane worn-surface fragment shader', () => {
-  it('keeps four dependent parallax samples and the uniform-driven clamp', () => {
-    expect(fragmentShader.match(/wornTriR\( uWornDisp/g)).toHaveLength(4);
-    // The per-family clamp rides a uniform now, so no family scalar bakes into
-    // source; only the structural clamp bound uWornParallaxClamp appears.
-    expect(fragmentShader).toContain('vec3( -uWornParallaxClamp )');
-    expect(fragmentShader).toContain('vec3( uWornParallaxClamp )');
+  it('walks the parallax with two height reads per path (a first read and one refinement) and the uniform-driven clamp', () => {
+    const { flat, corner } = planeArms(fragmentShader);
+    expect(count(flat, /texture2D\( uWornDisp/g)).toBe(2);
+    expect(count(corner, /wornTri3\( uWornDisp/g)).toBe(2);
+    expect(count(fragmentShader, /uWornDisp,/g)).toBe(4);
+    // The refinement is a mix by the live share, never a branch.
+    expect(fragmentShader).toContain('float wornRefK = 0.5 * clamp( uWornTaps - 1.0, 0.0, 1.0 );');
+    expect(count(fragmentShader, /, wornRefK \);/g)).toBe(2);
+    // The per-family clamp rides a uniform scaled by the live share, so no
+    // family scalar bakes into source.
+    expect(flat).toContain('vec2( -uWornParallaxClamp * uWornClampK )');
+    expect(corner).toContain('vec3( -uWornParallaxClamp * uWornClampK )');
   });
 
-  it('uses exact-zero two-plane fast paths for scalar and normal maps', () => {
-    expect(fragmentShader).toContain('if ( axis.x <= 0.0 )');
-    expect(fragmentShader).toContain('if ( axis.y <= 0.0 )');
-    expect(fragmentShader).toContain('if ( axis.z <= 0.0 )');
-    expect(fragmentShader).toContain('else if ( wornAxis.x <= 0.0 )');
-    expect(fragmentShader).toContain('else if ( wornAxis.y <= 0.0 )');
-    expect(fragmentShader).toContain('else if ( wornAxis.z <= 0.0 )');
-    expect(fragmentShader).toContain('vec3 wornGN = wornUnitN * faceDirection;');
-    expect(fragmentShader).toContain(
-      'return texture2D( tex, p.xz ).r * w.y + texture2D( tex, p.xy ).r * w.z;',
-    );
-    expect(fragmentShader).toContain(
-      'return texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xy ).r * w.z;',
-    );
-    expect(fragmentShader).toContain(
-      'return texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xz ).r * w.y;',
-    );
-    expect(fragmentShader).toContain(
-      'wornWorldN = normalize( wornNy.xzy * wornW.y + wornNz.xyz * wornW.z );',
-    );
-    expect(fragmentShader).toContain(
-      'wornWorldN = normalize( wornNx.zyx * wornW.x + wornNz.xyz * wornW.z );',
-    );
-    expect(fragmentShader).toContain(
-      'wornWorldN = normalize( wornNx.zyx * wornW.x + wornNy.xzy * wornW.y );',
-    );
+  it('spends exactly four branches: the fade, the plane split, and one parallax gate per arm', () => {
+    const block = injectedWorn(fragmentShader);
+    expect(count(block, /\bif \(/g)).toBe(4);
+    expect(block).not.toContain('else if');
+    expect(count(block, /if \( wornDetK > 0\.0 \)/g)).toBe(1);
+    expect(count(block, /if \( wornFlat \)/g)).toBe(1);
+    expect(count(block, /if \( wornParK > 0\.0 \)/g)).toBe(2);
+    // ANGLE unfolds short-circuit operators and ternaries into extra HLSL
+    // flow, so the block carries none.
+    expect(block).not.toMatch(/&&|\|\||\?/);
+    expect(block).toContain('float( gl_FrontFacing ) * 2.0 - 1.0');
   });
 
-  it('keeps the existing distance tap culling, now driven by fade uniforms and live taps', () => {
-    // The per-family fade bands are uniforms, so the structure reads uniform
-    // names, never the baked band values. The live tap count still gates the
-    // parallax walk without selecting a different program.
-    expect(fragmentShader).toContain('if ( uWornTaps > 0.0 && wornCamD < uWornParEnd )');
-    expect(fragmentShader).toContain('smoothstep( uWornParStart, uWornParEnd, wornCamD )');
-    expect(fragmentShader).toContain('smoothstep( uWornDetStart, uWornDetEnd, wornCamD )');
+  it('keeps a flat, axis-aligned facet at one fetch per map and a corner at three', () => {
+    const { flat, corner } = planeArms(fragmentShader);
+    for (const map of ['uWornDisp', 'uWornAo', 'uWornRough', 'uWornNormal']) {
+      expect(count(flat, new RegExp(`texture2D\\( ${map}, wornUv \\)`, 'g')), map).toBe(1);
+    }
+    // Four maps at the (offset) UV plus the one refining height read.
+    expect(count(flat, /texture2D\(/g)).toBe(5);
+    for (const map of ['uWornDisp', 'uWornAo', 'uWornRough']) {
+      expect(corner).toContain(`wornTri3( ${map}, wornUvX, wornUvY, wornUvZ, wornW )`);
+    }
+    expect(count(corner, /texture2D\( uWornNormal, wornUv[XYZ] \)/g)).toBe(3);
+    // The one-hot weight selects the plane's UV, view ray, and reorientation
+    // without a second selector.
+    expect(flat).toContain('wornW = step( vec3( 0.999 ), wornW );');
+    expect(flat).toContain(
+      'vec2 wornUv = wornUvX * wornW.x + wornUvY * wornW.y + wornUvZ * wornW.z;',
+    );
+    expect(flat).toContain(
+      'wornWorldN = wornN.zyx * wornW.x + wornN.xzy * wornW.y + wornN.xyz * wornW.z;',
+    );
+    expect(corner).toContain(
+      'wornWorldN = wornNx.zyx * wornW.x + wornNy.xzy * wornW.y + wornNz.xyz * wornW.z;',
+    );
+    // The corner read is the ONLY function the block declares, and it has one exit.
+    expect(count(fragmentShader, /float wornTri3\(/g)).toBe(1);
+    expect(fragmentShader).not.toContain('wornTriR');
+  });
+
+  it('samples every map inside the fade block and mixes the sampled locals after it, branch-free', () => {
+    const block = injectedWorn(fragmentShader);
+    // wornTri3 declares its fetches in the prologue; main's first fetch sits
+    // behind the fade gate.
+    const mainAt = block.indexOf('vec3 wornP = ');
+    const fadeAt = block.indexOf('if ( wornDetK > 0.0 ) {', mainAt);
+    expect(block.indexOf('texture2D(', mainAt)).toBeGreaterThan(fadeAt);
+    expect(block).toContain('smoothstep( uWornParStart, uWornParEnd, wornCamD )');
+    expect(block).toContain('smoothstep( uWornDetStart, uWornDetEnd, wornCamD )');
+    expect(block).toContain('float wornAoV = uWornAoMean;');
+    expect(block).toContain('float wornRoughV = uWornRoughMean;');
+    expect(block).toContain('mix( uWornAoMean, wornAoV, wornDetK )');
+    expect(fragmentShader).toContain('mix( uWornRoughMean, wornRoughV, wornDetK )');
+    expect(fragmentShader).toContain(
+      'normal = normalize( mix( normal, wornViewN, uWornStrength * wornDetK ) );',
+    );
+    // The roughness and normal chunks carry no branch of their own.
+    const tail = fragmentShader.slice(fragmentShader.indexOf('#include <roughnessmap_fragment>'));
+    expect(tail).not.toContain('wornDetK > 0.0');
   });
 
   it.each([
-    ['high', 'high', 0],
-    ['ultra', 'ultra', 3],
-    ['advanced basic', 'high&gfxo=surfaceDetail:1,surfaceDetailTaps:0,surfaceDetailClampK:0', 0],
-  ] as const)('emits a balanced %s worn shader', async (_name, search, parallaxCalls) => {
-    const shader = await compileWornShader(search);
+    ['high', 'high', 0, 2],
+    ['ultra', 'ultra', 2, 4],
+    ['advanced basic', 'high&gfxo=surfaceDetail:1,surfaceDetailTaps:0,surfaceDetailClampK:0', 0, 2],
+  ] as const)(
+    'emits a balanced %s worn shader',
+    async (_name, search, heightReadsPerPath, branches) => {
+      const shader = await compileWornShader(search);
+      const block = injectedWorn(shader);
+      expect(count(block, /texture2D\( uWornDisp/g)).toBe(heightReadsPerPath);
+      expect(count(block, /\bif \(/g)).toBe(branches);
+      expect(block).toContain('if ( wornFlat )');
+      expect(count(shader, /{/g)).toBe(count(shader, /}/g));
+    },
+  );
 
-    expect(shader.match(/wornTriR\( uWornDisp/g) ?? []).toHaveLength(parallaxCalls);
-    expect(shader).toContain('if ( axis.x <= 0.0 )');
-    expect(shader.match(/{/g) ?? []).toHaveLength((shader.match(/}/g) ?? []).length);
+  it('passes the metalness map through both plane paths', async () => {
+    const shader = await compileWornShader('insane', 'metal');
+    const { flat, corner } = planeArms(shader);
+    expect(flat).toContain('wornMetalV = texture2D( uWornMetal, wornUv ).r;');
+    expect(corner).toContain(
+      'wornMetalV = wornTri3( uWornMetal, wornUvX, wornUvY, wornUvZ, wornW );',
+    );
+    expect(shader).toContain('mix( uWornMetalMean, wornMetalV, wornDetK )');
+    expect(shader).not.toContain('uniform sampler2D uWornAo;');
   });
 
-  it('passes the cached axis through the metalness path', async () => {
-    const shader = await compileWornShader('insane', 'metal');
-
-    expect(shader).toContain('wornTriR( uWornMetal, wornP, wornW, wornAxis ), wornDetK');
-    expect(shader).not.toContain('uniform sampler2D uWornAo;');
+  it('object space samples AO and roughness only, with the plane split as its one branch', async () => {
+    const { shader } = await compileWornObject('ultra', 'stone', {
+      strength: 0.2,
+      objectSpace: true,
+    });
+    const block = injectedWorn(shader.fragmentShader);
+    expect(count(block, /\bif \(/g)).toBe(1);
+    expect(block).toContain('float wornDetK = 1.0;');
+    expect(block).not.toContain('uWornNormal, wornUv');
+    expect(block).not.toContain('uWornDisp');
+    expect(block).not.toContain('gl_FrontFacing');
   });
 });
 
@@ -251,36 +331,39 @@ describe('terrain-detail shed (governed uWornTaps / uWornClampK)', () => {
     expect(shader.fragmentShader).not.toContain('uniform float uWornTaps;');
   });
 
-  it('gates each refinement tap on the live count, fades the walk by min(taps, 1), and scales the baked clamp by the live share', async () => {
+  it('fades the walk by min(taps, 1) and scales the baked clamp by the live share, with no per-tap gate', async () => {
     const { shader } = await compileWornShaderFull('ultra');
     const frag = shader.fragmentShader;
     expect(frag).toContain('uniform float uWornTaps;');
     expect(frag).toContain('uniform float uWornClampK;');
-    // Ultra compiles 3 taps: the first always runs inside the > 0.0 block,
-    // taps 2 and 3 each behind their own live gate, weighed by the
-    // fractional live count so a crossing blends the tap in, and the average
-    // divides by the LIVE weight sum, never the compiled tap count.
-    expect(frag).toContain('if ( uWornTaps > 1.0 ) {');
-    expect(frag).toContain('float wornTapW = min( uWornTaps - 1.0, 1.0 );');
-    expect(frag).toContain('if ( uWornTaps > 2.0 ) {');
-    expect(frag).toContain('float wornTapW = min( uWornTaps - 2.0, 1.0 );');
-    expect(frag).not.toContain('if ( uWornTaps > 3.0 ) {');
-    expect(frag).toContain('wornHAcc += wornH * wornTapW;');
-    expect(frag).toContain('wornHN += wornTapW;');
-    expect(frag).toContain('wornV * ( wornHAcc * uWornParallaxAmp / wornHN )');
+    // Two height reads per path with no branch between them: the live count
+    // no longer gates a refinement tap, it fades the whole offset (and weighs
+    // the refinement below), and a zero count skips both reads through the
+    // wornParK gate.
+    expect(frag).not.toMatch(/uWornTaps\s*>/);
     expect(frag).not.toMatch(/uWornTaps\s*>=/);
     expect(frag).toContain('* min( uWornTaps, 1.0 );');
-    // The family clamp rides a uniform now, and the live uniform is a share of
+    expect(frag).toContain('if ( wornParK > 0.0 ) {');
+    // The refining read weighs by clamp(taps - 1, 0, 1): at a live count of 1
+    // the walk is the first read alone, at 2 and above the average of both.
+    expect(frag).toContain('clamp( uWornTaps - 1.0, 0.0, 1.0 )');
+    // The family clamp rides a uniform, and the live uniform is a share of
     // it, so 1 is exactly the static program.
     expect(frag).toContain(
-      'vec3( -uWornParallaxClamp ) * uWornClampK, vec3( uWornParallaxClamp ) * uWornClampK',
+      'vec2( -uWornParallaxClamp * uWornClampK ), vec2( uWornParallaxClamp * uWornClampK )',
+    );
+    expect(frag).toContain(
+      'vec3( -uWornParallaxClamp * uWornClampK ), vec3( uWornParallaxClamp * uWornClampK )',
     );
   });
 
-  it('an insane (4-tap) material gates its fourth tap on the live count too', async () => {
-    const { shader } = await compileWornShaderFull('insane');
-    expect(shader.fragmentShader).toContain('if ( uWornTaps > 3.0 ) {');
-    expect(shader.fragmentShader).toContain('float wornTapW = min( uWornTaps - 3.0, 1.0 );');
+  it('an insane material compiles the same two-read walk as ultra: the tier changes the clamp share, never the program text', async () => {
+    const ultra = await compileWornShaderFull('ultra');
+    const insane = await compileWornShaderFull('insane');
+    expect(insane.shader.fragmentShader).toBe(ultra.shader.fragmentShader);
+    expect(insane.shader.uniforms.uWornParallaxClamp.value).toBeGreaterThan(
+      ultra.shader.uniforms.uWornParallaxClamp.value,
+    );
   });
 
   it('writing the shared uniforms changes only the values the ALREADY-compiled ultra program reads, never its source', async () => {
