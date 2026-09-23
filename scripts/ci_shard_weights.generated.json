@@ -2,9 +2,36 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4077,
+    "files": 4097,
     "harvestedFiles": 3948,
     "carried": {
+      "tests/ability_imbue_text.test.ts": {
+        "ms": 1954,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          1954
+        ]
+      },
+      "tests/ability_line_of_sight.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          7
+        ]
+      },
+      "tests/absorb_credit.test.ts": {
+        "ms": 2821,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          2821
+        ]
+      },
       "tests/active_kit_prewarm.test.ts": {
         "ms": 69,
         "method": "local-median",
@@ -12,6 +39,15 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           69
+        ]
+      },
+      "tests/aura_bar_side.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          18
         ]
       },
       "tests/baked_pool_prewarm.test.ts": {
@@ -32,6 +68,15 @@
           23
         ]
       },
+      "tests/bug_report_error_text.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          5
+        ]
+      },
       "tests/camera_impact_core.test.ts": {
         "ms": 12,
         "method": "local-median",
@@ -39,6 +84,33 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           12
+        ]
+      },
+      "tests/class_health_table.test.ts": {
+        "ms": 2280,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          2280
+        ]
+      },
+      "tests/clock_memo.test.ts": {
+        "ms": 55,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          55
+        ]
+      },
+      "tests/combat_res_released_ghost.test.ts": {
+        "ms": 5729,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          5729
         ]
       },
       "tests/crest_prewarm.test.ts": {
@@ -50,6 +122,15 @@
           116
         ]
       },
+      "tests/deeds_restore.test.ts": {
+        "ms": 1806,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          1806
+        ]
+      },
       "tests/deferred_contact_bursts.test.ts": {
         "ms": 9,
         "method": "local-median",
@@ -57,6 +138,42 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           9
+        ]
+      },
+      "tests/deposit_all_status_text.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          7
+        ]
+      },
+      "tests/dev_town_teleport.test.ts": {
+        "ms": 429,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          429
+        ]
+      },
+      "tests/effective_stats.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          6
+        ]
+      },
+      "tests/error_toast_controller.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          44
         ]
       },
       "tests/far_bake_uv_pad.test.ts": {
@@ -75,6 +192,15 @@
         "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
         "runs": [
           15
+        ]
+      },
+      "tests/frame_rate_cap_setting.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          10
         ]
       },
       "tests/fury_audio_integration.test.ts": {
@@ -102,6 +228,24 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           37
+        ]
+      },
+      "tests/game_renderer.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          8
+        ]
+      },
+      "tests/gpu_timer_probe_core.test.ts": {
+        "ms": 24,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          24
         ]
       },
       "tests/harvest_choreography.test.ts": {
@@ -273,6 +417,26 @@
           7
         ]
       },
+      "tests/instanced_dither_fade.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          12,
+          14,
+          15
+        ]
+      },
+      "tests/interaction_input.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          16
+        ]
+      },
       "tests/ironguard_audio.test.ts": {
         "ms": 402,
         "method": "local-median",
@@ -280,6 +444,26 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           402
+        ]
+      },
+      "tests/kill_participation.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          6
+        ]
+      },
+      "tests/occluder_dither_fade.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          6,
+          8,
+          7
         ]
       },
       "tests/player_portrait_core.test.ts": {
@@ -333,6 +517,15 @@
           11
         ]
       },
+      "tests/raid_released_ghost_loot.test.ts": {
+        "ms": 1582,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          1582
+        ]
+      },
       "tests/ribbon_contact_admission.test.ts": {
         "ms": 35,
         "method": "local-median",
@@ -367,6 +560,39 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           16
+        ]
+      },
+      "tests/shader_ablation_transforms.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          8,
+          9,
+          9
+        ]
+      },
+      "tests/shader_harvest_corpus.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          7,
+          7,
+          7
+        ]
+      },
+      "tests/shader_link_bench_report.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          4,
+          4,
+          5
         ]
       },
       "tests/shield_contact_outcomes.test.ts": {
@@ -421,6 +647,15 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           18
+        ]
+      },
+      "tests/vault_search.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          44
         ]
       },
       "tests/warrior_ability_clips.test.ts": {
@@ -1142,61 +1377,6 @@
         "runs": [
           10
         ]
-      },
-      "tests/instanced_dither_fade.test.ts": {
-        "ms": 14,
-        "method": "local-median",
-        "measured": "2026-09-22",
-        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
-        "runs": [
-          12,
-          14,
-          15
-        ]
-      },
-      "tests/occluder_dither_fade.test.ts": {
-        "ms": 7,
-        "method": "local-median",
-        "measured": "2026-09-22",
-        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
-        "runs": [
-          6,
-          8,
-          7
-        ]
-      },
-      "tests/shader_ablation_transforms.test.ts": {
-        "ms": 9,
-        "method": "local-median",
-        "measured": "2026-09-22",
-        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
-        "runs": [
-          8,
-          9,
-          9
-        ]
-      },
-      "tests/shader_harvest_corpus.test.ts": {
-        "ms": 7,
-        "method": "local-median",
-        "measured": "2026-09-22",
-        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
-        "runs": [
-          7,
-          7,
-          7
-        ]
-      },
-      "tests/shader_link_bench_report.test.ts": {
-        "ms": 4,
-        "method": "local-median",
-        "measured": "2026-09-22",
-        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
-        "runs": [
-          4,
-          4,
-          5
-        ]
       }
     },
     "removed": {
@@ -1212,6 +1392,8 @@
   "tests/ability_description.test.ts": 23,
   "tests/ability_drill.test.ts": 8416,
   "tests/ability_icons.test.ts": 177,
+  "tests/ability_imbue_text.test.ts": 1954,
+  "tests/ability_line_of_sight.test.ts": 7,
   "tests/ability_material_prewarm_sweep.test.ts": 124,
   "tests/ability_requirement_keys.test.ts": 13,
   "tests/ability_self_only.test.ts": 10,
@@ -1232,6 +1414,7 @@
   "tests/ability_vfx_selfcast_fallthrough.test.ts": 5,
   "tests/ability_vfx_spectacle.test.ts": 25,
   "tests/absorb_bar.test.ts": 7,
+  "tests/absorb_credit.test.ts": 2821,
   "tests/abyssal_rift_fx.test.ts": 42,
   "tests/abyssal_rift_vfx.test.ts": 12,
   "tests/account_2fa.test.ts": 323,
@@ -1455,6 +1638,7 @@
   "tests/audit_conservation_property.test.ts": 66896,
   "tests/audit_conservation_vault.test.ts": 4584,
   "tests/audit_cur_conservation.test.ts": 3104,
+  "tests/aura_bar_side.test.ts": 18,
   "tests/aura_cancel.test.ts": 12,
   "tests/aura_classify.test.ts": 11,
   "tests/aura_effect.test.ts": 24,
@@ -1615,6 +1799,7 @@
   "tests/buffs_command.test.ts": 2597,
   "tests/bug_report.test.ts": 7,
   "tests/bug_report_db.test.ts": 16,
+  "tests/bug_report_error_text.test.ts": 5,
   "tests/build_assets_cli.test.ts": 754,
   "tests/build_bundle_pregen.test.ts": 458,
   "tests/build_lane_core.test.ts": 17,
@@ -1787,6 +1972,7 @@
   "tests/civic_service_placements.test.ts": 11,
   "tests/clamp.test.ts": 4,
   "tests/class_colors.test.ts": 11,
+  "tests/class_health_table.test.ts": 2280,
   "tests/class_icons.test.ts": 11,
   "tests/class_spec_kits.test.ts": 4747,
   "tests/claudium_latency_proxy_target.test.ts": 125,
@@ -1808,6 +1994,7 @@
   "tests/climb.test.ts": 3269,
   "tests/climb_slope.test.ts": 3379,
   "tests/clock_format.test.ts": 23,
+  "tests/clock_memo.test.ts": 55,
   "tests/clock_seconds_core.test.ts": 23,
   "tests/coach_prompt_view.test.ts": 40,
   "tests/coach_trail_core.test.ts": 14,
@@ -1828,6 +2015,7 @@
   "tests/combat_event_fidelity.test.ts": 4834,
   "tests/combat_log_event_route_online.test.ts": 3165,
   "tests/combat_rating.test.ts": 1340,
+  "tests/combat_res_released_ghost.test.ts": 5729,
   "tests/combat_scalar_wire.test.ts": 8,
   "tests/combat_sfx.test.ts": 18,
   "tests/combat_threat_modifiers.test.ts": 3360,
@@ -2021,6 +2209,7 @@
   "tests/deeds_leaderboard_view.test.ts": 10,
   "tests/deeds_rarity_client.test.ts": 14,
   "tests/deeds_reconcile.test.ts": 3312,
+  "tests/deeds_restore.test.ts": 1806,
   "tests/deeds_sites_pin.test.ts": 9196,
   "tests/deeds_view.test.ts": 33,
   "tests/deeds_window.test.ts": 115,
@@ -2059,6 +2248,7 @@
   "tests/deploy_rift_forge_switch.test.ts": 4,
   "tests/deploy_wallet_connect.test.ts": 10,
   "tests/deploy_watchdog.test.ts": 3103,
+  "tests/deposit_all_status_text.test.ts": 7,
   "tests/derelict_bomber.test.ts": 2163,
   "tests/design_code.test.ts": 47,
   "tests/desktop_discord_presence.test.ts": 27,
@@ -2108,6 +2298,7 @@
   "tests/dev_quest_commands.test.ts": 1700,
   "tests/dev_tier.test.ts": 21,
   "tests/dev_tier_ui.test.ts": 9,
+  "tests/dev_town_teleport.test.ts": 429,
   "tests/device_memory_hint.test.ts": 8,
   "tests/diagnostics_capture_guard.test.ts": 8,
   "tests/dialog_close_button_semantics.test.ts": 7,
@@ -2255,6 +2446,7 @@
   "tests/editor_undo_core.test.ts": 8,
   "tests/editor_user_assets.test.ts": 8,
   "tests/editor_view.test.ts": 13,
+  "tests/effective_stats.test.ts": 6,
   "tests/egg_hatchling.test.ts": 8,
   "tests/electron_builder_config.test.ts": 52,
   "tests/electron_desktop_config.test.ts": 14,
@@ -2337,6 +2529,7 @@
   "tests/equipment_instances_wire.test.ts": 7,
   "tests/equipment_proficiency.test.ts": 4407,
   "tests/error_text_i18n_core.test.ts": 24,
+  "tests/error_toast_controller.test.ts": 44,
   "tests/error_toast_log.test.ts": 14,
   "tests/escort_ambush_convoy.test.ts": 4347,
   "tests/escort_interact.test.ts": 18,
@@ -2481,6 +2674,7 @@
   "tests/form_visual_selection_core.test.ts": 12,
   "tests/frame_pos_reset.test.ts": 13,
   "tests/frame_present.test.ts": 10,
+  "tests/frame_rate_cap_setting.test.ts": 10,
   "tests/frost_ice_fields.test.ts": 236,
   "tests/frost_ice_fields_core.test.ts": 9,
   "tests/frost_mage_aoe.test.ts": 5884,
@@ -2497,6 +2691,7 @@
   "tests/gale_harbor.test.ts": 2326,
   "tests/galecrest.test.ts": 428,
   "tests/game_audio.test.ts": 35,
+  "tests/game_renderer.test.ts": 8,
   "tests/game_sessions.test.ts": 6665,
   "tests/game_state_metrics.test.ts": 6731,
   "tests/gamepad.test.ts": 133,
@@ -2596,6 +2791,7 @@
   "tests/gpu_prep_budget_core.test.ts": 40,
   "tests/gpu_prep_events.test.ts": 11,
   "tests/gpu_queue_window_core.test.ts": 6,
+  "tests/gpu_timer_probe_core.test.ts": 24,
   "tests/grant_line_view.test.ts": 17,
   "tests/graphics_overhaul_integration.test.ts": 17,
   "tests/graphics_profile_assets.test.ts": 13,
@@ -2892,11 +3088,13 @@
   "tests/inspect_window.test.ts": 128,
   "tests/instance_music.test.ts": 8,
   "tests/instance_provenance_boundaries.test.ts": 13372,
+  "tests/instanced_dither_fade.test.ts": 14,
   "tests/instanced_occluder_ghosts.test.ts": 11,
   "tests/interact_loot_only.test.ts": 2278,
   "tests/interact_object_credit.test.ts": 2378,
   "tests/interaction.test.ts": 5615,
   "tests/interaction_autorun.test.ts": 10,
+  "tests/interaction_input.test.ts": 16,
   "tests/interactions.test.ts": 27,
   "tests/interest.test.ts": 5302,
   "tests/interest_candidates.test.ts": 2344,
@@ -2974,6 +3172,7 @@
   "tests/keyboard_map_window.test.ts": 257,
   "tests/keyboard_turn_facing.test.ts": 26,
   "tests/keyboard_viewport.test.ts": 6,
+  "tests/kill_participation.test.ts": 6,
   "tests/kit_buildings.test.ts": 13,
   "tests/kit_uv_surface_core.test.ts": 34,
   "tests/kit_window_panes_core.test.ts": 28,
@@ -3514,6 +3713,7 @@
   "tests/oauth.test.ts": 28,
   "tests/objective_glow_view.test.ts": 8,
   "tests/obs_interaction.test.ts": 3746,
+  "tests/occluder_dither_fade.test.ts": 7,
   "tests/occluder_fade.test.ts": 4,
   "tests/occluder_fade_core.test.ts": 10,
   "tests/occluder_fade_gate.test.ts": 83,
@@ -4042,6 +4242,7 @@
   "tests/raid_lockout_view.test.ts": 7,
   "tests/raid_lockout_world.test.ts": 2420,
   "tests/raid_music_themes.test.ts": 7,
+  "tests/raid_released_ghost_loot.test.ts": 1582,
   "tests/raid_reset.test.ts": 76,
   "tests/raid_wipe_cooldowns.test.ts": 1454,
   "tests/range_command.test.ts": 3024,
@@ -4552,8 +4753,11 @@
   "tests/sfx_runtime_pack.test.ts": 191,
   "tests/sfx_studio.test.ts": 3330,
   "tests/sfx_studio_server_security.test.ts": 24286,
+  "tests/shader_ablation_transforms.test.ts": 9,
   "tests/shader_cache_warmup.test.ts": 120,
   "tests/shader_debug_flag.test.ts": 16,
+  "tests/shader_harvest_corpus.test.ts": 7,
+  "tests/shader_link_bench_report.test.ts": 4,
   "tests/shader_pow_domain.test.ts": 14,
   "tests/shader_warm_audit.test.ts": 93,
   "tests/shader_warm_audit_core.test.ts": 22,
@@ -4986,6 +5190,7 @@
   "tests/vault_admission_determinism.test.ts": 2175,
   "tests/vault_consumption_admission.test.ts": 341,
   "tests/vault_craft_gate.test.ts": 1242,
+  "tests/vault_search.test.ts": 44,
   "tests/vault_snapshot_wire.test.ts": 18,
   "tests/vault_view.test.ts": 21,
   "tests/vault_window.test.ts": 860,
@@ -5276,10 +5481,5 @@
   "tests/zone_streaming.test.ts": 11,
   "tests/zone_transition.test.ts": 5,
   "tests/zone_warm_tracker.test.ts": 26,
-  "tests/zones_command.test.ts": 2999,
-  "tests/instanced_dither_fade.test.ts": 14,
-  "tests/occluder_dither_fade.test.ts": 7,
-  "tests/shader_ablation_transforms.test.ts": 9,
-  "tests/shader_harvest_corpus.test.ts": 7,
-  "tests/shader_link_bench_report.test.ts": 4
+  "tests/zones_command.test.ts": 2999
 }

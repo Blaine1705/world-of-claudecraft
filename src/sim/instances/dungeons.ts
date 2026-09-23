@@ -1331,13 +1331,14 @@ export function claimedInstanceForMob(ctx: SimContext, mobId: number): InstanceS
 // the reward for anyone who actually ran the dungeon. A recipient already locked
 // for this reset is not paid again. Delivery splits on presence at the corpse: a
 // player in the death-time participation snapshot takes the marks straight to
-// bags (they were there to loot), while one locked from afar who walked through
-// the door this run (a back-line healer, a fallen or released raider) has them
-// posted to the Ravenpost so a distant participant never eats the daily lockout
-// without the reward. A member who never entered (a door-camper, an alt parked
-// in town) takes the lockout with no pay: roster membership alone is not income.
-// An uncredited death (no tap and no killer credit resolves, so the death-time
-// snapshot is empty) pays nobody, bags or mail, while the lockout still strikes.
+// bags (same-claim raid members, including distant back-line players and
+// released ghosts, are widened into that snapshot), while one locked outside
+// that snapshot who still walked through the door this run has them posted to
+// the Ravenpost so a lockout never outruns the reward. A member who never
+// entered (a door-camper, an alt parked in town) takes the lockout with no pay:
+// roster membership alone is not income. An uncredited death (no tap and no
+// killer credit resolves, so the death-time snapshot is empty) pays nobody,
+// bags or mail, while the lockout still strikes.
 export function awardHeroicMarks(
   ctx: SimContext,
   mob: Entity,

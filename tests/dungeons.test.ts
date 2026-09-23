@@ -2260,7 +2260,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     );
   });
 
-  it('mails the marks to a raider locked from far back, so lockout never outruns reward', () => {
+  it('pays marks to a raider locked from far back, so lockout never outruns reward', () => {
     const { sim, raiders, inst } = raidSetup('heroic');
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
     // The melee stack takes the kill at the boss; the back-line healer holds
@@ -2285,16 +2285,19 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
 
     // The whole raid takes the daily lockout, the far healer included...
     expect(sim.players.get(healer)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
-    // ...so the marks must reach them too. Not present at the corpse to loot, so
-    // they ride the Ravenpost instead of dropping into a distant player's bags.
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(0);
+    // ...so the marks must reach them too. Inside a claimed instance the whole
+    // claim footprint is in the death-time participation snapshot, so the
+    // back-line healer gets the direct heroic-mark pay instead of the fallback
+    // Ravenpost arm reserved for lockout recipients outside that snapshot.
+    expect(boss.lootRecipientIds).toContain(healer);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(3);
     const healerName = sim.players.get(healer)!.name;
     const mailedMarks = ((sim.postOffice as any).mail as any[])
       .filter((m) => m.recipientName === healerName)
       .flatMap((m) => m.items as { itemId: string; count: number }[])
       .filter((s) => s.itemId === HEROIC_MARK_ITEM_ID)
       .reduce((n, s) => n + s.count, 0);
-    expect(mailedMarks).toBe(3);
+    expect(mailedMarks).toBe(0);
   });
 
   it('lets a locked ghost return to its defeated heroic raid instance for loot', () => {
@@ -2457,7 +2460,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     ).toBe(true);
   });
 
-  it('resurrects an ineligible locked ghost in the crypt and keeps it out of the arena', () => {
+  it('keeps a same-claim locked ghost released through the crypt and resurrects at the arena', () => {
     const { sim, tank, raiders, inst } = raidSetup('heroic');
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
     raiders.slice(1).forEach((pid, i) => {
@@ -2477,25 +2480,24 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
       'hit',
     );
     expect(sim.players.get(tank)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
-    expect(boss.lootRecipientIds).not.toContain(tank);
+    // The dead tank's corpse is inside the same claimed instance; #4143 widened
+    // kill participation to the whole claim footprint so the lockout and loot
+    // rights travel together even beyond the overworld party range.
+    expect(boss.lootRecipientIds).toContain(tank);
 
     sim.releaseSpirit(tank);
     enterDungeon(sim.ctx, 'nythraxis_crypt', tank);
 
-    expect(tankEntity.dead).toBe(false);
-    expect(tankEntity.ghost).toBe(false);
+    expect(tankEntity.dead).toBe(true);
+    expect(tankEntity.ghost).toBe(true);
     expect(sim.instanceInfoAt(tankEntity.pos)?.dungeonId).toBe('nythraxis_crypt');
     sim.drainEvents();
 
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', tank);
 
-    expect(sim.instanceInfoAt(tankEntity.pos)?.dungeonId).toBe('nythraxis_crypt');
-    expect(
-      (sim.drainEvents() as any[]).some(
-        (event) =>
-          event.type === 'error' && event.text === 'You are locked to Heroic Nythraxis Raid Arena.',
-      ),
-    ).toBe(true);
+    expect(tankEntity.dead).toBe(false);
+    expect(tankEntity.ghost).toBe(false);
+    expect(sim.instanceInfoAt(tankEntity.pos)?.dungeonId).toBe('nythraxis_boss_arena');
   });
 
   it('keeps a locked ghost out after its defeated heroic claim is freed', () => {
