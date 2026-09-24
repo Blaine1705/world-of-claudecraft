@@ -18133,4 +18133,63 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.hoard_vault_reward.subject': '宝物庫の報酬',
   'entities.letters.hoard_vault_reward.body':
     '宝物庫は攻略されましたが、あなたの取り分は宝箱から受け取られていません。獲得した品とお金をカラス便がお届けします。\n\n- カラス便',
+  // Faction quartermaster goods and currencies, and the Buried Hoard add casts (M16).
+  'abilityUi.cast.hoard_cast_charge': '突撃',
+  'abilityUi.cast.hoard_cast_cinder_bolt': '燃えさしの矢',
+  'abilityUi.cast.hoard_cast_doom_ritual': '破滅の儀式',
+  'abilityUi.cast.hoard_cast_drowning_hook': '溺れの鉤',
+  'abilityUi.cast.hoard_cast_silk_snare': '絹の罠',
+  'abilityUi.cast.hoard_cast_void_empower': '虚無の強化',
+  'abilityUi.cast.hoard_cast_webbing': '蜘蛛の巣',
+  'entities.items.allied_hearthstone.name': '同盟のハースストーン',
+  'entities.items.allied_vanguard_duffel.name': '同盟先遣隊の雑嚢',
+  'entities.items.clockwork_shock_bomb.name': 'ぜんまい式衝撃爆弾',
+  'entities.items.clockwork_target_dummy.name': 'ぜんまい式訓練人形',
+  'entities.items.dawn_battle_standard.name': '夜明けの軍旗',
+  'entities.items.dense_sharpening_stone.name': '高密度の砥石',
+  'entities.items.elixir_of_mana_regeneration.name': 'マナ回復のエリクサー',
+  'entities.items.formula_enchant_feet_shadowstride.name': '製法書：ブーツエンチャント - 影歩き',
+  'entities.items.formula_enchant_gloves_forged_might.name':
+    '製法書：グローブエンチャント - 鍛えられた力',
+  'entities.items.formula_enchant_offhand_spirit.name': '製法書：オフハンドエンチャント - 精神',
+  'entities.items.pattern_reinforced_armor_kit.name': '型紙：強化アーマーキット',
+  'entities.items.plans_dense_sharpening_stone.name': '設計図：高密度の砥石',
+  'entities.items.potion_of_invisibility.name': '透明化のポーション',
+  'entities.items.recipe_elixir_of_mana_regeneration.name': 'レシピ：マナ回復のエリクサー',
+  'entities.items.recipe_potion_of_invisibility.name': 'レシピ：透明化のポーション',
+  'entities.items.reinforced_armor_kit.name': '強化アーマーキット',
+  'entities.items.rift_feather_glider.name': 'リフトの羽根グライダー',
+  'entities.items.schematic_clockwork_shock_bomb.name': '設計図：ぜんまい式衝撃爆弾',
+  'entities.mobs.rift_marrow_golem.name': '骨髄のゴーレム',
+  'hudChrome.currencies.automatonCog': 'オートマトンの歯車',
+  'hudChrome.currencies.automatonCogNote': 'オートマトン地域のワールドクエスト',
+  'hudChrome.currencies.churchOrderCrest': '修道会の紋章',
+  'hudChrome.currencies.churchOrderCrestNote': '教会修道会地域のワールドクエスト',
+  'hudChrome.currencies.riftWatchMark': 'リフトの見張りの徽章',
+  'hudChrome.currencies.riftWatchMarkNote': 'リフトの見張り地域のワールドクエスト',
+  'hudChrome.enchantName.enchant_feet_shadowstride': 'ブーツの刻印：影歩き',
+  'hudChrome.enchantName.enchant_gloves_forged_might': 'グローブの刻印：鍛えられた力',
+  'hudChrome.enchantName.enchant_offhand_spirit': 'オフハンドの刻印：精神',
+  'hudChrome.factionRewards.alliedHearthstoneAttuned': '同調先：{hub}',
+  'hudChrome.factionRewards.alliedHearthstoneUse':
+    '使用: 同調した勢力の拠点へテレポートします。（詠唱 10 秒、クールダウン 15 分）',
+  'hudChrome.factionRewards.armorKitUse':
+    '使用: 胸部防具を強化し、1 時間アーマーが 12 上昇します。',
+  'hudChrome.factionRewards.battleStandardUse':
+    '使用: 聖なる夜明けの軍旗を 5 分間設置し、周囲のすべての味方の非戦闘時の体力とマナの回復を大きく高めます。10 秒間その近くにとどまると、夜明けの祝福（全能力値 +5%、30 分）も得られます。（クールダウン 5 分）',
+  'hudChrome.factionRewards.hub_automatons': 'サウスリーチ（オートマトン鋳造所）',
+  'hudChrome.factionRewards.hub_church_order': 'イーストブルック渓谷（聖光教会修道会）',
+  'hudChrome.factionRewards.hub_none': 'なし（勢力の拠点の近くで使用すると同調します）',
+  'hudChrome.factionRewards.hub_rift_watch': 'ドリフトヘイヴン（リフトの見張り）',
+  'hudChrome.factionRewards.invisibilityUse':
+    '使用: 6 秒間ステルス状態になります。（クールダウン 2 分）',
+  'hudChrome.factionRewards.manaElixirUse': '使用: 1 時間精神が 6 上昇します。',
+  'hudChrome.factionRewards.riftGliderUse':
+    '使用: グライダーを広げ、30 秒間落下速度を下げます。着地するかダメージを受けると効果が解除されます。（クールダウン 2 分）',
+  'hudChrome.factionRewards.sharpeningStoneUse':
+    '使用: メインハンド武器を研ぎ、30 分間攻撃力が 6 上昇します。',
+  'hudChrome.factionRewards.shockBombUse':
+    '使用: 最大 30 ヤード先に衝撃爆弾を投げ、5 ヤード以内のすべての敵に 120～160 の自然ダメージを与えます。（クールダウン 1 分）',
+  'hudChrome.factionRewards.targetDummyUse':
+    '使用: 戦闘技能の練習用に、機械仕掛けの訓練人形をフィールドに 2 分間設置します。（クールダウン 5 分）',
 };

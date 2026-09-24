@@ -18106,4 +18106,62 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.hoard_vault_reward.subject': '보물 창고 보상',
   'entities.letters.hoard_vault_reward.body':
     '보물 창고가 공략되었지만 보물 상자에서 당신의 몫을 받지 않았습니다. 획득한 물품과 동전을 까마귀가 이곳으로 배달했습니다.\n\n- 까마귀 우편국',
+  // Faction quartermaster goods and currencies, and the Buried Hoard add casts (M16).
+  'abilityUi.cast.hoard_cast_charge': '돌진',
+  'abilityUi.cast.hoard_cast_cinder_bolt': '잿불 화살',
+  'abilityUi.cast.hoard_cast_doom_ritual': '파멸의 의식',
+  'abilityUi.cast.hoard_cast_drowning_hook': '익사의 갈고리',
+  'abilityUi.cast.hoard_cast_silk_snare': '비단 올가미',
+  'abilityUi.cast.hoard_cast_void_empower': '공허 강화',
+  'abilityUi.cast.hoard_cast_webbing': '거미줄',
+  'entities.items.allied_hearthstone.name': '동맹의 귀환석',
+  'entities.items.allied_vanguard_duffel.name': '동맹 선봉대의 더플백',
+  'entities.items.clockwork_shock_bomb.name': '태엽 충격 폭탄',
+  'entities.items.clockwork_target_dummy.name': '태엽 훈련용 허수아비',
+  'entities.items.dawn_battle_standard.name': '여명의 전투 깃발',
+  'entities.items.dense_sharpening_stone.name': '단단한 숫돌',
+  'entities.items.elixir_of_mana_regeneration.name': '마나 회복의 비약',
+  'entities.items.formula_enchant_feet_shadowstride.name': '공식: 장화 마법부여 - 그림자 걸음',
+  'entities.items.formula_enchant_gloves_forged_might.name': '공식: 장갑 마법부여 - 벼려진 힘',
+  'entities.items.formula_enchant_offhand_spirit.name': '공식: 보조장비 마법부여 - 정신력',
+  'entities.items.pattern_reinforced_armor_kit.name': '도안: 강화 방어구 키트',
+  'entities.items.plans_dense_sharpening_stone.name': '설계도: 단단한 숫돌',
+  'entities.items.potion_of_invisibility.name': '투명화 물약',
+  'entities.items.recipe_elixir_of_mana_regeneration.name': '제조법: 마나 회복의 비약',
+  'entities.items.recipe_potion_of_invisibility.name': '제조법: 투명화 물약',
+  'entities.items.reinforced_armor_kit.name': '강화 방어구 키트',
+  'entities.items.rift_feather_glider.name': '균열 깃털 글라이더',
+  'entities.items.schematic_clockwork_shock_bomb.name': '도면: 태엽 충격 폭탄',
+  'entities.mobs.rift_marrow_golem.name': '골수 골렘',
+  'hudChrome.currencies.automatonCog': '오토마톤 톱니',
+  'hudChrome.currencies.automatonCogNote': '오토마톤 지역의 월드 퀘스트',
+  'hudChrome.currencies.churchOrderCrest': '수도회 문장',
+  'hudChrome.currencies.churchOrderCrestNote': '교회 수도회 지역의 월드 퀘스트',
+  'hudChrome.currencies.riftWatchMark': '균열 감시단 징표',
+  'hudChrome.currencies.riftWatchMarkNote': '균열 감시단 지역의 월드 퀘스트',
+  'hudChrome.enchantName.enchant_feet_shadowstride': '장화 각인: 그림자 걸음',
+  'hudChrome.enchantName.enchant_gloves_forged_might': '장갑 각인: 벼려진 힘',
+  'hudChrome.enchantName.enchant_offhand_spirit': '보조장비 각인: 정신력',
+  'hudChrome.factionRewards.alliedHearthstoneAttuned': '조율된 곳: {hub}',
+  'hudChrome.factionRewards.alliedHearthstoneUse':
+    '사용: 조율된 진영 거점으로 순간이동합니다. (시전 10초, 재사용 대기시간 15분)',
+  'hudChrome.factionRewards.armorKitUse':
+    '사용: 가슴 방어구를 강화하여 1시간 동안 방어도가 12 증가합니다.',
+  'hudChrome.factionRewards.battleStandardUse':
+    '사용: 신성한 여명의 전투 깃발을 5분 동안 세워 주위 모든 아군의 비전투 생명력 및 마나 회복을 크게 높입니다. 10초 동안 그 근처에 머무르면 여명의 축복(모든 능력치 +5%, 30분)도 얻습니다. (재사용 대기시간 5분)',
+  'hudChrome.factionRewards.hub_automatons': '사우스 리치 (오토마톤 주조소)',
+  'hudChrome.factionRewards.hub_church_order': '이스트브룩 골짜기 (성스러운 빛의 교회 수도회)',
+  'hudChrome.factionRewards.hub_none': '없음 (진영 거점 근처에서 사용하여 조율)',
+  'hudChrome.factionRewards.hub_rift_watch': '드리프트헤이븐 (균열 감시단)',
+  'hudChrome.factionRewards.invisibilityUse':
+    '사용: 6초 동안 은신 상태가 됩니다. (재사용 대기시간 2분)',
+  'hudChrome.factionRewards.manaElixirUse': '사용: 1시간 동안 정신력이 6 증가합니다.',
+  'hudChrome.factionRewards.riftGliderUse':
+    '사용: 글라이더를 펼쳐 30초 동안 낙하 속도를 늦춥니다. 착지하거나 피해를 입으면 효과가 취소됩니다. (재사용 대기시간 2분)',
+  'hudChrome.factionRewards.sharpeningStoneUse':
+    '사용: 주 무기를 연마하여 30분 동안 전투력이 6 증가합니다.',
+  'hudChrome.factionRewards.shockBombUse':
+    '사용: 최대 30미터 거리에 충격 폭탄을 던져 5미터 내 모든 적에게 120~160의 자연 피해를 줍니다. (재사용 대기시간 1분)',
+  'hudChrome.factionRewards.targetDummyUse':
+    '사용: 전투 기술 연습을 위해 필드에 기계 훈련용 허수아비를 2분 동안 배치합니다. (재사용 대기시간 5분)',
 };
