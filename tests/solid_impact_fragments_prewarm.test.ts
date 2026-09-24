@@ -7,6 +7,7 @@ import {
 } from '../src/render/ability_vfx/active_kit_prewarm';
 import * as contact from '../src/render/ability_vfx/contact_assets';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
+import { GuardPrewarm } from '../src/render/ability_vfx/guard_prewarm';
 import * as assets from '../src/render/ability_vfx/production_assets';
 import { SolidImpactFragments } from '../src/render/ability_vfx/solid_impact_fragments';
 import type { BackgroundGpuQueue } from '../src/render/background_gpu_queue';
@@ -171,4 +172,66 @@ it('keeps the fragments off, and builds nothing, while the kit geometry is absen
   expect(k.host.draw).not.toHaveBeenCalled();
   for (const kind of KINDS) expect(burst(pool, kind)).toBe(0);
   pool.update(0.1, false);
+});
+
+function builtPool() {
+  const scene = new THREE.Scene();
+  const pool = new SolidImpactFragments(scene);
+  const sources = new Map(KINDS.map((kind) => [kind, new THREE.IcosahedronGeometry(1, 0)]));
+  vi.spyOn(assets, 'fragmentGeometry').mockImplementation((kind) => sources.get(kind) ?? null);
+  cleanups.push(() => {
+    for (const source of sources.values()) source.dispose();
+  });
+  const host = {
+    properties: { get: () => ({ programs: new Map() }) },
+    compile: vi.fn(async () => {}),
+    draw: vi.fn(),
+  };
+  const units = pool.units(host);
+  for (const kind of KINDS) units.find((unit) => unit.id === `fragment-build:${kind}`)?.run();
+  return { scene, pool, host, units };
+}
+
+it('finishes every batch cleanup when one carrier disposal throws, then reports it', () => {
+  const { scene, pool } = builtPool();
+  const live = liveFragments(scene);
+  expect(live).toHaveLength(3);
+  const failure = new Error('carrier cleanup failed');
+  const carriers = vi.spyOn(GuardPrewarm.prototype, 'dispose');
+  carriers.mockImplementationOnce(() => {
+    throw failure;
+  });
+  const disposals = live.flatMap((mesh) => [
+    vi.spyOn(mesh.geometry, 'dispose'),
+    vi.spyOn(mesh.material, 'dispose'),
+  ]);
+  let thrown: unknown;
+  try {
+    pool.dispose();
+  } catch (error) {
+    thrown = error;
+  }
+  expect(thrown).toBeInstanceOf(AggregateError);
+  expect((thrown as AggregateError).errors).toEqual([failure]);
+  expect(carriers).toHaveBeenCalledTimes(3);
+  expect(liveFragments(scene)).toHaveLength(0);
+  for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
+  for (const kind of KINDS) expect(burst(pool, kind)).toBe(0);
+  // Disposal is terminal: a second call is a no-op, not a second throw.
+  expect(() => pool.dispose()).not.toThrow();
+});
+
+it('fails a preparation step whose carrier unit no longer exists instead of skipping it', async () => {
+  const { pool, units } = builtPool();
+  cleanups.push(() => pool.dispose());
+  const real = GuardPrewarm.prototype.units;
+  vi.spyOn(GuardPrewarm.prototype, 'units').mockImplementation(function (this: GuardPrewarm, h) {
+    return real
+      .call(this, h)
+      .map((unit) => (unit.id === 'guard-compile' ? { ...unit, id: 'guard-link' } : unit));
+  });
+  const compile = units.find((unit) => unit.id === 'fragment-compile:stone_chip');
+  expect(compile).toBeDefined();
+  await expect(async () => compile?.run()).rejects.toThrow('guard-compile');
+  expect(burst(pool, 'stone_chip')).toBe(0);
 });

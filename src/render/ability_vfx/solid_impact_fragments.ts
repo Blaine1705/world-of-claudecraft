@@ -52,10 +52,12 @@ export class SolidImpactFragments {
     if (this.disposed) return;
     const batch = this.batches.get(kind);
     if (!batch) throw new Error(`Solid fragment ${kind} was not built`);
-    return batch.preparation
-      .units(host)
-      .find((unit) => unit.id === `guard-${step}`)
-      ?.run();
+    if (batch.preparation.ready()) return;
+    const unit = batch.preparation.units(host).find((u) => u.id === `guard-${step}`);
+    // A renamed carrier step must fail the recipe, never leave the kind cold
+    // while its unit reports success.
+    if (!unit) throw new Error(`Solid fragment ${kind} has no guard-${step} preparation unit`);
+    return unit.run();
   }
   private build(kind: FragmentKind): void {
     if (this.disposed || this.batches.has(kind)) return;
@@ -231,12 +233,23 @@ export class SolidImpactFragments {
     if (this.disposed) return;
     this.disposed = true;
     this.clear();
+    // One failing step (a carrier cleanup throws an AggregateError) must not
+    // strand the remaining batches' GPU buffers: finish, then report them all.
+    const errors: unknown[] = [];
+    const release = (work: () => void) => {
+      try {
+        work();
+      } catch (error) {
+        errors.push(error);
+      }
+    };
     for (const b of this.batches.values()) {
-      b.preparation.dispose();
-      b.mesh.removeFromParent();
-      b.mesh.geometry.dispose();
-      b.mesh.material.dispose();
+      release(() => b.preparation.dispose());
+      release(() => b.mesh.removeFromParent());
+      release(() => b.mesh.geometry.dispose());
+      release(() => b.mesh.material.dispose());
     }
     this.batches.clear();
+    if (errors.length) throw new AggregateError(errors, 'Solid fragment cleanup failed');
   }
 }
