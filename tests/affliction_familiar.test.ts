@@ -67,7 +67,7 @@ describe('Affliction Maledict Eye familiar', () => {
       model.name = 'approved-maledict-eye-model';
       return model;
     });
-    const familiar = new AfflictionFamiliar(factory);
+    const familiar = new AfflictionFamiliar(undefined, factory);
 
     familiar.update(world, views, true, 0);
     const root = host.getObjectByName('affliction-familiar') as THREE.Group;
@@ -84,10 +84,11 @@ describe('Affliction Maledict Eye familiar', () => {
     familiar.update(world, views, true, 2);
     expect(host.getObjectByName('affliction-familiar')).toBeUndefined();
 
+    // Re-shown by re-attaching the same root: no new clone per spec switch.
     world.talentSpec = 'affliction';
     familiar.update(world, views, true, 3);
-    expect(factory).toHaveBeenCalledTimes(2);
-    expect(host.getObjectByName('affliction-familiar')).toBeDefined();
+    expect(factory).toHaveBeenCalledOnce();
+    expect(host.getObjectByName('affliction-familiar')).toBe(root);
 
     familiar.clear();
     expect(host.getObjectByName('affliction-familiar')).toBeUndefined();
@@ -103,7 +104,7 @@ describe('Affliction Maledict Eye familiar', () => {
     expect(familiarSource).toContain('loadGltf(MODEL_URL)');
     // Deferred, never eager: the launch-burst OOM lane (defer_launcher_preloads).
     expect(familiarSource).toContain('registerDeferredPreload(');
-    expect(rendererSource).toContain('new AfflictionFamiliar()');
+    expect(rendererSource).toContain('new AfflictionFamiliar(() => this.worldCompileGate())');
     expect(rendererSource).toContain(
       'this.afflictionFamiliar.update(this.sim, this.views, this.reducedMotion(), this.time)',
     );

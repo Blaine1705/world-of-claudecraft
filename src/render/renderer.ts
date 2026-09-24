@@ -8726,7 +8726,7 @@ export class Renderer {
   private readonly burningPactMarkers = new BurningPactMarkers();
   private readonly umbralAnchorMarker = new UmbralAnchorMarker(this.groundSample);
   // The approved Maledict Eye is cosmetic: one local, non-targetable Affliction familiar.
-  private readonly afflictionFamiliar = new AfflictionFamiliar();
+  private readonly afflictionFamiliar = new AfflictionFamiliar(() => this.worldCompileGate());
   // Delve module interiors build asynchronously; the tracker also retires a
   // position's stale geometry when a new run puts a different module there
   // (see delve_interior_tracker.ts).

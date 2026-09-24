@@ -117,7 +117,9 @@ export interface EntityGateStandIn {
    *  of the view gate, registered where it hides something a player acts on:
    *  the farm module, whose plots and feast tables ride the host's gate
    *  through it (the renderer's own zone-feature attach and the coach trail
-   *  hide scenery and guidance built before any live frame, not entities). */
+   *  hide scenery and guidance built before any live frame, not entities; the
+   *  Affliction familiar's first attach hides a cosmetic companion whose one
+   *  state, Possess the Evil Eye, stays on the player's buff bar). */
   gate:
     | 'gateViewOnCompile'
     | 'gateSwapOnCompile'
