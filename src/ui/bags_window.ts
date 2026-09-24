@@ -1124,20 +1124,21 @@ export class BagsWindow {
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
       const lockSeal = lockMarkHtml(locked);
       row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${parts.qualityBadge}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
-      // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
-      // 5s throw pacing is visible in the bag. The bag is a cold window with no
-      // per-frame driver, so the sweep is a self-contained CSS animation seeded from
-      // the wired remaining seconds (world.player.firebottleCdRemaining), not a
-      // per-frame-repainted --cd-fill like the action bar. Appended after the
-      // Mid-cooldown items paint a draining curtain on their slot so the pacing
-      // is visible in the bag. The bag is a cold window with no per-frame driver, so
-      // the sweep is a self-contained CSS animation seeded from remaining seconds.
-      const itemCd =
-        world.player.cooldowns.get(item.id) ??
-        (item.id === FIREBOTTLE_ITEM_ID ? world.player.firebottleCdRemaining : 0);
+      // An item mid-cooldown (the firebottle's 5s throw pacing, the faction
+      // quartermaster goods in ITEM_BASE_COOLDOWNS) paints a draining curtain on
+      // its slot. The bag is a cold window with no per-frame driver, so the sweep
+      // is a self-contained CSS animation seeded from the wired remaining seconds,
+      // not a per-frame-repainted --cd-fill like the action bar. Only an item
+      // with a cooldown reads the player's timers, so an ordinary stack never
+      // touches world.player.
       const itemTotalCd =
         getItemCooldownDuration(item.id) ||
-        (item.id === FIREBOTTLE_ITEM_ID ? FIREBOTTLE_COOLDOWN_SECS : itemCd);
+        (item.id === FIREBOTTLE_ITEM_ID ? FIREBOTTLE_COOLDOWN_SECS : 0);
+      const itemCd =
+        itemTotalCd > 0
+          ? (world.player.cooldowns.get(item.id) ??
+            (item.id === FIREBOTTLE_ITEM_ID ? world.player.firebottleCdRemaining : 0))
+          : 0;
       if (itemCd > 0 && itemTotalCd > 0) {
         const remaining = itemCd;
         const curtain = document.createElement('span');
