@@ -817,6 +817,7 @@ const RENDER_PURE_CORES = [
   'src/render/dashed_ring_core.ts',
   'src/render/detail_horizon_core.ts',
   'src/render/drape_lod_core.ts',
+  'src/render/draw_program_signature_core.ts',
   'src/render/legendary_regalia_core.ts',
   'src/render/draped_bounds_core.ts',
   'src/render/vfx_screen_bounds_core.ts',

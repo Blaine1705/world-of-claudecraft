@@ -11,6 +11,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as contactAssets from '../src/render/ability_vfx/contact_assets';
 import { FLIPBOOK_STYLES } from '../src/render/ability_vfx/fx_textures';
 import {
+  abilityVfxCompileMaterials,
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
@@ -144,16 +145,45 @@ describe('abilityVfxTexturePrewarmSteps', () => {
 });
 
 describe('collectAbilityVfxCompileTargets', () => {
-  it('returns one target per distinct pooled material', () => {
+  it('returns one target per distinct pooled program', () => {
     const scene = new THREE.Scene();
     const shared = new THREE.MeshBasicMaterial();
     scene.add(vfxMesh('ring', shared));
     scene.add(vfxMesh('ring-slot-2', shared)); // same material: already covered
-    scene.add(vfxMesh('decal', new THREE.MeshBasicMaterial()));
+    scene.add(vfxMesh('decal', new THREE.MeshBasicMaterial({ transparent: true })));
     const targets = collectAbilityVfxCompileTargets(scene);
     expect(targets).toHaveLength(2);
     expect(targets.map((target) => target.object.name)).toEqual(['ring', 'decal']);
     expect(new Set(targets.map((target) => target.id)).size).toBe(2);
+  });
+
+  it('folds built-in material clones by program, not by material instance', () => {
+    // The warlock verdict pools build one MeshBasicMaterial per part per slot:
+    // hundreds of instances over a handful of programs. Keyed by uuid, each
+    // clone was a compile unit and a gate entry (about 400 on Sentence and
+    // Needle of Fate together); keyed by program, the slots collapse.
+    const scene = new THREE.Scene();
+    const proto = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false });
+    for (let slot = 0; slot < 8; slot++) {
+      const clone = proto.clone();
+      clone.color.setHex(0x100000 * (slot + 1));
+      clone.opacity = slot / 8;
+      scene.add(vfxMesh(`slot-${slot}`, clone));
+    }
+    // A real second program in the same pool still earns its own unit, and so
+    // does the same material drawn by a Points cloud.
+    scene.add(vfxMesh('opaque', new THREE.MeshBasicMaterial()));
+    const cloud = new THREE.Points(new THREE.BufferGeometry(), proto.clone());
+    cloud.name = 'cloud';
+    cloud.userData.renderCategory = 'vfx';
+    scene.add(cloud);
+    const targets = collectAbilityVfxCompileTargets(scene);
+    expect(targets.map((target) => target.object.name)).toEqual(['slot-0', 'opaque', 'cloud']);
+    const gated = abilityVfxCompileMaterials(scene);
+    // The gate asks about the SAME representatives the units compile.
+    expect(gated).toEqual(
+      targets.map((target) => (target.object as THREE.Mesh).material as THREE.Material),
+    );
   });
 
   it('ignores everything that is not a tagged VFX mesh', () => {
