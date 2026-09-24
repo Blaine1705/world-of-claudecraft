@@ -89,6 +89,28 @@ describe('the scene cast-VFX gate over three', () => {
     expect(readiness.ready()).toBe(true);
   });
 
+  it('opens over Points, line and Sprite pools once their units settled, never by the deadline', async () => {
+    // A class pool is not only meshes (wisp points, lash lines, glow sprites):
+    // a proof walk that saw meshes alone left these pending until the gate
+    // was forced open.
+    const { scene, host, webgl, readiness, programs } = harness([]);
+    const drawables: Array<THREE.Points | THREE.LineSegments | THREE.Sprite> = [
+      new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial()),
+      new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial()),
+      new THREE.Sprite(new THREE.SpriteMaterial()),
+    ];
+    for (const drawable of drawables) {
+      drawable.userData.renderCategory = 'vfx';
+      scene.add(drawable);
+      programs.set(drawable.material as THREE.Material, program());
+    }
+    const units = castVfxProgramUnits(scene, null, host, webgl, () => Promise.resolve());
+    expect(units).toHaveLength(3);
+    expect(readiness.ready()).toBe(false);
+    await Promise.all(units.map((unit) => unit.run()));
+    expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
+  });
+
   it('records nothing for a compile that failed: an unseen link is not a proof', async () => {
     const mesh = vfxMesh('ring');
     const { scene, host, webgl, readiness, programs, materialOf } = harness([mesh]);
