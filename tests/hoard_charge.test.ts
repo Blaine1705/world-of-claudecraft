@@ -37,11 +37,12 @@ function graskRoom(): { sim: Sim; inst: RiftInstance; boss: Entity; state: Hoard
   }
   boss.aiState = 'attack';
   boss.aggroTargetId = sim.player.id;
-  const state = (inst.hoardBoss ??= {
+  inst.hoardBoss ??= {
     cues: [],
     nextCueId: 1,
     sequenceStep: 0,
-  } as unknown as HoardBossState);
+  } as unknown as HoardBossState;
+  const state = inst.hoardBoss;
   sim.drainEvents();
   return { sim, inst, boss, state };
 }

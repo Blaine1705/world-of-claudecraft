@@ -26,11 +26,12 @@ function vysskaRoom(): { sim: Sim; inst: RiftInstance; boss: Entity; state: Hoar
   expect(boss.templateId).toBe('rift_boss_venom');
   boss.aiState = 'attack';
   boss.aggroTargetId = sim.player.id;
-  const state = (inst.hoardBoss ??= {
+  inst.hoardBoss ??= {
     cues: [],
     nextCueId: 1,
     sequenceStep: 0,
-  } as unknown as HoardBossState);
+  } as unknown as HoardBossState;
+  const state = inst.hoardBoss;
   sim.drainEvents();
   return { sim, inst, boss, state };
 }
