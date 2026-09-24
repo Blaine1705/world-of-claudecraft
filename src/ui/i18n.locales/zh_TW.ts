@@ -17300,4 +17300,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使用：向最遠 30 碼處投擲一枚震盪炸彈，對 5 碼內的所有敵人造成 120 到 160 點自然傷害。（冷卻 1 分鐘）',
   'hudChrome.factionRewards.targetDummyUse':
     '使用：在野外部署一個機械訓練假人，持續 2 分鐘，用於練習戰鬥技能。（冷卻 5 分鐘）',
+  'sim.factionVendor.currencyRequired': '你需要 {amount} 個{currency}才能購買。',
 };

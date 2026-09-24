@@ -9636,6 +9636,9 @@ export const pl_PL: EnTranslations = {
       "nhaliaCantorShield": "Kantorzy, trzymajcie nutę!",
       "nhaliaBlackwaterMark": "{name} naznacza {player} Czarną Wodą!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "Zamek ustępuje! Łupy poziomu: {tier}.",
       "tierPremium": "Premium",

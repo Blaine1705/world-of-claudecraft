@@ -9636,6 +9636,9 @@ export const zh_CN: EnTranslations = {
       "nhaliaCantorShield": "诵经者们，稳住音符！",
       "nhaliaBlackwaterMark": "{name}用黑水标记了{player}！"
     },
+    "factionVendor": {
+      "currencyRequired": "你需要 {amount} 个{currency}才能购买。"
+    },
     "lockpick": {
       "lockYields": "锁开了！{tier}战利品。",
       "tierPremium": "上乘",

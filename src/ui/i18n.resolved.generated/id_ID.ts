@@ -9636,6 +9636,9 @@ export const id_ID: EnTranslations = {
       "nhaliaCantorShield": "Para Pelantun, tahan nadanya!",
       "nhaliaBlackwaterMark": "{name} menandai {player} dengan Air Hitam!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "Kunci terbuka! Rampasan {tier}.",
       "tierPremium": "Premium",

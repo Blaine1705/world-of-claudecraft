@@ -1037,6 +1037,12 @@ export const en = {
       nhaliaCantorShield: 'Cantors, hold the note!',
       nhaliaBlackwaterMark: '{name} marks {player} with Blackwater!',
     },
+    // The faction quartermaster refusal (src/sim/items.ts, the faction-price
+    // arm of a vendor purchase). The sim emits English; sim_i18n.ts matches it
+    // and localizes {currency} through hudChrome.currencies.
+    factionVendor: {
+      currencyRequired: 'You need {amount} {currency} to purchase that.',
+    },
     lockpick: {
       lockYields: 'The lock yields! {tier} spoils.',
       tierPremium: 'Premium',

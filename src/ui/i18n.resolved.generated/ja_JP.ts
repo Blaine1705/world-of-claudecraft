@@ -9636,6 +9636,9 @@ export const ja_JP: EnTranslations = {
       "nhaliaCantorShield": "詠唱者たちよ、音を保て！",
       "nhaliaBlackwaterMark": "{name}が{player}に黒水の刻印を刻む！"
     },
+    "factionVendor": {
+      "currencyRequired": "購入するには{currency}が {amount} 個必要です。"
+    },
     "lockpick": {
       "lockYields": "錠が開いた! {tier}の戦利品だ。",
       "tierPremium": "極上",

@@ -9636,6 +9636,9 @@ export const vi_VN: EnTranslations = {
       "nhaliaCantorShield": "Các Lĩnh Xướng, giữ vững nốt ngân!",
       "nhaliaBlackwaterMark": "{name} đánh dấu {player} bằng Nước Đen!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "Ổ khóa bật mở! Chiến lợi phẩm {tier}.",
       "tierPremium": "Cao Cấp",

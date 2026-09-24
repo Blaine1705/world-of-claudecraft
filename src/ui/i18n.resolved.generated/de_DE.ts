@@ -9636,6 +9636,9 @@ export const de_DE: EnTranslations = {
       "nhaliaCantorShield": "Kantoren, haltet den Ton!",
       "nhaliaBlackwaterMark": "{name} zeichnet {player} mit Schwarzwasser!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "Das Schloss gibt nach! {tier} Beute.",
       "tierPremium": "Erlesen",

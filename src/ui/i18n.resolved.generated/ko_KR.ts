@@ -9636,6 +9636,9 @@ export const ko_KR: EnTranslations = {
       "nhaliaCantorShield": "영창자들이여, 음을 유지하라!",
       "nhaliaBlackwaterMark": "{name}이(가) {player}에게 흑수 표식을 남긴다!"
     },
+    "factionVendor": {
+      "currencyRequired": "구매하려면 {currency} {amount}개가 필요합니다."
+    },
     "lockpick": {
       "lockYields": "자물쇠가 열립니다! {tier} 전리품.",
       "tierPremium": "최상급",

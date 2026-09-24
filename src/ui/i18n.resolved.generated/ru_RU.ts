@@ -9636,6 +9636,9 @@ export const ru_RU: EnTranslations = {
       "nhaliaCantorShield": "Канторы, держите ноту!",
       "nhaliaBlackwaterMark": "{name} метит {player} Чёрной Водой!"
     },
+    "factionVendor": {
+      "currencyRequired": "Для покупки нужно {currency}: {amount}."
+    },
     "lockpick": {
       "lockYields": "Замок поддаётся! Добыча: {tier}.",
       "tierPremium": "Превосходная",

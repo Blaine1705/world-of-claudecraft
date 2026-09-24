@@ -9636,6 +9636,9 @@ export const tr_TR: EnTranslations = {
       "nhaliaCantorShield": "Kantorlar, notayı tutun!",
       "nhaliaBlackwaterMark": "{name}, {player} üzerine Kara Su işareti bırakır!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "Kilit açılır! {tier} ganimet.",
       "tierPremium": "Premium",

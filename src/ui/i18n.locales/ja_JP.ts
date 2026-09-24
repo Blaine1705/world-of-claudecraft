@@ -18192,4 +18192,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '使用: 最大 30 ヤード先に衝撃爆弾を投げ、5 ヤード以内のすべての敵に 120～160 の自然ダメージを与えます。（クールダウン 1 分）',
   'hudChrome.factionRewards.targetDummyUse':
     '使用: 戦闘技能の練習用に、機械仕掛けの訓練人形をフィールドに 2 分間設置します。（クールダウン 5 分）',
+  'sim.factionVendor.currencyRequired': '購入するには{currency}が {amount} 個必要です。',
 };

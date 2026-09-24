@@ -9636,6 +9636,9 @@ export const en_XA: EnTranslations = {
       "nhaliaCantorShield": "[Çáñţóŕš, ĥóļð ţĥé ñóţé!]",
       "nhaliaBlackwaterMark": "[{name} ɱáŕķš {player} ŵíţĥ Ɓļáçķŵáţéŕ!]"
     },
+    "factionVendor": {
+      "currencyRequired": "[Ýóú ñééð {amount} {currency} ţó þúŕçĥášé ţĥáţ.]"
+    },
     "lockpick": {
       "lockYields": "[Ţĥé ļóçķ ýíéļðš! {tier} šþóíļš.]",
       "tierPremium": "[Þŕéɱíúɱ]",

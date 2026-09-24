@@ -9636,6 +9636,9 @@ export const en_CA: EnTranslations = {
       "nhaliaCantorShield": "Cantors, hold the note!",
       "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "The lock yields! {tier} spoils.",
       "tierPremium": "Premium",

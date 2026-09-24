@@ -14426,6 +14426,7 @@ export type TranslationKeyFlat =
   | 'sim.delve.unknownTier'
   | 'sim.delve.wayOutNotOpen'
   | 'sim.delve.whileTrading'
+  | 'sim.factionVendor.currencyRequired'
   | 'sim.lockpick.alreadyInProgress'
   | 'sim.lockpick.cannotPickThat'
   | 'sim.lockpick.chooseAnte'

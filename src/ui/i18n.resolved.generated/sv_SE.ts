@@ -9636,6 +9636,9 @@ export const sv_SE: EnTranslations = {
       "nhaliaCantorShield": "Kantorer, håll tonen!",
       "nhaliaBlackwaterMark": "{name} märker {player} med Svartvatten!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "Låset ger vika! {tier} byte.",
       "tierPremium": "Premium",

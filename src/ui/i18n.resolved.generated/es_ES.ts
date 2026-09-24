@@ -9636,6 +9636,9 @@ export const es_ES: EnTranslations = {
       "nhaliaCantorShield": "¡Cantores, sostengan la nota!",
       "nhaliaBlackwaterMark": "¡{name} marca a {player} con Agua Negra!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "¡La cerradura cede! Botín {tier}.",
       "tierPremium": "Premium",

@@ -9636,6 +9636,9 @@ export const nl_NL: EnTranslations = {
       "nhaliaCantorShield": "Cantors, houd de noot aan!",
       "nhaliaBlackwaterMark": "{name} markeert {player} met Zwartwater!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "Het slot geeft toe! {tier} buit.",
       "tierPremium": "Premium",

@@ -17370,6 +17370,14 @@ function tRaidExtra(key: RaidExtraKey, params?: InterpolationValues): string {
   return interpolate(table[key] ?? RAID_EXTRA.en[key], params);
 }
 
+// factionCurrencyName's English (src/sim/factions.ts) -> the currency labels the
+// Currencies tab already renders, for the faction quartermaster refusal.
+const FACTION_CURRENCY_LABEL_KEYS: Record<string, TranslationKey> = {
+  'Rift Watch Mark': 'hudChrome.currencies.riftWatchMark',
+  'Order Crest': 'hudChrome.currencies.churchOrderCrest',
+  'Automaton Cog': 'hudChrome.currencies.automatonCog',
+};
+
 // The /gear readout's English slot labels -> the already-translated itemUi.slots.*
 // keys the character-window paperdoll renders. Keep in sync with gearReadout() in
 // src/sim/sim.ts (the slot order/labels it emits).
@@ -18453,6 +18461,19 @@ const RULES: Rule[] = [
   {
     re: /^You need (.+) Heroic Marks to buy (.+)\.$/,
     build: (m) => tSim('error.heroicMarksNeeded', { marks: m[1], name: locItem(m[2]) }),
+  },
+  {
+    // The faction quartermaster refusal (src/sim/items.ts); the currency name is
+    // factionCurrencyName's English, re-localized through its HUD label.
+    re: /^You need (\S+) (.+) to purchase that\.$/,
+    build: (m) => {
+      const amount = Number(m[1]);
+      const currencyKey = FACTION_CURRENCY_LABEL_KEYS[m[2]];
+      return t('sim.factionVendor.currencyRequired', {
+        amount: Number.isFinite(amount) ? formatNumber(amount, { maximumFractionDigits: 0 }) : m[1],
+        currency: currencyKey ? t(currencyKey) : m[2],
+      });
+    },
   },
   {
     // Anchored on the sigil naming vocabulary so a future unrelated

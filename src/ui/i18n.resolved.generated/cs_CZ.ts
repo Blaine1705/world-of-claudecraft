@@ -9636,6 +9636,9 @@ export const cs_CZ: EnTranslations = {
       "nhaliaCantorShield": "Kantoři, držte tón!",
       "nhaliaBlackwaterMark": "{name} označuje {player} Černou vodou!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "Zámek povoluje! Kořist {tier}.",
       "tierPremium": "Prémiová",

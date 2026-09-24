@@ -18277,4 +18277,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.sharpeningStoneUse': 'Использование: затачивает оружие в правой руке, повышая силу атаки на 6 на 30 мин.',
   'hudChrome.factionRewards.shockBombUse': 'Использование: бросает шоковую бомбу на расстояние до 30 м, нанося 120-160 ед. урона от сил природы всем противникам в радиусе 5 м. (Восстановление 1 мин.)',
   'hudChrome.factionRewards.targetDummyUse': 'Использование: устанавливает в открытом мире механический тренировочный манекен на 2 мин. для отработки боевых навыков. (Восстановление 5 мин.)',
+  'sim.factionVendor.currencyRequired': 'Для покупки нужно {currency}: {amount}.',
 };

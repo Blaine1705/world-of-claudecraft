@@ -9636,6 +9636,9 @@ export const it_IT: EnTranslations = {
       "nhaliaCantorShield": "Cantori, tenete la nota!",
       "nhaliaBlackwaterMark": "{name} marchia {player} con l'Acquanera!"
     },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
+    },
     "lockpick": {
       "lockYields": "La serratura cede! Bottino {tier}.",
       "tierPremium": "Pregiato",

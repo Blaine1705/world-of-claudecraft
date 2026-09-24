@@ -18164,4 +18164,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '사용: 최대 30미터 거리에 충격 폭탄을 던져 5미터 내 모든 적에게 120~160의 자연 피해를 줍니다. (재사용 대기시간 1분)',
   'hudChrome.factionRewards.targetDummyUse':
     '사용: 전투 기술 연습을 위해 필드에 기계 훈련용 허수아비를 2분 동안 배치합니다. (재사용 대기시간 5분)',
+  'sim.factionVendor.currencyRequired': '구매하려면 {currency} {amount}개가 필요합니다.',
 };
