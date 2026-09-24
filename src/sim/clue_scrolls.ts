@@ -128,7 +128,7 @@ export function canHoldAnotherClueScroll(ctx: SimContext, meta: PlayerMeta): boo
 /**
  * The completion arm of creditWorldQuest calls this right after the turn-in
  * lands. Pays at most once per cycle: the cycle is marked paid BEFORE the bag
- * check, so a lost scroll (stack full, bags full) is lost for the day, as the
+ * check, so a lost treasure map (bags full) is lost for the day, as the
  * design page says, and never re-rolls on the next turn-in.
  */
 export function maybeAwardClueScroll(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
