@@ -11,8 +11,8 @@
     "Spiritmend Tidecall deposit and Cascading Mend consumption",
     "Shaman spec state in deterministic headless snapshots"
   ],
-  "draws": 2588,
-  "drawDigest": "8a48c18e",
+  "draws": 2573,
+  "drawDigest": "22b62fe0",
   "frames": [
     {
       "tick": 0,
@@ -32,8 +32,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 1011,
-      "state": "e34337b2",
-      "events": "f26a320d",
+      "state": "294175d0",
+      "events": "49328e93",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -43,55 +43,55 @@
       "tick": 40,
       "time": 2,
       "nextId": 1011,
-      "state": "4054f574",
-      "events": "741638a5",
+      "state": "6b44f82d",
+      "events": "bc53ed96",
       "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
+        "draws": 4,
+        "digest": "608bf915"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 1011,
-      "state": "af949c16",
-      "events": "c1d990ce",
+      "state": "5b16fe1d",
+      "events": "741638a5",
       "rng": {
-        "draws": 154,
-        "digest": "63603153"
+        "draws": 155,
+        "digest": "bea68f72"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 1011,
-      "state": "ada42ac1",
+      "state": "d18c24de",
       "events": "741638a5",
       "rng": {
-        "draws": 328,
-        "digest": "40f16490"
+        "draws": 325,
+        "digest": "d391f643"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 1011,
-      "state": "14abf8ec",
-      "events": "47da3b8a",
+      "state": "d72df78b",
+      "events": "c4ab3cbb",
       "rng": {
-        "draws": 508,
-        "digest": "d2e4d967"
+        "draws": 506,
+        "digest": "fb97c1cb"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 1011,
-      "state": "14abf8ec",
+      "state": "d72df78b",
       "events": "741638a5",
       "rng": {
-        "draws": 508,
-        "digest": "d2e4d967"
+        "draws": 506,
+        "digest": "fb97c1cb"
       },
       "label": "thundercall-vent",
       "players": [
@@ -118,13 +118,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 250
+            "damageDealt": 139
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 250
+              "dummyDamage": 139
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -548,7 +548,7 @@
               "stacks": 1
             }
           ],
-          "castTotal": 2.181818,
+          "castTotal": 1.818182,
           "combatTimer": 0.9,
           "comboUntil": -1,
           "cooldowns": [
@@ -793,7 +793,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999750,
+          "hp": 999861,
           "id": 1010,
           "inCombat": true,
           "kind": "mob",
@@ -825,7 +825,7 @@
           "threat": [
             [
               1006,
-              250
+              139
             ]
           ],
           "weapon": {
@@ -838,55 +838,55 @@
       "tick": 120,
       "time": 6,
       "nextId": 1011,
-      "state": "dd70e84d",
-      "events": "8ae98292",
+      "state": "43ae8e6e",
+      "events": "2fe0e40c",
       "rng": {
-        "draws": 696,
-        "digest": "b7ac8b45"
+        "draws": 697,
+        "digest": "0f424c0b"
       }
     },
     {
       "tick": 140,
       "time": 7,
       "nextId": 1011,
-      "state": "8defd55a",
+      "state": "344ecdad",
       "events": "741638a5",
       "rng": {
-        "draws": 921,
-        "digest": "75d6fbca"
+        "draws": 918,
+        "digest": "a485d48c"
       }
     },
     {
       "tick": 160,
       "time": 8,
       "nextId": 1011,
-      "state": "0aebc3b9",
-      "events": "d8f7f30f",
+      "state": "adac239e",
+      "events": "46a70409",
       "rng": {
-        "draws": 1159,
-        "digest": "34b764c3"
+        "draws": 1144,
+        "digest": "6d517e55"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 1011,
-      "state": "68632ee9",
+      "state": "faaa255e",
       "events": "741638a5",
       "rng": {
-        "draws": 1423,
-        "digest": "0600cb5e"
+        "draws": 1406,
+        "digest": "d6a94d43"
       }
     },
     {
       "tick": 182,
       "time": 9.1,
       "nextId": 1011,
-      "state": "db035625",
+      "state": "7815578a",
       "events": "741638a5",
       "rng": {
-        "draws": 1452,
-        "digest": "56a220df"
+        "draws": 1435,
+        "digest": "afe616d6"
       },
       "label": "warspirit-cadence",
       "players": [
@@ -913,13 +913,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 250
+            "damageDealt": 139
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 250
+              "dummyDamage": 139
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1027,13 +1027,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 134
+            "damageDealt": 105
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 134
+              "dummyDamage": 105
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1348,7 +1348,7 @@
               "stacks": 1
             }
           ],
-          "castTotal": 2.181818,
+          "castTotal": 1.818182,
           "combatTimer": 5,
           "comboUntil": -1,
           "cooldowns": [
@@ -1658,7 +1658,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999616,
+          "hp": 999756,
           "id": 1010,
           "inCombat": true,
           "kind": "mob",
@@ -1690,11 +1690,11 @@
           "threat": [
             [
               1006,
-              250
+              139
             ],
             [
               1007,
-              134
+              105
             ]
           ],
           "weapon": {
@@ -1707,33 +1707,33 @@
       "tick": 200,
       "time": 10,
       "nextId": 1011,
-      "state": "024e05ac",
-      "events": "34ba8374",
+      "state": "9f79bfaf",
+      "events": "2242a79a",
       "rng": {
-        "draws": 1710,
-        "digest": "d846842a"
+        "draws": 1697,
+        "digest": "70de2ad4"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 1011,
-      "state": "6d164901",
+      "state": "a023ede0",
       "events": "741638a5",
       "rng": {
-        "draws": 1866,
-        "digest": "4a9ecae2"
+        "draws": 1856,
+        "digest": "16933b03"
       }
     },
     {
       "tick": 224,
       "time": 11.2,
       "nextId": 1011,
-      "state": "72092b02",
+      "state": "a60911bd",
       "events": "741638a5",
       "rng": {
-        "draws": 1886,
-        "digest": "15019e1b"
+        "draws": 1891,
+        "digest": "e538c416"
       },
       "label": "stonebound-posture",
       "players": [
@@ -1760,13 +1760,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 250
+            "damageDealt": 139
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 250
+              "dummyDamage": 139
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1874,13 +1874,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 287
+            "damageDealt": 265
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 287
+              "dummyDamage": 265
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2195,7 +2195,7 @@
               "stacks": 1
             }
           ],
-          "castTotal": 2.181818,
+          "castTotal": 1.818182,
           "combatTimer": 7.1,
           "comboUntil": -1,
           "critChance": 0.0675,
@@ -2525,7 +2525,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999463,
+          "hp": 999596,
           "id": 1010,
           "inCombat": true,
           "kind": "mob",
@@ -2557,11 +2557,11 @@
           "threat": [
             [
               1006,
-              250
+              139
             ],
             [
               1007,
-              554.75
+              545
             ]
           ],
           "weapon": {
@@ -2574,55 +2574,55 @@
       "tick": 240,
       "time": 12,
       "nextId": 1011,
-      "state": "19c49bf0",
-      "events": "c1baee89",
+      "state": "4b6cbedb",
+      "events": "0d01d795",
       "rng": {
-        "draws": 2008,
-        "digest": "4e1be6e9"
+        "draws": 2007,
+        "digest": "94fb126f"
       }
     },
     {
       "tick": 260,
       "time": 13,
       "nextId": 1011,
-      "state": "f239e761",
-      "events": "5b9e4490",
+      "state": "b432516c",
+      "events": "1f494bec",
       "rng": {
-        "draws": 2177,
-        "digest": "55b32668"
+        "draws": 2151,
+        "digest": "70f581f7"
       }
     },
     {
       "tick": 280,
       "time": 14,
       "nextId": 1011,
-      "state": "6bef6290",
-      "events": "1a758c0e",
+      "state": "cb15669f",
+      "events": "f91edae0",
       "rng": {
-        "draws": 2340,
-        "digest": "54a3667a"
+        "draws": 2323,
+        "digest": "289af628"
       }
     },
     {
       "tick": 300,
       "time": 15,
       "nextId": 1011,
-      "state": "6a36a76b",
-      "events": "c280afe7",
+      "state": "53e515d5",
+      "events": "6ad79d64",
       "rng": {
-        "draws": 2538,
-        "digest": "08e4c72d"
+        "draws": 2524,
+        "digest": "8395c270"
       }
     },
     {
       "tick": 306,
       "time": 15.3,
       "nextId": 1011,
-      "state": "78eec384",
+      "state": "e50b0a66",
       "events": "741638a5",
       "rng": {
-        "draws": 2588,
-        "digest": "8a48c18e"
+        "draws": 2573,
+        "digest": "22b62fe0"
       },
       "label": "spiritmend-consume",
       "players": [
@@ -2649,13 +2649,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 250
+            "damageDealt": 139
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 250
+              "dummyDamage": 139
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2763,13 +2763,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 504
+            "damageDealt": 394
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 504
+              "dummyDamage": 394
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3084,7 +3084,7 @@
               "stacks": 1
             }
           ],
-          "castTotal": 2.181818,
+          "castTotal": 1.818182,
           "combatTimer": 11.2,
           "comboUntil": -1,
           "critChance": 0.0675,
@@ -3212,16 +3212,6 @@
               "school": "nature",
               "sourceId": 1007,
               "value": 0.5
-            },
-            {
-              "duration": 86400,
-              "id": "shaman_warspirit_cadence",
-              "kind": "internal_cd",
-              "name": "Warspirit Cadence",
-              "remaining": 86400,
-              "school": "nature",
-              "sourceId": 1007,
-              "stacks": 1
             }
           ],
           "autoAttack": true,
@@ -3252,7 +3242,7 @@
             "speed": 2.6
           },
           "onGround": true,
-          "overpowerUntil": -1,
+          "overpowerUntil": 17.35,
           "petMode": "defensive",
           "pos": {
             "x": -94,
@@ -3373,7 +3363,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 114.3,
           "healPower": 5,
-          "hp": 761,
+          "hp": 770,
           "id": 1009,
           "kind": "player",
           "level": 20,
@@ -3423,7 +3413,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999246,
+          "hp": 999467,
           "id": 1010,
           "inCombat": true,
           "kind": "mob",
@@ -3455,11 +3445,11 @@
           "threat": [
             [
               1006,
-              250
+              139
             ],
             [
               1007,
-              1151.5
+              899.75
             ]
           ],
           "weapon": {
@@ -3472,11 +3462,11 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 1011,
-      "state": "78eec384",
+      "state": "e50b0a66",
       "events": "741638a5",
       "rng": {
-        "draws": 2588,
-        "digest": "8a48c18e"
+        "draws": 2573,
+        "digest": "22b62fe0"
       },
       "label": "final",
       "players": [
@@ -3503,13 +3493,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 250
+            "damageDealt": 139
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 250
+              "dummyDamage": 139
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3617,13 +3607,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 504
+            "damageDealt": 394
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 504
+              "dummyDamage": 394
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3938,7 +3928,7 @@
               "stacks": 1
             }
           ],
-          "castTotal": 2.181818,
+          "castTotal": 1.818182,
           "combatTimer": 11.2,
           "comboUntil": -1,
           "critChance": 0.0675,
@@ -4066,16 +4056,6 @@
               "school": "nature",
               "sourceId": 1007,
               "value": 0.5
-            },
-            {
-              "duration": 86400,
-              "id": "shaman_warspirit_cadence",
-              "kind": "internal_cd",
-              "name": "Warspirit Cadence",
-              "remaining": 86400,
-              "school": "nature",
-              "sourceId": 1007,
-              "stacks": 1
             }
           ],
           "autoAttack": true,
@@ -4106,7 +4086,7 @@
             "speed": 2.6
           },
           "onGround": true,
-          "overpowerUntil": -1,
+          "overpowerUntil": 17.35,
           "petMode": "defensive",
           "pos": {
             "x": -94,
@@ -4227,7 +4207,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 114.3,
           "healPower": 5,
-          "hp": 761,
+          "hp": 770,
           "id": 1009,
           "kind": "player",
           "level": 20,
@@ -4277,7 +4257,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999246,
+          "hp": 999467,
           "id": 1010,
           "inCombat": true,
           "kind": "mob",
@@ -4309,11 +4289,11 @@
           "threat": [
             [
               1006,
-              250
+              139
             ],
             [
               1007,
-              1151.5
+              899.75
             ]
           ],
           "weapon": {

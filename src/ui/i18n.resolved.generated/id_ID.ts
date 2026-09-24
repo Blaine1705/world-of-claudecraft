@@ -12027,6 +12027,18 @@ export const id_ID: EnTranslations = {
         "name": "Wadah Guruh",
         "description": "Pasif: Sambaran Busur dan Petir Bercabang memberi Guruh, hingga 5. Pada 5 Guruh, Sentakan Bumi memberi 125% lebih banyak kerusakan atau Gempa Bumi 100% lebih banyak, lalu menghabiskan seluruh Guruh. (Panggilan Guruh)"
       },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
+      },
       "rockbiter_weapon": {
         "name": "Senjata Stonebound",
         "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 40% zirah dan 20% Stamina, menerima 15% kerusakan lebih sedikit, dan kebal terhadap serangan kritis dari makhluk, dan menghasilkan 2,75 kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk."
