@@ -58,8 +58,8 @@ describe('worldPvpPairHostile on contested ground', () => {
     expect(contested(player(1), player(2), true)).toBe(false);
   });
 
-  it('guildmates are never hostile; different guilds and no guild are', () => {
-    expect(contested(player(1, { guild: 'Ravens' }), player(2, { guild: 'Ravens' }))).toBe(false);
+  it('a shared guild is no shield: guildmates, different guilds and no guild are all hostile', () => {
+    expect(contested(player(1, { guild: 'Ravens' }), player(2, { guild: 'Ravens' }))).toBe(true);
     expect(contested(player(1, { guild: 'Ravens' }), player(2, { guild: 'Crows' }))).toBe(true);
     // Two guildless players share the empty string and must NOT read as one guild,
     // and neither may an undefined guild on both sides (a bare test entity).
@@ -110,11 +110,11 @@ describe('worldPvpPairHostile on the other ground', () => {
     expect(worldPvpPairHostile(veteran, atGate, false, 'ffa', 'ffa')).toBe(true);
   });
 
-  it('the exemptions hold on free-for-all ground: self, party, guild', () => {
+  it('the exemptions hold on free-for-all ground: self and party, never a guild', () => {
     const a = player(1, { guild: 'Ravens' });
     expect(worldPvpPairHostile(a, a, false, 'ffa', 'ffa')).toBe(false);
     expect(worldPvpPairHostile(a, player(2), true, 'ffa', 'ffa')).toBe(false);
-    expect(worldPvpPairHostile(a, player(2, { guild: 'Ravens' }), false, 'ffa', 'ffa')).toBe(false);
+    expect(worldPvpPairHostile(a, player(2, { guild: 'Ravens' }), false, 'ffa', 'ffa')).toBe(true);
     expect(worldPvpPairHostile(a, player(2, { guild: 'Crows' }), false, 'ffa', 'ffa')).toBe(true);
   });
 
@@ -136,11 +136,11 @@ describe('worldPvpPairHostile on the other ground', () => {
 });
 
 describe('worldPvpPairExempt', () => {
-  it('names the three exemptions and nothing else', () => {
+  it('names the two exemptions and nothing else (a shared guild is not one)', () => {
     expect(worldPvpPairExempt(player(1), player(1), false)).toBe(true);
     expect(worldPvpPairExempt(player(1), player(2), true)).toBe(true);
     expect(worldPvpPairExempt(player(1, { guild: 'R' }), player(2, { guild: 'R' }), false)).toBe(
-      true,
+      false,
     );
     expect(worldPvpPairExempt(player(1), player(2), false)).toBe(false);
     expect(worldPvpPairExempt(player(1, { pvpFlag: false }), player(2), false)).toBe(false);

@@ -2262,7 +2262,7 @@ export const pt_BR: EnTranslations = {
       "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
       "groundContested": "Everywhere else is contested: only two flagged players can fight.",
       "groundFfa": "The Wraithwood, the Evergarden and the Nightbloom are free-for-all: everyone there can fight, flag or not.",
-      "groupLine": "Party, raid and guild members are never hostile to each other.",
+      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
       "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
       "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
       "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
@@ -2286,6 +2286,7 @@ export const pt_BR: EnTranslations = {
     },
     "hill": {
       "title": "King of the Hill",
+      "rising": "The hill has not risen yet",
       "heldYou": "Your group holds the hill",
       "heldOther": "Another group holds the hill",
       "heldNone": "Nobody holds the hill",
@@ -2297,8 +2298,10 @@ export const pt_BR: EnTranslations = {
       "contestNone": "Hold a majority inside for {total} to take it",
       "inside": "You are inside the circle",
       "distance": "{yards} yd to the circle",
-      "moves": "Moves in {minutes}",
-      "honorNote": "{honor} Honor a minute to each holder inside, up to {max} of you"
+      "rises": "Rises in {minutes}",
+      "falls": "Falls in {minutes}",
+      "standingRaid": "Raid members do not count: only parties can hold the hill",
+      "standingLevel": "You do not count on the hill until level {level}"
     },
     "warfareShop": {
       "gossipOption": "Ver Conjuntos de Guerra",
@@ -7335,14 +7338,14 @@ export const pt_BR: EnTranslations = {
       "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "limitsHeading": "Fair play rules",
       "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and three of the level-cap zones are free-for-all ground where everyone present is fair game, flag or no flag. Party, raid and guild mates are never enemies of yours anywhere.",
+      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and three of the level-cap zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
       "zonesHeading": "Where world PvP happens",
       "zonesBody": "The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Wraithwood, the Evergarden and the Nightbloom are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.",
       "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
       "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
       "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "hillHeading": "King of the Hill",
-      "hillBody": "Once an hour a hill rises somewhere in one of the free-for-all zones: a wide circle on open ground, announced to the whole realm and drawn on the ground where it stands. The group with the most players standing inside it contests the hill, and after a minute of unbroken majority the hill is theirs; a party or raid counts as one group, and a lone player is a group of one. While a group holds the hill, each of its members standing inside earns a little Honor every minute, to a handful of them at once, so a full party holding an uncontested hill for the whole hour earns about what one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members and characters too low for world PvP do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor."
     },
     "thornhollowPage": {

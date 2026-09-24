@@ -2,10 +2,10 @@
 //
 // A player raises the flag with /pvp (or the World PvP tab of the PvP window)
 // and becomes attackable by, and able to attack, every other flagged player
-// who is not in their party or guild, anywhere the ground allows it. The
-// ground has three answers (world_pvp_zones.ts): a sanctuary switches the
-// world off for everyone in it, a free-for-all zone makes everyone standing
-// in it fair game with no flag at all, and everywhere else is contested: the
+// who is not in their party or raid (a shared guild is no shield), anywhere
+// the ground allows it. The ground has three answers (world_pvp_zones.ts): a
+// sanctuary switches the world off for everyone in it, a free-for-all zone
+// makes everyone standing in it fair game with no flag at all, and everywhere else is contested: the
 // mutual-flag rule. In a free-for-all zone the first hit on an unflagged
 // player MARKS the attacker (raises their flag), so an aggressor always ends
 // up carrying the stake; whoever hits a flagged player, the victim included,

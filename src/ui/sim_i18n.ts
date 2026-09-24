@@ -14,6 +14,7 @@
 import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
 import type { EntityKind, PlayerClass } from '../sim/types';
+import { durationText } from './duration_text';
 import { tEntity } from './entity_i18n';
 import {
   formatMoney,
@@ -606,16 +607,15 @@ const baseEnTable = {
   'worldPvp.ffaEntered': 'You have entered a free-for-all PvP zone: anyone here can attack you.',
   'worldPvp.ffaLeft': 'You have left the free-for-all PvP zone.',
   'worldPvp.sanctuary': 'This is a sanctuary: World PvP is off here.',
+  'hill.warning': 'A hill will rise in {zone} in {minutes}.',
   'hill.risen': 'A hill has risen in {zone}: hold it to earn Honor.',
+  'hill.fallen': 'The hill in {zone} has fallen.',
   'hill.taken': 'Your group holds the hill.',
   'hill.lost': 'Another group has taken the hill.',
   'hill.readoutNone': 'No hill stands right now.',
-  'hill.readoutYou':
-    'The hill stands in {zone}: your group holds it. It moves in {minutes} minutes.',
-  'hill.readoutOther':
-    'The hill stands in {zone}: another group holds it. It moves in {minutes} minutes.',
-  'hill.readoutUnheld':
-    'The hill stands in {zone}: nobody holds it. It moves in {minutes} minutes.',
+  'hill.readoutYou': 'The hill stands in {zone}: your group holds it. It falls in {minutes}.',
+  'hill.readoutOther': 'The hill stands in {zone}: another group holds it. It falls in {minutes}.',
+  'hill.readoutUnheld': 'The hill stands in {zone}: nobody holds it. It falls in {minutes}.',
   // The aid refusal (WORLD_PVP_AID_REFUSED_LINE, voiced by
   // src/sim/combat/casting_lifecycle.ts): placeholder-free, EXACT-mapped too.
   'worldPvp.aidRefused': 'You cannot aid a World PvP enemy: invite them to your party first.',
@@ -14006,6 +14006,10 @@ function locZone(name: string): string {
   const id = zoneNameToId.get(name);
   return id ? tEntity({ kind: 'zone', id, field: 'name' }) : name;
 }
+/** A hill countdown's whole minutes as the locale's own duration phrase. */
+function hillMinutes(minutes: string): string {
+  return durationText(Number(minutes) * 60);
+}
 function locDelve(name: string): string {
   const id = delveNameToId.get(name);
   return id ? tEntity({ kind: 'delve', id, field: 'name' }) : name;
@@ -17942,23 +17946,33 @@ const RULES: Rule[] = [
     re: /^(.+) defeats you\.$/,
     build: (m) => tSim('worldPvp.defeatedPlain', { killer: m[1] }),
   },
-  // King of the Hill (src/sim/pvp/hill.ts): the rise announcement and the
-  // /hill readout carry the zone's English name; appended LAST like every rule.
+  // King of the Hill (src/sim/pvp/hill.ts): the warning, rise and fall
+  // announcements and the /hill readout carry the zone's English name, and
+  // the countdowns an English "N minute(s)" the locale re-renders through
+  // durationText (its own plural rules); appended LAST like every rule.
+  {
+    re: /^A hill will rise in (.+) in (\d+) minutes?\.$/,
+    build: (m) => tSim('hill.warning', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
+  },
   {
     re: /^A hill has risen in (.+): hold it to earn Honor\.$/,
     build: (m) => tSim('hill.risen', { zone: locZone(m[1]) }),
   },
   {
-    re: /^The hill stands in (.+): your group holds it\. It moves in (\d+) minutes\.$/,
-    build: (m) => tSim('hill.readoutYou', { zone: locZone(m[1]), minutes: m[2] }),
+    re: /^The hill in (.+) has fallen\.$/,
+    build: (m) => tSim('hill.fallen', { zone: locZone(m[1]) }),
   },
   {
-    re: /^The hill stands in (.+): another group holds it\. It moves in (\d+) minutes\.$/,
-    build: (m) => tSim('hill.readoutOther', { zone: locZone(m[1]), minutes: m[2] }),
+    re: /^The hill stands in (.+): your group holds it\. It falls in (\d+) minutes?\.$/,
+    build: (m) => tSim('hill.readoutYou', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
   },
   {
-    re: /^The hill stands in (.+): nobody holds it\. It moves in (\d+) minutes\.$/,
-    build: (m) => tSim('hill.readoutUnheld', { zone: locZone(m[1]), minutes: m[2] }),
+    re: /^The hill stands in (.+): another group holds it\. It falls in (\d+) minutes?\.$/,
+    build: (m) => tSim('hill.readoutOther', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
+  },
+  {
+    re: /^The hill stands in (.+): nobody holds it\. It falls in (\d+) minutes?\.$/,
+    build: (m) => tSim('hill.readoutUnheld', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
   },
 ];
 

@@ -1,7 +1,7 @@
 // World PvP (the /pvp flag, src/sim/pvp/world_pvp.ts): the flag lifecycle
 // (raise, the 5-minute disarm and its in-combat deferral, the toggle cooldown,
 // the realm kill switch, the /pvp chat arms), the hostility arm in isHostileTo
-// (mutual flag, party and guild exemptions, the jail and instanced-PvP arms,
+// (mutual flag, the party exemption (guildmates fight), the jail and instanced-PvP arms,
 // the #96 griefing invariant for everyone unflagged), the kill resolution (the
 // gold stake and the honor pool split across the killing blow, the damagers
 // and their healers; the grey rule; the persisted per-victim diminishing
@@ -426,7 +426,7 @@ describe('hostility: the world arm of isHostileTo', () => {
     expect(ent(sim, b).hp).toBe(startHp);
   });
 
-  it('party mates and guildmates are exempt both ways even when both are flagged', () => {
+  it('party mates are exempt both ways even when both are flagged; guildmates are not', () => {
     const sim = world();
     const a = addFighter(sim, 'Aleph');
     const b = addFighter(sim, 'Bet');
@@ -438,10 +438,11 @@ describe('hostility: the world arm of isHostileTo', () => {
     expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
     expect(sim.isHostileTo(ent(sim, b), ent(sim, a))).toBe(false);
     expect(sim.isHostileTo(ent(sim, a), ent(sim, c))).toBe(true);
+    // A guild is no shield outside a group (owner spec): only a party is.
     sim.setPlayerGuild(a, 'Ravens');
     sim.setPlayerGuild(c, 'Ravens');
-    expect(sim.isHostileTo(ent(sim, a), ent(sim, c))).toBe(false);
-    expect(sim.isHostileTo(ent(sim, c), ent(sim, a))).toBe(false);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, c))).toBe(true);
+    expect(sim.isHostileTo(ent(sim, c), ent(sim, a))).toBe(true);
   });
 
   it('the jail brawl and a live battleground or arena keep the world arm off', () => {
@@ -1020,7 +1021,7 @@ describe('the ground: free-for-all zones', () => {
     return { sim, a, b };
   }
 
-  it('two unflagged strangers are hostile both ways; party and guild mates stay exempt', () => {
+  it('two unflagged strangers are hostile both ways; party mates stay exempt, guildmates do not', () => {
     const { sim, a, b } = brawl();
     expect(ent(sim, a).pvpFlag).toBeUndefined();
     expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true);
@@ -1047,7 +1048,8 @@ describe('the ground: free-for-all zones', () => {
     expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true);
     sim.setPlayerGuild(a, 'Ravens');
     sim.setPlayerGuild(b, 'Ravens');
-    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true);
+    expect(sim.isHostileTo(ent(sim, b), ent(sim, a))).toBe(true);
   });
 
   it('the first hit on an unflagged player marks the attacker; hitting a flagged player never does', () => {

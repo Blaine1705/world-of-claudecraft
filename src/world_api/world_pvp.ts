@@ -38,18 +38,30 @@ export interface WorldPvpInfo {
 /** Who a side of the hill is, from the viewer's seat. */
 export type HillSide = 'none' | 'you' | 'other';
 
-/** The standing hill (src/sim/pvp/hill.ts), from one viewer's seat. The
- *  geometry and the holder are realm facts; `inZone`, `inside`, the counts and
- *  the contest clock are the viewer's. The live fields (counts, contest) are
- *  zero unless the viewer stands in the hill's zone, so the self wire elides
- *  the readout for everyone else between crossings and holder changes. */
+/** 'warning': announced and marked on the ground, not yet contestable.
+ *  'active': risen; the contest and the payouts run. */
+export type HillPhaseInfo = 'warning' | 'active';
+
+/** Whether the viewer counts on the hill: parties only, so a raid member
+ *  does not, and neither does a player under the world PvP level floor. */
+export type HillStandingInfo = 'counted' | 'raid' | 'underLevel';
+
+/** The announced or standing hill (src/sim/pvp/hill.ts), from one viewer's
+ *  seat. The geometry, the phase and the holder are realm facts; `inZone`,
+ *  `inside`, `standing`, the counts and the contest clock are the viewer's.
+ *  The live fields (counts, contest) are zero unless the viewer stands in the
+ *  hill's zone while it is risen, so the self wire elides the readout for
+ *  everyone else between crossings and holder changes. */
 export interface HillInfo {
   zoneId: string;
   x: number;
   z: number;
   radius: number;
-  /** Whole minutes until this hill closes and the next one rises. */
+  phase: HillPhaseInfo;
+  /** Whole minutes (rounded up) until the next phase change: the rise while
+   *  warning, the fall while risen. */
   minutesLeft: number;
+  standing: HillStandingInfo;
   /** The viewer stands in the hill's zone (the bar and the live fields are
    *  for them) and inside the circle itself. */
   inZone: boolean;
@@ -74,7 +86,7 @@ export interface IWorldWorldPvp {
    *  countdown. The sim refuses and explains under level or when nothing
    *  changes; the bare /pvp chat command toggles through the same path. */
   setWorldPvpFlag(enabled: boolean): void;
-  /** The standing King of the Hill circle, or null while none stands (before
-   *  the first rises, or on a realm whose World PvP switch is set). */
+  /** The announced or standing King of the Hill circle, or null while none
+   *  is (between hills, or on a realm whose World PvP switch is set). */
   hillInfo: HillInfo | null;
 }

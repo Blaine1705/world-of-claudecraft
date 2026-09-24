@@ -14963,6 +14963,10 @@
   #hill-bar.is-other .hill-held {
     color: var(--color-hostile);
   }
+  #hill-bar .hill-note {
+    margin-top: 2px;
+    color: var(--color-warning);
+  }
   #hill-bar .hill-counts {
     color: var(--color-text-muted);
   }

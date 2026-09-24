@@ -153,7 +153,7 @@ function makeCtx() {
     bgQueue: [],
     bgMatches: new Map(),
     worldPvpDisabled: false,
-    hillState: { active: null, risen: 0, nextAt: 120, passTick: 0 },
+    hillState: { active: null, window: 0, plan: null, attempts: 0, retryAt: 0, passTick: 0 },
     hillProbe: { wet: () => false, steep: () => false, blocked: () => false, zoneIdAt: () => null },
     worldPvpBooks: {
       recentDamage: new Map(),

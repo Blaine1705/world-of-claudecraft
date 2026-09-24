@@ -1,24 +1,33 @@
-// King of the Hill (src/sim/pvp/hill.ts): the hourly schedule and the realm
-// announcement, the spot (dry, open, clear of the hub, wholly inside a
-// free-for-all zone, the same on every host, drawn from a private rng), the
-// contest (parties as one group, the strict majority, the tie, the lapse, the
-// dead), the capture notices, the Honor trickle (a minute of presence pays
-// one, only inside, only holders, the payee cap, the level gate), the readout
-// from each viewer's seat, the /hill and /dev hill arms, and the kill switch.
+// King of the Hill (src/sim/pvp/hill.ts): the three-hour schedule (a random
+// warning inside each window, the rise fifteen minutes on, the fall 45 minutes
+// after) and its realm announcements, the spot (dry, open, clear of the hub,
+// wholly inside a free-for-all zone, the same on every host, drawn from a
+// private rng, a retry searching new ground), the contest (a party as one
+// group, raids and under-level players not counted, the strict majority, the
+// tie, the lapse, the dead), the capture notices, the Honor trickle (a minute
+// of presence pays one, only inside, only holders, a bank kept across a step
+// out), the readout from each viewer's seat, the /hill and /dev hill arms, and
+// the kill switch.
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import { BUILTIN_WORLD, ZONES, zoneContaining } from '../src/sim/data';
 import {
   HILL_ACCRUAL_SECONDS,
   HILL_CAPTURE_SECONDS,
-  HILL_CYCLE_SECONDS,
-  HILL_FIRST_AT_SECONDS,
+  HILL_DURATION_SECONDS,
+  HILL_FIRST_WINDOW_AT_SECONDS,
+  HILL_LATEST_WARN_OFFSET_SECONDS,
   HILL_LOST_LINE,
-  HILL_MAX_PAYEES,
   HILL_RADIUS,
   HILL_TAKEN_LINE,
+  HILL_WARNING_SECONDS,
+  HILL_WINDOW_SECONDS,
   hillContains,
+  hillFallenLine,
+  hillPlanFor,
   hillRiseLine,
+  hillWarningLine,
+  spawnHill,
   spawnHillNow,
 } from '../src/sim/pvp';
 import { HILL_READOUT_NONE_LINE, pickHillSpot } from '../src/sim/pvp/hill';
@@ -116,60 +125,111 @@ function hillWorld(names: string[]): { sim: Sim; pids: number[] } {
   return { sim, pids };
 }
 
-describe('the schedule and the announcement', () => {
-  it('rises the first hill two minutes in, in a free-for-all zone, announced to the realm', () => {
+describe('the schedule and the announcements', () => {
+  it('warns the realm at a random moment in the window, rises 15 minutes on, falls 45 after', () => {
     const sim = world();
     const a = addPlayer(sim, 'Aleph');
-    expect(sim.hillInfoFor(a)).toBeNull();
-    jumpTo(sim, HILL_FIRST_AT_SECONDS - 2);
+    const plan = hillPlanFor(sim.ctx, 0);
+    const windowStart = HILL_FIRST_WINDOW_AT_SECONDS;
+    expect(plan.warnAt).toBeGreaterThanOrEqual(windowStart);
+    expect(plan.warnAt).toBeLessThanOrEqual(windowStart + HILL_LATEST_WARN_OFFSET_SECONDS);
+    expect(plan.risesAt - plan.warnAt).toBe(HILL_WARNING_SECONDS);
+    expect(plan.closesAt - plan.risesAt).toBe(HILL_DURATION_SECONDS);
+    expect(plan.closesAt).toBeLessThanOrEqual(windowStart + HILL_WINDOW_SECONDS);
+    // Nothing before the warning.
+    jumpTo(sim, plan.warnAt - 2);
     tickSeconds(sim, 1);
     expect(sim.hillState.active).toBeNull();
-    const seen = tickSeconds(sim, 2);
+    expect(sim.hillInfoFor(a)).toBeNull();
+    // The warning names the zone and the minutes, and marks the ground.
+    let seen = tickSeconds(sim, 2);
     const hill = sim.hillState.active!;
-    expect(hill).not.toBeNull();
+    expect(hill.phase).toBe('warning');
     expect(FFA_IDS).toContain(hill.zoneId);
     expect(hill.radius).toBe(HILL_RADIUS);
     const zone = ZONES.find((z) => z.id === hill.zoneId)!;
-    expect(logLines(seen)).toContain(hillRiseLine(zone.name));
+    expect(logLines(seen)).toContain(hillWarningLine(zone.name, 15));
     expect(sim.hillInfoFor(a)).toMatchObject({
       zoneId: hill.zoneId,
+      phase: 'warning',
       holder: 'none',
-      minutesLeft: 60,
+      minutesLeft: 15,
     });
+    // The rise.
+    jumpTo(sim, plan.risesAt - 1);
+    seen = tickSeconds(sim, 2);
+    expect(hill.phase).toBe('active');
+    expect(logLines(seen)).toContain(hillRiseLine(zone.name));
+    expect(sim.hillInfoFor(a)).toMatchObject({ phase: 'active', minutesLeft: 45 });
+    // The fall.
+    jumpTo(sim, plan.closesAt - 1);
+    seen = tickSeconds(sim, 2);
+    expect(sim.hillState.active).toBeNull();
+    expect(logLines(seen)).toContain(hillFallenLine(zone.name));
+    expect(sim.hillInfoFor(a)).toBeNull();
   });
 
-  it('closes the hill as the next rises an hour later, and never rises on a switched-off realm', () => {
+  it('nobody can contest the hill while it is only announced', () => {
     const sim = world();
-    jumpTo(sim, HILL_FIRST_AT_SECONDS);
+    const a = addPlayer(sim, 'Aleph');
+    const hill = spawnHillNow(sim.ctx, 'wraithwood', { warn: true })!;
+    expect(hill.phase).toBe('warning');
+    inside(sim, a);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS + 5);
+    expect(hill.holder).toBeNull();
+    expect(hill.counts.size).toBe(0);
+    expect(sim.hillInfoFor(a)).toMatchObject({ phase: 'warning', inside: false, contest: 0 });
+  });
+
+  it('one hill per window, at a different time each window, and none on a switched-off realm', () => {
+    const sim = world();
+    const offsets = new Set<number>();
+    for (let w = 0; w < 6; w++) {
+      const plan = hillPlanFor(sim.ctx, w);
+      const windowStart = HILL_FIRST_WINDOW_AT_SECONDS + w * HILL_WINDOW_SECONDS;
+      offsets.add(plan.warnAt - windowStart);
+      expect(plan.closesAt).toBeLessThanOrEqual(windowStart + HILL_WINDOW_SECONDS);
+    }
+    expect(offsets.size).toBeGreaterThan(1);
+    const first = hillPlanFor(sim.ctx, 0);
+    jumpTo(sim, first.warnAt);
     tickSeconds(sim, 1);
-    const first = sim.hillState.active!;
-    expect(first.ordinal).toBe(0);
-    jumpTo(sim, HILL_FIRST_AT_SECONDS + HILL_CYCLE_SECONDS);
+    expect(sim.hillState.active?.ordinal).toBe(0);
+    jumpTo(sim, first.closesAt);
+    tickSeconds(sim, 2);
+    expect(sim.hillState.active).toBeNull();
+    // Still window 0's time: the next hill waits for window 1's own warning.
+    expect(sim.hillState.window).toBe(1);
+    const second = hillPlanFor(sim.ctx, 1);
+    jumpTo(sim, second.warnAt);
     tickSeconds(sim, 1);
-    const second = sim.hillState.active!;
-    expect(second.ordinal).toBe(1);
-    expect(`${second.x},${second.z}`).not.toBe(`${first.x},${first.z}`);
+    expect(sim.hillState.active?.ordinal).toBe(1);
     const closed = world({ worldPvpDisabled: true });
-    jumpTo(closed, HILL_FIRST_AT_SECONDS + 10);
+    jumpTo(closed, hillPlanFor(closed.ctx, 0).warnAt + 10);
     tickSeconds(closed, 2);
     expect(closed.hillState.active).toBeNull();
   });
 
-  it('a realm that slept through cycles rises the current hill, not every missed one', () => {
+  it('a realm that slept through windows plans the current one, not every missed one', () => {
     const sim = world();
-    jumpTo(sim, HILL_FIRST_AT_SECONDS + 3 * HILL_CYCLE_SECONDS + 5);
-    tickSeconds(sim, 1);
-    expect(sim.hillState.active?.ordinal).toBe(3);
-    expect(sim.hillState.risen).toBe(4);
+    const plan = hillPlanFor(sim.ctx, 3);
+    jumpTo(sim, plan.risesAt + 5);
+    const seen = tickSeconds(sim, 1);
+    const hill = sim.hillState.active!;
+    expect(hill.ordinal).toBe(3);
+    // Found after its rise time: it rises at once, announced as risen.
+    expect(hill.phase).toBe('active');
+    const zone = ZONES.find((z) => z.id === hill.zoneId)!;
+    expect(logLines(seen)).toContain(hillRiseLine(zone.name));
+    expect(sim.hillState.window).toBe(4);
   });
 });
 
 describe('the spot', () => {
-  it('is dry, clear of colliders, clear of the hub, and wholly inside its zone, for every ordinal', () => {
+  it('is dry, clear of colliders, clear of the hub, and wholly inside its zone, for every window', () => {
     const sim = world();
     for (let ordinal = 0; ordinal < 12; ordinal++) {
-      sim.hillState.risen = ordinal;
-      const hill = spawnHillNow(sim.ctx)!;
+      const hill = spawnHill(sim.ctx, ordinal, hillPlanFor(sim.ctx, ordinal))!;
       expect(hill, `ordinal ${ordinal}`).not.toBeNull();
       const zone = ZONES.find((z) => z.id === hill.zoneId)!;
       expect(FFA_IDS).toContain(zone.id);
@@ -196,12 +256,13 @@ describe('the spot', () => {
     const ha = spawnHillNow(a.ctx)!;
     const hb = spawnHillNow(b.ctx)!;
     expect([ha.zoneId, ha.x, ha.z]).toEqual([hb.zoneId, hb.x, hb.z]);
+    expect(hillPlanFor(a.ctx, 2)).toEqual(hillPlanFor(b.ctx, 2));
     const c = world();
     c.rng.next();
     expect(c.rng.next()).toBe(a.rng.next());
   });
 
-  it('gives up when no open ground is found and the schedule retries a minute on', () => {
+  it('gives up when no open ground is found, and a retry searches new ground', () => {
     const sim = world();
     const zone = ZONES.find((z) => z.id === 'wraithwood')!;
     const drowned = pickHillSpot(sim.ctx, new Rng(1), zone, {
@@ -211,6 +272,11 @@ describe('the spot', () => {
       zoneIdAt: () => zone.id,
     });
     expect(drowned).toBeNull();
+    // The retry salts its attempt number in: the same window, a different draw.
+    const times = hillPlanFor(sim.ctx, 0);
+    const first = spawnHill(sim.ctx, 0, times, 0, 'wraithwood')!;
+    const retry = spawnHill(sim.ctx, 0, times, 1, 'wraithwood')!;
+    expect(`${retry.x},${retry.z}`).not.toBe(`${first.x},${first.z}`);
   });
 });
 
@@ -298,6 +364,45 @@ describe('the contest', () => {
     expect(sim.hillInfoFor(b)).toMatchObject({ challenger: 'you', contest: 3 });
   });
 
+  it('a raid does not count at all, and neither does a player under the level floor', () => {
+    const { sim, pids } = hillWorld(['R1', 'R2', 'R3', 'R4', 'R5', 'Solo', 'Novice']);
+    const [r1, r2, r3, r4, r5, solo, novice] = pids;
+    sim.setPlayerLevel(9, novice);
+    // A raid needs a full party of five to convert; three of them take the field.
+    for (const pid of [r2, r3, r4, r5]) {
+      sim.partyInvite(pid, r1);
+      sim.partyAccept(pid);
+    }
+    sim.convertPartyToRaid(r1);
+    expect(sim.partyOf(r1)!.raid).toBe(true);
+    for (const [i, pid] of [r1, r2, r3, novice].entries()) inside(sim, pid, i * 4 - 6, 0);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS + 5);
+    // Three raiders and an alt stood a full minute on an empty hill: nothing.
+    expect(sim.hillState.active!.holder).toBeNull();
+    expect(sim.hillState.active!.counts.size).toBe(0);
+    expect(sim.hillInfoFor(r1)).toMatchObject({
+      standing: 'raid',
+      inside: true,
+      yourCount: 0,
+      challenger: 'none',
+    });
+    expect(sim.hillInfoFor(novice)).toMatchObject({ standing: 'underLevel', yourCount: 0 });
+    // A lone player beside them takes it unopposed.
+    inside(sim, solo, 0, 6);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
+    expect(sim.hillState.active!.holder).toBe(`solo:${solo}`);
+    expect(sim.hillInfoFor(solo)).toMatchObject({
+      standing: 'counted',
+      holder: 'you',
+      holderCount: 1,
+    });
+    // Back to a party of three, the same players count again.
+    sim.convertRaidToParty(r1);
+    expect(sim.partyOf(r1)!.raid).toBe(false);
+    tickSeconds(sim, 2);
+    expect(sim.hillInfoFor(r1)).toMatchObject({ standing: 'counted', yourCount: 3 });
+  });
+
   it('the dead do not count, and the holder keeps the hill while nobody beats them', () => {
     const { sim, pids } = hillWorld(['Aleph', 'Bet']);
     const [a, b] = pids;
@@ -339,41 +444,42 @@ describe('the Honor trickle', () => {
     expect(honorEvents(seen, a)).toHaveLength(4);
     expect(sim.meta(a)!.honor).toBe(5);
     expect(sim.hillState.active!.honorPaid).toBe(5);
+    // Stepping out banks nothing but keeps what was banked, so a holder who
+    // steps off the rim to fight does not forfeit the minute they stood.
+    tickSeconds(sim, 30);
+    const banked = sim.hillState.active!.accrual.get(a)!;
+    expect(banked).toBeGreaterThan(0);
     outside(sim, a);
-    tickSeconds(sim, 1); // the pass after leaving drops them from the books
-    expect(sim.hillState.active!.accrual.has(a)).toBe(false);
     const before = sim.meta(a)!.honor;
     seen = tickSeconds(sim, 2 * HILL_ACCRUAL_SECONDS);
     expect(honorEvents(seen, a)).toEqual([]);
     expect(sim.meta(a)!.honor).toBe(before);
+    expect(sim.hillState.active!.accrual.get(a)).toBe(banked);
+    inside(sim, a);
+    seen = tickSeconds(sim, HILL_ACCRUAL_SECONDS - banked + 1);
+    expect(honorEvents(seen, a)).toHaveLength(1);
   });
 
-  it('pays only the holding group, at most the cap, and never an under-level alt', () => {
-    const { sim, pids } = hillWorld(['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'Rival', 'Novice']);
-    const raid = pids.slice(0, 6);
-    const [rival, novice] = pids.slice(6);
+  it('pays every holder of the party inside and nobody else, never an under-level alt', () => {
+    const { sim, pids } = hillWorld(['A1', 'A2', 'A3', 'A4', 'Rival', 'Novice']);
+    const party = pids.slice(0, 4);
+    const [rival, novice] = pids.slice(4);
     sim.setPlayerLevel(9, novice);
-    // A party caps at five, so the sixth joins after the raid conversion.
-    for (const pid of raid.slice(1, 5)) {
-      sim.partyInvite(pid, raid[0]);
+    for (const pid of [...party.slice(1), novice]) {
+      sim.partyInvite(pid, party[0]);
       sim.partyAccept(pid);
     }
-    sim.convertPartyToRaid(raid[0]);
-    sim.partyInvite(raid[5], raid[0]);
-    sim.partyAccept(raid[5]);
-    expect(sim.partyOf(raid[0])!.members).toHaveLength(6);
-    sim.partyInvite(novice, raid[0]);
-    sim.partyAccept(novice);
-    for (const [i, pid] of raid.entries()) inside(sim, pid, i * 3 - 9, 0);
+    expect(sim.partyOf(party[0])!.members).toHaveLength(5);
+    for (const [i, pid] of party.entries()) inside(sim, pid, i * 3 - 6, 0);
     inside(sim, novice, 0, 6);
     inside(sim, rival, 0, -6);
     tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
-    expect(sim.hillState.active!.holder).toBe(`party:${sim.partyOf(raid[0])!.id}`);
+    expect(sim.hillState.active!.holder).toBe(`party:${sim.partyOf(party[0])!.id}`);
+    expect(sim.hillInfoFor(party[0])).toMatchObject({ holderCount: 4 });
     sim.events = [];
     const seen = tickSeconds(sim, HILL_ACCRUAL_SECONDS + 1);
-    const paid = [...raid, novice, rival].filter((pid) => honorEvents(seen, pid).length > 0);
-    expect(paid).toHaveLength(HILL_MAX_PAYEES);
-    expect(paid).toEqual([...raid].sort((x, y) => x - y).slice(0, HILL_MAX_PAYEES));
+    const paid = [...party, novice, rival].filter((pid) => honorEvents(seen, pid).length > 0);
+    expect(paid).toEqual(party);
     expect(sim.meta(rival)!.honor).toBe(0);
     expect(sim.meta(novice)!.honor).toBe(0);
   });
@@ -425,10 +531,10 @@ describe('the readout and the chat arms', () => {
       (ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error',
     );
     expect(errors.find((ev) => ev.pid === a)?.text).toBe(
-      'The hill stands in The Wraithwood: your group holds it. It moves in 59 minutes.',
+      'The hill stands in The Wraithwood: your group holds it. It falls in 44 minutes.',
     );
     expect(errors.find((ev) => ev.pid === b)?.text).toBe(
-      'The hill stands in The Wraithwood: another group holds it. It moves in 59 minutes.',
+      'The hill stands in The Wraithwood: another group holds it. It falls in 44 minutes.',
     );
     const quiet = world();
     const q = addPlayer(quiet, 'Quiet');
@@ -445,10 +551,30 @@ describe('the readout and the chat arms', () => {
     const hill = sim.hillState.active!;
     expect(hill.zoneId).toBe('evergarden');
     expect(hillContains(hill, ent(sim, a).pos.x, ent(sim, a).pos.z)).toBe(true);
+    expect(hill.phase).toBe('active');
+    sim.chat('/dev hill warn', a);
+    expect(sim.hillState.active).toMatchObject({ phase: 'warning' });
+    sim.chat('/dev hill nightbloom warn', a);
+    expect(sim.hillState.active).toMatchObject({ phase: 'warning', zoneId: 'nightbloom' });
     const plain = world();
     const p = addPlayer(plain, 'Plain');
     plain.chat('/dev hill', p);
     expect(plain.hillState.active).toBeNull();
+  });
+
+  it('/hill during the warning says where and when the hill will rise', () => {
+    const sim = world();
+    const a = addPlayer(sim, 'Aleph');
+    spawnHillNow(sim.ctx, 'wraithwood', { warn: true });
+    sim.events = [];
+    sim.chat('/hill', a);
+    const line = sim.events.find(
+      (ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error' && ev.pid === a,
+    )?.text;
+    expect(line).toBe('A hill will rise in The Wraithwood in 15 minutes.');
+    expect(hillWarningLine('The Wraithwood', 1)).toBe(
+      'A hill will rise in The Wraithwood in 1 minute.',
+    );
   });
 });
 

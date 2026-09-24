@@ -614,7 +614,9 @@ describe('the World PvP tab: the stakes list states the live rules', () => {
     expect(html).toContain('The Proving Shore and Eastbrook Vale are sanctuaries');
     expect(html).toContain('Everywhere else is contested: only two flagged players can fight.');
     expect(html).toContain('The Wraithwood, the Evergarden and the Nightbloom are free-for-all');
-    expect(html).toContain('Party, raid and guild members are never hostile to each other.');
+    expect(html).toContain(
+      'Party and raid members are never hostile to each other. Guildmates outside your group can fight.',
+    );
     // The names in the copy follow the zone table: a policy moved in
     // src/sim/content/ must move the sentence with it.
     const lower = html.toLowerCase();

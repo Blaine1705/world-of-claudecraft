@@ -1466,7 +1466,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.splitLine':
     '순수한 1대1은 전부를 가져가고, 조력자와 그 치유사는 나눠 가집니다.',
   'hudChrome.worldPvp.disarmLine': '끄는 데 {minutes}분이 걸리며 전투가 끝날 때까지 기다립니다.',
-  'hudChrome.worldPvp.groupLine': '파티, 공격대, 길드원끼리는 절대 적대하지 않습니다.',
+  'hudChrome.worldPvp.groupLine':
+    '파티원과 공격대원끼리는 절대 적대하지 않습니다. 그룹 밖의 길드원과는 싸울 수 있습니다.',
   'hudChrome.worldPvp.greyLine':
     '당신보다 {levels}레벨 넘게 낮은 플레이어는 아무것도 주지 않습니다.',
   'hudChrome.worldPvp.record': '전적: 처치 {kills}, 사망 {deaths}',
@@ -1525,6 +1526,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.firstWin': '첫 승리',
   'hudChrome.warfare.floatReasons.hill': '언덕',
   'hudChrome.hill.title': '언덕의 왕',
+  'hudChrome.hill.rising': '언덕이 아직 솟아오르지 않았습니다',
   'hudChrome.hill.heldYou': '당신의 그룹이 언덕을 점령했습니다',
   'hudChrome.hill.heldOther': '다른 그룹이 언덕을 점령했습니다',
   'hudChrome.hill.heldNone': '언덕을 점령한 그룹이 없습니다',
@@ -1536,9 +1538,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.contestNone': '{total} 동안 원 안에서 다수를 유지하면 점령합니다',
   'hudChrome.hill.inside': '당신은 원 안에 있습니다',
   'hudChrome.hill.distance': '원까지 {yards}야드',
-  'hudChrome.hill.moves': '{minutes} 후 이동합니다',
-  'hudChrome.hill.honorNote':
-    '원 안에 있는 점령 측 구성원마다 매분 명예 {honor}, 동시에 최대 {max}명까지',
+  'hudChrome.hill.rises': '{minutes} 후 솟아오릅니다',
+  'hudChrome.hill.falls': '{minutes} 후 사라집니다',
+  'hudChrome.hill.standingRaid':
+    '공격대원은 인원에 포함되지 않습니다. 언덕은 파티만 점령할 수 있습니다',
+  'hudChrome.hill.standingLevel': '{level}레벨이 되기 전에는 언덕 인원에 포함되지 않습니다',
   'hudChrome.warfareShop.gossipOption': '워페어 세트 둘러보기',
   'hudChrome.warfareShop.gossipOptionAria': '{name}이(가) 운영하는 워페어 세트 상점 둘러보기',
   'hudChrome.warfareShop.jewelry': '장신구',
@@ -1635,7 +1639,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.nav.worldPvp': '월드 PvP',
   'guide.worldPvpPage.heading': '월드 PvP',
   'guide.worldPvpPage.intro':
-    '열린 세계의 플레이어 간 전투는 선택 사항입니다. PvP 깃발을 올리면 파티, 공격대, 길드에 속하지 않은 깃발을 올린 모든 플레이어가 열린 세계 어디서든 적이 되고, 깃발을 내리면 잠시 후 다시 구경꾼이 됩니다. 깃발을 올리지 않은 사람은 공격할 수도, 공격받을 수도 없습니다.',
+    '열린 세계의 플레이어 간 전투는 선택 사항입니다. PvP 깃발을 올리면 파티나 공격대에 속하지 않은 깃발을 올린 모든 플레이어가 열린 세계 어디서든 적이 되고, 깃발을 내리면 잠시 후 다시 구경꾼이 됩니다. 깃발을 올리지 않은 사람은 공격할 수도, 공격받을 수도 없습니다.',
   'guide.worldPvpPage.flagHeading': '깃발 올리기와 내리기',
   'guide.worldPvpPage.flagBody':
     '채팅에 /pvp 를 입력하거나 G 키로 PvP 창을 열어 월드 PvP 탭을 사용하세요. 탭에는 전적과 판돈도 표시됩니다. 초반 레벨을 지나면 깃발은 즉시 올라갑니다. 내리면 몇 분의 카운트다운이 시작되고, 아직 싸우는 중이면 깃발이 내려가지 않으므로 자신이 시작한 싸움에서 도망치는 수단이 될 수 없습니다. 전투 중인 깃발 올린 플레이어를 치유하면 자신의 깃발도 올라갑니다.',
@@ -1646,7 +1650,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.limitsBody':
     '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 계수는 일일 초기화와 함께 초기화됩니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다.',
   'guide.worldPvpPage.introZones':
-    '열린 세계의 플레이어 간 전투는 선택 사항이며, 그 의미는 지금 서 있는 땅이 정합니다. PvP 깃발을 올리면 파티, 공격대, 길드에 속하지 않은 깃발을 올린 모든 플레이어가 분쟁 지역에서 적이 되고, 깃발을 내리면 잠시 후 다시 구경꾼이 됩니다. 두 지역은 월드 전투가 전혀 일어나지 않는 성역이고, 만렙 지역 가운데 셋은 깃발과 상관없이 그곳의 모두가 공격 대상인 자유 전투 지역입니다. 파티, 공격대, 길드원은 어디서든 서로의 적이 되지 않습니다.',
+    '열린 세계의 플레이어 간 전투는 선택 사항이며, 그 의미는 지금 서 있는 땅이 정합니다. PvP 깃발을 올리면 파티, 공격대, 길드에 속하지 않은 깃발을 올린 모든 플레이어가 분쟁 지역에서 적이 되고, 깃발을 내리면 잠시 후 다시 구경꾼이 됩니다. 두 지역은 월드 전투가 전혀 일어나지 않는 성역이고, 만렙 지역 가운데 셋은 깃발과 상관없이 그곳의 모두가 공격 대상인 자유 전투 지역입니다. 파티원과 공격대원은 어디서든 서로의 적이 되지 않지만, 그룹 밖의 길드원은 다른 누구와 마찬가지로 공격 대상입니다.',
   'guide.worldPvpPage.zonesHeading': '월드 PvP가 벌어지는 곳',
   'guide.worldPvpPage.zonesBody':
     '세계의 땅은 세 종류입니다. 수련의 해안과 이스트브룩 골짜기는 성역이라 깃발과 상관없이 월드 PvP가 전혀 일어나지 않으므로, 새 캐릭터가 깃발이 무엇인지 알기도 전에 싸움에 휘말리는 일은 없습니다. 세계의 대부분은 분쟁 지역이며, 그곳에서는 위의 깃발 규칙이 전부입니다. 망령숲, 상록 정원, 밤꽃 평원은 자유 전투 지역이라 그 안에 선 모두가 깃발과 상관없이 그 안에 선 다른 모두를 공격할 수 있고, 경계를 넘어 들어갈 때와 나갈 때 모두 안내를 받습니다. 그곳에서 깃발을 올리지 않은 플레이어를 공격하면 자신의 깃발이 올라가므로, 먼저 덤빈 쪽이 언제나 위험을 짊어집니다. 이미 깃발을 올린 상대를 때릴 때는 올라가지 않으니, 자신을 지키거나 깃발을 올리지 않은 누군가를 지키는 일에는 아무 대가가 없습니다.',
@@ -1660,7 +1664,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다.',
   'guide.worldPvpPage.hillHeading': '언덕의 왕',
   'guide.worldPvpPage.hillBody':
-    '한 시간에 한 번, 자유 전투 지역 가운데 한 곳에 언덕이 솟아오릅니다. 탁 트인 땅에 그려진 넓은 원이며, 그 위치는 서버 전체에 알려지고 땅에도 표시됩니다. 원 안에 선 플레이어가 가장 많은 그룹이 언덕을 두고 다투며, 1분 동안 끊이지 않고 다수를 유지하면 언덕은 그 그룹의 것이 됩니다. 파티나 공격대는 한 그룹으로 세고, 혼자인 플레이어도 한 그룹입니다. 한 그룹이 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 약간의 명예를 얻지만, 한 번에 받는 인원은 몇 명으로 제한됩니다. 그래서 가득 찬 파티가 아무런 다툼 없이 한 시간 내내 언덕을 지키면 전장 승리 한 번과 비슷한 명예를 얻습니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.',
+    '세 시간에 한 번, 아무도 예측할 수 없는 때에 자유 전투 지역 가운데 한 곳에 15분 뒤 언덕이 솟아오른다는 소식이 서버 전체에 알려지고, 언덕이 설 원이 탁 트인 땅에 표시됩니다. 솟아오른 언덕은 45분 동안 서 있다가 사라집니다. 원 안에 선 플레이어가 가장 많은 파티가 언덕을 두고 다투며, 1분 동안 끊이지 않고 다수를 유지하면 언덕은 그 파티의 것이 됩니다. 혼자인 플레이어는 1인 파티로 세지만, 공격대원과 월드 PvP에 필요한 레벨에 이르지 못한 캐릭터는 전혀 세지 않습니다. 한 파티가 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 약간의 명예를 얻습니다. 그래서 가득 찬 파티가 아무런 다툼 없이 언덕이 서 있는 내내 지키면 전장 승리 한 번보다 조금 적은 명예를 얻습니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.',
   'guide.thornhollowPage.heading': '쏜할로우 평원',
   'guide.thornhollowPage.intro':
     '가시봉 아래 오래된 숲의 성벽으로 둘러싸인 분지에서 벌어지는 랭크 5대 5 깃발 뺏기 전장. 협곡 양 끝에서 두 폐허 요새가 마주 보고, 그 사이에는 누구도 차지한 적 없는 더 오래된 안뜰이 있다. 다섯 명씩, 요새 둘, 목표 하나. 적의 깃발을 빼앗아 우리 깃발을 빼앗기기 전에 가져와라.',

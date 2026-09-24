@@ -7,7 +7,7 @@
 
 import * as THREE from 'three';
 import type { HillInfo } from '../world_api/world_pvp';
-import { HILL_FILL_OPACITY, hillPulseSpeed, hillRingKey, hillRingPlan } from './hill_ring_core';
+import { hillPulseSpeed, hillRingKey, hillRingPlan } from './hill_ring_core';
 
 const SEGMENTS = 96;
 /** Rim band inner edge as a fraction of the radius. A 50 yd circle needs a
@@ -22,6 +22,7 @@ interface RingVisual {
   fillMat: THREE.MeshBasicMaterial;
   ownedGeometries: THREE.BufferGeometry[];
   phase: number;
+  hillPhase: HillInfo['phase'];
   holder: HillInfo['holder'];
   challenger: HillInfo['challenger'];
 }
@@ -43,6 +44,7 @@ export class HillRingVisuals {
     const key = hillRingKey(info);
     if (this.visual && this.visual.key !== key) this.clear();
     if (!this.visual) this.visual = { key, ring: this.create(info) };
+    this.visual.ring.hillPhase = info.phase;
     this.visual.ring.holder = info.holder;
     this.visual.ring.challenger = info.challenger;
   }
@@ -53,7 +55,11 @@ export class HillRingVisuals {
     if (!ring) return;
     const contested = ring.challenger !== 'none';
     ring.phase = (ring.phase + dt * hillPulseSpeed(contested)) % (Math.PI * 2);
-    const plan = hillRingPlan(ring.phase, ring);
+    const plan = hillRingPlan(ring.phase, {
+      phase: ring.hillPhase,
+      holder: ring.holder,
+      challenger: ring.challenger,
+    });
     ring.rimMat.color.setHex(plan.color);
     ring.fillMat.color.setHex(plan.color);
     ring.rimMat.opacity = plan.ringOpacity;
@@ -91,7 +97,7 @@ export class HillRingVisuals {
     const fillMat = new THREE.MeshBasicMaterial({
       color: plan.color,
       transparent: true,
-      opacity: HILL_FILL_OPACITY,
+      opacity: plan.fillOpacity,
       depthWrite: false,
       side: THREE.DoubleSide,
     });
@@ -107,6 +113,7 @@ export class HillRingVisuals {
       fillMat,
       ownedGeometries,
       phase: 0,
+      hillPhase: info.phase,
       holder: info.holder,
       challenger: info.challenger,
     };

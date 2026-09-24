@@ -2895,7 +2895,8 @@ export const hudChromeStrings = {
     groundContested: 'Everywhere else is contested: only two flagged players can fight.',
     groundFfa:
       'The Wraithwood, the Evergarden and the Nightbloom are free-for-all: everyone there can fight, flag or not.',
-    groupLine: 'Party, raid and guild members are never hostile to each other.',
+    groupLine:
+      'Party and raid members are never hostile to each other. Guildmates outside your group can fight.',
     markLine:
       'Attacking an unflagged player there raises your own flag; attacking a flagged one never does.',
     aidLine: 'Healing, shielding or buffing a flagged player in a world fight raises your flag.',
@@ -2921,10 +2922,11 @@ export const hudChromeStrings = {
     pending: 'Waiting for your PvP status from the realm.',
     commandHint: 'Chat: /pvp toggles the flag, /pvp on and /pvp off set it.',
   },
-  // King of the Hill (src/ui/hud/hill/): the in-zone bar over the standing
-  // hill. Every number is a resolved value from src/sim/pvp/hill_rules.ts.
+  // King of the Hill (src/ui/hud/hill/): the in-zone bar over the announced or
+  // standing hill. Every number is a resolved value from src/sim/pvp/hill_rules.ts.
   hill: {
     title: 'King of the Hill',
+    rising: 'The hill has not risen yet',
     heldYou: 'Your group holds the hill',
     heldOther: 'Another group holds the hill',
     heldNone: 'Nobody holds the hill',
@@ -2936,8 +2938,10 @@ export const hudChromeStrings = {
     contestNone: 'Hold a majority inside for {total} to take it',
     inside: 'You are inside the circle',
     distance: '{yards} yd to the circle',
-    moves: 'Moves in {minutes}',
-    honorNote: '{honor} Honor a minute to each holder inside, up to {max} of you',
+    rises: 'Rises in {minutes}',
+    falls: 'Falls in {minutes}',
+    standingRaid: 'Raid members do not count: only parties can hold the hill',
+    standingLevel: 'You do not count on the hill until level {level}',
   },
   // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
   // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings

@@ -1420,7 +1420,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.honorLine': '每次击杀 {honor} 点荣誉，由所有参与者平分。',
   'hudChrome.worldPvp.splitLine': '干净的 1v1 可独得全部奖励；协助者及其治疗者共同分享。',
   'hudChrome.worldPvp.disarmLine': '关闭需要 {minutes} 分钟，并会等到战斗结束。',
-  'hudChrome.worldPvp.groupLine': '小队、团队和公会成员之间永远不会互相敌对。',
+  'hudChrome.worldPvp.groupLine':
+    '小队和团队成员之间永远不会互相敌对。队伍之外的公会成员之间可以交战。',
   'hudChrome.worldPvp.greyLine': '比你低 {levels} 级以上的玩家不会带来任何收益。',
   'hudChrome.worldPvp.record': '战绩：{kills} 次击杀，{deaths} 次死亡',
   'hudChrome.worldPvp.enable': '开启世界 PvP',
@@ -1474,6 +1475,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.firstWin': '首胜',
   'hudChrome.warfare.floatReasons.hill': '山丘',
   'hudChrome.hill.title': '山丘之王',
+  'hudChrome.hill.rising': '山丘尚未升起',
   'hudChrome.hill.heldYou': '你的队伍占据着山丘',
   'hudChrome.hill.heldOther': '另一支队伍占据着山丘',
   'hudChrome.hill.heldNone': '无人占据山丘',
@@ -1485,8 +1487,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.contestNone': '在圈内保持人数优势 {total} 即可夺取',
   'hudChrome.hill.inside': '你在圈内',
   'hudChrome.hill.distance': '距离圆圈 {yards} 码',
-  'hudChrome.hill.moves': '{minutes} 后移动',
-  'hudChrome.hill.honorNote': '圈内每名占据方成员每分钟获得 {honor} 点荣誉，同时最多 {max} 人',
+  'hudChrome.hill.rises': '{minutes} 后升起',
+  'hudChrome.hill.falls': '{minutes} 后消失',
+  'hudChrome.hill.standingRaid': '团队成员不计入人数：只有小队才能占据山丘',
+  'hudChrome.hill.standingLevel': '达到 {level} 级之前，你不计入山丘人数',
   'hudChrome.warfareShop.gossipOption': '浏览战争套装',
   'hudChrome.warfareShop.gossipOptionAria': '浏览 {name} 提供的战争套装商店',
   'hudChrome.warfareShop.jewelry': '饰品',
@@ -1581,7 +1585,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.nav.worldPvp': '世界 PvP',
   'guide.worldPvpPage.heading': '世界 PvP',
   'guide.worldPvpPage.intro':
-    '开放世界的玩家对战需要主动开启。升起你的 PvP 旗帜后，所有不在你的小队、团队或公会中且同样开启了旗帜的玩家都会在开放世界的任何地方成为敌人；降下旗帜后，稍作等待你就会重新成为旁观者。没有升起旗帜的人既不能攻击别人，也不会被攻击。',
+    '开放世界的玩家对战需要主动开启。升起你的 PvP 旗帜后，所有不在你的小队或团队中且同样开启了旗帜的玩家都会在开放世界的任何地方成为敌人；降下旗帜后，稍作等待你就会重新成为旁观者。没有升起旗帜的人既不能攻击别人，也不会被攻击。',
   'guide.worldPvpPage.flagHeading': '升起与降下旗帜',
   'guide.worldPvpPage.flagBody':
     '在聊天中输入 /pvp，或按 G 打开 PvP 窗口并使用世界 PvP 标签页，那里还会显示你的战绩和赌注。度过起始等级后，升起旗帜是即时的。降下旗帜会开始几分钟的倒计时，而且在你仍在战斗时旗帜不会降下，所以关闭永远不是逃离你挑起的战斗的手段。治疗正在战斗的已开启旗帜的玩家会升起你自己的旗帜。',
@@ -1592,7 +1596,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.limitsBody':
     '反复击败同一名玩家，每次的收益都会减少并很快归零，计数会随每日重置而重置。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。',
   'guide.worldPvpPage.introZones':
-    '开放世界的玩家对战需要主动开启，而你脚下的土地决定了这意味着什么。升起你的 PvP 旗帜后，所有不在你的小队、团队或公会中且同样开启了旗帜的玩家都会在争夺地带成为敌人；降下旗帜后，稍作等待你就会重新成为旁观者。有两座区域是完全不会发生世界战斗的圣域，而三座满级区域是自由混战地带，无论是否开启旗帜，身处其中的每个人都可以被攻击。小队、团队和公会的伙伴在任何地方都不会成为你的敌人。',
+    '开放世界的玩家对战需要主动开启，而你脚下的土地决定了这意味着什么。升起你的 PvP 旗帜后，所有不在你的小队、团队或公会中且同样开启了旗帜的玩家都会在争夺地带成为敌人；降下旗帜后，稍作等待你就会重新成为旁观者。有两座区域是完全不会发生世界战斗的圣域，而三座满级区域是自由混战地带，无论是否开启旗帜，身处其中的每个人都可以被攻击。小队和团队的伙伴在任何地方都不会成为你的敌人；队伍之外的公会成员与其他人一样可以被攻击。',
   'guide.worldPvpPage.zonesHeading': '世界 PvP 发生在哪里',
   'guide.worldPvpPage.zonesBody':
     '世界上的土地分为三种。试炼之滨与东溪谷是圣域：无论是否开启旗帜，那里都完全不会发生世界 PvP，所以新角色绝不会在弄清旗帜是什么之前就被人挑战。世界的大部分是争夺地带，上面那条旗帜规则就是全部。怨灵林、常青园与夜绽花野是自由混战地带：站在其中的每个人都可以攻击站在其中的其他任何人，无论是否开启旗帜，而且你跨入时会收到提示，离开时同样会。在那里攻击未开启旗帜的玩家会升起你自己的旗帜，所以挑起战斗的一方始终承担风险。攻击已经开启旗帜的玩家则永远不会升起你的旗帜，这意味着自卫，或是保护未开启旗帜的人，都不会让你付出任何代价。',
@@ -1606,7 +1610,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。',
   'guide.worldPvpPage.hillHeading': '山丘之王',
   'guide.worldPvpPage.hillBody':
-    '每小时会有一座山丘在某个自由混战地带升起：开阔地上的一个宽阔圆圈，消息通告全领域，并会在地面上标出它所在的位置。圈内站着玩家最多的队伍争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；小队或团队都算作一支队伍，单独一人也是一支队伍。一支队伍占据山丘期间，站在圈内的每名成员每分钟都会获得少量荣誉，但同时最多只有数人能拿到，因此一支满员小队在整整一小时里不受争夺地占据山丘，所获荣誉大致相当于一场战场胜利。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。',
+    '每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；单独一人算作一支一人小队，但团队成员以及等级不足以参加世界 PvP 的角色完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得少量荣誉，因此一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉略少于一场战场胜利。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。',
   'guide.thornhollowPage.heading': '荆谷原野',
   'guide.thornhollowPage.intro':
     '一场排位 5v5 夺旗战场，战场位于棘峰之下老林中的围墙山谷：两座废弃要塞沿着峡谷两端遥遥相对，中间是一座更古老的庭院，谁都不曾真正占据。每方五人，两座要塞，一个目标：夺走敌方战旗并抢在对方之前带回家。',

@@ -1,34 +1,44 @@
-// King of the Hill: the pure rules. Once an hour a hill rises somewhere in one
-// of the free-for-all zones, a HILL_RADIUS circle on dry, open ground; the
-// group with the most members standing inside it contests it, holds it after
+// King of the Hill: the pure rules. Once every three hours, at a random
+// moment inside the window, a hill is announced somewhere in one of the
+// free-for-all zones; it rises HILL_WARNING_SECONDS later as a HILL_RADIUS
+// circle on dry, open ground and stands for HILL_DURATION_SECONDS. The PARTY
+// with the most members standing inside it contests it, holds it after
 // HILL_CAPTURE_SECONDS of unbroken majority, and every holder standing inside
-// earns a slow trickle of Honor for as long as they hold it. No SimContext, no
-// rng, no clock: every function here is a plain function of its arguments so
-// the sim (hill.ts), the HUD bar and the tests read the same verdicts. The
+// earns a slow trickle of Honor for as long as they hold it. Raid members and
+// players under the world PvP level floor do not count. No SimContext, no rng,
+// no clock: every function here is a plain function of its arguments so the
+// sim (hill.ts), the HUD bar and the tests read the same verdicts. The
 // ctx-bound system that owns the schedule, the presence pass, the contest
 // clock and the payouts is hill.ts.
 
 /** The circle's radius in yards (owner spec). */
 export const HILL_RADIUS = 50;
-/** A new hill rises this often, and the old one closes as it does. */
-export const HILL_CYCLE_SECONDS = 60 * 60;
-/** The first hill of a realm's life rises this long after boot (the natural
- *  rift portal precedent: never at tick zero, so a fresh realm has players
- *  before the first announcement). Sim time, so offline the first hill of a
- *  session rises two minutes in. */
-export const HILL_FIRST_AT_SECONDS = 120;
+/** One hill per window of this length (owner spec: "once every 3 hours"). */
+export const HILL_WINDOW_SECONDS = 3 * 60 * 60;
+/** The realm is told where the hill will rise this long before it does
+ *  (owner spec: a 15 minute warning), so parties can form and travel. */
+export const HILL_WARNING_SECONDS = 15 * 60;
+/** A risen hill stands this long, then falls (owner spec: 45 minutes). */
+export const HILL_DURATION_SECONDS = 45 * 60;
+/** The first window opens this long after boot (the natural rift portal
+ *  precedent: never at tick zero). Sim time, so offline the first window
+ *  opens two minutes into a session. */
+export const HILL_FIRST_WINDOW_AT_SECONDS = 120;
+/** The latest a warning may sound inside its window and still leave the
+ *  whole warning and the whole stand inside that window, so two hills never
+ *  overlap. The warning's offset is drawn uniformly from [0, this]. */
+export const HILL_LATEST_WARN_OFFSET_SECONDS =
+  HILL_WINDOW_SECONDS - HILL_WARNING_SECONDS - HILL_DURATION_SECONDS;
 /** Unbroken majority for this long takes the hill (owner spec). */
 export const HILL_CAPTURE_SECONDS = 60;
 /** Each holder standing inside accrues this many seconds of presence before a
  *  payout, and each payout is HILL_HONOR_PER_PAYOUT. One Honor a minute: a full
- *  party holding an uncontested hill for the whole hour earns 60 each, about
- *  one Thornhollow Fields win for an hour of standing still, so Honor stays
- *  scarce and the instanced faucets stay ahead (docs/design/warfare.md). */
+ *  party holding an uncontested hill for its whole stand earns 45 each, under
+ *  one Thornhollow Fields win for 45 minutes of standing still, so Honor stays
+ *  scarce and the instanced faucets stay ahead (docs/design/warfare.md). Only
+ *  a party can hold, so a party's size is the payee cap. */
 export const HILL_ACCRUAL_SECONDS = 60;
 export const HILL_HONOR_PER_PAYOUT = 1;
-/** At most this many holders are paid at once, so a raid cannot multiply the
- *  trickle past a party's worth. Chosen by ascending pid inside the circle. */
-export const HILL_MAX_PAYEES = 5;
 /** The circle keeps this much clear of the zone's edges beyond its own radius,
  *  and this much clear of the hub settlement's radius. */
 export const HILL_EDGE_MARGIN = 25;
@@ -46,10 +56,30 @@ export const HILL_INNER_SAMPLES = 8;
  *  structure, and the hub exclusion keeps the circle off every settlement. */
 export const HILL_CENTER_CLEARANCE = 6;
 
-/** The group a player counts for: their party or raid as one group, an
- *  ungrouped player as a group of one. */
-export function hillGroupKey(pid: number, party: { id: number } | null): string {
-  return party ? `party:${party.id}` : `solo:${pid}`;
+/** Whether a player counts on the hill (owner spec: parties only): a raid
+ *  member does not, so a raid cannot flood the circle, and neither does a
+ *  player under the world PvP level floor, who cannot be attacked on
+ *  free-for-all ground and would otherwise hold the circle untouchable. */
+export type HillStanding = 'counted' | 'raid' | 'underLevel';
+
+export function hillStanding(
+  level: number,
+  party: { raid: boolean } | null,
+  minLevel: number,
+): HillStanding {
+  if (level < minLevel) return 'underLevel';
+  if (party?.raid) return 'raid';
+  return 'counted';
+}
+
+/** The group a counted player contests for: their party, or a group of one
+ *  when ungrouped. A raid has no key (it does not count). */
+export function hillGroupKey(
+  pid: number,
+  party: { id: number; raid: boolean } | null,
+): string | null {
+  if (!party) return `solo:${pid}`;
+  return party.raid ? null : `party:${party.id}`;
 }
 
 /** The group with the most members inside, or null on a tie for first place
@@ -92,12 +122,6 @@ export function hillContestStep(
   return sameChallenger ? prev + dt : dt;
 }
 
-/** Which of the holder's members inside are paid this pass: ascending pid,
- *  at most `max`. Deterministic on every host. */
-export function hillPayees(inside: readonly number[], max = HILL_MAX_PAYEES): number[] {
-  return [...inside].sort((a, b) => a - b).slice(0, max);
-}
-
 /** The world reads a spawn probe needs; the sim binds them to the terrain,
  *  the water bodies and the collider grid, the tests to fakes. */
 export interface HillSpotProbe {
@@ -138,16 +162,33 @@ export function hillSpotIsOpen(
   return ring(HILL_RIM_SAMPLES, radius) && ring(HILL_INNER_SAMPLES, radius / 2);
 }
 
-/** The ordinal of the hill that should be standing at sim time `now`: -1
- *  before the first, then 0, 1, 2... one per cycle. */
-export function hillOrdinalAt(now: number): number {
-  if (now < HILL_FIRST_AT_SECONDS) return -1;
-  return Math.floor((now - HILL_FIRST_AT_SECONDS) / HILL_CYCLE_SECONDS);
+/** The three moments of one hill: the realm-wide warning, the rise, the fall. */
+export interface HillTimes {
+  warnAt: number;
+  risesAt: number;
+  closesAt: number;
 }
 
-/** Sim time hill `ordinal` rises. */
-export function hillRiseTime(ordinal: number): number {
-  return HILL_FIRST_AT_SECONDS + ordinal * HILL_CYCLE_SECONDS;
+/** The window open at sim time `now`: -1 before the first, then 0, 1, 2... */
+export function hillWindowAt(now: number): number {
+  if (now < HILL_FIRST_WINDOW_AT_SECONDS) return -1;
+  return Math.floor((now - HILL_FIRST_WINDOW_AT_SECONDS) / HILL_WINDOW_SECONDS);
+}
+
+/** The times of window `ordinal`'s hill whose warning sounds `offset` seconds
+ *  into the window (clamped into [0, HILL_LATEST_WARN_OFFSET_SECONDS], so the
+ *  hill always falls inside its own window). */
+export function hillTimes(ordinal: number, offset: number): HillTimes {
+  const clamped = Math.max(0, Math.min(HILL_LATEST_WARN_OFFSET_SECONDS, Math.floor(offset)));
+  const warnAt = HILL_FIRST_WINDOW_AT_SECONDS + ordinal * HILL_WINDOW_SECONDS + clamped;
+  const risesAt = warnAt + HILL_WARNING_SECONDS;
+  return { warnAt, risesAt, closesAt: risesAt + HILL_DURATION_SECONDS };
+}
+
+/** Whole minutes from `now` to `at`, rounded up, never below zero: the one
+ *  rounding every countdown (the notices, /hill, the bar) shares. */
+export function hillMinutesUntil(at: number, now: number): number {
+  return Math.max(0, Math.ceil((at - now) / 60));
 }
 
 /** Is (px, pz) inside the circle? Squared distance, no sqrt on the presence pass. */

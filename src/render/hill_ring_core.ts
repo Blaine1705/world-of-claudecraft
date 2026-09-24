@@ -4,7 +4,9 @@
 // the friendly green; another group: the hostile red), its rim pulses while
 // a challenge is running so a contested hill reads as one before the bar is
 // looked at, and the interior wash stays faint so the circle marks ground
-// without hiding it. Colours are hex literals here rather than CSS tokens
+// without hiding it. While the hill is only announced (the warning phase) the
+// circle is drawn as a still, faint gold outline: the ground it will stand
+// on, not yet a prize. Colours are hex literals here rather than CSS tokens
 // because they feed Three materials, the rift death zone precedent.
 
 import type { HillInfo } from '../world_api/world_pvp';
@@ -25,6 +27,9 @@ export const HILL_RING_MIN_OPACITY = 0.55;
 export const HILL_PULSE_SPEED_CALM = 1.2;
 export const HILL_PULSE_SPEED_CONTESTED = 5.0;
 export const HILL_FILL_OPACITY = 0.12;
+/** The announced-but-not-risen circle: still and faint. */
+export const HILL_WARNING_RING_OPACITY = 0.35;
+export const HILL_WARNING_FILL_OPACITY = 0.04;
 
 export function hillRingColor(holder: HillInfo['holder']): number {
   if (holder === 'you') return HILL_COLOR_YOURS;
@@ -37,11 +42,18 @@ export function hillPulseSpeed(contested: boolean): number {
 }
 
 /** The full per-frame plan. `phase` is the caller-advanced pulse clock
- *  (radians, advanced by hillPulseSpeed * dt). */
+ *  (radians, advanced by hillPulseSpeed * dt); `info.phase` is the hill's. */
 export function hillRingPlan(
   phase: number,
-  info: Pick<HillInfo, 'holder' | 'challenger'>,
+  info: Pick<HillInfo, 'phase' | 'holder' | 'challenger'>,
 ): HillRingPlan {
+  if (info.phase === 'warning') {
+    return {
+      color: HILL_COLOR_UNHELD,
+      ringOpacity: HILL_WARNING_RING_OPACITY,
+      fillOpacity: HILL_WARNING_FILL_OPACITY,
+    };
+  }
   const contested = info.challenger !== 'none';
   const wave = contested ? 0.5 + 0.5 * Math.sin(phase) : 1;
   return {

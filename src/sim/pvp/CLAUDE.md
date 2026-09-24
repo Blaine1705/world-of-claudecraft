@@ -27,8 +27,9 @@ ratings.
 - `world_pvp_rules.ts` owns the World PvP (`/pvp` flag) PURE rules: the pair
   verdict over the two flags AND the two zone policies (`worldPvpPairHostile`,
   also read by the renderer and the HUD through `src/ui/pvp_hostile_core.ts`)
-  with its same-player, party/raid and guild exemptions (`worldPvpPairExempt`,
-  which cuts through every zone, free-for-all ground included), the marking rule
+  with its same-player and party/raid exemptions (`worldPvpPairExempt`, which
+  cuts through every zone, free-for-all ground included; a shared guild is NOT
+  an exemption, guildmates outside one group fight), the marking rule
   (`worldPvpHitMarksAttacker`: only a hit that needed NO flag marks, so hitting
   a flagged player never does), the gold stake, the equal split with the killing
   blow taking the remainder, the grey-level rule, and the per-pair DR multiplier
@@ -118,26 +119,34 @@ ratings.
 
 ## King of the Hill
 
-- `hill_rules.ts` owns the PURE rules: the group key (`hillGroupKey`, a party or
-  raid is one group), the strict-maximum leader (`hillLeader`, null on a tie),
-  the majority verdict (`hillChallengeStands`), the contest clock
-  (`hillContestStep`), the payee cap (`hillPayees`), the spot probe
-  (`hillSpotIsOpen` over a `HillSpotProbe` the sim binds to the terrain, the
-  water bodies, the collider grid and the static zones), the hourly schedule
-  (`hillOrdinalAt` / `hillRiseTime`) and the circle test. No ctx, no rng, no
-  clock. Every tuning literal (`HILL_RADIUS`, `HILL_CYCLE_SECONDS`,
-  `HILL_CAPTURE_SECONDS`, `HILL_ACCRUAL_SECONDS`, `HILL_HONOR_PER_PAYOUT`,
-  `HILL_MAX_PAYEES`) lives here and the copy resolves from it.
+- `hill_rules.ts` owns the PURE rules: who counts (`hillStanding`: parties
+  only, so a raid member does not, and neither does a player under
+  `WORLD_PVP_MIN_LEVEL`), the group key (`hillGroupKey`: a party, or a lone
+  player as a group of one; null for a raid), the strict-maximum leader
+  (`hillLeader`, null on a tie), the majority verdict (`hillChallengeStands`),
+  the contest clock (`hillContestStep`), the spot probe (`hillSpotIsOpen` over a
+  `HillSpotProbe` the sim binds to the terrain, the water bodies, the collider
+  grid and the static zones), the three-hour schedule (`hillWindowAt`,
+  `hillTimes` from a window and a warning offset, `hillMinutesUntil`) and the
+  circle test. No ctx, no rng, no clock. Every tuning literal (`HILL_RADIUS`,
+  `HILL_WINDOW_SECONDS`, `HILL_WARNING_SECONDS`, `HILL_DURATION_SECONDS`,
+  `HILL_CAPTURE_SECONDS`, `HILL_ACCRUAL_SECONDS`, `HILL_HONOR_PER_PAYOUT`) lives
+  here and the copy resolves from it.
 - `hill.ts` owns the SYSTEM behind the `SimContext` seam: the session state as
-  ONE live view (`Sim.hillState`, `ctx.hillState`: the standing hill, the
-  schedule, the presence counts, the contest clock, the hour's accruals; never
-  persisted), the spawn (`spawnHill` from a PRIVATE rng derived from the seed
-  and the ordinal, the rift portal precedent, so the world stream never moves;
-  `spawnHillNow` for the `/dev hill` arm), the once-a-second `updateHill` pass
-  (schedule, presence by group, contest, payouts through `grantHonor` with
-  reason `hill_hold`), the readout (`hillInfoFor`, live fields only for a
-  viewer in the hill's zone so the self wire elides it elsewhere), the `/hill`
-  readout line, and the notice lines the client matcher re-localizes
-  (`hillRiseLine` with the zone name, `HILL_TAKEN_LINE`, `HILL_LOST_LINE`).
-  The realm switch (`ctx.worldPvpDisabled`) drops a standing hill and rises
-  none. Pinned by `tests/hill.test.ts` and `tests/hill_rules.test.ts`.
+  ONE live view (`Sim.hillState`, `ctx.hillState`: the announced or standing
+  hill with its phase, the next window's plan and spot retries, the presence
+  counts, the contest clock, the accruals; never persisted), the plan
+  (`hillPlanFor`: the warning's offset inside the window from a PRIVATE rng
+  derived from the seed and the window's ordinal, the rift portal precedent, so
+  the world stream never moves), the spawn (`spawnHill`, whose spot rng salts
+  in the attempt number so a retry searches new ground; `spawnHillNow` for the
+  `/dev hill [zone] [warn]` arm), the once-a-second `updateHill` pass (the
+  phases warning, risen, fallen, each announced to the realm; then, only while
+  risen, presence by party, contest, payouts through `grantHonor` with reason
+  `hill_hold`), the readout (`hillInfoFor`, live fields only for a viewer in the
+  hill's zone while it is risen, so the self wire elides it elsewhere), the
+  `/hill` readout line, and the notice lines the client matcher re-localizes
+  (`hillWarningLine`, `hillRiseLine`, `hillFallenLine` with the zone name,
+  `HILL_TAKEN_LINE`, `HILL_LOST_LINE`). The realm switch
+  (`ctx.worldPvpDisabled`) drops a standing hill and announces none. Pinned by
+  `tests/hill.test.ts` and `tests/hill_rules.test.ts`.

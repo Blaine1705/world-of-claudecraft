@@ -400,10 +400,12 @@ whichever overworld zone a clamping lookup would misreport:
   `worldPvp` field. Two flagged players and nothing more.
 
 The one exemption cuts through all three (`worldPvpPairExempt`): the same
-player, two members of one party or raid, and two members of one guild are never
-hostile, in a free-for-all zone as much as anywhere. Outside a free-for-all zone
-every unflagged character is exactly as safe as before (the #96 griefing
-invariant), and a flagged player can never touch an unflagged one.
+player and two members of one party or raid are never hostile, in a
+free-for-all zone as much as anywhere. A shared guild is not an exemption
+(owner spec, 2026-09-24): guildmates outside one group fight like strangers,
+and a guild that wants to stand together forms a party. Outside a
+free-for-all zone every unflagged character is exactly as safe as before (the
+#96 griefing invariant), and a flagged player can never touch an unflagged one.
 
 Marking (`worldPvpHitMarksAttacker`): landing a hostile hit that needed NO flag
 raises the attacker's own flag, which is only ever the free-for-all arm, an
@@ -500,45 +502,70 @@ resolve every kill identically (`tests/world_pvp.test.ts`,
 
 ## King of the Hill
 
-Once an hour a hill rises somewhere in one of the free-for-all zones
-(`src/sim/pvp/hill.ts`, rules in `hill_rules.ts`, the zone set from
-`worldPvpFfaZones`): a `HILL_RADIUS` (50 yd) circle on dry, open ground, clear
-of the hub settlement and every collider, wholly inside its zone, chosen by a
-private rng derived from the seed and the hill's ordinal (the natural rift
-portal precedent, so the world's own rng stream never moves for a hill and
-every host resolves the same spot). The first rises `HILL_FIRST_AT_SECONDS`
-after boot and one every `HILL_CYCLE_SECONDS` after; the old one closes as the
-new one rises, announced to the whole realm. The realm's `WORLD_PVP_DISABLED`
-switch turns the hill off with the rest of world PvP.
+Once every `HILL_WINDOW_SECONDS` (three hours) a hill rises somewhere in one of
+the free-for-all zones (`src/sim/pvp/hill.ts`, rules in `hill_rules.ts`, the
+zone set from `worldPvpFfaZones`). The moment is random: the warning's offset
+inside the window is drawn by a private rng derived from the seed and the
+window's ordinal (`hillPlanFor`, the natural rift portal precedent, so the
+world's own rng stream never moves for a hill and every host resolves the same
+time and spot), anywhere from the window's opening to
+`HILL_LATEST_WARN_OFFSET_SECONDS` into it, so the whole hill always fits inside
+its own window and two never overlap. The first window opens
+`HILL_FIRST_WINDOW_AT_SECONDS` after boot.
 
-Control is by headcount inside the circle, by GROUP (`hillGroupKey`): a party
-or raid is one group, a lone player a group of one. The largest group that
-beats the holder's present members by a strict majority (`hillChallengeStands`;
-a tie never moves the hill, an absent holder is beaten by anyone) is the
-challenger, and after `HILL_CAPTURE_SECONDS` (60) of unbroken majority it takes
-the hill (`hillContestStep`: a lapsed challenge starts over, a new challenger
-starts its own clock). The dead do not count. Everyone standing in the zone is
-already hostile to every stranger there (the free-for-all arm), so the hill
+A hill has three moments, each announced to the whole realm:
+
+1. **The warning** (`hillWarningLine`): the zone and the minutes to the rise.
+   The spot is chosen now, a `HILL_RADIUS` (50 yd) circle on dry, open ground,
+   clear of the hub settlement and every collider, wholly inside its zone, and
+   it is drawn on the ground as a still, faint outline, so parties can form and
+   travel. Nothing counts yet. A failed spot search retries a minute on with the
+   attempt number salted into the spot rng (so a retry searches new ground); a
+   window whose hill never finds ground is skipped.
+2. **The rise** (`hillRiseLine`), `HILL_WARNING_SECONDS` (15 minutes) after the
+   warning. The contest and the payouts run from here.
+3. **The fall** (`hillFallenLine`), `HILL_DURATION_SECONDS` (45 minutes) after
+   the rise. Banked seconds short of a payout are lost with it.
+
+The realm's `WORLD_PVP_DISABLED` switch turns the hill off with the rest of
+world PvP. A realm that slept through whole windows plans the current one.
+
+Control is by headcount inside the circle, by PARTY (owner spec, 2026-09-24:
+parties only). A party is one group and a lone player a group of one
+(`hillGroupKey`); a raid member does not count at all, and neither does a
+player under `WORLD_PVP_MIN_LEVEL` (`hillStanding`), who cannot be attacked on
+free-for-all ground and would otherwise hold the circle untouchable. The
+largest group that beats the holder's present members by a strict majority
+(`hillChallengeStands`; a tie never moves the hill, an absent holder is beaten
+by anyone) is the challenger, and after `HILL_CAPTURE_SECONDS` (60) of
+unbroken majority it takes the hill (`hillContestStep`: a lapsed challenge
+starts over, a new challenger starts its own clock). The dead do not count.
+Everyone standing in the zone is already hostile to every stranger there (the
+free-for-all arm, and guildmates outside one party are strangers), so the hill
 needs no flag of its own.
 
 Honor is a deliberately thin trickle, so it stays scarce next to the instanced
-faucets: each holder standing inside banks a second per pass and every
-`HILL_ACCRUAL_SECONDS` (60) pays `HILL_HONOR_PER_PAYOUT` (1), to at most
-`HILL_MAX_PAYEES` (5) of them at once (ascending pid), never to a player under
-`WORLD_PVP_MIN_LEVEL`, and never to anyone outside the circle. A full party
-holding an uncontested hill for the whole hour earns 60 each, about one
-Thornhollow Fields win for an hour of standing still; a realm's whole hill
-income caps at 300 an hour. No diminishing returns: the cap and the pace are
-the limit. A capture clears the ousted holder's banked seconds.
+faucets: each counted holder standing inside banks a second per pass and every
+`HILL_ACCRUAL_SECONDS` (60) pays `HILL_HONOR_PER_PAYOUT` (1). A party's size
+(five) is the payee cap. A holder who steps out banks nothing but keeps what
+they banked; leaving the party or the realm forfeits it, and a capture clears
+the books. A full party holding an uncontested hill for its whole stand earns
+45 each, a little under one Thornhollow Fields win for 45 minutes of standing
+still; a realm's whole hill income caps at 225 per three hours. No diminishing
+returns: the cap and the pace are the limit.
 
 The readout (`IWorld.hillInfo`, the `hill` self key) carries the geometry, the
-holder from the viewer's seat and the minutes left for everyone, and the live
-counts and contest clock only for a viewer standing in the hill's zone, so the
-self wire elides it for everyone else between holder changes. The HUD bar
-(`src/ui/hud/hill/`) shows in that zone: who holds it, you against them, the
-contest fill, the distance to the circle; the renderer draws the circle
-(`src/render/hill_ring.ts`) in the holder's colour; `/hill` in chat says where
-it stands. The state is session-only and never persisted.
+phase, the holder from the viewer's seat, whether the viewer counts
+(`standing`) and the minutes to the next phase change for everyone, and the
+live counts and contest clock only for a viewer standing in the hill's zone
+while it is risen, so the self wire elides it for everyone else between holder
+changes. The HUD bar (`src/ui/hud/hill/`) shows in that zone: while announced,
+the rise countdown and the distance to the marked circle; once risen, who holds
+it, you against them, the contest fill, the distance and the fall countdown;
+and in both, a note when the viewer does not count. The renderer draws the
+circle (`src/render/hill_ring.ts`) in the holder's colour; `/hill` in chat says
+where it stands or will rise; `/dev hill [zone] [warn]` stages one. The state
+is session-only and never persisted.
 
 ## FURY prices
 

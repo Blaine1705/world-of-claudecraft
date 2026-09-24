@@ -5964,13 +5964,16 @@ describe('full self-state snapshot delta fixture', () => {
     });
     expect(client.player.pvpFlag).toBe(true);
     // hill -> hillInfo (social_self_wire.ts): the standing hill from the
-    // leader's seat (outside its zone, so the live fields are zero).
+    // leader's seat (outside its zone, so the live fields are zero; the
+    // fixture leader is under the world PvP level floor, so does not count).
     expect(client.hillInfo).toMatchObject({
       radius: 50,
+      phase: 'active',
+      standing: 'underLevel',
       holder: 'none',
       inZone: false,
       inside: false,
-      minutesLeft: 60,
+      minutesLeft: 45,
     });
     expect(['wraithwood', 'evergarden', 'nightbloom']).toContain(client.hillInfo?.zoneId);
     expect(client.restedXp).toBe(222); // rxp -> restedXp

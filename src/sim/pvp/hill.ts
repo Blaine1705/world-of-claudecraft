@@ -1,78 +1,93 @@
 // King of the Hill: the system half, behind the SimContext seam.
 //
-// Once an hour (HILL_CYCLE_SECONDS) a hill rises in one of the free-for-all
-// zones (world_pvp_zones.ts): a HILL_RADIUS circle on dry, open ground, clear
-// of the water, the hub settlement and every collider, wholly inside its
-// zone. Everyone standing in that zone is already hostile to every stranger
-// there (the free-for-all arm of world_pvp.ts), so the hill needs no flag of
-// its own. Once a second the presence pass counts the players inside the
-// circle by GROUP (a party or raid is one group, an ungrouped player a group
-// of one, hill_rules.ts hillGroupKey); the largest group that beats the
-// holder's present count by a strict majority is the challenger, and after
+// Once every HILL_WINDOW_SECONDS (three hours), at a moment drawn at random
+// inside the window, the realm is warned that a hill will rise in one of the
+// free-for-all zones (world_pvp_zones.ts); HILL_WARNING_SECONDS later it rises,
+// a HILL_RADIUS circle on dry, open ground, clear of the water, the hub
+// settlement and every collider, wholly inside its zone, and it stands for
+// HILL_DURATION_SECONDS before it falls. Each phase change is announced to the
+// whole realm. Everyone standing in that zone is already hostile to every
+// stranger there (the free-for-all arm of world_pvp.ts), so the hill needs no
+// flag of its own.
+//
+// Once a second while the hill stands the presence pass counts the players
+// inside the circle by PARTY (an ungrouped player is a group of one; a raid
+// member and a player under the world PvP level floor do not count at all,
+// hill_rules.ts hillStanding); the largest party that beats the holder's
+// present count by a strict majority is the challenger, and after
 // HILL_CAPTURE_SECONDS of unbroken majority it takes the hill (a tie never
 // moves it; a challenge that lapses starts over). Every holder standing inside
 // banks a second of presence per pass, and each HILL_ACCRUAL_SECONDS pays
-// HILL_HONOR_PER_PAYOUT Honor, to at most HILL_MAX_PAYEES of them at once.
+// HILL_HONOR_PER_PAYOUT Honor. A holder who steps out keeps what they banked;
+// a capture clears the books.
 //
 // State lives on the Sim as ONE live view (`ctx.hillState`), never in this
 // module: the modules hold functions, the Sim holds state (src/sim/CLAUDE.md).
-// Session-only and never persisted: a realm restart rises the next hill on
-// its own clock, and the hour's accruals are not worth a blob field.
+// Session-only and never persisted: a realm restart opens its first window on
+// its own clock, and a stand's accruals are not worth a blob field.
 //
 // The spot probe (the terrain, the water, the colliders) is bound by the Sim
 // (hill_probe.ts) and read through `ctx.hillProbe`, never imported here: the
 // pvp barrel must not reach the terrain modules (an import cycle).
 //
-// Determinism: the spawn draws from a PRIVATE rng derived from the seed and
-// the hill's ordinal (the natural rift portal precedent), so the world's own
-// rng stream never moves for a hill and every host resolves the same spot; the
-// schedule, the contest clock and the accruals run on ctx.time and
-// ctx.tickCount. No DOM, no wall clock.
+// Determinism: the warning's offset and the spot draw from PRIVATE rngs
+// derived from the seed and the window's ordinal (the natural rift portal
+// precedent), so the world's own rng stream never moves for a hill and every
+// host resolves the same time and spot; a spot retry salts in its attempt
+// number so it searches new ground. The schedule, the contest clock and the
+// accruals run on ctx.time and ctx.tickCount. No DOM, no wall clock.
 
 import { zoneContaining } from '../data';
 import { Rng } from '../rng';
-import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { Entity, ZoneDef } from '../types';
+import type { ZoneDef } from '../types';
 import {
   HILL_ACCRUAL_SECONDS,
   HILL_CAPTURE_SECONDS,
-  HILL_CYCLE_SECONDS,
+  HILL_DURATION_SECONDS,
   HILL_EDGE_MARGIN,
   HILL_HONOR_PER_PAYOUT,
   HILL_HUB_MARGIN,
+  HILL_LATEST_WARN_OFFSET_SECONDS,
   HILL_RADIUS,
   HILL_SPAWN_ATTEMPTS,
+  HILL_WARNING_SECONDS,
   type HillSpotProbe,
+  type HillTimes,
   hillChallengeStands,
   hillContains,
   hillContestStep,
   hillGroupKey,
   hillLeader,
-  hillOrdinalAt,
-  hillPayees,
-  hillRiseTime,
+  hillMinutesUntil,
   hillSpotIsOpen,
+  hillStanding,
+  hillTimes,
+  hillWindowAt,
 } from './hill_rules';
 import { grantHonor } from './honor';
 import { WORLD_PVP_MIN_LEVEL } from './world_pvp_rules';
 import { worldPvpFfaZones } from './world_pvp_zones';
 
-/** One standing hill. */
-export interface ActiveHill {
+/** 'warning': announced, drawn on the ground, not yet contestable.
+ *  'active': risen; the contest and the payouts run. */
+export type HillPhase = 'warning' | 'active';
+
+/** One announced or standing hill. */
+export interface ActiveHill extends HillTimes {
+  /** The window it belongs to (its private rng's ordinal). */
   ordinal: number;
+  phase: HillPhase;
   zoneId: string;
   x: number;
   z: number;
   radius: number;
-  /** Sim time it closes (the next hill's rise). */
-  closesAt: number;
-  /** The holding group's key (hillGroupKey), or null while unheld. */
+  /** The holding party's key (hillGroupKey), or null while unheld. */
   holder: string | null;
   /** The leading challenger's key and its banked seconds of majority. */
   challenger: string | null;
   contest: number;
-  /** Last presence pass: group key -> members inside; pid -> group key. */
+  /** Last presence pass: group key -> counted members inside; pid -> key. */
   counts: Map<string, number>;
   insideKeys: Map<number, string>;
   /** pid -> seconds of paid presence banked toward the next payout. */
@@ -84,42 +99,64 @@ export interface ActiveHill {
 /** The Sim-owned session state, exposed on SimContext as a live view. */
 export interface HillState {
   active: ActiveHill | null;
-  /** Hills risen so far (the next one's ordinal is this). */
-  risen: number;
-  /** Sim time of the next spawn attempt; a failed attempt retries a minute on. */
-  nextAt: number;
+  /** The window whose hill comes next, and its times once drawn. */
+  window: number;
+  plan: HillTimes | null;
+  /** Spot attempts spent on the planned hill, and when the next may run. */
+  attempts: number;
+  retryAt: number;
   /** Tick of the last once-a-second pass: the dueness form
    *  (`tickCount - passTick >= PASS_TICKS`, the books-sweep shape), never a
    *  modulo of the tick count, so a pass can never be skipped by a host that
-   *  does not visit every tick. Starts at 0, so the first pass lands on the
-   *  same tick the modulo form ran (the twentieth). */
+   *  does not visit every tick. */
   passTick: number;
 }
 
 export function newHillState(): HillState {
-  return { active: null, risen: 0, nextAt: hillRiseTime(0), passTick: 0 };
+  return { active: null, window: 0, plan: null, attempts: 0, retryAt: 0, passTick: 0 };
 }
 
 const PASS_TICKS = 20;
 const RETRY_SECONDS = 60;
 const NOTICE_COLOR = '#ffd100';
 const RISE_COLOR = '#f0c060';
+const OFFSET_SALT = 0x2c1b3c6d;
+const SPOT_SALT = 0x5bd1e995;
+
+/** "N minutes" with the English plural; the client matcher re-renders the
+ *  count through the locale's own plural rules. */
+function minutesPhrase(minutes: number): string {
+  return minutes === 1 ? '1 minute' : `${minutes} minutes`;
+}
 
 /** The notice lines the client matcher re-localizes (src/ui/sim_i18n.ts). The
- *  rise line carries the zone's English name, localized by the matcher's zone
+ *  zone lines carry the zone's English name, localized by the matcher's zone
  *  rule like the rift portal lines. */
+export function hillWarningLine(zoneName: string, minutes: number): string {
+  return `A hill will rise in ${zoneName} in ${minutesPhrase(minutes)}.`;
+}
 export function hillRiseLine(zoneName: string): string {
   return `A hill has risen in ${zoneName}: hold it to earn Honor.`;
+}
+export function hillFallenLine(zoneName: string): string {
+  return `The hill in ${zoneName} has fallen.`;
 }
 export const HILL_TAKEN_LINE = 'Your group holds the hill.';
 export const HILL_LOST_LINE = 'Another group has taken the hill.';
 
-function hillRng(ctx: SimContext, ordinal: number): Rng {
-  return new Rng((ctx.cfg.seed ^ Math.imul(ordinal + 1, 0x7f4a7c15) ^ 0x5bd1e995) >>> 0);
+function hillRng(ctx: SimContext, ordinal: number, salt: number): Rng {
+  return new Rng((ctx.cfg.seed ^ Math.imul(ordinal + 1, 0x7f4a7c15) ^ salt) >>> 0);
+}
+
+/** Window `ordinal`'s times: the warning's offset inside the window is the
+ *  first draw of the window's own private rng. */
+export function hillPlanFor(ctx: SimContext, ordinal: number): HillTimes {
+  const offset = hillRng(ctx, ordinal, OFFSET_SALT).int(0, HILL_LATEST_WARN_OFFSET_SECONDS);
+  return hillTimes(ordinal, offset);
 }
 
 /** A legal spot for a hill in `zone`, or null when HILL_SPAWN_ATTEMPTS random
- *  tries found none (the caller retries later). */
+ *  tries found none (the caller retries later with a fresh attempt salt). */
 export function pickHillSpot(
   ctx: SimContext,
   rng: Rng,
@@ -151,27 +188,57 @@ function notice(ctx: SimContext, pid: number, text: string, color = NOTICE_COLOR
   ctx.emit({ type: 'log', text, color, pid });
 }
 
+function zoneName(zoneId: string): string {
+  return worldPvpFfaZones().find((z) => z.id === zoneId)?.name ?? zoneId;
+}
+
+/** Tell the realm what just happened to the hill: the warning (with the
+ *  minutes left, whole and rounded up), the rise, or the fall. */
+function announcePhase(
+  ctx: SimContext,
+  hill: ActiveHill,
+  what: 'warning' | 'risen' | 'fallen',
+): void {
+  const name = zoneName(hill.zoneId);
+  if (what === 'warning') {
+    announce(ctx, hillWarningLine(name, hillMinutesUntil(hill.risesAt, ctx.time)), RISE_COLOR);
+  } else if (what === 'risen') {
+    announce(ctx, hillRiseLine(name), RISE_COLOR);
+  } else {
+    announce(ctx, hillFallenLine(name), RISE_COLOR);
+  }
+}
+
 /**
- * Raise hill `ordinal` in a free-for-all zone (a random one by the private
- * rng, or `zoneId` when given: the /dev arm and the tests). Returns the hill,
- * or null when no legal spot was found this attempt. A standing hill closes
- * as the new one rises.
+ * Place window `ordinal`'s hill on `times` in a free-for-all zone (a random
+ * one by the private rng, or `zoneId` when given: the /dev arm and the tests)
+ * and announce it: the warning when it has not risen yet, else the rise.
+ * `attempt` salts the spot rng so a retry searches new ground. Returns the
+ * hill, or null when no legal spot was found this attempt.
  */
-export function spawnHill(ctx: SimContext, ordinal: number, zoneId?: string): ActiveHill | null {
+export function spawnHill(
+  ctx: SimContext,
+  ordinal: number,
+  times: HillTimes,
+  attempt = 0,
+  zoneId?: string,
+): ActiveHill | null {
   const zones = worldPvpFfaZones();
   if (zones.length === 0) return null;
-  const rng = hillRng(ctx, ordinal);
+  const rng = hillRng(ctx, ordinal, SPOT_SALT ^ Math.imul(attempt, 0x27d4eb2f));
   const zone = zoneId ? zones.find((z) => z.id === zoneId) : zones[rng.int(0, zones.length - 1)];
   if (!zone) return null;
   const spot = pickHillSpot(ctx, rng, zone);
   if (!spot) return null;
+  const phase: HillPhase = ctx.time >= times.risesAt ? 'active' : 'warning';
   const hill: ActiveHill = {
+    ...times,
     ordinal,
+    phase,
     zoneId: zone.id,
     x: spot.x,
     z: spot.z,
     radius: HILL_RADIUS,
-    closesAt: hillRiseTime(ordinal + 1),
     holder: null,
     challenger: null,
     contest: 0,
@@ -181,50 +248,88 @@ export function spawnHill(ctx: SimContext, ordinal: number, zoneId?: string): Ac
     honorPaid: 0,
   };
   ctx.hillState.active = hill;
-  announce(ctx, hillRiseLine(zone.name), RISE_COLOR);
+  announcePhase(ctx, hill, phase === 'warning' ? 'warning' : 'risen');
   return hill;
 }
 
-/** The /dev arm: rise a hill now, closing any that stands, on the next
- *  ordinal (so its spot is the one the schedule would have picked). It
- *  stands a full cycle from now, and the schedule resumes when it closes. */
-export function spawnHillNow(ctx: SimContext, zoneId?: string): ActiveHill | null {
-  const state = ctx.hillState;
-  const hill = spawnHill(ctx, state.risen, zoneId);
-  if (!hill) return null;
-  hill.closesAt = ctx.time + HILL_CYCLE_SECONDS;
-  state.risen += 1;
-  state.nextAt = hill.closesAt;
-  return hill;
+/** The /dev arm: announce a hill now (closing any that stands), on the next
+ *  window's ordinal so its spot is one the schedule could have picked. With
+ *  `warn` it runs the full warning first; without, it rises at once. Either
+ *  way it stands a full HILL_DURATION_SECONDS, and the schedule resumes
+ *  when it falls. */
+export function spawnHillNow(
+  ctx: SimContext,
+  zoneId?: string,
+  opts: { warn?: boolean } = {},
+): ActiveHill | null {
+  const risesAt = ctx.time + (opts.warn ? HILL_WARNING_SECONDS : 0);
+  const times: HillTimes = {
+    warnAt: ctx.time,
+    risesAt,
+    closesAt: risesAt + HILL_DURATION_SECONDS,
+  };
+  return spawnHill(ctx, ctx.hillState.window, times, 0, zoneId);
 }
 
-/** The schedule: rise the hill whose time has come, retry a failed spot a
- *  minute on, never rise on a realm whose World PvP switch is set. */
+/** The schedule: move a standing hill through its phases, then warn of the
+ *  planned one when its time comes. A failed spot retries a minute on with a
+ *  fresh salt; a window that passes with no spot is skipped. */
 function updateSchedule(ctx: SimContext): void {
   const state = ctx.hillState;
-  if (ctx.time < state.nextAt) return;
-  const due = hillOrdinalAt(ctx.time);
-  if (due < 0) return;
-  // A realm that slept through several cycles (or a sim clock jumped forward)
-  // rises the CURRENT hill, not every missed one in turn.
-  const ordinal = Math.max(due, state.risen);
-  const hill = spawnHill(ctx, ordinal);
-  if (!hill) {
-    state.nextAt = ctx.time + RETRY_SECONDS;
+  const hill = state.active;
+  if (hill) {
+    if (ctx.time >= hill.closesAt) {
+      state.active = null;
+      announcePhase(ctx, hill, 'fallen');
+    } else {
+      if (hill.phase === 'warning' && ctx.time >= hill.risesAt) {
+        hill.phase = 'active';
+        announcePhase(ctx, hill, 'risen');
+      }
+      return;
+    }
+  }
+  const current = hillWindowAt(ctx.time);
+  if (current < 0) return;
+  // A realm that slept through whole windows (or a sim clock jumped forward)
+  // plans the CURRENT window, not every missed one in turn.
+  if (state.window < current) {
+    state.window = current;
+    state.plan = null;
+  }
+  if (!state.plan) {
+    state.plan = hillPlanFor(ctx, state.window);
+    state.attempts = 0;
+    state.retryAt = 0;
+  }
+  const plan = state.plan;
+  if (ctx.time >= plan.closesAt) {
+    state.window += 1;
+    state.plan = null;
     return;
   }
-  state.risen = ordinal + 1;
-  state.nextAt = hill.closesAt;
+  if (ctx.time < plan.warnAt || ctx.time < state.retryAt) return;
+  if (!spawnHill(ctx, state.window, plan, state.attempts)) {
+    state.attempts += 1;
+    state.retryAt = ctx.time + RETRY_SECONDS;
+    return;
+  }
+  state.window += 1;
+  state.plan = null;
 }
 
-/** The presence pass: who stands inside, by group. */
+/** The presence pass: who stands inside, by party. The dead, raid members and
+ *  players under the level floor are not counted. */
 function countInside(ctx: SimContext, hill: ActiveHill): void {
   hill.counts.clear();
   hill.insideKeys.clear();
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e || e.dead || !hillContains(hill, e.pos.x, e.pos.z)) continue;
-    const key = hillGroupKey(e.id, ctx.partyOf(e.id));
+    const party = ctx.partyOf(e.id);
+    if (hillStanding(e.level, party, WORLD_PVP_MIN_LEVEL) !== 'counted') continue;
+    const key = hillGroupKey(e.id, party);
+    if (key === null) continue;
     hill.insideKeys.set(e.id, key);
     hill.counts.set(key, (hill.counts.get(key) ?? 0) + 1);
   }
@@ -258,19 +363,23 @@ function updateContest(ctx: SimContext, hill: ActiveHill, dt: number): void {
   }
 }
 
-/** The trickle: every holder inside (up to HILL_MAX_PAYEES, by pid) banks
- *  this pass; a full minute pays one Honor. Under WORLD_PVP_MIN_LEVEL a
- *  player banks nothing (an alt parked on the hill earns its party nothing). */
+/** The trickle: every holder inside banks this pass, and a full minute pays
+ *  one Honor. Only counted players are inside the books, so the level floor
+ *  and the raid rule hold here too, and a party's size is the payee cap. A
+ *  holder who steps out keeps their bank; one who leaves the party, or the
+ *  realm, loses it. */
 function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
-  if (hill.holder === null) return;
-  const inside: number[] = [];
-  for (const [pid, key] of hill.insideKeys) if (key === hill.holder) inside.push(pid);
-  const payees = new Set(hillPayees(inside));
-  for (const pid of hill.accrual.keys()) if (!payees.has(pid)) hill.accrual.delete(pid);
-  for (const pid of payees) {
-    const meta: PlayerMeta | undefined = ctx.players.get(pid);
-    const e: Entity | undefined = ctx.entities.get(pid);
-    if (!meta || !e || e.level < WORLD_PVP_MIN_LEVEL) continue;
+  const holder = hill.holder;
+  if (holder === null) return;
+  for (const pid of hill.accrual.keys()) {
+    if (!ctx.players.has(pid) || hillGroupKey(pid, ctx.partyOf(pid)) !== holder) {
+      hill.accrual.delete(pid);
+    }
+  }
+  for (const [pid, key] of hill.insideKeys) {
+    if (key !== holder) continue;
+    const meta = ctx.players.get(pid);
+    if (!meta) continue;
     const banked = (hill.accrual.get(pid) ?? 0) + dt;
     if (banked < HILL_ACCRUAL_SECONDS) {
       hill.accrual.set(pid, banked);
@@ -282,10 +391,10 @@ function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
 }
 
 /**
- * Per-tick entry (the sim's world-PvP lap): once a second run the schedule,
- * the presence pass, the contest clock and the payouts. Draws no rng from the
- * world stream. A realm whose World PvP switch is set never rises a hill and
- * drops a standing one.
+ * Per-tick entry (the sim's hill lap): once a second run the schedule, then,
+ * while a hill stands risen, the presence pass, the contest clock and the
+ * payouts. Draws no rng from the world stream. A realm whose World PvP switch
+ * is set never announces a hill and drops a standing one silently.
  */
 export function updateHill(ctx: SimContext): void {
   const state = ctx.hillState;
@@ -295,11 +404,9 @@ export function updateHill(ctx: SimContext): void {
     state.active = null;
     return;
   }
-  const hill = state.active;
-  if (hill && ctx.time >= hill.closesAt) state.active = null;
   updateSchedule(ctx);
   const live = state.active;
-  if (!live) return;
+  if (!live || live.phase !== 'active') return;
   const dt = PASS_TICKS * (1 / 20);
   countInside(ctx, live);
   updateContest(ctx, live, dt);
@@ -307,8 +414,9 @@ export function updateHill(ctx: SimContext): void {
 }
 
 /** The IWorld readout for one viewer (src/world_api/world_pvp.ts HillInfo).
- *  The live fields are zero for a viewer outside the hill's zone, so the self
- *  wire elides the readout for everyone else between holder changes. */
+ *  The live fields are zero for a viewer outside the hill's zone (and for
+ *  everyone during the warning), so the self wire elides the readout for
+ *  everyone else between holder changes. */
 export function hillInfoFor(
   ctx: SimContext,
   pid: number,
@@ -317,21 +425,28 @@ export function hillInfoFor(
   if (!hill) return null;
   const e = ctx.entities.get(pid);
   if (!e || e.kind !== 'player') return null;
-  const key = hillGroupKey(pid, ctx.partyOf(pid));
+  const party = ctx.partyOf(pid);
+  const standing = hillStanding(e.level, party, WORLD_PVP_MIN_LEVEL);
+  const key = standing === 'counted' ? hillGroupKey(pid, party) : null;
   const side = (group: string | null): 'none' | 'you' | 'other' =>
     group === null ? 'none' : group === key ? 'you' : 'other';
   const inZone = zoneContaining(e.pos.x, e.pos.z)?.id === hill.zoneId;
-  const minutesLeft = Math.max(0, Math.ceil((hill.closesAt - ctx.time) / 60));
+  const minutesLeft = hillMinutesUntil(
+    hill.phase === 'warning' ? hill.risesAt : hill.closesAt,
+    ctx.time,
+  );
   const base = {
     zoneId: hill.zoneId,
     x: hill.x,
     z: hill.z,
     radius: hill.radius,
+    phase: hill.phase,
     minutesLeft,
     inZone,
+    standing,
     holder: side(hill.holder),
   };
-  if (!inZone) {
+  if (!inZone || hill.phase === 'warning') {
     return {
       ...base,
       inside: false,
@@ -344,32 +459,31 @@ export function hillInfoFor(
   }
   return {
     ...base,
-    inside: hill.insideKeys.has(pid),
+    inside: hillContains(hill, e.pos.x, e.pos.z),
     holderCount: hill.holder === null ? 0 : (hill.counts.get(hill.holder) ?? 0),
-    yourCount: hill.counts.get(key) ?? 0,
+    yourCount: key === null ? 0 : (hill.counts.get(key) ?? 0),
     challenger: side(hill.challenger),
     challengerCount: hill.challenger === null ? 0 : (hill.counts.get(hill.challenger) ?? 0),
     contest: Math.floor(hill.contest),
   };
 }
 
-/** The whole-cycle length, for the readouts that quote it. */
-export const HILL_CYCLE_MINUTES = Math.round(HILL_CYCLE_SECONDS / 60);
-
 export const HILL_READOUT_NONE_LINE = 'No hill stands right now.';
 
-/** The /hill chat readout: where the hill stands, who holds it from this
- *  player's seat, and when it moves. Three shapes plus the no-hill line, each
- *  re-localized by the client matcher (the zone name through its zone rule). */
+/** The /hill chat readout: the warning line while the hill is announced;
+ *  where it stands, who holds it from this player's seat, and when it falls
+ *  once risen; the no-hill line otherwise. Each shape is re-localized by the
+ *  client matcher (the zone name through its zone rule). */
 export function hillReadoutLine(ctx: SimContext, pid: number): string {
   const info = hillInfoFor(ctx, pid);
   if (!info) return HILL_READOUT_NONE_LINE;
-  const zoneName = worldPvpFfaZones().find((z) => z.id === info.zoneId)?.name ?? info.zoneId;
+  const name = zoneName(info.zoneId);
+  if (info.phase === 'warning') return hillWarningLine(name, info.minutesLeft);
   const held =
     info.holder === 'you'
       ? 'your group holds it'
       : info.holder === 'other'
         ? 'another group holds it'
         : 'nobody holds it';
-  return `The hill stands in ${zoneName}: ${held}. It moves in ${info.minutesLeft} minutes.`;
+  return `The hill stands in ${name}: ${held}. It falls in ${minutesPhrase(info.minutesLeft)}.`;
 }

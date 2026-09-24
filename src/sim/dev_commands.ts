@@ -174,10 +174,11 @@ export function handleDevChat(
   }
 
   // King of the Hill: rise a hill now (in the named free-for-all zone, else a
-  // random one) and stand the caller on its rim, for staging a contest.
-  const hillMatch = /^\/(?:dev\s+hill|devhill)(?:\s+([a-z_]+))?\s*$/i.exec(raw);
+  // random one) and stand the caller on its rim, for staging a contest. With a
+  // trailing `warn` it is announced instead, rising after the full warning.
+  const hillMatch = /^\/(?:dev\s+hill|devhill)(?:\s+(?!warn\b)([a-z_]+))?(\s+warn)?\s*$/i.exec(raw);
   if (hillMatch) {
-    const hill = spawnHillNow(ctx, hillMatch[1]?.toLowerCase());
+    const hill = spawnHillNow(ctx, hillMatch[1]?.toLowerCase(), { warn: !!hillMatch[2] });
     const entity = ctx.entities.get(pid);
     if (!hill) {
       emitDevLog(
@@ -190,7 +191,7 @@ export function handleDevChat(
       emitDevLog(
         ctx,
         pid,
-        `[dev] Hill risen in ${hill.zoneId} at ${hill.x.toFixed(1)}, ${hill.z.toFixed(1)}; you stand at ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`,
+        `[dev] Hill ${hill.phase === 'warning' ? 'announced' : 'risen'} in ${hill.zoneId} at ${hill.x.toFixed(1)}, ${hill.z.toFixed(1)}; you stand at ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`,
       );
     }
     return null;
@@ -1149,7 +1150,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone]',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] [warn]',
     );
     return null;
   }

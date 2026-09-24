@@ -1,43 +1,59 @@
 // Pins for the King of the Hill pure rules (src/sim/pvp/hill_rules.ts): the
-// group key, the strict-maximum leader, the majority verdict, the contest
-// clock, the payee cap, the spot probe, the hourly schedule and the circle test.
+// standing (parties only, the level floor), the group key, the strict-maximum
+// leader, the majority verdict, the contest clock, the spot probe, the
+// three-hour schedule and the circle test.
 import { describe, expect, it } from 'vitest';
 import {
   HILL_ACCRUAL_SECONDS,
   HILL_CAPTURE_SECONDS,
-  HILL_CYCLE_SECONDS,
-  HILL_FIRST_AT_SECONDS,
+  HILL_DURATION_SECONDS,
+  HILL_FIRST_WINDOW_AT_SECONDS,
   HILL_HONOR_PER_PAYOUT,
-  HILL_MAX_PAYEES,
+  HILL_LATEST_WARN_OFFSET_SECONDS,
   HILL_RADIUS,
+  HILL_WARNING_SECONDS,
+  HILL_WINDOW_SECONDS,
   type HillSpotProbe,
   hillChallengeStands,
   hillContains,
   hillContestStep,
   hillGroupKey,
   hillLeader,
-  hillOrdinalAt,
-  hillPayees,
-  hillRiseTime,
+  hillMinutesUntil,
   hillSpotIsOpen,
+  hillStanding,
+  hillTimes,
+  hillWindowAt,
 } from '../src/sim/pvp/hill_rules';
 
 describe('the tuning literals the copy and the docs quote', () => {
-  it('pins the radius, the cycle, the capture length, the trickle and the payee cap', () => {
+  it('pins the radius, the window, the warning, the stand, the capture length and the trickle', () => {
     expect(HILL_RADIUS).toBe(50);
-    expect(HILL_CYCLE_SECONDS).toBe(3_600);
-    expect(HILL_FIRST_AT_SECONDS).toBe(120);
+    expect(HILL_WINDOW_SECONDS).toBe(3 * 3_600);
+    expect(HILL_WARNING_SECONDS).toBe(15 * 60);
+    expect(HILL_DURATION_SECONDS).toBe(45 * 60);
+    expect(HILL_FIRST_WINDOW_AT_SECONDS).toBe(120);
+    expect(HILL_LATEST_WARN_OFFSET_SECONDS).toBe(2 * 3_600);
     expect(HILL_CAPTURE_SECONDS).toBe(60);
     expect(HILL_ACCRUAL_SECONDS).toBe(60);
     expect(HILL_HONOR_PER_PAYOUT).toBe(1);
-    expect(HILL_MAX_PAYEES).toBe(5);
   });
 });
 
-describe('hillGroupKey', () => {
-  it('keys a grouped player by the party and a lone player by themselves', () => {
-    expect(hillGroupKey(7, { id: 3 })).toBe('party:3');
-    expect(hillGroupKey(8, { id: 3 })).toBe('party:3');
+describe('hillStanding and hillGroupKey', () => {
+  it('counts a party member or a lone player, never a raid member or an under-level player', () => {
+    expect(hillStanding(20, null, 10)).toBe('counted');
+    expect(hillStanding(10, { raid: false }, 10)).toBe('counted');
+    expect(hillStanding(20, { raid: true }, 10)).toBe('raid');
+    expect(hillStanding(9, null, 10)).toBe('underLevel');
+    // The level floor reads first: an under-level raider is under level.
+    expect(hillStanding(9, { raid: true }, 10)).toBe('underLevel');
+  });
+
+  it('keys a party member by the party, a lone player by themselves, and a raid not at all', () => {
+    expect(hillGroupKey(7, { id: 3, raid: false })).toBe('party:3');
+    expect(hillGroupKey(8, { id: 3, raid: false })).toBe('party:3');
+    expect(hillGroupKey(7, { id: 3, raid: true })).toBeNull();
     expect(hillGroupKey(7, null)).toBe('solo:7');
     expect(hillGroupKey(8, null)).not.toBe(hillGroupKey(7, null));
   });
@@ -105,15 +121,6 @@ describe('hillContestStep', () => {
   });
 });
 
-describe('hillPayees', () => {
-  it('pays at most the cap, by ascending pid, whatever the order given', () => {
-    expect(hillPayees([9, 3, 7])).toEqual([3, 7, 9]);
-    expect(hillPayees([9, 3, 7, 1, 8, 2, 5])).toEqual([1, 2, 3, 5, 7]);
-    expect(hillPayees([])).toEqual([]);
-    expect(hillPayees([4, 2], 1)).toEqual([2]);
-  });
-});
-
 describe('hillSpotIsOpen', () => {
   const open = (over: Partial<HillSpotProbe> = {}): HillSpotProbe => ({
     wet: () => false,
@@ -160,16 +167,35 @@ describe('hillSpotIsOpen', () => {
     expect(hillSpotIsOpen(open({ blocked: (x) => x > 45 }), 'zone', 0, 0, 50)).toBe(true);
   });
 });
-describe('the hourly schedule', () => {
-  it('rises the first hill two minutes in and one every hour after', () => {
-    expect(hillOrdinalAt(0)).toBe(-1);
-    expect(hillOrdinalAt(119)).toBe(-1);
-    expect(hillOrdinalAt(120)).toBe(0);
-    expect(hillOrdinalAt(120 + 3_599)).toBe(0);
-    expect(hillOrdinalAt(120 + 3_600)).toBe(1);
-    expect(hillRiseTime(0)).toBe(120);
-    expect(hillRiseTime(2)).toBe(120 + 7_200);
-    expect(hillOrdinalAt(hillRiseTime(5))).toBe(5);
+describe('the three-hour schedule', () => {
+  it('opens the first window two minutes in and one every three hours after', () => {
+    expect(hillWindowAt(0)).toBe(-1);
+    expect(hillWindowAt(119)).toBe(-1);
+    expect(hillWindowAt(120)).toBe(0);
+    expect(hillWindowAt(120 + 10_799)).toBe(0);
+    expect(hillWindowAt(120 + 10_800)).toBe(1);
+  });
+
+  it('warns at the offset, rises 15 minutes on, falls 45 after, always inside the window', () => {
+    expect(hillTimes(0, 0)).toEqual({ warnAt: 120, risesAt: 120 + 900, closesAt: 120 + 3_600 });
+    expect(hillTimes(2, 600)).toEqual({
+      warnAt: 120 + 21_600 + 600,
+      risesAt: 120 + 21_600 + 1_500,
+      closesAt: 120 + 21_600 + 4_200,
+    });
+    // The latest offset ends exactly at the window's close; past it clamps.
+    expect(hillTimes(0, HILL_LATEST_WARN_OFFSET_SECONDS).closesAt).toBe(120 + 10_800);
+    expect(hillTimes(0, 99_999)).toEqual(hillTimes(0, HILL_LATEST_WARN_OFFSET_SECONDS));
+    expect(hillTimes(0, -5)).toEqual(hillTimes(0, 0));
+    expect(hillWindowAt(hillTimes(4, 1234).closesAt - 1)).toBe(4);
+  });
+
+  it('counts whole minutes up, never below zero', () => {
+    expect(hillMinutesUntil(900, 0)).toBe(15);
+    expect(hillMinutesUntil(900, 1)).toBe(15);
+    expect(hillMinutesUntil(900, 841)).toBe(1);
+    expect(hillMinutesUntil(900, 900)).toBe(0);
+    expect(hillMinutesUntil(900, 1_000)).toBe(0);
   });
 });
 

@@ -15,7 +15,13 @@ import {
   hillRingPlan,
 } from '../src/render/hill_ring_core';
 import { HILL_CAPTURE_SECONDS } from '../src/sim/pvp';
-import { HILL_LOST_LINE, HILL_TAKEN_LINE, hillRiseLine } from '../src/sim/pvp/hill';
+import {
+  HILL_LOST_LINE,
+  HILL_TAKEN_LINE,
+  hillFallenLine,
+  hillRiseLine,
+  hillWarningLine,
+} from '../src/sim/pvp/hill';
 import { buildHillBarView, HillBar, hillEdgeDistance, hillRivalCount } from '../src/ui/hud/hill';
 import { setLanguage } from '../src/ui/i18n';
 import type { PainterHostWriters } from '../src/ui/painter_host';
@@ -27,7 +33,9 @@ const info = (over: Partial<HillInfo> = {}): HillInfo => ({
   x: 360,
   z: 1540,
   radius: 50,
+  phase: 'active',
   minutesLeft: 42,
+  standing: 'counted',
   inZone: true,
   inside: false,
   holder: 'none',
@@ -94,8 +102,8 @@ describe('buildHillBarView', () => {
       contestFraction: 0.25,
       distanceYards: 0,
       minutesLeft: 42,
-      honorPerMinute: 1,
-      maxPayees: 5,
+      phase: 'active',
+      standing: 'counted',
     });
     // The sig moves on the structural fields and stays put on the live ones.
     const a = buildHillBarView(info({ contest: 3 }), null).sig;
@@ -105,6 +113,8 @@ describe('buildHillBarView', () => {
     expect(buildHillBarView(info({ challenger: 'other' }), null).sig).not.toBe(a);
     expect(buildHillBarView(info({ inside: true }), null).sig).not.toBe(a);
     expect(buildHillBarView(info({ x: 361 }), null).sig).not.toBe(a);
+    expect(buildHillBarView(info({ phase: 'warning' }), null).sig).not.toBe(a);
+    expect(buildHillBarView(info({ standing: 'raid' }), null).sig).not.toBe(a);
     // A contest past the capture length (a stale readout) clamps.
     const over = buildHillBarView(info({ contest: 999 }), null);
     expect(over.visible && over.contestFraction).toBe(1);
@@ -175,7 +185,8 @@ describe('HillBar (the painter)', () => {
     expect(root.textContent).toContain('Inside: you 0, largest rival 2');
     expect(root.textContent).toContain('Losing the hill: 12 seconds of 1 minute');
     expect(root.textContent).toContain('50 yd to the circle');
-    expect(root.textContent).toContain('Moves in 42 minutes');
+    expect(root.textContent).toContain('Falls in 42 minutes');
+    expect(root.querySelector('.hill-note')).toBeNull();
     expect((root.querySelector('.hill-fill') as HTMLElement).style.width).toBe('20%');
     expect(root.classList.contains('is-contested')).toBe(true);
     expect(root.classList.contains('is-you-contesting')).toBe(false);
@@ -235,6 +246,36 @@ describe('HillBar (the painter)', () => {
     expect(root.textContent).not.toContain('Your group holds the hill');
   });
 
+  it('while announced: no contest rows, the rise countdown, and still the distance', () => {
+    const { layer, bar } = harness();
+    bar.update(buildHillBarView(info({ phase: 'warning', minutesLeft: 15 }), { x: 460, z: 1540 }));
+    const root = layer.querySelector('#hill-bar') as HTMLElement;
+    expect(root.textContent).toContain('The hill has not risen yet');
+    expect(root.textContent).toContain('Rises in 15 minutes');
+    expect(root.textContent).toContain('50 yd to the circle');
+    expect(root.querySelector('.hill-counts')).toBeNull();
+    expect(root.querySelector('.hill-track')).toBeNull();
+    // The rise rebuilds the skeleton with the contest rows.
+    bar.update(buildHillBarView(info({ minutesLeft: 45 }), { x: 460, z: 1540 }));
+    expect(root.querySelector('.hill-counts')).not.toBeNull();
+    expect(root.textContent).toContain('Falls in 45 minutes');
+  });
+
+  it('tells a raid member and an under-level player they do not count', () => {
+    const { layer, bar } = harness();
+    bar.update(buildHillBarView(info({ standing: 'raid' }), { x: 360, z: 1540 }));
+    const root = layer.querySelector('#hill-bar') as HTMLElement;
+    expect(root.querySelector('.hill-note')?.textContent).toBe(
+      'Raid members do not count: only parties can hold the hill',
+    );
+    bar.update(buildHillBarView(info({ standing: 'underLevel' }), { x: 360, z: 1540 }));
+    expect(root.querySelector('.hill-note')?.textContent).toBe(
+      'You do not count on the hill until level 10',
+    );
+    bar.update(buildHillBarView(info(), { x: 360, z: 1540 }));
+    expect(root.querySelector('.hill-note')).toBeNull();
+  });
+
   it('hides when the hill closes or the player leaves the zone, and relocalizes in place', () => {
     const { layer, bar } = harness();
     bar.update(buildHillBarView(info(), { x: 360, z: 1540 }));
@@ -259,12 +300,28 @@ describe('HillBar (the painter)', () => {
 
 describe('the ring core', () => {
   it('colours by holder, pulses only while contested, and keys by geometry', () => {
-    expect(hillRingPlan(0, { holder: 'none', challenger: 'none' }).color).toBe(HILL_COLOR_UNHELD);
-    expect(hillRingPlan(0, { holder: 'you', challenger: 'none' }).color).toBe(HILL_COLOR_YOURS);
-    expect(hillRingPlan(0, { holder: 'other', challenger: 'you' }).color).toBe(HILL_COLOR_OTHERS);
-    const calm = hillRingPlan(Math.PI * 1.5, { holder: 'none', challenger: 'none' });
-    const contested = hillRingPlan(Math.PI * 1.5, { holder: 'none', challenger: 'other' });
+    const risen = { phase: 'active' } as const;
+    expect(hillRingPlan(0, { ...risen, holder: 'none', challenger: 'none' }).color).toBe(
+      HILL_COLOR_UNHELD,
+    );
+    expect(hillRingPlan(0, { ...risen, holder: 'you', challenger: 'none' }).color).toBe(
+      HILL_COLOR_YOURS,
+    );
+    expect(hillRingPlan(0, { ...risen, holder: 'other', challenger: 'you' }).color).toBe(
+      HILL_COLOR_OTHERS,
+    );
+    const calm = hillRingPlan(Math.PI * 1.5, { ...risen, holder: 'none', challenger: 'none' });
+    const contested = hillRingPlan(Math.PI * 1.5, {
+      ...risen,
+      holder: 'none',
+      challenger: 'other',
+    });
     expect(calm.ringOpacity).toBeGreaterThan(contested.ringOpacity);
+    // Announced: still and fainter than any risen frame.
+    const warn = hillRingPlan(0, { phase: 'warning', holder: 'none', challenger: 'none' });
+    expect(warn.color).toBe(HILL_COLOR_UNHELD);
+    expect(warn.ringOpacity).toBeLessThan(contested.ringOpacity);
+    expect(hillRingPlan(2, { phase: 'warning', holder: 'none', challenger: 'none' })).toEqual(warn);
     expect(hillPulseSpeed(true)).toBeGreaterThan(hillPulseSpeed(false));
     expect(hillRingKey(info())).toBe('360,1540,50');
     expect(hillRingKey(info({ x: 361 }))).not.toBe(hillRingKey(info()));
@@ -272,20 +329,37 @@ describe('the ring core', () => {
 });
 
 describe('the sim lines the client matcher re-localizes', () => {
-  it('matches the rise line (with the zone name), the capture notices and the /hill readouts', () => {
+  it('matches the warning, rise and fall lines, the capture notices and the /hill readouts', () => {
     setLanguage('en');
+    expect(localizeSimText(hillWarningLine('The Wraithwood', 15))).toBe(
+      'A hill will rise in The Wraithwood in 15 minutes.',
+    );
+    // The countdown re-renders through the locale's plural rules: one minute, not "1 minutes".
+    expect(localizeSimText(hillWarningLine('The Wraithwood', 1))).toBe(
+      'A hill will rise in The Wraithwood in 1 minute.',
+    );
     expect(localizeSimText(hillRiseLine('The Wraithwood'))).toBe(
       'A hill has risen in The Wraithwood: hold it to earn Honor.',
+    );
+    expect(localizeSimText(hillFallenLine('The Nightbloom'))).toBe(
+      'The hill in The Nightbloom has fallen.',
     );
     expect(localizeSimText(HILL_TAKEN_LINE)).toBe(HILL_TAKEN_LINE);
     expect(localizeSimText(HILL_LOST_LINE)).toBe(HILL_LOST_LINE);
     expect(
-      localizeSimText('The hill stands in The Evergarden: nobody holds it. It moves in 7 minutes.'),
-    ).toBe('The hill stands in The Evergarden: nobody holds it. It moves in 7 minutes.');
+      localizeSimText('The hill stands in The Evergarden: nobody holds it. It falls in 7 minutes.'),
+    ).toBe('The hill stands in The Evergarden: nobody holds it. It falls in 7 minutes.');
+    expect(
+      localizeSimText(
+        'The hill stands in The Evergarden: your group holds it. It falls in 1 minute.',
+      ),
+    ).toBe('The hill stands in The Evergarden: your group holds it. It falls in 1 minute.');
     // Under another language the rule still matches (the zone name resolves through
     // the entity table, whose locale chunks a unit test does not load, so only the
     // match is asserted here).
     setLanguage('zh_CN');
     expect(localizeSimText(hillRiseLine('The Wraithwood'))).not.toBeNull();
+    expect(localizeSimText(hillWarningLine('The Wraithwood', 15))).not.toBeNull();
+    expect(localizeSimText(hillFallenLine('The Wraithwood'))).not.toBeNull();
   });
 });

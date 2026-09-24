@@ -1,10 +1,13 @@
 // King of the Hill bar: the thin painter over hill_bar_view.ts. A self-mounted
 // strip under the Thornhollow Fields scoreboard's slot (#hill-bar, top centre)
-// that shows while the local player stands in the hill's zone: the title and
-// the zone, who holds the hill, "you N vs them M", the contest clock as a
-// fill bar, the distance to the circle, and when the hill moves. The skeleton
-// is rebuilt in ONE innerHTML write when the structural sig changes (a new
-// hill, a holder or challenger change, crossing the circle's edge); every
+// that shows while the local player stands in the hill's zone. While the hill
+// is announced: the title and the zone, "not yet risen", the distance to the
+// marked circle and when it rises. Once risen: who holds the hill, "you N vs
+// them M", the contest clock as a fill bar, the distance and when it falls.
+// Either way a note says so when the viewer does not count (a raid member, or
+// under the level floor). The skeleton is rebuilt in ONE innerHTML write when
+// the structural sig changes (a new hill, the rise, a holder or challenger
+// change, crossing the circle's edge); every
 // per-second value rides the PainterHost elided writers, so an idle second
 // writes nothing. The tone (yours / theirs / unheld) is a class chosen from
 // the union, never interpolated from the wire, and the state is carried by
@@ -25,11 +28,12 @@ export interface HillBarDeps {
 interface Slots {
   zone: HTMLElement;
   held: HTMLElement;
-  counts: HTMLElement;
-  contest: HTMLElement;
-  fill: HTMLElement;
+  /** The contest rows exist only once the hill has risen. */
+  counts: HTMLElement | null;
+  contest: HTMLElement | null;
+  fill: HTMLElement | null;
   where: HTMLElement;
-  moves: HTMLElement;
+  when: HTMLElement;
 }
 
 export class HillBar {
@@ -91,22 +95,27 @@ export class HillBar {
   }
 
   private build(root: HTMLElement, view: HillBarLive): void {
+    const risen = view.phase === 'active';
+    const note = standingNote(view);
     root.innerHTML =
       `<div class="hill-head"><span class="hill-title">${esc(t('hudChrome.hill.title'))}</span>` +
       `<span class="hill-zone"></span></div>` +
       `<div class="hill-held"></div>` +
-      `<div class="hill-counts"></div>` +
-      `<div class="hill-track"><div class="hill-fill"></div><span class="hill-contest"></span></div>` +
-      `<div class="hill-foot"><span class="hill-where"></span><span class="hill-moves"></span></div>`;
-    const q = (sel: string): HTMLElement => root.querySelector(sel) as HTMLElement;
+      (note ? `<div class="hill-note">${esc(note)}</div>` : '') +
+      (risen
+        ? `<div class="hill-counts"></div>` +
+          `<div class="hill-track"><div class="hill-fill"></div><span class="hill-contest"></span></div>`
+        : '') +
+      `<div class="hill-foot"><span class="hill-where"></span><span class="hill-when"></span></div>`;
+    const q = (sel: string): HTMLElement | null => root.querySelector(sel);
     this.slots = {
-      zone: q('.hill-zone'),
-      held: q('.hill-held'),
+      zone: q('.hill-zone') as HTMLElement,
+      held: q('.hill-held') as HTMLElement,
       counts: q('.hill-counts'),
       contest: q('.hill-contest'),
       fill: q('.hill-fill'),
-      where: q('.hill-where'),
-      moves: q('.hill-moves'),
+      where: q('.hill-where') as HTMLElement,
+      when: q('.hill-when') as HTMLElement,
     };
     // The structural texts are part of the skeleton and change only with the sig.
     this.deps.writers.setText(this.slots.zone, zoneDisplayName(view.zoneId));
@@ -117,29 +126,47 @@ export class HillBar {
     const s = this.slots;
     if (!s) return;
     const w = this.deps.writers;
-    const yours = formatNumber(view.yours);
-    const theirs = formatNumber(view.theirs);
-    w.setText(
-      s.counts,
-      view.holder === 'other'
-        ? t('hudChrome.hill.counts', { yours, theirs })
-        : view.holder === 'you'
-          ? t('hudChrome.hill.countsHolding', { yours, theirs })
-          : t('hudChrome.hill.countsUnheld', { yours, theirs }),
-    );
-    w.setText(s.contest, contestText(view));
-    w.setWidth(s.fill, `${Math.round(view.contestFraction * 100)}%`);
+    if (s.counts && s.contest && s.fill) {
+      const yours = formatNumber(view.yours);
+      const theirs = formatNumber(view.theirs);
+      w.setText(
+        s.counts,
+        view.holder === 'other'
+          ? t('hudChrome.hill.counts', { yours, theirs })
+          : view.holder === 'you'
+            ? t('hudChrome.hill.countsHolding', { yours, theirs })
+            : t('hudChrome.hill.countsUnheld', { yours, theirs }),
+      );
+      w.setText(s.contest, contestText(view));
+      w.setWidth(s.fill, `${Math.round(view.contestFraction * 100)}%`);
+    }
     w.setText(
       s.where,
       view.inside
         ? t('hudChrome.hill.inside')
         : t('hudChrome.hill.distance', { yards: formatNumber(view.distanceYards) }),
     );
-    w.setText(s.moves, t('hudChrome.hill.moves', { minutes: durationText(view.minutesLeft * 60) }));
+    const minutes = durationText(view.minutesLeft * 60);
+    w.setText(
+      s.when,
+      view.phase === 'warning'
+        ? t('hudChrome.hill.rises', { minutes })
+        : t('hudChrome.hill.falls', { minutes }),
+    );
   }
 }
 
+/** The note for a viewer who does not count on the hill, or null. */
+function standingNote(view: HillBarLive): string | null {
+  if (view.standing === 'raid') return t('hudChrome.hill.standingRaid');
+  if (view.standing === 'underLevel') {
+    return t('hudChrome.hill.standingLevel', { level: formatNumber(view.minLevel) });
+  }
+  return null;
+}
+
 function heldText(view: HillBarLive): string {
+  if (view.phase === 'warning') return t('hudChrome.hill.rising');
   if (view.holder === 'you') return t('hudChrome.hill.heldYou');
   if (view.holder === 'other') return t('hudChrome.hill.heldOther');
   return t('hudChrome.hill.heldNone');

@@ -1,19 +1,25 @@
 // King of the Hill bar: the pure, DOM-free view core. Turns the IWorld hill
 // readout plus the local player's position into what the bar paints: whether
-// it shows at all (only in the hill's zone), who holds the hill from the
-// viewer's seat, the two headcounts the contest is decided on, the contest
-// clock against its capture length, the distance to the circle, and the
-// structural signature the painter rebuilds its skeleton on. The painter
-// (hill_bar_painter.ts) only paints; every decision is here.
+// it shows at all (only in the hill's zone), the phase (announced or risen),
+// who holds the hill from the viewer's seat, the two headcounts the contest is
+// decided on, the contest clock against its capture length, the distance to
+// the circle, whether the viewer counts at all (parties only, level floor),
+// and the structural signature the painter rebuilds its skeleton on. The
+// painter (hill_bar_painter.ts) only paints; every decision is here.
 
-import { HILL_CAPTURE_SECONDS, HILL_HONOR_PER_PAYOUT, HILL_MAX_PAYEES } from '../../../sim/pvp';
-import type { HillInfo, HillSide } from '../../../world_api';
+import { HILL_CAPTURE_SECONDS, WORLD_PVP_MIN_LEVEL } from '../../../sim/pvp';
+import type { HillInfo, HillPhaseInfo, HillSide, HillStandingInfo } from '../../../world_api';
 
 export interface HillBarLive {
   visible: true;
   /** Structural identity: rebuild the skeleton only when this changes. */
   sig: string;
   zoneId: string;
+  phase: HillPhaseInfo;
+  /** Whether the viewer counts on the hill, and the level floor the
+   *  under-level note quotes. */
+  standing: HillStandingInfo;
+  minLevel: number;
   holder: HillSide;
   challenger: HillSide;
   /** The viewer's group inside, and the count they are measured against:
@@ -28,9 +34,8 @@ export interface HillBarLive {
   inside: boolean;
   /** Whole yards from the viewer to the circle's edge; 0 inside. */
   distanceYards: number;
+  /** Whole minutes to the rise (warning) or the fall (risen). */
   minutesLeft: number;
-  honorPerMinute: number;
-  maxPayees: number;
 }
 
 export interface HillBarHidden {
@@ -73,8 +78,11 @@ export function buildHillBarView(
   const contest = Math.max(0, Math.min(HILL_CAPTURE_SECONDS, info.contest));
   return {
     visible: true,
-    sig: `${info.zoneId}|${info.x},${info.z}|${info.holder}|${info.challenger}|${info.inside ? 1 : 0}`,
+    sig: `${info.zoneId}|${info.x},${info.z}|${info.phase}|${info.standing}|${info.holder}|${info.challenger}|${info.inside ? 1 : 0}`,
     zoneId: info.zoneId,
+    phase: info.phase,
+    standing: info.standing,
+    minLevel: WORLD_PVP_MIN_LEVEL,
     holder: info.holder,
     challenger: info.challenger,
     yours: info.yourCount,
@@ -85,7 +93,5 @@ export function buildHillBarView(
     inside: info.inside,
     distanceYards,
     minutesLeft: info.minutesLeft,
-    honorPerMinute: HILL_HONOR_PER_PAYOUT,
-    maxPayees: HILL_MAX_PAYEES,
   };
 }

@@ -59,17 +59,16 @@ export const WORLD_PVP_DR_WINDOW_SECONDS = 60 * 60;
 
 /**
  * Two PLAYERS who can never be hostile to each other in the open world,
- * whatever the flags or the ground say: the same player, two members of one
- * party or raid, or two members of one guild. The group is the "faction" of a
- * factionless world, and a flagged mage's Blizzard must never land on the
- * healer standing beside them, in a free-for-all zone as much as anywhere.
- * Symmetric by construction.
+ * whatever the flags or the ground say: the same player, or two members of
+ * one party or raid. The group is the "faction" of a factionless world, and a
+ * flagged mage's Blizzard must never land on the healer standing beside them,
+ * in a free-for-all zone as much as anywhere. A shared guild is NOT an
+ * exemption (owner spec): guildmates outside one group fight like strangers,
+ * so a guild that wants to stand together forms a party. Symmetric by
+ * construction.
  */
 export function worldPvpPairExempt(a: Entity, b: Entity, inSameParty: boolean): boolean {
-  if (a.id === b.id) return true;
-  if (inSameParty) return true;
-  if (a.guild && a.guild === b.guild) return true;
-  return false;
+  return a.id === b.id || inSameParty;
 }
 
 /**
