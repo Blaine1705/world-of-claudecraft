@@ -3,6 +3,7 @@
 // texture shaders, number formats, header telemetry, and one-click presets.
 
 import { markDialogRoot } from './dialog_root';
+import { t } from './i18n';
 import {
   DEFAULT_METERS_SETTINGS,
   exportProfileString,
@@ -11,7 +12,6 @@ import {
   importProfileString,
   loadProfiles,
   type MeterBarTexture,
-  type MeterFontFamily,
   type MeterNumberFormat,
   type MeterOpacity,
   type MetersSettings,
@@ -40,6 +40,30 @@ export class MetersOptionsDialog {
   private keydownHandler: ((ev: KeyboardEvent) => void) | null = null;
 
   constructor(private readonly deps: MetersOptionsDialogDeps) {}
+
+  get isDialogOpen(): boolean {
+    return this.isOpen;
+  }
+
+  relocalize(): void {
+    if (!this.dialogEl) return;
+    const titleEl = this.dialogEl.querySelector('.mt-opts-title');
+    if (titleEl) titleEl.textContent = t('hudChrome.meters.settingsTitle');
+    const badgeEl = this.dialogEl.querySelector('.mt-opts-badge');
+    if (badgeEl) badgeEl.textContent = t('hudChrome.meters.optionsEngineBadge');
+    const closeBtn = this.dialogEl.querySelector('.mt-opts-close');
+    if (closeBtn) {
+      closeBtn.setAttribute('title', t('hudChrome.meters.closeSettings'));
+      closeBtn.setAttribute('aria-label', t('hudChrome.meters.closeSettings'));
+    }
+    const resetBtn = this.dialogEl.querySelector('.mt-opts-btn-reset');
+    if (resetBtn) resetBtn.textContent = t('hudChrome.meters.resetDefaults');
+    const doneBtn = this.dialogEl.querySelector('.mt-opts-btn-done');
+    if (doneBtn) doneBtn.textContent = t('hudChrome.meters.closeSettings');
+    markDialogRoot(this.dialogEl, { label: t('hudChrome.meters.settingsTitle'), modal: true });
+    this.renderTabs();
+    this.renderActiveContent();
+  }
 
   open(): void {
     if (this.isOpen) return;
@@ -107,17 +131,17 @@ export class MetersOptionsDialog {
 
     const dialog = document.createElement('div');
     dialog.className = 'mt-opts-dialog panel';
-    markDialogRoot(dialog, { label: 'Ajustes de Details y Medidores', modal: true });
+    markDialogRoot(dialog, { label: t('hudChrome.meters.settingsTitle'), modal: true });
 
     // Header
     const header = document.createElement('div');
     header.className = 'mt-opts-header';
     header.innerHTML = `
       <div class="mt-opts-title-wrap">
-        <span class="mt-opts-title">Ajustes de Details / Medidores</span>
-        <span class="mt-opts-badge">WoC Details! Engine</span>
+        <span class="mt-opts-title">${t('hudChrome.meters.settingsTitle')}</span>
+        <span class="mt-opts-badge">${t('hudChrome.meters.optionsEngineBadge')}</span>
       </div>
-      <button type="button" class="x-btn mt-opts-close" title="Cerrar" aria-label="Cerrar">${svgIcon('close')}</button>
+      <button type="button" class="x-btn mt-opts-close" title="${t('hudChrome.meters.closeSettings')}" aria-label="${t('hudChrome.meters.closeSettings')}">${svgIcon('close')}</button>
     `;
     const closeBtn = header.querySelector('.mt-opts-close') as HTMLElement;
     closeBtn.addEventListener('click', () => this.close());
@@ -139,9 +163,9 @@ export class MetersOptionsDialog {
     const footer = document.createElement('div');
     footer.className = 'mt-opts-footer';
     footer.innerHTML = `
-      <button type="button" class="mt-opts-btn mt-opts-btn-reset">Restablecer por defecto</button>
+      <button type="button" class="mt-opts-btn mt-opts-btn-reset">${t('hudChrome.meters.resetDefaults')}</button>
       <div class="mt-opts-footer-spacer"></div>
-      <button type="button" class="mt-opts-btn mt-opts-btn-primary mt-opts-btn-done">Cerrar</button>
+      <button type="button" class="mt-opts-btn mt-opts-btn-primary mt-opts-btn-done">${t('hudChrome.meters.closeSettings')}</button>
     `;
 
     const resetBtn = footer.querySelector('.mt-opts-btn-reset') as HTMLElement;
@@ -171,26 +195,46 @@ export class MetersOptionsDialog {
     if (!sidebar) return;
 
     const tabs: { id: OptionsTab; label: string; desc: string }[] = [
-      { id: 'general', label: 'Ventana y Fondo', desc: 'Opacidad, escala, bloqueo' },
-      { id: 'bars', label: 'Barras y Texturas', desc: 'Altura, espaciado, animacion' },
-      { id: 'text', label: 'Texto y Tipografia', desc: 'Fuentes, k/M, DPS, clasif' },
-      { id: 'header', label: 'Cabecera y Titulo', desc: 'Total de grupo, botones' },
-      { id: 'combat', label: 'Combate y Limites', desc: 'Filas maximas, escudos' },
-      { id: 'presets', label: 'Temas Rapidos', desc: 'Presets de 1 clic' },
-      { id: 'profiles', label: 'Perfiles e Importar', desc: 'Exportar, importar y perfiles' },
+      {
+        id: 'general',
+        label: t('hudChrome.meters.tabGeneral'),
+        desc: t('hudChrome.meters.tabGeneralDesc'),
+      },
+      { id: 'bars', label: t('hudChrome.meters.tabBars'), desc: t('hudChrome.meters.tabBarsDesc') },
+      { id: 'text', label: t('hudChrome.meters.tabText'), desc: t('hudChrome.meters.tabTextDesc') },
+      {
+        id: 'header',
+        label: t('hudChrome.meters.tabHeader'),
+        desc: t('hudChrome.meters.tabHeaderDesc'),
+      },
+      {
+        id: 'combat',
+        label: t('hudChrome.meters.tabCombat'),
+        desc: t('hudChrome.meters.tabCombatDesc'),
+      },
+      {
+        id: 'presets',
+        label: t('hudChrome.meters.tabPresets'),
+        desc: t('hudChrome.meters.tabPresetsDesc'),
+      },
+      {
+        id: 'profiles',
+        label: t('hudChrome.meters.tabProfiles'),
+        desc: t('hudChrome.meters.tabProfilesDesc'),
+      },
     ];
 
     sidebar.innerHTML = '';
-    for (const t of tabs) {
+    for (const tab of tabs) {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `mt-opts-tab-btn${this.activeTab === t.id ? ' active' : ''}`;
+      btn.className = `mt-opts-tab-btn${this.activeTab === tab.id ? ' active' : ''}`;
       btn.innerHTML = `
-        <span class="mt-opts-tab-title">${t.label}</span>
-        <span class="mt-opts-tab-desc">${t.desc}</span>
+        <span class="mt-opts-tab-title">${tab.label}</span>
+        <span class="mt-opts-tab-desc">${tab.desc}</span>
       `;
       btn.addEventListener('click', () => {
-        this.activeTab = t.id;
+        this.activeTab = tab.id;
         this.renderTabs();
         this.renderActiveContent();
       });
@@ -239,18 +283,34 @@ export class MetersOptionsDialog {
   // --- TAB 1: General (Ventana y Fondo) ---
   private renderGeneralTab(): void {
     const s = this.s;
-    const group = this.createGroup('Fondo y Apariencia de Ventana');
+    const group = this.createGroup(t('hudChrome.meters.groupWindow'));
 
     // Opacity mode
     group.appendChild(
       this.createRadioRow(
-        'Modo de Fondo',
-        'Estilo visual del panel del medidor.',
+        t('hudChrome.meters.bgMode'),
+        t('hudChrome.meters.bgModeDesc'),
         [
-          { id: 'glass', label: 'Cristal (Blur)', desc: 'Efecto esmerilado con desenfoque' },
-          { id: 'solid', label: 'Solido', desc: 'Panel oscuro de alto contraste' },
-          { id: 'minimal', label: 'Minimo', desc: 'Translúcido tenue' },
-          { id: 'transparent', label: 'Transparente', desc: 'Sin fondo, solo barras' },
+          {
+            id: 'glass',
+            label: t('hudChrome.meters.optGlass'),
+            desc: t('hudChrome.meters.optGlassDesc'),
+          },
+          {
+            id: 'solid',
+            label: t('hudChrome.meters.optSolid'),
+            desc: t('hudChrome.meters.optSolidDesc'),
+          },
+          {
+            id: 'minimal',
+            label: t('hudChrome.meters.optMinimal'),
+            desc: t('hudChrome.meters.optMinimalDesc'),
+          },
+          {
+            id: 'transparent',
+            label: t('hudChrome.meters.optTransparent'),
+            desc: t('hudChrome.meters.optTransparentDesc'),
+          },
         ],
         s.opacity,
         (val) => {
@@ -262,8 +322,8 @@ export class MetersOptionsDialog {
     // Custom background alpha slider
     group.appendChild(
       this.createSliderRow(
-        'Opacidad de Fondo',
-        'Porcentaje de opacidad del fondo de la ventana.',
+        t('hudChrome.meters.bgOpacity'),
+        t('hudChrome.meters.bgOpacityDesc'),
         20,
         100,
         2,
@@ -278,8 +338,8 @@ export class MetersOptionsDialog {
     // Window scale
     group.appendChild(
       this.createSliderRow(
-        'Escala de la Ventana',
-        'Aumenta o reduce el tamaño de escala general del medidor.',
+        t('hudChrome.meters.windowScale'),
+        t('hudChrome.meters.windowScaleDesc'),
         80,
         130,
         5,
@@ -294,8 +354,8 @@ export class MetersOptionsDialog {
     // Lock position
     group.appendChild(
       this.createToggleRow(
-        'Bloquear Posicion',
-        'Fija la ventana para evitar moverla o redimensionarla accidentalmente en combate.',
+        t('hudChrome.meters.lockPosition'),
+        t('hudChrome.meters.lockPositionDesc'),
         s.locked,
         (checked) => {
           this.update({ locked: checked });
@@ -309,13 +369,13 @@ export class MetersOptionsDialog {
   // --- TAB 2: Barras y Texturas ---
   private renderBarsTab(): void {
     const s = this.s;
-    const group = this.createGroup('Geometria y Textura de las Barras');
+    const group = this.createGroup(t('hudChrome.meters.groupBars'));
 
     // Bar Height
     group.appendChild(
       this.createSliderRow(
-        'Altura de Barra',
-        'Grosor vertical de cada fila de daño/sanacion (14px compacto a 26px amplio).',
+        t('hudChrome.meters.barHeight'),
+        t('hudChrome.meters.barHeightDesc'),
         14,
         26,
         1,
@@ -330,8 +390,8 @@ export class MetersOptionsDialog {
     // Bar Spacing
     group.appendChild(
       this.createSliderRow(
-        'Espaciado entre Barras',
-        'Separacion vertical en píxeles entre filas contiguas.',
+        t('hudChrome.meters.barSpacing'),
+        t('hudChrome.meters.barSpacingDesc'),
         0,
         4,
         1,
@@ -346,16 +406,24 @@ export class MetersOptionsDialog {
     // Texture
     group.appendChild(
       this.createRadioRow(
-        'Textura de las Barras',
-        'Acabado visual y sombreado sobre el color de clase.',
+        t('hudChrome.meters.barTexture'),
+        t('hudChrome.meters.barTextureDesc'),
         [
           {
             id: 'specular',
-            label: 'Especular (Glossy)',
-            desc: 'Reflejo superior de luz con bisel',
+            label: t('hudChrome.meters.texSpecular'),
+            desc: t('hudChrome.meters.texSpecularDesc'),
           },
-          { id: 'smooth', label: 'Plano (Smooth)', desc: 'Color limpio plano de clase' },
-          { id: 'gradient', label: 'Degradado', desc: 'Gradiente horizontal suave' },
+          {
+            id: 'smooth',
+            label: t('hudChrome.meters.texSmooth'),
+            desc: t('hudChrome.meters.texSmoothDesc'),
+          },
+          {
+            id: 'gradient',
+            label: t('hudChrome.meters.texGradient'),
+            desc: t('hudChrome.meters.texGradientDesc'),
+          },
         ],
         s.barTexture,
         (val) => {
@@ -367,8 +435,8 @@ export class MetersOptionsDialog {
     // Animation toggle
     group.appendChild(
       this.createToggleRow(
-        'Animacion Suave de Barras',
-        'Interpola fluidamente el crecimiento y descenso de barras en tiempo real.',
+        t('hudChrome.meters.barAnimation'),
+        t('hudChrome.meters.barAnimationDesc'),
         s.barAnimation,
         (checked) => {
           this.update({ barAnimation: checked });
@@ -379,8 +447,8 @@ export class MetersOptionsDialog {
     // Always Show Me
     group.appendChild(
       this.createToggleRow(
-        'Mostrarme Siempre (Always Show Me)',
-        'Fija siempre la barra de tu personaje abajo si quedas fuera de las filas visibles.',
+        t('hudChrome.meters.alwaysShowMe'),
+        t('hudChrome.meters.alwaysShowMeDesc'),
         s.alwaysShowMe,
         (checked) => {
           this.update({ alwaysShowMe: checked });
@@ -394,16 +462,24 @@ export class MetersOptionsDialog {
   // --- TAB 3: Texto y Numeros ---
   private renderTextTab(): void {
     const s = this.s;
-    const group = this.createGroup('Formato de Texto y Telemetria');
+    const group = this.createGroup(t('hudChrome.meters.groupText'));
 
     // Number format
     group.appendChild(
       this.createRadioRow(
-        'Formato Numerico',
-        'Estilo de visualizacion de los totales.',
+        t('hudChrome.meters.numFormat'),
+        t('hudChrome.meters.numFormatDesc'),
         [
-          { id: 'compact', label: 'Abreviado (k / M)', desc: 'Ejemplo: 145.2k, 1.2M' },
-          { id: 'detailed', label: 'Detallado Completo', desc: 'Ejemplo: 145,200, 1,240,500' },
+          {
+            id: 'compact',
+            label: t('hudChrome.meters.optNumCompact'),
+            desc: t('hudChrome.meters.optNumCompactDesc'),
+          },
+          {
+            id: 'detailed',
+            label: t('hudChrome.meters.optNumDetailed'),
+            desc: t('hudChrome.meters.optNumDetailedDesc'),
+          },
         ],
         s.numberFormat,
         (val) => {
@@ -415,8 +491,8 @@ export class MetersOptionsDialog {
     // Show DPS/HPS
     group.appendChild(
       this.createToggleRow(
-        'Mostrar Tasa por Segundo (DPS / HPS)',
-        'Muestra la tasa de daño o sanacion por segundo en cada barra.',
+        t('hudChrome.meters.showDps'),
+        t('hudChrome.meters.showDpsDesc'),
         s.showDps,
         (checked) => {
           this.update({ showDps: checked });
@@ -427,8 +503,8 @@ export class MetersOptionsDialog {
     // Show Percent
     group.appendChild(
       this.createToggleRow(
-        'Mostrar Porcentaje (%)',
-        'Muestra la proporcion porcentual de contribucion sobre el total de la banda.',
+        t('hudChrome.meters.showPercent'),
+        t('hudChrome.meters.showPercentDesc'),
         s.showPercent,
         (checked) => {
           this.update({ showPercent: checked });
@@ -439,8 +515,8 @@ export class MetersOptionsDialog {
     // Show Rank
     group.appendChild(
       this.createToggleRow(
-        'Mostrar Posicion (#1, #2...)',
-        'Muestra el numero ordinal de clasificacion a la izquierda del nombre.',
+        t('hudChrome.meters.showRank'),
+        t('hudChrome.meters.showRankDesc'),
         s.showRank,
         (checked) => {
           this.update({ showRank: checked });
@@ -451,8 +527,8 @@ export class MetersOptionsDialog {
     // Show Class Icon
     group.appendChild(
       this.createToggleRow(
-        'Mostrar Icono de Clase',
-        'Muestra el icono de la clase o rol del jugador junto a su nombre.',
+        t('hudChrome.meters.showClassIcon'),
+        t('hudChrome.meters.showClassIconDesc'),
         s.showClassIcon,
         (checked) => {
           this.update({ showClassIcon: checked });
@@ -463,7 +539,7 @@ export class MetersOptionsDialog {
     this.contentEl!.appendChild(group);
 
     // Tipografia de Combate (Fuente de Letra)
-    const fontGroup = this.createGroup('Tipografia de Combate (Fuente de Letra)');
+    const fontGroup = this.createGroup(t('hudChrome.meters.groupFont'));
     const fontGrid = document.createElement('div');
     fontGrid.className = 'mt-opts-font-grid';
 
@@ -493,13 +569,13 @@ export class MetersOptionsDialog {
   // --- TAB 4: Cabecera y Titulo ---
   private renderHeaderTab(): void {
     const s = this.s;
-    const group = this.createGroup('Personalizacion de la Cabecera');
+    const group = this.createGroup(t('hudChrome.meters.groupHeader'));
 
     // Show Title Bar
     group.appendChild(
       this.createToggleRow(
-        'Mostrar Barra de Titulo',
-        'Muestra la barra superior con el nombre del combate y controles.',
+        t('hudChrome.meters.showTitleBar'),
+        t('hudChrome.meters.showTitleBarDesc'),
         s.showTitleBar,
         (checked) => {
           this.update({ showTitleBar: checked });
@@ -510,8 +586,8 @@ export class MetersOptionsDialog {
     // Show Raid Totals
     group.appendChild(
       this.createToggleRow(
-        'Resumen de Grupo en Subtitulo',
-        'Muestra el total acumulado de DPS y HPS del grupo entero en el subtítulo.',
+        t('hudChrome.meters.showRaidTotals'),
+        t('hudChrome.meters.showRaidTotalsDesc'),
         s.showRaidTotals,
         (checked) => {
           this.update({ showRaidTotals: checked });
@@ -525,18 +601,20 @@ export class MetersOptionsDialog {
   // --- TAB 5: Combate y Limites ---
   private renderCombatTab(): void {
     const s = this.s;
-    const group = this.createGroup('Reglas de Combate y Limites');
+    const group = this.createGroup(t('hudChrome.meters.groupCombat'));
 
     // Max Visible Rows
+    const unitText =
+      s.maxVisibleRows === 0 ? t('hudChrome.meters.autoRows') : t('hudChrome.meters.barsUnit');
     group.appendChild(
       this.createSliderRow(
-        'Filas Maximas Visibles',
-        'Numero de barras simultaneas (0 = ilimitadas, ajustadas al alto de ventana).',
+        t('hudChrome.meters.maxRows'),
+        t('hudChrome.meters.maxRowsDesc'),
         0,
         15,
         1,
         s.maxVisibleRows,
-        s.maxVisibleRows === 0 ? ' (Auto)' : ' barras',
+        unitText,
         (val) => {
           this.update({ maxVisibleRows: val });
         },
@@ -546,8 +624,8 @@ export class MetersOptionsDialog {
     // Include Shields in Heal
     group.appendChild(
       this.createToggleRow(
-        'Contabilizar Escudos como Sanacion',
-        'Suma el daño absorbido por escudos (Palabra de poder: Escudo, etc.) a la columna de Sanacion.',
+        t('hudChrome.meters.includeShields'),
+        t('hudChrome.meters.includeShieldsDesc'),
         s.includeShieldsInHeal,
         (checked) => {
           this.update({ includeShieldsInHeal: checked });
@@ -560,7 +638,7 @@ export class MetersOptionsDialog {
 
   // --- TAB 6: Temas y Perfiles (Presets) ---
   private renderPresetsTab(): void {
-    const group = this.createGroup('Temas Rapidos de 1 Clic');
+    const group = this.createGroup(t('hudChrome.meters.groupPresets'));
     const container = document.createElement('div');
     container.className = 'mt-opts-presets-grid';
 
@@ -572,27 +650,27 @@ export class MetersOptionsDialog {
     }[] = [
       {
         id: 'details_glass',
-        name: 'Details! Modern Glass',
-        desc: 'Fondo de cristal esmerilado con desenfoque, barras especulares con brillo, números abreviados y telemetría completa.',
-        badge: 'Recomendado',
+        name: t('hudChrome.meters.presetDetailsName'),
+        desc: t('hudChrome.meters.presetDetailsDesc'),
+        badge: t('hudChrome.meters.presetDetailsBadge'),
       },
       {
         id: 'classic',
-        name: 'Classic WoW',
-        desc: 'Panel sólido oscuro de alto contraste, barras planas de clase, números detallados sin abreviar estilo clásico.',
-        badge: 'Retro',
+        name: t('hudChrome.meters.presetClassicName'),
+        desc: t('hudChrome.meters.presetClassicDesc'),
+        badge: t('hudChrome.meters.presetClassicBadge'),
       },
       {
         id: 'minimal',
-        name: 'Minimalista Puro',
-        desc: 'Fondo casi transparente, barras compactas de 16px sin espaciado, texto directo sin porcentajes.',
-        badge: 'Limpio',
+        name: t('hudChrome.meters.presetMinimalName'),
+        desc: t('hudChrome.meters.presetMinimalDesc'),
+        badge: t('hudChrome.meters.presetMinimalBadge'),
       },
       {
         id: 'raid',
-        name: 'Raid Focus',
-        desc: 'Diseñado para bandas: densidad compacta de 18px, límite de 10 barras, total de grupo visible y fijado personal.',
-        badge: 'Banda',
+        name: t('hudChrome.meters.presetRaidName'),
+        desc: t('hudChrome.meters.presetRaidDesc'),
+        badge: t('hudChrome.meters.presetRaidBadge'),
       },
     ];
 
@@ -605,7 +683,7 @@ export class MetersOptionsDialog {
           <span class="mt-opts-preset-badge">${p.badge}</span>
         </div>
         <p class="mt-opts-preset-desc">${p.desc}</p>
-        <button type="button" class="mt-opts-btn mt-opts-btn-apply">Aplicar Tema</button>
+        <button type="button" class="mt-opts-btn mt-opts-btn-apply">${t('hudChrome.meters.applyPreset')}</button>
       `;
 
       const applyBtn = card.querySelector('.mt-opts-btn-apply') as HTMLElement;
@@ -631,7 +709,7 @@ export class MetersOptionsDialog {
     const activeProfile = getActiveProfileName(storage);
 
     // Group 1: Perfil Activo
-    const groupManage = this.createGroup('Gestion de Perfiles');
+    const groupManage = this.createGroup(t('hudChrome.meters.groupManageProfiles'));
     const manageWrap = document.createElement('div');
     manageWrap.className = 'mt-opts-profile-section';
 
@@ -641,8 +719,8 @@ export class MetersOptionsDialog {
     const selectInfo = document.createElement('div');
     selectInfo.className = 'mt-opts-row-info';
     selectInfo.innerHTML = `
-      <div class="mt-opts-row-title">Perfil Activo</div>
-      <div class="mt-opts-row-desc">Selecciona o administra perfiles independientes para cada situacion de juego.</div>
+      <div class="mt-opts-row-title">${t('hudChrome.meters.activeProfile')}</div>
+      <div class="mt-opts-row-desc">${t('hudChrome.meters.activeProfileDesc')}</div>
     `;
 
     const selectCtrl = document.createElement('div');
@@ -670,12 +748,12 @@ export class MetersOptionsDialog {
     const newBtn = document.createElement('button');
     newBtn.type = 'button';
     newBtn.className = 'mt-opts-btn';
-    newBtn.textContent = 'Guardar Como...';
+    newBtn.textContent = t('hudChrome.meters.saveAs');
     newBtn.addEventListener('click', () => {
-      const defaultNewName = `Perfil ${Object.keys(profiles).length + 1}`;
+      const defaultNewName = `Profile ${Object.keys(profiles).length + 1}`;
       const name =
         typeof window !== 'undefined' && window.prompt
-          ? window.prompt('Nombre del nuevo perfil:', defaultNewName)
+          ? window.prompt(t('hudChrome.meters.promptNewProfile'), defaultNewName)
           : defaultNewName;
       if (name && name.trim()) {
         const trimmed = name.trim();
@@ -689,9 +767,9 @@ export class MetersOptionsDialog {
     const dupBtn = document.createElement('button');
     dupBtn.type = 'button';
     dupBtn.className = 'mt-opts-btn';
-    dupBtn.textContent = 'Duplicar';
+    dupBtn.textContent = t('hudChrome.meters.duplicate');
     dupBtn.addEventListener('click', () => {
-      const dupName = `${activeProfile} (Copia)`;
+      const dupName = `${activeProfile}${t('hudChrome.meters.profileCopySuffix')}`;
       profiles[dupName] = { ...this.s };
       saveProfiles(profiles, storage);
       setActiveProfileName(dupName, storage);
@@ -701,10 +779,10 @@ export class MetersOptionsDialog {
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
     delBtn.className = 'mt-opts-btn mt-opts-btn-danger';
-    delBtn.textContent = 'Eliminar';
+    delBtn.textContent = t('hudChrome.meters.deleteProfile');
     if (activeProfile === 'Default') {
       delBtn.disabled = true;
-      delBtn.title = 'No se puede eliminar el perfil Default';
+      delBtn.title = t('hudChrome.meters.cannotDeleteDefault');
     }
     delBtn.addEventListener('click', () => {
       if (activeProfile === 'Default') return;
@@ -729,14 +807,13 @@ export class MetersOptionsDialog {
     this.contentEl!.appendChild(groupManage);
 
     // Group 2: Exportar Perfil Actual
-    const groupExport = this.createGroup('Exportar Perfil Actual');
+    const groupExport = this.createGroup(t('hudChrome.meters.groupExport'));
     const exportWrap = document.createElement('div');
     exportWrap.className = 'mt-opts-profile-section';
 
     const exportDesc = document.createElement('div');
     exportDesc.className = 'mt-opts-row-desc';
-    exportDesc.textContent =
-      'Cadena codificada de tu configuracion actual. Copiala para compartirla o guardarla de respaldo.';
+    exportDesc.textContent = t('hudChrome.meters.exportDesc');
 
     const exportTextarea = document.createElement('textarea');
     exportTextarea.className = 'mt-opts-textarea';
@@ -749,7 +826,7 @@ export class MetersOptionsDialog {
     const copyBtn = document.createElement('button');
     copyBtn.type = 'button';
     copyBtn.className = 'mt-opts-btn mt-opts-btn-primary';
-    copyBtn.textContent = 'Copiar Cadena de Perfil';
+    copyBtn.textContent = t('hudChrome.meters.copyString');
 
     const copyFeedback = document.createElement('span');
     copyFeedback.className = 'mt-opts-feedback';
@@ -761,7 +838,7 @@ export class MetersOptionsDialog {
         navigator.clipboard.writeText(text).catch(() => {});
       }
       exportTextarea.select();
-      copyFeedback.textContent = 'Copiado al portapapeles!';
+      copyFeedback.textContent = t('hudChrome.meters.copiedFeedback');
       copyFeedback.style.display = 'inline-block';
       setTimeout(() => {
         copyFeedback.style.display = 'none';
@@ -778,18 +855,17 @@ export class MetersOptionsDialog {
     this.contentEl!.appendChild(groupExport);
 
     // Group 3: Importar Perfil
-    const groupImport = this.createGroup('Importar Perfil');
+    const groupImport = this.createGroup(t('hudChrome.meters.groupImport'));
     const importWrap = document.createElement('div');
     importWrap.className = 'mt-opts-profile-section';
 
     const importDesc = document.createElement('div');
     importDesc.className = 'mt-opts-row-desc';
-    importDesc.textContent =
-      'Pega aqui una cadena de perfil (!WoC-Details:... o JSON) para aplicar y guardar la configuracion.';
+    importDesc.textContent = t('hudChrome.meters.importDesc');
 
     const importTextarea = document.createElement('textarea');
     importTextarea.className = 'mt-opts-textarea mt-opts-import-input';
-    importTextarea.placeholder = 'Pega la cadena de perfil aqui (!WoC-Details:...)';
+    importTextarea.placeholder = t('hudChrome.meters.importPlaceholder');
 
     const importRow = document.createElement('div');
     importRow.className = 'mt-opts-profile-actions';
@@ -797,12 +873,12 @@ export class MetersOptionsDialog {
     const importNameInput = document.createElement('input');
     importNameInput.type = 'text';
     importNameInput.className = 'mt-opts-text-input';
-    importNameInput.placeholder = 'Nombre para guardar (opcional)';
+    importNameInput.placeholder = t('hudChrome.meters.importNamePlaceholder');
 
     const importBtn = document.createElement('button');
     importBtn.type = 'button';
     importBtn.className = 'mt-opts-btn mt-opts-btn-primary mt-opts-btn-import';
-    importBtn.textContent = 'Importar y Aplicar';
+    importBtn.textContent = t('hudChrome.meters.importApply');
 
     const importFeedback = document.createElement('span');
     importFeedback.className = 'mt-opts-feedback';
@@ -811,14 +887,14 @@ export class MetersOptionsDialog {
     importBtn.addEventListener('click', () => {
       const raw = importTextarea.value.trim();
       if (!raw) {
-        importFeedback.textContent = 'Por favor, pega una cadena de perfil.';
+        importFeedback.textContent = t('hudChrome.meters.errEmptyProfile');
         importFeedback.className = 'mt-opts-feedback mt-opts-feedback-err';
         importFeedback.style.display = 'inline-block';
         return;
       }
       const imported = importProfileString(raw);
       if (!imported) {
-        importFeedback.textContent = 'Error: Cadena de perfil no valida o corrupta.';
+        importFeedback.textContent = t('hudChrome.meters.errInvalidProfile');
         importFeedback.className = 'mt-opts-feedback mt-opts-feedback-err';
         importFeedback.style.display = 'inline-block';
         return;
@@ -828,12 +904,12 @@ export class MetersOptionsDialog {
 
       const targetName =
         importNameInput.value.trim() ||
-        `Importado (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+        `Imported (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
       profiles[targetName] = { ...imported };
       saveProfiles(profiles, storage);
       setActiveProfileName(targetName, storage);
 
-      importFeedback.textContent = `Perfil "${targetName}" importado con exito!`;
+      importFeedback.textContent = t('hudChrome.meters.importSuccess', { name: targetName });
       importFeedback.className = 'mt-opts-feedback mt-opts-feedback-ok';
       importFeedback.style.display = 'inline-block';
 

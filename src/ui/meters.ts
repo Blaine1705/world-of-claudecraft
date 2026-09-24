@@ -1409,8 +1409,8 @@ export class MetersPanel {
 
     const settingsBtn = this.root.querySelector('.mt-settings') as HTMLElement | null;
     if (settingsBtn) {
-      settingsBtn.setAttribute('title', 'Ajustes de Details / Medidores');
-      settingsBtn.setAttribute('aria-label', 'Ajustes de Details / Medidores');
+      settingsBtn.setAttribute('title', t('hudChrome.meters.settingsTitle'));
+      settingsBtn.setAttribute('aria-label', t('hudChrome.meters.settingsTitle'));
       settingsBtn.addEventListener('click', (ev) => {
         ev.stopPropagation();
         this.openOptionsDialog();
@@ -1612,12 +1612,49 @@ export class MetersPanel {
     }
     this.copyToClipboardOrLog(text);
     const prevSub = this.subEl.textContent;
-    this.subEl.textContent = 'Reporte copiado y enviado al chat';
+    this.subEl.textContent = t('hudChrome.meters.reportSent');
     setTimeout(() => {
-      if (this.subEl.textContent === 'Reporte copiado y enviado al chat') {
+      if (this.subEl.textContent === t('hudChrome.meters.reportSent')) {
         this.subEl.textContent = prevSub;
       }
     }, 2000);
+  }
+
+  relocalize(): void {
+    if (this.spec.lockedTab) {
+      const label = this.root.querySelector('.mt-title-label') as HTMLElement | null;
+      if (label) label.textContent = t(TAB_LABEL_KEY[this.spec.lockedTab]);
+    }
+    const newWin = this.root.querySelector('.mt-new-window') as HTMLElement | null;
+    if (newWin) {
+      newWin.setAttribute('title', t('hud.meters.newWindow'));
+      newWin.setAttribute('aria-label', t('hud.meters.newWindow'));
+    }
+    const prev = this.root.querySelector('.mt-prev') as HTMLElement | null;
+    if (prev) prev.setAttribute('title', t('hud.meters.olderSegment'));
+    const next = this.root.querySelector('.mt-next') as HTMLElement | null;
+    if (next) next.setAttribute('title', t('hud.meters.newerSegment'));
+    const close = this.root.querySelector('.mt-close') as HTMLElement | null;
+    if (close) {
+      const closeKey: TranslationKey = this.spec.lockedTab
+        ? 'hudChrome.meters.dock'
+        : 'hud.meters.close';
+      close.setAttribute('title', t(closeKey));
+      close.setAttribute('aria-label', t(closeKey));
+    }
+    const reset = this.root.querySelector('.mt-reset') as HTMLElement | null;
+    if (reset) {
+      reset.setAttribute('title', t('hud.meters.resetHint'));
+      reset.setAttribute('aria-label', t('hud.meters.reset'));
+    }
+    const settingsBtn = this.root.querySelector('.mt-settings') as HTMLElement | null;
+    if (settingsBtn) {
+      settingsBtn.setAttribute('title', t('hudChrome.meters.settingsTitle'));
+      settingsBtn.setAttribute('aria-label', t('hudChrome.meters.settingsTitle'));
+    }
+    this.optionsDialog?.relocalize();
+    this.refreshTabs();
+    this.render(true);
   }
 
   setSettings(s: MetersSettings): void {
@@ -1652,22 +1689,31 @@ export class MetersPanel {
       {
         act: 'density',
         label:
-          s.density === 'compact' ? '* Densidad: Compacta (16px)' : 'Densidad: Estandar (20px)',
+          s.density === 'compact'
+            ? `* ${t('hudChrome.meters.densityCompact')}`
+            : t('hudChrome.meters.densityStandard'),
       },
       {
         act: 'opacity',
-        label: `Fondo: ${s.opacity === 'glass' ? '* Cristal (76%)' : s.opacity === 'solid' ? '* Solido (98%)' : '* Minimo (45%)'}`,
+        label:
+          s.opacity === 'glass'
+            ? `* ${t('hudChrome.meters.bgGlass')}`
+            : s.opacity === 'solid'
+              ? `* ${t('hudChrome.meters.bgSolid')}`
+              : `* ${t('hudChrome.meters.bgMinimal')}`,
       },
       {
         act: 'numbers',
         label:
-          s.numberFormat === 'detailed' ? '* Numeros: Detallados' : 'Numeros: Abreviados (k/M)',
+          s.numberFormat === 'detailed'
+            ? `* ${t('hudChrome.meters.numDetailed')}`
+            : t('hudChrome.meters.numCompact'),
       },
       {
         act: 'raid_totals',
         label: s.showRaidTotals
-          ? '* Total de grupo en cabecera: Si'
-          : 'Total de grupo en cabecera: No',
+          ? `* ${t('hudChrome.meters.raidTotalsOn')}`
+          : t('hudChrome.meters.raidTotalsOff'),
       },
     ];
 
@@ -2212,7 +2258,7 @@ export class MetersPanel {
 
     const entry = source.get(breakdownKey(this.selectedAbility.petName, this.selectedAbility.key));
     if (!entry) {
-      this.subEl.textContent = 'Sin datos detallados';
+      this.subEl.textContent = t('hudChrome.meters.noDetailedData');
       this.syncRowPool(0);
       for (const row of this.rowPool) row.el.style.display = 'none';
       return;
@@ -2315,7 +2361,7 @@ export class MetersPanel {
     }
 
     if (!record || record.events.length === 0) {
-      this.subEl.textContent = 'Sin eventos registrados antes de la muerte';
+      this.subEl.textContent = t('hudChrome.meters.noDeathEvents');
       this.syncRowPool(0);
       for (const row of this.rowPool) row.el.style.display = 'none';
       return;
@@ -2323,8 +2369,11 @@ export class MetersPanel {
 
     const rows = buildDeathRecapRows(record);
     this.subEl.textContent = record.killerName
-      ? `Asesinado por ${record.killerName} (${record.killerAbility ?? 'Golpe Letal'})`
-      : `Últimos ${rows.length} eventos de combate`;
+      ? t('hudChrome.meters.killedBy', {
+          killer: record.killerName,
+          ability: record.killerAbility ?? t('hudChrome.meters.lethalHit'),
+        })
+      : t('hudChrome.meters.recentCombatEvents', { count: rows.length });
 
     this.syncRowPool(rows.length);
     rows.forEach((r, i) => {
@@ -2363,7 +2412,7 @@ export class MetersPanel {
   private renderComparisonView(viewName: string): void {
     this.modeTrigger.style.display = 'none';
     this.backTrigger.style.display = 'inline-flex';
-    this.backTrigger.innerHTML = `<span class="mt-back-arrow">‹</span> <span class="mt-back-text">Comparativa</span>`;
+    this.backTrigger.innerHTML = `<span class="mt-back-arrow">‹</span> <span class="mt-back-text">${esc(t('hudChrome.meters.backComparison'))}</span>`;
     this.segTrigger.style.display = '';
     this.segTrigger.innerHTML = `<span class="mt-title-text">${viewName}</span> <span class="mt-arrow">▾</span>`;
 
@@ -2374,7 +2423,7 @@ export class MetersPanel {
       (this.host.data.current !== encA ? this.host.data.current : this.host.data.allTime);
 
     if (!encA || !encB) {
-      this.subEl.textContent = 'Se necesitan al menos 2 combates para comparar';
+      this.subEl.textContent = t('hudChrome.meters.comparisonNeedTwo');
       this.syncRowPool(0);
       for (const row of this.rowPool) row.el.style.display = 'none';
       return;
@@ -2443,13 +2492,13 @@ export class MetersPanel {
   private renderTimelineView(enc: Encounter, viewName: string): void {
     this.modeTrigger.style.display = 'none';
     this.backTrigger.style.display = 'inline-flex';
-    this.backTrigger.innerHTML = `<span class="mt-back-arrow">‹</span> <span class="mt-back-text">Cronologia</span>`;
+    this.backTrigger.innerHTML = `<span class="mt-back-arrow">‹</span> <span class="mt-back-text">${esc(t('hudChrome.meters.backTimeline'))}</span>`;
     this.segTrigger.style.display = '';
     this.segTrigger.innerHTML = `<span class="mt-title-text">${viewName}</span> <span class="mt-arrow">▾</span>`;
 
     const events = enc.timeline.getEvents();
     const rows = buildTimelineRows(events, enc.startedAt / 1000);
-    this.subEl.textContent = `Eventos del combate: ${rows.length}`;
+    this.subEl.textContent = t('hudChrome.meters.timelineCombatEvents', { count: rows.length });
 
     this.syncRowPool(rows.length);
     rows.forEach((r, i) => {
@@ -2490,12 +2539,12 @@ export class MetersPanel {
   private renderBalanceView(enc: Encounter, viewName: string): void {
     this.modeTrigger.style.display = 'none';
     this.backTrigger.style.display = 'inline-flex';
-    this.backTrigger.innerHTML = `<span class="mt-back-arrow">‹</span> <span class="mt-back-text">Balance / Dev</span>`;
+    this.backTrigger.innerHTML = `<span class="mt-back-arrow">‹</span> <span class="mt-back-text">${esc(t('hudChrome.meters.backDev'))}</span>`;
     this.segTrigger.style.display = '';
     this.segTrigger.innerHTML = `<span class="mt-title-text">${viewName}</span> <span class="mt-arrow">▾</span>`;
 
     const stats = buildAbilityBalanceStats(enc);
-    this.subEl.textContent = `Habilidades registradas: ${stats.length}`;
+    this.subEl.textContent = t('hudChrome.meters.balanceAbilitiesCount', { count: stats.length });
 
     const maxVal = stats.length > 0 ? stats[0].totalDamage + stats[0].totalHealing : 1;
 
@@ -2531,13 +2580,13 @@ export class MetersPanel {
 
     this.modeTrigger.style.display = 'none';
     this.backTrigger.style.display = 'inline-flex';
-    this.backTrigger.innerHTML = `<span class="mt-back-arrow">‹</span> <span class="mt-back-text">Objetivo: ${esc(this.selectedTarget)}</span>`;
+    this.backTrigger.innerHTML = `<span class="mt-back-arrow">‹</span> <span class="mt-back-text">${esc(t('hudChrome.meters.targetSubtitle', { target: this.selectedTarget }))}</span>`;
     this.segTrigger.style.display = '';
     this.segTrigger.innerHTML = `<span class="mt-title-text">${viewName}</span> <span class="mt-arrow">▾</span>`;
 
     const map = enc.targetDamageReceived.get(this.selectedTarget);
     if (!map || map.size === 0) {
-      this.subEl.textContent = 'Sin datos de jugadores para este objetivo';
+      this.subEl.textContent = t('hudChrome.meters.noTargetData');
       this.syncRowPool(0);
       for (const row of this.rowPool) row.el.style.display = 'none';
       return;
@@ -3027,6 +3076,13 @@ export class Meters {
     this.main.setSettings(this.settings);
     for (const panel of this.detached.values()) {
       panel.setSettings(this.settings);
+    }
+  }
+
+  relocalize(): void {
+    this.main.relocalize();
+    for (const panel of this.detached.values()) {
+      panel.relocalize();
     }
   }
 

@@ -339,7 +339,7 @@ describe('Meters Chat Reporting', () => {
     );
 
     const report = formatChatReport(m.current!, 'dmg', 'Ignivar', 5);
-    expect(report).toContain('[WoC] Daño');
+    expect(report).toMatch(/\[WoC\] (Damage|Daño)/);
     expect(report).toContain('1. Warrior');
     expect(report).toContain('2. Priest');
     expect(report).toContain('67%');
@@ -353,7 +353,7 @@ describe('Meters Chat Reporting', () => {
     m.resetAll(0);
 
     const report = formatChatReport(m.allTime, 'heal', 'Actual', 5);
-    expect(report).toContain('Sin datos registrados');
+    expect(report).toMatch(/Sin datos registrados|No data recorded/);
   });
 });
 
@@ -384,7 +384,7 @@ describe('Details! Options Dialog', () => {
     // Switch to Barras
     (tabButtons?.[1] as HTMLElement | undefined)?.click();
     const groupTitle = modal?.querySelector('.mt-opts-group-title');
-    expect(groupTitle?.textContent).toContain('Barras');
+    expect(groupTitle?.textContent).toMatch(/Bar|Barras/);
 
     // Switch to Presets
     (tabButtons?.[5] as HTMLElement | undefined)?.click();

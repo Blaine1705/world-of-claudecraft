@@ -7001,6 +7001,7 @@ export class Hud {
     this.auraTracks.relocalize();
     this.doomMeter.relocalize();
     this.optionsWindow.relocalize();
+    this.meters.relocalize();
     // The Target dots frame's accessible name is written once in its painter's
     // constructor, so it is the one string in that frame a runtime language
     // switch would otherwise leave in the previous locale (the row text itself

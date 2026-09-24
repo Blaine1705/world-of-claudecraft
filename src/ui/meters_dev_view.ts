@@ -3,7 +3,6 @@
 // overtuned or undertuned abilities during raid/dungeon testing.
 
 import type { Encounter } from './meters';
-import { fmtNum, fmtPercent } from './meters_format';
 
 export interface AbilityBalanceStat {
   ability: string;
@@ -22,7 +21,6 @@ export interface AbilityBalanceStat {
 }
 
 export function buildAbilityBalanceStats(enc: Encounter): AbilityBalanceStat[] {
-  const dur = Math.max(1, enc.duration);
   let totalRaidDamage = 0;
   for (const t of enc.tallies.values()) {
     totalRaidDamage += t.dmg;

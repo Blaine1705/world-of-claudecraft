@@ -9565,9 +9565,9 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 480px;
+    width: 520px;
     max-width: calc(100vw - 24px);
-    max-height: min(600px, calc(100vh - 40px));
+    max-height: min(720px, calc(var(--app-vh, 100vh) - 40px));
     display: none;
     flex-direction: column;
     z-index: 35;
@@ -9588,6 +9588,7 @@
     padding: 10px 14px;
     background: linear-gradient(180deg, #222630 0%, #161a22 100%);
     border-bottom: 1px solid #3d3222;
+    flex-shrink: 0;
   }
   .death-recap-title {
     margin: 0;
@@ -9606,6 +9607,7 @@
     background: #151820;
     border-bottom: 1px solid #28241c;
     font-size: 12px;
+    flex-shrink: 0;
   }
   .death-recap-summary {
     display: flex;
@@ -9639,7 +9641,7 @@
     color: #4ade80;
   }
   .death-recap-content {
-    flex: 1;
+    flex: 1 1 auto;
     overflow-y: auto;
     padding: 10px 14px;
     min-height: 120px;
@@ -9849,6 +9851,7 @@
     padding: 8px 14px;
     background: #14171f;
     border-top: 1px solid #2d261e;
+    flex-shrink: 0;
   }
   .death-recap-footer-close {
     min-width: 80px;

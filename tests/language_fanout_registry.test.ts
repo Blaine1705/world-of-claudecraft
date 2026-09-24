@@ -163,6 +163,7 @@ const FANOUT_ARMS: readonly string[] = [
   // (KeyboardMapWindow), which can stay open across a language switch and
   // repaints its title, option captions, legends and hint on this arm.
   'this.optionsWindow.relocalize|',
+  'this.meters.relocalize|',
   // The Target dots frame: only its aria-label is constructor-written, so this
   // arm is what keeps that one string from sticking in the previous locale.
   'this.targetDotsPainter.relocalize|',

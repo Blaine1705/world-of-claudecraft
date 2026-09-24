@@ -294,7 +294,7 @@ describe('DeathRecapDialog (DOM dialog controller)', () => {
 
     dialog.open();
     expect(dialog.isOpen()).toBe(true);
-    expect(rootEl.style.display).toBe('block');
+    expect(rootEl.style.display).toBe('flex');
 
     // Title and close button
     const title = rootEl.querySelector('#death-recap-title');

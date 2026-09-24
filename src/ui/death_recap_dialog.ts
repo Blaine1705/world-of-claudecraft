@@ -58,7 +58,7 @@ export class DeathRecapDialog {
     const el = this.ensureElement();
     const recap = this.deps.getLatestRecap();
     this.render(el, recap);
-    el.style.display = 'block';
+    el.style.display = 'flex';
     el.dataset.windowOpen = 'true';
 
     if (!this.keydownHandler) {
