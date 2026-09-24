@@ -7665,6 +7665,236 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
     ]
   },
   {
+    "id": "horizons_vault_of_ages",
+    "shelf": "horizons",
+    "name": "Vault of Ages",
+    "excludeFromCompletion": "retired",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Deathless Warguard Legmail"
+      },
+      {
+        "kind": "item",
+        "name": "Scourgehide Carapace"
+      },
+      {
+        "kind": "item",
+        "name": "Soulforged Warplate"
+      },
+      {
+        "kind": "item",
+        "name": "Soulrend Diadem"
+      }
+    ]
+  },
+  {
+    "id": "horizons_riftbound",
+    "shelf": "horizons",
+    "name": "Riftbound",
+    "excludeFromCompletion": "personal",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Might"
+      },
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Insight"
+      },
+      {
+        "kind": "item",
+        "name": "Riftbound Band of Guile"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_set_bramblehide",
+    "shelf": "conquerors",
+    "name": "Roots' Bramblehide",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Harness"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Cinch"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Treads"
+      }
+    ]
+  },
+  {
+    "id": "professions_crucible",
+    "shelf": "professions",
+    "name": "Crucible Craftsmanship",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Crucible Striker's Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Striker's Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Striker's Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Skirmisher's Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Skirmisher's Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Skirmisher's Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Prowler's Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Prowler's Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Prowler's Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Guardian's Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Sash"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Spellcaster's Slippers"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Sash"
+      },
+      {
+        "kind": "item",
+        "name": "Crucible Healer's Slippers"
+      }
+    ]
+  },
+  {
+    "id": "professions_forgebreaker",
+    "shelf": "professions",
+    "name": "Forgebreaker",
+    "excludeFromCompletion": "personal",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Forgebreaker, Engine of Varkhul"
+      }
+    ]
+  },
+  {
     "id": "conquerors_vanguard_gallery",
     "shelf": "conquerors",
     "name": "Vanguard Gallery",
@@ -8224,236 +8454,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Vanguard's Warstaff"
-      }
-    ]
-  },
-  {
-    "id": "horizons_vault_of_ages",
-    "shelf": "horizons",
-    "name": "Vault of Ages",
-    "excludeFromCompletion": "retired",
-    "relics": [
-      {
-        "kind": "item",
-        "name": "Deathless Warguard Legmail"
-      },
-      {
-        "kind": "item",
-        "name": "Scourgehide Carapace"
-      },
-      {
-        "kind": "item",
-        "name": "Soulforged Warplate"
-      },
-      {
-        "kind": "item",
-        "name": "Soulrend Diadem"
-      }
-    ]
-  },
-  {
-    "id": "horizons_riftbound",
-    "shelf": "horizons",
-    "name": "Riftbound",
-    "excludeFromCompletion": "personal",
-    "relics": [
-      {
-        "kind": "item",
-        "name": "Riftbound Band of Might"
-      },
-      {
-        "kind": "item",
-        "name": "Riftbound Band of Insight"
-      },
-      {
-        "kind": "item",
-        "name": "Riftbound Band of Guile"
-      }
-    ]
-  },
-  {
-    "id": "conquerors_set_bramblehide",
-    "shelf": "conquerors",
-    "name": "Roots' Bramblehide",
-    "relics": [
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Crown"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Mantle"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Harness"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Cinch"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Legguards"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Grips"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Treads"
-      }
-    ]
-  },
-  {
-    "id": "professions_crucible",
-    "shelf": "professions",
-    "name": "Crucible Craftsmanship",
-    "relics": [
-      {
-        "kind": "item",
-        "name": "Crucible Striker's Hauberk"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Striker's Girdle"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Striker's Sabatons"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Guardian's Hauberk"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Guardian's Girdle"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Guardian's Sabatons"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Spellcaster's Hauberk"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Spellcaster's Girdle"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Spellcaster's Sabatons"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Healer's Hauberk"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Healer's Girdle"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Healer's Sabatons"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Skirmisher's Jerkin"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Skirmisher's Belt"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Skirmisher's Boots"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Prowler's Jerkin"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Prowler's Belt"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Prowler's Boots"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Guardian's Jerkin"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Guardian's Belt"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Guardian's Boots"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Spellcaster's Jerkin"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Spellcaster's Belt"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Spellcaster's Boots"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Healer's Jerkin"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Healer's Belt"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Healer's Boots"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Spellcaster's Robe"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Spellcaster's Sash"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Spellcaster's Slippers"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Healer's Robe"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Healer's Sash"
-      },
-      {
-        "kind": "item",
-        "name": "Crucible Healer's Slippers"
-      }
-    ]
-  },
-  {
-    "id": "professions_forgebreaker",
-    "shelf": "professions",
-    "name": "Forgebreaker",
-    "excludeFromCompletion": "personal",
-    "relics": [
-      {
-        "kind": "item",
-        "name": "Forgebreaker, Engine of Varkhul"
       }
     ]
   }
