@@ -581,7 +581,7 @@ import {
   runPrewarmCompileSubmission,
   submitPrewarmCompileUnit,
 } from './prewarm_compile_submission_core';
-import type { PrewarmManifestEntry } from './prewarm_entry';
+import { type PrewarmManifestEntry, runStartedPrewarmEntry } from './prewarm_entry';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -606,7 +606,6 @@ import {
   prewarmEntryShouldDefer,
   prewarmResumeIsDebt,
   prewarmSubmitShouldStop,
-  resolvePrewarmEntryStatus,
   resolvePrewarmPolicy,
   skyAssetInlineWaitMs,
   withRestoredPrewarmState,
@@ -5794,27 +5793,10 @@ export class Renderer {
         dropEntry(entry, entry.resumeUnits?.() ?? []);
         return;
       }
-      let status: RendererPrewarmManifestEntryStats['status'] = 'completed';
-      try {
-        try {
-          options.onEntryStart?.(entry.id, entry.category);
-        } catch {
-          // Diagnostics must never change whether a prewarm entry runs.
-        }
-        await entry.run();
-      } catch (err) {
-        status = 'failed';
-        console.warn(`Renderer prewarm entry failed: ${entry.id}`, err);
-      }
-      // Deadline-limited work with planned units remaining reports 'partial',
-      // never 'completed'.
-      const progress = entry.progress?.() ?? null;
-      if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
-      // Explicit partial resumes may also recover failed indivisible units.
-      if (status === 'partial' || status === 'failed') {
-        const partialUnits = entry.resumePartialUnits?.() ?? [];
-        if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });
-      }
+      const { status, progress, partialUnits } = await runStartedPrewarmEntry(entry, () =>
+        options.onEntryStart?.(entry.id, entry.category),
+      );
+      if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });
       const after = liveProgramWatch.programCounts(this.webgl);
       const entryEnded = performance.now();
       target.push({

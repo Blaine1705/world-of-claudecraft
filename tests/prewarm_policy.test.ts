@@ -1849,8 +1849,9 @@ describe('boot prewarm ordering: the sky fetch never starves the compute stages'
   });
 
   it('resolves every ran entry through the honest status gate', () => {
-    const source = rendererSource();
-    expect(source).toContain("if (status === 'completed') status = resolvePrewarmEntryStatus(");
+    expect(rendererSource()).toContain('await runStartedPrewarmEntry(entry, () =>');
+    const runner = readFileSync(new URL('../src/render/prewarm_entry.ts', import.meta.url), 'utf8');
+    expect(runner).toContain("if (status === 'completed') status = resolvePrewarmEntryStatus(");
   });
 });
 
