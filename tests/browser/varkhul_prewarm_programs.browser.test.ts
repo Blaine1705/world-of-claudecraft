@@ -12,6 +12,7 @@
 // the Node driven test pins its factory and entity instead.
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
+import threeSource from '../../node_modules/three/build/three.module.js?raw';
 import { syncVarkhulEncounterVisuals } from '../../src/render/varkhul_encounter';
 import { VarkhulForgestormVisuals } from '../../src/render/varkhul_forgestorm_visual';
 import {
@@ -35,7 +36,15 @@ import { VARKHUL_SHARED_PYRE_AURA_ID } from '../../src/sim/varkhul_shared_pyre';
 import { buildVarkhulPrewarmSetRoots } from '../helpers/varkhul_prewarm_set';
 
 type ProgramDiagnostics = { diagnostics?: { runnable?: boolean } };
+type RetainingInfo = { retainedPrograms?: unknown[] };
 type Tier = 'low' | 'ultra';
+
+// The released-program FIFO bound of the patched three
+// (patches/three@0.185.1.patch, pinned by tests/three_compile_async_patch.test.ts),
+// read from the installed build so the churn below always overflows it.
+const RETAINED_PROGRAM_LIMIT = Number(
+  /const RETAINED_PROGRAM_LIMIT = (\d+);/.exec(threeSource)?.[1] ?? Number.NaN,
+);
 
 const WIDTH = 320;
 const HEIGHT = 240;
@@ -136,6 +145,30 @@ function programOf(rig: Rig, material: THREE.Material): { usedTimes: number } {
     .currentProgram as { usedTimes: number } | undefined;
   expect(program).toBeDefined();
   return program as { usedTimes: number };
+}
+
+/** Links, draws once and disposes `count` materials of unique program keys:
+ *  the interest churn of a live session (bodies and props leaving) that pushes
+ *  every released program through the FIFO and out. */
+function churnReleasedPrograms(rig: Rig, count: number): void {
+  const scene = new THREE.Scene();
+  const geometry = new THREE.PlaneGeometry(1, 1);
+  const mesh = new THREE.Mesh(geometry);
+  mesh.frustumCulled = false;
+  scene.add(mesh);
+  for (let i = 0; i < count; i++) {
+    const material = new THREE.ShaderMaterial({
+      vertexShader:
+        'void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: `void main() { gl_FragColor = vec4(${i}.0 / 1024.0, 0.0, 0.0, 1.0); }`,
+    });
+    mesh.material = material;
+    rig.renderer.render(scene, rig.camera);
+    material.dispose();
+  }
+  geometry.dispose();
+  const retained = (rig.renderer.info as RetainingInfo).retainedPrograms ?? [];
+  expect(retained).toHaveLength(RETAINED_PROGRAM_LIMIT);
 }
 
 function linksAssembly(): ActiveVarkhulAssembly {
@@ -294,7 +327,7 @@ describe.each<Tier>(['low', 'ultra'])('Varkhul encounter prewarm (%s)', (tier) =
     visuals.dispose();
   });
 
-  it('control: without the Forgestorm twin, the first storm links its meteor trail live', () => {
+  it('control: without the Forgestorm twin, both storms link the meteor trail live across a churn', () => {
     // Isolates the twin: the rest of the set staged, and no other staged
     // builder carries the trail's program. Once the storm's warnings are
     // disposed that program is in use by nothing: only the patched three's
@@ -312,10 +345,22 @@ describe.each<Tier>(['low', 'ultra'])('Varkhul encounter prewarm (%s)', (tier) =
     const trail = programOf(rig, liveTrailMaterial(rig.scene));
     visuals.syncWorld(encounterWorld([]));
     expect(trail.usedTimes).toBe(0);
+
+    // Churn past the FIFO bound: the parked trail program is destroyed, and
+    // the second storm links it again in its first frame.
+    expect(RETAINED_PROGRAM_LIMIT).toBeGreaterThan(0);
+    churnReleasedPrograms(rig, RETAINED_PROGRAM_LIMIT + 1);
+    expect(rig.renderer.info.programs).not.toContain(trail);
+    const beforeSecond = rig.programs();
+    visuals.syncWorld(encounterWorld(forgestormWave(2)));
+    visuals.update(0.1, true);
+    rig.draw();
+    expect(rig.programs()).toBeGreaterThan(beforeSecond);
+    expect(programOf(rig, liveTrailMaterial(rig.scene))).not.toBe(trail);
     visuals.dispose();
   });
 
-  it("staged: the first storm's dispose releases nothing, and the second storm links nothing", () => {
+  it("staged: the first storm's dispose releases nothing, and the second storm links nothing after a churn", () => {
     const rig = makeRig(tier);
     stageVarkhulSet(rig);
     rig.draw();
@@ -337,11 +382,17 @@ describe.each<Tier>(['low', 'ultra'])('Varkhul encounter prewarm (%s)', (tier) =
     expect(rig.programs()).toBe(staged);
     expect(trail.usedTimes).toBeGreaterThan(0);
 
+    // The same churn that evicts the trail without the twin: the program the
+    // twin holds never entered the FIFO, so it is still linked after it.
+    churnReleasedPrograms(rig, RETAINED_PROGRAM_LIMIT + 1);
+    expect(rig.renderer.info.programs).toContain(trail);
+    const beforeSecond = rig.programs();
     visuals.syncWorld(encounterWorld(forgestormWave(2)));
     visuals.update(0.1, true);
     expect(rig.scene.getObjectByName('varkhul-forgestorm-warning')).toBeDefined();
     rig.draw();
-    expect(rig.programs()).toBe(staged);
+    expect(rig.programs()).toBe(beforeSecond);
+    expect(programOf(rig, liveTrailMaterial(rig.scene))).toBe(trail);
     visuals.dispose();
   });
 });
