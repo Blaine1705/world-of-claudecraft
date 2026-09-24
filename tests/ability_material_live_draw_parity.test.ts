@@ -177,8 +177,8 @@ describe('ability-material stand-ins draw the live programs', () => {
 });
 
 describe('the Divine Ascension stand-in keeps its programs', () => {
-  it('a live crown torn down never disposes the shared crown material the stand-in holds', () => {
-    activateTier('ultra');
+  it.each(['ultra', 'low'] as const)('%s: a crown teardown disposes no staged material', (tier) => {
+    activateTier(tier);
     const staged = new Set<THREE.Material>();
     for (const draw of drawsUnder(buildAbilityMaterialPrewarmGroup())) staged.add(draw.material);
     const { visual, draws } = liveAscensionDraws(1.8);

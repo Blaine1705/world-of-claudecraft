@@ -341,8 +341,8 @@ describe('weapon-aura stand-ins carry every live aura program', () => {
     });
   }
 
-  it('keeps every aura program held by a compiled stand-in across every teardown', () => {
-    activateTier('ultra');
+  it.each(['ultra', 'low'] as const)('%s: every aura program outlives teardowns', (tier) => {
+    activateTier(tier);
     // The boot entry compiles one representative per signature
     // (abilityVfxCompileMaterials over the scene the group joins at renderer
     // construction). Each compiled material holds its programs; three drops a

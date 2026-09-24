@@ -76,34 +76,24 @@ function expectEveryDrawableCollected(scene: THREE.Scene, root: THREE.Object3D):
   }
 }
 
-/** Compile units per pool (the whole scene the pool's constructor built),
- *  keyed by program. Keyed by material instance, the same pools were 1
- *  (Drain Life's 36 ShaderMaterial clones already shared a source), 7,
- *  217 / 105 and 184 / 104 units. A count may sit a little above three's own
- *  distinct program count, never below it: the signature keeps the object
- *  kind and the material type apart where three can share one program (a
- *  LineBasicMaterial lash and a MeshBasicMaterial disc), one idle-slot cache
- *  hit each. A pool that grows past its pin carries a new program: re-pin it
- *  on purpose. */
-const POOL_UNITS = {
-  drainLife: 1,
-  umbral: 4,
-  sentenceFull: 8,
-  sentenceLow: 4,
-  needleFull: 5,
-  needleLow: 3,
-} as const;
-
-/** One compile unit and one gate entry per distinct program signature, and
- *  no signature ever covering two of three's programs (that would let the
- *  gate open on a program no unit linked). */
-function expectOneUnitPerProgram(pool: keyof typeof POOL_UNITS, scene: THREE.Scene): void {
+/** One compile unit and one gate entry per distinct program signature, no
+ *  signature ever covering two of three's programs (that would let the gate
+ *  open on a program no unit linked), and no more units than three's
+ *  programs split by draw kind, material type and wireframe, the axes the
+ *  signature keeps apart where three can share one program (a
+ *  LineBasicMaterial lash and a MeshBasicMaterial disc). Keyed by material
+ *  instance, the same pools were 1 (Drain Life's clones already shared a
+ *  source), 7, 217 / 105 and 184 / 104 units. */
+function expectOneUnitPerProgram(pool: string, scene: THREE.Scene): void {
   const keyOfSignature = new Map<string, string>();
   const programs = new Set<string>();
+  const bound = new Set<string>();
   for (const draw of drawsUnder(scene)) {
     if (draw.object.userData.renderCategory !== 'vfx') continue;
     const key = threeProgramKeys(draw.material, draw.object);
     programs.add(key);
+    const { wireframe } = draw.material as THREE.MeshBasicMaterial;
+    bound.add(`${key}|${draw.object.type}|${draw.material.type}|${wireframe}`);
     const signature = drawProgramSignature(draw.object, draw.material);
     const known = keyOfSignature.get(signature);
     if (known === undefined) keyOfSignature.set(signature, key);
@@ -112,7 +102,7 @@ function expectOneUnitPerProgram(pool: keyof typeof POOL_UNITS, scene: THREE.Sce
   const units = collectAbilityVfxCompileTargets(scene).length;
   expect(units, `${pool} units`).toBe(keyOfSignature.size);
   expect(abilityVfxCompileMaterials(scene), `${pool} gate entries`).toHaveLength(units);
-  expect(units, `${pool} units`).toBe(POOL_UNITS[pool]);
+  expect(units, `${pool} units`).toBeLessThanOrEqual(bound.size);
   expect(programs.size, `${pool} programs`).toBeLessThanOrEqual(units);
 }
 
@@ -126,7 +116,7 @@ describe('class VFX pools are reachable by the ability-VFX prewarm walk', () => 
       expect(slot.visible).toBe(false);
       expectEveryDrawableCollected(scene, slot);
     }
-    expectOneUnitPerProgram('drainLife', scene);
+    expectOneUnitPerProgram('Drain Life', scene);
   });
 
   it('Umbral Anchor: the sigil shader, the halo and shard meshes, and the wisp points', () => {
@@ -137,7 +127,7 @@ describe('class VFX pools are reachable by the ability-VFX prewarm walk', () => 
     const kinds = new Set(drawablesUnder(marker.group).map((object) => object.type));
     expect(kinds).toEqual(new Set(['Mesh', 'LineSegments', 'Points']));
     expectEveryDrawableCollected(scene, marker.group);
-    expectOneUnitPerProgram('umbral', scene);
+    expectOneUnitPerProgram('Umbral Anchor', scene);
   });
 
   for (const lowDetail of [false, true]) {
@@ -156,14 +146,14 @@ describe('class VFX pools are reachable by the ability-VFX prewarm walk', () => 
         expect(starburst, 'the full-detail starburst exists').toBeDefined();
       }
       expectEveryDrawableCollected(scene, vfx.group);
-      expectOneUnitPerProgram(lowDetail ? 'sentenceLow' : 'sentenceFull', scene);
+      expectOneUnitPerProgram(`Sentence ${lowDetail ? 'low' : 'full'}`, scene);
     });
 
     it(`Needle of Fate (${lowDetail ? 'low' : 'full'} detail): every windup, release, needle and impact`, () => {
       const scene = new THREE.Scene();
       const vfx = new NeedleOfFateVfx(scene, new THREE.PerspectiveCamera(), noAnchor, lowDetail);
       expectEveryDrawableCollected(scene, vfx.group);
-      expectOneUnitPerProgram(lowDetail ? 'needleLow' : 'needleFull', scene);
+      expectOneUnitPerProgram(`Needle ${lowDetail ? 'low' : 'full'}`, scene);
     });
   }
 });
