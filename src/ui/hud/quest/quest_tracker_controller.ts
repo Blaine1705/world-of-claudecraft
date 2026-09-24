@@ -3,6 +3,7 @@ import { WISP_MAZE_QUEST_ID } from '../../../sim/content/world_quest_wisp_maze';
 import { QUESTS, WORLD_QUESTS_BY_ID } from '../../../sim/data';
 import { questObjectiveRequired } from '../../../sim/types';
 import { wispMazeActionsLocked } from '../../../sim/wisp_maze_action_lock';
+import { positionInWorldQuestArea } from '../../../sim/world_quest_area';
 import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
@@ -27,6 +28,7 @@ import {
   type TrackedQuest,
 } from './quest_tracker';
 import { buildWispMazeHud, type WispMazeHudController } from './wisp_maze_hud_controller';
+import { createWorldQuestTrackerVisibility } from './world_quest_tracker_visibility';
 
 export interface QuestTrackerSettingsPort {
   available(): boolean;
@@ -71,6 +73,8 @@ export class QuestTrackerController {
    *  clock here; the strip's grace is measured in seconds and cannot see the
    *  one-tick staleness. */
   private lastNow = 0;
+  /** Area and completion grace for the World Quests section (presentation only). */
+  private readonly worldQuestVisibility = createWorldQuestTrackerVisibility();
 
   // The repaint memo compares against the LAST BUILT html, never the live
   // innerHTML: overlays decorate the painted rows in place (the island
@@ -155,6 +159,9 @@ export class QuestTrackerController {
     for (const progress of worldQuestLog.values()) {
       if (
         progress.state !== 'active' &&
+        // A just-completed quest keeps its row for the completion grace; the
+        // visibility core drops it (and never lists one completed earlier).
+        progress.state !== 'completed' &&
         !(progress.traceResult && progress.tracing?.phase === 'success') &&
         !progress.forging &&
         !progress.wispMaze &&
@@ -163,25 +170,37 @@ export class QuestTrackerController {
         continue;
       const quest = ownEntry(WORLD_QUESTS_BY_ID, progress.questId);
       if (!quest) continue;
-      if (
-        progress.tracing ||
+      const lessonRunning =
+        !!progress.tracing ||
         progress.forging?.phase === 'countdown' ||
         progress.forging?.phase === 'working' ||
         (!!progress.wispMaze && !progress.wispMaze.paused && progress.wispMaze.phase !== 'won') ||
         progress.glider?.phase === 'countdown' ||
-        progress.glider?.phase === 'flying'
+        progress.glider?.phase === 'flying';
+      const complete =
+        progress.state === 'completed' &&
+        !(progress.wispMaze && progress.wispMaze.phase !== 'won') &&
+        progress.glider?.phase !== 'countdown' &&
+        progress.glider?.phase !== 'flying';
+      // WoW style: listed only while the player is in the quest's area, with
+      // a grace on leaving and on completion. Display only: the progress on
+      // the log entry is untouched, so 5/10 is still 5/10 on the way back.
+      const inArea = positionInWorldQuestArea(world.player.pos, quest);
+      if (
+        !this.worldQuestVisibility.visible(
+          progress.questId,
+          { inArea, complete, lessonRunning },
+          now,
+        )
       )
-        focusQuestId = progress.questId;
+        continue;
+      if (lessonRunning) focusQuestId = progress.questId;
       quests.push({
         id: progress.questId,
         number: quests.length + 1,
         worldQuest: true,
         title: worldQuestDisplayName(progress.questId),
-        complete:
-          progress.state === 'completed' &&
-          !(progress.wispMaze && progress.wispMaze.phase !== 'won') &&
-          progress.glider?.phase !== 'countdown' &&
-          progress.glider?.phase !== 'flying',
+        complete,
         objectives:
           quest.objective.type === 'forging' ||
           quest.objective.type === 'wisp_maze' ||
@@ -216,6 +235,7 @@ export class QuestTrackerController {
               ],
       });
     }
+    this.worldQuestVisibility.retain(new Set(worldQuestLog.keys()));
     // The active Clue Scroll hunt rides the tracker as one row: the hunt's
     // title, and the current clue as a full-width instruction line with the
     // step tally. It persists across the daily reset, so it stays put while

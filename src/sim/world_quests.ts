@@ -41,6 +41,7 @@ import {
   triggerWorldQuestAmbush,
   updateWorldQuestAmbush,
 } from './world_quest_ambush';
+import { positionInWorldQuestArea } from './world_quest_area';
 import {
   awardWorldQuestBonusCopper,
   WISP_MAZE_HARD_BONUS,
@@ -216,15 +217,6 @@ export function worldQuestRewardAmount(
   const safeLevel = Math.max(1, Math.floor(level));
   if (reward.type === 'xp') return Math.max(1, Math.round(xpForLevel(safeLevel) * reward.rate));
   return Math.max(0, Math.round(reward.base + reward.perLevel * safeLevel));
-}
-
-function positionInWorldQuestArea(
-  pos: Pick<Entity['pos'], 'x' | 'z'>,
-  quest: WorldQuestDef,
-): boolean {
-  const dx = pos.x - quest.area.x;
-  const dz = pos.z - quest.area.z;
-  return dx * dx + dz * dz <= quest.area.radius * quest.area.radius;
 }
 
 function inWorldQuestArea(entity: Entity, quest: WorldQuestDef): boolean {

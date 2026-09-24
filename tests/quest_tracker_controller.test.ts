@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { QUESTS, WORLD_QUESTS } from '../src/sim/data';
+import { QUESTS, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { createForgeWorkshop } from '../src/sim/minigames/forge_workshop';
 import { createGliderFlightState, scoreGliderFlight } from '../src/sim/minigames/glider_flight';
 import type { QuestProgress, WorldQuestProgress } from '../src/sim/types';
@@ -53,6 +53,10 @@ function harness(
   worldEntries: WorldQuestProgress[] = [],
   clueHunt: { huntId: string; step: number } | null = null,
 ) {
+  // The World Quests section lists a quest only while the player stands in
+  // its area, so the rig's player stands at the first world quest's centre.
+  const firstArea = worldEntries[0] && WORLD_QUESTS_BY_ID[worldEntries[0].questId]?.area;
+  const playerPos = { x: firstArea?.x ?? 0, y: 0, z: firstArea?.z ?? 0 };
   const questLog = new Map(entries.map((entry) => [entry.questId, entry]));
   const worldQuestLog = new Map(worldEntries.map((entry) => [entry.questId, entry]));
   const tracking = new QuestTrackingState(fakeStorage());
@@ -111,7 +115,7 @@ function harness(
     world: () =>
       ({
         cfg: { playerClass: 'warrior' },
-        player: { name: 'Adventurer' },
+        player: { name: 'Adventurer', pos: playerPos },
         questLog,
         worldQuestLog,
         clueHunt,
@@ -124,6 +128,7 @@ function harness(
   });
   return {
     controller,
+    playerPos,
     questLog,
     tracking,
     settings,
@@ -486,6 +491,34 @@ describe('QuestTrackerController', () => {
     expect(test.html()).not.toContain('Arcane Calligraphy');
   });
 
+  it('lists a world quest only in its area, keeps it 5 sec after leaving, and keeps its progress', () => {
+    const quest = WORLD_QUESTS.find((entry) => entry.id === 'wq_eastbrook_bandits');
+    if (!quest) throw new Error('missing Eastbrook bandit fixture');
+    const entry: WorldQuestProgress = { questId: quest.id, count: 5, state: 'active' };
+    const test = harness([], [entry]);
+    const row = `${worldQuestObjectiveLabel(quest.id)}: 5/${quest.count}`;
+    test.controller.update(0);
+    expect(test.html()).toContain(row);
+    // Walk out of the area: the row lingers for the grace, then drops off.
+    test.playerPos.x = quest.area.x + quest.area.radius + 50;
+    test.controller.update(1_000);
+    expect(test.html()).toContain(row);
+    test.controller.update(1_000 + 5_000);
+    expect(test.html()).not.toContain(row);
+    // Back inside: the row returns with the same 5/N (display only, the
+    // progress on the log entry never moved).
+    test.playerPos.x = quest.area.x;
+    test.controller.update(30_000);
+    expect(test.html()).toContain(row);
+    // Completed: it shows as done for the grace, then leaves the section.
+    entry.state = 'completed';
+    entry.count = quest.count;
+    test.controller.update(31_000);
+    expect(test.html()).toContain(worldQuestDisplayName(quest.id));
+    test.controller.update(31_000 + 5_000);
+    expect(test.html()).not.toContain(worldQuestDisplayName(quest.id));
+  });
+
   it('gives world quests their own "World Quests" section after the Quests section', () => {
     const wolves = progress('q_wolves');
     wolves.counts[0] = 0;
@@ -653,7 +686,11 @@ it('tracks completed glider replays through flight and result without retaining 
     ]);
     entry.gliderResult = glider.result;
     delete entry.glider;
+    // The finished replay keeps its row for the completion grace, then the
+    // stale saved medal is gone with it.
     rig.controller.update(2);
+    expect(update.mock.lastCall?.[0]).toHaveLength(1);
+    rig.controller.update(2 + 5_000);
     expect(update.mock.lastCall?.[0]).toEqual([]);
   } finally {
     build.mockRestore();
