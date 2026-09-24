@@ -12,6 +12,7 @@ import {
   setEncounterPrewarmInterior,
   startInteriorEncounterPrewarm,
 } from '../src/render/interior_encounter_prewarm_pass';
+import { NYTHRAXIS_GRAVE_PREWARM_NAME } from '../src/render/nythraxis_grave_flame_visual';
 import { MOBS } from '../src/sim/data';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
 
@@ -364,6 +365,20 @@ describe('interior encounter prewarm pass (driven)', () => {
     } finally {
       activateGfxProfile(was);
     }
+  });
+
+  it('compiles the Nythraxis floor telegraphs before the Soul Rend catalog', async () => {
+    // The eruption and Gravefire land seconds after the pull while the catalog
+    // is a whole rig per class and per VFX skin: compiled behind it, the first
+    // eruption could link its programs live.
+    rigs.fake = true;
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('nythraxis', host);
+    await drain();
+    expect(rigs.built.length).toBeGreaterThan(10);
+    expect(host.compiled[0]).toBe(NYTHRAXIS_GRAVE_PREWARM_NAME);
+    expect(host.compiled.slice(1).every((label) => label.startsWith('rig:player:'))).toBe(true);
+    expect(host.compiled).toHaveLength(rigs.built.length + 1);
   });
 
   it('compiles and retains the Ignivar mechanic visuals beside the Varkhul set', async () => {

@@ -241,6 +241,21 @@ async function runInteriorEncounterPrewarm(
   // attaches the interior (measured: a >150ms stall at arena entry), so the
   // build drains across idle slots exactly like the compile below.
   const units: Array<() => void> = [
+    // Nythraxis's eruption, flame patches, Gravefire strip, and Binding Sigil:
+    // actionable floor visuals built lazily by per-frame encounter sync, so
+    // their first appearance must not link programs inside live combat. FIRST,
+    // so it is also compiled first: the eruption lands seconds after the pull,
+    // and behind the Soul Rend catalog it waited for every rig's compile.
+    ...(spec.nythraxisGraveVisuals
+      ? [
+          () => {
+            const grave = buildNythraxisGravePrewarmVisual();
+            grave.position.set(-24, 0, 0);
+            group.add(grave);
+            varkhulKeepAlive.push(grave);
+          },
+        ]
+      : []),
     ...plan.playerClasses.map((cls) => () => buildPlayerClass(cls)),
     ...plan.weaponSkinIds.map((skinId) => () => buildWeaponSkin(skinId)),
     ...(spec.varkhulVisuals
@@ -313,19 +328,6 @@ async function runInteriorEncounterPrewarm(
             judgment.position.set(0, 0, 36);
             group.add(judgment);
             varkhulKeepAlive.push(judgment);
-          },
-        ]
-      : []),
-    // Nythraxis's eruption, flame patches, Gravefire strip, and Binding Sigil:
-    // actionable floor visuals built lazily by per-frame encounter sync, so
-    // their first appearance must not link programs inside live combat.
-    ...(spec.nythraxisGraveVisuals
-      ? [
-          () => {
-            const grave = buildNythraxisGravePrewarmVisual();
-            grave.position.set(-24, 0, 0);
-            group.add(grave);
-            varkhulKeepAlive.push(grave);
           },
         ]
       : []),
