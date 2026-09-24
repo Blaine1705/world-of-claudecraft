@@ -37,8 +37,8 @@ export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
   ...WARRIOR_PRESSURE_KINDS,
 ];
 /** The kit's queue priority. The kit is a cosmetic upgrade gated by its own
- *  readiness (the baked layers wait on `textureReady`, the crests on their
- *  prepared slots), so the generic presentation carries every cast until it
+ *  readiness (the baked layers and contact sheets wait on `textureReady`, the
+ *  crests on their prepared slots), so the generic presentation carries every cast until it
  *  lands and nothing here is actionable. It rides the boot-debt lane, which
  *  the budget paces as approaching work (at most one big upload per presented
  *  frame, where the actionable floor admitted all ten sheets into one 533 to
@@ -65,19 +65,25 @@ interface Preparation {
 const preparations = new WeakMap<object, Preparation>();
 
 /** Every sheet the kit's live presentation draws, each uploaded by its own
- *  paced unit before any geometry unit runs: the signature sheets, the contact
- *  sheets (`flipbooks.ts`) and the smoke and dust layers
- *  (`baked_impact_layers.ts`). They land with the kit's demand load, and this
- *  recipe is their only upload home on each renderer, so a sheet missing here
- *  is uploaded by the first cast that draws it, inside a live frame. The loaded `shockwave` sheet is left out on
- *  purpose: only the boot-window `prewarmSpawn` draws it, behind the curtain.
- *  A sheet that is absent fails its unit, so the kit stays cold rather than
- *  half-ready. */
+ *  paced unit before any geometry unit runs: the contact sheets
+ *  (`flipbooks.ts`), the smoke and dust layers (`baked_impact_layers.ts`) and
+ *  the signature sheets. They land with the kit's demand load, and this recipe
+ *  is their only upload home on each renderer; every drawer waits for its
+ *  sheet's upload (a contact binds a procedural sheet meanwhile, smoke and dust
+ *  skip), so those five go first to shorten that window. The loaded
+ *  `shockwave` sheet is left out on purpose: only the boot-window
+ *  `prewarmSpawn` draws it, behind the curtain. A sheet that is absent fails
+ *  its unit, so the kit stays cold rather than half-ready. */
 const KIT_SHEETS: readonly (readonly [
   id: string,
   name: string,
   sheet: () => THREE.Texture | null,
 ])[] = [
+  ['active-contact-cut', 'Warrior cut contact', () => contactTexture('contact_cut')],
+  ['active-contact-crush', 'Warrior crush contact', () => contactTexture('contact_crush')],
+  ['active-contact-pierce', 'Warrior pierce contact', () => contactTexture('contact_pierce')],
+  ['active-smoke', 'Warrior smoke', () => bakedTexture('smoke')],
+  ['active-shout-dust', 'Warrior shout dust', () => bakedTexture('shout_dust')],
   ['active-warrior-blood', 'Active Warrior blood', () => warriorBloodTexture()],
   ['active-warrior-steel', 'Active Warrior steel', () => warriorSteelTexture()],
   ['active-warrior-pressure', 'Active Warrior pressure', () => warriorPressureTexture()],
@@ -88,11 +94,6 @@ const KIT_SHEETS: readonly (readonly [
   ['active-warrior-bite', 'Warrior bite', () => bakedTexture('warrior_bite')],
   ['active-warrior-shear', 'Warrior shear', () => bakedTexture('warrior_shear')],
   ['active-warrior-crush', 'Warrior crush', () => bakedTexture('warrior_crush')],
-  ['active-contact-cut', 'Warrior cut contact', () => contactTexture('contact_cut')],
-  ['active-contact-crush', 'Warrior crush contact', () => contactTexture('contact_crush')],
-  ['active-contact-pierce', 'Warrior pierce contact', () => contactTexture('contact_pierce')],
-  ['active-smoke', 'Warrior smoke', () => bakedTexture('smoke')],
-  ['active-shout-dust', 'Warrior shout dust', () => bakedTexture('shout_dust')],
 ];
 
 function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {

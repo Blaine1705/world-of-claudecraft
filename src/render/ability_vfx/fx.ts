@@ -702,7 +702,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.pillars = new LightPillars(scene);
     this.shells = new BuffShells(scene);
     this.groundAuras = new GroundAuras(scene, tex);
-    this.flipbooks = new ImpactFlipbooks(scene);
+    this.flipbooks = new ImpactFlipbooks(scene, textureReady);
     this.spirits = new SpiritApparitions(scene, groundY);
   }
 

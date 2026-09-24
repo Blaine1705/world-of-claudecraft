@@ -151,21 +151,23 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
       expect(call[3]).toEqual({ releaseTail: String(call[2]).startsWith('crest-compile:') });
     }
     expect(f.upload).toHaveBeenCalledTimes(15);
-    expect(f.upload).toHaveBeenNthCalledWith(1, f.blood);
-    expect(f.upload).toHaveBeenNthCalledWith(2, f.steel);
-    expect(f.upload).toHaveBeenNthCalledWith(3, f.texture);
-    expect(f.upload).toHaveBeenNthCalledWith(4, f.rock);
-    expect(f.upload).toHaveBeenNthCalledWith(5, f.power);
-    expect(f.upload).toHaveBeenNthCalledWith(6, f.fervor);
-    expect(f.upload).toHaveBeenNthCalledWith(7, f.harvest);
-    expect(f.upload).toHaveBeenNthCalledWith(8, f.bite);
-    expect(f.upload).toHaveBeenNthCalledWith(9, f.shear);
-    expect(f.upload).toHaveBeenNthCalledWith(10, f.crush);
-    expect(f.upload).toHaveBeenNthCalledWith(11, f.contacts.contact_cut);
-    expect(f.upload).toHaveBeenNthCalledWith(12, f.contacts.contact_crush);
-    expect(f.upload).toHaveBeenNthCalledWith(13, f.contacts.contact_pierce);
-    expect(f.upload).toHaveBeenNthCalledWith(14, f.smoke);
-    expect(f.upload).toHaveBeenNthCalledWith(15, f.shoutDust);
+    // The sheets a cast draws with a fallback (contacts) or a skip (smoke,
+    // dust) upload first, so their degraded window after the load is shortest.
+    expect(f.upload).toHaveBeenNthCalledWith(1, f.contacts.contact_cut);
+    expect(f.upload).toHaveBeenNthCalledWith(2, f.contacts.contact_crush);
+    expect(f.upload).toHaveBeenNthCalledWith(3, f.contacts.contact_pierce);
+    expect(f.upload).toHaveBeenNthCalledWith(4, f.smoke);
+    expect(f.upload).toHaveBeenNthCalledWith(5, f.shoutDust);
+    expect(f.upload).toHaveBeenNthCalledWith(6, f.blood);
+    expect(f.upload).toHaveBeenNthCalledWith(7, f.steel);
+    expect(f.upload).toHaveBeenNthCalledWith(8, f.texture);
+    expect(f.upload).toHaveBeenNthCalledWith(9, f.rock);
+    expect(f.upload).toHaveBeenNthCalledWith(10, f.power);
+    expect(f.upload).toHaveBeenNthCalledWith(11, f.fervor);
+    expect(f.upload).toHaveBeenNthCalledWith(12, f.harvest);
+    expect(f.upload).toHaveBeenNthCalledWith(13, f.bite);
+    expect(f.upload).toHaveBeenNthCalledWith(14, f.shear);
+    expect(f.upload).toHaveBeenNthCalledWith(15, f.crush);
     expect(f.upload).not.toHaveBeenCalledWith(f.shockwave);
     expect(f.crush).not.toBe(f.shear);
     expect(f.host.draw).toHaveBeenCalledTimes(27);

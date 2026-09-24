@@ -158,8 +158,12 @@ selected by ability id only:
   layers included, since the kit is their only consumer (the loaded shockwave
   sheet has no live consumer, only the boot-window `prewarmSpawn`); the boot
   warm-up (`abilityVfxTexturePrewarmSteps`) reads none of them, so the recipe is
-  their one upload home on every renderer, a recycled one included. A pool built at boot never reads those
-  getters in its constructor, since the load lands after it: it binds them in
+  their one upload home on every renderer, a recycled one included. A sheet is
+  stored as soon as it decodes, so every drawer also waits for this renderer's
+  upload (`textureReady`): the baked layers skip, a contact flipbook binds a
+  boot-uploaded procedural sheet meanwhile (`tests/warrior_kit_sheet_readiness.test.ts`).
+  A pool built at boot never relies on those getters in its constructor, since
+  the load lands after it: it binds them in
   a unit of its own preparation recipe, ahead of its compile (the crests'
   `crest-bind-kit`, the guards' `guard-bind-steel`; `tests/crest_prewarm.test.ts`).
   A pool whose GEOMETRY comes from the kit builds its meshes in that recipe

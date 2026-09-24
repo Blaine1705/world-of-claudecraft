@@ -52,7 +52,8 @@ it.each(styles)('expands %s reach without scaling ordinary contacts on pooled re
 
 function fixture() {
   const scene = new THREE.Scene();
-  const pool = new ImpactFlipbooks(scene);
+  // Every sheet counts as uploaded here: these pins cover the warm carrier.
+  const pool = new ImpactFlipbooks(scene, () => true);
   pools.push(pool);
   const meshes = scene.children as ImpactMesh[];
   return { scene, pool, meshes };

@@ -23,6 +23,12 @@ const FLIP_SLOTS = 6;
 const FLIP_DUR = 0.55;
 const LAST_FRAME = FLIPBOOK_GRID * FLIPBOOK_GRID - 1;
 
+// A contact sheet lands with the Warrior kit's demand load and is uploaded by
+// the kit recipe (`active_kit_prewarm.ts`); until then a contact binds this
+// boot-uploaded procedural sheet (its shard burst is the physical one), so a
+// cast never uploads a 1024px sheet inside a live frame.
+const CONTACT_FALLBACK: FlipbookStyle = 'shatter';
+
 const easeOutCubic = (t: number): number => 1 - (1 - t) ** 3;
 
 interface FlipSlot {
@@ -52,7 +58,10 @@ export class ImpactFlipbooks {
   private readonly projectedStrike = new THREE.Vector3();
   private readonly projectedDown = new THREE.Vector3();
 
-  constructor(scene: THREE.Scene) {
+  constructor(
+    scene: THREE.Scene,
+    private readonly textureReady?: (texture: THREE.Texture) => boolean,
+  ) {
     this.geometry = new THREE.PlaneGeometry(1, 1);
     const proto = new THREE.ShaderMaterial({
       uniforms: {
@@ -176,12 +185,17 @@ export class ImpactFlipbooks {
   ): void {
     if (this.disposed) return;
     const warrior = warriorFlashStyle(style);
-    const texture = warrior
+    const contact = warrior || isContactSheet(style);
+    const kit = warrior
       ? contactTexture('contact_cut')
       : isContactSheet(style)
         ? contactTexture(style)
-        : flipbookSheet(style as FlipbookStyle);
-    if (!texture) return;
+        : null;
+    if (contact && !kit) return;
+    const sheet = kit && this.textureReady?.(kit) ? kit : null;
+    const texture = contact
+      ? (sheet ?? flipbookSheet(CONTACT_FALLBACK))
+      : flipbookSheet(style as FlipbookStyle);
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % FLIP_SLOTS;
     slot.active = true;
@@ -198,10 +212,9 @@ export class ImpactFlipbooks {
     );
     slot.aspect = Number.isFinite(aspect) ? Math.max(0.25, Math.min(4, aspect)) : 1;
     slot.mat.uniforms.uMap.value = texture;
-    slot.mat.uniforms.uInset.value =
-      warrior || isContactSheet(style)
-        ? 4 / Math.max(64, (texture.image as { width?: number })?.width ?? 512)
-        : 0;
+    slot.mat.uniforms.uInset.value = sheet
+      ? 4 / Math.max(64, (texture.image as { width?: number })?.width ?? 512)
+      : 0;
     (slot.mat.uniforms.uTint.value as THREE.Color).setHex(colorHex);
     slot.mat.uniforms.uHdr.value = hdr;
     slot.mat.uniforms.uFrame.value = 0;

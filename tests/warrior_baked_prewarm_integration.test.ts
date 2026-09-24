@@ -20,7 +20,13 @@ afterEach(() => {
 
 function fixture(cls: string, warriorTextures = true) {
   const scene = new THREE.Scene();
+  // Recipe upload order: the contact, smoke and dust sheets first.
   const names = [
+    'contact_cut',
+    'contact_crush',
+    'contact_pierce',
+    'smoke',
+    'shout_dust',
     'blood',
     'steel',
     'pressure',
@@ -31,11 +37,6 @@ function fixture(cls: string, warriorTextures = true) {
     'warrior_bite',
     'warrior_shear',
     'warrior_crush',
-    'contact_cut',
-    'contact_crush',
-    'contact_pierce',
-    'smoke',
-    'shout_dust',
   ] as const;
   const textures = new Map<string, THREE.Texture>(names.map((name) => [name, new THREE.Texture()]));
   const smoke = textures.get('smoke') as THREE.Texture;
@@ -192,5 +193,13 @@ it('keeps other classes and generic dispatch independent of missing Warrior text
   expect(h.upload).not.toHaveBeenCalled();
   expect(h.host.compile).not.toHaveBeenCalled();
   expect(h.host.draw).not.toHaveBeenCalled();
-  expect(h.pool.spawn('smoke', 0, 1, 0, 4, 0xffffff, 0xffffff, 0.2, 0, 0, 0)).toBe(true);
+  // Smoke is a kit sheet (it loads only with the Warrior kit), so it waits for
+  // its own upload on this renderer, like the signature layers. That gate reads
+  // the smoke sheet alone: no Warrior texture, recipe or class is consulted.
+  const smoke = h.textures.get('smoke') as THREE.Texture;
+  const spawnSmoke = () => h.pool.spawn('smoke', 0, 1, 0, 4, 0xffffff, 0xffffff, 0.2, 0, 0, 0);
+  expect(spawnSmoke()).toBe(false);
+  h.upload(smoke);
+  expect(spawnSmoke()).toBe(true);
+  expect(h.queue.run).not.toHaveBeenCalled();
 });

@@ -7,6 +7,18 @@ import { type BakedKind, bakedTexture } from './production_assets';
 import { warriorShearPhase } from './warrior_impact_material';
 
 const CAPACITY = 10;
+/** The sheets the active Warrior kit recipe uploads (`active_kit_prewarm.ts`
+ *  `KIT_SHEETS`); a draw before that upload would upload it in a live frame. */
+const KIT_UPLOADED: ReadonlySet<BakedKind> = new Set([
+  'smoke',
+  'shout_dust',
+  'warrior_power',
+  'warrior_fervor',
+  'harvest_impact',
+  'warrior_bite',
+  'warrior_shear',
+  'warrior_crush',
+]);
 interface Slot {
   mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
   active: boolean;
@@ -161,15 +173,9 @@ export class BakedImpactLayers {
     if (
       this.disposed ||
       !bakedTexture(kind) ||
-      // Decoding is not GPU preparation. The new large optional layer stays
+      // Decoding is not GPU preparation. A layer the Warrior kit uploads stays
       // cold until this renderer's explicit upload has completed successfully.
-      ((kind === 'warrior_power' ||
-        kind === 'warrior_fervor' ||
-        kind === 'harvest_impact' ||
-        kind === 'warrior_bite' ||
-        kind === 'warrior_shear' ||
-        kind === 'warrior_crush') &&
-        !this.textureReady?.(bakedTexture(kind)!)) ||
+      (KIT_UPLOADED.has(kind) && !this.textureReady?.(bakedTexture(kind)!)) ||
       ![x, y, z, size, duration, delay, heat, floor, angle, roll, aspect].every(Number.isFinite) ||
       aspect <= 0 ||
       size <= 0 ||
