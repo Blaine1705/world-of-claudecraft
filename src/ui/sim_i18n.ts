@@ -15201,6 +15201,8 @@ const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
 const ABILITY_NAMED_AURA_IDS: Readonly<Record<string, string>> = {
   'Bruin Rush': 'bear_charge',
   Lunge: 'lunge',
+  // Thundercall's Magma Surge proc aura carries its ability's name.
+  'Magma Burst': 'lava_burst',
 };
 
 export function localizeSimAuraName(name: string): string | null {

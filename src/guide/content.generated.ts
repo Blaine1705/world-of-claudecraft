@@ -1326,6 +1326,18 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Thunder Reservoir"
       },
       {
+        "id": "lightning_overload",
+        "name": "Arc Overload"
+      },
+      {
+        "id": "lava_burst",
+        "name": "Magma Burst"
+      },
+      {
+        "id": "thunderstorm",
+        "name": "Stormbreak"
+      },
+      {
         "id": "chain_lightning",
         "name": "Skybranch"
       },

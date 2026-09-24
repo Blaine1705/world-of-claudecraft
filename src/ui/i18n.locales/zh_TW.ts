@@ -8692,8 +8692,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '召喚什一魔會重置裂心術的冷卻時間，且什一魔每次攻擊回復的法力值加倍。',
   'entities.itemSets.stormkindled.name': '燃暴禮裝',
   'entities.itemSets.stormkindled.bonus2':
-    '焰烙狀態下的釋放武器獲得 3 層雷霆。受到傷害不再延遲你的施法。',
-  'entities.itemSets.stormkindled.bonus4': '大地震擊的每層雷霆加成提高至 30%。',
+    '電弧超載的觸發機率提高至 30%。受到傷害不再延遲你的施法。',
+  'entities.itemSets.stormkindled.bonus4':
+    '大地震擊的每層雷霆加成提高至 30%，熔岩爆裂造成的傷害提高 20%。',
   'entities.itemSets.warspirit_emberscale.name': '戰魂燼鱗甲',
   'entities.itemSets.warspirit_emberscale.bonus2': '先祖打擊將戰魂節律推進 3 段。',
   'entities.itemSets.warspirit_emberscale.bonus4': '先祖打擊造成的傷害提高 30%。',
@@ -14236,6 +14237,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     '被動：奧術閃電與天穹連鎖會獲得雷霆，最多5層。達到5層時，大地震擊造成的傷害提高125%，或裂地震波造成的傷害提高100%，隨後消耗全部雷霆。（雷霆召喚）',
   'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
+  'entities.abilities.lightning_overload.name': '電弧超載',
+  'entities.abilities.lightning_overload.description':
+    '被動：電弧箭與叉狀閃電有20%的機率超載，對其第一個目標再次造成所造成傷害的50%，並獲得1層雷霆。（雷霆召喚）',
+  'entities.abilities.lava_burst.name': '熔岩爆裂',
+  'entities.abilities.lava_burst.description':
+    '造成{damage}點火焰傷害。對身上帶有你的燼焰震擊燃燒效果的目標必定造成致命一擊。熔岩湧動：燼焰震擊每次跳動有20%的機率重置此技能的冷卻時間，並使你在10秒內的下一次熔岩爆裂變為瞬發。傷害隨法術強度提高。（雷霆召喚）',
+  'entities.abilities.thunderstorm.name': '風暴破擊',
+  'entities.abilities.thunderstorm.description':
+    '召喚一聲霹靂，對10公尺內的敵人造成{damage}點自然傷害，並使其移動速度降低50%，持續5秒。恢復你最大法力值的8%。傷害隨法術強度提高。（雷霆召喚）',
   'entities.abilities.tidecall.description':
     '為一個友方目標恢復{damage}點生命值。治療量隨法術強度提高。將過量治療前的完整治療量加入癒合水流，最多為目標最大生命值的30%。',
   'entities.abilities.tidecall.name': '潮汐召喚',

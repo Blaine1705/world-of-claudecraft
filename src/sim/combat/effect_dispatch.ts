@@ -254,6 +254,11 @@ import {
   thundercallOnArcBoltImpact,
   thundercallOnChainLightningImpact,
 } from './shaman_thundercall';
+import {
+  applyStormbreakMana,
+  magmaBurstGuaranteedCrit,
+  rollArcOverload,
+} from './shaman_thundercall_kit';
 import { runUnleashWeapon } from './shaman_unleash_weapon';
 import {
   applyStoneboundJolt,
@@ -550,6 +555,7 @@ export function runEffects(
   };
 
   if (ability.id === 'elemental_mastery') armPrimalMastery(ctx, p);
+  if (ability.id === 'thunderstorm') applyStormbreakMana(ctx, p);
   if (ability.id === 'primal_exaltation') applyPrimalExaltation(ctx, p);
   if (ability.id === 'stoneward' && target) applyStoneward(ctx, p, target);
   if (ability.id === 'lightning_shield') onThunderWardActivated(ctx, p);
@@ -873,7 +879,10 @@ export function runEffects(
           sureCrit ||
           // Fire spec (combat/fire_mage.ts): Combustion / Fire Blast / Scorch
           // execute override the OUTCOME; the roll above is still drawn.
-          fireGuaranteedCrit(ctx, p, ability.id, ability.school, target);
+          fireGuaranteedCrit(ctx, p, ability.id, ability.school, target) ||
+          // Magma Burst (combat/shaman_thundercall_kit.ts): same outcome-only
+          // override against the caster's own Cinder Jolt; the roll is still drawn.
+          magmaBurstGuaranteedCrit(ctx, p, ability.id, target);
         if (sureCrit) sureCritRolled = true;
         if (crit) dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
@@ -914,6 +923,7 @@ export function runEffects(
         if (ability.id === 'lightning_bolt') {
           thundercallOnArcBoltImpact(ctx, p);
           triggerWardCycle(ctx, p);
+          rollArcOverload(ctx, p, target, ability.id, finalDamage, resolvedDamage, threatOpts.mult);
         }
         if (ability.id === 'earth_shock') {
           consumeThunderVent(ctx, p, ability.id, target, finalDamage);
@@ -2710,6 +2720,8 @@ export function runEffects(
           hitList.push(best);
           from = best;
         }
+        let firstChainHit = 0;
+        let firstChainLanded = 0;
         for (let i = 0; i < hitList.length; i++) {
           const m = hitList[i];
           const sunwardDisc = ability.id === 'sunward_disc';
@@ -2731,7 +2743,8 @@ export function runEffects(
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           else dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
           const hpBefore = m.hp;
-          ctx.dealDamage(
+          if (i === 0) firstChainHit = Math.max(1, Math.round(dmg));
+          const chainLanded = ctx.dealDamage(
             p,
             m,
             Math.max(1, Math.round(dmg)),
@@ -2746,11 +2759,21 @@ export function runEffects(
             false,
             ability.id,
           );
+          if (i === 0) firstChainLanded = chainLanded;
           if (m.hp < hpBefore) devotionDamageTriggered = true;
         }
         if (ability.id === 'chain_lightning' && hitList.length > 0) {
           thundercallOnChainLightningImpact(ctx, p);
           triggerWardCycle(ctx, p);
+          rollArcOverload(
+            ctx,
+            p,
+            hitList[0],
+            ability.id,
+            firstChainHit,
+            firstChainLanded,
+            threatOpts.mult,
+          );
         }
         break;
       }
