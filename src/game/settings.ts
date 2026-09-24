@@ -96,6 +96,10 @@ export const SETTING_RANGES = {
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.
   cameraFov: { min: 55, max: 100, def: 60 },
+  // Action Cam shoulder offset (render/action_cam_core.ts): -1 = full left,
+  // 0 = centered behind the avatar, 1 = full right. Only read while the
+  // actionCam boolean is on; remembered across toggles.
+  actionCamShoulder: { min: -1, max: 1, def: 1 },
   // Camera zoom distance (Input.camDist), remembered across sessions like the other
   // camera settings. Range mirrors Input.zoomBy's clamp; def 12 is the shipped starting
   // distance. Set by the wheel/pinch zoom (persisted debounced from main.ts), applied back
@@ -570,6 +574,10 @@ export const BOOL_SETTINGS = {
   // passes per frame, so the player who wants the quietest water gets it as
   // an opt-in rather than an opt-out.
   waterRipples: { def: false },
+  // off by default: the over-the-shoulder Action Cam (render/action_cam_core.ts).
+  // A camera framing preference like the FOV slider; it never changes zoom or
+  // hides anything, and the side lives in actionCamShoulder.
+  actionCam: { def: false },
   // off by default: the classic "target of target" mini-frame. When on, and you have
   // a target, a small unit frame under the target frame shows who YOUR target is
   // targeting (a mob's aggro target, a player's selected target). Purely a display

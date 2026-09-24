@@ -42,7 +42,7 @@ describe('graphics-overhaul integration', () => {
     );
     expect(renderer).toContain('this.camera.position.set(cx, Math.max(cy, groundY), cz);');
     const chaseCamera = renderer.slice(
-      renderer.indexOf('const px = this.camBoom.x + this.camFeel.leadX;'),
+      renderer.indexOf('const px = this.camBoom.x + this.camFeel.leadX'),
       renderer.indexOf('// Spatial-audio listener'),
     );
     expect(chaseCamera).not.toMatch(/pose\.dist\s*[-+*/]?=/);
@@ -50,6 +50,21 @@ describe('graphics-overhaul integration', () => {
     expect(chaseCamera.match(/\bconst cy =/g)).toHaveLength(1);
     expect(chaseCamera.match(/\bconst cz =/g)).toHaveLength(1);
     expect(renderer).toContain('resolveCameraFov(this.baseFov, this.camFeel)');
+  });
+
+  it('hands the occluder fades and ambience the avatar eye, not the Action Cam aim', () => {
+    const renderer = source('src/render/renderer.ts');
+    const tail = renderer.slice(
+      renderer.indexOf('lookAtFrozen(this.camera, this.cameraLookAt);\n    // Later readers'),
+      renderer.indexOf('sink.ambience('),
+    );
+    // After the one aim, cameraLookAt is reset to the un-shifted avatar eye,
+    // and the ambience is sampled there, never at the shifted pivot.
+    expect(tail).toContain(
+      'this.cameraLookAt.set(px - shoulder.x, eyeY + shoulder.drop, pz - shoulder.z);',
+    );
+    expect(tail).toContain('sampleAmbienceInto(this.ambience, eye.x, eye.z, seed, this.weatherOn)');
+    expect(tail).not.toMatch(/zoneBiomeAt\(px|sampleAmbienceInto\([^)]*\bpx\b/);
   });
 
   it('routes reduced motion through every occluder-fade consumer', () => {

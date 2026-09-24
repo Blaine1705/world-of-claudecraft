@@ -112,6 +112,7 @@ import {
   buildInterfaceUnlockRow,
 } from './options_interface_rows';
 import { buildOptionsMenuList, type OptionsMenuRoutedAction } from './options_main_menu_controller';
+import { sliderFormatter } from './options_slider_format';
 import { optionsText } from './options_text_values';
 import {
   type BoolToggleControl,
@@ -136,7 +137,6 @@ import {
   type OptionsSettingsSource,
   optionsControlKeys,
   type SliderControl,
-  type SliderFmt,
   sliderDispatchValue,
   type ToggleControl,
   toggleIsOn,
@@ -724,13 +724,6 @@ export class OptionsWindow {
     return dropdown;
   }
 
-  private sliderFormatter(fmt: SliderFmt): (v: number) => string {
-    if (fmt === 'degrees')
-      return (v) => `${formatNumber(Math.round(v), { maximumFractionDigits: 0 })}°`;
-    if (fmt === 'oneDecimal') return (v) => formatNumber(v, { maximumFractionDigits: 1 });
-    return (v) => formatNumber(v, { style: 'percent', maximumFractionDigits: 0 });
-  }
-
   private applyControls(
     parent: HTMLElement,
     controls: OptionsControl[],
@@ -786,7 +779,7 @@ export class OptionsWindow {
     slider.dataset.focusKey = key;
     const val = document.createElement('span');
     val.className = 'set-val';
-    const fmt = this.sliderFormatter(c.fmt);
+    const fmt = sliderFormatter(c.fmt);
     // Mirror the formatted readout into the visible value AND aria-valuetext, so a
     // screen reader announces the human-meaningful value (50%, 90 degrees) instead
     // of the raw stored number. The native range already exposes role=slider plus

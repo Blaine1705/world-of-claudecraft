@@ -2318,6 +2318,14 @@ export const hudChromeStrings = {
     // off it. It sits in the Display card beside Weather because it costs
     // GPU passes, not because it is a comfort toggle.
     waterRipples: 'Water Ripples (Wakes)',
+    // Camera card opt-in (default off): the over-the-shoulder Action Cam, plus
+    // the shoulder slider (full left .. center .. full right) that only shows
+    // while it is on. The slider readout: {pct} is a formatted percent.
+    actionCam: 'Action Cam',
+    actionCamShoulder: 'Action Cam Shoulder',
+    actionCamShoulderLeft: 'Left {pct}',
+    actionCamShoulderRight: 'Right {pct}',
+    actionCamShoulderCenter: 'Center',
     // Interface panel toggle for the fixed Attack button in the first action-bar
     // slot (on by default). Off frees that slot for a normal action (drag one in;
     // its key then casts it). Right-clicking the Attack button flips this off too.

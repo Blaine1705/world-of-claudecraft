@@ -40,6 +40,7 @@ import {
   updateFollowCameraYaw,
   wrapAngle,
 } from './game/camera_follow';
+import { applyCameraViewSetting, applyCameraViewSettings } from './game/camera_view_settings';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
@@ -2523,6 +2524,7 @@ async function startGame(
     }
     if (applyPadSetting(key, value)) return;
     if (crossHotbar.applySetting(gamepad, settings, key, value)) return;
+    if (applyCameraViewSetting(renderer, settings, key, value, input)) return;
     if (key === 'voiceEnabled') {
       voice.setEnabled(settings.set('voiceEnabled', !!value));
       return;
@@ -2562,9 +2564,6 @@ async function startGame(
         break;
       case 'brightness':
         renderer.setBrightness(v);
-        break;
-      case 'cameraFov':
-        renderer.setCameraFov(v);
         break;
       case 'cameraZoom':
         // Restore the remembered zoom on boot (via the startup apply-all loop) and on Reset.
@@ -2749,7 +2748,7 @@ async function startGame(
     setNameplateDotScale(settings.nameplateDotRenderScale());
     next.reduceMotionSetting = settings.get('reduceMotion');
     next.setBrightness(settings.get('brightness'));
-    next.setCameraFov(settings.get('cameraFov'));
+    applyCameraViewSettings(next, settings);
     next.setRenderScale(settings.get('renderScale'));
     next.setWeatherEnabled(settings.get('weather') >= 0.5);
     next.camYaw = input.camYaw;

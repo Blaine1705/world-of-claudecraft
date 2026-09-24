@@ -6,6 +6,7 @@ import {
 import { BOOL_SETTINGS, SETTING_RANGES } from '../src/game/settings';
 import { AURA_TRACKS } from '../src/ui/hud/aura_tracks';
 import {
+  actionCamShoulderReadout,
   boolToggleNextValue,
   buildAudioControls,
   buildBugReportInfo,
@@ -86,6 +87,47 @@ describe('options_view: control primitive dispatch (cluster 1)', () => {
   it('settingBoolToggle flips the stored boolean', () => {
     expect(boolToggleNextValue(true)).toBe(false);
     expect(boolToggleNextValue(false)).toBe(true);
+  });
+
+  it('Action Cam shows its shoulder slider only while it is on', () => {
+    const env: OptionsEnv = { touch: false, nativeShell: false };
+    const off = buildGraphicsControls(makeSource(), env);
+    expect(find(off, 'actionCam')).toMatchObject({
+      control: 'boolToggle',
+      on: false,
+      rerender: true,
+    });
+    expect(find(off, 'actionCamShoulder')).toBeUndefined();
+
+    const src = makeSource({ actionCamShoulder: -0.4 }, { actionCam: true });
+    const on = keysOf(buildGraphicsControls(src, env));
+    expect(on[on.indexOf('actionCam') + 1]).toBe('actionCamShoulder');
+    // Full left through center to full right, on the shoulder readout.
+    expect(find(buildGraphicsControls(src, env), 'actionCamShoulder')).toMatchObject({
+      control: 'slider',
+      min: -1,
+      max: 1,
+      value: -0.4,
+      fmt: 'shoulder',
+    });
+    expect(SETTING_RANGES.actionCamShoulder).toMatchObject({ min: -1, max: 1, def: 1 });
+    expect(BOOL_SETTINGS.actionCam.def).toBe(false);
+  });
+
+  it('the shoulder readout names the side and its strength, or Center', () => {
+    expect(actionCamShoulderReadout(-1)).toEqual({
+      key: 'hudChrome.options.actionCamShoulderLeft',
+      pct: 1,
+    });
+    expect(actionCamShoulderReadout(0.6)).toEqual({
+      key: 'hudChrome.options.actionCamShoulderRight',
+      pct: 0.6,
+    });
+    expect(actionCamShoulderReadout(0)).toEqual({
+      key: 'hudChrome.options.actionCamShoulderCenter',
+      pct: 0,
+    });
+    expect(actionCamShoulderReadout(0.01).key).toBe('hudChrome.options.actionCamShoulderCenter');
   });
 
   it('a slider descriptor carries the live value, range, step and format', () => {
@@ -185,8 +227,10 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'dynamicLights',
       'particleEffects',
       'note:hudChrome.options.gfxEffectsNote',
-      // Camera card (column 2 under Lighting).
+      // Camera card (column 2 under Lighting). The Action Cam shoulder picker
+      // only joins while Action Cam is on (off in this source).
       'cameraSpeed',
+      'actionCam',
       // Display card (full width).
       'renderScale',
       'brightness',

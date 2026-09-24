@@ -541,7 +541,9 @@ const MONOLITHS: MonolithRow[] = [
     // (src/ui/host_diag_section_controller.ts over the pure
     // src/ui/host_diag_view.ts), not a sub-view of this window. Exact count,
     // zero slack.
-    ceiling: 2821,
+    // LOWERED 2821 -> 2814 when the slider readouts (plus the new Action Cam
+    // shoulder readout) moved to src/ui/options_slider_format.ts.
+    ceiling: 2814,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -931,7 +933,10 @@ const MONOLITHS: MonolithRow[] = [
     // 12790 -> 12789 when the Warrior kit textures moved to demand loading
     // (the boot-time sheet upload loop and its comment went, the kit host
     // gained its assets line). Exact count.
-    ceiling: 12789,
+    // LOWERED 12789 -> 12787 when the camera-follow ambience readout moved to
+    // src/render/ambience_state_core.ts and the Action Cam landed as the
+    // two-call ActionCamRig (src/render/action_cam_core.ts).
+    ceiling: 12787,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1337,7 +1342,9 @@ const MONOLITHS: MonolithRow[] = [
     // click / Enter-Space / double-click wiring moved into wireCharselectRow
     // (src/ui/charselect_hints.ts), which skips activations from inside the
     // lockout disclosure instead of stopping propagation there.
-    ceiling: 11276,
+    // LOWERED 11276 -> 11275: the camera FOV case moved into
+    // src/game/camera_view_settings.ts alongside the Action Cam keys.
+    ceiling: 11275,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

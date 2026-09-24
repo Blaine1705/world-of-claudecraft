@@ -63,7 +63,26 @@ export function withGraphicsDraft<K extends string>(
 // choice an enumerated set.
 
 /** How a slider's readout is formatted; the painter maps this to a formatter. */
-export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal';
+// 'shoulder' reads a -1..1 offset as "Left 60%" / "Center" / "Right 100%"
+// (actionCamShoulderReadout below resolves which key and percent).
+export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal' | 'shoulder';
+
+/** The Action Cam shoulder slider's readout: which label key, and the
+ *  magnitude as a 0..1 fraction for the percent formatter. */
+export function actionCamShoulderReadout(v: number): {
+  key: TranslationKey;
+  pct: number;
+} {
+  const pct = Math.min(1, Math.abs(v));
+  if (pct < 0.025) return { key: 'hudChrome.options.actionCamShoulderCenter', pct: 0 };
+  return {
+    key:
+      v < 0
+        ? 'hudChrome.options.actionCamShoulderLeft'
+        : 'hudChrome.options.actionCamShoulderRight',
+    pct,
+  };
+}
 
 /** Which Interface-panel tab a control belongs to. The Interface panel is split
  *  into four tabs (the interface list grew to ~40 rows in one scroll); every
@@ -656,6 +675,12 @@ export function buildGraphicsSections(
   const camera: OptionsControl[] = [slider(s, 'cameraSpeed', 'hud.options.cameraSpeed')];
   // Camera Speed only scales mouselook; touch gets a dedicated look-rate slider.
   if (env.touch) camera.push(slider(s, 'touchLookSpeed', 'hud.options.touchLookSpeed'));
+  // Action Cam: the opt-in over-the-shoulder framing. The shoulder slider only
+  // shows while it is on, so the toggle re-renders the card.
+  camera.push(boolToggle(s, 'actionCam', 'hudChrome.options.actionCam', { rerender: true }));
+  if (s.bool('actionCam')) {
+    camera.push(slider(s, 'actionCamShoulder', 'hudChrome.options.actionCamShoulder', 'shoulder'));
+  }
 
   const display: OptionsControl[] = [
     slider(s, 'renderScale', 'hud.options.renderQuality'),
