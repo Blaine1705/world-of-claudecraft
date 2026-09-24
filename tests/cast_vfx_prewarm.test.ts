@@ -16,8 +16,11 @@ import type { LinkedProgramLike } from '../src/render/linked_program_touch';
 
 /** A pooled VFX mesh: `renderCategory` is the tag abilityVfxCompileMaterials
  *  selects on, so this is what the gate's scene walk collects. */
-function vfxMesh(name: string): THREE.Mesh {
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial());
+function vfxMesh(
+  name: string,
+  material: THREE.Material = new THREE.MeshBasicMaterial(),
+): THREE.Mesh {
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
   mesh.name = name;
   mesh.userData.renderCategory = 'vfx';
   return mesh;
@@ -111,6 +114,61 @@ describe('the scene cast-VFX gate over three', () => {
     expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
   });
 
+  it('compiles two clones on one program as one unit, and opens on that one proof', async () => {
+    // A pool clones one material per slot. three hands the second clone the
+    // program the first linked (same cache key, acquireProgram returns the
+    // existing WebGLProgram), so the clone never needs its own link and the
+    // gate must not wait for a currentProgram it will only get at first draw.
+    const proto = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false });
+    const clone = proto.clone();
+    clone.color.setHex(0xff2040);
+    const first = vfxMesh('slot-0', proto);
+    const second = vfxMesh('slot-1', clone);
+    const { scene, host, webgl, readiness, programs } = harness([first, second]);
+    const shared = program();
+    programs.set(proto, shared);
+    let settle: () => void = () => {};
+    const units = castVfxProgramUnits(
+      scene,
+      null,
+      host,
+      webgl,
+      () =>
+        new Promise<void>((resolve) => {
+          settle = resolve;
+        }),
+    );
+    expect(units.map((unit) => unit.roots)).toEqual([[first]]);
+    const run = units[0].run();
+    // Held while the shared program is not proved.
+    expect(readiness.ready()).toBe(false);
+    expect(readiness.snapshot().pending).toBe(1);
+    settle();
+    await run;
+    expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
+  });
+
+  it('keeps two programs apart: each holds the gate until its own unit settles', async () => {
+    const opaque = vfxMesh('opaque');
+    const transparent = vfxMesh('glow', new THREE.MeshBasicMaterial({ transparent: true }));
+    const { scene, host, webgl, readiness, programs, materialOf } = harness([opaque, transparent]);
+    const points = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial());
+    points.userData.renderCategory = 'vfx';
+    scene.add(points);
+    for (const material of [materialOf(opaque), materialOf(transparent), points.material]) {
+      programs.set(material as THREE.Material, program());
+    }
+    const units = castVfxProgramUnits(scene, null, host, webgl, () => Promise.resolve());
+    expect(units.map((unit) => unit.roots?.[0])).toEqual([opaque, transparent, points]);
+    await units[0].run();
+    await units[2].run();
+    // The transparent program is the one really unlinked: it holds the gate.
+    expect(readiness.ready()).toBe(false);
+    expect(readiness.snapshot().pending).toBe(1);
+    await units[1].run();
+    expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
+  });
+
   it('records nothing for a compile that failed: an unseen link is not a proof', async () => {
     const mesh = vfxMesh('ring');
     const { scene, host, webgl, readiness, programs, materialOf } = harness([mesh]);
@@ -126,7 +184,7 @@ describe('the scene cast-VFX gate over three', () => {
     // The record answers per program while the gate asks per material, so a
     // boolean would be an answer about a program that can already be gone.
     const ready = vfxMesh('ring');
-    const pending = vfxMesh('decal');
+    const pending = vfxMesh('decal', new THREE.MeshBasicMaterial({ transparent: true }));
     const h = harness([ready, pending]);
     const proved = program();
     markProgramReady(proved);
@@ -141,7 +199,7 @@ describe('the scene cast-VFX gate over three', () => {
     // latched on the MATERIAL would keep answering for the program that is
     // gone and let a cast draw on one still in flight.
     const ring = vfxMesh('ring');
-    const decal = vfxMesh('decal');
+    const decal = vfxMesh('decal', new THREE.MeshBasicMaterial({ transparent: true }));
     const h = harness([ring, decal]);
     const a = program();
     markProgramReady(a);
