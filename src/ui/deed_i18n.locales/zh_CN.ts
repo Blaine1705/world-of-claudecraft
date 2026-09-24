@@ -858,4 +858,8 @@ export const table: DeedLocaleTable = {
 
     name: '传奇缔造者',
   },
+  exp_harbor_to_harbor: {
+    name: '港口到港口',
+    desc: '乘坐东溪渡船前往烛港，然后再返航。',
+  },
 };

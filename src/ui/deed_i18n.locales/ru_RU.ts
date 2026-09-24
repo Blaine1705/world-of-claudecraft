@@ -1148,4 +1148,8 @@ export const table: DeedLocaleTable = {
 
     name: 'Творец легенд',
   },
+  exp_harbor_to_harbor: {
+    name: 'От гавани к гавани',
+    desc: 'Переправьтесь на пароме из Истврука в Викхарбор и обратно.',
+  },
 };

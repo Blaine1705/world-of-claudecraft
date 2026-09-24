@@ -222,6 +222,19 @@ describe('sailing (the real Sim)', () => {
     expect(meta.deedStats.visited.has('ferry:eastbrook_wickharbor')).toBe(true);
   });
 
+  it('both crossings earn the Harbor to Harbor deed', () => {
+    const p = sim.player;
+    const meta = sim.players.get(p.id);
+    if (!meta) throw new Error('meta');
+    // the way back already sailed (a save carries the one-way mark)
+    meta.deedStats.visited.add('ferry:wickharbor_eastbrook');
+    expect(meta.deedsEarned.has('exp_harbor_to_harbor')).toBe(false);
+    setClock(sim, DEPART_EAST - 0.5);
+    placeOnDeck(sim, p, 0, 1.5, 0.8);
+    tickSeconds(sim, 1 + T.departing + T.atSea + T.arriving + 1.5);
+    expect(meta.deedsEarned.has('exp_harbor_to_harbor')).toBe(true);
+  });
+
   it('leaves a player on the pier behind', () => {
     const p = sim.player;
     setClock(sim, DEPART_EAST - 0.5);

@@ -1030,4 +1030,8 @@ export const table: DeedLocaleTable = {
 
     name: '伝説を生む者',
   },
+  exp_harbor_to_harbor: {
+    name: '港から港へ',
+    desc: 'イーストブルックの渡し船でウィックハーバーへ渡り、また戻る。',
+  },
 };
