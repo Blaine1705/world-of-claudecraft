@@ -11526,7 +11526,7 @@ export const en_CA: EnTranslations = {
       },
       "earthquake": {
         "name": "Faultwake",
-        "description": "Shake an 8-yard area for 6 sec, dealing {damage} Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 100% more damage and consume all Thunder."
+        "description": "Shake an 8-yard area for 6 sec, dealing {damage} Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: consume all Thunder, dealing 20% more damage per Thunder (100% at 5)."
       },
       "heroic_strike": {
         "name": "Reaver Strike",
@@ -12125,7 +12125,19 @@ export const en_CA: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
+        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)"
+      },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
       },
       "rockbiter_weapon": {
         "name": "Stonebound Weapon",
@@ -12137,7 +12149,7 @@ export const en_CA: EnTranslations = {
       },
       "earth_shock": {
         "name": "Earthen Jolt",
-        "description": "Deal {damage} Nature damage. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 125% more damage and consume all Thunder. Stonebound: force the target to attack you for 3 sec."
+        "description": "Deal {damage} Nature damage. Damage increases with Spell Power. Thundercall: consume all Thunder, dealing 25% more damage per Thunder (125% at 5). Stonebound: force the target to attack you for 3 sec."
       },
       "lightning_shield": {
         "name": "Thunder Ward",
@@ -21360,8 +21372,8 @@ export const en_CA: EnTranslations = {
       },
       "stormkindled": {
         "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "bonus2": "Arc Overload triggers 30 percent of the time. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent, and Magma Burst deals 20 percent more damage."
       },
       "vale_arcanist": {
         "name": "Vale Arcanist's Regalia",

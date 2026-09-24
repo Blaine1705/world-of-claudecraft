@@ -12127,6 +12127,18 @@ export const pt_BR: EnTranslations = {
         "name": "Reservatório de Trovão",
         "description": "Passiva: o Raio em Arco e o Relâmpago Bifurcado concedem Trovão, até 5. Com 5 de Trovão, o Abalo Terreno causa 125% mais dano ou o Terremoto causa 100% mais, e então consome todo o Trovão. (Chamado do Trovão)"
       },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
+      },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
         "description": "Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano adicional. Aprimoramento ganha ainda 40% de armadura e 20% de Vigor, sofre 15% menos dano e é imune a acertos críticos de criaturas e gera 2,75 vezes mais ameaça. Abalo Terreno força seu alvo a vos atacar por 3 s, e Salvaguarda do Trovão concede 10% de redução de dano por 3 s."

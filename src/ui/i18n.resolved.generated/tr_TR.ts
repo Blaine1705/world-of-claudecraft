@@ -12127,6 +12127,18 @@ export const tr_TR: EnTranslations = {
         "name": "Gök Gürültüsü Haznesi",
         "description": "Pasif: Ark Oku ve Çatallı Yıldırım Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)"
       },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
+      },
       "rockbiter_weapon": {
         "name": "Stonebound Silahı",
         "description": "Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %40 zırh ve %20 Dayanıklılık kazanır, %15 daha az hasar alır ve yaratıkların kritik vuruşlarına karşı bağışıktır ve 2,75 katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir."
