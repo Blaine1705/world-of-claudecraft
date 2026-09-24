@@ -1005,6 +1005,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the arena match strip, facet-routed',
   },
   {
+    call: 'this.ferryHud.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the scheduled ferry countdown panel and the at-sea card class (the fade itself is a CSS transition), facet-routed',
+  },
+  {
     call: 'this.updateMapWindow',
     band: 'medium',
     gate: "$('#map-window').style.display === 'block'",
@@ -1796,7 +1803,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 90 -> 91: the always-on pinned-recipe tracker
       // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
       // tracker's exact slow-band row shape.
-    ).toEqual({ window: 49, chrome: 91, none: 17 });
+    ).toEqual({ window: 49, chrome: 92, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

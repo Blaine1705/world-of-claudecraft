@@ -1383,7 +1383,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  'd8d1ff3e12d29df640618feb3c4b4fcbc77eb65b6ae9224620f9977d33230778';
+  // Re-minted for the Eastbrook ferry's Phase 2: the renderer leaf gained the at-sea passenger hide and moved two helpers out. No capture was retaken.
+  '588f8aef81b10e46ef8117f02190431fd3b3fb1f61d884b56ffa6de47ea7641a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1395,7 +1396,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  'e651995fbf1ac8413176d75b35b5da91b9a241918ea183430642a9c6b51d3fd5';
+  // Re-minted for the Eastbrook ferry's Phase 2: the renderer leaf gained the at-sea passenger hide and moved two helpers out. No capture was retaken.
+  'e7a19a56c2928525ec3de02443a01fb6a54b18992d15d4e3077c8b9094857708';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2772,7 +2774,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // devalue audit floor: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-    ).toBe('7c84c7c53ca7d33345e15966eda0f4e73b8c6cfdba707b4f26aa04db5fe37065');
+      // Eastbrook ferry Phase 2: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+    ).toBe('a4af633cd8b71530e98246d58e0d2e5de19bf5bccf86b4b14f9d32d39301fdfb');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

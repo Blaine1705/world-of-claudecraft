@@ -689,7 +689,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  'e651995fbf1ac8413176d75b35b5da91b9a241918ea183430642a9c6b51d3fd5';
+  // Re-minted for the Eastbrook ferry's Phase 2: the renderer leaf gained the at-sea passenger hide and moved two helpers out. No capture was retaken.
+  'e7a19a56c2928525ec3de02443a01fb6a54b18992d15d4e3077c8b9094857708';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
