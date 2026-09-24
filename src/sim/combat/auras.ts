@@ -66,6 +66,7 @@ import { priestOnAuraEnded } from './priest/talents';
 import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
 import { tickShamanTalentAura } from './shaman_talents';
+import { thundercallOnDotTick } from './shaman_thundercall_kit';
 import { stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
@@ -346,7 +347,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             school: a.school,
             fx: 'tick',
           });
-          ctx.dealDamage(
+          const tickLanded = ctx.dealDamage(
             dotSource,
             e,
             tickDamage,
@@ -379,6 +380,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.finalDamage === true,
           );
           vespersOnDotTick(ctx, e, a);
+          thundercallOnDotTick(ctx, dotSource, a, tickLanded);
           druidEngineOnBleedTick(ctx, dotSource, a);
           if (a.leechPct !== undefined) {
             const src = dotSource;
