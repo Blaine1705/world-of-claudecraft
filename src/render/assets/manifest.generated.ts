@@ -168,6 +168,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/biome/dungeon_wall_stone.glb": "/media/models/biome/dungeon_wall_stone.4455aa833d8e.glb",
   "models/biome/dungeon_wood_structure.glb": "/media/models/biome/dungeon_wood_structure.3b58a9c6d540.glb",
   "models/biome/dungeon_wood_support.glb": "/media/models/biome/dungeon_wood_support.b18dfec27e68.glb",
+  "models/biome/eastbrook_ferry.glb": "/media/models/biome/eastbrook_ferry.90a13fcba82f.glb",
   "models/biome/hex_anchor.glb": "/media/models/biome/hex_anchor.f1683fd9f563.glb",
   "models/biome/hex_barracks.glb": "/media/models/biome/hex_barracks.a072e4884935.glb",
   "models/biome/hex_barrel.glb": "/media/models/biome/hex_barrel.68029192955f.glb",

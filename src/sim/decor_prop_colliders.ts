@@ -1,6 +1,6 @@
 import type { Collider } from './colliders';
 import type { WorldContent } from './types';
-import { groundHeight } from './world';
+import { groundHeight, WATER_LEVEL } from './world';
 
 type DecorProp = NonNullable<WorldContent['props']['decorProps']>[number];
 
@@ -29,10 +29,14 @@ export function buildDecorPropColliders(seed: number, decorProps: DecorProp[]): 
   const out: Collider[] = [];
   for (const d of decorProps) {
     const cameraTopY = topY(seed, d.x, d.z, d.h ?? 4);
+    const supportBaseY =
+      d.float === undefined
+        ? groundHeight(d.x, d.z, seed)
+        : Math.max(groundHeight(d.x, d.z, seed), WATER_LEVEL - d.float);
     const stand =
       d.standableTop === undefined
         ? {}
-        : { moveTopY: topY(seed, d.x, d.z, d.standableTop), standable: true as const };
+        : { moveTopY: supportBaseY + d.standableTop, standable: true as const };
     if (d.hw !== undefined && d.hd !== undefined) {
       out.push({
         type: 'obb',

@@ -263,6 +263,7 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexrTowerA: { url: '/models/biome/hexr_tower_a.glb', kit: 'khex' },
   hexbTowerB: { url: '/models/biome/hexb_tower_b.glb', kit: 'khex' },
   hexShipBlue: { url: '/models/biome/hex_ship_blue.glb', kit: 'khex' },
+  eastbrookFerry: { url: '/models/biome/eastbrook_ferry.glb', kit: 'ferry' },
   hexShipRed: { url: '/models/biome/hex_ship_red.glb', kit: 'khex' },
   hexShipGreen: { url: '/models/biome/hex_ship_green.glb', kit: 'khex' },
   hexBoat: { url: '/models/biome/hex_boat.glb', kit: 'khex' },

@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { PROPS } from '../src/sim/data';
 import { buildDecorPropColliders } from '../src/sim/decor_prop_colliders';
-import { groundHeight } from '../src/sim/world';
+import { groundHeight, WATER_LEVEL } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // Direct unit coverage for src/sim/decor_prop_colliders.ts, extracted out of
 // src/sim/colliders.ts (see that module's header for the contract). These
@@ -61,6 +62,16 @@ describe('buildDecorPropColliders', () => {
     if (c.type !== 'obb') return;
     expect(c.standable).toBe(true);
     expect(c.moveTopY).toBeCloseTo(groundHeight(X, Z, SEED) + 1.6, 6);
+  });
+
+  it('floated deck collision follows the waterline, not the seabed', () => {
+    const x = -121;
+    const z = -47;
+    const [c] = buildDecorPropColliders(WORLD_SEED, [
+      { key: 'ferry', x, z, float: 0.25, hw: 3.5, hd: 11.5, standableTop: 2.1 },
+    ]);
+    expect(groundHeight(x, z, WORLD_SEED)).toBeLessThan(WATER_LEVEL - 0.25);
+    expect(c.moveTopY).toBeCloseTo(WATER_LEVEL - 0.25 + 2.1, 6);
   });
 
   it('standableTop with no footprint at all warns and degrades to walk-through, never throws', () => {

@@ -2054,10 +2054,15 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // is already below the sea. These berths were measured against the cove
     // bathymetry so every hull is wet across its whole footprint, and each lies
     // alongside a pier in the gap the round 6 respacing opened.
-    { key: 'hexShipBlue', x: -115, z: -45, rot: -1.6, scale: 7, r: 4.6, h: 11, float: 0.55 },
+    // The first ship is now the walkable ferry prototype. Its open side gates
+    // face the middle pier and the narrow berth between the working piers.
+    {
+      key: 'eastbrookFerry', x: -121, z: -47, rot: -Math.PI / 2,
+      hw: 3.5, hd: 11.5, h: 11.6, float: 0.25, standableTop: 2.1,
+    },
     { key: 'hexShipBlue', x: -115, z: -63, rot: 1.55, scale: 7, r: 4.6, h: 11, float: 0.55 },
     // a smaller fishing hull riding the fairway west of the ferry berth
-    { key: 'seaBoatFishing', x: -122, z: -54, rot: 0, scale: 2.5, r: 2.4, h: 7, float: 0.5 },
+    { key: 'seaBoatFishing', x: -119, z: -79, rot: 0, scale: 2.5, r: 2.4, h: 7, float: 0.5 },
     // dinghies riding the water in the pier gaps, Wickharbor-style
     // the two dinghies pulled off the pad and into real water beside the piers
     { key: 'hexBoat', x: -107.5, z: -47, rot: 0.7, scale: 6, float: 0.1 },
