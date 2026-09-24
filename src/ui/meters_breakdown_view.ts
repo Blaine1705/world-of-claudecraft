@@ -129,6 +129,8 @@ function rankRows(
   const shown = rowCap > 0 && kept.length > rowCap ? kept.slice(0, rowCap - 1) : kept;
   const rows: BreakdownRow[] = shown.map((entry) => ({
     ...entry,
+    abilityId: entry.abilityId,
+    targets: entry.targets,
     share: shareOf(entry.amount),
     fill: fillOf(entry.amount),
     folded: 0,

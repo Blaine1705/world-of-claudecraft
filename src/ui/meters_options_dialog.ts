@@ -314,7 +314,15 @@ export class MetersOptionsDialog {
         ],
         s.opacity,
         (val) => {
-          this.update({ opacity: val as MeterOpacity });
+          const op = val as MeterOpacity;
+          const bgAlpha =
+            op === 'transparent' ? 0 : s.backgroundAlpha === 0 ? 76 : s.backgroundAlpha;
+          this.update({ opacity: op, backgroundAlpha: bgAlpha });
+          const slider = this.contentEl?.querySelector<HTMLInputElement>('input[type="range"]');
+          if (slider && slider.nextElementSibling) {
+            slider.value = String(bgAlpha);
+            slider.nextElementSibling.textContent = `${bgAlpha}%`;
+          }
         },
       ),
     );
@@ -324,13 +332,24 @@ export class MetersOptionsDialog {
       this.createSliderRow(
         t('hudChrome.meters.bgOpacity'),
         t('hudChrome.meters.bgOpacityDesc'),
-        20,
+        0,
         100,
         2,
         s.backgroundAlpha ?? 76,
         '%',
         (val) => {
-          this.update({ backgroundAlpha: val });
+          const newOp: MeterOpacity =
+            val === 0 ? 'transparent' : s.opacity === 'transparent' ? 'glass' : s.opacity;
+          this.update({
+            backgroundAlpha: val,
+            opacity: newOp,
+          });
+          const btnGroup = this.contentEl?.querySelector('.mt-opts-btn-group');
+          if (btnGroup) {
+            for (const b of btnGroup.querySelectorAll<HTMLButtonElement>('.mt-opts-choice-btn')) {
+              b.classList.toggle('active', b.dataset.id === newOp);
+            }
+          }
         },
       ),
     );
@@ -479,6 +498,11 @@ export class MetersOptionsDialog {
             id: 'detailed',
             label: t('hudChrome.meters.optNumDetailed'),
             desc: t('hudChrome.meters.optNumDetailedDesc'),
+          },
+          {
+            id: 'damage_dps',
+            label: t('hudChrome.meters.optNumDamageDps'),
+            desc: t('hudChrome.meters.optNumDamageDpsDesc'),
           },
         ],
         s.numberFormat,
@@ -671,6 +695,12 @@ export class MetersOptionsDialog {
         name: t('hudChrome.meters.presetRaidName'),
         desc: t('hudChrome.meters.presetRaidDesc'),
         badge: t('hudChrome.meters.presetRaidBadge'),
+      },
+      {
+        id: 'pro_gradient',
+        name: t('hudChrome.meters.presetProGradientName'),
+        desc: t('hudChrome.meters.presetProGradientDesc'),
+        badge: t('hudChrome.meters.presetProGradientBadge'),
       },
     ];
 
@@ -1050,6 +1080,7 @@ export class MetersOptionsDialog {
     for (const opt of options) {
       const btn = document.createElement('button');
       btn.type = 'button';
+      btn.dataset.id = opt.id;
       btn.className = `mt-opts-choice-btn${selectedValue === opt.id ? ' active' : ''}`;
       btn.innerHTML = `
         <span class="mt-opts-choice-title">${opt.label}</span>

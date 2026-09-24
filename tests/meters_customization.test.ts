@@ -14,6 +14,7 @@ import {
   importProfileString,
   loadMetersSettings,
   type MetersSettings,
+  PRESETS,
   saveMetersSettings,
 } from '../src/ui/meters_settings';
 import type { IWorld } from '../src/world_api';
@@ -389,7 +390,7 @@ describe('Details! Options Dialog', () => {
     // Switch to Presets
     (tabButtons?.[5] as HTMLElement | undefined)?.click();
     const presetCards = modal?.querySelectorAll('.mt-opts-preset-card');
-    expect(presetCards?.length).toBe(4);
+    expect(presetCards?.length).toBe(5);
 
     // Switch to Profiles
     (tabButtons?.[6] as HTMLElement | undefined)?.click();
@@ -580,12 +581,20 @@ describe('Details! Options Dialog', () => {
 
     // Click Apply on Classic WoW preset (second card)
     const applyButtons = modal?.querySelectorAll('.mt-opts-btn-apply');
-    expect(applyButtons && applyButtons.length >= 2).toBe(true);
+    expect(applyButtons && applyButtons.length >= 5).toBe(true);
     (applyButtons?.[1] as HTMLElement | undefined)?.click();
 
     expect(currentSettings.themePreset).toBe('classic');
     expect(currentSettings.barTexture).toBe('smooth');
     expect(currentSettings.numberFormat).toBe('detailed');
+
+    // Click Apply on Pro Gradient preset (fifth card)
+    (applyButtons?.[4] as HTMLElement | undefined)?.click();
+    expect(currentSettings.themePreset).toBe('pro_gradient');
+    expect(currentSettings.barTexture).toBe('gradient');
+    expect(currentSettings.numberFormat).toBe('damage_dps');
+    expect(currentSettings.barHeight).toBe(22);
+    expect(currentSettings.barSpacing).toBe(0);
 
     dialog.close();
   });
@@ -788,5 +797,54 @@ describe('Details! Options Dialog', () => {
     expect(acts.includes('tool:timeline')).toBe(false);
     expect(acts.includes('tool:export_text')).toBe(false);
     expect(acts.includes('tool:report_chat')).toBe(false);
+  });
+
+  it('renders damage_dps number format and breakdown targets in tooltip', () => {
+    document.body.innerHTML = MARKUP;
+    const world = fakeWorld();
+    let tipHtml = '';
+    const meters = new Meters(world, {
+      attachTooltip: (el, fn) => {
+        el.addEventListener('mouseenter', () => {
+          tipHtml = fn();
+        });
+      },
+    });
+
+    meters.updateSettings({
+      ...DEFAULT_METERS_SETTINGS,
+      ...PRESETS.pro_gradient,
+      numberFormat: 'damage_dps',
+      showDps: true,
+      showPercent: false,
+    });
+
+    meters.onEvent({
+      type: 'damage',
+      sourceId: 1,
+      targetId: 50,
+      targetName: 'Swift Lynx',
+      amount: 24000,
+      crit: false,
+      school: 'physical',
+      ability: 'Attack',
+      abilityId: 'attack',
+      kind: 'hit',
+    } as unknown as SimEvent);
+    meters.render(true);
+
+    const row = document.querySelector('#meters-window .mt-row') as HTMLElement;
+    expect(row).not.toBeNull();
+    const numEl = row.querySelector('.mt-num');
+    expect(numEl?.innerHTML).toContain('mt-val-sep');
+    expect(numEl?.textContent).toContain('|');
+    expect(numEl?.textContent).toContain('24.0k');
+
+    // Trigger hover tooltip
+    row.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(tipHtml).toContain('mt-tip-targets-section');
+    expect(tipHtml).toContain('Ignivar');
+    expect(tipHtml).toContain('mt-tip-target-bar');
+    expect(tipHtml).toContain('mt-tip-icon');
   });
 });

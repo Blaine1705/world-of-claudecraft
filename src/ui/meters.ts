@@ -2139,13 +2139,23 @@ export class MetersPanel {
           row.num.innerHTML = `<span class="mt-val-amount">${this.formatVal(value)}</span>${pct}`;
         } else {
           const rate = value / Math.max(1, enc.duration);
-          const dps = this.settings.showDps
-            ? ` <span class="mt-val-rate">${fmtPerSecond(rate)}</span>`
-            : '';
-          const pct = this.settings.showPercent
-            ? ` <span class="mt-val-pct">${fmtPercent(percent)}</span>`
-            : '';
-          row.num.innerHTML = `<span class="mt-val-amount">${this.formatVal(value)}</span>${dps}${pct}`;
+          if (this.settings.numberFormat === 'damage_dps') {
+            const dps = this.settings.showDps
+              ? ` <span class="mt-val-sep">|</span> <span class="mt-val-rate">${fmtNum(rate)}</span>`
+              : '';
+            const pct = this.settings.showPercent
+              ? ` <span class="mt-val-pct">${fmtPercent(percent)}</span>`
+              : '';
+            row.num.innerHTML = `<span class="mt-val-amount">${this.formatVal(value)}</span>${dps}${pct}`;
+          } else {
+            const dps = this.settings.showDps
+              ? ` <span class="mt-val-rate">${fmtPerSecond(rate)}</span>`
+              : '';
+            const pct = this.settings.showPercent
+              ? ` <span class="mt-val-pct">${fmtPercent(percent)}</span>`
+              : '';
+            row.num.innerHTML = `<span class="mt-val-amount">${this.formatVal(value)}</span>${dps}${pct}`;
+          }
         }
         row.el.classList.toggle('aggro', hasAggro);
         const isPinned =
@@ -2855,7 +2865,11 @@ export class MetersPanel {
         value: fmtNum(model.total),
       });
       const body = model.rows.map((r) => this.breakdownRowHtml(r, false)).join('');
-      return `${title}${summaryCard}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>`;
+      const targetsHtml =
+        isThreat || this.tab === 'interrupts' || this.tab === 'deaths'
+          ? ''
+          : this.breakdownTargetsHtml(entries, enc.duration);
+      return `${title}${summaryCard}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>${targetsHtml}`;
     }
 
     const grouped = buildGroupedMeterBreakdown(entries, enc.duration);
@@ -2872,7 +2886,8 @@ export class MetersPanel {
         return `${head}<div class="mt-tip-group">${rows}</div>`;
       })
       .join('');
-    return `${title}${summaryCard}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>`;
+    const targetsHtml = this.breakdownTargetsHtml(entries, enc.duration);
+    return `${title}${summaryCard}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>${targetsHtml}`;
   }
 
   /** A contributor's subtotal line: the member or one of their pets. */
@@ -2906,11 +2921,61 @@ export class MetersPanel {
         }),
       }),
     });
+    let iconHtml = '';
+    try {
+      const rawKey =
+        row.abilityId || (row.ability ? row.ability.toLowerCase().replace(/\s+/g, '_') : 'attack');
+      const url = iconDataUrl('ability', rawKey, 16);
+      if (url) {
+        iconHtml = `<span class="mt-tip-icon" style="background-image:url('${url}')"></span>`;
+      }
+    } catch {
+      iconHtml = '';
+    }
     return (
       `<div class="mt-tip-row">` +
       `<span class="mt-tip-bar" style="width:${Math.max(2, row.fill * 100)}%"></span>` +
+      iconHtml +
       `<span class="mt-tip-name">${esc(label)}</span>` +
       `<span class="mt-tip-val">${esc(value)}</span>` +
+      `</div>`
+    );
+  }
+
+  private breakdownTargetsHtml(entries: BreakdownEntry[], duration: number): string {
+    const targetMap = new Map<string, number>();
+    for (const e of entries) {
+      if (e.targets && e.targets.size > 0) {
+        for (const [name, amt] of e.targets) {
+          targetMap.set(name, (targetMap.get(name) ?? 0) + amt);
+        }
+      }
+    }
+    if (targetMap.size === 0) return '';
+
+    const sorted = [...targetMap.entries()].sort((a, b) => b[1] - a[1]);
+    const maxVal = sorted[0][1] || 1;
+    const dur = Math.max(1, duration);
+
+    const rows = sorted
+      .slice(0, 5)
+      .map(([name, amt]) => {
+        const fillPct = Math.max(2, (amt / maxVal) * 100);
+        const dps = amt / dur;
+        return (
+          `<div class="mt-tip-target-row">` +
+          `<span class="mt-tip-target-bar" style="width:${fillPct}%"></span>` +
+          `<span class="mt-tip-target-name">${esc(name)}</span>` +
+          `<span class="mt-tip-target-val">${fmtNum(amt)} <span class="mt-val-sep">|</span> ${fmtNum(dps)}</span>` +
+          `</div>`
+        );
+      })
+      .join('');
+
+    return (
+      `<div class="mt-tip-targets-section">` +
+      `<div class="mt-tip-targets-hdr">${esc(t('hudChrome.meters.targetsHeader'))}</div>` +
+      `<div class="mt-tip-targets-rows">${rows}</div>` +
       `</div>`
     );
   }

@@ -8550,6 +8550,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s} s',
   'hudChrome.meters.breakdownOther': 'Otros ({count})',
+  'hudChrome.meters.targetsHeader': 'Objetivos',
   'hudChrome.meters.breakdownRow': '{value} ({percent})',
   'hudChrome.meters.breakdownSummary': '{tab}: {value}',
   'hudChrome.meters.melee': 'Cuerpo a cuerpo',
@@ -8627,6 +8628,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.optNumCompactDesc': 'Ejemplo: 145.2k, 1.2M',
   'hudChrome.meters.optNumDetailed': 'Detallado Completo',
   'hudChrome.meters.optNumDetailedDesc': 'Ejemplo: 145,200, 1,240,500',
+  'hudChrome.meters.optNumDamageDps': 'Daño | DPS',
+  'hudChrome.meters.optNumDamageDpsDesc': 'Ejemplo: 239.2k | 18.4k (telemetria limpia)',
   'hudChrome.meters.showDps': 'Mostrar Tasa por Segundo (DPS / HPS)',
   'hudChrome.meters.showDpsDesc': 'Muestra la tasa de daño o sanacion por segundo en cada barra.',
   'hudChrome.meters.showPercent': 'Mostrar Porcentaje (%)',
@@ -8673,6 +8676,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.presetRaidDesc':
     'Diseñado para bandas: densidad compacta de 18px, limite de 10 barras, total de grupo visible y fijado personal.',
   'hudChrome.meters.presetRaidBadge': 'Banda',
+  'hudChrome.meters.presetProGradientName': 'Degradado Pro',
+  'hudChrome.meters.presetProGradientDesc':
+    'Panel transparente flotante, barras con degradado horizontal, iconos de especializacion y telemetria Daño | DPS.',
+  'hudChrome.meters.presetProGradientBadge': 'Pro',
   'hudChrome.meters.groupManageProfiles': 'Gestion de Perfiles',
   'hudChrome.meters.activeProfile': 'Perfil Activo',
   'hudChrome.meters.activeProfileDesc':

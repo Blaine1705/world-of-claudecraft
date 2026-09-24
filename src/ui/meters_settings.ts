@@ -4,9 +4,15 @@
 
 export type MeterDensity = 'standard' | 'compact';
 export type MeterOpacity = 'glass' | 'solid' | 'minimal' | 'transparent';
-export type MeterNumberFormat = 'compact' | 'detailed';
+export type MeterNumberFormat = 'compact' | 'detailed' | 'damage_dps';
 export type MeterBarTexture = 'smooth' | 'specular' | 'gradient';
-export type MeterThemePreset = 'custom' | 'details_glass' | 'classic' | 'minimal' | 'raid';
+export type MeterThemePreset =
+  | 'custom'
+  | 'details_glass'
+  | 'classic'
+  | 'minimal'
+  | 'raid'
+  | 'pro_gradient';
 export type MeterFontFamily =
   | 'expressway'
   | 'alegreya_sans'
@@ -218,6 +224,27 @@ export const PRESETS: Record<Exclude<MeterThemePreset, 'custom'>, Partial<Meters
     includeShieldsInHeal: true,
     themePreset: 'raid',
   },
+  pro_gradient: {
+    density: 'standard',
+    opacity: 'transparent',
+    backgroundAlpha: 0,
+    fontFamily: 'expressway',
+    barHeight: 22,
+    barSpacing: 0,
+    barTexture: 'gradient',
+    barAnimation: true,
+    alwaysShowMe: true,
+    numberFormat: 'damage_dps',
+    showDps: true,
+    showPercent: false,
+    showRank: false,
+    showClassIcon: true,
+    showRaidTotals: false,
+    showTitleBar: true,
+    maxVisibleRows: 0,
+    includeShieldsInHeal: true,
+    themePreset: 'pro_gradient',
+  },
 };
 
 export function loadMetersSettings(storage?: Pick<Storage, 'getItem' | 'setItem'>): MetersSettings {
@@ -249,7 +276,10 @@ export function loadMetersSettings(storage?: Pick<Storage, 'getItem' | 'setItem'
           : 'specular',
       barAnimation: typeof parsed.barAnimation === 'boolean' ? parsed.barAnimation : d.barAnimation,
       alwaysShowMe: typeof parsed.alwaysShowMe === 'boolean' ? parsed.alwaysShowMe : d.alwaysShowMe,
-      numberFormat: parsed.numberFormat === 'detailed' ? 'detailed' : 'compact',
+      numberFormat:
+        parsed.numberFormat === 'detailed' || parsed.numberFormat === 'damage_dps'
+          ? parsed.numberFormat
+          : 'compact',
       showDps: typeof parsed.showDps === 'boolean' ? parsed.showDps : d.showDps,
       showPercent: typeof parsed.showPercent === 'boolean' ? parsed.showPercent : d.showPercent,
       showRank: typeof parsed.showRank === 'boolean' ? parsed.showRank : d.showRank,
@@ -291,6 +321,10 @@ export function loadProfiles(
 ): Record<string, MetersSettings> {
   const defaults: Record<string, MetersSettings> = {
     Default: { ...DEFAULT_METERS_SETTINGS },
+    'Pro Gradient': {
+      ...DEFAULT_METERS_SETTINGS,
+      ...PRESETS.pro_gradient,
+    },
     'Banda / Raid': {
       ...DEFAULT_METERS_SETTINGS,
       ...PRESETS.raid,
@@ -408,11 +442,16 @@ export function applySettingsClasses(el: HTMLElement, settings: Partial<MetersSe
         (settings.barHeight !== undefined && settings.barHeight <= 16),
     );
   }
-  if (settings.opacity !== undefined) {
-    el.classList.toggle('mt-opacity-glass', settings.opacity === 'glass');
-    el.classList.toggle('mt-opacity-solid', settings.opacity === 'solid');
-    el.classList.toggle('mt-opacity-minimal', settings.opacity === 'minimal');
-    el.classList.toggle('mt-opacity-transparent', settings.opacity === 'transparent');
+  if (settings.opacity !== undefined || settings.backgroundAlpha !== undefined) {
+    const isExplicitTransparent =
+      settings.opacity === 'transparent' || settings.backgroundAlpha === 0;
+    el.classList.toggle('mt-opacity-glass', settings.opacity === 'glass' && !isExplicitTransparent);
+    el.classList.toggle('mt-opacity-solid', settings.opacity === 'solid' && !isExplicitTransparent);
+    el.classList.toggle(
+      'mt-opacity-minimal',
+      settings.opacity === 'minimal' && !isExplicitTransparent,
+    );
+    el.classList.toggle('mt-opacity-transparent', isExplicitTransparent);
   }
 
   if (settings.barTexture !== undefined) {
@@ -453,8 +492,9 @@ export function applySettingsClasses(el: HTMLElement, settings: Partial<MetersSe
   if (typeof settings.barSpacing === 'number') {
     el.style.setProperty('--mt-bar-gap', `${settings.barSpacing}px`);
   }
-  if (settings.backgroundAlpha) {
+  if (typeof settings.backgroundAlpha === 'number') {
     el.style.setProperty('--mt-bg-alpha', `${settings.backgroundAlpha}%`);
+    el.style.setProperty('--mt-bg-alpha-ratio', `${settings.backgroundAlpha / 100}`);
   }
   if (settings.windowScale && settings.windowScale !== 100) {
     el.style.setProperty('--mt-scale', `${settings.windowScale / 100}`);
