@@ -16,6 +16,7 @@ import { WarriorFuryStates } from '../src/render/ability_vfx/warrior_fury_states
 import { WarriorGuardPlates } from '../src/render/ability_vfx/warrior_guard_plates';
 import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms';
 import { WarriorSpiritHammers } from '../src/render/ability_vfx/warrior_spirit_hammers';
+import { setArrivalCover } from '../src/render/arrival_cover';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import { createGpuPrepAdmission } from '../src/render/gpu_prep_admission';
 import { createGpuPrepBudget } from '../src/render/gpu_prep_budget_core';
@@ -127,7 +128,7 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     await ensureActiveAbilityKit(f.scene);
     expect(f.queue.run).toHaveBeenCalledTimes(118);
     for (const call of f.queue.run.mock.calls as unknown[][]) {
-      expect(call[1]).toBe(GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+      expect(call[1]).toBe(GPU_WORK_PRIORITY.BOOT_DEBT);
       expect(call[3]).toEqual({ releaseTail: String(call[2]).startsWith('crest-compile:') });
     }
     expect(f.upload).toHaveBeenCalledTimes(10);
@@ -472,6 +473,64 @@ it('spreads the kit texture uploads one per presented frame under the real queue
     expect(uploadsPerFrame.filter((count) => count > 0)).toHaveLength(10);
     expect(uploadsPerFrame.length).toBeLessThanOrEqual(13);
   } finally {
+    await queue.shutdown();
+    f.close();
+  }
+});
+
+it('waits out a loading cover instead of freezing it, then paces its uploads', async () => {
+  // Measured on the HD 530 for a local Warrior: under the world-entry settle
+  // cover the ten uploads still ran as one 555 ms frame, because the cover
+  // admits everything the camera landed among. The kit is not that; it waits
+  // for the reveal like the boot debt and is paced once the frames are live.
+  const f = fixture();
+  let clock = 0;
+  const budget = createGpuPrepBudget();
+  const queue = createBackgroundGpuQueue({
+    now: () => clock,
+    admission: createGpuPrepAdmission(budget),
+  });
+  const uploadsPerFrame: number[] = [0];
+  const flush = async () => {
+    for (let i = 0; i < 50; i++) await Promise.resolve();
+  };
+  let lastFrameAt = 0;
+  const frame = () => {
+    clock += 16;
+    budget.noteFrame(clock - lastFrameAt);
+    queue.noteFrame(clock);
+    lastFrameAt = clock;
+    uploadsPerFrame.push(0);
+  };
+  try {
+    activeKitPrewarmEntry(f.scene, 'warrior', {
+      queue,
+      geometry: () => [],
+      texture: (texture) => {
+        f.upload(texture);
+        clock += 100;
+        uploadsPerFrame[uploadsPerFrame.length - 1]++;
+      },
+    });
+    setArrivalCover(true);
+    frame();
+    const task = ensureActiveAbilityKit(f.scene);
+    for (let i = 0; i < 60; i++) {
+      await flush();
+      frame();
+    }
+    expect(f.upload).not.toHaveBeenCalled();
+    setArrivalCover(false);
+    for (let i = 0; i < 40 && f.upload.mock.calls.length < 10; i++) {
+      await flush();
+      frame();
+    }
+    await task;
+    expect(f.upload).toHaveBeenCalledTimes(10);
+    // Not ageing under the cover: no starvation burst on the first live frame.
+    expect(Math.max(...uploadsPerFrame)).toBe(1);
+  } finally {
+    setArrivalCover(false);
     await queue.shutdown();
     f.close();
   }

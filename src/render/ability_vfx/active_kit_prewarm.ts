@@ -38,11 +38,13 @@ export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
 /** The kit's queue priority. The kit is a cosmetic upgrade gated by its own
  *  readiness (the baked layers wait on `textureReady`, the crests on their
  *  prepared slots), so the generic presentation carries every cast until it
- *  lands and nothing here is actionable. Approaching work takes the per-frame
- *  budget: at most one big upload per presented frame, where the actionable
- *  floor admitted all ten sheets into one 533 to 635 ms freeze on an Intel
- *  HD 530 (a 2048px WebP costs about 100 ms of decode plus upload). */
-export const ACTIVE_KIT_PRIORITY = GPU_WORK_PRIORITY.VISIBLE_PREWARM;
+ *  lands and nothing here is actionable. It rides the boot-debt lane, which
+ *  the budget paces as approaching work (at most one big upload per presented
+ *  frame, where the actionable floor admitted all ten sheets into one 533 to
+ *  635 ms freeze on an Intel HD 530) and which waits out a loading cover: the
+ *  cover's frames belong to what the camera landed among, and the kit's
+ *  uploads froze the entry settle cover for 555 ms under the visible class. */
+export const ACTIVE_KIT_PRIORITY = GPU_WORK_PRIORITY.BOOT_DEBT;
 interface ActiveKitHost {
   queue: Pick<BackgroundGpuQueue, 'run'>;
   /** Start (or join) the kit's demand-loaded assets before any unit runs;

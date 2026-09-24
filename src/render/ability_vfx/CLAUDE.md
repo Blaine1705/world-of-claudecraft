@@ -153,9 +153,10 @@ selected by ability id only:
   on constrained-memory devices, where the kit stays cold and the generic
   presentation runs (`tests/warrior_kit_assets.test.ts`,
   `tests/active_kit_prewarm.test.ts`). Its preparation rides
-  `ACTIVE_KIT_PRIORITY` under the per-frame budget, never the actionable floor:
-  the kit is cosmetic and gated by its own readiness, and the floor once
-  admitted all ten sheets into one frame (about 0.6 s on an Intel HD 530). Generic sheets (smoke, dust,
+  `ACTIVE_KIT_PRIORITY` (the boot-debt lane) under the per-frame budget, never
+  the actionable floor, and it waits out a loading cover: the kit is cosmetic
+  and gated by its own readiness, and the floor once admitted all ten sheets
+  into one frame (about 0.6 s on an Intel HD 530). Generic sheets (smoke, dust,
   shockwave, the harvest splash) ship at 1024px; only signature sheets earn
   2048px, and a new sheet needs the same justification.
 - **Cost rules still apply.** The shared families it extends (`ribbons.ts`
