@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "6ef18776",
+      "state": "c10ae397",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,6 +74,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -100,6 +101,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -163,7 +165,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "0e28fbea",
+      "state": "f31f8443",
       "events": "139d503c",
       "rng": {
         "draws": 0,
@@ -214,6 +216,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -241,6 +244,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -347,7 +351,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "400e327c",
+      "state": "8c902441",
       "events": "796c4679",
       "rng": {
         "draws": 0,
@@ -398,6 +402,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -425,6 +430,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -545,7 +551,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "1346932d",
+      "state": "fb648d26",
       "events": "620a6523",
       "rng": {
         "draws": 0,
@@ -556,7 +562,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "a196c22b",
+      "state": "3acea4e8",
       "events": "2678504f",
       "rng": {
         "draws": 0,
@@ -567,7 +573,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1014,
-      "state": "56472558",
+      "state": "3a32789b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -635,6 +641,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -663,6 +670,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -845,7 +853,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1014,
-      "state": "456fb5db",
+      "state": "a907c838",
       "events": "73ea6f18",
       "rng": {
         "draws": 0,
@@ -913,6 +921,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -941,6 +950,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1060,7 +1070,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1016,
-      "state": "f1de960b",
+      "state": "d751ab08",
       "events": "3029cb04",
       "rng": {
         "draws": 0,
@@ -1128,6 +1138,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1156,6 +1167,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1318,7 +1330,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1016,
-      "state": "2b4aeaee",
+      "state": "8c1cc515",
       "events": "efdefed8",
       "rng": {
         "draws": 0,
@@ -1386,6 +1398,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1414,6 +1427,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1576,7 +1590,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1016,
-      "state": "456fb5db",
+      "state": "a907c838",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1644,6 +1658,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1672,6 +1687,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1791,7 +1807,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1017,
-      "state": "456fb5db",
+      "state": "a907c838",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1859,6 +1875,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1887,6 +1904,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2006,7 +2024,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1019,
-      "state": "57c86bc8",
+      "state": "2157b7a6",
       "events": "4257800d",
       "rng": {
         "draws": 0,
@@ -2074,6 +2092,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2102,6 +2121,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2148,6 +2168,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2179,6 +2200,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2397,7 +2419,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1019,
-      "state": "c9fad361",
+      "state": "acdf9c25",
       "events": "b60efd74",
       "rng": {
         "draws": 151,
@@ -2408,7 +2430,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1019,
-      "state": "37e3a1aa",
+      "state": "9f9ca716",
       "events": "c52d757a",
       "rng": {
         "draws": 286,
@@ -2419,7 +2441,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1019,
-      "state": "37e3a1aa",
+      "state": "9f9ca716",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -2487,6 +2509,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2515,6 +2538,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2575,6 +2599,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2607,6 +2632,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2830,7 +2856,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1021,
-      "state": "a5f3fcc4",
+      "state": "6220b380",
       "events": "e84e0151",
       "rng": {
         "draws": 286,
@@ -2898,6 +2924,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2926,6 +2953,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2986,6 +3014,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3018,6 +3047,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -3242,7 +3272,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1023,
-      "state": "027415fd",
+      "state": "dcc1dd81",
       "events": "77a1fbfc",
       "rng": {
         "draws": 286,
@@ -3310,6 +3340,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3338,6 +3369,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -3398,6 +3430,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3430,6 +3463,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -3661,7 +3695,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1023,
-      "state": "027415fd",
+      "state": "dcc1dd81",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -3729,6 +3763,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3757,6 +3792,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -3817,6 +3853,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3849,6 +3886,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

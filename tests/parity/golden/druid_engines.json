@@ -30,7 +30,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1014,
-      "state": "e6ed9ac8",
+      "state": "2a3520a9",
       "events": "f76ae6cd",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1014,
-      "state": "74eb5251",
+      "state": "ab0c099c",
       "events": "59861371",
       "rng": {
         "draws": 0,
@@ -52,7 +52,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1014,
-      "state": "6305139d",
+      "state": "44ebb730",
       "events": "ed35158a",
       "rng": {
         "draws": 147,
@@ -63,7 +63,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1014,
-      "state": "09e3c8d6",
+      "state": "008581fb",
       "events": "53599f3a",
       "rng": {
         "draws": 331,
@@ -74,7 +74,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1014,
-      "state": "49a7aa6e",
+      "state": "40569d33",
       "events": "59861371",
       "rng": {
         "draws": 496,
@@ -85,7 +85,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1014,
-      "state": "78960210",
+      "state": "014b37b1",
       "events": "3a7baabd",
       "rng": {
         "draws": 703,
@@ -96,7 +96,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1014,
-      "state": "f8dd42ba",
+      "state": "396eaff7",
       "events": "59861371",
       "rng": {
         "draws": 930,
@@ -107,7 +107,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1014,
-      "state": "7b3a3f7f",
+      "state": "a29ec46e",
       "events": "741638a5",
       "rng": {
         "draws": 1174,
@@ -118,7 +118,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1014,
-      "state": "df71164b",
+      "state": "67938ab2",
       "events": "a37359fc",
       "rng": {
         "draws": 1461,
@@ -129,7 +129,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1014,
-      "state": "a2618ee4",
+      "state": "a863269d",
       "events": "027e11ba",
       "rng": {
         "draws": 1712,
@@ -140,7 +140,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1014,
-      "state": "92b8d13c",
+      "state": "296b1035",
       "events": "59861371",
       "rng": {
         "draws": 1850,
@@ -151,7 +151,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 1014,
-      "state": "e66deef7",
+      "state": "9382eb86",
       "events": "cbebdb2b",
       "rng": {
         "draws": 2001,
@@ -162,7 +162,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 1014,
-      "state": "6a039e5f",
+      "state": "f501a48e",
       "events": "59861371",
       "rng": {
         "draws": 2183,
@@ -173,7 +173,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 1014,
-      "state": "46cf4c90",
+      "state": "b1c5ce31",
       "events": "741638a5",
       "rng": {
         "draws": 2365,
@@ -184,7 +184,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 1014,
-      "state": "cddb95be",
+      "state": "ae4e3b23",
       "events": "823dcb3e",
       "rng": {
         "draws": 2546,
@@ -195,7 +195,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 1014,
-      "state": "a3ce75ad",
+      "state": "19edb0a0",
       "events": "59861371",
       "rng": {
         "draws": 2735,
@@ -206,7 +206,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 1014,
-      "state": "968486c4",
+      "state": "eb45ad3d",
       "events": "3a7baabd",
       "rng": {
         "draws": 2920,
@@ -217,7 +217,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 1014,
-      "state": "4381251a",
+      "state": "1cd7e317",
       "events": "c99d93f5",
       "rng": {
         "draws": 3107,
@@ -228,7 +228,7 @@
       "tick": 375,
       "time": 18.75,
       "nextId": 1014,
-      "state": "8a382080",
+      "state": "5fadb6c1",
       "events": "741638a5",
       "rng": {
         "draws": 3235,
@@ -316,6 +316,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -349,6 +350,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -428,6 +430,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -461,6 +464,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -540,6 +544,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -573,6 +578,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -831,7 +837,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 1014,
-      "state": "6d579134",
+      "state": "5f04e2cd",
       "events": "3f3ce7ec",
       "rng": {
         "draws": 3290,
@@ -842,7 +848,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 1014,
-      "state": "1c28c328",
+      "state": "295ec449",
       "events": "741638a5",
       "rng": {
         "draws": 3487,
@@ -853,7 +859,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 1014,
-      "state": "ff1e813a",
+      "state": "7d7e7043",
       "events": "ee07b182",
       "rng": {
         "draws": 3681,
@@ -864,7 +870,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 1014,
-      "state": "7d87955e",
+      "state": "8060e59f",
       "events": "52610379",
       "rng": {
         "draws": 3841,
@@ -875,7 +881,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 1014,
-      "state": "42d51333",
+      "state": "b80e202e",
       "events": "a4d02bdb",
       "rng": {
         "draws": 3985,
@@ -886,7 +892,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 1014,
-      "state": "4e350d0d",
+      "state": "5f5b3614",
       "events": "b9dec783",
       "rng": {
         "draws": 4157,
@@ -897,7 +903,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 1014,
-      "state": "9a36a0d5",
+      "state": "9a0a9a24",
       "events": "28fc5dea",
       "rng": {
         "draws": 4357,
@@ -908,7 +914,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 1014,
-      "state": "ac123483",
+      "state": "69b631c6",
       "events": "e07da303",
       "rng": {
         "draws": 4511,
@@ -919,7 +925,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 1014,
-      "state": "ff24701b",
+      "state": "49fdc35e",
       "events": "019f0c89",
       "rng": {
         "draws": 4658,
@@ -930,7 +936,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 1014,
-      "state": "ad746867",
+      "state": "b9cfe0fe",
       "events": "2c2c48f7",
       "rng": {
         "draws": 4858,
@@ -941,7 +947,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 1014,
-      "state": "cf038873",
+      "state": "54bfdd52",
       "events": "741638a5",
       "rng": {
         "draws": 5028,
@@ -952,7 +958,7 @@
       "tick": 600,
       "time": 30,
       "nextId": 1014,
-      "state": "7b3321d1",
+      "state": "6ac4feac",
       "events": "9542badd",
       "rng": {
         "draws": 5215,
@@ -963,7 +969,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 1014,
-      "state": "3aa53fe4",
+      "state": "e189a2e5",
       "events": "741638a5",
       "rng": {
         "draws": 5362,
@@ -974,7 +980,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 1014,
-      "state": "4a7716ff",
+      "state": "c8eb3322",
       "events": "1adf0a25",
       "rng": {
         "draws": 5563,
@@ -985,7 +991,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 1014,
-      "state": "529960a1",
+      "state": "bf8db13c",
       "events": "df7f6a62",
       "rng": {
         "draws": 5740,
@@ -996,7 +1002,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 1014,
-      "state": "86007a98",
+      "state": "5ab94221",
       "events": "741638a5",
       "rng": {
         "draws": 5925,
@@ -1007,7 +1013,7 @@
       "tick": 700,
       "time": 35,
       "nextId": 1014,
-      "state": "b1d7b353",
+      "state": "e87b10e6",
       "events": "e52b8803",
       "rng": {
         "draws": 6085,
@@ -1018,7 +1024,7 @@
       "tick": 720,
       "time": 36,
       "nextId": 1014,
-      "state": "3b34f3d2",
+      "state": "f3ccf5e3",
       "events": "741638a5",
       "rng": {
         "draws": 6262,
@@ -1029,7 +1035,7 @@
       "tick": 740,
       "time": 37,
       "nextId": 1014,
-      "state": "80eb45f0",
+      "state": "c093ee75",
       "events": "83496345",
       "rng": {
         "draws": 6435,
@@ -1040,7 +1046,7 @@
       "tick": 760,
       "time": 38,
       "nextId": 1014,
-      "state": "80f399f2",
+      "state": "8823b7ab",
       "events": "741638a5",
       "rng": {
         "draws": 6618,
@@ -1051,7 +1057,7 @@
       "tick": 780,
       "time": 39,
       "nextId": 1014,
-      "state": "d35f9d87",
+      "state": "0ef3deba",
       "events": "05fe1eb7",
       "rng": {
         "draws": 6787,
@@ -1062,7 +1068,7 @@
       "tick": 800,
       "time": 40,
       "nextId": 1014,
-      "state": "6daf995a",
+      "state": "6e98d253",
       "events": "741638a5",
       "rng": {
         "draws": 6969,
@@ -1073,7 +1079,7 @@
       "tick": 820,
       "time": 41,
       "nextId": 1014,
-      "state": "5348eefd",
+      "state": "3cba644c",
       "events": "45e94a57",
       "rng": {
         "draws": 7141,
@@ -1084,7 +1090,7 @@
       "tick": 840,
       "time": 42,
       "nextId": 1014,
-      "state": "eb15ee32",
+      "state": "1e6c4e1b",
       "events": "d40e66a9",
       "rng": {
         "draws": 7331,
@@ -1095,7 +1101,7 @@
       "tick": 860,
       "time": 43,
       "nextId": 1014,
-      "state": "92766980",
+      "state": "0435dfc5",
       "events": "741638a5",
       "rng": {
         "draws": 7522,
@@ -1106,7 +1112,7 @@
       "tick": 880,
       "time": 44,
       "nextId": 1014,
-      "state": "015de4ce",
+      "state": "c0554a3f",
       "events": "1ad3221c",
       "rng": {
         "draws": 7678,
@@ -1117,7 +1123,7 @@
       "tick": 900,
       "time": 45,
       "nextId": 1014,
-      "state": "36e1dce0",
+      "state": "bdd08ba5",
       "events": "741638a5",
       "rng": {
         "draws": 7867,
@@ -1128,7 +1134,7 @@
       "tick": 920,
       "time": 46,
       "nextId": 1014,
-      "state": "ea1e7e5d",
+      "state": "22d3585c",
       "events": "1ad3221c",
       "rng": {
         "draws": 8062,
@@ -1139,7 +1145,7 @@
       "tick": 940,
       "time": 47,
       "nextId": 1014,
-      "state": "e67662ed",
+      "state": "c2c6130c",
       "events": "741638a5",
       "rng": {
         "draws": 8231,
@@ -1150,7 +1156,7 @@
       "tick": 960,
       "time": 48,
       "nextId": 1014,
-      "state": "c2bd6c1a",
+      "state": "eb2ec4b3",
       "events": "e099c8cb",
       "rng": {
         "draws": 8404,
@@ -1161,7 +1167,7 @@
       "tick": 980,
       "time": 49,
       "nextId": 1014,
-      "state": "38a05ced",
+      "state": "0f40185c",
       "events": "26916b0c",
       "rng": {
         "draws": 8564,
@@ -1172,7 +1178,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 1014,
-      "state": "d2c3ad67",
+      "state": "85a036ba",
       "events": "741638a5",
       "rng": {
         "draws": 8743,
@@ -1183,7 +1189,7 @@
       "tick": 1015,
       "time": 50.75,
       "nextId": 1014,
-      "state": "72b3b4ea",
+      "state": "7bc6b81b",
       "events": "deb0083c",
       "rng": {
         "draws": 8872,
@@ -1275,6 +1281,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1308,6 +1315,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1395,6 +1403,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1428,6 +1437,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1507,6 +1517,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1540,6 +1551,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1817,7 +1829,7 @@
       "tick": 1020,
       "time": 51,
       "nextId": 1014,
-      "state": "62f9cfb2",
+      "state": "52e937c3",
       "events": "7331d2f6",
       "rng": {
         "draws": 8909,
@@ -1828,7 +1840,7 @@
       "tick": 1040,
       "time": 52,
       "nextId": 1014,
-      "state": "701cee7f",
+      "state": "06947f5a",
       "events": "52610379",
       "rng": {
         "draws": 9099,
@@ -1839,7 +1851,7 @@
       "tick": 1060,
       "time": 53,
       "nextId": 1014,
-      "state": "eb2c64a1",
+      "state": "a8834960",
       "events": "ab57bca9",
       "rng": {
         "draws": 9293,
@@ -1850,7 +1862,7 @@
       "tick": 1080,
       "time": 54,
       "nextId": 1014,
-      "state": "ade354a6",
+      "state": "30d6931f",
       "events": "e4333285",
       "rng": {
         "draws": 9455,
@@ -1861,7 +1873,7 @@
       "tick": 1100,
       "time": 55,
       "nextId": 1014,
-      "state": "c36a3a5b",
+      "state": "ae44cb2e",
       "events": "49cdb0db",
       "rng": {
         "draws": 9596,
@@ -1872,7 +1884,7 @@
       "tick": 1120,
       "time": 56,
       "nextId": 1014,
-      "state": "8c2184a2",
+      "state": "0ae45593",
       "events": "8a500c1f",
       "rng": {
         "draws": 9769,
@@ -1883,7 +1895,7 @@
       "tick": 1140,
       "time": 57,
       "nextId": 1014,
-      "state": "dd3a754d",
+      "state": "09f80444",
       "events": "390d7b51",
       "rng": {
         "draws": 9953,
@@ -1894,7 +1906,7 @@
       "tick": 1160,
       "time": 58,
       "nextId": 1014,
-      "state": "acaa377c",
+      "state": "2fc19c41",
       "events": "5bf0bbf7",
       "rng": {
         "draws": 10144,
@@ -1905,7 +1917,7 @@
       "tick": 1180,
       "time": 59,
       "nextId": 1014,
-      "state": "a4077b13",
+      "state": "c4506186",
       "events": "ed572663",
       "rng": {
         "draws": 10315,
@@ -1916,7 +1928,7 @@
       "tick": 1200,
       "time": 60,
       "nextId": 1014,
-      "state": "e9dd35cd",
+      "state": "4f49e0c4",
       "events": "3cc970d1",
       "rng": {
         "draws": 10499,
@@ -1927,7 +1939,7 @@
       "tick": 1220,
       "time": 61,
       "nextId": 1014,
-      "state": "186a10cb",
+      "state": "22c32c3e",
       "events": "5cef8f2b",
       "rng": {
         "draws": 10694,
@@ -1938,7 +1950,7 @@
       "tick": 1225,
       "time": 61.25,
       "nextId": 1014,
-      "state": "9da5515d",
+      "state": "bb49a134",
       "events": "a9c46f8d",
       "rng": {
         "draws": 10727,
@@ -2030,6 +2042,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2063,6 +2076,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2150,6 +2164,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2183,6 +2198,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2262,6 +2278,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2295,6 +2312,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2572,7 +2590,7 @@
       "tick": 1225,
       "time": 61.25,
       "nextId": 1014,
-      "state": "9da5515d",
+      "state": "bb49a134",
       "events": "741638a5",
       "rng": {
         "draws": 10727,
@@ -2664,6 +2682,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2697,6 +2716,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2784,6 +2804,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2817,6 +2838,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2896,6 +2918,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2929,6 +2952,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

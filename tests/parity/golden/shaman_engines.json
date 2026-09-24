@@ -32,7 +32,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1015,
-      "state": "20e1372b",
+      "state": "8f7fbb47",
       "events": "1e9fd37a",
       "rng": {
         "draws": 0,
@@ -43,7 +43,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1015,
-      "state": "3fbe0111",
+      "state": "c54b7f4d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1015,
-      "state": "293fcf20",
+      "state": "33ad0c58",
       "events": "167fd723",
       "rng": {
         "draws": 154,
@@ -65,7 +65,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1015,
-      "state": "b8df0497",
+      "state": "c03318b3",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -76,7 +76,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1015,
-      "state": "06bec448",
+      "state": "9c760ce0",
       "events": "04834f84",
       "rng": {
         "draws": 508,
@@ -87,7 +87,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1015,
-      "state": "06bec448",
+      "state": "9c760ce0",
       "events": "741638a5",
       "rng": {
         "draws": 508,
@@ -175,6 +175,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -208,6 +209,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -287,6 +289,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -320,6 +323,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -399,6 +403,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -432,6 +437,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -508,6 +514,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -536,6 +543,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -846,7 +854,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1015,
-      "state": "896d7d42",
+      "state": "420743aa",
       "events": "ef98a54c",
       "rng": {
         "draws": 696,
@@ -857,7 +865,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1015,
-      "state": "578f61cd",
+      "state": "56c85ad9",
       "events": "741638a5",
       "rng": {
         "draws": 921,
@@ -868,7 +876,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1015,
-      "state": "ee51cd20",
+      "state": "b41ed8ec",
       "events": "9cea0958",
       "rng": {
         "draws": 1159,
@@ -879,7 +887,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1015,
-      "state": "8e01ff24",
+      "state": "894bb910",
       "events": "741638a5",
       "rng": {
         "draws": 1423,
@@ -890,7 +898,7 @@
       "tick": 182,
       "time": 9.1,
       "nextId": 1015,
-      "state": "9006100c",
+      "state": "b8931478",
       "events": "741638a5",
       "rng": {
         "draws": 1452,
@@ -978,6 +986,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1011,6 +1020,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1095,6 +1105,7 @@
             "offhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1128,6 +1139,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1207,6 +1219,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1240,6 +1253,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1316,6 +1330,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1344,6 +1359,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1723,7 +1739,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1015,
-      "state": "1fd89cd9",
+      "state": "a966c4d5",
       "events": "e1ac4f5d",
       "rng": {
         "draws": 1710,
@@ -1734,7 +1750,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1015,
-      "state": "72b28760",
+      "state": "37487598",
       "events": "741638a5",
       "rng": {
         "draws": 1866,
@@ -1745,7 +1761,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 1015,
-      "state": "3258a60b",
+      "state": "e289a8c7",
       "events": "741638a5",
       "rng": {
         "draws": 1886,
@@ -1833,6 +1849,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1866,6 +1883,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1950,6 +1968,7 @@
             "offhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1983,6 +2002,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2062,6 +2082,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2095,6 +2116,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2171,6 +2193,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2199,6 +2222,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2598,7 +2622,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 1015,
-      "state": "2dcc8056",
+      "state": "4d376d5e",
       "events": "553c5c3a",
       "rng": {
         "draws": 2008,
@@ -2609,7 +2633,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 1015,
-      "state": "5a68c884",
+      "state": "21c5ad38",
       "events": "8a34b4d0",
       "rng": {
         "draws": 2177,
@@ -2620,7 +2644,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 1015,
-      "state": "1fb29e69",
+      "state": "a4314439",
       "events": "4096a814",
       "rng": {
         "draws": 2340,
@@ -2631,7 +2655,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 1015,
-      "state": "d8e626f6",
+      "state": "6cd43a86",
       "events": "c64f28a6",
       "rng": {
         "draws": 2538,
@@ -2642,7 +2666,7 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 1015,
-      "state": "0d10ed91",
+      "state": "854a2245",
       "events": "741638a5",
       "rng": {
         "draws": 2588,
@@ -2730,6 +2754,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2763,6 +2788,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2847,6 +2873,7 @@
             "offhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2880,6 +2907,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2959,6 +2987,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2992,6 +3021,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -3068,6 +3098,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3096,6 +3127,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -3504,7 +3536,7 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 1015,
-      "state": "0d10ed91",
+      "state": "854a2245",
       "events": "741638a5",
       "rng": {
         "draws": 2588,
@@ -3592,6 +3624,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3625,6 +3658,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -3709,6 +3743,7 @@
             "offhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3742,6 +3777,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -3821,6 +3857,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3854,6 +3891,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -3930,6 +3968,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3958,6 +3997,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

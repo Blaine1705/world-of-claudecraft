@@ -844,7 +844,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Clue Scroll items (clue_scroll, treasure_casket): 1,322.
     // The faction reward items (18), the treasure maps and Cartographer's Ink (5)
     // and the Buried Hoard boss loot (content/hoard_loot.ts, 96): 1,441.
-    expect(Object.keys(ITEMS)).toHaveLength(1441);
+    // The release/v0.44.0 merge into feature/buried-hoards adds the release's
+    // Viridian Valestrider reins (reins_avian_strider): 1,442.
+    expect(Object.keys(ITEMS)).toHaveLength(1442);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -999,18 +1001,19 @@ describe('item-art consistency accepted-art provenance', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04 + roots-bramblehide-icons-2026-09-07)
     // = 1,281. The OSSBrain PR #3781 reconcile's two disjoint reins owners
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283. The
-    // world-quest branch's two batches (four quest-object icons) join at the
-    // release/v0.43.0 merge: 1,287.
+    // release's Viridian Valestrider reins (reins_avian_strider) adds one: 1,284.
+    // The world-quest branch's two batches (four quest-object icons) join at the
+    // release/v0.43.0 merge: 1,288.
     // The faction quartermaster icons (faction-vendor-icons-2026-09-16, 15
-    // SVG compositions) join at the wq-reputation merge: 1,302.
+    // SVG compositions) join at the wq-reputation merge: 1,303.
     // The Clue Scroll icons (clue-scroll-icons-2026-09-17, two SVG
-    // compositions) join: 1,304.
+    // compositions) join: 1,305.
     // The faction reward icons (faction-rewards-icons-2026-09-17, 18), the
     // treasure map icons (buried-hoard-treasure-maps-2026-09-19, 5) and the hoard
-    // boss loot icons (hoard-boss-loot-icons-2026-09-20, 96) join: 1,423.
-    expect(new Set(currentOwnerIds).size).toBe(1423);
-    expect(shippingIds).toHaveLength(1423);
-    expect(Object.keys(ITEMS)).toHaveLength(1441);
+    // boss loot icons (hoard-boss-loot-icons-2026-09-20, 96) join: 1,424.
+    expect(new Set(currentOwnerIds).size).toBe(1424);
+    expect(shippingIds).toHaveLength(1424);
+    expect(Object.keys(ITEMS)).toHaveLength(1442);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1138,6 +1141,7 @@ describe('item-art consistency accepted-art provenance', () => {
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        'reins_avian_strider',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1289,7 +1293,7 @@ describe('item-art consistency accepted-art provenance', () => {
     ).toBeUndefined();
     // The completion wave consolidates 68 interim per-entry/SVG owners into
     // one generated batch. The surviving ordinary-art cohort stays explicit.
-    expect(mapping.entries).toHaveLength(43);
+    expect(mapping.entries).toHaveLength(44);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
@@ -1373,8 +1377,8 @@ describe('item-art consistency accepted-art provenance', () => {
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1423);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1423);
+    expect(allCurrentOwnerIds).toHaveLength(1424);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1424);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1382,7 +1386,8 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      entries: 43,
+      // 44 entries: the release's Viridian Valestrider reins joins as an entry.
+      entries: 44,
       // 755 + the world-quest branch's four batch ids (release/v0.43.0 merge)
       // + the 15 faction quartermaster ids (wq-reputation merge) = 774
       // + the 2 Clue Scroll ids = 776 + the 18 faction reward, 5 treasure map
@@ -1434,7 +1439,8 @@ describe('item-art consistency accepted-art provenance', () => {
           (id) =>
             !completionIdSet.has(id) &&
             id !== 'reins_goblin_rocket_sled' &&
-            id !== 'reins_rallycart_rxt',
+            id !== 'reins_rallycart_rxt' &&
+            id !== 'reins_avian_strider',
         ),
         ...(completionBatch?.itemIds ?? []),
         ...(crucibleBatch?.itemIds ?? []),
@@ -1468,6 +1474,7 @@ describe('item-art consistency accepted-art provenance', () => {
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        'reins_avian_strider',
       ]),
       'the dated catalog plus the release batches, the world-quest, faction-vendor, clue-scroll, faction-reward, treasure-map and hoard-loot batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
@@ -1600,10 +1607,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // batch ids + 46 Crucible-professions batch ids = 1283.
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the two Clue Scroll owners = 1304. Plus the 18 faction
-    // reward, 5 treasure map and 96 hoard boss loot owners = 1423.
-    if (ownerIds.length !== 1423)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1423`);
-    if (fileIds.length !== 1423) violations.push(`shipping WebP count: ${fileIds.length} != 1423`);
+    // reward, 5 treasure map and 96 hoard boss loot owners = 1423. Plus the
+    // release's Viridian Valestrider reins entry at the release/v0.44.0 merge
+    // into feature/buried-hoards = 1424.
+    if (ownerIds.length !== 1424)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1424`);
+    if (fileIds.length !== 1424) violations.push(`shipping WebP count: ${fileIds.length} != 1424`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

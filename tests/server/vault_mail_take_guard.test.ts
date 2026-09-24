@@ -8,14 +8,15 @@ describe('vault mail take guard', () => {
   it('refuses a fresh join until recovery has restored the durable letter', () => {
     const game = readFileSync(join(process.cwd(), 'server/game.ts'), 'utf8');
     const joinBody = game.split('  join(\n')[1]?.split('    const pid = this.sim.addPlayer(')[0];
-    expect(joinBody).toContain('this.vaultMailRecovery.joinError(characterId)');
+    // The recovery rides the composed vault services (server/vault_game_services.ts).
+    expect(joinBody).toContain('this.vault.joinError(characterId)');
   });
 
   it('rechecks the vault fence after each offline mail-send await before escrow', () => {
     const game = readFileSync(join(process.cwd(), 'server/game.ts'), 'utf8');
     const send = game.split("case 'mail_send': {")[1]?.split("case 'mail_take':")[0];
     expect(send).toBeDefined();
-    const fence = 'if (this.vaultMailTakeGuard.isLocked(session.characterId)) return;';
+    const fence = 'if (this.vault.guard.isLocked(session.characterId)) return;';
     expect(send?.split(fence)).toHaveLength(3);
     expect(send?.indexOf(fence)).toBeGreaterThan(send?.indexOf('.then(async (target) => {') ?? -1);
     expect(send?.lastIndexOf(fence)).toBeGreaterThan(

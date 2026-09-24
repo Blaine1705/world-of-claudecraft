@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "7912fe1c",
+      "state": "b1eb28b9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -68,6 +68,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -94,6 +95,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -165,7 +167,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1021,
-      "state": "1634d839",
+      "state": "1d20ffb0",
       "events": "707b6954",
       "rng": {
         "draws": 5,
@@ -176,7 +178,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1021,
-      "state": "6e4299ba",
+      "state": "b0349b3b",
       "events": "6cb80331",
       "rng": {
         "draws": 5,
@@ -187,7 +189,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1021,
-      "state": "2533dc3f",
+      "state": "8ebf673a",
       "events": "67fcaac8",
       "rng": {
         "draws": 8,
@@ -198,7 +200,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 1023,
-      "state": "81256254",
+      "state": "9ed4b6c5",
       "events": "641e6918",
       "rng": {
         "draws": 11,
@@ -295,6 +297,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -323,6 +326,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {},
           "xp": 898
@@ -537,7 +541,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1023,
-      "state": "94771162",
+      "state": "7a7861c7",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -548,7 +552,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1023,
-      "state": "94771162",
+      "state": "7a7861c7",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -645,6 +649,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -673,6 +678,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {},
           "xp": 898

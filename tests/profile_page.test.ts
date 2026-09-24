@@ -193,7 +193,12 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // 415 at the faction standing deeds: the three Champion titles
     // (Riftwarden, Dawnkeeper, Forgemaster) take their slots on the same page.
     // 416 at the Clue Scroll casket deeds: the Treasure Hunter title's slot.
-    expect(catalogTotal).toBe(416);
+    // 448 with the 32 Buried Hoard pieces (character-scoped items), the same
+    // +32 as reliquary_content.test.ts's character pair.
+    // 449 at the release/v0.44.0 merge into feature/buried-hoards: the
+    // Viridian Valestrider takes a horizons_mounts slot
+    // (RELIQUARY_HORIZON_MOUNTS, src/sim/content/reliquary.ts).
+    expect(catalogTotal).toBe(449);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

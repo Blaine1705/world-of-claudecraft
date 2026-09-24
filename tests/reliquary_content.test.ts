@@ -462,8 +462,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // page at the release/v0.43.0 merge: 441. The three faction standing
     // Champion titles (Riftwarden, Dawnkeeper, Forgemaster) join it: 444. The
     // Clue Scroll Treasure Hunter title joins it: 445. The Buried Hoards page
-    // adds its 32 pieces (one slot per piece, never per tier): 477.
-    expect(full).toEqual({ owned: 477, total: 477 });
+    // adds its 32 pieces (one slot per piece, never per tier): 477. The
+    // release's Viridian Valestrider horizons_mounts slot joins at the
+    // release/v0.44.0 merge into feature/buried-hoards: 478.
+    expect(full).toEqual({ owned: 478, total: 478 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -494,8 +496,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 448 with the 32 Buried Hoard
-    // pieces (character-scoped items).
-    expect(character).toEqual({ owned: 448, total: 448 });
+    // pieces (character-scoped items). 449 with the release's Viridian
+    // Valestrider mount slot (release/v0.44.0 merge).
+    expect(character).toEqual({ owned: 449, total: 449 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -548,11 +551,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // one titles-page slot at the release/v0.43.0 merge into feature/world-quests:
     // 484. The three faction standing Champion titles add three more: 487.
     // The Clue Scroll Treasure Hunter title adds one more: 488. The Buried
-    // Hoards page adds 32: 520.
+    // Hoards page adds 32: 520. The release's Viridian Valestrider
+    // horizons_mounts slot joins at the release/v0.44.0 merge: 521.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(520);
+    ).toBe(521);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -2941,7 +2945,12 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // dev-grant only, deliberately absent from
   // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
   // def comments in content/mounts.ts).
-  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll', 'terrorspark_groundshaker'],
+  horizons_mounts: [
+    'drakemaw_raptor',
+    'avian_strider',
+    'lanternback_troll',
+    'terrorspark_groundshaker',
+  ],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -4024,7 +4033,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the five mounts content awards no route at all', () => {
+  it('the surviving pending rows are the four mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -4036,6 +4045,7 @@ describe('Reliquary source hint coverage', () => {
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
+      'avian_strider',
       'lanternback_troll',
       'terrorspark_groundshaker',
     ]);

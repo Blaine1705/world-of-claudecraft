@@ -14,7 +14,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "b0a312ca",
+      "state": "c75c5879",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -65,6 +65,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -95,6 +96,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -157,7 +159,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1012,
-      "state": "f75ed9aa",
+      "state": "bf55bd69",
       "events": "3158e840",
       "rng": {
         "draws": 3,
@@ -168,7 +170,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1012,
-      "state": "46ea8b5f",
+      "state": "c465fdb8",
       "events": "6cb80331",
       "rng": {
         "draws": 3,
@@ -179,7 +181,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1012,
-      "state": "032e942a",
+      "state": "85381be9",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -190,7 +192,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1012,
-      "state": "ab976e25",
+      "state": "97703b4a",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -201,7 +203,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1012,
-      "state": "f58e1fa8",
+      "state": "6de21efb",
       "events": "642d64fd",
       "rng": {
         "draws": 72,
@@ -212,7 +214,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1012,
-      "state": "7edd43e0",
+      "state": "550deed3",
       "events": "741638a5",
       "rng": {
         "draws": 153,
@@ -223,7 +225,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1012,
-      "state": "9351fd09",
+      "state": "0b1a71d6",
       "events": "741638a5",
       "rng": {
         "draws": 241,
@@ -234,7 +236,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1012,
-      "state": "c6cba914",
+      "state": "7f6a4adf",
       "events": "4487dd8a",
       "rng": {
         "draws": 329,
@@ -245,7 +247,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 1012,
-      "state": "79f489b7",
+      "state": "6b2bf9f0",
       "events": "d41fd948",
       "rng": {
         "draws": 414,
@@ -256,7 +258,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1012,
-      "state": "a93fac46",
+      "state": "f6a1763d",
       "events": "741638a5",
       "rng": {
         "draws": 507,
@@ -267,7 +269,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 1012,
-      "state": "5c6f1771",
+      "state": "e8c253fe",
       "events": "741638a5",
       "rng": {
         "draws": 605,
@@ -278,7 +280,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1012,
-      "state": "902b562f",
+      "state": "a9e5e6e8",
       "events": "741638a5",
       "rng": {
         "draws": 688,
@@ -289,7 +291,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1012,
-      "state": "902b562f",
+      "state": "a9e5e6e8",
       "events": "741638a5",
       "rng": {
         "draws": 688,
@@ -374,6 +376,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -406,6 +409,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -543,7 +547,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1012,
-      "state": "902b562f",
+      "state": "a9e5e6e8",
       "events": "741638a5",
       "rng": {
         "draws": 688,
@@ -628,6 +632,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -660,6 +665,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

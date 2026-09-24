@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "a415789c",
+      "state": "982e4739",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -69,6 +69,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -95,6 +96,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -170,8 +172,8 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1028,
-      "state": "173e6895",
-      "events": "890ea919",
+      "state": "00487488",
+      "events": "0d0b6de2",
       "rng": {
         "draws": 58,
         "digest": "d526240a"
@@ -181,7 +183,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1028,
-      "state": "45cdfe64",
+      "state": "489d40cd",
       "events": "741638a5",
       "rng": {
         "draws": 58,
@@ -192,7 +194,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1028,
-      "state": "c391c379",
+      "state": "79b118a4",
       "events": "741638a5",
       "rng": {
         "draws": 58,
@@ -203,7 +205,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1028,
-      "state": "74f665bb",
+      "state": "d406c8e2",
       "events": "b93655d8",
       "rng": {
         "draws": 59,
@@ -214,7 +216,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1028,
-      "state": "e4a35803",
+      "state": "6e54070a",
       "events": "d01a73de",
       "rng": {
         "draws": 59,
@@ -225,7 +227,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1028,
-      "state": "e4a35803",
+      "state": "6e54070a",
       "events": "741638a5",
       "rng": {
         "draws": 59,
@@ -304,6 +306,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -332,6 +335,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -529,7 +533,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1028,
-      "state": "720ba6f7",
+      "state": "4a3f9876",
       "events": "741638a5",
       "rng": {
         "draws": 59,
@@ -540,7 +544,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1028,
-      "state": "8927cf73",
+      "state": "8c1e705a",
       "events": "741638a5",
       "rng": {
         "draws": 59,
@@ -551,7 +555,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1028,
-      "state": "1186b002",
+      "state": "3bc6bd8f",
       "events": "f28076a1",
       "rng": {
         "draws": 69,
@@ -562,7 +566,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 1028,
-      "state": "a058ddac",
+      "state": "c0d439f5",
       "events": "741638a5",
       "rng": {
         "draws": 95,
@@ -573,7 +577,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1028,
-      "state": "6633650f",
+      "state": "5ff8cbce",
       "events": "741638a5",
       "rng": {
         "draws": 135,
@@ -584,7 +588,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 1028,
-      "state": "8ac19700",
+      "state": "538c38d1",
       "events": "741638a5",
       "rng": {
         "draws": 173,
@@ -595,7 +599,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1028,
-      "state": "5aca13c9",
+      "state": "c6215f14",
       "events": "741638a5",
       "rng": {
         "draws": 221,
@@ -606,7 +610,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 1028,
-      "state": "a53f0f25",
+      "state": "3ffc1c78",
       "events": "741638a5",
       "rng": {
         "draws": 260,
@@ -617,7 +621,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1028,
-      "state": "e97a13eb",
+      "state": "6d179c32",
       "events": "741638a5",
       "rng": {
         "draws": 307,
@@ -628,7 +632,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1028,
-      "state": "09f27ff8",
+      "state": "9e2205e9",
       "events": "cfa45131",
       "rng": {
         "draws": 353,
@@ -639,7 +643,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1028,
-      "state": "f49e42b2",
+      "state": "0a8bcbdf",
       "events": "2ca4cbae",
       "rng": {
         "draws": 407,
@@ -650,7 +654,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 1028,
-      "state": "d78b06ba",
+      "state": "b605f467",
       "events": "741638a5",
       "rng": {
         "draws": 467,
@@ -661,7 +665,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 1028,
-      "state": "83b4ce11",
+      "state": "5be8509c",
       "events": "741638a5",
       "rng": {
         "draws": 518,
@@ -672,7 +676,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 1028,
-      "state": "ba43cfed",
+      "state": "b9aa6480",
       "events": "741638a5",
       "rng": {
         "draws": 566,
@@ -683,7 +687,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1028,
-      "state": "809cea4e",
+      "state": "48392f73",
       "events": "741638a5",
       "rng": {
         "draws": 627,
@@ -694,7 +698,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 1028,
-      "state": "9cc89f58",
+      "state": "2406ae89",
       "events": "741638a5",
       "rng": {
         "draws": 678,
@@ -705,7 +709,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 1028,
-      "state": "f441da07",
+      "state": "a4a01de6",
       "events": "741638a5",
       "rng": {
         "draws": 743,
@@ -716,7 +720,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 1028,
-      "state": "cd29b3b4",
+      "state": "a3c2cc3d",
       "events": "60a7a46b",
       "rng": {
         "draws": 792,
@@ -727,7 +731,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1028,
-      "state": "4c70b93f",
+      "state": "db85e11e",
       "events": "3e16fcb0",
       "rng": {
         "draws": 839,
@@ -738,7 +742,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1028,
-      "state": "542fbcf5",
+      "state": "55f63128",
       "events": "741638a5",
       "rng": {
         "draws": 895,
@@ -749,7 +753,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 1028,
-      "state": "69fb4cf0",
+      "state": "b052a6e1",
       "events": "741638a5",
       "rng": {
         "draws": 946,
@@ -760,7 +764,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1028,
-      "state": "e8928aff",
+      "state": "d0f75dde",
       "events": "741638a5",
       "rng": {
         "draws": 1010,
@@ -771,7 +775,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1028,
-      "state": "497d25f7",
+      "state": "8ffdef76",
       "events": "741638a5",
       "rng": {
         "draws": 1058,
@@ -782,7 +786,7 @@
       "tick": 145,
       "time": 7.25,
       "nextId": 1028,
-      "state": "b445cfa8",
+      "state": "2fe64379",
       "events": "741638a5",
       "rng": {
         "draws": 1118,
@@ -793,7 +797,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1028,
-      "state": "9ae45f58",
+      "state": "7eb86e89",
       "events": "c67d7a43",
       "rng": {
         "draws": 1174,
@@ -804,7 +808,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1028,
-      "state": "9ae45f58",
+      "state": "7eb86e89",
       "events": "741638a5",
       "rng": {
         "draws": 1174,
@@ -883,6 +887,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -911,6 +916,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1129,7 +1135,7 @@
       "tick": 155,
       "time": 7.75,
       "nextId": 1028,
-      "state": "041a63a8",
+      "state": "c31df779",
       "events": "70bc303e",
       "rng": {
         "draws": 1234,
@@ -1140,7 +1146,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1028,
-      "state": "4d1b62f3",
+      "state": "50558fda",
       "events": "7a96392d",
       "rng": {
         "draws": 1289,
@@ -1151,7 +1157,7 @@
       "tick": 165,
       "time": 8.25,
       "nextId": 1028,
-      "state": "6fa4da50",
+      "state": "a0607301",
       "events": "741638a5",
       "rng": {
         "draws": 1343,
@@ -1162,7 +1168,7 @@
       "tick": 166,
       "time": 8.3,
       "nextId": 1028,
-      "state": "eb822066",
+      "state": "c6ec3cab",
       "events": "741638a5",
       "rng": {
         "draws": 1363,
@@ -1241,6 +1247,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1269,6 +1276,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1493,7 +1501,7 @@
       "tick": 166,
       "time": 8.3,
       "nextId": 1028,
-      "state": "eb822066",
+      "state": "c6ec3cab",
       "events": "741638a5",
       "rng": {
         "draws": 1363,
@@ -1572,6 +1580,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1600,6 +1609,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

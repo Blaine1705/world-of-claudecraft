@@ -652,6 +652,9 @@ describe('bake and merge wiring order', () => {
   const gameSrc = stripComments(
     readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8'),
   );
+  const vaultSrc = stripComments(
+    readFileSync(path.resolve(process.cwd(), 'server/vault_game_services.ts'), 'utf8'),
+  );
 
   it('saveMailState snapshots at entry; bake and watermark ride the book transaction', () => {
     const body = boundedBody(dbSrc, 'export async function saveMailState', '\nexport ');
@@ -781,15 +784,21 @@ describe('bake and merge wiring order', () => {
     // permit) so a dirty-book character save cannot invert against a periodic
     // mail save, and it still carries the profiler sample through.
     expect(gameSrc).toMatch(
-      /await writeDirtyMailPartitions<TickProfilerSample>\(\s*this\.sim,\s*\(write, context\) => this\.enqueueBackgroundMarketWrite\(write, context\),\s*false,\s*sample,\s*this\.vaultMailTakeGuard\.blocked,\s*\)/,
+      /await writeDirtyMailPartitions<TickProfilerSample>\(\s*this\.sim,\s*\(write, context\) => this\.enqueueBackgroundMarketWrite\(write, context\),\s*false,\s*sample,\s*this\.vault\.guard\.blocked,\s*\)/,
     );
-    expect(gameSrc).toContain('mailPartitionsForRearm = takeMailPartitionsForCharacterSave(');
+    // The vault-aware drain is composed in server/vault_game_services.ts
+    // (captureMailSave); the coordinator keeps the rearm handle.
+    expect(gameSrc).toContain('vaultMail = this.vault.captureMailSave(session, withMarket);');
+    expect(gameSrc).toContain('mailPartitionsForRearm = vaultMail.partitions;');
+    expect(vaultSrc).toContain('const partitions = takeMailPartitionsForCharacterSave(');
     expect(gameSrc).toMatch(
       /saveCharacterAndMarketState\(\s*session\.characterId,\s*snap\.level,\s*snap,\s*withMarket \? this\.sim\.serializeMarket\(\) : null,\s*mailPartitionsForRearm,/,
     );
     expect(gameSrc).toContain('const withMarket = opts.withMarket === true;');
     expect(gameSrc).toMatch(
-      /case 'mail_take':\s*if \(typeof msg\.id === 'number'\)[\s\S]*?this\.saveCharacter\(session\)/,
+      /case 'mail_take':\s*if \(typeof msg\.id === 'number'\) this\.vault\.mailTake\(session, msg\.id\);/,
     );
+    expect(gameSrc).toContain('save: (session) => this.saveCharacter(session),');
+    expect(vaultSrc).toContain('() => this.host.save(session),');
   });
 });

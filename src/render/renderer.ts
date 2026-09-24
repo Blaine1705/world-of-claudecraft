@@ -50,8 +50,12 @@ import {
   abilityMaterialPrewarmMaterials,
   buildAbilityMaterialPrewarmGroup,
 } from './ability_material_prewarm';
-import { AbilityVfx, AbilityVfxFx, abilityVfxTexturePrewarmSteps } from './ability_vfx';
+import { type AbilityVfx, type AbilityVfxFx, abilityVfxTexturePrewarmSteps } from './ability_vfx';
+import { activeKitPrewarmEntry, resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
+import { ensureWarriorKitAssets } from './ability_vfx/production_assets';
+import { isWarriorFuryAuraEvent } from './ability_vfx/warrior_fury_feedback';
+import { warriorInsultCue } from './ability_vfx/warrior_insult_core';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { shouldDrawLegacyCastSparkle, syncAbilityVfxCast } from './ability_vfx_registry';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
@@ -109,6 +113,7 @@ import {
   stepLandingDetector,
   underwaterCameraCeiling,
 } from './camera_feel_core';
+import { CameraImpact, fiestaShakeX, fiestaShakeY } from './camera_impact_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { castVfxProgramUnits, createSceneCastVfxReadiness } from './cast_vfx_prewarm';
@@ -200,6 +205,14 @@ import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
+import {
+  chosenCadenceHoldsQuality,
+  chosenCadenceMissShare,
+  frameLoadMs,
+  noteCadenceProbeContext,
+  noteGovernorShedding,
+  resetChosenCadenceForRenderer,
+} from './chosen_cadence';
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
@@ -212,6 +225,7 @@ import {
   compileMayStartBeforeInitialPaint,
   compilePriorityForTarget,
 } from './compile_priority_core';
+import { compileTargetPrepared } from './compile_target_readiness';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import { type CorpseBeacon, createCorpseBeacon } from './corpse_beacon';
@@ -389,14 +403,7 @@ import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { HOARD_BODY_IDS, hoardEntrance } from './hoard_entrance';
-import {
-  buildHoardValley,
-  disposeHoardValleyGroup,
-  resolveHoardValleyEffectsProfile,
-  updateHoardValleyDayNight,
-  updateHoardValleySkyDayNight,
-} from './hoard_valley';
-import { resolveHoardValleyEnvironment } from './hoard_valley_environment';
+import * as hoardValley from './hoard_valley_frame';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
@@ -409,6 +416,7 @@ import {
 import { ignivarBossFacingLocked } from './ignivar_encounter_core';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
 import { buildIgnivarRaidGate, ignivarRaidGatePlan } from './ignivar_raid_gate';
+import { damageContact } from './impact_contact';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
 import { buildInitialSceneCompileUnits, entryCompileTail } from './initial_scene_compile_units';
@@ -578,6 +586,7 @@ import {
   runPrewarmCompileSubmission,
   submitPrewarmCompileUnit,
 } from './prewarm_compile_submission_core';
+import type { PrewarmManifestEntry } from './prewarm_entry';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -656,6 +665,7 @@ import {
   type RenderableDiagnosticObject,
   RenderDiagnostics,
 } from './render_diagnostics';
+import { createRendererAbilityPresentation } from './renderer_ability_presentation';
 import { createRendererBuildDiag } from './renderer_build_diag';
 import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
 import { snapshotRendererFrameStats } from './renderer_frame_stats_snapshot';
@@ -699,6 +709,7 @@ import {
   type SceneCensusReport,
   sceneCensusChild,
 } from './scene_census_core';
+import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
 import { drapeRingLocalY } from './selection_ring';
@@ -1020,7 +1031,7 @@ const FOOT_STRIDE_RUN = 1.55;
 const SWIM_STRIDE = 2.4;
 // Surface kick: beats per second at a standstill, quickening with swim speed,
 // and how far behind the pivot the prone body's feet trail (as a fraction of
-// stand height — the authored stroke lays the legs out behind the hips).
+// stand height, the authored stroke lays the legs out behind the hips).
 const SWIM_KICK_HZ = 2.6;
 const SWIM_FOOT_TRAIL = 0.19;
 // Depth below the waterline over which the underwater wash fades fully in.
@@ -1030,7 +1041,7 @@ const UNDERWATER_FADE_DEPTH = 0.45;
 const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
 // HDR boosts so the bloom pass picks these out (composer tiers only)
 const SELECTION_RING_BOOST = 1.5;
-const SELECTION_RING_SPIN = 0.6; // rad/s — slow classic target-reticle rotation
+const SELECTION_RING_SPIN = 0.6; // rad/s, slow classic target-reticle rotation
 
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
 const SPARKLE_BOOST = 1.5;
@@ -1156,8 +1167,8 @@ export interface EntityView extends RickshawMountViewState, WorldQuestCarryViewS
   paladinOathChainVisual: PaladinOathChainVisual | null;
   paladinAegisVisual: PaladinAegisVisual | null;
   paladinSunVerdictVisual: PaladinSunVerdictVisual | null;
-  skin: number; // last-rendered appearance skin — diffed each frame for live swaps
-  mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
+  skin: number; // last-rendered appearance skin, diffed each frame for live swaps
+  mainhandItemId: string | null; // last-rendered equipped weapon, diffed for live held-weapon swaps
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
@@ -1946,6 +1957,7 @@ export class Renderer {
   // them); this is the state object its tick functions mutate, and that the
   // HUD event handler also writes into directly on a `fiestaPowerup` event.
   private shakeTrauma = 0;
+  private readonly warriorCameraImpact = new CameraImpact();
   private shakeElapsed = 0;
   private readonly fiestaEffects = createFiestaEffectsState();
   // Per-target heal-glow throttle (ms since a target last bloomed a heal glow). A
@@ -2133,6 +2145,7 @@ export class Renderer {
     // The lightweight material path does not preload HDR sky/water assets.
     // Keep the renderer's HDR/IBL branch aligned with that preload decision.
     this.lowGfx = !GFX.standardMaterials;
+    resetChosenCadenceForRenderer();
     this.renderBudgetGovernor = new RenderBudgetGovernor({
       tier: GFX.tier,
       budget: GFX.budget,
@@ -3003,94 +3016,33 @@ export class Renderer {
     );
     this.underwaterView = new UnderwaterView(this.lowGfx);
     this.scene.add(this.underwaterView.group);
-    this.abilityVfxFx = new AbilityVfxFx(
-      this.scene,
-      this.camera,
-      vfxAnchor,
-      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
-      // the DISPLAYED facing, not e.facing: the view group carries the smoothed
-      // yaw actually on screen, so a stationary spirit lines up with the body it
-      // is rising out of instead of with a pose one frame ahead of the draw
-      (id) => this.views.get(id)?.group.rotation.y ?? this.sim.entities.get(id)?.facing ?? null,
-    );
-    this.abilityVfxFx.setViewportScale(
-      this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(),
-      60,
-    );
-    this.abilityVfxFx.setSpiritBuildScheduler((build) => this.queueSpiritPuppetBuild(build));
-    this.abilityVfxFx.setSpiritCompileGate(
-      this.asyncCompileSupported ? (root: THREE.Object3D) => this.compileGate(root) : null,
-    );
-    // The painter draws no cast until every cast program is linked (cast_vfx_prewarm.ts).
+    // Preserve release44 cast admission while the Warrior bindings own their detail.
     this.scene.add(buildCastVfxBasicStandIns());
     const standIns = (): THREE.Material[] | null => this.abilityMaterialStandIns;
     this.castVfxReadiness = createSceneCastVfxReadiness(this.scene, this.webgl, standIns);
-    this.abilityVfx = new AbilityVfx({
-      vfx: this.vfx,
-      fx: this.abilityVfxFx,
-      castVfxAdmit: () => this.castVfxReadiness.admit(),
-      castVfxReady: () => this.castVfxReadiness.ready(),
-      anchor: vfxAnchor,
-      spawnAoeRing: (x, z, radius, school, colorHex) =>
-        this.spawnAoeRing(x, z, radius, school, colorHex),
-      triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
-      lightPulse: (id, school, intensity, duration, range) =>
-        this.pulseAt(id, school, intensity, duration, range),
-      setAuraGlow: (id, colorHex, intensity) => {
-        const v = this.views.get(id);
-        if (v) this.activeVisual(v)?.setAuraGlow(colorHex, intensity);
+    const abilityPresentation = createRendererAbilityPresentation({
+      scene: this.scene, camera: this.camera, vfx: this.vfx, anchor: vfxAnchor,
+      world: () => this.sim, time: () => this.time, views: this.views,
+      visual: this.activeVisual.bind(this), textureReady: (t) => this.gpuReadyTextures.has(t),
+      ground: (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      height: () => this.webgl.domElement.clientHeight,
+      pixelRatio: () => this.webgl.getPixelRatio(), reducedMotion: () => this.reducedMotion(),
+      audio: () => this.audioSink, light: this.lightPulses,
+      spiritBuild: (build) => this.queueSpiritPuppetBuild(build),
+      compile: this.asyncCompileSupported ? (root) => this.compileGate(root) : null,
+      painter: {
+        castVfxAdmit: () => this.castVfxReadiness.admit(),
+        castVfxReady: () => this.castVfxReadiness.ready(),
+        spawnAoeRing: (x, z, r, school, color) => this.spawnAoeRing(x, z, r, school, color),
+        triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
+        lightPulse: (id, school, intensity, duration, range) => this.pulseAt(id, school, intensity, duration, range),
+        addShake: (amount, x, y, z, crunch) => this.addShake(amount, x, y, z, crunch),
+        screenFlash: (strength) => { if (this.post && !this.reducedMotion()) this.post.screenFlash(strength); },
+        screenImpact: (x, y, z, strength) => this.screenImpactAt(x, y, z, strength),
       },
-      playShoutAnim: (id) => {
-        const v = this.views.get(id);
-        const vis = v ? this.activeVisual(v) : null;
-        if (vis && !vis.isMidOneShot) vis.playEmote('cheer', 1);
-      },
-      isMob: (id) => this.sim.entities.get(id)?.kind === 'mob',
-      castingAbilityOf: (id) => this.sim.entities.get(id)?.castingAbility ?? null,
-      isMidOneShot: (id) => {
-        const v = this.views.get(id);
-        return v ? !!this.activeVisual(v)?.isMidOneShot : false;
-      },
-      localPlayerId: () => this.sim.player.id,
-      hasGestureClip: (id, abilityId) => {
-        const v = this.views.get(id);
-        const vis = v ? this.activeVisual(v) : null;
-        return vis ? vis.hasAttackClipOverride(abilityId) : false;
-      },
-      isInstantAbility: (abilityId) => {
-        const def = ABILITIES[abilityId];
-        return !def || (def.castTime <= 0 && !def.channel && !def.empowerStages);
-      },
-      // heavy VFX moments (fissures, gavel verdicts, finisher crits) ride the
-      // Fiesta trauma accumulator; the fx engine has already applied distance
-      // falloff and its rolling anti-spam budget
-      addShake: (amount) => this.addShake(amount),
-      // contact-frame hitstop: only THAT rig's animation clock slows (the
-      // world, sim, and every other character keep running); the visual
-      // guards against stacking
-      animHold: (id, scale, dur) => {
-        const v = this.views.get(id);
-        if (v) this.activeVisual(v)?.holdFrame(scale, dur);
-      },
-      // caster windup lean, fed per frame by the staged ceremony
-      bodyLean: (id, amount) => {
-        const v = this.views.get(id);
-        if (v) this.activeVisual(v)?.setWindupLean(amount);
-      },
-      // screen feedback (crit flash, finisher ripples): composer-gated like
-      // bloom, skipped for reduced-motion players
-      screenFlash: (strength) => {
-        if (this.post && !this.reducedMotion()) this.post.screenFlash(strength);
-      },
-      screenImpact: (x, y, z, strength) => this.screenImpactAt(x, y, z, strength),
-      // per-ability procedural audio (release whooshes, palette impact
-      // identities, zone pulses, crit stings) rides the injected spatial
-      // audio sink; offline/headless hosts without one stay silent
-      abilityAudio: (kind, palette, power, x, y, z, opts) =>
-        this.audioSink?.abilityAudio?.(kind, palette, power, x, y, z, opts),
     });
-    // Dev-only ability VFX probe surface (scripts/ability_vfx_probe.mjs):
-    // self-installs onto window.__game once main.ts has assembled it, so the
+    this.abilityVfxFx = abilityPresentation.fx;
+    this.abilityVfx = abilityPresentation.painter;
     // probe wiring lives entirely inside the subsystem it measures and the
     // production bundle carries none of it.
     if (import.meta.env.DEV && typeof window !== 'undefined') {
@@ -3507,7 +3459,7 @@ export class Renderer {
       devicePxHeight *= rect.renderHeight / rect.targetHeight;
     }
     this.vfx.setViewportScale(devicePxHeight, 60);
-    this.abilityVfxFx.setViewportScale(devicePxHeight, 60);
+    this.abilityVfxFx.setViewportScale(devicePxHeight, 60, this.webgl.domElement.clientHeight);
     // Weapon-skin VFX point sprites size against the device-pixel height too:
     // future rigs read the module value, live rigs re-scale in place.
     setWeaponVfxViewportHeight(devicePxHeight);
@@ -4606,6 +4558,8 @@ export class Renderer {
     const sample = this.renderBudgetSample;
     sample.dt = dt;
     sample.frameMs = frameMs;
+    sample.chosenCadenceMissShare = chosenCadenceMissShare();
+    sample.holdRecovery = chosenCadenceHoldsQuality();
     // Non-composer profiles read info.render live, where three's per-render
     // auto-reset drops the off-screen water-simulation passes: add them back
     // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
@@ -4630,6 +4584,11 @@ export class Renderer {
     // preparation waits. The budget's frame boundary is fed in sync() instead,
     // where it lands on every frame rather than only on a presented one.
     this.gpuPrepBudget.notePressure(state.mode === 'degrading');
+    noteGovernorShedding(state.mode === 'degrading', dt);
+    noteCadenceProbeContext(
+      this.renderBudgetGovernor.atBaseline(sample.maxRenderScale),
+      this.sim.player.inCombat,
+    );
     this.frameMsEma = state.frameMsEma;
     this.adaptiveCooldown = state.cooldownSeconds;
     this.stableFrameTime = state.stableSeconds;
@@ -4671,6 +4630,7 @@ export class Renderer {
     input.constrainedMemory = GFX.constrainedMemory;
     input.entryElapsedMs = this.runtimeEntryElapsedMs;
     input.dt = dt;
+    input.frameLoadMs = frameLoadMs(dt * 1000);
     input.frameMsEma = this.frameMsEma;
     input.dropFrameMs = GFX.budget.dropFrameMs;
     return runtimeViewCreateBudget(input, this.viewCreateBudgetState);
@@ -4862,7 +4822,10 @@ export class Renderer {
   // per-frame flags, so it gets the gate as a callback, one bake at a time.
   private readonly farBakeLane = new SerialGateLane();
   private readonly farBakeGate: FarBakeGate = (target, onSettled) =>
-    this.farBakeLane.enqueue((settled) => this.gateSwapFlagOnCompile(target, settled), onSettled);
+    this.farBakeLane.enqueue(
+      (settled) => this.gateSwapFlagOnCompile(target, settled),
+      () => onSettled(() => compileTargetPrepared(this.webgl.properties, target)),
+    );
 
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot
    *  unset; the shared gate retries after its cooldown. A freshly built form
@@ -5034,12 +4997,7 @@ export class Renderer {
     // it there left a black void above the ramparts).
     this.sky.visible = isOpenAirFogState(this.fogState);
     if (this.sky.visible) {
-      const valleySky = resolveHoardValleyEnvironment(this.sim.riftFloor)?.sky;
-      this.skyView.setCameraPos(
-        valleySky?.x ?? this.camera.position.x,
-        valleySky?.z ?? this.camera.position.z,
-        dt,
-      );
+      hoardValley.setSkyCamera(this.skyView, this.sim.riftFloor, this.camera.position, dt);
       if (!this.lowGfx) {
         this.skyView.setDayNight(this.dnGrade.sky);
         this.skyView.setCycle(
@@ -5630,30 +5588,6 @@ export class Renderer {
     // (#2571 review).
     let compiledPrewarmRoots = 0;
     let diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null = null;
-
-    type PrewarmManifestEntry = {
-      id: string;
-      category: RendererPrewarmCategory;
-      priority: number;
-      required: boolean;
-      /** This small entry still runs if an earlier required view consumed maxMs. */
-      deadlineExempt?: boolean;
-      /** Explicit small units that may resume after world entry. The absence of
-       * this hook is intentional: a whole manifest entry is never rerun live. */
-      resumeUnits?: () => readonly PrewarmResumeUnit[];
-      /** Optional remainder for a started entry that reports partial progress. */
-      resumePartialUnits?: () => readonly PrewarmResumeUnit[];
-      /** The entry's program links, resumed as DEBT under `programs.<id>` when
-       * the entry never ran (a cast VFX has no stand-in). */
-      resumeProgramUnits?: () => readonly PrewarmResumeUnit[];
-      run: () => void | Promise<void>;
-      /** Read after run(): how much of the planned work actually happened. A
-       * trimmed report downgrades the entry to 'partial' (prewarm_policy.ts),
-       * so a deadline return can never masquerade as completed again. */
-      progress?: () => PrewarmEntryProgress | null;
-      budgetVariants?: () => NonNullable<RendererPrewarmManifestEntryStats['budgetVariants']>;
-      detail?: () => string;
-    };
 
     // Explicitly bounded units captured when their manifest entry misses the
     // loading deadline. Whole entry callbacks are never resumed live.
@@ -6494,6 +6428,20 @@ export class Renderer {
         },
         detail: () => `objects=${weaponVfxPrewarmGroup?.children.length ?? 0}`,
       },
+      activeKitPrewarmEntry(this.scene, this.sim.cfg.playerClass, {
+        queue: this.backgroundGpuWork,
+        assets: () => ensureWarriorKitAssets(GFX.constrainedMemory),
+        geometry: (kinds) =>
+          this.abilityVfxFx.authoredPrewarmUnits(
+            {
+              properties: this.webgl.properties,
+              compile: (root, offscreen) => this.compilePrewarmColorPrograms(root, offscreen),
+              draw: (group, child) => this.renderBoundedPrewarmRoot(group, child),
+            },
+            kinds,
+          ),
+        texture: (texture) => this.prewarmTexture(texture),
+      }),
       {
         // The cast VFX (cast_vfx_prewarm.ts): stage the lazy stand-ins, link
         // every cast program through the compile arms; the spawn only binds
@@ -6948,6 +6896,7 @@ export class Renderer {
     } finally {
       cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication });
     }
+    resumeActiveAbilityKit(this.scene, options.resumeAfterFirstPaint, this.sim.cfg.playerClass);
 
     // Deferred compile-submit units whose owner never drained them (the
     // compile entry itself was dropped, or its drain hit the deadline again):
@@ -7252,7 +7201,7 @@ export class Renderer {
         // owns the wave/sequence, the bubble is this renderer's own read.
         // Pure symbols, so it is i18n-exempt (CLAUDE.md: emojis/symbols need
         // no t() entry) - it must read as swearing in every locale.
-        if (ev.fx === 'selfCast' && ev.ability === 'taunt') {
+        if (warriorInsultCue(ev.fx, ev.ability)) {
           this.showChatBubble(ev.sourceId, '$@#%&*!', false, 1.8);
         }
         // Spec-driven per-ability visuals claim the event first; unknown
@@ -7598,24 +7547,41 @@ export class Renderer {
         // carrying the typed launch cue already began its cosmetic one-shot,
         // so do not restart that same shot when its damage lands.
         const sourceView = this.views.get(ev.sourceId);
+        const sourceEntity = this.sim.entities.get(ev.sourceId);
+        const warrior = sourceEntity?.kind === 'player' && sourceEntity.templateId === 'warrior';
         const startsAttackAnimation = damageEventStartsAttackAnimation(
           this.sim.entities.get(ev.sourceId),
           sourceView ? this.activeVisual(sourceView) : null,
           ev.attackAnimationStarted,
+          warrior ? ev.ability : undefined,
+          warrior ? ev.abilityId : undefined,
+          warrior && ev.sourceId === ev.targetId,
         );
         if (ev.school === 'physical' && ev.sourceId !== -1 && startsAttackAnimation)
           this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
-        if (ev.kind === 'hit' && ev.amount > 0) {
+        const authoredContact = warrior && this.abilityVfx.onDamage(ev) === true;
+        if (ev.kind === 'hit' && ev.amount > 0 && !authoredContact) {
+          if (warrior && ev.ability) {
+            const victim = this.views.get(ev.targetId);
+            damageContact(
+              victim ? this.activeVisual(victim) : null,
+              ev,
+              ev.sourceId === this.sim.playerId,
+              this.reducedMotion(),
+            );
+          }
           // landed blows flinch the victim (rate-limited inside the visual)
           this.triggerHit(ev.targetId);
           if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
         }
         // spec-driven per-ability impact accent (no-op for unknown abilities)
         if (attackAbilityId(ev.ability) === 'drain_life') this.vfx.drainLifeTick(ev.sourceId);
-        this.abilityVfx.onDamage(ev);
+        if (!warrior) this.abilityVfx.onDamage(ev);
         break;
       }
       case 'heal2':
+        if (this.abilityVfxFx.warriorRecovery(ev, this.sim.entities.get(ev.targetId)?.maxHp ?? 0))
+          break;
         // Throttle the particle bloom to one per target per 110ms so a burst of tiny
         // simultaneous heals (a Chronomancy group echo converting an AoE that hit
         // several enemies onto five allies in one frame) cannot spike the particle
@@ -7632,6 +7598,8 @@ export class Renderer {
         break;
       case 'aura': {
         const tgt = this.sim.entities.get(ev.targetId);
+        if (isWarriorFuryAuraEvent(ev, tgt) || this.abilityVfx.onWarriorControlAura(ev, tgt?.auras))
+          break;
         // Set-proc auras announce themselves with a themed swirl: on the wearer
         // for the self buffs, on the struck mob for the bleeds (so this arm is
         // NOT player-gated). Everything else keeps the generic player swirl.
@@ -7748,8 +7716,12 @@ export class Renderer {
   // Add camera trauma (0..1). Squared on apply, so small adds barely register
   // and big hits (kills, ring closes) really kick. A no-op for
   // reduced-motion players (OS query or the in-game switch).
-  addShake(amount: number): void {
+  addShake(amount: number, x?: number, y?: number, z?: number, crunch = false): void {
     if (this.reducedMotion()) return;
+    if (x !== undefined || crunch) {
+      this.warriorCameraImpact.add(amount, this.camera.position, x, y, z, crunch);
+      return;
+    }
     this.shakeTrauma = Math.min(1, this.shakeTrauma + amount);
   }
 
@@ -7898,12 +7870,7 @@ export class Renderer {
       // in-rift descent/pylons and a missing gate asset keep the procedural arch.
       const asGate = e.templateId === 'rift_portal' || e.templateId === 'rift_exit';
       const built =
-        hoardEntrance(
-          e,
-          this.groundSample,
-          () => this.reducedMotion(),
-          this.sim.riftFloor !== null,
-        ) ??
+        hoardEntrance(e, this.groundSample, () => this.reducedMotion(), this.sim) ??
         (asGate ? buildRiftGateBody(this.lowGfx, e.riftTier) : null) ??
         buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;
@@ -8765,7 +8732,7 @@ export class Renderer {
 
   /** Drop a retired interior's scene nodes, registries, and owned resources. */
   private retireInteriorGroup(group: THREE.Group): void {
-    if (disposeHoardValleyGroup(group)) return;
+    if (hoardValley.disposeHoardValleyGroup(group)) return;
     this.scene.remove(group);
     this.releaseInteriorExternalRefs(group);
     const resourceErrors = this.dungeons?.disposeInteriorResources(group).errors;
@@ -9088,7 +9055,7 @@ export class Renderer {
     const settleVistaEntry = this.vistaEntrySettlePending;
     this.vistaEntrySettlePending = false;
     const riftFloor = inside && isRiftPos(px) ? this.sim.riftFloor : null;
-    const valley = resolveHoardValleyEnvironment(riftFloor);
+    const valley = hoardValley.resolveHoardValleyEnvironment(riftFloor);
     const biome = valley?.profile.biome ?? zoneBiomeAt(this.sim.player.pos.x, pz);
     // Per-biome god-ray strength, eased over about half a second so a border
     // crossing fades the shafts with the rest of the ambience.
@@ -9206,25 +9173,11 @@ export class Renderer {
             this.builtInteriors.add(key);
             const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
             const build = floor.outdoor
-              ? Promise.resolve(
-                  buildHoardValley({
-                    scene: this.scene,
-                    compileGate: this.worldCompileGate(),
-                    plan: floor,
-                    offset: { x: o.x, y: 0, z: o.z },
-                    effectsProfile: resolveHoardValleyEffectsProfile(GFX.effectsTier),
-                    prepareEnvironment:
-                      valley && GFX.standardMaterials
-                        ? () =>
-                            this.prepareZoneSky(
-                              zoneAt(valley.sky.x, valley.sky.z),
-                              valley.sky.x,
-                              valley.sky.z,
-                              false,
-                            )
-                        : undefined,
-                  }).group,
-                )
+              ? hoardValley.buildInterior(floor, o, valley, {
+                  scene: this.scene,
+                  compileGate: this.worldCompileGate(),
+                  prepareSky: (x, z) => this.prepareZoneSky(zoneAt(x, z), x, z, false),
+                })
               : this.ensureDungeons().buildInterior(floor.style.kit, o.x, o.z, {
                   layout: floor.layout,
                   style: floor.style,
@@ -9349,8 +9302,8 @@ export class Renderer {
         requestedFar,
         this.gpuHitchCompileLifecycle?.records ?? null,
         residencyFar,
-        Math.max(0, dt * 1000),
-        this.renderBudgetState.externalFrameCap,
+        frameLoadMs(Math.max(0, dt * 1000)),
+        this.renderBudgetState.externalFrameCap || chosenCadenceMissShare() >= 0,
       );
       if (vista) {
         // Entry settle (one-shot, armed by farVistaReady behind the opaque
@@ -9390,8 +9343,8 @@ export class Renderer {
       ZONE_ENVIRONMENT_RESPONSE,
     );
     if (valley) {
-      updateHoardValleyDayNight(this.dnGrade, this.camera.position, this.cameraLookAt);
-      updateHoardValleySkyDayNight(this.skyView, this.dnGrade, this.sunDir);
+      hoardValley.updateHoardValleyDayNight(this.dnGrade, this.camera.position, this.cameraLookAt);
+      hoardValley.updateHoardValleySkyDayNight(this.skyView, this.dnGrade, this.sunDir);
     }
     // Every open-air state follows the live grade. Thornhollow keeps its
     // authored fog range while sharing the overworld's color and light grade.
@@ -9614,6 +9567,9 @@ export class Renderer {
       }
     }
     this.sun.target.position.set(anchor.x, anchor.y, anchor.z);
+    sceneKeyLightUniform(this.scene)
+      .value.subVectors(this.sun.position, this.sun.target.position)
+      .normalize();
   }
 
   // Aim the sun and moon disc sprites along their directions and fade them by how
@@ -9872,7 +9828,7 @@ export class Renderer {
     // so both per-frame slots latched while the queue's clock kept aging. Same
     // dt-derived ms the governor samples, and the tier's live drop-frame
     // threshold, which a tier change reassigns.
-    this.gpuPrepBudget.noteFrame(Math.min(250, dt * 1000), GFX.budget.dropFrameMs);
+    this.gpuPrepBudget.noteFrame(frameLoadMs(Math.min(250, dt * 1000)), GFX.budget.dropFrameMs);
     let phaseStart = totalStart;
     const frameStats = this.lastFrameStats;
     const framePhaseMs = frameStats.phaseMs;
@@ -10755,7 +10711,7 @@ export class Renderer {
 
       // Sheathe, from the Z key OR from being in the water: nobody swims with a
       // sword in their hand. Swimming is an OVERLAY on the sim's cosmetic
-      // weaponStowed bit rather than a write to it — the player's own sheathe
+      // weaponStowed bit rather than a write to it, the player's own sheathe
       // choice is untouched, so wading back out restores exactly what they had
       // drawn, and a peer's weapon rides their back the moment they start
       // swimming without any wire traffic. (This diff sits here, after the swim
@@ -10782,7 +10738,7 @@ export class Renderer {
         vz = az - v.lastZ;
       // Vertical travel, off the SAME displayed coordinates: how hard the body
       // noses over into its dive or its climb. Taken from motion rather than
-      // from the local camera on purpose — peers pitch the same way with no
+      // from the local camera on purpose, peers pitch the same way with no
       // wire traffic, and the pose can never disagree with the descent it is
       // drawn against (at the bed, or held at the line, it levels out by
       // itself). Only players ever leave the surface, so mobs skip it.
@@ -11879,12 +11835,7 @@ export class Renderer {
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     this.sky.visible = isOpenAirFogState(this.fogState);
     if (this.sky.visible) {
-      const valleySky = resolveHoardValleyEnvironment(this.sim.riftFloor)?.sky;
-      this.skyView.setCameraPos(
-        valleySky?.x ?? this.camera.position.x,
-        valleySky?.z ?? this.camera.position.z,
-        dt,
-      );
+      hoardValley.setSkyCamera(this.skyView, this.sim.riftFloor, this.camera.position, dt);
       if (!this.lowGfx) {
         this.skyView.setDayNight(this.dnGrade.sky);
         this.skyView.setCycle(
@@ -11927,15 +11878,18 @@ export class Renderer {
     this.updateChatBubbles();
     phaseStart = this.markRendererPhase(framePhaseMs, 'nameplates', phaseStart);
     this.updateTravelSpeedFx(p, selfPos, dt);
+    const warriorShifted = this.warriorCameraImpact.beginDraw(
+      this.camera,
+      dt,
+      this.reducedMotion(),
+    );
     // Fiesta screen shake: trauma^2 jitter offsets the camera for the draw only.
     let shakeX = 0,
       shakeY = 0;
     if (this.shakeTrauma > 0) {
       this.shakeElapsed += dt;
-      const intensity = this.shakeTrauma * this.shakeTrauma;
-      const t = this.shakeElapsed * 60;
-      shakeX = Math.sin(t * 1.7) * intensity * 0.6;
-      shakeY = Math.sin(t * 2.3 + 1.1) * intensity * 0.45;
+      shakeX = fiestaShakeX(this.shakeTrauma, this.shakeElapsed);
+      shakeY = fiestaShakeY(this.shakeTrauma, this.shakeElapsed);
       this.camera.position.x += shakeX;
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
@@ -11943,7 +11897,7 @@ export class Renderer {
     this.jailScene.updateVisibility(this.camera, this.sun);
     this.gatherNodes.update(this.camera, this.sun, Math.max(fogFar, this.lastRequestedFogFar));
     this.updateOpaqueDrawOrder(dt);
-    if (shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera);
+    if (warriorShifted || shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera);
     // Refresh the reused host every frame instead of building a literal: sync
     // is the rAF hot path (no per-frame allocation), and post can be torn down
     // and rebuilt by a graphics rebuild, so a cached reference would go stale.
@@ -11959,6 +11913,8 @@ export class Renderer {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;
     }
+    this.warriorCameraImpact.endDraw(this.camera);
+    if (warriorShifted || shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera);
     phaseStart = this.markRendererPhase(framePhaseMs, 'submit', phaseStart);
     const totalMs = performance.now() - totalStart;
     framePhaseMs.total = roundMs(totalMs);
@@ -11989,7 +11945,7 @@ export class Renderer {
     if (this.hitchLogEnabled) {
       const sample = this.hitchAligner.atEnd(
         afterSubmit,
-        Math.min(250, Math.max(0, dt * 1000)),
+        frameLoadMs(Math.min(250, Math.max(0, dt * 1000))),
         framePhaseMs.submit,
         createdViews,
         framePhaseMs.total,

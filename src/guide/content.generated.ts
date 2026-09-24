@@ -6979,6 +6979,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Viridian Valestrider"
+      },
+      {
+        "kind": "mount",
         "name": "Grumbol the Lanternback"
       },
       {

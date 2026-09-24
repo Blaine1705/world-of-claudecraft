@@ -9,8 +9,8 @@
     "class:warrior",
     "class:mage"
   ],
-  "draws": 7,
-  "drawDigest": "284731db",
+  "draws": 8,
+  "drawDigest": "5b236bae",
   "frames": [
     {
       "tick": 0,
@@ -30,11 +30,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "6b2059e3",
+      "state": "9e69e87f",
       "events": "741638a5",
       "rng": {
-        "draws": 7,
-        "digest": "284731db"
+        "draws": 8,
+        "digest": "5b236bae"
       },
       "label": "loot-identity-captured",
       "players": [
@@ -82,6 +82,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gathererIdentity": {
             "id": 101,
@@ -112,6 +113,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -158,6 +160,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gathererIdentity": {
             "id": 102,
@@ -192,6 +195,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -399,11 +403,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "fb29f7e3",
+      "state": "22131153",
       "events": "31e5d163",
       "rng": {
-        "draws": 7,
-        "digest": "284731db"
+        "draws": 8,
+        "digest": "5b236bae"
       },
       "label": "leaver-remains-eligible",
       "players": [
@@ -455,6 +459,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gathererIdentity": {
             "id": 101,
@@ -502,6 +507,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -548,6 +554,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gathererIdentity": {
             "id": 102,
@@ -583,6 +590,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -790,11 +798,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "fb29f7e3",
+      "state": "22131153",
       "events": "741638a5",
       "rng": {
-        "draws": 7,
-        "digest": "284731db"
+        "draws": 8,
+        "digest": "5b236bae"
       },
       "label": "final",
       "players": [
@@ -846,6 +854,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gathererIdentity": {
             "id": 101,
@@ -893,6 +902,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -939,6 +949,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gathererIdentity": {
             "id": 102,
@@ -974,6 +985,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

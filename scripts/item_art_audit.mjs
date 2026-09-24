@@ -124,7 +124,8 @@ const build = await buildItemArtAudit({
     // 1071 / 1089 (its two disjoint reins items, reins_goblin_rocket_sled and
     // reins_rallycart_rxt, on the shared 1069 / 1087 base); both deltas are
     // additive over that shared base, so 1069 + 212 + 2 = 1283 and
-    // 1087 + 212 + 2 = 1301. Verified with `node scripts/item_art_audit.mjs
+    // 1087 + 212 + 2 = 1301, plus the Viridian Valestrider's reins on both
+    // sides = 1284 / 1302. Verified with `node scripts/item_art_audit.mjs
     // --verify-only` against the merged tree.
     // + the World Quests branch merge (release/v0.43.0 sync): its two painted
     // puzzle activators and two Eastbrook freight icons join both counts.
@@ -135,13 +136,18 @@ const build = await buildItemArtAudit({
     // + the 18 faction reward paintings and the five Buried Hoard map-family
     // paintings: 1327 catalog records and 1345 live definitions, measured with
     // the same verifier run.
-    catalogCount: 1327,
-    liveItemCount: 1345,
+    // + the 96 Buried Hoard boss loot paintings (hoard-boss-loot-icons-2026-09-20)
+    // and, at the release/v0.44.0 merge into feature/buried-hoards, the
+    // release's Viridian Valestrider reins (1284 / 1302 on its own arm):
+    // 1424 catalog records and 1442 live definitions on 34 sheet pages,
+    // measured with the same verifier run on the merged tree.
+    catalogCount: 1424,
+    liveItemCount: 1442,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 31,
+    sheetPageCount: 34,
     groupCount: 25,
   },
 });

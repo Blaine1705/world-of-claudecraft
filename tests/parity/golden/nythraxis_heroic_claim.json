@@ -10,8 +10,8 @@
     "awardHeroicMarks on a heroic raid kill (instances/dungeons) plus the raid lockout, neither of which a normal claim grants",
     "class:warrior"
   ],
-  "draws": 12,
-  "drawDigest": "e512a40d",
+  "draws": 14,
+  "drawDigest": "31372acd",
   "frames": [
     {
       "tick": 0,
@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1020,
-      "state": "60034d8c",
+      "state": "383b0043",
       "events": "bc873d79",
       "rng": {
         "draws": 1,
@@ -86,6 +86,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -117,6 +118,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -165,6 +167,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -196,6 +199,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -244,6 +248,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -275,6 +280,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -323,6 +329,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -354,6 +361,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -402,6 +410,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -433,6 +442,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -745,11 +755,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "9fd9e129",
-      "events": "c8643206",
+      "state": "a7e5dc0a",
+      "events": "3b126ae3",
       "rng": {
-        "draws": 12,
-        "digest": "e512a40d"
+        "draws": 14,
+        "digest": "31372acd"
       },
       "label": "death",
       "players": [
@@ -876,6 +886,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -897,11 +908,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -933,6 +944,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -1054,6 +1066,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1079,11 +1092,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1111,6 +1124,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -1232,6 +1246,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1257,11 +1272,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1289,6 +1304,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -1410,6 +1426,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1435,11 +1452,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1467,6 +1484,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -1588,6 +1606,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1613,11 +1632,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1645,6 +1664,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -2001,11 +2021,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "9fd9e129",
+      "state": "a7e5dc0a",
       "events": "741638a5",
       "rng": {
-        "draws": 12,
-        "digest": "e512a40d"
+        "draws": 14,
+        "digest": "31372acd"
       },
       "label": "final",
       "players": [
@@ -2132,6 +2152,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2153,11 +2174,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2189,6 +2210,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -2310,6 +2332,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2335,11 +2358,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2367,6 +2390,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -2488,6 +2512,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2513,11 +2538,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2545,6 +2570,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -2666,6 +2692,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2691,11 +2718,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2723,6 +2750,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -2844,6 +2872,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2869,11 +2898,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2901,6 +2930,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [

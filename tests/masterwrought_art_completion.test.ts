@@ -813,14 +813,19 @@ describe('Masterwrought art completion evidence', () => {
     // both later release-merge waves, already machine-checked and owner-review
     // pending per item_art_consistency.test.ts / item_icons.test.ts /
     // weapon_icons.test.ts, so their mapping owners are genuine, not fabricated.
-    // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners;
-    // these do not alter the dated completion/approval universe below.
+    // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners, and
+    // the Viridian Valestrider adds its own; none of the three alter the dated
+    // completion/approval universe below (1,284 on the release line).
     // The world-quest branch adds its two batches (four quest-object icons) at
-    // the release/v0.43.0 merge: 1,287.
-    // The wq-reputation merge adds the 15 faction quartermaster icons
-    // (faction-vendor-icons-2026-09-16): 1,302. The Clue Scroll items add
-    // their two (clue-scroll-icons-2026-09-17): 1,304.
-    expect(currentOwnerIds).toHaveLength(1304);
+    // the release/v0.43.0 merge, the wq-reputation merge adds the 15 faction
+    // quartermaster icons (faction-vendor-icons-2026-09-16), and the Clue
+    // Scroll items add their two (clue-scroll-icons-2026-09-17): 1,305.
+    // The Buried Hoards branch adds the 18 faction reward paintings
+    // (faction-rewards-icons-2026-09-17), the five treasure-map family icons
+    // (buried-hoard-treasure-maps-2026-09-19), and the 96 hoard boss loot
+    // icons (hoard-boss-loot-icons-2026-09-20): 1,424 at the release/v0.44.0
+    // merge into feature/buried-hoards.
+    expect(currentOwnerIds).toHaveLength(1424);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -900,12 +905,35 @@ describe('Masterwrought art completion evidence', () => {
     expect(clueScrollIds.size).toBe(2);
     expect(datedIds.filter((id) => clueScrollIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => clueScrollIds.has(id))).toHaveLength(2);
+    // The Buried Hoards branch's three batches (faction reward paintings,
+    // treasure-map family, hoard boss loot): 18 + 5 + 96 = 119 ids, additive
+    // the same way.
+    const hoardBranchBatchIds: readonly (string | undefined)[] = [
+      'faction-rewards-icons-2026-09-17',
+      'buried-hoard-treasure-maps-2026-09-19',
+      'hoard-boss-loot-icons-2026-09-20',
+    ];
+    const hoardBranchIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => hoardBranchBatchIds.includes(batchId))
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(hoardBranchIds.size).toBe(119);
+    expect(datedIds.filter((id) => hoardBranchIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => hoardBranchIds.has(id))).toHaveLength(119);
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
-    // Strip all five later additive waves (Crucible professions, the Field Kit, the
+    // The Viridian Valestrider's reins is additive the same way, and postdates
+    // the dated verdict too.
+    expect(datedIds).not.toContain('reins_avian_strider');
+    expect(currentOwnerIds).toContain('reins_avian_strider');
+
+    // Strip all the later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
-    // and the OSSBrain mount reins)
+    // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
+    // faction quartermaster, and Clue Scroll batches, and the Buried Hoards
+    // branch's three batches)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -919,7 +947,9 @@ describe('Masterwrought art completion evidence', () => {
         !ossBrainMountIds.has(id) &&
         !worldQuestObjectIds.has(id) &&
         !factionVendorIds.has(id) &&
-        !clueScrollIds.has(id),
+        !clueScrollIds.has(id) &&
+        !hoardBranchIds.has(id) &&
+        id !== 'reins_avian_strider',
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

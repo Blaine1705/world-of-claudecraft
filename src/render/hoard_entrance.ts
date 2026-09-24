@@ -37,8 +37,10 @@ export function hoardEntrance(
   entity: Entity,
   ground: (x: number, z: number) => number,
   reducedMotion: () => boolean,
-  alreadyOpen = false,
+  /** The live world: a floor already running (riftFloor set) opens the entrance at once. */
+  world: { readonly riftFloor: unknown } | null = null,
 ) {
+  const alreadyOpen = world !== null && world.riftFloor !== null;
   // The hoard's other bespoke object rides the same override: the reward chest.
   return entity.templateId === 'hoard_entrance'
     ? buildHoardEntrance(entity, ground, reducedMotion, source, alreadyOpen)

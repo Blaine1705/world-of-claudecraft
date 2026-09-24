@@ -10,6 +10,8 @@ import type {
 } from '../sim/types';
 import type { WorldQuestDifficulty } from '../sim/world_quest_activity';
 import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
+import type { HoardBossCueView } from '../world_api/dungeons';
+import { HoardBossCueMirror } from './hoard_boss_cue_mirror';
 import { applyQuestSelfWire } from './quest_snapshot_wire';
 import { decodeVehicleSession } from './vehicle_session_wire';
 import { decodeActiveWorldBossIds } from './world_boss_snapshot_wire';
@@ -49,6 +51,9 @@ export class QuestWorldWireState {
   clueHunt: Readonly<{ huntId: string; step: number }> | null = null;
   /** The read treasure map mirrored from the `tmap` self key (null when none). */
   treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null = null;
+  /** Client clock mirror of the authoritative Buried Hoard boss telegraphs;
+   *  the host feeds it every routed event (ClientWorld's event loop). */
+  protected readonly hoardBossCueMirror = new HoardBossCueMirror(() => performance.now());
   private activeWorldBossIds = new Set<string>();
   private questWorldTransport: ((command: QuestWorldCommand) => void) | null = null;
   private questWorldRestBase = '';
@@ -64,6 +69,10 @@ export class QuestWorldWireState {
       throw new Error('Quest world command transport is not configured');
     }
     this.questWorldTransport(command);
+  }
+
+  hoardBossCues(): HoardBossCueView[] {
+    return this.hoardBossCueMirror?.views() ?? [];
   }
 
   worldQuestLeaderboard(board: string, page = 0, pageSize?: number, viewer?: string) {

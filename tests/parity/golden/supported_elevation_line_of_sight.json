@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "ccbd4228",
+      "state": "47a37550",
       "events": "9cf0feb4",
       "rng": {
         "draws": 0,
@@ -81,6 +81,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -111,6 +112,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -158,6 +160,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -184,6 +187,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -315,7 +319,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1012,
-      "state": "5f9292ab",
+      "state": "ba90ad3b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -326,7 +330,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1012,
-      "state": "269335d7",
+      "state": "00e5eff5",
       "events": "cd1db2b2",
       "rng": {
         "draws": 0,
@@ -337,7 +341,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1012,
-      "state": "0a630ec8",
+      "state": "8fcc794e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -348,7 +352,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1012,
-      "state": "361e6151",
+      "state": "3ad58907",
       "events": "97eed0bc",
       "rng": {
         "draws": 2,
@@ -359,7 +363,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1012,
-      "state": "361e6151",
+      "state": "3ad58907",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -414,6 +418,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -444,6 +449,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -494,6 +500,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -520,6 +527,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -647,7 +655,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 1012,
-      "state": "1e3f0213",
+      "state": "40874f04",
       "events": "9cf0feb4",
       "rng": {
         "draws": 6,
@@ -702,6 +710,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -732,6 +741,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -782,6 +792,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -808,6 +819,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -890,7 +902,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 2.317629,
+          "fallStartY": 2.057629,
           "fiveSecondRule": 101.05,
           "healPower": 5,
           "hp": 1,
@@ -939,7 +951,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1012,
-      "state": "521a9fe1",
+      "state": "23a3cc57",
       "events": "741638a5",
       "rng": {
         "draws": 68,
@@ -950,7 +962,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1012,
-      "state": "42c7a8d4",
+      "state": "29aab0ee",
       "events": "741638a5",
       "rng": {
         "draws": 158,
@@ -961,7 +973,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1012,
-      "state": "80f62733",
+      "state": "6d5f7af5",
       "events": "741638a5",
       "rng": {
         "draws": 249,
@@ -972,7 +984,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1012,
-      "state": "971c1cb6",
+      "state": "23f92190",
       "events": "741638a5",
       "rng": {
         "draws": 353,
@@ -983,7 +995,7 @@
       "tick": 81,
       "time": 4.05,
       "nextId": 1012,
-      "state": "cfe6d5bf",
+      "state": "ec9f0df1",
       "events": "97eed0bc",
       "rng": {
         "draws": 362,
@@ -1038,6 +1050,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1068,6 +1081,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1119,6 +1133,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1145,6 +1160,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1272,7 +1288,7 @@
       "tick": 81,
       "time": 4.05,
       "nextId": 1012,
-      "state": "4514f427",
+      "state": "71b31c79",
       "events": "feb66ba1",
       "rng": {
         "draws": 362,
@@ -1327,6 +1343,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1357,6 +1374,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1408,6 +1426,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1434,6 +1453,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1561,7 +1581,7 @@
       "tick": 81,
       "time": 4.05,
       "nextId": 1012,
-      "state": "4514f427",
+      "state": "71b31c79",
       "events": "741638a5",
       "rng": {
         "draws": 362,
@@ -1616,6 +1636,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1646,6 +1667,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1697,6 +1719,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1723,6 +1746,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

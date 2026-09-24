@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1014,
-      "state": "38fdec4f",
+      "state": "c09c9d63",
       "events": "8c92e89b",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1014,
-      "state": "3a19408e",
+      "state": "08b4571e",
       "events": "3a5da579",
       "rng": {
         "draws": 64,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1014,
-      "state": "cabb5a6c",
+      "state": "9fd6bcbc",
       "events": "70150bad",
       "rng": {
         "draws": 280,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1014,
-      "state": "4ce1d4e7",
+      "state": "6584557b",
       "events": "f35a0f3d",
       "rng": {
         "draws": 531,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1014,
-      "state": "237955fa",
+      "state": "8b5f0e2e",
       "events": "6307f48a",
       "rng": {
         "draws": 542,
@@ -131,6 +131,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -171,6 +172,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -217,6 +219,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -261,6 +264,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -309,6 +313,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -349,6 +354,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -394,6 +400,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -434,6 +441,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -670,7 +678,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1014,
-      "state": "536ef2c6",
+      "state": "f679c5da",
       "events": "7b856255",
       "rng": {
         "draws": 542,
@@ -726,6 +734,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -766,6 +775,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -812,6 +822,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -856,6 +867,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -904,6 +916,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -944,6 +957,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -989,6 +1003,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1029,6 +1044,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1263,7 +1279,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1014,
-      "state": "693510c1",
+      "state": "00217713",
       "events": "4ae6f06e",
       "rng": {
         "draws": 542,
@@ -1320,6 +1336,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1362,6 +1379,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1408,6 +1426,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1452,6 +1471,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1501,6 +1521,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1541,6 +1562,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -1586,6 +1608,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1626,6 +1649,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1860,7 +1884,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1014,
-      "state": "38d70fb3",
+      "state": "763089d5",
       "events": "741638a5",
       "rng": {
         "draws": 800,
@@ -1871,7 +1895,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1014,
-      "state": "ff04ec98",
+      "state": "f2901576",
       "events": "741638a5",
       "rng": {
         "draws": 979,
@@ -1928,6 +1952,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1970,6 +1995,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2016,6 +2042,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -2060,6 +2087,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2109,6 +2137,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -2149,6 +2178,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -2194,6 +2224,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -2234,6 +2265,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
