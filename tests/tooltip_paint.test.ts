@@ -95,22 +95,55 @@ describe('paintMobTooltipBottomRight', () => {
     const el = fakeTooltipEl({ w: 260, h: 120 });
     // A seat dragged to the top-left: the card hangs from its top-left corner
     // (unitTooltipAnchorPlacement, pinned in tests/tooltip_clamp_core.test.ts).
-    paintMobTooltipBottomRight(el, '<div>mob</div>', VIEW, null, {
+    paintMobTooltipBottomRight(el, '<div>mob</div>', VIEW, null, () => ({
       left: 100,
       top: 80,
       right: 320,
       bottom: 152,
-    });
+    }));
     expect(el.classList.contains('mob-tooltip')).toBe(true);
     expect(el.style.left).toBe('100px');
     expect(el.style.top).toBe('80px');
   });
 
+  it('reads the seat only AFTER the one box measure, so both share one layout', () => {
+    // The seat reader is a layout read too: taken before the content write it
+    // would settle a layout the write then dirties, and the measure would force
+    // a second. The fake logs both reads in order.
+    const reads: string[] = [];
+    const el = fakeTooltipEl({ w: 260, h: 120 });
+    const measured = {
+      ...el,
+      classList: el.classList,
+      style: el.style,
+      get offsetWidth() {
+        reads.push('measure');
+        return 260;
+      },
+      get offsetHeight() {
+        return 120;
+      },
+    };
+    paintMobTooltipBottomRight(measured, 'x', VIEW, null, () => {
+      reads.push('seat');
+      return null;
+    });
+    expect(reads).toEqual(['measure', 'seat']);
+    // An unlaid-out seat (the reader yields null) keeps the fixed corner.
+    expect([measured.style.left, measured.style.top]).toEqual(['1050px', '588px']);
+  });
+
   it('lets the touch minimap slot win over a seat, and no seat keep the fixed corner', () => {
-    const seat = { left: 100, top: 80, right: 320, bottom: 152 };
+    let seatReads = 0;
+    const seat = () => {
+      seatReads++;
+      return { left: 100, top: 80, right: 320, bottom: 152 };
+    };
     const touch = fakeTooltipEl({ w: 260, h: 120 });
     paintMobTooltipBottomRight(touch, 'x', VIEW, { left: 1100, top: 24 }, seat);
     expect([touch.style.left, touch.style.top]).toEqual(['832px', '24px']);
+    // The touch arm never pays for the seat's layout read.
+    expect(seatReads).toBe(0);
     const none = fakeTooltipEl({ w: 260, h: 120 });
     paintMobTooltipBottomRight(none, 'x', VIEW, null, null);
     expect([none.style.left, none.style.top]).toEqual(['1050px', '588px']);

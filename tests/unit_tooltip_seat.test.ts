@@ -7,7 +7,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { UNIT_TOOLTIP_ANCHOR_ELEMENT_ID } from '../src/ui/interface_unlock_core';
+import { HUD_FRAME_SPECS, UNIT_TOOLTIP_ANCHOR_ELEMENT_ID } from '../src/ui/interface_unlock_core';
 import { FRAME_USER_HIDDEN_CLASS } from '../src/ui/movable_frame';
 import { MOB_TOOLTIP_MARGIN_BOTTOM, MOB_TOOLTIP_MARGIN_RIGHT } from '../src/ui/tooltip_clamp_core';
 import { resolveUnitTooltipSeat } from '../src/ui/unit_tooltip_seat';
@@ -39,23 +39,27 @@ describe('resolveUnitTooltipSeat', () => {
     const seat = resolveUnitTooltipSeat(document);
     expect(seat.hidden).toBe(false);
     expect(seat.minimap).toBeNull();
-    expect(seat.anchor).toMatchObject({ left: 100, top: 80, right: 320, bottom: 152 });
+    expect(seat.readAnchor?.()).toMatchObject({ left: 100, top: 80, right: 320, bottom: 152 });
   });
 
   it('hides the card when the player unticked the Tooltip frame', () => {
     const el = mount(UNIT_TOOLTIP_ANCHOR_ELEMENT_ID, { left: 0, top: 0, width: 0, height: 0 });
     el.classList.add(FRAME_USER_HIDDEN_CLASS);
-    expect(resolveUnitTooltipSeat(document)).toEqual({ hidden: true, minimap: null, anchor: null });
+    expect(resolveUnitTooltipSeat(document)).toEqual({
+      hidden: true,
+      minimap: null,
+      readAnchor: null,
+    });
   });
 
   it('falls back to the fixed corner for a missing or unlaid-out anchor', () => {
     expect(resolveUnitTooltipSeat(document)).toEqual({
       hidden: false,
       minimap: null,
-      anchor: null,
+      readAnchor: null,
     });
     mount(UNIT_TOOLTIP_ANCHOR_ELEMENT_ID, { left: 0, top: 0, width: 0, height: 0 });
-    expect(resolveUnitTooltipSeat(document).anchor).toBeNull();
+    expect(resolveUnitTooltipSeat(document).readAnchor?.()).toBeNull();
   });
 
   it('keeps the touch minimap slot and ignores the seat, even a desktop hide', () => {
@@ -70,7 +74,7 @@ describe('resolveUnitTooltipSeat', () => {
     el.classList.add(FRAME_USER_HIDDEN_CLASS);
     const seat = resolveUnitTooltipSeat(document);
     expect(seat.hidden).toBe(false);
-    expect(seat.anchor).toBeNull();
+    expect(seat.readAnchor).toBeNull();
     expect(seat.minimap).toMatchObject({ left: 1100, top: 24 });
   });
 });
@@ -95,10 +99,25 @@ describe('the anchor ships in both entries at the fixed corner', () => {
     expect(rule).toContain('pointer-events: none;');
   });
 
+  it('sizes the placeholder exactly as the frame row clamps a hidden seat', () => {
+    const row = HUD_FRAME_SPECS.find((s) => s.id === 'unitTooltip');
+    const rule = block('#unit-tooltip-anchor');
+    expect(rule).toContain(`width: ${row?.fallbackSize.w}px;`);
+    expect(rule).toContain(`height: ${row?.fallbackSize.h}px;`);
+  });
+
   it('hands the placeholder back to the pointer while the interface is unlocked', () => {
     const rule = block('body.interface-unlocked #unit-tooltip-anchor.tf-unlocked');
     expect(rule).toContain('visibility: visible;');
     expect(rule).toContain('pointer-events: auto;');
+    // Above the button rail (z-index 19) it overlaps at the stock seat.
+    expect(rule).toContain('z-index: 20;');
+  });
+
+  it('gives the seat the governed frames corner move button, focus ring included', () => {
+    // Without these the button would render as an unstyled in-flow control.
+    expect(css).toContain('#unit-tooltip-anchor .tf-move-btn,');
+    expect(css).toContain('#unit-tooltip-anchor .tf-move-btn:focus-visible,');
   });
 
   it('mounts the anchor as a #ui child beside #tooltip in index.html and play.html', () => {

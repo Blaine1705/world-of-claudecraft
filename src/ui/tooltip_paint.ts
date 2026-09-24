@@ -51,23 +51,27 @@ export function paintTooltipAt(
   return box;
 }
 
-// `anchorRect` is the movable Tooltip frame's seat (desktop only): when present
-// the card grows from it (unitTooltipAnchorPlacement); the touch minimap slot
-// always wins, and no seat at all falls back to the fixed corner.
+// `readAnchor` reads the movable Tooltip frame's seat (desktop only): when it
+// yields a rect the card grows from it (unitTooltipAnchorPlacement); the touch
+// minimap slot always wins, and no seat at all falls back to the fixed corner.
+// It is a READER, called only after the one box measure below, so the seat's
+// rect comes off the layout that measure already settled instead of forcing a
+// second one ahead of the content write.
 export function paintMobTooltipBottomRight(
   tooltipEl: TooltipPaintTarget,
   html: string,
   viewport: TooltipViewport,
   minimapRect: { left: number; top: number } | null,
-  anchorRect: TooltipAnchorRect | null = null,
+  readAnchor: (() => TooltipAnchorRect | null) | null = null,
 ): void {
   tooltipEl.classList.add('mob-tooltip');
   tooltipEl.innerHTML = html;
   tooltipEl.style.display = 'block';
   tooltipEl.style.maxHeight = `${tooltipMaxHeight(viewport)}px`;
   const box = { w: tooltipEl.offsetWidth, h: tooltipEl.offsetHeight };
+  const anchorRect = minimapRect === null && readAnchor !== null ? readAnchor() : null;
   const at =
-    minimapRect === null && anchorRect !== null
+    anchorRect !== null
       ? unitTooltipAnchorPlacement(box, viewport, anchorRect)
       : mobTooltipCornerPlacement(box, viewport, minimapRect);
   tooltipEl.style.left = `${at.left}px`;

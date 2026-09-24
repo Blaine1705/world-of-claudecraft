@@ -6306,14 +6306,14 @@ export class Hud {
 
   // Seats the world-hover tooltip on its movable Tooltip frame (desktop; stock
   // seat the WoW bottom-right slot) or beside the minimap (touch), never the
-  // cursor; unit_tooltip_seat.ts resolves which, and a hidden frame shows none.
+  // cursor; unit_tooltip_seat.ts resolves which. A hidden frame paints nothing
+  // and drops only a world card already up, never a cursor tooltip's box.
   private paintMobTooltipBottomRight(html: string): void {
     const seat = resolveUnitTooltipSeat(document);
-    if (seat.hidden) this.hideTooltip();
-    else {
+    if (!seat.hidden) {
       const view = this.tooltipViewport();
-      paintMobTooltipBottomRightCore(this.tooltipEl, html, view, seat.minimap, seat.anchor);
-    }
+      paintMobTooltipBottomRightCore(this.tooltipEl, html, view, seat.minimap, seat.readAnchor);
+    } else if (this.tooltipEl.classList.contains('mob-tooltip')) this.hideTooltip();
   }
 
   // Shows the WoW-style mouseover tooltip (name / level / creature type) for a

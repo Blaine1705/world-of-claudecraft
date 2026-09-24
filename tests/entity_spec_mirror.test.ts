@@ -30,8 +30,10 @@ describe('Entity.specId mirror', () => {
     const sim = newSim();
     sim.setPlayerLevel(20);
     sim.setSpec(classSpecs('priest')[0]);
-    if (sim.setSpec(null)) expect(sim.player.specId).toBeNull();
-    else expect(sim.player.specId).toBe(sim.talentSpec);
+    expect(sim.player.specId).not.toBeNull();
+    expect(sim.setSpec(null)).toBe(true);
+    expect(sim.player.specId).toBeNull();
+    expect(sim.talentSpec).toBeNull();
   });
 
   it('keeps the spec across a talent respec, which retains the spec', () => {
@@ -72,11 +74,11 @@ describe('Entity.specId mirror', () => {
     expect(host.player.specId).toBeNull();
   });
 
-  it('never stamps a mob', () => {
+  it('never stamps a mob (the shared entity default stays null)', () => {
     const template = Object.values(MOBS)[0];
     if (!template) throw new Error('no mob templates');
     const mob = createMob(1, template, 5, { x: 0, y: 0, z: 0 });
-    expect(mob.specId).toBeUndefined();
+    expect(mob.specId).toBeNull();
   });
 
   it('is deterministic: the same seed and picks give the same mirror', () => {

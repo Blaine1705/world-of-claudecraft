@@ -5,11 +5,17 @@
 // decode that reads them (src/net/player_identity_wire.ts, pinned together by
 // tests/player_identity_wire.test.ts) and the monolith stays a consumer.
 //
-// Runs inside the per-entity, per-tick identity stringify (wireCacheFor), so
-// it stays a handful of scalar truthiness checks with no allocation. Sparse by
+// Runs inside the per-entity, per-tick identity stringify (wireCacheFor) and
+// the per-session self record (selfWireJson builds it from wireEntity), so it
+// stays a handful of scalar truthiness checks with no allocation. Sparse by
 // construction: an absent key on a full identity record means "unset", which
 // the decode resets to its default, so an unguilded, untitled, unspecced
-// player ships none of these bytes.
+// player ships none of these bytes. Peers pay for a line only on first sight
+// and when it changes (idVer); the owner's self record carries these lines
+// every snapshot, like the rest of its identity. For `spc` that is bounded by
+// the talent content (a spec id is at most 13 characters), accepted rather
+// than moved to the self delta channel, whose absent-means-unchanged rule
+// would need a separate self key for all six lines at once.
 
 import type { Entity } from '../src/sim/types';
 

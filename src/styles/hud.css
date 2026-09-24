@@ -1764,6 +1764,7 @@
   #swingbar-offhand .tf-move-btn,
   #paladin-devotion-frame .tf-move-btn,
   #proc-overlay .tf-move-btn,
+  #unit-tooltip-anchor .tf-move-btn,
   #meters-window .tf-move-btn {
     position: absolute;
     top: -10px;
@@ -1799,6 +1800,7 @@
   #paladin-devotion-frame .tf-move-btn:focus-visible,
   #petbar .tf-move-btn:focus-visible,
   #proc-overlay .tf-move-btn:focus-visible,
+  #unit-tooltip-anchor .tf-move-btn:focus-visible,
   #meters-window .tf-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
@@ -1965,11 +1967,15 @@
   }
   /* The tooltip seat is invisible and click-through in play (visibility, so
      its box stays measurable), so editing hands both back and dims it like
-     the other placeholders; its name chip says what it seats. */
+     the other placeholders; its name chip says what it seats. Its stock box
+     overlaps the button rail's lower corner (the card always did), so it
+     stacks one above the rail (z-index 19) to keep its corner move button
+     and body grabbable there; the #tooltip card itself stays above both. */
   body.interface-unlocked #unit-tooltip-anchor.tf-unlocked {
     visibility: visible;
     pointer-events: auto;
     opacity: 0.55;
+    z-index: 20;
   }
   /* A resizable unit frame needs a positioned host for its grip; the three
      already carry one (.unitframe and #party-frames are absolute, #player-frame

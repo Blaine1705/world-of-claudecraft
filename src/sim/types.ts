@@ -4870,7 +4870,7 @@ export interface Entity extends ClientMirroredEntityFields {
   // from persisted state; rides the identity wire only when non-null.
   border?: string | null;
   // The chosen talent specialization (a spec id such as 'holy', never display
-  // text), null for a character with no spec yet; absent on every mob/npc.
+  // text), null for a character with no spec yet and for every mob/npc.
   // Render-only mirror of PlayerMeta.talentMods.spec, stamped by
   // recalcPlayerStats beside the other worn-state mirrors so every spec,
   // respec, loadout, level, and load path refreshes it. The sim never reads

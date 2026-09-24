@@ -250,6 +250,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     guildTier: 0,
     title: null,
     border: null,
+    specId: null,
   };
 }
 
