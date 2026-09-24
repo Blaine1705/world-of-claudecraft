@@ -446,6 +446,7 @@ export type OptionsPanelId =
   | 'graphics'
   | 'interface'
   | 'auras'
+  | 'cooldowns'
   | 'audio'
   | 'performance'
   | 'transfer'
@@ -498,6 +499,7 @@ export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
     { labelKey: 'hud.options.graphics', action: { kind: 'goto', view: 'graphics' } },
     { labelKey: 'hud.options.interface', action: { kind: 'goto', view: 'interface' } },
     { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
+    { labelKey: 'hudChrome.cooldownManager.title', action: { kind: 'goto', view: 'cooldowns' } },
     { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
     { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
     // Full settings export/import: its own sub-panel, since the code it carries

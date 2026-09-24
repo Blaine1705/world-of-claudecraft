@@ -1261,6 +1261,7 @@ describe('options_view: main menu routing', () => {
       'hud.options.graphics',
       'hud.options.interface',
       'hudChrome.auraOverlay.title',
+      'hudChrome.cooldownManager.title',
       'hud.options.audio',
       'hudChrome.perf.title',
       'hudChrome.fullTransfer.menu',
@@ -1279,6 +1280,11 @@ describe('options_view: main menu routing', () => {
     expect(offline.find((e) => e.labelKey === 'hudChrome.auraOverlay.title')?.action).toEqual({
       kind: 'goto',
       view: 'auras',
+    });
+    // Cooldown Manager sits directly below Auras, its sibling overlay panel.
+    expect(offline.find((e) => e.labelKey === 'hudChrome.cooldownManager.title')?.action).toEqual({
+      kind: 'goto',
+      view: 'cooldowns',
     });
     // The Wiki row is unconditional (offline play has a wiki too) and routes to
     // the confirm-first external hop, never a sub-view.

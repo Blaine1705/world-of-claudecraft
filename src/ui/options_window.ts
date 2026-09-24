@@ -76,7 +76,7 @@ import { shaderWarmChoiceAvailable } from '../render/shader_warm_client';
 import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
-import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
+import type { AuraOverlayHooks } from './aura_overlay_settings';
 import { controllerDeviceStatusView } from './controller_options_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
@@ -84,6 +84,7 @@ import type { FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, findFocusKey, restoreFirstEnabled } from './focus_restore';
 import type { BugReportHooks, GraphicsApplyOutcome, OptionsHooks } from './hud';
 import type { ChatClock } from './hud/chat/chat_timestamp';
+import type { CooldownManagerHooks } from './hud/cooldown_manager';
 import {
   formatNumber,
   getLanguage,
@@ -110,6 +111,7 @@ import {
   buildInterfaceUnlockRow,
 } from './options_interface_rows';
 import { buildOptionsMenuList, type OptionsMenuRoutedAction } from './options_main_menu_controller';
+import { OptionsOverlayPanels } from './options_overlay_panels';
 import {
   type BoolToggleControl,
   boolToggleNextValue,
@@ -237,6 +239,8 @@ export interface OptionsWindowDeps {
   options(): OptionsHooks | null;
   /** Player-specific proc overlay editor, owned by Hud (null until wired). */
   auraOverlays?: () => AuraOverlayHooks;
+  /** Options > Cooldown Manager, owned by Hud like the aura editor. */
+  cooldownManager?: () => CooldownManagerHooks;
   /** The bug-report seam (online only; its presence gates the Report a Bug row). */
   bugReport(): BugReportHooks | null;
   /** The Wiki row: Hud's confirm-first external hop (src/ui/wiki_link.ts). The
@@ -422,7 +426,15 @@ export class OptionsWindow {
   // The Options > Performance panel, lazily built and reused (it caches the live
   // position-slider handles so a drag-to-move can update them in place).
   private perfSettings: PerfOverlaySettingsPanel | null = null;
-  private auraSettings: AuraOverlaySettingsPanel | null = null;
+  // Options > Auras and > Cooldown Manager (options_overlay_panels.ts).
+  private readonly overlayPanels = new OptionsOverlayPanels({
+    root: () => this.deps.root(),
+    viewShell: (title, bodyClass) => this.viewShell(title, bodyClass),
+    auras: () => this.deps.auraOverlays?.(),
+    cooldowns: () => this.deps.cooldownManager?.(),
+    openFocusTrap: (root, returnFocusTo) => this.deps.openFocusTrap(root, returnFocusTo),
+    close: () => this.close(),
+  });
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
   // Tracked separately from the root's inline `display` (rather than reading
@@ -506,8 +518,7 @@ export class OptionsWindow {
     this.keyboardBoard?.dispose();
     this.keyboardBoard = null;
     this.deps.options()?.perfOverlay.setPlacement(false);
-    this.auraSettings?.closePlacement();
-    this.deps.auraOverlays?.().setPlacement(false);
+    this.overlayPanels.close();
     this.deps.hideTooltip();
     music.resumeFromMenu();
     const target = this.returnFocus;
@@ -555,10 +566,9 @@ export class OptionsWindow {
     if (this.view !== 'keybinds') el.classList.remove('kb-wide');
     if (this.view !== 'graphics') el.classList.remove('gfx-wide');
     if (this.view !== 'performance') el.classList.remove('perf-wide');
-    if (this.view !== 'auras') el.classList.remove('aura-wide');
     // The overlay is draggable only while the Performance sub-view is open.
     this.deps.options()?.perfOverlay.setPlacement(this.view === 'performance');
-    this.deps.auraOverlays?.().setPlacement(this.view === 'auras');
+    this.overlayPanels.sync(this.view);
     this.syncGpuBackendWatch();
     switch (this.view) {
       case 'keybinds':
@@ -574,7 +584,8 @@ export class OptionsWindow {
         this.renderInterface();
         break;
       case 'auras':
-        this.renderAuras();
+      case 'cooldowns':
+        this.overlayPanels.render(this.view);
         break;
       case 'controller':
         this.renderController();
@@ -1938,23 +1949,6 @@ export class OptionsWindow {
     if (!hooks) return;
     this.perfSettings ??= new PerfOverlaySettingsPanel(this.perfSettingsHost(hooks));
     this.perfSettings.render(this.deps.root());
-  }
-
-  private renderAuras(): void {
-    const hooks = this.deps.auraOverlays?.();
-    if (!hooks) return;
-    this.deps.root().classList.add('aura-wide');
-    const body = this.viewShell(t('hudChrome.auraOverlay.title'), 'set-rows');
-    this.auraSettings ??= new AuraOverlaySettingsPanel({
-      auras: hooks,
-      click: () => audio.click(),
-      openFocusTrap: this.deps.openFocusTrap,
-    });
-    this.auraSettings.render(body);
-    this.deps
-      .root()
-      .querySelector('[data-close]')
-      ?.addEventListener('click', () => this.close());
   }
 
   private perfSettingsHost(hooks: OptionsHooks): PerfSettingsHost {

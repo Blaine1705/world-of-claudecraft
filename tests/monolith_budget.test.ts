@@ -493,7 +493,11 @@ const MONOLITHS: MonolithRow[] = [
     // Interface entry that joined it) moved to
     // src/ui/options_main_menu_controller.ts; the window keeps only the
     // routing and the touch gate. Exact count, zero slack.
-    ceiling: 2831,
+    // LOWERED 2831 -> 2825 when Options > Cooldown Manager landed: rather than
+    // grow a second inline overlay sub-panel, the Auras render method and its
+    // placement/teardown lines moved out with it to
+    // src/ui/options_overlay_panels.ts. Exact count, zero slack.
+    ceiling: 2825,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {

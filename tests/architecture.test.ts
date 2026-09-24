@@ -220,6 +220,9 @@ const UI_PURE_CORES = [
   'src/ui/proc_ready_glow_core.ts',
   'src/ui/reticle_ticks_core.ts',
   'src/ui/aura_watchlist_core.ts',
+  // The Cooldown Manager's per-frame core: readiness composed from the action
+  // bar's own pure view, the transform and glow flags, and the cue edges.
+  'src/ui/hud/cooldown_manager/cooldown_manager_view.ts',
   'src/ui/collection_actions_core.ts',
   'src/ui/hud/cosmetics/cosmetics_cards_view.ts',
   'src/ui/hud/cosmetics/cosmetics_view.ts',
@@ -2472,6 +2475,15 @@ const UI_DOM_MODULES = [
   // RULES it wires up are all in the pure cores (reticle_ticks_core,
   // proc_ready_glow_core, haptic_pulse_core, aura_watchlist_core).
   'src/ui/aura_overlay_wiring.ts',
+  // The Cooldown Manager's browser half: the controller mints and mounts the
+  // floating row and reads one drag rect; the store owns its localStorage record;
+  // the settings panel builds the Options sub-view; the wiring attaches the sfx
+  // engine and reads the live body class. Every RULE is in the two pure cores
+  // (cooldown_manager_config, cooldown_manager_view).
+  'src/ui/hud/cooldown_manager/cooldown_manager_controller.ts',
+  'src/ui/hud/cooldown_manager/cooldown_manager_settings.ts',
+  'src/ui/hud/cooldown_manager/cooldown_manager_store.ts',
+  'src/ui/hud/cooldown_manager/cooldown_manager_wiring.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
   'src/ui/mount_inspect_controller.ts',

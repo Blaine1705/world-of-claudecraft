@@ -709,6 +709,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the configured Warrior proc frames; writer-facet toggles elide unchanged states',
   },
   {
+    call: 'this.cooldownManager.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the Cooldown Manager groups, facet-routed: its pure core ticks the action bar view over the tracked spells (reusing the same world snapshot), then the painter writes through the elided writers, so a steady frame writes nothing; must run every frame for the ready-cue edges even when the groups are hidden',
+  },
+  {
     call: 'this.renderPetBar',
     band: 'frame',
     gate: '',
@@ -1796,7 +1803,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 90 -> 91: the always-on pinned-recipe tracker
       // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
       // tracker's exact slow-band row shape.
-    ).toEqual({ window: 49, chrome: 91, none: 17 });
+      // chrome 91 -> 92: the Cooldown Manager's per-frame paint
+      // (src/ui/hud/cooldown_manager/), facet-routed chrome.
+    ).toEqual({ window: 49, chrome: 92, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

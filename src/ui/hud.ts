@@ -438,6 +438,7 @@ import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
 import { RaidWarningBanner } from './hud/chat/raid_warning_banner';
 import { ReadyCheckLeaderWindow } from './hud/chat/ready_check_leader_window';
+import { type CooldownManagerController, mountCooldowns } from './hud/cooldown_manager';
 import { CosmeticsWindow } from './hud/cosmetics';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
 import {
@@ -2190,6 +2191,7 @@ export class Hud {
       paintGroundRings: (rings) => this.renderer.setPlayerAuraRings(rings),
       playCue: (cueId, volume) => audio.auraCue(cueId, volume),
     });
+    this.cooldownManager = mountCooldowns(this.sim, this.writerFacet, this.auraOverlayController);
     this.farmPressAffordance = new FarmPressAffordanceController({
       root: $('#interact-affordance'),
       writers: this.writerFacet,
@@ -4621,6 +4623,7 @@ export class Hud {
   // spell icon plus two side crescents once; its painter only toggles active
   // state on the hot path. Options > Auras owns preview and placement mode.
   private readonly auraOverlayController: AuraOverlayController;
+  private readonly cooldownManager: CooldownManagerController;
   private readonly farmPressAffordance: FarmPressAffordanceController;
   // One-shot login preview gate for the phoenix (see update()).
   private procOverlayPreviewed = false;
@@ -5708,6 +5711,7 @@ export class Hud {
         playerClass: () => this.sim.cfg.playerClass,
         previewCue: (cueId, volume) => audio.auraCue(cueId, volume),
       }),
+    cooldownManager: () => this.cooldownManager.settingsHooks(),
     bugReport: () => this.bugReportHooks,
     openWiki: () => this.openWiki(),
     keybinds: () => this.keybinds,
@@ -8035,7 +8039,7 @@ export class Hud {
         itemName: itemDisplayName,
         slotLabel: (i) => formatAbilityNumber(i + 1),
         formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
-        watchedGlowAbilityIds: () => this.auraOverlayController.readyGlowAbilityIds(),
+        watchedGlowAbilityIds: () => this.cooldownManager.readyGlowAbilityIds(),
       },
     );
     this.actionBarPainter = new ActionBarPainter(
@@ -9418,6 +9422,7 @@ export class Hud {
       };
       this.actionBarWorldInput = actionBarWorld;
     }
+    this.cooldownManager.paint(actionBarWorld);
     this.renderPetBar(pet);
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();

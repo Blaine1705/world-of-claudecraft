@@ -16974,6 +16974,87 @@
       grid-template-columns: 1fr;
     }
   }
+  /* Options > Cooldown Manager (src/ui/hud/cooldown_manager/cooldown_manager_settings.ts):
+     reuses the Auras panel's cards and grid above, plus the Tracked Spells
+     sorter (search, one drop section per group, Not Displayed). */
+  .cdm-add-bar {
+    flex-wrap: wrap;
+  }
+  .cdm-group-card:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .cdm-capacity {
+    margin: 0 0 6px;
+  }
+  .cdm-select {
+    min-height: 32px;
+  }
+  .cdm-group-actions,
+  .cdm-order-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .cdm-group-actions > .btn,
+  .cdm-order-row > .btn {
+    flex: 1 1 0;
+    width: auto;
+    min-height: 40px;
+    margin-top: 0;
+  }
+  .cdm-tracked {
+    margin-top: 14px;
+  }
+  .cdm-search {
+    width: 100%;
+    max-width: 320px;
+    min-height: 32px;
+    margin: 0 0 10px;
+  }
+  .cdm-detail-card {
+    margin: 0 0 10px;
+  }
+  .cdm-spell-section {
+    margin: 0 0 10px;
+    padding: 6px 8px 8px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-cell);
+  }
+  .cdm-spell-section.drop-target {
+    border-color: var(--gold);
+    box-shadow: var(--glow-gold);
+  }
+  .cdm-spell-section-title {
+    margin-bottom: 6px;
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .cdm-spell-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--socket-gap);
+    min-height: 40px;
+  }
+  .cdm-spell-chip {
+    --ui-socket-size: 40px;
+    flex: none;
+    padding: 0;
+    cursor: grab;
+  }
+  .cdm-spell-chip[aria-pressed="true"] {
+    border-color: var(--gold);
+    box-shadow: var(--glow-gold);
+  }
+  .cdm-spell-chip:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .cdm-spell-list .cdm-empty {
+    margin: 0;
+    align-self: center;
+  }
   /* Streamlined title bar for the perf panel (less bulky than the default chrome). */
   #options-menu.perf-wide > .panel-title {
     font-size: 14px;
