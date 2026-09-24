@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { VISUALS } from '../src/render/characters/manifest';
+import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { activateGfxProfile, GFX, getActiveGfxProfile } from '../src/render/gfx';
 import type { LiveSoulRendLook } from '../src/render/interior_encounter_prewarm';
 import {
@@ -16,6 +16,7 @@ import {
 import { NYTHRAXIS_GRAVE_PREWARM_NAME } from '../src/render/nythraxis_grave_flame_visual';
 import { MOBS } from '../src/sim/data';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
+import type { Entity } from '../src/sim/types';
 
 // The real factory needs resident GLBs, which Node never has (it returns null
 // there, fail-soft). A test that asks for rigs swaps in named stand-ins so
@@ -375,9 +376,12 @@ describe('interior encounter prewarm pass (driven)', () => {
       scale: template.scale,
     });
     // The entity carries the local player's held items (prewarmEntity spreads
-    // the player), which is harmless only because this rig has no swap slot.
-    expect(VISUALS.mob_varkhul_forgefather.weaponSlots ?? []).toEqual([]);
-    expect(VISUALS.mob_varkhul_forgefather.offhandSlot).toBeUndefined();
+    // the player), which is harmless only because this rig has no swap slot
+    // (tests/interior_encounter_prewarm_rig_key.test.ts drives the real spread).
+    const key = visualKeyFor(rigs.built[0] as unknown as Entity);
+    expect(key).toBe('mob_varkhul_forgefather');
+    expect(VISUALS[key].weaponSlots ?? []).toEqual([]);
+    expect(VISUALS[key].offhandSlot).toBeUndefined();
     // First unit of the set, so first child of the group: compiled first.
     expect(host.compiled[0]).toBe(`rig:mob:${VARKHUL_BOSS_ID}`);
     const rig = rigs.built[0].root as THREE.Object3D;
