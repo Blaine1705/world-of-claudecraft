@@ -305,4 +305,3 @@ function keepBannerInViewport(el: HTMLElement, uiRoot: HTMLElement): void {
   };
   win?.addEventListener('resize', clamp);
 }
-
