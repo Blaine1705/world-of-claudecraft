@@ -3421,6 +3421,10 @@ export const vi_VN: EnTranslations = {
       "elite": "Tinh Anh",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Di chuyển khung mục tiêu",
       "lock": "Khóa khung mục tiêu"
@@ -3499,7 +3503,8 @@ export const vi_VN: EnTranslations = {
         "deedTracker": "Theo Dõi Chiến Công",
         "delveTracker": "Theo Dõi Delve",
         "riftTracker": "Theo Dõi Khe Nứt",
-        "swingBarOffhand": "Tay Phụ"
+        "swingBarOffhand": "Tay Phụ",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Cài Đặt Khung",
       "framesMenuTitle": "Hiện hoặc ẩn từng khung riêng lẻ. Một khung chưa được đánh dấu sẽ vẫn ẩn cho đến khi bạn đánh dấu lại hoặc đặt lại về mặc định.",
@@ -6401,6 +6406,7 @@ export const vi_VN: EnTranslations = {
       "framesGovernedExtra": "Chỉnh Sửa Khung cũng nới khóa cụm theo dõi bên dưới (các nhiệm vụ bạn đang theo dõi cùng mục tiêu của chúng, tiến độ kỳ công, các trang Kỳ Trân Các của bạn, các công thức bạn đã ghim từ chế tác, hang sâu bạn đang khám phá, bất kỳ Vết Nứt nào bạn đang tham gia, và công thức hay đơn đặt hàng bạn đang theo dõi), thanh hành động của thú cưỡi bên cạnh khung thú cưỡi, khung điểm mục tiêu cho các hiệu ứng bất lợi của bạn trên các kẻ địch gần đó, mề đay Sùng Tín của Thánh Kỵ Sĩ, Thanh Sa Đọa của Thuật Sĩ Hắc Ám, lớp phủ hiệu ứng kích hoạt phép, đồng hồ đòn tay phụ cho người dùng vũ khí đôi, và cửa sổ đo sát thương theo tab, mỗi thứ mang nhãn tên riêng khi được nới lỏng.",
       "framesGovernedAuraTracks": "Chỉnh Khung cũng mở khóa sáu thanh hào quang tùy chọn sau khi bạn bật chúng trong thẻ Chiến Đấu của cùng cửa sổ tùy chọn Giao Diện: Bùa Lợi Của Tôi, Hồi Chiêu Phòng Thủ, Lá Chắn Của Tôi, Hồi Chiêu Tấn Công, Di Chuyển Và Tàng Hình, và Bùa Lợi Của Tôi Trên Đồng Minh. Mặc định mọi thanh đều tắt; mỗi thanh hiện nhãn tên riêng khi được mở khóa.",
       "framesGovernedTalkingHead": "Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
       "aurasTitle": "Buff và debuff",

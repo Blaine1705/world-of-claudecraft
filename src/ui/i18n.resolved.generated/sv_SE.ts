@@ -3421,6 +3421,10 @@ export const sv_SE: EnTranslations = {
       "elite": "Elit",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Flytta målramen",
       "lock": "Lås målramen"
@@ -3499,7 +3503,8 @@ export const sv_SE: EnTranslations = {
         "deedTracker": "Dådspårare",
         "delveTracker": "Delve-spårare",
         "riftTracker": "Revspårare",
-        "swingBarOffhand": "Avhand"
+        "swingBarOffhand": "Avhand",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Raminställningar",
       "framesMenuTitle": "Visa eller göm enskilda ramar. En avbockad ram förblir dold tills du bockar för den igen eller återställer till standard.",
@@ -6401,6 +6406,7 @@ export const sv_SE: EnTranslations = {
       "framesGovernedExtra": "Redigera ramar frigör också spårarstacken nedanför (dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, recept du fäst vid tillverkning, djupet du befinner dig i, varje spricka du deltar i samt receptet eller beställningen du följer), husdjurets åtgärdsrad bredvid dess ram, Målprickar-ramen för dina försvagningar på fiender i närheten, paladinens Andaktsmedaljong, häxmästarens Lidelsefält, överlägget för besvärjelseprocs, timern för vapenhandens svingar för den som använder två vapen och fönstret med flikar för skademätaren. Var och en får sin egen namnmarkering när den är frigjord.",
       "framesGovernedAuraTracks": "Redigera ramar frigör också de sex frivilliga auraraderna när du har slagit på dem på stridsfliken i samma gränssnittsalternativ: raden Mina förstärkningar, raden Defensiva nedkylningar, raden Mina sköldar, raden Offensiva nedkylningar, raden Rörelse och Smygande samt raden Mina förstärkningar på allierade. Varje rad är avstängd från början och får sin egen namnmarkering när den är frigjord.",
       "framesGovernedTalkingHead": "Redigera ramar lossar också dialogpanelen, som bär en NPC: s talade linje medan den NPC är utom synhåll; den bär sitt namnchip medan den är lös.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Mätare, timer och stridstext",
       "barsBody": "Din besvärjelsemätare visas mitt på skärmen, precis ovanför dina handlingsfält, närhelst du kastar eller kanaliserar, och bär besvärjelsens namn och tiden som återstår. Ditt mål får en egen besvärjelsemätare på sin ram, så du kan se vad som kommer och svara på det.\n\nEn tunn svingmätare sitter under din besvärjelsemätare och fylls mellan dina vapensvingar, så en närstrids- eller distansanfallare kan se när nästa automatiska träff landar.\n\nDin erfarenhetsmätare löper i full bredd under dina handlingsfält, uppdelad i segment, med en ljusare sträcka som visar den vilade erfarenhet du har sparat.\n\nSimma under vatten så visas en blå andningsmätare högst upp på skärmen. Den tappas medan huvudet är under ytan, blinkar rött när den tar slut och du börjar drunkna, och fylls snabbt på igen så fort du dyker upp. Blanksteg simmar dig upp, och tangenten Simma ner, Ctrl som standard, tar dig djupare.\n\nSkada och läkning flyter upp över det de landade på som små siffror, så du kan läsa en strid utan att läsa text. Fliken Stridslogg i din chattruta håller den fullständiga skriftliga redogörelsen.",
       "aurasTitle": "Buffar och debuffar",

@@ -3421,6 +3421,10 @@ export const en: EnTranslations = {
       "elite": "Elite",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Move target frame",
       "lock": "Lock target frame"
@@ -3499,7 +3503,8 @@ export const en: EnTranslations = {
         "deedTracker": "Deed Tracker",
         "delveTracker": "Delve Tracker",
         "riftTracker": "Rift Tracker",
-        "swingBarOffhand": "Off Hand"
+        "swingBarOffhand": "Off Hand",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Frames Settings",
       "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",
@@ -6401,6 +6406,7 @@ export const en: EnTranslations = {
       "framesGovernedExtra": "Edit Frames also loosens the tracker stack below (your tracked quests and their objectives, your deed progress, your Reliquary pages, recipes you pinned from crafting, the delve you are in, any rift you are taking part in, and the recipe or commission you are tracking), the pet action bar beside your pet frame, the Target dots frame for your debuffs across nearby enemies, the paladin's Devotion medallion, the warlock's Affliction Bar, the spell-proc overlay, the off-hand swing timer for dual-wielders, and the tabbed damage meter window, each wearing its own name chip while it is loose.",
       "framesGovernedAuraTracks": "Edit Frames also loosens the six opt-in aura tracks once you have switched them on from the Combat tab of the same Interface options: the My Buffs track, the Defensive Cooldowns track, the My Shields track, the Offensive Cooldowns track, the Movement and Stealth track, and the My Buffs on Allies track. Every track is off by default, and each wears its own name chip while it is loose.",
       "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Bars, timers, and combat text",
       "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands. Fighting with a weapon in each hand adds a second bar right below it, filling on its own separate clock, so you can time your abilities between BOTH swings instead of just one.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
       "aurasTitle": "Buffs and debuffs",

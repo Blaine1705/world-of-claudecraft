@@ -16864,6 +16864,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '「フレーム編集」は、その下に積み重なるトラッカー群(追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、製作でピン留めしたレシピ、潜っているデルヴ、参加中のリフト、そして追跡中のレシピまたは依頼)、ペットフレーム脇のペットアクションバー、周囲の敵にかけた継続的なデバフをまとめて表示する「ターゲットデバフ」フレーム、パラディンの「献身」の記章、ウォーロックの「苦痛リソースバー」、スペル発動オーバーレイ、二刀流時のオフハンド用スイングバー、そしてタブ式のダメージメーターウィンドウも緩めます。緩んでいる間はそれぞれに名前のチップが付きます。',
   'guide.interfacePage.framesGovernedTalkingHead':
     '「フレームを編集」では会話パネルも動かせるようになります。会話パネルは、話しているNPCが視界の外にいるときにそのセリフを表示するもので、ロック解除中は名前チップを表示します。',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    '「フレーム編集」ではツールチップフレームも動かせるようになります。マウスを合わせた対象のカードが表示される位置で、クリーチャーならレベルと種類、ほかのプレイヤーなら称号、ギルド、レベルとクラス、そして専門化とその役割が表示されます。好きな場所へドラッグすると、カードはそこから画面の近い端を避ける向きに広がります。「フレーム設定」の「フレームの表示・非表示」でツールチップのチェックを外すと、このカードを完全に非表示にできます。',
   'guide.interfacePage.framesGovernedAuraTracks':
     '「フレーム編集」は、同じ「インターフェース」オプションの「戦闘」タブでオンにした任意の6つのオーラトラック、すなわち「自分のバフ」トラック、「防御クールダウン」トラック、「自分のシールド」トラック、「攻撃クールダウン」トラック、「移動とステルス」トラック、「味方へのバフ」トラックも緩めます。どのトラックも初期状態ではオフで、緩んでいる間はそれぞれに名前のチップが付きます。',
   'guide.interfacePage.mapBodyZoneFirst':
@@ -16992,6 +16994,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'バトルグラウンドまたはアリーナのキューが成立したら Discord のダイレクトメッセージで知らせる（Discord アカウントの連携が必要）',
   'hudChrome.interfaceUnlock.frameNames.petBar': 'ペットバー',
   'hudChrome.interfaceUnlock.frameNames.swingBarOffhand': 'オフハンド',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'ツールチップ',
   'hudChrome.keyboardMap.assignOption': '{category}: {action}',
   'hudChrome.keyboardMap.bindingLine': '{key}: {action}',
   'hudChrome.keyboardMap.form60': '60%',

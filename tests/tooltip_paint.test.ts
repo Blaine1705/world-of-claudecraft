@@ -91,6 +91,31 @@ describe('paintMobTooltipBottomRight', () => {
     expect(el.style.top).toBe('24px');
   });
 
+  it('grows from the movable seat when one is given (desktop)', () => {
+    const el = fakeTooltipEl({ w: 260, h: 120 });
+    // A seat dragged to the top-left: the card hangs from its top-left corner
+    // (unitTooltipAnchorPlacement, pinned in tests/tooltip_clamp_core.test.ts).
+    paintMobTooltipBottomRight(el, '<div>mob</div>', VIEW, null, {
+      left: 100,
+      top: 80,
+      right: 320,
+      bottom: 152,
+    });
+    expect(el.classList.contains('mob-tooltip')).toBe(true);
+    expect(el.style.left).toBe('100px');
+    expect(el.style.top).toBe('80px');
+  });
+
+  it('lets the touch minimap slot win over a seat, and no seat keep the fixed corner', () => {
+    const seat = { left: 100, top: 80, right: 320, bottom: 152 };
+    const touch = fakeTooltipEl({ w: 260, h: 120 });
+    paintMobTooltipBottomRight(touch, 'x', VIEW, { left: 1100, top: 24 }, seat);
+    expect([touch.style.left, touch.style.top]).toEqual(['832px', '24px']);
+    const none = fakeTooltipEl({ w: 260, h: 120 });
+    paintMobTooltipBottomRight(none, 'x', VIEW, null, null);
+    expect([none.style.left, none.style.top]).toEqual(['1050px', '588px']);
+  });
+
   it('caps the height off the viewport BEFORE the box is measured', () => {
     // Both paths share the ONE #tooltip element; a cap written after the
     // measure or never written lets a prior cursor tooltip's cap leak in.

@@ -14,6 +14,7 @@ import {
   HUD_FRAME_SPECS,
   HUD_FRAME_STORAGE_KEYS,
   interfaceUnlockLabelKey,
+  UNIT_TOOLTIP_ANCHOR_ELEMENT_ID,
   type UnlockCandidate,
 } from '../src/ui/interface_unlock_core';
 
@@ -61,6 +62,8 @@ describe('HUD_FRAME_SPECS', () => {
       'auraTrack_utility',
       'auraTrack_friendly',
       'auraTrack_shields',
+      // The mouseover tooltip's movable seat, appended after the tracks.
+      'unitTooltip',
     ]);
     expect(HUD_FRAME_SPECS.map((s) => s.elementId)).toEqual([
       'actionbar',
@@ -98,6 +101,7 @@ describe('HUD_FRAME_SPECS', () => {
       'aura-track-utility',
       'aura-track-friendly',
       'aura-track-shields',
+      'unit-tooltip-anchor',
     ]);
     // A duplicated storage key would make two frames overwrite each other's
     // saved box, which is silent and only shows up after a reload.
@@ -160,6 +164,7 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_track_utility',
       'woc_hud_frame_track_friendly',
       'woc_hud_frame_track_shields',
+      'woc_hud_frame_unit_tooltip',
     ]);
   });
 
@@ -217,6 +222,21 @@ describe('HUD_FRAME_SPECS', () => {
       'damageMeter',
       ...AURA_TRACKS.map((t) => `auraTrack_${t.id}`),
     ]);
+  });
+
+  it('makes exactly the tooltip seat move-only', () => {
+    // The seat's box is a placement proxy for the transient #tooltip card, so a
+    // grip or edge resize would change nothing the player sees; every other row
+    // stays scalable (absent means scalable at the Hud wiring site).
+    const moveOnly = HUD_FRAME_SPECS.filter((s) => s.scalable === false).map((s) => s.id);
+    expect(moveOnly).toEqual(['unitTooltip']);
+    const seat = HUD_FRAME_SPECS.find((s) => s.id === 'unitTooltip');
+    expect(seat?.elementId).toBe(UNIT_TOOLTIP_ANCHOR_ELEMENT_ID);
+    expect(seat?.detachToUiRoot).toBe(false);
+    // The flag is inert unless the Hud wiring forwards it to MovableFrame, which
+    // builds the grip and the edge resizes only for a scalable config.
+    const hud = readFileSync(join(import.meta.dirname, '..', 'src', 'ui', 'hud.ts'), 'utf8');
+    expect(hud).toContain('scalable: spec.scalable ?? true,');
   });
 
   it('lifts the zoom ceiling for exactly the wishlist chip', () => {

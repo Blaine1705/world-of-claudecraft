@@ -3421,6 +3421,10 @@ export const nl_NL: EnTranslations = {
       "elite": "Elite",
       "boss": "Baas"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Doelwitframe verplaatsen",
       "lock": "Doelwitframe vergrendelen"
@@ -3499,7 +3503,8 @@ export const nl_NL: EnTranslations = {
         "deedTracker": "Daadvolger",
         "delveTracker": "Delve-volger",
         "riftTracker": "Riftvolger",
-        "swingBarOffhand": "Offhand"
+        "swingBarOffhand": "Offhand",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Frame-instellingen",
       "framesMenuTitle": "Toon of verberg afzonderlijke frames. Een uitgevinkt frame blijft verborgen tot je het weer aanvinkt of terugzet naar de standaardinstellingen.",
@@ -6401,6 +6406,7 @@ export const nl_NL: EnTranslations = {
       "framesGovernedExtra": "Frames bewerken maakt ook de tracker-stapel eronder los, met je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, recepten die je vanuit het ambacht hebt vastgezet, de delve waarin je zit, elke rift waaraan je deelneemt en het recept of de opdracht die je volgt. Ook de huisdieractiebar naast je huisdierframe, het Doel-puntenframe voor je debuffs op nabije vijanden, de Toewijding-medaille van de paladijn, de Affliction-balk van de warlock, de spreukproc-overlay, de zwaai-timer voor de vrije hand van dubbelzwaaiers en het venster met tabbladen voor de schademeter worden losgemaakt, elk met zijn eigen naamlabel.",
       "framesGovernedAuraTracks": "Frames bewerken maakt ook de zes optionele aurastromen los zodra je ze hebt ingeschakeld op het tabblad Gevecht van dezelfde Interface-opties: de stroom Mijn buffs, de stroom Verdedigingsafkoelingen, de stroom Mijn schilden, de stroom Aanvalsafkoelingen, de stroom Beweging en sluipen, en de stroom Mijn buffs op bondgenoten. Elke stroom staat standaard uit en draagt zijn eigen naamlabel zolang hij losstaat.",
       "framesGovernedTalkingHead": "Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Balken, timers en gevechtstekst",
       "barsBody": "Je spreukbalk verschijnt in het midden van het scherm, net boven je actiebalken, telkens wanneer je een spreuk uitspreekt of kanaliseert, en toont de naam van de spreuk en de resterende tijd. Je doelwit krijgt een eigen spreukbalk op zijn frame, zodat je kunt zien wat eraan komt en erop kunt reageren.\n\nEen dunne wapenslagbalk zit onder je spreukbalk en vult zich tussen je wapenslagen, zodat een nabij- of afstandsaanvaller kan zien wanneer de volgende automatische treffer landt.\n\nJe ervaringsbalk loopt over de volle breedte onder je actiebalken, verdeeld in segmenten, met een lichter stuk dat de uitgeruste ervaring toont die je hebt opgespaard.\n\nZwem onder water en een blauwe adembalk verschijnt bovenaan het scherm. Hij loopt leeg terwijl je hoofd onder water is, knippert rood zodra hij leeg is en je begint te verdrinken, en vult zich snel weer zodra je boven water komt. Spatie zwemt je omhoog, en de toets Omlaag Zwemmen, standaard Ctrl, brengt je dieper.\n\nSchade en genezing zweven als kleine getallen omhoog boven wat ze raken, zodat je een gevecht kunt lezen zonder tekst te lezen. Het tabblad Gevecht in je chatbox houdt het volledige geschreven verslag bij.",
       "aurasTitle": "Buffs en debuffs",

@@ -3421,6 +3421,10 @@ export const pl_PL: EnTranslations = {
       "elite": "Elita",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Przesuń ramkę celu",
       "lock": "Zablokuj ramkę celu"
@@ -3499,7 +3503,8 @@ export const pl_PL: EnTranslations = {
         "deedTracker": "Śledzenie czynów",
         "delveTracker": "Śledzenie wypraw",
         "riftTracker": "Śledzenie szczeliny",
-        "swingBarOffhand": "Lewa ręka"
+        "swingBarOffhand": "Lewa ręka",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Ustawienia ramek",
       "framesMenuTitle": "Pokazuj lub ukrywaj poszczególne ramki. Odznaczona ramka pozostaje ukryta, dopóki jej ponownie nie zaznaczysz albo nie przywrócisz ustawień domyślnych.",
@@ -6401,6 +6406,7 @@ export const pl_PL: EnTranslations = {
       "framesGovernedExtra": "Edycja ramek odblokowuje także stos śledzonych elementów poniżej: śledzone zadania i ich cele, postęp dokonań, strony Reliquarium, przypięte receptury rzemieślnicze, aktywną wyprawę, każdą trwającą szczelinę oraz śledzoną recepturę lub zlecenie. Obejmuje też pasek akcji pupila obok jego ramki, ramkę kropek Celu dla osłabień pobliskich wrogów, medalion Oddania paladyna, Pasek utrapień czarnoksiężnika, nakładkę wyzwalacza zaklęć, zegar uderzeń broni podręcznej dla walczących dwiema broniami oraz okno miernika obrażeń z kartami. Każdy element ma własną etykietę, gdy zostanie odblokowany.",
       "framesGovernedAuraTracks": "Edycja ramek odblokowuje także sześć dobrowolnych ścieżek aur, gdy włączysz je na karcie Walka tych samych opcji interfejsu: ścieżkę Moje premie, ścieżkę defensywnych czasów odnowienia, ścieżkę Moich tarcz, ścieżkę ofensywnych czasów odnowienia, ścieżkę Ruchu i ukrycia oraz ścieżkę Moich premii na sojusznikach. Każda ścieżka jest domyślnie wyłączona i każda nosi własną etykietę, gdy zostanie odblokowana.",
       "framesGovernedTalkingHead": "Edytuj ramki rozluźnia także panel Dialogu, który zawiera wypowiedź NPC, gdy ten NPC jest poza twoim polem widzenia; nosi chip z nazwą, gdy jest luzem.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Paski, liczniki i tekst walki",
       "barsBody": "Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.",
       "aurasTitle": "Wzmocnienia i osłabienia",

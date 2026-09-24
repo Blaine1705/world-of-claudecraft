@@ -242,6 +242,7 @@ import {
   perfectingSwapCommand,
   perfectingSwapInfoForMirror,
 } from './perfecting_swap_command';
+import { decodePlayerIdentityWire } from './player_identity_wire';
 import { applyProfessionsSelfMirror } from './professions_self_mirror';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
@@ -2765,11 +2766,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.dungeonId = w.dgn ?? null;
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
-        e.guild = w.gd ?? '';
-        e.pledgeGuild = w.pg ?? '';
-        e.guildTier = w.gt ?? 0;
-        e.title = w.title ?? null; // Book of Deeds active title (a deed id)
-        e.border = w.border ?? null; // Book of Deeds nameplate border (a deed id)
+        Object.assign(e, decodePlayerIdentityWire(w)); // guild, pledge, tier, deed title/border, spec
         if (e.kind === 'npc') {
           const def = NPCS[e.templateId];
           e.questIds = def ? [...def.questIds] : [];

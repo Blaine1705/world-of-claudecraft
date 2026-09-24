@@ -398,6 +398,7 @@ import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types'
 import { dispatchPerfectItemCommand } from './perfect_item_command';
 import { parsePerfectingSwapCommand } from './perfecting_swap_command';
 import { runPeriodicSaveFlush } from './periodic_save_flush';
+import { writePlayerIdentityWire } from './player_identity_wire';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
@@ -1356,11 +1357,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   // wireStreamerLinks at the point they were set on the entity, so an account whose
   // streamer flag is off has none here, whatever is stored against it.
   if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
-  if (e.guild) out.gd = e.guild;
-  if (e.pledgeGuild) out.pg = e.pledgeGuild; // guild pledge (display only; '' for members)
-  if (e.guildTier) out.gt = e.guildTier; // guild colour tier (sim/guild_tier.ts)
-  if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
-  if (e.border) out.border = e.border; // Book of Deeds nameplate border (a deed id; the client resolves the slug)
+  writePlayerIdentityWire(e, out); // guild, pledge, guild tier, deed title/border, spec
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
   if (e.objectItemId) out.obj = e.objectItemId;

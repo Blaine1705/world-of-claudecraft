@@ -3421,6 +3421,10 @@ export const tr_TR: EnTranslations = {
       "elite": "Seçkin",
       "boss": "Patron"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Hedef çerçevesini taşı",
       "lock": "Hedef çerçevesini kilitle"
@@ -3499,7 +3503,8 @@ export const tr_TR: EnTranslations = {
         "deedTracker": "Edim Takipçisi",
         "delveTracker": "Delve Takipçisi",
         "riftTracker": "Yarık Takipçisi",
-        "swingBarOffhand": "Sol El"
+        "swingBarOffhand": "Sol El",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Çerçeve Ayarları",
       "framesMenuTitle": "Ayrı ayrı çerçeveleri göster ya da gizle. İşareti kaldırılmış bir çerçeve, tekrar işaretleyene ya da varsayılanlara sıfırlayana kadar gizli kalır.",
@@ -6401,6 +6406,7 @@ export const tr_TR: EnTranslations = {
       "framesGovernedExtra": "Çerçeveleri Düzenle, aşağıdaki takipçi yığınını da gevşetir: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, Reliquary sayfaların, üretimden sabitlediğin tarifler, içinde olduğun delve, katıldığın her yarık ve takip ettiğin tarif veya komisyon. Ayrıca evcil hayvan çerçevesinin yanındaki evcil hayvan eylem çubuğu, yakındaki düşmanlardaki zayıflatmaların için Hedef noktaları çerçevesi, paladinin Adanmışlık madalyası, büyücünün Lanet Çubuğu, büyü tetikleme kaplaması, çift elli savaşçılar için yardımcı el savurma sayacı ve sekmeli hasar ölçer penceresi de her biri kendi ad çipini taşırken gevşetilir.",
       "framesGovernedAuraTracks": "Arayüz seçeneklerinin aynı Arayüz sekmesindeki Savaş sekmesinden açtığın altı isteğe bağlı aura izini de Çerçeveleri Düzenle gevşetir: Takviyelerim izi, Savunma Bekleme Süreleri izi, Kalkanlarım izi, Saldırı Bekleme Süreleri izi, Hareket ve Gizlilik izi ve Müttefiklerde Takviyelerim izi. Her iz varsayılan olarak kapalıdır ve gevşekken kendi ad çipini taşır.",
       "framesGovernedTalkingHead": "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
       "aurasTitle": "Takviyeler ve zayıflatmalar",

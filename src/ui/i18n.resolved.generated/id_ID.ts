@@ -3421,6 +3421,10 @@ export const id_ID: EnTranslations = {
       "elite": "Elite",
       "boss": "Bos"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Pindahkan bingkai sasaran",
       "lock": "Kunci bingkai sasaran"
@@ -3499,7 +3503,8 @@ export const id_ID: EnTranslations = {
         "deedTracker": "Pelacak Perbuatan",
         "delveTracker": "Pelacak Delve",
         "riftTracker": "Pelacak Rift",
-        "swingBarOffhand": "Tangan Kiri"
+        "swingBarOffhand": "Tangan Kiri",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Pengaturan Bingkai",
       "framesMenuTitle": "Tampilkan atau sembunyikan bingkai satu per satu. Bingkai yang tidak dicentang tetap tersembunyi sampai kamu mencentangnya lagi atau mengatur ulang ke bawaan.",
@@ -6401,6 +6406,7 @@ export const id_ID: EnTranslations = {
       "framesGovernedExtra": "Edit Bingkai juga melonggarkan tumpukan pelacak di bawahnya, yaitu misi dan tujuan yang kamu lacak, kemajuan jasamu, halaman Relikvarium, resep yang kamu sematkan dari kerajinan, delve yang sedang kamu jalani, rift yang sedang kamu ikuti, serta resep atau komisi yang kamu lacak, bilah aksi pet di samping bingkai pet, bingkai Titik Sasaran untuk debuffmu pada musuh terdekat, medali Devosi paladin, Bilah Penderitaan warlock, hamparan proc mantra, timer ayunan tangan kedua untuk pemakai dua senjata, dan jendela meter kerusakan bertab, semuanya memakai chip nama sendiri saat dilonggarkan.",
       "framesGovernedAuraTracks": "Edit Bingkai juga melonggarkan enam jalur aura pilihan setelah kamu menyalakannya dari tab Tempur pada opsi Antarmuka yang sama: jalur Buffku, jalur Masa Tunggu Defensif, jalur Perisaiku, jalur Masa Tunggu Ofensif, jalur Pergerakan dan Sembunyi, serta jalur Buffku pada Sekutu. Semua jalur mati secara bawaan, dan masing-masing memakai chip nama sendiri saat dilonggarkan.",
       "framesGovernedTalkingHead": "Edit Frames juga melonggarkan panel Dialog, yang membawa kalimat lisan NPC saat NPC tersebut berada di luar pandangan Anda; ia memakai chip namanya saat longgar.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Bilah, penghitung waktu, dan teks pertarungan",
       "barsBody": "Bilah rapalanmu muncul di tengah layar, tepat di atas bilah aksimu, setiap kali kamu merapal atau menyalurkan mantra, dan menampilkan nama mantra serta waktu yang tersisa. Targetmu mendapatkan bilah rapalannya sendiri pada bingkainya, sehingga kamu bisa melihat apa yang akan datang dan meresponsnya.\n\nSebuah bilah ayunan tipis berada di bawah bilah rapalanmu dan terisi di antara ayunan senjatamu, sehingga penyerang jarak dekat atau jarak jauh bisa melihat kapan pukulan otomatis berikutnya akan mendarat.\n\nBilah pengalamanmu membentang selebar penuh di bawah bilah aksimu, terbagi menjadi segmen-segmen, dengan sebuah bagian yang lebih terang menunjukkan pengalaman istirahat yang telah kamu tabung.\n\nBerenang di bawah air dan sebuah bilah napas biru muncul di bagian atas layar. Bilah itu berkurang selama kepalamu terendam, berkedip merah begitu habis dan kamu mulai tenggelam, lalu terisi cepat begitu kamu muncul ke permukaan. Space membuatmu berenang ke atas, dan tombol Berenang Turun, Ctrl secara bawaan, membawamu lebih dalam.\n\nKerusakan dan penyembuhan melayang ke atas dari apa pun yang menerimanya sebagai angka-angka kecil, sehingga kamu bisa membaca sebuah pertarungan tanpa membaca teks. Tab Catatan Tempur di kotak obrolanmu menyimpan catatan tertulis yang lengkap.",
       "aurasTitle": "Buff dan debuff",

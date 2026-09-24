@@ -3421,6 +3421,10 @@ export const it_IT: EnTranslations = {
       "elite": "Élite",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Sposta il riquadro del bersaglio",
       "lock": "Blocca il riquadro del bersaglio"
@@ -3499,7 +3503,8 @@ export const it_IT: EnTranslations = {
         "deedTracker": "Tracciatore imprese",
         "delveTracker": "Tracciatore esplorazioni",
         "riftTracker": "Tracciatore varchi",
-        "swingBarOffhand": "Mano secondaria"
+        "swingBarOffhand": "Mano secondaria",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Impostazioni riquadri",
       "framesMenuTitle": "Mostra o nascondi i singoli riquadri. Un riquadro deselezionato resta nascosto finché non lo riselezioni o ripristini i valori predefiniti.",
@@ -6401,6 +6406,7 @@ export const it_IT: EnTranslations = {
       "framesGovernedExtra": "Modifica Strutture allenta anche la pila di tracciatori sottostante, con le missioni e gli obiettivi tracciati, il progresso delle imprese, le pagine del Reliquiario, le ricette che hai appuntato dalla fabbricazione, la spedizione in corso, lo squarcio a cui partecipi e la ricetta o commissione seguita, oltre alla barra delle azioni del famiglio, ai punti del bersaglio per le tue debilitazioni sui nemici vicini, al medaglione Devozione del paladino, alla Barra Afflizione dello stregone, alla sovrapposizione dei proc degli incantesimi, al timer del colpo della mano secondaria per chi impugna due armi e alla finestra a schede dei misuratori dei danni. Ognuno porta il proprio chip con il nome quando è allentato.",
       "framesGovernedAuraTracks": "Modifica Strutture allenta anche le sei tracce aura opzionali dopo che le hai attivate dalla scheda Combattimento delle stesse opzioni Interfaccia: la traccia I miei benefici, la traccia Recuperi difensivi, la traccia I miei scudi, la traccia Recuperi offensivi, la traccia Movimento e furtività e la traccia I miei benefici sugli alleati. Ogni traccia è disattivata per impostazione predefinita e, quando è allentata, porta il proprio chip con il nome.",
       "framesGovernedTalkingHead": "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Barre, timer e testo di combattimento",
       "barsBody": "La tua barra di lancio appare al centro dello schermo, appena sopra le barre delle azioni, ogni volta che lanci o canalizzi un incantesimo, e riporta il nome dell'incantesimo e il tempo rimanente. Anche il tuo bersaglio ha una propria barra di lancio sul suo riquadro, così puoi vedere cosa sta arrivando e rispondere.\n\nUna sottile barra dell'attacco sta sotto la tua barra di lancio e si riempie tra un colpo d'arma e l'altro, così chi attacca in mischia o a distanza può vedere quando arriverà il prossimo colpo automatico.\n\nLa tua barra dell'esperienza occupa tutta la larghezza sotto le barre delle azioni, suddivisa in segmenti, con un tratto più chiaro che mostra l'esperienza da riposo che hai accumulato.\n\nNuota sott'acqua e in cima allo schermo compare una barra del Fiato blu. Si consuma finché hai la testa sott'acqua, lampeggia di rosso quando si esaurisce e inizi ad annegare, e si riempie di nuovo in fretta non appena riemergi. Barra spaziatrice ti fa nuotare verso l'alto, e il tasto Nuota Verso il Basso, Ctrl di default, ti porta più in profondità.\n\nI danni e le cure salgono fluttuando sopra ciò che hanno colpito come piccoli numeri, così puoi leggere uno scontro senza leggere del testo. La scheda Combattimento nella tua chat conserva il resoconto scritto completo.",
       "aurasTitle": "Potenziamenti e indebolimenti",

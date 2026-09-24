@@ -3421,6 +3421,10 @@ export const cs_CZ: EnTranslations = {
       "elite": "Elita",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Přesunout rám cíle",
       "lock": "Zamknout rám cíle"
@@ -3499,7 +3503,8 @@ export const cs_CZ: EnTranslations = {
         "deedTracker": "Sledování skutků",
         "delveTracker": "Sledování výprav do hlubin",
         "riftTracker": "Sledování trhlin",
-        "swingBarOffhand": "Levá ruka"
+        "swingBarOffhand": "Levá ruka",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Nastavení rámečků",
       "framesMenuTitle": "Zobraz nebo skryj jednotlivé rámečky. Nezaškrtnutý rámeček zůstane skrytý, dokud ho znovu nezaškrtneš nebo neobnovíš výchozí nastavení.",
@@ -6401,6 +6406,7 @@ export const cs_CZ: EnTranslations = {
       "framesGovernedExtra": "Upravit rámečky uvolní také zásobník trackerů pod nimi, tedy sledované úkoly a jejich cíle, postup skutků, stránky Reliquiáře, recepty, které sis připnul(a) z řemesel, delve, ve kterém jsi, rift, jehož se účastníš, a sledovaný recept či zakázku, dále akční lištu mazlíčka vedle jeho rámečku, rámeček teček cíle pro tvé záporné účinky na blízkých nepřátelích, paladinův medailon Oddanosti, čarodějův Panel trápení, překryv procs kouzel, časovač švihu vedlejší ruky pro bojovníky se dvěma zbraněmi a záložkové okno měřiče poškození. Každý při uvolnění nosí vlastní štítek se jménem.",
       "framesGovernedAuraTracks": "Upravit rámečky po zapnutí v kartě Boj stejných možností Rozhraní uvolní také šest volitelných stop aur: stopu Mých posílení, stopu Obranných obnov, stopu Mých štítů, stopu Útočných obnov, stopu Pohybu a utajení a stopu Mých posílení na spojencích. Každá stopa je ve výchozím stavu vypnutá a po uvolnění nosí vlastní štítek se jménem.",
       "framesGovernedTalkingHead": "Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Lišty, časovače a bojový text",
       "barsBody": "Tvá lišta sesílání se objeví uprostřed obrazovky, těsně nad tvými akčními lištami, kdykoli sesíláš nebo kanáluješ kouzlo, a nese jméno kouzla a zbývající čas. Tvůj cíl má na svém rámu vlastní lištu sesílání, takže vidíš, co přichází, a můžeš na to zareagovat.\n\nPod tvou lištou sesílání sedí tenká lišta švihu, která se plní mezi švihy tvé zbraně, takže útočník na blízko nebo na dálku vidí, kdy dopadne další automatický zásah.\n\nTvá lišta zkušeností běží přes celou šířku pod akčními lištami, rozdělená do úseků, se světlejším pruhem, který ukazuje naspořené odpočaté zkušenosti.\n\nPlav pod vodou a nahoře na obrazovce se objeví modrá lišta dechu. Vyprazdňuje se, dokud máš hlavu pod hladinou, jakmile dojde, zabliká červeně a začneš se topit, a jakmile se vynoříš, rychle se doplní. Mezerník tě žene nahoru a klávesa Plavat dolů, ve výchozím stavu Ctrl, tě táhne hlouběji.\n\nPoškození a léčení vyplouvají nad tím, co zasáhly, jako malá čísla, takže boj přečteš, aniž bys musel číst text. Záložka Bojový záznam v tvém chatu drží úplný písemný záznam.",
       "aurasTitle": "Buffy a debuffy",

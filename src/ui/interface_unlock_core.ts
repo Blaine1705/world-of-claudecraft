@@ -54,6 +54,11 @@ export interface HudFrameSpec {
   /** This frame's own zoom ceiling, replacing the shared FRAME_SCALE_MAX
    *  (see MovableFrameConfig.maxScale); Infinity means no upper limit. */
   maxScale?: number;
+  /** False for a frame that only MOVES: no resize grip and no edge or corner
+   *  resize. Absent means scalable, like every other row. Only a seat whose box
+   *  is a placement proxy (the tooltip anchor) opts out, since resizing it
+   *  would read as resizing the card it seats while changing nothing on it. */
+  scalable?: false;
   /**
    * The stock slot a detaching frame returns to, RESOLVED at release time rather
    * than remembered from detach time. Only a frame whose stock parent holds
@@ -66,6 +71,11 @@ export interface HudFrameSpec {
    */
   stockHome?: { parentId: string; slot: 'first' | 'last' };
 }
+
+/** The mouseover unit tooltip's movable seat in index.html / play.html: an
+ *  invisible box the 'unitTooltip' row below places and the tooltip paint
+ *  path (unit_tooltip_seat.ts) grows the card from. */
+export const UNIT_TOOLTIP_ANCHOR_ELEMENT_ID = 'unit-tooltip-anchor';
 
 /**
  * Every frame the "Unlock interface" option moves and scales, in the order the
@@ -413,6 +423,23 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
       resizeMode: 'box',
     }),
   ),
+  // The mouseover unit tooltip (the mob and player hover card). The card itself
+  // is the shared transient #tooltip box, so the frame is its SEAT: an
+  // invisible anchor whose stock spot is the classic bottom-right slot, which
+  // the card grows from wherever the player parks it (tooltip_clamp_core.ts
+  // unitTooltipAnchorPlacement). Move-only: the anchor's box is a placement
+  // proxy, so a grip would resize nothing the player sees. Hiding the row from
+  // the frames menu suppresses the hover card (unit_tooltip_seat.ts). Already a
+  // #ui child, so no re-home.
+  {
+    id: 'unitTooltip',
+    elementId: UNIT_TOOLTIP_ANCHOR_ELEMENT_ID,
+    storageKey: 'woc_hud_frame_unit_tooltip',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.unitTooltip',
+    fallbackSize: { w: 220, h: 72 },
+    detachToUiRoot: false,
+    scalable: false,
+  },
 ] as const;
 
 /** Every storage key the option owns, so a reset can clear the whole set. */

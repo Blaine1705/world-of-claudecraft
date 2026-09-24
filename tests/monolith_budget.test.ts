@@ -511,7 +511,12 @@ const MONOLITHS: MonolithRow[] = [
     // Regeneration exemption) moved out of the heal2 arm into
     // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
     // count, zero slack.
-    ceiling: 18235,
+    // LOWERED 18235 -> 18221 at the movable unit tooltip: the player hover
+    // card's key and lines moved to player_tooltip_view.ts (live resolvers in
+    // player_tooltip.ts) and the world-hover seat resolution to
+    // unit_tooltip_seat.ts. Measured with wc -l after biome. Exact count,
+    // zero slack.
+    ceiling: 18221,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1569,7 +1574,10 @@ const MONOLITHS: MonolithRow[] = [
     // quest/death record arms of the event drain moved to
     // server/event_record_observers.ts (which also hosts the new craftRoll
     // arm), so the audit landed as a net shrink. Exact count, zero slack.
-    ceiling: 9965,
+    // LOWERED 9965 -> 9962 at the movable unit tooltip: the identity record's
+    // guild, pledge, guild tier, deed title/border lines (plus the new spec
+    // key) moved to server/player_identity_wire.ts. Exact count, zero slack.
+    ceiling: 9962,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1724,7 +1732,10 @@ const MONOLITHS: MonolithRow[] = [
     // src/net/target_echo.ts, banking the 52 lines of slack the row already
     // carried with it. Measured with wc -l < src/net/online.ts after biome.
     // Exact count, zero slack.
-    ceiling: 5426,
+    // LOWERED 5426 -> 5423 at the movable unit tooltip: the identity block's
+    // guild, pledge, guild tier, deed title/border decode (plus the new spec)
+    // moved to src/net/player_identity_wire.ts. Exact count, zero slack.
+    ceiling: 5423,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

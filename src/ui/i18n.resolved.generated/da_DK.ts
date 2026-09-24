@@ -3421,6 +3421,10 @@ export const da_DK: EnTranslations = {
       "elite": "Elite",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Flyt målrammen",
       "lock": "Lås målrammen"
@@ -3499,7 +3503,8 @@ export const da_DK: EnTranslations = {
         "deedTracker": "Bedriftssporer",
         "delveTracker": "Delve-sporer",
         "riftTracker": "Riftsporer",
-        "swingBarOffhand": "Venstre hånd"
+        "swingBarOffhand": "Venstre hånd",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Rammeindstillinger",
       "framesMenuTitle": "Vis eller skjul enkelte rammer. En fravalgt ramme forbliver skjult, indtil du vælger den igen eller nulstiller til standard.",
@@ -6401,6 +6406,7 @@ export const da_DK: EnTranslations = {
       "framesGovernedExtra": "Rediger rammer løsner også sporingsstakken nedenunder (dine sporede opgaver og deres mål, din bedriftstatus, dine Relikvarium-sider, opskrifter du har fastgjort fra håndværk, den udgravning du er i, enhver rift du deltager i, og opskriften eller bestillingen du sporer), kæledyrets handlingslinje ved siden af kæledyrsrammen, Mål-prikkerammen for dine debuffs på fjender i nærheden, paladinens Hengivenhedsmedaljon, troldmandens Affektionslinje, besværgelsesproc-overlayet, svingtimeren for sekundærhånd for dobbelthåndsbrugere og det fanebladede skademålervindue, hver med sin egen navnebrik, mens den er løsnet.",
       "framesGovernedAuraTracks": "Rediger rammer løsner også de seks valgfri aurabaner, når du har slået dem til fra Kamp-fanen i de samme grænsefladeindstillinger: Mine fordele-banen, Defensive nedkølinger-banen, Mine skjolde-banen, Offensive nedkølinger-banen, Bevægelse og stealth-banen samt Mine fordele på allierede-banen. Alle baner er slået fra som standard, og hver har sin egen navnebrik, mens den er løsnet.",
       "framesGovernedTalkingHead": "Edit Frames løsner også dialogpanelet, som bærer en NPC's talte linje, mens den NPC er ude af dit syn; den bærer sin navnechip, mens den er løs.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Bjælker, timere og kamptekst",
       "barsBody": "Din castbjælke dukker op midt på skærmen, lige over dine handlingsbjælker, når du kaster eller kanaliserer, og viser besværgelsens navn og den resterende tid. Dit mål får sin egen castbjælke på sin ramme, så du kan se, hvad der er på vej, og svare på det.\n\nEn tynd svingbjælke sidder under din castbjælke og fyldes op mellem dine våbensving, så en nærkamps- eller afstandsangriber kan se, hvornår det næste automatiske slag lander.\n\nDin erfaringsbjælke løber i fuld bredde under dine handlingsbjælker, inddelt i segmenter, med en lysere strækning, der viser den udhvilede erfaring, du har opsparet.\n\nSvøm under vandet, og en blå åndedrætsbjælke dukker op øverst på skærmen. Den tømmes, mens dit hoved er under, blinker rødt, når den løber ud, og du begynder at drukne, og fyldes hurtigt op igen, i det øjeblik du dukker op. Mellemrum svømmer dig op, og tasten Svøm ned, Ctrl som standard, tager dig dybere.\n\nSkade og helbredelse svæver op over det, de rammer, som små tal, så du kan læse en kamp uden at læse tekst. Fanen Kamp i dit chatvindue holder den fulde skriftlige log.",
       "aurasTitle": "Forstærkninger og svækkelser",

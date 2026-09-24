@@ -16028,6 +16028,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '「編輯框體」也會一併鬆開下方那疊追蹤面板(你追蹤中的任務與它們的目標、你的功績進度、你的聖物庫頁面、你從製作中釘選的配方、你所在的秘探、你正參與的任何裂隙，以及你正在追蹤的配方或委託)、寵物框架旁的寵物動作列、顯示你對附近敵人所施減益的「目標減益」框架、聖騎士的「虔誠」勳章、術士的「痛苦資源條」、法術觸發浮層、雙持武器時的副手揮擊條，以及附分頁的傷害統計視窗，每一個在鬆開期間都掛著一枚名稱標籤。',
   'guide.interfacePage.framesGovernedTalkingHead':
     '「編輯框體」也會解鎖對話面板：當某個 NPC 不在你的視野內時，它承載該 NPC 說出的台詞；處於解鎖狀態時它會顯示自己的名稱標籤。',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    '「編輯框體」也會解鎖提示框框體，也就是滑鼠所停留對象的資訊卡出現的位置：生物的等級與種類，或其他玩家的頭銜、公會、等級與職業，以及專精和對應定位。把它拖到任意位置，資訊卡就會從那裡朝遠離螢幕最近邊緣的方向展開。在「框體設定」的「顯示或隱藏框體」中取消勾選「提示框」，即可完全隱藏這張資訊卡。',
   'guide.interfacePage.framesGovernedAuraTracks':
     '「編輯框體」也會鬆開六條可選的光環軌道，前提是你已在同一「介面」選項的「戰鬥」分頁中開啟它們：「我的增益」軌道、「防禦性冷卻」軌道、「我的護盾」軌道、「攻擊性冷卻」軌道、「移動與潛行」軌道，以及「我給隊友的增益」軌道。所有軌道預設關閉，每一條在鬆開期間都掛著一枚名稱標籤。',
   'guide.interfacePage.mapBodyZoneFirst':
@@ -16149,6 +16151,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '當我的戰場或競技場排隊配對成功時，透過 Discord 私訊通知我（需要已連結的 Discord 帳號）',
   'hudChrome.interfaceUnlock.frameNames.petBar': '寵物列',
   'hudChrome.interfaceUnlock.frameNames.swingBarOffhand': '副手',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': '提示框',
   'hudChrome.keyboardMap.assignOption': '{category}：{action}',
   'hudChrome.keyboardMap.bindingLine': '{key}：{action}',
   'hudChrome.keyboardMap.form60': '60%',

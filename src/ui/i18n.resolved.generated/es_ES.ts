@@ -3421,6 +3421,10 @@ export const es_ES: EnTranslations = {
       "elite": "Élite",
       "boss": "Jefe"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Mover el marco del objetivo",
       "lock": "Bloquear el marco del objetivo"
@@ -3499,7 +3503,8 @@ export const es_ES: EnTranslations = {
         "deedTracker": "Seguimiento de hazañas",
         "delveTracker": "Seguimiento de exploraciones",
         "riftTracker": "Seguimiento de fallas",
-        "swingBarOffhand": "Mano izquierda"
+        "swingBarOffhand": "Mano izquierda",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Ajustes de marcos",
       "framesMenuTitle": "Muestra u oculta marcos individuales. Un marco sin marcar permanece oculto hasta que vuelvas a marcarlo o restablezcas los valores predeterminados.",
@@ -6401,6 +6406,7 @@ export const es_ES: EnTranslations = {
       "framesGovernedExtra": "Editar marcos también libera la pila de rastreadores inferior, con tus misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, las recetas que hayas fijado desde la fabricación, la Profundidad actual, cualquier Brecha en la que participes y la receta o comisión que sigas; además de la barra de acción de mascota, los puntos de objetivo para tus perjuicios en enemigos cercanos, el medallón Devoción del paladín, la Barra de aflicción del brujo, la superposición de activaciones de hechizos, el temporizador de mano izquierda para quienes empuñan dos armas y la ventana de medidores de daño con pestañas. Cada elemento lleva su propia etiqueta cuando está libre.",
       "framesGovernedAuraTracks": "Editar marcos también libera las seis pistas de auras opcionales cuando las activas en la pestaña Combate de las mismas opciones de Interfaz: Mis beneficios, Enfriamientos defensivos, Mis escudos, Enfriamientos ofensivos, Movimiento y sigilo, y Mis beneficios sobre aliados. Todas están desactivadas de forma predeterminada y cada una muestra su propia etiqueta cuando está libre.",
       "framesGovernedTalkingHead": "Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Barras, temporizadores y texto de combate",
       "barsBody": "Tu barra de lanzamiento aparece en el centro de la pantalla, justo encima de tus barras de acción, cada vez que lanzas o canalizas, y muestra el nombre del hechizo y el tiempo restante. Tu objetivo tiene su propia barra de lanzamiento en su marco, para que puedas ver lo que viene y responder a ello.\n\nUna fina barra de golpe se sitúa bajo tu barra de lanzamiento y se llena entre los golpes de tu arma, para que un atacante cuerpo a cuerpo o a distancia pueda ver cuándo llega el próximo golpe automático.\n\nTu barra de experiencia ocupa el ancho completo bajo tus barras de acción, dividida en segmentos, con un tramo más claro que muestra la experiencia de descanso que tienes acumulada.\n\nNada bajo el agua y aparecerá una barra de aliento azul en la parte superior de la pantalla. Se vacía mientras tienes la cabeza sumergida, parpadea en rojo en cuanto se agota y empiezas a ahogarte, y se rellena rápido en cuanto sales a la superficie. Space te hace nadar hacia arriba, y la tecla Nadar hacia abajo, Ctrl de forma predeterminada, te lleva más profundo.\n\nEl daño y la sanación flotan hacia arriba sobre aquello que los recibió en forma de pequeños números, para que puedas leer un combate sin leer texto. La pestaña Combate de tu caja de chat conserva el registro escrito completo.",
       "aurasTitle": "Beneficios y perjuicios",

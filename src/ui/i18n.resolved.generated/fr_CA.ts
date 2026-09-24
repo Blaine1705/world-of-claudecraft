@@ -3421,6 +3421,10 @@ export const fr_CA: EnTranslations = {
       "elite": "Élite",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Déplacer le cadre de la cible",
       "lock": "Verrouiller le cadre de la cible"
@@ -3499,7 +3503,8 @@ export const fr_CA: EnTranslations = {
         "deedTracker": "Suivi des hauts faits",
         "delveTracker": "Suivi des explorations",
         "riftTracker": "Suivi des failles",
-        "swingBarOffhand": "Main gauche"
+        "swingBarOffhand": "Main gauche",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Paramètres des cadres",
       "framesMenuTitle": "Affiche ou masque chaque cadre individuellement. Un cadre décoché reste masqué jusqu'à ce que vous le recochiez ou que vous rétablissiez les valeurs par défaut.",
@@ -6401,6 +6406,7 @@ export const fr_CA: EnTranslations = {
       "framesGovernedExtra": "Modifier les cadres déverrouille aussi la pile de suivi ci-dessous (quêtes et objectifs suivis, progression des hauts faits, pages du Reliquaire, recettes épinglées depuis l'artisanat, l'exploration, la faille et la recette ou commission suivies), la barre d'action du familier, le cadre des points de cible pour vos affaiblissements sur les ennemis proches, le médaillon de Dévotion du paladin, la barre d'affliction du démoniste, la superposition des déclenchements de sorts, le minuteur de frappe de la main secondaire et la fenêtre à onglets des compteurs de dégâts. Chacun porte sa propre étiquette lorsqu'il est déverrouillé.",
       "framesGovernedAuraTracks": "Modifier les cadres déverrouille aussi les six pistes d’auras facultatives après leur activation dans l’onglet Combat des mêmes options d’interface : Mes améliorations, Temps de recharge défensifs, Mes boucliers, Temps de recharge offensifs, Déplacement et furtivité, et Mes améliorations sur les alliés. Chaque piste est désactivée par défaut et porte sa propre étiquette lorsqu’elle est déverrouillée.",
       "framesGovernedTalkingHead": "Modifier les cadres desserre également le panneau de dialogue, qui diffuse la ligne parlée d'un PNJ lorsque ce PNJ est hors de votre vue; il porte sa puce nominative lorsqu'il est en vrac.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Barres, minuteries et texte de combat",
       "barsBody": "Votre barre d'incantation apparaît au milieu de l'écran, juste au-dessus de vos barres d'action, chaque fois que vous incantez ou canalisez, et affiche le nom du sort ainsi que le temps restant. Votre cible dispose de sa propre barre d'incantation sur son cadre, pour que vous puissiez voir ce qui arrive et y répondre.\n\nUne fine barre de cadence se trouve sous votre barre d'incantation et se remplit entre vos coups d'arme, pour qu'un attaquant au corps à corps ou à distance puisse voir quand le prochain coup automatique arrivera.\n\nVotre barre d'expérience s'étend sur toute la largeur sous vos barres d'action, graduée en segments, avec une portion plus claire montrant l'expérience reposée que vous avez accumulée.\n\nNagez sous l'eau et une barre de souffle bleue apparaît en haut de l'écran. Elle se vide tant que votre tête est immergée, clignote en rouge une fois épuisée quand vous commencez à vous noyer, puis se remplit rapidement dès que vous refaites surface. Espace vous fait remonter, et la touche Nager vers le bas, Ctrl par défaut, vous emmène plus profond.\n\nLes dégâts et les soins flottent au-dessus de ce qu'ils ont touché sous forme de petits nombres, pour que vous puissiez lire un combat sans lire de texte. L'onglet Combat de votre fenêtre de discussion conserve le relevé écrit complet.",
       "aurasTitle": "Améliorations et affaiblissements",

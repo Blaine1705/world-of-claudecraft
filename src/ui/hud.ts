@@ -754,11 +754,8 @@ import {
   streamerMenuActions,
 } from './player_context_menu';
 import { playerPortraitSubject, portraitUpdateFrames } from './player_portrait_core';
-import {
-  type PlayerTooltipI18n,
-  type PlayerTooltipModel,
-  playerTooltipHtml,
-} from './player_tooltip_view';
+import { playerHoverTooltipHtml } from './player_tooltip';
+import { playerTooltipKey } from './player_tooltip_view';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import {
   type PreviewPrewarmHandle,
@@ -899,6 +896,7 @@ import { newUnitFrameBuffer, type UnitFrameDescriptor, unitFrameViewInto } from 
 import { UnitFramePainter } from './unit_frame_painter';
 import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
+import { resolveUnitTooltipSeat } from './unit_tooltip_seat';
 import { knownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
 import { vendorSellConfirmPolicyFrom } from './vendor_sell_confirm_policy';
@@ -1100,10 +1098,6 @@ const STAT_VIEW_DEPS: StatTooltipI18n = {
 };
 // Same i18n + number-formatting surface, handed to the pure mob-hover tooltip view.
 const MOB_TOOLTIP_VIEW_DEPS: MobTooltipI18n = {
-  t: (key, params) => t(key as TranslationKey, params),
-  fmt: (value, opts) => formatNumber(value, opts),
-};
-const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
 };
@@ -3939,7 +3933,7 @@ export class Hud {
         draggingBodyClass: 'hud-frame-dragging',
         fallbackSize: spec.fallbackSize,
         isMobileLayout,
-        scalable: true,
+        scalable: spec.scalable ?? true,
         resizeMode: spec.resizeMode,
         maxScale: spec.maxScale,
         buttonOnlyWhenUnlocked: true,
@@ -6310,17 +6304,16 @@ export class Hud {
     return { w: window.innerWidth, h: window.innerHeight, scale: getUiScale() };
   }
 
-  // Anchors the mob-hover tooltip to a fixed viewport corner instead of the
-  // cursor. Desktop keeps the WoW default bottom-right slot; touch moves to the
-  // left of the minimap so selected enemy info does not cover the bottom action
-  // controls.
-  // Deliberately NOT tied to the player frame: that frame is player-movable
-  // (MovableFrame), and an anchor riding it wanders wherever the frame was dragged.
+  // Seats the world-hover tooltip on its movable Tooltip frame (desktop; stock
+  // seat the WoW bottom-right slot) or beside the minimap (touch), never the
+  // cursor; unit_tooltip_seat.ts resolves which, and a hidden frame shows none.
   private paintMobTooltipBottomRight(html: string): void {
-    const minimapRect = document.body.classList.contains('mobile-touch')
-      ? (document.getElementById('minimap-wrap')?.getBoundingClientRect() ?? null)
-      : null;
-    paintMobTooltipBottomRightCore(this.tooltipEl, html, this.tooltipViewport(), minimapRect);
+    const seat = resolveUnitTooltipSeat(document);
+    if (seat.hidden) this.hideTooltip();
+    else {
+      const view = this.tooltipViewport();
+      paintMobTooltipBottomRightCore(this.tooltipEl, html, view, seat.minimap, seat.anchor);
+    }
   }
 
   // Shows the WoW-style mouseover tooltip (name / level / creature type) for a
@@ -6372,20 +6365,13 @@ export class Hud {
     this.paintMobTooltipBottomRight(mobTooltipHtml(model, MOB_TOOLTIP_VIEW_DEPS));
   }
 
+  // The player hover card (title, guild, level and class, spec and role);
+  // player_tooltip_view.ts owns the key and the lines.
   showPlayerHoverTooltip(entity: Entity): void {
-    const playerClass = entity.templateId as PlayerClass;
-    const classLabel = CLASSES[playerClass] ? classDisplayName(playerClass) : entity.templateId;
-    const key = `player:${entity.id}:${entity.name}:${entity.level}:${entity.templateId}:${entity.guild}`;
+    const key = playerTooltipKey(entity);
     if (key === this.lastHoverTooltipId) return;
     this.lastHoverTooltipId = key;
-    const model: PlayerTooltipModel = {
-      name: entity.name,
-      classLabel,
-      classColor: classCss(playerClass),
-      level: entity.level,
-      guild: entity.guild,
-    };
-    this.paintMobTooltipBottomRight(playerTooltipHtml(model, PLAYER_TOOLTIP_VIEW_DEPS));
+    this.paintMobTooltipBottomRight(playerHoverTooltipHtml(entity));
   }
 
   // Clears a world-hover tooltip; a no-op if none is showing, so main.ts can

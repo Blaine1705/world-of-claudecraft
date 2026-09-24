@@ -16020,6 +16020,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '“编辑框体”还会一并松开下方的追踪器堆栈(你追踪的任务及其目标、你的功绩进度、你的圣物库页面、你从制作中置顶的配方、你所在的探秘、你正在参与的任何裂隙，以及你正在追踪的配方或委托)、宠物框体旁的宠物动作条、显示你对附近敌人所施减益的“目标减益”框体、圣骑士的“虔诚”勋章、术士的“痛苦资源条”、法术触发浮层、双持武器时的副手挥击条，以及带标签页的伤害统计窗口，松开期间每一件都挂着自己的名牌。',
   'guide.interfacePage.framesGovernedTalkingHead':
     '“编辑框体”也会解锁对话面板：当某个 NPC 不在你的视野内时，它承载该 NPC 说出的台词；处于解锁状态时它会显示自己的名称标签。',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    '“编辑框体”也会解锁提示框框体，也就是鼠标所停留对象的信息卡出现的位置：生物的等级与种类，或其他玩家的头衔、公会、等级与职业，以及专精和对应定位。把它拖到任意位置，信息卡就会从那里朝远离屏幕最近边缘的方向展开。在“框体设置”的“显示或隐藏框体”中取消勾选“提示框”，即可完全隐藏这张信息卡。',
   'guide.interfacePage.framesGovernedAuraTracks':
     '“编辑框体”还会松开六条可选的光环轨道，前提是你已在同一“界面”选项的“战斗”页中开启它们：“我的增益”轨道、“防御性冷却”轨道、“我的护盾”轨道、“攻击性冷却”轨道、“移动与潜行”轨道，以及“我给队友的增益”轨道。所有轨道默认关闭，松开期间每一条都挂着自己的名牌。',
   'guide.interfacePage.mapBodyZoneFirst':
@@ -16141,6 +16143,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '当我的战场或竞技场排队匹配成功时，通过 Discord 私信通知我（需要已关联的 Discord 账号）',
   'hudChrome.interfaceUnlock.frameNames.petBar': '宠物栏',
   'hudChrome.interfaceUnlock.frameNames.swingBarOffhand': '副手',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': '提示框',
   'hudChrome.keyboardMap.assignOption': '{category}：{action}',
   'hudChrome.keyboardMap.bindingLine': '{key}：{action}',
   'hudChrome.keyboardMap.form60': '60%',

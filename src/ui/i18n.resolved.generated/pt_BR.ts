@@ -3421,6 +3421,10 @@ export const pt_BR: EnTranslations = {
       "elite": "Elite",
       "boss": "Chefe"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Mover quadro do alvo",
       "lock": "Travar quadro do alvo"
@@ -3499,7 +3503,8 @@ export const pt_BR: EnTranslations = {
         "deedTracker": "Rastreador de feitos",
         "delveTracker": "Rastreador de explorações",
         "riftTracker": "Rastreador de fendas",
-        "swingBarOffhand": "Mão secundária"
+        "swingBarOffhand": "Mão secundária",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Configurações de Quadros",
       "framesMenuTitle": "Mostre ou oculte quadros individuais. Um quadro desmarcado permanece oculto até que você o marque novamente ou redefina para o padrão.",
@@ -6401,6 +6406,7 @@ export const pt_BR: EnTranslations = {
       "framesGovernedExtra": "Editar Quadros também libera a pilha de rastreadores abaixo, seus atributos e objetivos de missões rastreadas, seu progresso de feitos, suas páginas do Relicário, as receitas que você fixou na criação, a incursão em que você está, qualquer fenda da qual participa e a receita ou encomenda que rastreia, além da barra de ação do mascote ao lado do quadro dele, o quadro de pontos do Alvo para suas debilitações em inimigos próximos, o medalhão de Devoção do paladino, a Barra de Aflição do bruxo, a sobreposição de ativações de feitiço, o cronômetro do golpe da mão secundária para quem usa duas armas e a janela de medidores de dano com abas, cada um usando seu próprio chip de nome quando está liberado.",
       "framesGovernedAuraTracks": "Editar Quadros também libera as seis trilhas de aura opcionais depois que você as ativa na aba Combate das mesmas opções de Interface: trilha Meus Benefícios, trilha Recargas Defensivas, trilha Meus Escudos, trilha Recargas Ofensivas, trilha Movimento e Furtividade e trilha Meus Benefícios nos Aliados. Todas as trilhas começam desligadas, e cada uma usa seu próprio chip de nome quando está liberada.",
       "framesGovernedTalkingHead": "Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.",
+      "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "barsTitle": "Barras, temporizadores e texto de combate",
       "barsBody": "Sua barra de conjuração aparece no meio da tela, logo acima das suas barras de ação, sempre que você conjura ou canaliza, e mostra o nome do feitiço e o tempo restante. Seu alvo tem sua própria barra de conjuração no quadro dele, para que você veja o que está por vir e possa reagir.\n\nUma fina barra de ataque fica sob sua barra de conjuração e se enche entre os golpes da sua arma, para que um combatente corpo a corpo ou à distância veja quando o próximo acerto automático vai acontecer.\n\nSua barra de experiência ocupa toda a largura sob suas barras de ação, dividida em segmentos, com um trecho mais claro mostrando a experiência de descanso que você acumulou.\n\nNade debaixo d'água e uma barra azul de fôlego aparece no topo da tela. Ela se esvazia enquanto sua cabeça estiver submersa, pisca em vermelho quando se esgota e você começa a se afogar, e se enche rapidamente assim que você emerge à superfície. Espaço faz você nadar para cima, e a tecla Nadar para Baixo, Ctrl por padrão, leva você mais fundo.\n\nO dano e a cura sobem, em forma de pequenos números, sobre quem os recebeu, para que você acompanhe uma luta sem precisar ler texto. A aba Combate na sua janela de chat mantém o registro escrito completo.",
       "aurasTitle": "Benefícios e penalidades",
