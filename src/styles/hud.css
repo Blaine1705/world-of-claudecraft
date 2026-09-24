@@ -146,12 +146,23 @@
   .vehicle-bar.forge-action-bar {
     grid-template-columns: 1fr;
     width: min(440px, calc(100% - 24px));
+    top: 50%;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    z-index: 50;
   }
   .vehicle-bar.forge-action-bar > * {
     grid-column: 1 / -1;
   }
   .forge-action-bar .vehicle-action-slots {
     justify-content: center;
+  }
+  .forge-action-bar .vehicle-action .icon-label {
+    position: absolute;
+    inset: 3px;
+    display: block;
+    background-size: cover;
+    border-radius: 4px;
   }
   .forge-action-bar .forge-heat {
     min-height: 18px;
