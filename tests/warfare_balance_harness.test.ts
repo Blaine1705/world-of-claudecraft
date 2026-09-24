@@ -298,11 +298,13 @@ describe('WARFARE balance re-check (merge blocker)', () => {
     const honor = geared(WARFARE_KIT);
     const pve = geared(PVE_T1_T2);
     expect(honor.attackPower, 'honor kit attack power').toBe(260);
-    // In PvP the kit's WARFARE Vitality (302 rating, capped at +50%) applies;
+    // In PvP the kit's WARFARE Vitality (302 rating, about +50%) applies;
     // inside a PvE instance the Sim clears it and the kit reads its plain 1,722,
     // below the PvE reference's 1,772, so honor gear is never the raid pick.
-    expect(honor.stats.pvpVitality, 'honor kit vitality').toBe(0.5);
-    expect(honor.maxHp, 'honor kit health in PvP').toBe(2583);
+    expect(honor.stats.pvpVitality, 'honor kit vitality').toBeCloseTo(302 / 600, 10);
+    // 2,583 -> 2,589 when the Vitality cap rose to +80% (Warfare Season 2): the
+    // kit's 302 rating now reads +50.3% instead of stopping at +50%.
+    expect(honor.maxHp, 'honor kit health in PvP').toBe(2589);
     const inInstance = createPlayer(0, 'warrior', { x: 0, y: 0, z: 0 }, '');
     inInstance.level = 20;
     inInstance.pvpVitalityActive = false;

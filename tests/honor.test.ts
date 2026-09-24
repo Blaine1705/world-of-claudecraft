@@ -904,28 +904,31 @@ describe('WARFARE Vitality', () => {
     for (let i = 0; i < 12; i++) sim.tick();
   }
 
-  it('reads the Warfare Defense Rating at six per percent, capped at +50%', () => {
+  it('reads the Warfare Defense Rating at six per percent, capped at +80%', () => {
+    // A full Season 1 kit (302 rating) lands at about +50%; only the Warfare
+    // Season 2 pieces carry the rating to reach the +80% cap.
     expect(PVP_VITALITY_RATING_PER_PCT).toBe(6);
-    expect(PVP_VITALITY_CAP).toBe(0.5);
+    expect(PVP_VITALITY_CAP).toBe(0.8);
     expect(pvpVitalityFromRating(0)).toBe(0);
     expect(pvpVitalityFromRating(-40)).toBe(0);
     expect(pvpVitalityFromRating(60)).toBeCloseTo(0.1, 10);
     expect(pvpVitalityFromRating(182)).toBeCloseTo(182 / 600, 10);
-    expect(pvpVitalityFromRating(300)).toBe(0.5);
-    expect(pvpVitalityFromRating(302)).toBe(0.5);
-    expect(pvpVitalityFromRating(9_999)).toBe(0.5);
+    expect(pvpVitalityFromRating(302)).toBeCloseTo(302 / 600, 10);
+    expect(pvpVitalityFromRating(480)).toBeCloseTo(0.8, 10);
+    expect(pvpVitalityFromRating(9_999)).toBe(0.8);
   });
 
   it('applies in the open world and never on dungeon ground, keeping the health fraction', () => {
     const { sim, e } = geared('warrior', 'arms', STR_KIT);
-    expect(e.stats.pvpVitality).toBe(0.5);
+    // The full Season 1 kit's 302 rating.
+    expect(e.stats.pvpVitality).toBeCloseTo(302 / 600, 10);
     const open = e.maxHp;
     // Walking onto the instance plane (a dungeon band) switches it off; the
     // health FRACTION survives the switch.
     e.hp = Math.round(open * 0.6);
     standAt(sim, e, INSTANCE_X);
     expect(e.pvpVitalityActive).toBe(false);
-    expect(e.maxHp).toBe(Math.round(open / 1.5));
+    expect(e.maxHp).toBe(Math.round(open / (1 + 302 / 600)));
     expect(e.hp / e.maxHp).toBeCloseTo(0.6, 2);
     // Back in the open world it returns.
     standAt(sim, e, 0);
@@ -941,6 +944,12 @@ describe('WARFARE Vitality', () => {
     expect(e.pvpVitalityActive).not.toBe(false);
     // The same ground outside a match is an instance: off.
     sim.arenaMatches.delete(a);
+    expect(pvpVitalityAppliesTo(sim.ctx, e)).toBe(false);
+    // A battleground match counts the same way (the membership is all the
+    // context check reads; no tick runs against the placeholder match).
+    (sim.bgMatches as Map<number, unknown>).set(a, {});
+    expect(pvpVitalityAppliesTo(sim.ctx, e)).toBe(true);
+    sim.bgMatches.delete(a);
     expect(pvpVitalityAppliesTo(sim.ctx, e)).toBe(false);
   });
 

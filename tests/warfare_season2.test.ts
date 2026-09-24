@@ -8,6 +8,8 @@ import { HONOR_QUARTERMASTER_STOCK } from '../src/sim/content/pvp_honor';
 import {
   SEASON2_ARMOR_FRACTION,
   SEASON2_ARMOR_SLOTS,
+  SEASON2_DEFENSE_RATING_MULT,
+  SEASON2_OFFENSE_RATING_MULT,
   SEASON2_PRICES,
   SEASON2_SETS,
   SEASON2_SOURCE_LEVEL,
@@ -129,9 +131,9 @@ describe('the stat rules (the honor discount at item level 35)', () => {
       } else {
         expect((s.str ?? 0) + (s.agi ?? 0), `${id} physical line`).toBe(line - floor);
       }
-      // Warfare ratings mirror the full slot budget, as on the entry tier.
-      expect(it.pvpOffenseRating, id).toBe(budget);
-      expect(it.pvpDefenseRating, id).toBe(budget);
+      // Warfare ratings: multiples of the full slot budget (the entry tier is 1x).
+      expect(it.pvpOffenseRating, id).toBe(Math.round(budget * SEASON2_OFFENSE_RATING_MULT));
+      expect(it.pvpDefenseRating, id).toBe(Math.round(budget * SEASON2_DEFENSE_RATING_MULT));
       // Never a combat rating: that is the raid tier's.
       expect(it.critRating ?? 0, id).toBe(0);
       expect(it.hitRating ?? 0, id).toBe(0);
@@ -285,6 +287,71 @@ describe('the PvE promise: never the raid pick for a tank', () => {
       const raid = geared(cls, spec, bestEpicGearFor(cls, spec), bear);
       expect(honor.pvpVitalityActive, `${cls}/${spec}`).toBe(false);
       expect(ehp(honor), `${cls}/${spec} Season 2 effective health`).toBeLessThan(ehp(raid));
+    }
+  });
+});
+
+describe('the PvP promise: Season 2 is the PvP upgrade over a full Season 1 kit', () => {
+  // Level 20, open world. Season 1: the full seven-piece family plus its honor
+  // jewelry and weapon. Season 2: the same kit with the five set slots swapped,
+  // so the difference is the armor alone.
+  const S1 = {
+    str: {
+      set: 'warfare_furyforged',
+      extras: {
+        neck: 'final_oath_medallion',
+        ring1: 'iron_vow_band',
+        ring2: 'unbroken_circle',
+        mainhand: 'final_argument_greatblade',
+      },
+    },
+    caster: {
+      set: 'warfare_cinderweave',
+      extras: {
+        neck: 'cinder_sigil_pendant',
+        ring1: 'ashen_focus_ring',
+        ring2: 'spellbreakers_seal',
+        mainhand: 'emberglass_warstaff',
+      },
+    },
+  } as const;
+
+  function inOpenWorld(cls: PlayerClass, spec: string, kit: Partial<Record<EquipSlot, string>>) {
+    const sim = new Sim({ seed: 20061, playerClass: cls, noPlayer: true });
+    const pid = sim.addPlayer(cls, `P${cls}`);
+    sim.setPlayerLevel(20, pid);
+    sim.applyTalents({ spec, rows: {} } as TalentAllocation, pid);
+    for (const [slot, id] of Object.entries(kit)) {
+      sim.addItem(id, 1, pid);
+      sim.equipItemToSlot(id, slot as EquipSlot, pid);
+    }
+    for (let i = 0; i < 12; i++) sim.tick();
+    const e = sim.entities.get(pid) as Entity;
+    sim.ctx.recalcPlayer(e);
+    return e;
+  }
+
+  it('reaches every Warfare cap and carries more health than Season 1 in PvP', () => {
+    for (const [cls, spec, profile] of [
+      ['warrior', 'arms', 'str'],
+      ['warrior', 'prot', 'str'],
+      ['mage', 'fire', 'caster'],
+    ] as [PlayerClass, string, keyof typeof S1][]) {
+      const family = S1[profile];
+      const s1: Partial<Record<EquipSlot, string>> = { ...family.extras };
+      for (const it of Object.values(ITEMS)) {
+        if (it.set === family.set) s1[it.slot as EquipSlot] = it.id;
+      }
+      const s2: Partial<Record<EquipSlot, string>> = { ...s1 };
+      const set = SEASON2_SETS.find((s) => s.cls === cls && s.spec === spec);
+      for (const id of set?.itemIds ?? []) s2[ITEMS[id].slot as EquipSlot] = id;
+      const a = inOpenWorld(cls, spec, s1);
+      const b = inOpenWorld(cls, spec, s2);
+      expect(b.stats.pvpOffense, `${cls}/${spec} offense`).toBeCloseTo(0.3, 10);
+      expect(b.stats.pvpDefense, `${cls}/${spec} defense`).toBeCloseTo(0.3, 10);
+      expect(b.stats.pvpVitality, `${cls}/${spec} vitality`).toBeCloseTo(0.8, 10);
+      // Owner target: about 10 percent more health than a full Season 1 kit.
+      expect(b.maxHp / a.maxHp, `${cls}/${spec} health over Season 1`).toBeGreaterThan(1.07);
     }
   });
 });

@@ -67,10 +67,22 @@ everywhere. These rules hold them together:
     larger value, never added.
 - **No spell-pushback immunity on any honor set.** Every caster raid 2-piece carries it, and
   it would be the strongest PvP rider of all.
-- **WARFARE ratings:** Offense and Defense per piece equal the full slot budget, as in the
-  entry tier. The existing caps (30 percent, and Vitality's +50 percent) bound the total, so
-  Season 2 changes nothing about the PvP multipliers. Its PvP edge over the entry tier is
-  item level, the set bonus and the weapons.
+- **WARFARE ratings (rebalanced 2026-09-25, owner rule "make Season 2 better than Season
+  1"):** a full Season 1 kit reaches every Warfare cap through its 4-piece and 7-piece
+  bonuses (+200 rating), and Season 2's ability bonuses carry no rating, so at 1x the slot
+  budget a Season 2 kit fell short of Season 1 in PvP (about 13 percent less health, 19 and
+  23 percent Offense and Defense). The pieces now carry the rating instead:
+  - Offense is 2.2x and Defense 3.4x the slot budget (`SEASON2_OFFENSE_RATING_MULT`,
+    `SEASON2_DEFENSE_RATING_MULT`). A Season 2 kit (the five pieces plus entry-tier waist,
+    feet, jewelry and weapon) reaches the 30 percent Offense and Defense caps.
+  - The Vitality cap rose from +50 to +80 percent (`PVP_VITALITY_CAP`). A full Season 1 kit
+    still lands at about +50 percent (302 rating); a Season 2 kit reaches +80.
+  - Measured at level 20 on the Sim: Season 2 carries 9 to 10 percent more maximum health in
+    PvP than a full Season 1 kit for physical specs and about 14 percent for casters (whose
+    Season 1 pieces carry only half the stamina premium). None of it applies in dungeons or
+    raids, where Vitality is off and Warfare never touches PvE, so the tank guard is
+    unchanged. `tests/warfare_season2.test.ts` ("the PvP promise") pins the caps and a
+    health floor over Season 1.
 
 ## Prices and stock
 
