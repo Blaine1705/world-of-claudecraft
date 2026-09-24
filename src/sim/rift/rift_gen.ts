@@ -73,7 +73,9 @@ function entryZFor(layout: DungeonLayout): number {
   return layout.zMin + ENTRY_Z_OFFSET;
 }
 
-const RIFT_SUFFIXES = [
+/** The procedural rift name suffixes ("The <noun> <suffix>"); exported for the
+ * client name localizer (src/ui/rift_text_i18n.ts), which rebuilds the grammar. */
+export const RIFT_SUFFIXES = [
   'Abyss',
   'Depths',
   'Descent',

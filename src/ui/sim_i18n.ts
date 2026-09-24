@@ -31,6 +31,7 @@ import {
   type TranslationKey,
   t,
 } from './i18n';
+import { localizeRiftBossYell, localizeRiftPlaceName } from './rift_text_i18n';
 import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
 import { localizeTalentTitle } from './talent_i18n';
 import { localizeWorldQuestFreightYell, worldQuestFreightSpeakerName } from './world_quest_freight_i18n';
@@ -18101,11 +18102,11 @@ const RULES: Rule[] = [
   },
   {
     re: /^You step through the rift into (.+)\.$/,
-    build: (m) => t('sim.rift.enterFloor', { name: m[1] }),
+    build: (m) => t('sim.rift.enterFloor', { name: localizeRiftPlaceName(m[1]) ?? m[1] }),
   },
   {
     re: /^You descend deeper into (.+)\.$/,
-    build: (m) => t('sim.rift.descendFloor', { name: m[1] }),
+    build: (m) => t('sim.rift.descendFloor', { name: localizeRiftPlaceName(m[1]) ?? m[1] }),
   },
   { re: /^You step back through the rift\.$/, build: () => t('sim.rift.stepBack') },
   {
@@ -18117,7 +18118,7 @@ const RULES: Rule[] = [
   { re: /^This hoard has already admitted five adventurers\.$/, build: () => t('sim.rift.hoardEntrantsFull') },
   {
     re: /^You climb down into (.+)\.$/,
-    build: (m) => t('sim.rift.hoardEnter', { name: m[1] }),
+    build: (m) => t('sim.rift.hoardEnter', { name: localizeRiftPlaceName(m[1]) ?? m[1] }),
   },
   {
     re: /^The hoard is yours\. Return to the entrance to climb out\.$/,
@@ -18837,7 +18838,12 @@ export function localizeAuthoredYellText(
   classId?: PlayerClass,
 ): string {
   if (speakerKind === 'player' || classId !== undefined) return text;
-  return localizeWorldQuestFreightYell(text, getLanguage()) ?? localizeSimText(text) ?? text;
+  return (
+    localizeRiftBossYell(text) ??
+    localizeWorldQuestFreightYell(text, getLanguage()) ??
+    localizeSimText(text) ??
+    text
+  );
 }
 
 export function localizeAuthoredYellSpeakerName(

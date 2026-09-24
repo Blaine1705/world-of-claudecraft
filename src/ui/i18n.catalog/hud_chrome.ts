@@ -6913,7 +6913,7 @@ export const hudChromeStrings = {
     alliedHearthstoneAttuned: 'Attuned to: {hub}',
     hub_none: 'None (Use near a faction hub to attune)',
     hub_rift_watch: 'Drifthaven (The Rift Watch)',
-    hub_church_order: 'Eastbrook Vale (The Church of the Holy Light Order)',
+    hub_church_order: 'Eastbrook Vale (The Church Order)',
     hub_automatons: 'South Reach (The Automaton Foundry)',
     riftGliderUse:
       'Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)',
