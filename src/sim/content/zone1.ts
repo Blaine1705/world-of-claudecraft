@@ -2054,15 +2054,24 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // is already below the sea. These berths were measured against the cove
     // bathymetry so every hull is wet across its whole footprint, and each lies
     // alongside a pier in the gap the round 6 respacing opened.
-    // The first ship is now the walkable ferry prototype. Its open side gates
-    // face the middle pier and the narrow berth between the working piers.
-    {
-      key: 'eastbrookFerry', x: -121, z: -47, rot: -Math.PI / 2,
-      hw: 3.5, hd: 11.5, h: 11.6, float: 0.25, standableTop: 2.1,
-    },
-    { key: 'hexShipBlue', x: -115, z: -63, rot: 1.55, scale: 7, r: 4.6, h: 11, float: 0.55 },
-    // a smaller fishing hull riding the fairway west of the ferry berth
-    { key: 'seaBoatFishing', x: -119, z: -79, rot: 0, scale: 2.5, r: 2.4, h: 7, float: 0.5 },
+    // The Eastbrook ferry (transport ship, Phase 1: moored, idle-animated).
+    // It lies broadside across the ferry pier's T-head, bow to the north,
+    // its port gangway square to the pier's end (world z -54) so the
+    // gangplank drops onto the pier deck. Origin = the waterline centre
+    // (float 0). Its walkable decks, stairs, rails and gangways come from
+    // content/transport_ships.ts (decor_prop_colliders.ts places them); the
+    // model is render/transport_ship.ts. To make its berth, the blue hull
+    // that lay in the gap north of the ferry pier (x -115, z -45) was
+    // retired, the second blue hull (x -115, z -63, whose stern reached
+    // under the ferry's quarter) moved out to ride at anchor offshore, north
+    // west of the cove mouth, where its calm pad reshapes no shore, and the
+    // fishing hull (x -122, z -54, under the ferry) moved into the freed gap
+    // north of the pier.
+    { key: 'eastbrookFerry', x: -125, z: -54.8, rot: 0, float: 0 },
+    { key: 'hexShipBlue', x: -170, z: -22, rot: 1.55, scale: 7, r: 4.6, h: 11, float: 0.55 },
+    // a smaller fishing hull riding the gap between the ferry pier and the
+    // north working pier
+    { key: 'seaBoatFishing', x: -113, z: -46, rot: 0, scale: 2.5, r: 2.4, h: 7, float: 0.5 },
     // dinghies riding the water in the pier gaps, Wickharbor-style
     // the two dinghies pulled off the pad and into real water beside the piers
     { key: 'hexBoat', x: -107.5, z: -47, rot: 0.7, scale: 6, float: 0.1 },
@@ -2092,8 +2101,10 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { key: 'shrubFlowering', x: -30, z: -96.4, rot: 0.2, scale: 1.05 },
     { key: 'shrubFlowering', x: -7.2, z: -124, rot: 2.7, scale: 0.95 },
     // fairway buoys marking the channel to the ferry berth
-    { key: 'seaBuoy', x: -126, z: -46, rot: 0.4, scale: 3, float: 0.15 },
-    { key: 'seaBuoyFlag', x: -124, z: -62, rot: -0.8, scale: 3, float: 0.15 },
+    // (both moved clear of the Eastbrook ferry's hull when it took the berth:
+    // they stood at (-126, -46) and (-124, -62), inside its footprint)
+    { key: 'seaBuoy', x: -134, z: -44, rot: 0.4, scale: 3, float: 0.15 },
+    { key: 'seaBuoyFlag', x: -134, z: -64, rot: -0.8, scale: 3, float: 0.15 },
     // round 4: the KayKit barracks takes the armoury's lot as the Wolf Run
     // garrison. r 5.2 stays the clearance radius scatter and keep-outs read
     // (the dawnhold_layout.ts pattern); hw/hd collide the model's real wall

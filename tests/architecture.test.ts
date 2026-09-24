@@ -719,6 +719,7 @@ const RENDER_PURE_CORES = [
   'src/render/warrior_power_core.ts',
   'src/render/warrior_readiness_core.ts',
   'src/render/tree_hide_index_core.ts',
+  'src/render/transport_ship_core.ts',
   'src/render/view_candidate_scan_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/outdoor_light_rig_core.ts',

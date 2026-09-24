@@ -1,4 +1,6 @@
 import type { Collider } from './colliders';
+import { TRANSPORT_SHIP_HULLS } from './content/transport_ships';
+import { shipHullColliders } from './transport_ship';
 import type { WorldContent } from './types';
 import { groundHeight, WATER_LEVEL } from './world';
 
@@ -22,6 +24,10 @@ function topY(seed: number, x: number, z: number, height: number): number {
  * instead of failing once at load. `tests/decor_prop_colliders.test.ts` pins
  * every SHIPPED `standableTop` entry has a footprint, the hard gate for the
  * mistake this module exists to catch (see evergarden.ts's hexCannonballs).
+ * A row whose key names a transport ship hull (content/transport_ships.ts)
+ * moors that ship instead: its walkable decks, stairs, rails and gangways
+ * (transport_ship.ts), seated on the same waterline the renderer floats it
+ * on; the row's own footprint fields are ignored for it.
  * Extracted from colliders.ts (shared logic, not per-zone) to stay under its
  * monolith ceiling.
  */
@@ -33,6 +39,16 @@ export function buildDecorPropColliders(seed: number, decorProps: DecorProp[]): 
       d.float === undefined
         ? groundHeight(d.x, d.z, seed)
         : Math.max(groundHeight(d.x, d.z, seed), WATER_LEVEL - d.float);
+    // own keys only: a key like 'constructor' must never reach the hull path
+    const hull = Object.hasOwn(TRANSPORT_SHIP_HULLS, d.key)
+      ? TRANSPORT_SHIP_HULLS[d.key]
+      : undefined;
+    if (hull) {
+      out.push(
+        ...shipHullColliders(hull, { x: d.x, z: d.z, rot: d.rot ?? 0, baseY: supportBaseY }),
+      );
+      continue;
+    }
     const stand =
       d.standableTop === undefined
         ? {}

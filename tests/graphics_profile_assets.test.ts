@@ -20,6 +20,7 @@ const mocks = vi.hoisted(() => {
     armoury: prepare(),
     mailbox: prepare(),
     noticeboard: prepare(),
+    ship: prepare(),
     reset: vi.fn(),
   };
 });
@@ -65,6 +66,10 @@ vi.mock('../src/render/cliff_scree', () => ({
 vi.mock('../src/render/eastbrook_town', () => ({
   prepareEastbrookTownProfileAssets: mocks.town,
   resetEastbrookTownProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/transport_ship', () => ({
+  prepareTransportShipAssets: mocks.ship,
+  resetTransportShipCaches: mocks.reset,
 }));
 vi.mock('../src/render/eastbrook_grand_armoury', () => ({
   prepareEastbrookGrandArmouryProfileAssets: mocks.armoury,
@@ -141,6 +146,7 @@ const prepareSpies = [
   mocks.armoury,
   mocks.mailbox,
   mocks.noticeboard,
+  mocks.ship,
 ];
 
 beforeEach(() => {
@@ -162,7 +168,13 @@ describe('graphics profile asset preparation', () => {
     for (const prepare of prepareSpies.slice(0, 9)) expect(prepare).toHaveBeenCalledWith(target);
     expect(mocks.sky).toHaveBeenCalledWith(position.x, position.z, target);
     expect(mocks.cliff).toHaveBeenCalledWith(target);
-    for (const prepare of [mocks.town, mocks.armoury, mocks.mailbox, mocks.noticeboard]) {
+    for (const prepare of [
+      mocks.town,
+      mocks.armoury,
+      mocks.mailbox,
+      mocks.noticeboard,
+      mocks.ship,
+    ]) {
       expect(prepare).toHaveBeenCalledWith();
     }
     expect(progress).toHaveLength(graphicsProfileAssetsInternalsForTest.channelCount);
@@ -211,6 +223,7 @@ describe('graphics profile derived-cache reset', () => {
       'frost_nova_root_visual',
       'ice_block_visual',
       'temporal_hourglass_visual',
+      'transport_ship',
       'ground_decor_prewarm',
     ]);
     expect(() => resetGraphicsProfileDerivedCaches()).not.toThrow();

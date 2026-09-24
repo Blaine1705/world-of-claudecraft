@@ -64,6 +64,12 @@ import {
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
 import { mergeBandDepth, mergeStaticMeshes, normalizedStaticGeometry } from './static_merge';
+import {
+  buildTransportShipView,
+  isTransportShipKey,
+  type TransportShipView,
+  transportShipPrewarmParts,
+} from './transport_ship';
 import { applySurfaceDetail, type WornFamilyPick, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
@@ -263,7 +269,6 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexrTowerA: { url: '/models/biome/hexr_tower_a.glb', kit: 'khex' },
   hexbTowerB: { url: '/models/biome/hexb_tower_b.glb', kit: 'khex' },
   hexShipBlue: { url: '/models/biome/hex_ship_blue.glb', kit: 'khex' },
-  eastbrookFerry: { url: '/models/biome/eastbrook_ferry.glb', kit: 'ferry' },
   hexShipRed: { url: '/models/biome/hex_ship_red.glb', kit: 'khex' },
   hexShipGreen: { url: '/models/biome/hex_ship_green.glb', kit: 'khex' },
   hexBoat: { url: '/models/biome/hex_boat.glb', kit: 'khex' },
@@ -1007,6 +1012,14 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
       place(tinted);
     }
   }
+  // moored transport ships draw their own merged, vertex-coloured meshes
+  // (transport_ship.ts): one twin per distinct program, shadow variant included
+  for (const part of transportShipPrewarmParts()) {
+    const mesh = new THREE.Mesh(part.geometry, part.material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    place(mesh);
+  }
   return group;
 }
 
@@ -1325,6 +1338,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const keepLiveMeshes = new Set<THREE.Mesh>();
   const windmillFans: THREE.Object3D[] = [];
   const fireLights: THREE.PointLight[] = [];
+  // moored transport ships (render/transport_ship.ts): live, idle-animated,
+  // their own LODs; ticked from update() below, never merged or ghosted
+  const transportShips: TransportShipView[] = [];
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
 
@@ -1568,6 +1584,26 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // r > 0 entries mirror the circle collider in colliders.ts and camera-ghost;
   // r 0 dressing stays always-visible (small silhouettes, nothing to hide).
   for (const d of getActiveWorldContent().props.decorProps ?? []) {
+    if (isTransportShipKey(d.key)) {
+      const ship = buildTransportShipView({
+        key: d.key,
+        x: d.x,
+        z: d.z,
+        rot: d.rot ?? 0,
+        baseY:
+          d.float !== undefined
+            ? Math.max(ground(d.x, d.z), WATER_LEVEL - d.float)
+            : ground(d.x, d.z),
+      });
+      if (ship) {
+        group.add(ship.group);
+        ship.group.traverse((o) => {
+          if ((o as THREE.Mesh).isMesh) keepFromMerge.add(o);
+        });
+        transportShips.push(ship);
+      }
+      continue;
+    }
     if (!(d.key in PROP_ASSET_DEFS)) {
       console.warn(`decorProps: unknown prop key "${d.key}" skipped`);
       continue;
@@ -2522,6 +2558,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       reducedMotion = false,
     ): void {
       const fogFarSq = fogFar * fogFar;
+      for (let i = 0; i < transportShips.length; i++) {
+        transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
+      }
       // Band fog cull (prop_cull_core): a band's first reveal on a walking
       // approach holds until the gate has linked its programs, and an arrival
       // among the bands holds too, with its compiles submitted at the imminent
