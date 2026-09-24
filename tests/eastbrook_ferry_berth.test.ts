@@ -1,35 +1,52 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { supportHeightAt } from '../src/sim/colliders';
-import { EASTBROOK_FERRY_HULL } from '../src/sim/content/transport_ships';
+import {
+  EASTBROOK_FERRY_HULL,
+  EASTBROOK_WICKHARBOR_FERRY,
+} from '../src/sim/content/transport_ships';
 import { PROPS } from '../src/sim/data';
-import { buildDecorPropColliders } from '../src/sim/decor_prop_colliders';
 import { EASTBROOK_HARBOR_DECKS } from '../src/sim/eastbrook_harbor';
+import { GALE_HARBOR_DECKS } from '../src/sim/gale_harbor';
 import { entityLineOfSightClear } from '../src/sim/line_of_sight_elevation';
-import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
+import { MAX_STEP_HEIGHT, PLATFORM_CARRY_CLEARANCE } from '../src/sim/physics/character';
 import { Sim } from '../src/sim/sim';
+import { transportBerthColliders } from '../src/sim/transport_gates';
 import { shipToWorld, worldToShip } from '../src/sim/transport_ship';
 import type { Entity } from '../src/sim/types';
 import { groundHeight, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-// The Eastbrook ferry, Phase 1: moored across the ferry pier's T-head, its deck
-// walkable. These pin the berth (position, waterline, the harbor it displaced),
-// the boarding route from the pier onto the deck and up to the quarterdeck, the
-// rails that keep a crowd aboard, and sight lines across the open deck, by
-// driving the real movement kernel through the shipped content.
+// The Eastbrook ferry's berths: moored across the ferry pier's T-head at
+// Eastbrook (Phase 1) and across the deepwater pier's T-head at Wickharbor
+// (Phase 2), its deck walkable while it lies docked. These pin the berths
+// (position, waterline, the harbor they displaced), the boarding route from
+// each pier onto the deck and up to the quarterdeck, the rails that keep a
+// crowd aboard, and sight lines across the open deck, by driving the real
+// movement kernel through the shipped content. The schedule is held at a
+// docked moment (Sim.transportClockOffset) for every walk.
 
-const ferry = PROPS.decorProps?.find((prop) => prop.key === 'eastbrookFerry');
+const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const ferry = ROUTE.berths[0];
+const WICK = ROUTE.berths[1];
 const HULL = EASTBROOK_FERRY_HULL;
+/** Clocks at which the ship lies docked at each berth. */
+const DOCKED_EAST = 1;
+const DOCKED_WICK =
+  ROUTE.timings.docked + ROUTE.timings.departing + ROUTE.timings.atSea + ROUTE.timings.arriving + 1;
 
 function pose() {
-  if (!ferry) throw new Error('ferry placement missing');
-  return { x: ferry.x, z: ferry.z, rot: ferry.rot ?? 0, baseY: WATER_LEVEL - (ferry.float ?? 0) };
+  return { x: ferry.x, z: ferry.z, rot: ferry.rot, baseY: WATER_LEVEL };
+}
+
+function wickPose() {
+  return { x: WICK.x, z: WICK.z, rot: WICK.rot, baseY: WATER_LEVEL };
 }
 
 describe('Eastbrook ferry berth', () => {
   it('moors one ferry broadside across the ferry pier T-head, on the waterline', () => {
-    expect(PROPS.decorProps?.filter((prop) => prop.key === 'eastbrookFerry')).toHaveLength(1);
-    expect(ferry).toMatchObject({ x: -125, z: -54.8, rot: 0, float: 0 });
+    // the scheduled route owns the ship: no static decorProps row moors it
+    expect(PROPS.decorProps?.filter((prop) => prop.key === 'eastbrookFerry')).toHaveLength(0);
+    expect(ferry).toMatchObject({ id: 'eastbrook', x: -125, z: -54.8, rot: 0 });
     // the ferry pier keeps its authored width (no widening for the ship)
     const pier = EASTBROOK_HARBOR_DECKS[1];
     expect(pier).toMatchObject({ x: -107, z: -54, hl: 10, hw: 2.2 });
@@ -76,7 +93,7 @@ describe('Eastbrook ferry berth', () => {
     const decks = HULL.volumes.filter((v) => v.kind === 'deck');
     for (const other of PROPS.decorProps ?? []) {
       // every floating row, walk-through dressing (buoys) included
-      if (other.key === 'eastbrookFerry' || other.float === undefined) continue;
+      if (other.float === undefined) continue;
       const clearance = other.r ?? 1;
       const local = worldToShip(p, other.x, other.z);
       for (const d of decks) {
@@ -94,8 +111,12 @@ describe('Eastbrook ferry berth', () => {
   });
 
   it('seats the deck volumes on the rendered waterline', () => {
-    const colliders = buildDecorPropColliders(WORLD_SEED, ferry ? [ferry] : []);
-    expect(colliders).toHaveLength(HULL.volumes.length);
+    // one hull per berth, each tagged with its berth's schedule gate
+    const colliders = transportBerthColliders();
+    expect(colliders).toHaveLength(2 * HULL.volumes.length);
+    expect(new Set(colliders.map((c) => c.gate))).toEqual(
+      new Set(['eastbrookWickharbor:0', 'eastbrookWickharbor:1']),
+    );
     const main = HULL.volumes.find((v) => v.id === 'main_deck_aft');
     if (!main) throw new Error('no main deck');
     const at = shipToWorld(pose(), main.x + 2, main.z);
@@ -135,8 +156,10 @@ describe('walking aboard (the real movement kernel)', () => {
     place(at.x, at.z, pose().baseY + y);
   }
 
-  /** Walk toward a ship-frame point; returns where the walk ended, ship frame. */
+  /** Walk toward a ship-frame point; returns where the walk ended, ship frame.
+   *  The timetable is held docked at Eastbrook for the whole walk. */
   function walkToLocal(tx: number, tz: number, jump = false, maxTicks = 240) {
+    sim.transportClockOffset = DOCKED_EAST - sim.time;
     const target = shipToWorld(pose(), tx, tz);
     const meta = sim.players.get(sim.player.id);
     if (!meta) throw new Error('player meta missing');
@@ -252,4 +275,130 @@ describe('walking aboard (the real movement kernel)', () => {
     const e = { ...sim.player, id: -4, pos: at(0, 7, HULL.mainDeckY) } as Entity;
     expect(entityLineOfSightClear(WORLD_SEED, d, e)).toBe(false);
   });
+});
+
+describe('Wickharbor berth (Phase 2)', () => {
+  const stair = GALE_HARBOR_DECKS[GALE_HARBOR_DECKS.length - 2];
+  const pier = GALE_HARBOR_DECKS[2];
+
+  it('lies broadside across the deepwater pier T-head, its gangway on the pier axis', () => {
+    expect(pier).toMatchObject({ x: 464.1, z: 378, rot: 1.3, hl: 12 });
+    // the same relation to its pier as at Eastbrook: ship rot = pier rot + PI/2
+    expect(WICK.rot).toBeCloseTo(pier.rot + Math.PI / 2, 9);
+    const gangway = HULL.boarding.find((b) => b.side === 'port');
+    if (!gangway) throw new Error('no port gangway');
+    const at = shipToWorld(wickPose(), gangway.x, gangway.z);
+    // on the pier's centre line (zero across offset)
+    const dx = at.x - pier.x;
+    const dz = at.z - pier.z;
+    const across = dx * Math.cos(pier.rot) - dz * Math.sin(pier.rot);
+    expect(Math.abs(across)).toBeLessThan(0.05);
+  });
+
+  it('bridges the low pier to the gangplank with a stair and a landing stage', () => {
+    const landing = GALE_HARBOR_DECKS[GALE_HARBOR_DECKS.length - 1];
+    expect(stair).toMatchObject({ rot: pier.rot, farAboveWater: 2.2 });
+    expect(landing).toMatchObject({ rot: pier.rot, nearAboveWater: 2.2, farAboveWater: 2.2 });
+    const along = (d: typeof stair, x: number, z: number) =>
+      (x - d.x) * Math.sin(d.rot) + (z - d.z) * Math.cos(d.rot);
+    // the landing reaches under the gangplank's outer tread (ship x 7.1..8.3)
+    // and stops short of the hull (ship x 5.15)
+    const plankOuter = shipToWorld(wickPose(), 8.3, 0.8);
+    const plankInner = shipToWorld(wickPose(), 7.1, 0.8);
+    const hullSide = shipToWorld(wickPose(), 5.15, 0.8);
+    expect(Math.abs(along(landing, plankOuter.x, plankOuter.z))).toBeLessThan(landing.hl);
+    expect(Math.abs(along(landing, plankInner.x, plankInner.z))).toBeLessThan(landing.hl);
+    expect(along(landing, hullSide.x, hullSide.z)).toBeGreaterThan(landing.hl);
+    // the plank tread is a stride above the landing, and high enough to carry
+    // a body off the stage's water edge
+    const rise = HULL.mainDeckY - 0.44 - 2.2;
+    expect(rise).toBeLessThan(MAX_STEP_HEIGHT);
+    expect(rise).toBeGreaterThan(PLATFORM_CARRY_CLEARANCE);
+    // the stair's foot is flush with the pier deck, its head with the landing
+    const at = (d: typeof stair, a: number) => ({
+      x: d.x + Math.sin(d.rot) * a,
+      z: d.z + Math.cos(d.rot) * a,
+    });
+    const foot = at(stair, -(stair.hl - 0.1));
+    const pierTop = groundHeight(pier.x, pier.z, WORLD_SEED);
+    expect(groundHeight(foot.x, foot.z, WORLD_SEED)).toBeCloseTo(pierTop, 1);
+    expect(pierTop - WATER_LEVEL).toBeCloseTo(0.89, 2);
+    const head = at(landing, 0);
+    expect(groundHeight(head.x, head.z, WORLD_SEED) - WATER_LEVEL).toBeCloseTo(2.2, 6);
+  });
+
+  it('floats in water across its whole footprint', () => {
+    const p = wickPose();
+    for (const z of [-15, -10, -5, 0, 5, 10, 14]) {
+      for (const x of [-4, 0, 4]) {
+        const at = shipToWorld(p, x, z);
+        // the bay is shallow here (1.5 to 2.1 yd): the hull is wet end to end,
+        // its keel reaching into the sand under water where the bay is shoal
+        expect(terrainHeight(at.x, at.z, WORLD_SEED)).toBeLessThan(WATER_LEVEL - 1.4);
+      }
+    }
+  });
+
+  it('keeps every Wickharbor hull clear of its decks (one moved out into the bay)', () => {
+    const p = wickPose();
+    const decks = HULL.volumes.filter((v) => v.kind === 'deck');
+    const props = PROPS.decorProps ?? [];
+    expect(props.some((q) => q.key === 'hexShipBlue' && q.x === 487 && q.z === 370.1)).toBe(false);
+    expect(props.filter((q) => q.key === 'hexShipBlue' && q.x === 515 && q.z === 392)).toHaveLength(
+      1,
+    );
+    for (const other of props) {
+      if (other.float === undefined) continue;
+      const clearance = other.r ?? 1;
+      const local = worldToShip(p, other.x, other.z);
+      for (const d of decks) {
+        const dx = Math.max(0, Math.abs(local.x - d.x) - (d.hw ?? 0));
+        const dz = Math.max(0, Math.abs(local.z - d.z) - (d.hd ?? 0));
+        expect(Math.hypot(dx, dz), `${other.key} at (${other.x}, ${other.z})`).toBeGreaterThan(
+          clearance,
+        );
+      }
+    }
+  });
+
+  it('boards from the pier, up the stair and over the gangplank, onto the deck', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const p = sim.player;
+    const meta = sim.players.get(p.id);
+    if (!meta) throw new Error('meta');
+    const start = WICK.landing;
+    p.pos = { x: start.x, y: groundHeight(start.x, start.z, WORLD_SEED), z: start.z };
+    p.prevPos = { ...p.pos };
+    const idle = {
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: false,
+      jump: false,
+      dive: false,
+      surface: false,
+    };
+    const walk = (lx: number, lz: number) => {
+      sim.transportClockOffset = DOCKED_WICK - sim.time;
+      const target = shipToWorld(wickPose(), lx, lz);
+      for (let i = 0; i < 300; i++) {
+        const dx = target.x - p.pos.x;
+        const dz = target.z - p.pos.z;
+        if (Math.hypot(dx, dz) < 0.25) break;
+        p.facing = Math.atan2(dx, dz);
+        Object.assign(meta.moveInput, { ...idle, forward: true });
+        sim.tick();
+      }
+      Object.assign(meta.moveInput, idle);
+      for (let i = 0; i < 10; i++) sim.tick();
+    };
+    walk(9, 0.8); // up the stair to its top
+    walk(4.4, 0.8); // over the plank onto the gangway
+    walk(1.5, 0.8); // onto the waist
+    const local = worldToShip(wickPose(), p.pos.x, p.pos.z);
+    expect(Math.abs(local.x - 1.5)).toBeLessThan(0.3);
+    expect(p.pos.y - WATER_LEVEL).toBeCloseTo(HULL.mainDeckY, 3);
+  }, 60_000);
 });

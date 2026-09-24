@@ -23,6 +23,7 @@
 import { OVERWORLD_GRAVEYARDS } from './content/graveyards';
 import { MAILBOXES } from './content/mailboxes';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
+import { TRANSPORT_ROUTES } from './content/transport_ships';
 import { TUNNELS } from './content/tunnels';
 import {
   DUNGEONS,
@@ -275,6 +276,12 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
     // landmark-sized pad, not a crate-sized one.
     const foot = Math.max(decor.r ?? 1.5, (decor.scale ?? 1) * 1.2);
     pad('decorProp', decor.x, decor.z, foot + 2, foot + 8);
+  }
+  // Scheduled transport berths (content/transport_ships.ts): each keeps the
+  // pad its ship had as a moored decorProps row (the default 1.5 footprint),
+  // so the Eastbrook berth's seabed is exactly the Phase 1 one.
+  for (const route of TRANSPORT_ROUTES) {
+    for (const berth of route.berths) pad('decorProp', berth.x, berth.z, 3.5, 9.5);
   }
   if (PROPS.raceCourse) {
     const course = PROPS.raceCourse;

@@ -29,6 +29,14 @@ export interface GaleDeckDef {
    */
   ax2?: number;
   az2?: number;
+  /**
+   * Optional end surfaces, yards ABOVE THE WATERLINE, in place of the anchor
+   * samples (near = the ax end at along -hl, far = the ax2 end at +hl): a deck
+   * whose height is set by something that is not terrain (the Wickharbor
+   * ferry stair and landing stage, which meet the ship's gangplank).
+   */
+  nearAboveWater?: number;
+  farAboveWater?: number;
 }
 
 /** Deck plank surface sits this far above the shore anchor's ground. */
@@ -63,6 +71,27 @@ export const GALE_HARBOR_DECKS: GaleDeckDef[] = [
   // share walkable ground at the junction (no dead wedge between rects)
   { x: 517.2, z: 337.2, rot: 0.785, hl: 13, hw: 2.2, ax: 507, az: 327 },
   { x: 503.3, z: 325.3, rot: 0.99, hl: 6.94, hw: 1.4, ax: 497, az: 321, ax2: 507, az2: 327 },
+  // The Eastbrook ferry's Wickharbor boarding stage (content/transport_ships.ts
+  // WICKHARBOR_BERTH): the deepwater pier's deck stands 0.89 yd above the
+  // water where the ferry's gangplank tip lies at 2.86, so a stair runs on out
+  // from the pier's end along its axis (rooted 0.3 yd back on the pier, on the
+  // pier's own anchor, so its foot is flush with the planks) up to a level
+  // landing under the plank. The landing sits 0.66 below the plank's outer
+  // tread: a stride up onto it, and high enough that a body on the plank is
+  // carried clear of the landing's water edge (physics/character.ts
+  // PLATFORM_CARRY_CLEARANCE).
+  { x: 477.2, z: 381.64, rot: 1.3, hl: 1.9, hw: 0.8, ax: 451, az: 375, farAboveWater: 2.2 },
+  {
+    x: 480.38,
+    z: 382.52,
+    rot: 1.3,
+    hl: 1.4,
+    hw: 0.9,
+    ax: 451,
+    az: 375,
+    nearAboveWater: 2.2,
+    farAboveWater: 2.2,
+  },
 ];
 
 /**
@@ -76,9 +105,14 @@ export function galeDeckSurfaceAt(
   waterLevel: number,
 ): number {
   const floor = waterLevel + GALE_DECK_FREEBOARD;
-  const y0 = Math.max(terrainAt(deck.ax, deck.az), floor) + GALE_DECK_LIFT;
-  if (deck.ax2 === undefined || deck.az2 === undefined) return y0;
-  const y1 = Math.max(terrainAt(deck.ax2, deck.az2), floor) + GALE_DECK_LIFT;
+  const y0 =
+    deck.nearAboveWater !== undefined
+      ? waterLevel + deck.nearAboveWater
+      : Math.max(terrainAt(deck.ax, deck.az), floor) + GALE_DECK_LIFT;
+  let y1: number;
+  if (deck.farAboveWater !== undefined) y1 = waterLevel + deck.farAboveWater;
+  else if (deck.ax2 === undefined || deck.az2 === undefined) return y0;
+  else y1 = Math.max(terrainAt(deck.ax2, deck.az2), floor) + GALE_DECK_LIFT;
   const t = Math.min(1, Math.max(0, (along + deck.hl) / (2 * deck.hl)));
   return y0 + (y1 - y0) * t;
 }

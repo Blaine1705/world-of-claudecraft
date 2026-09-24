@@ -755,7 +755,10 @@ export const GALECREST_PROPS: ZonePropsDef = {
     // stays clear of every walkway so nobody wedges between hull and rail)
     { key: 'hexShipBlue', x: 492.9, z: 350.2, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 475.1, z: 368.7, rot: 1.45, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 487, z: 370.1, rot: -1.69, scale: 6, r: 4, h: 9, float: 0.55 },
+    // (this hull lay at x 487, z 370.1, inside the Eastbrook ferry's berth off
+    // the deepwater pier's end; it rides at anchor out in the bay since the
+    // ferry's Phase 2 timetable, clear of its sailing paths)
+    { key: 'hexShipBlue', x: 515, z: 392, rot: -1.69, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 456.6, z: 382.8, rot: 1.3, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 468.1, z: 386, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
     // the Beacon dock's pair, alongside the lighthouse pier

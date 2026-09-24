@@ -175,8 +175,9 @@ export function buildDeckWood(
         }
       }
     }
-    // mooring bollards on the two tip corners of each pier
-    if (opts.bollards) {
+    // mooring bollards on the two tip corners of each pier (never on the
+    // ferry's boarding stage, whose tip is where the gangplank lands)
+    if (opts.bollards && d.farAboveWater === undefined) {
       for (const side of [1, -1]) {
         const bx = d.x + dirx * (d.hl - 0.5) + pxu * (d.hw - 0.35) * side;
         const bz = d.z + dirz * (d.hl - 0.5) + pzu * (d.hw - 0.35) * side;

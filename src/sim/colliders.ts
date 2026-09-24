@@ -120,6 +120,7 @@ import { riftRegionAt } from './rift_regions';
 import { type PlacedStreetlamp, planStreetlamps, styleStreetlampSites } from './streetlamp_layout';
 import { STREETLAMP_COLLIDER_RADIUS, STREETLAMP_FIXTURE_HEIGHT } from './streetlamp_style';
 import { townPropPlacements } from './town_props';
+import { transportBerthColliders, transportGatesClosedAtBuild } from './transport_gates';
 import type { WorldContent } from './types';
 import { WILDHEART_COLLIDERS } from './wildheart_field';
 import {
@@ -179,6 +180,9 @@ export interface CircleCollider {
    * Undefined means nothing passes under (the default for everything).
    */
   passUnderY?: number;
+  /** A transport berth gate (transport_gates.ts): the collider is in its grid
+   *  cells only while that berth's ship lies docked (setColliderGateOpen). */
+  gate?: string;
   /** Engine bookkeeping: index into the owning grid's dedupe stamp buffer. */
   gridIndex?: number;
 }
@@ -206,6 +210,8 @@ export interface ObbCollider {
    * the OBBs built from `PROPS.fences`.
    */
   isFence?: boolean;
+  /** See {@link CircleCollider.gate}. */
+  gate?: string;
   /** See {@link CircleCollider.gridIndex}. */
   gridIndex?: number;
 }
@@ -779,6 +785,9 @@ function staticWorldColliders(seed: number): Collider[] {
   // per PROPS.decorProps entry, walk-through when r/hw+hd are absent, standable
   // on top when standableTop is set (see that module's header).
   out.push(...buildDecorPropColliders(seed, PROPS.decorProps ?? []));
+  // Scheduled transport ships moor at every berth of their route, gated by
+  // the timetable (transport_gates.ts); built-in world only.
+  if (content === BUILTIN_WORLD) out.push(...transportBerthColliders());
 
   // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
   // grid the renderer lays the hedge GLBs from, so the blocked ground IS the
@@ -1427,6 +1436,9 @@ interface ColliderGrid {
   nextGridIndex: number;
   /** Bumped once per query; a stamp equal to it means "already collected". */
   gen: number;
+  /** Gated colliders by gate id, and the gates currently closed. */
+  gated: Map<string, Collider[]>;
+  closedGates: Set<string>;
 }
 
 // cellKey / cellKeyAt moved to collider_cells.ts (shared with the rift
@@ -1472,11 +1484,22 @@ function gridFor(seed: number): ColliderGrid {
     stamps: new Uint32Array(built.length),
     nextGridIndex: built.length,
     gen: 0,
+    gated: new Map(),
+    closedGates: new Set(),
   };
   // Bind the chest spots this build resolved to this grid, so a later build
   // for another world/seed can never leak its spots into this one's readers.
   bankerChestSpotsByGrid.set(grid, lastBuiltBankerChestSpots);
-  for (const c of built) registerInCells(grid, c);
+  for (const c of built) {
+    if (c.gate === undefined) registerInCells(grid, c);
+    else grid.gated.set(c.gate, [...(grid.gated.get(c.gate) ?? []), c]);
+  }
+  // gated berths start in the clock-0 schedule state (transport_gates.ts)
+  const closedAtBuild = transportGatesClosedAtBuild();
+  for (const [gate, list] of grid.gated) {
+    if (closedAtBuild.includes(gate)) grid.closedGates.add(gate);
+    else for (const c of list) registerInCells(grid, c);
+  }
   perContent.set(seed, grid);
   // Streetlamps join AFTER the grid is published, and the order is the whole
   // trick: planning a post calls resolvePosition to check the spot is free,
@@ -1495,7 +1518,7 @@ function gridFor(seed: number): ColliderGrid {
  * complete, so every path that adds a collider to a grid goes through here
  * rather than repeating the arithmetic.
  */
-function registerInCells(grid: ColliderGrid, c: Collider): void {
+function registerInCells(grid: ColliderGrid, c: Collider, remove = false): void {
   const b = colliderBounds(c);
   const x0 = Math.floor((b.minX - MAX_BODY_RADIUS) / GRID_CELL);
   const x1 = Math.floor((b.maxX + MAX_BODY_RADIUS) / GRID_CELL);
@@ -1505,10 +1528,30 @@ function registerInCells(grid: ColliderGrid, c: Collider): void {
     for (let gz = z0; gz <= z1; gz++) {
       const key = cellKey(gx, gz);
       const list = grid.cells.get(key);
-      if (list) list.push(c);
+      // a gate toggle changes the cell's membership: drop its combined memo
+      grid.combinedCells.delete(key);
+      if (remove) {
+        const at = list ? list.indexOf(c) : -1;
+        if (list && at >= 0) list.splice(at, 1);
+      } else if (list) list.push(c);
       else grid.cells.set(key, [c]);
     }
   }
+}
+
+/**
+ * Open (colliders back in their cells) or close (out of them) one transport
+ * berth gate on the seed's grid for the ACTIVE content. The schedule that
+ * decides it lives in transport_gates.ts; an unchanged gate, or a gate this
+ * grid does not carry, is a no-op.
+ */
+export function setColliderGateOpen(seed: number, gate: string, open: boolean): void {
+  const grid = gridFor(seed);
+  const list = grid.gated.get(gate);
+  if (!list || grid.closedGates.has(gate) !== open) return;
+  if (open) grid.closedGates.delete(gate);
+  else grid.closedGates.add(gate);
+  for (const c of list) registerInCells(grid, c, !open);
 }
 
 // ---------------------------------------------------------------------------

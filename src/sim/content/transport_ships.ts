@@ -17,6 +17,7 @@
 // treads rise 0.3 yd, the cabin door is 3 yd tall, and the waist deck is a
 // 9.5 yd wide, 16 yd long open floor with the masts on the centre line.
 
+import type { TransportBerthDef, TransportRouteDef, TransportTimings } from '../transport_schedule';
 import { railRun, type ShipHullLayout, type ShipVolume, stairFlight } from '../transport_ship';
 
 const DECK = 3.3; // main (waist) deck, above the waterline
@@ -313,3 +314,90 @@ export const EASTBROOK_FERRY_HULL: ShipHullLayout = {
 export const TRANSPORT_SHIP_HULLS: Readonly<Record<string, ShipHullLayout>> = {
   eastbrookFerry: EASTBROOK_FERRY_HULL,
 };
+
+// ---------------------------------------------------------------------------
+// Scheduled routes (Phase 2): the Eastbrook ferry sails a free, round-trip
+// timetable between Eastbrook Docks and Wickharbor (transport_schedule.ts owns
+// the cycle math, transport_ferry.ts carries the passengers). A route's ship
+// is NOT a decorProps row: its hull colliders are placed at BOTH berths and
+// gated by the schedule (transport_gates.ts), so the deck exists only where
+// and while the ship lies docked.
+// ---------------------------------------------------------------------------
+
+/** The Eastbrook berth: broadside across the ferry pier's T-head, bow north
+ *  (+z), the port gangway square to the pier's end (world z -54) so the
+ *  gangplank drops onto the pier deck (Phase 1's mooring, unchanged). */
+const EASTBROOK_BERTH: TransportBerthDef = {
+  id: 'eastbrook',
+  x: -125,
+  z: -54.8,
+  rot: 0,
+  // ahead up the cove, then a long turn to port out past the western buoys
+  departure: [
+    { x: -125, z: -54.8, rot: 0 },
+    { x: -125.6, z: -42, rot: -0.15 },
+    { x: -135, z: -32, rot: -0.9 },
+    { x: -155, z: -27.5, rot: -1.42 },
+    { x: -172, z: -28.5, rot: -1.64 },
+  ],
+  // in from the south-western shallows, bow first, straightening into the berth
+  arrival: [
+    { x: -166, z: -96, rot: 0.8 },
+    { x: -143, z: -80, rot: 0.5 },
+    { x: -128.5, z: -68, rot: 0.12 },
+    { x: -125, z: -54.8, rot: 0 },
+  ],
+  // the ferry pier's T-head, facing back up the pier toward the quay
+  landing: { x: -113.5, z: -54, facing: Math.PI / 2 },
+};
+
+/** The Wickharbor berth: broadside across the deepwater pier's T-head (the
+ *  south pier, gale_harbor.ts GALE_HARBOR_DECKS[2]: centre (464.1, 378), rot
+ *  1.3, hl 12, so its end is (475.66, 381.21)). The ship lies with the same
+ *  relation to the pier as at Eastbrook (ship rot = pier rot + PI/2, the port
+ *  gangway on the pier's axis), 12.3 yd out along the axis: the pier deck is
+ *  only 0.89 yd above the water where Eastbrook's stands 2.64, so the Galecrest
+ *  boarding stair (the ramp deck appended to GALE_HARBOR_DECKS) bridges the
+ *  last 4.7 yd from the pier's end up to the gangplank. */
+const WICKHARBOR_BERTH: TransportBerthDef = {
+  id: 'wickharbor',
+  x: 487.3,
+  z: 385.27,
+  rot: 1.3 + Math.PI / 2,
+  // a pivot to starboard in place (the bow swings away from the middle pier's
+  // end), then out east across the bay
+  departure: [
+    { x: 487.3, z: 385.27, rot: 1.3 + Math.PI / 2 },
+    { x: 490.5, z: 381, rot: 2.3 },
+    { x: 501, z: 375.5, rot: 1.8 },
+    { x: 521, z: 373, rot: 1.62 },
+    { x: 540, z: 373.5, rot: 1.56 },
+  ],
+  // up the bay from the south, bow first, onto the berth
+  arrival: [
+    { x: 506, z: 441, rot: 3.55 },
+    { x: 494, z: 416, rot: 3.3 },
+    { x: 488.8, z: 399, rot: 2.98 },
+    { x: 487.3, z: 385.27, rot: 1.3 + Math.PI / 2 },
+  ],
+  // on the deepwater pier, just shoreward of the boarding stair, facing town
+  landing: { x: 473.25, z: 380.54, facing: 1.3 - Math.PI },
+};
+
+/** The Eastbrook ferry's timetable, in seconds (transport_schedule.ts). */
+export const EASTBROOK_FERRY_TIMINGS: TransportTimings = {
+  docked: 60,
+  departing: 8,
+  atSea: 12,
+  arriving: 8,
+};
+
+export const EASTBROOK_WICKHARBOR_FERRY: TransportRouteDef = {
+  id: 'eastbrookWickharbor',
+  ship: 'eastbrookFerry',
+  berths: [EASTBROOK_BERTH, WICKHARBOR_BERTH],
+  timings: EASTBROOK_FERRY_TIMINGS,
+};
+
+/** Every scheduled route in the built-in world. */
+export const TRANSPORT_ROUTES: readonly TransportRouteDef[] = [EASTBROOK_WICKHARBOR_FERRY];

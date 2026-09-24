@@ -2054,20 +2054,17 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // is already below the sea. These berths were measured against the cove
     // bathymetry so every hull is wet across its whole footprint, and each lies
     // alongside a pier in the gap the round 6 respacing opened.
-    // The Eastbrook ferry (transport ship, Phase 1: moored, idle-animated).
-    // It lies broadside across the ferry pier's T-head, bow to the north,
-    // its port gangway square to the pier's end (world z -54) so the
-    // gangplank drops onto the pier deck. Origin = the waterline centre
-    // (float 0). Its walkable decks, stairs, rails and gangways come from
-    // content/transport_ships.ts (decor_prop_colliders.ts places them); the
-    // model is render/transport_ship.ts. To make its berth, the blue hull
-    // that lay in the gap north of the ferry pier (x -115, z -45) was
-    // retired, the second blue hull (x -115, z -63, whose stern reached
-    // under the ferry's quarter) moved out to ride at anchor offshore, north
-    // west of the cove mouth, where its calm pad reshapes no shore, and the
-    // fishing hull (x -122, z -54, under the ferry) moved into the freed gap
-    // north of the pier.
-    { key: 'eastbrookFerry', x: -125, z: -54.8, rot: 0, float: 0 },
+    // The Eastbrook ferry berths broadside across the ferry pier's T-head,
+    // but it is no longer a decorProps row: since Phase 2 it sails a
+    // timetable to Wickharbor and back (content/transport_ships.ts
+    // EASTBROOK_WICKHARBOR_FERRY), its deck placed at both berths and gated
+    // by the schedule. To make its berth (Phase 1), the blue hull that lay in
+    // the gap north of the ferry pier (x -115, z -45) was retired, the second
+    // blue hull (x -115, z -63, whose stern reached under the ferry's
+    // quarter) moved out to ride at anchor offshore, north west of the cove
+    // mouth, where its calm pad reshapes no shore, and the fishing hull
+    // (x -122, z -54, under the ferry) moved into the freed gap north of the
+    // pier.
     { key: 'hexShipBlue', x: -170, z: -22, rot: 1.55, scale: 7, r: 4.6, h: 11, float: 0.55 },
     // a smaller fishing hull riding the gap between the ferry pier and the
     // north working pier

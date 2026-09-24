@@ -4687,6 +4687,26 @@ export function isConsuming(e: { eating: Consuming | null; drinking: Consuming |
  * Absent until first use, so unrelated entity snapshots and deterministic
  * traces gain no inert state.
  */
+/** A ferry passenger's ride (src/sim/transport_ferry.ts): the deck-local spot
+ *  they boarded at, carried with the ship's pose until it docks. */
+export interface FerryRide {
+  /** route id (content/transport_ships.ts TRANSPORT_ROUTES) */
+  route: string;
+  /** destination berth index */
+  to: number;
+  /** deck-local offset in the ship frame: x port, y above the waterline, z bow */
+  lx: number;
+  ly: number;
+  lz: number;
+  /** facing relative to the ship's heading */
+  lf: number;
+  /** the world x/z the ride last wrote, so a teleport ends the ride */
+  wx: number;
+  wz: number;
+  /** on the hidden at-sea leg (the wire's `fry` 2) */
+  atSea: boolean;
+}
+
 export interface LedgeClimb {
   from: Vec3;
   to: Vec3;
@@ -4773,6 +4793,10 @@ export interface ClientMirroredEntityFields {
   climbProgress?: number;
   /** Mirror of an in-flight Vaulting Charge: a bare server-owned movement bit. */
   leaping?: boolean;
+  /** Mirror of a ferry ride (`ferryRide`): a server-owned movement bit, plus
+   *  whether the ride is on its hidden at-sea leg. */
+  ferryRiding?: boolean;
+  ferryAtSea?: boolean;
 }
 
 export interface Entity extends ClientMirroredEntityFields {
@@ -5167,6 +5191,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // Authoritative ledge-climb pull-up. Like `leap`, it owns movement while it
   // runs; see `src/sim/climb.ts`.
   climb?: LedgeClimb | null;
+  // A scheduled ferry passenger (src/sim/transport_ferry.ts): the ship's pose
+  // owns the body's position until it docks. Session-only and absent until a
+  // first ride; the wire carries only the `fry` bit (see ferryRiding).
+  ferryRide?: FerryRide | null;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
   sitting: boolean;
