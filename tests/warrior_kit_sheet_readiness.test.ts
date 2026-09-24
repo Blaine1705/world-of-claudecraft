@@ -29,6 +29,7 @@ vi.mock('../src/render/ability_vfx/fx_textures', async () => {
         procedural.set(style, new three.Texture({ width: 512, height: 512 }));
       return procedural.get(style);
     },
+    builtFlipbookSheet: (style: string) => procedural.get(style) ?? null,
   };
 });
 
@@ -37,6 +38,7 @@ const disposers: (() => void)[] = [];
 afterEach(() => {
   for (const dispose of disposers.splice(0)) dispose();
   contacts.clear();
+  procedural.clear();
   vi.restoreAllMocks();
 });
 
@@ -49,18 +51,25 @@ function flipbooks(ready?: (texture: THREE.Texture) => boolean) {
   return { pool, meshes: scene.children as ImpactMesh[] };
 }
 
+function uploadedShatter(uploaded: Set<THREE.Texture>) {
+  // What the boot warm-up leaves behind: the procedural sheet built and uploaded.
+  const shatter = new THREE.Texture({ width: 512, height: 512 });
+  procedural.set('shatter', shatter);
+  uploaded.add(shatter);
+  return shatter;
+}
+
 it.each(CONTACT_SHEETS)(
-  'binds a boot-uploaded procedural sheet for %s until the kit uploaded it',
+  'binds the uploaded procedural sheet for %s until the kit uploaded its own',
   (kind: ContactSheet) => {
     const uploaded = new Set<THREE.Texture>();
     const { pool, meshes } = flipbooks((texture) => uploaded.has(texture));
+    const shatter = uploadedShatter(uploaded);
     const sheet = contacts.get(kind) as THREE.Texture;
     pool.spawn(0, 1, 0, 3, 0xc6dce9, 1.5, kind, 0.2);
     const cold = meshes[0].material.uniforms;
     expect(meshes[0].visible).toBe(true);
-    expect(cold.uMap.value).not.toBe(sheet);
-    expect(procedural.has('shatter')).toBe(true);
-    expect(cold.uMap.value).toBe(procedural.get('shatter'));
+    expect(cold.uMap.value).toBe(shatter);
     // The procedural sheet has no baked gutter to inset.
     expect(cold.uInset.value).toBe(0);
 
@@ -72,30 +81,50 @@ it.each(CONTACT_SHEETS)(
   },
 );
 
+it('skips a contact when neither its sheet nor the procedural one is uploaded here', () => {
+  const uploaded = new Set<THREE.Texture>();
+  const { pool, meshes } = flipbooks((texture) => uploaded.has(texture));
+  // Never built on this page: the fallback must not paint and upload it live.
+  pool.spawn(0, 1, 0, 3, 0xffffff, 1.5, 'contact_cut', 0.2);
+  expect(procedural.has('shatter')).toBe(false);
+  // Built but not uploaded by this renderer (a rebuilt one, before its warm-up).
+  procedural.set('shatter', new THREE.Texture({ width: 512, height: 512 }));
+  pool.spawn(0, 1, 0, 3, 0xffffff, 1.5, 'contact_pierce', 0.2);
+  pool.spawn(0, 1, 0, 3, 0xffffff, 2, 'warrior_storm_flash', 0.2);
+  expect(meshes.filter((mesh) => mesh.visible)).toHaveLength(0);
+  expect(meshes.every((mesh) => mesh.material.uniforms.uMap.value === null)).toBe(true);
+});
+
 it('never binds the cut contact sheet to a Warrior flash before its upload', () => {
   const uploaded = new Set<THREE.Texture>();
   const { pool, meshes } = flipbooks((texture) => uploaded.has(texture));
+  const shatter = uploadedShatter(uploaded);
   const cut = contacts.get('contact_cut') as THREE.Texture;
   pool.spawn(0, 1, 0, 3, 0xffffff, 2, 'warrior_steel_flash', 0.2);
   expect(meshes[0].visible).toBe(true);
-  expect(meshes[0].material.uniforms.uMap.value).not.toBe(cut);
+  expect(meshes[0].material.uniforms.uMap.value).toBe(shatter);
   uploaded.add(cut);
   pool.spawn(0, 1, 0, 3, 0xffffff, 2, 'warrior_steel_flash', 0.2);
   expect(meshes[1].material.uniforms.uMap.value).toBe(cut);
 });
 
-it('falls back without a readiness host and still skips a contact whose kit never loaded', () => {
+it('draws no contact without a readiness host or before the kit decoded', () => {
   const { pool, meshes } = flipbooks();
-  pool.spawn(0, 1, 0, 3, 0xffffff, 1.5, 'contact_crush', 0.2);
-  expect(meshes[0].material.uniforms.uMap.value).toBe(procedural.get('shatter'));
-  // A declined or not-yet-decoded kit keeps its previous presentation: no quad.
-  contacts.clear();
+  procedural.set('shatter', new THREE.Texture({ width: 512, height: 512 }));
   pool.spawn(0, 1, 0, 3, 0xffffff, 1.5, 'contact_crush', 0.2);
   pool.spawn(0, 1, 0, 3, 0xffffff, 1.5, 'warrior_blood_flash', 0.2);
-  expect(meshes.filter((mesh) => mesh.visible)).toHaveLength(1);
-  // Ordinary school sheets never consult the kit.
+  expect(meshes.filter((mesh) => mesh.visible)).toHaveLength(0);
+  // A declined or not-yet-decoded kit keeps its previous presentation: no quad.
+  const uploaded = new Set<THREE.Texture>();
+  const ready = flipbooks((texture) => uploaded.has(texture));
+  uploadedShatter(uploaded);
+  contacts.clear();
+  ready.pool.spawn(0, 1, 0, 3, 0xffffff, 1.5, 'contact_crush', 0.2);
+  ready.pool.spawn(0, 1, 0, 3, 0xffffff, 1.5, 'warrior_blood_flash', 0.2);
+  expect(ready.meshes.filter((mesh) => mesh.visible)).toHaveLength(0);
+  // Ordinary school sheets never consult the kit or the readiness host.
   pool.spawn(0, 1, 0, 3, 0xffffff, 1.5, 'flame', 0.2);
-  expect(meshes[1].material.uniforms.uMap.value).toBe(procedural.get('flame'));
+  expect(meshes[0].material.uniforms.uMap.value).toBe(procedural.get('flame'));
 });
 
 it.each(['smoke', 'shout_dust'] as const)(

@@ -22,6 +22,7 @@ vi.mock('../src/render/ability_vfx/fx_textures', async () => {
     FLIPBOOK_GRID: 8,
     FLIPBOOK_STYLES: ['flame', 'shatter', 'electric', 'void', 'verdant', 'radiance'],
     flipbookSheet: vi.fn(() => texture),
+    builtFlipbookSheet: vi.fn(() => texture),
   };
 });
 

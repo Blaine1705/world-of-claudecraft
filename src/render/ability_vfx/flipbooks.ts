@@ -1,7 +1,13 @@
 import * as THREE from 'three';
 import { boundQuadSize, IMPACT_QUAD_MAX_SCREEN_FRACTION } from '../vfx_screen_bounds_core';
 import { type ContactSheet, contactTexture, isContactSheet } from './contact_assets';
-import { FLIPBOOK_GRID, FLIPBOOK_STYLES, type FlipbookStyle, flipbookSheet } from './fx_textures';
+import {
+  builtFlipbookSheet,
+  FLIPBOOK_GRID,
+  FLIPBOOK_STYLES,
+  type FlipbookStyle,
+  flipbookSheet,
+} from './fx_textures';
 import {
   WARRIOR_FLASH_GLSL,
   WARRIOR_IMPACT_REACH,
@@ -25,8 +31,9 @@ const LAST_FRAME = FLIPBOOK_GRID * FLIPBOOK_GRID - 1;
 
 // A contact sheet lands with the Warrior kit's demand load and is uploaded by
 // the kit recipe (`active_kit_prewarm.ts`); until then a contact binds this
-// boot-uploaded procedural sheet (its shard burst is the physical one), so a
-// cast never uploads a 1024px sheet inside a live frame.
+// procedural sheet (its shard burst is the physical one) once the boot warm-up
+// uploaded it on this renderer, and skips otherwise, so a cast never paints or
+// uploads a sheet inside a live frame.
 const CONTACT_FALLBACK: FlipbookStyle = 'shatter';
 
 const easeOutCubic = (t: number): number => 1 - (1 - t) ** 3;
@@ -192,10 +199,12 @@ export class ImpactFlipbooks {
         ? contactTexture(style)
         : null;
     if (contact && !kit) return;
-    const sheet = kit && this.textureReady?.(kit) ? kit : null;
+    const ready = (sheet: THREE.Texture | null) => !!sheet && !!this.textureReady?.(sheet);
+    const sheet = ready(kit) ? kit : null;
     const texture = contact
-      ? (sheet ?? flipbookSheet(CONTACT_FALLBACK))
+      ? (sheet ?? builtFlipbookSheet(CONTACT_FALLBACK))
       : flipbookSheet(style as FlipbookStyle);
+    if (!texture || (contact && !sheet && !ready(texture))) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % FLIP_SLOTS;
     slot.active = true;

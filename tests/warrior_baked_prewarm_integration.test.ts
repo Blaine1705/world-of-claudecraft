@@ -20,7 +20,7 @@ afterEach(() => {
 
 function fixture(cls: string, warriorTextures = true) {
   const scene = new THREE.Scene();
-  // Recipe upload order: the contact, smoke and dust sheets first.
+  // Listed in the recipe's upload order, which the first test compares against.
   const names = [
     'contact_cut',
     'contact_crush',

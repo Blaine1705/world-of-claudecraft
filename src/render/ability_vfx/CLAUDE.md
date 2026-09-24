@@ -160,8 +160,11 @@ selected by ability id only:
   warm-up (`abilityVfxTexturePrewarmSteps`) reads none of them, so the recipe is
   their one upload home on every renderer, a recycled one included. A sheet is
   stored as soon as it decodes, so every drawer also waits for this renderer's
-  upload (`textureReady`): the baked layers skip, a contact flipbook binds a
-  boot-uploaded procedural sheet meanwhile (`tests/warrior_kit_sheet_readiness.test.ts`).
+  upload (`textureReady`): the baked layers skip, a contact flipbook binds the
+  procedural shard sheet meanwhile when this renderer uploaded it and skips
+  otherwise (`tests/warrior_kit_sheet_readiness.test.ts`). A rebuilt renderer
+  therefore draws none of them until its own recipe runs, which for another
+  class waits for the next Warrior sighting.
   A pool built at boot never relies on those getters in its constructor, since
   the load lands after it: it binds them in
   a unit of its own preparation recipe, ahead of its compile (the crests'
