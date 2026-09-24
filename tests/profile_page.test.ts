@@ -188,7 +188,9 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // (tsx, no full compile), since these additions could in principle
     // collide on a relic id. Re-confirm with
     // `npx vitest run tests/profile_page.test.ts` once the tree compiles.
-    expect(catalogTotal).toBe(411);
+    // +1 on the 411 above: the Viridian Valestrider takes a horizons_mounts
+    // slot (RELIQUARY_HORIZON_MOUNTS, src/sim/content/reliquary.ts).
+    expect(catalogTotal).toBe(412);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

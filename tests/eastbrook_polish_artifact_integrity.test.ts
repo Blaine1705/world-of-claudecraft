@@ -1382,7 +1382,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  '4478da409d0b0ce1fa8d2381665322a5dbdfb09dbb89af96b47695cc3c4ab73e';
+  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
+  'd8d1ff3e12d29df640618feb3c4b4fcbc77eb65b6ae9224620f9977d33230778';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1393,7 +1394,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  'd872e91fef162b388fd9e35249a01b6b07a299595e9e2ae8b880ef95da810edd';
+  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
+  'e651995fbf1ac8413176d75b35b5da91b9a241918ea183430642a9c6b51d3fd5';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2768,7 +2770,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // again over the re-swept evidence. No capture was retaken.
       // Frame Rate Limit: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-    ).toBe('cd43154133e82de3b3a778b6709602ade4158d7275b33902caa9624eb05ccf09');
+      // devalue audit floor: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+    ).toBe('7c84c7c53ca7d33345e15966eda0f4e73b8c6cfdba707b4f26aa04db5fe37065');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

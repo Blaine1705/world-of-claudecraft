@@ -460,6 +460,7 @@ export const zh_TW: EnTranslations = {
       "help": "脫困：/unstuck 會啟動原地倒數，之後將你移動到附近可到達的安全位置。",
       "helpAtGraveyard": "脫困：/unstuck 會啟動原地倒數，結束後將你的靈魂送往最近的墓地。你必須向靈魂醫者接受守護者的代價才能復活。",
       "helpUnstuckSickness": "脫困：/unstuck 會啟動原地倒數，結束後將你移動到最近的墓地，若你已倒下則會復活你。你將帶著脫困虛弱，最多持續 5 分鐘。",
+      "helpUnstuckWindow": "脫困：/unstuck 會啟動原地倒數，結束後將你移動到最近的墓地，若你已倒下則會復活你。一小時內的首次使用不付代價。若在上次使用後一小時內再次使用，你將帶著脫困虛弱，最多持續 5 分鐘。",
       "started": "將在 {seconds} 秒後脫困。移動、戰鬥、受到傷害或開始其他動作都會取消。",
       "countdown": "脫困：{seconds}",
       "completed": "已移動到最近且可到達的安全位置。",
@@ -467,6 +468,8 @@ export const zh_TW: EnTranslations = {
       "revivedAtGraveyard": "你已被送回最近的墓地並復活。守護者的代價正壓在你身上。",
       "movedToGraveyard": "你已被移動到最近的墓地。脫困虛弱正壓在你身上。",
       "revivedAtGraveyardUnstuck": "你已被移動到最近的墓地並復活。脫困虛弱正壓在你身上。",
+      "movedToGraveyardFree": "你已被移動到最近的墓地。一小時內再次使用脫困將讓你帶上脫困虛弱。",
+      "revivedAtGraveyardFree": "你已被移動到最近的墓地並復活。一小時內再次使用脫困將讓你帶上脫困虛弱。",
       "cancelledMoved": "你進行了移動，脫困已取消。",
       "cancelledDamaged": "你受到了傷害，脫困已取消。",
       "cancelledCombat": "你進入了戰鬥，脫困已取消。",
@@ -1580,6 +1583,7 @@ export const zh_TW: EnTranslations = {
       "name_rallycart_rxt": "拉力卡丁車 RXT",
       "name_terrorspark_groundshaker": "駭雷撼地者",
       "name_drakemaw_raptor": "龍喉迅猛龍",
+      "name_avian_strider": "蒼翠谷行者",
       "name_mech_bird": "發條機械鳥",
       "name_lanternback_troll": "提燈背者格倫博",
       "name_chimeglass_tortoise": "鐘晶的托利弗",
@@ -1596,6 +1600,7 @@ export const zh_TW: EnTranslations = {
       "desc_rallycart_skin": "一輛小巧的拉力賽車，轟鳴聲卻震天響。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
       "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。",
+      "desc_avian_strider": "高大的坐騎巨鳥，粗壯的利爪與收攏的雙翼讓每一段旅程都化作雷鳴般的疾馳。",
       "desc_mech_bird": "一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。",
       "desc_lanternback_troll": "被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。",
       "desc_chimeglass_tortoise": "鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。",
@@ -1910,7 +1915,8 @@ export const zh_TW: EnTranslations = {
       "crossHotbarEditHelp": "按住左肩鍵並按上方面鍵，即可用手把整理十字熱鍵列。"
     },
     "perf": {
-      "title": "效能監視器",
+      "title": "效能",
+      "overlaySection": "效能監視器",
       "enable": "顯示效能監視器",
       "description": "選擇要顯示的數據、監視器的位置及其外觀。",
       "sectionPosition": "位置",
@@ -2583,6 +2589,15 @@ export const zh_TW: EnTranslations = {
       "tooLarge": "此回報過大，無法傳送。請移除截圖後重試。",
       "rateLimited": "你最近已傳送多份回報。請稍候再傳送。",
       "failed": "無法傳送錯誤回報。請重試。"
+    },
+    "hostDiag": {
+      "title": "系統報告",
+      "intro": "將這台電腦的詳細資訊(包括占用最多處理器與記憶體的程式)收集到一個檔案中，協助診斷效能問題。不會傳送任何內容：該檔案只保存在你的電腦上。",
+      "create": "產生系統報告",
+      "running": "正在收集系統資訊...",
+      "saved": "報告已儲存為 {fileName}。",
+      "savedNoName": "報告已儲存。",
+      "failed": "無法建立報告。請再試一次。"
     },
     "paperdoll": {
       "unequipAria": "卸下 {item}",
@@ -3639,6 +3654,15 @@ export const zh_TW: EnTranslations = {
         "socket": "已為{name}鑲嵌一顆寶石。",
         "socketReplaced": "已將寶石鑲入{name}；{gem}已被摧毀。"
       }
+    },
+    "lootQuality": {
+      "ordinary": "普通",
+      "superior": "優良",
+      "exceptional": "卓越",
+      "magnificent": "華麗",
+      "transcendent": "超凡",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}：+{levels} 物品等級。強化後仍會保留。"
     },
     "itemTooltip": {
       "requiresLevel": "需要等級 {level}",
@@ -6400,6 +6424,7 @@ export const zh_TW: EnTranslations = {
       "allyRezBody": "你並非總得自己走回去。帶有復活法術的盟友可以將你扶起，而它會化為一個提示送到你面前，由你接受或婉拒；放著不理它就會過期，所以趁它還在時就回應。接受之後，你會帶著部分生命與法力，在施法的那位夥伴身旁站起。有些治療者能一次向整支倒地的隊伍伸出援手，不過你們每個人仍得各自回應自己的提示。荊谷原野是例外：那裡沒有任何復活法術能觸及你，你只能等待己方的下一波復活潮。",
       "unstuckTitle": "當你真的卡住時",
       "unstuckBody": "若這個世界把你困在某個出不去的地方，請輸入 /unstuck。你必須脫離戰鬥並原地站定，不能被昏迷或定身控制，也不能身處決鬥或競技場對戰中：接著會跑一段短短的倒數，移動或受到傷害都會中斷它。倒數結束後，你會被放置在最近的墓地。它從不會殺死你，也不會留下屍體，而若你當時已經倒下，它會就地將你扶起。代價是脫困虛弱：一種對你全身上下的暫時削弱，等到你能再次使用這道指令時它早已消退，而且和守護者的代價一樣，全新的角色可完全免除。",
+      "unstuckBodyWindow": "若這個世界把你困在某個出不去的地方，請輸入 /unstuck。你必須脫離戰鬥並原地站定，不能被昏迷或定身控制，也不能身處決鬥或競技場對戰中：接著會跑一段短短的倒數，移動或受到傷害都會中斷它。倒數結束後，你會被放置在最近的墓地。它從不會殺死你，也不會留下屍體，而若你當時已經倒下，它會就地將你扶起。一小時內的首次使用不付任何代價。若在上次使用後一小時內再次使用，代價便是脫困虛弱：一種對你全身上下的暫時削弱，等到你能再次使用這道指令時它早已消退，而且和守護者的代價一樣，全新的角色可完全免除。",
       "climbTitle": "翻上一道岩架",
       "climbBody": "岩架並不是牆。朝著高得跨不上去的東西起跳，你的角色會在跳躍接近頂點時攀住邊緣並翻身上去，不需要按任何專屬按鍵。任何你自己就能跨過的低矮障礙都會平淡無奇地過去；完整的引體向上留給高過你頭頂的邊緣。它很短暫，而且在進行時會接管你的操控，因此你無法中途轉向脫離。若你在攀爬途中被昏迷，你會鬆手墜落，落地距離從跳躍起跳的地面算起；而昏迷或定身則會讓攀爬根本無法開始，這一點在你想從一場戰鬥的險境中脫身時很值得記住。"
     },
@@ -6574,6 +6599,7 @@ export const zh_TW: EnTranslations = {
       "dungeonReset": "放棄你自己那些空無一人的副本，這正是你切換難度之後該做的事。",
       "groupRecovery": "脫困與狀態",
       "unstuck": "當這個世界把你困住時的出路。原地站定撐過一段短短的倒數，你就會被移動到最近的墓地，若你已經倒下，還會在那裡被扶起。之後你會帶著脫困虛弱一陣子，所以它是最後手段，而不是抄近路的辦法。",
+      "unstuckWindow": "當這個世界把你困住時的出路。原地站定撐過一段短短的倒數，你就會被移動到最近的墓地，若你已經倒下，還會在那裡被扶起。一小時內的首次使用不付代價。若在上次使用後一小時內再次使用，之後你會帶著脫困虛弱一陣子，所以它是救援手段，而不是抄近路的辦法。",
       "afk": "將自己標記為暫時離開，可附上一段訊息，讓密語你的人自動收到它作為回覆。不加訊息再輸入一次即可清除；任何其他聊天發言也會清除它。",
       "dnd": "請勿打擾：與離開類似，只是送給你的密語會被留住而不會送達。",
       "sit": "就地坐下，以及重新站起。只要你一移動、施法或挨了一下，就會自動站起來。",
@@ -6680,6 +6706,7 @@ export const zh_TW: EnTranslations = {
       "fatigueDef": "往外海游得夠遠，海水就會開始消耗你：先是一則警告，接著是不斷升高的傷害，直到你掉頭游回陸地為止。",
       "unstuckTerm": "脫困虛弱",
       "unstuckDef": "從遊戲選單使用「脫困」所付出的代價。在倒數期間站著不動，它就會把你放到最近的墓地，而此後一段時間你會帶著一份暫時的虛弱。",
+      "unstuckDefWindow": "一小時內不只一次倚賴遊戲選單「脫困」所付出的代價。在倒數期間站著不動，它就會把你放到最近的墓地。一小時內的首次使用不付代價，而在上次使用後一小時內再次使用，此後一段時間你還會帶著一份暫時的虛弱。",
       "itemLevelTerm": "物品等級",
       "itemLevelDef": "一個總結裝備強度的數值，想快速比較兩件裝備時很好用。在選項中開啟「顯示物品等級」，即可在物品提示上看到它。只有來源明確的裝備才帶有物品等級，因此普通的商人基本貨品與新手裝備不會顯示，缺少數值是正常現象，而非瑕疵。",
       "requiredLevelTerm": "需求等級",
@@ -9943,6 +9970,11 @@ export const zh_TW: EnTranslations = {
       "quit": "離開",
       "fatalBody": "World of ClaudeCraft 發生未預期的錯誤，必須關閉。"
     },
+    "hostDiag": {
+      "saveTitle": "儲存系統報告",
+      "saveButton": "儲存",
+      "fileType": "JSON 檔案"
+    },
     "titlebar": {
       "exitGame": "離開遊戲"
     }
@@ -9993,6 +10025,11 @@ export const zh_TW: EnTranslations = {
     "inWorld": "在世界中",
     "takeOver": "接管",
     "inWorldHint": "已在世界中。請在別處登出，或接管工作階段。",
+    "currentLocation": "目前位置：{zone}",
+    "lockouts": "鎖定（{count}）",
+    "lockoutRaids": "團隊副本",
+    "lockoutDungeons": "地城",
+    "lockoutWorldBosses": "世界首領",
     "takeOverConfirm": "這會使該角色從另一個工作階段中斷並切換到此處。是否繼續？",
     "renameRequired": "需要更名",
     "delete": "刪除",
@@ -14552,6 +14589,9 @@ export const zh_TW: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "駭雷撼地者點火鑰匙"
+      },
+      "reins_avian_strider": {
+        "name": "蒼翠谷行者的韁繩"
       },
       "reins_goblin_rocket_sled": {
         "name": "哥布林火箭雪橇點火鑰匙"

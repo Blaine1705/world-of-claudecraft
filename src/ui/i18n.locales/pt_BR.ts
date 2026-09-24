@@ -5218,7 +5218,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Inclui uma chance base de 5% compartilhada por todos os aventureiros.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Uma estimativa, que exclui acertos críticos e dano de habilidades.',
-  'hudChrome.perf.title': 'Sobreposição de Desempenho',
+  'hudChrome.perf.overlaySection': 'Sobreposição de Desempenho',
   'hudChrome.perf.enable': 'Mostrar Sobreposição de Desempenho',
   'hudChrome.perf.description':
     'Escolha quais estatísticas exibir, onde a sobreposição fica e como ela aparece.',

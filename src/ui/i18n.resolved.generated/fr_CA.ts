@@ -460,6 +460,7 @@ export const fr_CA: EnTranslations = {
       "help": "Récupération : /unstuck démarre un compte à rebours immobile qui vous déplace vers un endroit sûr et accessible à proximité.",
       "helpAtGraveyard": "Récupération : /unstuck démarre un compte à rebours immobile, puis envoie votre esprit au cimetière le plus proche. Revenir par le Veilleur pâle exige le Glas du Veilleur.",
       "helpUnstuckSickness": "Récupération : /unstuck démarre un compte à rebours immobile, puis vous déplace au cimetière le plus proche en vous ranimant si vous étiez tombé. Le Mal de déblocage vous accable pendant 5 minutes au maximum.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Déblocage dans {seconds} secondes. Bouger, combattre, subir des dégâts ou commencer une autre action l'annule.",
       "countdown": "Déblocage: {seconds}",
       "completed": "Déplacé vers l'endroit sûr accessible le plus proche.",
@@ -467,6 +468,8 @@ export const fr_CA: EnTranslations = {
       "revivedAtGraveyard": "Vous avez été ramené au cimetière le plus proche et ranimé. Le Glas du Veilleur pèse sur vous.",
       "movedToGraveyard": "Vous avez été déplacé au cimetière le plus proche. Le Mal de déblocage pèse sur vous.",
       "revivedAtGraveyardUnstuck": "Vous avez été déplacé au cimetière le plus proche et ranimé. Le Mal de déblocage pèse sur vous.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Déblocage annulé : vous avez bougé.",
       "cancelledDamaged": "Déblocage annulé : vous avez subi des dégâts.",
       "cancelledCombat": "Déblocage annulé : vous êtes entré en combat.",
@@ -1580,6 +1583,7 @@ export const fr_CA: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Secoueur de terre Étincelle-de-terreur",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Oiseau Mécanique",
       "name_lanternback_troll": "Grumbol le Lanternback",
       "name_chimeglass_tortoise": "Tolliver le Chimeglass",
@@ -1596,6 +1600,7 @@ export const fr_CA: EnTranslations = {
       "desc_rallycart_skin": "Une minuscule voiture de rallye au rugissement puissant.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
       "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Un poulet de guerre mécanique construit à la main qui sprinte sur des servos qui claquent, la clé de remontage tournant toujours.",
       "desc_lanternback_troll": "Un troll des collines brisé jusqu'au joug par des allumeurs de réverbères, portant un trône de fer sur ses épaules avec une lanterne tempête allumée sur chaque bras.",
       "desc_chimeglass_tortoise": "Une tortue des salines qui a dépassé trois générations de caravanes. Les bricoleurs lui ont arraché des lunettes en verre tempête et lui ont accroché une cloche de bronze à la gorge, pour que la route l'entende bien avant de le voir.",
@@ -1910,7 +1915,8 @@ export const fr_CA: EnTranslations = {
       "crossHotbarEditHelp": "Maintenez le pare-chocs gauche et appuyez sur le bouton supérieur pour organiser la barre avec le contrôleur."
     },
     "perf": {
-      "title": "Surcouche de performance",
+      "title": "Performance",
+      "overlaySection": "Surcouche de performance",
       "enable": "Afficher la surcouche de performance",
       "description": "Choisissez les statistiques à afficher, l'emplacement de la surcouche et son apparence.",
       "sectionPosition": "Position",
@@ -2583,6 +2589,15 @@ export const fr_CA: EnTranslations = {
       "tooLarge": "Ce rapport est trop volumineux pour être envoyé. Réessayez sans la capture d'écran.",
       "rateLimited": "Vous avez envoyé plusieurs rapports récemment. Veuillez patienter un peu avant d'en envoyer un autre.",
       "failed": "Impossible d'envoyer le rapport de bug. Veuillez réessayer."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Déséquiper {item}",
@@ -3639,6 +3654,15 @@ export const fr_CA: EnTranslations = {
         "socket": "J'ai inséré une gemme dans {name}.",
         "socketReplaced": "Enchâssé une gemme dans {name}; {gem} a été détruit."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Niveau requis : {level}",
@@ -6400,6 +6424,7 @@ export const fr_CA: EnTranslations = {
       "allyRezBody": "Vous n'avez pas toujours besoin de faire le trajet à pied. Un allié disposant d'un sort de résurrection peut vous ramener à la vie à la place, et cela vous parvient sous la forme d'une invite que vous acceptez ou refusez ; laissez-la sans réponse et elle expire, alors répondez pendant qu'elle est là. Acceptez, et vous vous relevez aux côtés de l'ami qui l'a lancée, une partie de vos points de vie et de votre mana récupérée. Certains soigneurs peuvent proposer à tout le groupe à terre en même temps, même si chacun répond encore à sa propre invite. Les Champs de Thornhollow font exception : aucun sort de résurrection ne vous y atteint, et vous attendez la prochaine vague de votre équipe.",
       "unstuckTitle": "Quand vous êtes vraiment coincé",
       "unstuckBody": "Si le monde vous piège quelque part dont vous ne pouvez pas sortir, tapez /unstuck. Vous devez être hors combat et immobile, non entravé par un étourdissement ou une immobilisation, et non engagé dans un duel ou un match d'arène : un court compte à rebours démarre, et bouger ou subir des dégâts l'annule. Une fois terminé, vous êtes déposé au cimetière le plus proche. Cela ne vous tue jamais et ne laisse aucun cadavre, et si vous étiez déjà tombé, cela vous relève sur place à la place. Le prix en est le Mal de déblocage, un affaiblissement temporaire de tout ce que vous êtes qui s'est dissipé le temps que vous puissiez réutiliser la commande, et comme le Glas du Veilleur, il épargne entièrement les personnages tout neufs.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Se hisser sur une corniche",
       "climbBody": "Les corniches ne sont pas des murs. Sautez vers quelque chose de trop haut pour y monter d'un pas, et votre personnage attrape le rebord près du sommet du saut et se hisse dessus, sans qu'aucune touche dédiée ne soit nécessaire. Tout ce qui est assez bas pour être franchi tout seul passe sans cérémonie ; le rétablissement complet est réservé aux rebords au-dessus de votre tête. C'est bref, et cela prend les commandes le temps que ça dure, si bien que vous ne pouvez pas en sortir en cours de route. Un étourdissement qui vous frappe en plein rétablissement vous fait lâcher prise et tomber, la chute étant mesurée depuis l'endroit où le saut a quitté le sol, et un étourdissement ou une immobilisation empêche même un rétablissement de commencer, ce qui vaut la peine d'être gardé en tête quand vous essayez de sortir d'une mauvaise position en plein combat."
     },
@@ -6574,6 +6599,7 @@ export const fr_CA: EnTranslations = {
       "dungeonReset": "Abandonnez vos propres instances vides, ce que vous faites après avoir changé de difficulté.",
       "groupRecovery": "Récupération et présence",
       "unstuck": "L'issue de secours quand le monde vous a piégé. Restez immobile le temps d'un court compte à rebours et vous êtes déplacé au cimetière le plus proche, et relevé sur place si vous étiez déjà tombé. Cela vous laisse affaibli par le Mal de déblocage pendant un moment ensuite, c'est donc un dernier recours plutôt qu'un raccourci.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Signalez-vous absent, avec un message facultatif que quiconque vous murmure reçoit en réponse automatique. Répétez la commande sans message pour l'annuler ; n'importe quel autre message de discussion l'annule aussi.",
       "dnd": "Ne pas déranger : comme absent, sauf que les murmures qui vous sont envoyés sont retenus au lieu d'être livrés.",
       "sit": "Asseyez-vous là où vous êtes, ou relevez-vous. Vous vous relevez automatiquement dès que vous bougez, incantez ou subissez un coup.",
@@ -6680,6 +6706,7 @@ export const fr_CA: EnTranslations = {
       "fatigueDef": "Nagez assez loin en pleine mer et l'eau commence à vous épuiser : un avertissement vient d'abord, puis des dégâts croissants jusqu'à ce que vous rebroussiez chemin vers la terre.",
       "unstuckTerm": "Mal de déblocage",
       "unstuckDef": "Le prix à payer pour utiliser le Déblocage depuis le menu du jeu. Restez immobile pendant le compte à rebours et il vous dépose au cimetière le plus proche, puis vous porte une faiblesse temporaire pendant un moment.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Niveau d'objet",
       "itemLevelDef": "Un chiffre unique qui résume la puissance d'une pièce d'équipement, pratique pour comparer rapidement deux pièces. Activez Afficher le niveau d'objet dans les options pour le voir sur les infobulles. Seul l'équipement dont la provenance est connue en porte un, si bien que les articles de base des marchands et l'équipement de départ n'affichent rien, et un chiffre manquant est normal, pas un défaut.",
       "requiredLevelTerm": "Niveau requis",
@@ -9943,6 +9970,11 @@ export const fr_CA: EnTranslations = {
       "quit": "Quitter",
       "fatalBody": "World of ClaudeCraft a rencontré une erreur inattendue et doit se fermer."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Quitter le jeu"
     }
@@ -9993,6 +10025,11 @@ export const fr_CA: EnTranslations = {
     "inWorld": "dans le monde",
     "takeOver": "Prendre le contrôle",
     "inWorldHint": "Déjà en jeu. Déconnectez-vous ailleurs, ou prenez le contrôle.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Cela déconnectera ce personnage d'une autre session et l'amènera ici. Continuer ?",
     "renameRequired": "renommage requis",
     "delete": "Supprimer",
@@ -14552,6 +14589,9 @@ export const fr_CA: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Clé d’allumage : Secoueur-de-sol Étincelle-de-terreur"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Clé de contact : luge-fusée gobeline"

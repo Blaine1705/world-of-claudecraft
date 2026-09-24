@@ -178,6 +178,11 @@ export const hudChromeStrings = {
     // still promise the old outcome.
     helpUnstuckSickness:
       'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.',
+    // v0.44.0: the first use in an hour is free and only a repeat inside the window
+    // charges the sickness. New key for the same reason again: the shipped rows above
+    // promise a charge on every use.
+    helpUnstuckWindow:
+      'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.',
     started:
       'Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.',
     countdown: 'Unstuck: {seconds}',
@@ -192,6 +197,12 @@ export const hudChromeStrings = {
       'You have been moved to the nearest graveyard. Unstuck Sickness weighs on you.',
     revivedAtGraveyardUnstuck:
       'You have been moved to the nearest graveyard and revived. Unstuck Sickness weighs on you.',
+    // v0.44.0: the same two outcomes when no sickness was charged (the first use in an
+    // hour). They warn about the repeat instead of announcing a debuff that never landed.
+    movedToGraveyardFree:
+      'You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.',
+    revivedAtGraveyardFree:
+      'You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.',
     cancelledMoved: 'Unstuck cancelled because you moved.',
     cancelledDamaged: 'Unstuck cancelled because you took damage.',
     cancelledCombat: 'Unstuck cancelled because you entered combat.',
@@ -1866,6 +1877,7 @@ export const hudChromeStrings = {
     name_rallycart_rxt: 'Rallycart RXT',
     name_terrorspark_groundshaker: 'Dreadspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
+    name_avian_strider: 'Viridian Valestrider',
     name_mech_bird: 'Cluckwork Mech Bird',
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
@@ -1889,6 +1901,8 @@ export const hudChromeStrings = {
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
+    desc_avian_strider:
+      'A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.',
     desc_mech_bird:
       'A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.',
     desc_lanternback_troll:
@@ -2470,7 +2484,11 @@ export const hudChromeStrings = {
   // the older dev `?perf` trace output, which stays English like console.*. The real-DOM
   // `?diagnostics=1` panel below is localized because its chrome is user-visible.
   perf: {
-    title: 'Performance Overlay',
+    // The sub-view now holds more than the overlay (the desktop shell's System
+    // Report section sits under it), so the view is "Performance" and the
+    // overlay controls carry their own section heading inside it.
+    title: 'Performance',
+    overlaySection: 'Performance Overlay',
     enable: 'Show Performance Overlay',
     description: 'Choose which stats to show, where the overlay sits, and how it looks.',
     sectionPosition: 'Position',
@@ -3326,6 +3344,23 @@ export const hudChromeStrings = {
     tooLarge: 'That report is too large to send. Try again without the screenshot.',
     rateLimited: "You've sent several reports recently. Please wait a bit before sending another.",
     failed: 'Could not send the bug report. Please try again.',
+  },
+  // The System Report section at the foot of Options > Performance
+  // (src/ui/host_diag_section_controller.ts), desktop shell only. Deliberately
+  // small: one sentence, one button, one status line. Nothing is uploaded,
+  // which the sentence says outright, because the section's whole job is asking
+  // a player to hand over a description of their own computer.
+  hostDiag: {
+    title: 'System Report',
+    intro:
+      'Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.',
+    create: 'Generate system report',
+    running: 'Collecting system details...',
+    saved: 'Report saved as {fileName}.',
+    // Defensive twin of the line above, for a shell that saved a file without
+    // naming it back: never expected, and better than an empty file name.
+    savedNoName: 'Report saved.',
+    failed: 'The report could not be created. Please try again.',
   },
   // Character window (paperdoll) controls.
   paperdoll: {
@@ -5064,6 +5099,15 @@ export const hudChromeStrings = {
       // The same success on a full band: the oldest gem was destroyed.
       socketReplaced: 'Socketed a gem into {name}; {gem} was destroyed.',
     },
+  },
+  lootQuality: {
+    ordinary: 'Ordinary',
+    superior: 'Superior',
+    exceptional: 'Exceptional',
+    magnificent: 'Magnificent',
+    transcendent: 'Transcendent',
+    itemName: '{item}, {quality}',
+    tooltip: '{quality}: +{levels} item levels. Retained through upgrades.',
   },
   itemTooltip: {
     requiresLevel: 'Requires Level {level}',

@@ -460,6 +460,7 @@ export const sv_SE: EnTranslations = {
       "help": "Räddning: /unstuck startar en stillastående nedräkning som flyttar dig till en närliggande nåbar säker plats.",
       "helpAtGraveyard": "Räddning: /unstuck startar en stillastående nedräkning och skickar sedan din ande till närmaste kyrkogård. Att återvända via Den bleka väktaren kräver Väktarens tribut.",
       "helpUnstuckSickness": "Räddning: /unstuck startar en stillastående nedräkning och flyttar dig sedan till närmaste kyrkogård, och återupplivar dig om du hade fallit. Räddningssjuka stannar på dig i upp till 5 minuter.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Fastna-hjälp om {seconds} sekunder. Att röra sig, strida, ta skada eller påbörja en annan handling avbryter den.",
       "countdown": "Fastna-hjälp: {seconds}",
       "completed": "Flyttad till närmaste nåbara säkra plats.",
@@ -467,6 +468,8 @@ export const sv_SE: EnTranslations = {
       "revivedAtGraveyard": "Du har återförts till närmaste kyrkogård och återupplivats. Väktarens tribut vilar tungt på dig.",
       "movedToGraveyard": "Du har flyttats till närmaste kyrkogård. Räddningssjuka vilar tungt på dig.",
       "revivedAtGraveyardUnstuck": "Du har flyttats till närmaste kyrkogård och återupplivats. Räddningssjuka vilar tungt på dig.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Fastna-hjälp avbröts eftersom du rörde dig.",
       "cancelledDamaged": "Fastna-hjälp avbröts eftersom du tog skada.",
       "cancelledCombat": "Fastna-hjälp avbröts eftersom du gick in i strid.",
@@ -1580,6 +1583,7 @@ export const sv_SE: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Dreadsparks markskakare",
       "name_drakemaw_raptor": "Drakgapsraptor",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork-mekafågel",
       "name_lanternback_troll": "Lanternbacken Grumbol",
       "name_chimeglass_tortoise": "Tolliver klockglaset",
@@ -1596,6 +1600,7 @@ export const sv_SE: EnTranslations = {
       "desc_rallycart_skin": "En liten rallybil med mäktigt vrål.",
       "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.",
       "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "En handbyggd urverkshöna som sprintar på knäppande servon medan upprullningsnyckeln fortfarande vrider sig.",
       "desc_lanternback_troll": "Ett kulletroll bröts till oket av lamptändare, bärande en järntron över sina axlar med en stormlykta som brinner på vardera arm.",
       "desc_chimeglass_tortoise": "En saltplattsköldpadda som har gått ur tre generationer husvagnar. Tinkers malde honom glasögon från stormglas och hängde en bronsklocka i hans hals, så vägen hör honom långt innan den ser honom.",
@@ -1910,7 +1915,8 @@ export const sv_SE: EnTranslations = {
       "crossHotbarEditHelp": "Håll i den vänstra stötfångaren och tryck på den övre ansiktsknappen för att placera stången med kontrollen."
     },
     "perf": {
-      "title": "Prestandaöverlägg",
+      "title": "Performance",
+      "overlaySection": "Prestandaöverlägg",
       "enable": "Visa prestandaöverlägg",
       "description": "Välj vilka statistikvärden som ska visas, var överlägget ska sitta och hur det ser ut.",
       "sectionPosition": "Position",
@@ -2583,6 +2589,15 @@ export const sv_SE: EnTranslations = {
       "tooLarge": "Den rapporten är för stor för att skickas. Försök igen utan skärmbilden.",
       "rateLimited": "Du har skickat flera rapporter nyligen. Vänta en stund innan du skickar en till.",
       "failed": "Kunde inte skicka felrapporten. Försök igen."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Ta av {item}",
@@ -3639,6 +3654,15 @@ export const sv_SE: EnTranslations = {
         "socket": "Socket en pärla i {name}.",
         "socketReplaced": "Socket en pärla i {name}; {gem} förstördes."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Kräver nivå {level}",
@@ -6400,6 +6424,7 @@ export const sv_SE: EnTranslations = {
       "allyRezBody": "Du behöver inte alltid gå tillbaka till fots. En allierad med en återupplivningsbesvärjelse kan återuppliva dig i stället, och det kommer till dig som en förfrågan du accepterar eller avvisar; låter du den ligga kvar går den ut, så svara på den medan den finns där. Accepterar du reser du dig bredvid vännen som kastade den, med en del av din hälsa och mana återställd. Vissa helare kan erbjuda hela den fallna gruppen på en gång, men var och en av er svarar ändå på sin egen förfrågan. Törnhålefälten är undantaget: ingen återupplivningsbesvärjelse når dig där, och du väntar på ditt lags nästa återuppståndelsevåg.",
       "unstuckTitle": "När du verkligen sitter fast",
       "unstuckBody": "Om världen fångar dig någonstans du inte kan ta dig ut ifrån, skriv /unstuck. Du måste vara utanför strid och stå stilla, inte hållen av en bedövning eller en rot, och inte i en duell eller en arenamatch: en kort nedräkning löper, och att röra dig eller ta skada avbryter den. När den är klar sätts du ner vid närmaste kyrkogård. Den dödar dig aldrig och lämnar inget lik efter sig, och om du redan låg nere återupplivar den dig där i stället. Priset är Räddningssjuka, en tillfällig försvagning av allt du är som har klingat av innan du kan använda kommandot igen, och precis som Väktartullen skonar den helt nya karaktärer helt och hållet.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Att dra dig upp på en avsats",
       "climbBody": "Avsatser är inte väggar. Hoppa mot något för högt för att kliva upp på, så griper din karaktär tag i kanten nära hoppets topp och drar sig upp på den, utan att någon egen knapp behöver tryckas. Allt som är lågt nog för att klara på egen hand passeras utan ceremoni; det fullständiga greppet sparas för kanter ovanför ditt huvud. Det är kort, och det tar över styrningen medan det pågår, så du kan inte styra dig ur det halvvägs. Fångas du av en bedövning mitt i greppet släpper du taget och faller, mätt från platsen där hoppet lämnade marken, och en bedövning eller en rot hindrar en klättring från att ens börja, vilket är värt att komma ihåg när du försöker ta dig ur en svår sits i en strid."
     },
@@ -6574,6 +6599,7 @@ export const sv_SE: EnTranslations = {
       "dungeonReset": "Överge dina egna tomma instanser, vilket är vad du gör efter att ha bytt svårighetsgrad.",
       "groupRecovery": "Återhämtning och närvaro",
       "unstuck": "Vägen ut när världen har fångat dig. Stå stilla genom en kort nedräkning så flyttas du till närmaste kyrkogård, och återupplivas där om du redan hade fallit. Det lämnar dig försvagad av Räddningssjuka ett tag efteråt, så det är en sista utväg snarare än en genväg.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Markera dig som Borta, med ett valfritt meddelande som den som viskar dig får som automatiskt svar. Upprepa utan meddelande för att rensa det; all annan chatt rensar det också.",
       "dnd": "Stör ej: som borta, förutom att viskningar som skickas till dig hålls tillbaka i stället för att levereras.",
       "sit": "Sätt dig ner där du står, och res dig upp igen. Du reser dig automatiskt i samma stund som du rör dig, kastar en besvärjelse eller tar en träff.",
@@ -6680,6 +6706,7 @@ export const sv_SE: EnTranslations = {
       "fatigueDef": "Simma tillräckligt långt ut på öppet hav så börjar vattnet tära på dig: en varning kommer först, sedan stigande skada tills du vänder tillbaka mot land.",
       "unstuckTerm": "Räddningssjuka",
       "unstuckDef": "Priset för att använda Räddning från spelmenyn. Stå still genom nedräkningen så sätter den ner dig vid närmaste kyrkogård, och du bär på en tillfällig försvagning ett tag efteråt.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Föremålsnivå",
       "itemLevelDef": "Ett enda tal som sammanfattar hur stark en utrustningspjäs är, praktiskt när du snabbt vill jämföra två pjäser. Slå på Visa föremålsnivå i alternativen för att se den på verktygstips. Bara utrustning med känd källa bär en, så enkla handelsvaror och startutrustning visar ingenting, och en saknad siffra är normal snarare än ett fel.",
       "requiredLevelTerm": "Nivåkrav",
@@ -9943,6 +9970,11 @@ export const sv_SE: EnTranslations = {
       "quit": "Avsluta",
       "fatalBody": "World of ClaudeCraft stötte på ett oväntat fel och måste stängas."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Avsluta spelet"
     }
@@ -9993,6 +10025,11 @@ export const sv_SE: EnTranslations = {
     "inWorld": "i världen",
     "takeOver": "Ta över",
     "inWorldHint": "Redan i världen. Logga ut någon annanstans, eller ta över.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Detta kopplar bort denna karaktär från en annan session och hämtar hit den. Fortsätta?",
     "renameRequired": "namnbyte krävs",
     "delete": "Radera",
@@ -14552,6 +14589,9 @@ export const sv_SE: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Tändningsnyckel: Skräckgnistas jordskakare"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Tändningsnyckel: Goblinraketsläde"

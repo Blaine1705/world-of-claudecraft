@@ -954,6 +954,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': 'Персональный при получении',
   'hudChrome.loot.bindConfirmBody':
     'Среди этой добычи есть предмет, который станет персональным, когда вы его возьмёте. Персональный предмет можно передать только игрокам, разделившим эту добычу, и только в течение ограниченного времени.',
+  'hudChrome.lootQuality.ordinary': 'Обычный',
+  'hudChrome.lootQuality.superior': 'Превосходный',
+  'hudChrome.lootQuality.exceptional': 'Исключительный',
+  'hudChrome.lootQuality.magnificent': 'Великолепный',
+  'hudChrome.lootQuality.transcendent': 'Запредельный',
+  'hudChrome.lootQuality.tooltip': '{quality}: +{levels} к уровню предмета. Сохраняется при улучшениях.',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
   'hudChrome.spellbook.removeFromBarAria': 'Убрать {name} с панели действий',
@@ -1705,7 +1711,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Включает базовый шанс 5%, общий для всех искателей приключений.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Это приблизительная оценка, не учитывающая критические удары и урон от способностей.',
-  'hudChrome.perf.title': 'Оверлей производительности',
+  'hudChrome.perf.title': 'Производительность',
+  'hudChrome.perf.overlaySection': 'Оверлей производительности',
   'hudChrome.perf.enable': 'Показывать оверлей производительности',
   'hudChrome.perf.description':
     'Выберите, какие показатели отображать, где разместить оверлей и как он выглядит.',
@@ -1787,6 +1794,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.rateLimited':
     'Вы недавно отправили несколько отчётов. Подождите немного перед следующим.',
   'hudChrome.bugReport.failed': 'Не удалось отправить отчёт об ошибке. Попробуйте снова.',
+  'hudChrome.hostDiag.title': 'Отчет о системе',
+  'hudChrome.hostDiag.intro':
+    'Собирает сведения об этом компьютере, включая программы, которые больше всего нагружают процессор и память, в файл, который помогает выявить причины проблем с производительностью. Ничего не отправляется: файл остается на вашем компьютере.',
+  'hudChrome.hostDiag.create': 'Создать отчет о системе',
+  'hudChrome.hostDiag.running': 'Сбор сведений о системе...',
+  'hudChrome.hostDiag.saved': 'Отчет сохранен как {fileName}.',
+  'hudChrome.hostDiag.savedNoName': 'Отчет сохранен.',
+  'hudChrome.hostDiag.failed': 'Не удалось создать отчет. Повторите попытку.',
   'hudChrome.keybinds.emoteWheel': 'Колесо эмоций',
   'hudChrome.keybinds.sheathe': 'Убрать/обнажить оружие',
   'hudChrome.keybinds.hideInterface': 'Скрыть интерфейс',
@@ -2509,6 +2524,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': 'в мире',
   'character.takeOver': 'Перехватить',
   'character.inWorldHint': 'Уже в мире. Выйдите в другом месте или перехватите сессию.',
+  'character.currentLocation': 'Текущее местоположение: {zone}',
+  'character.lockouts': 'Блокировки ({count})',
+  'character.lockoutRaids': 'Рейды',
+  'character.lockoutDungeons': 'Подземелья',
+  'character.lockoutWorldBosses': 'Мировые боссы',
   'character.takeOverConfirm':
     'Это отключит персонажа от другой сессии и перенесёт его сюда. Продолжить?',
   'character.renameRequired': 'требуется переименование',
@@ -9451,6 +9471,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': 'Перезагрузить',
   'desktop.crash.quit': 'Выйти',
   'desktop.titlebar.exitGame': 'Выйти из игры',
+  'desktop.hostDiag.saveTitle': 'Сохранить отчет о системе',
+  'desktop.hostDiag.saveButton': 'Сохранить',
+  'desktop.hostDiag.fileType': 'Файл JSON',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
   'gpuNotice.bodyDesktop':
@@ -11880,6 +11903,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
   'hudChrome.mounts.name_drakemaw_raptor': 'Раптор Дрейкмо',
+  'hudChrome.mounts.name_avian_strider': 'Изумрудный Долиноход',
   'hudChrome.mounts.name_lanternback_troll': 'Грумбол Фонареносец',
   'hudChrome.mounts.name_chimeglass_tortoise': 'Толливер Звонкостёкл',
   'hudChrome.mounts.desc_drakemaw_raptor':
@@ -11887,6 +11911,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_mech_bird': 'Заводная механоптица',
   'hudChrome.mounts.desc_mech_bird':
     'Заводная боевая курица ручной сборки: несётся на щёлкающих сервоприводах, а заводной ключ всё ещё крутится.',
+  'hudChrome.mounts.desc_avian_strider':
+    'Огромная верховая птица, чьи тяжёлые когти и сложенные крылья превращают любое путешествие в громоподобный бросок.',
   'hudChrome.mounts.desc_lanternback_troll':
     'Холмовой тролль, укрощённый фонарщиками: на плечах он несёт железный трон, а на обоих подлокотниках горит по штормовому фонарю.',
   'hudChrome.mounts.desc_chimeglass_tortoise':
@@ -12018,6 +12044,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого вас перенесёт на ближайшее кладбище и воскресит, если вы пали. Болезнь спасения останется на вас до 5 минут.',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    'Спасение: /unstuck запускает неподвижный отсчёт, после которого вас перенесёт на ближайшее кладбище и воскресит, если вы пали. Первое использование за час бесплатно. Воспользуйтесь командой снова в течение часа после прошлого раза, и Болезнь спасения останется на вас до 5 минут.',
   'hudChrome.unstuck.menuButton': 'Выбраться',
   'hudChrome.unstuck.help':
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.',
@@ -12025,6 +12053,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого ваш дух отправится на ближайшее кладбище. Чтобы вернуться к жизни, примите Подать Хранителя у Целителя душ.',
   'hudChrome.unstuck.movedToGraveyard':
     'Вас перенесли на ближайшее кладбище. Болезнь спасения тяготит вас.',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    'Вас перенесли на ближайшее кладбище. Если снова выбраться в течение часа, на вас останется Болезнь спасения.',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    'Вас перенесли на ближайшее кладбище и воскресили. Если снова выбраться в течение часа, на вас останется Болезнь спасения.',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     'Вас перенесли на ближайшее кладбище и воскресили. Болезнь спасения тяготит вас.',
   'hudChrome.unstuck.started':
@@ -12849,6 +12881,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.enterText':
     'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Ужасоискра',
+  'entities.items.reins_avian_strider.name': 'Поводья изумрудного долинохода',
   'entities.items.reins_lanternback_troll.name': 'Ярмо фонарщика: Грумбол',
   'entities.items.reins_chimeglass_tortoise.name': 'Колокольный ремень путеблюстителя: Толливер',
   'entities.items.reins_rickshaw_mount.name': 'Связанные поводья: Костяная рикша',
@@ -14989,6 +15022,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': 'Кого бьёт враг',
   'guide.combat.unstuckBody':
     'Если мир запер вас там, откуда не выбраться, введите /unstuck. Нужно быть вне боя и стоять на месте, не под оглушением и не в обездвиживании, и не на дуэли и не в матче арены: пойдёт короткий отсчёт, а движение или полученный урон его отменят. Когда он закончится, вас поставят на ближайшем кладбище. Команда никогда вас не убивает и не оставляет тела, а если вы уже пали, она вас там же и поднимет. Плата за это — Болезнь спасения, временное ослабление всего, что вы есть, которое проходит к тому времени, когда командой можно будет воспользоваться снова, и, как и Подать Хранителя, совсем новых персонажей она обходит стороной.',
+  'guide.combat.unstuckBodyWindow':
+    'Если мир запер вас там, откуда не выбраться, введите /unstuck. Нужно быть вне боя и стоять на месте, не под оглушением и не в обездвиживании, и не на дуэли и не в матче арены: пойдёт короткий отсчёт, а движение или полученный урон его отменят. Когда он закончится, вас поставят на ближайшем кладбище. Команда никогда вас не убивает и не оставляет тела, а если вы уже пали, она вас там же и поднимет. Первое использование за час ничего не стоит. Воспользуйтесь командой снова в течение часа после прошлого раза, и платой станет Болезнь спасения, временное ослабление всего, что вы есть, которое проходит к тому времени, когда командой можно будет воспользоваться снова, и, как и Подать Хранителя, совсем новых персонажей она обходит стороной.',
   'guide.combat.unstuckTitle': 'Когда вы застряли всерьёз',
   'guide.commandsPage.abilities': 'Способности, которые вы изучили.',
   'guide.commandsPage.afk':
@@ -15137,6 +15172,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': 'Если команда не работает',
   'guide.commandsPage.unstuck':
     'Выход, когда мир вас запер. Простойте неподвижно короткий отсчёт, и вас перенесут на ближайшее кладбище, а если вы уже пали, там же и поднимут. После этого вас на время тяготит Болезнь спасения, так что это крайнее средство, а не короткий путь.',
+  'guide.commandsPage.unstuckWindow':
+    'Выход, когда мир вас запер. Простойте неподвижно короткий отсчёт, и вас перенесут на ближайшее кладбище, а если вы уже пали, там же и поднимут. Первое использование за час бесплатно. Воспользуйтесь командой снова в течение часа после прошлого раза, и вас на время будет тяготить Болезнь спасения, так что это средство спасения, а не короткий путь.',
   'guide.commandsPage.where': 'Зона, в которой вы стоите, её диапазон уровней и ваши координаты.',
   'guide.commandsPage.whisper':
     'Отправить личное сообщение одному игроку, который сейчас в сети. Имя распознаётся в любом регистре, каким вы его наберёте, лишь бы подходил только один игрок.',
@@ -15326,6 +15363,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': 'Талисман для инструмента',
   'guide.glossary.unstuckDef':
     'Цена за «Выбраться» из игрового меню. Простойте неподвижно весь отсчёт, и вас опустит на ближайшем кладбище, а после вы какое-то время носите временную слабость.',
+  'guide.glossary.unstuckDefWindow':
+    'Цена за то, чтобы прибегнуть к «Выбраться» из игрового меню больше одного раза за час. Простойте неподвижно весь отсчёт, и вас опустит на ближайшем кладбище. Первое использование за час бесплатно, а повтор в течение часа после прошлого раза вдобавок оставляет на вас на какое-то время временную слабость.',
   'guide.glossary.unstuckTerm': 'Болезнь спасения',
   'guide.glossary.warfareDef':
     'Снаряжённая сторона схваток игрок против игрока. Интендант продаёт комплекты брони Боевой мощи за Честь, а рейтинг Боевой мощи, что они несут, считается только в боях против других игроков.',

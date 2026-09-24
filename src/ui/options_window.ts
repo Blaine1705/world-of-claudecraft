@@ -83,6 +83,7 @@ import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
 import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
+import { bugReportErrorText } from './bug_report_error_text';
 import { controllerDeviceStatusView } from './controller_options_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
@@ -1963,6 +1964,7 @@ export class OptionsWindow {
       onBack: () => this.goBack(),
       closeIconHtml: svgIcon('close'),
       backIconHtml: svgIcon('prev'),
+      hostDiag: { world: () => this.deps.world(), options: () => this.deps.options() },
     };
   }
 
@@ -2115,7 +2117,7 @@ export class OptionsWindow {
           })
           .catch((err: unknown) => {
             submit.disabled = false;
-            error.textContent = this.localizeBugReportError(err);
+            error.textContent = bugReportErrorText(err);
           });
       });
     });
@@ -2126,17 +2128,6 @@ export class OptionsWindow {
       ?.addEventListener('click', () => this.close());
     // Focus the description so a keyboard/screen-reader user lands in the field.
     window.setTimeout(() => desc.focus(), 0);
-  }
-
-  private localizeBugReportError(err: unknown): string {
-    const text = err instanceof Error ? err.message : '';
-    const keyByMessage: Record<string, TranslationKey> = {
-      'describe the bug': 'hudChrome.bugReport.describeFirst',
-      'bug report too large': 'hudChrome.bugReport.tooLarge',
-      'too many bug reports, try again later': 'hudChrome.bugReport.rateLimited',
-    };
-    const key = keyByMessage[text.toLowerCase()];
-    return key ? t(key) : t('hudChrome.bugReport.failed');
   }
 
   // -------------------------------------------------------------------------

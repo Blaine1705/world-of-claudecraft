@@ -957,6 +957,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': '拾うと魂縛される',
   'hudChrome.loot.bindConfirmBody':
     'この戦利品には、取得すると自分に魂縛されるアイテムが含まれています。魂縛されたアイテムは、同じドロップを分かち合ったプレイヤーとの間でのみ、限られた時間だけ取引できます。',
+  'hudChrome.lootQuality.ordinary': '通常',
+  'hudChrome.lootQuality.superior': '上質',
+  'hudChrome.lootQuality.exceptional': '卓越',
+  'hudChrome.lootQuality.magnificent': '壮麗',
+  'hudChrome.lootQuality.transcendent': '超越',
+  'hudChrome.lootQuality.tooltip': '{quality}：アイテムレベル +{levels}。強化後も維持されます。',
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
@@ -1696,7 +1702,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.notes.baseChance': '全ての冒険者が共有する5%の基本確率を含みます。',
   'hudChrome.statInfo.notes.dpsApprox':
     '推定値であり、クリティカルやアビリティによるダメージは含みません。',
-  'hudChrome.perf.title': 'パフォーマンスオーバーレイ',
+  'hudChrome.perf.title': 'パフォーマンス',
+  'hudChrome.perf.overlaySection': 'パフォーマンスオーバーレイ',
   'hudChrome.perf.enable': 'パフォーマンスオーバーレイを表示',
   'hudChrome.perf.description': '表示する統計、オーバーレイの位置、外観を設定します。',
   'hudChrome.perf.sectionPosition': '位置',
@@ -1775,6 +1782,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.rateLimited':
     '最近、報告を複数回送信しています。しばらく待ってから送信してください。',
   'hudChrome.bugReport.failed': 'バグ報告を送信できませんでした。もう一度お試しください。',
+  'hudChrome.hostDiag.title': 'システムレポート',
+  'hudChrome.hostDiag.intro':
+    'このコンピューターの詳細情報(プロセッサとメモリを最も多く使用しているプログラムを含む)をファイルにまとめ、パフォーマンスの問題の診断に役立てます。送信は一切行われません。ファイルはお使いのコンピューターに保存されるだけです。',
+  'hudChrome.hostDiag.create': 'システムレポートを作成',
+  'hudChrome.hostDiag.running': 'システム情報を収集しています...',
+  'hudChrome.hostDiag.saved': 'レポートを {fileName} として保存しました。',
+  'hudChrome.hostDiag.savedNoName': 'レポートを保存しました。',
+  'hudChrome.hostDiag.failed': 'レポートを作成できませんでした。もう一度お試しください。',
   'hudChrome.keybinds.emoteWheel': 'エモートホイール',
   'hudChrome.keybinds.sheathe': '武器を納刀/抜刀',
   'hudChrome.keybinds.hideInterface': 'インターフェースを隠す',
@@ -2487,6 +2502,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': '世界にいます',
   'character.takeOver': '引き継ぐ',
   'character.inWorldHint': 'すでに世界にいます。別の場所からログアウトするか、引き継いでください。',
+  'character.currentLocation': '現在地: {zone}',
+  'character.lockouts': 'ロックアウト（{count}）',
+  'character.lockoutRaids': 'レイド',
+  'character.lockoutDungeons': 'ダンジョン',
+  'character.lockoutWorldBosses': 'ワールドボス',
   'character.takeOverConfirm':
     'このキャラクターを別のセッションから切断し、こちらに移します。続けますか？',
   'character.renameRequired': '名前変更が必要',
@@ -9283,6 +9303,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '再読み込み',
   'desktop.crash.quit': '終了',
   'desktop.titlebar.exitGame': 'ゲームを終了',
+  'desktop.hostDiag.saveTitle': 'システムレポートを保存',
+  'desktop.hostDiag.saveButton': '保存',
+  'desktop.hostDiag.fileType': 'JSON ファイル',
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
@@ -11743,6 +11766,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跳びのカマカゲ',
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
   'hudChrome.mounts.name_drakemaw_raptor': '火口のラプトル',
+  'hudChrome.mounts.name_avian_strider': 'ヴィリジアン・ヴェイルストライダー',
   'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
   'hudChrome.mounts.desc_drakemaw_raptor':
@@ -11750,6 +11774,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_mech_bird': 'ゼンマイ・メカバード',
   'hudChrome.mounts.desc_mech_bird':
     '手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。',
+  'hudChrome.mounts.desc_avian_strider':
+    '巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。',
   'hudChrome.mounts.desc_lanternback_troll':
     '点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
@@ -11874,6 +11900,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。スタック解除の後遺症が最大5分間残ります。',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    '復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。1時間以内の初回使用は無償です。前回の使用から1時間以内に再び使うと、スタック解除の後遺症が最大5分間残ります。',
   'hudChrome.unstuck.menuButton': 'スタック解除',
   'hudChrome.unstuck.help':
     '復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。',
@@ -11881,6 +11909,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。',
   'hudChrome.unstuck.movedToGraveyard':
     '最寄りの墓地へ移動しました。スタック解除の後遺症があなたにのしかかっています。',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    '最寄りの墓地へ移動しました。1時間以内にもう一度スタック解除を使うと、スタック解除の後遺症が残ります。',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    '最寄りの墓地へ移動し、蘇生しました。1時間以内にもう一度スタック解除を使うと、スタック解除の後遺症が残ります。',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     '最寄りの墓地へ移動し、蘇生しました。スタック解除の後遺症があなたにのしかかっています。',
   'hudChrome.unstuck.started':
@@ -12688,6 +12720,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
+  'entities.items.reins_avian_strider.name': 'ヴィリジアン・ヴェイルストライダーの手綱',
   'entities.items.reins_lanternback_troll.name': '点灯人の軛：グルンボル',
   'entities.items.reins_chimeglass_tortoise.name': '道守の鈴帯：トリヴァー',
   'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',
@@ -14776,6 +14809,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': '敵は誰を殴るのか',
   'guide.combat.unstuckBody':
     '世界に閉じ込められて抜け出せなくなったら、/unstuck と入力しましょう。戦闘外で静止していること、スタンや根縛りで拘束されていないこと、決闘中でもアリーナ試合中でもないことが条件です。短いカウントダウンが走り、移動するかダメージを受けると中断されます。終われば最寄りの墓地に下ろされます。これで死ぬことはなく、亡骸も残りません。すでに倒れていた場合は、そこで蘇生されます。代償はスタック解除の後遺症です。あなたのすべてが一時的に弱まる効果ですが、次にこのコマンドを使えるようになる頃には切れています。そして復活の後遺症と同じく、生まれたてのキャラクターは完全に免除されます。',
+  'guide.combat.unstuckBodyWindow':
+    '世界に閉じ込められて抜け出せなくなったら、/unstuck と入力しましょう。戦闘外で静止していること、スタンや根縛りで拘束されていないこと、決闘中でもアリーナ試合中でもないことが条件です。短いカウントダウンが走り、移動するかダメージを受けると中断されます。終われば最寄りの墓地に下ろされます。これで死ぬことはなく、亡骸も残りません。すでに倒れていた場合は、そこで蘇生されます。1時間以内の初回使用には何の代償もありません。前回の使用から1時間以内に再び使うと、代償はスタック解除の後遺症です。あなたのすべてが一時的に弱まる効果ですが、次にこのコマンドを使えるようになる頃には切れています。そして復活の後遺症と同じく、生まれたてのキャラクターは完全に免除されます。',
   'guide.combat.unstuckTitle': '本当に動けなくなったとき',
   'guide.commandsPage.abilities': '習得済みのアビリティを表示します。',
   'guide.commandsPage.afk':
@@ -14927,6 +14962,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': 'コマンドが働かないとき',
   'guide.commandsPage.unstuck':
     '世界に閉じ込められたときの出口です。短いカウントダウンのあいだ静止していれば最寄りの墓地へ移され、すでに倒れていた場合はそこで蘇生されます。その後しばらくスタック解除の後遺症で弱ったままになるので、近道ではなく最後の手段と考えましょう。',
+  'guide.commandsPage.unstuckWindow':
+    '世界に閉じ込められたときの出口です。短いカウントダウンのあいだ静止していれば最寄りの墓地へ移され、すでに倒れていた場合はそこで蘇生されます。1時間以内の初回使用は無償です。前回の使用から1時間以内に再び使うと、その後しばらくスタック解除の後遺症で弱ったままになるので、近道ではなく救助手段と考えましょう。',
   'guide.commandsPage.where': '今立っている地方、そのレベル帯、そしてあなたの座標を表示します。',
   'guide.commandsPage.whisper':
     'オンラインのプレイヤー1人に非公開のメッセージを送ります。該当する人が1人しかいなければ、名前の大文字小文字は入力したとおりで一致します。',
@@ -15116,6 +15153,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': '道具の護符',
   'guide.glossary.unstuckDef':
     'ゲームメニューのスタック解除を使った代償です。カウントダウンのあいだ動かずにいると最寄りの墓地へ降ろされ、その後しばらく一時的な衰弱を背負います。',
+  'guide.glossary.unstuckDefWindow':
+    'ゲームメニューのスタック解除に1時間のうち二度以上頼った代償です。カウントダウンのあいだ動かずにいると最寄りの墓地へ降ろされます。1時間以内の初回使用は無償ですが、前回の使用から1時間以内に繰り返すと、その後しばらく一時的な衰弱も背負います。',
   'guide.glossary.unstuckTerm': 'スタック解除の後遺症',
   'guide.glossary.warfareDef':
     '対人戦の装備側の仕組みです。需品係が名誉と引き換えにウォーフェアの防具セットを売り、それらが持つウォーフェアレーティングは、ほかのプレイヤーとの戦いでのみ効果があります。',

@@ -460,6 +460,7 @@ export const zh_CN: EnTranslations = {
       "help": "脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。",
       "helpAtGraveyard": "脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。",
       "helpUnstuckSickness": "脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。",
+      "helpUnstuckWindow": "脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。一小时内的首次使用不付代价。若在上次使用后一小时内再次使用，你将带着脱困后遗症，最多持续 5 分钟。",
       "started": "将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。",
       "countdown": "脱困：{seconds}",
       "completed": "已移动到最近且可到达的安全位置。",
@@ -467,6 +468,8 @@ export const zh_CN: EnTranslations = {
       "revivedAtGraveyard": "你已被送回最近的墓地并复活。守护者的代价正压在你身上。",
       "movedToGraveyard": "你已被移动到最近的墓地。脱困后遗症正压在你身上。",
       "revivedAtGraveyardUnstuck": "你已被移动到最近的墓地并复活。脱困后遗症正压在你身上。",
+      "movedToGraveyardFree": "你已被移动到最近的墓地。一小时内再次使用脱困将让你带上脱困后遗症。",
+      "revivedAtGraveyardFree": "你已被移动到最近的墓地并复活。一小时内再次使用脱困将让你带上脱困后遗症。",
       "cancelledMoved": "你进行了移动，脱困已取消。",
       "cancelledDamaged": "你受到了伤害，脱困已取消。",
       "cancelledCombat": "你进入了战斗，脱困已取消。",
@@ -1580,6 +1583,7 @@ export const zh_CN: EnTranslations = {
       "name_rallycart_rxt": "拉力卡丁车 RXT",
       "name_terrorspark_groundshaker": "骇雷撼地者",
       "name_drakemaw_raptor": "龙喉迅猛龙",
+      "name_avian_strider": "苍翠谷行者",
       "name_mech_bird": "发条机械鸟",
       "name_lanternback_troll": "提灯背者格伦博",
       "name_chimeglass_tortoise": "钟晶的托利弗",
@@ -1596,6 +1600,7 @@ export const zh_CN: EnTranslations = {
       "desc_rallycart_skin": "一辆小巧的拉力赛车，轰鸣声却震天响。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
       "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。",
+      "desc_avian_strider": "高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。",
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
       "desc_lanternback_troll": "被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。",
       "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
@@ -1910,7 +1915,8 @@ export const zh_CN: EnTranslations = {
       "crossHotbarEditHelp": "按住左肩键并按上方面键，即可用手柄整理十字热键栏。"
     },
     "perf": {
-      "title": "性能监视器",
+      "title": "性能",
+      "overlaySection": "性能监视器",
       "enable": "显示性能监视器",
       "description": "选择要显示的信息、监视器的位置及其外观。",
       "sectionPosition": "位置",
@@ -2583,6 +2589,15 @@ export const zh_CN: EnTranslations = {
       "tooLarge": "该报告过大，无法发送。请去掉截图后重试。",
       "rateLimited": "你最近已发送多份报告。请稍后再发送。",
       "failed": "无法发送错误报告。请重试。"
+    },
+    "hostDiag": {
+      "title": "系统报告",
+      "intro": "将这台电脑的详细信息(包括占用最多处理器和内存的程序)收集到一个文件中，帮助诊断性能问题。不会发送任何内容：该文件只保存在你的电脑上。",
+      "create": "生成系统报告",
+      "running": "正在收集系统信息...",
+      "saved": "报告已保存为 {fileName}。",
+      "savedNoName": "报告已保存。",
+      "failed": "无法创建报告。请重试。"
     },
     "paperdoll": {
       "unequipAria": "卸下 {item}",
@@ -3639,6 +3654,15 @@ export const zh_CN: EnTranslations = {
         "socket": "已为{name}镶嵌一颗宝石。",
         "socketReplaced": "已将宝石镶入{name}；{gem}已被摧毁。"
       }
+    },
+    "lootQuality": {
+      "ordinary": "普通",
+      "superior": "优良",
+      "exceptional": "卓越",
+      "magnificent": "华丽",
+      "transcendent": "超凡",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}：+{levels} 物品等级。强化后仍会保留。"
     },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}",
@@ -6400,6 +6424,7 @@ export const zh_CN: EnTranslations = {
       "allyRezBody": "你并不总是得自己走回去。拥有复活法术的盟友可以把你扶起来，它会以一个提示的形式送到你面前，由你接受或拒绝；放着不管它就会过期，所以趁它还在时给个答复。接受之后，你会带着一部分生命与法力，在施法的那位朋友身旁站起来。有些治疗者可以一次向倒下的整支队伍发出邀请，不过你们每个人仍要各自回应自己的提示。荆谷原野是唯一的例外：那里没有任何复活法术能触及你，你只能等待己方的下一波复活潮。",
       "unstuckTitle": "当你真的被困住时",
       "unstuckBody": "如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。代价是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。",
+      "unstuckBodyWindow": "如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。一小时内的首次使用不付任何代价。若在上次使用后一小时内再次使用，代价便是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。",
       "climbTitle": "翻上岩架",
       "climbBody": "岩架并不是墙。跳向某个高得踩不上去的东西时，你的角色会在跳跃接近顶点时抓住边沿，并翻身上去，不需要按下任何专门的按键。凡是你自己就能跨过的低矮障碍，都会被平平常常地略过；完整的引体上翻只留给高过你头顶的边沿。这个动作很短，而且在进行时会接管你的操控，因此你无法中途改变方向。若在翻越途中被击晕，你会松手坠落，坠落距离从起跳的地面算起；而击晕或定身会让翻越根本无法开始，这一点在你想从一场恶战的困境中脱身时很值得记住。"
     },
@@ -6574,6 +6599,7 @@ export const zh_CN: EnTranslations = {
       "dungeonReset": "放弃你自己名下的空副本，也就是改完难度之后要做的那件事。",
       "groupRecovery": "脱困与状态",
       "unstuck": "被世界困住时的那条出路。站定不动熬过一段短暂的倒计时，你就会被移动到最近的墓地；若你已经倒下，还会在那里被复活。事后你会带着脱困后遗症虚弱一阵子，因此它是最后的手段，而不是捷径。",
+      "unstuckWindow": "被世界困住时的那条出路。站定不动熬过一段短暂的倒计时，你就会被移动到最近的墓地；若你已经倒下，还会在那里被复活。一小时内的首次使用不付代价。若在上次使用后一小时内再次使用，事后你会带着脱困后遗症虚弱一阵子，因此它是救援手段，而不是捷径。",
       "afk": "把自己标记为暂离，并可附上一条留言，任何密语你的人都会收到它作为自动回复。不带留言再输入一次即可清除；任何其他聊天也会清除它。",
       "dnd": "请勿打扰：与暂离类似，只是发给你的密语会被拦下，而不是送达。",
       "sit": "就地坐下，以及重新站起来。只要你移动、施法或挨了一下，就会自动站起。",
@@ -6680,6 +6706,7 @@ export const zh_CN: EnTranslations = {
       "fatigueDef": "向外海游得够远，海水便开始抽走你的力气：先是一声警告，随后伤害不断加重，直到你转身游回陆地。",
       "unstuckTerm": "脱困虚弱",
       "unstuckDef": "从游戏菜单里使用“脱困”所要付出的代价。站着别动，等倒计时走完，它会把你放在最近的墓地，而此后一段时间里，你会带着一层临时的虚弱。",
+      "unstuckDefWindow": "一小时内不止一次依赖游戏菜单里的“脱困”所要付出的代价。站着别动，等倒计时走完，它会把你放在最近的墓地。一小时内的首次使用不付代价，而在上次使用后一小时内再次使用，此后一段时间里你还会带着一层临时的虚弱。",
       "itemLevelTerm": "物品等级",
       "itemLevelDef": "一个概括装备强弱的数字，想快速比较两件装备时很好用。在选项中开启“显示物品等级”，就能在提示中看到它。只有来源明确的装备才带着它，因此商人处的普通货色与新手装备什么都不显示，缺了这个数字属于正常，而不是出了毛病。",
       "requiredLevelTerm": "需求等级",
@@ -9943,6 +9970,11 @@ export const zh_CN: EnTranslations = {
       "quit": "退出",
       "fatalBody": "World of ClaudeCraft 遇到意外错误，需要关闭。"
     },
+    "hostDiag": {
+      "saveTitle": "保存系统报告",
+      "saveButton": "保存",
+      "fileType": "JSON 文件"
+    },
     "titlebar": {
       "exitGame": "退出游戏"
     }
@@ -9993,6 +10025,11 @@ export const zh_CN: EnTranslations = {
     "inWorld": "在世界中",
     "takeOver": "接管",
     "inWorldHint": "已在世界中。请在别处登出，或接管会话。",
+    "currentLocation": "当前位置：{zone}",
+    "lockouts": "锁定（{count}）",
+    "lockoutRaids": "团队副本",
+    "lockoutDungeons": "地下城",
+    "lockoutWorldBosses": "世界首领",
     "takeOverConfirm": "这将使该角色从另一个会话断开并切换到此处。是否继续？",
     "renameRequired": "需要改名",
     "delete": "删除",
@@ -14552,6 +14589,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "骇雷撼地者点火钥匙"
+      },
+      "reins_avian_strider": {
+        "name": "苍翠谷行者的缰绳"
       },
       "reins_goblin_rocket_sled": {
         "name": "哥布林火箭雪橇点火钥匙"

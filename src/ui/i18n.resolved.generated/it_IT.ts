@@ -460,6 +460,7 @@ export const it_IT: EnTranslations = {
       "help": "Recupero: /unstuck avvia un conto alla rovescia da fermo per spostarti in un punto sicuro raggiungibile nelle vicinanze.",
       "helpAtGraveyard": "Recupero: /unstuck avvia un conto alla rovescia da fermo, poi invia il tuo spirito al cimitero più vicino. Tornare tramite il Custode Pallido richiede il Mal di resurrezione.",
       "helpUnstuckSickness": "Recupero: /unstuck avvia un conto alla rovescia da fermo, poi ti sposta al cimitero più vicino, rianimandoti se eri caduto. Ti lascia il Mal di sblocco per un massimo di 5 minuti.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Sblocco tra {seconds} secondi. Muoverti, combattere, subire danni o avviare un'altra azione lo annulla.",
       "countdown": "Sblocco: {seconds}",
       "completed": "Spostato nel punto sicuro raggiungibile più vicino.",
@@ -467,6 +468,8 @@ export const it_IT: EnTranslations = {
       "revivedAtGraveyard": "Sei stato riportato al cimitero più vicino e rianimato. Il Mal di resurrezione grava su di te.",
       "movedToGraveyard": "Sei stato spostato al cimitero più vicino. Il Mal di sblocco grava su di te.",
       "revivedAtGraveyardUnstuck": "Sei stato spostato al cimitero più vicino e rianimato. Il Mal di sblocco grava su di te.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Sblocco annullato perché ti sei mosso.",
       "cancelledDamaged": "Sblocco annullato perché hai subito danni.",
       "cancelledCombat": "Sblocco annullato perché sei entrato in combattimento.",
@@ -1580,6 +1583,7 @@ export const it_IT: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Scuotiterra Scintillaterribile",
       "name_drakemaw_raptor": "Raptor di Drakemaw",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Uccello Mech",
       "name_lanternback_troll": "Grumbol il Lanterna",
       "name_chimeglass_tortoise": "Tolliver il Chimeglass",
@@ -1596,6 +1600,7 @@ export const it_IT: EnTranslations = {
       "desc_rallycart_skin": "Una minuscola auto da rally dal rombo possente.",
       "desc_terrorspark_groundshaker": "Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi.",
       "desc_drakemaw_raptor": "Un raptor da covata domato per la sella, proveniente dalla Caldera di Drakemaw, tutto muscoli e scatto, che sa ancora vagamente di cenere.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Un pollo da guerra a orologeria costruito a mano che scatta su servi scattanti, con la chiave di carica ancora in movimento.",
       "desc_lanternback_troll": "Un troll di collina piegato al giogo dai lampionai, che porta un trono di ferro sulle spalle con una lanterna antivento accesa su entrambi i bracci.",
       "desc_chimeglass_tortoise": "Una tartaruga salata che ha superato tre generazioni di carovane. I calderai gli montarono gli occhiali di vetro anti-tempesta e gli appesero una campana di bronzo al collo, così la strada lo sentì molto prima di vederlo.",
@@ -1910,7 +1915,8 @@ export const it_IT: EnTranslations = {
       "crossHotbarEditHelp": "Tieni il paraurti sinistro e premi il pulsante frontale superiore per sistemare la barra con il controller."
     },
     "perf": {
-      "title": "Pannello prestazioni",
+      "title": "Performance",
+      "overlaySection": "Pannello prestazioni",
       "enable": "Mostra pannello prestazioni",
       "description": "Scegli quali statistiche mostrare, dove posizionare il pannello e il suo aspetto.",
       "sectionPosition": "Posizione",
@@ -2583,6 +2589,15 @@ export const it_IT: EnTranslations = {
       "tooLarge": "Questa segnalazione è troppo grande per essere inviata. Riprova senza la schermata.",
       "rateLimited": "Hai inviato diverse segnalazioni di recente. Attendi un momento prima di inviarne un'altra.",
       "failed": "Impossibile inviare la segnalazione del bug. Riprova."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Rimuovi {item}",
@@ -3639,6 +3654,15 @@ export const it_IT: EnTranslations = {
         "socket": "Inserita una gemma in {name}.",
         "socketReplaced": "Incastonata una gemma in {name}; {gem} è stato distrutto."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Richiede livello {level}",
@@ -6400,6 +6424,7 @@ export const it_IT: EnTranslations = {
       "allyRezBody": "Non devi sempre tornare a piedi. Un alleato con un incantesimo di resurrezione può riportarti in vita al suo posto, e ti arriva come una richiesta da accettare o rifiutare; lasciala in sospeso e scade, quindi rispondi finché è ancora lì. Accetta e ti rialzi accanto all'amico che l'ha lanciato, con parte della salute e del mana ripristinati. Alcuni guaritori possono offrirla a tutto il gruppo caduto in una volta sola, anche se ciascuno di voi risponde comunque alla propria richiesta. I Campi di Thornhollow sono l'eccezione: nessun incantesimo di resurrezione ti raggiunge lì, e devi attendere la prossima ondata della tua squadra.",
       "unstuckTitle": "Quando sei davvero bloccato",
       "unstuckBody": "Se il mondo ti intrappola da qualche parte da cui non riesci a uscire, digita /unstuck. Devi essere fuori dal combattimento e fermo, non immobilizzato da uno stordimento o un radicamento, e non in un duello o in un incontro d'arena: parte un breve conto alla rovescia, e muoverti o subire danni lo annulla. Al termine vieni depositato al cimitero più vicino. Non ti uccide mai e non lascia alcun corpo, e se eri già caduto ti rianima lì. Il prezzo è il Mal di sblocco, un indebolimento temporaneo di tutto ciò che sei, che si sarà esaurito per quando potrai usare di nuovo il comando, e come il Mal di resurrezione risparmia del tutto i personaggi appena creati.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Issarti su una sporgenza",
       "climbBody": "Le sporgenze non sono muri. Salta verso qualcosa troppo alto per salirci sopra normalmente e il tuo personaggio afferra il bordo vicino al culmine del salto e si issa sopra, senza alcun tasto dedicato da premere. Qualsiasi cosa abbastanza bassa da superare da solo passa senza cerimonie; l'issata completa è riservata ai bordi sopra la tua testa. È breve, e prende il controllo per tutta la sua durata, quindi non puoi deviarla a metà. Uno stordimento ti coglie a metà issata e lasci la presa, cadendo da dove il salto ha lasciato il terreno, e uno stordimento o un radicamento impediscono del tutto l'inizio di un'issata, il che vale la pena ricordare quando cerchi di uscire da una brutta posizione in uno scontro."
     },
@@ -6574,6 +6599,7 @@ export const it_IT: EnTranslations = {
       "dungeonReset": "Abbandona le tue istanze vuote, cosa che si fa dopo aver cambiato difficoltà.",
       "groupRecovery": "Recupero e presenza",
       "unstuck": "La via d'uscita quando il mondo ti ha intrappolato. Resta fermo per un breve conto alla rovescia e verrai spostato al cimitero più vicino, rianimato lì se eri già caduto. Ti lascia indebolito dal Mal di sblocco per un po' di tempo dopo, quindi è un'ultima risorsa, non una scorciatoia.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Segnati come Assente, con un messaggio facoltativo che chiunque ti sussurri riceve come risposta automatica. Ripetilo senza messaggio per annullarlo; qualsiasi altra chat lo annulla anch'essa.",
       "dnd": "Non Disturbare: come assente, tranne che i sussurri inviati a te vengono trattenuti invece che recapitati.",
       "sit": "Siediti dove ti trovi, e rialzati. Ti alzi automaticamente nel momento in cui ti muovi, lanci un incantesimo o subisci un colpo.",
@@ -6680,6 +6706,7 @@ export const it_IT: EnTranslations = {
       "fatigueDef": "Nuota abbastanza al largo in mare aperto e l'acqua comincia a fiaccarti: prima arriva un avvertimento, poi danni crescenti finché non torni verso la riva.",
       "unstuckTerm": "Mal di sblocco",
       "unstuckDef": "Il prezzo di usare Sblocco dal menu di gioco. Resta fermo per tutto il conto alla rovescia e ti deposita al cimitero più vicino, lasciandoti poi una debolezza temporanea per un po'.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Livello oggetto",
       "itemLevelDef": "Un unico numero che riassume quanto è forte un pezzo di equipaggiamento, utile per confrontare rapidamente due pezzi. Attiva Mostra livello oggetto nelle opzioni per vederlo nei suggerimenti. Solo l'equipaggiamento di provenienza nota ne porta uno, quindi gli articoli base dei mercanti e l'equipaggiamento iniziale non mostrano nulla, e un valore mancante è normale, non un difetto.",
       "requiredLevelTerm": "Livello richiesto",
@@ -9943,6 +9970,11 @@ export const it_IT: EnTranslations = {
       "quit": "Esci",
       "fatalBody": "World of ClaudeCraft ha riscontrato un errore imprevisto e deve chiudersi."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Esci dal gioco"
     }
@@ -9993,6 +10025,11 @@ export const it_IT: EnTranslations = {
     "inWorld": "nel mondo",
     "takeOver": "Prendi il controllo",
     "inWorldHint": "Già nel mondo. Esci altrove, oppure prendine il controllo.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Questo scollegherà il personaggio da un'altra sessione e lo porterà qui. Continuare?",
     "renameRequired": "rinomina richiesta",
     "delete": "Elimina",
@@ -14552,6 +14589,9 @@ export const it_IT: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chiave di Accensione: Spaccaterra Scintilla del Terrore"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Chiave di accensione: Slitta a razzo goblin"

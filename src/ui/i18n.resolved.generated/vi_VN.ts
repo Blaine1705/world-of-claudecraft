@@ -460,6 +460,7 @@ export const vi_VN: EnTranslations = {
       "help": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên để đưa bạn đến một vị trí an toàn gần đó có thể tiếp cận được.",
       "helpAtGraveyard": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa linh hồn của bạn đến nghĩa trang gần nhất. Quay lại qua Người Giữ Nhợt Nhạt yêu cầu Phí Tổn Của Người Giữ.",
       "helpUnstuckSickness": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa bạn đến nghĩa trang gần nhất và hồi sinh bạn nếu bạn đã ngã xuống. Hội Chứng Thoát Kẹt sẽ đè nặng lên bạn tối đa 5 phút.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Thoát Kẹt sau {seconds} giây. Di chuyển, chiến đấu, bị gây sát thương, hoặc bắt đầu hành động khác sẽ hủy nó.",
       "countdown": "Thoát Kẹt: {seconds}",
       "completed": "Đã di chuyển đến vị trí an toàn gần nhất có thể tiếp cận được.",
@@ -467,6 +468,8 @@ export const vi_VN: EnTranslations = {
       "revivedAtGraveyard": "Bạn đã được đưa về nghĩa trang gần nhất và hồi sinh. Phí Tổn Của Người Giữ đang đè nặng lên bạn.",
       "movedToGraveyard": "Bạn đã được đưa đến nghĩa trang gần nhất. Hội Chứng Thoát Kẹt đang đè nặng lên bạn.",
       "revivedAtGraveyardUnstuck": "Bạn đã được đưa đến nghĩa trang gần nhất và hồi sinh. Hội Chứng Thoát Kẹt đang đè nặng lên bạn.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Thoát Kẹt bị hủy vì bạn đã di chuyển.",
       "cancelledDamaged": "Thoát Kẹt bị hủy vì bạn đã bị gây sát thương.",
       "cancelledCombat": "Thoát Kẹt bị hủy vì bạn đã vào trạng thái chiến đấu.",
@@ -1580,6 +1583,7 @@ export const vi_VN: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Kẻ Nghiền Đất Tia Kinh Hoàng",
       "name_drakemaw_raptor": "Cuồng Long Drakemaw",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Chim Mech Cluckwork",
       "name_lanternback_troll": "Grumbol Lưng Đèn",
       "name_chimeglass_tortoise": "Tolliver chiếc cốc thủy tinh",
@@ -1596,6 +1600,7 @@ export const vi_VN: EnTranslations = {
       "desc_rallycart_skin": "Một chiếc xe đua nhỏ có tiếng gầm vang dội.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
       "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Một con gà chiến đồng hồ được chế tạo bằng tay chạy nước rút trên các động cơ servo, phím lên dây cót vẫn quay.",
       "desc_lanternback_troll": "Một con quỷ đồi bị những người đốt đèn bẻ gãy ách, vác một chiếc ngai sắt trên vai với một chiếc đèn bão đang cháy trên hai tay.",
       "desc_chimeglass_tortoise": "Một con rùa bằng muối đã vượt qua ba thế hệ đoàn lữ hành. Những người thợ hàn mài cho anh ta một cặp kính từ kính bão và treo một chiếc chuông đồng vào cổ anh ta, để con đường nghe thấy anh ta từ rất lâu trước khi nó nhìn thấy anh ta.",
@@ -1910,7 +1915,8 @@ export const vi_VN: EnTranslations = {
       "crossHotbarEditHelp": "Giữ cản trái và nhấn nút mặt trên để sắp xếp thanh với bộ điều khiển."
     },
     "perf": {
-      "title": "Lớp Phủ Hiệu Năng",
+      "title": "Performance",
+      "overlaySection": "Lớp Phủ Hiệu Năng",
       "enable": "Hiện Lớp Phủ Hiệu Suất",
       "description": "Chọn các chỉ số muốn hiển thị, vị trí đặt lớp phủ, và cách nó hiển thị.",
       "sectionPosition": "Vị Trí",
@@ -2583,6 +2589,15 @@ export const vi_VN: EnTranslations = {
       "tooLarge": "Báo cáo đó quá lớn để gửi. Hãy thử lại mà không kèm ảnh chụp màn hình.",
       "rateLimited": "Bạn đã gửi khá nhiều báo cáo gần đây. Vui lòng chờ một chút trước khi gửi tiếp.",
       "failed": "Không thể gửi báo cáo lỗi. Vui lòng thử lại."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Tháo {item}",
@@ -3639,6 +3654,15 @@ export const vi_VN: EnTranslations = {
         "socket": "Đã gắn một viên đá quý vào {name}.",
         "socketReplaced": "Gắn một viên đá quý vào {name}; {gem} đã bị phá hủy."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Yêu cầu Cấp {level}",
@@ -6400,6 +6424,7 @@ export const vi_VN: EnTranslations = {
       "allyRezBody": "Bạn không phải lúc nào cũng cần chạy xác về. Một đồng minh có phép hồi sinh có thể cứu bạn dậy thay vào đó, và nó đến với bạn dưới dạng một lời nhắc để bạn chấp nhận hoặc từ chối; để mặc nó và nó sẽ hết hạn, nên hãy trả lời khi nó còn đó. Chấp nhận và bạn sẽ đứng dậy bên cạnh người bạn đã hồi sinh bạn, với một phần máu và mana được trả lại. Một số nhà trị liệu có thể mời cả tổ đội đã ngã xuống cùng lúc, dù mỗi người trong các bạn vẫn phải tự trả lời lời nhắc của riêng mình. Cánh Đồng Trũng Gai là ngoại lệ: không phép hồi sinh nào chạm tới bạn ở đó, và bạn phải chờ đợt hồi sinh tiếp theo của đội mình.",
       "unstuckTitle": "Khi Bạn Thực Sự Bị Kẹt",
       "unstuckBody": "Nếu thế giới nhốt bạn ở đâu đó không thể thoát ra, hãy gõ /unstuck. Bạn cần đang ngoài chiến đấu và đứng yên, không bị một đòn choáng hay đòn trói giữ lại, và không đang trong một trận đấu tay đôi hay một trận đấu trường: một đợt đếm ngược ngắn sẽ chạy, và di chuyển hoặc bị gây sát thương sẽ hủy nó. Khi hoàn tất, bạn sẽ được đưa tới nghĩa trang gần nhất. Nó không bao giờ giết bạn và không để lại xác, và nếu bạn đã ngã xuống từ trước, nó sẽ hồi sinh bạn ngay tại đó. Cái giá phải trả là Hội Chứng Thoát Kẹt, một sự suy yếu tạm thời lên toàn bộ con người bạn, sẽ hết hiệu lực trước khi bạn có thể dùng lệnh này lần nữa, và giống như Phí Tổn Của Người Giữ, nó hoàn toàn bỏ qua các nhân vật vừa mới tạo.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Kéo Mình Lên Một Gờ Đá",
       "climbBody": "Gờ đá không phải là tường. Nhảy vào thứ gì đó quá cao để bước lên và nhân vật của bạn sẽ bám lấy mép gờ gần đỉnh cú nhảy rồi kéo mình lên đó, không cần một phím riêng nào để bấm. Bất cứ thứ gì đủ thấp để bạn tự vượt qua sẽ trôi qua không cần nghi thức gì cả; cú kéo lên toàn phần chỉ dành cho những mép gờ cao hơn đầu bạn. Nó diễn ra nhanh, và nó giành quyền điều khiển trong lúc chạy, nên bạn không thể lái ra khỏi nó giữa chừng. Một đòn choáng bắt trúng bạn giữa lúc đang kéo lên sẽ khiến bạn buông tay và rơi xuống, tính từ nơi cú nhảy rời khỏi mặt đất, và một đòn choáng hay một đòn trói sẽ ngăn một cú leo bắt đầu ngay từ đầu, điều đáng nhớ khi bạn đang cố thoát khỏi một tình huống xấu giữa trận chiến."
     },
@@ -6574,6 +6599,7 @@ export const vi_VN: EnTranslations = {
       "dungeonReset": "Từ bỏ những instance trống của riêng bạn, việc bạn cần làm sau khi đổi độ khó.",
       "groupRecovery": "Hồi Phục Và Hiện Diện",
       "unstuck": "Lối thoát khi thế giới đã nhốt bạn lại. Đứng yên qua một đợt đếm ngược ngắn và bạn sẽ được đưa tới nghĩa trang gần nhất, và được hồi sinh ngay tại đó nếu bạn đã ngã xuống từ trước. Nó khiến bạn suy yếu bởi Hội Chứng Thoát Kẹt trong một khoảng thời gian sau đó, nên đây là phương án cuối cùng chứ không phải một đường tắt.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Đánh dấu bạn đang vắng mặt (Away From Keyboard), kèm một tin nhắn tùy chọn mà bất kỳ ai thì thầm với bạn sẽ nhận được như một câu trả lời tự động. Lặp lại lệnh này mà không kèm tin nhắn để xóa nó; bất kỳ cuộc trò chuyện nào khác cũng xóa nó.",
       "dnd": "Không Làm Phiền: giống như vắng mặt, ngoại trừ việc những lời thì thầm gửi đến bạn sẽ bị giữ lại thay vì được chuyển tới.",
       "sit": "Ngồi xuống tại chỗ, rồi đứng dậy trở lại. Bạn tự động đứng dậy ngay khoảnh khắc di chuyển, thi triển phép, hoặc bị trúng đòn.",
@@ -6680,6 +6706,7 @@ export const vi_VN: EnTranslations = {
       "fatigueDef": "Bơi đủ xa ra ngoài biển khơi và nước sẽ bắt đầu rút cạn sức bạn: một cảnh báo hiện lên trước, rồi sát thương tăng dần cho tới khi bạn quay về phía đất liền.",
       "unstuckTerm": "Hội Chứng Thoát Kẹt",
       "unstuckDef": "Cái giá phải trả khi dùng Thoát Kẹt từ menu trò chơi. Đứng yên qua hết thời gian đếm ngược và nó sẽ đưa bạn đến nghĩa địa gần nhất, kèm theo một sự suy yếu tạm thời trong một khoảng thời gian sau đó.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Cấp vật phẩm",
       "itemLevelDef": "Một con số duy nhất tóm tắt trang bị đó mạnh đến đâu, tiện lợi khi bạn muốn so sánh nhanh hai món. Bật Hiện Cấp Vật Phẩm trong tùy chọn để thấy nó trên chú giải. Chỉ trang bị có nguồn gốc rõ ràng mới mang một con số như vậy, nên hàng cơ bản của thương nhân và trang bị khởi đầu không hiện gì cả, và một con số bị thiếu là bình thường chứ không phải lỗi.",
       "requiredLevelTerm": "Cấp yêu cầu",
@@ -9943,6 +9970,11 @@ export const vi_VN: EnTranslations = {
       "quit": "Thoát",
       "fatalBody": "World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Thoát trò chơi"
     }
@@ -9993,6 +10025,11 @@ export const vi_VN: EnTranslations = {
     "inWorld": "trong thế giới",
     "takeOver": "Tiếp Quản",
     "inWorldHint": "Đã ở trong thế giới. Đăng xuất ở nơi khác, hoặc tiếp quản.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Thao tác này sẽ ngắt nhân vật khỏi phiên khác và đưa về đây. Tiếp tục?",
     "renameRequired": "cần đổi tên",
     "delete": "Xóa",
@@ -14552,6 +14589,9 @@ export const vi_VN: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chìa Khóa Khởi Động: Chấn Địa Tia Kinh Hoàng"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Khóa khởi động: Xe trượt tên lửa goblin"
