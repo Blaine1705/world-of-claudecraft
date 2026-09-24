@@ -2,9 +2,18 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4068,
+    "files": 4072,
     "harvestedFiles": 3948,
     "carried": {
+      "tests/action_bar_spectate.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "Frame layout review validation measured locally; current full CI run found coverage just below its floor while the next green full harvest is pending.",
+        "runs": [
+          14
+        ]
+      },
       "tests/active_kit_prewarm.test.ts": {
         "ms": 69,
         "method": "local-median",
@@ -84,6 +93,24 @@
         "reason": "New frame layout suites measured locally pending the next full CI harvest",
         "runs": [
           11
+        ]
+      },
+      "tests/frame_menus.test.ts": {
+        "ms": 120,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "Frame layout review validation measured locally; current full CI run found coverage just below its floor while the next green full harvest is pending.",
+        "runs": [
+          120
+        ]
+      },
+      "tests/frame_presets.test.ts": {
+        "ms": 162,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "Frame layout review validation measured locally; current full CI run found coverage just below its floor while the next green full harvest is pending.",
+        "runs": [
+          162
         ]
       },
       "tests/frame_presets_live.test.ts": {
@@ -253,6 +280,15 @@
           801,
           843,
           805
+        ]
+      },
+      "tests/hud_frame_groups.test.ts": {
+        "ms": 86,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "Frame layout review validation measured locally; current full CI run found coverage just below its floor while the next green full harvest is pending.",
+        "runs": [
+          86
         ]
       },
       "tests/impact_contact.test.ts": {
@@ -1165,6 +1201,7 @@
   "tests/action_bar_layout_sync.test.ts": 16,
   "tests/action_bar_lock.test.ts": 5,
   "tests/action_bar_painter.test.ts": 18,
+  "tests/action_bar_spectate.test.ts": 14,
   "tests/action_bar_toggle.test.ts": 16,
   "tests/action_bar_view.test.ts": 42,
   "tests/action_bar_visibility_core.test.ts": 5,
@@ -2389,8 +2426,10 @@
   "tests/form_draft.test.ts": 64,
   "tests/form_swing.test.ts": 5170,
   "tests/form_visual_selection_core.test.ts": 12,
+  "tests/frame_menus.test.ts": 120,
   "tests/frame_pos_reset.test.ts": 13,
   "tests/frame_present.test.ts": 10,
+  "tests/frame_presets.test.ts": 162,
   "tests/frame_presets_live.test.ts": 46,
   "tests/frost_ice_fields.test.ts": 236,
   "tests/frost_ice_fields_core.test.ts": 9,
@@ -2668,6 +2707,7 @@
   "tests/hud_chrome_i18n.test.ts": 22,
   "tests/hud_confirm_gates.test.ts": 48,
   "tests/hud_frame_coverage.test.ts": 608,
+  "tests/hud_frame_groups.test.ts": 86,
   "tests/hud_frames.test.ts": 22,
   "tests/hud_map_marker_lifecycle.test.ts": 22,
   "tests/hud_meteor_fall_preload.test.ts": 6,
