@@ -1484,15 +1484,19 @@ function gridFor(seed: number): ColliderGrid {
   // Bind the chest spots this build resolved to this grid, so a later build
   // for another world/seed can never leak its spots into this one's readers.
   bankerChestSpotsByGrid.set(grid, lastBuiltBankerChestSpots);
-  for (const c of built) {
-    if (c.gate === undefined) registerInCells(grid, c);
-    else grid.gated.set(c.gate, [...(grid.gated.get(c.gate) ?? []), c]);
-  }
   // gated berths start in the clock-0 schedule state (transport_gates.ts)
   const closedAtBuild = transportGatesClosedAtBuild();
-  for (const [gate, list] of grid.gated) {
-    if (closedAtBuild.includes(gate)) grid.closedGates.add(gate);
-    else for (const c of list) registerInCells(grid, c);
+  for (const c of built) {
+    if (c.gate !== undefined) {
+      const gatedList = grid.gated.get(c.gate);
+      if (gatedList) gatedList.push(c);
+      else grid.gated.set(c.gate, [c]);
+      if (closedAtBuild.includes(c.gate)) {
+        grid.closedGates.add(c.gate);
+        continue;
+      }
+    }
+    registerInCells(grid, c);
   }
   perContent.set(seed, grid);
   // Streetlamps join AFTER the grid is published, and the order is the whole
@@ -1527,8 +1531,15 @@ function registerInCells(grid: ColliderGrid, c: Collider, remove = false): void 
       if (remove) {
         const at = list ? list.indexOf(c) : -1;
         if (list && at >= 0) list.splice(at, 1);
-      } else if (list) list.push(c);
-      else grid.cells.set(key, [c]);
+      } else if (!list) grid.cells.set(key, [c]);
+      else if (c.gate === undefined) list.push(c);
+      else {
+        // a reopened gate's colliders go back in gridIndex order, so a cell's
+        // order never depends on how often its berth has opened and closed
+        let at = list.length;
+        while (at > 0 && (list[at - 1].gridIndex ?? 0) > (c.gridIndex ?? 0)) at--;
+        list.splice(at, 0, c);
+      }
     }
   }
 }

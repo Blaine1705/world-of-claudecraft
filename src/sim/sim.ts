@@ -684,7 +684,7 @@ import {
   CURRENT_CHARACTER_CONTENT_REVISION,
   migrateCharacterTalentsV2,
 } from './talent_save_migration';
-import { ferrySavePosition, transportFerryView, updateTransportFerries } from './transport_ferry';
+import * as ferryMod from './transport_ferry';
 import type { TransportFerryView } from './transport_schedule';
 import { updateAbilityDrill } from './tutorial/ability_drill';
 import { updateGauntletRuns } from './tutorial/gauntlet_run';
@@ -822,7 +822,6 @@ import {
   type AuraKind,
   angleTo,
   assertCanonicalEastbrookNoticeboardDef,
-  type CampDef,
   CORPSE_HARVEST_CAST_ID,
   type CrowdControlDrCategory,
   type CrowdControlDrState,
@@ -2245,6 +2244,7 @@ export class Sim {
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
     this.ctx = this.buildSimContext(cfg.vaultConsumptionAdmission);
+    ferryMod.syncFerryGates(this.ctx); // this world's own deck gates before any placement query
     // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
     this.playerMotionDeps = {
       seed: this.cfg.seed,
@@ -4052,7 +4052,7 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: ferrySavePosition(e), // never the sea: a ride saves the destination pier
+      pos: ferryMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
       facing: e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
@@ -4305,7 +4305,7 @@ export class Sim {
 
   // --- IWorldTransport ---
   ferryView(): TransportFerryView | null {
-    return transportFerryView(this.ctx, this.entities.get(this.primaryId));
+    return ferryMod.transportFerryView(this.ctx, this.entities.get(this.primaryId));
   }
 
   // --- IWorldMounts ---
@@ -6054,7 +6054,7 @@ export class Sim {
     lap?.('respawns');
     this.updateWorldBosses();
     lap?.('worldBosses');
-    updateTransportFerries(this.ctx); // the ferry timetable: board, carry, set down
+    ferryMod.updateTransportFerries(this.ctx); // the ferry timetable: board, carry, set down
     tickGroundAoEs(this.ctx);
     lap?.('groundAoEs');
     tickFrozenOrbs(this.ctx);

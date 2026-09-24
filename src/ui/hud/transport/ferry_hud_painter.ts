@@ -94,7 +94,11 @@ export class FerryHudPainter {
     const cardBody = document.createElement('div');
     cardBody.className = 'ferry-sea-body';
     card.append(cardTitle, cardBody);
-    mount.append(card, root);
+    // The card is a sibling of the HUD root, not a child: it stacks between the
+    // game canvas and the HUD (hud.css), so it hides the world, never the
+    // player's own interface (health, chat, bars stay drawn above it).
+    (mount.parentElement ?? mount).append(card);
+    mount.append(root);
     this.els = { root, line, hint, card, cardTitle, cardBody };
     return this.els;
   }

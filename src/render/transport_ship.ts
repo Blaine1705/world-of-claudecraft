@@ -1,5 +1,6 @@
-// Moored transport ships (the Eastbrook ferry): the Blender-authored GLB made into a
-// live, idle-animated, level-of-detail view. The pure decisions (which LOD, whether
+// Transport ships (the Eastbrook ferry): the Blender-authored GLB made into a live,
+// idle-animated, level-of-detail view. A decorProps row moors one for good; a
+// scheduled route (transport_ferry_ships.ts) builds one and moves it with setPose. The pure decisions (which LOD, whether
 // the clip runs, whether a sail blocks the camera) live in transport_ship_core.ts;
 // this is the Three.js painter props.ts composes for every decorProps row whose key
 // names a ship model. Collision is not here: the sim moors the ship's simple deck

@@ -12940,10 +12940,11 @@
      card a passenger sails behind on the at-sea leg. The panel composes
      .ui-panel; this section sets geometry only. The card fades on the `shown`
      class (the painter runs on the medium band; the transition keeps the fade
-     smooth between its updates) and never takes a pointer. */
+     smooth between its updates) and never takes a pointer. It is a sibling of
+     #ui (z 10) at z 5, above the game canvas and below the whole HUD. */
   .ferry-hud {
     position: absolute;
-    top: 96px;
+    top: 172px;
     left: 50%;
     transform: translateX(-50%);
     display: none;
@@ -12981,7 +12982,7 @@
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    z-index: 25;
+    z-index: 5;
     transition:
       opacity 1.1s ease,
       visibility 0s linear 1.1s;

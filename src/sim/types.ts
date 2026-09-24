@@ -4680,13 +4680,6 @@ export function isConsuming(e: { eating: Consuming | null; drinking: Consuming |
   return e.eating !== null || e.drinking !== null;
 }
 
-/**
- * An in-progress ledge climb (see `src/sim/climb.ts`). While present it OWNS
- * the body's position: the destination was validated as a surface the body
- * fits on before the climb started, so nothing re-resolves it mid-pull.
- * Absent until first use, so unrelated entity snapshots and deterministic
- * traces gain no inert state.
- */
 /** A ferry passenger's ride (src/sim/transport_ferry.ts): the deck-local spot
  *  they boarded at, carried with the ship's pose until it docks. */
 export interface FerryRide {
@@ -4707,6 +4700,13 @@ export interface FerryRide {
   atSea: boolean;
 }
 
+/**
+ * An in-progress ledge climb (see `src/sim/climb.ts`). While present it OWNS
+ * the body's position: the destination was validated as a surface the body
+ * fits on before the climb started, so nothing re-resolves it mid-pull.
+ * Absent until first use, so unrelated entity snapshots and deterministic
+ * traces gain no inert state.
+ */
 export interface LedgeClimb {
   from: Vec3;
   to: Vec3;
@@ -5195,6 +5195,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // owns the body's position until it docks. Session-only and absent until a
   // first ride; the wire carries only the `fry` bit (see ferryRiding).
   ferryRide?: FerryRide | null;
+  // The ferry parked this player's pet for a crossing (the delve pet stash);
+  // it comes back once the owner is off the ship and alive.
+  ferryPetParked?: boolean;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
   sitting: boolean;

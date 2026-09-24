@@ -1,5 +1,6 @@
-// The scatter decorations' collision bodies (rocks and tree trunks), moved
-// verbatim out of colliders.ts under the monolith ratchet; colliders.ts
+// The scatter decorations' collision bodies (rocks and tree trunks), moved out
+// of colliders.ts under the monolith ratchet (its private topY helper inlined
+// as the same groundHeight + height sum, operands in the same order); colliders.ts
 // materializes them per grid cell on demand. Pure leaf.
 
 import type { Collider } from './colliders';

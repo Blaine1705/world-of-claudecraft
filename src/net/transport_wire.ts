@@ -8,8 +8,9 @@
 //    leg (server wireEntity dynamic fields).
 // From the clock the ClientWorld derives the same phase and ship pose the
 // server runs (transport_schedule.ts), and re-applies the berth gates to its
-// own collider grid so the local self-extrapolator and the renderer's seating
-// see the deck exactly where the server does.
+// own collider grid so the renderer's seating sees the deck where the server
+// does, one snapshot's latency behind it (the self-extrapolator stands down
+// for passengers, and reconciliation absorbs a walk-on at the boundary).
 //
 // The decoded clock lives in a WeakMap keyed by the world (one entry per
 // ClientWorld, collected with it), so online.ts carries no field for it.

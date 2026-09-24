@@ -36,7 +36,7 @@ import { TRANSPORT_ROUTES, TRANSPORT_SHIP_HULLS } from './content/transport_ship
 import { isBuiltinWorldActive } from './data';
 import { markVisited } from './deeds';
 import { forceDismount } from './mounts';
-import { restorePetFromDelveStash, stowPetForDelve } from './pet/pet_commands';
+import { petOf, restorePetFromDelveStash, stowPetForDelve } from './pet/pet_commands';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import type { SimContext } from './sim_context';
 import { settleTeleportArrival } from './teleport_arrival';
@@ -48,7 +48,6 @@ import {
   type TransportPose,
   type TransportRouteDef,
   transportFerryViewAt,
-  transportPhaseAt,
   transportShipPoseAt,
 } from './transport_schedule';
 import { type ShipHullLayout, shipToWorld, worldToShip } from './transport_ship';
@@ -68,6 +67,16 @@ const RIDE_DISPLACED_YD = 1.5;
 /** A carried step longer than this is the at-sea crossing, treated as a
  *  teleport (interpolation reset, rebucket, session teardown). */
 const RIDE_JUMP_YD = 30;
+/** Passengers stop drawing this long before the ship vanishes at sea, and
+ *  start again this long after it reappears: the drawn ship trails the newest
+ *  tick by about one step (render/transport_ship_core.ts advanceShipClock), so
+ *  the margin keeps a passenger from ever standing on open water. */
+const AT_SEA_DRAW_MARGIN_S = 0.2;
+/** Boarding runs on the first tick(s) of a departure: any tick at most this far
+ *  into the leg. Stateless and idempotent (a second qualifying tick finds the
+ *  riders already riding), so float drift in the sim clock can neither skip
+ *  the departure nor board anyone twice. */
+const BOARDING_WINDOW_S = 1.5 * DT;
 
 /** The schedule clock: sim seconds plus the dev-only skip offset. */
 export function transportClock(ctx: SimContext): number {
@@ -126,11 +135,11 @@ function board(
     const p = ctx.entities.get(meta.entityId);
     if (!p || p.ferryRide) continue;
     if (!aboard(hull, pose, p)) {
-      if (onBoardingRoute(hull, pose, p) && !p.dead) setDown(ctx, p, b.landing);
+      if (onBoardingRoute(hull, pose, p)) setDown(ctx, p, b.landing);
       continue;
     }
-    if (p.ghost || p.inCombat) {
-      // a spirit or a fighter stays behind: set down on the pier
+    if (p.dead || p.inCombat) {
+      // a spirit, a corpse or a fighter stays behind: set down on the pier
       setDown(ctx, p, b.landing);
       if (p.inCombat) ctx.error(p.id, 'You cannot board the ferry while in combat.');
       continue;
@@ -148,7 +157,10 @@ function board(
       atSea: false,
     };
     forceDismount(ctx, p);
-    stowPetForDelve(ctx, p.id);
+    if (petOf(ctx, p.id, true)) {
+      stowPetForDelve(ctx, p.id);
+      p.ferryPetParked = true;
+    }
     p.targetId = null;
     p.autoAttack = false;
     settleTeleportArrival(p);
@@ -167,6 +179,13 @@ function carry(ctx: SimContext, p: Entity, pose: TransportPose, atSea: boolean):
   p.facing = pose.rot + ride.lf;
   p.vx = 0;
   p.vz = 0;
+  // no other movement mode survives aboard (a Charge, a leap or a /follow
+  // started on deck would otherwise resume wherever the ride ends)
+  p.chargeTargetId = null;
+  p.chargePath = [];
+  p.leap = null;
+  p.climb = null;
+  p.followTargetId = null;
   settleTeleportArrival(p);
   if (jump) {
     // the at-sea crossing: a teleport behind the sea card
@@ -180,9 +199,33 @@ function carry(ctx: SimContext, p: Entity, pose: TransportPose, atSea: boolean):
 }
 
 function endRide(ctx: SimContext, p: Entity): void {
-  p.ferryRide = null;
-  // the parked pet comes back beside its owner wherever the ride ended
+  delete p.ferryRide;
+  returnParkedPet(ctx, p);
+}
+
+/**
+ * Bring a pet the ferry parked back, once its owner is off the ship and
+ * alive (a pet is never handed to a corpse or a spirit: it waits for the
+ * revive). An owner standing on a docked deck gets it on that berth's pier,
+ * where a pet can stand; anywhere else, beside the owner.
+ */
+function returnParkedPet(ctx: SimContext, p: Entity): void {
+  if (!p.ferryPetParked || p.ferryRide || p.dead) return;
+  delete p.ferryPetParked;
   restorePetFromDelveStash(ctx, p.id);
+  const pet = petOf(ctx, p.id, true);
+  if (!pet) return;
+  for (const route of TRANSPORT_ROUTES) {
+    const hull = hullFor(route);
+    if (!hull) continue;
+    for (const b of route.berths) {
+      if (!aboard(hull, { x: b.x, z: b.z, rot: b.rot }, p)) continue;
+      pet.pos = ctx.groundPos(b.landing.x, b.landing.z);
+      pet.prevPos = { ...pet.pos };
+      ctx.rebucket(pet);
+      return;
+    }
+  }
 }
 
 const phaseNow: TransportPhaseState = {
@@ -194,8 +237,23 @@ const phaseNow: TransportPhaseState = {
   remaining: 0,
   departsIn: 0,
 };
-const phasePrev: TransportPhaseState = { ...phaseNow };
 const poseNow: TransportPose = { x: 0, z: 0, rot: 0 };
+
+/** Apply this world's schedule to its deck gates (colliders.ts), so queries
+ *  made before the first tick (construction-time placement) see this world's
+ *  berths, never whatever another world in the process left behind. */
+export function syncFerryGates(ctx: SimContext): void {
+  if (!isBuiltinWorldActive()) return;
+  syncTransportGates(ctx.cfg.seed, transportClock(ctx), setColliderGateOpen);
+}
+
+/** Is a passenger drawn at this phase (the ship's hidden leg, with a margin)? */
+function passengerHidden(visible: boolean, s: TransportPhaseState): boolean {
+  if (!visible) return true;
+  if (s.phase === 'departing') return s.remaining < AT_SEA_DRAW_MARGIN_S;
+  if (s.phase === 'arriving') return s.elapsed < AT_SEA_DRAW_MARGIN_S;
+  return false;
+}
 
 /** The per-tick ferry system (called at the top of Sim.tick). */
 export function updateTransportFerries(ctx: SimContext): void {
@@ -206,16 +264,12 @@ export function updateTransportFerries(ctx: SimContext): void {
     const hull = hullFor(route);
     if (!hull) continue;
     const visible = transportShipPoseAt(route, clock, poseNow, phaseNow);
-    transportPhaseAt(route, clock - DT, phasePrev);
-    if (
-      phaseNow.phase === 'departing' &&
-      phasePrev.phase === 'docked' &&
-      phasePrev.berth === phaseNow.berth
-    ) {
+    if (phaseNow.phase === 'departing' && phaseNow.elapsed < BOARDING_WINDOW_S) {
       board(ctx, route, hull, phaseNow.berth);
     }
     for (const meta of ctx.players.values()) {
       const p = ctx.entities.get(meta.entityId);
+      if (p?.ferryPetParked) returnParkedPet(ctx, p);
       const ride = p?.ferryRide;
       if (!p || !ride || ride.route !== route.id) continue;
       if (p.ghost) {
@@ -243,7 +297,7 @@ export function updateTransportFerries(ctx: SimContext): void {
         endRide(ctx, p);
         continue;
       }
-      carry(ctx, p, poseNow, !visible);
+      carry(ctx, p, poseNow, passengerHidden(visible, phaseNow));
     }
   }
 }
@@ -254,6 +308,7 @@ export function updateTransportFerries(ctx: SimContext): void {
  * the time they log back in), otherwise where they stand.
  */
 export function ferrySavePosition(e: Entity): { x: number; z: number } {
+  if (!isBuiltinWorldActive()) return { x: e.pos.x, z: e.pos.z };
   for (const route of TRANSPORT_ROUTES) {
     const ride = e.ferryRide;
     if (ride && ride.route === route.id) {

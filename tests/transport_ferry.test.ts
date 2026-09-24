@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { supportHeightAt } from '../src/sim/colliders';
+import { queryOpenWorldColliders, supportHeightAt } from '../src/sim/colliders';
 import {
   EASTBROOK_FERRY_HULL,
   EASTBROOK_WICKHARBOR_FERRY,
@@ -172,10 +172,27 @@ describe('the deck exists only where, and while, the ship lies docked', () => {
     sim.tick();
     expect(deckTop(0)).toBe(-Infinity);
     expect(deckTop(1)).toBeCloseTo(onDeck, 6);
-    // back to the clock-0 state so no later suite inherits a closed berth
-    setClock(sim, 1);
-    sim.tick();
+    // a new world syncs its own gates at construction, before any tick: it
+    // never inherits the berth another world in the process left open
+    const fresh = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     expect(deckTop(0)).toBeCloseTo(onDeck, 6);
+    expect(deckTop(1)).toBe(-Infinity);
+    // a berth that closes and reopens puts its colliders back in the same
+    // cell order (gridIndex), whatever its toggle history
+    const at = shipToWorld(berthPose(0), 1.5, 0.8);
+    const order = () =>
+      queryOpenWorldColliders(WORLD_SEED, at.x - 8, at.z - 8, at.x + 8, at.z + 8, []).map(
+        (c) => c.gridIndex,
+      );
+    const before = order();
+    for (let i = 0; i < 3; i++) {
+      setClock(fresh, DEPART_EAST + 1);
+      fresh.tick();
+      setClock(fresh, 5);
+      fresh.tick();
+    }
+    expect(order()).toEqual(before);
+    void sim;
   });
 });
 
@@ -305,11 +322,46 @@ describe('sailing (the real Sim)', () => {
     const saved = sim.serializeCharacter(p.id);
     expect(saved?.pet?.templateId).toBe('wild_boar');
     expect(saved?.pos).toEqual({ x: WICK.landing.x, z: WICK.landing.z });
-    tickSeconds(sim, T.departing + T.atSea + T.arriving);
+    // tick to the release itself
+    for (let i = 0; i < 1000 && p.ferryRide; i++) sim.tick();
     expect(p.ferryRide ?? null).toBeNull();
+    // the owner steps off on the deck; the pet comes back on the pier, where
+    // a pet can stand (never on the seabed beside the hull)
     const pet = sim.petOf(p.id);
     expect(pet).toBeTruthy();
-    expect(Math.hypot((pet?.pos.x ?? 0) - p.pos.x, (pet?.pos.z ?? 0) - p.pos.z)).toBeLessThan(6);
+    const fromLanding = Math.hypot(
+      (pet?.pos.x ?? 0) - WICK.landing.x,
+      (pet?.pos.z ?? 0) - WICK.landing.z,
+    );
+    expect(fromLanding).toBeLessThan(0.5);
+    expect(pet?.pos.y ?? 0).toBeGreaterThan(WATER_LEVEL);
+    expect(p.ferryPetParked).toBeUndefined();
+  });
+
+  it('keeps a pet parked while its owner lies dead, and hands it back on the revive', () => {
+    const p = sim.player;
+    restorePet(sim.ctx, p, {
+      templateId: 'wild_boar',
+      name: 'Rip',
+      level: p.level,
+      hp: 1,
+      dead: false,
+      mode: 'defensive',
+    });
+    setClock(sim, DEPART_EAST - 0.5);
+    placeOnDeck(sim, p, 0, 1.5, 0.8);
+    tickSeconds(sim, 2);
+    p.hp = 0;
+    p.dead = true;
+    tickSeconds(sim, T.departing + T.atSea + T.arriving);
+    expect(p.ferryRide ?? null).toBeNull();
+    expect(sim.petOf(p.id, true)).toBeNull();
+    expect(p.ferryPetParked).toBe(true);
+    p.dead = false;
+    p.hp = p.maxHp;
+    sim.tick();
+    expect(sim.petOf(p.id)).toBeTruthy();
+    expect(p.ferryPetParked).toBeUndefined();
   });
 
   it('a reconnect mid-voyage lands on the destination pier, never in the sea', () => {
@@ -341,6 +393,39 @@ describe('sailing (the real Sim)', () => {
     placeOnDeck(sim, p, 0, 0, -3);
     sim.tick();
     expect(sim.serializeCharacter(p.id)?.pos).toEqual({ x: EAST.landing.x, z: EAST.landing.z });
+  });
+
+  it('sets a corpse on deck down on the pier instead of sailing it', () => {
+    const p = sim.player;
+    setClock(sim, DEPART_EAST - 0.5);
+    placeOnDeck(sim, p, 0, 0, 2);
+    p.hp = 0;
+    p.dead = true;
+    tickSeconds(sim, 1);
+    expect(p.ferryRide ?? null).toBeNull();
+    expect(Math.hypot(p.pos.x - EAST.landing.x, p.pos.z - EAST.landing.z)).toBeLessThan(0.5);
+    expect(p.pos.y).toBeGreaterThan(WATER_LEVEL + 2);
+  });
+
+  it('boards across a whole-cycle float drift in the clock (never skips a departure)', () => {
+    const p = sim.player;
+    // a long-lived world: the clock a thousand cycles on, stepping in DT
+    setClock(sim, 1000 * CYCLE + DEPART_EAST - 0.5);
+    placeOnDeck(sim, p, 0, 1.5, 0.8);
+    tickSeconds(sim, 1);
+    expect(p.ferryRide).toBeTruthy();
+  });
+
+  it('clears a movement mode started on deck, so nothing resumes after the ride', () => {
+    const p = sim.player;
+    setClock(sim, DEPART_EAST - 0.5);
+    placeOnDeck(sim, p, 0, 1.5, 0.8);
+    tickSeconds(sim, 1);
+    p.followTargetId = 12345;
+    p.chargeTargetId = 12345;
+    sim.tick();
+    expect(p.followTargetId).toBeNull();
+    expect(p.chargeTargetId).toBeNull();
   });
 
   it('a teleport ends the ride where it put the player', () => {
