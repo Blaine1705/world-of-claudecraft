@@ -246,9 +246,7 @@ export class TargetAurasWindow {
     const closeButton = root.querySelector('.ta-close-btn') as HTMLButtonElement | null;
     if (closeButton) {
       titleEl.appendChild(closeButton);
-      closeButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+      closeButton.addEventListener('click', () => {
         if (!this.visible) return;
         this.visible = false;
         this.hide();
