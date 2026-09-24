@@ -12257,6 +12257,10 @@ export const ko_KR: EnTranslations = {
         "name": "재도약",
         "description": "기운을 되찾습니다: 4초 동안 이동 속도가 50% 증가합니다."
       },
+      "clockwork_shock_bomb": {
+        "name": "태엽 충격 폭탄",
+        "description": "대상 위치에 태엽 충격 폭탄을 던져 5미터 내의 적에게 120~160의 자연 피해를 입힙니다."
+      },
       "flamestrike": {
         "name": "화염 폭발",
         "description": "지정한 지역에 화염 폭발을 일으켜 폭발 범위 안의 적에게 {damage}의 화염 피해를 입힙니다."

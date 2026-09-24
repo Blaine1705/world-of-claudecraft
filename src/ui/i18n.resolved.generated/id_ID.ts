@@ -12257,6 +12257,10 @@ export const id_ID: EnTranslations = {
         "name": "Kaki Segar",
         "description": "Temukan kembali tenagamu: bergerak 50% lebih cepat selama 4 detik."
       },
+      "clockwork_shock_bomb": {
+        "name": "Bom Kejut Mekanis",
+        "description": "Melempar Bom Kejut Mekanis ke lokasi sasaran, memberikan 120 hingga 160 kerusakan Alam kepada musuh dalam radius 5 meter."
+      },
       "flamestrike": {
         "name": "Hantaman Api",
         "description": "Memanggil ledakan api di area sasaran, memberikan {damage} kerusakan Api kepada musuh yang terkena ledakan."

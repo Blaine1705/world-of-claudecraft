@@ -3889,6 +3889,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Kollektiv tilbagespoling',
   'entities.abilities.collective_reversal.description':
     'Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid, som er inden for 40 meter og i din synsvidde, og genopliver dem ved din side med 30% helbred og mana. Kan ikke kastes i kamp. (Kronomanti)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Kaster en Mekanisk chokbombe på målstedet og giver 120 til 160 Naturskade til fjender inden for 5 meter.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Mekanisk chokbombe',
   'entities.abilities.sport_boot.description':
     'Et langt, højt spark mod sigtepunktet. Publikum elsker det.',
   'entities.abilities.sport_boot.name': 'Kæmpespark',

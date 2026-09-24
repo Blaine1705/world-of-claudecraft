@@ -4020,6 +4020,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Pembalikan Kolektif',
   'entities.abilities.collective_reversal.description':
     'Memundurkan alur waktu setiap anggota grup atau raid yang gugur dalam 40 m dan dalam garis pandangmu, menghidupkan mereka kembali di sisimu dengan 30% kesehatan dan mana. Tidak dapat digunakan saat bertarung. (Kronomansi)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Melempar Bom Kejut Mekanis ke lokasi sasaran, memberikan 120 hingga 160 kerusakan Alam kepada musuh dalam radius 5 meter.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Bom Kejut Mekanis',
   'entities.abilities.sport_boot.description':
     'Tendangan lambung jauh ke arah titik bidik. Penonton menyukainya.',
   'entities.abilities.sport_boot.name': 'Tendangan Jauh',

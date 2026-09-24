@@ -3983,6 +3983,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Toplu Geri Sarım',
   'entities.abilities.collective_reversal.description':
     'Grubunuzdaki veya baskınınızdaki, 40 yarda yakınındaki ve görüş hattınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları yanınıza %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Hedef konuma bir Mekanik Şok Bombası fırlatır ve 5 metre içindeki düşmanlara 120 ile 160 arası Doğa hasarı verir.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Mekanik Şok Bombası',
   'entities.abilities.sport_boot.description':
     'Nişan noktasına doğru uzun, havadan bir vuruş. Seyirci buna bayılır.',
   'entities.abilities.sport_boot.name': 'Aşırtma',

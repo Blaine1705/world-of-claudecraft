@@ -4049,6 +4049,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Collectieve omkering',
   'entities.abilities.collective_reversal.description':
     'Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid binnen 40 meter en in je zichtlijn terug en brengt hen weer tot leven aan je zijde met 30% gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Gooit een Mechanische schokbom op de doellocatie en doet 120 tot 160 Natuurschade aan vijanden binnen 5 meter.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Mechanische schokbom',
   'entities.abilities.sport_boot.description':
     'Een lange, hoge uithaal richting het richtpunt. Het publiek smult ervan.',
   'entities.abilities.sport_boot.name': 'Grote Uithaal',

@@ -12257,6 +12257,10 @@ export const nl_NL: EnTranslations = {
         "name": "Frisse Benen",
         "description": "Vind je benen terug: beweeg 4 sec lang 50% sneller."
       },
+      "clockwork_shock_bomb": {
+        "name": "Mechanische schokbom",
+        "description": "Gooit een Mechanische schokbom op de doellocatie en doet 120 tot 160 Natuurschade aan vijanden binnen 5 meter."
+      },
       "flamestrike": {
         "name": "Vlammenslag",
         "description": "Roept een vuurexplosie op in het doelgebied die vijanden in de explosie {damage} Vuurschade toebrengt."

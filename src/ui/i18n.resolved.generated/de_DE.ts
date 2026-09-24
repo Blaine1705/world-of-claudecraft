@@ -12257,6 +12257,10 @@ export const de_DE: EnTranslations = {
         "name": "Frische Beine",
         "description": "Finde deine Beine: Bewege dich 4 Sek. lang 50% schneller."
       },
+      "clockwork_shock_bomb": {
+        "name": "Mechanische Schockbombe",
+        "description": "Wirft eine Mechanische Schockbombe auf den Zielort und fügt Feinden im Umkreis von 5 Metern 120 bis 160 Naturschaden zu."
+      },
       "flamestrike": {
         "name": "Flammenschlag",
         "description": "Lässt am Zielort eine Feuerexplosion niedergehen, die allen Gegnern im Wirkungsbereich {damage} Feuerschaden zufügt."

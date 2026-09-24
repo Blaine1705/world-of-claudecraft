@@ -4103,6 +4103,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Coloca un reloj de arena temporal en la ubicación seleccionada. Bajo un enemigo, lo suspende {hostilePveDuration} s en JcE o {hostilePvpDuration} s en JcJ e impide que actúe; cualquier daño rompe el efecto. Sobre tus pies o bajo un aliado del grupo, concede estasis durante {duration} s, impide recibir daño y actuar, recupera un {healing}% de la salud máxima y hace que los tiempos de reutilización se recuperen un {selfCooldownRecovery}% más rápido para ti o un {allyCooldownRecovery}% más rápido para un aliado. Si la ubicación está vacía, espera {groundDuration} s y afecta a la primera unidad válida que lo pise. El aura beneficiosa puede eliminarse manualmente.',
   'hudChrome.auraEffect.temporalHourglass':
     'Inmune e incapaz de actuar; recupera salud y acelera los tiempos de reutilización. Haz clic derecho para cancelar.',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Lanza una Bomba de choque mecánica a la zona elegida e inflige de 120 a 160 de daño de Naturaleza a los enemigos en 5 metros.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Bomba de choque mecánica',
   'entities.abilities.sport_boot.description':
     'Un patadón largo y elevado hacia el punto de mira. El público lo adora.',
   'entities.abilities.sport_boot.name': 'Patadón',

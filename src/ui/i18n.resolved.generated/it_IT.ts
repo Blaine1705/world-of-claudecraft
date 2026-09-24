@@ -12257,6 +12257,10 @@ export const it_IT: EnTranslations = {
         "name": "Gambe Fresche",
         "description": "Ritrovi le gambe: ti muovi il 50% più veloce per 4 sec."
       },
+      "clockwork_shock_bomb": {
+        "name": "Bomba a shock meccanica",
+        "description": "Lancia una Bomba a shock meccanica nel punto bersaglio, infliggendo da 120 a 160 danni da Natura ai nemici entro 5 metri."
+      },
       "flamestrike": {
         "name": "Ondata di Fiamme",
         "description": "Evoca un'esplosione di fiamme sulla zona bersaglio, infliggendo {damage} danni da Fuoco ai nemici investiti dalla deflagrazione."

@@ -12257,6 +12257,10 @@ export const zh_CN: EnTranslations = {
         "name": "重振旗鼓",
         "description": "找回状态：移动速度提高50%，持续4秒。"
       },
+      "clockwork_shock_bomb": {
+        "name": "发条震荡炸弹",
+        "description": "向目标位置投掷一枚发条震荡炸弹，对5码内的敌人造成120到160点自然伤害。"
+      },
       "flamestrike": {
         "name": "烈焰风暴",
         "description": "在目标区域召唤一次烈焰爆发，对爆炸范围内的敌人造成 {damage} 点火焰伤害。"

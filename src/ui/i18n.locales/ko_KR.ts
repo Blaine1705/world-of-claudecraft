@@ -11233,6 +11233,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_pass.description':
     '지정한 팀원에게 힘 있는 패스를 굴려 주며, 달리는 길목으로 이어 줍니다.',
   'entities.abilities.sport_boot.name': '빅 부트',
+  'entities.abilities.clockwork_shock_bomb.description':
+    '대상 위치에 태엽 충격 폭탄을 던져 5미터 내의 적에게 120~160의 자연 피해를 입힙니다.',
+  'entities.abilities.clockwork_shock_bomb.name': '태엽 충격 폭탄',
   'entities.abilities.sport_boot.description':
     '조준 지점을 향해 길게 띄워 차는 킥. 관중이 열광합니다.',
   'entities.abilities.sport_hoof.name': '걷어내기',

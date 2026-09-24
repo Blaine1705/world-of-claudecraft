@@ -12257,6 +12257,10 @@ export const tr_TR: EnTranslations = {
         "name": "Taze Bacaklar",
         "description": "Bacaklarını topla: 4 sn boyunca %50 daha hızlı hareket et."
       },
+      "clockwork_shock_bomb": {
+        "name": "Mekanik Şok Bombası",
+        "description": "Hedef konuma bir Mekanik Şok Bombası fırlatır ve 5 metre içindeki düşmanlara 120 ile 160 arası Doğa hasarı verir."
+      },
       "flamestrike": {
         "name": "Alev Vuruşu",
         "description": "Hedef alanda bir alev patlaması yaratır ve patlamaya yakalanan düşmanlara {damage} Ateş hasarı verir."

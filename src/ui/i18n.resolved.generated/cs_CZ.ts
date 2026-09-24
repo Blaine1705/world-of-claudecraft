@@ -12257,6 +12257,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Čerstvé nohy",
         "description": "Najdi druhý dech: pohybuješ se o 50 % rychleji po dobu 4 s."
       },
+      "clockwork_shock_bomb": {
+        "name": "Mechanická šoková bomba",
+        "description": "Hodí Mechanickou šokovou bombu na cílové místo a způsobí nepřátelům do 5 metrů 120 až 160 poškození přírodou."
+      },
       "flamestrike": {
         "name": "Plamenný úder",
         "description": "Přivolá výbuch plamene do cílové oblasti a způsobí {damage} ohnivého poškození nepřátelům chyceným ve výbuchu."

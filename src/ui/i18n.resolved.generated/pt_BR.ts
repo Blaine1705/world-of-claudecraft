@@ -12257,6 +12257,10 @@ export const pt_BR: EnTranslations = {
         "name": "Pernas Novas",
         "description": "Recupere as pernas: mova-se 50% mais rápido por 4 s."
       },
+      "clockwork_shock_bomb": {
+        "name": "Bomba de Choque Mecânica",
+        "description": "Arremessa uma Bomba de Choque Mecânica no local alvo, causando de 120 a 160 de dano de Natureza aos inimigos a até 5 metros."
+      },
       "flamestrike": {
         "name": "Golpe Flamejante",
         "description": "Invoca uma explosão de chamas no local-alvo, causando {damage} de dano de Fogo aos inimigos atingidos pela explosão."

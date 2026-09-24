@@ -12257,6 +12257,10 @@ export const en: EnTranslations = {
         "name": "Fresh Legs",
         "description": "Find your legs: move 50% faster for 4 sec."
       },
+      "clockwork_shock_bomb": {
+        "name": "Clockwork Shock Bomb",
+        "description": "Throws a Clockwork Shock Bomb at the target location, dealing 120 to 160 Nature damage to enemies within 5 yards."
+      },
       "flamestrike": {
         "name": "Flamestrike",
         "description": "Calls down a burst of flame at the target area, dealing {damage} Fire damage to enemies caught in the blast."

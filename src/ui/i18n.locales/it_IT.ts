@@ -4039,6 +4039,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Inversione collettiva',
   'entities.abilities.collective_reversal.description':
     "Riavvolge la linea temporale di ogni membro morto del gruppo o dell'incursione entro 40 metri e nella tua linea di vista, riportandolo in vita al tuo fianco con il 30% di salute e mana. Non può essere lanciata in combattimento. (Cronomanzia)",
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Lancia una Bomba a shock meccanica nel punto bersaglio, infliggendo da 120 a 160 danni da Natura ai nemici entro 5 metri.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Bomba a shock meccanica',
   'entities.abilities.sport_boot.description':
     'Un calcione alto e lungo verso il punto mirato. La folla lo adora.',
   'entities.abilities.sport_boot.name': 'Calcione',

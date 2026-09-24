@@ -4020,6 +4020,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Kollektive Umkehr',
   'entities.abilities.collective_reversal.description':
     'Spult die Zeitlinie jedes gefallenen Mitglieds eurer Gruppe oder Schlachtgruppe innerhalb von 40 Metern und in eurer Sichtlinie zurück und erweckt es an eurer Seite mit 30% Gesundheit und Mana wieder. Kann nicht im Kampf gewirkt werden. (Chronomantie)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Wirft eine Mechanische Schockbombe auf den Zielort und fügt Feinden im Umkreis von 5 Metern 120 bis 160 Naturschaden zu.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Mechanische Schockbombe',
   'entities.abilities.sport_boot.description':
     'Ein hoher, weiter Schlag Richtung Zielpunkt. Die Menge liebt es.',
   'entities.abilities.sport_boot.name': 'Weitschlag',

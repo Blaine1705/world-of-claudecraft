@@ -12257,6 +12257,10 @@ export const fr_FR: EnTranslations = {
         "name": "Jambes fraîches",
         "description": "Retrouvez vos jambes : déplacement 50 % plus rapide pendant 4 sec."
       },
+      "clockwork_shock_bomb": {
+        "name": "Bombe à choc mécanique",
+        "description": "Lance une Bombe à choc mécanique sur la zone ciblée, infligeant de 120 à 160 points de dégâts de Nature aux ennemis dans un rayon de 5 mètres."
+      },
       "flamestrike": {
         "name": "Frappe enflammée",
         "description": "Fait s'abattre une explosion de flammes sur la zone visée, infligeant {damage} points de dégâts de Feu aux ennemis pris dans la déflagration."

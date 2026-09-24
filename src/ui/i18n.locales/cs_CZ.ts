@@ -3861,6 +3861,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Hromadné navrácení',
   'entities.abilities.collective_reversal.description':
     'Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu do 40 yardů a na dohled a oživí ho po vašem boku s 30% zdraví a many. Nelze seslat v boji. (Chronomancie)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Hodí Mechanickou šokovou bombu na cílové místo a způsobí nepřátelům do 5 metrů 120 až 160 poškození přírodou.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Mechanická šoková bomba',
   'entities.abilities.sport_boot.description':
     'Dlouhý vysoký odkop směrem k zaměřovanému bodu. Dav to miluje.',
   'entities.abilities.sport_boot.name': 'Velký odkop',

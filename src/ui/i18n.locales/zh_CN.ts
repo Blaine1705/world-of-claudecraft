@@ -10713,6 +10713,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_pass.description':
     '把球稳稳地传给你选定的队友，提前送到他的跑动路线上。',
   'entities.abilities.sport_boot.name': '大脚开球',
+  'entities.abilities.clockwork_shock_bomb.description':
+    '向目标位置投掷一枚发条震荡炸弹，对5码内的敌人造成120到160点自然伤害。',
+  'entities.abilities.clockwork_shock_bomb.name': '发条震荡炸弹',
   'entities.abilities.sport_boot.description': '朝瞄准点来一记高远长传。观众最爱这一脚。',
   'entities.abilities.sport_hoof.name': '大脚解围',
   'entities.abilities.sport_hoof.description': '把球又低又狠地轰向前场。',

@@ -12257,6 +12257,10 @@ export const pl_PL: EnTranslations = {
         "name": "Świeże Nogi",
         "description": "Łapiesz oddech: poruszasz się o 50% szybciej przez 4 s."
       },
+      "clockwork_shock_bomb": {
+        "name": "Mechaniczna bomba wstrząsowa",
+        "description": "Rzuca Mechaniczną bombę wstrząsową w wybrane miejsce, zadając od 120 do 160 pkt. obrażeń od natury wrogom w promieniu 5 metrów."
+      },
       "flamestrike": {
         "name": "Ognista nawała",
         "description": "Sprowadza wybuch płomieni na wybrany obszar, zadając {damage} obrażeń od ognia wrogom w zasięgu eksplozji."

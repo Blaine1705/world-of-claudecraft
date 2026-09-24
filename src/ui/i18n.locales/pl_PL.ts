@@ -4018,6 +4018,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Zbiorowe odwrócenie',
   'entities.abilities.collective_reversal.description':
     'Cofa linię czasu każdego poległego członka grupy lub rajdu w promieniu 40 jardów i w zasięgu wzroku, przywracając go do życia u twojego boku z 30% zdrowia i many. Nie można użyć podczas walki. (Chronomancja)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Rzuca Mechaniczną bombę wstrząsową w wybrane miejsce, zadając od 120 do 160 pkt. obrażeń od natury wrogom w promieniu 5 metrów.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Mechaniczna bomba wstrząsowa',
   'entities.abilities.sport_boot.description':
     'Długie, wysokie wykopnięcie w stronę punktu celowania. Trybuny to uwielbiają.',
   'entities.abilities.sport_boot.name': 'Potężny Wykop',

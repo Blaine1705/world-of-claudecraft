@@ -12257,6 +12257,10 @@ export const es: EnTranslations = {
         "name": "Piernas frescas",
         "description": "Recupera las piernas: muévete un 50% más rápido durante 4 s."
       },
+      "clockwork_shock_bomb": {
+        "name": "Bomba de choque mecánica",
+        "description": "Lanza una Bomba de choque mecánica a la zona elegida e inflige de 120 a 160 de daño de Naturaleza a los enemigos en 5 metros."
+      },
       "flamestrike": {
         "name": "Llamarada",
         "description": "Invoca un estallido de fuego en el área objetivo que inflige {damage} de daño de Fuego a los enemigos alcanzados por la explosión."

@@ -12257,6 +12257,10 @@ export const da_DK: EnTranslations = {
         "name": "Friske Ben",
         "description": "Find benene: bevæg dig 50% hurtigere i 4 sek."
       },
+      "clockwork_shock_bomb": {
+        "name": "Mekanisk chokbombe",
+        "description": "Kaster en Mekanisk chokbombe på målstedet og giver 120 til 160 Naturskade til fjender inden for 5 meter."
+      },
       "flamestrike": {
         "name": "Flammeslag",
         "description": "Nedkalder en flammeeksplosion på målområdet, der giver {damage} Ildskade til fjender fanget i eksplosionen."

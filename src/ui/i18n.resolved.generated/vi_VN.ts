@@ -12257,6 +12257,10 @@ export const vi_VN: EnTranslations = {
         "name": "Đôi Chân Sung Sức",
         "description": "Lấy lại đôi chân: di chuyển nhanh hơn 50% trong 4 giây."
       },
+      "clockwork_shock_bomb": {
+        "name": "Bom Sốc Cơ Khí",
+        "description": "Ném một quả Bom Sốc Cơ Khí vào vị trí mục tiêu, gây 120 đến 160 sát thương Tự Nhiên cho kẻ địch trong phạm vi 5 mét."
+      },
       "flamestrike": {
         "name": "Cú Đánh Lửa",
         "description": "Gọi một vụ nổ lửa xuống khu vực mục tiêu, gây {damage} sát thương Lửa cho kẻ địch trong vụ nổ."

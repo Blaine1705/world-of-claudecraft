@@ -3999,6 +3999,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Reversão coletiva',
   'entities.abilities.collective_reversal.description':
     'Rebobina a linha temporal de cada membro morto do seu grupo ou raide a até 40 m e dentro da sua linha de visão, trazendo-o de volta à vida ao seu lado com 30% de vida e mana. Não pode ser lançada em combate. (Cronomancia)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Arremessa uma Bomba de Choque Mecânica no local alvo, causando de 120 a 160 de dano de Natureza aos inimigos a até 5 metros.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Bomba de Choque Mecânica',
   'entities.abilities.sport_boot.description':
     'Um chutão alto e longo em direção ao ponto de mira. A torcida adora.',
   'entities.abilities.sport_boot.name': 'Chutão',

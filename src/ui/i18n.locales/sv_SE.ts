@@ -3892,6 +3892,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Kollektiv återgång',
   'entities.abilities.collective_reversal.description':
     'Spolar tillbaka tidslinjen för varje fallen medlem i din grupp eller raid inom 40 meter och inom synhåll, och återupplivar dem vid din sida med 30% hälsa och mana. Kan inte användas i strid. (Kronomanti)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Kastar en Mekanisk chockbomb på målplatsen och gör 120 till 160 Naturskada på fiender inom 5 meter.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Mekanisk chockbomb',
   'entities.abilities.sport_boot.description':
     'En lång, hög spark mot siktpunkten. Publiken älskar den.',
   'entities.abilities.sport_boot.name': 'Storspark',

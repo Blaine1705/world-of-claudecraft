@@ -11368,6 +11368,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_pass.description':
     'Уверенно катит мяч выбранному партнёру, на ход в его забег.',
   'entities.abilities.sport_boot.name': 'Дальний удар',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Бросает Механическую шоковую бомбу в выбранное место, нанося врагам в радиусе 5 м от 120 до 160 ед. урона от сил природы.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Механическая шоковая бомба',
   'entities.abilities.sport_boot.description':
     'Длинный навесной удар к точке прицела. Трибуны в восторге.',
   'entities.abilities.sport_hoof.name': 'Вынос мяча',

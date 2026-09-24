@@ -4036,6 +4036,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Đảo ngược tập thể',
   'entities.abilities.collective_reversal.description':
     'Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, trong phạm vi 40 mét và trong tầm nhìn thẳng của bạn, hồi sinh họ bên cạnh bạn với 30% máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Ném một quả Bom Sốc Cơ Khí vào vị trí mục tiêu, gây 120 đến 160 sát thương Tự Nhiên cho kẻ địch trong phạm vi 5 mét.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Bom Sốc Cơ Khí',
   'entities.abilities.sport_boot.description':
     'Một cú sút bổng thật xa về phía điểm ngắm. Khán đài mê tít.',
   'entities.abilities.sport_boot.name': 'Cú Sút Lớn',

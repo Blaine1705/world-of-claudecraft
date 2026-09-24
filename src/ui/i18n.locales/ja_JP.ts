@@ -11264,6 +11264,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_pass.description':
     '狙った味方へ強めのパスを転がし、走り込みに合わせて送る。',
   'entities.abilities.sport_boot.name': 'ビッグブート',
+  'entities.abilities.clockwork_shock_bomb.description':
+    '目標地点にぜんまい式ショックボムを投げ、5ヤード以内の敵に120～160の自然ダメージを与える。',
+  'entities.abilities.clockwork_shock_bomb.name': 'ぜんまい式ショックボム',
   'entities.abilities.sport_boot.description': '狙った地点への高く長いキック。観客が沸き立つ。',
   'entities.abilities.sport_hoof.name': 'クリアリング',
   'entities.abilities.sport_hoof.description': 'ボールを低く強くフィールドの先へ叩き込む。',

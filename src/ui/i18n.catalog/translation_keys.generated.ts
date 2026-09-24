@@ -1498,6 +1498,8 @@ export type TranslationKeyFlat =
   | 'entities.abilities.cleaving_blows.name'
   | 'entities.abilities.cloak_of_shadows.description'
   | 'entities.abilities.cloak_of_shadows.name'
+  | 'entities.abilities.clockwork_shock_bomb.description'
+  | 'entities.abilities.clockwork_shock_bomb.name'
   | 'entities.abilities.cold_blood.description'
   | 'entities.abilities.cold_blood.name'
   | 'entities.abilities.cold_focus.description'

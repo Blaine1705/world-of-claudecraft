@@ -4550,6 +4550,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Réversion collective',
   'entities.abilities.collective_reversal.description':
     'Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, et le ramène à la vie à vos côtés avec 30% de ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)',
+  'entities.abilities.clockwork_shock_bomb.description':
+    'Lance une Bombe à choc mécanique sur la zone ciblée, infligeant de 120 à 160 points de dégâts de Nature aux ennemis dans un rayon de 5 mètres.',
+  'entities.abilities.clockwork_shock_bomb.name': 'Bombe à choc mécanique',
   'entities.abilities.sport_boot.description':
     'Une longue balle bottée en cloche vers le point visé. La foule adore.',
   'entities.abilities.sport_boot.name': 'Grosse botte',

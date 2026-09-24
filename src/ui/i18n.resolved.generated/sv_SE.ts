@@ -12257,6 +12257,10 @@ export const sv_SE: EnTranslations = {
         "name": "Fräscha ben",
         "description": "Hitta benen: rör dig 50 % snabbare i 4 sek."
       },
+      "clockwork_shock_bomb": {
+        "name": "Mekanisk chockbomb",
+        "description": "Kastar en Mekanisk chockbomb på målplatsen och gör 120 till 160 Naturskada på fiender inom 5 meter."
+      },
       "flamestrike": {
         "name": "Flamslag",
         "description": "Kallar ner en eldexplosion på målområdet som ger {damage} Eldskada till fiender som fångas i explosionen."

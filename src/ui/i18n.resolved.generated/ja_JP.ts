@@ -12257,6 +12257,10 @@ export const ja_JP: EnTranslations = {
         "name": "フレッシュレッグス",
         "description": "脚を取り戻す:4秒間、移動速度が50%上昇する。"
       },
+      "clockwork_shock_bomb": {
+        "name": "ぜんまい式ショックボム",
+        "description": "目標地点にぜんまい式ショックボムを投げ、5ヤード以内の敵に120～160の自然ダメージを与える。"
+      },
       "flamestrike": {
         "name": "フレイムストライク",
         "description": "対象地点に炎の爆発を呼び出し、爆発に巻き込まれた敵に{damage}の火炎ダメージを与えます。"
