@@ -86,7 +86,21 @@ export interface CooldownManagerTrackedSpell {
   /** The cue id to play on a ready edge, or null for silence. Resolved by the
    *  caller so this core never imports the cue catalog (src/game). */
   cue: string | null;
+  /** Set for an AURA entry (an engine, a proc, a buff): how a live aura on the
+   *  player matches it, and its precomputed icon key. Absent for a spell. */
+  aura?: { match: 'id' | 'kind'; value: string; iconKey: string };
 }
+
+/** The aura fields an aura entry reads. Both worlds mirror them on the player. */
+interface TrackedAuraInput {
+  id?: string;
+  kind: string;
+  stacks?: number;
+  remaining?: number;
+}
+
+/** Remaining seconds past this read as a mode, not a timer (a form, a stance). */
+const AURA_TIMER_CEILING_SEC = 600;
 
 export interface CooldownManagerView {
   /** Rebuild for a new tracked list or changed per-spell settings (cold path). */
@@ -145,6 +159,9 @@ export function createCooldownManagerView(deps: CooldownManagerViewDeps): Cooldo
   const state: CooldownManagerState = { buttons: [], cues: [] };
   let configs: CooldownSpellConfig[] = [];
   let cues: (string | null)[] = [];
+  let auraRules: (CooldownManagerTrackedSpell['aura'] | undefined)[] = [];
+  /** Per tracked entry: its slot in the inner action-bar view, -1 for an aura. */
+  let barIndex: number[] = [];
   let bar: ActionBarView | null = null;
   // Last ready key per base id (the resolved id while ready, else null). Kept
   // across setTracked so re-ordering or re-tuning a spell never replays an edge.
@@ -159,12 +176,16 @@ export function createCooldownManagerView(deps: CooldownManagerViewDeps): Cooldo
       state.buttons = spells.map((spell) => previous.get(spell.id) ?? makeButton(spell.id));
       configs = spells.map((spell) => spell.config);
       cues = spells.map((spell) => spell.cue);
+      auraRules = spells.map((spell) => spell.aura);
+      const spellEntries = spells.filter((spell) => !spell.aura);
+      let next = 0;
+      barIndex = spells.map((spell) => (spell.aura ? -1 : next++));
       bar =
-        spells.length === 0
+        spellEntries.length === 0
           ? null
           : createActionBarView(
               {
-                slots: spells.map((spell, slotIndex) => ({
+                slots: spellEntries.map((spell, slotIndex) => ({
                   slotIndex,
                   isAttack: () => false,
                   hasAction: () => true,
@@ -187,42 +208,29 @@ export function createCooldownManagerView(deps: CooldownManagerViewDeps): Cooldo
 
     tick(world, opts) {
       state.cues.length = 0;
-      if (!bar) return state;
-      const slots = bar.tick(world).slots;
+      if (state.buttons.length === 0) return state;
+      const slots = bar ? bar.tick(world).slots : null;
       const dead = world.player.dead;
+      const auras = world.player.auras as readonly TrackedAuraInput[];
       for (let i = 0; i < state.buttons.length; i++) {
         const button = state.buttons[i];
-        const slot = slots[i];
         const config = configs[i];
-        const known = slot.kind === 'ability' && slot.abilityId !== null;
-        const ready = known && cooldownSlotReady(slot, dead);
-        const abilityId = known ? slot.abilityId : null;
-        button.abilityId = abilityId;
-        button.iconKey = abilityId === null ? '' : slot.iconKey;
-        button.ready = ready;
-        button.transformed = abilityId !== null && abilityId !== button.baseId;
-        button.proc = known && (button.transformed || slot.procGlow);
-        button.glow = ready && config.glowWhenReady;
-        button.hotbarGlow = ready && config.hotbarGlow;
-        button.unusable = known && !slot.usable;
-        button.outOfRange = known && slot.outOfRange;
-        // The spell's own cooldown only: the bar's sweep also runs the GCD, which
-        // would paint a sweep over a button this core calls ready.
-        button.cooldownPercent =
-          known && slot.cooldownRemaining > 0 && slot.cooldownTotal > 0
-            ? Math.min(MAX_PERCENT, (slot.cooldownRemaining / slot.cooldownTotal) * MAX_PERCENT)
-            : 0;
-        button.cdText = known ? slot.cdText : '';
-        button.count = known && slot.isCharges ? slot.count : '';
-        button.visible = known && (opts.preview || !config.onlyWhenReady || ready);
+        const rule = auraRules[i];
+        let current: string | null;
+        if (rule) {
+          current = tickAura(button, rule, config, auras, dead, opts.preview, deps.formatCount);
+        } else {
+          const slot = slots?.[barIndex[i]];
+          if (!slot) continue;
+          current = tickSpell(button, slot, config, dead, opts.preview);
+        }
 
         // Death forgets every edge, so the first living frame only records:
-        // otherwise resurrecting would chime every tracked spell at once.
+        // otherwise resurrecting would chime every tracked entry at once.
         if (dead) {
           edges.delete(button.baseId);
           continue;
         }
-        const current = ready ? abilityId : null;
         const previous = edges.get(button.baseId);
         edges.set(button.baseId, current);
         const cueId = cues[i];
@@ -242,4 +250,82 @@ export function createCooldownManagerView(deps: CooldownManagerViewDeps): Cooldo
       return state;
     },
   };
+}
+
+/** One SPELL entry from its action-bar slot; returns its ready key. */
+function tickSpell(
+  button: CooldownButtonState,
+  slot: ActionBarSlotState,
+  config: CooldownSpellConfig,
+  dead: boolean,
+  preview: boolean,
+): string | null {
+  const known = slot.kind === 'ability' && slot.abilityId !== null;
+  const ready = known && cooldownSlotReady(slot, dead);
+  const abilityId = known ? slot.abilityId : null;
+  button.abilityId = abilityId;
+  button.iconKey = abilityId === null ? '' : slot.iconKey;
+  button.ready = ready;
+  button.transformed = abilityId !== null && abilityId !== button.baseId;
+  button.proc = known && (button.transformed || slot.procGlow);
+  button.glow = ready && config.glowWhenReady;
+  button.hotbarGlow = ready && config.hotbarGlow;
+  button.unusable = known && !slot.usable;
+  button.outOfRange = known && slot.outOfRange;
+  // The spell's own cooldown only: the bar's sweep also runs the GCD, which
+  // would paint a sweep over a button this core calls ready.
+  button.cooldownPercent =
+    known && slot.cooldownRemaining > 0 && slot.cooldownTotal > 0
+      ? Math.min(MAX_PERCENT, (slot.cooldownRemaining / slot.cooldownTotal) * MAX_PERCENT)
+      : 0;
+  button.cdText = known ? slot.cdText : '';
+  button.count = known && slot.isCharges ? slot.count : '';
+  button.visible = known && (preview || !config.onlyWhenReady || ready);
+  return ready ? abilityId : null;
+}
+
+/**
+ * One AURA entry (an engine bank, a proc, a buff) from the player's live auras.
+ * It is "up" (ready: lit, and the cue edge) once the aura is on the player with
+ * at least `alertStacks` stacks (0 means as soon as it appears); reaching a
+ * stack goal above 1 also pulses it, the way a transform does. The button shows
+ * the stack count and the seconds left; an absent aura is dimmed like a spell
+ * the player cannot cast. Returns its ready key.
+ */
+function tickAura(
+  button: CooldownButtonState,
+  rule: NonNullable<CooldownManagerTrackedSpell['aura']>,
+  config: CooldownSpellConfig,
+  auras: readonly TrackedAuraInput[],
+  dead: boolean,
+  preview: boolean,
+  formatCount: (n: number) => string,
+): string | null {
+  let aura: TrackedAuraInput | undefined;
+  for (const candidate of auras) {
+    if (rule.match === 'id' ? candidate.id === rule.value : candidate.kind === rule.value) {
+      aura = candidate;
+      break;
+    }
+  }
+  const present = aura !== undefined && !dead;
+  const stacks = aura?.stacks ?? 1;
+  const goal = Math.max(1, config.alertStacks);
+  const ready = present && stacks >= goal;
+  button.abilityId = null;
+  button.iconKey = rule.iconKey;
+  button.ready = ready;
+  button.transformed = false;
+  button.proc = ready && config.alertStacks > 1;
+  button.glow = ready && config.glowWhenReady;
+  button.hotbarGlow = false;
+  button.unusable = !present;
+  button.outOfRange = false;
+  button.cooldownPercent = 0;
+  const remaining = present ? (aura?.remaining ?? 0) : 0;
+  button.cdText =
+    remaining > 1 && remaining < AURA_TIMER_CEILING_SEC ? formatCount(Math.ceil(remaining)) : '';
+  button.count = present && stacks > 1 ? formatCount(stacks) : '';
+  button.visible = preview || !config.onlyWhenReady || ready;
+  return ready ? button.baseId : null;
 }

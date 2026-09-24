@@ -143,6 +143,50 @@ describe('CooldownManagerController', () => {
     expect(pulls).toBe(0);
   });
 
+  it('remembers helpful auras seen on the player and offers them, never a debuff', () => {
+    const { controller, hooks, snapshot } = rig();
+    (snapshot.player as unknown as { auras: unknown[] }).auras = [
+      {
+        id: 'trinket_fury',
+        kind: 'buff_ap',
+        value: 50,
+        name: 'Fury of the Ancients',
+        remaining: 10,
+      },
+      { id: 'nasty_curse', kind: 'dot', value: 5, name: 'Curse', remaining: 10 },
+    ];
+    controller.paint(snapshot);
+    const tokens = hooks.auraCatalog().map((entry) => entry.token);
+    expect(tokens).toContain('aura:trinket_fury');
+    expect(tokens).not.toContain('aura:nasty_curse');
+    // The druid's own engines are there before anything was ever seen.
+    expect(tokens).toContain('kind:old_blood');
+    // Persisted: the next session still offers it.
+    document.body.replaceChildren();
+    expect(
+      rig()
+        .hooks.auraCatalog()
+        .map((entry) => entry.token),
+    ).toContain('aura:trinket_fury');
+  });
+
+  it('paints a tracked aura with the buff bar icon, its stacks and time left', () => {
+    const { controller, hooks, snapshot, layer } = rig();
+    const id = hooks.addGroup('single') as string;
+    expect(hooks.assign('kind:old_blood', id)).toBe(true);
+    (snapshot.player as unknown as { auras: unknown[] }).auras = [
+      { id: 'old_blood', kind: 'old_blood', value: 0, stacks: 2, remaining: 12, name: 'Old Blood' },
+    ];
+    controller.paint(snapshot);
+    const btn = layer().querySelector<HTMLElement>('.cdm-btn');
+    expect(btn?.querySelector('.ui-socket-count')?.textContent).toBe('2');
+    expect(btn?.querySelector('.ui-socket-cd-text')?.textContent).toBe('12');
+    expect(btn?.classList.contains('is-ready')).toBe(true);
+    expect(btn?.querySelector<HTMLElement>('.ui-socket-art')?.style.backgroundImage).toContain(
+      'url(',
+    );
+  });
+
   it('persists groups per character and restores them on the next session', () => {
     const first = rig();
     const id = first.hooks.addGroup('line') as string;
@@ -315,6 +359,20 @@ describe('CooldownManagerSettingsPanel', () => {
     settings.render(root);
     expect(hooks.assign('regrowth', id)).toBe(true);
     expect(hooks.groups()[0].spells).toEqual(['regrowth']);
+  });
+
+  it('lists engines and procs, and an aura card offers a stack goal but no hotbar glow', () => {
+    const { root, hooks, settings } = panel();
+    const auras = chips(root, '__auras').map((chip) => chip.dataset.focusKey);
+    expect(auras).toContain('cdm-spell:kind:old_blood');
+    const id = hooks.addGroup('line') as string;
+    hooks.assign('kind:old_blood', id);
+    settings.render(root);
+    chips(root, id)[0].click();
+    const card = root.querySelector<HTMLElement>('.cdm-detail-card');
+    expect(card?.textContent).toContain('Alert at Stacks');
+    expect(card?.textContent).not.toContain('Hotbar Glow');
+    expect(card?.textContent).toContain('Only Show While Active');
   });
 
   it('moves a spell by drag and drop onto a group section', () => {

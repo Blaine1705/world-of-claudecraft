@@ -158,12 +158,17 @@ describe('cooldown manager groups: sanitizing a save', () => {
       glowWhenReady: true,
       onlyWhenReady: false,
       hotbarGlow: false,
+      alertStacks: 0,
     });
     const cue = AURA_CUES[0].id;
     expect(sanitizeCooldownSpellConfig({ soundId: cue, hotbarGlow: true })).toMatchObject({
       soundId: cue,
       hotbarGlow: true,
     });
+    // An aura's stack goal is an integer, clamped to the stack ceiling.
+    expect(sanitizeCooldownSpellConfig({ alertStacks: 3.6 }).alertStacks).toBe(4);
+    expect(sanitizeCooldownSpellConfig({ alertStacks: 99 }).alertStacks).toBe(20);
+    expect(sanitizeCooldownSpellConfig({ alertStacks: -2 }).alertStacks).toBe(0);
     expect(sanitizeCooldownManagerLayout({ idleOpacity: 5, enabled: 'no' })).toEqual({
       enabled: true,
       idleOpacity: 1,

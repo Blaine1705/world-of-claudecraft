@@ -21,13 +21,22 @@ import { AURA_CUE_NONE, AURA_CUES } from '../../../game/aura_cue_catalog';
 import { ABILITIES } from '../../../sim/content/classes';
 import type { PlayerClass } from '../../../sim/types';
 import { abilityDisplayName } from '../../ability_display_name';
+import { auraDisplayNameFromSource } from '../../aura_display_name';
+import { resolveHudAuraIconId, resolveHudAuraIconUrl } from '../../aura_icon_runtime';
 import { classDisplayName } from '../../entity_i18n';
 import { restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
 import { iconDataUrl } from '../../icons';
 import { settingRow, settingsCard, sliderControl, toggleControl } from '../../settings_controls';
+import { tTalent } from '../../talent_i18n';
 import {
+  type CooldownAuraEntry,
+  isCooldownAuraToken,
+  parseCooldownAuraToken,
+} from './cooldown_manager_auras';
+import {
+  COOLDOWN_ALERT_STACKS_MAX,
   COOLDOWN_GRID_MAX_SIDE,
   COOLDOWN_MAX_GROUPS,
   COOLDOWN_OPACITY_MAX,
@@ -60,6 +69,9 @@ export interface CooldownManagerHooks {
   /** Every castable spell the CLASS can have, across every spec, talent and
    *  level (a superset of spellbook()). */
   catalog(): readonly string[];
+  /** Every trackable aura: the class's engines, procs and buffs, plus the
+   *  auras seen on the player that those do not cover. */
+  auraCatalog(): readonly CooldownAuraEntry[];
   groups(): readonly CooldownGroup[];
   /** Add a group; returns its id, or null when the group cap is reached. */
   addGroup(kind: CooldownGroupKind): string | null;
@@ -107,6 +119,8 @@ const NOT_DISPLAYED = '';
 /** The section of class spells the current build does not know. Not a group:
  *  dropping a spell here takes it out of every group, like Not Displayed. */
 const OTHER_SPELLS = '__other';
+/** The section of trackable auras (engines, procs, buffs) not in any group. */
+const AURAS_SECTION = '__auras';
 /** A private drag type: a word dragged in from chat or another page carries
  *  only text/plain, so it can never be dropped into a group. */
 const DRAG_TYPE = 'application/x-woc-cooldown-spell';
@@ -118,6 +132,41 @@ const count = (value: number): string => formatNumber(value, { maximumFractionDi
 function spellName(abilityId: string): string {
   const ability = ABILITIES[abilityId];
   return ability ? abilityDisplayName(ability) : abilityId;
+}
+
+/** A catalog aura's player-facing name, through the localized path its label
+ *  names (the buff bar's own sim aura-name matcher for engines and seen auras). */
+function auraEntryName(entry: CooldownAuraEntry): string {
+  const label = entry.label;
+  switch (label.type) {
+    case 'ability':
+      return spellName(label.id);
+    case 'talent':
+      return tTalent({ kind: 'talentChoice', choice: label.choice, field: 'name' });
+    case 'key':
+      return t(label.key);
+    default:
+      return auraDisplayNameFromSource(label.name);
+  }
+}
+
+/** The icon element for a tracked entry: ability art, or the aura art the buff
+ *  bar would paint for it. */
+function entryIcon(id: string, entry: CooldownAuraEntry | undefined): HTMLElement {
+  const rule = parseCooldownAuraToken(id);
+  if (rule) {
+    const art = document.createElement('span');
+    art.className = 'ui-socket-art cdm-aura-art';
+    const iconId = resolveHudAuraIconId({ id: rule.value, kind: entry?.kind ?? rule.value });
+    art.style.backgroundImage = resolveHudAuraIconUrl(iconId);
+    return art;
+  }
+  const img = document.createElement('img');
+  img.className = 'ui-socket-art';
+  img.src = iconDataUrl('ability', id);
+  img.alt = '';
+  img.draggable = false;
+  return img;
 }
 
 /** "Button Group 2": numbered within its own kind, in group order. */
@@ -554,6 +603,13 @@ export class CooldownManagerSettingsPanel {
     const spellbook = hooks.spellbook();
     const known = new Set(spellbook);
     const catalog = hooks.catalog();
+    const auraEntries = hooks.auraCatalog();
+    const auraByToken = new Map(auraEntries.map((entry) => [entry.token, entry] as const));
+    const name = (id: string): string => {
+      const entry = auraByToken.get(id);
+      if (entry) return auraEntryName(entry);
+      return isCooldownAuraToken(id) ? t('hudChrome.cooldownManager.auraFallback') : spellName(id);
+    };
     const section = document.createElement('div');
     section.className = 'aura-watch-section cdm-tracked';
     const head = document.createElement('div');
@@ -574,7 +630,9 @@ export class CooldownManagerSettingsPanel {
     search.value = this.query;
     section.appendChild(search);
 
-    if (this.selected !== null) this.buildDetail(section, this.selected, refresh);
+    if (this.selected !== null) {
+      this.buildDetail(section, this.selected, name(this.selected), auraByToken, refresh);
+    }
 
     const chips: { el: HTMLElement; name: string }[] = [];
     const assigned = new Set(groups.flatMap((group) => group.spells));
@@ -594,6 +652,11 @@ export class CooldownManagerSettingsPanel {
         label: t('hudChrome.cooldownManager.otherSpells'),
         spells: catalog.filter((id) => !known.has(id) && !assigned.has(id)),
       },
+      {
+        id: AURAS_SECTION,
+        label: t('hudChrome.cooldownManager.aurasTitle'),
+        spells: auraEntries.map((entry) => entry.token).filter((token) => !assigned.has(token)),
+      },
     ];
     for (const entry of sections) {
       const box = document.createElement('div');
@@ -609,34 +672,32 @@ export class CooldownManagerSettingsPanel {
       box.append(label);
       if (entry.id === OTHER_SPELLS) {
         this.note(box, t('hudChrome.cooldownManager.otherSpellsHint'), 'cdm-other-hint');
+      } else if (entry.id === AURAS_SECTION) {
+        this.note(box, t('hudChrome.cooldownManager.aurasHint'), 'cdm-other-hint');
       }
       box.append(list);
       if (entry.spells.length === 0) {
         this.note(list, t('hudChrome.cooldownManager.emptySection'), 'cdm-empty');
       }
       for (const id of entry.spells) {
-        const name = spellName(id);
+        const label = name(id);
+        const isAura = isCooldownAuraToken(id);
         const chip = document.createElement('button');
         chip.type = 'button';
         // A spell the current build does not know (another spec, talent or a
         // higher level) is dimmed and says so: its button appears once known.
-        const unknown = !known.has(id);
+        const unknown = !isAura && !known.has(id);
         chip.className = `ui-socket cdm-spell-chip${unknown ? ' is-unknown' : ''}`;
         chip.draggable = true;
         chip.dataset.focusKey = `cdm-spell:${id}`;
-        const shown = unknown ? t('hudChrome.cooldownManager.notKnown', { spell: name }) : name;
+        const shown = unknown ? t('hudChrome.cooldownManager.notKnown', { spell: label }) : label;
         chip.title = shown;
         chip.setAttribute(
           'aria-label',
           t('hudChrome.cooldownManager.selectSpell', { spell: shown }),
         );
         chip.setAttribute('aria-pressed', String(this.selected === id));
-        const icon = document.createElement('img');
-        icon.className = 'ui-socket-art';
-        icon.src = iconDataUrl('ability', id);
-        icon.alt = '';
-        icon.draggable = false;
-        chip.appendChild(icon);
+        chip.appendChild(entryIcon(id, auraByToken.get(id)));
         chip.addEventListener('click', () => {
           this.host.click();
           this.selected = this.selected === id ? null : id;
@@ -647,7 +708,7 @@ export class CooldownManagerSettingsPanel {
           if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
         });
         list.appendChild(chip);
-        chips.push({ el: chip, name });
+        chips.push({ el: chip, name: label });
       }
       // Drop target: the whole section, including its label, takes a spell.
       box.addEventListener('dragover', (event) => {
@@ -665,8 +726,11 @@ export class CooldownManagerSettingsPanel {
         box.classList.remove('drop-target');
         const id = event.dataTransfer?.getData(DRAG_TYPE) ?? '';
         // Only a spell this panel listed can land in a group.
-        if (!catalog.includes(id) && !assigned.has(id)) return;
-        const target = entry.id === NOT_DISPLAYED || entry.id === OTHER_SPELLS ? null : entry.id;
+        if (!catalog.includes(id) && !auraByToken.has(id) && !assigned.has(id)) return;
+        const target =
+          entry.id === NOT_DISPLAYED || entry.id === OTHER_SPELLS || entry.id === AURAS_SECTION
+            ? null
+            : entry.id;
         if (hooks.assign(id, target)) {
           this.host.click();
           refresh([`cdm-spell:${id}`]);
@@ -691,20 +755,19 @@ export class CooldownManagerSettingsPanel {
   private buildDetail(
     parent: HTMLElement,
     id: string,
+    spell: string,
+    auraByToken: ReadonlyMap<string, CooldownAuraEntry>,
     refresh: (keys?: readonly string[]) => void,
   ): void {
     const { hooks } = this.host;
     const groups = hooks.groups();
-    const spell = spellName(id);
+    const isAura = isCooldownAuraToken(id);
     const card = settingsCard(parent, spell, { className: 'aura-settings-card cdm-detail-card' });
     const preview = document.createElement('div');
     preview.className = 'aura-settings-chip cdm-settings-chip';
-    const icon = document.createElement('img');
-    icon.src = iconDataUrl('ability', id);
-    icon.alt = '';
     const label = document.createElement('span');
     label.textContent = spell;
-    preview.append(icon, label);
+    preview.append(entryIcon(id, auraByToken.get(id)), label);
     card.appendChild(preview);
 
     const current = cooldownGroupOf(groups, id);
@@ -769,7 +832,8 @@ export class CooldownManagerSettingsPanel {
       (glowWhenReady) => hooks.patchSpell(id, { glowWhenReady }),
     );
     this.note(card, t('hudChrome.cooldownManager.glowWhenReadyHint'));
-    if (hooks.hotbarGlowAvailable()) {
+    // An aura has no action-bar button of its own to light.
+    if (!isAura && hooks.hotbarGlowAvailable()) {
       this.toggle(
         card,
         t('hudChrome.cooldownManager.hotbarGlow'),
@@ -780,11 +844,29 @@ export class CooldownManagerSettingsPanel {
     }
     this.toggle(
       card,
-      t('hudChrome.cooldownManager.onlyWhenReady'),
+      t(
+        isAura
+          ? 'hudChrome.cooldownManager.onlyWhileActive'
+          : 'hudChrome.cooldownManager.onlyWhenReady',
+      ),
       () => hooks.getSpell(id).onlyWhenReady,
       (onlyWhenReady) => hooks.patchSpell(id, { onlyWhenReady }),
     );
-    this.buildSound(card, id, refresh);
+    if (isAura) {
+      sliderControl({
+        parent: card,
+        label: t('hudChrome.cooldownManager.alertStacks'),
+        get: () => hooks.getSpell(id).alertStacks,
+        set: (alertStacks) => hooks.patchSpell(id, { alertStacks: Math.round(alertStacks) }),
+        min: 0,
+        max: COOLDOWN_ALERT_STACKS_MAX,
+        step: 1,
+        format: (value) =>
+          value < 1 ? t('hudChrome.cooldownManager.alertStacksAny') : count(Math.round(value)),
+      });
+      this.note(card, t('hudChrome.cooldownManager.alertStacksHint'));
+    }
+    this.buildSound(card, id, isAura, refresh);
   }
 
   /** The ready sound: the Auras cue palette, a preview and a volume slider. The
@@ -792,6 +874,7 @@ export class CooldownManagerSettingsPanel {
   private buildSound(
     card: HTMLElement,
     id: string,
+    isAura: boolean,
     refresh: (keys?: readonly string[]) => void,
   ): void {
     const { hooks } = this.host;
@@ -811,7 +894,10 @@ export class CooldownManagerSettingsPanel {
       },
       'cdm-sound',
     );
-    this.note(card, t('hudChrome.cooldownManager.soundHint'));
+    this.note(
+      card,
+      t(isAura ? 'hudChrome.cooldownManager.auraSoundHint' : 'hudChrome.cooldownManager.soundHint'),
+    );
     if (current.soundId === AURA_CUE_NONE) return;
     const volume = sliderControl({
       parent: card,

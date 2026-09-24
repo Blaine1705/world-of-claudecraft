@@ -13930,6 +13930,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.otherSpellsHint':
     '他の専門化、タレントの選択、より高いレベルの呪文です。今配置しておくと、習得したときにボタンが表示されます。',
   'hudChrome.cooldownManager.notKnown': '{spell}（未習得）',
+  'hudChrome.cooldownManager.aurasTitle': '発動・エンジン・強化',
+  'hudChrome.cooldownManager.aurasHint':
+    'エンジン資源とそのスタック、発動効果、そして自分の呪文で得る強化効果です。それ以外に自分にかかったことのある効果もここに表示されます。',
+  'hudChrome.cooldownManager.auraFallback': 'オーラ',
+  'hudChrome.cooldownManager.onlyWhileActive': '発動中のみ表示',
+  'hudChrome.cooldownManager.alertStacks': 'スタック数で通知',
+  'hudChrome.cooldownManager.alertStacksAny': '獲得時',
+  'hudChrome.cooldownManager.alertStacksHint':
+    'オーラがこのスタック数に達すると、ボタンが光って脈打ち、音が鳴ります。「獲得時」は現れた瞬間に通知します。',
+  'hudChrome.cooldownManager.auraSoundHint':
+    'オーラが現れたとき、または設定したスタック数に達したときに鳴ります。',
   'hudChrome.cooldownManager.notDisplayed': '非表示',
   'hudChrome.cooldownManager.emptySection': 'ここに呪文をドロップします。',
   'hudChrome.cooldownManager.spellsEmpty': 'まだ呪文を習得していません。',

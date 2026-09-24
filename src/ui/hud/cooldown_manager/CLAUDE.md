@@ -15,6 +15,8 @@ core, thin painter, one controller, one settings panel.
 | File | What it is |
 |---|---|
 | `cooldown_manager_config.ts` | Stored shape (groups, per-spell config, shared layout), sanitizers, the group layout rules (`cooldownCell`, `cooldownGroupShown`), spell assignment, and the search matcher. Pure rules; imports the cue catalog, so it is not a registered pure core. |
+| `cooldown_manager_catalog.ts` | Every ability a class can hold across all specs, talents and levels (derived), and its trackable-spell subset the picker offers. Pinned by a sweep over every class, spec and talent option. |
+| `cooldown_manager_auras.ts` | The trackable AURAS (engines, procs, buffs): `ENGINE_AURAS` (the one hand table, each row pinned against the sim source), the Auras panel's procs, every talent-row proc, and class self-buffs; plus the `aura:<id>` / `kind:<kind>` token rules. |
 | `cooldown_manager_store.ts` | The per-character localStorage record (`woc_cooldown_manager:<class>:<name>`), carried by the full settings export. |
 | `cooldown_manager_view.ts` | The per-frame pure core: readiness, transform, glow flags, cue edges. Registered in `UI_PURE_CORES`. |
 | `cooldown_manager_painter.ts` | Thin painter over `PainterHostWriters` (a `HOT_PAINTERS` member). |
@@ -24,6 +26,13 @@ core, thin painter, one controller, one settings panel.
 | `index.ts` | The barrel the Hud and `src/ui/options_overlay_panels.ts` import. |
 
 ## Load-bearing rules
+
+- **A tracked entry is a spell id or an aura token.** `aura:<id>` matches a live
+  player aura by id, `kind:<kind>` by kind (an engine bank). An aura button is up
+  once the aura has `alertStacks` stacks (0: on appearance); a goal above 1 also
+  pulses it. It shows stacks and time left, never a hotbar glow. Auras the static
+  catalog misses are still offered: the controller remembers every helpful aura
+  seen on the player (`recordSeen`, one Set lookup per aura per frame, capped).
 
 - **Readiness is the action bar's, never a second rule.** The view composes
   `createActionBarView` over a descriptor whose slots are the tracked spells, and

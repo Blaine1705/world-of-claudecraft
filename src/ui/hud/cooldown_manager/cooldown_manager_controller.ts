@@ -11,12 +11,20 @@
 // what the hotbar reads.
 
 import { AURA_CUE_NONE } from '../../../game/aura_cue_catalog';
+import { isDebuffDisplayAura } from '../../../sim/aura_classify';
 import type { ResolvedAbility } from '../../../sim/sim';
-import type { PlayerClass } from '../../../sim/types';
+import type { AuraKind, PlayerClass } from '../../../sim/types';
+import { resolveHudAuraIconId, resolveHudAuraIconUrl } from '../../aura_icon_runtime';
 import { formatNumber } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { actionBarIconBg } from '../action_bar/action_bar_icon_bg';
 import type { ActionBarWorldInput } from '../action_bar/action_bar_view';
+import {
+  type CooldownAuraEntry,
+  cooldownAuraCatalog,
+  parseCooldownAuraToken,
+  seenAuraEntry,
+} from './cooldown_manager_auras';
 import { cooldownClassCatalog } from './cooldown_manager_catalog';
 import {
   assignCooldownSpell,
@@ -36,8 +44,12 @@ import {
 } from './cooldown_manager_config';
 import { type CooldownButtonElements, CooldownManagerPainter } from './cooldown_manager_painter';
 import type { CooldownManagerHooks } from './cooldown_manager_settings';
-import { CooldownManagerStore } from './cooldown_manager_store';
-import { type CooldownManagerView, createCooldownManagerView } from './cooldown_manager_view';
+import { CooldownManagerStore, type SeenCooldownAura } from './cooldown_manager_store';
+import {
+  type CooldownManagerTrackedSpell,
+  type CooldownManagerView,
+  createCooldownManagerView,
+} from './cooldown_manager_view';
 
 /** The world slice the manager reads: a structural subset of IWorld. */
 export interface CooldownManagerWorld {
@@ -65,6 +77,16 @@ export interface CooldownManagerControllerDeps {
 }
 
 const NO_GLOW: ReadonlySet<string> = new Set();
+const AURA_ICON_PREFIX = 'aura:';
+const SEEN_AURA_ID_RE = /^[a-z0-9_]{1,64}$/;
+
+/** A button's icon: ability art through the action bar's resolver, an aura's
+ *  through the buff bar's (painted art above a procedural safety layer). */
+function cooldownIconBackground(iconKey: string): string {
+  return iconKey.startsWith(AURA_ICON_PREFIX)
+    ? resolveHudAuraIconUrl(iconKey.slice(AURA_ICON_PREFIX.length))
+    : actionBarIconBg(iconKey);
+}
 /** Group fields that restyle a group without moving any button between cells. */
 const APPEARANCE_KEYS: ReadonlySet<string> = new Set([
   'posX',
@@ -90,6 +112,11 @@ export class CooldownManagerController {
   private readonly groupShown: boolean[] = [];
   private buttons: CooldownButtonElements[] = [];
   private placement = false;
+  // Helpful auras seen on the player (persisted), offered in the picker so
+  // anything the static aura catalog misses (a trinket, a new passive) is still
+  // trackable. The id set makes the per-frame check a lookup, no allocation.
+  private seen: SeenCooldownAura[] = [];
+  private readonly seenIds = new Set<string>();
   // The snapshot this manager's view ticks over: the Hud's action-bar snapshot,
   // field for field, except `entities`, which is a fresh iterator from the
   // roster. The Hud's snapshot carries ONE single-use Map iterator that the
@@ -115,7 +142,9 @@ export class CooldownManagerController {
       resolve: (id) => this.deps.world.resolvedAbility(id),
       formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
     });
-    this.painter = new CooldownManagerPainter(deps.writers, actionBarIconBg);
+    this.painter = new CooldownManagerPainter(deps.writers, cooldownIconBackground);
+    this.seen = this.store.getSeen();
+    for (const aura of this.seen) this.seenIds.add(aura.id);
     this.layer = doc.createElement('div');
     this.layer.id = 'cooldown-manager';
     // Floating readouts, not controls: the buttons are never clickable and the
@@ -141,6 +170,7 @@ export class CooldownManagerController {
     own.activeAimSlot = world.activeAimSlot;
     own.entities = this.deps.world.entities.values();
     const state = this.view.tick(own, { soundsAllowed, preview: this.placement });
+    this.recordSeen(world.player.auras);
     for (let g = 0; g < this.groups.length; g++) {
       this.groupShown[g] = cooldownGroupShown(this.groups[g].visibility, inCombat, this.placement);
     }
@@ -184,6 +214,7 @@ export class CooldownManagerController {
     return {
       playerClass: () => this.deps.world.cfg.playerClass,
       spellbook: () => this.spellbook(),
+      auraCatalog: () => this.auraCatalog(),
       catalog: () => this.catalog(),
       groups: () => this.groups,
       addGroup: (kind) => this.addGroup(kind),
@@ -235,6 +266,33 @@ export class CooldownManagerController {
     const out = [...cooldownClassCatalog(this.deps.world.cfg.playerClass)];
     for (const id of this.spellbook()) if (!out.includes(id)) out.push(id);
     return out;
+  }
+
+  /** Every trackable aura of the class (engines, procs, buffs), then the ones
+   *  seen on the player that the catalog does not already cover. */
+  private auraCatalog(): CooldownAuraEntry[] {
+    const out = [...cooldownAuraCatalog(this.deps.world.cfg.playerClass)];
+    const ids = new Set(out.filter((entry) => entry.match === 'id').map((entry) => entry.value));
+    const kinds = new Set(out.filter((entry) => entry.match === 'kind').map((e) => e.value));
+    for (const aura of this.seen) {
+      if (!ids.has(aura.id) && !kinds.has(aura.kind)) out.push(seenAuraEntry(aura));
+    }
+    return out;
+  }
+
+  /** Remember each helpful aura the first time it appears on the player. A
+   *  steady frame is one Set lookup per aura; a new one is a rare storage write. */
+  private recordSeen(
+    auras: readonly { id?: string; kind: string; value?: number; name?: string }[],
+  ): void {
+    for (const aura of auras) {
+      const id = aura.id;
+      if (!id || this.seenIds.has(id)) continue;
+      this.seenIds.add(id);
+      if (!SEEN_AURA_ID_RE.test(id) || !SEEN_AURA_ID_RE.test(aura.kind)) continue;
+      if (isDebuffDisplayAura(aura.kind as AuraKind, aura.value ?? 0, id)) continue;
+      this.seen = this.store.addSeen({ id, kind: aura.kind, name: aura.name ?? id });
+    }
   }
 
   private addGroup(kind: CooldownGroupKind): string | null {
@@ -314,11 +372,27 @@ export class CooldownManagerController {
 
   /** Hand the view the flattened spell list with each spell's current settings. */
   private rearm(): void {
-    const spells = [];
+    const spells: CooldownManagerTrackedSpell[] = [];
+    const catalog = this.auraCatalog();
     for (const group of this.groups) {
       for (const id of group.spells) {
         const config = this.store.getSpell(id);
-        spells.push({ id, config, cue: config.soundId === AURA_CUE_NONE ? null : config.soundId });
+        const cue = config.soundId === AURA_CUE_NONE ? null : config.soundId;
+        const rule = parseCooldownAuraToken(id);
+        if (!rule) {
+          spells.push({ id, config, cue });
+          continue;
+        }
+        // The icon identity the buff bar would give this aura (its kind decides
+        // the fallback art), resolved once here rather than per frame.
+        const kind = catalog.find((entry) => entry.token === id)?.kind ?? rule.value;
+        const iconId = resolveHudAuraIconId({ id: rule.value, kind });
+        spells.push({
+          id,
+          config,
+          cue,
+          aura: { ...rule, iconKey: `${AURA_ICON_PREFIX}${iconId}` },
+        });
       }
     }
     this.view.setTracked(spells);

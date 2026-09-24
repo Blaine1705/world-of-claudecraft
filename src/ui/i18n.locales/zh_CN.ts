@@ -13254,6 +13254,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.otherSpellsHint':
     '来自你的其他专精、天赋选择和更高等级的法术。现在放置一个，当你学会它时，它的按钮就会出现。',
   'hudChrome.cooldownManager.notKnown': '{spell}（尚未学会）',
+  'hudChrome.cooldownManager.aurasTitle': '触发、引擎与增益',
+  'hudChrome.cooldownManager.aurasHint':
+    '引擎资源及其层数、触发效果，以及你的法术施加在你身上的增益。其他曾出现在你身上的效果也会显示在这里。',
+  'hudChrome.cooldownManager.auraFallback': '光环',
+  'hudChrome.cooldownManager.onlyWhileActive': '仅在生效时显示',
+  'hudChrome.cooldownManager.alertStacks': '层数提醒',
+  'hudChrome.cooldownManager.alertStacksAny': '获得时',
+  'hudChrome.cooldownManager.alertStacksHint':
+    '光环达到此层数时，按钮会亮起、闪烁并发出提示音。“获得时”表示一出现就提醒。',
+  'hudChrome.cooldownManager.auraSoundHint': '光环出现时，或达到你设定的层数时播放。',
   'hudChrome.cooldownManager.notDisplayed': '不显示',
   'hudChrome.cooldownManager.emptySection': '把法术拖到这里。',
   'hudChrome.cooldownManager.spellsEmpty': '你还不会任何法术。',

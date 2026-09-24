@@ -13895,6 +13895,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.otherSpellsHint':
     '다른 전문화, 특성 선택, 더 높은 레벨의 주문입니다. 지금 배치해 두면 배웠을 때 버튼이 나타납니다.',
   'hudChrome.cooldownManager.notKnown': '{spell} (아직 배우지 않음)',
+  'hudChrome.cooldownManager.aurasTitle': '발동, 엔진, 강화 효과',
+  'hudChrome.cooldownManager.aurasHint':
+    '엔진 자원과 그 중첩, 발동 효과, 그리고 내 주문이 나에게 거는 강화 효과입니다. 그 밖에 나에게 걸렸던 효과도 여기에 표시됩니다.',
+  'hudChrome.cooldownManager.auraFallback': '오라',
+  'hudChrome.cooldownManager.onlyWhileActive': '활성 중에만 표시',
+  'hudChrome.cooldownManager.alertStacks': '중첩 알림',
+  'hudChrome.cooldownManager.alertStacksAny': '획득 시',
+  'hudChrome.cooldownManager.alertStacksHint':
+    '오라가 이 중첩 수에 도달하면 버튼이 빛나고 깜박이며 소리가 납니다. 획득 시는 나타나는 즉시 알립니다.',
+  'hudChrome.cooldownManager.auraSoundHint':
+    '오라가 나타날 때, 또는 설정한 중첩 수에 도달할 때 재생됩니다.',
   'hudChrome.cooldownManager.notDisplayed': '표시 안 함',
   'hudChrome.cooldownManager.emptySection': '여기에 주문을 놓으세요.',
   'hudChrome.cooldownManager.spellsEmpty': '아직 배운 주문이 없습니다.',

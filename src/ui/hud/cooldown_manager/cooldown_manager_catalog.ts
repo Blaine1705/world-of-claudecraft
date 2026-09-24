@@ -26,19 +26,21 @@ export function cooldownTrackable(abilityId: string): boolean {
   return def !== undefined && !def.passive && !def.hiddenFromPlayer;
 }
 
+const allCache = new Map<PlayerClass, readonly string[]>();
 const cache = new Map<PlayerClass, readonly string[]>();
 
 /**
- * Every trackable spell of a class, in a stable order: the authored kit first
- * (spellbook order), then spec signatures, then talent and spec grants. Memoized
- * per class; content is static for the session.
+ * Every ability id a class can ever hold, passives included: the authored kit,
+ * each spec's signature, and every grant a talent row option or spec effect
+ * carries. The aura catalog reads this (a passive such as Hot Streak is what
+ * arms its proc); the spell picker reads the trackable subset below.
  */
-export function cooldownClassCatalog(cls: PlayerClass): readonly string[] {
-  const cached = cache.get(cls);
+export function cooldownClassAbilityIds(cls: PlayerClass): readonly string[] {
+  const cached = allCache.get(cls);
   if (cached) return cached;
   const out: string[] = [];
   const add = (id: string | undefined): void => {
-    if (id && cooldownTrackable(id) && !out.includes(id)) out.push(id);
+    if (id && ABILITIES[id] && !out.includes(id)) out.push(id);
   };
   const addEffect = (effect: TalentEffect | undefined): void => add(effect?.grant?.ability);
   for (const id of CLASSES[cls]?.abilities ?? []) add(id);
@@ -50,6 +52,19 @@ export function cooldownClassCatalog(cls: PlayerClass): readonly string[] {
   for (const row of rowTreeFor(cls) ?? []) {
     for (const option of row.options) addEffect(option.effect);
   }
+  allCache.set(cls, out);
+  return out;
+}
+
+/**
+ * Every trackable spell of a class, in a stable order: the authored kit first
+ * (spellbook order), then spec signatures, then talent and spec grants. Memoized
+ * per class; content is static for the session.
+ */
+export function cooldownClassCatalog(cls: PlayerClass): readonly string[] {
+  const cached = cache.get(cls);
+  if (cached) return cached;
+  const out = cooldownClassAbilityIds(cls).filter(cooldownTrackable);
   cache.set(cls, out);
   return out;
 }

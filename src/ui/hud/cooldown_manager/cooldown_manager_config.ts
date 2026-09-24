@@ -31,8 +31,11 @@ export const COOLDOWN_LINE_MAX = 12;
 export const COOLDOWN_GRID_MAX_SIDE = 12;
 export const COOLDOWN_PADDING_MAX = 12;
 
-/** Ability ids are snake_case content keys; anything else in a save is junk. */
-const ABILITY_ID_RE = /^[a-z0-9_]{1,64}$/;
+/** A tracked entry: a snake_case ability id, or an aura token (`aura:<id>`,
+ *  `kind:<kind>`, see cooldown_manager_auras.ts). Anything else is junk. */
+const ABILITY_ID_RE = /^(?:(?:aura|kind):)?[a-z0-9_]{1,64}$/;
+/** The highest stack count an aura alert can wait for. */
+export const COOLDOWN_ALERT_STACKS_MAX = 20;
 const GROUP_ID_RE = /^g[0-9]{1,4}$/;
 
 /** One floating group of buttons. */
@@ -79,6 +82,9 @@ export interface CooldownSpellConfig {
    *  ready. Additive only, like the Auras panel's Hotbar Glow: it can never
    *  suppress an authored class proc glow. */
   hotbarGlow: boolean;
+  /** Aura entries only: the stack count at which the aura counts as "up" (it
+   *  lights, pulses and chimes). 0 means as soon as it appears. */
+  alertStacks: number;
 }
 
 export type CooldownSpellPatch = Partial<CooldownSpellConfig>;
@@ -109,6 +115,7 @@ export function defaultCooldownSpellConfig(): CooldownSpellConfig {
     glowWhenReady: true,
     onlyWhenReady: false,
     hotbarGlow: false,
+    alertStacks: 0,
   };
 }
 
@@ -315,6 +322,7 @@ export function sanitizeCooldownSpellConfig(raw: unknown): CooldownSpellConfig {
     glowWhenReady: boolOr(value.glowWhenReady, fallback.glowWhenReady),
     onlyWhenReady: boolOr(value.onlyWhenReady, fallback.onlyWhenReady),
     hotbarGlow: boolOr(value.hotbarGlow, fallback.hotbarGlow),
+    alertStacks: intIn(value.alertStacks, 0, COOLDOWN_ALERT_STACKS_MAX, fallback.alertStacks),
   };
 }
 

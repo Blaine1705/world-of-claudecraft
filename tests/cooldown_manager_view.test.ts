@@ -248,6 +248,93 @@ describe('cooldown manager view over a live Sim (feral druid)', () => {
   });
 });
 
+describe('cooldown manager view: aura entries (engines, procs, buffs)', () => {
+  const OLD_BLOOD = { match: 'kind' as const, value: 'old_blood', iconKey: 'aura:old_blood' };
+
+  it('tracks the Old Blood engine: stacks, a stack goal that lights and chimes, and dims when gone', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([
+      {
+        id: 'kind:old_blood',
+        config: { ...defaultCooldownSpellConfig(), alertStacks: 3 },
+        cue: CUE,
+        aura: OLD_BLOOD,
+      },
+      spell('claw'),
+    ]);
+    const empty = view.tick(worldOf(sim), OPEN).buttons[0];
+    expect(empty).toMatchObject({
+      iconKey: 'aura:old_blood',
+      ready: false,
+      unusable: true,
+      count: '',
+    });
+
+    sim.player.auras.push(oldBlood(sim, 2));
+    const two = view.tick(worldOf(sim), OPEN);
+    expect(two.buttons[0]).toMatchObject({
+      ready: false,
+      unusable: false,
+      count: '2',
+      proc: false,
+    });
+    expect(two.cues).toEqual([]);
+    // The spell beside it still reads through the action bar's view.
+    expect(two.buttons[1]).toMatchObject({ abilityId: 'claw', ready: true });
+
+    const blood = sim.player.auras.find((aura) => aura.kind === 'old_blood');
+    if (blood) blood.stacks = 3;
+    const full = view.tick(worldOf(sim), OPEN);
+    expect(full.buttons[0]).toMatchObject({
+      ready: true,
+      proc: true,
+      glow: true,
+      count: '3',
+      cdText: '30',
+    });
+    expect(full.cues).toEqual([{ soundId: CUE, volume: 0.7 }]);
+
+    sim.player.auras = sim.player.auras.filter((aura) => aura.kind !== 'old_blood');
+    expect(view.tick(worldOf(sim), OPEN).buttons[0]).toMatchObject({
+      ready: false,
+      unusable: true,
+    });
+  });
+
+  it('with no stack goal, lights and chimes the moment the aura appears', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([
+      { id: 'kind:old_blood', config: defaultCooldownSpellConfig(), cue: CUE, aura: OLD_BLOOD },
+    ]);
+    view.tick(worldOf(sim), OPEN);
+    sim.player.auras.push(oldBlood(sim, 1));
+    const up = view.tick(worldOf(sim), OPEN);
+    expect(up.buttons[0]).toMatchObject({ ready: true, proc: false, count: '' });
+    expect(up.cues).toHaveLength(1);
+  });
+
+  it('hides an only-while-active aura until it is up, and never lights the hotbar', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([
+      {
+        id: 'kind:old_blood',
+        config: { ...defaultCooldownSpellConfig(), onlyWhenReady: true, hotbarGlow: true },
+        cue: null,
+        aura: OLD_BLOOD,
+      },
+    ]);
+    expect(view.tick(worldOf(sim), OPEN).buttons[0].visible).toBe(false);
+    sim.player.auras.push(oldBlood(sim, 1));
+    expect(view.tick(worldOf(sim), OPEN).buttons[0]).toMatchObject({
+      visible: true,
+      hotbarGlow: false,
+    });
+  });
+});
+
 describe('cooldown manager view over a ClientWorld-shaped mirror', () => {
   it('reads the same structural snapshot an online mirror supplies', () => {
     const def = ABILITIES.ferocious_bite;
