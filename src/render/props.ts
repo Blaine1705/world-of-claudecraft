@@ -64,6 +64,7 @@ import {
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
 import { mergeBandDepth, mergeStaticMeshes, normalizedStaticGeometry } from './static_merge';
+import { buildScheduledShips, type FerryViewSource } from './transport_ferry_ships';
 import {
   buildTransportShipView,
   isTransportShipKey,
@@ -1328,7 +1329,17 @@ function buildDelveEmbers(
 // `delveLabel` resolves a delve id to its localized display name for the carved
 // entrance sign. Passed in by renderer.ts (the only render-side i18n surface) so
 // props.ts itself stays string-table-free; falls back to the id if absent.
-export function buildProps(seed: number, delveLabel?: (delveId: string) => string): PropsResult {
+/** What buildProps reads from the world: its seed, and the ferry timetable the
+ *  scheduled ships follow (an IWorld satisfies it). */
+export interface PropsWorld extends FerryViewSource {
+  cfg: { seed: number };
+}
+
+export function buildProps(
+  world: PropsWorld,
+  delveLabel?: (delveId: string) => string,
+): PropsResult {
+  const seed = world.cfg.seed;
   const group = new THREE.Group();
   const flames: THREE.Mesh[] = [];
   // Meshes the far-cell bake must never absorb because the renderer animates
@@ -1643,6 +1654,17 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       registerHideable(g, circleFootprint(d.x, d.z, d.r, baseY + (d.h ?? 4)));
     }
   }
+  // The scheduled ferry (render/transport_ferry_ships.ts): the same ship model,
+  // posed every frame from the world's timetable; built-in world only.
+  const scheduledShips = builtInWorld
+    ? buildScheduledShips(world, (ship) => {
+        group.add(ship.group);
+        ship.group.traverse((o) => {
+          if ((o as THREE.Mesh).isMesh) keepFromMerge.add(o);
+        });
+        transportShips.push(ship);
+      })
+    : null;
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
   activeContent.props.stalls.forEach((s, i) => {
@@ -2558,6 +2580,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       reducedMotion = false,
     ): void {
       const fogFarSq = fogFar * fogFar;
+      scheduledShips?.sync(dt);
       for (let i = 0; i < transportShips.length; i++) {
         transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
       }

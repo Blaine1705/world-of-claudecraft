@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  advanceShipClock,
+  newShipClockState,
+  SHIP_CLOCK_SNAP_S,
   type ShipLocalBox,
   segmentHitsShipBox,
   TRANSPORT_SHIP_ANIMATE_RANGE,
@@ -97,5 +100,38 @@ describe('segmentHitsShipBox', () => {
     expect(segmentHitsShipBox(0, 10, 3, 0, 20, 30, sail)).toBe(true);
     expect(segmentHitsShipBox(0, 9, 3, 0, 9, 3, sail)).toBe(true);
     expect(segmentHitsShipBox(0, 20, 3, 0, 20, 3, sail)).toBe(false);
+  });
+});
+
+describe('advanceShipClock: the drawn clock of a scheduled ship', () => {
+  it('adopts the first reading, then glides each new tick in over its own step', () => {
+    const s = newShipClockState();
+    expect(advanceShipClock(s, 10, 0.016)).toBe(10);
+    // a new tick 0.05 s later: halfway after 0.025 s of frames
+    expect(advanceShipClock(s, 10.05, 0.025)).toBeCloseTo(10.025, 9);
+    expect(advanceShipClock(s, 10.05, 0.025)).toBeCloseTo(10.05, 9);
+    // never overshoots the newest reading
+    expect(advanceShipClock(s, 10.05, 0.5)).toBeCloseTo(10.05, 9);
+  });
+
+  it('starts every glide from what is on screen, so a frame never jumps', () => {
+    const s = newShipClockState();
+    advanceShipClock(s, 0, 0);
+    let shown = 0;
+    for (let tick = 1; tick <= 40; tick++) {
+      for (let f = 0; f < 3; f++) {
+        const next = advanceShipClock(s, tick * 0.05, 1 / 60);
+        expect(next - shown).toBeLessThanOrEqual(0.05 + 1e-9);
+        expect(next).toBeGreaterThanOrEqual(shown);
+        shown = next;
+      }
+    }
+  });
+
+  it('adopts a skip outright (a dev jump, a reconnect)', () => {
+    const s = newShipClockState();
+    advanceShipClock(s, 5, 0.016);
+    expect(advanceShipClock(s, 5 + SHIP_CLOCK_SNAP_S + 1, 0.016)).toBe(5 + SHIP_CLOCK_SNAP_S + 1);
+    expect(advanceShipClock(s, 1, 0.016)).toBe(1);
   });
 });

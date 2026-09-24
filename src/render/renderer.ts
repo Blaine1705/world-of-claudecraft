@@ -32,6 +32,7 @@ import {
   zoneAt,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
+import { isFerryPassengerAtSea } from '../sim/ferry_passenger';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import {
@@ -667,6 +668,7 @@ import {
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
 import { createRendererGlContext } from './renderer_gl_context';
+import { collectCasters, sleep } from './renderer_helpers';
 import type {
   RendererFrameStats,
   RendererPerfStats,
@@ -1269,16 +1271,6 @@ export interface EntityView extends RickshawMountViewState {
   tiltSampleT: number;
   tiltSample: EntityGroundSample;
   groundSample: EntityGroundSample;
-}
-
-function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
-  root.traverse((o) => {
-    if ((o as THREE.Mesh).isMesh && (o as THREE.Mesh).castShadow) into.push(o);
-  });
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
 }
 
 export interface RendererCreateOptions extends QuestObjectGateOptions, QuestGuidanceOptions {
@@ -2520,7 +2512,7 @@ export class Renderer {
     setRenderCategory(this.impactSite.group, 'props');
     this.scene.add(this.impactSite.group);
     this.scene.add(this.impactSite.light);
-    const props = buildProps(this.sim.cfg.seed, (delveId) =>
+    const props = buildProps(this.sim, (delveId) =>
       tEntity({ kind: 'delve', id: delveId, field: 'name' }),
     );
     setRenderCategory(props.group, 'props');
@@ -10080,7 +10072,9 @@ export class Renderer {
         // Per-frame visibility follows the create/destroy hysteresis above so
         // rigs at the draw edge do not flicker. The object branch below may
         // still re-hide loot.
-        v.group.visible = raidEncounterViewVisibleDuringCompile(e, v.compilePending);
+        // a ferry passenger on the hidden at-sea leg is not drawn (nor the ship)
+        v.group.visible =
+          raidEncounterViewVisibleDuringCompile(e, v.compilePending) && !isFerryPassengerAtSea(e);
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
         // server-side resurrect-range checks, and other ghosts still see it. The

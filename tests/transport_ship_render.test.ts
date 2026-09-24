@@ -6,6 +6,7 @@ import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import { freezeStaticMatrices } from '../src/render/static_matrix';
+import { buildScheduledShips } from '../src/render/transport_ferry_ships';
 import {
   buildTransportShipView,
   isTransportShipKey,
@@ -15,7 +16,16 @@ import {
   transportShipPrewarmParts,
 } from '../src/render/transport_ship';
 import { TRANSPORT_SHIP_LOD_DISTANCES } from '../src/render/transport_ship_core';
-import { TRANSPORT_SHIP_HULLS } from '../src/sim/content/transport_ships';
+import {
+  EASTBROOK_WICKHARBOR_FERRY,
+  TRANSPORT_SHIP_HULLS,
+} from '../src/sim/content/transport_ships';
+import {
+  emptyTransportFerryView,
+  type TransportPose,
+  transportFerryViewAt,
+  transportShipPoseAt,
+} from '../src/sim/transport_schedule';
 
 // The moored transport ship view (src/render/transport_ship.ts) over the shipped
 // Eastbrook ferry GLB: the static merge (a handful of draws per level), the live
@@ -238,5 +248,60 @@ describe('transport ship view', () => {
     view2.update(X + 20, BASE_Y + 10, Z, X, BASE_Y + 8, Z, 2000, 0.05, false);
     for (const m of meshesUnder(mast2))
       expect((m.material as THREE.Material).transparent).toBe(false);
+  });
+});
+
+describe('the scheduled ferry on screen (transport_ferry_ships.ts)', () => {
+  const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+  const view = emptyTransportFerryView(ROUTE);
+  const source = { ferryView: () => view };
+  function at(clock: number) {
+    transportFerryViewAt(ROUTE, clock, BASE_Y, false, view);
+  }
+
+  it('poses the ship from the timetable, frozen props tree and all, and hides it at sea', () => {
+    const adopted: TransportShipView[] = [];
+    const ships = buildScheduledShips(source, (v) => adopted.push(v));
+    expect(adopted).toHaveLength(1);
+    const ship = adopted[0];
+    // the renderer freezes the whole props tree after build
+    freezeStaticMatrices(ship.group);
+    const want: TransportPose = { x: 0, z: 0, rot: 0 };
+    // mid-departure: step the world clock at 20 Hz and let the drawn clock
+    // settle onto the newest tick
+    for (let c = 62; c <= 64; c += 0.05) {
+      at(c);
+      ships.sync(0.05);
+    }
+    ships.sync(0.05);
+    transportShipPoseAt(ROUTE, view.clock, want);
+    ship.group.updateMatrixWorld(true);
+    const e = ship.group.matrixWorld.elements;
+    expect(e[12]).toBeCloseTo(want.x, 3);
+    expect(e[14]).toBeCloseTo(want.z, 3);
+    expect(ship.group.rotation.y).toBeCloseTo(want.rot, 6);
+    ship.update(want.x + 20, BASE_Y + 10, want.z, want.x, BASE_Y + 8, want.z, 2000, 0.05, false);
+    expect(ship.group.visible).toBe(true);
+    // the at-sea leg: a skip onto the hidden leg adopts the clock outright
+    at(ROUTE.timings.docked + ROUTE.timings.departing + 3);
+    ships.sync(0.05);
+    ship.update(want.x + 20, BASE_Y + 10, want.z, want.x, BASE_Y + 8, want.z, 2000, 0.05, false);
+    expect(ship.group.visible).toBe(false);
+    // docked at Wickharbor
+    const wick = ROUTE.berths[1];
+    at(ROUTE.timings.docked * 2 + 10);
+    ships.sync(0.05);
+    ship.group.updateMatrixWorld(true);
+    expect(ship.group.matrixWorld.elements[12]).toBeCloseTo(wick.x, 3);
+    expect(ship.group.matrixWorld.elements[14]).toBeCloseTo(wick.z, 3);
+    ship.update(wick.x + 20, BASE_Y + 10, wick.z, wick.x, BASE_Y + 8, wick.z, 2000, 0.05, false);
+    expect(ship.group.visible).toBe(true);
+  });
+
+  it('a world with no ferry leaves the ship where it was built', () => {
+    const adopted: TransportShipView[] = [];
+    const ships = buildScheduledShips({ ferryView: () => null }, (v) => adopted.push(v));
+    ships.sync(0.05);
+    expect(adopted[0].group.position.x).toBeCloseTo(ROUTE.berths[0].x, 6);
   });
 });

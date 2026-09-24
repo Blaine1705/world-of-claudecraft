@@ -328,6 +328,13 @@ export interface TransportShipView {
   group: THREE.Group;
   /** The level of detail drawn last frame (-1 before the first update). */
   readonly lod: number;
+  /**
+   * Move a SCHEDULED ship (the ferry's timetable, props.ts) to a new pose, or
+   * hide it (the at-sea leg). The props tree is matrix-frozen after build, so
+   * this recomposes the ship root's own matrix; its children follow through
+   * the scene's world-matrix pass. A moored ship never calls it.
+   */
+  setPose(x: number, z: number, rot: number, shown: boolean): void;
   update(
     camX: number,
     camY: number,
@@ -354,6 +361,9 @@ export function buildTransportShipView(
   group.position.set(placement.x, placement.baseY, placement.z);
   group.rotation.y = placement.rot;
   group.add(root);
+  // the live pose (a scheduled ship moves it through setPose)
+  const pose = { x: placement.x, z: placement.z, rot: placement.rot, baseY: placement.baseY };
+  let hidden = false;
 
   const lods = LOD_NAMES.map((name) => root.getObjectByName(name) ?? null);
   lods.forEach((lod, i) => {
@@ -428,8 +438,22 @@ export function buildTransportShipView(
     get lod() {
       return current;
     },
+    setPose(x, z, rot, shown) {
+      hidden = !shown;
+      if (pose.x === x && pose.z === z && pose.rot === rot) return;
+      pose.x = x;
+      pose.z = z;
+      pose.rot = rot;
+      group.position.set(x, pose.baseY, z);
+      group.rotation.y = rot;
+      group.updateMatrix();
+    },
     update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion) {
-      const distance = Math.hypot(camX - placement.x, camZ - placement.z);
+      if (hidden) {
+        group.visible = false;
+        return;
+      }
+      const distance = Math.hypot(camX - pose.x, camZ - pose.z);
       if (!transportShipVisible(distance, fogFar)) {
         group.visible = false;
         return;
@@ -450,28 +474,10 @@ export function buildTransportShipView(
       if (sails.length === 0) return;
       if (lod === 0) {
         for (let i = 0; i < sails.length; i++) {
-          prefetchOccluderFadeWithin(sails[i].mats, placement.x, placement.z, camX, camZ);
+          prefetchOccluderFadeWithin(sails[i].mats, pose.x, pose.z, camX, camZ);
         }
-        toShipLocal(
-          eyeX,
-          eyeY,
-          eyeZ,
-          placement.x,
-          placement.baseY,
-          placement.z,
-          placement.rot,
-          eye,
-        );
-        toShipLocal(
-          camX,
-          camY,
-          camZ,
-          placement.x,
-          placement.baseY,
-          placement.z,
-          placement.rot,
-          cam,
-        );
+        toShipLocal(eyeX, eyeY, eyeZ, pose.x, pose.baseY, pose.z, pose.rot, eye);
+        toShipLocal(camX, camY, camZ, pose.x, pose.baseY, pose.z, pose.rot, cam);
       }
       for (let i = 0; i < sails.length; i++) {
         const sail = sails[i];

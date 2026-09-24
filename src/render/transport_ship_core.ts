@@ -130,3 +130,53 @@ export function segmentHitsShipBox(
     clipSlab(az, bz - az, box.minZ, box.maxZ)
   );
 }
+
+// ---------------------------------------------------------------------------
+// The scheduled ship's drawn clock
+// ---------------------------------------------------------------------------
+
+/** A world clock jump larger than this (seconds) is a skip (a dev jump, a
+ *  reconnect), adopted outright instead of glided through. */
+export const SHIP_CLOCK_SNAP_S = 2;
+
+/** The schedule clock the ship is drawn at, smoothed between world ticks. */
+export interface ShipClockState {
+  shown: number;
+  from: number;
+  to: number;
+  since: number;
+  ready: boolean;
+}
+
+export function newShipClockState(): ShipClockState {
+  return { shown: 0, from: 0, to: 0, since: 0, ready: false };
+}
+
+/**
+ * Advance the drawn clock one frame toward the world's `worldClock` (which
+ * steps once per sim tick or snapshot). Each new reading starts a glide from
+ * what is on screen to it, spread over the reading's own step of real time:
+ * the drawn ship trails the newest tick by about one step, the same lag the
+ * entity interpolation shows its passengers with, so a body on deck and the
+ * deck under it move together. Allocation free; returns the clock to draw.
+ */
+export function advanceShipClock(s: ShipClockState, worldClock: number, dt: number): number {
+  if (!s.ready || Math.abs(worldClock - s.shown) > SHIP_CLOCK_SNAP_S) {
+    s.shown = worldClock;
+    s.from = worldClock;
+    s.to = worldClock;
+    s.since = 0;
+    s.ready = true;
+    return s.shown;
+  }
+  if (worldClock !== s.to) {
+    s.from = s.shown;
+    s.to = worldClock;
+    s.since = 0;
+  }
+  s.since += Math.max(0, dt);
+  const span = s.to - s.from;
+  const f = span > 1e-6 ? Math.min(1, s.since / span) : 1;
+  s.shown = s.from + span * f;
+  return s.shown;
+}
