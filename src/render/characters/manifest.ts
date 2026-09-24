@@ -74,6 +74,10 @@ export interface ClipMap {
   prowlWalk?: string;
   walk: string;
   run: string;
+  /** Native braced rush, selected by a cast window plus displayed movement. */
+  rush?: string;
+  /** Successful Onrush stop, separate from its looping travel pose. */
+  rushArrival?: string;
   /** one-shot swing clips, rotated per attack */
   attack: string[];
   /** Optional per-ability swing or cast-gesture override. */
@@ -1473,7 +1477,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
     // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
     // instead of pointed at an unused clip.
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`, `${PLAYERS}/warrior_ability_anims.glb`],
+    animUrls: [
+      `${PLAYERS}/knight_hit_variety_anims.glb`,
+      `${PLAYERS}/warrior_ability_anims.glb`,
+      `${PLAYERS}/warrior_fury_anims.glb`,
+      `${PLAYERS}/warrior_contact_anims.glb`,
+    ],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
@@ -1481,33 +1490,51 @@ export const VISUALS: Record<string, VisualDef> = {
         twohand: '2H_Melee_Attack_Chop',
         dualwield: 'Dualwield_Melee_Attack_Chop',
       },
+      castByAbility: { bladestorm: 'Warrior_Bladestorm_Loop' },
+      rush: 'Warrior_Rush_Loop',
+      rushArrival: 'Warrior_Onrush_Arrival',
+      castTimeScaleByAbility: { bladestorm: 1 },
+      attackTimeScaleByAbility: { heroic_leap: 1 },
       attackByAbility: {
-        mortal_strike: '2H_Melee_Attack_Chop',
-        execute: '2H_Melee_Attack_Chop',
-        slam: '2H_Melee_Attack_Chop',
-        red_harvest: '2H_Melee_Attack_Chop',
-        breachmaker: '2H_Melee_Attack_Chop',
-        // Shieldcrack slams the SHIELD (offhand arm), not the sword: the
-        // synthesized bash (scripts/_add_shield_bash_anim.mjs) drives the
-        // left arm carrying the handslot.l shield; the weapon hand stays back.
-        shield_slam: 'Shield_Bash',
-        raging_gale: 'Dualwield_Melee_Attack_Chop',
-        bloodthirst: 'Dualwield_Melee_Attack_Chop',
-        // Reaping Arc and Revenge hit everything in the frontal arc: the
-        // synthesized flat reap (scripts/_add_sweep_slice_anim.mjs), not the
-        // top-to-bottom chop (owner: "sideways sword sweep").
-        cleave: '1H_Melee_Attack_Slice_Horizontal',
-        revenge: '1H_Melee_Attack_Slice_Horizontal',
-        thunder_clap: '1H_Melee_Attack_Chop',
-        faultline: '1H_Melee_Attack_Chop',
-        heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
-        overpower: '1H_Melee_Attack_Slice_Diagonal',
-        hamstring: '1H_Melee_Attack_Slice_Diagonal',
-        sanguine_aura: 'Spellcast_Raise',
-        raised_guard: 'Block',
-        // Jawcrack is a bare-fist interrupt: the synthesized punch
-        // (scripts/_add_pummel_punch_anim.mjs), not a weapon swing.
-        pummel: 'Punch_A',
+        charge: 'Warrior_Rush_Loop',
+        intervene: 'Warrior_Rush_Loop',
+        mortal_strike: 'Warrior_Maiming_Strike',
+        execute: 'Warrior_Early_Grave',
+        slam: 'Warrior_Brute_Swing',
+        red_harvest: 'Fury_Red_Harvest',
+        breachmaker: 'Warrior_Breachmaker',
+        // Native shield drive with a planted lower body and a held contact.
+        // scripts/build_warrior_contact_anims.mjs bakes foot locking offline.
+        shield_slam: 'Warrior_Shieldcrack',
+        raging_gale: 'Fury_Twinstrike',
+        bloodthirst: 'Warrior_Bloodletting',
+        battle_shout: 'Warrior_Iron_Bellow',
+        demoralizing_shout: 'Warrior_Direhowl',
+        emboldening_roar: 'Warrior_Emboldening_Roar',
+        defiant_bellow: 'Warrior_Defiant_Bellow',
+        rallying_cry: 'Warrior_Valor_Roar',
+        intimidating_shout: 'Warrior_Intimidating_Shout',
+        piercing_howl: 'Warrior_Piercing_Howl',
+        // Reaping Arc turns through all surrounding enemies; Revenge is frontal.
+        cleave: 'Warrior_Reaping_Arc',
+        revenge: 'Warrior_Revenge',
+        thunder_clap: 'Warrior_Quaking_Blow',
+        faultline: 'Warrior_Faultline',
+        heroic_strike: 'Warrior_Reaver_Strike',
+        overpower: 'Warrior_Redhand',
+        hamstring: 'Warrior_Hobbling_Cut',
+        sunder_armor: 'Warrior_Armor_Shear',
+        storm_bolt: 'Warrior_Storm_Bolt',
+        sanguine_aura: 'Warrior_Sanguine_Aura',
+        sweeping_strikes: 'Warrior_Widening_Arc',
+        battle_stance: 'Warrior_Battle_Stance',
+        defensive_stance: 'Warrior_Guarded_Stance',
+        berserker_stance: 'Warrior_Berserker_Stance',
+        raised_guard: 'Warrior_Raised_Guard',
+        iron_resolve: 'Warrior_Iron_Resolve',
+        // Jawcrack drives the held weapon's guard into the interrupt:
+        // planted feet and a compact contact hold preserve both grips.
+        pummel: 'Warrior_Jawcrack',
         // Vaulting Charge is a position-targeted jump, not a swing: the bespoke
         // pose-sample-and-blend clip (coil, airborne, driven two-hand slam on
         // landing). It carries no castFx and resolves no target entity, so it
@@ -1517,32 +1544,20 @@ export const VISUALS: Record<string, VisualDef> = {
         // painter.ts's non-contact 'selfCast' branch); with no entry it plays
         // nothing at all on the body.
         heroic_leap: 'Warrior_Heroic_Leap',
-        // Victor's Surge is a real weapon strike (weaponStrike effect, not a
-        // pure buff), so it lands through the ordinary damage-event attack
-        // trigger like every entry above it: a confident decisive swing, the
-        // same clip heroic_strike/overpower/hamstring already use.
-        victory_rush: '1H_Melee_Attack_Slice_Diagonal',
-        // Seething Fury and Recklessness are both a defiant roar of rage: no
-        // castFx, no target, so (like Vaulting Charge above) the existing Cheer
-        // gesture only shows up once an attackByAbility entry exists for it.
-        berserker_rage: 'Cheer',
-        recklessness: 'Cheer',
-        // Die by the Sword braces behind the blade: the existing raised_guard
-        // donor (Block) reads the same defensive beat, reached the same way.
-        die_by_sword: 'Block',
-        // Avatar's colossus transformation gets the raised-arm flourish
-        // (the longest clip on the rig, fits a dramatic moment), same path.
-        avatar: 'Spellcast_Raise',
-        // Piercing Howl's own description calls it "a piercing shout" even
-        // though it carries no castFx (unlike the six castFx:'shout'
-        // abilities below, which the painter's 'shout' case always plays as
-        // the Cheer EMOTE and never reaches attackByAbility at all - adding
-        // an entry for any of those would be dead code, so this batch leaves
-        // them alone). Piercing Howl's own selfCast cue DOES reach the same
-        // gesture path Vaulting Charge/berserker_rage/etc use above, and the
-        // painter's shout-emote call right after it is guarded on
-        // isMidOneShot, so it does not stomp this gesture.
-        piercing_howl: 'Spellcast_Raise',
+        // A decisive cut followed by an upright, confident recovery.
+        victory_rush: 'Warrior_Victory_Rush',
+        // Native resource ceremonies: inward clench, outward pressure release,
+        // and an aggressive opening of both arms. Each recovers inside a GCD.
+        taunt: 'Warrior_Goad',
+        furious_mending: 'Warrior_Furious_Mending',
+        whirlwind: 'Warrior_Bladed_Gyre',
+        bloodrage: 'Warrior_Blood_Toll',
+        berserker_rage: 'Warrior_Seething_Fury',
+        recklessness: 'Warrior_Recklessness',
+        // The actual blade supplies its distinct defensive presentation.
+        die_by_sword: 'Warrior_Sword_Guard',
+        // A planted rise carries Avatar's physical transformation.
+        avatar: 'Warrior_Avatar',
       },
     },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
