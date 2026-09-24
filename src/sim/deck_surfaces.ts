@@ -7,6 +7,7 @@
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { eastbrookDeckSurface } from './eastbrook_harbor';
 import { galeDeckSurface } from './gale_harbor';
+import { gliderWharfSurface } from './glider_wharf_layout';
 import { reachDeckSurface } from './reach_decks';
 import type { ZonePropsDef } from './types';
 
@@ -24,6 +25,8 @@ export function dockSurfaceHeight(
   surface = Math.max(surface, eastbrookDeckSurface(x, z, terrainAt, waterLevel));
   // ...and the Palmreach's river bridges and lagoon decks, the same idiom
   surface = Math.max(surface, reachDeckSurface(x, z, terrainAt, waterLevel));
+  // ...and Zephyr's launch wharf on the crest of the Shear, the same idiom
+  surface = Math.max(surface, gliderWharfSurface(x, z, terrainAt, waterLevel));
   for (const dock of docks) {
     const local = dockLocalPoint(dock, x, z);
     if (dockSectionAtLocal(local.x, local.z) < 0) continue;

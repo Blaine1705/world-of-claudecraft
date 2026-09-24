@@ -847,9 +847,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // plus the release's 28 Nythraxis gap-fill and Bramblehide item definitions
     // (14 base pieces + their 14 auto-generated heroic variants) = 1,299. The
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
-    // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301. The
-    // trinket slot's 18 trinkets (src/sim/content/trinkets.ts) bring it to 1,319.
-    expect(Object.keys(ITEMS)).toHaveLength(1319);
+    // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
+    // The wq-reputation merge's 15 faction quartermaster items: 1,320.
+    // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
+    // treasure_casket): 1,323. the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1,324. the trinket slot's 18 trinkets (PR 4173): 1,342.
+    expect(Object.keys(ITEMS)).toHaveLength(1342);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1004,10 +1006,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04 + roots-bramblehide-icons-2026-09-07)
     // = 1,281. The OSSBrain PR #3781 reconcile's two disjoint reins owners
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283. The
-    // trinket-slot-icons-2026-09-23 batch owns the 18 trinkets: 1,301.
-    expect(new Set(currentOwnerIds).size).toBe(1301);
-    expect(shippingIds).toHaveLength(1301);
-    expect(Object.keys(ITEMS)).toHaveLength(1319);
+    // world-quest branch's two batches (four quest-object icons) join at the
+    // release/v0.43.0 merge: 1,287.
+    // The faction quartermaster icons (faction-vendor-icons-2026-09-16, 15
+    // SVG compositions) join at the wq-reputation merge: 1,302.
+    // The Emissary's Cache chest (feature/weekly-quests): 1,303. The Clue
+    // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
+    // 1,305. the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1,306. the trinket slot's 18 trinkets (PR 4173): 1,324.
+    expect(new Set(currentOwnerIds).size).toBe(1324);
+    expect(shippingIds).toHaveLength(1324);
+    expect(Object.keys(ITEMS)).toHaveLength(1342);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1030,16 +1038,68 @@ describe('item-art consistency accepted-art provenance', () => {
       )
       .flatMap(({ itemIds }) => itemIds);
     expect(releaseBatchIds).toHaveLength(25);
+    // The world-quest branch's two batches are additive beyond the dated chain
+    // as well (release/v0.43.0 merge into feature/world-quests).
+    const worldQuestBatchIds = mapping.generatedBatches
+      .filter(
+        ({ batchId }) =>
+          typeof batchId === 'string' &&
+          [
+            'world-quest-puzzle-activators-2026-09-01',
+            'world-quest-freight-icons-2026-09-01',
+          ].includes(batchId),
+      )
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(worldQuestBatchIds)).toEqual([
+      'confection_game_box',
+      'eastbrook_freight_crate',
+      'eastbrook_freight_wagon',
+      'leyline_cache',
+    ]);
+    // The wq-reputation merge's faction quartermaster stock, one SVG batch
+    // (faction-vendor-icons-2026-09-16), additive beyond the chain the same way.
+    const factionVendorBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(factionVendorBatchIds)).toEqual([
+      'artificers_welding_cowl',
+      'automaton_cog_ring',
+      'champion_dawn_medallion',
+      'champion_forged_loop',
+      'champion_rift_band',
+      'clockwork_tinkers_pack',
+      'dawnkeeper_consecrated_mace',
+      'forgemaster_crag_cleaver',
+      'order_prayer_beads',
+      'rift_surveyors_satchel',
+      'rift_watchers_band',
+      'riftwalkers_tunic',
+      'riftwarden_voidblade',
+      'templar_dawn_shield',
+      'vestments_of_the_acolyte',
+    ]);
+    // The Clue Scroll items, one SVG batch (clue-scroll-icons-2026-09-17),
+    // additive beyond the chain the same way.
+    const clueScrollBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(clueScrollBatchIds)).toEqual(['clue_scroll', 'treasure_casket']);
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
     // this whole historical chain too, the same way the Field Kit is.
     expect(
       sorted([
         ...oldPassIds,
         ...releaseBatchIds,
+        ...worldQuestBatchIds,
+        ...factionVendorBatchIds,
+        ...clueScrollBatchIds,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
         ...trinketIconIds(mapping.generatedBatches),
+        // The weekly emissary's cache chest, additive the same way.
+        'emissary_cache',
+        'reins_avian_strider',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1191,15 +1251,22 @@ describe('item-art consistency accepted-art provenance', () => {
     ).toBeUndefined();
     // The completion wave consolidates 68 interim per-entry/SVG owners into
     // one generated batch. The surviving ordinary-art cohort stays explicit.
-    expect(mapping.entries).toHaveLength(43);
+    // 43 -> 44 at the weekly emissary: the Emissary's Cache chest; 45 with
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge).
+    expect(mapping.entries).toHaveLength(45);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
     // (nythraxis-gap-weapon-renders-2026-09-04, roots-bramblehide-icons-2026-09-07) = 29.
     // OSSBrain PR #3781 reconcile adds its own 2 disjoint batches
     // (goblin-rocket-sled-icon-2026-08-12, rallycart-rxt-icon-2026-08-20) = 31.
-    // The trinket slot's icon batch (trinket-slot-icons-2026-09-23) = 32.
-    expect(mapping.generatedBatches).toHaveLength(32);
+    // The world-quest branch adds its 2 batches (world-quest-puzzle-activators and
+    // world-quest-freight-icons, 2026-09-01) at the release/v0.43.0 merge = 33.
+    // The wq-reputation merge adds the faction quartermaster icons' batch
+    // (faction-vendor-icons-2026-09-16) = 34. The Clue Scroll items add their
+    // batch (clue-scroll-icons-2026-09-17) = 35. The trinket slot's icon batch
+    // (trinket-slot-icons-2026-09-23) = 36.
+    expect(mapping.generatedBatches).toHaveLength(36);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1261,14 +1328,17 @@ describe('item-art consistency accepted-art provenance', () => {
     // (+25) = 753. OSSBrain PR #3781 reconcile adds its own two disjoint
     // batches (goblin-rocket-sled-icon-2026-08-12,
     // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755. The
-    // trinket-slot-icons-2026-09-23 batch adds its 18 trinkets: 773.
-    expect(priorGeneratedIds).toHaveLength(773);
+    // world-quest branch's two batches add four ids at the release/v0.43.0
+    // merge: 759. The faction quartermaster batch adds 15 at the
+    // wq-reputation merge: 774. The Clue Scroll batch adds 2: 776. The
+    // trinket-slot-icons-2026-09-23 batch adds its 18 trinkets: 794.
+    expect(priorGeneratedIds).toHaveLength(794);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1301);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1301);
+    expect(allCurrentOwnerIds).toHaveLength(1324);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1324);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1276,8 +1346,14 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      entries: 43,
-      priorGenerated: 773,
+      // 44 -> 45 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0
+      // base merge), an entries row beside the Emissary's Cache chest.
+      entries: 45,
+      // 755 + the world-quest branch's four batch ids (release/v0.43.0 merge)
+      // + the 15 faction quartermaster ids (wq-reputation merge) = 774
+      // + the 2 Clue Scroll ids = 776.
+      // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 794.
+      priorGenerated: 794,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1324,7 +1400,8 @@ describe('item-art consistency accepted-art provenance', () => {
           (id) =>
             !completionIdSet.has(id) &&
             id !== 'reins_goblin_rocket_sled' &&
-            id !== 'reins_rallycart_rxt',
+            id !== 'reins_rallycart_rxt' &&
+            id !== 'reins_avian_strider',
         ),
         ...(completionBatch?.itemIds ?? []),
         ...(crucibleBatch?.itemIds ?? []),
@@ -1337,12 +1414,31 @@ describe('item-art consistency accepted-art provenance', () => {
       sorted([
         ...datedMasterwroughtVerdict.visualVerdict.passIds,
         ...releaseBatchIdsForCatalog,
+        // The world-quest branch's two batches (release/v0.43.0 merge).
+        ...mapping.generatedBatches
+          .filter(
+            ({ batchId }) =>
+              typeof batchId === 'string' &&
+              [
+                'world-quest-puzzle-activators-2026-09-01',
+                'world-quest-freight-icons-2026-09-01',
+                // The faction quartermaster stock (wq-reputation merge).
+                'faction-vendor-icons-2026-09-16',
+                // The Clue Scroll items.
+                'clue-scroll-icons-2026-09-17',
+              ].includes(batchId),
+          )
+          .flatMap(({ itemIds }) => itemIds),
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
         ...trinketIconIds(mapping.generatedBatches),
+        // The weekly emissary's cache chest (feature/weekly-quests), additive
+        // beyond the historical chain like the Field Kit.
+        'emissary_cache',
+        'reins_avian_strider',
       ]),
-      'the dated catalog plus the release batches, the Field Kit, the OSSBrain reins icons, and the trinket icons is the full current catalog',
+      'the dated catalog plus the release batches, the world-quest, faction-vendor and clue-scroll batches, the Field Kit, the OSSBrain reins icons, the Emissary Cache and the trinket icons is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1470,10 +1566,13 @@ describe('item-art consistency accepted-art provenance', () => {
     const violations: string[] = [];
     // Matches the mapping-owner sum above: 43 entries + 755 prior-generated
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
-    // batch ids + 46 Crucible-professions batch ids = 1283, + 18 trinkets = 1301.
-    if (ownerIds.length !== 1301)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1301`);
-    if (fileIds.length !== 1301) violations.push(`shipping WebP count: ${fileIds.length} != 1301`);
+    // batch ids + 46 Crucible-professions batch ids = 1283.
+    // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
+    // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
+    // Clue Scroll owners = 1305. Plus the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) = 1306. Plus the 18 trinkets = 1324.
+    if (ownerIds.length !== 1324)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1324`);
+    if (fileIds.length !== 1324) violations.push(`shipping WebP count: ${fileIds.length} != 1324`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

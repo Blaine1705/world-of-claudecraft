@@ -59,7 +59,7 @@ export function wornTrinket(
   e: Entity,
 ): { itemId: string; spec: TrinketSpec } | null {
   if (e.kind !== 'player') return null;
-  const itemId = ctx.players.get(e.id)?.equipment.trinket ?? null;
+  const itemId = ctx.players.get(e.id)?.equipment?.trinket ?? null;
   const spec = trinketSpec(itemId);
   return itemId && spec ? { itemId, spec } : null;
 }

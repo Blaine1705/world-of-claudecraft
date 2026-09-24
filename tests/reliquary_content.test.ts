@@ -463,14 +463,13 @@ describe('Reliquary Conqueror catalog structure', () => {
     // horizons_mounts rows (goblin_rocket_sled, rallycart_rxt): 445, MEASURED
     // on the merged tree. UNION MERGE: base plus both deltas, the professions
     // and release branches content is disjoint.
-    // The trinket slot adds twelve new item relics, one page each: four
-    // five-man heroic trinkets on their bosses' heroic pages, four on the
-    // Heroic Nythraxis page, two rift trinkets on the Rift page, and the two
-    // honor trinkets on the Warfare Armory: 452.
-    // The five Crucible raid trinkets drop on both difficulties and sit on
-    // both their boss's Normal and Heroic page (multi-page fill); completion
-    // counts distinct items, so they add five: 457.
-    expect(full).toEqual({ owned: 457, total: 457 });
+    // The world-quest branch's Arcane Calligraphy gold title joins the titles
+    // page at the release/v0.43.0 merge: 441. The three faction standing
+    // Champion titles (Riftwarden, Dawnkeeper, Forgemaster) join it: 444. The
+    // Clue Scroll Treasure Hunter title joins it: 445.
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
+    // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
+    expect(full).toEqual({ owned: 463, total: 463 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -498,10 +497,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // (goblin_rocket_sled, rallycart_rxt), the same +2 as the overview pair
     // above: 416, MEASURED on the merged tree. UNION MERGE: base plus both
     // deltas, see the overview pair's note above.
-    // The twelve trinket item relics (character-scoped) move this pair by the
-    // same twelve as the overview: 423.
-    // The five Crucible raid trinkets move this pair by five as well: 428.
-    expect(character).toEqual({ owned: 428, total: 428 });
+    // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
+    // 415 with the three faction standing Champion title slots. 416 with the
+    // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
+    expect(character).toEqual({ owned: 434, total: 434 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -550,13 +549,15 @@ describe('Reliquary Conqueror catalog structure', () => {
     // OSSBrain candidate side of THIS merge independently adds its own two
     // horizons_mounts slots (goblin_rocket_sled, rallycart_rxt): 488,
     // MEASURED on the merged tree. UNION MERGE: base plus both deltas, see
-    // the completion pair note above.
+    // the completion pair note above. The Arcane Calligraphy gold title adds
+    // one titles-page slot at the release/v0.43.0 merge into feature/world-quests:
+    // 484. The three faction standing Champion titles add three more: 487.
+    // The Clue Scroll Treasure Hunter title adds one more: 488.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-      // The twelve trinket relics add one slot each: 495. The five Crucible
-      // raid trinkets add two slots each (Normal and Heroic page): 505.
-    ).toBe(505);
+      // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
+    ).toBe(511);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -2949,7 +2950,12 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // dev-grant only, deliberately absent from
   // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
   // def comments in content/mounts.ts).
-  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll', 'terrorspark_groundshaker'],
+  horizons_mounts: [
+    'drakemaw_raptor',
+    'avian_strider',
+    'lanternback_troll',
+    'terrorspark_groundshaker',
+  ],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -3075,8 +3081,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
-  // Crucible raid's flawless title.
-  horizons_titles: 44,
+  // Crucible raid's flawless title + the three faction standing Champion
+  // titles + the Clue Scroll Treasure Hunter title.
+  horizons_titles: 49,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.
@@ -4028,7 +4035,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the five mounts content awards no route at all', () => {
+  it('the surviving pending rows are the four mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -4040,6 +4047,7 @@ describe('Reliquary source hint coverage', () => {
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
+      'avian_strider',
       'lanternback_troll',
       'terrorspark_groundshaker',
     ]);
