@@ -229,30 +229,30 @@ describe('i18n whole-catalog completeness', () => {
   it('keeps every localized marker accessibility meaning pinned per locale', () => {
     // The release fill translates mapMarkerLabels.farmPatch in the Latin locales.
     // Re-derived after inspecting those labels and regenerating the resolved tables.
-    // Keep literal digests over the 105 marker rows so unintended copy changes fail.
+    // Keep literal digests over the 106 marker rows so unintended copy changes fail.
     // Recipe: sha256(JSON.stringify(Object.entries(flatten(TABLES[lang]))
     //   .filter(([key]) => key.startsWith('hud.core.mapMarker')))).
     const expected = {
-      es: '8ad0056cefca25504e57be289073d9f5917ee7711736bd6d7cc5f7d6cd118b0c',
-      es_ES: '8ad0056cefca25504e57be289073d9f5917ee7711736bd6d7cc5f7d6cd118b0c',
-      fr_FR: '135078689c31ba7096db729d262920ec55baa26fede96a532f4f45bcfa1b4797',
-      fr_CA: '135078689c31ba7096db729d262920ec55baa26fede96a532f4f45bcfa1b4797',
-      it_IT: 'f98fe689d61ffb7cfa54d313ccfa6bb996ad04419aba3ad1df316c20f6f44116',
-      de_DE: '6f50964e66259e028a7656a78e5fc343e68d38b5f26cbeac074feae044b39c27',
-      zh_CN: 'cfbca5252de67eceb1c7fd4b0fc740198f05ece982f342b798f3125b832a5533',
-      zh_TW: '82afdeb8d1c36160c58cb99181e2d7abbcced8969f7a752e564b08f478e926ff',
-      ko_KR: 'f591a03aabca2352a12538f2526e94d3b7f7042760f33dbb71589ebe186640d8',
-      ja_JP: '00e3527b61eb4b27f81f8d018df5b30f0253db50d781510ea037a84f662d5bf5',
-      pt_BR: 'be786db4efaabddd51d37a4726da90fadb21f76543c82a08c1f90250dbe1c909',
-      ru_RU: 'c35400460f874317e83cbc045ea0ef087429420a4a81841bd5d621e681654a8c',
-      cs_CZ: '0d1123b18ea14f229e4c335e6798bd48c85b1884292678e7fdba4421e8082cd3',
-      nl_NL: '2b86cfd15162052671f69632faf80822340dda1b57c23b4bedf1968445786bd4',
-      pl_PL: '762463d0982d1fc76ad6e9e9d95669f3259c8649edb7f09bfc90696ae18c91c6',
-      id_ID: '4f2cf38dc587d3dce49ad885347478d41047aa79ec10115c9326135da6626d7c',
-      tr_TR: '9ca692e2139d25046beef20a11bca0d37f03ef87d61de77ceb1b1506b9f398ee',
-      sv_SE: '2ed1ac50847c2b66b1c9addf9da670174a38f0ef764f30b81660925365703d26',
-      vi_VN: '3c33c82b3e3309ac409ed9a288ada1714e2d11a42e3d0f8ccb6d60cfdc61a648',
-      da_DK: '811a8d8f2be1c3ac511cd6378f3a828cfd1899a61b1abb35ca16008226b933ea',
+      es: '37f0340c6a9dc027680fbd6962407b2d27635ecde3b10874999b64b9cc8c94ba',
+      es_ES: '37f0340c6a9dc027680fbd6962407b2d27635ecde3b10874999b64b9cc8c94ba',
+      fr_FR: 'e353d2f82ec72ddd4da5a0fce5bdf076f22d748e9b224053d38bc5830ef215fc',
+      fr_CA: 'e353d2f82ec72ddd4da5a0fce5bdf076f22d748e9b224053d38bc5830ef215fc',
+      it_IT: 'cde052e43c24b60c84cce4a986e715f1a658fadd983f140db00a02cb17c98cd3',
+      de_DE: '79f0cddfd76e5c97c5795e5f8b7f644b124bb76ffe8a15ab40dfb76d1db485b7',
+      zh_CN: '25a4447107be04d07da7839ea1f771572b70118ec1992f2cfabb447c0f774297',
+      zh_TW: '55598183fde49ce0a991f382968b45b49317fb42e58eebdcefa574dd96a364bf',
+      ko_KR: 'f85a6cdaf3fbcb285417d26ecd4720702530530f5b421e47db820e31987a8149',
+      ja_JP: '693f803807ac6d828a1d9f8bd156c10c913a1969df785b90ebcd06523b1283a5',
+      pt_BR: 'af52b69934f5ac49ddb5294a1bee6b76cfe01a2b4f88a1ec5e5dad55d209a40d',
+      ru_RU: '6996bb8a44dfea40d44f884bb25651f0e18ce49e551547072917a4f096a972bd',
+      cs_CZ: '8fd3e57e8c45c0c39ce0b05863fe20a1a3bdc82752bc4ce8733331397b1f0d37',
+      nl_NL: '44f8d4d786f40e9a4aebbb01729f369c0bee221670331925968c90db18a2d268',
+      pl_PL: '5676e372392c1d23072e6bb76e18de61d0bf093fdaf54a984e244e2147ee25ef',
+      id_ID: '27f12943414fc0ad64c6fe5b37e7fab7e59640cebd6b5686145b92866abd597a',
+      tr_TR: '153057df4dce6a2cfa177f231aaffbbae1a3176f60f0bca757b6486e3adc23f7',
+      sv_SE: '01ea394cc908fa54845ca922151eea44a84c5b26435c1851efc21ae2a583b30d',
+      vi_VN: '827de1906ca8b03d30443cbbce43f450b3a08447f7b792515ce6e2c619bd3f82',
+      da_DK: '8db5e221df1554ef1d196c62fb1ae44cdbeab5b646560ae5941059ac42ae02af',
     } as const satisfies Partial<Record<SupportedLanguage, string>>;
 
     for (const [lang, digest] of Object.entries(expected) as Array<
@@ -270,7 +270,10 @@ describe('i18n whole-catalog completeness', () => {
       // branch's activeWorldQuest, availableWorldQuest and worldBoss marker
       // labels, re-measured for all twenty locales on the merged tree.
       // One additional row identifies the Buried Hoard entrance.
-      expect(markerRows).toHaveLength(105);
+      // 106 with mapMarkerLabels.hoardReturnEntrance (the hoard's way back out,
+      // 9b7ac4d5fe); every digest was re-derived and checked to reproduce the
+      // prior 105-row digest with only that row removed.
+      expect(markerRows).toHaveLength(106);
       expect(createHash('sha256').update(JSON.stringify(markerRows)).digest('hex'), lang).toBe(
         digest,
       );
