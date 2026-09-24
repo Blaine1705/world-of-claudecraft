@@ -2324,8 +2324,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // q_hub_healing_numbers) joining questsDone in this maximal fixture: 23 and
     // 21 characters as `"<id>",` in the sorted array (26 + 24 bytes). MEASURED,
     // not inferred, same as every other row this equation names.
+    // Plus 13,496 for the Warfare Season 2 honor stock (139 item ids across the
+    // maximal fixture's discovered-item and reliquary fields). MEASURED: the
+    // settled blob grew by exactly this much when the stock landed.
     expect(counterfactualBytes - 156144).toBe(
-      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) + 183 + 1548 + 50 + 71,
+      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
+        183 +
+        1548 +
+        50 +
+        71 +
+        13496,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2346,8 +2354,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       ),
       // questsDone moved from 50 to 100 against the SAME forgeBaseline reference
       // point: the +50 hub practice quest delta above, on top of the prior +50
-      // this row already carried.
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 32, deedStats: 21, reliquary: 80 });
+      // this row already carried. deedStats +4,648 and reliquary +8,848: the
+      // Warfare Season 2 stock's 139 item ids (the 13,496 attributed above).
+    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 32, deedStats: 4669, reliquary: 8928 });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2356,11 +2365,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // after the real merge settle: 209,474. RE-MEASURED at 209,524 once the
     // hub training dummy and hub healing dummy PRs landed their two guided
     // practice quests (+50, attributed above; neither dummy nor its NPC touches
-    // any other field this fixture tracks).
+    // any other field this fixture tracks). RE-MEASURED at 223,269 for Warfare
+    // Season 2: exactly +13,496, the 139 honor item ids attributed above.
     expect(
       Buffer.byteLength(JSON.stringify(preReleaseCounterfactual), 'utf8'),
       'field_kit and the Bramblehide release content removed, must reproduce the recorded pre-field-kit Crucible+hammer baseline',
-    ).toBe(209773);
+    ).toBe(223269);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2371,11 +2381,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 211,392 for the Viridian Valestrider, exactly +22 over the 211,370
     // above: the one new developer-only mount reins id in
     // deedStats.itemsDiscovered (`"reins_avian_strider",`), inside the same
-    // devMountReleaseDelta isolation.
+    // devMountReleaseDelta isolation. RE-MEASURED at 224,888 for Warfare
+    // Season 2: exactly +13,496, the same 139 honor item ids.
     expect(
       counterfactualBytes,
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
-    ).toBe(211392);
+    ).toBe(224888);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2429,8 +2440,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // over the 211,382 above, the same one new reins id, attributed through
     // the same devMountReleaseDelta isolation. Same standing rule, same 381
     // width: 211,024..211,405.
-    expect(bytes, reMint).toBeGreaterThan(211024);
-    expect(bytes, reMint).toBeLessThan(211405);
+    // RE-BASED for Warfare Season 2: 224,900 bytes, exactly +13,496 over the
+    // 211,404 above: the 139 honor item ids in deedStats.itemsDiscovered and
+    // the reliquary firstFind rows (attributed in the fixture rows above).
+    // Same standing rule, same 381 width: 224,520..224,901.
+    expect(bytes, reMint).toBeGreaterThan(224520);
+    expect(bytes, reMint).toBeLessThan(224901);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

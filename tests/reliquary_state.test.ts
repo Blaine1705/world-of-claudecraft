@@ -2701,7 +2701,9 @@ describe('Reliquary catalog index memo', () => {
     // personal-Forgebreaker flags), so 39 scoring pages, matching the
     // arithmetic reconciliation (base 39 + ours' delta +2 + theirs' delta +1
     // = 42; flagged base 2 + ours' delta +1 + theirs' delta +0 = 3).
-    expect(first?.length).toBe(39);
+    // +1 scoring page: the Warfare Season 2 Vanguard Gallery, appended after
+    // the reconciliation above.
+    expect(first?.length).toBe(40);
     expect(first?.some((p) => p.excludeFromCompletion !== undefined)).toBe(false);
 
     // An UNFLAGGED synthetic table answers the caller's own array by identity:
