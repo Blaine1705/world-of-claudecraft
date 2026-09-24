@@ -111,6 +111,7 @@ export class QuestTrackerController {
     this.wispHud?.update(
       worldQuestLog.get(WISP_MAZE_QUEST_ID),
       wispMazeActionsLocked(worldQuestLog),
+      now,
     );
     let collapsed = this.deps.settings.collapsed();
     const quests: TrackedQuest[] = [];
