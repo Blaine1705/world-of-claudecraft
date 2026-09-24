@@ -45,7 +45,6 @@ describe('buildFramesMenuToggles', () => {
     expect(ids).toEqual([
       'combineActionBars',
       'hideUnusedActionSlots',
-      'mouseoverCast',
       'lockActionBars',
       'buffsLeftToRight',
       'debuffsLeftToRight',
