@@ -2889,12 +2889,17 @@ export const hudChromeStrings = {
     // cancel labels are currency-neutral and reused verbatim.
     buyConfirmBody: 'Buy {item} for {honor}? Honor purchases cannot be refunded.',
   },
-  // Character sheet showcase layout: the two titled stat-panel headings under the
-  // primary attribute tiles. Stat NAMES themselves reuse itemUi.stats.* / the
-  // statInfo.names.* labels below; only these two group headings are new here.
+  // Character sheet showcase layout: the four titled stat-panel headings under
+  // the primary attribute tiles (a 2x2 block: Offense beside Spell, Defense
+  // beside Ratings). Stat NAMES themselves reuse itemUi.stats.* / the
+  // statInfo.names.* labels below; only these group headings are new here.
+  // Spell holds the caster stats (Spell Power, Healing Power, Spell Crit);
+  // Ratings holds the gear ratings that feed both the weapon and spell sides.
   charSheet: {
     offense: 'Offense',
+    spell: 'Spell',
     defense: 'Defense',
+    ratings: 'Ratings',
     // The lifetime "Time Played" line at the foot of the sheet (the same
     // running total the /playtime chat command reports). The value composes
     // the two coarsest units from the plurals.playtime* fragments through
@@ -2940,6 +2945,8 @@ export const hudChromeStrings = {
     names: {
       spellPower: 'Spell Power',
       healPower: 'Healing Power',
+      // The spell and heal crit pool, shown beside the weapon Crit Chance.
+      spellCrit: 'Spell Crit',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
       parry: 'Parry',
@@ -2958,8 +2965,12 @@ export const hudChromeStrings = {
       attackPower: 'Powers your weapon attacks. Every 14 attack power adds 1 damage per second.',
       spellPower:
         'Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.',
+      healPower:
+        'Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.',
       dps: "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
       critChance: 'Your chance for an attack to strike critically, dealing double damage.',
+      spellCrit:
+        'Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.',
       dodge: 'Your chance to completely avoid an incoming melee attack, taking no damage.',
       critRating:
         'Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 20 rating grants exactly 1% crit.',

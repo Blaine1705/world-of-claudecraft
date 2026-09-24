@@ -511,7 +511,11 @@ const MONOLITHS: MonolithRow[] = [
     // Regeneration exemption) moved out of the heal2 arm into
     // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
     // count, zero slack.
-    ceiling: 18235,
+    // LOWERED 18235 -> 18181 by the character sheet's Healing Power + Spell
+    // Crit cells: the world -> stat-model bridge (Hud.statModel and its four
+    // imports) moved to the char_stat_model_core pure core rather than growing
+    // by the two new input fields (18235 - 54). Exact count, zero slack.
+    ceiling: 18181,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1125,7 +1129,11 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the loot identity receipt
     // and projection helpers moved to dedicated siblings, composed with the
     // release extractions above. Exact merged count, zero slack.
-    ceiling: 11750,
+    // Down 11750 -> 11749 at the character sheet's Spell Crit cell: the spell
+    // crit formula moved out of Sim.spellCrit into combat/spell_combat.ts
+    // spellCritChance (the sheet runs the same function on both hosts), leaving
+    // a one-line delegate. Exact count, zero slack.
+    ceiling: 11749,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

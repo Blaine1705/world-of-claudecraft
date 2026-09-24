@@ -2255,7 +2255,9 @@ export const de_DE: EnTranslations = {
     },
     "charSheet": {
       "offense": "Angriff",
+      "spell": "Spell",
       "defense": "Verteidigung",
+      "ratings": "Ratings",
       "playtimeLabel": "Spielzeit",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Weniger als eine Minute",
@@ -2284,6 +2286,7 @@ export const de_DE: EnTranslations = {
       "names": {
         "spellPower": "Zaubermacht",
         "healPower": "Heilkraft",
+        "spellCrit": "Spell Crit",
         "critRating": "Kritische Trefferwertung",
         "hasteRating": "Tempowertung",
         "parry": "Parieren",
@@ -2300,8 +2303,10 @@ export const de_DE: EnTranslations = {
         "armor": "Mildert eingehende physische Schläge ab. Die Verringerung fällt gegen Angreifer niedrigerer Stufe stärker aus und ist auf 75% begrenzt.",
         "attackPower": "Verstärkt deine Waffenangriffe. Je 14 Angriffskraft fügen 1 Schaden pro Sekunde hinzu.",
         "spellPower": "Erhöht den Schaden deiner Zauber und die Stärke deiner Heilungen. Jeder Punkt Intelligenz gewährt etwas Zaubermacht, zusätzlich zu der aus Ausrüstung oder Stärkungszaubern.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "Dein geschätzter Waffenschaden pro Sekunde, der Schaden und Geschwindigkeit deiner Waffe mit deiner Angriffskraft verbindet.",
         "critChance": "Deine Chance, dass ein Angriff kritisch trifft und doppelten Schaden verursacht.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "Deine Chance, einem eingehenden Nahkampfangriff vollständig auszuweichen und keinen Schaden zu erleiden.",
         "critRating": "Kritische Trefferwertung aus deiner Ausrüstung und deinen Setboni, die deine kritische Trefferchance erhöht. Etwa 10 Wertung gewähren 1% kritische Trefferchance.",
         "hasteRating": "Tempowertung aus deiner Ausrüstung und deinen Setboni, die deine Angriffe und dein Zaubern beschleunigt. Etwa 10 Wertung gewähren 1% Tempo.",

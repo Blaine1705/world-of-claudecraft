@@ -1538,7 +1538,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.ladderBody':
     '每場比賽都會牽動一份與角色綁定的持久戰場評級，無論勝負，而歷代榜單則為國度的勇士們排定名次。',
   'hudChrome.charSheet.offense': '攻擊',
+  'hudChrome.charSheet.spell': '法術',
   'hudChrome.charSheet.defense': '防禦',
+  'hudChrome.charSheet.ratings': '戰鬥等級',
   'hudChrome.charSheet.playtimeLabel': '遊戲時長',
   'hudChrome.charSheet.playtimeParts': '{major}{minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '不到一分鐘',
@@ -1548,6 +1550,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.fromYour': '來自你的 {value} 點{stat}：',
   'hudChrome.statInfo.names.spellPower': '法術強度',
   'hudChrome.statInfo.names.healPower': '治療強度',
+  'hudChrome.statInfo.names.spellCrit': '法術暴擊',
   'hudChrome.statInfo.names.critRating': '暴擊等級',
   'hudChrome.statInfo.names.hasteRating': '急速等級',
   'hudChrome.statInfo.names.parry': '招架',
@@ -1585,6 +1588,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.desc.attackPower': '強化你的武器攻擊。每 14 點攻擊強度可增加 1 點每秒傷害。',
   'hudChrome.statInfo.desc.dps':
     '你的預估武器每秒傷害，由武器的傷害與速度結合你的攻擊強度計算而來。',
+  'hudChrome.statInfo.desc.healPower':
+    '提高你的治療與持續治療效果的治療量，以及吸收護盾的強度。它等於你的法術強度，加上來自裝備與套裝加成的治療強度；治療強度只提升治療，從不提升傷害。',
+  'hudChrome.statInfo.desc.spellCrit':
+    '你的法術或治療造成暴擊的機率，暴擊時造成150%的傷害或治療量。法術與治療使用此機率而非暴擊機率：智力只提高此機率，而暴擊等級、天賦與套裝加成會同時提高兩者。',
   'hudChrome.statInfo.desc.critChance': '你的攻擊造成暴擊並施加雙倍傷害的機率。',
   'hudChrome.statInfo.desc.dodge': '你完全閃躲受到的近戰攻擊、不受任何傷害的機率。',
   'hudChrome.statInfo.effects.attackPower': '+{value} 攻擊強度',

@@ -1594,7 +1594,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.ladderBody':
     'どの試合も、キャラクターに結び付いた戦場レートを勝敗にかかわらず動かし、歴代の表がワールドの勇者たちを順に並べます。',
   'hudChrome.charSheet.offense': '攻撃',
+  'hudChrome.charSheet.spell': '呪文',
   'hudChrome.charSheet.defense': '防御',
+  'hudChrome.charSheet.ratings': 'レーティング',
   'hudChrome.charSheet.playtimeLabel': 'プレイ時間',
   'hudChrome.charSheet.playtimeParts': '{major}{minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '1分未満',
@@ -1604,6 +1606,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.fromYour': 'あなたの{stat}{value}による効果:',
   'hudChrome.statInfo.names.spellPower': '呪文威力',
   'hudChrome.statInfo.names.healPower': '治癒力',
+  'hudChrome.statInfo.names.spellCrit': '呪文クリティカル',
   'hudChrome.statInfo.names.critRating': 'クリティカルレーティング',
   'hudChrome.statInfo.names.hasteRating': 'ヘイストレーティング',
   'hudChrome.statInfo.names.parry': '受け流し',
@@ -1641,6 +1644,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '武器による攻撃を強化します。攻撃力14ごとに秒間ダメージが1上昇します。',
   'hudChrome.statInfo.desc.dps':
     '武器のダメージと速度に攻撃力を組み合わせて算出した、推定の秒間ダメージです。',
+  'hudChrome.statInfo.desc.healPower':
+    '回復と継続回復効果の回復量、および吸収シールドの量を高めます。呪文威力に、装備とセットボーナスによる治癒力を加えた値です。治癒力は回復のみを高め、ダメージは高めません。',
+  'hudChrome.statInfo.desc.spellCrit':
+    '呪文や回復がクリティカルとなり、150%のダメージまたは回復量になる確率です。呪文と回復はクリティカル率の代わりにこの確率を使います。知力はこの確率のみを高め、クリティカルレーティング、タレント、セットボーナスは両方を高めます。',
   'hudChrome.statInfo.desc.critChance': '攻撃がクリティカルとなり、ダメージが2倍になる確率です。',
   'hudChrome.statInfo.desc.dodge': '迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。',
   'hudChrome.statInfo.effects.attackPower': '攻撃力 +{value}',

@@ -2255,7 +2255,9 @@ export const zh_CN: EnTranslations = {
     },
     "charSheet": {
       "offense": "攻击",
+      "spell": "法术",
       "defense": "防御",
+      "ratings": "战斗等级",
       "playtimeLabel": "游戏时长",
       "playtimeParts": "{major}{minor}",
       "playtimeUnderMinute": "不到一分钟",
@@ -2284,6 +2286,7 @@ export const zh_CN: EnTranslations = {
       "names": {
         "spellPower": "法术强度",
         "healPower": "治疗强度",
+        "spellCrit": "法术暴击",
         "critRating": "暴击等级",
         "hasteRating": "急速等级",
         "parry": "招架",
@@ -2300,8 +2303,10 @@ export const zh_CN: EnTranslations = {
         "armor": "减轻受到的物理打击。对等级较低的攻击者减伤效果更强，最高减伤上限为75%。",
         "attackPower": "强化你的武器攻击。每14点攻击强度可提高1点每秒伤害。",
         "spellPower": "提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。",
+        "healPower": "提高你的治疗和持续治疗效果的治疗量，以及吸收护盾的强度。它等于你的法术强度，加上来自装备和套装奖励的治疗强度；治疗强度只提升治疗，从不提升伤害。",
         "dps": "你的预估武器每秒伤害，由武器的伤害与速度以及你的攻击强度共同计算得出。",
         "critChance": "你的攻击造成暴击的几率，暴击将造成双倍伤害。",
+        "spellCrit": "你的法术或治疗造成暴击的几率，暴击时造成150%的伤害或治疗量。法术和治疗使用此几率而非暴击几率：智力只提高此几率，而暴击等级、天赋和套装奖励会同时提高两者。",
         "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
         "critRating": "来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。",
         "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。",

@@ -1582,7 +1582,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.ladderBody':
     '모든 경기가 캐릭터에 매인 지속되는 전장 평점을 승패와 상관없이 움직이며, 역대 순위표가 세계의 용사들을 차례로 세웁니다.',
   'hudChrome.charSheet.offense': '공격',
+  'hudChrome.charSheet.spell': '주문',
   'hudChrome.charSheet.defense': '방어',
+  'hudChrome.charSheet.ratings': '전투 등급',
   'hudChrome.charSheet.playtimeLabel': '플레이 시간',
   'hudChrome.charSheet.playtimeParts': '{major} {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '1분 미만',
@@ -1592,6 +1594,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.fromYour': '당신의 {value} {stat}에서:',
   'hudChrome.statInfo.names.spellPower': '주문력',
   'hudChrome.statInfo.names.healPower': '치유력',
+  'hudChrome.statInfo.names.spellCrit': '주문 치명타',
   'hudChrome.statInfo.names.critRating': '치명타 등급',
   'hudChrome.statInfo.names.hasteRating': '가속 등급',
   'hudChrome.statInfo.names.parry': '무기 막기',
@@ -1630,6 +1633,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.desc.attackPower':
     '무기 공격을 강화합니다. 전투력 14당 초당 피해 1이 추가됩니다.',
   'hudChrome.statInfo.desc.dps': '무기의 피해와 속도, 전투력을 종합한 예상 무기 초당 피해입니다.',
+  'hudChrome.statInfo.desc.healPower':
+    '치유와 지속 치유 효과의 치유량, 흡수 보호막의 크기를 증가시킵니다. 주문력에 장비와 세트 보너스에서 얻는 치유력을 더한 값이며, 치유력은 치유만 증가시키고 피해는 증가시키지 않습니다.',
+  'hudChrome.statInfo.desc.spellCrit':
+    '주문이나 치유가 치명타로 적중하여 150%의 피해량 또는 치유량을 낼 확률입니다. 주문과 치유는 치명타율 대신 이 확률을 사용합니다. 지능은 이 확률만 높이며, 치명타 등급, 특성, 세트 보너스는 둘 다 높입니다.',
   'hudChrome.statInfo.desc.critChance':
     '공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.',
   'hudChrome.statInfo.desc.dodge':
