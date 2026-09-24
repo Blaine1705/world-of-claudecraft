@@ -12,19 +12,8 @@
 // the Node driven test pins its factory and entity instead.
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
-import { buildVarkhulForgePortalPrewarmVisual } from '../../src/render/necromancy_army_portal_fx';
-import { buildVarkhulAssemblyPrewarmVisual } from '../../src/render/varkhul_assembly_visual';
-import {
-  buildVarkhulEncounterPrewarmVisual,
-  syncVarkhulEncounterVisuals,
-} from '../../src/render/varkhul_encounter';
-import { buildVarkhulForgeBeamPrewarmVisual } from '../../src/render/varkhul_forge_beam_visual';
-import {
-  buildVarkhulForgestormPrewarmVisual,
-  VarkhulForgestormVisuals,
-} from '../../src/render/varkhul_forgestorm_visual';
-import { buildVarkhulInterceptBeamPrewarmVisual } from '../../src/render/varkhul_intercept_beam_visual';
-import { buildVarkhulWorldfirePrewarmVisual } from '../../src/render/varkhul_worldfire_visual';
+import { syncVarkhulEncounterVisuals } from '../../src/render/varkhul_encounter';
+import { VarkhulForgestormVisuals } from '../../src/render/varkhul_forgestorm_visual';
 import {
   VARKHUL_BOSS_ID,
   VARKHUL_CINDER_ORBS_AURA_ID,
@@ -43,6 +32,7 @@ import {
 } from '../../src/sim/varkhul_forgestorm';
 import { VARKHUL_FRONTAL_CAST_ID } from '../../src/sim/varkhul_frontal';
 import { VARKHUL_SHARED_PYRE_AURA_ID } from '../../src/sim/varkhul_shared_pyre';
+import { buildVarkhulPrewarmSetRoots } from '../helpers/varkhul_prewarm_set';
 
 type ProgramDiagnostics = { diagnostics?: { runnable?: boolean } };
 type Tier = 'low' | 'ultra';
@@ -117,22 +107,15 @@ function makeRig(tier: Tier): Rig {
   };
 }
 
-/** The Varkhul set as the pass stages it (the rig aside), hidden, compiled
+/** The Varkhul set as the pass stages it (the rig aside; the shared builder
+ *  list is held equal to the pass's own in the Node driven test), hidden, compiled
  *  where the frame draws, then detached and held undisposed exactly as the
  *  pass holds it after compileEncounterPrewarmGroup. */
 function stageVarkhulSet(rig: Rig, forgestormTwin = true): THREE.Group {
   const staged = new THREE.Group();
   staged.name = 'interior-encounter-prewarm';
   staged.visible = false;
-  staged.add(
-    buildVarkhulEncounterPrewarmVisual(),
-    buildVarkhulForgeBeamPrewarmVisual(),
-    buildVarkhulInterceptBeamPrewarmVisual(),
-    buildVarkhulForgePortalPrewarmVisual().root,
-    buildVarkhulWorldfirePrewarmVisual(),
-    buildVarkhulAssemblyPrewarmVisual(),
-  );
-  if (forgestormTwin) staged.add(buildVarkhulForgestormPrewarmVisual());
+  staged.add(...buildVarkhulPrewarmSetRoots({ forgestormTwin }));
   rig.scene.add(staged);
   rig.compile();
   const programs = rig.renderer.info.programs as ProgramDiagnostics[] | null;

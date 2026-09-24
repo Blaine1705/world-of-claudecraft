@@ -17,6 +17,7 @@ import { NYTHRAXIS_GRAVE_PREWARM_NAME } from '../src/render/nythraxis_grave_flam
 import { MOBS } from '../src/sim/data';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
 import type { Entity } from '../src/sim/types';
+import { buildVarkhulPrewarmSetRoots } from './helpers/varkhul_prewarm_set';
 
 // The real factory needs resident GLBs, which Node never has (it returns null
 // there, fail-soft). A test that asks for rigs swaps in named stand-ins so
@@ -322,6 +323,26 @@ describe('interior encounter prewarm pass (driven)', () => {
     startInteriorEncounterPrewarm('ignivar_depths', host);
     await drain();
     expect(host.compiled).toHaveLength(afterFirst);
+  });
+
+  it('stages the very roots the browser program test stages for the Varkhul set', async () => {
+    // tests/browser/varkhul_prewarm_programs.browser.test.ts proves the set on a
+    // real driver from a builder list of its own; this holds that list to the
+    // pass, so a unit added to (or dropped from) the set cannot leave it behind.
+    const raid = fakeHost();
+    startInteriorEncounterPrewarm('ignivar_depths', raid);
+    await drain();
+    const arena = fakeHost();
+    startInteriorEncounterPrewarm('ignivar', arena);
+    await drain();
+    const varkhul = raid.compiled.filter((name) => !arena.compiled.includes(name));
+    expect(varkhul).toEqual(expect.arrayContaining(VARKHUL_SET_ROOTS));
+    const browser = buildVarkhulPrewarmSetRoots().map((root) => root.name);
+    expect(new Set(browser).size).toBe(browser.length);
+    expect([...varkhul].sort()).toEqual([...browser].sort());
+    expect(buildVarkhulPrewarmSetRoots({ forgestormTwin: false }).map((root) => root.name)).toEqual(
+      browser.filter((name) => name !== 'varkhul-forgestorm-prewarm'),
+    );
   });
 
   it('stages the Forgestorm warning twin with the Varkhul set, held past its compile', async () => {
