@@ -9660,6 +9660,7 @@ export class Sim {
   guildEventRemove(_eventId: number): void {}
   guildSetMotd(_text: string): void {}
   guildBuyRosterPage(): void {}
+  guildSetRanks(_ranks: readonly import('./guild_ranks').GuildRankDef[]): void {}
   // The Guild Bank is a guild feature, and guilds live in the server social DB,
   // so offline play never has one: the read is null and the commands are inert
   // (the socialInfo idiom), forever. The online path is live: ClientWorld sends

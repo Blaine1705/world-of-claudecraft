@@ -1535,10 +1535,12 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     const tern = expr.match(/\?\s*'([^']*)'\s*:\s*'([^']*)'/);
     if (tern) return tern[1] || tern[2];
     if (/\?[^:]*:/.test(expr)) return '';
-    // server/social.ts's guild-rank lines interpolate RANK_LABEL[rank], and their
-    // server_i18n rows accept only the three real labels, so the probe value is
-    // one of them (the numeric class below would otherwise read `rank` as 5).
-    if (/RANK_LABEL/.test(expr)) return 'Officer';
+    // server/social.ts's guild-rank lines interpolate rankLabel(ladder, id)
+    // (formerly RANK_LABEL[rank]): a built-in rank's bare label, or a guild
+    // title in [brackets]. The probe takes the bare built-in arm (the numeric
+    // class below would otherwise read `rank` as 5); the bracketed arm has its
+    // own matcher cases in tests/server_i18n.test.ts.
+    if (/RANK_LABEL|rankLabel\(/.test(expr)) return 'Officer';
     if (
       // The three ready-check tallies are counts whose names say so in words
       // rather than in any of the stems below, so they read as a NAME and the

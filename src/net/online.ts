@@ -143,6 +143,7 @@ import {
   type GuildBoardCategory,
   type GuildLeaderboardPage,
   type GuildPledgeSettings,
+  type GuildRankDef,
   type GuildRosterInfo,
   type IWorld,
   isOverheadEmoteId,
@@ -217,6 +218,7 @@ import { reanchorDecision } from './entity_reanchor';
 import { applyGroundTelegraphSnapshot } from './ground_telegraph_wire';
 import { GuildBankLogMirror } from './guild_bank_log_mirror';
 import { decodeGuildBoardPage, emptyGuildBoardPage, guildBoardPath } from './guild_board_wire';
+import { decodeGuildRoster } from './guild_roster_wire';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { inputSignature } from './input_signature';
@@ -4503,6 +4505,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   guildBuyRosterPage(): void {
     this.cmd({ cmd: 'guild_buy_roster_page' });
   }
+  guildSetRanks(ranks: readonly GuildRankDef[]): void {
+    this.cmd({ cmd: 'guild_set_ranks', ranks });
+  }
   whoRequest(filter: string): void {
     this.cmd({ cmd: 'who', filter });
   }
@@ -5221,29 +5226,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // UNKNOWN guild (the window's honest empty state); a transport failure or
   // a malformed body REJECTS so the window can show its retry state instead
   // of misreading a dead server as an empty board. Rows are re-validated at
-  // this trust boundary (numbers coerced, rank narrowed) before the view
-  // core consumes them.
+  // this trust boundary by decodeGuildRoster (guild_roster_wire.ts).
   async guildRoster(name: string): Promise<GuildRosterInfo | null> {
     const res = await fetch(
       apiUrl(`/api/guilds/roster?name=${encodeURIComponent(name)}`, this.base),
     );
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`guild roster read failed (${res.status})`);
-    const data = await res.json();
-    if (typeof data?.guild !== 'string' || !Array.isArray(data?.members)) {
-      throw new Error('guild roster read returned a malformed body');
-    }
-    const members = (data.members as Record<string, unknown>[]).map((m) => ({
-      name: String(m.name ?? ''),
-      class: String(m.class ?? ''),
-      rank: (m.rank === 'leader' || m.rank === 'officer' ? m.rank : 'member') as
-        | 'leader'
-        | 'officer'
-        | 'member',
-      level: Number(m.level) || 0,
-      lifetimeXp: Number(m.lifetimeXp) || 0,
-    }));
-    return { guild: data.guild, members };
+    return decodeGuildRoster(await res.json());
   }
   // Developer high-score board (REST GET, no wire command): ?board=devs ranks
   // contributors by landed commits. The same data for every realm, paged exactly

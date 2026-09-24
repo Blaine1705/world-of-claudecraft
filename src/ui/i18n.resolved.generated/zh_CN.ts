@@ -1313,6 +1313,48 @@ export const zh_CN: EnTranslations = {
       "since": "宣誓于{date}",
       "withdraw": "撤回宣誓"
     },
+    "guildRanks": {
+      "tab": "职位",
+      "introEdit": "为公会职位命名，并选择每个职位可以做什么。保存后，改动会应用于该职位的所有成员。",
+      "introView": "每个职位的名称及其权限。只有会长可以修改。",
+      "colRank": "职位",
+      "colTitle": "名称",
+      "colMembers": "成员",
+      "colActions": "排序",
+      "numbered": "职位 {n}",
+      "perm": {
+        "invite": "邀请",
+        "remove": "移除",
+        "promote": "晋升",
+        "bank": "公会银行",
+        "officerChat": "官员频道",
+        "motd": "公告板",
+        "events": "日历"
+      },
+      "permHint": {
+        "invite": "邀请玩家加入公会，并处理他们的宣誓。",
+        "remove": "移除职位低于自己的成员。",
+        "promote": "晋升或降级职位低于自己的成员，最高可晋升至比自己低一级的职位。",
+        "bank": "在公会银行存取铜币和物品。所有成员都可以查看。",
+        "officerChat": "阅读并发言于官员频道。",
+        "motd": "编辑公会公告板。",
+        "events": "添加或删除公会日历活动。"
+      },
+      "titleLabel": "{rank}的名称",
+      "permLabel": "{rank}的{perm}权限",
+      "leaderLocked": "会长始终拥有所有权限。",
+      "add": "添加职位",
+      "save": "保存职位",
+      "moveUp": "上移{rank}",
+      "moveDown": "下移{rank}",
+      "remove": "移除{rank}",
+      "full": "一个公会最多只能有 {max} 个职位。",
+      "invalidTitle": "职位名称只能使用字母、数字、空格、撇号和连字符，最多 {max} 个字符。",
+      "removeConfirm": "担任{rank}的成员将变为{fallback}。要移除此职位吗？",
+      "removeAccept": "移除职位",
+      "promoteTo": "将 {name} 晋升为{rank}",
+      "demoteTo": "将 {name} 降级为{rank}"
+    },
     "raidLockout": {
       "title": "团队副本锁定",
       "allReady": "所有团队副本就绪",

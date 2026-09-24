@@ -1125,7 +1125,13 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the loot identity receipt
     // and projection helpers moved to dedicated siblings, composed with the
     // release extractions above. Exact merged count, zero slack.
-    ceiling: 11750,
+    // Raised +1 (11750 -> 11751) for guild custom ranks: the one-line inert
+    // offline guildSetRanks stub every online-only guild op carries (the
+    // socialInfo idiom beside guildBuyRosterPage), which the IWorld parity
+    // contract requires on Sim. The logic lives in src/sim/guild_ranks.ts and
+    // server/social.ts; the same change lowers server/game.ts and
+    // src/net/online.ts by 15 lines between them. Exact count, zero slack.
+    ceiling: 11751,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1569,7 +1575,11 @@ const MONOLITHS: MonolithRow[] = [
     // quest/death record arms of the event drain moved to
     // server/event_record_observers.ts (which also hosts the new craftRoll
     // arm), so the audit landed as a net shrink. Exact count, zero slack.
-    ceiling: 9965,
+    // LOWERED 9965 -> 9960 by guild custom ranks: the guild_promote /
+    // guild_demote arms and the new guild_set_ranks command stack into one
+    // label group dispatched by server/guild_rank_cmd.ts, so the new command
+    // landed as a net shrink. Exact count, zero slack.
+    ceiling: 9960,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1724,7 +1734,11 @@ const MONOLITHS: MonolithRow[] = [
     // src/net/target_echo.ts, banking the 52 lines of slack the row already
     // carried with it. Measured with wc -l < src/net/online.ts after biome.
     // Exact count, zero slack.
-    ceiling: 5426,
+    // LOWERED 5426 -> 5416 by guild custom ranks: the signpost roster body
+    // decode moved to src/net/guild_roster_wire.ts, paying for the
+    // guildSetRanks send (a three-line cmd delegate) with room to spare.
+    // Exact count, zero slack.
+    ceiling: 5416,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
