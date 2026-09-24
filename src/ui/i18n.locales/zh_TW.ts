@@ -8494,8 +8494,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '召喚什一魔會重置裂心術的冷卻時間，且什一魔每次攻擊回復的法力值加倍。',
   'entities.itemSets.stormkindled.name': '燃暴禮裝',
   'entities.itemSets.stormkindled.bonus2':
-    '焰烙狀態下的釋放武器獲得 3 層雷霆。受到傷害不再延遲你的施法。',
-  'entities.itemSets.stormkindled.bonus4': '大地震擊的每層雷霆加成提高至 30%。',
+    '電弧超載的觸發機率提高至 30%。受到傷害不再延遲你的施法。',
+  'entities.itemSets.stormkindled.bonus4':
+    '大地震擊的每層雷霆加成提高至 30%，熔岩爆裂造成的傷害提高 20%。',
   'entities.itemSets.warspirit_emberscale.name': '戰魂燼鱗甲',
   'entities.itemSets.warspirit_emberscale.bonus2': '先祖打擊將戰魂節律推進 3 段。',
   'entities.itemSets.warspirit_emberscale.bonus4': '先祖打擊造成的傷害提高 30%。',

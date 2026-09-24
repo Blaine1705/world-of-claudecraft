@@ -21272,8 +21272,8 @@ export const en: EnTranslations = {
       },
       "stormkindled": {
         "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "bonus2": "Arc Overload triggers 30 percent of the time. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent, and Magma Burst deals 20 percent more damage."
       },
       "vale_arcanist": {
         "name": "Vale Arcanist's Regalia",

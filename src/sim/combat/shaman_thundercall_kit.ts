@@ -14,8 +14,10 @@
 // ability, so no other build's draw stream moves. Design and numbers:
 // docs/prd/shaman-thundercall-elemental-v028.md ("v0.44.0 rework").
 
+import { STORMKINDLED_2PC_ARC_OVERLOAD_CHANCE } from '../content/ignivar_set_bonuses';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
+import { wearsSetBonus } from './set_bonus_wearer';
 import { addThunderCharges, MAGMA_SURGE_ID } from './shaman_thundercall';
 
 export const ARC_OVERLOAD_ABILITY_ID = 'lightning_overload';
@@ -64,7 +66,11 @@ export function rollArcOverload(
   if (!OVERLOAD_ABILITIES.has(abilityId) || plannedDamage <= 0 || landed <= 0) return false;
   if (target.dead) return false;
   if (!knows(ctx, player, ARC_OVERLOAD_ABILITY_ID)) return false;
-  if (!ctx.rng.chance(ARC_OVERLOAD_CHANCE)) return false;
+  // Stormkindled 2pc raises the threshold; the one draw is identical either way.
+  const chance = wearsSetBonus(ctx, player, 'stormkindled', 2)
+    ? STORMKINDLED_2PC_ARC_OVERLOAD_CHANCE
+    : ARC_OVERLOAD_CHANCE;
+  if (!ctx.rng.chance(chance)) return false;
   ctx.emit({
     type: 'spellfx',
     sourceId: player.id,

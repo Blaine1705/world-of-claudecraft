@@ -8493,8 +8493,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '召唤什一魔会重置碎心术的冷却时间，且什一魔每次攻击回复的法力值翻倍。',
   'entities.itemSets.stormkindled.name': '燃暴礼装',
   'entities.itemSets.stormkindled.bonus2':
-    '焰烙状态下的释放武器获得 3 层雷霆。受到伤害不再延迟你的施法。',
-  'entities.itemSets.stormkindled.bonus4': '大地震击的每层雷霆加成提高至 30%。',
+    '电弧超载的触发几率提高至 30%。受到伤害不再延迟你的施法。',
+  'entities.itemSets.stormkindled.bonus4':
+    '大地震击的每层雷霆加成提高至 30%，熔岩爆裂造成的伤害提高 20%。',
   'entities.itemSets.warspirit_emberscale.name': '战魂烬鳞甲',
   'entities.itemSets.warspirit_emberscale.bonus2': '先祖打击将战魂节律推进 3 段。',
   'entities.itemSets.warspirit_emberscale.bonus4': '先祖打击造成的伤害提高 30%。',

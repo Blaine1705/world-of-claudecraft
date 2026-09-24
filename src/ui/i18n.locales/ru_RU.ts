@@ -8999,8 +8999,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Призыв демона десятины сбрасывает восстановление Раскола разума, а демон возвращает вдвое больше маны за каждый удар.',
   'entities.itemSets.stormkindled.name': 'Регалии грозового розжига',
   'entities.itemSets.stormkindled.bonus2':
-    'Высвобождение оружия с пламенным клеймом даёт 3 Грома. Получаемый урон больше не замедляет чтение ваших заклинаний.',
-  'entities.itemSets.stormkindled.bonus4': 'Бонус Земного толчка за каждый Гром возрастает до 30%.',
+    'Дуговая перегрузка срабатывает с вероятностью 30%. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.stormkindled.bonus4': 'Бонус Земного толчка за каждый Гром возрастает до 30%, а Магматический взрыв наносит на 20% больше урона.',
   'entities.itemSets.warspirit_emberscale.name': 'Угольная чешуя духа войны',
   'entities.itemSets.warspirit_emberscale.bonus2': 'Удар предков продвигает ваш ритм на 3 шага.',
   'entities.itemSets.warspirit_emberscale.bonus4': 'Удар предков наносит на 30% больше урона.',

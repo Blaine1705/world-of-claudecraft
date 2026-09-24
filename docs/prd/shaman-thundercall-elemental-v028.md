@@ -214,6 +214,22 @@ The single-target bench lands inside the existing role band (at most 1.1 times V
 plays perfectly, so it cannot show the transfer gain the rework targets; the live check is the
 next week of heroic parses (elemental cancel rate, damage share outside Arc Bolt, median DPS).
 
+### Stormkindled set rework
+
+Measured in Ignivar best in slot on the 120 sec level-20 boss, the old Stormkindled Regalia was worth
++6.4 DPS (2.7 percent), against Moonscorch's +17.7 (8.3 percent) for balance. Its 2pc only worked
+through Unleash Weapon, which the bench never pressed and live wearers pressed at a fraction of its
+availability, and Arc Overload now makes Thunder plentiful anyway.
+
+| Bonus | Before | After |
+|---|---|---|
+| 2 pieces | Unleash Weapon on Pyrebrand grants 3 Thunder | Arc Overload triggers 30 percent of the time (was 20) |
+| 4 pieces | Earthen Jolt's bonus per Thunder rises to 30 percent | unchanged, and Magma Burst deals 20 percent more damage (delivered) |
+
+Both 2pcs keep the caster pushback rider. The reworked set measures 259.0 against 235.9 DPS without
+it: +23.1 DPS (9.8 percent). The owned-class bands wear the Nythraxis PBE kit, so no existing band
+moves.
+
 ### Follow-ups
 
 - A Fire Elemental cooldown (the Wrath Fire Elemental Totem) through the existing guardian summon

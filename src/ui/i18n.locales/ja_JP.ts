@@ -8842,8 +8842,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'タイスフィーンドを招来すると精神粉砕のクールダウンがリセットされ、タイスフィーンドの攻撃ごとのマナ回復量が2倍になります。',
   'entities.itemSets.stormkindled.name': 'ストームキンドルの礼装',
   'entities.itemSets.stormkindled.bonus2':
-    '火焔烙印中の武器解放で雷鳴を3獲得します。被ダメージで詠唱が遅れなくなります。',
-  'entities.itemSets.stormkindled.bonus4': '大地の衝撃の雷鳴ごとのボーナスが30%に上昇します。',
+    'アークオーバーロードの発動率が30%になります。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.stormkindled.bonus4':
+    '大地の衝撃の雷鳴ごとのボーナスが30%に上昇し、マグマバーストのダメージが20%増加します。',
   'entities.itemSets.warspirit_emberscale.name': 'ウォースピリットの残火鱗鎧',
   'entities.itemSets.warspirit_emberscale.bonus2': '祖霊の一撃が戦霊の律動を3段階進めます。',
   'entities.itemSets.warspirit_emberscale.bonus4': '祖霊の一撃のダメージが30%増加します。',
