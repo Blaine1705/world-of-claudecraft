@@ -13498,6 +13498,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocStore.wtype.sword'
   | 'hudChrome.wocStore.wtype.wand'
   | 'hudChrome.worldBoss.spawn'
+  | 'hudChrome.worldQuestBanner.subtitle'
   | 'hudChrome.worldQuestTooltip.currencyAmount'
   | 'hudChrome.worldQuestTooltip.currencyReward'
   | 'hudChrome.worldQuestTooltip.factionLine'

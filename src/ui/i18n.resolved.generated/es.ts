@@ -2398,6 +2398,9 @@ export const es: EnTranslations = {
       "standingReward": "+{amount} de reputación con {faction}",
       "currencyReward": "+{amount} {currency}"
     },
+    "worldQuestBanner": {
+      "subtitle": "Misión de mundo"
+    },
     "reputation": {
       "intro": "All three factions progress at once: every world quest counts toward the faction of its zone.",
       "faction": {

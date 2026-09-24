@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.worldQuestBanner.subtitle': 'ワールドクエスト',
   'hudChrome.worldQuestTooltip.factionLine': '勢力：{faction}',
   'hudChrome.worldQuestTooltip.timeRemaining': '残り時間：',
   'hudChrome.worldQuestTooltip.standingReward': '{faction}の評判 +{amount}',

@@ -2398,6 +2398,9 @@ export const zh_CN: EnTranslations = {
       "standingReward": "{faction}声望 +{amount}",
       "currencyReward": "+{amount} {currency}"
     },
+    "worldQuestBanner": {
+      "subtitle": "世界任务"
+    },
     "reputation": {
       "intro": "三个阵营同时推进：每个世界任务都会计入其所在区域的阵营。",
       "faction": {

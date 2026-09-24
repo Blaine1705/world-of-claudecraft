@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.worldQuestBanner.subtitle': '전역 퀘스트',
   'hudChrome.worldQuestTooltip.factionLine': '세력: {faction}',
   'hudChrome.worldQuestTooltip.timeRemaining': '남은 시간:',
   'hudChrome.worldQuestTooltip.standingReward': '{faction} 평판 +{amount}',

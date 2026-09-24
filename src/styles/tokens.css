@@ -51,6 +51,12 @@
     --skill-banner-bg: linear-gradient(165deg, rgb(42 32 14 / 94%) 0%, rgb(18 14 8 / 96%) 100%);
     --color-skill-banner-subtext: #e8d8a8;
     --color-skill-banner-inset: rgb(255 209 0 / 14%);
+    /* The #subzone-banner line's top edge. The world quest entry plate
+       (#banner.banner-world-quest) anchors its BOTTOM edge this gap above it,
+       so the two centre lines stack and never overlap; touch layouts re-pin
+       the token rather than the element (hud.mobile.css). */
+    --subzone-banner-top: 35%;
+    --banner-stack-gap: 10px;
     --border: #6f5a2a;
     /* --panel-base is the single themeable frame colour; --panel-bg derives the
        shipped gradient from it (overwritten wholesale by the theme system). */

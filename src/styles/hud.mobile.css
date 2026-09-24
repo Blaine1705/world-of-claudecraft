@@ -4376,6 +4376,31 @@
     width: 34px;
     height: 34px;
   }
+  /* The world quest entry plate on touch: smaller type and padding, and a
+     tighter gap, but the same bottom anchor above the subzone line (the token
+     is re-pinned per orientation, never the plate), so it cannot collide there
+     either. This layer already beats the hud.css variant; inside it, the class
+     compound outranks the landscape block's plain `body.mobile-touch #banner`
+     restatement, whatever the source order. The title stays on ONE line
+     (ellipsis past the width): the plate grows upward from its anchor, so a
+     wrapped title on a short phone would climb off the top edge. */
+  body.mobile-touch #banner.banner-world-quest {
+    --banner-stack-gap: 6px;
+    top: calc(var(--subzone-banner-top) - var(--banner-stack-gap));
+    min-width: 0;
+    padding: 6px 30px 12px;
+    font-size: calc(22px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch #banner.banner-world-quest .banner-subtext {
+    font-size: calc(13px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch #banner.banner-world-quest .banner-title {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
   body.mobile-touch .window {
     max-width: calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 20px);
     /* --window-scale, never --ui-scale: this generic rule also governs the
@@ -9122,8 +9147,10 @@
       white-space: normal;
       overflow-wrap: anywhere;
     }
+    body.mobile-touch {
+      --subzone-banner-top: 25%;
+    }
     body.mobile-touch #subzone-banner {
-      top: 25%;
       font-size: 18px;
     }
     body.mobile-touch #error-msg {

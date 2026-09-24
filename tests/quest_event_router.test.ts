@@ -2,8 +2,10 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import type { SimEvent } from '../src/sim/types';
 import { applyQuestEventPresentation } from '../src/ui/hud/quest/quest_event_router';
+import { WORLD_QUEST_BANNER_MS } from '../src/ui/hud/quest/world_quest_banner_view';
 import { HUD_LOG } from '../src/ui/hud_tones';
 import { HOARD_GOBLIN_BANNER_MS } from '../src/ui/quest_event_view';
+import { worldQuestDisplayName } from '../src/ui/world_quest_view';
 
 const playUi = vi.hoisted(() => vi.fn());
 vi.mock('../src/game/sfx', () => ({ sfx: { playUi } }));
@@ -63,6 +65,25 @@ describe('quest event router', () => {
     expect(playUi).toHaveBeenLastCalledWith('quest_ready');
   });
 
+  it('queues the world quest entry plate through the full banner call', () => {
+    const hud = fakeHud();
+    const ev = { type: 'worldQuestStarted', questId: 'wq_eastbrook_bandits' } as SimEvent;
+    expect(applyQuestEventPresentation(hud, ev)).toBe(true);
+    const title = worldQuestDisplayName('wq_eastbrook_bandits');
+    expect(hud.showBanner).toHaveBeenCalledTimes(1);
+    expect(hud.showBanner).toHaveBeenCalledWith(
+      title,
+      true,
+      undefined,
+      'worldQuest',
+      'World Quest',
+      WORLD_QUEST_BANNER_MS,
+      null,
+      'deed',
+    );
+    expect(hud.log).toHaveBeenCalledWith(`World quest started: ${title}`, HUD_LOG.PROGRESS);
+  });
+
   it('keeps an undressed banner on the plain call', () => {
     const hud = fakeHud();
     applyQuestEventPresentation(hud, { type: 'treasureVaultOpened', rarity: 'rare' } as SimEvent);
@@ -81,7 +102,7 @@ describe('quest event router', () => {
       "private readonly questBanner = new QuestProgressBanner($('#quest-banner'));",
       'private readonly questDialog: QuestDialogController;',
       'private readonly worldQuestPuzzleWindow = new WorldQuestPuzzleWindow({',
-      '  log(\n    text: string,',
+      '  log(\n    // A string body, or a caller-assembled NODE body',
       '  showBanner(\n    text: string,',
       'if (applyQuestEventPresentation(this, ev)) continue;',
     ]) {

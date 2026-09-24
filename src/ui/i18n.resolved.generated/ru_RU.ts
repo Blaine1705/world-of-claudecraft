@@ -2398,6 +2398,9 @@ export const ru_RU: EnTranslations = {
       "standingReward": "Репутация с фракцией {faction}: +{amount}",
       "currencyReward": "+{amount} {currency}"
     },
+    "worldQuestBanner": {
+      "subtitle": "Локальное задание"
+    },
     "reputation": {
       "intro": "Все три фракции развиваются одновременно: каждое мировое задание идёт в зачёт фракции своей зоны.",
       "faction": {

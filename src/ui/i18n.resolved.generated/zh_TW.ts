@@ -2398,6 +2398,9 @@ export const zh_TW: EnTranslations = {
       "standingReward": "{faction}聲望 +{amount}",
       "currencyReward": "+{amount} {currency}"
     },
+    "worldQuestBanner": {
+      "subtitle": "世界任務"
+    },
     "reputation": {
       "intro": "三個陣營同時推進：每個世界任務都會計入其所在區域的陣營。",
       "faction": {

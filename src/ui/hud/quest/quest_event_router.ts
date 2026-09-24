@@ -17,10 +17,12 @@ interface QuestEventHost {
     text: string,
     motion?: boolean,
     decorativeIconUrl?: string,
-    variant?: 'default',
+    variant?: 'default' | 'worldQuest',
     subtext?: string,
     durationMs?: number,
-  ): void;
+    source?: null,
+    bannerClass?: 'deed',
+  ): unknown;
   questDialog: { refresh(): void };
   worldQuestPuzzleWindow: { applyEventPresentation(presentation: QuestEventPresentation): void };
   treasureMapWindow: { open(): void; refresh(): void };
@@ -40,7 +42,20 @@ export function applyQuestEventPresentation(hud: object, ev: SimEvent): boolean 
   if (questEvent.logText) h.log(questEvent.logText, HUD_LOG.PROGRESS);
   if (questEvent.flashText) h.questBanner.show(questEvent.flashText);
   if (questEvent.bannerText) {
-    if (questEvent.bannerSubtext || questEvent.bannerIconUrl || questEvent.bannerDurationMs)
+    if (questEvent.bannerVariant || questEvent.bannerClass)
+      // A plate variant or a queued class (the world quest entry banner):
+      // the full call, so the class reaches the banner scheduler.
+      h.showBanner(
+        questEvent.bannerText,
+        true,
+        questEvent.bannerIconUrl,
+        questEvent.bannerVariant ?? 'default',
+        questEvent.bannerSubtext,
+        questEvent.bannerDurationMs,
+        null,
+        questEvent.bannerClass,
+      );
+    else if (questEvent.bannerSubtext || questEvent.bannerIconUrl || questEvent.bannerDurationMs)
       h.showBanner(
         questEvent.bannerText,
         true,

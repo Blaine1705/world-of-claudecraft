@@ -3065,6 +3065,11 @@ export const hudChromeStrings = {
     standingReward: '+{amount} {faction} Standing',
     currencyReward: '+{amount} {currency}',
   },
+  // The world quest entry banner (src/ui/hud/quest/world_quest_banner_view.ts):
+  // the smaller line under the quest name when a world quest becomes active.
+  worldQuestBanner: {
+    subtitle: 'World Quest',
+  },
   // The Reputation tab (src/ui/hud/reputation/). Faction and tier names are
   // PROVISIONAL: the World Quests scope leaves the final names to narrative.
   reputation: {

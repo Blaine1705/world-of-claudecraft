@@ -2398,6 +2398,9 @@ export const en_XA: EnTranslations = {
       "standingReward": "[+{amount} {faction} Šţáñðíñĝ]",
       "currencyReward": "[+{amount} {currency}]"
     },
+    "worldQuestBanner": {
+      "subtitle": "[Ŵóŕļð Ɋúéšţ]"
+    },
     "reputation": {
       "intro": "[Áļļ ţĥŕéé ƒáçţíóñš þŕóĝŕéšš áţ óñçé: éʋéŕý ŵóŕļð ɋúéšţ çóúñţš ţóŵáŕð ţĥé ƒáçţíóñ óƒ íţš žóñé.]",
       "faction": {

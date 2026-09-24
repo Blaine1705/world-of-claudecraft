@@ -2398,6 +2398,9 @@ export const ko_KR: EnTranslations = {
       "standingReward": "{faction} 평판 +{amount}",
       "currencyReward": "+{amount} {currency}"
     },
+    "worldQuestBanner": {
+      "subtitle": "전역 퀘스트"
+    },
     "reputation": {
       "intro": "세 세력이 동시에 진행됩니다. 모든 월드 퀘스트는 해당 지역의 세력에 반영됩니다.",
       "faction": {

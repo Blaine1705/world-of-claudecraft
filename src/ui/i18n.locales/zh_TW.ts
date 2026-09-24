@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.worldQuestBanner.subtitle': '世界任務',
   'hudChrome.worldQuestTooltip.factionLine': '陣營：{faction}',
   'hudChrome.worldQuestTooltip.timeRemaining': '剩餘時間：',
   'hudChrome.worldQuestTooltip.standingReward': '{faction}聲望 +{amount}',

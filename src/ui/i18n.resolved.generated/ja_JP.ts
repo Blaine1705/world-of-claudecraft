@@ -2398,6 +2398,9 @@ export const ja_JP: EnTranslations = {
       "standingReward": "{faction}の評判 +{amount}",
       "currencyReward": "+{amount} {currency}"
     },
+    "worldQuestBanner": {
+      "subtitle": "ワールドクエスト"
+    },
     "reputation": {
       "intro": "3つの勢力は同時に進行します。各ワールドクエストは、その地域の勢力に加算されます。",
       "faction": {

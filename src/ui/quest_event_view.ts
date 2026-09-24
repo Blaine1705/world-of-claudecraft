@@ -13,6 +13,7 @@ import { HOARD_GOBLIN_TEMPLATE_ID } from '../sim/rift/hoard_goblin';
 import type { SimEvent } from '../sim/types';
 import { questTitle } from './entity_display_core';
 import { itemDisplayName, zoneDisplayName } from './entity_i18n';
+import { worldQuestBannerModel } from './hud/quest/world_quest_banner_view';
 import { cannonResultText } from './hud/vehicle/cannon_tactics_view';
 import { formatList, formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
@@ -28,6 +29,11 @@ export interface QuestEventPresentation {
   bannerSubtext?: string;
   bannerIconUrl?: string;
   bannerDurationMs?: number;
+  /** A plate variant of the shared #banner slot (the world quest entry plate). */
+  bannerVariant?: 'worldQuest';
+  /** Queue the banner as a celebration instead of the ambient default, so it
+   *  waits its turn rather than replacing (or being replaced by) a zone name. */
+  bannerClass?: 'deed';
   logText?: string;
   flashText?: string;
   sound?: 'quest_accept' | 'quest_ready' | 'quest_complete';
@@ -71,10 +77,20 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
         mountOwnedPrompt: event.questId === 'q_riding_lessons',
       };
     case 'worldQuestStarted': {
-      const text = t('questUi.logs.worldQuestStarted', {
-        name: worldQuestDisplayName(event.questId),
-      });
-      return { bannerText: text, logText: text, sound: 'quest_accept' };
+      // The chat keeps the durable "World quest started: <name>" line; the
+      // screen gets the entry plate (world_quest_banner_view.ts).
+      const banner = worldQuestBannerModel(event.questId);
+      return {
+        bannerText: banner.title,
+        bannerSubtext: banner.subtitle,
+        bannerVariant: banner.variant,
+        bannerClass: banner.bannerClass,
+        bannerDurationMs: banner.durationMs,
+        logText: t('questUi.logs.worldQuestStarted', {
+          name: worldQuestDisplayName(event.questId),
+        }),
+        sound: 'quest_accept',
+      };
     }
     case 'worldQuestBanner': {
       const text = t(`questUi.worldQuest.banner.${event.banner}` as const);

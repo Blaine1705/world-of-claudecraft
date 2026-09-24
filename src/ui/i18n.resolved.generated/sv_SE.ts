@@ -2398,6 +2398,9 @@ export const sv_SE: EnTranslations = {
       "standingReward": "+{amount} {faction} Standing",
       "currencyReward": "+{amount} {currency}"
     },
+    "worldQuestBanner": {
+      "subtitle": "World Quest"
+    },
     "reputation": {
       "intro": "All three factions progress at once: every world quest counts toward the faction of its zone.",
       "faction": {
