@@ -17,7 +17,7 @@ import {
 import { isItemLevelEligible, itemInstanceLevel } from '../../../sim/item_level';
 import type { ItemDef, WorldQuestDef } from '../../../sim/types';
 import { worldQuestRewardAmount } from '../../../sim/world_quests';
-import { currencyImageUrl } from '../../currency_art';
+import { currencyImageUrl, factionEmblemImageUrl } from '../../currency_art';
 import { itemDisplayName } from '../../entity_i18n';
 import { formatMoney, formatNumber, type MoneyParts, moneyParts, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
@@ -35,9 +35,8 @@ export interface WorldQuestTooltipStandingReward {
   readonly amount: number;
   /** "80 Rift Watch": the amount beside the faction name. */
   readonly text: string;
-  /** The faction's emblem art. The factions have no dedicated crest image (the
-   *  Reputation tab paints a CSS-only crest frame), so this is the faction's own
-   *  currency art, which the painter sets inside a crest frame. */
+  /** The faction's emblem art (`factionEmblemImageUrl`, the same art the
+   *  Reputation tab sets in its crest), which the painter frames as a crest. */
   readonly iconUrl: string | null;
 }
 
@@ -150,7 +149,6 @@ export function buildWorldQuestTooltip(input: WorldQuestTooltipInput): WorldQues
   const rewards: WorldQuestTooltipReward[] = [];
   const standing = worldQuestStandingReward(quest, playerLevel);
   const currencyId = FACTION_CURRENCY_IDS[factionId];
-  const currencyIconUrl = currencyImageUrl(currencyId);
   if (standing > 0) {
     rewards.push({
       kind: 'standing',
@@ -160,7 +158,7 @@ export function buildWorldQuestTooltip(input: WorldQuestTooltipInput): WorldQues
         amount: whole(standing),
         faction: factionName,
       }),
-      iconUrl: currencyIconUrl,
+      iconUrl: factionEmblemImageUrl(factionId),
     });
   }
   const currency = worldQuestFactionCurrencyReward(quest, playerLevel);
@@ -173,7 +171,7 @@ export function buildWorldQuestTooltip(input: WorldQuestTooltipInput): WorldQues
         amount: whole(currency),
         currency: factionCurrencyNameText(factionId),
       }),
-      iconUrl: currencyIconUrl,
+      iconUrl: currencyImageUrl(currencyId),
     });
   }
   rewards.push(baseReward(quest, playerLevel));
