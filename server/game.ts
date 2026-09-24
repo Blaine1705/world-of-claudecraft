@@ -451,6 +451,7 @@ import {
 import { createTickSaveObserver, TickProfiler, type TickProfilerSample } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { applyTownFocusCommand } from './town_focus_command';
+import { fullEntityJson, liteEntityJson, transportHeadJson } from './transport_head';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
@@ -1430,6 +1431,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
   }
   if (e.leap) out.lp = 1; // Vaulting Charge: server-owned movement arc
+  if (e.ferryRide) out.fry = e.ferryRide.atSea ? 2 : 1; // ferry passenger (transport_head.ts)
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.helmHidden) out.hh = 1; // paperdoll eye toggle: kit helm left off the composed body
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
@@ -1566,14 +1568,6 @@ function emptyWireVariant(): EntityWireVariantCache {
     fullAuraJson: '',
     liteAuraJson: '',
   };
-}
-
-function fullEntityJson(id: number, idJson: string, dynJson: string): string {
-  return `{"id":${id},${idJson.slice(1, -1)},${dynJson.slice(1, -1)}}`;
-}
-
-function liteEntityJson(id: number, dynJson: string): string {
-  return `{"id":${id},${dynJson.slice(1, -1)}}`;
 }
 
 function logSocialErr(err: unknown): void {
@@ -8009,7 +8003,7 @@ export class GameServer {
         this.lastTickHzHeadTime = now;
       }
     }
-    const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
+    const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}${transportHeadJson(this.sim)}`;
     const telegraphWorld = groundTelegraphWorld(this.sim, INTEREST_QUERY_RADIUS, EVENT_RADIUS);
     const varkhulPortalReplay = buildVarkhulPortalReplayBatch(
       this.clients.values(),

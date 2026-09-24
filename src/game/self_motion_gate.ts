@@ -8,6 +8,7 @@
 // delve (the portcullis door clamps are not mirrored client-side).
 
 import { isDelvePos, isRiftPos } from '../sim/data';
+import { isFerryPassenger } from '../sim/ferry_passenger';
 import type { Aura } from '../sim/types';
 import type { RiftFloorView } from '../world_api/dungeons';
 
@@ -25,8 +26,14 @@ export function isPlayerImmobilized(auras: readonly Aura[]): boolean {
 // A released spirit (ghost) moves, turns, and drives the camera like the living; only
 // a corpse that has not yet released its spirit is frozen. Combat stays gated by
 // `dead` (and re-validated server-side), so this only unlocks locomotion for ghosts.
-export function isMovementFrozen(player: { dead: boolean; ghost: boolean }): boolean {
-  return player.dead && !player.ghost;
+// A ferry passenger is frozen too: the ship owns their pose and the server locks
+// their movement input (src/sim/transport_ferry.ts), so there is no click-to-move,
+// no camera-driven facing and nothing for the self-predictor to run; the camera
+// still orbits, and chat and emotes still work.
+export function isMovementFrozen(
+  player: { dead: boolean; ghost: boolean } & Parameters<typeof isFerryPassenger>[0],
+): boolean {
+  return (player.dead && !player.ghost) || isFerryPassenger(player);
 }
 
 export interface SelfMotionGateArgs {
