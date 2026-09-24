@@ -15,7 +15,8 @@ import type { TranslationKey } from '../i18n.catalog';
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.framePresets.pickerLabel': 'フレームプリセット：{name}',
   'hudChrome.framePresets.overwrite': 'プリセットを上書き',
-  'hudChrome.framePresets.overwriteBody': '保存済みプリセット「{name}」を現在のレイアウトで上書きしますか？',
+  'hudChrome.framePresets.overwriteBody':
+    '保存済みプリセット「{name}」を現在のレイアウトで上書きしますか？',
   'hudChrome.framePresets.current': '現在のレイアウト',
   'hudChrome.framePresets.new': '新規プリセット',
   'hudChrome.framePresets.empty': '保存済みプリセットはありません',
