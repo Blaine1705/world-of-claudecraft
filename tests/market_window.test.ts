@@ -6,6 +6,7 @@ import { itemDisplayName } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { MARKET_ITEM_TYPE_FILTERS } from '../src/ui/market_filters';
 import { MarketWindow } from '../src/ui/market_window';
+import { PRESET_ORDER, resolveTheme, themeCssVars } from '../src/ui/theme';
 
 // The market window painter is a DOM module; driving the live DOM + events is the
 // opt-in browser suite. This is the no-DOM-suite equivalent: it
@@ -493,6 +494,88 @@ describe('market_window: behavior preserved through the core', () => {
     expect(painter).toContain('.marketCollect()');
     expect(painter).toContain('this.deps.moneyHtml(');
     expect(painter).toContain('formatLocalizedMoney(');
+  });
+});
+
+describe('market_window: filter menus float on a solid surface', () => {
+  // Every Browse filter menu (type, subtype, armor, stat, rarity, sort) opens OVER the
+  // filters and listing rows. They used to wear the .ui-card plate, a 28 percent keyline
+  // wash meant for in-flow rows, so the labels and tabs behind an open menu read straight
+  // through its options. A floating menu takes the library's strong panel instead: the
+  // same --panel-bg-strong fill the shared gold dropdown (.ui-dd-menu) paints.
+  const libraryCss = readFileSync(new URL('../src/styles/library.css', import.meta.url), 'utf8');
+  const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+  const MIN_MENU_ALPHA = 0.95;
+  // The alpha of every colour stop in a linear-gradient. A stop that is not a plain
+  // rgba() (a hex alpha, hsla, color-mix, transparent) yields NaN, so it fails the
+  // threshold instead of being skipped.
+  const stopAlphas = (fill: string): number[] => {
+    const body = fill.trim().match(/^linear-gradient\(([\s\S]*)\)$/)?.[1];
+    if (!body) return [];
+    const args: string[] = [];
+    let depth = 0;
+    let start = 0;
+    for (let i = 0; i < body.length; i++) {
+      if (body[i] === '(') depth++;
+      else if (body[i] === ')') depth--;
+      else if (body[i] === ',' && depth === 0) {
+        args.push(body.slice(start, i).trim());
+        start = i + 1;
+      }
+    }
+    args.push(body.slice(start).trim());
+    return args
+      .filter((arg) => !/^-?[\d.]+deg$/.test(arg))
+      .map((stop) =>
+        Number(stop.match(/^rgba\(\s*\d+,\s*\d+,\s*\d+,\s*([\d.]+)\s*\)(\s+[\d.]+%)?$/)?.[1]),
+      );
+  };
+  const menuRules = (css: string) =>
+    [
+      ...css
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .matchAll(/([^{}]*\.mkt-select-menu[^{}]*)\{([^}]*)\}/g),
+    ].map((m) => ({ selector: m[1].trim(), body: m[2] }));
+
+  it('composes the strong panel primitive on the menu, never the translucent card', () => {
+    const menu = painterCode.match(/<div class="mkt-select-menu[^"]*"/)?.[0];
+    expect(menu, 'the filter menu markup must exist').toBeTruthy();
+    expect(menu).toContain('ui-panel-strong');
+    expect(menu).not.toContain('ui-card');
+  });
+
+  it('keeps the menu look on the primitive, not re-declared in any component rule', () => {
+    // Every rule naming the menu, compound selectors and the mobile sheet included.
+    const rules = [...menuRules(componentsCss), ...menuRules(mobileCss)];
+    expect(rules.length, 'the .mkt-select-menu geometry rule must exist').toBeGreaterThan(0);
+    for (const { selector, body } of rules) {
+      expect(body, `${selector} must not re-declare the fill`).not.toMatch(
+        /\bbackground(-color|-image)?\s*:/,
+      );
+    }
+    expect(libraryCss.match(/\.ui-panel-strong\s*\{[^}]*\}/)?.[0]).toContain(
+      'background: var(--panel-bg-strong);',
+    );
+  });
+
+  it('paints --panel-bg-strong near-opaque in the static default and on every preset', () => {
+    const staticFill = tokensCss.match(/--panel-bg-strong:\s*([^;]+);/)?.[1] ?? '';
+    const fills = [
+      staticFill,
+      ...PRESET_ORDER.map(
+        (preset) => themeCssVars(resolveTheme({ preset, custom: {} }))['--panel-bg-strong'],
+      ),
+    ];
+    for (const fill of fills) {
+      const stops = stopAlphas(fill);
+      expect(stops.length, `no gradient stops parsed from ${fill}`).toBeGreaterThan(0);
+      for (const a of stops) expect(a, `a stop of ${fill}`).toBeGreaterThanOrEqual(MIN_MENU_ALPHA);
+    }
+    // The parser itself fails closed: a translucent or unparseable stop cannot slip by.
+    expect(stopAlphas('linear-gradient(170deg, rgba(1, 2, 3, 0.97) 0%, #0000 100%)')[1]).toBeNaN();
+    expect(
+      stopAlphas('linear-gradient(170deg, rgba(1, 2, 3, 0.97) 0%, rgba(1, 2, 3, 0.5) 100%)'),
+    ).toEqual([0.97, 0.5]);
   });
 });
 

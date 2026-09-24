@@ -1349,10 +1349,12 @@ export class MarketWindow {
         return `<button type="button" class="mkt-select-option ui-chip${selected ? ' sel is-on' : ''}" role="option" tabindex="-1" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${esc(option)}">${esc(optionLabel(option))}</button>`;
       })
       .join('');
+    // The open menu floats over the rows and the other filters, so it wears the strong
+    // panel (the shared gold dropdown's fill), not the translucent in-flow .ui-card plate.
     return (
       `<div class="mkt-filter"><span>${esc(label)}</span><div class="mkt-select" data-market-filter-menu="${menu}">` +
       `<button type="button" class="mkt-select-btn ui-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t('itemUi.market.filterValueAria', { label, value: current }))}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
-      `<div class="mkt-select-menu ui-card" role="listbox" hidden>${optionHtml}</div>` +
+      `<div class="mkt-select-menu ui-panel-strong" role="listbox" hidden>${optionHtml}</div>` +
       `</div></div>`
     );
   }
