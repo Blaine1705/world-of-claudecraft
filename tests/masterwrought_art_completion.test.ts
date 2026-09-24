@@ -813,9 +813,10 @@ describe('Masterwrought art completion evidence', () => {
     // both later release-merge waves, already machine-checked and owner-review
     // pending per item_art_consistency.test.ts / item_icons.test.ts /
     // weapon_icons.test.ts, so their mapping owners are genuine, not fabricated.
-    // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners;
-    // these do not alter the dated completion/approval universe below.
-    expect(currentOwnerIds).toHaveLength(1283);
+    // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners, and
+    // the Viridian Valestrider adds its own; none of the three alter the dated
+    // completion/approval universe below.
+    expect(currentOwnerIds).toHaveLength(1284);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -869,9 +870,14 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
-    // Strip all five later additive waves (Crucible professions, the Field Kit, the
+    // The Viridian Valestrider's reins is additive the same way, and postdates
+    // the dated verdict too.
+    expect(datedIds).not.toContain('reins_avian_strider');
+    expect(currentOwnerIds).toContain('reins_avian_strider');
+
+    // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
-    // and the OSSBrain mount reins)
+    // the OSSBrain mount reins, and the Valestrider's reins)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -882,7 +888,8 @@ describe('Masterwrought art completion evidence', () => {
         !crucibleIds.has(id) &&
         id !== 'field_kit' &&
         !laterGapFillIds.has(id) &&
-        !ossBrainMountIds.has(id),
+        !ossBrainMountIds.has(id) &&
+        id !== 'reins_avian_strider',
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

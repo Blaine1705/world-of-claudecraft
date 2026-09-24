@@ -839,7 +839,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // (14 base pieces + their 14 auto-generated heroic variants) = 1,299. The
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
-    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    expect(Object.keys(ITEMS)).toHaveLength(1302);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -994,9 +994,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04 + roots-bramblehide-icons-2026-09-07)
     // = 1,281. The OSSBrain PR #3781 reconcile's two disjoint reins owners
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283.
-    expect(new Set(currentOwnerIds).size).toBe(1283);
-    expect(shippingIds).toHaveLength(1283);
-    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    expect(new Set(currentOwnerIds).size).toBe(1284);
+    expect(shippingIds).toHaveLength(1284);
+    expect(Object.keys(ITEMS)).toHaveLength(1302);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1028,6 +1028,7 @@ describe('item-art consistency accepted-art provenance', () => {
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        'reins_avian_strider',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1179,7 +1180,7 @@ describe('item-art consistency accepted-art provenance', () => {
     ).toBeUndefined();
     // The completion wave consolidates 68 interim per-entry/SVG owners into
     // one generated batch. The surviving ordinary-art cohort stays explicit.
-    expect(mapping.entries).toHaveLength(43);
+    expect(mapping.entries).toHaveLength(44);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
@@ -1253,8 +1254,8 @@ describe('item-art consistency accepted-art provenance', () => {
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1283);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1283);
+    expect(allCurrentOwnerIds).toHaveLength(1284);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1284);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1262,7 +1263,7 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      entries: 43,
+      entries: 44,
       priorGenerated: 755,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
@@ -1310,7 +1311,8 @@ describe('item-art consistency accepted-art provenance', () => {
           (id) =>
             !completionIdSet.has(id) &&
             id !== 'reins_goblin_rocket_sled' &&
-            id !== 'reins_rallycart_rxt',
+            id !== 'reins_rallycart_rxt' &&
+            id !== 'reins_avian_strider',
         ),
         ...(completionBatch?.itemIds ?? []),
         ...(crucibleBatch?.itemIds ?? []),
@@ -1326,6 +1328,7 @@ describe('item-art consistency accepted-art provenance', () => {
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        'reins_avian_strider',
       ]),
       'the dated catalog plus the release batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
@@ -1456,9 +1459,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // Matches the mapping-owner sum above: 43 entries + 755 prior-generated
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
     // batch ids + 46 Crucible-professions batch ids = 1283.
-    if (ownerIds.length !== 1283)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1283`);
-    if (fileIds.length !== 1283) violations.push(`shipping WebP count: ${fileIds.length} != 1283`);
+    if (ownerIds.length !== 1284)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1284`);
+    if (fileIds.length !== 1284) violations.push(`shipping WebP count: ${fileIds.length} != 1284`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

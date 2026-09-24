@@ -124,10 +124,11 @@ const build = await buildItemArtAudit({
     // 1071 / 1089 (its two disjoint reins items, reins_goblin_rocket_sled and
     // reins_rallycart_rxt, on the shared 1069 / 1087 base); both deltas are
     // additive over that shared base, so 1069 + 212 + 2 = 1283 and
-    // 1087 + 212 + 2 = 1301. Verified with `node scripts/item_art_audit.mjs
+    // 1087 + 212 + 2 = 1301, plus the Viridian Valestrider's reins on both
+    // sides = 1284 / 1302. Verified with `node scripts/item_art_audit.mjs
     // --verify-only` against the merged tree.
-    catalogCount: 1283,
-    liveItemCount: 1301,
+    catalogCount: 1284,
+    liveItemCount: 1302,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

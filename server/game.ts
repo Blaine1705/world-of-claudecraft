@@ -409,8 +409,9 @@ import {
   fullEntityJson,
   liteEntityJson,
 } from './entity_wire_cache';
+import { observeEventRecords } from './event_record_observers';
 import { parseGuildPledgeSettingsCommand } from './guild_pledge_settings_cmd';
-import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
+import { recordLevelUp } from './progress_events';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
@@ -9080,24 +9081,9 @@ export class GameServer {
           recordLevelUp(session, ev.level);
         }
       }
-      if ((ev.type === 'questAccepted' || ev.type === 'questDone') && ev.pid !== undefined) {
-        const s = this.clients.get(ev.pid);
-        const entity = this.sim.entities.get(ev.pid);
-        // Skip when the entity is gone rather than defaulting the level: the
-        // level is the gate that bounds ftue_events growth, so it must never
-        // fail open (the death arm has the same direction).
-        if (s && entity)
-          recordFtueQuest(
-            s,
-            ev.type === 'questAccepted' ? 'quest_accepted' : 'quest_done',
-            ev.questId,
-            entity.level,
-          );
-      }
-      if (ev.type === 'death' && this.clients.has(ev.entityId)) {
-        const s = this.clients.get(ev.entityId);
-        if (s) recordFtueDeath(s, this.sim, ev.entityId, ev.killerId);
-      }
+      // The database RECORD arms (ftue_events quest/death rows, the
+      // craft_roll_events audit) live in server/event_record_observers.ts.
+      observeEventRecords(ev, this.sim, this.clients);
       if (ev.type === 'levelup' && (ev.level === 2 || ev.level === 5) && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         // Level 2 and 5 ad conversions, email-enriched for match quality

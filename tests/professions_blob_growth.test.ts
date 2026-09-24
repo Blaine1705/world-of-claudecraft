@@ -2274,12 +2274,17 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // persisted reliquary state (the same reasoning that keeps the DEEDS/
     // deeds.ts Vale Cup and Fiesta retirement edits in this same merge byte-
     // neutral: those touch only desc/renown/feat metadata on EXISTING ids,
-    // never deedStats or reliquary). MEASURED directly, isolating the two ids
-    // the same way withoutFieldKit/withoutBramblehideContent do: 49 bytes
+    // never deedStats or reliquary). MEASURED directly, isolating the three ids
+    // the same way withoutFieldKit/withoutBramblehideContent do: 71 bytes
     // exactly, `"reins_rallycart_rxt",` (19 characters, 22 bytes) plus
-    // `"reins_goblin_rocket_sled",` (24 characters, 27 bytes) in the sorted
+    // `"reins_goblin_rocket_sled",` (24 characters, 27 bytes) plus
+    // `"reins_avian_strider",` (19 characters, 22 bytes) in the sorted
     // itemsDiscovered array.
-    const DEV_MOUNT_RELEASE_ITEM_IDS = ['reins_rallycart_rxt', 'reins_goblin_rocket_sled'] as const;
+    const DEV_MOUNT_RELEASE_ITEM_IDS = [
+      'reins_rallycart_rxt',
+      'reins_goblin_rocket_sled',
+      'reins_avian_strider',
+    ] as const;
     function withoutDevMountReleaseContent(state: CharacterState): CharacterState {
       const copy = JSON.parse(JSON.stringify(state)) as CharacterState;
       if (copy.deedStats?.itemsDiscovered)
@@ -2291,10 +2296,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const withoutDevMountRelease = withoutDevMountReleaseContent(withoutFieldKit);
     const devMountReleaseDelta =
       fieldBytes(withoutFieldKit, 'deedStats') - fieldBytes(withoutDevMountRelease, 'deedStats');
-    expect(devMountReleaseDelta).toBe(49);
+    expect(devMountReleaseDelta).toBe(71);
     expect(
       counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8'),
-    ).toBe(49);
+    ).toBe(71);
     const preReleaseCounterfactual = withoutBramblehideContent(withoutDevMountRelease);
     // The Bramblehide/Nythgap release content, attributed exactly against
     // f73615a511 (the last test-ledger commit, where the settled ceiling
@@ -2306,7 +2311,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // and non-professions field is byte-identical across the merge.
     // Measured against withoutDevMountRelease, not withoutFieldKit: the two
     // dev-mount ids isolated above must not leak into this delta, or the
-    // deedStats term would read 791 (742 + the 49 already attributed).
+    // deedStats term would read 813 (742 + the 71 already attributed).
     const bramblehideDelta = Object.fromEntries(
       (['deeds', 'deedStats', 'reliquary'] as const).map((key) => [
         key,
@@ -2320,7 +2325,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 21 characters as `"<id>",` in the sorted array (26 + 24 bytes). MEASURED,
     // not inferred, same as every other row this equation names.
     expect(counterfactualBytes - 156144).toBe(
-      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) + 183 + 1548 + 50 + 49,
+      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) + 183 + 1548 + 50 + 71,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2358,15 +2363,19 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     ).toBe(209773);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
-    // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
-    // dev-mount delta attributed above: 211,121. OSSBrain integration
-    // (goblin_rocket_sled, rallycart_rxt) is the dev-mount mover, MEASURED
-    // via the devMountReleaseDelta isolation, not inferred; the hub practice
-    // quests are the +50 above it.
+    // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
+    // dev-mount delta attributed above: 211,143. OSSBrain integration
+    // (goblin_rocket_sled, rallycart_rxt) and the Viridian Valestrider are the
+    // dev-mount movers, MEASURED via the devMountReleaseDelta isolation, not
+    // inferred; the hub practice quests are the +50 above it. RE-MEASURED at
+    // 211,392 for the Viridian Valestrider, exactly +22 over the 211,370
+    // above: the one new developer-only mount reins id in
+    // deedStats.itemsDiscovered (`"reins_avian_strider",`), inside the same
+    // devMountReleaseDelta isolation.
     expect(
       counterfactualBytes,
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
-    ).toBe(211370);
+    ).toBe(211392);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2416,8 +2425,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // the zero-valued Spirit keys the old normaliser wrote (-8). Re-based per
     // the standing rule (floor measurement minus 380, edge measurement plus
     // one, band width unchanged at 381): 211,002..211,383.
-    expect(bytes, reMint).toBeGreaterThan(211002);
-    expect(bytes, reMint).toBeLessThan(211383);
+    // RE-BASED again for the Viridian Valestrider: 211,404 bytes, exactly +22
+    // over the 211,382 above, the same one new reins id, attributed through
+    // the same devMountReleaseDelta isolation. Same standing rule, same 381
+    // width: 211,024..211,405.
+    expect(bytes, reMint).toBeGreaterThan(211024);
+    expect(bytes, reMint).toBeLessThan(211405);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

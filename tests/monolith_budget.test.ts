@@ -1593,11 +1593,15 @@ const MONOLITHS: MonolithRow[] = [
     // entity wire bit and the wpvp self key; the one-use delay() helper was
     // inlined to pay for the /pvp command-lane claim. Measured with
     // wc -l < server/game.ts after biome. Exact count, zero slack.
-    // Re-pinned at the merge of release/v0.44.0 into feature/world-pvp-flag (the
-    // release's PR 4054 / 4137 / 4141 extractions above plus this branch's below):
-    // exact count measured on the MERGED working tree (wc -l < server/game.ts),
-    // never reconciled by arithmetic. Zero slack.
-    ceiling: 9920,
+    // LOWERED 9979 -> 9965 by the craft_roll_events change: the ftue_events
+    // quest/death record arms of the event drain moved to
+    // server/event_record_observers.ts (which also hosts the new craftRoll
+    // arm), so the audit landed as a net shrink. Exact count, zero slack.
+    // Re-pinned at each merge of release/v0.44.0 into feature/world-pvp-flag
+    // (the release's extractions above plus this branch's): exact count
+    // measured on the MERGED working tree (wc -l < server/game.ts), never
+    // reconciled by arithmetic. Zero slack.
+    ceiling: 9906,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
