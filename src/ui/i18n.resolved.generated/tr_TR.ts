@@ -1537,6 +1537,7 @@ export const tr_TR: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Dehşet Kıvılcımı Yer Sarsıcı",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Makine Kuşu",
       "name_lanternback_troll": "Fener Sırtlı Grumbol",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
@@ -1553,6 +1554,7 @@ export const tr_TR: EnTranslations = {
       "desc_rallycart_skin": "Güçlü kükreyen küçücük bir ralli arabası.",
       "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
       "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Kapanan servolarla koşan, kurma anahtarı hâlâ dönen, el yapımı, saat mekanizmalı bir savaş tavuğu.",
       "desc_lanternback_troll": "Omuzlarında demir bir taht taşıyan, her iki kolunda da yanan bir fırtına feneri taşıyan, fener yakanlar tarafından boyunduruğa alınan bir tepe trolü.",
       "desc_chimeglass_tortoise": "Üç nesildir karavanları geride bırakan, tuzla kaplı bir kaplumbağa. Tamirciler ona fırtına camından gözlük taktı ve boğazına bronz bir çan astı, böylece yol onu görmeden çok önce onu duyardı.",
@@ -14536,6 +14538,9 @@ export const tr_TR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Ateşleme Anahtarı: Dehşetkoru Yer Sarsıcı"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Kontak anahtarı: Goblin Roket Kızağı"

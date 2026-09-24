@@ -1537,6 +1537,7 @@ export const fr_FR: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Secoueur de terre Étincelle-de-terreur",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Oiseau Mécanique",
       "name_lanternback_troll": "Grumbol le Lanternback",
       "name_chimeglass_tortoise": "Tolliver le Chimeglass",
@@ -1553,6 +1554,7 @@ export const fr_FR: EnTranslations = {
       "desc_rallycart_skin": "Une minuscule voiture de rallye au rugissement puissant.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
       "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Un poulet de guerre mécanique construit à la main qui sprinte sur des servos qui claquent, la clé de remontage tournant toujours.",
       "desc_lanternback_troll": "Un troll des collines brisé jusqu'au joug par des allumeurs de réverbères, portant un trône de fer sur ses épaules avec une lanterne tempête allumée sur chaque bras.",
       "desc_chimeglass_tortoise": "Une tortue des salines qui a dépassé trois générations de caravanes. Les bricoleurs lui ont arraché des lunettes en verre tempête et lui ont accroché une cloche de bronze à la gorge, pour que la route l'entende bien avant de le voir.",
@@ -14536,6 +14538,9 @@ export const fr_FR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Clé d’allumage : Secoueur-de-sol Étincelle-de-terreur"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Clé de contact : luge-fusée gobeline"

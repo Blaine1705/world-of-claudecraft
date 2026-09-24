@@ -1537,6 +1537,7 @@ export const it_IT: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Scuotiterra Scintillaterribile",
       "name_drakemaw_raptor": "Raptor di Drakemaw",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Uccello Mech",
       "name_lanternback_troll": "Grumbol il Lanterna",
       "name_chimeglass_tortoise": "Tolliver il Chimeglass",
@@ -1553,6 +1554,7 @@ export const it_IT: EnTranslations = {
       "desc_rallycart_skin": "Una minuscola auto da rally dal rombo possente.",
       "desc_terrorspark_groundshaker": "Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi.",
       "desc_drakemaw_raptor": "Un raptor da covata domato per la sella, proveniente dalla Caldera di Drakemaw, tutto muscoli e scatto, che sa ancora vagamente di cenere.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Un pollo da guerra a orologeria costruito a mano che scatta su servi scattanti, con la chiave di carica ancora in movimento.",
       "desc_lanternback_troll": "Un troll di collina piegato al giogo dai lampionai, che porta un trono di ferro sulle spalle con una lanterna antivento accesa su entrambi i bracci.",
       "desc_chimeglass_tortoise": "Una tartaruga salata che ha superato tre generazioni di carovane. I calderai gli montarono gli occhiali di vetro anti-tempesta e gli appesero una campana di bronzo al collo, così la strada lo sentì molto prima di vederlo.",
@@ -14536,6 +14538,9 @@ export const it_IT: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chiave di Accensione: Spaccaterra Scintilla del Terrore"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Chiave di accensione: Slitta a razzo goblin"

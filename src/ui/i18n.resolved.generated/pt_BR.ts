@@ -1537,6 +1537,7 @@ export const pt_BR: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Treme-terra Fagulha do Terror",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Pássaro Mech Cluckwork",
       "name_lanternback_troll": "Grumbol, o Lanterna Dorso",
       "name_chimeglass_tortoise": "Tolliver o Chimeglass",
@@ -1553,6 +1554,7 @@ export const pt_BR: EnTranslations = {
       "desc_rallycart_skin": "Um carrinho de corrida minúsculo com um rugido poderoso.",
       "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
       "desc_drakemaw_raptor": "Um raptor da ninhada domado na sela, vindo da Caldeira de Drakemaw, puro músculo e velocidade, ainda com um leve cheiro de cinzas.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Uma galinha de guerra mecânica construída à mão que corre em servos em movimento, com a chave de corda ainda girando.",
       "desc_lanternback_troll": "Um troll das colinas quebrado no jugo por acendedores de lampiões, carregando um trono de ferro sobre os ombros com uma lanterna de tempestade acesa em cada braço.",
       "desc_chimeglass_tortoise": "Uma tartaruga das salinas que ultrapassou três gerações de caravanas. Os funileiros moeram-lhe óculos de vidro e penduraram um sino de bronze em sua garganta, para que a estrada o ouça muito antes de vê-lo.",
@@ -14536,6 +14538,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Rédeas: Quebra-terra Fagulha do Terror"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Chave de ignição: Trenó-foguete goblin"

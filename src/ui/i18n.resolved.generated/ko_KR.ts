@@ -1537,6 +1537,7 @@ export const ko_KR: EnTranslations = {
       "name_rallycart_rxt": "랠리카트 RXT",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 드레드스파크",
       "name_drakemaw_raptor": "화산구 랩터",
+      "name_avian_strider": "비리디안 베일스트라이더",
       "name_mech_bird": "태엽 기계새",
       "name_lanternback_troll": "등불지기 그룸볼",
       "name_chimeglass_tortoise": "종유리의 톨리버",
@@ -1553,6 +1554,7 @@ export const ko_KR: EnTranslations = {
       "desc_rallycart_skin": "작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
       "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
+      "desc_avian_strider": "우뚝 솟은 탈것 조류로, 육중한 발톱과 접은 날개가 모든 여정을 천둥 같은 질주로 바꾼다.",
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
       "desc_lanternback_troll": "점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.",
       "desc_chimeglass_tortoise": "소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.",
@@ -14536,6 +14538,9 @@ export const ko_KR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "드레드스파크 시동 열쇠"
+      },
+      "reins_avian_strider": {
+        "name": "비리디안 베일스트라이더의 고삐"
       },
       "reins_goblin_rocket_sled": {
         "name": "고블린 로켓 썰매 시동 열쇠"

@@ -1537,6 +1537,7 @@ export const pl_PL: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Grzmot Złowieszczej Iskry",
       "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Mech Ptak",
       "name_lanternback_troll": "Grumbol Latarniowy Grzbiet",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
@@ -1553,6 +1554,7 @@ export const pl_PL: EnTranslations = {
       "desc_rallycart_skin": "Mały samochód rajdowy o potężnym ryku.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
       "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Ręcznie zbudowany mechaniczny kurczak bojowy, który biegnie na pstrykających serwach, a nakręcany klucz wciąż się obraca.",
       "desc_lanternback_troll": "Hill troll złamany do jarzma przez latarników, niosący na ramionach żelazny tron z latarniami burzowymi płonącymi na obu ramionach.",
       "desc_chimeglass_tortoise": "Żółw solny, który wyprzedził trzy pokolenia przyczep kempingowych. Druciarze zmielili mu okulary ze szkła burzowego i zawiesili mu na szyi dzwonek z brązu, tak że droga usłyszy go na długo, zanim go zobaczy.",
@@ -14536,6 +14538,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Wodosprawiające lejce Iskry Grozy"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Kluczyk zapłonu: Goblińskie sanie rakietowe"

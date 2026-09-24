@@ -35,6 +35,7 @@ import {
   castHoldStep,
   desiredBaseState,
   drivesPose,
+  gaitWindDownTimeScale,
   locomotionTimeScale,
   pickProxyHeight,
   SUBMERGED_HEAD_FRACTION,
@@ -728,6 +729,8 @@ export class CharacterVisual {
   private wasDead = false;
   /** previous frame's airborne flag, for the touchdown edge (see ClipMap.land) */
   private wasAirborne = false;
+  /** Was the body moving at takeoff? See the ClipMap's jumpMoving. */
+  private jumpWhileMoving = false;
   private initialized = false;
   private attackIdx = 0;
   private hitCooldown = 0;
@@ -1058,6 +1061,10 @@ export class CharacterVisual {
       this.playOneShot(landClip, 1);
       this.currentOneShotIsLanding = true;
     }
+    // Latch WHY we are airborne, on the takeoff edge. It cannot be read later:
+    // a moving jump keeps `moving` true the whole time it is in the air, so by
+    // the time the pose is chosen the takeoff is no longer observable.
+    if (!this.wasAirborne && s.airborne) this.jumpWhileMoving = s.moving;
     this.wasAirborne = s.airborne;
 
     this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
@@ -1141,6 +1148,8 @@ export class CharacterVisual {
           this.def.prowlRef,
           this.def.walkBackRef,
           this.def.runTimeScaleMin,
+          this.def.walkTimeScaleMax,
+          this.def.runTimeScaleMax,
         );
         if (timeScale !== null) {
           if (timeScale < 0 && this.current.time <= 1e-3)
@@ -1193,6 +1202,7 @@ export class CharacterVisual {
         }
       }
     }
+    this.advanceGaitWindDown(dt);
 
     // Zero-weight watchdog. The fades above only run on a base-state EDGE, so
     // any transient that leaves NO action driving the rig keeps it in bind pose
@@ -3468,6 +3478,23 @@ export class CharacterVisual {
     this.fadeTo(this.baseAction(), FADE, false);
   }
 
+  /**
+   * Normalized phase of the base locomotion clip, 0..1, or null when no base
+   * action is running.
+   *
+   * Exposed so audio can be pinned to events INSIDE the animation (a foot
+   * meeting the ground) rather than to distance travelled. A distance
+   * accumulator drifts against the clip whenever playback rate and ground speed
+   * disagree, and then footfalls land between the visible steps.
+   */
+  baseClipPhase(): number | null {
+    const a = this.current ?? this.baseAction();
+    const clip = a?.getClip?.();
+    if (!a || !clip || clip.duration <= 0) return null;
+    const t = a.time % clip.duration;
+    return (t < 0 ? t + clip.duration : t) / clip.duration;
+  }
+
   private baseTransitionFade(next: BaseState): number {
     // A winged form without an authored Jump clip must leave its locomotion
     // stride almost immediately. The normal crossfade preserves too much of a
@@ -3678,8 +3705,10 @@ export class CharacterVisual {
         return this.action(c.wade) ?? this.action(c.walk) ?? this.action(c.idle);
       case 'sit':
         return this.action(c.sitDown) ?? this.action(c.sitIdle) ?? this.action(c.idle);
-      case 'jump':
-        return this.action(c.jump) ?? this.action(c.idle);
+      case 'jump': {
+        const moving = this.jumpWhileMoving ? this.action(c.jumpMoving) : null;
+        return moving ?? this.action(c.jump) ?? this.action(c.idle);
+      }
       case 'fall':
         // Rigs without the authored flail (mobs, creatures) hold the jump
         // pose for the whole fall, which is what every rig did before it.
@@ -3691,6 +3720,35 @@ export class CharacterVisual {
 
   private shouldInterruptEmote(s: AnimState): boolean {
     return s.moving || s.airborne || s.swimming || s.casting || !!s.spinning || s.sitting || s.dead;
+  }
+
+  /** The outgoing gait currently winding down, if this rig opted in. Cleared
+   *  when the fade completes, or the moment the action is re-driven. */
+  private windDown: {
+    action: THREE.AnimationAction;
+    from: number;
+    fade: number;
+    elapsed: number;
+  } | null = null;
+
+  /** Decay the outgoing gait's cadence alongside its crossfade, so a stop
+   *  settles instead of sprinting out under a dissolving pose. A no-op for a
+   *  rig that has not opted in, and for the whole of the rest of the game. */
+  private advanceGaitWindDown(dt: number): void {
+    const w = this.windDown;
+    if (!w) return;
+    // Re-driven as the live pose (a stop that immediately becomes a start), or
+    // stopped out from under us: hand it back, the per-frame speed matching
+    // owns its cadence again. isScheduled(), NOT isRunning(): three reports a
+    // timeScale-0 action as not running, so isRunning would call the freeze
+    // this very function just applied a reason to stop tracking it.
+    if (w.action === this.current || !w.action.isScheduled()) {
+      this.windDown = null;
+      return;
+    }
+    w.elapsed += dt;
+    w.action.timeScale = gaitWindDownTimeScale(w.from, w.elapsed, w.fade);
+    if (w.elapsed >= w.fade) this.windDown = null;
   }
 
   /** The cast just ended mid-clip: let a listed cast clip FINISH as a one-shot
@@ -3771,9 +3829,20 @@ export class CharacterVisual {
     }
     if (prev && prev !== next && drivesPose(readActionWeight(prev))) {
       prev.fadeOut(fade);
+      // Arm the cadence wind-down on the SAME action the mixer is fading, and
+      // only for a gait that was actually running forward: a reversed
+      // backpedal (negative scale) or an already-idle clip has nothing to wind
+      // down, and one-shots own their own timing.
+      this.windDown =
+        this.def.gaitWindDown && !this.currentIsOneShot && prev.timeScale > 0
+          ? { action: prev, from: prev.timeScale, fade, elapsed: 0 }
+          : null;
       next.fadeIn(fade).play();
       return;
     }
+    // The snap path stops `prev` outright, so there is no outgoing cadence left
+    // to decay; drop any wind-down still pointing at it.
+    this.windDown = null;
     // A prev below the pose-drive threshold still needs its scheduled fades
     // cancelled: it is excluded from the sweep above (as prev) and from the
     // crossfade (below threshold), so a fade-in it was carrying would
@@ -4061,6 +4130,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.swimIdle,
     c.wade,
     c.jump,
+    c.jumpMoving,
     c.fall,
     c.land,
     c.walkBack,

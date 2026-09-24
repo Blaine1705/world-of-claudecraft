@@ -1537,6 +1537,7 @@ export const nl_NL: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Vreesvonk Grondschudder",
       "name_drakemaw_raptor": "Drakenmuil-Raptor",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Mechvogel",
       "name_lanternback_troll": "Grumbol de Lantaarnrug",
       "name_chimeglass_tortoise": "Tolliver het klokkenspel",
@@ -1553,6 +1554,7 @@ export const nl_NL: EnTranslations = {
       "desc_rallycart_skin": "Een kleine rallyauto met een machtige brul.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
       "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Een met de hand gebouwde oorlogskip die sprint op klikkende servo's terwijl de opwindsleutel nog draait.",
       "desc_lanternback_troll": "Een heuveltrol die door lantaarnopstekers tot aan zijn juk werd gebroken, met een ijzeren troon op zijn schouders en een stormlantaarn die aan beide armen brandde.",
       "desc_chimeglass_tortoise": "Een zoutvlakteschildpad die drie generaties karavanen is ontlopen. Tinkers hebben een bril van stormglas voor hem geslepen en een bronzen bel om zijn keel gehangen, zodat de weg hem lang hoort voordat hij hem ziet.",
@@ -14536,6 +14538,9 @@ export const nl_NL: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Ontstekingssleutel: Doodsprank Grondschudder"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Contactsleutel: Goblin-raketslee"

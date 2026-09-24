@@ -1537,6 +1537,7 @@ export const vi_VN: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Kẻ Nghiền Đất Tia Kinh Hoàng",
       "name_drakemaw_raptor": "Cuồng Long Drakemaw",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Chim Mech Cluckwork",
       "name_lanternback_troll": "Grumbol Lưng Đèn",
       "name_chimeglass_tortoise": "Tolliver chiếc cốc thủy tinh",
@@ -1553,6 +1554,7 @@ export const vi_VN: EnTranslations = {
       "desc_rallycart_skin": "Một chiếc xe đua nhỏ có tiếng gầm vang dội.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
       "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Một con gà chiến đồng hồ được chế tạo bằng tay chạy nước rút trên các động cơ servo, phím lên dây cót vẫn quay.",
       "desc_lanternback_troll": "Một con quỷ đồi bị những người đốt đèn bẻ gãy ách, vác một chiếc ngai sắt trên vai với một chiếc đèn bão đang cháy trên hai tay.",
       "desc_chimeglass_tortoise": "Một con rùa bằng muối đã vượt qua ba thế hệ đoàn lữ hành. Những người thợ hàn mài cho anh ta một cặp kính từ kính bão và treo một chiếc chuông đồng vào cổ anh ta, để con đường nghe thấy anh ta từ rất lâu trước khi nó nhìn thấy anh ta.",
@@ -14536,6 +14538,9 @@ export const vi_VN: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chìa Khóa Khởi Động: Chấn Địa Tia Kinh Hoàng"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Khóa khởi động: Xe trượt tên lửa goblin"

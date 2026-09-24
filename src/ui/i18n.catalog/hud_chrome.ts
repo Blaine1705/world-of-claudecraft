@@ -1830,6 +1830,7 @@ export const hudChromeStrings = {
     name_rallycart_rxt: 'Rallycart RXT',
     name_terrorspark_groundshaker: 'Dreadspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
+    name_avian_strider: 'Viridian Valestrider',
     name_mech_bird: 'Cluckwork Mech Bird',
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
@@ -1853,6 +1854,8 @@ export const hudChromeStrings = {
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
+    desc_avian_strider:
+      'A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.',
     desc_mech_bird:
       'A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.',
     desc_lanternback_troll:
