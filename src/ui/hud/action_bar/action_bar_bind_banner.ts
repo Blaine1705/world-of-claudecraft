@@ -23,37 +23,6 @@ import {
 
 const ACTION_BAR_BIND_BANNER_ID = 'actionbar-bind-banner';
 
-/** Keep a manually placed banner reachable after a viewport or orientation change. */
-function keepBannerInViewport(el: HTMLElement, uiRoot: HTMLElement): void {
-  const win = uiRoot.ownerDocument.defaultView;
-  const clamp = () => {
-    if (!el.isConnected) {
-      win?.removeEventListener('resize', clamp);
-      return;
-    }
-    const scale = liveScale();
-    const viewport = visibleViewport(uiRoot, scale);
-    const pos = draggedWindowPosition(
-      {
-        pointerX: (Number.parseFloat(el.style.left) || 0) * scale,
-        pointerY: (Number.parseFloat(el.style.top) || 0) * scale,
-        grabOffsetX: 0,
-        grabOffsetY: 0,
-      },
-      {
-        scale,
-        viewportWidth: viewport.width,
-        viewportHeight: viewport.height,
-        windowWidth: el.offsetWidth,
-        windowHeight: el.offsetHeight,
-      },
-    );
-    el.style.left = `${pos.left}px`;
-    el.style.top = `${pos.top}px`;
-  };
-  win?.addEventListener('resize', clamp);
-}
-
 /** The bars the banner must clear, primary first (the placement centres on it).
  *  Looked up by id so a bar Interface Unlock reparented to #ui still counts. */
 export const ACTION_BAR_BIND_BANNER_ANCHORS: readonly string[] = [
@@ -305,3 +274,35 @@ export function setActionBarBindBannerStatus(banner: HTMLElement, state: ActionB
 export function removeActionBarBindBanner(banner: HTMLElement | null): void {
   banner?.remove();
 }
+
+/** Keep a manually placed banner reachable after a viewport or orientation change. */
+function keepBannerInViewport(el: HTMLElement, uiRoot: HTMLElement): void {
+  const win = uiRoot.ownerDocument.defaultView;
+  const clamp = () => {
+    if (!el.isConnected) {
+      win?.removeEventListener('resize', clamp);
+      return;
+    }
+    const scale = liveScale();
+    const viewport = visibleViewport(uiRoot, scale);
+    const pos = draggedWindowPosition(
+      {
+        pointerX: (Number.parseFloat(el.style.left) || 0) * scale,
+        pointerY: (Number.parseFloat(el.style.top) || 0) * scale,
+        grabOffsetX: 0,
+        grabOffsetY: 0,
+      },
+      {
+        scale,
+        viewportWidth: viewport.width,
+        viewportHeight: viewport.height,
+        windowWidth: el.offsetWidth,
+        windowHeight: el.offsetHeight,
+      },
+    );
+    el.style.left = `${pos.left}px`;
+    el.style.top = `${pos.top}px`;
+  };
+  win?.addEventListener('resize', clamp);
+}
+
