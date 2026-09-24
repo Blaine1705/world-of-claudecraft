@@ -997,7 +997,10 @@ export const zh_TW: EnTranslations = {
       "count": "（{count}）",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "收合任務追蹤器",
-      "expandHint": "展開任務追蹤器"
+      "expandHint": "展開任務追蹤器",
+      "worldQuests": "世界任務",
+      "worldQuestsCollapseHint": "收合世界任務",
+      "worldQuestsExpandHint": "展開世界任務"
     },
     "interfaceTabs": {
       "general": "一般",

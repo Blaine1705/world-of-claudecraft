@@ -997,7 +997,10 @@ export const ko_KR: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "퀘스트 추적기 접기",
-      "expandHint": "퀘스트 추적기 펼치기"
+      "expandHint": "퀘스트 추적기 펼치기",
+      "worldQuests": "전역 퀘스트",
+      "worldQuestsCollapseHint": "전역 퀘스트 접기",
+      "worldQuestsExpandHint": "전역 퀘스트 펼치기"
     },
     "interfaceTabs": {
       "general": "일반",

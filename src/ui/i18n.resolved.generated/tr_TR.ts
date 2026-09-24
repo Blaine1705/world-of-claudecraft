@@ -997,7 +997,10 @@ export const tr_TR: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Görev takipçisini daralt",
-      "expandHint": "Görev takipçisini genişlet"
+      "expandHint": "Görev takipçisini genişlet",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "Genel",

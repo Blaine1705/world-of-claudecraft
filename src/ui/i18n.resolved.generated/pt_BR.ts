@@ -997,7 +997,10 @@ export const pt_BR: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Recolher missões",
-      "expandHint": "Expandir missões"
+      "expandHint": "Expandir missões",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "Geral",

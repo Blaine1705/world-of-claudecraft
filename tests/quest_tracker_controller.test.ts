@@ -9,6 +9,7 @@ import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_contro
 import { makeWriterFacet } from '../src/ui/painter_host';
 import { dropPointerFocus } from '../src/ui/pointer_blur';
 import { QuestTrackingState } from '../src/ui/quest_tracking_core';
+import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../src/ui/world_quest_view';
 import type { IWorld } from '../src/world_api';
 
 const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
@@ -61,6 +62,11 @@ function harness(
   let html = '';
   let writes = 0;
   let collapsed = false;
+  let worldQuestsCollapsed = false;
+  const wqHeader = {
+    classList: { contains: (value: string) => value === 'qt-header' },
+    focus: vi.fn(),
+  };
   const header = {
     classList: { contains: (value: string) => value === 'qt-header' },
     focus: vi.fn(),
@@ -78,7 +84,12 @@ function harness(
       html = value;
       writes++;
     },
-    querySelector: (selector: string) => (selector === '.qt-header' ? header : null),
+    querySelector: (selector: string) =>
+      selector === '.qt-header:not([data-qt-section])'
+        ? header
+        : selector === '.qt-header[data-qt-section="worldQuests"]'
+          ? wqHeader
+          : null,
   } as unknown as HTMLElement;
   const document = docState as unknown as Document;
   const settings = {
@@ -86,6 +97,10 @@ function harness(
     collapsed: vi.fn(() => collapsed),
     setCollapsed: vi.fn((next: boolean) => {
       collapsed = next;
+    }),
+    worldQuestsCollapsed: vi.fn(() => worldQuestsCollapsed),
+    setWorldQuestsCollapsed: vi.fn((next: boolean) => {
+      worldQuestsCollapsed = next;
     }),
   };
   const click = vi.fn();
@@ -114,12 +129,17 @@ function harness(
     settings,
     click,
     header,
+    wqHeader,
     html: () => html,
     writes: () => writes,
     setCollapsed: (next: boolean) => {
       collapsed = next;
     },
     collapsed: () => collapsed,
+    setWorldQuestsCollapsed: (next: boolean) => {
+      worldQuestsCollapsed = next;
+    },
+    worldQuestsCollapsed: () => worldQuestsCollapsed,
   };
 }
 
@@ -298,17 +318,21 @@ describe('QuestTrackerController', () => {
       [{ questId: 'wq_evergarden_forging', state: 'completed', count: 1, forging }],
     );
     rig.controller.update(0);
-    rig.controller.toggleCollapsed();
-    expect(rig.collapsed()).toBe(false);
+    rig.controller.toggleCollapsed('worldQuests');
+    expect(rig.worldQuestsCollapsed()).toBe(false);
     forging.phase = 'success';
     forging.result = { elapsed: 30, adjustedTime: 30, mistakes: 0, rating: 'gold' };
     rig.controller.update(1);
     expect(rig.html()).toContain('Gold! 30s. Mistakes: 0.');
     expect(rig.html()).not.toContain('disabled aria-disabled="true"');
-    rig.controller.toggleCollapsed();
-    expect(rig.collapsed()).toBe(true);
-    rig.controller.toggleCollapsed();
+    rig.controller.toggleCollapsed('worldQuests');
+    expect(rig.worldQuestsCollapsed()).toBe(true);
+    expect(rig.html()).not.toContain('Gold! 30s. Mistakes: 0.');
+    rig.controller.toggleCollapsed('worldQuests');
     expect(rig.html()).toContain('Gold! 30s. Mistakes: 0.');
+    // The Quests section is not on screen, so its toggle is inert.
+    rig.controller.toggleCollapsed();
+    expect(rig.settings.setCollapsed).not.toHaveBeenCalled();
   });
 
   it('stops forcing touch selection on every update after forge success', () => {
@@ -359,15 +383,15 @@ describe('QuestTrackerController', () => {
         },
       ],
     );
-    rig.setCollapsed(true);
+    rig.setWorldQuestsCollapsed(true);
     rig.controller.update(500000);
     expect(rig.html()).toContain('Strikes: 0/10');
     expect(rig.html()).not.toContain('Gold:');
     expect(rig.html()).not.toContain('Stoke the fire');
     expect(rig.html()).not.toContain('500000');
-    expect(rig.collapsed()).toBe(true);
-    rig.controller.toggleCollapsed();
-    expect(rig.collapsed()).toBe(true);
+    rig.controller.toggleCollapsed('worldQuests');
+    expect(rig.worldQuestsCollapsed()).toBe(true);
+    expect(rig.settings.setWorldQuestsCollapsed).not.toHaveBeenCalled();
   });
 
   it('shows authoritative movement instructions even when collapsed without changing the preference', () => {
@@ -390,15 +414,18 @@ describe('QuestTrackerController', () => {
       },
     };
     const rig = harness([], [entry]);
-    rig.setCollapsed(true);
+    rig.setWorldQuestsCollapsed(true);
     rig.controller.update(0);
     expect(rig.html()).toContain('Watch the outline. Golden sparkles will guide you.');
     expect(rig.html()).toContain('Round 1 of 3: Triangle.');
     expect(rig.html()).toContain('disabled aria-disabled="true"');
     expect(rig.html()).not.toContain('title="Collapse quest tracker"');
+    expect(rig.html()).not.toContain('title="Collapse world quests"');
     rig.controller.toggleCollapsed();
-    expect(rig.collapsed()).toBe(true);
+    rig.controller.toggleCollapsed('worldQuests');
+    expect(rig.worldQuestsCollapsed()).toBe(true);
     expect(rig.settings.setCollapsed).not.toHaveBeenCalled();
+    expect(rig.settings.setWorldQuestsCollapsed).not.toHaveBeenCalled();
     expect(rig.click).not.toHaveBeenCalled();
     if (!entry.tracing) throw new Error('missing tracing fixture');
     entry.tracing.phase = 'failed';
@@ -454,8 +481,142 @@ describe('QuestTrackerController', () => {
     expect(test.html()).toContain('Eastbrook Vale');
     expect(test.html()).not.toContain(`data-quest="${quest.id}"`);
     expect(test.html()).not.toMatch(/class="qt-title" role="button"[^>]*wq_/);
-    expect(test.html()).toContain(`2 / ${quest.count}`);
+    // Listed the classic way: the tally rides inline after the objective.
+    expect(test.html()).toContain(`${worldQuestObjectiveLabel(quest.id)}: 2/${quest.count}`);
     expect(test.html()).not.toContain('Arcane Calligraphy');
+  });
+
+  it('gives world quests their own "World Quests" section after the Quests section', () => {
+    const wolves = progress('q_wolves');
+    wolves.counts[0] = 0;
+    const questId = 'wq_eastbrook_bandits';
+    const entry: WorldQuestProgress = { questId, count: 3, state: 'active' };
+    const total = WORLD_QUESTS.find((quest) => quest.id === questId)?.count;
+    expect(total).toBeGreaterThan(4);
+    const test = harness([wolves], [entry]);
+    test.controller.update(0);
+    const html = test.html();
+
+    const questsHeader = html.indexOf('<span class="qt-h-label">Quests</span>');
+    const wqHeader = html.indexOf('<span class="qt-h-label">World Quests</span>');
+    expect(questsHeader).toBeGreaterThanOrEqual(0);
+    expect(wqHeader).toBeGreaterThan(questsHeader);
+    expect(html).toContain(
+      'class="qt-header qt-header-wq ui-cin" data-qt-section="worldQuests" aria-expanded="true" aria-controls="qt-wq-list" title="Collapse world quests"',
+    );
+    // Each list holds only its own rows: the normal quest keeps its log number
+    // and click-to-open row, the world quest is a plain title with no badge.
+    const quests = html.slice(html.indexOf('<div id="qt-list">'), html.indexOf('<button', 1));
+    const worldQuests = html.slice(html.indexOf('<div id="qt-wq-list">'));
+    expect(quests).toContain('data-quest="q_wolves"');
+    expect(quests).toContain('title:q_wolves');
+    expect(quests).not.toContain(worldQuestDisplayName(questId));
+    expect(worldQuests).toContain(
+      `<div class="qt-title qt-wq-title ui-cin">${worldQuestDisplayName(questId)}</div>`,
+    );
+    expect(worldQuests).not.toContain('title:q_wolves');
+    expect(worldQuests).not.toContain('qt-num');
+    expect(worldQuests).toContain(
+      `<div class="qt-obj ui-meta counted"><span>- ${worldQuestObjectiveLabel(questId)}: 3/${total}</span></div>`,
+    );
+    // The Quests header counts its own rows only.
+    expect(html).toContain(
+      '<span class="qt-h-label">Quests</span> <span class="qt-count ui-num">1</span>',
+    );
+    expect(html).toContain(
+      '<span class="qt-h-label">World Quests</span> <span class="qt-count ui-num">1</span>',
+    );
+
+    // Progress updates live on the next frame.
+    entry.count = 4;
+    test.controller.update(1);
+    expect(test.html()).toContain(`${worldQuestObjectiveLabel(questId)}: 4/${total}`);
+  });
+
+  it('collapses each section on its own header and persists it in its own setting', () => {
+    const questId = 'wq_eastbrook_bandits';
+    const test = harness([progress('q_wolves')], [{ questId, count: 1, state: 'active' }]);
+    test.controller.update(0);
+
+    test.controller.toggleHeader({
+      dataset: { qtSection: 'worldQuests' },
+    } as unknown as HTMLElement);
+    expect(test.settings.setWorldQuestsCollapsed).toHaveBeenLastCalledWith(true);
+    expect(test.settings.setCollapsed).not.toHaveBeenCalled();
+    expect(test.html()).toContain('data-qt-section="worldQuests" aria-expanded="false"');
+    expect(test.html()).not.toContain(worldQuestDisplayName(questId));
+    // The quest list is untouched, and the World Quests header keeps its count.
+    expect(test.html()).toContain('title:q_wolves');
+    expect(test.html()).toContain(
+      '<span class="qt-h-label">World Quests</span> <span class="qt-count ui-num">1</span>',
+    );
+
+    // The Quests header (no section attribute) flips only the quest list.
+    test.controller.toggleHeader({ dataset: {} } as unknown as HTMLElement);
+    expect(test.collapsed()).toBe(true);
+    expect(test.html()).not.toContain('title:q_wolves');
+    test.controller.toggleHeader({
+      dataset: { qtSection: 'worldQuests' },
+    } as unknown as HTMLElement);
+    expect(test.worldQuestsCollapsed()).toBe(false);
+    expect(test.html()).toContain(worldQuestDisplayName(questId));
+    expect(test.html()).not.toContain('title:q_wolves');
+  });
+
+  it('clears a stale collapse per section once that section empties', () => {
+    // Quests collapsed while only world quests are tracked: the Quests header is
+    // not on screen, so the next accepted quest must not arrive hidden.
+    const onlyWorld = harness([], [{ questId: 'wq_eastbrook_bandits', count: 1, state: 'active' }]);
+    onlyWorld.setCollapsed(true);
+    onlyWorld.controller.update(0);
+    expect(onlyWorld.settings.setCollapsed).toHaveBeenCalledTimes(1);
+    expect(onlyWorld.settings.setCollapsed).toHaveBeenCalledWith(false);
+    expect(onlyWorld.settings.setWorldQuestsCollapsed).not.toHaveBeenCalled();
+
+    // World Quests collapsed with no world quest left (the daily reset): the
+    // next world quest arrives expanded. The Quests preference is untouched.
+    const onlyQuests = harness([progress('q_wolves')]);
+    onlyQuests.setCollapsed(true);
+    onlyQuests.setWorldQuestsCollapsed(true);
+    onlyQuests.controller.update(0);
+    onlyQuests.controller.update(1);
+    expect(onlyQuests.settings.setWorldQuestsCollapsed).toHaveBeenCalledTimes(1);
+    expect(onlyQuests.settings.setWorldQuestsCollapsed).toHaveBeenCalledWith(false);
+    expect(onlyQuests.settings.setCollapsed).not.toHaveBeenCalled();
+    expect(onlyQuests.collapsed()).toBe(true);
+  });
+
+  it('numbers the clue hunt row after the log, never counting world quests', () => {
+    const test = harness(
+      [progress('q_wolves')],
+      [
+        { questId: 'wq_eastbrook_bandits', count: 1, state: 'active' },
+        { questId: 'wq_hollow_sporelings', count: 0, state: 'active' },
+      ],
+      { huntId: 'hunt_drakelands_gate_ashes', step: 0 },
+    );
+    test.controller.update(0);
+    const quests = test.html().slice(0, test.html().indexOf('data-qt-section'));
+    expect(quests).toContain('class="qt-num ui-badge ui-num">1</span>title:q_wolves');
+    expect(quests).toContain('class="qt-num ui-badge ui-num">2</span>Ashes at the Gate');
+  });
+
+  it('keeps the World Quests header a disabled control on a host that cannot persist it', () => {
+    const test = harness([], [{ questId: 'wq_eastbrook_bandits', count: 1, state: 'active' }]);
+    const settings = test.settings as { setWorldQuestsCollapsed?: unknown };
+    delete settings.setWorldQuestsCollapsed;
+    test.controller.update(0);
+    expect(test.html()).toMatch(/data-qt-section="worldQuests"[^>]*disabled aria-disabled="true"/);
+    test.controller.toggleCollapsed('worldQuests');
+    expect(test.click).not.toHaveBeenCalled();
+  });
+
+  it('restores keyboard focus to the World Quests header it toggled', () => {
+    const test = harness([], [{ questId: 'wq_eastbrook_bandits', count: 1, state: 'active' }]);
+    test.controller.update(0);
+    test.controller.toggleCollapsed('worldQuests');
+    expect(test.wqHeader.focus).toHaveBeenCalledTimes(1);
+    expect(test.header.focus).not.toHaveBeenCalled();
   });
 });
 

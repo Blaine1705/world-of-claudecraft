@@ -997,7 +997,10 @@ export const ru_RU: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Свернуть трекер заданий",
-      "expandHint": "Развернуть трекер заданий"
+      "expandHint": "Развернуть трекер заданий",
+      "worldQuests": "Локальные задания",
+      "worldQuestsCollapseHint": "Свернуть локальные задания",
+      "worldQuestsExpandHint": "Развернуть локальные задания"
     },
     "interfaceTabs": {
       "general": "Общие",

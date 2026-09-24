@@ -997,7 +997,10 @@ export const fr_CA: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Réduire le suivi des quêtes",
-      "expandHint": "Développer le suivi des quêtes"
+      "expandHint": "Développer le suivi des quêtes",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "Général",

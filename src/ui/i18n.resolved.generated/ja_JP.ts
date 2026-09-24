@@ -997,7 +997,10 @@ export const ja_JP: EnTranslations = {
       "count": "（{count}）",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "クエストトラッカーを折りたたむ",
-      "expandHint": "クエストトラッカーを展開する"
+      "expandHint": "クエストトラッカーを展開する",
+      "worldQuests": "ワールドクエスト",
+      "worldQuestsCollapseHint": "ワールドクエストを折りたたむ",
+      "worldQuestsExpandHint": "ワールドクエストを展開する"
     },
     "interfaceTabs": {
       "general": "全般",

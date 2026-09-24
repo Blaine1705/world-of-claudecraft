@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.questTracker.worldQuests': '전역 퀘스트',
+  'hudChrome.questTracker.worldQuestsCollapseHint': '전역 퀘스트 접기',
+  'hudChrome.questTracker.worldQuestsExpandHint': '전역 퀘스트 펼치기',
   'hudChrome.worldQuestBanner.subtitle': '전역 퀘스트',
   'hudChrome.worldQuestTooltip.factionLine': '세력: {faction}',
   'hudChrome.worldQuestTooltip.timeRemaining': '남은 시간:',

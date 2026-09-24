@@ -721,6 +721,10 @@ export const hudChromeStrings = {
     objectiveValue: '{current} / {total}',
     collapseHint: 'Collapse quest tracker',
     expandHint: 'Expand quest tracker',
+    // The tracker's own section for active world quests (quest_tracker_controller.ts).
+    worldQuests: 'World Quests',
+    worldQuestsCollapseHint: 'Collapse world quests',
+    worldQuestsExpandHint: 'Expand world quests',
   },
   interfaceTabs: {
     general: 'General',

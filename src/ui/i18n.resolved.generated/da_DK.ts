@@ -997,7 +997,10 @@ export const da_DK: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Fold opgavesporing sammen",
-      "expandHint": "Fold opgavesporing ud"
+      "expandHint": "Fold opgavesporing ud",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "Generelt",

@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.questTracker.worldQuests': 'ワールドクエスト',
+  'hudChrome.questTracker.worldQuestsCollapseHint': 'ワールドクエストを折りたたむ',
+  'hudChrome.questTracker.worldQuestsExpandHint': 'ワールドクエストを展開する',
   'hudChrome.worldQuestBanner.subtitle': 'ワールドクエスト',
   'hudChrome.worldQuestTooltip.factionLine': '勢力：{faction}',
   'hudChrome.worldQuestTooltip.timeRemaining': '残り時間：',

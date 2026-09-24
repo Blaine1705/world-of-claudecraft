@@ -997,7 +997,10 @@ export const nl_NL: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Queestevolger inklappen",
-      "expandHint": "Queestevolger uitklappen"
+      "expandHint": "Queestevolger uitklappen",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "Algemeen",

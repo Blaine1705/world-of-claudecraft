@@ -997,7 +997,10 @@ export const sv_SE: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Fäll ihop uppdragsspåraren",
-      "expandHint": "Fäll ut uppdragsspåraren"
+      "expandHint": "Fäll ut uppdragsspåraren",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "Allmänt",

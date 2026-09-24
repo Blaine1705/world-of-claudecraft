@@ -997,7 +997,10 @@ export const es_ES: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Contraer el seguimiento de misiones",
-      "expandHint": "Expandir el seguimiento de misiones"
+      "expandHint": "Expandir el seguimiento de misiones",
+      "worldQuests": "Misiones de mundo",
+      "worldQuestsCollapseHint": "Contraer misiones de mundo",
+      "worldQuestsExpandHint": "Expandir misiones de mundo"
     },
     "interfaceTabs": {
       "general": "General",

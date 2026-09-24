@@ -2445,6 +2445,10 @@ export class Hud {
         setCollapsed: (collapsed) => {
           this.optionsHooks?.settings.set('questTrackerCollapsed', collapsed);
         },
+        worldQuestsCollapsed: () =>
+          (this.optionsHooks?.settings.get('worldQuestTrackerCollapsed') ?? false) === true,
+        setWorldQuestsCollapsed: (collapsed) =>
+          this.optionsHooks?.settings.set('worldQuestTrackerCollapsed', collapsed),
       },
       questTitle,
       objectiveLabel: questObjectiveLabel,
@@ -2927,7 +2931,7 @@ export class Hud {
     // on touch.
     wireTrackerHeader($('#quest-tracker'), {
       header: '.qt-header',
-      toggle: () => this.toggleQuestTrackerCollapsed(),
+      toggle: (header) => this.questTracker.toggleHeader(header),
       rows: {
         selector: '.qt-title',
         activate: (row) => {
@@ -9939,12 +9943,6 @@ export class Hud {
   private updateQuestTracker(now: number): void {
     this.questTracker.update(now);
     this.worldQuestPuzzleWindow.refreshIfChanged();
-  }
-
-  /** Flip the persisted tracker-collapsed preference (the header click/keyboard
-   *  activation), preserving keyboard focus across the innerHTML rebuild. */
-  private toggleQuestTrackerCollapsed(): void {
-    this.questTracker.toggleCollapsed();
   }
 
   // -------------------------------------------------------------------------

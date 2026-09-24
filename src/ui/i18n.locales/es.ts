@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.questTracker.worldQuests': 'Misiones de mundo',
+  'hudChrome.questTracker.worldQuestsCollapseHint': 'Contraer misiones de mundo',
+  'hudChrome.questTracker.worldQuestsExpandHint': 'Expandir misiones de mundo',
   'hudChrome.worldQuestBanner.subtitle': 'Misión de mundo',
   'hudChrome.worldQuestTooltip.factionLine': 'Facción: {faction}',
   'hudChrome.worldQuestTooltip.timeRemaining': 'Tiempo restante:',

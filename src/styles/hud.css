@@ -5663,6 +5663,18 @@
   #quest-tracker .qt-title:hover {
     color: var(--color-text-light);
   }
+  /* The World Quests section (quest_tracker_controller.ts): its header opens a
+     second block under the quest list, and its titles are plain text (a world
+     quest has no quest-log entry to open), so they are click-through like the
+     objective lines: no pointer, no hover, and a rail icon under a long title
+     keeps its click. */
+  #quest-tracker #qt-list + .qt-header-wq {
+    margin-top: 10px;
+  }
+  #quest-tracker .qt-wq-title {
+    pointer-events: none;
+    cursor: default;
+  }
   /* Bag-hover highlight: matching quest title while a quest stack is hovered
      in bags. Information-add, always-on (no --fx gate). Quest gold wash, not
      a second yellow. Shape of the title row is unchanged. */

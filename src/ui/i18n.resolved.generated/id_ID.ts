@@ -997,7 +997,10 @@ export const id_ID: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Ciutkan pelacak misi",
-      "expandHint": "Bentangkan pelacak misi"
+      "expandHint": "Bentangkan pelacak misi",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "Umum",

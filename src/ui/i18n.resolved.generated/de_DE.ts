@@ -997,7 +997,10 @@ export const de_DE: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Quests einklappen",
-      "expandHint": "Quests ausklappen"
+      "expandHint": "Quests ausklappen",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "Allgemein",

@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.questTracker.worldQuests': '世界任務',
+  'hudChrome.questTracker.worldQuestsCollapseHint': '收合世界任務',
+  'hudChrome.questTracker.worldQuestsExpandHint': '展開世界任務',
   'hudChrome.worldQuestBanner.subtitle': '世界任務',
   'hudChrome.worldQuestTooltip.factionLine': '陣營：{faction}',
   'hudChrome.worldQuestTooltip.timeRemaining': '剩餘時間：',

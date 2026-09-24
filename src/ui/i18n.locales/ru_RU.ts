@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.questTracker.worldQuests': 'Локальные задания',
+  'hudChrome.questTracker.worldQuestsCollapseHint': 'Свернуть локальные задания',
+  'hudChrome.questTracker.worldQuestsExpandHint': 'Развернуть локальные задания',
   'hudChrome.worldQuestBanner.subtitle': 'Локальное задание',
   'hudChrome.worldQuestTooltip.factionLine': 'Фракция: {faction}',
   'hudChrome.worldQuestTooltip.timeRemaining': 'Осталось времени:',

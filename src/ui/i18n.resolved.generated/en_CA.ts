@@ -997,7 +997,10 @@ export const en_CA: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Collapse quest tracker",
-      "expandHint": "Expand quest tracker"
+      "expandHint": "Expand quest tracker",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "General",

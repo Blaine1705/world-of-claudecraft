@@ -997,7 +997,10 @@ export const en_XA: EnTranslations = {
       "count": "[({count})]",
       "objectiveValue": "[{current} / {total}]",
       "collapseHint": "[Çóļļáþšé ɋúéšţ ţŕáçķéŕ]",
-      "expandHint": "[Éẋþáñð ɋúéšţ ţŕáçķéŕ]"
+      "expandHint": "[Éẋþáñð ɋúéšţ ţŕáçķéŕ]",
+      "worldQuests": "[Ŵóŕļð Ɋúéšţš]",
+      "worldQuestsCollapseHint": "[Çóļļáþšé ŵóŕļð ɋúéšţš]",
+      "worldQuestsExpandHint": "[Éẋþáñð ŵóŕļð ɋúéšţš]"
     },
     "interfaceTabs": {
       "general": "[Ĝéñéŕáļ]",

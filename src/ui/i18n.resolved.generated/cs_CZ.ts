@@ -997,7 +997,10 @@ export const cs_CZ: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Sbalit tracker úkolů",
-      "expandHint": "Rozbalit tracker úkolů"
+      "expandHint": "Rozbalit tracker úkolů",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "Obecné",

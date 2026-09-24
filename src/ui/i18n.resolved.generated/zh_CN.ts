@@ -997,7 +997,10 @@ export const zh_CN: EnTranslations = {
       "count": "（{count}）",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "收起任务追踪器",
-      "expandHint": "展开任务追踪器"
+      "expandHint": "展开任务追踪器",
+      "worldQuests": "世界任务",
+      "worldQuestsCollapseHint": "收起世界任务",
+      "worldQuestsExpandHint": "展开世界任务"
     },
     "interfaceTabs": {
       "general": "通用",
