@@ -1,7 +1,7 @@
 // Pins for the World PvP pure rules (src/sim/pvp/world_pvp_rules.ts): the
 // pair verdict over the two flags and the two zone policies (a sanctuary on
 // either end, a free-for-all zone under both, the mutual flag elsewhere) with
-// its party and guild exemptions, the marking rule for a hit that needed no
+// its self and party exemptions (a guild is none), the marking rule for a hit that needed no
 // flag, the gold stake (the smaller of the cap and the purse fraction), the
 // equal split with the killing blow taking the remainder, the grey-level rule,
 // and the per-pair diminishing-returns curve it shares with the battleground

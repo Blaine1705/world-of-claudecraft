@@ -23,6 +23,7 @@ import {
   hillSpotIsOpen,
   hillStanding,
   hillTimes,
+  hillTimesFrom,
   hillWindowAt,
 } from '../src/sim/pvp/hill_rules';
 
@@ -188,6 +189,17 @@ describe('the three-hour schedule', () => {
     expect(hillTimes(0, 99_999)).toEqual(hillTimes(0, HILL_LATEST_WARN_OFFSET_SECONDS));
     expect(hillTimes(0, -5)).toEqual(hillTimes(0, 0));
     expect(hillWindowAt(hillTimes(4, 1234).closesAt - 1)).toBe(4);
+  });
+
+  it('slides a late warning whole, keeping the full warning and stand', () => {
+    const planned = hillTimes(0, 600);
+    expect(hillTimesFrom(planned, planned.warnAt - 30)).toBe(planned);
+    expect(hillTimesFrom(planned, planned.warnAt)).toBe(planned);
+    expect(hillTimesFrom(planned, planned.warnAt + 100)).toEqual({
+      warnAt: planned.warnAt + 100,
+      risesAt: planned.warnAt + 100 + HILL_WARNING_SECONDS,
+      closesAt: planned.warnAt + 100 + HILL_WARNING_SECONDS + HILL_DURATION_SECONDS,
+    });
   });
 
   it('counts whole minutes up, never below zero', () => {

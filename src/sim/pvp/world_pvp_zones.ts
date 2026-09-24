@@ -6,7 +6,7 @@
 //   tutorial island) and Eastbrook Vale (the starter zone and its town), so a
 //   new character can never be fought before they know what the flag is.
 // - 'ffa': free-for-all. Everyone standing in the zone can attack everyone else
-//   there who is not in their party or guild, flag or no flag. The three
+//   there who is not in their party or raid, flag or no flag. The three
 //   highest-level zones: Wraithwood, Evergarden and Nightbloom (the level-20
 //   zones with the heaviest S-tier rift weight, and the furthest north).
 //   Attacking an UNFLAGGED player here marks the attacker (world_pvp.ts).

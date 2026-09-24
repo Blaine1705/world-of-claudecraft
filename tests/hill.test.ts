@@ -210,18 +210,86 @@ describe('the schedule and the announcements', () => {
     expect(closed.hillState.active).toBeNull();
   });
 
-  it('a realm that slept through windows plans the current one, not every missed one', () => {
+  it('a realm that slept through windows plans the current one, and a late hill keeps its full warning', () => {
     const sim = world();
     const plan = hillPlanFor(sim.ctx, 3);
     jumpTo(sim, plan.risesAt + 5);
     const seen = tickSeconds(sim, 1);
     const hill = sim.hillState.active!;
     expect(hill.ordinal).toBe(3);
-    // Found after its rise time: it rises at once, announced as risen.
-    expect(hill.phase).toBe('active');
+    // Found after its planned rise: it slides whole instead of rising unannounced.
+    expect(hill.phase).toBe('warning');
+    expect(hill.risesAt - hill.warnAt).toBe(HILL_WARNING_SECONDS);
+    expect(hill.closesAt - hill.risesAt).toBe(HILL_DURATION_SECONDS);
     const zone = ZONES.find((z) => z.id === hill.zoneId)!;
-    expect(logLines(seen)).toContain(hillRiseLine(zone.name));
+    expect(logLines(seen)).toContain(hillWarningLine(zone.name, 15));
     expect(sim.hillState.window).toBe(4);
+  });
+
+  it('a /dev hill standing past the planned warning delays the real one, never shortens it', () => {
+    const sim = world();
+    const plan = hillPlanFor(sim.ctx, 0);
+    jumpTo(sim, plan.warnAt - 60);
+    spawnHillNow(sim.ctx, 'nightbloom');
+    const devClose = sim.hillState.active!.closesAt;
+    expect(devClose).toBeGreaterThan(plan.risesAt);
+    // While the dev hill stands, the planned warning waits.
+    jumpTo(sim, plan.risesAt + 5);
+    tickSeconds(sim, 1);
+    expect(sim.hillState.active!.closesAt).toBe(devClose);
+    // It falls, and the next pass warns of the real hill in full.
+    jumpTo(sim, devClose - 1);
+    const seen = tickSeconds(sim, 3);
+    expect(logLines(seen)).toContain(hillFallenLine('The Nightbloom'));
+    const hill = sim.hillState.active!;
+    expect(hill.warnAt).toBeGreaterThanOrEqual(devClose);
+    expect(hill.ordinal).toBe(0);
+    expect(hill.phase).toBe('warning');
+    expect(hill.risesAt - hill.warnAt).toBe(HILL_WARNING_SECONDS);
+    const zone = ZONES.find((z) => z.id === hill.zoneId)!;
+    expect(logLines(seen)).toContain(hillWarningLine(zone.name, 15));
+  });
+
+  it('a failed spot retries a minute on with new ground, and the retried hill keeps its full warning', () => {
+    const sim = world();
+    const real = sim.hillProbe;
+    let calls = 0;
+    // The first search finds only water; every later one sees the real world.
+    (sim as unknown as { hillProbe: typeof real }).hillProbe = {
+      ...real,
+      wet: (x, z) => calls === 0 || real.wet(x, z),
+    };
+    const plan = hillPlanFor(sim.ctx, 0);
+    jumpTo(sim, plan.warnAt);
+    tickSeconds(sim, 1);
+    expect(sim.hillState.active).toBeNull();
+    expect(sim.hillState.attempts).toBe(1);
+    calls = 1;
+    tickSeconds(sim, 30);
+    expect(sim.hillState.active).toBeNull();
+    const seen = tickSeconds(sim, 31);
+    const hill = sim.hillState.active!;
+    expect(hill).not.toBeNull();
+    expect(hill.warnAt).toBeGreaterThan(plan.warnAt);
+    expect(hill.risesAt - hill.warnAt).toBe(HILL_WARNING_SECONDS);
+    const zone = ZONES.find((z) => z.id === hill.zoneId)!;
+    expect(logLines(seen)).toContain(hillWarningLine(zone.name, 15));
+  });
+
+  it('the whole schedule draws nothing from the world rng on the tick path', () => {
+    const run = (disabled: boolean) => {
+      const sim = world({ worldPvpDisabled: disabled });
+      const plan = hillPlanFor(sim.ctx, 0);
+      jumpTo(sim, plan.warnAt - 1);
+      tickSeconds(sim, 3);
+      jumpTo(sim, plan.risesAt - 1);
+      tickSeconds(sim, 3);
+      jumpTo(sim, plan.closesAt - 1);
+      tickSeconds(sim, 3);
+      return sim.rng.next();
+    };
+    // The same ticks with the hill switched off: any world draw would split them.
+    expect(run(false)).toBe(run(true));
   });
 });
 

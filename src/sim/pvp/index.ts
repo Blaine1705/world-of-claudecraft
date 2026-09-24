@@ -39,6 +39,7 @@ export {
   hillSpotIsOpen,
   hillStanding,
   hillTimes,
+  hillTimesFrom,
   hillWindowAt,
 } from './hill_rules';
 export {

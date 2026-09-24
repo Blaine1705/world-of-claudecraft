@@ -63,6 +63,7 @@ import {
   hillSpotIsOpen,
   hillStanding,
   hillTimes,
+  hillTimesFrom,
   hillWindowAt,
 } from './hill_rules';
 import { grantHonor } from './honor';
@@ -272,8 +273,11 @@ export function spawnHillNow(
 }
 
 /** The schedule: move a standing hill through its phases, then warn of the
- *  planned one when its time comes. A failed spot retries a minute on with a
- *  fresh salt; a window that passes with no spot is skipped. */
+ *  planned one when its time comes. A late warning (a spot retry, a standing
+ *  /dev hill, a realm switched back on) slides the hill whole, so every hill
+ *  keeps its full warning and stand. A failed spot retries a minute on with a
+ *  fresh salt; a window whose planned stand has passed before any warning is
+ *  skipped. */
 function updateSchedule(ctx: SimContext): void {
   const state = ctx.hillState;
   const hill = state.active;
@@ -309,7 +313,7 @@ function updateSchedule(ctx: SimContext): void {
     return;
   }
   if (ctx.time < plan.warnAt || ctx.time < state.retryAt) return;
-  if (!spawnHill(ctx, state.window, plan, state.attempts)) {
+  if (!spawnHill(ctx, state.window, hillTimesFrom(plan, ctx.time), state.attempts)) {
     state.attempts += 1;
     state.retryAt = ctx.time + RETRY_SECONDS;
     return;
@@ -415,8 +419,8 @@ export function updateHill(ctx: SimContext): void {
 
 /** The IWorld readout for one viewer (src/world_api/world_pvp.ts HillInfo).
  *  The live fields are zero for a viewer outside the hill's zone (and for
- *  everyone during the warning), so the self wire elides the readout for
- *  everyone else between holder changes. */
+ *  everyone during the warning), so outside the zone the readout changes only
+ *  on a phase, holder or standing change and once a minute (the countdown). */
 export function hillInfoFor(
   ctx: SimContext,
   pid: number,

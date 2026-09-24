@@ -5415,7 +5415,7 @@ export interface Entity extends ClientMirroredEntityFields {
    *  restore; never true offline, never user-settable. */
   jailed?: boolean;
   /** World PvP flag (/pvp, src/sim/pvp/world_pvp.ts): two flagged players who
-   *  share neither a party nor a guild are mutually hostile anywhere in the
+   *  share no party or raid (a guild is no shield) are mutually hostile in the
    *  open world (isHostileTo's world arm). The DISPLAY mirror of the
    *  authoritative PlayerMeta.worldPvp state, written only by that module
    *  (the away.ts meta<->entity precedent), and it rides the entity wire

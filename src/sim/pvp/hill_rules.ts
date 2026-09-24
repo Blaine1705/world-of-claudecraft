@@ -185,6 +185,16 @@ export function hillTimes(ordinal: number, offset: number): HillTimes {
   return { warnAt, risesAt, closesAt: risesAt + HILL_DURATION_SECONDS };
 }
 
+/** `times` as they run when the warning actually sounds at `now`: unchanged
+ *  on schedule, else slid whole so a late hill (a spot retry, a /dev hill
+ *  still standing, a realm switched back on) keeps its full warning and its
+ *  full stand. A slid hill may run past its window; the next window waits. */
+export function hillTimesFrom(times: HillTimes, now: number): HillTimes {
+  if (now <= times.warnAt) return times;
+  const risesAt = now + HILL_WARNING_SECONDS;
+  return { warnAt: now, risesAt, closesAt: risesAt + HILL_DURATION_SECONDS };
+}
+
 /** Whole minutes from `now` to `at`, rounded up, never below zero: the one
  *  rounding every countdown (the notices, /hill, the bar) shares. */
 export function hillMinutesUntil(at: number, now: number): number {

@@ -509,8 +509,11 @@ inside the window is drawn by a private rng derived from the seed and the
 window's ordinal (`hillPlanFor`, the natural rift portal precedent, so the
 world's own rng stream never moves for a hill and every host resolves the same
 time and spot), anywhere from the window's opening to
-`HILL_LATEST_WARN_OFFSET_SECONDS` into it, so the whole hill always fits inside
-its own window and two never overlap. The first window opens
+`HILL_LATEST_WARN_OFFSET_SECONDS` into it, so on schedule the whole hill fits
+inside its own window. Only one hill stands at a time. A hill whose warning
+sounds late (a spot retry, a `/dev hill` still standing, a realm switched back
+on) slides whole (`hillTimesFrom`), so every hill keeps its full warning and
+its full stand; the next window waits for it. The first window opens
 `HILL_FIRST_WINDOW_AT_SECONDS` after boot.
 
 A hill has three moments, each announced to the whole realm:
@@ -521,7 +524,7 @@ A hill has three moments, each announced to the whole realm:
    it is drawn on the ground as a still, faint outline, so parties can form and
    travel. Nothing counts yet. A failed spot search retries a minute on with the
    attempt number salted into the spot rng (so a retry searches new ground); a
-   window whose hill never finds ground is skipped.
+   window whose planned stand passes before any spot is found is skipped.
 2. **The rise** (`hillRiseLine`), `HILL_WARNING_SECONDS` (15 minutes) after the
    warning. The contest and the payouts run from here.
 3. **The fall** (`hillFallenLine`), `HILL_DURATION_SECONDS` (45 minutes) after
