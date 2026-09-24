@@ -171,7 +171,10 @@ cadence logic of its own. Narrow helpers:
   A bespoke `src/render/` module (the `paladin_*_visual.ts` set,
   `warlock_meteor_fx.ts`, `necromancy_*_fx.ts`, the frost/mage modules) is for
   effects that need scene objects the pooled primitive families cannot
-  express; even then the pure math lands in a registered `_core`.
+  express; even then the pure math lands in a registered `_core`. A pooled
+  bespoke subtree calls `tagVfxSubtree` once it is fully built: the warm-up
+  walk selects on each object's OWN tag, so tagging only the root hides its
+  drawables from the prewarm and the cast gate.
 - **Models are real GLB assets** (CC0 kits, Tripo-generated models, and the
   image-to-GLB procedural exporters: props, foliage, dungeon, fish, gather nodes,
   mailbox, delve props, characters, the Eastbrook town kit), loaded via

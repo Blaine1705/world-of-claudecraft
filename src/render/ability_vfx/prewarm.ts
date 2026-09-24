@@ -103,7 +103,8 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
 
 /** One pooled draw per distinct PROGRAM under `root`, in walk order: the
  *  object whose compile links it and the material that stands for every
- *  other material on it. Keyed by drawProgramSignature, never by material
+ *  other material on it. That representative must live as long as its pool:
+ *  disposing it would release the program the uncompiled clones rely on. Keyed by drawProgramSignature, never by material
  *  instance: the verdict pools build one MeshBasicMaterial per part per slot,
  *  hundreds of instances over a handful of programs, and a clone sharing a
  *  linked program reuses it on its first draw (three's acquireProgram hands
