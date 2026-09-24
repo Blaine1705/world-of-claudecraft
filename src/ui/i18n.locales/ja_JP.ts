@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.ferry.regionLabel': '渡し船の時刻表',
+  'hudChrome.ferry.departsIn': '{dest}行きの渡し船は{time}後に出航します',
+  'hudChrome.ferry.castingOff': '{dest}行きの渡し船が出航します',
+  'hudChrome.ferry.boardHint': '出航の時に甲板に立っていれば一緒に出発できます。運賃は無料です。',
+  'hudChrome.ferry.sailing': '{dest}へ航行中',
+  'hudChrome.ferry.seaCardBody': '航海の途中です。',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':

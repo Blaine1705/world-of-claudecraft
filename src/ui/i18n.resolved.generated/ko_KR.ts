@@ -343,6 +343,14 @@ export const ko_KR: EnTranslations = {
       "hobby": "취미 전문가",
       "nameplate": "＜{title}＞"
     },
+    "ferry": {
+      "regionLabel": "여객선 시간표",
+      "departsIn": "{dest}행 여객선이 {time} 후에 출항합니다",
+      "castingOff": "{dest}행 여객선이 출항하고 있습니다",
+      "boardHint": "출항할 때 갑판 위에 서 있으면 함께 떠납니다. 운임은 무료입니다.",
+      "sailing": "{dest}(으)로 항해 중",
+      "seaCardBody": "항해가 진행 중입니다."
+    },
     "materialStackSelectionUnavailable": "해당 재료 선택을 더 이상 사용할 수 없습니다.",
     "warlock": {
       "doomLabel": "단죄",

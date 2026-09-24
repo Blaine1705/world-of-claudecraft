@@ -343,6 +343,14 @@ export const zh_CN: EnTranslations = {
       "hobby": "爱好训练师",
       "nameplate": "＜{title}＞"
     },
+    "ferry": {
+      "regionLabel": "渡船时刻表",
+      "departsIn": "前往{dest}的渡船将在{time}后起航",
+      "castingOff": "前往{dest}的渡船正在起航",
+      "boardHint": "起航时站在甲板上即可随船出发。渡船免费。",
+      "sailing": "正在驶往{dest}",
+      "seaCardBody": "航行进行中。"
+    },
     "materialStackSelectionUnavailable": "该素材选择已失效。",
     "warlock": {
       "doomLabel": "谴罪",

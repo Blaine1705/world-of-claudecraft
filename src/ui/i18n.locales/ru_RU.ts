@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.ferry.regionLabel': 'Расписание парома',
+  'hudChrome.ferry.departsIn': 'Паром на {dest}: отправление через {time}',
+  'hudChrome.ferry.castingOff': 'Паром на {dest} отчаливает',
+  'hudChrome.ferry.boardHint': 'Стойте на палубе в момент отплытия. Переправа бесплатна.',
+  'hudChrome.ferry.sailing': 'Курс на {dest}',
+  'hudChrome.ferry.seaCardBody': 'Переправа в пути.',
   'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
   'hudChrome.professionTrainers.nameplate': '<{title}>',
   'guide.professions.endgameBodyRaidCollections':

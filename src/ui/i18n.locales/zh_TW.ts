@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.ferry.regionLabel': '渡船時刻表',
+  'hudChrome.ferry.departsIn': '前往{dest}的渡船將在{time}後啟航',
+  'hudChrome.ferry.castingOff': '前往{dest}的渡船正在啟航',
+  'hudChrome.ferry.boardHint': '啟航時站在甲板上即可隨船出發。渡船免費。',
+  'hudChrome.ferry.sailing': '正在駛往{dest}',
+  'hudChrome.ferry.seaCardBody': '航行進行中。',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '《{title}》',
   'guide.professions.endgameBodyRaidCollections':

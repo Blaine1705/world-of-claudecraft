@@ -36,8 +36,12 @@ export interface TransportLanding {
 }
 
 export interface TransportBerthDef {
-  /** Stable id (also the HUD's destination key suffix). */
+  /** Stable id (the timetable view names berths by it). */
   id: string;
+  /** The zone point of interest the berth serves, as a Book of Deeds POI mark
+   *  (`poi:<zoneId>:<poiId>`): the HUD shows that POI's localized label as the
+   *  destination name, so a town name is never re-authored here. */
+  poi: string;
   /** The moored pose: the first point of `departure`, the last of `arrival`. */
   x: number;
   z: number;

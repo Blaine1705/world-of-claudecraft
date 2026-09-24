@@ -1000,6 +1000,9 @@ const baseEnTable = {
   'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
   'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
   'error.tutorialFromHere': 'You cannot set sail from here.',
+  // The scheduled ferry (sim/transport_ferry.ts): a player in combat on deck at
+  // departure is set down on the pier instead of sailing.
+  'error.ferryInCombat': 'You cannot board the ferry while in combat.',
   'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
   'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
   'log.longWalkCorpse': 'You are whole again, and you found your own way back.',

@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.ferry.regionLabel': '여객선 시간표',
+  'hudChrome.ferry.departsIn': '{dest}행 여객선이 {time} 후에 출항합니다',
+  'hudChrome.ferry.castingOff': '{dest}행 여객선이 출항하고 있습니다',
+  'hudChrome.ferry.boardHint': '출항할 때 갑판 위에 서 있으면 함께 떠납니다. 운임은 무료입니다.',
+  'hudChrome.ferry.sailing': '{dest}(으)로 항해 중',
+  'hudChrome.ferry.seaCardBody': '항해가 진행 중입니다.',
   'hudChrome.noticeboard.officerEntry': '{name}({rank})',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':

@@ -343,6 +343,14 @@ export const es_ES: EnTranslations = {
       "hobby": "Instructor de Aficiones",
       "nameplate": "<{title}>"
     },
+    "ferry": {
+      "regionLabel": "Ferry timetable",
+      "departsIn": "The ferry to {dest} departs in {time}",
+      "castingOff": "The ferry to {dest} is casting off",
+      "boardHint": "Stand on its deck when it sails. The crossing is free.",
+      "sailing": "Sailing to {dest}",
+      "seaCardBody": "The crossing is under way."
+    },
     "materialStackSelectionUnavailable": "Esa selección de materiales ya no está disponible.",
     "warlock": {
       "doomLabel": "Condena",

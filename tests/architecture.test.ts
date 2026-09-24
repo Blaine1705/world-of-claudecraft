@@ -677,6 +677,8 @@ const UI_PURE_CORES = [
   'src/ui/trade_view.ts',
   'src/ui/trade_woc_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
+  'src/ui/hud/transport/ferry_hud_view.ts',
+  'src/ui/raid_marker_labels_view.ts',
   'src/ui/hud/practice/practice_dps_view.ts',
   'src/ui/hud/practice/hub_lesson_view.ts',
   'src/ui/hud/talking_head/talking_head_core.ts',

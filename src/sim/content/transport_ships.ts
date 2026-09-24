@@ -329,6 +329,7 @@ export const TRANSPORT_SHIP_HULLS: Readonly<Record<string, ShipHullLayout>> = {
  *  gangplank drops onto the pier deck (Phase 1's mooring, unchanged). */
 const EASTBROOK_BERTH: TransportBerthDef = {
   id: 'eastbrook',
+  poi: 'poi:eastbrook_vale:eastbrook',
   x: -125,
   z: -54.8,
   rot: 0,
@@ -361,6 +362,7 @@ const EASTBROOK_BERTH: TransportBerthDef = {
  *  last 4.7 yd from the pier's end up to the gangplank. */
 const WICKHARBOR_BERTH: TransportBerthDef = {
   id: 'wickharbor',
+  poi: 'poi:galecrest:wickharbor',
   x: 487.3,
   z: 385.27,
   rot: 1.3 + Math.PI / 2,
