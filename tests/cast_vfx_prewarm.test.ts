@@ -7,12 +7,16 @@
 // each cast unit marks its root's programs once its compile settled, and the
 // gate reads the record.
 
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { castVfxProgramUnits, createSceneCastVfxReadiness } from '../src/render/cast_vfx_prewarm';
 import type { CompileArmHost } from '../src/render/compile_arms';
 import { markProgramReady } from '../src/render/linked_program_readiness';
 import type { LinkedProgramLike } from '../src/render/linked_program_touch';
+import { desktopTierProfile } from './helpers/gfx_tier';
+import { stripComments } from './helpers/strip_comments';
+import { threeProgramKeys } from './helpers/three_program_keys';
 
 /** A pooled VFX mesh: `renderCategory` is the tag abilityVfxCompileMaterials
  *  selects on, so this is what the gate's scene walk collects. */
@@ -279,5 +283,51 @@ describe('the units the resume lane runs', () => {
     // The ambient target is back, and the settle wrote the record.
     expect(current).toBeNull();
     expect(readiness.ready()).toBe(true);
+  });
+
+  it('compiles the program variant the world pass draws, on every tier', async () => {
+    // three keys tone mapping and the output colour space on the bound target
+    // (none and linear into any target), so a unit compiling the canvas variant
+    // under a composer's scene pass would leave every never-compiled clone to
+    // link live under a ready gate. The renderer builds `post` exactly on the
+    // composer or grade tiers, draws the world through it (its scene pass
+    // renders into the composer target), and hands the arm offscreen = !!post.
+    const renderer = stripComments(readFileSync('src/render/renderer.ts', 'utf8'));
+    expect(renderer).toContain(
+      'if (GFX.composer || GFX.gradePass)\n      this.post = buildComposer(',
+    );
+    expect(renderer).toContain('offscreen: () => !!this.post,');
+    const material = new THREE.MeshBasicMaterial({ transparent: true });
+    const mesh = vfxMesh('ring', material);
+    const composerTarget = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType });
+    const keyAt = (target: THREE.WebGLRenderTarget | null) =>
+      threeProgramKeys(material, mesh, target);
+    expect(keyAt(composerTarget), 'the two variants are two programs').not.toBe(keyAt(null));
+    for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+      const { composer, gradePass } = desktopTierProfile(tier).settings;
+      expect(composer || gradePass, `${tier} draws into a target`).toBe(tier !== 'low');
+      const { scene, webgl } = harness([mesh]);
+      const bound: Array<THREE.WebGLRenderTarget | null> = [];
+      let current: THREE.WebGLRenderTarget | null = null;
+      const host = {
+        webgl: () => ({
+          getRenderTarget: () => current,
+          setRenderTarget: (target: THREE.WebGLRenderTarget | null) => {
+            current = target;
+          },
+          compileAsync: (root: THREE.Object3D) => {
+            bound.push(current);
+            return Promise.resolve(root);
+          },
+        }),
+        camera: () => new THREE.PerspectiveCamera(),
+        scene: () => scene,
+        offscreen: () => composer || gradePass,
+        offscreenTarget: () => new THREE.WebGLRenderTarget(8, 8),
+      } as unknown as CompileArmHost;
+      await Promise.all(castVfxProgramUnits(scene, null, host, webgl).map((unit) => unit.run()));
+      const drawn = keyAt(composer || gradePass ? composerTarget : null);
+      expect(bound.map(keyAt), tier).toEqual([drawn]);
+    }
   });
 });

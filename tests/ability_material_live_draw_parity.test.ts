@@ -17,69 +17,20 @@
 
 import * as THREE from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
-import type { GraphicsSettingsSnapshot } from '../src/game/graphics_rebuild_core';
 import {
   ABILITY_MATERIAL_SOURCES,
   buildAbilityMaterialPrewarmGroup,
 } from '../src/render/ability_material_prewarm';
-import { resetGraphicsProfileDerivedCaches } from '../src/render/assets/graphics_profile';
 import { drawProgramSignature } from '../src/render/draw_program_signature_core';
 import { FrozenOrbFx } from '../src/render/frozen_orb_fx';
-import {
-  activateGfxProfile,
-  GFX,
-  type GfxCapabilities,
-  getActiveGfxProfile,
-  resolveGfxProfile,
-} from '../src/render/gfx';
+import { GFX } from '../src/render/gfx';
 import { MageGroundFx } from '../src/render/mage_ground_fx';
 import { syncPaladinAscensionVisual } from '../src/render/paladin_ascension_visual';
 import { WarlockMeteorFx } from '../src/render/warlock_meteor_fx';
+import { activateTier, gfxProfileRestorer } from './helpers/gfx_tier';
 import { drawsUnder, threeProgramKeys } from './helpers/three_program_keys';
 
-const desktopCapabilities: GfxCapabilities = Object.freeze({
-  deviceMemory: 8,
-  hardwareConcurrency: 12,
-  maxTouchPoints: 0,
-  coarsePointer: false,
-  narrowViewport: false,
-  gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)',
-  nativeApp: false,
-  tightMemory: false,
-  platform: 'other',
-  softwareRendering: false,
-});
-
-const basePreferences: GraphicsSettingsSnapshot = {
-  graphicsPreset: 2,
-  terrainDetail: 1,
-  foliageDensity: 1,
-  surfaceDetail: 1,
-  effectsQuality: 1,
-  shadowQuality: 1,
-  antiAliasing: 1,
-  bloomQuality: 1,
-  ambientOcclusion: 1,
-  viewDistance: 1,
-  waterQuality: 1,
-  characterDetail: 1,
-  dynamicLights: 1,
-  particleEffects: 1,
-};
-
-const originalProfile = getActiveGfxProfile();
-
-afterAll(() => {
-  activateGfxProfile(originalProfile);
-  resetGraphicsProfileDerivedCaches();
-});
-
-/** Switch the process to a tier the way a profile rebuild does: publish the
- *  profile, then drop every profile-derived cache. */
-function activateTier(tier: 'low' | 'ultra'): void {
-  activateGfxProfile(resolveGfxProfile(desktopCapabilities, basePreferences, `?gfx=${tier}`));
-  resetGraphicsProfileDerivedCaches();
-}
+afterAll(gfxProfileRestorer());
 
 interface Coverage {
   signatures: Set<string>;

@@ -2,10 +2,11 @@
 //
 // Built on the pinned three's real WebGLPrograms (getParameters +
 // getProgramCacheKey) over a stub renderer with one fixed scene state: no
-// lights, no fog, no clipping, canvas target, no shadows. Every object asked
-// about gets the same scene state, so two draws whose keys differ here differ
-// in what the MATERIAL or the OBJECT hands three, which is exactly the
-// question a program-level dedupe has to answer.
+// lights, no fog, no clipping, no shadows, the canvas target unless a key
+// asks for a bound one (tone mapping and the output colour space follow it).
+// Every object asked about gets the same scene state, so two draws whose keys
+// differ here differ in what the MATERIAL or the OBJECT hands three, which is
+// exactly the question a program-level dedupe has to answer.
 //
 // Blind spots, by construction: no env map (the environments stub returns
 // null), no extensions, no material clipping (the clipping stub is fixed),
@@ -45,8 +46,10 @@ const lights = {
   numLightProbes: 0,
 };
 
+let boundTarget: THREE.WebGLRenderTarget | null = null;
+
 const renderer = {
-  getRenderTarget: () => null,
+  getRenderTarget: () => boundTarget,
   state: { buffers: { depth: { getReversed: () => false } } },
   toneMapping: THREE.ACESFilmicToneMapping,
   outputColorSpace: THREE.SRGBColorSpace,
@@ -81,7 +84,12 @@ function keyAt(material: THREE.Material, object: THREE.Object3D): string {
 
 /** The program keys three links for this material on this object, in pass
  *  order, joined: one key, or the back and front keys of a two-pass draw. */
-export function threeProgramKeys(material: THREE.Material, object: THREE.Object3D): string {
+export function threeProgramKeys(
+  material: THREE.Material,
+  object: THREE.Object3D,
+  target: THREE.WebGLRenderTarget | null = null,
+): string {
+  boundTarget = target;
   if (
     material.transparent === true &&
     material.side === THREE.DoubleSide &&

@@ -28,13 +28,11 @@ import { closeSync, existsSync, openSync, readSync } from 'node:fs';
 import path from 'node:path';
 import * as THREE from 'three';
 import { afterAll, describe, expect, it, vi } from 'vitest';
-import type { GraphicsSettingsSnapshot } from '../src/game/graphics_rebuild_core';
 import {
   abilityVfxCompileMaterials,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx';
 import { ABILITY_VFX_FULL_SPECS } from '../src/render/ability_vfx_full_specs';
-import { resetGraphicsProfileDerivedCaches } from '../src/render/assets/graphics_profile';
 import { characterWeaponAuraInto, characterWeaponAuraMode } from '../src/render/character_effects';
 import {
   itemWeaponModelUrls,
@@ -44,59 +42,14 @@ import {
 import { SanguineWeaponSheath } from '../src/render/characters/sanguine_weapon_sheath';
 import { CharacterVisual } from '../src/render/characters/visual';
 import { drawProgramSignature } from '../src/render/draw_program_signature_core';
-import {
-  activateGfxProfile,
-  type GfxCapabilities,
-  getActiveGfxProfile,
-  resolveGfxProfile,
-} from '../src/render/gfx';
 import { buildCastVfxBasicStandIns } from '../src/render/vfx_basic_materials';
 import type { Entity } from '../src/sim/types';
+import { activateTier, gfxProfileRestorer } from './helpers/gfx_tier';
 import { drawsUnder, threeProgramKeys } from './helpers/three_program_keys';
 
 const publicDir = path.resolve(__dirname, '../public');
 
-const desktopCapabilities: GfxCapabilities = Object.freeze({
-  deviceMemory: 8,
-  hardwareConcurrency: 12,
-  maxTouchPoints: 0,
-  coarsePointer: false,
-  narrowViewport: false,
-  gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)',
-  nativeApp: false,
-  tightMemory: false,
-  platform: 'other',
-  softwareRendering: false,
-});
-
-const basePreferences: GraphicsSettingsSnapshot = {
-  graphicsPreset: 2,
-  terrainDetail: 1,
-  foliageDensity: 1,
-  surfaceDetail: 1,
-  effectsQuality: 1,
-  shadowQuality: 1,
-  antiAliasing: 1,
-  bloomQuality: 1,
-  ambientOcclusion: 1,
-  viewDistance: 1,
-  waterQuality: 1,
-  characterDetail: 1,
-  dynamicLights: 1,
-  particleEffects: 1,
-};
-
-const originalProfile = getActiveGfxProfile();
-
-afterAll(() => {
-  activateGfxProfile(originalProfile);
-  resetGraphicsProfileDerivedCaches();
-});
-
-function activateTier(tier: 'low' | 'ultra'): void {
-  activateGfxProfile(resolveGfxProfile(desktopCapabilities, basePreferences, `?gfx=${tier}`));
-  resetGraphicsProfileDerivedCaches();
-}
+afterAll(gfxProfileRestorer());
 
 // --- The mainhand geometries a player can hold -----------------------------
 
