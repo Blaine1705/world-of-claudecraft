@@ -368,10 +368,14 @@ async function runInteriorEncounterPrewarm(
 // the pass would link each program without ever paying its first DRAW. The zone
 // prewarm plants its group in front of the player for the same reason.
 function placeHiddenPrewarmGroup(host: InteriorEncounterPrewarmHost, group: THREE.Group): void {
-  const pos = host.sim.player.pos;
-  group.position.set(pos.x, pos.y, pos.z - 24);
+  placeAtPlayer(host, group);
   setRenderCategory(group, 'prewarm');
   group.visible = false;
+}
+
+function placeAtPlayer(host: InteriorEncounterPrewarmHost, group: THREE.Group): void {
+  const pos = host.sim.player.pos;
+  group.position.set(pos.x, pos.y, pos.z - 24);
 }
 
 function liveSoulRendProxyMesh(
@@ -463,7 +467,13 @@ async function compileEncounterPrewarmGroup(
         }
         units.push({
           label: `encounter-prewarm-render:${childRoot.name || childRoot.type}`,
-          run: () => host.renderBoundedPrewarmRoot(groupLike as THREE.Group, childRoot),
+          run: () => {
+            // A pass that starts in the Forge-Lift can still be draining when
+            // the raid walks into the Halls, another instance origin: placed
+            // once, its later children would be culled from their first draw.
+            placeAtPlayer(host, groupLike as THREE.Group);
+            host.renderBoundedPrewarmRoot(groupLike as THREE.Group, childRoot);
+          },
         });
         return units;
       },

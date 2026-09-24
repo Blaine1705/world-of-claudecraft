@@ -490,6 +490,28 @@ describe('interior encounter prewarm pass (driven)', () => {
     }
   });
 
+  it('draws each child where the player is now, after the raid left the lift', async () => {
+    // A bounded prewarm render draws only what the camera frames. The lift
+    // pass can still be draining when the raid walks into the Halls, another
+    // instance origin, so a group placed once would be culled from its first
+    // draw for every child after the move.
+    const host = fakeHost();
+    const drawnAt: Array<{ x: number; z: number }> = [];
+    let moved = false;
+    host.renderBoundedPrewarmRoot = ((group: THREE.Group) => {
+      drawnAt.push({ x: group.position.x, z: group.position.z });
+      if (!moved) {
+        moved = true;
+        host.sim.player.pos = { x: 104_800, y: 4, z: -1600 };
+      }
+    }) as typeof host.renderBoundedPrewarmRoot;
+    startInteriorEncounterPrewarm('ignivar_lift', host);
+    await drain();
+    expect(drawnAt.length).toBeGreaterThan(5);
+    expect(drawnAt[0]).toEqual({ x: 103_300, z: -1246 - 24 });
+    for (const at of drawnAt.slice(1)) expect(at).toEqual({ x: 104_800, z: -1600 - 24 });
+  });
+
   it('gives a failed lift pass its sets back, so the next raid room builds them', async () => {
     const host = fakeHost();
     const pos = host.sim.player.pos;
