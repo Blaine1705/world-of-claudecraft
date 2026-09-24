@@ -17055,6 +17055,17 @@
     margin: 0;
     align-self: center;
   }
+  /* Touch: the selects and the search box meet the 40px target floor. */
+  @media (pointer: coarse) {
+    .cdm-select,
+    .cdm-search {
+      min-height: 40px;
+    }
+  }
+  body.mobile-touch .cdm-select,
+  body.mobile-touch .cdm-search {
+    min-height: 40px;
+  }
   /* Streamlined title bar for the perf panel (less bulky than the default chrome). */
   #options-menu.perf-wide > .panel-title {
     font-size: 14px;

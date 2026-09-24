@@ -43,6 +43,9 @@ export interface CooldownManagerWorld {
   readonly cfg: { readonly playerClass: PlayerClass };
   readonly player: { readonly name: string; readonly inCombat: boolean };
   readonly known: readonly ResolvedAbility[];
+  /** The entity roster (IWorld.entities). The manager takes its OWN iterator
+   *  from it each frame; see paint(). */
+  readonly entities: { values(): ActionBarWorldInput['entities'] };
   resolvedAbility(abilityId: string): ResolvedAbility | null;
 }
 
@@ -86,6 +89,12 @@ export class CooldownManagerController {
   private readonly groupShown: boolean[] = [];
   private buttons: CooldownButtonElements[] = [];
   private placement = false;
+  // The snapshot this manager's view ticks over: the Hud's action-bar snapshot,
+  // field for field, except `entities`, which is a fresh iterator from the
+  // roster. The Hud's snapshot carries ONE single-use Map iterator that the
+  // desktop bar reads after this paint; walking it here (a tracked Dominion
+  // summon does) would leave that bar blind to the player's servants.
+  private world: ActionBarWorldInput | null = null;
   private readonly moveListeners = new Set<(group: CooldownGroup) => void>();
   // The action bar's additive glow channel: the spells this manager lights on
   // the hotbar this frame, unioned with the Auras panel's set without allocating.
@@ -120,7 +129,17 @@ export class CooldownManagerController {
     const { enabled, soundInCombatOnly } = this.layout;
     const inCombat = this.deps.world.player.inCombat;
     const soundsAllowed = enabled && (!soundInCombatOnly || inCombat);
-    const state = this.view.tick(world, { soundsAllowed, preview: this.placement });
+    const own = this.world ?? { ...world };
+    this.world = own;
+    own.player = world.player;
+    own.target = world.target;
+    own.inventory = world.inventory;
+    own.stealthed = world.stealthed;
+    own.paladinSpec = world.paladinSpec;
+    own.fateThreads = world.fateThreads;
+    own.activeAimSlot = world.activeAimSlot;
+    own.entities = this.deps.world.entities.values();
+    const state = this.view.tick(own, { soundsAllowed, preview: this.placement });
     for (let g = 0; g < this.groups.length; g++) {
       this.groupShown[g] = cooldownGroupShown(this.groups[g].visibility, inCombat, this.placement);
     }
@@ -220,7 +239,9 @@ export class CooldownManagerController {
     this.rebuild();
   }
 
-  private patchGroup(id: string, patch: CooldownGroupPatch): void {
+  /** `persist: false` restyles live state only (a drag in flight); the drag
+   *  saves once when it ends instead of writing storage on every move. */
+  private patchGroup(id: string, patch: CooldownGroupPatch, persist = true): void {
     const next = patchCooldownGroup(this.groups, id, patch);
     // Placement and look only (a slider drag): restyle this group in place.
     // Anything that moves a button between cells re-mints the groups.
@@ -229,7 +250,7 @@ export class CooldownManagerController {
       this.setGroups(next);
       return;
     }
-    this.groups = this.store.setGroups(next);
+    this.groups = persist ? this.store.setGroups(next) : next;
     const index = this.groups.findIndex((group) => group.id === id);
     if (index >= 0) this.applyGroup(this.groupEls[index], this.groups[index]);
   }
@@ -318,30 +339,41 @@ export class CooldownManagerController {
 
   private startDrag(event: PointerEvent, id: string, root: HTMLElement): void {
     if (!this.placement || event.button !== 0) return;
+    const group = this.groups.find((entry) => entry.id === id);
+    if (!group) return;
     event.preventDefault();
     root.setPointerCapture(event.pointerId);
     root.classList.add('dragging');
     // One viewport rect per drag (the layer is fixed to the app viewport), so a
     // pointer move converts to a normalized position with no further layout read.
     const bounds = this.layer.getBoundingClientRect();
+    if (bounds.width <= 0 || bounds.height <= 0) return;
+    // Keep the grab point under the pointer: no jump to centre on the first move.
+    const offsetX = (event.clientX - bounds.left) / bounds.width - group.posX;
+    const offsetY = (event.clientY - bounds.top) / bounds.height - group.posY;
     const move = (next: PointerEvent): void => {
-      if (bounds.width <= 0 || bounds.height <= 0) return;
-      // An appearance patch: restyled in place, no re-mint mid-drag.
-      this.patchGroup(id, {
-        posX: snap((next.clientX - bounds.left) / bounds.width),
-        posY: snap((next.clientY - bounds.top) / bounds.height),
-      });
-      const group = this.groups.find((entry) => entry.id === id);
-      if (group) for (const listener of this.moveListeners) listener(group);
+      this.patchGroup(
+        id,
+        {
+          posX: snap((next.clientX - bounds.left) / bounds.width - offsetX),
+          posY: snap((next.clientY - bounds.top) / bounds.height - offsetY),
+        },
+        false,
+      );
+      const moved = this.groups.find((entry) => entry.id === id);
+      if (moved) for (const listener of this.moveListeners) listener(moved);
     };
     const end = (): void => {
       root.classList.remove('dragging');
       root.removeEventListener('pointermove', move);
       root.removeEventListener('pointerup', end);
       root.removeEventListener('pointercancel', end);
+      root.removeEventListener('lostpointercapture', end);
+      this.groups = this.store.setGroups(this.groups);
     };
     root.addEventListener('pointermove', move);
     root.addEventListener('pointerup', end);
     root.addEventListener('pointercancel', end);
+    root.addEventListener('lostpointercapture', end);
   }
 }

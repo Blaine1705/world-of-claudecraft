@@ -176,6 +176,22 @@ describe('cooldown manager view over a live Sim (feral druid)', () => {
     expect(view.tick(worldOf(sim), OPEN).cues).toEqual([]);
   });
 
+  it('does not chime every tracked spell at once on resurrection', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([spell('ferocious_bite'), spell('claw')]);
+    view.tick(worldOf(sim), OPEN);
+    sim.player.dead = true;
+    view.tick(worldOf(sim), OPEN);
+    sim.player.dead = false;
+    expect(view.tick(worldOf(sim), OPEN).cues).toEqual([]);
+    // After that first living frame the ordinary edge applies again.
+    sim.player.resource = 0;
+    view.tick(worldOf(sim), OPEN);
+    sim.player.resource = sim.player.maxResource;
+    expect(view.tick(worldOf(sim), OPEN).cues).toHaveLength(2);
+  });
+
   it('plays nothing for a silent spell, and dedupes nothing it should not', () => {
     const sim = feral();
     const view = viewOver(sim);

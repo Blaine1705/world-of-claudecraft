@@ -135,6 +135,11 @@ export function cooldownGroupCapacity(
   return group.perLine * group.lines;
 }
 
+/** The smallest run length whose longest run count still holds the spells. */
+export function minGridPerLine(spellCount: number): number {
+  return Math.max(1, Math.ceil(spellCount / COOLDOWN_GRID_MAX_SIDE));
+}
+
 /** The smallest run count that still holds a grid's spells at this width. */
 export function minGridLines(spellCount: number, perLine: number): number {
   return Math.max(1, Math.ceil(spellCount / Math.max(1, perLine)));
@@ -239,11 +244,10 @@ export function sanitizeCooldownGroup(raw: unknown): CooldownGroup | null {
   const kind = COOLDOWN_GROUP_KINDS.find((entry) => entry === value.kind);
   if (!kind) return null;
   const base = newCooldownGroup(kind, []);
-  const perLine = intIn(value.perLine, 1, COOLDOWN_GRID_MAX_SIDE, base.perLine);
   const maxSpells =
     kind === 'grid'
-      ? perLine * COOLDOWN_GRID_MAX_SIDE
-      : cooldownGroupCapacity({ kind, perLine, lines: 1 });
+      ? COOLDOWN_GRID_MAX_SIDE * COOLDOWN_GRID_MAX_SIDE
+      : cooldownGroupCapacity({ kind, perLine: 1, lines: 1 });
   const spells: string[] = [];
   if (Array.isArray(value.spells)) {
     for (const id of value.spells) {
@@ -251,8 +255,13 @@ export function sanitizeCooldownGroup(raw: unknown): CooldownGroup | null {
       if (typeof id === 'string' && ABILITY_ID_RE.test(id) && !spells.includes(id)) spells.push(id);
     }
   }
-  // A grid's run count grows to hold its spells, so narrowing the grid
-  // reflows the buttons rather than dropping one the player placed.
+  // A grid never drops a spell the player placed: narrowing it grows the run
+  // count to hold them, and past the longest run count the run length stays
+  // wide enough instead (see minGridPerLine, which the Columns slider uses).
+  const perLine = Math.max(
+    intIn(value.perLine, 1, COOLDOWN_GRID_MAX_SIDE, base.perLine),
+    kind === 'grid' ? minGridPerLine(spells.length) : 1,
+  );
   const lines = Math.max(
     intIn(value.lines, 1, COOLDOWN_GRID_MAX_SIDE, base.lines),
     kind === 'grid' ? minGridLines(spells.length, perLine) : 1,

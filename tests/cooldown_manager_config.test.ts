@@ -213,6 +213,19 @@ describe('cooldown manager groups: assigning spells', () => {
     expect(narrow.lines).toBe(2);
   });
 
+  it('never drops a spell when a full grid is narrowed below what its rows can hold', () => {
+    const spells = Array.from({ length: 20 }, (_, i) => `s${i}`);
+    const grid: CooldownGroup = {
+      ...group('grid', spells, { perLine: 4, lines: 5 }),
+      id: 'g1',
+    };
+    // One column can only reach 12 rows: the width stays wide enough instead.
+    const [narrow] = patchCooldownGroup([grid], 'g1', { perLine: 1 });
+    expect(narrow.spells).toEqual(spells);
+    expect(narrow.perLine).toBe(2);
+    expect(narrow.lines).toBe(10);
+  });
+
   it('staggers new groups and never reuses a live id', () => {
     const first = newCooldownGroup('line', []);
     const second = newCooldownGroup('line', [first]);

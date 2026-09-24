@@ -216,6 +216,12 @@ export function createCooldownManagerView(deps: CooldownManagerViewDeps): Cooldo
         button.count = known && slot.isCharges ? slot.count : '';
         button.visible = known && (opts.preview || !config.onlyWhenReady || ready);
 
+        // Death forgets every edge, so the first living frame only records:
+        // otherwise resurrecting would chime every tracked spell at once.
+        if (dead) {
+          edges.delete(button.baseId);
+          continue;
+        }
         const current = ready ? abilityId : null;
         const previous = edges.get(button.baseId);
         edges.set(button.baseId, current);

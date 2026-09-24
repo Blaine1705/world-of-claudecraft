@@ -50,6 +50,7 @@ import {
   cooldownGroupOf,
   cooldownSpellMatches,
   minGridLines,
+  minGridPerLine,
 } from './cooldown_manager_config';
 
 export interface CooldownManagerHooks {
@@ -100,6 +101,9 @@ const VISIBILITY_KEYS: Readonly<Record<CooldownVisibility, TranslationKey>> = {
   hidden: 'hudChrome.cooldownManager.visHidden',
 };
 const NOT_DISPLAYED = '';
+/** A private drag type: a word dragged in from chat or another page carries
+ *  only text/plain, so it can never be dropped into a group. */
+const DRAG_TYPE = 'application/x-woc-cooldown-spell';
 
 const percent = (value: number): string =>
   formatNumber(value, { style: 'percent', maximumFractionDigits: 0 });
@@ -208,6 +212,19 @@ export class CooldownManagerSettingsPanel {
     hint.textContent = text;
     parent.appendChild(hint);
     return hint;
+  }
+
+  /** Tag a slider's input with a focus key and rebuild the panel once its value
+   *  settles (`change`), putting focus back on the same slider. */
+  private settleRefresh(
+    row: HTMLElement,
+    focusKey: string,
+    refresh: (keys?: readonly string[]) => void,
+  ): void {
+    const input = row.querySelector('input');
+    if (!input) return;
+    input.dataset.focusKey = focusKey;
+    input.addEventListener('change', () => refresh([focusKey]));
   }
 
   private select(
@@ -375,13 +392,15 @@ export class CooldownManagerSettingsPanel {
         label: perLabel,
         get: () => live().perLine,
         set: (perLine) => patch({ perLine: Math.round(perLine) }, false),
-        min: 1,
+        // Never narrower than the widest run count can hold (no spell dropped).
+        min: minGridPerLine(group.spells.length),
         max: COOLDOWN_GRID_MAX_SIDE,
         step: 1,
         format: count,
       });
-      // Re-cell the buttons once the drag settles, not per slider step.
-      perSlider.row.querySelector('input')?.addEventListener('change', () => refresh());
+      // The card rebuilds once the value settles (the new run count bounds the
+      // other slider); the focus key carries a keyboard user back to it.
+      this.settleRefresh(perSlider.row, `cdm-per:${group.id}`, refresh);
       const linesSlider = sliderControl({
         parent: card,
         label: linesLabel,
@@ -398,7 +417,7 @@ export class CooldownManagerSettingsPanel {
         step: 1,
         format: count,
       });
-      linesSlider.row.querySelector('input')?.addEventListener('change', () => refresh());
+      this.settleRefresh(linesSlider.row, `cdm-lines:${group.id}`, refresh);
     }
     if (group.kind !== 'single') {
       this.select(
@@ -603,7 +622,7 @@ export class CooldownManagerSettingsPanel {
           refresh([this.selected === id ? 'cdm-detail-group' : `cdm-spell:${id}`]);
         });
         chip.addEventListener('dragstart', (event) => {
-          event.dataTransfer?.setData('text/plain', id);
+          event.dataTransfer?.setData(DRAG_TYPE, id);
           if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
         });
         list.appendChild(chip);
@@ -614,12 +633,18 @@ export class CooldownManagerSettingsPanel {
         event.preventDefault();
         box.classList.add('drop-target');
       });
-      box.addEventListener('dragleave', () => box.classList.remove('drop-target'));
+      box.addEventListener('dragleave', (event) => {
+        // Crossing onto a child chip is not leaving the section.
+        const next = event.relatedTarget;
+        if (next instanceof Node && box.contains(next)) return;
+        box.classList.remove('drop-target');
+      });
       box.addEventListener('drop', (event) => {
         event.preventDefault();
         box.classList.remove('drop-target');
-        const id = event.dataTransfer?.getData('text/plain') ?? '';
-        if (!id) return;
+        const id = event.dataTransfer?.getData(DRAG_TYPE) ?? '';
+        // Only a spell this panel listed can land in a group.
+        if (!spellbook.includes(id) && !assigned.has(id)) return;
         if (hooks.assign(id, entry.id === NOT_DISPLAYED ? null : entry.id)) {
           this.host.click();
           refresh([`cdm-spell:${id}`]);

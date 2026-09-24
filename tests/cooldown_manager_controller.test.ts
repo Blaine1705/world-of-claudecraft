@@ -33,12 +33,13 @@ function resolved(id: string): ResolvedAbility {
 }
 
 /** A druid that knows Flense (rake), Rendclaw (claw) and Gorebite (ferocious_bite). */
-function rig(opts: { inCombat?: boolean } = {}) {
-  const known = ['rake', 'claw', 'ferocious_bite'].map(resolved);
+function rig(opts: { inCombat?: boolean; extra?: string[] } = {}) {
+  const known = ['rake', 'claw', 'ferocious_bite', ...(opts.extra ?? [])].map(resolved);
   const world = {
     cfg: { playerClass: 'druid' },
     player: { name: 'Bob', inCombat: opts.inCombat ?? false },
     known,
+    entities: new Map(),
     resolvedAbility: (id: string) => known.find((ability) => ability.def.id === id) ?? null,
   } as unknown as CooldownManagerWorld & { player: { inCombat: boolean } };
   const cues: [string, number][] = [];
@@ -112,6 +113,27 @@ describe('CooldownManagerController', () => {
     expect(hooks.groups().find((g) => g.id === single)?.spells).toEqual(['ferocious_bite']);
     hooks.assign('claw', grid);
     expect(hooks.groups().find((g) => g.id === line)?.spells).toEqual(['rake']);
+  });
+
+  it('never drains the shared entity iterator the action bar reads after it', () => {
+    // The Hud hands every action-bar-family view ONE snapshot whose `entities`
+    // is a single-use Map iterator. The manager paints first, so if its inner
+    // bar view walked that iterator (a tracked Dominion summon does), the
+    // desktop bar would then see no servants and misread its summon gate.
+    const { hooks, controller, snapshot } = rig({ extra: ['raise_skeletal_warrior'] });
+    hooks.assign('raise_skeletal_warrior', hooks.addGroup('line'));
+    let pulls = 0;
+    const servants = [{ id: 7 }];
+    snapshot.entities = {
+      [Symbol.iterator]() {
+        pulls++;
+        return servants[Symbol.iterator]();
+      },
+    } as unknown as ActionBarWorldInput['entities'];
+    const shared = snapshot.entities;
+    controller.paint(snapshot);
+    expect(snapshot.entities).toBe(shared);
+    expect(pulls).toBe(0);
   });
 
   it('persists groups per character and restores them on the next session', () => {
@@ -276,9 +298,31 @@ describe('CooldownManagerSettingsPanel', () => {
     settings.render(root);
     const section = root.querySelector<HTMLElement>(`.cdm-spell-section[data-group="${id}"]`);
     const drop = new Event('drop', { bubbles: true, cancelable: true });
-    Object.defineProperty(drop, 'dataTransfer', { value: { getData: () => 'rake' } });
+    Object.defineProperty(drop, 'dataTransfer', {
+      value: {
+        getData: (type: string) => (type === 'application/x-woc-cooldown-spell' ? 'rake' : ''),
+      },
+    });
     section?.dispatchEvent(drop);
     expect(hooks.groups()[0].spells).toEqual(['rake']);
+  });
+
+  it('refuses a drop that is not one of the listed spells (stray text, another class)', () => {
+    const { root, hooks, settings } = panel();
+    const id = hooks.addGroup('grid') as string;
+    settings.render(root);
+    const section = root.querySelector<HTMLElement>(`.cdm-spell-section[data-group="${id}"]`);
+    for (const payload of [
+      { type: 'text/plain', id: 'rake' },
+      { type: 'application/x-woc-cooldown-spell', id: 'fireball' },
+    ]) {
+      const drop = new Event('drop', { bubbles: true, cancelable: true });
+      Object.defineProperty(drop, 'dataTransfer', {
+        value: { getData: (type: string) => (type === payload.type ? payload.id : '') },
+      });
+      section?.dispatchEvent(drop);
+    }
+    expect(hooks.groups()[0].spells).toEqual([]);
   });
 
   it('filters every section by spell name as the player types, without a rebuild', () => {
