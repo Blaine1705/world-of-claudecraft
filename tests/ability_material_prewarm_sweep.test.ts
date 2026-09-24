@@ -86,6 +86,10 @@ const REGISTERED_MODULES = [
   'fireball_travel_visual.ts',
   'ignivar_fire_vfx.ts',
   'ring_of_frost_visual.ts',
+  'paladin_ascension_visual.ts',
+  'frozen_orb_fx.ts',
+  'mage_ground_fx.ts',
+  'warlock_meteor_fx.ts',
   'coach_trail_materials.ts',
 ];
 
@@ -233,12 +237,14 @@ describe('the lazy-material sweep', () => {
     const hits = sweep();
     const files = hits.map((hit) => basename(hit.file));
     for (const module of REGISTERED_MODULES) expect(files).toContain(module);
-    // Vacuity floor, kept just under the real count: the seven registered
-    // bundles (the coach trail's guidance set, the ground fire AoE anchor and
-    // the Ring of Frost stand-in among the four spell visuals), the two
-    // excluded scenery bakes, and the battleground caches.
-    expect(hits.length).toBeGreaterThanOrEqual(10);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(9);
+    // Vacuity floor, kept just under the real count. Bundles: the eleven
+    // registered sources (four lazy spell-visual caches, the coach trail's
+    // guidance set, the ground fire AoE anchor, and five per-instance pool
+    // stand-ins: Ring of Frost, Divine Ascension, Frostglobe, the mage and
+    // the warlock meteor rocks) plus the two excluded scenery bakes. The
+    // battleground caches are the remaining non-bundle hit.
+    expect(hits.length).toBeGreaterThanOrEqual(14);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(13);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

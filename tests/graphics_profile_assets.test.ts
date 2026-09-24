@@ -108,6 +108,9 @@ vi.mock('../src/render/stations', () => ({
 vi.mock('../src/render/temporal_hourglass_visual', () => ({
   resetTemporalHourglassProfileCaches: mocks.reset,
 }));
+vi.mock('../src/render/paladin_ascension_visual', () => ({
+  resetPaladinAscensionProfileCaches: mocks.reset,
+}));
 vi.mock('../src/render/wildheart_terrain', () => ({
   resetWildheartTerrainProfileCaches: mocks.reset,
 }));
@@ -211,6 +214,7 @@ describe('graphics profile derived-cache reset', () => {
       'frost_nova_root_visual',
       'ice_block_visual',
       'temporal_hourglass_visual',
+      'paladin_ascension_visual',
       'ground_decor_prewarm',
     ]);
     expect(() => resetGraphicsProfileDerivedCaches()).not.toThrow();

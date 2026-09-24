@@ -390,18 +390,7 @@ export class MageGroundFx {
     const warningLead = Math.min(Math.max(0, opts.warningLead ?? 0), duration - 0.1);
     const initialElapsed = Math.min(duration, Math.max(0, opts.initialElapsed ?? 0));
     body.visible = !grave && warningLead === 0;
-    const rockMat = this.acquireMaterial(
-      'meteor-rock',
-      1,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: 0x111013,
-          emissive: 0x210600,
-          emissiveIntensity: 0.42,
-          roughness: 0.9,
-          metalness: 0.04,
-        }),
-    );
+    const rockMat = this.acquireMaterial('meteor-rock', 1, createMeteorRockMaterial);
     const rock = new THREE.Mesh(geometry.rock, rockMat);
     rock.name = 'mage-meteor-rock';
     rock.castShadow = true;
@@ -1871,6 +1860,53 @@ export interface MageGroundSpellfxEvent {
   ability?: string;
   warningLead?: number;
   persistentId?: string;
+}
+
+/** The basalt rock of the Meteor fall, one config for the live pool and the
+ *  boot stand-in below. */
+function createMeteorRockMaterial(): THREE.MeshStandardMaterial {
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x111013,
+    emissive: 0x210600,
+    emissiveIntensity: 0.42,
+    roughness: 0.9,
+    metalness: 0.04,
+  });
+  material.name = 'mageMeteor:rock';
+  return material;
+}
+
+/**
+ * The boot manifest's stand-in for the Meteor rock: one hidden rock of its
+ * own, never disposed, drawn the way the live fall draws it (an opaque
+ * MeshStandard on a plain Mesh of the icosahedron, casting shadows), so its
+ * program is linked behind the loading cover and held for the session. The
+ * live rock comes from a per-instance pool minted on the first fall; before
+ * this, only an unrelated material sharing the key kept the first fall from
+ * linking it live. Registered in ABILITY_MATERIAL_SOURCES.
+ */
+interface MeteorRockStandIn {
+  root: THREE.Group;
+  materials: THREE.Material[];
+}
+let meteorRockStandIn: MeteorRockStandIn | null = null;
+
+export function buildMeteorRockStandIn(): MeteorRockStandIn {
+  if (!meteorRockStandIn) {
+    const root = new THREE.Group();
+    root.name = 'mage-meteor-rock-stand-in';
+    const material = createMeteorRockMaterial();
+    const rock = new THREE.Mesh(new THREE.IcosahedronGeometry(METEOR_RADIUS, 2), material);
+    rock.name = 'mage-meteor-rock';
+    rock.castShadow = true;
+    root.add(rock);
+    meteorRockStandIn = { root, materials: [material] };
+  }
+  return meteorRockStandIn;
+}
+
+export function meteorRockStandInMaterials(): readonly THREE.Material[] {
+  return buildMeteorRockStandIn().materials;
 }
 
 /**

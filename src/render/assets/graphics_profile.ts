@@ -23,6 +23,7 @@ import { resetIceBlockProfileCaches } from '../ice_block_visual';
 import { resetJailSceneProfileCaches } from '../jail_scene';
 import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailbox';
 import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '../noticeboard';
+import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
 import { preparePropProfileAssets, resetPropProfileCaches } from '../props';
 import { resetQuestObjectProfileCaches } from '../quest_objects';
 import { ensureSkyAssetsAt } from '../sky';
@@ -84,6 +85,7 @@ const RESETTERS = [
   ['frost_nova_root_visual', resetFrostNovaRootProfileCaches],
   ['ice_block_visual', resetIceBlockProfileCaches],
   ['temporal_hourglass_visual', resetTemporalHourglassProfileCaches],
+  ['paladin_ascension_visual', resetPaladinAscensionProfileCaches],
   // The boot twin manifest for the lazy ground-decor pools holds the LIVE
   // materials of the retiring profile: a rebuild mints new ones, and a twin
   // wearing a retired material links a program nothing will ever draw.
