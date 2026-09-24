@@ -923,7 +923,7 @@ export function runEffects(
         if (ability.id === 'lightning_bolt') {
           thundercallOnArcBoltImpact(ctx, p);
           triggerWardCycle(ctx, p);
-          rollArcOverload(ctx, p, target, ability.id, finalDamage, threatOpts);
+          rollArcOverload(ctx, p, target, ability.id, finalDamage, resolvedDamage, threatOpts.mult);
         }
         if (ability.id === 'earth_shock') {
           consumeThunderVent(ctx, p, ability.id, target, finalDamage);
@@ -2721,6 +2721,7 @@ export function runEffects(
           from = best;
         }
         let firstChainHit = 0;
+        let firstChainLanded = 0;
         for (let i = 0; i < hitList.length; i++) {
           const m = hitList[i];
           const sunwardDisc = ability.id === 'sunward_disc';
@@ -2743,7 +2744,7 @@ export function runEffects(
           else dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
           const hpBefore = m.hp;
           if (i === 0) firstChainHit = Math.max(1, Math.round(dmg));
-          ctx.dealDamage(
+          const chainLanded = ctx.dealDamage(
             p,
             m,
             Math.max(1, Math.round(dmg)),
@@ -2758,12 +2759,21 @@ export function runEffects(
             false,
             ability.id,
           );
+          if (i === 0) firstChainLanded = chainLanded;
           if (m.hp < hpBefore) devotionDamageTriggered = true;
         }
         if (ability.id === 'chain_lightning' && hitList.length > 0) {
           thundercallOnChainLightningImpact(ctx, p);
           triggerWardCycle(ctx, p);
-          rollArcOverload(ctx, p, hitList[0], ability.id, firstChainHit, threatOpts);
+          rollArcOverload(
+            ctx,
+            p,
+            hitList[0],
+            ability.id,
+            firstChainHit,
+            firstChainLanded,
+            threatOpts.mult,
+          );
         }
         break;
       }

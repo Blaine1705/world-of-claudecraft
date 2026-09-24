@@ -347,7 +347,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             school: a.school,
             fx: 'tick',
           });
-          ctx.dealDamage(
+          const tickLanded = ctx.dealDamage(
             dotSource,
             e,
             tickDamage,
@@ -380,7 +380,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.finalDamage === true,
           );
           vespersOnDotTick(ctx, e, a);
-          thundercallOnDotTick(ctx, dotSource, a);
+          thundercallOnDotTick(ctx, dotSource, a, tickLanded);
           druidEngineOnBleedTick(ctx, dotSource, a);
           if (a.leechPct !== undefined) {
             const src = dotSource;

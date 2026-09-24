@@ -44,20 +44,25 @@ function knows(ctx: SimContext, player: Entity, abilityId: string): boolean {
 }
 
 /**
- * Rolls Arc Overload after a landed Arc Bolt or Skybranch. `landedDamage` is
- * the fully resolved amount the primary hit dealt (crit included), so the
- * repeat is an exact half copy and draws no damage or crit roll of its own:
- * the only draw is the proc chance itself.
+ * Rolls Arc Overload after an Arc Bolt or Skybranch hit. `plannedDamage` is
+ * the amount the primary hit handed to dealDamage (crit included, before the
+ * caster's output modifiers such as damage-done buffs or Weakening Hex), so
+ * the repeat takes half of it and dealDamage applies those modifiers once,
+ * exactly as it did for the parent: the result is half the parent's damage.
+ * `landed` is what the parent actually took off the target; a hit that did
+ * nothing (evade, immunity) never rolls. The only draw is the proc chance.
  */
 export function rollArcOverload(
   ctx: SimContext,
   player: Entity,
   target: Entity,
   abilityId: string,
-  landedDamage: number,
-  threatOpts?: { flat?: number; mult?: number },
+  plannedDamage: number,
+  landed: number,
+  threatMult?: number,
 ): boolean {
-  if (!OVERLOAD_ABILITIES.has(abilityId) || landedDamage <= 0 || target.dead) return false;
+  if (!OVERLOAD_ABILITIES.has(abilityId) || plannedDamage <= 0 || landed <= 0) return false;
+  if (target.dead) return false;
   if (!knows(ctx, player, ARC_OVERLOAD_ABILITY_ID)) return false;
   if (!ctx.rng.chance(ARC_OVERLOAD_CHANCE)) return false;
   ctx.emit({
@@ -71,17 +76,18 @@ export function rollArcOverload(
   ctx.dealDamage(
     player,
     target,
-    Math.max(1, Math.round(landedDamage * ARC_OVERLOAD_DAMAGE_FRACTION)),
+    Math.max(1, Math.round(plannedDamage * ARC_OVERLOAD_DAMAGE_FRACTION)),
     false,
     'nature',
     'Arc Overload',
     'hit',
     false,
-    threatOpts,
+    // Multiplier only: a flat threat add belongs to the parent cast, once.
+    threatMult === undefined ? undefined : { mult: threatMult },
     true,
     false,
-    // The copied amount already carries every source-output multiplier.
-    true,
+    // Not final: the caster's output modifiers apply to the copy once.
+    false,
     ARC_OVERLOAD_ABILITY_ID,
   );
   addThunderCharges(ctx, player, ARC_OVERLOAD_THUNDER);
@@ -101,9 +107,20 @@ export function magmaBurstGuaranteedCrit(
   );
 }
 
-/** Called once per landed DoT tick; only a Thundercall's own Cinder Jolt can surge. */
-export function thundercallOnDotTick(ctx: SimContext, source: Entity | null, dot: Aura): void {
-  if (dot.id !== CINDER_JOLT_DOT_ID || !source || source.dead) return;
+/**
+ * Called once per DoT tick with the damage it landed; only a Thundercall's own
+ * Cinder Jolt tick that dealt damage can surge. No roll while the caster is
+ * hard-casting Magma Burst: that cast arms the cooldown when it completes,
+ * which would strand a proc taken mid-cast.
+ */
+export function thundercallOnDotTick(
+  ctx: SimContext,
+  source: Entity | null,
+  dot: Aura,
+  landed: number,
+): void {
+  if (dot.id !== CINDER_JOLT_DOT_ID || !source || source.dead || landed <= 0) return;
+  if (source.castingAbility === MAGMA_BURST_ABILITY_ID) return;
   if (!knows(ctx, source, MAGMA_BURST_ABILITY_ID)) return;
   if (!ctx.rng.chance(MAGMA_SURGE_CHANCE)) return;
   source.cooldowns.delete(MAGMA_BURST_ABILITY_ID);

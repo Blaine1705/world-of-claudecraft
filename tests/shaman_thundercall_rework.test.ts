@@ -201,9 +201,56 @@ describe('Thundercall v0.44 Arc Overload', () => {
     for (const options of [{ spec: 'enhancement' }, { level: 9 }]) {
       const { sim, shaman, target } = setup(options);
       const chance = vi.spyOn(sim.rng, 'chance');
-      expect(rollArcOverload(sim.ctx, shaman, target, 'lightning_bolt', 100)).toBe(false);
+      expect(rollArcOverload(sim.ctx, shaman, target, 'lightning_bolt', 100, 100)).toBe(false);
       expect(chance).not.toHaveBeenCalled();
     }
+  });
+
+  it('never rolls for a hit that dealt nothing (evade, immunity)', () => {
+    const { sim, shaman, target } = setup();
+    const chance = vi.spyOn(sim.rng, 'chance');
+    expect(rollArcOverload(sim.ctx, shaman, target, 'lightning_bolt', 100, 0)).toBe(false);
+    expect(chance).not.toHaveBeenCalled();
+  });
+
+  it('applies the caster’s damage-done modifiers to the copy once, so it stays half the bolt', () => {
+    const { sim, shaman } = setup();
+    shaman.auras.push({
+      id: 'test_damage_done',
+      name: 'Test Fury',
+      kind: 'buff_dmg_done',
+      value: 0.5,
+      remaining: 60,
+      duration: 60,
+      sourceId: shaman.id,
+      school: 'physical',
+    });
+    // Land every hit, fail crits, force the overload (its chance is below 0.5).
+    vi.spyOn(sim.rng, 'chance').mockImplementation(
+      (p: number) => p === ARC_OVERLOAD_CHANCE || p >= 0.5,
+    );
+    const events = cast(sim, shaman, 'lightning_bolt');
+    const bolt = hits(events, 'Arc Bolt')[0];
+    const overload = hits(events, 'Arc Overload')[0];
+    expect(bolt).toBeDefined();
+    // Within one point of rounding: a pre-fix copy skipped the 1.5x and landed near a third.
+    expect(Math.abs((overload?.amount ?? 0) - bolt.amount / 2)).toBeLessThanOrEqual(1);
+  });
+
+  it('overloads Skybranch on its first target and banks the extra Thunder', () => {
+    const { sim, shaman, target } = setup();
+    vi.spyOn(sim.rng, 'chance').mockImplementation(
+      (p: number) => p === ARC_OVERLOAD_CHANCE || p >= 0.5,
+    );
+    const events = cast(sim, shaman, 'chain_lightning');
+    const first = hits(events, 'Skybranch').find((hit) => hit.targetId === target.id);
+    const overload = hits(events, 'Arc Overload');
+    expect(first).toBeDefined();
+    expect(overload).toHaveLength(1);
+    expect(overload[0].targetId).toBe(target.id);
+    expect(Math.abs(overload[0].amount - (first?.amount ?? 0) / 2)).toBeLessThanOrEqual(1);
+    // One Thunder for the landed chain plus one for the overload.
+    expect(thunder(shaman)).toBe(2);
   });
 });
 
@@ -230,7 +277,7 @@ describe('Thundercall v0.44 Magma Burst and Magma Surge', () => {
     vi.spyOn(sim.rng, 'chance').mockImplementation(
       (p: number) => p === MAGMA_SURGE_CHANCE || p >= 0.5,
     );
-    thundercallOnDotTick(sim.ctx, shaman, cinderDot(shaman));
+    thundercallOnDotTick(sim.ctx, shaman, cinderDot(shaman), 12);
     expect(shaman.cooldowns.has('lava_burst')).toBe(false);
     const surge = shaman.auras.find((aura) => aura.id === MAGMA_SURGE_ID);
     expect(surge?.kind).toBe('next_cast_instant');
@@ -252,20 +299,42 @@ describe('Thundercall v0.44 Magma Burst and Magma Surge', () => {
   it('only a Thundercall’s own Cinder Jolt draws a surge roll', () => {
     const warspirit = setup({ spec: 'enhancement' });
     const chance = vi.spyOn(warspirit.sim.rng, 'chance');
-    thundercallOnDotTick(warspirit.sim.ctx, warspirit.shaman, cinderDot(warspirit.shaman));
+    thundercallOnDotTick(warspirit.sim.ctx, warspirit.shaman, cinderDot(warspirit.shaman), 12);
     expect(chance).not.toHaveBeenCalled();
 
     const thundercall = setup();
     const otherDot = { ...cinderDot(thundercall.shaman), id: 'shadow_word_pain' };
     const chance2 = vi.spyOn(thundercall.sim.rng, 'chance');
-    thundercallOnDotTick(thundercall.sim.ctx, thundercall.shaman, otherDot);
+    thundercallOnDotTick(thundercall.sim.ctx, thundercall.shaman, otherDot, 12);
     expect(chance2).not.toHaveBeenCalled();
+  });
+
+  it('draws no surge roll for a tick that dealt nothing or while Magma Burst is being cast', () => {
+    const { sim, shaman } = setup();
+    const chance = vi.spyOn(sim.rng, 'chance');
+    thundercallOnDotTick(sim.ctx, shaman, cinderDot(shaman), 0);
+    shaman.castingAbility = 'lava_burst';
+    thundercallOnDotTick(sim.ctx, shaman, cinderDot(shaman), 12);
+    expect(chance).not.toHaveBeenCalled();
+  });
+
+  it('surges from a real Cinder Jolt tick in the aura loop', () => {
+    const { sim, shaman, target } = setup();
+    shaman.cooldowns.set('lava_burst', 8);
+    target.auras.push({ ...cinderDot(shaman), tickTimer: 0.05 });
+    vi.spyOn(sim.rng, 'chance').mockImplementation(
+      (p: number) => p === MAGMA_SURGE_CHANCE || p >= 0.5,
+    );
+    const events = run(sim, 4);
+    expect(hits(events, 'Cinder Jolt').length).toBeGreaterThan(0);
+    expect(shaman.auras.some((aura) => aura.id === MAGMA_SURGE_ID)).toBe(true);
+    expect(shaman.cooldowns.has('lava_burst')).toBe(false);
   });
 
   it('clears the surge with the rest of the Thundercall state on a spec change', () => {
     const { sim, shaman } = setup();
     vi.spyOn(sim.rng, 'chance').mockReturnValue(true);
-    thundercallOnDotTick(sim.ctx, shaman, cinderDot(shaman));
+    thundercallOnDotTick(sim.ctx, shaman, cinderDot(shaman), 12);
     expect(shaman.auras.some((aura) => aura.id === MAGMA_SURGE_ID)).toBe(true);
     clearThundercallState(sim.ctx, shaman);
     expect(shaman.auras.some((aura) => aura.id === MAGMA_SURGE_ID)).toBe(false);

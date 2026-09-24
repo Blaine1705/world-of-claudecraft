@@ -967,7 +967,7 @@ const classAbilityNamesEn = {
       [
         'lava_burst',
         'Magma Burst',
-        'Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst instant. Damage increases with Spell Power. (Thundercall)',
+        'Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
       ],
       [
         'thunderstorm',

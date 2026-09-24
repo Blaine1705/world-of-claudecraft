@@ -13921,7 +13921,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '被動：電弧箭與叉狀閃電有20%的機率超載，對其第一個目標再次造成所造成傷害的50%，並獲得1層雷霆。（雷霆召喚）',
   'entities.abilities.lava_burst.name': '熔岩爆裂',
   'entities.abilities.lava_burst.description':
-    '造成{damage}點火焰傷害。對身上帶有你的燼焰震擊燃燒效果的目標必定造成致命一擊。熔岩湧動：燼焰震擊每次跳動有20%的機率重置此技能的冷卻時間，並使你的下一次熔岩爆裂變為瞬發。傷害隨法術強度提高。（雷霆召喚）',
+    '造成{damage}點火焰傷害。對身上帶有你的燼焰震擊燃燒效果的目標必定造成致命一擊。熔岩湧動：燼焰震擊每次跳動有20%的機率重置此技能的冷卻時間，並使你在10秒內的下一次熔岩爆裂變為瞬發。傷害隨法術強度提高。（雷霆召喚）',
   'entities.abilities.thunderstorm.name': '風暴破擊',
   'entities.abilities.thunderstorm.description':
     '召喚一聲霹靂，對10公尺內的敵人造成{damage}點自然傷害，並使其移動速度降低50%，持續5秒。恢復你最大法力值的8%。傷害隨法術強度提高。（雷霆召喚）',

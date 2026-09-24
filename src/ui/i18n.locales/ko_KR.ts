@@ -14574,7 +14574,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '지속 효과: 전격 화살과 갈래 번개가 20% 확률로 과부하되어 첫 번째 대상에게 입힌 피해의 50%로 다시 공격하고 천둥을 1 부여합니다. (천둥소환)',
   'entities.abilities.lava_burst.name': '용암 폭발',
   'entities.abilities.lava_burst.description':
-    '{damage}의 화염 피해를 입힙니다. 당신의 잉걸 충격으로 불타는 대상에게는 항상 치명타가 적중합니다. 용암 쇄도: 잉걸 충격의 지속 피해가 들어갈 때마다 20% 확률로 이 재사용 대기시간이 초기화되고 다음 용암 폭발이 즉시 시전됩니다. 피해는 주문력에 따라 증가합니다. (천둥소환)',
+    '{damage}의 화염 피해를 입힙니다. 당신의 잉걸 충격으로 불타는 대상에게는 항상 치명타가 적중합니다. 용암 쇄도: 잉걸 충격의 지속 피해가 들어갈 때마다 20% 확률로 이 재사용 대기시간이 초기화되고 10초 안에 사용하는 다음 용암 폭발이 즉시 시전됩니다. 피해는 주문력에 따라 증가합니다. (천둥소환)',
   'entities.abilities.thunderstorm.name': '폭풍 파쇄',
   'entities.abilities.thunderstorm.description':
     '벼락을 내려 10미터 내의 적에게 {damage}의 자연 피해를 입히고 5초 동안 이동 속도를 50% 감소시킵니다. 최대 마나의 8%를 회복합니다. 피해는 주문력에 따라 증가합니다. (천둥소환)',
