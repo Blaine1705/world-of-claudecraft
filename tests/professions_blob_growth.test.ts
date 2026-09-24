@@ -203,6 +203,10 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   // Faction standing rows (src/sim/factions.ts), persisted beside the
   // world-quest log they are earned from.
   'factions',
+  // Faction currencies (src/sim/factions.ts awardFactionCurrency), the
+  // world-quest payout spent at the faction quartermasters: persisted beside
+  // the standing rows, world-quest state, never professions state.
+  'factionCurrencies',
   'arenaRating',
   'arenaWins',
   'arenaLosses',
@@ -886,8 +890,11 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s2.knownRecipes ?? []).toHaveLength(RETAINABLE_KNOWN_IDS.size);
     expect(new Set(s2.knownRecipes)).toEqual(RETAINABLE_KNOWN_IDS);
     expect(MAX_KNOWN_RECIPE_IDS).toBe(512);
-    expect(new Set(ALL_RECIPES.map((recipe) => recipe.id)).size).toBe(204);
-    expect(RETAINABLE_KNOWN_IDS.size).toBe(205);
+    // 204 -> 209 recipes and 205 -> 213 retainable ids at the faction
+    // quartermasters (src/sim/content/faction_vendors.ts): five recipes and
+    // three drop-acquired enchants sold for faction currency.
+    expect(new Set(ALL_RECIPES.map((recipe) => recipe.id)).size).toBe(209);
+    expect(RETAINABLE_KNOWN_IDS.size).toBe(213);
     expect(RETAINABLE_KNOWN_IDS.size).toBeLessThan(MAX_KNOWN_RECIPE_IDS);
     expect(s2.knownRecipes).toContain('enchant_weapon_lastflame_zeal');
     // Derived from the refusal policy so a profession becoming slottable
@@ -1167,8 +1174,16 @@ describe('the professions blob growth bound (phase 16)', () => {
     // (Zeal) - 10 (legal equipment payloads, including new binding/provenance,
     // replacing the invented three-stat rolls). Same narrow tracking band.
     // One quest recipe adds exactly 30 UTF-8 bytes to retained knowledge.
-    expect(bytes).toBeGreaterThan(18457);
-    expect(bytes).toBeLessThan(18838);
+    // Faction quartermasters: 19,077 = 18,830 (the release measurement) + 247,
+    // all in knownRecipes and measured EXACTLY: the five vendor recipe ids
+    // (pattern_reinforced_armor_kit 31, plans_dense_sharpening_stone 31,
+    // recipe_elixir_of_mana_regeneration 37, recipe_potion_of_invisibility 32,
+    // schematic_clockwork_shock_bomb 33, each quoted plus comma) and the three
+    // vendor enchant ids (enchant_feet_shadowstride 28,
+    // enchant_gloves_forged_might 30, enchant_offhand_spirit 25). The edge
+    // stays measurement plus one and the floor measurement minus 380.
+    expect(bytes).toBeGreaterThan(18697);
+    expect(bytes).toBeLessThan(19078);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.
@@ -1953,8 +1968,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // professions arm pins, so the two measurements can never describe
     // different fixtures.
     const professions = professionsBytes(s2);
-    expect(professions).toBeGreaterThan(18457);
-    expect(professions).toBeLessThan(18838);
+    expect(professions).toBeGreaterThan(18697);
+    expect(professions).toBeLessThan(19078);
 
     // Every container really reached its ceiling through the load (the
     // `field in state` and non-empty pins above are the pattern): a load clamp
@@ -2184,7 +2199,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       inventory: 16400,
       bank: 36080,
       vendorBuyback: 756,
-      knownRecipes: 62,
+      // 62 + 247: the faction quartermasters' five recipe ids and three enchant
+      // ids in knownRecipes (itemized at the professions band above).
+      knownRecipes: 309,
     });
     // field_kit (below) is the ONE Field Kit deedStats entry inside this same
     // settled state; the fixture-repair deltas above are Crucible-only and
@@ -2347,6 +2364,20 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // characters of ids plus 2 x 3 = 32). Predicted from the literals BEFORE
     // the run (56,241 to 56,346; the deeds row below moves 599 to 672 and
     // deedStats 469 to 501).
+    // Plus 533 at the faction currency stock (fffccbd715): the 19 new faction
+    // quartermaster item ids (recipes, formulas, their crafted goods,
+    // cartographers_ink, the allied/rift conveniences) in
+    // deedStats.itemsDiscovered, sorted-array rows of `"<id>",`. Its other
+    // mover, the eight new retainable recipe and enchant ids in knownRecipes
+    // (+247), is already inside fixtureDelta.knownRecipes (62 to 309) above.
+    // Plus 4,711 at the Buried Hoards content: cmb_coinsack_caught in the deeds
+    // row (+35), the 96 hoard gear ids (32 pieces in base, rare_ and
+    // legendary_ forms, content/hoard_loot.ts) and the four treasure_map_* ids
+    // in itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and
+    // the 32 hoard gear reliquary.firstFind rows plus the
+    // conquerors_buried_hoards illuminated page (+1,761). MEASURED on the
+    // merged tree against the 212,524 re-base: 218,015, exactly +5,491
+    // (247 + 533 + 4,711).
     expect(counterfactualBytes - 156144).toBe(
       Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
         183 +
@@ -2356,7 +2387,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         375 +
         358 +
         282 +
-        105,
+        105 +
+        533 +
+        4711,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2383,8 +2416,17 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // wq-reputation merge: the faction quartermaster items (+358 above).
       // deeds 317 -> 599 at the faction standing deeds (+282 above). deeds
       // 599 -> 672 and deedStats 469 -> 501 at the Clue Scroll content (+73
-      // and +32 of the +105 above).
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 672, deedStats: 501, reliquary: 80 });
+      // and +32 of the +105 above). knownRecipes 30 -> 277 and deedStats
+      // 501 -> 1034 at the faction currency stock (+247, +533 above); deeds
+      // 672 -> 707, deedStats 1034 -> 3949 and reliquary 80 -> 1841 at the
+      // Buried Hoards content (+35, +2,915, +1,761 of the +4,711 above).
+    ).toEqual({
+      questsDone: 100,
+      knownRecipes: 277,
+      deeds: 707,
+      deedStats: 3949,
+      reliquary: 1841,
+    });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2405,8 +2447,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // quartermaster item ids (+358, attributed above) stay here too.
       // 210,506 -> 210,788 at the faction standing deeds (+282), in the deeds
       // row this counterfactual keeps. 210,788 -> 210,893 at the Clue Scroll
-      // content (+105: the two deed ids and the two item ids).
-    ).toBe(210893);
+      // content (+105: the two deed ids and the two item ids). 210,893 ->
+      // 216,384 at the faction currency stock and the Buried Hoards content
+      // (+247 + 533 + 4,711, attributed above).
+    ).toBe(216384);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2429,7 +2473,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 212,490 -> 212,512 at the release/v0.44.0 merge into
       // feature/buried-hoards: the release's Viridian Valestrider reins id
       // (+22, the devMountReleaseDelta 49 -> 71 above).
-    ).toBe(212512);
+      // 212,512 -> 218,003 at the faction currency stock and the Buried Hoards
+      // content (+5,491, attributed above).
+    ).toBe(218003);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2503,8 +2549,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 212,524 bytes, the branch's 212,502 plus the release's +22 Valestrider
     // reins id above. Floor at measurement minus 380, edge at measurement plus
     // one: 212,144..212,525.
-    expect(bytes, reMint).toBeGreaterThan(212144);
-    expect(bytes, reMint).toBeLessThan(212525);
+    // RE-BASED at the faction currency stock and the Buried Hoards content:
+    // 218,015 bytes, up 5,491 from 212,524 (knownRecipes +247, deeds +35,
+    // deedStats +3,448, reliquary +1,761, each attributed in the growth
+    // equation above). Floor at measurement minus 380, edge at measurement
+    // plus one: 217,635..218,016.
+    expect(bytes, reMint).toBeGreaterThan(217635);
+    expect(bytes, reMint).toBeLessThan(218016);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
