@@ -18,6 +18,11 @@ import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MeleeImpactProfile } from '../melee_impact_core';
 import type { MountRideSpec } from '../mount_visuals';
 import {
+  stoneboundShardMaterialOptions,
+  stoneboundShellMaterialOptions,
+  weaponImbueAuraMaterialOptions,
+} from '../vfx_basic_materials';
+import {
   createWeaponVfx,
   DEFAULT_TUNING,
   WEAPON_VFX,
@@ -2942,15 +2947,7 @@ export class CharacterVisual {
           if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
           const aura = new THREE.Mesh(
             mesh.geometry,
-            new THREE.MeshBasicMaterial({
-              color: 0x9a9384,
-              transparent: true,
-              opacity: 0.72,
-              depthWrite: false,
-              blending: THREE.NormalBlending,
-              side: THREE.DoubleSide,
-              wireframe: true,
-            }),
+            new THREE.MeshBasicMaterial(stoneboundShellMaterialOptions()),
           );
           aura.position.copy(mesh.position);
           aura.quaternion.copy(mesh.quaternion);
@@ -2982,20 +2979,13 @@ export class CharacterVisual {
         const mesh = o as THREE.Mesh;
         if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
         const tipGeometry = this.weaponAuraTip ? tipFadedWeaponGeometry(mesh, holder) : null;
+        // The option tables are shared with the never-disposed boot stand-ins
+        // (vfx_basic_materials.ts), which hold these programs between rebuilds.
         const aura = new THREE.Mesh(
           tipGeometry ?? mesh.geometry,
-          new THREE.MeshBasicMaterial({
-            // Additive translucent clone of the weapon mesh in the spec-authored
-            // soak color. Brightness class is fixed here; only the hue is data.
-            // Tip scope rides a vertex-alpha ramp baked into the cloned geometry.
-            color: auraColor,
-            transparent: true,
-            opacity: 0.42,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending,
-            side: THREE.DoubleSide,
-            vertexColors: tipGeometry !== null,
-          }),
+          new THREE.MeshBasicMaterial(
+            weaponImbueAuraMaterialOptions(auraColor, tipGeometry !== null),
+          ),
         );
         aura.position.copy(mesh.position);
         aura.quaternion.copy(mesh.quaternion);
@@ -3018,13 +3008,7 @@ export class CharacterVisual {
     for (const placement of placements) {
       const shard = new THREE.Mesh(
         STONEBOUND_SHARD_GEOMETRY,
-        new THREE.MeshBasicMaterial({
-          color: 0x777065,
-          transparent: true,
-          opacity: 0.82,
-          wireframe: true,
-          depthWrite: false,
-        }),
+        new THREE.MeshBasicMaterial(stoneboundShardMaterialOptions()),
       );
       shard.position.set(placement.x, placement.y, placement.z);
       shard.rotation.z = placement.rz;
