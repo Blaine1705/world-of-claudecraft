@@ -50,7 +50,7 @@ function fixture(cls: string, warriorTextures = true) {
   const empty = () => ({ units: vi.fn(() => []) });
   const fx = Object.create(AbilityVfxFx.prototype) as AbilityVfxFx;
   Object.assign(fx, {
-    crests: { preparation: empty() },
+    crests: empty(),
     guards: empty(),
     powerForms: empty(),
     spiritHammers: empty(),

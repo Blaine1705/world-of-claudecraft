@@ -152,7 +152,11 @@ selected by ability id only:
   (`requestClassKit`), keeps a mip chain on the WebP sheets, and DECLINES them
   on constrained-memory devices, where the kit stays cold and the generic
   presentation runs (`tests/warrior_kit_assets.test.ts`,
-  `tests/active_kit_prewarm.test.ts`). Its preparation rides
+  `tests/active_kit_prewarm.test.ts`). A pool built at boot never reads those
+  getters in its constructor, since the load lands after it: it binds them in
+  a unit of its own preparation recipe, ahead of its compile (the crests'
+  `crest-bind-kit`, the guards' `guard-bind-steel`; `tests/crest_prewarm.test.ts`).
+  Its preparation rides
   `ACTIVE_KIT_PRIORITY` (the boot-debt lane) under the per-frame budget, never
   the actionable floor, and it waits out a loading cover: the kit is cosmetic
   and gated by its own readiness, and the floor once admitted all ten sheets

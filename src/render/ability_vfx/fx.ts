@@ -1321,7 +1321,7 @@ export class AbilityVfxFx implements SequencerHost {
   // The prewarm's finally-block clear() hides everything again.
   authoredPrewarmUnits(host: CrestPrewarmHost, kinds?: readonly CrestKind[]) {
     return [
-      ...this.crests.preparation.units(host, kinds),
+      ...this.crests.units(host, kinds),
       ...this.guards.units(host),
       ...this.powerForms.units(host),
       ...this.spiritHammers.units(host),

@@ -12,6 +12,7 @@ import { CrestPrewarm } from '../src/render/ability_vfx/crest_prewarm';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import * as assets from '../src/render/ability_vfx/production_assets';
+import { SignatureCrests } from '../src/render/ability_vfx/signature_crests';
 import { WarriorFuryStates } from '../src/render/ability_vfx/warrior_fury_states';
 import { WarriorGuardPlates } from '../src/render/ability_vfx/warrior_guard_plates';
 import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms';
@@ -199,7 +200,8 @@ it('keeps synchronous declarations through every production Warrior preparation 
   const baked = new BakedImpactLayers(f.scene);
   const fx = Object.create(AbilityVfxFx.prototype) as AbilityVfxFx;
   Object.assign(fx, {
-    crests: { preparation: f.prep },
+    // The real crest wrapper (its kit bind) over the fixture's preparation.
+    crests: { preparation: f.prep, units: SignatureCrests.prototype.units },
     guards,
     powerForms,
     spiritHammers,
@@ -208,7 +210,8 @@ it('keeps synchronous declarations through every production Warrior preparation 
   });
   try {
     const units = fx.authoredPrewarmUnits(f.host, ACTIVE_WARRIOR_CRESTS);
-    expect(units).toHaveLength(ACTIVE_WARRIOR_CRESTS.length * 4 + 4 + 16 + 3 + 12 + 30);
+    expect(units).toHaveLength(ACTIVE_WARRIOR_CRESTS.length * 4 + 1 + 4 + 16 + 3 + 12 + 30);
+    expect(units[0].id).toBe('crest-bind-kit');
     expect(units.filter((unit) => unit.id.includes('compile'))).toHaveLength(46);
     for (const unit of units)
       expect(unit.synchronous === true, unit.id).toBe(!unit.id.includes('compile'));
