@@ -275,7 +275,9 @@
      window beneath it, e.g. an equip socket under the move zone in the
      paired char+bags layout (the fix-round review's blocker). Neutralize
      everything but the ring for exactly the drag window; hit-testing then
-     falls through to the sheet and the paperdoll as before. */
+     falls through to the sheet and the paperdoll as before, and anywhere
+     else to #mobile-window-backdrop, which the hit test counts as the world
+     (a release there only opens the destroy prompt). */
   body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring),
   body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring) * {
     pointer-events: none;
@@ -664,7 +666,9 @@
      behind it instead of relying on DOM occlusion order (several windows are
      translucent / don't fully cover the viewport). Hidden by default and on
      desktop (no body.mobile-touch): this pass only blocks touches, it does not
-     close windows on tap.
+     close windows on tap. It stands in for the world under a touch item drag
+     (src/ui/item_drop_hit_test.ts), since it is all of the world a finger can
+     reach while a window is open.
      Stacking: #mobile-controls sits at z-index 60 (game-active, above), and #ui
      (the container every `.window` lives inside) rises to z-index 90 only while
      body.mobile-window-open (see the `#ui` rule above). The backdrop sits at 85:

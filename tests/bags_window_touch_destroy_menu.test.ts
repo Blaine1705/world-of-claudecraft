@@ -5,7 +5,7 @@
 // bag action menu there; this pins that the menu carries a Destroy row on the
 // touch HUD only, gated by the same bagDestroyAction the drag reads, and that
 // the row opens the bags' own destroy prompt (confirm + quantity), never
-// destroying anything by itself. Drives the REAL BagsWindow against a jsdom
+// destroying anything by itself. Drives the REAL BagsWindow against a happy-dom
 // container (the bags_window_destroy_default_qty.test.ts fixture idiom).
 import { describe, expect, it } from 'vitest';
 import type { InvSlot } from '../src/sim/types';
@@ -21,9 +21,10 @@ interface MenuOpen {
 function harness(
   inventory: InvSlot[],
   opts: { touch: boolean },
-): { root: HTMLElement; opens: MenuOpen[]; discards: unknown[][] } {
+): { root: HTMLElement; opens: MenuOpen[]; discards: unknown[][]; errors: string[] } {
   document.body.innerHTML = '';
   const discards: unknown[][] = [];
+  const errors: string[] = [];
   const world = {
     inventory,
     bags: [null, null, null, null],
@@ -73,7 +74,7 @@ function harness(
     stageMarketSell: noop,
     stageMailParcel: noop,
     insertItemChatLink: noop,
-    showError: noop,
+    showError: (msg: string) => errors.push(msg),
     setPendingPetFeed: noop,
     resetPetBarSig: noop,
     isHotbarItemId: () => false,
@@ -103,14 +104,15 @@ function harness(
     },
   };
   new BagsWindow(deps).render();
-  return { root, opens, discards };
+  return { root, opens, discards, errors };
 }
 
-function tapFirstCell(root: HTMLElement): void {
-  const cell = root.querySelector('button.bag-item');
-  expect(cell).not.toBeNull();
+function tapCell(root: HTMLElement, nth = 0): void {
+  const cell = root.querySelectorAll('button.bag-item')[nth];
+  expect(cell).toBeDefined();
   cell?.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
 }
+const tapFirstCell = (root: HTMLElement): void => tapCell(root);
 
 function rightClickFirstCell(root: HTMLElement): void {
   const cell = root.querySelector('button.bag-item');
@@ -134,6 +136,31 @@ describe('bags_window touch Destroy row', () => {
     expect(prompt?.querySelector<HTMLInputElement>('input.prompt-number')?.value).toBe('7');
     // Opening the prompt destroys nothing; only its confirm does.
     expect(discards).toHaveLength(0);
+  });
+
+  it('destroys exactly the tapped special copy, not its plain duplicate', () => {
+    const inventory: InvSlot[] = [
+      { itemId: 'worn_sword', count: 1 },
+      { itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } },
+    ];
+    const { root, opens, discards } = harness(inventory, { touch: true });
+    // The default Recent grid keeps bag order, so cell 1 is the signed copy.
+    tapCell(root, 1);
+    opens[0]?.runDestroy?.();
+    const prompt = document.querySelector('#prompt-stack .discard-item-prompt');
+    expect(prompt?.querySelector('input.prompt-number')).toBeNull();
+    prompt?.querySelector<HTMLButtonElement>('button')?.click();
+    expect(discards).toEqual([['worn_sword', 1, { slotIndex: 1 }]]);
+  });
+
+  it('refuses when the tapped copy left the bags while the menu was open', () => {
+    const inventory: InvSlot[] = [{ itemId: 'linen_scrap', count: 7 }];
+    const { root, opens, errors } = harness(inventory, { touch: true });
+    tapFirstCell(root);
+    inventory.splice(0, 1);
+    opens[0]?.runDestroy?.();
+    expect(document.querySelector('#prompt-stack .discard-item-prompt')).toBeNull();
+    expect(errors).toHaveLength(1);
   });
 
   it('never offers Destroy on a noDiscard item (the drag refuses it too)', () => {

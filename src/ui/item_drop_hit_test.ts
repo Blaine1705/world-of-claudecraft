@@ -4,9 +4,10 @@
 //
 // One shared hit test so both arms of the gesture agree on what "over the paperdoll"
 // and "over the world" mean: a paperdoll socket is any element carrying
-// data-equip-slot (char_window stamps it), the world is the game canvas, and every
-// other surface (a window, the HUD chrome, the action bar) is inert, so releasing a
-// stack over the chat box never destroys it.
+// data-equip-slot (char_window stamps it), the world is the game canvas (or the
+// touch HUD's dim over it while a window is open), and every other surface (a
+// window, the HUD chrome, the action bar) is inert, so releasing a stack over the
+// chat box never destroys it. A world release only OPENS the destroy prompt.
 
 import { type EquipSlot, isEquipSlot } from '../sim/types';
 

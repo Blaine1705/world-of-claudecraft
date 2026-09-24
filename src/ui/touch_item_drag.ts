@@ -153,14 +153,17 @@ export function bindTouchItemDrag(el: HTMLElement, deps: TouchItemDragDeps): voi
   // down without a drop (the "cannot drag an item out of the bag on mobile"
   // report). A non-passive touchmove on the row itself, bound up front so the
   // browser knows it can block before the touch starts, cancels the scroll for
-  // an ARMED drag only; an unarmed flick still scrolls the grid.
-  el.addEventListener(
-    'touchmove',
-    (e) => {
-      if (drag?.armed && e.cancelable) e.preventDefault();
-    },
-    { passive: false },
-  );
+  // an ARMED drag only; an unarmed flick still scrolls the grid. Touch HUD only
+  // (rows rebuild on every render), so the desktop grid keeps passive scrolling.
+  if (deps.isTouchHud()) {
+    el.addEventListener(
+      'touchmove',
+      (e) => {
+        if (drag?.armed && e.cancelable) e.preventDefault();
+      },
+      { passive: false },
+    );
+  }
 
   el.addEventListener('pointermove', (e) => {
     if (!drag || drag.pointerId !== e.pointerId) return;

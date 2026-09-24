@@ -1182,7 +1182,8 @@ export class BagsWindow {
         // is unavailable (itemMenuAvailable excludes it, same as every other
         // special mode), so a sellable item falls into the vendor row set
         // instead: touch has no shift-click either, so this is its only way
-        // to reach Sell all.
+        // to reach Sell all. The touch menu also ends in Destroy (the drag out
+        // to the world has almost no world to land on under the bags sheet).
         if (this.deps.isTouchHud()) {
           if (this.itemMenuAvailable(item, s.itemId, s.instance, materialSourcesForDisplay(s))) {
             this.openItemMenuFor(item, s, ev);
@@ -1270,8 +1271,9 @@ export class BagsWindow {
         }
         ev.preventDefault();
         // The action menu opens, whose FIRST row is the classic left-click
-        // action so that binding survives (right-click never destroys;
-        // destroying is the drag-out-to-world gesture). Every item now offers
+        // action so that binding survives (right-click never destroys; on the
+        // desktop HUD destroying is the drag-out-to-world gesture, while the
+        // touch HUD's menu adds a Destroy row). Every item now offers
         // at least Lock/Unlock (issue 3042), so this always opens the menu;
         // left-click is unchanged (still runs the classic action instantly).
         if (this.itemMenuAvailable(item, s.itemId, s.instance, materialSourcesForDisplay(s))) {
@@ -2174,16 +2176,27 @@ export class BagsWindow {
     const index = bagStackIndex(this.deps.world().inventory, s);
     // Touch has no world to drop a stack on while the bags sheet covers the
     // screen, so the menu carries the destroy prompt the drag opens on desktop,
-    // with the same copy re-resolve (promptDestroy) and the same gate.
+    // behind the same gate. The menu can stay open across a bag change, so the
+    // tapped copy is re-resolved (and its live count read) when the row runs,
+    // refusing like the Lock row when it is gone; focus goes back to the cell
+    // first so the prompt's Cancel returns there, not to the hidden menu row.
+    const opener = ev.currentTarget as HTMLElement | null;
     const runDestroy =
       vendorSellCount === undefined &&
       this.deps.isTouchHud() &&
       this.destroyAction(s.itemId) === 'discard'
-        ? () =>
+        ? () => {
+            const at = bagStackIndex(this.deps.world().inventory, s);
+            if (at < 0) {
+              this.deps.showError(tSim('error.noItem'));
+              return;
+            }
+            opener?.focus({ preventScroll: true });
             this.promptDestroy(s.itemId, Math.max(1, Math.floor(s.count)), {
-              index: index >= 0 ? index : null,
+              index: at,
               copyPin: itemCopyPin(s),
-            })
+            });
+          }
         : undefined;
     this.deps.openItemActionMenu(
       item,
