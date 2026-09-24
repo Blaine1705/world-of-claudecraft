@@ -2,6 +2,10 @@
 // aura value itself, so ticking and Chain Heal consumption share one authority.
 
 import { SPRINGMENDER_4PC_CHAIN_HARVEST_MULT } from '../content/ignivar_set_bonuses';
+import {
+  VANGUARD_RESTO_SHAMAN_4PC_SHIELD_DURATION_SEC,
+  VANGUARD_RESTO_SHAMAN_4PC_SHIELD_PCT_MAX,
+} from '../content/vanguard_set_bonuses_b';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 
@@ -16,6 +20,8 @@ import {
 } from './shaman_talents';
 
 export const MENDING_CURRENT_ID = 'shaman_mending_current';
+/** The Brineward 4pc shield aura id (distinct from Tidecall's own heal). */
+export const BRINEWARD_SHIELD_ID = 'set_vanguard_shaman_restoration_4pc';
 export const LIFESPRING_WEAPON_ID = 'lifespring_weapon';
 export const MENDING_CURRENT_DURATION = 12;
 export const MENDING_CURRENT_INTERVAL = 3;
@@ -184,7 +190,28 @@ export function depositMendingCurrent(
     }
     if (best) depositRawMendingCurrent(ctx, source, best, calculatedHealing * 0.5);
   }
+  if (abilityId === 'tidecall') applyBrinewardShield(ctx, source, target);
   return added;
+}
+
+/** Brineward Chainmail 4pc (Warfare Season 2): Tidecall also shields its
+ *  target for a fraction of the SHAMAN's max health. Called from the one
+ *  Tidecall heal site above, so an echoed or chained heal never re-grants it;
+ *  a second Tidecall refreshes the shield (same id and source). No rng. */
+function applyBrinewardShield(ctx: SimContext, source: Entity, target: Entity): void {
+  if (!wearsSetBonus(ctx, source, 'vanguard_shaman_restoration', 4)) return;
+  const amount = Math.round(source.maxHp * VANGUARD_RESTO_SHAMAN_4PC_SHIELD_PCT_MAX);
+  if (amount <= 0) return;
+  ctx.applyAura(target, {
+    id: BRINEWARD_SHIELD_ID,
+    name: 'Tidecall',
+    kind: 'absorb',
+    remaining: VANGUARD_RESTO_SHAMAN_4PC_SHIELD_DURATION_SEC,
+    duration: VANGUARD_RESTO_SHAMAN_4PC_SHIELD_DURATION_SEC,
+    value: amount,
+    sourceId: source.id,
+    school: 'nature',
+  });
 }
 
 /**

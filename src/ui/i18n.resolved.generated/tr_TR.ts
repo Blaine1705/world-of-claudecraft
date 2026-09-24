@@ -2323,6 +2323,8 @@ export const tr_TR: EnTranslations = {
       "gossipOptionAria": "{name} tarafından sunulan Harp seti dükkanına göz at",
       "jewelry": "Takılar",
       "weapons": "Silahlar",
+      "groupSeason2": "Warfare Season 2: Vanguard",
+      "groupEntry": "Warfare Season 1",
       "owned": "Sahip",
       "buyAria": "{honor} karşılığında {item} satın al",
       "buyOwnedAria": "{honor} karşılığında {item} satın al, zaten sahipsin",
@@ -7343,7 +7345,9 @@ export const tr_TR: EnTranslations = {
       "warfareBody": "Her Harp parçası Harp Saldırı Puanı ve Harp Savunma Puanı taşır, ve bu iki puan canavarlara karşı hiçbir işe yaramaz. Yalnızca başka bir oyuncuyla dövüştüğünde, bir düelloda, arenada ya da savaş alanında işler; burada Saldırı verdiğin hasara eklenir, Savunma ise aldığın hasarı azaltır, her biri kendi tavanına kadar. Her zırh ailesi aynı zamanda bir takımdır, ve takım bonusları da benzer şekilde Harp puanı ya da yalnızca oyunculara karşı işleyen etkilerdir, bu yüzden tam bir onur kiti bir zindan patronunda hiçbir işe yaramaz.",
       "warfareBodyStatsStay": "Her Harp parçası Harp Saldırı ve Harp Savunma Derecesi taşır; bu iki derece canavarlara karşı hiçbir şey yapmaz. Yalnızca düelloda, arenada veya savaş alanında başka bir oyuncuyla dövüşürken uygulanır; Saldırı verdiğin hasarı artırır, Savunma aldığın hasarı azaltır ve her biri kendi tavanına ulaşabilir. Her zırh ailesi aynı zamanda bir settir ve set bonusları da yalnızca oyunculara karşı çalışan Harp derecesi veya etkileridir; bu nedenle eksiksiz bir onur setinin set bonusları zindan patronuna karşı hiçbir şey yapmaz. Parçaların sıradan istatistikleri, zırhı ve silah hasarı yine vardır ve her yerde çalışır; canavara karşı sessiz kalan Harp dereceleri ve set bonuslarıdır.",
       "warfareTradeBody": "Bu bilinçli bir değiş tokuştur. Harp teçhizatı oyuncularla dövüşmek için yapılmıştır, zindan kademelerini atlamanın bir kestirmesi değildir: bir Harp parçası aynı yuvadaki destansı bir zindan parçasının taşıdığı savaş puanlarını asla taşımaz, ve getirdiği her şey diğer oyunculara harcanır. Arenada kendini tutmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlarda kazan.",
-      "warfareTradeBodyRatingSpent": "Bu, kasıtlı takastır. Harp teçhizatı zindan kademelerini atlamak için değil, oyuncularla savaşmak için yapılır: bir Harp parçası aynı yuvadaki zindan epik parçasının taşıdığı savaş derecelerini asla taşımaz; onun yerine taşıdığı Harp derecesi ve set bonusları tamamen diğer oyunculara harcanır. Arenada ayakta kalmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlardan kazan."
+      "warfareTradeBodyRatingSpent": "Bu, kasıtlı takastır. Harp teçhizatı zindan kademelerini atlamak için değil, oyuncularla savaşmak için yapılır: bir Harp parçası aynı yuvadaki zindan epik parçasının taşıdığı savaş derecelerini asla taşımaz; onun yerine taşıdığı Harp derecesi ve set bonusları tamamen diğer oyunculara harcanır. Arenada ayakta kalmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlardan kazan.",
+      "vanguardHeading": "Vanguard gear: Warfare Season 2",
+      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
     },
     "worldPvpPage": {
       "heading": "World PvP",
@@ -16013,6 +16017,423 @@ export const tr_TR: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "Fırtına İlahisi Zincir Tabanları"
       },
+      "vanguard_warrior_arms_helmet": {
+        "name": "Bladewake Greathelm"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "Bladewake Pauldrons"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "Bladewake Hauberk"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "Bladewake Legplates"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "Bladewake Crushers"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "Bloodmarch Visage"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "Bloodmarch Shoulderguards"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "Bloodmarch Chainmail"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "Bloodmarch Leggings"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "Bloodmarch Grips"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "Ironmarch Helm"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "Ironmarch Spaulders"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "Ironmarch Chestguard"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "Ironmarch Legguards"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "Ironmarch Handguards"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "Sunvigil Circlet"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "Sunvigil Mantle"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "Sunvigil Hauberk"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "Sunvigil Legmail"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "Sunvigil Gloves"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "Shieldvow Helm"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "Shieldvow Pauldrons"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "Shieldvow Breastplate"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "Shieldvow Legplates"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "Shieldvow Gauntlets"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "Lightbrand Crown"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "Lightbrand Spaulders"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "Lightbrand Cuirass"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "Lightbrand Legguards"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "Lightbrand Gauntlets"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "Packwarden Coif"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "Packwarden Spaulders"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "Packwarden Jerkin"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "Packwarden Legguards"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "Packwarden Gauntlets"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "Farsight Coif"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "Farsight Spaulders"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "Farsight Jerkin"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "Farsight Legguards"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "Farsight Gauntlets"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "Snaretooth Coif"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "Snaretooth Spaulders"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "Snaretooth Jerkin"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "Snaretooth Legguards"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "Snaretooth Gauntlets"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "Nightcut Hood"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "Nightcut Shoulderpads"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "Nightcut Tunic"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "Nightcut Breeches"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "Nightcut Gloves"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "Brawlmark Hood"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "Brawlmark Shoulderpads"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "Brawlmark Tunic"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "Brawlmark Breeches"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "Brawlmark Gloves"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "Shadewalk Hood"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "Shadewalk Shoulderpads"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "Shadewalk Tunic"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "Shadewalk Breeches"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "Shadewalk Gloves"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "Veilpsalm Cowl"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "Veilpsalm Mantle"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "Veilpsalm Robe"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "Veilpsalm Leggings"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "Veilpsalm Handwraps"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "Gracewing Cowl"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "Gracewing Mantle"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "Gracewing Robe"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "Gracewing Leggings"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "Gracewing Handwraps"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "Duskhymn Cowl"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "Duskhymn Mantle"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "Duskhymn Robe"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "Duskhymn Leggings"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "Duskhymn Handwraps"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "Tempestwrit Coif"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "Tempestwrit Pauldrons"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "Tempestwrit Hauberk"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "Tempestwrit Legmail"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "Tempestwrit Gauntlets"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "Galeborn Helm"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "Galeborn Spaulders"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "Galeborn Chainmail"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "Galeborn Legguards"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "Galeborn Grips"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "Brineward Circlet"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "Brineward Mantle"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "Brineward Hauberk"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "Brineward Kilt"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "Brineward Handwraps"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "Hourbinder's Hood"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "Hourbinder's Amice"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "Hourbinder's Robe"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "Hourbinder's Trousers"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "Hourbinder's Gloves"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "Emberlash Cowl"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "Emberlash Mantle"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "Emberlash Robes"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "Emberlash Leggings"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "Emberlash Gloves"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "Rimewarden Hood"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "Rimewarden Shoulderpads"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "Rimewarden Vestment"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "Rimewarden Legwraps"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "Rimewarden Mitts"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "Dreadquill Hood"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "Dreadquill Mantle"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "Dreadquill Robe"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "Dreadquill Leggings"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "Dreadquill Handwraps"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "Marrowbound Cowl"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "Marrowbound Spaulders"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "Marrowbound Robe"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "Marrowbound Leggings"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "Marrowbound Grips"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "Slagcrown Hood"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "Slagcrown Mantle"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "Slagcrown Robes"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "Slagcrown Leggings"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "Slagcrown Gloves"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "Starwarden Headdress"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "Starwarden Spaulders"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "Starwarden Vest"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "Starwarden Breeches"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "Starwarden Gloves"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "Bloodmane Helm"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "Bloodmane Shoulderpads"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "Bloodmane Tunic"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "Bloodmane Legguards"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "Bloodmane Grips"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "Thistlebloom Crown"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "Thistlebloom Mantle"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "Thistlebloom Vest"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "Thistlebloom Leggings"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "Thistlebloom Gloves"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "Vanguard's Verdict"
+      },
+      "vanguard_oath_blade": {
+        "name": "Vanguard's Oath"
+      },
+      "vanguard_fang_dagger": {
+        "name": "Vanguard's Fang"
+      },
+      "vanguard_warstaff": {
+        "name": "Vanguard's Warstaff"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -21366,6 +21787,141 @@ export const tr_TR: EnTranslations = {
       "vale_arcanist": {
         "name": "Vadi Arkanisti giysileri",
         "bonus3": "Saldırı ve büyü hızını %15 artırır."
+      },
+      "vanguard_druid_balance": {
+        "name": "Starwarden Raiment",
+        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
+        "bonus4": "Casting Gripping Roots increases your movement speed by 30 percent for 4 sec."
+      },
+      "vanguard_druid_feral": {
+        "name": "Bloodmane Hide",
+        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec.",
+        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
+      },
+      "vanguard_druid_restoration": {
+        "name": "Thistlebloom Vestment",
+        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
+        "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "Packwarden Harness",
+        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec.",
+        "bonus4": "Rattling Shot reduces Howling Rage's remaining cooldown by 1 sec."
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "Farsight Harness",
+        "bonus2": "Trailbreak's cooldown is reduced by 4 sec.",
+        "bonus4": "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more than once every 15 sec."
+      },
+      "vanguard_hunter_survival": {
+        "name": "Snaretooth Harness",
+        "bonus2": "Bloodhook's cooldown is reduced by 3 sec.",
+        "bonus4": "Bloodhook grants 1 Hunting Momentum."
+      },
+      "vanguard_mage_arcane": {
+        "name": "Hourbinder's Vestments",
+        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
+        "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
+      },
+      "vanguard_mage_fire": {
+        "name": "Emberlash Regalia",
+        "bonus2": "Cinderfall recharges 3 sec faster.",
+        "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
+      },
+      "vanguard_mage_frost": {
+        "name": "Rimewarden Garb",
+        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
+        "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
+      },
+      "vanguard_paladin_holy": {
+        "name": "Sunvigil Regalia",
+        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
+        "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
+      },
+      "vanguard_paladin_protection": {
+        "name": "Shieldvow Bastion",
+        "bonus2": "Oath Chain's cooldown is reduced by 4 sec.",
+        "bonus4": "Oath Chain also interrupts spellcasting, locking that school for 3 sec, and grants you Solar Reprisal when it binds an enemy that can be pulled."
+      },
+      "vanguard_paladin_retribution": {
+        "name": "Lightbrand Warplate",
+        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec.",
+        "bonus4": "Valkyr's Calling resets Final Edict's cooldown, and your next Final Edict within 6 sec of landing deals 15 percent more damage."
+      },
+      "vanguard_priest_discipline": {
+        "name": "Veilpsalm Raiment",
+        "bonus2": "Terror Canticle's cooldown is reduced by 6 sec.",
+        "bonus4": "When your Psalm of Warding is fully consumed, Terror Canticle's remaining cooldown is reduced by 4 sec. Cannot occur more than once every 8 sec."
+      },
+      "vanguard_priest_holy": {
+        "name": "Gracewing Raiment",
+        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
+        "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
+      },
+      "vanguard_priest_shadow": {
+        "name": "Duskhymn Regalia",
+        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
+        "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
+      },
+      "vanguard_rogue_assassination": {
+        "name": "Nightcut Leathers",
+        "bonus2": "Low Blow's cooldown is reduced by 4 sec.",
+        "bonus4": "Low Blow also makes your next attack within 6 sec a critical strike."
+      },
+      "vanguard_rogue_combat": {
+        "name": "Brawlmark Leathers",
+        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
+        "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "Shadewalk Leathers",
+        "bonus2": "Smokefade's cooldown is reduced by 60 sec.",
+        "bonus4": "Gut Punch awards 2 additional combo points when used from Smokefade."
+      },
+      "vanguard_shaman_elemental": {
+        "name": "Tempestwrit Battlemail",
+        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
+        "bonus4": "Unleash Weapon also increases your movement speed by 30 percent for 3 sec."
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "Galeborn Warmail",
+        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
+        "bonus4": "Ancestral Strike reduces the remaining cooldown of Elemental Trance by 4 sec."
+      },
+      "vanguard_shaman_restoration": {
+        "name": "Brineward Chainmail",
+        "bonus2": "Mending Waters' cast time is reduced by 0.2 sec.",
+        "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
+      },
+      "vanguard_warlock_affliction": {
+        "name": "Dreadquill Vestments",
+        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
+        "bonus4": "Passing Sentence heals you for 4 percent of your maximum health."
+      },
+      "vanguard_warlock_demonology": {
+        "name": "Marrowbound Regalia",
+        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
+        "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
+      },
+      "vanguard_warlock_destruction": {
+        "name": "Slagcrown Vestments",
+        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
+        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
+      },
+      "vanguard_warrior_arms": {
+        "name": "Bladewake Battlegear",
+        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 2 sec.",
+        "bonus4": "Onrush also empowers your next Maiming Strike by 20 percent (one stack of Redhand's empower)."
+      },
+      "vanguard_warrior_fury": {
+        "name": "Bloodmarch Ragegear",
+        "bonus2": "Vaulting Charge's cooldown is reduced by 8 sec.",
+        "bonus4": "Landing Vaulting Charge Enrages you."
+      },
+      "vanguard_warrior_prot": {
+        "name": "Ironmarch Bulwark",
+        "bonus2": "Faultline's cooldown is reduced by 5 sec.",
+        "bonus4": "Shieldcrack reduces Faultline's remaining cooldown by 1 sec."
       },
       "vesperash": {
         "name": "Akşam Külünün Örtüsü",

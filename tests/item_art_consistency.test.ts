@@ -839,7 +839,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (14 base pieces + their 14 auto-generated heroic variants) = 1,299. The
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
-    expect(Object.keys(ITEMS)).toHaveLength(1302);
+    // Warfare Season 2 adds 139 honor items (27 five-piece spec sets plus
+    // four weapons, content/pvp_honor_season2.ts): 1,302 -> 1,441.
+    expect(Object.keys(ITEMS)).toHaveLength(1441);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -996,7 +998,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283.
     expect(new Set(currentOwnerIds).size).toBe(1284);
     expect(shippingIds).toHaveLength(1284);
-    expect(Object.keys(ITEMS)).toHaveLength(1302);
+    // Warfare Season 2 adds 139 honor items (27 five-piece spec sets plus
+    // four weapons, content/pvp_honor_season2.ts): 1,302 -> 1,441.
+    expect(Object.keys(ITEMS)).toHaveLength(1441);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);

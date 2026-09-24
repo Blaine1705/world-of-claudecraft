@@ -79,6 +79,9 @@ export function bestEpicGearFor(
     (item) =>
       item.quality === 'epic' &&
       (item.kind === 'armor' || item.kind === 'weapon') &&
+      // Raid best-in-slot: honor gear (the Warfare tiers) is never a pick, so
+      // the tank guards that compare honor kits against this stay honest.
+      !(item.priceHonor && item.priceHonor > 0) &&
       collectionFitsRole(item, cls as PlayerClass, collectionRole),
   );
   const picks: Partial<Record<EquipSlot, string>> = {};

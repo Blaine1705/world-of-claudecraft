@@ -71,6 +71,7 @@ function offer(
 function section(key: string, offers: WarfareShopOffer[]): WarfareShopSection {
   return {
     kind: 'set',
+    group: 'entry',
     key,
     setId: key,
     offers,
@@ -486,5 +487,29 @@ describe('#warfare-window traps Tab (WCAG 2.4.3 / 2.1.2)', () => {
     } finally {
       Element.prototype.getClientRects = realRects;
     }
+  });
+});
+
+describe('renderWarfareVendorWindow: the Season 2 and entry-tier groups', () => {
+  it('heads each group once, in section order, and never repeats a heading', () => {
+    const el = mount();
+    const seasonSection = {
+      ...section(SET_A, [offer('s2_one', 'helmet')]),
+      group: 'season2' as const,
+    };
+    renderWarfareVendorWindow(
+      el,
+      'Draven',
+      view([seasonSection, section(SET_B, [offer('b_one', 'legs'), offer('b_two', 'gloves')])]),
+      deps(),
+    );
+    const headings = [...el.querySelectorAll<HTMLElement>('.warfare-group-title')].map(
+      (h) => h.textContent,
+    );
+    expect(headings).toEqual(['Warfare Season 2: Vanguard', 'Warfare Season 1']);
+    // The group heading sits directly before its first section's own title.
+    const titles = [...el.querySelectorAll<HTMLElement>('.vendor-section-title')];
+    expect(titles[0].classList.contains('warfare-group-title')).toBe(true);
+    expect(titles[1].classList.contains('warfare-group-title')).toBe(false);
   });
 });

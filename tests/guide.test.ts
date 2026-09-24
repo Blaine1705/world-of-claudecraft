@@ -81,6 +81,7 @@ import {
   STATIONS,
 } from '../src/sim/content/professions';
 import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
+import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
@@ -5904,7 +5905,8 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     const honorRows = [...stocked].filter((id) => (ITEMS[id].priceHonor ?? 0) > 0);
     expect(honorRows.length).toBeGreaterThan(0);
     for (const id of honorRows) {
-      expect(id in WARFARE_ITEMS, id).toBe(true);
+      // The Warfare tier: the entry tier plus Warfare Season 2.
+      expect(id in WARFARE_ITEMS || SEASON2_STOCK.includes(id), id).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);
       expect(ITEMS[id].sellValue, id).toBe(0);
     }

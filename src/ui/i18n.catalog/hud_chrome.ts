@@ -2956,6 +2956,10 @@ export const hudChromeStrings = {
     gossipOptionAria: 'Browse the Warfare set shop offered by {name}',
     jewelry: 'Jewelry',
     weapons: 'Weapons',
+    // Group headings: Warfare Season 2 (the viewer's class sets and weapons)
+    // listed above the Season 1 entry tier (warfare_vendor_window.ts).
+    groupSeason2: 'Warfare Season 2: Vanguard',
+    groupEntry: 'Warfare Season 1',
     // Marks a piece the viewer already wears or carries. The tile still sells.
     owned: 'Owned',
     // The buy tile's accessible name, as ONE key per arm rather than a base name

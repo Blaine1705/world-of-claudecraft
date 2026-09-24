@@ -2323,6 +2323,8 @@ export const ja_JP: EnTranslations = {
       "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
       "jewelry": "アクセサリー",
       "weapons": "武器",
+      "groupSeason2": "ウォーフェア・シーズン2：ヴァンガード",
+      "groupEntry": "ウォーフェア・シーズン1",
       "owned": "所有済み",
       "buyAria": "{item}を{honor}で購入",
       "buyOwnedAria": "{item}を{honor}で購入、所有済み",
@@ -7343,7 +7345,9 @@ export const ja_JP: EnTranslations = {
       "warfareBody": "ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式は、ダンジョンのボスの前では何の値打ちもありません。",
       "warfareBodyStatsStay": "ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。",
       "warfareTradeBody": "それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、備えているものはすべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。",
-      "warfareTradeBodyRatingSpent": "それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。"
+      "warfareTradeBodyRatingSpent": "それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。",
+      "vanguardHeading": "ヴァンガード装備：ウォーフェア・シーズン2",
+      "vanguardBody": "ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ2人の補給官が元の装備の上段に並べて売っています。元の装備も引き続き販売されます。すべてのスペックに、頭、肩、胴、脚、手の5部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる3セットと、扱えるヴァンガード武器だけが表示されます。ヴァンガード装備は元の装備と同じウォーフェア・レーティングを、より高いアイテムレベルで備えています。各セットには2部位と4部位で発動する2つのボーナスがあり、スペックのアビリティの1つを変化させます。元のセットと違い、これらのボーナスはモンスター相手も含めてどこでも有効ですが、対人戦向けに作られているため、レイドの中ではレイドセットの方が優れた選択のままです。"
     },
     "worldPvpPage": {
       "heading": "ワールドPvP",
@@ -16013,6 +16017,423 @@ export const ja_JP: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "嵐の賛歌の鎖の靴"
       },
+      "vanguard_warrior_arms_helmet": {
+        "name": "刃跡の大兜"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "刃跡の肩甲"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "刃跡のホーバーク"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "刃跡の脚鎧"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "刃跡の粉砕の篭手"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "血の行軍の面頬"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "血の行軍の肩当て"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "血の行軍の鎖帷子"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "血の行軍のレギンス"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "血の行軍のグリップ"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "鉄の行軍の兜"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "鉄の行軍の肩鎧"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "鉄の行軍の胸甲"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "鉄の行軍の脚甲"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "鉄の行軍の手甲"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "陽の守夜のサークレット"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "陽の守夜のマントル"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "陽の守夜のホーバーク"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "陽の守夜の鎖の脚甲"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "陽の守夜の手袋"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "盾の誓いの兜"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "盾の誓いの肩甲"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "盾の誓いの胸当て"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "盾の誓いの脚鎧"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "盾の誓いの篭手"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "光の烙印の冠"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "光の烙印の肩鎧"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "光の烙印の胴鎧"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "光の烙印の脚甲"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "光の烙印の篭手"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "群れの守り手の頭巾"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "群れの守り手の肩鎧"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "群れの守り手のジャーキン"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "群れの守り手の脚甲"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "群れの守り手の篭手"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "遠見の頭巾"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "遠見の肩鎧"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "遠見のジャーキン"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "遠見の脚甲"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "遠見の篭手"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "罠の牙の頭巾"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "罠の牙の肩鎧"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "罠の牙のジャーキン"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "罠の牙の脚甲"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "罠の牙の篭手"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "夜斬りのフード"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "夜斬りの肩パッド"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "夜斬りのチュニック"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "夜斬りの脚衣"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "夜斬りの手袋"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "乱闘の印のフード"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "乱闘の印の肩パッド"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "乱闘の印のチュニック"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "乱闘の印の脚衣"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "乱闘の印の手袋"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "影歩きのフード"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "影歩きの肩パッド"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "影歩きのチュニック"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "影歩きの脚衣"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "影歩きの手袋"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "帳の詩篇のカウル"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "帳の詩篇のマントル"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "帳の詩篇のローブ"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "帳の詩篇のレギンス"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "帳の詩篇の手巻き布"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "恩寵の翼のカウル"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "恩寵の翼のマントル"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "恩寵の翼のローブ"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "恩寵の翼のレギンス"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "恩寵の翼の手巻き布"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "黄昏の賛歌のカウル"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "黄昏の賛歌のマントル"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "黄昏の賛歌のローブ"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "黄昏の賛歌のレギンス"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "黄昏の賛歌の手巻き布"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "嵐の書の頭巾"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "嵐の書の肩甲"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "嵐の書のホーバーク"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "嵐の書の鎖の脚甲"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "嵐の書の篭手"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "疾風生まれの兜"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "疾風生まれの肩鎧"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "疾風生まれの鎖帷子"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "疾風生まれの脚甲"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "疾風生まれのグリップ"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "潮の守りのサークレット"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "潮の守りのマントル"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "潮の守りのホーバーク"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "潮の守りのキルト"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "潮の守りの手巻き布"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "時縛りのフード"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "時縛りの肩衣"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "時縛りのローブ"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "時縛りのズボン"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "時縛りの手袋"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "燼の鞭のカウル"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "燼の鞭のマントル"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "燼の鞭の法衣"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "燼の鞭のレギンス"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "燼の鞭の手袋"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "霜の番人のフード"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "霜の番人の肩パッド"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "霜の番人の祭服"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "霜の番人の脚巻き"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "霜の番人のミトン"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "恐怖の羽ペンのフード"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "恐怖の羽ペンのマントル"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "恐怖の羽ペンのローブ"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "恐怖の羽ペンのレギンス"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "恐怖の羽ペンの手巻き布"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "骨髄の縛めのカウル"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "骨髄の縛めの肩鎧"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "骨髄の縛めのローブ"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "骨髄の縛めのレギンス"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "骨髄の縛めのグリップ"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "鉱滓の冠のフード"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "鉱滓の冠のマントル"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "鉱滓の冠の法衣"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "鉱滓の冠のレギンス"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "鉱滓の冠の手袋"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "星の番人の頭飾り"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "星の番人の肩鎧"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "星の番人のベスト"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "星の番人の脚衣"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "星の番人の手袋"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "血のたてがみの兜"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "血のたてがみの肩パッド"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "血のたてがみのチュニック"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "血のたてがみの脚甲"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "血のたてがみのグリップ"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "薊の花の冠"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "薊の花のマントル"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "薊の花のベスト"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "薊の花のレギンス"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "薊の花の手袋"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "先鋒の裁き"
+      },
+      "vanguard_oath_blade": {
+        "name": "先鋒の誓い"
+      },
+      "vanguard_fang_dagger": {
+        "name": "先鋒の牙"
+      },
+      "vanguard_warstaff": {
+        "name": "先鋒の戦杖"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -21366,6 +21787,141 @@ export const ja_JP: EnTranslations = {
       "vale_arcanist": {
         "name": "谷の秘術師の装束",
         "bonus3": "攻撃速度と詠唱速度が15%上昇します。"
+      },
+      "vanguard_druid_balance": {
+        "name": "星の番人の衣装",
+        "bonus2": "締めつける根の詠唱時間が0.5秒短縮されます。",
+        "bonus4": "締めつける根を詠唱すると、移動速度が4秒間30%上昇します。"
+      },
+      "vanguard_druid_feral": {
+        "name": "血のたてがみの毛皮鎧",
+        "bonus2": "ブルーインラッシュのクールダウンが3秒短縮されます。",
+        "bonus4": "ブルーインラッシュは、あなたに最大体力の6%のシールドを6秒間付与します。"
+      },
+      "vanguard_druid_restoration": {
+        "name": "薊の花の祭服",
+        "bonus2": "スウィフトメンドのクールダウンが1秒短縮されます。",
+        "bonus4": "スウィフトメンドは、移動速度も3秒間30%上昇させます。"
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "群れの守り手の狩装束",
+        "bonus2": "動揺の射撃のクールダウンが4秒短縮されます。",
+        "bonus4": "動揺の射撃が野獣の怒りの残りクールダウンを1秒短縮します。"
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "遠見の狩装束",
+        "bonus2": "離脱跳躍のクールダウンが4秒短縮されます。",
+        "bonus4": "離脱跳躍の後6秒以内の次の引き絞りが即時詠唱になります。発動は15秒に1回まで。"
+      },
+      "vanguard_hunter_survival": {
+        "name": "罠の牙の狩装束",
+        "bonus2": "血鉤のクールダウンが3秒短縮されます。",
+        "bonus4": "血鉤が狩猟の勢いを1与えます。"
+      },
+      "vanguard_mage_arcane": {
+        "name": "時縛りの祭服",
+        "bonus2": "時の障壁のクールダウンが2秒短縮されます。",
+        "bonus4": "時の障壁は、守られた対象の移動速度も3秒間20%上昇させます。"
+      },
+      "vanguard_mage_fire": {
+        "name": "燼の鞭の礼装",
+        "bonus2": "灰燼爆ぜのチャージが3秒速く回復します。",
+        "bonus4": "灰燼爆ぜを詠唱すると、ブレイジングバリアの残りクールダウンが2秒短縮されます。"
+      },
+      "vanguard_mage_frost": {
+        "name": "霜の番人の装束",
+        "bonus2": "氷縛のクールダウンが2秒短縮されます。",
+        "bonus4": "氷縛を詠唱すると、瞬き歩みの残りクールダウンが5秒短縮されます。"
+      },
+      "vanguard_paladin_holy": {
+        "name": "陽の守夜の礼装",
+        "bonus2": "生命の契約のクールダウンが30秒短縮されます。",
+        "bonus4": "生命の契約は、味方にもその最大体力の8%のシールドを6秒間付与します。"
+      },
+      "vanguard_paladin_protection": {
+        "name": "盾の誓いの砦",
+        "bonus2": "誓いの鎖のクールダウンが4秒短縮されます。",
+        "bonus4": "誓いの鎖は詠唱も中断してその系統を3秒間封じ、引き寄せられる敵を縛ったときには太陽の報復を与えます。"
+      },
+      "vanguard_paladin_retribution": {
+        "name": "光の烙印の戦鎧",
+        "bonus2": "ヴァルキュリアの召命のクールダウンが15秒短縮されます。",
+        "bonus4": "ヴァルキュリアの召命は最後の勅令のクールダウンをリセットし、着地から6秒以内の次の最後の勅令は15%多くのダメージを与えます。"
+      },
+      "vanguard_priest_discipline": {
+        "name": "帳の詩篇の衣装",
+        "bonus2": "精神の絶叫のクールダウンが6秒短縮されます。",
+        "bonus4": "守りの聖歌が完全に消費されると、精神の絶叫の残りクールダウンが4秒短縮されます。発動は8秒に1回まで。"
+      },
+      "vanguard_priest_holy": {
+        "name": "恩寵の翼の衣装",
+        "bonus2": "ヴェイルステップのクールダウンが6秒短縮されます。",
+        "bonus4": "ヴェイルステップは、あなたにも最大体力の8%のシールドを6秒間付与します。"
+      },
+      "vanguard_priest_shadow": {
+        "name": "黄昏の賛歌の礼装",
+        "bonus2": "嘆きの連祷は、チャネル中に対象の移動速度も30%低下させます。",
+        "bonus4": "タイスフィーンド招来は、あなたにも最大体力の10%のシールドを8秒間付与します。"
+      },
+      "vanguard_rogue_assassination": {
+        "name": "夜斬りの革鎧",
+        "bonus2": "急所打ちのクールダウンが4秒短縮されます。",
+        "bonus4": "急所打ちは、6秒以内の次の攻撃も必ずクリティカルにします。"
+      },
+      "vanguard_rogue_combat": {
+        "name": "乱闘の印の革鎧",
+        "bonus2": "駿足のクールダウンが60秒短縮されます。",
+        "bonus4": "駿足の効果中、邪悪な斬撃とヘイメーカーはコンボポイントを1追加で与えます。"
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "影歩きの革鎧",
+        "bonus2": "煙隠れのクールダウンが60秒短縮されます。",
+        "bonus4": "煙隠れから使ったみぞおち強打は、コンボポイントを2追加で与えます。"
+      },
+      "vanguard_shaman_elemental": {
+        "name": "嵐の書の戦の鎖鎧",
+        "bonus2": "武器解放のクールダウンが3秒短縮されます。",
+        "bonus4": "武器解放は、移動速度も3秒間30%上昇させます。"
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "疾風生まれの戦鎖帷子",
+        "bonus2": "祖霊の一撃は、対象の移動速度を4秒間30%低下させます。",
+        "bonus4": "祖霊の一撃がエレメンタルトランスの残りクールダウンを4秒短縮します。"
+      },
+      "vanguard_shaman_restoration": {
+        "name": "潮の守りの鎖帷子",
+        "bonus2": "癒しの水流の詠唱時間が0.2秒短縮されます。",
+        "bonus4": "潮呼びは、その対象にもあなたの最大体力の5%のシールドを6秒間付与します。"
+      },
+      "vanguard_warlock_affliction": {
+        "name": "恐怖の羽ペンの祭服",
+        "bonus2": "責め苦の詠唱時間が0.3秒短縮されます。",
+        "bonus4": "宣告を下すと、最大体力の4%を回復します。"
+      },
+      "vanguard_warlock_demonology": {
+        "name": "骨髄の縛めの礼装",
+        "bonus2": "骨の鎧のクールダウンが10秒短縮されます。",
+        "bonus4": "刈り取りの号令が骨の鎧の残りクールダウンを2秒短縮します。"
+      },
+      "vanguard_warlock_destruction": {
+        "name": "鉱滓の冠の祭服",
+        "bonus2": "燼皮のクールダウンが30秒短縮されます。",
+        "bonus4": "コンフラグレートを2回使うごとに、8秒以内の次の破滅の矢が即時詠唱になります。"
+      },
+      "vanguard_warrior_arms": {
+        "name": "刃跡の戦装束",
+        "bonus2": "重傷の一撃が突撃の残りクールダウンを2秒短縮します。",
+        "bonus4": "突撃は次の重傷の一撃も20%強化します（血染めの手の強化1スタック）。"
+      },
+      "vanguard_warrior_fury": {
+        "name": "血の行軍の憤怒の装備",
+        "bonus2": "英雄的跳躍のクールダウンが8秒短縮されます。",
+        "bonus4": "英雄的跳躍で着地すると激昂します。"
+      },
+      "vanguard_warrior_prot": {
+        "name": "鉄の行軍の防壁",
+        "bonus2": "断層のクールダウンが5秒短縮されます。",
+        "bonus4": "盾砕きが断層の残りクールダウンを1秒短縮します。"
       },
       "vesperash": {
         "name": "ヴェスパーアッシュの外套",

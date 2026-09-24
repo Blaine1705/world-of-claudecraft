@@ -3,8 +3,10 @@ import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import { DT, type Entity } from '../types';
 import { relocateSwept } from './heroic_leap';
+import { grantSolarReprisal } from './paladin_solar_reprisal';
 import { isVeilboundMarchActive } from './paladin_veilbound_state';
 import { isPullEligible } from './pull_eligibility';
+import { wearsSetBonus } from './set_bonus_wearer';
 
 const OATH_CHAIN_PULL_SUFFIX = '_pull';
 
@@ -143,6 +145,17 @@ export function pullPaladinTargets(
       abilityId,
       abilityName,
     );
+  }
+  // Shieldvow Bastion 4pc (Warfare Season 2): an Oath Chain that binds a
+  // pullable enemy grants Solar Reprisal outright. grantSolarReprisal is the
+  // roll-free arm (tryGrantSolarReprisal is the rolled one), so no rng draw
+  // is added; bosses are not pullable, so they never grant it.
+  if (
+    abilityId === 'oath_chain' &&
+    isPullEligible(primary) &&
+    wearsSetBonus(ctx, source, 'vanguard_paladin_protection', 4)
+  ) {
+    grantSolarReprisal(ctx, source);
   }
 }
 

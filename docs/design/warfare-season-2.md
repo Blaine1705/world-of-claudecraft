@@ -1,7 +1,9 @@
 # Warfare Season 2: a spec set for every spec
 
-Status: DRAFT for owner review (2026-09-24). Nothing below is implemented yet; Phase 3 of the
-plan implements the bonuses only after this document is approved.
+Status: IMPLEMENTED (2026-09-24). The items are built by `src/sim/content/pvp_honor_season2.ts`,
+the set rows live in `src/sim/content/vanguard_item_sets.ts`, and the bonuses in
+`src/sim/content/vanguard_set_bonuses*.ts` plus the class combat modules. Where a bonus text
+below differs from the shipped tooltip, the tooltip (the set row) is the source of truth.
 
 ## What Season 2 is
 
@@ -37,20 +39,24 @@ The owner's two rules are that honor gear is never the raid pick, and that bonus
 everywhere. These rules hold them together:
 
 - **Stats:**
-  - Primary stats are 0.9 of the item-level-35 line budget (the honor discount), with no
-    hit, crit or haste rating.
-  - Physical pieces carry a PvE-normal stamina share of 45 percent of that total, which is
-    what item-level-31 PvE physical epics carry. That is lower than the entry tier's stamina
-    premium, because Vitality now supplies the PvP health.
-  - Caster pieces sit on the stamina floor, plus the caster premium share.
+  - Each piece's stat line is 0.9 of its item-level-35 line budget (the honor discount),
+    with no hit, crit or haste rating.
+  - Stamina is the full-budget stamina floor (`staminaBaseline` of the undiscounted budget),
+    so every piece meets the same floor as any item-level-35 epic, and no more: Vitality,
+    not stamina, is where honor gear's PvP health comes from.
+  - Physical pieces spend the rest of the line on their primary stat. Caster pieces spend the
+    whole line on intellect and spirit, with the stamina floor on top (the caster premium).
 - **Armor:** 0.9 of the mean armor of same-slot, same-armor-type item-level-35 raid epics.
-- **Tanks, measured:** a prototype probe (`tmp_season2/s2_tank_probe.ts`) stood each tank set
-  inside an instance and compared effective health against raid best-in-slot.
-  - With the five Season 2 pieces plus entry-tier waist and feet (what an honor-geared
-    tank actually wears): prot warrior 0.74×, prot paladin 0.74×, feral in bear form 0.91×.
-  - The feral figure is the reason the stamina share is 45 percent. At the entry tier's
-    58 percent a full honor kit measured 1.01×.
-  - Phase 5 pins this as a guard.
+- **Tanks, measured:** each tank set, with entry-tier waist and feet (what an honor-geared
+  tank actually wears), stood inside an instance, where Vitality is off, and compared on
+  effective health against raid best-in-slot.
+  - A prototype at a 45 percent stamina share measured prot warrior 0.74 times, prot paladin
+    0.74 times, and feral in bear form 0.91 times. The shipped floor rule carries less
+    stamina than that prototype, so every figure is lower.
+  - At the entry tier's 58 percent share a full honor feral kit measured 1.01 times, which is
+    why Season 2 does not copy the entry tier's stamina premium.
+  - `tests/warfare_season2.test.ts` ("the PvE promise") pins all three below raid
+    best-in-slot.
 - **Mixed loadouts:** Season 2 and raid sets share the same five slots, so a raid 4-piece
   leaves one slot and cannot be paired with any Season 2 bonus. The only mix is a raid
   2-piece plus a Season 2 2-piece. Therefore:
@@ -81,8 +87,12 @@ everywhere. These rules hold them together:
   A full set costs 6,600 Honor.
 - **Weapons:** 1,800 Honor each.
 - **Where it is sold:** both honor quartermasters (FURY in Eastbrook Vale, Warmarshal Draven
-  Kole in Highwatch). The shop gets a Season 2 group sectioned by class, then spec, plus a
-  class filter. The entry tier keeps its own group.
+  Kole in Highwatch). The shop lists a Season 2 group first: the viewer's own three spec
+  sets (the sets are class-locked, so the shop shows only what the viewer can wear), then the
+  season weapons the viewer can wield. The entry tier follows as its own group, unfiltered.
+- **Art:** a follow-up art pass paints all 139 icons. Until then the 135 armor pieces sit on
+  `ITEM_ART_PENDING` (pinned in `tests/item_icons.test.ts`) and the four weapons draw
+  their procedural icon, as every unpainted weapon does.
 - **Ids:** sets use a new prefix, `vanguard_<spec>`, so the existing `warfare_*` pins keep
   meaning the entry tier.
 
@@ -234,10 +244,10 @@ Implementation routes:
 
 ---
 
-## Hunter (mail)
+## Hunter (leather)
 
 ### Beast Mastery (`beast_mastery`, signature Howling Rage `bestial_wrath`)
-- **Set:** Packwarden Mail. Packwarden Coif, Packwarden Spaulders, Packwarden Hauberk, Packwarden Legguards, Packwarden Gauntlets.
+- **Set:** Packwarden Harness. Packwarden Coif, Packwarden Spaulders, Packwarden Jerkin, Packwarden Legguards, Packwarden Gauntlets.
 - **2pc:** "Rattling Shot's cooldown is reduced by 4 sec."
   Route: DATA, ability row `{ ability: 'concussive_shot', cooldownFlat: -4 }` (12 to 8 sec;
   50 percent slow for 4 sec, so near-permanent kite pressure on one target).
@@ -252,7 +262,7 @@ Implementation routes:
   cadence gain (+25 percent) would approach the raid set.
 
 ### Marksmanship (`marksmanship`, signature Cold Focus `cold_focus`)
-- **Set:** Farsight Mail. Farsight Coif, Farsight Spaulders, Farsight Hauberk, Farsight Legguards, Farsight Gauntlets.
+- **Set:** Farsight Harness. Farsight Coif, Farsight Spaulders, Farsight Jerkin, Farsight Legguards, Farsight Gauntlets.
 - **2pc:** "Trailbreak's cooldown is reduced by 4 sec."
   Route: DATA, ability row `{ ability: 'trailbreak', cooldownFlat: -4 }` (15 to 11 sec,
   12 yd backward leap).
@@ -269,7 +279,7 @@ Implementation routes:
   cooldown would lift the PvE value toward 5 percent.
 
 ### Survival (`survival`, signature Bloodhook `bloodhook`)
-- **Set:** Snaretooth Mail. Snaretooth Coif, Snaretooth Spaulders, Snaretooth Hauberk, Snaretooth Legguards, Snaretooth Gauntlets.
+- **Set:** Snaretooth Harness. Snaretooth Coif, Snaretooth Spaulders, Snaretooth Jerkin, Snaretooth Legguards, Snaretooth Gauntlets.
 - **2pc:** "Bloodhook's cooldown is reduced by 3 sec."
   Route: DATA, ability row `{ ability: 'bloodhook', cooldownFlat: -3 }` (15 to 12 sec;
   Bloodhook is the spec's charge-in gap closer).
@@ -372,7 +382,10 @@ Implementation routes:
   Route: preferred DATA, ability row `{ ability: 'mind_flay', addEffects: [{ type: 'slow',
   mult: 0.7, duration: 1 }] }` (the `hamstring` slow shape) IF the channel dispatch
   applies non-tick rows on each tick; otherwise BESPOKE, a flag-gated slow refresh per
-  `drainTick` in the channel path. Classic Mind Flay flavour; verify before commit.
+  `drainTick` in the channel path. Classic Mind Flay flavour. Shipped BESPOKE: the
+  channel never applies non-tick rows, so `priest/vespers.ts` applies the slow for the
+  channel's length at channel start and strips it when the channel ends (completion,
+  cancel, pushback or the priest's death).
 - **4pc:** "Call Tithefiend also shields you for 10 percent of your maximum health for
   8 sec."
   Route: DATA, ProcDef `{ on: 'castNth', n: 1, abilities: ['summon_tithefiend'] }` with

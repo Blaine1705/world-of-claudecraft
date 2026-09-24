@@ -614,6 +614,24 @@ full warning, or a shorter one for a quick test); `/dev hill rise` skips the
 countdown; `/dev hill end` makes the hill fall; `/dev hill next` runs the real
 schedule's next hill now (its own zone and spot, the window spent).
 
+## Season 2 (Vanguard)
+
+A second, top tier of honor gear sells beside the five entry-tier sets above, which stay on
+sale unchanged. Full design, the 54 set bonuses and their PvE ceilings:
+`docs/design/warfare-season-2.md`.
+
+- **27 spec sets**, one per spec, class-locked, each the five raid-set slots (helmet,
+  shoulder, chest, legs, gloves) with a 2-piece and a 4-piece bonus that work everywhere.
+- **Four season weapons:** a strength two-hander, a strength one-hander, an agility dagger and
+  a caster staff.
+- **Item level 35**, level with the Ignivar raid tier, on the honor discount: 0.9 of the line
+  budget, the full-budget stamina floor, no hit, crit or haste rating, and 0.9 of raid armor.
+  The Warfare ratings match the entry tier (the full slot budget), so the PvP multipliers and
+  their caps are unchanged.
+- **Prices:** 1.5 times the entry tier per slot, 6,600 Honor for a full set, 1,800 per weapon.
+- **Pins:** `tests/warfare_season2.test.ts` (stock shape, stat, armor and weapon rules, set
+  rows, and the tank effective-health guard).
+
 ## FURY prices
 
 FURY sells one item-level 31 epic tier for every equipment slot the game

@@ -34,7 +34,12 @@ import {
   GATHERING_PROFESSIONS,
   HARVEST_COMPONENT_SPECIMENS,
 } from '../src/sim/content/professions';
-import { FURY_NPC_ID, FURY_STOCK, WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
+import {
+  FURY_NPC_ID,
+  FURY_STOCK,
+  HONOR_QUARTERMASTER_STOCK,
+  WARFARE_ITEMS,
+} from '../src/sim/content/pvp_honor';
 import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
@@ -374,11 +379,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 27 + the four Crucible raid pages (per-boss N+H, the obligations
     // closeout of docs/prd/ignivar-raid-loot.md) + the Roots' Bramblehide
     // set page (the eighth epic armor family).
-    expect(CONQUEROR_PAGES.length).toBe(32);
+    // +1: conquerors_vanguard_gallery (Warfare Season 2).
+    expect(CONQUEROR_PAGES.length).toBe(33);
     expect(PROFESSION_PAGES.length).toBe(5);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(42);
+    expect(RELIQUARY_PAGES.length).toBe(43);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -457,7 +463,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // horizons_mounts rows (goblin_rocket_sled, rallycart_rxt): 445, MEASURED
     // on the merged tree. UNION MERGE: base plus both deltas, the professions
     // and release branches content is disjoint.
-    expect(full).toEqual({ owned: 441, total: 441 });
+    // +139: the Warfare Season 2 page (135 set pieces and four weapons).
+    expect(full).toEqual({ owned: 580, total: 580 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -485,7 +492,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // (goblin_rocket_sled, rallycart_rxt), the same +2 as the overview pair
     // above: 416, MEASURED on the merged tree. UNION MERGE: base plus both
     // deltas, see the overview pair's note above.
-    expect(character).toEqual({ owned: 412, total: 412 });
+    // +139: the Warfare Season 2 page.
+    expect(character).toEqual({ owned: 551, total: 551 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -538,7 +546,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(484);
+    ).toBe(623); // +139: the Warfare Season 2 page.
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -697,10 +705,10 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     }
     expect(vendorOffenders).toEqual([]);
     // The exemption's own premises: it really covers the two Warfare counters
-    // (47 stock ids on both NPCS rows) and nothing rides it that could also
+    // (the entry stock plus Warfare Season 2 on both NPCS rows) and nothing rides it that could also
     // be bought for copper (a dual-priced row would fall back into the sweep
     // above by construction; this pins the classifier's copper half live).
-    expect(honorExempt).toBe(FURY_STOCK.length * 2);
+    expect(honorExempt).toBe(HONOR_QUARTERMASTER_STOCK.length * 2);
     expect(FURY_STOCK.every((id) => honorOnly(priceOf(id)))).toBe(true);
     expect(honorOnly(priceOf('deacon_reliquary_helm'))).toBe(false);
     // The DUAL-PRICED arm, which the live catalog exhibits nowhere today: an
@@ -767,7 +775,7 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the seven Roots Bramblehide pieces and the seven Nythraxis
     // gap-fill drops: 333. UNION MERGE: base plus both deltas, see the
     // completion pair note above.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(333);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(472); // +139: the Warfare Season 2 page.
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1468,7 +1476,7 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     // The quality arm: epic-only is vacuous as a page filter today (the whole
     // stock is epic), so it is asserted as a STOCK fact instead; a sub-epic
     // honor row would red here and force the museum-in-or-out decision.
-    for (const id of FURY_STOCK) expect(ITEMS[id]?.quality, id).toBe('epic');
+    for (const id of HONOR_QUARTERMASTER_STOCK) expect(ITEMS[id]?.quality, id).toBe('epic');
   });
 
   it('both hinted quartermasters really sell every slot (and every slot names both)', () => {
@@ -1480,8 +1488,10 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     expect(FURY_NPC_ID).toBe('fury');
     for (const npcId of ['fury', 'warmarshal_draven_kole']) {
       const stock = new Set(NPCS[npcId]?.vendorItems ?? []);
-      expect(stock.size, npcId).toBe(FURY_STOCK.length);
-      for (const id of FURY_STOCK) expect(stock.has(id), `${npcId} sells ${id}`).toBe(true);
+      expect(stock.size, npcId).toBe(HONOR_QUARTERMASTER_STOCK.length);
+      for (const id of HONOR_QUARTERMASTER_STOCK) {
+        expect(stock.has(id), `${npcId} sells ${id}`).toBe(true);
+      }
     }
     for (const page of [gallery, armory]) {
       for (const relic of page.relics) {
@@ -3076,6 +3086,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // The two honor quartermasters, on every slot of both pages (Phase 21).
   conquerors_warfare_gallery: 2,
   conquerors_warfare_armory: 2,
+  conquerors_vanguard_gallery: 2,
   // The retired vault is deliberately sourceless (excludeFromCompletion:
   // retired relics have no door to name), so it resolves to zero sources.
   horizons_vault_of_ages: 0,

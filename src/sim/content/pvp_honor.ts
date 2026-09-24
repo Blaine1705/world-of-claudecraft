@@ -46,6 +46,7 @@ import {
   SET_WARFARE_STORMBOUND,
   SET_WARFARE_THORNHIDE,
 } from './item_sets';
+import { SEASON2_STOCK } from './pvp_honor_season2';
 
 export const FURY_NPC_ID = 'fury';
 // Reserved so adding FURY does not shift the deterministic nextId sequence used
@@ -859,6 +860,11 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
 
 export const FURY_STOCK: readonly string[] = Object.keys(WARFARE_ITEMS);
 
+// What both honor quartermasters sell: the Warfare entry tier above, then Warfare
+// Season 2 (content/pvp_honor_season2.ts), the item-level-35 spec sets and
+// weapons. FURY_STOCK keeps meaning the entry tier everywhere it is read.
+export const HONOR_QUARTERMASTER_STOCK: readonly string[] = [...FURY_STOCK, ...SEASON2_STOCK];
+
 export const FURY_NPC: NpcDef = {
   id: FURY_NPC_ID,
   name: 'FURY',
@@ -867,7 +873,7 @@ export const FURY_NPC: NpcDef = {
   facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.fury.facing,
   color: 0xb52a2a,
   questIds: [],
-  vendorItems: [...FURY_STOCK],
+  vendorItems: [...HONOR_QUARTERMASTER_STOCK],
   dynamic: true,
   // The Eastbrook mirror sells the identical stock, so it presents the identical
   // set-divided shop window. One canonical stock, two placements.
