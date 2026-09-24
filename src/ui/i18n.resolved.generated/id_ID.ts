@@ -2382,7 +2382,8 @@ export const id_ID: EnTranslations = {
         "hasteRating": "Rating kecepatan dari perlengkapan dan bonus set Anda, mempercepat serangan dan rapalan mantra Anda. Sekitar 10 rating memberi 1% kecepatan.",
         "parry": "Peluang Anda untuk sepenuhnya menangkis serangan jarak dekat dari depan, tanpa menerima kerusakan. Pukulan dari belakang tidak dapat ditangkis.",
         "hitRating": "Rating pukulan dari perlengkapan dan bonus setelanmu, mengurangi seberapa sering seranganmu meleset dan mantramu ditangkal, terutama melawan musuh level lebih tinggi. Sekitar 10 rating memberikan 1% hit.",
-        "warfare": "Meningkatkan kerusakan yang diberikan kepada pemain sebesar {increase}% dan mengurangi kerusakan yang diterima dari pemain sebesar {reduction}%."
+        "warfare": "Meningkatkan kerusakan yang diberikan kepada pemain sebesar {increase}% dan mengurangi kerusakan yang diterima dari pemain sebesar {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Daya Serang",
@@ -8165,7 +8166,7 @@ export const id_ID: EnTranslations = {
       "parryBody": "Tangkis adalah pertahanan khas Prajurit: peluang untuk sepenuhnya menepis sebuah pukulan jarak dekat dan tidak menerima kerusakan sama sekali, dan ia tumbuh bersama Strength. Hanya serangan yang datang dari depan yang bisa ditangkis, satu alasan lagi untuk terus menghadap apa pun yang sedang menyerangmu. Kelas lain melihat barisnya di lembar statistik berada di angka nol.",
       "warfareTitle": "Perang",
       "warfareBody": "Perang adalah satu-satunya statistik yang hanya berlaku melawan pemain lain: ia menaikkan kerusakan yang kamu berikan kepada mereka dan menurunkan kerusakan yang kamu terima dari mereka, dan lembar statistikmu menampilkan kedua bagian itu dalam satu baris. Terhadap makhluk, ia sama sekali tidak berpengaruh. Ia berasal dari perlengkapan Perang yang kamu beli dengan Kehormatan, sehingga ia adalah hadiah untuk bermain PvP, bukan sesuatu yang perlu kamu kejar saat naik level.",
-      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Setiap pertempuran, misi, dan langkah ke utara membuat pahlawanmu lebih kuat. Inilah cara kerja menaikkan level dan apa yang membuatmu terus berkembang setelah mencapai puncak.",

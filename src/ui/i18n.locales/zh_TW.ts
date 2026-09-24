@@ -1663,6 +1663,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '提高你法術造成的傷害與治療的強度。每點智力都會提供少量法術強度，此外還有來自裝備與增益的加成。',
   'hudChrome.statInfo.desc.warfare':
     '對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。',
+  'hudChrome.statInfo.desc.warfareWithHealth':
+    '對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。此外，在地城、團隊副本、秘探和裂隙以外的所有地方，最大生命值提高 {health}%。',
   'hudChrome.statInfo.sources.header': '構成：',
   'hudChrome.statInfo.sources.base': '基礎：{value}',
   'hudChrome.statInfo.sources.attributes': '來自屬性：{value}',
@@ -14897,7 +14899,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.stats.warfareBody':
     '戰爭是唯一一項只對其他玩家生效的屬性：它提高你對他們造成的傷害，並降低你從他們身上承受的傷害，而你的角色面板會把這兩半顯示在同一行上。面對生物時，它完全沒有作用。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。',
   'guide.stats.warfareBodyPets':
-    '戰爭是唯一一項只在玩家之間的戰鬥中生效的屬性：它提高你和你的寵物對其他玩家及其寵物造成的傷害，並降低你和你的寵物從他們身上承受的傷害，而你的角色面板會把這兩半顯示在同一行上。面對野生生物時，它完全沒有作用。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。',
+    '戰爭是榮譽裝備為對抗玩家而帶有的屬性。在玩家之間的戰鬥中，它提高你和你的寵物對其他玩家及其寵物造成的傷害，並降低你和你的寵物從他們身上承受的傷害。它還會在地城、團隊副本、秘探和裂隙以外的所有地方提高你的最大生命值，因此穿著榮譽裝備的玩家遠比沒有穿的玩家難以擊殺。你的角色面板會把這一切顯示在同一行上。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。',
   'guide.stats.warfareTitle': '戰爭',
   'guide.talentsPage.loadoutNote':
     '你不必只定下一套配置。在面板中儲存一份具名的配置，它會同時記住天賦的選擇與你的動作列，因此切換到另一套只需要點一下，適用的規則與重置相同：必須脫離戰鬥，且不在競技場對戰之中。',

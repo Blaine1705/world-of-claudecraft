@@ -103,10 +103,14 @@ export {
   PVP_DEFENSE_CAP,
   PVP_OFFENSE_CAP,
   PVP_RATING_PER_PCT,
+  PVP_VITALITY_CAP,
+  PVP_VITALITY_RATING_PER_PCT,
   type PvpCaps,
   pvpDamageMultiplier,
   pvpFractionsFromRatings,
+  pvpVitalityFromRating,
 } from './power';
+export { pvpVitalityAppliesTo, updatePvpVitality } from './vitality';
 export {
   isWorldPvpFlagged,
   isWorldPvpHostile,

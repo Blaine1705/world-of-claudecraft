@@ -1662,6 +1662,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。',
   'hudChrome.statInfo.desc.warfare':
     '对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。',
+  'hudChrome.statInfo.desc.warfareWithHealth':
+    '对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。此外，在地下城、团队副本、探秘和裂隙以外的所有地方，最大生命值提高 {health}%。',
   'hudChrome.statInfo.sources.header': '构成：',
   'hudChrome.statInfo.sources.base': '基础：{value}',
   'hudChrome.statInfo.sources.attributes': '来自属性：{value}',
@@ -14891,7 +14893,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.stats.warfareBody':
     '战争是唯一一项只在对抗其他玩家时才作数的属性：它提高你对他们造成的伤害，也降低你从他们那里受到的伤害，你的面板会把这两半写在同一行上。面对生物时它毫无作用。它来自你用荣誉换购的战争装备，因此它是参与 PvP 的回报，而不是升级途中该去追求的东西。',
   'guide.stats.warfareBodyPets':
-    '战争是唯一一项只在玩家之间的战斗中才作数的属性：它提高你和你的宠物对其他玩家及其宠物造成的伤害，也降低你和你的宠物从他们那里受到的伤害，你的面板会把这两半写在同一行上。面对野生生物时它毫无作用。它来自你用荣誉换购的战争装备，因此它是参与 PvP 的回报，而不是升级途中该去追求的东西。',
+    '战争是荣誉装备为对抗玩家而携带的属性。在玩家之间的战斗中，它提高你和你的宠物对其他玩家及其宠物造成的伤害，也降低你和你的宠物从他们那里受到的伤害。它还会在地下城、团队副本、探秘和裂隙以外的所有地方提高你的最大生命值，因此穿着荣誉装备的玩家远比没有穿的玩家难以击杀。你的面板会把这一切写在同一行上。它来自你用荣誉换购的战争装备，因此它是参与 PvP 的回报，而不是升级途中该去追求的东西。',
   'guide.stats.warfareTitle': '战争',
   'guide.talentsPage.loadoutNote':
     '你不必只认准一套配点。在面板里保存一套具名的配置，它会连同天赋选择和你的动作条一起记住，因此切换到另一套只需点一下，遵循的规则与重置相同：脱离战斗，且不在竞技场比赛之中。',

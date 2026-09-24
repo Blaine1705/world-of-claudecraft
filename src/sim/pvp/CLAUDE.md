@@ -19,8 +19,13 @@ ratings.
   weekend loss boost in `awardBattlegroundHonor`). The event stays off only
   when BOTH keys are empty (no host calendar): a host feeds both keys or
   neither, never just one.
-- `power.ts` owns rating conversion, the independent offense/defense caps, and
-  the hostile-player damage multiplier. It must stay pure and deterministic.
+- `power.ts` owns rating conversion, the independent offense/defense caps, the
+  hostile-player damage multiplier, and WARFARE Vitality's health fraction
+  (`pvpVitalityFromRating`). It must stay pure and deterministic.
+- `vitality.ts` decides WHERE Vitality applies (never on the instance plane
+  outside a battleground or arena match) and flips `Entity.pvpVitalityActive`,
+  recalculating only players whose state changed; `entity.ts` applies the
+  fraction to maxHp. Pinned by the `WARFARE Vitality` block in `tests/honor.test.ts`.
 - `honor_persist.ts` owns the persisted form of the honor ledger and its daily
   DR window (`savedHonorState` / `loadHonorState`), moved out of the Sim
   coordinator's serialize/load so a new honor field lands here, not in `sim.ts`.

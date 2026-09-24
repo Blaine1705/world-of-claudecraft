@@ -2382,7 +2382,8 @@ export const en_CA: EnTranslations = {
         "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 20 rating grants exactly 1% haste.",
         "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.",
         "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. Every 10 rating grants exactly 1% hit.",
-        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
+        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Attack Power",
@@ -8165,7 +8166,7 @@ export const en_CA: EnTranslations = {
       "parryBody": "Parry is the warrior's own defense: a chance to turn a melee blow aside entirely and take no damage, and it grows with Strength. Only an attack coming at your front can be parried, which is one more reason to keep facing whatever is hitting you. Other classes see the row on their sheet sitting at zero.",
       "warfareTitle": "Warfare",
       "warfareBody": "Warfare is the one stat that counts only against other players: it raises the damage you deal to them and lowers the damage you take from them, and your sheet shows both halves on one line. Against creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling.",
-      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Every fight, quest, and step north makes your hero stronger. Here is how leveling works and what keeps you growing once you reach the top.",

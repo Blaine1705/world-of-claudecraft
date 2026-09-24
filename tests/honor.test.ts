@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import type { TalentAllocation } from '../src/sim/content/talents';
+import { DUNGEON_X_THRESHOLD, MOBS } from '../src/sim/data';
+import { bestEpicGearFor } from '../src/sim/dev/bis_gear';
 import { createMob } from '../src/sim/entity';
 import {
   ARENA_DAILY_TAPER_START,
@@ -22,6 +24,10 @@ import {
   FIESTA_WIN_BONUS_HONOR,
   grantHonor,
   HONOR_REPEAT_DR,
+  PVP_VITALITY_CAP,
+  PVP_VITALITY_RATING_PER_PCT,
+  pvpVitalityAppliesTo,
+  pvpVitalityFromRating,
   RANKED_ARENA_LOSS_HONOR,
   RANKED_ARENA_WIN_HONOR,
   repeatHonorMultiplier,
@@ -30,6 +36,7 @@ import type { ArenaMatch } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import * as arena from '../src/sim/social/arena';
 import * as fiesta from '../src/sim/social/fiesta';
+import { armorReduction, type Entity, type EquipSlot, type PlayerClass } from '../src/sim/types';
 import { RL_TEST_WORLD } from './sim_shared';
 
 function world(): Sim {
@@ -843,5 +850,134 @@ describe('WARFARE damage', () => {
     (sim as any).dealDamage(source, target, 100, false, 'arcane', null, 'hit');
     // 100 x (1 + 0.30) x (1 - 0.30) = 91 at the raised WARFARE caps.
     expect(target.hp).toBe(909);
+  });
+});
+
+// WARFARE Vitality (owner rule, 2026-09-24): honor gear raises maximum health
+// everywhere except PvE instances, so PvP gear gives players far more health than
+// players without it while raid gear stays the raid pick.
+describe('WARFARE Vitality', () => {
+  const STR_KIT: Partial<Record<EquipSlot, string>> = {
+    mainhand: 'final_argument_greatblade',
+    helmet: 'furyforged_warhelm',
+    shoulder: 'furyforged_warspaulders',
+    chest: 'furyforged_warplate',
+    waist: 'furyforged_girdle',
+    legs: 'furyforged_legguards',
+    gloves: 'furyforged_gauntlets',
+    feet: 'furyforged_sabatons',
+    neck: 'final_oath_medallion',
+    ring1: 'iron_vow_band',
+    ring2: 'unbroken_circle',
+  };
+  const AGI_KIT: Partial<Record<EquipSlot, string>> = {
+    mainhand: 'first_blood_razor',
+    helmet: 'ashstalker_cowl',
+    shoulder: 'ashstalker_shoulderguards',
+    chest: 'ashstalker_harness',
+    waist: 'ashstalker_waistband',
+    legs: 'ashstalker_legguards',
+    gloves: 'ashstalker_grips',
+    feet: 'ashstalker_treads',
+    neck: 'razorwind_torque',
+    ring1: 'fleetblood_band',
+    ring2: 'last_step_signet',
+  };
+  const INSTANCE_X = DUNGEON_X_THRESHOLD + 900;
+
+  function geared(cls: PlayerClass, spec: string, kit: Partial<Record<EquipSlot, string>>) {
+    const sim = world();
+    const pid = sim.addPlayer(cls, `V${cls}`);
+    sim.setPlayerLevel(20, pid);
+    sim.applyTalents({ spec, rows: {} } as TalentAllocation, pid);
+    for (const [slot, id] of Object.entries(kit)) {
+      sim.addItem(id, 1, pid);
+      sim.equipItemToSlot(id, slot as EquipSlot, pid);
+    }
+    for (let i = 0; i < 12; i++) sim.tick();
+    return { sim, pid, e: sim.entities.get(pid)! };
+  }
+
+  function standAt(sim: Sim, e: Entity, x: number): void {
+    e.pos = { ...e.pos, x };
+    e.prevPos = { ...e.pos };
+    for (let i = 0; i < 12; i++) sim.tick();
+  }
+
+  it('reads the Warfare Defense Rating at six per percent, capped at +50%', () => {
+    expect(PVP_VITALITY_RATING_PER_PCT).toBe(6);
+    expect(PVP_VITALITY_CAP).toBe(0.5);
+    expect(pvpVitalityFromRating(0)).toBe(0);
+    expect(pvpVitalityFromRating(-40)).toBe(0);
+    expect(pvpVitalityFromRating(60)).toBeCloseTo(0.1, 10);
+    expect(pvpVitalityFromRating(182)).toBeCloseTo(182 / 600, 10);
+    expect(pvpVitalityFromRating(300)).toBe(0.5);
+    expect(pvpVitalityFromRating(302)).toBe(0.5);
+    expect(pvpVitalityFromRating(9_999)).toBe(0.5);
+  });
+
+  it('applies in the open world and never on dungeon ground, keeping the health fraction', () => {
+    const { sim, e } = geared('warrior', 'arms', STR_KIT);
+    expect(e.stats.pvpVitality).toBe(0.5);
+    const open = e.maxHp;
+    // Walking onto the instance plane (a dungeon band) switches it off; the
+    // health FRACTION survives the switch.
+    e.hp = Math.round(open * 0.6);
+    standAt(sim, e, INSTANCE_X);
+    expect(e.pvpVitalityActive).toBe(false);
+    expect(e.maxHp).toBe(Math.round(open / 1.5));
+    expect(e.hp / e.maxHp).toBeCloseTo(0.6, 2);
+    // Back in the open world it returns.
+    standAt(sim, e, 0);
+    expect(e.maxHp).toBe(open);
+  });
+
+  it('counts a live arena match as PvP, though the arena sits on the instance plane', () => {
+    const { sim, a } = liveArena();
+    const e = sim.entities.get(a)!;
+    for (let i = 0; i < 12; i++) sim.tick();
+    expect(e.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
+    expect(pvpVitalityAppliesTo(sim.ctx, e)).toBe(true);
+    expect(e.pvpVitalityActive).not.toBe(false);
+    // The same ground outside a match is an instance: off.
+    sim.arenaMatches.delete(a);
+    expect(pvpVitalityAppliesTo(sim.ctx, e)).toBe(false);
+  });
+
+  it('never makes honor gear the raid pick: in an instance every tank kit has less effective health than raid best-in-slot', () => {
+    // Effective health against a level-22 boss's physical hit: health over the
+    // share of the hit that survives armor. Raw health alone is the wrong
+    // measure (a feral's honor kit carries 52 more health in bear form but about
+    // a thousand less armor, so 872 less effective health), and the tier also
+    // carries no hit, crit or haste rating at all (tests/warfare_gear_tier.test.ts).
+    const BOSS_LEVEL = 22;
+    const ehp = (e: Entity) => e.maxHp / (1 - armorReduction(e.stats.armor, BOSS_LEVEL));
+    for (const [cls, spec, kit, bear] of [
+      ['warrior', 'prot', STR_KIT, false],
+      ['paladin', 'protection', STR_KIT, false],
+      ['druid', 'feral', AGI_KIT, true],
+    ] as [PlayerClass, string, Partial<Record<EquipSlot, string>>, boolean][]) {
+      const sides = [kit, bestEpicGearFor(cls, spec)].map((k) => {
+        const side = geared(cls, spec, k);
+        if (bear) {
+          side.e.auras.push({
+            id: 'bear_form',
+            name: 'Bear Form',
+            kind: 'form_bear',
+            remaining: 9999,
+            duration: 9999,
+            value: 0,
+          } as never);
+        }
+        standAt(side.sim, side.e, INSTANCE_X);
+        side.sim.ctx.recalcPlayer(side.e);
+        return side.e;
+      });
+      const [honor, raid] = sides;
+      expect(honor.pvpVitalityActive, `${cls}/${spec}`).toBe(false);
+      expect(ehp(honor), `${cls}/${spec} honor kit effective health in an instance`).toBeLessThan(
+        ehp(raid),
+      );
+    }
   });
 });

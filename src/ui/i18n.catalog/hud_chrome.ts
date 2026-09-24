@@ -3051,6 +3051,10 @@ export const hudChromeStrings = {
         'Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. Every 10 rating grants exactly 1% hit.',
       warfare:
         'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%.',
+      // The same line once honor gear grants WARFARE Vitality (a sibling key, not a
+      // new placeholder on the translated one above).
+      warfareWithHealth:
+        'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts.',
     },
     // One line per derived effect a stat contributes. {value} is a live number.
     effects: {

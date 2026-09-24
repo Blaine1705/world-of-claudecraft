@@ -846,6 +846,11 @@ export interface Stats {
   // player-vs-player damage only; PvE never reads them.
   pvpOffense: number;
   pvpDefense: number;
+  // WARFARE Vitality: the maximum-health fraction honor gear grants outside PvE
+  // instances (pvp/power.ts pvpVitalityFromRating). Unlike the two above it is
+  // not scoped to hostile hits; pvp/vitality.ts switches it off in dungeons,
+  // raids, delves and rift floors.
+  pvpVitality: number;
 }
 
 // The six class/item attributes authored in content. WARFARE fractions are
@@ -5423,6 +5428,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  unflagged, so an unflagged character samples and serializes exactly as
    *  before the flag existed. */
   pvpFlag?: boolean;
+  /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
+   *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
+   *  gear's health bonus never reaches raid content. Absent means the open
+   *  world, where it applies; battlegrounds and arenas apply it too. */
+  pvpVitalityActive?: boolean;
   /** Wearing the operator-applied Cheater tag (src/sim/moderation/). Server-set
    *  via setCheaterMark at join restore and when an operator applies or lifts a
    *  mark; never true offline, never user-settable. Cosmetic: nothing reads it

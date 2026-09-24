@@ -2382,7 +2382,8 @@ export const sv_SE: EnTranslations = {
         "hasteRating": "Snabbhetsvärde från din utrustning och setbonusar, som snabbar upp dina attacker och besvärjelser. Ungefär 10 i värde ger 1% snabbhet.",
         "parry": "Din chans att helt parera ett närstridsanfall framifrån utan att ta någon skada. Ett slag bakifrån kan inte pareras.",
         "hitRating": "Träffvärde från din utrustning och setbonusar, som minskar hur ofta dina attacker missar och dina besvärjelser motarbetas, framfor allt mot fiender av högre nivå. Ungefär 10 i värde ger 1% träff.",
-        "warfare": "Ökar skadan mot spelare med {increase}% och minskar skadan från spelare med {reduction}%."
+        "warfare": "Ökar skadan mot spelare med {increase}% och minskar skadan från spelare med {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Attackstyrka",
@@ -8165,7 +8166,7 @@ export const sv_SE: EnTranslations = {
       "parryBody": "Parering är krigarens eget försvar: en chans att helt avvärja ett närstridsslag och inte ta någon skada, och den växer med Styrka. Bara en attack som kommer framifrån kan pareras, vilket är ännu en anledning att hålla dig vänd mot det som slår dig. Andra klasser ser raden på sitt blad stå på noll.",
       "warfareTitle": "Krigföring",
       "warfareBody": "Krigföring är den enda statistiken som bara räknas mot andra spelare: den höjer skadan du tillfogar dem och sänker skadan du tar från dem, och ditt blad visar båda halvorna på en rad. Mot varelser gör den ingenting alls. Den kommer från Krigföringsutrustning du köper med Heder, så den är en belöning för att spela PvP snarare än något att jaga medan du stiger i nivå.",
-      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Varje strid, uppdrag och steg norrut gör din hjälte starkare. Här är hur nivåökning fungerar och vad som håller dig växande när du väl når toppen.",

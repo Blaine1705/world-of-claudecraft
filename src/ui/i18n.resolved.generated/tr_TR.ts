@@ -2382,7 +2382,8 @@ export const tr_TR: EnTranslations = {
         "hasteRating": "Teçhizatından ve set bonuslarından gelen hız puanı, saldırılarını ve büyü yapmanı hızlandırır. Yaklaşık 10 puan %1 hız sağlar.",
         "parry": "Önden gelen bir yakın dövüş saldırısını hiç hasar almadan tümüyle karşılama şansın. Arkadan gelen bir darbe karşılanamaz.",
         "hitRating": "Ekipmanından ve set bonuslarından gelen isabetlilik puanı; özellikle daha yüksek seviyeli düşmanlara karşı saldırılarının ıskalanma ve büyülerinin dirençle engelleme olasılığını azaltır. Her yaklaşık 10 puan, isabetliliği %1 artırır.",
-        "warfare": "Oyunculara verilen hasarı {increase}% artırır ve oyunculardan alınan hasarı {reduction}% azaltır."
+        "warfare": "Oyunculara verilen hasarı {increase}% artırır ve oyunculardan alınan hasarı {reduction}% azaltır.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Saldırı Gücü",
@@ -8165,7 +8166,7 @@ export const tr_TR: EnTranslations = {
       "parryBody": "Savuşturma, savaşçının kendine özgü savunmasıdır: bir yakın dövüş darbesini tamamen bir kenara savurup hiç hasar almama şansıdır ve Güç ile birlikte büyür. Yalnızca önünden gelen bir saldırı savuşturulabilir, bu da seni vuran şeye dönük kalman için bir sebep daha. Diğer sınıflar kendi sayfalarında bu satırın sıfırda oturduğunu görür.",
       "warfareTitle": "Harp",
       "warfareBody": "Harp, yalnızca diğer oyunculara karşı sayılan tek istatistiktir: onlara verdiğin hasarı yükseltir ve onlardan aldığın hasarı düşürür, ve karakter sayfan bu iki yarıyı tek bir satırda gösterir. Yaratıklara karşı hiçbir şey yapmaz. Onur karşılığında satın aldığın Harp teçhizatından gelir, bu yüzden seviye atlarken peşinde koşulacak bir şeyden çok, PvP oynamanın bir ödülüdür.",
-      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Her dövüş, her görev ve kuzeye atılan her adım kahramanını daha güçlü yapar. İşte seviye atlamanın nasıl işlediği ve zirveye vardığında seni nelerin geliştirmeye devam ettiği.",

@@ -3161,7 +3161,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // object predates WARFARE. Preserve numeric PvP fields instead of letting
       // an old six-field object turn the character-sheet percentages into NaN.
       if (s.stats !== undefined) {
-        e.stats = { pvpOffense: 0, pvpDefense: 0, ...s.stats };
+        e.stats = { pvpOffense: 0, pvpDefense: 0, pvpVitality: 0, ...s.stats };
       }
       applySelfCombatScalars(e, s);
       // ticksElapsed is a sim-internal sfx-cadence counter (consume_sfx.ts):

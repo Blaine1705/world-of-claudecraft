@@ -2382,7 +2382,8 @@ export const nl_NL: EnTranslations = {
         "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid.",
         "parry": "Je kans om een frontale melee-aanval volledig te pareren, zodat je geen schade oploopt. Een klap van achteren kan niet worden gepareerd.",
         "hitRating": "Raakwaarde van je uitrusting en setbonussen, waardoor je aanvallen minder vaak missen en je spreuken minder weerstand ondervinden, vooral tegen vijanden van een hoger niveau. Ongeveer 10 raakwaarde geeft 1% raakkans.",
-        "warfare": "Verhoogt de schade die aan spelers wordt toegebracht met {increase}% en vermindert de schade die aan spelers wordt toegebracht met {reduction}%."
+        "warfare": "Verhoogt de schade die aan spelers wordt toegebracht met {increase}% en vermindert de schade die aan spelers wordt toegebracht met {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Aanvalskracht",
@@ -8165,7 +8166,7 @@ export const nl_NL: EnTranslations = {
       "parryBody": "Parering is de eigen verdediging van de krijger: een kans om een melee-klap volledig af te weren en geen schade op te lopen, en het groeit met Kracht. Alleen een aanval die van voren komt, kan gepareerd worden, nog een reden om te blijven gericht staan op wat je raakt. Andere klassen zien de rij op hun blad op nul staan.",
       "warfareTitle": "Oorlogvoering",
       "warfareBody": "Oorlogvoering is de enige stat die alleen telt tegen andere spelers: het verhoogt de schade die je hen toebrengt en verlaagt de schade die je van hen oploopt, en je blad toont beide helften op één regel. Tegen wezens doet het helemaal niets. Het komt van Oorlogvoering-uitrusting die je koopt met Eer, dus het is een beloning voor PvP spelen in plaats van iets om achteraan te jagen tijdens het levelen.",
-      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Elk gevecht, elke quest en elke stap naar het noorden maakt je held sterker. Zo werkt het levelen en zo blijf je groeien wanneer je de top bereikt.",

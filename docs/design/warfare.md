@@ -64,6 +64,38 @@ Warfare multiplies that resolved amount before absorb shields. Keeping it as a
 single, isolated multiplier makes the interaction explicit; mathematically it is
 independent of mitigation apart from the engine's integer-rounding boundary.
 
+## Vitality: honor gear's health bonus
+
+Owner rule (2026-09-24): PvP gear gives players significantly more health than
+players without it, and it never works in dungeons or raids. The same combined
+Warfare Defense Rating (gear plus set) also grants maximum health
+(`pvpVitalityFromRating` in `src/sim/pvp/power.ts`): six rating per percent,
+capped at +50 percent (`PVP_VITALITY_RATING_PER_PCT`, `PVP_VITALITY_CAP`). A full
+11-slot kit alone (182 rating) gives about +30 percent and the seven-piece set
+(+120) reaches the cap.
+
+Where it applies (`src/sim/pvp/vitality.ts`, safest-first): anywhere on the
+instance plane (dungeons, raids, delves, rift floors, any instance added later)
+it is OFF, unless the player is in a battleground or arena match; everywhere else
+(the open world) it is ON. It is decided on the world PvP pass twice a second,
+also on a realm whose world PvP switch is off, and a player whose state flips is
+recalculated once with the health fraction preserved, so a switch never gains or
+loses health.
+
+What it does to the numbers, level 20, full honor kit, measured on the Sim
+(`tmp_pvp_stamina/` probes, 2026-09-24): a fire mage 1,265 to about 2,100 health
+in PvP, an arms warrior 1,732 to 2,598. In a mirror duel against the same spec in
+raid best-in-slot, the honor kit wins 1.13x (arms) to 2.27x (destruction), where
+without Vitality arms (0.76x) and elemental (0.94x) lost and combat and fire were
+even. Inside an instance every tank's honor kit stays below raid best-in-slot on
+effective health (health over the share of a level-22 boss hit that survives
+armor), pinned in `tests/honor.test.ts`.
+
+Caster honor armor and weapons also carry half the stamina premium the physical
+piece in the same slot carries (`WARFARE_CASTER_STAMINA_PREMIUM_SHARE`), which
+closes most of the cloth gap in honor gear; jewelry is excluded so it stays below
+the badge jewelry.
+
 ## Stat budgets, and why honor gear is not a PvE shortcut
 
 Three authored fractions shape every FURY item, all named constants in

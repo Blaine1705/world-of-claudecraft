@@ -12226,6 +12226,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.statInfo.desc.sta'
   | 'hudChrome.statInfo.desc.str'
   | 'hudChrome.statInfo.desc.warfare'
+  | 'hudChrome.statInfo.desc.warfareWithHealth'
   | 'hudChrome.statInfo.effects.armor'
   | 'hudChrome.statInfo.effects.attackPower'
   | 'hudChrome.statInfo.effects.critPct'

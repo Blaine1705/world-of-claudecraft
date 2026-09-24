@@ -2382,7 +2382,8 @@ export const de_DE: EnTranslations = {
         "hasteRating": "Tempowertung aus deiner Ausrüstung und deinen Setboni, die deine Angriffe und dein Zaubern beschleunigt. Etwa 10 Wertung gewähren 1% Tempo.",
         "parry": "Deine Chance, einen frontalen Nahkampfangriff vollständig zu parieren und keinen Schaden zu erleiden. Ein Schlag von hinten kann nicht pariert werden.",
         "hitRating": "Trefferwertung aus deiner Ausrustung und Setboni, die verringert, wie oft deine Angriffe verfehlen und deine Zauber widerstanden werden, besonders gegen hoher stufige Feinde. Etwa 10 Wertung verleihen 1% Treffer.",
-        "warfare": "Erhöht den Spielern zugefügten Schaden um {increase}% und verringert von Spielern erlittenen Schaden um {reduction}%."
+        "warfare": "Erhöht den Spielern zugefügten Schaden um {increase}% und verringert von Spielern erlittenen Schaden um {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Angriffskraft",
@@ -8165,7 +8166,7 @@ export const de_DE: EnTranslations = {
       "parryBody": "Parieren ist die ureigene Verteidigung des Kriegers: eine Chance, einen Nahkampfschlag völlig abzuwehren und keinen Schaden zu nehmen, und sie wächst mit Stärke. Nur ein Angriff von vorne lässt sich parieren, ein weiterer Grund, dem, was dich trifft, immer zugewandt zu bleiben. Andere Klassen sehen die Zeile auf ihrem Bogen bei null stehen.",
       "warfareTitle": "Kriegsführung",
       "warfareBody": "Kriegsführung ist der eine Wert, der nur gegen andere Spieler zählt: Er erhöht den Schaden, den du ihnen zufügst, und senkt den Schaden, den du von ihnen erleidest, und dein Bogen zeigt beide Hälften in einer Zeile. Gegen Kreaturen bewirkt er gar nichts. Er kommt von der Kriegsführungs-Ausrüstung, die du mit Ehre kaufst, er ist also eine Belohnung fürs PvP-Spielen und nichts, dem du beim Aufsteigen hinterherjagen musst.",
-      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Jeder Kampf, jede Quest und jeder Schritt nach Norden macht deinen Helden stärker. Hier erfährst du, wie der Aufstieg funktioniert und was dich weiter wachsen lässt, sobald du an der Spitze bist.",

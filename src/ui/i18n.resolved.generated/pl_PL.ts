@@ -2382,7 +2382,8 @@ export const pl_PL: EnTranslations = {
         "hasteRating": "Ocena pośpiechu z twojego ekwipunku i bonusów zestawów, przyspieszająca twoje ataki i rzucanie zaklęć. Około 10 oceny daje 1% pośpiechu.",
         "parry": "Twoja szansa na całkowite sparowanie ataku wręcz z przodu, bez otrzymania obrażeń. Ciosu zadanego od tyłu nie można sparować.",
         "hitRating": "Ocena trafienia z wyposażenia i bonusów zestawów, zmniejszająca częstotliwość chybień ataków i oparcia zaklęć, szczególnie przeciwko wrogom wyższego poziomu. Około 10 oceny daje 1% trafienia.",
-        "warfare": "Zwiększa obrażenia zadawane graczom o {increase}% i zmniejsza obrażenia otrzymywane od graczy o {reduction}%."
+        "warfare": "Zwiększa obrażenia zadawane graczom o {increase}% i zmniejsza obrażenia otrzymywane od graczy o {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} mocy ataku",
@@ -8165,7 +8166,7 @@ export const pl_PL: EnTranslations = {
       "parryBody": "Parowanie to własna obrona wojownika: szansa, by całkowicie odbić cios wręcz i nie otrzymać żadnych obrażeń, rosnąca wraz z Siłą. Sparować można tylko atak nadchodzący od przodu, co jest kolejnym powodem, by zawsze być zwróconym twarzą do tego, co cię atakuje. U pozostałych klas ten wiersz na karcie postaci stoi na zerze.",
       "warfareTitle": "Działania wojenne",
       "warfareBody": "Działania wojenne to jedyna statystyka, która liczy się wyłącznie przeciwko innym graczom: zwiększa obrażenia, jakie im zadajesz, i zmniejsza obrażenia, jakie od nich otrzymujesz, a twoja karta postaci pokazuje obie połowy na jednej linii. Przeciwko stworzeniom nie robi zupełnie nic. Pochodzi z ekwipunku Działań Wojennych, który kupujesz za Honor, więc jest nagrodą za granie w PvP, a nie czymś, do czego warto dążyć podczas zdobywania poziomów.",
-      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Każda walka, każde zadanie i każdy krok na północ czynią twojego bohatera silniejszym. Oto jak działa zdobywanie poziomów i co napędza twój rozwój, gdy dotrzesz na szczyt.",

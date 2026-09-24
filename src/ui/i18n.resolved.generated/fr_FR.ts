@@ -2382,7 +2382,8 @@ export const fr_FR: EnTranslations = {
         "hasteRating": "Score de hâte de votre équipement et de vos bonus de panoplie, accélérant vos attaques et vos incantations. Environ 10 points de score confèrent 1% de hâte.",
         "parry": "Vos chances de parer entièrement une attaque de mêlée frontale, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.",
         "hitRating": "La précision provenant de votre équipement et de vos bonus d'ensemble, réduisant la fréquence à laquelle vos attaques ratent et vos sorts sont résistés, notamment contre les ennemis de niveau supérieur. Environ 10 points de précision accordent 1 % de toucher.",
-        "warfare": "Augmente de {increase} % les dégâts infligés aux joueurs et réduit de {reduction} % les dégâts que les joueurs vous infligent."
+        "warfare": "Augmente de {increase} % les dégâts infligés aux joueurs et réduit de {reduction} % les dégâts que les joueurs vous infligent.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Puissance d'attaque",
@@ -8165,7 +8166,7 @@ export const fr_FR: EnTranslations = {
       "parryBody": "La Parade est la défense propre au guerrier : une chance de dévier entièrement un coup de mêlée et de ne subir aucun dégât, et elle augmente avec la Force. Seule une attaque frontale peut être parée, une raison de plus de toujours faire face à ce qui vous frappe. Les autres classes voient cette ligne de leur feuille rester à zéro.",
       "warfareTitle": "Art de la guerre",
       "warfareBody": "L'Art de la guerre est la seule caractéristique qui ne compte que contre les autres joueurs : elle augmente les dégâts que vous leur infligez et réduit ceux qu'ils vous infligent, et votre feuille affiche les deux moitiés sur une seule ligne. Contre les créatures, elle ne fait rigoureusement rien. Elle provient de l'équipement de Guerre que vous achetez avec de l'honneur, une récompense pour le JcJ plutôt qu'une caractéristique à poursuivre en montant de niveau.",
-      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Chaque combat, chaque quête et chaque pas vers le nord rend votre héros plus fort. Voici comment fonctionnent les niveaux et ce qui vous fait continuer de progresser une fois arrivé au sommet.",

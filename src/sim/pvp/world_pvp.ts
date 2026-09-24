@@ -7,9 +7,9 @@
 // sanctuary switches the world off for everyone in it, a free-for-all zone
 // makes everyone standing in it fair game with no flag at all, and everywhere
 // else is contested: the mutual-flag rule. In a free-for-all zone the first
-// hit on an unflagged player MARKS the attacker (raises their flag), so an aggressor always ends
-// up carrying the stake; whoever hits a flagged player, the victim included,
-// is never marked for it.
+// hit on an unflagged player MARKS the attacker (raises their flag), so an
+// aggressor always ends up carrying the stake; whoever hits a flagged player,
+// the victim included, is never marked for it.
 //
 // Lowering the flag takes WORLD_PVP_DISARM_SECONDS, and the drop waits for
 // combat to end. A kill moves a gold stake (world_pvp_rules.ts worldPvpStake)
@@ -43,6 +43,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { grantHonor } from './honor';
+import { updatePvpVitality } from './vitality';
 import {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
@@ -366,9 +367,12 @@ export function updateWorldPvp(ctx: SimContext): void {
     }
     books.nextDisarmAt = next;
   }
-  if (!ctx.worldPvpDisabled && ctx.tickCount - books.zonePassTick >= ZONE_PASS_TICKS) {
+  if (ctx.tickCount - books.zonePassTick >= ZONE_PASS_TICKS) {
     books.zonePassTick = ctx.tickCount;
-    noticeZoneChanges(ctx, books);
+    // WARFARE Vitality rides this pass but not the world switch: battlegrounds
+    // and arenas grant it on a realm with world PvP turned off too.
+    updatePvpVitality(ctx);
+    if (!ctx.worldPvpDisabled) noticeZoneChanges(ctx, books);
   }
   if (ctx.tickCount - books.sweptAtTick >= SWEEP_TICKS) {
     books.sweptAtTick = ctx.tickCount;

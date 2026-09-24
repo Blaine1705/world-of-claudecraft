@@ -2382,7 +2382,8 @@ export const vi_VN: EnTranslations = {
         "hasteRating": "Chỉ số thần tốc từ trang bị và phần thưởng bộ trang bị của bạn, đẩy nhanh các đòn tấn công và việc thi triển phép của bạn. Khoảng 10 điểm chỉ số ban 1% thần tốc.",
         "parry": "Cơ hội để bạn gạt trọn vẹn một đòn cận chiến từ phía trước, không nhận chút sát thương nào. Đòn đánh từ phía sau không thể bị gạt.",
         "hitRating": "Chỉ số trúng đòn từ trang bị và các chỉ số bộ của bạn, giảm tần suất tấn công bị hụt và phép thuật bị kháng, đặc biệt khi đối mặt với kẻ địch cấp cao hơn. Khoảng 10 chỉ số cho 1% trúng đòn.",
-        "warfare": "Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%."
+        "warfare": "Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Công Kích",
@@ -8165,7 +8166,7 @@ export const vi_VN: EnTranslations = {
       "parryBody": "Đỡ Đòn là khả năng phòng thủ riêng của chiến binh: cơ hội gạt hẳn một đòn cận chiến sang bên và không nhận sát thương nào, và nó tăng theo Sức Mạnh. Chỉ đòn tấn công đến từ phía trước mới có thể bị đỡ, đây là một lý do nữa để luôn quay mặt về phía thứ đang đánh bạn. Các lớp nhân vật khác thấy dòng này trên bảng của họ luôn nằm ở mức không.",
       "warfareTitle": "Chiến Tranh",
       "warfareBody": "Chiến Tranh là chỉ số duy nhất chỉ có tác dụng khi đối đầu người chơi khác: nó tăng sát thương bạn gây cho họ và giảm sát thương bạn nhận từ họ, và bảng nhân vật của bạn hiển thị cả hai nửa đó trên cùng một dòng. Với sinh vật thì nó chẳng có tác dụng gì cả. Nó đến từ trang bị Chiến Tranh bạn mua bằng danh dự, nên đây là phần thưởng cho việc chơi PvP chứ không phải thứ đáng để theo đuổi trong lúc lên cấp.",
-      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Mỗi trận chiến, nhiệm vụ, và mỗi bước về phương bắc đều khiến anh hùng của bạn mạnh hơn. Đây là cách lên cấp hoạt động và điều gì giúp bạn tiếp tục trưởng thành khi đã lên đến đỉnh.",
