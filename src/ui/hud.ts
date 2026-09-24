@@ -2215,7 +2215,10 @@ export class Hud {
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     hydrateCrestImageFallbacks(document);
-    this.mapMarkerTooltipContent = new MapMarkerTooltipContent(this.sim);
+    // A world quest's item reward embeds the same card the bags show.
+    this.mapMarkerTooltipContent = new MapMarkerTooltipContent(this.sim, {
+      itemTooltip: (item) => this.itemTooltip(item, false),
+    });
     this.mapMarkerInteraction = new MapMarkerInteractionController({
       names: {
         zone: zoneDisplayName,
