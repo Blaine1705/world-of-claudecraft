@@ -189,12 +189,12 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
   if (selected !== 'warrior') return Promise.resolve();
   state.localClass = selected;
   if (state.task) return state.task;
-  const units = recipe(state, selected);
-  if (!units.length) return Promise.resolve();
   const task = (async () => {
+    // The recipe enumerates units that need the kit's sheets resident, so it
+    // is built only once the demand load has landed.
     if (state.host.assets && !(await state.host.assets())) return;
     if (state.cancelled) return;
-    for (const unit of units) {
+    for (const unit of recipe(state, selected)) {
       if (state.cancelled) return;
       await state.host.queue.run(
         () => {

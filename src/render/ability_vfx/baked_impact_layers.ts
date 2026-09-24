@@ -128,11 +128,12 @@ export class BakedImpactLayers {
     geometry.dispose();
   }
   /** Active Warrior preparation opts into strict, per-slot draw readiness.
-   * Other classes keep their existing dependency set and texture-only path. */
+   * Other classes keep their existing dependency set and texture-only path.
+   * Nothing is enumerable before the kit's demand load lands the sheet. */
   units(host: CrestPrewarmHost) {
     if (this.disposed) return [];
     const texture = bakedTexture('harvest_impact');
-    if (!texture) throw new Error('Authored contact texture is not loaded');
+    if (!texture) return [];
     this.preparation ??= new BakedPoolPrewarm(
       this.scene,
       this.slots.map((s) => s.mesh),
