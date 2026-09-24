@@ -2280,12 +2280,17 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // persisted reliquary state (the same reasoning that keeps the DEEDS/
     // deeds.ts Vale Cup and Fiesta retirement edits in this same merge byte-
     // neutral: those touch only desc/renown/feat metadata on EXISTING ids,
-    // never deedStats or reliquary). MEASURED directly, isolating the two ids
-    // the same way withoutFieldKit/withoutBramblehideContent do: 49 bytes
+    // never deedStats or reliquary). MEASURED directly, isolating the three ids
+    // the same way withoutFieldKit/withoutBramblehideContent do: 71 bytes
     // exactly, `"reins_rallycart_rxt",` (19 characters, 22 bytes) plus
-    // `"reins_goblin_rocket_sled",` (24 characters, 27 bytes) in the sorted
+    // `"reins_goblin_rocket_sled",` (24 characters, 27 bytes) plus
+    // `"reins_avian_strider",` (19 characters, 22 bytes) in the sorted
     // itemsDiscovered array.
-    const DEV_MOUNT_RELEASE_ITEM_IDS = ['reins_rallycart_rxt', 'reins_goblin_rocket_sled'] as const;
+    const DEV_MOUNT_RELEASE_ITEM_IDS = [
+      'reins_rallycart_rxt',
+      'reins_goblin_rocket_sled',
+      'reins_avian_strider',
+    ] as const;
     function withoutDevMountReleaseContent(state: CharacterState): CharacterState {
       const copy = JSON.parse(JSON.stringify(state)) as CharacterState;
       if (copy.deedStats?.itemsDiscovered)
@@ -2297,10 +2302,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const withoutDevMountRelease = withoutDevMountReleaseContent(withoutFieldKit);
     const devMountReleaseDelta =
       fieldBytes(withoutFieldKit, 'deedStats') - fieldBytes(withoutDevMountRelease, 'deedStats');
-    expect(devMountReleaseDelta).toBe(49);
+    expect(devMountReleaseDelta).toBe(71);
     expect(
       counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8'),
-    ).toBe(49);
+    ).toBe(71);
     const preReleaseCounterfactual = withoutBramblehideContent(withoutDevMountRelease);
     // The Bramblehide/Nythgap release content, attributed exactly against
     // f73615a511 (the last test-ledger commit, where the settled ceiling
@@ -2312,7 +2317,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // and non-professions field is byte-identical across the merge.
     // Measured against withoutDevMountRelease, not withoutFieldKit: the two
     // dev-mount ids isolated above must not leak into this delta, or the
-    // deedStats term would read 791 (742 + the 49 already attributed).
+    // deedStats term would read 813 (742 + the 71 already attributed).
     const bramblehideDelta = Object.fromEntries(
       (['deeds', 'deedStats', 'reliquary'] as const).map((key) => [
         key,
@@ -2350,7 +2355,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         183 +
         1548 +
         50 +
-        49 +
+        // 49 -> 71 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) in the dev-mount isolation.
+        71 +
         375 +
         358 +
         // Plus 17 at the weekly emissary rebase: the Emissary's Cache id in the
@@ -2414,11 +2420,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     ).toBe(210910);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
-    // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
-    // dev-mount delta attributed above: 211,121. OSSBrain integration
-    // (goblin_rocket_sled, rallycart_rxt) is the dev-mount mover, MEASURED
-    // via the devMountReleaseDelta isolation, not inferred; the hub practice
-    // quests are the +50 above it.
+    // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
+    // dev-mount delta attributed above: 211,143. OSSBrain integration
+    // (goblin_rocket_sled, rallycart_rxt) and the Viridian Valestrider are the
+    // dev-mount movers, MEASURED via the devMountReleaseDelta isolation, not
+    // inferred; the hub practice quests are the +50 above it. RE-MEASURED at
+    // 211,392 for the Viridian Valestrider, exactly +22 over the 211,370
+    // above: the one new developer-only mount reins id in
+    // deedStats.itemsDiscovered (`"reins_avian_strider",`), inside the same
+    // devMountReleaseDelta isolation.
     expect(
       counterfactualBytes,
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
@@ -2428,7 +2438,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 211,745 -> 212,103 at the wq-reputation merge (+358, the faction items).
       // 212,103 -> 212,385 at the faction standing deeds (+282); +17 at the
       // weekly emissary rebase; +105 at the Clue Scroll content.
-    ).toBe(212507);
+      // 212,507 -> 212,529 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) (+22).
+    ).toBe(212529);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2498,8 +2509,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // above; no container or ceiling changed shape. On the quests integration
     // branch: 212,519 bytes. Floor at measurement minus 380, edge at
     // measurement plus one: 212,139..212,520.
-    expect(bytes, reMint).toBeGreaterThan(212139);
-    expect(bytes, reMint).toBeLessThan(212520);
+    // RE-BASED again with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): +22, the same one reins id in
+    // deedStats.itemsDiscovered: 212,161..212,542.
+    expect(bytes, reMint).toBeGreaterThan(212161);
+    expect(bytes, reMint).toBeLessThan(212542);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

@@ -821,7 +821,8 @@ describe('Masterwrought art completion evidence', () => {
     // (faction-vendor-icons-2026-09-16): 1,302. 1303 with the weekly emissary's
     // cache chest (feature/weekly-quests). The Clue Scroll items add their two
     // (clue-scroll-icons-2026-09-17): 1,305.
-    expect(currentOwnerIds).toHaveLength(1305);
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1,306.
+    expect(currentOwnerIds).toHaveLength(1306);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -904,9 +905,14 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
-    // Strip all five later additive waves (Crucible professions, the Field Kit, the
+    // The Viridian Valestrider's reins is additive the same way, and postdates
+    // the dated verdict too.
+    expect(datedIds).not.toContain('reins_avian_strider');
+    expect(currentOwnerIds).toContain('reins_avian_strider');
+
+    // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
-    // and the OSSBrain mount reins)
+    // the OSSBrain mount reins, and the Valestrider's reins)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -923,7 +929,8 @@ describe('Masterwrought art completion evidence', () => {
         !clueScrollIds.has(id) &&
         // The weekly emissary's cache chest (feature/weekly-quests) is additive
         // beyond the dated completion union, like the Field Kit.
-        id !== 'emissary_cache',
+        id !== 'emissary_cache' &&
+        id !== 'reins_avian_strider',
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

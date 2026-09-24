@@ -11864,6 +11864,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '그림자 도약 두꺼비 카마카게',
   'hudChrome.mounts.name_stormfeather_griffin': '하늘닿이 폭풍깃',
   'hudChrome.mounts.name_drakemaw_raptor': '화산구 랩터',
+  'hudChrome.mounts.name_avian_strider': '비리디안 베일스트라이더',
   'hudChrome.mounts.name_lanternback_troll': '등불지기 그룸볼',
   'hudChrome.mounts.name_chimeglass_tortoise': '종유리의 톨리버',
   'hudChrome.mounts.desc_drakemaw_raptor':
@@ -11871,6 +11872,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_mech_bird': '태엽 기계새',
   'hudChrome.mounts.desc_mech_bird':
     '수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.',
+  'hudChrome.mounts.desc_avian_strider':
+    '우뚝 솟은 탈것 조류로, 육중한 발톱과 접은 날개가 모든 여정을 천둥 같은 질주로 바꾼다.',
   'hudChrome.mounts.desc_lanternback_troll':
     '점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.',
   'hudChrome.mounts.desc_chimeglass_tortoise':
@@ -12818,6 +12821,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.reins_terrorspark_groundshaker.name': '드레드스파크 시동 열쇠',
+  'entities.items.reins_avian_strider.name': '비리디안 베일스트라이더의 고삐',
   'entities.items.reins_lanternback_troll.name': '점등인의 멍에: 그룸볼',
   'entities.items.reins_chimeglass_tortoise.name': '길지기의 종끈: 톨리버',
   'entities.items.reins_rickshaw_mount.name': '결속된 고삐: 뼈에 묶인 인력거',

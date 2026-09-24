@@ -11310,6 +11310,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跃蟾蜍卡玛影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天风暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龙喉迅猛龙',
+  'hudChrome.mounts.name_avian_strider': '苍翠谷行者',
   'hudChrome.mounts.name_lanternback_troll': '提灯背者格伦博',
   'hudChrome.mounts.name_chimeglass_tortoise': '钟晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
@@ -11317,6 +11318,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_mech_bird': '发条机械鸟',
   'hudChrome.mounts.desc_mech_bird':
     '一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。',
+  'hudChrome.mounts.desc_avian_strider':
+    '高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。',
   'hudChrome.mounts.desc_lanternback_troll':
     '被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
@@ -12207,6 +12210,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.reins_terrorspark_groundshaker.name': '骇雷撼地者点火钥匙',
+  'entities.items.reins_avian_strider.name': '苍翠谷行者的缰绳',
   'entities.items.reins_lanternback_troll.name': '点灯人之轭：格伦博',
   'entities.items.reins_chimeglass_tortoise.name': '守道人的铃带：托利弗',
   'entities.items.reins_rickshaw_mount.name': '白骨人力车缚绳',

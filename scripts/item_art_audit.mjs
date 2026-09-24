@@ -124,7 +124,8 @@ const build = await buildItemArtAudit({
     // 1071 / 1089 (its two disjoint reins items, reins_goblin_rocket_sled and
     // reins_rallycart_rxt, on the shared 1069 / 1087 base); both deltas are
     // additive over that shared base, so 1069 + 212 + 2 = 1283 and
-    // 1087 + 212 + 2 = 1301. Verified with `node scripts/item_art_audit.mjs
+    // 1087 + 212 + 2 = 1301, plus the Viridian Valestrider's reins on both
+    // sides = 1284 / 1302. Verified with `node scripts/item_art_audit.mjs
     // --verify-only` against the merged tree.
     // + the World Quests branch merge (release/v0.43.0 sync): its two painted
     // puzzle activators and two Eastbrook freight icons join both counts.
@@ -133,9 +134,10 @@ const build = await buildItemArtAudit({
     // emissary's cache chest (feature/weekly-quests: 1303 / 1321), + the two
     // Clue Scroll items (clue_scroll, treasure_casket; clue-scroll-icons-2026-09-17):
     // 1305 / 1323 on the quests integration branch, measured with
-    // `node scripts/item_art_audit.mjs --verify-only`.
-    catalogCount: 1305,
-    liveItemCount: 1323,
+    // `node scripts/item_art_audit.mjs --verify-only`. + the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge):
+    // 1306 / 1324, measured the same way.
+    catalogCount: 1306,
+    liveItemCount: 1324,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

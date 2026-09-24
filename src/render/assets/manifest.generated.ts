@@ -954,6 +954,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/medieval_village_v2/buildings/CastleStairs_03.glb": "/media/models/medieval_village_v2/buildings/CastleStairs_03.1dd5b842c0df.glb",
   "models/medieval_village_v2/buildings/Stairs_01.glb": "/media/models/medieval_village_v2/buildings/Stairs_01.df7c17997160.glb",
   "models/mounts/aether_hover_cycle.glb": "/media/models/mounts/aether_hover_cycle.10935b02e1d8.glb",
+  "models/mounts/avian_strider.glb": "/media/models/mounts/avian_strider.bb2d8a8f41b4.glb",
   "models/mounts/chimeglass_tortoise.glb": "/media/models/mounts/chimeglass_tortoise.3b0eb4332f63.glb",
   "models/mounts/drakemaw_raptor.glb": "/media/models/mounts/drakemaw_raptor.44d00a10e348.glb",
   "models/mounts/goblin_rocket_sled.glb": "/media/models/mounts/goblin_rocket_sled.0957ec5ff7bb.glb",

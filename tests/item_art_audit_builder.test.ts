@@ -850,16 +850,17 @@ describe('item-art audit builder', () => {
     // faction quartermaster items (which landed without moving this block)
     // plus the two clue items (clue_scroll, treasure_casket): 1304 / 1322,
     // the sha/bytes straight from `--verify-only` on this tree.
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1306 / 1324, re-minted on the merged tree.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
       // Re-minted on the quests integration branch: the catalog carries the 15
       // faction quartermaster owners, the Emissary's Cache chest and the two
       // Clue Scroll items (1305 / 1323).
-      catalogSha256: 'd41d1a47f8a01c48b612b257a550503997319a1ff7cd090f8cff2b1bf7ab47c6',
-      catalogBytes: 710773,
+      catalogSha256: '946640531d8ac01e5aa747216686e2958cb04159cbad13e4382b8ed818fec20a',
+      catalogBytes: 711308,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1305,
-      liveItemCount: 1323,
+      catalogCount: 1306,
+      liveItemCount: 1324,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -877,7 +878,7 @@ describe('item-art audit builder', () => {
         identity: 31,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'f19748b98126115136a11b738eba3097a76b9c25732623407e71a4f902188fe4',
+      shippingCatalogSha256: '1d282d616a072cd9a6e0f8fa027c73541aa7e36b7fa68f5b08b853617d832d6c',
       machineChecksPassed: true,
       verdict: null,
     });

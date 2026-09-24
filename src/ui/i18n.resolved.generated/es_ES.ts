@@ -1725,6 +1725,7 @@ export const es_ES: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Sacudetierra Chispa de Terror",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Pájaro mecánico",
       "name_lanternback_troll": "Grumbol el lomo de linterna",
       "name_chimeglass_tortoise": "Tolliver el timbre de cristal",
@@ -1741,6 +1742,7 @@ export const es_ES: EnTranslations = {
       "desc_rallycart_skin": "Un pequeño coche de carreras con un rugido enorme.",
       "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos.",
       "desc_drakemaw_raptor": "Un raptor de cría domado para la silla, procedente de la Caldera de Drakemaw, puro tendón y arranque, que aún huele ligeramente a ceniza.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Un pollo de guerra mecánico hecho a mano que corre con servos chasqueantes y la llave de cuerda sigue girando.",
       "desc_lanternback_troll": "Un troll de las colinas sometido al yugo de los faroleros, que lleva un trono de hierro sobre los hombros y una linterna de tormenta encendida en cada brazo.",
       "desc_chimeglass_tortoise": "Una tortuga salada que ha dejado atrás a tres generaciones de caravanas. Los caldereros le quitaron las gafas de cristal de tormenta y le colgaron una campana de bronce en el cuello, de modo que la carretera le oye mucho antes de verlo.",
@@ -15366,6 +15368,9 @@ export const es_ES: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Llave de ignición: Triturador Chispa de Terror"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Llave de encendido: Trineo cohete goblin"
