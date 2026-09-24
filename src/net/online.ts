@@ -3247,6 +3247,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
+      const restoreSessionPreferences = this.spectateExitPending;
       const arena = s.arena !== undefined ? s.arena : this.arenaInfo;
       const presentation = buildClientAbilityPresentation(
         this.cfg.playerClass,
@@ -3265,14 +3266,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (this.spectateExitPending) {
         this.spectateExitPending = false;
         this.spectating = null; // own presentation rebuilt: the view is ours again
-        // The hold also blocked preferences changed while watching. Replay
-        // only now, after cmd() can send to our own character again.
-        this.resendSessionPreferences();
       }
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
+      // The own presentation has released the spectate hold, so preference
+      // changes made while watching can now pass cmd()'s normal guard.
+      if (restoreSessionPreferences) this.resendSessionPreferences();
       // --- IWorldTrade / IWorldDuelArena: trade/duel/arena delta self-decode
       // (W0a-covered; keep the prior mirror value when the field is omitted).
       // IWorldSocialGraph.socialInfo has NO snapshot key - it is set only by the

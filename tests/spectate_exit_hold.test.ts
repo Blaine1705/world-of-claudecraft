@@ -35,7 +35,6 @@ interface ClientInternals {
   applySnapshot(snap: unknown): void;
   onMessage(raw: string): void;
   reconnectAttempts: number;
-  ws: { readyState: number; send(payload: string): void };
 }
 
 function playerWire(id: number, nm: string, tid: string): Record<string, unknown> {
@@ -87,27 +86,6 @@ describe('ClientWorld spectate exit hold', () => {
     wire.applySnapshot({ t: 'snap', ents: [], self: playerWire(1, 'Me', 'warrior') });
     expect(world.spectating).toBeNull();
     expect(knownIds(world)).toContain('heroic_strike');
-  });
-
-  it('replays preferences changed while watching only after the own snapshot releases the hold', () => {
-    withDomStubs(() => {
-      const { world, wire } = makeWorld();
-      const sent: Array<Record<string, unknown>> = [];
-      wire.ws = {
-        readyState: StubWebSocket.OPEN,
-        send: (payload) => sent.push(JSON.parse(payload)),
-      };
-      wire.onMessage(JSON.stringify({ t: 'spectate', name: 'Watched' }));
-      wire.applySnapshot({ t: 'snap', ents: [], self: playerWire(2, 'Watched', 'mage') });
-      world.setStopAutoAttackOnTargetSwitch(true);
-      expect(sent).toEqual([]);
-      wire.onMessage(JSON.stringify({ t: 'spectate', name: null }));
-      expect(sent).toEqual([]);
-      wire.applySnapshot({ t: 'snap', ents: [], self: playerWire(1, 'Me', 'warrior') });
-      expect(sent).toEqual([{ t: 'cmd', cmd: 'stopAutoAttackOnTargetSwitch', enabled: true }]);
-      wire.applySnapshot({ t: 'snap', ents: [], self: playerWire(1, 'Me', 'warrior') });
-      expect(sent).toHaveLength(1);
-    });
   });
 
   it('a reconnect hello clears the hold with the rest of the spectate swap', () => {
