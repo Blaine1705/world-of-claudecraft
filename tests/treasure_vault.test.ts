@@ -176,6 +176,35 @@ describe('digging on the X', () => {
     expect(retry?.riftSeed).toBe(map.seed);
     expect(sim.countItem(TREASURE_MAP_ITEM_IDS.common)).toBe(0);
   });
+
+  it('reopens an abandoned active vault after its empty timeout without another map', () => {
+    const sim = makeSim();
+    metaOf(sim).characterId = 8102;
+    const { map, site } = readAndDig(sim, 'common');
+    const portal = [...sim.entities.values()].find((e) => e.vaultAttemptId === '8102:1');
+    if (!portal) throw new Error('vault portal missing');
+    sim.enterRift(map.seed, portal.riftBaseLevel!, sim.playerId, undefined, portal);
+    const first = sim.riftInstances.find((run) => run.vault?.attemptId === '8102:1');
+    if (!first) throw new Error('active vault missing');
+    leaveRift(sim.ctx, sim.playerId);
+    first.emptyFor = 179;
+    portal.vaultExpiresAt = sim.time + 1;
+    placeAt(sim, site.x + 60, site.z);
+    for (let i = 0; i < 80; i++) sim.tick();
+    expect(first.partyKey).toBeNull();
+    expect(sim.entities.has(portal.id)).toBe(false);
+    expect(metaOf(sim).vaultAttempt?.id).toBe('8102:1');
+    placeAt(sim, site.x + 2, site.z - 2);
+    for (let i = 0; i < 25; i++) sim.tick();
+    const retry = [...sim.entities.values()].find((e) => e.vaultAttemptId === '8102:1');
+    expect(retry?.id).not.toBe(portal.id);
+    expect(retry?.riftSeed).toBe(map.seed);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.common)).toBe(0);
+    sim.enterRift(map.seed, retry!.riftBaseLevel!, sim.playerId, undefined, retry);
+    expect(
+      sim.riftInstances.some((run) => run.partyKey !== null && run.vault?.attemptId === '8102:1'),
+    ).toBe(true);
+  });
 });
 
 describe('the vault run', () => {
@@ -266,6 +295,13 @@ describe('the vault run', () => {
     expect(inst.memberIds.has(returningOwner)).toBe(true);
     expect(inst.vault?.chest?.eligible).toContain(returningOwner);
     expect(inst.outcome).toBe('won');
+    const afterClear = sim.addPlayer('warrior', 'AfterClear', { characterId: 704 });
+    sim.setPlayerLevel(20, afterClear);
+    sim.partyInvite(afterClear, returningOwner);
+    sim.partyAccept(afterClear);
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, afterClear, undefined, portal);
+    expect(inst.memberIds.has(afterClear)).toBe(false);
+    expect(inst.vault?.chest?.eligible).not.toContain(afterClear);
   });
 
   it('keeps the original party authorized and pays the owner if they disconnect before anyone enters', () => {

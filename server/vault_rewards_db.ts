@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS vault_reward_claims (
   copper BIGINT NOT NULL CHECK (copper >= 0),
   guest_cycle TEXT NOT NULL DEFAULT '',
   mail_due_at TIMESTAMPTZ NOT NULL,
+  mail_capacity_deferred_at TIMESTAMPTZ,
   direct_claimed_at TIMESTAMPTZ,
   mail_booked_at TIMESTAMPTZ,
   PRIMARY KEY (realm, attempt_id, character_id),
@@ -44,9 +45,14 @@ CREATE TABLE IF NOT EXISTS vault_guest_cycle_baselines (
 );
 ALTER TABLE vault_reward_outcomes ADD COLUMN IF NOT EXISTS source_payload JSONB;
 ALTER TABLE vault_reward_claims ADD COLUMN IF NOT EXISTS guest_cycle TEXT NOT NULL DEFAULT '';
+ALTER TABLE vault_reward_claims ADD COLUMN IF NOT EXISTS mail_capacity_deferred_at TIMESTAMPTZ;
 CREATE INDEX IF NOT EXISTS vault_reward_claims_due_mail
   ON vault_reward_claims (realm, mail_due_at, attempt_id, character_id)
   WHERE direct_claimed_at IS NULL AND mail_booked_at IS NULL;
+CREATE INDEX IF NOT EXISTS vault_reward_claims_recipient_first_deferred
+  ON vault_reward_claims (realm, character_id, mail_capacity_deferred_at, attempt_id)
+  WHERE direct_claimed_at IS NULL AND mail_booked_at IS NULL
+    AND mail_capacity_deferred_at IS NOT NULL;
 CREATE INDEX IF NOT EXISTS vault_reward_claims_guest_cycle
   ON vault_reward_claims (realm, character_id, guest_cycle)
   WHERE copper > 0 OR items <> '[]'::jsonb;
@@ -381,6 +387,59 @@ export function createVaultRewardsDb(pool: VaultRewardPool, realm = REALM) {
       return {
         ...(result.rows[0].payload as Omit<VaultOutcome, 'completedAt'>),
         completedAt: result.rows[0].completed_at as Date,
+      };
+    },
+
+    // A full vault mailbox keeps its payload in this ledger. Move only its
+    // next delivery attempt; the immutable outcome remains unchanged.
+    async deferVaultRewardClaim(
+      attemptId: string,
+      characterId: number,
+      nextAt: Date,
+    ): Promise<boolean> {
+      const result = await pool.query(
+        `UPDATE vault_reward_claims
+            SET mail_due_at = GREATEST(mail_due_at, $4),
+                mail_capacity_deferred_at = COALESCE(mail_capacity_deferred_at, now())
+         WHERE realm = $1 AND attempt_id = $2 AND character_id = $3
+           AND direct_claimed_at IS NULL AND mail_booked_at IS NULL`,
+        [realm, attemptId, characterId, nextAt],
+      );
+      return result.rowCount === 1;
+    },
+
+    async wakeOldestVaultRewardClaim(
+      characterId: number,
+      now: Date,
+    ): Promise<DueVaultRewardClaim | null> {
+      const result = await pool.query(
+        `WITH oldest AS (
+           SELECT attempt_id FROM vault_reward_claims
+           WHERE realm = $1 AND character_id = $2
+             AND direct_claimed_at IS NULL AND mail_booked_at IS NULL
+             AND mail_capacity_deferred_at IS NOT NULL
+           ORDER BY mail_capacity_deferred_at, attempt_id LIMIT 1
+         )
+         UPDATE vault_reward_claims AS claim
+            SET mail_due_at = LEAST(claim.mail_due_at, $3),
+                mail_capacity_deferred_at = NULL
+           FROM oldest
+          WHERE claim.realm = $1 AND claim.character_id = $2
+            AND claim.attempt_id = oldest.attempt_id
+            AND claim.direct_claimed_at IS NULL AND claim.mail_booked_at IS NULL
+         RETURNING claim.attempt_id, claim.character_id, claim.recipient_name,
+                   claim.items, claim.copper, claim.mail_due_at`,
+        [realm, characterId, now],
+      );
+      if (result.rowCount !== 1) return null;
+      const row = result.rows[0];
+      return {
+        attemptId: row.attempt_id as string,
+        characterId: numericId(row.character_id),
+        recipientName: row.recipient_name as string,
+        items: row.items as VaultRewardItem[],
+        copper: numericId(row.copper),
+        mailDueAt: (row.mail_due_at as Date).toISOString(),
       };
     },
 

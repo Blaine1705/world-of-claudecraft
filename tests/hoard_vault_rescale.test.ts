@@ -68,6 +68,7 @@ function livingTrash(sim: Sim, inst: RiftInstance): Entity[] {
 describe('hoard vault rescale', () => {
   it('reconnects owner and guest by character identity without counting phantom entrants', () => {
     const sim = new Sim({ seed: 9323, playerClass: 'warrior', noPlayer: true });
+    sim.cfg.vaultRewardNeedsSave = true;
     const owner = sim.addPlayer('warrior', 'Owner', { characterId: 101 });
     const guest = sim.addPlayer('warrior', 'Guest', { characterId: 202 });
     sim.setPlayerLevel(20, owner);
@@ -82,6 +83,7 @@ describe('hoard vault rescale', () => {
       vaultOwnerPid: owner,
       vaultOwnerCharacterId: 101,
       vaultRarity: 'epic' as const,
+      vaultAttemptId: '101:1',
       riftSeed: SEED,
     } as Entity;
     sim.enterRift(SEED, 23, owner, undefined, portal);
@@ -111,6 +113,18 @@ describe('hoard vault rescale', () => {
     expect(inst.vault?.ownerPid).toBe(ownerAgain);
     expect(inst.memberIds.size).toBe(2);
     expect(boss.maxHp).toBe(scaledHp);
+    for (const id of inst.mobIds) {
+      const mob = sim.entities.get(id);
+      if (mob) {
+        mob.hp = 0;
+        mob.dead = true;
+      }
+    }
+    const events: ReturnType<Sim['tick']> = [];
+    for (let i = 0; i < 45; i++) events.push(...sim.tick());
+    const outcomes = events.filter((event) => event.type === 'treasureVaultOutcomePending');
+    expect(outcomes).toHaveLength(1);
+    expect(outcomes[0].claims.map((claim) => claim.characterId).sort()).toEqual([101, 202]);
   });
 
   it('scales to the players who have entered, never down, capped at five', () => {

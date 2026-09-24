@@ -10,7 +10,7 @@ import {
   releaseHoardRewardClaim,
 } from '../src/sim/rift/hoard_reward_chest';
 import type { Sim } from '../src/sim/sim';
-import { finishVaultAttempt } from '../src/sim/treasure_vault';
+import { confirmVaultAttemptDurable, finishVaultAttempt } from '../src/sim/treasure_vault';
 import type { SimEvent } from '../src/sim/types';
 import { pool } from './db';
 import {
@@ -31,6 +31,9 @@ import {
 const MAIL_DELAY_MS = 5 * 60_000;
 const RETRY_MS = 5_000;
 const MAIL_POLL_MS = 30_000;
+const MAIL_FULL_RETRY_MS = 10 * 60_000;
+const MAIL_WAKE_WAIT_MS = 10_000;
+const MAX_MAIL_WAKES_QUEUED = 64;
 const MAX_OUTCOME_WRITES = 2;
 const MAX_DIRECT_CLAIMS = 3;
 const MAX_RECONCILES = 2;
@@ -38,7 +41,7 @@ const rewardsDb = createVaultRewardsDb(pool, REALM);
 
 export interface VaultRewardHost {
   readonly sim: Sim;
-  withPermit<T>(run: () => Promise<T>): Promise<T>;
+  withPermit<T>(run: () => Promise<T>, signal?: AbortSignal): Promise<T>;
   saveOwner(pid: number): Promise<boolean>;
   claimDirect(
     attemptId: string,
@@ -73,6 +76,9 @@ export class VaultRewardService {
   private nextRetryAt = 0;
   private nextMailAt = 0;
   private mailing = false;
+  private readonly mailingRecipients = new Set<number>();
+  private readonly queuedMailWakes = new Set<number>();
+  private readonly activeMailWakes = new Set<number>();
   private mailCursor: { mailDueAt: string; attemptId: string; characterId: number } | null = null;
   private readonly pendingLiveParcels = new Map<
     string,
@@ -98,6 +104,12 @@ export class VaultRewardService {
             })),
           });
         }
+        // While the immutable outcome is still only in memory, do not let an
+        // expired/cleaned-up instance reopen the same consumed map. A restart
+        // with no committed outcome deliberately restores the retry right.
+        const ownerPid = this.host.characterPid(event.ownerCharacterId);
+        const owner = ownerPid === null ? undefined : this.host.sim.meta(ownerPid);
+        if (owner?.vaultAttempt?.id === event.attemptId) owner.vaultAttemptDurable = false;
         this.drainOutcomes();
       } else if (event.type === 'treasureVaultClaimRequested' && event.pid !== undefined) {
         this.pendingClaims.set(`${event.attemptId}:${event.characterId}`, {
@@ -120,6 +132,46 @@ export class VaultRewardService {
     if (now >= this.nextMailAt && !this.mailing) {
       this.nextMailAt = now + MAIL_POLL_MS;
       void this.mailDue(new Date(now));
+    }
+  }
+
+  onVaultMailTaken(characterId: number): void {
+    if (
+      !this.queuedMailWakes.has(characterId) &&
+      this.queuedMailWakes.size >= MAX_MAIL_WAKES_QUEUED
+    )
+      return; // the durable ten-minute retry still owns this claim
+    this.queuedMailWakes.add(characterId);
+    this.drainMailWakes();
+  }
+
+  private drainMailWakes(): void {
+    for (const characterId of this.queuedMailWakes) {
+      if (this.activeMailWakes.size >= 2) break;
+      if (this.activeMailWakes.has(characterId)) continue;
+      this.queuedMailWakes.delete(characterId);
+      this.activeMailWakes.add(characterId);
+      void this.wakeMailOne(characterId).finally(() => {
+        this.activeMailWakes.delete(characterId);
+        this.drainMailWakes();
+      });
+    }
+  }
+
+  private async wakeMailOne(characterId: number): Promise<void> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), MAIL_WAKE_WAIT_MS);
+    timeout.unref();
+    try {
+      const claim = await this.host.withPermit(
+        () => this.db.wakeOldestVaultRewardClaim(characterId, new Date()),
+        controller.signal,
+      );
+      if (claim) await this.host.withPermit(() => this.mailOne(claim), controller.signal);
+    } catch (error) {
+      this.host.onClaimFailure(characterId, error);
+    } finally {
+      clearTimeout(timeout);
     }
   }
 
@@ -174,7 +226,8 @@ export class VaultRewardService {
           .saveOwner(pending.pid)
           .catch((error) => this.host.onClaimFailure(characterId, error));
       } else {
-        fresh.vaultAttemptDurable = true;
+        if (!this.pending.has(pending.attemptId))
+          confirmVaultAttemptDurable(this.host.sim.ctx, pending.pid, pending.attemptId);
       }
     } catch (error) {
       this.host.onClaimFailure(characterId, error);
@@ -263,16 +316,23 @@ export class VaultRewardService {
       const due = await this.host.withPermit(() =>
         this.db.dueVaultRewardClaims(100, now, this.mailCursor ?? undefined),
       );
+      let last: (typeof due)[number] | undefined;
+      let processed = 0;
+      let failures = 0;
+      const startedAt = Date.now();
       for (const claim of due) {
+        if (failures >= 3 || Date.now() - startedAt >= 5_000) break;
+        last = claim;
+        processed++;
         try {
           await this.host.withPermit(() => this.mailOne(claim));
         } catch (error) {
+          failures++;
           this.host.onClaimFailure(claim.characterId, error);
         }
       }
-      const last = due.at(-1);
       this.mailCursor =
-        due.length === 100 && last
+        (due.length === 100 || processed < due.length) && last
           ? { mailDueAt: last.mailDueAt, attemptId: last.attemptId, characterId: last.characterId }
           : null;
     } catch (error) {
@@ -335,7 +395,25 @@ export class VaultRewardService {
   }
 
   private async mailOne(claim: VaultRewardClaim & { attemptId: string }): Promise<void> {
+    if (this.mailingRecipients.has(claim.characterId)) return;
+    this.mailingRecipients.add(claim.characterId);
+    try {
+      await this.mailOneExclusive(claim);
+    } finally {
+      this.mailingRecipients.delete(claim.characterId);
+    }
+  }
+
+  private async mailOneExclusive(claim: VaultRewardClaim & { attemptId: string }): Promise<void> {
     const hasPayload = claim.items.length > 0 || claim.copper > 0;
+    if (hasPayload && !this.host.sim.canBookVaultRewardMail(claim.characterId)) {
+      await this.db.deferVaultRewardClaim(
+        claim.attemptId,
+        claim.characterId,
+        new Date(Date.now() + MAIL_FULL_RETRY_MS),
+      );
+      return;
+    }
     for (const item of claim.items)
       if (!Object.hasOwn(ITEMS, item.itemId))
         throw new Error(`unknown vault reward item ${item.itemId}`);

@@ -284,7 +284,10 @@ export function updateVaultPortals(ctx: SimContext): void {
       continue;
     if (
       ctx.riftInstances.some(
-        (inst) => inst.vault?.attemptId === attempt.id && inst.outcome !== 'active',
+        (inst) =>
+          inst.partyKey !== null &&
+          inst.vault?.attemptId === attempt.id &&
+          inst.outcome !== 'active',
       )
     )
       continue;

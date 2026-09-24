@@ -54,9 +54,10 @@ describe('vault mail take guard', () => {
     expect(guard.isLocked(7)).toBe(true);
   });
 
-  it('schedules a paired save only for a changed vault letter', () => {
+  it('wakes pending rewards only after a changed vault letter is durably saved', async () => {
     const guard = new VaultMailTakeGuard();
     const save = vi.fn(async () => true);
+    const onSaved = vi.fn();
     const letter = {
       id: 1,
       letterId: 'hoard_vault_reward',
@@ -73,14 +74,16 @@ describe('vault mail take guard', () => {
         letter.read = true;
       },
     } as unknown as Pick<Sim, 'mailInfoFor' | 'mailTake' | 'postOffice'>;
-    handleVaultMailTake(guard, sim, 7, 70, 1, save);
+    handleVaultMailTake(guard, sim, 7, 70, 1, save, undefined, onSaved);
     expect(save).toHaveBeenCalledOnce();
     expect(guard.isLocked(7)).toBe(true);
+    await vi.waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
   });
 
   it('reports a fenced-out save while keeping the projected loot locked', async () => {
     const guard = new VaultMailTakeGuard();
     const onFailure = vi.fn();
+    const onSaved = vi.fn();
     const letter = { id: 1, letterId: 'hoard_vault_reward', copper: 12, items: [], read: false };
     const sim = {
       mailInfoFor: () => ({ messages: [letter] }),
@@ -90,8 +93,9 @@ describe('vault mail take guard', () => {
         letter.read = true;
       },
     } as unknown as Pick<Sim, 'mailInfoFor' | 'mailTake' | 'postOffice'>;
-    handleVaultMailTake(guard, sim, 7, 70, 1, async () => false, onFailure);
+    handleVaultMailTake(guard, sim, 7, 70, 1, async () => false, onFailure, onSaved);
     await vi.waitFor(() => expect(onFailure).toHaveBeenCalledOnce());
+    expect(onSaved).not.toHaveBeenCalled();
     expect(guard.isLocked(7)).toBe(true);
   });
 });

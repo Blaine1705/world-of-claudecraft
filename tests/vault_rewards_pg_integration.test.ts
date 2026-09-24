@@ -250,6 +250,10 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
   });
 
   it('rolls a mail parcel and claim marker back together, then books both once', async () => {
+    await pool.query(
+      `INSERT INTO characters (id, realm, state) VALUES (72, 'VaultRealm', '{}'::jsonb)
+       ON CONFLICT (id) DO NOTHING`,
+    );
     const db = createVaultRewardsDb(pool, 'VaultRealm');
     await db.commitVaultOutcome({
       attemptId: '72:3',
@@ -347,6 +351,100 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
     expect(
       (await db.dueVaultRewardClaims(10, due)).some((claim) => claim.attemptId === '72:3'),
     ).toBe(false);
+  });
+
+  it('waits for an ambiguous character and mail save before restoring a vault letter', async () => {
+    await pool.query(
+      `INSERT INTO characters (id, realm, state) VALUES (72, 'VaultRealm', '{}'::jsonb)
+       ON CONFLICT (id) DO NOTHING`,
+    );
+    const ref = 'vault:VaultRealm:72:late-commit:72';
+    const key = mailRecipientKey(REALM, '72');
+    const letter = (copper: number) => ({
+      mail: [
+        {
+          recipientKey: '72',
+          recipientName: 'Owner',
+          letterId: 'hoard_vault_reward',
+          custodyRef: ref,
+          copper,
+          items: copper > 0 ? [{ itemId: 'thorium_ore', count: 1 }] : [],
+          read: copper === 0,
+        },
+      ],
+    });
+    await pool.query(
+      `INSERT INTO world_state (key, data) VALUES ($1, $2::jsonb)
+       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data`,
+      [key, JSON.stringify(letter(19))],
+    );
+    const oldSave = await pool.connect();
+    try {
+      await oldSave.query('BEGIN');
+      await oldSave.query('UPDATE characters SET state = $2::jsonb WHERE id = $1', [
+        72,
+        JSON.stringify({ vaultRewardCredited: true }),
+      ]);
+      await oldSave.query('UPDATE world_state SET data = $2::jsonb WHERE key = $1', [
+        key,
+        JSON.stringify(letter(0)),
+      ]);
+      let settled = false;
+      const recovery = loadVaultMailRecovery(pool, REALM, 72, ref).then((source) => {
+        settled = true;
+        return source;
+      });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      expect(settled).toBe(false);
+      await oldSave.query('COMMIT');
+      expect(await recovery).toBeNull();
+    } finally {
+      await oldSave.query('ROLLBACK').catch(() => {});
+      oldSave.release();
+    }
+  });
+
+  it('defers a full mailbox claim and wakes its oldest pending reward after collection', async () => {
+    const db = createVaultRewardsDb(pool, 'VaultRealm');
+    const attemptId = '72:mail-cap';
+    await db.commitVaultOutcome({
+      attemptId,
+      ownerCharacterId: 72,
+      claims: [{ ...outcome.claims[0], mailDueAt: due }],
+    });
+    const later = new Date(due.getTime() + 600_000);
+    expect(await db.deferVaultRewardClaim(attemptId, 72, later)).toBe(true);
+    await db.commitVaultOutcome({
+      attemptId: '72:mail-cap-second',
+      ownerCharacterId: 72,
+      claims: [{ ...outcome.claims[0], mailDueAt: due }],
+    });
+    expect(await db.deferVaultRewardClaim('72:mail-cap-second', 72, later)).toBe(true);
+    await pool.query(
+      `UPDATE vault_reward_claims
+          SET mail_capacity_deferred_at = CASE attempt_id
+            WHEN $2 THEN $4::timestamptz ELSE $5::timestamptz END
+        WHERE realm = $1 AND character_id = $3 AND attempt_id IN ($2, $6)`,
+      ['VaultRealm', attemptId, 72, due, later, '72:mail-cap-second'],
+    );
+    expect(await db.deferVaultRewardClaim(attemptId, 72, new Date(later.getTime() + 600_000))).toBe(
+      true,
+    );
+    expect(
+      (await db.dueVaultRewardClaims(100, due)).some((claim) => claim.attemptId === attemptId),
+    ).toBe(false);
+    const awakened = await db.wakeOldestVaultRewardClaim(72, due);
+    expect(awakened?.attemptId).toBe(attemptId);
+    expect((await db.wakeOldestVaultRewardClaim(72, due))?.attemptId).toBe('72:mail-cap-second');
+    await db.commitVaultOutcome({
+      attemptId: '72:not-yet-due',
+      ownerCharacterId: 72,
+      claims: [{ ...outcome.claims[0], mailDueAt: later }],
+    });
+    expect(await db.wakeOldestVaultRewardClaim(72, due)).toBeNull();
+    expect(
+      (await db.dueVaultRewardClaims(100, due)).some((claim) => claim.attemptId === attemptId),
+    ).toBe(true);
   });
 
   it('reserves at most three guest payouts per cycle at clear, even before any chest or mail claim', async () => {
@@ -607,7 +705,11 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
     });
     const onClaimFailure = vi.fn();
     const host = {
-      sim: { mailSystemParcel, hasCustodyParcel: (ref: string) => live.has(ref) } as unknown as Sim,
+      sim: {
+        mailSystemParcel,
+        hasCustodyParcel: (ref: string) => live.has(ref),
+        canBookVaultRewardMail: () => true,
+      } as unknown as Sim,
       withPermit: async <T>(run: () => Promise<T>) => run(),
       saveOwner: async () => true,
       claimDirect: async () => 'retry' as const,

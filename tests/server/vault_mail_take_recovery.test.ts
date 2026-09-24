@@ -47,4 +47,37 @@ describe('vault mail take recovery', () => {
     await vi.waitFor(() => expect(guard.isLocked(7)).toBe(false));
     expect(restoreVaultLetter).not.toHaveBeenCalled();
   });
+
+  it('bounds permit waiters and drains queued characters in FIFO order', async () => {
+    const guard = new VaultMailTakeGuard();
+    for (let id = 1; id <= 70; id++) guard.begin(id, id, `vault:test:${id}`);
+    const admitted: Array<() => void> = [];
+    const loads: number[] = [];
+    const recovery = new VaultMailTakeRecovery(
+      guard,
+      () => ({ postOffice: { restoreVaultLetter: () => true } }) as unknown as Sim,
+      (run) => new Promise<void>((resolve) => admitted.push(resolve)).then(run),
+      async (id) => {
+        loads.push(id);
+        return null;
+      },
+    );
+    for (let id = 1; id <= 70; id++) recovery.recover(id);
+    expect(admitted).toHaveLength(2);
+    expect(recovery.stats()).toEqual({ active: 2, queued: 64, overflow: 4, refused: 4 });
+    admitted[0]();
+    await vi.waitFor(() => expect(loads).toEqual([1]));
+    await vi.waitFor(() => expect(admitted).toHaveLength(3));
+    admitted[1]();
+    await vi.waitFor(() => expect(loads).toEqual([1, 2]));
+    admitted[2]();
+    await vi.waitFor(() => expect(loads).toEqual([1, 2, 3]));
+    for (let i = 3; i < 70; i++) {
+      await vi.waitFor(() => expect(admitted.length).toBeGreaterThan(i));
+      admitted[i]();
+    }
+    await vi.waitFor(() => expect(loads).toHaveLength(70));
+    expect(guard.isLocked(70)).toBe(false);
+    expect(recovery.stats()).toMatchObject({ active: 0, queued: 0, overflow: 0 });
+  });
 });

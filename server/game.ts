@@ -406,7 +406,7 @@ import { runPeriodicSaveFlush } from './periodic_save_flush';
 import { claimVaultRewardForSession, type VaultDirectClaimHost } from './vault_direct_claim_host';
 import { handleVaultMailTake, VaultMailTakeGuard } from './vault_mail_take_guard';
 import { VaultMailTakeRecovery } from './vault_mail_take_recovery';
-import { createVaultOpenPersistenceDeps, persistNewVaultOpens } from './vault_open_persistence';
+import * as vo from './vault_open_persistence';
 import { saveVaultOwner, VaultRewardService } from './vault_reward_service';
 import { dispatchVehicleCommand } from './vehicle_command_wire';
 
@@ -1616,20 +1616,19 @@ function liteEntityJson(id: number, dynJson: string): string {
 function logSocialErr(err: unknown): void {
   console.error('social command failed:', err);
 }
-
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
-  private readonly vaultOpenSaveIds = new Set<string>();
+  private readonly vaultOpenSaveState = vo.createVaultOpenPersistenceState();
   private readonly vaultRewards: VaultRewardService;
   private readonly vaultClaimHost: VaultDirectClaimHost;
   private readonly vaultMailTakeGuard = new VaultMailTakeGuard();
   private readonly vaultMailRecovery = new VaultMailTakeRecovery(
     this.vaultMailTakeGuard,
     () => this.sim,
-    (run) => this.withBackgroundDbPermit(run),
+    (run, signal) => this.withBackgroundDbPermit(run, signal),
   );
-  private readonly vaultOpenPersistence = createVaultOpenPersistenceDeps(
+  private readonly vaultOpenPersistence = vo.createVaultOpenPersistenceDeps(
     () => this.sim,
     (pid) => this.clients.get(pid),
     (session) => this.saveCharacterWithBackgroundPermit(session),
@@ -1931,7 +1930,7 @@ export class GameServer {
     };
     this.vaultRewards = new VaultRewardService({
       sim: this.sim,
-      withPermit: (run) => this.withBackgroundDbPermit(run),
+      withPermit: (run, signal) => this.withBackgroundDbPermit(run, signal),
       saveOwner: (pid) =>
         saveVaultOwner(this.clients.get(pid), (session) =>
           this.saveCharacterWithBackgroundPermit(session),
@@ -2757,7 +2756,7 @@ export class GameServer {
             // routeEvents early-outs when no clients are connected, and the
             // recorder must see every tick. Read-only; never mutates events.
             this.parseCapture.observe(events);
-            persistNewVaultOpens(events, this.vaultOpenSaveIds, this.vaultOpenPersistence);
+            vo.persistNewVaultOpens(events, this.vaultOpenSaveState, this.vaultOpenPersistence);
             this.vaultRewards.observe(events);
             this.vaultRewards.tick();
             this.routeEvents(events);
@@ -7790,6 +7789,7 @@ export class GameServer {
                 'Vault reward save failed. Please reconnect.',
                 'vault mail save failed',
               ),
+            () => void this.vaultRewards.onVaultMailTaken(session.characterId),
           );
         break;
       case 'mail_delete':

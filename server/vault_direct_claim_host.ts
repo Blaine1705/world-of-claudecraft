@@ -49,6 +49,7 @@ export function claimVaultRewardForSession(
   attemptId: string,
   claim: VaultRewardClaim,
   owner: boolean,
+  commit: typeof commitVaultDirectClaim = commitVaultDirectClaim,
 ): Promise<VaultDirectClaimResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 5_000);
@@ -73,7 +74,7 @@ export function claimVaultRewardForSession(
       try {
         result = await host.withPermit(
           () =>
-            commitVaultDirectClaim(
+            commit(
               {
                 pool,
                 cancelBackend: cancelVaultBackend,

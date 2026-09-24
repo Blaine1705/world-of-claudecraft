@@ -97,6 +97,7 @@ export function mailHoldsEscrow(m: { copper: number; items: readonly unknown[] }
 // remain (the never-auto-deleted rule), like a system parcel.
 export const MAIL_ATTACHMENT_EXPIRY_SECONDS = 30 * 24 * 3600;
 const MAIL_MAX_PER_RECIPIENT = 100; // stored letters per mailbox (full = refuse new)
+const MAIL_MAX_VAULT_REWARDS = 32; // unclaimed vault escrow letters; overflow stays in the claim ledger
 // #3561: the window every still-live letter with a finite expiresAt gets its
 // persisted deliverIn/secondsLeft refreshed at least once, staggered by id
 // (one ~1/3600th slice of the book per sim-second, never a synchronized
@@ -803,6 +804,8 @@ export class PostOffice {
     // Escrow in the expiry sense (sub-silver coin alone does not count): the
     // clock write at the tail keys on this, the coin grant below on any coin.
     const hadAttachments = mailHoldsEscrow(m);
+    const hadVaultEscrow =
+      m.letterId === 'hoard_vault_reward' && (m.copper > 0 || m.items.length > 0);
     // Bump only when something observable moved: the revision is realm-global,
     // so an unconditional bump would let a repeat-take on an already-emptied,
     // already-read letter force an inbox rebuild for every near-pillar viewer
@@ -860,6 +863,7 @@ export class PostOffice {
     }
     if (kept.length !== m.items.length) mutated = true;
     m.items = kept;
+    this.index.refreshVaultEscrow(m, hadVaultEscrow);
     if (mutated && m.letterId === 'hoard_vault_reward' && !m.vaultRewardCredited) {
       m.vaultRewardCredited = true;
       meta.clueCasketsOpened = (meta.clueCasketsOpened ?? 0) + 1;
@@ -1032,6 +1036,10 @@ export class PostOffice {
     // production six-figure-letter class) would put a whole-array walk on
     // the world loop. Pinned by tests/mail_custody_parcels.test.ts.
     return this.index.hasCustodyRef(custodyRef);
+  }
+
+  canBookVaultRewardMail(characterId: number): boolean {
+    return this.index.vaultEscrowFor(String(characterId)) < MAIL_MAX_VAULT_REWARDS;
   }
 
   vaultCustodyRefFor(mailId: number, pid: number): string | null {

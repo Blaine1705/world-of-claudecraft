@@ -127,12 +127,14 @@ export function handleVaultMailTake(
   mailId: number,
   save: () => Promise<boolean>,
   onSaveFailure: (error: unknown) => void = () => {},
+  onSaved: () => void = () => {},
 ): void {
   if (
     !guard.take(sim, characterId, pid, mailId, () => {
       void save().then(
         (saved) => {
-          if (!saved) onSaveFailure(new Error('vault mail take was not saved'));
+          if (saved) onSaved();
+          else onSaveFailure(new Error('vault mail take was not saved'));
         },
         (error) => {
           console.error(`vault mail take save failed for ${characterId}:`, error);
