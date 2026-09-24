@@ -165,3 +165,57 @@ implementation slice targets and reconciles against `release/v0.29.0`.
 - Mobile players can build and vent without precision ground placement.
 - Reduced-motion and low-graphics modes retain every actionable cue.
 - PBE validates Mana pacing, vent timing, Faultwake targeting, burst, host parity, and PvP damage.
+
+## v0.44.0 rework
+
+Status: implementation PR against `release/v0.44.0`. Owner request: Thundercall does not feel good
+to play next to the other damage specs.
+
+### Evidence (live parses, 2026-09-17 to 2026-09-23)
+
+- Adoption: 4 elemental heroic raid kills from 2 characters all week, against 33 enhancement,
+  55 balance and 66 fire kills on the same bosses. The census holds 167 elemental characters, at
+  the lowest average level of any damage caster.
+- Output: since 2026-09-01, heroic Nythraxis medians are elemental 93, balance 154, fire 148
+  DPS. Normal Ignivar arena: elemental 94, balance 206, fire 197.
+- Shape: Arc Bolt plus Earthen Jolt are 85 to 90 percent of elemental damage. Cinder Jolt deals
+  nothing (it shares the shock cooldown with the vent and has no payoff), and players cancel 15
+  to 20 percent of their Arc Bolts, against 0 to 4 cancels per fight for fire and balance in the
+  same raids.
+- The pre-rework bench already had Thundercall level with Vespers (160.5 against 160.6 DPS on the
+  120 sec level-20 boss), so the gap is bench-to-live transfer, not raw coefficients.
+
+### Changes
+
+| Change | Classic source | Behavior |
+|---|---|---|
+| Partial vents | this PRD ("vent early") | Earthen Jolt and Faultwake spend any Thunder, scaling per charge (Jolt 25 percent, Faultwake 20 percent per Thunder). Primal Mastery's vent bonus, Echoing Elements, Deep Reservoir and Living Weapon still need a full bank of 5. |
+| Arc Overload (`lightning_overload`, passive, level 10) | TBC Lightning Overload 5/5 | Arc Bolt and Skybranch have a 20 percent chance to strike their first target again for 50 percent of the landed damage and grant 1 Thunder. |
+| Lightning Mastery (spec baseline) | Classic Lightning Mastery 5/5 | Arc Bolt and Skybranch cast one third faster (rank-4 Arc Bolt 3.0 to 2.0 sec before haste). |
+| Magma Burst (`lava_burst`, level 12, rank 2 at 20) | Wrath Lava Burst | 2.0 sec cast, 8 sec cooldown, Fire. Always crits a target carrying the caster's own Cinder Jolt. Grants no Thunder. |
+| Magma Surge | Cataclysm Lava Surge | Each Cinder Jolt tick has a 20 percent chance to reset Magma Burst and make the next one instant (10 sec window, action-bar glow). |
+| Stormbreak (`thunderstorm`, level 16) | Wrath Thunderstorm | Instant, 45 sec cooldown: Nature damage and a 50 percent slow for 5 sec within 10 yards, and 8 percent of maximum Mana back. The knockback is not modelled (no mob displacement primitive). |
+| Offensive spec bonus | tuning | `spec_output_tuning.ts` elemental spell bonus 0.13 to 0.07, paying for the above. |
+
+Every new rng draw is gated on a Thundercall caster who knows the relevant ability; the parity
+gate shows only the `shaman_engines` golden moving.
+
+### Bench (owned-class probe, 3 seeds, DPS)
+
+| Scenario | Before | After | Vespers |
+|---|---|---|---|
+| 1 target, 15 sec | 148.7 | 153.6 | 151.8 |
+| 1 target, 60 sec | 153.9 | 174.7 | 162.7 |
+| 3 targets, 60 sec | 207.6 | 211.9 | 227.2 |
+| Level-20 boss, 120 sec | 160.5 | 173.6 | 160.6 |
+| Level-22 boss, 120 sec | 144.9 | 170.1 | 156.1 |
+
+The single-target bench lands inside the existing role band (at most 1.1 times Vespers). The bench
+plays perfectly, so it cannot show the transfer gain the rework targets; the live check is the
+next week of heroic parses (elemental cancel rate, damage share outside Arc Bolt, median DPS).
+
+### Follow-ups
+
+- A Fire Elemental cooldown (the Wrath Fire Elemental Totem) through the existing guardian summon
+  path, as its own PR.
+- A class-wide totem system is a separate design pass.

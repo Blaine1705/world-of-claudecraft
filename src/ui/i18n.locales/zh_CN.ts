@@ -13912,6 +13912,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     '被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
   'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
+  'entities.abilities.lightning_overload.name': '电弧超载',
+  'entities.abilities.lightning_overload.description':
+    '被动：电弧箭和叉状闪电有20%的几率超载，对其第一个目标再次造成所造成伤害的50%，并获得1层雷霆。（雷霆召唤）',
+  'entities.abilities.lava_burst.name': '熔岩爆裂',
+  'entities.abilities.lava_burst.description':
+    '造成{damage}点火焰伤害。对身上带有你的余烬震击燃烧效果的目标必定造成致命一击。熔岩涌动：余烬震击每次跳动有20%的几率重置此技能的冷却时间，并使你的下一次熔岩爆裂变为瞬发。伤害随法术强度提高。（雷霆召唤）',
+  'entities.abilities.thunderstorm.name': '风暴破击',
+  'entities.abilities.thunderstorm.description':
+    '召唤一声霹雳，对10米内的敌人造成{damage}点自然伤害，并使其移动速度降低50%，持续5秒。恢复你最大法力值的8%。伤害随法术强度提高。（雷霆召唤）',
   'entities.abilities.tidecall.description':
     '为一个友方目标恢复{damage}点生命值。治疗量随法术强度提高。将过量治疗前的完整治疗量加入愈合水流，最多为目标最大生命值的30%。',
   'entities.abilities.tidecall.name': '潮汐召唤',

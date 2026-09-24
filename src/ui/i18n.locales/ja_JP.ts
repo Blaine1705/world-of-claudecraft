@@ -14602,6 +14602,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）',
   'entities.abilities.thunder_reservoir.name': '雷鳴の貯蔵',
+  'entities.abilities.lightning_overload.name': 'アークオーバーロード',
+  'entities.abilities.lightning_overload.description':
+    'パッシブ：電弧の矢と枝分かれの稲妻は20%の確率でオーバーロードし、最初の目標に与えたダメージの50%で再び攻撃し、雷鳴を1獲得する。（サンダーコール）',
+  'entities.abilities.lava_burst.name': 'マグマバースト',
+  'entities.abilities.lava_burst.description':
+    '{damage}の火炎ダメージを与える。あなたの灰燼の衝撃で燃えている目標には必ずクリティカルヒットする。マグマサージ：灰燼の衝撃の継続ダメージごとに20%の確率でこのクールダウンをリセットし、次のマグマバーストを即時詠唱にする。ダメージは呪文威力とともに上がる。（サンダーコール）',
+  'entities.abilities.thunderstorm.name': 'ストームブレイク',
+  'entities.abilities.thunderstorm.description':
+    '雷鳴を呼び、10ヤード以内の敵に{damage}の自然ダメージを与え、5秒間移動速度を50%低下させる。最大マナの8%を回復する。ダメージは呪文威力とともに上がる。（サンダーコール）',
   'entities.abilities.tidecall.description':
     '味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。',
   'entities.abilities.tidecall.name': '潮呼び',

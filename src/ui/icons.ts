@@ -4828,6 +4828,10 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'stoneward',
   'primal_exaltation',
   'ancestor_return',
+  // v0.44 Thundercall rework (project-generated, style-referenced).
+  'lava_burst',
+  'lightning_overload',
+  'thunderstorm',
   // cross-class fills from the two generic CraftPix "100 RPG/skill icon" packs — abilities
   // their own class pack couldn't cover but a generic icon fit. (warrior taunt completes warrior.)
   'aspect_of_the_hawk',

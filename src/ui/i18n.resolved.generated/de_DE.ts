@@ -12025,6 +12025,18 @@ export const de_DE: EnTranslations = {
         "name": "Donnerspeicher",
         "description": "Passiv: Der Lichtbogenblitz und der Gabelblitz gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)"
       },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst instant. Damage increases with Spell Power. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
+      },
       "rockbiter_weapon": {
         "name": "Stonebound-Waffe",
         "description": "Erfüllt eure Waffe 30 Min. lang. Jeder Schlag verursacht {damage} zusätzlichen Schaden. Verstärkung gewinnt zudem 40% Rüstung und 20% Ausdauer, erleidet 15% weniger Schaden und ist immun gegen kritische Treffer von Kreaturen und erzeugt das 2,75-Fache an Bedrohung. Erdstoß zwingt sein Ziel, euch 3 Sek. lang anzugreifen, und Donnerschild gewährt 3 Sek. lang 10% Schadensminderung."

@@ -12025,6 +12025,18 @@ export const cs_CZ: EnTranslations = {
         "name": "Zásobárna hromu",
         "description": "Pasivní: Bleskový šíp a Rozvětvený blesk udělují Hrom, až do 5. Při 5 Hromech způsobí Zemní otřes o 125% větší poškození nebo Zemětřesení o 100% větší a poté spotřebuje veškerý Hrom. (Volání hromu)"
       },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst instant. Damage increases with Spell Power. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
+      },
       "rockbiter_weapon": {
         "name": "Zbraň spoutaná kamenem",
         "description": "Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 40 % zbroje a 20 % výdrže, utrpí o 15 % nižší poškození a je odolný vůči kritickým zásahům od nestvůr a vytváří 2,75násobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s."
