@@ -56,6 +56,7 @@ function fixture(cls: string, warriorTextures = true) {
     spiritHammers: empty(),
     furyStates: empty(),
     baked: pool,
+    fragments: empty(),
   });
   const program = { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() };
   const seenSlots = new Set<THREE.BufferGeometry>();

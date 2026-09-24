@@ -280,6 +280,7 @@ function kitRecipe(crests: SignatureCrests) {
     spiritHammers: empty,
     furyStates: empty,
     baked: empty,
+    fragments: empty,
   });
   return fx;
 }

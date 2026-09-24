@@ -156,6 +156,9 @@ selected by ability id only:
   getters in its constructor, since the load lands after it: it binds them in
   a unit of its own preparation recipe, ahead of its compile (the crests'
   `crest-bind-kit`, the guards' `guard-bind-steel`; `tests/crest_prewarm.test.ts`).
+  A pool whose GEOMETRY comes from the kit builds its meshes in that recipe
+  too, and spawns nothing until their upload unit ran (the solid fragments'
+  `fragment-build`; `tests/solid_impact_fragments_prewarm.test.ts`).
   Its preparation rides
   `ACTIVE_KIT_PRIORITY` (the boot-debt lane) under the per-frame budget, never
   the actionable floor, and it waits out a loading cover: the kit is cosmetic
