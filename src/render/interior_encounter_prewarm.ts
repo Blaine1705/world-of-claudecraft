@@ -22,23 +22,27 @@ export interface InteriorEncounterPrewarmSpec {
   nythraxisGraveVisuals?: boolean;
 }
 
-/** The staged sets a spec can build. Each is claimed once per session, not once
- *  per interior: the Ignivar raid reaches the same sets from several rooms, and
- *  programs are per GL context, so what one room linked every later room keeps. */
-export type EncounterPrewarmSet =
-  | 'soulRendPlayerClasses'
-  | 'soulRendVfxWeaponSkins'
-  | 'varkhulVisuals'
-  | 'ignivarVisuals'
-  | 'nythraxisGraveVisuals';
+/** The staged sets a spec can build: every flag but the live arm, which warms
+ *  per body. Each is claimed once per session, not once per interior: the
+ *  Ignivar raid reaches the same sets from several rooms, and programs are per
+ *  GL context, so what one room linked every later room keeps. */
+export type EncounterPrewarmSet = Exclude<
+  keyof InteriorEncounterPrewarmSpec,
+  'soulRendLivePlayerVisuals'
+>;
 
-export const ENCOUNTER_PREWARM_SETS: readonly EncounterPrewarmSet[] = [
-  'soulRendPlayerClasses',
-  'soulRendVfxWeaponSkins',
-  'varkhulVisuals',
-  'ignivarVisuals',
-  'nythraxisGraveVisuals',
-];
+// A Record, so a new spec flag fails to compile until it is listed here.
+const ENCOUNTER_PREWARM_SET_FLAGS: Record<EncounterPrewarmSet, true> = {
+  soulRendPlayerClasses: true,
+  soulRendVfxWeaponSkins: true,
+  varkhulVisuals: true,
+  ignivarVisuals: true,
+  nythraxisGraveVisuals: true,
+};
+
+export const ENCOUNTER_PREWARM_SETS = Object.keys(
+  ENCOUNTER_PREWARM_SET_FLAGS,
+) as readonly EncounterPrewarmSet[];
 
 export function unclaimedEncounterPrewarmSets(
   spec: InteriorEncounterPrewarmSpec,
@@ -52,14 +56,9 @@ export function encounterPrewarmSpecForSets(
   spec: InteriorEncounterPrewarmSpec,
   sets: readonly EncounterPrewarmSet[],
 ): InteriorEncounterPrewarmSpec {
-  return {
-    ...spec,
-    soulRendPlayerClasses: sets.includes('soulRendPlayerClasses'),
-    soulRendVfxWeaponSkins: sets.includes('soulRendVfxWeaponSkins'),
-    varkhulVisuals: sets.includes('varkhulVisuals'),
-    ignivarVisuals: sets.includes('ignivarVisuals'),
-    nythraxisGraveVisuals: sets.includes('nythraxisGraveVisuals'),
-  };
+  const narrowed = { ...spec };
+  for (const set of ENCOUNTER_PREWARM_SETS) narrowed[set] = sets.includes(set);
+  return narrowed;
 }
 
 export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarmSpec> = {

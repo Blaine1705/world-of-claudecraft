@@ -17,6 +17,8 @@ import {
 import { prewarmProgramContentKeys } from '../src/render/prewarm_policy';
 import { WEAPON_VFX } from '../src/render/weapon_vfx';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import { DUNGEONS } from '../src/sim/data';
+import { IGNIVAR_LIFT_ROOM_ID, IGNIVAR_RAID_ROOM_IDS } from '../src/sim/ignivar_raid_ids';
 import { ALL_CLASSES } from '../src/sim/types';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
@@ -100,6 +102,35 @@ describe('interior encounter prewarm spec', () => {
     }
     const nythraxis = INTERIOR_ENCOUNTER_PREWARM.nythraxis;
     expect(encounterPrewarmSpecForSets(nythraxis, []).soulRendLivePlayerVisuals).toBe(true);
+  });
+
+  it('keys every row by an interior some dungeon room declares, the lift first in the raid', () => {
+    const interiors = new Set<string>(Object.values(DUNGEONS).map((room) => room.interior));
+    const rows = Object.keys(INTERIOR_ENCOUNTER_PREWARM);
+    expect(rows.length).toBeGreaterThanOrEqual(5);
+    for (const row of rows) expect(interiors.has(row), row).toBe(true);
+    // The rows count on the raid entering through the lift, its quiet room.
+    expect(IGNIVAR_RAID_ROOM_IDS[0]).toBe(IGNIVAR_LIFT_ROOM_ID);
+    expect(DUNGEONS[IGNIVAR_LIFT_ROOM_ID].interior).toBe('ignivar_lift');
+    for (const room of IGNIVAR_RAID_ROOM_IDS) {
+      const interior = DUNGEONS[room].interior;
+      expect(interior && encounterPrewarmForInterior(interior), room).not.toBeNull();
+    }
+  });
+
+  it('claims every staged flag a row sets as a set, and nothing else', () => {
+    const staged = new Set<string>();
+    const flags = new Set<string>();
+    for (const spec of Object.values(INTERIOR_ENCOUNTER_PREWARM)) {
+      for (const [flag, on] of Object.entries(spec)) {
+        flags.add(flag);
+        if (on === true && flag !== 'soulRendLivePlayerVisuals') staged.add(flag);
+      }
+    }
+    expect([...staged].sort()).toEqual([...ENCOUNTER_PREWARM_SETS].sort());
+    expect([...flags].sort()).toEqual(
+      [...ENCOUNTER_PREWARM_SETS, 'soulRendLivePlayerVisuals'].sort(),
+    );
   });
 
   it('warms the Ignivar mechanic visuals in the Crucible arena, without the Varkhul set', () => {
