@@ -8,8 +8,10 @@ plan implements the bonuses only after this document is approved.
 A new, top tier of honor gear sold beside today's Warfare gear, which stays on sale as the
 cheaper entry tier:
 
-- **27 sets, one per spec:** 9 classes, 3 specs each, 7 armor pieces per set (helmet,
-  shoulder, chest, waist, legs, gloves, feet). 189 armor items.
+- **27 sets, one per spec:** 9 classes, 3 specs each, 5 armor pieces per set (helmet,
+  shoulder, chest, legs, gloves), the same five slots and the same 2-piece and 4-piece
+  thresholds as every raid set (owner decision). 135 armor items. Waist and feet stay
+  entry tier.
 - **Four season weapons:** a strength two-hander (the honor shop has none today), a
   strength one-hander, an agility one-hander and a caster staff.
 - **Jewelry** stays entry tier: at item level 35 it would out-stat the badge jewelry.
@@ -43,14 +45,17 @@ everywhere. These rules hold them together:
   - Caster pieces sit on the stamina floor, plus the caster premium share.
 - **Armor:** 0.9 of the mean armor of same-slot, same-armor-type item-level-35 raid epics.
 - **Tanks, measured:** a prototype probe (`tmp_season2/s2_tank_probe.ts`) stood each tank set
-  inside an instance and compared effective health against raid best-in-slot. Prot warrior
-  measured 0.74×, prot paladin 0.73×, and feral in bear form 0.93×.
+  inside an instance and compared effective health against raid best-in-slot.
+  - With the five Season 2 pieces plus entry-tier waist and feet (what an honor-geared
+    tank actually wears): prot warrior 0.74×, prot paladin 0.74×, feral in bear form 0.91×.
   - The feral figure is the reason the stamina share is 45 percent. At the entry tier's
-    58 percent it measured 1.01×.
+    58 percent a full honor kit measured 1.01×.
   - Phase 5 pins this as a guard.
-- **Mixed loadouts:** raid sets use only helmet, shoulder, chest, gloves and legs, so a raider
-  can wear their raid 4-piece plus a Season 2 2-piece on waist and feet. Therefore:
-  - every Season 2 **2-piece** is PvP utility with near-zero PvE throughput;
+- **Mixed loadouts:** Season 2 and raid sets share the same five slots, so a raid 4-piece
+  leaves one slot and cannot be paired with any Season 2 bonus. The only mix is a raid
+  2-piece plus a Season 2 2-piece. Therefore:
+  - every Season 2 **2-piece** is weaker in PvE than the same spec's raid 4-piece, so the
+    mix never beats the full raid set (the 2-pieces below are PvP utility, near zero in PvE);
   - every **4-piece** is sized below the same spec's raid 4-piece;
   - where a Season 2 bonus touches a number a raid bonus also bends, the two combine as the
     larger value, never added.
@@ -70,12 +75,10 @@ everywhere. These rules hold them together:
   | Helmet | 1,350 |
   | Shoulder | 1,050 |
   | Chest | 1,800 |
-  | Waist | 675 |
   | Legs | 1,575 |
   | Gloves | 825 |
-  | Feet | 825 |
 
-  A full set costs 8,100 Honor.
+  A full set costs 6,600 Honor.
 - **Weapons:** 1,800 Honor each.
 - **Where it is sold:** both honor quartermasters (FURY in Eastbrook Vale, Warmarshal Draven
   Kole in Highwatch). The shop gets a Season 2 group sectioned by class, then spec, plus a
@@ -91,11 +94,11 @@ everywhere. These rules hold them together:
    - The item model has no spec lock, so an off-spec wearer still gets the row.
    - **Recommendation: accept it.** The bonuses are PvP utility, the sets are class-locked,
      and a spec lock would be new item-model plumbing.
-2. **2-piece bonuses are PvP utility, not PvE throughput.** This is what keeps "raid 4-piece
-   plus a Season 2 2-piece on waist and feet" from being a PvE upgrade. If you want
-   throughput 2-pieces, the alternative is a rule that raid and Season 2 set pieces cannot be
-   worn together.
-3. **Names:** all 27 set names and 189 item names below are proposals. Rename freely.
+2. **2-piece bonuses are PvP utility, not PvE throughput.** With the raid slots shared, the
+   only mix is raid 2-piece plus Season 2 2-piece, so a 2-piece could carry some PvE value
+   as long as it stays below the raid 4-piece. The drafts keep them PvP utility; say if you
+   want some to carry PvE damage or healing instead.
+3. **Names:** all 27 set names and 135 item names below are proposals. Rename freely.
 
 ## To verify during implementation
 
@@ -124,9 +127,7 @@ Implementation routes:
 ## Warrior (mail)
 
 ### Arms (`arms`, signature Maiming Strike `mortal_strike`)
-- **Set:** Bladewake Battlegear. Bladewake Greathelm, Bladewake Pauldrons, Bladewake
-  Hauberk, Bladewake Waistplate, Bladewake Legplates, Bladewake Crushers (gloves),
-  Bladewake Treads (feet).
+- **Set:** Bladewake Battlegear. Bladewake Greathelm, Bladewake Pauldrons, Bladewake Hauberk, Bladewake Legplates, Bladewake Crushers (gloves).
 - **2pc:** "Maiming Strike reduces Onrush's remaining cooldown by 2 sec."
   Route: DATA, castNth refund `{ on: 'castNth', n: 1, abilities: ['mortal_strike'] }` to
   `{ kind: 'cooldownRefund', ability: 'charge', seconds: 2 }`. Onrush base 15 sec, MS
@@ -143,9 +144,7 @@ Implementation routes:
   what Redhand already provides.
 
 ### Fury (`fury`, signature Bloodletting `bloodthirst`)
-- **Set:** Bloodmarch Ragegear. Bloodmarch Visage, Bloodmarch Shoulderguards,
-  Bloodmarch Chainmail, Bloodmarch Belt, Bloodmarch Leggings, Bloodmarch Grips,
-  Bloodmarch Stompers.
+- **Set:** Bloodmarch Ragegear. Bloodmarch Visage, Bloodmarch Shoulderguards, Bloodmarch Chainmail, Bloodmarch Leggings, Bloodmarch Grips.
 - **2pc:** "Vaulting Charge's cooldown is reduced by 8 sec."
   Route: DATA, ability row `{ ability: 'heroic_leap', cooldownFlat: -8 }` (30 to 22 sec).
 - **4pc:** "Landing Vaulting Charge Enrages you."
@@ -162,8 +161,7 @@ Implementation routes:
   and nothing at all on top of Emberfury 4pc. Well under the raid 4pc.
 
 ### Protection (`prot`, signature Shieldcrack `shield_slam`)
-- **Set:** Ironmarch Bulwark. Ironmarch Helm, Ironmarch Spaulders, Ironmarch Chestguard,
-  Ironmarch Girdle, Ironmarch Legguards, Ironmarch Handguards, Ironmarch Sabatons.
+- **Set:** Ironmarch Bulwark. Ironmarch Helm, Ironmarch Spaulders, Ironmarch Chestguard, Ironmarch Legguards, Ironmarch Handguards.
 - **2pc:** "Faultline's cooldown is reduced by 5 sec."
   Route: DATA, ability row `{ ability: 'faultline', cooldownFlat: -5 }` (30 to 25 sec,
   3 sec frontal stun).
@@ -180,8 +178,7 @@ Implementation routes:
 ## Paladin (mail)
 
 ### Holy (`holy`, signature Mercy Lance `mercy_lance`)
-- **Set:** Sunvigil Regalia. Sunvigil Circlet, Sunvigil Mantle, Sunvigil Hauberk,
-  Sunvigil Cord, Sunvigil Legmail, Sunvigil Gloves, Sunvigil Boots.
+- **Set:** Sunvigil Regalia. Sunvigil Circlet, Sunvigil Mantle, Sunvigil Hauberk, Sunvigil Legmail, Sunvigil Gloves.
 - **2pc:** "Life Covenant's cooldown is reduced by 30 sec."
   Route: DATA, ability row `{ ability: 'life_covenant', cooldownFlat: -30 }` (90 to
   60 sec; 40 percent damage reduction for 6 sec on an ally).
@@ -200,8 +197,7 @@ Implementation routes:
   the raid 2pc's rider for nothing).
 
 ### Protection (`protection`, signature Sunward Disc `sunward_disc`)
-- **Set:** Shieldvow Bastion. Shieldvow Helm, Shieldvow Pauldrons, Shieldvow Breastplate,
-  Shieldvow Waistguard, Shieldvow Legplates, Shieldvow Gauntlets, Shieldvow Greaves.
+- **Set:** Shieldvow Bastion. Shieldvow Helm, Shieldvow Pauldrons, Shieldvow Breastplate, Shieldvow Legplates, Shieldvow Gauntlets.
 - **2pc:** "Oath Chain's cooldown is reduced by 4 sec."
   Route: DATA, ability row `{ ability: 'oath_chain', cooldownFlat: -4 }` (18 to 14 sec).
 - **4pc:** "Oath Chain also interrupts spellcasting, locking that school for 3 sec, and
@@ -220,8 +216,7 @@ Implementation routes:
   Oathpyre 2pc's rate.
 
 ### Retribution (`retribution`, signature Final Edict `final_edict`)
-- **Set:** Lightbrand Warplate. Lightbrand Crown, Lightbrand Spaulders, Lightbrand Cuirass,
-  Lightbrand Belt, Lightbrand Legguards, Lightbrand Gauntlets, Lightbrand Sollerets.
+- **Set:** Lightbrand Warplate. Lightbrand Crown, Lightbrand Spaulders, Lightbrand Cuirass, Lightbrand Legguards, Lightbrand Gauntlets.
 - **2pc:** "Valkyr's Calling's cooldown is reduced by 15 sec."
   Route: DATA, ability row `{ ability: 'valkyrs_calling', cooldownFlat: -15 }` (60 to
   45 sec; gap-closer with damage immunity in flight).
@@ -242,8 +237,7 @@ Implementation routes:
 ## Hunter (mail)
 
 ### Beast Mastery (`beast_mastery`, signature Howling Rage `bestial_wrath`)
-- **Set:** Packwarden Mail. Packwarden Coif, Packwarden Spaulders, Packwarden Hauberk,
-  Packwarden Belt, Packwarden Legguards, Packwarden Gauntlets, Packwarden Boots.
+- **Set:** Packwarden Mail. Packwarden Coif, Packwarden Spaulders, Packwarden Hauberk, Packwarden Legguards, Packwarden Gauntlets.
 - **2pc:** "Rattling Shot's cooldown is reduced by 4 sec."
   Route: DATA, ability row `{ ability: 'concussive_shot', cooldownFlat: -4 }` (12 to 8 sec;
   50 percent slow for 4 sec, so near-permanent kite pressure on one target).
@@ -258,8 +252,7 @@ Implementation routes:
   cadence gain (+25 percent) would approach the raid set.
 
 ### Marksmanship (`marksmanship`, signature Cold Focus `cold_focus`)
-- **Set:** Farsight Mail. Farsight Coif, Farsight Spaulders, Farsight Hauberk, Farsight
-  Belt, Farsight Legguards, Farsight Gauntlets, Farsight Boots.
+- **Set:** Farsight Mail. Farsight Coif, Farsight Spaulders, Farsight Hauberk, Farsight Legguards, Farsight Gauntlets.
 - **2pc:** "Trailbreak's cooldown is reduced by 4 sec."
   Route: DATA, ability row `{ ability: 'trailbreak', cooldownFlat: -4 }` (15 to 11 sec,
   12 yd backward leap).
@@ -276,8 +269,7 @@ Implementation routes:
   cooldown would lift the PvE value toward 5 percent.
 
 ### Survival (`survival`, signature Bloodhook `bloodhook`)
-- **Set:** Snaretooth Mail. Snaretooth Coif, Snaretooth Spaulders, Snaretooth Hauberk,
-  Snaretooth Belt, Snaretooth Legguards, Snaretooth Gauntlets, Snaretooth Boots.
+- **Set:** Snaretooth Mail. Snaretooth Coif, Snaretooth Spaulders, Snaretooth Hauberk, Snaretooth Legguards, Snaretooth Gauntlets.
 - **2pc:** "Bloodhook's cooldown is reduced by 3 sec."
   Route: DATA, ability row `{ ability: 'bloodhook', cooldownFlat: -3 }` (15 to 12 sec;
   Bloodhook is the spec's charge-in gap closer).
@@ -297,8 +289,7 @@ Implementation routes:
 ## Rogue (leather)
 
 ### Assassination (`assassination`, signature Killer's Calm `cold_blood`)
-- **Set:** Nightcut Leathers. Nightcut Hood, Nightcut Shoulderpads, Nightcut Tunic,
-  Nightcut Belt, Nightcut Breeches, Nightcut Gloves, Nightcut Boots.
+- **Set:** Nightcut Leathers. Nightcut Hood, Nightcut Shoulderpads, Nightcut Tunic, Nightcut Breeches, Nightcut Gloves.
 - **2pc:** "Low Blow's cooldown is reduced by 4 sec."
   Route: DATA, ability row `{ ability: 'kidney_shot', cooldownFlat: -4 }` (20 to 16 sec;
   finisher stun 1 sec plus 1 per combo point).
@@ -313,8 +304,7 @@ Implementation routes:
   after its energy and GCD cost. Far below Cinderfang 4pc.
 
 ### Combat (`combat`, signature Mirrored Blades `blade_flurry`)
-- **Set:** Brawlmark Leathers. Brawlmark Hood, Brawlmark Shoulderpads, Brawlmark Tunic,
-  Brawlmark Belt, Brawlmark Breeches, Brawlmark Gloves, Brawlmark Boots.
+- **Set:** Brawlmark Leathers. Brawlmark Hood, Brawlmark Shoulderpads, Brawlmark Tunic, Brawlmark Breeches, Brawlmark Gloves.
 - **2pc:** "Swift Heels' cooldown is reduced by 60 sec."
   Route: DATA, ability row `{ ability: 'sprint', cooldownFlat: -60 }` (300 to 240 sec;
   70 percent speed for 15 sec). The Gladiator-era rogue sprint bonus.
@@ -329,8 +319,7 @@ Implementation routes:
   DPS, and the 2pc is pure mobility. Far below both raid bonuses.
 
 ### Subtlety (`subtlety`, signature Red Ribbon `hemorrhage`)
-- **Set:** Shadewalk Leathers. Shadewalk Hood, Shadewalk Shoulderpads, Shadewalk Tunic,
-  Shadewalk Belt, Shadewalk Breeches, Shadewalk Gloves, Shadewalk Boots.
+- **Set:** Shadewalk Leathers. Shadewalk Hood, Shadewalk Shoulderpads, Shadewalk Tunic, Shadewalk Breeches, Shadewalk Gloves.
 - **2pc:** "Smokefade's cooldown is reduced by 60 sec."
   Route: DATA, ability row `{ ability: 'vanish', cooldownFlat: -60 }` (300 to 240 sec).
 - **4pc:** "Smokefade no longer slows your movement, and a Gut Punch from Smokefade
@@ -349,8 +338,7 @@ Implementation routes:
 ## Priest (cloth)
 
 ### Discipline (`discipline`, signature Scouring Mercy `scouring_mercy`)
-- **Set:** Veilpsalm Raiment. Veilpsalm Cowl, Veilpsalm Mantle, Veilpsalm Robe,
-  Veilpsalm Sash, Veilpsalm Leggings, Veilpsalm Handwraps, Veilpsalm Slippers.
+- **Set:** Veilpsalm Raiment. Veilpsalm Cowl, Veilpsalm Mantle, Veilpsalm Robe, Veilpsalm Leggings, Veilpsalm Handwraps.
 - **2pc:** "Terror Canticle's cooldown is reduced by 6 sec."
   Route: DATA, ability row `{ ability: 'psychic_scream', cooldownFlat: -6 }` (30 to 24 sec).
 - **4pc:** "When your Psalm of Warding is fully consumed, Terror Canticle's remaining
@@ -364,8 +352,7 @@ Implementation routes:
   does nothing on bosses, so Season 2 contributes zero PvE healing or damage.
 
 ### Holy (`holy`, signature Seraphic Vigil `seraphic_vigil`)
-- **Set:** Gracewing Raiment. Gracewing Cowl, Gracewing Mantle, Gracewing Robe,
-  Gracewing Sash, Gracewing Leggings, Gracewing Handwraps, Gracewing Slippers.
+- **Set:** Gracewing Raiment. Gracewing Cowl, Gracewing Mantle, Gracewing Robe, Gracewing Leggings, Gracewing Handwraps.
 - **2pc:** "Veilstep's cooldown is reduced by 6 sec."
   Route: DATA, ability row `{ ability: 'veilstep', cooldownFlat: -6 }` (18 to 12 sec;
   10 yd forward step).
@@ -379,8 +366,7 @@ Implementation routes:
   cooldown: that would stack on the Benison 4pc's per-trigger HoT in a mixed loadout.
 
 ### Shadow (`shadow`, signature Call Tithefiend `summon_tithefiend`)
-- **Set:** Duskhymn Regalia. Duskhymn Cowl, Duskhymn Mantle, Duskhymn Robe, Duskhymn
-  Sash, Duskhymn Leggings, Duskhymn Handwraps, Duskhymn Slippers.
+- **Set:** Duskhymn Regalia. Duskhymn Cowl, Duskhymn Mantle, Duskhymn Robe, Duskhymn Leggings, Duskhymn Handwraps.
 - **2pc:** "Litany of Woe also slows the target's movement by 30 percent while you
   channel it."
   Route: preferred DATA, ability row `{ ability: 'mind_flay', addEffects: [{ type: 'slow',
@@ -405,9 +391,7 @@ Implementation routes:
 
 ### Elemental (`elemental`, Thundercall, dps)
 **Set:** Tempestwrit Battlemail
-**Items:** Tempestwrit Coif (helmet), Tempestwrit Pauldrons (shoulder), Tempestwrit
-Hauberk (chest), Tempestwrit Cinch (waist), Tempestwrit Legmail (legs), Tempestwrit
-Gauntlets (gloves), Tempestwrit Sabatons (feet)
+**Items:** Tempestwrit Coif (helmet), Tempestwrit Pauldrons (shoulder), Tempestwrit Hauberk (chest), Tempestwrit Legmail (legs), Tempestwrit Gauntlets (gloves)
 
 - **2pc:** "Unleash Weapon's cooldown is reduced by 3 sec." (`unleash_weapon`, 15 to 12 sec)
   - Route: DATA. `{ ability: 'unleash_weapon', cooldownFlat: -3 }`.
@@ -423,8 +407,7 @@ Gauntlets (gloves), Tempestwrit Sabatons (feet)
 
 ### Enhancement (`enhancement`, Warspirit, melee dps)
 **Set:** Galeborn Warmail
-**Items:** Galeborn Helm, Galeborn Spaulders, Galeborn Chainmail, Galeborn Belt,
-Galeborn Legguards, Galeborn Grips, Galeborn Treads
+**Items:** Galeborn Helm, Galeborn Spaulders, Galeborn Chainmail, Galeborn Legguards, Galeborn Grips
 
 - **2pc:** "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec." (`stormstrike`, 12 sec cooldown)
   - Route: DATA. `{ ability: 'stormstrike', addEffects: [{ type: 'slow', mult: 0.7, duration: 4 }] }` (Radiant Shackles precedent).
@@ -440,8 +423,7 @@ Galeborn Legguards, Galeborn Grips, Galeborn Treads
 
 ### Restoration (`restoration`, Spiritcall, healer)
 **Set:** Brineward Chainmail
-**Items:** Brineward Circlet, Brineward Mantle, Brineward Hauberk, Brineward Waistguard,
-Brineward Kilt, Brineward Handwraps, Brineward Boots
+**Items:** Brineward Circlet, Brineward Mantle, Brineward Hauberk, Brineward Kilt, Brineward Handwraps
 
 - **2pc:** "Mending Waters' cast time is reduced by 0.2 sec." (`healing_wave`, 1.5 to 1.3 sec)
   - Route: DATA. `{ ability: 'healing_wave', castPct: -0.1333 }` (resolves 1.3 sec; round in tooltip from the resolved def).
@@ -462,8 +444,7 @@ Brineward Kilt, Brineward Handwraps, Brineward Boots
 
 ### Arcane (`arcane`, Chronomancy, HEALER)
 **Set:** Hourbinder's Vestments
-**Items:** Hourbinder's Hood, Hourbinder's Amice, Hourbinder's Robe, Hourbinder's Sash,
-Hourbinder's Trousers, Hourbinder's Gloves, Hourbinder's Slippers
+**Items:** Hourbinder's Hood, Hourbinder's Amice, Hourbinder's Robe, Hourbinder's Trousers, Hourbinder's Gloves
 
 - **2pc:** "Temporal Barrier's cooldown is reduced by 2 sec." (`temporal_barrier`, absorb for 10 sec, 12 to 10 sec)
   - Route: DATA. `{ ability: 'temporal_barrier', cooldownFlat: -2 }`.
@@ -481,8 +462,7 @@ Hourbinder's Trousers, Hourbinder's Gloves, Hourbinder's Slippers
 
 ### Fire (`fire`, Pyromancy, dps)
 **Set:** Emberlash Regalia
-**Items:** Emberlash Cowl, Emberlash Mantle, Emberlash Robes, Emberlash Cord,
-Emberlash Leggings, Emberlash Gloves, Emberlash Sandals
+**Items:** Emberlash Cowl, Emberlash Mantle, Emberlash Robes, Emberlash Leggings, Emberlash Gloves
 
 - **2pc:** "Cinderfall recharges 3 sec faster." (`fire_blast`, 3 charges, 30 to 27 sec recharge)
   - Route: DATA. `{ ability: 'fire_blast', cooldownFlat: -3 }` (confirm the charge recharge reads the resolved cooldown, as Ruincaller's bonusCharges path does).
@@ -497,8 +477,7 @@ Emberlash Leggings, Emberlash Gloves, Emberlash Sandals
 
 ### Frost (`frost`, Cryomancy, dps)
 **Set:** Rimewarden Garb
-**Items:** Rimewarden Hood, Rimewarden Shoulderpads, Rimewarden Vestment, Rimewarden
-Belt, Rimewarden Legwraps, Rimewarden Mitts, Rimewarden Footwraps
+**Items:** Rimewarden Hood, Rimewarden Shoulderpads, Rimewarden Vestment, Rimewarden Legwraps, Rimewarden Mitts
 
 - **2pc:** "Icebind's cooldown is reduced by 2 sec." (`frost_nova`, 8 sec root, 22 to 20 sec)
   - Route: DATA. `{ ability: 'frost_nova', cooldownFlat: -2 }` (the Gladiator-era Frost Nova shape).
@@ -516,8 +495,7 @@ Belt, Rimewarden Legwraps, Rimewarden Mitts, Rimewarden Footwraps
 
 ### Affliction (`affliction`, Hexcraft, dps)
 **Set:** Dreadquill Vestments
-**Items:** Dreadquill Hood, Dreadquill Mantle, Dreadquill Robe, Dreadquill Sash,
-Dreadquill Leggings, Dreadquill Handwraps, Dreadquill Slippers
+**Items:** Dreadquill Hood, Dreadquill Mantle, Dreadquill Robe, Dreadquill Leggings, Dreadquill Handwraps
 
 - **2pc:** "Harrow's cast time is reduced by 0.3 sec." (`fear`, 5 sec incapacitate, 1.5 to 1.2 sec cast)
   - Route: DATA. `{ ability: 'fear', castPct: -0.2 }`.
@@ -531,8 +509,7 @@ Dreadquill Leggings, Dreadquill Handwraps, Dreadquill Slippers
 
 ### Demonology (`demonology`, Necromancy, dps)
 **Set:** Marrowbound Regalia
-**Items:** Marrowbound Cowl, Marrowbound Spaulders, Marrowbound Robe, Marrowbound
-Girdle, Marrowbound Leggings, Marrowbound Grips, Marrowbound Boots
+**Items:** Marrowbound Cowl, Marrowbound Spaulders, Marrowbound Robe, Marrowbound Leggings, Marrowbound Grips
 
 - **2pc:** "Bone Armor's cooldown is reduced by 10 sec." (`bone_armor`, absorb 20 percent of max health for 12 sec, 45 to 35 sec)
   - Route: DATA. `{ ability: 'bone_armor', cooldownFlat: -10 }`.
@@ -545,8 +522,7 @@ Girdle, Marrowbound Leggings, Marrowbound Grips, Marrowbound Boots
 
 ### Destruction (`destruction`, Ruination, dps)
 **Set:** Slagcrown Vestments
-**Items:** Slagcrown Hood, Slagcrown Mantle, Slagcrown Robes, Slagcrown Cord,
-Slagcrown Leggings, Slagcrown Gloves, Slagcrown Sandals
+**Items:** Slagcrown Hood, Slagcrown Mantle, Slagcrown Robes, Slagcrown Leggings, Slagcrown Gloves
 
 - **2pc:** "Cinderhide's cooldown is reduced by 30 sec." (`cinderhide`, 25 percent damage reduction for 10 sec, 120 to 90 sec)
   - Route: DATA. `{ ability: 'cinderhide', cooldownFlat: -30 }`.
@@ -567,8 +543,7 @@ Slagcrown Leggings, Slagcrown Gloves, Slagcrown Sandals
 
 ### Balance (`balance`, Moongrove, dps)
 **Set:** Starwarden Raiment
-**Items:** Starwarden Headdress, Starwarden Spaulders, Starwarden Vest, Starwarden Belt,
-Starwarden Breeches, Starwarden Gloves, Starwarden Boots
+**Items:** Starwarden Headdress, Starwarden Spaulders, Starwarden Vest, Starwarden Breeches, Starwarden Gloves
 
 - **2pc:** "Gripping Roots' cast time is reduced by 0.5 sec." (`entangling_roots`, 12 sec root, 1.5 to 1.0 sec cast)
   - Route: DATA. `{ ability: 'entangling_roots', castPct: -0.3333 }`.
@@ -581,8 +556,7 @@ Starwarden Breeches, Starwarden Gloves, Starwarden Boots
 
 ### Feral (`feral`, Wildfang, TANK; also plays Cat)
 **Set:** Bloodmane Hide
-**Items:** Bloodmane Helm, Bloodmane Shoulderpads, Bloodmane Tunic, Bloodmane Belt,
-Bloodmane Legguards, Bloodmane Grips, Bloodmane Boots
+**Items:** Bloodmane Helm, Bloodmane Shoulderpads, Bloodmane Tunic, Bloodmane Legguards, Bloodmane Grips
 
 - **2pc:** "Bruin Rush's cooldown is reduced by 3 sec." (`bear_charge`, charge plus 1 sec stun, 15 to 12 sec)
   - Route: DATA. `{ ability: 'bear_charge', cooldownFlat: -3 }`.
@@ -597,8 +571,7 @@ Bloodmane Legguards, Bloodmane Grips, Bloodmane Boots
 
 ### Restoration (`restoration`, Groveheart, healer)
 **Set:** Thistlebloom Vestment
-**Items:** Thistlebloom Crown, Thistlebloom Mantle, Thistlebloom Vest, Thistlebloom
-Sash, Thistlebloom Leggings, Thistlebloom Gloves, Thistlebloom Treads
+**Items:** Thistlebloom Crown, Thistlebloom Mantle, Thistlebloom Vest, Thistlebloom Leggings, Thistlebloom Gloves
 
 - **2pc:** "Fleetmend's cooldown is reduced by 1 sec." (`swiftmend`, 8 to 7 sec)
   - Route: DATA. `{ ability: 'swiftmend', cooldownFlat: -1 }`.
