@@ -572,7 +572,11 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   Warm nothing whose cost you have not measured: Brother Aldric was in this
   spec until an A/B from a start zone that had never compiled his model showed
   his spawn linking ZERO programs (the player bodies on screen already carry
-  them). The claim is per staged SET, not per interior
+  them). Varkhul's rig is the measured opposite (the harvest caught its body
+  programs linking live at the pull), so the Varkhul set stages it first,
+  through the live view's own factory, beside a held Forgestorm warning twin
+  (each storm disposes its warnings, and three drops a program with its last
+  material). The claim is per staged SET, not per interior
   (`unclaimedEncounterPrewarmSets`): the Ignivar raid's sets start in the
   Forge-Lift, its first and quietest room, and every later raid room finds them
   claimed, so each set is built once per session.

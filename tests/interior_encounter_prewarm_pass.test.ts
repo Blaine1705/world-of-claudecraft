@@ -5,12 +5,61 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { activateGfxProfile, GFX, getActiveGfxProfile } from '../src/render/gfx';
 import type { LiveSoulRendLook } from '../src/render/interior_encounter_prewarm';
 import {
   queueLiveSoulRendPrewarm,
   setEncounterPrewarmInterior,
   startInteriorEncounterPrewarm,
 } from '../src/render/interior_encounter_prewarm_pass';
+import { MOBS } from '../src/sim/data';
+import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
+
+// The real factory needs resident GLBs, which Node never has (it returns null
+// there, fail-soft). A test that asks for rigs swaps in named stand-ins so
+// what the pass builds, in which order, and whether it ever disposes one can
+// be read; every other test keeps the real factory.
+const rigs = vi.hoisted(() => ({
+  fake: false,
+  built: [] as Array<{
+    kind: string;
+    templateId: string;
+    color: number;
+    scale: number;
+    disposed: number;
+    root: unknown;
+  }>,
+}));
+vi.mock('../src/render/characters', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/render/characters')>();
+  return {
+    ...actual,
+    createCharacterVisual: (...args: Parameters<typeof actual.createCharacterVisual>) => {
+      if (!rigs.fake) return actual.createCharacterVisual(...args);
+      const [entity] = args;
+      const root = new THREE.Group();
+      root.name = `rig:${entity.kind}:${entity.templateId}`;
+      root.add(new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial()));
+      const record = {
+        kind: entity.kind,
+        templateId: entity.templateId,
+        color: entity.color,
+        scale: entity.scale,
+        disposed: 0,
+        root,
+      };
+      rigs.built.push(record);
+      return {
+        root,
+        setSoulRend: () => {},
+        setWeaponSkin: () => [{}],
+        dispose: () => {
+          record.disposed++;
+        },
+      };
+    },
+  };
+});
 
 type Slot = { source: THREE.Mesh; overlay: THREE.Material };
 
@@ -117,6 +166,7 @@ const drain = async (): Promise<void> => {
 // One root per staged unit of the Varkhul and Ignivar sets, as each builder names it.
 const RAID_SET_ROOTS = [
   'varkhul-encounter-prewarm-entity',
+  'varkhul-forgestorm-prewarm',
   'varkhul-forge-beam-prewarm',
   'varkhul-tempering-ray-prewarm',
   'varkhul-forge-portal-prewarm',
@@ -165,6 +215,8 @@ describe('interior encounter prewarm pass (driven)', () => {
   afterEach(() => {
     restoreIdle();
     vi.restoreAllMocks();
+    rigs.fake = false;
+    rigs.built.length = 0;
   });
 
   it('records the attached interior itself, before its host would report one', async () => {
@@ -232,6 +284,86 @@ describe('interior encounter prewarm pass (driven)', () => {
     startInteriorEncounterPrewarm('ignivar_depths', host);
     await drain();
     expect(host.compiled).toHaveLength(afterFirst);
+  });
+
+  it('stages the Forgestorm warning twin with the Varkhul set, held past its compile', async () => {
+    // Each storm disposes its warnings when they end; only a held twin keeps
+    // their programs linked for the next storm.
+    const host = fakeHost();
+    const roots: THREE.Object3D[] = [];
+    const compile = host.compilePrewarmColorPrograms;
+    host.compilePrewarmColorPrograms = async (root: THREE.Object3D) => {
+      roots.push(root);
+      return compile(root);
+    };
+    startInteriorEncounterPrewarm('ignivar_depths', host);
+    await drain();
+    const twin = roots.find((root) => root.name === 'varkhul-forgestorm-prewarm');
+    expect(twin).toBeDefined();
+    const parts = ['rim', 'fill', 'countdown', 'meteor', 'meteor-trail'].map((part) =>
+      twin?.getObjectByName(`varkhul-forgestorm-${part}`),
+    );
+    for (const part of parts) expect(part?.visible).toBe(true);
+    let disposed = 0;
+    for (const part of parts) {
+      ((part as THREE.Mesh).material as THREE.Material).addEventListener('dispose', () => {
+        disposed++;
+      });
+    }
+    startInteriorEncounterPrewarm('ignivar_lift', host);
+    await drain();
+    expect(disposed).toBe(0);
+    expect(twin?.parent).toBeNull();
+  });
+
+  it("stages Varkhul's rig first, through the live view's factory, and never disposes it", async () => {
+    rigs.fake = true;
+    const host = fakeHost();
+    host.prewarmEntity = ((kind: string, templateId: string, color: number, scale: number) => ({
+      kind,
+      templateId,
+      color,
+      scale,
+    })) as unknown as typeof host.prewarmEntity;
+    startInteriorEncounterPrewarm('ignivar_lift', host);
+    await drain();
+
+    const template = MOBS[VARKHUL_BOSS_ID];
+    expect(rigs.built).toHaveLength(1);
+    expect(rigs.built[0]).toMatchObject({
+      kind: 'mob',
+      templateId: VARKHUL_BOSS_ID,
+      color: template.color,
+      scale: template.scale,
+    });
+    // First unit of the set, so first child of the group: compiled first.
+    expect(host.compiled[0]).toBe(`rig:mob:${VARKHUL_BOSS_ID}`);
+    const rig = rigs.built[0].root as THREE.Object3D;
+    expect(rig.parent).toBeNull();
+    expect(rig.visible).toBe(false);
+
+    for (const interior of ['ignivar_approach', 'ignivar', 'ignivar_depths']) {
+      startInteriorEncounterPrewarm(interior, host);
+      await drain();
+    }
+    expect(rigs.built).toHaveLength(1);
+    expect(rigs.built[0].disposed).toBe(0);
+  });
+
+  it("skips Varkhul's rig on a constrained device and keeps the rest of the set", async () => {
+    rigs.fake = true;
+    const was = getActiveGfxProfile();
+    activateGfxProfile({ ...was, settings: { ...was.settings, constrainedMemory: true } });
+    try {
+      expect(GFX.constrainedMemory).toBe(true);
+      const host = fakeHost();
+      startInteriorEncounterPrewarm('ignivar_lift', host);
+      await drain();
+      expect(rigs.built).toEqual([]);
+      for (const name of RAID_SET_ROOTS) expect(host.compiled).toContain(name);
+    } finally {
+      activateGfxProfile(was);
+    }
   });
 
   it('compiles and retains the Ignivar mechanic visuals beside the Varkhul set', async () => {

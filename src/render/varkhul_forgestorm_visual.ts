@@ -10,7 +10,11 @@ import type {
   ActiveVarkhulCinderFire,
   ActiveVarkhulCinderOrbProjectile,
 } from '../sim/varkhul_cinder_orbs';
-import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
+import {
+  type ActiveVarkhulForgestormWarning,
+  VARKHUL_FORGESTORM_RADIUS,
+  VARKHUL_FORGESTORM_WARNING_SECONDS,
+} from '../sim/varkhul_forgestorm';
 import {
   type VarkhulAssemblyViewerFocus,
   varkhulAssemblyViewerFocusInto,
@@ -148,6 +152,31 @@ export function buildVarkhulForgestormTelegraph(
   group.userData.meteor = meteor;
   group.userData.trailMaterial = trailMaterial;
   group.userData.trail = trail;
+  return group;
+}
+
+/** One warning built by the live builder, every part drawn, held by the
+ *  encounter prewarm: each storm's warnings are disposed when they end, and
+ *  three drops a program with its last material, so without a held twin every
+ *  storm would link its warning programs again. */
+export function buildVarkhulForgestormPrewarmVisual(): THREE.Group {
+  const group = buildVarkhulForgestormTelegraph(
+    {
+      id: 'varkhul-forgestorm-prewarm',
+      sourceId: 0,
+      x: 0,
+      z: 0,
+      radius: VARKHUL_FORGESTORM_RADIUS,
+      duration: VARKHUL_FORGESTORM_WARNING_SECONDS,
+      remaining: VARKHUL_FORGESTORM_WARNING_SECONDS,
+      warningLead: 0,
+    },
+    0,
+  );
+  group.name = 'varkhul-forgestorm-prewarm';
+  group.traverse((child) => {
+    child.visible = true;
+  });
   return group;
 }
 

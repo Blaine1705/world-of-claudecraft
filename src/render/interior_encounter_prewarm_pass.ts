@@ -3,7 +3,8 @@
 // dispose because three drops a program when its last material is disposed.
 import * as THREE from 'three';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
-import { CLASSES } from '../sim/data';
+import { CLASSES, MOBS } from '../sim/data';
+import { VARKHUL_BOSS_ID } from '../sim/ignivar_raid_ids';
 import { ALL_CLASSES, type PlayerClass } from '../sim/types';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { type CharacterVisual, createCharacterVisual } from './characters';
@@ -37,6 +38,7 @@ import { setRenderCategory } from './renderer_diagnostics';
 import { buildVarkhulAssemblyPrewarmVisual } from './varkhul_assembly_visual';
 import { buildVarkhulEncounterPrewarmVisual } from './varkhul_encounter';
 import { buildVarkhulForgeBeamPrewarmVisual } from './varkhul_forge_beam_visual';
+import { buildVarkhulForgestormPrewarmVisual } from './varkhul_forgestorm_visual';
 import { buildVarkhulInterceptBeamPrewarmVisual } from './varkhul_intercept_beam_visual';
 import { buildVarkhulWorldfirePrewarmVisual } from './varkhul_worldfire_visual';
 import { WEAPON_VFX } from './weapon_vfx';
@@ -217,6 +219,23 @@ async function runInteriorEncounterPrewarm(
     place(visual);
   };
 
+  // Varkhul stands in the Inner Crucible before the pull and his view draws on
+  // the frame it is built, so its programs link there unless a twin linked
+  // them earlier (the harvest caught two body programs linking live). Same
+  // factory and entity shape as the live view, so the same visual key and
+  // program keys. Constrained devices skip it: the rig is held for the session
+  // and creature bodies stream there, so it may not even be resident.
+  const buildVarkhulRig = (): void => {
+    if (GFX.constrainedMemory) return;
+    const template = MOBS[VARKHUL_BOSS_ID];
+    if (!template) return;
+    const entity = host.prewarmEntity('mob', template.id, template.color, template.scale);
+    const visual = createCharacterVisual(entity);
+    if (!visual) return;
+    keepAlive.push(visual);
+    place(visual);
+  };
+
   // Each catalog rig is a skinned clone plus a full material clone pass, a few
   // ms of pure CPU. Built in one loop the whole catalog lands on the frame that
   // attaches the interior (measured: a >150ms stall at arena entry), so the
@@ -226,20 +245,31 @@ async function runInteriorEncounterPrewarm(
     ...plan.weaponSkinIds.map((skinId) => () => buildWeaponSkin(skinId)),
     ...(spec.varkhulVisuals
       ? [
+          buildVarkhulRig,
           () => {
             const encounter = buildVarkhulEncounterPrewarmVisual();
+            const forgestorm = buildVarkhulForgestormPrewarmVisual();
             const forgeBeams = buildVarkhulForgeBeamPrewarmVisual();
             const interceptBeam = buildVarkhulInterceptBeamPrewarmVisual();
             const forgePortals = buildVarkhulForgePortalPrewarmVisual();
             const worldfire = buildVarkhulWorldfirePrewarmVisual();
             encounter.position.set(-12, 0, 0);
+            forgestorm.position.set(-12, 0, 12);
             forgeBeams.position.set(12, 0, 0);
             interceptBeam.position.set(0, 0, 12);
             forgePortals.root.position.set(0, 0, 12);
             worldfire.position.set(0, 0, -12);
-            group.add(encounter, forgeBeams, interceptBeam, forgePortals.root, worldfire);
+            group.add(
+              encounter,
+              forgestorm,
+              forgeBeams,
+              interceptBeam,
+              forgePortals.root,
+              worldfire,
+            );
             varkhulKeepAlive.push(
               encounter,
+              forgestorm,
               forgeBeams,
               interceptBeam,
               forgePortals.root,
