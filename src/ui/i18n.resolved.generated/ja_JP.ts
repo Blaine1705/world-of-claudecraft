@@ -333,17 +333,17 @@ export const ja_JP: EnTranslations = {
   "hudChrome": {
     "framePresets": {
       "apply": "適用",
+      "pickerLabel": "フレームプリセット：{name}",
+      "overwrite": "プリセットを上書き",
+      "overwriteBody": "保存済みプリセット「{name}」を現在のレイアウトで上書きしますか？",
       "current": "現在のレイアウト",
       "new": "新規プリセット",
       "empty": "保存済みプリセットはありません",
-      "saveCurrent": "現在のプリセットを保存",
       "deleteNamed": "{name} を削除",
       "deleteBody": "フレームプリセット「{name}」を削除しますか？",
       "title": "フレームプリセット",
       "name": "プリセット名",
       "slot": "プリセット {slot}",
-      "save": "保存",
-      "load": "読み込んで再読み込み",
       "remove": "削除",
       "saved": "完了。",
       "failed": "プリセットを保存または読み込めませんでした。"
@@ -370,12 +370,8 @@ export const ja_JP: EnTranslations = {
       "frame1": "フォーカス 1",
       "frame2": "フォーカス 2",
       "frame3": "フォーカス 3",
-      "hint": "対象フレームをクリックするか {key} を押すと、このフォーカスを選択します。",
-      "clickHint": "対象フレームをクリックすると、このフォーカスを選択します。",
-      "title": "フォーカスターゲット",
       "assign": "フォーカス {slot} を設定",
-      "target": "フォーカス {slot} を選択",
-      "clear": "フォーカス {slot} を解除"
+      "target": "フォーカス {slot} を選択"
     },
     "professionTrainers": {
       "blacksmithing": "鍛冶のトレーナー",

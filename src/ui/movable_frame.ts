@@ -116,6 +116,10 @@ export interface MovableFrameConfig {
   moveHandle?: string;
   resizeWhileLocked?: boolean;
   globalLockOnly?: boolean;
+  /** Only frames whose startup footprint settles later need observation. */
+  observeSizeChanges?: boolean;
+  /** Keep legacy size fields durable until the owner migrates them to settings. */
+  preserveSavedSize?: boolean;
 }
 
 /** One settings-backed axis for resizeMode 'dimensions'. `factor` converts one
@@ -290,35 +294,42 @@ export class MovableFrame {
   }
   /** Bottom edge (visual px) at the last applyPos, for reanchorBottom(). */
   private lastBottom: number | null = null;
-  private readonly btn: HTMLButtonElement;
+  private readonly btn: HTMLButtonElement | null;
   private grip: HTMLButtonElement | null = null;
   private label: HTMLElement | null = null;
 
   private readonly originalTabIndex: string | null;
+  private readonly originalAriaLabel: string | null;
+  private readonly originalRole: string | null;
 
   constructor(private readonly cfg: MovableFrameConfig) {
     this.originalTabIndex = cfg.frame.getAttribute('tabindex');
+    this.originalAriaLabel = cfg.frame.getAttribute('aria-label');
+    this.originalRole = cfg.frame.getAttribute('role');
     cfg.frame.classList.toggle('mf-always-interactive', !!cfg.moveHandle);
     cfg.frame.classList.toggle('mf-always-resizable', !!cfg.resizeWhileLocked);
     // The corner toggle. Built here (like the chat resize grip) so index.html
     // stays untouched; its glyph + position are styled in hud.css.
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'tf-move-btn';
-    btn.setAttribute('aria-pressed', 'false');
-    btn.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
-    if (!cfg.globalLockOnly) cfg.frame.appendChild(btn);
-    else
+    this.btn = null;
+    if (cfg.globalLockOnly) {
       cfg.frame.addEventListener('keydown', (ev) => {
         if (ev.target === cfg.frame) this.onKeyMove(ev);
       });
-    this.btn = btn;
-    btn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      this.setUnlocked(!this.unlocked);
-    });
-    btn.addEventListener('keydown', (ev) => this.onKeyMove(ev));
+    } else {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tf-move-btn';
+      btn.setAttribute('aria-pressed', 'false');
+      btn.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
+      cfg.frame.appendChild(btn);
+      this.btn = btn;
+      btn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        this.setUnlocked(!this.unlocked);
+      });
+      btn.addEventListener('keydown', (ev) => this.onKeyMove(ev));
+    }
 
     // The SE-corner grip, built here like the button (and like the chat box's own
     // grip) so index.html stays untouched. CSS keeps it out of the way while the
@@ -412,7 +423,7 @@ export class MovableFrame {
       const stripped = adopted !== parsedSaved;
       this.applyPos();
       // Upgrade the durable intent, never the temporary startup clamp.
-      if ((legacy || stripped) && adopted) {
+      if ((legacy || stripped) && adopted && !(cfg.preserveSavedSize && stripped)) {
         try {
           localStorage.setItem(
             cfg.storageKey,
@@ -433,7 +444,7 @@ export class MovableFrame {
 
     // Party rows, orientation and saved dimensions can settle after construction.
     // Re-clamp from durable intent when the actual footprint becomes available.
-    if (typeof ResizeObserver !== 'undefined') {
+    if (cfg.observeSizeChanges && typeof ResizeObserver !== 'undefined') {
       this.sizeObserver = new ResizeObserver(() => this.rederiveFromSaved());
       this.sizeObserver.observe(cfg.frame);
     }
@@ -650,19 +661,29 @@ export class MovableFrame {
   // frame is unlocked; the frame gets a class so the cursor + drag affordance show.
   private refreshChrome(): void {
     const label = this.unlocked ? t(this.cfg.lockLabelKey) : t(this.cfg.unlockLabelKey);
-    this.btn.setAttribute('aria-pressed', this.unlocked ? 'true' : 'false');
-    this.btn.setAttribute('aria-label', label);
-    this.btn.title = label;
-    this.btn.classList.toggle('active', this.unlocked);
-    // A frame driven only by the global toggle keeps no permanent chrome: its
-    // button is hidden (and taken out of the tab order) until the interface is
-    // unlocked, so the stock HUD looks exactly as it did.
-    if (this.cfg.buttonOnlyWhenUnlocked) {
-      this.btn.classList.toggle('tf-move-btn-hidden', !this.unlocked);
-      this.btn.hidden = !this.unlocked;
+    if (this.btn) {
+      this.btn.setAttribute('aria-pressed', this.unlocked ? 'true' : 'false');
+      this.btn.setAttribute('aria-label', label);
+      this.btn.title = label;
+      this.btn.classList.toggle('active', this.unlocked);
+      // A frame driven only by the global toggle keeps no permanent chrome: its
+      // button is hidden (and taken out of the tab order) until the interface is
+      // unlocked, so the stock HUD looks exactly as it did.
+      if (this.cfg.buttonOnlyWhenUnlocked) {
+        this.btn.classList.toggle('tf-move-btn-hidden', !this.unlocked);
+        this.btn.hidden = !this.unlocked;
+      }
     }
     this.cfg.frame.classList.toggle('tf-unlocked', this.unlocked);
     if (this.cfg.globalLockOnly) {
+      const frameName = this.frameLabelKey();
+      if (this.originalRole === null && ['DIV', 'SPAN'].includes(this.cfg.frame.tagName)) {
+        if (this.unlocked) this.cfg.frame.setAttribute('role', 'group');
+        else this.cfg.frame.removeAttribute('role');
+      }
+      if (this.unlocked && frameName) this.cfg.frame.setAttribute('aria-label', t(frameName));
+      else if (this.originalAriaLabel === null) this.cfg.frame.removeAttribute('aria-label');
+      else this.cfg.frame.setAttribute('aria-label', this.originalAriaLabel);
       if (this.unlocked) this.cfg.frame.tabIndex = 0;
       else if (this.originalTabIndex === null) this.cfg.frame.removeAttribute('tabindex');
       else this.cfg.frame.setAttribute('tabindex', this.originalTabIndex);

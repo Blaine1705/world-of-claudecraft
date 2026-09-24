@@ -589,7 +589,7 @@ import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
 import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
 import { WocTradeController } from './hud/woc_trade';
 import { HudFrameGroups, refreshHudFrameGroupLabels } from './hud_frame_groups';
-import { registerHudFrames } from './hud_frame_registry';
+import { partyFrameGrid, registerHudFrames } from './hud_frame_registry';
 import { healthTextMode, unitFrameCurrentMaxText, unitFrameHealthText } from './hud_frames';
 import { BG_END_LOG_COLORS, CHROME_TONE, HUD_LOG, MAP_TONE } from './hud_tones';
 import { availableMobVoiceCue, sfxHasCue, yellVoiceKey } from './hud_voice_cues';
@@ -3832,6 +3832,7 @@ export class Hud {
       this.bindMobileFrameLongPress(this.petFrameEl, openPet);
     }
     this.partyFrameMover = new MovableFrame({
+      observeSizeChanges: true,
       globalLockOnly: true,
       frame: this.partyFramesEl,
       storageKey: PARTY_FRAME_POS_KEY,
@@ -3880,14 +3881,7 @@ export class Hud {
   // rendered rows (the edit-mode preview's sample rows included, since those
   // are what the drag is sized against) and caps columns at the row count.
   private partyFrameGrid(): { cols: number; rows: number } {
-    // While the edit preview is mounted its sample roster IS the visible
-    // stack (the interface-unlocked CSS folds the live rows wrapper away),
-    // so the drag factors count the preview's rows; the container fallback
-    // covers a gesture with no preview mounted.
-    const scope = this.partyFramesEl.querySelector('.tf-preview-party') ?? this.partyFramesEl;
-    const count = scope.querySelectorAll('.party-frame').length || 1;
-    const cols = Math.max(1, Math.min(count, Math.round(this.numericSetting('partyFrameColumns'))));
-    return { cols, rows: Math.ceil(count / cols) };
+    return partyFrameGrid(this.partyFramesEl, this.numericSetting('partyFrameColumns'));
   }
 
   // Table-driven movers and the unit frames share the global editor registry.
@@ -8754,7 +8748,7 @@ export class Hud {
     this.resolvePendingLoadoutBar();
     this.syncActiveHotbarForm();
     this.syncSlotMap(); // picks up newly learned abilities mid-session
-    this.focusTargets.update();
+    this.focusTargets.update(now, targetFrameNonSelfIntervalMs(fxTier));
 
     // talent buttons glow while the player has unspent points (and a tree exists)
     const tp = sim.talentPoints();
@@ -15634,6 +15628,7 @@ export class Hud {
   // unconfirmed Perfecting exchange without replaying its mutation.
   resyncAfterReconnect(): void {
     this.marketWindow.onReconnected();
+    this.focusTargets.reset();
     this.perfectingWindow?.onReconnected();
   }
 

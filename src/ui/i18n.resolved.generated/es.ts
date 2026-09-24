@@ -333,17 +333,17 @@ export const es: EnTranslations = {
   "hudChrome": {
     "framePresets": {
       "apply": "Apply",
+      "pickerLabel": "Frame Presets: {name}",
+      "overwrite": "Overwrite Preset",
+      "overwriteBody": "Replace the saved preset \"{name}\" with your current layout?",
       "current": "Current Layout",
       "new": "New Preset",
       "empty": "No saved presets",
-      "saveCurrent": "Save Current Preset",
       "deleteNamed": "Delete {name}",
       "deleteBody": "Delete the frame preset \"{name}\"?",
       "title": "Frame Presets",
       "name": "Preset Name",
       "slot": "Preset {slot}",
-      "save": "Save",
-      "load": "Load and Reload",
       "remove": "Delete",
       "saved": "Done.",
       "failed": "Could not save or load the preset."
@@ -370,12 +370,8 @@ export const es: EnTranslations = {
       "frame1": "Focus 1",
       "frame2": "Focus 2",
       "frame3": "Focus 3",
-      "hint": "Click the target frame or press {key} to target this focus.",
-      "clickHint": "Click the target frame to target this focus.",
-      "title": "Focus targets",
       "assign": "Set focus {slot}",
-      "target": "Target focus {slot}",
-      "clear": "Clear focus {slot}"
+      "target": "Target focus {slot}"
     },
     "professionTrainers": {
       "blacksmithing": "Instructor de Herrería",

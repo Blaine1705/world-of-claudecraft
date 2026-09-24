@@ -822,6 +822,8 @@ const GENERAL_KEYS = [
   'note:hudChrome.options.confirmVendorSellMinQualityNote',
 ];
 const FRAMES_KEYS = [
+  'partyFrameStyle',
+  'showPetFrame',
   // partyFrameWidth/Height have no rows (Edit Frames drags them directly);
   // partyFrameColumns and partyFrameSpacing moved into the in-editor Frames
   // Settings dropdown.
@@ -899,7 +901,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     ]);
     // the redundant partyFrames.section note is gone now that Frames is its own tab
     expect(keysOf(controls)).not.toContain('note:hudChrome.partyFrames.section');
-    expect(keysOf(controls)).not.toContain('partyFrameStyle');
+    expect(keysOf(controls)).toContain('partyFrameStyle');
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
     // The sticky-target opt-in renders in the Combat tab with its label key, so
     // the toggle cannot silently drop out of the options window.

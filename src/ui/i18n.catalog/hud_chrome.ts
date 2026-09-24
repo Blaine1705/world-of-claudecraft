@@ -14,18 +14,18 @@ import { professionTrainerStrings } from './profession_trainers';
 export const hudChromeStrings = {
   framePresets: {
     apply: 'Apply',
+    pickerLabel: 'Frame Presets: {name}',
+    overwrite: 'Overwrite Preset',
+    overwriteBody: 'Replace the saved preset "{name}" with your current layout?',
     current: 'Current Layout',
     new: 'New Preset',
     empty: 'No saved presets',
-    saveCurrent: 'Save Current Preset',
     deleteNamed: 'Delete {name}',
     deleteBody: 'Delete the frame preset "{name}"?',
 
     title: 'Frame Presets',
     name: 'Preset Name',
     slot: 'Preset {slot}',
-    save: 'Save',
-    load: 'Load and Reload',
     remove: 'Delete',
     saved: 'Done.',
     failed: 'Could not save or load the preset.',
@@ -52,12 +52,8 @@ export const hudChromeStrings = {
     frame1: 'Focus 1',
     frame2: 'Focus 2',
     frame3: 'Focus 3',
-    hint: 'Click the target frame or press {key} to target this focus.',
-    clickHint: 'Click the target frame to target this focus.',
-    title: 'Focus targets',
     assign: 'Set focus {slot}',
     target: 'Target focus {slot}',
-    clear: 'Clear focus {slot}',
   },
   professionTrainers: professionTrainerStrings,
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
@@ -795,11 +791,7 @@ export const hudChromeStrings = {
     // is a five-letter run), so this reuses the frame's own term for the target ("Mark", from
     // targetLabel above), which a screen-reader user already hears as the target frame's name.
     targetAnnounce: 'Mark {name}',
-    // targetOfTargetLabel names the optional #totarget-frame region (the classic
-    // "target of target": who your current target is targeting). Kept NON-WORDY (no
-    // run of four+ lowercase after stripping tokens) so an English-filled non-Latin
-    // locale does not trip the M16 untranslated-leak guard, reusing the frame's own
-    // term for the target ("Mark", from targetLabel): your mark's mark.
+    // Names the optional region showing who the current target is targeting.
     targetOfTargetLabel: 'Target of Target',
     // partyLabel names the #party-frames region (a group of tappable / focusable
     // party member buttons, each named by its visible member name). Kept short and

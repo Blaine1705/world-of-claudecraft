@@ -333,17 +333,17 @@ export const ko_KR: EnTranslations = {
   "hudChrome": {
     "framePresets": {
       "apply": "적용",
+      "pickerLabel": "프레임 프리셋: {name}",
+      "overwrite": "프리셋 덮어쓰기",
+      "overwriteBody": "저장된 프리셋 \"{name}\"을 현재 배치로 덮어쓰시겠습니까?",
       "current": "현재 배치",
       "new": "새 프리셋",
       "empty": "저장된 프리셋 없음",
-      "saveCurrent": "현재 프리셋 저장",
       "deleteNamed": "{name} 삭제",
       "deleteBody": "프레임 프리셋 \"{name}\"을 삭제하시겠습니까?",
       "title": "프레임 프리셋",
       "name": "프리셋 이름",
       "slot": "프리셋 {slot}",
-      "save": "저장",
-      "load": "불러오고 새로고침",
       "remove": "삭제",
       "saved": "완료.",
       "failed": "프리셋을 저장하거나 불러올 수 없습니다."
@@ -370,12 +370,8 @@ export const ko_KR: EnTranslations = {
       "frame1": "주시 대상 1",
       "frame2": "주시 대상 2",
       "frame3": "주시 대상 3",
-      "hint": "대상 프레임을 클릭하거나 {key} 키를 눌러 이 주시 대상을 선택하세요.",
-      "clickHint": "대상 프레임을 클릭하여 이 주시 대상을 선택하세요.",
-      "title": "주시 대상",
       "assign": "주시 대상 {slot} 설정",
-      "target": "주시 대상 {slot} 선택",
-      "clear": "주시 대상 {slot} 해제"
+      "target": "주시 대상 {slot} 선택"
     },
     "professionTrainers": {
       "blacksmithing": "대장기술 전문가",

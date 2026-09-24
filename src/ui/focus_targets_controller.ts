@@ -1,4 +1,5 @@
 import { localPartyMemberIds } from '../game/corpse_loot_availability';
+import { nonSelfRepaintDue } from '../game/ui_tier_knobs';
 import type { Entity } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { focusedWithin } from './focus_restore';
@@ -32,6 +33,8 @@ export class FocusTargetsController {
     painter: UnitFramePainter;
     descriptor: UnitFrameDescriptor;
     view: ReturnType<typeof newUnitFrameBuffer>;
+    chrome: string;
+    lastPaintAt: number;
   }> = [];
 
   constructor(private readonly deps: FocusTargetsDeps) {
@@ -117,6 +120,8 @@ export class FocusTargetsController {
           outOfRange: false,
         },
         view: newUnitFrameBuffer(),
+        chrome: '',
+        lastPaintAt: -Infinity,
       });
     }
     this.relocalize();
@@ -153,7 +158,6 @@ export class FocusTargetsController {
     const focus = this.hoveredEntityId;
     return mouseoverCastTargetPid(focus ?? partyHover, ability, {
       enabled,
-      allowHostile: focus !== null,
       hasEntity: (id) => world.entities.has(id),
       partyMemberPids: () => localPartyMemberIds(world.partyInfo),
     });
@@ -194,9 +198,17 @@ export class FocusTargetsController {
     if (assign && restoreFocus && this.slots.ids[slot] !== null) row.frame.focus();
   }
 
+  reset(): void {
+    this.hoveredSlot = null;
+    for (let slot = 0; slot < this.rows.length; slot++) this.slots.assign(slot, null);
+    this.relocalize();
+    this.update();
+  }
+
   relocalize(): void {
     for (let slot = 0; slot < this.rows.length; slot++) {
       const row = this.rows[slot];
+      row.chrome = '';
       const number = formatNumber(slot + 1, { maximumFractionDigits: 0 });
       row.assign.textContent = t('hudChrome.focusTargets.assign', { slot: number });
     }
@@ -210,7 +222,7 @@ export class FocusTargetsController {
       : !!entity.hostile;
   }
 
-  update(): void {
+  update(now = 0, intervalMs = 0): void {
     const world = this.deps.world();
     const writers = this.deps.writers;
     for (let slot = 0; slot < this.rows.length; slot++) {
@@ -219,34 +231,44 @@ export class FocusTargetsController {
       const key = this.deps.keybinds.primaryLabel(
         `${id === null ? 'set' : 'target'}Focus${slot + 1}`,
       );
-      writers.setText(
-        row.hint,
-        id === null
-          ? t(
-              key ? 'hudChrome.focusTargets.assignHint' : 'hudChrome.focusTargets.assignClickHint',
-              {
-                key,
-                button: t('hudChrome.focusTargets.assign', {
-                  slot: formatNumber(slot + 1, { maximumFractionDigits: 0 }),
-                }),
-              },
-            )
-          : '',
-      );
-      writers.setDisplay(row.assign, id === null ? '' : 'none');
-      writers.setStyleProp(row.hint, 'display', id === null ? '' : 'none');
       const entity = id === null ? undefined : world.entities.get(id);
       const hostile = entity ? this.hostile(entity, world) : false;
-      writers.setText(row.key, key);
-      writers.setStyleProp(row.key, 'display', key ? '' : 'none');
-      writers.setText(
-        row.reaction,
-        entity ? t(hostile ? 'hudChrome.focusTargets.enemy' : 'hudChrome.focusTargets.ally') : '',
-      );
-      writers.toggleClass(row.root, 'focus-hostile', !!entity && hostile);
-      writers.toggleClass(row.root, 'focus-friendly', !!entity && !hostile);
-      writers.toggleClass(row.root, 'focus-hide-empty', !this.deps.showEmpty?.());
-      writers.toggleClass(row.root, 'focus-empty', !entity);
+      const chrome = `${id}/${!!entity}/${key}/${hostile}/${!!this.deps.showEmpty?.()}`;
+      const changed = row.chrome !== chrome;
+      if (changed) {
+        row.chrome = chrome;
+        writers.setText(
+          row.hint,
+          id === null
+            ? t(
+                key
+                  ? 'hudChrome.focusTargets.assignHint'
+                  : 'hudChrome.focusTargets.assignClickHint',
+                {
+                  key,
+                  button: t('hudChrome.focusTargets.assign', {
+                    slot: formatNumber(slot + 1, { maximumFractionDigits: 0 }),
+                  }),
+                },
+              )
+            : '',
+        );
+        writers.setDisplay(row.assign, id === null ? '' : 'none');
+        writers.setStyleProp(row.hint, 'display', id === null ? '' : 'none');
+        writers.setText(row.key, key);
+        writers.setStyleProp(row.key, 'display', key ? '' : 'none');
+        writers.setText(
+          row.reaction,
+          entity ? t(hostile ? 'hudChrome.focusTargets.enemy' : 'hudChrome.focusTargets.ally') : '',
+        );
+        writers.toggleClass(row.root, 'focus-hostile', !!entity && hostile);
+        writers.toggleClass(row.root, 'focus-friendly', !!entity && !hostile);
+        writers.toggleClass(row.root, 'focus-hide-empty', !this.deps.showEmpty?.());
+        writers.toggleClass(row.root, 'focus-empty', !entity);
+      }
+      if (!changed && (!entity || !nonSelfRepaintDue(false, row.lastPaintAt, now, intervalMs)))
+        continue;
+      row.lastPaintAt = now;
       if (entity) fillTargetOfTargetDescriptor(row.descriptor, entity, 3);
       else row.descriptor.present = false;
       row.painter.paint(unitFrameViewInto(row.view, row.descriptor));

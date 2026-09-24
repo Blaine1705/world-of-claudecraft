@@ -1,4 +1,4 @@
-import { additionalUnitDimensions } from './frame_dimensions';
+import { additionalUnitDimensions, migratePetFrameSize } from './frame_dimensions';
 import type { HudFrameGroups } from './hud_frame_groups';
 import { frameGroupFor } from './hud_frame_groups';
 import type { TranslationKey } from './i18n.catalog';
@@ -20,6 +20,9 @@ export function registerHudFrames(deps: {
   options(): FramesMenuSettingsHooks | null;
 }): (force?: boolean) => void {
   const independentTarget = () => !!deps.options()?.settings.get('moveTargetOfTargetIndependently');
+  let petMover: MovableFrame | undefined;
+  let petStorageKey: string | undefined;
+  let petMigrated = false;
   let targetMover: MovableFrame | undefined;
   for (const spec of HUD_FRAME_SPECS) {
     const frame = deps.document.getElementById(spec.elementId);
@@ -43,6 +46,8 @@ export function registerHudFrames(deps: {
       moveHandle: spec.id === 'damageMeter' ? '#meters-window' : undefined,
       resizeWhileLocked: spec.id === 'damageMeter',
       globalLockOnly: true,
+      observeSizeChanges: spec.id === 'menu',
+      preserveSavedSize: spec.id === 'petFrame',
       maxScale: spec.maxScale,
       buttonOnlyWhenUnlocked: true,
       onPositioned: (active) => {
@@ -50,6 +55,10 @@ export function registerHudFrames(deps: {
         deps.onPositioned(spec.id, active);
       },
     });
+    if (spec.id === 'petFrame') {
+      petMover = mover;
+      petStorageKey = spec.storageKey;
+    }
     if (spec.id === 'targetOfTarget') targetMover = mover;
     const setting = frameRowSettingKey(spec.id);
     deps.registry.register({
@@ -91,6 +100,19 @@ export function registerHudFrames(deps: {
   let independent: boolean | undefined;
   return (force = false) => {
     if (!deps.options()) return;
+    if ((!petMigrated || force) && petMover && petStorageKey) {
+      petMigrated = true;
+      if (petMover.isUserHidden) {
+        deps.options()!.onSettingChange('showPetFrame', false);
+        petMover.setUserHidden(false);
+      }
+      try {
+        if (migratePetFrameSize(localStorage, petStorageKey, deps.options))
+          petMover.restoreSavedPosition();
+      } catch {
+        /* Storage unavailable. */
+      }
+    }
     const next = independentTarget();
     if (next === independent && !force) return;
     independent = next;
@@ -103,4 +125,15 @@ export function registerHudFrames(deps: {
       });
     } else deps.registry.clearAppliedGeometry('targetOfTarget');
   };
+}
+
+/** The edit preview replaces the live party rows while arranging frames. */
+export function partyFrameGrid(
+  frame: HTMLElement,
+  columns: number,
+): { cols: number; rows: number } {
+  const scope = frame.querySelector('.tf-preview-party') ?? frame;
+  const count = scope.querySelectorAll('.party-frame').length || 1;
+  const cols = Math.max(1, Math.min(count, Math.round(columns)));
+  return { cols, rows: Math.ceil(count / cols) };
 }

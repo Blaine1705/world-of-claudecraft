@@ -246,9 +246,15 @@ describe('talent-style frame loadouts', () => {
   });
 });
 
-it('exports and imports a frame layout with the preset action buttons and applies it immediately', () => {
+it('exports the selected full preset and imports a new slot without applying until requested', () => {
   const parent = document.createElement('div');
   document.body.replaceChildren(parent);
+  localStorage.setItem('woc_party_frame_pos', '{"left":120,"top":80}');
+  localStorage.setItem(
+    'woc_settings',
+    JSON.stringify({ uiScale: 1.8, combineTrackerFrames: true }),
+  );
+  new FramePresets(localStorage).save(0, 'Raid');
   const inputDialog = vi.fn();
   const applyFramePreset = vi.fn();
   const dispose = renderFramePresets(parent, {
@@ -263,6 +269,11 @@ it('exports and imports a frame layout with the preset action buttons and applie
       .click();
   localStorage.setItem('woc_party_frame_pos', '{"left":120,"top":80}');
   picker.click();
+  localStorage.setItem(
+    'woc_settings',
+    JSON.stringify({ uiScale: 0.8, combineTrackerFrames: false }),
+  );
+  localStorage.setItem('woc_party_frame_pos', '{"left":700,"top":200}');
   action('Export');
   const exported = inputDialog.mock.calls[0][0];
   expect(exported.readOnly).toBe(true);
@@ -271,10 +282,91 @@ it('exports and imports a frame layout with the preset action buttons and applie
   picker.click();
   action('Import');
   inputDialog.mock.calls[1][0].onOk(exported.value);
-  expect(localStorage.getItem('woc_party_frame_pos')).toBe('{"left":120,"top":80}');
+  expect(localStorage.getItem('woc_party_frame_pos')).toBe('{"left":400,"top":80}');
+  expect(applyFramePreset).not.toHaveBeenCalled();
+  const store = new FramePresets(localStorage);
+  expect(store.list()[1]).toEqual(store.list()[0]);
+  expect(store.active()).toBe(0);
+  action('Apply');
   expect(applyFramePreset).toHaveBeenCalledOnce();
+  expect(localStorage.getItem('woc_party_frame_pos')).toBe('{"left":120,"top":80}');
+  expect(JSON.parse(localStorage.getItem('woc_settings')!)).toMatchObject({
+    uiScale: 1.8,
+    combineTrackerFrames: true,
+  });
   inputDialog.mock.calls[1][0].onOk('invalid');
   expect(applyFramePreset).toHaveBeenCalledOnce();
   expect(parent.querySelector('[role="status"]')?.textContent).toContain('not a valid');
   dispose();
+});
+
+it('confirms before overwriting a selected but unapplied layout', () => {
+  const store = new FramePresets(localStorage);
+  localStorage.setItem('woc_settings', JSON.stringify({ uiScale: 1.4 }));
+  store.save(0, 'Raid');
+  localStorage.setItem('woc_settings', JSON.stringify({ uiScale: 1.8 }));
+  store.save(1, 'Questing');
+  const parent = document.createElement('div');
+  const confirmDialog = vi.fn();
+  const dispose = renderFramePresets(parent, {
+    inputDialog: vi.fn(),
+    confirmDialog,
+    applyFramePreset: vi.fn(),
+  });
+  parent.querySelector<HTMLButtonElement>('.tal-loadout-btn')!.click();
+  parent.querySelector<HTMLButtonElement>('.tal-lo-pick')!.click();
+  parent.querySelector<HTMLButtonElement>('[data-preset-action="save"]')!.click();
+  expect(confirmDialog).toHaveBeenCalledOnce();
+  expect(store.list()[0]?.settings.uiScale).toBe(1.4);
+  confirmDialog.mock.calls[0][4]();
+  expect(store.list()[0]?.settings.uiScale).toBe(1.8);
+  dispose();
+});
+
+it('excludes gameplay input preferences from saved and imported layouts and enforces the import limit', () => {
+  const store = new FramePresets(localStorage);
+  localStorage.setItem(
+    'woc_settings',
+    JSON.stringify({ mouseoverCast: false, lockActionBars: true, frameSnapToGrid: false }),
+  );
+  store.save(0, 'Layout');
+  expect(store.list()[0]?.settings).toEqual({ uiScale: 1 });
+  const exported = JSON.parse(store.export(0)!);
+  exported.preset.settings.mouseoverCast = true;
+  exported.preset.settings.lockActionBars = false;
+  expect(store.import(JSON.stringify(exported))).toBe(1);
+  expect(store.apply(1)).toBe(true);
+  expect(JSON.parse(localStorage.getItem('woc_settings')!)).toMatchObject({
+    mouseoverCast: false,
+    lockActionBars: true,
+    frameSnapToGrid: false,
+  });
+  for (let i = 2; i < 10; i++) expect(store.import(store.export(0)!)).toBe(i);
+  expect(store.import(store.export(0)!)).toBeNull();
+  expect(store.import(JSON.stringify({ ...exported, preset: { name: 'broken' } }))).toBeNull();
+});
+
+it('rejects aggregate preset storage overflow without losing existing slots', () => {
+  const store = new FramePresets(localStorage);
+  const geometry = Object.fromEntries(
+    [
+      'woc_hud_frame_menu',
+      'woc_hud_frame_pet',
+      'woc_party_frame_pos',
+      'woc_target_frame_pos',
+      'woc_player_frame_pos',
+    ].map((id) => [id, 'x'.repeat(120 * 1024)]),
+  );
+  const code = JSON.stringify({
+    woc: 'woc-frame-preset',
+    v: 1,
+    preset: { name: 'Large', geometry, settings: { uiScale: 1.2 } },
+  });
+  expect(store.import(code)).toBe(0);
+  const before = localStorage.getItem(FRAME_PRESETS_KEY);
+  expect(store.import(code)).toBeNull();
+  expect(localStorage.getItem(FRAME_PRESETS_KEY)).toBe(before);
+  for (const [key, value] of Object.entries(geometry)) localStorage.setItem(key, value);
+  expect(store.save(1, 'Too large')).toBe(false);
+  expect(localStorage.getItem(FRAME_PRESETS_KEY)).toBe(before);
 });

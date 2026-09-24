@@ -13,17 +13,17 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.framePresets.pickerLabel': 'フレームプリセット：{name}',
+  'hudChrome.framePresets.overwrite': 'プリセットを上書き',
+  'hudChrome.framePresets.overwriteBody': '保存済みプリセット「{name}」を現在のレイアウトで上書きしますか？',
   'hudChrome.framePresets.current': '現在のレイアウト',
   'hudChrome.framePresets.new': '新規プリセット',
   'hudChrome.framePresets.empty': '保存済みプリセットはありません',
-  'hudChrome.framePresets.saveCurrent': '現在のプリセットを保存',
   'hudChrome.framePresets.deleteNamed': '{name} を削除',
   'hudChrome.framePresets.deleteBody': 'フレームプリセット「{name}」を削除しますか？',
   'hudChrome.framePresets.title': 'フレームプリセット',
   'hudChrome.framePresets.name': 'プリセット名',
   'hudChrome.framePresets.slot': 'プリセット {slot}',
-  'hudChrome.framePresets.save': '保存',
-  'hudChrome.framePresets.load': '読み込んで再読み込み',
   'hudChrome.framePresets.remove': '削除',
   'hudChrome.framePresets.saved': '完了。',
   'hudChrome.framePresets.failed': 'プリセットを保存または読み込めませんでした。',
@@ -42,17 +42,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.focusTargets.frame1': 'フォーカス 1',
   'hudChrome.focusTargets.frame2': 'フォーカス 2',
   'hudChrome.focusTargets.frame3': 'フォーカス 3',
-  'hudChrome.focusTargets.hint':
-    '対象フレームをクリックするか {key} を押すと、このフォーカスを選択します。',
-  'hudChrome.focusTargets.clickHint': '対象フレームをクリックすると、このフォーカスを選択します。',
   'hudChrome.interfaceUnlock.combineTrackers': '追跡フレームをまとめる',
   'hudChrome.interfaceUnlock.combineAuras': 'オーラフレームをまとめる',
   'guide.interfacePage.frameGroups':
     '{trackers} はクエスト、功績、リフト、地下探索、採集目標、聖遺物の追跡をまとめられます。{auras} は対象の継続ダメージと6種のオーラ追跡をまとめられます。フレーム設定で有効にするとまとめて移動でき、無効なら個別に移動できます。{tot} にはリソースバーがあります。{focus} の3つの対象は個別に移動できます。Shift+F1～F3で設定し、Ctrl+F1～F3で選択します。ダメージと脅威メーターはロック中でも、ボタン以外をドラッグして移動し、端をドラッグしてサイズ変更できます。ロック解除中は専用のグループ別メニューで表示を切り替えられます。フレームを右クリックするとサイズのリセットや関連設定を開けます。インターフェースのフレームタブには共通設定と折りたたみ可能なパーティ設定があります。「ターゲットのターゲットをターゲットに固定」をオフにすると個別に移動でき、オンに戻しても個別の位置は保存されます。フォーカスを設定すると設定ボタンと説明が隠れます。右クリックして「フォーカスを解除」を選ぶと元に戻ります。マウスオーバーキャストはフォーカスフレームでも使えます。',
-  'hudChrome.focusTargets.title': 'フォーカスターゲット',
   'hudChrome.focusTargets.assign': 'フォーカス {slot} を設定',
   'hudChrome.focusTargets.target': 'フォーカス {slot} を選択',
-  'hudChrome.focusTargets.clear': 'フォーカス {slot} を解除',
   'hudChrome.interfaceUnlock.frameNames.trackerGroup': '進行状況トラッカー',
   'hudChrome.interfaceUnlock.frameNames.auraGroup': 'オーラとターゲット効果',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',

@@ -1,10 +1,14 @@
 import { LAYOUT_RESET_EPOCH, LAYOUT_RESET_EPOCH_KEY } from './frame_pos_reset';
 import {
+  decodeFramePreset,
+  encodeFramePreset,
   FRAME_PRESET_LIMIT,
   FRAME_PRESET_SETTINGS,
   FRAME_PRESETS_KEY,
+  FRAME_PRESETS_MAX_LENGTH,
   type FramePreset,
   framePresetGeometryKey,
+  isFramePresetSetting,
   parseFramePresets,
 } from './frame_presets_core';
 import { clampUiScale } from './ui_scale';
@@ -48,16 +52,38 @@ export class FramePresets {
       }
       const raw = JSON.parse(this.storage.getItem('woc_settings') ?? '{}');
       const settings = Object.fromEntries(
-        Object.entries(raw).filter(([key]) => FRAME_PRESET_SETTINGS.has(key)),
+        Object.entries(raw).filter(([key]) => isFramePresetSetting(key)),
       );
       // Record even the default explicitly so each preset owns its UI scale.
       settings.uiScale = clampUiScale(raw.uiScale);
       const slots = this.list();
       slots[index] = { name: name.trim().slice(0, 40), geometry, settings } as FramePreset;
-      this.storage.setItem(FRAME_PRESETS_KEY, JSON.stringify({ v: 1, slots, active: index }));
+      const encoded = JSON.stringify({ v: 1, slots, active: index });
+      if (encoded.length > FRAME_PRESETS_MAX_LENGTH) return false;
+      this.storage.setItem(FRAME_PRESETS_KEY, encoded);
       return true;
     } catch {
       return false;
+    }
+  }
+  export(index: number): string | null {
+    const preset = this.list()[index];
+    return preset ? encodeFramePreset(preset) : null;
+  }
+  import(code: string): number | null {
+    const preset = decodeFramePreset(code);
+    if (!preset) return null;
+    try {
+      const slots = this.list();
+      const index = slots.findIndex((slot) => !slot);
+      if (index < 0) return null;
+      slots[index] = preset;
+      const encoded = JSON.stringify({ v: 1, slots, active: this.active() });
+      if (encoded.length > FRAME_PRESETS_MAX_LENGTH) return null;
+      this.storage.setItem(FRAME_PRESETS_KEY, encoded);
+      return index;
+    } catch {
+      return null;
     }
   }
   remove(index: number): boolean {

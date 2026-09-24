@@ -106,7 +106,8 @@ export class MeterFrame {
 
     for (const handle of handles) {
       handle.classList.add('mt-move-handle');
-      handle.setAttribute('title', t('hudChrome.meters.move'));
+      const title = handle === el ? handle.querySelector<HTMLElement>('.panel-title') : handle;
+      title?.setAttribute('title', t('hudChrome.meters.move'));
       // A container's title is inherited by every descendant that has none of
       // its own, so on the tabbed window "Dmg" / "Heal" / "Threat" would each
       // advertise a drag that pressing them does NOT perform. An empty title is

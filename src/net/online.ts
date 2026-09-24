@@ -2324,10 +2324,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.netPipeline().noteReset();
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
+        this.spectateFacingPending = this.spectating !== null || this.spectateExitPending;
         this.spectating = null;
         this.spectateExitPending = false;
         this.cfg.playerClass = this.ownPlayerClass;
-        this.spectateFacingPending = true;
         this.pendingSpectateFacing = null;
         // marketInfo is delta-omitted (s.market only streams when it changes),
         // so the mirror otherwise still holds the pre-drop echo at the instant

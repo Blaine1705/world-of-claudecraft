@@ -976,6 +976,12 @@ export function buildInterfaceControls(
       // them, see renderInterface's footer).
       // Dimensions are adjusted directly in Edit Frames. Party columns and spacing
       // are rendered by the separate Party Frame Options section.
+      choice(s, 'partyFrameStyle', 'hudChrome.partyFrames.style', [
+        { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
+        { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
+        { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
+      ]),
+      boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
       choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', HEALTH_TEXT_CHOICES),
       choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
         { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },

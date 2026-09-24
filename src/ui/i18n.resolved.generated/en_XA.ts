@@ -333,17 +333,17 @@ export const en_XA: EnTranslations = {
   "hudChrome": {
     "framePresets": {
       "apply": "[Áþþļý]",
+      "pickerLabel": "[Ƒŕáɱé Þŕéšéţš: {name}]",
+      "overwrite": "[Óʋéŕŵŕíţé Þŕéšéţ]",
+      "overwriteBody": "[Ŕéþļáçé ţĥé šáʋéð þŕéšéţ \"{name}\" ŵíţĥ ýóúŕ çúŕŕéñţ ļáýóúţ?]",
       "current": "[Çúŕŕéñţ Ļáýóúţ]",
       "new": "[Ñéŵ Þŕéšéţ]",
       "empty": "[Ñó šáʋéð þŕéšéţš]",
-      "saveCurrent": "[Šáʋé Çúŕŕéñţ Þŕéšéţ]",
       "deleteNamed": "[Ðéļéţé {name}]",
       "deleteBody": "[Ðéļéţé ţĥé ƒŕáɱé þŕéšéţ \"{name}\"?]",
       "title": "[Ƒŕáɱé Þŕéšéţš]",
       "name": "[Þŕéšéţ Ñáɱé]",
       "slot": "[Þŕéšéţ {slot}]",
-      "save": "[Šáʋé]",
-      "load": "[Ļóáð áñð Ŕéļóáð]",
       "remove": "[Ðéļéţé]",
       "saved": "[Ðóñé.]",
       "failed": "[Çóúļð ñóţ šáʋé óŕ ļóáð ţĥé þŕéšéţ.]"
@@ -370,12 +370,8 @@ export const en_XA: EnTranslations = {
       "frame1": "[Ƒóçúš 1]",
       "frame2": "[Ƒóçúš 2]",
       "frame3": "[Ƒóçúš 3]",
-      "hint": "[Çļíçķ ţĥé ţáŕĝéţ ƒŕáɱé óŕ þŕéšš {key} ţó ţáŕĝéţ ţĥíš ƒóçúš.]",
-      "clickHint": "[Çļíçķ ţĥé ţáŕĝéţ ƒŕáɱé ţó ţáŕĝéţ ţĥíš ƒóçúš.]",
-      "title": "[Ƒóçúš ţáŕĝéţš]",
       "assign": "[Šéţ ƒóçúš {slot}]",
-      "target": "[Ţáŕĝéţ ƒóçúš {slot}]",
-      "clear": "[Çļéáŕ ƒóçúš {slot}]"
+      "target": "[Ţáŕĝéţ ƒóçúš {slot}]"
     },
     "professionTrainers": {
       "blacksmithing": "[Ɓļáçķšɱíţĥíñĝ Ţŕáíñéŕ]",

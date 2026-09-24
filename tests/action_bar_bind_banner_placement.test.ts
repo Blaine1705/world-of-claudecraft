@@ -256,6 +256,10 @@ describe('bindActionBarBindBannerDrag', () => {
     window.dispatchEvent(new Event('resize'));
     expect(el.style.top).not.toBe(placed);
     expect(el.style.top).toBe('478px');
+    windowSize(800, 500);
+    window.dispatchEvent(new Event('resize'));
+    expect(Number.parseFloat(el.style.left)).toBeLessThan(400);
+    expect(Number.parseFloat(el.style.top)).toBeLessThan(250);
   });
 
   it('drags by the plate, converting visual px to author px under the UI zoom', () => {

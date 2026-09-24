@@ -252,6 +252,20 @@ export function bindActionBarBindBannerDrag(el: HTMLElement, uiRoot: HTMLElement
       return;
     }
     if (!moved) placeActionBarBindBanner(el, uiRoot);
+    else {
+      const b = bounds();
+      write(
+        draggedWindowPosition(
+          {
+            pointerX: (Number.parseFloat(el.style.left) || 0) * b.scale,
+            pointerY: (Number.parseFloat(el.style.top) || 0) * b.scale,
+            grabOffsetX: 0,
+            grabOffsetY: 0,
+          },
+          b,
+        ),
+      );
+    }
   };
   win?.addEventListener('resize', onResize);
 }

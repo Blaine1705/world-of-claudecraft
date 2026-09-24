@@ -4,7 +4,6 @@ import { FRAME_PRESET_LIMIT } from './frame_presets_core';
 import { formatNumber, t } from './i18n';
 import type { InputDialogOpts } from './input_controller';
 import { settingsCard } from './settings_controls';
-import { exportTransferCode, importTransferCode } from './settings_transfer';
 import { getUiScale } from './ui_scale';
 
 export interface FramePresetControlsDeps {
@@ -62,12 +61,17 @@ export function renderFramePresets(
     const slots = store?.list();
     const active = selected;
     name.textContent = slots?.[active]?.name ?? t('hudChrome.framePresets.current');
-    picker.setAttribute('aria-label', `${t('hudChrome.framePresets.title')}: ${name.textContent}`);
+    picker.setAttribute(
+      'aria-label',
+      t('hudChrome.framePresets.pickerLabel', { name: name.textContent }),
+    );
     picker.disabled = !store || !deps;
     for (const button of [applyButton, save, add, remove, importButton, exportButton])
       button.disabled = picker.disabled;
     add.disabled ||= (slots?.filter(Boolean).length ?? 0) >= FRAME_PRESET_LIMIT;
     save.disabled ||= active < 0 && !!slots?.every(Boolean);
+    importButton.disabled ||= (slots?.filter(Boolean).length ?? 0) >= FRAME_PRESET_LIMIT;
+    exportButton.disabled ||= active < 0;
     applyButton.disabled ||= active < 0;
     remove.disabled ||= active < 0;
     remove.setAttribute(
@@ -104,8 +108,17 @@ export function renderFramePresets(
     close(true);
     const active = selected;
     const preset = store?.list()[active];
-    if (preset) result(store?.save(active, preset.name) ?? false);
-    else promptNew();
+    if (!preset) return promptNew();
+    const saveSelected = () => result(store?.save(active, preset.name) ?? false);
+    if (active === store?.active()) saveSelected();
+    else
+      deps?.confirmDialog(
+        t('hudChrome.framePresets.overwrite'),
+        t('hudChrome.framePresets.overwriteBody', { name: preset.name }),
+        t('game.talents.save'),
+        t('game.talents.cancel'),
+        saveSelected,
+      );
   };
   const action = (id: string, label: string, run: () => void) => {
     const button = document.createElement('button');
@@ -155,22 +168,18 @@ export function renderFramePresets(
     close(true);
     deps?.inputDialog({
       title: t('hudChrome.transfer.importAction'),
-      label: t('hudChrome.transfer.frameLayout'),
+      label: t('hudChrome.framePresets.title'),
       placeholder: t('hudChrome.transfer.pastePlaceholder'),
       multiline: true,
       okText: t('game.talents.import'),
       onOk: (value) => {
-        const imported = importTransferCode('frames', value);
-        if (!imported.ok) {
-          status.textContent = t(
-            imported.reason === 'kind'
-              ? 'hudChrome.transfer.wrongKind'
-              : 'hudChrome.transfer.invalid',
-          );
+        const imported = store?.import(value) ?? null;
+        if (imported === null) {
+          status.textContent = t('hudChrome.transfer.invalid');
           return;
         }
-        deps.applyFramePreset();
-        applied?.();
+        selected = imported;
+        result(true);
       },
     });
   });
@@ -178,8 +187,8 @@ export function renderFramePresets(
     close(true);
     deps?.inputDialog({
       title: t('hudChrome.transfer.exportAction'),
-      label: t('hudChrome.transfer.frameLayout'),
-      value: exportTransferCode('frames'),
+      label: t('hudChrome.framePresets.title'),
+      value: store?.export(selected) ?? '',
       multiline: true,
       readOnly: true,
       copy: true,

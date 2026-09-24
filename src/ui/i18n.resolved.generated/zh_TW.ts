@@ -333,17 +333,17 @@ export const zh_TW: EnTranslations = {
   "hudChrome": {
     "framePresets": {
       "apply": "套用",
+      "pickerLabel": "框架預設：{name}",
+      "overwrite": "覆寫預設",
+      "overwriteBody": "以目前配置取代已儲存的預設「{name}」？",
       "current": "目前配置",
       "new": "新增預設",
       "empty": "沒有已儲存的預設",
-      "saveCurrent": "儲存目前預設",
       "deleteNamed": "刪除 {name}",
       "deleteBody": "刪除框架預設「{name}」？",
       "title": "框架預設",
       "name": "預設名稱",
       "slot": "預設 {slot}",
-      "save": "儲存",
-      "load": "載入並重新整理",
       "remove": "刪除",
       "saved": "完成。",
       "failed": "無法儲存或載入預設。"
@@ -370,12 +370,8 @@ export const zh_TW: EnTranslations = {
       "frame1": "焦點 1",
       "frame2": "焦點 2",
       "frame3": "焦點 3",
-      "hint": "點擊目標框架或按 {key} 選取此焦點。",
-      "clickHint": "點擊目標框架選取此焦點。",
-      "title": "焦點目標",
       "assign": "設定焦點 {slot}",
-      "target": "選取焦點 {slot}",
-      "clear": "清除焦點 {slot}"
+      "target": "選取焦點 {slot}"
     },
     "professionTrainers": {
       "blacksmithing": "鍛造訓練師",

@@ -190,7 +190,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'three reusable unit-frame instances, all writes use the shared elision facet',
+    why: 'three reusable unit frames: chrome signature, non-self tier cadence and shared writer elision',
   },
   {
     call: 'this.fxTier',

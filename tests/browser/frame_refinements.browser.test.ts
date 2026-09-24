@@ -75,12 +75,18 @@ describe('frame refinements', () => {
         draggingBodyClass: 'test-dragging',
         fallbackSize: { w: 200, h: 100 },
         globalLockOnly: true,
+        frameLabelKey: 'hudChrome.focusTargets.frame1',
       });
       expect(frame.getAttribute('tabindex')).toBeNull();
       expect(frame.tabIndex).toBe(tag === 'button' ? 0 : -1);
       mover.setLockState(true);
       expect(frame.tabIndex).toBe(0);
+      expect(frame.getAttribute('aria-label')).toBe('Focus 1');
+      expect(frame.getAttribute('role')).toBe(tag === 'div' ? 'group' : null);
+      expect(frame.querySelector('.tf-move-btn')).toBeNull();
       mover.setLockState(false);
+      expect(frame.hasAttribute('aria-label')).toBe(false);
+      expect(frame.hasAttribute('role')).toBe(false);
       expect(frame.getAttribute('tabindex')).toBeNull();
       expect(frame.tabIndex).toBe(tag === 'button' ? 0 : -1);
       mover.dispose();
@@ -396,6 +402,7 @@ it.each(['woc_party_frame_pos', 'woc_hud_frame_menu'])(
     const mover = new MovableFrame({
       frame,
       storageKey,
+      observeSizeChanges: true,
       fallbackSize: { w: 600, h: 400 },
       isMobileLayout: () => false,
       unlockLabelKey: 'hudChrome.interfaceUnlock.unlockFrame',
@@ -438,4 +445,58 @@ it('does not accumulate menu position drift after clamping, closing and reopenin
     expect(el.getBoundingClientRect().left).toBe(20);
     expect(el.getBoundingClientRect().top).toBe(20);
   }
+});
+
+it('migrates legacy pet visibility and reclamps resized preset geometry immediately', async () => {
+  await mount();
+  const spec = HUD_FRAME_SPECS.find((row) => row.id === 'petFrame')!;
+  const frame = document.createElement('div');
+  frame.id = spec.elementId;
+  frame.style.cssText = 'position:absolute;width:200px;height:60px';
+  document.getElementById('ui')!.appendChild(frame);
+  const saved = JSON.stringify({ left: 950, top: 700, scale: 1.4, vw: 1024, vh: 768 });
+  localStorage.setItem(spec.storageKey, saved);
+  localStorage.setItem(spec.storageKey + '_hidden', '1');
+  let ready = false;
+  const values: Record<string, number | boolean> = {
+    showPetFrame: true,
+    petFrameWidth: 200,
+    petFrameHeight: 15,
+  };
+  const registry = new InterfaceUnlock({ document });
+  const sync = registerHudFrames({
+    document,
+    registry,
+    groups: new HudFrameGroups(document, HUD_FRAME_SPECS),
+    isMobileLayout: () => false,
+    snapToGrid: () => false,
+    labelKey: (row) => row.labelKey,
+    isActive: () => true,
+    onPositioned: () => {},
+    options: () =>
+      ready
+        ? {
+            settings: { get: (key) => values[key], set: (key, value) => (values[key] = value) },
+            onSettingChange: (key, value) => {
+              values[key] = value;
+              if (key === 'petFrameWidth') frame.style.width = `${value}px`;
+              if (key === 'petFrameHeight') frame.style.height = `${Number(value) * 2}px`;
+            },
+          }
+        : null,
+  });
+  expect(localStorage.getItem(spec.storageKey)).toBe(saved);
+  ready = true;
+  sync();
+  expect(values.showPetFrame).toBe(false);
+  expect(frame.classList.contains('tf-user-hidden')).toBe(false);
+  expect(localStorage.getItem(spec.storageKey + '_hidden')).toBeNull();
+  // Applying another old preset restores geometry before the migration settles.
+  frame.style.width = '200px';
+  localStorage.setItem(spec.storageKey, saved);
+  registry.restoreSavedLayout();
+  sync(true);
+  expect(frame.getBoundingClientRect().right).toBeLessThanOrEqual(1024);
+  expect(frame.getBoundingClientRect().bottom).toBeLessThanOrEqual(768);
+  expect(JSON.parse(localStorage.getItem(spec.storageKey)!).scale).toBeUndefined();
 });

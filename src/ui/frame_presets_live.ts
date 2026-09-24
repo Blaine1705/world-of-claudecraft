@@ -29,11 +29,10 @@ export function applySavedFrameLayout(
   const geometry = new Map(keys().map((key) => [key, localStorage.getItem(key)!]));
   const loaded = new Settings().all();
   const patch = Object.fromEntries(
-    [...FRAME_PRESET_SETTINGS].map((key) => [key, loaded[key as keyof GameSettings]]),
+    [...FRAME_PRESET_SETTINGS].map((key) => [key, loaded[key]]),
   ) as Partial<GameSettings>;
   hooks.settings.patch(patch);
-  for (const key of FRAME_PRESET_SETTINGS)
-    hooks.onSettingChange(key, hooks.settings.get(key as keyof GameSettings));
+  for (const key of FRAME_PRESET_SETTINGS) hooks.onSettingChange(key, hooks.settings.get(key));
   // Normal settings application can reanchor and persist old live geometry. The preset wins.
   for (const key of keys()) if (!geometry.has(key)) localStorage.removeItem(key);
   for (const [key, value] of geometry) localStorage.setItem(key, value);

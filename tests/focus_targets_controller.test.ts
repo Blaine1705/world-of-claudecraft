@@ -125,7 +125,7 @@ describe('focus targets', () => {
     expect((rows[0].children[2] as HTMLElement).style.display).toBe('none');
     rows[0].dispatchEvent(new Event('mouseenter'));
     expect(controller.hoveredEntityId).toBe(4);
-    expect(controller.castTarget({ requiresTarget: true }, null, true)).toBe(4);
+    expect(controller.castTarget({ requiresTarget: true }, null, true)).toBeNull();
     expect(
       controller.castTarget({ requiresTarget: true, targetType: 'friendly' }, null, true),
     ).toBe(4);
@@ -152,6 +152,22 @@ describe('focus targets', () => {
     expect(assign.style.display).not.toBe('none');
     controller.update();
     expect(rows[0].classList.contains('focus-empty')).toBe(true);
+    const textWrites = vi.spyOn(writers, 'setText');
+    controller.update(100, 100);
+    expect(textWrites).not.toHaveBeenCalled();
+    controller.action(0, true);
+    textWrites.mockClear();
+    controller.update(10, 100);
+    expect(textWrites).not.toHaveBeenCalled();
+    controller.update(100, 100);
+    expect(textWrites).toHaveBeenCalled();
+    world.actionBarReadOnly = true;
+    controller.reset();
+    world.actionBarReadOnly = false;
+    world.targetEntity.mockClear();
+    controller.action(0, false);
+    expect(world.targetEntity).not.toHaveBeenCalled();
+    expect(controller.contextActions('focusTarget1')).toHaveLength(0);
     world.actionBarReadOnly = true;
     assign.dispatchEvent(new Event('click'));
     controller.update();

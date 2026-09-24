@@ -425,7 +425,8 @@ describe('detachable meter windows', () => {
     // The detached windows keep their MeterFrame drag, so their handles carry
     // the move tooltip.
     const heal = el('heal-window');
-    const move = heal.getAttribute('title') ?? '';
+    expect(heal.hasAttribute('title')).toBe(false);
+    const move = heal.querySelector('.panel-title')?.getAttribute('title') ?? '';
     expect(move).not.toBe('');
     expect(heal.classList.contains('mt-move-handle')).toBe(true);
     // The tabbed damage window's movement is the Unlock Interface registry's,

@@ -1,8 +1,10 @@
 // @vitest-environment happy-dom
 import { beforeEach, expect, it, vi } from 'vitest';
-import { Settings } from '../src/game/settings';
+import { SETTING_RANGES, Settings } from '../src/game/settings';
+import { migratePetFrameSize } from '../src/ui/frame_dimensions';
 import { FramePresets } from '../src/ui/frame_presets';
 import { applySavedFrameLayout } from '../src/ui/frame_presets_live';
+import type { FramesMenuSettingsHooks } from '../src/ui/interface_unlock_menu_core';
 import { getUiScale } from '../src/ui/ui_scale';
 
 beforeEach(() => localStorage.clear());
@@ -106,4 +108,26 @@ it('reclamps every owner on scale changes without replacing settings or saved ge
   expect(onSettingChange).not.toHaveBeenCalled();
   expect(settings.all()).toEqual(values);
   expect(localStorage.getItem('woc_party_frame_pos')).toBe(saved);
+});
+
+it('preserves legacy pet size until settings are ready, then migrates once without losing position', () => {
+  const key = 'woc_hud_frame_pet';
+  const saved = JSON.stringify({ left: 100, top: 120, scale: 1.2, scaleY: 1.5, vw: 1024, vh: 768 });
+  localStorage.setItem(key, saved);
+  migratePetFrameSize(localStorage, key, () => null);
+  expect(localStorage.getItem(key)).toBe(saved);
+  const settings = new Settings();
+  const hooks = { settings, onSettingChange: () => {} } as unknown as FramesMenuSettingsHooks;
+  migratePetFrameSize(localStorage, key, () => hooks);
+  expect(settings.get('petFrameWidth')).toBe(SETTING_RANGES.petFrameWidth.def * 1.2);
+  expect(settings.get('petFrameHeight')).toBe(SETTING_RANGES.petFrameHeight.def * 1.5);
+  expect(JSON.parse(localStorage.getItem(key)!)).toEqual({
+    left: 100,
+    top: 120,
+    vw: 1024,
+    vh: 768,
+  });
+  settings.set('petFrameWidth', 300);
+  migratePetFrameSize(localStorage, key, () => hooks);
+  expect(settings.get('petFrameWidth')).toBe(300);
 });

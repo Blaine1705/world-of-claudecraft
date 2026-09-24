@@ -4454,12 +4454,12 @@ export class Sim {
   // reconcile ('noop' leaves the localStorage-loaded bars untouched). Keeping
   // these host-agnostic no-ops here is what stops the offline Sim ever becoming
   // aware of a persistence host.
-  takeActionBarLayoutRestore() {
-    return this.actionBarRestore();
-  }
-
   saveActionBarLayout(_profile: ActionBarLayoutProfile, _layout: ActionBarLayout): void {
     // Offline: the controller already wrote localStorage; nothing else to do.
+  }
+
+  takeActionBarLayoutRestore() {
+    return this.actionBarRestore();
   }
 
   /** Z-key sheathe toggle (IWorld.toggleWeaponStow; server `stow_weapon` command).

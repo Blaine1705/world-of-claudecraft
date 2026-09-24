@@ -26,8 +26,6 @@ export interface MouseoverCastAbility {
 export interface MouseoverCastInputs {
   /** The Interface option (mouseoverCast, on by default). */
   enabled: boolean;
-  /** A focus frame can also supply the target for hostile abilities. */
-  allowHostile?: boolean;
   /** Whether this client currently holds the entity (in interest scope). */
   hasEntity: (pid: number) => boolean;
   /** The local player's party/raid roster (pids, self included; null when solo).
@@ -41,8 +39,8 @@ export interface MouseoverCastInputs {
  * The pid a mouseover cast should be redirected to, or null to leave the press on
  * the classic current-target-else-self path.
  *
- * Party frames redirect friendly targeted abilities; focus frames also allow
- * hostile abilities. The hovered unit must be one this client can vouch for: one it holds
+ * Party and focus frames redirect friendly targeted abilities.
+ * The hovered unit must be one this client can vouch for: one it holds
  * an entity for, or one the party wire still lists as a member.
  */
 export function mouseoverCastTargetPid(
@@ -51,8 +49,7 @@ export function mouseoverCastTargetPid(
   inputs: MouseoverCastInputs,
 ): number | null {
   if (hoveredPid === null || !inputs.enabled) return null;
-  if (!ability?.requiresTarget || (ability.targetType !== 'friendly' && !inputs.allowHostile))
-    return null;
+  if (!ability?.requiresTarget || ability.targetType !== 'friendly') return null;
   if (inputs.hasEntity(hoveredPid)) return hoveredPid;
   return inputs.partyMemberPids()?.includes(hoveredPid) ? hoveredPid : null;
 }
