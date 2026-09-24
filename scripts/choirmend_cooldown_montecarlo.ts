@@ -22,7 +22,9 @@ import { addSpecPlayer, cast, round1, type Spec, summarize, teleport } from './h
 const args = process.argv.slice(2);
 function flag(name: string, fallback: string): string {
   const i = args.indexOf(`--${name}`);
-  return i >= 0 ? args[i + 1] : fallback;
+  const value = i >= 0 ? args[i + 1] : undefined;
+  if (value === undefined || value.startsWith('--')) return fallback;
+  return value;
 }
 const RUNS = Number(flag('runs', '20'));
 const SECONDS = Number(flag('seconds', '300'));
@@ -33,7 +35,7 @@ const BASE_SEED = 424200;
 const CHOIRMEND = 'prayer_of_healing';
 const SOLEMN = 'heal';
 
-// The most common live holy build on raid boss kills (Parses, builds 0.43-0.44,
+// The most common live holy build on raid boss kills (Parses, builds 0.43 to 0.44,
 // 21 of 153 priests; every row's plurality pick except row 20, where Second
 // Verse repeats 40% of Choirmend healing and is the Choirmend-relevant choice).
 const LIVE_HOLY: Spec = {
@@ -54,7 +56,7 @@ const LIVE_HOLY: Spec = {
 };
 
 // Where tests/healing_training.test.ts stands the priest: within 30 yards of all
-// five dummies (x = -76, z = -50 .. -34).
+// five dummies (x = -76, z = -50 to -34).
 const TRAINING_GROUND = { x: -82, z: -42 };
 // Far from overworld content and every dungeon instance origin (healing_montecarlo.ts).
 const RAID_ARENA = { x: -2000, z: 3000 };
@@ -92,6 +94,9 @@ function lowestHpFraction(targets: Entity[]): Entity {
 }
 
 function runOne(arena: Arena, cooldown: number, seed: number): { run: Run; profile: Profile } {
+  // Deliberate, process-local mutation of the shared content table: each run sets
+  // the value before addSpecPlayer resolves the priest's known abilities, and the
+  // resolved cooldown is asserted below. Nothing else imports this script.
   ABILITIES[CHOIRMEND].cooldown = cooldown;
   // The shipped world (the training ground sits in Eastbrook, so terrain and line of
   // sight must be the live ones); only the dice vary between runs.

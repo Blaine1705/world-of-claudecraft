@@ -27,19 +27,21 @@ are once-a-fight buttons, not fillers, so they are not the reference.
 ## Monte Carlo (real Sim)
 
 Level 20 best-in-slot holy priest with the most common live raid build (Veil Unbound,
-Improved Shield, Psychic Scream, Measured Faith, Martyr's Aegis, Second Verse). Rotation:
+Shattered Psalm, Lingering Dread, Measured Faith, Martyr's Aegis, Second Verse). Rotation:
 Choirmend whenever off cooldown, otherwise Solemn Prayer on the lowest-health target. Two
 arenas: the five Eastbrook Healing Training Ground dummies (the priest at the test spot in
 `tests/healing_training.test.ts`, whose 30 yd ring also includes Drillmaster Hale and the two
 hub practice dummies at full health) and ten wounded level 20 allies as a raid-sized bench.
-8 runs of 180 sec per row; the world seed is pinned and only the dice vary.
+8 runs of 180 sec per row; the world seed is pinned and only the dice vary. The raid-sized
+bench was run only for the shipped value and the candidate, since the dummies arena already
+showed that 8 to 15 sec land within a few percent of each other.
 
 | Cooldown | Dummies raw HPS | Dummies effective HPS | Raid-10 raw HPS | Choirmend/min | Solemn/min |
 |---|---:|---:|---:|---:|---:|
 | 0 (before) | 1,068 | 848 | 1,718 | 16.0 | 0 |
-| 8 | 626 | 563 | | 4.7 | 17.3 |
+| 8 | 626 | 563 | not run | 4.7 | 17.3 |
 | 12 | 563 | 518 | 708 | 3.3 | 19.0 |
-| 15 | 511 | 478 | | 2.7 | 19.7 |
+| 15 | 511 | 478 | not run | 2.7 | 19.7 |
 
 Mana is neutral: Choirmend costs 145 per 3 sec cast and Solemn Prayer 91 per 2 sec, so both
 rotations burn about 2,800 mana per minute at full cast uptime against about 800 regen, and the
@@ -64,6 +66,13 @@ time. The change lands on the top quarter (the priests spamming it hardest lose 
 moves Choirmend from 71% to 27% of holy healing (casts per fight 20 to 7). Even the
 pessimistic row keeps holy priest level with holy paladin, so no compensating buff ships with
 the cooldown.
+
+## Release follow-up
+
+The player wiki seed (`mediawiki/seed/pages.xml`, built by `scripts/mediawiki/build_seed.mjs`)
+prints each ability's cooldown and is only held byte-fresh at the release tier
+(`tests/mediawiki_seed_freshness.test.ts`), so the release that carries this change regenerates
+it with `npm run wiki:seed`.
 
 ## Reproducing
 
