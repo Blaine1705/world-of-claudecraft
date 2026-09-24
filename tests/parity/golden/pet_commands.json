@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "6ef18776",
+      "state": "7e657c51",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,6 +74,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -163,7 +164,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "0e28fbea",
+      "state": "a7932ecd",
       "events": "139d503c",
       "rng": {
         "draws": 0,
@@ -214,6 +215,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -347,7 +349,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "400e327c",
+      "state": "f9383b5b",
       "events": "796c4679",
       "rng": {
         "draws": 0,
@@ -398,6 +400,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -545,7 +548,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "1346932d",
+      "state": "5d606772",
       "events": "620a6523",
       "rng": {
         "draws": 0,
@@ -556,7 +559,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "a196c22b",
+      "state": "025c9c7c",
       "events": "2678504f",
       "rng": {
         "draws": 0,
@@ -567,7 +570,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1014,
-      "state": "56472558",
+      "state": "b64a4485",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -635,6 +638,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -845,7 +849,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1014,
-      "state": "456fb5db",
+      "state": "9c90210c",
       "events": "73ea6f18",
       "rng": {
         "draws": 0,
@@ -913,6 +917,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1060,7 +1065,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1016,
-      "state": "f1de960b",
+      "state": "dba6589c",
       "events": "3029cb04",
       "rng": {
         "draws": 0,
@@ -1128,6 +1133,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1318,7 +1324,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1016,
-      "state": "2b4aeaee",
+      "state": "355a445f",
       "events": "efdefed8",
       "rng": {
         "draws": 0,
@@ -1386,6 +1392,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1576,7 +1583,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1016,
-      "state": "456fb5db",
+      "state": "9c90210c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1644,6 +1651,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1791,7 +1799,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1017,
-      "state": "456fb5db",
+      "state": "9c90210c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1859,6 +1867,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2006,7 +2015,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1019,
-      "state": "57c86bc8",
+      "state": "ce1af2be",
       "events": "4257800d",
       "rng": {
         "draws": 0,
@@ -2074,6 +2083,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2148,6 +2158,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2397,7 +2408,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1019,
-      "state": "c9fad361",
+      "state": "b46973d1",
       "events": "b60efd74",
       "rng": {
         "draws": 151,
@@ -2408,7 +2419,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1019,
-      "state": "37e3a1aa",
+      "state": "56b1966e",
       "events": "c52d757a",
       "rng": {
         "draws": 286,
@@ -2419,7 +2430,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1019,
-      "state": "37e3a1aa",
+      "state": "56b1966e",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -2487,6 +2498,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2575,6 +2587,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2830,7 +2843,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1021,
-      "state": "a5f3fcc4",
+      "state": "7c12b5d8",
       "events": "e84e0151",
       "rng": {
         "draws": 286,
@@ -2898,6 +2911,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2986,6 +3000,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3242,7 +3257,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1023,
-      "state": "027415fd",
+      "state": "e7cf778d",
       "events": "77a1fbfc",
       "rng": {
         "draws": 286,
@@ -3310,6 +3325,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3398,6 +3414,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3661,7 +3678,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1023,
-      "state": "027415fd",
+      "state": "e7cf778d",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -3729,6 +3746,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -3817,6 +3835,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {

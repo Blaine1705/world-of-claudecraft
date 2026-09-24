@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "7912fe1c",
+      "state": "f93952b3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -68,6 +68,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -165,7 +166,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1021,
-      "state": "1634d839",
+      "state": "4226dde4",
       "events": "707b6954",
       "rng": {
         "draws": 5,
@@ -176,7 +177,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1021,
-      "state": "6e4299ba",
+      "state": "16635ba5",
       "events": "6cb80331",
       "rng": {
         "draws": 5,
@@ -187,7 +188,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1021,
-      "state": "2533dc3f",
+      "state": "eb516786",
       "events": "67fcaac8",
       "rng": {
         "draws": 8,
@@ -198,7 +199,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 1023,
-      "state": "81256254",
+      "state": "8aeb4f31",
       "events": "641e6918",
       "rng": {
         "draws": 11,
@@ -295,6 +296,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -537,7 +539,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1023,
-      "state": "94771162",
+      "state": "88587dab",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -548,7 +550,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1023,
-      "state": "94771162",
+      "state": "88587dab",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -645,6 +647,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {

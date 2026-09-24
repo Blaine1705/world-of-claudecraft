@@ -826,10 +826,10 @@ describe('stock rows: the phase 11n pulls', () => {
       fury: 47,
       stablemaster_marla: 2,
       wardsmith_orun: 3,
-      // The three faction quartermasters (faction_vendors.ts), five rows each.
-      npc_rift_watch_quartermaster: 5,
-      npc_church_order_quartermaster: 5,
-      npc_automaton_quartermaster: 5,
+      // The three faction quartermasters (faction_vendors.ts): 11, 10, and 11 rows.
+      npc_rift_watch_quartermaster: 11,
+      npc_church_order_quartermaster: 10,
+      npc_automaton_quartermaster: 11,
     });
   });
 });

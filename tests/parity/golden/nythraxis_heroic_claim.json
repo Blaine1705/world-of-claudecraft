@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1020,
-      "state": "60034d8c",
+      "state": "269d6b01",
       "events": "bc873d79",
       "rng": {
         "draws": 1,
@@ -86,6 +86,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -165,6 +166,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -244,6 +246,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -323,6 +326,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -402,6 +406,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -745,7 +750,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "9fd9e129",
+      "state": "da28d974",
       "events": "c8643206",
       "rng": {
         "draws": 12,
@@ -876,6 +881,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1054,6 +1060,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1232,6 +1239,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1410,6 +1418,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1588,6 +1597,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2001,7 +2011,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "9fd9e129",
+      "state": "da28d974",
       "events": "741638a5",
       "rng": {
         "draws": 12,
@@ -2132,6 +2142,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2310,6 +2321,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2488,6 +2500,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2666,6 +2679,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2844,6 +2858,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {

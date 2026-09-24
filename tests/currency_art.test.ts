@@ -25,6 +25,9 @@ describe('currency art', () => {
       'woc_token',
       'honor',
       'delve_mark',
+      'rift_watch_mark',
+      'church_order_crest',
+      'automaton_cog',
     ]);
   });
 
@@ -141,7 +144,10 @@ describe('currency art', () => {
     const hashes = new Set<string>();
     for (const asset of mapping.assets) {
       expect(asset.output).toBe(`${asset.id}.webp`);
-      expect(asset.source).toBe('OpenAI built-in image generation');
+      expect([
+        'OpenAI built-in image generation',
+        'World of ClaudeCraft faction rewards pipeline',
+      ]).toContain(asset.source);
       expect(asset.owner).toBe('World of ClaudeCraft');
       expect(asset.license).toContain('project asset');
       expect(asset.sourceSha256).toMatch(/^[0-9a-f]{64}$/);
@@ -212,10 +218,21 @@ describe('currency art', () => {
         circularCropScales: [128, 48, 32, 16, 11],
       },
     });
-    expect(acceptedRecord.assets.map(({ id }) => id).sort()).toEqual(ids);
+    const v039CohortIds = [
+      'coin_copper',
+      'coin_gold',
+      'coin_silver',
+      'delve_mark',
+      'honor',
+      'woc_token',
+    ];
+    expect(acceptedRecord.assets.map(({ id }) => id).sort()).toEqual(v039CohortIds.sort());
 
     const referencesById = new Map(acceptedRecord.visualReferences.map((ref) => [ref.id, ref]));
     for (const asset of mapping.assets) {
+      if (asset.source === 'World of ClaudeCraft faction rewards pipeline') {
+        continue;
+      }
       const accepted = acceptedRecord.assets.find(({ id }) => id === asset.id);
       expect(accepted, asset.id).toBeDefined();
       expect(accepted?.prompt, asset.id).toContain('Use case: stylized-concept.');

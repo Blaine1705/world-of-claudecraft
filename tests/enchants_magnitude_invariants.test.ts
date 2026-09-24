@@ -281,12 +281,17 @@ describe('enchant table magnitude invariants', () => {
         .filter((e) => e.requiresPerfected)
         .map((e) => e.id),
     ).toEqual(['enchant_lucent_infusion']);
-    // Ordinary static enchants outside Lucent keep the historical free floor.
-    // Zeal's separate learned skill-100 contract is pinned above.
-    for (const e of Object.values(ENCHANTS).filter((x) => isStaticEnchant(x) && !isApex(x))) {
+    // Ordinary static enchants outside Lucent and drop formulas keep the historical free floor.
+    // Zeal and the three faction enchants are formula-taught drop enchants with skillReq gates.
+    for (const e of Object.values(ENCHANTS).filter(
+      (x) => isStaticEnchant(x) && !isApex(x) && x.acquisition !== 'drop',
+    )) {
       expect(e.skillReq, `${e.id}: free floor`).toBeUndefined();
       expect(e.requiresPerfected, `${e.id}: any-copy`).toBeUndefined();
     }
+    expect(ENCHANTS.enchant_offhand_spirit.skillReq).toBe(40);
+    expect(ENCHANTS.enchant_feet_shadowstride.skillReq).toBe(40);
+    expect(ENCHANTS.enchant_gloves_forged_might.skillReq).toBe(40);
     // The two rungs the design settled on: the apex quartet at the skill-100
     // product rung, the capstone Infusion at the 125 cap.
     expect(ENCHANTS.enchant_weapon_lucent_might.skillReq).toBe(100);

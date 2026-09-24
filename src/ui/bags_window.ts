@@ -19,9 +19,9 @@
 
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
+import { getItemCooldownDuration } from '../sim/content/item_cooldowns';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
-import { getItemCooldownDuration } from '../sim/content/item_cooldowns';
 import { baggedCopyAnchor } from '../sim/item_copy_anchor';
 import { itemCopyPin, type NamedSlotTarget } from '../sim/item_copy_ref';
 import { isItemLocked } from '../sim/item_lock';
@@ -1119,8 +1119,8 @@ export class BagsWindow {
       // is visible in the bag. The bag is a cold window with no per-frame driver, so
       // the sweep is a self-contained CSS animation seeded from remaining seconds.
       const itemCd =
-        world.player.cooldowns.get(item.id) ??
-        (item.id === FIREBOTTLE_ITEM_ID ? world.player.firebottleCdRemaining : 0);
+        world.player?.cooldowns?.get(item.id) ??
+        (item.id === FIREBOTTLE_ITEM_ID ? (world.player?.firebottleCdRemaining ?? 0) : 0);
       const itemTotalCd =
         getItemCooldownDuration(item.id) ||
         (item.id === FIREBOTTLE_ITEM_ID ? FIREBOTTLE_COOLDOWN_SECS : itemCd);

@@ -1,6 +1,5 @@
-import { ABILITIES } from '../../../sim/data';
 import type { ResolvedAbility } from '../../../sim/sim';
-import type { AbilityEffect, Entity } from '../../../sim/types';
+import type { AbilityDef, AbilityEffect, Entity } from '../../../sim/types';
 
 export interface AimPoint {
   x: number;
@@ -152,15 +151,41 @@ export function abilityAoeRadius(res: { effects: readonly AbilityEffect[] }): nu
   return effect && 'radius' in effect ? effect.radius : DEFAULT_GROUND_AOE_RADIUS;
 }
 
+const CLOCKWORK_SHOCK_BOMB_ABILITY: AbilityDef = {
+  id: 'clockwork_shock_bomb',
+  name: 'Clockwork Shock Bomb',
+  class: 'warrior',
+  learnLevel: 1,
+  cost: 0,
+  castTime: 0,
+  cooldown: 60,
+  range: 30,
+  school: 'nature',
+  requiresTarget: false,
+  targetMode: 'position',
+  effects: [
+    {
+      type: 'aoeDamage',
+      min: 120,
+      max: 160,
+      radius: 5,
+    },
+  ],
+  description:
+    'Throws a Clockwork Shock Bomb at the target location, dealing 120 to 160 Nature damage to enemies within 5 yards.',
+};
+
 export function resolveGroundAimAbility(
   known: ReadonlyArray<ResolvedAbility>,
   id: string,
 ): ResolvedAbility | null {
   const match = known.find((k) => k.def.id === id);
   if (match) return match;
-  if (id === 'clockwork_shock_bomb' && ABILITIES.clockwork_shock_bomb) {
-    const def = ABILITIES.clockwork_shock_bomb;
-    return { def, effects: def.effects ?? [] } as ResolvedAbility;
+  if (id === 'clockwork_shock_bomb') {
+    return {
+      def: CLOCKWORK_SHOCK_BOMB_ABILITY,
+      effects: CLOCKWORK_SHOCK_BOMB_ABILITY.effects ?? [],
+    } as ResolvedAbility;
   }
   return null;
 }

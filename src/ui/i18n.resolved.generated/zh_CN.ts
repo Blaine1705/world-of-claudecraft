@@ -2333,12 +2333,12 @@ export const zh_CN: EnTranslations = {
       "wocPreview": "预览余额，尚未验证",
       "lifetime": "累计 {amount}",
       "factionPending": "阵营货币：待第二阶段",
-      "riftWatchMark": "Rift Watch Mark",
-      "riftWatchMarkNote": "World Quests in Rift Watch zones",
-      "churchOrderCrest": "Order Crest",
-      "churchOrderCrestNote": "World Quests in Church Order zones",
-      "automatonCog": "Automaton Cog",
-      "automatonCogNote": "World Quests in Automaton zones"
+      "riftWatchMark": "裂隙守望印记",
+      "riftWatchMarkNote": "裂隙守望区域的世界任务",
+      "churchOrderCrest": "教会徽记",
+      "churchOrderCrestNote": "教会修会区域的世界任务",
+      "automatonCog": "机械齿轮",
+      "automatonCogNote": "机械造物区域的世界任务"
     },
     "reputation": {
       "intro": "三个阵营同时推进：每个世界任务都会计入其所在区域的阵营。",
@@ -4631,28 +4631,28 @@ export const zh_CN: EnTranslations = {
       "enchant_chest_lucent_stamina": "胸甲蚀刻：莹光耐力",
       "enchant_feet_lucent_agility": "长靴蚀刻：莹光敏捷",
       "enchant_lucent_infusion": "莹光灌注",
-      "enchant_offhand_spirit": "Offhand Etching: Spirit",
-      "enchant_feet_shadowstride": "Boot Etching: Shadowstride",
-      "enchant_gloves_forged_might": "Glove Etching: Forged Might"
+      "enchant_offhand_spirit": "副手蚀刻：精神",
+      "enchant_feet_shadowstride": "长靴蚀刻：暗影漫步",
+      "enchant_gloves_forged_might": "手套蚀刻：锻造力量"
     },
     "enchantDescription": {
       "enchant_weapon_lastflame_zeal": "命中的近战攻击有几率使你获得50点力量，持续15秒，并为你恢复200点生命值。治疗加成与减益生效。每次命中的触发几率为攻击武器基础速度每0.6秒对应1%。没有内置冷却时间。双手共享同一个增益；任一只手触发都会刷新该增益，且永不叠加。远程攻击不会触发此效果。狼形态改用其1秒的基础挥击速度。"
     },
     "factionRewards": {
-      "alliedHearthstoneUse": "Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)",
-      "alliedHearthstoneAttuned": "Attuned to: {hub}",
-      "hub_none": "None (Use near a faction hub to attune)",
-      "hub_rift_watch": "Drifthaven (The Rift Watch)",
-      "hub_church_order": "Eastbrook Vale (The Church of the Holy Light Order)",
-      "hub_automatons": "South Reach (The Automaton Foundry)",
-      "riftGliderUse": "Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)",
-      "targetDummyUse": "Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)",
-      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)",
-      "shockBombUse": "Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)",
-      "invisibilityUse": "Use: Shrouds you in stealth for 6 sec. (2 min cooldown)",
-      "armorKitUse": "Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.",
-      "sharpeningStoneUse": "Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.",
-      "manaElixirUse": "Use: Increases Spirit by 6 for 1 hour."
+      "alliedHearthstoneUse": "使用：将你传送至已协调的阵营据点。（10秒施法时间，15分钟冷却时间）",
+      "alliedHearthstoneAttuned": "已协调至：{hub}",
+      "hub_none": "无（在阵营据点附近使用以进行协调）",
+      "hub_rift_watch": "漂流港（裂隙守望）",
+      "hub_church_order": "东溪谷（圣光教会修会）",
+      "hub_automatons": "南境（机械铸造厂）",
+      "riftGliderUse": "使用：展开滑翔器，使坠落速度减缓，持续30秒。着陆或受到伤害会取消此效果。（2分钟冷却时间）",
+      "targetDummyUse": "使用：在野外放置一个机械训练假人，持续2分钟，用于练习战斗技能。（5分钟冷却时间）",
+      "battleStandardUse": "使用：放置神圣晨曦战旗，持续5分钟，显著提高附近所有盟友的非战斗生命与法力回复速度。在其附近停留10秒还会获得晨曦祝福（所有属性提高5%，持续30分钟）。（5分钟冷却时间）",
+      "shockBombUse": "使用：向最多30码的目标投掷一枚震击炸弹，对5码内的所有敌人造成120至160点自然伤害。（1分钟冷却时间）",
+      "invisibilityUse": "使用：使你进入潜行状态，持续6秒。（2分钟冷却时间）",
+      "armorKitUse": "使用：加固你的胸甲，使其护甲值提高12点，持续1小时。",
+      "sharpeningStoneUse": "使用：打磨你的主手武器，使其攻击强度提高6点，持续30分钟。",
+      "manaElixirUse": "使用：使精神提高6点，持续1小时。"
     },
     "professions": {
       "title": "专业",
@@ -16435,58 +16435,58 @@ export const zh_CN: EnTranslations = {
         "name": "风暴颂歌链甲之靴"
       },
       "allied_hearthstone": {
-        "name": "Allied Hearthstone"
+        "name": "盟友炉石"
       },
       "allied_vanguard_duffel": {
-        "name": "Allied Vanguard Duffel"
+        "name": "盟友先锋行李袋"
       },
       "rift_feather_glider": {
-        "name": "Rift Feather Glider"
+        "name": "裂隙羽毛滑翔器"
       },
       "formula_enchant_feet_shadowstride": {
-        "name": "Formula: Enchant Boots - Shadowstride"
+        "name": "配方：附魔长靴 - 暗影漫步"
       },
       "recipe_potion_of_invisibility": {
-        "name": "Recipe: Potion of Invisibility"
+        "name": "配方：隐形药水"
       },
       "potion_of_invisibility": {
-        "name": "Potion of Invisibility"
+        "name": "隐形药水"
       },
       "pattern_reinforced_armor_kit": {
-        "name": "Pattern: Reinforced Armor Kit"
+        "name": "图样：加固护甲片"
       },
       "reinforced_armor_kit": {
-        "name": "Reinforced Armor Kit"
+        "name": "加固护甲片"
       },
       "dawn_battle_standard": {
-        "name": "Dawn Battle Standard"
+        "name": "晨曦战旗"
       },
       "formula_enchant_offhand_spirit": {
-        "name": "Formula: Enchant Off-Hand - Spirit"
+        "name": "配方：附魔副手 - 精神"
       },
       "recipe_elixir_of_mana_regeneration": {
-        "name": "Recipe: Elixir of Mana Regeneration"
+        "name": "配方：法力回复药剂"
       },
       "elixir_of_mana_regeneration": {
-        "name": "Elixir of Mana Regeneration"
+        "name": "法力回复药剂"
       },
       "clockwork_target_dummy": {
-        "name": "Clockwork Target Dummy"
+        "name": "发条假人"
       },
       "schematic_clockwork_shock_bomb": {
-        "name": "Schematic: Clockwork Shock Bomb"
+        "name": "结构图：发条震击炸弹"
       },
       "clockwork_shock_bomb": {
-        "name": "Clockwork Shock Bomb"
+        "name": "发条震击炸弹"
       },
       "plans_dense_sharpening_stone": {
-        "name": "Plans: Dense Sharpening Stone"
+        "name": "设计图：致密磨刀石"
       },
       "dense_sharpening_stone": {
-        "name": "Dense Sharpening Stone"
+        "name": "致密磨刀石"
       },
       "formula_enchant_gloves_forged_might": {
-        "name": "Formula: Enchant Gloves - Forged Might"
+        "name": "配方：附魔手套 - 锻造力量"
       },
       "conjured_water4": {
         "name": "魔法泉水"

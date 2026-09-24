@@ -29,6 +29,7 @@ import {
   APEX_ARMOR_RECIPES,
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
+  FACTION_REWARD_RECIPES,
   INTERMEDIATE_RECIPES,
 } from '../src/sim/content/recipes';
 import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
@@ -828,6 +829,7 @@ describe('masterwrought Phase 11h GATE C: the flask crop', () => {
     // suite; the other eight were the exploitable half until now. The map and
     // the total check each other so neither can drift alone.
     const alchemyHerbPerRecipe: Record<string, number> = {
+      recipe_elixir_of_mana_regeneration: 3,
       recipe_elixir_of_the_boar: 2,
       recipe_elixir_of_the_serpent: 1,
       recipe_goldleaf_healing_draught: 4,
@@ -840,6 +842,7 @@ describe('masterwrought Phase 11h GATE C: the flask crop', () => {
       recipe_lesser_healing_potion: 1,
       recipe_ironhusk_flask: 2,
       recipe_minor_healing_potion: 2,
+      recipe_potion_of_invisibility: 6,
       recipe_quickening_catalyst: 3,
       recipe_runewater_flask: 2,
       recipe_silverleaf_healing_draught: 4,
@@ -866,10 +869,12 @@ describe('masterwrought Phase 11h GATE C: the flask crop', () => {
     // phase 11l, whose trophy row recipe_lesser_healing_potion (re-picked by
     // the 11l QA from recipe_healing_potion) added goldleaf 1 (a
     // pure addition, so R18's no-reduction direction still holds).
+    // Faction rewards added recipe_elixir_of_mana_regeneration (3) and
+    // recipe_potion_of_invisibility (6), bringing the total to 54.
     expect(
       Object.values(alchemyHerbPerRecipe).reduce((t, n) => t + n, 0),
       "alchemy's whole herb demand",
-    ).toBe(45);
+    ).toBe(54);
   });
 
   it('every apex alchemy row that took a crop still consumes an herb', () => {
@@ -1479,10 +1484,12 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     expect(
       ALL_RECIPES.filter(
         (recipe) =>
-          !CRUCIBLE_COLLECTION_RECIPES.includes(recipe) && !FORGEBREAKER_RECIPES.includes(recipe),
+          !CRUCIBLE_COLLECTION_RECIPES.includes(recipe) &&
+          !FORGEBREAKER_RECIPES.includes(recipe) &&
+          !FACTION_REWARD_RECIPES.includes(recipe),
       ),
     ).toHaveLength(170);
-    expect(ALL_RECIPES).toHaveLength(204);
+    expect(ALL_RECIPES).toHaveLength(209);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

@@ -2333,12 +2333,12 @@ export const ja_JP: EnTranslations = {
       "wocPreview": "プレビュー残高（未検証）",
       "lifetime": "累計 {amount}",
       "factionPending": "勢力通貨：第2段階で決定",
-      "riftWatchMark": "Rift Watch Mark",
-      "riftWatchMarkNote": "World Quests in Rift Watch zones",
-      "churchOrderCrest": "Order Crest",
-      "churchOrderCrestNote": "World Quests in Church Order zones",
-      "automatonCog": "Automaton Cog",
-      "automatonCogNote": "World Quests in Automaton zones"
+      "riftWatchMark": "リフトの見張りの印",
+      "riftWatchMarkNote": "リフトの見張り地域のワールドクエスト",
+      "churchOrderCrest": "修道会の紋章",
+      "churchOrderCrestNote": "教会修道会地域のワールドクエスト",
+      "automatonCog": "オートマトンの歯車",
+      "automatonCogNote": "オートマトン地域のワールドクエスト"
     },
     "reputation": {
       "intro": "3つの勢力は同時に進行します。各ワールドクエストは、その地域の勢力に加算されます。",
@@ -4631,28 +4631,28 @@ export const ja_JP: EnTranslations = {
       "enchant_chest_lucent_stamina": "胸銘刻：光輝のスタミナ",
       "enchant_feet_lucent_agility": "足銘刻：光輝の敏捷性",
       "enchant_lucent_infusion": "光輝の注入",
-      "enchant_offhand_spirit": "Offhand Etching: Spirit",
-      "enchant_feet_shadowstride": "Boot Etching: Shadowstride",
-      "enchant_gloves_forged_might": "Glove Etching: Forged Might"
+      "enchant_offhand_spirit": "オフハンド銘刻：精神力",
+      "enchant_feet_shadowstride": "足銘刻：シャドウストライド",
+      "enchant_gloves_forged_might": "手銘刻：鍛造の剛力"
     },
     "enchantDescription": {
       "enchant_weapon_lastflame_zeal": "命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。"
     },
     "factionRewards": {
-      "alliedHearthstoneUse": "Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)",
-      "alliedHearthstoneAttuned": "Attuned to: {hub}",
-      "hub_none": "None (Use near a faction hub to attune)",
-      "hub_rift_watch": "Drifthaven (The Rift Watch)",
-      "hub_church_order": "Eastbrook Vale (The Church of the Holy Light Order)",
-      "hub_automatons": "South Reach (The Automaton Foundry)",
-      "riftGliderUse": "Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)",
-      "targetDummyUse": "Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)",
-      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)",
-      "shockBombUse": "Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)",
-      "invisibilityUse": "Use: Shrouds you in stealth for 6 sec. (2 min cooldown)",
-      "armorKitUse": "Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.",
-      "sharpeningStoneUse": "Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.",
-      "manaElixirUse": "Use: Increases Spirit by 6 for 1 hour."
+      "alliedHearthstoneUse": "使用効果：同調した勢力拠点へテレポートする。（詠唱時間10秒、クールダウン15分）",
+      "alliedHearthstoneAttuned": "同調先：{hub}",
+      "hub_none": "なし（勢力拠点の近くで使用して同調）",
+      "hub_rift_watch": "ドリフトヘイブン（リフトの見張り）",
+      "hub_church_order": "イーストブルック渓谷（聖なる光の教会修道会）",
+      "hub_automatons": "サウスリーチ（オートマトン鋳造所）",
+      "riftGliderUse": "使用効果：グライダーを展開し、落下速度を30秒間低下させる。着地するかダメージを受けると効果は解除される。（クールダウン2分）",
+      "targetDummyUse": "使用効果：野外に機械仕掛けの訓練用標的を2分間設置し、戦闘能力を訓練する。（クールダウン5分）",
+      "battleStandardUse": "使用効果：聖なる暁の軍旗を5分間設置し、近くの味方全員の非戦闘時の体力およびマナ回復力を大幅に増加させる。近くに10秒間留まると「暁の祝福」（全ステータス+5%、30分間）も付与される。（クールダウン5分）",
+      "shockBombUse": "使用効果：最大30ヤード先にショックボムを投げ、5ヤード以内のすべての敵に120～160の自然ダメージを与える。（クールダウン1分）",
+      "invisibilityUse": "使用効果：6秒間ステルス状態になる。（クールダウン2分）",
+      "armorKitUse": "使用効果：胸当てを補強し、1時間アーマーを12増加させる。",
+      "sharpeningStoneUse": "使用効果：利き手武器を研ぎ澄まし、30分間攻撃力を6増加させる。",
+      "manaElixirUse": "使用効果：1時間精神力を6増加させる。"
     },
     "professions": {
       "title": "専門技能",
@@ -16435,58 +16435,58 @@ export const ja_JP: EnTranslations = {
         "name": "嵐の賛歌の鎖の靴"
       },
       "allied_hearthstone": {
-        "name": "Allied Hearthstone"
+        "name": "盟友の炉石"
       },
       "allied_vanguard_duffel": {
-        "name": "Allied Vanguard Duffel"
+        "name": "盟友の先鋒ダッフルバッグ"
       },
       "rift_feather_glider": {
-        "name": "Rift Feather Glider"
+        "name": "リフトフェザー・グライダー"
       },
       "formula_enchant_feet_shadowstride": {
-        "name": "Formula: Enchant Boots - Shadowstride"
+        "name": "製法書：ブーツへの付与 - シャドウストライド"
       },
       "recipe_potion_of_invisibility": {
-        "name": "Recipe: Potion of Invisibility"
+        "name": "レシピ：不可視のポーション"
       },
       "potion_of_invisibility": {
-        "name": "Potion of Invisibility"
+        "name": "不可視のポーション"
       },
       "pattern_reinforced_armor_kit": {
-        "name": "Pattern: Reinforced Armor Kit"
+        "name": "型紙：強化アーマーキット"
       },
       "reinforced_armor_kit": {
-        "name": "Reinforced Armor Kit"
+        "name": "強化アーマーキット"
       },
       "dawn_battle_standard": {
-        "name": "Dawn Battle Standard"
+        "name": "暁の軍旗"
       },
       "formula_enchant_offhand_spirit": {
-        "name": "Formula: Enchant Off-Hand - Spirit"
+        "name": "製法書：副手への付与 - 精神力"
       },
       "recipe_elixir_of_mana_regeneration": {
-        "name": "Recipe: Elixir of Mana Regeneration"
+        "name": "レシピ：マナ回復のエリクサー"
       },
       "elixir_of_mana_regeneration": {
-        "name": "Elixir of Mana Regeneration"
+        "name": "マナ回復のエリクサー"
       },
       "clockwork_target_dummy": {
-        "name": "Clockwork Target Dummy"
+        "name": "ぜんまい仕掛けの訓練用標的"
       },
       "schematic_clockwork_shock_bomb": {
-        "name": "Schematic: Clockwork Shock Bomb"
+        "name": "設計図：ぜんまい仕掛けのショックボム"
       },
       "clockwork_shock_bomb": {
-        "name": "Clockwork Shock Bomb"
+        "name": "ぜんまい仕掛けのショックボム"
       },
       "plans_dense_sharpening_stone": {
-        "name": "Plans: Dense Sharpening Stone"
+        "name": "鍛冶設計図：高密度砥石"
       },
       "dense_sharpening_stone": {
-        "name": "Dense Sharpening Stone"
+        "name": "高密度砥石"
       },
       "formula_enchant_gloves_forged_might": {
-        "name": "Formula: Enchant Gloves - Forged Might"
+        "name": "製法書：手袋への付与 - 鍛造の剛力"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

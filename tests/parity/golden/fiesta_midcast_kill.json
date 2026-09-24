@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1014,
-      "state": "38fdec4f",
+      "state": "47ef2b61",
       "events": "8c92e89b",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1014,
-      "state": "3a19408e",
+      "state": "ad55b2d0",
       "events": "3a5da579",
       "rng": {
         "draws": 64,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1014,
-      "state": "cabb5a6c",
+      "state": "95d57d06",
       "events": "70150bad",
       "rng": {
         "draws": 280,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1014,
-      "state": "4ce1d4e7",
+      "state": "4c68ab39",
       "events": "f35a0f3d",
       "rng": {
         "draws": 531,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1014,
-      "state": "237955fa",
+      "state": "ee71c124",
       "events": "6307f48a",
       "rng": {
         "draws": 542,
@@ -131,6 +131,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -217,6 +218,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -309,6 +311,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -394,6 +397,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -670,7 +674,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1014,
-      "state": "536ef2c6",
+      "state": "afdd1b90",
       "events": "7b856255",
       "rng": {
         "draws": 542,
@@ -726,6 +730,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -812,6 +817,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -904,6 +910,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -989,6 +996,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1263,7 +1271,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1014,
-      "state": "693510c1",
+      "state": "8b9c30e5",
       "events": "4ae6f06e",
       "rng": {
         "draws": 542,
@@ -1320,6 +1328,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1408,6 +1417,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1501,6 +1511,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1586,6 +1597,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -1860,7 +1872,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1014,
-      "state": "38d70fb3",
+      "state": "9933427f",
       "events": "741638a5",
       "rng": {
         "draws": 800,
@@ -1871,7 +1883,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1014,
-      "state": "ff04ec98",
+      "state": "a99a986c",
       "events": "741638a5",
       "rng": {
         "draws": 979,
@@ -1928,6 +1940,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -2016,6 +2029,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -2109,6 +2123,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,
@@ -2194,6 +2209,7 @@
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "fiestaRestore": {
             "level": 1,

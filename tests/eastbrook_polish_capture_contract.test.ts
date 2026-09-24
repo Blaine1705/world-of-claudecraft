@@ -690,7 +690,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted at the third release/v0.43.0 merge into feature/world-quests
   // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
   // No capture was retaken.
-  'cb3585ee0788cbaa3befd04c3c0971ea7a4cbd165c741e81bbb8d3391748c119';
+  '106081313d991a798953e99d9c12104707ebc09c76042814adc1c0877b586ebe';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

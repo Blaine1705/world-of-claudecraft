@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "a415789c",
+      "state": "6eab4e33",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,6 +71,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -172,7 +173,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "4dcd1a35",
+      "state": "1f712746",
       "events": "c4514c52",
       "rng": {
         "draws": 1,
@@ -226,6 +227,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -336,7 +338,7 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 1011,
-      "state": "072e91bc",
+      "state": "b3e62b71",
       "events": "238e2198",
       "rng": {
         "draws": 1,
@@ -390,6 +392,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -500,7 +503,7 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 1011,
-      "state": "9cc2d05c",
+      "state": "554610f5",
       "events": "04ba906b",
       "rng": {
         "draws": 2,
@@ -558,6 +561,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -680,7 +684,7 @@
       "tick": 99,
       "time": 4.95,
       "nextId": 1011,
-      "state": "57a48301",
+      "state": "4379a7de",
       "events": "8dee233a",
       "rng": {
         "draws": 3,
@@ -744,6 +748,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {
             "fishing": 0.08

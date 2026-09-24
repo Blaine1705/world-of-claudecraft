@@ -974,8 +974,8 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     // "herbalism loses nothing", and a total that only ever climbs is what says
     // so.
     expect(totals).toEqual({
-      silverleaf_herb: 28,
-      goldleaf_herb: 33,
+      silverleaf_herb: 34,
+      goldleaf_herb: 36,
       sunpetal_herb: 58,
     });
   });

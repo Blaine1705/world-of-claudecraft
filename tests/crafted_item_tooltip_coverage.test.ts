@@ -20,6 +20,7 @@ import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
 import { cookingCatchHintKey } from '../src/ui/hud/professions/cooking_catch_hint_view';
 import { elixirTooltipLines } from '../src/ui/hud/professions/elixir_tooltip_view';
 import { feastTooltipLines } from '../src/ui/hud/professions/feast_tooltip_view';
+import { factionRewardTooltipLines } from '../src/ui/hud/faction_reward_tooltip_view';
 import { materialHintLine } from '../src/ui/hud/professions/material_hint_view';
 import { materialProfessionHintText } from '../src/ui/hud/professions/material_profession_hint_view';
 import { mobileStationTooltipLines } from '../src/ui/hud/professions/mobile_station_tooltip';
@@ -51,6 +52,7 @@ const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
   ['potion use line', (def) => (def.potionHp ?? 0) > 0 || (def.potionMana ?? 0) > 0],
   ['elixir use line', (def) => elixirTooltipLines(def) !== ''],
   ['feast use line', (def) => feastTooltipLines(def) !== ''],
+  ['faction reward line', (def) => factionRewardTooltipLines(def) !== ''],
   ['gathering tool lines', (def) => gatherToolTooltipLines(def) !== ''],
   ['tool effect charm lines', (def) => toolEffectTooltipLines(def) !== ''],
   // The station-name resolver is irrelevant to the has-a-card predicate.

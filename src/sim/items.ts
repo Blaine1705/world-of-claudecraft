@@ -61,11 +61,11 @@ import {
   weaponHand,
 } from './equipment_rules';
 import {
-  type FactionId,
   factionCurrencyName,
-  factionDisplayName,
-  STANDING_TIER_LABELS,
-} from './factions';
+  hasFactionCurrency,
+  spendFactionCurrency,
+} from './faction_currencies';
+import { type FactionId, factionDisplayName, STANDING_TIER_LABELS } from './factions';
 import { formatMoney } from './format_money';
 import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
@@ -1456,10 +1456,12 @@ export function buyItem(
     honorCost = totals.honor;
   }
   if (hasFactionPrice && requiredFaction && !freeVendor) {
-    const currentMarks = meta.factionCurrencies?.[requiredFaction] ?? 0;
-    if (currentMarks < factionCurrencyCost) {
+    if (!hasFactionCurrency(meta, requiredFaction, factionCurrencyCost)) {
       const curName = factionCurrencyName(requiredFaction);
-      ctx.error(meta.entityId, `You need ${factionCurrencyCost} ${curName} to purchase that.`);
+      ctx.error(
+        meta.entityId,
+        `You need ${factionCurrencyCost} ${curName}${factionCurrencyCost === 1 ? '' : 's'} to purchase that.`,
+      );
       return;
     }
   }
@@ -1476,10 +1478,7 @@ export function buyItem(
     return;
   }
   if (hasFactionPrice && requiredFaction && !freeVendor) {
-    if (!meta.factionCurrencies) {
-      meta.factionCurrencies = { rift_watch: 0, church_order: 0, automatons: 0 };
-    }
-    meta.factionCurrencies[requiredFaction] -= factionCurrencyCost;
+    spendFactionCurrency(meta, requiredFaction, factionCurrencyCost, ctx);
   }
   meta.copper -= copperCost;
   meta.honor -= honorCost;

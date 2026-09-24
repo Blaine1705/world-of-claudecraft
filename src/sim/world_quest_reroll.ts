@@ -19,6 +19,19 @@ export interface CanRerollResult {
 }
 
 /** Determine all active world quests for a player, applying any personal cycle replacements. */
+export function canRerollWorldQuestForPlayer(
+  ctx: SimContext,
+  questId: string,
+  pid?: number,
+): CanRerollResult {
+  const r = ctx.resolve(pid);
+  if (!r) return { canReroll: false, reason: 'Player not found.' };
+  const { meta, e: player } = r;
+  const level = player.level ?? 20;
+  const cycle = meta.devWorldQuestCycle ?? ctx.currentWorldQuestRotation().cycle;
+  return canRerollWorldQuest(meta, questId, cycle, level);
+}
+
 export function playerActiveWorldQuests(
   meta: Pick<PlayerMeta, 'worldQuestCycle' | 'worldQuestReplacements'>,
   cycle?: string,

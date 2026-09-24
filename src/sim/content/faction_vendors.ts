@@ -532,6 +532,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     critRating: 7,
     sellValue: 25000,
     buyValue: 0,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   champion_forged_loop: {
     id: 'champion_forged_loop',

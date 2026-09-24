@@ -320,62 +320,19 @@ export function awardFactionReputation(
   return { gained, total: newTotal, tier, previousTier, capped };
 }
 
+import { FACTION_CURRENCY_ITEM_IDS } from './faction_currencies';
+
+export {
+  awardFactionCurrency,
+  FACTION_CURRENCY_ITEM_IDS,
+  factionCurrencyName,
+  freshFactionCurrencies,
+  getFactionCurrency,
+  hasFactionCurrency,
+  sanitizeFactionCurrencies,
+  spendFactionCurrency,
+  worldQuestFactionCurrencyReward,
+} from './faction_currencies';
+
 /** The dedicated currency ID for each allied faction. */
-export const FACTION_CURRENCY_IDS: Readonly<Record<FactionId, string>> = Object.freeze({
-  rift_watch: 'rift_watch_mark',
-  church_order: 'church_order_crest',
-  automatons: 'automaton_cog',
-});
-
-export function freshFactionCurrencies(): Record<FactionId, number> {
-  return {
-    rift_watch: 0,
-    church_order: 0,
-    automatons: 0,
-  };
-}
-
-export function sanitizeFactionCurrencies(raw: unknown): Record<FactionId, number> {
-  const result = freshFactionCurrencies();
-  if (!raw || typeof raw !== 'object') return result;
-  const obj = raw as Record<string, unknown>;
-  for (const id of FACTION_IDS) {
-    const val = obj[id];
-    if (typeof val === 'number' && Number.isFinite(val) && val > 0) {
-      result[id] = Math.floor(val);
-    }
-  }
-  return result;
-}
-
-/** Reward in faction currency for completing a World Quest in that faction's zone. */
-export function worldQuestFactionCurrencyReward(_quest: WorldQuestDef, level: number): number {
-  return level <= 15 ? 5 : 10;
-}
-
-/** Display name of each faction's currency. */
-export function factionCurrencyName(factionId: FactionId): string {
-  switch (factionId) {
-    case 'rift_watch':
-      return 'Rift Watch Mark';
-    case 'church_order':
-      return 'Order Crest';
-    case 'automatons':
-      return 'Automaton Cog';
-  }
-}
-
-/** Award faction currency directly to PlayerMeta. */
-export function awardFactionCurrency(
-  meta: PlayerMeta,
-  factionId: FactionId,
-  amount: number,
-): number {
-  if (!meta.factionCurrencies) {
-    meta.factionCurrencies = freshFactionCurrencies();
-  }
-  const current = meta.factionCurrencies[factionId] ?? 0;
-  const next = current + Math.max(0, Math.floor(amount));
-  meta.factionCurrencies[factionId] = next;
-  return next;
-}
+export const FACTION_CURRENCY_IDS = FACTION_CURRENCY_ITEM_IDS;

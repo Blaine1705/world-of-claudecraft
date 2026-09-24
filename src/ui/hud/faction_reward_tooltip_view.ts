@@ -3,15 +3,16 @@ import { esc } from '../esc';
 import { t } from '../i18n';
 
 /** Tooltip description lines for allied faction rewards and consumables. */
-export function factionRewardTooltipLines(
-  item: ItemDef,
-  attunement?: string | null,
-): string {
+export function factionRewardTooltipLines(item: ItemDef, attunement?: string | null): string {
   if (item.id === 'allied_hearthstone') {
-    const hubKey = attunement
-      ? `hudChrome.factionRewards.hub_${attunement}`
-      : 'hudChrome.factionRewards.hub_none';
-    const hubName = t(hubKey as any);
+    const hubName =
+      attunement === 'rift_watch'
+        ? t('hudChrome.factionRewards.hub_rift_watch')
+        : attunement === 'church_order'
+          ? t('hudChrome.factionRewards.hub_church_order')
+          : attunement === 'automatons'
+            ? t('hudChrome.factionRewards.hub_automatons')
+            : t('hudChrome.factionRewards.hub_none');
     return (
       `<div class="tt-desc">${esc(t('hudChrome.factionRewards.alliedHearthstoneUse'))}</div>` +
       `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.factionRewards.alliedHearthstoneAttuned', { hub: hubName }))}</div>`

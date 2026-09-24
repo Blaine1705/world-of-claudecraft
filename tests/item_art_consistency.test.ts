@@ -840,7 +840,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
     // The wq-reputation merge's 15 faction quartermaster items: 1,320.
-    expect(Object.keys(ITEMS)).toHaveLength(1320);
+    // The allied faction world quest rewards and toys: 1,338 (+18 items).
+    expect(Object.keys(ITEMS)).toHaveLength(1338);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -999,9 +1000,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // release/v0.43.0 merge: 1,287.
     // The faction quartermaster icons (faction-vendor-icons-2026-09-16, 15
     // SVG compositions) join at the wq-reputation merge: 1,302.
-    expect(new Set(currentOwnerIds).size).toBe(1302);
-    expect(shippingIds).toHaveLength(1302);
-    expect(Object.keys(ITEMS)).toHaveLength(1320);
+    // The allied faction reward icons (faction-rewards-icons-2026-09-17, 18
+    // SVG compositions) join here: 1,320.
+    expect(new Set(currentOwnerIds).size).toBe(1320);
+    expect(shippingIds).toHaveLength(1320);
+    expect(Object.keys(ITEMS)).toHaveLength(1338);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1064,6 +1067,26 @@ describe('item-art consistency accepted-art provenance', () => {
       'templar_dawn_shield',
       'vestments_of_the_acolyte',
     ]);
+    const factionRewardsBatchIds = sorted([
+      'allied_hearthstone',
+      'allied_vanguard_duffel',
+      'clockwork_shock_bomb',
+      'clockwork_target_dummy',
+      'dawn_battle_standard',
+      'dense_sharpening_stone',
+      'elixir_of_mana_regeneration',
+      'formula_enchant_feet_shadowstride',
+      'formula_enchant_gloves_forged_might',
+      'formula_enchant_offhand_spirit',
+      'pattern_reinforced_armor_kit',
+      'plans_dense_sharpening_stone',
+      'potion_of_invisibility',
+      'recipe_elixir_of_mana_regeneration',
+      'recipe_potion_of_invisibility',
+      'reinforced_armor_kit',
+      'rift_feather_glider',
+      'schematic_clockwork_shock_bomb',
+    ]);
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
     // this whole historical chain too, the same way the Field Kit is.
     expect(
@@ -1072,6 +1095,7 @@ describe('item-art consistency accepted-art provenance', () => {
         ...releaseBatchIds,
         ...worldQuestBatchIds,
         ...factionVendorBatchIds,
+        ...factionRewardsBatchIds,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
@@ -1237,7 +1261,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // world-quest-freight-icons, 2026-09-01) at the release/v0.43.0 merge = 33.
     // The wq-reputation merge adds the faction quartermaster icons' batch
     // (faction-vendor-icons-2026-09-16) = 34.
-    expect(mapping.generatedBatches).toHaveLength(34);
+    // The allied faction rewards batch (faction-rewards-icons-2026-09-17) = 35.
+    expect(mapping.generatedBatches).toHaveLength(35);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1301,14 +1326,14 @@ describe('item-art consistency accepted-art provenance', () => {
     // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755. The
     // world-quest branch's two batches add four ids at the release/v0.43.0
     // merge: 759. The faction quartermaster batch adds 15 at the
-    // wq-reputation merge: 774.
-    expect(priorGeneratedIds).toHaveLength(774);
+    // wq-reputation merge: 774. The allied faction rewards batch adds 18: 792.
+    expect(priorGeneratedIds).toHaveLength(792);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1302);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1302);
+    expect(allCurrentOwnerIds).toHaveLength(1320);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1320);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1318,8 +1343,8 @@ describe('item-art consistency accepted-art provenance', () => {
     }).toEqual({
       entries: 43,
       // 755 + the world-quest branch's four batch ids (release/v0.43.0 merge)
-      // + the 15 faction quartermaster ids (wq-reputation merge) = 774.
-      priorGenerated: 774,
+      // + the 15 faction quartermaster ids (wq-reputation merge) + 18 faction rewards = 792.
+      priorGenerated: 792,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1389,6 +1414,8 @@ describe('item-art consistency accepted-art provenance', () => {
                 'world-quest-freight-icons-2026-09-01',
                 // The faction quartermaster stock (wq-reputation merge).
                 'faction-vendor-icons-2026-09-16',
+                // The faction rewards stock (wq-rewards-online merge).
+                'faction-rewards-icons-2026-09-17',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1396,7 +1423,7 @@ describe('item-art consistency accepted-art provenance', () => {
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
       ]),
-      'the dated catalog plus the release batches, the world-quest and faction-vendor batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
+      'the dated catalog plus the release batches, the world-quest, faction-vendor, and faction-rewards batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1527,9 +1554,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // batch ids + 46 Crucible-professions batch ids = 1283.
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302.
-    if (ownerIds.length !== 1302)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1302`);
-    if (fileIds.length !== 1302) violations.push(`shipping WebP count: ${fileIds.length} != 1302`);
+    // Plus the allied faction world quest reward icons (18 items) = 1320.
+    if (ownerIds.length !== 1320)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1320`);
+    if (fileIds.length !== 1320) violations.push(`shipping WebP count: ${fileIds.length} != 1320`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -228,13 +228,21 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'exp_windrider_slalom',
       'exp_duskweave_dispatches',
       'exp_wisp_maze',
+      'prog_rift_watch_trusted',
+      'prog_church_order_trusted',
+      'prog_automatons_trusted',
+      'prog_rift_watch_champion',
+      'prog_church_order_champion',
+      'prog_automatons_champion',
+      'prog_faction_champion_all',
     ]);
     // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
     // 300 live (counted directly off the resolved src/sim/content/deeds.ts
     // DEEDS table, matching the same pin in tests/deed_icons.test.ts and
     // tests/deed_i18n.test.ts) - 11 explicitly pending = 289 painted.
     // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
-    expect(DEED_ORDER).toHaveLength(308);
+    // 315 at the faction rewards merge: plus the seven faction standing deeds.
+    expect(DEED_ORDER).toHaveLength(315);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
@@ -268,7 +276,7 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       expect(path.isAbsolute(reference.repositoryPath), reference.id).toBe(false);
       expect(path.isAbsolute(reference.generationTimePath), reference.id).toBe(true);
       expect(reference.generationTimePath).toBe(
-        path.join(generation.worktree, reference.repositoryPath),
+        path.posix.join(generation.worktree, reference.repositoryPath),
       );
       const file = path.join(repoRoot, reference.repositoryPath);
       const bytes = readFileSync(file);

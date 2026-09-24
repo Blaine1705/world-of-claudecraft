@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "2ca6c636",
+      "state": "6b83edcf",
       "events": "2412e009",
       "rng": {
         "draws": 1,
@@ -88,6 +88,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -170,6 +171,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -252,6 +254,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -525,7 +528,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1014,
-      "state": "f72457fd",
+      "state": "6592e838",
       "events": "396469ff",
       "rng": {
         "draws": 3,
@@ -590,6 +593,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -690,6 +694,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -779,6 +784,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1060,7 +1066,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1014,
-      "state": "8211d335",
+      "state": "b85bbb6e",
       "events": "60f677cb",
       "rng": {
         "draws": 3,
@@ -1125,6 +1131,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1226,6 +1233,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1330,6 +1338,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1595,7 +1604,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 1014,
-      "state": "37c599aa",
+      "state": "1927d657",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -1660,6 +1669,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1761,6 +1771,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1865,6 +1876,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {

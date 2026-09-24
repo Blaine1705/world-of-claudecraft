@@ -1384,7 +1384,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted at the third release/v0.43.0 merge into feature/world-quests
   // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
   // No capture was retaken.
-  'e9216c460d8656182ec22c88fa7c685ee3009647cdac328ad9621e03d5b5ca57';
+  'ec92565a3b5da96b3928e134dbfcccdf44af134a39f8d59a761ba84bdde1799c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1397,7 +1397,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the third release/v0.43.0 merge into feature/world-quests
   // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
   // No capture was retaken.
-  'cb3585ee0788cbaa3befd04c3c0971ea7a4cbd165c741e81bbb8d3391748c119';
+  '106081313d991a798953e99d9c12104707ebc09c76042814adc1c0877b586ebe';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2772,7 +2772,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // again over the re-swept evidence. No capture was retaken.
       // Third release/v0.43.0 merge into feature/world-quests: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('99ebc1ece3554d5946158a424745558226bec1f680b72d5f5e7867c4cb132614');
+    ).toBe('2024b1899b83cc3021abdc4915c4418413c4ed4fcd40d3349a5d3fed26edfc42');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

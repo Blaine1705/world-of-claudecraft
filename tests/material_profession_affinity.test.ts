@@ -259,8 +259,20 @@ describe('craftIdsForMaterialItem', () => {
     // Masterwrought phase 05 catalog's rung-25 recipes).
     const fine = craftIdsForMaterialItem('fine_iron_ore');
     const base = craftIdsForMaterialItem('iron_ore');
-    expect(base).toEqual(['jewelcrafting', 'weaponcrafting', 'armorcrafting']);
-    expect(fine).toEqual(['engineering', 'jewelcrafting', 'weaponcrafting', 'armorcrafting']);
+    expect(base).toEqual([
+      'engineering',
+      'leatherworking',
+      'jewelcrafting',
+      'weaponcrafting',
+      'armorcrafting',
+    ]);
+    expect(fine).toEqual([
+      'engineering',
+      'leatherworking',
+      'jewelcrafting',
+      'weaponcrafting',
+      'armorcrafting',
+    ]);
     for (const craftId of base) {
       expect(fine, `fine inherits ${craftId}`).toContain(craftId);
     }

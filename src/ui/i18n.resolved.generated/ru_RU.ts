@@ -2333,12 +2333,12 @@ export const ru_RU: EnTranslations = {
       "wocPreview": "Предварительный баланс, ещё не подтверждён",
       "lifetime": "Всего {amount}",
       "factionPending": "Валюта фракции: ожидает этапа 2",
-      "riftWatchMark": "Rift Watch Mark",
-      "riftWatchMarkNote": "World Quests in Rift Watch zones",
-      "churchOrderCrest": "Order Crest",
-      "churchOrderCrestNote": "World Quests in Church Order zones",
-      "automatonCog": "Automaton Cog",
-      "automatonCogNote": "World Quests in Automaton zones"
+      "riftWatchMark": "Знак Дозора Разлома",
+      "riftWatchMarkNote": "Локальные задания в зонах Дозора Разлома",
+      "churchOrderCrest": "Герб Ордена",
+      "churchOrderCrestNote": "Локальные задания в зонах Церковного ордена",
+      "automatonCog": "Шестеренка автоматона",
+      "automatonCogNote": "Локальные задания в зонах Автоматонов"
     },
     "reputation": {
       "intro": "Все три фракции развиваются одновременно: каждое мировое задание идёт в зачёт фракции своей зоны.",
@@ -4631,28 +4631,28 @@ export const ru_RU: EnTranslations = {
       "enchant_chest_lucent_stamina": "Травление нагрудника: Светозарная выносливость",
       "enchant_feet_lucent_agility": "Травление сапог: Светозарная ловкость",
       "enchant_lucent_infusion": "Светозарное вливание",
-      "enchant_offhand_spirit": "Offhand Etching: Spirit",
-      "enchant_feet_shadowstride": "Boot Etching: Shadowstride",
-      "enchant_gloves_forged_might": "Glove Etching: Forged Might"
+      "enchant_offhand_spirit": "Травление левой руки: Дух",
+      "enchant_feet_shadowstride": "Травление сапог: Поступь теней",
+      "enchant_gloves_forged_might": "Травление перчаток: Кованая мощь"
     },
     "enchantDescription": {
       "enchant_weapon_lastflame_zeal": "Попавшие в цель атаки ближнего боя могут повысить силу на 50 на 15 сек. и восстановить вам 200 ед. здоровья. Действуют модификаторы исцеления. При каждом попадании шанс срабатывания равен 1% за каждые 0,6 сек. базовой скорости атакующего оружия. Внутренней перезарядки нет. Обе руки дают одно общее усиление; любое срабатывание обновляет его, и оно никогда не суммируется. Дальние атаки не вызывают этот эффект. В облике волка вместо этого используется базовая скорость атаки в 1 сек."
     },
     "factionRewards": {
-      "alliedHearthstoneUse": "Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)",
-      "alliedHearthstoneAttuned": "Attuned to: {hub}",
-      "hub_none": "None (Use near a faction hub to attune)",
-      "hub_rift_watch": "Drifthaven (The Rift Watch)",
-      "hub_church_order": "Eastbrook Vale (The Church of the Holy Light Order)",
-      "hub_automatons": "South Reach (The Automaton Foundry)",
-      "riftGliderUse": "Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)",
-      "targetDummyUse": "Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)",
-      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)",
-      "shockBombUse": "Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)",
-      "invisibilityUse": "Use: Shrouds you in stealth for 6 sec. (2 min cooldown)",
-      "armorKitUse": "Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.",
-      "sharpeningStoneUse": "Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.",
-      "manaElixirUse": "Use: Increases Spirit by 6 for 1 hour."
+      "alliedHearthstoneUse": "Использование: телепортирует вас в привязанный оплот фракции. (Применение: 10 сек., восстановление: 15 мин.)",
+      "alliedHearthstoneAttuned": "Привязка: {hub}",
+      "hub_none": "Нет (используйте рядом с оплотом фракции для привязки)",
+      "hub_rift_watch": "Дрифтхейвен (Дозор Разлома)",
+      "hub_church_order": "Долина Истбрук (Орден Церкви Святого Света)",
+      "hub_automatons": "Южный Предел (Литейная автоматонов)",
+      "riftGliderUse": "Использование: раскрывает планер, замедляя скорость падения на 30 сек. Приземление или получение урона отменяет эффект. (Восстановление: 2 мин.)",
+      "targetDummyUse": "Использование: устанавливает механический тренировочный манекен в открытом мире на 2 минуты для отработки боевых способностей. (Восстановление: 5 мин.)",
+      "battleStandardUse": "Использование: устанавливает освященный боевой штандарт Зари на 5 минут, значительно повышая регенерацию здоровья и маны вне боя для всех ближайших союзников. Нахождение рядом в течение 10 секунд также дает благословение Зари (+5% ко всем характеристикам на 30 мин.). (Восстановление: 5 мин.)",
+      "shockBombUse": "Использование: бросает шоковую бомбу на расстояние до 30 м, нанося от 120 до 160 ед. урона от сил природы всем врагам в радиусе 5 м. (Восстановление: 1 мин.)",
+      "invisibilityUse": "Использование: укрывает вас незаметностью на 6 сек. (Восстановление: 2 мин.)",
+      "armorKitUse": "Использование: укрепляет ваш нагрудник, увеличивая броню на 12 на 1 час.",
+      "sharpeningStoneUse": "Использование: затачивает оружие в правой руке, увеличивая силу атаки на 6 на 30 мин.",
+      "manaElixirUse": "Использование: увеличивает дух на 6 на 1 час."
     },
     "professions": {
       "title": "Профессии",
@@ -16435,58 +16435,58 @@ export const ru_RU: EnTranslations = {
         "name": "Кольчужные сапоги Штормового гимна"
       },
       "allied_hearthstone": {
-        "name": "Allied Hearthstone"
+        "name": "Союзнический камень возвращения"
       },
       "allied_vanguard_duffel": {
-        "name": "Allied Vanguard Duffel"
+        "name": "Вещмешок союзного авангарда"
       },
       "rift_feather_glider": {
-        "name": "Rift Feather Glider"
+        "name": "Разломный перьевой планер"
       },
       "formula_enchant_feet_shadowstride": {
-        "name": "Formula: Enchant Boots - Shadowstride"
+        "name": "Формула: зачаровывание сапог - поступь теней"
       },
       "recipe_potion_of_invisibility": {
-        "name": "Recipe: Potion of Invisibility"
+        "name": "Рецепт: зелье невидимости"
       },
       "potion_of_invisibility": {
-        "name": "Potion of Invisibility"
+        "name": "Зелье невидимости"
       },
       "pattern_reinforced_armor_kit": {
-        "name": "Pattern: Reinforced Armor Kit"
+        "name": "Выкройка: укрепленная накладка для доспехов"
       },
       "reinforced_armor_kit": {
-        "name": "Reinforced Armor Kit"
+        "name": "Укрепленная накладка для доспехов"
       },
       "dawn_battle_standard": {
-        "name": "Dawn Battle Standard"
+        "name": "Боевой штандарт Зари"
       },
       "formula_enchant_offhand_spirit": {
-        "name": "Formula: Enchant Off-Hand - Spirit"
+        "name": "Формула: зачаровывание левой руки - дух"
       },
       "recipe_elixir_of_mana_regeneration": {
-        "name": "Recipe: Elixir of Mana Regeneration"
+        "name": "Рецепт: эликсир восполнения маны"
       },
       "elixir_of_mana_regeneration": {
-        "name": "Elixir of Mana Regeneration"
+        "name": "Эликсир восполнения маны"
       },
       "clockwork_target_dummy": {
-        "name": "Clockwork Target Dummy"
+        "name": "Заводной тренировочный манекен"
       },
       "schematic_clockwork_shock_bomb": {
-        "name": "Schematic: Clockwork Shock Bomb"
+        "name": "Схема: заводная шоковая бомба"
       },
       "clockwork_shock_bomb": {
-        "name": "Clockwork Shock Bomb"
+        "name": "Заводная шоковая бомба"
       },
       "plans_dense_sharpening_stone": {
-        "name": "Plans: Dense Sharpening Stone"
+        "name": "Чертеж: плотное точило"
       },
       "dense_sharpening_stone": {
-        "name": "Dense Sharpening Stone"
+        "name": "Плотное точило"
       },
       "formula_enchant_gloves_forged_might": {
-        "name": "Formula: Enchant Gloves - Forged Might"
+        "name": "Формула: зачаровывание перчаток - кованая мощь"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

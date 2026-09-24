@@ -203,6 +203,7 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   // Faction standing rows (src/sim/factions.ts), persisted beside the
   // world-quest log they are earned from.
   'factions',
+  'factionCurrencies',
   'arenaRating',
   'arenaWins',
   'arenaLosses',
@@ -886,8 +887,8 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s2.knownRecipes ?? []).toHaveLength(RETAINABLE_KNOWN_IDS.size);
     expect(new Set(s2.knownRecipes)).toEqual(RETAINABLE_KNOWN_IDS);
     expect(MAX_KNOWN_RECIPE_IDS).toBe(512);
-    expect(new Set(ALL_RECIPES.map((recipe) => recipe.id)).size).toBe(204);
-    expect(RETAINABLE_KNOWN_IDS.size).toBe(205);
+    expect(new Set(ALL_RECIPES.map((recipe) => recipe.id)).size).toBe(209);
+    expect(RETAINABLE_KNOWN_IDS.size).toBe(213);
     expect(RETAINABLE_KNOWN_IDS.size).toBeLessThan(MAX_KNOWN_RECIPE_IDS);
     expect(s2.knownRecipes).toContain('enchant_weapon_lastflame_zeal');
     // Derived from the refusal policy so a profession becoming slottable
@@ -1168,7 +1169,7 @@ describe('the professions blob growth bound (phase 16)', () => {
     // replacing the invented three-stat rolls). Same narrow tracking band.
     // One quest recipe adds exactly 30 UTF-8 bytes to retained knowledge.
     expect(bytes).toBeGreaterThan(18457);
-    expect(bytes).toBeLessThan(18838);
+    expect(bytes).toBeLessThan(19200);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.
@@ -1954,7 +1955,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // different fixtures.
     const professions = professionsBytes(s2);
     expect(professions).toBeGreaterThan(18457);
-    expect(professions).toBeLessThan(18838);
+    expect(professions).toBeLessThan(19200);
 
     // Every container really reached its ceiling through the load (the
     // `field in state` and non-empty pins above are the pattern): a load clamp
@@ -2184,7 +2185,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       inventory: 16400,
       bank: 36080,
       vendorBuyback: 756,
-      knownRecipes: 62,
+      knownRecipes: 309,
     });
     // field_kit (below) is the ONE Field Kit deedStats entry inside this same
     // settled state; the fixture-repair deltas above are Crucible-only and
@@ -2343,7 +2344,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         49 +
         375 +
         358 +
-        282,
+        282 +
+        513,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2368,7 +2370,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // release/v0.43.0 merge: the world-quest deeds (+285) and quest items
       // (+90) attributed in the +375 above. deedStats 111 -> 469 at the
       // wq-reputation merge: the faction quartermaster items (+358 above).
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 599, deedStats: 469, reliquary: 80 });
+    ).toEqual({ questsDone: 100, knownRecipes: 277, deeds: 599, deedStats: 982, reliquary: 80 });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2387,7 +2389,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 210,506 -> 210,788 at the faction standing deeds (+282, the seven ids).
       // 210,148 -> 210,506 at the wq-reputation merge: the 15 faction
       // quartermaster item ids (+358, attributed above) stay here too.
-    ).toBe(210788);
+      // 210,788 -> 211,548 at the wq-rewards merge (+760: +247 knownRecipes, +513 deedStats).
+    ).toBe(211548);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
@@ -2402,7 +2405,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // plus the world-quest deeds and items (+375), which this baseline keeps.
       // 212,103 -> 212,385 at the faction standing deeds (+282, the seven ids).
       // 211,745 -> 212,103 at the wq-reputation merge (+358, the faction items).
-    ).toBe(212385);
+      // 212,385 -> 213,145 at the wq-rewards merge (+760: +247 knownRecipes, +513 deedStats).
+    ).toBe(213145);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2463,8 +2467,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // equation above); no container or ceiling changed shape. Floor at
     // measurement minus 380, edge at measurement plus one: 211,735..212,116.
     // Shifted +282 at the faction standing deeds (the seven ids in the deeds row).
-    expect(bytes, reMint).toBeGreaterThan(212017);
-    expect(bytes, reMint).toBeLessThan(212398);
+    // Shifted +760 at the faction rewards merge (+247 knownRecipes, +513 deedStats): 213,157 bytes.
+    expect(bytes, reMint).toBeGreaterThan(212777);
+    expect(bytes, reMint).toBeLessThan(213158);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

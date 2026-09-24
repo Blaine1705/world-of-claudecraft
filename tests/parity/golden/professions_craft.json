@@ -21,7 +21,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "3a277cd3",
+      "state": "8f81cea6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,6 +73,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -174,7 +175,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "34184046",
+      "state": "91ca190d",
       "events": "73d5e097",
       "rng": {
         "draws": 0,
@@ -226,6 +227,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -331,7 +333,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "cd0b742c",
+      "state": "295f5b63",
       "events": "eeb84322",
       "rng": {
         "draws": 1,
@@ -393,6 +395,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -508,7 +511,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "a0a09f78",
+      "state": "8e62d6eb",
       "events": "ab1f3f4c",
       "rng": {
         "draws": 2,
@@ -586,6 +589,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -762,7 +766,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "bc62dd17",
+      "state": "b69c3108",
       "events": "eeb84322",
       "rng": {
         "draws": 3,
@@ -840,6 +844,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1014,7 +1019,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "f89f6730",
+      "state": "037d4f99",
       "events": "659364bb",
       "rng": {
         "draws": 4,
@@ -1103,6 +1108,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1310,7 +1316,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "db050605",
+      "state": "d946878e",
       "events": "4abd7a40",
       "rng": {
         "draws": 4,
@@ -1399,6 +1405,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1603,7 +1610,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "f226710d",
+      "state": "5c72dbdc",
       "events": "94e8a079",
       "rng": {
         "draws": 4,
@@ -1692,6 +1699,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1931,7 +1939,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "f226710d",
+      "state": "5c72dbdc",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -2020,6 +2028,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {

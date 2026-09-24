@@ -39,6 +39,10 @@ import { DELVE_SHOPS } from '../src/sim/content/delves';
 import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
 import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import {
+  FACTION_VENDOR_ITEMS,
+  FACTION_VENDOR_NPCS,
+} from '../src/sim/content/faction_vendors';
 import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_NPC_ID, HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_NPC_ID, CRUCIBLE_VENDOR_STOCK } from '../src/sim/content/ignivar_loot';
@@ -50,6 +54,7 @@ import {
   APEX_ARMOR_RECIPES,
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
+  FACTION_REWARD_RECIPES,
   FARM_RECIPES,
   ROD_RECIPES,
   recipeById,
@@ -115,6 +120,10 @@ const FARM_RAID_GROUP = 'nythraxis_farm';
 const FARM_HEROIC_GROUP = FARM_HEROIC_PATTERN_GROUP;
 const SANCTIONED_MOB_LOOT_GROUPS = new Set([RAID_GROUP, FARM_RAID_GROUP]);
 const SANCTIONED_HEROIC_GROUPS = new Set([FARM_HEROIC_GROUP]);
+const SANCTIONED_VENDOR_NPCS = new Set(Object.keys(FACTION_VENDOR_NPCS));
+const FACTION_PATTERN_ITEM_IDS = Object.values(FACTION_VENDOR_ITEMS)
+  .filter((item) => item.kind === 'recipe')
+  .map((item) => item.id);
 
 // The 28 shipped pattern ids, derived from the def table (the universe pin in
 // apex_pattern_items.test.ts holds this equal to the recipe-derived set). The
@@ -166,7 +175,11 @@ const FARM_RIFT_CHANNEL_IDS = new Set(
 describe('masterwrought R8 referential contract: every drop recipe reaches exactly its channel', () => {
   // The drop-acquisition set in ALL_RECIPES is the recipe-side universe. The
   // counts are LITERAL floors (the recorded phase decisions), never re-derived.
-  const apexDropRecipes = ALL_RECIPES.filter((recipe) => recipe.acquisition?.includes('drop'));
+  // Faction reward recipes are sold by faction quartermasters for faction currency,
+  // not dropped through the legacy Masterwrought / Crucible apex pillars.
+  const apexDropRecipes = ALL_RECIPES.filter(
+    (recipe) => recipe.acquisition?.includes('drop') && !FACTION_REWARD_RECIPES.includes(recipe),
+  );
 
   it('the drop-acquisition recipe set partitions the legacy families plus 33 Crucible recipes', () => {
     // 38 since masterwrought Phase 11i: three angler cooking rows plus the
@@ -252,6 +265,17 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
       expect(channels.includes('vendor'), `${recipe.id} needs the deterministic valve (D13)`).toBe(
         true,
       );
+    }
+  });
+
+  it('the 5 faction reward recipes are taught by patterns sold by faction quartermasters', () => {
+    expect(FACTION_REWARD_RECIPES).toHaveLength(5);
+    for (const recipe of FACTION_REWARD_RECIPES) {
+      expect(recipe.acquisition).toContain('drop');
+      const patternDef = Object.values(FACTION_VENDOR_ITEMS).find(
+        (item) => item.kind === 'recipe' && item.teachesRecipeId === recipe.id,
+      );
+      expect(patternDef, `${recipe.id} must have a teaching pattern item`).toBeDefined();
     }
   });
 });
@@ -468,10 +492,14 @@ describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourt
     expect(leaks).toEqual([]);
   });
 
-  it('no NPC vendorItems list carries a pattern id', () => {
+  it('no NPC vendorItems list carries a pattern id outside sanctioned quartermasters', () => {
     // The quartermaster's marks stock is NOT a vendorItems list (he carries
     // none); a pattern in any coin vendorItems row would be a fourth channel.
-    const vendors = Object.values(NPCS).filter((npc) => (npc.vendorItems?.length ?? 0) > 0);
+    // Faction quartermasters sell reputation-gated patterns for faction marks,
+    // which are sanctioned non-coin vendors.
+    const vendors = Object.values(NPCS).filter(
+      (npc) => (npc.vendorItems?.length ?? 0) > 0 && !SANCTIONED_VENDOR_NPCS.has(npc.id),
+    );
     expect(vendors.length).toBeGreaterThanOrEqual(17);
     let idsWalked = 0;
     const leaks: string[] = [];
@@ -483,6 +511,21 @@ describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourt
     }
     expect(idsWalked).toBeGreaterThanOrEqual(205);
     expect(leaks).toEqual([]);
+  });
+
+  it('sanctioned faction quartermasters only sell sanctioned faction patterns', () => {
+    let factionPatternsWalked = 0;
+    for (const npcId of SANCTIONED_VENDOR_NPCS) {
+      const npc = NPCS[npcId];
+      expect(npc).toBeDefined();
+      for (const itemId of npc?.vendorItems ?? []) {
+        if (isPatternId(itemId)) {
+          expect(FACTION_PATTERN_ITEM_IDS).toContain(itemId);
+          factionPatternsWalked++;
+        }
+      }
+    }
+    expect(factionPatternsWalked).toBe(8);
   });
 
   it('no gather node material resolves to a pattern id', () => {
@@ -653,7 +696,7 @@ describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourt
 });
 
 describe('the phase 02 sweep floor', () => {
-  it('every shipped pattern teaches drop-acquirable recipes, and only the Zeal formula teaches an enchant', () => {
+  it('every shipped pattern teaches drop-acquirable recipes, and only sanctioned formulas teach enchants', () => {
     // recipe_pattern_items.test.ts sweeps every kind:'recipe' def for this
     // shape but is deliberately floorless (it predates shipped content); the
     // literal here is the floor, and the referential arms above make it
@@ -662,15 +705,28 @@ describe('the phase 02 sweep floor', () => {
     const recipeDefs = Object.values(ITEMS).filter((def) => def.kind === 'recipe');
     // 38 since masterwrought Phase 11i (the angler's endgame block), 40 since
     // Phase 11k (three apex feast recipes in, 11i's capstone feast out).
-    expect(recipeDefs).toHaveLength(52);
-    expect(recipeDefs.filter((def) => !CRUCIBLE_SCROLL_IDS.includes(def.id))).toHaveLength(40);
+    // 52 with Crucible (12 scrolls/formulas). 60 with Faction Vendors (8 patterns/formulas).
+    expect(recipeDefs).toHaveLength(60);
+    expect(
+      recipeDefs.filter(
+        (def) =>
+          !CRUCIBLE_SCROLL_IDS.includes(def.id) && !FACTION_PATTERN_ITEM_IDS.includes(def.id),
+      ),
+    ).toHaveLength(40);
     let recipesTaught = 0;
     let enchantsTaught = 0;
+    const SANCTIONED_FORMULA_IDS = new Set([
+      'formula_lastflame_zeal',
+      'formula_enchant_feet_shadowstride',
+      'formula_enchant_offhand_spirit',
+      'formula_enchant_gloves_forged_might',
+    ]);
     for (const def of recipeDefs) {
       if (def.kind !== 'recipe') continue; // narrow for teachesRecipeId
       if (def.teachesEnchantId !== undefined) {
-        expect(def.id).toBe('formula_lastflame_zeal');
-        expect(def.teachesEnchantId).toBe('enchant_weapon_lastflame_zeal');
+        expect(SANCTIONED_FORMULA_IDS.has(def.id), `${def.id} must be a sanctioned formula`).toBe(
+          true,
+        );
         expect(ENCHANTS[def.teachesEnchantId]?.acquisition).toBe('drop');
         enchantsTaught++;
         continue;
@@ -682,8 +738,8 @@ describe('the phase 02 sweep floor', () => {
         recipesTaught++;
       }
     }
-    expect(recipesTaught).toBe(73);
-    expect(enchantsTaught).toBe(1);
+    expect(recipesTaught).toBe(78);
+    expect(enchantsTaught).toBe(4);
   });
 });
 

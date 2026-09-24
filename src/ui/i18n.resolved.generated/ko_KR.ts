@@ -2333,12 +2333,12 @@ export const ko_KR: EnTranslations = {
       "wocPreview": "미검증 미리보기 잔액",
       "lifetime": "누적 {amount}",
       "factionPending": "세력 화폐: 2단계에서 결정",
-      "riftWatchMark": "Rift Watch Mark",
-      "riftWatchMarkNote": "World Quests in Rift Watch zones",
-      "churchOrderCrest": "Order Crest",
-      "churchOrderCrestNote": "World Quests in Church Order zones",
-      "automatonCog": "Automaton Cog",
-      "automatonCogNote": "World Quests in Automaton zones"
+      "riftWatchMark": "균열 감시단의 징표",
+      "riftWatchMarkNote": "균열 감시단 지역의 전역 퀘스트",
+      "churchOrderCrest": "수도회 문장",
+      "churchOrderCrestNote": "교회 수도회 지역의 전역 퀘스트",
+      "automatonCog": "오토마톤 톱니바퀴",
+      "automatonCogNote": "오토마톤 지역의 전역 퀘스트"
     },
     "reputation": {
       "intro": "세 세력이 동시에 진행됩니다. 모든 월드 퀘스트는 해당 지역의 세력에 반영됩니다.",
@@ -4631,28 +4631,28 @@ export const ko_KR: EnTranslations = {
       "enchant_chest_lucent_stamina": "갑옷 새김: 광휘 체력",
       "enchant_feet_lucent_agility": "신발 새김: 광휘 민첩성",
       "enchant_lucent_infusion": "광휘 주입",
-      "enchant_offhand_spirit": "Offhand Etching: Spirit",
-      "enchant_feet_shadowstride": "Boot Etching: Shadowstride",
-      "enchant_gloves_forged_might": "Glove Etching: Forged Might"
+      "enchant_offhand_spirit": "보조장비 새김: 정신력",
+      "enchant_feet_shadowstride": "신발 새김: 그림자걸음",
+      "enchant_gloves_forged_might": "장갑 새김: 단련된 위력"
     },
     "enchantDescription": {
       "enchant_weapon_lastflame_zeal": "적중한 근접 공격은 일정 확률로 15초 동안 힘을 50 증가시키고 자신의 생명력을 200 회복합니다. 치유량 보정이 적용됩니다. 적중마다 공격한 무기의 기본 속도 0.6초당 1%의 확률로 발동합니다. 내부 재사용 대기시간이 없습니다. 강화 효과는 양손이 하나를 공유하며, 어느 손으로 발동하든 지속시간이 갱신되고 중첩되지 않습니다. 원거리 공격은 이 효과를 발동시키지 않습니다. 늑대 형상에서는 대신 1초의 기본 공격 속도를 사용합니다."
     },
     "factionRewards": {
-      "alliedHearthstoneUse": "Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)",
-      "alliedHearthstoneAttuned": "Attuned to: {hub}",
-      "hub_none": "None (Use near a faction hub to attune)",
-      "hub_rift_watch": "Drifthaven (The Rift Watch)",
-      "hub_church_order": "Eastbrook Vale (The Church of the Holy Light Order)",
-      "hub_automatons": "South Reach (The Automaton Foundry)",
-      "riftGliderUse": "Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)",
-      "targetDummyUse": "Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)",
-      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)",
-      "shockBombUse": "Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)",
-      "invisibilityUse": "Use: Shrouds you in stealth for 6 sec. (2 min cooldown)",
-      "armorKitUse": "Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.",
-      "sharpeningStoneUse": "Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.",
-      "manaElixirUse": "Use: Increases Spirit by 6 for 1 hour."
+      "alliedHearthstoneUse": "사용 효과: 조율된 진영 거점으로 순간이동합니다. (시전 시간 10초, 재사용 대기시간 15분)",
+      "alliedHearthstoneAttuned": "조율된 거점: {hub}",
+      "hub_none": "없음 (진영 거점 근처에서 사용하여 조율)",
+      "hub_rift_watch": "표류항 (균열 감시단)",
+      "hub_church_order": "동쪽시내 계곡 (성스러운 빛의 교회 수도회)",
+      "hub_automatons": "남부 자락 (오토마톤 주조소)",
+      "riftGliderUse": "사용 효과: 글라이더를 펼쳐 30초 동안 낙하 속도를 감소시킵니다. 착지하거나 피해를 입으면 효과가 취소됩니다. (재사용 대기시간 2분)",
+      "targetDummyUse": "사용 효과: 야외에 2분 동안 기계 표적 허수아비를 배치하여 전투 능력을 연습합니다. (재사용 대기시간 5분)",
+      "battleStandardUse": "사용 효과: 축성된 여명의 전투 깃발을 5분 동안 꽂아 주변 모든 아군의 비전투 중 생명력 및 마나 재생을 크게 증가시킵니다. 10초 동안 근처에 머무르면 여명의 축복(30분 동안 모든 능력치 +5%)도 부여됩니다. (재사용 대기시간 5분)",
+      "shockBombUse": "사용 효과: 최대 30미터 거리에 충격 폭탄을 던져 5미터 반경 내 모든 적에게 120~160의 자연 피해를 입힙니다. (재사용 대기시간 1분)",
+      "invisibilityUse": "사용 효과: 6초 동안 은신 상태가 됩니다. (재사용 대기시간 2분)",
+      "armorKitUse": "사용 효과: 가슴 방어구를 강화하여 1시간 동안 방어도를 12만큼 증가시킵니다.",
+      "sharpeningStoneUse": "사용 효과: 주무기를 갈아 30분 동안 전투력을 6만큼 증가시킵니다.",
+      "manaElixirUse": "사용 효과: 1시간 동안 정신력이 6만큼 증가합니다."
     },
     "professions": {
       "title": "전문 기술",
@@ -16435,58 +16435,58 @@ export const ko_KR: EnTranslations = {
         "name": "폭풍찬가 사슬 장화"
       },
       "allied_hearthstone": {
-        "name": "Allied Hearthstone"
+        "name": "연합의 귀환석"
       },
       "allied_vanguard_duffel": {
-        "name": "Allied Vanguard Duffel"
+        "name": "연합 선봉대 더플백"
       },
       "rift_feather_glider": {
-        "name": "Rift Feather Glider"
+        "name": "균열 깃털 글라이더"
       },
       "formula_enchant_feet_shadowstride": {
-        "name": "Formula: Enchant Boots - Shadowstride"
+        "name": "주문식: 장화 마법부여 - 그림자걸음"
       },
       "recipe_potion_of_invisibility": {
-        "name": "Recipe: Potion of Invisibility"
+        "name": "제조법: 투명화 물약"
       },
       "potion_of_invisibility": {
-        "name": "Potion of Invisibility"
+        "name": "투명화 물약"
       },
       "pattern_reinforced_armor_kit": {
-        "name": "Pattern: Reinforced Armor Kit"
+        "name": "도안: 강화 방어구 키트"
       },
       "reinforced_armor_kit": {
-        "name": "Reinforced Armor Kit"
+        "name": "강화 방어구 키트"
       },
       "dawn_battle_standard": {
-        "name": "Dawn Battle Standard"
+        "name": "여명의 전투 깃발"
       },
       "formula_enchant_offhand_spirit": {
-        "name": "Formula: Enchant Off-Hand - Spirit"
+        "name": "주문식: 보조장비 마법부여 - 정신력"
       },
       "recipe_elixir_of_mana_regeneration": {
-        "name": "Recipe: Elixir of Mana Regeneration"
+        "name": "제조법: 마나 회복의 영약"
       },
       "elixir_of_mana_regeneration": {
-        "name": "Elixir of Mana Regeneration"
+        "name": "마나 회복의 영약"
       },
       "clockwork_target_dummy": {
-        "name": "Clockwork Target Dummy"
+        "name": "태엽장치 표적 허수아비"
       },
       "schematic_clockwork_shock_bomb": {
-        "name": "Schematic: Clockwork Shock Bomb"
+        "name": "도면: 태엽장치 충격 폭탄"
       },
       "clockwork_shock_bomb": {
-        "name": "Clockwork Shock Bomb"
+        "name": "태엽장치 충격 폭탄"
       },
       "plans_dense_sharpening_stone": {
-        "name": "Plans: Dense Sharpening Stone"
+        "name": "도면: 단단한 숫돌"
       },
       "dense_sharpening_stone": {
-        "name": "Dense Sharpening Stone"
+        "name": "단단한 숫돌"
       },
       "formula_enchant_gloves_forged_might": {
-        "name": "Formula: Enchant Gloves - Forged Might"
+        "name": "주문식: 장갑 마법부여 - 단련된 위력"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

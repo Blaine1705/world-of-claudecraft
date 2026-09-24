@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1019,
-      "state": "50ef6db0",
+      "state": "054e56d7",
       "events": "a90aa35a",
       "rng": {
         "draws": 6,
@@ -86,6 +86,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -164,6 +165,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -240,6 +242,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -316,6 +319,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -393,6 +397,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -942,7 +947,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1019,
-      "state": "5a125a73",
+      "state": "aefa2e42",
       "events": "94d1e27d",
       "rng": {
         "draws": 6,
@@ -993,6 +998,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1071,6 +1077,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1152,6 +1159,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1228,6 +1236,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1305,6 +1314,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -1872,7 +1882,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1019,
-      "state": "2239c70b",
+      "state": "cbbfe5fa",
       "events": "d364e9ab",
       "rng": {
         "draws": 10,
@@ -1883,7 +1893,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1019,
-      "state": "e896dd8b",
+      "state": "d00b1d7a",
       "events": "c8fcdabd",
       "rng": {
         "draws": 10,
@@ -1934,6 +1944,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2012,6 +2023,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2093,6 +2105,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2169,6 +2182,7 @@
             "mainhand": "training_mace"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
@@ -2246,6 +2260,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {

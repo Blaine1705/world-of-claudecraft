@@ -513,11 +513,13 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // PR #3898 admits the four painted elixirs to the production hotbar item
     // inventory. The production set is broader than the sealed historical
     // second-pass record because it also includes later pending-art families.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(101);
+    // Faction rewards adds two new usable potions (potion_of_invisibility,
+    // elixir_of_mana_regeneration): 101 + 2 = 103.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(103);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(101);
+    ).toHaveLength(103);
     expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),

@@ -48,6 +48,7 @@ import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
+import type { FactionRewardPlayerState } from './faction_currencies';
 import type { FactionId } from './factions';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
@@ -1341,7 +1342,9 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
-export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
+export interface PlayerMeta
+  extends worldQuestState.WorldQuestPlayerState,
+    FactionRewardPlayerState {
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
@@ -1620,14 +1623,6 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   // change (recomputeTalents), never walked on the combat or stat hot path.
   talents: TalentAllocation;
   talentMods: TalentModifiers;
-  // Allied faction reward and toy tracking (session-only, cooldown timers)
-  alliedHearthstoneReadyAt?: number;
-  alliedHearthstoneAttunement?: FactionId;
-  riftGliderReadyAt?: number;
-  targetDummyReadyAt?: number;
-  dawnStandardReadyAt?: number;
-  dawnStandardSeconds?: number;
-  shockBombReadyAt?: number;
   // Battle Rhythm's every-third-ability counter. Session-only: a new login
   // starts a fresh rhythm and persistence never needs to migrate it.
   abilityRhythm: number;
@@ -4826,17 +4821,11 @@ export class Sim {
     return this.primary.worldQuestRerollCycle;
   }
   canRerollWorldQuest(questId: string, pid?: number): { canReroll: boolean; reason?: string } {
-    const meta = pid !== undefined ? this.players.get(pid) : this.primary;
-    if (!meta) return { canReroll: false, reason: 'Player not found.' };
-    const player = this.entities.get(meta.entityId);
-    const level = player?.level ?? 20;
-    const cycle = meta.devWorldQuestCycle ?? this.ctx.currentWorldQuestRotation().cycle;
-    return worldQuestMod.canRerollWorldQuest(meta, questId, cycle, level);
+    return worldQuestMod.canRerollWorldQuestForPlayer(this.ctx, questId, pid);
   }
   rerollWorldQuest(questId: string, pid?: number): boolean {
-    const meta = pid !== undefined ? this.players.get(pid) : this.primary;
-    if (!meta) return false;
-    return worldQuestMod.rerollWorldQuest(this.ctx, meta, questId);
+    const r = this.resolve(pid);
+    return r ? worldQuestMod.rerollWorldQuest(this.ctx, r.meta, questId) : false;
   }
   // --- IWorldDeeds: the Book of Deeds read surface + title/border selection.
   // The reads expose the live per-player state (the questLog precedent above);
@@ -8527,16 +8516,15 @@ export class Sim {
     slotIndex?: number,
     aim?: { x: number; z: number },
   ): ItemUseResult | undefined {
-    const slotTarget =
-      typeof pidOrTarget === 'object' && pidOrTarget !== null && pidOrTarget.slotIndex !== undefined
+    const isObj = typeof pidOrTarget === 'object' && pidOrTarget !== null;
+    const target =
+      isObj && pidOrTarget.slotIndex !== undefined
         ? { slotIndex: pidOrTarget.slotIndex }
         : typeof pidOrTarget === 'number'
           ? pidOrTarget
           : undefined;
-    const { pid, named } = foldNamedSlotTarget(slotTarget, slotIndex);
-    const targetAim =
-      typeof pidOrTarget === 'object' && pidOrTarget !== null ? (pidOrTarget.aim ?? aim) : aim;
-    return items.useItem(this.ctx, itemId, pid, named, targetAim);
+    const { pid, named } = foldNamedSlotTarget(target, slotIndex);
+    return items.useItem(this.ctx, itemId, pid, named, isObj ? (pidOrTarget.aim ?? aim) : aim);
   }
 
   // ONE explicit shape, no overloads (phase 21): the request rides an options

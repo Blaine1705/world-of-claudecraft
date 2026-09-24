@@ -5582,6 +5582,7 @@ const ALL_DELTA_KEYS = [
   'ench',
   'equip',
   'fac',
+  'facCur',
   'fplot',
   'ggoal',
   'gprof',
@@ -5710,6 +5711,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   ench: 'lastEnchantResult',
   equip: 'equipment',
   fac: 'factions',
+  facCur: 'factionCurrencies',
   fplot: 'myFarmPlots',
   ggoal: 'gatheringGoal',
   gprof: 'gatheringProficiency',
@@ -6985,9 +6987,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The World Quests branch adds its rotation id, expiry and progress mirrors
     // (wqday, wqexp, wqlog), the vehicle session and the world-boss liveness
     // key wba, for 100.
-    // The faction standing (fac) and daily reroll (wqrr, wqrep) owner keys, for 103.
-    expect(ALL_DELTA_KEYS).toHaveLength(103);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(103);
+    // The faction standing (fac), faction currencies (facCur), and daily reroll (wqrr, wqrep) owner keys, for 104.
+    expect(ALL_DELTA_KEYS).toHaveLength(104);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(104);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7151,8 +7153,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The candidate self in-combat key cbt brings the combined inventory to 94;
     // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
     // The World Quests branch adds its five self keys, for 100.
-    // Plus the faction standing and daily reroll owner keys, for 103.
-    expect(scraped.size).toBe(103);
+    // Plus the faction standing, faction currencies, and daily reroll owner keys, for 104.
+    expect(scraped.size).toBe(104);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

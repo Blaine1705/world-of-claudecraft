@@ -141,6 +141,7 @@ import {
 
 export {
   canRerollWorldQuest,
+  canRerollWorldQuestForPlayer,
   playerActiveWorldQuests,
   rerollWorldQuest,
   sanitizeWorldQuestReplacements,

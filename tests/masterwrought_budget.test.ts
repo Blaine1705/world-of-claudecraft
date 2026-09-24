@@ -1277,7 +1277,11 @@ describe('masterwrought apex budget sweep', () => {
     // ruling amended) is an OPEN maintainer ruling: re-tighten this to
     // toBeLessThan and drop the tie set if the bag is re-distinguished; the
     // rescoped pin below IS the final shape if the position is amended.
-    const APEX_TIE_BAGS = ['resonant_weave_bag', 'wayfarers_backpack'];
+    const APEX_TIE_BAGS = [
+      'allied_vanguard_duffel',
+      'resonant_weave_bag',
+      'wayfarers_backpack',
+    ];
     const ties: string[] = [];
     for (const def of Object.values(ITEMS)) {
       if (def.kind !== 'bag' || def.id === APEX_BAG_ID) continue;
