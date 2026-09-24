@@ -57,6 +57,9 @@ export interface CooldownManagerHooks {
   playerClass(): PlayerClass;
   /** Every castable spell the player knows, in spellbook order. */
   spellbook(): readonly string[];
+  /** Every castable spell the CLASS can have, across every spec, talent and
+   *  level (a superset of spellbook()). */
+  catalog(): readonly string[];
   groups(): readonly CooldownGroup[];
   /** Add a group; returns its id, or null when the group cap is reached. */
   addGroup(kind: CooldownGroupKind): string | null;
@@ -101,6 +104,9 @@ const VISIBILITY_KEYS: Readonly<Record<CooldownVisibility, TranslationKey>> = {
   hidden: 'hudChrome.cooldownManager.visHidden',
 };
 const NOT_DISPLAYED = '';
+/** The section of class spells the current build does not know. Not a group:
+ *  dropping a spell here takes it out of every group, like Not Displayed. */
+const OTHER_SPELLS = '__other';
 /** A private drag type: a word dragged in from chat or another page carries
  *  only text/plain, so it can never be dropped into a group. */
 const DRAG_TYPE = 'application/x-woc-cooldown-spell';
@@ -546,6 +552,8 @@ export class CooldownManagerSettingsPanel {
     const { hooks } = this.host;
     const groups = hooks.groups();
     const spellbook = hooks.spellbook();
+    const known = new Set(spellbook);
+    const catalog = hooks.catalog();
     const section = document.createElement('div');
     section.className = 'aura-watch-section cdm-tracked';
     const head = document.createElement('div');
@@ -581,6 +589,11 @@ export class CooldownManagerSettingsPanel {
         label: t('hudChrome.cooldownManager.notDisplayed'),
         spells: spellbook.filter((id) => !assigned.has(id)),
       },
+      {
+        id: OTHER_SPELLS,
+        label: t('hudChrome.cooldownManager.otherSpells'),
+        spells: catalog.filter((id) => !known.has(id) && !assigned.has(id)),
+      },
     ];
     for (const entry of sections) {
       const box = document.createElement('div');
@@ -593,7 +606,11 @@ export class CooldownManagerSettingsPanel {
       list.className = 'cdm-spell-list';
       list.setAttribute('role', 'group');
       list.setAttribute('aria-label', entry.label);
-      box.append(label, list);
+      box.append(label);
+      if (entry.id === OTHER_SPELLS) {
+        this.note(box, t('hudChrome.cooldownManager.otherSpellsHint'), 'cdm-other-hint');
+      }
+      box.append(list);
       if (entry.spells.length === 0) {
         this.note(list, t('hudChrome.cooldownManager.emptySection'), 'cdm-empty');
       }
@@ -601,13 +618,17 @@ export class CooldownManagerSettingsPanel {
         const name = spellName(id);
         const chip = document.createElement('button');
         chip.type = 'button';
-        chip.className = 'ui-socket cdm-spell-chip';
+        // A spell the current build does not know (another spec, talent or a
+        // higher level) is dimmed and says so: its button appears once known.
+        const unknown = !known.has(id);
+        chip.className = `ui-socket cdm-spell-chip${unknown ? ' is-unknown' : ''}`;
         chip.draggable = true;
         chip.dataset.focusKey = `cdm-spell:${id}`;
-        chip.title = name;
+        const shown = unknown ? t('hudChrome.cooldownManager.notKnown', { spell: name }) : name;
+        chip.title = shown;
         chip.setAttribute(
           'aria-label',
-          t('hudChrome.cooldownManager.selectSpell', { spell: name }),
+          t('hudChrome.cooldownManager.selectSpell', { spell: shown }),
         );
         chip.setAttribute('aria-pressed', String(this.selected === id));
         const icon = document.createElement('img');
@@ -644,8 +665,9 @@ export class CooldownManagerSettingsPanel {
         box.classList.remove('drop-target');
         const id = event.dataTransfer?.getData(DRAG_TYPE) ?? '';
         // Only a spell this panel listed can land in a group.
-        if (!spellbook.includes(id) && !assigned.has(id)) return;
-        if (hooks.assign(id, entry.id === NOT_DISPLAYED ? null : entry.id)) {
+        if (!catalog.includes(id) && !assigned.has(id)) return;
+        const target = entry.id === NOT_DISPLAYED || entry.id === OTHER_SPELLS ? null : entry.id;
+        if (hooks.assign(id, target)) {
           this.host.click();
           refresh([`cdm-spell:${id}`]);
         }

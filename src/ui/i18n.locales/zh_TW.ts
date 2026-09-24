@@ -13254,6 +13254,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '將法術拖到群組上，或選取它來選擇群組和提醒。當法術變成另一個法術時，按鈕會隨之改變並亮起。',
   'hudChrome.cooldownManager.search': '搜尋法術',
   'hudChrome.cooldownManager.searchPlaceholder': '搜尋',
+  'hudChrome.cooldownManager.otherSpells': '其他法術',
+  'hudChrome.cooldownManager.otherSpellsHint':
+    '來自你的其他專精、天賦選擇和更高等級的法術。現在放置一個，當你學會它時，它的按鈕就會出現。',
+  'hudChrome.cooldownManager.notKnown': '{spell}（尚未學會）',
   'hudChrome.cooldownManager.notDisplayed': '不顯示',
   'hudChrome.cooldownManager.emptySection': '把法術拖到這裡。',
   'hudChrome.cooldownManager.spellsEmpty': '你還不會任何法術。',

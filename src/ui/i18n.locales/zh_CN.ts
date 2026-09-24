@@ -13250,6 +13250,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '将法术拖到分组上，或选中它来选择分组和提醒。当法术变为另一个法术时，按钮会随之变化并亮起。',
   'hudChrome.cooldownManager.search': '搜索法术',
   'hudChrome.cooldownManager.searchPlaceholder': '搜索',
+  'hudChrome.cooldownManager.otherSpells': '其他法术',
+  'hudChrome.cooldownManager.otherSpellsHint':
+    '来自你的其他专精、天赋选择和更高等级的法术。现在放置一个，当你学会它时，它的按钮就会出现。',
+  'hudChrome.cooldownManager.notKnown': '{spell}（尚未学会）',
   'hudChrome.cooldownManager.notDisplayed': '不显示',
   'hudChrome.cooldownManager.emptySection': '把法术拖到这里。',
   'hudChrome.cooldownManager.spellsEmpty': '你还不会任何法术。',

@@ -17043,6 +17043,12 @@
     padding: 0;
     cursor: grab;
   }
+  .cdm-spell-chip.is-unknown img {
+    filter: grayscale(0.85) brightness(0.6);
+  }
+  .cdm-other-hint {
+    margin: 0 0 6px;
+  }
   .cdm-spell-chip[aria-pressed="true"] {
     border-color: var(--gold);
     box-shadow: var(--glow-gold);

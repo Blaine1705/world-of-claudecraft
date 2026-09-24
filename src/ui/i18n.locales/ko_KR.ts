@@ -13891,6 +13891,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주문을 그룹으로 끌어 놓거나, 선택해서 그룹과 알림을 고르세요. 주문이 다른 주문으로 바뀌면 버튼도 따라 바뀌고 빛납니다.',
   'hudChrome.cooldownManager.search': '주문 검색',
   'hudChrome.cooldownManager.searchPlaceholder': '검색',
+  'hudChrome.cooldownManager.otherSpells': '기타 주문',
+  'hudChrome.cooldownManager.otherSpellsHint':
+    '다른 전문화, 특성 선택, 더 높은 레벨의 주문입니다. 지금 배치해 두면 배웠을 때 버튼이 나타납니다.',
+  'hudChrome.cooldownManager.notKnown': '{spell} (아직 배우지 않음)',
   'hudChrome.cooldownManager.notDisplayed': '표시 안 함',
   'hudChrome.cooldownManager.emptySection': '여기에 주문을 놓으세요.',
   'hudChrome.cooldownManager.spellsEmpty': '아직 배운 주문이 없습니다.',

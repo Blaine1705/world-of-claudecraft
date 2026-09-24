@@ -17,6 +17,7 @@ import { formatNumber } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { actionBarIconBg } from '../action_bar/action_bar_icon_bg';
 import type { ActionBarWorldInput } from '../action_bar/action_bar_view';
+import { cooldownClassCatalog } from './cooldown_manager_catalog';
 import {
   assignCooldownSpell,
   COOLDOWN_MAX_GROUPS,
@@ -183,6 +184,7 @@ export class CooldownManagerController {
     return {
       playerClass: () => this.deps.world.cfg.playerClass,
       spellbook: () => this.spellbook(),
+      catalog: () => this.catalog(),
       groups: () => this.groups,
       addGroup: (kind) => this.addGroup(kind),
       removeGroup: (id) => this.setGroups(this.groups.filter((group) => group.id !== id)),
@@ -223,6 +225,15 @@ export class CooldownManagerController {
       if (def.passive || def.hiddenFromPlayer || out.includes(def.id)) continue;
       out.push(def.id);
     }
+    return out;
+  }
+
+  /** Every trackable spell of the class across all specs, talents and levels,
+   *  plus anything the live build knows that the catalog does not (defensive:
+   *  the catalog test pins that set empty). */
+  private catalog(): string[] {
+    const out = [...cooldownClassCatalog(this.deps.world.cfg.playerClass)];
+    for (const id of this.spellbook()) if (!out.includes(id)) out.push(id);
     return out;
   }
 

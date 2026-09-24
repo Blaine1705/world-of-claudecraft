@@ -13926,6 +13926,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '呪文をグループにドラッグするか、選択してグループと通知を選びます。呪文が別の呪文に変化すると、ボタンもそれに合わせて変わり、光ります。',
   'hudChrome.cooldownManager.search': '呪文を検索',
   'hudChrome.cooldownManager.searchPlaceholder': '検索',
+  'hudChrome.cooldownManager.otherSpells': 'その他の呪文',
+  'hudChrome.cooldownManager.otherSpellsHint':
+    '他の専門化、タレントの選択、より高いレベルの呪文です。今配置しておくと、習得したときにボタンが表示されます。',
+  'hudChrome.cooldownManager.notKnown': '{spell}（未習得）',
   'hudChrome.cooldownManager.notDisplayed': '非表示',
   'hudChrome.cooldownManager.emptySection': 'ここに呪文をドロップします。',
   'hudChrome.cooldownManager.spellsEmpty': 'まだ呪文を習得していません。',

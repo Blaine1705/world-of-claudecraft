@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ABILITIES } from '../src/sim/content/classes';
 import type { ResolvedAbility } from '../src/sim/sim';
 import type { ActionBarWorldInput } from '../src/ui/hud/action_bar/action_bar_view';
@@ -9,6 +9,13 @@ import {
 } from '../src/ui/hud/cooldown_manager/cooldown_manager_controller';
 import { CooldownManagerSettingsPanel } from '../src/ui/hud/cooldown_manager/cooldown_manager_settings';
 import type { PainterHostWriters } from '../src/ui/painter_host';
+
+// Additive, never bare: only the canvas-touching iconDataUrl is stubbed (the
+// Other Spells section draws procedural icons, and happy-dom has no canvas).
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
+  iconDataUrl: () => 'data:,',
+}));
 
 const CUE = 'ui_aura_hard_bell';
 
@@ -292,6 +299,24 @@ describe('CooldownManagerSettingsPanel', () => {
     expect(chips(root, id).map((chip) => chip.dataset.focusKey)).toEqual(['cdm-spell:claw']);
   });
 
+  it('offers every druid spell from every spec, the unknown ones dimmed in Other Spells', () => {
+    const { root } = panel();
+    const other = chips(root, '__other').map((chip) => chip.dataset.focusKey?.slice(10));
+    // The stub druid knows three spells; the rest of the class (other specs,
+    // talents, higher levels) is still pickable.
+    expect(other.length).toBeGreaterThan(10);
+    expect(other).not.toContain('rake');
+    expect(other).toContain('regrowth');
+    const chip = chips(root, '__other')[0];
+    expect(chip.classList.contains('is-unknown')).toBe(true);
+    // Placing one works like any other spell: it waits in the group until known.
+    const { hooks, settings } = panel();
+    const id = hooks.addGroup('line') as string;
+    settings.render(root);
+    expect(hooks.assign('regrowth', id)).toBe(true);
+    expect(hooks.groups()[0].spells).toEqual(['regrowth']);
+  });
+
   it('moves a spell by drag and drop onto a group section', () => {
     const { root, hooks, settings } = panel();
     const id = hooks.addGroup('grid') as string;
@@ -337,7 +362,8 @@ describe('CooldownManagerSettingsPanel', () => {
     const visible = Array.from(root.querySelectorAll<HTMLElement>('.cdm-spell-chip'))
       .filter((chip) => !chip.hidden)
       .map((chip) => chip.dataset.focusKey);
-    expect(visible).toEqual(['cdm-spell:claw']);
+    // Rendclaw (known) and Sweeping Claws (another spec's, in Other Spells).
+    expect(visible).toEqual(['cdm-spell:claw', 'cdm-spell:swipe']);
     // The query survives a rebuild (a move never clears the search).
     settings.render(root);
     expect(root.querySelector<HTMLInputElement>('.cdm-search')?.value).toBe('CLAW');

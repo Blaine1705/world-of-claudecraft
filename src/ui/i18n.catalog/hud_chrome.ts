@@ -2685,6 +2685,10 @@ export const hudChromeStrings = {
     search: 'Search spells',
     searchPlaceholder: 'Search',
     notDisplayed: 'Not Displayed',
+    otherSpells: 'Other Spells',
+    otherSpellsHint:
+      'Spells from your other specializations, talent choices and higher levels. Place one now and its button appears once you know it.',
+    notKnown: '{spell} (not known yet)',
     emptySection: 'Drop a spell here.',
     spellsEmpty: 'You do not know any spells yet.',
     selectSpell: 'Select {spell}',
