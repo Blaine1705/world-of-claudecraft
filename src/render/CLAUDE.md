@@ -575,8 +575,9 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   them). Varkhul's rig is the measured opposite (the harvest caught its body
   programs linking live at the pull), so the Varkhul set stages it first,
   through the live view's own factory, beside a held Forgestorm warning twin
-  (each storm disposes its warnings, and three drops a program with its last
-  material). The claim is per staged SET, not per interior
+  (each storm disposes its warnings, and a program no material uses survives
+  only in the patched three's bounded released-program FIFO). The claim is per
+  staged SET, not per interior
   (`unclaimedEncounterPrewarmSets`): the Ignivar raid's sets start in the
   Forge-Lift, its first and quietest room, and every later raid room finds them
   claimed, so each set is built once per session.

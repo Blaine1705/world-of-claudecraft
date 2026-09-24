@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { VISUALS } from '../src/render/characters/manifest';
 import { activateGfxProfile, GFX, getActiveGfxProfile } from '../src/render/gfx';
 import type { LiveSoulRendLook } from '../src/render/interior_encounter_prewarm';
 import {
@@ -288,8 +289,8 @@ describe('interior encounter prewarm pass (driven)', () => {
   });
 
   it('stages the Forgestorm warning twin with the Varkhul set, held past its compile', async () => {
-    // Each storm disposes its warnings when they end; only a held twin keeps
-    // their programs linked for the next storm.
+    // Each storm disposes its warnings when they end; the held twin keeps
+    // their programs in use for the next storm.
     const host = fakeHost();
     const roots: THREE.Object3D[] = [];
     const compile = host.compilePrewarmColorPrograms;
@@ -337,6 +338,10 @@ describe('interior encounter prewarm pass (driven)', () => {
       color: template.color,
       scale: template.scale,
     });
+    // The entity carries the local player's held items (prewarmEntity spreads
+    // the player), which is harmless only because this rig has no swap slot.
+    expect(VISUALS.mob_varkhul_forgefather.weaponSlots ?? []).toEqual([]);
+    expect(VISUALS.mob_varkhul_forgefather.offhandSlot).toBeUndefined();
     // First unit of the set, so first child of the group: compiled first.
     expect(host.compiled[0]).toBe(`rig:mob:${VARKHUL_BOSS_ID}`);
     const rig = rigs.built[0].root as THREE.Object3D;

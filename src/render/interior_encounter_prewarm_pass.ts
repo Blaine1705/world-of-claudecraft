@@ -219,9 +219,10 @@ async function runInteriorEncounterPrewarm(
     place(visual);
   };
 
-  // Varkhul stands in the Inner Crucible before the pull and his view draws on
-  // the frame it is built, so its programs link there unless a twin linked
-  // them earlier (the harvest caught two body programs linking live). Same
+  // Varkhul stands in the Inner Crucible before the pull, and his view keeps
+  // drawing while its compile gate is pending (raidEncounterViewVisibleDuringCompile
+  // re-shows it every frame), so its programs link in a live frame unless a
+  // twin linked them earlier (the harvest caught two body programs doing so). Same
   // factory and entity shape as the live view, so the same visual key and
   // program keys. Constrained devices skip it: the rig is held for the session
   // and creature bodies stream there, so it may not even be resident.

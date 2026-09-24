@@ -120,7 +120,7 @@ function makeRig(tier: Tier): Rig {
 /** The Varkhul set as the pass stages it (the rig aside), hidden, compiled
  *  where the frame draws, then detached and held undisposed exactly as the
  *  pass holds it after compileEncounterPrewarmGroup. */
-function stageVarkhulSet(rig: Rig): THREE.Group {
+function stageVarkhulSet(rig: Rig, forgestormTwin = true): THREE.Group {
   const staged = new THREE.Group();
   staged.name = 'interior-encounter-prewarm';
   staged.visible = false;
@@ -131,8 +131,8 @@ function stageVarkhulSet(rig: Rig): THREE.Group {
     buildVarkhulForgePortalPrewarmVisual().root,
     buildVarkhulWorldfirePrewarmVisual(),
     buildVarkhulAssemblyPrewarmVisual(),
-    buildVarkhulForgestormPrewarmVisual(),
   );
+  if (forgestormTwin) staged.add(buildVarkhulForgestormPrewarmVisual());
   rig.scene.add(staged);
   rig.compile();
   const programs = rig.renderer.info.programs as ProgramDiagnostics[] | null;
@@ -140,6 +140,19 @@ function stageVarkhulSet(rig: Rig): THREE.Group {
   expect(programs?.filter((program) => program.diagnostics?.runnable === false)).toHaveLength(0);
   staged.removeFromParent();
   return staged;
+}
+
+function liveTrailMaterial(scene: THREE.Scene): THREE.Material {
+  const warning = scene.getObjectByName('varkhul-forgestorm-warning');
+  const trail = warning?.getObjectByName('varkhul-forgestorm-meteor-trail') as THREE.Mesh;
+  return trail.material as THREE.Material;
+}
+
+function programOf(rig: Rig, material: THREE.Material): { usedTimes: number } {
+  const program = (rig.renderer.properties.get(material) as { currentProgram?: unknown })
+    .currentProgram as { usedTimes: number } | undefined;
+  expect(program).toBeDefined();
+  return program as { usedTimes: number };
 }
 
 function linksAssembly(): ActiveVarkhulAssembly {
@@ -298,7 +311,28 @@ describe.each<Tier>(['low', 'ultra'])('Varkhul encounter prewarm (%s)', (tier) =
     visuals.dispose();
   });
 
-  it("staged: the second storm links nothing after the first storm's warnings are disposed", () => {
+  it('control: without the Forgestorm twin, the first storm links its meteor trail live', () => {
+    // Isolates the twin: the rest of the set staged, and no other staged
+    // builder carries the trail's program. Once the storm's warnings are
+    // disposed that program is in use by nothing: only the patched three's
+    // bounded released-program FIFO still holds it, and any later release
+    // pushes it toward eviction before the next storm.
+    const rig = makeRig(tier);
+    stageVarkhulSet(rig, false);
+    rig.draw();
+    const staged = rig.programs();
+    const visuals = new VarkhulForgestormVisuals(rig.scene, () => 0);
+    visuals.syncWorld(encounterWorld(forgestormWave(1)));
+    visuals.update(0.1, true);
+    rig.draw();
+    expect(rig.programs()).toBeGreaterThan(staged);
+    const trail = programOf(rig, liveTrailMaterial(rig.scene));
+    visuals.syncWorld(encounterWorld([]));
+    expect(trail.usedTimes).toBe(0);
+    visuals.dispose();
+  });
+
+  it("staged: the first storm's dispose releases nothing, and the second storm links nothing", () => {
     const rig = makeRig(tier);
     stageVarkhulSet(rig);
     rig.draw();
@@ -311,11 +345,14 @@ describe.each<Tier>(['low', 'ultra'])('Varkhul encounter prewarm (%s)', (tier) =
     expect(rig.programs()).toBe(staged);
 
     // The storm ends: its warnings leave the snapshot and the owner disposes
-    // all five materials of each. The held twin is what keeps the programs.
+    // all five materials of each. The held twin keeps the trail's program in
+    // use, so it never joins the released-program FIFO it could be evicted from.
+    const trail = programOf(rig, liveTrailMaterial(rig.scene));
     visuals.syncWorld(encounterWorld([]));
     rig.draw();
     expect(rig.scene.getObjectByName('varkhul-forgestorm-warning')).toBeUndefined();
     expect(rig.programs()).toBe(staged);
+    expect(trail.usedTimes).toBeGreaterThan(0);
 
     visuals.syncWorld(encounterWorld(forgestormWave(2)));
     visuals.update(0.1, true);

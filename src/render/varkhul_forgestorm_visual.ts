@@ -156,9 +156,10 @@ export function buildVarkhulForgestormTelegraph(
 }
 
 /** One warning built by the live builder, every part drawn, held by the
- *  encounter prewarm: each storm's warnings are disposed when they end, and
- *  three drops a program with its last material, so without a held twin every
- *  storm would link its warning programs again. */
+ *  encounter prewarm so its programs link before the first storm. Each storm
+ *  disposes its warnings when they end; a program no material uses survives
+ *  only in the patched three's bounded released-program FIFO, so the held twin
+ *  keeps it in use instead. */
 export function buildVarkhulForgestormPrewarmVisual(): THREE.Group {
   const group = buildVarkhulForgestormTelegraph(
     {
