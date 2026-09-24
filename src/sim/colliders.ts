@@ -63,12 +63,7 @@ import {
   dawnholdParapetSegments,
 } from './dawnhold_layout';
 import { buildDecorPropColliders } from './decor_prop_colliders';
-import {
-  decorationHasCollider,
-  ROCK_RADIUS_PER_SCALE,
-  rockHeight,
-  rockRadius,
-} from './decoration_dims';
+import { decorationCollider, MAX_DECORATION_COLLIDER_RADIUS } from './decoration_collider';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
 import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layout';
 import { dungeonDoorJambColliders } from './dungeon_door_jambs';
@@ -125,7 +120,6 @@ import type { WorldContent } from './types';
 import { WILDHEART_COLLIDERS } from './wildheart_field';
 import {
   crossesSealedBorder,
-  type Decoration,
   farshorePalmSpots,
   gardenMazeCellPieces,
   generateDecorationsInBounds,
@@ -1670,41 +1664,6 @@ function addStreetlampColliders(grid: ColliderGrid, seed: number): void {
  */
 export function streetlampPlacements(seed: number): readonly PlacedStreetlamp[] {
   return streetlampsByGrid.get(gridFor(seed)) ?? [];
-}
-
-// Decoration scale is `0.7 + hash * 0.9` (world.ts), and rocks have the
-// largest collision multiplier (ROCK_RADIUS_PER_SCALE). This conservative
-// bound selects every candidate whose circle could be assigned to a queried
-// grid cell.
-const MAX_DECORATION_COLLIDER_RADIUS = 1.6 * ROCK_RADIUS_PER_SCALE;
-
-function decorationCollider(seed: number, d: Decoration): Collider | null {
-  if (d.kind === 'rock') {
-    if (!decorationHasCollider(d)) return null;
-    // Height comes from decoration_dims (the one source the renderer scales
-    // the rock GLB to), so the collision top IS the silhouette top: a squat
-    // field stone is inside the character step height and gets walked over,
-    // instead of carrying an invisible wall above it.
-    const height = rockHeight(d.x, d.z, d.scale, seed);
-    const top = topY(seed, d.x, d.z, height);
-    return {
-      type: 'circle',
-      x: d.x,
-      z: d.z,
-      r: rockRadius(d.scale),
-      cameraTopY: top,
-      moveTopY: top,
-      standable: true,
-    };
-  }
-  // tree trunks only; canopies don't block
-  return {
-    type: 'circle',
-    x: d.x,
-    z: d.z,
-    r: 0.55 * d.scale,
-    cameraTopY: topY(seed, d.x, d.z, 7.5 * d.scale),
-  };
 }
 
 /** Claim the next `gridIndex` for a collider built after the eager pass,

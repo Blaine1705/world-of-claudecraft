@@ -511,7 +511,10 @@ const MONOLITHS: MonolithRow[] = [
     // Regeneration exemption) moved out of the heal2 arm into
     // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
     // count, zero slack.
-    ceiling: 18235,
+    // LOWERED 18235 -> 18228 at the Eastbrook ferry's Phase 2: the raid marker
+    // labels moved to raid_marker_labels_view.ts, paying for the ferry HUD's
+    // three wiring lines (18235 - 10 + 3). wc -l. Exact count, zero slack.
+    ceiling: 18228,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -931,7 +934,10 @@ const MONOLITHS: MonolithRow[] = [
     // 12790 -> 12789 when the Warrior kit textures moved to demand loading
     // (the boot-time sheet upload loop and its comment went, the kit host
     // gained its assets line). Exact count.
-    ceiling: 12789,
+    // LOWERED 12789 -> 12783 at the Eastbrook ferry's Phase 2: collectCasters
+    // and sleep moved to renderer_helpers.ts, paying for the at-sea passenger
+    // hide. wc -l. Exact count, zero slack.
+    ceiling: 12783,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1125,7 +1131,10 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the loot identity receipt
     // and projection helpers moved to dedicated siblings, composed with the
     // release extractions above. Exact merged count, zero slack.
-    ceiling: 11750,
+    // LOWERED 11750 -> 11746 at the Eastbrook ferry's Phase 2: campPrivateRng
+    // moved to camp_private_rng.ts, paying for the ferry wiring (tick call,
+    // movement guard, ferryView, the dev offset view). wc -l. Exact count.
+    ceiling: 11746,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1569,7 +1578,10 @@ const MONOLITHS: MonolithRow[] = [
     // quest/death record arms of the event drain moved to
     // server/event_record_observers.ts (which also hosts the new craftRoll
     // arm), so the audit landed as a net shrink. Exact count, zero slack.
-    ceiling: 9965,
+    // LOWERED 9965 -> 9959 at the Eastbrook ferry's Phase 2: the entity-record
+    // splicers moved to transport_head.ts beside the ferry's head fragment.
+    // wc -l. Exact count, zero slack.
+    ceiling: 9959,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1724,7 +1736,10 @@ const MONOLITHS: MonolithRow[] = [
     // src/net/target_echo.ts, banking the 52 lines of slack the row already
     // carried with it. Measured with wc -l < src/net/online.ts after biome.
     // Exact count, zero slack.
-    ceiling: 5426,
+    // LOWERED 5426 -> 5402 at the Eastbrook ferry's Phase 2: the REST payload
+    // types moved to rest_types.ts, paying for the ferry decode wiring.
+    // wc -l. Exact count, zero slack.
+    ceiling: 5402,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2021,7 +2036,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the keep wall-ledge and parapet loops retired and the Wildheart static set moved beside its field data. Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    ceiling: 2548,
+    // LOWERED 2548 -> 2488 at the Eastbrook ferry's Phase 2: the berth gate
+    // bookkeeping (setColliderGateOpen) landed and the decoration collider
+    // builder moved to decoration_collider.ts. wc -l. Exact count.
+    ceiling: 2488,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
