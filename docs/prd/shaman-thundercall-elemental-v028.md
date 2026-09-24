@@ -204,11 +204,11 @@ gate shows only the `shaman_engines` golden moving.
 
 | Scenario | Before | After | Vespers |
 |---|---|---|---|
-| 1 target, 15 sec | 148.7 | 153.6 | 151.8 |
-| 1 target, 60 sec | 153.9 | 174.7 | 162.7 |
-| 3 targets, 60 sec | 207.6 | 211.9 | 227.2 |
-| Level-20 boss, 120 sec | 160.5 | 173.6 | 160.6 |
-| Level-22 boss, 120 sec | 144.9 | 170.1 | 156.1 |
+| 1 target, 15 sec | 148.7 | 151.4 | 151.8 |
+| 1 target, 60 sec | 153.9 | 174.0 | 162.7 |
+| 3 targets, 60 sec | 207.6 | 216.7 | 227.2 |
+| Level-20 boss, 120 sec | 160.5 | 175.6 | 160.6 |
+| Level-22 boss, 120 sec | 144.9 | 163.9 | 156.1 |
 
 The single-target bench lands inside the existing role band (at most 1.1 times Vespers). The bench
 plays perfectly, so it cannot show the transfer gain the rework targets; the live check is the
