@@ -11273,6 +11273,8 @@ export const TARGETS = [
       // coat does per swing, and whether the row asks for a target at all.
       'sim/combat/poison_coating',
       'ui/ability_imbue_text',
+      // The Thundercall rework's new kit and reworded vent copy.
+      'sim/combat/shaman_thundercall',
     ],
     variants: [
       // Every variant enters as the class that OWNS the ability: the standalone
@@ -11338,6 +11340,32 @@ export const TARGETS = [
         charName: 'Nightsliver',
         abilityId: 'shadowstep',
         talentRow: { 5: 'rog_r5_shadeslip' },
+        mobile: true,
+      },
+      // Thundercall rework: the three new spells plus the reworded partial-vent
+      // copy on Earthen Jolt, as an Elemental Shaman at level 20.
+      ...[
+        ['magma-burst', 'lava_burst'],
+        ['arc-overload', 'lightning_overload'],
+        ['stormbreak', 'thunderstorm'],
+        ['earthen-jolt', 'earth_shock'],
+      ].map(([key, abilityId]) => ({
+        key: `thundercall-${key}`,
+        charClass: 'shaman',
+        charName: 'Stormcaller',
+        abilityId,
+        spec: 'elemental',
+        talentRow: {},
+        beforeLoad: lowGraphicsSeed,
+      })),
+      {
+        key: 'thundercall-magma-burst-mobile',
+        charClass: 'shaman',
+        charName: 'Stormcaller',
+        abilityId: 'lava_burst',
+        spec: 'elemental',
+        talentRow: {},
+        beforeLoad: lowGraphicsSeed,
         mobile: true,
       },
     ],

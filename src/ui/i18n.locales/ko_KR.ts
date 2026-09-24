@@ -9082,8 +9082,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '십일조 악마를 소환하면 정신 파열의 재사용 대기시간이 초기화되고, 십일조 악마가 공격할 때마다 회복하는 마나가 두 배가 됩니다.',
   'entities.itemSets.stormkindled.name': '폭풍점화 예장',
   'entities.itemSets.stormkindled.bonus2':
-    '화염낙인 상태에서 무기 해방 사용 시 천둥을 3 얻습니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
-  'entities.itemSets.stormkindled.bonus4': '대지의 충격의 천둥당 보너스가 30%로 증가합니다.',
+    '전격 과부하의 발동 확률이 30%가 됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.stormkindled.bonus4':
+    '대지의 충격의 천둥당 보너스가 30%로 증가하고, 용암 폭발의 피해가 20% 증가합니다.',
   'entities.itemSets.warspirit_emberscale.name': '전령 잉걸비늘 갑주',
   'entities.itemSets.warspirit_emberscale.bonus2':
     '선조의 일격이 전령의 박자를 3단계 진행시킵니다.',
@@ -14956,6 +14957,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     '지속 효과: 비전 화살과 하늘가지가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)',
   'entities.abilities.thunder_reservoir.name': '천둥 비축',
+  'entities.abilities.lightning_overload.name': '전격 과부하',
+  'entities.abilities.lightning_overload.description':
+    '지속 효과: 전격 화살과 갈래 번개가 20% 확률로 과부하되어 첫 번째 대상에게 입힌 피해의 50%로 다시 공격하고 천둥을 1 부여합니다. (천둥소환)',
+  'entities.abilities.lava_burst.name': '용암 폭발',
+  'entities.abilities.lava_burst.description':
+    '{damage}의 화염 피해를 입힙니다. 당신의 잉걸 충격으로 불타는 대상에게는 항상 치명타가 적중합니다. 용암 쇄도: 잉걸 충격의 지속 피해가 들어갈 때마다 20% 확률로 이 재사용 대기시간이 초기화되고 10초 안에 사용하는 다음 용암 폭발이 즉시 시전됩니다. 피해는 주문력에 따라 증가합니다. (천둥소환)',
+  'entities.abilities.thunderstorm.name': '폭풍 파쇄',
+  'entities.abilities.thunderstorm.description':
+    '벼락을 내려 10미터 내의 적에게 {damage}의 자연 피해를 입히고 5초 동안 이동 속도를 50% 감소시킵니다. 최대 마나의 8%를 회복합니다. 피해는 주문력에 따라 증가합니다. (천둥소환)',
   'entities.abilities.tidecall.description':
     '아군 대상의 생명력을 {damage}만큼 회복시킵니다. 치유량은 주문력에 따라 증가합니다. 초과 치유 전의 전체 치유량을 치유의 물결에 더하며, 대상 최대 생명력의 30%까지 저장합니다.',
   'entities.abilities.tidecall.name': '해일 부름',
