@@ -1444,6 +1444,7 @@ export const pt_BR: EnTranslations = {
       "buffs": "Benefícios",
       "unlock": "Mover a janela de auras do alvo",
       "lock": "Bloquear a janela de auras do alvo",
+      "close": "Close target aura window",
       "configureRows": "Configurar as auras do alvo",
       "fewerRows": "Preferir menos linhas de auras",
       "moreRows": "Preferir mais linhas de auras",

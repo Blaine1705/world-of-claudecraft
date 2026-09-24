@@ -1444,6 +1444,7 @@ export const cs_CZ: EnTranslations = {
       "buffs": "Buffy",
       "unlock": "Přesunout okno aur cíle",
       "lock": "Zamknout okno aur cíle",
+      "close": "Close target aura window",
       "configureRows": "Nastavit aury cíle",
       "fewerRows": "Upřednostnit méně řad aur",
       "moreRows": "Upřednostnit více řad aur",

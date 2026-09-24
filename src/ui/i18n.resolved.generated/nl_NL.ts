@@ -1444,6 +1444,7 @@ export const nl_NL: EnTranslations = {
       "buffs": "Buffs",
       "unlock": "Venster met auras van het doel verplaatsen",
       "lock": "Venster met auras van het doel vergrendelen",
+      "close": "Close target aura window",
       "configureRows": "Auras van het doel instellen",
       "fewerRows": "Voorkeur voor minder aurarijen",
       "moreRows": "Voorkeur voor meer aurarijen",

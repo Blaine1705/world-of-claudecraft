@@ -1444,6 +1444,7 @@ export const en: EnTranslations = {
       "buffs": "Buffs",
       "unlock": "Move target aura window",
       "lock": "Lock target aura window",
+      "close": "Close target aura window",
       "configureRows": "Configure target auras",
       "fewerRows": "Prefer fewer aura rows",
       "moreRows": "Prefer more aura rows",

@@ -1444,6 +1444,7 @@ export const da_DK: EnTranslations = {
       "buffs": "Forstærkninger",
       "unlock": "Flyt vinduet med målets auraer",
       "lock": "Lås vinduet med målets auraer",
+      "close": "Close target aura window",
       "configureRows": "Konfigurer målets auraer",
       "fewerRows": "Foretræk færre rækker med auraer",
       "moreRows": "Foretræk flere rækker med auraer",

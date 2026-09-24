@@ -1444,6 +1444,7 @@ export const fr_FR: EnTranslations = {
       "buffs": "Améliorations",
       "unlock": "Déplacer la fenêtre des auras de la cible",
       "lock": "Verrouiller la fenêtre des auras de la cible",
+      "close": "Close target aura window",
       "configureRows": "Configurer les auras de la cible",
       "fewerRows": "Préférer moins de rangées d’auras",
       "moreRows": "Préférer plus de rangées d’auras",

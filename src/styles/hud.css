@@ -6095,6 +6095,15 @@
     cursor: var(--cursor-point);
     opacity: 0.78;
   }
+  .ta-close-btn {
+    display: grid;
+    flex: 0 0 24px;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    margin-left: 4px;
+    padding: 0;
+  }
   .ta-rows-config-btn {
     position: relative;
     flex: 0 0 24px;

@@ -14130,6 +14130,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.buffs': 'Усиления',
   'hudChrome.targetAuras.unlock': 'Переместить окно аур цели',
   'hudChrome.targetAuras.lock': 'Закрепить окно аур цели',
+  'hudChrome.targetAuras.close': 'Закрыть окно аур цели',
   'hudChrome.targetAuras.configureRows': 'Настроить ауры цели',
   'hudChrome.targetAuras.fewerRows': 'Уменьшить число строк аур',
   'hudChrome.targetAuras.moreRows': 'Увеличить число строк аур',

@@ -12236,6 +12236,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.talkingHead.label'
   | 'hudChrome.targetAuras.all'
   | 'hudChrome.targetAuras.buffs'
+  | 'hudChrome.targetAuras.close'
   | 'hudChrome.targetAuras.configureRows'
   | 'hudChrome.targetAuras.debuffs'
   | 'hudChrome.targetAuras.fewerRows'

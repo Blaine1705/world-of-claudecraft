@@ -1444,6 +1444,7 @@ export const pl_PL: EnTranslations = {
       "buffs": "Wzmocnienia",
       "unlock": "Przesuń okno aur celu",
       "lock": "Zablokuj okno aur celu",
+      "close": "Close target aura window",
       "configureRows": "Skonfiguruj aury celu",
       "fewerRows": "Preferuj mniej rzędów aur",
       "moreRows": "Preferuj więcej rzędów aur",

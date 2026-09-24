@@ -13266,6 +13266,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.buffs': '增益',
   'hudChrome.targetAuras.unlock': '移動目標光環視窗',
   'hudChrome.targetAuras.lock': '鎖定目標光環視窗',
+  'hudChrome.targetAuras.close': '關閉目標光環視窗',
   'hudChrome.targetAuras.configureRows': '設定目標光環',
   'hudChrome.targetAuras.fewerRows': '減少光環列數',
   'hudChrome.targetAuras.moreRows': '增加光環列數',
