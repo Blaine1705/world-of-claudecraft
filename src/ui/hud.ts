@@ -193,7 +193,7 @@ import { CalendarWindow } from './calendar_window';
 import { require2dContext } from './canvas_context';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
-import { castDisplayName } from './cast_display_name';
+import { castDisplayName, targetCastDisplayName } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSigFor } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
@@ -4804,11 +4804,11 @@ export class Hud {
       timer: this.targetCastbarTimerEl,
     },
     {
-      // The release's Ignivar raid pass localizes every cast through
-      // abilityDisplayNameFromSource (the boss mechanic names ride the
-      // aura/mechanic matcher there). The Phase 14 farming arm that used to
-      // sit in front of it went with the farming plant cast itself.
-      resolveCastLabel: (s) => abilityDisplayNameFromSource(s.label),
+      // Hoard and rift boss cast IDs resolve to their localized wind-up name,
+      // then every other label through abilityDisplayNameFromSource (the boss
+      // mechanic names ride the aura/mechanic matcher there), so a cave boss
+      // never shows its raw cast id (cast_display_name.ts).
+      resolveCastLabel: (s) => targetCastDisplayName(s.label),
     },
   );
   // Second unit-frame painter instance; heraldry hosts are player identity only.

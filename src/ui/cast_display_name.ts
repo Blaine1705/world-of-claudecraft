@@ -16,7 +16,7 @@ import {
   SUNDER_CAST_ID,
   TOOL_RECHARGE_CAST_ID,
 } from '../sim/types';
-import { abilityDisplayName } from './ability_display_name';
+import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { type TranslationKey, t } from './i18n';
 
 // Rift boss one-shot mechanic cast IDs: keyed by their authored mechanic name.
@@ -92,4 +92,14 @@ export const castDisplayName = (id: string): string => {
   if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
   const ability = ABILITIES[id];
   return ability ? abilityDisplayName(ability) : id;
+};
+
+/** The TARGET cast bar's label. A mob's cast label is usually an authored
+ *  mechanic NAME (resolved by abilityDisplayNameFromSource), but the Buried
+ *  Hoard and rift boss wind-ups carry a cast ID (hoard_cast_mole_rake), which
+ *  must read as its localized name there too, never the raw id. */
+export const targetCastDisplayName = (label: string): string => {
+  const riftKey = `abilityUi.cast.${label}` as TranslationKey;
+  if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
+  return abilityDisplayNameFromSource(label);
 };
