@@ -2,6 +2,7 @@
 // rules that keep honor gear under the raid tier in PvE, the set rows, and the
 // tank guard (docs/design/warfare-season-2.md, "The PvE promise").
 import { describe, expect, it } from 'vitest';
+import { ABILITIES } from '../src/sim/content/classes';
 import { DEV_KIT_ROLES } from '../src/sim/content/dev_kit_roles';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { HONOR_QUARTERMASTER_STOCK } from '../src/sim/content/pvp_honor';
@@ -19,6 +20,7 @@ import {
   SEASON2_WEAPON_PRICE,
 } from '../src/sim/content/pvp_honor_season2';
 import type { TalentAllocation } from '../src/sim/content/talents';
+import { VANGUARD_SET_ENGINE_BONUSES } from '../src/sim/content/vanguard_set_bonuses';
 import { DUNGEON_X_THRESHOLD, ITEMS, NPCS } from '../src/sim/data';
 import { bestEpicGearFor } from '../src/sim/dev/bis_gear';
 import { canEquipItem, maxArmorTypeForClass } from '../src/sim/equipment_rules';
@@ -353,5 +355,84 @@ describe('the PvP promise: Season 2 is the PvP upgrade over a full Season 1 kit'
       // Owner target: about 10 percent more health than a full Season 1 kit.
       expect(b.maxHp / a.maxHp, `${cls}/${spec} health over Season 1`).toBeGreaterThan(1.07);
     }
+  });
+});
+
+describe('the crowd-control promise: no set makes heavy control spammable', () => {
+  // Player stuns carry no PvP diminishing returns here (src/sim/stun_dr.ts), so
+  // a cooldown cut on a stun is pure extra stun time; fears, roots, pulls and
+  // lockouts ride ladders but still gain uptime. Every Season 2 set that
+  // shortens a control ability's cooldown, flat or through a cast-triggered
+  // refund (with the trigger used on its own cooldown), stays within 20 percent
+  // of the base cooldown.
+  const CONTROL = new Set([
+    'stun',
+    'finisherStun',
+    'aoeFear',
+    'fear',
+    'incapacitate',
+    'root',
+    'aoeRoot',
+    'pullTarget',
+    'interrupt',
+    'polymorph',
+    'silence',
+    'knockback',
+  ]);
+  const MAX_CUT = 0.2;
+
+  type Row = { ability: string; cooldownFlat?: number; cooldownPct?: number };
+  type Proc = {
+    trigger: { on: string; abilities?: string[]; ability?: string; icd?: number };
+    responses: { kind: string; ability?: string; seconds?: number | 'reset' }[];
+  };
+
+  function isControl(abilityId: string): boolean {
+    const def = ABILITIES[abilityId] as unknown as { effects?: Record<string, unknown>[] };
+    return (def?.effects ?? []).some((e) => CONTROL.has(String(e.type)) || e.stunSec !== undefined);
+  }
+
+  it('cuts no control ability cooldown by more than 20 percent, refunds included', () => {
+    const cuts: Record<string, number> = {};
+    for (const [setId, tiers] of Object.entries(VANGUARD_SET_ENGINE_BONUSES)) {
+      // Every tier of the set together: the worst case is the full four pieces.
+      const flat = new Map<string, number>();
+      const refundRate = new Map<string, number>();
+      for (const tier of tiers) {
+        const effect = tier.effect as { ability?: Row[]; proc?: Proc | Proc[] };
+        for (const row of effect.ability ?? []) {
+          const base = ABILITIES[row.ability]?.cooldown ?? 0;
+          const cut = -(row.cooldownFlat ?? 0) - base * (row.cooldownPct ?? 0);
+          if (cut > 0) flat.set(row.ability, (flat.get(row.ability) ?? 0) + cut);
+        }
+        const procs = effect.proc ? (Array.isArray(effect.proc) ? effect.proc : [effect.proc]) : [];
+        for (const proc of procs) {
+          for (const r of proc.responses) {
+            if (r.kind !== 'cooldownRefund' || !r.ability) continue;
+            // Seconds refunded per second of play, with the trigger on cooldown.
+            const triggers =
+              proc.trigger.abilities ?? (proc.trigger.ability ? [proc.trigger.ability] : []);
+            const period = Math.max(
+              proc.trigger.icd ?? 0,
+              ...triggers.map((id) => ABILITIES[id]?.cooldown ?? 0),
+            );
+            const refunded = r.seconds === 'reset' ? Number.POSITIVE_INFINITY : (r.seconds ?? 0);
+            const rate = period > 0 ? refunded / period : Number.POSITIVE_INFINITY;
+            refundRate.set(r.ability, (refundRate.get(r.ability) ?? 0) + rate);
+          }
+        }
+      }
+      for (const id of new Set([...flat.keys(), ...refundRate.keys()])) {
+        if (!isControl(id)) continue;
+        const base = ABILITIES[id]?.cooldown ?? 0;
+        const effective = (base - (flat.get(id) ?? 0)) / (1 + (refundRate.get(id) ?? 0));
+        cuts[`${setId}:${id}`] = base > 0 ? 1 - effective / base : 1;
+      }
+    }
+    for (const [key, cut] of Object.entries(cuts)) {
+      expect(cut, `${key} cooldown cut`).toBeLessThanOrEqual(MAX_CUT + 1e-9);
+    }
+    // Anti-vacuity: the sweep sees the control cuts that do ship.
+    expect(Object.keys(cuts).length).toBeGreaterThan(3);
   });
 });

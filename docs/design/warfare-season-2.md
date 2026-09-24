@@ -136,6 +136,34 @@ everywhere. These rules hold them together:
 - Every bonus gets a decisive test (the bonus works at its tier, and not below it) and tooltip
   copy per `docs/design/tooltip-writing.md`.
 
+## Revision 2026-09-25: PvP feedback and the crowd-control audit
+
+Playtest feedback (Oath Chain's pull plus kick, speed after a cast, two thin bonuses) and an
+owner-requested audit of every cooldown cut on a crowd-control ability. Player stuns carry no
+PvP diminishing returns in this game (`src/sim/stun_dr.ts`), so a stun cooldown cut is pure
+extra stun time. The per-spec sections below keep the original drafts; these rows supersede
+them, and the shipped tooltip text is the source of truth.
+
+| Set | Tier | Was | Now | Why |
+|---|---|---|---|---|
+| Arms | 2pc | Maiming Strike refunds 2 sec of Onrush | refunds 1 sec | Onrush stuns; 25 percent effective cut became about 14 |
+| Protection warrior | 4pc | Shieldcrack refunds 1 sec of Faultline | Faultline also reduces damage taken by 10 percent for 6 sec | AoE stun with no diminishing returns |
+| Protection paladin | 2pc | Oath Chain -4 sec | -2 sec | Pull plus the new 4pc |
+| Protection paladin | 4pc | Oath Chain interrupts and locks the school for 3 sec | Pulled enemies cast 30 percent slower for 4 sec (Solar Reprisal kept) | A pull plus a kick in one button |
+| Assassination | 2pc | Low Blow -4 sec | Low Blow costs 10 less Energy | Stun uptime 30 to 37.5 percent with no diminishing returns |
+| Discipline | 2pc | Terror Canticle -6 sec | -3 sec | AoE fear; stacked with Lingering Dread it reached 15 sec |
+| Discipline | 4pc | Shield consumed refunds 4 sec of Terror Canticle | The shielded ally gains 20 percent speed for 3 sec (8 sec icd) | About a 10 sec AoE fear |
+| Elemental | 4pc | Unleash Weapon +30 percent speed for 3 sec | Cast while moving and +20 percent speed for 4 sec (20 sec icd) | Speed after a 30 yd cast read oddly |
+| Balance | 4pc | Gripping Roots +30 percent speed for 4 sec | Same shape as Elemental (20 sec icd) | Same reason |
+| Restoration shaman | 2pc | Mending Waters -0.2 sec | -0.5 sec on an ally below 50 percent health | 0.2 of a 2.25 sec cast was unfelt |
+| Affliction | 4pc | Sentence heals 4 percent of max health | Consume heals 30 percent more and channels while moving | Too thin for the setup Sentence takes |
+
+`tests/warfare_season2.test.ts` ("the crowd-control promise") now caps every Season 2 cut to a
+stun, fear, root, incapacitate, pull, interrupt or knockback cooldown at 20 percent, counting
+cast-triggered refunds at their trigger's own cooldown. The highest left: Bruin Rush (20),
+Faultline (17), Onrush (about 14). Oath Chain's cast slow reads only on player casts, so it
+does nothing to mobs; it is a PvP bonus by design.
+
 ## The 27 sets
 
 Each spec lists its set and item names, the 2-piece and 4-piece text, the implementation

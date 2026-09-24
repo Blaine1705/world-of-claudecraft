@@ -21803,7 +21803,7 @@ export const ko_KR: EnTranslations = {
       "vanguard_druid_balance": {
         "name": "별 파수꾼 의복",
         "bonus2": "옥죄는 뿌리의 시전 시간이 0.5초 감소합니다.",
-        "bonus4": "옥죄는 뿌리를 시전하면 이동 속도가 4초 동안 30% 증가합니다."
+        "bonus4": "옥죄는 뿌리를 시전하면 4초 동안 이동 중에 시전할 수 있고 이동 속도가 20% 증가합니다. 20초에 한 번만 발동합니다."
       },
       "vanguard_druid_feral": {
         "name": "피갈기 가죽",
@@ -21852,8 +21852,8 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "방패 서약 요새",
-        "bonus2": "맹세의 사슬의 재사용 대기시간이 4초 감소합니다.",
-        "bonus4": "맹세의 사슬이 주문 시전도 방해하여 해당 계열을 3초 동안 봉쇄하며, 끌어올 수 있는 적을 속박하면 태양의 응보를 얻습니다."
+        "bonus2": "맹세의 사슬의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "맹세의 사슬에 끌려온 적은 4초 동안 주문 시전이 30% 느려지며, 맹세의 사슬이 끌어올 수 있는 적을 속박하면 태양의 응보를 얻습니다."
       },
       "vanguard_paladin_retribution": {
         "name": "빛의 낙인 전투 판금",
@@ -21862,8 +21862,8 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "장막 성가 의복",
-        "bonus2": "정신의 절규의 재사용 대기시간이 6초 감소합니다.",
-        "bonus4": "수호의 성가가 완전히 소모되면 정신의 절규의 남은 재사용 대기시간이 4초 감소합니다. 8초에 한 번만 발동합니다."
+        "bonus2": "정신의 절규의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "수호의 성가가 완전히 소모되면 보호받던 아군의 이동 속도가 3초 동안 20% 증가합니다. 8초에 한 번만 발동합니다."
       },
       "vanguard_priest_holy": {
         "name": "은총의 날개 의복",
@@ -21877,7 +21877,7 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_rogue_assassination": {
         "name": "밤의 칼날 가죽 갑옷",
-        "bonus2": "반칙 가격의 재사용 대기시간이 4초 감소합니다.",
+        "bonus2": "반칙 가격의 에너지 소모량이 10 감소합니다.",
         "bonus4": "반칙 가격이 6초 안에 가하는 다음 공격도 반드시 치명타가 되게 합니다."
       },
       "vanguard_rogue_combat": {
@@ -21893,7 +21893,7 @@ export const ko_KR: EnTranslations = {
       "vanguard_shaman_elemental": {
         "name": "폭풍 율법 전투 사슬",
         "bonus2": "무기 해방의 재사용 대기시간이 3초 감소합니다.",
-        "bonus4": "무기 해방이 이동 속도도 3초 동안 30% 증가시킵니다."
+        "bonus4": "무기 해방을 사용하면 4초 동안 이동 중에 시전할 수 있고 이동 속도가 20% 증가합니다. 20초에 한 번만 발동합니다."
       },
       "vanguard_shaman_enhancement": {
         "name": "돌풍태생 전쟁 사슬",
@@ -21902,13 +21902,13 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "바닷물 수호 사슬갑옷",
-        "bonus2": "치유의 물결의 시전 시간이 0.2초 감소합니다.",
+        "bonus2": "생명력이 50% 미만인 아군에게 시전하는 치유의 물결의 시전 시간이 0.5초 감소합니다.",
         "bonus4": "해일 부름이 대상에게 당신의 최대 생명력의 5%만큼 보호막도 6초 동안 씌웁니다."
       },
       "vanguard_warlock_affliction": {
         "name": "공포의 깃펜 성의",
         "bonus2": "번민의 시전 시간이 0.3초 감소합니다.",
-        "bonus4": "선고를 내리면 최대 생명력의 4%를 회복합니다."
+        "bonus4": "집어삼키기의 치유량이 30% 증가하며, 이동 중에도 정신 집중할 수 있습니다."
       },
       "vanguard_warlock_demonology": {
         "name": "골수 결속 예복",
@@ -21922,7 +21922,7 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_warrior_arms": {
         "name": "칼날자국 전투 장비",
-        "bonus2": "불구의 일격이 쇄도의 남은 재사용 대기시간을 2초 감소시킵니다.",
+        "bonus2": "불구의 일격이 쇄도의 남은 재사용 대기시간을 1초 감소시킵니다.",
         "bonus4": "쇄도가 다음 불구의 일격도 20% 강화합니다(붉은 손 강화 1중첩)."
       },
       "vanguard_warrior_fury": {
@@ -21933,7 +21933,7 @@ export const ko_KR: EnTranslations = {
       "vanguard_warrior_prot": {
         "name": "강철 행군 보루",
         "bonus2": "단층선의 재사용 대기시간이 5초 감소합니다.",
-        "bonus4": "방패 강타가 단층선의 남은 재사용 대기시간을 1초 감소시킵니다."
+        "bonus4": "단층선이 받는 피해도 6초 동안 10% 감소시킵니다."
       },
       "vesperash": {
         "name": "만과의 잿가루 장막",

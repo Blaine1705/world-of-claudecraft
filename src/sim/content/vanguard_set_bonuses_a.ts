@@ -19,7 +19,7 @@ import type { SetEngineBonusTier } from './ignivar_set_bonuses';
 
 // ---- Warrior ----
 /** Arms 2pc: seconds each Maiming Strike takes off Onrush's remaining cooldown. */
-export const VANGUARD_ARMS_2PC_ONRUSH_REFUND_SEC = 2;
+export const VANGUARD_ARMS_2PC_ONRUSH_REFUND_SEC = 1;
 /** Arms 4pc: Onrush's Maiming Strike empower, one Redhand stack (Redhand's own 0.2). */
 export const VANGUARD_ARMS_4PC_EMPOWER_PCT = 0.2;
 /** Arms 4pc: the empower's lifetime, Redhand's own 15 sec. */
@@ -30,8 +30,10 @@ export const VANGUARD_FURY_2PC_LEAP_COOLDOWN_CUT_SEC = 8;
 export const VANGUARD_FURY_4PC_ENRAGE_DURATION_SEC = 4;
 /** Protection 2pc: Faultline cooldown cut in seconds (30 to 25). */
 export const VANGUARD_PROT_2PC_FAULTLINE_COOLDOWN_CUT_SEC = 5;
-/** Protection 4pc: seconds each Shieldcrack takes off Faultline's remaining cooldown. */
-export const VANGUARD_PROT_4PC_FAULTLINE_REFUND_SEC = 1;
+/** Protection 4pc: the damage reduction Faultline grants (buff_dr: 0.1 is 10 percent less taken). */
+export const VANGUARD_PROT_4PC_FAULTLINE_DR_PCT = 0.1;
+/** Protection 4pc: the Faultline damage reduction's duration in seconds. */
+export const VANGUARD_PROT_4PC_FAULTLINE_DR_DURATION_SEC = 6;
 
 // ---- Paladin ----
 /** Holy 2pc: Life Covenant cooldown cut in seconds (90 to 60). */
@@ -40,10 +42,12 @@ export const VANGUARD_HOLY_PALADIN_2PC_COVENANT_COOLDOWN_CUT_SEC = 30;
 export const VANGUARD_HOLY_PALADIN_4PC_SHIELD_PCT_MAX = 0.08;
 /** Holy 4pc: the shield's duration in seconds. */
 export const VANGUARD_HOLY_PALADIN_4PC_SHIELD_DURATION_SEC = 6;
-/** Protection 2pc: Oath Chain cooldown cut in seconds (18 to 14). */
-export const VANGUARD_PROT_PALADIN_2PC_OATH_CHAIN_COOLDOWN_CUT_SEC = 4;
-/** Protection 4pc: the school lockout Oath Chain's interrupt applies, in seconds. */
-export const VANGUARD_PROT_PALADIN_4PC_LOCKOUT_SEC = 3;
+/** Protection 2pc: Oath Chain cooldown cut in seconds (18 to 16). */
+export const VANGUARD_PROT_PALADIN_2PC_OATH_CHAIN_COOLDOWN_CUT_SEC = 2;
+/** Protection 4pc: the cast-time multiplier on enemies Oath Chain pulls (tongues: 1.3 is 30 percent slower). */
+export const VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_MULT = 1.3;
+/** Protection 4pc: the cast slow's duration in seconds. */
+export const VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_DURATION_SEC = 4;
 /** Retribution 2pc: Valkyr's Calling cooldown cut in seconds (60 to 45). */
 export const VANGUARD_RET_2PC_VALKYR_COOLDOWN_CUT_SEC = 15;
 /** Retribution 4pc: the empowered Final Edict's damage bonus. */
@@ -68,8 +72,10 @@ export const VANGUARD_SURVIVAL_2PC_BLOODHOOK_COOLDOWN_CUT_SEC = 3;
 export const VANGUARD_SURVIVAL_4PC_MOMENTUM_STACKS = 1;
 
 // ---- Rogue ----
-/** Assassination 2pc: Low Blow cooldown cut in seconds (20 to 16). */
-export const VANGUARD_ASSASSINATION_2PC_LOW_BLOW_COOLDOWN_CUT_SEC = 4;
+/** Assassination 2pc: Energy cut off Low Blow's cost (25 to 15). */
+export const VANGUARD_ASSASSINATION_2PC_LOW_BLOW_ENERGY_CUT = 10;
+/** Low Blow's authored base Energy cost (content/classes.ts kidney_shot), pinned by the test. */
+export const VANGUARD_ASSASSINATION_LOW_BLOW_BASE_ENERGY = 25;
 /** Assassination 4pc: the sure-crit window after Low Blow, in seconds. */
 export const VANGUARD_ASSASSINATION_4PC_CRIT_WINDOW_SEC = 6;
 /** Combat 2pc: Swift Heels cooldown cut in seconds (300 to 240). */
@@ -82,11 +88,13 @@ export const VANGUARD_SUBTLETY_2PC_SMOKEFADE_COOLDOWN_CUT_SEC = 60;
 export const VANGUARD_SUBTLETY_4PC_BONUS_COMBO = 2;
 
 // ---- Priest ----
-/** Discipline 2pc: Terror Canticle cooldown cut in seconds (30 to 24). */
-export const VANGUARD_DISC_2PC_CANTICLE_COOLDOWN_CUT_SEC = 6;
-/** Discipline 4pc: seconds a fully consumed Psalm of Warding takes off Terror Canticle. */
-export const VANGUARD_DISC_4PC_CANTICLE_REFUND_SEC = 4;
-/** Discipline 4pc: the internal cooldown between refunds. */
+/** Discipline 2pc: Terror Canticle cooldown cut in seconds (30 to 27). */
+export const VANGUARD_DISC_2PC_CANTICLE_COOLDOWN_CUT_SEC = 3;
+/** Discipline 4pc: the shielded ally's movement multiplier (buff_speed: 1.2 is 20 percent faster). */
+export const VANGUARD_DISC_4PC_SPEED_MULT = 1.2;
+/** Discipline 4pc: the speed burst's duration in seconds. */
+export const VANGUARD_DISC_4PC_SPEED_DURATION_SEC = 3;
+/** Discipline 4pc: the internal cooldown between speed bursts. */
 export const VANGUARD_DISC_4PC_ICD_SEC = 8;
 /** Holy 2pc: Veilstep cooldown cut in seconds (18 to 12). */
 export const VANGUARD_HOLY_PRIEST_2PC_VEILSTEP_COOLDOWN_CUT_SEC = 6;
@@ -180,21 +188,27 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
     },
     {
       pieces: 4,
-      // Each Shieldcrack cast refunds Faultline cooldown. castNth n:1 draws no rng.
+      // Faultline also grants a plain buff_dr self-buff (the shared additive
+      // damage-reduction read in combat/damage.ts). Its only selfBuff, so the
+      // aura keeps Faultline's bare id and name. No rng.
       effect: {
-        proc: {
-          id: 'set_vanguard_warrior_prot_4pc',
-          name: 'Ironmarch Tremor',
-          trigger: { on: 'castNth', n: 1, abilities: ['shield_slam'] },
-          responses: [
-            {
-              kind: 'cooldownRefund',
-              ability: 'faultline',
-              seconds: VANGUARD_PROT_4PC_FAULTLINE_REFUND_SEC,
-            },
-          ],
+        ability: [
+          {
+            ability: 'faultline',
+            addEffects: [
+              {
+                type: 'selfBuff',
+                kind: 'buff_dr',
+                value: VANGUARD_PROT_4PC_FAULTLINE_DR_PCT,
+                duration: VANGUARD_PROT_4PC_FAULTLINE_DR_DURATION_SEC,
+              },
+            ],
+          },
+        ],
+        tuning: {
+          damageReductionPct: VANGUARD_PROT_4PC_FAULTLINE_DR_PCT,
+          damageReductionDurationSec: VANGUARD_PROT_4PC_FAULTLINE_DR_DURATION_SEC,
         },
-        tuning: { faultlineRefundSec: VANGUARD_PROT_4PC_FAULTLINE_REFUND_SEC },
       },
     },
   ],
@@ -241,7 +255,7 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_paladin_protection: [
     {
       pieces: 2,
-      // Oath Chain 18 -> 14 sec on the resolved entry.
+      // Oath Chain 18 -> 16 sec on the resolved entry.
       effect: {
         ability: [
           {
@@ -253,18 +267,17 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
     },
     {
       pieces: 4,
-      // The interrupt is a generic row (the Hushbrand interrupt shape). The
-      // Solar Reprisal grant is bespoke: combat/paladin_control.ts calls the
-      // roll-free grantSolarReprisal when Oath Chain binds a pullable enemy,
-      // so no rng draw is added (bosses are not pulled, so no grant).
+      // Bespoke, both halves in combat/paladin_control.ts pullPaladinTargets:
+      // every pullable enemy the chain binds gets a tongues aura (the Curse of
+      // Tongues cast stretch tonguesMult reads at cast start), and the
+      // roll-free grantSolarReprisal fires when the primary is pullable
+      // (bosses are not pulled, so neither half lands on them). No interrupt:
+      // the pull plus a kick was too strong in PvP. No rng draw is added.
       effect: {
-        ability: [
-          {
-            ability: 'oath_chain',
-            addEffects: [{ type: 'interrupt', lockout: VANGUARD_PROT_PALADIN_4PC_LOCKOUT_SEC }],
-          },
-        ],
-        tuning: { lockoutSec: VANGUARD_PROT_PALADIN_4PC_LOCKOUT_SEC },
+        tuning: {
+          castSlowMult: VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_MULT,
+          castSlowDurationSec: VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_DURATION_SEC,
+        },
       },
     },
   ],
@@ -394,14 +407,20 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_rogue_assassination: [
     {
       pieces: 2,
-      // Low Blow 20 -> 16 sec on the resolved entry.
+      // Low Blow 25 -> 15 Energy on the resolved entry. costPct is the only
+      // cost primitive, so the flat cut is expressed against the base cost
+      // (round(25 * 0.6) = 15). The stun keeps its 20 sec cooldown: a heavy
+      // CC button never gets more frequent.
       effect: {
         ability: [
           {
             ability: 'kidney_shot',
-            cooldownFlat: -VANGUARD_ASSASSINATION_2PC_LOW_BLOW_COOLDOWN_CUT_SEC,
+            costPct:
+              -VANGUARD_ASSASSINATION_2PC_LOW_BLOW_ENERGY_CUT /
+              VANGUARD_ASSASSINATION_LOW_BLOW_BASE_ENERGY,
           },
         ],
+        tuning: { energyCut: VANGUARD_ASSASSINATION_2PC_LOW_BLOW_ENERGY_CUT },
       },
     },
     {
@@ -472,7 +491,7 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_priest_discipline: [
     {
       pieces: 2,
-      // Terror Canticle 30 -> 24 sec on the resolved entry.
+      // Terror Canticle 30 -> 27 sec on the resolved entry.
       effect: {
         ability: [
           { ability: 'psychic_scream', cooldownFlat: -VANGUARD_DISC_2PC_CANTICLE_COOLDOWN_CUT_SEC },
@@ -481,13 +500,15 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
     },
     {
       pieces: 4,
-      // A fully consumed Psalm of Warding refunds Terror Canticle, once per
-      // 8 sec (the Emberscreed 4pc trigger and its icd). A distinct proc id,
-      // so it fires beside Emberscreed's proc off the same consume. No rng.
+      // A fully consumed Psalm of Warding speeds the SHIELDED ally, once per
+      // 8 sec (the Emberscreed 4pc trigger and its icd). The aura response
+      // targets the trigger subject (the shield's owner, not the priest). A
+      // distinct proc id, so it fires beside Emberscreed's proc off the same
+      // consume. The name reuses the localized ability string. No rng.
       effect: {
         proc: {
           id: 'set_vanguard_priest_discipline_4pc',
-          name: 'Veilpsalm Dread',
+          name: 'Psalm of Warding',
           trigger: {
             on: 'shieldConsumed',
             ability: 'power_word_shield',
@@ -495,14 +516,18 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
           },
           responses: [
             {
-              kind: 'cooldownRefund',
-              ability: 'psychic_scream',
-              seconds: VANGUARD_DISC_4PC_CANTICLE_REFUND_SEC,
+              kind: 'aura',
+              auraKind: 'buff_speed',
+              value: VANGUARD_DISC_4PC_SPEED_MULT,
+              duration: VANGUARD_DISC_4PC_SPEED_DURATION_SEC,
+              name: 'Psalm of Warding',
+              target: 'subject',
             },
           ],
         },
         tuning: {
-          canticleRefundSec: VANGUARD_DISC_4PC_CANTICLE_REFUND_SEC,
+          speedMult: VANGUARD_DISC_4PC_SPEED_MULT,
+          speedDurationSec: VANGUARD_DISC_4PC_SPEED_DURATION_SEC,
           icdSec: VANGUARD_DISC_4PC_ICD_SEC,
         },
       },

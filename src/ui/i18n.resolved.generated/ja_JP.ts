@@ -21803,7 +21803,7 @@ export const ja_JP: EnTranslations = {
       "vanguard_druid_balance": {
         "name": "星の番人の衣装",
         "bonus2": "締めつける根の詠唱時間が0.5秒短縮されます。",
-        "bonus4": "締めつける根を詠唱すると、移動速度が4秒間30%上昇します。"
+        "bonus4": "締めつける根を詠唱すると、4秒間移動しながら詠唱でき、移動速度が20%上昇します。発動は20秒に1回まで。"
       },
       "vanguard_druid_feral": {
         "name": "血のたてがみの毛皮鎧",
@@ -21852,8 +21852,8 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "盾の誓いの砦",
-        "bonus2": "誓いの鎖のクールダウンが4秒短縮されます。",
-        "bonus4": "誓いの鎖は詠唱も中断してその系統を3秒間封じ、引き寄せられる敵を縛ったときには太陽の報復を与えます。"
+        "bonus2": "誓いの鎖のクールダウンが2秒短縮されます。",
+        "bonus4": "誓いの鎖で引き寄せられた敵は4秒間呪文の詠唱が30%遅くなり、引き寄せられる敵を縛ったときには誓いの鎖があなたに太陽の報復を与えます。"
       },
       "vanguard_paladin_retribution": {
         "name": "光の烙印の戦鎧",
@@ -21862,8 +21862,8 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "帳の詩篇の衣装",
-        "bonus2": "精神の絶叫のクールダウンが6秒短縮されます。",
-        "bonus4": "守りの聖歌が完全に消費されると、精神の絶叫の残りクールダウンが4秒短縮されます。発動は8秒に1回まで。"
+        "bonus2": "精神の絶叫のクールダウンが3秒短縮されます。",
+        "bonus4": "守りの聖歌が完全に消費されると、守られていた味方の移動速度が3秒間20%上昇します。発動は8秒に1回まで。"
       },
       "vanguard_priest_holy": {
         "name": "恩寵の翼の衣装",
@@ -21877,7 +21877,7 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_rogue_assassination": {
         "name": "夜斬りの革鎧",
-        "bonus2": "急所打ちのクールダウンが4秒短縮されます。",
+        "bonus2": "急所打ちのエネルギーコストが10減少します。",
         "bonus4": "急所打ちは、6秒以内の次の攻撃も必ずクリティカルにします。"
       },
       "vanguard_rogue_combat": {
@@ -21893,7 +21893,7 @@ export const ja_JP: EnTranslations = {
       "vanguard_shaman_elemental": {
         "name": "嵐の書の戦の鎖鎧",
         "bonus2": "武器解放のクールダウンが3秒短縮されます。",
-        "bonus4": "武器解放は、移動速度も3秒間30%上昇させます。"
+        "bonus4": "武器解放を使うと、4秒間移動しながら詠唱でき、移動速度が20%上昇します。発動は20秒に1回まで。"
       },
       "vanguard_shaman_enhancement": {
         "name": "疾風生まれの戦鎖帷子",
@@ -21902,13 +21902,13 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "潮の守りの鎖帷子",
-        "bonus2": "癒しの水流の詠唱時間が0.2秒短縮されます。",
+        "bonus2": "体力が50%未満の味方への癒しの水流の詠唱時間が0.5秒短縮されます。",
         "bonus4": "潮呼びは、その対象にもあなたの最大体力の5%のシールドを6秒間付与します。"
       },
       "vanguard_warlock_affliction": {
         "name": "恐怖の羽ペンの祭服",
         "bonus2": "責め苦の詠唱時間が0.3秒短縮されます。",
-        "bonus4": "宣告を下すと、最大体力の4%を回復します。"
+        "bonus4": "喰らうの回復量が30%増加し、移動しながらチャネルできます。"
       },
       "vanguard_warlock_demonology": {
         "name": "骨髄の縛めの礼装",
@@ -21922,7 +21922,7 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_warrior_arms": {
         "name": "刃跡の戦装束",
-        "bonus2": "重傷の一撃が突撃の残りクールダウンを2秒短縮します。",
+        "bonus2": "重傷の一撃が突撃の残りクールダウンを1秒短縮します。",
         "bonus4": "突撃は次の重傷の一撃も20%強化します（血染めの手の強化1スタック）。"
       },
       "vanguard_warrior_fury": {
@@ -21933,7 +21933,7 @@ export const ja_JP: EnTranslations = {
       "vanguard_warrior_prot": {
         "name": "鉄の行軍の防壁",
         "bonus2": "断層のクールダウンが5秒短縮されます。",
-        "bonus4": "盾砕きが断層の残りクールダウンを1秒短縮します。"
+        "bonus4": "断層は、受けるダメージも6秒間10%軽減します。"
       },
       "vesperash": {
         "name": "ヴェスパーアッシュの外套",

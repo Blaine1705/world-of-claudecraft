@@ -8846,7 +8846,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.name': '谷地秘法师法衣',
   'entities.itemSets.vale_arcanist.bonus3': '攻击速度和施法速度提高 15%。',
   'entities.itemSets.vanguard_warrior_arms.name': '刃痕战装',
-  'entities.itemSets.vanguard_warrior_arms.bonus2': '致残打击使突进的剩余冷却时间缩短 2 秒。',
+  'entities.itemSets.vanguard_warrior_arms.bonus2': '致残打击使突进的剩余冷却时间缩短 1 秒。',
   'entities.itemSets.vanguard_warrior_arms.bonus4':
     '突进还会使你的下一次致残打击强化 20%（1 层血手强化）。',
   'entities.itemSets.vanguard_warrior_fury.name': '血征怒装',
@@ -8854,15 +8854,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warrior_fury.bonus4': '英勇飞跃落地时使你激怒。',
   'entities.itemSets.vanguard_warrior_prot.name': '铁征壁垒',
   'entities.itemSets.vanguard_warrior_prot.bonus2': '地裂的冷却时间缩短 5 秒。',
-  'entities.itemSets.vanguard_warrior_prot.bonus4': '碎盾击使地裂的剩余冷却时间缩短 1 秒。',
+  'entities.itemSets.vanguard_warrior_prot.bonus4': '地裂还会使你受到的伤害降低 10%，持续 6 秒。',
   'entities.itemSets.vanguard_paladin_holy.name': '日守华服',
   'entities.itemSets.vanguard_paladin_holy.bonus2': '生命契约的冷却时间缩短 30 秒。',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     '生命契约还会为该盟友提供相当于其最大生命值 8% 的护盾，持续 6 秒。',
   'entities.itemSets.vanguard_paladin_protection.name': '盾誓堡垒',
-  'entities.itemSets.vanguard_paladin_protection.bonus2': '誓约锁链的冷却时间缩短 4 秒。',
+  'entities.itemSets.vanguard_paladin_protection.bonus2': '誓约锁链的冷却时间缩短 2 秒。',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
-    '誓约锁链还会打断施法，封锁该系法术 3 秒；当它束缚一个可被拉动的敌人时，你获得烈阳反击。',
+    '被誓约锁链拉动的敌人施法速度降低 30%，持续 4 秒；当誓约锁链束缚一个可被拉动的敌人时，还会使你获得烈阳反击。',
   'entities.itemSets.vanguard_paladin_retribution.name': '光印战甲',
   'entities.itemSets.vanguard_paladin_retribution.bonus2': '瓦尔基里的召唤的冷却时间缩短 15 秒。',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
@@ -8879,7 +8879,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus2': '血钩的冷却时间缩短 3 秒。',
   'entities.itemSets.vanguard_hunter_survival.bonus4': '血钩提供 1 点狩猎势能。',
   'entities.itemSets.vanguard_rogue_assassination.name': '夜斩皮甲',
-  'entities.itemSets.vanguard_rogue_assassination.bonus2': '下作一击的冷却时间缩短 4 秒。',
+  'entities.itemSets.vanguard_rogue_assassination.bonus2': '下作一击的能量消耗降低 10 点。',
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     '下作一击还会使你在 6 秒内的下一次攻击必定暴击。',
   'entities.itemSets.vanguard_rogue_combat.name': '斗印皮甲',
@@ -8891,9 +8891,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_subtlety.bonus4':
     '在烟遁状态下使用击腹拳时，额外提供 2 个连击点数。',
   'entities.itemSets.vanguard_priest_discipline.name': '幕颂衣装',
-  'entities.itemSets.vanguard_priest_discipline.bonus2': '心灵尖啸的冷却时间缩短 6 秒。',
+  'entities.itemSets.vanguard_priest_discipline.bonus2': '心灵尖啸的冷却时间缩短 3 秒。',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
-    '你的守护圣咏被完全消耗时，心灵尖啸的剩余冷却时间缩短 4 秒。每 8 秒最多触发一次。',
+    '你的守护圣咏被完全消耗时，受护盟友的移动速度提高 20%，持续 3 秒。每 8 秒最多触发一次。',
   'entities.itemSets.vanguard_priest_holy.name': '恩翼衣装',
   'entities.itemSets.vanguard_priest_holy.bonus2': '帷幕步的冷却时间缩短 6 秒。',
   'entities.itemSets.vanguard_priest_holy.bonus4':
@@ -8906,14 +8906,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_shaman_elemental.name': '风暴律令战锁甲',
   'entities.itemSets.vanguard_shaman_elemental.bonus2': '释放武器的冷却时间缩短 3 秒。',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
-    '释放武器还会使你的移动速度提高 30%，持续 3 秒。',
+    '释放武器使你可以在移动中施法，并使你的移动速度提高 20%，持续 4 秒。每 20 秒最多触发一次。',
   'entities.itemSets.vanguard_shaman_enhancement.name': '疾风战链甲',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
     '先祖打击使目标的移动速度降低 30%，持续 4 秒。',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     '先祖打击使元素恍惚的剩余冷却时间缩短 4 秒。',
   'entities.itemSets.vanguard_shaman_restoration.name': '潮守链甲',
-  'entities.itemSets.vanguard_shaman_restoration.bonus2': '治愈之水的施法时间缩短 0.2 秒。',
+  'entities.itemSets.vanguard_shaman_restoration.bonus2':
+    '对生命值低于 50% 的盟友施放治愈之水时，施法时间缩短 0.5 秒。',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     '潮汐召唤还会为其目标提供相当于你最大生命值 5% 的护盾，持续 6 秒。',
   'entities.itemSets.vanguard_mage_arcane.name': '缚时者圣袍',
@@ -8929,7 +8930,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warlock_affliction.name': '恐羽圣袍',
   'entities.itemSets.vanguard_warlock_affliction.bonus2': '惊惧的施法时间缩短 0.3 秒。',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
-    '施放裁决会为你恢复相当于你最大生命值 4% 的生命值。',
+    '吞噬的治疗效果提高 30%，并且可以在移动中引导。',
   'entities.itemSets.vanguard_warlock_demonology.name': '髓缚华服',
   'entities.itemSets.vanguard_warlock_demonology.bonus2': '骸骨护甲的冷却时间缩短 10 秒。',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
@@ -8941,7 +8942,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.name': '星卫衣装',
   'entities.itemSets.vanguard_druid_balance.bonus2': '缠握根须的施法时间缩短 0.5 秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
-    '施放缠握根须会使你的移动速度提高 30%，持续 4 秒。',
+    '施放缠握根须使你可以在移动中施法，并使你的移动速度提高 20%，持续 4 秒。每 20 秒最多触发一次。',
   'entities.itemSets.vanguard_druid_feral.name': '血鬃兽皮甲',
   'entities.itemSets.vanguard_druid_feral.bonus2': '巨熊冲锋的冷却时间缩短 3 秒。',
   'entities.itemSets.vanguard_druid_feral.bonus4':

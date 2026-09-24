@@ -21803,7 +21803,7 @@ export const da_DK: EnTranslations = {
       "vanguard_druid_balance": {
         "name": "Starwarden Raiment",
         "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
-        "bonus4": "Casting Gripping Roots increases your movement speed by 30 percent for 4 sec."
+        "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
       },
       "vanguard_druid_feral": {
         "name": "Bloodmane Hide",
@@ -21852,8 +21852,8 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Shieldvow Bastion",
-        "bonus2": "Oath Chain's cooldown is reduced by 4 sec.",
-        "bonus4": "Oath Chain also interrupts spellcasting, locking that school for 3 sec, and grants you Solar Reprisal when it binds an enemy that can be pulled."
+        "bonus2": "Oath Chain's cooldown is reduced by 2 sec.",
+        "bonus4": "Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled."
       },
       "vanguard_paladin_retribution": {
         "name": "Lightbrand Warplate",
@@ -21862,8 +21862,8 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "Veilpsalm Raiment",
-        "bonus2": "Terror Canticle's cooldown is reduced by 6 sec.",
-        "bonus4": "When your Psalm of Warding is fully consumed, Terror Canticle's remaining cooldown is reduced by 4 sec. Cannot occur more than once every 8 sec."
+        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
+        "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
       },
       "vanguard_priest_holy": {
         "name": "Gracewing Raiment",
@@ -21877,7 +21877,7 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_rogue_assassination": {
         "name": "Nightcut Leathers",
-        "bonus2": "Low Blow's cooldown is reduced by 4 sec.",
+        "bonus2": "Low Blow costs 10 less Energy.",
         "bonus4": "Low Blow also makes your next attack within 6 sec a critical strike."
       },
       "vanguard_rogue_combat": {
@@ -21893,7 +21893,7 @@ export const da_DK: EnTranslations = {
       "vanguard_shaman_elemental": {
         "name": "Tempestwrit Battlemail",
         "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
-        "bonus4": "Unleash Weapon also increases your movement speed by 30 percent for 3 sec."
+        "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
       },
       "vanguard_shaman_enhancement": {
         "name": "Galeborn Warmail",
@@ -21902,13 +21902,13 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "Brineward Chainmail",
-        "bonus2": "Mending Waters' cast time is reduced by 0.2 sec.",
+        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
         "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
       },
       "vanguard_warlock_affliction": {
         "name": "Dreadquill Vestments",
         "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
-        "bonus4": "Passing Sentence heals you for 4 percent of your maximum health."
+        "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
       },
       "vanguard_warlock_demonology": {
         "name": "Marrowbound Regalia",
@@ -21922,7 +21922,7 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_warrior_arms": {
         "name": "Bladewake Battlegear",
-        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 2 sec.",
+        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 1 sec.",
         "bonus4": "Onrush also empowers your next Maiming Strike by 20 percent (one stack of Redhand's empower)."
       },
       "vanguard_warrior_fury": {
@@ -21933,7 +21933,7 @@ export const da_DK: EnTranslations = {
       "vanguard_warrior_prot": {
         "name": "Ironmarch Bulwark",
         "bonus2": "Faultline's cooldown is reduced by 5 sec.",
-        "bonus4": "Shieldcrack reduces Faultline's remaining cooldown by 1 sec."
+        "bonus4": "Faultline also reduces damage you take by 10 percent for 6 sec."
       },
       "vesperash": {
         "name": "Vesperash-svøb",

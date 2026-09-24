@@ -4,11 +4,12 @@
 // Design and PvE ceilings: docs/design/warfare-season-2.md.
 //
 // Most tiers are GENERIC rows (ability mods, procs) that accumulateTalentEffect
-// applies with no class-module change. Three tiers are BESPOKE (the effect
+// applies with no class-module change. Five tiers are BESPOKE (the effect
 // carries only the audited numbers under `tuning`; the call site gates on
-// wearsSetBonus): Brineward 4pc (combat/shaman_spiritmend.ts), Hourbinder's
-// 4pc (combat/chronomancy.ts via the mage post-cast rider) and Rimewarden 4pc
-// (combat/frost_mage.ts). None of the bonuses carries the raid sets' spell
+// wearsSetBonus): Brineward 2pc and 4pc (combat/shaman_spiritmend.ts),
+// Hourbinder's 4pc (combat/chronomancy.ts via the mage post-cast rider),
+// Rimewarden 4pc (combat/frost_mage.ts) and Dreadquill 4pc's heal half
+// (combat/affliction.ts). None of the bonuses carries the raid sets' spell
 // pushback rider, and every added self-aura takes its own `auraId` so it can
 // never replace the ability's own aura (applyAura replaces by id and source).
 // `src/sim`-pure; no rng, no clock.
@@ -18,22 +19,26 @@ import type { SetEngineBonusTier } from './ignivar_set_bonuses';
 // ---- Shaman ----
 /** Tempestwrit 2pc: seconds cut from Unleash Weapon's cooldown (15 to 12). */
 export const VANGUARD_ELEMENTAL_2PC_UNLEASH_COOLDOWN_CUT_SEC = 3;
-/** Tempestwrit 4pc: Unleash Weapon's movement speed multiplier (+30 percent). */
-export const VANGUARD_ELEMENTAL_4PC_SPEED_MULT = 1.3;
-/** Tempestwrit 4pc: speed buff duration in seconds. */
-export const VANGUARD_ELEMENTAL_4PC_SPEED_DURATION_SEC = 3;
+/** Tempestwrit 4pc: movement speed multiplier after Unleash Weapon (+20 percent). */
+export const VANGUARD_ELEMENTAL_4PC_SPEED_MULT = 1.2;
+/** Tempestwrit 4pc: duration in seconds of both the speed and cast-while-moving auras. */
+export const VANGUARD_ELEMENTAL_4PC_DURATION_SEC = 4;
+/** Tempestwrit 4pc: internal cooldown in seconds. */
+export const VANGUARD_ELEMENTAL_4PC_ICD_SEC = 20;
+/** Tempestwrit 4pc aura ids: never the bare 'unleash_weapon' id, which the
+ *  Lifespring Unleash guard absorb uses on a self-target. */
+export const VANGUARD_ELEMENTAL_4PC_MOBILE_AURA_ID = 'set_vanguard_shaman_elemental_4pc_mobile';
+export const VANGUARD_ELEMENTAL_4PC_SPEED_AURA_ID = 'set_vanguard_shaman_elemental_4pc_speed';
 /** Galeborn 2pc: Ancestral Strike's slow multiplier (30 percent slower). */
 export const VANGUARD_ENHANCEMENT_2PC_SLOW_MULT = 0.7;
 /** Galeborn 2pc: slow duration in seconds. */
 export const VANGUARD_ENHANCEMENT_2PC_SLOW_DURATION_SEC = 4;
 /** Galeborn 4pc: seconds refunded from Elemental Trance per Ancestral Strike. */
 export const VANGUARD_ENHANCEMENT_4PC_TRANCE_REFUND_SEC = 4;
-/** Brineward 2pc: seconds cut from Mending Waters' cast. */
-export const VANGUARD_RESTO_SHAMAN_2PC_CAST_CUT_SEC = 0.2;
-/** Mending Waters' authored cast time at the level-20 rank the set requires
- *  (rank 5, 2.5 sec). castPct scales the AUTHORED cast additively beside the
- *  Spiritcall baseline's -0.1, so -0.08 is exactly 0.2 sec for everyone. */
-export const MENDING_WATERS_MAX_RANK_CAST_SEC = 2.5;
+/** Brineward 2pc: seconds cut from Mending Waters' cast on a low-health target. */
+export const VANGUARD_RESTO_SHAMAN_2PC_CAST_CUT_SEC = 0.5;
+/** Brineward 2pc: the target's health fraction the cut applies BELOW. */
+export const VANGUARD_RESTO_SHAMAN_2PC_HEALTH_BELOW = 0.5;
 /** Brineward 4pc: Tidecall's shield as a fraction of the SHAMAN's max health. */
 export const VANGUARD_RESTO_SHAMAN_4PC_SHIELD_PCT_MAX = 0.05;
 /** Brineward 4pc: shield duration in seconds. */
@@ -60,8 +65,8 @@ export const VANGUARD_FROST_4PC_FLITSTEP_REFUND_SEC = 5;
 export const VANGUARD_AFFLICTION_2PC_HARROW_CAST_CUT_SEC = 0.3;
 /** Harrow's authored cast time (castPct scales it additively). */
 export const HARROW_CAST_SEC = 1.5;
-/** Dreadquill 4pc: Sentence's self-heal as a fraction of max health. */
-export const VANGUARD_AFFLICTION_4PC_SENTENCE_HEAL_PCT_MAX = 0.04;
+/** Dreadquill 4pc: Consume's health transfer multiplier (+30 percent). */
+export const VANGUARD_AFFLICTION_4PC_CONSUME_HEAL_MULT = 1.3;
 /** Marrowbound 2pc: seconds cut from Bone Armor's cooldown (45 to 35). */
 export const VANGUARD_DEMONOLOGY_2PC_BONE_ARMOR_COOLDOWN_CUT_SEC = 10;
 /** Marrowbound 4pc: seconds refunded from Bone Armor per Reaping Command. */
@@ -79,10 +84,15 @@ export const VANGUARD_BALANCE_2PC_ROOTS_CAST_CUT_SEC = 0.5;
 /** Gripping Roots' authored cast time (castPct scales it additively beside
  *  the Moongrove baseline's -0.24, so the cut is 0.5 sec for everyone). */
 export const GRIPPING_ROOTS_CAST_SEC = 1.5;
-/** Starwarden 4pc: movement speed multiplier after Gripping Roots. */
-export const VANGUARD_BALANCE_4PC_SPEED_MULT = 1.3;
-/** Starwarden 4pc: speed buff duration in seconds. */
-export const VANGUARD_BALANCE_4PC_SPEED_DURATION_SEC = 4;
+/** Starwarden 4pc: movement speed multiplier after Gripping Roots (+20 percent). */
+export const VANGUARD_BALANCE_4PC_SPEED_MULT = 1.2;
+/** Starwarden 4pc: duration in seconds of both the speed and cast-while-moving auras. */
+export const VANGUARD_BALANCE_4PC_DURATION_SEC = 4;
+/** Starwarden 4pc: internal cooldown in seconds. */
+export const VANGUARD_BALANCE_4PC_ICD_SEC = 20;
+/** Starwarden 4pc aura ids (never Gripping Roots' own). */
+export const VANGUARD_BALANCE_4PC_MOBILE_AURA_ID = 'set_vanguard_druid_balance_4pc_mobile';
+export const VANGUARD_BALANCE_4PC_SPEED_AURA_ID = 'set_vanguard_druid_balance_4pc_speed';
 /** Bloodmane 2pc: seconds cut from Bruin Rush's cooldown (15 to 12). */
 export const VANGUARD_FERAL_2PC_RUSH_COOLDOWN_CUT_SEC = 3;
 /** Bloodmane 4pc: Bruin Rush's self-shield as a fraction of max health. */
@@ -114,25 +124,41 @@ export const VANGUARD_BONUSES_B: Record<string, readonly SetEngineBonusTier[]> =
     },
     {
       pieces: 4,
-      // Unleash Weapon also grants +30 percent movement speed for 3 sec (the
-      // Scald rider shape). Its own auraId: the Lifespring Unleash guard
-      // absorb uses the bare 'unleash_weapon' id on a self-target.
+      // Unleash Weapon grants cast-while-moving (a processional_grace aura,
+      // the kind combat/cast_move_gate.ts reads) and +20 percent movement
+      // speed for 4 sec, at most once every 20 sec (castNth icd; draws no
+      // rng). Each aura takes its own id so neither replaces the other nor
+      // any of Unleash Weapon's own auras.
       effect: {
-        ability: [
-          {
-            ability: 'unleash_weapon',
-            addEffects: [
-              {
-                type: 'selfBuff',
-                kind: 'buff_speed',
-                value: VANGUARD_ELEMENTAL_4PC_SPEED_MULT,
-                duration: VANGUARD_ELEMENTAL_4PC_SPEED_DURATION_SEC,
-                auraId: 'set_vanguard_shaman_elemental_4pc',
-                auraName: 'Unleash Weapon',
-              },
-            ],
+        proc: {
+          id: 'set_vanguard_shaman_elemental_4pc',
+          name: 'Unleash Weapon',
+          school: 'nature',
+          trigger: {
+            on: 'castNth',
+            n: 1,
+            abilities: ['unleash_weapon'],
+            icd: VANGUARD_ELEMENTAL_4PC_ICD_SEC,
           },
-        ],
+          responses: [
+            {
+              kind: 'aura',
+              auraKind: 'processional_grace',
+              value: 1,
+              duration: VANGUARD_ELEMENTAL_4PC_DURATION_SEC,
+              name: 'Unleash Weapon',
+              auraId: VANGUARD_ELEMENTAL_4PC_MOBILE_AURA_ID,
+            },
+            {
+              kind: 'aura',
+              auraKind: 'buff_speed',
+              value: VANGUARD_ELEMENTAL_4PC_SPEED_MULT,
+              duration: VANGUARD_ELEMENTAL_4PC_DURATION_SEC,
+              name: 'Unleash Weapon',
+              auraId: VANGUARD_ELEMENTAL_4PC_SPEED_AURA_ID,
+            },
+          ],
+        },
       },
     },
   ],
@@ -180,15 +206,16 @@ export const VANGUARD_BONUSES_B: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_shaman_restoration: [
     {
       pieces: 2,
-      // Mending Waters casts 0.2 sec faster at the level-20 rank (2.25 -> 2.05
-      // for Spiritcall with its baseline -0.1).
+      // Bespoke: Mending Waters casts 0.5 sec faster when its target (the
+      // caster on a self-cast) is below 50 percent health at cast start
+      // (brinewardMendingCastTime in combat/shaman_spiritmend.ts, called at
+      // the cast-time resolve in casting_lifecycle.ts). Conditional on the
+      // target, so it cannot be a resolved castPct row.
       effect: {
-        ability: [
-          {
-            ability: 'healing_wave',
-            castPct: -VANGUARD_RESTO_SHAMAN_2PC_CAST_CUT_SEC / MENDING_WATERS_MAX_RANK_CAST_SEC,
-          },
-        ],
+        tuning: {
+          castCutSec: VANGUARD_RESTO_SHAMAN_2PC_CAST_CUT_SEC,
+          healthBelow: VANGUARD_RESTO_SHAMAN_2PC_HEALTH_BELOW,
+        },
       },
     },
     {
@@ -306,23 +333,14 @@ export const VANGUARD_BONUSES_B: Record<string, readonly SetEngineBonusTier[]> =
     },
     {
       pieces: 4,
-      // Passing Sentence heals the warlock for 4 percent of max health.
-      // target 'self' is REQUIRED (Sentence is hostile). The heal runs through
-      // applyHeal like every proc heal, so it can crit (a wearer-only roll).
+      // Consume (drain_life) can be channeled while moving: a resolved
+      // castWhileMoving row, which cast_move_gate.ts reads off the resolved
+      // ability at both the press and the move-to-cancel check. Its health
+      // transfer is 30 percent larger: bespoke, at the channel's drainTick
+      // site (afflictionConsumeHealMult in combat/affliction.ts). Draws no rng.
       effect: {
-        proc: {
-          id: 'set_vanguard_warlock_affliction_4pc',
-          name: 'Sentence',
-          school: 'shadow',
-          trigger: { on: 'castNth', n: 1, abilities: ['sentence'] },
-          responses: [
-            {
-              kind: 'heal',
-              amountPctMaxHp: VANGUARD_AFFLICTION_4PC_SENTENCE_HEAL_PCT_MAX,
-              target: 'self',
-            },
-          ],
-        },
+        ability: [{ ability: 'drain_life', castWhileMoving: true }],
+        tuning: { consumeHealMult: VANGUARD_AFFLICTION_4PC_CONSUME_HEAL_MULT },
       },
     },
   ],
@@ -417,23 +435,39 @@ export const VANGUARD_BONUSES_B: Record<string, readonly SetEngineBonusTier[]> =
     },
     {
       pieces: 4,
-      // Casting Gripping Roots grants +30 percent movement speed for 4 sec.
+      // Casting Gripping Roots grants cast-while-moving and +20 percent
+      // movement speed for 4 sec, at most once every 20 sec (the Tempestwrit
+      // 4pc shape: castNth icd, two self-auras on their own ids).
       effect: {
-        ability: [
-          {
-            ability: 'entangling_roots',
-            addEffects: [
-              {
-                type: 'selfBuff',
-                kind: 'buff_speed',
-                value: VANGUARD_BALANCE_4PC_SPEED_MULT,
-                duration: VANGUARD_BALANCE_4PC_SPEED_DURATION_SEC,
-                auraId: 'set_vanguard_druid_balance_4pc',
-                auraName: 'Gripping Roots',
-              },
-            ],
+        proc: {
+          id: 'set_vanguard_druid_balance_4pc',
+          name: 'Gripping Roots',
+          school: 'nature',
+          trigger: {
+            on: 'castNth',
+            n: 1,
+            abilities: ['entangling_roots'],
+            icd: VANGUARD_BALANCE_4PC_ICD_SEC,
           },
-        ],
+          responses: [
+            {
+              kind: 'aura',
+              auraKind: 'processional_grace',
+              value: 1,
+              duration: VANGUARD_BALANCE_4PC_DURATION_SEC,
+              name: 'Gripping Roots',
+              auraId: VANGUARD_BALANCE_4PC_MOBILE_AURA_ID,
+            },
+            {
+              kind: 'aura',
+              auraKind: 'buff_speed',
+              value: VANGUARD_BALANCE_4PC_SPEED_MULT,
+              duration: VANGUARD_BALANCE_4PC_DURATION_SEC,
+              name: 'Gripping Roots',
+              auraId: VANGUARD_BALANCE_4PC_SPEED_AURA_ID,
+            },
+          ],
+        },
       },
     },
   ],

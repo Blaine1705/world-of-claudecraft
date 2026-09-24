@@ -6,8 +6,10 @@
 // live casts on a real Sim. The last block pins every number in the tooltip
 // text against the engine constants.
 import { describe, expect, it } from 'vitest';
+import { tonguesMult } from '../src/sim/combat/cc';
+import { SHIELDVOW_CAST_SLOW_AURA_ID } from '../src/sim/combat/paladin_control';
 import { onCastCompleted, onShieldConsumed } from '../src/sim/combat/talent_procs';
-import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { setBonusFlag } from '../src/sim/content/ignivar_set_bonuses';
 import { VANGUARD_ITEM_SETS } from '../src/sim/content/vanguard_item_sets';
 import * as V from '../src/sim/content/vanguard_set_bonuses_a';
@@ -167,7 +169,7 @@ function flag(cls: PlayerClass, spec: string, setId: string, pieces: number, tie
 
 // ---------------------------------------------------------------------------
 describe('Warrior Season 2 sets', () => {
-  it('Bladewake 2pc: Maiming Strike refunds 2 sec of Onrush, only at 2 pieces', () => {
+  it('Bladewake 2pc: Maiming Strike refunds 1 sec of Onrush, only at 2 pieces', () => {
     const id = 'set_vanguard_warrior_arms_2pc';
     expect(hasProc('warrior', 'arms', 'vanguard_warrior_arms', 1, id)).toBe(false);
     const { p, ctx } = procHarness('warrior', 'arms', 'vanguard_warrior_arms', 2);
@@ -251,15 +253,26 @@ describe('Warrior Season 2 sets', () => {
     );
   });
 
-  it('Ironmarch 4pc: Shieldcrack refunds 1 sec of Faultline, only at 4 pieces', () => {
-    const run = (pieces: number) => {
-      const { p, ctx } = procHarness('warrior', 'prot', 'vanguard_warrior_prot', pieces);
-      p.cooldowns.set('faultline', 20);
-      onCastCompleted(ctx, p, 'shield_slam');
-      return p.cooldowns.get('faultline');
+  it('Ironmarch 4pc: Faultline grants 10 percent damage reduction for 6 sec, only at 4 pieces', () => {
+    const faultline = (pieces: number) => {
+      const sim = makeSim('warrior', 'prot');
+      equipSet(sim, 'vanguard_warrior_prot', pieces);
+      const p = sim.player;
+      p.resource = p.maxResource;
+      p.gcdRemaining = 0;
+      sim.castAbility('faultline');
+      expect(p.cooldowns.has('faultline'), 'Faultline was cast').toBe(true);
+      return p.auras.find((a) => a.kind === 'buff_dr');
     };
-    expect(run(3)).toBe(20);
-    expect(run(4)).toBe(20 - V.VANGUARD_PROT_4PC_FAULTLINE_REFUND_SEC);
+    expect(faultline(3)).toBeUndefined();
+    const dr = expectDefined(faultline(4));
+    expect(dr.value).toBe(V.VANGUARD_PROT_4PC_FAULTLINE_DR_PCT);
+    expect(dr.duration).toBe(V.VANGUARD_PROT_4PC_FAULTLINE_DR_DURATION_SEC);
+    expect(dr.name).toBe('Faultline');
+    // The removed Shieldcrack refund stays gone.
+    expect(
+      hasProc('warrior', 'prot', 'vanguard_warrior_prot', 5, 'set_vanguard_warrior_prot_4pc'),
+    ).toBe(false);
   });
 });
 
@@ -296,7 +309,7 @@ describe('Paladin Season 2 sets', () => {
     expect(shield.aura.name).toBe('Life Covenant');
   });
 
-  it('Shieldvow 2pc: Oath Chain cooldown 18 to 14, only at 2 pieces', () => {
+  it('Shieldvow 2pc: Oath Chain cooldown 18 to 16, only at 2 pieces', () => {
     expectCooldownCut(
       'paladin',
       'protection',
@@ -308,7 +321,7 @@ describe('Paladin Season 2 sets', () => {
     );
   });
 
-  it('Shieldvow 4pc: Oath Chain interrupts a caster and grants Solar Reprisal', () => {
+  it('Shieldvow 4pc: Oath Chain slows the pulled enemy casts 30 percent and grants Solar Reprisal', () => {
     const chain = (pieces: number) => {
       const sim = makeSim('paladin', 'protection');
       equipSet(sim, 'vanguard_paladin_protection', pieces);
@@ -323,14 +336,26 @@ describe('Paladin Season 2 sets', () => {
       return { sim, mob };
     };
     const short = chain(3);
-    expect(short.mob.castingAbility).toBe('fireball');
+    expect(short.mob.auras.some((a) => a.kind === 'tongues')).toBe(false);
+    expect(tonguesMult(short.mob)).toBe(1);
     expect(short.sim.player.auras.some((a) => a.kind === 'paladin_solar_reprisal')).toBe(false);
 
     const full = chain(4);
     expect(full.mob.auras.some((a) => a.id === 'oath_chain_pull')).toBe(true);
-    expect(full.mob.castingAbility).toBeNull();
-    const lockout = expectDefined(full.mob.auras.find((a) => a.kind === 'lockout'));
-    expect(lockout.duration).toBe(V.VANGUARD_PROT_PALADIN_4PC_LOCKOUT_SEC);
+    const slow = expectDefined(full.mob.auras.find((a) => a.id === SHIELDVOW_CAST_SLOW_AURA_ID));
+    expect(slow.kind).toBe('tongues');
+    expect(slow.value).toBe(V.VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_MULT);
+    expect(slow.duration).toBe(V.VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_DURATION_SEC);
+    expect(slow.sourceId).toBe(full.sim.player.id);
+    expect(tonguesMult(full.mob)).toBe(V.VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_MULT);
+    // No interrupt any more: the cast keeps going and no school is locked.
+    expect(full.mob.castingAbility).toBe('fireball');
+    expect(full.mob.auras.some((a) => a.kind === 'lockout')).toBe(false);
+    expect(
+      effectsOf('paladin', 'protection', 'vanguard_paladin_protection', 5, 'oath_chain').some(
+        (e) => e.type === 'interrupt',
+      ),
+    ).toBe(false);
     expect(full.sim.player.auras.some((a) => a.kind === 'paladin_solar_reprisal')).toBe(true);
   });
 
@@ -345,6 +370,7 @@ describe('Paladin Season 2 sets', () => {
     sim.castAbility('oath_chain');
     expect(sim.player.cooldowns.has('oath_chain'), 'the chain was cast').toBe(true);
     expect(sim.player.auras.some((a) => a.kind === 'paladin_solar_reprisal')).toBe(false);
+    expect(anchor.auras.some((a) => a.kind === 'tongues')).toBe(false);
   });
 
   it("Lightbrand 2pc: Valkyr's Calling cooldown 60 to 45, only at 2 pieces", () => {
@@ -549,16 +575,28 @@ describe('Rogue Season 2 sets', () => {
     throw new Error(`${abilityId} never landed`);
   }
 
-  it('Nightcut 2pc: Low Blow cooldown 20 to 16, only at 2 pieces', () => {
-    expectCooldownCut(
-      'rogue',
-      'assassination',
-      'vanguard_rogue_assassination',
-      2,
-      'kidney_shot',
-      20,
-      V.VANGUARD_ASSASSINATION_2PC_LOW_BLOW_COOLDOWN_CUT_SEC,
-    );
+  it('Nightcut 2pc: Low Blow costs 10 less Energy, only at 2 pieces', () => {
+    const setId = 'vanguard_rogue_assassination';
+    const base = V.VANGUARD_ASSASSINATION_LOW_BLOW_BASE_ENERGY;
+    expect(expectDefined(ABILITIES.kidney_shot).cost, 'authored base cost').toBe(base);
+    const entry = (pieces: number) =>
+      resolvedEntry('rogue', 'assassination', setId, pieces, 'kidney_shot');
+    expect(entry(1).cost, 'one short').toBe(base);
+    expect(entry(2).cost, 'at tier').toBe(base - V.VANGUARD_ASSASSINATION_2PC_LOW_BLOW_ENERGY_CUT);
+    // The stun's cooldown is no longer cut.
+    expect(entry(5).cooldown).toBe(20);
+
+    // Live: the cast spends the resolved cost.
+    const spent = (pieces: number) => {
+      const { sim } = rogueAt('assassination', setId, pieces);
+      sim.player.comboPoints = 1;
+      const before = sim.player.resource;
+      sim.castAbility('kidney_shot');
+      expect(sim.player.cooldowns.has('kidney_shot'), 'Low Blow was cast').toBe(true);
+      return before - sim.player.resource;
+    };
+    expect(spent(1)).toBe(base);
+    expect(spent(2)).toBe(base - V.VANGUARD_ASSASSINATION_2PC_LOW_BLOW_ENERGY_CUT);
   });
 
   it('Nightcut 4pc: Low Blow arms a 6 sec sure crit, only at 4 pieces', () => {
@@ -651,7 +689,7 @@ describe('Rogue Season 2 sets', () => {
 
 // ---------------------------------------------------------------------------
 describe('Priest Season 2 sets', () => {
-  it('Veilpsalm 2pc: Terror Canticle cooldown 30 to 24, only at 2 pieces', () => {
+  it('Veilpsalm 2pc: Terror Canticle cooldown 30 to 27, only at 2 pieces', () => {
     expectCooldownCut(
       'priest',
       'discipline',
@@ -663,21 +701,65 @@ describe('Priest Season 2 sets', () => {
     );
   });
 
-  it('Veilpsalm 4pc: a consumed Psalm refunds 4 sec of Terror Canticle, once per 8 sec', () => {
-    const run = (pieces: number) => {
-      const harness = procHarness('priest', 'discipline', 'vanguard_priest_discipline', pieces);
-      harness.p.cooldowns.set('psychic_scream', 20);
-      onShieldConsumed(harness.ctx, harness.p, 'power_word_shield', harness.ally);
-      return harness;
+  it('Veilpsalm 4pc: a consumed Psalm speeds the SHIELDED ally 20 percent for 3 sec', () => {
+    const consume = (pieces: number) => {
+      const sim = makeSim('priest', 'discipline');
+      equipSet(sim, 'vanguard_priest_discipline', pieces);
+      const id = sim.addPlayer('warrior', 'Warded');
+      sim.setPlayerLevel(MAX_LEVEL, id);
+      const ally = expectDefined(sim.entities.get(id));
+      ally.pos.x = sim.player.pos.x + 4;
+      ally.pos.z = sim.player.pos.z;
+      sim.partyInvite(id, sim.player.id);
+      sim.partyAccept(id);
+      sim.player.resource = sim.player.maxResource;
+      sim.targetEntity(ally.id);
+      sim.castAbility('power_word_shield');
+      const shield = expectDefined(
+        ally.auras.find((a) => a.id === 'power_word_shield' && a.kind === 'absorb'),
+        'the Psalm landed',
+      );
+      const mob = addMob(sim, 8);
+      sim.ctx.dealDamage(mob, ally, shield.value + 10, false, 'physical', 'Bite', 'hit');
+      expect(
+        ally.auras.some((a) => a.id === 'power_word_shield'),
+        'the Psalm was fully consumed',
+      ).toBe(false);
+      return { sim, ally };
     };
-    expect(run(3).p.cooldowns.get('psychic_scream')).toBe(20);
-    const { p, ally, ctx } = run(4);
-    const refunded = 20 - V.VANGUARD_DISC_4PC_CANTICLE_REFUND_SEC;
-    expect(p.cooldowns.get('psychic_scream')).toBe(refunded);
-    // Inside the internal cooldown a second consume refunds nothing.
+    const speedOf = (e: Entity) => e.auras.find((a) => a.kind === 'buff_speed');
+    const short = consume(3);
+    expect(speedOf(short.ally)).toBeUndefined();
+
+    const full = consume(4);
+    const burst = expectDefined(speedOf(full.ally));
+    expect(burst.id).toBe('set_vanguard_priest_discipline_4pc');
+    expect(burst.value).toBe(V.VANGUARD_DISC_4PC_SPEED_MULT);
+    expect(burst.duration).toBe(V.VANGUARD_DISC_4PC_SPEED_DURATION_SEC);
+    expect(burst.sourceId).toBe(full.sim.player.id);
+    // It lands on the shielded ally, never the priest.
+    expect(speedOf(full.sim.player)).toBeUndefined();
+  });
+
+  it('Veilpsalm 4pc: the speed burst cannot occur more than once every 8 sec', () => {
+    const { p, ally, ctx, applied } = procHarness(
+      'priest',
+      'discipline',
+      'vanguard_priest_discipline',
+      4,
+    );
     onShieldConsumed(ctx, p, 'power_word_shield', ally);
-    expect(p.cooldowns.get('psychic_scream')).toBe(refunded);
+    expect(applied.filter((a) => a.aura.kind === 'buff_speed').map((a) => a.target.id)).toEqual([
+      2,
+    ]);
+    onShieldConsumed(ctx, p, 'power_word_shield', ally);
+    expect(applied.filter((a) => a.aura.kind === 'buff_speed')).toHaveLength(1);
     expect(p.procState?.icds.set_vanguard_priest_discipline_4pc).toBe(V.VANGUARD_DISC_4PC_ICD_SEC);
+    // The removed Terror Canticle refund stays gone.
+    const fresh = procHarness('priest', 'discipline', 'vanguard_priest_discipline', 4);
+    fresh.p.cooldowns.set('psychic_scream', 20);
+    onShieldConsumed(fresh.ctx, fresh.p, 'power_word_shield', fresh.ally);
+    expect(fresh.p.cooldowns.get('psychic_scream')).toBe(20);
   });
 
   it('Gracewing 2pc: Veilstep cooldown 18 to 12, only at 2 pieces', () => {
@@ -802,7 +884,7 @@ describe('Season 2 group A tooltips match the engine constants', () => {
     vanguard_warrior_fury: [[V.VANGUARD_FURY_2PC_LEAP_COOLDOWN_CUT_SEC], []],
     vanguard_warrior_prot: [
       [V.VANGUARD_PROT_2PC_FAULTLINE_COOLDOWN_CUT_SEC],
-      [V.VANGUARD_PROT_4PC_FAULTLINE_REFUND_SEC],
+      [pct(V.VANGUARD_PROT_4PC_FAULTLINE_DR_PCT), V.VANGUARD_PROT_4PC_FAULTLINE_DR_DURATION_SEC],
     ],
     vanguard_paladin_holy: [
       [V.VANGUARD_HOLY_PALADIN_2PC_COVENANT_COOLDOWN_CUT_SEC],
@@ -813,7 +895,10 @@ describe('Season 2 group A tooltips match the engine constants', () => {
     ],
     vanguard_paladin_protection: [
       [V.VANGUARD_PROT_PALADIN_2PC_OATH_CHAIN_COOLDOWN_CUT_SEC],
-      [V.VANGUARD_PROT_PALADIN_4PC_LOCKOUT_SEC],
+      [
+        pct(V.VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_MULT - 1),
+        V.VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_DURATION_SEC,
+      ],
     ],
     vanguard_paladin_retribution: [
       [V.VANGUARD_RET_2PC_VALKYR_COOLDOWN_CUT_SEC],
@@ -832,7 +917,7 @@ describe('Season 2 group A tooltips match the engine constants', () => {
       [V.VANGUARD_SURVIVAL_4PC_MOMENTUM_STACKS],
     ],
     vanguard_rogue_assassination: [
-      [V.VANGUARD_ASSASSINATION_2PC_LOW_BLOW_COOLDOWN_CUT_SEC],
+      [V.VANGUARD_ASSASSINATION_2PC_LOW_BLOW_ENERGY_CUT],
       [V.VANGUARD_ASSASSINATION_4PC_CRIT_WINDOW_SEC],
     ],
     vanguard_rogue_combat: [
@@ -845,7 +930,11 @@ describe('Season 2 group A tooltips match the engine constants', () => {
     ],
     vanguard_priest_discipline: [
       [V.VANGUARD_DISC_2PC_CANTICLE_COOLDOWN_CUT_SEC],
-      [V.VANGUARD_DISC_4PC_CANTICLE_REFUND_SEC, V.VANGUARD_DISC_4PC_ICD_SEC],
+      [
+        pct(V.VANGUARD_DISC_4PC_SPEED_MULT - 1),
+        V.VANGUARD_DISC_4PC_SPEED_DURATION_SEC,
+        V.VANGUARD_DISC_4PC_ICD_SEC,
+      ],
     ],
     vanguard_priest_holy: [
       [V.VANGUARD_HOLY_PRIEST_2PC_VEILSTEP_COOLDOWN_CUT_SEC],
@@ -893,7 +982,6 @@ describe('Season 2 group A tooltips match the engine constants', () => {
       ['hunter', 'beast_mastery', 'vanguard_hunter_beast_mastery', 'concussive_shot', 12],
       ['hunter', 'marksmanship', 'vanguard_hunter_marksmanship', 'trailbreak', 15],
       ['hunter', 'survival', 'vanguard_hunter_survival', 'bloodhook', 15],
-      ['rogue', 'assassination', 'vanguard_rogue_assassination', 'kidney_shot', 20],
       ['rogue', 'combat', 'vanguard_rogue_combat', 'sprint', 300],
       ['rogue', 'subtlety', 'vanguard_rogue_subtlety', 'vanish', 300],
       ['priest', 'discipline', 'vanguard_priest_discipline', 'psychic_scream', 30],

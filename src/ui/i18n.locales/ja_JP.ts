@@ -9218,7 +9218,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.vanguard_warrior_arms.name': '刃跡の戦装束',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
-    '重傷の一撃が突撃の残りクールダウンを2秒短縮します。',
+    '重傷の一撃が突撃の残りクールダウンを1秒短縮します。',
   'entities.itemSets.vanguard_warrior_arms.bonus4':
     '突撃は次の重傷の一撃も20%強化します（血染めの手の強化1スタック）。',
   'entities.itemSets.vanguard_warrior_fury.name': '血の行軍の憤怒の装備',
@@ -9226,17 +9226,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warrior_fury.bonus4': '英雄的跳躍で着地すると激昂します。',
   'entities.itemSets.vanguard_warrior_prot.name': '鉄の行軍の防壁',
   'entities.itemSets.vanguard_warrior_prot.bonus2': '断層のクールダウンが5秒短縮されます。',
-  'entities.itemSets.vanguard_warrior_prot.bonus4':
-    '盾砕きが断層の残りクールダウンを1秒短縮します。',
+  'entities.itemSets.vanguard_warrior_prot.bonus4': '断層は、受けるダメージも6秒間10%軽減します。',
   'entities.itemSets.vanguard_paladin_holy.name': '陽の守夜の礼装',
   'entities.itemSets.vanguard_paladin_holy.bonus2': '生命の契約のクールダウンが30秒短縮されます。',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     '生命の契約は、味方にもその最大体力の8%のシールドを6秒間付与します。',
   'entities.itemSets.vanguard_paladin_protection.name': '盾の誓いの砦',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    '誓いの鎖のクールダウンが4秒短縮されます。',
+    '誓いの鎖のクールダウンが2秒短縮されます。',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
-    '誓いの鎖は詠唱も中断してその系統を3秒間封じ、引き寄せられる敵を縛ったときには太陽の報復を与えます。',
+    '誓いの鎖で引き寄せられた敵は4秒間呪文の詠唱が30%遅くなり、引き寄せられる敵を縛ったときには誓いの鎖があなたに太陽の報復を与えます。',
   'entities.itemSets.vanguard_paladin_retribution.name': '光の烙印の戦鎧',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
     'ヴァルキュリアの召命のクールダウンが15秒短縮されます。',
@@ -9257,7 +9256,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus4': '血鉤が狩猟の勢いを1与えます。',
   'entities.itemSets.vanguard_rogue_assassination.name': '夜斬りの革鎧',
   'entities.itemSets.vanguard_rogue_assassination.bonus2':
-    '急所打ちのクールダウンが4秒短縮されます。',
+    '急所打ちのエネルギーコストが10減少します。',
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     '急所打ちは、6秒以内の次の攻撃も必ずクリティカルにします。',
   'entities.itemSets.vanguard_rogue_combat.name': '乱闘の印の革鎧',
@@ -9270,9 +9269,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '煙隠れから使ったみぞおち強打は、コンボポイントを2追加で与えます。',
   'entities.itemSets.vanguard_priest_discipline.name': '帳の詩篇の衣装',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    '精神の絶叫のクールダウンが6秒短縮されます。',
+    '精神の絶叫のクールダウンが3秒短縮されます。',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
-    '守りの聖歌が完全に消費されると、精神の絶叫の残りクールダウンが4秒短縮されます。発動は8秒に1回まで。',
+    '守りの聖歌が完全に消費されると、守られていた味方の移動速度が3秒間20%上昇します。発動は8秒に1回まで。',
   'entities.itemSets.vanguard_priest_holy.name': '恩寵の翼の衣装',
   'entities.itemSets.vanguard_priest_holy.bonus2':
     'ヴェイルステップのクールダウンが6秒短縮されます。',
@@ -9286,7 +9285,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_shaman_elemental.name': '嵐の書の戦の鎖鎧',
   'entities.itemSets.vanguard_shaman_elemental.bonus2': '武器解放のクールダウンが3秒短縮されます。',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
-    '武器解放は、移動速度も3秒間30%上昇させます。',
+    '武器解放を使うと、4秒間移動しながら詠唱でき、移動速度が20%上昇します。発動は20秒に1回まで。',
   'entities.itemSets.vanguard_shaman_enhancement.name': '疾風生まれの戦鎖帷子',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
     '祖霊の一撃は、対象の移動速度を4秒間30%低下させます。',
@@ -9294,7 +9293,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '祖霊の一撃がエレメンタルトランスの残りクールダウンを4秒短縮します。',
   'entities.itemSets.vanguard_shaman_restoration.name': '潮の守りの鎖帷子',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    '癒しの水流の詠唱時間が0.2秒短縮されます。',
+    '体力が50%未満の味方への癒しの水流の詠唱時間が0.5秒短縮されます。',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     '潮呼びは、その対象にもあなたの最大体力の5%のシールドを6秒間付与します。',
   'entities.itemSets.vanguard_mage_arcane.name': '時縛りの祭服',
@@ -9312,7 +9311,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warlock_affliction.name': '恐怖の羽ペンの祭服',
   'entities.itemSets.vanguard_warlock_affliction.bonus2': '責め苦の詠唱時間が0.3秒短縮されます。',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
-    '宣告を下すと、最大体力の4%を回復します。',
+    '喰らうの回復量が30%増加し、移動しながらチャネルできます。',
   'entities.itemSets.vanguard_warlock_demonology.name': '骨髄の縛めの礼装',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
     '骨の鎧のクールダウンが10秒短縮されます。',
@@ -9325,7 +9324,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.name': '星の番人の衣装',
   'entities.itemSets.vanguard_druid_balance.bonus2': '締めつける根の詠唱時間が0.5秒短縮されます。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
-    '締めつける根を詠唱すると、移動速度が4秒間30%上昇します。',
+    '締めつける根を詠唱すると、4秒間移動しながら詠唱でき、移動速度が20%上昇します。発動は20秒に1回まで。',
   'entities.itemSets.vanguard_druid_feral.name': '血のたてがみの毛皮鎧',
   'entities.itemSets.vanguard_druid_feral.bonus2':
     'ブルーインラッシュのクールダウンが3秒短縮されます。',

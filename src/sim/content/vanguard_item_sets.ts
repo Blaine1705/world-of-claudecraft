@@ -15,7 +15,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: "Maiming Strike reduces Onrush's remaining cooldown by 2 sec.",
+        text: "Maiming Strike reduces Onrush's remaining cooldown by 1 sec.",
       },
       {
         pieces: 4,
@@ -40,7 +40,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 4,
         effect: {},
-        text: "Shieldcrack reduces Faultline's remaining cooldown by 1 sec.",
+        text: 'Faultline also reduces damage you take by 10 percent for 6 sec.',
       },
     ],
   },
@@ -60,11 +60,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_paladin_protection',
     name: 'Shieldvow Bastion',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Oath Chain's cooldown is reduced by 4 sec." },
+      { pieces: 2, effect: {}, text: "Oath Chain's cooldown is reduced by 2 sec." },
       {
         pieces: 4,
         effect: {},
-        text: 'Oath Chain also interrupts spellcasting, locking that school for 3 sec, and grants you Solar Reprisal when it binds an enemy that can be pulled.',
+        text: 'Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled.',
       },
     ],
   },
@@ -116,7 +116,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_rogue_assassination',
     name: 'Nightcut Leathers',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Low Blow's cooldown is reduced by 4 sec." },
+      { pieces: 2, effect: {}, text: 'Low Blow costs 10 less Energy.' },
       {
         pieces: 4,
         effect: {},
@@ -152,11 +152,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_priest_discipline',
     name: 'Veilpsalm Raiment',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Terror Canticle's cooldown is reduced by 6 sec." },
+      { pieces: 2, effect: {}, text: "Terror Canticle's cooldown is reduced by 3 sec." },
       {
         pieces: 4,
         effect: {},
-        text: "When your Psalm of Warding is fully consumed, Terror Canticle's remaining cooldown is reduced by 4 sec. Cannot occur more than once every 8 sec.",
+        text: 'When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec.',
       },
     ],
   },
@@ -196,7 +196,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 4,
         effect: {},
-        text: 'Unleash Weapon also increases your movement speed by 30 percent for 3 sec.',
+        text: 'Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec.',
       },
     ],
   },
@@ -220,7 +220,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_shaman_restoration',
     name: 'Brineward Chainmail',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Mending Waters' cast time is reduced by 0.2 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Mending Waters casts 0.5 sec faster on an ally below 50 percent health.',
+      },
       {
         pieces: 4,
         effect: {},
@@ -272,7 +276,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 4,
         effect: {},
-        text: 'Passing Sentence heals you for 4 percent of your maximum health.',
+        text: 'Consume heals you for 30 percent more and can be channeled while moving.',
       },
     ],
   },
@@ -308,7 +312,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 4,
         effect: {},
-        text: 'Casting Gripping Roots increases your movement speed by 30 percent for 4 sec.',
+        text: 'Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec.',
       },
     ],
   },

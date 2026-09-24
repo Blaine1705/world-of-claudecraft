@@ -5,11 +5,11 @@
 // last block pins every number in the tooltip copy (content/
 // vanguard_item_sets.ts) to the implementation constants.
 import { describe, expect, it } from 'vitest';
-import { gainDoom } from '../src/sim/combat/affliction';
 import { HOURBINDER_HASTE_ID } from '../src/sim/combat/chronomancy';
 import { gainRuin, ruinAmount } from '../src/sim/combat/destruction';
 import { refundFlitstep } from '../src/sim/combat/frost_mage';
-import { BRINEWARD_SHIELD_ID } from '../src/sim/combat/shaman_spiritmend';
+import { BRINEWARD_SHIELD_ID, brinewardMendingCastTime } from '../src/sim/combat/shaman_spiritmend';
+import { spellHasteMult } from '../src/sim/combat/spell_combat';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { setBonusFlag } from '../src/sim/content/ignivar_set_bonuses';
 import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
@@ -20,7 +20,7 @@ import { createMob } from '../src/sim/entity';
 import { moveSpeedMult } from '../src/sim/player_motion';
 import { computeCharacterModifiers } from '../src/sim/set_bonus_mods';
 import { Sim } from '../src/sim/sim';
-import type { Entity, PlayerClass, SimEvent } from '../src/sim/types';
+import { type Entity, MIN_GCD, type PlayerClass, type SimEvent } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
 
 const SET_SLOTS = ['helmet', 'shoulder', 'chest', 'legs', 'gloves'] as const;
@@ -114,6 +114,24 @@ function cast(sim: Sim, abilityId: string, target?: Entity): SimEvent[] {
   return events;
 }
 
+/** Presses a hard cast (or channel) with forward held, then rides 5 ticks of
+ *  movement: true only when the cast started AND survived the moving ticks. */
+function castWhileMoving(sim: Sim, abilityId: string, target: Entity): boolean {
+  sim.targetEntity(target.id);
+  ready(sim, abilityId);
+  sim.moveInput.forward = true;
+  try {
+    sim.castAbility(abilityId);
+    if (sim.player.castingAbility !== abilityId) return false;
+    const start = { ...sim.player.pos };
+    for (let i = 0; i < 5; i++) sim.tick();
+    expect(Math.hypot(sim.player.pos.x - start.x, sim.player.pos.z - start.z)).toBeGreaterThan(0);
+    return sim.player.castingAbility === abilityId;
+  } finally {
+    sim.moveInput.forward = false;
+  }
+}
+
 function resolved(sim: Sim, abilityId: string) {
   return expectDefined(sim.resolvedAbility(abilityId), abilityId);
 }
@@ -165,25 +183,67 @@ describe('Tempestwrit Battlemail (elemental)', () => {
     expect(resolved(live('shaman', 'elemental', SET, 1), 'unleash_weapon').cooldown).toBe(15);
   });
 
-  function unleashSpeed(pieces: number): number {
+  const SET_AURAS = [
+    B.VANGUARD_ELEMENTAL_4PC_MOBILE_AURA_ID,
+    B.VANGUARD_ELEMENTAL_4PC_SPEED_AURA_ID,
+  ];
+
+  function unleashed(pieces: number) {
     const sim = live('shaman', 'elemental', SET, pieces);
     const mob = addHostile(sim, 10);
     cast(sim, 'flametongue_weapon');
     cast(sim, 'unleash_weapon', mob);
     expect(sim.player.cooldowns.has('unleash_weapon')).toBe(true); // the cast resolved
-    return moveSpeedMult(sim.player);
+    return { sim, mob };
   }
 
-  it('4pc: Unleash Weapon grants +30 percent movement speed for 3 sec, not at 3 pieces', () => {
-    expect(unleashSpeed(4)).toBeCloseTo(B.VANGUARD_ELEMENTAL_4PC_SPEED_MULT, 6);
-    expect(unleashSpeed(3)).toBe(1);
-    const sim = live('shaman', 'elemental', SET, 4);
-    const mob = addHostile(sim, 10);
-    cast(sim, 'flametongue_weapon');
+  it('4pc: Unleash Weapon grants cast-while-moving and +20 percent speed for 4 sec', () => {
+    const { sim, mob } = unleashed(4);
+    const speed = expectDefined(auraOn(sim.player, B.VANGUARD_ELEMENTAL_4PC_SPEED_AURA_ID));
+    expect(speed.kind).toBe('buff_speed');
+    expect(speed.value).toBe(B.VANGUARD_ELEMENTAL_4PC_SPEED_MULT);
+    expect(speed.duration).toBe(B.VANGUARD_ELEMENTAL_4PC_DURATION_SEC);
+    const mobile = expectDefined(auraOn(sim.player, B.VANGUARD_ELEMENTAL_4PC_MOBILE_AURA_ID));
+    expect(mobile.kind).toBe('processional_grace');
+    expect(mobile.duration).toBe(B.VANGUARD_ELEMENTAL_4PC_DURATION_SEC);
+    expect(moveSpeedMult(sim.player)).toBeCloseTo(B.VANGUARD_ELEMENTAL_4PC_SPEED_MULT, 6);
+    // Neither set aura replaced one of Unleash Weapon's own: the non-set auras
+    // match the 3-piece control exactly.
+    const control = unleashed(3).sim.player;
+    const own = (p: Entity) =>
+      p.auras
+        .map((aura) => aura.id)
+        .filter((id) => !SET_AURAS.includes(id))
+        .sort();
+    expect(own(sim.player)).toEqual(own(control));
+    expect(control.auras.some((aura) => SET_AURAS.includes(aura.id))).toBe(false);
+    expect(moveSpeedMult(control)).toBe(1);
+    // A hard cast started while moving holds (the press and the move-cancel).
+    expect(castWhileMoving(sim, 'lightning_bolt', mob)).toBe(true);
+    const bare = unleashed(3);
+    expect(castWhileMoving(bare.sim, 'lightning_bolt', bare.mob)).toBe(false);
+  });
+
+  it('4pc: at most once every 20 sec (the icd arms on the proc)', () => {
+    const { sim, mob } = unleashed(4);
+    const p = sim.player;
+    expect(p.procState?.icds.set_vanguard_shaman_elemental_4pc).toBe(
+      B.VANGUARD_ELEMENTAL_4PC_ICD_SEC,
+    );
+    const clearSetAuras = () => {
+      p.auras = p.auras.filter((aura) => !SET_AURAS.includes(aura.id));
+    };
+    clearSetAuras();
+    // A second Unleash 1 sec later: no auras, the icd keeps running.
+    for (let i = 0; i < 20; i++) sim.tick();
     cast(sim, 'unleash_weapon', mob);
-    const aura = expectDefined(auraOn(sim.player, 'set_vanguard_shaman_elemental_4pc'));
-    expect(aura.kind).toBe('buff_speed');
-    expect(aura.duration).toBe(B.VANGUARD_ELEMENTAL_4PC_SPEED_DURATION_SEC);
+    expect(p.auras.some((aura) => SET_AURAS.includes(aura.id))).toBe(false);
+    // Past the icd the next Unleash procs again.
+    for (let i = 0; i < 20 * B.VANGUARD_ELEMENTAL_4PC_ICD_SEC; i++) sim.tick();
+    expect(p.procState?.icds.set_vanguard_shaman_elemental_4pc).toBeUndefined();
+    cast(sim, 'unleash_weapon', mob);
+    expect(auraOn(p, B.VANGUARD_ELEMENTAL_4PC_SPEED_AURA_ID)).toBeDefined();
+    expect(auraOn(p, B.VANGUARD_ELEMENTAL_4PC_MOBILE_AURA_ID)).toBeDefined();
   });
 });
 
@@ -225,11 +285,51 @@ describe('Galeborn Warmail (enhancement)', () => {
 describe('Brineward Chainmail (restoration shaman)', () => {
   const SET = 'vanguard_shaman_restoration';
 
-  it('2pc: Mending Waters casts 0.2 sec faster at level 20, not at 1 piece', () => {
-    const worn = resolved(live('shaman', 'restoration', SET, 2), 'healing_wave').castTime;
-    const bare = resolved(live('shaman', 'restoration', SET, 1), 'healing_wave').castTime;
-    expect(bare).toBeCloseTo(2.25, 6); // rank 5 2.5 sec with the Spiritcall -0.1
-    expect(bare - worn).toBeCloseTo(B.VANGUARD_RESTO_SHAMAN_2PC_CAST_CUT_SEC, 6);
+  /** The UNSTRETCHED cast time of a Mending Waters press (castTotal times
+   *  spell haste; Curse of Tongues is absent). `allyHpFrac` null self-casts. */
+  function mendingCast(pieces: number, allyHpFrac: number | null, selfHpFrac = 1): number {
+    const sim = live('shaman', 'restoration', SET, pieces);
+    sim.player.hp = Math.round(sim.player.maxHp * selfHpFrac);
+    if (allyHpFrac !== null) {
+      const ally = addAlly(sim, 'Tidebound');
+      ally.hp = Math.round(ally.maxHp * allyHpFrac);
+      sim.targetEntity(ally.id);
+    } else {
+      sim.targetEntity(sim.player.id);
+    }
+    ready(sim, 'healing_wave');
+    sim.castAbility('healing_wave');
+    expect(sim.player.castingAbility).toBe('healing_wave');
+    return sim.player.castTotal * spellHasteMult(sim.player);
+  }
+
+  it('2pc: Mending Waters casts 0.5 sec faster on a target below 50 percent health', () => {
+    const cut = B.VANGUARD_RESTO_SHAMAN_2PC_CAST_CUT_SEC;
+    const full = mendingCast(2, 0.9);
+    expect(full).toBeCloseTo(2.25, 6); // rank 5 2.5 sec with the Spiritcall -0.1
+    expect(full - mendingCast(2, 0.3)).toBeCloseTo(cut, 6);
+    // Exactly 50 percent is not below it.
+    expect(mendingCast(2, B.VANGUARD_RESTO_SHAMAN_2PC_HEALTH_BELOW)).toBeCloseTo(full, 6);
+    // The TARGET's health decides, not the caster's.
+    expect(mendingCast(2, 0.9, 0.3)).toBeCloseTo(full, 6);
+    // A self-cast reads the caster.
+    expect(mendingCast(2, null, 1)).toBeCloseTo(full, 6);
+    expect(full - mendingCast(2, null, 0.3)).toBeCloseTo(cut, 6);
+    // One piece below the tier: no cut at any health.
+    expect(mendingCast(1, 0.3)).toBeCloseTo(mendingCast(1, 0.9), 6);
+    expect(mendingCast(1, 0.9)).toBeCloseTo(full, 6);
+  });
+
+  it('2pc: the cut never takes a cast below the GCD floor, and skips instants and others', () => {
+    const sim = live('shaman', 'restoration', SET, 2);
+    const p = sim.player;
+    p.hp = Math.round(p.maxHp * 0.2);
+    expect(brinewardMendingCastTime(sim.ctx, p, 'healing_wave', p, 1)).toBe(MIN_GCD);
+    expect(brinewardMendingCastTime(sim.ctx, p, 'healing_wave', p, 0)).toBe(0);
+    expect(brinewardMendingCastTime(sim.ctx, p, 'chain_heal', p, 2)).toBe(2);
+    const bare = live('shaman', 'restoration', SET, 1);
+    bare.player.hp = Math.round(bare.player.maxHp * 0.2);
+    expect(brinewardMendingCastTime(bare.ctx, bare.player, 'healing_wave', null, 2)).toBe(2);
   });
 
   function tidecallShield(pieces: number) {
@@ -373,35 +473,58 @@ describe('Dreadquill Vestments (affliction)', () => {
     expect(resolved(live('warlock', 'affliction', SET, 1), 'fear').castTime).toBeCloseTo(1.5, 6);
   });
 
-  function sentenceSelfHeals(pieces: number) {
+  /** Channels Consume standing still at low health; pairs each pulse's damage
+   *  with its self-heal. */
+  function consumePulses(pieces: number) {
     const sim = live('warlock', 'affliction', SET, pieces);
     const mob = addHostile(sim, 10);
-    // Sentence needs the warlock's Evil Eye on the target plus 20 Condemnation.
-    cast(sim, 'evil_eye', mob);
-    expect(mob.auras.some((aura) => aura.kind === 'affliction_eye')).toBe(true);
-    gainDoom(sim.ctx, sim.player, 20);
-    sim.player.hp = Math.round(sim.player.maxHp * 0.2);
-    const events = cast(sim, 'sentence', mob);
-    return {
-      heals: events.filter(
-        (event): event is Extract<SimEvent, { type: 'heal2' }> =>
-          event.type === 'heal2' &&
-          event.ability === 'Sentence' &&
-          event.targetId === sim.player.id,
-      ),
-      maxHp: sim.player.maxHp,
-    };
+    sim.player.hp = Math.round(sim.player.maxHp * 0.1);
+    const events = cast(sim, 'drain_life', mob);
+    for (let i = 0; i < 20 * 4; i++) events.push(...sim.tick());
+    const hits = events.filter(
+      (event): event is Extract<SimEvent, { type: 'damage' }> =>
+        event.type === 'damage' && event.ability === 'Consume' && event.targetId === mob.id,
+    );
+    const heals = events.filter(
+      (event): event is Extract<SimEvent, { type: 'heal2' }> =>
+        event.type === 'heal2' && event.ability === 'Consume' && event.targetId === sim.player.id,
+    );
+    return { hits, heals };
   }
 
-  it('4pc: passing Sentence heals the warlock for 4 percent of max health, not at 3', () => {
-    const { heals, maxHp } = sentenceSelfHeals(4);
-    expect(heals).toHaveLength(1);
-    const heal = expectDefined(heals[0]);
-    const base = Math.round(maxHp * B.VANGUARD_AFFLICTION_4PC_SENTENCE_HEAL_PCT_MAX);
-    // A crit is 1.5x (plus crit-heal bonus); outside of that the heal is the base.
-    if (!heal.crit) expect(heal.amount).toBe(base);
-    else expect(heal.amount).toBeGreaterThan(base);
-    expect(sentenceSelfHeals(3).heals).toHaveLength(0);
+  it('4pc: Consume heals for 30 percent more, not at 3 pieces', () => {
+    const worn = consumePulses(4);
+    expect(worn.hits.length).toBeGreaterThan(0);
+    expect(worn.heals).toHaveLength(worn.hits.length);
+    worn.hits.forEach((hit, i) => {
+      expect(worn.heals[i]?.amount).toBe(
+        Math.round(hit.amount * B.VANGUARD_AFFLICTION_4PC_CONSUME_HEAL_MULT),
+      );
+    });
+    // Affliction transfers all of the damage (healFrac 1) below the tier.
+    const bare = consumePulses(3);
+    expect(bare.hits.length).toBeGreaterThan(0);
+    bare.hits.forEach((hit, i) => {
+      expect(bare.heals[i]?.amount).toBe(hit.amount);
+    });
+  });
+
+  it('4pc: Consume can be channeled while moving, not at 3 pieces', () => {
+    const sim = live('warlock', 'affliction', SET, 4);
+    expect(resolved(sim, 'drain_life').castWhileMoving).toBe(true);
+    expect(castWhileMoving(sim, 'drain_life', addHostile(sim, 10))).toBe(true);
+    const bare = live('warlock', 'affliction', SET, 3);
+    expect(resolved(bare, 'drain_life').castWhileMoving).toBeFalsy();
+    expect(castWhileMoving(bare, 'drain_life', addHostile(bare, 10))).toBe(false);
+    // Only Consume: another hard cast still refuses the moving press.
+    expect(castWhileMoving(sim, 'fear', addHostile(sim, 10))).toBe(false);
+  });
+
+  it('4pc: the old Passing Sentence self-heal is gone', () => {
+    const sim = live('warlock', 'affliction', SET, 4);
+    expect(modsOf(sim).procs.some((proc) => proc.id.startsWith('set_vanguard_warlock'))).toBe(
+      false,
+    );
   });
 });
 
@@ -510,19 +633,47 @@ describe('Starwarden Raiment (balance)', () => {
     expect(bare - worn).toBeCloseTo(B.VANGUARD_BALANCE_2PC_ROOTS_CAST_CUT_SEC, 6);
   });
 
-  function rootsSpeed(pieces: number) {
+  const SET_AURAS = [B.VANGUARD_BALANCE_4PC_MOBILE_AURA_ID, B.VANGUARD_BALANCE_4PC_SPEED_AURA_ID];
+
+  function rooted(pieces: number) {
     const sim = live('druid', 'balance', SET, pieces);
     const mob = addHostile(sim, 10);
     cast(sim, 'entangling_roots', mob);
     expect(mob.auras.some((aura) => aura.kind === 'root')).toBe(true);
-    return { aura: auraOn(sim.player, 'set_vanguard_druid_balance_4pc'), p: sim.player };
+    return { sim, mob, p: sim.player };
   }
 
-  it('4pc: Gripping Roots grants +30 percent movement speed for 4 sec, not at 3', () => {
-    const { aura, p } = rootsSpeed(4);
-    expect(expectDefined(aura).duration).toBe(B.VANGUARD_BALANCE_4PC_SPEED_DURATION_SEC);
+  it('4pc: Gripping Roots grants cast-while-moving and +20 percent speed for 4 sec', () => {
+    const { sim, mob, p } = rooted(4);
+    const speed = expectDefined(auraOn(p, B.VANGUARD_BALANCE_4PC_SPEED_AURA_ID));
+    expect(speed.kind).toBe('buff_speed');
+    expect(speed.value).toBe(B.VANGUARD_BALANCE_4PC_SPEED_MULT);
+    expect(speed.duration).toBe(B.VANGUARD_BALANCE_4PC_DURATION_SEC);
+    const mobile = expectDefined(auraOn(p, B.VANGUARD_BALANCE_4PC_MOBILE_AURA_ID));
+    expect(mobile.kind).toBe('processional_grace');
+    expect(mobile.duration).toBe(B.VANGUARD_BALANCE_4PC_DURATION_SEC);
     expect(moveSpeedMult(p)).toBeCloseTo(B.VANGUARD_BALANCE_4PC_SPEED_MULT, 6);
-    expect(rootsSpeed(3).aura).toBeUndefined();
+    expect(castWhileMoving(sim, 'wrath', mob)).toBe(true);
+    const bare = rooted(3);
+    expect(bare.p.auras.some((aura) => SET_AURAS.includes(aura.id))).toBe(false);
+    expect(moveSpeedMult(bare.p)).toBe(1);
+    expect(castWhileMoving(bare.sim, 'wrath', bare.mob)).toBe(false);
+  });
+
+  it('4pc: at most once every 20 sec (the icd arms on the proc)', () => {
+    const { sim, mob, p } = rooted(4);
+    // Armed at the proc (the cast helper rides out the Roots projectile after).
+    const icd = expectDefined(p.procState?.icds.set_vanguard_druid_balance_4pc);
+    expect(icd).toBeLessThanOrEqual(B.VANGUARD_BALANCE_4PC_ICD_SEC);
+    expect(icd).toBeGreaterThan(B.VANGUARD_BALANCE_4PC_ICD_SEC - 1);
+    p.auras = p.auras.filter((aura) => !SET_AURAS.includes(aura.id));
+    cast(sim, 'entangling_roots', mob);
+    expect(p.auras.some((aura) => SET_AURAS.includes(aura.id))).toBe(false);
+    for (let i = 0; i < 20 * B.VANGUARD_BALANCE_4PC_ICD_SEC; i++) sim.tick();
+    expect(p.procState?.icds.set_vanguard_druid_balance_4pc).toBeUndefined();
+    cast(sim, 'entangling_roots', mob);
+    expect(auraOn(p, B.VANGUARD_BALANCE_4PC_SPEED_AURA_ID)).toBeDefined();
+    expect(auraOn(p, B.VANGUARD_BALANCE_4PC_MOBILE_AURA_ID)).toBeDefined();
   });
 });
 
@@ -583,14 +734,18 @@ describe('Vanguard B sets: tooltip numbers match the constants', () => {
   const EXPECTED: Record<string, [number[], number[]]> = {
     vanguard_shaman_elemental: [
       [B.VANGUARD_ELEMENTAL_2PC_UNLEASH_COOLDOWN_CUT_SEC],
-      [pct(B.VANGUARD_ELEMENTAL_4PC_SPEED_MULT), B.VANGUARD_ELEMENTAL_4PC_SPEED_DURATION_SEC],
+      [
+        pct(B.VANGUARD_ELEMENTAL_4PC_SPEED_MULT),
+        B.VANGUARD_ELEMENTAL_4PC_DURATION_SEC,
+        B.VANGUARD_ELEMENTAL_4PC_ICD_SEC,
+      ],
     ],
     vanguard_shaman_enhancement: [
       [pct(B.VANGUARD_ENHANCEMENT_2PC_SLOW_MULT), B.VANGUARD_ENHANCEMENT_2PC_SLOW_DURATION_SEC],
       [B.VANGUARD_ENHANCEMENT_4PC_TRANCE_REFUND_SEC],
     ],
     vanguard_shaman_restoration: [
-      [B.VANGUARD_RESTO_SHAMAN_2PC_CAST_CUT_SEC],
+      [B.VANGUARD_RESTO_SHAMAN_2PC_CAST_CUT_SEC, B.VANGUARD_RESTO_SHAMAN_2PC_HEALTH_BELOW * 100],
       [
         B.VANGUARD_RESTO_SHAMAN_4PC_SHIELD_PCT_MAX * 100,
         B.VANGUARD_RESTO_SHAMAN_4PC_SHIELD_DURATION_SEC,
@@ -610,7 +765,7 @@ describe('Vanguard B sets: tooltip numbers match the constants', () => {
     ],
     vanguard_warlock_affliction: [
       [B.VANGUARD_AFFLICTION_2PC_HARROW_CAST_CUT_SEC],
-      [B.VANGUARD_AFFLICTION_4PC_SENTENCE_HEAL_PCT_MAX * 100],
+      [pct(B.VANGUARD_AFFLICTION_4PC_CONSUME_HEAL_MULT)],
     ],
     vanguard_warlock_demonology: [
       [B.VANGUARD_DEMONOLOGY_2PC_BONE_ARMOR_COOLDOWN_CUT_SEC],
@@ -622,7 +777,11 @@ describe('Vanguard B sets: tooltip numbers match the constants', () => {
     ],
     vanguard_druid_balance: [
       [B.VANGUARD_BALANCE_2PC_ROOTS_CAST_CUT_SEC],
-      [pct(B.VANGUARD_BALANCE_4PC_SPEED_MULT), B.VANGUARD_BALANCE_4PC_SPEED_DURATION_SEC],
+      [
+        pct(B.VANGUARD_BALANCE_4PC_SPEED_MULT),
+        B.VANGUARD_BALANCE_4PC_DURATION_SEC,
+        B.VANGUARD_BALANCE_4PC_ICD_SEC,
+      ],
     ],
     vanguard_druid_feral: [
       [B.VANGUARD_FERAL_2PC_RUSH_COOLDOWN_CUT_SEC],

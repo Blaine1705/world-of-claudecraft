@@ -9209,7 +9209,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.vanguard_warrior_arms.name': '칼날자국 전투 장비',
   'entities.itemSets.vanguard_warrior_arms.bonus2':
-    '불구의 일격이 쇄도의 남은 재사용 대기시간을 2초 감소시킵니다.',
+    '불구의 일격이 쇄도의 남은 재사용 대기시간을 1초 감소시킵니다.',
   'entities.itemSets.vanguard_warrior_arms.bonus4':
     '쇄도가 다음 불구의 일격도 20% 강화합니다(붉은 손 강화 1중첩).',
   'entities.itemSets.vanguard_warrior_fury.name': '피의 행군 분노 장비',
@@ -9219,7 +9219,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warrior_prot.name': '강철 행군 보루',
   'entities.itemSets.vanguard_warrior_prot.bonus2': '단층선의 재사용 대기시간이 5초 감소합니다.',
   'entities.itemSets.vanguard_warrior_prot.bonus4':
-    '방패 강타가 단층선의 남은 재사용 대기시간을 1초 감소시킵니다.',
+    '단층선이 받는 피해도 6초 동안 10% 감소시킵니다.',
   'entities.itemSets.vanguard_paladin_holy.name': '태양 파수 예복',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
     '생명의 서약의 재사용 대기시간이 30초 감소합니다.',
@@ -9227,9 +9227,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '생명의 서약이 아군에게 그 대상 최대 생명력의 8%만큼 보호막도 6초 동안 씌웁니다.',
   'entities.itemSets.vanguard_paladin_protection.name': '방패 서약 요새',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    '맹세의 사슬의 재사용 대기시간이 4초 감소합니다.',
+    '맹세의 사슬의 재사용 대기시간이 2초 감소합니다.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
-    '맹세의 사슬이 주문 시전도 방해하여 해당 계열을 3초 동안 봉쇄하며, 끌어올 수 있는 적을 속박하면 태양의 응보를 얻습니다.',
+    '맹세의 사슬에 끌려온 적은 4초 동안 주문 시전이 30% 느려지며, 맹세의 사슬이 끌어올 수 있는 적을 속박하면 태양의 응보를 얻습니다.',
   'entities.itemSets.vanguard_paladin_retribution.name': '빛의 낙인 전투 판금',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
     '발키리의 부름의 재사용 대기시간이 15초 감소합니다.',
@@ -9251,7 +9251,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus4': '피갈고리가 사냥의 기세를 1 부여합니다.',
   'entities.itemSets.vanguard_rogue_assassination.name': '밤의 칼날 가죽 갑옷',
   'entities.itemSets.vanguard_rogue_assassination.bonus2':
-    '반칙 가격의 재사용 대기시간이 4초 감소합니다.',
+    '반칙 가격의 에너지 소모량이 10 감소합니다.',
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     '반칙 가격이 6초 안에 가하는 다음 공격도 반드시 치명타가 되게 합니다.',
   'entities.itemSets.vanguard_rogue_combat.name': '난투의 표식 가죽 갑옷',
@@ -9265,9 +9265,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '연막 걸음 상태에서 사용한 명치 가격이 연계 점수를 2 추가로 줍니다.',
   'entities.itemSets.vanguard_priest_discipline.name': '장막 성가 의복',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    '정신의 절규의 재사용 대기시간이 6초 감소합니다.',
+    '정신의 절규의 재사용 대기시간이 3초 감소합니다.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
-    '수호의 성가가 완전히 소모되면 정신의 절규의 남은 재사용 대기시간이 4초 감소합니다. 8초에 한 번만 발동합니다.',
+    '수호의 성가가 완전히 소모되면 보호받던 아군의 이동 속도가 3초 동안 20% 증가합니다. 8초에 한 번만 발동합니다.',
   'entities.itemSets.vanguard_priest_holy.name': '은총의 날개 의복',
   'entities.itemSets.vanguard_priest_holy.bonus2': '장막걸음의 재사용 대기시간이 6초 감소합니다.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
@@ -9281,7 +9281,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
     '무기 해방의 재사용 대기시간이 3초 감소합니다.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
-    '무기 해방이 이동 속도도 3초 동안 30% 증가시킵니다.',
+    '무기 해방을 사용하면 4초 동안 이동 중에 시전할 수 있고 이동 속도가 20% 증가합니다. 20초에 한 번만 발동합니다.',
   'entities.itemSets.vanguard_shaman_enhancement.name': '돌풍태생 전쟁 사슬',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
     '선조의 일격이 대상의 이동 속도를 4초 동안 30% 감소시킵니다.',
@@ -9289,7 +9289,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '선조의 일격이 정령의 무아지경의 남은 재사용 대기시간을 4초 감소시킵니다.',
   'entities.itemSets.vanguard_shaman_restoration.name': '바닷물 수호 사슬갑옷',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    '치유의 물결의 시전 시간이 0.2초 감소합니다.',
+    '생명력이 50% 미만인 아군에게 시전하는 치유의 물결의 시전 시간이 0.5초 감소합니다.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     '해일 부름이 대상에게 당신의 최대 생명력의 5%만큼 보호막도 6초 동안 씌웁니다.',
   'entities.itemSets.vanguard_mage_arcane.name': '시간결속자의 성의',
@@ -9308,7 +9308,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warlock_affliction.name': '공포의 깃펜 성의',
   'entities.itemSets.vanguard_warlock_affliction.bonus2': '번민의 시전 시간이 0.3초 감소합니다.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
-    '선고를 내리면 최대 생명력의 4%를 회복합니다.',
+    '집어삼키기의 치유량이 30% 증가하며, 이동 중에도 정신 집중할 수 있습니다.',
   'entities.itemSets.vanguard_warlock_demonology.name': '골수 결속 예복',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
     '뼈 갑옷의 재사용 대기시간이 10초 감소합니다.',
@@ -9322,7 +9322,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.name': '별 파수꾼 의복',
   'entities.itemSets.vanguard_druid_balance.bonus2': '옥죄는 뿌리의 시전 시간이 0.5초 감소합니다.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
-    '옥죄는 뿌리를 시전하면 이동 속도가 4초 동안 30% 증가합니다.',
+    '옥죄는 뿌리를 시전하면 4초 동안 이동 중에 시전할 수 있고 이동 속도가 20% 증가합니다. 20초에 한 번만 발동합니다.',
   'entities.itemSets.vanguard_druid_feral.name': '피갈기 가죽',
   'entities.itemSets.vanguard_druid_feral.bonus2': '큰곰 돌진의 재사용 대기시간이 3초 감소합니다.',
   'entities.itemSets.vanguard_druid_feral.bonus4':

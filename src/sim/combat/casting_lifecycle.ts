@@ -89,6 +89,7 @@ import { sharedCooldownIds } from './ability_cooldown_groups';
 import {
   afflictionAdjustedCastTime,
   afflictionCastError,
+  afflictionConsumeHealMult,
   afflictionConsumeThreadDoomBonus,
   afflictionDrainCompletionDoom,
   afflictionDrainTickDoom,
@@ -217,6 +218,7 @@ import {
   veilAllowsStealthAbilities,
 } from './rogue_engines';
 import { combineCostMultipliers, duskCostMultiplier } from './rogue_talents';
+import { brinewardMendingCastTime } from './shaman_spiritmend';
 import {
   stonehearthStormcastMendingActive,
   stonehearthStormcastMendingHealMult,
@@ -1783,10 +1785,17 @@ export function castAbility(
   }
   const instantBaseCastTime =
     consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id);
-  const castTime =
+  // Brineward 2pc (Warfare Season 2) reads the resolved friendly target's
+  // health; a pass-through for every other ability and caster.
+  const castTime = brinewardMendingCastTime(
+    ctx,
+    p,
+    ability.id,
+    target,
     afflictionAdjustedCastTime(p, ability.id, instantBaseCastTime) *
-    destructionCastTimeMult(p, ability.id) *
-    ashenFocusCastTimeMult(ctx, p, meta, ability.id);
+      destructionCastTimeMult(p, ability.id) *
+      ashenFocusCastTimeMult(ctx, p, meta, ability.id),
+  );
   // A press that cannot survive movement (abilityCastSurvivesMovement) is denied
   // OUTRIGHT here, before the GCD arms or any cast-commit body state is changed,
   // when the player's held movement input would actually move this tick. A root,
@@ -2551,7 +2560,9 @@ function applyChannelTick(
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
         if (doom > 0) gainDoom(ctx, src, doom);
         if (!src.dead) {
-          const intended = Math.round(dmg * eff.healFrac);
+          const intended = Math.round(
+            dmg * eff.healFrac * afflictionConsumeHealMult(ctx, src, res.def.id),
+          );
           const healed = Math.min(intended, src.maxHp - src.hp);
           onCraftedCollectionHeal(ctx, src, src, intended - healed);
           if (healed > 0) {
