@@ -9,7 +9,11 @@
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { castVfxProgramUnits, createSceneCastVfxReadiness } from '../src/render/cast_vfx_prewarm';
+import {
+  castVfxProgramUnits,
+  castVfxStandInSlot,
+  createSceneCastVfxReadiness,
+} from '../src/render/cast_vfx_prewarm';
 import type { CompileArmHost } from '../src/render/compile_arms';
 import { markProgramReady } from '../src/render/linked_program_readiness';
 import type { LinkedProgramLike } from '../src/render/linked_program_touch';
@@ -199,5 +203,88 @@ describe('the units the resume lane runs', () => {
     // The ambient target is back, and the settle wrote the record.
     expect(current).toBeNull();
     expect(readiness.ready()).toBe(true);
+  });
+});
+
+describe('a vfx.ability-primitives entry the boot budget dropped', () => {
+  // The drop evaluates the entry's resumeProgramUnits while the lazy stand-ins
+  // are not staged, so castVfxProgramUnits holds no stand-in unit then: the
+  // slot's own resume units stage and link them. Measured on healthy Ultra
+  // boots: the debt drained 26 of 26 units and the gate still waited 14
+  // materials out to its 30 s deadline, opening forced.
+  function droppedEntry() {
+    const scene = new THREE.Scene();
+    scene.add(vfxMesh('ring'));
+    const programs = new Map<THREE.Material, LinkedProgramLike>();
+    const webgl = {
+      properties: {
+        get: (material: THREE.Material) => ({ currentProgram: programs.get(material) }),
+      },
+    };
+    // three's program cache hands each material its program as the compile
+    // is submitted, before the link resolves; the settle is the only proof.
+    const settles: Array<() => void> = [];
+    const submit = (root: THREE.Object3D) =>
+      new Promise<void>((resolve) => {
+        root.traverse((object) => {
+          const material = (object as THREE.Mesh).material;
+          for (const entry of Array.isArray(material) ? material : material ? [material] : []) {
+            if (!programs.has(entry)) programs.set(entry, program());
+          }
+        });
+        settles.push(resolve);
+      });
+    let standIns: THREE.Material[] | null = null;
+    const slot = castVfxStandInSlot({ scene, compileColorPrograms: submit }, webgl, (materials) => {
+      standIns = materials;
+    });
+    const readiness = createSceneCastVfxReadiness(
+      scene,
+      webgl,
+      () => standIns,
+      () => 0,
+    );
+    // The renderer's resumeProgramUnits, evaluated at drop time.
+    const units = [
+      ...slot.resumeUnits(),
+      ...castVfxProgramUnits(scene, slot.group, {} as CompileArmHost, webgl, submit),
+    ];
+    return { units, readiness, settles, standIns: () => standIns };
+  }
+
+  it('holds no stand-in unit of its own at drop time', () => {
+    const { units } = droppedEntry();
+    expect(units.map((unit) => unit.id)).toEqual([
+      'ability-materials:group',
+      'ability-materials:compile',
+      'program:ring:0',
+    ]);
+  });
+
+  it('opens on its programs once the resume drains, not on the deadline', async () => {
+    const { units, readiness, settles, standIns } = droppedEntry();
+    for (const unit of units) {
+      const run = unit.run();
+      // Still refused while the unit's link is in flight: the gate is not
+      // weakened, the settle is what proves it.
+      if (settles.length > 0) expect(readiness.ready()).toBe(false);
+      for (const settle of settles.splice(0)) settle();
+      await run;
+    }
+    expect(standIns()?.length ?? 0).toBeGreaterThan(0);
+    expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
+  });
+
+  it('keeps refusing while the stand-ins are staged but their link has not settled', async () => {
+    const { units, readiness, settles } = droppedEntry();
+    const [stage, link] = units;
+    await stage.run();
+    const run = link.run();
+    expect(readiness.ready()).toBe(false);
+    expect(readiness.snapshot().pending).toBeGreaterThan(0);
+    for (const settle of settles.splice(0)) settle();
+    await run;
+    // The pooled ring is still unlinked: its own unit has not run.
+    expect(readiness.snapshot()).toMatchObject({ ready: false, pending: 1 });
   });
 });

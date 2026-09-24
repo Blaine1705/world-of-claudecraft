@@ -16,6 +16,10 @@
 // for the 5558 ms it cost once).
 
 import type * as THREE from 'three';
+import {
+  abilityMaterialPrewarmMaterials,
+  buildAbilityMaterialPrewarmGroup,
+} from './ability_material_prewarm';
 import { abilityVfxCompileMaterials, collectAbilityVfxCompileTargets } from './ability_vfx';
 import { type CastVfxReadiness, createCastVfxReadiness } from './cast_vfx_readiness_core';
 import { type CompileArmHost, linkColorPrograms } from './compile_arms';
@@ -23,6 +27,11 @@ import { isProgramKnownReady, markProgramsReadyUnder } from './linked_program_re
 import type { LinkedProgramLike } from './linked_program_touch';
 import type { PrewarmResumeUnit } from './prewarm_resume';
 import { REVEAL_GATE_WATCHDOG_MS } from './reveal_gate';
+import {
+  createPrewarmGroupSlot,
+  type VariantPrewarmSlot,
+  type VariantPrewarmSlotHost,
+} from './variant_prewarm_slot';
 
 /** What the gate reads off the renderer: three's per-material properties,
  *  whose `currentProgram` is the program the settle record is keyed on. */
@@ -59,6 +68,30 @@ export function castVfxProgramUnits(
     units.push(unit(`program:${target.id}`, target.object));
   }
   return units;
+}
+
+/** The boot slot of the lazy stand-ins (ability_material_prewarm.ts). A
+ *  dropped entry's resume units are fixed at drop time, before the stand-ins
+ *  are staged, so castVfxProgramUnits holds no stand-in unit then and this
+ *  slot's own resume link is the one that links them: it records their
+ *  programs on the settle exactly as a cast unit does, or the gate waits them
+ *  out to its deadline with every program linked. */
+export function castVfxStandInSlot(
+  host: VariantPrewarmSlotHost,
+  webgl: LinkedProgramSource,
+  onStage: (materials: THREE.Material[]) => void,
+): VariantPrewarmSlot {
+  return createPrewarmGroupSlot(host, 'ability-materials', {
+    stage: () => {
+      const group = buildAbilityMaterialPrewarmGroup();
+      onStage(abilityMaterialPrewarmMaterials(group));
+      return group;
+    },
+    link: (group) =>
+      host.compileColorPrograms(group).then(() => {
+        markProgramsReadyUnder(webgl.properties, group);
+      }),
+  });
 }
 
 /** How long the cast gate may hold before it opens whatever its programs say.

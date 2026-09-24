@@ -46,10 +46,6 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
-import {
-  abilityMaterialPrewarmMaterials,
-  buildAbilityMaterialPrewarmGroup,
-} from './ability_material_prewarm';
 import { type AbilityVfx, type AbilityVfxFx, abilityVfxTexturePrewarmSteps } from './ability_vfx';
 import { activeKitPrewarmEntry, resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
@@ -115,7 +111,11 @@ import {
 import { CameraImpact, fiestaShakeX, fiestaShakeY } from './camera_impact_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
-import { castVfxProgramUnits, createSceneCastVfxReadiness } from './cast_vfx_prewarm';
+import {
+  castVfxProgramUnits,
+  castVfxStandInSlot,
+  createSceneCastVfxReadiness,
+} from './cast_vfx_prewarm';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
 import {
@@ -5505,15 +5505,9 @@ export class Renderer {
     const landmarkSlot = createVariantPrewarmSlot(variantSlotHost, 'landmarks.impact-site', () =>
       buildImpactSitePrewarmGroup(this.impactSite.group, p.pos),
     );
-    const abilityMaterialSlot = createVariantPrewarmSlot(
-      variantSlotHost,
-      'ability-materials',
-      () => {
-        const group = buildAbilityMaterialPrewarmGroup();
-        this.abilityMaterialStandIns = abilityMaterialPrewarmMaterials(group);
-        return group;
-      },
-    );
+    const abilityMaterialSlot = castVfxStandInSlot(variantSlotHost, this.webgl, (materials) => {
+      this.abilityMaterialStandIns = materials;
+    });
     const castVfxUnits = (): PrewarmResumeUnit[] =>
       castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);
     let mountPrewarmGroup: THREE.Group | null = null;

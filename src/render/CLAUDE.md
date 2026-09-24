@@ -814,7 +814,9 @@ GPU work signs. Each rule names its seam and its guard.
   `cast_vfx_prewarm.ts`) is the same idea one level up: the ability-VFX painter
   draws no cast until every cast program is linked (linked means the settle
   record of `linked_program_readiness.ts`, which each cast unit writes once its
-  compile settled; never the presence of `currentProgram`, assigned before the
+  compile settled, and so does the stand-in slot's own resume link
+  (`castVfxStandInSlot`), the only unit that links the stand-ins after a dropped
+  entry; never the presence of `currentProgram`, assigned before the
   link resolves, and never a driver query from a live frame), and the reads a
   player ACTS on never wait behind it: the
   terrain-draped area ring and a mob's windup clip on the cast path, and on the

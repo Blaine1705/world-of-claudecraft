@@ -1384,7 +1384,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
-  '319e46bad87b6af6ab7e92eaad0f3a53d11da4aebd0415904784dfee8cfd5190';
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  '753fec82b569ffe1084822a4a9e95401c92d71854d2afea45db1e889714bb35a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1397,7 +1398,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
-  '358f70becd7123a33bfe4239a12ee62ef62ed59507fe41af78a2261b1402a4ec';
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  '495d404cd4383e25ef8522694ef288e3ca528a9881a4cd22131f27b14e885c77';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2776,7 +2778,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // fail-soft prewarm entry runner: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('69a0f7dfeba9e1cbd18847f88e9475cbd1ba31f9bde38c5c63af0d86f867ff51');
+      // cast stand-in slot: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+    ).toBe('1d8e99fa2ac37b1c41d2ac064469cefc4f633f0930d5288c236bca362738f7e7');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

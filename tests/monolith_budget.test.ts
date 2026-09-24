@@ -934,7 +934,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12789 -> 12771: a started prewarm entry's run, progress and
     // partial remainder moved into runStartedPrewarmEntry (prewarm_entry.ts),
     // one fail-soft unit so a throwing progress() cannot end the manifest.
-    ceiling: 12771,
+    // LOWERED 12771 -> 12765: the lazy cast stand-ins' boot slot moved into
+    // castVfxStandInSlot (cast_vfx_prewarm.ts), whose resume link records the
+    // settle the cast gate reads.
+    ceiling: 12765,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

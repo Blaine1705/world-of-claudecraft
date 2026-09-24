@@ -690,7 +690,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
-  '358f70becd7123a33bfe4239a12ee62ef62ed59507fe41af78a2261b1402a4ec';
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  '495d404cd4383e25ef8522694ef288e3ca528a9881a4cd22131f27b14e885c77';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
