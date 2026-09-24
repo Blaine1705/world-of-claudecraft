@@ -186,6 +186,13 @@ const VIEW_SIG_BLOCK = 'if (view.sig !== this.lastSig) {';
  */
 const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
+    call: 'this.focusTargets.update',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'three reusable unit-frame instances, all writes use the shared elision facet',
+  },
+  {
     call: 'this.fxTier',
     band: 'frame',
     gate: '',
@@ -604,6 +611,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "target && target.kind !== 'object'",
     surface: 'chrome',
     why: 'the target/boss cast bar (a raid mechanic indicator, deliberately untiered)',
+  },
+  {
+    call: 'fillTargetOfTargetDescriptor',
+    band: 'frame',
+    gate: "target && target.kind !== 'object' && tot && tot.kind !== 'object' && nonSelfRepaintDue(totChanged, this.lastTotFramePaintAt, now, targetFrameNonSelfIntervalMs(fxTier))",
+    surface: 'chrome',
+    why: 'fills target-of-target health and resource',
   },
   {
     call: 'this.totFramePainter.paint',
@@ -1796,7 +1810,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 90 -> 91: the always-on pinned-recipe tracker
       // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
       // tracker's exact slow-band row shape.
-    ).toEqual({ window: 49, chrome: 91, none: 17 });
+    ).toEqual({ window: 49, chrome: 93, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

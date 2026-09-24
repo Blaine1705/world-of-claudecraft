@@ -1,5 +1,6 @@
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
+import { resolveInitialActionBarLayout } from './action_bar_restore';
 import { materialStorageTransferPayload } from './material_storage_command';
 
 // Online play: REST auth client + WebSocket world mirror.
@@ -171,11 +172,10 @@ import {
   type VaultInfo,
   type WhoRosterInfo,
 } from '../world_api';
-import {
-  type ActionBarLayout,
-  type ActionBarLayoutProfile,
-  type ActionBarLayoutRestore,
-  sanitizeActionBarLayoutProfiles,
+import type {
+  ActionBarLayout,
+  ActionBarLayoutProfile,
+  ActionBarLayoutRestore,
 } from '../world_api/action_bar';
 import type { GroundAimPointXZ } from '../world_api/combat';
 import type {
@@ -1213,6 +1213,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private ownPlayerId = -1;
   private readonly ownPlayerClass: PlayerClass;
   spectating: string | null = null;
+  get actionBarReadOnly(): boolean {
+    return this.spectating !== null || this.spectateFacingPending === true;
+  }
   moveInput: MoveInput = emptyMoveInput();
   known: ResolvedAbility[] = [];
   private talentMods: TalentModifiers = emptyModifiers();
@@ -1742,6 +1745,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private inputEchoSamples: number[] = [];
   private spectateFacingPending = false;
   private pendingSpectateFacing: number | null = null;
+  // A spectate EXIT frame arrives before the snapshot that rebuilds the self
+  // presentation (known, talentSpec, loadouts) for the moderator's own body.
+  // `spectating` is the HUD's "this self view is mine" signal (the action bar
+  // freezes on it), so it must not clear while those reads still describe the
+  // watched character: the exit is held here until the next self-decode.
+  private spectateExitPending = false;
   private dungeonEntrySeq: number | null = null;
   private pendingDungeonEntryFacing: number | null = null;
 
@@ -1833,7 +1842,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // the final edit for a second device. Bounded: a no-op unless a save is
       // pending. A raw tab close routes through pagehide, not sendLogout, so this
       // is what covers it.
-      this.flushActionBarLayoutSave();
+      this.actionBarUploader.flush();
       return;
     }
     if (this.sessionEnded) return;
@@ -1935,7 +1944,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // and `connected` is still true: close() calls this before ws.close() and
     // sendLogout() calls it before the logout frame, so the final edit is not
     // lost to a deliberate logout within the debounce window.
-    this.flushActionBarLayoutSave();
+    this.actionBarUploader.flush();
     this.sessionEnded = true;
     this.worldInteractionRequests?.reset();
     // RIFT_REGIONS (src/sim/colliders.ts) is a module-level registry keyed by
@@ -2316,8 +2325,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
         this.spectating = null;
+        this.spectateExitPending = false;
         this.cfg.playerClass = this.ownPlayerClass;
-        this.spectateFacingPending = false;
+        this.spectateFacingPending = true;
         this.pendingSpectateFacing = null;
         // marketInfo is delta-omitted (s.market only streams when it changes),
         // so the mirror otherwise still holds the pre-drop echo at the instant
@@ -2350,7 +2360,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
     if (msg.t === 'spectate') {
       if (typeof msg.name === 'string') this.worldInteractionRequests?.reset();
-      this.spectating = typeof msg.name === 'string' ? msg.name : null;
+      this.spectateExitPending = typeof msg.name !== 'string';
+      if (!this.spectateExitPending) this.spectating = msg.name as string;
       this.spectateFacingPending = true;
       this.pendingSpectateFacing = null;
       // the spectate swap changes whose record the self-decode writes; a hold
@@ -2359,7 +2370,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
       this.resetReconWireState();
-      if (typeof this.spectating !== 'string') {
+      if (this.spectateExitPending) {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
         // cmd() drops every non-chat command while spectating (see below), so
@@ -3255,6 +3266,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.talentSpec = presentation.mods.spec;
       this.talentRole = presentation.mods.role;
       this.known = presentation.known;
+      if (this.spectateExitPending) {
+        this.spectateExitPending = false;
+        this.spectating = null; // own presentation rebuilt: the view is ours again
+      }
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
@@ -3340,21 +3355,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
         while (d < -Math.PI) d += 2 * Math.PI;
         this.pendingFacingDelta += d;
       }
-      // IWorldActionBar: resolve the login-time layout reconciliation exactly
-      // once, on the first self-payload this ClientWorld processes. A fresh join
-      // always carries the heavy self block, so `hbl` is present: the stored
-      // per-profile document (this device's profile WINS; another profile seeds
-      // it) or an explicit null (the server has no copy, so seed from local).
-      // `hbl` absent on the first payload (a resumed session's re-sync, where it
-      // was already sent once) leaves the local mirror authoritative ('noop').
       if (!this.actionBarRestoreResolved) {
         this.actionBarRestoreResolved = true;
-        if (s.hbl !== undefined) {
-          const doc = s.hbl === null ? null : sanitizeActionBarLayoutProfiles(s.hbl);
-          this.actionBarRestore = doc ? { source: 'server', profiles: doc } : { source: 'seed' };
-        } else {
-          this.actionBarRestore = { source: 'noop' };
-        }
+        this.actionBarRestore = resolveInitialActionBarLayout(s.hbl);
       }
     }
 
@@ -4147,14 +4150,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.actionBarUploader.save(profile, layout);
   }
 
-  // Send any debounced-but-not-yet-sent layout NOW. Called when the session ends
-  // or the page backgrounds (endSession + the visibilitychange 'hidden' branch),
-  // so the final sub-debounce edit reaches the server before the socket goes
-  // away instead of being stranded (the local mirror would still be right on
-  // the same device, but a second device would miss it).
-  private flushActionBarLayoutSave(): void {
-    this.actionBarUploader.flush();
-  }
   takeActionBarLayoutRestore(): ActionBarLayoutRestore | undefined {
     const restore = this.actionBarRestore;
     this.actionBarRestore = undefined; // one-shot: consumed by the HUD at world entry

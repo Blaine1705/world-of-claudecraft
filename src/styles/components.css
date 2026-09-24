@@ -1984,7 +1984,7 @@
     flex: 1;
   }
   .spell-row[draggable="true"] {
-    cursor: grab;
+    cursor: var(--cursor-grab, grab);
   }
   .spell-row .spell-name {
     font-size: 13px;
@@ -20567,5 +20567,42 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+@layer components {
+  .frame-preset-loadouts .tal-foot {
+    flex-wrap: wrap;
+  }
+  .frame-preset-picker {
+    position: relative;
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+  .frame-preset-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+    max-width: 100%;
+  }
+  .frame-preset-actions > button.ui-btn,
+  #options-menu .frame-preset-actions > button.ui-btn {
+    min-height: 40px;
+    padding: 6px 8px;
+  }
+  .frame-preset-loadouts .tal-loadout-menu {
+    bottom: auto;
+    top: calc(100% + 6px);
+    width: min(320px, 100%);
+    min-width: 0;
+    max-height: calc(var(--app-vh, 100vh) * 0.35 / var(--ui-scale, 1));
+    overflow-y: auto;
+  }
+  .frame-preset-loadouts .tal-loadout-caret {
+    transform: rotate(180deg);
+  }
+  .frame-preset-loadouts .tal-lo-item {
+    min-height: 40px;
   }
 }

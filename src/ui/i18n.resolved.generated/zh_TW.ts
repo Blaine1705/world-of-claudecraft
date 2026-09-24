@@ -331,6 +331,52 @@ export const zh_TW: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "Apply",
+      "current": "目前配置",
+      "new": "新增預設",
+      "empty": "沒有已儲存的預設",
+      "saveCurrent": "儲存目前預設",
+      "deleteNamed": "刪除 {name}",
+      "deleteBody": "刪除框架預設「{name}」？",
+      "title": "框架預設",
+      "name": "預設名稱",
+      "slot": "預設 {slot}",
+      "save": "儲存",
+      "load": "載入並重新整理",
+      "remove": "刪除",
+      "saved": "完成。",
+      "failed": "無法儲存或載入預設。"
+    },
+    "frameMenus": {
+      "hide": "隱藏框架",
+      "units": "單位框架",
+      "bars": "動作列",
+      "trackers": "追蹤器",
+      "auras": "光環",
+      "combat": "戰鬥顯示",
+      "other": "其他介面元素",
+      "options": "框架選項",
+      "allOptions": "所有框架選項",
+      "independentTarget": "將目標的目標鎖定到目標"
+    },
+    "focusTargets": {
+      "showEmpty": "Show Empty Focus Frames",
+      "assignHint": "Select a target. Press {key} or click {button}.",
+      "assignClickHint": "Select a target. Click {button}.",
+      "ally": "Ally",
+      "enemy": "Enemy",
+      "unset": "清除焦點",
+      "frame1": "焦點 1",
+      "frame2": "焦點 2",
+      "frame3": "焦點 3",
+      "hint": "點擊目標框架或按 {key} 選取此焦點。",
+      "clickHint": "點擊目標框架選取此焦點。",
+      "title": "焦點目標",
+      "assign": "設定焦點 {slot}",
+      "target": "選取焦點 {slot}",
+      "clear": "清除焦點 {slot}"
+    },
     "professionTrainers": {
       "blacksmithing": "鍛造訓練師",
       "cooking": "烹飪訓練師",
@@ -1761,7 +1807,7 @@ export const zh_TW: EnTranslations = {
       "stopAutoAttackOnTargetSwitch": "切換目標時停止自動攻擊",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
-      "mouseoverCast": "對隊伍框架滑鼠指向施法",
+      "mouseoverCast": "滑鼠懸停隊伍與焦點框架施法",
       "stickyTarget": "點擊地面時保留目標",
       "showItemLevel": "顯示物品等級",
       "showReliquaryTracker": "顯示聖物庫追蹤器",
@@ -3450,6 +3496,8 @@ export const zh_TW: EnTranslations = {
       "label": "重置框體位置"
     },
     "interfaceUnlock": {
+      "combineTrackers": "合併追蹤框架",
+      "combineAuras": "合併光環框架",
       "label": "編輯框體",
       "unlock": "解鎖介面",
       "lock": "鎖定介面",
@@ -3460,6 +3508,8 @@ export const zh_TW: EnTranslations = {
       "lockFrame": "鎖定此框體",
       "resizeFrame": "調整此框體大小",
       "frameNames": {
+        "trackerGroup": "任務追蹤器",
+        "auraGroup": "光環與目標效果",
         "actionBar1": "動作條",
         "actionBar2": "動作條 2",
         "actionBar3": "動作條 3",
@@ -6375,6 +6425,7 @@ export const zh_TW: EnTranslations = {
       "framesMoveBodyEditFrames": "你自己的框架、目標框架與隊伍框架全都可以移動。每個框架的角落都帶著一顆小小的移動按鈕：解除鎖定，把框架拖到你要的位置，再重新鎖上，這樣一次失手的點擊就無法把它挪走。「介面」選項中「頭像框」分頁最上方的「編輯框體」，則會一口氣鬆開其餘的整個介面，連同這三個框架一起：動作列、施法條、揮擊條、經驗條、小地圖、按鈕列、寵物框架、姿態列、增益與減益列，以及「願望清單提醒」小標籤，每一個在鬆開期間都掛著一枚名稱標籤。萬一它們跑到你會後悔的地方，同一個「頭像框」分頁底部的「恢復預設」會把它們全部彈回原本的位置。",
       "framesGovernedExtra": "「編輯框體」也會一併鬆開下方那疊追蹤面板(你追蹤中的任務與它們的目標、你的功績進度、你的聖物庫頁面、你從製作中釘選的配方、你所在的秘探、你正參與的任何裂隙，以及你正在追蹤的配方或委託)、寵物框架旁的寵物動作列、顯示你對附近敵人所施減益的「目標減益」框架、聖騎士的「虔誠」勳章、術士的「痛苦資源條」、法術觸發浮層、雙持武器時的副手揮擊條，以及附分頁的傷害統計視窗，每一個在鬆開期間都掛著一枚名稱標籤。",
       "framesGovernedAuraTracks": "「編輯框體」也會鬆開六條可選的光環軌道，前提是你已在同一「介面」選項的「戰鬥」分頁中開啟它們：「我的增益」軌道、「防禦性冷卻」軌道、「我的護盾」軌道、「攻擊性冷卻」軌道、「移動與潛行」軌道，以及「我給隊友的增益」軌道。所有軌道預設關閉，每一條在鬆開期間都掛著一枚名稱標籤。",
+      "frameGroups": "{trackers}可合併任務、功績、裂隙、地下探索、採集目標及聖物匣追蹤。{auras}可合併目標持續傷害與六種光環追蹤。在框架設定中分別啟用合併，關閉後可個別移動。{tot}具有資源條。{focus}的三個目標可獨立移動：Shift+F1至F3設定，Ctrl+F1至F3選取。傷害與威脅統計即使在框架鎖定時，也可拖曳按鈕以外的區域移動，拖曳邊緣調整大小。解鎖後，獨立的框架顯示選單依群組控制顯示。右鍵點擊框架可重設大小或開啟相關設定。介面中的框架頁也包含共用設定及可摺疊的隊伍設定。關閉「將目標的目標鎖定至目標」即可獨立移動，重新啟用仍會保留獨立位置。設定焦點後，設定按鈕與說明會隱藏。右鍵選擇「清除焦點」可恢復預設狀態。滑鼠懸停施法同樣適用於焦點框架。",
       "framesGovernedTalkingHead": "「編輯框體」也會解鎖對話面板：當某個 NPC 不在你的視野內時，它承載該 NPC 說出的台詞；處於解鎖狀態時它會顯示自己的名稱標籤。",
       "barsTitle": "各種條、計時與戰鬥文字",
       "barsBody": "你的施法條會在你施法或引導時出現在畫面中央、動作列的正上方，上頭帶著法術的名稱與剩餘時間。你的目標在自己的框架上也有一條施法條，讓你看清接下來要來的是什麼，並做出回應。\n\n施法條下方還有一條細細的揮擊條，會在兩次武器揮擊之間逐漸填滿，讓近戰或遠程攻擊者看出下一次自動攻擊何時落下。\n\n你的經驗條橫貫動作列下方的整個寬度，切分成一段一段，其中較亮的一段顯示你已經存下的充分休息經驗。\n\n潛到水面下時，畫面上方會出現一條藍色的呼吸條。頭部沒入水中時它會逐漸消耗，耗盡並開始溺水時會閃成紅色，而你一浮出水面便會迅速回滿。空白鍵讓你往上游，下潛鍵（預設是 Ctrl）則帶你潛得更深。\n\n傷害與治療會化作小小的數字，從它們落下之處往上浮起，讓你不必讀文字也能看懂一場戰鬥。聊天框中的「戰鬥」分頁則保留完整的文字紀錄。",

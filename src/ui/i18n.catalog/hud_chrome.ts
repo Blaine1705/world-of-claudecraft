@@ -12,6 +12,53 @@ import { cosmeticsStrings } from './cosmetics';
 import { professionTrainerStrings } from './profession_trainers';
 
 export const hudChromeStrings = {
+  framePresets: {
+    apply: 'Apply',
+    current: 'Current Layout',
+    new: 'New Preset',
+    empty: 'No saved presets',
+    saveCurrent: 'Save Current Preset',
+    deleteNamed: 'Delete {name}',
+    deleteBody: 'Delete the frame preset "{name}"?',
+
+    title: 'Frame Presets',
+    name: 'Preset Name',
+    slot: 'Preset {slot}',
+    save: 'Save',
+    load: 'Load and Reload',
+    remove: 'Delete',
+    saved: 'Done.',
+    failed: 'Could not save or load the preset.',
+  },
+  frameMenus: {
+    hide: 'Hide Frame',
+    units: 'Unit Frames',
+    bars: 'Action Bars',
+    trackers: 'Trackers',
+    auras: 'Auras',
+    combat: 'Combat Displays',
+    other: 'Other HUD Elements',
+    options: 'Frame Options',
+    allOptions: 'All Frame Options',
+    independentTarget: 'Lock Target of Target to Target',
+  },
+  focusTargets: {
+    showEmpty: 'Show Empty Focus Frames',
+    assignHint: 'Select a target. Press {key} or click {button}.',
+    assignClickHint: 'Select a target. Click {button}.',
+    ally: 'Ally',
+    enemy: 'Enemy',
+    unset: 'Unset Focus',
+    frame1: 'Focus 1',
+    frame2: 'Focus 2',
+    frame3: 'Focus 3',
+    hint: 'Click the target frame or press {key} to target this focus.',
+    clickHint: 'Click the target frame to target this focus.',
+    title: 'Focus targets',
+    assign: 'Set focus {slot}',
+    target: 'Target focus {slot}',
+    clear: 'Clear focus {slot}',
+  },
   professionTrainers: professionTrainerStrings,
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
   warlock: {
@@ -742,7 +789,7 @@ export const hudChromeStrings = {
     // run of four+ lowercase after stripping tokens) so an English-filled non-Latin
     // locale does not trip the M16 untranslated-leak guard, reusing the frame's own
     // term for the target ("Mark", from targetLabel): your mark's mark.
-    targetOfTargetLabel: "Mark's Mark",
+    targetOfTargetLabel: 'Target of Target',
     // partyLabel names the #party-frames region (a group of tappable / focusable
     // party member buttons, each named by its visible member name). Kept short and
     // non-wordy (no run of four+ lowercase) so an English-filled non-Latin locale
@@ -2222,7 +2269,7 @@ export const hudChromeStrings = {
     groundReticle: 'Ground-Targeting Reticle',
     // Interface panel toggle: Clique-style mouseover casting of friendly abilities
     // on the hovered party frame (on by default).
-    mouseoverCast: 'Mouseover Cast on Party Frames',
+    mouseoverCast: 'Mouseover Cast on Party and Focus Frames',
     // Combat-tab toggle (off by default: ground left-clicks clear the target,
     // the classic behavior). On keeps the target on a ground left-click so
     // click-to-move repositioning does not deselect.
@@ -4770,6 +4817,8 @@ export const hudChromeStrings = {
   // not be told to drag something a keyboard player operates with arrows.
   // All wordy (M16), so the five non-Latin fills land in this same change.
   interfaceUnlock: {
+    combineTrackers: 'Combine Tracker Frames',
+    combineAuras: 'Combine Aura Frames',
     label: 'Edit Frames',
     unlock: 'Unlock interface',
     lock: 'Lock interface',
@@ -4792,6 +4841,8 @@ export const hudChromeStrings = {
     // Action Bar / Minimap / Stance Bar are wordy (M16), so their five
     // non-Latin fills land in this same change; Menu / XP Bar / Chat are not.
     frameNames: {
+      trackerGroup: 'Trackers',
+      auraGroup: 'Aura trackers',
       actionBar1: 'Action Bar',
       actionBar2: 'Action Bar 2',
       actionBar3: 'Action Bar 3',

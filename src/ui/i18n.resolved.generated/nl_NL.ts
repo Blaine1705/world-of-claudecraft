@@ -331,6 +331,52 @@ export const nl_NL: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "Apply",
+      "current": "Current Layout",
+      "new": "New Preset",
+      "empty": "No saved presets",
+      "saveCurrent": "Save Current Preset",
+      "deleteNamed": "Delete {name}",
+      "deleteBody": "Delete the frame preset \"{name}\"?",
+      "title": "Frame Presets",
+      "name": "Preset Name",
+      "slot": "Preset {slot}",
+      "save": "Save",
+      "load": "Load and Reload",
+      "remove": "Delete",
+      "saved": "Done.",
+      "failed": "Could not save or load the preset."
+    },
+    "frameMenus": {
+      "hide": "Hide Frame",
+      "units": "Unit Frames",
+      "bars": "Action Bars",
+      "trackers": "Trackers",
+      "auras": "Auras",
+      "combat": "Combat Displays",
+      "other": "Other HUD Elements",
+      "options": "Frame Options",
+      "allOptions": "All Frame Options",
+      "independentTarget": "Lock Target of Target to Target"
+    },
+    "focusTargets": {
+      "showEmpty": "Show Empty Focus Frames",
+      "assignHint": "Select a target. Press {key} or click {button}.",
+      "assignClickHint": "Select a target. Click {button}.",
+      "ally": "Ally",
+      "enemy": "Enemy",
+      "unset": "Unset Focus",
+      "frame1": "Focus 1",
+      "frame2": "Focus 2",
+      "frame3": "Focus 3",
+      "hint": "Click the target frame or press {key} to target this focus.",
+      "clickHint": "Click the target frame to target this focus.",
+      "title": "Focus targets",
+      "assign": "Set focus {slot}",
+      "target": "Target focus {slot}",
+      "clear": "Clear focus {slot}"
+    },
     "professionTrainers": {
       "blacksmithing": "Smeedtrainer",
       "cooking": "Kooktrainer",
@@ -3450,6 +3496,8 @@ export const nl_NL: EnTranslations = {
       "label": "Frameposities herstellen"
     },
     "interfaceUnlock": {
+      "combineTrackers": "Combine Tracker Frames",
+      "combineAuras": "Combine Aura Frames",
       "label": "Frames Bewerken",
       "unlock": "Interface ontgrendelen",
       "lock": "Interface vergrendelen",
@@ -3460,6 +3508,8 @@ export const nl_NL: EnTranslations = {
       "lockFrame": "Dit frame vergrendelen",
       "resizeFrame": "Formaat van dit frame aanpassen",
       "frameNames": {
+        "trackerGroup": "Trackers",
+        "auraGroup": "Aura trackers",
         "actionBar1": "Actiebalk",
         "actionBar2": "Actiebalk 2",
         "actionBar3": "Actiebalk 3",
@@ -6375,6 +6425,7 @@ export const nl_NL: EnTranslations = {
       "framesMoveBodyEditFrames": "Je eigen frame, je doelraam en je groepsframes kunnen allemaal worden verplaatst. Elk heeft een kleine verplaatsknop in de hoek: ontgrendel hem, sleep het frame naar de gewenste plek en vergrendel hem weer zodat een verdwaalde klik niets kan verschuiven. Frames bewerken bovenaan het tabblad Frames in de Interface-opties maakt de rest van de interface in één keer los, samen met die drie frames: de actiebar, de werpbalk, de zwaaibalk, de ervaringsbalk, de minimap, de knoppenrail, het huisdierframe, de houdingsbalk, de buff- en debuffrijen en het label Herinnering voor verlanglijst. Als ze op een plek belanden waar je spijt van krijgt, zet Herstellen naar standaard onderaan hetzelfde tabblad Frames ze allemaal terug naar hun oorspronkelijke plek.",
       "framesGovernedExtra": "Frames bewerken maakt ook de tracker-stapel eronder los, met je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, recepten die je vanuit het ambacht hebt vastgezet, de delve waarin je zit, elke rift waaraan je deelneemt en het recept of de opdracht die je volgt. Ook de huisdieractiebar naast je huisdierframe, het Doel-puntenframe voor je debuffs op nabije vijanden, de Toewijding-medaille van de paladijn, de Affliction-balk van de warlock, de spreukproc-overlay, de zwaai-timer voor de vrije hand van dubbelzwaaiers en het venster met tabbladen voor de schademeter worden losgemaakt, elk met zijn eigen naamlabel.",
       "framesGovernedAuraTracks": "Frames bewerken maakt ook de zes optionele aurastromen los zodra je ze hebt ingeschakeld op het tabblad Gevecht van dezelfde Interface-opties: de stroom Mijn buffs, de stroom Verdedigingsafkoelingen, de stroom Mijn schilden, de stroom Aanvalsafkoelingen, de stroom Beweging en sluipen, en de stroom Mijn buffs op bondgenoten. Elke stroom staat standaard uit en draagt zijn eigen naamlabel zolang hij losstaat.",
+      "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.",
       "barsTitle": "Balken, timers en gevechtstekst",
       "barsBody": "Je spreukbalk verschijnt in het midden van het scherm, net boven je actiebalken, telkens wanneer je een spreuk uitspreekt of kanaliseert, en toont de naam van de spreuk en de resterende tijd. Je doelwit krijgt een eigen spreukbalk op zijn frame, zodat je kunt zien wat eraan komt en erop kunt reageren.\n\nEen dunne wapenslagbalk zit onder je spreukbalk en vult zich tussen je wapenslagen, zodat een nabij- of afstandsaanvaller kan zien wanneer de volgende automatische treffer landt.\n\nJe ervaringsbalk loopt over de volle breedte onder je actiebalken, verdeeld in segmenten, met een lichter stuk dat de uitgeruste ervaring toont die je hebt opgespaard.\n\nZwem onder water en een blauwe adembalk verschijnt bovenaan het scherm. Hij loopt leeg terwijl je hoofd onder water is, knippert rood zodra hij leeg is en je begint te verdrinken, en vult zich snel weer zodra je boven water komt. Spatie zwemt je omhoog, en de toets Omlaag Zwemmen, standaard Ctrl, brengt je dieper.\n\nSchade en genezing zweven als kleine getallen omhoog boven wat ze raken, zodat je een gevecht kunt lezen zonder tekst te lezen. Het tabblad Gevecht in je chatbox houdt het volledige geschreven verslag bij.",

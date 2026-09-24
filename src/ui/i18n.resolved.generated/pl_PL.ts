@@ -331,6 +331,52 @@ export const pl_PL: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "Apply",
+      "current": "Current Layout",
+      "new": "New Preset",
+      "empty": "No saved presets",
+      "saveCurrent": "Save Current Preset",
+      "deleteNamed": "Delete {name}",
+      "deleteBody": "Delete the frame preset \"{name}\"?",
+      "title": "Frame Presets",
+      "name": "Preset Name",
+      "slot": "Preset {slot}",
+      "save": "Save",
+      "load": "Load and Reload",
+      "remove": "Delete",
+      "saved": "Done.",
+      "failed": "Could not save or load the preset."
+    },
+    "frameMenus": {
+      "hide": "Hide Frame",
+      "units": "Unit Frames",
+      "bars": "Action Bars",
+      "trackers": "Trackers",
+      "auras": "Auras",
+      "combat": "Combat Displays",
+      "other": "Other HUD Elements",
+      "options": "Frame Options",
+      "allOptions": "All Frame Options",
+      "independentTarget": "Lock Target of Target to Target"
+    },
+    "focusTargets": {
+      "showEmpty": "Show Empty Focus Frames",
+      "assignHint": "Select a target. Press {key} or click {button}.",
+      "assignClickHint": "Select a target. Click {button}.",
+      "ally": "Ally",
+      "enemy": "Enemy",
+      "unset": "Unset Focus",
+      "frame1": "Focus 1",
+      "frame2": "Focus 2",
+      "frame3": "Focus 3",
+      "hint": "Click the target frame or press {key} to target this focus.",
+      "clickHint": "Click the target frame to target this focus.",
+      "title": "Focus targets",
+      "assign": "Set focus {slot}",
+      "target": "Target focus {slot}",
+      "clear": "Clear focus {slot}"
+    },
     "professionTrainers": {
       "blacksmithing": "Trener Kowalstwa",
       "cooking": "Trener Gotowania",
@@ -3450,6 +3496,8 @@ export const pl_PL: EnTranslations = {
       "label": "Resetuj pozycje ramek"
     },
     "interfaceUnlock": {
+      "combineTrackers": "Combine Tracker Frames",
+      "combineAuras": "Combine Aura Frames",
       "label": "Edytuj ramki",
       "unlock": "Odblokuj interfejs",
       "lock": "Zablokuj interfejs",
@@ -3460,6 +3508,8 @@ export const pl_PL: EnTranslations = {
       "lockFrame": "Zablokuj tę ramkę",
       "resizeFrame": "Zmień rozmiar tej ramki",
       "frameNames": {
+        "trackerGroup": "Trackers",
+        "auraGroup": "Aura trackers",
         "actionBar1": "Pasek akcji",
         "actionBar2": "Pasek akcji 2",
         "actionBar3": "Pasek akcji 3",
@@ -6375,6 +6425,7 @@ export const pl_PL: EnTranslations = {
       "framesMoveBodyEditFrames": "Możesz przesuwać własną ramkę, ramkę celu i ramki drużyny. Każda ma w rogu mały przycisk przesuwania: odblokuj ją, przeciągnij w wybrane miejsce i zablokuj ponownie, aby przypadkowe kliknięcie jej nie przesunęło. Edycja ramek na górze karty Ramki w opcjach interfejsu odblokowuje naraz resztę interfejsu, w tym te trzy ramki: paski akcji, pasek rzucania, pasek uderzeń, pasek doświadczenia, minimapę, szynę przycisków, ramkę pupila, pasek postawy, wiersze premii i osłabień oraz etykietę przypomnienia listy życzeń. Jeśli trafią w miejsce, którego żałujesz, przycisk Przywróć domyślne na dole tej samej karty Ramki przywraca je wszystkie.",
       "framesGovernedExtra": "Edycja ramek odblokowuje także stos śledzonych elementów poniżej: śledzone zadania i ich cele, postęp dokonań, strony Reliquarium, przypięte receptury rzemieślnicze, aktywną wyprawę, każdą trwającą szczelinę oraz śledzoną recepturę lub zlecenie. Obejmuje też pasek akcji pupila obok jego ramki, ramkę kropek Celu dla osłabień pobliskich wrogów, medalion Oddania paladyna, Pasek utrapień czarnoksiężnika, nakładkę wyzwalacza zaklęć, zegar uderzeń broni podręcznej dla walczących dwiema broniami oraz okno miernika obrażeń z kartami. Każdy element ma własną etykietę, gdy zostanie odblokowany.",
       "framesGovernedAuraTracks": "Edycja ramek odblokowuje także sześć dobrowolnych ścieżek aur, gdy włączysz je na karcie Walka tych samych opcji interfejsu: ścieżkę Moje premie, ścieżkę defensywnych czasów odnowienia, ścieżkę Moich tarcz, ścieżkę ofensywnych czasów odnowienia, ścieżkę Ruchu i ukrycia oraz ścieżkę Moich premii na sojusznikach. Każda ścieżka jest domyślnie wyłączona i każda nosi własną etykietę, gdy zostanie odblokowana.",
+      "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Edytuj ramki rozluźnia także panel Dialogu, który zawiera wypowiedź NPC, gdy ten NPC jest poza twoim polem widzenia; nosi chip z nazwą, gdy jest luzem.",
       "barsTitle": "Paski, liczniki i tekst walki",
       "barsBody": "Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.",

@@ -493,7 +493,11 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
     // per-frame healer-range scan (the Keeper is talked to). wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 18276,
+    // LOWERED 18276 -> 18220 by extracting the HUD frame registry wiring.
+    // LOWERED 18220 -> 18201 by extracting editor menu dependencies.
+    // LOWERED 18201 -> 18191 by extracting chat frame context and focus mouseover routing.
+    // LOWERED 18191 -> 18186 by sharing unit dimensions and pet frame input.
+    ceiling: 18186,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -517,7 +521,9 @@ const MONOLITHS: MonolithRow[] = [
     // and the notes both carried moved to src/ui/options_text_values.ts (the
     // Frame Rate Limit row and its numeric status line arrived in the same
     // change). Exact count, zero slack.
-    ceiling: 2830,
+    // LOWERED 2830 -> 2829 by extracting shared frame settings and reset-key scope.
+    // LOWERED 2829 -> 2827 by extracting menu placement into OptionsWindowLayout.
+    ceiling: 2827,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1676,7 +1682,8 @@ const MONOLITHS: MonolithRow[] = [
     // src/net/target_echo.ts, banking the 52 lines of slack the row already
     // carried with it. Measured with wc -l < src/net/online.ts after biome.
     // Exact count, zero slack.
-    ceiling: 5426,
+    // LOWERED 5426 -> 5421 by extracting first-snapshot action bar restore resolution.
+    ceiling: 5421,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
