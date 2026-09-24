@@ -22,7 +22,15 @@ describe('buried hoard placement', () => {
   it('keeps the map and progress when the dig cannot fit a safe entrance', () => {
     const site = TREASURE_SITES[3];
     const map = { rarity: 'rare' as const, seed: 17, siteId: site.id };
-    const meta = { entityId: 1, treasureMap: map, wireRev: 7 } as PlayerMeta;
+    // vaultAttemptSeq is the durable attempt counter (627105d708): without it
+    // the dig stops at the sequence guard before it ever tries to place.
+    const meta = {
+      entityId: 1,
+      treasureMap: map,
+      wireRev: 7,
+      vaultAttempt: null,
+      vaultAttemptSeq: 0,
+    } as unknown as PlayerMeta;
     const player = { pos: { x: site.x, y: -100, z: site.z }, facing: 0 } as Entity;
     const emit = vi.fn();
     const addEntity = vi.fn();
@@ -39,6 +47,8 @@ describe('buried hoard placement', () => {
     expect(addEntity).not.toHaveBeenCalled();
     expect(meta.treasureMap).toBe(map);
     expect(meta.wireRev).toBe(7);
+    expect(meta.vaultAttempt).toBeNull();
+    expect(meta.vaultAttemptSeq).toBe(0);
     expect(ctx.nextId).toBe(10);
     expect(emit).toHaveBeenCalledExactlyOnceWith({
       type: 'treasureMapRead',
