@@ -69,7 +69,7 @@ const SEED = 7;
  *  (open ground, no hub colliders). Every fighter starts on contested ground:
  *  the default spawn is Eastbrook Vale, a sanctuary, where nobody is hostile. */
 const CONTESTED_ZONE = 'thornpeak_heights';
-const FFA_ZONE = 'wraithwood';
+const FFA_ZONE = 'drakelands';
 const STARTER_ZONE = 'eastbrook_vale';
 const TUTORIAL_ZONE = 'proving_shore';
 
@@ -78,7 +78,7 @@ const TUTORIAL_ZONE = 'proving_shore';
  *  graveyards, which only ever host a hostility check. */
 const OPEN_GROUND: Record<string, { x: number; z: number }> = {
   [CONTESTED_ZONE]: { x: 60, z: 700 },
-  [FFA_ZONE]: { x: 360, z: 1540 },
+  [FFA_ZONE]: { x: 353.8, z: 2262.4 },
   [STARTER_ZONE]: { x: PLAYER_START.x, z: PLAYER_START.z },
 };
 

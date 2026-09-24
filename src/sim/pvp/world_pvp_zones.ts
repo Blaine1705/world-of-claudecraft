@@ -7,8 +7,8 @@
 //   new character can never be fought before they know what the flag is.
 // - 'ffa': free-for-all. Everyone standing in the zone can attack everyone else
 //   there who is not in their party or raid, flag or no flag. The three
-//   highest-level zones: Wraithwood, Evergarden and Nightbloom (the level-20
-//   zones with the heaviest S-tier rift weight, and the furthest north).
+//   northernmost zones, the top row of the map (owner pick): the Drakelands,
+//   the Frostveil Reach and the Amberfall.
 //   Attacking an UNFLAGGED player here marks the attacker (world_pvp.ts).
 // - 'contested': everywhere else. The mutual-flag rule and nothing more.
 //

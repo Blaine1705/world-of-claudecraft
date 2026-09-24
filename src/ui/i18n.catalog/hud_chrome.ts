@@ -2894,7 +2894,7 @@ export const hudChromeStrings = {
     groundSanctuary: 'The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.',
     groundContested: 'Everywhere else is contested: only two flagged players can fight.',
     groundFfa:
-      'The Wraithwood, the Evergarden and the Nightbloom are free-for-all: everyone there can fight, flag or not.',
+      'The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.',
     groupLine:
       'Party and raid members are never hostile to each other. Guildmates outside your group can fight.',
     markLine:

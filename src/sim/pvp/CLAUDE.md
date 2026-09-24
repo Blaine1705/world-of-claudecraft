@@ -42,8 +42,8 @@ ratings.
   (data-as-code in `src/sim/content/`, absent meaning contested). A sanctuary
   under EITHER player switches the world off (the Proving Shore and Eastbrook
   Vale, so a new character cannot be fought); both players on free-for-all
-  ground are hostile with no flag at all (the Wraithwood, the Evergarden and the
-  Nightbloom); everything else is the mutual-flag rule. The lookup is the strict
+  ground are hostile with no flag at all (the Drakelands, the Frostveil Reach and
+  the Amberfall, the map's top row); everything else is the mutual-flag rule. The lookup is the strict
   rectangle containment (`zoneContaining`, never the clamping `zoneAt`), so the
   instance plane reads as contested and the open-world policy cannot leak into a
   dungeon, delve, arena or battleground floor. Pure and host-agnostic: the sim's

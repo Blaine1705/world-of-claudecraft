@@ -5975,7 +5975,7 @@ describe('full self-state snapshot delta fixture', () => {
       inside: false,
       minutesLeft: 45,
     });
-    expect(['wraithwood', 'evergarden', 'nightbloom']).toContain(client.hillInfo?.zoneId);
+    expect(['drakelands', 'frostveil', 'amberfall']).toContain(client.hillInfo?.zoneId);
     expect(client.restedXp).toBe(222); // rxp -> restedXp
     expect(client.prestigeRank).toBe(3); // prk -> prestigeRank
 

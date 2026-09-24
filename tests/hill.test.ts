@@ -45,7 +45,7 @@ const ARENA_FREE_WORLD: WorldContent = {
   groundObjects: [],
 };
 const SEED = 7;
-const FFA_IDS = ['wraithwood', 'evergarden', 'nightbloom'];
+const FFA_IDS = ['drakelands', 'frostveil', 'amberfall'];
 
 function world(extra: Partial<SimConfig> = {}): Sim {
   const sim = new Sim({
@@ -118,7 +118,7 @@ function jumpTo(sim: Sim, time: number): void {
 function hillWorld(names: string[]): { sim: Sim; pids: number[] } {
   const sim = world();
   const pids = names.map((n) => addPlayer(sim, n));
-  expect(spawnHillNow(sim.ctx, 'wraithwood')).not.toBeNull();
+  expect(spawnHillNow(sim.ctx, 'drakelands')).not.toBeNull();
   // Stand everyone outside first (the presence pass runs on the tick boundary).
   for (const pid of pids) outside(sim, pid);
   sim.tick();
@@ -173,7 +173,7 @@ describe('the schedule and the announcements', () => {
   it('nobody can contest the hill while it is only announced', () => {
     const sim = world();
     const a = addPlayer(sim, 'Aleph');
-    const hill = spawnHillNow(sim.ctx, 'wraithwood', { warn: true })!;
+    const hill = spawnHillNow(sim.ctx, 'drakelands', { warn: true })!;
     expect(hill.phase).toBe('warning');
     inside(sim, a);
     tickSeconds(sim, HILL_CAPTURE_SECONDS + 5);
@@ -231,7 +231,7 @@ describe('the schedule and the announcements', () => {
     const sim = world();
     const plan = hillPlanFor(sim.ctx, 0);
     jumpTo(sim, plan.warnAt - 60);
-    spawnHillNow(sim.ctx, 'nightbloom');
+    spawnHillNow(sim.ctx, 'amberfall');
     const devClose = sim.hillState.active!.closesAt;
     expect(devClose).toBeGreaterThan(plan.risesAt);
     // While the dev hill stands, the planned warning waits.
@@ -241,7 +241,7 @@ describe('the schedule and the announcements', () => {
     // It falls, and the next pass warns of the real hill in full.
     jumpTo(sim, devClose - 1);
     const seen = tickSeconds(sim, 3);
-    expect(logLines(seen)).toContain(hillFallenLine('The Nightbloom'));
+    expect(logLines(seen)).toContain(hillFallenLine('The Amberfall'));
     const hill = sim.hillState.active!;
     expect(hill.warnAt).toBeGreaterThanOrEqual(devClose);
     expect(hill.ordinal).toBe(0);
@@ -333,7 +333,7 @@ describe('the spot', () => {
 
   it('gives up when no open ground is found, and a retry searches new ground', () => {
     const sim = world();
-    const zone = ZONES.find((z) => z.id === 'wraithwood')!;
+    const zone = ZONES.find((z) => z.id === 'drakelands')!;
     const drowned = pickHillSpot(sim.ctx, new Rng(1), zone, {
       wet: () => true,
       steep: () => false,
@@ -343,8 +343,8 @@ describe('the spot', () => {
     expect(drowned).toBeNull();
     // The retry salts its attempt number in: the same window, a different draw.
     const times = hillPlanFor(sim.ctx, 0);
-    const first = spawnHill(sim.ctx, 0, times, 0, 'wraithwood')!;
-    const retry = spawnHill(sim.ctx, 0, times, 1, 'wraithwood')!;
+    const first = spawnHill(sim.ctx, 0, times, 0, 'drakelands')!;
+    const retry = spawnHill(sim.ctx, 0, times, 1, 'drakelands')!;
     expect(`${retry.x},${retry.z}`).not.toBe(`${first.x},${first.z}`);
   });
 });
@@ -602,10 +602,10 @@ describe('the readout and the chat arms', () => {
       (ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error',
     );
     expect(errors.find((ev) => ev.pid === a)?.text).toBe(
-      'The hill stands in The Wraithwood: your group holds it. It falls in 44 minutes.',
+      'The hill stands in The Drakelands: your group holds it. It falls in 44 minutes.',
     );
     expect(errors.find((ev) => ev.pid === b)?.text).toBe(
-      'The hill stands in The Wraithwood: another group holds it. It falls in 44 minutes.',
+      'The hill stands in The Drakelands: another group holds it. It falls in 44 minutes.',
     );
     const quiet = world();
     const q = addPlayer(quiet, 'Quiet');
@@ -618,9 +618,9 @@ describe('the readout and the chat arms', () => {
   it('/dev hill rises a hill now and stands the caller on its rim (dev commands only)', () => {
     const sim = world({ devCommands: true });
     const a = addPlayer(sim, 'Aleph');
-    sim.chat('/dev hill evergarden', a);
+    sim.chat('/dev hill frostveil', a);
     const hill = sim.hillState.active!;
-    expect(hill.zoneId).toBe('evergarden');
+    expect(hill.zoneId).toBe('frostveil');
     expect(hillContains(hill, ent(sim, a).pos.x, ent(sim, a).pos.z)).toBe(true);
     expect(hill.phase).toBe('active');
     const plain = world();
@@ -639,27 +639,27 @@ describe('the readout and the chat arms', () => {
     expect(full.risesAt - sim.time).toBe(HILL_WARNING_SECONDS);
     expect(hillContains(full, ent(sim, a).pos.x, ent(sim, a).pos.z)).toBe(true);
     // A short countdown in a named zone, then let it run out on its own.
-    sim.chat('/dev hill warn nightbloom 5', a);
+    sim.chat('/dev hill warn amberfall 5', a);
     const short = sim.hillState.active!;
-    expect(short).toMatchObject({ phase: 'warning', zoneId: 'nightbloom' });
+    expect(short).toMatchObject({ phase: 'warning', zoneId: 'amberfall' });
     expect(short.risesAt - sim.time).toBe(5);
     const seen = tickSeconds(sim, 7);
     expect(short.phase).toBe('active');
-    expect(logLines(seen)).toContain(hillRiseLine('The Nightbloom'));
+    expect(logLines(seen)).toContain(hillRiseLine('The Amberfall'));
     expect(short.closesAt - short.risesAt).toBe(HILL_DURATION_SECONDS);
     // Skip a countdown: the announced hill rises now and stands in full.
-    sim.chat('/dev hill warn evergarden', a);
+    sim.chat('/dev hill warn frostveil', a);
     sim.events = [];
     sim.chat('/dev hill rise', a);
     const risen = sim.hillState.active!;
-    expect(risen).toMatchObject({ phase: 'active', zoneId: 'evergarden' });
+    expect(risen).toMatchObject({ phase: 'active', zoneId: 'frostveil' });
     expect(risen.closesAt - sim.time).toBe(HILL_DURATION_SECONDS);
-    expect(logLines(sim.events)).toContain(hillRiseLine('The Evergarden'));
+    expect(logLines(sim.events)).toContain(hillRiseLine('The Frostveil Reach'));
     // End it: the realm hears the fall.
     sim.events = [];
     sim.chat('/dev hill end', a);
     expect(sim.hillState.active).toBeNull();
-    expect(logLines(sim.events)).toContain(hillFallenLine('The Evergarden'));
+    expect(logLines(sim.events)).toContain(hillFallenLine('The Frostveil Reach'));
     // Nothing to rise or end now: told so, nothing changes.
     sim.events = [];
     sim.chat('/dev hill rise', a);
@@ -692,15 +692,15 @@ describe('the readout and the chat arms', () => {
   it('/hill during the warning says where and when the hill will rise', () => {
     const sim = world();
     const a = addPlayer(sim, 'Aleph');
-    spawnHillNow(sim.ctx, 'wraithwood', { warn: true });
+    spawnHillNow(sim.ctx, 'drakelands', { warn: true });
     sim.events = [];
     sim.chat('/hill', a);
     const line = sim.events.find(
       (ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error' && ev.pid === a,
     )?.text;
-    expect(line).toBe('A hill will rise in The Wraithwood in 15 minutes.');
-    expect(hillWarningLine('The Wraithwood', 1)).toBe(
-      'A hill will rise in The Wraithwood in 1 minute.',
+    expect(line).toBe('A hill will rise in The Drakelands in 15 minutes.');
+    expect(hillWarningLine('The Drakelands', 1)).toBe(
+      'A hill will rise in The Drakelands in 1 minute.',
     );
   });
 });
@@ -709,20 +709,20 @@ describe('the /dev hill grammar', () => {
   it('parses every arm and refuses malformed arguments', () => {
     expect(parseHillDevCommand('/dev hill')).toEqual({ kind: 'now' });
     expect(parseHillDevCommand('/devhill')).toEqual({ kind: 'now' });
-    expect(parseHillDevCommand('/dev hill Wraithwood')).toEqual({
+    expect(parseHillDevCommand('/dev hill Drakelands')).toEqual({
       kind: 'now',
-      zoneId: 'wraithwood',
+      zoneId: 'drakelands',
     });
     expect(parseHillDevCommand('/dev hill warn')).toEqual({ kind: 'warn' });
     expect(parseHillDevCommand('/dev hill warn 30')).toEqual({ kind: 'warn', seconds: 30 });
-    expect(parseHillDevCommand('/dev hill warn evergarden 30')).toEqual({
+    expect(parseHillDevCommand('/dev hill warn frostveil 30')).toEqual({
       kind: 'warn',
-      zoneId: 'evergarden',
+      zoneId: 'frostveil',
       seconds: 30,
     });
-    expect(parseHillDevCommand('/dev hill warn 30 evergarden')).toEqual({
+    expect(parseHillDevCommand('/dev hill warn 30 frostveil')).toEqual({
       kind: 'warn',
-      zoneId: 'evergarden',
+      zoneId: 'frostveil',
       seconds: 30,
     });
     expect(parseHillDevCommand('/dev hill warn 0')).toEqual({ kind: 'warn', seconds: 1 });

@@ -1625,7 +1625,7 @@ export const TARGETS = [
     variants: [
       { key: 'tab-down', scene: 'down' },
       { key: 'tab-confirm', scene: 'confirm' },
-      // Free-for-all ground: the offline character is stood in the Wraithwood
+      // Free-for-all ground: the offline character is stood in the Drakelands
       // first, so the ground line reads the hostile state with the flag down.
       { key: 'tab-ffa', scene: 'ffa' },
       // Last on purpose: it raises the flag, which the earlier scenes must not see.
@@ -1635,7 +1635,7 @@ export const TARGETS = [
     async capture(page, variant) {
       const scene = variant?.scene ?? 'down';
       if (scene === 'ffa') {
-        // Open ground in the Wraithwood (a free-for-all zone, see
+        // Open ground in the Drakelands (a free-for-all zone, see
         // src/sim/pvp/world_pvp_zones.ts); the sim settles the height. The
         // window opens only once the HUD has seen the crossing (the zone pass
         // runs twice a second and the HUD reacts to the new zone on its own),
@@ -1644,7 +1644,7 @@ export const TARGETS = [
           const game = window.__game;
           if (!game?.sim) return false;
           const me = game.sim.player;
-          me.pos = { x: 360, y: me.pos.y, z: 1540 };
+          me.pos = { x: 353.8, y: me.pos.y, z: 2262.4 };
           me.prevPos = { ...me.pos };
           return true;
         });
@@ -1706,7 +1706,7 @@ export const TARGETS = [
         if (!worldReady) await wait(500);
       }
       if (!worldReady) throw new Error('offline world never became available');
-      // The /dev arm (offline dev commands) rises a hill in the Wraithwood now
+      // The /dev arm (offline dev commands) rises a hill in the Drakelands now
       // and stands the character on its rim, inside the zone, so the bar shows
       // and the ring is at their feet. The character is levelled first so the
       // trickle would pay them (not needed for the shot, but the honest state).
@@ -1714,11 +1714,11 @@ export const TARGETS = [
         const game = window.__game;
         if (!game?.sim) return { ok: false, reason: 'offline world is unavailable' };
         game.sim.setPlayerLevel(20);
-        game.sim.chat('/dev hill wraithwood');
+        game.sim.chat('/dev hill drakelands');
         return { ok: !!game.sim.hillInfo, reason: 'no hill rose (dev commands off?)' };
       });
       if (!risen.ok) throw new Error(risen.reason);
-      // The teleport into the Wraithwood shows the zone loading screen; the bar
+      // The teleport into the Drakelands shows the zone loading screen; the bar
       // and the ring are only honest evidence once it has cleared.
       let loaded = false;
       for (let attempt = 0; attempt < 120 && !loaded; attempt++) {

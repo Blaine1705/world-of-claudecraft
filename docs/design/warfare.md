@@ -394,10 +394,10 @@ whichever overworld zone a clamping lookup would misreport:
   itself: an under-level character cannot raise one, so their hits there mark
   nobody and they stake no gold; the grey rule keeps their deaths worthless to
   a far higher killer. The
-  Wraithwood, the Evergarden and the Nightbloom (`content/wraithwood.ts`,
-  `content/evergarden.ts`, `content/nightbloom.ts`), the level-20 zones with the
-  heaviest S-tier rift weight and the furthest north: the richest ground
-  carries the most risk.
+  Drakelands, the Frostveil Reach and the Amberfall (`content/drakelands.ts`,
+  `content/frostveil.ts`, `content/amberfall.ts`): the three northernmost zones,
+  the top row of the map (owner pick, 2026-09-24), the far edge of the world and
+  its richest ground carrying the most risk.
 - `'contested'`: everywhere else, and the default for a zone record with no
   `worldPvp` field. Two flagged players and nothing more.
 

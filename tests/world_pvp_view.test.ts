@@ -44,10 +44,10 @@ import {
 import { localizeSimText } from '../src/ui/sim_i18n';
 import type { WorldPvpInfo } from '../src/world_api';
 
-// Thornpeak Heights (contested), the Wraithwood graveyard (free-for-all) and
+// Thornpeak Heights (contested), the Drakelands (free-for-all) and
 // Eastbrook Vale (a sanctuary), by the zone table's own rectangles.
 const CONTESTED_SPOT = { x: 0, y: 0, z: 700 };
-const FFA_SPOT = { x: 360, y: 0, z: 1500 };
+const FFA_SPOT = { x: 360, y: 0, z: 2100 };
 const SANCTUARY_SPOT = { x: 0, y: 0, z: 0 };
 
 const info = (over: Partial<WorldPvpInfo> = {}): WorldPvpInfo => ({
@@ -613,7 +613,9 @@ describe('the World PvP tab: the stakes list states the live rules', () => {
     const html = stakesHtml();
     expect(html).toContain('The Proving Shore and Eastbrook Vale are sanctuaries');
     expect(html).toContain('Everywhere else is contested: only two flagged players can fight.');
-    expect(html).toContain('The Wraithwood, the Evergarden and the Nightbloom are free-for-all');
+    expect(html).toContain(
+      'The Drakelands, the Frostveil Reach and the Amberfall are free-for-all',
+    );
     expect(html).toContain(
       'Party and raid members are never hostile to each other. Guildmates outside your group can fight.',
     );
