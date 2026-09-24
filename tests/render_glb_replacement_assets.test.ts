@@ -42,6 +42,7 @@ import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
 import { wildheartPropsPreloadInternalsForTest } from '../src/render/wildheart_props';
+import { wispMazeKitPreloadInternalsForTest } from '../src/render/wisp_maze_kit';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
 import { EASTBROOK_GRAND_ARMOURY } from '../src/sim/building_layout';
 import type { BuildingDef } from '../src/sim/types';
@@ -495,6 +496,9 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
   it('buried hoard entrance asset', () => {
     for (const url of hoardEntrancePreloadInternalsForTest.urls)
       expectAssetExistsAndManifested(url);
+  });
+  it('wisp maze kit asset', () => {
+    for (const url of wispMazeKitPreloadInternalsForTest.urls) expectAssetExistsAndManifested(url);
   });
   it('leaping fish asset', () => {
     expectAssetExistsAndManifested(fishPreloadInternalsForTest.fishAssetUrl);

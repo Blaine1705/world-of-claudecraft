@@ -793,6 +793,8 @@ const RENDER_PURE_CORES = [
   'src/render/tree_hide_index_core.ts',
   'src/render/view_candidate_scan_core.ts',
   'src/render/wisp_maze_core.ts',
+  // the maze kit's dressing plan (hedge piece per wall cell, gates, lanterns)
+  'src/render/wisp_maze_kit_core.ts',
   'src/render/glider_course_core.ts',
   'src/render/glider_flight_pose_core.ts',
   'src/render/shadow_detection_core.ts',
