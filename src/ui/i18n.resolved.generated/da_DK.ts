@@ -1537,6 +1537,7 @@ export const da_DK: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Dreadspark jordryster",
       "name_drakemaw_raptor": "Dragegabets Raptor",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork-mekafugl",
       "name_lanternback_troll": "Lanternryggen Grumbol",
       "name_chimeglass_tortoise": "Tolliver kimeglasset",
@@ -1553,6 +1554,7 @@ export const da_DK: EnTranslations = {
       "desc_rallycart_skin": "En lille rallybil med et mægtigt brøl.",
       "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
       "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "En håndbygget urværks-krigskylling, der spurter på knækkende servoer, mens optræksnøglen stadig drejer.",
       "desc_lanternback_troll": "En bakketrold brækket til åget af lampetændere, der bar en jerntrone over sine skuldre med en stormlanterne brændende på begge arme.",
       "desc_chimeglass_tortoise": "En salt-flad skildpadde, der har overgået tre generationer af campingvogne. Tindere knuste ham briller af stormglas og hængte en bronzeklokke i halsen på ham, så vejen hører ham længe før den ser ham.",
@@ -14548,6 +14550,9 @@ export const da_DK: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Tændingsnøgle: Skrækspark Jordryster"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Tændingsnøgle: Goblin-raketslæde"

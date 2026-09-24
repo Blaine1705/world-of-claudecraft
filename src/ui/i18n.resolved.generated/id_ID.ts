@@ -1537,6 +1537,7 @@ export const id_ID: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Pengguncang Tanah Percik Teror",
       "name_drakemaw_raptor": "Raptor Drakemaw",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Burung Mekanik Cluckwork",
       "name_lanternback_troll": "Grumbol si Punggung Lentera",
       "name_chimeglass_tortoise": "Tolliver si Kaca Cerobong Asap",
@@ -1553,6 +1554,7 @@ export const id_ID: EnTranslations = {
       "desc_rallycart_skin": "Mobil reli kecil dengan raungan dahsyat.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
       "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Ayam perang jarum jam buatan tangan yang berlari dengan kecepatan servo, kunci putaran masih berputar.",
       "desc_lanternback_troll": "Troll bukit dipatahkan oleh penyala lampu, membawa singgasana besi di bahunya dengan lentera badai menyala di kedua lengannya.",
       "desc_chimeglass_tortoise": "Kura-kura dataran garam yang telah melampaui tiga generasi karavan. Tinker memberinya kacamata dari kaca badai dan menggantungkan lonceng perunggu di tenggorokannya, sehingga jalan mendengarnya jauh sebelum jalan melihatnya.",
@@ -14548,6 +14550,9 @@ export const id_ID: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Kunci Penyalaan: Pengguncang Tanah Percik Teror"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Kunci kontak: Kereta Luncur Roket Goblin"
