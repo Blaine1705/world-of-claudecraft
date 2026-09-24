@@ -10205,6 +10205,7 @@ export class Renderer {
               this.sim.questLog,
               v.compilePending,
               withinRange,
+              this.sim.worldQuestLog,
             );
         if (v.sparkle && vis) {
           // sub-pixel beyond ~45u but still a full transparent draw each

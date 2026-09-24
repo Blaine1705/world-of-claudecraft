@@ -39,6 +39,12 @@
     gap: 6px;
     padding: 10px;
   }
+  body.mobile-touch .vehicle-bar.forge-action-bar {
+    top: 50%;
+    bottom: auto;
+    grid-template-columns: 1fr;
+    transform: translate(-50%, -50%);
+  }
   body.mobile-touch .vehicle-action-slots {
     gap: 6px;
   }
