@@ -8164,7 +8164,8 @@ export const da_DK: EnTranslations = {
       "parryTitle": "Parade",
       "parryBody": "Parade er krigerens eget forsvar: en chance for at afværge et nærkampsslag helt og undgå al skade, og den vokser med Styrke. Kun et angreb, der kommer forfra, kan pareres, hvilket er endnu en grund til at blive vendt mod det, der rammer dig. Andre klasser ser rækken på deres ark stå på nul.",
       "warfareTitle": "Krigsførelse",
-      "warfareBody": "Krigsførelse er den ene egenskab, der kun tæller mod andre spillere: den hæver den skade, du gør mod dem, og sænker den skade, du tager fra dem, og dit ark viser begge halvdele på én linje. Mod skabninger gør den slet ingenting. Den kommer fra Krigsførelsesudstyret, du køber for Ære, så det er en belønning for at spille PvP snarere end noget, du skal jage, mens du leveler."
+      "warfareBody": "Krigsførelse er den ene egenskab, der kun tæller mod andre spillere: den hæver den skade, du gør mod dem, og sænker den skade, du tager fra dem, og dit ark viser begge halvdele på én linje. Mod skabninger gør den slet ingenting. Den kommer fra Krigsførelsesudstyret, du køber for Ære, så det er en belønning for at spille PvP snarere end noget, du skal jage, mens du leveler.",
+      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Hver kamp, hvert opdrag og hvert skridt mod nord gør din helt stærkere. Her er, hvordan opleveling fungerer, og hvad der holder dig i vækst, når du når toppen.",

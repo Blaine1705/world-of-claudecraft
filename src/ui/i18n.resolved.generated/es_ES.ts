@@ -8164,7 +8164,8 @@ export const es_ES: EnTranslations = {
       "parryTitle": "Parada",
       "parryBody": "La parada es la defensa propia del guerrero: la probabilidad de desviar por completo un golpe cuerpo a cuerpo y no recibir ningún daño, y crece con la Fuerza. Solo se puede parar un ataque que llega de frente, una razón más para mantenerte encarando a lo que te golpea. Las demás clases ven esta fila de su hoja fija en cero.",
       "warfareTitle": "Pericia bélica",
-      "warfareBody": "La pericia bélica es la única característica que solo cuenta contra otros jugadores: aumenta el daño que les infliges y reduce el daño que recibes de ellos, y tu hoja muestra ambas mitades en una sola línea. Contra criaturas no hace absolutamente nada. Proviene del equipo de guerra que compras con honor, así que es una recompensa por jugar JcJ y no algo que perseguir mientras subes de nivel."
+      "warfareBody": "La pericia bélica es la única característica que solo cuenta contra otros jugadores: aumenta el daño que les infliges y reduce el daño que recibes de ellos, y tu hoja muestra ambas mitades en una sola línea. Contra criaturas no hace absolutamente nada. Proviene del equipo de guerra que compras con honor, así que es una recompensa por jugar JcJ y no algo que perseguir mientras subes de nivel.",
+      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Cada combate, misión y paso hacia el norte hace más fuerte a tu héroe. Aquí tienes cómo funciona subir de nivel y qué te mantiene creciendo una vez que llegas a la cima.",

@@ -9,9 +9,13 @@ be tuned independently, but those are internal mechanics rather than separate
 player-facing stats. Every current FURY item grants the same Warfare rating to
 both sides.
 
-Both are inert outside hostile player-versus-player combat. Friendly damage,
-self-damage, pets, player-versus-mob damage, and mob-versus-player damage do not
-read Warfare.
+Warfare applies to ALL hostile player-versus-player combat and never to PvE
+(owner rule, 2026-09-24). Both sides of a hit resolve to the player who controls
+them (`pvpController`), so a pet, guardian or totem deals damage with its owner's
+Offense and takes it with its owner's Defense, and a WARFARE signature fires
+against a hostile player's pet as it does against the player. Friendly damage,
+self-damage, and anything touching a mob no player controls (player-versus-mob
+and mob-versus-player) do not read Warfare.
 
 ## Rating curve and cap
 
@@ -172,10 +176,11 @@ Breakpoints are 2, 4 and 7 of the seven armor pieces, the same in every family:
 | 4 pieces | +40 Warfare Offense Rating, and crowd control cast on you by hostile players lasts 15 percent less |
 | 7 pieces | +80 Warfare Offense and Defense Rating, plus the family signature |
 
-The 4-piece wording is deliberate. Crowd control applied by a player's **pet** is
-entity kind `mob` and takes the non-hostile-pair early return in
-`Sim.diminishedCrowdControlDuration`, so it is not reduced: "cast on you by
-hostile players" is true where "from hostile players" would not be.
+The 4-piece wording is deliberate: no pet applies hard crowd control today (pet
+abilities apply slows, damage over time and a spell-vulnerability mark, none of
+which pass through `Sim.diminishedCrowdControlDuration`), so "cast on you by
+hostile players" is exact. A future pet stun or fear must route through that
+funnel and resolve its caster with `pvpController` so the reduction covers it.
 
 Signatures, all `pvpOnly` and therefore inert in PvE by construction (the gate in
 `src/sim/combat/set_procs.ts` sits before the chance roll, so a signature draws

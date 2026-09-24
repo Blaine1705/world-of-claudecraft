@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import {
   ARENA_DAILY_TAPER_START,
   ARENA_LOSS_HONOR_SHARE,
@@ -765,6 +767,59 @@ describe('WARFARE damage', () => {
     target.hp = 1_000;
     (sim as any).dealDamage(mob, target, 100, false, 'arcane', null, 'hit');
     expect(target.hp).toBe(900);
+  });
+
+  it("applies to ALL PvP combat: pets fight with their owner's WARFARE, and PvE never moves", () => {
+    const sim = world();
+    const ownerPid = sim.addPlayer('hunter', 'Owner');
+    const foePid = sim.addPlayer('mage', 'Foe');
+    const owner = sim.entities.get(ownerPid)!;
+    const foe = sim.entities.get(foePid)!;
+    owner.stats.pvpOffense = 0.1;
+    owner.stats.pvpDefense = 0.2;
+    foe.stats.pvpOffense = 0.1;
+    foe.stats.pvpDefense = 0.2;
+    foe.maxHp = foe.hp = 1_000;
+    const pet = createMob(sim.nextId++, MOBS.forest_wolf, owner.level, { ...owner.pos });
+    pet.ownerId = owner.id;
+    pet.hostile = false;
+    pet.maxHp = pet.hp = 1_000;
+    sim.addEntity(pet);
+    sim.duels.set(ownerPid, {
+      a: ownerPid,
+      b: foePid,
+      state: 'active',
+      timer: 0,
+      controlled: new Map(),
+    });
+    sim.duels.set(foePid, sim.duels.get(ownerPid)!);
+
+    // The pet hits the foe with its owner's Offense against the foe's Defense:
+    // 100 x 1.1 x 0.8 = 88.
+    (sim as any).dealDamage(pet, foe, 100, false, 'physical', null, 'hit');
+    expect(foe.hp).toBe(912);
+    // The foe hits the pet, which takes it with its owner's Defense.
+    (sim as any).dealDamage(foe, pet, 100, false, 'arcane', null, 'hit');
+    expect(pet.hp).toBe(912);
+
+    // PvE never moves: the pet against a wild mob, and a wild mob against the pet.
+    const mob = [...sim.entities.values()].find(
+      (entity) => entity.kind === 'mob' && entity.ownerId === null,
+    )!;
+    mob.maxHp = mob.hp = 1_000;
+    (sim as any).dealDamage(pet, mob, 100, false, 'physical', null, 'hit');
+    expect(mob.hp).toBe(900);
+    pet.hp = 1_000;
+    (sim as any).dealDamage(mob, pet, 100, false, 'physical', null, 'hit');
+    expect(pet.hp).toBe(900);
+
+    // Nor does a pet's damage to a player it is not hostile to (no fight between them).
+    const bystanderPid = sim.addPlayer('priest', 'Bystander');
+    const bystander = sim.entities.get(bystanderPid)!;
+    bystander.stats.pvpDefense = 0.2;
+    bystander.maxHp = bystander.hp = 1_000;
+    (sim as any).dealDamage(pet, bystander, 100, false, 'physical', null, 'hit');
+    expect(bystander.hp).toBe(900);
   });
 
   it('clamps oversized derived fractions on the applied damage path', () => {

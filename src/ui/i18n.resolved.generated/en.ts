@@ -8164,7 +8164,8 @@ export const en: EnTranslations = {
       "parryTitle": "Parry",
       "parryBody": "Parry is the warrior's own defense: a chance to turn a melee blow aside entirely and take no damage, and it grows with Strength. Only an attack coming at your front can be parried, which is one more reason to keep facing whatever is hitting you. Other classes see the row on their sheet sitting at zero.",
       "warfareTitle": "Warfare",
-      "warfareBody": "Warfare is the one stat that counts only against other players: it raises the damage you deal to them and lowers the damage you take from them, and your sheet shows both halves on one line. Against creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBody": "Warfare is the one stat that counts only against other players: it raises the damage you deal to them and lowers the damage you take from them, and your sheet shows both halves on one line. Against creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling.",
+      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Every fight, quest, and step north makes your hero stronger. Here is how leveling works and what keeps you growing once you reach the top.",

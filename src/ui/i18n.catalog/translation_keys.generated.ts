@@ -7447,6 +7447,7 @@ export type TranslationKeyFlat =
   | 'guide.stats.strBody'
   | 'guide.stats.strTitle'
   | 'guide.stats.warfareBody'
+  | 'guide.stats.warfareBodyPets'
   | 'guide.stats.warfareTitle'
   | 'guide.tag.both'
   | 'guide.tag.complex'

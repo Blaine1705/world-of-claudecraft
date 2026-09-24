@@ -552,20 +552,25 @@ export function dealDamage(
   }
 
   const sourcePlayer = ctx.pvpController(source);
+  const targetPlayer = ctx.pvpController(target);
 
-  // WARFARE is a hostile player-vs-player modifier only. Pets, self-damage,
-  // friendly effects, player-vs-mob, and mob-vs-player damage stay byte-identical.
-  // dealDamage receives post-mitigation damage, so this deterministic step sits
-  // after the upstream armor/resist roll and before absorb shields.
+  // WARFARE applies to ALL hostile player-vs-player combat and never to PvE
+  // (owner rule). Both sides resolve to the player who controls them, so a pet,
+  // guardian or totem fights with its owner's Offense and takes hits with its
+  // owner's Defense. Self-damage, friendly effects, and anything touching a mob
+  // no player controls stay byte-identical. dealDamage receives post-mitigation
+  // damage, so this deterministic step sits after the upstream armor/resist roll
+  // and before absorb shields.
   if (
     !resolvedHpLoss &&
     amount > 0 &&
-    source?.kind === 'player' &&
-    target.kind === 'player' &&
-    source.id !== target.id &&
+    source &&
+    sourcePlayer &&
+    targetPlayer &&
+    sourcePlayer.id !== targetPlayer.id &&
     ctx.isHostileTo(source, target)
   ) {
-    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(source, target)));
+    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(sourcePlayer, targetPlayer)));
   }
 
   if (

@@ -8164,7 +8164,8 @@ export const nl_NL: EnTranslations = {
       "parryTitle": "Parering",
       "parryBody": "Parering is de eigen verdediging van de krijger: een kans om een melee-klap volledig af te weren en geen schade op te lopen, en het groeit met Kracht. Alleen een aanval die van voren komt, kan gepareerd worden, nog een reden om te blijven gericht staan op wat je raakt. Andere klassen zien de rij op hun blad op nul staan.",
       "warfareTitle": "Oorlogvoering",
-      "warfareBody": "Oorlogvoering is de enige stat die alleen telt tegen andere spelers: het verhoogt de schade die je hen toebrengt en verlaagt de schade die je van hen oploopt, en je blad toont beide helften op één regel. Tegen wezens doet het helemaal niets. Het komt van Oorlogvoering-uitrusting die je koopt met Eer, dus het is een beloning voor PvP spelen in plaats van iets om achteraan te jagen tijdens het levelen."
+      "warfareBody": "Oorlogvoering is de enige stat die alleen telt tegen andere spelers: het verhoogt de schade die je hen toebrengt en verlaagt de schade die je van hen oploopt, en je blad toont beide helften op één regel. Tegen wezens doet het helemaal niets. Het komt van Oorlogvoering-uitrusting die je koopt met Eer, dus het is een beloning voor PvP spelen in plaats van iets om achteraan te jagen tijdens het levelen.",
+      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Elk gevecht, elke quest en elke stap naar het noorden maakt je held sterker. Zo werkt het levelen en zo blijf je groeien wanneer je de top bereikt.",

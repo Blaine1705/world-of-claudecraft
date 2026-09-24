@@ -8164,7 +8164,8 @@ export const tr_TR: EnTranslations = {
       "parryTitle": "Savuşturma",
       "parryBody": "Savuşturma, savaşçının kendine özgü savunmasıdır: bir yakın dövüş darbesini tamamen bir kenara savurup hiç hasar almama şansıdır ve Güç ile birlikte büyür. Yalnızca önünden gelen bir saldırı savuşturulabilir, bu da seni vuran şeye dönük kalman için bir sebep daha. Diğer sınıflar kendi sayfalarında bu satırın sıfırda oturduğunu görür.",
       "warfareTitle": "Harp",
-      "warfareBody": "Harp, yalnızca diğer oyunculara karşı sayılan tek istatistiktir: onlara verdiğin hasarı yükseltir ve onlardan aldığın hasarı düşürür, ve karakter sayfan bu iki yarıyı tek bir satırda gösterir. Yaratıklara karşı hiçbir şey yapmaz. Onur karşılığında satın aldığın Harp teçhizatından gelir, bu yüzden seviye atlarken peşinde koşulacak bir şeyden çok, PvP oynamanın bir ödülüdür."
+      "warfareBody": "Harp, yalnızca diğer oyunculara karşı sayılan tek istatistiktir: onlara verdiğin hasarı yükseltir ve onlardan aldığın hasarı düşürür, ve karakter sayfan bu iki yarıyı tek bir satırda gösterir. Yaratıklara karşı hiçbir şey yapmaz. Onur karşılığında satın aldığın Harp teçhizatından gelir, bu yüzden seviye atlarken peşinde koşulacak bir şeyden çok, PvP oynamanın bir ödülüdür.",
+      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Her dövüş, her görev ve kuzeye atılan her adım kahramanını daha güçlü yapar. İşte seviye atlamanın nasıl işlediği ve zirveye vardığında seni nelerin geliştirmeye devam ettiği.",

@@ -72,6 +72,9 @@ export const RETIRED_KEYS = [
   'guide.glossary.augmentDef',
   'guide.bestiary.flavor.mirejaw_frenzy', // summon-only encounter add, filtered from the bestiary
   'guide.footer.communityWiki', // the standalone MediaWiki redirect this SPA replaced
+  // Warfare now covers pets (they fight with their owner's Warfare), so the old stats
+  // body's "does nothing against creatures" became false. Successor: warfareBodyPets.
+  'guide.stats.warfareBody',
 
   // -- Superseded by generated content. These were hand-written dungeon facts before
   // GUIDE_DUNGEONS carried the roster; the page now renders names and level bands from

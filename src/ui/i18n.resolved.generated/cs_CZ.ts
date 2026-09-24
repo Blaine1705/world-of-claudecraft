@@ -8164,7 +8164,8 @@ export const cs_CZ: EnTranslations = {
       "parryTitle": "Odražení",
       "parryBody": "Odražení je válečníkova vlastní obrana: šance úplně odrazit úder na blízko a neutrpět žádné poškození, a roste se Sílou. Odrazit lze jen útok přicházející zepředu, což je další důvod, proč zůstat čelem k tomu, co tě bije. Ostatní třídy vidí tento řádek na svém panelu sedět na nule.",
       "warfareTitle": "Válečnictví",
-      "warfareBody": "Válečnictví je jediná statistika, která se počítá jen proti ostatním hráčům: zvyšuje poškození, které jim způsobíš, a snižuje poškození, které od nich utrpíš, a tvůj panel ukazuje obě poloviny na jednom řádku. Proti nestvůrám nedělá vůbec nic. Pochází z výbavy Válečnictví, kterou kupuješ za čest, takže je to odměna za hraní PvP, ne něco, za čím se honit při levelování."
+      "warfareBody": "Válečnictví je jediná statistika, která se počítá jen proti ostatním hráčům: zvyšuje poškození, které jim způsobíš, a snižuje poškození, které od nich utrpíš, a tvůj panel ukazuje obě poloviny na jednom řádku. Proti nestvůrám nedělá vůbec nic. Pochází z výbavy Válečnictví, kterou kupuješ za čest, takže je to odměna za hraní PvP, ne něco, za čím se honit při levelování.",
+      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Každý boj, úkol a krok na sever posiluje hrdinu. Takhle funguje levelování a co tě drží v růstu, když dosáhneš vrcholu.",

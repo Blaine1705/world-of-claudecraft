@@ -8164,7 +8164,8 @@ export const pt_BR: EnTranslations = {
       "parryTitle": "Aparar",
       "parryBody": "Aparar é a defesa própria do guerreiro: a chance de desviar completamente um golpe corpo a corpo e não sofrer dano nenhum, e ela cresce com a Força. Só um ataque vindo de frente pode ser aparado, mais um motivo para manter de frente o que estiver batendo em você. As outras classes veem essa linha zerada na própria ficha.",
       "warfareTitle": "Guerra",
-      "warfareBody": "Guerra é o único atributo que só conta contra outros jogadores: ele aumenta o dano que você causa a eles e reduz o dano que você recebe deles, e sua ficha mostra as duas metades numa única linha. Contra criaturas ele não faz nada. Ele vem do equipamento de Guerra que você compra com Honra, então é uma recompensa por jogar JcJ, não algo para perseguir enquanto sobe de nível."
+      "warfareBody": "Guerra é o único atributo que só conta contra outros jogadores: ele aumenta o dano que você causa a eles e reduz o dano que você recebe deles, e sua ficha mostra as duas metades numa única linha. Contra criaturas ele não faz nada. Ele vem do equipamento de Guerra que você compra com Honra, então é uma recompensa por jogar JcJ, não algo para perseguir enquanto sobe de nível.",
+      "warfareBodyPets": "Warfare is the one stat that counts only in fights between players: it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them, and your sheet shows both halves on one line. Against wild creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Toda luta, missão e passo ao norte deixa seu herói mais forte. Veja como a progressão de nível funciona e o que mantém você crescendo depois de chegar ao topo.",
