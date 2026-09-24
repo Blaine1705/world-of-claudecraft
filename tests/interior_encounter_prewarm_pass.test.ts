@@ -165,8 +165,40 @@ const drain = async (): Promise<void> => {
   for (let i = 0; i < 200; i++) await new Promise((resolve) => setTimeout(resolve, 0));
 };
 
+// Watch every material under a staged root from the moment the pass compiles
+// it, so a dispose anywhere later in that same pass is seen too.
+function watchDisposals(root: THREE.Object3D, disposed: string[], watched: Set<THREE.Material>) {
+  root.traverse((child) => {
+    const drawn = (child as THREE.Mesh).material;
+    if (!drawn) return;
+    for (const material of Array.isArray(drawn) ? drawn : [drawn]) {
+      if (watched.has(material)) continue;
+      watched.add(material);
+      material.addEventListener('dispose', () => disposed.push(material.name || material.type));
+    }
+  });
+}
+
+// Fails the next pass at its first step (the group placement reads the
+// player's position), and only that pass.
+function failNextPass(host: ReturnType<typeof fakeHost>): void {
+  const pos = host.sim.player.pos;
+  let failNext = true;
+  Object.defineProperty(host.sim.player, 'pos', {
+    configurable: true,
+    get() {
+      if (!failNext) return pos;
+      failNext = false;
+      throw new Error('prewarm pass failed');
+    },
+  });
+}
+
+const countOf = (compiled: string[], name: string): number =>
+  compiled.filter((label) => label === name).length;
+
 // One root per staged unit of the Varkhul and Ignivar sets, as each builder names it.
-const RAID_SET_ROOTS = [
+const VARKHUL_SET_ROOTS = [
   'varkhul-encounter-prewarm-entity',
   'varkhul-forgestorm-prewarm',
   'varkhul-forge-beam-prewarm',
@@ -174,10 +206,13 @@ const RAID_SET_ROOTS = [
   'varkhul-forge-portal-prewarm',
   'varkhul-worldfire-prewarm',
   'varkhul-assembly-prewarm',
+];
+const IGNIVAR_SET_ROOTS = [
   'ignivar-encounter-prewarm-entity',
   'ignivar-rotating-rays-prewarm',
   'ignivar-forge-judgment-prewarm',
 ];
+const RAID_SET_ROOTS = [...VARKHUL_SET_ROOTS, ...IGNIVAR_SET_ROOTS];
 
 describe('interior encounter prewarm host contract', () => {
   it('names only members the renderer actually declares', () => {
@@ -293,9 +328,12 @@ describe('interior encounter prewarm pass (driven)', () => {
     // their programs in use for the next storm.
     const host = fakeHost();
     const roots: THREE.Object3D[] = [];
+    const disposed: string[] = [];
+    const watched = new Set<THREE.Material>();
     const compile = host.compilePrewarmColorPrograms;
     host.compilePrewarmColorPrograms = async (root: THREE.Object3D) => {
       roots.push(root);
+      watchDisposals(root, disposed, watched);
       return compile(root);
     };
     startInteriorEncounterPrewarm('ignivar_depths', host);
@@ -305,16 +343,13 @@ describe('interior encounter prewarm pass (driven)', () => {
     const parts = ['rim', 'fill', 'countdown', 'meteor', 'meteor-trail'].map((part) =>
       twin?.getObjectByName(`varkhul-forgestorm-${part}`),
     );
-    for (const part of parts) expect(part?.visible).toBe(true);
-    let disposed = 0;
     for (const part of parts) {
-      ((part as THREE.Mesh).material as THREE.Material).addEventListener('dispose', () => {
-        disposed++;
-      });
+      expect(part?.visible).toBe(true);
+      expect(watched.has((part as THREE.Mesh).material as THREE.Material)).toBe(true);
     }
     startInteriorEncounterPrewarm('ignivar_lift', host);
     await drain();
-    expect(disposed).toBe(0);
+    expect(disposed).toEqual([]);
     expect(twin?.parent).toBeNull();
   });
 
@@ -330,6 +365,7 @@ describe('interior encounter prewarm pass (driven)', () => {
     startInteriorEncounterPrewarm('ignivar_lift', host);
     await drain();
 
+    expect(VARKHUL_BOSS_ID).toBe('varkhul_forgefather_of_the_last_flame');
     const template = MOBS[VARKHUL_BOSS_ID];
     expect(rigs.built).toHaveLength(1);
     expect(rigs.built[0]).toMatchObject({
@@ -433,8 +469,8 @@ describe('interior encounter prewarm pass (driven)', () => {
 
   it('builds a set once when the next room attaches while the first pass still runs', async () => {
     // A raid walks out of the lift before its pass drains; the Halls must not
-    // start a second build of what the lift is still building. Today's double
-    // build of the Ignivar set (arena, then depths) was exactly this shape.
+    // start a second build of what the lift is still building. A per-interior
+    // claim built the Ignivar set twice this way (arena, then depths).
     const host = fakeHost();
     startInteriorEncounterPrewarm('ignivar_lift', host);
     startInteriorEncounterPrewarm('ignivar_approach', host);
@@ -463,26 +499,17 @@ describe('interior encounter prewarm pass (driven)', () => {
     // held undisposed.
     const host = fakeHost();
     const roots: THREE.Object3D[] = [];
+    const disposed: string[] = [];
+    const watched = new Set<THREE.Material>();
     const compile = host.compilePrewarmColorPrograms;
     host.compilePrewarmColorPrograms = async (root: THREE.Object3D) => {
       roots.push(root);
+      watchDisposals(root, disposed, watched);
       return compile(root);
     };
     startInteriorEncounterPrewarm('ignivar_lift', host);
     await drain();
-    const disposed: string[] = [];
-    const materials = new Set<THREE.Material>();
-    for (const root of roots) {
-      root.traverse((child) => {
-        const drawn = (child as THREE.Mesh).material;
-        if (!drawn) return;
-        for (const material of Array.isArray(drawn) ? drawn : [drawn]) materials.add(material);
-      });
-    }
-    expect(materials.size).toBeGreaterThan(20);
-    for (const material of materials) {
-      material.addEventListener('dispose', () => disposed.push(material.name || material.type));
-    }
+    expect(watched.size).toBeGreaterThan(20);
     for (const interior of ['ignivar_approach', 'ignivar', 'ignivar_depths']) {
       startInteriorEncounterPrewarm(interior, host);
       setEncounterPrewarmInterior(host, interior);
@@ -501,33 +528,25 @@ describe('interior encounter prewarm pass (driven)', () => {
     // instance origin, so a group placed once would be culled from its first
     // draw for every child after the move.
     const host = fakeHost();
-    const drawnAt: Array<{ x: number; z: number }> = [];
+    const drawnAt: Array<{ x: number; y: number; z: number }> = [];
     let moved = false;
     host.renderBoundedPrewarmRoot = ((group: THREE.Group) => {
-      drawnAt.push({ x: group.position.x, z: group.position.z });
+      drawnAt.push({ x: group.position.x, y: group.position.y, z: group.position.z });
       if (!moved) {
         moved = true;
-        host.sim.player.pos = { x: 104_800, y: 4, z: -1600 };
+        host.sim.player.pos = { x: 104_800, y: -12, z: -1600 };
       }
     }) as typeof host.renderBoundedPrewarmRoot;
     startInteriorEncounterPrewarm('ignivar_lift', host);
     await drain();
     expect(drawnAt.length).toBeGreaterThan(5);
-    expect(drawnAt[0]).toEqual({ x: 103_300, z: -1246 - 24 });
-    for (const at of drawnAt.slice(1)) expect(at).toEqual({ x: 104_800, z: -1600 - 24 });
+    expect(drawnAt[0]).toEqual({ x: 103_300, y: 4, z: -1246 - 24 });
+    for (const at of drawnAt.slice(1)) expect(at).toEqual({ x: 104_800, y: -12, z: -1600 - 24 });
   });
 
   it('gives a failed lift pass its sets back, so the next raid room builds them', async () => {
     const host = fakeHost();
-    const pos = host.sim.player.pos;
-    let failNext = true;
-    Object.defineProperty(host.sim.player, 'pos', {
-      get() {
-        if (!failNext) return pos;
-        failNext = false;
-        throw new Error('prewarm pass failed');
-      },
-    });
+    failNextPass(host);
     startInteriorEncounterPrewarm('ignivar_lift', host);
     await drain();
     expect(host.compiled).toEqual([]);
@@ -537,6 +556,43 @@ describe('interior encounter prewarm pass (driven)', () => {
     for (const name of RAID_SET_ROOTS) {
       expect(host.compiled.filter((compiled) => compiled === name)).toHaveLength(1);
     }
+  });
+
+  it('gives a failed pass back only the sets it claimed, never one an earlier room built', async () => {
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('ignivar', host);
+    await drain();
+    for (const name of IGNIVAR_SET_ROOTS) expect(countOf(host.compiled, name)).toBe(1);
+    expect(host.compiled.filter((name) => name.startsWith('varkhul-'))).toEqual([]);
+
+    // The lift finds the Ignivar set claimed, so it claims the Varkhul set
+    // alone, and that pass fails.
+    failNextPass(host);
+    startInteriorEncounterPrewarm('ignivar_lift', host);
+    await drain();
+    expect(host.compiled.filter((name) => name.startsWith('varkhul-'))).toEqual([]);
+
+    startInteriorEncounterPrewarm('ignivar_approach', host);
+    await drain();
+    for (const name of IGNIVAR_SET_ROOTS) expect(countOf(host.compiled, name)).toBe(1);
+    for (const name of VARKHUL_SET_ROOTS) expect(countOf(host.compiled, name)).toBe(1);
+  });
+
+  it("keeps another dungeon's claim when a raid pass fails", async () => {
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('nythraxis', host);
+    await drain();
+    const afterCrypt = [...host.compiled];
+    expect(afterCrypt).toContain(NYTHRAXIS_GRAVE_PREWARM_NAME);
+
+    failNextPass(host);
+    startInteriorEncounterPrewarm('ignivar_lift', host);
+    await drain();
+    expect(host.compiled).toEqual(afterCrypt);
+
+    startInteriorEncounterPrewarm('nythraxis', host);
+    await drain();
+    expect(host.compiled).toEqual(afterCrypt);
   });
 
   it('retries an interior whose first prewarm pass failed', async () => {
