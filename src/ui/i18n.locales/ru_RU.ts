@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.worldQuestTooltip.factionLine': 'Фракция: {faction}',
+  'hudChrome.worldQuestTooltip.timeRemaining': 'Осталось времени:',
+  'hudChrome.worldQuestTooltip.standingReward': 'Репутация с фракцией {faction}: +{amount}',
   'hud.core.mapMarkerLabels.hoardEntrance': 'Вход в зарытую сокровищницу',
   'hud.core.mapMarkerLabels.hoardReturnEntrance': 'Обратный вход в сокровищницу',
   'sim.rift.hoardExitOpens': 'Сокровища ваши. Вернитесь ко входу, чтобы выбраться наружу.',

@@ -2390,6 +2390,14 @@ export const zh_CN: EnTranslations = {
       "automatonCog": "机械齿轮",
       "automatonCogNote": "机械造物区域的世界任务"
     },
+    "worldQuestTooltip": {
+      "factionLine": "阵营：{faction}",
+      "timeRemaining": "剩余时间：",
+      "standingAmount": "{amount} {faction}",
+      "currencyAmount": "{amount} {currency}",
+      "standingReward": "{faction}声望 +{amount}",
+      "currencyReward": "+{amount} {currency}"
+    },
     "reputation": {
       "intro": "三个阵营同时推进：每个世界任务都会计入其所在区域的阵营。",
       "faction": {

@@ -2390,6 +2390,14 @@ export const en_XA: EnTranslations = {
       "automatonCog": "[Áúţóɱáţóñ Çóĝ]",
       "automatonCogNote": "[Ŵóŕļð Ɋúéšţš íñ Áúţóɱáţóñ žóñéš]"
     },
+    "worldQuestTooltip": {
+      "factionLine": "[Ƒáçţíóñ: {faction}]",
+      "timeRemaining": "[Ţíɱé ŕéɱáíñíñĝ:]",
+      "standingAmount": "[{amount} {faction}]",
+      "currencyAmount": "[{amount} {currency}]",
+      "standingReward": "[+{amount} {faction} Šţáñðíñĝ]",
+      "currencyReward": "[+{amount} {currency}]"
+    },
     "reputation": {
       "intro": "[Áļļ ţĥŕéé ƒáçţíóñš þŕóĝŕéšš áţ óñçé: éʋéŕý ŵóŕļð ɋúéšţ çóúñţš ţóŵáŕð ţĥé ƒáçţíóñ óƒ íţš žóñé.]",
       "faction": {

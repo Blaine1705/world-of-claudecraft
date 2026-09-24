@@ -2390,6 +2390,14 @@ export const ru_RU: EnTranslations = {
       "automatonCog": "Шестерня автоматонов",
       "automatonCogNote": "Локальные задания в землях автоматонов"
     },
+    "worldQuestTooltip": {
+      "factionLine": "Фракция: {faction}",
+      "timeRemaining": "Осталось времени:",
+      "standingAmount": "{amount} {faction}",
+      "currencyAmount": "{amount} {currency}",
+      "standingReward": "Репутация с фракцией {faction}: +{amount}",
+      "currencyReward": "+{amount} {currency}"
+    },
     "reputation": {
       "intro": "Все три фракции развиваются одновременно: каждое мировое задание идёт в зачёт фракции своей зоны.",
       "faction": {

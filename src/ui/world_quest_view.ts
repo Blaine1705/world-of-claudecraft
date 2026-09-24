@@ -1,7 +1,6 @@
 import { ITEMS, WORLD_QUESTS_BY_ID } from '../sim/data';
 import {
-  factionCurrencyName,
-  factionDisplayName,
+  type FactionId,
   worldQuestFaction,
   worldQuestFactionCurrencyReward,
   worldQuestStandingReward,
@@ -10,7 +9,7 @@ import type { WorldQuestDef } from '../sim/types';
 import { worldQuestRewardAmount } from '../sim/world_quests';
 import { mobDisplayName, vehicleStationDisplayName } from './entity_display_core';
 import { itemDisplayName, zoneDisplayName } from './entity_i18n';
-import { formatList, formatMoney, formatNumber, t } from './i18n';
+import { formatList, formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
 
 export function worldQuestDef(questId: string): WorldQuestDef | null {
@@ -87,24 +86,52 @@ export function worldQuestRewardText(quest: WorldQuestDef, level: number): strin
   return t('questUi.worldQuest.itemReward', { name });
 }
 
+// The sim's factionDisplayName / factionCurrencyName are English data labels;
+// every player-facing faction and currency name renders from these catalog keys.
+const FACTION_NAME_KEY: Readonly<Record<FactionId, TranslationKey>> = {
+  rift_watch: 'hudChrome.reputation.faction.rift_watch',
+  church_order: 'hudChrome.reputation.faction.church_order',
+  automatons: 'hudChrome.reputation.faction.automatons',
+};
+
+const FACTION_CURRENCY_NAME_KEY: Readonly<Record<FactionId, TranslationKey>> = {
+  rift_watch: 'hudChrome.currencies.riftWatchMark',
+  church_order: 'hudChrome.currencies.churchOrderCrest',
+  automatons: 'hudChrome.currencies.automatonCog',
+};
+
+const whole = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
+
+/** The localized faction name (the Reputation tab's own key). */
+export function factionNameText(factionId: FactionId): string {
+  return t(FACTION_NAME_KEY[factionId]);
+}
+
+/** The localized name of a faction's currency (the Currencies tab's own key). */
+export function factionCurrencyNameText(factionId: FactionId): string {
+  return t(FACTION_CURRENCY_NAME_KEY[factionId]);
+}
+
 export function worldQuestFactionName(quest: WorldQuestDef): string {
-  return factionDisplayName(worldQuestFaction(quest));
+  return factionNameText(worldQuestFaction(quest));
 }
 
 export function worldQuestFactionLine(quest: WorldQuestDef): string {
-  return `Faction: ${worldQuestFactionName(quest)}`;
+  return t('hudChrome.worldQuestTooltip.factionLine', { faction: worldQuestFactionName(quest) });
 }
 
 export function worldQuestStandingRewardText(quest: WorldQuestDef, level: number): string {
-  const amount = worldQuestStandingReward(quest, level);
-  const factionName = worldQuestFactionName(quest);
-  return `+${amount} ${factionName} Standing`;
+  return t('hudChrome.worldQuestTooltip.standingReward', {
+    amount: whole(worldQuestStandingReward(quest, level)),
+    faction: worldQuestFactionName(quest),
+  });
 }
 
 export function worldQuestFactionCurrencyRewardText(quest: WorldQuestDef, level: number): string {
-  const amount = worldQuestFactionCurrencyReward(quest, level);
-  const curName = factionCurrencyName(worldQuestFaction(quest));
-  return `+${amount} ${curName}`;
+  return t('hudChrome.worldQuestTooltip.currencyReward', {
+    amount: whole(worldQuestFactionCurrencyReward(quest, level)),
+    currency: factionCurrencyNameText(worldQuestFaction(quest)),
+  });
 }
 
 export function worldQuestRewardLine(quest: WorldQuestDef, level: number): string {
@@ -119,8 +146,9 @@ function durationUnit(value: number, unit: 'day' | 'hour' | 'minute'): string {
   return formatNumber(value, { style: 'unit', unit, unitDisplay: 'long' });
 }
 
-/** Localized multi-part countdown for the host-authoritative rotation deadline. */
-export function worldQuestTimeRemainingText(expiresAtMs: number, nowMs: number): string {
+/** Localized multi-part duration ("2 days, 14 hours, and 16 minutes") until the
+ *  host-authoritative rotation deadline; empty when there is no deadline. */
+export function worldQuestDurationText(expiresAtMs: number, nowMs: number): string {
   if (!Number.isFinite(expiresAtMs) || expiresAtMs <= 0 || !Number.isFinite(nowMs)) return '';
   const totalMinutes = Math.max(0, Math.ceil((expiresAtMs - nowMs) / 60_000));
   const days = Math.floor(totalMinutes / (24 * 60));
@@ -130,5 +158,11 @@ export function worldQuestTimeRemainingText(expiresAtMs: number, nowMs: number):
   if (days > 0) parts.push(durationUnit(days, 'day'));
   if (hours > 0) parts.push(durationUnit(hours, 'hour'));
   if (minutes > 0 || parts.length === 0) parts.push(durationUnit(minutes, 'minute'));
-  return t('questUi.worldQuest.expiresIn', { time: formatList(parts) });
+  return formatList(parts);
+}
+
+/** Localized multi-part countdown for the host-authoritative rotation deadline. */
+export function worldQuestTimeRemainingText(expiresAtMs: number, nowMs: number): string {
+  const time = worldQuestDurationText(expiresAtMs, nowMs);
+  return time ? t('questUi.worldQuest.expiresIn', { time }) : '';
 }

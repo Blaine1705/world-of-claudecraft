@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.worldQuestTooltip.factionLine': '勢力：{faction}',
+  'hudChrome.worldQuestTooltip.timeRemaining': '残り時間：',
+  'hudChrome.worldQuestTooltip.standingReward': '{faction}の評判 +{amount}',
   'hud.core.mapMarkerLabels.hoardEntrance': '埋もれた宝物庫の入口',
   'hud.core.mapMarkerLabels.hoardReturnEntrance': '財宝庫の帰還口',
   'sim.rift.hoardExitOpens': '財宝はあなたのものです。入口に戻って外へ登ってください。',

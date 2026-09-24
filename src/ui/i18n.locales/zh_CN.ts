@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.worldQuestTooltip.factionLine': '阵营：{faction}',
+  'hudChrome.worldQuestTooltip.timeRemaining': '剩余时间：',
+  'hudChrome.worldQuestTooltip.standingReward': '{faction}声望 +{amount}',
   'hud.core.mapMarkerLabels.hoardEntrance': '埋藏宝藏入口',
   'hud.core.mapMarkerLabels.hoardReturnEntrance': '宝藏返回入口',
   'sim.rift.hoardExitOpens': '宝藏已经属于你。返回入口并爬出去。',

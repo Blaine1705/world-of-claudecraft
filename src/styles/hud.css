@@ -7532,6 +7532,115 @@
     color: var(--color-text-muted);
     font-size: 12px;
   }
+  /* The world quest hover card (src/ui/hud/map/world_quest_tooltip_html.ts):
+     white title, gold faction / time label / Rewards head, then one reward per
+     row with its art inline at text size (em-sized, so the Tooltip Text Size
+     setting scales the icons with the words). An item reward embeds the shared
+     item card beside its icon. */
+  #tooltip .wq-tt {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    max-width: 300px;
+  }
+  #tooltip .wq-tt-faction,
+  #tooltip .wq-tt-label,
+  #tooltip .wq-tt-rewards-head,
+  #tooltip .wq-tt-ilvl {
+    color: var(--gold);
+  }
+  #tooltip .wq-tt-time {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.35em;
+    color: var(--color-text-light);
+  }
+  #tooltip .wq-tt-objective {
+    color: var(--color-text-light);
+  }
+  #tooltip .wq-tt-objective::before {
+    content: "- ";
+  }
+  #tooltip .wq-tt-rewards-head {
+    margin-top: 0.75em;
+    font-family: var(--title-font);
+    font-size: 1.08em;
+  }
+  #tooltip .wq-tt-rewards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    margin-top: 0.2em;
+  }
+  #tooltip .wq-tt-reward {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+    color: var(--color-text-light);
+  }
+  #tooltip .wq-tt-icon {
+    flex: none;
+    width: 1.4em;
+    height: 1.4em;
+    border-radius: 3px;
+    object-fit: cover;
+  }
+  /* Faction standing: the faction art inside the Reputation tab's crest shape, so
+     it reads apart from the currency row that shows the same art bare. */
+  #tooltip .wq-tt-crest {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4em;
+    height: 1.6em;
+    border: 1px solid var(--gold-dim);
+    border-radius: 3px 3px 0.7em 0.7em;
+    background: var(--socket-fill);
+  }
+  #tooltip .wq-tt-crest .wq-tt-icon {
+    width: 1.05em;
+    height: 1.05em;
+  }
+  #tooltip .wq-tt-xp-orb {
+    flex: none;
+    width: 1.1em;
+    height: 1.1em;
+    margin: 0 0.15em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--color-xp), var(--color-xp-deep));
+  }
+  #tooltip .wq-tt-reward.is-money .coin {
+    width: 1em;
+    height: 1em;
+    margin-left: 0.25em;
+    margin-right: 0.45em;
+  }
+  #tooltip .wq-tt-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6em;
+    margin-top: 0.15em;
+  }
+  #tooltip .wq-tt-item-icon {
+    position: relative;
+    flex: none;
+  }
+  #tooltip .wq-tt-item-icon .item-icon {
+    width: 3em;
+    height: 3em;
+  }
+  #tooltip .wq-tt-item-count {
+    position: absolute;
+    right: 3px;
+    bottom: 1px;
+    color: var(--color-text-light);
+    text-shadow: var(--title-shadow);
+  }
+  #tooltip .wq-tt-item-card {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
   /* Questie-style quest lines in the mob tooltip: quest title in green over
      its objective progress in gold, between level/family and the reaction. */
   #tooltip.mob-tooltip .tt-quest-name {

@@ -2390,6 +2390,14 @@ export const id_ID: EnTranslations = {
       "automatonCog": "Automaton Cog",
       "automatonCogNote": "World Quests in Automaton zones"
     },
+    "worldQuestTooltip": {
+      "factionLine": "Faction: {faction}",
+      "timeRemaining": "Time remaining:",
+      "standingAmount": "{amount} {faction}",
+      "currencyAmount": "{amount} {currency}",
+      "standingReward": "+{amount} {faction} Standing",
+      "currencyReward": "+{amount} {currency}"
+    },
     "reputation": {
       "intro": "All three factions progress at once: every world quest counts toward the faction of its zone.",
       "faction": {

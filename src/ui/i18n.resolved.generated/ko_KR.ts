@@ -2390,6 +2390,14 @@ export const ko_KR: EnTranslations = {
       "automatonCog": "오토마톤 톱니",
       "automatonCogNote": "오토마톤 지역의 월드 퀘스트"
     },
+    "worldQuestTooltip": {
+      "factionLine": "세력: {faction}",
+      "timeRemaining": "남은 시간:",
+      "standingAmount": "{amount} {faction}",
+      "currencyAmount": "{amount} {currency}",
+      "standingReward": "{faction} 평판 +{amount}",
+      "currencyReward": "+{amount} {currency}"
+    },
     "reputation": {
       "intro": "세 세력이 동시에 진행됩니다. 모든 월드 퀘스트는 해당 지역의 세력에 반영됩니다.",
       "faction": {

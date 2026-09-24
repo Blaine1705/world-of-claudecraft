@@ -3055,6 +3055,16 @@ export const hudChromeStrings = {
     automatonCog: 'Automaton Cog',
     automatonCogNote: 'World Quests in Automaton zones',
   },
+  // The world quest hover card (src/ui/hud/map/world_quest_tooltip_view.ts) and the
+  // plain reward texts world_quest_view.ts builds for the screen-reader summary.
+  worldQuestTooltip: {
+    factionLine: 'Faction: {faction}',
+    timeRemaining: 'Time remaining:',
+    standingAmount: '{amount} {faction}',
+    currencyAmount: '{amount} {currency}',
+    standingReward: '+{amount} {faction} Standing',
+    currencyReward: '+{amount} {currency}',
+  },
   // The Reputation tab (src/ui/hud/reputation/). Faction and tier names are
   // PROVISIONAL: the World Quests scope leaves the final names to narrative.
   reputation: {

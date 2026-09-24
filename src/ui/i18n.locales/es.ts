@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.worldQuestTooltip.factionLine': 'Facción: {faction}',
+  'hudChrome.worldQuestTooltip.timeRemaining': 'Tiempo restante:',
+  'hudChrome.worldQuestTooltip.standingReward': '+{amount} de reputación con {faction}',
   'hud.errors.cannotCastWhileMoving': 'No puedes lanzar hechizos mientras te mueves.',
   'hudChrome.auraEffect.wolfForm':
     'Forma de gato: daño cuerpo a cuerpo y energía; velocidad de movimiento aumentada un {pct}%',

@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.worldQuestTooltip.factionLine': '세력: {faction}',
+  'hudChrome.worldQuestTooltip.timeRemaining': '남은 시간:',
+  'hudChrome.worldQuestTooltip.standingReward': '{faction} 평판 +{amount}',
   'hud.core.mapMarkerLabels.hoardEntrance': '묻힌 보물 창고 입구',
   'hud.core.mapMarkerLabels.hoardReturnEntrance': '보물 귀환 입구',
   'sim.rift.hoardExitOpens': '보물은 당신의 것입니다. 입구로 돌아가 밖으로 올라가세요.',
