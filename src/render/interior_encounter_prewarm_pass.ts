@@ -13,13 +13,16 @@ import { buildIgnivarEncounterPrewarmVisual } from './ignivar_encounter';
 import { buildIgnivarForgeJudgmentPrewarmVisual } from './ignivar_forge_judgment';
 import { buildIgnivarRotatingRaysPrewarmVisual } from './ignivar_rotating_rays';
 import {
+  type EncounterPrewarmSet,
   encounterPrewarmDisabled,
   encounterPrewarmForInterior,
+  encounterPrewarmSpecForSets,
   type InteriorEncounterPrewarmSpec,
   type LiveSoulRendLook,
   liveSoulRendPrewarmIdentity,
   planInteriorEncounterPrewarm,
   shouldQueueLiveSoulRendPrewarm,
+  unclaimedEncounterPrewarmSets,
   vfxWeaponSkinIds,
 } from './interior_encounter_prewarm';
 import type { InteriorEncounterPrewarmHost } from './interior_encounter_prewarm_host';
@@ -38,7 +41,7 @@ import { buildVarkhulInterceptBeamPrewarmVisual } from './varkhul_intercept_beam
 import { buildVarkhulWorldfirePrewarmVisual } from './varkhul_worldfire_visual';
 import { WEAPON_VFX } from './weapon_vfx';
 
-const startedByHost = new WeakMap<object, Set<string>>();
+const startedByHost = new WeakMap<object, Set<EncounterPrewarmSet>>();
 const keepAliveByHost = new WeakMap<object, CharacterVisual[]>();
 const varkhulKeepAliveByHost = new WeakMap<object, THREE.Group[]>();
 const varkhulPortalKeepAliveByHost = new WeakMap<object, VarkhulForgePortalPrewarmVisual[]>();
@@ -73,20 +76,23 @@ export function startInteriorEncounterPrewarm(interior: string, host: object): v
   if (!spec || typed.shutdownStarted) return;
   // The attach is the earliest honest answer to "which interior is live".
   setEncounterPrewarmInterior(host, interior);
-  // Held as a const so the failure arm below can close over it.
-  const started = startedByHost.get(host) ?? new Set<string>();
+  const started = startedByHost.get(host) ?? new Set<EncounterPrewarmSet>();
   startedByHost.set(host, started);
-  if (!started.has(interior)) {
-    started.add(interior);
+  // Claimed per SET, not per interior: the raid reaches the Varkhul and Ignivar
+  // sets from several interiors, and a set an earlier room is still building
+  // must not be built a second time beside it.
+  const sets = unclaimedEncounterPrewarmSets(spec, started);
+  if (sets.length > 0) {
+    for (const set of sets) started.add(set);
     // Handled the moment it exists: the background GPU queue REJECTS every
     // pending unit when the renderer shuts down (logout, graphics rebuild), and
     // a rejection sitting un-awaited across that window is reported as an
     // unhandledrejection, which is the client's fatal overlay.
-    // Forget the interior again on failure: the key is claimed BEFORE the work,
-    // so a rejected pass (a shutdown mid-flight, a compile that threw) would
-    // otherwise leave the catalog cold for the session and link it at first draw.
-    void runInteriorEncounterPrewarm(spec, typed).catch(() => {
-      started.delete(interior);
+    // Forget the sets again on failure: they are claimed BEFORE the work, so a
+    // rejected pass (a shutdown mid-flight, a compile that threw) would
+    // otherwise leave them cold for the session and link them at first draw.
+    void runInteriorEncounterPrewarm(encounterPrewarmSpecForSets(spec, sets), typed).catch(() => {
+      for (const set of sets) started.delete(set);
     });
   }
   for (const [id, view] of typed.views) {

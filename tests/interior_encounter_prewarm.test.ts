@@ -1,13 +1,17 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  ENCOUNTER_PREWARM_SETS,
+  type EncounterPrewarmSet,
   encounterPrewarmDisabled,
   encounterPrewarmForInterior,
+  encounterPrewarmSpecForSets,
   INTERIOR_ENCOUNTER_PREWARM,
   type LiveSoulRendLook,
   liveSoulRendPrewarmIdentity,
   planInteriorEncounterPrewarm,
   shouldQueueLiveSoulRendPrewarm,
+  unclaimedEncounterPrewarmSets,
   vfxWeaponSkinIds,
 } from '../src/render/interior_encounter_prewarm';
 import { prewarmProgramContentKeys } from '../src/render/prewarm_policy';
@@ -40,6 +44,62 @@ describe('interior encounter prewarm spec', () => {
         weaponSkinIds: ['ice_fang_sword'],
       }),
     ).toEqual({ playerClasses: [], weaponSkinIds: [] });
+  });
+
+  it('warms both raid sets from the Forge-Lift and the Halls, before either boss room', () => {
+    for (const interior of ['ignivar_lift', 'ignivar_approach']) {
+      const spec = INTERIOR_ENCOUNTER_PREWARM[interior];
+      expect(spec).toEqual({
+        soulRendPlayerClasses: false,
+        soulRendVfxWeaponSkins: false,
+        soulRendLivePlayerVisuals: false,
+        varkhulVisuals: true,
+        ignivarVisuals: true,
+      });
+      expect(encounterPrewarmForInterior(interior)).toEqual(spec);
+    }
+  });
+
+  it('claims a set once whichever interior asks, and narrows a spec to the unclaimed sets', () => {
+    const lift = INTERIOR_ENCOUNTER_PREWARM.ignivar_lift;
+    const claimed = new Set<EncounterPrewarmSet>();
+    expect(unclaimedEncounterPrewarmSets(lift, claimed)).toEqual([
+      'varkhulVisuals',
+      'ignivarVisuals',
+    ]);
+    claimed.add('varkhulVisuals');
+    claimed.add('ignivarVisuals');
+    for (const interior of ['ignivar_approach', 'ignivar', 'ignivar_depths']) {
+      expect(unclaimedEncounterPrewarmSets(INTERIOR_ENCOUNTER_PREWARM[interior], claimed)).toEqual(
+        [],
+      );
+    }
+    // A claim on the raid sets says nothing about the crypt's.
+    expect(unclaimedEncounterPrewarmSets(INTERIOR_ENCOUNTER_PREWARM.nythraxis, claimed)).toEqual([
+      'soulRendPlayerClasses',
+      'soulRendVfxWeaponSkins',
+      'nythraxisGraveVisuals',
+    ]);
+
+    // Every staged set, one per flag the spec can carry, and the live arm is
+    // not one: it warms per body, never once per session.
+    expect([...ENCOUNTER_PREWARM_SETS].sort()).toEqual([
+      'ignivarVisuals',
+      'nythraxisGraveVisuals',
+      'soulRendPlayerClasses',
+      'soulRendVfxWeaponSkins',
+      'varkhulVisuals',
+    ]);
+    const depths = INTERIOR_ENCOUNTER_PREWARM.ignivar_depths;
+    const onlyIgnivar = encounterPrewarmSpecForSets(depths, ['ignivarVisuals']);
+    expect(onlyIgnivar.ignivarVisuals).toBe(true);
+    expect(onlyIgnivar.varkhulVisuals).toBe(false);
+    for (const set of ENCOUNTER_PREWARM_SETS) {
+      expect(encounterPrewarmSpecForSets(depths, [set])[set]).toBe(true);
+      expect(encounterPrewarmSpecForSets(depths, [])[set]).toBe(false);
+    }
+    const nythraxis = INTERIOR_ENCOUNTER_PREWARM.nythraxis;
+    expect(encounterPrewarmSpecForSets(nythraxis, []).soulRendLivePlayerVisuals).toBe(true);
   });
 
   it('warms the Ignivar mechanic visuals in the Crucible arena, without the Varkhul set', () => {

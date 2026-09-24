@@ -114,6 +114,19 @@ const drain = async (): Promise<void> => {
   for (let i = 0; i < 200; i++) await new Promise((resolve) => setTimeout(resolve, 0));
 };
 
+// One root per staged unit of the Varkhul and Ignivar sets, as each builder names it.
+const RAID_SET_ROOTS = [
+  'varkhul-encounter-prewarm-entity',
+  'varkhul-forge-beam-prewarm',
+  'varkhul-tempering-ray-prewarm',
+  'varkhul-forge-portal-prewarm',
+  'varkhul-worldfire-prewarm',
+  'varkhul-assembly-prewarm',
+  'ignivar-encounter-prewarm-entity',
+  'ignivar-rotating-rays-prewarm',
+  'ignivar-forge-judgment-prewarm',
+];
+
 describe('interior encounter prewarm host contract', () => {
   it('names only members the renderer actually declares', () => {
     // The pass reaches its host through a cast, because most of what it needs is
@@ -248,6 +261,108 @@ describe('interior encounter prewarm pass (driven)', () => {
     expect(host.compiled).toContain('ignivar-rotating-rays-prewarm');
     expect(host.compiled).toContain('ignivar-forge-judgment-prewarm');
     expect(host.compiled.filter((name) => name.startsWith('varkhul-'))).toEqual([]);
+  });
+
+  it('builds each raid set once per session, from the Forge-Lift on', async () => {
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('ignivar_lift', host);
+    await drain();
+    // The lift starts BOTH raid sets: it is the one quiet room before them.
+    for (const name of RAID_SET_ROOTS) expect(host.compiled).toContain(name);
+    const afterLift = [...host.compiled];
+
+    // Every later raid interior finds its sets claimed and builds nothing.
+    for (const interior of ['ignivar_approach', 'ignivar', 'ignivar_approach', 'ignivar_depths']) {
+      startInteriorEncounterPrewarm(interior, host);
+      await drain();
+    }
+    expect(host.compiled).toEqual(afterLift);
+  });
+
+  it('builds a set once when the next room attaches while the first pass still runs', async () => {
+    // A raid walks out of the lift before its pass drains; the Halls must not
+    // start a second build of what the lift is still building. Today's double
+    // build of the Ignivar set (arena, then depths) was exactly this shape.
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('ignivar_lift', host);
+    startInteriorEncounterPrewarm('ignivar_approach', host);
+    startInteriorEncounterPrewarm('ignivar', host);
+    startInteriorEncounterPrewarm('ignivar_depths', host);
+    await drain();
+    for (const name of RAID_SET_ROOTS) {
+      expect(host.compiled.filter((compiled) => compiled === name)).toHaveLength(1);
+    }
+  });
+
+  it('builds the Ignivar set once across the arena and the depths', async () => {
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('ignivar', host);
+    await drain();
+    startInteriorEncounterPrewarm('ignivar_depths', host);
+    await drain();
+    for (const name of RAID_SET_ROOTS) {
+      expect(host.compiled.filter((compiled) => compiled === name)).toHaveLength(1);
+    }
+  });
+
+  it('keeps what the lift linked alive across the interior change', async () => {
+    // Programs are per GL context and three drops one with its last material:
+    // the lift's work survives the rooms after it only while its stand-ins are
+    // held undisposed.
+    const host = fakeHost();
+    const roots: THREE.Object3D[] = [];
+    const compile = host.compilePrewarmColorPrograms;
+    host.compilePrewarmColorPrograms = async (root: THREE.Object3D) => {
+      roots.push(root);
+      return compile(root);
+    };
+    startInteriorEncounterPrewarm('ignivar_lift', host);
+    await drain();
+    const disposed: string[] = [];
+    const materials = new Set<THREE.Material>();
+    for (const root of roots) {
+      root.traverse((child) => {
+        const drawn = (child as THREE.Mesh).material;
+        if (!drawn) return;
+        for (const material of Array.isArray(drawn) ? drawn : [drawn]) materials.add(material);
+      });
+    }
+    expect(materials.size).toBeGreaterThan(20);
+    for (const material of materials) {
+      material.addEventListener('dispose', () => disposed.push(material.name || material.type));
+    }
+    for (const interior of ['ignivar_approach', 'ignivar', 'ignivar_depths']) {
+      startInteriorEncounterPrewarm(interior, host);
+      setEncounterPrewarmInterior(host, interior);
+      await drain();
+    }
+    expect(disposed).toEqual([]);
+    for (const staged of roots) {
+      expect(staged.parent).toBeNull();
+      expect(staged.visible).toBe(false);
+    }
+  });
+
+  it('gives a failed lift pass its sets back, so the next raid room builds them', async () => {
+    const host = fakeHost();
+    const pos = host.sim.player.pos;
+    let failNext = true;
+    Object.defineProperty(host.sim.player, 'pos', {
+      get() {
+        if (!failNext) return pos;
+        failNext = false;
+        throw new Error('prewarm pass failed');
+      },
+    });
+    startInteriorEncounterPrewarm('ignivar_lift', host);
+    await drain();
+    expect(host.compiled).toEqual([]);
+
+    startInteriorEncounterPrewarm('ignivar_approach', host);
+    await drain();
+    for (const name of RAID_SET_ROOTS) {
+      expect(host.compiled.filter((compiled) => compiled === name)).toHaveLength(1);
+    }
   });
 
   it('retries an interior whose first prewarm pass failed', async () => {
