@@ -84,7 +84,7 @@ function fixture(cls: string, warriorTextures = true) {
   const labels: string[] = [];
   const queue = {
     run: vi.fn((work: PrewarmResumeUnit['run'], priority: number, label: string) => {
-      expect(priority).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
+      expect(priority).toBe(GPU_WORK_PRIORITY.VISIBLE_PREWARM);
       labels.push(label);
       return new Promise<void>((resolve, reject) => jobs.push({ work, resolve, reject, label }));
     }),

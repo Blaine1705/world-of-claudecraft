@@ -35,6 +35,14 @@ export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
   'leap_rupture',
   ...WARRIOR_PRESSURE_KINDS,
 ];
+/** The kit's queue priority. The kit is a cosmetic upgrade gated by its own
+ *  readiness (the baked layers wait on `textureReady`, the crests on their
+ *  prepared slots), so the generic presentation carries every cast until it
+ *  lands and nothing here is actionable. Approaching work takes the per-frame
+ *  budget: at most one big upload per presented frame, where the actionable
+ *  floor admitted all ten sheets into one 533 to 635 ms freeze on an Intel
+ *  HD 530 (a 2048px WebP costs about 100 ms of decode plus upload). */
+export const ACTIVE_KIT_PRIORITY = GPU_WORK_PRIORITY.VISIBLE_PREWARM;
 interface ActiveKitHost {
   queue: Pick<BackgroundGpuQueue, 'run'>;
   /** Start (or join) the kit's demand-loaded assets before any unit runs;
@@ -200,7 +208,7 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
         () => {
           if (!state.cancelled) return unit.run();
         },
-        GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+        ACTIVE_KIT_PRIORITY,
         unit.id,
         {
           // Synchronous uploads/touches cannot add an asynchronous driver

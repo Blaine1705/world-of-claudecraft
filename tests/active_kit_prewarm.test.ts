@@ -17,6 +17,8 @@ import { WarriorGuardPlates } from '../src/render/ability_vfx/warrior_guard_plat
 import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms';
 import { WarriorSpiritHammers } from '../src/render/ability_vfx/warrior_spirit_hammers';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import { createGpuPrepAdmission } from '../src/render/gpu_prep_admission';
+import { createGpuPrepBudget } from '../src/render/gpu_prep_budget_core';
 import type { PrewarmResumeUnit } from '../src/render/prewarm_resume';
 
 function fixture(cls = 'warrior') {
@@ -125,7 +127,7 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     await ensureActiveAbilityKit(f.scene);
     expect(f.queue.run).toHaveBeenCalledTimes(118);
     for (const call of f.queue.run.mock.calls as unknown[][]) {
-      expect(call[1]).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
+      expect(call[1]).toBe(GPU_WORK_PRIORITY.VISIBLE_PREWARM);
       expect(call[3]).toEqual({ releaseTail: String(call[2]).startsWith('crest-compile:') });
     }
     expect(f.upload).toHaveBeenCalledTimes(10);
@@ -417,6 +419,60 @@ it('prepares remote Warriors for a Mage only after first paint, retaining fallba
     for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind)).toBe(true);
     expect(f.prep.ready('fire')).toBe(false);
   } finally {
+    f.close();
+  }
+});
+
+it('spreads the kit texture uploads one per presented frame under the real queue and budget', async () => {
+  // Measured on an Intel HD 530: each 2048px sheet costs about 100 ms of
+  // decode plus upload, and all ten ran back to back with no frame between
+  // them (one 533 to 635 ms freeze). The kit is a cosmetic upgrade gated by its
+  // own readiness, so its uploads must take the per-frame budget, not the
+  // actionable floor that admits them all into one frame.
+  const f = fixture();
+  let clock = 0;
+  const budget = createGpuPrepBudget();
+  const queue = createBackgroundGpuQueue({
+    now: () => clock,
+    admission: createGpuPrepAdmission(budget),
+  });
+  const uploadsPerFrame: number[] = [0];
+  const flush = async () => {
+    for (let i = 0; i < 50; i++) await Promise.resolve();
+  };
+  let lastFrameAt = 0;
+  const frame = () => {
+    clock += 16;
+    budget.noteFrame(clock - lastFrameAt);
+    queue.noteFrame(clock);
+    lastFrameAt = clock;
+    uploadsPerFrame.push(0);
+  };
+  try {
+    activeKitPrewarmEntry(f.scene, 'warrior', {
+      queue,
+      geometry: () => [],
+      texture: (texture) => {
+        f.upload(texture);
+        clock += 100;
+        uploadsPerFrame[uploadsPerFrame.length - 1]++;
+      },
+    });
+    // The kit starts after first paint: the frame clock is already running.
+    frame();
+    const task = ensureActiveAbilityKit(f.scene);
+    for (let i = 0; i < 40 && f.upload.mock.calls.length < 10; i++) {
+      await flush();
+      frame();
+    }
+    await task;
+    expect(f.upload).toHaveBeenCalledTimes(10);
+    expect(Math.max(...uploadsPerFrame)).toBe(1);
+    // Paced, never starved: one upload per frame, ten frames.
+    expect(uploadsPerFrame.filter((count) => count > 0)).toHaveLength(10);
+    expect(uploadsPerFrame.length).toBeLessThanOrEqual(13);
+  } finally {
+    await queue.shutdown();
     f.close();
   }
 });
