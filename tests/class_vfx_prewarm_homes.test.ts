@@ -18,6 +18,8 @@ import { drawProgramSignature } from '../src/render/draw_program_signature_core'
 import { NeedleOfFateVfx } from '../src/render/needle_of_fate_vfx';
 import { SentenceVfx } from '../src/render/sentence_vfx';
 import { UmbralAnchorMarker } from '../src/render/umbral_anchor_marker';
+import { UMBRAL_ANCHOR_ID } from '../src/sim/combat/warlock_utility';
+import type { Entity } from '../src/sim/types';
 import { drawsUnder, threeProgramKeys } from './helpers/three_program_keys';
 
 const TEST_TEXTURES = {
@@ -164,4 +166,70 @@ describe('class VFX pools are reachable by the ability-VFX prewarm walk', () => 
       expectOneUnitPerProgram(lowDetail ? 'needleLow' : 'needleFull', scene);
     });
   }
+});
+
+/** Each draw under the pool, with its tag and its program signature. */
+const drawState = (root: THREE.Object3D): string[] =>
+  drawsUnder(root).map(
+    ({ object, material }) =>
+      `${object.uuid}|${object.userData.renderCategory}|${drawProgramSignature(object, material)}`,
+  );
+/** Whether some draw under `root` is on screen: the play really spawned. */
+const shows = (root: THREE.Object3D): boolean =>
+  drawsUnder(root).some(({ object }) => {
+    for (let node: THREE.Object3D | null = object; node; node = node.parent) {
+      if (!node.visible) return false;
+    }
+    return true;
+  });
+const at = (_id: number, _height: number, out: THREE.Vector3): boolean => {
+  out.set(3, 0, 3);
+  return true;
+};
+const anchored = {
+  id: 1,
+  auras: [
+    { id: UMBRAL_ANCHOR_ID, kind: 'warlock_anchor', sourceId: 1, value: 0, value2: 0, value3: 0 },
+  ],
+} as unknown as Entity;
+/** `update` takes the elapsed seconds; each frame is a thirtieth of one. */
+type Played = { root: THREE.Object3D; play: () => void; update: (time: number) => void };
+
+// The pools are built once, at construction, and the walk above runs over that
+// build: a cast that added a drawable, or left one untagged or on another
+// program, would link it live whatever the gate said.
+// biome-ignore format: one pool per row
+const PLAYS: Array<[string, (scene: THREE.Scene) => Played]> = [
+  ['Drain Life', (scene) => {
+    const vfx = new DrainLifeVfx(scene, (_id, _h, _x, _z, out) => out?.set(1, 0, 1) ?? null, vi.fn());
+    const play = () => [vfx.drain(1, 2, 3), vfx.demonicDrain(3, 2, 3), vfx.evilEyeGaze(4, 2), vfx.tick(1)];
+    return { root: scene, play, update: () => vfx.update(1 / 30) };
+  }],
+  ['Umbral Anchor (draped)', (scene) => {
+    const marker = new UmbralAnchorMarker(() => 0.5);
+    scene.add(marker.group);
+    return { root: marker.group, play: () => marker.update(anchored, 0), update: (time) => marker.update(anchored, time) };
+  }],
+  ...[false, true].flatMap((low): Array<[string, (scene: THREE.Scene) => Played]> => [
+    [`Sentence (${low ? 'low' : 'full'} detail)`, (scene) => {
+      const vfx = new SentenceVfx(scene, new THREE.PerspectiveCamera(), at, low, vi.fn(), TEST_TEXTURES);
+      return { root: vfx.group, play: () => vfx.trigger(1, 2, 80, 3), update: () => vfx.update(1 / 30) };
+    }],
+    [`Needle of Fate (${low ? 'low' : 'full'} detail)`, (scene) => {
+      const vfx = new NeedleOfFateVfx(scene, new THREE.PerspectiveCamera(), at, low, vi.fn());
+      return { root: vfx.group, play: () => [vfx.beginCast(1, 1), vfx.spawn(1, 2)], update: () => vfx.update(1 / 30) };
+    }],
+  ]),
+];
+
+it.each(PLAYS)('%s: a cast adds no drawable and moves none off its tag or program', (_, build) => {
+  const pool = build(new THREE.Scene());
+  const built = drawState(pool.root);
+  expect(built.length).toBeGreaterThan(0);
+  expect(built.filter((line) => !line.includes('|vfx|'))).toEqual([]);
+  pool.play();
+  pool.update(1 / 30);
+  expect(shows(pool.root)).toBe(true);
+  for (let frame = 2; frame <= 90; frame++) pool.update(frame / 30);
+  expect(drawState(pool.root)).toEqual(built);
 });
