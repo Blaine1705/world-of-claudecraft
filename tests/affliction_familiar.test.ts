@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { AfflictionFamiliar } from '../src/render/affliction_familiar';
 import type { Entity } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
+import { stripComments } from './helpers/strip_comments';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/maledict_eye.glb');
@@ -99,7 +100,9 @@ describe('Affliction Maledict Eye familiar', () => {
       path.join(REPO_ROOT, 'src/render/affliction_familiar.ts'),
       'utf8',
     );
-    const rendererSource = readFileSync(path.join(REPO_ROOT, 'src/render/renderer.ts'), 'utf8');
+    const rendererSource = stripComments(
+      readFileSync(path.join(REPO_ROOT, 'src/render/renderer.ts'), 'utf8'),
+    );
     expect(familiarSource).toContain("const MODEL_URL = '/models/props/maledict_eye.glb'");
     expect(familiarSource).toContain('loadGltf(MODEL_URL)');
     // Deferred, never eager: the launch-burst OOM lane (defer_launcher_preloads).
