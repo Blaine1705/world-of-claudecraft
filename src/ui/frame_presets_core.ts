@@ -1,10 +1,9 @@
-import type { GameSettings } from '../game/settings';
 import { transferKeyAllowed } from './settings_transfer_core';
 
 export const FRAME_PRESET_LIMIT = 10;
 export const FRAME_PRESETS_MAX_LENGTH = 1024 * 1024;
 export const FRAME_PRESETS_KEY = 'woc_frame_presets_v1';
-export const FRAME_PRESET_SETTINGS = new Set<keyof GameSettings>([
+export const FRAME_PRESET_SETTINGS = new Set([
   'playerFrameScale',
   'targetFrameScale',
   'partyFrameScale',
@@ -64,11 +63,12 @@ export const FRAME_PRESET_SETTINGS = new Set<keyof GameSettings>([
   'showUtilityModes',
   'showFriendlyTrack',
   'showShieldTrack',
-]);
+] as const);
+type FramePresetSetting = typeof FRAME_PRESET_SETTINGS extends Set<infer Key> ? Key : never;
 export interface FramePreset {
   name: string;
   geometry: Record<string, string>;
-  settings: Partial<GameSettings>;
+  settings: Partial<Record<FramePresetSetting, number | boolean>>;
 }
 export function framePresetGeometryKey(key: string): boolean {
   return (
@@ -109,7 +109,7 @@ export function parseFramePresets(text: string | null): (FramePreset | null)[] {
       )
         return null;
       const geometry: Record<string, string> = {};
-      const settings: Partial<GameSettings> = {};
+      const settings: Partial<Record<FramePresetSetting, number | boolean>> = {};
       for (const [key, value] of Object.entries(slot.geometry))
         if (framePresetGeometryKey(key) && typeof value === 'string' && value.length <= 128 * 1024)
           geometry[key] = value;
@@ -126,8 +126,8 @@ export function parseFramePresets(text: string | null): (FramePreset | null)[] {
   }
 }
 
-export function isFramePresetSetting(key: string): key is keyof GameSettings {
-  return FRAME_PRESET_SETTINGS.has(key as keyof GameSettings);
+export function isFramePresetSetting(key: string): key is FramePresetSetting {
+  return FRAME_PRESET_SETTINGS.has(key as FramePresetSetting);
 }
 
 /** A portable saved layout, with the same allowlists as local preset storage. */

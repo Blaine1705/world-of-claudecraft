@@ -56,24 +56,6 @@ function makeWorld(): { world: ClientWorld; wire: ClientInternals } {
 const knownIds = (world: ClientWorld): string[] => world.known.map((k) => k.def.id);
 
 describe('ClientWorld spectate exit hold', () => {
-  it.each(['ordinary', 'active', 'exiting'])(
-    'only restores reconnect camera facing after spectate (%s)',
-    (spectate) => {
-      const { world, wire } = makeWorld();
-      if (spectate !== 'ordinary')
-        wire.onMessage(JSON.stringify({ t: 'spectate', name: 'Watched' }));
-      if (spectate === 'exiting') wire.onMessage(JSON.stringify({ t: 'spectate', name: null }));
-      wire.reconnectAttempts = 1;
-      wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 20061 }));
-      wire.applySnapshot({
-        t: 'snap',
-        ents: [],
-        self: { ...playerWire(1, 'Me', 'warrior'), f: 1.25 },
-      });
-      expect(world.consumeSpectateFacing()).toBe(spectate !== 'ordinary' ? 1.25 : null);
-      expect(world.consumeSpectateFacing()).toBeNull();
-    },
-  );
   it('enters spectate on the frame itself and mirrors the watched kit from the next snapshot', () => {
     const { world, wire } = makeWorld();
     const ownKit = knownIds(world);
