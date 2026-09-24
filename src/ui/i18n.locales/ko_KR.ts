@@ -17187,4 +17187,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '이름을 사용하여 타운 허브로 순간이동합니다.',
   'devCommand.actions.town.label': '타운 허브',
   'devCommand.fields.town': '도시',
+  'hudChrome.framePresets.apply': '적용',
+  'hudChrome.focusTargets.showEmpty': '빈 주시 대상 프레임 표시',
+  'hudChrome.focusTargets.assignHint':
+    '대상을 선택하세요. {key} 키를 누르거나 {button} 버튼을 클릭하세요.',
+  'hudChrome.focusTargets.assignClickHint': '대상을 선택하고 {button} 버튼을 클릭하세요.',
+  'hudChrome.focusTargets.ally': '아군',
+  'hudChrome.focusTargets.enemy': '적',
 };

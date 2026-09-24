@@ -49,7 +49,9 @@ describe('focus targets', () => {
       },
       setTransform: vi.fn(),
       setWidth: vi.fn(),
-      setStyleProp: vi.fn(),
+      setStyleProp: (el, name, value) => {
+        el?.style.setProperty(name, value);
+      },
       setAttr: vi.fn(),
       toggleClass: (el, cls, on) => {
         el?.classList.toggle(cls, on);

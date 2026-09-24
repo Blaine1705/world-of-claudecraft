@@ -6219,12 +6219,14 @@
     overflow-y: auto;
     overflow-x: hidden;
   }
-  /* The title bar is the move handle. Buttons inside keep their own cursor and
+  /* The detached panel is the move handle. Buttons inside keep their own cursor and
      their own pointerdown (meters_frame.ts ignores a press that lands on one). */
+  .mt-panel.mt-move-handle,
   .mt-panel .mt-move-handle {
-    cursor: var(--cursor-point);
+    cursor: var(--cursor-move, move);
     touch-action: none;
   }
+  .mt-panel.mt-move-handle button,
   .mt-panel .mt-move-handle button {
     touch-action: auto;
   }
@@ -6262,6 +6264,7 @@
   body.mobile-touch .panel-resize-grip {
     display: none;
   }
+  body.mobile-touch .mt-panel.mt-move-handle,
   body.mobile-touch .mt-panel .mt-move-handle {
     cursor: default;
     touch-action: auto;

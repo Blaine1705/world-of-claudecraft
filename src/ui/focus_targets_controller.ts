@@ -234,11 +234,11 @@ export class FocusTargetsController {
           : '',
       );
       writers.setDisplay(row.assign, id === null ? '' : 'none');
-      writers.setDisplay(row.hint, id === null ? '' : 'none');
+      writers.setStyleProp(row.hint, 'display', id === null ? '' : 'none');
       const entity = id === null ? undefined : world.entities.get(id);
       const hostile = entity ? this.hostile(entity, world) : false;
       writers.setText(row.key, key);
-      writers.setDisplay(row.key, key ? '' : 'none');
+      writers.setStyleProp(row.key, 'display', key ? '' : 'none');
       writers.setText(
         row.reaction,
         entity ? t(hostile ? 'hudChrome.focusTargets.enemy' : 'hudChrome.focusTargets.ally') : '',

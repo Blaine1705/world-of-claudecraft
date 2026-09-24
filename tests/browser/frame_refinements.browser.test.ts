@@ -256,6 +256,7 @@ describe('frame refinements', () => {
     const controller = new FocusTargetsController({
       document,
       world: () => world,
+      showEmpty: () => true,
       keybinds: { primaryLabel: () => 'Ctrl+F1' },
       writers: makeWriterFacet(
         new WeakMap(),

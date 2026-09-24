@@ -332,7 +332,7 @@ export const ru_RU: EnTranslations = {
   },
   "hudChrome": {
     "framePresets": {
-      "apply": "Apply",
+      "apply": "Применить",
       "current": "Текущая раскладка",
       "new": "Новый набор",
       "empty": "Нет сохранённых наборов",
@@ -361,11 +361,11 @@ export const ru_RU: EnTranslations = {
       "independentTarget": "Закрепить цель цели за целью"
     },
     "focusTargets": {
-      "showEmpty": "Show Empty Focus Frames",
-      "assignHint": "Select a target. Press {key} or click {button}.",
-      "assignClickHint": "Select a target. Click {button}.",
-      "ally": "Ally",
-      "enemy": "Enemy",
+      "showEmpty": "Показывать пустые рамки фокуса",
+      "assignHint": "Выберите цель. Нажмите {key} или кнопку «{button}».",
+      "assignClickHint": "Выберите цель. Нажмите кнопку «{button}».",
+      "ally": "Союзник",
+      "enemy": "Враг",
       "unset": "Снять фокус",
       "frame1": "Фокус 1",
       "frame2": "Фокус 2",

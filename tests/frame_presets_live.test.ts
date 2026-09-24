@@ -75,3 +75,35 @@ it('restores settings and live owners while preserving preset geometry through r
   expect(new Settings().get('uiScale')).toBe(1);
   document.documentElement.style.removeProperty('--ui-scale');
 });
+
+it('reclamps every owner on scale changes without replacing settings or saved geometry', () => {
+  const settings = new Settings();
+  settings.set('uiScale', 1.5);
+  localStorage.setItem('woc_party_frame_pos', '{"left":80,"top":40}');
+  const saved = localStorage.getItem('woc_party_frame_pos');
+  const values = settings.all();
+  const restore = vi.fn();
+  const owners = {
+    frames: { reapplyAll: vi.fn(), restoreSavedLayout: restore, refreshSettings: vi.fn() },
+    chat: { reapply: vi.fn(), restoreSavedLayout: restore },
+    meters: { reapplyFrames: vi.fn(), restoreSavedLayout: restore },
+    auras: { reapplyFrame: vi.fn(), restoreSavedLayout: restore },
+    settle: vi.fn(),
+  };
+  const onSettingChange = vi.fn();
+  applySavedFrameLayout({ settings, onSettingChange }, false, owners);
+  for (const reapply of [
+    owners.frames.reapplyAll,
+    owners.chat.reapply,
+    owners.meters.reapplyFrames,
+    owners.auras.reapplyFrame,
+  ]) {
+    expect(reapply).toHaveBeenCalledOnce();
+  }
+  expect(restore).not.toHaveBeenCalled();
+  expect(owners.frames.refreshSettings).not.toHaveBeenCalled();
+  expect(owners.settle).not.toHaveBeenCalled();
+  expect(onSettingChange).not.toHaveBeenCalled();
+  expect(settings.all()).toEqual(values);
+  expect(localStorage.getItem('woc_party_frame_pos')).toBe(saved);
+});

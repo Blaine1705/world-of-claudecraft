@@ -332,7 +332,7 @@ export const zh_CN: EnTranslations = {
   },
   "hudChrome": {
     "framePresets": {
-      "apply": "Apply",
+      "apply": "应用",
       "current": "当前布局",
       "new": "新建预设",
       "empty": "没有已保存的预设",
@@ -361,11 +361,11 @@ export const zh_CN: EnTranslations = {
       "independentTarget": "将目标的目标锁定到目标"
     },
     "focusTargets": {
-      "showEmpty": "Show Empty Focus Frames",
-      "assignHint": "Select a target. Press {key} or click {button}.",
-      "assignClickHint": "Select a target. Click {button}.",
-      "ally": "Ally",
-      "enemy": "Enemy",
+      "showEmpty": "显示空的焦点框体",
+      "assignHint": "选择一个目标。按 {key} 或点击 {button}。",
+      "assignClickHint": "选择一个目标。点击 {button}。",
+      "ally": "盟友",
+      "enemy": "敌人",
       "unset": "清除焦点",
       "frame1": "焦点 1",
       "frame2": "焦点 2",

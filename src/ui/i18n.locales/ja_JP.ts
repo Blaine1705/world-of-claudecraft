@@ -17226,4 +17226,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
   'devCommand.actions.town.label': 'タウンハブ',
   'devCommand.fields.town': '町',
+  'hudChrome.framePresets.apply': '適用',
+  'hudChrome.focusTargets.showEmpty': '空のフォーカスフレームを表示',
+  'hudChrome.focusTargets.assignHint':
+    '対象を選択してください。{key} を押すか、{button} をクリックしてください。',
+  'hudChrome.focusTargets.assignClickHint': '対象を選択して、{button} をクリックしてください。',
+  'hudChrome.focusTargets.ally': '味方',
+  'hudChrome.focusTargets.enemy': '敵',
 };

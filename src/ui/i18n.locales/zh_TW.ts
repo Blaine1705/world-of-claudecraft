@@ -16374,4 +16374,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '按名字傳送到城鎮中心。',
   'devCommand.actions.town.label': '城鎮中心',
   'devCommand.fields.town': '鎮',
+  'hudChrome.framePresets.apply': '套用',
+  'hudChrome.focusTargets.showEmpty': '顯示空的焦點框架',
+  'hudChrome.focusTargets.assignHint': '選擇一個目標。按 {key} 或點擊 {button}。',
+  'hudChrome.focusTargets.assignClickHint': '選擇一個目標。點擊 {button}。',
+  'hudChrome.focusTargets.ally': '盟友',
+  'hudChrome.focusTargets.enemy': '敵人',
 };

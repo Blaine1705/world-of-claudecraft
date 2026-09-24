@@ -332,7 +332,7 @@ export const ko_KR: EnTranslations = {
   },
   "hudChrome": {
     "framePresets": {
-      "apply": "Apply",
+      "apply": "적용",
       "current": "현재 배치",
       "new": "새 프리셋",
       "empty": "저장된 프리셋 없음",
@@ -361,11 +361,11 @@ export const ko_KR: EnTranslations = {
       "independentTarget": "대상의 대상을 대상에 고정"
     },
     "focusTargets": {
-      "showEmpty": "Show Empty Focus Frames",
-      "assignHint": "Select a target. Press {key} or click {button}.",
-      "assignClickHint": "Select a target. Click {button}.",
-      "ally": "Ally",
-      "enemy": "Enemy",
+      "showEmpty": "빈 주시 대상 프레임 표시",
+      "assignHint": "대상을 선택하세요. {key} 키를 누르거나 {button} 버튼을 클릭하세요.",
+      "assignClickHint": "대상을 선택하고 {button} 버튼을 클릭하세요.",
+      "ally": "아군",
+      "enemy": "적",
       "unset": "주시 해제",
       "frame1": "주시 대상 1",
       "frame2": "주시 대상 2",

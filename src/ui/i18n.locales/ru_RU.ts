@@ -17456,4 +17456,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   "devCommand.actions.town.description": "Телепортируйтесь в центр города по имени.",
   "devCommand.actions.town.label": "Городской центр",
   "devCommand.fields.town": "Город",
+  'hudChrome.framePresets.apply': 'Применить',
+  'hudChrome.focusTargets.showEmpty': 'Показывать пустые рамки фокуса',
+  'hudChrome.focusTargets.assignHint': 'Выберите цель. Нажмите {key} или кнопку «{button}».',
+  'hudChrome.focusTargets.assignClickHint': 'Выберите цель. Нажмите кнопку «{button}».',
+  'hudChrome.focusTargets.ally': 'Союзник',
+  'hudChrome.focusTargets.enemy': 'Враг',
 };

@@ -332,7 +332,7 @@ export const ja_JP: EnTranslations = {
   },
   "hudChrome": {
     "framePresets": {
-      "apply": "Apply",
+      "apply": "適用",
       "current": "現在のレイアウト",
       "new": "新規プリセット",
       "empty": "保存済みプリセットはありません",
@@ -361,11 +361,11 @@ export const ja_JP: EnTranslations = {
       "independentTarget": "ターゲットのターゲットをターゲットに固定"
     },
     "focusTargets": {
-      "showEmpty": "Show Empty Focus Frames",
-      "assignHint": "Select a target. Press {key} or click {button}.",
-      "assignClickHint": "Select a target. Click {button}.",
-      "ally": "Ally",
-      "enemy": "Enemy",
+      "showEmpty": "空のフォーカスフレームを表示",
+      "assignHint": "対象を選択してください。{key} を押すか、{button} をクリックしてください。",
+      "assignClickHint": "対象を選択して、{button} をクリックしてください。",
+      "ally": "味方",
+      "enemy": "敵",
       "unset": "フォーカスを解除",
       "frame1": "フォーカス 1",
       "frame2": "フォーカス 2",

@@ -689,45 +689,21 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "zh_CN": [
-    "hudChrome.focusTargets.ally",
-    "hudChrome.focusTargets.assignClickHint",
-    "hudChrome.focusTargets.assignHint",
-    "hudChrome.focusTargets.enemy",
-    "hudChrome.focusTargets.showEmpty",
-    "hudChrome.framePresets.apply",
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
     "hudChrome.options.frameRateCapThirty"
   ],
   "zh_TW": [
-    "hudChrome.focusTargets.ally",
-    "hudChrome.focusTargets.assignClickHint",
-    "hudChrome.focusTargets.assignHint",
-    "hudChrome.focusTargets.enemy",
-    "hudChrome.focusTargets.showEmpty",
-    "hudChrome.framePresets.apply",
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
     "hudChrome.options.frameRateCapThirty"
   ],
   "ko_KR": [
-    "hudChrome.focusTargets.ally",
-    "hudChrome.focusTargets.assignClickHint",
-    "hudChrome.focusTargets.assignHint",
-    "hudChrome.focusTargets.enemy",
-    "hudChrome.focusTargets.showEmpty",
-    "hudChrome.framePresets.apply",
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
     "hudChrome.options.frameRateCapThirty"
   ],
   "ja_JP": [
-    "hudChrome.focusTargets.ally",
-    "hudChrome.focusTargets.assignClickHint",
-    "hudChrome.focusTargets.assignHint",
-    "hudChrome.focusTargets.enemy",
-    "hudChrome.focusTargets.showEmpty",
-    "hudChrome.framePresets.apply",
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
     "hudChrome.options.frameRateCapThirty"
@@ -846,12 +822,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unstuck.revivedAtGraveyardFree"
   ],
   "ru_RU": [
-    "hudChrome.focusTargets.ally",
-    "hudChrome.focusTargets.assignClickHint",
-    "hudChrome.focusTargets.assignHint",
-    "hudChrome.focusTargets.enemy",
-    "hudChrome.focusTargets.showEmpty",
-    "hudChrome.framePresets.apply",
     "hudChrome.lootQuality.itemName",
     "hudChrome.options.frameRateCapSixty",
     "hudChrome.options.frameRateCapThirty"
