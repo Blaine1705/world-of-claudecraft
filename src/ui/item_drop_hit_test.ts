@@ -10,8 +10,11 @@
 
 import { type EquipSlot, isEquipSlot } from '../sim/types';
 
-/** The world surface: the one element the destroy drop accepts. */
-const WORLD_CANVAS_SELECTOR = '#game-canvas';
+/** The world surface: the one element the destroy drop accepts. On the touch
+ *  HUD an open window raises #mobile-window-backdrop, a full-screen dim over the
+ *  canvas, so every visible bit of world under the finger is that backdrop, and
+ *  it counts as the world (without it the touch world drop could never land). */
+const WORLD_SURFACE_SELECTOR = '#game-canvas, #mobile-window-backdrop';
 
 export type DropTargetAt =
   | { kind: 'equip'; slot: EquipSlot }
@@ -71,6 +74,6 @@ export function resolveDropTargetAt(
   if (ringBtn && Number.isInteger(ringIndex) && ringIndex >= 0) {
     return { kind: 'actionRingSlot', ringIndex };
   }
-  if (el.closest?.(WORLD_CANVAS_SELECTOR)) return { kind: 'world' };
+  if (el.closest?.(WORLD_SURFACE_SELECTOR)) return { kind: 'world' };
   return { kind: 'none' };
 }

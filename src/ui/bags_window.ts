@@ -333,7 +333,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  `runDefault` runs the exact classic left-click action for the clicked
    *  slot, so the menu's first row stays byte-identical to a plain click.
    *  `vendorSellCount` is every copy of this item held across the bags,
-   *  supplied only when it should show the vendor row set instead. */
+   *  supplied only when it should show the vendor row set instead.
+   *  `runDestroy` (touch HUD only) adds the Destroy row. */
   openItemActionMenu(
     def: ItemDef,
     itemId: string,
@@ -345,6 +346,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     vendorSellCount?: number,
     runSellAll?: () => void,
     materialSources?: MaterialComposition,
+    runDestroy?: () => void,
   ): void;
 }
 
@@ -2170,6 +2172,19 @@ export class BagsWindow {
     const x = ev.clientX || rect?.left || 0;
     const y = ev.clientY || rect?.top || 0;
     const index = bagStackIndex(this.deps.world().inventory, s);
+    // Touch has no world to drop a stack on while the bags sheet covers the
+    // screen, so the menu carries the destroy prompt the drag opens on desktop,
+    // with the same copy re-resolve (promptDestroy) and the same gate.
+    const runDestroy =
+      vendorSellCount === undefined &&
+      this.deps.isTouchHud() &&
+      this.destroyAction(s.itemId) === 'discard'
+        ? () =>
+            this.promptDestroy(s.itemId, Math.max(1, Math.floor(s.count)), {
+              index: index >= 0 ? index : null,
+              copyPin: itemCopyPin(s),
+            })
+        : undefined;
     this.deps.openItemActionMenu(
       item,
       s.itemId,
@@ -2191,6 +2206,7 @@ export class BagsWindow {
         ? undefined
         : () => this.sellAllBagItem(item, s, vendorSellCount),
       materialSourcesForDisplay(s),
+      runDestroy,
     );
   }
 
