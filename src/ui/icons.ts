@@ -2946,6 +2946,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   tidecall: r('nature', 'sky', ['sunburst', { p: 'droplet', ...BR }], ['arcs']),
   stoneward: r('earth', 'earthBrown', ['shield', { p: 'gem', ...TR }], ['crack', 'glow']),
   primal_exaltation: r('storm', 'gold', ['sunburst', { p: 'lightning', ...BR }], ['glow', 'arcs']),
+  // v0.44 Thundercall rework kit.
+  lava_burst: r('fire', 'ember', ['flame', { p: 'sunburst', ...BR }], ['glow']),
+  lightning_overload: r('storm', 'sky', ['lightning', { p: 'lightning', ...BR }], ['arcs']),
+  thunderstorm: r('storm', 'sky', ['sunburst', { p: 'lightning', ...BR }], ['arcs', 'glow']),
   // warlock
   shadow_bolt: r('shadow', 'shadowPurple', ['bolt'], ['glow']),
   demon_skin: r('shadow', 'venom', [{ p: 'chestplate', pal: 'venom' }]),
