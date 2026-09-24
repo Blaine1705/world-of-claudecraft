@@ -1,3 +1,4 @@
+import { readdirSync, readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { expect, it, vi } from 'vitest';
 import {
@@ -8,10 +9,13 @@ import {
   resumeActiveAbilityKit,
 } from '../src/render/ability_vfx/active_kit_prewarm';
 import { BakedImpactLayers } from '../src/render/ability_vfx/baked_impact_layers';
+import * as contact from '../src/render/ability_vfx/contact_assets';
+import { CONTACT_SHEETS, type ContactSheet } from '../src/render/ability_vfx/contact_assets';
 import { CrestPrewarm } from '../src/render/ability_vfx/crest_prewarm';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import * as assets from '../src/render/ability_vfx/production_assets';
+import { BAKED_URLS, type BakedKind } from '../src/render/ability_vfx/production_assets';
 import { SignatureCrests } from '../src/render/ability_vfx/signature_crests';
 import { SolidImpactFragments } from '../src/render/ability_vfx/solid_impact_fragments';
 import { WarriorFuryStates } from '../src/render/ability_vfx/warrior_fury_states';
@@ -51,21 +55,27 @@ function fixture(cls = 'warrior') {
   const bite = new THREE.Texture();
   const shear = new THREE.Texture();
   const crush = new THREE.Texture();
-  vi.spyOn(assets, 'bakedTexture').mockImplementation((kind) =>
-    kind === 'warrior_fervor'
-      ? fervor
-      : kind === 'warrior_power'
-        ? power
-        : kind === 'harvest_impact'
-          ? harvest
-          : kind === 'warrior_bite'
-            ? bite
-            : kind === 'warrior_shear'
-              ? shear
-              : kind === 'warrior_crush'
-                ? crush
-                : null,
-  );
+  const smoke = new THREE.Texture();
+  const shockwave = new THREE.Texture();
+  const shoutDust = new THREE.Texture();
+  const baked: Record<BakedKind, THREE.Texture> = {
+    smoke,
+    shout_dust: shoutDust,
+    warrior_power: power,
+    warrior_fervor: fervor,
+    harvest_impact: harvest,
+    warrior_bite: bite,
+    warrior_shear: shear,
+    warrior_crush: crush,
+    shockwave,
+  };
+  vi.spyOn(assets, 'bakedTexture').mockImplementation((kind) => baked[kind] ?? null);
+  const contacts: Record<ContactSheet, THREE.Texture> = {
+    contact_cut: new THREE.Texture(),
+    contact_crush: new THREE.Texture(),
+    contact_pierce: new THREE.Texture(),
+  };
+  vi.spyOn(contact, 'contactTexture').mockImplementation((kind) => contacts[kind] ?? null);
   const queue = {
     run: vi.fn(async (work: PrewarmResumeUnit['run']) => {
       await work();
@@ -97,6 +107,11 @@ function fixture(cls = 'warrior') {
     bite,
     shear,
     crush,
+    smoke,
+    shockwave,
+    shoutDust,
+    baked,
+    contacts,
     close: () => {
       cancelActiveAbilityKit(scene);
       prep.dispose();
@@ -112,6 +127,8 @@ function fixture(cls = 'warrior') {
       bite.dispose();
       shear.dispose();
       crush.dispose();
+      for (const sheet of [smoke, shockwave, shoutDust, ...Object.values(contacts)])
+        sheet.dispose();
       vi.restoreAllMocks();
     },
   };
@@ -124,16 +141,16 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     expect(f.entry).not.toHaveProperty('resumeUnits');
     expect(f.entry).not.toHaveProperty('deadlineExempt');
     expect(f.queue.run).not.toHaveBeenCalled();
-    expect(f.entry.progress()).toEqual({ done: 0, planned: 118, trimmed: true });
+    expect(f.entry.progress()).toEqual({ done: 0, planned: 123, trimmed: true });
     // A dropped/skipped manifest never ran entry.run(), but kept registration.
     resumeActiveAbilityKit(f.scene);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(118);
+    expect(f.queue.run).toHaveBeenCalledTimes(123);
     for (const call of f.queue.run.mock.calls as unknown[][]) {
       expect(call[1]).toBe(GPU_WORK_PRIORITY.BOOT_DEBT);
       expect(call[3]).toEqual({ releaseTail: String(call[2]).startsWith('crest-compile:') });
     }
-    expect(f.upload).toHaveBeenCalledTimes(10);
+    expect(f.upload).toHaveBeenCalledTimes(15);
     expect(f.upload).toHaveBeenNthCalledWith(1, f.blood);
     expect(f.upload).toHaveBeenNthCalledWith(2, f.steel);
     expect(f.upload).toHaveBeenNthCalledWith(3, f.texture);
@@ -144,6 +161,12 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     expect(f.upload).toHaveBeenNthCalledWith(8, f.bite);
     expect(f.upload).toHaveBeenNthCalledWith(9, f.shear);
     expect(f.upload).toHaveBeenNthCalledWith(10, f.crush);
+    expect(f.upload).toHaveBeenNthCalledWith(11, f.contacts.contact_cut);
+    expect(f.upload).toHaveBeenNthCalledWith(12, f.contacts.contact_crush);
+    expect(f.upload).toHaveBeenNthCalledWith(13, f.contacts.contact_pierce);
+    expect(f.upload).toHaveBeenNthCalledWith(14, f.smoke);
+    expect(f.upload).toHaveBeenNthCalledWith(15, f.shoutDust);
+    expect(f.upload).not.toHaveBeenCalledWith(f.shockwave);
     expect(f.crush).not.toBe(f.shear);
     expect(f.host.draw).toHaveBeenCalledTimes(27);
     // The full, ordered 27-name crest list (20 authored kinds + the 7
@@ -184,12 +207,88 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind)).toBe(true);
     expect(f.prep.ready('fire')).toBe(false);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(118);
+    expect(f.queue.run).toHaveBeenCalledTimes(123);
     expect(f.entry.progress().trimmed).toBe(false);
   } finally {
     f.close();
   }
 });
+
+it('uploads every sheet the Warrior kit draws before a geometry unit runs', async () => {
+  // The kit's presentation draws the three contact sheets (flipbooks.ts) and
+  // the generic smoke and dust layers (baked_impact_layers.ts) as well as its
+  // signature sheets. They all land with the kit's demand load, after the boot
+  // warm-up ran, so a sheet the recipe does not upload is uploaded by the
+  // first cast that draws it, in a live frame. The loaded shockwave sheet is
+  // drawn only by the boot-window prewarmSpawn, never by a cast.
+  const f = fixture();
+  try {
+    await ensureActiveAbilityKit(f.scene);
+    const uploaded = new Set(f.upload.mock.calls.map(([texture]) => texture));
+    for (const kind of Object.keys(BAKED_URLS) as BakedKind[])
+      expect(uploaded.has(assets.bakedTexture(kind)), kind).toBe(kind !== 'shockwave');
+    for (const kind of CONTACT_SHEETS)
+      expect(uploaded.has(contact.contactTexture(kind)), kind).toBe(true);
+    for (const texture of [f.blood, f.steel, f.texture, f.rock])
+      expect(uploaded.has(texture)).toBe(true);
+    const labels = (f.queue.run.mock.calls as unknown[][]).map((call) => String(call[2]));
+    const uploads = labels.filter((label) => label.startsWith('upload-big:'));
+    expect(uploads).toHaveLength(f.upload.mock.calls.length);
+    expect(labels.slice(0, uploads.length)).toEqual(uploads);
+  } finally {
+    f.close();
+  }
+});
+
+it('leaves out only the shockwave sheet, which no cast draws', () => {
+  // The recipe skips the loaded shockwave sheet because its one drawer is the
+  // boot-window prewarmSpawn, behind the curtain. A cast that starts drawing
+  // it must move it into the recipe, or its first draw uploads it live.
+  const root = new URL('../src/render/', import.meta.url);
+  const drawers: string[] = [];
+  for (const file of readdirSync(root, { recursive: true, encoding: 'utf8' })) {
+    if (!file.endsWith('.ts')) continue;
+    const source = readFileSync(new URL(file, root), 'utf8');
+    for (const match of source.matchAll(/(?:bakedAt|spawn)\??\.?\(\s*'shockwave'/g))
+      drawers.push(`${file}:${source.slice(0, match.index).split('\n').length}`);
+  }
+  expect(drawers).toHaveLength(1);
+  expect(drawers[0]).toMatch(/^ability_vfx\/fx\.ts:/);
+  const fx = readFileSync(new URL('ability_vfx/fx.ts', root), 'utf8');
+  const spawn = fx.slice(fx.indexOf('  prewarmSpawn('), fx.indexOf('  prewarmSpawn(') + 600);
+  expect(spawn).toContain("this.bakedAt('shockwave'");
+});
+
+it.each(CONTACT_SHEETS)('keeps the kit cold when the %s sheet is missing', async (kind) => {
+  const f = fixture();
+  try {
+    vi.spyOn(contact, 'contactTexture').mockImplementation((sheet) =>
+      sheet === kind ? null : f.contacts[sheet],
+    );
+    await expect(ensureActiveAbilityKit(f.scene)).rejects.toThrow('was not loaded');
+    expect(f.host.draw).not.toHaveBeenCalled();
+    expect(f.prep.ready('blood_cut')).toBe(false);
+  } finally {
+    f.close();
+  }
+});
+
+it.each(['smoke', 'shout_dust'] as const)(
+  'keeps the kit cold when the %s sheet is missing',
+  async (kind) => {
+    const f = fixture();
+    try {
+      vi.spyOn(assets, 'bakedTexture').mockImplementation((sheet) =>
+        sheet === kind ? null : f.baked[sheet],
+      );
+      await expect(ensureActiveAbilityKit(f.scene)).rejects.toThrow('was not loaded');
+      expect(f.host.draw).not.toHaveBeenCalled();
+      expect(f.prep.ready('blood_cut')).toBe(false);
+    } finally {
+      f.close();
+    }
+  },
+);
 
 it('keeps synchronous declarations through every production Warrior preparation wrapper', () => {
   const f = fixture();
@@ -274,7 +373,7 @@ it('lets synchronous Warrior uploads and real crest touches pass two released ta
 
     task = ensureActiveAbilityKit(f.scene);
     await flush();
-    expect(f.upload).toHaveBeenCalledTimes(10);
+    expect(f.upload).toHaveBeenCalledTimes(15);
     expect(f.prep.ready('blood_cut')).toBe(true);
     expect(f.host.draw).toHaveBeenCalledTimes(1);
     expect(f.host.compile).toHaveBeenCalledTimes(1);
@@ -323,18 +422,18 @@ it('surfaces a failed compile without blessing its buffers and retries only unpa
   try {
     f.host.compile.mockRejectedValueOnce(new Error('driver link failed'));
     await expect(ensureActiveAbilityKit(f.scene)).rejects.toThrow('driver link failed');
-    // The 10 texture uploads are earlier, synchronous units in the same
+    // The 15 texture uploads are earlier, synchronous units in the same
     // recipe array and every one of them already ran (and was marked done)
     // before the loop ever reached the first crest geometry unit whose
     // compile rejected: paid work, already spent by the time this failed.
-    expect(f.upload).toHaveBeenCalledTimes(10);
+    expect(f.upload).toHaveBeenCalledTimes(15);
     expect(f.prep.ready('blood_cut')).toBe(false);
     expect(f.host.draw).not.toHaveBeenCalled();
     await ensureActiveAbilityKit(f.scene);
     // The retry's recipe filters out every id already in state.done, so it
     // replays only the unpaid geometry work; the texture upload count must
-    // stay at 10, the proof that the paid uploads were not repeated.
-    expect(f.upload).toHaveBeenCalledTimes(10);
+    // stay at 15, the proof that the paid uploads were not repeated.
+    expect(f.upload).toHaveBeenCalledTimes(15);
     expect(f.prep.ready('blood_cut')).toBe(true);
   } finally {
     f.close();
@@ -422,7 +521,7 @@ it('prepares remote Warriors for a Mage only after first paint, retaining fallba
     reveal();
     await Promise.resolve();
     await ensureActiveAbilityKit(f.scene, 'warrior');
-    expect(f.upload).toHaveBeenCalledTimes(10);
+    expect(f.upload).toHaveBeenCalledTimes(15);
     expect(f.host.draw).toHaveBeenCalledTimes(27);
     for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind)).toBe(true);
     expect(f.prep.ready('fire')).toBe(false);
@@ -469,16 +568,16 @@ it('spreads the kit texture uploads one per presented frame under the real queue
     // The kit starts after first paint: the frame clock is already running.
     frame();
     const task = ensureActiveAbilityKit(f.scene);
-    for (let i = 0; i < 40 && f.upload.mock.calls.length < 10; i++) {
+    for (let i = 0; i < 40 && f.upload.mock.calls.length < 15; i++) {
       await flush();
       frame();
     }
     await task;
-    expect(f.upload).toHaveBeenCalledTimes(10);
+    expect(f.upload).toHaveBeenCalledTimes(15);
     expect(Math.max(...uploadsPerFrame)).toBe(1);
-    // Paced, never starved: one upload per frame, ten frames.
-    expect(uploadsPerFrame.filter((count) => count > 0)).toHaveLength(10);
-    expect(uploadsPerFrame.length).toBeLessThanOrEqual(13);
+    // Paced, never starved: one upload per frame, fifteen frames.
+    expect(uploadsPerFrame.filter((count) => count > 0)).toHaveLength(15);
+    expect(uploadsPerFrame.length).toBeLessThanOrEqual(18);
   } finally {
     await queue.shutdown();
     f.close();
@@ -528,12 +627,12 @@ it('waits out a loading cover instead of freezing it, then paces its uploads', a
     }
     expect(f.upload).not.toHaveBeenCalled();
     setArrivalCover(false);
-    for (let i = 0; i < 40 && f.upload.mock.calls.length < 10; i++) {
+    for (let i = 0; i < 40 && f.upload.mock.calls.length < 15; i++) {
       await flush();
       frame();
     }
     await task;
-    expect(f.upload).toHaveBeenCalledTimes(10);
+    expect(f.upload).toHaveBeenCalledTimes(15);
     // Not ageing under the cover: no starvation burst on the first live frame.
     expect(Math.max(...uploadsPerFrame)).toBe(1);
   } finally {

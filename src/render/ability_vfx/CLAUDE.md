@@ -152,7 +152,13 @@ selected by ability id only:
   (`requestClassKit`), keeps a mip chain on the WebP sheets, and DECLINES them
   on constrained-memory devices, where the kit stays cold and the generic
   presentation runs (`tests/warrior_kit_assets.test.ts`,
-  `tests/active_kit_prewarm.test.ts`). A pool built at boot never reads those
+  `tests/active_kit_prewarm.test.ts`). Every sheet a live cast draws is
+  uploaded by its own unit of the kit recipe (`KIT_SHEETS` in
+  `active_kit_prewarm.ts`), the contact sheets and the generic smoke and dust
+  layers included, since the kit is their only consumer (the loaded shockwave
+  sheet has no live consumer, only the boot-window `prewarmSpawn`); the boot
+  warm-up (`abilityVfxTexturePrewarmSteps`) reads none of them, so the recipe is
+  their one upload home on every renderer, a recycled one included. A pool built at boot never reads those
   getters in its constructor, since the load lands after it: it binds them in
   a unit of its own preparation recipe, ahead of its compile (the crests'
   `crest-bind-kit`, the guards' `guard-bind-steel`; `tests/crest_prewarm.test.ts`).

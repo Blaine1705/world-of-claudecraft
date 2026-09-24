@@ -1,11 +1,3 @@
-import { CONTACT_SHEETS, contactTexture } from './contact_assets';
-import {
-  bakedTexture,
-  warriorBloodTexture,
-  warriorPressureTexture,
-  warriorRockTexture,
-  warriorSteelTexture,
-} from './production_assets';
 // The SAFE half of the ability-VFX boot warm-up, expressed as explicit small
 // units the renderer can run outside its world-entry window.
 //
@@ -45,7 +37,10 @@ export interface AbilityVfxCompileTarget {
  * One unit per procedurally drawn impact sheet, plus one for the shared canvas
  * set. The sheets are deliberately separate: each is an independent 64-frame
  * canvas draw, and the whole point of the resume lane is that no single unit
- * blocks a live frame for long.
+ * blocks a live frame for long. The Warrior kit's sheets are not here: they
+ * load on demand, and every one a cast draws is uploaded by the kit's own paced
+ * recipe (active_kit_prewarm.ts), on each renderer (a recycled one included),
+ * for a local and a remote Warrior alike.
  */
 export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] {
   const steps: AbilityVfxPrewarmTextureStep[] = FLIPBOOK_STYLES.map((style) => ({
@@ -58,45 +53,6 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
     // unit rather than eight that would each re-enter the same builder.
     build: () => Object.values(abilityVfxTextures()),
   });
-  for (const kind of CONTACT_SHEETS)
-    steps.push({
-      id: kind,
-      build: () => {
-        const texture = contactTexture(kind);
-        return texture ? [texture] : [];
-      },
-    });
-  for (const kind of [
-    'smoke',
-    'shockwave',
-    'shout_dust',
-    'warrior_power',
-    'warrior_fervor',
-    'harvest_impact',
-    'warrior_bite',
-    'warrior_shear',
-    'warrior_crush',
-  ] as const)
-    steps.push({
-      id: kind,
-      build: () => {
-        const texture = bakedTexture(kind);
-        return texture ? [texture] : [];
-      },
-    });
-  for (const [id, load] of [
-    ['warrior-blood', warriorBloodTexture],
-    ['warrior-pressure', warriorPressureTexture],
-    ['warrior-rock', warriorRockTexture],
-    ['warrior-steel', warriorSteelTexture],
-  ] as const)
-    steps.push({
-      id,
-      build: () => {
-        const texture = load();
-        return texture ? [texture] : [];
-      },
-    });
   return steps;
 }
 

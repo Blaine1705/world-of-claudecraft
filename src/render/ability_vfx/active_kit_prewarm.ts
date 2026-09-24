@@ -2,6 +2,7 @@ import type * as THREE from 'three';
 import { type BackgroundGpuQueue, GPU_WORK_PRIORITY } from '../background_gpu_queue';
 import type { PrewarmManifestEntry } from '../prewarm_entry';
 import type { PrewarmResumeUnit } from '../prewarm_resume';
+import { contactTexture } from './contact_assets';
 import {
   bakedTexture,
   warriorBloodTexture,
@@ -63,99 +64,51 @@ interface Preparation {
 }
 const preparations = new WeakMap<object, Preparation>();
 
+/** Every sheet the kit's live presentation draws, each uploaded by its own
+ *  paced unit before any geometry unit runs: the signature sheets, the contact
+ *  sheets (`flipbooks.ts`) and the smoke and dust layers
+ *  (`baked_impact_layers.ts`). They land with the kit's demand load, and this
+ *  recipe is their only upload home on each renderer, so a sheet missing here
+ *  is uploaded by the first cast that draws it, inside a live frame. The loaded `shockwave` sheet is left out on
+ *  purpose: only the boot-window `prewarmSpawn` draws it, behind the curtain.
+ *  A sheet that is absent fails its unit, so the kit stays cold rather than
+ *  half-ready. */
+const KIT_SHEETS: readonly (readonly [
+  id: string,
+  name: string,
+  sheet: () => THREE.Texture | null,
+])[] = [
+  ['active-warrior-blood', 'Active Warrior blood', () => warriorBloodTexture()],
+  ['active-warrior-steel', 'Active Warrior steel', () => warriorSteelTexture()],
+  ['active-warrior-pressure', 'Active Warrior pressure', () => warriorPressureTexture()],
+  ['active-warrior-rock', 'Active Warrior rock', () => warriorRockTexture()],
+  ['active-warrior-power', 'Active Warrior power', () => bakedTexture('warrior_power')],
+  ['active-warrior-fervor', 'Active Warrior fervor', () => bakedTexture('warrior_fervor')],
+  ['active-harvest-impact', 'Red Harvest impact', () => bakedTexture('harvest_impact')],
+  ['active-warrior-bite', 'Warrior bite', () => bakedTexture('warrior_bite')],
+  ['active-warrior-shear', 'Warrior shear', () => bakedTexture('warrior_shear')],
+  ['active-warrior-crush', 'Warrior crush', () => bakedTexture('warrior_crush')],
+  ['active-contact-cut', 'Warrior cut contact', () => contactTexture('contact_cut')],
+  ['active-contact-crush', 'Warrior crush contact', () => contactTexture('contact_crush')],
+  ['active-contact-pierce', 'Warrior pierce contact', () => contactTexture('contact_pierce')],
+  ['active-smoke', 'Warrior smoke', () => bakedTexture('smoke')],
+  ['active-shout-dust', 'Warrior shout dust', () => bakedTexture('shout_dust')],
+];
+
 function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
   if (cls !== 'warrior') return [];
   return [
-    {
-      id: 'upload-big:active-warrior-blood',
-      synchronous: true,
-      run: () => {
-        const texture = warriorBloodTexture();
-        if (!texture) throw new Error('Active Warrior blood texture was not loaded');
-        state.host.texture(texture);
-      },
-    },
-    {
-      id: 'upload-big:active-warrior-steel',
-      synchronous: true,
-      run: () => {
-        const texture = warriorSteelTexture();
-        if (!texture) throw new Error('Active Warrior steel texture was not loaded');
-        state.host.texture(texture);
-      },
-    },
-    {
-      id: 'upload-big:active-warrior-pressure',
-      synchronous: true,
-      run: () => {
-        const texture = warriorPressureTexture();
-        if (!texture) throw new Error('Active Warrior pressure texture was not loaded');
-        state.host.texture(texture);
-      },
-    },
-    {
-      id: 'upload-big:active-warrior-rock',
-      synchronous: true,
-      run: () => {
-        const texture = warriorRockTexture();
-        if (!texture) throw new Error('Active Warrior rock texture was not loaded');
-        state.host.texture(texture);
-      },
-    },
-    {
-      id: 'upload-big:active-warrior-power',
-      synchronous: true,
-      run: () => {
-        const texture = bakedTexture('warrior_power');
-        if (!texture) throw new Error('Active Warrior power texture was not loaded');
-        state.host.texture(texture);
-      },
-    },
-    {
-      id: 'upload-big:active-warrior-fervor',
-      synchronous: true,
-      run: () => {
-        const texture = bakedTexture('warrior_fervor');
-        if (!texture) throw new Error('Active Warrior fervor texture was not loaded');
-        state.host.texture(texture);
-      },
-    },
-    {
-      id: 'upload-big:active-harvest-impact',
-      synchronous: true,
-      run: () => {
-        const texture = bakedTexture('harvest_impact');
-        if (!texture) throw new Error('Red Harvest impact texture was not loaded');
-        state.host.texture(texture);
-      },
-    },
-    {
-      id: 'upload-big:active-warrior-bite',
-      synchronous: true,
-      run: () => {
-        const texture = bakedTexture('warrior_bite');
-        if (!texture) throw new Error('Warrior bite texture was not loaded');
-        state.host.texture(texture);
-      },
-    },
-    {
-      id: 'upload-big:active-warrior-shear',
-      synchronous: true,
-      run: () => {
-        const texture = bakedTexture('warrior_shear');
-        if (!texture) throw new Error('Warrior shear texture was not loaded');
-        state.host.texture(texture);
-      },
-    },
-    {
-      id: 'upload-big:active-warrior-crush',
-      synchronous: true,
-      run: () => {
-        const texture = bakedTexture('warrior_crush');
-        if (!texture) throw new Error('Warrior crush texture was not loaded');
-        state.host.texture(texture);
-      },
-    },
+    ...KIT_SHEETS.map(
+      ([id, name, sheet]): PrewarmResumeUnit => ({
+        id: `upload-big:${id}`,
+        synchronous: true,
+        run: () => {
+          const texture = sheet();
+          if (!texture) throw new Error(`${name} texture was not loaded`);
+          state.host.texture(texture);
+        },
+      }),
+    ),
     ...state.host.geometry(ACTIVE_WARRIOR_CRESTS),
   ].filter((unit) => !state.done.has(unit.id));
 }

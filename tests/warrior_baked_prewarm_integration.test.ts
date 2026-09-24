@@ -6,6 +6,7 @@ import {
   ensureActiveAbilityKit,
 } from '../src/render/ability_vfx/active_kit_prewarm';
 import { BakedImpactLayers } from '../src/render/ability_vfx/baked_impact_layers';
+import * as contact from '../src/render/ability_vfx/contact_assets';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import * as assets from '../src/render/ability_vfx/production_assets';
 import { type BackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
@@ -30,15 +31,21 @@ function fixture(cls: string, warriorTextures = true) {
     'warrior_bite',
     'warrior_shear',
     'warrior_crush',
+    'contact_cut',
+    'contact_crush',
+    'contact_pierce',
+    'smoke',
+    'shout_dust',
   ] as const;
   const textures = new Map<string, THREE.Texture>(names.map((name) => [name, new THREE.Texture()]));
-  const smoke = new THREE.Texture();
+  const smoke = textures.get('smoke') as THREE.Texture;
   const uploaded = new Set<THREE.Texture>();
   const texture = (name: string) => (warriorTextures ? (textures.get(name) ?? null) : null);
   vi.spyOn(assets, 'warriorBloodTexture').mockImplementation(() => texture('blood'));
   vi.spyOn(assets, 'warriorSteelTexture').mockImplementation(() => texture('steel'));
   vi.spyOn(assets, 'warriorPressureTexture').mockImplementation(() => texture('pressure'));
   vi.spyOn(assets, 'warriorRockTexture').mockImplementation(() => texture('rock'));
+  vi.spyOn(contact, 'contactTexture').mockImplementation((kind) => texture(kind));
   const bakedTexture = vi
     .spyOn(assets, 'bakedTexture')
     .mockImplementation((kind) => (kind === 'smoke' ? smoke : texture(kind)));
@@ -63,10 +70,10 @@ function fixture(cls: string, warriorTextures = true) {
   const host = {
     properties: { get: () => ({ programs: new Map([['flat', program]]) }) },
     compile: vi.fn(async () => {
-      expect(uploaded.size).toBe(10);
+      expect(uploaded.size).toBe(15);
     }),
     draw: vi.fn((_group: THREE.Group, root: THREE.Object3D) => {
-      expect(uploaded.size).toBe(10);
+      expect(uploaded.size).toBe(15);
       const mesh = root as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
       expect(
         live.some((slot) => slot.geometry === mesh.geometry && slot.material === mesh.material),
@@ -115,7 +122,6 @@ function fixture(cls: string, warriorTextures = true) {
     cancelActiveAbilityKit(scene);
     pool.dispose();
     for (const value of textures.values()) value.dispose();
-    smoke.dispose();
   });
   const spawn = (kind: 'warrior_shear' | 'warrior_crush' | 'warrior_fervor') =>
     pool.spawn(kind, 0, 1, 0, 4, 0xffffff, 0xffffff, 0.2, 0, 0, 0);
@@ -148,7 +154,7 @@ it.each(['warrior_shear', 'warrior_crush', 'warrior_fervor'] as const)(
     });
     expect(h.poolUnits).toHaveBeenCalled();
     expect(h.spawn(kind)).toBe(false);
-    for (let i = 0; i < 10; i++) await h.next();
+    for (let i = 0; i < 15; i++) await h.next();
     expect(h.upload.mock.calls.map(([value]) => value)).toEqual([...h.textures.values()]);
     expect(h.host.compile).not.toHaveBeenCalled();
     expect(h.host.draw).not.toHaveBeenCalled();
@@ -167,10 +173,10 @@ it.each(['warrior_shear', 'warrior_crush', 'warrior_fervor'] as const)(
     expect(h.seenSlots.size).toBe(10);
     expect(h.spawn(kind)).toBe(true);
     expect(h.spawn(kind)).toBe(false);
-    expect(h.labels).toHaveLength(40);
-    expect(new Set(h.labels).size).toBe(40);
+    expect(h.labels).toHaveLength(45);
+    expect(new Set(h.labels).size).toBe(45);
     await ensureActiveAbilityKit(h.scene, 'warrior');
-    expect(h.labels).toHaveLength(40);
+    expect(h.labels).toHaveLength(45);
   },
 );
 

@@ -5,6 +5,7 @@ import {
   cancelActiveAbilityKit,
   ensureActiveAbilityKit,
 } from '../src/render/ability_vfx/active_kit_prewarm';
+import * as contact from '../src/render/ability_vfx/contact_assets';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import * as assets from '../src/render/ability_vfx/production_assets';
 import { SolidImpactFragments } from '../src/render/ability_vfx/solid_impact_fragments';
@@ -57,6 +58,7 @@ function kit(scene: THREE.Scene, fragments: SolidImpactFragments) {
   });
   const sheet = new THREE.Texture();
   vi.spyOn(assets, 'bakedTexture').mockReturnValue(sheet);
+  vi.spyOn(contact, 'contactTexture').mockReturnValue(sheet);
   const program = { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() };
   const compiled = new Set<THREE.Material>();
   const drawn = new Set<THREE.Material>();

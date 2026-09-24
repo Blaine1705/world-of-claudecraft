@@ -254,8 +254,8 @@ describe('the active kit loads its own assets before its recipe', () => {
     const k = lateKit('warrior');
     try {
       // The boot manifest reads progress() while the sheets are still cold:
-      // the ten uploads are planned, the pool's units are not enumerable yet.
-      expect(k.entry.progress()).toEqual({ done: 0, planned: 10, trimmed: true });
+      // the fifteen uploads are planned, the pool's units are not enumerable yet.
+      expect(k.entry.progress()).toEqual({ done: 0, planned: 15, trimmed: true });
       const task = ensureActiveAbilityKit(k.scene);
       expect(k.assets).toHaveBeenCalledTimes(1);
       await flush();
@@ -264,12 +264,12 @@ describe('the active kit loads its own assets before its recipe', () => {
       k.arrive();
       await task;
       expect(warriorKitAssetsState()).toBe('ready');
-      expect(k.texture).toHaveBeenCalledTimes(10);
+      expect(k.texture).toHaveBeenCalledTimes(15);
       expect(k.texture).toHaveBeenCalledWith(bakedTexture('harvest_impact'));
       // One compile and one upload draw per baked pool slot.
       expect(k.gpu.compile).toHaveBeenCalledTimes(10);
       expect(k.gpu.draw).toHaveBeenCalledTimes(10);
-      expect(k.entry.progress()).toEqual({ done: 40, planned: 40, trimmed: false });
+      expect(k.entry.progress()).toEqual({ done: 45, planned: 45, trimmed: false });
     } finally {
       k.close();
     }
@@ -290,7 +290,7 @@ describe('the active kit loads its own assets before its recipe', () => {
         await ensureActiveAbilityKit(k.scene, 'warrior');
         expect(warn).not.toHaveBeenCalled();
         expect(warriorKitAssetsState()).toBe('ready');
-        expect(k.texture).toHaveBeenCalledTimes(10);
+        expect(k.texture).toHaveBeenCalledTimes(15);
         expect(k.gpu.draw).toHaveBeenCalledTimes(10);
       } finally {
         k.close();
