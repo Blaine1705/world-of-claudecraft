@@ -1077,21 +1077,18 @@ describe('the ground: free-for-all zones', () => {
     expect(sim.worldPvpBooks.recentDamage.get(a)?.has(d)).toBe(true);
   });
 
-  it('a character under the level gate is outside the free-for-all arm, both ways, and hears nothing', () => {
+  it('a character under the flag level is still fair game on free-for-all ground, and is told so', () => {
     const { sim, a } = brawl();
     const novice = addFighter(sim, 'Novice', WORLD_PVP_MIN_LEVEL - 1, 1005);
     standTogether(sim, [a, novice]);
-    expect(sim.isHostileTo(ent(sim, novice), ent(sim, a))).toBe(false);
-    expect(sim.isHostileTo(ent(sim, a), ent(sim, novice))).toBe(false);
-    // A blow forced through the hub anyway is booked nowhere and marks nobody.
-    hit(sim, novice, a);
-    expect(ent(sim, novice).pvpFlag).toBeUndefined();
-    expect(sim.worldPvpBooks.recentDamage.get(a)?.has(novice) ?? false).toBe(false);
-    expect(tickCollecting(sim, 1, novice)).not.toContain(WORLD_PVP_FFA_ENTER_LINE);
-    // Reaching the gate inside the zone opens the arm and tells them where they stand.
-    sim.setPlayerLevel(WORLD_PVP_MIN_LEVEL, novice);
     expect(tickCollecting(sim, 1, novice)).toContain(WORLD_PVP_FFA_ENTER_LINE);
     expect(sim.isHostileTo(ent(sim, novice), ent(sim, a))).toBe(true);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, novice))).toBe(true);
+    // Their blow lands and is booked, but they cannot carry a flag, so it
+    // marks nobody (and with no flag they stake no gold either).
+    hit(sim, novice, a);
+    expect(ent(sim, novice).pvpFlag).toBeUndefined();
+    expect(sim.worldPvpBooks.recentDamage.get(a)?.has(novice)).toBe(true);
   });
 
   it('a freshly marked player cannot drop the flag the same instant (the toggle cooldown)', () => {

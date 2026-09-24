@@ -2941,7 +2941,6 @@ export const hudChromeStrings = {
     rises: 'Rises in {minutes}',
     falls: 'Falls in {minutes}',
     standingRaid: 'Raid members do not count: only parties can hold the hill',
-    standingLevel: 'You do not count on the hill until level {level}',
   },
   // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
   // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings

@@ -1,5 +1,6 @@
 export {
   type ActiveHill,
+  endHillNow,
   HILL_LOST_LINE,
   HILL_READOUT_NONE_LINE,
   HILL_TAKEN_LINE,
@@ -13,9 +14,11 @@ export {
   hillWarningLine,
   newHillState,
   pickHillSpot,
+  riseHillNow,
   spawnHill,
   spawnHillNow,
   updateHill,
+  warnNextHillNow,
 } from './hill';
 export {
   HILL_ACCRUAL_SECONDS,

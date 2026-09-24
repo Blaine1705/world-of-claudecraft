@@ -12,8 +12,7 @@
 //
 // Once a second while the hill stands the presence pass counts the players
 // inside the circle by PARTY (an ungrouped player is a group of one; a raid
-// member and a player under the world PvP level floor do not count at all,
-// hill_rules.ts hillStanding); the largest party that beats the holder's
+// member does not count at all, hill_rules.ts hillStanding; any level does); the largest party that beats the holder's
 // present count by a strict majority is the challenger, and after
 // HILL_CAPTURE_SECONDS of unbroken majority it takes the hill (a tie never
 // moves it; a challenge that lapses starts over). Every holder standing inside
@@ -67,7 +66,6 @@ import {
   hillWindowAt,
 } from './hill_rules';
 import { grantHonor } from './honor';
-import { WORLD_PVP_MIN_LEVEL } from './world_pvp_rules';
 import { worldPvpFfaZones } from './world_pvp_zones';
 
 /** 'warning': announced, drawn on the ground, not yet contestable.
@@ -253,23 +251,74 @@ export function spawnHill(
   return hill;
 }
 
-/** The /dev arm: announce a hill now (closing any that stands), on the next
- *  window's ordinal so its spot is one the schedule could have picked. With
- *  `warn` it runs the full warning first; without, it rises at once. Either
- *  way it stands a full HILL_DURATION_SECONDS, and the schedule resumes
- *  when it falls. */
+// ---- The /dev arms (src/sim/dev_commands.ts `/dev hill ...`). Each is a test
+// lever over the real phases: it announces through the same lines and leaves
+// the schedule to resume on its own when the staged hill falls.
+
+/** Announce a hill now (replacing any that stands), on the next window's
+ *  ordinal so its spot is one the schedule could have picked. With `warn` it
+ *  counts down first (the full HILL_WARNING_SECONDS, or `warningSeconds` to
+ *  shorten a test); without, it rises at once. It stands a full
+ *  HILL_DURATION_SECONDS either way. */
 export function spawnHillNow(
   ctx: SimContext,
   zoneId?: string,
-  opts: { warn?: boolean } = {},
+  opts: { warn?: boolean; warningSeconds?: number } = {},
 ): ActiveHill | null {
-  const risesAt = ctx.time + (opts.warn ? HILL_WARNING_SECONDS : 0);
+  const warning = opts.warn ? Math.max(1, opts.warningSeconds ?? HILL_WARNING_SECONDS) : 0;
+  const risesAt = ctx.time + warning;
   const times: HillTimes = {
     warnAt: ctx.time,
     risesAt,
     closesAt: risesAt + HILL_DURATION_SECONDS,
   };
   return spawnHill(ctx, ctx.hillState.window, times, 0, zoneId);
+}
+
+/** Skip the countdown: the announced hill rises now and stands its full
+ *  HILL_DURATION_SECONDS. Null when no hill is counting down. */
+export function riseHillNow(ctx: SimContext): ActiveHill | null {
+  const hill = ctx.hillState.active;
+  if (!hill || hill.phase !== 'warning') return null;
+  hill.risesAt = ctx.time;
+  hill.closesAt = ctx.time + HILL_DURATION_SECONDS;
+  hill.phase = 'active';
+  announcePhase(ctx, hill, 'risen');
+  return hill;
+}
+
+/** End the announced or standing hill now, with the realm's fall line. Null
+ *  when there is none. */
+export function endHillNow(ctx: SimContext): ActiveHill | null {
+  const hill = ctx.hillState.active;
+  if (!hill) return null;
+  ctx.hillState.active = null;
+  announcePhase(ctx, hill, 'fallen');
+  return hill;
+}
+
+/** Run the real schedule now: the next window's hill is warned of at once (its
+ *  own zone and spot, the full warning), and that window is spent, exactly as
+ *  if its random moment had come. Ends any hill that stands first. Null when no
+ *  spot was found this attempt (the schedule then retries it on its own). */
+export function warnNextHillNow(ctx: SimContext): ActiveHill | null {
+  const state = ctx.hillState;
+  if (state.active) endHillNow(ctx);
+  const current = hillWindowAt(ctx.time);
+  if (state.window < current) state.window = current;
+  const risesAt = ctx.time + HILL_WARNING_SECONDS;
+  const times: HillTimes = {
+    warnAt: ctx.time,
+    risesAt,
+    closesAt: risesAt + HILL_DURATION_SECONDS,
+  };
+  const hill = spawnHill(ctx, state.window, times, state.attempts);
+  if (!hill) return null;
+  state.window += 1;
+  state.plan = null;
+  state.attempts = 0;
+  state.retryAt = 0;
+  return hill;
 }
 
 /** The schedule: move a standing hill through its phases, then warn of the
@@ -322,8 +371,8 @@ function updateSchedule(ctx: SimContext): void {
   state.plan = null;
 }
 
-/** The presence pass: who stands inside, by party. The dead, raid members and
- *  players under the level floor are not counted. */
+/** The presence pass: who stands inside, by party. The dead and raid members
+ *  are not counted. */
 function countInside(ctx: SimContext, hill: ActiveHill): void {
   hill.counts.clear();
   hill.insideKeys.clear();
@@ -331,7 +380,7 @@ function countInside(ctx: SimContext, hill: ActiveHill): void {
     const e = ctx.entities.get(meta.entityId);
     if (!e || e.dead || !hillContains(hill, e.pos.x, e.pos.z)) continue;
     const party = ctx.partyOf(e.id);
-    if (hillStanding(e.level, party, WORLD_PVP_MIN_LEVEL) !== 'counted') continue;
+    if (hillStanding(party) !== 'counted') continue;
     const key = hillGroupKey(e.id, party);
     if (key === null) continue;
     hill.insideKeys.set(e.id, key);
@@ -368,8 +417,8 @@ function updateContest(ctx: SimContext, hill: ActiveHill, dt: number): void {
 }
 
 /** The trickle: every holder inside banks this pass, and a full minute pays
- *  one Honor. Only counted players are inside the books, so the level floor
- *  and the raid rule hold here too, and a party's size is the payee cap. A
+ *  one Honor. Only counted players are inside the books, so the raid rule
+ *  holds here too, and a party's size is the payee cap. A
  *  holder who steps out keeps their bank; one who leaves the party, or the
  *  realm, loses it. */
 function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
@@ -430,7 +479,7 @@ export function hillInfoFor(
   const e = ctx.entities.get(pid);
   if (!e || e.kind !== 'player') return null;
   const party = ctx.partyOf(pid);
-  const standing = hillStanding(e.level, party, WORLD_PVP_MIN_LEVEL);
+  const standing = hillStanding(party);
   const key = standing === 'counted' ? hillGroupKey(pid, party) : null;
   const side = (group: string | null): 'none' | 'you' | 'other' =>
     group === null ? 'none' : group === key ? 'you' : 'other';

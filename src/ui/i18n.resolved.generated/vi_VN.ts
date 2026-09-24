@@ -192,6 +192,22 @@ export const vi_VN: EnTranslations = {
       "lfgboard": {
         "label": "Tạo dữ liệu bảng đăng nhóm",
         "description": "Tạo kịch bản đăng nhóm lập sẵn."
+      },
+      "hillwarn": {
+        "label": "Hill countdown",
+        "description": "Announce a hill now; it rises after the full warning."
+      },
+      "hillnow": {
+        "label": "Raise hill now",
+        "description": "Raise a hill at once and stand on it."
+      },
+      "hillrise": {
+        "label": "Skip hill countdown",
+        "description": "Raise the announced hill right away."
+      },
+      "hillend": {
+        "label": "End hill",
+        "description": "Make the current hill fall now."
       }
     }
   },
@@ -2300,8 +2316,7 @@ export const vi_VN: EnTranslations = {
       "distance": "{yards} yd to the circle",
       "rises": "Rises in {minutes}",
       "falls": "Falls in {minutes}",
-      "standingRaid": "Raid members do not count: only parties can hold the hill",
-      "standingLevel": "You do not count on the hill until level {level}"
+      "standingRaid": "Raid members do not count: only parties can hold the hill"
     },
     "warfareShop": {
       "gossipOption": "Duyệt Bộ Chiến Tranh",
@@ -7345,7 +7360,7 @@ export const vi_VN: EnTranslations = {
       "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
       "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "hillHeading": "King of the Hill",
-      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members and characters too low for world PvP do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor."
     },
     "thornhollowPage": {

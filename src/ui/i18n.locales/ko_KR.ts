@@ -1542,7 +1542,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.falls': '{minutes} 후 사라집니다',
   'hudChrome.hill.standingRaid':
     '공격대원은 인원에 포함되지 않습니다. 언덕은 파티만 점령할 수 있습니다',
-  'hudChrome.hill.standingLevel': '{level}레벨이 되기 전에는 언덕 인원에 포함되지 않습니다',
   'hudChrome.warfareShop.gossipOption': '워페어 세트 둘러보기',
   'hudChrome.warfareShop.gossipOptionAria': '{name}이(가) 운영하는 워페어 세트 상점 둘러보기',
   'hudChrome.warfareShop.jewelry': '장신구',
@@ -1664,7 +1663,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다.',
   'guide.worldPvpPage.hillHeading': '언덕의 왕',
   'guide.worldPvpPage.hillBody':
-    '세 시간에 한 번, 아무도 예측할 수 없는 때에 자유 전투 지역 가운데 한 곳에 15분 뒤 언덕이 솟아오른다는 소식이 서버 전체에 알려지고, 언덕이 설 원이 탁 트인 땅에 표시됩니다. 솟아오른 언덕은 45분 동안 서 있다가 사라집니다. 원 안에 선 플레이어가 가장 많은 파티가 언덕을 두고 다투며, 1분 동안 끊이지 않고 다수를 유지하면 언덕은 그 파티의 것이 됩니다. 혼자인 플레이어는 1인 파티로 세지만, 공격대원과 월드 PvP에 필요한 레벨에 이르지 못한 캐릭터는 전혀 세지 않습니다. 한 파티가 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 약간의 명예를 얻습니다. 그래서 가득 찬 파티가 아무런 다툼 없이 언덕이 서 있는 내내 지키면 전장 승리 한 번보다 조금 적은 명예를 얻습니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.',
+    '세 시간에 한 번, 아무도 예측할 수 없는 때에 자유 전투 지역 가운데 한 곳에 15분 뒤 언덕이 솟아오른다는 소식이 서버 전체에 알려지고, 언덕이 설 원이 탁 트인 땅에 표시됩니다. 솟아오른 언덕은 45분 동안 서 있다가 사라집니다. 원 안에 선 플레이어가 가장 많은 파티가 언덕을 두고 다투며, 1분 동안 끊이지 않고 다수를 유지하면 언덕은 그 파티의 것이 됩니다. 혼자인 플레이어는 1인 파티로 세지만, 공격대원은 전혀 세지 않습니다. 한 파티가 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 약간의 명예를 얻습니다. 그래서 가득 찬 파티가 아무런 다툼 없이 언덕이 서 있는 내내 지키면 전장 승리 한 번보다 조금 적은 명예를 얻습니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.',
   'guide.thornhollowPage.heading': '쏜할로우 평원',
   'guide.thornhollowPage.intro':
     '가시봉 아래 오래된 숲의 성벽으로 둘러싸인 분지에서 벌어지는 랭크 5대 5 깃발 뺏기 전장. 협곡 양 끝에서 두 폐허 요새가 마주 보고, 그 사이에는 누구도 차지한 적 없는 더 오래된 안뜰이 있다. 다섯 명씩, 요새 둘, 목표 하나. 적의 깃발을 빼앗아 우리 깃발을 빼앗기기 전에 가져와라.',
@@ -12215,6 +12214,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.level.label': '레벨 설정',
   'devCommand.actions.lfgboard.description': '사전 구성 파티 모집 시나리오를 만듭니다.',
   'devCommand.actions.lfgboard.label': '모집 게시판 채우기',
+  'devCommand.actions.hillend.description': '지금 있는 언덕을 바로 사라지게 합니다.',
+  'devCommand.actions.hillend.label': '언덕 종료',
+  'devCommand.actions.hillnow.description': '언덕을 즉시 솟아오르게 하고 그 위에 섭니다.',
+  'devCommand.actions.hillnow.label': '지금 언덕 솟아오르기',
+  'devCommand.actions.hillrise.description': '알린 언덕을 바로 솟아오르게 합니다.',
+  'devCommand.actions.hillrise.label': '언덕 카운트다운 건너뛰기',
+  'devCommand.actions.hillwarn.description':
+    '지금 언덕을 알립니다. 전체 경고 시간이 지나면 솟아오릅니다.',
+  'devCommand.actions.hillwarn.label': '언덕 카운트다운',
   'devCommand.actions.lfgqueue.description': '던전 찾기 대기열 시나리오를 만듭니다.',
   'devCommand.actions.lfgqueue.label': '찾기 대기열 채우기',
   'devCommand.actions.lfgraid.description': '공격대 찾기 시나리오를 만듭니다.',

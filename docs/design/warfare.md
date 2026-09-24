@@ -388,10 +388,12 @@ whichever overworld zone a clamping lookup would misreport:
   (`content/zone1.ts`), so a new character can never be fought before they know
   what the flag is.
 - `'ffa'`: free-for-all. Everyone standing there is hostile to everyone else
-  standing there, flag or no flag, provided both are at least
-  `WORLD_PVP_MIN_LEVEL`: the level gate is the flag's, and the ground is not a
-  way around it, so a character too low to opt in can neither be opened on nor
-  open on anyone there (and hears no crossing notice until they reach it). The
+  standing there, flag or no flag, whatever their levels (owner spec,
+  2026-09-24: anyone on free-for-all ground is fair game), and every level
+  hears the crossing notices. The flag's level gate still holds for the flag
+  itself: an under-level character cannot raise one, so their hits there mark
+  nobody and they stake no gold; the grey rule keeps their deaths worthless to
+  a far higher killer. The
   Wraithwood, the Evergarden and the Nightbloom (`content/wraithwood.ts`,
   `content/evergarden.ts`, `content/nightbloom.ts`), the level-20 zones with the
   heaviest S-tier rift weight and the furthest north: the richest ground
@@ -535,9 +537,8 @@ world PvP. A realm that slept through whole windows plans the current one.
 
 Control is by headcount inside the circle, by PARTY (owner spec, 2026-09-24:
 parties only). A party is one group and a lone player a group of one
-(`hillGroupKey`); a raid member does not count at all, and neither does a
-player under `WORLD_PVP_MIN_LEVEL` (`hillStanding`), who cannot be attacked on
-free-for-all ground and would otherwise hold the circle untouchable. The
+(`hillGroupKey`); a raid member does not count at all (`hillStanding`). Any
+level counts, since anyone on free-for-all ground is fair game. The
 largest group that beats the holder's present members by a strict majority
 (`hillChallengeStands`; a tie never moves the hill, an absent holder is beaten
 by anyone) is the challenger, and after `HILL_CAPTURE_SECONDS` (60) of
@@ -567,8 +568,14 @@ the rise countdown and the distance to the marked circle; once risen, who holds
 it, you against them, the contest fill, the distance and the fall countdown;
 and in both, a note when the viewer does not count. The renderer draws the
 circle (`src/render/hill_ring.ts`) in the holder's colour; `/hill` in chat says
-where it stands or will rise; `/dev hill [zone] [warn]` stages one. The state
-is session-only and never persisted.
+where it stands or will rise. The state is session-only and never persisted.
+
+Test levers (dev realms only, `ALLOW_DEV_COMMANDS`; also buttons in the dev
+command window's Scenarios tab): `/dev hill [zone]` raises a hill at once and
+stands you on its rim; `/dev hill warn [zone] [seconds]` starts a countdown (the
+full warning, or a shorter one for a quick test); `/dev hill rise` skips the
+countdown; `/dev hill end` makes the hill fall; `/dev hill next` runs the real
+schedule's next hill now (its own zone and spot, the window spent).
 
 ## FURY prices
 

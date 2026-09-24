@@ -3,11 +3,11 @@
 // it shows at all (only in the hill's zone), the phase (announced or risen),
 // who holds the hill from the viewer's seat, the two headcounts the contest is
 // decided on, the contest clock against its capture length, the distance to
-// the circle, whether the viewer counts at all (parties only, level floor),
+// the circle, whether the viewer counts at all (parties only),
 // and the structural signature the painter rebuilds its skeleton on. The
 // painter (hill_bar_painter.ts) only paints; every decision is here.
 
-import { HILL_CAPTURE_SECONDS, WORLD_PVP_MIN_LEVEL } from '../../../sim/pvp';
+import { HILL_CAPTURE_SECONDS } from '../../../sim/pvp';
 import type { HillInfo, HillPhaseInfo, HillSide, HillStandingInfo } from '../../../world_api';
 
 export interface HillBarLive {
@@ -16,10 +16,8 @@ export interface HillBarLive {
   sig: string;
   zoneId: string;
   phase: HillPhaseInfo;
-  /** Whether the viewer counts on the hill, and the level floor the
-   *  under-level note quotes. */
+  /** Whether the viewer counts on the hill (a raid member does not). */
   standing: HillStandingInfo;
-  minLevel: number;
   holder: HillSide;
   challenger: HillSide;
   /** The viewer's group inside, and the count they are measured against:
@@ -82,7 +80,6 @@ export function buildHillBarView(
     zoneId: info.zoneId,
     phase: info.phase,
     standing: info.standing,
-    minLevel: WORLD_PVP_MIN_LEVEL,
     holder: info.holder,
     challenger: info.challenger,
     yours: info.yourCount,

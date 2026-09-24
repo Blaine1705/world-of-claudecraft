@@ -4,8 +4,7 @@
 // is announced: the title and the zone, "not yet risen", the distance to the
 // marked circle and when it rises. Once risen: who holds the hill, "you N vs
 // them M", the contest clock as a fill bar, the distance and when it falls.
-// Either way a note says so when the viewer does not count (a raid member, or
-// under the level floor). The skeleton is rebuilt in ONE innerHTML write when
+// Either way a note says so when the viewer does not count (a raid member). The skeleton is rebuilt in ONE innerHTML write when
 // the structural sig changes (a new hill, the rise, a holder or challenger
 // change, crossing the circle's edge); every
 // per-second value rides the PainterHost elided writers, so an idle second
@@ -158,11 +157,7 @@ export class HillBar {
 
 /** The note for a viewer who does not count on the hill, or null. */
 function standingNote(view: HillBarLive): string | null {
-  if (view.standing === 'raid') return t('hudChrome.hill.standingRaid');
-  if (view.standing === 'underLevel') {
-    return t('hudChrome.hill.standingLevel', { level: formatNumber(view.minLevel) });
-  }
-  return null;
+  return view.standing === 'raid' ? t('hudChrome.hill.standingRaid') : null;
 }
 
 function heldText(view: HillBarLive): string {

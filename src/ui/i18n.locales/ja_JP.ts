@@ -1551,7 +1551,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.falls': '{minutes} 後に消えます',
   'hudChrome.hill.standingRaid':
     'レイドのメンバーは数えられません。丘を占拠できるのはパーティだけです',
-  'hudChrome.hill.standingLevel': 'レベル {level} になるまで、あなたは丘の人数に数えられません',
   'hudChrome.warfareShop.gossipOption': 'ウォーフェアセットを見る',
   'hudChrome.warfareShop.gossipOptionAria': '{name}のウォーフェアセット商店を見る',
   'hudChrome.warfareShop.jewelry': 'アクセサリー',
@@ -1677,7 +1676,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
   'guide.worldPvpPage.hillHeading': '丘の王',
   'guide.worldPvpPage.hillBody':
-    '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーとワールドPvPに必要なレベルに達していないキャラクターは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分わずかな名誉を得ます。そのため満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利1回分より少し少ない名誉になります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
+    '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分わずかな名誉を得ます。そのため満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利1回分より少し少ない名誉になります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
   'guide.thornhollowPage.heading': 'ソーンホロウ平原',
   'guide.thornhollowPage.intro':
     'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',
@@ -12250,6 +12249,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.level.label': 'レベルを設定',
   'devCommand.actions.lfgboard.description': '事前編成の募集掲示シナリオを作成します。',
   'devCommand.actions.lfgboard.label': '募集掲示板を準備',
+  'devCommand.actions.hillend.description': '現在の丘を今すぐ消します。',
+  'devCommand.actions.hillend.label': '丘を終了',
+  'devCommand.actions.hillnow.description': '丘をすぐに出現させ、その上に立ちます。',
+  'devCommand.actions.hillnow.label': '今すぐ丘を出現',
+  'devCommand.actions.hillrise.description': '告知中の丘をすぐに出現させます。',
+  'devCommand.actions.hillrise.label': '丘のカウントダウンを省略',
+  'devCommand.actions.hillwarn.description':
+    '今すぐ丘を告知します。警告の時間が過ぎると出現します。',
+  'devCommand.actions.hillwarn.label': '丘のカウントダウン',
   'devCommand.actions.lfgqueue.description': 'ダンジョンファインダーの待機列シナリオを作成します。',
   'devCommand.actions.lfgqueue.label': 'ファインダー待機列を準備',
   'devCommand.actions.lfgraid.description': 'レイドファインダーのシナリオを作成します。',

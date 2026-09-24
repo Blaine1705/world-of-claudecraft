@@ -261,16 +261,12 @@ describe('HillBar (the painter)', () => {
     expect(root.textContent).toContain('Falls in 45 minutes');
   });
 
-  it('tells a raid member and an under-level player they do not count', () => {
+  it('tells a raid member they do not count', () => {
     const { layer, bar } = harness();
     bar.update(buildHillBarView(info({ standing: 'raid' }), { x: 360, z: 1540 }));
     const root = layer.querySelector('#hill-bar') as HTMLElement;
     expect(root.querySelector('.hill-note')?.textContent).toBe(
       'Raid members do not count: only parties can hold the hill',
-    );
-    bar.update(buildHillBarView(info({ standing: 'underLevel' }), { x: 360, z: 1540 }));
-    expect(root.querySelector('.hill-note')?.textContent).toBe(
-      'You do not count on the hill until level 10',
     );
     bar.update(buildHillBarView(info(), { x: 360, z: 1540 }));
     expect(root.querySelector('.hill-note')).toBeNull();

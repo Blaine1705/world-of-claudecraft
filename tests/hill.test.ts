@@ -3,7 +3,7 @@
 // after) and its realm announcements, the spot (dry, open, clear of the hub,
 // wholly inside a free-for-all zone, the same on every host, drawn from a
 // private rng, a retry searching new ground), the contest (a party as one
-// group, raids and under-level players not counted, the strict majority, the
+// group, raids not counted, any level counted, the strict majority, the
 // tie, the lapse, the dead), the capture notices, the Honor trickle (a minute
 // of presence pays one, only inside, only holders, a bank kept across a step
 // out), the readout from each viewer's seat, the /hill and /dev hill arms, and
@@ -31,6 +31,7 @@ import {
   spawnHillNow,
 } from '../src/sim/pvp';
 import { HILL_READOUT_NONE_LINE, pickHillSpot } from '../src/sim/pvp/hill';
+import { HILL_DEV_USAGE, parseHillDevCommand } from '../src/sim/pvp/hill_dev';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimConfig, SimEvent, WorldContent } from '../src/sim/types';
@@ -432,7 +433,7 @@ describe('the contest', () => {
     expect(sim.hillInfoFor(b)).toMatchObject({ challenger: 'you', contest: 3 });
   });
 
-  it('a raid does not count at all, and neither does a player under the level floor', () => {
+  it('a raid does not count at all, while a player of any level does', () => {
     const { sim, pids } = hillWorld(['R1', 'R2', 'R3', 'R4', 'R5', 'Solo', 'Novice']);
     const [r1, r2, r3, r4, r5, solo, novice] = pids;
     sim.setPlayerLevel(9, novice);
@@ -443,9 +444,9 @@ describe('the contest', () => {
     }
     sim.convertPartyToRaid(r1);
     expect(sim.partyOf(r1)!.raid).toBe(true);
-    for (const [i, pid] of [r1, r2, r3, novice].entries()) inside(sim, pid, i * 4 - 6, 0);
+    for (const [i, pid] of [r1, r2, r3].entries()) inside(sim, pid, i * 4 - 6, 0);
     tickSeconds(sim, HILL_CAPTURE_SECONDS + 5);
-    // Three raiders and an alt stood a full minute on an empty hill: nothing.
+    // Three raiders stood a full minute on an empty hill: nothing.
     expect(sim.hillState.active!.holder).toBeNull();
     expect(sim.hillState.active!.counts.size).toBe(0);
     expect(sim.hillInfoFor(r1)).toMatchObject({
@@ -454,16 +455,19 @@ describe('the contest', () => {
       yourCount: 0,
       challenger: 'none',
     });
-    expect(sim.hillInfoFor(novice)).toMatchObject({ standing: 'underLevel', yourCount: 0 });
-    // A lone player beside them takes it unopposed.
-    inside(sim, solo, 0, 6);
+    // A level-9 lone player beside them counts, and takes it unopposed.
+    inside(sim, novice, 0, 6);
     tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
-    expect(sim.hillState.active!.holder).toBe(`solo:${solo}`);
-    expect(sim.hillInfoFor(solo)).toMatchObject({
+    expect(sim.hillState.active!.holder).toBe(`solo:${novice}`);
+    expect(sim.hillInfoFor(novice)).toMatchObject({
       standing: 'counted',
       holder: 'you',
       holderCount: 1,
     });
+    // Another lone player makes a tie, which never moves the hill.
+    inside(sim, solo, 0, -6);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
+    expect(sim.hillState.active!.holder).toBe(`solo:${novice}`);
     // Back to a party of three, the same players count again.
     sim.convertRaidToParty(r1);
     expect(sim.partyOf(r1)!.raid).toBe(false);
@@ -528,7 +532,7 @@ describe('the Honor trickle', () => {
     expect(honorEvents(seen, a)).toHaveLength(1);
   });
 
-  it('pays every holder of the party inside and nobody else, never an under-level alt', () => {
+  it('pays every holder of the party inside, whatever their level, and nobody else', () => {
     const { sim, pids } = hillWorld(['A1', 'A2', 'A3', 'A4', 'Rival', 'Novice']);
     const party = pids.slice(0, 4);
     const [rival, novice] = pids.slice(4);
@@ -543,13 +547,12 @@ describe('the Honor trickle', () => {
     inside(sim, rival, 0, -6);
     tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
     expect(sim.hillState.active!.holder).toBe(`party:${sim.partyOf(party[0])!.id}`);
-    expect(sim.hillInfoFor(party[0])).toMatchObject({ holderCount: 4 });
+    expect(sim.hillInfoFor(party[0])).toMatchObject({ holderCount: 5 });
     sim.events = [];
     const seen = tickSeconds(sim, HILL_ACCRUAL_SECONDS + 1);
     const paid = [...party, novice, rival].filter((pid) => honorEvents(seen, pid).length > 0);
-    expect(paid).toEqual(party);
+    expect(paid).toEqual([...party, novice]);
     expect(sim.meta(rival)!.honor).toBe(0);
-    expect(sim.meta(novice)!.honor).toBe(0);
   });
 
   it("a capture clears the old holder's banked minute", () => {
@@ -620,14 +623,70 @@ describe('the readout and the chat arms', () => {
     expect(hill.zoneId).toBe('evergarden');
     expect(hillContains(hill, ent(sim, a).pos.x, ent(sim, a).pos.z)).toBe(true);
     expect(hill.phase).toBe('active');
-    sim.chat('/dev hill warn', a);
-    expect(sim.hillState.active).toMatchObject({ phase: 'warning' });
-    sim.chat('/dev hill nightbloom warn', a);
-    expect(sim.hillState.active).toMatchObject({ phase: 'warning', zoneId: 'nightbloom' });
     const plain = world();
     const p = addPlayer(plain, 'Plain');
     plain.chat('/dev hill', p);
+    plain.chat('/dev hill warn', p);
     expect(plain.hillState.active).toBeNull();
+  });
+
+  it('/dev hill warn counts down (full, or a short test countdown), then rise and end drive the phases', () => {
+    const sim = world({ devCommands: true });
+    const a = addPlayer(sim, 'Aleph');
+    sim.chat('/dev hill warn', a);
+    const full = sim.hillState.active!;
+    expect(full.phase).toBe('warning');
+    expect(full.risesAt - sim.time).toBe(HILL_WARNING_SECONDS);
+    expect(hillContains(full, ent(sim, a).pos.x, ent(sim, a).pos.z)).toBe(true);
+    // A short countdown in a named zone, then let it run out on its own.
+    sim.chat('/dev hill warn nightbloom 5', a);
+    const short = sim.hillState.active!;
+    expect(short).toMatchObject({ phase: 'warning', zoneId: 'nightbloom' });
+    expect(short.risesAt - sim.time).toBe(5);
+    const seen = tickSeconds(sim, 7);
+    expect(short.phase).toBe('active');
+    expect(logLines(seen)).toContain(hillRiseLine('The Nightbloom'));
+    expect(short.closesAt - short.risesAt).toBe(HILL_DURATION_SECONDS);
+    // Skip a countdown: the announced hill rises now and stands in full.
+    sim.chat('/dev hill warn evergarden', a);
+    sim.events = [];
+    sim.chat('/dev hill rise', a);
+    const risen = sim.hillState.active!;
+    expect(risen).toMatchObject({ phase: 'active', zoneId: 'evergarden' });
+    expect(risen.closesAt - sim.time).toBe(HILL_DURATION_SECONDS);
+    expect(logLines(sim.events)).toContain(hillRiseLine('The Evergarden'));
+    // End it: the realm hears the fall.
+    sim.events = [];
+    sim.chat('/dev hill end', a);
+    expect(sim.hillState.active).toBeNull();
+    expect(logLines(sim.events)).toContain(hillFallenLine('The Evergarden'));
+    // Nothing to rise or end now: told so, nothing changes.
+    sim.events = [];
+    sim.chat('/dev hill rise', a);
+    sim.chat('/dev hill end', a);
+    expect(logLines(sim.events, a)).toEqual([
+      '[dev] No hill is counting down.',
+      '[dev] No hill stands.',
+    ]);
+    // A malformed line prints the usage.
+    sim.events = [];
+    sim.chat('/dev hill warn 5 6', a);
+    expect(logLines(sim.events, a)).toEqual([HILL_DEV_USAGE]);
+    expect(sim.hillState.active).toBeNull();
+  });
+
+  it("/dev hill next runs the real schedule now: the next window's own hill, warned in full", () => {
+    const sim = world({ devCommands: true });
+    const a = addPlayer(sim, 'Aleph');
+    const reference = world();
+    const expected = spawnHill(reference.ctx, 0, hillPlanFor(reference.ctx, 0))!;
+    sim.chat('/dev hill next', a);
+    const hill = sim.hillState.active!;
+    expect(hill).toMatchObject({ ordinal: 0, phase: 'warning', zoneId: expected.zoneId });
+    expect([hill.x, hill.z]).toEqual([expected.x, expected.z]);
+    expect(hill.risesAt - hill.warnAt).toBe(HILL_WARNING_SECONDS);
+    // The window is spent: the schedule plans the next one.
+    expect(sim.hillState.window).toBe(1);
   });
 
   it('/hill during the warning says where and when the hill will rise', () => {
@@ -643,6 +702,44 @@ describe('the readout and the chat arms', () => {
     expect(hillWarningLine('The Wraithwood', 1)).toBe(
       'A hill will rise in The Wraithwood in 1 minute.',
     );
+  });
+});
+
+describe('the /dev hill grammar', () => {
+  it('parses every arm and refuses malformed arguments', () => {
+    expect(parseHillDevCommand('/dev hill')).toEqual({ kind: 'now' });
+    expect(parseHillDevCommand('/devhill')).toEqual({ kind: 'now' });
+    expect(parseHillDevCommand('/dev hill Wraithwood')).toEqual({
+      kind: 'now',
+      zoneId: 'wraithwood',
+    });
+    expect(parseHillDevCommand('/dev hill warn')).toEqual({ kind: 'warn' });
+    expect(parseHillDevCommand('/dev hill warn 30')).toEqual({ kind: 'warn', seconds: 30 });
+    expect(parseHillDevCommand('/dev hill warn evergarden 30')).toEqual({
+      kind: 'warn',
+      zoneId: 'evergarden',
+      seconds: 30,
+    });
+    expect(parseHillDevCommand('/dev hill warn 30 evergarden')).toEqual({
+      kind: 'warn',
+      zoneId: 'evergarden',
+      seconds: 30,
+    });
+    expect(parseHillDevCommand('/dev hill warn 0')).toEqual({ kind: 'warn', seconds: 1 });
+    expect(parseHillDevCommand('/dev hill rise')).toEqual({ kind: 'rise' });
+    expect(parseHillDevCommand('/dev hill end')).toEqual({ kind: 'end' });
+    expect(parseHillDevCommand('/dev hill next')).toEqual({ kind: 'next' });
+    for (const bad of [
+      '/dev hill rise now',
+      '/dev hill warn 5 6',
+      '/dev hill warn a b',
+      '/dev hill a b',
+      '/dev hill 12',
+      '/dev hill wraith-wood',
+      '/dev gold 5',
+    ]) {
+      expect(parseHillDevCommand(bad), bad).toBeNull();
+    }
   });
 });
 

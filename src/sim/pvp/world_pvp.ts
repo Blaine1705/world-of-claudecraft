@@ -5,9 +5,9 @@
 // who is not in their party or raid (a shared guild is no shield), anywhere
 // the ground allows it. The ground has three answers (world_pvp_zones.ts): a
 // sanctuary switches the world off for everyone in it, a free-for-all zone
-// makes everyone standing in it fair game with no flag at all, and everywhere else is contested: the
-// mutual-flag rule. In a free-for-all zone the first hit on an unflagged
-// player MARKS the attacker (raises their flag), so an aggressor always ends
+// makes everyone standing in it fair game with no flag at all, and everywhere
+// else is contested: the mutual-flag rule. In a free-for-all zone the first
+// hit on an unflagged player MARKS the attacker (raises their flag), so an aggressor always ends
 // up carrying the stake; whoever hits a flagged player, the victim included,
 // is never marked for it.
 //
@@ -117,8 +117,7 @@ export interface WorldPvpBooks {
   killsByPair: Map<string, WorldPvpPairKills>;
   /** pid -> the zone policy the player stood in at the last zone pass, so the
    *  enter/leave notices fire once per crossing. Rows of players who left the
-   *  world, and of players under WORLD_PVP_MIN_LEVEL (told on the pass after
-   *  they reach it), are dropped. */
+   *  world are dropped. */
   zoneOf: Map<number, WorldPvpZonePolicy>;
   /** The earliest pending disarm (sim time), Infinity when nobody is switching
    *  off: the per-tick pass is skipped entirely until then, so a realm with no
@@ -314,21 +313,16 @@ function sweepBooks(ctx: SimContext, books: WorldPvpBooks): void {
  * PvP means. Entering a free-for-all zone always says so (a player who logs
  * in inside one is told on their first pass); leaving it says so; a FLAGGED
  * player entering a sanctuary is told the flag is idle there (an unflagged
- * level-one character walking around the starter zone hears nothing). A
- * character under WORLD_PVP_MIN_LEVEL is outside the free-for-all arm
- * altogether (world_pvp_rules.ts), so they hear nothing either, and their row
- * is dropped so the pass after they reach the level tells them where they
- * stand. The policy is re-read from the ground each pass, so a teleport or a
+ * level-one character walking around the starter zone hears nothing). Every
+ * level hears the free-for-all notices: free-for-all ground makes anyone fair
+ * game (world_pvp_rules.ts), so a low-level character most of all needs to
+ * know they walked onto it. The policy is re-read from the ground each pass, so a teleport or a
  * tow across a zone line is noticed the same as a walk.
  */
 function noticeZoneChanges(ctx: SimContext, books: WorldPvpBooks): void {
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e) continue;
-    if (e.level < WORLD_PVP_MIN_LEVEL) {
-      books.zoneOf.delete(e.id);
-      continue;
-    }
     const now = worldPvpZonePolicyAt(e.pos.x, e.pos.z);
     const was = books.zoneOf.get(e.id);
     if (was === now) continue;

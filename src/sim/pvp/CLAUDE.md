@@ -120,8 +120,7 @@ ratings.
 ## King of the Hill
 
 - `hill_rules.ts` owns the PURE rules: who counts (`hillStanding`: parties
-  only, so a raid member does not, and neither does a player under
-  `WORLD_PVP_MIN_LEVEL`), the group key (`hillGroupKey`: a party, or a lone
+  only, so a raid member does not; any level does), the group key (`hillGroupKey`: a party, or a lone
   player as a group of one; null for a raid), the strict-maximum leader
   (`hillLeader`, null on a tie), the majority verdict (`hillChallengeStands`),
   the contest clock (`hillContestStep`), the spot probe (`hillSpotIsOpen` over a
@@ -139,8 +138,9 @@ ratings.
   (`hillPlanFor`: the warning's offset inside the window from a PRIVATE rng
   derived from the seed and the window's ordinal, the rift portal precedent, so
   the world stream never moves), the spawn (`spawnHill`, whose spot rng salts
-  in the attempt number so a retry searches new ground; `spawnHillNow` for the
-  `/dev hill [zone] [warn]` arm), the once-a-second `updateHill` pass (the
+  in the attempt number so a retry searches new ground), the `/dev hill` test
+  levers (`spawnHillNow`, `riseHillNow`, `endHillNow`, `warnNextHillNow`; their
+  argument grammar is the pure `hill_dev.ts`), the once-a-second `updateHill` pass (the
   phases warning, risen, fallen, each announced to the realm; then, only while
   risen, presence by party, contest, payouts through `grantHonor` with reason
   `hill_hold`), the readout (`hillInfoFor`, live fields only for a viewer in the

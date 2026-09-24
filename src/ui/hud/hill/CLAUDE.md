@@ -7,7 +7,7 @@ through `IWorld.hillInfo`), behind the `index.ts` barrel:
   `buildHillBarView(info, playerPos)` decides everything: the bar shows only
   while the local player stands in the hill's zone (`info.inZone`); the phase
   (announced or risen) and whether the viewer counts (`standing`: a raid member
-  or an under-level player does not, and the bar says so); the holder
+  does not, and the bar says so); the holder
   and the challenger from the viewer's seat; the two headcounts the contest is
   decided on (`yours` against the holder's members inside, or the largest
   rival's while the hill is unheld, `hillRivalCount`); the contest clock

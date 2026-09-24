@@ -4,9 +4,8 @@
 // circle on dry, open ground and stands for HILL_DURATION_SECONDS. The PARTY
 // with the most members standing inside it contests it, holds it after
 // HILL_CAPTURE_SECONDS of unbroken majority, and every holder standing inside
-// earns a slow trickle of Honor for as long as they hold it. Raid members and
-// players under the world PvP level floor do not count. No SimContext, no rng,
-// no clock: every function here is a plain function of its arguments so the
+// earns a slow trickle of Honor for as long as they hold it. Raid members do
+// not count; every level does. No SimContext, no rng, no clock: every function here is a plain function of its arguments so the
 // sim (hill.ts), the HUD bar and the tests read the same verdicts. The
 // ctx-bound system that owns the schedule, the presence pass, the contest
 // clock and the payouts is hill.ts.
@@ -57,19 +56,12 @@ export const HILL_INNER_SAMPLES = 8;
 export const HILL_CENTER_CLEARANCE = 6;
 
 /** Whether a player counts on the hill (owner spec: parties only): a raid
- *  member does not, so a raid cannot flood the circle, and neither does a
- *  player under the world PvP level floor, who cannot be attacked on
- *  free-for-all ground and would otherwise hold the circle untouchable. */
-export type HillStanding = 'counted' | 'raid' | 'underLevel';
+ *  member does not, so a raid cannot flood the circle. Level does not matter:
+ *  anyone on free-for-all ground is fair game, so anyone there can hold. */
+export type HillStanding = 'counted' | 'raid';
 
-export function hillStanding(
-  level: number,
-  party: { raid: boolean } | null,
-  minLevel: number,
-): HillStanding {
-  if (level < minLevel) return 'underLevel';
-  if (party?.raid) return 'raid';
-  return 'counted';
+export function hillStanding(party: { raid: boolean } | null): HillStanding {
+  return party?.raid ? 'raid' : 'counted';
 }
 
 /** The group a counted player contests for: their party, or a group of one

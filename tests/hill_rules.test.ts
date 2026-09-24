@@ -1,5 +1,5 @@
 // Pins for the King of the Hill pure rules (src/sim/pvp/hill_rules.ts): the
-// standing (parties only, the level floor), the group key, the strict-maximum
+// standing (parties only, any level), the group key, the strict-maximum
 // leader, the majority verdict, the contest clock, the spot probe, the
 // three-hour schedule and the circle test.
 import { describe, expect, it } from 'vitest';
@@ -42,13 +42,10 @@ describe('the tuning literals the copy and the docs quote', () => {
 });
 
 describe('hillStanding and hillGroupKey', () => {
-  it('counts a party member or a lone player, never a raid member or an under-level player', () => {
-    expect(hillStanding(20, null, 10)).toBe('counted');
-    expect(hillStanding(10, { raid: false }, 10)).toBe('counted');
-    expect(hillStanding(20, { raid: true }, 10)).toBe('raid');
-    expect(hillStanding(9, null, 10)).toBe('underLevel');
-    // The level floor reads first: an under-level raider is under level.
-    expect(hillStanding(9, { raid: true }, 10)).toBe('underLevel');
+  it('counts a party member or a lone player of any level, never a raid member', () => {
+    expect(hillStanding(null)).toBe('counted');
+    expect(hillStanding({ raid: false })).toBe('counted');
+    expect(hillStanding({ raid: true })).toBe('raid');
   });
 
   it('keys a party member by the party, a lone player by themselves, and a raid not at all', () => {

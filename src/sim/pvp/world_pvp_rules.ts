@@ -76,11 +76,10 @@ export function worldPvpPairExempt(a: Entity, b: Entity, inSameParty: boolean): 
  * before reaching here, in the sim's pvpController and the renderer's
  * isOwnedPetHostile). In order: the exemptions above; a sanctuary under EITHER
  * player switches the world off; both standing in a free-for-all zone makes
- * them hostile with no flag at all, provided BOTH are at least
- * WORLD_PVP_MIN_LEVEL (the level gate is the flag's, and the ground must not
- * be a way around it: a character too low to opt in can neither be opened on
- * nor open on anyone there); anywhere else both must carry the flag, which an
- * under-level character can never do. Symmetric in every arm.
+ * them hostile with no flag at all, whatever their levels (owner spec: anyone
+ * standing on free-for-all ground is fair game); anywhere else both must carry
+ * the flag, which an under-level character can never do. Symmetric in every
+ * arm.
  */
 export function worldPvpPairHostile(
   a: Entity,
@@ -91,9 +90,7 @@ export function worldPvpPairHostile(
 ): boolean {
   if (worldPvpPairExempt(a, b, inSameParty)) return false;
   if (zoneA === 'sanctuary' || zoneB === 'sanctuary') return false;
-  if (zoneA === 'ffa' && zoneB === 'ffa') {
-    return a.level >= WORLD_PVP_MIN_LEVEL && b.level >= WORLD_PVP_MIN_LEVEL;
-  }
+  if (zoneA === 'ffa' && zoneB === 'ffa') return true;
   return !!a.pvpFlag && !!b.pvpFlag;
 }
 
