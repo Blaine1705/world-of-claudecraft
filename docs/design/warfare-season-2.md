@@ -90,9 +90,10 @@ everywhere. These rules hold them together:
   Kole in Highwatch). The shop lists a Season 2 group first: the viewer's own three spec
   sets (the sets are class-locked, so the shop shows only what the viewer can wear), then the
   season weapons the viewer can wield. The entry tier follows as its own group, unfiltered.
-- **Art:** a follow-up art pass paints all 139 icons. Until then the 135 armor pieces sit on
-  `ITEM_ART_PENDING` (pinned in `tests/item_icons.test.ts`) and the four weapons draw
-  their procedural icon, as every unpainted weapon does.
+- **Art:** the four weapons ship painted icons (the `warfare-season2-weapons-2026-09-25`
+  batch in `public/ui/items/mapping.json`) and held models on shipped GLBs. The 135 armor
+  pieces sit on `ITEM_ART_PENDING` (pinned in `tests/item_icons.test.ts`) and draw their
+  procedural icon until a follow-up art pass paints them.
 - **Ids:** sets use a new prefix, `vanguard_<spec>`, so the existing `warfare_*` pins keep
   meaning the entry tier.
 

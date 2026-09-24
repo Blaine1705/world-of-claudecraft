@@ -320,7 +320,9 @@ describe('item webp icons', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04) to 136. This merge unions both waves
     // plus this branch's own Crucible professions weapon additions; re-counted directly
     // off the merged src/ui/weapon_variants.ts (Object.keys(ITEM_WEAPON_VARIANTS).size).
-    expect(WEAPON_IMAGE_IDS.size).toBe(138);
+    // 138 -> 142: the four Warfare Season 2 honor weapons
+    // (warfare-season2-weapons-2026-09-25).
+    expect(WEAPON_IMAGE_IDS.size).toBe(142);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
