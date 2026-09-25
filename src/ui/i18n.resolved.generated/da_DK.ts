@@ -17738,6 +17738,11 @@ export const da_DK: EnTranslations = {
         "title": "Vagt over de Fjerne Klitter",
         "greeting": "Hold dig lavt. Lyd bærer mærkeligt fra glasset, og porten dernede har ører."
       },
+      "harbormaster_tamsin": {
+        "name": "Harbormaster Tamsin",
+        "title": "Keeper of the Wyrmwatch Quays",
+        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
+      },
       "reeve_ottoline": {
         "name": "Foged Ottoline",
         "title": "Foged af Lygtesø",

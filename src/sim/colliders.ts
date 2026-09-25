@@ -136,6 +136,7 @@ import {
   terrainHeight,
   waterLevelAt,
 } from './world';
+import { wyrmwatchHarborColliders } from './wyrmwatch_harbor';
 import { yumiMazeColliders } from './yumi_maze_layout';
 
 // Static world collision. Prop placement comes from the per-zone content
@@ -775,13 +776,12 @@ function staticWorldColliders(seed: number): Collider[] {
     }
   }
 
-  // Hand-placed GLB decor (src/sim/decor_prop_colliders.ts): a circle or box
-  // per PROPS.decorProps entry, walk-through when r/hw+hd are absent, standable
-  // on top when standableTop is set (see that module's header).
+  // Hand-placed GLB decor (src/sim/decor_prop_colliders.ts): a circle or box per
+  // PROPS.decorProps row, walk-through without r/hw+hd, standable with standableTop.
   out.push(...buildDecorPropColliders(seed, PROPS.decorProps ?? []));
-  // Scheduled transport ships moor at every berth of their route, gated by
-  // the timetable (transport_gates.ts); built-in world only.
+  // Built-in only: the berths (transport_gates.ts), then the Wyrmwatch cliff harbor.
   if (content === BUILTIN_WORLD) out.push(...transportBerthColliders(seed));
+  if (content === BUILTIN_WORLD) out.push(...wyrmwatchHarborColliders(seed));
 
   // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
   // grid the renderer lays the hedge GLBs from, so the blocked ground IS the

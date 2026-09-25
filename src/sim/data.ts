@@ -328,6 +328,7 @@ import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
 import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
+import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
@@ -470,6 +471,10 @@ export const NPCS: Record<string, NpcDef> = {
   // dynamic, spawned after the player by sim/hub_practice.ts, so his
   // presence in this record moves no id.
   ...HUB_PRACTICE_NPCS,
+  // The Harbormaster's House keeper at the Wyrmwatch cliff harbor
+  // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
+  // before her keeps its entity id.
+  ...WYRMWATCH_HARBOR_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the

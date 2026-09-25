@@ -12523,6 +12523,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Каждая лодка в этой бухте обязана килем Старому Маяку. Говори быстрее — прилив ждать не станет.',
   'entities.npcs.harbormaster_odile.name': 'Начальница гавани Одиль',
   'entities.npcs.harbormaster_odile.title': 'Начальница гавани Викхарбора',
+  'entities.npcs.harbormaster_tamsin.greeting':
+    'Заходите с причала, погрейте руки. Корабль у нашего пирса идёт вдоль длинного восточного берега до Викхарбора и обратно. Далеко на западе другой паром ходит между пристанями Истврука и Ночецветья. На карте на стене видны оба маршрута. Отдохните у огня, прежде чем подниматься к Змеиному дозору.',
+  'entities.npcs.harbormaster_tamsin.name': 'Начальница гавани Тамсин',
+  'entities.npcs.harbormaster_tamsin.title': 'Смотрительница причалов Змеиного дозора',
   'entities.npcs.head_gardener_amaranth.greeting':
     'Не обращай внимания на тени у меня под глазами. Кто-то должен бодрствовать, пока сад видит сны.',
   'entities.npcs.head_gardener_amaranth.name': 'Старшая садовница Амарант',

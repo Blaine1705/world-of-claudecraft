@@ -696,6 +696,7 @@ import {
   WORLD_BOSSES,
   type WorldBossDef,
 } from './world_boss';
+import { spawnHarborHouseKeeper } from './wyrmwatch_harbor_house';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
 // per-realm world_state row alongside the market).
@@ -2619,12 +2620,11 @@ export class Sim {
       }
     }
 
-    // Escort NPCs (escort.ts) and the hub practice yard (hub_practice.ts) last
-    // on purpose: rng-free, trailing ids only, so everything above is byte-
-    // identical to a world without them.
+    // Escorts, the practice yards, the harbormaster: rng-free, trailing or reserved ids.
     initEscortsImpl(this.ctx);
     spawnHubPractice(this.ctx, worldContent);
     spawnHealingTrainingGround(this.ctx, worldContent);
+    spawnHarborHouseKeeper(this.ctx, worldContent);
   }
 
   private spawnHealerPracticeDummy(): void {

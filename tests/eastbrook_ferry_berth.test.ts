@@ -5,6 +5,7 @@ import {
   EASTBROOK_NIGHTBLOOM_FERRY,
   WICKHARBOR_DRAKELANDS_FERRY,
 } from '../src/sim/content/transport_ships';
+import { WYRMWATCH_HARBOR_DECKS } from '../src/sim/content/wyrmwatch_harbor';
 import { PROPS } from '../src/sim/data';
 import { EASTBROOK_HARBOR_DECKS } from '../src/sim/eastbrook_harbor';
 import { FERRY_PIER_DECK_ABOVE_WATER, FERRY_PIER_DECKS } from '../src/sim/ferry_piers';
@@ -474,11 +475,13 @@ describe('the far berths: the Moonrest and Wyrmwatch ferry piers', () => {
       const meta = sim.players.get(p.id);
       if (!meta) throw new Error('meta');
       const docked = route.timings.docked + transportVoyageSeconds(route, 0) + 1;
-      // start on the shore past the pier's root (on the bank's crest, above
-      // the stair, at Wyrmwatch)
-      const root = name === 'Wyrmwatch' ? FERRY_PIER_DECKS[2] : pier;
-      const start = point(root, name === 'Wyrmwatch' ? root.hl + 1.5 : -root.hl - 1.5);
-      expect(terrainHeight(start.x, start.z, WORLD_SEED)).toBeGreaterThan(WATER_LEVEL + 2);
+      // start on the shore past the pier's root (at Wyrmwatch, at the pier's root
+      // beside the cliff harbor's north yard: the climb down from the cliff top is
+      // walked in tests/wyrmwatch_harbor.test.ts)
+      const start = name === 'Wyrmwatch' ? { x: 490.9, z: 1898.4 } : point(pier, -pier.hl - 1.5);
+      if (name !== 'Wyrmwatch') {
+        expect(terrainHeight(start.x, start.z, WORLD_SEED)).toBeGreaterThan(WATER_LEVEL + 2);
+      }
       p.pos = { x: start.x, y: groundHeight(start.x, start.z, WORLD_SEED), z: start.z };
       p.prevPos = { ...p.pos };
       const idle = {
@@ -517,23 +520,18 @@ describe('the far berths: the Moonrest and Wyrmwatch ferry piers', () => {
     }, 60_000);
   }
 
-  it('Wyrmwatch: the bluff stair runs from the pier root up to the bank crest', () => {
-    const stair = FERRY_PIER_DECKS[2];
+  it('Wyrmwatch: the pier root opens flush onto the cliff harbor quays', () => {
     const pier = FERRY_PIER_DECKS[1];
-    // its foot overlaps into the pier root, flush with the planks
-    const foot = point(stair, -stair.hl + 0.01);
-    expect(Math.abs(along(pier, foot.x, foot.z))).toBeLessThan(pier.hl);
-    expect(groundHeight(foot.x, foot.z, WORLD_SEED) - WATER_LEVEL).toBeCloseTo(2.64, 1);
-    // its head meets the crest, and no tread sinks into the bank
-    const head = point(stair, stair.hl);
-    expect(
-      groundHeight(head.x, head.z, WORLD_SEED) - terrainHeight(head.x, head.z, WORLD_SEED),
-    ).toBeLessThan(0.5);
-    for (let a = -stair.hl; a <= stair.hl; a += 0.5) {
-      const at = point(stair, a);
-      expect(groundHeight(at.x, at.z, WORLD_SEED)).toBeGreaterThanOrEqual(
-        terrainHeight(at.x, at.z, WORLD_SEED),
-      );
+    // the north yard and the south quay each lap onto the pier's root, level with its
+    // planks, so the walk off the pier onto either has no step (the climb itself is
+    // pinned by tests/wyrmwatch_harbor.test.ts)
+    for (const id of ['northYard', 'southQuay'] as const) {
+      const quay = WYRMWATCH_HARBOR_DECKS.find((d) => d.id === id);
+      if (!quay) throw new Error(id);
+      const edge = id === 'northYard' ? quay.z + quay.hl - 0.1 : quay.z - quay.hl + 0.1;
+      const x = id === 'northYard' ? 491 : 495;
+      expect(Math.abs(across(pier, x, edge))).toBeLessThan(pier.hw);
+      expect(groundHeight(x, edge, WORLD_SEED) - WATER_LEVEL).toBeCloseTo(2.64, 6);
     }
   });
 });
