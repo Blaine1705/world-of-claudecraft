@@ -94,7 +94,7 @@ class Rig {
 
   constructor(
     readonly view: UnderwaterView,
-    readonly water: WaterView,
+    public water: WaterView,
   ) {
     this.scene.fog = new THREE.Fog(0x88aacc, 30, 220);
     this.scene.add(view.group, water.group);
@@ -185,6 +185,37 @@ for (const tier of ['low', 'medium'] as const) {
       rig.frame();
       expect(rig.undersideShown()).toBe(tier === 'medium');
       expect(calls).toHaveLength(tier === 'low' ? 1 : 2);
+    });
+
+    it('gates a rebuilt water view afresh, ignoring the old link settling', async () => {
+      const first = await load(tier);
+      const rig = new Rig(first.view, first.water);
+      const { gate, calls } = heldGate();
+      let current = first.water;
+      first.view.setCompileGate(gate, () => current);
+      ponds.push({ x: 0, z: 0, r: 30 });
+      rig.place(0, 0, WATERLINE - 3);
+      rig.frame(2);
+      const firstCalls = calls.length;
+      expect(firstCalls).toBe(tier === 'low' ? 1 : 2);
+
+      const { buildWater } = await import('../src/render/water');
+      current = buildWater(SEED);
+      rig.water = current;
+      rig.frame();
+      expect(calls.map((c) => c.root).slice(firstCalls)).toEqual(
+        tier === 'low' ? [first.view.group] : [first.view.group, current.undersideRoot()],
+      );
+      for (const call of calls.slice(0, firstCalls)) call.resolve();
+      await flush();
+      rig.frame(3);
+      expect(first.view.group.visible).toBe(false);
+      expect(rig.undersideShown()).toBe(false);
+      for (const call of calls.slice(firstCalls)) call.resolve();
+      await flush();
+      rig.frame(2);
+      expect(first.view.group.visible).toBe(true);
+      expect(rig.undersideShown()).toBe(tier === 'medium');
     });
 
     it('shows at once with no gate installed', async () => {

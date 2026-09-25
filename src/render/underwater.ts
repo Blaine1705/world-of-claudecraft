@@ -136,6 +136,8 @@ export class UnderwaterView {
   private gateState: 'idle' | 'linking' | 'ready' = 'ready';
   private compileGate: UnderwaterCompileGate | null = null;
   private water: (() => UnderwaterWaterSide) | null = null;
+  private gatedWater: UnderwaterWaterSide | null = null;
+  private gateEpoch = 0;
   private readonly approach = createWaterApproachProbe(waterLevelAt);
 
   constructor(lowGfx: boolean) {
@@ -215,14 +217,21 @@ export class UnderwaterView {
   ): void {
     const cam = camera.position;
     const level = waterLevelAt(cam.x, cam.z, seed);
+    const water = this.water?.() ?? null;
+    // The editor rebuilds the water view, disposing the underside material
+    // the gate linked: the new one is gated afresh.
+    if (water !== this.gatedWater) {
+      this.gatedWater = water;
+      this.gateEpoch++;
+      if (this.compileGate) this.gateState = 'idle';
+    }
     if (
       this.gateState === 'idle' &&
       (Number.isFinite(level) || this.approach.near(player.x, player.z, seed))
     ) {
       this.armCompileGate();
     }
-    // Re-read every frame: the editor rebuilds the water view in place.
-    this.water?.().setUndersideHeld(this.gateState !== 'ready');
+    water?.setUndersideHeld(this.gateState !== 'ready');
     this.blend = underwaterBlendStep(this.blend, level, cam.y, dt);
     this.update(camera, this.blend, dt);
     // The fog stays outside the hold: view range under water is gameplay.
@@ -237,19 +246,22 @@ export class UnderwaterView {
   setCompileGate(gate: UnderwaterCompileGate | null, water: () => UnderwaterWaterSide): void {
     this.compileGate = gate;
     this.water = water;
+    this.gatedWater = water();
+    this.gateEpoch++;
     this.gateState = gate ? 'idle' : 'ready';
-    water().setUndersideHeld(this.gateState !== 'ready');
+    this.gatedWater.setUndersideHeld(this.gateState !== 'ready');
   }
 
   private armCompileGate(): void {
     const gate = this.compileGate;
     if (!gate) return;
     this.gateState = 'linking';
+    const epoch = this.gateEpoch;
     // Flag only on settle: frame() applies it on the next frame boundary.
     const settle = (): void => {
-      this.gateState = 'ready';
+      if (epoch === this.gateEpoch) this.gateState = 'ready';
     };
-    const underside = this.water?.().undersideRoot() ?? null;
+    const underside = this.gatedWater?.undersideRoot() ?? null;
     try {
       const links = [gate(this.group)];
       if (underside) links.push(gate(underside));
