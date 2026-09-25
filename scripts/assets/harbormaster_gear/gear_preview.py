@@ -24,7 +24,7 @@ HEAD_IN_HIPS = (0.0, 0.836, 0.0)
 REF_COLORS = {
     'F_Head': (0.62, 0.42, 0.3),
     'F_Ear_round': (0.62, 0.42, 0.3),
-    'F_Eye_almond': (0.03, 0.04, 0.05),
+    'F_Eye_narrow': (0.03, 0.04, 0.05),
     'F_Brow_thick': (0.55, 0.53, 0.5),
     'F_Mouth_smile': (0.35, 0.16, 0.14),
     'H2_warriorbraid': (0.62, 0.6, 0.57),

@@ -345,6 +345,16 @@ describe('tinted character materials', () => {
       expect(gear.emissiveMap).toBeNull();
       const kit = derive(false);
       expect(kit.emissive.getHex()).not.toBe(0x000000);
+      // an authoredAtlas BODY with untextured vertex-coloured parts (the rocket sled mount)
+      // keeps the uniform floor: the drop is for authored held props only
+      const src = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true });
+      const mesh = new THREE.Mesh(new THREE.BufferGeometry(), src);
+      const root = new THREE.Group();
+      root.add(mesh);
+      applyMaterials(root, { authoredAtlas: true } as VisualDef, 0xffffff);
+      const body = mesh.material as unknown as THREE.MeshLambertMaterial;
+      expect(body.isMeshLambertMaterial).toBe(true);
+      expect(body.emissive.getHex()).not.toBe(0x000000);
     } finally {
       restoreGfx();
     }

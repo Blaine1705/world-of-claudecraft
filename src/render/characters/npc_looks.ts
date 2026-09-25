@@ -27,7 +27,7 @@
 //
 // tests/npc_looks.test.ts pins: every NpcDef id resolves to a look EXCEPT
 // Brother Aldric (see aldricKeepsHisRig), every authored value survives
-// normalizeAppearance unchanged (a typo'd style id would silently clamp to the
+// normalizeNpcAppearance unchanged (a typo'd style id would silently clamp to the
 // default), and no two NPCs share an appearance.
 
 import type { EntityKind } from '../../sim/types';

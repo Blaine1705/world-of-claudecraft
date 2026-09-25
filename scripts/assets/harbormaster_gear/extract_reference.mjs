@@ -9,8 +9,9 @@
 //   node scripts/assets/harbormaster_gear/extract_reference.mjs [OUT_DIR]
 //
 // Writes reference_<bone>.glb per bone (default OUT_DIR tmp/harbormaster_gear, gitignored).
-// A preview aid only: the Blender builder's dimensions are constants, so the shipped GLBs
-// never depend on this output.
+// A preview aid for the builder, whose dimensions are constants (the shipped GLBs never
+// depend on this output); tests/harbormaster_gear_asset.test.ts imports the same bone-frame
+// math to check the shipped gear still fits the live body.
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,7 +28,7 @@ const OUT = path.resolve(ROOT, process.argv[2] ?? 'tmp/harbormaster_gear');
 export const REFERENCE_PARTS = [
   'F_Head',
   'F_Ear_round',
-  'F_Eye_almond',
+  'F_Eye_narrow',
   'F_Brow_thick',
   'F_Mouth_smile',
   'H2_warriorbraid',
@@ -52,70 +53,82 @@ function mul(m, v) {
   ];
 }
 
-await MeshoptDecoder.ready;
-const io = new NodeIO()
-  .registerExtensions(ALL_EXTENSIONS)
-  .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
-const src = await io.read(SRC);
-await src.transform(dequantize());
-mkdirSync(OUT, { recursive: true });
+/** The shipped modular body, decoded and dequantized (positions stay in each part's own
+ *  quantized space: its skin's inverse bind matrices carry the dequantization). */
+export async function loadModularBody(file = SRC) {
+  await MeshoptDecoder.ready;
+  const io = new NodeIO()
+    .registerExtensions(ALL_EXTENSIONS)
+    .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+  const doc = await io.read(file);
+  await doc.transform(dequantize());
+  return doc;
+}
 
-for (const bone of REFERENCE_BONES) {
-  const doc = new Document();
-  const buf = doc.createBuffer();
-  const scene = doc.createScene('Reference');
-  const report = [];
-  for (const name of REFERENCE_PARTS) {
-    const node = src
-      .getRoot()
-      .listNodes()
-      .find((n) => n.getName() === name || n.getMesh()?.getName() === name);
-    const skin = node?.getSkin();
-    if (!node || !skin) throw new Error(`no skinned part ${name}`);
-    const joints = skin.listJoints();
-    const j = joints.findIndex((n) => n.getName() === bone);
-    if (j < 0) throw new Error(`${name}: no joint ${bone}`);
-    const ibm = skin.getInverseBindMatrices().getElement(j, new Array(16));
-    const lo = [Infinity, Infinity, Infinity];
-    const hi = [-Infinity, -Infinity, -Infinity];
-    const mesh = doc.createMesh(name);
-    for (const prim of node.getMesh().listPrimitives()) {
+/** One part's vertices in `bone`'s bind frame, one Float32Array (xyz) per primitive, with
+ *  that primitive's indices. */
+export function boneFramePart(doc, name, bone) {
+  const node = doc
+    .getRoot()
+    .listNodes()
+    .find((n) => n.getName() === name || n.getMesh()?.getName() === name);
+  const skin = node?.getSkin();
+  if (!node || !skin) throw new Error(`no skinned part ${name}`);
+  const j = skin.listJoints().findIndex((n) => n.getName() === bone);
+  if (j < 0) throw new Error(`${name}: no joint ${bone}`);
+  const ibm = skin.getInverseBindMatrices().getElement(j, new Array(16));
+  return node
+    .getMesh()
+    .listPrimitives()
+    .map((prim) => {
       const pos = prim.getAttribute('POSITION');
       const out = new Float32Array(pos.getCount() * 3);
       const v = [0, 0, 0];
-      for (let i = 0; i < pos.getCount(); i++) {
-        const p = mul(ibm, pos.getElement(i, v));
-        out.set(p, i * 3);
-        for (let k = 0; k < 3; k++) {
-          lo[k] = Math.min(lo[k], p[k]);
-          hi[k] = Math.max(hi[k], p[k]);
-        }
-      }
+      for (let i = 0; i < pos.getCount(); i++) out.set(mul(ibm, pos.getElement(i, v)), i * 3);
       const idx = prim.getIndices();
-      const p2 = doc
-        .createPrimitive()
-        .setAttribute(
-          'POSITION',
-          doc.createAccessor().setType('VEC3').setArray(out).setBuffer(buf),
-        );
-      if (idx) {
-        p2.setIndices(
-          doc
-            .createAccessor()
-            .setType('SCALAR')
-            .setArray(new Uint32Array(idx.getArray()))
-            .setBuffer(buf),
-        );
+      return { positions: out, indices: idx ? new Uint32Array(idx.getArray()) : null };
+    });
+}
+
+async function main() {
+  const src = await loadModularBody();
+  mkdirSync(OUT, { recursive: true });
+  for (const bone of REFERENCE_BONES) {
+    const doc = new Document();
+    const buf = doc.createBuffer();
+    const scene = doc.createScene('Reference');
+    const report = [];
+    for (const name of REFERENCE_PARTS) {
+      const lo = [Infinity, Infinity, Infinity];
+      const hi = [-Infinity, -Infinity, -Infinity];
+      const mesh = doc.createMesh(name);
+      for (const { positions, indices } of boneFramePart(src, name, bone)) {
+        for (let i = 0; i < positions.length; i++) {
+          lo[i % 3] = Math.min(lo[i % 3], positions[i]);
+          hi[i % 3] = Math.max(hi[i % 3], positions[i]);
+        }
+        const prim = doc
+          .createPrimitive()
+          .setAttribute(
+            'POSITION',
+            doc.createAccessor().setType('VEC3').setArray(positions).setBuffer(buf),
+          );
+        if (indices) {
+          prim.setIndices(doc.createAccessor().setType('SCALAR').setArray(indices).setBuffer(buf));
+        }
+        mesh.addPrimitive(prim);
       }
-      mesh.addPrimitive(p2);
+      scene.addChild(doc.createNode(name).setMesh(mesh));
+      const f = (a) => a.map((x) => x.toFixed(3)).join(' ');
+      report.push(`${name.padEnd(20)} lo ${f(lo)}  hi ${f(hi)}`);
     }
-    scene.addChild(doc.createNode(name).setMesh(mesh));
-    report.push(
-      `${name.padEnd(20)} lo ${lo.map((x) => x.toFixed(3)).join(' ')}  hi ${hi.map((x) => x.toFixed(3)).join(' ')}`,
-    );
+    const file = path.join(OUT, `reference_${bone}.glb`);
+    await new NodeIO().write(file, doc);
+    console.log(`# ${bone}-local bind frame -> ${path.relative(ROOT, file)}`);
+    for (const line of report) console.log(line);
   }
-  const file = path.join(OUT, `reference_${bone}.glb`);
-  await new NodeIO().write(file, doc);
-  console.log(`# ${bone}-local bind frame -> ${path.relative(ROOT, file)}`);
-  for (const line of report) console.log(line);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await main();
 }
