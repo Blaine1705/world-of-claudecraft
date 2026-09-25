@@ -679,7 +679,6 @@ interface AttributionTargetFixture {
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  // Re-minted for the floor VFX ladder merge with release/v0.44.0: the merged renderer leaf (the ladder rungs over the Frame Rate Limit feeds) matches neither parent. No capture was retaken.
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -689,7 +688,14 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  '3bd727fafa0b6ec9743dd75fcec70bb68f1663cbbf68aebbd83a4debb1e070c0';
+  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  '715a8537d1683523b8af113f00335f5e1f46eeda69d455fa8c0ab58038583bb6';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

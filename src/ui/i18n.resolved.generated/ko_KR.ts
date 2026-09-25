@@ -192,6 +192,22 @@ export const ko_KR: EnTranslations = {
       "lfgboard": {
         "label": "모집 게시판 채우기",
         "description": "사전 구성 파티 모집 시나리오를 만듭니다."
+      },
+      "hillwarn": {
+        "label": "언덕 카운트다운",
+        "description": "지금 언덕을 알립니다. 전체 경고 시간이 지나면 솟아오릅니다."
+      },
+      "hillnow": {
+        "label": "지금 언덕 솟아오르기",
+        "description": "언덕을 즉시 솟아오르게 하고 그 위에 섭니다."
+      },
+      "hillrise": {
+        "label": "언덕 카운트다운 건너뛰기",
+        "description": "알린 언덕을 바로 솟아오르게 합니다."
+      },
+      "hillend": {
+        "label": "언덕 종료",
+        "description": "지금 있는 언덕을 바로 사라지게 합니다."
       }
     }
   },
@@ -331,6 +347,48 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "적용",
+      "pickerLabel": "프레임 프리셋: {name}",
+      "overwrite": "프리셋 덮어쓰기",
+      "overwriteBody": "저장된 프리셋 \"{name}\"을 현재 배치로 덮어쓰시겠습니까?",
+      "current": "현재 배치",
+      "new": "새 프리셋",
+      "empty": "저장된 프리셋 없음",
+      "deleteNamed": "{name} 삭제",
+      "deleteBody": "프레임 프리셋 \"{name}\"을 삭제하시겠습니까?",
+      "title": "프레임 프리셋",
+      "name": "프리셋 이름",
+      "slot": "프리셋 {slot}",
+      "remove": "삭제",
+      "saved": "완료.",
+      "failed": "프리셋을 저장하거나 불러올 수 없습니다."
+    },
+    "frameMenus": {
+      "hide": "프레임 숨기기",
+      "units": "유닛 프레임",
+      "bars": "행동 단축바",
+      "trackers": "추적기",
+      "auras": "오라",
+      "combat": "전투 표시",
+      "other": "기타 HUD 요소",
+      "options": "프레임 설정",
+      "allOptions": "모든 프레임 설정",
+      "independentTarget": "대상의 대상을 대상에 고정"
+    },
+    "focusTargets": {
+      "showEmpty": "빈 주시 대상 프레임 표시",
+      "assignHint": "대상을 선택하세요. {key} 키를 누르거나 {button} 버튼을 클릭하세요.",
+      "assignClickHint": "대상을 선택하고 {button} 버튼을 클릭하세요.",
+      "ally": "아군",
+      "enemy": "적",
+      "unset": "주시 해제",
+      "frame1": "주시 대상 1",
+      "frame2": "주시 대상 2",
+      "frame3": "주시 대상 3",
+      "assign": "주시 대상 {slot} 설정",
+      "target": "주시 대상 {slot} 선택"
+    },
     "professionTrainers": {
       "blacksmithing": "대장기술 전문가",
       "cooking": "요리 전문가",
@@ -388,9 +446,18 @@ export const ko_KR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "시신에서 부활",
       "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
+      "ghostHint": "죽은 장소로 달려가거나 영혼 치유사에게 말을 걸어 부활하세요",
       "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다.",
+      "keeperTalkTitle": "영혼 치유사",
+      "keeperTalkBody": "그 자리에서 되살려 줄 수 있지만 대가가 따릅니다. 부활 후유증으로 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다. 영혼이 쓰러진 곳으로 달려가 부활하면 아무런 대가가 없습니다.",
+      "keeperTalkSparedBody": "그 자리에서 되살려 줄 수 있습니다. 본래라면 부활 후유증이 따라 한동안 당신의 모든 것이 약해지지만, 당신은 이 세계에 갓 발을 들였으니 이번에는 면해 주겠습니다. 영혼이 쓰러진 곳으로 달려가 부활하면 어느 쪽이든 아무런 대가가 없습니다.",
+      "keeperTalkAccept": "부활",
+      "keeperTalkLeave": "떠나기",
       "healerConfirmTitle": "부활의 후유증을 감수하시겠습니까?",
       "healerConfirmBody": "영혼 치유사가 이 자리에서 부활시켜 주지만, 부활의 후유증으로 모든 능력치가 75% 감소하며 높은 레벨에서는 최대 10분간 지속됩니다. 영혼이 시신까지 걸어가서 부활하면 아무런 불이익이 없습니다.",
+      "keeperConfirmBody": "정말입니까? 영혼 치유사가 당신을 부활시키지만 그 대가로 약해집니다. 부활 후유증이 사라질 때까지 모든 능력치가 75% 감소하며, 레벨이 높을수록 길게, 최대 10분간 지속됩니다.",
+      "keeperConfirmSparedTitle": "영혼 치유사에게 부활을 맡기시겠습니까?",
+      "keeperConfirmSparedBody": "정말입니까? 영혼 치유사가 여기서 당신을 부활시킵니다. 당신은 10레벨 미만이므로 이번에는 부활 후유증으로 약해지지 않습니다.",
       "healerConfirmAccept": "부활",
       "healerConfirmCancel": "취소"
     },
@@ -405,6 +472,7 @@ export const ko_KR: EnTranslations = {
       "help": "탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.",
       "helpAtGraveyard": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 영혼을 가장 가까운 묘지로 보냅니다. 되살아나려면 영혼 치유사에게서 수호자의 대가를 받아야 합니다.",
       "helpUnstuckSickness": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 최대 5분 동안 탈출의 후유증이 남습니다.",
+      "helpUnstuckWindow": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 한 시간 안의 첫 사용은 대가가 없습니다. 마지막 사용 후 한 시간 안에 다시 쓰면 최대 5분 동안 탈출의 후유증이 남습니다.",
       "started": "{seconds}초 후 탈출합니다. 이동, 전투, 피해를 받거나 다른 행동을 시작하면 취소됩니다.",
       "countdown": "갇힘 탈출: {seconds}",
       "completed": "도달할 수 있는 가장 가까운 안전한 위치로 이동했습니다.",
@@ -412,6 +480,8 @@ export const ko_KR: EnTranslations = {
       "revivedAtGraveyard": "가장 가까운 묘지로 옮겨져 부활했습니다. 수호자의 대가가 당신을 짓누릅니다.",
       "movedToGraveyard": "가장 가까운 묘지로 이동했습니다. 탈출의 후유증이 당신을 짓누릅니다.",
       "revivedAtGraveyardUnstuck": "가장 가까운 묘지로 이동해 부활했습니다. 탈출의 후유증이 당신을 짓누릅니다.",
+      "movedToGraveyardFree": "가장 가까운 묘지로 이동했습니다. 한 시간 안에 갇힘 탈출을 다시 쓰면 탈출의 후유증이 남습니다.",
+      "revivedAtGraveyardFree": "가장 가까운 묘지로 이동해 부활했습니다. 한 시간 안에 갇힘 탈출을 다시 쓰면 탈출의 후유증이 남습니다.",
       "cancelledMoved": "이동해서 갇힘 탈출이 취소되었습니다.",
       "cancelledDamaged": "피해를 받아 갇힘 탈출이 취소되었습니다.",
       "cancelledCombat": "전투에 진입해 갇힘 탈출이 취소되었습니다.",
@@ -518,6 +588,15 @@ export const ko_KR: EnTranslations = {
     },
     "trade": {
       "windowClosed": "거래 창이 닫혔습니다.",
+      "offerQuantityHint": "내놓을 수량을 묻습니다",
+      "offerQuantityTitle": "{item} 내놓기",
+      "offerQuantityInput": "내놓을 수량",
+      "offerQuantityConfirm": "내놓기",
+      "offerQuantityAll": "모두 내놓기",
+      "offerRemoveTitle": "{item} 제거",
+      "offerRemoveInput": "제거할 수량",
+      "offerRemove": "제거",
+      "offerRemoveAll": "모두 제거",
       "woc": {
         "tabGold": "금화",
         "tabWoc": "$WOC",
@@ -1516,6 +1595,7 @@ export const ko_KR: EnTranslations = {
       "name_rallycart_rxt": "랠리카트 RXT",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 드레드스파크",
       "name_drakemaw_raptor": "화산구 랩터",
+      "name_avian_strider": "비리디안 베일스트라이더",
       "name_mech_bird": "태엽 기계새",
       "name_lanternback_troll": "등불지기 그룸볼",
       "name_chimeglass_tortoise": "종유리의 톨리버",
@@ -1532,6 +1612,7 @@ export const ko_KR: EnTranslations = {
       "desc_rallycart_skin": "작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
       "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
+      "desc_avian_strider": "우뚝 솟은 탈것 조류로, 육중한 발톱과 접은 날개가 모든 여정을 천둥 같은 질주로 바꾼다.",
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
       "desc_lanternback_troll": "점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.",
       "desc_chimeglass_tortoise": "소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.",
@@ -1648,6 +1729,7 @@ export const ko_KR: EnTranslations = {
       "clickMoveLeft": "왼쪽 클릭",
       "clickMoveRight": "오른쪽 클릭",
       "version": "v{version} ({build})",
+      "overlays": "오버레이",
       "browserEffects": "브라우저 효과",
       "browserEffectsAuto": "자동",
       "browserEffectsFull": "전체",
@@ -1743,7 +1825,7 @@ export const ko_KR: EnTranslations = {
       "stopAutoAttackOnTargetSwitch": "대상 전환 시 자동 공격 중지",
       "walkByAutoloot": "지나가며 자동 획득",
       "groundReticle": "지면 조준 표시기",
-      "mouseoverCast": "파티 창에서 마우스오버 시전",
+      "mouseoverCast": "파티 및 주시 프레임에 마우스오버 시전",
       "stickyTarget": "지면 클릭 시 대상 유지",
       "showItemLevel": "아이템 레벨 표시",
       "showReliquaryTracker": "성물고 추적기 표시",
@@ -1846,7 +1928,8 @@ export const ko_KR: EnTranslations = {
       "crossHotbarEditHelp": "왼쪽 범퍼를 누른 채 위쪽 페이스 버튼을 누르면 컨트롤러로 바를 정렬할 수 있습니다."
     },
     "perf": {
-      "title": "성능 오버레이",
+      "title": "성능",
+      "overlaySection": "성능 오버레이",
       "enable": "성능 오버레이 표시",
       "description": "표시할 통계, 오버레이 위치, 모양을 선택하세요.",
       "sectionPosition": "위치",
@@ -2088,6 +2171,80 @@ export const ko_KR: EnTranslations = {
         }
       }
     },
+    "cooldownManager": {
+      "title": "재사용 대기시간 관리자",
+      "intro": "선택한 주문을 떠 있는 버튼으로 표시합니다. 버튼은 클릭할 수 없습니다. 각 버튼은 재사용 대기시간을 보여 주고, 시전할 수 없을 때는 어두워지며, 준비되면 빛납니다.",
+      "generalTitle": "일반",
+      "enabled": "재사용 대기시간 관리자 표시",
+      "idleOpacity": "준비되지 않았을 때 불투명도",
+      "combatOnly": "전투 중에만 소리 재생",
+      "dragHint": "이 메뉴가 열려 있는 동안 모든 그룹이 화면에 표시되며, 끌어서 옮길 수 있습니다.",
+      "addSingle": "단일 버튼 추가",
+      "addGrid": "버튼 그룹 추가",
+      "addLine": "주문 줄 추가",
+      "groupsFull": "그룹 수가 최대입니다. 그룹을 하나 삭제해야 새로 추가할 수 있습니다.",
+      "noGroups": "단일 버튼, 버튼 그룹 또는 주문 줄을 추가해 시작하세요.",
+      "groupSingle": "단일 버튼 {index}",
+      "groupGrid": "버튼 그룹 {index}",
+      "groupLine": "주문 줄 {index}",
+      "groupName": "그룹 이름",
+      "spellCount": "주문 {count} / {max}",
+      "orientation": "방향",
+      "horizontal": "가로",
+      "vertical": "세로",
+      "columns": "열 수",
+      "rows": "행 수",
+      "direction": "아이콘 방향",
+      "dirRight": "오른쪽",
+      "dirLeft": "왼쪽",
+      "dirDown": "아래",
+      "dirUp": "위",
+      "iconSize": "아이콘 크기",
+      "iconPadding": "아이콘 간격",
+      "opacity": "불투명도",
+      "visibility": "표시",
+      "visAlways": "항상 표시",
+      "visCombat": "전투 중",
+      "visHidden": "숨김",
+      "visHiddenHint": "숨긴 그룹도 소리를 재생하고 행동 단축바를 빛나게 합니다.",
+      "showTimer": "타이머 표시",
+      "positionX": "가로 위치",
+      "positionY": "세로 위치",
+      "resetPosition": "기본 위치로 초기화",
+      "deleteGroup": "그룹 삭제",
+      "deleteGroupAria": "{group} 삭제",
+      "trackedTitle": "추적 중인 주문",
+      "trackedHint": "주문을 그룹으로 끌어 놓거나, 선택해서 그룹과 알림을 고르세요. 주문이 다른 주문으로 바뀌면 버튼도 따라 바뀌고 빛납니다.",
+      "search": "주문 검색",
+      "searchPlaceholder": "검색",
+      "notDisplayed": "표시 안 함",
+      "otherSpells": "기타 주문",
+      "otherSpellsHint": "다른 전문화, 특성 선택, 더 높은 레벨의 주문입니다. 지금 배치해 두면 배웠을 때 버튼이 나타납니다.",
+      "notKnown": "{spell} (아직 배우지 않음)",
+      "aurasTitle": "발동, 엔진, 강화 효과",
+      "aurasHint": "엔진 자원과 그 중첩, 발동 효과, 그리고 내 주문이 나에게 거는 강화 효과입니다. 그 밖에 나에게 걸렸던 효과도 여기에 표시됩니다.",
+      "auraFallback": "오라",
+      "onlyWhileActive": "활성 중에만 표시",
+      "alertStacks": "중첩 알림",
+      "alertStacksAny": "획득 시",
+      "alertStacksHint": "오라가 이 중첩 수에 도달하면 버튼이 빛나고 깜박이며 소리가 납니다. 획득 시는 나타나는 즉시 알립니다.",
+      "auraSoundHint": "오라가 나타날 때, 또는 설정한 중첩 수에 도달할 때 재생됩니다.",
+      "emptySection": "여기에 주문을 놓으세요.",
+      "spellsEmpty": "아직 배운 주문이 없습니다.",
+      "selectSpell": "{spell} 선택",
+      "group": "그룹",
+      "groupFullOption": "{group} (가득 참)",
+      "notInGroupHint": "이 주문을 그룹에 넣으면 버튼이 표시됩니다.",
+      "moveEarlier": "{spell} 앞으로 이동",
+      "moveLater": "{spell} 뒤로 이동",
+      "glowWhenReady": "준비되면 빛내기",
+      "glowWhenReadyHint": "주문을 시전할 수 있는 동안 버튼을 밝게 하고 테두리를 표시합니다.",
+      "hotbarGlow": "단축바 강조",
+      "hotbarGlowHint": "준비된 동안 행동 단축바의 이 주문도 빛나게 합니다.",
+      "onlyWhenReady": "준비되었을 때만 표시",
+      "sound": "준비 알림음",
+      "soundHint": "주문이 준비되었을 때, 또는 준비된 상태에서 버튼이 다른 주문으로 바뀔 때 재생됩니다."
+    },
     "auraOverlay": {
       "title": "오라",
       "currentClass": "현재 직업: {class}",
@@ -2211,19 +2368,80 @@ export const ko_KR: EnTranslations = {
         "battlegroundFirstWin": "오늘의 쏜할로우 평원 첫 승리",
         "battlegroundComplete": "쏜할로우 평원 참전",
         "battlegroundKill": "명예로운 처치",
-        "battlegroundAssist": "처치 도움"
+        "battlegroundAssist": "처치 도움",
+        "worldKill": "월드 처치",
+        "worldAssist": "월드 처치 지원",
+        "hillHold": "언덕 점령"
       },
       "floatReasons": {
         "kill": "처치",
         "assist": "도움",
-        "firstWin": "첫 승리"
+        "firstWin": "첫 승리",
+        "hill": "언덕"
       }
+    },
+    "worldPvp": {
+      "tab": "월드 PvP",
+      "title": "월드 PvP",
+      "blurb": "PvP 깃발을 올리면 열린 세계 어디서든 깃발을 올린 다른 플레이어와 싸울 수 있습니다. 상대를 쓰러뜨리면 상대 지갑의 일부와 PvP 장비를 위한 명예를 얻습니다. 전장과 투기장의 보상은 여전히 더 많습니다.",
+      "statusOn": "PvP 깃발이 올라가 있습니다. 깃발을 올린 플레이어가 당신을 공격할 수 있습니다.",
+      "statusOff": "PvP 깃발이 내려가 있습니다. 열린 세계에서는 공격할 수도, 공격받을 수도 없습니다.",
+      "statusOffFfa": "PvP 깃발이 내려가 있지만, 자유 전투 지역에서는 여전히 공격할 수도, 공격받을 수도 있습니다.",
+      "statusDisarming": "깃발은 {time} 후 또는 현재 전투가 끝나면 내려갑니다.",
+      "zoneSanctuary": "성역: 이곳에서는 월드 PvP가 일어나지 않습니다.",
+      "zoneContested": "분쟁 지역: 이곳에서는 깃발을 올린 플레이어끼리만 싸웁니다.",
+      "zoneFfa": "자유 전투 지역: 이곳의 모두가 공격 대상입니다.",
+      "realmDisabled": "이 서버에서는 월드 PvP가 꺼져 있습니다.",
+      "groundSanctuary": "수련의 해안과 이스트브룩 골짜기는 성역이라 월드 PvP가 전혀 없습니다.",
+      "groundContested": "그 밖의 모든 곳은 분쟁 지역이라 깃발을 올린 두 플레이어만 싸울 수 있습니다.",
+      "groundFfa": "드레이크랜드, 서리장막 봉우리, 호박빛 가을터은 자유 전투 지역이라 깃발과 상관없이 그곳의 모두가 싸울 수 있습니다.",
+      "groupLine": "파티원과 공격대원끼리는 절대 적대하지 않습니다. 그룹 밖의 길드원과는 싸울 수 있습니다.",
+      "markLine": "그곳에서 깃발을 올리지 않은 플레이어를 공격하면 자신의 깃발이 올라갑니다. 이미 깃발을 올린 상대를 공격할 때는 올라가지 않습니다.",
+      "aidLine": "월드 전투 중인 깃발 올린 플레이어를 치유하거나 보호막을 주거나 강화하면 자신의 깃발이 올라갑니다.",
+      "stakeLine": "패자는 {cap} 또는 지갑의 {percent} 중 더 적은 쪽을 지불합니다.",
+      "noStakeLine": "깃발을 올리지 않은 플레이어는 자유 전투 지역에서 쓰러져도 금화를 잃지 않습니다.",
+      "noTakeLine": "깃발을 올리지 않은 전투원도 골드를 얻지 못합니다. 골드는 깃발을 올린 두 플레이어 사이에서만 움직입니다.",
+      "honorLine": "처치당 명예 {honor}, 기여한 모두가 나눕니다.",
+      "splitLine": "순수한 1대1은 전부를 가져가고, 조력자와 그 치유사는 나눠 가집니다.",
+      "repeatLine": "같은 플레이어를 거듭 처치하면 {second}, 그다음 {third}, 이후로는 아무것도 주지 않으며, 계수는 첫 처치로부터 {reset} 후에 초기화됩니다.",
+      "greyLine": "당신보다 {levels}레벨 넘게 낮은 플레이어는 아무것도 주지 않습니다.",
+      "disarmLine": "끄는 데 {minutes}분이 걸리며 전투가 끝날 때까지 기다립니다.",
+      "record": "전적: 처치 {kills}, 사망 {deaths}",
+      "enable": "월드 PvP 켜기",
+      "disable": "월드 PvP 끄기",
+      "keepUp": "깃발 유지",
+      "confirmBody": "깃발을 올린 다른 플레이어가 어디서든 당신을 공격할 수 있고, 이기면 지갑에서 최대 {cap}을 가져갑니다. 다시 끌 수 있지만 {minutes}분이 걸립니다.",
+      "confirmAccept": "깃발 올리기",
+      "confirmCancel": "취소",
+      "levelReq": "{level}레벨이 필요합니다.",
+      "pending": "서버에서 PvP 상태를 기다리는 중입니다.",
+      "commandHint": "채팅: /pvp 로 깃발을 전환하고, /pvp on 과 /pvp off 로 직접 설정합니다."
+    },
+    "hill": {
+      "title": "언덕의 왕",
+      "rising": "언덕이 아직 솟아오르지 않았습니다",
+      "heldYou": "당신의 그룹이 언덕을 점령했습니다",
+      "heldOther": "다른 그룹이 언덕을 점령했습니다",
+      "heldNone": "언덕을 점령한 그룹이 없습니다",
+      "counts": "원 안: 아군 {yours}, 점령 측 {theirs}",
+      "countsUnheld": "원 안: 아군 {yours}, 최대 경쟁 그룹 {theirs}",
+      "countsHolding": "원 안: 아군 {yours}, 경쟁 그룹 {theirs}",
+      "contestYou": "언덕 점령 중: {total} 중 {seconds}",
+      "contestOther": "언덕을 빼앗기는 중: {total} 중 {seconds}",
+      "contestNone": "{total} 동안 원 안에서 다수를 유지하면 점령합니다",
+      "inside": "당신은 원 안에 있습니다",
+      "distance": "원까지 {yards}야드",
+      "rises": "{minutes} 후 솟아오릅니다",
+      "falls": "{minutes} 후 사라집니다",
+      "standingRaid": "공격대원은 인원에 포함되지 않습니다. 언덕은 파티만 점령할 수 있습니다"
     },
     "warfareShop": {
       "gossipOption": "워페어 세트 둘러보기",
       "gossipOptionAria": "{name}이(가) 운영하는 워페어 세트 상점 둘러보기",
       "jewelry": "장신구",
       "weapons": "무기",
+      "groupSeason2": "워페어 시즌 2: 선봉대",
+      "groupEntry": "워페어 시즌 1",
       "owned": "보유 중",
       "buyAria": "{honor}에 {item} 구매",
       "buyOwnedAria": "{honor}에 {item} 구매, 이미 보유 중",
@@ -2283,7 +2501,8 @@ export const ko_KR: EnTranslations = {
         "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",
         "parry": "전방 근접 공격을 완전히 무기로 막아 피해를 입지 않을 확률입니다. 뒤에서 오는 공격은 막을 수 없습니다.",
         "hitRating": "장비와 세트 보너스에서 얻는 명중 등급으로 공격이 빗나가거나 주문이 저항되는 빈도를 줄이며, 특히 더 높은 레벨의 적에게 효과적입니다. 약 10등급당 1% 명중.",
-        "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다."
+        "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다.",
+        "warfareWithHealth": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다. 또한 던전, 공격대, 탐굴, 균열을 제외한 모든 곳에서 최대 생명력이 {health}% 증가합니다."
       },
       "effects": {
         "attackPower": "+{value} 전투력",
@@ -2519,6 +2738,15 @@ export const ko_KR: EnTranslations = {
       "tooLarge": "신고가 너무 커서 보낼 수 없습니다. 스크린샷 없이 다시 시도하세요.",
       "rateLimited": "최근에 여러 건의 신고를 보냈습니다. 잠시 후 다시 보내 주세요.",
       "failed": "버그 신고를 보낼 수 없습니다. 다시 시도해 주세요."
+    },
+    "hostDiag": {
+      "title": "시스템 보고서",
+      "intro": "프로세서와 메모리를 가장 많이 사용하는 프로그램을 포함한 이 컴퓨터의 세부 정보를 파일로 모아 성능 문제를 진단하는 데 도움을 줍니다. 전송되는 것은 없습니다. 파일은 사용자의 컴퓨터에만 남습니다.",
+      "create": "시스템 보고서 만들기",
+      "running": "시스템 정보를 수집하는 중...",
+      "saved": "보고서가 {fileName}(으)로 저장되었습니다.",
+      "savedNoName": "보고서가 저장되었습니다.",
+      "failed": "보고서를 만들지 못했습니다. 다시 시도해 주세요."
     },
     "paperdoll": {
       "unequipAria": "{item} 장착 해제",
@@ -3354,6 +3582,7 @@ export const ko_KR: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "자리비움",
+      "pvpTag": "PvP",
       "cheaterTag": "< 부정행위자 >",
       "pledgeTag": "{guild} 서약자",
       "npcRoleTag": "<{role}>",
@@ -3432,6 +3661,8 @@ export const ko_KR: EnTranslations = {
       "label": "프레임 위치 초기화"
     },
     "interfaceUnlock": {
+      "combineTrackers": "추적 프레임 합치기",
+      "combineAuras": "오라 프레임 합치기",
       "label": "프레임 편집",
       "unlock": "인터페이스 잠금 해제",
       "lock": "인터페이스 잠금",
@@ -3442,6 +3673,8 @@ export const ko_KR: EnTranslations = {
       "lockFrame": "이 프레임 잠금",
       "resizeFrame": "이 프레임 크기 조절",
       "frameNames": {
+        "trackerGroup": "진행 상황 추적기",
+        "auraGroup": "오라 및 대상 효과",
         "actionBar1": "행동 단축바",
         "actionBar2": "행동 단축바 2",
         "actionBar3": "행동 단축바 3",
@@ -3571,6 +3804,15 @@ export const ko_KR: EnTranslations = {
         "socket": "{name}에 보석을 박았습니다.",
         "socketReplaced": "{name}에 보석을 박았습니다. {gem}은(는) 파괴되었습니다."
       }
+    },
+    "lootQuality": {
+      "ordinary": "일반",
+      "superior": "상급",
+      "exceptional": "특급",
+      "magnificent": "걸작",
+      "transcendent": "초월",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: 아이템 레벨 +{levels}. 강화 후에도 유지됩니다."
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
@@ -5922,6 +6164,7 @@ export const ko_KR: EnTranslations = {
       "talents": "특성",
       "arena": "투기장과 PvP",
       "thornhollow": "쏜할로우 평원",
+      "worldPvp": "월드 PvP",
       "deeds": "업적의 서",
       "reliquary": "성물고",
       "glossary": "용어집",
@@ -6332,6 +6575,7 @@ export const ko_KR: EnTranslations = {
       "allyRezBody": "언제나 걸어서 돌아가야 하는 것은 아닙니다. 부활 주문을 가진 아군이 대신 일으켜 줄 수 있는데, 이는 수락하거나 거절하는 알림으로 도착합니다. 그대로 두면 시간이 지나 사라지니, 떠 있을 때 답하세요. 수락하면 주문을 건 친구 곁에서 생명력과 마나를 일부 되찾은 채 일어납니다. 일부 힐러는 쓰러진 파티 전원에게 한 번에 제안할 수 있지만, 그래도 각자 자기 알림에 답해야 합니다. 쏜할로우 평원만은 예외로, 그곳에서는 어떤 부활 주문도 닿지 않으며 팀의 다음 물결을 기다리게 됩니다.",
       "unstuckTitle": "정말로 갇혔을 때",
       "unstuckBody": "세계가 빠져나올 수 없는 곳에 당신을 가둬 버렸다면 /unstuck을 입력하세요. 전투 중이 아니어야 하고, 제자리에 서 있어야 하며, 기절이나 속박에 걸려 있지 않고, 결투나 투기장 시합 중이 아니어야 합니다. 짧은 카운트다운이 흐르고, 움직이거나 피해를 받으면 취소됩니다. 카운트다운이 끝나면 가장 가까운 묘지에 내려놓습니다. 이 명령은 결코 당신을 죽이지 않고 시신도 남기지 않으며, 이미 쓰러져 있었다면 그 자리에서 일으켜 줍니다. 대가는 탈출의 후유증으로, 존재 전체가 잠시 약해지지만 명령을 다시 쓸 수 있게 될 무렵이면 이미 사라져 있습니다. 그리고 수호자의 대가와 마찬가지로, 갓 만든 캐릭터는 이 후유증을 전혀 겪지 않습니다.",
+      "unstuckBodyWindow": "세계가 빠져나올 수 없는 곳에 당신을 가둬 버렸다면 /unstuck을 입력하세요. 전투 중이 아니어야 하고, 제자리에 서 있어야 하며, 기절이나 속박에 걸려 있지 않고, 결투나 투기장 시합 중이 아니어야 합니다. 짧은 카운트다운이 흐르고, 움직이거나 피해를 받으면 취소됩니다. 카운트다운이 끝나면 가장 가까운 묘지에 내려놓습니다. 이 명령은 결코 당신을 죽이지 않고 시신도 남기지 않으며, 이미 쓰러져 있었다면 그 자리에서 일으켜 줍니다. 한 시간 안의 첫 사용에는 아무 대가도 없습니다. 마지막 사용 후 한 시간 안에 다시 쓰면 대가는 탈출의 후유증으로, 존재 전체가 잠시 약해지지만 명령을 다시 쓸 수 있게 될 무렵이면 이미 사라져 있습니다. 그리고 수호자의 대가와 마찬가지로, 갓 만든 캐릭터는 이 후유증을 전혀 겪지 않습니다.",
       "climbTitle": "난간을 붙잡고 올라서기",
       "climbBody": "난간은 벽이 아닙니다. 그냥 올라서기에는 너무 높은 곳을 향해 뛰면, 점프가 가장 높이 오르는 즈음에 캐릭터가 턱을 붙잡고 그 위로 몸을 끌어올립니다. 따로 누를 키는 없습니다. 스스로 넘어설 만큼 낮은 것은 아무 일 없이 지나가고, 제대로 된 끌어올리기는 머리 위의 턱에만 쓰입니다. 순식간에 끝나지만 진행되는 동안에는 조작을 가져가므로, 도중에 방향을 틀 수는 없습니다. 끌어올리는 중에 기절당하면 손을 놓고 떨어지며, 낙하 거리는 점프가 시작된 지면에서부터 잽니다. 기절이나 속박은 끌어올리기가 시작되는 것 자체를 막으니, 싸우다 곤경에서 빠져나오려 할 때 기억해 둘 만합니다."
     },
@@ -6357,6 +6601,7 @@ export const ko_KR: EnTranslations = {
       "framesMoveBodyEditFrames": "내 프레임과 대상 프레임, 파티 프레임은 모두 옮길 수 있습니다. 각 프레임 모서리에는 작은 이동 버튼이 하나씩 있습니다. 잠금을 풀고 원하는 자리로 끌어다 놓은 다음 다시 잠그면, 잘못 누른 클릭에 프레임이 밀려나지 않습니다. 인터페이스 옵션의 프레임 탭 맨 위에 있는 프레임 편집은 그 세 프레임과 함께 나머지 인터페이스도 한 번에 풀어 줍니다. 행동 단축바와 시전 바, 공격 속도 바, 경험치 바, 미니맵, 버튼 열, 소환수 프레임, 태세 바, 강화 효과와 약화 효과 줄, 그리고 찜 목록 알림 칩까지, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다. 자리가 마음에 들지 않게 되었다면 같은 프레임 탭 맨 아래의 기본값 복원으로 전부 처음 자리로 되돌릴 수 있습니다.",
       "framesGovernedExtra": "\"프레임 편집\"은 그 아래 쌓이는 추적기 무리(추적 중인 퀘스트와 그 목표, 업적 진행도, 성물고 페이지, 제작에서 고정해 둔 제작법, 지금 들어와 있는 탐굴, 참여 중인 균열, 그리고 추적 중인 제작법이나 의뢰)와 소환수 프레임 옆 소환수 행동 단축바, 주변 적에게 건 약화 효과를 모아 보여주는 \"대상 디버프\" 프레임, 성기사의 \"헌신\" 메달, 흑마법사의 \"고통 자원 막대\", 주문 발동 오버레이, 이도류일 때의 보조 무기 공격 속도 바, 그리고 탭으로 나뉜 피해 측정기 창까지 함께 풀어 주며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
       "framesGovernedAuraTracks": "\"프레임 편집\"은 같은 인터페이스 옵션의 전투 탭에서 켠 선택형 오라 트랙 여섯 개, 곧 \"내 버프\" 트랙, \"방어 재사용 대기시간\" 트랙, \"내 보호막\" 트랙, \"공격 재사용 대기시간\" 트랙, \"이동 및 은신\" 트랙, \"아군에게 건 내 버프\" 트랙도 함께 풀어 줍니다. 모든 트랙은 기본적으로 꺼져 있으며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
+      "frameGroups": "{trackers}는 퀘스트, 업적, 균열, 탐험, 채집 목표, 성유물 추적을 합칠 수 있습니다. {auras}는 대상 지속 피해와 여섯 오라 추적을 합칠 수 있습니다. 프레임 설정에서 각각 활성화하거나 꺼서 개별 이동하세요. {tot}에는 자원 막대가 있습니다. {focus}의 세 대상은 개별 이동하며 Shift+F1~F3으로 지정하고 Ctrl+F1~F3으로 선택합니다. 피해 및 위협 미터는 잠긴 상태에서도 버튼 이외의 영역을 끌어 이동하고 가장자리를 끌어 크기를 조절할 수 있습니다. 잠금 해제 시 프레임 표시 메뉴에서 그룹별로 표시를 바꾸고, 프레임을 우클릭해 크기를 초기화하거나 관련 설정을 열 수 있습니다. 인터페이스의 프레임 탭에는 공통 설정과 접을 수 있는 파티 설정도 있습니다. 대상의 대상을 대상에 고정하는 옵션을 끄면 따로 이동할 수 있고, 다시 켜도 개별 위치는 보관됩니다. 주시 대상을 지정하면 설정 버튼과 안내가 숨겨집니다. 우클릭하여 주시 해제를 선택하면 기본 상태로 돌아갑니다. 마우스오버 시전은 주시 프레임에서도 작동합니다.",
       "framesGovernedTalkingHead": "프레임 편집은 대화 패널도 해제합니다. 대화 패널은 말하는 NPC가 시야 밖에 있을 때 그 NPC의 대사를 담으며, 해제된 동안에는 자신의 이름 칩을 표시합니다.",
       "barsTitle": "바와 시간 표시, 전투 문자",
       "barsBody": "주문을 시전하거나 정신을 집중할 때마다 화면 한가운데, 행동 단축바 바로 위에 시전 바가 나타나 주문 이름과 남은 시간을 알려 줍니다. 대상도 자기 프레임에 시전 바를 가지므로, 무엇이 날아오는지 보고 답할 수 있습니다.\n\n시전 바 아래에는 가느다란 공격 속도 바가 있어 무기를 휘두르는 사이를 채웁니다. 근접이나 원거리 공격자는 다음 자동 공격이 언제 들어가는지 볼 수 있습니다.\n\n경험치 바는 행동 단축바 아래를 가로질러 화면 전체 폭으로 이어지며 눈금으로 나뉘어 있고, 밝게 표시된 구간이 쌓아 둔 휴식 경험치를 보여 줍니다.\n\n물속으로 헤엄쳐 들어가면 화면 위쪽에 파란 호흡 바가 나타납니다. 머리가 잠겨 있는 동안 줄어들고, 다 떨어져 익사가 시작되면 붉게 깜빡이며, 물 위로 올라오는 순간 빠르게 다시 찹니다. 스페이스로 위로 헤엄치고, 기본값이 Ctrl인 아래로 헤엄치기 키로 더 깊이 내려갑니다.\n\n피해와 치유는 맞은 대상 위로 작은 숫자가 되어 떠오르므로, 글을 읽지 않고도 전투를 읽어 낼 수 있습니다. 채팅창의 전투 탭에는 온전한 기록이 글로 남습니다.",
@@ -6468,6 +6713,8 @@ export const ko_KR: EnTranslations = {
       "completed": "이미 완료해 넘긴 퀘스트를 끝낸 순서대로 보여 줍니다.",
       "session": "접속한 뒤 해낸 일을 보여 줍니다. 처치와 사망, 피해량과 경험치입니다.",
       "arena": "잿빛 콜로세움에서의 두 등급 구간 성적입니다. 1대1과 2대2 각각의 평점, 승수, 패수, 승률을 보여 줍니다.",
+      "pvp": "월드 PvP 깃발: /pvp 로 전환하고 /pvp on 과 /pvp off 로 직접 설정합니다. 깃발을 올린 플레이어끼리는 어디서든 싸울 수 있으며, 끄는 데 5분이 걸립니다.",
+      "pvpZones": "월드 PvP 깃발: /pvp 로 전환하고 /pvp on 과 /pvp off 로 직접 설정합니다. 깃발을 올린 플레이어끼리는 분쟁 지역에서 싸울 수 있고, 성역에서는 월드 전투가 전혀 허용되지 않으며, 자유 전투 지역에서는 깃발과 상관없이 싸울 수 있습니다. 끄는 데 5분이 걸립니다.",
       "listings": "세계 시장에 올려 둔 자신의 등록 물품을 호가와 남은 시간, 그리고 앞으로 더 올릴 수 있는 여유와 함께 보여 줍니다.",
       "buyback": "최근에 상인에게 판 물건 가운데 아직 되사기가 가능한 것을 보여 줍니다.",
       "groupState": "지금 내 상태",
@@ -6505,6 +6752,7 @@ export const ko_KR: EnTranslations = {
       "dungeonReset": "비어 있는 자신의 인스턴스를 버립니다. 난이도를 바꾼 뒤에 하는 일입니다.",
       "groupRecovery": "복귀와 상태 표시",
       "unstuck": "세계에 갇혔을 때 빠져나오는 길입니다. 짧은 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지로 옮겨지고, 이미 쓰러져 있었다면 그곳에서 부활합니다. 그 뒤 한동안 탈출의 후유증으로 약해지므로, 지름길이 아니라 최후의 수단입니다.",
+      "unstuckWindow": "세계에 갇혔을 때 빠져나오는 길입니다. 짧은 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지로 옮겨지고, 이미 쓰러져 있었다면 그곳에서 부활합니다. 한 시간 안의 첫 사용은 대가가 없습니다. 마지막 사용 후 한 시간 안에 다시 쓰면 그 뒤 한동안 탈출의 후유증으로 약해지므로, 지름길이 아니라 구조 수단입니다.",
       "afk": "자리 비움으로 표시합니다. 메시지를 함께 남기면 귓속말을 보낸 사람에게 자동 답장으로 전해집니다. 메시지 없이 다시 입력하면 해제되고, 다른 채팅을 해도 해제됩니다.",
       "dnd": "다른 용무 중입니다. 자리 비움과 비슷하지만, 당신에게 온 귓속말이 전달되는 대신 보류됩니다.",
       "sit": "그 자리에 앉고, 다시 일어섭니다. 움직이거나 시전하거나 한 대 맞으면 곧바로 일어납니다.",
@@ -6611,6 +6859,7 @@ export const ko_KR: EnTranslations = {
       "fatigueDef": "트인 바다로 충분히 멀리 헤엄쳐 나가면 물이 여러분을 갉아먹기 시작합니다. 먼저 경고가 오고, 뭍으로 돌아설 때까지 피해가 점점 커집니다.",
       "unstuckTerm": "탈출의 후유증",
       "unstuckDef": "게임 메뉴의 갇힘 탈출을 쓴 대가입니다. 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지에 내려놓아 주며, 그 뒤 한동안 일시적인 약화를 안고 다니게 됩니다.",
+      "unstuckDefWindow": "게임 메뉴의 갇힘 탈출을 한 시간 안에 두 번 이상 쓴 대가입니다. 카운트다운 동안 가만히 서 있으면 가장 가까운 묘지에 내려놓아 줍니다. 한 시간 안의 첫 사용은 대가가 없지만, 마지막 사용 후 한 시간 안에 되풀이하면 그 뒤 한동안 일시적인 약화도 안고 다니게 됩니다.",
       "itemLevelTerm": "아이템 레벨",
       "itemLevelDef": "장비 한 점이 얼마나 강한지를 하나의 숫자로 정리한 값으로, 두 장비를 빠르게 견주고 싶을 때 편리합니다. 옵션에서 아이템 레벨 표시를 켜면 툴팁에서 볼 수 있습니다. 출처가 분명한 장비에만 붙으므로 평범한 상인 기본품이나 초보용 장비에는 아무것도 표시되지 않으며, 숫자가 없는 것은 결함이 아니라 정상입니다.",
       "requiredLevelTerm": "필요 레벨",
@@ -7218,7 +7467,30 @@ export const ko_KR: EnTranslations = {
       "warfareBody": "모든 워페어 장비에는 워페어 공격 등급과 워페어 방어 등급이 붙어 있는데, 이 두 등급은 몬스터에게는 아무런 효과가 없습니다. 오직 다른 플레이어와 싸울 때, 즉 결투와 투기장, 전장에서만 작동해 공격 등급은 주는 피해를 올리고 방어 등급은 받는 피해를 깎아 주며, 각각 자체 상한이 있습니다. 방어구 계열은 저마다 세트이기도 한데, 세트 효과 역시 워페어 등급이거나 플레이어에게만 통하는 효과입니다. 그러니 명예로 맞춘 한 벌은 던전 우두머리 앞에서는 아무 값어치가 없습니다.",
       "warfareBodyStatsStay": "모든 워페어 장비에는 워페어 공격 등급과 워페어 방어 등급이 붙어 있는데, 이 두 등급은 몬스터에게는 아무런 효과가 없습니다. 오직 다른 플레이어와 싸울 때, 즉 결투와 투기장, 전장에서만 작동해 공격 등급은 주는 피해를 올리고 방어 등급은 받는 피해를 깎아 주며, 각각 자체 상한이 있습니다. 방어구 계열은 저마다 세트이기도 한데, 세트 효과 역시 워페어 등급이거나 플레이어에게만 통하는 효과입니다. 그러니 명예로 맞춘 한 벌의 세트 효과는 던전 우두머리 앞에서는 아무 값어치가 없습니다. 장비 자체는 여전히 보통의 능력치와 방어도, 무기 피해를 지니고 있고 그것들은 어디서나 통합니다. 몬스터 앞에서 잠잠해지는 것은 워페어 등급과 세트 효과입니다.",
       "warfareTradeBody": "이는 의도된 맞바꿈입니다. 워페어 장비는 플레이어와 싸우기 위한 것이지, 던전 등급을 건너뛰는 지름길이 아닙니다. 같은 부위의 던전 영웅 장비가 지닌 전투 능력치를 워페어 장비는 결코 갖지 못하며, 그 대신 지닌 모든 것은 다른 플레이어를 상대로 쓰입니다. 투기장에서 제 몫을 하고 싶다면 사세요. 영웅 던전을 더 빨리 밀고 싶다면 던전에서 장비를 구하세요.",
-      "warfareTradeBodyRatingSpent": "이는 의도된 맞바꿈입니다. 워페어 장비는 플레이어와 싸우기 위한 것이지, 던전 등급을 건너뛰는 지름길이 아닙니다. 같은 부위의 던전 영웅 장비가 지닌 전투 등급을 워페어 장비는 결코 갖지 못하며, 그 대신 지닌 워페어 등급과 세트 효과는 온전히 다른 플레이어를 상대로 쓰입니다. 투기장에서 제 몫을 하고 싶다면 사세요. 영웅 던전을 더 빨리 밀고 싶다면 던전에서 장비를 구하세요."
+      "warfareTradeBodyRatingSpent": "이는 의도된 맞바꿈입니다. 워페어 장비는 플레이어와 싸우기 위한 것이지, 던전 등급을 건너뛰는 지름길이 아닙니다. 같은 부위의 던전 영웅 장비가 지닌 전투 등급을 워페어 장비는 결코 갖지 못하며, 그 대신 지닌 워페어 등급과 세트 효과는 온전히 다른 플레이어를 상대로 쓰입니다. 투기장에서 제 몫을 하고 싶다면 사세요. 영웅 던전을 더 빨리 밀고 싶다면 던전에서 장비를 구하세요.",
+      "vanguardHeading": "선봉대 장비: 워페어 시즌 2",
+      "vanguardBody": "선봉대 장비는 워페어 장비의 두 번째 시즌으로, 같은 두 병참장교가 기존 장비 위에 진열해 판매하며 기존 장비도 계속 판매됩니다. 모든 전문화에는 머리, 어깨, 가슴, 다리, 손의 다섯 부위로 이루어진 전용 선봉대 세트가 있고, 상점에는 당신의 직업이 착용할 수 있는 세 세트와 다룰 수 있는 선봉대 무기만 표시됩니다. 선봉대 장비는 기존 장비와 같은 워페어 등급을 더 높은 아이템 레벨로 지니며, 각 세트에는 2부위와 4부위에서 발동하는 두 가지 보너스가 있어 전문화 능력 하나를 바꿉니다. 기존 세트와 달리 이 보너스는 몬스터를 상대할 때를 포함해 어디서나 작동하지만, 플레이어와의 전투를 위해 만들어졌기 때문에 공격대 안에서는 여전히 공격대 세트가 더 나은 선택입니다."
+    },
+    "worldPvpPage": {
+      "heading": "월드 PvP",
+      "intro": "열린 세계의 플레이어 간 전투는 선택 사항입니다. PvP 깃발을 올리면 파티, 공격대, 길드에 속하지 않은 깃발을 올린 모든 플레이어가 열린 세계 어디서든 적이 되고, 깃발을 내리면 잠시 후 다시 구경꾼이 됩니다. 깃발을 올리지 않은 사람은 공격할 수도, 공격받을 수도 없습니다.",
+      "flagHeading": "깃발 올리기와 내리기",
+      "flagBody": "채팅에 /pvp 를 입력하거나 G 키로 PvP 창을 열어 월드 PvP 탭을 사용하세요. 탭에는 전적과 판돈도 표시됩니다. 초반 레벨을 지나면 깃발은 즉시 올라갑니다. 내리면 몇 분의 카운트다운이 시작되고, 아직 싸우는 중이면 깃발이 내려가지 않으므로 자신이 시작한 싸움에서 도망치는 수단이 될 수 없습니다. 전투 중인 깃발 올린 플레이어를 치유하면 자신의 깃발도 올라갑니다.",
+      "stakesHeading": "처치의 가치",
+      "stakesBody": "깃발을 올린 플레이어들이 깃발을 올린 플레이어를 쓰러뜨리면 패자는 지갑에 든 금화의 작은 몫을 지불하고(상한이 있습니다), 승자들은 PvP 장비를 위한 명예를 얻습니다. 기여한 모두가 둘 다 나눕니다. 마지막 일격을 가한 사람, 직전에 대상에게 피해를 준 사람, 그 전사들을 버티게 한 치유사입니다. 순수한 1대1은 전부를 가져가고 무리는 나눕니다.",
+      "limitsHeading": "공정한 규칙",
+      "limitsBody": "같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 계수는 일일 초기화와 함께 초기화됩니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다.",
+      "introZones": "열린 세계의 플레이어 간 전투는 선택 사항이며, 그 의미는 지금 서 있는 땅이 정합니다. PvP 깃발을 올리면 파티나 공격대에 속하지 않은 깃발을 올린 모든 플레이어가 분쟁 지역에서 적이 되고, 깃발을 내리면 잠시 후 다시 구경꾼이 됩니다. 두 지역은 월드 전투가 전혀 일어나지 않는 성역이고, 가장 북쪽의 세 지역은 깃발과 상관없이 그곳의 모두가 공격 대상인 자유 전투 지역입니다. 파티원과 공격대원은 어디서든 서로의 적이 되지 않지만, 그룹 밖의 길드원은 다른 누구와 마찬가지로 공격 대상입니다.",
+      "zonesHeading": "월드 PvP가 벌어지는 곳",
+      "zonesBody": "세계의 땅은 세 종류입니다. 수련의 해안과 이스트브룩 골짜기는 성역이라 깃발과 상관없이 월드 PvP가 전혀 일어나지 않으므로, 새 캐릭터가 깃발이 무엇인지 알기도 전에 싸움에 휘말리는 일은 없습니다. 세계의 대부분은 분쟁 지역이며, 그곳에서는 위의 깃발 규칙이 전부입니다. 드레이크랜드, 서리장막 봉우리, 호박빛 가을터은 자유 전투 지역이라 그 안에 선 모두가 깃발과 상관없이 그 안에 선 다른 모두를 공격할 수 있고, 경계를 넘어 들어갈 때와 나갈 때 모두 안내를 받습니다. 그곳에서 깃발을 올리지 않은 플레이어를 공격하면 자신의 깃발이 올라가므로, 먼저 덤빈 쪽이 언제나 위험을 짊어집니다. 이미 깃발을 올린 상대를 때릴 때는 올라가지 않으니, 자신을 지키거나 깃발을 올리지 않은 누군가를 지키는 일에는 아무 대가가 없습니다.",
+      "flagBodyAid": "채팅에 /pvp 를 입력하거나 G 키로 PvP 창을 열어 월드 PvP 탭을 사용하세요. 탭에는 전적과 판돈도 표시됩니다. 초반 레벨을 지나면 깃발은 즉시 올라갑니다. 내리면 몇 분의 카운트다운이 시작되고, 아직 싸우는 중이면 깃발이 내려가지 않으므로 자신이 시작한 싸움에서 도망치는 수단이 될 수 없습니다. 전투 중인 깃발 올린 플레이어를 치유하거나 보호막을 주거나 강화해도 자신의 깃발이 함께 올라가므로, 자신은 깃발을 올리지 않은 채 뒤에서 싸우는 이를 떠받칠 수 없습니다. 깃발을 올리지 않은 플레이어를 도울 때는 아무것도 올라가지 않습니다.",
+      "stakesUnflaggedTake": "깃발을 올리지 않은 전투원 역시 골드를 얻지 못합니다. 골드는 깃발을 올린 두 플레이어 사이에서만 움직이지만, 기여한 모두가 명예는 얻습니다.",
+      "stakesBodyFlagged": "깃발을 올린 플레이어가 다른 플레이어에게 쓰러지면 패자는 지갑에 든 금화의 작은 몫을 지불하고(상한이 있습니다), 승자들은 PvP 장비를 위한 명예를 얻습니다. 깃발을 올리지 않았던 플레이어는 자유 전투 지역에서 쓰러져도 금화를 전혀 내지 않습니다. 기여한 모두가 둘 다 나눕니다. 마지막 일격을 가한 사람, 직전에 대상에게 피해를 준 사람, 그 전사들을 버티게 한 치유사입니다. 순수한 1대1은 전부를 가져가고 무리는 나눕니다.",
+      "hillHeading": "언덕의 왕",
+      "hillBody": "세 시간에 한 번, 아무도 예측할 수 없는 때에 자유 전투 지역 가운데 한 곳에 15분 뒤 언덕이 솟아오른다는 소식이 서버 전체에 알려지고, 언덕이 설 원이 탁 트인 땅에 표시됩니다. 솟아오른 언덕은 45분 동안 서 있다가 사라집니다. 원 안에 선 플레이어가 가장 많은 파티가 언덕을 두고 다투며, 1분 동안 끊이지 않고 다수를 유지하면 언덕은 그 파티의 것이 됩니다. 혼자인 플레이어는 1인 파티로 세지만, 공격대원은 전혀 세지 않습니다. 한 파티가 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 약간의 명예를 얻습니다. 그래서 가득 찬 파티가 아무런 다툼 없이 언덕이 서 있는 내내 지키면 전장 승리 한 번보다 조금 적은 명예를 얻습니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.",
+      "limitsBodyHour": "같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다.",
+      "hillBodyRamp": "세 시간에 한 번, 아무도 예측할 수 없는 때에 자유 전투 지역 가운데 한 곳에 15분 뒤 언덕이 솟아오른다는 소식이 서버 전체에 알려지고, 언덕이 설 원이 탁 트인 땅에 표시됩니다. 솟아오른 언덕은 45분 동안 서 있다가 사라집니다. 원 안에 선 플레이어가 가장 많은 파티가 언덕을 두고 다투며, 1분 동안 끊이지 않고 다수를 유지하면 언덕은 그 파티의 것이 됩니다. 혼자인 플레이어는 1인 파티로 세지만, 공격대원은 전혀 세지 않습니다. 한 파티가 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 명예를 얻으며, 같은 파티가 오래 지킬수록 1분마다 얻는 명예가 늘어납니다. 가득 찬 파티가 아무런 다툼 없이 언덕이 서 있는 내내 지키면 전장 승리 약 세 번에 해당하는 명예를 얻습니다. 언덕의 주인이 바뀌면 새 주인의 누적은 처음부터 시작됩니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.",
+      "limitsBodyRaids": "같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다. 공격대는 월드 처치에서 아무것도 얻지 못합니다. 공격대원은 명예도 골드도 받지 않으며 다른 사람의 몫도 줄이지 않으니, 보상을 받으려면 파티로 싸우세요."
     },
     "thornhollowPage": {
       "heading": "쏜할로우 평원",
@@ -8021,7 +8293,8 @@ export const ko_KR: EnTranslations = {
       "parryTitle": "무기 막기",
       "parryBody": "무기 막기는 전사만의 방어 수단입니다. 근접 일격을 통째로 흘려보내 피해를 전혀 받지 않는 확률이며, 힘과 함께 자랍니다. 정면에서 들어오는 공격만 막아 낼 수 있으니, 나를 때리는 대상을 계속 마주 보아야 할 이유가 하나 더 늘어납니다. 다른 직업의 캐릭터 정보에서는 이 항목이 0으로 남아 있습니다.",
       "warfareTitle": "워페어",
-      "warfareBody": "워페어는 오직 다른 플레이어를 상대로만 셈해지는 유일한 능력치입니다. 그들에게 주는 피해를 올리고 그들에게서 받는 피해를 낮추며, 캐릭터 정보에는 두 값이 한 줄에 함께 표시됩니다. 생명체를 상대로는 아무 일도 하지 않습니다. 명예로 사는 워페어 장비에서 나오므로, 레벨을 올리는 동안 좇을 것이 아니라 PvP를 즐긴 대가로 주어지는 보상입니다."
+      "warfareBody": "워페어는 오직 다른 플레이어를 상대로만 셈해지는 유일한 능력치입니다. 그들에게 주는 피해를 올리고 그들에게서 받는 피해를 낮추며, 캐릭터 정보에는 두 값이 한 줄에 함께 표시됩니다. 생명체를 상대로는 아무 일도 하지 않습니다. 명예로 사는 워페어 장비에서 나오므로, 레벨을 올리는 동안 좇을 것이 아니라 PvP를 즐긴 대가로 주어지는 보상입니다.",
+      "warfareBodyPets": "워페어는 명예 장비가 플레이어와 싸우기 위해 지닌 능력치입니다. 플레이어끼리의 싸움에서 당신과 소환수가 다른 플레이어와 그 소환수에게 주는 피해를 올리고, 그들에게서 받는 피해를 낮춥니다. 또한 던전, 공격대, 탐굴, 균열을 제외한 모든 곳에서 최대 생명력을 높여 주므로, 명예 장비를 입은 플레이어는 입지 않은 플레이어보다 훨씬 쓰러뜨리기 어렵습니다. 캐릭터 정보에는 이 모두가 한 줄에 표시됩니다. 명예로 사는 워페어 장비에서 나오므로, 레벨을 올리는 동안 좇을 것이 아니라 PvP를 즐긴 대가로 주어지는 보상입니다."
     },
     "progression": {
       "intro": "모든 전투와 퀘스트, 북쪽으로 내딛는 한 걸음 한 걸음이 당신의 영웅을 강하게 만듭니다. 레벨업이 어떻게 돌아가는지, 그리고 정점에 이른 뒤에도 무엇이 당신을 계속 성장하게 하는지 정리했습니다.",
@@ -9874,6 +10147,11 @@ export const ko_KR: EnTranslations = {
       "quit": "종료",
       "fatalBody": "World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다."
     },
+    "hostDiag": {
+      "saveTitle": "시스템 보고서 저장",
+      "saveButton": "저장",
+      "fileType": "JSON 파일"
+    },
     "titlebar": {
       "exitGame": "게임 종료"
     }
@@ -9924,6 +10202,11 @@ export const ko_KR: EnTranslations = {
     "inWorld": "세계에 있음",
     "takeOver": "넘겨받기",
     "inWorldHint": "이미 세계에 있습니다. 다른 곳에서 로그아웃하거나 넘겨받으세요.",
+    "currentLocation": "현재 위치: {zone}",
+    "lockouts": "잠금 ({count})",
+    "lockoutRaids": "공격대",
+    "lockoutDungeons": "던전",
+    "lockoutWorldBosses": "월드 보스",
     "takeOverConfirm": "이 캐릭터를 다른 세션에서 연결 해제하고 여기로 가져옵니다. 계속하시겠습니까?",
     "renameRequired": "이름 변경 필요",
     "delete": "삭제",
@@ -10468,6 +10751,7 @@ export const ko_KR: EnTranslations = {
       "deathRecapDrowned": "사망했습니다. 익사했습니다.",
       "deathRecapCauterized": "사망했습니다. 소작의 화염이 당신을 집어삼켰습니다.",
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
+      "respawnKeeperToll": "영혼 치유사가 당신을 부활시켰지만 그 대가로 약해졌습니다. 부활 후유증이 사라질 때까지 모든 능력치가 감소합니다.",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
       "playerNotNearby": "그 플레이어는 근처에 없습니다.",
@@ -11970,6 +12254,18 @@ export const ko_KR: EnTranslations = {
       "thunder_reservoir": {
         "name": "천둥 비축",
         "description": "지속 효과: 비전 화살과 하늘가지가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)"
+      },
+      "lightning_overload": {
+        "name": "전격 과부하",
+        "description": "지속 효과: 전격 화살과 갈래 번개가 20% 확률로 과부하되어 첫 번째 대상에게 입힌 피해의 50%로 다시 공격하고 천둥을 1 부여합니다. (천둥소환)"
+      },
+      "lava_burst": {
+        "name": "용암 폭발",
+        "description": "{damage}의 화염 피해를 입힙니다. 당신의 잉걸 충격으로 불타는 대상에게는 항상 치명타가 적중합니다. 용암 쇄도: 잉걸 충격의 지속 피해가 들어갈 때마다 20% 확률로 이 재사용 대기시간이 초기화되고 10초 안에 사용하는 다음 용암 폭발이 즉시 시전됩니다. 피해는 주문력에 따라 증가합니다. (천둥소환)"
+      },
+      "thunderstorm": {
+        "name": "폭풍 파쇄",
+        "description": "벼락을 내려 10미터 내의 적에게 {damage}의 자연 피해를 입히고 5초 동안 이동 속도를 50% 감소시킵니다. 최대 마나의 8%를 회복합니다. 피해는 주문력에 따라 증가합니다. (천둥소환)"
       },
       "rockbiter_weapon": {
         "name": "바위결속 무기",
@@ -14483,6 +14779,9 @@ export const ko_KR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "드레드스파크 시동 열쇠"
       },
+      "reins_avian_strider": {
+        "name": "비리디안 베일스트라이더의 고삐"
+      },
       "reins_goblin_rocket_sled": {
         "name": "고블린 로켓 썰매 시동 열쇠"
       },
@@ -15853,6 +16152,423 @@ export const ko_KR: EnTranslations = {
       },
       "stormhymn_chain_treads": {
         "name": "폭풍찬가 사슬 장화"
+      },
+      "vanguard_warrior_arms_helmet": {
+        "name": "칼날자국 대투구"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "칼날자국 견갑"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "칼날자국 사슬 갑주"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "칼날자국 판금 다리갑옷"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "칼날자국 분쇄 건틀릿"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "피의 행군 면갑"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "피의 행군 어깨보호대"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "피의 행군 사슬갑옷"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "피의 행군 레깅스"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "피의 행군 그립"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "강철 행군 투구"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "강철 행군 어깨갑옷"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "강철 행군 가슴보호대"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "강철 행군 다리보호구"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "강철 행군 손보호대"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "태양 파수 머리띠"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "태양 파수 망토"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "태양 파수 사슬 갑주"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "태양 파수 사슬 다리갑옷"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "태양 파수 장갑"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "방패 서약 투구"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "방패 서약 견갑"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "방패 서약 흉갑"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "방패 서약 판금 다리갑옷"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "방패 서약 건틀릿"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "빛의 낙인 왕관"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "빛의 낙인 어깨갑옷"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "빛의 낙인 몸통갑옷"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "빛의 낙인 다리보호구"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "빛의 낙인 건틀릿"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "무리 수호자 두건"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "무리 수호자 어깨갑옷"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "무리 수호자 가죽 조끼"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "무리 수호자 다리보호구"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "무리 수호자 건틀릿"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "천리안 두건"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "천리안 어깨갑옷"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "천리안 가죽 조끼"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "천리안 다리보호구"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "천리안 건틀릿"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "올가미 송곳니 두건"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "올가미 송곳니 어깨갑옷"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "올가미 송곳니 가죽 조끼"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "올가미 송곳니 다리보호구"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "올가미 송곳니 건틀릿"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "밤의 칼날 후드"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "밤의 칼날 어깨덧대"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "밤의 칼날 튜닉"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "밤의 칼날 반바지"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "밤의 칼날 장갑"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "난투의 표식 후드"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "난투의 표식 어깨덧대"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "난투의 표식 튜닉"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "난투의 표식 반바지"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "난투의 표식 장갑"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "그늘걸음 후드"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "그늘걸음 어깨덧대"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "그늘걸음 튜닉"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "그늘걸음 반바지"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "그늘걸음 장갑"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "장막 성가 고깔"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "장막 성가 망토"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "장막 성가 로브"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "장막 성가 레깅스"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "장막 성가 손싸개"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "은총의 날개 고깔"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "은총의 날개 망토"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "은총의 날개 로브"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "은총의 날개 레깅스"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "은총의 날개 손싸개"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "황혼 찬가 고깔"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "황혼 찬가 망토"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "황혼 찬가 로브"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "황혼 찬가 레깅스"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "황혼 찬가 손싸개"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "폭풍 율법 두건"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "폭풍 율법 견갑"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "폭풍 율법 사슬 갑주"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "폭풍 율법 사슬 다리갑옷"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "폭풍 율법 건틀릿"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "돌풍태생 투구"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "돌풍태생 어깨갑옷"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "돌풍태생 사슬갑옷"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "돌풍태생 다리보호구"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "돌풍태생 그립"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "바닷물 수호 머리띠"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "바닷물 수호 망토"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "바닷물 수호 사슬 갑주"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "바닷물 수호 킬트"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "바닷물 수호 손싸개"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "시간결속자의 후드"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "시간결속자의 어깨망토"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "시간결속자의 로브"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "시간결속자의 바지"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "시간결속자의 장갑"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "잿불 채찍 고깔"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "잿불 채찍 망토"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "잿불 채찍 법복"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "잿불 채찍 레깅스"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "잿불 채찍 장갑"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "서리 파수꾼 후드"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "서리 파수꾼 어깨덧대"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "서리 파수꾼 제의"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "서리 파수꾼 다리싸개"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "서리 파수꾼 벙어리장갑"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "공포의 깃펜 후드"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "공포의 깃펜 망토"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "공포의 깃펜 로브"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "공포의 깃펜 레깅스"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "공포의 깃펜 손싸개"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "골수 결속 고깔"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "골수 결속 어깨갑옷"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "골수 결속 로브"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "골수 결속 레깅스"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "골수 결속 그립"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "광재 왕관 후드"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "광재 왕관 망토"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "광재 왕관 법복"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "광재 왕관 레깅스"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "광재 왕관 장갑"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "별 파수꾼 머리장식"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "별 파수꾼 어깨갑옷"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "별 파수꾼 조끼"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "별 파수꾼 반바지"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "별 파수꾼 장갑"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "피갈기 투구"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "피갈기 어깨덧대"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "피갈기 튜닉"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "피갈기 다리보호구"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "피갈기 그립"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "엉겅퀴꽃 왕관"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "엉겅퀴꽃 망토"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "엉겅퀴꽃 조끼"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "엉겅퀴꽃 레깅스"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "엉겅퀴꽃 장갑"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "선봉대의 심판"
+      },
+      "vanguard_oath_blade": {
+        "name": "선봉대의 맹세"
+      },
+      "vanguard_fang_dagger": {
+        "name": "선봉대의 송곳니"
+      },
+      "vanguard_warstaff": {
+        "name": "선봉대의 전투 지팡이"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -20271,6 +20987,7 @@ export const ko_KR: EnTranslations = {
       "eastbrook_vale": {
         "name": "이스트브룩 골짜기",
         "welcome": "마을의 레드브룩 원수를 찾아가십시오. 그가 당신에게 맡길 일이 있습니다.",
+        "welcomeDone": "레드브룩 원수가 맡길 일은 더 이상 없습니다 - 당신의 여정이 시작된 아담한 바닷가 마을은 그 덕분에 한결 평온합니다.",
         "pois": {
           "0": {
             "label": "이스트브룩"
@@ -20316,6 +21033,7 @@ export const ko_KR: EnTranslations = {
       "mirefen_marsh": {
         "name": "마이어펜 습지",
         "welcome": "펜브리지 문에서 감시관 펜윅에게 보고하십시오.",
+        "welcomeDone": "감시관 펜윅의 명령은 더 이상 없습니다 - 질퍽한 늪지대 깊숙이 자리한 정착지는 그 덕분에 더 안전해졌습니다.",
         "pois": {
           "0": {
             "label": "펜브리지"
@@ -20346,6 +21064,7 @@ export const ko_KR: EnTranslations = {
       "thornpeak_heights": {
         "name": "쏜피크 고지",
         "welcome": "테살리 대장이 간신히 하이워치 성벽을 지키고 있습니다.",
+        "welcomeDone": "테살리 대장이 하이워치 성벽을 지키고 있습니다 - 결코 쉽지 않지만, 당신 같은 모험가들의 도움으로 이제는 감당할 만합니다.",
         "pois": {
           "0": {
             "label": "하이워치"
@@ -21198,12 +21917,147 @@ export const ko_KR: EnTranslations = {
       },
       "stormkindled": {
         "name": "폭풍점화 예장",
-        "bonus2": "화염낙인 상태에서 무기 해방 사용 시 천둥을 3 얻습니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
-        "bonus4": "대지의 충격의 천둥당 보너스가 30%로 증가합니다."
+        "bonus2": "전격 과부하의 발동 확률이 30%가 됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "대지의 충격의 천둥당 보너스가 30%로 증가하고, 용암 폭발의 피해가 20% 증가합니다."
       },
       "vale_arcanist": {
         "name": "계곡 비전술사의 예복",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
+      },
+      "vanguard_druid_balance": {
+        "name": "별 파수꾼 의복",
+        "bonus2": "옥죄는 뿌리의 시전 시간이 0.5초 감소합니다.",
+        "bonus4": "옥죄는 뿌리를 시전하면 4초 동안 이동 중에 시전할 수 있고 이동 속도가 20% 증가합니다. 20초에 한 번만 발동합니다."
+      },
+      "vanguard_druid_feral": {
+        "name": "피갈기 가죽",
+        "bonus2": "큰곰 돌진의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "큰곰 돌진이 최대 생명력의 6%만큼 보호막을 6초 동안 씌워 줍니다."
+      },
+      "vanguard_druid_restoration": {
+        "name": "엉겅퀴꽃 제의",
+        "bonus2": "신속한 치유의 재사용 대기시간이 1초 감소합니다.",
+        "bonus4": "신속한 치유가 이동 속도도 3초 동안 30% 증가시킵니다."
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "무리 수호자 사냥 장비",
+        "bonus2": "뒤흔드는 사격의 재사용 대기시간이 4초 감소합니다.",
+        "bonus4": "뒤흔드는 사격이 야수의 격노의 남은 재사용 대기시간을 1초 감소시킵니다."
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "천리안 사냥 장비",
+        "bonus2": "흔적 끊기의 재사용 대기시간이 4초 감소합니다.",
+        "bonus4": "흔적 끊기 후 6초 안에 사용하는 다음 긴 시위가 즉시 시전됩니다. 15초에 한 번만 발동합니다."
+      },
+      "vanguard_hunter_survival": {
+        "name": "올가미 송곳니 사냥 장비",
+        "bonus2": "피갈고리의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "피갈고리가 사냥의 기세를 1 부여합니다."
+      },
+      "vanguard_mage_arcane": {
+        "name": "시간결속자의 성의",
+        "bonus2": "시간의 방벽의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "시간의 방벽이 보호받는 대상의 이동 속도도 3초 동안 20% 증가시킵니다."
+      },
+      "vanguard_mage_fire": {
+        "name": "잿불 채찍 예복",
+        "bonus2": "잉걸 작렬의 충전이 3초 더 빨리 회복됩니다.",
+        "bonus4": "잉걸 작렬을 시전하면 이글거리는 방벽의 남은 재사용 대기시간이 2초 감소합니다."
+      },
+      "vanguard_mage_frost": {
+        "name": "서리 파수꾼 차림",
+        "bonus2": "얼음 속박의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "얼음 속박을 시전하면 날쌘걸음의 남은 재사용 대기시간이 5초 감소합니다."
+      },
+      "vanguard_paladin_holy": {
+        "name": "태양 파수 예복",
+        "bonus2": "생명의 서약의 재사용 대기시간이 30초 감소합니다.",
+        "bonus4": "생명의 서약이 아군에게 그 대상 최대 생명력의 8%만큼 보호막도 6초 동안 씌웁니다."
+      },
+      "vanguard_paladin_protection": {
+        "name": "방패 서약 요새",
+        "bonus2": "맹세의 사슬의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "맹세의 사슬에 끌려온 적은 4초 동안 주문 시전이 30% 느려지며, 맹세의 사슬이 끌어올 수 있는 적을 속박하면 태양의 응보를 얻습니다."
+      },
+      "vanguard_paladin_retribution": {
+        "name": "빛의 낙인 전투 판금",
+        "bonus2": "발키리의 부름의 재사용 대기시간이 15초 감소합니다.",
+        "bonus4": "발키리의 부름이 최후의 칙령의 재사용 대기시간을 초기화하며, 착지 후 6초 안에 사용하는 다음 최후의 칙령은 15% 더 많은 피해를 줍니다."
+      },
+      "vanguard_priest_discipline": {
+        "name": "장막 성가 의복",
+        "bonus2": "정신의 절규의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "수호의 성가가 완전히 소모되면 보호받던 아군의 이동 속도가 3초 동안 20% 증가합니다. 8초에 한 번만 발동합니다."
+      },
+      "vanguard_priest_holy": {
+        "name": "은총의 날개 의복",
+        "bonus2": "장막걸음의 재사용 대기시간이 6초 감소합니다.",
+        "bonus4": "장막걸음이 최대 생명력의 8%만큼 보호막도 6초 동안 씌워 줍니다."
+      },
+      "vanguard_priest_shadow": {
+        "name": "황혼 찬가 예복",
+        "bonus2": "비탄의 연도를 정신 집중하는 동안 대상의 이동 속도도 30% 감소시킵니다.",
+        "bonus4": "십일조 악마 소환이 최대 생명력의 10%만큼 보호막도 8초 동안 씌워 줍니다."
+      },
+      "vanguard_rogue_assassination": {
+        "name": "밤의 칼날 가죽 갑옷",
+        "bonus2": "반칙 가격의 에너지 소모량이 10 감소합니다.",
+        "bonus4": "반칙 가격이 6초 안에 가하는 다음 공격도 반드시 치명타가 되게 합니다."
+      },
+      "vanguard_rogue_combat": {
+        "name": "난투의 표식 가죽 갑옷",
+        "bonus2": "날쌘 발의 재사용 대기시간이 60초 감소합니다.",
+        "bonus4": "날쌘 발이 활성화된 동안 사악한 베기와 헤이메이커가 연계 점수를 1 추가로 줍니다."
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "그늘걸음 가죽 갑옷",
+        "bonus2": "연막 걸음의 재사용 대기시간이 60초 감소합니다.",
+        "bonus4": "연막 걸음 상태에서 사용한 명치 가격이 연계 점수를 2 추가로 줍니다."
+      },
+      "vanguard_shaman_elemental": {
+        "name": "폭풍 율법 전투 사슬",
+        "bonus2": "무기 해방의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "무기 해방을 사용하면 4초 동안 이동 중에 시전할 수 있고 이동 속도가 20% 증가합니다. 20초에 한 번만 발동합니다."
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "돌풍태생 전쟁 사슬",
+        "bonus2": "선조의 일격이 대상의 이동 속도를 4초 동안 30% 감소시킵니다.",
+        "bonus4": "선조의 일격이 정령의 무아지경의 남은 재사용 대기시간을 4초 감소시킵니다."
+      },
+      "vanguard_shaman_restoration": {
+        "name": "바닷물 수호 사슬갑옷",
+        "bonus2": "생명력이 50% 미만인 아군에게 시전하는 치유의 물결의 시전 시간이 0.5초 감소합니다.",
+        "bonus4": "해일 부름이 대상에게 당신의 최대 생명력의 5%만큼 보호막도 6초 동안 씌웁니다."
+      },
+      "vanguard_warlock_affliction": {
+        "name": "공포의 깃펜 성의",
+        "bonus2": "번민의 시전 시간이 0.3초 감소합니다.",
+        "bonus4": "집어삼키기의 치유량이 30% 증가하며, 이동 중에도 정신 집중할 수 있습니다."
+      },
+      "vanguard_warlock_demonology": {
+        "name": "골수 결속 예복",
+        "bonus2": "뼈 갑옷의 재사용 대기시간이 10초 감소합니다.",
+        "bonus4": "수확의 명령이 뼈 갑옷의 남은 재사용 대기시간을 2초 감소시킵니다."
+      },
+      "vanguard_warlock_destruction": {
+        "name": "광재 왕관 성의",
+        "bonus2": "잿가죽의 재사용 대기시간이 30초 감소합니다.",
+        "bonus4": "점화를 두 번 사용할 때마다 8초 안에 사용하는 다음 파멸 화살이 즉시 시전됩니다."
+      },
+      "vanguard_warrior_arms": {
+        "name": "칼날자국 전투 장비",
+        "bonus2": "불구의 일격이 쇄도의 남은 재사용 대기시간을 1초 감소시킵니다.",
+        "bonus4": "쇄도가 다음 불구의 일격도 20% 강화합니다(붉은 손 강화 1중첩)."
+      },
+      "vanguard_warrior_fury": {
+        "name": "피의 행군 분노 장비",
+        "bonus2": "영웅의 도약의 재사용 대기시간이 8초 감소합니다.",
+        "bonus4": "영웅의 도약으로 착지하면 격노합니다."
+      },
+      "vanguard_warrior_prot": {
+        "name": "강철 행군 보루",
+        "bonus2": "단층선의 재사용 대기시간이 5초 감소합니다.",
+        "bonus4": "단층선이 받는 피해도 6초 동안 10% 감소시킵니다."
       },
       "vesperash": {
         "name": "만과의 잿가루 장막",

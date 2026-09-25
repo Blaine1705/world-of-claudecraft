@@ -16,8 +16,8 @@
     "Grave Eruption hash-placed warning + impact damage + Grave Flame residue tick",
     "class:warrior"
   ],
-  "draws": 11407,
-  "drawDigest": "a79244a6",
+  "draws": 11412,
+  "drawDigest": "8b0b984e",
   "frames": [
     {
       "tick": 0,
@@ -8021,7 +8021,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 1019,
-      "state": "b884563f",
+      "state": "b64bec86",
       "events": "ab7d4e6b",
       "rng": {
         "draws": 3977,
@@ -8032,7 +8032,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 1019,
-      "state": "94a26902",
+      "state": "48c5156c",
       "events": "741638a5",
       "rng": {
         "draws": 4068,
@@ -8043,7 +8043,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 1019,
-      "state": "f13524bb",
+      "state": "f0bba6d3",
       "events": "741638a5",
       "rng": {
         "draws": 4160,
@@ -8054,7 +8054,7 @@
       "tick": 481,
       "time": 24.05,
       "nextId": 1019,
-      "state": "7cdf2b25",
+      "state": "9d70558a",
       "events": "74d5713c",
       "rng": {
         "draws": 4175,
@@ -8975,6 +8975,7 @@
             "raiseFallenTimer": 0.05,
             "sigilTimer": 13.85,
             "soulRendLockout": 15,
+            "soulRendSettleTimer": 4.9,
             "soulRendTimer": 20.9,
             "transitionReleased": true,
             "transitionStarted": true,
@@ -9213,7 +9214,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 1019,
-      "state": "506727d4",
+      "state": "01bb1587",
       "events": "8afbd21f",
       "rng": {
         "draws": 4237,
@@ -9224,7 +9225,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 1019,
-      "state": "36fd1754",
+      "state": "510e94ef",
       "events": "8afbd21f",
       "rng": {
         "draws": 4325,
@@ -9235,7 +9236,7 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 1019,
-      "state": "86ee4c0a",
+      "state": "9ab66582",
       "events": "8afbd21f",
       "rng": {
         "draws": 4392,
@@ -9246,7 +9247,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 1019,
-      "state": "37adde66",
+      "state": "87e3fdc4",
       "events": "8afbd21f",
       "rng": {
         "draws": 4472,
@@ -9257,7 +9258,7 @@
       "tick": 530,
       "time": 26.5,
       "nextId": 1019,
-      "state": "9e3a6710",
+      "state": "a8f2a229",
       "events": "8afbd21f",
       "rng": {
         "draws": 4585,
@@ -9268,7 +9269,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 1019,
-      "state": "e7b7da1a",
+      "state": "4748f89b",
       "events": "8afbd21f",
       "rng": {
         "draws": 4693,
@@ -9279,7 +9280,7 @@
       "tick": 550,
       "time": 27.5,
       "nextId": 1019,
-      "state": "e1e86a12",
+      "state": "f8f0fae4",
       "events": "8afbd21f",
       "rng": {
         "draws": 4774,
@@ -9290,7 +9291,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 1019,
-      "state": "dd0fcd6e",
+      "state": "0202909a",
       "events": "8afbd21f",
       "rng": {
         "draws": 4868,
@@ -9301,7 +9302,7 @@
       "tick": 570,
       "time": 28.5,
       "nextId": 1019,
-      "state": "9f7c15b4",
+      "state": "c1ac167b",
       "events": "8afbd21f",
       "rng": {
         "draws": 4949,
@@ -17128,11 +17129,11 @@
       "tick": 1248,
       "time": 62.4,
       "nextId": 1019,
-      "state": "8c206094",
+      "state": "cb94d623",
       "events": "aa75afa5",
       "rng": {
-        "draws": 10864,
-        "digest": "357cfa5c"
+        "draws": 10871,
+        "digest": "6de396df"
       },
       "label": "death",
       "players": [
@@ -18305,6 +18306,19 @@
               },
               {
                 "count": 1,
+                "instance": {
+                  "lootQuality": {
+                    "tier": 1,
+                    "version": 1,
+                    "weights": [
+                      496,
+                      50,
+                      865,
+                      659,
+                      416
+                    ]
+                  }
+                },
                 "itemId": "wraithfire_orb"
               }
             ]
@@ -18588,77 +18602,77 @@
       "tick": 1250,
       "time": 62.5,
       "nextId": 1019,
-      "state": "985508ba",
+      "state": "32d259f1",
       "events": "741638a5",
       "rng": {
-        "draws": 10886,
-        "digest": "2ec95abf"
+        "draws": 10893,
+        "digest": "fcf294ff"
       }
     },
     {
       "tick": 1260,
       "time": 63,
       "nextId": 1019,
-      "state": "401ec0c1",
+      "state": "f6e179e8",
       "events": "741638a5",
       "rng": {
-        "draws": 10968,
-        "digest": "230ae63f"
+        "draws": 10975,
+        "digest": "46dadfd2"
       }
     },
     {
       "tick": 1270,
       "time": 63.5,
       "nextId": 1019,
-      "state": "0fc1bbcb",
+      "state": "624121a6",
       "events": "741638a5",
       "rng": {
-        "draws": 11062,
-        "digest": "4f598a76"
+        "draws": 11072,
+        "digest": "a93337f7"
       }
     },
     {
       "tick": 1280,
       "time": 64,
       "nextId": 1019,
-      "state": "4eb910c2",
+      "state": "fd591cd1",
       "events": "741638a5",
       "rng": {
-        "draws": 11152,
-        "digest": "9b4860c5"
+        "draws": 11158,
+        "digest": "15fc20af"
       }
     },
     {
       "tick": 1290,
       "time": 64.5,
       "nextId": 1019,
-      "state": "363bb4ca",
+      "state": "a08e7b59",
       "events": "741638a5",
       "rng": {
-        "draws": 11251,
-        "digest": "f53a8613"
+        "draws": 11261,
+        "digest": "24b73599"
       }
     },
     {
       "tick": 1300,
       "time": 65,
       "nextId": 1019,
-      "state": "8aa1b1a9",
+      "state": "2ec3b5c8",
       "events": "741638a5",
       "rng": {
-        "draws": 11350,
-        "digest": "ab698c36"
+        "draws": 11359,
+        "digest": "82127fa3"
       }
     },
     {
       "tick": 1308,
       "time": 65.4,
       "nextId": 1019,
-      "state": "43c09684",
+      "state": "85016ceb",
       "events": "6e96776a",
       "rng": {
-        "draws": 11407,
-        "digest": "a79244a6"
+        "draws": 11412,
+        "digest": "8b0b984e"
       },
       "label": "final",
       "players": [
@@ -19830,6 +19844,19 @@
               },
               {
                 "count": 1,
+                "instance": {
+                  "lootQuality": {
+                    "tier": 1,
+                    "version": 1,
+                    "weights": [
+                      496,
+                      50,
+                      865,
+                      659,
+                      416
+                    ]
+                  }
+                },
                 "itemId": "wraithfire_orb"
               }
             ]

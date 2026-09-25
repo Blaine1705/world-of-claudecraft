@@ -192,6 +192,22 @@ export const ja_JP: EnTranslations = {
       "lfgboard": {
         "label": "募集掲示板を準備",
         "description": "事前編成の募集掲示シナリオを作成します。"
+      },
+      "hillwarn": {
+        "label": "丘のカウントダウン",
+        "description": "今すぐ丘を告知します。警告の時間が過ぎると出現します。"
+      },
+      "hillnow": {
+        "label": "今すぐ丘を出現",
+        "description": "丘をすぐに出現させ、その上に立ちます。"
+      },
+      "hillrise": {
+        "label": "丘のカウントダウンを省略",
+        "description": "告知中の丘をすぐに出現させます。"
+      },
+      "hillend": {
+        "label": "丘を終了",
+        "description": "現在の丘を今すぐ消します。"
       }
     }
   },
@@ -331,6 +347,48 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "適用",
+      "pickerLabel": "フレームプリセット：{name}",
+      "overwrite": "プリセットを上書き",
+      "overwriteBody": "保存済みプリセット「{name}」を現在のレイアウトで上書きしますか？",
+      "current": "現在のレイアウト",
+      "new": "新規プリセット",
+      "empty": "保存済みプリセットはありません",
+      "deleteNamed": "{name} を削除",
+      "deleteBody": "フレームプリセット「{name}」を削除しますか？",
+      "title": "フレームプリセット",
+      "name": "プリセット名",
+      "slot": "プリセット {slot}",
+      "remove": "削除",
+      "saved": "完了。",
+      "failed": "プリセットを保存または読み込めませんでした。"
+    },
+    "frameMenus": {
+      "hide": "フレームを非表示",
+      "units": "ユニットフレーム",
+      "bars": "アクションバー",
+      "trackers": "トラッカー",
+      "auras": "オーラ",
+      "combat": "戦闘表示",
+      "other": "その他のHUD要素",
+      "options": "フレーム設定",
+      "allOptions": "すべてのフレーム設定",
+      "independentTarget": "ターゲットのターゲットをターゲットに固定"
+    },
+    "focusTargets": {
+      "showEmpty": "空のフォーカスフレームを表示",
+      "assignHint": "対象を選択してください。{key} を押すか、{button} をクリックしてください。",
+      "assignClickHint": "対象を選択して、{button} をクリックしてください。",
+      "ally": "味方",
+      "enemy": "敵",
+      "unset": "フォーカスを解除",
+      "frame1": "フォーカス 1",
+      "frame2": "フォーカス 2",
+      "frame3": "フォーカス 3",
+      "assign": "フォーカス {slot} を設定",
+      "target": "フォーカス {slot} を選択"
+    },
     "professionTrainers": {
       "blacksmithing": "鍛冶のトレーナー",
       "cooking": "料理のトレーナー",
@@ -388,9 +446,18 @@ export const ja_JP: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "亡骸で復活",
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
+      "ghostHint": "死亡した場所まで走るか、霊魂の癒し手に話しかけて復活しよう",
       "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。",
+      "keeperTalkTitle": "霊魂の癒し手",
+      "keeperTalkBody": "その場で蘇らせることはできるが、代償が伴う。復活の後遺症により、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。倒れた場所まで魂を走らせて復活すれば、代償は何もない。",
+      "keeperTalkSparedBody": "その場で蘇らせることはできる。本来なら復活の後遺症が伴い、しばらくのあいだ力のすべてが弱まるのだが、おまえはこの世界に来たばかりだ。だから今回は免じてやろう。倒れた場所まで魂を走らせて復活すれば、いずれにせよ代償は何もない。",
+      "keeperTalkAccept": "復活する",
+      "keeperTalkLeave": "立ち去る",
       "healerConfirmTitle": "復活の後遺症を受けますか？",
       "healerConfirmBody": "霊魂の癒し手はこの場で復活させてくれますが、復活の後遺症により全属性が75%低下します。高レベルでは最長10分間続きます。魂を遺体まで戻せばペナルティなしで復活できます。",
+      "keeperConfirmBody": "本当によいか？霊魂の癒し手はあなたを蘇らせるが、その代償として弱くなる。復活の後遺症が消えるまで、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。",
+      "keeperConfirmSparedTitle": "霊魂の癒し手に蘇らせてもらうか？",
+      "keeperConfirmSparedBody": "本当によいか？霊魂の癒し手はここであなたを蘇らせる。あなたはレベル10未満なので、今回は復活の後遺症で弱ることはない。",
       "healerConfirmAccept": "復活する",
       "healerConfirmCancel": "キャンセル"
     },
@@ -405,6 +472,7 @@ export const ja_JP: EnTranslations = {
       "help": "復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。",
       "helpAtGraveyard": "復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。",
       "helpUnstuckSickness": "復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。スタック解除の後遺症が最大5分間残ります。",
+      "helpUnstuckWindow": "復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。1時間以内の初回使用は無償です。前回の使用から1時間以内に再び使うと、スタック解除の後遺症が最大5分間残ります。",
       "started": "{seconds}秒後にスタックを解除します。移動、戦闘、被ダメージ、別の行動を始めるとキャンセルされます。",
       "countdown": "スタック解除：{seconds}",
       "completed": "到達可能な最寄りの安全な場所へ移動しました。",
@@ -412,6 +480,8 @@ export const ja_JP: EnTranslations = {
       "revivedAtGraveyard": "最寄りの墓地へ戻され、蘇生しました。番人の代償があなたにのしかかっています。",
       "movedToGraveyard": "最寄りの墓地へ移動しました。スタック解除の後遺症があなたにのしかかっています。",
       "revivedAtGraveyardUnstuck": "最寄りの墓地へ移動し、蘇生しました。スタック解除の後遺症があなたにのしかかっています。",
+      "movedToGraveyardFree": "最寄りの墓地へ移動しました。1時間以内にもう一度スタック解除を使うと、スタック解除の後遺症が残ります。",
+      "revivedAtGraveyardFree": "最寄りの墓地へ移動し、蘇生しました。1時間以内にもう一度スタック解除を使うと、スタック解除の後遺症が残ります。",
       "cancelledMoved": "移動したため、スタック解除をキャンセルしました。",
       "cancelledDamaged": "ダメージを受けたため、スタック解除をキャンセルしました。",
       "cancelledCombat": "戦闘に入ったため、スタック解除をキャンセルしました。",
@@ -518,6 +588,15 @@ export const ja_JP: EnTranslations = {
     },
     "trade": {
       "windowClosed": "取引ウィンドウを閉じました。",
+      "offerQuantityHint": "差し出す数量を選べます",
+      "offerQuantityTitle": "{item}を差し出す",
+      "offerQuantityInput": "差し出す数量",
+      "offerQuantityConfirm": "差し出す",
+      "offerQuantityAll": "すべて差し出す",
+      "offerRemoveTitle": "{item}を取り除く",
+      "offerRemoveInput": "取り除く数量",
+      "offerRemove": "取り除く",
+      "offerRemoveAll": "すべて取り除く",
       "woc": {
         "tabGold": "金貨",
         "tabWoc": "$WOC",
@@ -1516,6 +1595,7 @@ export const ja_JP: EnTranslations = {
       "name_rallycart_rxt": "ラリーカートRXT",
       "name_terrorspark_groundshaker": "地揺らしのドレッドスパーク",
       "name_drakemaw_raptor": "火口のラプトル",
+      "name_avian_strider": "ヴィリジアン・ヴェイルストライダー",
       "name_mech_bird": "ゼンマイ・メカバード",
       "name_lanternback_troll": "ランタンバックのグルンボル",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
@@ -1532,6 +1612,7 @@ export const ja_JP: EnTranslations = {
       "desc_rallycart_skin": "小さな車体から豪快なエンジン音を響かせるラリーカー。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
       "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
+      "desc_avian_strider": "巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。",
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
       "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
@@ -1648,6 +1729,7 @@ export const ja_JP: EnTranslations = {
       "clickMoveLeft": "左クリック",
       "clickMoveRight": "右クリック",
       "version": "v{version} ({build})",
+      "overlays": "オーバーレイ",
       "browserEffects": "ブラウザエフェクト",
       "browserEffectsAuto": "自動",
       "browserEffectsFull": "フル",
@@ -1743,7 +1825,7 @@ export const ja_JP: EnTranslations = {
       "stopAutoAttackOnTargetSwitch": "ターゲット切り替え時に自動攻撃を停止",
       "walkByAutoloot": "通りがかり自動ルート",
       "groundReticle": "地面ターゲットのレティクル",
-      "mouseoverCast": "パーティフレームでマウスオーバーキャスト",
+      "mouseoverCast": "パーティとフォーカスフレームでマウスオーバーキャスト",
       "stickyTarget": "地面クリックでターゲットを維持",
       "showItemLevel": "アイテムレベルを表示",
       "showReliquaryTracker": "聖遺物庫トラッカーを表示",
@@ -1846,7 +1928,8 @@ export const ja_JP: EnTranslations = {
       "crossHotbarEditHelp": "左バンパーを押しながら上の面ボタンを押すと、コントローラーでバーを配置変更できます。"
     },
     "perf": {
-      "title": "パフォーマンスオーバーレイ",
+      "title": "パフォーマンス",
+      "overlaySection": "パフォーマンスオーバーレイ",
       "enable": "パフォーマンスオーバーレイを表示",
       "description": "表示する統計、オーバーレイの位置、外観を設定します。",
       "sectionPosition": "位置",
@@ -2088,6 +2171,80 @@ export const ja_JP: EnTranslations = {
         }
       }
     },
+    "cooldownManager": {
+      "title": "クールダウンマネージャー",
+      "intro": "選んだ呪文をフローティングボタンで表示します。ボタンはクリックできません。それぞれクールダウンを表示し、使えない間は暗くなり、使用可能になると光ります。",
+      "generalTitle": "全般",
+      "enabled": "クールダウンマネージャーを表示",
+      "idleOpacity": "準備中の不透明度",
+      "combatOnly": "戦闘中のみ音を鳴らす",
+      "dragHint": "このメニューを開いている間はすべてのグループが画面に表示され、ドラッグして移動できます。",
+      "addSingle": "単体ボタンを追加",
+      "addGrid": "ボタングループを追加",
+      "addLine": "呪文の列を追加",
+      "groupsFull": "グループ数が上限に達しています。追加するには、いずれかを削除してください。",
+      "noGroups": "単体ボタン、ボタングループ、呪文の列のいずれかを追加して始めましょう。",
+      "groupSingle": "単体ボタン {index}",
+      "groupGrid": "ボタングループ {index}",
+      "groupLine": "呪文の列 {index}",
+      "groupName": "グループ名",
+      "spellCount": "{count} / {max} 呪文",
+      "orientation": "向き",
+      "horizontal": "横",
+      "vertical": "縦",
+      "columns": "列数",
+      "rows": "行数",
+      "direction": "アイコンの方向",
+      "dirRight": "右",
+      "dirLeft": "左",
+      "dirDown": "下",
+      "dirUp": "上",
+      "iconSize": "アイコンのサイズ",
+      "iconPadding": "アイコンの間隔",
+      "opacity": "不透明度",
+      "visibility": "表示",
+      "visAlways": "常に表示",
+      "visCombat": "戦闘中",
+      "visHidden": "非表示",
+      "visHiddenHint": "非表示のグループも音を鳴らし、アクションバーを光らせます。",
+      "showTimer": "タイマーを表示",
+      "positionX": "横の位置",
+      "positionY": "縦の位置",
+      "resetPosition": "初期位置に戻す",
+      "deleteGroup": "グループを削除",
+      "deleteGroupAria": "{group}を削除",
+      "trackedTitle": "追跡する呪文",
+      "trackedHint": "呪文をグループにドラッグするか、選択してグループと通知を選びます。呪文が別の呪文に変化すると、ボタンもそれに合わせて変わり、光ります。",
+      "search": "呪文を検索",
+      "searchPlaceholder": "検索",
+      "notDisplayed": "非表示",
+      "otherSpells": "その他の呪文",
+      "otherSpellsHint": "他の専門化、タレントの選択、より高いレベルの呪文です。今配置しておくと、習得したときにボタンが表示されます。",
+      "notKnown": "{spell}（未習得）",
+      "aurasTitle": "発動・エンジン・強化",
+      "aurasHint": "エンジン資源とそのスタック、発動効果、そして自分の呪文で得る強化効果です。それ以外に自分にかかったことのある効果もここに表示されます。",
+      "auraFallback": "オーラ",
+      "onlyWhileActive": "発動中のみ表示",
+      "alertStacks": "スタック数で通知",
+      "alertStacksAny": "獲得時",
+      "alertStacksHint": "オーラがこのスタック数に達すると、ボタンが光って脈打ち、音が鳴ります。「獲得時」は現れた瞬間に通知します。",
+      "auraSoundHint": "オーラが現れたとき、または設定したスタック数に達したときに鳴ります。",
+      "emptySection": "ここに呪文をドロップします。",
+      "spellsEmpty": "まだ呪文を習得していません。",
+      "selectSpell": "{spell}を選択",
+      "group": "グループ",
+      "groupFullOption": "{group}（満杯）",
+      "notInGroupHint": "この呪文をグループに入れると、そのボタンが表示されます。",
+      "moveEarlier": "{spell}を前へ移動",
+      "moveLater": "{spell}を後ろへ移動",
+      "glowWhenReady": "使用可能時に光らせる",
+      "glowWhenReadyHint": "呪文を使用できる間、ボタンを明るくして縁取りします。",
+      "hotbarGlow": "ホットバーの発光",
+      "hotbarGlowHint": "使用可能な間、アクションバー上のこの呪文も光らせます。",
+      "onlyWhenReady": "使用可能時のみ表示",
+      "sound": "準備完了の音",
+      "soundHint": "呪文が使用可能になったとき、または使用可能なままボタンが別の呪文に変化したときに鳴ります。"
+    },
     "auraOverlay": {
       "title": "オーラ",
       "currentClass": "現在のクラス: {class}",
@@ -2211,19 +2368,80 @@ export const ja_JP: EnTranslations = {
         "battlegroundFirstWin": "本日のソーンホロウ平原初勝利",
         "battlegroundComplete": "ソーンホロウ平原参戦",
         "battlegroundKill": "名誉ある撃破",
-        "battlegroundAssist": "撃破アシスト"
+        "battlegroundAssist": "撃破アシスト",
+        "worldKill": "ワールド撃破",
+        "worldAssist": "ワールド撃破アシスト",
+        "hillHold": "丘の占拠"
       },
       "floatReasons": {
         "kill": "撃破",
         "assist": "アシスト",
-        "firstWin": "初勝利"
+        "firstWin": "初勝利",
+        "hill": "丘"
       }
+    },
+    "worldPvp": {
+      "tab": "ワールドPvP",
+      "title": "ワールドPvP",
+      "blurb": "PvPフラグを立てると、オープンワールドのどこでもフラグを立てた他のプレイヤーと戦えます。倒せば相手の所持金の一部と、PvP装備につながる名誉を得られます。バトルグラウンドとアリーナの報酬はそれより多いままです。",
+      "statusOn": "PvPフラグが立っています。フラグを立てたプレイヤーはあなたを攻撃できます。",
+      "statusOff": "PvPフラグは下りています。オープンワールドでは攻撃も被攻撃もありません。",
+      "statusOffFfa": "PvPフラグは下りていますが、無差別戦闘地帯では攻撃することも攻撃されることもあります。",
+      "statusDisarming": "フラグは {time} 後、または現在の戦闘が終わったときに下ります。",
+      "zoneSanctuary": "聖域: ここではワールドPvPは行われません。",
+      "zoneContested": "係争地: ここで戦えるのはフラグを立てたプレイヤーだけです。",
+      "zoneFfa": "無差別戦闘地帯: ここにいる全員が攻撃対象です。",
+      "realmDisabled": "このレルムではワールドPvPは無効です。",
+      "groundSanctuary": "修練の浜とイーストブルック渓谷は聖域で、ワールドPvPは一切行われません。",
+      "groundContested": "それ以外の場所はすべて係争地で、フラグを立てた者同士だけが戦えます。",
+      "groundFfa": "ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯で、フラグの有無に関わらず誰でも戦えます。",
+      "groupLine": "パーティとレイドのメンバー同士が敵対することはありません。グループ外のギルドメンバーとは戦えます。",
+      "markLine": "そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立ちます。フラグを立てた相手を攻撃しても立ちません。",
+      "aidLine": "ワールドの戦闘中のフラグを立てたプレイヤーを回復、シールド、強化すると自分のフラグが立ちます。",
+      "stakeLine": "敗者は {cap} か所持金の {percent} のうち少ない方を支払います。",
+      "noStakeLine": "無差別戦闘地帯でフラグを立てていないプレイヤーが倒されても、所持金は失われません。",
+      "noTakeLine": "フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きます。",
+      "honorLine": "撃破ごとに名誉 {honor} を、貢献した全員で分配します。",
+      "splitLine": "純粋な1対1なら報酬を独占できます。協力者とそのヒーラーは分け合います。",
+      "repeatLine": "同じプレイヤーを繰り返し倒すと報酬は {second}、次に {third}、その後はゼロになります。カウントは最初の撃破から {reset} でリセットされます。",
+      "greyLine": "あなたより {levels} レベル以上低いプレイヤーからは何も得られません。",
+      "disarmLine": "解除には {minutes} 分かかり、戦闘が終わるまで待ちます。",
+      "record": "戦績: 撃破 {kills}、死亡 {deaths}",
+      "enable": "ワールドPvPを有効にする",
+      "disable": "ワールドPvPを無効にする",
+      "keepUp": "フラグを維持",
+      "confirmBody": "フラグを立てた他のプレイヤーがどこでもあなたを攻撃でき、勝てば所持金から最大 {cap} を奪えます。再び無効にはできますが、{minutes} 分かかります。",
+      "confirmAccept": "フラグを立てる",
+      "confirmCancel": "キャンセル",
+      "levelReq": "レベル {level} が必要です。",
+      "pending": "レルムからのPvP状態を待っています。",
+      "commandHint": "チャット: /pvp でフラグを切り替え、/pvp on と /pvp off で直接設定します。"
+    },
+    "hill": {
+      "title": "丘の王",
+      "rising": "丘はまだ現れていません",
+      "heldYou": "あなたのグループが丘を占拠しています",
+      "heldOther": "別のグループが丘を占拠しています",
+      "heldNone": "丘を占拠しているグループはいません",
+      "counts": "円内: あなた側 {yours}、占拠側 {theirs}",
+      "countsUnheld": "円内: あなた側 {yours}、最大の対抗勢力 {theirs}",
+      "countsHolding": "円内: あなた側 {yours}、対抗勢力 {theirs}",
+      "contestYou": "丘を奪取中: {total} 中 {seconds}",
+      "contestOther": "丘を奪われています: {total} 中 {seconds}",
+      "contestNone": "円内で {total} の間、多数を保てば奪取できます",
+      "inside": "あなたは円の中にいます",
+      "distance": "円まで {yards} ヤード",
+      "rises": "{minutes} 後に出現します",
+      "falls": "{minutes} 後に消えます",
+      "standingRaid": "レイドのメンバーは数えられません。丘を占拠できるのはパーティだけです"
     },
     "warfareShop": {
       "gossipOption": "ウォーフェアセットを見る",
       "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
       "jewelry": "アクセサリー",
       "weapons": "武器",
+      "groupSeason2": "ウォーフェア・シーズン2：ヴァンガード",
+      "groupEntry": "ウォーフェア・シーズン1",
       "owned": "所有済み",
       "buyAria": "{item}を{honor}で購入",
       "buyOwnedAria": "{item}を{honor}で購入、所有済み",
@@ -2283,7 +2501,8 @@ export const ja_JP: EnTranslations = {
         "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
         "parry": "前方からの近接攻撃を完全に受け流し、ダメージを受けない確率です。背後からの一撃は受け流せません。",
         "hitRating": "装備とセットボーナスによる命中レーティング。攻撃がミスする頻度と呪文が抵抗される頻度を減らし、特に高レベルの敵に有効です。約10レーティングで1%命中。",
-        "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。"
+        "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。",
+        "warfareWithHealth": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。さらに、ダンジョン、レイド、デルヴ、リフト以外のすべての場所で最大体力が {health}% 増加します。"
       },
       "effects": {
         "attackPower": "攻撃力 +{value}",
@@ -2519,6 +2738,15 @@ export const ja_JP: EnTranslations = {
       "tooLarge": "報告のサイズが大きすぎて送信できません。スクリーンショットを外して再試行してください。",
       "rateLimited": "最近、報告を複数回送信しています。しばらく待ってから送信してください。",
       "failed": "バグ報告を送信できませんでした。もう一度お試しください。"
+    },
+    "hostDiag": {
+      "title": "システムレポート",
+      "intro": "このコンピューターの詳細情報(プロセッサとメモリを最も多く使用しているプログラムを含む)をファイルにまとめ、パフォーマンスの問題の診断に役立てます。送信は一切行われません。ファイルはお使いのコンピューターに保存されるだけです。",
+      "create": "システムレポートを作成",
+      "running": "システム情報を収集しています...",
+      "saved": "レポートを {fileName} として保存しました。",
+      "savedNoName": "レポートを保存しました。",
+      "failed": "レポートを作成できませんでした。もう一度お試しください。"
     },
     "paperdoll": {
       "unequipAria": "{item}を外す",
@@ -3354,6 +3582,7 @@ export const ja_JP: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "退席",
+      "pvpTag": "PvP",
       "cheaterTag": "< チーター >",
       "pledgeTag": "{guild}への誓約者",
       "npcRoleTag": "<{role}>",
@@ -3432,6 +3661,8 @@ export const ja_JP: EnTranslations = {
       "label": "フレーム位置をリセット"
     },
     "interfaceUnlock": {
+      "combineTrackers": "追跡フレームをまとめる",
+      "combineAuras": "オーラフレームをまとめる",
       "label": "フレーム編集",
       "unlock": "インターフェースのロックを解除",
       "lock": "インターフェースをロック",
@@ -3442,6 +3673,8 @@ export const ja_JP: EnTranslations = {
       "lockFrame": "このフレームをロック",
       "resizeFrame": "このフレームのサイズを変更",
       "frameNames": {
+        "trackerGroup": "進行状況トラッカー",
+        "auraGroup": "オーラとターゲット効果",
         "actionBar1": "アクションバー",
         "actionBar2": "アクションバー 2",
         "actionBar3": "アクションバー 3",
@@ -3571,6 +3804,15 @@ export const ja_JP: EnTranslations = {
         "socket": "{name}に宝石をはめ込みました。",
         "socketReplaced": "{name}に宝石をはめ込みました。{gem}は破壊されました。"
       }
+    },
+    "lootQuality": {
+      "ordinary": "通常",
+      "superior": "上質",
+      "exceptional": "卓越",
+      "magnificent": "壮麗",
+      "transcendent": "超越",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}：アイテムレベル +{levels}。強化後も維持されます。"
     },
     "itemTooltip": {
       "requiresLevel": "必要レベル {level}",
@@ -5922,6 +6164,7 @@ export const ja_JP: EnTranslations = {
       "talents": "タレント",
       "arena": "アリーナとPvP",
       "thornhollow": "ソーンホロウ平原",
+      "worldPvp": "ワールドPvP",
       "deeds": "功績の書",
       "reliquary": "聖遺物庫",
       "glossary": "用語集",
@@ -6332,6 +6575,7 @@ export const ja_JP: EnTranslations = {
       "allyRezBody": "必ずしも歩いて戻る必要はありません。蘇生の呪文を持つ味方があなたを起こしてくれることもあり、それは受けるか断るかを選ぶ確認として届きます。放っておくと期限が切れてしまうので、表示されているうちに答えましょう。受ければ、唱えてくれた仲間のそばで、体力とマナの一部が戻った状態で立ち上がります。ヒーラーによっては倒れたパーティ全員にまとめて差し出せますが、それでも一人ひとりが自分の確認に答えます。ソーンホロウ平原だけは例外で、そこには蘇生の呪文は届きません。自軍の次の波を待つことになります。",
       "unstuckTitle": "本当に動けなくなったとき",
       "unstuckBody": "世界に閉じ込められて抜け出せなくなったら、/unstuck と入力しましょう。戦闘外で静止していること、スタンや根縛りで拘束されていないこと、決闘中でもアリーナ試合中でもないことが条件です。短いカウントダウンが走り、移動するかダメージを受けると中断されます。終われば最寄りの墓地に下ろされます。これで死ぬことはなく、亡骸も残りません。すでに倒れていた場合は、そこで蘇生されます。代償はスタック解除の後遺症です。あなたのすべてが一時的に弱まる効果ですが、次にこのコマンドを使えるようになる頃には切れています。そして復活の後遺症と同じく、生まれたてのキャラクターは完全に免除されます。",
+      "unstuckBodyWindow": "世界に閉じ込められて抜け出せなくなったら、/unstuck と入力しましょう。戦闘外で静止していること、スタンや根縛りで拘束されていないこと、決闘中でもアリーナ試合中でもないことが条件です。短いカウントダウンが走り、移動するかダメージを受けると中断されます。終われば最寄りの墓地に下ろされます。これで死ぬことはなく、亡骸も残りません。すでに倒れていた場合は、そこで蘇生されます。1時間以内の初回使用には何の代償もありません。前回の使用から1時間以内に再び使うと、代償はスタック解除の後遺症です。あなたのすべてが一時的に弱まる効果ですが、次にこのコマンドを使えるようになる頃には切れています。そして復活の後遺症と同じく、生まれたてのキャラクターは完全に免除されます。",
       "climbTitle": "出っ張りによじ登る",
       "climbBody": "出っ張りは壁ではありません。またいで登るには高すぎるものへ向かって跳ぶと、跳躍の頂点あたりでキャラクターが縁をつかみ、そのまま体を引き上げます。専用のキーはありません。自力で越えられる低さのものは何事もなく通り過ぎ、この本格的な引き上げは頭より上の縁のためにとってあります。動作は短く、その間は操作を預けることになるので、途中で向きを変えることはできません。引き上げの最中にスタンを受ければ手を放して落下し、落下距離は跳び上がった地面から測られます。またスタンや根縛りを受けていると、そもそもよじ登り自体が始まりません。戦いの最中に悪い場所から抜け出そうとしているときは、覚えておく価値のある話です。"
     },
@@ -6357,6 +6601,7 @@ export const ja_JP: EnTranslations = {
       "framesMoveBodyEditFrames": "自分のフレーム、ターゲットフレーム、パーティフレームは、いずれも移動できます。どれも隅に小さな移動ボタンを備えているので、固定を外し、好きな位置へドラッグし、もう一度固定すれば、うっかりクリックしてもずれません。オプションの「インターフェース」にある「フレーム」タブの先頭の「フレーム編集」を使うと、インターフェースの残りの部分もいっせいに動かせるようになり、この3つのフレームもそれに含まれます。アクションバー、キャストバー、スイングバー、経験値バー、ミニマップ、ボタンレール、ペットフレーム、スタンスバー、バフとデバフの列、そして「ウィッシュリストの通知」のチップが対象で、動かせる間はそれぞれに名前のチップが付きます。置き場所を悔やむことになったら、同じ「フレーム」タブの末尾にある「初期設定に戻す」で、すべて元の場所へ戻せます。",
       "framesGovernedExtra": "「フレーム編集」は、その下に積み重なるトラッカー群(追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、製作でピン留めしたレシピ、潜っているデルヴ、参加中のリフト、そして追跡中のレシピまたは依頼)、ペットフレーム脇のペットアクションバー、周囲の敵にかけた継続的なデバフをまとめて表示する「ターゲットデバフ」フレーム、パラディンの「献身」の記章、ウォーロックの「苦痛リソースバー」、スペル発動オーバーレイ、二刀流時のオフハンド用スイングバー、そしてタブ式のダメージメーターウィンドウも緩めます。緩んでいる間はそれぞれに名前のチップが付きます。",
       "framesGovernedAuraTracks": "「フレーム編集」は、同じ「インターフェース」オプションの「戦闘」タブでオンにした任意の6つのオーラトラック、すなわち「自分のバフ」トラック、「防御クールダウン」トラック、「自分のシールド」トラック、「攻撃クールダウン」トラック、「移動とステルス」トラック、「味方へのバフ」トラックも緩めます。どのトラックも初期状態ではオフで、緩んでいる間はそれぞれに名前のチップが付きます。",
+      "frameGroups": "{trackers} はクエスト、功績、リフト、地下探索、採集目標、聖遺物の追跡をまとめられます。{auras} は対象の継続ダメージと6種のオーラ追跡をまとめられます。フレーム設定で有効にするとまとめて移動でき、無効なら個別に移動できます。{tot} にはリソースバーがあります。{focus} の3つの対象は個別に移動できます。Shift+F1～F3で設定し、Ctrl+F1～F3で選択します。ダメージと脅威メーターはロック中でも、ボタン以外をドラッグして移動し、端をドラッグしてサイズ変更できます。ロック解除中は専用のグループ別メニューで表示を切り替えられます。フレームを右クリックするとサイズのリセットや関連設定を開けます。インターフェースのフレームタブには共通設定と折りたたみ可能なパーティ設定があります。「ターゲットのターゲットをターゲットに固定」をオフにすると個別に移動でき、オンに戻しても個別の位置は保存されます。フォーカスを設定すると設定ボタンと説明が隠れます。右クリックして「フォーカスを解除」を選ぶと元に戻ります。マウスオーバーキャストはフォーカスフレームでも使えます。",
       "framesGovernedTalkingHead": "「フレームを編集」では会話パネルも動かせるようになります。会話パネルは、話しているNPCが視界の外にいるときにそのセリフを表示するもので、ロック解除中は名前チップを表示します。",
       "barsTitle": "バー、タイマー、戦闘テキスト",
       "barsBody": "詠唱やチャネルを行うと、画面中央、アクションバーのすぐ上にキャストバーが現れ、呪文の名前と残り時間を伝えます。ターゲットにもそのフレーム上に専用のキャストバーが出るので、何が来るのかを見て応じられます。\n\nキャストバーの下には細いスイングバーがあり、武器を振るたびに満ちていきます。近接や遠隔で戦う人は、次の自動攻撃がいつ当たるのかを見て取れます。\n\n経験値バーはアクションバーの下を画面幅いっぱいに走り、区切りが刻まれ、明るく伸びた部分が蓄えている休息経験値を示します。\n\n水中を泳ぐと、画面上部に青い息バーが現れます。頭が沈んでいる間は減り続け、尽きて溺れ始めると赤く点滅し、水面に出た瞬間に素早く戻ります。スペースで浮上し、初期設定でCtrlの「潜水」キーを押せばさらに深く潜れます。\n\nダメージと回復は、当たった相手の上に小さな数字となって浮かび上がるので、文字を読まなくても戦いの流れがつかめます。書かれた記録はすべて、チャットボックスの「戦闘」タブに残ります。",
@@ -6468,6 +6713,8 @@ export const ja_JP: EnTranslations = {
       "completed": "すでに納品したクエストを、終えた順に表示します。",
       "session": "ログインしてからの成果です。撃破数、死亡数、ダメージ、経験値が表示されます。",
       "arena": "灰の闘技場での両ブラケットの戦績です。1対1と2対2それぞれのレーティング、勝敗数、勝率が表示されます。",
+      "pvp": "ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士はどこでも戦えます。解除には5分かかります。",
+      "pvpZones": "ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士は係争地で戦え、聖域ではワールドの戦闘は一切行われず、無差別戦闘地帯ではフラグの有無に関わらず戦えます。解除には5分かかります。",
       "listings": "世界市場に出している自分の出品を、希望価格、それぞれの残り時間、そしてあとどれだけ出せるかとあわせて表示します。",
       "buyback": "最近商人に売った品のうち、まだ買い戻せるものを表示します。",
       "groupState": "今のあなたの状態",
@@ -6505,6 +6752,7 @@ export const ja_JP: EnTranslations = {
       "dungeonReset": "誰も残っていない自分のインスタンスを破棄します。難易度を変えた後にすることです。",
       "groupRecovery": "復帰と在席",
       "unstuck": "世界に閉じ込められたときの出口です。短いカウントダウンのあいだ静止していれば最寄りの墓地へ移され、すでに倒れていた場合はそこで蘇生されます。その後しばらくスタック解除の後遺症で弱ったままになるので、近道ではなく最後の手段と考えましょう。",
+      "unstuckWindow": "世界に閉じ込められたときの出口です。短いカウントダウンのあいだ静止していれば最寄りの墓地へ移され、すでに倒れていた場合はそこで蘇生されます。1時間以内の初回使用は無償です。前回の使用から1時間以内に再び使うと、その後しばらくスタック解除の後遺症で弱ったままになるので、近道ではなく救助手段と考えましょう。",
       "afk": "自分に離席中（AFK）の印をつけます。任意でメッセージを添えると、ささやいてきた相手に自動返信として届きます。メッセージなしでもう一度入力すれば解除され、ほかの発言をしても解除されます。",
       "dnd": "取り込み中（DND）です。離席と似ていますが、あなた宛てのささやきは届けられず、差し止められます。",
       "sit": "その場に座り、また立ち上がります。移動、詠唱、被弾のいずれかがあれば、その瞬間に自動的に立ち上がります。",
@@ -6611,6 +6859,7 @@ export const ja_JP: EnTranslations = {
       "fatigueDef": "外海へ十分に遠く泳ぎ出ると、水があなたの力を奪い始めます。まず警告が出て、その後は陸へ引き返すまでダメージが増していきます。",
       "unstuckTerm": "スタック解除の後遺症",
       "unstuckDef": "ゲームメニューのスタック解除を使った代償です。カウントダウンのあいだ動かずにいると最寄りの墓地へ降ろされ、その後しばらく一時的な衰弱を背負います。",
+      "unstuckDefWindow": "ゲームメニューのスタック解除に1時間のうち二度以上頼った代償です。カウントダウンのあいだ動かずにいると最寄りの墓地へ降ろされます。1時間以内の初回使用は無償ですが、前回の使用から1時間以内に繰り返すと、その後しばらく一時的な衰弱も背負います。",
       "itemLevelTerm": "アイテムレベル",
       "itemLevelDef": "その装備がどれだけ強いかを一つにまとめた数値で、2つの装備を手早く比べたいときに便利です。オプションで「アイテムレベルを表示」をオンにすると、ツールチップに表示されます。入手元がはっきりしている装備だけが持つので、商人の素の基本装備や初期装備には何も表示されません。数値がないのは異常ではなく、正常なことです。",
       "requiredLevelTerm": "必要レベル",
@@ -7218,7 +7467,30 @@ export const ja_JP: EnTranslations = {
       "warfareBody": "ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式は、ダンジョンのボスの前では何の値打ちもありません。",
       "warfareBodyStatsStay": "ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。",
       "warfareTradeBody": "それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、備えているものはすべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。",
-      "warfareTradeBodyRatingSpent": "それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。"
+      "warfareTradeBodyRatingSpent": "それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。",
+      "vanguardHeading": "ヴァンガード装備：ウォーフェア・シーズン2",
+      "vanguardBody": "ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ2人の補給官が元の装備の上段に並べて売っています。元の装備も引き続き販売されます。すべてのスペックに、頭、肩、胴、脚、手の5部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる3セットと、扱えるヴァンガード武器だけが表示されます。ヴァンガード装備は元の装備と同じウォーフェア・レーティングを、より高いアイテムレベルで備えています。各セットには2部位と4部位で発動する2つのボーナスがあり、スペックのアビリティの1つを変化させます。元のセットと違い、これらのボーナスはモンスター相手も含めてどこでも有効ですが、対人戦向けに作られているため、レイドの中ではレイドセットの方が優れた選択のままです。"
+    },
+    "worldPvpPage": {
+      "heading": "ワールドPvP",
+      "intro": "オープンワールドの対人戦は任意参加です。PvPフラグを立てると、パーティ、レイド、ギルドに属さないフラグを立てた全プレイヤーがオープンワールドのどこでも敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。フラグを立てていない人は攻撃することも攻撃されることもありません。",
+      "flagHeading": "フラグの上げ下げ",
+      "flagBody": "チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復すると、自分のフラグも立ちます。",
+      "stakesHeading": "撃破の価値",
+      "stakesBody": "フラグを立てたプレイヤーがフラグを立てた相手を倒すと、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。",
+      "limitsHeading": "フェアプレイのルール",
+      "limitsBody": "同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。カウントは日次リセットで元に戻ります。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。",
+      "introZones": "オープンワールドの対人戦は任意参加で、その意味は足元の土地が決めます。PvPフラグを立てると、パーティやレイドに属さないフラグを立てた全プレイヤーが係争地で敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。2つのゾーンはワールドの戦闘が一切起こらない聖域で、最北の3つのゾーンは、フラグの有無に関わらずその場の全員が攻撃対象となる無差別戦闘地帯です。パーティとレイドの仲間はどこでも敵になりませんが、グループ外のギルドメンバーは他の誰とも同じく攻撃対象です。",
+      "zonesHeading": "ワールドPvPが起こる場所",
+      "zonesBody": "世界の土地は3種類に分かれます。修練の浜とイーストブルック渓谷は聖域で、フラグの有無に関わらずワールドPvPは一切起こらないため、新しいキャラクターがフラグとは何かを知る前に戦いを挑まれることはありません。世界の大半は係争地で、そこでは上記のフラグの規則がすべてです。ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯で、そこにいる全員がフラグの有無に関わらず、そこにいる他の全員を攻撃できます。境界を越えて入るときにも、出るときにも通知されます。そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立つので、仕掛けた側が必ずリスクを背負います。すでにフラグを立てている相手を攻撃しても自分のフラグは立たないため、自衛や、フラグを立てていない誰かを守ることには何の代償もありません。",
+      "flagBodyAid": "チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復、シールド、強化した場合も自分のフラグが立つため、自分はフラグを立てないまま戦う者を背後から支え続けることはできません。フラグを立てていないプレイヤーを支援しても、フラグは立ちません。",
+      "stakesUnflaggedTake": "フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きますが、貢献した全員が名誉は得られます。",
+      "stakesBodyFlagged": "フラグを立てたプレイヤーが他のプレイヤーに倒されると、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。フラグを立てていなかったプレイヤーは、無差別戦闘地帯で倒れても金貨を一切支払いません。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。",
+      "hillHeading": "丘の王",
+      "hillBody": "3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分わずかな名誉を得ます。そのため満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利1回分より少し少ない名誉になります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。",
+      "limitsBodyHour": "同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。",
+      "hillBodyRamp": "3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分名誉を得て、同じパーティが占拠し続けるほど1分ごとの名誉は増えていきます。満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利およそ3回分の名誉になります。丘の持ち主が変わると、新しい持ち主の積み上げは最初から始まります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。",
+      "limitsBodyRaids": "同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。レイドはワールドでの撃破から何も得られません。レイドのメンバーは名誉もゴールドも受け取らず、他の人の取り分も減らさないため、報酬を得るにはパーティで戦いましょう。"
     },
     "thornhollowPage": {
       "heading": "ソーンホロウ平原",
@@ -8021,7 +8293,8 @@ export const ja_JP: EnTranslations = {
       "parryTitle": "パリィ",
       "parryBody": "パリィはウォリアー固有の防御です。近接の一撃をまるごと受け流し、ダメージをまったく受けない確率で、筋力とともに伸びます。パリィできるのは正面から来る攻撃だけなので、自分を叩いているものへ体を向け続ける理由がもう一つ増えるわけです。他のクラスでは、キャラクターシートのこの行はゼロのままです。",
       "warfareTitle": "ウォーフェア",
-      "warfareBody": "ウォーフェアは、他のプレイヤーに対してのみ効く唯一のステータスです。相手に与えるダメージを高め、相手から受けるダメージを下げ、キャラクターシートにはその両面が一行で表示されます。クリーチャー相手にはまったく働きません。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。"
+      "warfareBody": "ウォーフェアは、他のプレイヤーに対してのみ効く唯一のステータスです。相手に与えるダメージを高め、相手から受けるダメージを下げ、キャラクターシートにはその両面が一行で表示されます。クリーチャー相手にはまったく働きません。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。",
+      "warfareBodyPets": "ウォーフェアは、プレイヤーと戦うために名誉のギアが持つステータスです。プレイヤー同士の戦いでは、あなたとペットが他のプレイヤーやそのペットに与えるダメージを高め、彼らから受けるダメージを下げます。さらにダンジョン、レイド、デルヴ、リフト以外のすべての場所で最大体力を高めるので、名誉のギアを身につけたプレイヤーは、身につけていないプレイヤーよりはるかに倒されにくくなります。キャラクターシートにはそのすべてが一行で表示されます。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。"
     },
     "progression": {
       "intro": "あらゆる戦い、クエスト、北へ進む一歩が、あなたの英雄を強くします。ここでは、レベリングの仕組みと、頂点に達した後も成長を続けさせるものを紹介します。",
@@ -9874,6 +10147,11 @@ export const ja_JP: EnTranslations = {
       "quit": "終了",
       "fatalBody": "World of ClaudeCraft で予期しないエラーが発生したため、終了します。"
     },
+    "hostDiag": {
+      "saveTitle": "システムレポートを保存",
+      "saveButton": "保存",
+      "fileType": "JSON ファイル"
+    },
     "titlebar": {
       "exitGame": "ゲームを終了"
     }
@@ -9924,6 +10202,11 @@ export const ja_JP: EnTranslations = {
     "inWorld": "世界にいます",
     "takeOver": "引き継ぐ",
     "inWorldHint": "すでに世界にいます。別の場所からログアウトするか、引き継いでください。",
+    "currentLocation": "現在地: {zone}",
+    "lockouts": "ロックアウト（{count}）",
+    "lockoutRaids": "レイド",
+    "lockoutDungeons": "ダンジョン",
+    "lockoutWorldBosses": "ワールドボス",
     "takeOverConfirm": "このキャラクターを別のセッションから切断し、こちらに移します。続けますか？",
     "renameRequired": "名前変更が必要",
     "delete": "削除",
@@ -10468,6 +10751,7 @@ export const ja_JP: EnTranslations = {
       "deathRecapDrowned": "死亡しました。溺死しました。",
       "deathRecapCauterized": "死亡しました。焼灼の炎に飲み込まれました。",
       "respawn": "再び休まり、完全な状態になりました。",
+      "respawnKeeperToll": "霊魂の癒し手があなたを復活させたが、その代償として弱っている。復活の後遺症が消えるまで、すべての能力値が下がる。",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
       "playerNotNearby": "そのプレイヤーは近くにいません。",
@@ -11970,6 +12254,18 @@ export const ja_JP: EnTranslations = {
       "thunder_reservoir": {
         "name": "雷鳴の貯蔵",
         "description": "パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）"
+      },
+      "lightning_overload": {
+        "name": "アークオーバーロード",
+        "description": "パッシブ：電弧の矢と枝分かれの稲妻は20%の確率でオーバーロードし、最初の目標に与えたダメージの50%で再び攻撃し、雷鳴を1獲得する。（サンダーコール）"
+      },
+      "lava_burst": {
+        "name": "マグマバースト",
+        "description": "{damage}の火炎ダメージを与える。あなたの灰燼の衝撃で燃えている目標には必ずクリティカルヒットする。マグマサージ：灰燼の衝撃の継続ダメージごとに20%の確率でこのクールダウンをリセットし、10秒以内の次のマグマバーストを即時詠唱にする。ダメージは呪文威力とともに上がる。（サンダーコール）"
+      },
+      "thunderstorm": {
+        "name": "ストームブレイク",
+        "description": "雷鳴を呼び、10ヤード以内の敵に{damage}の自然ダメージを与え、5秒間移動速度を50%低下させる。最大マナの8%を回復する。ダメージは呪文威力とともに上がる。（サンダーコール）"
       },
       "rockbiter_weapon": {
         "name": "石縛の武器",
@@ -14483,6 +14779,9 @@ export const ja_JP: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "ドレッドスパークの始動キー"
       },
+      "reins_avian_strider": {
+        "name": "ヴィリジアン・ヴェイルストライダーの手綱"
+      },
       "reins_goblin_rocket_sled": {
         "name": "ゴブリンロケットそりの始動キー"
       },
@@ -15853,6 +16152,423 @@ export const ja_JP: EnTranslations = {
       },
       "stormhymn_chain_treads": {
         "name": "嵐の賛歌の鎖の靴"
+      },
+      "vanguard_warrior_arms_helmet": {
+        "name": "刃跡の大兜"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "刃跡の肩甲"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "刃跡のホーバーク"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "刃跡の脚鎧"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "刃跡の粉砕の篭手"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "血の行軍の面頬"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "血の行軍の肩当て"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "血の行軍の鎖帷子"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "血の行軍のレギンス"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "血の行軍のグリップ"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "鉄の行軍の兜"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "鉄の行軍の肩鎧"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "鉄の行軍の胸甲"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "鉄の行軍の脚甲"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "鉄の行軍の手甲"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "陽の守夜のサークレット"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "陽の守夜のマントル"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "陽の守夜のホーバーク"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "陽の守夜の鎖の脚甲"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "陽の守夜の手袋"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "盾の誓いの兜"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "盾の誓いの肩甲"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "盾の誓いの胸当て"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "盾の誓いの脚鎧"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "盾の誓いの篭手"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "光の烙印の冠"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "光の烙印の肩鎧"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "光の烙印の胴鎧"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "光の烙印の脚甲"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "光の烙印の篭手"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "群れの守り手の頭巾"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "群れの守り手の肩鎧"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "群れの守り手のジャーキン"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "群れの守り手の脚甲"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "群れの守り手の篭手"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "遠見の頭巾"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "遠見の肩鎧"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "遠見のジャーキン"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "遠見の脚甲"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "遠見の篭手"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "罠の牙の頭巾"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "罠の牙の肩鎧"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "罠の牙のジャーキン"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "罠の牙の脚甲"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "罠の牙の篭手"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "夜斬りのフード"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "夜斬りの肩パッド"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "夜斬りのチュニック"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "夜斬りの脚衣"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "夜斬りの手袋"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "乱闘の印のフード"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "乱闘の印の肩パッド"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "乱闘の印のチュニック"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "乱闘の印の脚衣"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "乱闘の印の手袋"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "影歩きのフード"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "影歩きの肩パッド"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "影歩きのチュニック"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "影歩きの脚衣"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "影歩きの手袋"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "帳の詩篇のカウル"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "帳の詩篇のマントル"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "帳の詩篇のローブ"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "帳の詩篇のレギンス"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "帳の詩篇の手巻き布"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "恩寵の翼のカウル"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "恩寵の翼のマントル"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "恩寵の翼のローブ"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "恩寵の翼のレギンス"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "恩寵の翼の手巻き布"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "黄昏の賛歌のカウル"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "黄昏の賛歌のマントル"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "黄昏の賛歌のローブ"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "黄昏の賛歌のレギンス"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "黄昏の賛歌の手巻き布"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "嵐の書の頭巾"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "嵐の書の肩甲"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "嵐の書のホーバーク"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "嵐の書の鎖の脚甲"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "嵐の書の篭手"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "疾風生まれの兜"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "疾風生まれの肩鎧"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "疾風生まれの鎖帷子"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "疾風生まれの脚甲"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "疾風生まれのグリップ"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "潮の守りのサークレット"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "潮の守りのマントル"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "潮の守りのホーバーク"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "潮の守りのキルト"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "潮の守りの手巻き布"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "時縛りのフード"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "時縛りの肩衣"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "時縛りのローブ"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "時縛りのズボン"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "時縛りの手袋"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "燼の鞭のカウル"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "燼の鞭のマントル"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "燼の鞭の法衣"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "燼の鞭のレギンス"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "燼の鞭の手袋"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "霜の番人のフード"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "霜の番人の肩パッド"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "霜の番人の祭服"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "霜の番人の脚巻き"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "霜の番人のミトン"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "恐怖の羽ペンのフード"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "恐怖の羽ペンのマントル"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "恐怖の羽ペンのローブ"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "恐怖の羽ペンのレギンス"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "恐怖の羽ペンの手巻き布"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "骨髄の縛めのカウル"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "骨髄の縛めの肩鎧"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "骨髄の縛めのローブ"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "骨髄の縛めのレギンス"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "骨髄の縛めのグリップ"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "鉱滓の冠のフード"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "鉱滓の冠のマントル"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "鉱滓の冠の法衣"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "鉱滓の冠のレギンス"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "鉱滓の冠の手袋"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "星の番人の頭飾り"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "星の番人の肩鎧"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "星の番人のベスト"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "星の番人の脚衣"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "星の番人の手袋"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "血のたてがみの兜"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "血のたてがみの肩パッド"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "血のたてがみのチュニック"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "血のたてがみの脚甲"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "血のたてがみのグリップ"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "薊の花の冠"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "薊の花のマントル"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "薊の花のベスト"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "薊の花のレギンス"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "薊の花の手袋"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "先鋒の裁き"
+      },
+      "vanguard_oath_blade": {
+        "name": "先鋒の誓い"
+      },
+      "vanguard_fang_dagger": {
+        "name": "先鋒の牙"
+      },
+      "vanguard_warstaff": {
+        "name": "先鋒の戦杖"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -20271,6 +20987,7 @@ export const ja_JP: EnTranslations = {
       "eastbrook_vale": {
         "name": "イーストブルック渓谷",
         "welcome": "町のレッドブルック元帥を訪ねてください。あなたに頼みたい仕事があります。",
+        "welcomeDone": "レッドブルック元帥からの仕事はもうありません - あなたの旅が始まった趣のある海辺の町は、おかげで安らかです。",
         "pois": {
           "0": {
             "label": "イーストブルック"
@@ -20316,6 +21033,7 @@ export const ja_JP: EnTranslations = {
       "mirefen_marsh": {
         "name": "マイアフェン湿地",
         "welcome": "フェンブリッジの門で番人フェンウィックに報告してください。",
+        "welcomeDone": "番人フェンウィックからの命令はもうありません - 沼地の湿原の奥深くにたたずむ集落は、おかげでより安全になりました。",
         "pois": {
           "0": {
             "label": "フェンブリッジ"
@@ -20346,6 +21064,7 @@ export const ja_JP: EnTranslations = {
       "thornpeak_heights": {
         "name": "ソーンピーク高地",
         "welcome": "テサリー隊長がかろうじてハイウォッチの壁を保っています。",
+        "welcomeDone": "テサリー隊長がハイウォッチの壁を守っています - 決して楽ではありませんが、あなたのような冒険者たちの助けで今は何とか持ちこたえています。",
         "pois": {
           "0": {
             "label": "ハイウォッチ"
@@ -21198,12 +21917,147 @@ export const ja_JP: EnTranslations = {
       },
       "stormkindled": {
         "name": "ストームキンドルの礼装",
-        "bonus2": "火焔烙印中の武器解放で雷鳴を3獲得します。被ダメージで詠唱が遅れなくなります。",
-        "bonus4": "大地の衝撃の雷鳴ごとのボーナスが30%に上昇します。"
+        "bonus2": "アークオーバーロードの発動率が30%になります。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "大地の衝撃の雷鳴ごとのボーナスが30%に上昇し、マグマバーストのダメージが20%増加します。"
       },
       "vale_arcanist": {
         "name": "谷の秘術師の装束",
         "bonus3": "攻撃速度と詠唱速度が15%上昇します。"
+      },
+      "vanguard_druid_balance": {
+        "name": "星の番人の衣装",
+        "bonus2": "締めつける根の詠唱時間が0.5秒短縮されます。",
+        "bonus4": "締めつける根を詠唱すると、4秒間移動しながら詠唱でき、移動速度が20%上昇します。発動は20秒に1回まで。"
+      },
+      "vanguard_druid_feral": {
+        "name": "血のたてがみの毛皮鎧",
+        "bonus2": "ブルーインラッシュのクールダウンが3秒短縮されます。",
+        "bonus4": "ブルーインラッシュは、あなたに最大体力の6%のシールドを6秒間付与します。"
+      },
+      "vanguard_druid_restoration": {
+        "name": "薊の花の祭服",
+        "bonus2": "スウィフトメンドのクールダウンが1秒短縮されます。",
+        "bonus4": "スウィフトメンドは、移動速度も3秒間30%上昇させます。"
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "群れの守り手の狩装束",
+        "bonus2": "動揺の射撃のクールダウンが4秒短縮されます。",
+        "bonus4": "動揺の射撃が野獣の怒りの残りクールダウンを1秒短縮します。"
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "遠見の狩装束",
+        "bonus2": "離脱跳躍のクールダウンが4秒短縮されます。",
+        "bonus4": "離脱跳躍の後6秒以内の次の引き絞りが即時詠唱になります。発動は15秒に1回まで。"
+      },
+      "vanguard_hunter_survival": {
+        "name": "罠の牙の狩装束",
+        "bonus2": "血鉤のクールダウンが3秒短縮されます。",
+        "bonus4": "血鉤が狩猟の勢いを1与えます。"
+      },
+      "vanguard_mage_arcane": {
+        "name": "時縛りの祭服",
+        "bonus2": "時の障壁のクールダウンが2秒短縮されます。",
+        "bonus4": "時の障壁は、守られた対象の移動速度も3秒間20%上昇させます。"
+      },
+      "vanguard_mage_fire": {
+        "name": "燼の鞭の礼装",
+        "bonus2": "灰燼爆ぜのチャージが3秒速く回復します。",
+        "bonus4": "灰燼爆ぜを詠唱すると、ブレイジングバリアの残りクールダウンが2秒短縮されます。"
+      },
+      "vanguard_mage_frost": {
+        "name": "霜の番人の装束",
+        "bonus2": "氷縛のクールダウンが2秒短縮されます。",
+        "bonus4": "氷縛を詠唱すると、瞬き歩みの残りクールダウンが5秒短縮されます。"
+      },
+      "vanguard_paladin_holy": {
+        "name": "陽の守夜の礼装",
+        "bonus2": "生命の契約のクールダウンが30秒短縮されます。",
+        "bonus4": "生命の契約は、味方にもその最大体力の8%のシールドを6秒間付与します。"
+      },
+      "vanguard_paladin_protection": {
+        "name": "盾の誓いの砦",
+        "bonus2": "誓いの鎖のクールダウンが2秒短縮されます。",
+        "bonus4": "誓いの鎖で引き寄せられた敵は4秒間呪文の詠唱が30%遅くなり、引き寄せられる敵を縛ったときには誓いの鎖があなたに太陽の報復を与えます。"
+      },
+      "vanguard_paladin_retribution": {
+        "name": "光の烙印の戦鎧",
+        "bonus2": "ヴァルキュリアの召命のクールダウンが15秒短縮されます。",
+        "bonus4": "ヴァルキュリアの召命は最後の勅令のクールダウンをリセットし、着地から6秒以内の次の最後の勅令は15%多くのダメージを与えます。"
+      },
+      "vanguard_priest_discipline": {
+        "name": "帳の詩篇の衣装",
+        "bonus2": "精神の絶叫のクールダウンが3秒短縮されます。",
+        "bonus4": "守りの聖歌が完全に消費されると、守られていた味方の移動速度が3秒間20%上昇します。発動は8秒に1回まで。"
+      },
+      "vanguard_priest_holy": {
+        "name": "恩寵の翼の衣装",
+        "bonus2": "ヴェイルステップのクールダウンが6秒短縮されます。",
+        "bonus4": "ヴェイルステップは、あなたにも最大体力の8%のシールドを6秒間付与します。"
+      },
+      "vanguard_priest_shadow": {
+        "name": "黄昏の賛歌の礼装",
+        "bonus2": "嘆きの連祷は、チャネル中に対象の移動速度も30%低下させます。",
+        "bonus4": "タイスフィーンド招来は、あなたにも最大体力の10%のシールドを8秒間付与します。"
+      },
+      "vanguard_rogue_assassination": {
+        "name": "夜斬りの革鎧",
+        "bonus2": "急所打ちのエネルギーコストが10減少します。",
+        "bonus4": "急所打ちは、6秒以内の次の攻撃も必ずクリティカルにします。"
+      },
+      "vanguard_rogue_combat": {
+        "name": "乱闘の印の革鎧",
+        "bonus2": "駿足のクールダウンが60秒短縮されます。",
+        "bonus4": "駿足の効果中、邪悪な斬撃とヘイメーカーはコンボポイントを1追加で与えます。"
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "影歩きの革鎧",
+        "bonus2": "煙隠れのクールダウンが60秒短縮されます。",
+        "bonus4": "煙隠れから使ったみぞおち強打は、コンボポイントを2追加で与えます。"
+      },
+      "vanguard_shaman_elemental": {
+        "name": "嵐の書の戦の鎖鎧",
+        "bonus2": "武器解放のクールダウンが3秒短縮されます。",
+        "bonus4": "武器解放を使うと、4秒間移動しながら詠唱でき、移動速度が20%上昇します。発動は20秒に1回まで。"
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "疾風生まれの戦鎖帷子",
+        "bonus2": "祖霊の一撃は、対象の移動速度を4秒間30%低下させます。",
+        "bonus4": "祖霊の一撃がエレメンタルトランスの残りクールダウンを4秒短縮します。"
+      },
+      "vanguard_shaman_restoration": {
+        "name": "潮の守りの鎖帷子",
+        "bonus2": "体力が50%未満の味方への癒しの水流の詠唱時間が0.5秒短縮されます。",
+        "bonus4": "潮呼びは、その対象にもあなたの最大体力の5%のシールドを6秒間付与します。"
+      },
+      "vanguard_warlock_affliction": {
+        "name": "恐怖の羽ペンの祭服",
+        "bonus2": "責め苦の詠唱時間が0.3秒短縮されます。",
+        "bonus4": "喰らうの回復量が30%増加し、移動しながらチャネルできます。"
+      },
+      "vanguard_warlock_demonology": {
+        "name": "骨髄の縛めの礼装",
+        "bonus2": "骨の鎧のクールダウンが10秒短縮されます。",
+        "bonus4": "刈り取りの号令が骨の鎧の残りクールダウンを2秒短縮します。"
+      },
+      "vanguard_warlock_destruction": {
+        "name": "鉱滓の冠の祭服",
+        "bonus2": "燼皮のクールダウンが30秒短縮されます。",
+        "bonus4": "コンフラグレートを2回使うごとに、8秒以内の次の破滅の矢が即時詠唱になります。"
+      },
+      "vanguard_warrior_arms": {
+        "name": "刃跡の戦装束",
+        "bonus2": "重傷の一撃が突撃の残りクールダウンを1秒短縮します。",
+        "bonus4": "突撃は次の重傷の一撃も20%強化します（血染めの手の強化1スタック）。"
+      },
+      "vanguard_warrior_fury": {
+        "name": "血の行軍の憤怒の装備",
+        "bonus2": "英雄的跳躍のクールダウンが8秒短縮されます。",
+        "bonus4": "英雄的跳躍で着地すると激昂します。"
+      },
+      "vanguard_warrior_prot": {
+        "name": "鉄の行軍の防壁",
+        "bonus2": "断層のクールダウンが5秒短縮されます。",
+        "bonus4": "断層は、受けるダメージも6秒間10%軽減します。"
       },
       "vesperash": {
         "name": "ヴェスパーアッシュの外套",

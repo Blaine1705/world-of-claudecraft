@@ -9864,7 +9864,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Yeşim',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Renk Kodlu Uyarılar',
-  'hudChrome.perf.title': 'Performans Katmanı',
+  'hudChrome.perf.overlaySection': 'Performans Katmanı',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',

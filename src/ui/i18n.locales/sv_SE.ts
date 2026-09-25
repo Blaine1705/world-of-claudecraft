@@ -9147,7 +9147,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Jade',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Färgkodade varningar',
-  'hudChrome.perf.title': 'Prestandaöverlägg',
+  'hudChrome.perf.overlaySection': 'Prestandaöverlägg',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',

@@ -192,6 +192,22 @@ export const de_DE: EnTranslations = {
       "lfgboard": {
         "label": "Angebotstafel befüllen",
         "description": "Ein Szenario mit einer vorgefertigten Gruppensuche erstellen."
+      },
+      "hillwarn": {
+        "label": "Hill countdown",
+        "description": "Announce a hill now; it rises after the full warning."
+      },
+      "hillnow": {
+        "label": "Raise hill now",
+        "description": "Raise a hill at once and stand on it."
+      },
+      "hillrise": {
+        "label": "Skip hill countdown",
+        "description": "Raise the announced hill right away."
+      },
+      "hillend": {
+        "label": "End hill",
+        "description": "Make the current hill fall now."
       }
     }
   },
@@ -331,6 +347,48 @@ export const de_DE: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "Apply",
+      "pickerLabel": "Frame Presets: {name}",
+      "overwrite": "Overwrite Preset",
+      "overwriteBody": "Replace the saved preset \"{name}\" with your current layout?",
+      "current": "Current Layout",
+      "new": "New Preset",
+      "empty": "No saved presets",
+      "deleteNamed": "Delete {name}",
+      "deleteBody": "Delete the frame preset \"{name}\"?",
+      "title": "Frame Presets",
+      "name": "Preset Name",
+      "slot": "Preset {slot}",
+      "remove": "Delete",
+      "saved": "Done.",
+      "failed": "Could not save or load the preset."
+    },
+    "frameMenus": {
+      "hide": "Hide Frame",
+      "units": "Unit Frames",
+      "bars": "Action Bars",
+      "trackers": "Trackers",
+      "auras": "Auras",
+      "combat": "Combat Displays",
+      "other": "Other HUD Elements",
+      "options": "Frame Options",
+      "allOptions": "All Frame Options",
+      "independentTarget": "Lock Target of Target to Target"
+    },
+    "focusTargets": {
+      "showEmpty": "Show Empty Focus Frames",
+      "assignHint": "Select a target. Press {key} or click {button}.",
+      "assignClickHint": "Select a target. Click {button}.",
+      "ally": "Ally",
+      "enemy": "Enemy",
+      "unset": "Unset Focus",
+      "frame1": "Focus 1",
+      "frame2": "Focus 2",
+      "frame3": "Focus 3",
+      "assign": "Set focus {slot}",
+      "target": "Target focus {slot}"
+    },
     "professionTrainers": {
       "blacksmithing": "Schmiedelehrer",
       "cooking": "Kochlehrer",
@@ -388,9 +446,18 @@ export const de_DE: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Am Leichnam wiederbeleben",
       "resurrectAtHealer": "Der Bleiche Hüter (Zoll des Hüters)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Der Bleiche Hüter wacht über die Toten. Du weilst noch unter den Lebenden.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "Den Hüterzoll annehmen?",
       "healerConfirmBody": "Der Bleiche Hüter belebt dich hier wieder, doch der Hüterzoll verringert alle deine Attribute um 75 %, auf höheren Stufen bis zu 10 Minuten lang. Kehrst du als Geist zu deinem Leichnam zurück, wirst du ohne Strafe wiederbelebt.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Belebe mich wieder",
       "healerConfirmCancel": "Abbrechen"
     },
@@ -405,6 +472,7 @@ export const de_DE: EnTranslations = {
       "help": "Rettung: /unstuck startet einen Countdown im Stehen, der dich zu einer nahen, erreichbaren sicheren Stelle bewegt.",
       "helpAtGraveyard": "Rettung: /unstuck startet einen Countdown im Stehen und schickt deinen Geist dann zum nächsten Friedhof. Die Rückkehr über den Bleichen Hüter erfordert den Hüterzoll.",
       "helpUnstuckSickness": "Rettung: /unstuck startet einen Countdown im Stehen und bringt dich dann zum nächsten Friedhof, wobei du wiederbelebt wirst, falls du gefallen warst. Die Befreiungskrankheit bleibt bis zu 5 Minuten auf dir.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Befreien in {seconds} Sekunden. Bewegen, Kämpfen, Schaden erleiden oder eine andere Aktion beginnen bricht es ab.",
       "countdown": "Befreien: {seconds}",
       "completed": "Zur nächsten erreichbaren sicheren Stelle bewegt.",
@@ -412,6 +480,8 @@ export const de_DE: EnTranslations = {
       "revivedAtGraveyard": "Du wurdest zum nächsten Friedhof zurückgebracht und wiederbelebt. Der Hüterzoll lastet auf dir.",
       "movedToGraveyard": "Du wurdest zum nächsten Friedhof gebracht. Die Befreiungskrankheit lastet auf dir.",
       "revivedAtGraveyardUnstuck": "Du wurdest zum nächsten Friedhof gebracht und wiederbelebt. Die Befreiungskrankheit lastet auf dir.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Befreien abgebrochen, weil du dich bewegt hast.",
       "cancelledDamaged": "Befreien abgebrochen, weil du Schaden erlitten hast.",
       "cancelledCombat": "Befreien abgebrochen, weil du in den Kampf eingetreten bist.",
@@ -518,6 +588,15 @@ export const de_DE: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Handelsfenster geschlossen.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",
@@ -1516,6 +1595,7 @@ export const de_DE: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Schreckensfunken-Erderschütterer",
       "name_drakemaw_raptor": "Drakenrachen-Raptor",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork-Mechvogel",
       "name_lanternback_troll": "Grumbol der Laternenrücken",
       "name_chimeglass_tortoise": "Tolliver das Chimeglass",
@@ -1532,6 +1612,7 @@ export const de_DE: EnTranslations = {
       "desc_rallycart_skin": "Ein winziges Rallyeauto mit mächtigem Dröhnen.",
       "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten.",
       "desc_drakemaw_raptor": "Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Ein handgefertigtes Uhrwerk-Kriegshuhn, das mit schnappenden Servos sprintet, während sich der Aufziehschlüssel noch dreht.",
       "desc_lanternback_troll": "Ein von Lampenanzündern bis zum Joch gebrochener Bergtroll, der einen eisernen Thron über seinen Schultern trägt und auf beiden Armen eine brennende Sturmlaterne trägt.",
       "desc_chimeglass_tortoise": "Eine Salzschildkröte, die drei Generationen von Wohnwagen überholt hat. Kesselflicker haben ihm eine Brille aus Sturmglas geschliffen und ihm eine Bronzeglocke an den Hals gehängt, damit die Straße ihn hört, lange bevor sie ihn sieht.",
@@ -1648,6 +1729,7 @@ export const de_DE: EnTranslations = {
       "clickMoveLeft": "Linksklick",
       "clickMoveRight": "Rechtsklick",
       "version": "v{version} ({build})",
+      "overlays": "Overlays",
       "browserEffects": "Browser-Effekte",
       "browserEffectsAuto": "Auto",
       "browserEffectsFull": "Voll",
@@ -1846,7 +1928,8 @@ export const de_DE: EnTranslations = {
       "crossHotbarEditHelp": "Halten Sie den linken Stoßfänger fest und drücken Sie die Taste auf der Oberseite, um die Leiste mit dem Controller auszurichten."
     },
     "perf": {
-      "title": "Leistungsanzeige",
+      "title": "Performance",
+      "overlaySection": "Leistungsanzeige",
       "enable": "Leistungsanzeige anzeigen",
       "description": "Wähle, welche Werte angezeigt werden, wo die Anzeige sitzt und wie sie aussieht.",
       "sectionPosition": "Position",
@@ -2088,6 +2171,80 @@ export const de_DE: EnTranslations = {
         }
       }
     },
+    "cooldownManager": {
+      "title": "Cooldown Manager",
+      "intro": "Floating buttons for the spells you pick. They cannot be clicked: each one shows its cooldown, dims while you cannot cast it, and lights up when it is ready.",
+      "generalTitle": "General",
+      "enabled": "Show Cooldown Manager",
+      "idleOpacity": "Opacity While Not Ready",
+      "combatOnly": "Sounds Only in Combat",
+      "dragHint": "While this menu is open, every group shows on screen and you can drag it to move it.",
+      "addSingle": "Add Single Button",
+      "addGrid": "Add Button Group",
+      "addLine": "Add Line of Spells",
+      "groupsFull": "You have the most groups allowed. Delete one to add another.",
+      "noGroups": "Add a single button, a group of buttons or a line of spells to get started.",
+      "groupSingle": "Single Button {index}",
+      "groupGrid": "Button Group {index}",
+      "groupLine": "Line of Spells {index}",
+      "groupName": "Group Name",
+      "spellCount": "{count} / {max} spells",
+      "orientation": "Orientation",
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "columns": "# Columns",
+      "rows": "# Rows",
+      "direction": "Icon Direction",
+      "dirRight": "Right",
+      "dirLeft": "Left",
+      "dirDown": "Down",
+      "dirUp": "Up",
+      "iconSize": "Icon Size",
+      "iconPadding": "Icon Padding",
+      "opacity": "Opacity",
+      "visibility": "Visibility",
+      "visAlways": "Always Visible",
+      "visCombat": "In Combat",
+      "visHidden": "Hidden",
+      "visHiddenHint": "A hidden group still plays its sounds and lights your action bar.",
+      "showTimer": "Show Timer",
+      "positionX": "Horizontal Position",
+      "positionY": "Vertical Position",
+      "resetPosition": "Reset to Default Position",
+      "deleteGroup": "Delete Group",
+      "deleteGroupAria": "Delete {group}",
+      "trackedTitle": "Tracked Spells",
+      "trackedHint": "Drag a spell onto a group, or select it to choose its group and alerts. A button follows its spell when it changes into another one, and lights up when it does.",
+      "search": "Search spells",
+      "searchPlaceholder": "Search",
+      "notDisplayed": "Not Displayed",
+      "otherSpells": "Other Spells",
+      "otherSpellsHint": "Spells from your other specializations, talent choices and higher levels. Place one now and its button appears once you know it.",
+      "notKnown": "{spell} (not known yet)",
+      "aurasTitle": "Procs, Engines and Buffs",
+      "aurasHint": "Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.",
+      "auraFallback": "Aura",
+      "onlyWhileActive": "Only Show While Active",
+      "alertStacks": "Alert at Stacks",
+      "alertStacksAny": "On gain",
+      "alertStacksHint": "The button lights, pulses and chimes once the aura reaches this many stacks. On gain means as soon as it appears.",
+      "auraSoundHint": "Plays when the aura comes up, or when it reaches your stack goal.",
+      "emptySection": "Drop a spell here.",
+      "spellsEmpty": "You do not know any spells yet.",
+      "selectSpell": "Select {spell}",
+      "group": "Group",
+      "groupFullOption": "{group} (full)",
+      "notInGroupHint": "Put this spell in a group to show its button.",
+      "moveEarlier": "Move {spell} earlier",
+      "moveLater": "Move {spell} later",
+      "glowWhenReady": "Light Up When Ready",
+      "glowWhenReadyHint": "Brightens and outlines the button while the spell can be cast.",
+      "hotbarGlow": "Hotbar Glow",
+      "hotbarGlowHint": "Also lights this spell on your action bar while it is ready.",
+      "onlyWhenReady": "Only Show When Ready",
+      "sound": "Ready Sound",
+      "soundHint": "Plays when the spell becomes ready, or when its button changes into another spell while ready."
+    },
     "auraOverlay": {
       "title": "Auren",
       "currentClass": "Aktuelle Klasse: {class}",
@@ -2211,19 +2368,80 @@ export const de_DE: EnTranslations = {
         "battlegroundFirstWin": "erster heutiger Sieg in den Thornhollow-Feldern",
         "battlegroundComplete": "Kampf um die Thornhollow-Felder ausgetragen",
         "battlegroundKill": "ehrenhafte Ausschaltung",
-        "battlegroundAssist": "Unterstützung beim Todesstoß"
+        "battlegroundAssist": "Unterstützung beim Todesstoß",
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted",
+        "hillHold": "holding the hill"
       },
       "floatReasons": {
         "kill": "Ausschaltung",
         "assist": "Unterstützung",
-        "firstWin": "Erster Sieg"
+        "firstWin": "Erster Sieg",
+        "hill": "Hill"
       }
+    },
+    "worldPvp": {
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusOffFfa": "Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "zoneSanctuary": "Sanctuary: no world PvP here.",
+      "zoneContested": "Contested ground: only flagged players fight here.",
+      "zoneFfa": "Free-for-all ground: everyone here is fair game.",
+      "realmDisabled": "World PvP is disabled on this realm.",
+      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
+      "groundContested": "Everywhere else is contested: only two flagged players can fight.",
+      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
+      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
+      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
+      "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
+      "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
+    },
+    "hill": {
+      "title": "King of the Hill",
+      "rising": "The hill has not risen yet",
+      "heldYou": "Your group holds the hill",
+      "heldOther": "Another group holds the hill",
+      "heldNone": "Nobody holds the hill",
+      "counts": "Inside: you {yours}, holder {theirs}",
+      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
+      "countsHolding": "Inside: you {yours}, rival {theirs}",
+      "contestYou": "Taking the hill: {seconds} of {total}",
+      "contestOther": "Losing the hill: {seconds} of {total}",
+      "contestNone": "Hold a majority inside for {total} to take it",
+      "inside": "You are inside the circle",
+      "distance": "{yards} yd to the circle",
+      "rises": "Rises in {minutes}",
+      "falls": "Falls in {minutes}",
+      "standingRaid": "Raid members do not count: only parties can hold the hill"
     },
     "warfareShop": {
       "gossipOption": "Kriegsführungs-Sets durchsuchen",
       "gossipOptionAria": "Den von {name} angebotenen Kriegsführungs-Set-Laden durchsuchen",
       "jewelry": "Schmuck",
       "weapons": "Waffen",
+      "groupSeason2": "Warfare Season 2: Vanguard",
+      "groupEntry": "Warfare Season 1",
       "owned": "Im Besitz",
       "buyAria": "{item} für {honor} kaufen",
       "buyOwnedAria": "{item} für {honor} kaufen, bereits im Besitz",
@@ -2283,7 +2501,8 @@ export const de_DE: EnTranslations = {
         "hasteRating": "Tempowertung aus deiner Ausrüstung und deinen Setboni, die deine Angriffe und dein Zaubern beschleunigt. Etwa 10 Wertung gewähren 1% Tempo.",
         "parry": "Deine Chance, einen frontalen Nahkampfangriff vollständig zu parieren und keinen Schaden zu erleiden. Ein Schlag von hinten kann nicht pariert werden.",
         "hitRating": "Trefferwertung aus deiner Ausrustung und Setboni, die verringert, wie oft deine Angriffe verfehlen und deine Zauber widerstanden werden, besonders gegen hoher stufige Feinde. Etwa 10 Wertung verleihen 1% Treffer.",
-        "warfare": "Erhöht den Spielern zugefügten Schaden um {increase}% und verringert von Spielern erlittenen Schaden um {reduction}%."
+        "warfare": "Erhöht den Spielern zugefügten Schaden um {increase}% und verringert von Spielern erlittenen Schaden um {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Angriffskraft",
@@ -2519,6 +2738,15 @@ export const de_DE: EnTranslations = {
       "tooLarge": "Diese Meldung ist zu groß zum Senden. Versuche es ohne den Screenshot erneut.",
       "rateLimited": "Du hast kürzlich mehrere Meldungen gesendet. Bitte warte einen Moment, bevor du eine weitere sendest.",
       "failed": "Die Fehlermeldung konnte nicht gesendet werden. Bitte versuche es erneut."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "{item} ablegen",
@@ -3354,6 +3582,7 @@ export const de_DE: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
+      "pvpTag": "PvP",
       "cheaterTag": "< Schummler >",
       "pledgeTag": "Gelöbnis: {guild}",
       "npcRoleTag": "<{role}>",
@@ -3432,6 +3661,8 @@ export const de_DE: EnTranslations = {
       "label": "Fensterpositionen zurücksetzen"
     },
     "interfaceUnlock": {
+      "combineTrackers": "Combine Tracker Frames",
+      "combineAuras": "Combine Aura Frames",
       "label": "Rahmen bearbeiten",
       "unlock": "Oberfläche entsperren",
       "lock": "Oberfläche sperren",
@@ -3442,6 +3673,8 @@ export const de_DE: EnTranslations = {
       "lockFrame": "Diesen Rahmen sperren",
       "resizeFrame": "Diesen Rahmen skalieren",
       "frameNames": {
+        "trackerGroup": "Trackers",
+        "auraGroup": "Aura trackers",
         "actionBar1": "Aktionsleiste",
         "actionBar2": "Aktionsleiste 2",
         "actionBar3": "Aktionsleiste 3",
@@ -3571,6 +3804,15 @@ export const de_DE: EnTranslations = {
         "socket": "Ein Juwel in {name} eingefasst.",
         "socketReplaced": "Einen Edelstein in {name} eingesteckt; {gem} wurde zerstört."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Benötigt Stufe {level}",
@@ -5922,6 +6164,7 @@ export const de_DE: EnTranslations = {
       "talents": "Talente",
       "arena": "Arena und PvP",
       "thornhollow": "Thornhollow-Felder",
+      "worldPvp": "World PvP",
       "deeds": "Buch der Taten",
       "reliquary": "Das Reliquiar",
       "glossary": "Glossar",
@@ -6332,6 +6575,7 @@ export const de_DE: EnTranslations = {
       "allyRezBody": "Du musst nicht immer zu Fuß zurücklaufen. Ein Verbündeter mit einem Wiederbelebungszauber kann dich stattdessen erwecken, und das erreicht dich als Aufforderung, die du annimmst oder ablehnst; lässt du sie liegen, verfällt sie, also beantworte sie, solange sie da ist. Nimmst du an, erhebst du dich neben dem Freund, der sie gewirkt hat, mit einem Teil deiner Gesundheit und deines Manas zurück. Manche Heiler können die ganze gefallene Gruppe auf einmal anbieten, wobei jeder von euch trotzdem seine eigene Aufforderung beantwortet. Die Thornhollow-Felder sind die Ausnahme: Dort erreicht dich kein Wiederbelebungszauber, und du wartest auf die nächste Welle deines Teams.",
       "unstuckTitle": "Wenn du wirklich feststeckst",
       "unstuckBody": "Wenn die Welt dich irgendwo einsperrt, aus dem du nicht herauskommst, tippe /unstuck. Du musst dich außerhalb des Kampfes befinden und stillstehen, nicht durch eine Betäubung oder Verwurzelung festgehalten werden, und dich nicht in einem Duell oder einem Arenakampf befinden: Ein kurzer Countdown läuft, und Bewegung oder erlittener Schaden brechen ihn ab. Ist er abgeschlossen, wirst du am nächsten Friedhof abgesetzt. Er tötet dich nie und hinterlässt keine Leiche, und warst du bereits gefallen, wirst du stattdessen dort wiederbelebt. Der Preis dafür ist die Befreiungskrankheit, eine vorübergehende Schwächung all dessen, was du bist, die abgeklungen ist, bis du den Befehl erneut benutzen könntest, und wie der Zoll des Hüters verschont sie brandneue Charaktere vollständig.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Sich an einem Felsvorsprung hochziehen",
       "climbBody": "Felsvorsprünge sind keine Wände. Springst du gegen etwas, das zu hoch ist, um einfach hinaufzusteigen, greift dein Charakter nahe dem Scheitelpunkt des Sprungs die Kante und zieht sich hinauf, ganz ohne eigene Taste dafür. Alles, was niedrig genug ist, um es aus eigener Kraft zu überwinden, wird ohne Umstände genommen; der volle Klimmzug ist Kanten über Kopfhöhe vorbehalten. Er ist kurz und übernimmt für seine Dauer die Kontrolle, sodass du nicht mittendrin herauslenken kannst. Eine Betäubung erwischt dich mitten im Klimmzug, und du lässt los und fällst, gemessen ab der Stelle, wo der Sprung den Boden verlassen hat, und eine Betäubung oder Verwurzelung verhindert, dass ein Klimmzug überhaupt erst beginnt, was es wert ist, sich zu merken, wenn du versuchst, dich in einem Kampf aus einer schlechten Lage zu befreien."
     },
@@ -6357,6 +6601,7 @@ export const de_DE: EnTranslations = {
       "framesMoveBodyEditFrames": "Dein Einheitenrahmen, dein Zielrahmen und deine Gruppenrahmen können alle verschoben werden. Jeder besitzt eine kleine Verschiebeschaltfläche in der Ecke: entsperre ihn, ziehe ihn an die gewünschte Stelle und sperre ihn wieder, damit ein Fehlklick nichts verschiebt. Rahmen bearbeiten oben im Reiter Rahmen der Interfaceoptionen löst den übrigen Bildschirm gleichzeitig mit diesen drei Rahmen: Aktionsleisten, Zauberleiste, Schwungleiste, Erfahrungsleiste, Minikarte, Schaltflächenleiste, Haustierrahmen, Haltungsleiste, Stärkungs- und Schwächungsreihen sowie den Wunschlistenhinweis. Wenn ein Rahmen falsch steht, setzt Auf Standard zurück am Fuß desselben Reiters alle auf ihren Ausgangsort.",
       "framesGovernedExtra": "Rahmen bearbeiten löst außerdem den Trackerstapel darunter: verfolgte Quests und Ziele, Fortschritt im Buch der Taten, Reliquiarseiten, vom Handwerk angepinnte Rezepte, das aktuelle Delve, jeden Riss, an dem du teilnimmst, und das verfolgte Rezept oder die Kommission. Ebenfalls enthalten sind die Haustieraktionsleiste neben dem Haustierrahmen, der Zielpunkte-Rahmen für deine Schwächungen auf nahen Gegnern, das Paladin-Medaillon der Hingabe, die Affliction-Leiste des Hexenmeisters, das Zauberproc-Overlay, der Nebenhandschwungtimer für Beidhänder und das Register-Schadensmeterfenster. Jeder Bereich trägt seinen eigenen Namenschip, sobald er gelöst ist.",
       "framesGovernedAuraTracks": "Rahmen bearbeiten löst außerdem die sechs optionalen Aurenleisten, sobald du sie im Reiter Kampf der Interfaceoptionen einschaltest: Meine Stärkungen, defensive Abklingzeiten, meine Schilde, offensive Abklingzeiten, Bewegung und Verstohlenheit sowie Meine Stärkungen auf Verbündeten. Jede Leiste ist zunächst aus und trägt beim Lösen ihren eigenen Namenschip.",
+      "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Durch Bearbeiten von Frames wird auch das Dialogfenster aufgelockert, das die gesprochene Zeile eines NPCs enthält, während sich dieser NPC außerhalb Ihrer Sicht befindet. Es trägt seinen Namenschip, solange es locker ist.",
       "barsTitle": "Leisten, Timer und Kampftext",
       "barsBody": "Deine Zauberleiste erscheint in der Mitte des Bildschirms, direkt über deinen Aktionsleisten, sobald du zauberst oder kanalisierst, und zeigt den Namen des Zaubers sowie die verbleibende Zeit. Dein Ziel bekommt eine eigene Zauberleiste auf seinem Fenster, sodass du siehst, was kommt, und darauf reagieren kannst.\n\nEine dünne Schwungleiste liegt unter deiner Zauberleiste und füllt sich zwischen deinen Waffenschwüngen, sodass ein Nah- oder Fernkämpfer sehen kann, wann der nächste automatische Treffer landet.\n\nDeine Erfahrungsleiste läuft über die volle Breite unter deinen Aktionsleisten, in Segmente unterteilt, mit einem helleren Abschnitt, der die ausgeruhte Erfahrung zeigt, die du angesammelt hast.\n\nSchwimme unter Wasser, und am oberen Bildschirmrand erscheint eine blaue Atemleiste. Sie leert sich, während dein Kopf unter Wasser ist, blinkt rot auf, sobald sie aufgebraucht ist und du zu ertrinken beginnst, und füllt sich schnell wieder, sobald du auftauchst. Die Leertaste lässt dich nach oben schwimmen, und die Taste zum Abtauchen, standardmäßig Strg, bringt dich tiefer.\n\nSchaden und Heilung schweben als kleine Zahlen über dem auf, was sie getroffen haben, sodass du einen Kampf lesen kannst, ohne Text lesen zu müssen. Der Kampf-Reiter in deinem Chatfenster führt das vollständige schriftliche Protokoll.",
@@ -6468,6 +6713,8 @@ export const de_DE: EnTranslations = {
       "completed": "Die Quests, die du bereits abgegeben hast, in der Reihenfolge, in der du sie beendet hast.",
       "session": "Was du seit deinem Einloggen getan hast: Tötungen, Tode, Schaden und Erfahrung.",
       "arena": "Dein Stand im Aschenen Kolosseum in beiden Wertungsklassen: Wertung, Siege, Niederlagen und Gewinnrate für 1v1 und für 2v2.",
+      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
+      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.",
       "listings": "Deine eigenen Angebote auf dem Weltmarkt, mit dem geforderten Preis, der verbleibenden Zeit für jedes und wie viel Platz du für weitere hast.",
       "buyback": "Was du kürzlich an einen Händler verkauft hast und noch zurückkaufen könntest.",
       "groupState": "Wie es dir gerade geht",
@@ -6505,6 +6752,7 @@ export const de_DE: EnTranslations = {
       "dungeonReset": "Gib deine eigenen leeren Instanzen auf, was du nach einem Schwierigkeitswechsel tust.",
       "groupRecovery": "Erholung und Präsenz",
       "unstuck": "Der Ausweg, wenn dich die Welt eingesperrt hat. Steh während eines kurzen Countdowns still, und du wirst zum nächsten Friedhof gebracht, dort wiederbelebt, falls du bereits gefallen warst. Es lässt dich danach eine Weile durch die Befreiungskrankheit geschwächt zurück, es ist also ein letztes Mittel und keine Abkürzung.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Markiere dich als abwesend, mit einer optionalen Nachricht, die jeder, der dich anflüstert, automatisch als Antwort erhält. Wiederhole den Befehl ohne Nachricht, um sie aufzuheben; jeder andere Chat hebt sie ebenfalls auf.",
       "dnd": "Nicht stören: wie abwesend, außer dass dir gesendete Flüsternachrichten zurückgehalten statt zugestellt werden.",
       "sit": "Setz dich hin, wo du stehst, und steh wieder auf. Du stehst automatisch auf, sobald du dich bewegst, wirkst oder einen Treffer erleidest.",
@@ -6611,6 +6859,7 @@ export const de_DE: EnTranslations = {
       "fatigueDef": "Schwimmst du weit genug in die offene See hinaus, beginnt das Wasser, an dir zu zehren: Zuerst kommt eine Warnung, dann steigender Schaden, bis du zum Land zurückkehrst.",
       "unstuckTerm": "Befreiungskrankheit",
       "unstuckDef": "Der Preis für die Nutzung von Befreien aus dem Spielmenü. Wenn du während des Countdowns stillstehst, bringt es dich zum nächsten Friedhof, und du trägst danach eine Weile eine vorübergehende Schwäche.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Gegenstandsstufe",
       "itemLevelDef": "Eine einzelne Zahl, die zusammenfasst, wie stark ein Ausrüstungsteil ist, praktisch, wenn du zwei Teile schnell vergleichen willst. Schalte Gegenstandsstufe anzeigen in den Optionen ein, um sie auf Tooltips zu sehen. Nur Ausrüstung mit bekannter Herkunft trägt eine, einfache Händlerware und Startausrüstung zeigen also nichts, und eine fehlende Zahl ist normal, kein Fehler.",
       "requiredLevelTerm": "Erforderliche Stufe",
@@ -7218,7 +7467,30 @@ export const de_DE: EnTranslations = {
       "warfareBody": "Jedes Kriegsführungs-Ausrüstungsteil trägt Kriegsführungs-Angriffswertung und Kriegsführungs-Verteidigungswertung, und diese beiden Wertungen bewirken gegen Monster überhaupt nichts. Sie wirken nur, wenn du gegen einen anderen Spieler kämpfst, in einem Duell, in der Arena oder auf dem Schlachtfeld, wo Angriff dem von dir verursachten Schaden hinzufügt und Verteidigung den an dir erlittenen Schaden verringert, jeweils bis zu einer eigenen Obergrenze. Jede Rüstungsfamilie ist zugleich ein Set, und seine Set-Boni sind ebenso Kriegsführungswertung oder Effekte, die nur gegen Spieler wirken, sodass eine komplette Ehrenausrüstung auf einem Dungeon-Boss nichts wert ist.",
       "warfareBodyStatsStay": "Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster.",
       "warfareTradeBody": "Das ist der bewusste Kompromiss. Kriegsführungsausrüstung ist für den Kampf gegen Spieler gebaut, nicht als Abkürzung an den Dungeon-Stufen vorbei: Ein Kriegsführungsteil trägt niemals die Kampfwertungen, die ein Dungeon-Epic im selben Slot bietet, und alles, was es mitbringt, ist für andere Spieler bestimmt. Willst du dich in der Arena behaupten, kauf sie dir. Willst du heroische Dungeons schneller schaffen, verdiene dir deine Ausrüstung in den Dungeons.",
-      "warfareTradeBodyRatingSpent": "Kriegsführungsausrüstung ist für Spieler gegen Spieler gedacht und überspringt keine Dungeonstufen. Sie trägt nicht die Kampfbewertungen eines Dungeonepics, sondern investiert ihre Bewertungen und Setboni vollständig in Kämpfe gegen Spieler. Für die Arena kaufst du sie, für schnellere heroische Dungeons verdienst du deine Ausrüstung dort."
+      "warfareTradeBodyRatingSpent": "Kriegsführungsausrüstung ist für Spieler gegen Spieler gedacht und überspringt keine Dungeonstufen. Sie trägt nicht die Kampfbewertungen eines Dungeonepics, sondern investiert ihre Bewertungen und Setboni vollständig in Kämpfe gegen Spieler. Für die Arena kaufst du sie, für schnellere heroische Dungeons verdienst du deine Ausrüstung dort.",
+      "vanguardHeading": "Vanguard gear: Warfare Season 2",
+      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
+    },
+    "worldPvpPage": {
+      "heading": "World PvP",
+      "intro": "Open-world player-versus-player is opt-in. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy anywhere in the open world; lower it and, after a short delay, you are a bystander again. Nobody who has not raised the flag can attack or be attacked.",
+      "flagHeading": "Raising and lowering the flag",
+      "flagBody": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing a flagged player who is in a fight raises your own flag.",
+      "stakesHeading": "What a kill is worth",
+      "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "limitsHeading": "Fair play rules",
+      "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
+      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
+      "zonesHeading": "Where world PvP happens",
+      "zonesBody": "The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.",
+      "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
+      "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
+      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "hillHeading": "King of the Hill",
+      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
+      "hillBodyRamp": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "limitsBodyRaids": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid."
     },
     "thornhollowPage": {
       "heading": "Thornhollow-Felder",
@@ -8021,7 +8293,8 @@ export const de_DE: EnTranslations = {
       "parryTitle": "Parieren",
       "parryBody": "Parieren ist die ureigene Verteidigung des Kriegers: eine Chance, einen Nahkampfschlag völlig abzuwehren und keinen Schaden zu nehmen, und sie wächst mit Stärke. Nur ein Angriff von vorne lässt sich parieren, ein weiterer Grund, dem, was dich trifft, immer zugewandt zu bleiben. Andere Klassen sehen die Zeile auf ihrem Bogen bei null stehen.",
       "warfareTitle": "Kriegsführung",
-      "warfareBody": "Kriegsführung ist der eine Wert, der nur gegen andere Spieler zählt: Er erhöht den Schaden, den du ihnen zufügst, und senkt den Schaden, den du von ihnen erleidest, und dein Bogen zeigt beide Hälften in einer Zeile. Gegen Kreaturen bewirkt er gar nichts. Er kommt von der Kriegsführungs-Ausrüstung, die du mit Ehre kaufst, er ist also eine Belohnung fürs PvP-Spielen und nichts, dem du beim Aufsteigen hinterherjagen musst."
+      "warfareBody": "Kriegsführung ist der eine Wert, der nur gegen andere Spieler zählt: Er erhöht den Schaden, den du ihnen zufügst, und senkt den Schaden, den du von ihnen erleidest, und dein Bogen zeigt beide Hälften in einer Zeile. Gegen Kreaturen bewirkt er gar nichts. Er kommt von der Kriegsführungs-Ausrüstung, die du mit Ehre kaufst, er ist also eine Belohnung fürs PvP-Spielen und nichts, dem du beim Aufsteigen hinterherjagen musst.",
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Jeder Kampf, jede Quest und jeder Schritt nach Norden macht deinen Helden stärker. Hier erfährst du, wie der Aufstieg funktioniert und was dich weiter wachsen lässt, sobald du an der Spitze bist.",
@@ -9874,6 +10147,11 @@ export const de_DE: EnTranslations = {
       "quit": "Beenden",
       "fatalBody": "World of ClaudeCraft ist auf einen unerwarteten Fehler gestoßen und muss geschlossen werden."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Spiel beenden"
     }
@@ -9924,6 +10202,11 @@ export const de_DE: EnTranslations = {
     "inWorld": "in der Welt",
     "takeOver": "Übernehmen",
     "inWorldHint": "Bereits in der Welt. Melde dich anderswo ab oder übernimm den Charakter.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Dadurch wird dieser Charakter von einer anderen Sitzung getrennt und hierher geholt. Fortfahren?",
     "renameRequired": "Umbenennung erforderlich",
     "delete": "Löschen",
@@ -10468,6 +10751,7 @@ export const de_DE: EnTranslations = {
       "deathRecapDrowned": "Ihr seid gestorben. Ihr seid ertrunken.",
       "deathRecapCauterized": "Ihr seid gestorben. Die Verbrennung von Kauterisieren hat Euch überwältigt.",
       "respawn": "Ihr fühlt Euch wieder ausgeruht und unversehrt.",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "Chat von {name} wird ignoriert.",
       "noLongerIgnoring": "{name} wird nicht mehr ignoriert.",
       "playerNotNearby": "Dieser Spieler ist nicht in der Nähe.",
@@ -11970,6 +12254,18 @@ export const de_DE: EnTranslations = {
       "thunder_reservoir": {
         "name": "Donnerspeicher",
         "description": "Passiv: Der Lichtbogenblitz und der Gabelblitz gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)"
+      },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
       },
       "rockbiter_weapon": {
         "name": "Stonebound-Waffe",
@@ -14483,6 +14779,9 @@ export const de_DE: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Zündschlüssel: Schreckensfunken-Erderschütterer"
       },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Zündschlüssel: Goblin-Raketenschlitten"
       },
@@ -15853,6 +16152,423 @@ export const de_DE: EnTranslations = {
       },
       "stormhymn_chain_treads": {
         "name": "Sturmhymnen-Kettenstiefel"
+      },
+      "vanguard_warrior_arms_helmet": {
+        "name": "Bladewake Greathelm"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "Bladewake Pauldrons"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "Bladewake Hauberk"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "Bladewake Legplates"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "Bladewake Crushers"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "Bloodmarch Visage"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "Bloodmarch Shoulderguards"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "Bloodmarch Chainmail"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "Bloodmarch Leggings"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "Bloodmarch Grips"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "Ironmarch Helm"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "Ironmarch Spaulders"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "Ironmarch Chestguard"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "Ironmarch Legguards"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "Ironmarch Handguards"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "Sunvigil Circlet"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "Sunvigil Mantle"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "Sunvigil Hauberk"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "Sunvigil Legmail"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "Sunvigil Gloves"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "Shieldvow Helm"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "Shieldvow Pauldrons"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "Shieldvow Breastplate"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "Shieldvow Legplates"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "Shieldvow Gauntlets"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "Lightbrand Crown"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "Lightbrand Spaulders"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "Lightbrand Cuirass"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "Lightbrand Legguards"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "Lightbrand Gauntlets"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "Packwarden Coif"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "Packwarden Spaulders"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "Packwarden Jerkin"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "Packwarden Legguards"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "Packwarden Gauntlets"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "Farsight Coif"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "Farsight Spaulders"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "Farsight Jerkin"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "Farsight Legguards"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "Farsight Gauntlets"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "Snaretooth Coif"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "Snaretooth Spaulders"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "Snaretooth Jerkin"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "Snaretooth Legguards"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "Snaretooth Gauntlets"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "Nightcut Hood"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "Nightcut Shoulderpads"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "Nightcut Tunic"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "Nightcut Breeches"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "Nightcut Gloves"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "Brawlmark Hood"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "Brawlmark Shoulderpads"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "Brawlmark Tunic"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "Brawlmark Breeches"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "Brawlmark Gloves"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "Shadewalk Hood"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "Shadewalk Shoulderpads"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "Shadewalk Tunic"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "Shadewalk Breeches"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "Shadewalk Gloves"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "Veilpsalm Cowl"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "Veilpsalm Mantle"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "Veilpsalm Robe"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "Veilpsalm Leggings"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "Veilpsalm Handwraps"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "Gracewing Cowl"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "Gracewing Mantle"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "Gracewing Robe"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "Gracewing Leggings"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "Gracewing Handwraps"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "Duskhymn Cowl"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "Duskhymn Mantle"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "Duskhymn Robe"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "Duskhymn Leggings"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "Duskhymn Handwraps"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "Tempestwrit Coif"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "Tempestwrit Pauldrons"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "Tempestwrit Hauberk"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "Tempestwrit Legmail"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "Tempestwrit Gauntlets"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "Galeborn Helm"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "Galeborn Spaulders"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "Galeborn Chainmail"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "Galeborn Legguards"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "Galeborn Grips"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "Brineward Circlet"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "Brineward Mantle"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "Brineward Hauberk"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "Brineward Kilt"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "Brineward Handwraps"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "Hourbinder's Hood"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "Hourbinder's Amice"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "Hourbinder's Robe"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "Hourbinder's Trousers"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "Hourbinder's Gloves"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "Emberlash Cowl"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "Emberlash Mantle"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "Emberlash Robes"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "Emberlash Leggings"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "Emberlash Gloves"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "Rimewarden Hood"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "Rimewarden Shoulderpads"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "Rimewarden Vestment"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "Rimewarden Legwraps"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "Rimewarden Mitts"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "Dreadquill Hood"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "Dreadquill Mantle"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "Dreadquill Robe"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "Dreadquill Leggings"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "Dreadquill Handwraps"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "Marrowbound Cowl"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "Marrowbound Spaulders"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "Marrowbound Robe"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "Marrowbound Leggings"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "Marrowbound Grips"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "Slagcrown Hood"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "Slagcrown Mantle"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "Slagcrown Robes"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "Slagcrown Leggings"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "Slagcrown Gloves"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "Starwarden Headdress"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "Starwarden Spaulders"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "Starwarden Vest"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "Starwarden Breeches"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "Starwarden Gloves"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "Bloodmane Helm"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "Bloodmane Shoulderpads"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "Bloodmane Tunic"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "Bloodmane Legguards"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "Bloodmane Grips"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "Thistlebloom Crown"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "Thistlebloom Mantle"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "Thistlebloom Vest"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "Thistlebloom Leggings"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "Thistlebloom Gloves"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "Vanguard's Verdict"
+      },
+      "vanguard_oath_blade": {
+        "name": "Vanguard's Oath"
+      },
+      "vanguard_fang_dagger": {
+        "name": "Vanguard's Fang"
+      },
+      "vanguard_warstaff": {
+        "name": "Vanguard's Warstaff"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
@@ -20271,6 +20987,7 @@ export const de_DE: EnTranslations = {
       "eastbrook_vale": {
         "name": "Eastbrook-Tal",
         "welcome": "Suche Marschall Redbrook in der Stadt: Er hat Arbeit für dich.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20316,6 +21033,7 @@ export const de_DE: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefen-Moor",
         "welcome": "Melde dich bei Wärter Fenwick am Tor von Fenbridge.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20346,6 +21064,7 @@ export const de_DE: EnTranslations = {
       "thornpeak_heights": {
         "name": "Thornpeak-Höhen",
         "welcome": "Hauptmann Thessaly hält die Mauer von Highwatch, gerade so.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"
@@ -21204,6 +21923,141 @@ export const de_DE: EnTranslations = {
       "vale_arcanist": {
         "name": "Ornat des Talarkanisten",
         "bonus3": "Erhöht Angriffs- und Zaubertempo um 15%."
+      },
+      "vanguard_druid_balance": {
+        "name": "Starwarden Raiment",
+        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
+        "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+      },
+      "vanguard_druid_feral": {
+        "name": "Bloodmane Hide",
+        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec.",
+        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
+      },
+      "vanguard_druid_restoration": {
+        "name": "Thistlebloom Vestment",
+        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
+        "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "Packwarden Harness",
+        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec.",
+        "bonus4": "Rattling Shot reduces Howling Rage's remaining cooldown by 1 sec."
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "Farsight Harness",
+        "bonus2": "Trailbreak's cooldown is reduced by 4 sec.",
+        "bonus4": "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more than once every 15 sec."
+      },
+      "vanguard_hunter_survival": {
+        "name": "Snaretooth Harness",
+        "bonus2": "Bloodhook's cooldown is reduced by 3 sec.",
+        "bonus4": "Bloodhook grants 1 Hunting Momentum."
+      },
+      "vanguard_mage_arcane": {
+        "name": "Hourbinder's Vestments",
+        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
+        "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
+      },
+      "vanguard_mage_fire": {
+        "name": "Emberlash Regalia",
+        "bonus2": "Cinderfall recharges 3 sec faster.",
+        "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
+      },
+      "vanguard_mage_frost": {
+        "name": "Rimewarden Garb",
+        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
+        "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
+      },
+      "vanguard_paladin_holy": {
+        "name": "Sunvigil Regalia",
+        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
+        "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
+      },
+      "vanguard_paladin_protection": {
+        "name": "Shieldvow Bastion",
+        "bonus2": "Oath Chain's cooldown is reduced by 2 sec.",
+        "bonus4": "Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled."
+      },
+      "vanguard_paladin_retribution": {
+        "name": "Lightbrand Warplate",
+        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec.",
+        "bonus4": "Valkyr's Calling resets Final Edict's cooldown, and your next Final Edict within 6 sec of landing deals 15 percent more damage."
+      },
+      "vanguard_priest_discipline": {
+        "name": "Veilpsalm Raiment",
+        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
+        "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
+      },
+      "vanguard_priest_holy": {
+        "name": "Gracewing Raiment",
+        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
+        "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
+      },
+      "vanguard_priest_shadow": {
+        "name": "Duskhymn Regalia",
+        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
+        "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
+      },
+      "vanguard_rogue_assassination": {
+        "name": "Nightcut Leathers",
+        "bonus2": "Low Blow costs 10 less Energy.",
+        "bonus4": "Low Blow also makes your next attack within 6 sec a critical strike."
+      },
+      "vanguard_rogue_combat": {
+        "name": "Brawlmark Leathers",
+        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
+        "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "Shadewalk Leathers",
+        "bonus2": "Smokefade's cooldown is reduced by 60 sec.",
+        "bonus4": "Gut Punch awards 2 additional combo points when used from Smokefade."
+      },
+      "vanguard_shaman_elemental": {
+        "name": "Tempestwrit Battlemail",
+        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
+        "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "Galeborn Warmail",
+        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
+        "bonus4": "Ancestral Strike reduces the remaining cooldown of Elemental Trance by 4 sec."
+      },
+      "vanguard_shaman_restoration": {
+        "name": "Brineward Chainmail",
+        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
+        "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
+      },
+      "vanguard_warlock_affliction": {
+        "name": "Dreadquill Vestments",
+        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
+        "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
+      },
+      "vanguard_warlock_demonology": {
+        "name": "Marrowbound Regalia",
+        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
+        "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
+      },
+      "vanguard_warlock_destruction": {
+        "name": "Slagcrown Vestments",
+        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
+        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
+      },
+      "vanguard_warrior_arms": {
+        "name": "Bladewake Battlegear",
+        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 1 sec.",
+        "bonus4": "Onrush also empowers your next Maiming Strike by 20 percent (one stack of Redhand's empower)."
+      },
+      "vanguard_warrior_fury": {
+        "name": "Bloodmarch Ragegear",
+        "bonus2": "Vaulting Charge's cooldown is reduced by 8 sec.",
+        "bonus4": "Landing Vaulting Charge Enrages you."
+      },
+      "vanguard_warrior_prot": {
+        "name": "Ironmarch Bulwark",
+        "bonus2": "Faultline's cooldown is reduced by 5 sec.",
+        "bonus4": "Faultline also reduces damage you take by 10 percent for 6 sec."
       },
       "vesperash": {
         "name": "Schleier der Abendasche",

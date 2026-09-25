@@ -5818,7 +5818,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Inclut 5 % de chances de base communes à tous les aventuriers.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Une estimation, elle exclut les coups critiques et les dégâts des capacités.',
-  'hudChrome.perf.title': 'Surcouche de performance',
+  'hudChrome.perf.overlaySection': 'Surcouche de performance',
   'hudChrome.perf.enable': 'Afficher la surcouche de performance',
   'hudChrome.perf.description':
     "Choisissez les statistiques à afficher, l'emplacement de la surcouche et son apparence.",

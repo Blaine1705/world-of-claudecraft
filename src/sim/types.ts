@@ -1,3 +1,4 @@
+import { cloneLootQuality, type LootQualityDescriptor } from './loot_quality/types';
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
 import type { MaterialComposition } from './material_sources';
@@ -119,7 +120,16 @@ export type HonorReason =
   | 'battleground_first_win'
   | 'battleground_complete'
   | 'battleground_kill'
-  | 'battleground_assist';
+  | 'battleground_assist'
+  // World PvP (/pvp flag, src/sim/pvp/world_pvp.ts): the killing blow's share
+  // of the kill pool, and everyone else's who damaged the victim or healed a
+  // damager inside the assist window. Two reasons so the float and the chat
+  // line can name which one just paid, like the battleground drip above.
+  | 'world_kill'
+  | 'world_assist'
+  // King of the Hill (pvp/hill.ts): the once-a-minute trickle to a holder
+  // standing inside the circle.
+  | 'hill_hold';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
@@ -836,6 +846,11 @@ export interface Stats {
   // player-vs-player damage only; PvE never reads them.
   pvpOffense: number;
   pvpDefense: number;
+  // WARFARE Vitality: the maximum-health fraction honor gear grants outside PvE
+  // instances (pvp/power.ts pvpVitalityFromRating). Unlike the two above it is
+  // not scoped to hostile hits; pvp/vitality.ts switches it off in dungeons,
+  // raids, delves and rift floors.
+  pvpVitality: number;
 }
 
 // The six class/item attributes authored in content. WARFARE fractions are
@@ -1145,6 +1160,10 @@ interface BaseItemDef {
   // `kind` (weapon/armor/bag/tool: 1, everything else: 20); see stackSizeOf.
   stackSize?: number;
   requiredClass?: PlayerClass[];
+  // Class-locked gear (Warfare Season 2 spec sets): only the requiredClass list
+  // may equip it. Without the flag, armor follows the armor-type rank alone and
+  // requiredClass is advisory (canEquipItem in equipment_rules.ts).
+  classLocked?: boolean;
   // Minimum character level needed to equip this piece. When omitted, the level
   // is DERIVED from `quality` (see src/sim/item_level_req.ts); set this only to
   // override the per-quality default for a specific item.
@@ -1553,6 +1572,8 @@ export type ItemDef =
 // time, see market.ts marketList); #1146 wires real market handling for
 // instanced items later.
 export interface ItemInstancePayload {
+  /** Permanent enemy-drop quality, independent of rarity, enchants and upgrades. */
+  lootQuality?: LootQualityDescriptor;
   /** Player name that signed/crafted this specific copy, if any. */
   signer?: string;
   /** Remaining charges for a per-effect-limited item, keyed by effect id. */
@@ -1680,6 +1701,10 @@ export interface ItemInstancePayload {
 // piece's, src/sim/rift/progression.ts), so all copy through the exact same rules.
 export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
   const instance: ItemInstancePayload = { ...src };
+  // Invalid descriptors remain untouched until the atomic load-bound arm drops
+  // them. Never iterate or clone an unbounded corrupt weights subtree here.
+  const lootQuality = cloneLootQuality(src.lootQuality);
+  if (lootQuality) instance.lootQuality = lootQuality;
   if (src.charges) instance.charges = { ...src.charges };
   if (
     src.perfectingBonus &&
@@ -1806,6 +1831,7 @@ export type ItemLootStrategy = 'looter-takes-all' | 'need-greed' | 'round-robin'
 export interface LootRollPrompt {
   rollId: number;
   itemId: string;
+  instance?: ItemInstancePayload;
   itemName: string;
   quality: ItemDef['quality'];
   expiresAt: number;
@@ -1827,6 +1853,7 @@ export interface LootRollStatusEntry {
 export interface LootRollGroupStatus {
   rollId: number;
   itemId: string;
+  instance?: ItemInstancePayload;
   itemName: string;
   quality: ItemDef['quality'];
   expiresAt: number;
@@ -1855,6 +1882,7 @@ export interface MasterLootSettings {
 export interface MasterLootPrompt {
   rollId: number;
   itemId: string;
+  instance?: ItemInstancePayload;
   itemName: string;
   quality: ItemDef['quality'];
   expiresAt: number;
@@ -4150,6 +4178,15 @@ export interface ZoneDef {
   westPassZ?: number;
   zMax: number;
   levelRange: [number, number];
+  /**
+   * World PvP policy of the ground (src/sim/pvp/world_pvp_zones.ts). 'sanctuary':
+   * no world PvP at all, flagged or not. 'ffa': free-for-all, everyone standing
+   * here is fair game with no flag. Absent: contested, the mutual-flag rule.
+   * Owner tuning: the tutorial island and the starter zone are sanctuaries, the
+   * three highest-level zones are free-for-all (tests/world_pvp_zones.test.ts
+   * pins the set; flip one word here to move a zone).
+   */
+  worldPvp?: 'sanctuary' | 'ffa';
   biome: BiomeId;
   hub: { x: number; z: number; radius: number; name: string };
   graveyard: { x: number; z: number };
@@ -4165,6 +4202,9 @@ export interface ZoneDef {
   pois: { x: number; z: number; label: string; id?: string; hideOnMap?: boolean }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
+  // Replaces the welcome hint on entry once every town quest of the zone is
+  // turned in (sim/town_quests.ts). Zones without it keep the welcome rule only.
+  welcomeDone?: string;
   // The zone's southern border ridge has NO road pass and is raised past the
   // climbable slope: the zone is reachable only by portal (see world.ts).
   sealedSouthBorder?: boolean;
@@ -5383,6 +5423,20 @@ export interface Entity extends ClientMirroredEntityFields {
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */
   jailed?: boolean;
+  /** World PvP flag (/pvp, src/sim/pvp/world_pvp.ts): two flagged players who
+   *  share no party or raid (a guild is no shield) are mutually hostile in the
+   *  open world (isHostileTo's world arm). The DISPLAY mirror of the
+   *  authoritative PlayerMeta.worldPvp state, written only by that module
+   *  (the away.ts meta<->entity precedent), and it rides the entity wire
+   *  (`pvp`) so every nearby client colours the nameplate. Absent/false is
+   *  unflagged, so an unflagged character samples and serializes exactly as
+   *  before the flag existed. */
+  pvpFlag?: boolean;
+  /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
+   *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
+   *  gear's health bonus never reaches raid content. Absent means the open
+   *  world, where it applies; battlegrounds and arenas apply it too. */
+  pvpVitalityActive?: boolean;
   /** Wearing the operator-applied Cheater tag (src/sim/moderation/). Server-set
    *  via setCheaterMark at join restore and when an operator applies or lifts a
    *  mark; never true offline, never user-settable. Cosmetic: nothing reads it
@@ -5791,6 +5845,9 @@ export interface NythraxisEncounterState {
     ascensionStacks: number;
   } | null;
   majorGapTimer?: number;
+  // Seconds left before Bone Storm may begin after a Soul Rend detonation
+  // (nythraxis_soul_rend.ts); 0 when no detonation is settling.
+  soulRendSettleTimer?: number;
   // The Crown Endures: seconds since the first encounter tick (the clock runs
   // through the transition) and the enrage stack the boss carries once it has
   // run out (nythraxis_enrage_clock.ts).
@@ -6203,17 +6260,23 @@ export type UnstuckEvent =
       // 'moved_to_graveyard': a living player was moved there and left alive.
       // 'revived_at_graveyard': an already dead or released player was pulled to
       // the graveyard and raised there.
-      // Both charge Unstuck Sickness. The two retired reasons stay in the union so
-      // the client renders them rather than t(undefined): 'nearest_safe_position'
-      // (the short-range teleport) survives in historical telemetry, and
-      // 'nearest_graveyard' (the pre-0.32.1 kill-and-release outcome) can still
-      // arrive from a not-yet-updated server under an OTA bundle that agrees on
-      // the layout epoch.
+      // Both charge Unstuck Sickness on a repeat inside the hour window (see
+      // `sickness`). The two retired reasons stay in the union so the client renders
+      // them rather than t(undefined): 'nearest_safe_position' (the short-range
+      // teleport) survives in historical telemetry, and 'nearest_graveyard' (the
+      // pre-0.32.1 kill-and-release outcome) can still arrive from a not-yet-updated
+      // server under an OTA bundle that agrees on the layout epoch.
       reason:
         | 'nearest_safe_position'
         | 'nearest_graveyard'
         | 'moved_to_graveyard'
         | 'revived_at_graveyard';
+      // Whether Unstuck Sickness was applied by this completion: false for the first
+      // use in an hour (and for a character below the sickness floor), true for a
+      // repeat inside the window. Optional only for wire skew: a not-yet-updated
+      // server (pre-window) omits it, and it always charged, so an absent value reads
+      // as charged.
+      sickness?: boolean;
       area: UnstuckArea;
       origin: UnstuckPosition;
       destination: UnstuckPosition;
@@ -6352,11 +6415,21 @@ export type SimEvent = { pid?: number } & (
   //   link) off its own result event. Without it a profession action printed
   //   two lines for one grant (#2430). Everything else the client does on a
   //   loot event (bag refresh, loot-roll close) still runs.
-  | { type: 'loot'; text: string; silent?: boolean; callerLogs?: boolean }
+  | {
+      type: 'loot';
+      text: string;
+      rollId?: number;
+      silent?: boolean;
+      callerLogs?: boolean;
+      itemId?: string;
+      instance?: ItemInstancePayload;
+      count?: number;
+    }
   | {
       type: 'lootRoll';
       rollId: number;
       itemId: string;
+      instance?: ItemInstancePayload;
       itemName: string;
       quality: ItemDef['quality'];
       expiresAt: number;
@@ -6366,6 +6439,7 @@ export type SimEvent = { pid?: number } & (
       type: 'masterLoot';
       rollId: number;
       itemId: string;
+      instance?: ItemInstancePayload;
       itemName: string;
       quality: ItemDef['quality'];
       expiresAt: number;
@@ -6479,7 +6553,9 @@ export type SimEvent = { pid?: number } & (
   // (e.g. 'Falling' for environmental damage), the client localizes it via
   // abilityDisplayNameFromSource like every other ability-name event field.
   | { type: 'playerDeath'; killerId?: number; killerAbility?: string }
-  | { type: 'respawn' }
+  // sickness names the penalty the revive charged, so the client can say so; a
+  // penalty-free revive (corpse run, instance re-entry, delve reset) omits it.
+  | { type: 'respawn'; sickness?: 'resurrection' }
   | UnstuckEvent
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
@@ -7401,6 +7477,30 @@ export type SimEvent = { pid?: number } & (
   // `crafter` repeats as payload). Ids only, text-free on purpose (like
   // craftResult above): the client renders its own localized copy.
   | { type: 'masterwork'; recipeId: string; itemId: string; crafter: number }
+  // Chance-based craft outcome audit record (craft_roll_events): one per
+  // resolved roll that decides a crafting outcome, carrying the draw the sim
+  // actually made, the chance it was measured against, and the verdict, so
+  // the real success rate of a system can be read back from the database
+  // after the fact. `kind` names the roll: 'masterwork' is the single
+  // output-side proc draw of a player craft whose output could ever proc
+  // (chance is the EFFECTIVE chance, 0 when an archetype ceiling or a worse
+  // Jack variance gated the effect off); 'perfecting' is the Perfecting
+  // attempt's success roll (professions/perfecting.ts), with the rank walked
+  // from and to (rank PERFECTING_RANKS meaning Perfected). Personal (pid =
+  // the crafter's entity id), SERVER-SIDE EVIDENCE ONLY: never routed to a
+  // client (server/event_frame.ts filterRoutableEvents), text-free, and emits
+  // no draw of its own (the roll it reports is the one the system drew).
+  | {
+      type: 'craftRoll';
+      kind: 'masterwork' | 'perfecting';
+      recipeId: string | null;
+      itemId: string;
+      roll: number;
+      chance: number;
+      success: boolean;
+      rankBefore?: number;
+      rankAfter?: number;
+    }
   // Masterwork zone broadcast (Professions 2.0): the soft zone-wide
   // copy of a masterwork proc, one per overworld player currently in the
   // crafter's zone INCLUDING the crafter, `pid` being the RECIPIENT (the
@@ -8319,6 +8419,7 @@ export interface SimConfig {
   playerName?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
+  worldPvpDisabled?: boolean; // realm kill switch for the /pvp flag (server env WORLD_PVP_DISABLED=1)
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
   // Live server: schedule the first world-boss rise at boot instead of one
   // interval out, so a freshly (re)started realm has Thunzharr up immediately.

@@ -153,6 +153,7 @@ export const LAKE = { x: -92, z: 88, radius: 30 };
 
 export const ZONE1_ZONE: ZoneDef = {
   id: 'eastbrook_vale',
+  worldPvp: 'sanctuary',
   name: 'Eastbrook Vale',
   zMin: -180,
   zMax: 180,
@@ -188,6 +189,8 @@ export const ZONE1_ZONE: ZoneDef = {
   ],
   welcome: 'Find Marshal Redbrook in town - he has work for you.',
   welcomeQuestId: 'q_wolves',
+  welcomeDone:
+    'Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.',
 };
 
 // ---------------------------------------------------------------------------

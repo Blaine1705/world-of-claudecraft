@@ -1373,7 +1373,6 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  // Re-minted for the floor VFX ladder merge with release/v0.44.0: the merged renderer leaf (the ladder rungs over the Frame Rate Limit feeds) matches neither parent. No capture was retaken.
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1383,9 +1382,15 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  '85ac138ef8ea9c874d73e5d2c0f7555ed49a12163f32e0fff025875790a431ab';
+  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  '16066ee57db5876a3a9ad56cca7626cf56d4728b1ed96eeb4aba0a1e9746a70f';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  // Re-minted for the floor VFX ladder merge with release/v0.44.0: the merged renderer leaf (the ladder rungs over the Frame Rate Limit feeds) matches neither parent. No capture was retaken.
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1395,7 +1400,14 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  '3bd727fafa0b6ec9743dd75fcec70bb68f1663cbbf68aebbd83a4debb1e070c0';
+  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  '715a8537d1683523b8af113f00335f5e1f46eeda69d455fa8c0ab58038583bb6';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2770,9 +2782,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // again over the re-swept evidence. No capture was retaken.
       // Frame Rate Limit: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-      // Floor VFX ladder merge with release/v0.44.0: recomputed LAST again over
-      // the re-swept evidence. No capture was retaken.
-    ).toBe('47d167a56f0a1499679f148375ec15f1bc6ca5bb7c69db3631d3042c724b37b9');
+      // devalue audit floor: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+      // release/v0.44.0 merge into feature/world-pvp-flag: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+      // feature/world-pvp-flag (review round) merge into feature/king-of-the-hill: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+      // release/v0.44.0 (PR 4200) merge into feature/vfx-floor-layering: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+    ).toBe('6af2cff704920e9d77ac8f963af58bc25ca1f833277abd27f8339e67f50031d6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

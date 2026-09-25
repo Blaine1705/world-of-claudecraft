@@ -664,6 +664,16 @@ async function seedMediumGraphicsPreset(page) {
   );
 }
 
+/** A distinctive authored look for the composed-portrait shots, seeded into the
+ *  creator draft (src/main.ts MODULAR_APPEARANCE_KEY) the offline quick-start
+ *  reads, on top of the lowest graphics preset. */
+async function seedComposedLookOnLowPreset(page) {
+  await seedLowGraphicsPreset(page);
+  await page.evaluateOnNewDocument(
+    `try { localStorage.setItem('woc.modularAppearance', JSON.stringify({ gender: 'female', hair: 'curlycap', skinHue: 25, skinSat: 0.55, skinLight: 0.32, hairHue: 285, hairSat: 0.55, hairLight: 0.45, lashes: true })); } catch {}`,
+  );
+}
+
 /** Persist the "Current / Max (Percent)" health text mode (4) for the player and
  *  target frames before boot, on top of the lowest graphics preset. */
 async function seedHealthTextPercentMode(page) {
@@ -1651,6 +1661,147 @@ export const TARGETS = [
         .catch(() => {});
       await wait(900);
       return {};
+    },
+  },
+  {
+    key: 'world-pvp',
+    label: 'World PvP tab of the PvP window: flag down, the raise confirm, flag up, mobile',
+    // The tab's own files plus the sim rules the copy resolves its numbers from.
+    when: [
+      'ui/hud/world_pvp/',
+      'ui/pvp_hostile_core.ts',
+      'sim/pvp/world_pvp.ts',
+      'sim/pvp/world_pvp_rules.ts',
+    ],
+    variants: [
+      { key: 'tab-down', scene: 'down' },
+      { key: 'tab-confirm', scene: 'confirm' },
+      // Free-for-all ground: the offline character is stood in the Drakelands
+      // first, so the ground line reads the hostile state with the flag down.
+      { key: 'tab-ffa', scene: 'ffa' },
+      // Last on purpose: it raises the flag, which the earlier scenes must not see.
+      { key: 'tab-up', scene: 'up' },
+      { key: 'tab-mobile', scene: 'down', mobile: true },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.scene ?? 'down';
+      if (scene === 'ffa') {
+        // Open ground in the Drakelands (a free-for-all zone, see
+        // src/sim/pvp/world_pvp_zones.ts); the sim settles the height. The
+        // window opens only once the HUD has seen the crossing (the zone pass
+        // runs twice a second and the HUD reacts to the new zone on its own),
+        // so the tab that opens is the one the ground line is read from.
+        const moved = await page.evaluate(() => {
+          const game = window.__game;
+          if (!game?.sim) return false;
+          const me = game.sim.player;
+          me.pos = { x: 353.8, y: me.pos.y, z: 2262.4 };
+          me.prevPos = { ...me.pos };
+          return true;
+        });
+        if (!moved) throw new Error('offline world is unavailable');
+        await wait(2_000);
+      }
+      const opened = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.sim) return { ok: false, reason: 'offline world is unavailable' };
+        // The raise is level-gated (WORLD_PVP_MIN_LEVEL), and the shot wants the
+        // live button, so the offline character is levelled first.
+        game.sim.setPlayerLevel(20);
+        const root = document.querySelector('#arena-window');
+        if (!(root instanceof HTMLElement)) return { ok: false, reason: 'no PvP window root' };
+        if (root.style.display !== 'block') game.hud.toggleArena();
+        return { ok: true };
+      });
+      if (!opened.ok) throw new Error(opened.reason);
+      const ready = await pollForSize(page, '#arena-window');
+      if (!ready) throw new Error('the PvP window never became visible');
+      // The real tab button, not a debug hook: the strip is what the player uses.
+      await page.click('[data-bracket="world"]');
+      if (scene === 'ffa') {
+        const ffa = await pollForSize(page, '.wpvp-zone.is-ffa');
+        if (!ffa) throw new Error('the free-for-all ground line never appeared');
+      }
+      await pollForSize(page, '.wpvp-status, .bg-note');
+      if (scene === 'confirm' || scene === 'up') {
+        await page.click('[data-act="pvp-enable"]');
+        const confirm = await pollForSize(page, '[data-act="pvp-confirm"]');
+        if (!confirm) throw new Error('the raise confirm step never appeared');
+      }
+      if (scene === 'up') {
+        await page.click('[data-act="pvp-confirm"]');
+        const up = await pollForSize(page, '.wpvp-status.is-on');
+        if (!up) throw new Error('the flag never came up');
+      }
+      return { clip: '#arena-window' };
+    },
+  },
+  {
+    key: 'hill',
+    label: 'King of the Hill: the in-zone bar (desktop + mobile) and the circle on the ground',
+    when: ['ui/hud/hill/', 'sim/pvp/hill.ts', 'sim/pvp/hill_rules.ts', 'render/hill_ring'],
+    variants: [
+      // The whole viewport first (the ring drawn on the ground beside the player):
+      // the zone loading screen fades after the teleport, and the first variant on
+      // a fresh page is the one that would catch its tail.
+      { key: 'field', scene: 'field' },
+      { key: 'bar', scene: 'bar' },
+      { key: 'bar-mobile', scene: 'bar', mobile: true },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.scene ?? 'bar';
+      // The first variant on a fresh page can arrive before the world exists.
+      let worldReady = false;
+      for (let attempt = 0; attempt < 120 && !worldReady; attempt++) {
+        worldReady = await page.evaluate(() => !!window.__game?.sim?.player);
+        if (!worldReady) await wait(500);
+      }
+      if (!worldReady) throw new Error('offline world never became available');
+      // The /dev arm (offline dev commands) rises a hill in the Drakelands now
+      // and stands the character on its rim, inside the zone, so the bar shows
+      // and the ring is at their feet. The character is levelled first so the
+      // trickle would pay them (not needed for the shot, but the honest state).
+      const risen = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.sim) return { ok: false, reason: 'offline world is unavailable' };
+        game.sim.setPlayerLevel(20);
+        game.sim.chat('/dev hill drakelands');
+        return { ok: !!game.sim.hillInfo, reason: 'no hill rose (dev commands off?)' };
+      });
+      if (!risen.ok) throw new Error(risen.reason);
+      // The teleport into the Drakelands shows the zone loading screen; the bar
+      // and the ring are only honest evidence once it has cleared.
+      let loaded = false;
+      for (let attempt = 0; attempt < 120 && !loaded; attempt++) {
+        loaded = await page.evaluate(() => {
+          const el = document.getElementById('loading-screen');
+          if (!el) return true;
+          const cs = getComputedStyle(el);
+          return cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0;
+        });
+        if (!loaded) await wait(500);
+      }
+      if (!loaded) throw new Error('the zone loading screen never cleared');
+      await wait(3_000);
+      const bar = await pollForSize(page, '#hill-bar');
+      if (!bar) throw new Error('the hill bar never showed');
+      if (scene === 'field') return {};
+      const rect = await page.evaluate(() => {
+        const el = document.querySelector('#hill-bar');
+        if (!(el instanceof HTMLElement)) return null;
+        const r = el.getBoundingClientRect();
+        return { x: r.left, y: r.top, width: r.width, height: r.height };
+      });
+      if (!rect) throw new Error('the hill bar has no box');
+      const pad = 12;
+      return {
+        clip: {
+          x: Math.max(0, rect.x - pad),
+          y: Math.max(0, rect.y - pad),
+          width: rect.width + pad * 2,
+          height: rect.height + pad * 2,
+        },
+      };
     },
   },
   {
@@ -9972,6 +10123,74 @@ export const TARGETS = [
     },
   },
   {
+    // A player's composed (authored) face in every frame that holds a player,
+    // not only the player's own: the target frame (self-targeted, the offline
+    // world has no peers) and the player menu's title chip beside the player
+    // frame, then the Inspect card's turntable. The look is seeded before boot
+    // and made deliberately unlike the stock warrior art (female body, dark
+    // skin, violet hair) so the composed face and the class headshot cannot be
+    // mistaken for each other in the frame.
+    key: 'composed-player-portraits',
+    label: 'Composed player face in the target frame, the player menu chip and the Inspect card',
+    when: ['ui/player_portrait_core', 'ui/unit_portrait_painter', 'ui/portrait_chip'],
+    variants: [
+      { key: 'frames', beforeLoad: seedComposedLookOnLowPreset },
+      { key: 'inspect', beforeLoad: seedComposedLookOnLowPreset, clip: '#inspect-window' },
+    ],
+    async capture(page, variant) {
+      await sweepOverlays(page);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!game || !sim || !p) return { ok: false, reason: 'offline world is unavailable' };
+        if (!p.modularAppearance) {
+          return { ok: false, reason: 'the seeded look did not reach the offline player' };
+        }
+        // The target frame holds a PLAYER only when one is targeted; self is the
+        // one player an offline world has (the F1 targetSelf keybind's path).
+        sim.targetEntity(p.id);
+        return { ok: true, targeted: p.targetId === p.id };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      if (!staged.targeted) throw new Error('self-target did not take');
+      // The composed portrait is captured off the frame that asks for it and
+      // lands a beat later (longer under software GL); give it room.
+      await wait(5000);
+      await sweepOverlays(page, 4);
+      if (variant.key === 'inspect') {
+        await page.evaluate(() => {
+          const game = window.__game;
+          game.hud.openInspect(game.sim.player.id);
+        });
+        if (!(await pollForSize(page, '#inspect-window'))) {
+          throw new Error('inspect window did not open');
+        }
+        await wait(2500);
+        return { clip: variant.clip };
+      }
+      // The player menu opens above the frames so its chip shares the region
+      // with the player frame and the target frame.
+      const region = await page.evaluate(() => {
+        const game = window.__game;
+        const p = game.sim.player;
+        const frame = document.getElementById('player-frame').getBoundingClientRect();
+        game.hud.openContextMenu(p.id, p.name, Math.round(frame.left), Math.round(frame.top - 260));
+        const rects = ['#player-frame', '#target-frame', '#ctx-menu']
+          .map((sel) => document.querySelector(sel)?.getBoundingClientRect())
+          .filter((r) => r && r.width > 0 && r.height > 0);
+        const x0 = Math.min(...rects.map((r) => r.left));
+        const y0 = Math.min(...rects.map((r) => r.top));
+        const x1 = Math.max(...rects.map((r) => r.right));
+        const y1 = Math.max(...rects.map((r) => r.bottom));
+        return { x: x0, y: y0, width: x1 - x0, height: y1 - y0, count: rects.length };
+      });
+      if (region.count < 3) throw new Error('player menu or a unit frame is not visible');
+      await wait(800);
+      return { clip: region };
+    },
+  },
+  {
     // The player and target frames printing the "Current / Max (Percent)" mode
     // (seeded through the persisted settings), against a living mob.
     key: 'unit-frame-health-text-percent',
@@ -10209,6 +10428,9 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
+        // Auras sits under Overlays; a base commit that predates the Overlays row
+        // still lists it on the Game Menu root, so the Overlays click is optional.
+        document.querySelector('#options-menu .opt-btn[data-menu-action="overlays"]')?.click();
         document.querySelector('#options-menu .opt-btn[data-menu-action="auras"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .aura-settings-intro');
@@ -10278,6 +10500,9 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
+        // Auras sits under Overlays; a base commit that predates the Overlays row
+        // still lists it on the Game Menu root, so the Overlays click is optional.
+        document.querySelector('#options-menu .opt-btn[data-menu-action="overlays"]')?.click();
         document.querySelector('#options-menu .opt-btn[data-menu-action="auras"]')?.click();
       });
       // Poll the panel INTRO, not the proc grid: a class with no authored proc
@@ -11105,6 +11330,8 @@ export const TARGETS = [
       // coat does per swing, and whether the row asks for a target at all.
       'sim/combat/poison_coating',
       'ui/ability_imbue_text',
+      // The Thundercall rework's new kit and reworded vent copy.
+      'sim/combat/shaman_thundercall',
     ],
     variants: [
       // Every variant enters as the class that OWNS the ability: the standalone
@@ -11170,6 +11397,32 @@ export const TARGETS = [
         charName: 'Nightsliver',
         abilityId: 'shadowstep',
         talentRow: { 5: 'rog_r5_shadeslip' },
+        mobile: true,
+      },
+      // Thundercall rework: the three new spells plus the reworded partial-vent
+      // copy on Earthen Jolt, as an Elemental Shaman at level 20.
+      ...[
+        ['magma-burst', 'lava_burst'],
+        ['arc-overload', 'lightning_overload'],
+        ['stormbreak', 'thunderstorm'],
+        ['earthen-jolt', 'earth_shock'],
+      ].map(([key, abilityId]) => ({
+        key: `thundercall-${key}`,
+        charClass: 'shaman',
+        charName: 'Stormcaller',
+        abilityId,
+        spec: 'elemental',
+        talentRow: {},
+        beforeLoad: lowGraphicsSeed,
+      })),
+      {
+        key: 'thundercall-magma-burst-mobile',
+        charClass: 'shaman',
+        charName: 'Stormcaller',
+        abilityId: 'lava_burst',
+        spec: 'elemental',
+        talentRow: {},
+        beforeLoad: lowGraphicsSeed,
         mobile: true,
       },
     ],
@@ -13336,7 +13589,9 @@ export const TARGETS = [
           }
         });
         await wait(600);
-        await page.evaluate(() => document.querySelector('#resurrect-healer-btn')?.click());
+        // The Keeper's raise is a conversation now (no ghost-prompt button): open the
+        // same gate the world click and the interact key reach.
+        await page.evaluate(() => window.__game?.hud.requestSpiritHealerResurrect());
       } else if (variant.scene === 'heroic') {
         await page.evaluate(() => {
           const game = window.__game;

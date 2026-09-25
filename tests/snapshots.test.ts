@@ -67,6 +67,7 @@ import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
+import { spawnHillNow } from '../src/sim/pvp';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
 import {
@@ -526,11 +527,32 @@ describe('spectate client POV', () => {
     expect(client.consumeSpectateFacing()).toBeNull();
 
     internals.onMessage(JSON.stringify({ t: 'spectate', name: null }));
-    expect(client.spectating).toBeNull();
+    // Identity restores on the exit frame itself, but `spectating` (the HUD's
+    // "this self view is mine" signal) is held until the next own self-decode
+    // rebuilds the moderator's presentation (tests/spectate_exit_hold.test.ts).
+    expect(client.spectating).toBe('Suspect');
     expect(client.playerId).toBe(1);
     expect(client.player.name).toBe('Moderator');
     expect(client.cfg.playerClass).toBe('warrior');
     expect(client.consumeSpectateFacing()).toBeNull();
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 1,
+        k: 'player',
+        tid: 'warrior',
+        nm: 'Moderator',
+        lv: 10,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+      },
+    });
+    expect(client.spectating).toBeNull();
   });
 });
 
@@ -1538,6 +1560,62 @@ describe('delta snapshots', () => {
     fc.sent.length = 0;
     broadcast(server);
     expect(lastSnap(fc.sent).self.ack).toBe(7);
+  });
+
+  it("folds a seq-bearing 'target' command into the same input ack, beside its target echo", () => {
+    // The online mirror's pending-target echo (src/net/target_echo.ts) reads a
+    // covering ack as "this snapshot was built after my command", so the
+    // command's seq must ride the one high-water the movement frames use.
+    const other = joinServer(server, fakeWs(), 2, 'Other', 'mage');
+    server.handleMessage(session, JSON.stringify({ t: 'input', seq: 7, mi: { f: 1 } }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'target', id: other.pid, seq: 8 }),
+    );
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ack).toBe(8);
+    expect(snap.self.target).toBe(other.pid);
+
+    // A refused target (an unknown id) is still acked: the mirror then adopts
+    // the server's unchanged value from that very snapshot.
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'target', id: 424242, seq: 9 }));
+    fc.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.ack).toBe(9);
+    expect(lastSnap(fc.sent).self.target).toBe(other.pid);
+
+    // A seq-less 'target' (an older client) leaves the high-water alone.
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'target', id: null }));
+    fc.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.ack).toBe(9);
+    expect(lastSnap(fc.sent).self.target).toBeNull();
+  });
+
+  it("acks a lane-dropped 'target' command without running it, so the mirror yields to the server", () => {
+    // The fold sits at receipt, ahead of the lane verdict: a command the flood
+    // defense drops still advances the ack, and the client's hold then adopts
+    // the server's unchanged target from that snapshot (a command that never
+    // ran has no other correct outcome). Pinned by stubbing the lane verdict.
+    const other = joinServer(server, fakeWs(), 2, 'Other', 'mage');
+    // biome-ignore lint/suspicious/noExplicitAny: consumeLane is a private dispatcher method
+    const priv = server as any;
+    const realConsumeLane = priv.consumeLane;
+    priv.consumeLane = (s: unknown, lane: string, nowSec: number) =>
+      lane === 'command' ? false : realConsumeLane.call(server, s, lane, nowSec);
+    try {
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'target', id: other.pid, seq: 12 }),
+      );
+    } finally {
+      priv.consumeLane = realConsumeLane;
+    }
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ack).toBe(12);
+    expect(snap.self.target).toBeNull();
   });
 
   it('adds the consumed client tick beside the legacy ack only for movement v2', () => {
@@ -5204,6 +5282,7 @@ const ALL_DELTA_KEYS = [
   'gprof',
   'guildBank',
   'hbl',
+  'hill',
   'hirat',
   'honor',
   'hpref',
@@ -5248,6 +5327,7 @@ const ALL_DELTA_KEYS = [
   'tslot',
   'vault',
   'weapon',
+  'wpvp',
   'xp',
 ] as const;
 
@@ -5323,6 +5403,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   ggoal: 'gatheringGoal',
   gprof: 'gatheringProficiency',
   guildBank: 'guildBankInfo',
+  hill: 'hillInfo',
   hirat: 'hitRating',
   hpref: 'harvestPreference',
   hrat: 'hasteRating',
@@ -5360,6 +5441,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   tfocus: 'townFocus',
   tslot: 'toolEffectSlots',
   vault: 'vaultInfo',
+  wpvp: 'worldPvpInfo',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
@@ -5484,6 +5566,12 @@ function dirtyEveryDeltaField(): {
   meta.lifetimeXp = 555;
   meta.honor = 321;
   meta.lifetimeHonor = 654;
+  // World PvP: the wpvp self readout (meta) and the pvp entity bit (entity).
+  meta.worldPvp = { flagged: true, disarmAt: null, kills: 2, deaths: 1 };
+  sim.entities.get(lp)!.pvpFlag = true;
+  // King of the Hill: a hill stands (in a free-for-all zone the leader is not
+  // in), so the hill self readout rides the snapshot.
+  spawnHillNow(sim.ctx);
   meta.restedXp = 222;
   meta.prestigeRank = 3;
   meta.delveMarks = 7;
@@ -5886,6 +5974,29 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.lifetimeXp).toBe(555); // lxp -> lifetimeXp
     expect(client.honor).toBe(321); // honor
     expect(client.lifetimeHonor).toBe(654); // lhonor -> lifetimeHonor
+    // wpvp -> worldPvpInfo (social_self_wire.ts), and the entity-record pvp bit
+    // -> e.pvpFlag on the self record (a full record) for the flagged leader.
+    expect(client.worldPvpInfo).toMatchObject({
+      flagged: true,
+      kills: 2,
+      deaths: 1,
+      zone: 'contested', // the fixture leader stands on contested ground
+      enabled: true,
+    });
+    expect(client.player.pvpFlag).toBe(true);
+    // hill -> hillInfo (social_self_wire.ts): the standing hill from the
+    // leader's seat (outside its zone, so the live fields are zero; the
+    // fixture leader is ungrouped, so counts as a group of one).
+    expect(client.hillInfo).toMatchObject({
+      radius: 50,
+      phase: 'active',
+      standing: 'counted',
+      holder: 'none',
+      inZone: false,
+      inside: false,
+      minutesLeft: 45,
+    });
+    expect(['drakelands', 'frostveil', 'amberfall']).toContain(client.hillInfo?.zoneId);
     expect(client.restedXp).toBe(222); // rxp -> restedXp
     expect(client.prestigeRank).toBe(3); // prk -> prestigeRank
 
@@ -6460,7 +6571,8 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 95 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 97 unique keys in sorted order', () => {
+    // 96 plus the King of the Hill readout hill (src/sim/pvp/hill.ts).
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6503,9 +6615,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // for 92. Intentional Gathering PR4 adds the owner-only tracked-goal
     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
     // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
-    // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95.
-    expect(ALL_DELTA_KEYS).toHaveLength(95);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(95);
+    // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95. The
+    // World PvP flag readout wpvp (src/sim/pvp/world_pvp.ts) makes it 97, and
+    // the King of the Hill readout hill (src/sim/pvp/hill.ts) makes it 97.
+    expect(ALL_DELTA_KEYS).toHaveLength(97);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(97);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6667,8 +6781,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Gathering PR4's ggoal (emitted from the new gathering_goal_wire.ts
     // sibling, likewise inside the recursive scrape) makes 93.
     // The candidate self in-combat key cbt brings the combined inventory to 94;
-    // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
-    expect(scraped.size).toBe(95);
+    // the account ledger's acct key (server/deeds_wire.ts) makes it 95; the
+    // World PvP readout wpvp makes it 96; the King of the Hill readout hill
+    // makes it 97.
+    expect(scraped.size).toBe(97);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

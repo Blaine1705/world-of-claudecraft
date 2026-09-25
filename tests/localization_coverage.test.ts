@@ -1025,8 +1025,9 @@ describe('i18n Localization Key Coverage', () => {
     // sets x (name + bonus2/bonus4). The druid wave completed the Crucible
     // rollout, so all 29 sets are registered (the ledger in
     // tests/ignivar_loot.test.ts). The eleven crafted collections each carry
-    // a name plus one two-piece bonus, not another raid four-piece tier.
-    expect(itemSetEntries).toHaveLength(8 * 4 + 3 * 2 + 5 * 4 + 29 * 3 + 11 * 2);
+    // a name plus one two-piece bonus, not another raid four-piece tier. The
+    // 27 Warfare Season 2 spec sets carry name + bonus2/bonus4.
+    expect(itemSetEntries).toHaveLength(8 * 4 + 3 * 2 + 5 * 4 + 29 * 3 + 11 * 2 + 27 * 3);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -1090,6 +1091,8 @@ describe('i18n Localization Key Coverage', () => {
       Object.keys(QUESTS).length * 3 +
       Object.values(QUESTS).reduce((sum, quest) => sum + quest.objectives.length, 0) +
       ZONES.length * 2 +
+      // The optional town-done line (ZoneDef.welcomeDone) only where authored.
+      ZONES.filter((zone) => zone.welcomeDone !== undefined).length +
       ZONES.reduce((sum, zone) => sum + zone.pois.length, 0) +
       Object.keys(DUNGEONS).length * 3 +
       Object.keys(DELVES).length * 3 +

@@ -19,6 +19,7 @@
 // would double-count completion.
 
 import { FURY_STOCK, WARFARE_ITEMS } from './pvp_honor';
+import { SEASON2_STOCK } from './pvp_honor_season2';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_GEAR_ITEM_IDS,
@@ -266,6 +267,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'aether_hover_cycle',
   'thunderstrut_gobbler',
   'drakemaw_raptor',
+  'avian_strider',
   'lanternback_troll',
   'terrorspark_groundshaker',
 ] as const;
@@ -283,8 +285,9 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// Drakemaw Raptor, Lanternback Troll and Dreadspark Groundshaker have no
-// player acquisition path. Paid mount skins are deliberately absent here.
+// Drakemaw Raptor, Viridian Valestrider, Lanternback Troll and Dreadspark
+// Groundshaker have no player acquisition path. Paid mount skins are
+// deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -913,6 +916,10 @@ const WARFARE_VENDOR_HINTS = [fromVendor('fury'), fromVendor('warmarshal_draven_
 // the partition and both floors are pinned in tests/reliquary_content.test.ts.
 const WARFARE_GALLERY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
 const WARFARE_ARMORY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined);
+// Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts) is sold by the same
+// two quartermasters: its 27 spec sets and four weapons fill one page, in stock
+// order (class, then spec, each helmet to gloves, then the weapons).
+const VANGUARD_GALLERY_ITEM_IDS = [...SEASON2_STOCK];
 
 /**
  * Freeze the whole page table at its one construction site: the top-level
@@ -1847,6 +1854,21 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     excludeFromCompletion: 'personal',
     sourceDefault: fromProfession('weaponcrafting'),
     relics: items('varkhul_forgebreaker'),
+  },
+  // Warfare Season 2 (content/pvp_honor_season2.ts): appended per the
+  // append-only page table; it files under the Conquerors shelf by its shelf id.
+  {
+    id: 'conquerors_vanguard_gallery',
+    shelf: 'conquerors',
+    name: 'Vanguard Gallery',
+    desc: 'The Warfare Season 2 spec sets and weapons, bought with honor.',
+    clearSource: { kind: 'none' },
+    // Class-personal stock (each set is class-locked and the shop lists only the
+    // viewer's own class), so no single character can fill it: outside both
+    // completion pairs, the Riftbound precedent, so the Conquerors capstone never
+    // needs a character of every class.
+    excludeFromCompletion: 'personal',
+    relics: items(...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },
 ]);
 

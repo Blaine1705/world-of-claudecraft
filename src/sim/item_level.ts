@@ -30,6 +30,7 @@ import {
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { IGNIVAR_LOOT_ITEM_IDS, IGNIVAR_RAID_LOOT_SOURCE_LEVEL } from './content/ignivar_loot';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
+import { SEASON2_SOURCE_LEVEL, SEASON2_STOCK } from './content/pvp_honor_season2';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_GEAR_ITEM_IDS,
@@ -66,7 +67,9 @@ import {
   TWOHAND_STAT_MULT,
   WORN_OFFHAND_STAT_MULT,
 } from './item_budget';
+import { lootQualityItemLevelBonus } from './loot_quality/core';
 import { COLLECTION_PERFECTING_SOURCE_INCREASE } from './professions/perfecting_bonus';
+import { RIFT_BAND_SHELLS, riftBandItemLevel } from './rift/band_ladder';
 import type { ItemDef, ItemInstancePayload } from './types';
 
 export {
@@ -219,9 +222,11 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // bosses), so the stock reads that source level: the epic pieces land at item
   // level 26 (20 + the epic bump) and get budget-enforced like any drop.
   for (const offer of HEROIC_VENDOR_STOCK) bump(offer.itemId, HEROIC_VENDOR_SOURCE_LEVEL, false);
-  // FURY's WARFARE stock is level-22 PvP content. The epic quality bump puts
-  // every piece at item level 28, including vendor-only necks and rings.
+  // FURY's WARFARE entry stock reads source 25, so the epic bump puts every
+  // piece at item level 31, including vendor-only necks and rings.
   for (const itemId of FURY_STOCK) bump(itemId, WARFARE_SOURCE_LEVEL, false);
+  // Warfare Season 2 reads source 29: epic item level 35, level with the raid tier.
+  for (const itemId of SEASON2_STOCK) bump(itemId, SEASON2_SOURCE_LEVEL, false);
   // Heroic boss drops: level-20 content one tier up (the heroic bump), so the
   // five-man epic pieces read item level 31 (25 + the epic bump). The 10-player
   // raid (Heroic Nythraxis) is one tier ABOVE the five-mans: its heroic-only
@@ -396,10 +401,16 @@ export function itemInstanceLevel(
   item: ItemDef,
   instance?: ItemInstancePayload,
 ): number | undefined {
-  const level = itemLevel(item);
-  return level !== undefined && instance?.perfected === true && crucibleCollectionForItem(item.id)
-    ? level + COLLECTION_PERFECTING_SOURCE_INCREASE
-    : level;
+  const level =
+    instance?.rift && RIFT_BAND_SHELLS[item.id]
+      ? riftBandItemLevel(instance.rift.tier, instance.rift.upgradeLevel)
+      : itemLevel(item);
+  if (level === undefined) return undefined;
+  const perfected =
+    instance?.perfected === true && crucibleCollectionForItem(item.id)
+      ? COLLECTION_PERFECTING_SOURCE_INCREASE
+      : 0;
+  return level + perfected + lootQualityItemLevelBonus(instance);
 }
 
 // The offense-and-resource LINE an item is expected to spend on its identity
