@@ -92,9 +92,9 @@ export interface ReconciledSelfPrediction {
   position: Vec3Like;
   residual: Vec3Like | null;
   /** Set while the prediction runs in a sailing ship's frame (the route
-   *  index): position and residual are then deck-relative (x port, y above
-   *  the waterline, z bow), and render/deck_frame.ts places them on the
-   *  drawn deck. */
+   *  index): position and residual are then deck-relative (x port, z bow; the
+   *  height stays world yards, the hull never heaves), and
+   *  render/deck_frame.ts places them on the drawn deck. */
   deck?: number | null;
 }
 

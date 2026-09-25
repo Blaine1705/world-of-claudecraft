@@ -60,7 +60,14 @@ export function buildScheduledShips(
     sync(dt) {
       if (ships.length === 0) return;
       deckFrameForShips(df, source, dt);
-      if (!df.active) return;
+      if (!df.active) {
+        // no timetable to follow: leave the ships be, and let no wake hang
+        for (let i = 0; i < ships.length; i++) {
+          const wake = ships[i].wake;
+          if (wake) wake.points.visible = false;
+        }
+        return;
+      }
       for (let i = 0; i < ships.length; i++) {
         const ship = ships[i];
         const drawn = df.ships[ship.route];

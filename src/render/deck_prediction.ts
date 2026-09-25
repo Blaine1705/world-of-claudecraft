@@ -134,7 +134,11 @@ export function createDeckAwareStep(
     const slot = onDeck === null ? null : (slots[onDeck] ?? null);
     if (slot && onDeck !== null) {
       toWorld(state, slot.now, frame.facing !== null);
-      platform = slot.sailingNow ? slot.platform.at(slot.now, WATER_LEVEL) : null;
+      // the deck stays under their feet even on the tick it moors: the moored
+      // deck's grid gates follow the last snapshot's clock, a step or two
+      // behind this predicted one (the platform and an open gate are the same
+      // geometry, so both at once changes nothing)
+      platform = slot.platform.at(slot.now, WATER_LEVEL);
       stepPlayerMotion(stepDeps, body, frame.mi);
       if (
         slot.sailingNow &&
