@@ -197,6 +197,8 @@ describe("Harbormaster's House: the rest area (the inn rule)", () => {
     const x = (I.x0 + I.x1) / 2;
     const z = (I.z0 + I.z1) / 2;
     expect(isResting(at(x, WATER_LEVEL - 0.5, z))).toBe(false);
+    // ...nor anything above the room (over the wall plate)
+    expect(isResting(at(x, floorY + H.wallTop + 0.5, z))).toBe(false);
     expect(isResting(at(x, floorY, z, true))).toBe(false);
     expect(isResting(at(x, floorY, z), [], [], false)).toBe(false);
     expect(isResting(at(x, floorY, z), [], [], true)).toBe(true);

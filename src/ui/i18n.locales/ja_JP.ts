@@ -12361,12 +12361,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '芝生の上は歩き方に気をつけよ。庭が自ら刈り込んでいるのでな。庭は、整った芝を好むのだ。',
   'entities.npcs.harbormaster_odile.name': '港務長オディール',
   'entities.npcs.harbormaster_odile.title': 'ウィックハーバーの港務長',
+  'entities.npcs.harbormaster_odile.greeting':
+    'この入り江の船はどれも、竜骨ごとオールドビーコンに借りがある。用件は手短にね、潮は待ってくれないよ。',
   'entities.npcs.harbormaster_tamsin.greeting':
     '波止場から中へどうぞ、手を温めていきなさい。うちの桟橋の船は長い東の海岸を北へ上ってウィックハーバーへ向かい、また戻ってきます。はるか西では、もう一隻の渡し船がイーストブルックとナイトブルームの間を行き来しています。壁の地図に二つの航路が描いてありますよ。ワームウォッチへ登る前に、火のそばでひと休みしていきなさい。',
   'entities.npcs.harbormaster_tamsin.name': '港務長タムシン',
   'entities.npcs.harbormaster_tamsin.title': 'ワームウォッチ波止場の番人',
-  'entities.npcs.harbormaster_odile.greeting':
-    'この入り江の船はどれも、竜骨ごとオールドビーコンに借りがある。用件は手短にね、潮は待ってくれないよ。',
   'entities.npcs.head_gardener_amaranth.name': '庭園長アマランス',
   'entities.npcs.head_gardener_amaranth.title': 'エバーガーデンの庭園長',
   'entities.npcs.head_gardener_amaranth.greeting':

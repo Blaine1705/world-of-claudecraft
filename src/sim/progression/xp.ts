@@ -10,7 +10,7 @@ import {
   buildingContainsRestPoint,
   buildingRestPadding,
 } from '../building_layout';
-import { BUILTIN_WORLD, getActiveWorldContent } from '../data';
+import { getActiveWorldContent, isBuiltinWorldActive } from '../data';
 import { KIT_BUILDINGS } from '../kit_buildings';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -35,7 +35,7 @@ export function isResting(
   p: Entity,
   buildings: readonly BuildingDef[] = getActiveWorldContent().props.buildings,
   kitBuildings: readonly BuildingDef[] = KIT_BUILDINGS,
-  harborHouse: boolean = getActiveWorldContent() === BUILTIN_WORLD,
+  harborHouse: boolean = isBuiltinWorldActive(),
 ): boolean {
   if (p.inCombat) return false;
   if (harborHouse && harborHouseRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;

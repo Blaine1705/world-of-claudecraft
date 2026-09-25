@@ -100,11 +100,12 @@ export function harborHouseColliders(seed: number): Collider[] {
 }
 
 /** Whether a body at (x, y, z) stands in the house's rest area: over the interior's floor,
- *  its feet on (or above) the floor. */
+ *  its feet between the floor and the wall plate (a swimmer under the stilts is not in it). */
 export function harborHouseRestsAt(x: number, y: number, z: number): boolean {
   const i = HARBOR_HOUSE_INTERIOR;
   if (x < i.x0 || x > i.x1 || z < i.z0 || z > i.z1) return false;
-  return y >= harborHouseFloorY() - HARBOR_HOUSE_REST_SINK;
+  const floor = harborHouseFloorY();
+  return y >= floor - HARBOR_HOUSE_REST_SINK && y <= floor + HARBOR_HOUSE.wallTop;
 }
 
 /** The keeper's id in the NPC table. */
