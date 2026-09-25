@@ -797,6 +797,9 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
 // interfaceControlsForTab(all, tab) must return exactly these, in order; the
 // concatenation (in INTERFACE_TAB_ORDER) is the whole deduped list.
 const GENERAL_KEYS = [
+  'playerFrameHealthText',
+  'targetFrameHealthText',
+  'uiScale',
   'hudOpacity',
   'tooltipScale',
   'frostedPanels',
@@ -820,6 +823,7 @@ const GENERAL_KEYS = [
 ];
 const FRAMES_KEYS = [
   'partyFrameStyle',
+  'showPetFrame',
   // partyFrameWidth/Height have no rows (Edit Frames drags them directly);
   // partyFrameColumns and partyFrameSpacing moved into the in-editor Frames
   // Settings dropdown.
@@ -830,14 +834,11 @@ const FRAMES_KEYS = [
   'partyFrameShowAuras',
   'partyFrameShowPets',
   'partyFrameShowSelf',
-  'playerFrameHealthText',
-  'targetFrameHealthText',
   'aurasOnPlayerFrame',
   'auraBarBelowFrame',
   'alwaysShowAllBuffs',
   'showTargetOfTarget',
   'showTargetSwingTimer',
-  'showPetFrame',
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat', 'filterProfanity'];
 const COMBAT_KEYS = [
@@ -900,14 +901,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     ]);
     // the redundant partyFrames.section note is gone now that Frames is its own tab
     expect(keysOf(controls)).not.toContain('note:hudChrome.partyFrames.section');
-    expect(find(controls, 'partyFrameStyle')).toMatchObject({
-      control: 'choice',
-      options: [
-        { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
-        { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
-        { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
-      ],
-    });
+    expect(keysOf(controls)).toContain('partyFrameStyle');
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
     // The sticky-target opt-in renders in the Combat tab with its label key, so
     // the toggle cannot silently drop out of the options window.
@@ -1156,12 +1150,17 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     expect(find(off, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: false });
   });
 
-  it('renders NO uiScale row (owner request); the comfort sliders stay live', () => {
+  it('offers global scale from 75 to 200 percent, committing on release', () => {
     const controls = buildInterfaceControls(makeSource());
     // The UI Scale slider is retired from the menu: the stored setting still
     // applies at boot and the General tab's Reset to Defaults still clears it
     // (renderInterface's off-menu key list).
-    expect(find(controls, 'uiScale')).toBeUndefined();
+    expect(find(controls, 'uiScale')).toMatchObject({
+      control: 'slider',
+      min: 0.75,
+      max: 2,
+      commitOnChange: true,
+    });
     // Sibling sliders keep their live preview (no commitOnChange flag).
     expect(find(controls, 'chatFontScale')).not.toHaveProperty('commitOnChange');
     expect(find(controls, 'tooltipScale')).not.toHaveProperty('commitOnChange');

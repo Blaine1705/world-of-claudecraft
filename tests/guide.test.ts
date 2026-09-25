@@ -6501,6 +6501,13 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // Every frame the toggle governs has a phrase, and every phrase renders: a
     // new HUD_FRAME_SPECS row with no phrase here reds.
     const phraseFor: Record<string, string> = {
+      trackerGroup: t('hudChrome.interfaceUnlock.frameNames.trackerGroup'),
+      auraGroup: t('hudChrome.interfaceUnlock.frameNames.auraGroup'),
+      targetOfTarget: t('hudChrome.unitFrame.targetOfTargetLabel'),
+      focusTarget1: t('hudChrome.focusTargets.frame1'),
+      focusTarget2: t('hudChrome.focusTargets.frame2'),
+      focusTarget3: t('hudChrome.focusTargets.frame3'),
+      practiceTracker: 'a practice tracker',
       actionBar1: 'the action bars',
       actionBar2: 'the action bars',
       actionBar3: 'the action bars',
