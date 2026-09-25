@@ -21,11 +21,12 @@ import {
 } from './warrior_area';
 import { warriorAttentionSource } from './warrior_attention_core';
 import { WARRIOR_BLADE_STYLES } from './warrior_blades';
-import { drawWarriorControlAura } from './warrior_control';
+import { drawWarriorControlAura, warriorControlAuraCast } from './warrior_control';
 import { holdWarriorControlMark } from './warrior_control_marks';
 import { warriorGuardKind } from './warrior_guard_plates';
 import { drawWarriorHammerContact } from './warrior_hammer';
 import { drawWarriorLeapLanding, drawWarriorLeapLaunch } from './warrior_leap';
+
 // Thin painter for the per-ability spell VFX system: resolves an event's
 // ability id against the authored spec table (ability_vfx_specs.ts), asks the
 // pure core (ability_vfx_core.ts) for a plan, and drives the pooled Vfx
@@ -34,6 +35,7 @@ import { drawWarriorLeapLanding, drawWarriorLeapLaunch } from './warrior_leap';
 // spec's color, scale, and archetype. Unknown ability or fx kind: it declines
 // and the renderer's generic school-colored arm runs unchanged.
 
+import { isBloodlettingRecovery } from '../../game/warrior_recovery_core';
 import { ABILITIES } from '../../sim/data';
 import {
   AbilityVfxBudget,
@@ -53,9 +55,11 @@ import {
 import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
 import { isVisuallyDead } from '../anim_state';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
-import { CAST_VFX_ENGINE, CAST_VFX_KIT } from '../cast_vfx_family';
+import { CAST_VFX_ENGINE } from '../cast_vfx_family';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
 import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
+import { CastAdmission } from './cast_admission_core';
+import { castVfxRequirement, WARRIOR_KIT_REQUIREMENT } from './cast_requirements';
 import { abilityVfxFullSpecFor, abilityVfxSpecFor } from './encounter_specs';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
 
@@ -142,12 +146,14 @@ export interface AbilityVfxDeps {
   // gesture below: without an authored clip, triggerAttack would fall back to
   // a weapon swing, which a blessing must never read as. Optional for tests.
   hasGestureClip?: (entityId: number, abilityId: string) => boolean;
-  // Whether a cast drawing from every family in `mask` (cast_vfx_family.ts)
-  // may draw at all: false while a program of one of them is still unlinked
-  // (the boot manifest missed it and the resume lane has not reached it
-  // yet), so a first cast never links a program cold on a live frame. The
-  // renderer's cast_vfx_readiness_core decides; optional for tests (always
-  // admitted).
+  // Whether a cast drawing from every family in `mask` (cast_vfx_family.ts,
+  // the cast's requirement from cast_requirements.ts) may draw at all: false
+  // while a program of one of them is still unlinked (the boot manifest
+  // missed it and the resume lane has not reached it yet), so a first cast
+  // never links a program cold on a live frame. Asked once per cast, at its
+  // first entry point (cast_admission_core.ts keeps a refusal for the rest
+  // of that cast). The renderer's cast_vfx_readiness_core decides; optional
+  // for tests (always admitted).
   castVfxAdmit?: (mask: number) => boolean;
   // The same answer for the per-frame syncEntity consult, uncounted (a
   // refusal is a cast, not a frame). Defaults to castVfxAdmit.
@@ -304,8 +310,6 @@ const PHYSICAL_WOUND_DNA = { density: 6, spread: 0.12, up: -1.3, span: 1.1, size
  *  budget. Neither the area ring nor a rig clip varies with it. */
 const REFUSED_CAST_TIER = 2;
 
-const PAINTER_FAMILIES = CAST_VFX_ENGINE | CAST_VFX_KIT;
-
 // Palette to school mapping for the pooled point-light flashes (the renderer's
 // pulseAt is school-colored).
 const SCHOOL_BY_PALETTE: Record<string, string> = {
@@ -430,6 +434,12 @@ const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
 const POINT_SEQ_REFRACTORY_SEC = 3;
 const POINT_SEQ_CELLS_PER_YARD = 4;
 
+// A beam channel whose next tick is overdue (an interrupt, a death, a
+// retarget mid-cord): it expires without its impact.
+function channelLapsed(ch: { lastAt: number; every: number }, nowSec: number): boolean {
+  return nowSec - ch.lastAt > ch.every * 1.9 + 0.25;
+}
+
 // One cast-budget charge per (caster, ability) inside this window: a cast
 // event plus its own point-anchored landing (or a strike's contact hit) are
 // ONE cast to the spam guard, never two. Matches the budget's rolling second.
@@ -492,6 +502,10 @@ export class AbilityVfx {
 
   // Class kits requested from the host on first sighting (see syncEntity).
   private readonly kitsRequested = new Set<string>();
+  private readonly admission = new CastAdmission({
+    admit: (mask) => this.deps.castVfxAdmit?.(mask) ?? true,
+    ready: (mask) => (this.deps.castVfxReady ?? this.deps.castVfxAdmit)?.(mask) ?? true,
+  });
   private readonly harvestDetonations = new HarvestDetonations();
 
   /** A preview take can replace its world while keeping warmed primitives. */
@@ -505,6 +519,7 @@ export class AbilityVfx {
     this.gestureAt.clear();
     this.semanticFrame = 0;
     this.harvestDetonations.clear();
+    this.admission.clear();
     this.spawned = 0;
   }
 
@@ -602,17 +617,55 @@ export class AbilityVfx {
 
   // Returns true when this painter fully handled the event (the renderer skips
   // its generic school-colored arm), false to fall through unchanged.
-  private admitted(): boolean {
-    return this.deps.castVfxAdmit?.(PAINTER_FAMILIES) ?? true;
+  // The families a cast of this ability draws from, under the appearance it
+  // plays with too.
+  private requirementOf(abilityId: string, appearance: string): number {
+    const mask = castVfxRequirement(abilityId);
+    return appearance === abilityId ? mask : mask | castVfxRequirement(appearance);
   }
 
-  private ready(): boolean {
-    return (this.deps.castVfxReady ?? this.deps.castVfxAdmit)?.(PAINTER_FAMILIES) ?? true;
+  // A spellfx cue's verdict: a cast-moment cue releases a cast (its cast
+  // bar's, or a new one), a channel tick and any other cue follow one.
+  private spellfxAdmitted(ev: AbilityVfxSpellfxEvent, abilityId: string): boolean {
+    const nowSec = this.now();
+    const appearance = this.deps.visualVariantOf?.(abilityId, ev.sourceId) ?? abilityId;
+    const mask = this.requirementOf(abilityId, appearance);
+    if (this.continuesChannel(ev, abilityId, appearance, nowSec))
+      return this.admission.channel(ev.sourceId, abilityId, mask, nowSec);
+    if (!CAST_FX.has(ev.fx)) return this.admission.follow(ev.sourceId, abilityId, mask, nowSec);
+    return this.admission.release(ev.sourceId, abilityId, mask, nowSec);
+  }
+
+  // A tick of a beam channel already under way, drawn or refused: every tick
+  // arrives as its own cast cue, and only the first releases the cast.
+  private continuesChannel(
+    ev: AbilityVfxSpellfxEvent,
+    abilityId: string,
+    appearance: string,
+    nowSec: number,
+  ): boolean {
+    if (ev.fx === 'windup' || ev.fx === 'shout') return false;
+    if (abilityVfxFullSpecFor(appearance)?.archetype !== 'beam') return false;
+    const ch = this.beamChannels.get(ev.sourceId);
+    if (ch && ch.abilityId === abilityId && !channelLapsed(ch, nowSec)) return true;
+    return this.admission.isRefused(ev.sourceId, abilityId, nowSec);
+  }
+
+  // Follow-through of a cast (its landing, contact, recovery or control
+  // mark): refused with its cast, else decided as the cast itself.
+  private followAdmitted(casterId: number, abilityId: string, mask: number): boolean {
+    return this.admission.follow(casterId, abilityId, mask, this.now());
   }
 
   // Bloodletting's recovery heal, which the renderer routes here before its
-  // generic heal bloom: true when the Warrior kit claimed it.
+  // generic heal bloom: true when the Warrior kit claimed it, drawn or
+  // refused with its cast (a refused one draws nothing, not the bloom).
   warriorRecovery(ev: Extract<SimEvent, { type: 'heal2' }>, maxHp: number): boolean {
+    if (
+      isBloodlettingRecovery(ev) &&
+      !this.followAdmitted(ev.sourceId, 'bloodthirst', castVfxRequirement('bloodthirst'))
+    )
+      return true;
     return this.deps.fx.warriorRecovery(ev, maxHp);
   }
 
@@ -625,12 +678,10 @@ export class AbilityVfx {
         this.deps.fx.burstAt(at.x, at.y, at.z, 0xa9152d, 9, 0.65, 'blood', 0.23);
       return true;
     }
-    if (ev.ability && !this.admitted()) {
-      const refused = abilityVfxSpecFor(ev.ability);
-      if (refused) {
-        this.refusedTelegraphs(ev, refused);
-        return true;
-      }
+    const refusable = ev.ability ? abilityVfxSpecFor(ev.ability) : undefined;
+    if (ev.ability && refusable && !this.spellfxAdmitted(ev, ev.ability)) {
+      this.refusedTelegraphs(ev, refusable);
+      return true;
     }
     const originalEvent = ev;
     const ability = ev.ability;
@@ -674,7 +725,9 @@ export class AbilityVfx {
     // Claimed and drawn as nothing: the generic arm would link cold too. Two
     // reads survive the refusal, for the same reason the point-anchored ring
     // survives it in handleSpellfxAt below, and neither costs a cast program.
-    if (!this.admitted()) {
+    // Decided above when the cue's own id has a spec; an appearance-only spec
+    // is decided here.
+    if (!refusable && !this.spellfxAdmitted(ev, ability)) {
       this.refusedTelegraphs(ev, spec);
       return true;
     }
@@ -1025,7 +1078,7 @@ export class AbilityVfx {
     const expected = Math.max(1, full.beam?.ticks ?? 3);
     const every = Math.max(0.4, (full.beam?.dur ?? 3) / expected);
     let ch = this.beamChannels.get(ev.sourceId);
-    if (!ch || ch.abilityId !== abilityId || nowSec - ch.lastAt > every * 1.9 + 0.25) {
+    if (!ch || ch.abilityId !== abilityId || channelLapsed(ch, nowSec)) {
       const tier = this.castTier(ev.sourceId, abilityId);
       ch = {
         abilityId,
@@ -1111,7 +1164,7 @@ export class AbilityVfx {
     if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
     const spec = abilityVfxSpecFor(ev.ability);
     if (!spec) return false;
-    if (!this.admitted()) {
+    if (!this.followAdmitted(ev.sourceId ?? -1, ev.ability, castVfxRequirement(ev.ability))) {
       // The terrain-draped area ring is an actionable telegraph (the blast
       // AREA the player steps out of): its pool is linked at boot and never
       // waits on the cast programs, so it draws even while the rest is held.
@@ -1305,6 +1358,9 @@ export class AbilityVfx {
     ev: Extract<SimEvent, { type: 'aura' }>,
     auras?: readonly { id: string; kind: string; remaining?: number }[],
   ): boolean {
+    const cast = warriorControlAuraCast(ev.abilityId);
+    if (cast && !this.followAdmitted(ev.sourceId ?? ev.targetId, cast, WARRIOR_KIT_REQUIREMENT))
+      return true;
     return drawWarriorControlAura(
       this.deps.fx,
       ev,
@@ -1314,7 +1370,11 @@ export class AbilityVfx {
   }
 
   onDamage(ev: AbilityVfxDamageEvent): boolean | void {
-    if (!this.admitted()) return;
+    const castId = ev.abilityId ?? attackAbilityId(ev.ability);
+    if (castId) {
+      const appearance = this.deps.visualVariantOf?.(castId, ev.sourceId) ?? castId;
+      if (!this.followAdmitted(ev.sourceId, castId, this.requirementOf(castId, appearance))) return;
+    } else if (!this.admission.hold(CAST_VFX_ENGINE)) return;
     // The resource payment is already presented by selfCast. Claim only this
     // self cost so the renderer retains health text without a duplicate hit.
     if (
@@ -1681,8 +1741,10 @@ export class AbilityVfx {
   // anything not refreshed this frame, so there is no teardown bookkeeping.
   // Allocation-free per call.
   syncEntity(e: AbilityVfxEntityState, renderEffects = true): void {
-    // The held state below is kept either way; only the draws wait.
-    const gateHeld = renderEffects && !this.ready();
+    // The held state below is kept either way; only the draws wait. Every
+    // read the painter draws needs the engine, so while it is not ready the
+    // entity sleeps whole; past it, each cast and hold waits on its own mask.
+    const gateHeld = renderEffects && !this.admission.hold(CAST_VFX_ENGINE);
     const fx = this.deps.fx;
     if (e.kind === 'player' && e.templateId === 'warrior' && !this.kitsRequested.has('warrior')) {
       this.kitsRequested.add('warrior');
@@ -1702,6 +1764,20 @@ export class AbilityVfx {
     }
     const castingWasHeld = e.castingAbility !== null && held.castingAbility === e.castingAbility;
     const queuedWasHeld = e.queuedOnSwing != null && held.queuedOnSwing === e.queuedOnSwing;
+    // The cast bar is a cast's first entry point: its verdict, refused or
+    // not, is latched for the release, impact and lingers that follow.
+    const castSpec =
+      renderEffects && e.castingAbility ? abilityVfxSpecFor(e.castingAbility) : undefined;
+    const castDrawn =
+      castSpec !== undefined &&
+      this.admission.windup(
+        e.id,
+        e.castingAbility!,
+        castVfxRequirement(e.castingAbility!),
+        this.now(),
+        e.castRemaining,
+        !castingWasHeld,
+      );
     if (gateHeld || !renderEffects) {
       // A culled rig is off screen and drops everything with it (the
       // pre-existing skip). A gate-held one is on screen and only its COSMETIC
@@ -1714,8 +1790,15 @@ export class AbilityVfx {
       this.latchHeldState(held, e);
       return;
     }
+    // The Warrior kit's per-frame reads wait on the kit as a whole: shown the
+    // frame it is ready, never partly.
+    let kitHolds = -1;
+    const kitReady = (): boolean => {
+      if (kitHolds < 0) kitHolds = this.admission.hold(WARRIOR_KIT_REQUIREMENT) ? 1 : 0;
+      return kitHolds === 1;
+    };
     const attentionSource = warriorAttentionSource(e);
-    if (attentionSource !== null && this.deps.isLivingWarrior?.(attentionSource))
+    if (attentionSource !== null && this.deps.isLivingWarrior?.(attentionSource) && kitReady())
       fx.holdWarriorAttention?.(
         e.id,
         attentionSource,
@@ -1737,12 +1820,13 @@ export class AbilityVfx {
     let glowSlow = false;
     if (
       e.castingAbility === 'bladestorm' &&
+      castDrawn &&
       e.castRemaining > 0 &&
       !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })
     )
       fx.holdWarriorStorm?.(e.id, Math.max(0, e.castTotal - e.castRemaining));
-    if (e.castingAbility) {
-      const spec = abilityVfxSpecFor(e.castingAbility);
+    if (e.castingAbility && castDrawn) {
+      const spec = castSpec;
       if (spec) {
         const progress =
           e.castTotal > 0 ? Math.min(1, Math.max(0, 1 - e.castRemaining / e.castTotal)) : 0;
@@ -1795,18 +1879,19 @@ export class AbilityVfx {
       const auraWasHeld = held.auraStamps.has(aura.id);
       const readiness = this.deps.isLivingWarrior?.(e.id) ? warriorReadinessBit(aura) : 0;
       if (readiness) {
-        fx.holdWarriorReadiness?.(e.id, readiness, this.deps.localPlayerId?.() === e.id);
+        if (kitReady())
+          fx.holdWarriorReadiness?.(e.id, readiness, this.deps.localPlayerId?.() === e.id);
         continue;
       }
       const furyState = warriorFuryStateKind(aura);
       if (furyState !== null) {
-        if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+        if (kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
           fx.holdWarriorFuryState?.(e.id, furyState, aura, this.deps.localPlayerId?.() === e.id);
         continue;
       }
       const power = warriorPowerKind(aura);
       if (power !== null) {
-        if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+        if (kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
           fx.holdWarriorPower?.(
             e.id,
             power,
@@ -1818,7 +1903,7 @@ export class AbilityVfx {
       }
       const guard = warriorGuardKind(aura);
       if (guard !== null) {
-        if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+        if (kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
           fx.holdWarriorGuard?.(e.id, guard, aura, this.deps.localPlayerId?.() === e.id);
         continue;
       }
@@ -1827,12 +1912,13 @@ export class AbilityVfx {
           fx,
           e.id,
           aura,
-          !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }),
+          kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }),
         )
       )
         continue;
       if (aura.id === 'breachmaker_vuln' || aura.id === 'thunder_clap_as') {
         if (
+          kitReady() &&
           (aura.remaining ?? 0) > 0 &&
           !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })
         ) {
@@ -1843,7 +1929,7 @@ export class AbilityVfx {
         continue;
       }
       if (aura.kind === 'overpower_charge') {
-        if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+        if (kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
           fx.holdBladeCharges?.(e.id, aura.stacks ?? 1);
         continue;
       }
@@ -1864,6 +1950,8 @@ export class AbilityVfx {
       if (spec === undefined) continue;
       // maintenance passives (stances, spellbook traits): no read at all
       if (isPassiveAura(auraId)) continue;
+      // A hold is not a cast: it shows the frame its families are ready.
+      if (!this.admission.hold(castVfxRequirement(auraId))) continue;
       const full = abilityVfxFullSpecFor(auraId);
       if (
         aura.kind === 'dot' &&
@@ -2006,7 +2094,11 @@ export class AbilityVfx {
       const qspec = abilityVfxSpecFor(e.queuedOnSwing);
       const qfull = abilityVfxFullSpecFor(e.queuedOnSwing);
       const qstyle = qspec ? asOrbitStyle(qfull?.buff?.orbit ?? qspec.bo) : null;
-      if (qspec !== undefined && (qfull?.physical || (qstyle !== null && bands < 3))) {
+      if (
+        qspec !== undefined &&
+        (qfull?.physical || (qstyle !== null && bands < 3)) &&
+        this.admission.hold(castVfxRequirement(e.queuedOnSwing))
+      ) {
         if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
         const created = qfull?.physical
           ? fx.holdQueuedWeapon?.(e.id, abilityVfxColor(qspec), orbitTier)
@@ -2046,7 +2138,7 @@ export class AbilityVfx {
     if (this.beamChannels.size > 0) {
       const nowSec = this.now();
       for (const [id, ch] of this.beamChannels) {
-        if (nowSec - ch.lastAt > ch.every * 1.9 + 0.25) this.beamChannels.delete(id);
+        if (channelLapsed(ch, nowSec)) this.beamChannels.delete(id);
       }
     }
   }

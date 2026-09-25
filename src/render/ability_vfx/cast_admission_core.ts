@@ -10,12 +10,12 @@
 // families are ready.
 //
 // A refusal outlives the release by REFUSED_CAST_TAIL_SEC, the cap on an
-// authored linger (the sequencer's longest dwell), and every follow-through
-// hit (a DoT tick, a channel tick) extends it, so a refused channel stays
-// refused to its end. A new release of the same ability is a new cast and is
-// decided afresh; only a release that follows a latched cast bar belongs to
-// it. Follow-through is matched to the caster's latest cast of that ability,
-// so two overlapping flights of one ability share one verdict.
+// authored linger (the sequencer's longest dwell); a channel tick extends it,
+// so a refused channel stays refused to its end. A new release of the same
+// ability is a new cast and is decided afresh; only a release that follows a
+// latched cast bar belongs to it. Follow-through is matched to the caster's
+// latest cast of that ability, so two overlapping flights of one ability
+// share one verdict, the newer cast's.
 //
 // Host-agnostic (RENDER_PURE_CORES): the gate and the clock are injected, and
 // a latch is allocated only on a refusal.
@@ -84,17 +84,18 @@ export class CastAdmission {
     return false;
   }
 
-  /** Follow-through of a cast (an impact, a landing, a channel or DoT tick):
-   *  refused with its cast, else decided as the cast's first entry point. */
+  /** Follow-through of a cast (an impact, a landing, a contact, a DoT tick):
+   *  refused with its cast, else decided as the cast's first entry point. It
+   *  never extends the latch, so a refused ability pressed again and again
+   *  is decided afresh once the tail of its first refusal has passed. */
   follow(casterId: number, abilityId: string, mask: number, nowSec: number): boolean {
-    const latched = this.latched(casterId, abilityId, nowSec);
-    if (latched) {
-      latched.until = Math.max(latched.until, nowSec + REFUSED_CAST_TAIL_SEC);
-      return false;
-    }
-    if (this.gate.admit(mask)) return true;
-    this.latch(casterId, abilityId, nowSec + REFUSED_CAST_TAIL_SEC, false, nowSec);
-    return false;
+    return this.followThrough(casterId, abilityId, mask, nowSec, false);
+  }
+
+  /** A tick of a channel: follow-through that keeps a refused channel
+   *  refused to its end, however long it runs. */
+  channel(casterId: number, abilityId: string, mask: number, nowSec: number): boolean {
+    return this.followThrough(casterId, abilityId, mask, nowSec, true);
   }
 
   /** A per-frame hold: shown the frame its families are ready. */
@@ -109,6 +110,23 @@ export class CastAdmission {
 
   clear(): void {
     this.refused.clear();
+  }
+
+  private followThrough(
+    casterId: number,
+    abilityId: string,
+    mask: number,
+    nowSec: number,
+    extend: boolean,
+  ): boolean {
+    const latched = this.latched(casterId, abilityId, nowSec);
+    if (latched) {
+      if (extend) latched.until = Math.max(latched.until, nowSec + REFUSED_CAST_TAIL_SEC);
+      return false;
+    }
+    if (this.gate.admit(mask)) return true;
+    this.latch(casterId, abilityId, nowSec + REFUSED_CAST_TAIL_SEC, false, nowSec);
+    return false;
   }
 
   private latched(casterId: number, abilityId: string, nowSec: number): RefusedCast | null {

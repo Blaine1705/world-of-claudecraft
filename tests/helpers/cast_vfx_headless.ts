@@ -4,9 +4,17 @@
 // pins. A suite that needs the Warrior fragments resident mocks
 // production_assets' fragmentGeometry itself (vi.mock is hoisted per file).
 
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { vi } from 'vitest';
-import { castVfxFamilyBitOf } from '../../src/render/cast_vfx_family';
+import { AbilityVfxFx } from '../../src/render/ability_vfx/fx';
+import { AbilityVfx } from '../../src/render/ability_vfx/painter';
+import {
+  CAST_VFX_ENGINE,
+  CAST_VFX_KIT,
+  castVfxFamilyBitOf,
+} from '../../src/render/cast_vfx_family';
+import { createCastVfxReadiness } from '../../src/render/cast_vfx_readiness_core';
+import { createVfxAnchor } from '../../src/render/vfx_anchor';
 
 export function installCastVfxCanvasStub(): void {
   const noop = () => {};
@@ -70,4 +78,118 @@ export function drawingFamilies(drawables: readonly THREE.Object3D[]): number {
   let bits = 0;
   for (const object of drawables) if (wouldDraw(object)) bits |= castVfxFamilyBitOf(object);
   return bits;
+}
+
+/** The real painter over the real engine, headless, behind the real cast
+ *  gate core with one stand-in material per family: `prove(bit)` links a
+ *  family, `step` renders a frame. The Vfx particle calls land in `vfx`. */
+export function castGateRig(options: { kitDeclined?: boolean; deadlineMs?: number } = {}) {
+  installCastVfxCanvasStub();
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 400);
+  camera.position.set(0, 4, 18);
+  camera.lookAt(0, 1, 0);
+  camera.updateMatrixWorld();
+  const place = (id: number) => ({ x: (id % 7) * 2.5 - 6, z: -Math.floor(id / 7) * 2.5 });
+  const fxAnchor = createVfxAnchor((id, pose) => {
+    const at = place(id);
+    pose.x = at.x;
+    pose.y = 0;
+    pose.z = at.z;
+    pose.height = 2;
+    return true;
+  });
+  const fx = new AbilityVfxFx(
+    scene,
+    camera,
+    fxAnchor,
+    () => 0,
+    () => 0,
+  );
+  const materials = [{ id: 'engine' }, { id: 'kit' }] as const;
+  const proved = new Set<string>();
+  const clock = { ms: 0, frame: 0 };
+  const readiness = createCastVfxReadiness<{ id: string }>({
+    now: () => clock.ms,
+    frame: () => clock.frame,
+    deadlineMs: options.deadlineMs ?? 30_000,
+    families: [
+      { id: 'engine', bit: CAST_VFX_ENGINE, materials: () => [materials[0]] },
+      {
+        id: 'kit',
+        bit: CAST_VFX_KIT,
+        materials: () => [materials[1]],
+        declined: () => options.kitDeclined === true,
+      },
+    ],
+    linked: (material) => (proved.has(material.id) ? material : null),
+  });
+  fx.setCastVfxSpawnGate((bit) => readiness.spawnAllowed(bit));
+  const vfxCalls: string[] = [];
+  const record =
+    (name: string) =>
+    (..._args: unknown[]) => {
+      vfxCalls.push(name);
+    };
+  const warriors = new Set<number>();
+  const painter = new AbilityVfx(
+    {
+      fx,
+      vfx: {
+        projectile: record('projectile'),
+        lightningProjectile: record('lightningProjectile'),
+        burst: record('burst'),
+        nova: record('nova'),
+        tick: record('tick'),
+        shoutwave: record('shoutwave'),
+        buffSwirl: record('buffSwirl'),
+        beam: record('beam'),
+      },
+      anchor: (id, heightFrac) => ({ ...place(id), y: heightFrac * 2 }),
+      spawnAoeRing: () => {},
+      triggerAttack: () => {},
+      localPlayerId: () => -99,
+      isWarrior: (id) => warriors.has(id),
+      isLivingWarrior: (id) => warriors.has(id),
+      isMob: () => false,
+      castingAbilityOf: () => null,
+      castVfxAdmit: (mask) => readiness.admit(mask),
+      castVfxReady: (mask) => readiness.ready(mask),
+    },
+    () => clock.ms / 1000,
+  );
+  const drawables = gatedDrawables(scene);
+  let drawn = 0;
+  const step = (frames = 1, dt = 1 / 20): number => {
+    let seen = 0;
+    for (let i = 0; i < frames; i++) {
+      clock.frame++;
+      clock.ms += dt * 1000;
+      painter.update(dt);
+      seen |= drawingFamilies(drawables);
+    }
+    drawn |= seen;
+    return seen;
+  };
+  return {
+    scene,
+    fx,
+    painter,
+    readiness,
+    drawables,
+    warriors,
+    vfxCalls,
+    clock,
+    step,
+    prove: (bit: number) => {
+      if (bit & CAST_VFX_ENGINE) proved.add('engine');
+      if (bit & CAST_VFX_KIT) proved.add('kit');
+    },
+    /** The families any gated drawable drew with since the last reset. */
+    drawn: () => drawn,
+    resetDrawn: () => {
+      drawn = 0;
+      vfxCalls.length = 0;
+    },
+  };
 }

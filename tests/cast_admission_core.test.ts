@@ -100,14 +100,25 @@ describe('an instant', () => {
 });
 
 describe('the latch lifetime', () => {
-  it('ends the tail after the release, and every follow-through hit extends it', () => {
+  it('keeps a refused channel refused to its end: every tick extends the tail', () => {
     const { gate, admission } = harness(0);
     expect(admission.release(3, 'drain_soul', ENGINE, 0)).toBe(false);
     gate.bits = ENGINE;
-    // A refused channel ticking every second stays refused to its end.
-    for (let t = 1; t <= 12; t++) expect(admission.follow(3, 'drain_soul', ENGINE, t)).toBe(false);
+    for (let t = 1; t <= 12; t++) expect(admission.channel(3, 'drain_soul', ENGINE, t)).toBe(false);
     expect(admission.isRefused(3, 'drain_soul', 12 + REFUSED_CAST_TAIL_SEC - 0.01)).toBe(true);
-    expect(admission.follow(3, 'drain_soul', ENGINE, 12 + REFUSED_CAST_TAIL_SEC)).toBe(true);
+    expect(admission.channel(3, 'drain_soul', ENGINE, 12 + REFUSED_CAST_TAIL_SEC)).toBe(true);
+  });
+
+  it('never lets follow-through extend a refusal: a pressed-again strike reads afresh after the tail', () => {
+    // A Warrior strike whose contact IS its cast arrives as follow-through
+    // every press; if each press extended the first refusal, a player
+    // spamming it would never see it once the kit is ready.
+    const { gate, admission } = harness(ENGINE);
+    expect(admission.follow(3, 'heroic_strike', WARRIOR, 0)).toBe(false);
+    gate.bits = WARRIOR;
+    for (let t = 1.5; t < REFUSED_CAST_TAIL_SEC; t += 1.5)
+      expect(admission.follow(3, 'heroic_strike', WARRIOR, t)).toBe(false);
+    expect(admission.follow(3, 'heroic_strike', WARRIOR, REFUSED_CAST_TAIL_SEC)).toBe(true);
   });
 
   it('holds a cast bar refusal over the remaining bar plus the tail', () => {
