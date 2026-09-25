@@ -17,6 +17,7 @@ import {
 } from '../src/render/ability_vfx/prewarm';
 import * as productionAssets from '../src/render/ability_vfx/production_assets';
 import { tagCastVfxEngine, tagCastVfxKit } from '../src/render/cast_vfx_family';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 // The canvas textures are procedurally drawn, so a plain Node run needs a 2D
 // context stub (same shape as the ability-VFX and vfx suites use).
@@ -258,7 +259,9 @@ describe('collectAbilityVfxCompileTargets', () => {
 });
 
 describe('the renderer wires the units into the prewarm resume lane', () => {
-  const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+  const renderer = codeWithoutLineComments(
+    readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
+  );
   const entryStart = renderer.indexOf("id: 'vfx.ability-primitives'");
   const entry = renderer.slice(renderer.lastIndexOf('{', entryStart), entryStart + 2000);
 
@@ -272,7 +275,7 @@ describe('the renderer wires the units into the prewarm resume lane', () => {
     expect(units).toContain('abilityVfxTexturePrewarmSteps()');
     expect(units).toContain('this.prewarmTexture(texture)');
     // The program links are the debt arm (cast_vfx_prewarm.ts): one unit per
-    // pooled program, the engine family first, then the lazy stand-ins'
+    // pooled program, the engine and kit families first, then the lazy stand-ins'
     // stage + link, which never hold a cast.
     expect(entry.slice(programsStart)).toContain(
       'resumeProgramUnits: () => [...castVfxUnits(), ...abilityMaterialSlot.resumeUnits()],',

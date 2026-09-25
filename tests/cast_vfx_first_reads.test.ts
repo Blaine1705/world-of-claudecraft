@@ -19,6 +19,7 @@ vi.mock('../src/render/assets/preload', () => ({
 }));
 
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
+import { CC_BAND_SPECS } from '../src/render/ability_vfx_core';
 import { buildAoeRingMesh } from '../src/render/aoe_ring_mesh';
 import {
   CAST_VFX_FIRST_READS_ENTRY_ID,
@@ -30,9 +31,11 @@ import type { CompileArmHost } from '../src/render/compile_arms';
 import { isProgramKnownReady } from '../src/render/linked_program_readiness';
 import type { LinkedProgramLike } from '../src/render/linked_program_touch';
 import {
+  orderedPrewarmIds,
   orderPrewarmResumeEntries,
   prewarmEntryShouldDefer,
   prewarmResumeIsDebt,
+  resolvePrewarmPolicy,
 } from '../src/render/prewarm_policy';
 import { Vfx } from '../src/render/vfx';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
@@ -127,14 +130,16 @@ describe('the cast first-reads boot entry', () => {
   it('carries the CC band cloud, the ring and the particle cloud, each its own unit', () => {
     expect((h.roots[0] as THREE.Points).isPoints).toBe(true);
     expect((h.roots[2] as THREE.Points).isPoints).toBe(true);
+    expect(h.roots[2]).toBe((h.vfx as unknown as { points: THREE.Points }).points);
     const units = h.entry.resumeProgramUnits?.() ?? [];
     expect(units.map((unit) => unit.roots)).toEqual(h.roots.map((root) => [root]));
     expect(new Set(units.map((unit) => unit.id)).size).toBe(units.length);
   });
 
-  it('links its roots and proves them to the gate before any other cast unit', async () => {
+  it('links and proves its roots, and the other cast units then open the gate', async () => {
+    // The engine's 10 programs and the kit's 6 (tests/cast_vfx_engine_family.test.ts).
     const pendingBefore = h.readiness.snapshot().pending ?? 0;
-    expect(pendingBefore).toBeGreaterThan(2);
+    expect(pendingBefore).toBe(16);
     for (const root of h.roots) expect(isProgramKnownReady(h.programOf(root))).toBe(false);
     await h.entry.run();
     expect(h.compiled).toEqual(h.roots);
@@ -193,6 +198,29 @@ describe('the cast first-reads boot entry', () => {
   });
 });
 
+describe('the CC band root', () => {
+  it('is the overlay cloud a held band writes into', () => {
+    installCanvasStub();
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+    camera.updateMatrixWorld();
+    const fx = new AbilityVfxFx(
+      scene,
+      camera,
+      () => new THREE.Vector3(0, 1.8, -5),
+      () => 0,
+    );
+    const band = fx.ccBandDrawable() as THREE.Points;
+    expect(band).toBe((fx as unknown as { overlay: { drawable: THREE.Points } }).overlay.drawable);
+    fx.update(0.05);
+    expect(band.geometry.drawRange.count).toBe(0);
+    fx.holdCcBand(7, 'stun', 3);
+    fx.update(0.05);
+    expect(band.geometry.drawRange.count).toBe(CC_BAND_SPECS.stun.count);
+    expect(band.visible).toBe(true);
+  });
+});
+
 describe('when the boot drops it', () => {
   it('runs past the soft deadline and is deferred only past the hard one', () => {
     // entryStarted, soft deadline, hard deadline, exempt, finish-full.
@@ -200,19 +228,24 @@ describe('when the boot drops it', () => {
     expect(prewarmEntryShouldDefer(5000, 3000, 5000, true, false)).toBe(true);
   });
 
-  it('resumes its links as program debt ahead of the ability primitives', () => {
+  it('resumes its links as program debt behind the compile remainder, ahead of the primitives', () => {
     const id = `programs.${CAST_VFX_FIRST_READS_ENTRY_ID}`;
     expect(prewarmResumeIsDebt(id)).toBe(true);
-    // dropEntry pushes program debt in manifest order, and the entry sits
-    // before vfx.ability-primitives (the wiring pin below).
+    // The lane as the renderer fills it: a dropped entry's own units, then
+    // programs.compile-submit, then the program debt in drop order (the
+    // source pin in tests/ability_vfx_prewarm.test.ts). Debt goes first.
     const ordered = orderPrewarmResumeEntries([
       { id: 'vfx.weapon-skins' },
       { id: 'programs.compile-submit' },
       { id },
       { id: 'programs.vfx.ability-primitives' },
     ]).map((entry) => entry.id);
-    expect(ordered.indexOf(id)).toBeLessThan(ordered.indexOf('programs.vfx.ability-primitives'));
-    expect(ordered.indexOf(id)).toBeLessThan(ordered.indexOf('vfx.weapon-skins'));
+    expect(ordered).toEqual([
+      'programs.compile-submit',
+      id,
+      'programs.vfx.ability-primitives',
+      'vfx.weapon-skins',
+    ]);
   });
 });
 
@@ -221,19 +254,82 @@ describe('the renderer wiring (source pin)', () => {
     readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
   );
 
-  it('builds the entry from the live band cloud, ring and particle cloud, right before the ability primitives', () => {
+  it('builds the entry from the live band cloud, ring and particle cloud, right after the kit entry', () => {
     const at = renderer.indexOf('      castVfxFirstReadsEntry(\n');
     expect(at).toBeGreaterThan(-1);
+    const kitCall = '      activeKitPrewarmEntry(this.scene';
+    const kit = renderer.indexOf(kitCall);
+    expect(kit).toBeGreaterThan(-1);
+    expect(kit).toBeLessThan(at);
     const primitives = renderer.indexOf("        id: 'vfx.ability-primitives',", at);
     expect(primitives).toBeGreaterThan(at);
-    const between = renderer.slice(at, primitives);
+    // Positive control: the factory-call pattern sees this entry's own call.
+    const factoryCall = /\b[A-Za-z]+Entry\(/g;
+    expect(renderer.slice(at, at + 40).match(factoryCall)).toEqual(['castVfxFirstReadsEntry(']);
+    const afterKit = renderer.slice(kit + kitCall.length, at);
+    expect(afterKit).not.toMatch(/id: '/);
+    expect(afterKit.match(factoryCall)).toBeNull();
+    const between = renderer.slice(at + 'castVfxFirstReadsEntry('.length + 6, primitives);
     expect(between).not.toMatch(/id: '/);
+    expect(between.match(factoryCall)).toBeNull();
     expect(between).toContain(
       '[this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()],',
     );
     expect(between).toContain('this.compileArms,');
     expect(between).toContain('this.webgl,');
-    expect(renderer.indexOf('activeKitPrewarmEntry(this.scene')).toBeLessThan(at);
+  });
+
+  it('runs the kit entry, this entry and the primitives in manifest order on every policy', () => {
+    // dropEntry pushes program debt in the order the loop reaches entries,
+    // which is the manifest's after the policy reorder.
+    const start = renderer.indexOf('    const manifest: PrewarmManifestEntry[] = [');
+    const end = renderer.indexOf('    const byId = new Map(manifest.map', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const ids: string[] = [];
+    const line = /^ {8}id: '([^']+)',$|^ {6}(activeKitPrewarmEntry|castVfxFirstReadsEntry)\(/gm;
+    const factoryIds: Record<string, string> = {
+      activeKitPrewarmEntry: 'vfx.active-local-kit',
+      castVfxFirstReadsEntry: CAST_VFX_FIRST_READS_ENTRY_ID,
+    };
+    for (const match of renderer.slice(start, end).matchAll(line)) {
+      ids.push(match[1] ?? factoryIds[match[2]]);
+    }
+    expect(ids).toContain('programs.compile-submit');
+    const policyInput = {
+      lowGfx: false,
+      finishFullManifestBeforeReveal: false,
+      defaultMaxMs: 3000,
+      constrainedMaxMs: 3000,
+      defaultCompileMaxMs: 1500,
+      constrainedCompileMaxMs: 1500,
+      maxViewsLow: 12,
+      maxViewsHigh: 16,
+      maxViewsConstrained: 2,
+    };
+    for (const constrainedMemory of [false, true]) {
+      for (const asyncCompileSupported of [false, true]) {
+        const policy = resolvePrewarmPolicy({
+          ...policyInput,
+          constrainedMemory,
+          asyncCompileSupported,
+        });
+        const order = orderedPrewarmIds(ids, policy);
+        const kit = order.indexOf('vfx.active-local-kit');
+        const reads = order.indexOf(CAST_VFX_FIRST_READS_ENTRY_ID);
+        const primitives = order.indexOf('vfx.ability-primitives');
+        expect(kit, `${constrainedMemory}/${asyncCompileSupported}`).toBe(reads - 1);
+        expect(primitives).toBe(reads + 1);
+        const lane = orderPrewarmResumeEntries([
+          { id: 'programs.compile-submit' },
+          ...order.map((entry) => ({ id: `programs.${entry}` })),
+        ]).map((entry) => entry.id);
+        expect(lane.indexOf('programs.compile-submit')).toBe(0);
+        expect(lane.indexOf(`programs.${CAST_VFX_FIRST_READS_ENTRY_ID}`)).toBe(
+          lane.indexOf('programs.vfx.ability-primitives') - 1,
+        );
+      }
+    }
   });
 
   it('builds every ring slot with the shared builder the fixture uses', () => {

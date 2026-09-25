@@ -1406,6 +1406,7 @@ describe('constrained skips that still resume in the background', () => {
     expect(prewarmEntryRuns('vfx.cast-first-reads', constrained)).toBe(false);
     expect(prewarmEntryResumesAfterSkip('vfx.cast-first-reads', constrained)).toBe(true);
     expect(prewarmEntryRuns('vfx.cast-first-reads', desktop)).toBe(true);
+    expect(prewarmEntryResumesAfterSkip('vfx.cast-first-reads', desktop)).toBe(false);
   });
 
   it('never resumes an entry skipped for its GPU footprint', () => {

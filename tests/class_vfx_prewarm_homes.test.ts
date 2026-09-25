@@ -104,6 +104,18 @@ const POOL_UNITS = {
   needleLow: 3,
 } as const;
 
+/** Gate entries per pool: none of their own, and Sentence's lash, an embedded
+ *  engine AbilityVfxRibbons, the one engine program they draw (on both detail
+ *  levels, since the lash is not a detail cut). */
+const POOL_GATED = {
+  drainLife: 0,
+  umbral: 0,
+  sentenceFull: 1,
+  sentenceLow: 1,
+  needleFull: 0,
+  needleLow: 0,
+} as const;
+
 /** One compile unit per distinct program signature, and no signature ever
  *  covering two of three's programs (that would leave a program no unit
  *  linked). */
@@ -122,6 +134,7 @@ function expectOneUnitPerProgram(pool: keyof typeof POOL_UNITS, scene: THREE.Sce
   const units = collectAbilityVfxCompileTargets(scene).length;
   expect(units, `${pool} units`).toBe(keyOfSignature.size);
   expect(units, `${pool} units`).toBe(POOL_UNITS[pool]);
+  expect(abilityVfxGateMaterials(scene), `${pool} gated`).toHaveLength(POOL_GATED[pool]);
   expect(programs.size, `${pool} programs`).toBeLessThanOrEqual(units);
 }
 
