@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4096,
+    "files": 4124,
     "harvestedFiles": 3948,
     "carried": {
       "tests/action_bar_spectate.test.ts": {
@@ -141,6 +141,24 @@
           9
         ]
       },
+      "tests/eastbrook_ferry_asset.test.ts": {
+        "ms": 20,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          20
+        ]
+      },
+      "tests/eastbrook_ferry_berth.test.ts": {
+        "ms": 10436,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          10436
+        ]
+      },
       "tests/fct_stage_core.test.ts": {
         "ms": 15,
         "method": "local-median",
@@ -157,6 +175,24 @@
         "reason": "Eastbrook ferry Phase 2 adds four suites absent from the last green full CI harvest; actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
         "runs": [
           1868
+        ]
+      },
+      "tests/ferry_piers.test.ts": {
+        "ms": 36,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          36
+        ]
+      },
+      "tests/ferry_view_route.test.ts": {
+        "ms": 1441,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          1441
         ]
       },
       "tests/focus_targets_controller.test.ts": {
@@ -229,6 +265,51 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           37
+        ]
+      },
+      "tests/harbor_route_marker_asset.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          15
+        ]
+      },
+      "tests/harbor_route_marker_core.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          8
+        ]
+      },
+      "tests/harbor_route_marker_render.test.ts": {
+        "ms": 106,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          106
+        ]
+      },
+      "tests/harbor_route_markers.test.ts": {
+        "ms": 1517,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          1517
+        ]
+      },
+      "tests/harbormaster_gear_asset.test.ts": {
+        "ms": 63,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          63
         ]
       },
       "tests/harvest_choreography.test.ts": {
@@ -418,6 +499,15 @@
           402
         ]
       },
+      "tests/lockpick_action_guard.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          3
+        ]
+      },
       "tests/practice_dps_controller.test.ts": {
         "ms": 13,
         "method": "local-median",
@@ -496,6 +586,15 @@
           69
         ]
       },
+      "tests/ship_shadow_hold.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          13
+        ]
+      },
       "tests/spectate_session_preferences.test.ts": {
         "ms": 22,
         "method": "local-median",
@@ -557,6 +656,33 @@
         "reason": "Eastbrook ferry Phase 3 adds four suites and grows the voyage suites (the moving deck); actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
         "runs": [
           3874
+        ]
+      },
+      "tests/transport_ship.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          18
+        ]
+      },
+      "tests/transport_ship_core.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          9
+        ]
+      },
+      "tests/transport_ship_render.test.ts": {
+        "ms": 110,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          110
         ]
       },
       "tests/transport_wire.test.ts": {
@@ -1324,6 +1450,78 @@
           10
         ]
       },
+      "tests/wickharbor_harbor.test.ts": {
+        "ms": 41367,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          41367
+        ]
+      },
+      "tests/wickharbor_harbor_asset.test.ts": {
+        "ms": 222,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          222
+        ]
+      },
+      "tests/wickharbor_harbor_core.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          9
+        ]
+      },
+      "tests/wickharbor_harbor_render.test.ts": {
+        "ms": 144,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          144
+        ]
+      },
+      "tests/wickharbor_wharf.test.ts": {
+        "ms": 15173,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          15173
+        ]
+      },
+      "tests/wickharbor_wharf_asset.test.ts": {
+        "ms": 146,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          146
+        ]
+      },
+      "tests/wickharbor_wharf_core.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          5
+        ]
+      },
+      "tests/wickharbor_wharf_render.test.ts": {
+        "ms": 77,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          77
+        ]
+      },
       "tests/world_pvp.test.ts": {
         "ms": 30440,
         "method": "local-median",
@@ -1367,6 +1565,60 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           7
+        ]
+      },
+      "tests/wyrmwatch_harbor.test.ts": {
+        "ms": 19798,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          19798
+        ]
+      },
+      "tests/wyrmwatch_harbor_asset.test.ts": {
+        "ms": 1824,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          1824
+        ]
+      },
+      "tests/wyrmwatch_harbor_core.test.ts": {
+        "ms": 38,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          38
+        ]
+      },
+      "tests/wyrmwatch_harbor_house.test.ts": {
+        "ms": 11666,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          11666
+        ]
+      },
+      "tests/wyrmwatch_harbor_house_core.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          7
+        ]
+      },
+      "tests/wyrmwatch_harbor_render.test.ts": {
+        "ms": 444,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
+        "runs": [
+          444
         ]
       }
     },
@@ -2390,6 +2642,8 @@
   "tests/early_ability_curve.test.ts": 7,
   "tests/eastbrook_camp_spacing.test.ts": 1932,
   "tests/eastbrook_dedupe_objectives.test.ts": 7,
+  "tests/eastbrook_ferry_asset.test.ts": 20,
+  "tests/eastbrook_ferry_berth.test.ts": 10436,
   "tests/eastbrook_gameplay_integration.test.ts": 103908,
   "tests/eastbrook_grand_armoury.test.ts": 1633,
   "tests/eastbrook_grand_armoury_capture.test.ts": 73,
@@ -2597,7 +2851,9 @@
   "tests/fenbridge_town_renderer.test.ts": 1141,
   "tests/ferry_bell.test.ts": 2524,
   "tests/ferry_hud.test.ts": 1868,
+  "tests/ferry_piers.test.ts": 36,
   "tests/ferry_prewarm.test.ts": 7,
+  "tests/ferry_view_route.test.ts": 1441,
   "tests/field_kit_content.test.ts": 2298,
   "tests/field_kit_use.test.ts": 551,
   "tests/fiesta.test.ts": 6640,
@@ -2857,6 +3113,11 @@
   "tests/guild_roster_view.test.ts": 7,
   "tests/guild_stamp_fence.test.ts": 3160,
   "tests/hallowed_wall_bounce.test.ts": 2173,
+  "tests/harbor_route_marker_asset.test.ts": 15,
+  "tests/harbor_route_marker_core.test.ts": 8,
+  "tests/harbor_route_marker_render.test.ts": 106,
+  "tests/harbor_route_markers.test.ts": 1517,
+  "tests/harbormaster_gear_asset.test.ts": 63,
   "tests/harvest_admission.test.ts": 14,
   "tests/harvest_body_pick.test.ts": 11,
   "tests/harvest_choreography.test.ts": 9,
@@ -3218,6 +3479,7 @@
   "tests/local_storage_json.test.ts": 4,
   "tests/localization_coverage.test.ts": 10446,
   "tests/localization_fixes.test.ts": 3895,
+  "tests/lockpick_action_guard.test.ts": 3,
   "tests/lockpick_bountiful_jam.test.ts": 3951,
   "tests/lockpick_by_sight.test.ts": 95,
   "tests/lockpick_col4_heroic.test.ts": 255,
@@ -4774,6 +5036,7 @@
   "tests/sheathe_toggle.test.ts": 5,
   "tests/shield_block.test.ts": 3613,
   "tests/shield_contact_outcomes.test.ts": 69,
+  "tests/ship_shadow_hold.test.ts": 13,
   "tests/shipped_item_ids.test.ts": 7,
   "tests/shore_water_gate_core.test.ts": 187,
   "tests/sickness_undispellable.test.ts": 2527,
@@ -5076,6 +5339,9 @@
   "tests/transport_ferry.test.ts": 37112,
   "tests/transport_ferry_online.test.ts": 5566,
   "tests/transport_lanes.test.ts": 3874,
+  "tests/transport_ship.test.ts": 18,
+  "tests/transport_ship_core.test.ts": 9,
+  "tests/transport_ship_render.test.ts": 110,
   "tests/transport_wire.test.ts": 1650,
   "tests/travel_speed_fx.test.ts": 18,
   "tests/trivial_mob_passive.test.ts": 1659,
@@ -5389,6 +5655,14 @@
   "tests/wellfed_tooltip_view.test.ts": 39,
   "tests/whirlwind_echo.test.ts": 4522,
   "tests/who_filter.test.ts": 3333,
+  "tests/wickharbor_harbor.test.ts": 41367,
+  "tests/wickharbor_harbor_asset.test.ts": 222,
+  "tests/wickharbor_harbor_core.test.ts": 9,
+  "tests/wickharbor_harbor_render.test.ts": 144,
+  "tests/wickharbor_wharf.test.ts": 15173,
+  "tests/wickharbor_wharf_asset.test.ts": 146,
+  "tests/wickharbor_wharf_core.test.ts": 5,
+  "tests/wickharbor_wharf_render.test.ts": 77,
   "tests/wiki_link.test.ts": 16,
   "tests/wiki_vendor_channel.test.ts": 9,
   "tests/wildheart.test.ts": 5481,
@@ -5451,6 +5725,12 @@
   "tests/write_module_dir.test.ts": 10,
   "tests/ws_backpressure.test.ts": 6,
   "tests/ws_buffer.test.ts": 6,
+  "tests/wyrmwatch_harbor.test.ts": 19798,
+  "tests/wyrmwatch_harbor_asset.test.ts": 1824,
+  "tests/wyrmwatch_harbor_core.test.ts": 38,
+  "tests/wyrmwatch_harbor_house.test.ts": 11666,
+  "tests/wyrmwatch_harbor_house_core.test.ts": 7,
+  "tests/wyrmwatch_harbor_render.test.ts": 444,
   "tests/xp.test.ts": 5319,
   "tests/xp_bar_painter.test.ts": 8,
   "tests/xp_command.test.ts": 2295,
