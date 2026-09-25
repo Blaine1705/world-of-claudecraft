@@ -108,8 +108,14 @@ export function castVfxFirstReadsEntry(
     required: false,
     deadlineExempt: true,
     resumeProgramUnits: units,
+    // Every unit settles before the entry reports: one root's failed compile
+    // must not end the entry while the others' links, and so their proofs,
+    // are still in flight.
     run: async () => {
-      await Promise.all(units().map((unit) => unit.run()));
+      const failed = (await Promise.allSettled(units().map((unit) => unit.run()))).find(
+        (result): result is PromiseRejectedResult => result.status === 'rejected',
+      );
+      if (failed) throw failed.reason;
     },
     detail: () => `roots=${units().length}`,
   };

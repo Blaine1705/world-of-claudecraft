@@ -158,6 +158,30 @@ describe('the cast first-reads boot entry', () => {
     expect(isProgramKnownReady(handle)).toBe(false);
   });
 
+  it('lets every other root settle and record before it reports one failure', async () => {
+    const [band, ring, cloud] = [aoeRing(), aoeRing(), aoeRing()];
+    const handles = new Map([band, ring, cloud].map((root) => [root.material, program()]));
+    const webgl = {
+      properties: {
+        get: (material: THREE.Material) => ({ currentProgram: handles.get(material) }),
+      },
+    };
+    // The failure lands at once; the two good links settle a macrotask later.
+    const entry = castVfxFirstReadsEntry(
+      [band, ring, cloud],
+      {} as CompileArmHost,
+      webgl,
+      (root) =>
+        root === ring
+          ? Promise.reject(new Error('lost'))
+          : new Promise((resolve) => setTimeout(resolve, 0)),
+    );
+    await expect(entry.run()).rejects.toThrow('lost');
+    expect(isProgramKnownReady(handles.get(band.material) as LinkedProgramLike)).toBe(true);
+    expect(isProgramKnownReady(handles.get(cloud.material) as LinkedProgramLike)).toBe(true);
+    expect(isProgramKnownReady(handles.get(ring.material) as LinkedProgramLike)).toBe(false);
+  });
+
   it('skips a missing root rather than failing the entry', () => {
     const entry = castVfxFirstReadsEntry(
       [null, aoeRing(), undefined],
