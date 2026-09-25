@@ -35,6 +35,7 @@ import {
 } from '../src/render/prewarm_policy';
 import { PREWARM_SUBMIT_LANE_MAX_MS } from '../src/render/prewarm_submit_stop_core';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
+import { stripComments } from './helpers/strip_comments';
 
 // The real desktop constants (renderer.ts), injected so the test pins the actual
 // numbers the renderer uses rather than duplicating magic values.
@@ -521,7 +522,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       "units: (textures) => textureResumeUnits('weather-materials', textures),",
     );
     // The dropped entry's resume links the live points before the uploads.
-    expect(renderer).toContain('linkRoot: () => this.weather.prewarmRoot(),');
+    expect(stripComments(renderer)).toContain('linkRoot: () => this.weather.prewarmRoot(),');
     expect(renderer).toContain('cleanup: () => this.weather.endPrewarm(),');
     // The manifest-local mutable state is gone with them.
     expect(renderer).not.toContain('landmarkPrewarmGroup');
