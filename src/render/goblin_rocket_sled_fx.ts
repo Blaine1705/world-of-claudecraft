@@ -119,7 +119,7 @@ const layerValues = (): PlumeLayerValues => ({
 
 // The shared pair draws for every rider, so each mesh writes its own rider's
 // values right before its draw; three uploads a ShaderMaterial's uniforms
-// whenever uniformsNeedUpdate is set (the ground_auras.ts idiom).
+// whenever uniformsNeedUpdate is set (the src/render/ability_vfx/ground_auras.ts idiom).
 function pushLayer(material: THREE.ShaderMaterial, values: PlumeLayerValues): void {
   const uniforms = material.uniforms;
   uniforms.uTime.value = values.time;
