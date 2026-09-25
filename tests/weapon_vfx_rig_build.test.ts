@@ -13,8 +13,6 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { addRimGlow, GFX } from '../src/render/gfx';
-import { materialProgramSignature } from '../src/render/prewarm_policy';
 import { isSharedTexture } from '../src/render/shared_resource';
 import {
   buildWeaponVfxPrewarmGroup,
@@ -708,75 +706,6 @@ describe('bounded emissive derivation cache (the C2 ratchet fix)', () => {
 });
 
 describe('buildWeaponVfxPrewarmGroup', () => {
-  /** A painted GLB map: drawable, so deriveEmissive takes its derived arm. */
-  function paintedMap(): THREE.CanvasTexture {
-    const canvas = document.createElement('canvas') as unknown as HTMLCanvasElement;
-    canvas.width = 4;
-    canvas.height = 4;
-    return new THREE.CanvasTexture(canvas);
-  }
-
-  /** The shape a WORN skin material really has when the rig hands it to
-   *  createWeaponVfx: a painted GLB map set, plus the silhouette rim glow
-   *  characters/assets.ts buildTintedClone applies on the GFX.standardMaterials
-   *  arm, which characters/visual.ts then carries into its isolated clone
-   *  through cloneMaterialWithHooks. The hook is part of three's program cache
-   *  key, so a fixture without it would pin the host against a variant no live
-   *  sighting asks for. */
-  function liveSkinMesh(): THREE.Mesh {
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      map: paintedMap(),
-      metalnessMap: paintedMap(),
-      roughnessMap: paintedMap(),
-    });
-    if (GFX.standardMaterials) addRimGlow(material);
-    return new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.1), material);
-  }
-
-  it('hosts the LIVE program variant, not the mapless flat-tint twin', () => {
-    // deriveEmissive BRANCHES on the host material's map. A mapless host takes
-    // the flat-tint fallback (emissiveMap absent, map absent), which is a
-    // different program-cache key from the live path's (map and emissiveMap
-    // present, metalnessMap and roughnessMap nulled), so the first skin sighted
-    // in the world linked that program inside a live frame however complete the
-    // boot entry looked.
-    const specs = Object.entries(WEAPON_VFX);
-    // Every spec, not the first: the branch is per host material, so one
-    // entry left on the flat-tint arm is exactly the escape this pins.
-    expect(specs.length).toBeGreaterThan(1);
-    const group = buildWeaponVfxPrewarmGroup();
-
-    for (const [key, spec] of specs) {
-      const host = group.getObjectByName(`prewarm-skin-host:${key}`) as THREE.Mesh;
-      const hostMat = host.material as THREE.MeshStandardMaterial;
-
-      const live = liveSkinMesh();
-      const rig = createWeaponVfx(live, spec, { grounded: false });
-      const liveMat = live.material as THREE.MeshStandardMaterial;
-
-      expect(liveMat.emissiveMap, key).not.toBeNull();
-      expect(hostMat.emissiveMap, key).toBeTruthy();
-      expect(hostMat.metalnessMap, key).toBeNull();
-      expect(materialProgramSignature(hostMat), key).toBe(materialProgramSignature(liveMat));
-
-      // The mapless host this replaced is the negative case: it never carried
-      // the live key, so the comparison above is not trivially true.
-      const mapless = new THREE.Mesh(
-        new THREE.BoxGeometry(0.1, 1, 0.1),
-        new THREE.MeshStandardMaterial({ color: 0xffffff }),
-      );
-      const maplessRig = createWeaponVfx(mapless, spec, { grounded: false });
-      expect(
-        materialProgramSignature(mapless.material as THREE.MeshStandardMaterial),
-        key,
-      ).not.toBe(materialProgramSignature(liveMat));
-
-      rig.dispose();
-      maplessRig.dispose();
-    }
-  });
-
   it('builds one rig per REAL catalog spec through the live world path', () => {
     // The old single synthetic spec covered each component FAMILY but not the
     // real program-key set: the first skin sighted in the world still linked
@@ -805,7 +734,10 @@ describe('buildWeaponVfxPrewarmGroup', () => {
       if (object.userData.__vfx) shells.push(object);
     });
 
-    expect(hosts).toBe(specCount);
+    // One host surface per GLB material: the 23 skins plus the untextured
+    // ring on astravyr_fang_of_the_fallen_star (the live-key parity lives in
+    // tests/weapon_skin_prewarm_host.test.ts).
+    expect(hosts).toBe(24);
     for (const key of Object.keys(WEAPON_VFX)) {
       expect(names, `spec ${key} missing from the prewarm group`).toContain(
         `prewarm-skin-host:${key}`,
