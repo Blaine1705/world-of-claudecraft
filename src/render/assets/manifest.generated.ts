@@ -1160,6 +1160,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/varkhul_grand_forge.glb": "/media/models/props/varkhul_grand_forge.d3ffe6d57532.glb",
   "models/props/weapon_stand.glb": "/media/models/props/weapon_stand.ecfaf0e2be3b.glb",
   "models/props/well.glb": "/media/models/props/well.9308ba09ea3b.glb",
+  "models/props/wickharbor_harbor.glb": "/media/models/props/wickharbor_harbor.7aee02f2fe27.glb",
   "models/props/wickharbor_wharf.glb": "/media/models/props/wickharbor_wharf.655410d0d104.glb",
   "models/props/wildheart_ancestor_ruin.glb": "/media/models/props/wildheart_ancestor_ruin.5f37b9de8ac2.glb",
   "models/props/wildheart_beast_den.glb": "/media/models/props/wildheart_beast_den.10cd806a8f1f.glb",

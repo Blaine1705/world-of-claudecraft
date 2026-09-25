@@ -725,6 +725,7 @@ const RENDER_PURE_CORES = [
   'src/render/harbor_route_marker_core.ts',
   'src/render/wyrmwatch_harbor_core.ts',
   'src/render/wickharbor_wharf_core.ts',
+  'src/render/wickharbor_harbor_core.ts',
   'src/render/wyrmwatch_harbor_house_core.ts',
   'src/render/ship_wake_core.ts',
   'src/render/view_candidate_scan_core.ts',
