@@ -9,7 +9,8 @@
 //   GAME_URL=http://localhost:5178 SHOTS_DIR=tmp/wickharbor-harbor GPU=1 node scripts/wickharbor_harbor_shot.mjs
 //
 // GRAPHICS_PRESET picks the preset (1 low, 2 medium, 3 high, the default, 4 ultra). ONLY limits
-// the run to a comma list of shot names; PREFIX and SUFFIX wrap every file name.
+// the run to a comma list of shot names; PREFIX and SUFFIX wrap every file name. DAYNIGHT
+// picks the time of day (a /daynight word: day, the default, night, dusk...).
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -23,6 +24,7 @@ const ONLY = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;
 const PREFIX = process.env.PREFIX ?? '';
 const SUFFIX = process.env.SUFFIX ?? '';
 const GPU = process.env.GPU === '1';
+const DAYNIGHT = process.env.DAYNIGHT ?? 'day';
 fs.mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -63,14 +65,15 @@ await run(`
   window.__ferry = await import('/src/sim/transport_schedule.ts');
   window.__ships = await import('/src/sim/content/transport_ships.ts');
 `);
-// solar noon, whatever the live clock says (the /daynight dev command, through the chat box)
+// the chosen time of day, whatever the live clock says (the /daynight dev command, through
+// the chat box)
 await page.waitForSelector('#chat-input', { timeout: 120000 });
-await page.evaluate(() => {
+await page.evaluate((word) => {
   const chat = document.querySelector('#chat-input');
-  chat.value = '/daynight day';
+  chat.value = `/daynight ${word}`;
   chat.dispatchEvent(new Event('input', { bubbles: true }));
   chat.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-});
+}, DAYNIGHT);
 await sleep(6000); // the grade lerps in
 console.log(
   'graphics',
@@ -173,6 +176,10 @@ const STATIONS = [
   ['beacon_stair', 499, 322.5, 518, 338, 0.45, 12],
   // where the boardwalk meets the ferry wharf's flight
   ['wharf_join', 465.2, 364.2, 461, 374, 0.45, 9],
+  // the owner's view: high over the grass by the camp on the bluff, out over the harbor
+  ['owner', 463, 361, 490, 363, 0.9, 24],
+  // the whole waterfront from the bay, low over the water
+  ['sea_wide', 500, 364, 468, 364, 0.3, 26],
 ];
 for (const [name, x, z, tx, tz, pitch, dist] of STATIONS) {
   if (!want(name)) continue;
