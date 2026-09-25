@@ -23,6 +23,7 @@ const mocks = vi.hoisted(() => {
     ship: prepare(),
     harborMarker: prepare(),
     wyrmwatchHarbor: prepare(),
+    wickharborWharf: prepare(),
     reset: vi.fn(),
   };
 });
@@ -80,6 +81,10 @@ vi.mock('../src/render/harbor_route_markers', () => ({
 vi.mock('../src/render/wyrmwatch_harbor', () => ({
   prepareWyrmwatchHarborAssets: mocks.wyrmwatchHarbor,
   resetWyrmwatchHarborCaches: mocks.reset,
+}));
+vi.mock('../src/render/wickharbor_wharf', () => ({
+  prepareWickharborWharfAssets: mocks.wickharborWharf,
+  resetWickharborWharfCaches: mocks.reset,
 }));
 vi.mock('../src/render/eastbrook_grand_armoury', () => ({
   prepareEastbrookGrandArmouryProfileAssets: mocks.armoury,
@@ -159,6 +164,7 @@ const prepareSpies = [
   mocks.ship,
   mocks.harborMarker,
   mocks.wyrmwatchHarbor,
+  mocks.wickharborWharf,
 ];
 
 beforeEach(() => {
@@ -188,6 +194,7 @@ describe('graphics profile asset preparation', () => {
       mocks.ship,
       mocks.harborMarker,
       mocks.wyrmwatchHarbor,
+      mocks.wickharborWharf,
     ]) {
       expect(prepare).toHaveBeenCalledWith();
     }
@@ -240,6 +247,7 @@ describe('graphics profile derived-cache reset', () => {
       'transport_ship',
       'harbor_route_markers',
       'wyrmwatch_harbor',
+      'wickharbor_wharf',
       'ground_decor_prewarm',
     ]);
     expect(() => resetGraphicsProfileDerivedCaches()).not.toThrow();

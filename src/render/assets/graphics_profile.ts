@@ -35,6 +35,7 @@ import { resetTemporalHourglassProfileCaches } from '../temporal_hourglass_visua
 import { prepareTerrainProfileAssets } from '../terrain';
 import { prepareTransportShipAssets, resetTransportShipCaches } from '../transport_ship';
 import { prepareWaterProfileAssets } from '../water';
+import { prepareWickharborWharfAssets, resetWickharborWharfCaches } from '../wickharbor_wharf';
 import { resetWildheartTerrainProfileCaches } from '../wildheart_terrain';
 import { prepareSurfaceDetailProfileAssets, resetSurfaceDetailProfileCaches } from '../worn_stone';
 import { prepareWyrmwatchHarborAssets, resetWyrmwatchHarborCaches } from '../wyrmwatch_harbor';
@@ -68,6 +69,7 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
       prepareTransportShipAssets(),
       prepareHarborRouteMarkerAssets(),
       prepareWyrmwatchHarborAssets(),
+      prepareWickharborWharfAssets(),
     ]).then(() => undefined),
 ];
 
@@ -96,6 +98,7 @@ const RESETTERS = [
   ['transport_ship', resetTransportShipCaches],
   ['harbor_route_markers', resetHarborRouteMarkerCaches],
   ['wyrmwatch_harbor', resetWyrmwatchHarborCaches],
+  ['wickharbor_wharf', resetWickharborWharfCaches],
   // The boot twin manifest for the lazy ground-decor pools holds the LIVE
   // materials of the retiring profile: a rebuild mints new ones, and a twin
   // wearing a retired material links a program nothing will ever draw.
