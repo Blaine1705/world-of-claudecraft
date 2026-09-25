@@ -9,7 +9,7 @@
 // createWeaponVfx all run as in the world. The fixture this replaced (a
 // Standard, FrontSide material with no normal map) could not see that Low
 // draws a Lambert, that every skin carries normal and occlusion maps, or that
-// ten skins are double-sided, so it passed while the host warmed a key no
+// some skins are double-sided, so it passed while the host warmed a key no
 // live weapon asked for.
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -70,6 +70,7 @@ import {
   type GfxSettings,
   type GfxTier,
   gfxInternalsForTest,
+  resolveGfxProfile,
 } from '../src/render/gfx';
 import { materialProgramSignature, prewarmProgramContentKeys } from '../src/render/prewarm_policy';
 import {
@@ -77,6 +78,7 @@ import {
   clearWeaponVfxTextureCacheForTest,
   createWeaponVfx,
   disposeWeaponEmissiveCache,
+  disposeWeaponVfxPrewarmSkinGroup,
   WEAPON_VFX,
   WEAPON_VFX_DOUBLE_SIDED_SKINS,
   WEAPON_VFX_UNTEXTURED_PARTS,
@@ -85,21 +87,65 @@ import {
   createWeaponVfxPrewarmSkinStage,
   weaponVfxPrewarmUnits,
 } from '../src/render/weapon_vfx_prewarm';
-import { resetSurfaceDetailProfileCaches } from '../src/render/worn_stone';
+import {
+  prepareSurfaceDetailProfileAssets,
+  resetSurfaceDetailProfileCaches,
+} from '../src/render/worn_stone';
 import { WEAPON_TYPE_BY_ITEM } from '../src/sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 
-/** Every preset, plus the two knobs that move a key input off its preset:
- *  the constrained-memory profile and the surface-detail dial turned off. */
-const PROFILES: readonly [string, GfxTier, Partial<GfxSettings>][] = [
-  ['low', 'low', {}],
-  ['medium', 'medium', {}],
-  ['high', 'high', {}],
-  ['ultra', 'ultra', {}],
-  ['insane', 'insane', {}],
-  ['ultra, constrained memory', 'ultra', { constrainedMemory: true }],
-  ['ultra, surface detail off', 'ultra', { surfaceDetail: false, surfaceDetailTaps: 0 }],
+/** An iPhone session forced to ultra, resolved the way the client resolves
+ *  one: the platform alone turns the iOS memory profile on. */
+const IOS_ULTRA = resolveGfxProfile(
+  {
+    deviceMemory: 8,
+    hardwareConcurrency: 6,
+    maxTouchPoints: 5,
+    coarsePointer: true,
+    narrowViewport: true,
+    gpuRenderer: 'Apple GPU',
+    nativeApp: false,
+    tightMemory: false,
+    platform: 'ios',
+    softwareRendering: false,
+  },
+  {
+    graphicsPreset: 4,
+    terrainDetail: 1,
+    foliageDensity: 1,
+    surfaceDetail: 1,
+    effectsQuality: 1,
+    shadowQuality: 1,
+    antiAliasing: 1,
+    bloomQuality: 1,
+    ambientOcclusion: 1,
+    viewDistance: 1,
+    waterQuality: 1,
+    characterDetail: 1,
+    dynamicLights: 1,
+    particleEffects: 1,
+  },
+  '?gfx=ultra',
+).settings;
+
+/** Every preset, plus the knobs that move a key input off its preset: the
+ *  constrained-memory profile, the surface-detail dial turned off, and the iOS
+ *  memory profile. The last column says whether the ring wears the worn layer. */
+const PROFILES: readonly [string, GfxTier, Partial<GfxSettings>, boolean][] = [
+  ['low', 'low', {}, false],
+  ['medium', 'medium', {}, false],
+  ['high', 'high', {}, true],
+  ['ultra', 'ultra', {}, true],
+  ['insane', 'insane', {}, true],
+  ['ultra, constrained memory', 'ultra', { constrainedMemory: true }, true],
+  ['ultra, surface detail off', 'ultra', { surfaceDetail: false, surfaceDetailTaps: 0 }, false],
+  ['ultra, iOS memory profile', 'ultra', IOS_ULTRA, false],
 ];
+
+/** The worn metal layer's key head, as worn_stone.ts spells it with the family
+ *  textures resident: ready, no parallax, no cell mask, metalness, no AO, and
+ *  the object-space projection. */
+const WORN_METAL_KEY_HEAD = 'surface-detail|on|-|-|met|-|o|';
 
 /** The skin id that displays a VFX model (WEAPON_VFX is keyed by model). */
 function skinIdFor(model: string): string | null {
@@ -198,6 +244,7 @@ interface GlbMaterialJson {
 
 interface GlbJson {
   materials?: GlbMaterialJson[];
+  meshes?: { primitives: { attributes: Record<string, number> }[] }[];
   images?: { mimeType?: string; uri?: string }[];
   extensionsUsed?: string[];
 }
@@ -218,6 +265,11 @@ beforeAll(async () => {
     proto.getContext = original;
   };
   loaderState.parse = parseShippedGlb;
+  // A session on high and up enters the world with the worn family textures
+  // resident (the boot lane prepares them before the Renderer is built), and
+  // the worn key reads that residency. The import-time tier guess here
+  // prepares none, so prepare them as that boot does.
+  await prepareSurfaceDetailProfileAssets(gfxInternalsForTest.settingsFor('insane'));
   await charactersReady();
   const urls = WORN_KEYS.map((key) => weaponSkinModelUrl(skinIdFor(key)) as string);
   const arrived = new Set<string>();
@@ -232,8 +284,9 @@ afterAll(() => {
 });
 
 /** Every input three keys a mesh's program on that the scene does not own:
- *  the material signature, the mesh and geometry bits, and the per-slot UV
- *  channel and normal-map space, which the signature folds to presence. */
+ *  the material signature, the mesh and geometry bits, the extra UV sets, and
+ *  the per-slot UV channel and normal-map space, which the signature folds to
+ *  presence. */
 function drawKeys(root: THREE.Object3D, include: (mesh: THREE.Mesh) => boolean): Set<string> {
   const keys = new Set<string>();
   root.traverse((object) => {
@@ -251,9 +304,12 @@ function drawKeys(root: THREE.Object3D, include: (mesh: THREE.Mesh) => boolean):
       const channels = (['map', 'normalMap', 'aoMap', 'emissiveMap'] as const)
         .map((slot) => `${slot}:${std[slot] ? std[slot].channel : '-'}`)
         .join(',');
+      const extraUvs = (['uv1', 'uv2', 'uv3'] as const)
+        .map((name) => `${name}:${geometry.attributes[name] ? 1 : 0}`)
+        .join(',');
       const [key] = prewarmProgramContentKeys(shape, [materialProgramSignature(material)]);
       keys.add(
-        `${key}|${channels}|nmt:${std.normalMap ? std.normalMapType : '-'}|rs:${mesh.receiveShadow}`,
+        `${key}|${channels}|${extraUvs}|nmt:${std.normalMap ? std.normalMapType : '-'}|rs:${mesh.receiveShadow}`,
       );
     }
   });
@@ -329,6 +385,15 @@ describe('the weapon-skin prewarm host warms the program the live weapon draws',
       for (const image of json.images ?? []) {
         expect(['image/webp', 'image/png', 'image/jpeg'], key).toContain(image.mimeType);
       }
+      // No tangents, vertex colours, skin weights or extra UV sets: the host
+      // box carries none of them either.
+      const primitives = (json.meshes ?? []).flatMap((mesh) => mesh.primitives);
+      expect(primitives.length, key).toBeGreaterThan(0);
+      for (const primitive of primitives) {
+        for (const attribute of Object.keys(primitive.attributes)) {
+          expect(['POSITION', 'NORMAL', 'TEXCOORD_0'], `${key}:${attribute}`).toContain(attribute);
+        }
+      }
       const textured = materials.filter((m) => m.pbrMetallicRoughness?.baseColorTexture);
       const untextured = materials.filter((m) => !m.pbrMetallicRoughness?.baseColorTexture);
       // The textured host carries exactly these slots, opaque, no extension.
@@ -358,7 +423,7 @@ describe('the weapon-skin prewarm host warms the program the live weapon draws',
 
   it.each(PROFILES)(
     'hosts every live skin weapon, drawn and sheathed, and nothing else, on %s',
-    async (_label, tier, overrides) => {
+    async (_label, tier, overrides, worn) => {
       await withTier(
         tier,
         () => {
@@ -366,6 +431,7 @@ describe('the weapon-skin prewarm host warms the program the live weapon draws',
           const liveUnion = new Set<string>();
           const hostUnion = new Set<string>();
           const releaseHits: string[] = [];
+          const ringKeys = new Set<string>();
           for (const key of Object.keys(WEAPON_VFX)) {
             for (const hostKey of drawKeys(buildWeaponVfxPrewarmSkinGroup(key), isHostSurface)) {
               hostUnion.add(hostKey);
@@ -397,7 +463,13 @@ describe('the weapon-skin prewarm host warms the program the live weapon draws',
               });
               // The skin really is worn, and really moved between the poses.
               expect(meshes.length, `${key} stowed=${stowed}`).toBeGreaterThan(0);
-              for (const mesh of meshes) expect(onChestBone(mesh), key).toBe(stowed);
+              for (const mesh of meshes) {
+                expect(onChestBone(mesh), key).toBe(stowed);
+                // The ring is the one skin part without UVs.
+                if (!mesh.geometry.attributes.uv) {
+                  ringKeys.add((mesh.material as THREE.Material).customProgramCacheKey());
+                }
+              }
               for (const liveKey of drawKeys(visual.root, isLiveSkinWeapon)) {
                 liveUnion.add(liveKey);
                 // The skin's OWN host holds it, so the shape table is right per
@@ -409,6 +481,13 @@ describe('the weapon-skin prewarm host warms the program the live weapon draws',
             visual.dispose();
           }
           expect(misses).toEqual([]);
+          // An absolute pin on the live ring, since the host and the live rig
+          // share one worn helper and the parity above cannot see it vanish
+          // from both at once.
+          expect(ringKeys.size).toBe(1);
+          const [ringKey] = ringKeys;
+          if (worn) expect(ringKey.startsWith(WORN_METAL_KEY_HEAD), ringKey).toBe(true);
+          else expect(ringKey).not.toContain('surface-detail|');
           // The release host never matched a live weapon on any tier, so the
           // comparison above is not trivially true.
           expect(releaseHits).toEqual([]);
@@ -416,6 +495,62 @@ describe('the weapon-skin prewarm host warms the program the live weapon draws',
           // for. Textured single-sided, textured double-sided, and the ring.
           expect([...hostUnion].map(tag).sort()).toEqual([...liveUnion].map(tag).sort());
           expect(hostUnion.size).toBe(3);
+        },
+        overrides,
+      );
+    },
+  );
+});
+
+describe('the weapon-skin prewarm host covers a dual-wielded skin', () => {
+  /** The dagger skins: a dagger offhand mirrors the skin onto the second hand. */
+  const DAGGER_KEYS = WORN_KEYS.filter(
+    (key) => WEAPON_SKINS[skinIdFor(key) as string].weaponType === 'dagger',
+  );
+
+  function onBone(mesh: THREE.Object3D, bone: string): boolean {
+    for (let node: THREE.Object3D | null = mesh; node; node = node.parent) {
+      if (node.name === bone) return true;
+    }
+    return false;
+  }
+
+  it.each(PROFILES)(
+    'hosts both hands of every dagger skin on %s',
+    async (_label, tier, overrides) => {
+      expect(DAGGER_KEYS).toContain('astravyr_fang_of_the_fallen_star');
+      await withTier(
+        tier,
+        () => {
+          const misses: string[] = [];
+          for (const key of DAGGER_KEYS) {
+            const skinId = skinIdFor(key) as string;
+            const hostKeys = drawKeys(buildWeaponVfxPrewarmSkinGroup(key), isHostSurface);
+            const dagger = mainhandFor(skinId);
+            const visual = new CharacterVisual('player_rogue', 0xffffff, 0, dagger, null, dagger);
+            visual.setWeaponSkin(skinId);
+            for (const stowed of [false, true]) {
+              visual.setWeaponStowed(stowed);
+              const meshes: THREE.Mesh[] = [];
+              visual.root.traverse((o) => {
+                if ((o as THREE.Mesh).isMesh && isLiveSkinWeapon(o as THREE.Mesh))
+                  meshes.push(o as THREE.Mesh);
+              });
+              if (!stowed) {
+                for (const hand of ['handslotr', 'handslotl']) {
+                  expect(
+                    meshes.some((mesh) => onBone(mesh, hand)),
+                    `${key} ${hand}`,
+                  ).toBe(true);
+                }
+              }
+              for (const liveKey of drawKeys(visual.root, isLiveSkinWeapon)) {
+                if (!hostKeys.has(liveKey)) misses.push(`${key} stowed=${stowed}: ${tag(liveKey)}`);
+              }
+            }
+            visual.dispose();
+          }
+          expect(misses).toEqual([]);
         },
         overrides,
       );
@@ -435,26 +570,45 @@ describe('the weapon-skin prewarm host outlives live skin churn', () => {
       });
       for (const unit of units) await unit.run();
 
-      const hostResources = new Set<THREE.Material | THREE.BufferGeometry | THREE.Texture>();
+      type HostResource = THREE.Material | THREE.BufferGeometry | THREE.Texture;
+      const hostResourcesOf = (group: THREE.Group): Set<HostResource> => {
+        const resources = new Set<HostResource>();
+        group.traverse((object) => {
+          const mesh = object as THREE.Mesh;
+          if (!mesh.isMesh || !isHostSurface(mesh)) return;
+          resources.add(mesh.geometry);
+          const material = mesh.material as THREE.MeshStandardMaterial;
+          resources.add(material);
+          for (const texture of [material.map, material.emissiveMap, material.normalMap]) {
+            if (texture) resources.add(texture);
+          }
+        });
+        return resources;
+      };
+      const listenForDisposal = (resources: Iterable<HostResource>, into: string[]): void => {
+        for (const resource of resources) {
+          resource.addEventListener('dispose', () => into.push(resource.uuid));
+        }
+      };
+
+      // Positive control: the same listeners do hear a host surface go when
+      // its owner really releases it, so the empty list below means something.
+      const control = buildWeaponVfxPrewarmSkinGroup('astravyr_fang_of_the_fallen_star');
+      const controlDisposals: string[] = [];
+      listenForDisposal(hostResourcesOf(control), controlDisposals);
+      disposeWeaponVfxPrewarmSkinGroup(control);
+      // Both surfaces' geometry and material; the shared one-pixel map stays.
+      expect(controlDisposals).toHaveLength(4);
+
+      const hostResources = new Set<HostResource>();
       const hostKeysBefore = new Set<string>();
       for (const key of Object.keys(WEAPON_VFX)) {
         const group = stage.get(key) as THREE.Group;
         for (const hostKey of drawKeys(group, isHostSurface)) hostKeysBefore.add(hostKey);
-        group.traverse((object) => {
-          const mesh = object as THREE.Mesh;
-          if (!mesh.isMesh || !isHostSurface(mesh)) return;
-          hostResources.add(mesh.geometry);
-          const material = mesh.material as THREE.MeshStandardMaterial;
-          hostResources.add(material);
-          for (const texture of [material.map, material.emissiveMap, material.normalMap]) {
-            if (texture) hostResources.add(texture);
-          }
-        });
+        for (const resource of hostResourcesOf(group)) hostResources.add(resource);
       }
       const hostDisposals: string[] = [];
-      for (const resource of hostResources) {
-        resource.addEventListener('dispose', () => hostDisposals.push(resource.uuid));
-      }
+      listenForDisposal(hostResources, hostDisposals);
       const hosts = Object.keys(WEAPON_VFX).map((key) => stage.get(key) as THREE.Group);
 
       // The renderer's prewarm cleanup: the aggregate leaves the scene, the
@@ -462,12 +616,15 @@ describe('the weapon-skin prewarm host outlives live skin churn', () => {
       stage.dispose();
       expect(scene.children).toHaveLength(0);
 
+      const watched = new Set<THREE.Material>();
       const liveDisposals: THREE.Material[] = [];
       const watchLive = (visual: CharacterVisual) =>
         visual.root.traverse((object) => {
           const mesh = object as THREE.Mesh;
           if (!mesh.isMesh || !isLiveSkinWeapon(mesh)) return;
           const material = mesh.material as THREE.Material;
+          if (watched.has(material)) return;
+          watched.add(material);
           material.addEventListener('dispose', () => liveDisposals.push(material));
         });
       const visual = new CharacterVisual(
@@ -489,9 +646,11 @@ describe('the weapon-skin prewarm host outlives live skin churn', () => {
       visual.setWeaponSkin(null);
       visual.dispose();
 
-      // The live chain really churned: each of the seven swaps disposed the
-      // exclusive clone the previous pose or skin drew.
+      // The live chain really churned: every swap drew a fresh exclusive
+      // clone and disposed it exactly once.
+      expect(watched.size).toBe(7);
       expect(liveDisposals).toHaveLength(7);
+      expect(new Set(liveDisposals)).toEqual(watched);
       expect(hostDisposals).toEqual([]);
       const hostKeysAfter = new Set<string>();
       for (const group of hosts) {
