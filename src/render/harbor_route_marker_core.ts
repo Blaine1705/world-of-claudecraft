@@ -9,7 +9,8 @@
 // anchor roundel) and the destination name itself are kept on EVERY tier. A
 // lower preset sheds only dressing: the metal trim below medium, the lantern,
 // its chain and the rope coil below high. The tier is the STATIC effects tier
-// (GFX.effectsTier, set by the preset), never the frame-rate governor.
+// (GFX.effectsTier: the preset, lowered by the Advanced Effects-quality
+// setting), never the frame-rate governor.
 
 import type { GfxTier } from './gfx';
 

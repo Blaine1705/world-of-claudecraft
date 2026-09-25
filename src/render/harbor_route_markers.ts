@@ -7,9 +7,10 @@
 // Which parts a graphics tier keeps is the pure core's call
 // (harbor_route_marker_core.ts): the post, the arrow board, the anchor roundel
 // and the destination name on every tier; the metal trim from medium, the
-// lantern, chain and rope from high. The tier is the static effects tier the
-// preset sets (GFX.effectsTier), never the frame-rate governor, and a preset
-// change rebuilds the props (the graphics-profile resetter below).
+// lantern, chain and rope from high. The tier is the static effects tier
+// (GFX.effectsTier: the preset, lowered by the Advanced Effects-quality
+// setting), never the frame-rate governor, and a graphics-profile change
+// rebuilds the props (the resetter below).
 //
 // Text: each destination is a canvas painted once (the plate's cream paint and
 // the name, fitted to the plate) and shared by every marker that reads it, on a
@@ -254,6 +255,9 @@ function paintPlate(p: PaintedPlate): void {
   ctx.strokeRect(22, 22, w - 44, h - 44);
   const label = harborDestinationLabel(p.dest);
   if (!label) {
+    // a destination content has retired: a blank plate, and a note for whoever
+    // edits the markers (content/harbor_route_markers.ts)
+    console.warn(`harbor route marker: no label for ${destKey(p.dest)}`);
     p.texture.needsUpdate = true;
     return;
   }
@@ -283,8 +287,11 @@ function hookRepaint(): void {
   if (repaintHooked || typeof document === 'undefined') return;
   repaintHooked = true;
   document.addEventListener('woc:languagechange', repaintAll);
-  // the plate font is a web font: repaint once it has arrived
+  // the plate font is a web font: repaint once it has arrived, whether it was
+  // already loading at the first paint (ready) or starts loading later
+  // (loadingdone, the nameplate canvas's idiom)
   document.fonts?.ready.then(repaintAll).catch(() => undefined);
+  document.fonts?.addEventListener?.('loadingdone', repaintAll);
 }
 
 function plateFor(
@@ -351,7 +358,10 @@ export function buildHarborRouteMarker(def: HarborRouteMarkerDef, seed: number):
 export function buildHarborRouteMarkers(seed: number): THREE.Group {
   const group = new THREE.Group();
   group.name = 'harborRouteMarkers';
-  if (!loaded) return group;
+  if (!loaded) {
+    console.warn(`harbor route markers skipped: ${MARKER_URL} was not preloaded`);
+    return group;
+  }
   for (const def of HARBOR_ROUTE_MARKERS) group.add(buildHarborRouteMarker(def, seed));
   return group;
 }
@@ -370,4 +380,15 @@ export function harborRouteMarkerPrewarmParts(): readonly MarkerPart[] {
 export const harborRouteMarkerInternalsForTest = {
   assetUrl: MARKER_URL,
   destinationLabel: harborDestinationLabel,
+  /** Hand a parsed GLB to the preload slot (Node tests have no fetch path). */
+  setLoadedGltfForTest(gltf: GLTF | null): void {
+    loaded = gltf;
+    resetHarborRouteMarkerCaches();
+  },
+  /** Repaint every plate (what a language switch or the web font does). */
+  repaintAll,
+  /** Forget the painted plates (their canvases belong to one test's document). */
+  clearPlatesForTest(): void {
+    plates.clear();
+  },
 };

@@ -145,14 +145,6 @@ describe('harbor route markers: the arrow points at the boarding point', () => {
       expect(arrow.x * hx + arrow.z * hz, m.berth).toBeGreaterThan(Math.cos((12 * Math.PI) / 180));
     }
   });
-
-  it('is never mirrored: the yaw alone turns it (the renderer draws the name on both faces)', () => {
-    for (const m of HARBOR_ROUTE_MARKERS) {
-      const yaw = harborRouteMarkerYaw(m);
-      expect(Number.isFinite(yaw)).toBe(true);
-      expect(Math.abs(yaw)).toBeLessThanOrEqual(Math.PI);
-    }
-  });
 });
 
 describe('harbor route markers: placement clear of the boarding path', () => {

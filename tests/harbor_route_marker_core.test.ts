@@ -87,8 +87,11 @@ describe('harbor route marker destination plate', () => {
     // the back plane's reading direction (its local +x) runs along the sign's
     // -x, which is left to right for a player standing behind the board
     expect(Math.cos(faces[1].yaw)).toBeCloseTo(-1, 12);
-    // and its face (local +z) looks out of the back
-    expect(Math.cos(faces[1].yaw) * 1).toBeLessThan(0);
+    // and its face (local +z, turned by the yaw about y: z' = cos yaw) looks out
+    // of the back, while the front's looks out of the front
+    expect(Math.cos(faces[0].yaw)).toBeCloseTo(1, 12);
+    expect(faces[1].z).toBeLessThan(0);
+    expect(faces[0].z).toBeGreaterThan(0);
   });
 
   it('cuts the plate to the painted panel: clipped corners, UVs spanning the canvas', () => {
