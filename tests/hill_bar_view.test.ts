@@ -10,7 +10,13 @@ import {
   HILL_COLOR_OTHERS,
   HILL_COLOR_UNHELD,
   HILL_COLOR_YOURS,
+  HILL_RADIAL_STEP_YARDS,
+  HILL_RIM_INNER_T,
+  HILL_RIM_OUTER_T,
+  hillFillAlpha,
   hillPulseSpeed,
+  hillRadialStops,
+  hillRimAlpha,
   hillRingKey,
   hillRingPlan,
 } from '../src/render/hill_ring_core';
@@ -357,5 +363,40 @@ describe('the sim lines the client matcher re-localizes', () => {
     expect(localizeSimText(hillRiseLine('The Drakelands'))).not.toBeNull();
     expect(localizeSimText(hillWarningLine('The Drakelands', 15))).not.toBeNull();
     expect(localizeSimText(hillFallenLine('The Drakelands'))).not.toBeNull();
+  });
+});
+
+describe('the hill circle radial profile (hill_ring_core)', () => {
+  it('keeps the wash clear at the centre and strongest toward the edge, nothing outside', () => {
+    expect(hillFillAlpha(0)).toBe(0);
+    expect(hillFillAlpha(0.25)).toBeLessThan(hillFillAlpha(0.5));
+    expect(hillFillAlpha(0.5)).toBeLessThan(hillFillAlpha(0.95));
+    expect(hillFillAlpha(1)).toBe(0);
+    expect(hillFillAlpha(1.2)).toBe(0);
+  });
+
+  it('peaks the rim glow on the true radius and feathers it to nothing both ways', () => {
+    expect(hillRimAlpha(1)).toBeCloseTo(1, 10);
+    expect(hillRimAlpha(HILL_RIM_INNER_T)).toBe(0);
+    expect(hillRimAlpha(HILL_RIM_OUTER_T)).toBe(0);
+    expect(hillRimAlpha(0.5)).toBe(0);
+    const inside = hillRimAlpha((HILL_RIM_INNER_T + 1) / 2);
+    const outside = hillRimAlpha((1 + HILL_RIM_OUTER_T) / 2);
+    expect(inside).toBeGreaterThan(0);
+    expect(inside).toBeLessThan(1);
+    expect(outside).toBeGreaterThan(0);
+    expect(outside).toBeLessThan(1);
+  });
+
+  it('spaces the draped rings no further apart than the step, ends included', () => {
+    // The flat centre-to-rim fan cut through slopes; a stop every couple of
+    // yards drapes the circle on the ground.
+    const stops = hillRadialStops(50, 0, 1, HILL_RADIAL_STEP_YARDS);
+    expect(stops[0]).toBe(0);
+    expect(stops.at(-1)).toBe(1);
+    for (let i = 1; i < stops.length; i++) {
+      expect((stops[i] - stops[i - 1]) * 50).toBeLessThanOrEqual(HILL_RADIAL_STEP_YARDS + 1e-9);
+    }
+    expect(hillRadialStops(50, 0.9, 0.9, 1)).toEqual([0.9, 0.9]);
   });
 });
