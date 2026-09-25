@@ -733,6 +733,7 @@ import {
   snapShadowAnchor,
 } from './shadow_texel_snap_core';
 import { disposeUnsharedMeshResources, markSharedMaterial } from './shared_resource';
+import { shipShadowHold } from './ship_shadow_hold';
 import {
   buildSky,
   ensureSkyAssetsAt,
@@ -4595,8 +4596,7 @@ export class Renderer {
    *  prewarm's and census probe's save/restore of the shadowMap flags heals
    *  itself (shadow_cadence_core.ts / shadow_extent_core.ts own the rules). */
   private applyShadowShed(): void {
-    // The live ortho box: consumers read it back off the camera, so this write
-    // is the whole wiring.
+    // The live ortho box: consumers read it back off the camera (the whole wiring).
     const cam = this.sun.shadow.camera;
     const extent = shadowExtentHalf(this.shadowBaseExtent, this.shadowExtent.scale);
     if (cam.top !== extent) {
@@ -4609,7 +4609,7 @@ export class Renderer {
     }
     if (!this.sun.castShadow) return;
     const shadowMap = this.webgl.shadowMap;
-    const autoUpdate = !this.shadowCadence.halfRate;
+    const autoUpdate = !this.shadowCadence.halfRate || shipShadowHold(this.sim, this.sun, extent);
     if (shadowMap.autoUpdate !== autoUpdate) shadowMap.autoUpdate = autoUpdate;
     // Under half rate three skips the pass when both flags are false and clears
     // needsUpdate after each pass, so the every-other-frame arm is this write.

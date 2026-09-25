@@ -165,6 +165,11 @@ describe('shadow feature renderer wiring', () => {
     );
     const apply = methodBody('private applyShadowShed');
     expect(apply).toContain('const autoUpdate = !this.shadowCadence.halfRate');
+    // ...except around a ship under way (ship_shadow_hold.ts): a stale map
+    // every other frame flickers the moving ship's own shadows
+    expect(apply).toContain(
+      '!this.shadowCadence.halfRate || shipShadowHold(this.sim, this.sun, extent)',
+    );
     expect(apply).toContain(
       'if (!autoUpdate && this.shadowCadence.renderThisFrame) shadowMap.needsUpdate = true',
     );
