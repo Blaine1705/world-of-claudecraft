@@ -108,7 +108,8 @@ describe('with the kit not ready', () => {
     expect(rig.drawn()).toBe(0);
     expect(rig.vfxCalls).toEqual([]);
     expect(rig.readiness.snapshot()).toMatchObject({ requirementMiss: 0 });
-    expect(rig.readiness.snapshot().families[1].refused).toBeGreaterThan(0);
+    // One cast, refused once at its cue; its contact rides the latch.
+    expect(rig.readiness.snapshot().families[1].refused).toBe(1);
   });
 
   it('draws a Mage cast whole, and never asks it for the kit', () => {
@@ -274,6 +275,7 @@ describe('a queued recast of the same ability', () => {
       rig.step();
     }
     expect(rig.drawn()).toBe(CAST_VFX_ENGINE);
+    expect(rig.readiness.snapshot()).toMatchObject({ refused: 1, requirementMiss: 0 });
   });
 });
 
@@ -380,6 +382,8 @@ describe('a white swing', () => {
     rig.painter.onDamage(swing(MAGE));
     rig.step(10);
     expect(rig.drawn()).toBe(CAST_VFX_ENGINE);
+    // A swing is a per-frame read, never a counted cast.
+    expect(rig.readiness.snapshot()).toMatchObject({ refused: 0, requirementMiss: 0 });
   });
 });
 
@@ -690,6 +694,11 @@ describe('the kit deadline', () => {
     rig.resetDrawn();
     shieldSlam(rig);
     expect(rig.drawn() & CAST_VFX_ENGINE).toBe(CAST_VFX_ENGINE);
-    expect(rig.readiness.snapshot().families[1]).toMatchObject({ ready: true, forced: true });
+    expect(rig.readiness.snapshot().families[1]).toMatchObject({
+      ready: true,
+      forced: true,
+      refused: 1,
+      requirementMiss: 0,
+    });
   });
 });

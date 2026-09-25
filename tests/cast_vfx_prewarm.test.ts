@@ -8,7 +8,7 @@
 // gate reads the record.
 
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   CAST_VFX_ENGINE,
   CAST_VFX_KIT,
@@ -275,6 +275,27 @@ describe('the scene cast-VFX gate over three', () => {
     expect(readiness.admit(GATED)).toBe(true);
     expect(readiness.snapshot()).toMatchObject({ ready: true, forced: false, requirementMiss: 0 });
     expect(readiness.snapshot().families[1]).toMatchObject({ id: 'kit', declined: true });
+  });
+
+  it("reads the device's real kit decline by default", async () => {
+    // A fresh module graph, so the decline stays out of the other cases.
+    vi.resetModules();
+    const three = await import('three');
+    const family = await import('../src/render/cast_vfx_family');
+    const assets = await import('../src/render/ability_vfx/production_assets');
+    const { createSceneCastVfxReadiness: sceneGate } = await import(
+      '../src/render/cast_vfx_prewarm'
+    );
+    const scene = new three.Scene();
+    const crest = new three.Mesh(new three.PlaneGeometry(1, 1), new three.MeshBasicMaterial());
+    family.tagCastVfxKit(crest);
+    scene.add(crest);
+    const readiness = sceneGate(scene, { properties: { get: () => ({ currentProgram: null }) } });
+    expect(readiness.snapshot().families[1]).toMatchObject({ id: 'kit', declined: false });
+    expect(await assets.ensureWarriorKitAssets(true)).toBe(false);
+    expect(assets.warriorKitAssetsState()).toBe('declined');
+    expect(readiness.snapshot().families[1]).toMatchObject({ id: 'kit', declined: true });
+    expect(readiness.admit(CAST_VFX_KIT)).toBe(true);
   });
 
   it('starts no deadline clock on a diagnostics read taken before the first consult', () => {

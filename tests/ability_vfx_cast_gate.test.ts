@@ -256,6 +256,10 @@ describe('the Warrior follow-through the renderer routes to the painter', () => 
     expect(touched).toEqual(new Set());
     // Any other aura is not the painter's, gate or not.
     expect(painter.onWarriorControlAura({ ...sunder, abilityId: 'frost_armor' })).toBe(false);
+    // The same mark, kit ready, queues its authored peel.
+    const open = painterWith(() => true);
+    expect(open.painter.onWarriorControlAura(sunder)).toBe(true);
+    expect(open.touched).toEqual(new Set(['queueWarriorControl']));
   });
 
   it('claims Bloodletting and suppresses the generic bloom while the kit is not ready', () => {
@@ -274,6 +278,11 @@ describe('the Warrior follow-through the renderer routes to the painter', () => 
     // A heal that is no Warrior recovery reaches the engine's own answer.
     painter.warriorRecovery({ ...heal, abilityId: 'flash_heal', ability: 'Flash Heal' }, 400);
     expect(touched).toEqual(new Set(['warriorRecovery']));
+    // The same recovery, kit ready, reaches the engine's bloom.
+    const open = painterWith(() => true);
+    open.painter.warriorRecovery(heal, 400);
+    expect(open.calls.map((call) => call.name)).toEqual(['warriorRecovery']);
+    expect(open.calls[0].args[0]).toBe(heal);
   });
 });
 
@@ -295,6 +304,20 @@ describe('events that name their cast loosely', () => {
       amount: 40,
     });
     expect(touched).toEqual(new Set());
+    // The same contact, kit ready, draws its authored strike.
+    const open = painterWith(() => true);
+    open.painter.onDamage({
+      sourceId: 1,
+      targetId: 2,
+      school: 'physical',
+      ability: ABILITIES.shield_slam.name,
+      abilityId: 'no_such_proc_for_the_gate',
+      kind: 'hit',
+      crit: false,
+      amount: 40,
+    });
+    expect(open.calls.map((call) => call.name)).toEqual(['sequenceInstant']);
+    expect(open.calls[0].args[0]).toBe('shield_slam');
   });
 
   it('decides a point landing that names no caster on its own, with no latch to share', () => {
