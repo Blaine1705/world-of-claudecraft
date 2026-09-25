@@ -10074,7 +10074,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.ferry.departsIn'
   | 'hudChrome.ferry.regionLabel'
   | 'hudChrome.ferry.sailing'
-  | 'hudChrome.ferry.seaCardBody'
   | 'hudChrome.finder.accept'
   | 'hudChrome.finder.acceptApplicantAria'
   | 'hudChrome.finder.accepted'

@@ -688,12 +688,11 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 14, '.setAttribute': 3 },
     reflowAllow: {},
   },
-  // the ferry panel + sea card are built once in ensureEls (six class names,
-  // the panel's status role and the card's aria-hidden); every update write is
-  // facet-routed.
+  // the ferry panel is built once in ensureEls (three class names and the
+  // panel's status role); every update write is facet-routed.
   {
     file: 'hud/transport/ferry_hud_painter.ts',
-    allow: { '.className': 6, '.setAttribute': 2 },
+    allow: { '.className': 3, '.setAttribute': 1 },
     reflowAllow: {},
   },
   // 3 one-time pooled-node builds (createNode's .buff/.dur/.stacks) + the overflow

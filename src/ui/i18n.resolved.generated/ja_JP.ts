@@ -348,8 +348,7 @@ export const ja_JP: EnTranslations = {
       "departsIn": "{dest}行きの渡し船は{time}後に出航します",
       "castingOff": "{dest}行きの渡し船が出航します",
       "boardHint": "出航の時に甲板に立っていれば一緒に出発できます。運賃は無料です。",
-      "sailing": "{dest}へ航行中",
-      "seaCardBody": "航海の途中です。"
+      "sailing": "{dest}へ航行中"
     },
     "materialStackSelectionUnavailable": "この素材の選択は利用できなくなりました。",
     "warlock": {

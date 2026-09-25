@@ -1,16 +1,13 @@
 // Thin facet-routed painter for the ferry HUD: the small timetable panel near
 // the top of the screen (the countdown to the next departure plus the
-// boarding hint, or the sailing line aboard) and the full-screen sea card a
-// passenger sails behind on the at-sea leg. The consumer half of the pure-core
-// + thin-painter split over ferry_hud_view.ts: it owns only the lazily built
-// DOM under the injected mount, and EVERY per-update write routes through the
-// PainterHost elided writers. The card's fade is a CSS opacity transition on a
-// class (hud.css "ferry timetable"), so this runs on the HUD's medium band and
-// the fade stays smooth between updates; reduced motion drops the transition
-// there. Text re-renders through t() each update and relies on writer elision,
+// boarding hint, or the quiet sailing line aboard). The consumer half of the
+// pure-core + thin-painter split over ferry_hud_view.ts: it owns only the
+// lazily built DOM under the injected mount, and EVERY per-update write
+// routes through the PainterHost elided writers. It runs on the HUD's medium
+// band. Text re-renders through t() each update and relies on writer elision,
 // so a language switch applies on the next update.
 //
-// Fairness: the countdown and the card are the same on every graphics tier.
+// Fairness: the countdown is the same on every graphics tier.
 
 import type { Entity } from '../../../sim/types';
 import type { TransportFerryView } from '../../../world_api';
@@ -23,9 +20,6 @@ interface FerryHudEls {
   root: HTMLElement;
   line: HTMLElement;
   hint: HTMLElement;
-  card: HTMLElement;
-  cardTitle: HTMLElement;
-  cardBody: HTMLElement;
 }
 
 /** m:ss with localized digits (the Yumi match clock's form). */
@@ -46,7 +40,7 @@ export class FerryHudPainter {
 
   update(view: TransportFerryView | null, player: Entity | undefined): void {
     const m = ferryHudModel(view, player?.pos.x ?? 0, player?.pos.z ?? 0, this.model);
-    if (m.line === 'none' && !m.card && !this.els) return;
+    if (m.line === 'none' && !this.els) return;
     const els = this.ensureEls();
     if (!els) return;
     const dest = poiMarkLabel(m.destPoi) ?? '';
@@ -63,11 +57,6 @@ export class FerryHudPainter {
     this.w.setStyleProp(els.hint, 'display', m.hint ? 'block' : 'none');
     if (m.hint) this.w.setText(els.hint, t('hudChrome.ferry.boardHint'));
     this.w.setAttr(els.root, 'aria-label', t('hudChrome.ferry.regionLabel'));
-    this.w.toggleClass(els.card, 'shown', m.card);
-    if (m.card) {
-      this.w.setText(els.cardTitle, t('hudChrome.ferry.sailing', { dest }));
-      this.w.setText(els.cardBody, t('hudChrome.ferry.seaCardBody'));
-    }
   }
 
   // Build the DOM once under the mount; static structure only (all text and
@@ -85,23 +74,8 @@ export class FerryHudPainter {
     const hint = document.createElement('div');
     hint.className = 'ferry-hud-hint';
     root.append(line, hint);
-    // The card is presentation: the status line already says where the ship
-    // is sailing, so assistive tech is not told twice.
-    const card = document.createElement('div');
-    card.id = 'ferry-sea-card';
-    card.className = 'ferry-sea-card';
-    card.setAttribute('aria-hidden', 'true');
-    const cardTitle = document.createElement('div');
-    cardTitle.className = 'ferry-sea-title';
-    const cardBody = document.createElement('div');
-    cardBody.className = 'ferry-sea-body';
-    card.append(cardTitle, cardBody);
-    // The card is a sibling of the HUD root, not a child: it stacks between the
-    // game canvas and the HUD (hud.css), so it hides the world, never the
-    // player's own interface (health, chat, bars stay drawn above it).
-    (mount.parentElement ?? mount).append(card);
     mount.append(root);
-    this.els = { root, line, hint, card, cardTitle, cardBody };
+    this.els = { root, line, hint };
     return this.els;
   }
 }

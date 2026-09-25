@@ -1009,7 +1009,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'medium',
     gate: '',
     surface: 'chrome',
-    why: 'the scheduled ferry countdown panel and the at-sea card class (the fade itself is a CSS transition), facet-routed',
+    why: 'the scheduled ferry countdown panel and the sailing line, facet-routed',
   },
   {
     call: 'this.updateMapWindow',

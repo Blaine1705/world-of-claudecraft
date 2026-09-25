@@ -348,8 +348,7 @@ export const zh_TW: EnTranslations = {
       "departsIn": "前往{dest}的渡船將在{time}後啟航",
       "castingOff": "前往{dest}的渡船正在啟航",
       "boardHint": "啟航時站在甲板上即可隨船出發。渡船免費。",
-      "sailing": "正在駛往{dest}",
-      "seaCardBody": "航行進行中。"
+      "sailing": "正在駛往{dest}"
     },
     "materialStackSelectionUnavailable": "此素材選擇已失效。",
     "warlock": {

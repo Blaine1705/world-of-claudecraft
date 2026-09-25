@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 //
 // The ferry HUD (src/ui/hud/transport/): the pure view-core that turns the
-// world's timetable view into the panel line, the hint and the sea card, fed
-// identically by the offline Sim and the online ClientWorld, and the thin
-// painter that writes it through the elided writers.
+// world's timetable view into the panel line and the hint, fed identically by
+// the offline Sim and the online ClientWorld, and the thin painter that
+// writes it through the elided writers. The voyage is in plain sight now
+// (Phase 3), so there is no sea card over the world.
 
 import { beforeAll, describe, expect, it } from 'vitest';
 
@@ -13,15 +14,10 @@ import {
   emptyTransportFerryView,
   type TransportFerryView,
   transportFerryViewAt,
+  transportVoyageSeconds,
 } from '../src/sim/transport_schedule';
 import { WORLD_SEED } from '../src/sim/world_seed';
-import {
-  FERRY_CARD_LEAD_S,
-  FERRY_CARD_TAIL_S,
-  FERRY_HUD_NEAR_YD,
-  FerryHudPainter,
-  ferryHudModel,
-} from '../src/ui/hud/transport';
+import { FERRY_HUD_NEAR_YD, FerryHudPainter, ferryHudModel } from '../src/ui/hud/transport';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import { bareClient } from './helpers/bare_client';
@@ -30,8 +26,7 @@ const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
 const T = ROUTE.timings;
 const EAST = ROUTE.berths[0];
 const DEPART = T.docked;
-const AT_SEA = DEPART + T.departing;
-const ARRIVE = AT_SEA + T.atSea;
+const ARRIVE = DEPART + transportVoyageSeconds(ROUTE, 0);
 
 function viewAt(clock: number, passenger: boolean): TransportFerryView {
   return transportFerryViewAt(ROUTE, clock, -4.3, passenger, emptyTransportFerryView(ROUTE));
@@ -45,7 +40,6 @@ describe('ferryHudModel', () => {
       destPoi: 'poi:galecrest:wickharbor',
       seconds: 45,
       hint: true,
-      card: false,
     });
     // the last second reads as casting off
     expect(ferryHudModel(viewAt(DEPART - 0.2, false), EAST.x, EAST.z).line).toBe('departsIn');
@@ -60,18 +54,19 @@ describe('ferryHudModel', () => {
     expect(ferryHudModel(null, EAST.x, EAST.z).line).toBe('none');
   });
 
-  it('puts the sea card up around the at-sea leg for a passenger only', () => {
-    const card = (clock: number) => ferryHudModel(viewAt(clock, true), 0, 0).card;
-    expect(ferryHudModel(viewAt(DEPART + 1, true), 0, 0).line).toBe('sailing');
-    expect(card(DEPART + 1)).toBe(false);
-    expect(card(AT_SEA - FERRY_CARD_LEAD_S + 0.01)).toBe(true);
-    expect(card(AT_SEA + T.atSea / 2)).toBe(true);
-    expect(card(ARRIVE + FERRY_CARD_TAIL_S - 0.01)).toBe(true);
-    expect(card(ARRIVE + FERRY_CARD_TAIL_S + 0.1)).toBe(false);
-    expect(ferryHudModel(viewAt(AT_SEA + 1, false), 0, 0).card).toBe(false);
+  it('shows a passenger the quiet sailing line the whole voyage long', () => {
+    for (const clock of [DEPART + 1, (DEPART + ARRIVE) / 2, ARRIVE - 1]) {
+      expect(ferryHudModel(viewAt(clock, true), 0, 0)).toEqual({
+        line: 'sailing',
+        destPoi: 'poi:galecrest:wickharbor',
+        seconds: 0,
+        hint: false,
+      });
+    }
+    // a bystander sees nothing while it sails
+    expect(ferryHudModel(viewAt((DEPART + ARRIVE) / 2, false), 0, 0).line).toBe('none');
     // bound for Wickharbor on the way out, Eastbrook on the way back
-    expect(ferryHudModel(viewAt(DEPART + 1, true), 0, 0).destPoi).toBe('poi:galecrest:wickharbor');
-    expect(ferryHudModel(viewAt(ARRIVE + T.arriving + T.docked + 1, true), 0, 0).destPoi).toBe(
+    expect(ferryHudModel(viewAt(ARRIVE + T.docked + 1, true), 0, 0).destPoi).toBe(
       'poi:eastbrook_vale:eastbrook',
     );
   });
@@ -81,7 +76,7 @@ describe('ferryHudModel', () => {
     const client = bareClient(sim.player.id);
     const apply = (s: unknown) =>
       (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(s);
-    for (const clock of [12, 59.2, 63, 71, 82, 120]) {
+    for (const clock of [12, 59.2, 63, 71, 82, 120, ARRIVE + 3, ARRIVE + 70]) {
       sim.transportClockOffset = clock - sim.time;
       apply({ t: 'snap', time: clock, ents: [] });
       const offline = ferryHudModel(sim.ferryView(), EAST.landing.x, EAST.landing.z);
@@ -131,27 +126,25 @@ describe('FerryHudPainter', () => {
     expect(mount.children).toHaveLength(0);
   });
 
-  it('paints the countdown on the pier, then the sailing line and the sea card aboard', () => {
+  it('paints the countdown on the pier, then the sailing line aboard, and no sea card', () => {
+    const host = document.createElement('div');
     const mount = document.createElement('div');
+    host.append(mount);
     const painter = new FerryHudPainter(writers(), () => mount);
     const player = { pos: { x: EAST.landing.x, y: 0, z: EAST.landing.z } } as never;
     painter.update(viewAt(15, false), player);
     const root = mount.querySelector<HTMLElement>('#ferry-hud');
-    const card = mount.querySelector<HTMLElement>('#ferry-sea-card');
-    if (!root || !card) throw new Error('not built');
+    if (!root) throw new Error('not built');
     expect(root.getAttribute('role')).toBe('status');
     expect(root.style.display).toBe('flex');
     expect(root.textContent).toContain('The ferry to Wickharbor departs in 0:45');
     expect(root.textContent).toContain('The crossing is free.');
-    expect(card.classList.contains('shown')).toBe(false);
-    expect(card.getAttribute('aria-hidden')).toBe('true');
-    painter.update(viewAt(AT_SEA + 2, true), player);
+    painter.update(viewAt(DEPART + 40, true), player);
     expect(root.textContent).toContain('Sailing to Wickharbor');
-    expect(card.classList.contains('shown')).toBe(true);
-    expect(card.textContent).toContain('Sailing to Wickharbor');
-    // docked at Wickharbor and far from it: the panel hides, the card drops
-    painter.update(viewAt(ARRIVE + T.arriving + 5, false), player);
+    // nothing covers the world: the voyage is in sight
+    expect(host.querySelector('#ferry-sea-card')).toBeNull();
+    // docked at Wickharbor and far from it: the panel hides
+    painter.update(viewAt(ARRIVE + 5, false), player);
     expect(root.style.display).toBe('none');
-    expect(card.classList.contains('shown')).toBe(false);
   });
 });
