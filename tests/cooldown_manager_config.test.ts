@@ -30,7 +30,8 @@ const group = (kind: CooldownGroup['kind'], spells: string[], extra: Partial<Coo
 describe('cooldown manager groups: capacity and layout cells', () => {
   it('holds one spell in a single button, a fixed line, and perLine x lines in a grid', () => {
     expect(cooldownGroupCapacity(group('single', []))).toBe(1);
-    expect(cooldownGroupCapacity(group('line', []))).toBe(COOLDOWN_LINE_MAX);
+    expect(cooldownGroupCapacity(group('line', []))).toBe(12);
+    expect(COOLDOWN_LINE_MAX).toBe(12);
     expect(cooldownGroupCapacity(group('grid', [], { perLine: 4, lines: 2 }))).toBe(8);
   });
 
@@ -108,7 +109,7 @@ describe('cooldown manager groups: sanitizing a save', () => {
       id: `g${i + 1}`,
       kind: 'single',
     }));
-    expect(sanitizeCooldownGroups(many)).toHaveLength(COOLDOWN_MAX_GROUPS);
+    expect(sanitizeCooldownGroups(many)).toHaveLength(12);
     const wild = sanitizeCooldownGroup({
       id: 'g1',
       kind: 'grid',
@@ -131,7 +132,7 @@ describe('cooldown manager groups: sanitizing a save', () => {
       padding: 12,
       opacity: 0.2,
       perLine: 1,
-      lines: COOLDOWN_GRID_MAX_SIDE,
+      lines: 12,
       orientation: 'horizontal',
       direction: 'forward',
       visibility: 'always',
@@ -143,7 +144,7 @@ describe('cooldown manager groups: sanitizing a save', () => {
     const named = (name: unknown) => sanitizeCooldownGroup({ id: 'g1', kind: 'line', name })?.name;
     expect(named('  Burst   Window ')).toBe('Burst Window');
     expect(named('Tab\there\nnewline')).toBe('Tab here newline');
-    expect(named('x'.repeat(COOLDOWN_GROUP_NAME_MAX + 10))).toHaveLength(COOLDOWN_GROUP_NAME_MAX);
+    expect(named('x'.repeat(COOLDOWN_GROUP_NAME_MAX + 10))).toHaveLength(32);
     expect(named(42)).toBe('');
     expect(named(undefined)).toBe('');
     expect(sanitizeCooldownGroupName('   ')).toBe('');

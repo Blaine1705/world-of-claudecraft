@@ -77,6 +77,32 @@ export interface CooldownManagerControllerDeps {
 }
 
 const NO_GLOW: ReadonlySet<string> = new Set();
+
+/**
+ * Every action-bar input field the per-frame snapshot refreshes: all of them but
+ * `entities`, which is re-read from the live world each frame (the Hud's own
+ * iterator is single-use). Pinned against the full ActionBarWorldInput key set in
+ * tests/cooldown_manager_controller.test.ts, so a field added to the input cannot
+ * stay frozen at its first-frame value here.
+ */
+export const COOLDOWN_WORLD_FIELDS = [
+  'player',
+  'target',
+  'inventory',
+  'stealthed',
+  'paladinSpec',
+  'playerClass',
+  'fateThreads',
+  'activeAimSlot',
+] as const satisfies readonly Exclude<keyof ActionBarWorldInput, 'entities'>[];
+
+function copyWorldField<K extends keyof ActionBarWorldInput>(
+  to: ActionBarWorldInput,
+  from: ActionBarWorldInput,
+  key: K,
+): void {
+  to[key] = from[key];
+}
 const AURA_ICON_PREFIX = 'aura:';
 const SEEN_AURA_ID_RE = /^[a-z0-9_]{1,64}$/;
 
@@ -128,6 +154,8 @@ export class CooldownManagerController {
   // the hotbar this frame, unioned with the Auras panel's set without allocating.
   private readonly glowIds = new Set<string>();
   private readonly glowUnion = new Set<string>();
+  /** The set readyGlowAbilityIds() hands out until the next paint. */
+  private glowOut: ReadonlySet<string> | null = null;
 
   constructor(private readonly deps: CooldownManagerControllerDeps) {
     const doc = deps.doc ?? document;
@@ -161,13 +189,7 @@ export class CooldownManagerController {
     const soundsAllowed = enabled && (!soundInCombatOnly || inCombat);
     const own = this.world ?? { ...world };
     this.world = own;
-    own.player = world.player;
-    own.target = world.target;
-    own.inventory = world.inventory;
-    own.stealthed = world.stealthed;
-    own.paladinSpec = world.paladinSpec;
-    own.fateThreads = world.fateThreads;
-    own.activeAimSlot = world.activeAimSlot;
+    for (const key of COOLDOWN_WORLD_FIELDS) copyWorldField(own, world, key);
     own.entities = this.deps.world.entities.values();
     const state = this.view.tick(own, { soundsAllowed, preview: this.placement });
     this.recordSeen(world.player.auras);
@@ -183,6 +205,7 @@ export class CooldownManagerController {
       state,
     );
     this.glowIds.clear();
+    this.glowOut = null;
     if (enabled) {
       for (const button of state.buttons) {
         if (!button.hotbarGlow || button.abilityId === null) continue;
@@ -196,17 +219,26 @@ export class CooldownManagerController {
 
   /**
    * The ability ids the action bar should light: this manager's ready spells
-   * unioned with the Auras panel's set. Returns one input when the other is
-   * empty and otherwise a reused set, so the per-frame call never allocates.
+   * unioned with the Auras panel's set. The action bar asks once per slot, so
+   * the answer is built on the first ask after each paint() and every later ask
+   * returns the stored set. It is built lazily rather than at the end of paint()
+   * because the bar reads it BEFORE this manager paints each frame, after the
+   * Auras panel has painted: built here, the Auras half is never a frame old.
+   * Returns one input when the other is empty and otherwise a reused set, so it
+   * never allocates.
    */
   readyGlowAbilityIds(): ReadonlySet<string> {
+    if (this.glowOut) return this.glowOut;
     const other = this.deps.auraGlowIds?.() ?? NO_GLOW;
-    if (this.glowIds.size === 0) return other;
-    if (other.size === 0) return this.glowIds;
-    this.glowUnion.clear();
-    for (const id of other) this.glowUnion.add(id);
-    for (const id of this.glowIds) this.glowUnion.add(id);
-    return this.glowUnion;
+    if (this.glowIds.size === 0) this.glowOut = other;
+    else if (other.size === 0) this.glowOut = this.glowIds;
+    else {
+      this.glowUnion.clear();
+      for (const id of other) this.glowUnion.add(id);
+      for (const id of this.glowIds) this.glowUnion.add(id);
+      this.glowOut = this.glowUnion;
+    }
+    return this.glowOut;
   }
 
   /** The Options > Cooldown Manager surface over this controller. */

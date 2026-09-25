@@ -4,6 +4,7 @@ import { ABILITIES } from '../src/sim/content/classes';
 import type { ResolvedAbility } from '../src/sim/sim';
 import type { ActionBarWorldInput } from '../src/ui/hud/action_bar/action_bar_view';
 import {
+  COOLDOWN_WORLD_FIELDS,
   CooldownManagerController,
   type CooldownManagerWorld,
 } from '../src/ui/hud/cooldown_manager/cooldown_manager_controller';
@@ -236,12 +237,37 @@ describe('CooldownManagerController', () => {
     const own = controller.readyGlowAbilityIds();
     expect([...own]).toEqual(['rake']);
     setAuraGlow(['execute']);
+    controller.paint(snapshot);
     const union = controller.readyGlowAbilityIds();
     expect([...union].sort()).toEqual(['execute', 'rake']);
+    // Built once per frame: the bar asks once per slot, and every later ask
+    // until the next paint returns the stored set without rebuilding it.
+    setAuraGlow(['judgement']);
     expect(controller.readyGlowAbilityIds()).toBe(union);
+    expect([...union].sort()).toEqual(['execute', 'rake']);
+    setAuraGlow(['execute']);
     cooldowns.set('rake', 5);
     controller.paint(snapshot);
     expect([...controller.readyGlowAbilityIds()]).toEqual(['execute']);
+  });
+
+  it('refreshes every action-bar input field per frame, not a hand-picked few', () => {
+    // Required<> makes tsc fail here until a field added to ActionBarWorldInput
+    // is added to this sample, and the key check then fails until it is added to
+    // COOLDOWN_WORLD_FIELDS, so no field can stay frozen at its first frame.
+    const sample: Required<ActionBarWorldInput> = {
+      player: {} as ActionBarWorldInput['player'],
+      target: null,
+      inventory: [],
+      stealthed: false,
+      paladinSpec: null,
+      playerClass: null,
+      fateThreads: 0,
+      entities: [],
+      activeAimSlot: null,
+    };
+    const refreshed = Object.keys(sample).filter((key) => key !== 'entities');
+    expect([...COOLDOWN_WORLD_FIELDS].sort()).toEqual(refreshed.sort());
   });
 
   it('hides a group by its visibility rule and shows every group while placing', () => {
