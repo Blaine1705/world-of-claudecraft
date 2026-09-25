@@ -3280,8 +3280,12 @@ export const WEAPON_VFX_UNTEXTURED_PARTS: Readonly<Record<string, readonly strin
  */
 function prewarmHostTexturedMaterial(side: THREE.Side): THREE.Material {
   const map = weaponVfxPrewarmHostMap();
-  if (!GFX.standardMaterials) return new THREE.MeshLambertMaterial({ color: 0xffffff, map, side });
+  const name = 'weapon-vfx-prewarm-host:textured';
+  if (!GFX.standardMaterials) {
+    return new THREE.MeshLambertMaterial({ name, color: 0xffffff, map, side });
+  }
   const material = new THREE.MeshStandardMaterial({
+    name,
     color: 0xffffff,
     map,
     normalMap: map,
@@ -3292,13 +3296,17 @@ function prewarmHostTexturedMaterial(side: THREE.Side): THREE.Material {
   return material;
 }
 
-/** An untextured part: deriveEmissive takes its flat-tint arm, and the name
- *  routes the same worn layer buildTintedClone gives that name. */
-function prewarmHostUntexturedMaterial(name: string): THREE.Material {
-  if (!GFX.standardMaterials) return new THREE.MeshLambertMaterial({ color: 0xffffff });
-  const material = new THREE.MeshStandardMaterial({ color: 0xffffff, name });
+/** An untextured part: deriveEmissive takes its flat-tint arm, and the GLB
+ *  name routes the same worn layer buildTintedClone gives that name. The
+ *  routing reads the name once, and three's key never does, so the host takes
+ *  its own name afterwards and a program label tells it from the live part. */
+function prewarmHostUntexturedMaterial(part: string): THREE.Material {
+  const name = `weapon-vfx-prewarm-host:${part}`;
+  if (!GFX.standardMaterials) return new THREE.MeshLambertMaterial({ name, color: 0xffffff });
+  const material = new THREE.MeshStandardMaterial({ color: 0xffffff, name: part });
   addRimGlow(material);
   applyRiggedWornDetail(material);
+  material.name = name;
   return material;
 }
 
@@ -3320,28 +3328,7 @@ export function buildWeaponVfxPrewarmSkinGroup(key: string): THREE.Group {
   group.name = `weapon-vfx-program-prewarm:${key}`;
   group.userData.renderCategory = 'prewarm';
 
-  // The host is the SHAPE of the worn skin's material on this tier, one
-  // surface per GLB material: a host keyed differently warms a program no live
-  // sighting asks for and leaves the real one to link on the first arrival.
-  const side = WEAPON_VFX_DOUBLE_SIDED_SKINS.has(key) ? THREE.DoubleSide : THREE.FrontSide;
-  const host = new THREE.Mesh(
-    new THREE.BoxGeometry(0.1, 1, 0.1),
-    prewarmHostTexturedMaterial(side),
-  );
-  host.name = `prewarm-skin-host:${key}`;
-  host.frustumCulled = false;
-  const surfaces: THREE.Mesh[] = [host];
-  for (const part of WEAPON_VFX_UNTEXTURED_PARTS[key] ?? []) {
-    // The GLB part has no UVs; neither does its twin.
-    const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-    geometry.deleteAttribute('uv');
-    const surface = new THREE.Mesh(geometry, prewarmHostUntexturedMaterial(part));
-    surface.name = `prewarm-skin-host:${key}:${part}`;
-    surface.frustumCulled = false;
-    host.add(surface);
-    surfaces.push(surface);
-  }
-
+  const surfaces: THREE.Mesh[] = [];
   let handle: WeaponVfxHandle | null = null;
   let disposed = false;
   const cleanup = (): void => {
@@ -3354,6 +3341,28 @@ export function buildWeaponVfxPrewarmSkinGroup(key: string): THREE.Group {
     }
   };
   try {
+    // The host is the SHAPE of the worn skin's material on this tier, one
+    // surface per GLB material: a host keyed differently warms a program no
+    // live sighting asks for and leaves the real one to link on the first
+    // arrival.
+    const side = WEAPON_VFX_DOUBLE_SIDED_SKINS.has(key) ? THREE.DoubleSide : THREE.FrontSide;
+    const host = new THREE.Mesh(
+      new THREE.BoxGeometry(0.1, 1, 0.1),
+      prewarmHostTexturedMaterial(side),
+    );
+    host.name = `prewarm-skin-host:${key}`;
+    host.frustumCulled = false;
+    surfaces.push(host);
+    for (const part of WEAPON_VFX_UNTEXTURED_PARTS[key] ?? []) {
+      // The GLB part has no UVs; neither does its twin.
+      const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+      geometry.deleteAttribute('uv');
+      const surface = new THREE.Mesh(geometry, prewarmHostUntexturedMaterial(part));
+      surface.name = `prewarm-skin-host:${key}:${part}`;
+      surface.frustumCulled = false;
+      host.add(surface);
+      surfaces.push(surface);
+    }
     handle = createWeaponVfx(host, spec, { grounded: false });
     // A visible light would change the scene's light counts, and those counts
     // are part of every program cache key: one extra point light here and the

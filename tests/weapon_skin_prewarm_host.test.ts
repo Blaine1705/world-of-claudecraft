@@ -64,7 +64,13 @@ import {
 } from '../src/render/characters/assets';
 import { weaponSkinModelUrl } from '../src/render/characters/manifest';
 import { CharacterVisual } from '../src/render/characters/visual';
-import { addRimGlow, GFX, type GfxTier, gfxInternalsForTest } from '../src/render/gfx';
+import {
+  addRimGlow,
+  GFX,
+  type GfxSettings,
+  type GfxTier,
+  gfxInternalsForTest,
+} from '../src/render/gfx';
 import { materialProgramSignature, prewarmProgramContentKeys } from '../src/render/prewarm_policy';
 import {
   buildWeaponVfxPrewarmSkinGroup,
@@ -83,7 +89,17 @@ import { resetSurfaceDetailProfileCaches } from '../src/render/worn_stone';
 import { WEAPON_TYPE_BY_ITEM } from '../src/sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 
-const TIERS: readonly GfxTier[] = ['low', 'medium', 'high', 'ultra', 'insane'];
+/** Every preset, plus the two knobs that move a key input off its preset:
+ *  the constrained-memory profile and the surface-detail dial turned off. */
+const PROFILES: readonly [string, GfxTier, Partial<GfxSettings>][] = [
+  ['low', 'low', {}],
+  ['medium', 'medium', {}],
+  ['high', 'high', {}],
+  ['ultra', 'ultra', {}],
+  ['insane', 'insane', {}],
+  ['ultra, constrained memory', 'ultra', { constrainedMemory: true }],
+  ['ultra, surface detail off', 'ultra', { surfaceDetail: false, surfaceDetailTaps: 0 }],
+];
 
 /** The skin id that displays a VFX model (WEAPON_VFX is keyed by model). */
 function skinIdFor(model: string): string | null {
@@ -180,11 +196,16 @@ interface GlbMaterialJson {
   pbrMetallicRoughness?: { baseColorTexture?: unknown; metallicRoughnessTexture?: unknown };
 }
 
-function glbMaterials(url: string): GlbMaterialJson[] {
+interface GlbJson {
+  materials?: GlbMaterialJson[];
+  images?: { mimeType?: string; uri?: string }[];
+  extensionsUsed?: string[];
+}
+
+function glbJson(url: string): GlbJson {
   const bytes = shippedGlb(url);
   const length = bytes.readUInt32LE(12);
-  const json = JSON.parse(bytes.subarray(20, 20 + length).toString('utf8'));
-  return json.materials ?? [];
+  return JSON.parse(bytes.subarray(20, 20 + length).toString('utf8'));
 }
 
 let restoreCanvas: (() => void) | null = null;
@@ -256,8 +277,15 @@ function onChestBone(mesh: THREE.Object3D): boolean {
   return false;
 }
 
-async function withTier(tier: GfxTier, run: () => void | Promise<void>): Promise<void> {
-  const restore = gfxInternalsForTest.overrideSettings(gfxInternalsForTest.settingsFor(tier));
+async function withTier(
+  tier: GfxTier,
+  run: () => void | Promise<void>,
+  overrides: Partial<GfxSettings> = {},
+): Promise<void> {
+  const restore = gfxInternalsForTest.overrideSettings({
+    ...gfxInternalsForTest.settingsFor(tier),
+    ...overrides,
+  });
   resetCharacterProfileCaches();
   resetSurfaceDetailProfileCaches();
   clearWeaponVfxTextureCacheForTest();
@@ -293,7 +321,14 @@ describe('the weapon-skin prewarm host warms the program the live weapon draws',
 
   it('reads the host shape table off every shipped skin GLB', () => {
     for (const key of Object.keys(WEAPON_VFX)) {
-      const materials = glbMaterials(`models/weapons/${key}.glb`);
+      const json = glbJson(`models/weapons/${key}.glb`);
+      const materials = json.materials ?? [];
+      // Decoded to RGBA like the one-pixel host map: a GPU-compressed normal
+      // (KTX2, an RG format) would flip three's packedNormalMap bit live only.
+      expect(json.extensionsUsed ?? [], key).not.toContain('KHR_texture_basisu');
+      for (const image of json.images ?? []) {
+        expect(['image/webp', 'image/png', 'image/jpeg'], key).toContain(image.mimeType);
+      }
       const textured = materials.filter((m) => m.pbrMetallicRoughness?.baseColorTexture);
       const untextured = materials.filter((m) => !m.pbrMetallicRoughness?.baseColorTexture);
       // The textured host carries exactly these slots, opaque, no extension.
@@ -321,54 +356,69 @@ describe('the weapon-skin prewarm host warms the program the live weapon draws',
     expect(Object.keys(WEAPON_VFX_UNTEXTURED_PARTS)).toEqual(['astravyr_fang_of_the_fallen_star']);
   });
 
-  it.each(TIERS)(
+  it.each(PROFILES)(
     'hosts every live skin weapon, drawn and sheathed, and nothing else, on %s',
-    async (tier) => {
-      await withTier(tier, () => {
-        const misses: string[] = [];
-        const liveUnion = new Set<string>();
-        const hostUnion = new Set<string>();
-        const releaseHits: string[] = [];
-        for (const key of Object.keys(WEAPON_VFX)) {
-          for (const hostKey of drawKeys(buildWeaponVfxPrewarmSkinGroup(key), isHostSurface)) {
-            hostUnion.add(hostKey);
-          }
-        }
-        for (const key of WORN_KEYS) {
-          const skinId = skinIdFor(key) as string;
-          const hostKeys = drawKeys(buildWeaponVfxPrewarmSkinGroup(key), isHostSurface);
-          const released = releaseHostKeys(key);
-          const visual = new CharacterVisual('player_warrior', 0xffffff, 0, mainhandFor(skinId));
-          visual.setWeaponSkin(skinId);
-          for (const stowed of [false, true, false, true]) {
-            visual.setWeaponStowed(stowed);
-            const meshes: THREE.Mesh[] = [];
-            visual.root.traverse((o) => {
-              if ((o as THREE.Mesh).isMesh && isLiveSkinWeapon(o as THREE.Mesh))
-                meshes.push(o as THREE.Mesh);
-            });
-            // The skin really is worn, and really moved between the poses.
-            expect(meshes.length, `${key} stowed=${stowed}`).toBeGreaterThan(0);
-            for (const mesh of meshes) expect(onChestBone(mesh), key).toBe(stowed);
-            for (const liveKey of drawKeys(visual.root, isLiveSkinWeapon)) {
-              liveUnion.add(liveKey);
-              // The skin's OWN host holds it, so the shape table is right per
-              // skin, not merely somewhere in the catalog.
-              if (!hostKeys.has(liveKey)) misses.push(`${key} stowed=${stowed}: ${tag(liveKey)}`);
-              if (released.has(liveKey)) releaseHits.push(`${key}: ${tag(liveKey)}`);
+    async (_label, tier, overrides) => {
+      await withTier(
+        tier,
+        () => {
+          const misses: string[] = [];
+          const liveUnion = new Set<string>();
+          const hostUnion = new Set<string>();
+          const releaseHits: string[] = [];
+          for (const key of Object.keys(WEAPON_VFX)) {
+            for (const hostKey of drawKeys(buildWeaponVfxPrewarmSkinGroup(key), isHostSurface)) {
+              hostUnion.add(hostKey);
             }
           }
-          visual.dispose();
-        }
-        expect(misses).toEqual([]);
-        // The release host never matched a live weapon on any tier, so the
-        // comparison above is not trivially true.
-        expect(releaseHits).toEqual([]);
-        // No dead key: every program the entry warms is one a sighting asks
-        // for. Textured single-sided, textured double-sided, and the ring.
-        expect([...hostUnion].map(tag).sort()).toEqual([...liveUnion].map(tag).sort());
-        expect(hostUnion.size).toBe(3);
-      });
+          for (const key of WORN_KEYS) {
+            const skinId = skinIdFor(key) as string;
+            const hostGroup = buildWeaponVfxPrewarmSkinGroup(key);
+            const hostKeys = drawKeys(hostGroup, isHostSurface);
+            // Every host material is labelled as the host, so a program label in
+            // a capture tells it from the live weapon it stands in for.
+            hostGroup.traverse((o) => {
+              const mesh = o as THREE.Mesh;
+              if (mesh.isMesh && isHostSurface(mesh)) {
+                expect((mesh.material as THREE.Material).name, key).toMatch(
+                  /^weapon-vfx-prewarm-host:/,
+                );
+              }
+            });
+            const released = releaseHostKeys(key);
+            const visual = new CharacterVisual('player_warrior', 0xffffff, 0, mainhandFor(skinId));
+            visual.setWeaponSkin(skinId);
+            for (const stowed of [false, true, false, true]) {
+              visual.setWeaponStowed(stowed);
+              const meshes: THREE.Mesh[] = [];
+              visual.root.traverse((o) => {
+                if ((o as THREE.Mesh).isMesh && isLiveSkinWeapon(o as THREE.Mesh))
+                  meshes.push(o as THREE.Mesh);
+              });
+              // The skin really is worn, and really moved between the poses.
+              expect(meshes.length, `${key} stowed=${stowed}`).toBeGreaterThan(0);
+              for (const mesh of meshes) expect(onChestBone(mesh), key).toBe(stowed);
+              for (const liveKey of drawKeys(visual.root, isLiveSkinWeapon)) {
+                liveUnion.add(liveKey);
+                // The skin's OWN host holds it, so the shape table is right per
+                // skin, not merely somewhere in the catalog.
+                if (!hostKeys.has(liveKey)) misses.push(`${key} stowed=${stowed}: ${tag(liveKey)}`);
+                if (released.has(liveKey)) releaseHits.push(`${key}: ${tag(liveKey)}`);
+              }
+            }
+            visual.dispose();
+          }
+          expect(misses).toEqual([]);
+          // The release host never matched a live weapon on any tier, so the
+          // comparison above is not trivially true.
+          expect(releaseHits).toEqual([]);
+          // No dead key: every program the entry warms is one a sighting asks
+          // for. Textured single-sided, textured double-sided, and the ring.
+          expect([...hostUnion].map(tag).sort()).toEqual([...liveUnion].map(tag).sort());
+          expect(hostUnion.size).toBe(3);
+        },
+        overrides,
+      );
     },
   );
 });
