@@ -1454,3 +1454,50 @@ describe('determinism', () => {
     );
   });
 });
+
+describe('raids earn nothing from world kills', () => {
+  it('a raid member takes no honor or gold and is left out of the split', () => {
+    const sim = world();
+    const raid = ['R1', 'R2', 'R3', 'R4', 'R5'].map((name) => addFighter(sim, name));
+    const solo = addFighter(sim, 'Solo');
+    const victim = addFighter(sim, 'Victim');
+    for (const pid of raid.slice(1)) {
+      sim.partyInvite(pid, raid[0]);
+      sim.partyAccept(pid);
+    }
+    sim.convertPartyToRaid(raid[0]);
+    expect(sim.partyOf(raid[0])!.raid).toBe(true);
+    for (const pid of [...raid, solo, victim]) flag(sim, pid);
+    standTogether(sim, [victim, raid[0], solo]);
+    sim.meta(victim)!.copper = 20_000;
+    for (const pid of [raid[0], solo]) sim.meta(pid)!.copper = 0;
+    // The lone helper and the raid's killing blow: only the helper is paid,
+    // and the whole pool and the whole stake go to them.
+    hit(sim, solo, victim);
+    slay(sim, raid[0], victim);
+    expect(ent(sim, victim).dead).toBe(true);
+    expect(sim.meta(raid[0])!.honor).toBe(0);
+    expect(sim.meta(raid[0])!.copper).toBe(0);
+    expect(sim.meta(solo)!.honor).toBe(10);
+    expect(sim.meta(solo)!.copper).toBe(2_000);
+    expect(sim.meta(victim)!.copper).toBe(18_000);
+  });
+
+  it('a kill by a raid alone pays nobody and stakes nothing', () => {
+    const sim = world();
+    const raid = ['R1', 'R2', 'R3', 'R4', 'R5'].map((name) => addFighter(sim, name));
+    const victim = addFighter(sim, 'Victim');
+    for (const pid of raid.slice(1)) {
+      sim.partyInvite(pid, raid[0]);
+      sim.partyAccept(pid);
+    }
+    sim.convertPartyToRaid(raid[0]);
+    for (const pid of [...raid, victim]) flag(sim, pid);
+    standTogether(sim, [victim, raid[0]]);
+    sim.meta(victim)!.copper = 20_000;
+    slay(sim, raid[0], victim);
+    expect(ent(sim, victim).dead).toBe(true);
+    for (const pid of raid) expect(sim.meta(pid)!.honor, `raider ${pid}`).toBe(0);
+    expect(sim.meta(victim)!.copper).toBe(20_000);
+  });
+});

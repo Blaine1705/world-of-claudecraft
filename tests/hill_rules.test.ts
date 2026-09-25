@@ -8,9 +8,11 @@ import {
   HILL_CAPTURE_SECONDS,
   HILL_DURATION_SECONDS,
   HILL_FIRST_WINDOW_AT_SECONDS,
-  HILL_HONOR_PER_PAYOUT,
   HILL_LATEST_WARN_OFFSET_SECONDS,
   HILL_RADIUS,
+  HILL_RAMP_MAX_HONOR,
+  HILL_RAMP_STEP_HONOR,
+  HILL_RAMP_STEP_SECONDS,
   HILL_WARNING_SECONDS,
   HILL_WINDOW_SECONDS,
   type HillSpotProbe,
@@ -18,6 +20,7 @@ import {
   hillContains,
   hillContestStep,
   hillGroupKey,
+  hillHonorPerPayout,
   hillLeader,
   hillMinutesUntil,
   hillSpotIsOpen,
@@ -37,7 +40,9 @@ describe('the tuning literals the copy and the docs quote', () => {
     expect(HILL_LATEST_WARN_OFFSET_SECONDS).toBe(2 * 3_600);
     expect(HILL_CAPTURE_SECONDS).toBe(60);
     expect(HILL_ACCRUAL_SECONDS).toBe(60);
-    expect(HILL_HONOR_PER_PAYOUT).toBe(1);
+    expect(HILL_RAMP_STEP_SECONDS).toBe(5 * 60);
+    expect(HILL_RAMP_STEP_HONOR).toBe(2);
+    expect(HILL_RAMP_MAX_HONOR).toBe(12);
   });
 });
 
@@ -216,5 +221,26 @@ describe('hillContains', () => {
     expect(hillContains(hill, 150.1, -50)).toBe(false);
     expect(hillContains(hill, 100 + 35, -50 + 35)).toBe(true);
     expect(hillContains(hill, 100 + 36, -50 + 36)).toBe(false);
+  });
+});
+
+describe('hillHonorPerPayout: the hold ramp', () => {
+  it('pays 2 a minute for the first five minutes, +2 each five after, capped at 12', () => {
+    expect(hillHonorPerPayout(0)).toBe(2);
+    expect(hillHonorPerPayout(299)).toBe(2);
+    expect(hillHonorPerPayout(300)).toBe(4);
+    expect(hillHonorPerPayout(10 * 60)).toBe(6);
+    expect(hillHonorPerPayout(20 * 60)).toBe(10);
+    expect(hillHonorPerPayout(25 * 60)).toBe(12);
+    expect(hillHonorPerPayout(45 * 60)).toBe(12);
+    expect(hillHonorPerPayout(-5)).toBe(2);
+  });
+
+  it('pays about 380 for a full uncontested stand (owner tuning: doubled with the battlegrounds)', () => {
+    // One payout per minute of the 45-minute stand after the 60-second capture.
+    let total = 0;
+    for (let minute = 1; minute <= 44; minute++) total += hillHonorPerPayout(minute * 60);
+    expect(total).toBeGreaterThanOrEqual(360);
+    expect(total).toBeLessThanOrEqual(400);
   });
 });

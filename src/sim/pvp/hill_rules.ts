@@ -31,13 +31,28 @@ export const HILL_LATEST_WARN_OFFSET_SECONDS =
 /** Unbroken majority for this long takes the hill (owner spec). */
 export const HILL_CAPTURE_SECONDS = 60;
 /** Each holder standing inside accrues this many seconds of presence before a
- *  payout, and each payout is HILL_HONOR_PER_PAYOUT. One Honor a minute: a full
- *  party holding an uncontested hill for its whole stand earns 45 each, under
- *  one Thornhollow Fields win for 45 minutes of standing still, so Honor stays
- *  scarce and the instanced faucets stay ahead (docs/design/warfare.md). Only
- *  a party can hold, so a party's size is the payee cap. */
+ *  payout, and each payout RAMPS with how long the holding party has held the
+ *  hill (hillHonorPerPayout): HILL_RAMP_STEP_HONOR a minute for the first five
+ *  minutes, that much more each further five minutes, capped at
+ *  HILL_RAMP_MAX_HONOR a minute. A full uncontested stand pays about 380 each
+ *  (owner tuning 2026-09-25: King of the Hill is a real road to Warfare gear,
+ *  doubled alongside the Thornhollow Fields awards). The streak belongs to the party and resets when the
+ *  hill changes hands, so a long hold is the thing worth taking. Only a party
+ *  can hold, so a party's size is the payee cap. */
 export const HILL_ACCRUAL_SECONDS = 60;
-export const HILL_HONOR_PER_PAYOUT = 1;
+/** Held seconds per step of the ramp, the Honor each step adds to a minute's
+ *  payout, and the per-minute cap it climbs to. */
+export const HILL_RAMP_STEP_SECONDS = 300;
+export const HILL_RAMP_STEP_HONOR = 2;
+export const HILL_RAMP_MAX_HONOR = 12;
+
+/** The Honor one payout is worth after the holding party has held the hill
+ *  for `heldSeconds`: HILL_RAMP_STEP_HONOR, then that much more every
+ *  HILL_RAMP_STEP_SECONDS, capped at HILL_RAMP_MAX_HONOR. */
+export function hillHonorPerPayout(heldSeconds: number): number {
+  const steps = Math.floor(Math.max(0, heldSeconds) / HILL_RAMP_STEP_SECONDS);
+  return Math.min(HILL_RAMP_MAX_HONOR, HILL_RAMP_STEP_HONOR * (1 + steps));
+}
 /** The circle keeps this much clear of the zone's edges beyond its own radius,
  *  and this much clear of the hub settlement's radius. */
 export const HILL_EDGE_MARGIN = 25;

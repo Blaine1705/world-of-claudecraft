@@ -17,8 +17,9 @@
 // HILL_CAPTURE_SECONDS of unbroken majority it takes the hill (a tie never
 // moves it; a challenge that lapses starts over). Every holder standing inside
 // banks a second of presence per pass, and each HILL_ACCRUAL_SECONDS pays
-// HILL_HONOR_PER_PAYOUT Honor. A holder who steps out keeps what they banked;
-// a capture clears the books.
+// hillHonorPerPayout Honor, which ramps with how long the holding party has
+// held (hill_rules.ts). A holder who steps out keeps what they banked; a
+// capture clears the books and restarts the ramp.
 //
 // State lives on the Sim as ONE live view (`ctx.hillState`), never in this
 // module: the modules hold functions, the Sim holds state (src/sim/CLAUDE.md).
@@ -45,7 +46,6 @@ import {
   HILL_CAPTURE_SECONDS,
   HILL_DURATION_SECONDS,
   HILL_EDGE_MARGIN,
-  HILL_HONOR_PER_PAYOUT,
   HILL_HUB_MARGIN,
   HILL_LATEST_WARN_OFFSET_SECONDS,
   HILL_RADIUS,
@@ -57,6 +57,7 @@ import {
   hillContains,
   hillContestStep,
   hillGroupKey,
+  hillHonorPerPayout,
   hillLeader,
   hillMinutesUntil,
   hillSpotIsOpen,
@@ -91,6 +92,9 @@ export interface ActiveHill extends HillTimes {
   insideKeys: Map<number, string>;
   /** pid -> seconds of paid presence banked toward the next payout. */
   accrual: Map<number, number>;
+  /** Seconds the current holder has held the hill: the ramp's clock. Reset to
+   *  zero whenever the hill changes hands. */
+  heldSeconds: number;
   /** Honor paid out by this hill so far (the readout and the tests). */
   honorPaid: number;
 }
@@ -244,6 +248,7 @@ export function spawnHill(
     counts: new Map(),
     insideKeys: new Map(),
     accrual: new Map(),
+    heldSeconds: 0,
     honorPaid: 0,
   };
   ctx.hillState.active = hill;
@@ -410,6 +415,7 @@ function updateContest(ctx: SimContext, hill: ActiveHill, dt: number): void {
   hill.challenger = null;
   hill.contest = 0;
   hill.accrual.clear();
+  hill.heldSeconds = 0;
   for (const [pid, key] of hill.insideKeys) {
     if (key === challenger) notice(ctx, pid, HILL_TAKEN_LINE);
     else if (key === ousted) notice(ctx, pid, HILL_LOST_LINE);
@@ -424,6 +430,8 @@ function updateContest(ctx: SimContext, hill: ActiveHill, dt: number): void {
 function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
   const holder = hill.holder;
   if (holder === null) return;
+  hill.heldSeconds += dt;
+  const amount = hillHonorPerPayout(hill.heldSeconds);
   for (const pid of hill.accrual.keys()) {
     if (!ctx.players.has(pid) || hillGroupKey(pid, ctx.partyOf(pid)) !== holder) {
       hill.accrual.delete(pid);
@@ -439,7 +447,7 @@ function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
       continue;
     }
     hill.accrual.set(pid, banked - HILL_ACCRUAL_SECONDS);
-    hill.honorPaid += grantHonor(ctx, meta, HILL_HONOR_PER_PAYOUT, 'hill_hold');
+    hill.honorPaid += grantHonor(ctx, meta, amount, 'hill_hold');
   }
 }
 

@@ -62,6 +62,8 @@ export const RETIRED_KEYS = [
   'guide.worldPvpPage.flagBody', // -> guide.worldPvpPage.flagBodyAid (shields and buffs are aid)
   'guide.worldPvpPage.stakesBody', // -> guide.worldPvpPage.stakesBodyFlagged
   'guide.worldPvpPage.limitsBody', // -> guide.worldPvpPage.limitsBodyHour
+  'guide.worldPvpPage.limitsBodyHour', // -> guide.worldPvpPage.limitsBodyRaids (the raid rule)
+  'guide.worldPvpPage.hillBody', // -> guide.worldPvpPage.hillBodyRamp (the hold ramp)
   'guide.commandsPage.pvp', // -> guide.commandsPage.pvpZones
 
   // -- Content the game no longer has, so the wiki must not define it.

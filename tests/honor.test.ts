@@ -509,17 +509,17 @@ describe('Thornhollow Fields honor income', () => {
     return { sim, meta: sim.meta(pid)! };
   }
 
-  it("pays 80 for the day's first win and 60 for the next", () => {
+  it("pays 160 for the day's first win and 120 for the next", () => {
     const { sim, meta } = bgPlayer();
     const first = awardBattlegroundHonor(sim.ctx, meta, '["character:1"]', 'win');
     expect(first.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
-    expect(first.total).toBe(80);
+    expect(first.total).toBe(160);
     // A fresh opposing identity, so the repeat curve is not what is measured:
     // only the bonus should be missing the second time.
     const second = awardBattlegroundHonor(sim.ctx, meta, '["character:2"]', 'win');
     expect(second.firstWinBonus).toBe(0);
     expect(second.total).toBe(BATTLEGROUND_WIN_HONOR);
-    expect(second.total).toBe(60);
+    expect(second.total).toBe(120);
   });
 
   it('neither arms nor claims the daily bonus on a loss or a draw', () => {
@@ -544,9 +544,9 @@ describe('Thornhollow Fields honor income', () => {
     for (let i = 0; i < 3; i++) awardBattlegroundHonor(sim.ctx, meta, key, 'loss');
     const win = awardBattlegroundHonor(sim.ctx, meta, key, 'win');
     // Base is floored at 0.25 (60 -> 15); the bonus is NOT decayed with it.
-    expect(win.total - win.firstWinBonus).toBe(15);
+    expect(win.total - win.firstWinBonus).toBe(30);
     expect(win.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
-    expect(win.total).toBe(35);
+    expect(win.total).toBe(70);
   });
 
   it('floors the result curve at a quarter and never reaches zero', () => {
@@ -557,7 +557,7 @@ describe('Thornhollow Fields honor income', () => {
       { length: 10 },
       () => awardBattlegroundHonor(sim.ctx, meta, key, 'loss').total,
     );
-    expect(paid).toEqual([20, 10, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(paid).toEqual([40, 20, 10, 10, 10, 10, 10, 10, 10, 10]);
     expect(paid.every((amount) => amount > 0)).toBe(true);
 
     const wins = bgPlayer();
@@ -566,7 +566,7 @@ describe('Thornhollow Fields honor income', () => {
       () => awardBattlegroundHonor(wins.sim.ctx, wins.meta, key, 'win').total,
     );
     // The first carries the +20 daily bonus; the rest are the floored base.
-    expect(winPaid).toEqual([80, 30, 15, 15, 15, 15]);
+    expect(winPaid).toEqual([160, 60, 30, 30, 30, 30]);
   });
 
   it('keeps the battleground result curve separate from the shared Fiesta one', () => {
@@ -602,18 +602,18 @@ describe('Thornhollow Fields honor income', () => {
     const kills = new Map<string, number>();
     expect(
       Array.from({ length: 5 }, () => awardBattlegroundKillHonor(sim.ctx, meta, 99, kills)),
-    ).toEqual([5, 2, 1, 0, 0]);
-    expect(BATTLEGROUND_KILL_HONOR).toBe(5);
+    ).toEqual([10, 5, 2, 0, 0]);
+    expect(BATTLEGROUND_KILL_HONOR).toBe(10);
 
     const assists = new Map<string, number>();
     expect(
       Array.from({ length: 5 }, () => awardBattlegroundAssistHonor(sim.ctx, meta, 99, assists)),
-    ).toEqual([2, 1, 0, 0, 0]);
-    expect(BATTLEGROUND_ASSIST_HONOR).toBe(2);
+    ).toEqual([4, 2, 1, 0, 0]);
+    expect(BATTLEGROUND_ASSIST_HONOR).toBe(4);
 
     // The counters live on the MATCH, so a new match starts the curve over.
     const nextMatch = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 99, nextMatch)).toBe(5);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 99, nextMatch)).toBe(10);
   });
 });
 
@@ -629,11 +629,11 @@ describe('weekly Double Honor', () => {
     const kills = new Map<string, number>();
     expect(
       Array.from({ length: 5 }, () => awardBattlegroundKillHonor(sim.ctx, meta, 99, kills)),
-    ).toEqual([10, 5, 2, 0, 0]);
+    ).toEqual([20, 10, 5, 0, 0]);
     const assists = new Map<string, number>();
     expect(
       Array.from({ length: 5 }, () => awardBattlegroundAssistHonor(sim.ctx, meta, 99, assists)),
-    ).toEqual([4, 2, 1, 0, 0]);
+    ).toEqual([8, 4, 2, 0, 0]);
     expect(sim.events).toContainEqual({
       type: 'honor',
       pid,
@@ -644,10 +644,10 @@ describe('weekly Double Honor', () => {
     // Sunday is still inside the window; the Monday rollover closes it.
     sim.resetDay = '2026-08-16';
     const sunday = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, sunday)).toBe(10);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, sunday)).toBe(20);
     sim.resetDay = '2026-08-17';
     const monday = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, monday)).toBe(5);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, monday)).toBe(10);
   });
 
   it('opens 12 hours early: Friday pays double once the lead probe reads Saturday', () => {
@@ -659,13 +659,13 @@ describe('weekly Double Honor', () => {
 
     // Before the probe crosses, Friday is an ordinary weekday.
     const morning = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, morning)).toBe(5);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, morning)).toBe(10);
 
     // From 3 PM realm time the host's probe reads Saturday: every award path
     // doubles, and the loss boost opens with the same window.
     sim.eventLeadDay = '2026-08-22';
     const evening = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, evening)).toBe(10);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, evening)).toBe(20);
     const loss = awardBattlegroundHonor(sim.ctx, meta, '["character:fri"]', 'loss');
     expect(loss.total).toBe(BATTLEGROUND_WIN_HONOR * 2);
     expect(loss.firstWinBonus, 'a loss never claims the daily bonus').toBe(0);

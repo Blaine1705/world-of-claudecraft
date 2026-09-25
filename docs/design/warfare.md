@@ -318,13 +318,20 @@ Phase 1 starts with these owner-selected values:
 - Fiesta takedown: 20 Honor.
 - Completed Fiesta match: 20 Honor.
 - Fiesta win bonus: 40 Honor.
-- Thornhollow Fields battleground win: 60 Honor per winning player
+- Thornhollow Fields battleground win: 120 Honor per winning player
   (`BATTLEGROUND_WIN_HONOR`).
-- Thornhollow Fields battleground loss, played out to a result: 20 Honor
+- Thornhollow Fields battleground loss, played out to a result: 40 Honor
   (`BATTLEGROUND_LOSS_HONOR`); a draw pays the loss amount to both sides.
-- First Thornhollow Fields WIN of each UTC day: a flat 20 Honor on top of the win
-  award (`BATTLEGROUND_FIRST_WIN_BONUS_HONOR`), so the day's first win pays 80
-  against a routine 60, a ratio of 1.33x.
+- First Thornhollow Fields WIN of each UTC day: a flat 40 Honor on top of the win
+  award (`BATTLEGROUND_FIRST_WIN_BONUS_HONOR`), so the day's first win pays 160
+  against a routine 120, a ratio of 1.33x.
+- Killing blow 10, assist 4 (`BATTLEGROUND_KILL_HONOR`,
+  `BATTLEGROUND_ASSIST_HONOR`).
+
+Every Thornhollow Fields award above was DOUBLED on 2026-09-25 (owner tuning,
+alongside King of the Hill's ramp) so Warfare Season 2 gear is a goal of weeks,
+not a season: the figures further down that quote 60/20 and a 900-a-day session
+are the pre-doubling record.
 
 Every weekend is the Double Honor Weekend: every Thornhollow Fields Honor
 award (the result, the kill and assist drip, and the first-win bonus) pays
@@ -492,11 +499,15 @@ alone is the owner's stated shape.
   gold only ever moves between two players who both carry the stake, and
   hunting flags from behind no flag is never the best play.
 - Honor: `WORLD_PVP_KILL_HONOR` (10) per kill, the whole pool, split as above.
-  Deliberately BELOW the instanced faucets: a Thornhollow Fields win pays 60 plus
+  Deliberately BELOW the instanced faucets: a Thornhollow Fields win pays 120 plus
   its drip and a ranked 1v1 win pays 25, so a player who wants Warfare gear
   fastest still queues. Battleground and arena pay more; world PvP pays for
   being out in the world. The Double Honor Weekend does not apply to it (that
   event is battleground-only by design).
+- Raids earn nothing (`worldPvpGroupEarns`, owner rule 2026-09-25, the King of
+  the Hill raid rule carried to kills): a contributor in a raid group takes no
+  honor and no gold and is left out of the split, so a zerg pays nobody and never
+  dilutes a party's share; a kill by a raid alone stakes nothing from the victim.
 - Anti-farm: the per-PAIR diminishing returns ride `HONOR_REPEAT_DR` (100, 50,
   25, then 0 percent) for honor AND gold alike, counted by `worldPvpPairRepeats`
   on a rolling `WORLD_PVP_DR_WINDOW_SECONDS` (one hour) window that opens at the
@@ -586,15 +597,20 @@ Everyone standing in the zone is already hostile to every stranger there (the
 free-for-all arm, and guildmates outside one party are strangers), so the hill
 needs no flag of its own.
 
-Honor is a deliberately thin trickle, so it stays scarce next to the instanced
-faucets: each counted holder standing inside banks a second per pass and every
-`HILL_ACCRUAL_SECONDS` (60) pays `HILL_HONOR_PER_PAYOUT` (1). A party's size
-(five) is the payee cap. A holder who steps out banks nothing but keeps what
-they banked; leaving the party or the realm forfeits it, and a capture clears
-the books. A full party holding an uncontested hill for its whole stand earns
-45 each, a little under one Thornhollow Fields win for 45 minutes of standing
-still; a realm's whole hill income caps at 225 per three hours. No diminishing
-returns: the cap and the pace are the limit.
+Honor RAMPS with the hold (owner tuning 2026-09-25, replacing a flat 1 a minute
+that paid 45 for a whole stand): each counted holder standing inside banks a
+second per pass, and every `HILL_ACCRUAL_SECONDS` (60) pays `hillHonorPerPayout`
+of the seconds the current holder has held the hill, `HILL_RAMP_STEP_HONOR` (2) a
+minute for the first `HILL_RAMP_STEP_SECONDS` (five minutes), 2 more each further
+five minutes, capped at `HILL_RAMP_MAX_HONOR` (12). The streak belongs to the
+holding party and restarts when the hill changes hands, so a long hold is the
+thing worth taking. A party's size (five) is the payee cap. A holder who steps
+out banks nothing but keeps what they banked; leaving the party or the realm
+forfeits it, and a capture clears the books. A full party holding an uncontested
+hill for its whole stand earns about 380 each, about three Thornhollow Fields wins
+at the doubled award; two held hills a day is about 760, so 10,000 Honor is about
+13 days, level with a committed battleground day at the live result floor. No
+diminishing returns: the cap and the pace are the limit.
 
 The readout (`IWorld.hillInfo`, the `hill` self key) carries the geometry, the
 phase, the holder from the viewer's seat, whether the viewer counts
