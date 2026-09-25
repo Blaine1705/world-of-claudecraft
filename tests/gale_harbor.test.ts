@@ -94,10 +94,10 @@ describe('the harbor decks', () => {
     const mid = { x: pier.x, z: pier.z };
     const onDeck = groundHeight(mid.x, mid.z, SEED);
     expect(onDeck).toBeCloseTo(galeDeckSurfaceAt(pier, 0, terrain, WATER_LEVEL), 5);
-    // ten yards off the pier's seaward side there is only sea
+    // ten yards past the pier's head there is only sea (its south side is the great quay's)
     const off = {
-      x: mid.x - dirz * (pier.hw + 10),
-      z: mid.z + dirx * (pier.hw + 10),
+      x: mid.x + dirx * (pier.hl + 10),
+      z: mid.z + dirz * (pier.hl + 10),
     };
     expect(galeDeckSurface(off.x, off.z, terrain, WATER_LEVEL)).toBe(-Infinity);
     expect(groundHeight(off.x, off.z, SEED)).toBeLessThan(WATER_LEVEL);

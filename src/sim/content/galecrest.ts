@@ -772,11 +772,12 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexShipBlue', x: 515.9, z: 345.5, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 507, z: 339, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 530, z: 338, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
-    // dinghies: two on the water, one hauled out by the rack on the shingle (the first lay
-    // at x 474, z 354, rot 0.7, half under the north pier's root; it rides between the two
-    // piers now, clear of both, since the harbor was rebuilt, content/wickharbor_harbor.ts)
-    { key: 'hexBoat', x: 473.9, z: 355.5, rot: 1.45, scale: 6, float: 0.1 },
-    { key: 'hexBoat', x: 479, z: 357.5, rot: -1.8, scale: 6, float: 0.1 },
+    // dinghies: two on the water, one hauled out by the rack on the shingle. The two afloat
+    // rode where the great quay now stands (the first at x 474, z 354, then x 473.9, z 355.5;
+    // the second at x 479, z 357.5); they lie in the slip between the north pier and the
+    // middle pier now, out past the quay's sea face (content/wickharbor_harbor.ts)
+    { key: 'hexBoat', x: 486.7, z: 359.1, rot: 1.3, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: 490.4, z: 360.1, rot: 1.3 + Math.PI, scale: 6, float: 0.1 },
     { key: 'hexBoat', x: 484, z: 346, rot: 2.3, scale: 6 },
     { key: 'hexBoatrack', x: 486, z: 340, rot: 0.9, scale: 6 },
     // harbor cargo around the office and the stalls

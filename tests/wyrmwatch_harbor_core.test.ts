@@ -58,6 +58,8 @@ describe('wyrmwatch harbor tiers (graphics fairness)', () => {
       bollard: 'Cargo',
       crateStack: 'Cargo',
       barrel: 'Cargo',
+      // (none stands at Wyrmwatch: Wickharbor's quay crane and cargo shelter)
+      timberPost: 'Cargo',
     };
     // the house: its walls, the furniture and cargo inside, and the chimney stack on the
     // land wall (build_harbor_house.py)

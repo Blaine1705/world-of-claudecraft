@@ -157,9 +157,9 @@ describe('Wickharbor ferry wharf: the decks', () => {
         `${x}, ${z}`,
       ).toBe(false);
     }
-    // the rest of the harbor stands as it was: two piers, the boardwalk, its two stairs,
-    // and the Beacon dock with its stair
-    expect(GALE_HARBOR_DECKS).toHaveLength(7);
+    // the rest of the harbor: two piers, the boardwalk, its two stairs, the Beacon dock with
+    // its stair, and the great quay's two halves (tests/wickharbor_harbor.test.ts)
+    expect(GALE_HARBOR_DECKS).toHaveLength(9);
     expect(BOARDWALK).toBeDefined();
   });
 

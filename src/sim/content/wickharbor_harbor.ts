@@ -1,7 +1,8 @@
 // Wickharbor's wooden harbor (the Galecrest): the shore boardwalk laid along the waterline
-// under the bluff, the two piers fanned out over the bay from it, the two stairs climbing
-// the bluff from it to the town, and the Old Beacon's dock with the stair down the
-// headland to it. Data-as-code; ../gale_harbor.ts walks the decks (GALE_HARBOR_DECKS), the
+// under the bluff, the great quay that fills the water off it from the north pier down to
+// the ferry wharf, the two fingers (the north pier and the middle pier) out from the quay's
+// sea face, the two stairs climbing the bluff from the boardwalk to the town, and the Old
+// Beacon's dock with the stair down the headland to it. Data-as-code; ../gale_harbor.ts walks the decks (GALE_HARBOR_DECKS), the
 // colliders are built by ../wickharbor_harbor.ts, and render/wickharbor_harbor.ts draws the
 // one Blender model (public/models/props/wickharbor_harbor.glb,
 // scripts/assets/wickharbor_harbor/, which reads THESE numbers through its exported
@@ -14,10 +15,24 @@
 // only keep the terrain under the roots padded as it always was (terrain_calm_anchors.ts),
 // and the decks keep their old order for that.
 //
+// The great quay lies in the ferry wharf's own frame (QUAY_ORIGIN, QUAY_ROT: the wharf's
+// origin and heading, which the north pier has always shared), at the boardwalk's height, so
+// the wharf's pier becomes the raised berth mole along the quay's south side and its flight
+// the stair up onto it. It is two plank fields split along the line of the boardwalk's south
+// end: the north half from the boardwalk's seaward edge to the sea face, between the north
+// pier and that line; the south half from the wharf's arm and flight to the sea face, between
+// that line and the wharf's pier. The sea face runs where the berth head begins (the ship
+// lies clear beyond it, as it always lay clear of the head).
+//
 // The joins, so no two floors ever share a plank plane:
-//  - the middle pier runs square off the boardwalk's seaward edge, its root ON that edge;
-//  - the north pier keeps its fanned heading and is cut along that same edge, so the two
-//    share the edge and nothing else;
+//  - the quay's north half meets the boardwalk along its seaward edge (a cut), the north
+//    pier along the pier's south side, and its south half along the boardwalk's south end
+//    line (a cut on each);
+//  - the quay's south half meets the wharf's pier, arm and berth head along their edges,
+//    1.75 yd below their planks (the wharf's own rails stand on that drop);
+//  - the middle pier runs straight out from the quay's sea face, its root ON the face;
+//  - the north pier keeps its heading and is cut along the boardwalk's seaward edge, so the
+//    two share the edge and nothing else;
 //  - the north stair runs square off the boardwalk's landward edge from the boardwalk's own
 //    height, and lands on the bluff top where the ground meets it;
 //  - the south stair climbs a bluff too steep for that: its first tread stands ON the
@@ -34,7 +49,8 @@
 //
 // Scale: the player model stands 2.6 yd to the crown on a 0.5 yd body radius and climbs
 // 0.9 yd unaided (MAX_STEP_HEIGHT): the boardwalk is 3.4 wide, the piers 3.6 to 4.4, the
-// stairs 2.6 to 2.8, and the rails stand 1.2 yd (the wharf's, above a jump).
+// quay some 23 by 14, the stairs 2.6 to 2.8, the rails stand 1.2 yd (the wharf's, above a
+// jump), and the quay's crane and cargo shelter stand well over a player's head.
 
 import type { GaleDeckCut, GaleDeckDef } from '../gale_harbor';
 import type { WyrmwatchHarborProp } from './wyrmwatch_harbor';
@@ -82,7 +98,51 @@ export type WickharborHarborDeckId =
   | 'stairSouth'
   | 'stairNorth'
   | 'beaconPier'
-  | 'beaconStair';
+  | 'beaconStair'
+  | 'quayNorth'
+  | 'quaySouth';
+
+/** The great quay's frame: the ferry wharf's origin and heading (content/wickharbor_wharf.ts
+ *  WICKHARBOR_WHARF_ORIGIN and WICKHARBOR_WHARF_ROT, pinned equal by the tests; not imported,
+ *  as that module reads ../gale_harbor's values, which import this one). `along` runs out to
+ *  sea, `across` north. */
+export const QUAY_ORIGIN = { x: 452.54, z: 374.79 } as const;
+export const QUAY_ROT = 1.3;
+const QX = Math.sin(QUAY_ROT);
+const QZ = Math.cos(QUAY_ROT);
+
+/** A quay-frame point (along, across) in world yards. */
+export function quayPoint(along: number, across: number): { x: number; z: number } {
+  return {
+    x: QUAY_ORIGIN.x + QX * along + QZ * across,
+    z: QUAY_ORIGIN.z + QZ * along - QX * across,
+  };
+}
+
+/** A world point in the quay frame. */
+export function quayLocal(x: number, z: number): { along: number; across: number } {
+  const dx = x - QUAY_ORIGIN.x;
+  const dz = z - QUAY_ORIGIN.z;
+  return { along: dx * QX + dz * QZ, across: dx * QZ - dz * QX };
+}
+
+/** The quay's sea face (where the ferry wharf's berth head begins), the wharf pier's north
+ *  edge it runs along, and the wharf arm's east edge it starts from (quay frame). */
+export const QUAY_FACE_A = 26.3;
+export const QUAY_WHARF_EDGE_C = 2.8;
+export const QUAY_ARM_EDGE_A = 12.65;
+/** The berth head's north end, where the sea face's rail begins. */
+export const QUAY_BERTH_HEAD_C = 5.5;
+/** The north pier: its centre and half width (its south side bounds the quay). */
+const PIER_N_CENTRE = { x: 481.6, z: 353.7 } as const;
+const PIER_N_HW = 1.8;
+/** The north pier's south side, in the quay frame (the pier shares the quay's heading). */
+export const QUAY_NORTH_EDGE_C = quayLocal(PIER_N_CENTRE.x, PIER_N_CENTRE.z).across - PIER_N_HW;
+/** The middle pier: a finger straight out from the sea face, across MID_C0..MID_C1, out to
+ *  MID_A1 (its head, a stride short of where the old square pier's head stood). */
+export const QUAY_MID_C0 = 18.2;
+export const QUAY_MID_C1 = 22.2;
+export const QUAY_MID_A1 = 34.3;
 
 /** A walkable harbor deck, named for the model and the tests. */
 export interface WickharborHarborDeck extends GaleDeckDef {
@@ -150,6 +210,38 @@ const BEACON_STAIR_FOOT: GaleDeckCut = {
 /** The shore network's one anchor (the boardwalk's root on the beach). */
 const SHORE = { ax: 465, az: 354 } as const;
 
+/** The boardwalk's south end line (harbor frame u = its half length) as a cut: the quay's
+ *  north half keeps the boardwalk's side of it, the south half the other. */
+const SOUTH_END = harborPoint(WICKHARBOR_BOARDWALK_HALF_LENGTH, 0);
+const SOUTH_END_NORTH: GaleDeckCut = { ...SOUTH_END, nx: -SU, nz: -CU };
+const SOUTH_END_SOUTH: GaleDeckCut = { ...SOUTH_END, nx: SU, nz: CU };
+
+/** A level deck at the boardwalk's height over the quay-frame rectangle along a0..a1,
+ *  across c0..c1 (its heading out to sea), trimmed by `cuts`. */
+function quayDeck(
+  id: WickharborHarborDeckId,
+  a0: number,
+  a1: number,
+  c0: number,
+  c1: number,
+  cuts?: readonly GaleDeckCut[],
+): WickharborHarborDeck {
+  const c = quayPoint((a0 + a1) / 2, (c0 + c1) / 2);
+  return {
+    id,
+    kind: 'level',
+    x: c.x,
+    z: c.z,
+    rot: QUAY_ROT,
+    hl: (a1 - a0) / 2,
+    hw: (c1 - c0) / 2,
+    ...SHORE,
+    nearAboveWater: BW,
+    farAboveWater: BW,
+    ...(cuts ? { cuts } : {}),
+  };
+}
+
 /** The harbor's walkable decks, in their old order (the terrain pads read their anchors in
  *  it). The middle pier and the stairs are laid square in the harbor frame; the north pier,
  *  the Beacon dock and its stair keep the headings they always had. */
@@ -168,8 +260,8 @@ export const WICKHARBOR_HARBOR_DECKS: readonly WickharborHarborDeck[] = [
     farAboveWater: BW,
     cuts: [SEAWARD_EDGE],
   },
-  // the middle pier: square off the boardwalk, its head where it always was
-  squareDeck('pierMiddle', 'level', 2.99, BW_HW, 25.87, 2.0, BW, BW, SHORE),
+  // the middle pier: a finger straight out from the quay's sea face
+  quayDeck('pierMiddle', QUAY_FACE_A, QUAY_MID_A1, QUAY_MID_C0, QUAY_MID_C1),
   // the shore boardwalk along the waterline; its south end gives onto the ferry wharf,
   // whose flight stands on it
   {
@@ -223,6 +315,12 @@ export const WICKHARBOR_HARBOR_DECKS: readonly WickharborHarborDeck[] = [
     nearAboveWater: WICKHARBOR_BEACON_STAIR_TOP,
     farAboveWater: WICKHARBOR_BEACON_DOCK_TOP,
   },
+  // the great quay's north half: from the boardwalk's seaward edge out to the sea face,
+  // between the boardwalk's south end line and the north pier's south side
+  quayDeck('quayNorth', 10, QUAY_FACE_A, 12, QUAY_NORTH_EDGE_C, [SEAWARD_EDGE, SOUTH_END_NORTH]),
+  // ...and its south half: from the wharf's arm and flight out to the sea face, between the
+  // wharf's pier and the boardwalk's south end line
+  quayDeck('quaySouth', QUAY_ARM_EDGE_A, QUAY_FACE_A, QUAY_WHARF_EDGE_C, 14.6, [SOUTH_END_SOUTH]),
 ];
 
 export function harborDeck(id: WickharborHarborDeckId): WickharborHarborDeck {
@@ -271,12 +369,10 @@ export const WICKHARBOR_RAIL_INSET = 0.15;
 const IN = WICKHARBOR_RAIL_INSET;
 
 const PIER_N = harborDeck('pierNorth');
-const PIER_M = harborDeck('pierMiddle');
 const STAIR_S = harborDeck('stairSouth');
 const STAIR_N = harborDeck('stairNorth');
 const BEACON = harborDeck('beaconPier');
 const BEACON_ST = harborDeck('beaconStair');
-const U = { x: SU, z: CU };
 
 /** Where the boardwalk's north end is railed, from its seaward corner to this far across
  *  (landward of it the beach meets the planks within a stride). */
@@ -285,10 +381,12 @@ export const WICKHARBOR_NORTH_END_RAIL_V = 0.3;
 /** The rails as world polylines. Openings: every join of two floors, the heads of the
  *  stairs on the bluff and the headland, the boardwalk's landward edge where the beach and
  *  the bluff's foot meet its planks, the landward half of its north end onto the beach,
- *  and its south end, where the ferry wharf's flight stands. */
+ *  and its south end, where the ferry wharf's flight stands. The quay needs none where it
+ *  meets the wharf: the wharf stands 1.75 yd over it there, railed on its own planks. */
 export const WICKHARBOR_HARBOR_RAILS: readonly (readonly (readonly [number, number])[])[] = [
-  // the seaward line: from the boardwalk's north end, round the north pier, down the boardwalk's seaward edge, round the
-  // middle pier, and on to the wharf flight's foot (the wharf's own rail takes it up)
+  // the seaward line: from the boardwalk's north end round the north pier, back along the
+  // pier's south side to the quay's sea face, along the face round the middle pier, and on
+  // to the ferry wharf's berth head (the wharf's own rail takes it on round the head)
   [
     harborPoint(-WICKHARBOR_BOARDWALK_HALF_LENGTH + IN, WICKHARBOR_NORTH_END_RAIL_V),
     // across the cut onto the north pier's root, and straight to its north corner (the pier
@@ -297,12 +395,12 @@ export const WICKHARBOR_HARBOR_RAILS: readonly (readonly (readonly [number, numb
     deckPoint(PIER_N, -PIER_N.hl + IN, PIER_N.hw - IN),
     deckPoint(PIER_N, PIER_N.hl - IN, PIER_N.hw - IN),
     deckPoint(PIER_N, PIER_N.hl - IN, -PIER_N.hw + IN),
-    meet(deckPoint(PIER_N, 0, -PIER_N.hw + IN), heading(PIER_N), harborPoint(0, BW_HW - IN), U),
-    harborPoint(2.99 - PIER_M.hw + IN, BW_HW - IN),
-    deckPoint(PIER_M, PIER_M.hl - IN, PIER_M.hw - IN),
-    deckPoint(PIER_M, PIER_M.hl - IN, -PIER_M.hw + IN),
-    harborPoint(2.99 + PIER_M.hw - IN, BW_HW - IN),
-    harborPoint(WICKHARBOR_BOARDWALK_HALF_LENGTH - 0.1, BW_HW - IN),
+    quayPoint(QUAY_FACE_A - IN, QUAY_NORTH_EDGE_C + IN),
+    quayPoint(QUAY_FACE_A - IN, QUAY_MID_C1 - IN),
+    quayPoint(QUAY_MID_A1 - IN, QUAY_MID_C1 - IN),
+    quayPoint(QUAY_MID_A1 - IN, QUAY_MID_C0 + IN),
+    quayPoint(QUAY_FACE_A - IN, QUAY_MID_C0 + IN),
+    quayPoint(QUAY_FACE_A - IN, QUAY_BERTH_HEAD_C - IN),
   ],
   // the north stair's south side, on along the boardwalk's landward edge over the hollow
   // under it
@@ -350,10 +448,10 @@ export const WICKHARBOR_HARBOR_RAILS: readonly (readonly (readonly [number, numb
   ],
 ].map((rail) => rail.map((p) => [p.x, p.z] as const));
 
-/** A harbor prop, placed in its deck's frame (the collider and the model read the world
- *  record below). */
+/** A harbor prop, placed in its deck's frame, or ('quay') in the great quay's frame (the
+ *  collider and the model read the world record below). */
 interface HarborPropFrame {
-  deck: WickharborHarborDeckId;
+  deck: WickharborHarborDeckId | 'quay';
   kind: WyrmwatchHarborProp['kind'];
   along: number;
   across: number;
@@ -375,15 +473,6 @@ const PROP_FRAME: readonly HarborPropFrame[] = [
     along: 11.4,
     across: -1.2,
     turn: -Math.PI / 2,
-    r: 0.24,
-    height: 4.4,
-  },
-  {
-    deck: 'pierMiddle',
-    kind: 'lanternPost',
-    along: 11.5,
-    across: 1.4,
-    turn: Math.PI / 2,
     r: 0.24,
     height: 4.4,
   },
@@ -426,26 +515,6 @@ const PROP_FRAME: readonly HarborPropFrame[] = [
     standable: true,
   },
   {
-    deck: 'pierMiddle',
-    kind: 'crateStack',
-    along: 9.6,
-    across: -1.1,
-    turn: Math.PI / 2,
-    hw: 0.55,
-    hd: 0.95,
-    height: 1.7,
-    standable: true,
-  },
-  {
-    deck: 'pierMiddle',
-    kind: 'barrel',
-    along: 8.1,
-    across: -1.15,
-    r: 0.5,
-    height: 1.35,
-    standable: true,
-  },
-  {
     deck: 'beaconPier',
     kind: 'crateStack',
     along: 10.4,
@@ -465,18 +534,122 @@ const PROP_FRAME: readonly HarborPropFrame[] = [
     height: 1.35,
     standable: true,
   },
+  // the great quay (its own frame: along out to sea, across north). Lantern posts on the
+  // sea face, their lanterns hanging out over the water, and one on the middle pier's head
+  { deck: 'quay', kind: 'lanternPost', along: 25.45, across: 6.4, r: 0.24, height: 4.4 },
+  { deck: 'quay', kind: 'lanternPost', along: 25.45, across: 24.6, r: 0.24, height: 4.4 },
+  {
+    deck: 'quay',
+    kind: 'lanternPost',
+    along: 33.3,
+    across: 21.35,
+    turn: Math.PI / 2,
+    r: 0.24,
+    height: 4.4,
+  },
+  // mooring bollards along the sea face and on the middle pier's head, inside the rails
+  {
+    deck: 'quay',
+    kind: 'bollard',
+    along: 25.5,
+    across: 9.4,
+    r: 0.32,
+    height: 1.0,
+    standable: true,
+  },
+  {
+    deck: 'quay',
+    kind: 'bollard',
+    along: 25.5,
+    across: 16.4,
+    r: 0.32,
+    height: 1.0,
+    standable: true,
+  },
+  {
+    deck: 'quay',
+    kind: 'bollard',
+    along: 33.4,
+    across: 19.0,
+    r: 0.32,
+    height: 1.0,
+    standable: true,
+  },
+  // the quay crane: its mast by the sea face, the jib swung out over the water (the model's;
+  // only the mast stands in the way)
+  { deck: 'quay', kind: 'timberPost', along: 23.8, across: 12.2, r: 0.5, height: 7.4 },
+  // the cargo shelter on the quay's north side: four corner posts under a shingled roof, the
+  // cargo under it
+  { deck: 'quay', kind: 'timberPost', along: 14.6, across: 22.8, r: 0.2, height: 4.3 },
+  { deck: 'quay', kind: 'timberPost', along: 19.6, across: 22.8, r: 0.2, height: 4.3 },
+  { deck: 'quay', kind: 'timberPost', along: 14.6, across: 25.7, r: 0.2, height: 4.3 },
+  { deck: 'quay', kind: 'timberPost', along: 19.6, across: 25.7, r: 0.2, height: 4.3 },
+  {
+    deck: 'quay',
+    kind: 'crateStack',
+    along: 16.1,
+    across: 24.6,
+    hw: 0.7,
+    hd: 0.95,
+    height: 1.7,
+    standable: true,
+  },
+  {
+    deck: 'quay',
+    kind: 'barrel',
+    along: 18.1,
+    across: 25.0,
+    r: 0.5,
+    height: 1.35,
+    standable: true,
+  },
+  {
+    deck: 'quay',
+    kind: 'barrel',
+    along: 18.2,
+    across: 23.8,
+    r: 0.5,
+    height: 1.35,
+    standable: true,
+  },
+  // cargo waiting for the crane, clear of the walk along the face
+  {
+    deck: 'quay',
+    kind: 'crateStack',
+    along: 22.0,
+    across: 9.6,
+    hw: 0.7,
+    hd: 0.95,
+    height: 1.7,
+    standable: true,
+  },
+  { deck: 'quay', kind: 'barrel', along: 20.6, across: 8.3, r: 0.5, height: 1.35, standable: true },
+  { deck: 'quay', kind: 'barrel', along: 20.5, across: 7.1, r: 0.5, height: 1.35, standable: true },
+  // a barrel on the middle pier's head, against its north rail
+  {
+    deck: 'quay',
+    kind: 'barrel',
+    along: 32.2,
+    across: 21.3,
+    r: 0.45,
+    height: 1.35,
+    standable: true,
+  },
 ];
 
 export type WickharborHarborProp = WyrmwatchHarborProp;
 
 export const WICKHARBOR_HARBOR_PROPS: readonly WickharborHarborProp[] = PROP_FRAME.map((p) => {
-  const d = harborDeck(p.deck);
-  const at = deckPoint(d, p.along, p.across);
+  const at =
+    p.deck === 'quay'
+      ? quayPoint(p.along, p.across)
+      : deckPoint(harborDeck(p.deck), p.along, p.across);
+  const rot = p.deck === 'quay' ? QUAY_ROT : harborDeck(p.deck).rot;
   return {
     kind: p.kind,
     x: at.x,
     z: at.z,
-    rot: d.rot - Math.PI / 2 + (p.turn ?? 0),
+    rot: rot - Math.PI / 2 + (p.turn ?? 0),
     height: p.height,
     ...(p.r !== undefined ? { r: p.r } : { hw: p.hw ?? 0.5, hd: p.hd ?? 0.5 }),
     ...(p.standable ? { standable: true } : {}),
@@ -485,9 +658,14 @@ export const WICKHARBOR_HARBOR_PROPS: readonly WickharborHarborProp[] = PROP_FRA
 
 /** Decor rows the rebuild moved off the planks (content/galecrest.ts), each keeping the
  *  terrain pad it had where it first lay (terrain_calm_anchors.ts), so the ground round the
- *  harbor is byte-identical: the dinghy that lay half under the north pier's root. */
+ *  harbor is byte-identical: the two dinghies that rode where the great quay now stands (the
+ *  first had lain half under the north pier's root before that), moored now in the slip
+ *  between the north pier and the middle pier, out past the quay's sea face. */
 export const WICKHARBOR_HARBOR_MOVED_DECOR: readonly {
   key: string;
   from: { x: number; z: number };
   to: { x: number; z: number };
-}[] = [{ key: 'hexBoat', from: { x: 474, z: 354 }, to: { x: 473.9, z: 355.5 } }];
+}[] = [
+  { key: 'hexBoat', from: { x: 474, z: 354 }, to: { x: 486.7, z: 359.1 } },
+  { key: 'hexBoat', from: { x: 479, z: 357.5 }, to: { x: 490.4, z: 360.1 } },
+];

@@ -1,10 +1,23 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { type Collider, queryOpenWorldColliders } from '../src/sim/colliders';
+import { EASTBROOK_FERRY_HULL, TRANSPORT_ROUTES } from '../src/sim/content/transport_ships';
 import {
   deckPoint,
   harborDeck,
   harborLocal,
   harborPoint,
+  QUAY_ARM_EDGE_A,
+  QUAY_BERTH_HEAD_C,
+  QUAY_FACE_A,
+  QUAY_MID_A1,
+  QUAY_MID_C0,
+  QUAY_MID_C1,
+  QUAY_NORTH_EDGE_C,
+  QUAY_ORIGIN,
+  QUAY_ROT,
+  QUAY_WHARF_EDGE_C,
+  quayLocal,
+  quayPoint,
   WICKHARBOR_BEACON_DOCK_TOP,
   WICKHARBOR_BEACON_STAIR_TOP,
   WICKHARBOR_BOARDWALK_TOP,
@@ -14,7 +27,17 @@ import {
   WICKHARBOR_STAIR_FIRST_RISE,
   type WickharborHarborDeck,
 } from '../src/sim/content/wickharbor_harbor';
-import { WICKHARBOR_BOARDWALK_ABOVE_WATER } from '../src/sim/content/wickharbor_wharf';
+import {
+  WICKHARBOR_ARM_A1,
+  WICKHARBOR_BERTH_HEAD_A0,
+  WICKHARBOR_BERTH_HEAD_HALF_WIDTH,
+  WICKHARBOR_BOARDWALK_ABOVE_WATER,
+  WICKHARBOR_PIER_HALF_WIDTH,
+  WICKHARBOR_WHARF_ABOVE_WATER,
+  WICKHARBOR_WHARF_ORIGIN,
+  WICKHARBOR_WHARF_ROT,
+  wharfPoint,
+} from '../src/sim/content/wickharbor_wharf';
 import { WYRMWATCH_RAIL_HEIGHT } from '../src/sim/content/wyrmwatch_harbor';
 import { CAMPS, GATHER_NODES, NPCS, PROPS, ZONES } from '../src/sim/data';
 import { FERRY_PIER_DECKS } from '../src/sim/ferry_piers';
@@ -34,8 +57,9 @@ import { groundHeight, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // Wickharbor's wooden harbor (src/sim/content/wickharbor_harbor.ts): the shore boardwalk,
-// the two north piers, the two bluff stairs and the Old Beacon's dock and stair, rebuilt in
-// the ferry wharf's wood as one harbor. This suite pins that no two walkable floors of the
+// the great quay filling the water off it down to the ferry wharf, the two piers out from
+// the quay, the two bluff stairs and the Old Beacon's dock and stair, rebuilt in the ferry
+// wharf's wood as one harbor. This suite pins that no two walkable floors of the
 // WHOLE harbor share a plank plane anywhere (the wharf's own decks among them), that every
 // join is flush or one deliberate step with no gap, that every drop is railed and every
 // opening is a stride onto the land, that the solids stand clear of the walks, and walks
@@ -102,6 +126,8 @@ describe('Wickharbor harbor: the decks', () => {
       'stairNorth',
       'beaconPier',
       'beaconStair',
+      'quayNorth',
+      'quaySouth',
     ]);
     expect(WICKHARBOR_HARBOR_DECKS.map((d) => [d.ax, d.az, d.ax2, d.az2])).toEqual([
       [465, 354, undefined, undefined],
@@ -111,6 +137,8 @@ describe('Wickharbor harbor: the decks', () => {
       [465, 354, 460, 352],
       [507, 327, undefined, undefined],
       [497, 321, 507, 327],
+      [465, 354, undefined, undefined],
+      [465, 354, undefined, undefined],
     ]);
   });
 
@@ -136,7 +164,7 @@ describe('Wickharbor harbor: the decks', () => {
         GALE_DECK_FREEBOARD,
       );
     }
-    for (const id of ['pierNorth', 'pierMiddle', 'boardwalk'] as const) {
+    for (const id of ['pierNorth', 'pierMiddle', 'boardwalk', 'quayNorth', 'quaySouth'] as const) {
       expect(byId(id).nearAboveWater, id).toBe(WICKHARBOR_BOARDWALK_TOP);
     }
   });
@@ -147,11 +175,64 @@ describe('Wickharbor harbor: the decks', () => {
     expect(byId('beaconPier')).toMatchObject({ x: 517.2, z: 337.2, rot: 0.785, hl: 13, hw: 2.2 });
     // the headland's cutting (world.ts terrainHeight) was carved for exactly this stair
     expect(byId('beaconStair')).toMatchObject({ x: 503.3, z: 325.3, rot: 0.99, hl: 6.94, hw: 1.4 });
-    // the middle pier squared off the boardwalk: its head is where it always was
+    // the middle pier runs straight out of the quay's sea face, its head within a stride or
+    // two of where the old pier's head stood (492.81, 364.17)
     const m = byId('pierMiddle');
-    const tip = deckPoint(m, m.hl, 0);
-    expect(Math.hypot(tip.x - 492.81, tip.z - 364.17)).toBeLessThan(0.02);
+    expect(m.rot).toBe(QUAY_ROT);
     expect(m.hw).toBe(2);
+    const root = quayLocal(deckPoint(m, -m.hl, 0).x, deckPoint(m, -m.hl, 0).z);
+    expect(root.along).toBeCloseTo(QUAY_FACE_A, 9);
+    const tip = deckPoint(m, m.hl, 0);
+    expect(Math.hypot(tip.x - 492.81, tip.z - 364.17)).toBeLessThan(2.5);
+    expect(quayLocal(tip.x, tip.z).along).toBeCloseTo(QUAY_MID_A1, 9);
+  });
+
+  it('lays the great quay in the ferry wharf frame, between the north pier, the boardwalk and the wharf', () => {
+    // the quay frame is the wharf's, and the north pier's heading
+    expect(QUAY_ORIGIN).toEqual(WICKHARBOR_WHARF_ORIGIN);
+    expect(QUAY_ROT).toBe(WICKHARBOR_WHARF_ROT);
+    expect(byId('pierNorth').rot).toBe(QUAY_ROT);
+    // its edges are the wharf's: the pier's north side, the arm's east edge, the berth head
+    expect(QUAY_WHARF_EDGE_C).toBe(WICKHARBOR_PIER_HALF_WIDTH);
+    expect(QUAY_ARM_EDGE_A).toBe(WICKHARBOR_ARM_A1);
+    expect(QUAY_FACE_A).toBe(WICKHARBOR_BERTH_HEAD_A0);
+    expect(QUAY_BERTH_HEAD_C).toBe(WICKHARBOR_BERTH_HEAD_HALF_WIDTH);
+    // ...and the north pier's south side
+    const n = byId('pierNorth');
+    expect(quayLocal(n.x, n.z).across - n.hw).toBeCloseTo(QUAY_NORTH_EDGE_C, 9);
+    // the quay's planks are the boardwalk's, the wharf's stand 1.75 yd over them
+    expect(byId('quayNorth').nearAboveWater).toBe(WICKHARBOR_BOARDWALK_TOP);
+    expect(WICKHARBOR_WHARF_ABOVE_WATER - WICKHARBOR_BOARDWALK_TOP).toBeCloseTo(1.75, 9);
+    // the water between the piers is planked: the old open basins, from the boardwalk to the
+    // sea face, from the north pier to the wharf, all stand on the quay now
+    const holes: string[] = [];
+    for (let a = 13; a <= QUAY_FACE_A - 0.05; a += 0.25) {
+      for (let c = QUAY_WHARF_EDGE_C + 0.05; c <= QUAY_NORTH_EDGE_C - 0.05; c += 0.25) {
+        const p = quayPoint(a, c);
+        if (floorsAt(p.x, p.z, 0).length === 0) holes.push(`(${a}, ${c.toFixed(2)})`);
+      }
+    }
+    expect(holes.slice(0, 8)).toEqual([]);
+    // and past the face only the piers and the berth head stand out over the water
+    for (let c = QUAY_BERTH_HEAD_C + 0.1; c <= QUAY_NORTH_EDGE_C - 0.1; c += 0.25) {
+      const p = quayPoint(QUAY_FACE_A + 0.3, c);
+      const onFinger = c > QUAY_MID_C0 && c < QUAY_MID_C1;
+      expect(floorsAt(p.x, p.z, 0).length > 0, `past the face at ${c.toFixed(2)}`).toBe(onFinger);
+    }
+  });
+
+  it('keeps the quay and the piers clear of the berthed ferry', () => {
+    // the Wickharbor berth's hull side (the ship's beam, 5.15 either side of its keel) lies
+    // past the quay's sea face and every pier head near it
+    const route = TRANSPORT_ROUTES.find((r) => r.id === 'wickharborDrakelands');
+    if (!route) throw new Error('no Wickharbor route');
+    const berth = route.berths.find((b) => Math.hypot(b.x - 487.3, b.z - 385.27) < 0.5);
+    if (!berth) throw new Error('no Wickharbor berth');
+    const hullSide = quayLocal(berth.x, berth.z).along - 5.15;
+    expect(QUAY_FACE_A).toBeLessThan(hullSide - 4);
+    // the middle pier stands well clear of the hull's bow and stern, whichever way it lies
+    const keel = quayLocal(berth.x, berth.z).across;
+    expect(QUAY_MID_C0 - keel).toBeGreaterThan(EASTBROOK_FERRY_HULL.length / 2 + 2);
   });
 });
 
@@ -189,7 +270,22 @@ describe('Wickharbor harbor: no two floors in one plane (the owner report)', () 
     }
     // the flush joins: across each shared edge the floors meet with no gap and no step
     const seams: { name: string; a: { x: number; z: number }; b: { x: number; z: number } }[] = [
-      { name: 'middle pier on the boardwalk', a: harborPoint(1.0, 1.7), b: harborPoint(4.98, 1.7) },
+      { name: 'the quay on the boardwalk', a: harborPoint(-5.9, 1.7), b: harborPoint(8.08, 1.7) },
+      {
+        name: 'the quay halves on the boardwalk end line',
+        a: harborPoint(8.1, 1.75),
+        b: harborPoint(8.1, 13),
+      },
+      {
+        name: 'the north pier beside the quay',
+        a: quayPoint(11.5, QUAY_NORTH_EDGE_C),
+        b: quayPoint(QUAY_FACE_A - 0.05, QUAY_NORTH_EDGE_C),
+      },
+      {
+        name: 'the middle pier off the quay face',
+        a: quayPoint(QUAY_FACE_A, QUAY_MID_C0 + 0.05),
+        b: quayPoint(QUAY_FACE_A, QUAY_MID_C1 - 0.05),
+      },
       {
         name: 'north pier on the boardwalk',
         a: harborPoint(-8.08, 1.7),
@@ -319,10 +415,13 @@ describe('Wickharbor harbor: rails and solids', () => {
             open.push(`${d.id} (${a.toFixed(2)}, ${c.toFixed(2)}) drop ${drop.toFixed(2)}`);
         }
       }
-      // the cut edges: the north pier's (the boardwalk joins it, the rail closes the rest)
-      // and the Beacon dock's (the stair joins it, rails either side)
+      // the cut edges: the north pier's (the boardwalk joins it, the rail closes the rest),
+      // the Beacon dock's (the stair joins it, rails either side) and the quay's (the
+      // boardwalk and the other half of the quay join them)
       for (const cut of d.cuts ?? []) {
-        for (let t = -6; t <= 6; t += 0.1) {
+        // (the quay's cut edges run the boardwalk's whole seaward edge and the quay's width)
+        const reach = d.id.startsWith('quay') ? 30 : 6;
+        for (let t = -reach; t <= reach; t += 0.1) {
           const x = cut.x - cut.nz * t;
           const z = cut.z + cut.nx * t;
           if (galeDeckAlong(d, x + cut.nx * 0.05, z + cut.nz * 0.05) === null) continue;
@@ -340,7 +439,7 @@ describe('Wickharbor harbor: rails and solids', () => {
     expect(railed).toBeGreaterThan(300);
   });
 
-  it('solidifies every prop on the planks: cargo can be stood on, the lantern posts are full height', () => {
+  it('solidifies every prop on the planks: cargo can be stood on, the posts are full height', () => {
     const props = colliders.slice(railCount);
     props.forEach((c, i) => {
       const p = WICKHARBOR_HARBOR_PROPS[i];
@@ -349,7 +448,7 @@ describe('Wickharbor harbor: rails and solids', () => {
       expect(floorsAt(p.x, p.z).length, p.kind).toBe(1);
       const base = groundHeight(p.x, p.z, S);
       expect(c.cameraTopY).toBeCloseTo(base + p.height, 6);
-      if (p.kind === 'lanternPost') expect(c.moveTopY).toBeUndefined();
+      if (p.kind === 'lanternPost' || p.kind === 'timberPost') expect(c.moveTopY).toBeUndefined();
       else expect(c.standable, p.kind).toBe(true);
       // no prop stands in a rail (a box prop: its outline, sampled)
       const outline: [number, number, number][] = [];
@@ -413,8 +512,11 @@ describe('Wickharbor harbor: what stays as it was', () => {
     }
   });
 
-  it('moved only the dinghy that lay under the north pier, and it keeps its terrain pad', () => {
-    expect(WICKHARBOR_HARBOR_MOVED_DECOR).toHaveLength(1);
+  it('moved only the two dinghies that rode where the quay stands, and they keep their terrain pads', () => {
+    expect(WICKHARBOR_HARBOR_MOVED_DECOR.map((m) => m.from)).toEqual([
+      { x: 474, z: 354 },
+      { x: 479, z: 357.5 },
+    ]);
     for (const m of WICKHARBOR_HARBOR_MOVED_DECOR) {
       const rows = (PROPS.decorProps ?? []).filter((p) => p.key === m.key);
       expect(rows.filter((p) => p.x === m.to.x && p.z === m.to.z)).toHaveLength(1);
@@ -513,6 +615,7 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
   }
 
   const H = harborPoint;
+  const Q = quayPoint;
   const D = (id: Parameters<typeof harborDeck>[0], a: number, c: number) =>
     deckPoint(byId(id), a, c);
 
@@ -521,15 +624,41 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
     sim.setPlayerLevel(60);
   });
 
-  it('town to the middle pier head: down the south stair, across the boardwalk, out along the pier', () => {
+  it('town to the middle pier head: down the south stair, across the boardwalk and the quay, out along the pier', () => {
     route([
       H(4.27, -9.2),
       H(4.27, -6.5),
       H(4.27, -3.5),
       H(4.2, -1.0),
       H(2.99, 0.6),
-      D('pierMiddle', -8, 0),
-      D('pierMiddle', 10.5, 0.4),
+      Q(18, 17),
+      Q(25, 20.2),
+      Q(33.2, 19.9),
+    ]);
+  }, 120_000);
+
+  it('across the whole quay: from the north pier root to its south corner by the berth head, and along the face', () => {
+    route([
+      H(-5.5, 1.0),
+      Q(13.5, 21.5),
+      Q(21, 21),
+      Q(24.5, 14.6),
+      Q(24.8, 6.2),
+      Q(16, 3.5),
+      Q(13.4, 11.5),
+      Q(14.5, 14.5),
+    ]);
+  }, 120_000);
+
+  it('the quay to the ferry landing: onto the boardwalk, up the wharf flight, along the pier', () => {
+    route([
+      Q(19, 6.5),
+      Q(15, 14.2),
+      H(6.4, 0.3),
+      wharfPoint(11.05, 11.4),
+      wharfPoint(11.05, 6.5),
+      wharfPoint(15, 0.5),
+      { x: 473.25, z: 380.54 },
     ]);
   }, 120_000);
 
@@ -568,7 +697,7 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
       ['pierNorth', 10.5, -0.2, 18, -0.2],
       ['pierMiddle', 0, -1.1, 0, -8],
       ['pierMiddle', 0, 1.1, 0, 8],
-      ['pierMiddle', 10.8, 0.6, 18, 0.6],
+      ['pierMiddle', 2.6, 0.2, 10, 0.2],
       ['boardwalk', -1.0, 0.8, -1.0, 8],
       ['boardwalk', 6.5, 0.8, 6.5, 8],
       ['boardwalk', -2.2, -0.3, -2.2, -8],
@@ -576,6 +705,12 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
       ['beaconPier', 0, -1.3, 0, -8],
       ['beaconPier', 0, 1.3, 0, 8],
       ['beaconPier', 11.6, 0, 18, 0],
+    ];
+    // the quay's sea face, either side of the middle pier and by the berth head (quay frame)
+    const faceDrops: [number, number][] = [
+      [24.8, 7.6],
+      [24.8, 15.2],
+      [24.8, 23.5],
     ];
     for (const jump of [false, true]) {
       for (const [id, a, c, ta, tc] of drops) {
@@ -591,6 +726,21 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
         const y0 = sim.player.pos.y - WATER_LEVEL;
         const end = walk(to.x, to.z, jump, 60);
         expect(end.y, `${jump ? 'jump' : 'walk'} ${id} (${a}, ${c})`).toBeGreaterThan(y0 - 0.05);
+      }
+      for (const [a, c] of faceDrops) {
+        const start = Q(a, c);
+        const to = Q(a + 8, c);
+        for (const col of colliders) {
+          expect(clearance(start.x, start.z, 0.5, col), `start quay (${a}, ${c})`).toBeGreaterThan(
+            0,
+          );
+        }
+        place(start.x, start.z);
+        const y0 = sim.player.pos.y - WATER_LEVEL;
+        const end = walk(to.x, to.z, jump, 60);
+        expect(end.y, `${jump ? 'jump' : 'walk'} quay face (${a}, ${c})`).toBeGreaterThan(
+          y0 - 0.05,
+        );
       }
     }
     // the stairs' sides: the player stays on the treads (whatever height they reach)

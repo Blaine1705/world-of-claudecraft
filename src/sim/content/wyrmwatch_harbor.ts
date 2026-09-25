@@ -224,7 +224,10 @@ export type WyrmwatchHarborPropKind =
   | 'lanternPost'
   | 'bollard'
   | 'crateStack'
-  | 'barrel';
+  | 'barrel'
+  /** A structural timber standing on the planks (a crane's mast, a cargo shelter's corner
+   *  post): full height, never stood on. */
+  | 'timberPost';
 
 export interface WyrmwatchHarborProp {
   kind: WyrmwatchHarborPropKind;
