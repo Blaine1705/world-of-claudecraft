@@ -1,9 +1,11 @@
-// The wire half of the scheduled ferry: the server's `fry` passenger bit and
-// the snapshot head's schedule clock (`time`, or `fc` under a dev skip), and
-// the ClientWorld decode that turns them back into the same timetable view the
-// offline Sim serves (src/net/transport_wire.ts). The sim half lives in
-// tests/transport_ferry.test.ts; the end-to-end ride in
-// tests/transport_ferry_online.test.ts.
+// The wire half of the scheduled ferry: a passenger's `fry` deck spot (their
+// spot on the moving deck in the hull's frame), the snapshot head's schedule
+// clock (`time`, or `fc` under a dev skip), the reconciliation self block's
+// full-precision deck pose (`rdk`), and the ClientWorld decode that turns them
+// back into the same timetable view the offline Sim serves and the deck
+// mirrors the renderer draws passengers from (src/net/transport_wire.ts). The
+// sim half lives in tests/transport_ferry.test.ts and transport_deck.test.ts;
+// the end-to-end voyage in tests/transport_ferry_online.test.ts.
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -30,46 +32,136 @@ vi.mock('../server/db', () => ({
 }));
 
 import { wireEntity } from '../server/game';
-import { transportHeadJson } from '../server/transport_head';
+import { reconciliationSelfWire } from '../server/movement_reconciliation_wire';
+import { ferryDeckWire, ferryMovementFrame, transportHeadJson } from '../server/transport_head';
 import { isMovementFrozen } from '../src/game/self_motion_gate';
-import { transportClockFromHead } from '../src/net/transport_wire';
+import { applyReconSelfWire, ReconWireState } from '../src/net/movement_reconciliation_wire';
+import { applyFerryWire, parseFerryDeck, transportClockFromHead } from '../src/net/transport_wire';
 import { EASTBROOK_WICKHARBOR_FERRY } from '../src/sim/content/transport_ships';
 import { Sim } from '../src/sim/sim';
+import { deckToWorld } from '../src/sim/transport_deck';
 import { transportPhaseAt } from '../src/sim/transport_schedule';
+import type { Entity } from '../src/sim/types';
+import { WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import { bareClient } from './helpers/bare_client';
 
 const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const SHIP = { x: 40, z: -12, rot: 0.9 };
 
-function ride(atSea: boolean) {
-  return { route: ROUTE.id, to: 1, lx: 1, ly: 3.3, lz: 0.8, lf: 0, wx: 0, wz: 0, atSea };
+/** Put `e` on a ship at SHIP, at deck spot (lx, lz), facing `lf` off the bow. */
+function aboard(e: Entity, lx: number, lz: number, lf: number): void {
+  const at = deckToWorld(SHIP, lx, lz, { x: 0, z: 0 });
+  e.pos = { x: at.x, y: WATER_LEVEL + 3.3, z: at.z };
+  e.facing = SHIP.rot + lf;
+  e.ferryRide = { route: ROUTE.id, from: 0, to: 1, ship: { ...SHIP } };
 }
 
-describe('the fry passenger bit', () => {
-  it('is absent for a player on foot, 1 aboard, 2 on the hidden at-sea leg', () => {
+describe('the fry deck spot', () => {
+  it('is absent on foot, and the hull-frame spot aboard, rounded like x/y/z', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     const e = sim.player;
     expect(wireEntity(e)).not.toHaveProperty('fry');
-    e.ferryRide = ride(false);
-    expect(wireEntity(e).fry).toBe(1);
-    e.ferryRide = ride(true);
-    expect(wireEntity(e).fry).toBe(2);
+    aboard(e, 1.234567, -4.5, 0.25);
+    expect(wireEntity(e).fry).toEqual([0, 1.23, 3.3, -4.5, 0.25]);
+    expect(ferryDeckWire(e)).toEqual([0, 1.23, 3.3, -4.5, 0.25]);
+    e.ferryRide = null;
+    expect(ferryDeckWire(e)).toBeUndefined();
   });
 
-  it('decodes onto the client mirrors, and clears when the key is absent', () => {
+  it('parses only a well-formed spot on a known route', () => {
+    expect(parseFerryDeck([0, 1, 3.3, -2, 0.5])).toEqual({ route: 0, x: 1, y: 3.3, z: -2, f: 0.5 });
+    expect(parseFerryDeck(undefined)).toBeNull();
+    expect(parseFerryDeck(1)).toBeNull();
+    expect(parseFerryDeck([0, 1, 3.3, -2])).toBeNull();
+    expect(parseFerryDeck([7, 1, 3.3, -2, 0])).toBeNull();
+    expect(parseFerryDeck([-1, 1, 3.3, -2, 0])).toBeNull();
+    expect(parseFerryDeck([0.5, 1, 3.3, -2, 0])).toBeNull();
+    expect(parseFerryDeck([0, 'x', 3.3, -2, 0])).toBeNull();
+    expect(parseFerryDeck([0, Number.NaN, 3.3, -2, 0])).toBeNull();
+  });
+
+  it('decodes onto the client deck mirrors, re-anchors the interpolation, and clears', () => {
+    const e = { ferryRiding: false } as Entity;
+    applyFerryWire(e, [0, 1, 3.3, 2, 0], -1);
+    expect(e.ferryRiding).toBe(true);
+    expect(e.ferryDeck).toEqual({ route: 0, x: 1, y: 3.3, z: 2, f: 0 });
+    expect(e.ferryDeckPrev).toEqual(e.ferryDeck);
+    // the next spot glides on from where the body was drawn (the old spot
+    // here: its interpolation had not started)
+    applyFerryWire(e, [0, 3, 3.3, 2, 0.4], 0.5);
+    expect(e.ferryDeck).toEqual({ route: 0, x: 3, y: 3.3, z: 2, f: 0.4 });
+    expect(e.ferryDeckPrev).toEqual({ route: 0, x: 1, y: 3.3, z: 2, f: 0 });
+    // half way from 1 to 3 when the next one lands
+    applyFerryWire(e, [0, 5, 3.3, 2, 0.4], 0.5);
+    expect(e.ferryDeckPrev?.x).toBeCloseTo(2, 9);
+    // a snap (negative alpha) restarts on the new spot
+    applyFerryWire(e, [0, 9, 3.3, 2, 0.4], -1);
+    expect(e.ferryDeckPrev?.x).toBe(9);
+    // gone from the wire: off the ship
+    applyFerryWire(e, undefined, 0.5);
+    expect(e.ferryRiding).toBe(false);
+    expect(e.ferryDeck).toBeNull();
+    expect(e.ferryDeckPrev).toBeNull();
+  });
+
+  it('reaches the ClientWorld mirrors through a real snapshot', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     const e = sim.player;
     const client = bareClient(e.id + 1000);
     const apply = (s: unknown) =>
       (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(s);
-    e.ferryRide = ride(true);
+    aboard(e, -2, 6, 0);
     apply({ t: 'snap', time: 1, ents: [wireEntity(e)] });
     expect(client.entities.get(e.id)?.ferryRiding).toBe(true);
-    expect(client.entities.get(e.id)?.ferryAtSea).toBe(true);
+    expect(client.entities.get(e.id)?.ferryDeck).toMatchObject({ route: 0, x: -2, z: 6 });
     e.ferryRide = null;
     apply({ t: 'snap', time: 2, ents: [wireEntity(e)] });
     expect(client.entities.get(e.id)?.ferryRiding).toBe(false);
-    expect(client.entities.get(e.id)?.ferryAtSea).toBe(false);
+    expect(client.entities.get(e.id)?.ferryDeck ?? null).toBeNull();
+  });
+});
+
+describe('the reconciliation self block aboard', () => {
+  const session = {
+    movementWireVersion: 2 as const,
+    lastConsumedCt: 41,
+    movementOverrideEpoch: 3,
+    movementOverrideActive: false,
+    movementMoveSpeedMult: 1,
+  };
+
+  it('adds the full-precision deck pose (rdk) for a passenger only', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const e = sim.player;
+    expect(reconciliationSelfWire(session, e)).not.toHaveProperty('rdk');
+    aboard(e, 1.234567, -4.5, 0.25);
+    const wire = reconciliationSelfWire(session, e);
+    const rdk = wire.rdk as number[];
+    expect(rdk[0]).toBe(0);
+    expect(rdk[1]).toBeCloseTo(1.234567, 9);
+    expect(rdk[3]).toBeCloseTo(-4.5, 9);
+    expect(rdk[4]).toBeCloseTo(0.25, 9);
+    // the client decodes it beside the world pose
+    const target = new ReconWireState();
+    applyReconSelfWire(target, wire as Record<string, unknown>, 2);
+    expect(target.reconDeck?.x).toBeCloseTo(1.234567, 9);
+    expect(target.reconAuthoritativeX).toBeCloseTo(e.pos.x, 9);
+    applyReconSelfWire(target, reconciliationSelfWire(session, { ...e, ferryRide: null }), 2);
+    expect(target.reconDeck).toBeNull();
+  });
+
+  it('measures the steps of a passenger in the hull frame, for the override epoch', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const e = sim.player;
+    const out = { x: 0, y: 0, z: 0 };
+    expect(ferryMovementFrame(e, out)).toBe(-1);
+    expect(out).toEqual(e.pos);
+    aboard(e, 2, 3, 0);
+    expect(ferryMovementFrame(e, out)).toBe(0);
+    expect(out.x).toBeCloseTo(2, 9);
+    expect(out.y).toBeCloseTo(3.3, 9);
+    expect(out.z).toBeCloseTo(3, 9);
   });
 });
 
@@ -88,7 +180,7 @@ describe('the schedule clock on the snapshot head', () => {
     const client = bareClient(sim.player.id + 1000);
     const apply = (s: unknown) =>
       (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(s);
-    for (const clock of [5, 61, 75, 85, 100, 150, 170]) {
+    for (const clock of [5, 61, 75, 85, 100, 150, 170, 240, 300]) {
       sim.transportClockOffset = clock - sim.time;
       apply({ t: 'snap', time: sim.time, fc: sim.time + sim.transportClockOffset, ents: [] });
       const online = client.ferryView();
@@ -100,14 +192,10 @@ describe('the schedule clock on the snapshot head', () => {
   });
 });
 
-describe('a passenger is movement-frozen on the client (both worlds)', () => {
-  it('freezes the online mirror bit and the offline ride alike, and nobody else', () => {
+describe('a passenger walks the deck (never movement-frozen)', () => {
+  it('only an unreleased corpse is frozen', () => {
     const alive = { dead: false, ghost: false };
     expect(isMovementFrozen(alive)).toBe(false);
-    expect(isMovementFrozen({ ...alive, ferryRiding: true })).toBe(true);
-    expect(isMovementFrozen({ ...alive, ferryRide: ride(false) })).toBe(true);
-    expect(isMovementFrozen({ ...alive, ferryRiding: false, ferryRide: null })).toBe(false);
-    // the corpse rule is unchanged
     expect(isMovementFrozen({ dead: true, ghost: false })).toBe(true);
     expect(isMovementFrozen({ dead: true, ghost: true })).toBe(false);
   });
