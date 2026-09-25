@@ -43,6 +43,7 @@ import {
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { scalePrimaryHealing } from '../primary_healing';
 import { scheduleProjectile } from '../projectile_travel';
+import { worldPvpOnPlayerAided } from '../pvp';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
@@ -209,7 +210,7 @@ import {
   repeatDawnEcho,
   unleashPerpetualSun,
 } from './paladin_talents';
-import { armValkyrsCalling } from './paladin_valkyrs_calling';
+import { armValkyrsCalling, consumeLightbrandEdict } from './paladin_valkyrs_calling';
 import { activateVeilboundMarch } from './paladin_veilbound_march';
 import {
   captureDirgeReapplication,
@@ -231,6 +232,7 @@ import {
   knockoutRedlineMult,
   rogueEngineOnFinisher,
   rogueGloamDetonation,
+  rogueSetComboBonus,
 } from './rogue_engines';
 import {
   capturedTrueStealthAmbush,
@@ -529,6 +531,9 @@ export function runEffects(
   // cast's effects resolve, so the detonating Lurker's Strike is the doubled
   // one. Checked before breakStealth: a true-stealth opener banks instead.
   const trueStealthOpener = capturedTrueStealthAmbush(ctx, p, ability.id);
+  // Warfare Season 2 rogue set combo bends, snapshotted before breakStealth
+  // (the Shadewalk 4pc reads the Smokefade stealth this cast breaks).
+  const setComboBonus = rogueSetComboBonus(ctx, p, ability.id);
   rogueGloamDetonation(ctx, p, ability.id);
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
@@ -674,6 +679,14 @@ export function runEffects(
           weaponMult *= 1.15;
           bonus = Math.round(bonus * 1.15);
         }
+        // Lightbrand Warplate 4pc: the Valkyr's Calling landing armed a
+        // one-shot empower (combat/paladin_valkyrs_calling.ts); the whole
+        // strike scales, weapon and flat bonus alike. No rng.
+        if (ability.id === FINAL_EDICT_ID) {
+          const edictMult = consumeLightbrandEdict(ctx, p);
+          weaponMult *= edictMult;
+          bonus = Math.round(bonus * edictMult);
+        }
         const hunterStrike =
           meta.cls === 'hunter' &&
           (ability.id === 'raptor_strike' || ability.id === 'mongoose_bite');
@@ -780,7 +793,7 @@ export function runEffects(
           advanceSunGodVerdictForHit(ctx, p, strikeTarget, ability.id, sunVerdictMark);
         }
         if (hit && ability.awardsCombo) {
-          ctx.awardCombo(p, target, ability.awardsCombo);
+          ctx.awardCombo(p, target, ability.awardsCombo + setComboBonus);
           comboAwarded = true;
         }
         if (ability.requiresDodgeProc) p.overpowerUntil = -1;
@@ -1048,7 +1061,7 @@ export function runEffects(
         // recast can read the count (combat/chronomancy.ts).
         if (ability.id === ARCANE_SURGE_ID) aetherSurgeAddStack(ctx, p);
         if (!target.dead && ability.awardsCombo && !comboAwarded) {
-          ctx.awardCombo(p, target, ability.awardsCombo);
+          ctx.awardCombo(p, target, ability.awardsCombo + setComboBonus);
           comboAwarded = true;
         }
         // Legendary on-spell-damage weapon procs (e.g. Deathless Heartwood's
@@ -1588,6 +1601,9 @@ export function runEffects(
       }
       case 'absorb': {
         const shieldTarget = target ?? p;
+        // World PvP: a shield on a flagged ally mid-fight is aid (the heal rule).
+        if (shieldTarget.kind === 'player' && shieldTarget.id !== p.id)
+          worldPvpOnPlayerAided(ctx, shieldTarget, p);
         ctx.applyAura(shieldTarget, {
           id: absorbAuraId(ability, eff),
           name: ability.name,
@@ -1924,6 +1940,8 @@ export function runEffects(
         targetBuffIndex += 1;
         const applyBuff = (e: Entity) => {
           const lifetime = eff.permanent ? Number.POSITIVE_INFINITY : eff.duration;
+          // World PvP: a buff on a flagged ally mid-fight is aid (the heal rule).
+          if (e.kind === 'player' && e.id !== p.id) worldPvpOnPlayerAided(ctx, e, p);
           ctx.applyAura(e, {
             id: auraId,
             name: ability.name,
@@ -2264,7 +2282,7 @@ export function runEffects(
         // arm's rule; the comboAwarded latch keeps a strike-plus-stun ability
         // at one point per cast.
         if (ability.awardsCombo && !comboAwarded) {
-          ctx.awardCombo(p, target, ability.awardsCombo);
+          ctx.awardCombo(p, target, ability.awardsCombo + setComboBonus);
           comboAwarded = true;
         }
         // Same moment, same rule for the feral Old Blood bank: Slinkstrike's
@@ -2355,7 +2373,7 @@ export function runEffects(
         // incapacitate this same cast just applied.
         if (ability.id === 'gouge') resetSwingTimer(ctx, p, meta);
         if (ability.awardsCombo && !comboAwarded) {
-          ctx.awardCombo(p, target, ability.awardsCombo);
+          ctx.awardCombo(p, target, ability.awardsCombo + setComboBonus);
           comboAwarded = true;
         }
         // Sap (noCombatEntry) is the classic out-of-combat setup tool: it must

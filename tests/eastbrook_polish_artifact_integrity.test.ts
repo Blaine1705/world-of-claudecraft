@@ -1385,7 +1385,15 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the Eastbrook ferry's Phase 2: the renderer leaf gained the at-sea passenger hide and moved two helpers out. No capture was retaken.
   // Re-minted for the ferry's playtest fixes (renderer and ground-sample leaves). No capture was retaken.
-  'f1a29afb008d49790918e7c24935b501854460186a8873ff2417623edeb544a2';
+  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 into the Eastbrook ferry branch: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  'e20c91641109f7aba1b4ebeffdf9844e95aa141c7c35ebf549e255e355ce989a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1399,7 +1407,15 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the Eastbrook ferry's Phase 2: the renderer leaf gained the at-sea passenger hide and moved two helpers out. No capture was retaken.
   // Re-minted for the ferry's Phase 3 and playtest fixes (renderer and ground-sample leaves). No capture was retaken.
-  'cb7c2454fa7994063b1336117665090323c991255e99e828b4c5e0d120b17a17';
+  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 into the Eastbrook ferry branch: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  '9a9eefdae8f9f231b25fde437b18cc6eecd4feb2f407e9fa8431694ee6fcf52f';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2780,7 +2796,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // Ferry playtest fixes: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('3fceecc3361c9cd8c53608229360410eca26a4bba31e5817f59bf3ba74825548');
+      // release/v0.44.0 merge into feature/world-pvp-flag: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+      // feature/world-pvp-flag (review round) merge into feature/king-of-the-hill: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+      // release/v0.44.0 (PR 4200) merge into feature/vfx-floor-layering: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+      // release/v0.44.0 merge into the Eastbrook ferry branch: recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+    ).toBe('341ebc7090c7e73677eda58304c2843f2ae297d1c7ebda22c66a027ca00239c5');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -126,10 +126,12 @@ const build = await buildItemArtAudit({
     // additive over that shared base, so 1069 + 212 + 2 = 1283 and
     // 1087 + 212 + 2 = 1301, plus the Viridian Valestrider's reins on both
     // sides = 1284 / 1302. Verified with `node scripts/item_art_audit.mjs
-    // --verify-only` against the merged tree.
-    catalogCount: 1284,
-    liveItemCount: 1302,
-    pendingArtCount: 0,
+    // --verify-only` against the merged tree. Warfare Season 2: the four
+    // painted weapons (warfare-season2-weapons-2026-09-25) make 1288 / 1306,
+    // and its 135 armor pieces ride ITEM_ART_PENDING until the art pass.
+    catalogCount: 1288,
+    liveItemCount: 1306,
+    pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,

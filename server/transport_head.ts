@@ -1,7 +1,7 @@
 // The scheduled ferry's share of the server wire (src/sim/transport_ferry.ts is
-// the authority; src/net/transport_wire.ts the client decode), plus the two
-// entity-record splicers the snapshot builder shares, moved out of game.ts
-// under the monolith ratchet.
+// the authority; src/net/transport_wire.ts the client decode). The two
+// entity-record splicers the snapshot builder shares live in
+// server/entity_wire_cache.ts.
 //
 // The ferry's schedule clock IS the snapshot head's `time` in play, so the head
 // normally carries nothing extra. Only while a dev skip is active
@@ -75,14 +75,4 @@ export function transportHeadJson(sim: Pick<Sim, 'time' | 'transportClockOffset'
   const offset = sim.transportClockOffset;
   if (!offset) return '';
   return `,"fc":${round2(sim.time + offset)}`;
-}
-
-/** A full entity record: id, identity fields, dynamic fields. */
-export function fullEntityJson(id: number, idJson: string, dynJson: string): string {
-  return `{"id":${id},${idJson.slice(1, -1)},${dynJson.slice(1, -1)}}`;
-}
-
-/** A lite entity record: id and dynamic fields only. */
-export function liteEntityJson(id: number, dynJson: string): string {
-  return `{"id":${id},${dynJson.slice(1, -1)}}`;
 }

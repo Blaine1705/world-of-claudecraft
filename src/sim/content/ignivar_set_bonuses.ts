@@ -30,6 +30,7 @@
 // `src/sim`-pure; no rng, no clock.
 
 import type { TalentEffect } from './talents';
+import { VANGUARD_SET_ENGINE_BONUSES } from './vanguard_set_bonuses';
 
 export interface SetEngineBonusTier {
   pieces: number;
@@ -336,6 +337,8 @@ export const GROVESPRING_4PC_VERDANCE_BANK = 1;
 /** The engine payloads, keyed by set id (the `set` tag on each member item
  *  and the ItemSet id in item_sets.ts). Tiers ascend by pieces. */
 export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> = {
+  // Warfare Season 2 (content/vanguard_set_bonuses.ts).
+  ...VANGUARD_SET_ENGINE_BONUSES,
   // ---- Warrior ----
   slagbreaker: [
     {
