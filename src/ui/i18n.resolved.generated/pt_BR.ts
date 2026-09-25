@@ -17738,6 +17738,11 @@ export const pt_BR: EnTranslations = {
         "title": "Vigia das Dunas Distantes",
         "greeting": "Fique abaixado. O som se propaga de forma estranha no vidro, e o portão lá embaixo tem ouvidos."
       },
+      "harbormaster_tamsin": {
+        "name": "Harbormaster Tamsin",
+        "title": "Keeper of the Wyrmwatch Quays",
+        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
+      },
       "reeve_ottoline": {
         "name": "Prefeita Ottoline",
         "title": "Prefeita de Lanternmere",

@@ -99,6 +99,7 @@ describe('Wyrmwatch cliff harbor: the decks', () => {
       turnLanding: [WYRMWATCH_LANDING_ABOVE_WATER, WYRMWATCH_LANDING_ABOVE_WATER],
       flightTwo: [WYRMWATCH_LANDING_ABOVE_WATER, WYRMWATCH_TOP_ABOVE_WATER],
       topLanding: [WYRMWATCH_TOP_ABOVE_WATER, WYRMWATCH_TOP_ABOVE_WATER],
+      houseFloor: [WYRMWATCH_QUAY_ABOVE_WATER, WYRMWATCH_QUAY_ABOVE_WATER],
     };
     for (const d of WYRMWATCH_HARBOR_DECKS) {
       const [near, far] = levels[d.id];
@@ -186,7 +187,9 @@ describe('Wyrmwatch cliff harbor: rails and solids', () => {
   });
 
   it('solidifies every prop: cargo can be stood on, the rest is full height', () => {
-    const props = colliders.slice(colliders.length - WYRMWATCH_HARBOR_PROPS.length);
+    // the rails first, then the props (the house's own colliders follow them)
+    const rails = WYRMWATCH_HARBOR_RAILS.flatMap((r) => wyrmwatchRailColliders(r, S)).length;
+    const props = colliders.slice(rails, rails + WYRMWATCH_HARBOR_PROPS.length);
     props.forEach((c, i) => {
       const p = WYRMWATCH_HARBOR_PROPS[i];
       expect(c.x).toBe(p.x);
@@ -202,12 +205,13 @@ describe('Wyrmwatch cliff harbor: rails and solids', () => {
     });
   });
 
-  it('keeps the walkway clear: the route, the shack door and the gate pass every solid', () => {
+  it('keeps the walkway clear: the route, the house door and the gate pass every solid', () => {
     // a body is 0.5 across its radius: the route's centre line keeps that from all of them
     const doorWalk: [number, number][] = [
       [491, 1899.4],
-      [490.8, 1893],
-      [489.85, 1891.2],
+      [491, 1896.6],
+      [490.2, 1893],
+      [490.2, 1891.0],
     ];
     for (const path of [ROUTE, doorWalk]) {
       for (let i = 0; i + 1 < path.length; i++) {
@@ -403,12 +407,13 @@ describe('Wyrmwatch cliff harbor: walking it (the real movement kernel)', () => 
     }
   }, 120_000);
 
-  it('reaches the harbormaster shack door from the pier', () => {
+  it("reaches the Harbormaster's House door from the pier", () => {
     place(494.5, 1899.4);
     for (const [x, z] of [
       [491, 1899.4],
-      [490.8, 1893],
-      [489.85, 1891.2],
+      [491, 1896.6],
+      [490.2, 1893],
+      [490.2, 1891.0],
     ] as const) {
       const end = walk(x, z);
       expect(Math.hypot(end.x - x, end.z - z)).toBeLessThan(0.4);

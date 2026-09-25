@@ -17738,6 +17738,11 @@ export const it_IT: EnTranslations = {
         "title": "Vedetta delle Dune Lontane",
         "greeting": "Resta basso. Il suono si propaga in modo strano sul vetro, e il cancello sottostante ha orecchie."
       },
+      "harbormaster_tamsin": {
+        "name": "Harbormaster Tamsin",
+        "title": "Keeper of the Wyrmwatch Quays",
+        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
+      },
       "reeve_ottoline": {
         "name": "Podestà Ottoline",
         "title": "Podestà di Lanternmere",

@@ -1,6 +1,7 @@
 // The Wyrmwatch cliff harbor's colliders (content/wyrmwatch_harbor.ts): the rails
-// that line every drop off its quays, flights and landings, and the solid things
-// standing on it (the shack, the gate posts, the lantern posts, bollards, cargo).
+// that line every drop off its quays, flights and landings, the solid things
+// standing on it (the gate posts, the lantern posts, bollards, cargo), and the
+// Harbormaster's House (wyrmwatch_harbor_house.ts: its walls and furnishings).
 // Its walkable decks are not here: they join the ferry pier surface query
 // (ferry_piers.ts), so world.ts groundHeight walks them like any harbor planks.
 //
@@ -24,6 +25,7 @@ import {
   type WyrmwatchHarborProp,
 } from './content/wyrmwatch_harbor';
 import { groundHeight } from './world';
+import { harborHouseColliders } from './wyrmwatch_harbor_house';
 
 /** A rail box is never longer than this, so its top tracks a flight's rise. */
 export const WYRMWATCH_RAIL_SEGMENT = 1.2;
@@ -90,10 +92,11 @@ export function wyrmwatchPropCollider(prop: WyrmwatchHarborProp, seed: number): 
   };
 }
 
-/** Every collider of the harbor: the rails, then the props. */
+/** Every collider of the harbor: the rails, then the props, then the house. */
 export function wyrmwatchHarborColliders(seed: number): Collider[] {
   const out: Collider[] = [];
   for (const rail of WYRMWATCH_HARBOR_RAILS) out.push(...wyrmwatchRailColliders(rail, seed));
   for (const prop of WYRMWATCH_HARBOR_PROPS) out.push(wyrmwatchPropCollider(prop, seed));
+  out.push(...harborHouseColliders(seed));
   return out;
 }

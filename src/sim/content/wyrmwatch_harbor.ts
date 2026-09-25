@@ -11,7 +11,8 @@
 //  - the pier (unchanged, ../ferry_piers.ts) runs out east at z 1899.2 from the
 //    foot of the bluff (x 490) to the berth, its planks 2.64 above the water;
 //  - the north yard: a quay beside the pier's root, west of the route marker,
-//    holding the harbormaster's shack with its door toward the pier;
+//    the forecourt of the Harbormaster's House (content/wyrmwatch_harbor_house.ts),
+//    whose floor is the `houseFloor` deck here and whose door faces the pier;
 //  - the south quay: off the pier's south side, along the foot of the cliff;
 //  - the switchback: the first flight climbs south from the quay over the water,
 //    turns on a wide landing, and the second climbs back north against the cliff
@@ -27,10 +28,11 @@
 //
 // Scale: the player model stands 2.6 yd to the crown on a 0.5 yd body radius and
 // climbs 0.9 yd unaided (MAX_STEP_HEIGHT), so flights are 3.2 yd wide, the rails
-// stand 1.2 yd high (above a jump), the gate clears 5 yd, and the shack door 3.2 yd;
+// stand 1.2 yd high (above a jump), the gate clears 5 yd, and the house door 3.8 yd;
 // the dressing is sized generously so the player reads small beside it.
 
 import type { GaleDeckDef } from '../gale_harbor';
+import { HARBOR_HOUSE, HARBOR_HOUSE_FLOOR_ABOVE_WATER } from './wyrmwatch_harbor_house';
 
 /** The quays stand at the Wyrmwatch ferry pier's plank height (FERRY_PIER_DECK_ABOVE_WATER). */
 export const WYRMWATCH_QUAY_ABOVE_WATER = 2.64;
@@ -54,9 +56,17 @@ const TOP = WYRMWATCH_TOP_ABOVE_WATER;
 
 /** A walkable harbor deck, named for the model and the tests. */
 export interface WyrmwatchHarborDeck extends GaleDeckDef {
-  id: 'northYard' | 'southQuay' | 'flightOne' | 'turnLanding' | 'flightTwo' | 'topLanding';
-  /** Stair flights draw as treads; level decks as planks. */
-  kind: 'quay' | 'flight' | 'landing';
+  id:
+    | 'northYard'
+    | 'southQuay'
+    | 'flightOne'
+    | 'turnLanding'
+    | 'flightTwo'
+    | 'topLanding'
+    | 'houseFloor';
+  /** Stair flights draw as treads; level decks as planks; the house floor is drawn by the
+   *  house (its boards run under the walls). */
+  kind: 'quay' | 'flight' | 'landing' | 'floor';
 }
 
 /** Every deck is level or a two-height ramp set above the water, never by the
@@ -64,18 +74,19 @@ export interface WyrmwatchHarborDeck extends GaleDeckDef {
  *  deck's length along +z, rot PI along -z (galeDeckSurfaceAt's near end is
  *  along -hl). */
 export const WYRMWATCH_HARBOR_DECKS: readonly WyrmwatchHarborDeck[] = [
-  // the north yard: x 487.5..492.2, z 1885.5..1897.2 (its south edge laps
-  // 0.2 onto the pier's north edge at the pier's root, west of the marker)
+  // the north yard: x 487.5..492.2, z 1890.1..1897.2 (its south edge laps
+  // 0.2 onto the pier's north edge at the pier's root, west of the marker; its
+  // north edge laps 0.3 under the house's south wall, so the doorway has no seam)
   {
     id: 'northYard',
     kind: 'quay',
     x: 489.85,
-    z: 1891.35,
+    z: 1893.65,
     rot: 0,
-    hl: 5.85,
+    hl: 3.55,
     hw: 2.35,
     ax: 489.85,
-    az: 1891.35,
+    az: 1893.65,
     nearAboveWater: QUAY,
     farAboveWater: QUAY,
   },
@@ -149,6 +160,21 @@ export const WYRMWATCH_HARBOR_DECKS: readonly WyrmwatchHarborDeck[] = [
     nearAboveWater: TOP,
     farAboveWater: TOP,
   },
+  // the Harbormaster's House floor: its whole footprint, x 487.9..498.3, z 1880.8..1890.4,
+  // over the water north of the yard (the house's walls stand on its edges)
+  {
+    id: 'houseFloor',
+    kind: 'floor',
+    x: HARBOR_HOUSE.x,
+    z: HARBOR_HOUSE.z,
+    rot: 0,
+    hl: HARBOR_HOUSE.hd,
+    hw: HARBOR_HOUSE.hw,
+    ax: HARBOR_HOUSE.x,
+    az: HARBOR_HOUSE.z,
+    nearAboveWater: HARBOR_HOUSE_FLOOR_ABOVE_WATER,
+    farAboveWater: HARBOR_HOUSE_FLOOR_ABOVE_WATER,
+  },
 ];
 
 /**
@@ -159,13 +185,12 @@ export const WYRMWATCH_HARBOR_DECKS: readonly WyrmwatchHarborDeck[] = [
  * and the top landing through the gate onto the cliff top.
  */
 export const WYRMWATCH_HARBOR_RAILS: readonly (readonly (readonly [number, number])[])[] = [
-  // the inner line: round the north yard's back and landward sides, across the
-  // pier's root against the cliff, down the south quay's cliff side, up flight
+  // the inner line: from the house's south-west corner down the north yard's
+  // landward side, across the pier's root against the cliff, down the south quay's cliff side, up flight
   // one's inner side, across the gap between the flights, up flight two's inner
   // side and round the top landing's seaward edges to the north gate post
   [
-    [492.05, 1885.65],
-    [487.65, 1885.65],
+    [487.65, 1890.0],
     [487.65, 1897.05],
     [490.15, 1897.05],
     [490.15, 1901.25],
@@ -195,13 +220,11 @@ export const WYRMWATCH_HARBOR_RAILS: readonly (readonly (readonly [number, numbe
 /** A solid thing standing in the harbor: what the sim collides with and the
  *  model draws there. Heights are over the ground (or planks) under its centre. */
 export type WyrmwatchHarborPropKind =
-  | 'shack'
   | 'gatePost'
   | 'lanternPost'
   | 'bollard'
   | 'crateStack'
-  | 'barrel'
-  | 'netRack';
+  | 'barrel';
 
 export interface WyrmwatchHarborProp {
   kind: WyrmwatchHarborPropKind;
@@ -221,13 +244,11 @@ export interface WyrmwatchHarborProp {
 }
 
 export const WYRMWATCH_HARBOR_PROPS: readonly WyrmwatchHarborProp[] = [
-  // the harbormaster's shack on the north yard, its door (+z) toward the pier
-  { kind: 'shack', x: 489.85, z: 1888.2, rot: 0, hw: 1.75, hd: 2.2, height: 6.4 },
   // the harbor gate at the head of the stair, one post either side of the top
   // landing's west edge on its own plinth
   { kind: 'gatePost', x: 488.8, z: 1906.05, rot: 0, r: 0.55, height: 7.2 },
   { kind: 'gatePost', x: 488.8, z: 1910.75, rot: 0, r: 0.55, height: 7.2 },
-  // lantern posts: by the shack door, at the yard's cliff corner, and three
+  // lantern posts: by the house door, at the yard's cliff corner, and three
   // along the path to Wyrmwatch (the rails' newel lanterns need no collider)
   { kind: 'lanternPost', x: 491.75, z: 1891.1, rot: 0, r: 0.24, height: 4.4 },
   { kind: 'lanternPost', x: 488.05, z: 1896.55, rot: 0, r: 0.24, height: 4.4 },
@@ -235,22 +256,21 @@ export const WYRMWATCH_HARBOR_PROPS: readonly WyrmwatchHarborProp[] = [
   { kind: 'lanternPost', x: 453.0, z: 1908.6, rot: 0, r: 0.24, height: 4.4 },
   { kind: 'lanternPost', x: 438.8, z: 1906.9, rot: 0, r: 0.24, height: 4.4 },
   // mooring bollards along the water sides of the yard and the quay
-  { kind: 'bollard', x: 491.9, z: 1886.9, rot: 0, r: 0.32, height: 1.0, standable: true },
   { kind: 'bollard', x: 491.9, z: 1894.2, rot: 0, r: 0.32, height: 1.0, standable: true },
   { kind: 'bollard', x: 498.15, z: 1902.3, rot: 0, r: 0.32, height: 1.0, standable: true },
   { kind: 'bollard', x: 498.15, z: 1905.9, rot: 0, r: 0.32, height: 1.0, standable: true },
-  // cargo on the yard's landward side, clear of the walk to the shack door
+  // cargo on the yard's landward side, clear of the walk to the house door (the
+  // nets went indoors)
   {
     kind: 'crateStack',
     x: 488.45,
-    z: 1891.5,
+    z: 1892.3,
     rot: 0,
     hw: 0.7,
     hd: 0.95,
     height: 1.7,
     standable: true,
   },
-  { kind: 'netRack', x: 488.1, z: 1893.75, rot: 0, hw: 0.25, hd: 1.2, height: 2.5 },
   { kind: 'barrel', x: 488.45, z: 1895.35, rot: 0, r: 0.5, height: 1.35, standable: true },
   // ...and on the south quay's cliff side, clear of the walk to flight one
   {

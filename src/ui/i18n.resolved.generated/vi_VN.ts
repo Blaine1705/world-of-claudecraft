@@ -17738,6 +17738,11 @@ export const vi_VN: EnTranslations = {
         "title": "Người Canh Gác Cồn Cát Xa",
         "greeting": "Cúi thấp xuống. Âm thanh vọng lại kỳ lạ trên mặt kính, và cánh cổng bên dưới có tai đấy."
       },
+      "harbormaster_tamsin": {
+        "name": "Harbormaster Tamsin",
+        "title": "Keeper of the Wyrmwatch Quays",
+        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
+      },
       "reeve_ottoline": {
         "name": "Xã Trưởng Ottoline",
         "title": "Xã Trưởng Của Lanternmere",

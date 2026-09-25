@@ -17738,6 +17738,11 @@ export const id_ID: EnTranslations = {
         "title": "Pengawas Gumuk Pasir Jauh",
         "greeting": "Tetap merunduk. Suara merambat aneh dari kaca itu, dan gerbang di bawah sana punya telinga."
       },
+      "harbormaster_tamsin": {
+        "name": "Harbormaster Tamsin",
+        "title": "Keeper of the Wyrmwatch Quays",
+        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
+      },
       "reeve_ottoline": {
         "name": "Demang Ottoline",
         "title": "Reeve Lanternmere",

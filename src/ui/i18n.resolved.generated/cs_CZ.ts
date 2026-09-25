@@ -17738,6 +17738,11 @@ export const cs_CZ: EnTranslations = {
         "title": "Hlídač Vzdálených dun",
         "greeting": "Drž se při zemi. Zvuk se od skla nese podivně, a brána dole má uši."
       },
+      "harbormaster_tamsin": {
+        "name": "Harbormaster Tamsin",
+        "title": "Keeper of the Wyrmwatch Quays",
+        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
+      },
       "reeve_ottoline": {
         "name": "Rychtářka Ottoline",
         "title": "Rychtářka Lucernojezera",

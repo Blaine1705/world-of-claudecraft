@@ -1752,6 +1752,24 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('ranger'),
     props: 'crossbow',
   },
+  // Harbormaster Tamsin of the Wyrmwatch quays: salt-grey braid, a sea coat, the charts.
+  harbormaster_tamsin: {
+    app: {
+      gender: 'female',
+      hair: 'warriorbraid',
+      ...hair(30, 0.12, 0.62),
+      brows: 'thick',
+      eyeShape: 'almond',
+      ...eyes(200, 0.4, 0.4),
+      ...skin(22, 0.5, 0.46),
+      mouth: 'smile',
+      face: face({ jaw: 0.1, brow: 0.15 }),
+      body: body({ shoulders: 0.2 }),
+      outfit: 'azure',
+    },
+    worn: kit('ranger', { arms: null }),
+    props: 'tome',
+  },
   // Reeve Ottoline of Lanternmere: the harvest never ends; neither do ledgers.
   reeve_ottoline: {
     app: {

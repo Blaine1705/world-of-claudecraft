@@ -73,7 +73,7 @@ export const FERRY_PIER_DECKS: readonly GaleDeckDef[] = [
 // and the Wyrmwatch pier with its cliff harbor.
 const BOXES: readonly (readonly [number, number, number, number])[] = [
   [-514, 1502, -488, 1510],
-  [486, 1884, 509, 1922],
+  [486, 1880, 509, 1922],
 ];
 const BAND_Z1 = Math.min(...BOXES.map((b) => b[1]));
 const BAND_Z2 = Math.max(...BOXES.map((b) => b[3]));
