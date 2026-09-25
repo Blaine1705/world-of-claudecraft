@@ -17,6 +17,7 @@ import type { UnderwaterView } from '../src/render/underwater';
 import type { WaterView } from '../src/render/water';
 import {
   WATER_APPROACH_DISC_POINTS,
+  WATER_APPROACH_PITCH,
   WATER_APPROACH_RADIUS,
 } from '../src/render/water_approach_core';
 import { stripComments } from './helpers/strip_comments';
@@ -24,8 +25,10 @@ import { stripComments } from './helpers/strip_comments';
 const WATERLINE = 0;
 const SEED = 20061;
 const ponds: { x: number; z: number; r: number }[] = [];
+const levelReads: { x: number; z: number }[] = [];
 
 function pondLevel(x: number, z: number): number {
+  levelReads.push({ x, z });
   for (const p of ponds) {
     if ((x - p.x) ** 2 + (z - p.z) ** 2 < p.r * p.r) return WATERLINE;
   }
@@ -80,6 +83,11 @@ function heldGate() {
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
+function expectRoots(calls: readonly GateCall[], roots: readonly (THREE.Object3D | null)[]): void {
+  expect(calls).toHaveLength(roots.length);
+  for (const [i, root] of roots.entries()) expect(calls[i].root).toBe(root);
+}
+
 function undersides(water: WaterView): THREE.Mesh[] {
   return water.group.children.filter(
     (c): c is THREE.Mesh => c instanceof THREE.Mesh && c.name === 'water-underside',
@@ -128,6 +136,7 @@ class Rig {
 
 afterEach(() => {
   ponds.length = 0;
+  levelReads.length = 0;
   vi.doUnmock('../src/render/assets/loader');
   vi.doUnmock('../src/render/assets/preload');
   vi.doUnmock('../src/render/gfx');
@@ -163,9 +172,7 @@ for (const tier of ['low', 'medium'] as const) {
 
       rig.place(100 - 18 - (WATER_APPROACH_RADIUS - 20), 0);
       rig.settleProbe();
-      expect(calls.map((c) => c.root)).toEqual(
-        tier === 'low' ? [view.group] : [view.group, water.undersideRoot()],
-      );
+      expectRoots(calls, tier === 'low' ? [view.group] : [view.group, water.undersideRoot()]);
 
       rig.place(100, 0, WATERLINE - 3);
       rig.frame(40);
@@ -203,7 +210,8 @@ for (const tier of ['low', 'medium'] as const) {
       current = buildWater(SEED);
       rig.water = current;
       rig.frame();
-      expect(calls.map((c) => c.root).slice(firstCalls)).toEqual(
+      expectRoots(
+        calls.slice(firstCalls),
         tier === 'low' ? [first.view.group] : [first.view.group, current.undersideRoot()],
       );
       for (const call of calls.slice(0, firstCalls)) call.resolve();
@@ -216,6 +224,71 @@ for (const tier of ['low', 'medium'] as const) {
       rig.frame(2);
       expect(first.view.group.visible).toBe(true);
       expect(rig.undersideShown()).toBe(tier === 'medium');
+    });
+
+    it('gates a water view rebuilt after the first link settled', async () => {
+      const first = await load(tier);
+      const rig = new Rig(first.view, first.water);
+      const { gate, calls } = heldGate();
+      let current = first.water;
+      first.view.setCompileGate(gate, () => current);
+      ponds.push({ x: 0, z: 0, r: 30 });
+      rig.place(0, 0, WATERLINE - 3);
+      rig.frame(2);
+      const firstCalls = calls.length;
+      for (const call of calls) call.resolve();
+      await flush();
+      rig.frame(2);
+      expect(first.view.group.visible).toBe(true);
+      expect(rig.undersideShown()).toBe(tier === 'medium');
+
+      const { buildWater } = await import('../src/render/water');
+      const oldRoot = current.undersideRoot();
+      current = buildWater(SEED);
+      rig.water = current;
+      rig.frame();
+      expectRoots(
+        calls.slice(firstCalls),
+        tier === 'low' ? [first.view.group] : [first.view.group, current.undersideRoot()],
+      );
+      if (tier === 'medium') expect(current.undersideRoot()).not.toBe(oldRoot);
+      rig.frame(3);
+      expect(first.view.group.visible).toBe(false);
+      expect(rig.undersideShown()).toBe(false);
+      for (const call of calls.slice(firstCalls)) call.resolve();
+      await flush();
+      rig.frame(2);
+      expect(first.view.group.visible).toBe(true);
+      expect(rig.undersideShown()).toBe(tier === 'medium');
+    });
+
+    it('keeps showing a rebuilt water view with no gate installed', async () => {
+      const first = await load(tier);
+      const rig = new Rig(first.view, first.water);
+      let current = first.water;
+      first.view.setCompileGate(null, () => current);
+      ponds.push({ x: 0, z: 0, r: 30 });
+      rig.place(0, 0, WATERLINE - 3);
+      rig.frame(2);
+      expect(first.view.group.visible).toBe(true);
+
+      const { buildWater } = await import('../src/render/water');
+      current = buildWater(SEED);
+      rig.water = current;
+      rig.frame(2);
+      expect(first.view.group.visible).toBe(true);
+      expect(rig.undersideShown()).toBe(tier === 'medium');
+    });
+
+    it('holds the undersides from the install, before any frame', async () => {
+      const { water, view } = await load(tier);
+      const rig = new Rig(view, water);
+      ponds.push({ x: 0, z: 0, r: 30 });
+      rig.place(0, 0, WATERLINE - 3);
+      rig.frame(2);
+      expect(rig.undersideShown()).toBe(tier === 'medium');
+      view.setCompileGate(heldGate().gate, () => water);
+      expect(rig.undersideShown()).toBe(false);
     });
 
     it('shows at once with no gate installed', async () => {
@@ -258,18 +331,28 @@ for (const tier of ['low', 'medium'] as const) {
       rig.place(0, 0, WATERLINE - 3);
       rig.frame(3);
       expect(view.group.visible).toBe(true);
+      expect(rig.undersideShown()).toBe(tier === 'medium');
     });
 
-    it('does not arm with water just past its radius', async () => {
-      const { water, view } = await load(tier);
-      const rig = new Rig(view, water);
-      const { gate, calls } = heldGate();
-      view.setCompileGate(gate, () => water);
-      ponds.push({ x: WATER_APPROACH_RADIUS + 40, z: 0, r: 10 });
-      rig.place(0, 0);
-      rig.settleProbe();
-      expect(calls).toEqual([]);
-    });
+    for (const [label, x, arms] of [
+      ['arms on a pond at its radius', WATER_APPROACH_RADIUS, true],
+      [
+        'does not arm on a pond a ring past its radius',
+        WATER_APPROACH_RADIUS + WATER_APPROACH_PITCH,
+        false,
+      ],
+    ] as const) {
+      it(label, async () => {
+        const { water, view } = await load(tier);
+        const rig = new Rig(view, water);
+        const { gate, calls } = heldGate();
+        view.setCompileGate(gate, () => water);
+        ponds.push({ x, z: 0, r: 1 });
+        rig.place(0, 0);
+        rig.settleProbe();
+        expect(calls.length > 0).toBe(arms);
+      });
+    }
 
     it('never arms, and stops reading, for a player who never nears water', async () => {
       const { water, view } = await load(tier);
@@ -285,6 +368,16 @@ for (const tier of ['low', 'medium'] as const) {
       expect(calls).toEqual([]);
       expect(view.group.visible).toBe(false);
       expect(rig.undersideShown()).toBe(false);
+      // Past a full cycle from a still player, the only waterline reads left
+      // are the camera's own (the blend and the water ceiling).
+      const settled = levelReads.length;
+      rig.frame(WATER_APPROACH_DISC_POINTS);
+      const still = levelReads.slice(settled);
+      expect(still.length).toBeGreaterThan(0);
+      for (const read of still) {
+        expect(read.x).toBe(rig.camera.position.x);
+        expect(read.z).toBe(rig.camera.position.z);
+      }
     });
 
     it('arms on the first camera-over-water frame where the lattice misses a small pond', async () => {
