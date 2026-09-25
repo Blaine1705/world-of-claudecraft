@@ -51,7 +51,7 @@ describe('the harbor decks', () => {
     const seams: [number, number][] = [
       [469.5, 351], // north pier root on the boardwalk
       [467, 361.5], // mid pier root near the boardwalk elbow
-      [453.5, 375.5], // ramp's south end at the deepwater pier root
+      [466.4, 366.0], // the boardwalk's south end, where the ferry wharf's flight stands
     ];
     for (const [x, z] of seams) {
       const here = groundHeight(x, z, SEED);

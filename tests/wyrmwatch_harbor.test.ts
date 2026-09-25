@@ -86,7 +86,10 @@ const ROUTE: readonly (readonly [number, number])[] = [
 
 describe('Wyrmwatch cliff harbor: the decks', () => {
   it('joins the ferry pier surface query, in its own list after the plank-built piers', () => {
-    expect(FERRY_PIER_DECKS.slice(FERRY_PIERS.flat().length)).toEqual(WYRMWATCH_HARBOR_DECKS);
+    const start = FERRY_PIERS.flat().length;
+    expect(FERRY_PIER_DECKS.slice(start, start + WYRMWATCH_HARBOR_DECKS.length)).toEqual(
+      WYRMWATCH_HARBOR_DECKS,
+    );
     // the quays stand at the pier's own plank height
     expect(WYRMWATCH_QUAY_ABOVE_WATER).toBe(FERRY_PIER_DECK_ABOVE_WATER);
   });

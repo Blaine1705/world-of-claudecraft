@@ -344,21 +344,19 @@ const EASTBROOK_BERTH: TransportBerthDef = {
   landing: { x: -113.5, z: -54, facing: Math.PI / 2 },
 };
 
-/** The Wickharbor berth: broadside across the deepwater pier's T-head (the
- *  south pier, gale_harbor.ts GALE_HARBOR_DECKS[2]: centre (464.1, 378), rot
- *  1.3, hl 12, so its end is (475.66, 381.21)). The ship lies with the same
- *  relation to the pier as at Eastbrook (ship rot = pier rot + PI/2, the port
- *  gangway on the pier's axis), 12.3 yd out along the axis: the pier deck is
- *  only 0.89 yd above the water where Eastbrook's stands 2.64, so the Galecrest
- *  boarding stair (the ramp deck appended to GALE_HARBOR_DECKS) bridges the
- *  last 4.7 yd from the pier's end up to the gangplank. */
+/** The Wickharbor berth: broadside across the berth head of the Wickharbor ferry wharf
+ *  (content/wickharbor_wharf.ts: its pier runs out at rot 1.3 from the foot of the bluff,
+ *  the head ends 30.3 yd out, where the old deepwater pier's landing stage ended). The ship
+ *  lies with the same relation to the pier as at Eastbrook (ship rot = pier rot + PI/2, the
+ *  port gangway on the pier's axis), and the wharf stands at the ferry pier height, so the
+ *  gangplank drops onto the head the way it does at every other berth. */
 const WICKHARBOR_BERTH: TransportBerthDef = {
   id: 'wickharbor',
   poi: 'poi:galecrest:wickharbor',
   x: 487.3,
   z: 385.27,
   rot: 1.3 + Math.PI / 2,
-  // on the deepwater pier, just shoreward of the boarding stair, facing town
+  // on the wharf's pier, short of the berth head, facing town
   landing: { x: 473.25, z: 380.54, facing: 1.3 - Math.PI },
 };
 
@@ -534,7 +532,7 @@ const NIGHTBLOOM_TO_EASTBROOK: readonly TransportWaypoint[] = [
  * coast. At the berth it runs on past the pier, heading north, and swings its
  * bow east about its stern until it points south, lying alongside the pier.
  * It casts off from Wickharbor by pivoting its bow east away from the
- * deepwater pier's end, as the ferry always has.
+ * berth head of the wharf (content/wickharbor_wharf.ts), as the ferry always has.
  */
 const WICKHARBOR_TO_DRAKELANDS: readonly TransportWaypoint[] = [
   { x: WICKHARBOR_BERTH.x, z: WICKHARBOR_BERTH.z, rot: WICKHARBOR_BERTH.rot },

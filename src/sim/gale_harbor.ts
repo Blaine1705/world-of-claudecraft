@@ -32,8 +32,8 @@ export interface GaleDeckDef {
   /**
    * Optional end surfaces, yards ABOVE THE WATERLINE, in place of the anchor
    * samples (near = the ax end at along -hl, far = the ax2 end at +hl): a deck
-   * whose height is set by something that is not terrain (the Wickharbor
-   * ferry stair and landing stage, which meet the ship's gangplank).
+   * whose height is set by something that is not terrain (the ferry piers and
+   * harbors of ferry_piers.ts, which meet the ship's gangplank).
    */
   nearAboveWater?: number;
   farAboveWater?: number;
@@ -51,16 +51,18 @@ const DECKS_Z1 = 312;
 const DECKS_Z2 = 392;
 
 export const GALE_HARBOR_DECKS: GaleDeckDef[] = [
-  // the three harbor piers, rooted on the boardwalk and fanned wide along
+  // the two north harbor piers, rooted on the boardwalk and fanned wide along
   // the bay so each has open water and breathing room, north to south
-  // (the north shore's decks all share one anchor so the network runs flush)
+  // (the north shore's decks all share one anchor so the network runs flush;
+  // the third, south of them, is the ferry wharf's pier)
   { x: 481.6, z: 353.7, rot: 1.3, hl: 12, hw: 1.8, ax: 465, az: 354 },
   { x: 479.9, z: 362.6, rot: 1.45, hl: 13, hw: 2.0, ax: 465, az: 354 },
-  // the deepwater pier off the south shore, reaching the drowned channel
-  { x: 464.1, z: 378.0, rot: 1.3, hl: 12, hw: 2.0, ax: 451, az: 375 },
-  // the shore boardwalk, laid right along the waterline (never inland)
+  // the shore boardwalk, laid right along the waterline (never inland). Its south end
+  // gives onto the Wickharbor ferry wharf (content/wickharbor_wharf.ts), whose flight
+  // stands on it; the wharf replaced the deepwater pier off the south shore, this
+  // boardwalk's diagonal ramp down to that pier's root (the two crossed at one height),
+  // and the ferry's boarding stair and landing stage off the pier's end.
   { x: 467.5, z: 358.0, rot: -0.124, hl: 8.1, hw: 1.7, ax: 465, az: 354 },
-  { x: 459.75, z: 371.25, rot: -0.91, hl: 8.6, hw: 1.7, ax: 465, az: 354, ax2: 451, az2: 375 },
   // the two wooden stairs climbing the bluff from the boardwalk to level
   // land (steep ramps; the renderer draws them as stepped treads)
   { x: 462.7, z: 361.7, rot: -1.648, hl: 3.3, hw: 1.3, ax: 465, az: 354, ax2: 458, az2: 361 },
@@ -71,27 +73,6 @@ export const GALE_HARBOR_DECKS: GaleDeckDef[] = [
   // share walkable ground at the junction (no dead wedge between rects)
   { x: 517.2, z: 337.2, rot: 0.785, hl: 13, hw: 2.2, ax: 507, az: 327 },
   { x: 503.3, z: 325.3, rot: 0.99, hl: 6.94, hw: 1.4, ax: 497, az: 321, ax2: 507, az2: 327 },
-  // The Wickharbor ferry's boarding stage (content/transport_ships.ts
-  // WICKHARBOR_BERTH): the deepwater pier's deck stands 0.89 yd above the
-  // water where the ferry's gangplank tip lies at 2.86, so a stair runs on out
-  // from the pier's end along its axis (rooted 0.3 yd back on the pier, on the
-  // pier's own anchor, so its foot is flush with the planks) up to a level
-  // landing under the plank. The landing sits 0.66 below the plank's outer
-  // tread: a stride up onto it, and high enough that a body on the plank is
-  // carried clear of the landing's water edge (physics/character.ts
-  // PLATFORM_CARRY_CLEARANCE).
-  { x: 477.2, z: 381.64, rot: 1.3, hl: 1.9, hw: 0.8, ax: 451, az: 375, farAboveWater: 2.2 },
-  {
-    x: 480.38,
-    z: 382.52,
-    rot: 1.3,
-    hl: 1.4,
-    hw: 0.9,
-    ax: 451,
-    az: 375,
-    nearAboveWater: 2.2,
-    farAboveWater: 2.2,
-  },
 ];
 
 /**

@@ -5,13 +5,17 @@ import {
   EASTBROOK_NIGHTBLOOM_FERRY,
   WICKHARBOR_DRAKELANDS_FERRY,
 } from '../src/sim/content/transport_ships';
+import {
+  WICKHARBOR_WHARF_ABOVE_WATER,
+  WICKHARBOR_WHARF_DECKS,
+  WICKHARBOR_WHARF_ROT,
+} from '../src/sim/content/wickharbor_wharf';
 import { WYRMWATCH_HARBOR_DECKS } from '../src/sim/content/wyrmwatch_harbor';
 import { PROPS } from '../src/sim/data';
 import { EASTBROOK_HARBOR_DECKS } from '../src/sim/eastbrook_harbor';
 import { FERRY_PIER_DECK_ABOVE_WATER, FERRY_PIER_DECKS } from '../src/sim/ferry_piers';
-import { GALE_HARBOR_DECKS } from '../src/sim/gale_harbor';
 import { entityLineOfSightClear } from '../src/sim/line_of_sight_elevation';
-import { MAX_STEP_HEIGHT, PLATFORM_CARRY_CLEARANCE } from '../src/sim/physics/character';
+import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
 import { Sim } from '../src/sim/sim';
 import { transportBerthColliders } from '../src/sim/transport_gates';
 import { transportVoyageSeconds } from '../src/sim/transport_schedule';
@@ -21,7 +25,7 @@ import { groundHeight, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The ferries' berths: moored across the ferry pier's T-head at Eastbrook
-// (Phase 1), across the deepwater pier's T-head at Wickharbor (Phase 2), and
+// (Phase 1), across the ferry wharf's berth head at Wickharbor (Phase 2), and
 // across the ends of the Moonrest and Wyrmwatch ferry piers at the far berths
 // (sim/ferry_piers.ts), the deck walkable while the ship lies docked. These pin the berths
 // (position, waterline, the harbor they displaced), the boarding route from
@@ -290,11 +294,12 @@ describe('walking aboard (the real movement kernel)', () => {
 });
 
 describe('Wickharbor berth (Phase 2)', () => {
-  const stair = GALE_HARBOR_DECKS[GALE_HARBOR_DECKS.length - 2];
-  const pier = GALE_HARBOR_DECKS[2];
+  const pier = WICKHARBOR_WHARF_DECKS[0];
+  const head = WICKHARBOR_WHARF_DECKS[1];
 
-  it('lies broadside across the deepwater pier T-head, its gangway on the pier axis', () => {
-    expect(pier).toMatchObject({ x: 464.1, z: 378, rot: 1.3, hl: 12 });
+  it('lies broadside across the wharf berth head, its gangway on the pier axis', () => {
+    expect(pier).toMatchObject({ id: 'pier', rot: WICKHARBOR_WHARF_ROT });
+    expect(head).toMatchObject({ id: 'berthHead', rot: WICKHARBOR_WHARF_ROT });
     // the same relation to its pier as at Eastbrook: ship rot = pier rot + PI/2
     expect(WICK.rot).toBeCloseTo(pier.rot + Math.PI / 2, 9);
     const gangway = HULL.boarding.find((b) => b.side === 'port');
@@ -307,36 +312,26 @@ describe('Wickharbor berth (Phase 2)', () => {
     expect(Math.abs(across)).toBeLessThan(0.05);
   });
 
-  it('bridges the low pier to the gangplank with a stair and a landing stage', () => {
-    const landing = GALE_HARBOR_DECKS[GALE_HARBOR_DECKS.length - 1];
-    expect(stair).toMatchObject({ rot: pier.rot, farAboveWater: 2.2 });
-    expect(landing).toMatchObject({ rot: pier.rot, nearAboveWater: 2.2, farAboveWater: 2.2 });
-    const along = (d: typeof stair, x: number, z: number) =>
+  it('meets the gangplank with the berth head at the ferry pier height', () => {
+    const along = (d: typeof head, x: number, z: number) =>
       (x - d.x) * Math.sin(d.rot) + (z - d.z) * Math.cos(d.rot);
-    // the landing reaches under the gangplank's outer tread (ship x 7.1..8.3)
+    // the head reaches under the gangplank's outer tread (ship x 7.1..8.3)
     // and stops short of the hull (ship x 5.15)
     const plankOuter = shipToWorld(wickPose(), 8.3, 0.8);
     const plankInner = shipToWorld(wickPose(), 7.1, 0.8);
     const hullSide = shipToWorld(wickPose(), 5.15, 0.8);
-    expect(Math.abs(along(landing, plankOuter.x, plankOuter.z))).toBeLessThan(landing.hl);
-    expect(Math.abs(along(landing, plankInner.x, plankInner.z))).toBeLessThan(landing.hl);
-    expect(along(landing, hullSide.x, hullSide.z)).toBeGreaterThan(landing.hl);
-    // the plank tread is a stride above the landing, and high enough to carry
-    // a body off the stage's water edge
-    const rise = HULL.mainDeckY - 0.44 - 2.2;
+    expect(Math.abs(along(head, plankOuter.x, plankOuter.z))).toBeLessThan(head.hl);
+    expect(Math.abs(along(head, plankInner.x, plankInner.z))).toBeLessThan(head.hl);
+    expect(along(head, hullSide.x, hullSide.z)).toBeGreaterThan(head.hl);
+    // the plank's outer tread is a stride above the head, as at every other berth
+    expect(WICKHARBOR_WHARF_ABOVE_WATER).toBe(FERRY_PIER_DECK_ABOVE_WATER);
+    const rise = HULL.mainDeckY - 0.44 - WICKHARBOR_WHARF_ABOVE_WATER;
     expect(rise).toBeLessThan(MAX_STEP_HEIGHT);
-    expect(rise).toBeGreaterThan(PLATFORM_CARRY_CLEARANCE);
-    // the stair's foot is flush with the pier deck, its head with the landing
-    const at = (d: typeof stair, a: number) => ({
-      x: d.x + Math.sin(d.rot) * a,
-      z: d.z + Math.cos(d.rot) * a,
-    });
-    const foot = at(stair, -(stair.hl - 0.1));
+    expect(rise).toBeGreaterThan(0);
+    const centre = groundHeight(head.x, head.z, WORLD_SEED);
+    expect(centre - WATER_LEVEL).toBeCloseTo(WICKHARBOR_WHARF_ABOVE_WATER, 6);
     const pierTop = groundHeight(pier.x, pier.z, WORLD_SEED);
-    expect(groundHeight(foot.x, foot.z, WORLD_SEED)).toBeCloseTo(pierTop, 1);
-    expect(pierTop - WATER_LEVEL).toBeCloseTo(0.89, 2);
-    const head = at(landing, 0);
-    expect(groundHeight(head.x, head.z, WORLD_SEED) - WATER_LEVEL).toBeCloseTo(2.2, 6);
+    expect(pierTop).toBeCloseTo(centre, 9);
   });
 
   it('floats in water across its whole footprint', () => {
@@ -373,7 +368,7 @@ describe('Wickharbor berth (Phase 2)', () => {
     }
   });
 
-  it('boards from the pier, up the stair and over the gangplank, onto the deck', () => {
+  it('boards from the wharf, over the gangplank, onto the deck', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     const p = sim.player;
     const meta = sim.players.get(p.id);
@@ -406,7 +401,7 @@ describe('Wickharbor berth (Phase 2)', () => {
       Object.assign(meta.moveInput, idle);
       for (let i = 0; i < 10; i++) sim.tick();
     };
-    walk(9, 0.8); // up the stair to its top
+    walk(9, 0.8); // out along the pier onto the berth head
     walk(4.4, 0.8); // over the plank onto the gangway
     walk(1.5, 0.8); // onto the waist
     const local = worldToShip(wickPose(), p.pos.x, p.pos.z);
