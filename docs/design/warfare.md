@@ -70,9 +70,10 @@ Owner rule (2026-09-24): PvP gear gives players significantly more health than
 players without it, and it never works in dungeons or raids. The same combined
 Warfare Defense Rating (gear plus set) also grants maximum health
 (`pvpVitalityFromRating` in `src/sim/pvp/power.ts`): six rating per percent,
-capped at +50 percent (`PVP_VITALITY_RATING_PER_PCT`, `PVP_VITALITY_CAP`). A full
+capped at +80 percent (`PVP_VITALITY_RATING_PER_PCT`, `PVP_VITALITY_CAP`; raised from
++50 for Warfare Season 2, which alone carries the rating past a Season 1 kit). A full
 11-slot kit alone (182 rating) gives about +30 percent and the seven-piece set
-(+120) reaches the cap.
+(+120) lands at about +50 percent.
 
 Where it applies (`src/sim/pvp/vitality.ts`, safest-first): anywhere on the
 instance plane (dungeons, raids, delves, rift floors, any instance added later)
@@ -629,6 +630,26 @@ stands you on its rim; `/dev hill warn [zone] [seconds]` starts a countdown (the
 full warning, or a shorter one for a quick test); `/dev hill rise` skips the
 countdown; `/dev hill end` makes the hill fall; `/dev hill next` runs the real
 schedule's next hill now (its own zone and spot, the window spent).
+
+## Season 2 (Vanguard)
+
+A second, top tier of honor gear sells beside the five entry-tier sets above, which stay on
+sale unchanged. Full design, the 54 set bonuses and their PvE ceilings:
+`docs/design/warfare-season-2.md`.
+
+- **27 spec sets**, one per spec, class-locked, each the five raid-set slots (helmet,
+  shoulder, chest, legs, gloves) with a 2-piece and a 4-piece bonus that work everywhere.
+- **Four season weapons:** a strength two-hander, a strength one-hander, an agility dagger and
+  a caster staff.
+- **Item level 35**, level with the Ignivar raid tier, on the honor discount: 0.9 of the line
+  budget, the full-budget stamina floor, no hit, crit or haste rating, and 0.9 of raid armor.
+  The Warfare ratings are 2.2x (Offense) and 3.4x (Defense) the slot budget, so a Season 2
+  kit reaches the 30 percent caps and the +80 percent Vitality cap where a full entry-tier
+  kit stops at about +50: about 10 percent more health in PvP (14 for casters), and nothing
+  in dungeons or raids.
+- **Prices:** 1.5 times the entry tier per slot, 6,600 Honor for a full set, 1,800 per weapon.
+- **Pins:** `tests/warfare_season2.test.ts` (stock shape, stat, armor and weapon rules, set
+  rows, and the tank effective-health guard).
 
 ## FURY prices
 

@@ -2440,6 +2440,8 @@ export const ko_KR: EnTranslations = {
       "gossipOptionAria": "{name}이(가) 운영하는 워페어 세트 상점 둘러보기",
       "jewelry": "장신구",
       "weapons": "무기",
+      "groupSeason2": "워페어 시즌 2: 선봉대",
+      "groupEntry": "워페어 시즌 1",
       "owned": "보유 중",
       "buyAria": "{honor}에 {item} 구매",
       "buyOwnedAria": "{honor}에 {item} 구매, 이미 보유 중",
@@ -7465,7 +7467,9 @@ export const ko_KR: EnTranslations = {
       "warfareBody": "모든 워페어 장비에는 워페어 공격 등급과 워페어 방어 등급이 붙어 있는데, 이 두 등급은 몬스터에게는 아무런 효과가 없습니다. 오직 다른 플레이어와 싸울 때, 즉 결투와 투기장, 전장에서만 작동해 공격 등급은 주는 피해를 올리고 방어 등급은 받는 피해를 깎아 주며, 각각 자체 상한이 있습니다. 방어구 계열은 저마다 세트이기도 한데, 세트 효과 역시 워페어 등급이거나 플레이어에게만 통하는 효과입니다. 그러니 명예로 맞춘 한 벌은 던전 우두머리 앞에서는 아무 값어치가 없습니다.",
       "warfareBodyStatsStay": "모든 워페어 장비에는 워페어 공격 등급과 워페어 방어 등급이 붙어 있는데, 이 두 등급은 몬스터에게는 아무런 효과가 없습니다. 오직 다른 플레이어와 싸울 때, 즉 결투와 투기장, 전장에서만 작동해 공격 등급은 주는 피해를 올리고 방어 등급은 받는 피해를 깎아 주며, 각각 자체 상한이 있습니다. 방어구 계열은 저마다 세트이기도 한데, 세트 효과 역시 워페어 등급이거나 플레이어에게만 통하는 효과입니다. 그러니 명예로 맞춘 한 벌의 세트 효과는 던전 우두머리 앞에서는 아무 값어치가 없습니다. 장비 자체는 여전히 보통의 능력치와 방어도, 무기 피해를 지니고 있고 그것들은 어디서나 통합니다. 몬스터 앞에서 잠잠해지는 것은 워페어 등급과 세트 효과입니다.",
       "warfareTradeBody": "이는 의도된 맞바꿈입니다. 워페어 장비는 플레이어와 싸우기 위한 것이지, 던전 등급을 건너뛰는 지름길이 아닙니다. 같은 부위의 던전 영웅 장비가 지닌 전투 능력치를 워페어 장비는 결코 갖지 못하며, 그 대신 지닌 모든 것은 다른 플레이어를 상대로 쓰입니다. 투기장에서 제 몫을 하고 싶다면 사세요. 영웅 던전을 더 빨리 밀고 싶다면 던전에서 장비를 구하세요.",
-      "warfareTradeBodyRatingSpent": "이는 의도된 맞바꿈입니다. 워페어 장비는 플레이어와 싸우기 위한 것이지, 던전 등급을 건너뛰는 지름길이 아닙니다. 같은 부위의 던전 영웅 장비가 지닌 전투 등급을 워페어 장비는 결코 갖지 못하며, 그 대신 지닌 워페어 등급과 세트 효과는 온전히 다른 플레이어를 상대로 쓰입니다. 투기장에서 제 몫을 하고 싶다면 사세요. 영웅 던전을 더 빨리 밀고 싶다면 던전에서 장비를 구하세요."
+      "warfareTradeBodyRatingSpent": "이는 의도된 맞바꿈입니다. 워페어 장비는 플레이어와 싸우기 위한 것이지, 던전 등급을 건너뛰는 지름길이 아닙니다. 같은 부위의 던전 영웅 장비가 지닌 전투 등급을 워페어 장비는 결코 갖지 못하며, 그 대신 지닌 워페어 등급과 세트 효과는 온전히 다른 플레이어를 상대로 쓰입니다. 투기장에서 제 몫을 하고 싶다면 사세요. 영웅 던전을 더 빨리 밀고 싶다면 던전에서 장비를 구하세요.",
+      "vanguardHeading": "선봉대 장비: 워페어 시즌 2",
+      "vanguardBody": "선봉대 장비는 워페어 장비의 두 번째 시즌으로, 같은 두 병참장교가 기존 장비 위에 진열해 판매하며 기존 장비도 계속 판매됩니다. 모든 전문화에는 머리, 어깨, 가슴, 다리, 손의 다섯 부위로 이루어진 전용 선봉대 세트가 있고, 상점에는 당신의 직업이 착용할 수 있는 세 세트와 다룰 수 있는 선봉대 무기만 표시됩니다. 선봉대 장비는 기존 장비와 같은 워페어 등급을 더 높은 아이템 레벨로 지니며, 각 세트에는 2부위와 4부위에서 발동하는 두 가지 보너스가 있어 전문화 능력 하나를 바꿉니다. 기존 세트와 달리 이 보너스는 몬스터를 상대할 때를 포함해 어디서나 작동하지만, 플레이어와의 전투를 위해 만들어졌기 때문에 공격대 안에서는 여전히 공격대 세트가 더 나은 선택입니다."
     },
     "worldPvpPage": {
       "heading": "월드 PvP",
@@ -16149,6 +16153,423 @@ export const ko_KR: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "폭풍찬가 사슬 장화"
       },
+      "vanguard_warrior_arms_helmet": {
+        "name": "칼날자국 대투구"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "칼날자국 견갑"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "칼날자국 사슬 갑주"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "칼날자국 판금 다리갑옷"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "칼날자국 분쇄 건틀릿"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "피의 행군 면갑"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "피의 행군 어깨보호대"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "피의 행군 사슬갑옷"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "피의 행군 레깅스"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "피의 행군 그립"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "강철 행군 투구"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "강철 행군 어깨갑옷"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "강철 행군 가슴보호대"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "강철 행군 다리보호구"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "강철 행군 손보호대"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "태양 파수 머리띠"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "태양 파수 망토"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "태양 파수 사슬 갑주"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "태양 파수 사슬 다리갑옷"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "태양 파수 장갑"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "방패 서약 투구"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "방패 서약 견갑"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "방패 서약 흉갑"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "방패 서약 판금 다리갑옷"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "방패 서약 건틀릿"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "빛의 낙인 왕관"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "빛의 낙인 어깨갑옷"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "빛의 낙인 몸통갑옷"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "빛의 낙인 다리보호구"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "빛의 낙인 건틀릿"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "무리 수호자 두건"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "무리 수호자 어깨갑옷"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "무리 수호자 가죽 조끼"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "무리 수호자 다리보호구"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "무리 수호자 건틀릿"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "천리안 두건"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "천리안 어깨갑옷"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "천리안 가죽 조끼"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "천리안 다리보호구"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "천리안 건틀릿"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "올가미 송곳니 두건"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "올가미 송곳니 어깨갑옷"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "올가미 송곳니 가죽 조끼"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "올가미 송곳니 다리보호구"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "올가미 송곳니 건틀릿"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "밤의 칼날 후드"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "밤의 칼날 어깨덧대"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "밤의 칼날 튜닉"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "밤의 칼날 반바지"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "밤의 칼날 장갑"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "난투의 표식 후드"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "난투의 표식 어깨덧대"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "난투의 표식 튜닉"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "난투의 표식 반바지"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "난투의 표식 장갑"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "그늘걸음 후드"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "그늘걸음 어깨덧대"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "그늘걸음 튜닉"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "그늘걸음 반바지"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "그늘걸음 장갑"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "장막 성가 고깔"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "장막 성가 망토"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "장막 성가 로브"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "장막 성가 레깅스"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "장막 성가 손싸개"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "은총의 날개 고깔"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "은총의 날개 망토"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "은총의 날개 로브"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "은총의 날개 레깅스"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "은총의 날개 손싸개"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "황혼 찬가 고깔"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "황혼 찬가 망토"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "황혼 찬가 로브"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "황혼 찬가 레깅스"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "황혼 찬가 손싸개"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "폭풍 율법 두건"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "폭풍 율법 견갑"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "폭풍 율법 사슬 갑주"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "폭풍 율법 사슬 다리갑옷"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "폭풍 율법 건틀릿"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "돌풍태생 투구"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "돌풍태생 어깨갑옷"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "돌풍태생 사슬갑옷"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "돌풍태생 다리보호구"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "돌풍태생 그립"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "바닷물 수호 머리띠"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "바닷물 수호 망토"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "바닷물 수호 사슬 갑주"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "바닷물 수호 킬트"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "바닷물 수호 손싸개"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "시간결속자의 후드"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "시간결속자의 어깨망토"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "시간결속자의 로브"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "시간결속자의 바지"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "시간결속자의 장갑"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "잿불 채찍 고깔"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "잿불 채찍 망토"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "잿불 채찍 법복"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "잿불 채찍 레깅스"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "잿불 채찍 장갑"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "서리 파수꾼 후드"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "서리 파수꾼 어깨덧대"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "서리 파수꾼 제의"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "서리 파수꾼 다리싸개"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "서리 파수꾼 벙어리장갑"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "공포의 깃펜 후드"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "공포의 깃펜 망토"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "공포의 깃펜 로브"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "공포의 깃펜 레깅스"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "공포의 깃펜 손싸개"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "골수 결속 고깔"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "골수 결속 어깨갑옷"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "골수 결속 로브"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "골수 결속 레깅스"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "골수 결속 그립"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "광재 왕관 후드"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "광재 왕관 망토"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "광재 왕관 법복"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "광재 왕관 레깅스"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "광재 왕관 장갑"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "별 파수꾼 머리장식"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "별 파수꾼 어깨갑옷"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "별 파수꾼 조끼"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "별 파수꾼 반바지"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "별 파수꾼 장갑"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "피갈기 투구"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "피갈기 어깨덧대"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "피갈기 튜닉"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "피갈기 다리보호구"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "피갈기 그립"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "엉겅퀴꽃 왕관"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "엉겅퀴꽃 망토"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "엉겅퀴꽃 조끼"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "엉겅퀴꽃 레깅스"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "엉겅퀴꽃 장갑"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "선봉대의 심판"
+      },
+      "vanguard_oath_blade": {
+        "name": "선봉대의 맹세"
+      },
+      "vanguard_fang_dagger": {
+        "name": "선봉대의 송곳니"
+      },
+      "vanguard_warstaff": {
+        "name": "선봉대의 전투 지팡이"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -21502,6 +21923,141 @@ export const ko_KR: EnTranslations = {
       "vale_arcanist": {
         "name": "계곡 비전술사의 예복",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
+      },
+      "vanguard_druid_balance": {
+        "name": "별 파수꾼 의복",
+        "bonus2": "옥죄는 뿌리의 시전 시간이 0.5초 감소합니다.",
+        "bonus4": "옥죄는 뿌리를 시전하면 4초 동안 이동 중에 시전할 수 있고 이동 속도가 20% 증가합니다. 20초에 한 번만 발동합니다."
+      },
+      "vanguard_druid_feral": {
+        "name": "피갈기 가죽",
+        "bonus2": "큰곰 돌진의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "큰곰 돌진이 최대 생명력의 6%만큼 보호막을 6초 동안 씌워 줍니다."
+      },
+      "vanguard_druid_restoration": {
+        "name": "엉겅퀴꽃 제의",
+        "bonus2": "신속한 치유의 재사용 대기시간이 1초 감소합니다.",
+        "bonus4": "신속한 치유가 이동 속도도 3초 동안 30% 증가시킵니다."
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "무리 수호자 사냥 장비",
+        "bonus2": "뒤흔드는 사격의 재사용 대기시간이 4초 감소합니다.",
+        "bonus4": "뒤흔드는 사격이 야수의 격노의 남은 재사용 대기시간을 1초 감소시킵니다."
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "천리안 사냥 장비",
+        "bonus2": "흔적 끊기의 재사용 대기시간이 4초 감소합니다.",
+        "bonus4": "흔적 끊기 후 6초 안에 사용하는 다음 긴 시위가 즉시 시전됩니다. 15초에 한 번만 발동합니다."
+      },
+      "vanguard_hunter_survival": {
+        "name": "올가미 송곳니 사냥 장비",
+        "bonus2": "피갈고리의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "피갈고리가 사냥의 기세를 1 부여합니다."
+      },
+      "vanguard_mage_arcane": {
+        "name": "시간결속자의 성의",
+        "bonus2": "시간의 방벽의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "시간의 방벽이 보호받는 대상의 이동 속도도 3초 동안 20% 증가시킵니다."
+      },
+      "vanguard_mage_fire": {
+        "name": "잿불 채찍 예복",
+        "bonus2": "잉걸 작렬의 충전이 3초 더 빨리 회복됩니다.",
+        "bonus4": "잉걸 작렬을 시전하면 이글거리는 방벽의 남은 재사용 대기시간이 2초 감소합니다."
+      },
+      "vanguard_mage_frost": {
+        "name": "서리 파수꾼 차림",
+        "bonus2": "얼음 속박의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "얼음 속박을 시전하면 날쌘걸음의 남은 재사용 대기시간이 5초 감소합니다."
+      },
+      "vanguard_paladin_holy": {
+        "name": "태양 파수 예복",
+        "bonus2": "생명의 서약의 재사용 대기시간이 30초 감소합니다.",
+        "bonus4": "생명의 서약이 아군에게 그 대상 최대 생명력의 8%만큼 보호막도 6초 동안 씌웁니다."
+      },
+      "vanguard_paladin_protection": {
+        "name": "방패 서약 요새",
+        "bonus2": "맹세의 사슬의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "맹세의 사슬에 끌려온 적은 4초 동안 주문 시전이 30% 느려지며, 맹세의 사슬이 끌어올 수 있는 적을 속박하면 태양의 응보를 얻습니다."
+      },
+      "vanguard_paladin_retribution": {
+        "name": "빛의 낙인 전투 판금",
+        "bonus2": "발키리의 부름의 재사용 대기시간이 15초 감소합니다.",
+        "bonus4": "발키리의 부름이 최후의 칙령의 재사용 대기시간을 초기화하며, 착지 후 6초 안에 사용하는 다음 최후의 칙령은 15% 더 많은 피해를 줍니다."
+      },
+      "vanguard_priest_discipline": {
+        "name": "장막 성가 의복",
+        "bonus2": "정신의 절규의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "수호의 성가가 완전히 소모되면 보호받던 아군의 이동 속도가 3초 동안 20% 증가합니다. 8초에 한 번만 발동합니다."
+      },
+      "vanguard_priest_holy": {
+        "name": "은총의 날개 의복",
+        "bonus2": "장막걸음의 재사용 대기시간이 6초 감소합니다.",
+        "bonus4": "장막걸음이 최대 생명력의 8%만큼 보호막도 6초 동안 씌워 줍니다."
+      },
+      "vanguard_priest_shadow": {
+        "name": "황혼 찬가 예복",
+        "bonus2": "비탄의 연도를 정신 집중하는 동안 대상의 이동 속도도 30% 감소시킵니다.",
+        "bonus4": "십일조 악마 소환이 최대 생명력의 10%만큼 보호막도 8초 동안 씌워 줍니다."
+      },
+      "vanguard_rogue_assassination": {
+        "name": "밤의 칼날 가죽 갑옷",
+        "bonus2": "반칙 가격의 에너지 소모량이 10 감소합니다.",
+        "bonus4": "반칙 가격이 6초 안에 가하는 다음 공격도 반드시 치명타가 되게 합니다."
+      },
+      "vanguard_rogue_combat": {
+        "name": "난투의 표식 가죽 갑옷",
+        "bonus2": "날쌘 발의 재사용 대기시간이 60초 감소합니다.",
+        "bonus4": "날쌘 발이 활성화된 동안 사악한 베기와 헤이메이커가 연계 점수를 1 추가로 줍니다."
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "그늘걸음 가죽 갑옷",
+        "bonus2": "연막 걸음의 재사용 대기시간이 60초 감소합니다.",
+        "bonus4": "연막 걸음 상태에서 사용한 명치 가격이 연계 점수를 2 추가로 줍니다."
+      },
+      "vanguard_shaman_elemental": {
+        "name": "폭풍 율법 전투 사슬",
+        "bonus2": "무기 해방의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "무기 해방을 사용하면 4초 동안 이동 중에 시전할 수 있고 이동 속도가 20% 증가합니다. 20초에 한 번만 발동합니다."
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "돌풍태생 전쟁 사슬",
+        "bonus2": "선조의 일격이 대상의 이동 속도를 4초 동안 30% 감소시킵니다.",
+        "bonus4": "선조의 일격이 정령의 무아지경의 남은 재사용 대기시간을 4초 감소시킵니다."
+      },
+      "vanguard_shaman_restoration": {
+        "name": "바닷물 수호 사슬갑옷",
+        "bonus2": "생명력이 50% 미만인 아군에게 시전하는 치유의 물결의 시전 시간이 0.5초 감소합니다.",
+        "bonus4": "해일 부름이 대상에게 당신의 최대 생명력의 5%만큼 보호막도 6초 동안 씌웁니다."
+      },
+      "vanguard_warlock_affliction": {
+        "name": "공포의 깃펜 성의",
+        "bonus2": "번민의 시전 시간이 0.3초 감소합니다.",
+        "bonus4": "집어삼키기의 치유량이 30% 증가하며, 이동 중에도 정신 집중할 수 있습니다."
+      },
+      "vanguard_warlock_demonology": {
+        "name": "골수 결속 예복",
+        "bonus2": "뼈 갑옷의 재사용 대기시간이 10초 감소합니다.",
+        "bonus4": "수확의 명령이 뼈 갑옷의 남은 재사용 대기시간을 2초 감소시킵니다."
+      },
+      "vanguard_warlock_destruction": {
+        "name": "광재 왕관 성의",
+        "bonus2": "잿가죽의 재사용 대기시간이 30초 감소합니다.",
+        "bonus4": "점화를 두 번 사용할 때마다 8초 안에 사용하는 다음 파멸 화살이 즉시 시전됩니다."
+      },
+      "vanguard_warrior_arms": {
+        "name": "칼날자국 전투 장비",
+        "bonus2": "불구의 일격이 쇄도의 남은 재사용 대기시간을 1초 감소시킵니다.",
+        "bonus4": "쇄도가 다음 불구의 일격도 20% 강화합니다(붉은 손 강화 1중첩)."
+      },
+      "vanguard_warrior_fury": {
+        "name": "피의 행군 분노 장비",
+        "bonus2": "영웅의 도약의 재사용 대기시간이 8초 감소합니다.",
+        "bonus4": "영웅의 도약으로 착지하면 격노합니다."
+      },
+      "vanguard_warrior_prot": {
+        "name": "강철 행군 보루",
+        "bonus2": "단층선의 재사용 대기시간이 5초 감소합니다.",
+        "bonus4": "단층선이 받는 피해도 6초 동안 10% 감소시킵니다."
       },
       "vesperash": {
         "name": "만과의 잿가루 장막",

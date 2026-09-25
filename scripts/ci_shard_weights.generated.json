@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4085,
+    "files": 4088,
     "harvestedFiles": 3948,
     "carried": {
       "tests/action_bar_spectate.test.ts": {
@@ -503,6 +503,33 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           18
+        ]
+      },
+      "tests/vanguard_set_bonus_a.test.ts": {
+        "ms": 2661,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          2661
+        ]
+      },
+      "tests/vanguard_set_bonus_b.test.ts": {
+        "ms": 2509,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          2509
+        ]
+      },
+      "tests/warfare_season2.test.ts": {
+        "ms": 1211,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1211
         ]
       },
       "tests/warrior_ability_clips.test.ts": {
@@ -5024,6 +5051,8 @@
   "tests/v042_primary_healing.test.ts": 4,
   "tests/v042_rogue_stealth.test.ts": 12964,
   "tests/v042_stealth_integration.test.ts": 1471,
+  "tests/vanguard_set_bonus_a.test.ts": 2661,
+  "tests/vanguard_set_bonus_b.test.ts": 2509,
   "tests/variant_prewarm_slot.test.ts": 28,
   "tests/varkhul_add_models.test.ts": 79,
   "tests/varkhul_anvil_meteors.test.ts": 7,
@@ -5128,6 +5157,7 @@
   "tests/warfare_balance_harness.test.ts": 11,
   "tests/warfare_gear_tier.test.ts": 35,
   "tests/warfare_purchase_confirm.test.ts": 268,
+  "tests/warfare_season2.test.ts": 1211,
   "tests/warfare_set_bonus_text.test.ts": 11,
   "tests/warfare_set_bonuses.test.ts": 3940,
   "tests/warfare_titles.test.ts": 3407,

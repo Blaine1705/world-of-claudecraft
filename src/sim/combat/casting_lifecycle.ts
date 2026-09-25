@@ -89,6 +89,7 @@ import { sharedCooldownIds } from './ability_cooldown_groups';
 import {
   afflictionAdjustedCastTime,
   afflictionCastError,
+  afflictionConsumeHealMult,
   afflictionConsumeThreadDoomBonus,
   afflictionDrainCompletionDoom,
   afflictionDrainTickDoom,
@@ -204,7 +205,11 @@ import {
 import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { effectivePlayerAttackRange } from './player_attack_reach';
-import { hasTithefiendTarget } from './priest/vespers';
+import {
+  duskhymnChannelStart,
+  duskhymnChannelStopped,
+  hasTithefiendTarget,
+} from './priest/vespers';
 import { swingReadyForQueuedCast } from './queued_cast_swing_yield';
 import { resurrectionCastRange, resurrectionReachError } from './resurrection_reach';
 import {
@@ -213,6 +218,7 @@ import {
   veilAllowsStealthAbilities,
 } from './rogue_engines';
 import { combineCostMultipliers, duskCostMultiplier } from './rogue_talents';
+import { brinewardMendingCastTime } from './shaman_spiritmend';
 import {
   stonehearthStormcastMendingActive,
   stonehearthStormcastMendingHealMult,
@@ -616,6 +622,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       completeAfflictionDrain(ctx, p, channelTarget, p.castingAbility ?? '');
       clearAfflictionConsumeThreads(ctx, p);
       coldsightFeveredDrawCompleted(ctx, p, p.castingAbility, channelTarget);
+      duskhymnChannelStopped(ctx, p);
       p.castingAbility = null;
       p.channeling = false;
       // completed ground-targeted channels drop their aim like every other
@@ -841,6 +848,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   if (p.castingAbility) cleanupPaladinAegis(ctx, p.id);
   if (p.castingAbility === CORPSE_HARVEST_CAST_ID) releaseCorpseHarvest(ctx, p.id);
   if (p.castingAbility) coldsightVoidReservationOnCancel(ctx, p, p.castingAbility);
+  duskhymnChannelStopped(ctx, p);
   stopChannelVisual(ctx, p);
   clearAfflictionConsumeThreads(ctx, p);
   emitRainOfFireStop(ctx, p);
@@ -1777,10 +1785,17 @@ export function castAbility(
   }
   const instantBaseCastTime =
     consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id);
-  const castTime =
+  // Brineward 2pc (Warfare Season 2) reads the resolved friendly target's
+  // health; a pass-through for every other ability and caster.
+  const castTime = brinewardMendingCastTime(
+    ctx,
+    p,
+    ability.id,
+    target,
     afflictionAdjustedCastTime(p, ability.id, instantBaseCastTime) *
-    destructionCastTimeMult(p, ability.id) *
-    ashenFocusCastTimeMult(ctx, p, meta, ability.id);
+      destructionCastTimeMult(p, ability.id) *
+      ashenFocusCastTimeMult(ctx, p, meta, ability.id),
+  );
   // A press that cannot survive movement (abilityCastSurvivesMovement) is denied
   // OUTRIGHT here, before the GCD arms or any cast-commit body state is changed,
   // when the player's held movement input would actually move this tick. A root,
@@ -1941,6 +1956,8 @@ export function castAbility(
     p.channelTickTimer = ability.id === 'drain_life' ? DT : p.channelTickEvery;
     p.channelTicksLeft = channelTicks;
     coldsightFeveredDrawChannelStart(ctx, p, ability.id);
+    // Duskhymn Regalia 2pc: the Litany of Woe channel slow (priest/vespers.ts).
+    duskhymnChannelStart(ctx, p, ability.id, target, channelDuration);
     if (ability.id === 'drain_life') {
       consumeFateThreadsForDrain(ctx, p, target, channelDuration);
     }
@@ -2543,7 +2560,9 @@ function applyChannelTick(
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
         if (doom > 0) gainDoom(ctx, src, doom);
         if (!src.dead) {
-          const intended = Math.round(dmg * eff.healFrac);
+          const intended = Math.round(
+            dmg * eff.healFrac * afflictionConsumeHealMult(ctx, src, res.def.id),
+          );
           const healed = Math.min(intended, src.maxHp - src.hp);
           onCraftedCollectionHeal(ctx, src, src, intended - healed);
           if (healed > 0) {

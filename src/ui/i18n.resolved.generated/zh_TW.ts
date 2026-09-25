@@ -2440,6 +2440,8 @@ export const zh_TW: EnTranslations = {
       "gossipOptionAria": "瀏覽 {name} 提供的戰爭套裝商店",
       "jewelry": "飾品",
       "weapons": "武器",
+      "groupSeason2": "戰爭第二賽季：先鋒",
+      "groupEntry": "戰爭第一賽季",
       "owned": "已擁有",
       "buyAria": "以 {honor} 購買 {item}",
       "buyOwnedAria": "以 {honor} 購買 {item}，已擁有",
@@ -7465,7 +7467,9 @@ export const zh_TW: EnTranslations = {
       "warfareBody": "每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備打起地城首領來一文不值。",
       "warfareBodyStatsStay": "每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備的套裝效果打起地城首領來一文不值。裝備本身仍帶有一般的屬性、護甲值與武器傷害，而這些在任何地方都有效；面對怪物時沉寂下來的，是戰爭等級與套裝效果。",
       "warfareTradeBody": "這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它所帶來的一切都只花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。",
-      "warfareTradeBodyRatingSpent": "這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它轉而帶有的戰爭等級與套裝效果，則全都花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。"
+      "warfareTradeBodyRatingSpent": "這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它轉而帶有的戰爭等級與套裝效果，則全都花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。",
+      "vanguardHeading": "先鋒裝備：戰爭第二賽季",
+      "vanguardBody": "先鋒裝備是戰爭裝備的第二賽季，由同樣的兩位軍需官販售，陳列在原有裝備之上，原有裝備也繼續販售。每個專精都有自己的一套五件先鋒套裝，包括頭部、肩部、胸部、腿部和手部，商店只會列出你的職業能穿的三套，以及你能使用的先鋒武器。先鋒裝備帶有與原有裝備相同的戰爭等級，但物品等級更高；每套都有兩件和四件兩檔獎勵，會改變你專精的一個技能。與原有套裝不同，這些獎勵在任何地方都生效，對怪物也一樣，但它們是為對抗玩家而設計的，所以在團隊副本裡，團隊套裝仍是更好的選擇。"
     },
     "worldPvpPage": {
       "heading": "世界 PvP",
@@ -16149,6 +16153,423 @@ export const zh_TW: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "風暴頌歌鏈甲之靴"
       },
+      "vanguard_warrior_arms_helmet": {
+        "name": "刃痕巨盔"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "刃痕肩甲"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "刃痕鎖甲衫"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "刃痕板腿甲"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "刃痕碎擊護手"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "血征面甲"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "血征護肩"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "血征鏈甲"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "血征護腿"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "血征握套"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "鐵征頭盔"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "鐵征肩鎧"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "鐵征護胸"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "鐵征腿甲"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "鐵征護手甲"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "日守頭環"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "日守肩篷"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "日守鎖甲衫"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "日守鏈腿甲"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "日守手套"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "盾誓頭盔"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "盾誓肩甲"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "盾誓胸甲"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "盾誓板腿甲"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "盾誓護手"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "光印冠冕"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "光印肩鎧"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "光印胸鎧"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "光印腿甲"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "光印護手"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "群守頭巾"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "群守肩鎧"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "群守短皮衣"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "群守腿甲"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "群守護手"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "遠見頭巾"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "遠見肩鎧"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "遠見短皮衣"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "遠見腿甲"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "遠見護手"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "陷牙頭巾"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "陷牙肩鎧"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "陷牙短皮衣"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "陷牙腿甲"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "陷牙護手"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "夜斬風帽"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "夜斬肩墊"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "夜斬外衣"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "夜斬馬褲"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "夜斬手套"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "鬥印風帽"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "鬥印肩墊"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "鬥印外衣"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "鬥印馬褲"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "鬥印手套"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "影行風帽"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "影行肩墊"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "影行外衣"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "影行馬褲"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "影行手套"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "幕頌兜帽"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "幕頌肩篷"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "幕頌長袍"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "幕頌護腿"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "幕頌纏手布"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "恩翼兜帽"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "恩翼肩篷"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "恩翼長袍"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "恩翼護腿"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "恩翼纏手布"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "暮頌兜帽"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "暮頌肩篷"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "暮頌長袍"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "暮頌護腿"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "暮頌纏手布"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "風暴律令頭巾"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "風暴律令肩甲"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "風暴律令鎖甲衫"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "風暴律令鏈腿甲"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "風暴律令護手"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "疾風頭盔"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "疾風肩鎧"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "疾風鏈甲"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "疾風腿甲"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "疾風握套"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "潮守頭環"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "潮守肩篷"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "潮守鎖甲衫"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "潮守戰裙"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "潮守纏手布"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "縛時者風帽"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "縛時者披肩"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "縛時者長袍"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "縛時者長褲"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "縛時者手套"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "燼鞭兜帽"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "燼鞭肩篷"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "燼鞭法袍"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "燼鞭護腿"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "燼鞭手套"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "霜衛風帽"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "霜衛肩墊"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "霜衛祭袍"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "霜衛纏腿布"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "霜衛連指手套"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "恐羽風帽"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "恐羽肩篷"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "恐羽長袍"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "恐羽護腿"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "恐羽纏手布"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "髓縛兜帽"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "髓縛肩鎧"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "髓縛長袍"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "髓縛護腿"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "髓縛握套"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "渣冕風帽"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "渣冕肩篷"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "渣冕法袍"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "渣冕護腿"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "渣冕手套"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "星衛頭飾"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "星衛肩鎧"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "星衛背心"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "星衛馬褲"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "星衛手套"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "血鬃頭盔"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "血鬃肩墊"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "血鬃外衣"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "血鬃腿甲"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "血鬃握套"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "薊花冠冕"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "薊花肩篷"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "薊花背心"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "薊花護腿"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "薊花手套"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "先鋒裁決"
+      },
+      "vanguard_oath_blade": {
+        "name": "先鋒誓約"
+      },
+      "vanguard_fang_dagger": {
+        "name": "先鋒之牙"
+      },
+      "vanguard_warstaff": {
+        "name": "先鋒戰杖"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -21502,6 +21923,141 @@ export const zh_TW: EnTranslations = {
       "vale_arcanist": {
         "name": "谷地秘法師法衣",
         "bonus3": "攻擊速度和施法速度提高 15%。"
+      },
+      "vanguard_druid_balance": {
+        "name": "星衛衣裝",
+        "bonus2": "攫纏根鬚的施法時間縮短 0.5 秒。",
+        "bonus4": "施放攫纏根鬚使你可以在移動中施法，並使你的移動速度提高 20%，持續 4 秒。每 20 秒最多觸發一次。"
+      },
+      "vanguard_druid_feral": {
+        "name": "血鬃獸皮甲",
+        "bonus2": "巨熊衝鋒的冷卻時間縮短 3 秒。",
+        "bonus4": "巨熊衝鋒為你提供相當於你最大生命值 6% 的護盾，持續 6 秒。"
+      },
+      "vanguard_druid_restoration": {
+        "name": "薊花祭袍",
+        "bonus2": "迅癒的冷卻時間縮短 1 秒。",
+        "bonus4": "迅癒還會使你的移動速度提高 30%，持續 3 秒。"
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "群守獵裝",
+        "bonus2": "震顫射擊的冷卻時間縮短 4 秒。",
+        "bonus4": "震顫射擊使狂野怒火的剩餘冷卻時間縮短 1 秒。"
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "遠見獵裝",
+        "bonus2": "斷跡的冷卻時間縮短 4 秒。",
+        "bonus4": "斷跡使你在 6 秒內的下一次長弓引射變為瞬發。每 15 秒最多觸發一次。"
+      },
+      "vanguard_hunter_survival": {
+        "name": "陷牙獵裝",
+        "bonus2": "血鉤的冷卻時間縮短 3 秒。",
+        "bonus4": "血鉤提供 1 點狩獵動能。"
+      },
+      "vanguard_mage_arcane": {
+        "name": "縛時者聖袍",
+        "bonus2": "時光屏障的冷卻時間縮短 2 秒。",
+        "bonus4": "時光屏障還會使受護目標的移動速度提高 20%，持續 3 秒。"
+      },
+      "vanguard_mage_fire": {
+        "name": "燼鞭華服",
+        "bonus2": "燼焰墜的充能恢復速度加快 3 秒。",
+        "bonus4": "施放燼焰墜會使烈焰屏障的剩餘冷卻時間縮短 2 秒。"
+      },
+      "vanguard_mage_frost": {
+        "name": "霜衛裝束",
+        "bonus2": "縛冰術的冷卻時間縮短 2 秒。",
+        "bonus4": "施放縛冰術會使輕掠步的剩餘冷卻時間縮短 5 秒。"
+      },
+      "vanguard_paladin_holy": {
+        "name": "日守華服",
+        "bonus2": "生命契約的冷卻時間縮短 30 秒。",
+        "bonus4": "生命契約還會為該盟友提供相當於其最大生命值 8% 的護盾，持續 6 秒。"
+      },
+      "vanguard_paladin_protection": {
+        "name": "盾誓堡壘",
+        "bonus2": "誓約鎖鏈的冷卻時間縮短 2 秒。",
+        "bonus4": "被誓約鎖鏈拉動的敵人施法速度降低 30%，持續 4 秒；當誓約鎖鏈束縛一個可被拉動的敵人時，還會使你獲得烈陽反擊。"
+      },
+      "vanguard_paladin_retribution": {
+        "name": "光印戰甲",
+        "bonus2": "女武神的召喚的冷卻時間縮短 15 秒。",
+        "bonus4": "女武神的召喚會重置終末敕令的冷卻時間，且落地後 6 秒內的下一次終末敕令造成的傷害提高 15%。"
+      },
+      "vanguard_priest_discipline": {
+        "name": "幕頌衣裝",
+        "bonus2": "心靈尖嘯的冷卻時間縮短 3 秒。",
+        "bonus4": "你的守護聖詠被完全消耗時，受護盟友的移動速度提高 20%，持續 3 秒。每 8 秒最多觸發一次。"
+      },
+      "vanguard_priest_holy": {
+        "name": "恩翼衣裝",
+        "bonus2": "帷幕步的冷卻時間縮短 6 秒。",
+        "bonus4": "帷幕步還會為你提供相當於你最大生命值 8% 的護盾，持續 6 秒。"
+      },
+      "vanguard_priest_shadow": {
+        "name": "暮頌華服",
+        "bonus2": "哀禍連禱在你引導期間還會使目標的移動速度降低 30%。",
+        "bonus4": "召喚什一魔還會為你提供相當於你最大生命值 10% 的護盾，持續 8 秒。"
+      },
+      "vanguard_rogue_assassination": {
+        "name": "夜斬皮甲",
+        "bonus2": "陰狠一擊的能量消耗降低 10 點。",
+        "bonus4": "陰狠一擊還會使你在 6 秒內的下一次攻擊必定致命一擊。"
+      },
+      "vanguard_rogue_combat": {
+        "name": "鬥印皮甲",
+        "bonus2": "疾風之足的冷卻時間縮短 60 秒。",
+        "bonus4": "疾風之足生效期間，邪惡揮斬和重磅擺拳額外提供 1 個連擊點數。"
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "影行皮甲",
+        "bonus2": "煙遁步的冷卻時間縮短 60 秒。",
+        "bonus4": "在煙遁步狀態下使用掏腹重擊時，額外提供 2 個連擊點數。"
+      },
+      "vanguard_shaman_elemental": {
+        "name": "風暴律令戰鎖甲",
+        "bonus2": "釋放武器的冷卻時間縮短 3 秒。",
+        "bonus4": "釋放武器使你可以在移動中施法，並使你的移動速度提高 20%，持續 4 秒。每 20 秒最多觸發一次。"
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "疾風戰鏈甲",
+        "bonus2": "先祖打擊使目標的移動速度降低 30%，持續 4 秒。",
+        "bonus4": "先祖打擊使元素恍惚的剩餘冷卻時間縮短 4 秒。"
+      },
+      "vanguard_shaman_restoration": {
+        "name": "潮守鏈甲",
+        "bonus2": "對生命值低於 50% 的盟友施放療癒之水時，施法時間縮短 0.5 秒。",
+        "bonus4": "潮汐召喚還會為其目標提供相當於你最大生命值 5% 的護盾，持續 6 秒。"
+      },
+      "vanguard_warlock_affliction": {
+        "name": "恐羽聖袍",
+        "bonus2": "折魂的施法時間縮短 0.3 秒。",
+        "bonus4": "吞噬的治療效果提高 30%，並且可以在移動中引導。"
+      },
+      "vanguard_warlock_demonology": {
+        "name": "髓縛華服",
+        "bonus2": "骸骨護甲的冷卻時間縮短 10 秒。",
+        "bonus4": "收割號令使骸骨護甲的剩餘冷卻時間縮短 2 秒。"
+      },
+      "vanguard_warlock_destruction": {
+        "name": "渣冕聖袍",
+        "bonus2": "熔渣皮膚的冷卻時間縮短 30 秒。",
+        "bonus4": "每施放兩次燃盡，你在 8 秒內的下一次毀滅箭變為瞬發。"
+      },
+      "vanguard_warrior_arms": {
+        "name": "刃痕戰裝",
+        "bonus2": "致殘打擊使猛衝的剩餘冷卻時間縮短 1 秒。",
+        "bonus4": "猛衝還會使你的下一次致殘打擊強化 20%（1 層血手強化）。"
+      },
+      "vanguard_warrior_fury": {
+        "name": "血征怒裝",
+        "bonus2": "英勇飛躍的冷卻時間縮短 8 秒。",
+        "bonus4": "英勇飛躍落地時使你激怒。"
+      },
+      "vanguard_warrior_prot": {
+        "name": "鐵征壁壘",
+        "bonus2": "斷層的冷卻時間縮短 5 秒。",
+        "bonus4": "斷層還會使你受到的傷害降低 10%，持續 6 秒。"
       },
       "vesperash": {
         "name": "晚禱燼灰罩袍",

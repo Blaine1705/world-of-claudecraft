@@ -2440,6 +2440,8 @@ export const en_XA: EnTranslations = {
       "gossipOptionAria": "[Ɓŕóŵšé ţĥé Ŵáŕƒáŕé šéţ šĥóþ óƒƒéŕéð ƀý {name}]",
       "jewelry": "[Ĵéŵéļŕý]",
       "weapons": "[Ŵéáþóñš]",
+      "groupSeason2": "[Ŵáŕƒáŕé Šéášóñ 2: Ʋáñĝúáŕð]",
+      "groupEntry": "[Ŵáŕƒáŕé Šéášóñ 1]",
       "owned": "[Óŵñéð]",
       "buyAria": "[Ɓúý {item} ƒóŕ {honor}]",
       "buyOwnedAria": "[Ɓúý {item} ƒóŕ {honor}, áļŕéáðý óŵñéð]",
@@ -7465,7 +7467,9 @@ export const en_XA: EnTranslations = {
       "warfareBody": "[Éʋéŕý Ŵáŕƒáŕé þíéçé çáŕŕíéš Ŵáŕƒáŕé Óƒƒéñšé áñð Ŵáŕƒáŕé Ðéƒéñšé Ŕáţíñĝ, áñð ţĥóšé ţŵó ŕáţíñĝš ðó ñóţĥíñĝ áţ áļļ áĝáíñšţ ɱóñšţéŕš. Ţĥéý áþþļý óñļý ŵĥéñ ýóú ƒíĝĥţ áñóţĥéŕ þļáýéŕ, íñ á ðúéļ, íñ ţĥé áŕéñá, óŕ óñ ţĥé ƀáţţļéĝŕóúñð, ŵĥéŕé Óƒƒéñšé áððš ţó ţĥé ðáɱáĝé ýóú ðéáļ áñð Ðéƒéñšé çúţš ţĥé ðáɱáĝé ýóú ţáķé, éáçĥ úþ ţó íţš óŵñ çéíļíñĝ. Éáçĥ áŕɱóŕ ƒáɱíļý íš áļšó á šéţ, áñð íţš šéţ ƀóñúšéš áŕé ļíķéŵíšé Ŵáŕƒáŕé ŕáţíñĝ óŕ éƒƒéçţš ţĥáţ óñļý ŵóŕķ áĝáíñšţ þļáýéŕš, šó á ƒúļļ ĥóñóŕ ķíţ íš ŵóŕţĥ ñóţĥíñĝ óñ á ðúñĝéóñ ƀóšš.]",
       "warfareBodyStatsStay": "[Éʋéŕý Ŵáŕƒáŕé þíéçé çáŕŕíéš Ŵáŕƒáŕé Óƒƒéñšé áñð Ŵáŕƒáŕé Ðéƒéñšé Ŕáţíñĝ, áñð ţĥóšé ţŵó ŕáţíñĝš ðó ñóţĥíñĝ áţ áļļ áĝáíñšţ ɱóñšţéŕš. Ţĥéý áþþļý óñļý ŵĥéñ ýóú ƒíĝĥţ áñóţĥéŕ þļáýéŕ, íñ á ðúéļ, íñ ţĥé áŕéñá, óŕ óñ ţĥé ƀáţţļéĝŕóúñð, ŵĥéŕé Óƒƒéñšé áððš ţó ţĥé ðáɱáĝé ýóú ðéáļ áñð Ðéƒéñšé çúţš ţĥé ðáɱáĝé ýóú ţáķé, éáçĥ úþ ţó íţš óŵñ çéíļíñĝ. Éáçĥ áŕɱóŕ ƒáɱíļý íš áļšó á šéţ, áñð íţš šéţ ƀóñúšéš áŕé ļíķéŵíšé Ŵáŕƒáŕé ŕáţíñĝ óŕ éƒƒéçţš ţĥáţ óñļý ŵóŕķ áĝáíñšţ þļáýéŕš, šó á ƒúļļ ĥóñóŕ ķíţ'š šéţ ƀóñúšéš çóúñţ ƒóŕ ñóţĥíñĝ óñ á ðúñĝéóñ ƀóšš. Ţĥé þíéçéš ţĥéɱšéļʋéš šţíļļ çáŕŕý ţĥéíŕ óŕðíñáŕý šţáţš, áŕɱóŕ, áñð ŵéáþóñ ðáɱáĝé, áñð ţĥóšé ŵóŕķ éʋéŕýŵĥéŕé; íţ íš ţĥé Ŵáŕƒáŕé ŕáţíñĝš áñð ţĥé šéţ ƀóñúšéš ţĥáţ ĝó ɋúíéţ áĝáíñšţ á ɱóñšţéŕ.]",
       "warfareTradeBody": "[Ţĥáţ íš ţĥé ðéļíƀéŕáţé ţŕáðé. Ŵáŕƒáŕé ĝéáŕ íš ƀúíļţ ƒóŕ ƒíĝĥţíñĝ þļáýéŕš, ñóţ áš á šĥóŕţçúţ þášţ ţĥé ðúñĝéóñ ţíéŕš: á Ŵáŕƒáŕé þíéçé ñéʋéŕ çáŕŕíéš ţĥé çóɱƀáţ ŕáţíñĝš á ðúñĝéóñ éþíç íñ ţĥé šáɱé šļóţ ðóéš, áñð éʋéŕýţĥíñĝ íţ ðóéš ƀŕíñĝ íš šþéñţ óñ óţĥéŕ þļáýéŕš. Íƒ ýóú ŵáñţ ţó ĥóļð ýóúŕ óŵñ íñ ţĥé áŕéñá, ƀúý íţ. Íƒ ýóú ŵáñţ ţó çļéáŕ ĥéŕóíçš ƒášţéŕ, éáŕñ ýóúŕ ĝéáŕ íñ ţĥé ðúñĝéóñš.]",
-      "warfareTradeBodyRatingSpent": "[Ţĥáţ íš ţĥé ðéļíƀéŕáţé ţŕáðé. Ŵáŕƒáŕé ĝéáŕ íš ƀúíļţ ƒóŕ ƒíĝĥţíñĝ þļáýéŕš, ñóţ áš á šĥóŕţçúţ þášţ ţĥé ðúñĝéóñ ţíéŕš: á Ŵáŕƒáŕé þíéçé ñéʋéŕ çáŕŕíéš ţĥé çóɱƀáţ ŕáţíñĝš á ðúñĝéóñ éþíç íñ ţĥé šáɱé šļóţ ðóéš, áñð ţĥé Ŵáŕƒáŕé ŕáţíñĝ áñð šéţ ƀóñúšéš íţ çáŕŕíéš íñšţéáð áŕé šþéñţ éñţíŕéļý óñ óţĥéŕ þļáýéŕš. Íƒ ýóú ŵáñţ ţó ĥóļð ýóúŕ óŵñ íñ ţĥé áŕéñá, ƀúý íţ. Íƒ ýóú ŵáñţ ţó çļéáŕ ĥéŕóíçš ƒášţéŕ, éáŕñ ýóúŕ ĝéáŕ íñ ţĥé ðúñĝéóñš.]"
+      "warfareTradeBodyRatingSpent": "[Ţĥáţ íš ţĥé ðéļíƀéŕáţé ţŕáðé. Ŵáŕƒáŕé ĝéáŕ íš ƀúíļţ ƒóŕ ƒíĝĥţíñĝ þļáýéŕš, ñóţ áš á šĥóŕţçúţ þášţ ţĥé ðúñĝéóñ ţíéŕš: á Ŵáŕƒáŕé þíéçé ñéʋéŕ çáŕŕíéš ţĥé çóɱƀáţ ŕáţíñĝš á ðúñĝéóñ éþíç íñ ţĥé šáɱé šļóţ ðóéš, áñð ţĥé Ŵáŕƒáŕé ŕáţíñĝ áñð šéţ ƀóñúšéš íţ çáŕŕíéš íñšţéáð áŕé šþéñţ éñţíŕéļý óñ óţĥéŕ þļáýéŕš. Íƒ ýóú ŵáñţ ţó ĥóļð ýóúŕ óŵñ íñ ţĥé áŕéñá, ƀúý íţ. Íƒ ýóú ŵáñţ ţó çļéáŕ ĥéŕóíçš ƒášţéŕ, éáŕñ ýóúŕ ĝéáŕ íñ ţĥé ðúñĝéóñš.]",
+      "vanguardHeading": "[Ʋáñĝúáŕð ĝéáŕ: Ŵáŕƒáŕé Šéášóñ 2]",
+      "vanguardBody": "[Ʋáñĝúáŕð ĝéáŕ íš ţĥé šéçóñð šéášóñ óƒ Ŵáŕƒáŕé ĝéáŕ, šóļð ƀý ţĥé šáɱé ţŵó ɋúáŕţéŕɱášţéŕš áƀóʋé ţĥé óŕíĝíñáļ ţíéŕ, ŵĥíçĥ šţáýš óñ šáļé. Éʋéŕý šþéç ĥáš íţš óŵñ Ʋáñĝúáŕð šéţ óƒ ƒíʋé þíéçéš, ƒóŕ ţĥé ĥéáð, šĥóúļðéŕš, çĥéšţ, ļéĝš áñð ĥáñðš, áñð ţĥé šĥóþ ļíšţš óñļý ţĥé ţĥŕéé šéţš ýóúŕ çļášš çáñ ŵéáŕ, ƒóļļóŵéð ƀý ţĥé Ʋáñĝúáŕð ŵéáþóñš ýóú çáñ ŵíéļð. Á Ʋáñĝúáŕð þíéçé çáŕŕíéš ţĥé šáɱé Ŵáŕƒáŕé ŕáţíñĝš áš ţĥé óŕíĝíñáļ ţíéŕ áţ á ĥíĝĥéŕ íţéɱ ļéʋéļ, áñð éáçĥ šéţ ĥáš ţŵó ƀóñúšéš, áţ ţŵó áñð ƒóúŕ þíéçéš, ţĥáţ çĥáñĝé óñé óƒ ýóúŕ šþéç'š áƀíļíţíéš. Úñļíķé ţĥé óŕíĝíñáļ šéţš, ţĥóšé ƀóñúšéš ŵóŕķ éʋéŕýŵĥéŕé, ɱóñšţéŕš íñçļúðéð, ƀúţ ţĥéý áŕé ƀúíļţ ƒóŕ ƒíĝĥţíñĝ þļáýéŕš, šó á ŕáíð šéţ šţáýš ţĥé ƀéţţéŕ çĥóíçé íñšíðé á ŕáíð.]"
     },
     "worldPvpPage": {
       "heading": "[Ŵóŕļð ÞʋÞ]",
@@ -16149,6 +16153,423 @@ export const en_XA: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "[Šţóŕɱĥýɱñ Çĥáíñ Ţŕéáðš]"
       },
+      "vanguard_warrior_arms_helmet": {
+        "name": "[Ɓļáðéŵáķé Ĝŕéáţĥéļɱ]"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "[Ɓļáðéŵáķé Þáúļðŕóñš]"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "[Ɓļáðéŵáķé Ĥáúƀéŕķ]"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "[Ɓļáðéŵáķé Ļéĝþļáţéš]"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "[Ɓļáðéŵáķé Çŕúšĥéŕš]"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "[Ɓļóóðɱáŕçĥ Ʋíšáĝé]"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "[Ɓļóóðɱáŕçĥ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "[Ɓļóóðɱáŕçĥ Çĥáíñɱáíļ]"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "[Ɓļóóðɱáŕçĥ Ļéĝĝíñĝš]"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "[Ɓļóóðɱáŕçĥ Ĝŕíþš]"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "[Íŕóñɱáŕçĥ Ĥéļɱ]"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "[Íŕóñɱáŕçĥ Šþáúļðéŕš]"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "[Íŕóñɱáŕçĥ Çĥéšţĝúáŕð]"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "[Íŕóñɱáŕçĥ Ļéĝĝúáŕðš]"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "[Íŕóñɱáŕçĥ Ĥáñðĝúáŕðš]"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "[Šúñʋíĝíļ Çíŕçļéţ]"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "[Šúñʋíĝíļ Ɱáñţļé]"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "[Šúñʋíĝíļ Ĥáúƀéŕķ]"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "[Šúñʋíĝíļ Ļéĝɱáíļ]"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "[Šúñʋíĝíļ Ĝļóʋéš]"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "[Šĥíéļðʋóŵ Ĥéļɱ]"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "[Šĥíéļðʋóŵ Þáúļðŕóñš]"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "[Šĥíéļðʋóŵ Ɓŕéášţþļáţé]"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "[Šĥíéļðʋóŵ Ļéĝþļáţéš]"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "[Šĥíéļðʋóŵ Ĝáúñţļéţš]"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "[Ļíĝĥţƀŕáñð Çŕóŵñ]"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "[Ļíĝĥţƀŕáñð Šþáúļðéŕš]"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "[Ļíĝĥţƀŕáñð Çúíŕášš]"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "[Ļíĝĥţƀŕáñð Ļéĝĝúáŕðš]"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "[Ļíĝĥţƀŕáñð Ĝáúñţļéţš]"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "[Þáçķŵáŕðéñ Çóíƒ]"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "[Þáçķŵáŕðéñ Šþáúļðéŕš]"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "[Þáçķŵáŕðéñ Ĵéŕķíñ]"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "[Þáçķŵáŕðéñ Ļéĝĝúáŕðš]"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "[Þáçķŵáŕðéñ Ĝáúñţļéţš]"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "[Ƒáŕšíĝĥţ Çóíƒ]"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "[Ƒáŕšíĝĥţ Šþáúļðéŕš]"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "[Ƒáŕšíĝĥţ Ĵéŕķíñ]"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "[Ƒáŕšíĝĥţ Ļéĝĝúáŕðš]"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "[Ƒáŕšíĝĥţ Ĝáúñţļéţš]"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "[Šñáŕéţóóţĥ Çóíƒ]"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "[Šñáŕéţóóţĥ Šþáúļðéŕš]"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "[Šñáŕéţóóţĥ Ĵéŕķíñ]"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "[Šñáŕéţóóţĥ Ļéĝĝúáŕðš]"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "[Šñáŕéţóóţĥ Ĝáúñţļéţš]"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "[Ñíĝĥţçúţ Ĥóóð]"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "[Ñíĝĥţçúţ Šĥóúļðéŕþáðš]"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "[Ñíĝĥţçúţ Ţúñíç]"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "[Ñíĝĥţçúţ Ɓŕééçĥéš]"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "[Ñíĝĥţçúţ Ĝļóʋéš]"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "[Ɓŕáŵļɱáŕķ Ĥóóð]"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "[Ɓŕáŵļɱáŕķ Šĥóúļðéŕþáðš]"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "[Ɓŕáŵļɱáŕķ Ţúñíç]"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "[Ɓŕáŵļɱáŕķ Ɓŕééçĥéš]"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "[Ɓŕáŵļɱáŕķ Ĝļóʋéš]"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "[Šĥáðéŵáļķ Ĥóóð]"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "[Šĥáðéŵáļķ Šĥóúļðéŕþáðš]"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "[Šĥáðéŵáļķ Ţúñíç]"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "[Šĥáðéŵáļķ Ɓŕééçĥéš]"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "[Šĥáðéŵáļķ Ĝļóʋéš]"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "[Ʋéíļþšáļɱ Çóŵļ]"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "[Ʋéíļþšáļɱ Ɱáñţļé]"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "[Ʋéíļþšáļɱ Ŕóƀé]"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "[Ʋéíļþšáļɱ Ļéĝĝíñĝš]"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "[Ʋéíļþšáļɱ Ĥáñðŵŕáþš]"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "[Ĝŕáçéŵíñĝ Çóŵļ]"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "[Ĝŕáçéŵíñĝ Ɱáñţļé]"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "[Ĝŕáçéŵíñĝ Ŕóƀé]"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "[Ĝŕáçéŵíñĝ Ļéĝĝíñĝš]"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "[Ĝŕáçéŵíñĝ Ĥáñðŵŕáþš]"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "[Ðúšķĥýɱñ Çóŵļ]"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "[Ðúšķĥýɱñ Ɱáñţļé]"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "[Ðúšķĥýɱñ Ŕóƀé]"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "[Ðúšķĥýɱñ Ļéĝĝíñĝš]"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "[Ðúšķĥýɱñ Ĥáñðŵŕáþš]"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "[Ţéɱþéšţŵŕíţ Çóíƒ]"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "[Ţéɱþéšţŵŕíţ Þáúļðŕóñš]"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "[Ţéɱþéšţŵŕíţ Ĥáúƀéŕķ]"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "[Ţéɱþéšţŵŕíţ Ļéĝɱáíļ]"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "[Ţéɱþéšţŵŕíţ Ĝáúñţļéţš]"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "[Ĝáļéƀóŕñ Ĥéļɱ]"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "[Ĝáļéƀóŕñ Šþáúļðéŕš]"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "[Ĝáļéƀóŕñ Çĥáíñɱáíļ]"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "[Ĝáļéƀóŕñ Ļéĝĝúáŕðš]"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "[Ĝáļéƀóŕñ Ĝŕíþš]"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "[Ɓŕíñéŵáŕð Çíŕçļéţ]"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "[Ɓŕíñéŵáŕð Ɱáñţļé]"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "[Ɓŕíñéŵáŕð Ĥáúƀéŕķ]"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "[Ɓŕíñéŵáŕð Ķíļţ]"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "[Ɓŕíñéŵáŕð Ĥáñðŵŕáþš]"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "[Ĥóúŕƀíñðéŕ'š Ĥóóð]"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "[Ĥóúŕƀíñðéŕ'š Áɱíçé]"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "[Ĥóúŕƀíñðéŕ'š Ŕóƀé]"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "[Ĥóúŕƀíñðéŕ'š Ţŕóúšéŕš]"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "[Ĥóúŕƀíñðéŕ'š Ĝļóʋéš]"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "[Éɱƀéŕļášĥ Çóŵļ]"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "[Éɱƀéŕļášĥ Ɱáñţļé]"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "[Éɱƀéŕļášĥ Ŕóƀéš]"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "[Éɱƀéŕļášĥ Ļéĝĝíñĝš]"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "[Éɱƀéŕļášĥ Ĝļóʋéš]"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "[Ŕíɱéŵáŕðéñ Ĥóóð]"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "[Ŕíɱéŵáŕðéñ Šĥóúļðéŕþáðš]"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "[Ŕíɱéŵáŕðéñ Ʋéšţɱéñţ]"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "[Ŕíɱéŵáŕðéñ Ļéĝŵŕáþš]"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "[Ŕíɱéŵáŕðéñ Ɱíţţš]"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "[Ðŕéáðɋúíļļ Ĥóóð]"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "[Ðŕéáðɋúíļļ Ɱáñţļé]"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "[Ðŕéáðɋúíļļ Ŕóƀé]"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "[Ðŕéáðɋúíļļ Ļéĝĝíñĝš]"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "[Ðŕéáðɋúíļļ Ĥáñðŵŕáþš]"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "[Ɱáŕŕóŵƀóúñð Çóŵļ]"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "[Ɱáŕŕóŵƀóúñð Šþáúļðéŕš]"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "[Ɱáŕŕóŵƀóúñð Ŕóƀé]"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "[Ɱáŕŕóŵƀóúñð Ļéĝĝíñĝš]"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "[Ɱáŕŕóŵƀóúñð Ĝŕíþš]"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "[Šļáĝçŕóŵñ Ĥóóð]"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "[Šļáĝçŕóŵñ Ɱáñţļé]"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "[Šļáĝçŕóŵñ Ŕóƀéš]"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "[Šļáĝçŕóŵñ Ļéĝĝíñĝš]"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "[Šļáĝçŕóŵñ Ĝļóʋéš]"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "[Šţáŕŵáŕðéñ Ĥéáððŕéšš]"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "[Šţáŕŵáŕðéñ Šþáúļðéŕš]"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "[Šţáŕŵáŕðéñ Ʋéšţ]"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "[Šţáŕŵáŕðéñ Ɓŕééçĥéš]"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "[Šţáŕŵáŕðéñ Ĝļóʋéš]"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "[Ɓļóóðɱáñé Ĥéļɱ]"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "[Ɓļóóðɱáñé Šĥóúļðéŕþáðš]"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "[Ɓļóóðɱáñé Ţúñíç]"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "[Ɓļóóðɱáñé Ļéĝĝúáŕðš]"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "[Ɓļóóðɱáñé Ĝŕíþš]"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "[Ţĥíšţļéƀļóóɱ Çŕóŵñ]"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "[Ţĥíšţļéƀļóóɱ Ɱáñţļé]"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "[Ţĥíšţļéƀļóóɱ Ʋéšţ]"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "[Ţĥíšţļéƀļóóɱ Ļéĝĝíñĝš]"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "[Ţĥíšţļéƀļóóɱ Ĝļóʋéš]"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "[Ʋáñĝúáŕð'š Ʋéŕðíçţ]"
+      },
+      "vanguard_oath_blade": {
+        "name": "[Ʋáñĝúáŕð'š Óáţĥ]"
+      },
+      "vanguard_fang_dagger": {
+        "name": "[Ʋáñĝúáŕð'š Ƒáñĝ]"
+      },
+      "vanguard_warstaff": {
+        "name": "[Ʋáñĝúáŕð'š Ŵáŕšţáƒƒ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },
@@ -21502,6 +21923,141 @@ export const en_XA: EnTranslations = {
       "vale_arcanist": {
         "name": "[Ʋáļé Áŕçáñíšţ'š Ŕéĝáļíá]",
         "bonus3": "[Íñçŕéášéš áţţáçķ áñð çášţíñĝ šþééð ƀý 7.5%.]"
+      },
+      "vanguard_druid_balance": {
+        "name": "[Šţáŕŵáŕðéñ Ŕáíɱéñţ]",
+        "bonus2": "[Ĝŕíþþíñĝ Ŕóóţš' çášţ ţíɱé íš ŕéðúçéð ƀý 0.5 šéç.]",
+        "bonus4": "[Çášţíñĝ Ĝŕíþþíñĝ Ŕóóţš ļéţš ýóú çášţ ŵĥíļé ɱóʋíñĝ áñð íñçŕéášéš ýóúŕ ɱóʋéɱéñţ šþééð ƀý 20 þéŕçéñţ ƒóŕ 4 šéç. Çáññóţ óççúŕ ɱóŕé ţĥáñ óñçé éʋéŕý 20 šéç.]"
+      },
+      "vanguard_druid_feral": {
+        "name": "[Ɓļóóðɱáñé Ĥíðé]",
+        "bonus2": "[Ɓŕúíñ Ŕúšĥ'š çóóļðóŵñ íš ŕéðúçéð ƀý 3 šéç.]",
+        "bonus4": "[Ɓŕúíñ Ŕúšĥ šĥíéļðš ýóú ƒóŕ 6 þéŕçéñţ óƒ ýóúŕ ɱáẋíɱúɱ ĥéáļţĥ ƒóŕ 6 šéç.]"
+      },
+      "vanguard_druid_restoration": {
+        "name": "[Ţĥíšţļéƀļóóɱ Ʋéšţɱéñţ]",
+        "bonus2": "[Ƒļééţɱéñð'š çóóļðóŵñ íš ŕéðúçéð ƀý 1 šéç.]",
+        "bonus4": "[Ƒļééţɱéñð áļšó íñçŕéášéš ýóúŕ ɱóʋéɱéñţ šþééð ƀý 30 þéŕçéñţ ƒóŕ 3 šéç.]"
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "[Þáçķŵáŕðéñ Ĥáŕñéšš]",
+        "bonus2": "[Ŕáţţļíñĝ Šĥóţ'š çóóļðóŵñ íš ŕéðúçéð ƀý 4 šéç.]",
+        "bonus4": "[Ŕáţţļíñĝ Šĥóţ ŕéðúçéš Ĥóŵļíñĝ Ŕáĝé'š ŕéɱáíñíñĝ çóóļðóŵñ ƀý 1 šéç.]"
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "[Ƒáŕšíĝĥţ Ĥáŕñéšš]",
+        "bonus2": "[Ţŕáíļƀŕéáķ'š çóóļðóŵñ íš ŕéðúçéð ƀý 4 šéç.]",
+        "bonus4": "[Ţŕáíļƀŕéáķ ɱáķéš ýóúŕ ñéẋţ Ļóñĝ Ðŕáŵ ŵíţĥíñ 6 šéç íñšţáñţ. Çáññóţ óççúŕ ɱóŕé ţĥáñ óñçé éʋéŕý 15 šéç.]"
+      },
+      "vanguard_hunter_survival": {
+        "name": "[Šñáŕéţóóţĥ Ĥáŕñéšš]",
+        "bonus2": "[Ɓļóóðĥóóķ'š çóóļðóŵñ íš ŕéðúçéð ƀý 3 šéç.]",
+        "bonus4": "[Ɓļóóðĥóóķ ĝŕáñţš 1 Ĥúñţíñĝ Ɱóɱéñţúɱ.]"
+      },
+      "vanguard_mage_arcane": {
+        "name": "[Ĥóúŕƀíñðéŕ'š Ʋéšţɱéñţš]",
+        "bonus2": "[Ţéɱþóŕáļ Ɓáŕŕíéŕ'š çóóļðóŵñ íš ŕéðúçéð ƀý 2 šéç.]",
+        "bonus4": "[Ţéɱþóŕáļ Ɓáŕŕíéŕ áļšó íñçŕéášéš ţĥé šĥíéļðéð ţáŕĝéţ'š ɱóʋéɱéñţ šþééð ƀý 20 þéŕçéñţ ƒóŕ 3 šéç.]"
+      },
+      "vanguard_mage_fire": {
+        "name": "[Éɱƀéŕļášĥ Ŕéĝáļíá]",
+        "bonus2": "[Çíñðéŕƒáļļ ŕéçĥáŕĝéš 3 šéç ƒášţéŕ.]",
+        "bonus4": "[Çášţíñĝ Çíñðéŕƒáļļ ŕéðúçéš ţĥé ŕéɱáíñíñĝ çóóļðóŵñ óƒ Ɓļážíñĝ Ɓáŕŕíéŕ ƀý 2 šéç.]"
+      },
+      "vanguard_mage_frost": {
+        "name": "[Ŕíɱéŵáŕðéñ Ĝáŕƀ]",
+        "bonus2": "[Íçéƀíñð'š çóóļðóŵñ íš ŕéðúçéð ƀý 2 šéç.]",
+        "bonus4": "[Çášţíñĝ Íçéƀíñð ŕéðúçéš ţĥé ŕéɱáíñíñĝ çóóļðóŵñ óƒ Ƒļíţšţéþ ƀý 5 šéç.]"
+      },
+      "vanguard_paladin_holy": {
+        "name": "[Šúñʋíĝíļ Ŕéĝáļíá]",
+        "bonus2": "[Ļíƒé Çóʋéñáñţ'š çóóļðóŵñ íš ŕéðúçéð ƀý 30 šéç.]",
+        "bonus4": "[Ļíƒé Çóʋéñáñţ áļšó šĥíéļðš ţĥé áļļý ƒóŕ 8 þéŕçéñţ óƒ ţĥéíŕ ɱáẋíɱúɱ ĥéáļţĥ ƒóŕ 6 šéç.]"
+      },
+      "vanguard_paladin_protection": {
+        "name": "[Šĥíéļðʋóŵ Ɓášţíóñ]",
+        "bonus2": "[Óáţĥ Çĥáíñ'š çóóļðóŵñ íš ŕéðúçéð ƀý 2 šéç.]",
+        "bonus4": "[Éñéɱíéš þúļļéð ƀý Óáţĥ Çĥáíñ çášţ šþéļļš 30 þéŕçéñţ šļóŵéŕ ƒóŕ 4 šéç, áñð Óáţĥ Çĥáíñ ĝŕáñţš ýóú Šóļáŕ Ŕéþŕíšáļ ŵĥéñ íţ ƀíñðš áñ éñéɱý ţĥáţ çáñ ƀé þúļļéð.]"
+      },
+      "vanguard_paladin_retribution": {
+        "name": "[Ļíĝĥţƀŕáñð Ŵáŕþļáţé]",
+        "bonus2": "[Ʋáļķýŕ'š Çáļļíñĝ'š çóóļðóŵñ íš ŕéðúçéð ƀý 15 šéç.]",
+        "bonus4": "[Ʋáļķýŕ'š Çáļļíñĝ ŕéšéţš Ƒíñáļ Éðíçţ'š çóóļðóŵñ, áñð ýóúŕ ñéẋţ Ƒíñáļ Éðíçţ ŵíţĥíñ 6 šéç óƒ ļáñðíñĝ ðéáļš 15 þéŕçéñţ ɱóŕé ðáɱáĝé.]"
+      },
+      "vanguard_priest_discipline": {
+        "name": "[Ʋéíļþšáļɱ Ŕáíɱéñţ]",
+        "bonus2": "[Ţéŕŕóŕ Çáñţíçļé'š çóóļðóŵñ íš ŕéðúçéð ƀý 3 šéç.]",
+        "bonus4": "[Ŵĥéñ ýóúŕ Þšáļɱ óƒ Ŵáŕðíñĝ íš ƒúļļý çóñšúɱéð, ţĥé šĥíéļðéð áļļý ĝáíñš 20 þéŕçéñţ ɱóʋéɱéñţ šþééð ƒóŕ 3 šéç. Çáññóţ óççúŕ ɱóŕé ţĥáñ óñçé éʋéŕý 8 šéç.]"
+      },
+      "vanguard_priest_holy": {
+        "name": "[Ĝŕáçéŵíñĝ Ŕáíɱéñţ]",
+        "bonus2": "[Ʋéíļšţéþ'š çóóļðóŵñ íš ŕéðúçéð ƀý 6 šéç.]",
+        "bonus4": "[Ʋéíļšţéþ áļšó šĥíéļðš ýóú ƒóŕ 8 þéŕçéñţ óƒ ýóúŕ ɱáẋíɱúɱ ĥéáļţĥ ƒóŕ 6 šéç.]"
+      },
+      "vanguard_priest_shadow": {
+        "name": "[Ðúšķĥýɱñ Ŕéĝáļíá]",
+        "bonus2": "[Ļíţáñý óƒ Ŵóé áļšó šļóŵš ţĥé ţáŕĝéţ'š ɱóʋéɱéñţ ƀý 30 þéŕçéñţ ŵĥíļé ýóú çĥáññéļ íţ.]",
+        "bonus4": "[Çáļļ Ţíţĥéƒíéñð áļšó šĥíéļðš ýóú ƒóŕ 10 þéŕçéñţ óƒ ýóúŕ ɱáẋíɱúɱ ĥéáļţĥ ƒóŕ 8 šéç.]"
+      },
+      "vanguard_rogue_assassination": {
+        "name": "[Ñíĝĥţçúţ Ļéáţĥéŕš]",
+        "bonus2": "[Ļóŵ Ɓļóŵ çóšţš 10 ļéšš Éñéŕĝý.]",
+        "bonus4": "[Ļóŵ Ɓļóŵ áļšó ɱáķéš ýóúŕ ñéẋţ áţţáçķ ŵíţĥíñ 6 šéç á çŕíţíçáļ šţŕíķé.]"
+      },
+      "vanguard_rogue_combat": {
+        "name": "[Ɓŕáŵļɱáŕķ Ļéáţĥéŕš]",
+        "bonus2": "[Šŵíƒţ Ĥééļš' çóóļðóŵñ íš ŕéðúçéð ƀý 60 šéç.]",
+        "bonus4": "[Ŵĥíļé Šŵíƒţ Ĥééļš íš áçţíʋé, Ŵíçķéð Šļášĥ áñð Ĥáýɱáķéŕ áŵáŕð 1 áððíţíóñáļ çóɱƀó þóíñţ.]"
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "[Šĥáðéŵáļķ Ļéáţĥéŕš]",
+        "bonus2": "[Šɱóķéƒáðé'š çóóļðóŵñ íš ŕéðúçéð ƀý 60 šéç.]",
+        "bonus4": "[Ĝúţ Þúñçĥ áŵáŕðš 2 áððíţíóñáļ çóɱƀó þóíñţš ŵĥéñ úšéð ƒŕóɱ Šɱóķéƒáðé.]"
+      },
+      "vanguard_shaman_elemental": {
+        "name": "[Ţéɱþéšţŵŕíţ Ɓáţţļéɱáíļ]",
+        "bonus2": "[Úñļéášĥ Ŵéáþóñ'š çóóļðóŵñ íš ŕéðúçéð ƀý 3 šéç.]",
+        "bonus4": "[Úñļéášĥ Ŵéáþóñ ļéţš ýóú çášţ ŵĥíļé ɱóʋíñĝ áñð íñçŕéášéš ýóúŕ ɱóʋéɱéñţ šþééð ƀý 20 þéŕçéñţ ƒóŕ 4 šéç. Çáññóţ óççúŕ ɱóŕé ţĥáñ óñçé éʋéŕý 20 šéç.]"
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "[Ĝáļéƀóŕñ Ŵáŕɱáíļ]",
+        "bonus2": "[Áñçéšţŕáļ Šţŕíķé šļóŵš ţĥé ţáŕĝéţ'š ɱóʋéɱéñţ šþééð ƀý 30 þéŕçéñţ ƒóŕ 4 šéç.]",
+        "bonus4": "[Áñçéšţŕáļ Šţŕíķé ŕéðúçéš ţĥé ŕéɱáíñíñĝ çóóļðóŵñ óƒ Éļéɱéñţáļ Ţŕáñçé ƀý 4 šéç.]"
+      },
+      "vanguard_shaman_restoration": {
+        "name": "[Ɓŕíñéŵáŕð Çĥáíñɱáíļ]",
+        "bonus2": "[Ɱéñðíñĝ Ŵáţéŕš çášţš 0.5 šéç ƒášţéŕ óñ áñ áļļý ƀéļóŵ 50 þéŕçéñţ ĥéáļţĥ.]",
+        "bonus4": "[Ţíðéçáļļ áļšó šĥíéļðš íţš ţáŕĝéţ ƒóŕ 5 þéŕçéñţ óƒ ýóúŕ ɱáẋíɱúɱ ĥéáļţĥ ƒóŕ 6 šéç.]"
+      },
+      "vanguard_warlock_affliction": {
+        "name": "[Ðŕéáðɋúíļļ Ʋéšţɱéñţš]",
+        "bonus2": "[Ĥáŕŕóŵ'š çášţ ţíɱé íš ŕéðúçéð ƀý 0.3 šéç.]",
+        "bonus4": "[Çóñšúɱé ĥéáļš ýóú ƒóŕ 30 þéŕçéñţ ɱóŕé áñð çáñ ƀé çĥáññéļéð ŵĥíļé ɱóʋíñĝ.]"
+      },
+      "vanguard_warlock_demonology": {
+        "name": "[Ɱáŕŕóŵƀóúñð Ŕéĝáļíá]",
+        "bonus2": "[Ɓóñé Áŕɱóŕ'š çóóļðóŵñ íš ŕéðúçéð ƀý 10 šéç.]",
+        "bonus4": "[Ŕéáþíñĝ Çóɱɱáñð ŕéðúçéš ţĥé ŕéɱáíñíñĝ çóóļðóŵñ óƒ Ɓóñé Áŕɱóŕ ƀý 2 šéç.]"
+      },
+      "vanguard_warlock_destruction": {
+        "name": "[Šļáĝçŕóŵñ Ʋéšţɱéñţš]",
+        "bonus2": "[Çíñðéŕĥíðé'š çóóļðóŵñ íš ŕéðúçéð ƀý 30 šéç.]",
+        "bonus4": "[Éʋéŕý šéçóñð Çóñƒļáĝŕáţé ɱáķéš ýóúŕ ñéẋţ Ŕúíñƀóļţ ŵíţĥíñ 8 šéç íñšţáñţ.]"
+      },
+      "vanguard_warrior_arms": {
+        "name": "[Ɓļáðéŵáķé Ɓáţţļéĝéáŕ]",
+        "bonus2": "[Ɱáíɱíñĝ Šţŕíķé ŕéðúçéš Óñŕúšĥ'š ŕéɱáíñíñĝ çóóļðóŵñ ƀý 1 šéç.]",
+        "bonus4": "[Óñŕúšĥ áļšó éɱþóŵéŕš ýóúŕ ñéẋţ Ɱáíɱíñĝ Šţŕíķé ƀý 20 þéŕçéñţ (óñé šţáçķ óƒ Ŕéðĥáñð'š éɱþóŵéŕ).]"
+      },
+      "vanguard_warrior_fury": {
+        "name": "[Ɓļóóðɱáŕçĥ Ŕáĝéĝéáŕ]",
+        "bonus2": "[Ʋáúļţíñĝ Çĥáŕĝé'š çóóļðóŵñ íš ŕéðúçéð ƀý 8 šéç.]",
+        "bonus4": "[Ļáñðíñĝ Ʋáúļţíñĝ Çĥáŕĝé Éñŕáĝéš ýóú.]"
+      },
+      "vanguard_warrior_prot": {
+        "name": "[Íŕóñɱáŕçĥ Ɓúļŵáŕķ]",
+        "bonus2": "[Ƒáúļţļíñé'š çóóļðóŵñ íš ŕéðúçéð ƀý 5 šéç.]",
+        "bonus4": "[Ƒáúļţļíñé áļšó ŕéðúçéš ðáɱáĝé ýóú ţáķé ƀý 10 þéŕçéñţ ƒóŕ 6 šéç.]"
       },
       "vesperash": {
         "name": "[Ʋéšþéŕášĥ Šĥŕóúð]",

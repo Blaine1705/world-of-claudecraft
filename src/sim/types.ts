@@ -1160,6 +1160,10 @@ interface BaseItemDef {
   // `kind` (weapon/armor/bag/tool: 1, everything else: 20); see stackSizeOf.
   stackSize?: number;
   requiredClass?: PlayerClass[];
+  // Class-locked gear (Warfare Season 2 spec sets): only the requiredClass list
+  // may equip it. Without the flag, armor follows the armor-type rank alone and
+  // requiredClass is advisory (canEquipItem in equipment_rules.ts).
+  classLocked?: boolean;
   // Minimum character level needed to equip this piece. When omitted, the level
   // is DERIVED from `quality` (see src/sim/item_level_req.ts); set this only to
   // override the per-quality default for a specific item.

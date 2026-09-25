@@ -822,8 +822,9 @@ describe('stock rows: the phase 11n pulls', () => {
       farmer_verbena: 6,
       provisioner_fenna: 7,
       armorer_hode: 5,
-      warmarshal_draven_kole: 47,
-      fury: 47,
+      // 47 entry-tier Warfare rows plus 139 Warfare Season 2 rows.
+      warmarshal_draven_kole: 186,
+      fury: 186,
       stablemaster_marla: 2,
       wardsmith_orun: 3,
     });

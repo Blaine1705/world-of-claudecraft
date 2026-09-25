@@ -2241,6 +2241,12 @@ export const guideStrings = {
     // changes nothing else.
     warfareTradeBodyRatingSpent:
       'That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and the Warfare rating and set bonuses it carries instead are spent entirely on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons.',
+    // Warfare Season 2 (src/sim/content/pvp_honor_season2.ts,
+    // docs/design/warfare-season-2.md). Spoiler-safe: no prices, item levels,
+    // set names or bonus numbers.
+    vanguardHeading: 'Vanguard gear: Warfare Season 2',
+    vanguardBody:
+      "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid.",
   },
 
   // The Thornhollow Fields 5v5 capture-the-flag battleground page

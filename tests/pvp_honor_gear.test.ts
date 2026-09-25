@@ -3,6 +3,7 @@ import {
   FURY_ENTITY_ID,
   FURY_NPC,
   FURY_STOCK,
+  HONOR_QUARTERMASTER_STOCK,
   WARFARE_ITEMS,
   WARFARE_JEWELRY_STAT_FRACTION,
   WARFARE_SOURCE_LEVEL,
@@ -202,7 +203,9 @@ describe('FURY WARFARE stock', () => {
     expect(NPCS.fury.pos).toEqual({ x: 16, z: -78 });
     expect(NPCS.fury.facing).toBe(-2.2455372690184494);
     expect(NPCS.fury.dynamic).toBe(true);
-    expect(NPCS.fury.vendorItems).toEqual(FURY_STOCK);
+    // The entry tier first, then Warfare Season 2 (pinned in warfare_season2.test.ts).
+    expect(NPCS.fury.vendorItems).toEqual(HONOR_QUARTERMASTER_STOCK);
+    expect(HONOR_QUARTERMASTER_STOCK.slice(0, FURY_STOCK.length)).toEqual(FURY_STOCK);
   });
 
   it('covers every supported item slot with two distinct rings per role profile', () => {

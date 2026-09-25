@@ -81,6 +81,7 @@ import {
   STATIONS,
 } from '../src/sim/content/professions';
 import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
+import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
@@ -1025,7 +1026,7 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     }
   });
 
-  it('labels all three outside-completion pages, and renders tag plus note for each', () => {
+  it('labels all four outside-completion pages, and renders tag plus note for each', () => {
     // The generated blob carries the flag for exactly the live flagged set
     // (a third flagged page must surface here the moment it is authored)...
     expect(
@@ -1037,13 +1038,15 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
       ['professions_forgebreaker', 'personal'],
+      // Class-locked Warfare Season 2 stock.
+      ['conquerors_vanguard_gallery', 'personal'],
     ]);
     // ...and the rendered catalog SHOWS the label: the tag beside the page
     // heading and the explanatory note, one pair per flagged page, resolved
     // through t() (never hardcoded English), with none on ordinary pages.
     const html = reliquaryCatalogSections(GUIDE_RELIQUARY);
-    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(3);
-    expect(html.match(/guide-reliquary-note/g)?.length).toBe(3);
+    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(4);
+    expect(html.match(/guide-reliquary-note/g)?.length).toBe(4);
     expect(html).toContain(`(${t('guide.reliquaryPage.retiredTag')})`);
     expect(html).toContain(`(${t('guide.reliquaryPage.personalTag')})`);
     expect(html).toContain(t('guide.reliquaryPage.retiredNote'));
@@ -5904,7 +5907,8 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     const honorRows = [...stocked].filter((id) => (ITEMS[id].priceHonor ?? 0) > 0);
     expect(honorRows.length).toBeGreaterThan(0);
     for (const id of honorRows) {
-      expect(id in WARFARE_ITEMS, id).toBe(true);
+      // The Warfare tier: the entry tier plus Warfare Season 2.
+      expect(id in WARFARE_ITEMS || SEASON2_STOCK.includes(id), id).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);
       expect(ITEMS[id].sellValue, id).toBe(0);
     }

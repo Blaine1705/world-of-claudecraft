@@ -815,8 +815,9 @@ describe('Masterwrought art completion evidence', () => {
     // weapon_icons.test.ts, so their mapping owners are genuine, not fabricated.
     // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners, and
     // the Viridian Valestrider adds its own; none of the three alter the dated
-    // completion/approval universe below.
-    expect(currentOwnerIds).toHaveLength(1284);
+    // completion/approval universe below. Warfare Season 2's four painted
+    // weapons (warfare-season2-weapons-2026-09-25) make 1,288, likewise outside it.
+    expect(currentOwnerIds).toHaveLength(1288);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -875,6 +876,16 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds).not.toContain('reins_avian_strider');
     expect(currentOwnerIds).toContain('reins_avian_strider');
 
+    // The Warfare Season 2 painted weapons are additive the same way.
+    const season2WeaponIds = new Set([
+      'vanguard_verdict_greatsword',
+      'vanguard_oath_blade',
+      'vanguard_fang_dagger',
+      'vanguard_warstaff',
+    ]);
+    expect(datedIds.filter((id) => season2WeaponIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => season2WeaponIds.has(id))).toHaveLength(4);
+
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, and the Valestrider's reins)
@@ -889,7 +900,8 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'field_kit' &&
         !laterGapFillIds.has(id) &&
         !ossBrainMountIds.has(id) &&
-        id !== 'reins_avian_strider',
+        id !== 'reins_avian_strider' &&
+        !season2WeaponIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);
