@@ -759,11 +759,14 @@ export const GALECREST_PROPS: ZonePropsDef = {
     // the deepwater pier's end; it rides at anchor out in the bay since the
     // ferry's Phase 2 timetable, clear of its sailing paths)
     { key: 'hexShipBlue', x: 515, z: 392, rot: -1.69, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 456.6, z: 382.8, rot: 1.3, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 468.1, z: 386, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
-    // the Beacon dock's pair, alongside the lighthouse pier
+    // the Beacon dock's four, alongside the lighthouse pier. Two of them lay
+    // off the deepwater pier's south side (456.6, 382.8 and 468.1, 386) and hid
+    // the ferry's harbor route marker (content/harbor_route_markers.ts); they
+    // moor here now, clear of the ferry's lanes, owner-approved.
     { key: 'hexShipBlue', x: 519.2, z: 329.6, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 515.9, z: 345.5, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 507, z: 339, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 530, z: 338, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
     // dinghies: two on the water, one hauled out by the rack on the shingle
     { key: 'hexBoat', x: 474, z: 354, rot: 0.7, scale: 6, float: 0.1 },
     { key: 'hexBoat', x: 479, z: 357.5, rot: -1.8, scale: 6, float: 0.1 },

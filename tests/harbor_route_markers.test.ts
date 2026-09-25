@@ -4,7 +4,7 @@ import { harborDestinationLabel } from '../src/render/entity_labels';
 import { type Collider, queryOpenWorldColliders } from '../src/sim/colliders';
 import { HARBOR_ROUTE_MARKERS } from '../src/sim/content/harbor_route_markers';
 import { TRANSPORT_ROUTES, TRANSPORT_SHIP_HULLS } from '../src/sim/content/transport_ships';
-import { ZONES } from '../src/sim/data';
+import { PROPS, ZONES } from '../src/sim/data';
 import { EASTBROOK_HARBOR_DECKS } from '../src/sim/eastbrook_harbor';
 import { FERRY_PIER_DECKS } from '../src/sim/ferry_piers';
 import { GALE_HARBOR_DECKS, type GaleDeckDef } from '../src/sim/gale_harbor';
@@ -203,6 +203,73 @@ describe('harbor route markers: placement clear of the boarding path', () => {
         if (c.gate !== undefined) continue;
         if (c.type === 'circle' && c.x === m.x && c.z === m.z) continue; // itself
         expect(clearance(m.x, m.z, r, c), `${m.berth} vs (${c.x}, ${c.z})`).toBeGreaterThan(0.5);
+      }
+    }
+  });
+});
+
+describe('harbor route markers: nothing moored in front of them', () => {
+  it('keeps every moored ship well away from each marker (Wickharbor pair moved to the Beacon dock)', () => {
+    const ships = (PROPS.decorProps ?? []).filter(
+      (d) => d.key === 'hexShipBlue' && d.float !== undefined,
+    );
+    // the two hulls that lay off the deepwater pier's south side, hiding the sign
+    for (const [x, z] of [
+      [456.6, 382.8],
+      [468.1, 386],
+    ]) {
+      expect(
+        ships.some((d) => d.x === x && d.z === z),
+        `${x}, ${z}`,
+      ).toBe(false);
+    }
+    for (const [x, z] of [
+      [507, 339],
+      [530, 338],
+    ]) {
+      expect(
+        ships.filter((d) => d.x === x && d.z === z),
+        `${x}, ${z}`,
+      ).toHaveLength(1);
+    }
+    for (const m of HARBOR_ROUTE_MARKERS) {
+      for (const d of ships) {
+        const gap = Math.hypot(d.x - m.x, d.z - m.z) - (d.r ?? 4);
+        expect(gap, `${m.berth} vs ship at (${d.x}, ${d.z})`).toBeGreaterThan(12);
+      }
+    }
+  });
+
+  it('moors the moved hulls in water, off the Beacon dock, clear of every deck and each other', () => {
+    const ships = (PROPS.decorProps ?? []).filter(
+      (d) => d.key === 'hexShipBlue' && d.float !== undefined,
+    );
+    for (const [x, z] of [
+      [507, 339],
+      [530, 338],
+    ]) {
+      for (const [ox, oz] of [
+        [0, 0],
+        [4, 0],
+        [-4, 0],
+        [0, 4],
+        [0, -4],
+      ]) {
+        expect(groundHeight(x + ox, z + oz, WORLD_SEED), `${x}, ${z}`).toBeLessThan(
+          WATER_LEVEL - 1.2,
+        );
+      }
+      for (const deck of DECKS) {
+        const l = deckLocal(deck, x, z);
+        const gap = Math.hypot(
+          Math.max(0, Math.abs(l.along) - deck.hl),
+          Math.max(0, Math.abs(l.across) - deck.hw),
+        );
+        expect(gap, `${x}, ${z}`).toBeGreaterThan(4.5);
+      }
+      for (const other of ships) {
+        if (other.x === x && other.z === z) continue;
+        expect(Math.hypot(other.x - x, other.z - z), `${x}, ${z}`).toBeGreaterThan(10);
       }
     }
   });
