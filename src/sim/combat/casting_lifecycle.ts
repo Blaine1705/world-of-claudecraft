@@ -31,7 +31,6 @@ import { isDispellableAura } from '../aura_classify';
 import { nearestAttackerId } from '../auto_acquire_target';
 import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
-import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
 import { canActivateDivineAscension, hasDevotion, spendDevotion } from '../paladin_devotion';
@@ -140,6 +139,7 @@ import {
   iceFloesAuraForAbility,
   nextCastCheapMultiplier,
 } from './empower_next';
+import { shieldEquipped } from './equipment_requirement';
 import { executeWindowBlocksCast, executeWindowThreshold } from './execute_threshold';
 import { meleeReachActor } from './feral_reach';
 import {
@@ -1234,8 +1234,7 @@ export function castAbility(
     return;
   }
   if (ability.requiresShield) {
-    const offhand = p.equippedItems.offhand;
-    if (!offhand || !isShieldItem(ITEMS[offhand])) {
+    if (!shieldEquipped(p.equippedItems)) {
       ctx.error(p.id, 'You must have a shield equipped.');
       return;
     }

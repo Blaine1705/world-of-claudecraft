@@ -26,7 +26,11 @@
 
 import { afflictionPossessionEmpowers } from '../../../sim/combat/affliction';
 import { aetherDartsProcGlowActive } from '../../../sim/combat/chronomancy';
-import { destructionProcGlowActive, ruinAmountFromAuras } from '../../../sim/combat/destruction';
+import {
+  destructionProcGlowActive,
+  hasBurningPact,
+  ruinAmountFromAuras,
+} from '../../../sim/combat/destruction';
 import {
   NATURES_BOON_ID,
   naturesBoonArmedFor,
@@ -36,6 +40,11 @@ import {
   freeCostAuraActive,
   nextCastCheapMultiplierFromAuras,
 } from '../../../sim/combat/empower_next';
+import {
+  effectsRequireDagger,
+  shieldEquipped,
+  wieldsDagger,
+} from '../../../sim/combat/equipment_requirement';
 import { executeWindowBlocksCast } from '../../../sim/combat/execute_threshold';
 import type { MeleeReachActor } from '../../../sim/combat/feral_reach';
 import { willAutoUnshift } from '../../../sim/combat/form_auto_unshift';
@@ -66,8 +75,10 @@ import { countRawInSlots } from '../../../sim/item_lock';
 import { isAscensionEmpoweredAbility } from '../../../sim/paladin_devotion';
 import {
   type AbilityDef,
+  type AbilityEffect,
   type AuraKind,
   dist2d,
+  type EquipSlot,
   GCD,
   type ItemDef,
   type PlayerClass,
@@ -120,6 +131,9 @@ const FATE_SENTENCE_READY_ARIA_KEY: TranslationKey = 'hudChrome.warlock.fateThre
 export interface ActionBarAbility {
   def: AbilityDef;
   cost: number;
+  /** Rank-resolved effects (the list the cast gate walks); absent falls back to
+   *  the def's authored effects. */
+  effects?: readonly AbilityEffect[];
   /** Talent-resolved stored uses (Double Charge); undefined = 1. */
   charges?: number;
   /** Extra stored uses on the abilityCharges recharge model (e.g. Frost's second
@@ -158,6 +172,8 @@ export interface ActionBarAuraInput {
   empowerAbilities?: readonly string[];
   /** Stacks, for a stack-gated ability (Rimeneedle needs 5 Icicles). */
   stacks?: number;
+  /** Seconds left; a target aura's own clock (Burning Pact must still be ticking). */
+  remaining?: number;
 }
 
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
@@ -239,6 +255,10 @@ export interface ActionBarPlayerInput {
   /** Character-bound combo points (mirrored online as `combo`): a finisher that
    *  needs them greys out at zero. Absent reads as zero. */
   comboPoints?: number;
+  /** Level and worn item ids (the identity wire's `eq` online): the shield and
+   *  dagger requirements read the worn gear, never the sim-only weapon stat. */
+  level?: number;
+  equippedItems?: Partial<Record<EquipSlot, string>>;
   /** The player's worn auras: the free-cost proc read (Battle Trance /
    *  next_cast_free) that drives the slot glow and usable state, the kill-window
    *  gate, and the next-cast empowerment read. Both worlds expose the live aura
@@ -467,10 +487,11 @@ export function actionBarCooldownRemaining(
  * The cast gate's situational requirements beyond cost and cooldown, each asked
  * through the same predicate or field the sim's gate reads (combat/
  * casting_lifecycle.ts), so a slot greys out exactly when pressing it would be
- * refused: the target's execute window, combat state, combo points, and a
- * druid form. The execute check only runs against a live
- * target whose health is known; with no target the gate auto-acquires one, so
- * the slot stays lit rather than guessing.
+ * refused: the target's execute window, combat state, combo points, a druid
+ * form, a worn shield or dagger, and Conflagrate's Burning Pact. The
+ * target-dependent checks only run against a live target (with health known,
+ * for the execute window); with no target the gate auto-acquires one, so the
+ * slot stays lit rather than guessing.
  */
 export function secondaryRequirementsMet(
   world: Pick<ActionBarWorldInput, 'player' | 'target'>,
@@ -487,6 +508,24 @@ export function secondaryRequirementsMet(
   }
   if (def.spendsCombo && !def.comboOptional && (player.comboPoints ?? 0) <= 0) return false;
   if (def.requiresForm !== undefined && !formRequirementMet(player.auras, def)) return false;
+  const worn = player.equippedItems;
+  if (worn !== undefined) {
+    if (def.requiresShield && !shieldEquipped(worn)) return false;
+    if (
+      effectsRequireDagger(ability.effects ?? def.effects) &&
+      !wieldsDagger(worn, player.level ?? 1)
+    ) {
+      return false;
+    }
+  }
+  if (
+    def.id === 'conflagrate' &&
+    target !== null &&
+    !target.dead &&
+    !hasBurningPact(player, target)
+  ) {
+    return false;
+  }
   if (
     target !== null &&
     !target.dead &&

@@ -1,20 +1,29 @@
 // The action bar greys out a slot whose situational cast requirement is unmet
 // (a target above its execute threshold, combat for an out-of-combat ability, no
-// combo points for a finisher, the wrong druid form), asking the same predicates
+// combo points for a finisher, the wrong druid form, no shield or dagger worn, no
+// Burning Pact for Conflagrate), asking the same predicates
 // the sim's cast gate asks. Covers the shared execute-window leaf directly, the
 // bar view over the REAL ability defs, and a live Sim proving the bar and the
 // gate agree on both sides of the Execute boundary.
 
 import { describe, expect, it } from 'vitest';
+import { hasBurningPact } from '../src/sim/combat/destruction';
+import {
+  effectsRequireDagger,
+  shieldEquipped,
+  wieldsDagger,
+} from '../src/sim/combat/equipment_requirement';
 import {
   executeWindowBlocksCast,
   executeWindowBypassed,
   targetOutsideExecuteWindow,
 } from '../src/sim/combat/execute_threshold';
-import { ABILITIES, MOBS } from '../src/sim/data';
+import { ABILITIES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { isShieldItem } from '../src/sim/equipment_rules';
+import { requiredLevelFor } from '../src/sim/item_level_req';
 import { Sim } from '../src/sim/sim';
-import type { AbilityDef, Entity, SimEvent } from '../src/sim/types';
+import type { AbilityDef, Entity, EquipSlot, SimEvent } from '../src/sim/types';
 import {
   type ActionBarAbility,
   type ActionBarAuraInput,
@@ -41,6 +50,9 @@ interface WorldOpts {
   inCombat?: boolean;
   comboPoints?: number;
   paladinDevotion?: { value: number; ascensionCharges: number; ascensionRemaining: number };
+  level?: number;
+  equippedItems?: Partial<Record<EquipSlot, string>>;
+  targetAuras?: ActionBarAuraInput[];
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -61,6 +73,8 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       comboPoints: opts.comboPoints,
       auras: opts.auras ?? [],
       paladinDevotion: opts.paladinDevotion,
+      level: opts.level,
+      equippedItems: opts.equippedItems,
     },
     target: opts.noTarget
       ? null
@@ -71,7 +85,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
           pos: { x: 0, y: 0, z: 2 },
           hp: opts.targetHp,
           maxHp: opts.targetMaxHp,
-          auras: [],
+          auras: opts.targetAuras ?? [],
         },
     inventory: [],
     stealthed: false,
@@ -323,5 +337,83 @@ describe('action bar and the live cast gate agree on the Execute window', () => 
     } as Entity['auras'][number]);
     expect(barAllowsExecute(p, mob)).toBe(true);
     expect(pressExecute(sim, p)).toEqual({ refused: false, landed: true });
+  });
+});
+
+// Real catalog items, picked by shape so the suite survives catalog churn.
+const allItems = Object.values(ITEMS);
+const SHIELD = allItems.find((item) => isShieldItem(item))!.id;
+const DAGGERS = allItems.filter((item) => item.weapon?.dagger === true);
+const LOW_DAGGER = DAGGERS.reduce((a, b) => (requiredLevelFor(a) <= requiredLevelFor(b) ? a : b));
+const HIGH_DAGGER = DAGGERS.reduce((a, b) => (requiredLevelFor(a) >= requiredLevelFor(b) ? a : b));
+const SWORD = allItems.find(
+  (item) => item.weapon !== undefined && item.weapon.dagger !== true && item.slot === 'mainhand',
+)!.id;
+
+describe('action bar: equipment and target-aura requirements', () => {
+  it('finds the fixture items it needs', () => {
+    expect(SHIELD).toBeTruthy();
+    expect(SWORD).toBeTruthy();
+    expect(requiredLevelFor(HIGH_DAGGER)).toBeGreaterThan(requiredLevelFor(LOW_DAGGER));
+  });
+
+  it('greys Shield Slam without a shield in the off hand', () => {
+    const slam = ABILITIES.shield_slam;
+    expect(slam.requiresShield).toBe(true);
+    expect(usableOnBar(slam, world({ equippedItems: {} }))).toBe(false);
+    expect(usableOnBar(slam, world({ equippedItems: { mainhand: SWORD } }))).toBe(false);
+    expect(usableOnBar(slam, world({ equippedItems: { offhand: SHIELD } }))).toBe(true);
+    expect(shieldEquipped({ offhand: SHIELD })).toBe(true);
+  });
+
+  it('greys Backstab unless a usable dagger is in the main hand', () => {
+    const backstab = ABILITIES.backstab;
+    expect(effectsRequireDagger(backstab.effects)).toBe(true);
+    const at = (mainhand: string, level: number) =>
+      secondaryRequirementsMet(world({ level, equippedItems: { mainhand } }), known(backstab));
+    expect(at(SWORD, 60)).toBe(false);
+    expect(at(LOW_DAGGER.id, 60)).toBe(true);
+    // An over-level main hand is inert, exactly as recalcPlayerStats treats it.
+    expect(at(HIGH_DAGGER.id, requiredLevelFor(HIGH_DAGGER) - 1)).toBe(false);
+    expect(at(HIGH_DAGGER.id, requiredLevelFor(HIGH_DAGGER))).toBe(true);
+  });
+
+  it('reads the rank-resolved effects over the def when the resolve supplies them', () => {
+    const backstab = ABILITIES.backstab;
+    const w = world({ level: 60, equippedItems: { mainhand: SWORD } });
+    expect(secondaryRequirementsMet(w, { def: backstab, cost: 0, effects: [] })).toBe(true);
+    expect(secondaryRequirementsMet(w, { def: backstab, cost: 0 })).toBe(false);
+  });
+
+  it("greys Conflagrate unless the target carries the caster's own ticking Immolate", () => {
+    const conflagrate = ABILITIES.conflagrate;
+    const pact = (sourceId: number, remaining: number): ActionBarAuraInput => ({
+      id: 'immolate',
+      kind: 'dot',
+      sourceId,
+      remaining,
+    });
+    const at = (targetAuras: ActionBarAuraInput[]) =>
+      secondaryRequirementsMet(world({ targetAuras }), known(conflagrate));
+    expect(at([])).toBe(false);
+    expect(at([pact(2, 8)])).toBe(false);
+    expect(at([pact(1, 0)])).toBe(false);
+    expect(at([pact(1, 8)])).toBe(true);
+    // No target: the gate auto-acquires, so the bar does not guess.
+    expect(secondaryRequirementsMet(world({ noTarget: true }), known(conflagrate))).toBe(true);
+    expect(hasBurningPact({ id: 1 }, { auras: [pact(1, 8)] })).toBe(true);
+  });
+
+  it('agrees with the live sim: the worn-gear dagger read matches weapon.dagger', () => {
+    const sim = new Sim({ seed: 72, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(60);
+    const p = sim.player;
+    for (const id of [LOW_DAGGER.id, SWORD]) {
+      sim.addItem(id, 1);
+      sim.equipItem(id);
+      sim.tick();
+      expect(p.equippedItems.mainhand).toBe(id);
+      expect(wieldsDagger(p.equippedItems, p.level)).toBe(p.weapon.dagger === true);
+    }
   });
 });
