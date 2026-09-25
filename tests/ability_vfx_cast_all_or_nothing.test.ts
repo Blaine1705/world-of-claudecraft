@@ -322,6 +322,44 @@ describe('a pushed-back cast bar', () => {
   });
 });
 
+describe('a contact named like a Warrior ability from another caster', () => {
+  // A mob's Reaping Arc carries the display name of Cleave and no id; a
+  // foreign id beside a Warrior name is the other shape. Both draw the kit's
+  // contact, so both wait on the kit whole.
+  for (const [label, ability, abilityId] of [
+    ['a mob cleave', ABILITIES.cleave.name, null],
+    ['a foreign id', ABILITIES.shield_slam.name, 'no_such_mob_ability_for_the_gate'],
+  ] as const) {
+    it(`waits on the kit for ${label}, and draws it whole once the kit is ready`, () => {
+      const contact = (rig: ReturnType<typeof castGateRig>) => {
+        for (const crit of [false, true]) {
+          rig.painter.onDamage({
+            sourceId: MAGE,
+            targetId: VICTIM,
+            school: 'physical',
+            ability,
+            abilityId,
+            kind: 'hit',
+            crit,
+            amount: 80,
+          });
+          rig.step(60);
+        }
+      };
+      const shut = castGateRig({ deadlineMs: Number.POSITIVE_INFINITY });
+      shut.prove(CAST_VFX_ENGINE);
+      contact(shut);
+      expect(shut.drawn()).toBe(0);
+      expect(shut.readiness.snapshot()).toMatchObject({ refused: 1, requirementMiss: 0 });
+      const open = castGateRig({ deadlineMs: Number.POSITIVE_INFINITY });
+      open.prove(CAST_VFX_ENGINE | CAST_VFX_KIT);
+      contact(open);
+      expect(open.drawn()).toBe(CAST_VFX_ENGINE | CAST_VFX_KIT);
+      expect(open.readiness.snapshot()).toMatchObject({ refused: 0, requirementMiss: 0 });
+    });
+  }
+});
+
 describe('a white swing', () => {
   it('waits on the kit when a Warrior swings it, and on the engine alone otherwise', () => {
     const swing = (sourceId: number) => ({

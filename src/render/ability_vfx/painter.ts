@@ -1397,7 +1397,10 @@ export class AbilityVfx {
 
   onDamage(ev: AbilityVfxDamageEvent): boolean | void {
     // Latched on the event's own id, asked for every family its draws below
-    // can reach (they resolve the id off the display name).
+    // can reach. They resolve the id off the display name whatever the
+    // caster's class (a mob's Reaping Arc draws the kit's cleave contact), so
+    // a Warrior name asks for the kit from any caster: dropping it there would
+    // draw the engine half of the contact and refuse the rest.
     const castId = ev.abilityId ?? attackAbilityId(ev.ability);
     if (castId) {
       const drawnId = attackAbilityId(ev.ability);
