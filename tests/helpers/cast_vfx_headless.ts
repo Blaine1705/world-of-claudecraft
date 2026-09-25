@@ -124,7 +124,11 @@ export function castGateRig(options: { kitDeclined?: boolean; deadlineMs?: numbe
     ],
     linked: (material) => (proved.has(material.id) ? material : null),
   });
-  fx.setCastVfxSpawnGate((bit) => readiness.spawnAllowed(bit));
+  let asked = 0;
+  fx.setCastVfxSpawnGate((bit) => {
+    asked |= bit;
+    return readiness.spawnAllowed(bit);
+  });
   const vfxCalls: string[] = [];
   const record =
     (name: string) =>
@@ -187,8 +191,19 @@ export function castGateRig(options: { kitDeclined?: boolean; deadlineMs?: numbe
     },
     /** The families any gated drawable drew with since the last reset. */
     drawn: () => drawn,
+    /** The families any gated pool asked to spawn from since the last reset. */
+    asked: () => asked,
     resetDrawn: () => {
       drawn = 0;
+      asked = 0;
+      vfxCalls.length = 0;
+    },
+    /** Back to an idle engine and painter, readiness kept. */
+    reset: () => {
+      fx.clear();
+      painter.resetPresentation();
+      drawn = 0;
+      asked = 0;
       vfxCalls.length = 0;
     },
   };

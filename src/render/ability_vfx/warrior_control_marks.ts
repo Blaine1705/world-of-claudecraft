@@ -6,14 +6,19 @@ const STACKS = [{ n: 1 }, { n: 2 }, { n: 3 }, { n: 4 }, { n: 5 }] as const;
 
 /** Sunder is a shared armor status: a Warrior can refresh a Rogue-created
  * instance without changing its stored id. The real kind/stacks stay truthful. */
+/** Whether this aura is one of the Warrior control marks the painter holds. */
+export function isWarriorControlMark(aura: { id: string; kind?: string }): boolean {
+  return aura.kind === 'sunder' || (aura.id === 'hamstring_slow' && aura.kind === 'slow');
+}
+
 export function holdWarriorControlMark(
   fx: AbilityVfxFx,
   id: number,
   aura: { id: string; kind?: string; remaining?: number; stacks?: number },
   alive: boolean,
 ): boolean {
+  if (!isWarriorControlMark(aura)) return false;
   const armor = aura.kind === 'sunder';
-  if (!armor && !(aura.id === 'hamstring_slow' && aura.kind === 'slow')) return false;
   if (!alive || (aura.remaining ?? 0) <= 0) return true;
   const stack = Math.min(5, Math.max(1, Math.floor(aura.stacks ?? 1)));
   fx.orbit(

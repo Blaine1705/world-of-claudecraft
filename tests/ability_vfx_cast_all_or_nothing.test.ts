@@ -247,6 +247,40 @@ describe('a declined kit', () => {
 });
 
 describe('the kit deadline', () => {
+  it('starts no kit clock for a Mage wearing auras, however long', () => {
+    const rig = castGateRig({ deadlineMs: 5_000 });
+    rig.prove(CAST_VFX_ENGINE);
+    const mage: AbilityVfxEntityState = {
+      id: MAGE,
+      castingAbility: null,
+      castRemaining: 0,
+      castTotal: 0,
+      auras: [
+        { id: 'ice_barrier', kind: 'absorb', remaining: 30, duration: 60, value: 300 },
+        { id: 'frost_armor', kind: 'buff', remaining: 30, duration: 60 },
+        { id: 'war_stomp_stun', kind: 'stun', remaining: 2 },
+      ],
+    };
+    for (let i = 0; i < 400; i++) {
+      rig.painter.syncEntity(mage);
+      rig.step();
+    }
+    rig.reset();
+    // Twenty seconds past the bound: had the auras started the kit's clock,
+    // this first Warrior cast would be admitted on a forced kit and draw.
+    rig.warriors.add(WARRIOR);
+    rig.painter.handleSpellfx({
+      sourceId: WARRIOR,
+      targetId: VICTIM,
+      school: 'physical',
+      fx: 'selfCast',
+      ability: 'shield_slam',
+    });
+    expect(rig.readiness.snapshot().families[1]).toMatchObject({ ready: false, forced: false });
+    rig.step(20);
+    expect(rig.drawn()).toBe(0);
+  });
+
   it('opens a stuck kit at its bound, counted from the first Warrior consult, and says so', () => {
     const rig = castGateRig({ deadlineMs: 5_000 });
     rig.prove(CAST_VFX_ENGINE);

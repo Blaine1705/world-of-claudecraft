@@ -22,7 +22,7 @@ import {
 import { warriorAttentionSource } from './warrior_attention_core';
 import { WARRIOR_BLADE_STYLES } from './warrior_blades';
 import { drawWarriorControlAura, warriorControlAuraCast } from './warrior_control';
-import { holdWarriorControlMark } from './warrior_control_marks';
+import { holdWarriorControlMark, isWarriorControlMark } from './warrior_control_marks';
 import { warriorGuardKind } from './warrior_guard_plates';
 import { drawWarriorHammerContact } from './warrior_hammer';
 import { drawWarriorLeapLanding, drawWarriorLeapLaunch } from './warrior_leap';
@@ -1907,15 +1907,15 @@ export class AbilityVfx {
           fx.holdWarriorGuard?.(e.id, guard, aura, this.deps.localPlayerId?.() === e.id);
         continue;
       }
-      if (
+      if (isWarriorControlMark(aura)) {
         holdWarriorControlMark(
           fx,
           e.id,
           aura,
           kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }),
-        )
-      )
+        );
         continue;
+      }
       if (aura.id === 'breachmaker_vuln' || aura.id === 'thunder_clap_as') {
         if (
           kitReady() &&
