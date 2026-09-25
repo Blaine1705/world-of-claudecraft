@@ -34,6 +34,8 @@ import {
   OPEN_CAST_VFX_SPAWN_GATE,
 } from '../src/render/cast_vfx_family';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
+import { WARRIOR_READINESS } from '../src/render/warrior_readiness_core';
+import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 import {
   drawingFamilies,
   gatedDrawables,
@@ -71,7 +73,35 @@ function engine(open: number) {
     pose.height = 2;
     return true;
   });
-  const fx = new AbilityVfxFx(scene, camera, anchor, () => 0);
+  // A resolved weapon and body on every entity, so the doors that follow a
+  // weapon (the tracked trail, the Fury solids) can draw here at all.
+  const weapon = (id: number) =>
+    Object.assign(
+      (out: THREE.Vector3) => {
+        out.set(id * 2, 1, 0);
+        return true;
+      },
+      {
+        frame: (out: THREE.Matrix4) => {
+          out.makeTranslation(id * 2, 1, 0);
+          return true;
+        },
+      },
+    );
+  const fx = new AbilityVfxFx(
+    scene,
+    camera,
+    anchor,
+    () => 0,
+    undefined,
+    weapon,
+    undefined,
+    undefined,
+    (id, _piece, out) => {
+      out.makeTranslation(id * 2, 1, 0);
+      return true;
+    },
+  );
   fx.setDelegates(vi.fn(), vi.fn(), vi.fn(), vi.fn());
   const gate = { open, asked: [] as number[] };
   fx.setCastVfxSpawnGate((bit) => {
@@ -109,16 +139,58 @@ const ENGINE_DOORS: Record<string, (fx: AbilityVfxFx) => void> = {
       pts[1].set(1, 1, 0);
       return 2;
     }),
+  'bolt points': (fx) => fx.boltPoints(0, 1, 0, 4, 1, 0, 0xffffff, 0.3, 0.1, 1),
+  'tracked path': (fx) => fx.weaponTrail(1, 0, 0xffffff, 0.1, 0.3),
+  'styled slash': (fx) => fx.slashStyled({ x: 2, y: 1, z: 0 }, 0xffffff, 'horizontal'),
   windup: (fx) => fx.windup(1, 0xffffff, 0.5, 'orb'),
+  // The sequencer's pre-release ceremony: windupDraw inside the frame's batch.
+  'windup draw': (fx) =>
+    fx.sequenceInstant('fireball', ABILITY_VFX_FULL_SPECS.fireball, 1, 2, 0xff8800, 0, 0.5),
   orbit: (fx) => fx.orbit(2, 'runes', 0xffffff),
+  attention: (fx) => fx.holdWarriorAttention(2, 1, 3, true),
+  storm: (fx) => fx.holdWarriorStorm(1, 0.4),
+  // A Fury state whose solid is not prepared draws its engine-ribbon fallback.
+  'Fury fallback': (fx) =>
+    fx.holdWarriorFuryState(
+      1,
+      1,
+      { id: 'furious_mending', kind: 'buff_dr', remaining: 5, duration: 8 },
+      true,
+    ),
   // The sequencer's overlay transients go through pushOverlay inside the
   // frame's overlay batch, so the sequence is that door's case too.
   sequence: (fx) =>
     fx.sequenceInstant('fireball', ABILITY_VFX_FULL_SPECS.fireball, 1, 2, 0xff8800, 0),
 };
 
+/** The doors whose read is held: the painter feeds them every frame. */
+const HELD_DOORS = new Set([
+  'attention',
+  'storm',
+  'Fury fallback',
+  'guard plate',
+  'power form',
+  'Fury solid',
+]);
+
+/** What an engine door draws once every family is ready: the engine, and
+ *  for the storm the kit's baked volume too (which asks the kit itself). */
+const OPEN_DRAWS: Record<string, number> = { storm: CAST_VFX_ENGINE | CAST_VFX_KIT };
+
 function spawnEngine(fx: AbilityVfxFx): void {
   for (const door of Object.values(ENGINE_DOORS)) door(fx);
+}
+
+/** One door on a fresh engine: fed once, or every frame when it is held. */
+function driveDoor(name: string, door: (fx: AbilityVfxFx) => void, open: number, kit = false) {
+  const rig = engine(open);
+  if (kit) prepareKit(rig.fx);
+  door(rig.fx);
+  for (let frame = 0; frame < 4; frame++) {
+    if (HELD_DOORS.has(name)) door(rig.fx);
+    rig.step(1);
+  }
+  return rig;
 }
 
 /** Every kit spawn door the Warrior modules use, one by one, with the
@@ -140,8 +212,16 @@ const KIT_DOORS: Record<string, (fx: AbilityVfxFx) => void> = {
   'guard plate': (fx) =>
     fx.holdWarriorGuard(1, 0, { id: 'guard', remaining: 5, duration: 10 }, true),
   'power form': (fx) => fx.holdWarriorPower(1, 1, { remaining: 5, duration: 10 }, 1, true),
+  'spirit hammer': (fx) =>
+    fx.sequenceBolt('storm_bolt', WARRIOR_VFX_FULL_SPECS.storm_bolt, 1, 3, 0x78cce9, 0.3, 0),
+  'Fury solid': (fx) =>
+    fx.holdWarriorFuryState(
+      1,
+      1,
+      { id: 'furious_mending', kind: 'buff_dr', remaining: 5, duration: 8 },
+      true,
+    ),
 };
-const HELD_KIT_DOORS = new Set(['guard plate', 'power form']);
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -162,24 +242,36 @@ describe('the gated pools', () => {
 describe('with the engine family not ready', () => {
   for (const [name, door] of Object.entries(ENGINE_DOORS)) {
     it(`refuses the ${name} door, and asks the engine for it`, () => {
-      const shut = engine(CAST_VFX_KIT);
-      door(shut.fx);
-      shut.step(4);
+      const shut = driveDoor(name, door, CAST_VFX_KIT);
       expect(shut.drawing()).toBe(0);
       expect(new Set(shut.gate.asked)).toEqual(new Set([CAST_VFX_ENGINE]));
       // The same door draws once the engine is ready: the refusal is the gate's.
-      const open = engine(CAST_VFX_ENGINE | CAST_VFX_KIT);
-      door(open.fx);
-      open.step(4);
-      expect(open.drawing()).toBe(CAST_VFX_ENGINE);
+      expect(driveDoor(name, door, CAST_VFX_ENGINE | CAST_VFX_KIT).drawing()).toBe(
+        OPEN_DRAWS[name] ?? CAST_VFX_ENGINE,
+      );
     });
   }
+
+  it('refuses to register a readiness hold, and registers it once the engine opens', () => {
+    // The readiness wearers are held and swept but never drawn by the engine
+    // today, so the registration itself is what the gate is read on.
+    const wearers = (fx: AbilityVfxFx) =>
+      (fx as unknown as { warriorReadiness: { wearers: Map<number, unknown> } }).warriorReadiness
+        .wearers.size;
+    const shut = engine(CAST_VFX_KIT);
+    shut.fx.holdWarriorReadiness(1, WARRIOR_READINESS.battle, true);
+    expect(wearers(shut.fx)).toBe(0);
+    expect(shut.gate.asked).toEqual([CAST_VFX_ENGINE]);
+    const open = engine(CAST_VFX_ENGINE);
+    open.fx.holdWarriorReadiness(1, WARRIOR_READINESS.battle, true);
+    expect(wearers(open.fx)).toBe(1);
+  });
 
   it('draws them all once it opens (the arm the refusals above are measured against)', () => {
     const { fx, drawables, step, drawing } = engine(CAST_VFX_ENGINE | CAST_VFX_KIT);
     spawnEngine(fx);
     step(1);
-    expect(drawing()).toBe(CAST_VFX_ENGINE);
+    expect(drawing()).toBe(CAST_VFX_ENGINE | CAST_VFX_KIT);
     expect(drawables.filter(wouldDraw).length).toBeGreaterThanOrEqual(8);
   });
 
@@ -199,21 +291,13 @@ describe('with the engine family not ready', () => {
 describe('with the kit family not ready', () => {
   for (const [name, door] of Object.entries(KIT_DOORS)) {
     it(`refuses the ${name} door, and asks the kit for it`, () => {
-      const drive = (open: number) => {
-        const rig = engine(open);
-        prepareKit(rig.fx);
-        door(rig.fx);
-        for (let frame = 0; frame < 3; frame++) {
-          if (HELD_KIT_DOORS.has(name)) door(rig.fx);
-          rig.step(1);
-        }
-        return rig;
-      };
-      const shut = drive(CAST_VFX_ENGINE);
+      const shut = driveDoor(name, door, CAST_VFX_ENGINE, true);
       expect(shut.drawing() & CAST_VFX_KIT).toBe(0);
       expect(shut.gate.asked).toContain(CAST_VFX_KIT);
       // The same door draws a kit piece once the kit is ready.
-      expect(drive(CAST_VFX_ENGINE | CAST_VFX_KIT).drawing() & CAST_VFX_KIT).toBe(CAST_VFX_KIT);
+      expect(
+        driveDoor(name, door, CAST_VFX_ENGINE | CAST_VFX_KIT, true).drawing() & CAST_VFX_KIT,
+      ).toBe(CAST_VFX_KIT);
     });
   }
 });
