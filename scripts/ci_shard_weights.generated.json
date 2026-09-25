@@ -2,9 +2,31 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4064,
+    "files": 4073,
     "harvestedFiles": 3948,
     "carried": {
+      "tests/ability_vfx_cast_all_or_nothing.test.ts": {
+        "ms": 360,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          364,
+          360,
+          356
+        ]
+      },
+      "tests/ability_vfx_cast_requirements.test.ts": {
+        "ms": 4517,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          4516,
+          4577,
+          4517
+        ]
+      },
       "tests/active_kit_prewarm.test.ts": {
         "ms": 69,
         "method": "local-median",
@@ -41,6 +63,61 @@
           12
         ]
       },
+      "tests/cast_admission_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          3,
+          4,
+          4
+        ]
+      },
+      "tests/cast_vfx_engine_family.test.ts": {
+        "ms": 158,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          159,
+          157,
+          158
+        ]
+      },
+      "tests/cast_vfx_first_reads.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          23,
+          22,
+          22
+        ]
+      },
+      "tests/cast_vfx_spawn_gate.test.ts": {
+        "ms": 497,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          499,
+          493,
+          497
+        ]
+      },
+      "tests/class_vfx_prewarm_homes.test.ts": {
+        "ms": 72,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          72,
+          73,
+          72
+        ]
+      },
       "tests/crest_prewarm.test.ts": {
         "ms": 116,
         "method": "local-median",
@@ -56,6 +133,17 @@
         "measured": "2026-09-21",
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
+          9
+        ]
+      },
+      "tests/draw_program_signature_core.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          8,
+          9,
           9
         ]
       },
@@ -277,6 +365,17 @@
           11,
           11,
           11
+        ]
+      },
+      "tests/renderer_ability_presentation.test.ts": {
+        "ms": 73,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          71,
+          73,
+          75
         ]
       },
       "tests/ribbon_contact_admission.test.ts": {
@@ -1092,7 +1191,9 @@
   "tests/ability_tooltip_consistency.test.ts": 49,
   "tests/ability_tooltip_lines.test.ts": 16,
   "tests/ability_tooltip_talents.test.ts": 7,
+  "tests/ability_vfx_cast_all_or_nothing.test.ts": 360,
   "tests/ability_vfx_cast_gate.test.ts": 26,
+  "tests/ability_vfx_cast_requirements.test.ts": 4517,
   "tests/ability_vfx_cc_bands.test.ts": 164,
   "tests/ability_vfx_core.test.ts": 533,
   "tests/ability_vfx_frame_cost.test.ts": 59,
@@ -1519,11 +1620,15 @@
   "tests/card_duel_view.test.ts": 8,
   "tests/card_hand.test.ts": 11,
   "tests/cascade_playtest_dev.test.ts": 3331,
+  "tests/cast_admission_core.test.ts": 4,
   "tests/cast_bar.test.ts": 8,
   "tests/cast_bar_painter.test.ts": 36,
   "tests/cast_display_name.test.ts": 7,
+  "tests/cast_vfx_engine_family.test.ts": 158,
+  "tests/cast_vfx_first_reads.test.ts": 22,
   "tests/cast_vfx_prewarm.test.ts": 13,
   "tests/cast_vfx_readiness_core.test.ts": 12,
+  "tests/cast_vfx_spawn_gate.test.ts": 497,
   "tests/caster_set_bonus.test.ts": 2441,
   "tests/casting_command.test.ts": 3207,
   "tests/castle_plan_core.test.ts": 13,
@@ -1662,6 +1767,7 @@
   "tests/class_colors.test.ts": 11,
   "tests/class_icons.test.ts": 11,
   "tests/class_spec_kits.test.ts": 4747,
+  "tests/class_vfx_prewarm_homes.test.ts": 72,
   "tests/claudium_latency_proxy_target.test.ts": 125,
   "tests/claudium_launcher_balance.test.ts": 16,
   "tests/claudium_purchase_bridge.test.ts": 11,
@@ -2041,6 +2147,7 @@
   "tests/drain_life_vfx.test.ts": 33,
   "tests/drakelands_kit_assets.test.ts": 42,
   "tests/drape_lod_core.test.ts": 1680,
+  "tests/draw_program_signature_core.test.ts": 9,
   "tests/draw_stats_core.test.ts": 17,
   "tests/dropdown_nav.test.ts": 7,
   "tests/dropdown_position.test.ts": 7,
@@ -3973,6 +4080,7 @@
   "tests/render_diagnostics.test.ts": 10,
   "tests/render_glb_replacement_assets.test.ts": 1364,
   "tests/render_light_census_pin.test.ts": 999,
+  "tests/renderer_ability_presentation.test.ts": 73,
   "tests/renderer_build_ledger_wiring.test.ts": 10,
   "tests/renderer_compile_gate.test.ts": 340,
   "tests/renderer_cpu_hot_path.test.ts": 13,
