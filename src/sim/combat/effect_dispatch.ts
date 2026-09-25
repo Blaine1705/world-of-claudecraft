@@ -254,6 +254,11 @@ import {
   thundercallOnArcBoltImpact,
   thundercallOnChainLightningImpact,
 } from './shaman_thundercall';
+import {
+  applyStormbreakMana,
+  magmaBurstGuaranteedCrit,
+  rollArcOverload,
+} from './shaman_thundercall_kit';
 import { runUnleashWeapon } from './shaman_unleash_weapon';
 import {
   applyStoneboundJolt,
@@ -468,6 +473,12 @@ export function runEffects(
   facingOverride?: number,
 ): void {
   const ability = res.def;
+  // The cast-scoped heal multiplier the heal and hot arms below apply to the
+  // WHOLE resolved amount: the caller's mark times the Nature's Boon power the
+  // resolved copy carries (combat/druid_natures_boon.ts, stamped in
+  // casting_lifecycle.ts scaleNaturesBoonPower). 1 on every unmarked cast, and
+  // the === 1 guards at both sites keep that arithmetic byte-identical.
+  const castScopedHealMult = castHealMult * (res.naturesBoonPower ?? 1);
   // The island's ability drill (tutorial/ability_drill.ts): the lesson is
   // "use your own button on an effigy", so it credits on DELIVERY, not on
   // damage. Here rather than in dealDamage for two reasons: this runs once
@@ -544,6 +555,7 @@ export function runEffects(
   };
 
   if (ability.id === 'elemental_mastery') armPrimalMastery(ctx, p);
+  if (ability.id === 'thunderstorm') applyStormbreakMana(ctx, p);
   if (ability.id === 'primal_exaltation') applyPrimalExaltation(ctx, p);
   if (ability.id === 'stoneward' && target) applyStoneward(ctx, p, target);
   if (ability.id === 'lightning_shield') onThunderWardActivated(ctx, p);
@@ -676,6 +688,9 @@ export function runEffects(
         weaponMult *= trueStealthOpener ? trueStealthOpenerMultiplier(true) : veiledEdgeMult;
         bonus = trueStealthOpenerScaleBonus(trueStealthOpener, bonus);
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
+          // Red Harvest emits its opening cue before the strikes (warrior_harvest.ts),
+          // so its damage events must not restart the authored clip.
+          attackAnimationStarted: ability.id === 'red_harvest' && attackAnimationStarted,
           cannotBeDodged: eff.cannotBeDodged,
           normalizedInstant: eff.normalized,
           weaponMult,
@@ -864,7 +879,10 @@ export function runEffects(
           sureCrit ||
           // Fire spec (combat/fire_mage.ts): Combustion / Fire Blast / Scorch
           // execute override the OUTCOME; the roll above is still drawn.
-          fireGuaranteedCrit(ctx, p, ability.id, ability.school, target);
+          fireGuaranteedCrit(ctx, p, ability.id, ability.school, target) ||
+          // Magma Burst (combat/shaman_thundercall_kit.ts): same outcome-only
+          // override against the caster's own Cinder Jolt; the roll is still drawn.
+          magmaBurstGuaranteedCrit(ctx, p, ability.id, target);
         if (sureCrit) sureCritRolled = true;
         if (crit) dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
@@ -905,6 +923,7 @@ export function runEffects(
         if (ability.id === 'lightning_bolt') {
           thundercallOnArcBoltImpact(ctx, p);
           triggerWardCycle(ctx, p);
+          rollArcOverload(ctx, p, target, ability.id, finalDamage, resolvedDamage, threatOpts.mult);
         }
         if (ability.id === 'earth_shock') {
           consumeThunderVent(ctx, p, ability.id, target, finalDamage);
@@ -1337,9 +1356,9 @@ export function runEffects(
         // The cast-scoped multiplier (see the runEffects parameter note): the
         // === 1 guard keeps every unmarked cast's arithmetic byte-identical.
         const castHealAmount =
-          castHealMult === 1
+          castScopedHealMult === 1
             ? baseHealAmount
-            : Math.max(1, Math.round(baseHealAmount * castHealMult));
+            : Math.max(1, Math.round(baseHealAmount * castScopedHealMult));
         const healAmount =
           eff.casterMaxHpPct === undefined
             ? scalePrimaryHealing(castHealAmount, primaryHealMult)
@@ -1544,6 +1563,13 @@ export function runEffects(
               eff.interval,
               talentHealMult * (1 + mods.global.hotHealPct),
             );
+        // The cast-scoped multiplier reaches the WHOLE tick (base plus the Spell
+        // Power rider), the same rule as the direct heal above; === 1 guarded so
+        // every unmarked hot's arithmetic is byte-identical.
+        const hotTick =
+          castScopedHealMult === 1
+            ? hotBase + hotSp
+            : Math.max(1, Math.round((hotBase + hotSp) * castScopedHealMult));
         ctx.applyAura(hotTarget, {
           id: ability.id,
           name: ability.name,
@@ -1551,9 +1577,7 @@ export function runEffects(
           remaining: eff.duration,
           duration: eff.duration,
           value:
-            eff.pctOfMax === undefined
-              ? scalePrimaryHealing(hotBase + hotSp, primaryHealMult)
-              : hotBase + hotSp,
+            eff.pctOfMax === undefined ? scalePrimaryHealing(hotTick, primaryHealMult) : hotTick,
           tickInterval: eff.interval,
           tickTimer: eff.interval,
           sourceId: p.id,
@@ -2243,6 +2267,12 @@ export function runEffects(
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
         }
+        // Same moment, same rule for the feral Old Blood bank: Slinkstrike's
+        // stun IS its landed hit (no strike arm above ever runs for it), so
+        // this is where it reports. A no-op for every other class and for any
+        // druid ability outside OLD_BLOOD_STRIKE_IDS (combat/druid_engines.ts).
+        // Draws no rng.
+        druidEngineOnLandedStrike(ctx, p, ability.id);
         // Sundering Gavel (hammer_of_justice) and Gut Punch (cheap_shot)
         // sound at the target; every other stun has no dedicated recording
         // and stays silent here.
@@ -2690,6 +2720,8 @@ export function runEffects(
           hitList.push(best);
           from = best;
         }
+        let firstChainHit = 0;
+        let firstChainLanded = 0;
         for (let i = 0; i < hitList.length; i++) {
           const m = hitList[i];
           const sunwardDisc = ability.id === 'sunward_disc';
@@ -2711,7 +2743,8 @@ export function runEffects(
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           else dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
           const hpBefore = m.hp;
-          ctx.dealDamage(
+          if (i === 0) firstChainHit = Math.max(1, Math.round(dmg));
+          const chainLanded = ctx.dealDamage(
             p,
             m,
             Math.max(1, Math.round(dmg)),
@@ -2726,11 +2759,21 @@ export function runEffects(
             false,
             ability.id,
           );
+          if (i === 0) firstChainLanded = chainLanded;
           if (m.hp < hpBefore) devotionDamageTriggered = true;
         }
         if (ability.id === 'chain_lightning' && hitList.length > 0) {
           thundercallOnChainLightningImpact(ctx, p);
           triggerWardCycle(ctx, p);
+          rollArcOverload(
+            ctx,
+            p,
+            hitList[0],
+            ability.id,
+            firstChainHit,
+            firstChainLanded,
+            threatOpts.mult,
+          );
         }
         break;
       }
@@ -4126,6 +4169,16 @@ export function runEffects(
         // and it is gated on hostility rather than on the ability id so any future
         // friendly rush inherits the same rule.
         if (ctx.isFriendlyTo(p, target)) break;
+        if (meta.cls === 'warrior') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'selfCast',
+            ability: ability.id,
+          });
+        }
         if (p.resourceType === 'rage') {
           const amount = meta.cls === 'warrior' ? 9 * warriorAbilityRageMult(ctx, p, meta) : 9;
           p.resource = Math.min(p.maxResource, p.resource + amount);

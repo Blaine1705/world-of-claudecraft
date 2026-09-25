@@ -1,5 +1,6 @@
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
+import { resolveInitialActionBarLayout } from './action_bar_restore';
 import { materialStorageTransferPayload } from './material_storage_command';
 
 // Online play: REST auth client + WebSocket world mirror.
@@ -171,11 +172,10 @@ import {
   type VaultInfo,
   type WhoRosterInfo,
 } from '../world_api';
-import {
-  type ActionBarLayout,
-  type ActionBarLayoutProfile,
-  type ActionBarLayoutRestore,
-  sanitizeActionBarLayoutProfiles,
+import type {
+  ActionBarLayout,
+  ActionBarLayoutProfile,
+  ActionBarLayoutRestore,
 } from '../world_api/action_bar';
 import type { GroundAimPointXZ } from '../world_api/combat';
 import type {
@@ -255,6 +255,7 @@ import {
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
 import { socialInfoFromFrame } from './social_frame_wire';
+import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './target_echo';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { whoRosterFromFrame } from './who_frame_wire';
@@ -1199,15 +1200,6 @@ const INCOMPATIBLE_WORLD_VERSION_ERROR = ONLINE_WORLD_INCOMPATIBLE_MESSAGE;
 // DESPAWN_GRACE_MS before vanishing — acceptable, since you can only see a
 // stealthed unit at that range when far out-leveling it.
 const DESPAWN_GRACE_MIN_DIST_SQ = 70 * 70;
-// How many self snapshots a pending target echo may hold the optimistic value
-// before the server's value wins regardless (the reconcile valve: a server
-// REFUSAL, an invalid, dead, or out-of-interest target, must still win). Self
-// snapshots broadcast once per 50 ms server loop callback, so 3 spans ~150 ms,
-// comfortably past the typical command round trip; on a slower link the worst
-// case degrades to the pre-fix one-snapshot blink, never a stuck target. A
-// snapshot COUNT rather than wall-clock keeps the valve deterministic in tests
-// (and needs no clock at all in the decode path).
-const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
 
 export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
@@ -1221,6 +1213,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private ownPlayerId = -1;
   private readonly ownPlayerClass: PlayerClass;
   spectating: string | null = null;
+  get actionBarReadOnly(): boolean {
+    return this.spectating !== null || this.spectateFacingPending === true;
+  }
   moveInput: MoveInput = emptyMoveInput();
   known: ResolvedAbility[] = [];
   private talentMods: TalentModifiers = emptyModifiers();
@@ -1722,13 +1717,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // idiom as pendingQuestCommands / quest_state_optimistic.ts. targetEntity
   // writes the optimistic targetId locally, but a snapshot the server generated
   // BEFORE processing the 'target' command is nearly always already in flight
-  // and still carries the OLD target; applying it blanks the target frame for
-  // one snapshot (and re-toggles the party-frames below-target push), the
-  // select flicker. While set, every self targetId write routes through
-  // applySelfTargetFromServer, which keeps displaying the optimistic id until
-  // the server echoes it or the snapshot budget runs out (server authority is
-  // untouched: a refusal still wins via that valve).
-  private pendingTargetEcho: { id: number | null; snapshotsLeft: number } | null = null;
+  // and still carries the OLD target; applying it shows the previous target
+  // (or blanks the frame) until the echo lands, the select bounce. While set,
+  // every self targetId write routes through applySelfTargetFromServer, which
+  // keeps displaying the optimistic id until a snapshot whose input ack covers
+  // the command's seq (the decision core is the pure target_echo.ts; server
+  // authority is untouched: that snapshot's value wins, refusal included).
+  private pendingTargetEcho: PendingTargetEcho | null = null;
   // Lazy holder (the bareClient idiom): requests() below creates this on first use.
   private worldInteractionRequests: WorldInteractionRequests | undefined;
   private mouselookFacing: number | null = null;
@@ -1750,6 +1745,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private inputEchoSamples: number[] = [];
   private spectateFacingPending = false;
   private pendingSpectateFacing: number | null = null;
+  // A spectate EXIT frame arrives before the snapshot that rebuilds the self
+  // presentation (known, talentSpec, loadouts) for the moderator's own body.
+  // `spectating` is the HUD's "this self view is mine" signal (the action bar
+  // freezes on it), so it must not clear while those reads still describe the
+  // watched character: the exit is held here until the next self-decode.
+  private spectateExitPending = false;
   private dungeonEntrySeq: number | null = null;
   private pendingDungeonEntryFacing: number | null = null;
 
@@ -1841,7 +1842,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // the final edit for a second device. Bounded: a no-op unless a save is
       // pending. A raw tab close routes through pagehide, not sendLogout, so this
       // is what covers it.
-      this.flushActionBarLayoutSave();
+      this.actionBarUploader.flush();
       return;
     }
     if (this.sessionEnded) return;
@@ -1943,7 +1944,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // and `connected` is still true: close() calls this before ws.close() and
     // sendLogout() calls it before the logout frame, so the final edit is not
     // lost to a deliberate logout within the debounce window.
-    this.flushActionBarLayoutSave();
+    this.actionBarUploader.flush();
     this.sessionEnded = true;
     this.worldInteractionRequests?.reset();
     // RIFT_REGIONS (src/sim/colliders.ts) is a module-level registry keyed by
@@ -2323,9 +2324,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.netPipeline().noteReset();
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
+        this.spectateFacingPending = this.spectating !== null || this.spectateExitPending;
         this.spectating = null;
+        this.spectateExitPending = false;
         this.cfg.playerClass = this.ownPlayerClass;
-        this.spectateFacingPending = false;
         this.pendingSpectateFacing = null;
         // marketInfo is delta-omitted (s.market only streams when it changes),
         // so the mirror otherwise still holds the pre-drop echo at the instant
@@ -2358,7 +2360,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
     if (msg.t === 'spectate') {
       if (typeof msg.name === 'string') this.worldInteractionRequests?.reset();
-      this.spectating = typeof msg.name === 'string' ? msg.name : null;
+      this.spectateExitPending = typeof msg.name !== 'string';
+      if (!this.spectateExitPending) this.spectating = msg.name as string;
       this.spectateFacingPending = true;
       this.pendingSpectateFacing = null;
       // the spectate swap changes whose record the self-decode writes; a hold
@@ -2367,13 +2370,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
       this.resetReconWireState();
-      if (typeof this.spectating !== 'string') {
+      if (this.spectateExitPending) {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
-        // cmd() drops every non-chat command while spectating (see below), so
-        // a preference toggled mid-spectate never reached the server; now
-        // that spectate has ended, re-push it the same way a reconnect does.
-        this.resendSessionPreferences();
       }
       Object.assign(this.moveInput, emptyMoveInput());
       this.mouselookFacing = null;
@@ -3248,6 +3247,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
+      const restoreSessionPreferences = this.spectateExitPending;
       const arena = s.arena !== undefined ? s.arena : this.arenaInfo;
       const presentation = buildClientAbilityPresentation(
         this.cfg.playerClass,
@@ -3263,10 +3263,17 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.talentSpec = presentation.mods.spec;
       this.talentRole = presentation.mods.role;
       this.known = presentation.known;
+      if (this.spectateExitPending) {
+        this.spectateExitPending = false;
+        this.spectating = null; // own presentation rebuilt: the view is ours again
+      }
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
+      // The own presentation has released the spectate hold, so preference
+      // changes made while watching can now pass cmd()'s normal guard.
+      if (restoreSessionPreferences) this.resendSessionPreferences();
       // --- IWorldTrade / IWorldDuelArena: trade/duel/arena delta self-decode
       // (W0a-covered; keep the prior mirror value when the field is omitted).
       // IWorldSocialGraph.socialInfo has NO snapshot key - it is set only by the
@@ -3348,21 +3355,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
         while (d < -Math.PI) d += 2 * Math.PI;
         this.pendingFacingDelta += d;
       }
-      // IWorldActionBar: resolve the login-time layout reconciliation exactly
-      // once, on the first self-payload this ClientWorld processes. A fresh join
-      // always carries the heavy self block, so `hbl` is present: the stored
-      // per-profile document (this device's profile WINS; another profile seeds
-      // it) or an explicit null (the server has no copy, so seed from local).
-      // `hbl` absent on the first payload (a resumed session's re-sync, where it
-      // was already sent once) leaves the local mirror authoritative ('noop').
       if (!this.actionBarRestoreResolved) {
         this.actionBarRestoreResolved = true;
-        if (s.hbl !== undefined) {
-          const doc = s.hbl === null ? null : sanitizeActionBarLayoutProfiles(s.hbl);
-          this.actionBarRestore = doc ? { source: 'server', profiles: doc } : { source: 'seed' };
-        } else {
-          this.actionBarRestore = { source: 'noop' };
-        }
+        this.actionBarRestore = resolveInitialActionBarLayout(s.hbl);
       }
     }
 
@@ -3522,38 +3517,22 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // applyWire and the precise `target` self-decode, same server-side value per
   // server/game.ts selfWireJson) and both must apply the same echo protection,
   // else the unguarded one re-introduces the clobber. `countStale` is true only
-  // for the self-decode, so one snapshot never burns two units of the budget.
+  // for the self-decode, so one snapshot never burns two units of the valve
+  // budget; the self-decode also runs after the snapshot's ack has been folded
+  // into ackedInputSeq, so it is the write that sees the release.
   private applySelfTargetFromServer(
     e: Entity,
     serverTarget: number | null,
     countStale: boolean,
   ): void {
-    const pending = this.pendingTargetEcho;
-    if (!pending) {
-      e.targetId = serverTarget;
-      return;
-    }
-    if (serverTarget === pending.id) {
-      // The echo landed: the server agrees, resume normal mirroring so a LATER
-      // server-initiated change (target death, out of interest) applies again.
-      this.pendingTargetEcho = null;
-      e.targetId = serverTarget;
-      return;
-    }
-    if (countStale) {
-      pending.snapshotsLeft -= 1;
-      if (pending.snapshotsLeft <= 0) {
-        // Reconciliation valve: the server never echoed the command (it refused
-        // an invalid, dead, or out-of-interest target). Server authority wins.
-        this.pendingTargetEcho = null;
-        e.targetId = serverTarget;
-        return;
-      }
-    }
-    // A stale pre-command snapshot: keep displaying the optimistic value.
-    // Assigned (not merely skipped) so the applyWire write earlier in the same
-    // snapshot pass cannot leave the clobbered value behind.
-    e.targetId = pending.id;
+    const r = resolveSelfTarget(
+      this.pendingTargetEcho,
+      serverTarget,
+      this.ackedInputSeq,
+      countStale,
+    );
+    this.pendingTargetEcho = r.pending;
+    e.targetId = r.targetId;
   }
 
   // --- IWorldTargeting: target selection + tab cycling ---
@@ -3563,25 +3542,29 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // Armed only when the optimistic write actually happened, and never while
     // spectating: cmd() drops non-chat commands in spectate, so no echo would
     // ever arrive to release the hold on the spectated player's mirror.
+    // The command rides the input seq stream (server/game.ts folds a command's
+    // seq into the same lastInputSeq the self snapshot acks), so the mirror can
+    // tell a snapshot built after the command from a stale in-flight one. Not
+    // drawn in spectate, where cmd() drops the command: a hole in the seq stream
+    // reads server-side as a lost frame. (A send rawCmd drops on a closed socket
+    // burns a seq harmlessly: the input frames behind it drop the same way, and
+    // the reconnect hello restarts both counters.)
+    const seq = typeof this.spectating === 'string' ? null : ++this.inputSeq;
     const p = this.entities.get(this.playerId);
     if (p) {
       if (id === null) {
         p.targetId = null;
-        if (typeof this.spectating !== 'string') {
-          // last write wins: a newer call replaces any older pending record
-          this.pendingTargetEcho = { id: null, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
-        }
+        // last write wins: a newer call replaces any older pending record
+        if (seq !== null) this.pendingTargetEcho = armTargetEcho(null, seq);
       } else {
         const e = this.entities.get(id);
         if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) {
           p.targetId = id;
-          if (typeof this.spectating !== 'string') {
-            this.pendingTargetEcho = { id, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
-          }
+          if (seq !== null) this.pendingTargetEcho = armTargetEcho(id, seq);
         }
       }
     }
-    this.cmd({ cmd: 'target', id });
+    this.cmd(seq === null ? { cmd: 'target', id } : { cmd: 'target', id, seq });
   }
   tabTarget(): void {
     // Server-resolved retarget: its result must apply from the very next
@@ -4167,14 +4150,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.actionBarUploader.save(profile, layout);
   }
 
-  // Send any debounced-but-not-yet-sent layout NOW. Called when the session ends
-  // or the page backgrounds (endSession + the visibilitychange 'hidden' branch),
-  // so the final sub-debounce edit reaches the server before the socket goes
-  // away instead of being stranded (the local mirror would still be right on
-  // the same device, but a second device would miss it).
-  private flushActionBarLayoutSave(): void {
-    this.actionBarUploader.flush();
-  }
   takeActionBarLayoutRestore(): ActionBarLayoutRestore | undefined {
     const restore = this.actionBarRestore;
     this.actionBarRestore = undefined; // one-shot: consumed by the HUD at world entry

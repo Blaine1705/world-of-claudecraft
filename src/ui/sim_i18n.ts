@@ -1025,6 +1025,8 @@ const baseEnTable = {
   'aura.oldBlood': 'Old Blood',
   'aura.verdance': 'Verdance',
   'aura.lopingStride': 'Loping Stride',
+  // Nature's Boon, the Wildfang autoattack window (combat/druid_natures_boon.ts).
+  'aura.naturesBoon': "Nature's Boon",
   'aura.marrowbreak': 'Marrowbreak',
   'aura.pin': 'Pin',
   // Coldsight's banked Fevered Draw opportunity (combat/hunter_coldsight_read.ts).
@@ -14002,6 +14004,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Old Blood': 'aura.oldBlood',
   Verdance: 'aura.verdance',
   'Loping Stride': 'aura.lopingStride',
+  "Nature's Boon": 'aura.naturesBoon',
   'Coldsight Read': 'aura.coldsightRead',
   Marrowbreak: 'aura.marrowbreak',
   // Pin, the Bruin Rush to Cat Form rider's slow (combat/druid_engines.ts).
@@ -14377,6 +14380,8 @@ const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
 const ABILITY_NAMED_AURA_IDS: Readonly<Record<string, string>> = {
   'Bruin Rush': 'bear_charge',
   Lunge: 'lunge',
+  // Thundercall's Magma Surge proc aura carries its ability's name.
+  'Magma Burst': 'lava_burst',
 };
 
 export function localizeSimAuraName(name: string): string | null {

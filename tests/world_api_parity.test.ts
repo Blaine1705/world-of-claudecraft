@@ -518,6 +518,7 @@ export const IWORLD_MEMBERS = [
   { name: 'reliquaryRarity', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
+  { name: 'actionBarReadOnly', kind: 'data' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
   // IWorldFarming: the static garden-bed geography plus the viewer's own plot
   // rows (both data), the growth phase's two plot mutations, and the knobs
@@ -865,8 +866,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // methods, the Who tab data and method, CPU-hygiene entityRosterVersion,
     // and the account-wide Book of Deeds / Reliquary read halves. Counted
     // directly off the resolved IWORLD_MEMBERS literal.
-    expect(IWORLD_MEMBERS.length).toBe(378);
-    expect(DATA_MEMBERS.length).toBe(107);
+    expect(IWORLD_MEMBERS.length).toBe(379);
+    expect(DATA_MEMBERS.length).toBe(108);
     expect(METHOD_MEMBERS.length).toBe(271);
   });
   it('has no duplicate member names', () => {
@@ -887,6 +888,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountCosmetics',
       'accountDeeds',
       'accountFlair',
+      'actionBarReadOnly',
       'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
@@ -1264,6 +1266,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountAdmin',
       'accountCosmetics',
       'accountDeeds',
+      'actionBarReadOnly',
       'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
@@ -2244,6 +2247,7 @@ type _ExhaustReliquary = AssertNever<
 >;
 
 const FACET_ACTION_BAR = [
+  'actionBarReadOnly',
   'saveActionBarLayout',
   'takeActionBarLayoutRestore',
 ] as const satisfies readonly (keyof IWorldActionBar)[];
@@ -2391,8 +2395,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(378);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(378);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(379);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(379);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -331,6 +331,48 @@ export const tr_TR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "Apply",
+      "pickerLabel": "Frame Presets: {name}",
+      "overwrite": "Overwrite Preset",
+      "overwriteBody": "Replace the saved preset \"{name}\" with your current layout?",
+      "current": "Current Layout",
+      "new": "New Preset",
+      "empty": "No saved presets",
+      "deleteNamed": "Delete {name}",
+      "deleteBody": "Delete the frame preset \"{name}\"?",
+      "title": "Frame Presets",
+      "name": "Preset Name",
+      "slot": "Preset {slot}",
+      "remove": "Delete",
+      "saved": "Done.",
+      "failed": "Could not save or load the preset."
+    },
+    "frameMenus": {
+      "hide": "Hide Frame",
+      "units": "Unit Frames",
+      "bars": "Action Bars",
+      "trackers": "Trackers",
+      "auras": "Auras",
+      "combat": "Combat Displays",
+      "other": "Other HUD Elements",
+      "options": "Frame Options",
+      "allOptions": "All Frame Options",
+      "independentTarget": "Lock Target of Target to Target"
+    },
+    "focusTargets": {
+      "showEmpty": "Show Empty Focus Frames",
+      "assignHint": "Select a target. Press {key} or click {button}.",
+      "assignClickHint": "Select a target. Click {button}.",
+      "ally": "Ally",
+      "enemy": "Enemy",
+      "unset": "Unset Focus",
+      "frame1": "Focus 1",
+      "frame2": "Focus 2",
+      "frame3": "Focus 3",
+      "assign": "Set focus {slot}",
+      "target": "Target focus {slot}"
+    },
     "professionTrainers": {
       "blacksmithing": "Demircilik Eğitmeni",
       "cooking": "Aşçılık Eğitmeni",
@@ -388,9 +430,18 @@ export const tr_TR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Cesedinin Başında Diril",
       "resurrectAtHealer": "Solgun Bekçi (Bekçinin Bedeli)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Solgun Bekçi ölüleri gözetir. Sen hâlâ yaşayanlar arasındasın.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "Bekçinin Bedelini kabul ediyor musunuz?",
       "healerConfirmBody": "Solgun Bekçi sizi burada canlandıracak, ancak Bekçinin Bedeli, daha yüksek seviyelerde 10 dakikaya kadar tüm niteliklerinizi %75 azaltır. Ruhunuzu cesedinize geri götürmek sizi hiçbir ceza almadan canlandırır.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Beni Canlandır",
       "healerConfirmCancel": "İptal etmek"
     },
@@ -405,6 +456,7 @@ export const tr_TR: EnTranslations = {
       "help": "Kurtarma: /unstuck, seni yakındaki ulaşılabilir güvenli bir noktaya taşıyacak hareketsiz bir geri sayım başlatır.",
       "helpAtGraveyard": "Kurtarma: /unstuck hareketsiz bir geri sayım başlatır, ardından ruhunu en yakın mezarlığa gönderir. Solgun Gözcü aracılığıyla dönmek Gözcünün Bedelini gerektirir.",
       "helpUnstuckSickness": "Kurtarma: /unstuck hareketsiz bir geri sayım başlatır, ardından seni en yakın mezarlığa taşır ve düşmüşsen diriltir. En fazla 5 dakika boyunca üzerinde Kurtulma Hastalığı kalır.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Kurtulma {seconds} saniye içinde. Hareket etmek, savaşmak, hasar almak veya başka bir eylem başlatmak bunu iptal eder.",
       "countdown": "Kurtulma: {seconds}",
       "completed": "En yakın ulaşılabilir güvenli noktaya taşındın.",
@@ -412,6 +464,8 @@ export const tr_TR: EnTranslations = {
       "revivedAtGraveyard": "En yakın mezarlığa döndürüldün ve diriltildin. Gözcünün Bedeli üzerinde ağırlık yapıyor.",
       "movedToGraveyard": "En yakın mezarlığa taşındın. Kurtulma Hastalığı üzerinde ağırlık yapıyor.",
       "revivedAtGraveyardUnstuck": "En yakın mezarlığa taşındın ve diriltildin. Kurtulma Hastalığı üzerinde ağırlık yapıyor.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Hareket ettiğin için Kurtulma iptal edildi.",
       "cancelledDamaged": "Hasar aldığın için Kurtulma iptal edildi.",
       "cancelledCombat": "Savaşa girdiğin için Kurtulma iptal edildi.",
@@ -518,6 +572,15 @@ export const tr_TR: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Takas penceresi kapandı.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Altın",
         "tabWoc": "$WOC",
@@ -1516,6 +1579,7 @@ export const tr_TR: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Dehşet Kıvılcımı Yer Sarsıcı",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Makine Kuşu",
       "name_lanternback_troll": "Fener Sırtlı Grumbol",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
@@ -1532,6 +1596,7 @@ export const tr_TR: EnTranslations = {
       "desc_rallycart_skin": "Güçlü kükreyen küçücük bir ralli arabası.",
       "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
       "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Kapanan servolarla koşan, kurma anahtarı hâlâ dönen, el yapımı, saat mekanizmalı bir savaş tavuğu.",
       "desc_lanternback_troll": "Omuzlarında demir bir taht taşıyan, her iki kolunda da yanan bir fırtına feneri taşıyan, fener yakanlar tarafından boyunduruğa alınan bir tepe trolü.",
       "desc_chimeglass_tortoise": "Üç nesildir karavanları geride bırakan, tuzla kaplı bir kaplumbağa. Tamirciler ona fırtına camından gözlük taktı ve boğazına bronz bir çan astı, böylece yol onu görmeden çok önce onu duyardı.",
@@ -1702,6 +1767,15 @@ export const tr_TR: EnTranslations = {
       "shaderWarmOff": "Kapalı",
       "shaderWarmOn": "Açık",
       "shaderWarmNote": "Oyun içi takılmaları önlemek için shader önbelleğini arka planda önceden ısıtır. Otomatik: Yalnızca grafik sistemin desteklediğinde etkin. (Önerilir). Açık: Her yerde zorlanır. Bazı kurulumlarda performansı kötüleştirebilir. Kapalı: Devre dışı.",
+      "frameRateCap": "Frame Rate Limit",
+      "frameRateCapAuto": "Auto",
+      "frameRateCapDisplay": "Display",
+      "frameRateCapSixty": "60",
+      "frameRateCapThirty": "30",
+      "frameRateCapNote": "Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.",
+      "frameRateCapStatusPaced": "Drawing {fps} images per second on a {hz} Hz display.",
+      "frameRateCapStatusUnpaced": "Limiting to {fps} images per second.",
+      "frameRateCapStatusInert": "This display already runs at or under this limit, so the limit changes nothing.",
       "gpuBackend": "Grafik Arka Ucu",
       "gpuBackendAuto": "Otomatik",
       "gpuBackendVulkan": "Vulkan",
@@ -1838,7 +1912,8 @@ export const tr_TR: EnTranslations = {
       "crossHotbarEditHelp": "Çubuğu kontrol cihazıyla ayarlamak için sol tamponu tutun ve üst taraftaki düğmeye basın."
     },
     "perf": {
-      "title": "Performans Katmanı",
+      "title": "Performance",
+      "overlaySection": "Performans Katmanı",
       "enable": "Performans Kaplamasını Göster",
       "description": "Hangi istatistiklerin gösterileceğini, kaplamanın nerede duracağını ve nasıl görüneceğini seçin.",
       "sectionPosition": "Konum",
@@ -2585,6 +2660,15 @@ export const tr_TR: EnTranslations = {
       "tooLarge": "Bu bildirim gönderilemeyecek kadar büyük. Ekran görüntüsü olmadan tekrar deneyin.",
       "rateLimited": "Son zamanlarda birkaç bildirim gönderdiniz. Yenisini göndermeden önce lütfen biraz bekleyin.",
       "failed": "Hata bildirimi gönderilemedi. Lütfen tekrar deneyin."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "{item} eşyasını çıkar",
@@ -3498,6 +3582,8 @@ export const tr_TR: EnTranslations = {
       "label": "Çerçeve Konumlarını Sıfırla"
     },
     "interfaceUnlock": {
+      "combineTrackers": "Combine Tracker Frames",
+      "combineAuras": "Combine Aura Frames",
       "label": "Çerçeveleri Düzenle",
       "unlock": "Arayüzün kilidini aç",
       "lock": "Arayüzü kilitle",
@@ -3508,6 +3594,8 @@ export const tr_TR: EnTranslations = {
       "lockFrame": "Bu çerçeveyi kilitle",
       "resizeFrame": "Bu çerçeveyi yeniden boyutlandır",
       "frameNames": {
+        "trackerGroup": "Trackers",
+        "auraGroup": "Aura trackers",
         "actionBar1": "Eylem Çubuğu",
         "actionBar2": "Eylem Çubuğu 2",
         "actionBar3": "Eylem Çubuğu 3",
@@ -3637,6 +3725,15 @@ export const tr_TR: EnTranslations = {
         "socket": "{name}'a bir mücevher yerleştirildi.",
         "socketReplaced": "{name}'a bir mücevher yerleştirildi; {gem} yok edildi."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Gereken Seviye {level}",
@@ -6284,6 +6381,7 @@ export const tr_TR: EnTranslations = {
       "rowBrightness": "Sahne pozlaması, daha koyu veya daha parlak. Saf tercih.",
       "rowWeather": "Ortam yağmur ve kar. Yalnızca atmosfer ve onu kapatmak fırtınalar sırasında biraz tasarruf sağlar.",
       "rowBrowserEffects": "Arayüzün kendisinin ne kadar süslü olmasına izin veriliyor: cam bulanıklığı, parıltı, animasyonlu menüler. Otomatik olarak tarayıcınızla eşleşir; 3D dünyasına her iki durumda da dokunulmaz.",
+      "rowFrameRateCap": "A ceiling on how many images the game draws each second. A computer that cannot keep up with its display lands on an uneven rhythm; a steady 30 looks smoother than that, halves the work, and keeps the computer cooler. Display means no limit.",
       "rowTerrainDetail": "Daha basit, daha hızlı bir arazi görünümüne karşı zengin, harmanlanmış zemin dokuları.",
       "rowFoliageDensity": "Karakterinizin etrafındaki çimlerin ne kadar uzağa ve ne kadar kalın büyüdüğü.",
       "rowEffectsQuality": "Bloom, ortam örtüşmesi ve kaç meşale ile büyünün gerçek ışık saçtığı. Ayrıntı düğmeleri arasındaki tek başına en büyük tasarruf ve diğer ışıklandırma düğmelerinin bağlı olduğu anahtar.",
@@ -6291,7 +6389,7 @@ export const tr_TR: EnTranslations = {
       "rowFrostedPanels": "Pencerelerin arkasında buzlu cam bulanıklığı. Güzel ve tam olarak daha zayıf bir tarayıcının hissettiği türden bir etki; Klasik net görünüm için onu bırakın.",
       "rowReduceMotion": "Pencerelerin anında görünmesi için arayüz animasyonlarını kaldırır. Öncelikle küçük bir performans bonusuyla erişilebilirlik seçeneği.",
       "rowPerfOverlay": "FPS, kare süresi ve daha fazlasının ekrandan okunması. Bu sayfayı ayarlarken açın, ardından tekrar gizleyin.",
-      "tableFoot": "FPS sınırı mı arıyorsun? Aranacak bir şey yok: kare temposu ekranını izler. Çizim mesafesi, Dünya Ayrıntısı kartındaki Görüş Mesafesi adlı kendi düğmesidir ve sen onu oynatana kadar her ön ayar onu senin için belirler.",
+      "tableFoot": "Çizim mesafesi, Dünya Ayrıntısı kartındaki Görüş Mesafesi adlı kendi düğmesidir ve sen onu oynatana kadar her ön ayar onu senin için belirler.",
       "mobileTitle": "Telefonlarda ve tabletlerde",
       "mobileBody": "Telefon ya da tablette oyun seni Low'da başlatır. Her dokunmatik cihaz ilk açılışta bilerek oraya iner ki dünyaya girip oynayabilesin; istediğin zaman Grafikler panelinden kendin yükselt. Android tarayıcısında merdivenin tamamı sana açıktır ve seçimin kalıcıdır. iPhone ve iPad'de en üst ön ayarları yine seçebilirsin ve Uygula'ya basar basmaz tutarlar, ancak oyun bir sonraki açılışta seni High'a geri alır, çünkü iOS bu büyüklükte bir sahne kurulurken sekmeyi sonlandırabilir. İndirilen uygulama daha da dardır: ön ayar listesi High'da biter ve tek tek sistem düğmeleri gizlidir, çünkü uygulama onları kendisi yönetir.",
       "touchBody": "Dokunmatik ekranda Grafikler paneli kendine ait bir Dokunmatik Kontroller kartı kazanır: joystick boyutu ve ölü bölgesi, ekran düğmelerinin boyutu, kontrollerin saydamlığı, isteğe bağlı bir kamera çubuğu, solaklar için aynalanmış bir yerleşim ve ters dokunmatik bakış; böylece ekran senin ellerine uyar, tersi değil.",
@@ -6397,6 +6495,7 @@ export const tr_TR: EnTranslations = {
       "allyRezBody": "Her zaman geri yürümek zorunda değilsin. Bir diriltme büyüsüne sahip bir müttefik seni onun yerine diriltebilir; bu sana kabul edebileceğin ya da reddedebileceğin bir istek olarak gelir: onu öylece bırakırsan süresi dolar, o yüzden oradayken yanıtla. Kabul edersen, canının ve mananın bir kısmı geri gelmiş halde büyüyü okuyan arkadaşının yanında kalkarsın. Bazı şifacılar düşmüş partinin tamamına aynı anda teklif sunabilir, gerçi her biriniz yine de kendi isteğinizi yanıtlar. Dikenvadi Ovası istisnadır: orada hiçbir diriltme büyüsü sana ulaşmaz, ve takımının bir sonraki dalgasını beklersin.",
       "unstuckTitle": "Gerçekten sıkıştığında",
       "unstuckBody": "Dünya seni çıkamayacağın bir yere hapsederse /unstuck yaz. Dövüş dışında ve hareketsiz durman gerekir, bir sersemletme ya da kök tarafından tutulmaman, ve bir düelloda ya da arena maçında olmaman gerekir: kısa bir geri sayım başlar, hareket etmek ya da hasar almak onu iptal eder. Bittiğinde en yakın mezarlığa bırakılırsın. Seni asla öldürmez ve geride bir ceset bırakmaz, ve zaten düşmüşsen seni orada diriltir. Bedeli Kurtulma Hastalığı’dır: tüm varlığını geçici olarak zayıflatan ve komutu tekrar kullanabileceğin zamana kadar geçmiş olan bir güçsüzlük; ve Bekçinin Bedeli gibi, o da yepyeni karakterleri büsbütün muaf tutar.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Bir çıkıntıya tırmanmak",
       "climbBody": "Çıkıntılar duvar değildir. Üstüne çıkamayacağın kadar yüksek bir şeye zıplarsan, karakterin zıplamanın tepe noktasına yakın kenarı yakalar ve kendini yukarı çeker; bunun için basılacak ayrı bir tuş yoktur. Kendi başına aşabileceğin kadar alçak her şey törensiz geçilir; tam çekiş yalnızca başının üstündeki kenarlar için ayrılmıştır. Kısa sürer ve çalıştığı süre boyunca dizginleri eline alır, bu yüzden ortasında yönünü değiştiremezsin. Bir sersemletme seni çekiş ortasında yakalarsa bırakır ve düşersin, zıplamanın yerden ayrıldığı noktadan ölçülerek; bir sersemletme ya da kök ise bir tırmanışın başlamasını tamamen engeller, bu da bir dövüşte kötü bir durumdan kurtulmaya çalışırken hatırlaman gereken bir şeydir."
     },
@@ -6422,6 +6521,7 @@ export const tr_TR: EnTranslations = {
       "framesMoveBodyEditFrames": "Çerçeven, hedef çerçeven ve grup çerçevelerin tümü taşınabilir. Her birinin köşesinde küçük bir taşıma düğmesi vardır: kilidini aç, çerçeveyi istediğin yere sürükle ve yanlış bir tıklamanın yerini değiştirememesi için yeniden kilitle. Arayüz seçeneklerindeki Çerçeveler sekmesinin üstündeki Çerçeveleri Düzenle, bu üç çerçeveyle birlikte arayüzün geri kalanını da tek seferde gevşetir: eylem çubuklarını, okuma çubuğunu, savurma çubuğunu, deneyim çubuğunu, mini haritayı, düğme şeridini, evcil hayvan çerçevesini, duruş çubuğunu, takviye ve zayıflatma satırlarını ve İstek Listesi Hatırlatıcısı çipini. Bir yere pişman olursan aynı Çerçeveler sekmesinin altındaki Varsayılanlara Sıfırla hepsini başladıkları yere geri getirir.",
       "framesGovernedExtra": "Çerçeveleri Düzenle, aşağıdaki takipçi yığınını da gevşetir: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, Reliquary sayfaların, üretimden sabitlediğin tarifler, içinde olduğun delve, katıldığın her yarık ve takip ettiğin tarif veya komisyon. Ayrıca evcil hayvan çerçevesinin yanındaki evcil hayvan eylem çubuğu, yakındaki düşmanlardaki zayıflatmaların için Hedef noktaları çerçevesi, paladinin Adanmışlık madalyası, büyücünün Lanet Çubuğu, büyü tetikleme kaplaması, çift elli savaşçılar için yardımcı el savurma sayacı ve sekmeli hasar ölçer penceresi de her biri kendi ad çipini taşırken gevşetilir.",
       "framesGovernedAuraTracks": "Arayüz seçeneklerinin aynı Arayüz sekmesindeki Savaş sekmesinden açtığın altı isteğe bağlı aura izini de Çerçeveleri Düzenle gevşetir: Takviyelerim izi, Savunma Bekleme Süreleri izi, Kalkanlarım izi, Saldırı Bekleme Süreleri izi, Hareket ve Gizlilik izi ve Müttefiklerde Takviyelerim izi. Her iz varsayılan olarak kapalıdır ve gevşekken kendi ad çipini taşır.",
+      "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
@@ -6570,6 +6670,7 @@ export const tr_TR: EnTranslations = {
       "dungeonReset": "Kendi boş örneklerinden vazgeç, zorluğu değiştirdikten sonra yapılması gereken de budur.",
       "groupRecovery": "Toparlanma ve durum",
       "unstuck": "Dünya seni hapsettiğinde çıkış yolu. Kısa bir geri sayım boyunca hareketsiz dur, en yakın mezarlığa taşınırsın, ve zaten düşmüşsen orada diriltilirsin. Ardından bir süre seni Kurtulma Hastalığı ile zayıflatır, bu yüzden bir kestirme değil, son çare olarak kullanılır.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Kendini Uzakta olarak işaretle; isteğe bağlı bir mesaj eklersen, sana fısıldayan herkes onu otomatik bir yanıt olarak alır. Mesajsız tekrarlamak bunu temizler; başka herhangi bir sohbet de temizler.",
       "dnd": "Rahatsız Etmeyin: uzakta gibidir, yalnızca sana gönderilen fısıltılar iletilmek yerine bekletilir.",
       "sit": "Bulunduğun yerde otur, ve tekrar ayağa kalk. Hareket ettiğin, büyü okuduğun ya da bir darbe aldığın an otomatik olarak ayağa kalkarsın.",
@@ -6676,6 +6777,7 @@ export const tr_TR: EnTranslations = {
       "fatigueDef": "Açık denizde yeterince uzağa yüz ve su seni tüketmeye başlar: önce bir uyarı gelir, sonra karaya dönene dek artan hasar.",
       "unstuckTerm": "Kurtulma Hastalığı",
       "unstuckDef": "Oyun menüsündeki Kurtulma'yı kullanmanın bedeli. Geri sayım boyunca hareketsiz durursan seni en yakın mezarlığa bırakır ve ardından bir süre geçici bir güçsüzlük taşırsın.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Eşya seviyesi",
       "itemLevelDef": "Bir teçhizat parçasının ne kadar güçlü olduğunu özetleyen tek bir sayı, iki parçayı hızlıca karşılaştırmak istediğinde işe yarar. İpucu kutularında görmek için seçeneklerden Eşya Seviyesini Göster'i aç. Yalnızca bilinen bir kaynağı olan teçhizat bir tane taşır, bu yüzden düz satıcı temelleri ve başlangıç teçhizatı hiçbir şey göstermez; eksik bir rakam bir hata değil, normaldir.",
       "requiredLevelTerm": "Gerekli seviye",
@@ -9939,6 +10041,11 @@ export const tr_TR: EnTranslations = {
       "quit": "Çık",
       "fatalBody": "World of ClaudeCraft beklenmeyen bir hatayla karşılaştı ve kapatılması gerekiyor."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Oyundan Çık"
     }
@@ -9989,6 +10096,11 @@ export const tr_TR: EnTranslations = {
     "inWorld": "dünyada",
     "takeOver": "Devral",
     "inWorldHint": "Zaten dünyada. Başka yerden çıkış yap ya da devral.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Bu işlem bu karakteri başka bir oturumdan koparıp buraya getirecek. Devam edilsin mi?",
     "renameRequired": "yeniden adlandırma gerekli",
     "delete": "Sil",
@@ -10533,6 +10645,7 @@ export const tr_TR: EnTranslations = {
       "deathRecapDrowned": "Öldün. Boğuldun.",
       "deathRecapCauterized": "Öldün. Dağlama'nın yanığı seni alt etti.",
       "respawn": "Kendini dinlenmiş ve yeniden sapasağlam hissediyorsun.",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "{name} oyuncusunun sohbeti görmezden geliniyor.",
       "noLongerIgnoring": "{name} artık görmezden gelinmiyor.",
       "playerNotNearby": "O oyuncu yakında değil.",
@@ -10570,6 +10683,7 @@ export const tr_TR: EnTranslations = {
       "cantInForm": "{form} Formunda bunu yapamazsın.",
       "bear": "Bruin",
       "cat": "Kedi",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "Şekil değiştirmişken bunu yapamazsın.",
       "stealthed": "Gizlenmiş olmalısın.",
@@ -10901,7 +11015,8 @@ export const tr_TR: EnTranslations = {
     },
     "forms": {
       "bear": "Bruin",
-      "cat": "Kedi"
+      "cat": "Kedi",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Balık Tutma",
@@ -12033,6 +12148,18 @@ export const tr_TR: EnTranslations = {
       "thunder_reservoir": {
         "name": "Gök Gürültüsü Haznesi",
         "description": "Pasif: Ark Oku ve Çatallı Yıldırım Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)"
+      },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
       },
       "rockbiter_weapon": {
         "name": "Stonebound Silahı",
@@ -14545,6 +14672,9 @@ export const tr_TR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Ateşleme Anahtarı: Dehşetkoru Yer Sarsıcı"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Kontak anahtarı: Goblin Roket Kızağı"
@@ -20334,6 +20464,7 @@ export const tr_TR: EnTranslations = {
       "eastbrook_vale": {
         "name": "Doğudere Vadisi",
         "welcome": "Kasabada Mareşal Redbrook'u bul, senin için işi var.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Doğudere"
@@ -20379,6 +20510,7 @@ export const tr_TR: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefen Bataklığı",
         "welcome": "Bataklık Köprüsü kapısında Muhafız Fenwick'e rapor ver.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Bataklık Köprüsü"
@@ -20409,6 +20541,7 @@ export const tr_TR: EnTranslations = {
       "thornpeak_heights": {
         "name": "Dikenzirve Tepeleri",
         "welcome": "Yüzbaşı Thessaly, Yüksek Gözcü'deki duvarı tutuyor, zar zor.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Yüksek Gözcü"

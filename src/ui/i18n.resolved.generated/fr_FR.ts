@@ -331,6 +331,48 @@ export const fr_FR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "Apply",
+      "pickerLabel": "Frame Presets: {name}",
+      "overwrite": "Overwrite Preset",
+      "overwriteBody": "Replace the saved preset \"{name}\" with your current layout?",
+      "current": "Current Layout",
+      "new": "New Preset",
+      "empty": "No saved presets",
+      "deleteNamed": "Delete {name}",
+      "deleteBody": "Delete the frame preset \"{name}\"?",
+      "title": "Frame Presets",
+      "name": "Preset Name",
+      "slot": "Preset {slot}",
+      "remove": "Delete",
+      "saved": "Done.",
+      "failed": "Could not save or load the preset."
+    },
+    "frameMenus": {
+      "hide": "Hide Frame",
+      "units": "Unit Frames",
+      "bars": "Action Bars",
+      "trackers": "Trackers",
+      "auras": "Auras",
+      "combat": "Combat Displays",
+      "other": "Other HUD Elements",
+      "options": "Frame Options",
+      "allOptions": "All Frame Options",
+      "independentTarget": "Lock Target of Target to Target"
+    },
+    "focusTargets": {
+      "showEmpty": "Show Empty Focus Frames",
+      "assignHint": "Select a target. Press {key} or click {button}.",
+      "assignClickHint": "Select a target. Click {button}.",
+      "ally": "Ally",
+      "enemy": "Enemy",
+      "unset": "Unset Focus",
+      "frame1": "Focus 1",
+      "frame2": "Focus 2",
+      "frame3": "Focus 3",
+      "assign": "Set focus {slot}",
+      "target": "Target focus {slot}"
+    },
     "professionTrainers": {
       "blacksmithing": "Maître forgeron",
       "cooking": "Maître cuisinier",
@@ -388,9 +430,18 @@ export const fr_FR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Ressusciter près du cadavre",
       "resurrectAtHealer": "Le Veilleur pâle (Glas du Veilleur)",
+      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Le Veilleur pâle veille sur les morts. Vous êtes encore parmi les vivants.",
+      "keeperTalkTitle": "The Pale Keeper",
+      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
+      "keeperTalkAccept": "Revive Me",
+      "keeperTalkLeave": "Leave",
       "healerConfirmTitle": "Accepter le Glas du Veilleur ?",
       "healerConfirmBody": "Le Veilleur pâle vous fera revivre ici, mais le Glas du Veilleur réduit tous vos attributs de 75 % pendant un maximum de 10 minutes aux niveaux supérieurs. Ramener votre esprit à votre cadavre vous réanime sans pénalité.",
+      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
+      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Ravive-moi",
       "healerConfirmCancel": "Annuler"
     },
@@ -405,6 +456,7 @@ export const fr_FR: EnTranslations = {
       "help": "Récupération : /unstuck démarre un compte à rebours immobile qui vous déplace vers un endroit sûr et accessible à proximité.",
       "helpAtGraveyard": "Récupération : /unstuck démarre un compte à rebours immobile, puis envoie votre esprit au cimetière le plus proche. Revenir par le Veilleur pâle exige le Glas du Veilleur.",
       "helpUnstuckSickness": "Récupération : /unstuck démarre un compte à rebours immobile, puis vous déplace au cimetière le plus proche en vous ranimant si vous étiez tombé. Le Mal de déblocage vous accable pendant 5 minutes au maximum.",
+      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Déblocage dans {seconds} secondes. Bouger, combattre, subir des dégâts ou commencer une autre action l'annule.",
       "countdown": "Déblocage: {seconds}",
       "completed": "Déplacé vers l'endroit sûr accessible le plus proche.",
@@ -412,6 +464,8 @@ export const fr_FR: EnTranslations = {
       "revivedAtGraveyard": "Vous avez été ramené au cimetière le plus proche et ranimé. Le Glas du Veilleur pèse sur vous.",
       "movedToGraveyard": "Vous avez été déplacé au cimetière le plus proche. Le Mal de déblocage pèse sur vous.",
       "revivedAtGraveyardUnstuck": "Vous avez été déplacé au cimetière le plus proche et ranimé. Le Mal de déblocage pèse sur vous.",
+      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
       "cancelledMoved": "Déblocage annulé : vous avez bougé.",
       "cancelledDamaged": "Déblocage annulé : vous avez subi des dégâts.",
       "cancelledCombat": "Déblocage annulé : vous êtes entré en combat.",
@@ -518,6 +572,15 @@ export const fr_FR: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Fenêtre d'échange fermée.",
+      "offerQuantityHint": "You will be asked how many to offer",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
+      "offerRemoveTitle": "Remove {item}",
+      "offerRemoveInput": "Quantity to remove",
+      "offerRemove": "Remove",
+      "offerRemoveAll": "Remove all",
       "woc": {
         "tabGold": "Or",
         "tabWoc": "$WOC",
@@ -1516,6 +1579,7 @@ export const fr_FR: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Secoueur de terre Étincelle-de-terreur",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
+      "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Oiseau Mécanique",
       "name_lanternback_troll": "Grumbol le Lanternback",
       "name_chimeglass_tortoise": "Tolliver le Chimeglass",
@@ -1532,6 +1596,7 @@ export const fr_FR: EnTranslations = {
       "desc_rallycart_skin": "Une minuscule voiture de rallye au rugissement puissant.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
       "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
+      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "Un poulet de guerre mécanique construit à la main qui sprinte sur des servos qui claquent, la clé de remontage tournant toujours.",
       "desc_lanternback_troll": "Un troll des collines brisé jusqu'au joug par des allumeurs de réverbères, portant un trône de fer sur ses épaules avec une lanterne tempête allumée sur chaque bras.",
       "desc_chimeglass_tortoise": "Une tortue des salines qui a dépassé trois générations de caravanes. Les bricoleurs lui ont arraché des lunettes en verre tempête et lui ont accroché une cloche de bronze à la gorge, pour que la route l'entende bien avant de le voir.",
@@ -1702,6 +1767,15 @@ export const fr_FR: EnTranslations = {
       "shaderWarmOff": "Désactivé",
       "shaderWarmOn": "Activé",
       "shaderWarmNote": "Préchauffe le cache des shaders en'arrière-plan pour éviter les saccades en jeu. Auto : activé uniquement si votre système graphique le prend en charge. (Recommandé). Activé : forcé partout. Peut réduire les performances sur certaines configurations. Désactivé : désactivé.",
+      "frameRateCap": "Frame Rate Limit",
+      "frameRateCapAuto": "Auto",
+      "frameRateCapDisplay": "Display",
+      "frameRateCapSixty": "60",
+      "frameRateCapThirty": "30",
+      "frameRateCapNote": "Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.",
+      "frameRateCapStatusPaced": "Drawing {fps} images per second on a {hz} Hz display.",
+      "frameRateCapStatusUnpaced": "Limiting to {fps} images per second.",
+      "frameRateCapStatusInert": "This display already runs at or under this limit, so the limit changes nothing.",
       "gpuBackend": "Moteur graphique",
       "gpuBackendAuto": "Auto",
       "gpuBackendVulkan": "Vulkan",
@@ -1838,7 +1912,8 @@ export const fr_FR: EnTranslations = {
       "crossHotbarEditHelp": "Maintenez le pare-chocs gauche et appuyez sur le bouton supérieur pour organiser la barre avec le contrôleur."
     },
     "perf": {
-      "title": "Surcouche de performance",
+      "title": "Performance",
+      "overlaySection": "Surcouche de performance",
       "enable": "Afficher la surcouche de performance",
       "description": "Choisissez les statistiques à afficher, l'emplacement de la surcouche et son apparence.",
       "sectionPosition": "Position",
@@ -2585,6 +2660,15 @@ export const fr_FR: EnTranslations = {
       "tooLarge": "Ce rapport est trop volumineux pour être envoyé. Réessayez sans la capture d'écran.",
       "rateLimited": "Vous avez envoyé plusieurs rapports récemment. Veuillez patienter un peu avant d'en envoyer un autre.",
       "failed": "Impossible d'envoyer le rapport de bug. Veuillez réessayer."
+    },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
+      "create": "Generate system report",
+      "running": "Collecting system details...",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
       "unequipAria": "Déséquiper {item}",
@@ -3498,6 +3582,8 @@ export const fr_FR: EnTranslations = {
       "label": "Réinitialiser la position des cadres"
     },
     "interfaceUnlock": {
+      "combineTrackers": "Combine Tracker Frames",
+      "combineAuras": "Combine Aura Frames",
       "label": "Modifier les cadres",
       "unlock": "Déverrouiller l'interface",
       "lock": "Verrouiller l'interface",
@@ -3508,6 +3594,8 @@ export const fr_FR: EnTranslations = {
       "lockFrame": "Verrouiller ce cadre",
       "resizeFrame": "Redimensionner ce cadre",
       "frameNames": {
+        "trackerGroup": "Trackers",
+        "auraGroup": "Aura trackers",
         "actionBar1": "Barre d'action",
         "actionBar2": "Barre d'action 2",
         "actionBar3": "Barre d'action 3",
@@ -3637,6 +3725,15 @@ export const fr_FR: EnTranslations = {
         "socket": "J'ai inséré une gemme dans {name}.",
         "socketReplaced": "Enchâssé une gemme dans {name}; {gem} a été détruit."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinary",
+      "superior": "Superior",
+      "exceptional": "Exceptional",
+      "magnificent": "Magnificent",
+      "transcendent": "Transcendent",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
     },
     "itemTooltip": {
       "requiresLevel": "Niveau requis : {level}",
@@ -6284,6 +6381,7 @@ export const fr_FR: EnTranslations = {
       "rowBrightness": "Exposition de la scène, plus sombre ou plus claire. Pure préférence.",
       "rowWeather": "Pluie et neige ambiantes. Ambiance uniquement, et l'éteindre permet d'économiser un peu lors des orages.",
       "rowBrowserEffects": "À quel point l'interface elle-même peut être sophistiquée$1 flou de verre, lueur, menus animés. Correspond automatiquement à votre navigateur$1 le monde 3D est intact de toute façon.",
+      "rowFrameRateCap": "A ceiling on how many images the game draws each second. A computer that cannot keep up with its display lands on an uneven rhythm; a steady 30 looks smoother than that, halves the work, and keeps the computer cooler. Display means no limit.",
       "rowTerrainDetail": "Textures de sol riches et mélangées par rapport à un aspect de terrain plus simple et plus rapide.",
       "rowFoliageDensity": "Jusqu'où et quelle épaisseur l'herbe pousse autour de votre personnage.",
       "rowEffectsQuality": "Le bloom, l'occlusion ambiante et le nombre de torches et de sorts qui projettent une vraie lumière. La plus grosse économie parmi les réglages de détail, et l'interrupteur dont dépendent les autres réglages d'éclairage.",
@@ -6291,7 +6389,7 @@ export const fr_FR: EnTranslations = {
       "rowFrostedPanels": "Un flou de verre dépoli derrière les fenêtres. Joli, et exactement le genre d’effet ressenti par un navigateur plus faible$1 laissez-le de côté pour un look classique et net.",
       "rowReduceMotion": "Supprime les animations de l'interface pour que les fenêtres apparaissent instantanément. Une option d’accessibilité d’abord, avec un petit bonus de performances.",
       "rowPerfOverlay": "Une lecture à l'écran de FPS, du temps d'image, et plus encore. Activez-le pendant que vous réglez cette page, puis masquez-le à nouveau.",
-      "tableFoot": "Vous cherchez une limite de FPS ? Il n'y a rien à chercher : la cadence d'images suit votre écran. La distance d'affichage est un réglage à part entière, Distance de vue, dans la carte Détail du monde, et chaque préréglage la règle pour vous jusqu'à ce que vous y touchiez.",
+      "tableFoot": "La distance d'affichage est un réglage à part entière, Distance de vue, dans la carte Détail du monde, et chaque préréglage la règle pour vous jusqu'à ce que vous y touchiez.",
       "mobileTitle": "Sur téléphones et tablettes",
       "mobileBody": "Sur téléphone ou tablette, le jeu vous démarre sur Low. Tout appareil tactile atterrit là au premier lancement, volontairement, pour que vous entriez dans le monde et jouiez ; montez-le vous-même depuis le panneau Graphismes quand vous voulez. Dans un navigateur Android, toute l'échelle vous est ouverte et votre choix tient. Sur iPhone et iPad, vous pouvez toujours choisir les préréglages les plus élevés et ils prennent effet dès que vous appuyez sur Appliquer, mais le jeu vous remet sur High au lancement suivant, car iOS peut fermer l'onglet pendant qu'une scène de cette taille se construit. L'application téléchargée est plus stricte encore : sa liste de préréglages s'arrête à High et les réglages système individuels sont masqués, car l'application les gère elle-même.",
       "touchBody": "Sur un écran tactile, le panneau Graphismes gagne une carte Commandes tactiles qui lui est propre : taille et zone morte du joystick, taille des boutons à l'écran, opacité des commandes, un stick de caméra facultatif, une disposition inversée pour gaucher et une visée tactile inversée, pour que l'écran s'adapte à vos mains plutôt que l'inverse.",
@@ -6397,6 +6495,7 @@ export const fr_FR: EnTranslations = {
       "allyRezBody": "Vous n'avez pas toujours besoin de faire le trajet à pied. Un allié disposant d'un sort de résurrection peut vous ramener à la vie à la place, et cela vous parvient sous la forme d'une invite que vous acceptez ou refusez ; laissez-la sans réponse et elle expire, alors répondez pendant qu'elle est là. Acceptez, et vous vous relevez aux côtés de l'ami qui l'a lancée, une partie de vos points de vie et de votre mana récupérée. Certains soigneurs peuvent proposer à tout le groupe à terre en même temps, même si chacun répond encore à sa propre invite. Les Champs de Thornhollow font exception : aucun sort de résurrection ne vous y atteint, et vous attendez la prochaine vague de votre équipe.",
       "unstuckTitle": "Quand vous êtes vraiment coincé",
       "unstuckBody": "Si le monde vous piège quelque part dont vous ne pouvez pas sortir, tapez /unstuck. Vous devez être hors combat et immobile, non entravé par un étourdissement ou une immobilisation, et non engagé dans un duel ou un match d'arène : un court compte à rebours démarre, et bouger ou subir des dégâts l'annule. Une fois terminé, vous êtes déposé au cimetière le plus proche. Cela ne vous tue jamais et ne laisse aucun cadavre, et si vous étiez déjà tombé, cela vous relève sur place à la place. Le prix en est le Mal de déblocage, un affaiblissement temporaire de tout ce que vous êtes qui s'est dissipé le temps que vous puissiez réutiliser la commande, et comme le Glas du Veilleur, il épargne entièrement les personnages tout neufs.",
+      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
       "climbTitle": "Se hisser sur une corniche",
       "climbBody": "Les corniches ne sont pas des murs. Sautez vers quelque chose de trop haut pour y monter d'un pas, et votre personnage attrape le rebord près du sommet du saut et se hisse dessus, sans qu'aucune touche dédiée ne soit nécessaire. Tout ce qui est assez bas pour être franchi tout seul passe sans cérémonie ; le rétablissement complet est réservé aux rebords au-dessus de votre tête. C'est bref, et cela prend les commandes le temps que ça dure, si bien que vous ne pouvez pas en sortir en cours de route. Un étourdissement qui vous frappe en plein rétablissement vous fait lâcher prise et tomber, la chute étant mesurée depuis l'endroit où le saut a quitté le sol, et un étourdissement ou une immobilisation empêche même un rétablissement de commencer, ce qui vaut la peine d'être gardé en tête quand vous essayez de sortir d'une mauvaise position en plein combat."
     },
@@ -6422,6 +6521,7 @@ export const fr_FR: EnTranslations = {
       "framesMoveBodyEditFrames": "Votre cadre, votre cadre de cible et vos cadres de groupe peuvent tous être déplacés. Chacun possède un petit bouton de déplacement dans un coin : déverrouillez-le, faites glisser le cadre où vous le souhaitez, puis verrouillez-le afin qu’un clic égaré ne le déplace pas. Modifier les cadres, en haut de l’onglet Cadres des options d’interface, déverrouille tout le reste en même temps : barres d’action, barre d’incantation, barre de frappe, barre d’expérience, minicarte, rail de boutons, cadre du familier, barre de posture, lignes d’améliorations et d’affaiblissements et étiquette de rappel de liste de souhaits. Si le résultat ne vous convient pas, Réinitialiser par défaut, en bas du même onglet, remet tout à sa place.",
       "framesGovernedExtra": "Modifier les cadres déverrouille aussi la pile de suivi ci-dessous (quêtes et objectifs suivis, progression des hauts faits, pages du Reliquaire, recettes épinglées depuis l'artisanat, l'exploration, la faille et la recette ou commission suivies), la barre d'action du familier, le cadre des points de cible pour vos affaiblissements sur les ennemis proches, le médaillon de Dévotion du paladin, la barre d'affliction du démoniste, la superposition des déclenchements de sorts, le minuteur de frappe de la main secondaire et la fenêtre à onglets des compteurs de dégâts. Chacun porte sa propre étiquette lorsqu'il est déverrouillé.",
       "framesGovernedAuraTracks": "Modifier les cadres déverrouille aussi les six pistes d’auras facultatives après leur activation dans l’onglet Combat des mêmes options d’interface : Mes améliorations, Temps de recharge défensifs, Mes boucliers, Temps de recharge offensifs, Déplacement et furtivité, et Mes améliorations sur les alliés. Chaque piste est désactivée par défaut et porte sa propre étiquette lorsqu’elle est déverrouillée.",
+      "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Modifier les cadres desserre également le panneau de dialogue, qui diffuse la ligne parlée d'un PNJ lorsque ce PNJ est hors de votre vue; il porte sa puce nominative lorsqu'il est en vrac.",
       "barsTitle": "Barres, minuteries et texte de combat",
       "barsBody": "Votre barre d'incantation apparaît au milieu de l'écran, juste au-dessus de vos barres d'action, chaque fois que vous incantez ou canalisez, et affiche le nom du sort ainsi que le temps restant. Votre cible dispose de sa propre barre d'incantation sur son cadre, pour que vous puissiez voir ce qui arrive et y répondre.\n\nUne fine barre de cadence se trouve sous votre barre d'incantation et se remplit entre vos coups d'arme, pour qu'un attaquant au corps à corps ou à distance puisse voir quand le prochain coup automatique arrivera.\n\nVotre barre d'expérience s'étend sur toute la largeur sous vos barres d'action, graduée en segments, avec une portion plus claire montrant l'expérience reposée que vous avez accumulée.\n\nNagez sous l'eau et une barre de souffle bleue apparaît en haut de l'écran. Elle se vide tant que votre tête est immergée, clignote en rouge une fois épuisée quand vous commencez à vous noyer, puis se remplit rapidement dès que vous refaites surface. Espace vous fait remonter, et la touche Nager vers le bas, Ctrl par défaut, vous emmène plus profond.\n\nLes dégâts et les soins flottent au-dessus de ce qu'ils ont touché sous forme de petits nombres, pour que vous puissiez lire un combat sans lire de texte. L'onglet Combat de votre fenêtre de discussion conserve le relevé écrit complet.",
@@ -6570,6 +6670,7 @@ export const fr_FR: EnTranslations = {
       "dungeonReset": "Abandonnez vos propres instances vides, ce que vous faites après avoir changé de difficulté.",
       "groupRecovery": "Récupération et présence",
       "unstuck": "L'issue de secours quand le monde vous a piégé. Restez immobile le temps d'un court compte à rebours et vous êtes déplacé au cimetière le plus proche, et relevé sur place si vous étiez déjà tombé. Cela vous laisse affaibli par le Mal de déblocage pendant un moment ensuite, c'est donc un dernier recours plutôt qu'un raccourci.",
+      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
       "afk": "Signalez-vous absent, avec un message facultatif que quiconque vous murmure reçoit en réponse automatique. Répétez la commande sans message pour l'annuler ; n'importe quel autre message de discussion l'annule aussi.",
       "dnd": "Ne pas déranger : comme absent, sauf que les murmures qui vous sont envoyés sont retenus au lieu d'être livrés.",
       "sit": "Asseyez-vous là où vous êtes, ou relevez-vous. Vous vous relevez automatiquement dès que vous bougez, incantez ou subissez un coup.",
@@ -6676,6 +6777,7 @@ export const fr_FR: EnTranslations = {
       "fatigueDef": "Nagez assez loin en pleine mer et l'eau commence à vous épuiser : un avertissement vient d'abord, puis des dégâts croissants jusqu'à ce que vous rebroussiez chemin vers la terre.",
       "unstuckTerm": "Mal de déblocage",
       "unstuckDef": "Le prix à payer pour utiliser le Déblocage depuis le menu du jeu. Restez immobile pendant le compte à rebours et il vous dépose au cimetière le plus proche, puis vous porte une faiblesse temporaire pendant un moment.",
+      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
       "itemLevelTerm": "Niveau d'objet",
       "itemLevelDef": "Un chiffre unique qui résume la puissance d'une pièce d'équipement, pratique pour comparer rapidement deux pièces. Activez Afficher le niveau d'objet dans les options pour le voir sur les infobulles. Seul l'équipement dont la provenance est connue en porte un, si bien que les articles de base des marchands et l'équipement de départ n'affichent rien, et un chiffre manquant est normal, pas un défaut.",
       "requiredLevelTerm": "Niveau requis",
@@ -9939,6 +10041,11 @@ export const fr_FR: EnTranslations = {
       "quit": "Quitter",
       "fatalBody": "World of ClaudeCraft a rencontré une erreur inattendue et doit se fermer."
     },
+    "hostDiag": {
+      "saveTitle": "Save system report",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Quitter le jeu"
     }
@@ -9989,6 +10096,11 @@ export const fr_FR: EnTranslations = {
     "inWorld": "en jeu",
     "takeOver": "Prendre le contrôle",
     "inWorldHint": "Déjà en jeu. Déconnectez-vous ailleurs, ou prenez le contrôle.",
+    "currentLocation": "Current location: {zone}",
+    "lockouts": "Lockouts ({count})",
+    "lockoutRaids": "Raids",
+    "lockoutDungeons": "Dungeons",
+    "lockoutWorldBosses": "World bosses",
     "takeOverConfirm": "Cela déconnectera ce personnage d'une autre session et l'amènera ici. Continuer ?",
     "renameRequired": "renommage requis",
     "delete": "Supprimer",
@@ -10533,6 +10645,7 @@ export const fr_FR: EnTranslations = {
       "deathRecapDrowned": "Vous êtes mort. Vous vous êtes noyé.",
       "deathRecapCauterized": "Vous êtes mort. La brûlure de Cautérisation vous a submergé.",
       "respawn": "Vous vous sentez reposé et entier à nouveau.",
+      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "ignoringChat": "Discussion de {name} ignorée.",
       "noLongerIgnoring": "Vous n'ignorez plus {name}.",
       "playerNotNearby": "Ce joueur n'est pas à proximité.",
@@ -10570,6 +10683,7 @@ export const fr_FR: EnTranslations = {
       "cantInForm": "Vous ne pouvez pas faire cela en forme de {form}.",
       "bear": "Bruin",
       "cat": "chat",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "Vous ne pouvez pas faire cela en forme changeante.",
       "stealthed": "Vous devez être camouflé.",
@@ -10901,7 +11015,8 @@ export const fr_FR: EnTranslations = {
     },
     "forms": {
       "bear": "Bruin",
-      "cat": "chat"
+      "cat": "chat",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Pêche",
@@ -12033,6 +12148,18 @@ export const fr_FR: EnTranslations = {
       "thunder_reservoir": {
         "name": "Réservoir de tonnerre",
         "description": "Passif : le Éclair d'arc et l'Éclair fourchu octroient du Tonnerre, jusqu'à 5. À 5 Tonnerre, la Secousse tellurique inflige 125% de dégâts en plus ou le Tremblement de terre 100% de plus, puis consomme tout le Tonnerre. (Appel du tonnerre)"
+      },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
       },
       "rockbiter_weapon": {
         "name": "Arme Stonebound",
@@ -14545,6 +14672,9 @@ export const fr_FR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Clé d’allumage : Secoueur-de-sol Étincelle-de-terreur"
+      },
+      "reins_avian_strider": {
+        "name": "Reins of the Viridian Valestrider"
       },
       "reins_goblin_rocket_sled": {
         "name": "Clé de contact : luge-fusée gobeline"
@@ -20334,6 +20464,7 @@ export const fr_FR: EnTranslations = {
       "eastbrook_vale": {
         "name": "Val d'Eastbrook",
         "welcome": "Trouvez le maréchal Redbrook en ville: il a du travail pour vous.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20379,6 +20510,7 @@ export const fr_FR: EnTranslations = {
       "mirefen_marsh": {
         "name": "Marais de Mirefen",
         "welcome": "Présentez-vous au gardien Fenwick à la porte de Fenbridge.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20409,6 +20541,7 @@ export const fr_FR: EnTranslations = {
       "thornpeak_heights": {
         "name": "Hauteurs de Thornpeak",
         "welcome": "La capitaine Thessaly tient le mur de Highwatch, à peine.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"

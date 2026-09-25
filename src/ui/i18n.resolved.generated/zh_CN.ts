@@ -331,6 +331,48 @@ export const zh_CN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "应用",
+      "pickerLabel": "框架预设：{name}",
+      "overwrite": "覆盖预设",
+      "overwriteBody": "用当前布局替换已保存的预设“{name}”？",
+      "current": "当前布局",
+      "new": "新建预设",
+      "empty": "没有已保存的预设",
+      "deleteNamed": "删除 {name}",
+      "deleteBody": "删除框体预设“{name}”？",
+      "title": "框体预设",
+      "name": "预设名称",
+      "slot": "预设 {slot}",
+      "remove": "删除",
+      "saved": "完成。",
+      "failed": "无法保存或加载预设。"
+    },
+    "frameMenus": {
+      "hide": "隐藏框体",
+      "units": "单位框架",
+      "bars": "动作条",
+      "trackers": "追踪器",
+      "auras": "光环",
+      "combat": "战斗显示",
+      "other": "其他界面元素",
+      "options": "框架选项",
+      "allOptions": "所有框架选项",
+      "independentTarget": "将目标的目标锁定到目标"
+    },
+    "focusTargets": {
+      "showEmpty": "显示空的焦点框体",
+      "assignHint": "选择一个目标。按 {key} 或点击 {button}。",
+      "assignClickHint": "选择一个目标。点击 {button}。",
+      "ally": "盟友",
+      "enemy": "敌人",
+      "unset": "清除焦点",
+      "frame1": "焦点 1",
+      "frame2": "焦点 2",
+      "frame3": "焦点 3",
+      "assign": "设置焦点 {slot}",
+      "target": "选中焦点 {slot}"
+    },
     "professionTrainers": {
       "blacksmithing": "锻造训练师",
       "cooking": "烹饪训练师",
@@ -388,9 +430,18 @@ export const zh_CN: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "在尸体旁复活",
       "resurrectAtHealer": "灵魂医者（复活后遗症）",
+      "ghostHint": "跑回你死亡的地点，或与灵魂医者交谈以复活",
       "spiritHealerAlive": "灵魂医者只看护逝者。你仍是生者。",
+      "keeperTalkTitle": "灵魂医者",
+      "keeperTalkBody": "我可以让你就地复活，但代价随之而来：复活后遗症会使你的所有属性降低75%，等级越高持续越久，最长10分钟。让你的灵魂跑回倒下的地方复活则没有任何惩罚。",
+      "keeperTalkSparedBody": "我可以让你就地复活。通常这会附带复活后遗症，让你的一切在一段时间内变得虚弱，但你初来乍到，所以我会免去你的代价。无论如何，让你的灵魂跑回倒下的地方复活都没有任何惩罚。",
+      "keeperTalkAccept": "复活",
+      "keeperTalkLeave": "离开",
       "healerConfirmTitle": "接受复活后遗症？",
       "healerConfirmBody": "灵魂医者可以就地复活你，但复活后遗症会使你的全部属性降低75%，高等级时最长持续10分钟。让灵魂返回尸体复活则没有任何惩罚。",
+      "keeperConfirmBody": "确定吗？灵魂医者会复活你，但你会因此变得虚弱：复活后遗症会使你的所有属性降低75%，直到它消退，等级越高持续越久，最长10分钟。",
+      "keeperConfirmSparedTitle": "让灵魂医者复活你？",
+      "keeperConfirmSparedBody": "确定吗？灵魂医者会在此复活你。你还不到10级，所以这次复活后遗症不会削弱你。",
       "healerConfirmAccept": "复活",
       "healerConfirmCancel": "取消"
     },
@@ -405,6 +456,7 @@ export const zh_CN: EnTranslations = {
       "help": "脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。",
       "helpAtGraveyard": "脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。",
       "helpUnstuckSickness": "脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。",
+      "helpUnstuckWindow": "脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。一小时内的首次使用不付代价。若在上次使用后一小时内再次使用，你将带着脱困后遗症，最多持续 5 分钟。",
       "started": "将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。",
       "countdown": "脱困：{seconds}",
       "completed": "已移动到最近且可到达的安全位置。",
@@ -412,6 +464,8 @@ export const zh_CN: EnTranslations = {
       "revivedAtGraveyard": "你已被送回最近的墓地并复活。守护者的代价正压在你身上。",
       "movedToGraveyard": "你已被移动到最近的墓地。脱困后遗症正压在你身上。",
       "revivedAtGraveyardUnstuck": "你已被移动到最近的墓地并复活。脱困后遗症正压在你身上。",
+      "movedToGraveyardFree": "你已被移动到最近的墓地。一小时内再次使用脱困将让你带上脱困后遗症。",
+      "revivedAtGraveyardFree": "你已被移动到最近的墓地并复活。一小时内再次使用脱困将让你带上脱困后遗症。",
       "cancelledMoved": "你进行了移动，脱困已取消。",
       "cancelledDamaged": "你受到了伤害，脱困已取消。",
       "cancelledCombat": "你进入了战斗，脱困已取消。",
@@ -518,6 +572,15 @@ export const zh_CN: EnTranslations = {
     },
     "trade": {
       "windowClosed": "交易窗口已关闭。",
+      "offerQuantityHint": "将询问你要提供的数量",
+      "offerQuantityTitle": "提供 {item}",
+      "offerQuantityInput": "要提供的数量",
+      "offerQuantityConfirm": "提供",
+      "offerQuantityAll": "全部提供",
+      "offerRemoveTitle": "移除 {item}",
+      "offerRemoveInput": "要移除的数量",
+      "offerRemove": "移除",
+      "offerRemoveAll": "全部移除",
       "woc": {
         "tabGold": "金币",
         "tabWoc": "$WOC",
@@ -1516,6 +1579,7 @@ export const zh_CN: EnTranslations = {
       "name_rallycart_rxt": "拉力卡丁车 RXT",
       "name_terrorspark_groundshaker": "骇雷撼地者",
       "name_drakemaw_raptor": "龙喉迅猛龙",
+      "name_avian_strider": "苍翠谷行者",
       "name_mech_bird": "发条机械鸟",
       "name_lanternback_troll": "提灯背者格伦博",
       "name_chimeglass_tortoise": "钟晶的托利弗",
@@ -1532,6 +1596,7 @@ export const zh_CN: EnTranslations = {
       "desc_rallycart_skin": "一辆小巧的拉力赛车，轰鸣声却震天响。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
       "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。",
+      "desc_avian_strider": "高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。",
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
       "desc_lanternback_troll": "被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。",
       "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
@@ -1702,6 +1767,15 @@ export const zh_CN: EnTranslations = {
       "shaderWarmOff": "关闭",
       "shaderWarmOn": "开启",
       "shaderWarmNote": "在后台预热着色器缓存，以避免游戏中出现卡顿。自动：仅在你的图形系统支持时启用（推荐）。开启：在所有环境中强制启用，在部分配置上可能会让性能变差。关闭：不启用。",
+      "frameRateCap": "帧率上限",
+      "frameRateCapAuto": "自动",
+      "frameRateCapDisplay": "显示器",
+      "frameRateCapSixty": "60",
+      "frameRateCapThirty": "30",
+      "frameRateCapNote": "限制游戏每秒绘制的画面数量。如果电脑跟不上显示器的速度，较低的上限会让画面更平稳，也能让电脑更凉爽。上限会跟随你的显示器，因此实际数值可能与数字略有不同。自动：仅当这台电脑跟不上显示器时才降低上限，之后保持稳定（推荐）。显示器：不限制。",
+      "frameRateCapStatusPaced": "正在 {hz} Hz 的显示器上每秒绘制 {fps} 帧。",
+      "frameRateCapStatusUnpaced": "限制为每秒 {fps} 帧。",
+      "frameRateCapStatusInert": "此显示器的刷新率已不高于该上限，因此上限不会带来任何变化。",
       "gpuBackend": "图形后端",
       "gpuBackendAuto": "自动",
       "gpuBackendVulkan": "Vulkan",
@@ -1735,7 +1809,7 @@ export const zh_CN: EnTranslations = {
       "stopAutoAttackOnTargetSwitch": "切换目标时停止自动攻击",
       "walkByAutoloot": "路过自动拾取",
       "groundReticle": "地面瞄准指示圈",
-      "mouseoverCast": "队伍头像上鼠标悬停施法",
+      "mouseoverCast": "鼠标悬停队伍和焦点框体施法",
       "stickyTarget": "点击地面时保留目标",
       "showItemLevel": "显示物品等级",
       "showReliquaryTracker": "显示圣物库追踪器",
@@ -1838,7 +1912,8 @@ export const zh_CN: EnTranslations = {
       "crossHotbarEditHelp": "按住左肩键并按上方面键，即可用手柄整理十字热键栏。"
     },
     "perf": {
-      "title": "性能监视器",
+      "title": "性能",
+      "overlaySection": "性能监视器",
       "enable": "显示性能监视器",
       "description": "选择要显示的信息、监视器的位置及其外观。",
       "sectionPosition": "位置",
@@ -2585,6 +2660,15 @@ export const zh_CN: EnTranslations = {
       "tooLarge": "该报告过大，无法发送。请去掉截图后重试。",
       "rateLimited": "你最近已发送多份报告。请稍后再发送。",
       "failed": "无法发送错误报告。请重试。"
+    },
+    "hostDiag": {
+      "title": "系统报告",
+      "intro": "将这台电脑的详细信息(包括占用最多处理器和内存的程序)收集到一个文件中，帮助诊断性能问题。不会发送任何内容：该文件只保存在你的电脑上。",
+      "create": "生成系统报告",
+      "running": "正在收集系统信息...",
+      "saved": "报告已保存为 {fileName}。",
+      "savedNoName": "报告已保存。",
+      "failed": "无法创建报告。请重试。"
     },
     "paperdoll": {
       "unequipAria": "卸下 {item}",
@@ -3498,6 +3582,8 @@ export const zh_CN: EnTranslations = {
       "label": "重置框体位置"
     },
     "interfaceUnlock": {
+      "combineTrackers": "合并追踪框体",
+      "combineAuras": "合并光环框体",
       "label": "编辑框体",
       "unlock": "解锁界面",
       "lock": "锁定界面",
@@ -3508,6 +3594,8 @@ export const zh_CN: EnTranslations = {
       "lockFrame": "锁定此框体",
       "resizeFrame": "调整此框体大小",
       "frameNames": {
+        "trackerGroup": "任务追踪器",
+        "auraGroup": "光环与目标效果",
         "actionBar1": "动作条",
         "actionBar2": "动作条 2",
         "actionBar3": "动作条 3",
@@ -3637,6 +3725,15 @@ export const zh_CN: EnTranslations = {
         "socket": "已为{name}镶嵌一颗宝石。",
         "socketReplaced": "已将宝石镶入{name}；{gem}已被摧毁。"
       }
+    },
+    "lootQuality": {
+      "ordinary": "普通",
+      "superior": "优良",
+      "exceptional": "卓越",
+      "magnificent": "华丽",
+      "transcendent": "超凡",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}：+{levels} 物品等级。强化后仍会保留。"
     },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}",
@@ -6284,6 +6381,7 @@ export const zh_CN: EnTranslations = {
       "rowBrightness": "调整场景曝光，偏暗或偏亮，纯看个人喜好。",
       "rowWeather": "环境雨雪。纯氛围效果，关闭后在暴风雨天能省下一点性能。",
       "rowBrowserEffects": "决定界面本身可以多华丽：玻璃模糊、辉光、菜单动画。“自动”会根据你的浏览器自行匹配；无论怎么选，3D 世界都不受影响。",
+      "rowFrameRateCap": "游戏每秒绘制画面数量的上限。跟不上显示器的电脑会落入不均匀的节奏；稳定的 30 看起来比那更流畅，工作量减半，电脑也更凉爽。“显示器”表示不限制。",
       "rowTerrainDetail": "细腻混合的地表纹理，或更简洁、更省性能的地形外观，二选一。",
       "rowFoliageDensity": "决定角色周围的草地长多远、长多密。",
       "rowEffectsQuality": "泛光、环境光遮蔽，以及有多少火把和法术投出真实光照。细节旋钮中单项节省最大的一个，也是其余光照旋钮所依赖的那个开关。",
@@ -6291,7 +6389,7 @@ export const zh_CN: EnTranslations = {
       "rowFrostedPanels": "在窗口背后加一层毛玻璃模糊。效果漂亮，但也正是性能较弱的浏览器最吃力的那类特效；想要经典的清爽外观就保持关闭。",
       "rowReduceMotion": "移除界面动画，让窗口即刻显示。它首先是一项无障碍选项，顺带还有一点性能收益。",
       "rowPerfOverlay": "在屏幕上实时显示 FPS、帧时间等数据。调校本页选项时先打开它，调完再隐藏。",
-      "tableFoot": "在找帧数上限？没什么可找的：帧的节奏跟随你的显示器。绘制距离是一个单独的旋钮，即世界细节卡片中的“视野距离”，每个预设都会替你设定它，直到你亲自调动为止。",
+      "tableFoot": "绘制距离是一个单独的旋钮，即世界细节卡片中的“视野距离”，每个预设都会替你设定它，直到你亲自调动为止。",
       "mobileTitle": "手机与平板",
       "mobileBody": "在手机或平板上，游戏会让你从 Low 起步。所有触屏设备首次启动时都会落在这一档，这是刻意为之，好让你进入世界开始游玩；随时可以在图形面板中自行调高。在安卓浏览器上整条阶梯都向你敞开，你的选择也会保留。在 iPhone 和 iPad 上你依然可以选择最高的几档预设，按下“应用”后它们会立即生效，但游戏会在你下次启动时把你退回 High，因为 iOS 可能在构建这么大的场景时终止标签页。下载的应用更为收紧：它的预设列表止于 High，各项系统旋钮也被隐藏，因为应用会自行管理它们。",
       "touchBody": "在触屏上，图形面板会多出一张专属的触控操作卡片：摇杆大小与死区、屏幕按键大小、操作控件的不透明度、可选的镜头摇杆、供左手玩家使用的镜像布局，以及反转的触控视角，好让屏幕迁就你的双手，而不是反过来。",
@@ -6397,6 +6495,7 @@ export const zh_CN: EnTranslations = {
       "allyRezBody": "你并不总是得自己走回去。拥有复活法术的盟友可以把你扶起来，它会以一个提示的形式送到你面前，由你接受或拒绝；放着不管它就会过期，所以趁它还在时给个答复。接受之后，你会带着一部分生命与法力，在施法的那位朋友身旁站起来。有些治疗者可以一次向倒下的整支队伍发出邀请，不过你们每个人仍要各自回应自己的提示。荆谷原野是唯一的例外：那里没有任何复活法术能触及你，你只能等待己方的下一波复活潮。",
       "unstuckTitle": "当你真的被困住时",
       "unstuckBody": "如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。代价是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。",
+      "unstuckBodyWindow": "如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。一小时内的首次使用不付任何代价。若在上次使用后一小时内再次使用，代价便是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。",
       "climbTitle": "翻上岩架",
       "climbBody": "岩架并不是墙。跳向某个高得踩不上去的东西时，你的角色会在跳跃接近顶点时抓住边沿，并翻身上去，不需要按下任何专门的按键。凡是你自己就能跨过的低矮障碍，都会被平平常常地略过；完整的引体上翻只留给高过你头顶的边沿。这个动作很短，而且在进行时会接管你的操控，因此你无法中途改变方向。若在翻越途中被击晕，你会松手坠落，坠落距离从起跳的地面算起；而击晕或定身会让翻越根本无法开始，这一点在你想从一场恶战的困境中脱身时很值得记住。"
     },
@@ -6422,6 +6521,7 @@ export const zh_CN: EnTranslations = {
       "framesMoveBodyEditFrames": "你的框体、目标框体和队伍框体都可以移动。每个框体角上都有一个小小的移动按钮：解开它，把框体拖到你想要的位置，再锁上，这样一次误点就挪不动它。界面选项里“头像框”标签页顶部的“编辑框体”会一次松开界面的其余部分，这三个框体也随之一起松开：动作条、施法条、挥击条、经验条、小地图、按钮栏、宠物框体、姿态条、增益行与减益行，还有“愿望单提醒”小标签，松开期间每一件都挂着自己的名牌。如果挪到了让你后悔的地方，同一个“头像框”标签页底部的“恢复默认”会把它们统统弹回最初的位置。",
       "framesGovernedExtra": "“编辑框体”还会一并松开下方的追踪器堆栈(你追踪的任务及其目标、你的功绩进度、你的圣物库页面、你从制作中置顶的配方、你所在的探秘、你正在参与的任何裂隙，以及你正在追踪的配方或委托)、宠物框体旁的宠物动作条、显示你对附近敌人所施减益的“目标减益”框体、圣骑士的“虔诚”勋章、术士的“痛苦资源条”、法术触发浮层、双持武器时的副手挥击条，以及带标签页的伤害统计窗口，松开期间每一件都挂着自己的名牌。",
       "framesGovernedAuraTracks": "“编辑框体”还会松开六条可选的光环轨道，前提是你已在同一“界面”选项的“战斗”页中开启它们：“我的增益”轨道、“防御性冷却”轨道、“我的护盾”轨道、“攻击性冷却”轨道、“移动与潜行”轨道，以及“我给队友的增益”轨道。所有轨道默认关闭，松开期间每一条都挂着自己的名牌。",
+      "frameGroups": "{trackers}可合并任务、功绩、裂隙、地下探索、采集目标和圣物匣追踪。{auras}可合并目标持续伤害和六种光环追踪。在框体设置中分别开启合并，关闭则可单独移动。{tot}有资源条。{focus}的三个目标可以独立移动：Shift+F1至F3设置，Ctrl+F1至F3选中。伤害和威胁统计即使在框体锁定时，也可拖动按钮以外的区域移动，拖动边缘调整大小。解锁后，独立的框体显示菜单按组控制显示。右键框体可重置大小或打开相关设置。界面中的框体页也包含通用设置和可折叠的队伍设置。关闭“将目标的目标锁定到目标”可独立移动它，重新开启仍保留独立位置。设置焦点后，设置按钮和说明会隐藏。右键选择“清除焦点”可恢复默认状态。鼠标悬停施法同样适用于焦点框体。",
       "framesGovernedTalkingHead": "“编辑框体”也会解锁对话面板：当某个 NPC 不在你的视野内时，它承载该 NPC 说出的台词；处于解锁状态时它会显示自己的名称标签。",
       "barsTitle": "各类条、计时与战斗文字",
       "barsBody": "你施法或引导时，施法条会出现在屏幕中央、动作条正上方，并带着法术的名称与剩余时间。你的目标在它自己的框体上也有一条施法条，好让你看清接下来会发生什么并作出应对。\n\n施法条下方是一条细细的挥击条，它在你两次武器挥击之间填充，让近战或远程攻击者看清下一次自动攻击何时落下。\n\n你的经验条横贯动作条下方的整个宽度，被刻成一段一段，其中较亮的一截表示你已经存下的休息经验。\n\n潜入水下时，屏幕顶部会出现一条蓝色的呼吸条。头没在水里时它会一直下降，耗尽后会闪红并让你开始溺水，而你一浮出水面它就迅速回满。空格键让你上浮，下潜键（默认为 Ctrl）带你潜得更深。\n\n伤害与治疗会以小小的数字从命中之处向上飘起，让你不必读文字也能看懂一场战斗。聊天框里的“战斗”标签页保留着完整的文字记录。",
@@ -6570,6 +6670,7 @@ export const zh_CN: EnTranslations = {
       "dungeonReset": "放弃你自己名下的空副本，也就是改完难度之后要做的那件事。",
       "groupRecovery": "脱困与状态",
       "unstuck": "被世界困住时的那条出路。站定不动熬过一段短暂的倒计时，你就会被移动到最近的墓地；若你已经倒下，还会在那里被复活。事后你会带着脱困后遗症虚弱一阵子，因此它是最后的手段，而不是捷径。",
+      "unstuckWindow": "被世界困住时的那条出路。站定不动熬过一段短暂的倒计时，你就会被移动到最近的墓地；若你已经倒下，还会在那里被复活。一小时内的首次使用不付代价。若在上次使用后一小时内再次使用，事后你会带着脱困后遗症虚弱一阵子，因此它是救援手段，而不是捷径。",
       "afk": "把自己标记为暂离，并可附上一条留言，任何密语你的人都会收到它作为自动回复。不带留言再输入一次即可清除；任何其他聊天也会清除它。",
       "dnd": "请勿打扰：与暂离类似，只是发给你的密语会被拦下，而不是送达。",
       "sit": "就地坐下，以及重新站起来。只要你移动、施法或挨了一下，就会自动站起。",
@@ -6676,6 +6777,7 @@ export const zh_CN: EnTranslations = {
       "fatigueDef": "向外海游得够远，海水便开始抽走你的力气：先是一声警告，随后伤害不断加重，直到你转身游回陆地。",
       "unstuckTerm": "脱困虚弱",
       "unstuckDef": "从游戏菜单里使用“脱困”所要付出的代价。站着别动，等倒计时走完，它会把你放在最近的墓地，而此后一段时间里，你会带着一层临时的虚弱。",
+      "unstuckDefWindow": "一小时内不止一次依赖游戏菜单里的“脱困”所要付出的代价。站着别动，等倒计时走完，它会把你放在最近的墓地。一小时内的首次使用不付代价，而在上次使用后一小时内再次使用，此后一段时间里你还会带着一层临时的虚弱。",
       "itemLevelTerm": "物品等级",
       "itemLevelDef": "一个概括装备强弱的数字，想快速比较两件装备时很好用。在选项中开启“显示物品等级”，就能在提示中看到它。只有来源明确的装备才带着它，因此商人处的普通货色与新手装备什么都不显示，缺了这个数字属于正常，而不是出了毛病。",
       "requiredLevelTerm": "需求等级",
@@ -9939,6 +10041,11 @@ export const zh_CN: EnTranslations = {
       "quit": "退出",
       "fatalBody": "World of ClaudeCraft 遇到意外错误，需要关闭。"
     },
+    "hostDiag": {
+      "saveTitle": "保存系统报告",
+      "saveButton": "保存",
+      "fileType": "JSON 文件"
+    },
     "titlebar": {
       "exitGame": "退出游戏"
     }
@@ -9989,6 +10096,11 @@ export const zh_CN: EnTranslations = {
     "inWorld": "在世界中",
     "takeOver": "接管",
     "inWorldHint": "已在世界中。请在别处登出，或接管会话。",
+    "currentLocation": "当前位置：{zone}",
+    "lockouts": "锁定（{count}）",
+    "lockoutRaids": "团队副本",
+    "lockoutDungeons": "地下城",
+    "lockoutWorldBosses": "世界首领",
     "takeOverConfirm": "这将使该角色从另一个会话断开并切换到此处。是否继续？",
     "renameRequired": "需要改名",
     "delete": "删除",
@@ -10533,6 +10645,7 @@ export const zh_CN: EnTranslations = {
       "deathRecapDrowned": "你已经死亡。你淹死了。",
       "deathRecapCauterized": "你已经死亡。灼烧术的烈焰吞噬了你。",
       "respawn": "你再次感到精力恢复、身体完整。",
+      "respawnKeeperToll": "灵魂医者复活了你，但你因此变得虚弱：在复活后遗症消退之前，你的所有属性都会被削弱。",
       "ignoringChat": "已屏蔽来自 {name} 的聊天。",
       "noLongerIgnoring": "不再屏蔽 {name}。",
       "playerNotNearby": "该玩家不在附近。",
@@ -10570,6 +10683,7 @@ export const zh_CN: EnTranslations = {
       "cantInForm": "{form}形态下无法这样做。",
       "bear": "巨熊",
       "cat": "猫",
+      "bearOrCat": "熊或猫",
       "travel": "迅捷",
       "shapeshifted": "变形状态下不能这样做。",
       "stealthed": "你必须处于潜行状态。",
@@ -10901,7 +11015,8 @@ export const zh_CN: EnTranslations = {
     },
     "forms": {
       "bear": "熊",
-      "cat": "猫"
+      "cat": "猫",
+      "bearOrCat": "熊或猫"
     },
     "cast": {
       "fishing": "钓鱼",
@@ -12033,6 +12148,18 @@ export const zh_CN: EnTranslations = {
       "thunder_reservoir": {
         "name": "雷霆蓄能",
         "description": "被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）"
+      },
+      "lightning_overload": {
+        "name": "电弧超载",
+        "description": "被动：电弧箭和叉状闪电有20%的几率超载，对其第一个目标再次造成所造成伤害的50%，并获得1层雷霆。（雷霆召唤）"
+      },
+      "lava_burst": {
+        "name": "熔岩爆裂",
+        "description": "造成{damage}点火焰伤害。对身上带有你的余烬震击燃烧效果的目标必定造成致命一击。熔岩涌动：余烬震击每次跳动有20%的几率重置此技能的冷却时间，并使你在10秒内的下一次熔岩爆裂变为瞬发。伤害随法术强度提高。（雷霆召唤）"
+      },
+      "thunderstorm": {
+        "name": "风暴破击",
+        "description": "召唤一声霹雳，对10米内的敌人造成{damage}点自然伤害，并使其移动速度降低50%，持续5秒。恢复你最大法力值的8%。伤害随法术强度提高。（雷霆召唤）"
       },
       "rockbiter_weapon": {
         "name": "缚石武器",
@@ -14545,6 +14672,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "骇雷撼地者点火钥匙"
+      },
+      "reins_avian_strider": {
+        "name": "苍翠谷行者的缰绳"
       },
       "reins_goblin_rocket_sled": {
         "name": "哥布林火箭雪橇点火钥匙"
@@ -20334,6 +20464,7 @@ export const zh_CN: EnTranslations = {
       "eastbrook_vale": {
         "name": "东溪谷",
         "welcome": "去镇上找雷德布鲁克元帅，他有任务交给你。",
+        "welcomeDone": "雷德布鲁克元帅已没有任务交给你了 - 这座你踏上旅途的古朴海滨小镇因你而安宁。",
         "pois": {
           "0": {
             "label": "东溪"
@@ -20379,6 +20510,7 @@ export const zh_CN: EnTranslations = {
       "mirefen_marsh": {
         "name": "泥沼湿地",
         "welcome": "到芬桥大门向守望者芬威克报到。",
+        "welcomeDone": "守望者芬威克已没有命令交给你了 - 这处沼泽湿地深处的聚落因你而更加安全。",
         "pois": {
           "0": {
             "label": "芬桥"
@@ -20409,6 +20541,7 @@ export const zh_CN: EnTranslations = {
       "thornpeak_heights": {
         "name": "荆峰高地",
         "welcome": "瑟萨莉队长勉强守住高望城墙。",
+        "welcomeDone": "瑟萨莉队长守卫着高望城墙 - 从来都不轻松，但有了像你这样的冒险者相助，如今总算应付得来。",
         "pois": {
           "0": {
             "label": "高望"
@@ -21261,8 +21394,8 @@ export const zh_CN: EnTranslations = {
       },
       "stormkindled": {
         "name": "燃暴礼装",
-        "bonus2": "焰烙状态下的释放武器获得 3 层雷霆。受到伤害不再延迟你的施法。",
-        "bonus4": "大地震击的每层雷霆加成提高至 30%。"
+        "bonus2": "电弧超载的触发几率提高至 30%。受到伤害不再延迟你的施法。",
+        "bonus4": "大地震击的每层雷霆加成提高至 30%，熔岩爆裂造成的伤害提高 20%。"
       },
       "vale_arcanist": {
         "name": "谷地秘法师法衣",

@@ -1896,19 +1896,18 @@ describe('client HTML shell', () => {
     // On a phone the browser only synthesizes 'click' for the primary pointer,
     // so a bare click binding goes dead while another finger is down (a held
     // movement joystick when the player dies mid-run), stranding them on the
-    // death overlay (issue 1484). All three buttons must use bindTouchTap.
+    // death overlay (issue 1484). Both buttons must use bindTouchTap (the Pale
+    // Keeper's raise has no button: the ghost talks to the Keeper).
     expect(hudTs).toContain('bindTouchTap(this.releaseSpiritBtnEl, () => {');
     expect(hudTs).toContain(
       'bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());',
     );
-    expect(hudTs).toContain(
-      'bindTouchTap(this.resurrectHealerBtnEl, () => this.requestSpiritHealerResurrect());',
-    );
+    expect(hudTs).not.toContain('resurrectHealerBtnEl');
     expect(mainTs).toContain(
       'hud.onResurrectAtSpiritHealer = () => {\n    void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);\n  };',
     );
     expect(hudTs).not.toMatch(
-      /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl|resurrectHealerBtnEl)\.addEventListener\('click'/,
+      /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl)\.addEventListener\('click'/,
     );
   });
 
@@ -2357,7 +2356,7 @@ describe('client HTML shell', () => {
     expect(drawerTitleBody).toContain('min-height: 48px;');
     expect(drawerTitleBody).toContain('margin-bottom: 8px;');
     expect(drawerTitleBody).toContain('padding-bottom: 6px;');
-    expect(drawerTitleBody).toContain('cursor: move;');
+    expect(drawerTitleBody).toContain('cursor: var(--cursor-move, move);');
     // Smaller than the old 560px cap: the More tray only holds short pill
     // buttons now, not a wide desktop-style panel.
     expect(hudMobileCss).toContain(
@@ -3790,7 +3789,13 @@ describe('the legacy .btn plate never outranks the library', () => {
         '<button type="button" class="btn ui-btn ui-btn--red ui-btn--lg" id="release-btn"',
       );
       expect(entry).toContain('class="btn ui-btn" id="resurrect-corpse-btn"');
-      expect(entry).toContain('class="btn ui-btn" id="resurrect-healer-btn"');
+      // The Pale Keeper's raise has no ghost-prompt button: the ghost talks to the
+      // Keeper (world click / interact key), and a standing top line names both
+      // ways back.
+      expect(entry).not.toContain('id="resurrect-healer-btn"');
+      expect(entry).toContain(
+        '<div id="ghost-hint" class="ui-cin" role="status" aria-live="polite" data-i18n="hudChrome.death.ghostHint">',
+      );
     }
   });
 });

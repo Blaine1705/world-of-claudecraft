@@ -1179,10 +1179,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // The arrange-mode border hit test (edgeAt) reads a CACHED wrap box derived
   // from the applied placement (refilled by apply()/ensureGeometry, nulled on
   // viewport resize), so hovering the unlocked chat box costs no layout read
-  // per pointermove; the five reads are the drag/resize measures.
+  // per pointermove; five reads are drag/resize measures. Two more measure the
+  // CSS default box once after the explicit Reset Size action clears custom dimensions.
   {
     file: 'hud/chat/chat_geometry_controller.ts',
-    reflowAllow: { '.getBoundingClientRect': 5 },
+    reflowAllow: { '.getBoundingClientRect': 7 },
     driverAllow: {},
   },
   {
@@ -2954,6 +2955,7 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           aiming: false,
           procGlow: false,
           empowered: false,
+          naturesBoonGlow: false,
           ascensionSpender: false,
           ascensionCostLabel: '',
           fateConsumeReady: false,

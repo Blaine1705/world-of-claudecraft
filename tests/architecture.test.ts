@@ -209,6 +209,16 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/frame_presets_core.ts',
+  'src/ui/frame_menu_core.ts',
+  'src/ui/loot_quality_view.ts',
+  'src/ui/item_combat_tooltip_view.ts',
+  // The zone-entry chat line (welcome hint vs the town-done line); the
+  // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
+  'src/ui/zone_entry_line_core.ts',
+  // The Pale Keeper's two-step revive copy (dialogue, then a level-aware confirm);
+  // hud.ts resolves the keys and owns the dialog DOM.
+  'src/ui/keeper_revive_dialog_core.ts',
   // The one clamp and disabled rule the source picker's row steppers and the
   // bank quantity prompt share (quantity_stepper.ts is their DOM consumer).
   'src/ui/quantity_step_core.ts',
@@ -265,6 +275,9 @@ const UI_PURE_CORES = [
   'src/ui/log_event_route.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/unit_portrait.ts',
+  // Which body a player entity's frame shows (mech, composed, stock) and the
+  // matching rule for a landed portrait; unit_portrait_painter.ts draws it.
+  'src/ui/player_portrait_core.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
@@ -305,6 +318,7 @@ const UI_PURE_CORES = [
   'src/ui/target_flair_line_view.ts',
   'src/ui/meters_breakdown_view.ts',
   'src/ui/interface_unlock_core.ts',
+  'src/ui/focus_targets_core.ts',
   'src/ui/interface_visibility_core.ts',
   'src/ui/interface_unlock_menu_core.ts',
   'src/ui/touch_frame_drag_core.ts',
@@ -613,6 +627,10 @@ const UI_PURE_CORES = [
   'src/ui/tooltip_line_core.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
+  // Which authored contact beat a damage floater rides, and how long it waits. The
+  // beat table is INJECTED by the painter (it lives in src/game, a layer a pure core
+  // may not import), so this core imports nothing at all.
+  'src/ui/fct_stage_core.ts',
   'src/ui/honor_float_view.ts',
   'src/ui/heal_landing_feedback_core.ts',
   'src/ui/block_landing_feedback_core.ts',
@@ -638,15 +656,25 @@ const UI_PURE_CORES = [
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
   'src/ui/hud/cross_hotbar/cross_hotbar_view.ts',
+  // The System Report section's phase machine and its result table: the whole
+  // shell-verdict-to-copy mapping, keys only, so the table is asserted as data.
+  'src/ui/host_diag_view.ts',
   'src/ui/dpad_nav_core.ts',
   'src/game/graphics_rebuild_core.ts',
   'src/game/presentation_gate.ts',
   'src/game/stale_chrome_focus.ts',
   'src/game/perf_diagnosis_core.ts',
+  // Imported by the diagnosis core above: the purity scan does not follow imports.
+  'src/game/perf_frame_health_core.ts',
   'src/game/post_entry_warmups_core.ts',
   'src/game/perf_shader_warm_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  // Warrior audio cue tables shared by game, render and ui (PR 4139): pure data
+  // plus event discriminators, no DOM, no Three.
+  'src/game/fury_audio_core.ts',
+  'src/game/warrior_control_audio_core.ts',
+  'src/game/warrior_recovery_core.ts',
   // The Toggle Friendly Nameplates view pref (Ctrl+V): module state the input
   // layer owns and the nameplate painter reads, so render imports it as a game
   // leaf the same way it reads the tier knobs. Pure: no DOM, no sim, no renderer.
@@ -687,6 +715,15 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/ability_vfx/physical_choreography_core.ts',
+  'src/render/ability_vfx/signature_core.ts',
+  'src/render/ability_vfx/warrior_attention_core.ts',
+  'src/render/ability_vfx/warrior_insult_core.ts',
+  'src/render/camera_impact_core.ts',
+  'src/render/melee_impact_core.ts',
+  'src/render/warrior_fury_state_core.ts',
+  'src/render/warrior_power_core.ts',
+  'src/render/warrior_readiness_core.ts',
   'src/render/tree_hide_index_core.ts',
   'src/render/view_candidate_scan_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
@@ -780,6 +817,7 @@ const RENDER_PURE_CORES = [
   'src/render/character_effects_core.ts',
   'src/render/character_presentation_core.ts',
   'src/render/character_view_core.ts',
+  'src/render/chosen_cadence_pressure_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',
   'src/render/dashed_ring_core.ts',
@@ -2464,6 +2502,12 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/frame_presets_live.ts',
+  'src/ui/frame_editor_deps.ts',
+  'src/ui/frame_presets_controls.ts',
+  'src/ui/options_frame_settings.ts',
+  // Wires registered HUD roots to persistent movers and their live DOM homes.
+  'src/ui/hud_frame_registry.ts',
   // Mints the shared unit and bag-stack step buttons around a number input and
   // writes the input on a press; the rules are quantity_step_core.ts.
   'src/ui/quantity_stepper.ts',
@@ -2510,6 +2554,11 @@ const UI_DOM_MODULES = [
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/options_window_shell.ts',
   'src/ui/options_interface_rows.ts',
+  // Options > Performance > System Report: mints its own nodes (createElement)
+  // and reads the desktop bridge for its availability gate. Decisions live in
+  // the registered pure core src/ui/host_diag_view.ts; this half is nodes, one
+  // click handler and a class.
+  'src/ui/host_diag_section_controller.ts',
   'src/ui/options_main_menu_controller.ts',
   'src/ui/hud/talking_head/talking_head_controller.ts',
   'src/ui/char_skin_window.ts',

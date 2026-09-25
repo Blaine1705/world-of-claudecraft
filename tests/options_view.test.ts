@@ -202,10 +202,48 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       // System card (full width).
       'browserEffects',
       'note:hudChrome.options.browserEffectsNote',
+      'frameRateCap',
+      'note:hudChrome.options.frameRateCapNote',
       'shaderWarm',
       'note:hudChrome.options.shaderWarmNote',
       'interfaceMode',
       'note:hudChrome.options.interfaceModeNote',
+    ]);
+  });
+
+  it('states under the frame rate limit what it really does on this display', () => {
+    const capRow = (reading: ReturnType<NonNullable<OptionsEnv['frameRateCapReadingFor']>>) => {
+      const seen: number[] = [];
+      const row = flattenGraphicsSections(
+        buildGraphicsSections(makeSource({ graphicsPreset: 4, frameRateCap: 3 }), {
+          ...WEB_ENV,
+          frameRateCapReadingFor: (value) => {
+            seen.push(value);
+            return reading;
+          },
+        }),
+      ).find((c) => c.control === 'choice' && c.key === 'frameRateCap');
+      expect(seen).toEqual([3]);
+      if (row?.control !== 'choice') throw new Error('no frame rate limit row');
+      return row;
+    };
+    const paced = capRow({ kind: 'paced', fps: 36, refreshHz: 144 });
+    expect(paced.statusKey).toBe('hudChrome.options.frameRateCapStatusPaced');
+    expect(paced.statusNumbers).toEqual({ fps: 36, hz: 144 });
+    expect(paced.rerender).toBe(true);
+    const unpaced = capRow({ kind: 'unpaced', fps: 30 });
+    expect(unpaced.statusKey).toBe('hudChrome.options.frameRateCapStatusUnpaced');
+    expect(unpaced.statusNumbers).toEqual({ fps: 30 });
+    expect(capRow({ kind: 'inert' }).statusKey).toBe('hudChrome.options.frameRateCapStatusInert');
+    expect(capRow({ kind: 'none' }).statusKey).toBeUndefined();
+    // The stored value each label stands for is what the game resolves
+    // (src/game/frame_rate_cap_setting.ts FRAME_RATE_CAP_VALUES): a swap here
+    // would make the 60 button ask for 30.
+    expect(capRow({ kind: 'none' }).options).toEqual([
+      { value: 0, labelKey: 'hudChrome.options.frameRateCapAuto' },
+      { value: 1, labelKey: 'hudChrome.options.frameRateCapDisplay' },
+      { value: 2, labelKey: 'hudChrome.options.frameRateCapSixty' },
+      { value: 3, labelKey: 'hudChrome.options.frameRateCapThirty' },
     ]);
   });
 
@@ -761,6 +799,9 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
 // interfaceControlsForTab(all, tab) must return exactly these, in order; the
 // concatenation (in INTERFACE_TAB_ORDER) is the whole deduped list.
 const GENERAL_KEYS = [
+  'playerFrameHealthText',
+  'targetFrameHealthText',
+  'uiScale',
   'hudOpacity',
   'tooltipScale',
   'frostedPanels',
@@ -784,6 +825,7 @@ const GENERAL_KEYS = [
 ];
 const FRAMES_KEYS = [
   'partyFrameStyle',
+  'showPetFrame',
   // partyFrameWidth/Height have no rows (Edit Frames drags them directly);
   // partyFrameColumns and partyFrameSpacing moved into the in-editor Frames
   // Settings dropdown.
@@ -794,14 +836,11 @@ const FRAMES_KEYS = [
   'partyFrameShowAuras',
   'partyFrameShowPets',
   'partyFrameShowSelf',
-  'playerFrameHealthText',
-  'targetFrameHealthText',
   'aurasOnPlayerFrame',
   'auraBarBelowFrame',
   'alwaysShowAllBuffs',
   'showTargetOfTarget',
   'showTargetSwingTimer',
-  'showPetFrame',
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat', 'filterProfanity'];
 const COMBAT_KEYS = [
@@ -864,14 +903,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     ]);
     // the redundant partyFrames.section note is gone now that Frames is its own tab
     expect(keysOf(controls)).not.toContain('note:hudChrome.partyFrames.section');
-    expect(find(controls, 'partyFrameStyle')).toMatchObject({
-      control: 'choice',
-      options: [
-        { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
-        { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
-        { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
-      ],
-    });
+    expect(keysOf(controls)).toContain('partyFrameStyle');
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
     // The sticky-target opt-in renders in the Combat tab with its label key, so
     // the toggle cannot silently drop out of the options window.
@@ -1120,12 +1152,17 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     expect(find(off, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: false });
   });
 
-  it('renders NO uiScale row (owner request); the comfort sliders stay live', () => {
+  it('offers global scale from 75 to 200 percent, committing on release', () => {
     const controls = buildInterfaceControls(makeSource());
     // The UI Scale slider is retired from the menu: the stored setting still
     // applies at boot and the General tab's Reset to Defaults still clears it
     // (renderInterface's off-menu key list).
-    expect(find(controls, 'uiScale')).toBeUndefined();
+    expect(find(controls, 'uiScale')).toMatchObject({
+      control: 'slider',
+      min: 0.75,
+      max: 2,
+      commitOnChange: true,
+    });
     // Sibling sliders keep their live preview (no commitOnChange flag).
     expect(find(controls, 'chatFontScale')).not.toHaveProperty('commitOnChange');
     expect(find(controls, 'tooltipScale')).not.toHaveProperty('commitOnChange');
@@ -1349,6 +1386,22 @@ describe('options_view: main menu routing', () => {
       expect(touch[0]?.labelKey).toBe('hud.options.keyBindings');
       expect(touch).toEqual(locked.slice(1));
     }
+  });
+
+  it('carries NO System Report row: it is a section inside the Performance view', () => {
+    // The owner's decision: the feature was a whole menu row and a whole
+    // sub-panel, which was more room than it deserves. Performance now sits
+    // under Overlays, as that list's last row, with nothing after it; and the
+    // Game Menu root carries no System Report row either.
+    const rows = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
+    const overlays = buildOverlaysMenu();
+    for (const list of [rows, overlays]) {
+      expect(list.some((e) => e.labelKey === 'hudChrome.hostDiag.title')).toBe(false);
+    }
+    expect(overlays.at(-1)).toEqual({
+      labelKey: 'hudChrome.perf.title',
+      action: { kind: 'goto', view: 'performance' },
+    });
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {

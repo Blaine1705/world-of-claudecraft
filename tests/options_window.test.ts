@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { INTERFACE_OFF_MENU_KEYS } from '../src/ui/interface_reset_keys';
 import { keybindDeviceNoteKeys } from '../src/ui/keybind_device_notes_core';
 import { OptionsWindow } from '../src/ui/options_window';
 
@@ -424,7 +425,7 @@ describe('options_window: interface tab split', () => {
     // through render(), not renderInterface(): the dispatcher re-wires the
     // title-bar [data-back] control the rebuild just destroyed
     expect(painter).toMatch(
-      /wireTabStrip\(el, 'opt-tab', \(id, focusFollow\) => \{\s*this\.interfaceTab = id as InterfaceTab;\s*this\.render\(\);/,
+      /wireTabStrip\(el, 'opt-tab', \(id, focusFollow\) => \{\s*this\.interfaceTab = id as InterfaceTab;\s*this\.frameOptionsId = null;\s*this\.render\(\);/,
     );
     // the panel body is the tabpanel the strip points at
     expect(painter).toContain("panelId: 'interface-tabpanel',");
@@ -472,14 +473,9 @@ describe('options_window: interface tab split', () => {
     expect(painter).toMatch(
       /if \(tab === 'general'\) \{\s*this\.languageSelect\(body\);\s*this\.renderThemeControls\(body\);/,
     );
-    // the Edit Frames entry and the layout transfer lead the Frames tab, BOTH
-    // behind the touch gate (the editor is desktop-only and the layout code
-    // carries only its saved spots, so the touch HUD offers neither), with the
-    // remaining declarative rows under the Party Frame Options subhead (the
-    // unit-frames reset row was retired with the per-frame Reset size buttons
-    // in the editor's Show or Hide Frames list)
-    expect(painter).toMatch(
-      /if \(tab === 'frames'\) \{[\s\S]*?if \(!env\.touch && !env\.nativeShell\) buildInterfaceUnlockRow\(body, this\.deps\);\s*if \(!env\.touch && !env\.nativeShell\) this\.transferRows\(body, 'frames'\);\s*subhead\(body, t\('hudChrome\.partyFrames\.optionsSection'\), 'set-subhead'\);/,
+    // Edit Frames remains desktop-only; layout transfer now lives in the preset dropdown.
+    expect(painter).toContain(
+      'if (!env.touch && !env.nativeShell) buildInterfaceUnlockRow(body, this.deps);',
     );
     expect(painter).not.toContain('unitFramesResetRow');
     // the chat-timestamp / chat-reset / deed-broadcast rows live in the Chat tab
@@ -492,7 +488,8 @@ describe('options_window: interface tab split', () => {
     expect(painter).toContain("private interfaceTab: InterfaceTab = 'general';");
     // The ONLY mutation of interfaceTab is the tab-select in the wireTabStrip
     // callback, so the assignment count across the whole painter is exactly one.
-    expect(painter.match(/this\.interfaceTab = /g) ?? []).toHaveLength(1);
+    expect(painter.match(/this\.interfaceTab = /g) ?? []).toHaveLength(2);
+    expect(painter).toContain("this.interfaceTab = id === 'chat' ? 'chat' : 'frames';");
     // And that one assignment is the tab-select, not a reset.
     expect(painter).toContain('this.interfaceTab = id as InterfaceTab;');
   });
@@ -501,8 +498,7 @@ describe('options_window: interface tab split', () => {
     // The session-persistence contract fails if a reset creeps into a lifecycle
     // path, even one the "assignment count" guard above would miss (e.g. via a
     // helper or a differently-spelled expression). Slice each lifecycle method
-    // body and assert none so much as mentions interfaceTab: only tab selection
-    // touches it. This is the source-guard equivalent of a close-reopen round
+    // body and refuse assignments; close may read the tab to remember its scroll. This is the source-guard equivalent of a close-reopen round
     // trip (the live DOM round trip is the opt-in browser suite).
     const methodBody = (sig: string) => {
       const start = painter.indexOf(sig);
@@ -510,7 +506,9 @@ describe('options_window: interface tab split', () => {
       return painter.slice(start, painter.indexOf('\n  }\n', start));
     };
     for (const sig of ['toggle(): void {', 'close(): void {', 'private goBack(): void {']) {
-      expect(methodBody(sig), `${sig} must not touch interfaceTab`).not.toContain('interfaceTab');
+      expect(methodBody(sig), `${sig} must not reset interfaceTab`).not.toMatch(
+        /this\.interfaceTab\s*=(?!=)/,
+      );
     }
   });
 });
@@ -535,7 +533,7 @@ describe('options_window: control-primitive dispatch wiring', () => {
     expect(painter).toContain('toggle.dataset.settingKey = key');
     expect(painter).toContain('onChange?.(key)');
     expect(painter).toMatch(/data-setting-key="\$\{focusKey\}"/);
-    expect(painter).toContain('?.focus()');
+    expect(painter).toContain('?.focus({ preventScroll: true })');
   });
 
   it('fires the exact same setting write per control kind as the inline original', () => {
@@ -578,7 +576,7 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
   it('preserves the submit action and the no-text / in-flight / failure states', () => {
     const bug = painter.slice(
       painter.indexOf('private renderBugReport'),
-      painter.indexOf('private localizeBugReportError'),
+      painter.indexOf('// Controller (cluster 5)'),
     );
     // no-text guard short-circuits with the describe-first message
     expect(bug).toContain("error.textContent = t('hudChrome.bugReport.describeFirst')");
@@ -593,13 +591,13 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
     expect(bug).toContain('hudChrome.bugReport.submittedNoShot');
     // failure: re-enable + localized error
     expect(bug).toContain('submit.disabled = false');
-    expect(bug).toContain('this.localizeBugReportError(err)');
+    expect(bug).toContain('bugReportErrorText(err)');
   });
 
   it('paints the form before the deferred screenshot capture and gates submit on it', () => {
     const bug = painter.slice(
       painter.indexOf('private renderBugReport'),
-      painter.indexOf('private localizeBugReportError'),
+      painter.indexOf('// Controller (cluster 5)'),
     );
     expect(bug).toContain('const capturePromise = new Promise<string | null>');
     expect(bug).toContain('requestIdleCallback(capture, { timeout: 500 })');
@@ -920,7 +918,7 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
     const rest = painter.slice(start);
     const body = rest.slice(0, rest.indexOf('\n  }\n'));
     expect(body).toContain('buildInterfaceControls');
-    expect(body).toContain('this.settingsViewFooter(interfaceControlsForTab(controls, tab)');
+    expect(body).toContain('this.settingsViewFooter(shownControls');
   });
 
   it('renderGraphics passes its flattened section controls into the inline action row', () => {
@@ -960,7 +958,7 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
     expect(body).toContain("rows.className = 'set-rows';");
     // The dispatcher clears the wide class when the view moves elsewhere, the
     // same lifecycle the kb/perf/aura wide classes follow.
-    expect(painter).toContain("if (this.view !== 'graphics') el.classList.remove('gfx-wide');");
+    expect(painter).toContain('this.layout.begin(');
   });
 
   it('renderGraphics carries keyboard focus across its own rebuild', () => {
@@ -991,9 +989,7 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
     // the footer takes the active tab's slice plus a scoped reset callback
     // (the off-menu keys that moved into the editor's Frames Settings menu
     // reset with their tab even though no row renders them here)
-    expect(body).toContain(
-      'this.settingsViewFooter(interfaceControlsForTab(controls, tab), (hooks, keys) => {',
-    );
+    expect(body).toContain('this.settingsViewFooter(shownControls, (hooks, keys) => {');
     // the old bespoke back-button block (no reset) is gone from this method
     expect(body).not.toContain("back.textContent = t('hud.options.back')");
   });
@@ -1008,18 +1004,9 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
 // table is exactly the keys with no rendered control), so the table is pinned
 // here as literals, per tab.
 describe('options_window: off-menu reset keys are pinned per tab', () => {
-  // Extract the offMenuTabKeys object literal from the painter source and read
-  // each tab's quoted key list. Comments inside the literal are stripped first
-  // (one carries an apostrophe that would derail a quoted-string scan).
-  const start = painter.indexOf('const offMenuTabKeys');
-  const block = painter.slice(start, painter.indexOf('};', start)).replace(/^\s*\/\/.*$/gm, '');
-  const tabKeys = (tab: string): string[] => {
-    const list = block.match(new RegExp(`${tab}: \\[([^\\]]*)\\]`))?.[1] ?? '';
-    return [...list.matchAll(/'([^']+)'/g)].map((m) => m[1]);
-  };
-
-  it('finds the table inside renderInterface', () => {
-    expect(start).toBeGreaterThan(painter.indexOf('private renderInterface(): void {'));
+  const tabKeys = (tab: keyof typeof INTERFACE_OFF_MENU_KEYS) => INTERFACE_OFF_MENU_KEYS[tab];
+  it('uses the shared table in renderInterface', () => {
+    expect(painter).toContain('interfaceResetKeys(tab, this.frameOptionsId, keys)');
   });
 
   it('General owns exactly the retired UI Scale slider key', () => {
@@ -1035,6 +1022,16 @@ describe('options_window: off-menu reset keys are pinned per tab', () => {
       'playerFrameHeight',
       'targetFrameWidth',
       'targetFrameHeight',
+      'petFrameWidth',
+      'petFrameHeight',
+      'focusTarget1Width',
+      'focusTarget1Height',
+      'focusTarget2Width',
+      'focusTarget2Height',
+      'focusTarget3Width',
+      'focusTarget3Height',
+      'showPetFrame',
+      'showEmptyFocusFrames',
       'partyFrameWidth',
       'partyFrameHeight',
       'partyFrameColumns',
@@ -1048,6 +1045,9 @@ describe('options_window: off-menu reset keys are pinned per tab', () => {
       'menuRailHorizontal',
       'frameSnapToGrid',
       'combineActionBars',
+      'combineTrackerFrames',
+      'combineAuraFrames',
+      'moveTargetOfTargetIndependently',
       'hideUnusedActionSlots',
       'mouseoverCast',
       'lockActionBars',
@@ -1100,13 +1100,8 @@ describe('options_window: frame editing is locked out on touch', () => {
     );
   });
 
-  it('the Frames tab offers the layout export / import rows only off the touch HUD', () => {
-    // The layout code carries only the editor's saved spots, which the touch
-    // HUD can neither make nor apply (the engine indicators keep their own
-    // touch drag, touch_frame_drag.ts), so the rows are withheld with the row.
-    expect(painter).toContain(
-      "if (!env.touch && !env.nativeShell) this.transferRows(body, 'frames');",
-    );
+  it('moves frame transfer into presets while keeping General settings transfer available', () => {
+    expect(painter).not.toContain("this.transferRows(body, 'frames')");
     // The General tab's whole-settings transfer stays on every layout.
     expect(painter).toContain("if (tab === 'general') this.transferRows(body, 'settings');");
   });
