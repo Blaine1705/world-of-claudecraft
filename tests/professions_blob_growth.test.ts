@@ -2323,8 +2323,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // q_hub_healing_numbers) joining questsDone in this maximal fixture: 23 and
     // 21 characters as `"<id>",` in the sorted array (26 + 24 bytes). MEASURED,
     // not inferred, same as every other row this equation names.
+    // Plus 94 for the Eastbrook ferry's round-trip deed (exp_harbor_to_harbor)
+    // and its two ferry:<from>_<to> visit marks, earned in this maximal
+    // fixture: MEASURED on the ferry branch's tree.
     expect(counterfactualBytes - 156144).toBe(
-      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) + 183 + 1548 + 50 + 71,
+      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
+        183 +
+        1548 +
+        50 +
+        71 +
+        94,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2345,8 +2353,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       ),
       // questsDone moved from 50 to 100 against the SAME forgeBaseline reference
       // point: the +50 hub practice quest delta above, on top of the prior +50
-      // this row already carried.
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 32, deedStats: 21, reliquary: 80 });
+      // this row already carried. deeds +36 and deedStats +58 more for the
+      // Eastbrook ferry's round-trip deed and its two visit marks (the +94).
+    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 68, deedStats: 79, reliquary: 80 });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2359,7 +2368,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       Buffer.byteLength(JSON.stringify(preReleaseCounterfactual), 'utf8'),
       'field_kit and the Bramblehide release content removed, must reproduce the recorded pre-field-kit Crucible+hammer baseline',
-    ).toBe(209773);
+      // +94 for the Eastbrook ferry's round-trip deed and its two visit marks.
+    ).toBe(209867);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2374,7 +2384,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       counterfactualBytes,
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
-    ).toBe(211392);
+      // +94 for the Eastbrook ferry's round-trip deed and its two visit marks.
+    ).toBe(211486);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2428,8 +2439,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // over the 211,382 above, the same one new reins id, attributed through
     // the same devMountReleaseDelta isolation. Same standing rule, same 381
     // width: 211,024..211,405.
-    expect(bytes, reMint).toBeGreaterThan(211024);
-    expect(bytes, reMint).toBeLessThan(211405);
+    // RE-BASED for the Eastbrook ferry's Phase 2: 211,498 bytes, exactly +94
+    // over the 211,404 above: the round-trip deed (exp_harbor_to_harbor, +36
+    // in deeds) and its two ferry visit marks (+58 in deedStats), earned in
+    // this maximal fixture. Same standing rule, same 381 width:
+    // 211,118..211,499.
+    expect(bytes, reMint).toBeGreaterThan(211118);
+    expect(bytes, reMint).toBeLessThan(211499);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

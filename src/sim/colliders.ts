@@ -1442,6 +1442,8 @@ interface ColliderGrid {
 // built-in world's grid warm forever and lets swapped-out custom maps be
 // collected; the editor invalidates explicitly after mutating placements.
 const gridCaches = new WeakMap<WorldContent, Map<number, ColliderGrid>>();
+// Gate states requested before their grid was built (setColliderGateOpen).
+const pendingGateStates = new WeakMap<WorldContent, Map<number, Map<string, boolean>>>();
 
 /** Drop the cached collider grid for the ACTIVE world content (editor-only:
  * call after mutating its placements/props in place). */
@@ -1485,7 +1487,10 @@ function gridFor(seed: number): ColliderGrid {
   // for another world/seed can never leak its spots into this one's readers.
   bankerChestSpotsByGrid.set(grid, lastBuiltBankerChestSpots);
   // gated berths start in the clock-0 schedule state (transport_gates.ts)
-  const closedAtBuild = transportGatesClosedAtBuild();
+  const wished = pendingGateStates.get(content)?.get(seed);
+  const closedAtBuild = transportGatesClosedAtBuild().filter((g) => wished?.get(g) !== true);
+  for (const [g, open] of wished ?? []) if (!open) closedAtBuild.push(g);
+  pendingGateStates.get(content)?.delete(seed);
   for (const c of built) {
     if (c.gate !== undefined) {
       const gatedList = grid.gated.get(c.gate);
@@ -1551,7 +1556,17 @@ function registerInCells(grid: ColliderGrid, c: Collider, remove = false): void 
  * grid does not carry, is a no-op.
  */
 export function setColliderGateOpen(seed: number, gate: string, open: boolean): void {
-  const grid = gridFor(seed);
+  // Never BUILD a grid just to set a gate (a Sim that never queries collision
+  // would pay for a whole world): remember the wish, and gridFor applies it.
+  const content = getActiveWorldContent();
+  const grid = gridCaches.get(content)?.get(seed);
+  if (!grid) {
+    let wishes = pendingGateStates.get(content);
+    if (!wishes) pendingGateStates.set(content, (wishes = new Map()));
+    const bySeed = wishes.get(seed) ?? new Map<string, boolean>();
+    wishes.set(seed, bySeed.set(gate, open));
+    return;
+  }
   const list = grid.gated.get(gate);
   if (!list || grid.closedGates.has(gate) !== open) return;
   if (open) grid.closedGates.delete(gate);

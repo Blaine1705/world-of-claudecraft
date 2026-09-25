@@ -2036,11 +2036,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the keep wall-ledge and parapet loops retired and the Wildheart static set moved beside its field data. Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    // LOWERED 2548 -> 2499 at the Eastbrook ferry's Phase 2: the berth gate
-    // bookkeeping (setColliderGateOpen, gridIndex-ordered reopen) landed and
+    // LOWERED 2548 -> 2514 at the Eastbrook ferry's Phase 2: the berth gate
+    // bookkeeping (setColliderGateOpen, gridIndex-ordered reopen, lazy wishes) landed and
     // the decoration collider builder moved to decoration_collider.ts.
     // wc -l. Exact count.
-    ceiling: 2499,
+    ceiling: 2514,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

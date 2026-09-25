@@ -58,7 +58,9 @@ export class FerryHudPainter {
     } else if (m.line === 'sailing') {
       this.w.setText(els.line, t('hudChrome.ferry.sailing', { dest }));
     }
-    this.w.setDisplay(els.hint, m.hint ? 'block' : 'none');
+    // Visibility rides setStyleProp, not setDisplay: the hint node also carries
+    // its text, and two single-slot writers on one node would never elide.
+    this.w.setStyleProp(els.hint, 'display', m.hint ? 'block' : 'none');
     if (m.hint) this.w.setText(els.hint, t('hudChrome.ferry.boardHint'));
     this.w.setAttr(els.root, 'aria-label', t('hudChrome.ferry.regionLabel'));
     this.w.toggleClass(els.card, 'shown', m.card);
