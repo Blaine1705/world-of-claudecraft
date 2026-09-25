@@ -580,6 +580,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'swing_timer_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'aura_overlay_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/cooldown_manager/cooldown_manager_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
@@ -893,6 +894,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },
+  // The Cooldown Manager's twin of the above: one app-viewport rect when the player
+  // starts dragging the row while its Options sub-view is open. Pointer moves reuse
+  // it; the per-frame paint path makes no layout read.
+  {
+    file: 'hud/cooldown_manager/cooldown_manager_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
   // The scroll pair is the shape repeated across the windows: read the position before a
   // rebuild, write it back after, so the list does not jump under the player. Legitimate and
   // stable, granted per file, and the count is what makes a THIRD read in the same file (the
@@ -1179,10 +1188,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // The arrange-mode border hit test (edgeAt) reads a CACHED wrap box derived
   // from the applied placement (refilled by apply()/ensureGeometry, nulled on
   // viewport resize), so hovering the unlocked chat box costs no layout read
-  // per pointermove; the five reads are the drag/resize measures.
+  // per pointermove; five reads are drag/resize measures. Two more measure the
+  // CSS default box once after the explicit Reset Size action clears custom dimensions.
   {
     file: 'hud/chat/chat_geometry_controller.ts',
-    reflowAllow: { '.getBoundingClientRect': 5 },
+    reflowAllow: { '.getBoundingClientRect': 7 },
     driverAllow: {},
   },
   {
