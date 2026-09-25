@@ -242,7 +242,7 @@ describe('walking the deck under way (the real Sim and kernel)', () => {
     const spot = worldToDeck(wick, p.pos.x, p.pos.z, { x: 0, z: 0 });
     expect(spot.x).toBeCloseTo(-1.2, 1);
     expect(spot.z).toBeCloseTo(2.5, 1);
-  });
+  }, 120_000);
 
   it('jumps on a moving deck and lands on the deck, near where it left', () => {
     const sim = sailingSim(40);

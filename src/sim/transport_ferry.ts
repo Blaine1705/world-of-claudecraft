@@ -45,6 +45,9 @@
 
 import type { Collider } from './colliders';
 import { setColliderGateOpen } from './colliders';
+import { SHARED_FEAR_AURA_ID } from './combat/cc';
+import { finishChargeArrival } from './combat/charge_route';
+import { cancelValkyrsCalling } from './combat/paladin_valkyrs_calling';
 import { TRANSPORT_ROUTES, TRANSPORT_SHIP_HULLS } from './content/transport_ships';
 import { isBuiltinWorldActive } from './data';
 import { markVisited } from './deeds';
@@ -70,6 +73,8 @@ import { WATER_LEVEL } from './world';
 
 /** How far outside a boarding volume (gangway, gangplank) still counts as on it. */
 const BOARDING_MARGIN = 0.6;
+/** Ticks between the checks for a pet summoned mid-voyage (one a second). */
+const PET_SWEEP_TICKS = 20;
 
 /** The schedule clock: sim seconds plus the dev-only skip offset. */
 export function transportClock(ctx: SimContext): number {
@@ -107,18 +112,27 @@ function setDown(ctx: SimContext, p: Entity, landing: { x: number; z: number; fa
 function startRide(ctx: SimContext, route: TransportRouteDef, p: Entity, from: number): void {
   p.ferryRide = { route: route.id, from, to: 1 - from, ship: { ...poseNow } };
   forceDismount(ctx, p);
-  if (petOf(ctx, p.id, true)) {
-    stowPetForDelve(ctx, p.id);
-    p.ferryPetParked = true;
-  }
+  if (petOf(ctx, p.id, true)) parkPet(ctx, p);
 }
 
-/** Movement modes that steer by the static world never run on a moving deck. */
-function dropForcedMovement(p: Entity): void {
-  p.chargeTargetId = null;
+function parkPet(ctx: SimContext, p: Entity): void {
+  stowPetForDelve(ctx, p.id);
+  p.ferryPetParked = true;
+}
+
+/** Movement modes that steer by the static world never run on a moving
+ *  deck: a Charge in flight ends short (its arrival hooks settle as a miss,
+ *  the path the mover would take for a runner cut off), and a leap, a climb,
+ *  a Valkyr's Calling flight and a /follow end where they are. */
+function dropForcedMovement(ctx: SimContext, p: Entity): void {
+  if (p.chargeTargetId !== null) {
+    finishChargeArrival(ctx, p, ctx.entities.get(p.chargeTargetId) ?? null, false);
+    p.chargeTargetId = null;
+  }
   if (p.chargePath.length > 0) p.chargePath = [];
   p.leap = null;
   p.climb = null;
+  cancelValkyrsCalling(ctx, p);
   p.followTargetId = null;
 }
 
@@ -193,8 +207,17 @@ export function updateTransportFerries(ctx: SimContext): void {
         endRide(ctx, p);
         continue;
       }
-      if (!moving) continue;
-      const aboard = aboardDeck(hull, posePrev, WATER_LEVEL, p.pos.x, p.pos.y, p.pos.z);
+      if (!moving) {
+        // moored, and nothing moved it: a voyage still open here is stale (a
+        // dev clock jump onto a docked phase), over where they stand
+        if (ride) endRide(ctx, p);
+        continue;
+      }
+      // the cheap distance gate first: the whole realm walks this loop while
+      // the ship moves, and only a handful are anywhere near it
+      const aboard =
+        nearDeck(hull, posePrev, p.pos.x, p.pos.z) &&
+        aboardDeck(hull, posePrev, WATER_LEVEL, p.pos.x, p.pos.y, p.pos.z);
       if (castingOff && !ride && (onBoardingGear(hull, posePrev, p) || (aboard && p.dead))) {
         setDown(ctx, p, route.berths[phaseNow.from].landing);
         continue;
@@ -206,9 +229,14 @@ export function updateTransportFerries(ctx: SimContext): void {
       }
       carryWithDeck(posePrev, poseNow, p);
       if (sailing) {
-        if (ride) Object.assign(ride.ship, poseNow);
-        else startRide(ctx, route, p, phaseNow.from);
-        dropForcedMovement(p);
+        if (ride) {
+          Object.assign(ride.ship, poseNow);
+          // a pet called up mid-voyage goes back to the stash within the
+          // second (pets do not walk a moving deck; it returns on the far
+          // pier with the rest). Once a second: petOf walks every entity.
+          if (ctx.tickCount % PET_SWEEP_TICKS === 0 && petOf(ctx, p.id, true)) parkPet(ctx, p);
+        } else startRide(ctx, route, p, phaseNow.from);
+        dropForcedMovement(ctx, p);
         continue;
       }
       // moored this tick: the voyage is over where they stand
@@ -252,10 +280,11 @@ function deckStateAt(ctx: SimContext, clock: number): DeckState {
   }
   if (st.clock !== clock) {
     st.clock = clock;
-    TRANSPORT_ROUTES.forEach((route, i) => {
-      transportShipPoseAt(route, clock, (st as DeckState).poses[i], kernelPhase);
-      (st as DeckState).sailing[i] = kernelPhase.phase === 'sailing' && hullFor(route) !== null;
-    });
+    for (let i = 0; i < TRANSPORT_ROUTES.length; i++) {
+      const route = TRANSPORT_ROUTES[i];
+      transportShipPoseAt(route, clock, st.poses[i], kernelPhase);
+      st.sailing[i] = kernelPhase.phase === 'sailing' && hullFor(route) !== null;
+    }
   }
   return st;
 }
@@ -301,7 +330,11 @@ const COWER: MoveInput = emptyMoveInput();
  * done.
  */
 export function stepPassenger(deps: PlayerMotionDeps, p: Entity, input: MoveInput): boolean {
-  const feared = p.auras.some((a) => a.id === 'fear_incap' && a.kind === 'incapacitate');
+  let feared = false;
+  for (let i = 0; i < p.auras.length && !feared; i++) {
+    const a = p.auras[i];
+    feared = a.id === SHARED_FEAR_AURA_ID && a.kind === 'incapacitate';
+  }
   stepPlayerMotion(deps, p, feared ? COWER : input);
   return true;
 }
