@@ -559,13 +559,14 @@ describe('the Honor trickle', () => {
     expect(sim.meta(rival)!.honor).toBe(0);
   });
 
-  it('ramps with the hold and restarts at 1 a minute when the hill changes hands', () => {
+  it('ramps with the hold and restarts at the first step when the hill changes hands', () => {
     const { sim, pids } = hillWorld(['Aleph', 'Bet', 'Gimel']);
     const [a, b, c] = pids;
     inside(sim, a);
     tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
-    // Held past the cap: every minute now pays the capped amount.
-    tickSeconds(sim, 26 * 60);
+    // Held past the cap (the hold clock stands at 26 minutes rather than ticking
+    // 26 minutes of sim): every minute now pays the capped amount.
+    sim.hillState.active!.heldSeconds = 26 * 60;
     sim.events = [];
     const seen = tickSeconds(sim, HILL_ACCRUAL_SECONDS + 1);
     expect(honorEvents(seen, a)).toEqual([
