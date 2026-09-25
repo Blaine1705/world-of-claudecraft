@@ -28,7 +28,6 @@
 
 import * as THREE from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
   HARBOR_ROUTE_MARKERS,
   type HarborRouteMarkerDef,
@@ -37,7 +36,6 @@ import { harborRouteMarkerYaw } from '../sim/harbor_route_markers';
 import { groundHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { dequantizeAttribute } from './characters/dequantize_attribute';
 import { harborDestinationLabel } from './entity_labels';
 import { GFX, surfaceMat } from './gfx';
 import {
@@ -46,6 +44,12 @@ import {
   harborRouteMarkerPlateFan,
   harborRouteMarkerTextFaces,
 } from './harbor_route_marker_core';
+import {
+  addToBucket,
+  mergeVertexColourBuckets,
+  vertexColourMaterialConverter,
+  vertexColourMeshGeometry,
+} from './vertex_colour_glb_parts';
 
 const MARKER_URL = '/models/props/harbor_route_marker.glb';
 /** The plate canvas: wide like the painted panel (about 3 to 1). */
@@ -55,8 +59,6 @@ const PLATE_FONT_STACK = '"Cinzel", "Palatino Linotype", Palatino, Georgia, seri
 const PLATE_PAINT_TOP = '#f1e5c3';
 const PLATE_PAINT_BOTTOM = '#e4d3a6';
 const PLATE_INK = '#2b1d12';
-/** Warm lantern panes: the ferry's own glow (transport_ship.ts). */
-const GLOW_EMISSIVE = 0xff9a3c;
 /** The plate's fallback when the GLB anchor carries no extras (never in a
  *  shipped build: tests/harbor_route_marker_asset.test.ts pins them). */
 const FALLBACK_PLATE: HarborRouteMarkerPlate = {
@@ -105,33 +107,15 @@ interface MarkerTemplate {
 /** Templates by `effectsTier|standard`: a preset change converts anew. */
 const templates = new Map<string, MarkerTemplate>();
 let lastTemplate: MarkerTemplate | null = null;
-const convertedMaterials = new Map<string, THREE.Material>();
+const materials = vertexColourMaterialConverter();
 
 /** Drop the prepared templates (graphics-profile rebuilds convert materials
  *  anew; the parsed source and the painted plates survive). Registered in
  *  assets/graphics_profile.ts. */
 export function resetHarborRouteMarkerCaches(): void {
   templates.clear();
-  convertedMaterials.clear();
+  materials.clear();
   lastTemplate = null;
-}
-
-function convertMaterial(source: THREE.Material): THREE.Material {
-  const std = source as THREE.MeshStandardMaterial;
-  const glow = /glow/i.test(source.name);
-  const key = `${source.name}|${GFX.standardMaterials ? 's' : 'l'}`;
-  const cached = convertedMaterials.get(key);
-  if (cached) return cached;
-  const mat = surfaceMat({
-    color: 0xffffff,
-    vertexColors: true,
-    roughness: std.roughness ?? 0.85,
-    metalness: std.metalness ?? 0,
-    emissive: glow ? GLOW_EMISSIVE : 0x000000,
-    emissiveIntensity: glow ? (GFX.standardMaterials ? 1.9 : 1.0) : 1,
-  });
-  convertedMaterials.set(key, mat);
-  return mat;
 }
 
 function plateFromExtras(extras: unknown): HarborRouteMarkerPlate {
@@ -177,31 +161,15 @@ function buildTemplate(gltf: GLTF, keep: readonly string[]): MarkerTemplate {
     part.traverse((node) => {
       const mesh = node as THREE.Mesh;
       if (!mesh.isMesh) return;
-      const src = mesh.geometry;
-      const geo = new THREE.BufferGeometry();
-      for (const attr of ['position', 'normal', 'color'] as const) {
-        const a = src.getAttribute(attr) as THREE.BufferAttribute | undefined;
-        if (a) geo.setAttribute(attr, dequantizeAttribute(a));
-      }
-      if (src.index) geo.setIndex(src.index.clone());
-      geo.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inverse, mesh.matrixWorld));
-      const material = convertMaterial(mesh.material as THREE.Material);
-      let list = buckets.get(material);
-      if (!list) {
-        list = [];
-        buckets.set(material, list);
-      }
-      list.push(geo);
+      const frame = new THREE.Matrix4().multiplyMatrices(inverse, mesh.matrixWorld);
+      addToBucket(
+        buckets,
+        materials.convert(mesh.material as THREE.Material),
+        vertexColourMeshGeometry(mesh, frame),
+      );
     });
   }
-  const parts: MarkerPart[] = [];
-  for (const [material, geos] of buckets) {
-    const geometry = geos.length === 1 ? geos[0] : mergeGeometries(geos, false);
-    if (!geometry) continue;
-    for (const g of geos) if (g !== geometry) g.dispose();
-    geometry.computeBoundingSphere();
-    parts.push({ geometry, material });
-  }
+  const parts: MarkerPart[] = mergeVertexColourBuckets(buckets);
   const anchorNode = root.getObjectByName('DestinationTextAnchor');
   const anchor = new THREE.Vector3();
   if (anchorNode) anchor.setFromMatrixPosition(anchorNode.matrixWorld).applyMatrix4(inverse);

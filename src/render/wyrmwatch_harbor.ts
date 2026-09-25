@@ -14,12 +14,11 @@
 // world-entry compile links it with the rest of the props, and its distinct (geometry,
 // material) programs join the props material prewarm (wyrmwatchHarborPrewarmParts), so
 // a harbor first seen after the curtain links nothing in a live frame. The materials are
-// the surface family's vertex-coloured standard/lambert (the route marker's, the same
-// programs). Nothing here runs per frame.
+// the surface family's vertex-coloured standard/lambert (vertex_colour_glb_parts.ts,
+// shared with the route markers: the same programs). Nothing here runs per frame.
 
 import * as THREE from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
   WYRMWATCH_HARBOR_ORIGIN,
   WYRMWATCH_HARBOR_PATH,
@@ -28,8 +27,14 @@ import {
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { dequantizeAttribute } from './characters/dequantize_attribute';
-import { GFX, surfaceMat } from './gfx';
+import { GFX } from './gfx';
+import {
+  addToBucket,
+  mergeVertexColourBuckets,
+  type VertexColourPart,
+  vertexColourMaterialConverter,
+  vertexColourMeshGeometry,
+} from './vertex_colour_glb_parts';
 import {
   WYRMWATCH_PATH_STONE_PARTS,
   wyrmwatchHarborParts,
@@ -37,8 +42,6 @@ import {
 } from './wyrmwatch_harbor_core';
 
 const HARBOR_URL = '/models/props/wyrmwatch_harbor.glb';
-/** Warm lantern panes and the shack window: the ferry's own glow (transport_ship.ts). */
-const GLOW_EMISSIVE = 0xff9a3c;
 
 let loaded: GLTF | null = null;
 let loadTask: Promise<void> | null = null;
@@ -60,10 +63,7 @@ export function prepareWyrmwatchHarborAssets(): Promise<void> {
 
 if (typeof window !== 'undefined') registerDeferredPreload(prepareWyrmwatchHarborAssets);
 
-interface HarborPart {
-  geometry: THREE.BufferGeometry;
-  material: THREE.Material;
-}
+type HarborPart = VertexColourPart;
 
 interface HarborTemplate {
   /** The kept parts merged into one geometry per material, in the model's frame. */
@@ -75,57 +75,14 @@ interface HarborTemplate {
 /** Templates by `effectsTier|standard`: a preset change converts anew. */
 const templates = new Map<string, HarborTemplate>();
 let lastParts: HarborPart[] = [];
-const convertedMaterials = new Map<string, THREE.Material>();
+const materials = vertexColourMaterialConverter();
 
 /** Drop the prepared templates (graphics-profile rebuilds convert materials anew;
  *  the parsed source survives). Registered in assets/graphics_profile.ts. */
 export function resetWyrmwatchHarborCaches(): void {
   templates.clear();
-  convertedMaterials.clear();
+  materials.clear();
   lastParts = [];
-}
-
-function convertMaterial(source: THREE.Material): THREE.Material {
-  const std = source as THREE.MeshStandardMaterial;
-  const glow = /glow/i.test(source.name);
-  const key = `${source.name}|${GFX.standardMaterials ? 's' : 'l'}`;
-  const cached = convertedMaterials.get(key);
-  if (cached) return cached;
-  const mat = surfaceMat({
-    color: 0xffffff,
-    vertexColors: true,
-    roughness: std.roughness ?? 0.85,
-    metalness: std.metalness ?? 0,
-    emissive: glow ? GLOW_EMISSIVE : 0x000000,
-    emissiveIntensity: glow ? (GFX.standardMaterials ? 1.9 : 1.0) : 1,
-  });
-  convertedMaterials.set(key, mat);
-  return mat;
-}
-
-/** A mesh's geometry (dequantized) in the frame `frame` maps it into. */
-function meshGeometry(mesh: THREE.Mesh, frame: THREE.Matrix4): THREE.BufferGeometry {
-  const src = mesh.geometry;
-  const geo = new THREE.BufferGeometry();
-  for (const attr of ['position', 'normal', 'color'] as const) {
-    const a = src.getAttribute(attr) as THREE.BufferAttribute | undefined;
-    if (a) geo.setAttribute(attr, dequantizeAttribute(a));
-  }
-  if (src.index) geo.setIndex(src.index.clone());
-  geo.applyMatrix4(frame);
-  return geo;
-}
-
-function mergeBuckets(buckets: Map<THREE.Material, THREE.BufferGeometry[]>): HarborPart[] {
-  const parts: HarborPart[] = [];
-  for (const [material, geos] of buckets) {
-    const geometry = geos.length === 1 ? geos[0] : mergeGeometries(geos, false);
-    if (!geometry) continue;
-    for (const g of geos) if (g !== geometry) g.dispose();
-    geometry.computeBoundingSphere();
-    parts.push({ geometry, material });
-  }
-  return parts;
 }
 
 function buildTemplate(gltf: GLTF, keep: readonly string[]): HarborTemplate {
@@ -141,13 +98,11 @@ function buildTemplate(gltf: GLTF, keep: readonly string[]): HarborTemplate {
       const mesh = node as THREE.Mesh;
       if (!mesh.isMesh) return;
       const frame = new THREE.Matrix4().multiplyMatrices(inverse, mesh.matrixWorld);
-      const material = convertMaterial(mesh.material as THREE.Material);
-      let list = buckets.get(material);
-      if (!list) {
-        list = [];
-        buckets.set(material, list);
-      }
-      list.push(meshGeometry(mesh, frame));
+      addToBucket(
+        buckets,
+        materials.convert(mesh.material as THREE.Material),
+        vertexColourMeshGeometry(mesh, frame),
+      );
     });
   }
   // the flagstones keep their own frame (the path places each one)
@@ -162,15 +117,16 @@ function buildTemplate(gltf: GLTF, keep: readonly string[]): HarborTemplate {
         new THREE.Matrix4().copy(node.matrixWorld).invert(),
         mesh.matrixWorld,
       );
-      const material = convertMaterial(mesh.material as THREE.Material);
-      const list = stoneBuckets.get(material) ?? [];
-      list.push(meshGeometry(mesh, frame));
-      stoneBuckets.set(material, list);
+      addToBucket(
+        stoneBuckets,
+        materials.convert(mesh.material as THREE.Material),
+        vertexColourMeshGeometry(mesh, frame),
+      );
     });
-    const merged = mergeBuckets(stoneBuckets);
+    const merged = mergeVertexColourBuckets(stoneBuckets);
     if (merged.length === 1) stones.push(merged[0]);
   }
-  return { parts: mergeBuckets(buckets), stones };
+  return { parts: mergeVertexColourBuckets(buckets), stones };
 }
 
 function templateFor(): HarborTemplate {
@@ -214,12 +170,10 @@ export function buildWyrmwatchHarborPath(template: HarborTemplate, seed: number)
     place.compose(posV.set(s.x, s.y, s.z), tilt, scaleV.set(s.scale, 1, s.scale));
     const geo = stone.geometry.clone();
     geo.applyMatrix4(place);
-    const list = buckets.get(stone.material) ?? [];
-    list.push(geo);
-    buckets.set(stone.material, list);
+    addToBucket(buckets, stone.material, geo);
   }
   const centre = new THREE.Vector3();
-  for (const part of mergeBuckets(buckets)) {
+  for (const part of mergeVertexColourBuckets(buckets)) {
     part.geometry.computeBoundingBox();
     part.geometry.boundingBox?.getCenter(centre);
     part.geometry.translate(-centre.x, -centre.y, -centre.z);

@@ -188,7 +188,6 @@ describe('graphics profile asset preparation', () => {
       mocks.ship,
       mocks.harborMarker,
       mocks.wyrmwatchHarbor,
-      mocks.wyrmwatchHarbor,
     ]) {
       expect(prepare).toHaveBeenCalledWith();
     }
