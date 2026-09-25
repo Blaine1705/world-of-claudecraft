@@ -42,14 +42,18 @@ layers behind the `index.ts` barrel:
   shared canvases; `collectAbilityVfxCompileTargets`, one program link per
   distinct pooled PROGRAM, keyed by `../draw_program_signature_core.ts`, so a
   pool's per-slot material clones are one unit, never one per clone). The cast
-  gate waits on two families (`../cast_vfx_family.ts`), one entry per program:
-  the ENGINE (the pooled primitive families above except the spirits, plus the
-  `../vfx.ts` particle cloud) and the KIT (the Warrior kit's pools `fx.ts`
-  builds with the engine, because several of their pieces draw with no
-  readiness check of their own). A new pool tags every drawable it builds with
-  `tagCastVfxEngine` or `tagCastVfxKit`, the units link engine, then kit, then
-  every other pool, and `tests/cast_vfx_engine_family.test.ts` fails a pool
-  `fx.ts` builds that sits in none of its tables.
+  gate keeps one ready bit per family (`../cast_vfx_family.ts`), one entry per
+  program: the ENGINE (the pooled primitive families above except the spirits,
+  plus the `../vfx.ts` particle cloud) and the KIT (the Warrior kit's pools
+  `fx.ts` builds with the engine, because several of their pieces draw with no
+  readiness check of their own). The painter admits each cast on its own mask
+  (`cast_requirements.ts`) at its first entry point and latches a refusal for
+  the rest of that cast (`cast_admission_core.ts`); spirits keep their own
+  gate and sit in neither family. A new pool tags every drawable it builds with
+  `tagCastVfxEngine` or `tagCastVfxKit`, carries the `spawnGate` `fx.ts` hands
+  it and checks its family before every spawn, the units link engine, then
+  kit, then every other pool, and `tests/cast_vfx_engine_family.test.ts` fails
+  a pool `fx.ts` builds that sits in none of its tables.
   `AbilityVfxFx.prewarmSpawn` stays boot-window only,
   because it spawns VISIBLE primitives; these units are what the renderer's
   `vfx.ability-primitives` manifest entry retains when the entry deadline drops

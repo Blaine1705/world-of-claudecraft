@@ -811,14 +811,28 @@ GPU work signs. Each rule names its seam and its guard.
   task, so without a begin the prologue of a gate that minted between the last present
   and the census is charged to it), so read `unexpected` as the gates' own escapes.
   The cast-VFX gate (`cast_vfx_readiness_core.ts`,
-  `cast_vfx_prewarm.ts`) is the same idea one level up: the ability-VFX painter
-  draws no cast until every program of the engine and kit families it draws
-  casts with is linked (`cast_vfx_family.ts`; the class pools, lazy stand-ins
+  `cast_vfx_prewarm.ts`) is the same idea one level up, PER CAST and per
+  program FAMILY (`cast_vfx_family.ts`: the engine every class draws, the
+  Warrior kit): one ready bit per family, and a cast draws its whole
+  composition or nothing on the mask of the families it draws from
+  (`ability_vfx/cast_requirements.ts`: the engine, plus the kit for a Warrior
+  appearance and no other class), decided at its first entry point and kept
+  for the rest of that cast (`ability_vfx/cast_admission_core.ts`), while a
+  per-frame hold shows the frame its families are ready. A family opens on its
+  programs or on its own deadline, counted from the first consult that asks
+  for it (a diagnostics snapshot starts no clock), and a kit the device
+  declined never holds a cast. Every gated pool re-checks its own family at
+  spawn and skips (`AbilityVfxFx.setCastVfxSpawnGate`), counting a
+  `requirementMiss` a wrong mask would show instead of a live link
+  (`tests/ability_vfx_cast_requirements.test.ts` walks every spec'd id through
+  the real painter). The class pools, lazy stand-ins
   and generic basics keep their compile units in the same warm-up but never
-  hold a cast, since none of them draws behind the gate; linked means the settle
+  hold a cast, since none of them draws behind the gate (a bespoke visual
+  joins by a row in `CAST_VFX_FAMILIES`, a tag on its drawables and its ids in
+  the resolver); linked means the settle
   record of `linked_program_readiness.ts`, which each cast unit writes once its
   compile settled; never the presence of `currentProgram`, assigned before the
-  link resolves, and never a driver query from a live frame), and the reads a
+  link resolves, and never a driver query from a live frame. The reads a
   player ACTS on never wait behind it: the
   terrain-draped area ring and a mob's windup clip on the cast path, and on the
   per-frame path the hard-CC band (stun, fear, root), re-held right after the
