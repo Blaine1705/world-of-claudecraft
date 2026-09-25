@@ -17,12 +17,13 @@ import os
 import sys
 
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 from shiplib import P
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
 PLAYER_H = 2.6  # the player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts)
+CUTAWAY_OFFSET = (26.0, 0.0, -20.0)  # the house's cutaway copy, out on the water to the north-east
 
 
 def _mat(name, color, rough=0.8, emit=0.0, alpha=1.0, vertex=False):
@@ -180,6 +181,31 @@ def stage(objs, context_path):
     figure('PlayerReference_Yard', 0.6, d['northYard']['near'], -11.5, ref, body, head)
     figure('PlayerReference_Stair', 1.4, 7.05, 8.9, ref, body, head)
     figure('PlayerReference_Top', 0.2, d['topLanding']['near'], 3.4, ref, body, head)
+    # the Harbormaster's House: figures inside it (by the hearth, at the chart table) and in
+    # its doorway, and a cutaway copy of it out on the water to the east (the walls on the
+    # door and sea sides and the roof left off) with the same figures, so the room reads
+    house = layout['house']
+    hf = house['floor']
+    hearth = next(q for q in house['props'] if q['kind'] == 'hearth')
+    table = next(q for q in house['props'] if q['kind'] == 'chartTable')
+    spots = {
+        'Hearth': (hearth['x'] + hearth['hw'] + 1.3, hearth['z'] + 0.4),
+        'Table': (table['x'] - 0.4, table['z'] + table['hd'] + 0.8),
+        'Door': (house['door']['x'], house['z'] + house['hd'] + 0.9),
+    }
+    for name, (fx, fz) in spots.items():
+        figure(f'PlayerReference_House{name}', fx, hf, fz, ref, body, head)
+    cut = _collection('House cutaway (not exported)')
+    for name in ('HouseFrame', 'HouseWallNorth', 'HouseWallWest', 'HouseFurnishings'):
+        src = objs['pieces'][name]
+        dup = src.copy()
+        dup.name = f'{name}_Cutaway'
+        dup.parent = None
+        cut.objects.link(dup)
+        dup.matrix_world = Matrix.Translation(P(*CUTAWAY_OFFSET)) @ src.matrix_world
+    for name, (fx, fz) in spots.items():
+        figure(f'PlayerReference_Cutaway{name}', fx + CUTAWAY_OFFSET[0], hf, fz + CUTAWAY_OFFSET[2], cut, body,
+               head)
     # sun and sky: the game's warm afternoon
     sun = bpy.data.lights.new('Sun', 'SUN')
     sun.energy = 3.2
@@ -200,6 +226,8 @@ def stage(objs, context_path):
         'south': ((12.0, 9.0, 30.0), (3.0, 5.0, 8.0), 45),
         'gate': ((-12.0, 11.0, 4.5), (0.0, 11.0, 3.4), 50),
         'wide': ((48.0, 32.0, 30.0), (-6.0, 5.0, -1.0), 35),
+        'house': ((12.0, 12.0, -38.0), (3.0, 7.0, -19.0), 32),
+        'cutaway': ((40.0, 20.0, -10.0), (29.0, 3.5, -39.0), 30),
     }
     for name, (eye, look, lens) in cams.items():
         cam = bpy.data.cameras.new(f'Cam_{name}')
