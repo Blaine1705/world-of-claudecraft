@@ -71,7 +71,7 @@ export const GALE_HARBOR_DECKS: GaleDeckDef[] = [
   // share walkable ground at the junction (no dead wedge between rects)
   { x: 517.2, z: 337.2, rot: 0.785, hl: 13, hw: 2.2, ax: 507, az: 327 },
   { x: 503.3, z: 325.3, rot: 0.99, hl: 6.94, hw: 1.4, ax: 497, az: 321, ax2: 507, az2: 327 },
-  // The Eastbrook ferry's Wickharbor boarding stage (content/transport_ships.ts
+  // The Wickharbor ferry's boarding stage (content/transport_ships.ts
   // WICKHARBOR_BERTH): the deepwater pier's deck stands 0.89 yd above the
   // water where the ferry's gangplank tip lies at 2.86, so a stair runs on out
   // from the pier's end along its axis (rooted 0.3 yd back on the pier, on the

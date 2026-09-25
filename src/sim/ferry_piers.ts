@@ -22,51 +22,60 @@ export const FERRY_PIER_DECK_ABOVE_WATER = 2.64;
 
 const PIER = FERRY_PIER_DECK_ABOVE_WATER;
 
-export const FERRY_PIER_DECKS: readonly GaleDeckDef[] = [
-  // Moonrest: from the sunset shore (x -490, where the bank stands 2.4 above
-  // the water) straight out west to the berth, its end 8 yd from the ship's
-  // centre line like Eastbrook's T-head
-  {
-    x: -501,
-    z: 1506,
-    rot: -Math.PI / 2,
-    hl: 11,
-    hw: 2.2,
-    ax: -490,
-    az: 1506,
-    nearAboveWater: PIER,
-    farAboveWater: PIER,
-  },
-  // Wyrmwatch: from the foot of the bank (x 490) straight out east to the
-  // berth...
-  {
-    x: 498.5,
-    z: 1899.2,
-    rot: Math.PI / 2,
-    hl: 8.5,
-    hw: 2.2,
-    ax: 490,
-    az: 1899.2,
-    nearAboveWater: PIER,
-    farAboveWater: PIER,
-  },
-  // ...and the bluff stair up to the top of the bank (the Galecrest bluff
-  // stairs' idiom: a steep two-anchor ramp the renderer treads). Its foot
-  // overlaps INTO the pier root so the two share walkable ground (the harbor
-  // rule), its head roots on the terrain at the bank's crest.
-  {
-    x: 487,
-    z: 1899.2,
-    rot: -Math.PI / 2,
-    hl: 4,
-    hw: 1.3,
-    ax: 491,
-    az: 1899.2,
-    ax2: 483,
-    az2: 1899.2,
-    nearAboveWater: PIER,
-  },
+/** The piers, each its own list of decks (the renderer draws each pier as
+ *  its own local mesh). */
+export const FERRY_PIERS: readonly (readonly GaleDeckDef[])[] = [
+  [
+    // Moonrest: from the sunset shore (x -490, where the bank stands 2.4 above
+    // the water) straight out west to the berth, its end 8 yd from the ship's
+    // centre line like Eastbrook's T-head
+    {
+      x: -501,
+      z: 1506,
+      rot: -Math.PI / 2,
+      hl: 11,
+      hw: 2.2,
+      ax: -490,
+      az: 1506,
+      nearAboveWater: PIER,
+      farAboveWater: PIER,
+    },
+  ],
+  [
+    // Wyrmwatch: from the foot of the bank (x 490) straight out east to the
+    // berth...
+    {
+      x: 498.5,
+      z: 1899.2,
+      rot: Math.PI / 2,
+      hl: 8.5,
+      hw: 2.2,
+      ax: 490,
+      az: 1899.2,
+      nearAboveWater: PIER,
+      farAboveWater: PIER,
+    },
+    // ...and the bluff stair up to the top of the bank (the Galecrest bluff
+    // stairs' idiom: a steep two-anchor ramp the renderer treads). Its foot
+    // overlaps INTO the pier root so the two share walkable ground (the harbor
+    // rule), its head roots on the terrain at the bank's crest.
+    {
+      x: 487,
+      z: 1899.2,
+      rot: -Math.PI / 2,
+      hl: 4,
+      hw: 1.3,
+      ax: 491,
+      az: 1899.2,
+      ax2: 483,
+      az2: 1899.2,
+      nearAboveWater: PIER,
+    },
+  ],
 ];
+
+/** Every ferry pier deck, in one list (the walkable surface query). */
+export const FERRY_PIER_DECKS: readonly GaleDeckDef[] = FERRY_PIERS.flat();
 
 // Per-pier bounding boxes for the cheap early-out (the two piers are a world
 // apart, so one box would cover the whole east of the map).
@@ -74,8 +83,12 @@ const BOXES: readonly (readonly [number, number, number, number])[] = [
   [-514, 1502, -488, 1510],
   [480, 1895, 509, 1903],
 ];
+const BAND_Z1 = Math.min(...BOXES.map((b) => b[1]));
+const BAND_Z2 = Math.max(...BOXES.map((b) => b[3]));
 
-/** Whether (x, z) lies under a ferry pier's planks (nothing grows through). */
+/** Whether (x, z) lies under a ferry pier's planks (nothing grows through).
+ *  The footprint never depends on the water level (only the plank height
+ *  does), so none is asked for. */
 export function onFerryPier(
   x: number,
   z: number,
@@ -94,9 +107,12 @@ export function ferryPierSurface(
   terrainAt: (x: number, z: number) => number,
   waterLevel: number,
 ): number {
+  // one band test first: this runs inside every ground-height sample
+  if (z < BAND_Z1 || z > BAND_Z2) return Number.NEGATIVE_INFINITY;
   let inBox = false;
-  for (const [x1, z1, x2, z2] of BOXES) {
-    if (x >= x1 && x <= x2 && z >= z1 && z <= z2) inBox = true;
+  for (let i = 0; i < BOXES.length && !inBox; i++) {
+    const b = BOXES[i];
+    inBox = x >= b[0] && x <= b[2] && z >= b[1] && z <= b[3];
   }
   if (!inBox) return Number.NEGATIVE_INFINITY;
   let surface = Number.NEGATIVE_INFINITY;

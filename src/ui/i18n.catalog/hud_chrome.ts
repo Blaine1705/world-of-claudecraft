@@ -13,7 +13,8 @@ import { professionTrainerStrings } from './profession_trainers';
 
 export const hudChromeStrings = {
   professionTrainers: professionTrainerStrings,
-  // The scheduled ferry between Eastbrook and Wickharbor (src/ui/hud/transport/):
+  // The scheduled ferries (Eastbrook to Moonrest, Wickharbor to Wyrmwatch;
+  // src/ui/hud/transport/):
   // the timetable panel near the docked ship and the sailing line aboard.
   // {dest} is the destination town's localized POI label; {time} a m:ss
   // countdown.

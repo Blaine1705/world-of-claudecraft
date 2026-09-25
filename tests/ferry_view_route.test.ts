@@ -75,11 +75,18 @@ describe('both worlds show the same route', () => {
         expect(online?.passenger).toBe(false);
       }
     }
-    // a client passenger of route B (its deck mirror names the route)
+    // a passenger of route B standing near route A's berth, in both worlds:
+    // the Sim reads their ride, the client its deck mirror (the `fry` route)
+    sim.player.pos.x = A.berths[0].x;
+    sim.player.pos.z = A.berths[0].z;
+    sim.player.ferryRide = { route: B.id, from: 0, to: 1, ship: { x: 0, z: 0, rot: 0 } };
     player.ferryRiding = true;
     player.ferryDeck = { route: 1, x: 0, y: 3.3, z: 0, f: 0 };
     player.pos.x = A.berths[0].x;
     player.pos.z = A.berths[0].z;
-    expect(clientFerryView(client)).toMatchObject({ routeId: B.id, passenger: true });
+    const offline = sim.ferryView();
+    const online = clientFerryView(client);
+    expect(offline).toMatchObject({ routeId: B.id, passenger: true });
+    expect(online).toMatchObject({ routeId: B.id, passenger: true });
   });
 });

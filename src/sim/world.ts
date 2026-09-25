@@ -43,6 +43,7 @@ import { GALE_DECK_FREEBOARD } from './gale_harbor';
 import { KEEP_SITE, keepSitePadWeight } from './keep_site';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
+import { carveSeaChannels } from './sea_channels';
 import {
   CALM_SKIRT_MAX_WIDTH,
   type CalmProbe,
@@ -3495,7 +3496,8 @@ function baseHeight(
       }
     }
   }
-  return h;
+  // ...and the sea-channel bowls under the ferry lanes (sea_channels.ts)
+  return carveSeaChannels(x, z, h, WATER_LEVEL);
 }
 
 // ---------------------------------------------------------------------------

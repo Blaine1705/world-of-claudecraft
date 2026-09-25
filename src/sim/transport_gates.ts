@@ -11,8 +11,8 @@
 // (transport_schedule.ts). The owning world re-applies it every tick (the
 // Sim, transport_ferry.ts) or every snapshot (the online ClientWorld), and
 // the grid is BUILT in the clock-0 state (docked at each route's first
-// berth), so a world that never ticks still sees the ship moored at
-// Eastbrook. The grid is shared per (content, seed) inside one process, so
+// berth), so a world that never ticks still sees each ship moored there
+// (Eastbrook and Wickharbor). The grid is shared per (content, seed) inside one process, so
 // two worlds at different ferry phases in ONE process would contend for it:
 // no host does that (the server runs one world Sim per realm process, the
 // browser one world), and a re-apply at the top of every tick keeps each
@@ -89,9 +89,15 @@ export function syncTransportGates(
   clock: number,
   setOpen: (seed: number, gate: string, open: boolean) => void,
 ): void {
-  for (const route of TRANSPORT_ROUTES) {
+  for (let r = 0; r < TRANSPORT_ROUTES.length; r++) {
+    const route = TRANSPORT_ROUTES[r];
     for (let i = 0; i < route.berths.length; i++) {
-      setOpen(seed, transportGateId(route.id, i), transportBerthOpenAt(route, i, clock));
+      setOpen(seed, GATE_IDS[r][i], transportBerthOpenAt(route, i, clock));
     }
   }
 }
+
+/** Every route berth's gate id, built once (the per-tick sync reuses them). */
+const GATE_IDS: readonly (readonly string[])[] = TRANSPORT_ROUTES.map((route) =>
+  route.berths.map((_, i) => transportGateId(route.id, i)),
+);

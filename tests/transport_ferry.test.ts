@@ -556,7 +556,7 @@ describe('sailing (the real Sim)', () => {
     expect(p.ferryRide ?? null).toBeNull();
     const there = worldToDeck(FAR, p.pos.x, p.pos.z, { x: 0, z: 0 });
     expect(there.x).toBeCloseTo(1.5, 2);
-    expect(sim.players.get(p.id)?.deedStats.visited.has('ferry:eastbrook_wickharbor')).toBe(false);
+    expect(sim.players.get(p.id)?.deedStats.visited.has('ferry:eastbrook_nightbloom')).toBe(false);
   });
 
   it('a passenger who releases at sea leaves their body for the destination pier', () => {
@@ -764,6 +764,26 @@ describe('the second route, Wickharbor to the Drakelands (the real Sim)', () => 
     expect(meta?.deedStats.visited.has('ferry:wickharbor_drakelands')).toBe(true);
     expect(meta?.deedStats.visited.has('ferry:eastbrook_nightbloom')).toBe(false);
   }, 60_000);
+
+  it('a rider of one ship put on the other deck as it moors earns no crossing', () => {
+    const p = sim.player;
+    const arriveA = ROUTE.timings.docked + transportVoyageSeconds(ROUTE, 0);
+    // the very tick route A moors (a rider of A's own deck under way would
+    // have become its passenger already)
+    setClock(sim, arriveA - DT / 2);
+    const pose: TransportPose = { x: 0, z: 0, rot: 0 };
+    transportShipPoseAt(ROUTE, arriveA - DT, pose);
+    const at = deckToWorld(pose, 1.5, 0.8, { x: 0, z: 0 });
+    place(p, at.x, DECK, at.z);
+    // still marked as riding route B (a summon or a teleport put them here)
+    p.ferryRide = { route: B.id, from: 0, to: 1, ship: { x: 0, z: 0, rot: 0 } };
+    sim.tick();
+    expect(transportPhaseAt(ROUTE, transportClock(sim.ctx)).phase).toBe('docked');
+    expect(p.ferryRide ?? null).toBeNull();
+    const meta = sim.players.get(p.id);
+    expect(meta?.deedStats.visited.has('ferry:eastbrook_nightbloom')).toBe(false);
+    expect(meta?.deedStats.visited.has('ferry:wickharbor_drakelands')).toBe(false);
+  });
 
   it('the HUD view follows the route the player rides, else the nearest one', () => {
     const p = sim.player;

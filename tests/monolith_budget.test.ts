@@ -1778,8 +1778,10 @@ const MONOLITHS: MonolithRow[] = [
     // map-improvements epic (PR #3746): the castle pad chain and the Last Spring bank left with the castle (keep_site.ts holds the new pad). Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
     // Lowered when the decoration exclusion's two harbor-deck tests folded
-    // into deck_surfaces.ts onHarborPlanks (with the far ferry piers).
-    ceiling: 5208,
+    // into deck_surfaces.ts onHarborPlanks (with the far ferry piers); the
+    // sea-channel carve's one call (sea_channels.ts) rides two of the freed
+    // lines.
+    ceiling: 5210,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {

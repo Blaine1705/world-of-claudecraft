@@ -37,7 +37,7 @@ import { ferryDeckWire, ferryMovementFrame, transportHeadJson } from '../server/
 import { isMovementFrozen } from '../src/game/self_motion_gate';
 import { applyReconSelfWire, ReconWireState } from '../src/net/movement_reconciliation_wire';
 import { applyFerryWire, parseFerryDeck, transportClockFromHead } from '../src/net/transport_wire';
-import { EASTBROOK_NIGHTBLOOM_FERRY } from '../src/sim/content/transport_ships';
+import { EASTBROOK_NIGHTBLOOM_FERRY, TRANSPORT_ROUTES } from '../src/sim/content/transport_ships';
 import { Sim } from '../src/sim/sim';
 import { deckToWorld } from '../src/sim/transport_deck';
 import { transportPhaseAt } from '../src/sim/transport_schedule';
@@ -65,6 +65,9 @@ describe('the fry deck spot', () => {
     aboard(e, 1.234567, -4.5, 0.25);
     expect(wireEntity(e).fry).toEqual([0, 1.23, 3.3, -4.5, 0.25]);
     expect(ferryDeckWire(e)).toEqual([0, 1.23, 3.3, -4.5, 0.25]);
+    // a passenger of the second route names it by its index
+    e.ferryRide = { route: TRANSPORT_ROUTES[1].id, from: 0, to: 1, ship: { ...SHIP } };
+    expect((wireEntity(e).fry as number[] | undefined)?.[0]).toBe(1);
     e.ferryRide = null;
     expect(ferryDeckWire(e)).toBeUndefined();
   });
@@ -75,6 +78,9 @@ describe('the fry deck spot', () => {
     expect(parseFerryDeck(1)).toBeNull();
     expect(parseFerryDeck([0, 1, 3.3, -2])).toBeNull();
     expect(parseFerryDeck([7, 1, 3.3, -2, 0])).toBeNull();
+    // every route's index parses; one past the last never does
+    expect(parseFerryDeck([1, 1, 3.3, -2, 0])?.route).toBe(1);
+    expect(parseFerryDeck([TRANSPORT_ROUTES.length, 1, 3.3, -2, 0])).toBeNull();
     expect(parseFerryDeck([-1, 1, 3.3, -2, 0])).toBeNull();
     expect(parseFerryDeck([0.5, 1, 3.3, -2, 0])).toBeNull();
     expect(parseFerryDeck([0, 'x', 3.3, -2, 0])).toBeNull();

@@ -2055,9 +2055,9 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // bathymetry so every hull is wet across its whole footprint, and each lies
     // alongside a pier in the gap the round 6 respacing opened.
     // The Eastbrook ferry berths broadside across the ferry pier's T-head,
-    // but it is no longer a decorProps row: since Phase 2 it sails a
-    // timetable to Wickharbor and back (content/transport_ships.ts
-    // EASTBROOK_WICKHARBOR_FERRY), its deck placed at both berths and gated
+    // but it is no longer a decorProps row: it sails a timetable to Moonrest
+    // in the Nightbloom and back (content/transport_ships.ts
+    // EASTBROOK_NIGHTBLOOM_FERRY), its deck placed at both berths and gated
     // by the schedule. To make its berth (Phase 1), the blue hull that lay in
     // the gap north of the ferry pier (x -115, z -45) was retired, the second
     // blue hull (x -115, z -63, whose stern reached under the ferry's

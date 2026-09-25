@@ -1384,7 +1384,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the Eastbrook ferry's Phase 2: the renderer leaf gained the at-sea passenger hide and moved two helpers out. No capture was retaken.
-  '588f8aef81b10e46ef8117f02190431fd3b3fb1f61d884b56ffa6de47ea7641a';
+  // Re-minted for the ferry's playtest fixes (renderer and ground-sample leaves). No capture was retaken.
+  'f1a29afb008d49790918e7c24935b501854460186a8873ff2417623edeb544a2';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1397,7 +1398,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the Eastbrook ferry's Phase 2: the renderer leaf gained the at-sea passenger hide and moved two helpers out. No capture was retaken.
-  'e7a19a56c2928525ec3de02443a01fb6a54b18992d15d4e3077c8b9094857708';
+  // Re-minted for the ferry's Phase 3 and playtest fixes (renderer and ground-sample leaves). No capture was retaken.
+  'cb7c2454fa7994063b1336117665090323c991255e99e828b4c5e0d120b17a17';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2776,7 +2778,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // Eastbrook ferry Phase 2: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('a4af633cd8b71530e98246d58e0d2e5de19bf5bccf86b4b14f9d32d39301fdfb');
+      // Ferry playtest fixes: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+    ).toBe('3fceecc3361c9cd8c53608229360410eca26a4bba31e5817f59bf3ba74825548');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

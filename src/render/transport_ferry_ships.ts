@@ -71,7 +71,12 @@ export function buildScheduledShips(
         const ship = ships[i];
         const drawn = df.ships[ship.route];
         ship.view.setPose(drawn.drawn.x, drawn.drawn.z, drawn.drawn.rot, drawn.sailing);
-        ship.wake?.update(drawn.drawn, drawn.sailing ? drawn.speed : 0, dt);
+        // a ship past the fog (hidden by its own update last frame) leaves
+        // its wake undrawn and un-uploaded; it picks up again in sight
+        if (!ship.wake) continue;
+        if (ship.view.group.visible) {
+          ship.wake.update(drawn.drawn, drawn.sailing ? drawn.speed : 0, dt);
+        } else ship.wake.points.visible = false;
       }
     },
   };

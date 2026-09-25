@@ -75,6 +75,9 @@ function placeForDev(ctx: SimContext, pid: number, x: number, z: number, y?: num
   settleTeleportArrival(p);
 }
 
+const USAGE =
+  '[dev] /dev ferry [route] [depart | skip | at <s> | board], or /dev ferry goto <berth>';
+
 /** The route a token names (a berth id or a 1-based number), or -1. */
 function routeByToken(token: string): number {
   const n = Number(token);
@@ -89,10 +92,9 @@ export function handleFerryDevChat(ctx: SimContext, raw: string, pid: number): b
   if (TRANSPORT_ROUTES.length === 0) return true;
   const words = m[1].trim().toLowerCase().split(/\s+/).filter(Boolean);
   if (words[0] === 'goto') {
-    for (const route of TRANSPORT_ROUTES) {
-      const b = route.berths.find((berth) => berth.id === words[1]);
-      if (b) placeForDev(ctx, pid, b.landing.x, b.landing.z);
-    }
+    const berth = TRANSPORT_ROUTES.flatMap((r) => r.berths).find((b) => b.id === words[1]);
+    if (berth) placeForDev(ctx, pid, berth.landing.x, berth.landing.z);
+    else ctx.emit({ type: 'log', text: USAGE, pid });
     return true;
   }
   const p = ctx.entities.get(pid);
@@ -116,6 +118,7 @@ export function handleFerryDevChat(ctx: SimContext, raw: string, pid: number): b
     const spot = ferryBoardingSpot(ctx, index);
     if (spot) placeForDev(ctx, pid, spot.x, spot.z, spot.y);
   } else if (verb !== undefined) {
+    ctx.emit({ type: 'log', text: USAGE, pid });
     return true;
   }
   if (transportClock(ctx) !== clock) carryPassengersAcrossClockJump(ctx, clock);

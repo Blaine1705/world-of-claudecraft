@@ -28,15 +28,7 @@ export const ZONE3_ZONE: ZoneDef = {
   biome: 'peaks',
   hub: { x: 0, z: 660, radius: 20, name: 'Highwatch' },
   graveyard: { x: 15, z: 645 },
-  lakes: [
-    { x: -70, z: 760, radius: 18 },
-    // The Drakelands ferry's passage (content/transport_ships.ts, route B):
-    // a small carve on the east bank of the neck where the deep Thornpeak
-    // water narrows into the Evergarden shallows, widening it by about three
-    // yards so the ship's hull clears both banks (owner-approved). Nothing
-    // stood on the bank.
-    { x: 542, z: 768.5, radius: 4.5 },
-  ],
+  lakes: [{ x: -70, z: 760, radius: 18 }],
   pois: [
     { x: 0, z: 660, label: 'Highwatch', id: 'highwatch' },
     { x: -50, z: 590, label: 'Stalker Ridge', id: 'stalker_ridge' },

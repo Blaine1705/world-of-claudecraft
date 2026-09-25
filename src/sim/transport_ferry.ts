@@ -235,13 +235,17 @@ export function updateTransportFerries(ctx: SimContext): void {
           // a pet called up mid-voyage goes back to the stash within the
           // second (pets do not walk a moving deck; it returns on the far
           // pier with the rest). Once a second: petOf walks every entity.
-          if (ctx.tickCount % PET_SWEEP_TICKS === 0 && petOf(ctx, p.id, true)) parkPet(ctx, p);
+          // Staggered by id, so the passengers' entity scans spread over the
+          // second instead of landing on one tick.
+          const sweep = (ctx.tickCount + p.id) % PET_SWEEP_TICKS === 0;
+          if (sweep && petOf(ctx, p.id, true)) parkPet(ctx, p);
         } else startRide(ctx, route, p, phaseNow.from);
         dropForcedMovement(ctx, p);
         continue;
       }
-      // moored this tick: the voyage is over where they stand
-      const done = p.ferryRide;
+      // moored this tick: the voyage is over where they stand (this route's
+      // ride only: a rider of the other ship put on this deck earns nothing)
+      const done = ride;
       if (done && !p.dead && phaseNow.berth === done.to) {
         const from = route.berths[done.from].id;
         markVisited(ctx, meta, `ferry:${from}_${route.berths[done.to].id}`);

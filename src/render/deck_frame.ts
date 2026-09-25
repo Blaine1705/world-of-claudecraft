@@ -129,8 +129,8 @@ export function deckFrameFor(world: object): DeckFrame {
 const phase = newTransportPhaseState();
 
 /** Advance every route's drawn clock one frame toward the world's clock. The
- *  transport clock is one for all routes (IWorld.ferryView carries it on its
- *  first route's view), so a second route's ship is posed here too. */
+ *  transport clock is one for all routes (whichever route IWorld.ferryView
+ *  shows, its clock is the same), so every route's ship is posed here. */
 export function advanceDeckFrame(df: DeckFrame, source: FerryViewSource, dt: number): void {
   df.frame++;
   const view = source.ferryView();

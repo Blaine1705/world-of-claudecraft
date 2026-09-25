@@ -23,14 +23,20 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // about (the deck's rails meet the world's colliders in the kernel).
 
 const HULL = EASTBROOK_FERRY_HULL;
-/** Water the keel line always keeps over the bed (yards). */
-const KEEL_WATER = 0.2;
+/** Water the keel line always keeps over the bed (yards), per route: the
+ *  Nightbloom run's long western shallows keep about a quarter yard (the
+ *  owner-accepted keel-in-sand look), everything else the full margin. */
+const KEEL_WATER: Readonly<Record<string, number>> = {
+  eastbrookNightbloom: 0.2,
+  wickharborDrakelands: 0.3,
+};
 
 /** Every lane of every route, named for the test titles. */
 const LANES = TRANSPORT_ROUTES.flatMap((route) =>
   route.lanes.map((lane, i) => ({
     lane,
     name: `${route.berths[i].id} to ${route.berths[1 - i].id}`,
+    keelWater: KEEL_WATER[route.id],
   })),
 );
 
@@ -78,7 +84,11 @@ describe('the ferry sea lanes', () => {
     }
   });
 
-  for (const { lane, name } of LANES) {
+  it('every route has its keel margin', () => {
+    for (const route of TRANSPORT_ROUTES) expect(KEEL_WATER[route.id]).toBeGreaterThan(0);
+  });
+
+  for (const { lane, name, keelWater } of LANES) {
     it(`${name}: afloat and clear of every standing collider, yard by yard`, () => {
       const length = transportLaneLength(lane);
       const dry: string[] = [];
@@ -95,14 +105,10 @@ describe('the ferry sea lanes', () => {
             dry.push(`${d.toFixed(0)}:${at.x.toFixed(0)},${at.z.toFixed(0)}`);
           }
         }
-        // ...and the keel line never runs aground: the long western
-        // shallows on the Nightbloom run and the widened Thornpeak neck on
-        // the Drakelands run keep about a quarter yard of water over the
-        // centre line (the keel's lower edge in the sand there is the
-        // owner-accepted look), never dry land
+        // ...and the keel line never runs aground
         for (const [lx, lz] of keel) {
           deckToWorld(pose, lx, lz, at);
-          if (groundHeight(at.x, at.z, WORLD_SEED) > WATER_LEVEL - KEEL_WATER) {
+          if (groundHeight(at.x, at.z, WORLD_SEED) > WATER_LEVEL - keelWater) {
             dry.push(`keel ${d.toFixed(0)}`);
           }
         }

@@ -325,6 +325,45 @@ describe('the scheduled ferry on screen (transport_ferry_ships.ts)', () => {
     expect(plank.visible).toBe(true);
   });
 
+  it('a ship out of sight leaves its wake undrawn, and it resumes in sight', () => {
+    const adopted: TransportShipView[] = [];
+    const wakes: (ShipWake | null)[] = [];
+    const ships = buildScheduledShips(source, (v, w) => {
+      adopted.push(v);
+      wakes.push(w);
+    });
+    const want: TransportPose = { x: 0, z: 0, rot: 0 };
+    const mid = ROUTE.timings.docked + transportVoyageSeconds(ROUTE, 0) / 2;
+    const run = (camFar: boolean) => {
+      for (let c = mid; c <= mid + 1; c += 0.05) {
+        at(c);
+        ships.sync(0.05);
+        transportShipPoseAt(ROUTE, view.clock, want);
+        const d = camFar ? 5000 : 20;
+        adopted[0].update(
+          want.x + d,
+          BASE_Y + 10,
+          want.z,
+          want.x,
+          BASE_Y + 8,
+          want.z,
+          400,
+          0.05,
+          false,
+        );
+      }
+      ships.sync(0.05);
+    };
+    run(false);
+    expect(adopted[0].group.visible).toBe(true);
+    expect(wakes[0]?.points.visible).toBe(true);
+    run(true);
+    expect(adopted[0].group.visible).toBe(false);
+    expect(wakes[0]?.points.visible).toBe(false);
+    run(false);
+    expect(wakes[0]?.points.visible).toBe(true);
+  });
+
   it('a world with no ferry leaves the ship where it was built', () => {
     const adopted: TransportShipView[] = [];
     const ships = buildScheduledShips({ ferryView: () => null }, (v) => adopted.push(v));
