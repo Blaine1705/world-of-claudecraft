@@ -6,6 +6,7 @@ import {
   TRANSPORT_ROUTES,
 } from '../src/sim/content/transport_ships';
 import { handleFerryDevChat } from '../src/sim/dev/ferry_dev';
+import { summonMountItem } from '../src/sim/mounts';
 import { restorePet } from '../src/sim/pet/pet_commands';
 import { Sim } from '../src/sim/sim';
 import { deckToWorld, worldToDeck } from '../src/sim/transport_deck';
@@ -622,6 +623,46 @@ describe('sailing (the real Sim)', () => {
     expect(p.chargePath).toEqual([]);
     expect(p.ferryRide).toBeTruthy();
     expect(p.pos.y).toBeCloseTo(DECK, 2);
+  });
+
+  it('refuses a mount on the ship, moored or under way, and allows it on the pier', () => {
+    const p = sim.player;
+    sim.addItem('reins_valorsteed', 1, p.id);
+    const meta = sim.players.get(p.id);
+    if (!meta) throw new Error('meta');
+    meta.ridingTrained = true;
+    const errors = (events: { type: string; text?: string }[]) =>
+      events.filter((ev) => ev.type === 'error').map((ev) => ev.text);
+    // on the moored deck
+    setClock(sim, 10);
+    placeOnDeck(p, 0, 0, -3);
+    sim.tick();
+    expect(summonMountItem(sim.ctx, p.id, 'valorsteed')).toBe(false);
+    expect(errors(sim.tick())).toContain("You can't mount while aboard a ship.");
+    expect(p.mountCastKey).toBe('');
+    // under way
+    setClock(sim, DEPART_EAST - 0.5);
+    placeOnDeck(p, 0, 1.5, 0.8);
+    tickSeconds(sim, 5);
+    expect(p.ferryRide).toBeTruthy();
+    expect(summonMountItem(sim.ctx, p.id, 'valorsteed')).toBe(false);
+    expect(errors(sim.tick())).toContain("You can't mount while aboard a ship.");
+    // a swap from a mount already ridden is a summon too
+    p.mountKey = 'valorsteed';
+    sim.addItem('reins_valorsteed', 1, p.id);
+    expect(summonMountItem(sim.ctx, p.id, 'valorsteed')).toBe(true); // same reins: dismount
+    expect(p.mountKey).toBe('');
+    // back on the pier, riding is fine again
+    setClock(sim, 10);
+    place(
+      p,
+      EAST.landing.x,
+      groundHeight(EAST.landing.x, EAST.landing.z, WORLD_SEED),
+      EAST.landing.z,
+    );
+    sim.tick();
+    expect(summonMountItem(sim.ctx, p.id, 'valorsteed')).toBe(true);
+    expect(p.mountCastKey).toBe('valorsteed');
   });
 
   it('/dev ferry depart, skip, at and board', () => {
