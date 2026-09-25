@@ -520,6 +520,8 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(renderer).toContain(
       "units: (textures) => textureResumeUnits('weather-materials', textures),",
     );
+    // The dropped entry's resume links the live points before the uploads.
+    expect(renderer).toContain('linkRoot: () => this.weather.prewarmRoot(),');
     expect(renderer).toContain('cleanup: () => this.weather.endPrewarm(),');
     // The manifest-local mutable state is gone with them.
     expect(renderer).not.toContain('landmarkPrewarmGroup');

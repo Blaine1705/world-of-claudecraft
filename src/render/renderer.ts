@@ -5954,6 +5954,7 @@ export class Renderer {
       stage: () => this.weather.beginPrewarm(),
       hide: () => this.weather.hidePrewarm(),
       units: (textures) => textureResumeUnits('weather-materials', textures),
+      linkRoot: () => this.weather.prewarmRoot(),
       cleanup: () => this.weather.endPrewarm(),
     });
 
