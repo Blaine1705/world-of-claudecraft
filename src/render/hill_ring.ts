@@ -15,15 +15,20 @@
 // The ring is actionable (the capture zone and its holder), so it is never
 // gated or hidden. Instead, the first hill a session sees also builds a small
 // twin with the same builder, never added to the scene and never disposed, and
-// hands it to the renderer's compile gate: the program links off the draw
-// path, and the twin keeps it in use, so every later ring of the session (the
-// next hill comes hours later, likely past the retained-program FIFO) finds it
-// linked. A player who draws the ring before the twin's gate settles (looking
-// at the spot at the first announcement) still sees the live ring link its
-// program: that residual is accepted.
+// hands it to the renderer's compile gate: the ring's two programs (both
+// meshes are transparent and DoubleSide, so three draws each in a back pass
+// and a front pass, keys differing by the flipSided bit) link off the draw
+// path, and the twin keeps them in use, so every later ring of the session
+// (the next hill comes hours later, likely past the retained-program FIFO)
+// finds them linked. A player who draws the ring before the twin's gate
+// settles (looking at the spot at the first announcement) still sees the live
+// ring link them: that residual is accepted. A rejected twin is disposed and
+// the next hill tries again; the same hill never does, since sync runs every
+// frame.
 
 import * as THREE from 'three';
 import type { HillInfo } from '../world_api/world_pvp';
+import { isGpuQueueShutdown } from './background_gpu_queue';
 import {
   HILL_RADIAL_STEP_YARDS,
   HILL_RIM_INNER_T,
@@ -62,6 +67,7 @@ interface RingVisual {
 export class HillRingVisuals {
   private visual: { key: string; ring: RingVisual } | null = null;
   private twin: THREE.Group | null = null;
+  private failedTwinKey: string | null = null;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -75,8 +81,10 @@ export class HillRingVisuals {
       this.clear();
       return;
     }
-    if (!this.twin && this.compileGate) this.warmTwin(info, this.compileGate);
     const key = hillRingKey(info);
+    if (!this.twin && this.compileGate && key !== this.failedTwinKey) {
+      this.warmTwin(info, key, this.compileGate);
+    }
     if (this.visual && this.visual.key !== key) this.clear();
     if (!this.visual) {
       const ring = this.create(info);
@@ -109,19 +117,23 @@ export class HillRingVisuals {
     if (!this.visual) return;
     const ring = this.visual.ring;
     this.scene.remove(ring.group);
-    ring.rimMat.dispose();
-    ring.fillMat.dispose();
-    for (const geo of ring.ownedGeometries) geo.dispose();
+    disposeRing(ring);
     this.visual = null;
   }
 
-  private warmTwin(info: HillInfo, gate: HillRingCompileGate): void {
-    const twin = this.create({ ...info, radius: TWIN_RADIUS }).group;
+  private warmTwin(info: HillInfo, key: string, gate: HillRingCompileGate): void {
+    const ring = this.create({ ...info, radius: TWIN_RADIUS });
+    const twin = ring.group;
     twin.name = 'hill-ring-twin';
     twin.visible = false;
     this.twin = twin;
     gate(twin).catch((error) => {
-      if (this.twin === twin) this.twin = null;
+      if (this.twin !== twin) return;
+      this.twin = null;
+      this.failedTwinKey = key;
+      disposeRing(ring);
+      // A renderer shutdown rejects its queued work on purpose.
+      if (isGpuQueueShutdown(error)) return;
       console.warn('Hill ring warm twin compile failed, retrying at the next hill', error);
     });
   }
@@ -210,4 +222,10 @@ export class HillRingVisuals {
     geo.setIndex(indices);
     return geo;
   }
+}
+
+function disposeRing(ring: RingVisual): void {
+  ring.rimMat.dispose();
+  ring.fillMat.dispose();
+  for (const geo of ring.ownedGeometries) geo.dispose();
 }
