@@ -6,24 +6,24 @@ import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
 import {
-  buildWickharborWharf,
-  wickharborWharfInternalsForTest,
-  wickharborWharfPrewarmParts,
-} from '../src/render/wickharbor_wharf';
-import { WICKHARBOR_WHARF_ORIGIN } from '../src/sim/content/wickharbor_wharf';
+  buildWickharborHarbor,
+  wickharborHarborInternalsForTest,
+  wickharborHarborPrewarmParts,
+} from '../src/render/wickharbor_harbor';
+import { WICKHARBOR_HARBOR_FRAME } from '../src/sim/content/wickharbor_harbor';
 import { WATER_LEVEL } from '../src/sim/world';
 
-// The Wickharbor ferry wharf painter (src/render/wickharbor_wharf.ts) over the shipped GLB:
-// the model placed on the waterline at the wharf origin, what each graphics tier really draws
-// (the walkable structure, solids and every lantern on all of them), and the prewarm parts the
-// props warm-up links.
+// Wickharbor's wooden harbor painter (src/render/wickharbor_harbor.ts) over the shipped GLB:
+// the model placed on the waterline at the harbor frame's centre, what each graphics tier really
+// draws (the walkable structure, solids and every lantern on all of them), and the prewarm parts
+// the props warm-up links.
 
-const internals = wickharborWharfInternalsForTest;
+const internals = wickharborHarborInternalsForTest;
 const GLB = path.join(__dirname, '..', 'public', internals.assetUrl.replace(/^\//, ''));
-/** Triangles per part (tests/wickharbor_wharf_asset.test.ts pins the same). */
-const LOW = 1800 + 2112 + 360 + 1508 + 1128 + 828;
-const MEDIUM = LOW + 2652;
-const HIGH = MEDIUM + 904;
+/** Triangles per part (tests/wickharbor_harbor_asset.test.ts pins the same). */
+const LOW = 3596 + 3564 + 1572 + 3380 + 2360 + 540;
+const MEDIUM = LOW + 6924;
+const HIGH = MEDIUM + 1028;
 
 let gltf: GLTF;
 const originalProfile = getActiveGfxProfile();
@@ -72,15 +72,15 @@ afterAll(() => {
   internals.setLoadedGltfForTest(null);
 });
 
-describe('wickharbor wharf painter', () => {
-  it('places the model on the waterline at the wharf origin', () => {
+describe('wickharbor harbor painter', () => {
+  it('places the model on the waterline at the harbor frame centre', () => {
     withTier('high');
-    const wharf = buildWickharborWharf();
-    const model = wharf.getObjectByName('wickharborWharfModel');
+    const harbor = buildWickharborHarbor();
+    const model = harbor.getObjectByName('wickharborHarborModel');
     if (!model) throw new Error('no model');
-    expect(model.position.x).toBe(WICKHARBOR_WHARF_ORIGIN.x);
+    expect(model.position.x).toBe(WICKHARBOR_HARBOR_FRAME.x);
     expect(model.position.y).toBe(WATER_LEVEL);
-    expect(model.position.z).toBe(WICKHARBOR_WHARF_ORIGIN.z);
+    expect(model.position.z).toBe(WICKHARBOR_HARBOR_FRAME.z);
     expect(model.userData.assetUrl).toBe(internals.assetUrl);
   });
 
@@ -93,7 +93,7 @@ describe('wickharbor wharf painter', () => {
       ['insane', HIGH],
     ] as const) {
       withTier(tier);
-      const model = buildWickharborWharf().getObjectByName('wickharborWharfModel');
+      const model = buildWickharborHarbor().getObjectByName('wickharborHarborModel');
       if (!model) throw new Error('no model');
       expect(triangles(model), tier).toBe(want);
       // the lanterns are landmarks: they glow on every tier
@@ -109,13 +109,13 @@ describe('wickharbor wharf painter', () => {
           settings: { ...GFX, effectsTier: tier, standardMaterials },
         });
         internals.setLoadedGltfForTest(gltf);
-        const wharf = buildWickharborWharf();
+        const harbor = buildWickharborHarbor();
         const drawn = new Set<THREE.Material>();
-        wharf.traverse((o) => {
+        harbor.traverse((o) => {
           const mesh = o as THREE.Mesh;
           if (mesh.isMesh) drawn.add(mesh.material as THREE.Material);
         });
-        const warmed = new Set(wickharborWharfPrewarmParts().map((p) => p.material));
+        const warmed = new Set(wickharborHarborPrewarmParts().map((p) => p.material));
         const label = `${tier} ${standardMaterials ? 'standard' : 'lambert'}`;
         expect(drawn.size, label).toBeGreaterThan(0);
         for (const m of drawn) expect(warmed.has(m), label).toBe(true);
@@ -129,10 +129,10 @@ describe('wickharbor wharf painter', () => {
     const said: unknown[] = [];
     console.warn = (...args: unknown[]) => said.push(args[0]);
     try {
-      expect(buildWickharborWharf().children).toHaveLength(0);
+      expect(buildWickharborHarbor().children).toHaveLength(0);
     } finally {
       console.warn = warn;
     }
-    expect(String(said[0])).toContain('wickharbor wharf skipped');
+    expect(String(said[0])).toContain('wickharbor harbor skipped');
   });
 });

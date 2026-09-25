@@ -42,6 +42,7 @@ import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
 import { transportShipInternalsForTest } from '../src/render/transport_ship';
+import { wickharborHarborInternalsForTest } from '../src/render/wickharbor_harbor';
 import { wickharborWharfInternalsForTest } from '../src/render/wickharbor_wharf';
 import { wildheartPropsPreloadInternalsForTest } from '../src/render/wildheart_props';
 import { wyrmwatchHarborInternalsForTest } from '../src/render/wyrmwatch_harbor';
@@ -515,6 +516,10 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('wickharbor ferry wharf asset', () => {
     expectAssetExistsAndManifested(wickharborWharfInternalsForTest.assetUrl);
+  });
+
+  it('wickharbor harbor asset', () => {
+    expectAssetExistsAndManifested(wickharborHarborInternalsForTest.assetUrl);
   });
 
   it('gather node assets', () => {

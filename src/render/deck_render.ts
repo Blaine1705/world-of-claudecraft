@@ -5,10 +5,11 @@
 // when railAll is set, along every deck edge: the bridge-and-pier look).
 // Rails stop short where two decks of the batch join (deckRailRuns), so a
 // walkway the decks share never ends up fenced off across its mouth.
-// Callers merge the returned arrays with their own materials, so the
-// harbor and the jungle walkways each keep their own wood tones. Extracted
-// from render/gale_features.ts when the Palmreach walkways became the
-// second consumer.
+// Callers merge the returned arrays with their own materials, so each
+// walkway family keeps its own wood tones. Extracted from
+// render/gale_features.ts when the Palmreach walkways became the second
+// consumer (Wickharbor's own harbor is a Blender model now,
+// render/wickharbor_harbor.ts).
 import * as THREE from 'three';
 import { type GaleDeckDef, galeDeckSurfaceAt } from '../sim/gale_harbor';
 
@@ -109,9 +110,6 @@ export function buildDeckWood(
   opts: {
     railAll?: boolean;
     bollards?: boolean;
-    /** Decks of another batch standing on these ones (the Wickharbor wharf's flight on the
-     *  boardwalk's end): no bollard is planted inside them. */
-    bollardKeepOut?: readonly GaleDeckDef[];
   } = {},
 ): DeckWood {
   const planks: THREE.BufferGeometry[] = [];
@@ -158,7 +156,7 @@ export function buildDeckWood(
       }
       // stairs always get a handrail; railAll rails the level runs too. Runs
       // break where another deck of the batch joins, so no rail fences off a
-      // shared walkway (the lagoon T, the pool stair, the harbor stair feet).
+      // shared walkway (the lagoon T, the pool stair).
       if (stair || opts.railAll) {
         for (const run of deckRailRuns(d, side, decks)) {
           const railPts = run.map((p) => new THREE.Vector3(p.x, yAt(p.along), p.z));
@@ -187,7 +185,6 @@ export function buildDeckWood(
       for (const side of [1, -1]) {
         const bx = d.x + dirx * (d.hl - 0.5) + pxu * (d.hw - 0.35) * side;
         const bz = d.z + dirz * (d.hl - 0.5) + pzu * (d.hw - 0.35) * side;
-        if (opts.bollardKeepOut?.some((other) => deckContains(other, bx, bz, 0.5))) continue;
         const g = new THREE.BoxGeometry(0.26, 0.72, 0.26);
         g.translate(bx, yAt(d.hl - 0.5) + 0.3, bz);
         posts.push(g.toNonIndexed());

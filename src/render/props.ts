@@ -74,6 +74,7 @@ import {
   type TransportShipView,
   transportShipPrewarmParts,
 } from './transport_ship';
+import { buildWickharborHarbor, wickharborHarborPrewarmParts } from './wickharbor_harbor';
 import { buildWickharborWharf, wickharborWharfPrewarmParts } from './wickharbor_wharf';
 import { applySurfaceDetail, type WornFamilyPick, wornFamilyFor } from './worn_stone';
 import {
@@ -1029,14 +1030,15 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
   }
   // moored transport ships draw their own merged, vertex-coloured meshes
   // (transport_ship.ts), and so do the berths' route markers
-  // (harbor_route_markers.ts), the Wyrmwatch cliff harbor (wyrmwatch_harbor.ts) and the
-  // Wickharbor ferry wharf (wickharbor_wharf.ts): one twin per distinct program, shadow
-  // variant included
+  // (harbor_route_markers.ts), the Wyrmwatch cliff harbor (wyrmwatch_harbor.ts), the
+  // Wickharbor ferry wharf (wickharbor_wharf.ts) and the rest of Wickharbor's harbor
+  // (wickharbor_harbor.ts): one twin per distinct program, shadow variant included
   for (const part of [
     ...transportShipPrewarmParts(),
     ...harborRouteMarkerPrewarmParts(),
     ...wyrmwatchHarborPrewarmParts(),
     ...wickharborWharfPrewarmParts(),
+    ...wickharborHarborPrewarmParts(),
   ]) {
     const mesh = new THREE.Mesh(part.geometry, part.material);
     mesh.castShadow = true;
@@ -1707,8 +1709,12 @@ export function buildProps(
   } else {
     clearHarborHouseShell();
   }
-  // ...and the Wickharbor ferry wharf at the Wickharbor berth (render/wickharbor_wharf.ts)
-  if (builtInWorld) group.add(buildWickharborWharf());
+  // ...and the Wickharbor ferry wharf at the Wickharbor berth (render/wickharbor_wharf.ts),
+  // with the rest of the town's wooden harbor in the same wood (render/wickharbor_harbor.ts)
+  if (builtInWorld) {
+    group.add(buildWickharborWharf());
+    group.add(buildWickharborHarbor());
+  }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
   activeContent.props.stalls.forEach((s, i) => {
