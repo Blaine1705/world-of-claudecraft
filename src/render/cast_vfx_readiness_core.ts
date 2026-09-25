@@ -1,5 +1,5 @@
 // Whether the ability-VFX painter may draw a cast yet: every program of the
-// engine family it draws a cast with (cast_vfx_family.ts) is linked. Until
+// engine and kit families it draws a cast with (cast_vfx_family.ts) is linked. Until
 // then the painter draws nothing, so a first cast never links a program cold
 // on a live frame; the cast bars and nameplates the player acts on are
 // untouched, only the cosmetic read is skipped.
@@ -49,7 +49,7 @@ export interface CastVfxReadinessDeps<M> {
   now: () => number;
   /** How long the gate may hold before it opens on its own. Every sibling
    *  hold in this subsystem is bounded and this one was not: `ready` latches
-   *  only when the set is staged AND every material is linked, so a
+   *  only when every material is linked, so a
    *  boot entry the budget dropped whose resume never lands (a page
    *  backgrounded through the whole resume, a starved resume queue, a link
    *  that rejects) left the painter drawing NO cast for the rest of the
@@ -57,14 +57,11 @@ export interface CastVfxReadinessDeps<M> {
    *  early costs ONE cold link, never opening costs the whole session, so the
    *  bound is deliberately far past any legitimate resume. */
   deadlineMs: number;
-  /** Every material a cast may draw with. Read ONCE, at the first consult
-   *  once staged: the pools are never disposed or replaced, and the
+  /** Every material a cast may draw with. Read ONCE, at the first consult:
+   *  the pools are built before it and never disposed or replaced, and the
    *  per-frame consult must not walk the scene during the very seconds the
    *  programs are still linking. */
   materials: () => readonly M[];
-  /** The set is complete: until then nothing is admitted. Absent when the
-   *  set exists before the first consult. */
-  staged?: () => boolean;
   /** The program a settle has PROVED linked for this material, or null when
    *  its current one is not proved (the host reads the settle record, never
    *  the driver: a per-frame consult must not issue a GPU-process round
@@ -80,7 +77,7 @@ export interface CastVfxReadinessSnapshot {
   ready: boolean;
   /** Casts the painter skipped while not ready. */
   refused: number;
-  /** Unlinked materials at the last check; null while the set is not staged. */
+  /** Unlinked materials at the last check; null when no check has read the set. */
   pending: number | null;
   /** The gate opened on its deadline rather than on its programs: the resume
    *  never landed, and the readout says so instead of the session going quiet. */
@@ -104,8 +101,6 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
   let refused = 0;
   let pending: number | null = null;
   let materials: readonly M[] | null = null;
-  // From the first consult, not from the staging: the failure this bounds
-  // includes the one where the set is never staged at all.
   let firstConsultAt: number | null = null;
   const check = (): boolean => {
     if (ready) return true;
@@ -115,10 +110,6 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
       ready = true;
       forced = true;
       return true;
-    }
-    if (deps.staged && !deps.staged()) {
-      pending = null;
-      return false;
     }
     if (materials === null) materials = deps.materials();
     let unlinked = 0;

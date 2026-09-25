@@ -9,13 +9,13 @@
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { tagCastVfxEngine } from '../src/render/cast_vfx_family';
+import { tagCastVfxEngine, tagCastVfxKit } from '../src/render/cast_vfx_family';
 import { castVfxProgramUnits, createSceneCastVfxReadiness } from '../src/render/cast_vfx_prewarm';
 import type { CompileArmHost } from '../src/render/compile_arms';
 import { markProgramReady } from '../src/render/linked_program_readiness';
 import type { LinkedProgramLike } from '../src/render/linked_program_touch';
 
-/** A pooled engine-family mesh: the tag abilityVfxEngineMaterials selects
+/** A pooled engine-family mesh: the tag abilityVfxGateMaterials selects
  *  on, so this is what the gate's scene walk collects. */
 function vfxMesh(
   name: string,
@@ -24,6 +24,14 @@ function vfxMesh(
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
   mesh.name = name;
   tagCastVfxEngine(mesh);
+  return mesh;
+}
+
+/** A pooled Warrior kit mesh: the gate's second family. */
+function kitMesh(name: string, material: THREE.Material): THREE.Mesh {
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+  mesh.name = name;
+  tagCastVfxKit(mesh);
   return mesh;
 }
 
@@ -174,7 +182,7 @@ describe('the scene cast-VFX gate over three', () => {
     expect(readiness.ready()).toBe(false);
   });
 
-  it('links a pooled program outside the engine family and never waits on it', async () => {
+  it('links a pooled program outside the gated families and never waits on it', async () => {
     // A class pool, a lazy stand-in or a generic basic keeps its unit, but
     // the painter never draws it behind the gate, so it holds no cast.
     const ring = vfxMesh('ring');
@@ -194,15 +202,33 @@ describe('the scene cast-VFX gate over three', () => {
     expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
   });
 
-  it('links the engine family first, then the other pools, then the stand-ins', () => {
+  it('holds a cast on a kit program until its own unit settled', async () => {
+    // Several kit pieces draw with no readiness check of their own, so the
+    // gate is their protection (cast_vfx_family.ts).
+    const ring = vfxMesh('ring');
+    const { scene, host, webgl, readiness, programs, materialOf } = harness([ring]);
+    const crest = kitMesh('crest', new THREE.MeshBasicMaterial({ transparent: true }));
+    scene.add(crest);
+    programs.set(materialOf(ring), program());
+    programs.set(materialOf(crest), program());
+    const units = castVfxProgramUnits(scene, null, host, webgl, () => Promise.resolve());
+    expect(units.map((unit) => unit.roots?.[0])).toEqual([ring, crest]);
+    await units[0].run();
+    expect(readiness.snapshot()).toMatchObject({ ready: false, pending: 1 });
+    await units[1].run();
+    expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
+  });
+
+  it('links the engine family first, then the kit, then the other pools, then the stand-ins', () => {
     const bespoke = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial());
     bespoke.userData.renderCategory = 'vfx';
+    const crest = kitMesh('crest', new THREE.MeshBasicMaterial({ wireframe: true }));
     const ring = vfxMesh('ring', new THREE.MeshBasicMaterial({ transparent: true }));
     const { scene, host, webgl } = harness([]);
-    scene.add(bespoke, ring);
+    scene.add(bespoke, crest, ring);
     const standIns = new THREE.Group();
     const units = castVfxProgramUnits(scene, standIns, host, webgl, () => Promise.resolve());
-    expect(units.map((unit) => unit.roots?.[0])).toEqual([ring, bespoke, standIns]);
+    expect(units.map((unit) => unit.roots?.[0])).toEqual([ring, crest, bespoke, standIns]);
   });
 
   it('answers with the PROGRAM the record proved, not with the material', () => {

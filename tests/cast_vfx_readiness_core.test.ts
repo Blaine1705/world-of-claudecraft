@@ -23,13 +23,12 @@ const PROGRAM_B = { id: 'B' };
 
 const DEADLINE_MS = 30_000;
 
-function harness(materials: Mat[], staged = true) {
-  const state = { staged, materials, nowMs: 0 };
+function harness(materials: Mat[]) {
+  const state = { materials, nowMs: 0 };
   const readiness = createCastVfxReadiness<Mat>({
     now: () => state.nowMs,
     deadlineMs: DEADLINE_MS,
     materials: () => state.materials,
-    staged: () => state.staged,
     linked: (material) => material.program,
   });
   return { readiness, state };
@@ -48,14 +47,6 @@ describe('createCastVfxReadiness', () => {
     state.materials[1].program = PROGRAM_A;
     expect(readiness.admit()).toBe(true);
     expect(readiness.snapshot()).toEqual({ ready: true, refused: 2, pending: 0, forced: false });
-  });
-
-  it('refuses until the lazy stand-ins are staged, whatever the pools say', () => {
-    const { readiness, state } = harness([{ id: 'ring', program: PROGRAM_A }], false);
-    expect(readiness.admit()).toBe(false);
-    expect(readiness.snapshot()).toMatchObject({ ready: false, pending: null });
-    state.staged = true;
-    expect(readiness.admit()).toBe(true);
   });
 
   it('latches ready: a material that arrives later never re-closes the gate', () => {
@@ -78,22 +69,19 @@ describe('createCastVfxReadiness', () => {
     expect(readiness.ready()).toBe(true);
   });
 
-  it('reads the material set once, at the first consult after staging', () => {
+  it('reads the material set once, at the first consult', () => {
     // The per-frame consult runs once per entity while the programs are still
     // linking; the set behind it is a scene walk, so it is collected once
-    // (the pools and stand-ins are never disposed or replaced).
-    const state = { staged: false, materials: [{ id: 'ring', program: null }] as Mat[] };
+    // (the pools are built before it and never disposed or replaced).
+    const state = { materials: [{ id: 'ring', program: null }] as Mat[] };
     const reads = vi.fn(() => state.materials);
     const readiness = createCastVfxReadiness<Mat>({
       now: () => 0,
       deadlineMs: DEADLINE_MS,
       materials: reads,
-      staged: () => state.staged,
       linked: (material) => material.program,
     });
-    expect(readiness.ready()).toBe(false);
     expect(reads).not.toHaveBeenCalled();
-    state.staged = true;
     for (let i = 0; i < 5; i++) expect(readiness.ready()).toBe(false);
     expect(reads).toHaveBeenCalledTimes(1);
     state.materials[0].program = PROGRAM_A;
@@ -114,7 +102,6 @@ describe('createCastVfxReadiness', () => {
       now: () => 0,
       deadlineMs: DEADLINE_MS,
       materials: () => [ring, decal],
-      staged: () => true,
       linked: (material) => {
         asked.push(material.id);
         return material.program;
@@ -139,7 +126,7 @@ describe('createCastVfxReadiness', () => {
   });
 
   it('keeps the whole-gate latch: a swap after it opened never closes it again', () => {
-    // The pools and stand-ins are never disposed, and a cast's own live clone
+    // The pools are never disposed, and a cast's own live clone
     // shares an already-proved program; re-closing an open gate would blank
     // the cast VFX mid-fight over a material nothing is waiting on.
     const ring: Mat = { id: 'ring', program: PROGRAM_A };
@@ -147,7 +134,6 @@ describe('createCastVfxReadiness', () => {
       now: () => 0,
       deadlineMs: DEADLINE_MS,
       materials: () => [ring],
-      staged: () => true,
       linked: (material) => material.program,
     });
     expect(readiness.admit()).toBe(true);
@@ -156,7 +142,7 @@ describe('createCastVfxReadiness', () => {
     expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0 });
   });
 
-  it('is ready with nothing to link once staged', () => {
+  it('is ready with nothing to link', () => {
     const { readiness } = harness([]);
     expect(readiness.admit()).toBe(true);
   });
@@ -176,16 +162,6 @@ describe('createCastVfxReadiness', () => {
     // that opened because its programs linked.
     expect(readiness.snapshot().forced).toBe(true);
     expect(readiness.snapshot().ready).toBe(true);
-  });
-
-  it('bounds the never-staged case too, not only the never-linked one', () => {
-    // The deadline runs from the first CONSULT, so a stand-in group that is
-    // never staged at all is bounded exactly like an unlinked one.
-    const { readiness, state } = harness([], false);
-    expect(readiness.admit()).toBe(false);
-    state.nowMs = DEADLINE_MS;
-    expect(readiness.admit()).toBe(true);
-    expect(readiness.snapshot().forced).toBe(true);
   });
 
   it('does not report forced when the programs did arrive in time', () => {
@@ -214,7 +190,6 @@ describe('the linked answer is a handle, never a boolean', () => {
         now: () => 0,
         deadlineMs: DEADLINE_MS,
         materials: () => [],
-        staged: () => true,
         // @ts-expect-error a boolean is not a proof: the host returns the proved program or null
         linked: () => false,
       });

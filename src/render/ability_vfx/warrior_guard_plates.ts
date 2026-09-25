@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxKit } from '../cast_vfx_family';
 import { modulateEmissiveByVertexColor } from '../vertex_color_emissive';
 import type { WeaponAnchorSampler } from '../weapon_trail_anchor';
 import type { CrestPrewarmHost } from './crest_prewarm';
@@ -80,7 +81,7 @@ export class WarriorGuardPlates {
       SOLID_WEARERS * PLATES,
     );
     this.mesh.name = 'warrior-held-guard-plates';
-    this.mesh.userData.renderCategory = 'vfx';
+    tagCastVfxKit(this.mesh);
     this.mesh.frustumCulled = false;
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     for (let i = 0; i < SOLID_WEARERS * PLATES; i++) {

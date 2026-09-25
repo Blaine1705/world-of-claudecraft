@@ -4,8 +4,8 @@
 // The pooled primitives and the generic basics sit hidden in the scene from
 // the renderer's construction, so the visible-only scene compile never
 // collects them; the lazy spell stand-ins join once their group is staged.
-// Every one of them gets a unit, while the gate waits on the engine family
-// alone (cast_vfx_family.ts): the programs the painter draws behind it.
+// Every one of them gets a unit, while the gate waits on the engine and kit
+// families alone (cast_vfx_family.ts): the programs the painter draws behind it.
 // renderer.ts keeps the wiring only.
 //
 // Linked means PROVED linked, by the settle record (linked_program_readiness.ts):
@@ -18,7 +18,7 @@
 // for the 5558 ms it cost once).
 
 import type * as THREE from 'three';
-import { abilityVfxEngineMaterials, collectAbilityVfxCompileTargets } from './ability_vfx';
+import { abilityVfxGateMaterials, collectAbilityVfxCompileTargets } from './ability_vfx';
 import { type CastVfxReadiness, createCastVfxReadiness } from './cast_vfx_readiness_core';
 import { type CompileArmHost, linkColorPrograms } from './compile_arms';
 import { isProgramKnownReady, markProgramsReadyUnder } from './linked_program_readiness';
@@ -62,10 +62,10 @@ function linkUnit(
   };
 }
 
-/** One link unit per distinct pooled program, the engine family's first
- *  (the programs the gate waits on), then one for the staged lazy stand-ins
- *  (null before their stage), which never hold a cast. `compile` is the test
- *  seam. */
+/** One link unit per distinct pooled program, the engine family's first,
+ *  then the kit's (the programs the gate waits on), then one for the staged
+ *  lazy stand-ins (null before their stage), which never hold a cast.
+ *  `compile` is the test seam. */
 export function castVfxProgramUnits(
   scene: THREE.Object3D,
   standIns: THREE.Object3D | null,
@@ -122,9 +122,9 @@ export function castVfxFirstReadsEntry(
  *  with its reason, not a measurement, and derived rather than tuned. */
 export const CAST_VFX_READY_DEADLINE_MS = REVEAL_GATE_WATCHDOG_MS * 3;
 
-/** The gate over the engine family's programs in the scene. Its pools are
- *  built with the renderer, before any consult, so the set is read once and
- *  nothing waits on a stage. */
+/** The gate over the engine and kit families' programs in the scene. Their
+ *  pools are built with the renderer, before any consult, so the set is read
+ *  once and nothing waits on a stage. */
 export function createSceneCastVfxReadiness(
   scene: THREE.Object3D,
   webgl: LinkedProgramSource,
@@ -134,7 +134,7 @@ export function createSceneCastVfxReadiness(
   return createCastVfxReadiness<THREE.Material>({
     now,
     deadlineMs,
-    materials: () => abilityVfxEngineMaterials(scene),
+    materials: () => abilityVfxGateMaterials(scene),
     // The PROGRAM the settle record proved, not a boolean: the core keys its
     // answer on it, so a material three has repointed at a program no settle
     // has seen reads pending again instead of riding the earlier one's answer.

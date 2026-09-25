@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxKit } from '../cast_vfx_family';
 import { sceneKeyLightUniform } from '../scene_sampling';
 import { type FragmentKind, fragmentGeometry } from './production_assets';
 import { warriorFragmentShape } from './warrior_fragment_shape';
@@ -72,7 +73,7 @@ export class SolidImpactFragments {
       });
       const mesh = new THREE.Mesh(geometry, material);
       mesh.name = `solidImpact:${kind}`;
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxKit(mesh);
       mesh.visible = false;
       mesh.frustumCulled = false;
       scene.add(mesh);

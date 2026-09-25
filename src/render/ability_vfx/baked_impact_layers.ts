@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxKit } from '../cast_vfx_family';
 import { SUN_DIR } from '../gfx';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL } from '../scene_sampling';
 import { BakedPoolPrewarm } from './baked_pool_prewarm';
@@ -96,7 +97,7 @@ export class BakedImpactLayers {
       const mesh = new THREE.Mesh(geometry.clone(), proto.clone());
       this.unbind.push(bindSceneSamples(scene, mesh));
       mesh.name = 'bakedImpactVolume';
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxKit(mesh);
       mesh.visible = false;
       mesh.renderOrder = 5;
       mesh.frustumCulled = false;

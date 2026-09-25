@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxKit } from '../cast_vfx_family';
 import { modulateEmissiveByVertexColor } from '../vertex_color_emissive';
 import {
   type WarriorFuryStateAura,
@@ -92,7 +93,7 @@ export class WarriorFuryStates {
         'warrior-mending-stitches',
         'warrior-echo-charges',
       ][k];
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxKit(mesh);
       mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       for (let i = 0; i < WEARERS * COUNTS[kind]; i++) {

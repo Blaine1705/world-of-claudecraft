@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxKit } from '../cast_vfx_family';
 import { modulateEmissiveByVertexColor } from '../vertex_color_emissive';
 import type { CrestPrewarmHost } from './crest_prewarm';
 import { GuardPrewarm } from './guard_prewarm';
@@ -31,7 +32,7 @@ export class WarriorSpiritHammers {
     );
     this.mesh = new THREE.InstancedMesh(warriorSpiritHammerShape(), material, CAPACITY);
     this.mesh.name = 'warrior-spirit-hammers';
-    this.mesh.userData.renderCategory = 'vfx';
+    tagCastVfxKit(this.mesh);
     this.mesh.frustumCulled = false;
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     const white = new THREE.Color(0xffffff);

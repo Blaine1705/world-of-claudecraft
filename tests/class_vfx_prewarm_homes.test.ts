@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import {
-  abilityVfxEngineMaterials,
+  abilityVfxGateMaterials,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
 import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
@@ -62,12 +62,12 @@ function engineRibbonSignatures(): Set<string> {
  *  a compile unit: one representative per program, since a clone sharing a
  *  linked program reuses it on its first draw. None of its own programs holds
  *  the cast gate: the painter never draws these pools, so the gate waits on
- *  the engine family alone (tests/cast_vfx_engine_family.test.ts). */
+ *  the engine and kit families (tests/cast_vfx_engine_family.test.ts). */
 function expectEveryDrawableCollected(scene: THREE.Scene, root: THREE.Object3D): void {
   const drawables = drawablesUnder(root);
   expect(drawables.length).toBeGreaterThan(0);
   const engine = engineRibbonSignatures();
-  for (const material of abilityVfxEngineMaterials(scene)) {
+  for (const material of abilityVfxGateMaterials(scene)) {
     const draw = drawsUnder(scene).find((candidate) => candidate.material === material);
     const signature = draw ? drawProgramSignature(draw.object, draw.material) : material.uuid;
     expect(engine.has(signature), `${draw?.object.name ?? material.type} gated`).toBe(true);

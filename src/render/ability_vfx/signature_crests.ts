@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxKit } from '../cast_vfx_family';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL, sceneKeyLightUniform } from '../scene_sampling';
 import { BLOOD_FILM_GLSL } from './blood_film_material';
 import { BLOODLETTING_FRAGMENT, BLOODLETTING_VERTEX } from './bloodletting_shape';
@@ -271,7 +272,7 @@ export class SignatureCrests {
       this.unbind.push(bindSceneSamples(scene, mesh));
       mesh.name = 'signatureCrest';
       mesh.visible = false;
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxKit(mesh);
       mesh.renderOrder = 4;
       // Shader animation can move the surface beyond its prepared bounds.
       mesh.frustumCulled = false;

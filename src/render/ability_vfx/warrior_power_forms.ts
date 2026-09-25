@@ -1,4 +1,5 @@
 ﻿import * as THREE from 'three';
+import { tagCastVfxKit } from '../cast_vfx_family';
 import { modulateEmissiveByVertexColor } from '../vertex_color_emissive';
 import type { WarriorPowerAnchor } from '../warrior_power_anchor';
 import {
@@ -96,7 +97,7 @@ export class WarriorPowerForms {
         'warrior-avatar-bracers',
         'warrior-avatar-shins',
       ][kind];
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxKit(mesh);
       mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       for (let i = 0; i < CAPACITY[kind]; i++) {
