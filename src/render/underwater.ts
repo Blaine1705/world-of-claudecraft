@@ -5,7 +5,7 @@
 //
 //  * TINT — a camera-facing quad pinned just past the near plane, drawn last with
 //    depth testing off. The scene fog already darkens distance toward the same
-//    blue (renderer.ts applies an underwater fog override), but fog cannot reach
+//    blue (frame() applies an underwater fog override), but fog cannot reach
 //    the sky dome, which renders unfogged; the quad is what stops a clear sky
 //    showing through the surface from below and sells "you are inside water".
 //
@@ -20,6 +20,7 @@
 // the scene's materials, so surfacing simply fades the group back out.
 
 import * as THREE from 'three';
+import { waterLevelAt } from '../sim/world';
 
 /** The colour the world drowns toward. */
 export const UNDERWATER_TINT = 0x1d5f87;
@@ -27,6 +28,8 @@ export const UNDERWATER_TINT = 0x1d5f87;
 export const UNDERWATER_FOG_COLOR = 0x11466a;
 export const UNDERWATER_FOG_NEAR = 1.5;
 export const UNDERWATER_FOG_FAR = 46;
+/** Depth below the waterline over which the wash fades fully in. */
+const UNDERWATER_FADE_DEPTH = 0.45;
 /** Peak opacity of the tint quad, at full submersion. */
 const TINT_OPACITY = 0.46;
 /** Vertical extent of the bubble column (yards). Points wrap within it. */
@@ -35,6 +38,32 @@ const BUBBLE_BOX_HEIGHT = 9;
  *  projects to a screen-filling blob however small its world size. */
 const BUBBLE_RADIUS_MIN = 1.6;
 const BUBBLE_RADIUS_MAX = 7;
+
+/** One frame of the eased 0..1 blend toward the camera's depth under `level`,
+ *  the waterline at the camera (-Infinity off water). Fading across the first
+ *  half-yard under the line makes breaking the surface a wash lifting rather
+ *  than a switch flipping. */
+export function underwaterBlendStep(
+  blend: number,
+  level: number,
+  cameraY: number,
+  dt: number,
+): number {
+  const depth = Number.isFinite(level) ? level - cameraY : -1;
+  const target = Math.min(1, Math.max(0, depth / UNDERWATER_FADE_DEPTH));
+  return blend + (target - blend) * (1 - Math.exp(-dt * 7));
+}
+
+/** Pull the fog toward the water by `blend`. It rides ON TOP of whatever the
+ *  biome fog easing just wrote: the easing pulls back toward the zone preset
+ *  every frame and this pulls toward the water, so surfacing restores the
+ *  biome's own fog with no state to unwind. */
+export function applyUnderwaterFog(fog: THREE.Fog, blend: number, scratch: THREE.Color): void {
+  if (blend <= 0.002) return;
+  fog.color.lerp(scratch.setHex(UNDERWATER_FOG_COLOR), blend);
+  fog.near += (UNDERWATER_FOG_NEAR - fog.near) * blend;
+  fog.far += (UNDERWATER_FOG_FAR - fog.far) * blend;
+}
 
 const BUBBLE_VERT = /* glsl */ `
   attribute vec3 aOffset;   // x/z seat in the box, y = starting height
@@ -84,7 +113,9 @@ export class UnderwaterView {
   private readonly tint: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
   private readonly bubbles: THREE.Points;
   private readonly bubbleMat: THREE.ShaderMaterial;
+  private readonly fogScratch = new THREE.Color();
   private time = 0;
+  private blend = 0;
 
   constructor(lowGfx: boolean) {
     this.group.name = 'underwater';
@@ -148,6 +179,17 @@ export class UnderwaterView {
     // above the tint: the bubbles read as being between you and the blue
     this.bubbles.renderOrder = 9991;
     this.group.add(this.bubbles);
+  }
+
+  /** One frame of the camera under a waterline: a blue wash, shortened fog,
+   *  and a rising bubble stream. Keyed off the CAMERA, not the player, so a
+   *  third-person boom that dips below the surface reads right, and a swimmer
+   *  at the surface with the camera under it still sees water rather than air. */
+  frame(camera: THREE.PerspectiveCamera, fog: THREE.Fog, seed: number, dt: number): void {
+    const cam = camera.position;
+    this.blend = underwaterBlendStep(this.blend, waterLevelAt(cam.x, cam.z, seed), cam.y, dt);
+    this.update(camera, this.blend, dt);
+    applyUnderwaterFog(fog, this.blend, this.fogScratch);
   }
 
   /**

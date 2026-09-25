@@ -1387,7 +1387,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  'e05f804ff30f8ad1495b622a655a53d32f74d78a4583d8e4ab3e61293f035e6a';
+  // Re-minted for the underwater blend and fog move out of the renderer leaf. No capture was retaken.
+  '5315f742fe290a980fafc5fae523de4ac555365e11d299a8163ec8a46e8307dc';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1403,7 +1404,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  '100b2f995a9b9310c851d22f6bc8ee71dc14daabe1524cf850ef315fa5d545b4';
+  // Re-minted for the underwater blend and fog move out of the renderer leaf. No capture was retaken.
+  '970d484d4b280ea2111a460e4668c2ad2783e65386acf6c1d89d4f5d70d38995';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2784,7 +2786,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // feature/world-pvp-flag (review round) merge into feature/king-of-the-hill: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-    ).toBe('1c09657cefab5fe6314e3ffab25441c4ffb1408edd06b4bb8f8020a00b1013e3');
+      // underwater blend move out of the renderer leaf: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+    ).toBe('5cbe8efacb615b03c01e92b750caa786c3e774659ac97c379870690928b9188c');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
