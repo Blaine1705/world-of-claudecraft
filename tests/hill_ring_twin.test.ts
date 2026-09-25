@@ -5,7 +5,7 @@
 // half (zero programs linked at the live ring's first draw, canvas and render
 // target) is tests/browser/hill_ring_programs.browser.test.ts.
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { HillRingVisuals } from '../src/render/hill_ring';
 import { materialProgramSignature, prewarmProgramContentKeys } from '../src/render/prewarm_policy';
 import type { HillInfo } from '../src/world_api/world_pvp';
@@ -192,22 +192,31 @@ describe('hill ring warm twin', () => {
     expect(keySet(selectionShaped)).not.toEqual(keySet(submitted[0]));
   });
 
-  it('swallows a rejected gate and keeps drawing the live ring', async () => {
+  it('warns on a rejected gate, retries at the next hill and keeps drawing the live ring', async () => {
     const scene = new THREE.Scene();
     let calls = 0;
-    const visuals = new HillRingVisuals(
-      scene,
-      () => {
-        calls++;
-        return Promise.reject(new Error('Renderer shut down'));
-      },
-      unevenGround,
-    );
-    visuals.sync(hill());
-    await Promise.resolve();
-    visuals.sync(null);
-    visuals.sync(hill({ x: 9, z: 9 }));
-    expect(calls).toBe(1);
-    expect(scene.getObjectByName('hill-ring')?.visible).toBe(true);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const visuals = new HillRingVisuals(
+        scene,
+        () => {
+          calls++;
+          return Promise.reject(new Error('link failed'));
+        },
+        unevenGround,
+      );
+      visuals.sync(hill());
+      expect(scene.getObjectByName('hill-ring')?.visible).toBe(true);
+      visuals.sync(hill({ phase: 'active' }));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(calls).toBe(1);
+      expect(warn).toHaveBeenCalledTimes(1);
+      visuals.sync(null);
+      visuals.sync(hill({ x: 9, z: 9 }));
+      expect(calls).toBe(2);
+      expect(scene.getObjectByName('hill-ring')?.visible).toBe(true);
+    } finally {
+      warn.mockRestore();
+    }
   });
 });

@@ -4,8 +4,10 @@
 // leg (no gate) proves the harness sees the live ring's first draw link cold
 // and its program only park in the retention FIFO once the hill ends;
 // the PREPARED legs prove that once the twin the first sighting hands to the
-// gate has compiled under the tier's target (the canvas on a direct tier, a
-// render target on a composer tier), the live ring's first draw links ZERO
+// gate has compiled under the tier's target (the canvas on a direct tier; on a
+// composer tier a tiny throwaway target like the renderer's compile arm uses,
+// while the scene pass draws into a full-size HalfFloat one), the live ring's
+// first draw links ZERO
 // programs, a later hill at a new spot links zero again, and the twin's
 // program stays live, never parked, after the hill ends.
 import * as THREE from 'three';
@@ -52,6 +54,7 @@ function setup() {
   renderer.setSize(WIDTH, HEIGHT, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   const target = new THREE.WebGLRenderTarget(WIDTH, HEIGHT, { type: THREE.HalfFloatType });
+  const compileTarget = new THREE.WebGLRenderTarget(8, 8);
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0x88aacc, 20, 400);
   scene.add(new THREE.AmbientLight(0xffffff, 1));
@@ -63,10 +66,11 @@ function setup() {
   camera.updateProjectionMatrix();
   dispose = () => {
     target.dispose();
+    compileTarget.dispose();
     renderer.dispose();
     canvas.remove();
   };
-  return { renderer, target, scene, camera };
+  return { renderer, target, compileTarget, scene, camera };
 }
 
 // The three patch's bounded retention FIFO: a released program parks here,
@@ -103,8 +107,9 @@ describe('hill ring programs on a real WebGL driver', () => {
   ])(
     '%s: after the twin compiles, every ring of the session links nothing',
     async (_tier, offscreen) => {
-      const { renderer, target, scene, camera } = setup();
+      const { renderer, target, compileTarget, scene, camera } = setup();
       const bound = offscreen ? target : null;
+      const compileBound = offscreen ? compileTarget : null;
       const draw = () => {
         renderer.setRenderTarget(bound);
         renderer.render(scene, camera);
@@ -112,7 +117,7 @@ describe('hill ring programs on a real WebGL driver', () => {
       };
       const compiled: Promise<unknown>[] = [];
       const gate = (root: THREE.Object3D) => {
-        renderer.setRenderTarget(bound);
+        renderer.setRenderTarget(compileBound);
         const linked = renderer.compileAsync(root, camera, scene);
         renderer.setRenderTarget(null);
         compiled.push(linked);

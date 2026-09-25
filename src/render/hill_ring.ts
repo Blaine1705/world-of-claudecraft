@@ -18,9 +18,9 @@
 // hands it to the renderer's compile gate: the program links off the draw
 // path, and the twin keeps it in use, so every later ring of the session (the
 // next hill comes hours later, likely past the retained-program FIFO) finds it
-// linked. A player looking at the spot on the very frame of the first
-// announcement can still see the live ring link its program: that residual is
-// accepted.
+// linked. A player who draws the ring before the twin's gate settles (looking
+// at the spot at the first announcement) still sees the live ring link its
+// program: that residual is accepted.
 
 import * as THREE from 'three';
 import type { HillInfo } from '../world_api/world_pvp';
@@ -120,11 +120,15 @@ export class HillRingVisuals {
     twin.name = 'hill-ring-twin';
     twin.visible = false;
     this.twin = twin;
-    void gate(twin).catch(() => {});
+    gate(twin).catch((error) => {
+      if (this.twin === twin) this.twin = null;
+      console.warn('Hill ring warm twin compile failed, retrying at the next hill', error);
+    });
   }
 
   private material(color: number, opacity: number, additive: boolean): THREE.MeshBasicMaterial {
     return new THREE.MeshBasicMaterial({
+      name: additive ? 'hill-ring:rim' : 'hill-ring:fill',
       color,
       transparent: true,
       opacity,
