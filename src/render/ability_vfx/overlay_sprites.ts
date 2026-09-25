@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxEngine } from '../cast_vfx_family';
 import { type AbilityVfxTextures, OVERLAY_ATLAS_GRID, OVERLAY_CELL } from './fx_textures';
 
 // One pooled point cloud for every persistent overlay sprite (windup orbs,
@@ -106,7 +107,7 @@ export class OverlaySprites {
     this.points = new THREE.Points(this.geo, mat);
     this.points.frustumCulled = false;
     this.points.renderOrder = 7;
-    this.points.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(this.points);
     // An idle cloud is NOT free: three does not early-out on a zero draw count,
     // so a drawRange of 0 still pays setProgram, the VAO bind and a zero-count
     // draw every frame. Hide when empty, show on the first push: the toggle

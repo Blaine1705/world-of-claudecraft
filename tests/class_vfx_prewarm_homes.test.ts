@@ -1,7 +1,7 @@
 // The class VFX pools that live outside AbilityVfxFx still need a prewarm
-// home. The vfx.ability-primitives entry and the cast gate both walk the
-// scene through collectAbilityVfxCompileTargets / abilityVfxCompileMaterials,
-// which select on each object's OWN renderCategory tag. A module that tags
+// home. The vfx.ability-primitives entry walks the scene through
+// collectAbilityVfxCompileTargets, which selects on each object's OWN
+// renderCategory tag. A module that tags
 // only its (material-less, hidden) root group is invisible to that walk, so
 // its programs link live on the first cast. Each module below must hand the
 // walk every drawable it built.
@@ -10,9 +10,10 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import {
-  abilityVfxCompileMaterials,
+  abilityVfxEngineMaterials,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
+import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
 import { DrainLifeVfx } from '../src/render/drain_life_vfx';
 import { drawProgramSignature } from '../src/render/draw_program_signature_core';
 import { NeedleOfFateVfx } from '../src/render/needle_of_fate_vfx';
@@ -48,27 +49,38 @@ function materialsOf(object: Drawable): THREE.Material[] {
   return Array.isArray(object.material) ? object.material : [object.material];
 }
 
+/** The engine ribbon's programs: a class pool that embeds an
+ *  AbilityVfxRibbons (Sentence's lash) draws the engine's own program, which
+ *  the fx's ribbons already hold in the gate, so it adds no gate entry. */
+function engineRibbonSignatures(): Set<string> {
+  const scene = new THREE.Scene();
+  new AbilityVfxRibbons(scene, () => null, TEST_TEXTURES);
+  return new Set(drawsUnder(scene).map((draw) => drawProgramSignature(draw.object, draw.material)));
+}
+
 /** Every draw under `root`, as three would key its program set, is linked by
- *  a compile unit and gated by the cast gate: one representative per
- *  program, since a clone sharing a linked program reuses it on its first
- *  draw. */
+ *  a compile unit: one representative per program, since a clone sharing a
+ *  linked program reuses it on its first draw. None of its own programs holds
+ *  the cast gate: the painter never draws these pools, so the gate waits on
+ *  the engine family alone (tests/cast_vfx_engine_family.test.ts). */
 function expectEveryDrawableCollected(scene: THREE.Scene, root: THREE.Object3D): void {
   const drawables = drawablesUnder(root);
   expect(drawables.length).toBeGreaterThan(0);
-  const gatedSet = new Set(abilityVfxCompileMaterials(scene));
+  const engine = engineRibbonSignatures();
+  for (const material of abilityVfxEngineMaterials(scene)) {
+    const draw = drawsUnder(scene).find((candidate) => candidate.material === material);
+    const signature = draw ? drawProgramSignature(draw.object, draw.material) : material.uuid;
+    expect(engine.has(signature), `${draw?.object.name ?? material.type} gated`).toBe(true);
+  }
   const linked = new Set<string>();
-  const gated = new Set<string>();
   for (const target of collectAbilityVfxCompileTargets(scene)) {
     for (const draw of drawsUnder(target.object)) {
-      const key = threeProgramKeys(draw.material, draw.object);
-      linked.add(key);
-      if (gatedSet.has(draw.material)) gated.add(key);
+      linked.add(threeProgramKeys(draw.material, draw.object));
     }
   }
   for (const drawable of drawables) {
     for (const material of materialsOf(drawable)) {
       const key = threeProgramKeys(material, drawable);
-      expect(gated.has(key), `${drawable.name || drawable.type} gated`).toBe(true);
       expect(linked.has(key), `${drawable.name || drawable.type} linked`).toBe(true);
     }
   }
@@ -92,9 +104,9 @@ const POOL_UNITS = {
   needleLow: 3,
 } as const;
 
-/** One compile unit and one gate entry per distinct program signature, and
- *  no signature ever covering two of three's programs (that would let the
- *  gate open on a program no unit linked). */
+/** One compile unit per distinct program signature, and no signature ever
+ *  covering two of three's programs (that would leave a program no unit
+ *  linked). */
 function expectOneUnitPerProgram(pool: keyof typeof POOL_UNITS, scene: THREE.Scene): void {
   const keyOfSignature = new Map<string, string>();
   const programs = new Set<string>();
@@ -109,7 +121,6 @@ function expectOneUnitPerProgram(pool: keyof typeof POOL_UNITS, scene: THREE.Sce
   }
   const units = collectAbilityVfxCompileTargets(scene).length;
   expect(units, `${pool} units`).toBe(keyOfSignature.size);
-  expect(abilityVfxCompileMaterials(scene), `${pool} gate entries`).toHaveLength(units);
   expect(units, `${pool} units`).toBe(POOL_UNITS[pool]);
   expect(programs.size, `${pool} programs`).toBeLessThanOrEqual(units);
 }

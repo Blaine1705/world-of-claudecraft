@@ -4,6 +4,8 @@
 // The pooled primitives and the generic basics sit hidden in the scene from
 // the renderer's construction, so the visible-only scene compile never
 // collects them; the lazy spell stand-ins join once their group is staged.
+// Every one of them gets a unit, while the gate waits on the engine family
+// alone (cast_vfx_family.ts): the programs the painter draws behind it.
 // renderer.ts keeps the wiring only.
 //
 // Linked means PROVED linked, by the settle record (linked_program_readiness.ts):
@@ -16,7 +18,7 @@
 // for the 5558 ms it cost once).
 
 import type * as THREE from 'three';
-import { abilityVfxCompileMaterials, collectAbilityVfxCompileTargets } from './ability_vfx';
+import { abilityVfxEngineMaterials, collectAbilityVfxCompileTargets } from './ability_vfx';
 import { type CastVfxReadiness, createCastVfxReadiness } from './cast_vfx_readiness_core';
 import { type CompileArmHost, linkColorPrograms } from './compile_arms';
 import { isProgramKnownReady, markProgramsReadyUnder } from './linked_program_readiness';
@@ -68,21 +70,19 @@ export function castVfxProgramUnits(
  *  with its reason, not a measurement, and derived rather than tuned. */
 export const CAST_VFX_READY_DEADLINE_MS = REVEAL_GATE_WATCHDOG_MS * 3;
 
-/** The gate over the scene's cast materials and the lazy stand-ins' (kept by
- *  the host past their group's cleanup, since the group is removed and never
- *  disposed). */
+/** The gate over the engine family's programs in the scene. Its pools are
+ *  built with the renderer, before any consult, so the set is read once and
+ *  nothing waits on a stage. */
 export function createSceneCastVfxReadiness(
   scene: THREE.Object3D,
   webgl: LinkedProgramSource,
-  standIns: () => readonly THREE.Material[] | null,
   now: () => number = () => performance.now(),
   deadlineMs: number = CAST_VFX_READY_DEADLINE_MS,
 ): CastVfxReadiness {
   return createCastVfxReadiness<THREE.Material>({
     now,
     deadlineMs,
-    materials: () => [...abilityVfxCompileMaterials(scene), ...(standIns() ?? [])],
-    staged: () => standIns() !== null,
+    materials: () => abilityVfxEngineMaterials(scene),
     // The PROGRAM the settle record proved, not a boolean: the core keys its
     // answer on it, so a material three has repointed at a program no settle
     // has seen reads pending again instead of riding the earlier one's answer.

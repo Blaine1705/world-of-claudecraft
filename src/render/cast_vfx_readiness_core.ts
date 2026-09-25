@@ -1,8 +1,8 @@
-// Whether the ability-VFX painter may draw a cast yet: every program a cast
-// can need (the pooled primitives, the generic basics, the lazy spell
-// stand-ins) is linked. Until then the painter draws nothing, so a first cast
-// never links a program cold on a live frame; the cast bars and nameplates
-// the player acts on are untouched, only the cosmetic read is skipped.
+// Whether the ability-VFX painter may draw a cast yet: every program of the
+// engine family it draws a cast with (cast_vfx_family.ts) is linked. Until
+// then the painter draws nothing, so a first cast never links a program cold
+// on a live frame; the cast bars and nameplates the player acts on are
+// untouched, only the cosmetic read is skipped.
 // The per-frame path is wider than the cast draws alone (a held entity is
 // slept, so its ground aura, shell, orbit and glow sleep with it), with ONE
 // read that survives the closed gate: the hard-CC band, re-held right after
@@ -47,7 +47,7 @@ export interface CastVfxReadinessDeps<M> {
   now: () => number;
   /** How long the gate may hold before it opens on its own. Every sibling
    *  hold in this subsystem is bounded and this one was not: `ready` latches
-   *  only when the stand-ins are staged AND every material is linked, so a
+   *  only when the set is staged AND every material is linked, so a
    *  boot entry the budget dropped whose resume never lands (a page
    *  backgrounded through the whole resume, a starved resume queue, a link
    *  that rejects) left the painter drawing NO cast for the rest of the
@@ -56,13 +56,13 @@ export interface CastVfxReadinessDeps<M> {
    *  bound is deliberately far past any legitimate resume. */
   deadlineMs: number;
   /** Every material a cast may draw with. Read ONCE, at the first consult
-   *  after the stand-ins are staged: the pools and stand-ins are never
-   *  disposed or replaced, and the per-frame consult must not walk the scene
-   *  during the very seconds the programs are still linking. */
+   *  once staged: the pools are never disposed or replaced, and the
+   *  per-frame consult must not walk the scene during the very seconds the
+   *  programs are still linking. */
   materials: () => readonly M[];
-  /** The lazy stand-ins were staged at least once: until then their set is
-   *  unknown, so nothing is admitted. */
-  staged: () => boolean;
+  /** The set is complete: until then nothing is admitted. Absent when the
+   *  set exists before the first consult. */
+  staged?: () => boolean;
   /** The program a settle has PROVED linked for this material, or null when
    *  its current one is not proved (the host reads the settle record, never
    *  the driver: a per-frame consult must not issue a GPU-process round
@@ -78,7 +78,7 @@ export interface CastVfxReadinessSnapshot {
   ready: boolean;
   /** Casts the painter skipped while not ready. */
   refused: number;
-  /** Unlinked materials at the last check; null while the stand-ins are not staged. */
+  /** Unlinked materials at the last check; null while the set is not staged. */
   pending: number | null;
   /** The gate opened on its deadline rather than on its programs: the resume
    *  never landed, and the readout says so instead of the session going quiet. */
@@ -94,16 +94,16 @@ export interface CastVfxReadiness {
 }
 
 export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVfxReadiness {
-  // Latched once every material answered on a proved program: the pools and
-  // stand-ins are never disposed, and a gate that has opened is not asked to
-  // close over a later swap.
+  // Latched once every material answered on a proved program: the pools are
+  // never disposed, and a gate that has opened is not asked to close over a
+  // later swap.
   let ready = false;
   let forced = false;
   let refused = 0;
   let pending: number | null = null;
   let materials: readonly M[] | null = null;
   // From the first consult, not from the staging: the failure this bounds
-  // includes the one where the stand-ins are never staged at all.
+  // includes the one where the set is never staged at all.
   let firstConsultAt: number | null = null;
   const check = (): boolean => {
     if (ready) return true;
@@ -114,7 +114,7 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
       forced = true;
       return true;
     }
-    if (!deps.staged()) {
+    if (deps.staged && !deps.staged()) {
       pending = null;
       return false;
     }

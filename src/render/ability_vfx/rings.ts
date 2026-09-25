@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxEngine } from '../cast_vfx_family';
 import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
 import { drapeRingLocalY } from '../selection_ring';
 import { DRAPE_AXIS_Z, DRAPED_VERTEX_SHADER } from './draped_shader';
@@ -149,7 +150,7 @@ export class ShockRings {
       const mesh = slot.mesh;
       mesh.visible = false;
       mesh.renderOrder = 5;
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxEngine(mesh);
       // Culled again: the flat quad is permanent now, and the sphere is
       // refreshed from the drape extent at every spawn (see spawn).
       mesh.frustumCulled = true;

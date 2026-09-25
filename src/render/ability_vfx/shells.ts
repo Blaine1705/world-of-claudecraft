@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxEngine } from '../cast_vfx_family';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 
 // Translucent buff/barrier shells (the gallery's receiver shell): a soft
@@ -108,7 +109,7 @@ export class BuffShells {
     this.mesh.count = 0;
     this.mesh.visible = false;
     this.mesh.renderOrder = 6;
-    this.mesh.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(this.mesh);
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     // Refreshed from the packed instances each frame (see pack): three caches
     // an InstancedMesh's own sphere once and would never notice a shell move.

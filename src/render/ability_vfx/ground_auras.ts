@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxEngine } from '../cast_vfx_family';
 import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
 import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
 import type { VfxAnchorResolver } from '../vfx_anchor';
@@ -199,7 +200,7 @@ export class GroundAuras {
       const mesh = slot.mesh;
       mesh.visible = false;
       mesh.renderOrder = 4; // over ground decals (3), under the shock rings (5)
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxEngine(mesh);
       // Culled again: the flat disc is permanent now, and the sphere is
       // refreshed from the drape extent at every re-drape (see drapeInto).
       mesh.frustumCulled = true;

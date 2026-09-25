@@ -46,10 +46,7 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
-import {
-  abilityMaterialPrewarmMaterials,
-  buildAbilityMaterialPrewarmGroup,
-} from './ability_material_prewarm';
+import { buildAbilityMaterialPrewarmGroup } from './ability_material_prewarm';
 import { type AbilityVfx, type AbilityVfxFx, abilityVfxTexturePrewarmSteps } from './ability_vfx';
 import { activeKitPrewarmEntry, resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
@@ -1297,7 +1294,6 @@ export class Renderer {
   // A soft light pillar marking the local player's corpse during the ghost run.
   // Built lazily on first death, then just repositioned/toggled (no per-frame alloc).
   private corpseBeacon: CorpseBeacon | null = null;
-  private abilityMaterialStandIns: THREE.Material[] | null = null;
   private castVfxReadiness: CastVfxReadiness;
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
@@ -3020,8 +3016,7 @@ export class Renderer {
     this.scene.add(this.underwaterView.group);
     // Preserve release44 cast admission while the Warrior bindings own their detail.
     this.scene.add(buildCastVfxBasicStandIns());
-    const standIns = (): THREE.Material[] | null => this.abilityMaterialStandIns;
-    this.castVfxReadiness = createSceneCastVfxReadiness(this.scene, this.webgl, standIns);
+    this.castVfxReadiness = createSceneCastVfxReadiness(this.scene, this.webgl);
     const abilityPresentation = createRendererAbilityPresentation({
       scene: this.scene, camera: this.camera, vfx: this.vfx, anchor: vfxAnchor,
       world: () => this.sim, time: () => this.time, views: this.views,
@@ -5509,11 +5504,7 @@ export class Renderer {
     const abilityMaterialSlot = createVariantPrewarmSlot(
       variantSlotHost,
       'ability-materials',
-      () => {
-        const group = buildAbilityMaterialPrewarmGroup();
-        this.abilityMaterialStandIns = abilityMaterialPrewarmMaterials(group);
-        return group;
-      },
+      buildAbilityMaterialPrewarmGroup,
     );
     const castVfxUnits = (): PrewarmResumeUnit[] =>
       castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);

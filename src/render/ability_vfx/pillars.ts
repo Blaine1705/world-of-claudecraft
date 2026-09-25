@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxEngine } from '../cast_vfx_family';
 
 // Vertical light pillars (the gallery's shaft/skybeam/pillars read): a tapered
 // additive column that rises, holds, and fades. Used by the pillars motif,
@@ -87,7 +88,7 @@ export class LightPillars {
     this.mesh.count = 0;
     this.mesh.visible = false;
     this.mesh.renderOrder = 6;
-    this.mesh.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(this.mesh);
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     // Refreshed from the packed instances each frame (see pack): three caches
     // an InstancedMesh's own sphere once and would never notice a column move.

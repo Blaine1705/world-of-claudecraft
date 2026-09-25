@@ -812,7 +812,10 @@ GPU work signs. Each rule names its seam and its guard.
   and the census is charged to it), so read `unexpected` as the gates' own escapes.
   The cast-VFX gate (`cast_vfx_readiness_core.ts`,
   `cast_vfx_prewarm.ts`) is the same idea one level up: the ability-VFX painter
-  draws no cast until every cast program is linked (linked means the settle
+  draws no cast until every program of the engine family it draws casts with
+  is linked (`cast_vfx_family.ts`; the class pools, lazy stand-ins, generic
+  basics and the Warrior kit keep their compile units in the same warm-up but
+  never hold a cast, since none of them draws behind the gate; linked means the settle
   record of `linked_program_readiness.ts`, which each cast unit writes once its
   compile settled; never the presence of `currentProgram`, assigned before the
   link resolves, and never a driver query from a live frame), and the reads a

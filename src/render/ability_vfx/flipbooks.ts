@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxEngine } from '../cast_vfx_family';
 import { boundQuadSize, IMPACT_QUAD_MAX_SCREEN_FRACTION } from '../vfx_screen_bounds_core';
 import { type ContactSheet, contactTexture, isContactSheet } from './contact_assets';
 import { FLIPBOOK_GRID, FLIPBOOK_STYLES, type FlipbookStyle, flipbookSheet } from './fx_textures';
@@ -136,7 +137,7 @@ export class ImpactFlipbooks {
       const mesh = new THREE.Mesh(this.geometry, mat);
       mesh.visible = false;
       mesh.renderOrder = 8; // over the shock rings: the sheet IS the impact
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxEngine(mesh);
       mesh.onBeforeRender = (renderer, _scene, _camera, _geometry, material) => {
         const target = renderer.getRenderTarget();
         (material as THREE.ShaderMaterial).uniforms.uLowRangeTarget.value =

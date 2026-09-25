@@ -9,20 +9,21 @@
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { tagCastVfxEngine } from '../src/render/cast_vfx_family';
 import { castVfxProgramUnits, createSceneCastVfxReadiness } from '../src/render/cast_vfx_prewarm';
 import type { CompileArmHost } from '../src/render/compile_arms';
 import { markProgramReady } from '../src/render/linked_program_readiness';
 import type { LinkedProgramLike } from '../src/render/linked_program_touch';
 
-/** A pooled VFX mesh: `renderCategory` is the tag abilityVfxCompileMaterials
- *  selects on, so this is what the gate's scene walk collects. */
+/** A pooled engine-family mesh: the tag abilityVfxEngineMaterials selects
+ *  on, so this is what the gate's scene walk collects. */
 function vfxMesh(
   name: string,
   material: THREE.Material = new THREE.MeshBasicMaterial(),
 ): THREE.Mesh {
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
   mesh.name = name;
-  mesh.userData.renderCategory = 'vfx';
+  tagCastVfxEngine(mesh);
   return mesh;
 }
 
@@ -42,14 +43,7 @@ function harness(meshes: THREE.Mesh[]) {
   };
   // Never reached: every unit here injects its own compile.
   const host = {} as CompileArmHost;
-  const readiness = createSceneCastVfxReadiness(
-    scene,
-    webgl,
-    // Staged with nothing of its own: the lazy stand-in group is not what is
-    // under test here.
-    () => [],
-    () => 0,
-  );
+  const readiness = createSceneCastVfxReadiness(scene, webgl, () => 0);
   const materialOf = (mesh: THREE.Mesh) => mesh.material as THREE.Material;
   return { scene, host, webgl, readiness, programs, materialOf };
 }
@@ -103,7 +97,7 @@ describe('the scene cast-VFX gate over three', () => {
       new THREE.Sprite(new THREE.SpriteMaterial()),
     ];
     for (const drawable of drawables) {
-      drawable.userData.renderCategory = 'vfx';
+      tagCastVfxEngine(drawable);
       scene.add(drawable);
       programs.set(drawable.material as THREE.Material, program());
     }
@@ -153,7 +147,7 @@ describe('the scene cast-VFX gate over three', () => {
     const transparent = vfxMesh('glow', new THREE.MeshBasicMaterial({ transparent: true }));
     const { scene, host, webgl, readiness, programs, materialOf } = harness([opaque, transparent]);
     const points = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial());
-    points.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(points);
     scene.add(points);
     for (const material of [materialOf(opaque), materialOf(transparent), points.material]) {
       programs.set(material as THREE.Material, program());
@@ -178,6 +172,26 @@ describe('the scene cast-VFX gate over three', () => {
     );
     await expect(unit.run()).rejects.toThrow('lost');
     expect(readiness.ready()).toBe(false);
+  });
+
+  it('links a pooled program outside the engine family and never waits on it', async () => {
+    // A class pool, a lazy stand-in or a generic basic keeps its unit, but
+    // the painter never draws it behind the gate, so it holds no cast.
+    const ring = vfxMesh('ring');
+    const { scene, host, webgl, readiness, programs, materialOf } = harness([ring]);
+    const bespoke = new THREE.Mesh(
+      new THREE.PlaneGeometry(1, 1),
+      new THREE.MeshBasicMaterial({ transparent: true }),
+    );
+    bespoke.userData.renderCategory = 'vfx';
+    scene.add(bespoke);
+    programs.set(materialOf(ring), program());
+    programs.set(bespoke.material, program());
+    const units = castVfxProgramUnits(scene, null, host, webgl, () => Promise.resolve());
+    expect(units.map((unit) => unit.roots?.[0])).toEqual([ring, bespoke]);
+    expect(readiness.snapshot().pending).toBe(1);
+    await units[0].run();
+    expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
   });
 
   it('answers with the PROGRAM the record proved, not with the material', () => {

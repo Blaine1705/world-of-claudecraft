@@ -28,6 +28,7 @@ import {
 // PrewarmResumeUnits (see prewarm_resume.ts).
 
 import type * as THREE from 'three';
+import { inCastVfxEngine } from '../cast_vfx_family';
 import { drawProgramSignature } from '../draw_program_signature_core';
 import { abilityVfxTextures, FLIPBOOK_STYLES, flipbookSheet } from './fx_textures';
 
@@ -109,15 +110,19 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
  *  linked program reuses it on its first draw (three's acquireProgram hands
  *  back the cached WebGLProgram, so no link). Only objects that carry the
  *  renderCategory tag themselves are pooled VFX; a spirit holder group has
- *  no material and so no program of its own. */
-function pooledPrograms(root: THREE.Object3D): Array<{
+ *  no material and so no program of its own. `accept` narrows the walk to
+ *  one family. */
+function pooledPrograms(
+  root: THREE.Object3D,
+  accept: (object: THREE.Object3D) => boolean = () => true,
+): Array<{
   object: THREE.Object3D;
   materials: THREE.Material[];
 }> {
   const seen = new Set<string>();
   const found: Array<{ object: THREE.Object3D; materials: THREE.Material[] }> = [];
   root.traverse((child) => {
-    if (child.userData?.renderCategory !== 'vfx') return;
+    if (child.userData?.renderCategory !== 'vfx' || !accept(child)) return;
     const material = (child as THREE.Mesh).material;
     if (!material) return;
     const fresh: THREE.Material[] = [];
@@ -132,17 +137,17 @@ function pooledPrograms(root: THREE.Object3D): Array<{
   return found;
 }
 
-/** The representative material of each distinct pooled program, from the
- *  same walk as the compile targets: the cast readiness gate asks whether
- *  each one's program is proved linked, and a proof of that program covers
- *  every clone that shares it. One material instance drawn by two objects of
- *  different shapes is two units but one entry here, since the gate reads
- *  one current program per material (the uuid key had the same limit); no
- *  pool does that today, which tests/class_vfx_prewarm_homes.test.ts pins
- *  per pool (one gate entry per unit). */
-export function abilityVfxCompileMaterials(root: THREE.Object3D): THREE.Material[] {
+/** The representative material of each distinct ENGINE-family program
+ *  (cast_vfx_family.ts), from the same walk as the compile targets: the cast
+ *  readiness gate asks whether each one's program is proved linked, and a
+ *  proof of that program covers every clone that shares it. The other pooled
+ *  programs keep their compile units and never hold a cast. One material
+ *  instance drawn by two objects of different shapes is two units but one
+ *  entry here, since the gate reads one current program per material; no
+ *  engine pool does that, which tests/cast_vfx_engine_family.test.ts pins. */
+export function abilityVfxEngineMaterials(root: THREE.Object3D): THREE.Material[] {
   const materials: THREE.Material[] = [];
-  for (const entry of pooledPrograms(root)) {
+  for (const entry of pooledPrograms(root, inCastVfxEngine)) {
     for (const material of entry.materials) {
       if (!materials.includes(material)) materials.push(material);
     }

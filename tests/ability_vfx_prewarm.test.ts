@@ -11,11 +11,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as contactAssets from '../src/render/ability_vfx/contact_assets';
 import { FLIPBOOK_STYLES } from '../src/render/ability_vfx/fx_textures';
 import {
-  abilityVfxCompileMaterials,
+  abilityVfxEngineMaterials,
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
 import * as productionAssets from '../src/render/ability_vfx/production_assets';
+import { tagCastVfxEngine } from '../src/render/cast_vfx_family';
 
 // The canvas textures are procedurally drawn, so a plain Node run needs a 2D
 // context stub (same shape as the ability-VFX and vfx suites use).
@@ -55,7 +56,7 @@ function vfxMesh(name: string, material: THREE.Material | THREE.Material[]): THR
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
   mesh.name = name;
   mesh.visible = false;
-  mesh.userData.renderCategory = 'vfx';
+  tagCastVfxEngine(mesh);
   return mesh;
 }
 
@@ -175,11 +176,11 @@ describe('collectAbilityVfxCompileTargets', () => {
     scene.add(vfxMesh('opaque', new THREE.MeshBasicMaterial()));
     const cloud = new THREE.Points(new THREE.BufferGeometry(), proto.clone());
     cloud.name = 'cloud';
-    cloud.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(cloud);
     scene.add(cloud);
     const targets = collectAbilityVfxCompileTargets(scene);
     expect(targets.map((target) => target.object.name)).toEqual(['slot-0', 'opaque', 'cloud']);
-    const gated = abilityVfxCompileMaterials(scene);
+    const gated = abilityVfxEngineMaterials(scene);
     // The gate asks about the SAME representatives the units compile.
     expect(gated).toEqual(
       targets.map((target) => (target.object as THREE.Mesh).material as THREE.Material),

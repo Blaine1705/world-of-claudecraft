@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tagCastVfxEngine } from '../cast_vfx_family';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 import { type AbilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { slashWidthScale } from './spectacle';
@@ -356,7 +357,7 @@ export class AbilityVfxRibbons {
     this.mesh = new THREE.Mesh(this.geo, this.mat);
     this.mesh.frustumCulled = false;
     this.mesh.renderOrder = 6;
-    this.mesh.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(this.mesh);
     // An idle pool is NOT free: three does not early-out on a zero draw count,
     // so a drawRange of 0 still pays setProgram, the VAO bind and a zero-count
     // draw every frame, on every renderer that owns a ribbon pool (this one and
