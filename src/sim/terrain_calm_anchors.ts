@@ -25,6 +25,7 @@ import { MAILBOXES } from './content/mailboxes';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
 import { TRANSPORT_ROUTES } from './content/transport_ships';
 import { TUNNELS } from './content/tunnels';
+import { WICKHARBOR_HARBOR_MOVED_DECOR } from './content/wickharbor_harbor';
 import { WICKHARBOR_WHARF_CALM_ANCHORS } from './content/wickharbor_wharf';
 import {
   DUNGEONS,
@@ -279,7 +280,12 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
     // the VISUAL footprint tracks scale, so a scale-9 landmark gets a
     // landmark-sized pad, not a crate-sized one.
     const foot = Math.max(decor.r ?? 1.5, (decor.scale ?? 1) * 1.2);
-    pad('decorProp', decor.x, decor.z, foot + 2, foot + 8);
+    // a row moved off Wickharbor's rebuilt harbor keeps the pad it first had
+    const moved = WICKHARBOR_HARBOR_MOVED_DECOR.find(
+      (m) => m.key === decor.key && m.to.x === decor.x && m.to.z === decor.z,
+    );
+    const at = moved ? moved.from : decor;
+    pad('decorProp', at.x, at.z, foot + 2, foot + 8);
   }
   // Scheduled transport berths (content/transport_ships.ts): each keeps the
   // pad its ship had as a moored decorProps row (the default 1.5 footprint),

@@ -5,8 +5,9 @@
 // westPassZ). Salt-silvered downs roll to grey sea cliffs; the fishing town
 // of Wickharbor keeps its boats in the lee of the harbor cove; the Old
 // Beacon burns on the highest head, and the Wreckfields beach their bones
-// in the north. Terrain: the GALE_* tables in world.ts; the lighthouse,
-// harbor decks, and wreck ribs live in render/gale_features.ts.
+// in the north. Terrain: the GALE_* tables in world.ts; the lighthouse and
+// the wreck ribs live in render/gale_features.ts; the wooden harbor is
+// content/wickharbor_harbor.ts and content/wickharbor_wharf.ts.
 
 import type {
   CampDef,
@@ -693,7 +694,8 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { x: 365, z: 627, rot: 1.9, scale: 1 }, // Edda's storm-lashed tent
   ],
   // (no pirate-kit mini docks here: Wickharbor's piers are the walkable
-  // stilt decks in sim/gale_harbor.ts, drawn by render/gale_features.ts)
+  // harbor decks of content/wickharbor_harbor.ts, drawn by
+  // render/wickharbor_harbor.ts)
   docks: [],
   fences: [
     // Wickharbor's stone garden walls (the KayKit scalloped fence): the
@@ -751,7 +753,7 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'shipMonument', x: 447, z: 321, rot: 2.2, scale: 7, r: 3.4, h: 7 },
     { key: 'hexAnchor', x: 452, z: 326, rot: -0.6, scale: 7 },
     // the fleet, moored on the piers' open sides only (berths verified
-    // against the deck rectangles in sim/gale_harbor.ts; the r4 collider
+    // against the harbor decks, content/wickharbor_harbor.ts; the r4 collider
     // stays clear of every walkway so nobody wedges between hull and rail)
     { key: 'hexShipBlue', x: 492.9, z: 350.2, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
     // (a second hull lay at x 475.1, z 368.7, off the middle pier's south side: its
@@ -770,8 +772,10 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexShipBlue', x: 515.9, z: 345.5, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 507, z: 339, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 530, z: 338, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
-    // dinghies: two on the water, one hauled out by the rack on the shingle
-    { key: 'hexBoat', x: 474, z: 354, rot: 0.7, scale: 6, float: 0.1 },
+    // dinghies: two on the water, one hauled out by the rack on the shingle (the first lay
+    // at x 474, z 354, rot 0.7, half under the north pier's root; it rides between the two
+    // piers now, clear of both, since the harbor was rebuilt, content/wickharbor_harbor.ts)
+    { key: 'hexBoat', x: 473.9, z: 355.5, rot: 1.45, scale: 6, float: 0.1 },
     { key: 'hexBoat', x: 479, z: 357.5, rot: -1.8, scale: 6, float: 0.1 },
     { key: 'hexBoat', x: 484, z: 346, rot: 2.3, scale: 6 },
     { key: 'hexBoatrack', x: 486, z: 340, rot: 0.9, scale: 6 },
