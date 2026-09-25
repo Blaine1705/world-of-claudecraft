@@ -73,6 +73,12 @@ const EXCLUDED: Record<string, string> = {
     'assembles the Frostveil spire group, which frost_sky.ts adds to the zone scene, so the zone ' +
     'prepare and the boot scene sweep reach every mesh wearing it. Same ruling as the mailbox and ' +
     'the Vale Cup kit: built when its zone builds.',
+  'harbor_route_markers.ts':
+    'World scenery, not a cast (a hit only by its `_markers` filename): the ferry berth signposts ' +
+    'convert their GLB materials into this Map when buildProps places them in the props root at ' +
+    'world build (props.ts), so the world-entry compile links them, and harborRouteMarkerPrewarmParts ' +
+    'twins every (geometry, material) program, the painted plate included, in the props material ' +
+    'prewarm (tests/harbor_route_marker_render.test.ts). A boot twin here would link them twice.',
 };
 
 /** Files whose module ABILITY_MATERIAL_SOURCES stages, by basename. Held here
