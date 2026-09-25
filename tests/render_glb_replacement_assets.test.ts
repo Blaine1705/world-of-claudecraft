@@ -43,6 +43,7 @@ import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects'
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
 import { transportShipInternalsForTest } from '../src/render/transport_ship';
 import { wildheartPropsPreloadInternalsForTest } from '../src/render/wildheart_props';
+import { wyrmwatchHarborInternalsForTest } from '../src/render/wyrmwatch_harbor';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
 import { EASTBROOK_GRAND_ARMOURY } from '../src/sim/building_layout';
 import type { BuildingDef } from '../src/sim/types';
@@ -505,6 +506,10 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('harbor route marker asset', () => {
     expectAssetExistsAndManifested(harborRouteMarkerInternalsForTest.assetUrl);
+  });
+
+  it('wyrmwatch cliff harbor asset', () => {
+    expectAssetExistsAndManifested(wyrmwatchHarborInternalsForTest.assetUrl);
   });
 
   it('gather node assets', () => {

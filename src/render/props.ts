@@ -75,6 +75,7 @@ import {
   transportShipPrewarmParts,
 } from './transport_ship';
 import { applySurfaceDetail, type WornFamilyPick, wornFamilyFor } from './worn_stone';
+import { buildWyrmwatchHarbor, wyrmwatchHarborPrewarmParts } from './wyrmwatch_harbor';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -1018,8 +1019,13 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
   }
   // moored transport ships draw their own merged, vertex-coloured meshes
   // (transport_ship.ts), and so do the berths' route markers
-  // (harbor_route_markers.ts): one twin per distinct program, shadow variant included
-  for (const part of [...transportShipPrewarmParts(), ...harborRouteMarkerPrewarmParts()]) {
+  // (harbor_route_markers.ts) and the Wyrmwatch cliff harbor (wyrmwatch_harbor.ts):
+  // one twin per distinct program, shadow variant included
+  for (const part of [
+    ...transportShipPrewarmParts(),
+    ...harborRouteMarkerPrewarmParts(),
+    ...wyrmwatchHarborPrewarmParts(),
+  ]) {
     const mesh = new THREE.Mesh(part.geometry, part.material);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -1675,6 +1681,8 @@ export function buildProps(
   if (builtInWorld) group.add(buildFerryPiers(seed)); // their piers (render/ferry_piers.ts)
   // ...and the route marker at every berth (render/harbor_route_markers.ts)
   if (builtInWorld) group.add(buildHarborRouteMarkers(seed));
+  // ...and the Wyrmwatch cliff harbor at the Drakelands berth (render/wyrmwatch_harbor.ts)
+  if (builtInWorld) group.add(buildWyrmwatchHarbor(seed));
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
   activeContent.props.stalls.forEach((s, i) => {
