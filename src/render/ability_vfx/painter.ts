@@ -288,6 +288,8 @@ interface AbilityVfxHeldSemanticState {
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;
+  /** When `castRemaining` was read, on the painter's clock. */
+  castSeenAt: number;
   queuedOnSwing: string | null;
   auraStamps: Map<string, number>;
   serial: number;
@@ -679,7 +681,8 @@ export class AbilityVfx {
   }
 
   // A cast bar the sim stopped short (castStop without success): no release
-  // follows it, so its latched refusal is dropped.
+  // follows it, so its latched refusal is dropped. syncEntity makes the same
+  // drop for a bar that leaves with time left, since not every stop emits one.
   castInterrupted(casterId: number): void {
     this.admission.interrupted(casterId);
   }
@@ -1796,6 +1799,7 @@ export class AbilityVfx {
         castingAbility: null,
         castRemaining: 0,
         castTotal: 0,
+        castSeenAt: 0,
         queuedOnSwing: null,
         auraStamps: new Map(),
         serial: 0,
@@ -1804,6 +1808,16 @@ export class AbilityVfx {
       this.heldSemantic.set(e.id, held);
     }
     const castingWasHeld = e.castingAbility !== null && held.castingAbility === e.castingAbility;
+    // A bar that leaves with time still on it was stopped short, and several
+    // stops emit no castStop (death, an evade home, a boss or script clear).
+    // The time since the bar was read comes off first, so a bar that ran out
+    // between two slow frames reads as the completion it is.
+    if (
+      held.castingAbility !== null &&
+      e.castingAbility !== held.castingAbility &&
+      held.castRemaining - (this.now() - held.castSeenAt) > DT
+    )
+      this.admission.interrupted(e.id);
     const queuedWasHeld = e.queuedOnSwing != null && held.queuedOnSwing === e.queuedOnSwing;
     // The cast bar is a cast's first entry point: its verdict, refused or
     // not, is latched for the release, impact and lingers that follow. A
@@ -2217,6 +2231,7 @@ export class AbilityVfx {
     held.castingAbility = e.castingAbility;
     held.castRemaining = e.castRemaining;
     held.castTotal = e.castTotal;
+    if (e.castingAbility !== null) held.castSeenAt = this.now();
     held.queuedOnSwing = e.queuedOnSwing ?? null;
     held.frameSeen = this.semanticFrame;
     held.serial++;

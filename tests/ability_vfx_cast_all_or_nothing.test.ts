@@ -194,23 +194,21 @@ describe('a refusal latched at the cast bar', () => {
 });
 
 describe('an interrupted cast bar', () => {
-  it('hands its refusal to no later cast: an instant release of the same id draws', () => {
-    const rig = castGateRig();
-    const bar = (remaining: number): AbilityVfxEntityState => ({
-      id: MAGE,
-      castingAbility: remaining > 0 ? 'fireball' : null,
-      castRemaining: remaining,
-      castTotal: 2,
-      auras: [],
-    });
+  const bar = (remaining: number, castingAbility = 'fireball'): AbilityVfxEntityState => ({
+    id: MAGE,
+    castingAbility: remaining > 0 ? castingAbility : null,
+    castRemaining: remaining,
+    castTotal: 2,
+    auras: [],
+  });
+  /** A two second bar refused for its first second, on screen or not. */
+  function refusedBar(rig: ReturnType<typeof castGateRig>, renderEffects = true) {
     for (let t = 2; t > 1; t -= 0.05) {
-      rig.painter.syncEntity(bar(t));
+      rig.painter.syncEntity(bar(t), renderEffects);
       rig.step();
     }
-    rig.painter.castInterrupted(MAGE);
-    rig.painter.syncEntity(bar(0));
-    rig.step();
-    rig.prove(CAST_VFX_ENGINE);
+  }
+  function release(rig: ReturnType<typeof castGateRig>) {
     rig.painter.handleSpellfx({
       sourceId: MAGE,
       targetId: VICTIM,
@@ -219,37 +217,103 @@ describe('an interrupted cast bar', () => {
       ability: 'fireball',
     });
     rig.step(20);
-    expect(rig.drawn()).toBe(CAST_VFX_ENGINE);
+  }
+  /** The engine proves, then an instant release of the bar's id: what drew. */
+  function instantOnceReady(rig: ReturnType<typeof castGateRig>) {
+    rig.prove(CAST_VFX_ENGINE);
+    release(rig);
+    return rig.drawn();
+  }
+
+  it('hands its refusal to no later cast: an instant release of the same id draws', () => {
+    const rig = castGateRig();
+    refusedBar(rig);
+    rig.painter.castInterrupted(MAGE);
+    rig.painter.syncEntity(bar(0));
+    rig.step();
+    expect(instantOnceReady(rig)).toBe(CAST_VFX_ENGINE);
     const snapshot = rig.readiness.snapshot();
     expect(snapshot.refused).toBe(1);
     expect(snapshot.requirementMiss).toBe(0);
   });
 
+  it('reads a bar cleared with time left and no castStop as an interrupt', () => {
+    // Death, an evade home and the boss and script clears end a bar this way.
+    const rig = castGateRig();
+    refusedBar(rig);
+    rig.painter.syncEntity(bar(0));
+    rig.step();
+    expect(instantOnceReady(rig)).toBe(CAST_VFX_ENGINE);
+    expect(rig.readiness.snapshot()).toMatchObject({ refused: 1, requirementMiss: 0 });
+  });
+
+  it('reads a bar replaced with time left by another cast as an interrupt', () => {
+    const rig = castGateRig();
+    refusedBar(rig);
+    rig.painter.syncEntity(bar(1.5, 'frostbolt'));
+    rig.step();
+    expect(instantOnceReady(rig)).toBe(CAST_VFX_ENGINE);
+  });
+
+  it('reads a bar cleared while its rig is culled as an interrupt', () => {
+    const rig = castGateRig();
+    refusedBar(rig);
+    for (let t = 1; t > 0.5; t -= 0.05) {
+      rig.painter.syncEntity(bar(t), false);
+      rig.step();
+    }
+    rig.painter.syncEntity(bar(0), false);
+    rig.step();
+    expect(instantOnceReady(rig)).toBe(CAST_VFX_ENGINE);
+  });
+
   it('keeps the refusal for the release that ends an uninterrupted bar', () => {
     const rig = castGateRig();
-    const bar = (remaining: number): AbilityVfxEntityState => ({
-      id: MAGE,
-      castingAbility: remaining > 0 ? 'fireball' : null,
-      castRemaining: remaining,
-      castTotal: 2,
-      auras: [],
-    });
-    for (let t = 2; t > 1; t -= 0.05) {
+    refusedBar(rig);
+    for (let t = 1; t > 0; t -= 0.05) {
       rig.painter.syncEntity(bar(t));
       rig.step();
     }
     rig.painter.syncEntity(bar(0));
     rig.step();
+    expect(instantOnceReady(rig)).toBe(0);
+    expect(rig.readiness.snapshot().refused).toBe(1);
+  });
+
+  it('keeps it when the bar runs out between two slow frames', () => {
+    // At 15 fps the sim runs the bar's last two ticks between two frames.
+    const rig = castGateRig();
+    refusedBar(rig);
+    rig.painter.syncEntity(bar(0.1));
+    rig.step(1, 1 / 15);
+    rig.painter.syncEntity(bar(0));
+    rig.step();
+    expect(instantOnceReady(rig)).toBe(0);
+  });
+
+  it('drops nothing more when the castStop lands after the bar was read as stopped', () => {
+    const rig = castGateRig();
+    refusedBar(rig);
+    rig.painter.syncEntity(bar(0));
+    rig.step();
+    // A new instant cast, refused on its own while the engine is not ready.
+    release(rig);
+    rig.painter.castInterrupted(MAGE);
     rig.prove(CAST_VFX_ENGINE);
-    rig.painter.handleSpellfx({
+    rig.painter.onDamage({
       sourceId: MAGE,
       targetId: VICTIM,
       school: 'fire',
-      fx: 'projectile',
-      ability: 'fireball',
+      ability: ABILITIES.fireball.name,
+      abilityId: 'fireball',
+      kind: 'hit',
+      crit: false,
+      amount: 90,
     });
-    rig.step(20);
+    rig.step(160);
     expect(rig.drawn()).toBe(0);
+    expect(rig.vfxCalls).toEqual([]);
+    expect(rig.readiness.snapshot()).toMatchObject({ refused: 2, requirementMiss: 0 });
   });
 });
 
