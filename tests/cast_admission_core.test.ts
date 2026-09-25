@@ -152,6 +152,17 @@ describe('the verdict is per caster and per ability', () => {
   });
 });
 
+describe('a cue that names no caster', () => {
+  it('is counted but latches nothing', () => {
+    const { gate, admission } = harness(0);
+    expect(admission.once(ENGINE)).toBe(false);
+    expect(gate.refusals).toBe(1);
+    expect((admission as unknown as { refused: Map<number, unknown> }).refused.size).toBe(0);
+    gate.bits = ENGINE;
+    expect(admission.once(ENGINE)).toBe(true);
+  });
+});
+
 describe('a per-frame hold', () => {
   it('shows the frame its families are ready, with no latch and no count', () => {
     const { gate, admission } = harness(ENGINE);

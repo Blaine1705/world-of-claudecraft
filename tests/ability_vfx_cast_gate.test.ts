@@ -276,6 +276,38 @@ describe('the Warrior follow-through the renderer routes to the painter', () => 
   });
 });
 
+describe('events that name their cast loosely', () => {
+  const kitClosed = (mask: number) => (mask & CAST_VFX_KIT) === 0;
+
+  it('asks a contact for the families of the ability its name draws, not only its own id', () => {
+    // The draws below the gate resolve the id off the display name, so a
+    // proc id beside a Warrior name must wait on the kit too.
+    const { painter, touched } = painterWith(kitClosed);
+    painter.onDamage({
+      sourceId: 1,
+      targetId: 2,
+      school: 'physical',
+      ability: 'Shield Slam',
+      abilityId: 'no_such_proc_for_the_gate',
+      kind: 'hit',
+      crit: false,
+      amount: 40,
+    });
+    expect(touched).toEqual(new Set());
+  });
+
+  it('decides a point landing that names no caster on its own, with no latch to share', () => {
+    let open = false;
+    const { painter, touched } = painterWith(() => open);
+    const landing = { x: 0, z: 0, school: 'frost', fx: 'nova', ability: 'frost_nova' };
+    expect(painter.handleSpellfxAt(landing)).toBe(true);
+    expect(touched).toEqual(new Set());
+    open = true;
+    expect(painter.handleSpellfxAt(landing)).toBe(true);
+    expect(touched.size).toBeGreaterThan(0);
+  });
+});
+
 describe('the hard-CC band under a closed gate', () => {
   // The band is what says a victim is stunned, feared or rooted: actionable
   // information, which docs/design/graphics-settings-fairness.md keeps at every

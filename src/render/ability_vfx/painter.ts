@@ -282,6 +282,7 @@ export interface AbilityVfxEntityState {
 
 interface AbilityVfxHeldSemanticState {
   castingAbility: string | null;
+  castRemaining: number;
   queuedOnSwing: string | null;
   auraStamps: Map<string, number>;
   serial: number;
@@ -502,6 +503,8 @@ export class AbilityVfx {
 
   // Class kits requested from the host on first sighting (see syncEntity).
   private readonly kitsRequested = new Set<string>();
+  private kitHoldsFrame = -1;
+  private kitHoldsAnswer = false;
   private readonly admission = new CastAdmission({
     admit: (mask) => this.deps.castVfxAdmit?.(mask) ?? true,
     ready: (mask) => (this.deps.castVfxReady ?? this.deps.castVfxAdmit)?.(mask) ?? true,
@@ -653,8 +656,21 @@ export class AbilityVfx {
 
   // Follow-through of a cast (its landing, contact, recovery or control
   // mark): refused with its cast, else decided as the cast itself.
-  private followAdmitted(casterId: number, abilityId: string, mask: number): boolean {
+  // A cue that names no caster cannot be matched to its cast: decided on its
+  // own, with no latch to share across casters.
+  private followAdmitted(casterId: number | undefined, abilityId: string, mask: number): boolean {
+    if (casterId === undefined) return this.admission.once(mask);
     return this.admission.follow(casterId, abilityId, mask, this.now());
+  }
+
+  // The Warrior kit's per-frame reads wait on the kit as a whole: shown the
+  // frame it is ready, never partly. One answer per frame for every entity.
+  private kitHoldsOpen(): boolean {
+    if (this.kitHoldsFrame !== this.semanticFrame) {
+      this.kitHoldsFrame = this.semanticFrame;
+      this.kitHoldsAnswer = this.admission.hold(WARRIOR_KIT_REQUIREMENT);
+    }
+    return this.kitHoldsAnswer;
   }
 
   // Bloodletting's recovery heal, which the renderer routes here before its
@@ -1164,7 +1180,7 @@ export class AbilityVfx {
     if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
     const spec = abilityVfxSpecFor(ev.ability);
     if (!spec) return false;
-    if (!this.followAdmitted(ev.sourceId ?? -1, ev.ability, castVfxRequirement(ev.ability))) {
+    if (!this.followAdmitted(ev.sourceId, ev.ability, castVfxRequirement(ev.ability))) {
       // The terrain-draped area ring is an actionable telegraph (the blast
       // AREA the player steps out of): its pool is linked at boot and never
       // waits on the cast programs, so it draws even while the rest is held.
@@ -1359,8 +1375,7 @@ export class AbilityVfx {
     auras?: readonly { id: string; kind: string; remaining?: number }[],
   ): boolean {
     const cast = warriorControlAuraCast(ev.abilityId);
-    if (cast && !this.followAdmitted(ev.sourceId ?? ev.targetId, cast, WARRIOR_KIT_REQUIREMENT))
-      return true;
+    if (cast && !this.followAdmitted(ev.sourceId, cast, WARRIOR_KIT_REQUIREMENT)) return true;
     return drawWarriorControlAura(
       this.deps.fx,
       ev,
@@ -1370,11 +1385,21 @@ export class AbilityVfx {
   }
 
   onDamage(ev: AbilityVfxDamageEvent): boolean | void {
+    // Latched on the event's own id, asked for every family its draws below
+    // can reach (they resolve the id off the display name).
     const castId = ev.abilityId ?? attackAbilityId(ev.ability);
     if (castId) {
+      const drawnId = attackAbilityId(ev.ability);
       const appearance = this.deps.visualVariantOf?.(castId, ev.sourceId) ?? castId;
-      if (!this.followAdmitted(ev.sourceId, castId, this.requirementOf(castId, appearance))) return;
-    } else if (!this.admission.hold(CAST_VFX_ENGINE)) return;
+      let mask = this.requirementOf(castId, appearance);
+      if (drawnId && drawnId !== castId) mask |= castVfxRequirement(drawnId);
+      if (!this.followAdmitted(ev.sourceId, castId, mask)) return;
+    } else if (
+      !this.admission.hold(
+        this.deps.isWarrior?.(ev.sourceId) ? WARRIOR_KIT_REQUIREMENT : CAST_VFX_ENGINE,
+      )
+    )
+      return;
     // The resource payment is already presented by selfCast. Claim only this
     // self cost so the renderer retains health text without a duplicate hit.
     if (
@@ -1755,6 +1780,7 @@ export class AbilityVfx {
     if (!held) {
       held = {
         castingAbility: null,
+        castRemaining: 0,
         queuedOnSwing: null,
         auraStamps: new Map(),
         serial: 0,
@@ -1765,7 +1791,10 @@ export class AbilityVfx {
     const castingWasHeld = e.castingAbility !== null && held.castingAbility === e.castingAbility;
     const queuedWasHeld = e.queuedOnSwing != null && held.queuedOnSwing === e.queuedOnSwing;
     // The cast bar is a cast's first entry point: its verdict, refused or
-    // not, is latched for the release, impact and lingers that follow.
+    // not, is latched for the release, impact and lingers that follow. A
+    // queued recast of the same ability follows with no idle frame between,
+    // so a bar that restarts (its remaining time jumps back by more than any
+    // pushback) is a new cast too.
     const castSpec =
       renderEffects && e.castingAbility ? abilityVfxSpecFor(e.castingAbility) : undefined;
     const castDrawn =
@@ -1773,10 +1802,13 @@ export class AbilityVfx {
       this.admission.windup(
         e.id,
         e.castingAbility!,
-        castVfxRequirement(e.castingAbility!),
+        this.requirementOf(
+          e.castingAbility!,
+          this.deps.visualVariantOf?.(e.castingAbility!, e.id) ?? e.castingAbility!,
+        ),
         this.now(),
         e.castRemaining,
-        !castingWasHeld,
+        !castingWasHeld || e.castRemaining - held.castRemaining > 0.5 * e.castTotal,
       );
     if (gateHeld || !renderEffects) {
       // A culled rig is off screen and drops everything with it (the
@@ -1790,15 +1822,12 @@ export class AbilityVfx {
       this.latchHeldState(held, e);
       return;
     }
-    // The Warrior kit's per-frame reads wait on the kit as a whole: shown the
-    // frame it is ready, never partly.
-    let kitHolds = -1;
-    const kitReady = (): boolean => {
-      if (kitHolds < 0) kitHolds = this.admission.hold(WARRIOR_KIT_REQUIREMENT) ? 1 : 0;
-      return kitHolds === 1;
-    };
     const attentionSource = warriorAttentionSource(e);
-    if (attentionSource !== null && this.deps.isLivingWarrior?.(attentionSource) && kitReady())
+    if (
+      attentionSource !== null &&
+      this.deps.isLivingWarrior?.(attentionSource) &&
+      this.kitHoldsOpen()
+    )
       fx.holdWarriorAttention?.(
         e.id,
         attentionSource,
@@ -1879,19 +1908,19 @@ export class AbilityVfx {
       const auraWasHeld = held.auraStamps.has(aura.id);
       const readiness = this.deps.isLivingWarrior?.(e.id) ? warriorReadinessBit(aura) : 0;
       if (readiness) {
-        if (kitReady())
+        if (this.kitHoldsOpen())
           fx.holdWarriorReadiness?.(e.id, readiness, this.deps.localPlayerId?.() === e.id);
         continue;
       }
       const furyState = warriorFuryStateKind(aura);
       if (furyState !== null) {
-        if (kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+        if (this.kitHoldsOpen() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
           fx.holdWarriorFuryState?.(e.id, furyState, aura, this.deps.localPlayerId?.() === e.id);
         continue;
       }
       const power = warriorPowerKind(aura);
       if (power !== null) {
-        if (kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+        if (this.kitHoldsOpen() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
           fx.holdWarriorPower?.(
             e.id,
             power,
@@ -1903,7 +1932,7 @@ export class AbilityVfx {
       }
       const guard = warriorGuardKind(aura);
       if (guard !== null) {
-        if (kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+        if (this.kitHoldsOpen() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
           fx.holdWarriorGuard?.(e.id, guard, aura, this.deps.localPlayerId?.() === e.id);
         continue;
       }
@@ -1912,13 +1941,13 @@ export class AbilityVfx {
           fx,
           e.id,
           aura,
-          kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }),
+          this.kitHoldsOpen() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }),
         );
         continue;
       }
       if (aura.id === 'breachmaker_vuln' || aura.id === 'thunder_clap_as') {
         if (
-          kitReady() &&
+          this.kitHoldsOpen() &&
           (aura.remaining ?? 0) > 0 &&
           !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })
         ) {
@@ -1929,7 +1958,7 @@ export class AbilityVfx {
         continue;
       }
       if (aura.kind === 'overpower_charge') {
-        if (kitReady() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+        if (this.kitHoldsOpen() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
           fx.holdBladeCharges?.(e.id, aura.stacks ?? 1);
         continue;
       }
@@ -2167,6 +2196,7 @@ export class AbilityVfx {
 
   private latchHeldState(held: AbilityVfxHeldSemanticState, e: AbilityVfxEntityState): void {
     held.castingAbility = e.castingAbility;
+    held.castRemaining = e.castRemaining;
     held.queuedOnSwing = e.queuedOnSwing ?? null;
     held.frameSeen = this.semanticFrame;
     held.serial++;

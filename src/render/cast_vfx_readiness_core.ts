@@ -214,6 +214,8 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
 
   return {
     admit: (mask) => {
+      // Steady state: every family the cast asks for latched, nothing to walk.
+      if ((mask & ~readyBits) === 0) return true;
       refresh(mask, false);
       if (open(mask)) return true;
       refused++;
@@ -224,6 +226,7 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
       return false;
     },
     ready: (mask) => {
+      if ((mask & ~readyBits) === 0) return true;
       refresh(mask, false);
       return open(mask);
     },

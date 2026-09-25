@@ -98,6 +98,11 @@ export class CastAdmission {
     return this.followThrough(casterId, abilityId, mask, nowSec, true);
   }
 
+  /** A cue that names no caster: decided on its own, counted, never latched. */
+  once(mask: number): boolean {
+    return this.gate.admit(mask);
+  }
+
   /** A per-frame hold: shown the frame its families are ready. */
   hold(mask: number): boolean {
     return this.gate.ready(mask);

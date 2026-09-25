@@ -190,6 +190,54 @@ describe('a refusal latched at the cast bar', () => {
   });
 });
 
+describe('a queued recast of the same ability', () => {
+  it('is a new cast: decided afresh though the bar never goes idle between the two', () => {
+    const rig = castGateRig();
+    const bar = (remaining: number): AbilityVfxEntityState => ({
+      id: MAGE,
+      castingAbility: 'fireball',
+      castRemaining: remaining,
+      castTotal: 1.5,
+      auras: [],
+    });
+    for (let t = 1.5; t > 0; t -= 0.05) {
+      rig.painter.syncEntity(bar(t));
+      rig.step();
+    }
+    expect(rig.drawn()).toBe(0);
+    rig.prove(CAST_VFX_ENGINE);
+    // The queue fires the next Fireball on the tick the first completes.
+    for (let t = 1.5; t > 0.5; t -= 0.05) {
+      rig.painter.syncEntity(bar(t));
+      rig.step();
+    }
+    expect(rig.drawn()).toBe(CAST_VFX_ENGINE);
+  });
+});
+
+describe('a white swing', () => {
+  it('waits on the kit when a Warrior swings it, and on the engine alone otherwise', () => {
+    const swing = (sourceId: number) => ({
+      sourceId,
+      targetId: VICTIM,
+      school: 'physical',
+      ability: null,
+      kind: 'hit',
+      crit: false,
+      amount: 30,
+    });
+    const rig = castGateRig();
+    rig.warriors.add(WARRIOR);
+    rig.prove(CAST_VFX_ENGINE);
+    rig.painter.onDamage(swing(WARRIOR));
+    rig.step(10);
+    expect(rig.drawn()).toBe(0);
+    rig.painter.onDamage(swing(MAGE));
+    rig.step(10);
+    expect(rig.drawn()).toBe(CAST_VFX_ENGINE);
+  });
+});
+
 describe('a refused hold', () => {
   it('shows a Mage barrier the frame the engine is ready', () => {
     const rig = castGateRig();
@@ -231,6 +279,33 @@ describe('a refused hold', () => {
     rig.prove(CAST_VFX_KIT);
     rig.painter.syncEntity(wearer);
     expect(rig.step()).not.toBe(0);
+    expect(rig.readiness.snapshot().requirementMiss).toBe(0);
+  });
+
+  it('shows a Warrior aura held on the generic path once the kit is ready, and nothing before', () => {
+    // A physical blood DoT on its victim: the one Warrior read the generic
+    // aura path draws (an orbit of blood leaves), so the per-hold mask, not
+    // the engine sleep, is what holds it.
+    const rig = castGateRig();
+    rig.prove(CAST_VFX_ENGINE);
+    const victim: AbilityVfxEntityState = {
+      id: VICTIM,
+      castingAbility: null,
+      castRemaining: 0,
+      castTotal: 0,
+      auras: [{ id: 'hamstring', kind: 'dot', remaining: 12, duration: 15, sourceId: WARRIOR }],
+    };
+    for (let i = 0; i < 5; i++) {
+      rig.painter.syncEntity(victim);
+      rig.step();
+    }
+    expect(rig.drawn()).toBe(0);
+    rig.prove(CAST_VFX_KIT);
+    for (let i = 0; i < 10; i++) {
+      rig.painter.syncEntity(victim);
+      rig.step();
+    }
+    expect(rig.drawn()).toBe(CAST_VFX_ENGINE);
     expect(rig.readiness.snapshot().requirementMiss).toBe(0);
   });
 });
