@@ -34,7 +34,12 @@ import type { ItemInstancePayload } from '../sim/types';
 import { durationText } from './duration_text';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { captureFocusKey, FOCUS_KEY_ATTR, restoreFirstEnabled } from './focus_restore';
+import {
+  captureFocusKey,
+  FOCUS_KEY_ATTR,
+  findFocusKey,
+  restoreFirstEnabled,
+} from './focus_restore';
 import { formatNumber, t } from './i18n';
 import { iconDataUrl } from './icons';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
@@ -297,9 +302,7 @@ export class CharselectWocMarketPanel {
       focusActiveTab(root, 'csm-tab', 'csm-tab-selected');
     });
     if (focusKey) {
-      restoreFirstEnabled([
-        root.querySelector<HTMLElement>(`[data-focus-key="${focusKey.replace(/["\\]/g, '\\$&')}"]`),
-      ]);
+      restoreFirstEnabled([findFocusKey(root, focusKey)]);
     }
   }
 

@@ -16,7 +16,10 @@
 // that calls attachWocMarketExchange.
 
 import { WocMarketClient } from '../net/woc_market_sdk';
-import type { CharselectMarketClient } from '../ui/charselect_woc_market_panel';
+import {
+  type CharselectMarketClient,
+  CharselectWocMarketPanel,
+} from '../ui/charselect_woc_market_panel';
 import {
   defaultWocMarketShell,
   type WocMarketShell,
@@ -39,4 +42,38 @@ export async function attachCharselectWocMarket(
   if (!(await wocMarketAttachAllowed(shell))) return false;
   deps.attach(new WocMarketClient({ token: () => deps.api.token, base: deps.api.base }));
   return true;
+}
+
+export interface CharselectWocMarketUiDeps {
+  root(): HTMLElement | null;
+  newsHost(): HTMLElement | null;
+  /** The char-select launcher button: hidden by markup, revealed on a
+   *  successful attach, and wired to open the panel. */
+  launcherButton(): HTMLElement | null;
+  closeRedesignIfOpen(): void;
+  api: { readonly token: string | null; readonly base: string };
+}
+
+/** The whole char-select composition in one call: builds the panel, wires
+ *  its launcher button, and attaches the read-only client. src/main.ts is a
+ *  firewall, so every piece beyond the injected DOM accessors lives here
+ *  rather than as inline construction in main.ts. */
+export function initCharselectWocMarket(deps: CharselectWocMarketUiDeps): void {
+  let client: CharselectMarketClient | null = null;
+  const panel = new CharselectWocMarketPanel({
+    root: deps.root,
+    client: () => client,
+    newsHost: deps.newsHost,
+    closeRedesignIfOpen: deps.closeRedesignIfOpen,
+  });
+  deps.launcherButton()?.addEventListener('click', (e) => {
+    panel.open(e.currentTarget as HTMLElement);
+  });
+  void attachCharselectWocMarket({
+    api: deps.api,
+    attach: (c) => {
+      client = c;
+      deps.launcherButton()?.removeAttribute('hidden');
+    },
+  }).catch((err) => console.warn('[woc] char-select exchange attach failed', err));
 }

@@ -40,7 +40,7 @@ import {
   updateFollowCameraYaw,
   wrapAngle,
 } from './game/camera_follow';
-import { attachCharselectWocMarket } from './game/charselect_woc_market_wiring';
+import { initCharselectWocMarket } from './game/charselect_woc_market_wiring';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
@@ -331,6 +331,7 @@ import {
   CharacterPreview,
   npcLookFor,
   type PreviewAppearance,
+  previewAppearanceForRow,
   setModularLookProvider,
 } from './render/characters';
 import {
@@ -456,10 +457,6 @@ import { resetComposedRows, trackComposedChipRow } from './ui/charselect_compose
 import { charselectHintsHtml, wireCharselectRow } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
-import {
-  type CharselectMarketClient,
-  CharselectWocMarketPanel,
-} from './ui/charselect_woc_market_panel';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { classIconUrl } from './ui/class_icon_art';
@@ -7040,11 +7037,14 @@ function showCharselectCharacter(c: CharacterSummary): void {
   if (!characterPreview) return;
   const look = charselectLook(c);
   if (!look) {
-    characterPreview.setAppearance(charselectAppearance(c));
+    // Same on-demand weapon-skin warmup the composed path below performs
+    // (mech lazy-load: iOS WebKit streams Armory skins after world entry).
+    ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
+    characterPreview.setAppearance(previewAppearanceForRow(c));
     return;
   }
-  // Same on-demand weapon-skin warmup the legacy path performs (see
-  // charselectAppearance): the composed turntable holds the skinned weapon too.
+  // Same on-demand weapon-skin warmup the plain-appearance arm above
+  // performs: the composed turntable holds the skinned weapon too.
   ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   characterPreview.setModular(
     look.app,
@@ -7077,45 +7077,15 @@ const redesignEditor = new CharselectRedesignEditor({
   errorText: userFacingApiError,
 });
 
-// The character-select read-only $WOC Exchange (feature request: check
-// listings without needing a character in the world). Attached once,
-// independent of and before enterWorld's own attachWocMarketExchange, which
-// wires the money-moving hooks a live character requires.
-let charselectMarketClient: CharselectMarketClient | null = null;
-const charselectWocMarket = new CharselectWocMarketPanel({
+// Char-select read-only $WOC Exchange: the whole composition lives in
+// charselect_woc_market_wiring.ts, independent of enterWorld's own attach.
+initCharselectWocMarket({
   root: () => document.getElementById('charselect-woc-market'),
-  client: () => charselectMarketClient,
   newsHost: () => document.getElementById('charselect-news'),
-  closeRedesignIfOpen: () => {
-    if (redesignEditor.isOpen) redesignEditor.close(false);
-  },
-});
-void attachCharselectWocMarket({
+  launcherButton: () => document.getElementById('btn-charselect-woc-market'),
+  closeRedesignIfOpen: () => (redesignEditor.isOpen ? redesignEditor.close(false) : undefined),
   api,
-  attach: (client) => {
-    charselectMarketClient = client;
-    document.getElementById('btn-charselect-woc-market')?.removeAttribute('hidden');
-  },
-}).catch((err) => console.warn('[woc] char-select exchange attach failed', err));
-
-// The char-select roster row's real, in-world appearance for the 3D preview.
-function charselectAppearance(c: CharacterSummary): PreviewAppearance {
-  // Every iOS WebKit host streams the Armory weapon-skin GLBs after world
-  // entry instead of holding all of them at the launcher, so the preview of a
-  // character wearing one needs ITS skin fetched on demand (the mech lazy-load
-  // pattern). Memoized and a no-op when resident or on eager platforms; a
-  // preview built in the race window shows the base weapon and picks the skin
-  // up on the next selection change.
-  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
-  return {
-    cls: c.class,
-    skin: c.skin ?? 0,
-    skinCatalog: c.skinCatalog ?? 'class',
-    mainhandItemId: c.mainhandItemId ?? null,
-    offhandItemId: c.offhandItemId ?? null,
-    weaponSkinId: c.weaponSkinId ?? null,
-  };
-}
+});
 
 function renderClassDetails(
   panelId: string,
@@ -10186,11 +10156,6 @@ function wireStartScreens(): void {
   document
     .getElementById('btn-reroll-cancel')
     ?.addEventListener('click', () => redesignEditor.close(true));
-  // Read-only $WOC Exchange launcher (hidden until attachCharselectWocMarket
-  // confirms the platform allows it, same gate the real Exchange uses).
-  document.getElementById('btn-charselect-woc-market')?.addEventListener('click', (e) => {
-    charselectWocMarket.open(e.currentTarget as HTMLElement);
-  });
   // Close the realm dropdown on outside click or Escape.
   document.addEventListener('click', (e) => {
     if (!realmDropdownOpen) return;
