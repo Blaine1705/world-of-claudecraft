@@ -68,6 +68,11 @@ const EXCLUDED: Record<string, string> = {
     'scatter the Renderer constructor adds straight to the scene (renderer.ts), so the boot scene ' +
     'compile unit reaches the InstancedMeshes wearing it. A boot twin here would link a program ' +
     'the scene already carries.',
+  'goblin_rocket_sled_fx.ts':
+    'A mount look, not a cast: the shared plume pair is built with the Goblin Rocket Sled rig ' +
+    'in syncMountVisual (mount_lifecycle.ts), before gateMountSwapOnCompile lists the rig, so ' +
+    'the mount gate links it at the first sighting while the rig is still hidden. A boot twin ' +
+    'would link it for every session, sled or not.',
   'frost_ice_fields.ts':
     'Zone scenery, not a cast: prepareFrostIceParts() fills the cache while buildFrostIceFields ' +
     'assembles the Frostveil spire group, which frost_sky.ts adds to the zone scene, so the zone ' +
@@ -236,9 +241,10 @@ describe('the lazy-material sweep', () => {
     // Vacuity floor, kept just under the real count: the seven registered
     // bundles (the coach trail's guidance set, the ground fire AoE anchor and
     // the Ring of Frost stand-in among the four spell visuals), the two
-    // excluded scenery bakes, and the battleground caches.
-    expect(hits.length).toBeGreaterThanOrEqual(10);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(9);
+    // excluded scenery bakes, the rocket sled's plume pair, and the
+    // battleground caches.
+    expect(hits.length).toBeGreaterThanOrEqual(11);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(10);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

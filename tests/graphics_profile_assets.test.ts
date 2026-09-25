@@ -111,6 +111,9 @@ vi.mock('../src/render/temporal_hourglass_visual', () => ({
 vi.mock('../src/render/wildheart_terrain', () => ({
   resetWildheartTerrainProfileCaches: mocks.reset,
 }));
+vi.mock('../src/render/goblin_rocket_sled_fx', () => ({
+  resetGoblinRocketSledProfileCaches: mocks.reset,
+}));
 vi.mock('../src/render/ground_decor_prewarm', () => ({
   clearGroundDecorPrewarmDraws: mocks.reset,
 }));
@@ -211,6 +214,7 @@ describe('graphics profile derived-cache reset', () => {
       'frost_nova_root_visual',
       'ice_block_visual',
       'temporal_hourglass_visual',
+      'goblin_rocket_sled_fx',
       'ground_decor_prewarm',
     ]);
     expect(() => resetGraphicsProfileDerivedCaches()).not.toThrow();
