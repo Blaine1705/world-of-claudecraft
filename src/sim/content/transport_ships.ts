@@ -17,7 +17,12 @@
 // treads rise 0.3 yd, the cabin door is 3 yd tall, and the waist deck is a
 // 9.5 yd wide, 16 yd long open floor with the masts on the centre line.
 
-import type { TransportBerthDef, TransportRouteDef, TransportTimings } from '../transport_schedule';
+import type {
+  TransportBerthDef,
+  TransportRouteDef,
+  TransportTimings,
+  TransportWaypoint,
+} from '../transport_schedule';
 import { railRun, type ShipHullLayout, type ShipVolume, stairFlight } from '../transport_ship';
 
 const DECK = 3.3; // main (waist) deck, above the waterline
@@ -316,12 +321,13 @@ export const TRANSPORT_SHIP_HULLS: Readonly<Record<string, ShipHullLayout>> = {
 };
 
 // ---------------------------------------------------------------------------
-// Scheduled routes (Phase 2): the Eastbrook ferry sails a free, round-trip
-// timetable between Eastbrook Docks and Wickharbor (transport_schedule.ts owns
-// the cycle math, transport_ferry.ts carries the passengers). A route's ship
-// is NOT a decorProps row: its hull colliders are placed at BOTH berths and
-// gated by the schedule (transport_gates.ts), so the deck exists only where
-// and while the ship lies docked.
+// Scheduled routes: the Eastbrook ferry sails a free, round-trip timetable
+// between Eastbrook Docks and Wickharbor (transport_schedule.ts owns the cycle
+// math, transport_ferry.ts and transport_deck.ts carry the passengers on its
+// moving deck). A route's ship is NOT a decorProps row: its hull colliders are
+// placed at BOTH berths and gated by the schedule (transport_gates.ts), so the
+// moored deck exists only where and while the ship lies docked; under way the
+// deck is a kinematic platform that moves with the ship.
 // ---------------------------------------------------------------------------
 
 /** The Eastbrook berth: broadside across the ferry pier's T-head, bow north
@@ -333,21 +339,6 @@ const EASTBROOK_BERTH: TransportBerthDef = {
   x: -125,
   z: -54.8,
   rot: 0,
-  // ahead up the cove, then a long turn to port out past the western buoys
-  departure: [
-    { x: -125, z: -54.8, rot: 0 },
-    { x: -125.6, z: -42, rot: -0.15 },
-    { x: -135, z: -32, rot: -0.9 },
-    { x: -155, z: -27.5, rot: -1.42 },
-    { x: -172, z: -28.5, rot: -1.64 },
-  ],
-  // in from the south-western shallows, bow first, straightening into the berth
-  arrival: [
-    { x: -166, z: -96, rot: 0.8 },
-    { x: -143, z: -80, rot: 0.5 },
-    { x: -128.5, z: -68, rot: 0.12 },
-    { x: -125, z: -54.8, rot: 0 },
-  ],
   // the ferry pier's T-head, facing back up the pier toward the quay
   landing: { x: -113.5, z: -54, facing: Math.PI / 2 },
 };
@@ -366,38 +357,155 @@ const WICKHARBOR_BERTH: TransportBerthDef = {
   x: 487.3,
   z: 385.27,
   rot: 1.3 + Math.PI / 2,
-  // a pivot to starboard in place (the bow swings away from the middle pier's
-  // end), then out east across the bay
-  departure: [
-    { x: 487.3, z: 385.27, rot: 1.3 + Math.PI / 2 },
-    { x: 490.5, z: 381, rot: 2.3 },
-    { x: 501, z: 375.5, rot: 1.8 },
-    { x: 521, z: 373, rot: 1.62 },
-    { x: 540, z: 373.5, rot: 1.56 },
-  ],
-  // up the bay from the south, bow first, onto the berth
-  arrival: [
-    { x: 506, z: 441, rot: 3.55 },
-    { x: 494, z: 416, rot: 3.3 },
-    { x: 488.8, z: 399, rot: 2.98 },
-    { x: 487.3, z: 385.27, rot: 1.3 + Math.PI / 2 },
-  ],
   // on the deepwater pier, just shoreward of the boarding stair, facing town
   landing: { x: 473.25, z: 380.54, facing: 1.3 - Math.PI },
 };
 
-/** The Eastbrook ferry's timetable, in seconds (transport_schedule.ts). */
+/** Where a ship turning about its stern lies: `stern` stays put while the
+ *  bow swings to `rot` (the hull's 15.5 yd stern-to-centre offset). */
+function sternPivot(sx: number, sz: number, rot: number): TransportWaypoint {
+  return { x: sx + 15.5 * Math.sin(rot), z: sz + 15.5 * Math.cos(rot), rot };
+}
+
+/**
+ * The sea lane Eastbrook to Wickharbor. The two harbors share no water north
+ * of the vale (land meets the Mirefen along the whole border, and the column
+ * strait east of the vale is closed by the causeway), so the lane runs the
+ * only sea road there is: out of the cove, down the deep western strait,
+ * along the vale's south coast, east through the deep southern channel, up
+ * the east shore past the Old Beacon, and round into Wickharbor's bay.
+ * Authored against the heightfield and the harbor colliders, pinned by
+ * tests/transport_lanes.test.ts (always afloat, clear of every pier and post).
+ *
+ * The cove is barely longer than the ship, so it casts off by swinging its
+ * bow west about its stern (clear of the piers behind it) before it gathers
+ * way; at Wickharbor it loops the bay's north end and runs in along the
+ * berth's own axis.
+ */
+const EASTBROOK_TO_WICKHARBOR: readonly TransportWaypoint[] = [
+  { x: EASTBROOK_BERTH.x, z: EASTBROOK_BERTH.z, rot: EASTBROOK_BERTH.rot },
+  sternPivot(-125, -70.3, -0.3),
+  sternPivot(-125, -70.3, -0.75),
+  sternPivot(-125, -70.3, -1.2),
+  sternPivot(-125, -70.3, -Math.PI / 2),
+  { x: -152, z: -70.6 },
+  { x: -164, z: -72 },
+  { x: -175, z: -77.5 },
+  { x: -183, z: -87 },
+  { x: -186, z: -100 },
+  { x: -186, z: -118 },
+  { x: -186, z: -136 },
+  { x: -184, z: -152 },
+  { x: -177.5, z: -166 },
+  { x: -165, z: -175 },
+  { x: -148, z: -179 },
+  { x: -118, z: -180 },
+  { x: -75, z: -180 },
+  { x: -25, z: -180 },
+  { x: 25, z: -180 },
+  { x: 72, z: -181 },
+  { x: 112, z: -186 },
+  { x: 150, z: -192 },
+  { x: 186, z: -198 },
+  { x: 240, z: -200 },
+  { x: 320, z: -200 },
+  { x: 400, z: -200 },
+  { x: 470, z: -199 },
+  { x: 505, z: -193 },
+  { x: 526, z: -178 },
+  { x: 534, z: -156 },
+  { x: 535, z: -110 },
+  { x: 535, z: -30 },
+  { x: 535, z: 50 },
+  { x: 535, z: 130 },
+  { x: 535, z: 205 },
+  { x: 536, z: 285 },
+  { x: 537, z: 360 },
+  { x: 538, z: 405 },
+  { x: 536, z: 432 },
+  { x: 527, z: 452 },
+  { x: 510, z: 462 },
+  { x: 493, z: 457 },
+  { x: 482, z: 443 },
+  { x: 478.5, z: 424 },
+  { x: 482, z: 404.6, rot: WICKHARBOR_BERTH.rot },
+  { x: 484.6, z: 394.9, rot: WICKHARBOR_BERTH.rot },
+  { x: WICKHARBOR_BERTH.x, z: WICKHARBOR_BERTH.z, rot: WICKHARBOR_BERTH.rot },
+];
+
+/**
+ * The sea lane Wickharbor to Eastbrook: the same sea road the other way. It
+ * casts off by pivoting its bow east away from the middle pier's end, runs
+ * south down the east shore, west along the south coast, north up the
+ * western strait, and into the cove, where it swings north onto the berth
+ * along an arc that keeps its bow clear of the ferry pier's T-head.
+ */
+const WICKHARBOR_TO_EASTBROOK: readonly TransportWaypoint[] = [
+  { x: WICKHARBOR_BERTH.x, z: WICKHARBOR_BERTH.z, rot: WICKHARBOR_BERTH.rot },
+  { x: 489.6, z: 385.9, rot: WICKHARBOR_BERTH.rot },
+  { x: 492.6, z: 383.4, rot: 2.5 },
+  { x: 497.8, z: 379, rot: 2.05 },
+  { x: 505.5, z: 375, rot: 1.78 },
+  { x: 519, z: 372 },
+  { x: 532, z: 365 },
+  { x: 537.5, z: 350 },
+  { x: 538, z: 320 },
+  { x: 537, z: 270 },
+  { x: 536, z: 200 },
+  { x: 535, z: 120 },
+  { x: 535, z: 40 },
+  { x: 535, z: -40 },
+  { x: 535, z: -120 },
+  { x: 532.5, z: -158 },
+  { x: 523, z: -181 },
+  { x: 503, z: -196 },
+  { x: 468, z: -201 },
+  { x: 400, z: -201 },
+  { x: 320, z: -201 },
+  { x: 240, z: -201 },
+  { x: 186, z: -199 },
+  { x: 150, z: -193 },
+  { x: 110, z: -187 },
+  { x: 70, z: -182 },
+  { x: 20, z: -181 },
+  { x: -30, z: -181 },
+  { x: -80, z: -181 },
+  { x: -120, z: -181 },
+  { x: -150, z: -180 },
+  { x: -167, z: -175.5 },
+  { x: -179, z: -166 },
+  { x: -185, z: -151 },
+  { x: -186.5, z: -133 },
+  { x: -186.5, z: -112 },
+  { x: -185, z: -96 },
+  { x: -180, z: -84.5 },
+  { x: -171, z: -77.5 },
+  { x: -159, z: -75 },
+  { x: -145, z: -74.8 },
+  { x: -137.35, z: -73.28 },
+  { x: -130.86, z: -68.94 },
+  { x: -126.52, z: -62.45 },
+  { x: EASTBROOK_BERTH.x, z: EASTBROOK_BERTH.z, rot: EASTBROOK_BERTH.rot },
+];
+
+/** The Eastbrook ferry's timetable and handling (transport_schedule.ts): a
+ *  minute at each pier, then a voyage of just under two minutes each way. It
+ *  cruises at 19 yards a second (under three times a runner's pace), takes
+ *  about ten seconds to gather way or come to rest, and never swings its bow
+ *  faster than a quarter radian a second, so it creeps round the tight harbor
+ *  turns and the western strait's elbows and runs the long reaches. */
 export const EASTBROOK_FERRY_TIMINGS: TransportTimings = {
   docked: 60,
-  departing: 8,
-  atSea: 12,
-  arriving: 8,
+  cruise: 19,
+  accel: 2,
+  turnRate: 0.25,
 };
 
 export const EASTBROOK_WICKHARBOR_FERRY: TransportRouteDef = {
   id: 'eastbrookWickharbor',
   ship: 'eastbrookFerry',
   berths: [EASTBROOK_BERTH, WICKHARBOR_BERTH],
+  lanes: [EASTBROOK_TO_WICKHARBOR, WICKHARBOR_TO_EASTBROOK],
   timings: EASTBROOK_FERRY_TIMINGS,
 };
 

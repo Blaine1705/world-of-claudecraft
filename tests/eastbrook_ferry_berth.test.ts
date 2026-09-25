@@ -11,6 +11,7 @@ import { entityLineOfSightClear } from '../src/sim/line_of_sight_elevation';
 import { MAX_STEP_HEIGHT, PLATFORM_CARRY_CLEARANCE } from '../src/sim/physics/character';
 import { Sim } from '../src/sim/sim';
 import { transportBerthColliders } from '../src/sim/transport_gates';
+import { transportVoyageSeconds } from '../src/sim/transport_schedule';
 import { shipToWorld, worldToShip } from '../src/sim/transport_ship';
 import type { Entity } from '../src/sim/types';
 import { groundHeight, terrainHeight, WATER_LEVEL } from '../src/sim/world';
@@ -31,8 +32,7 @@ const WICK = ROUTE.berths[1];
 const HULL = EASTBROOK_FERRY_HULL;
 /** Clocks at which the ship lies docked at each berth. */
 const DOCKED_EAST = 1;
-const DOCKED_WICK =
-  ROUTE.timings.docked + ROUTE.timings.departing + ROUTE.timings.atSea + ROUTE.timings.arriving + 1;
+const DOCKED_WICK = ROUTE.timings.docked + transportVoyageSeconds(ROUTE, 0) + 1;
 
 function pose() {
   return { x: ferry.x, z: ferry.z, rot: ferry.rot, baseY: WATER_LEVEL };

@@ -2025,8 +2025,7 @@ export class Sim {
   // Placement-failure backoff gate only; per-zone cadence lives in the event
   // history (rift/portals.ts riftZoneNextOpenAt).
   riftPortalNextAt = 0;
-  // Dev-only schedule skip for the ferry timetable (transport_ferry.ts, /dev ferry).
-  transportClockOffset = 0;
+  transportClockOffset = 0; // dev-only ferry timetable skip (transport_ferry.ts, /dev ferry)
   // Escort quest runs (src/sim/escort.ts), keyed by EscortDef id. Live
   // SimContext view; the module owns every mutation.
   escortRuns = new Map<string, EscortRunState>();
@@ -2252,6 +2251,7 @@ export class Sim {
       resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
         this.resolveMove(fromX, fromZ, nx, nz, r, e, ignoreFences),
       resolvedAbility: (abilityId, pid) => this.resolvedAbility(abilityId, pid),
+      platform: (p) => ferryMod.ferryDeckPlatform(this.ctx, p), // a sailing ship's deck
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => this.standUp(p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
@@ -6738,7 +6738,7 @@ export class Sim {
       clearAfkOnMove(this.ctx, meta, p);
     }
     if (advanceValkyrsCalling(this.ctx, p)) return;
-    if (p.ferryRide) return; // a ferry passenger: transport_ferry.ts owns the pose
+    if (p.ferryRide && ferryMod.stepPassenger(this.playerMotionDeps, p, meta.moveInput)) return;
     // The race countdown is a real start lock, not just a client animation.
     // Hold every forced/manual locomotion mode until the authoritative GO tick.
     if (meta.mountRace?.phase === 'countdown') return;

@@ -4680,24 +4680,29 @@ export function isConsuming(e: { eating: Consuming | null; drinking: Consuming |
   return e.eating !== null || e.drinking !== null;
 }
 
-/** A ferry passenger's ride (src/sim/transport_ferry.ts): the deck-local spot
- *  they boarded at, carried with the ship's pose until it docks. */
+/** A ferry passenger's voyage (src/sim/transport_ferry.ts): which route,
+ *  and the berths it sails from and to (the ferry deed and a save taken
+ *  aboard read them). Where they stand is their ordinary position: the
+ *  moving deck carries it (src/sim/transport_deck.ts). */
 export interface FerryRide {
   /** route id (content/transport_ships.ts TRANSPORT_ROUTES) */
   route: string;
-  /** destination berth index */
+  /** departure and destination berth indexes */
+  from: number;
   to: number;
-  /** deck-local offset in the ship frame: x port, y above the waterline, z bow */
-  lx: number;
-  ly: number;
-  lz: number;
-  /** facing relative to the ship's heading */
-  lf: number;
-  /** the world x/z the ride last wrote, so a teleport ends the ride */
-  wx: number;
-  wz: number;
-  /** on the hidden at-sea leg (the wire's `fry` 2) */
-  atSea: boolean;
+  /** the ship's pose this tick (the frame the wire's deck spot is taken in) */
+  ship: { x: number; z: number; rot: number };
+}
+
+/** An online entity's spot on a sailing ship's deck, as the snapshot sends it
+ *  (src/net/transport_wire.ts): the route index, the spot in the hull's frame
+ *  (x port, y above the waterline, z bow) and the heading off the bow. */
+export interface FerryDeckMirror {
+  route: number;
+  x: number;
+  y: number;
+  z: number;
+  f: number;
 }
 
 /**
@@ -4793,10 +4798,13 @@ export interface ClientMirroredEntityFields {
   climbProgress?: number;
   /** Mirror of an in-flight Vaulting Charge: a bare server-owned movement bit. */
   leaping?: boolean;
-  /** Mirror of a ferry ride (`ferryRide`): a server-owned movement bit, plus
-   *  whether the ride is on its hidden at-sea leg. */
+  /** Mirror of a ferry ride (`ferryRide`): aboard a sailing ship, with the
+   *  deck spot of the newest snapshot and the one being interpolated from, so
+   *  the renderer draws deck-bound bodies in the ship's frame (no slide
+   *  against the deck while it moves). */
   ferryRiding?: boolean;
-  ferryAtSea?: boolean;
+  ferryDeck?: FerryDeckMirror | null;
+  ferryDeckPrev?: FerryDeckMirror | null;
 }
 
 export interface Entity extends ClientMirroredEntityFields {
@@ -5191,9 +5199,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // Authoritative ledge-climb pull-up. Like `leap`, it owns movement while it
   // runs; see `src/sim/climb.ts`.
   climb?: LedgeClimb | null;
-  // A scheduled ferry passenger (src/sim/transport_ferry.ts): the ship's pose
-  // owns the body's position until it docks. Session-only and absent until a
-  // first ride; the wire carries only the `fry` bit (see ferryRiding).
+  // A scheduled ferry passenger (src/sim/transport_ferry.ts): aboard while the
+  // ship sails, carried by its moving deck. Session-only and absent until a
+  // first voyage; the wire carries the deck spot (`fry`, see ferryDeck).
   ferryRide?: FerryRide | null;
   // The ferry parked this player's pet for a crossing (the delve pet stash);
   // it comes back once the owner is off the ship and alive.
