@@ -8,7 +8,7 @@
 
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { EASTBROOK_WICKHARBOR_FERRY } from '../src/sim/content/transport_ships';
+import { EASTBROOK_NIGHTBLOOM_FERRY } from '../src/sim/content/transport_ships';
 import { Sim } from '../src/sim/sim';
 import {
   emptyTransportFerryView,
@@ -22,7 +22,7 @@ import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import { bareClient } from './helpers/bare_client';
 
-const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const ROUTE = EASTBROOK_NIGHTBLOOM_FERRY;
 const T = ROUTE.timings;
 const EAST = ROUTE.berths[0];
 const DEPART = T.docked;
@@ -37,7 +37,7 @@ describe('ferryHudModel', () => {
     const m = ferryHudModel(viewAt(15, false), EAST.landing.x, EAST.landing.z);
     expect(m).toEqual({
       line: 'departsIn',
-      destPoi: 'poi:galecrest:wickharbor',
+      destPoi: 'poi:nightbloom:moonrest',
       seconds: 45,
       hint: true,
     });
@@ -58,14 +58,14 @@ describe('ferryHudModel', () => {
     for (const clock of [DEPART + 1, (DEPART + ARRIVE) / 2, ARRIVE - 1]) {
       expect(ferryHudModel(viewAt(clock, true), 0, 0)).toEqual({
         line: 'sailing',
-        destPoi: 'poi:galecrest:wickharbor',
+        destPoi: 'poi:nightbloom:moonrest',
         seconds: 0,
         hint: false,
       });
     }
     // a bystander sees nothing while it sails
     expect(ferryHudModel(viewAt((DEPART + ARRIVE) / 2, false), 0, 0).line).toBe('none');
-    // bound for Wickharbor on the way out, Eastbrook on the way back
+    // bound for Moonrest on the way out, Eastbrook on the way back
     expect(ferryHudModel(viewAt(ARRIVE + T.docked + 1, true), 0, 0).destPoi).toBe(
       'poi:eastbrook_vale:eastbrook',
     );
@@ -137,13 +137,13 @@ describe('FerryHudPainter', () => {
     if (!root) throw new Error('not built');
     expect(root.getAttribute('role')).toBe('status');
     expect(root.style.display).toBe('flex');
-    expect(root.textContent).toContain('The ferry to Wickharbor departs in 0:45');
+    expect(root.textContent).toContain('The ferry to Moonrest departs in 0:45');
     expect(root.textContent).toContain('The crossing is free.');
     painter.update(viewAt(DEPART + 40, true), player);
-    expect(root.textContent).toContain('Sailing to Wickharbor');
+    expect(root.textContent).toContain('Sailing to Moonrest');
     // nothing covers the world: the voyage is in sight
     expect(host.querySelector('#ferry-sea-card')).toBeNull();
-    // docked at Wickharbor and far from it: the panel hides
+    // docked at Moonrest and far from it: the panel hides
     painter.update(viewAt(ARRIVE + 5, false), player);
     expect(root.style.display).toBe('none');
   });

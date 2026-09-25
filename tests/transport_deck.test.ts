@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   EASTBROOK_FERRY_HULL,
-  EASTBROOK_WICKHARBOR_FERRY,
+  EASTBROOK_NIGHTBLOOM_FERRY,
 } from '../src/sim/content/transport_ships';
 import { platformGlueAt, platformSupportAt } from '../src/sim/physics';
 import { Sim } from '../src/sim/sim';
@@ -33,7 +33,7 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // a moving, turning ship exactly as on the moored one, and steps off the
 // gangway opening into the sea.
 
-const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const ROUTE = EASTBROOK_NIGHTBLOOM_FERRY;
 const HULL = EASTBROOK_FERRY_HULL;
 const DEPART_EAST = ROUTE.timings.docked;
 const VOYAGE_EAST = transportVoyageSeconds(ROUTE, 0);

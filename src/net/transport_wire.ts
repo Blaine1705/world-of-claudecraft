@@ -20,6 +20,7 @@
 
 import { setColliderGateOpen } from '../sim/colliders';
 import { TRANSPORT_ROUTES } from '../sim/content/transport_ships';
+import { ferryViewRouteIndex } from '../sim/ferry_view_route';
 import { syncTransportGates } from '../sim/transport_gates';
 import {
   angleDelta,
@@ -38,7 +39,7 @@ export interface TransportWireWorld {
 
 interface ClientTransportState {
   clock: number;
-  view: TransportFerryView | null;
+  views: TransportFerryView[] | null;
 }
 
 const states = new WeakMap<object, ClientTransportState>();
@@ -46,7 +47,7 @@ const states = new WeakMap<object, ClientTransportState>();
 function stateFor(world: object): ClientTransportState {
   let st = states.get(world);
   if (!st) {
-    st = { clock: 0, view: null };
+    st = { clock: 0, views: null };
     states.set(world, st);
   }
   return st;
@@ -116,12 +117,16 @@ export function applyFerryWire(e: Entity, fry: unknown, alpha: number): void {
   e.ferryDeck = next;
 }
 
-/** ClientWorld.ferryView: the first route at the last snapshot's clock. */
+/** ClientWorld.ferryView at the last snapshot's clock: the route the player
+ *  rides (their deck mirror names it), else the nearest one, the same pick
+ *  as the offline Sim (sim/ferry_view_route.ts). */
 export function clientFerryView(world: TransportWireWorld): TransportFerryView | null {
-  const route = TRANSPORT_ROUTES[0];
-  if (!route) return null;
   const st = stateFor(world);
-  st.view ??= emptyTransportFerryView(route);
-  const passenger = world.player?.ferryRiding === true;
-  return transportFerryViewAt(route, st.clock, WATER_LEVEL, passenger, st.view);
+  const p = world.player;
+  const riding = p?.ferryRiding === true ? (p.ferryDeck?.route ?? -1) : -1;
+  const i = ferryViewRouteIndex(st.clock, p?.pos.x ?? 0, p?.pos.z ?? 0, riding);
+  const route = TRANSPORT_ROUTES[i];
+  if (!route) return null;
+  st.views ??= TRANSPORT_ROUTES.map((r) => emptyTransportFerryView(r));
+  return transportFerryViewAt(route, st.clock, WATER_LEVEL, riding === i, st.views[i]);
 }

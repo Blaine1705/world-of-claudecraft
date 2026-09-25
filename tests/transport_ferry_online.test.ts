@@ -29,7 +29,7 @@ import { deckFrameFor, entityRenderPose } from '../src/render/deck_frame';
 import { remoteEntityAlpha } from '../src/render/net_interp_core';
 import {
   EASTBROOK_FERRY_HULL,
-  EASTBROOK_WICKHARBOR_FERRY,
+  EASTBROOK_NIGHTBLOOM_FERRY,
 } from '../src/sim/content/transport_ships';
 import type { Sim } from '../src/sim/sim';
 import { deckToWorld, worldToDeck } from '../src/sim/transport_deck';
@@ -51,15 +51,16 @@ import { createOnlineHarness } from './helpers/online_harness';
 // deck stays glued to it on screen while the ship sails at full speed (the
 // ship-frame interpolation of their wire deck spot); a connection dropped
 // mid-voyage resumes on the deck wherever the ship has got to; and a whole
-// voyage lands docked at Wickharbor.
+// voyage lands docked at the Nightbloom (route A; route B shares the code).
 
-const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const ROUTE = EASTBROOK_NIGHTBLOOM_FERRY;
 const T = ROUTE.timings;
-const WICK = ROUTE.berths[1];
+const FAR = ROUTE.berths[1];
 const DECK = WATER_LEVEL + EASTBROOK_FERRY_HULL.mainDeckY;
 const VOYAGE = transportVoyageSeconds(ROUTE, 0);
-/** A voyage second on the long southern reach: at cruise, running straight. */
-const CRUISING_S = 45;
+/** A schedule clock on the homeward voyage's long reach east along the
+ *  channel south of the Willowfen: at cruise, running straight, due east. */
+const CRUISING_CLOCK = 2 * T.docked + transportVoyageSeconds(ROUTE, 0) + 92;
 
 function shipPose(sim: Sim): TransportPose {
   return transportShipPoseAt(ROUTE, transportClock(sim.ctx), { x: 0, z: 0, rot: 0 });
@@ -86,7 +87,7 @@ describe('walking the deck under way, online', () => {
     try {
       const sim = harness.server.sim;
       const e = harness.serverEntity;
-      sim.transportClockOffset = T.docked + CRUISING_S - sim.time;
+      sim.transportClockOffset = CRUISING_CLOCK - sim.time;
       // on the port side of the waist, clear of the hatch, the mast and the
       // stairs: the harness steers by a fixed world heading, which on this
       // eastbound reach points across the deck to starboard
@@ -144,7 +145,7 @@ describe('walking the deck under way, online', () => {
     const harness = createOnlineHarness({ latency, frameMs: 1000 / 60 });
     try {
       const sim = harness.server.sim;
-      sim.transportClockOffset = T.docked + CRUISING_S - sim.time;
+      sim.transportClockOffset = CRUISING_CLOCK - sim.time;
       putOnDeck(sim, harness.serverEntity, 2, -6);
       // a second passenger on the same deck, a few yards forward
       const otherPid = sim.addPlayer('mage', 'Deckhand', { bot: true });
@@ -196,7 +197,7 @@ describe('walking the deck under way, online', () => {
     }
   }, 60_000);
 
-  it('rides a whole voyage and lands docked at Wickharbor, on the same deck spot', () => {
+  it('rides a whole voyage and lands docked at the Nightbloom, on the same deck spot', () => {
     const harness = createOnlineHarness({ latency, frameMs: 50 });
     try {
       const sim = harness.server.sim;
@@ -217,13 +218,13 @@ describe('walking the deck under way, online', () => {
       });
       expect(sawPassenger).toBe(true);
       expect(e.ferryRide ?? null).toBeNull();
-      const local = worldToDeck(WICK, e.pos.x, e.pos.z, { x: 0, z: 0 });
+      const local = worldToDeck(FAR, e.pos.x, e.pos.z, { x: 0, z: 0 });
       expect(local.x).toBeCloseTo(1.5, 1);
       expect(local.z).toBeCloseTo(0.8, 1);
       expect(e.pos.y).toBeCloseTo(DECK, 2);
       const view = harness.client.ferryView();
       expect(view?.phase).toBe('docked');
-      expect(view?.berth).toBe('wickharbor');
+      expect(view?.berth).toBe('nightbloom');
       expect(view?.passenger).toBe(false);
       const self = harness.client.entities.get(harness.pid);
       expect(self?.ferryRiding).toBe(false);

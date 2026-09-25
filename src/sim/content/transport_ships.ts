@@ -321,9 +321,10 @@ export const TRANSPORT_SHIP_HULLS: Readonly<Record<string, ShipHullLayout>> = {
 };
 
 // ---------------------------------------------------------------------------
-// Scheduled routes: the Eastbrook ferry sails a free, round-trip timetable
-// between Eastbrook Docks and Wickharbor (transport_schedule.ts owns the cycle
-// math, transport_ferry.ts and transport_deck.ts carry the passengers on its
+// Scheduled routes: two ferries (the same ship) sail free, round-trip
+// timetables, Eastbrook Docks to Moonrest's shore in the Nightbloom, and
+// Wickharbor to the shore below Wyrmwatch in the Drakelands
+// (transport_schedule.ts owns the cycle math, transport_ferry.ts and transport_deck.ts carry the passengers on its
 // moving deck). A route's ship is NOT a decorProps row: its hull colliders are
 // placed at BOTH berths and gated by the schedule (transport_gates.ts), so the
 // moored deck exists only where and while the ship lies docked; under way the
@@ -361,6 +362,34 @@ const WICKHARBOR_BERTH: TransportBerthDef = {
   landing: { x: 473.25, z: 380.54, facing: 1.3 - Math.PI },
 };
 
+/** The Nightbloom berth: off the sunset shore at the end of the Gloamfield
+ *  road, west of Moonrest, in the deep western strait. The ship lies bow
+ *  north, its port gangway facing the shore across the end of the Moonrest
+ *  ferry pier (content: sim/ferry_piers.ts), which stands in the water level
+ *  with the gangplank the way Eastbrook's pier does. */
+const NIGHTBLOOM_BERTH: TransportBerthDef = {
+  id: 'nightbloom',
+  poi: 'poi:nightbloom:moonrest',
+  x: -520,
+  z: 1505.2,
+  rot: 0,
+  // on the pier near its end, facing back up it toward the shore
+  landing: { x: -508.5, z: 1506, facing: Math.PI / 2 },
+};
+
+/** The Drakelands berth: east of Wyrmwatch, in the deep strait below the
+ *  bank. The ship lies bow south so its port gangway faces the shore (west)
+ *  across the end of the Wyrmwatch ferry pier (sim/ferry_piers.ts). */
+const DRAKELANDS_BERTH: TransportBerthDef = {
+  id: 'drakelands',
+  poi: 'poi:drakelands:wyrmwatch',
+  x: 515,
+  z: 1900,
+  rot: Math.PI,
+  // on the pier near its end, facing back up it toward the shore
+  landing: { x: 503.5, z: 1899.2, facing: -Math.PI / 2 },
+};
+
 /** Where a ship turning about its stern lies: `stern` stays put while the
  *  bow swings to `rot` (the hull's 15.5 yd stern-to-centre offset). */
 function sternPivot(sx: number, sz: number, rot: number): TransportWaypoint {
@@ -368,117 +397,126 @@ function sternPivot(sx: number, sz: number, rot: number): TransportWaypoint {
 }
 
 /**
- * The sea lane Eastbrook to Wickharbor. The two harbors share no water north
- * of the vale (land meets the Mirefen along the whole border, and the column
- * strait east of the vale is closed by the causeway), so the lane runs the
- * only sea road there is: out of the cove, down the deep western strait,
- * along the vale's south coast, east through the deep southern channel, up
- * the east shore past the Old Beacon, and round into Wickharbor's bay.
- * Authored against the heightfield and the harbor colliders, pinned by
- * tests/transport_lanes.test.ts (always afloat, clear of every pier and post).
+ * The sea lane Eastbrook to the Nightbloom. The only water that joins them
+ * runs up the far west of the world: out of the cove and north up the deep
+ * western strait, west along the deep channel south of the Willowfen, then
+ * north up the long western shallows past the Palmreach and into the
+ * Nightbloom's deep western strait, straight in onto the berth. Authored
+ * against the heightfield and the colliders, pinned by
+ * tests/transport_lanes.test.ts (the waterline hull afloat, clear of every
+ * pier, post and moored hull; the shallows are the known keel-in-sand
+ * stretch the owner accepted).
  *
  * The cove is barely longer than the ship, so it casts off by swinging its
  * bow west about its stern (clear of the piers behind it) before it gathers
- * way; at Wickharbor it loops the bay's north end and runs in along the
- * berth's own axis.
+ * way, then turns north out of the cove mouth.
  */
-const EASTBROOK_TO_WICKHARBOR: readonly TransportWaypoint[] = [
+const EASTBROOK_TO_NIGHTBLOOM: readonly TransportWaypoint[] = [
   { x: EASTBROOK_BERTH.x, z: EASTBROOK_BERTH.z, rot: EASTBROOK_BERTH.rot },
   sternPivot(-125, -70.3, -0.3),
   sternPivot(-125, -70.3, -0.75),
   sternPivot(-125, -70.3, -1.2),
   sternPivot(-125, -70.3, -Math.PI / 2),
   { x: -152, z: -70.6 },
-  { x: -164, z: -72 },
-  { x: -175, z: -77.5 },
-  { x: -183, z: -87 },
-  { x: -186, z: -100 },
-  { x: -186, z: -118 },
-  { x: -186, z: -136 },
-  { x: -184, z: -152 },
-  { x: -177.5, z: -166 },
-  { x: -165, z: -175 },
-  { x: -148, z: -179 },
-  { x: -118, z: -180 },
-  { x: -75, z: -180 },
-  { x: -25, z: -180 },
-  { x: 25, z: -180 },
-  { x: 72, z: -181 },
-  { x: 112, z: -186 },
-  { x: 150, z: -192 },
-  { x: 186, z: -198 },
-  { x: 240, z: -200 },
-  { x: 320, z: -200 },
-  { x: 400, z: -200 },
-  { x: 470, z: -199 },
-  { x: 505, z: -193 },
-  { x: 526, z: -178 },
-  { x: 534, z: -156 },
-  { x: 535, z: -110 },
-  { x: 535, z: -30 },
-  { x: 535, z: 50 },
-  { x: 535, z: 130 },
-  { x: 535, z: 205 },
-  { x: 536, z: 285 },
-  { x: 537, z: 360 },
-  { x: 538, z: 405 },
-  { x: 536, z: 432 },
-  { x: 527, z: 452 },
-  { x: 510, z: 462 },
-  { x: 493, z: 457 },
-  { x: 482, z: 443 },
-  { x: 478.5, z: 424 },
-  { x: 482, z: 404.6, rot: WICKHARBOR_BERTH.rot },
-  { x: 484.6, z: 394.9, rot: WICKHARBOR_BERTH.rot },
-  { x: WICKHARBOR_BERTH.x, z: WICKHARBOR_BERTH.z, rot: WICKHARBOR_BERTH.rot },
+  { x: -166, z: -72 },
+  { x: -179, z: -68 },
+  { x: -186, z: -52 },
+  { x: -187, z: -20 },
+  { x: -186, z: 20 },
+  { x: -186, z: 60 },
+  { x: -186, z: 100 },
+  { x: -193, z: 138 },
+  { x: -212, z: 158 },
+  { x: -245, z: 165 },
+  { x: -300, z: 165 },
+  { x: -360, z: 165 },
+  { x: -420, z: 165 },
+  { x: -478, z: 165 },
+  { x: -518, z: 172 },
+  { x: -544, z: 200 },
+  { x: -552, z: 240 },
+  { x: -552, z: 300 },
+  { x: -552, z: 360 },
+  { x: -552, z: 420 },
+  { x: -550, z: 480 },
+  { x: -548, z: 540 },
+  { x: -546, z: 600 },
+  { x: -546, z: 660 },
+  { x: -546, z: 720 },
+  { x: -540, z: 790 },
+  { x: -526, z: 828 },
+  { x: -540, z: 866 },
+  { x: -554, z: 910 },
+  { x: -548, z: 970 },
+  { x: -540, z: 1030 },
+  { x: -520, z: 1080 },
+  { x: -496, z: 1122 },
+  { x: -476, z: 1165 },
+  { x: -482, z: 1205 },
+  { x: -502, z: 1250 },
+  { x: -514, z: 1300 },
+  { x: -516, z: 1360 },
+  { x: -518, z: 1420 },
+  { x: -520, z: 1465 },
+  { x: NIGHTBLOOM_BERTH.x, z: 1485, rot: NIGHTBLOOM_BERTH.rot },
+  { x: NIGHTBLOOM_BERTH.x, z: NIGHTBLOOM_BERTH.z, rot: NIGHTBLOOM_BERTH.rot },
 ];
 
 /**
- * The sea lane Wickharbor to Eastbrook: the same sea road the other way. It
- * casts off by pivoting its bow east away from the middle pier's end, runs
- * south down the east shore, west along the south coast, north up the
- * western strait, and into the cove, where it swings north onto the berth
- * along an arc that keeps its bow clear of the ferry pier's T-head.
+ * The sea lane the Nightbloom to Eastbrook: the same sea road the other way.
+ * The berth faces north up the strait, so it casts off by swinging its bow
+ * west, away from the pier, about its stern until it points south, then runs
+ * the western shallows south, east along the channel, down the western
+ * strait, and into the cove, where it swings north onto the berth along an
+ * arc that keeps its bow clear of the ferry pier's T-head.
  */
-const WICKHARBOR_TO_EASTBROOK: readonly TransportWaypoint[] = [
-  { x: WICKHARBOR_BERTH.x, z: WICKHARBOR_BERTH.z, rot: WICKHARBOR_BERTH.rot },
-  { x: 489.6, z: 385.9, rot: WICKHARBOR_BERTH.rot },
-  { x: 492.6, z: 383.4, rot: 2.5 },
-  { x: 497.8, z: 379, rot: 2.05 },
-  { x: 505.5, z: 375, rot: 1.78 },
-  { x: 519, z: 372 },
-  { x: 532, z: 365 },
-  { x: 537.5, z: 350 },
-  { x: 538, z: 320 },
-  { x: 537, z: 270 },
-  { x: 536, z: 200 },
-  { x: 535, z: 120 },
-  { x: 535, z: 40 },
-  { x: 535, z: -40 },
-  { x: 535, z: -120 },
-  { x: 532.5, z: -158 },
-  { x: 523, z: -181 },
-  { x: 503, z: -196 },
-  { x: 468, z: -201 },
-  { x: 400, z: -201 },
-  { x: 320, z: -201 },
-  { x: 240, z: -201 },
-  { x: 186, z: -199 },
-  { x: 150, z: -193 },
-  { x: 110, z: -187 },
-  { x: 70, z: -182 },
-  { x: 20, z: -181 },
-  { x: -30, z: -181 },
-  { x: -80, z: -181 },
-  { x: -120, z: -181 },
-  { x: -150, z: -180 },
-  { x: -167, z: -175.5 },
-  { x: -179, z: -166 },
-  { x: -185, z: -151 },
-  { x: -186.5, z: -133 },
-  { x: -186.5, z: -112 },
-  { x: -185, z: -96 },
-  { x: -180, z: -84.5 },
+const NIGHTBLOOM_TO_EASTBROOK: readonly TransportWaypoint[] = [
+  { x: NIGHTBLOOM_BERTH.x, z: NIGHTBLOOM_BERTH.z, rot: NIGHTBLOOM_BERTH.rot },
+  sternPivot(-520, 1489.7, -0.5),
+  sternPivot(-520, 1489.7, -1.1),
+  sternPivot(-520, 1489.7, -1.7),
+  sternPivot(-520, 1489.7, -2.3),
+  sternPivot(-520, 1489.7, -2.8),
+  sternPivot(-520, 1489.7, -Math.PI),
+  { x: -520, z: 1440 },
+  { x: -518, z: 1400 },
+  { x: -516, z: 1340 },
+  { x: -512, z: 1290 },
+  { x: -500, z: 1245 },
+  { x: -480, z: 1205 },
+  { x: -476, z: 1165 },
+  { x: -496, z: 1122 },
+  { x: -520, z: 1080 },
+  { x: -540, z: 1030 },
+  { x: -548, z: 970 },
+  { x: -554, z: 910 },
+  { x: -540, z: 866 },
+  { x: -526, z: 828 },
+  { x: -540, z: 790 },
+  { x: -546, z: 720 },
+  { x: -546, z: 660 },
+  { x: -546, z: 600 },
+  { x: -548, z: 540 },
+  { x: -550, z: 480 },
+  { x: -552, z: 420 },
+  { x: -552, z: 360 },
+  { x: -552, z: 300 },
+  { x: -552, z: 240 },
+  { x: -544, z: 200 },
+  { x: -518, z: 172 },
+  { x: -478, z: 165 },
+  { x: -420, z: 165 },
+  { x: -360, z: 165 },
+  { x: -300, z: 165 },
+  { x: -245, z: 165 },
+  { x: -212, z: 158 },
+  { x: -193, z: 138 },
+  { x: -186, z: 100 },
+  { x: -186, z: 60 },
+  { x: -186, z: 20 },
+  { x: -187, z: -20 },
+  { x: -187, z: -50 },
+  { x: -182, z: -70 },
   { x: -171, z: -77.5 },
   { x: -159, z: -75 },
   { x: -145, z: -74.8 },
@@ -488,12 +526,114 @@ const WICKHARBOR_TO_EASTBROOK: readonly TransportWaypoint[] = [
   { x: EASTBROOK_BERTH.x, z: EASTBROOK_BERTH.z, rot: EASTBROOK_BERTH.rot },
 ];
 
-/** The Eastbrook ferry's timetable and handling (transport_schedule.ts): a
- *  minute at each pier, then a voyage of just under two minutes each way. It
- *  cruises at 19 yards a second (under three times a runner's pace), takes
- *  about ten seconds to gather way or come to rest, and never swings its bow
- *  faster than a quarter radian a second, so it creeps round the tight harbor
- *  turns and the western strait's elbows and runs the long reaches. */
+/**
+ * The sea lane Wickharbor to the Drakelands. North out of Wickharbor's bay,
+ * up the eastern shallows, through the deep Thornpeak water and its narrow
+ * northern neck (widened for the ship, content/zone3.ts), up the
+ * Evergarden shallows and into the deep eastern strait along the Drakelands
+ * coast. At the berth it runs on past the pier, heading north, and swings its
+ * bow east about its stern until it points south, lying alongside the pier.
+ * It casts off from Wickharbor by pivoting its bow east away from the
+ * deepwater pier's end, as the ferry always has.
+ */
+const WICKHARBOR_TO_DRAKELANDS: readonly TransportWaypoint[] = [
+  { x: WICKHARBOR_BERTH.x, z: WICKHARBOR_BERTH.z, rot: WICKHARBOR_BERTH.rot },
+  { x: 489.6, z: 385.9, rot: WICKHARBOR_BERTH.rot },
+  { x: 492.6, z: 383.4, rot: 2.5 },
+  { x: 497.8, z: 379, rot: 2.05 },
+  { x: 505.5, z: 375, rot: 1.78 },
+  { x: 519, z: 375 },
+  { x: 531, z: 386 },
+  { x: 537, z: 410 },
+  { x: 537, z: 440 },
+  { x: 536, z: 480 },
+  { x: 536, z: 540 },
+  { x: 536, z: 600 },
+  { x: 536, z: 660 },
+  { x: 540, z: 710 },
+  { x: 539.5, z: 740 },
+  { x: 539.5, z: 767 },
+  { x: 538.5, z: 800 },
+  { x: 532, z: 825 },
+  { x: 532, z: 865 },
+  { x: 528, z: 905 },
+  { x: 522, z: 945 },
+  { x: 522, z: 1000 },
+  { x: 522, z: 1060 },
+  { x: 522, z: 1110 },
+  { x: 524, z: 1160 },
+  { x: 524, z: 1220 },
+  { x: 524, z: 1280 },
+  { x: 524, z: 1360 },
+  { x: 524, z: 1440 },
+  { x: 524, z: 1520 },
+  { x: 524, z: 1600 },
+  { x: 524, z: 1680 },
+  { x: 529, z: 1740 },
+  { x: 530, z: 1800 },
+  { x: 526, z: 1850 },
+  { x: 520, z: 1885 },
+  { x: DRAKELANDS_BERTH.x, z: 1915.5, rot: 0 },
+  sternPivot(515, 1915.5, 0),
+  sternPivot(515, 1915.5, 0.6),
+  sternPivot(515, 1915.5, 1.2),
+  sternPivot(515, 1915.5, 1.8),
+  sternPivot(515, 1915.5, 2.4),
+  sternPivot(515, 1915.5, 2.9),
+  { x: DRAKELANDS_BERTH.x, z: DRAKELANDS_BERTH.z, rot: DRAKELANDS_BERTH.rot },
+];
+
+/**
+ * The sea lane the Drakelands to Wickharbor: the same sea road the other way.
+ * The berth already faces south, so it simply gathers way down the strait,
+ * and at Wickharbor it swings round the bay's north end and runs in along
+ * the berth's own axis.
+ */
+const DRAKELANDS_TO_WICKHARBOR: readonly TransportWaypoint[] = [
+  { x: DRAKELANDS_BERTH.x, z: DRAKELANDS_BERTH.z, rot: DRAKELANDS_BERTH.rot },
+  { x: 516, z: 1870 },
+  { x: 522, z: 1830 },
+  { x: 528, z: 1790 },
+  { x: 529, z: 1740 },
+  { x: 524, z: 1680 },
+  { x: 524, z: 1600 },
+  { x: 524, z: 1520 },
+  { x: 524, z: 1440 },
+  { x: 524, z: 1360 },
+  { x: 524, z: 1280 },
+  { x: 524, z: 1220 },
+  { x: 524, z: 1160 },
+  { x: 522, z: 1110 },
+  { x: 522, z: 1060 },
+  { x: 522, z: 1000 },
+  { x: 522, z: 945 },
+  { x: 528, z: 905 },
+  { x: 532, z: 865 },
+  { x: 532, z: 825 },
+  { x: 538, z: 795 },
+  { x: 539.5, z: 767 },
+  { x: 539.5, z: 740 },
+  { x: 540, z: 710 },
+  { x: 536, z: 660 },
+  { x: 536, z: 600 },
+  { x: 536, z: 540 },
+  { x: 534, z: 500 },
+  { x: 524, z: 470 },
+  { x: 508, z: 461 },
+  { x: 493, z: 457 },
+  { x: 482, z: 443 },
+  { x: 478.5, z: 424 },
+  { x: 482, z: 404.6, rot: WICKHARBOR_BERTH.rot },
+  { x: 484.6, z: 394.9, rot: WICKHARBOR_BERTH.rot },
+  { x: WICKHARBOR_BERTH.x, z: WICKHARBOR_BERTH.z, rot: WICKHARBOR_BERTH.rot },
+];
+
+/** The ferries' timetable and handling (transport_schedule.ts), shared by
+ *  both routes: a minute at each pier, then a voyage of about two minutes
+ *  each way. They cruise at 19 yards a second (under three times a runner's
+ *  pace), take about ten seconds to gather way or come to rest, and never
+ *  swing the bow faster than a quarter radian a second, so they creep round
+ *  the tight harbor turns and run the long reaches. */
 export const EASTBROOK_FERRY_TIMINGS: TransportTimings = {
   docked: 60,
   cruise: 19,
@@ -501,13 +641,27 @@ export const EASTBROOK_FERRY_TIMINGS: TransportTimings = {
   turnRate: 0.25,
 };
 
-export const EASTBROOK_WICKHARBOR_FERRY: TransportRouteDef = {
-  id: 'eastbrookWickharbor',
+/** Route A: Eastbrook Docks and Moonrest's shore, in the Nightbloom. */
+export const EASTBROOK_NIGHTBLOOM_FERRY: TransportRouteDef = {
+  id: 'eastbrookNightbloom',
   ship: 'eastbrookFerry',
-  berths: [EASTBROOK_BERTH, WICKHARBOR_BERTH],
-  lanes: [EASTBROOK_TO_WICKHARBOR, WICKHARBOR_TO_EASTBROOK],
+  berths: [EASTBROOK_BERTH, NIGHTBLOOM_BERTH],
+  lanes: [EASTBROOK_TO_NIGHTBLOOM, NIGHTBLOOM_TO_EASTBROOK],
   timings: EASTBROOK_FERRY_TIMINGS,
 };
 
-/** Every scheduled route in the built-in world. */
-export const TRANSPORT_ROUTES: readonly TransportRouteDef[] = [EASTBROOK_WICKHARBOR_FERRY];
+/** Route B: Wickharbor and the shore below Wyrmwatch, in the Drakelands. */
+export const WICKHARBOR_DRAKELANDS_FERRY: TransportRouteDef = {
+  id: 'wickharborDrakelands',
+  ship: 'eastbrookFerry',
+  berths: [WICKHARBOR_BERTH, DRAKELANDS_BERTH],
+  lanes: [WICKHARBOR_TO_DRAKELANDS, DRAKELANDS_TO_WICKHARBOR],
+  timings: EASTBROOK_FERRY_TIMINGS,
+};
+
+/** Every scheduled route in the built-in world, each sailed by its own ship
+ *  (the same model and hull). */
+export const TRANSPORT_ROUTES: readonly TransportRouteDef[] = [
+  EASTBROOK_NIGHTBLOOM_FERRY,
+  WICKHARBOR_DRAKELANDS_FERRY,
+];

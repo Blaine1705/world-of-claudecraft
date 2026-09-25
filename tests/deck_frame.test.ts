@@ -17,7 +17,7 @@ import {
   type WakeEmitter,
   wakeParticleAlpha,
 } from '../src/render/ship_wake_core';
-import { EASTBROOK_WICKHARBOR_FERRY } from '../src/sim/content/transport_ships';
+import { EASTBROOK_NIGHTBLOOM_FERRY } from '../src/sim/content/transport_ships';
 import { deckToWorld, worldToDeck } from '../src/sim/transport_deck';
 import {
   emptyTransportFerryView,
@@ -33,7 +33,7 @@ import { WATER_LEVEL } from '../src/sim/world';
 // display pose runs in the hull frame, and the chase camera rides the deck.
 // Plus the wake and bow splash particle math (src/render/ship_wake_core.ts).
 
-const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const ROUTE = EASTBROOK_NIGHTBLOOM_FERRY;
 const SAILING = ROUTE.timings.docked + 40;
 
 function world(clock: number) {

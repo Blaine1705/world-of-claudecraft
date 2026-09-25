@@ -1032,6 +1032,6 @@ export const table: DeedLocaleTable = {
   },
   exp_harbor_to_harbor: {
     name: '港から港へ',
-    desc: 'イーストブルックの渡し船でウィックハーバーへ渡り、また戻る。',
+    desc: 'イーストブルックとムーンレスト、ウィックハーバーとワームウォッチ、二つの渡し船でそれぞれ往復する。',
   },
 };

@@ -2,8 +2,9 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { queryOpenWorldColliders, supportHeightAt } from '../src/sim/colliders';
 import {
   EASTBROOK_FERRY_HULL,
-  EASTBROOK_WICKHARBOR_FERRY,
+  EASTBROOK_NIGHTBLOOM_FERRY,
   TRANSPORT_ROUTES,
+  WICKHARBOR_DRAKELANDS_FERRY,
 } from '../src/sim/content/transport_ships';
 import { handleFerryDevChat } from '../src/sim/dev/ferry_dev';
 import { summonMountItem } from '../src/sim/mounts';
@@ -26,24 +27,25 @@ import { DT, type Entity } from '../src/sim/types';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-// The scheduled, free, round-trip ferry between Eastbrook and Wickharbor
-// (Phases 2 and 3). The timetable is a pure function of the schedule clock;
+// The scheduled, free, round-trip ferries (Phases 2 and 3), driven here on
+// route A, Eastbrook to the Nightbloom (route B, Wickharbor to the
+// Drakelands, runs the same system on the same clock). The timetable is a pure function of the schedule clock;
 // the ship sails the whole voyage in sight along its sea lanes, and a
 // passenger walks its moving deck (transport_deck.test.ts pins the walking).
 // These drive the REAL Sim through departures and arrivals and pin who
 // sails, what the voyage does to them, and where they step off.
 
-const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const ROUTE = EASTBROOK_NIGHTBLOOM_FERRY;
 const HULL = EASTBROOK_FERRY_HULL;
 const T = ROUTE.timings;
 const EAST = ROUTE.berths[0];
-const WICK = ROUTE.berths[1];
+const FAR = ROUTE.berths[1];
 const VOYAGE_EAST = transportVoyageSeconds(ROUTE, 0);
-const VOYAGE_WICK = transportVoyageSeconds(ROUTE, 1);
+const VOYAGE_FAR = transportVoyageSeconds(ROUTE, 1);
 /** Clock of the first departure from Eastbrook (the cycle opens docked there). */
 const DEPART_EAST = T.docked;
-const ARRIVE_WICK = T.docked + VOYAGE_EAST;
-const DEPART_WICK = ARRIVE_WICK + T.docked;
+const ARRIVE_FAR = T.docked + VOYAGE_EAST;
+const DEPART_FAR = ARRIVE_FAR + T.docked;
 const CYCLE = transportCycleSeconds(ROUTE);
 const DECK = WATER_LEVEL + HULL.mainDeckY;
 
@@ -94,17 +96,17 @@ function deckSpot(sim: Sim, e: Entity): { x: number; z: number } {
 
 describe('the timetable (pure)', () => {
   it('runs one fixed cycle: docked, the voyage out, docked, the voyage home', () => {
-    expect(CYCLE).toBeCloseTo(2 * T.docked + VOYAGE_EAST + VOYAGE_WICK, 9);
+    expect(CYCLE).toBeCloseTo(2 * T.docked + VOYAGE_EAST + VOYAGE_FAR, 9);
     const at = (c: number) => {
       const s = transportPhaseAt(ROUTE, c);
       return `${s.phase}@${ROUTE.berths[s.berth].id}`;
     };
     expect(at(0)).toBe('docked@eastbrook');
     expect(at(DEPART_EAST - 0.001)).toBe('docked@eastbrook');
-    expect(at(DEPART_EAST)).toBe('sailing@wickharbor');
-    expect(at(ARRIVE_WICK - 0.001)).toBe('sailing@wickharbor');
-    expect(at(ARRIVE_WICK)).toBe('docked@wickharbor');
-    expect(at(DEPART_WICK)).toBe('sailing@eastbrook');
+    expect(at(DEPART_EAST)).toBe('sailing@nightbloom');
+    expect(at(ARRIVE_FAR - 0.001)).toBe('sailing@nightbloom');
+    expect(at(ARRIVE_FAR)).toBe('docked@nightbloom');
+    expect(at(DEPART_FAR)).toBe('sailing@eastbrook');
     expect(at(CYCLE - 0.001)).toBe('sailing@eastbrook');
     // periodic, and defined for any clock (a negative dev offset included)
     expect(at(CYCLE)).toBe('docked@eastbrook');
@@ -126,11 +128,13 @@ describe('the timetable (pure)', () => {
   });
 
   it('sails a WoW-length voyage each way, in sight and without a jump', () => {
-    // just under two minutes each way, a long sea road (not a hop)
-    expect(VOYAGE_EAST).toBeGreaterThan(60);
-    expect(VOYAGE_EAST).toBeLessThan(120);
-    expect(VOYAGE_WICK).toBeGreaterThan(60);
-    expect(VOYAGE_WICK).toBeLessThan(120);
+    // about two minutes each way on both routes, a long sea road (not a hop)
+    for (const route of TRANSPORT_ROUTES) {
+      for (const lane of [0, 1]) {
+        expect(transportVoyageSeconds(route, lane)).toBeGreaterThan(60);
+        expect(transportVoyageSeconds(route, lane)).toBeLessThan(150);
+      }
+    }
     for (const lane of ROUTE.lanes) expect(transportLaneLength(lane)).toBeGreaterThan(1000);
     // consecutive ticks never jump: the ship is a moving body the whole cycle
     const prev: TransportPose = { x: 0, z: 0, rot: 0 };
@@ -159,7 +163,7 @@ describe('the timetable (pure)', () => {
   it('leaves and arrives at rest, and cruises in between', () => {
     expect(transportShipSpeedAt(ROUTE, DEPART_EAST)).toBe(0);
     expect(transportShipSpeedAt(ROUTE, DEPART_EAST + 0.2)).toBeLessThan(1);
-    expect(transportShipSpeedAt(ROUTE, ARRIVE_WICK - 0.2)).toBeLessThan(1);
+    expect(transportShipSpeedAt(ROUTE, ARRIVE_FAR - 0.2)).toBeLessThan(1);
     expect(transportShipSpeedAt(ROUTE, 20)).toBe(0);
     let cruising = 0;
     for (let t = 0; t < VOYAGE_EAST; t += 0.5) {
@@ -189,10 +193,10 @@ describe('the timetable (pure)', () => {
     }
     // the moored pose at both ends of each voyage, heading included
     const p: TransportPose = { x: 0, z: 0, rot: 0 };
-    transportShipPoseAt(ROUTE, ARRIVE_WICK - 1e-6, p);
-    expect(p.x).toBeCloseTo(WICK.x, 3);
-    expect(p.z).toBeCloseTo(WICK.z, 3);
-    expect(Math.cos(p.rot - WICK.rot)).toBeCloseTo(1, 6);
+    transportShipPoseAt(ROUTE, ARRIVE_FAR - 1e-6, p);
+    expect(p.x).toBeCloseTo(FAR.x, 3);
+    expect(p.z).toBeCloseTo(FAR.z, 3);
+    expect(Math.cos(p.rot - FAR.rot)).toBeCloseTo(1, 6);
     transportShipPoseAt(ROUTE, CYCLE - 1e-6, p);
     expect(p.x).toBeCloseTo(EAST.x, 3);
     expect(Math.cos(p.rot - EAST.rot)).toBeCloseTo(1, 6);
@@ -214,7 +218,7 @@ describe('the moored deck exists only where, and while, the ship lies docked', (
     sim.tick();
     expect(deckTop(0)).toBe(-Infinity);
     expect(deckTop(1)).toBe(-Infinity);
-    setClock(sim, ARRIVE_WICK + 1);
+    setClock(sim, ARRIVE_FAR + 1);
     sim.tick();
     expect(deckTop(0)).toBe(-Infinity);
     expect(deckTop(1)).toBeCloseTo(DECK, 6);
@@ -250,7 +254,7 @@ describe('sailing (the real Sim)', () => {
     sim.setPlayerLevel(20);
   });
 
-  it('carries a player on deck at departure and sets them down docked at Wickharbor', () => {
+  it('carries a player on deck at departure and sets them down docked at the Nightbloom', () => {
     const p = sim.player;
     setClock(sim, DEPART_EAST - 0.5);
     placeOnDeck(p, 0, 1.5, 0.8);
@@ -260,15 +264,15 @@ describe('sailing (the real Sim)', () => {
     tickSeconds(sim, VOYAGE_EAST / 2);
     expect(p.ferryRide).toBeTruthy();
     expect(Math.hypot(p.pos.x - EAST.x, p.pos.z - EAST.z)).toBeGreaterThan(150);
-    expect(Math.hypot(p.pos.x - WICK.x, p.pos.z - WICK.z)).toBeGreaterThan(150);
+    expect(Math.hypot(p.pos.x - FAR.x, p.pos.z - FAR.z)).toBeGreaterThan(150);
     const mid = deckSpot(sim, p);
     expect(mid.x).toBeCloseTo(1.5, 2);
     expect(mid.z).toBeCloseTo(0.8, 2);
     expect(p.pos.y).toBeCloseTo(DECK, 3);
-    // moored at Wickharbor: the voyage ends where they stand
+    // moored at the Nightbloom: the voyage ends where they stand
     tickSeconds(sim, VOYAGE_EAST / 2 + 0.5);
     expect(p.ferryRide ?? null).toBeNull();
-    const there = worldToDeck(WICK, p.pos.x, p.pos.z, { x: 0, z: 0 });
+    const there = worldToDeck(FAR, p.pos.x, p.pos.z, { x: 0, z: 0 });
     expect(there.x).toBeCloseTo(1.5, 2);
     expect(there.z).toBeCloseTo(0.8, 2);
     expect(p.pos.y).toBeCloseTo(DECK, 3);
@@ -276,20 +280,23 @@ describe('sailing (the real Sim)', () => {
     tickSeconds(sim, 1);
     expect(p.pos.y).toBeCloseTo(DECK, 3);
     const meta = sim.players.get(p.id);
-    expect(meta?.deedStats.visited.has('ferry:eastbrook_wickharbor')).toBe(true);
+    expect(meta?.deedStats.visited.has('ferry:eastbrook_nightbloom')).toBe(true);
   }, 90_000);
 
-  it('both crossings earn the Harbor to Harbor deed', () => {
+  it('every crossing of both routes earns the Harbor to Harbor deed', () => {
     const p = sim.player;
     const meta = sim.players.get(p.id);
     if (!meta) throw new Error('meta');
-    // the way back already sailed (a save carries the one-way mark)
-    meta.deedStats.visited.add('ferry:wickharbor_eastbrook');
+    // the other three crossings already sailed (a save carries the marks)
+    meta.deedStats.visited.add('ferry:nightbloom_eastbrook');
+    meta.deedStats.visited.add('ferry:wickharbor_drakelands');
+    expect(meta.deedsEarned.has('exp_harbor_to_harbor')).toBe(false);
+    meta.deedStats.visited.add('ferry:drakelands_wickharbor');
     expect(meta.deedsEarned.has('exp_harbor_to_harbor')).toBe(false);
     setClock(sim, DEPART_EAST - 0.5);
     placeOnDeck(p, 0, 1.5, 0.8);
     tickSeconds(sim, 1);
-    sailUntil(sim, ARRIVE_WICK - 2);
+    sailUntil(sim, ARRIVE_FAR - 2);
     tickSeconds(sim, 3.5);
     expect(meta.deedsEarned.has('exp_harbor_to_harbor')).toBe(true);
   });
@@ -310,7 +317,7 @@ describe('sailing (the real Sim)', () => {
 
   it('sails the round trip back to Eastbrook', () => {
     const p = sim.player;
-    setClock(sim, DEPART_WICK - 0.5);
+    setClock(sim, DEPART_FAR - 0.5);
     placeOnDeck(p, 1, -2, 4);
     tickSeconds(sim, 1);
     expect(p.ferryRide?.to).toBe(0);
@@ -321,7 +328,7 @@ describe('sailing (the real Sim)', () => {
     expect(there.x).toBeCloseTo(-2, 2);
     expect(there.z).toBeCloseTo(4, 2);
     const meta = sim.players.get(p.id);
-    expect(meta?.deedStats.visited.has('ferry:wickharbor_eastbrook')).toBe(true);
+    expect(meta?.deedStats.visited.has('ferry:nightbloom_eastbrook')).toBe(true);
   });
 
   it('a player in combat sails too (the ship outruns the fight)', () => {
@@ -372,8 +379,8 @@ describe('sailing (the real Sim)', () => {
     // a save mid-voyage keeps the pet (the stash) and records the far pier
     const saved = sim.serializeCharacter(p.id);
     expect(saved?.pet?.templateId).toBe('wild_boar');
-    expect(saved?.pos).toEqual({ x: WICK.landing.x, z: WICK.landing.z });
-    sailUntil(sim, ARRIVE_WICK - 2);
+    expect(saved?.pos).toEqual({ x: FAR.landing.x, z: FAR.landing.z });
+    sailUntil(sim, ARRIVE_FAR - 2);
     for (let i = 0; i < 200 && p.ferryRide; i++) sim.tick();
     expect(p.ferryRide ?? null).toBeNull();
     // the owner steps off on the deck; the pet comes back on the pier, where
@@ -381,8 +388,8 @@ describe('sailing (the real Sim)', () => {
     const pet = sim.petOf(p.id);
     expect(pet).toBeTruthy();
     const fromLanding = Math.hypot(
-      (pet?.pos.x ?? 0) - WICK.landing.x,
-      (pet?.pos.z ?? 0) - WICK.landing.z,
+      (pet?.pos.x ?? 0) - FAR.landing.x,
+      (pet?.pos.z ?? 0) - FAR.landing.z,
     );
     expect(fromLanding).toBeLessThan(0.5);
     expect(pet?.pos.y ?? 0).toBeGreaterThan(WATER_LEVEL);
@@ -427,7 +434,7 @@ describe('sailing (the real Sim)', () => {
     tickSeconds(sim, 2);
     p.hp = 0;
     p.dead = true;
-    sailUntil(sim, ARRIVE_WICK - 2);
+    sailUntil(sim, ARRIVE_FAR - 2);
     tickSeconds(sim, 3);
     expect(p.ferryRide ?? null).toBeNull();
     expect(sim.petOf(p.id, true)).toBeNull();
@@ -447,7 +454,7 @@ describe('sailing (the real Sim)', () => {
     expect(p.ferryRide).toBeTruthy();
     const state = sim.serializeCharacter(p.id);
     if (!state) throw new Error('no save');
-    expect(state.pos).toEqual({ x: WICK.landing.x, z: WICK.landing.z });
+    expect(state.pos).toEqual({ x: FAR.landing.x, z: FAR.landing.z });
     // a fresh world, at a moment the ship is NOT docked at Wickharbor
     const next = new Sim({ seed: WORLD_SEED, playerClass: 'hunter', noPlayer: true });
     setClock(next, DEPART_EAST + 2);
@@ -456,7 +463,7 @@ describe('sailing (the real Sim)', () => {
     if (!back) throw new Error('no entity');
     next.tick();
     tickSeconds(next, 1);
-    expect(Math.hypot(back.pos.x - WICK.landing.x, back.pos.z - WICK.landing.z)).toBeLessThan(1);
+    expect(Math.hypot(back.pos.x - FAR.landing.x, back.pos.z - FAR.landing.z)).toBeLessThan(1);
     // standing on the pier deck, well above the water
     expect(back.pos.y).toBeGreaterThan(WATER_LEVEL + 0.5);
     expect(back.ferryRide ?? null).toBeNull();
@@ -544,10 +551,10 @@ describe('sailing (the real Sim)', () => {
     tickSeconds(sim, 2);
     p.hp = 0;
     p.dead = true;
-    sailUntil(sim, ARRIVE_WICK - 2);
+    sailUntil(sim, ARRIVE_FAR - 2);
     tickSeconds(sim, 3);
     expect(p.ferryRide ?? null).toBeNull();
-    const there = worldToDeck(WICK, p.pos.x, p.pos.z, { x: 0, z: 0 });
+    const there = worldToDeck(FAR, p.pos.x, p.pos.z, { x: 0, z: 0 });
     expect(there.x).toBeCloseTo(1.5, 2);
     expect(sim.players.get(p.id)?.deedStats.visited.has('ferry:eastbrook_wickharbor')).toBe(false);
   });
@@ -566,7 +573,7 @@ describe('sailing (the real Sim)', () => {
     expect(p.ferryRide ?? null).toBeNull();
     expect(p.corpsePos).toBeTruthy();
     const corpse = p.corpsePos ?? { x: 0, z: 0 };
-    expect(Math.hypot(corpse.x - WICK.landing.x, corpse.z - WICK.landing.z)).toBeLessThan(1);
+    expect(Math.hypot(corpse.x - FAR.landing.x, corpse.z - FAR.landing.z)).toBeLessThan(1);
   });
 
   it('never drags a player standing on either pier through a cast-off or a mooring', () => {
@@ -575,8 +582,8 @@ describe('sailing (the real Sim)', () => {
       // just inland of the gangplank's foot on each pier (whoever stands on
       // the plank, or the stage it rests on, is set down there at cast-off)
       [DEPART_EAST - 0.5, -115, -54],
-      [ARRIVE_WICK - 3, WICK.landing.x, WICK.landing.z],
-      [DEPART_WICK - 0.5, WICK.landing.x, WICK.landing.z],
+      [ARRIVE_FAR - 3, FAR.landing.x, FAR.landing.z],
+      [DEPART_FAR - 0.5, FAR.landing.x, FAR.landing.z],
       [CYCLE - 3, -115, -54],
     ];
     for (const [clock, x, z] of spots) {
@@ -690,10 +697,24 @@ describe('sailing (the real Sim)', () => {
 });
 
 describe('route content', () => {
-  it('ships one route, the Eastbrook ferry between Eastbrook and Wickharbor', () => {
-    expect(TRANSPORT_ROUTES).toEqual([ROUTE]);
-    expect(ROUTE.berths.map((b) => b.id)).toEqual(['eastbrook', 'wickharbor']);
-    expect(T).toEqual({ docked: 60, cruise: 19, accel: 2, turnRate: 0.25 });
+  it('ships two routes on the same ship and timetable: Eastbrook to the Nightbloom, Wickharbor to the Drakelands', () => {
+    expect(TRANSPORT_ROUTES.map((r) => r.id)).toEqual([
+      'eastbrookNightbloom',
+      'wickharborDrakelands',
+    ]);
+    expect(TRANSPORT_ROUTES[0]).toBe(ROUTE);
+    expect(TRANSPORT_ROUTES.map((r) => r.berths.map((b) => b.id))).toEqual([
+      ['eastbrook', 'nightbloom'],
+      ['wickharbor', 'drakelands'],
+    ]);
+    expect(TRANSPORT_ROUTES.map((r) => r.berths.map((b) => b.poi))).toEqual([
+      ['poi:eastbrook_vale:eastbrook', 'poi:nightbloom:moonrest'],
+      ['poi:galecrest:wickharbor', 'poi:drakelands:wyrmwatch'],
+    ]);
+    for (const route of TRANSPORT_ROUTES) {
+      expect(route.ship).toBe('eastbrookFerry');
+      expect(route.timings).toEqual({ docked: 60, cruise: 19, accel: 2, turnRate: 0.25 });
+    }
   });
 
   it('the dev boarding spot and a mid-voyage deck spot agree on the frame', () => {
@@ -703,5 +724,87 @@ describe('route content', () => {
     const back = worldToDeck(pose, at.x, at.z, { x: 0, z: 0 });
     expect(back.x).toBeCloseTo(0, 9);
     expect(back.z).toBeCloseTo(4, 9);
+  });
+});
+
+describe('the second route, Wickharbor to the Drakelands (the real Sim)', () => {
+  const B = WICKHARBOR_DRAKELANDS_FERRY;
+  const B_ARRIVE = B.timings.docked + transportVoyageSeconds(B, 0);
+  let sim: Sim;
+
+  beforeEach(() => {
+    sim = new Sim({ seed: WORLD_SEED, playerClass: 'hunter' });
+    sim.setPlayerLevel(20);
+  });
+
+  function placeOnB(e: Entity, lx: number, lz: number): void {
+    const b = B.berths[0];
+    const at = shipToWorld({ x: b.x, z: b.z, rot: b.rot, baseY: WATER_LEVEL }, lx, lz);
+    place(e, at.x, DECK, at.z);
+  }
+
+  it('carries its passenger from Wickharbor and sets them down at the Drakelands pier', () => {
+    const p = sim.player;
+    setClock(sim, B.timings.docked - 0.5);
+    placeOnB(p, 1.5, 0.8);
+    tickSeconds(sim, 1);
+    expect(p.ferryRide).toMatchObject({ route: B.id, from: 0, to: 1 });
+    // route A's ship sails its own lane at the same moment, nobody aboard
+    const a: TransportPose = { x: 0, z: 0, rot: 0 };
+    transportShipPoseAt(ROUTE, transportClock(sim.ctx), a);
+    expect(Math.hypot(a.x - p.pos.x, a.z - p.pos.z)).toBeGreaterThan(500);
+    sailUntil(sim, B_ARRIVE - 2);
+    tickSeconds(sim, 2.5);
+    expect(p.ferryRide ?? null).toBeNull();
+    const there = worldToDeck(B.berths[1], p.pos.x, p.pos.z, { x: 0, z: 0 });
+    expect(there.x).toBeCloseTo(1.5, 2);
+    expect(there.z).toBeCloseTo(0.8, 2);
+    expect(p.pos.y).toBeCloseTo(DECK, 3);
+    const meta = sim.players.get(p.id);
+    expect(meta?.deedStats.visited.has('ferry:wickharbor_drakelands')).toBe(true);
+    expect(meta?.deedStats.visited.has('ferry:eastbrook_nightbloom')).toBe(false);
+  }, 60_000);
+
+  it('the HUD view follows the route the player rides, else the nearest one', () => {
+    const p = sim.player;
+    const wick = B.berths[0].landing;
+    place(p, wick.x, groundHeight(wick.x, wick.z, WORLD_SEED), wick.z);
+    setClock(sim, 10);
+    expect(sim.ferryView()?.routeId).toBe(B.id);
+    expect(sim.ferryView()?.passenger).toBe(false);
+    place(p, EAST.landing.x, 0, EAST.landing.z);
+    expect(sim.ferryView()?.routeId).toBe(ROUTE.id);
+    // a passenger of route B out at sea sees route B, marked as theirs
+    setClock(sim, B.timings.docked - 0.5);
+    placeOnB(p, 1.5, 0.8);
+    tickSeconds(sim, 1);
+    sailUntil(sim, B.timings.docked + 40);
+    sim.tick();
+    expect(p.ferryRide?.route).toBe(B.id);
+    expect(sim.ferryView()).toMatchObject({ routeId: B.id, passenger: true, to: 'drakelands' });
+  });
+
+  it('/dev ferry names a route by a berth or a number, and goto lands on a berth pier', () => {
+    const ctx = sim.ctx;
+    const p = sim.player;
+    setClock(sim, 5);
+    expect(handleFerryDevChat(ctx, '/dev ferry goto drakelands', p.id)).toBe(true);
+    const dk = B.berths[1].landing;
+    expect(Math.hypot(p.pos.x - dk.x, p.pos.z - dk.z)).toBeLessThan(0.5);
+    expect(p.pos.y - WATER_LEVEL).toBeCloseTo(2.64, 2);
+    // board route B's ship by its number, wherever it is
+    expect(handleFerryDevChat(ctx, '/dev ferry 2 at 90', p.id)).toBe(true);
+    expect(transportPhaseAt(B, transportClock(ctx)).phase).toBe('sailing');
+    expect(handleFerryDevChat(ctx, '/dev ferry wickharbor board', p.id)).toBe(true);
+    sim.tick();
+    expect(p.ferryRide?.route).toBe(B.id);
+    // ...and route A's by either of its berths
+    expect(handleFerryDevChat(ctx, '/dev ferry nightbloom board', p.id)).toBe(true);
+    sim.tick();
+    expect(p.ferryRide?.route).toBe(ROUTE.id);
+    // an unknown word is swallowed, never a jump
+    const clock = transportClock(ctx);
+    expect(handleFerryDevChat(ctx, '/dev ferry sideways', p.id)).toBe(true);
+    expect(transportClock(ctx)).toBe(clock);
   });
 });

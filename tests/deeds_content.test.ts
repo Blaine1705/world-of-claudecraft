@@ -984,8 +984,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // off the merged DEED_ORDER/DEEDS table instead. No shipped TRIGGER changed
   // on either side; only those eighteen renown values moved.
   // Re-baselined for the Eastbrook ferry's exp_harbor_to_harbor (a pure tail append,
-  // proven by the pre-append digest below).
-  const FROZEN_CATALOG_SHA256 = '6d7eae0ec28b861c3ccbee54f836df2db95c61ee8fb4a105ab682271c7a83607';
+  // proven by the pre-append digest below), then again when the ferry grew to
+  // two routes and that same unshipped tail deed's visit marks became the four
+  // crossings (still a tail row: the proof below strips it and reproduces the
+  // previous digest).
+  const FROZEN_CATALOG_SHA256 = '7a9557182e647b4d298edc146c3f381d1c9cd4667a6a3b3191d2b54c9bcdc596';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(

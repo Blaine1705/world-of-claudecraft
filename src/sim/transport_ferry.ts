@@ -51,6 +51,7 @@ import { cancelValkyrsCalling } from './combat/paladin_valkyrs_calling';
 import { TRANSPORT_ROUTES, TRANSPORT_SHIP_HULLS } from './content/transport_ships';
 import { isBuiltinWorldActive } from './data';
 import { markVisited } from './deeds';
+import { ferryViewRouteIndex, transportRouteIndex } from './ferry_view_route';
 import { forceDismount } from './mounts';
 import { petOf, restorePetFromDelveStash, stowPetForDelve } from './pet/pet_commands';
 import { type PlayerMotionDeps, stepPlayerMotion } from './player_motion';
@@ -384,10 +385,13 @@ export function carryPassengersAcrossClockJump(ctx: SimContext, fromClock: numbe
   }
 }
 
-/** Where a dev boarding puts a player: the waist deck amidships of the
- *  route's ship wherever it is (dev/ferry_dev.ts `/dev ferry board`). */
-export function ferryBoardingSpot(ctx: SimContext): { x: number; y: number; z: number } | null {
-  const route = TRANSPORT_ROUTES[0];
+/** Where a dev boarding puts a player: the waist deck amidships of route
+ *  `index`'s ship wherever it is (dev/ferry_dev.ts `/dev ferry board`). */
+export function ferryBoardingSpot(
+  ctx: SimContext,
+  index: number,
+): { x: number; y: number; z: number } | null {
+  const route = TRANSPORT_ROUTES[index];
   const hull = route ? hullFor(route) : null;
   if (!route || !hull) return null;
   transportShipPoseAt(route, transportClock(ctx), poseNow);
@@ -395,17 +399,21 @@ export function ferryBoardingSpot(ctx: SimContext): { x: number; y: number; z: n
   return { x: at.x, y: WATER_LEVEL + hull.mainDeckY, z: at.z };
 }
 
-const views = new WeakMap<SimContext, TransportFerryView>();
+const views = new WeakMap<SimContext, TransportFerryView[]>();
 
-/** The offline world's IWorld.ferryView: the first route, for `viewer`. */
+/** The offline world's IWorld.ferryView: the route `viewer` rides, else the
+ *  one nearest them (ferry_view_route.ts), for `viewer`. */
 export function transportFerryView(ctx: SimContext, viewer: Entity | undefined) {
-  const route = TRANSPORT_ROUTES[0];
-  if (!route || !isBuiltinWorldActive()) return null;
-  let view = views.get(ctx);
-  if (!view) {
-    view = emptyTransportFerryView(route);
-    views.set(ctx, view);
+  if (!isBuiltinWorldActive()) return null;
+  const clock = transportClock(ctx);
+  const riding = transportRouteIndex(viewer?.ferryRide?.route);
+  const i = ferryViewRouteIndex(clock, viewer?.pos.x ?? 0, viewer?.pos.z ?? 0, riding);
+  const route = TRANSPORT_ROUTES[i];
+  if (!route) return null;
+  let list = views.get(ctx);
+  if (!list) {
+    list = TRANSPORT_ROUTES.map((r) => emptyTransportFerryView(r));
+    views.set(ctx, list);
   }
-  const passenger = !!viewer?.ferryRide && viewer.ferryRide.route === route.id;
-  return transportFerryViewAt(route, transportClock(ctx), WATER_LEVEL, passenger, view);
+  return transportFerryViewAt(route, clock, WATER_LEVEL, riding === i, list[i]);
 }

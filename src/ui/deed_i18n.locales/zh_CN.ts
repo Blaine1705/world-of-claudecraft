@@ -860,6 +860,6 @@ export const table: DeedLocaleTable = {
   },
   exp_harbor_to_harbor: {
     name: '港口到港口',
-    desc: '乘坐东溪渡船前往烛港，然后再返航。',
+    desc: '乘坐两条渡船各往返一次：东溪至月栖镇，烛港至望龙哨。',
   },
 };

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { advanceDeckFrame, deckFrameFor } from '../src/render/deck_frame';
 import { SHIP_SHADOW_REACH, shipShadowHold } from '../src/render/ship_shadow_hold';
-import { EASTBROOK_WICKHARBOR_FERRY } from '../src/sim/content/transport_ships';
+import { EASTBROOK_NIGHTBLOOM_FERRY } from '../src/sim/content/transport_ships';
 import { emptyTransportFerryView, transportFerryViewAt } from '../src/sim/transport_schedule';
 import { WATER_LEVEL } from '../src/sim/world';
 
@@ -13,7 +13,7 @@ import { WATER_LEVEL } from '../src/sim/world';
 // flicker at sea. The hold is narrow on purpose: a bystander far off keeps the
 // shed the governor chose.
 
-const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const ROUTE = EASTBROOK_NIGHTBLOOM_FERRY;
 const DOCKED = ROUTE.timings.docked / 2;
 const SAILING = ROUTE.timings.docked + 40;
 

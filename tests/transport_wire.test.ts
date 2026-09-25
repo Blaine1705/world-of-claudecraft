@@ -37,7 +37,7 @@ import { ferryDeckWire, ferryMovementFrame, transportHeadJson } from '../server/
 import { isMovementFrozen } from '../src/game/self_motion_gate';
 import { applyReconSelfWire, ReconWireState } from '../src/net/movement_reconciliation_wire';
 import { applyFerryWire, parseFerryDeck, transportClockFromHead } from '../src/net/transport_wire';
-import { EASTBROOK_WICKHARBOR_FERRY } from '../src/sim/content/transport_ships';
+import { EASTBROOK_NIGHTBLOOM_FERRY } from '../src/sim/content/transport_ships';
 import { Sim } from '../src/sim/sim';
 import { deckToWorld } from '../src/sim/transport_deck';
 import { transportPhaseAt } from '../src/sim/transport_schedule';
@@ -46,7 +46,7 @@ import { WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import { bareClient } from './helpers/bare_client';
 
-const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const ROUTE = EASTBROOK_NIGHTBLOOM_FERRY;
 const SHIP = { x: 40, z: -12, rot: 0.9 };
 
 /** Put `e` on a ship at SHIP, at deck spot (lx, lz), facing `lf` off the bow. */

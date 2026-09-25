@@ -18,7 +18,8 @@ import {
 } from '../src/render/transport_ship';
 import { TRANSPORT_SHIP_LOD_DISTANCES } from '../src/render/transport_ship_core';
 import {
-  EASTBROOK_WICKHARBOR_FERRY,
+  EASTBROOK_NIGHTBLOOM_FERRY,
+  TRANSPORT_ROUTES,
   TRANSPORT_SHIP_HULLS,
 } from '../src/sim/content/transport_ships';
 import {
@@ -254,7 +255,7 @@ describe('transport ship view', () => {
 });
 
 describe('the scheduled ferry on screen (transport_ferry_ships.ts)', () => {
-  const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+  const ROUTE = EASTBROOK_NIGHTBLOOM_FERRY;
   const view = emptyTransportFerryView(ROUTE);
   const source = { ferryView: () => view };
   function at(clock: number) {
@@ -268,7 +269,9 @@ describe('the scheduled ferry on screen (transport_ferry_ships.ts)', () => {
       adopted.push(v);
       wakes.push(w);
     });
-    expect(adopted).toHaveLength(1);
+    // one ship per route, each posed from the one shared clock
+    expect(adopted).toHaveLength(TRANSPORT_ROUTES.length);
+    expect(adopted).toHaveLength(2);
     const ship = adopted[0];
     const plank = ship.group.getObjectByName('Gangplank') as THREE.Object3D;
     ships.sync(0.05);
@@ -304,7 +307,13 @@ describe('the scheduled ferry on screen (transport_ferry_ships.ts)', () => {
     ship.update(want.x + 20, BASE_Y + 10, want.z, want.x, BASE_Y + 8, want.z, 2000, 0.05, false);
     expect(ship.group.visible).toBe(true);
     expect(wakes[0]?.points.visible).toBe(true);
-    // docked at Wickharbor: the plank is out again
+    // the second route's ship follows the same clock on its own timetable
+    const other = TRANSPORT_ROUTES[1];
+    transportShipPoseAt(other, view.clock, want);
+    adopted[1].group.updateMatrixWorld(true);
+    expect(adopted[1].group.matrixWorld.elements[12]).toBeCloseTo(want.x, 3);
+    expect(adopted[1].group.matrixWorld.elements[14]).toBeCloseTo(want.z, 3);
+    // docked at the Nightbloom: the plank is out again
     const wick = ROUTE.berths[1];
     at(ROUTE.timings.docked * 2 + transportVoyageSeconds(ROUTE, 0) - 10);
     ships.sync(0.05);

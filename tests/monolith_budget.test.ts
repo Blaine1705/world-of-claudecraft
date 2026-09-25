@@ -1777,7 +1777,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the castle pad chain and the Last Spring bank left with the castle (keep_site.ts holds the new pad). Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    ceiling: 5216,
+    // Lowered when the decoration exclusion's two harbor-deck tests folded
+    // into deck_surfaces.ts onHarborPlanks (with the far ferry piers).
+    ceiling: 5208,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {

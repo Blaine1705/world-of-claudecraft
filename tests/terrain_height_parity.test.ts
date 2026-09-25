@@ -39,6 +39,7 @@ import {
   YUMI_MAZE_X,
   yumiMazeOrigin,
 } from '../src/sim/data';
+import { FERRY_PIER_DECKS } from '../src/sim/ferry_piers';
 import { GALE_HARBOR_DECKS, type GaleDeckDef } from '../src/sim/gale_harbor';
 import { KEEP_SITE } from '../src/sim/keep_site';
 import { REACH_DECKS } from '../src/sim/reach_decks';
@@ -248,6 +249,9 @@ function buildPoints(): HeightPoint[] {
     addDeck(`Galecrest deck ${i}`, GALE_HARBOR_DECKS[i]);
   }
   for (let i = 0; i < REACH_DECKS.length; i++) addDeck(`Palmreach deck ${i}`, REACH_DECKS[i]);
+  for (let i = 0; i < FERRY_PIER_DECKS.length; i++) {
+    addDeck(`Ferry pier deck ${i}`, FERRY_PIER_DECKS[i]);
+  }
 
   const instanceXs = new Set<number>([
     DUNGEON_X_THRESHOLD,

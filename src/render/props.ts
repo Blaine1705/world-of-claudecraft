@@ -39,6 +39,7 @@ import {
   isFenbridgeRebuildStall,
   isFenbridgeRebuildWell,
 } from './fenbridge_town';
+import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import {
   type KitSurfaceFamily,
@@ -1669,6 +1670,7 @@ export function buildProps(
         if (wake) group.add(wake.points);
       })
     : null;
+  if (builtInWorld) group.add(buildFerryPiers(seed)); // their piers (render/ferry_piers.ts)
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
   activeContent.props.stalls.forEach((s, i) => {

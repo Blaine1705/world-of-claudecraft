@@ -2,10 +2,12 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { supportHeightAt } from '../src/sim/colliders';
 import {
   EASTBROOK_FERRY_HULL,
-  EASTBROOK_WICKHARBOR_FERRY,
+  EASTBROOK_NIGHTBLOOM_FERRY,
+  WICKHARBOR_DRAKELANDS_FERRY,
 } from '../src/sim/content/transport_ships';
 import { PROPS } from '../src/sim/data';
 import { EASTBROOK_HARBOR_DECKS } from '../src/sim/eastbrook_harbor';
+import { FERRY_PIER_DECK_ABOVE_WATER, FERRY_PIER_DECKS } from '../src/sim/ferry_piers';
 import { GALE_HARBOR_DECKS } from '../src/sim/gale_harbor';
 import { entityLineOfSightClear } from '../src/sim/line_of_sight_elevation';
 import { MAX_STEP_HEIGHT, PLATFORM_CARRY_CLEARANCE } from '../src/sim/physics/character';
@@ -17,22 +19,24 @@ import type { Entity } from '../src/sim/types';
 import { groundHeight, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-// The Eastbrook ferry's berths: moored across the ferry pier's T-head at
-// Eastbrook (Phase 1) and across the deepwater pier's T-head at Wickharbor
-// (Phase 2), its deck walkable while it lies docked. These pin the berths
+// The ferries' berths: moored across the ferry pier's T-head at Eastbrook
+// (Phase 1), across the deepwater pier's T-head at Wickharbor (Phase 2), and
+// across the ends of the Moonrest and Wyrmwatch ferry piers at the far berths
+// (sim/ferry_piers.ts), the deck walkable while the ship lies docked. These pin the berths
 // (position, waterline, the harbor they displaced), the boarding route from
 // each pier onto the deck and up to the quarterdeck, the rails that keep a
 // crowd aboard, and sight lines across the open deck, by driving the real
 // movement kernel through the shipped content. The schedule is held at a
 // docked moment (Sim.transportClockOffset) for every walk.
 
-const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const ROUTE = EASTBROOK_NIGHTBLOOM_FERRY;
 const ferry = ROUTE.berths[0];
-const WICK = ROUTE.berths[1];
+const WICK = WICKHARBOR_DRAKELANDS_FERRY.berths[0];
 const HULL = EASTBROOK_FERRY_HULL;
-/** Clocks at which the ship lies docked at each berth. */
+/** Clocks at which the ship lies docked at each berth (every route lies at
+ *  its first berth at clock 0). */
 const DOCKED_EAST = 1;
-const DOCKED_WICK = ROUTE.timings.docked + transportVoyageSeconds(ROUTE, 0) + 1;
+const DOCKED_WICK = 1;
 
 function pose() {
   return { x: ferry.x, z: ferry.z, rot: ferry.rot, baseY: WATER_LEVEL };
@@ -114,9 +118,14 @@ describe('Eastbrook ferry berth', () => {
   it('seats the deck volumes on the rendered waterline', () => {
     // one hull per berth, each tagged with its berth's schedule gate
     const colliders = transportBerthColliders();
-    expect(colliders).toHaveLength(2 * HULL.volumes.length);
+    expect(colliders).toHaveLength(4 * HULL.volumes.length);
     expect(new Set(colliders.map((c) => c.gate))).toEqual(
-      new Set(['eastbrookWickharbor:0', 'eastbrookWickharbor:1']),
+      new Set([
+        'eastbrookNightbloom:0',
+        'eastbrookNightbloom:1',
+        'wickharborDrakelands:0',
+        'wickharborDrakelands:1',
+      ]),
     );
     const main = HULL.volumes.find((v) => v.id === 'main_deck_aft');
     if (!main) throw new Error('no main deck');
@@ -402,4 +411,128 @@ describe('Wickharbor berth (Phase 2)', () => {
     expect(Math.abs(local.x - 1.5)).toBeLessThan(0.3);
     expect(p.pos.y - WATER_LEVEL).toBeCloseTo(HULL.mainDeckY, 3);
   }, 60_000);
+});
+
+describe('the far berths: the Moonrest and Wyrmwatch ferry piers', () => {
+  const FAR = [
+    { name: 'Moonrest', route: EASTBROOK_NIGHTBLOOM_FERRY, pier: FERRY_PIER_DECKS[0] },
+    { name: 'Wyrmwatch', route: WICKHARBOR_DRAKELANDS_FERRY, pier: FERRY_PIER_DECKS[1] },
+  ] as const;
+  type Deck = (typeof FERRY_PIER_DECKS)[number];
+  const farPose = (route: typeof ROUTE) => {
+    const b = route.berths[1];
+    return { x: b.x, z: b.z, rot: b.rot, baseY: WATER_LEVEL };
+  };
+  const along = (d: Deck, x: number, z: number) =>
+    (x - d.x) * Math.sin(d.rot) + (z - d.z) * Math.cos(d.rot);
+  const across = (d: Deck, x: number, z: number) =>
+    (x - d.x) * Math.cos(d.rot) - (z - d.z) * Math.sin(d.rot);
+  const point = (d: Deck, a: number) => ({
+    x: d.x + Math.sin(d.rot) * a,
+    z: d.z + Math.cos(d.rot) * a,
+  });
+
+  for (const { name, route, pier } of FAR) {
+    it(`${name}: lies across the pier end like Eastbrook, its gangway on the pier axis`, () => {
+      const p = farPose(route);
+      const gangway = HULL.boarding.find((b) => b.side === 'port');
+      if (!gangway) throw new Error('no port gangway');
+      const at = shipToWorld(p, gangway.x, gangway.z);
+      expect(Math.abs(across(pier, at.x, at.z))).toBeLessThan(0.05);
+      // the pier's far end runs out under the gangplank's outer tread (ship
+      // x 8.3) and stops short of the hull side (5.15), Eastbrook's relation
+      const tip = shipToWorld(p, 8.3, gangway.z);
+      const side = shipToWorld(p, 5.15, gangway.z);
+      expect(along(pier, tip.x, tip.z)).toBeLessThan(pier.hl);
+      expect(along(pier, side.x, side.z) - pier.hl).toBeGreaterThan(2);
+      expect(along(pier, side.x, side.z) - pier.hl).toBeLessThan(3.5);
+      // the planks stand at Eastbrook's pier height, a stride below the plank
+      const top = groundHeight(pier.x, pier.z, WORLD_SEED) - WATER_LEVEL;
+      expect(top).toBeCloseTo(FERRY_PIER_DECK_ABOVE_WATER, 6);
+      expect(top).toBeCloseTo(2.64, 2);
+      expect(HULL.mainDeckY - 0.44 - top).toBeLessThan(MAX_STEP_HEIGHT);
+      // the landing spot is on the pier
+      const landing = route.berths[1].landing;
+      expect(Math.abs(along(pier, landing.x, landing.z))).toBeLessThan(pier.hl);
+      expect(Math.abs(across(pier, landing.x, landing.z))).toBeLessThan(pier.hw);
+    });
+
+    it(`${name}: floats in deep water across its whole footprint`, () => {
+      const p = farPose(route);
+      for (const z of [-15, -10, -5, 0, 5, 10, 14]) {
+        for (const x of [-4, 0, 4]) {
+          const at = shipToWorld(p, x, z);
+          expect(terrainHeight(at.x, at.z, WORLD_SEED)).toBeLessThan(WATER_LEVEL - 2.6);
+        }
+      }
+    });
+
+    it(`${name}: boards from the shore, down the pier and over the gangplank`, () => {
+      const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+      const p = sim.player;
+      const meta = sim.players.get(p.id);
+      if (!meta) throw new Error('meta');
+      const docked = route.timings.docked + transportVoyageSeconds(route, 0) + 1;
+      // start on the shore past the pier's root (on the bank's crest, above
+      // the stair, at Wyrmwatch)
+      const root = name === 'Wyrmwatch' ? FERRY_PIER_DECKS[2] : pier;
+      const start = point(root, name === 'Wyrmwatch' ? root.hl + 1.5 : -root.hl - 1.5);
+      expect(terrainHeight(start.x, start.z, WORLD_SEED)).toBeGreaterThan(WATER_LEVEL + 2);
+      p.pos = { x: start.x, y: groundHeight(start.x, start.z, WORLD_SEED), z: start.z };
+      p.prevPos = { ...p.pos };
+      const idle = {
+        forward: false,
+        back: false,
+        turnLeft: false,
+        turnRight: false,
+        strafeLeft: false,
+        strafeRight: false,
+        jump: false,
+        dive: false,
+        surface: false,
+      };
+      const pose = farPose(route);
+      const walk = (lx: number, lz: number) => {
+        sim.transportClockOffset = docked - sim.time;
+        const target = shipToWorld(pose, lx, lz);
+        for (let i = 0; i < 400; i++) {
+          const dx = target.x - p.pos.x;
+          const dz = target.z - p.pos.z;
+          if (Math.hypot(dx, dz) < 0.25) break;
+          p.facing = Math.atan2(dx, dz);
+          Object.assign(meta.moveInput, { ...idle, forward: true });
+          sim.tick();
+        }
+        Object.assign(meta.moveInput, idle);
+        for (let i = 0; i < 10; i++) sim.tick();
+      };
+      walk(9.5, 0.8); // down the pier to its end
+      expect(p.pos.y - WATER_LEVEL).toBeCloseTo(2.64, 2);
+      walk(4.4, 0.8); // over the plank onto the gangway
+      walk(1.5, 0.8); // onto the waist
+      const local = worldToShip(pose, p.pos.x, p.pos.z);
+      expect(Math.abs(local.x - 1.5)).toBeLessThan(0.3);
+      expect(p.pos.y - WATER_LEVEL).toBeCloseTo(HULL.mainDeckY, 3);
+    }, 60_000);
+  }
+
+  it('Wyrmwatch: the bluff stair runs from the pier root up to the bank crest', () => {
+    const stair = FERRY_PIER_DECKS[2];
+    const pier = FERRY_PIER_DECKS[1];
+    // its foot overlaps into the pier root, flush with the planks
+    const foot = point(stair, -stair.hl + 0.01);
+    expect(Math.abs(along(pier, foot.x, foot.z))).toBeLessThan(pier.hl);
+    expect(groundHeight(foot.x, foot.z, WORLD_SEED) - WATER_LEVEL).toBeCloseTo(2.64, 1);
+    // its head meets the crest, and no tread sinks into the bank
+    const head = point(stair, stair.hl);
+    expect(
+      groundHeight(head.x, head.z, WORLD_SEED) - terrainHeight(head.x, head.z, WORLD_SEED),
+    ).toBeLessThan(0.5);
+    for (let a = -stair.hl; a <= stair.hl; a += 0.5) {
+      const at = point(stair, a);
+      expect(groundHeight(at.x, at.z, WORLD_SEED)).toBeGreaterThanOrEqual(
+        terrainHeight(at.x, at.z, WORLD_SEED),
+      );
+    }
+  });
 });

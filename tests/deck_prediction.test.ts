@@ -5,7 +5,7 @@ import { type MotionState, PredictionRing, predictTick } from '../src/render/sel
 import { setColliderGateOpen } from '../src/sim/colliders';
 import {
   EASTBROOK_FERRY_HULL,
-  EASTBROOK_WICKHARBOR_FERRY,
+  EASTBROOK_NIGHTBLOOM_FERRY,
 } from '../src/sim/content/transport_ships';
 import { Sim } from '../src/sim/sim';
 import { deckToWorld, worldToDeck } from '../src/sim/transport_deck';
@@ -22,7 +22,7 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // three hosts means the two must land on the same deck spot, tick by tick,
 // through walking, a turn, a jump and a step off the gangway opening.
 
-const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
+const ROUTE = EASTBROOK_NIGHTBLOOM_FERRY;
 const DECK = WATER_LEVEL + EASTBROOK_FERRY_HULL.mainDeckY;
 
 function poseAt(clock: number): TransportPose {

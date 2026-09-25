@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { type Collider, queryOpenWorldColliders } from '../src/sim/colliders';
 import {
   EASTBROOK_FERRY_HULL,
-  EASTBROOK_WICKHARBOR_FERRY,
   eastbrookFerryHalfBeam,
+  TRANSPORT_ROUTES,
 } from '../src/sim/content/transport_ships';
 import { PROPS } from '../src/sim/data';
 import { deckToWorld, worldToDeck } from '../src/sim/transport_deck';
@@ -15,15 +15,24 @@ import {
 import { groundHeight, WATER_LEVEL, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-// The ferry's sea lanes (content/transport_ships.ts) against the real world:
-// the ship sails the whole voyage in sight, so every yard of both lanes must
+// The ferries' sea lanes (content/transport_ships.ts) against the real world:
+// the ship sails the whole voyage in sight, so every yard of every lane must
 // keep the hull afloat (never over dry land) and clear of every pier, post,
 // buoy and prop that stands above the water. A lane authored across a spit or
 // through a pier would draw the ship through it and knock its passengers
 // about (the deck's rails meet the world's colliders in the kernel).
 
-const ROUTE = EASTBROOK_WICKHARBOR_FERRY;
 const HULL = EASTBROOK_FERRY_HULL;
+/** Water the keel line always keeps over the bed (yards). */
+const KEEL_WATER = 0.2;
+
+/** Every lane of every route, named for the test titles. */
+const LANES = TRANSPORT_ROUTES.flatMap((route) =>
+  route.lanes.map((lane, i) => ({
+    lane,
+    name: `${route.berths[i].id} to ${route.berths[1 - i].id}`,
+  })),
+);
 
 /** Ship-frame points around the hull's deck outline, and its centre line. */
 function outline(): { deck: [number, number][]; keel: [number, number][] } {
@@ -51,12 +60,26 @@ describe('the ferry sea lanes', () => {
   const pose: TransportPose = { x: 0, z: 0, rot: 0 };
   const at = { x: 0, z: 0 };
 
-  for (const [i, name] of [
-    [0, 'Eastbrook to Wickharbor'],
-    [1, 'Wickharbor to Eastbrook'],
-  ] as const) {
+  it('covers both routes, each lane from its departure berth to the far one', () => {
+    expect(LANES.map((l) => l.name)).toEqual([
+      'eastbrook to nightbloom',
+      'nightbloom to eastbrook',
+      'wickharbor to drakelands',
+      'drakelands to wickharbor',
+    ]);
+    for (const route of TRANSPORT_ROUTES) {
+      route.lanes.forEach((lane, i) => {
+        const from = route.berths[i];
+        const to = route.berths[1 - i];
+        expect([lane[0].x, lane[0].z, lane[0].rot]).toEqual([from.x, from.z, from.rot]);
+        const end = lane[lane.length - 1];
+        expect([end.x, end.z, end.rot]).toEqual([to.x, to.z, to.rot]);
+      });
+    }
+  });
+
+  for (const { lane, name } of LANES) {
     it(`${name}: afloat and clear of every standing collider, yard by yard`, () => {
-      const lane = ROUTE.lanes[i];
       const length = transportLaneLength(lane);
       const dry: string[] = [];
       const hits = new Set<string>();
@@ -72,9 +95,14 @@ describe('the ferry sea lanes', () => {
             dry.push(`${d.toFixed(0)}:${at.x.toFixed(0)},${at.z.toFixed(0)}`);
           }
         }
+        // ...and the keel line never runs aground: the long western
+        // shallows on the Nightbloom run and the widened Thornpeak neck on
+        // the Drakelands run keep about a quarter yard of water over the
+        // centre line (the keel's lower edge in the sand there is the
+        // owner-accepted look), never dry land
         for (const [lx, lz] of keel) {
           deckToWorld(pose, lx, lz, at);
-          if (groundHeight(at.x, at.z, WORLD_SEED) > WATER_LEVEL - 0.3) {
+          if (groundHeight(at.x, at.z, WORLD_SEED) > WATER_LEVEL - KEEL_WATER) {
             dry.push(`keel ${d.toFixed(0)}`);
           }
         }
@@ -106,7 +134,7 @@ describe('the ferry sea lanes', () => {
     const floating = (PROPS.decorProps ?? []).filter((d) => /ship|boat|buoy/i.test(d.key));
     expect(floating.length).toBeGreaterThan(5);
     const close: string[] = [];
-    for (const lane of ROUTE.lanes) {
+    for (const { lane } of LANES) {
       const length = transportLaneLength(lane);
       for (let d = 0; d <= length; d += 0.5) {
         transportLanePoseAt(lane, d, pose);
@@ -128,9 +156,9 @@ describe('the ferry sea lanes', () => {
   });
 
   it('each lane is one long sea road, not a hop between neighbouring harbors', () => {
-    for (const lane of ROUTE.lanes) {
+    for (const { lane } of LANES) {
       expect(transportLaneLength(lane)).toBeGreaterThan(1200);
-      expect(transportLaneLength(lane)).toBeLessThan(2000);
+      expect(transportLaneLength(lane)).toBeLessThan(2200);
     }
   });
 });

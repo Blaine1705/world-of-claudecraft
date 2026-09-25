@@ -1080,6 +1080,6 @@ export const table: DeedLocaleTable = {
   },
   exp_harbor_to_harbor: {
     name: '항구에서 항구로',
-    desc: '이스트브룩 여객선을 타고 윅하버에 갔다가 다시 돌아오십시오.',
+    desc: '이스트브룩과 문레스트, 윅하버와 와이름 감시탑을 잇는 두 여객선을 각각 왕복하십시오.',
   },
 };
