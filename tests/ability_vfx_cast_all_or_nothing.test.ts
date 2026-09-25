@@ -121,12 +121,12 @@ describe('with the kit not ready', () => {
     expect(snapshot.requirementMiss).toBe(0);
   });
 
-  it('draws the Warrior cast whole once the kit is ready', () => {
+  it('draws the Warrior cast whole once the kit is ready, kit pieces included', () => {
     const rig = castGateRig();
     rig.prove(CAST_VFX_ENGINE | CAST_VFX_KIT);
     shieldSlam(rig);
-    expect(rig.drawn() & CAST_VFX_ENGINE).toBe(CAST_VFX_ENGINE);
-    expect(rig.readiness.snapshot().requirementMiss).toBe(0);
+    expect(rig.drawn()).toBe(CAST_VFX_ENGINE | CAST_VFX_KIT);
+    expect(rig.readiness.snapshot()).toMatchObject({ refused: 0, requirementMiss: 0 });
   });
 });
 
@@ -494,6 +494,141 @@ describe('a held control mark', () => {
       rig.step();
     }
     expect(rig.drawn()).toBe(0);
+  });
+});
+
+describe('each Warrior hold site', () => {
+  // Every Warrior-only per-frame read waits on the kit as a whole: nothing
+  // of it while the kit is shut, shown the frame the kit is ready. The rig
+  // is equipped so the kit's solid pieces can draw.
+  const warrior = (
+    auras: AbilityVfxEntityState['auras'],
+    over: Partial<AbilityVfxEntityState> = {},
+  ): AbilityVfxEntityState => ({
+    id: WARRIOR,
+    kind: 'player',
+    templateId: 'warrior',
+    castingAbility: null,
+    castRemaining: 0,
+    castTotal: 0,
+    auras,
+    ...over,
+  });
+  const held = (rig: ReturnType<typeof castGateRig>, entity: AbilityVfxEntityState, n = 6) => {
+    for (let i = 0; i < n; i++) {
+      rig.painter.syncEntity(entity);
+      rig.step();
+    }
+  };
+  const rigWithWarrior = () => {
+    const rig = castGateRig({ equipped: true });
+    rig.warriors.add(WARRIOR);
+    rig.prove(CAST_VFX_ENGINE);
+    return rig;
+  };
+
+  for (const [site, aura] of [
+    ['a Fury state', { id: 'furious_mending', kind: 'buff_dr', remaining: 6, duration: 8 }],
+    ['a power form', { id: 'avatar', kind: 'buff_avatar', remaining: 12, duration: 20 }],
+  ] as const) {
+    it(`holds ${site} on the kit, and draws its kit solid once the kit is ready`, () => {
+      const rig = rigWithWarrior();
+      held(rig, warrior([aura]));
+      expect(rig.drawn()).toBe(0);
+      rig.prove(CAST_VFX_KIT);
+      held(rig, warrior([aura]), 2);
+      expect(rig.drawn() & CAST_VFX_KIT).toBe(CAST_VFX_KIT);
+      expect(rig.readiness.snapshot().requirementMiss).toBe(0);
+    });
+  }
+
+  it('holds a readiness stance on the kit: registered only once the kit is ready', () => {
+    // The readiness wearers are registered and swept; the engine draws none
+    // of them today, so the registration is what the hold is read on.
+    const rig = rigWithWarrior();
+    const wearers = () =>
+      (rig.fx as unknown as { warriorReadiness: { wearers: Map<number, unknown> } })
+        .warriorReadiness.wearers.size;
+    const stance = warrior([{ id: 'battle_stance', kind: 'battle_stance', remaining: 60 }]);
+    rig.painter.syncEntity(stance);
+    expect(wearers()).toBe(0);
+    rig.prove(CAST_VFX_KIT);
+    rig.step();
+    rig.painter.syncEntity(stance);
+    expect(wearers()).toBe(1);
+  });
+
+  it("holds a mob's forced attention on the kit, and draws it once the kit is ready", () => {
+    const rig = rigWithWarrior();
+    const taunted: AbilityVfxEntityState = {
+      id: VICTIM,
+      kind: 'mob',
+      hp: 100,
+      forcedTargetId: WARRIOR,
+      forcedTargetTimer: 3,
+      castingAbility: null,
+      castRemaining: 0,
+      castTotal: 0,
+      auras: [],
+    };
+    held(rig, taunted);
+    expect(rig.drawn()).toBe(0);
+    rig.prove(CAST_VFX_KIT);
+    held(rig, taunted, 2);
+    expect(rig.drawn()).toBe(CAST_VFX_ENGINE);
+  });
+
+  it('draws nothing of a Bladestorm bar refused on the kit, and its storm once the kit is ready', () => {
+    const bar = (rig: ReturnType<typeof castGateRig>) => {
+      for (let t = 4; t > 0; t -= 0.05) {
+        rig.painter.syncEntity(
+          warrior([], { castingAbility: 'bladestorm', castRemaining: t, castTotal: 4 }),
+        );
+        rig.step();
+      }
+    };
+    const storms = (rig: ReturnType<typeof castGateRig>) =>
+      (rig.fx as unknown as { warriorStorms: Map<number, unknown> }).warriorStorms.size;
+    const shut = rigWithWarrior();
+    bar(shut);
+    expect(shut.drawn()).toBe(0);
+    expect(storms(shut)).toBe(0);
+    expect(shut.readiness.snapshot()).toMatchObject({ refused: 1, requirementMiss: 0 });
+    const open = rigWithWarrior();
+    open.prove(CAST_VFX_KIT);
+    open.painter.syncEntity(
+      warrior([], { castingAbility: 'bladestorm', castRemaining: 4, castTotal: 4 }),
+    );
+    expect(storms(open)).toBe(1);
+    bar(open);
+    // Equipped, the storm draws on the kit's weapon surface.
+    expect(open.drawn() & CAST_VFX_KIT).toBe(CAST_VFX_KIT);
+    expect(open.readiness.snapshot()).toMatchObject({ refused: 0, requirementMiss: 0 });
+  });
+});
+
+describe('a refused beam channel', () => {
+  it('stays refused tick after tick, past the tail, after the engine proves mid-channel', () => {
+    const rig = castGateRig();
+    const tick = () =>
+      rig.painter.handleSpellfx({
+        sourceId: MAGE,
+        targetId: VICTIM,
+        school: 'shadow',
+        fx: 'beam',
+        ability: 'mind_flay',
+      });
+    expect(tick()).toBe(true);
+    rig.step(20);
+    rig.prove(CAST_VFX_ENGINE);
+    // One tick a second for longer than the refusal tail: each tick extends
+    // the channel's latch, so none of them is taken for a new cast.
+    for (let second = 1; second <= 9; second++) {
+      expect(tick()).toBe(true);
+      rig.step(20);
+    }
+    expect(rig.drawn()).toBe(0);
+    expect(rig.readiness.snapshot()).toMatchObject({ refused: 1, requirementMiss: 0 });
   });
 });
 

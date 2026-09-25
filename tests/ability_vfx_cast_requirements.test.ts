@@ -370,8 +370,8 @@ describe('the requirement walk over the real painter', () => {
       `${CAST_VFX_ENGINE | CAST_VFX_KIT}:true`,
     ]);
     // The victim-worn arms reach draws, and the fear-break arm ran on both
-    // tiers (its band is the hard-CC band's; the alias itself is pinned in
-    // tests/ability_vfx_cast_all_or_nothing.test.ts).
+    // tiers (the shout's spec authors no debuff block, so what it draws today
+    // is the hard-CC band).
     expect(walked.drewBy.get('aura worn slow') ?? 0).toBeGreaterThan(10);
     expect(walked.drewBy.get('aura worn root') ?? 0).toBeGreaterThan(5);
     expect(walked.drewBy.get('aura fear break') ?? 0).toBe(2);
