@@ -33,6 +33,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async (importOriginal) =>
 import { buildAbilityMaterialPrewarmGroup } from '../src/render/ability_material_prewarm';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import {
+  abilityVfxFamilyMaterials,
   abilityVfxGateMaterials,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
@@ -305,6 +306,34 @@ for (const fragments of [false, true]) {
         if (draw) gatedKeys.add(threeProgramKeys(draw.material, draw.object));
       }
       expect(gatedKeys).toEqual(new Set(keyOf.values()));
+    });
+
+    it('splits the representatives by family, and the scene gate reads each on its own', () => {
+      const byFamily = abilityVfxFamilyMaterials(h.scene);
+      expect([...byFamily.keys()]).toEqual(['engine', 'kit']);
+      const engine = byFamily.get('engine') ?? [];
+      const kit = byFamily.get('kit') ?? [];
+      expect(engine).toHaveLength(engineTotal);
+      expect(kit).toHaveLength(kitTotal(fragments));
+      const engineMaterials = new Set<THREE.Material>([
+        ...h.drawsOf(ENGINE_POOLS).map((draw) => draw.material),
+        h.cloud.material as THREE.Material,
+      ]);
+      const kitMaterials = new Set(
+        h
+          .drawsOf(KIT_POOLS)
+          .filter((draw) => inCastVfxKit(draw.object))
+          .map((draw) => draw.material),
+      );
+      for (const material of engine) expect(engineMaterials.has(material)).toBe(true);
+      for (const material of kit) expect(kitMaterials.has(material)).toBe(true);
+      expect([...engine, ...kit]).toEqual(abilityVfxGateMaterials(h.scene));
+      const webgl = { properties: { get: () => ({ currentProgram: null }) } };
+      const readiness = createSceneCastVfxReadiness(h.scene, webgl, () => 0);
+      expect(readiness.snapshot().families.map((family) => [family.id, family.pending])).toEqual([
+        ['engine', engineTotal],
+        ['kit', kitTotal(fragments)],
+      ]);
     });
 
     it('orders the compile units engine, then kit, then every other pool', () => {

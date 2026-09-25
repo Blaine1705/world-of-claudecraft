@@ -1,5 +1,10 @@
 import * as THREE from 'three';
-import { tagCastVfxEngine } from '../cast_vfx_family';
+import {
+  CAST_VFX_ENGINE,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxEngine,
+} from '../cast_vfx_family';
 import { boundQuadSize, IMPACT_QUAD_MAX_SCREEN_FRACTION } from '../vfx_screen_bounds_core';
 import { type ContactSheet, contactTexture, isContactSheet } from './contact_assets';
 import { FLIPBOOK_GRID, FLIPBOOK_STYLES, type FlipbookStyle, flipbookSheet } from './fx_textures';
@@ -45,6 +50,8 @@ export function asFlipbookStyle(s: string): FlipbookStyle {
 }
 
 export class ImpactFlipbooks {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private slots: FlipSlot[] = [];
   private next = 0;
   private readonly geometry: THREE.PlaneGeometry;
@@ -175,7 +182,7 @@ export class ImpactFlipbooks {
     groundY = Number.NaN,
     worldFacing = Number.NaN,
   ): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return;
     const warrior = warriorFlashStyle(style);
     const texture = warrior
       ? contactTexture('contact_cut')

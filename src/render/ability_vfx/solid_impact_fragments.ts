@@ -1,5 +1,10 @@
 import * as THREE from 'three';
-import { tagCastVfxKit } from '../cast_vfx_family';
+import {
+  CAST_VFX_KIT,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxKit,
+} from '../cast_vfx_family';
 import { sceneKeyLightUniform } from '../scene_sampling';
 import { type FragmentKind, fragmentGeometry } from './production_assets';
 import { warriorFragmentShape } from './warrior_fragment_shape';
@@ -14,6 +19,8 @@ interface Batch {
 /** Three capped solid draws. Faceted models are prepared offline; trajectories,
  * tumbling, a single damped bounce and shrink-out run entirely on the GPU. */
 export class SolidImpactFragments {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private readonly batches = new Map<FragmentKind, Batch>();
   private readonly color = new THREE.Color();
   private time = 0;
@@ -96,7 +103,7 @@ export class SolidImpactFragments {
   ): number {
     if (this.disposed || ![x, y, z, count, power, dx, dz].every(Number.isFinite)) return 0;
     const batch = this.batches.get(kind);
-    if (!batch) return 0;
+    if (!batch || !this.spawnGate.allows(CAST_VFX_KIT)) return 0;
     const g = batch.mesh.geometry;
     const origin = g.getAttribute('aOrigin') as THREE.InstancedBufferAttribute,
       velocity = g.getAttribute('aVelocity') as THREE.InstancedBufferAttribute,

@@ -1,5 +1,10 @@
 import * as THREE from 'three';
-import { tagCastVfxEngine } from '../cast_vfx_family';
+import {
+  CAST_VFX_ENGINE,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxEngine,
+} from '../cast_vfx_family';
 import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
 import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
 import { DRAPE_AXIS_Y, DRAPED_VERTEX_SHADER } from './draped_shader';
@@ -55,6 +60,8 @@ interface DecalSlot {
 }
 
 export class GroundDecals {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private slots: DecalSlot[] = [];
   private next = 0;
   private disposed = false;
@@ -220,7 +227,7 @@ export class GroundDecals {
     style: DecalStyle,
     dur: number,
   ): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % DECAL_SLOTS;
     slot.active = true;

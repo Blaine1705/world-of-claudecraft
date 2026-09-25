@@ -1,5 +1,10 @@
 import * as THREE from 'three';
-import { tagCastVfxKit } from '../cast_vfx_family';
+import {
+  CAST_VFX_KIT,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxKit,
+} from '../cast_vfx_family';
 import { SUN_DIR } from '../gfx';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL } from '../scene_sampling';
 import { BakedPoolPrewarm } from './baked_pool_prewarm';
@@ -33,6 +38,8 @@ interface Slot {
 /** Authored volume motion with premultiplied temporal blending, straight-alpha
  * output, scene-depth intersection softness and bounded heat refraction. */
 export class BakedImpactLayers {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private readonly point = new THREE.Vector3();
   private readonly cameraInverse = new THREE.Quaternion();
   private readonly slots: Slot[] = [];
@@ -160,6 +167,7 @@ export class BakedImpactLayers {
   ): boolean {
     if (
       this.disposed ||
+      !this.spawnGate.allows(CAST_VFX_KIT) ||
       !bakedTexture(kind) ||
       // Decoding is not GPU preparation. The new large optional layer stays
       // cold until this renderer's explicit upload has completed successfully.

@@ -77,6 +77,7 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
   fx.setViewportScale(h.height() * h.pixelRatio(), 60, h.height());
   fx.setSpiritBuildScheduler(h.spiritBuild);
   fx.setSpiritCompileGate(h.compile);
+  fx.setCastVfxSpawnGate((bit) => h.castGate.spawnAllowed(bit));
   fx.onRushArrival = createOnrushArrivalHandler(() => h.world().entities, h.views, h.visual);
   fx.setWorldLightDelegate((at, school, intensity, duration, range) =>
     h.light.pulse(at, school, intensity, duration, range),
