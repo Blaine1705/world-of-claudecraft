@@ -70,10 +70,11 @@ describe('Eastbrook ferry berth', () => {
     expect(
       props.filter((p) => p.key === 'seaBoatFishing' && p.x === -113 && p.z === -46),
     ).toHaveLength(1);
-    // the fairway buoys now flank the western approach, outside the hull
-    expect(props.filter((p) => p.key === 'seaBuoy' && p.x === -134 && p.z === -44)).toHaveLength(1);
+    // the fairway buoys flank the western approach, outside the hull and
+    // clear of its swing out of the cove (Phase 3)
+    expect(props.filter((p) => p.key === 'seaBuoy' && p.x === -160 && p.z === -58)).toHaveLength(1);
     expect(
-      props.filter((p) => p.key === 'seaBuoyFlag' && p.x === -134 && p.z === -64),
+      props.filter((p) => p.key === 'seaBuoyFlag' && p.x === -160 && p.z === -90),
     ).toHaveLength(1);
   });
 

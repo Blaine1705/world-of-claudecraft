@@ -5,7 +5,8 @@ import {
   EASTBROOK_WICKHARBOR_FERRY,
   eastbrookFerryHalfBeam,
 } from '../src/sim/content/transport_ships';
-import { deckToWorld } from '../src/sim/transport_deck';
+import { PROPS } from '../src/sim/data';
+import { deckToWorld, worldToDeck } from '../src/sim/transport_deck';
 import {
   type TransportPose,
   transportLaneLength,
@@ -100,6 +101,31 @@ describe('the ferry sea lanes', () => {
       expect([...hits]).toEqual([]);
     });
   }
+
+  it('never sails through a moored boat, ship or buoy (decor with no collider included)', () => {
+    const floating = (PROPS.decorProps ?? []).filter((d) => /ship|boat|buoy/i.test(d.key));
+    expect(floating.length).toBeGreaterThan(5);
+    const close: string[] = [];
+    for (const lane of ROUTE.lanes) {
+      const length = transportLaneLength(lane);
+      for (let d = 0; d <= length; d += 0.5) {
+        transportLanePoseAt(lane, d, pose);
+        for (const it of floating) {
+          if (Math.hypot(it.x - pose.x, it.z - pose.z) > 40) continue;
+          const l = worldToDeck(pose, it.x, it.z, at);
+          const half = HULL.length / 2;
+          const hb = Math.abs(l.z) <= half ? eastbrookFerryHalfBeam(l.z) : 0;
+          const gap = Math.hypot(
+            Math.max(0, Math.abs(l.x) - hb),
+            Math.max(0, Math.abs(l.z) - half),
+          );
+          // three yards from the hull's outline to the prop's centre
+          if (gap < 3) close.push(`${it.key}@${it.x},${it.z} d=${d}`);
+        }
+      }
+    }
+    expect(close).toEqual([]);
+  });
 
   it('each lane is one long sea road, not a hop between neighbouring harbors', () => {
     for (const lane of ROUTE.lanes) {
