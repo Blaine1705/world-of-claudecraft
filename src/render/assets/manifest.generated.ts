@@ -1069,6 +1069,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/gravestone_decorative.glb": "/media/models/props/gravestone_decorative.99857d708b17.glb",
   "models/props/gravestone_round.glb": "/media/models/props/gravestone_round.a96321115d06.glb",
   "models/props/hanging_cage.glb": "/media/models/props/hanging_cage.3fbac209b03a.glb",
+  "models/props/harbor_route_marker.glb": "/media/models/props/harbor_route_marker.57f037b8b6b1.glb",
   "models/props/hell_forge.glb": "/media/models/props/hell_forge.65f086560fa1.glb",
   "models/props/herbalism_drying_rack.glb": "/media/models/props/herbalism_drying_rack.2733d17f9180.glb",
   "models/props/hollow_gate_crystal.glb": "/media/models/props/hollow_gate_crystal.d6303ad81ae4.glb",
