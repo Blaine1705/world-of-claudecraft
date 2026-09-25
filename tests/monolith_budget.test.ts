@@ -511,7 +511,33 @@ const MONOLITHS: MonolithRow[] = [
     // Regeneration exemption) moved out of the heal2 arm into
     // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
     // count, zero slack.
-    ceiling: 18235,
+    // LOWERED 18276 -> 18271 at World PvP (the /pvp flag): the target frame's
+    // hostile colour and the two auto-attack gates now read ONE shared verdict
+    // (src/ui/pvp_hostile_core.ts, the third copy the action bar's comment
+    // asked to extract), which collapsed the multi-line call. Measured with
+    // wc -l < src/ui/hud.ts after biome. Exact count, zero slack.
+    // Re-pinned at the merge of release/v0.44.0 into feature/world-pvp-flag (the
+    // release's PR 4054 / 4137 / 4141 extractions above plus this branch's below):
+    // exact count measured on the MERGED working tree (wc -l < src/ui/hud.ts),
+    // never reconciled by arithmetic. Zero slack.
+    // Re-pinned at the merge of release/v0.44.0 (PR 4132's System Report) into
+    // feature/world-pvp-flag: exact count measured on the MERGED working tree
+    // (wc -l < src/ui/hud.ts), never reconciled by arithmetic. Zero slack.
+    // LOWERED 18276 -> 18220 by extracting the HUD frame registry wiring.
+    // LOWERED 18220 -> 18201 by extracting editor menu dependencies.
+    // LOWERED 18201 -> 18191 by extracting chat frame context and focus mouseover routing.
+    // LOWERED 18191 -> 18186 by sharing unit dimensions and pet frame input.
+    // Release/v0.44.0 sync at ee8883fa4f: compose parent pins 18186 / 18235.
+    // Exact merged line count, preserving both extraction sets.
+    // LOWERED 18140 -> 18138 when the Cooldown Manager landed: its five Hud
+    // lines (import, mount, field, settings hook, paint) were paid for by moving
+    // the Auras overlay's controller setup into mountAuraOverlay
+    // (src/ui/aura_overlay_wiring.ts). wc -l on the tree merged with
+    // release/v0.44.0. Exact count, zero slack.
+    // Re-pinned at the 2026-09-25 merge of release/v0.44.0 into feature/world-pvp-flag:
+    // exact count measured on the MERGED working tree (wc -l < src/ui/hud.ts),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 18133,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -541,7 +567,16 @@ const MONOLITHS: MonolithRow[] = [
     // (src/ui/host_diag_section_controller.ts over the pure
     // src/ui/host_diag_view.ts), not a sub-view of this window. Exact count,
     // zero slack.
-    ceiling: 2821,
+    // LOWERED 2830 -> 2829 by extracting shared frame settings and reset-key scope.
+    // LOWERED 2829 -> 2827 by extracting menu placement into OptionsWindowLayout.
+
+    // Release/v0.44.0 sync at ee8883fa4f: compose parent pins 2827 / 2821.
+    // Exact merged line count, preserving both extraction sets.
+    // LOWERED 2818 -> 2813 when Options > Cooldown Manager and the Overlays
+    // sub-view landed: the Auras render method and its placement/teardown lines
+    // moved out with them to src/ui/options_overlay_panels.ts. Measured with
+    // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
+    ceiling: 2813,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1129,7 +1164,21 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the loot identity receipt
     // and projection helpers moved to dedicated siblings, composed with the
     // release extractions above. Exact merged count, zero slack.
-    ceiling: 11750,
+    // LOWERED 11792 -> 11786 at World PvP (the /pvp flag): the honor ledger's
+    // persisted form (the serialize spread and the load normalizers) moved to
+    // src/sim/pvp/honor_persist.ts, paying for the flag's meta field, its live
+    // ctx view, the isHostileTo world arm, the tick call, the persistence hooks
+    // and the IWorld delegates. Measured with wc -l < src/sim/sim.ts after
+    // biome. Exact count, zero slack.
+    // Re-pinned at the merge of release/v0.44.0 into feature/world-pvp-flag (the
+    // release's PR 4054 / 4137 / 4141 extractions above plus this branch's below):
+    // exact count measured on the MERGED working tree (wc -l < src/sim/sim.ts),
+    // never reconciled by arithmetic. Zero slack.
+    // Frame layout restore extraction: bank the reduced coordinator size.
+    // Re-pinned at the 2026-09-25 merge of release/v0.44.0 into feature/world-pvp-flag:
+    // exact count measured on the MERGED working tree (wc -l < src/sim/sim.ts),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 11740,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1341,7 +1390,8 @@ const MONOLITHS: MonolithRow[] = [
     // click / Enter-Space / double-click wiring moved into wireCharselectRow
     // (src/ui/charselect_hints.ts), which skips activations from inside the
     // lockout disclosure instead of stopping propagation there.
-    ceiling: 11276,
+    // Frame layout extraction: bank the reduced coordinator size.
+    ceiling: 11260,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1569,11 +1619,21 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the equipped-instance wire
     // projection moved to server/equipped_instance_wire.ts, composed with the
     // release extractions above. Exact merged count, zero slack.
+    // LOWERED 9993 -> 9934 at World PvP (the /pvp flag): the per-entity wire
+    // fragment cache shapes and the two JSON splicers moved to
+    // server/entity_wire_cache.ts, paying for the flag's dispatch case, its
+    // entity wire bit and the wpvp self key; the one-use delay() helper was
+    // inlined to pay for the /pvp command-lane claim. Measured with
+    // wc -l < server/game.ts after biome. Exact count, zero slack.
     // LOWERED 9979 -> 9965 by the craft_roll_events change: the ftue_events
     // quest/death record arms of the event drain moved to
     // server/event_record_observers.ts (which also hosts the new craftRoll
     // arm), so the audit landed as a net shrink. Exact count, zero slack.
-    ceiling: 9965,
+    // Re-pinned at each merge of release/v0.44.0 into feature/world-pvp-flag
+    // (the release's extractions above plus this branch's): exact count
+    // measured on the MERGED working tree (wc -l < server/game.ts), never
+    // reconciled by arithmetic. Zero slack.
+    ceiling: 9906,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1728,7 +1788,16 @@ const MONOLITHS: MonolithRow[] = [
     // src/net/target_echo.ts, banking the 52 lines of slack the row already
     // carried with it. Measured with wc -l < src/net/online.ts after biome.
     // Exact count, zero slack.
-    ceiling: 5426,
+    // LOWERED 5426 -> 5421 at World PvP (the /pvp flag): the social / PvP /
+    // market / mail self-decode cohort moved to src/net/social_self_wire.ts
+    // (where the new wpvp readout also lands), paying for the flag's mirror
+    // field, the pvp entity bit and the setWorldPvpFlag send. Measured with
+    // wc -l < src/net/online.ts after biome. Exact count, zero slack.
+    // LOWERED 5426 -> 5421 by extracting first-snapshot action bar restore resolution.
+    // Re-pinned at the 2026-09-25 merge of release/v0.44.0 into feature/world-pvp-flag:
+    // exact count measured on the MERGED working tree (wc -l < src/net/online.ts),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 5416,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2004,7 +2073,10 @@ const MONOLITHS: MonolithRow[] = [
     // merged count, zero slack: any further growth reds again.
     // OSSBrain integration: canvas drawing primitives moved to nameplate_paint_primitives.ts.
     // Measured after formatting; lower the ratchet with the extraction.
-    ceiling: 827,
+    // LOWERED 827 -> 826 at World PvP (PR 4146 review): the state gained the pvpFlag
+    // the name row was built with, paid for by three comment trims. Exact count
+    // (wc -l < src/render/nameplate_canvas.ts), zero slack.
+    ceiling: 826,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

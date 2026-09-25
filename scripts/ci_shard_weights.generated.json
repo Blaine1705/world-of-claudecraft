@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4073,
+    "files": 4097,
     "harvestedFiles": 3948,
     "carried": {
       "tests/ability_vfx_cast_all_or_nothing.test.ts": {
@@ -25,6 +25,15 @@
           4516,
           4577,
           4517
+        ]
+      },
+      "tests/action_bar_spectate.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "Frame layout review validation measured locally; current full CI run found coverage just below its floor while the next green full harvest is pending.",
+        "runs": [
+          14
         ]
       },
       "tests/active_kit_prewarm.test.ts": {
@@ -118,6 +127,61 @@
           72
         ]
       },
+      "tests/cooldown_manager_auras.test.ts": {
+        "ms": 20,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "PR 4189 (Cooldown Manager) adds these five suites, absent from the last green full CI harvest; local single-worker Vitest default-reporter runs on 2026-09-25, pending the next green full-mode CI refresh.",
+        "runs": [
+          20,
+          20,
+          20
+        ]
+      },
+      "tests/cooldown_manager_catalog.test.ts": {
+        "ms": 2255,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "PR 4189 (Cooldown Manager) adds these five suites, absent from the last green full CI harvest; local single-worker Vitest default-reporter runs on 2026-09-25, pending the next green full-mode CI refresh.",
+        "runs": [
+          2216,
+          2277,
+          2255
+        ]
+      },
+      "tests/cooldown_manager_config.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "PR 4189 (Cooldown Manager) adds these five suites, absent from the last green full CI harvest; local single-worker Vitest default-reporter runs on 2026-09-25, pending the next green full-mode CI refresh.",
+        "runs": [
+          11,
+          11,
+          12
+        ]
+      },
+      "tests/cooldown_manager_controller.test.ts": {
+        "ms": 180,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "PR 4189 (Cooldown Manager) adds these five suites, absent from the last green full CI harvest; local single-worker Vitest default-reporter runs on 2026-09-25, pending the next green full-mode CI refresh.",
+        "runs": [
+          171,
+          180,
+          183
+        ]
+      },
+      "tests/cooldown_manager_view.test.ts": {
+        "ms": 1522,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "PR 4189 (Cooldown Manager) adds these five suites, absent from the last green full CI harvest; local single-worker Vitest default-reporter runs on 2026-09-25, pending the next green full-mode CI refresh.",
+        "runs": [
+          1497,
+          1522,
+          1614
+        ]
+      },
       "tests/crest_prewarm.test.ts": {
         "ms": 116,
         "method": "local-median",
@@ -154,6 +218,51 @@
         "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
         "runs": [
           15
+        ]
+      },
+      "tests/focus_targets_controller.test.ts": {
+        "ms": 89,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "New frame layout suites measured locally pending the next full CI harvest",
+        "runs": [
+          89
+        ]
+      },
+      "tests/focus_targets_core.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "New frame layout suites measured locally pending the next full CI harvest",
+        "runs": [
+          11
+        ]
+      },
+      "tests/frame_menus.test.ts": {
+        "ms": 120,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "Frame layout review validation measured locally; current full CI run found coverage just below its floor while the next green full harvest is pending.",
+        "runs": [
+          120
+        ]
+      },
+      "tests/frame_presets.test.ts": {
+        "ms": 162,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "Frame layout review validation measured locally; current full CI run found coverage just below its floor while the next green full harvest is pending.",
+        "runs": [
+          162
+        ]
+      },
+      "tests/frame_presets_live.test.ts": {
+        "ms": 46,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "New frame layout suites measured locally pending the next full CI harvest",
+        "runs": [
+          46
         ]
       },
       "tests/fury_audio_integration.test.ts": {
@@ -226,6 +335,33 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           1625
+        ]
+      },
+      "tests/hill.test.ts": {
+        "ms": 6063,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          6063
+        ]
+      },
+      "tests/hill_bar_view.test.ts": {
+        "ms": 27,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          27
+        ]
+      },
+      "tests/hill_rules.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5
         ]
       },
       "tests/hub_dummy_drill.test.ts": {
@@ -314,6 +450,15 @@
           801,
           843,
           805
+        ]
+      },
+      "tests/hud_frame_groups.test.ts": {
+        "ms": 86,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "Frame layout review validation measured locally; current full CI run found coverage just below its floor while the next green full harvest is pending.",
+        "runs": [
+          86
         ]
       },
       "tests/impact_contact.test.ts": {
@@ -423,6 +568,15 @@
           69
         ]
       },
+      "tests/spectate_session_preferences.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "New spectate preference regression measured locally pending the next full CI harvest",
+        "runs": [
+          22
+        ]
+      },
       "tests/steel_sweep.test.ts": {
         "ms": 28,
         "method": "local-median",
@@ -448,6 +602,33 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           18
+        ]
+      },
+      "tests/vanguard_set_bonus_a.test.ts": {
+        "ms": 2661,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          2661
+        ]
+      },
+      "tests/vanguard_set_bonus_b.test.ts": {
+        "ms": 2509,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          2509
+        ]
+      },
+      "tests/warfare_season2.test.ts": {
+        "ms": 1211,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1211
         ]
       },
       "tests/warrior_ability_clips.test.ts": {
@@ -1169,6 +1350,51 @@
         "runs": [
           10
         ]
+      },
+      "tests/world_pvp.test.ts": {
+        "ms": 30440,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          30440
+        ]
+      },
+      "tests/world_pvp_rules.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          21
+        ]
+      },
+      "tests/world_pvp_server_dispatch.test.ts": {
+        "ms": 5886,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5886
+        ]
+      },
+      "tests/world_pvp_view.test.ts": {
+        "ms": 271,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          271
+        ]
+      },
+      "tests/world_pvp_zones.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          7
+        ]
       }
     },
     "removed": {
@@ -1230,6 +1456,7 @@
   "tests/action_bar_layout_sync.test.ts": 16,
   "tests/action_bar_lock.test.ts": 5,
   "tests/action_bar_painter.test.ts": 18,
+  "tests/action_bar_spectate.test.ts": 14,
   "tests/action_bar_toggle.test.ts": 16,
   "tests/action_bar_view.test.ts": 42,
   "tests/action_bar_visibility_core.test.ts": 5,
@@ -1853,6 +2080,11 @@
   "tests/continent_map_painter.test.ts": 226,
   "tests/continent_map_view.test.ts": 19,
   "tests/cooking_catch_hint_view.test.ts": 31,
+  "tests/cooldown_manager_auras.test.ts": 20,
+  "tests/cooldown_manager_catalog.test.ts": 2255,
+  "tests/cooldown_manager_config.test.ts": 11,
+  "tests/cooldown_manager_controller.test.ts": 180,
+  "tests/cooldown_manager_view.test.ts": 1522,
   "tests/cooldown_persist.test.ts": 8179,
   "tests/cooldowns_command.test.ts": 1398,
   "tests/coords_format.test.ts": 21,
@@ -2427,6 +2659,8 @@
   "tests/focus_manager.test.ts": 22,
   "tests/focus_order.test.ts": 8,
   "tests/focus_restore.test.ts": 144,
+  "tests/focus_targets_controller.test.ts": 89,
+  "tests/focus_targets_core.test.ts": 11,
   "tests/focus_visible_guard.test.ts": 17,
   "tests/fog_scene_state.test.ts": 34,
   "tests/foliage_bucket_reveal_core.test.ts": 9,
@@ -2458,8 +2692,11 @@
   "tests/form_draft.test.ts": 64,
   "tests/form_swing.test.ts": 5170,
   "tests/form_visual_selection_core.test.ts": 12,
+  "tests/frame_menus.test.ts": 120,
   "tests/frame_pos_reset.test.ts": 13,
   "tests/frame_present.test.ts": 10,
+  "tests/frame_presets.test.ts": 162,
+  "tests/frame_presets_live.test.ts": 46,
   "tests/frost_ice_fields.test.ts": 236,
   "tests/frost_ice_fields_core.test.ts": 9,
   "tests/frost_mage_aoe.test.ts": 5884,
@@ -2712,6 +2949,9 @@
   "tests/heroic_soulbound.test.ts": 1654,
   "tests/heroic_vendor.test.ts": 8788,
   "tests/highscore_board.test.ts": 25,
+  "tests/hill.test.ts": 6063,
+  "tests/hill_bar_view.test.ts": 27,
+  "tests/hill_rules.test.ts": 5,
   "tests/hitch_forensics.test.ts": 10,
   "tests/hitch_frame_align_core.test.ts": 10,
   "tests/holder_broadcast.test.ts": 1986,
@@ -2736,6 +2976,7 @@
   "tests/hud_chrome_i18n.test.ts": 22,
   "tests/hud_confirm_gates.test.ts": 48,
   "tests/hud_frame_coverage.test.ts": 608,
+  "tests/hud_frame_groups.test.ts": 86,
   "tests/hud_frames.test.ts": 22,
   "tests/hud_map_marker_lifecycle.test.ts": 22,
   "tests/hud_meteor_fall_preload.test.ts": 6,
@@ -4629,6 +4870,7 @@
   "tests/spec_masteries.test.ts": 12124,
   "tests/spec_output_tuning.test.ts": 11,
   "tests/spec_signatures.test.ts": 4584,
+  "tests/spectate_session_preferences.test.ts": 22,
   "tests/speed_command.test.ts": 1798,
   "tests/spell_balance.test.ts": 6,
   "tests/spell_crit_shared_core.test.ts": 3169,
@@ -4917,6 +5159,8 @@
   "tests/v042_primary_healing.test.ts": 4,
   "tests/v042_rogue_stealth.test.ts": 12964,
   "tests/v042_stealth_integration.test.ts": 1471,
+  "tests/vanguard_set_bonus_a.test.ts": 2661,
+  "tests/vanguard_set_bonus_b.test.ts": 2509,
   "tests/variant_prewarm_slot.test.ts": 28,
   "tests/varkhul_add_models.test.ts": 79,
   "tests/varkhul_anvil_meteors.test.ts": 7,
@@ -5021,6 +5265,7 @@
   "tests/warfare_balance_harness.test.ts": 11,
   "tests/warfare_gear_tier.test.ts": 35,
   "tests/warfare_purchase_confirm.test.ts": 268,
+  "tests/warfare_season2.test.ts": 1211,
   "tests/warfare_set_bonus_text.test.ts": 11,
   "tests/warfare_set_bonuses.test.ts": 3940,
   "tests/warfare_titles.test.ts": 3407,
@@ -5222,6 +5467,11 @@
   "tests/world_grid.test.ts": 199,
   "tests/world_interaction_requests.test.ts": 24,
   "tests/world_population_invariant.test.ts": 43341,
+  "tests/world_pvp.test.ts": 30440,
+  "tests/world_pvp_rules.test.ts": 21,
+  "tests/world_pvp_server_dispatch.test.ts": 5886,
+  "tests/world_pvp_view.test.ts": 271,
+  "tests/world_pvp_zones.test.ts": 7,
   "tests/world_telemetry.test.ts": 5,
   "tests/worn_item_cell_view.test.ts": 7,
   "tests/worn_stone_shader.test.ts": 876,

@@ -1383,12 +1383,18 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the cast gate's engine family: the renderer leaf drops the lazy stand-ins from the gate. No capture was retaken.
   // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
   // Re-minted for the AoE ring slot builder: the renderer leaf moves the ring material to aoe_ring_mesh.ts and names the kit in the gate comment. No capture was retaken.
   // Re-minted for the per-family cast gate: the renderer leaf hands the gate object to the ability presentation and routes the Bloodletting recovery through the painter. No capture was retaken.
   // Re-minted for the cast bar interrupt: the renderer leaf routes an interrupted castStop to the painter. No capture was retaken.
-  '0b1bba8d86e13cd0267d0f73841d88579c4b4e507d3e9bf44df1c42bf12cca57';
+  // Re-minted for the merge of release/v0.44.0 into fix/cast-gate-engine-family (PR 4220): the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  '554c62fabd0097a28022fff5bac5d4c3551c5ede8a7f602c3972c430d98b5e20';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1400,12 +1406,18 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the cast gate's engine family: the renderer leaf drops the lazy stand-ins from the gate. No capture was retaken.
   // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
   // Re-minted for the AoE ring slot builder: the renderer leaf moves the ring material to aoe_ring_mesh.ts and names the kit in the gate comment. No capture was retaken.
   // Re-minted for the per-family cast gate: the renderer leaf hands the gate object to the ability presentation and routes the Bloodletting recovery through the painter. No capture was retaken.
   // Re-minted for the cast bar interrupt: the renderer leaf routes an interrupted castStop to the painter. No capture was retaken.
-  '9739ac1ffd8b673065647c28f87ffa9df37d996bf5e4c2779022004f928efd35';
+  // Re-minted for the merge of release/v0.44.0 into fix/cast-gate-engine-family (PR 4220): the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  'fa03318c7e3ee37a0b1f96b7cafdbb71d61145efcfd6644d89ed17dec33335de';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2782,6 +2794,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // devalue audit floor: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
+      // release/v0.44.0 merge into feature/world-pvp-flag: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+      // feature/world-pvp-flag (review round) merge into feature/king-of-the-hill: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
       // cast gate engine family: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
       // cast first-reads boot entry: recomputed LAST again over the re-swept
@@ -2792,7 +2808,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // cast bar interrupt: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('411c55eb7b2d0806d927dd54bf4687d81a9df36b598cf0330e74441af4b5261b');
+      // release/v0.44.0 merge into fix/cast-gate-engine-family (PR 4220): recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+    ).toBe('6463d9b30e91899c081bac0175971e5fe49b2aaa4def225ed6ca85352826d455');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
