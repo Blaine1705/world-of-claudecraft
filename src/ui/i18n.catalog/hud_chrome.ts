@@ -2978,6 +2978,9 @@ export const hudChromeStrings = {
       battlegroundComplete: 'Thornhollow Fields battle fought',
       battlegroundKill: 'honorable kill',
       battlegroundAssist: 'killing blow assisted',
+      worldKill: 'world kill',
+      worldAssist: 'world kill assisted',
+      hillHold: 'holding the hill',
     },
     // Short labels for the floating text over your own character. Kept apart from
     // `reasons` above, which are mid-sentence fragments for the chat line.
@@ -2985,7 +2988,84 @@ export const hudChromeStrings = {
       kill: 'Kill',
       assist: 'Assist',
       firstWin: 'First Win',
+      hill: 'Hill',
     },
+  },
+  // The World PvP tab of the merged PvP window (src/ui/hud/world_pvp/): the
+  // /pvp flag toggle, its stakes, and the character's world record. Every
+  // number is a resolved value from src/sim/pvp/world_pvp_rules.ts, never a
+  // literal in the copy, so a retune never strands the text.
+  worldPvp: {
+    tab: 'World PvP',
+    title: 'World PvP',
+    blurb:
+      'Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.',
+    statusOn: 'Your PvP flag is up. Flagged players can attack you.',
+    statusOff: 'Your PvP flag is down. You cannot attack or be attacked in the open world.',
+    // The flag-down line is only true where the flag decides fights, so
+    // free-for-all ground gets its own: standing there is the consent.
+    statusOffFfa:
+      'Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.',
+    statusDisarming: 'Your flag drops in {time}, or when your current fight ends.',
+    // The second line of the status card: what the ground under the player says
+    // (src/sim/pvp/world_pvp_zones.ts), or the realm line when the kill switch
+    // is set, which outranks every zone.
+    zoneSanctuary: 'Sanctuary: no world PvP here.',
+    zoneContested: 'Contested ground: only flagged players fight here.',
+    zoneFfa: 'Free-for-all ground: everyone here is fair game.',
+    realmDisabled: 'World PvP is disabled on this realm.',
+    // The stakes list, in reading order: where you can fight, what raises your
+    // flag for you, what a kill moves, and how to put the flag back down.
+    groundSanctuary: 'The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.',
+    groundContested: 'Everywhere else is contested: only two flagged players can fight.',
+    groundFfa:
+      'The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.',
+    groupLine:
+      'Party and raid members are never hostile to each other. Guildmates outside your group can fight.',
+    markLine:
+      'Attacking an unflagged player there raises your own flag; attacking a flagged one never does.',
+    aidLine: 'Healing, shielding or buffing a flagged player in a world fight raises your flag.',
+    stakeLine: 'The loser pays {cap} or {percent} of their purse, whichever is less.',
+    noStakeLine: 'An unflagged player killed on free-for-all ground loses no gold.',
+    noTakeLine:
+      'An unflagged fighter takes no gold either: it only moves between two flagged players.',
+    honorLine: '{honor} Honor per kill, split between everyone who helped.',
+    splitLine: 'A clean 1v1 pays the whole pot; helpers and their healers share it.',
+    repeatLine:
+      'Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.',
+    greyLine: 'Players more than {levels} levels below you pay nothing.',
+    disarmLine: 'Switching off takes {minutes} minutes and waits for combat to end.',
+    record: 'Record: {kills} kills, {deaths} deaths',
+    enable: 'Enable World PvP',
+    disable: 'Disable World PvP',
+    keepUp: 'Keep Flag Up',
+    confirmBody:
+      'Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.',
+    confirmAccept: 'Raise Flag',
+    confirmCancel: 'Cancel',
+    levelReq: 'Requires level {level}.',
+    pending: 'Waiting for your PvP status from the realm.',
+    commandHint: 'Chat: /pvp toggles the flag, /pvp on and /pvp off set it.',
+  },
+  // King of the Hill (src/ui/hud/hill/): the in-zone bar over the announced or
+  // standing hill. Every number is a resolved value from src/sim/pvp/hill_rules.ts.
+  hill: {
+    title: 'King of the Hill',
+    rising: 'The hill has not risen yet',
+    heldYou: 'Your group holds the hill',
+    heldOther: 'Another group holds the hill',
+    heldNone: 'Nobody holds the hill',
+    counts: 'Inside: you {yours}, holder {theirs}',
+    countsUnheld: 'Inside: you {yours}, largest rival {theirs}',
+    countsHolding: 'Inside: you {yours}, rival {theirs}',
+    contestYou: 'Taking the hill: {seconds} of {total}',
+    contestOther: 'Losing the hill: {seconds} of {total}',
+    contestNone: 'Hold a majority inside for {total} to take it',
+    inside: 'You are inside the circle',
+    distance: '{yards} yd to the circle',
+    rises: 'Rises in {minutes}',
+    falls: 'Falls in {minutes}',
+    standingRaid: 'Raid members do not count: only parties can hold the hill',
   },
   // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
   // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings
@@ -3096,6 +3176,10 @@ export const hudChromeStrings = {
         'Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. Every 10 rating grants exactly 1% hit.',
       warfare:
         'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%.',
+      // The same line once honor gear grants WARFARE Vitality (a sibling key, not a
+      // new placeholder on the translated one above).
+      warfareWithHealth:
+        'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts.',
     },
     // One line per derived effect a stat contributes. {value} is a live number.
     effects: {
@@ -4787,6 +4871,8 @@ export const hudChromeStrings = {
     // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
     // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
     afkTag: 'AFK',
+    // The World PvP flag tag, same bracket convention as afkTag.
+    pvpTag: 'PvP',
     // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
     // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
     // afkTag the brackets are part of the VALUE, so a locale that punctuates a

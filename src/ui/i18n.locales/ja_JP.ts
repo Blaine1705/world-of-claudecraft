@@ -1499,6 +1499,61 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorAmount': '名誉 {amount}',
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': '名誉: {amount}',
+  'hudChrome.worldPvp.tab': 'ワールドPvP',
+  'hudChrome.worldPvp.title': 'ワールドPvP',
+  'hudChrome.worldPvp.blurb':
+    'PvPフラグを立てると、オープンワールドのどこでもフラグを立てた他のプレイヤーと戦えます。倒せば相手の所持金の一部と、PvP装備につながる名誉を得られます。バトルグラウンドとアリーナの報酬はそれより多いままです。',
+  'hudChrome.worldPvp.statusOn':
+    'PvPフラグが立っています。フラグを立てたプレイヤーはあなたを攻撃できます。',
+  'hudChrome.worldPvp.statusOff':
+    'PvPフラグは下りています。オープンワールドでは攻撃も被攻撃もありません。',
+  'hudChrome.worldPvp.statusDisarming':
+    'フラグは {time} 後、または現在の戦闘が終わったときに下ります。',
+  'hudChrome.worldPvp.stakeLine': '敗者は {cap} か所持金の {percent} のうち少ない方を支払います。',
+  'hudChrome.worldPvp.honorLine': '撃破ごとに名誉 {honor} を、貢献した全員で分配します。',
+  'hudChrome.worldPvp.splitLine':
+    '純粋な1対1なら報酬を独占できます。協力者とそのヒーラーは分け合います。',
+  'hudChrome.worldPvp.disarmLine': '解除には {minutes} 分かかり、戦闘が終わるまで待ちます。',
+  'hudChrome.worldPvp.groupLine':
+    'パーティとレイドのメンバー同士が敵対することはありません。グループ外のギルドメンバーとは戦えます。',
+  'hudChrome.worldPvp.greyLine':
+    'あなたより {levels} レベル以上低いプレイヤーからは何も得られません。',
+  'hudChrome.worldPvp.record': '戦績: 撃破 {kills}、死亡 {deaths}',
+  'hudChrome.worldPvp.enable': 'ワールドPvPを有効にする',
+  'hudChrome.worldPvp.disable': 'ワールドPvPを無効にする',
+  'hudChrome.worldPvp.keepUp': 'フラグを維持',
+  'hudChrome.worldPvp.confirmBody':
+    'フラグを立てた他のプレイヤーがどこでもあなたを攻撃でき、勝てば所持金から最大 {cap} を奪えます。再び無効にはできますが、{minutes} 分かかります。',
+  'hudChrome.worldPvp.confirmAccept': 'フラグを立てる',
+  'hudChrome.worldPvp.confirmCancel': 'キャンセル',
+  'hudChrome.worldPvp.levelReq': 'レベル {level} が必要です。',
+  'hudChrome.worldPvp.pending': 'レルムからのPvP状態を待っています。',
+  'hudChrome.worldPvp.commandHint':
+    'チャット: /pvp でフラグを切り替え、/pvp on と /pvp off で直接設定します。',
+  'hudChrome.worldPvp.statusOffFfa':
+    'PvPフラグは下りていますが、無差別戦闘地帯では攻撃することも攻撃されることもあります。',
+  'hudChrome.worldPvp.zoneSanctuary': '聖域: ここではワールドPvPは行われません。',
+  'hudChrome.worldPvp.zoneContested': '係争地: ここで戦えるのはフラグを立てたプレイヤーだけです。',
+  'hudChrome.worldPvp.zoneFfa': '無差別戦闘地帯: ここにいる全員が攻撃対象です。',
+  'hudChrome.worldPvp.realmDisabled': 'このレルムではワールドPvPは無効です。',
+  'hudChrome.worldPvp.groundSanctuary':
+    '修練の浜とイーストブルック渓谷は聖域で、ワールドPvPは一切行われません。',
+  'hudChrome.worldPvp.groundContested':
+    'それ以外の場所はすべて係争地で、フラグを立てた者同士だけが戦えます。',
+  'hudChrome.worldPvp.groundFfa':
+    'ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯で、フラグの有無に関わらず誰でも戦えます。',
+  'hudChrome.worldPvp.markLine':
+    'そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立ちます。フラグを立てた相手を攻撃しても立ちません。',
+  'hudChrome.worldPvp.aidLine':
+    'ワールドの戦闘中のフラグを立てたプレイヤーを回復、シールド、強化すると自分のフラグが立ちます。',
+  'hudChrome.worldPvp.noStakeLine':
+    '無差別戦闘地帯でフラグを立てていないプレイヤーが倒されても、所持金は失われません。',
+  'hudChrome.worldPvp.noTakeLine':
+    'フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きます。',
+  'hudChrome.worldPvp.repeatLine':
+    '同じプレイヤーを繰り返し倒すと報酬は {second}、次に {third}、その後はゼロになります。カウントは最初の撃破から {reset} でリセットされます。',
+  'hudChrome.warfare.reasons.worldKill': 'ワールド撃破',
+  'hudChrome.warfare.reasons.worldAssist': 'ワールド撃破アシスト',
   'hudChrome.warfare.honorFloat': '名誉 +{amount}',
   'hudChrome.warfare.honorFloatReason': '名誉 +{amount}（{reason}）',
   'hudChrome.warfare.honorGain': '名誉を {amount} 獲得しました（{reason}）。',
@@ -1513,9 +1568,28 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'ソーンホロウ平原参戦',
   'hudChrome.warfare.reasons.battlegroundKill': '名誉ある撃破',
   'hudChrome.warfare.reasons.battlegroundAssist': '撃破アシスト',
+  'hudChrome.warfare.reasons.hillHold': '丘の占拠',
   'hudChrome.warfare.floatReasons.kill': '撃破',
   'hudChrome.warfare.floatReasons.assist': 'アシスト',
   'hudChrome.warfare.floatReasons.firstWin': '初勝利',
+  'hudChrome.warfare.floatReasons.hill': '丘',
+  'hudChrome.hill.title': '丘の王',
+  'hudChrome.hill.rising': '丘はまだ現れていません',
+  'hudChrome.hill.heldYou': 'あなたのグループが丘を占拠しています',
+  'hudChrome.hill.heldOther': '別のグループが丘を占拠しています',
+  'hudChrome.hill.heldNone': '丘を占拠しているグループはいません',
+  'hudChrome.hill.counts': '円内: あなた側 {yours}、占拠側 {theirs}',
+  'hudChrome.hill.countsUnheld': '円内: あなた側 {yours}、最大の対抗勢力 {theirs}',
+  'hudChrome.hill.countsHolding': '円内: あなた側 {yours}、対抗勢力 {theirs}',
+  'hudChrome.hill.contestYou': '丘を奪取中: {total} 中 {seconds}',
+  'hudChrome.hill.contestOther': '丘を奪われています: {total} 中 {seconds}',
+  'hudChrome.hill.contestNone': '円内で {total} の間、多数を保てば奪取できます',
+  'hudChrome.hill.inside': 'あなたは円の中にいます',
+  'hudChrome.hill.distance': '円まで {yards} ヤード',
+  'hudChrome.hill.rises': '{minutes} 後に出現します',
+  'hudChrome.hill.falls': '{minutes} 後に消えます',
+  'hudChrome.hill.standingRaid':
+    'レイドのメンバーは数えられません。丘を占拠できるのはパーティだけです',
   'hudChrome.warfareShop.gossipOption': 'ウォーフェアセットを見る',
   'hudChrome.warfareShop.gossipOptionAria': '{name}のウォーフェアセット商店を見る',
   'hudChrome.warfareShop.jewelry': 'アクセサリー',
@@ -1609,6 +1683,43 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.ruinCourtyard': '廃墟の中庭',
   'hudChrome.bg.map.graveyard': '墓地',
   'guide.nav.thornhollow': 'ソーンホロウ平原',
+  'guide.commandsPage.pvp':
+    'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士はどこでも戦えます。解除には5分かかります。',
+  'guide.commandsPage.pvpZones':
+    'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士は係争地で戦え、聖域ではワールドの戦闘は一切行われず、無差別戦闘地帯ではフラグの有無に関わらず戦えます。解除には5分かかります。',
+  'guide.nav.worldPvp': 'ワールドPvP',
+  'guide.worldPvpPage.heading': 'ワールドPvP',
+  'guide.worldPvpPage.intro':
+    'オープンワールドの対人戦は任意参加です。PvPフラグを立てると、パーティ、レイド、ギルドに属さないフラグを立てた全プレイヤーがオープンワールドのどこでも敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。フラグを立てていない人は攻撃することも攻撃されることもありません。',
+  'guide.worldPvpPage.flagHeading': 'フラグの上げ下げ',
+  'guide.worldPvpPage.flagBody':
+    'チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復すると、自分のフラグも立ちます。',
+  'guide.worldPvpPage.stakesHeading': '撃破の価値',
+  'guide.worldPvpPage.stakesBody':
+    'フラグを立てたプレイヤーがフラグを立てた相手を倒すと、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。',
+  'guide.worldPvpPage.limitsHeading': 'フェアプレイのルール',
+  'guide.worldPvpPage.limitsBody':
+    '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。カウントは日次リセットで元に戻ります。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
+  'guide.worldPvpPage.introZones':
+    'オープンワールドの対人戦は任意参加で、その意味は足元の土地が決めます。PvPフラグを立てると、パーティやレイドに属さないフラグを立てた全プレイヤーが係争地で敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。2つのゾーンはワールドの戦闘が一切起こらない聖域で、最北の3つのゾーンは、フラグの有無に関わらずその場の全員が攻撃対象となる無差別戦闘地帯です。パーティとレイドの仲間はどこでも敵になりませんが、グループ外のギルドメンバーは他の誰とも同じく攻撃対象です。',
+  'guide.worldPvpPage.zonesHeading': 'ワールドPvPが起こる場所',
+  'guide.worldPvpPage.zonesBody':
+    '世界の土地は3種類に分かれます。修練の浜とイーストブルック渓谷は聖域で、フラグの有無に関わらずワールドPvPは一切起こらないため、新しいキャラクターがフラグとは何かを知る前に戦いを挑まれることはありません。世界の大半は係争地で、そこでは上記のフラグの規則がすべてです。ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯で、そこにいる全員がフラグの有無に関わらず、そこにいる他の全員を攻撃できます。境界を越えて入るときにも、出るときにも通知されます。そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立つので、仕掛けた側が必ずリスクを背負います。すでにフラグを立てている相手を攻撃しても自分のフラグは立たないため、自衛や、フラグを立てていない誰かを守ることには何の代償もありません。',
+  'guide.worldPvpPage.flagBodyAid':
+    'チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復、シールド、強化した場合も自分のフラグが立つため、自分はフラグを立てないまま戦う者を背後から支え続けることはできません。フラグを立てていないプレイヤーを支援しても、フラグは立ちません。',
+  'guide.worldPvpPage.stakesBodyFlagged':
+    'フラグを立てたプレイヤーが他のプレイヤーに倒されると、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。フラグを立てていなかったプレイヤーは、無差別戦闘地帯で倒れても金貨を一切支払いません。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。',
+  'guide.worldPvpPage.stakesUnflaggedTake':
+    'フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きますが、貢献した全員が名誉は得られます。',
+  'guide.worldPvpPage.limitsBodyHour':
+    '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
+  'guide.worldPvpPage.hillBodyRamp':
+    '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分名誉を得て、同じパーティが占拠し続けるほど1分ごとの名誉は増えていきます。満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利およそ3回分の名誉になります。丘の持ち主が変わると、新しい持ち主の積み上げは最初から始まります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
+  'guide.worldPvpPage.limitsBodyRaids':
+    '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。レイドはワールドでの撃破から何も得られません。レイドのメンバーは名誉もゴールドも受け取らず、他の人の取り分も減らさないため、報酬を得るにはパーティで戦いましょう。',
+  'guide.worldPvpPage.hillHeading': '丘の王',
+  'guide.worldPvpPage.hillBody':
+    '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分わずかな名誉を得ます。そのため満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利1回分より少し少ない名誉になります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
   'guide.thornhollowPage.heading': 'ソーンホロウ平原',
   'guide.thornhollowPage.intro':
     'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',
@@ -1661,6 +1772,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。',
   'hudChrome.statInfo.desc.warfare':
     'プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。',
+  'hudChrome.statInfo.desc.warfareWithHealth':
+    'プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。さらに、ダンジョン、レイド、デルヴ、リフト以外のすべての場所で最大体力が {health}% 増加します。',
   'hudChrome.statInfo.sources.header': '内訳:',
   'hudChrome.statInfo.sources.base': '基本: {value}',
   'hudChrome.statInfo.sources.attributes': '能力値から: {value}',
@@ -12182,6 +12295,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.level.label': 'レベルを設定',
   'devCommand.actions.lfgboard.description': '事前編成の募集掲示シナリオを作成します。',
   'devCommand.actions.lfgboard.label': '募集掲示板を準備',
+  'devCommand.actions.hillend.description': '現在の丘を今すぐ消します。',
+  'devCommand.actions.hillend.label': '丘を終了',
+  'devCommand.actions.hillnow.description': '丘をすぐに出現させ、その上に立ちます。',
+  'devCommand.actions.hillnow.label': '今すぐ丘を出現',
+  'devCommand.actions.hillrise.description': '告知中の丘をすぐに出現させます。',
+  'devCommand.actions.hillrise.label': '丘のカウントダウンを省略',
+  'devCommand.actions.hillwarn.description':
+    '今すぐ丘を告知します。警告の時間が過ぎると出現します。',
+  'devCommand.actions.hillwarn.label': '丘のカウントダウン',
   'devCommand.actions.lfgqueue.description': 'ダンジョンファインダーの待機列シナリオを作成します。',
   'devCommand.actions.lfgqueue.label': 'ファインダー待機列を準備',
   'devCommand.actions.lfgraid.description': 'レイドファインダーのシナリオを作成します。',
@@ -15669,6 +15791,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.stats.parryTitle': 'パリィ',
   'guide.stats.warfareBody':
     'ウォーフェアは、他のプレイヤーに対してのみ効く唯一のステータスです。相手に与えるダメージを高め、相手から受けるダメージを下げ、キャラクターシートにはその両面が一行で表示されます。クリーチャー相手にはまったく働きません。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。',
+  'guide.stats.warfareBodyPets':
+    'ウォーフェアは、プレイヤーと戦うために名誉のギアが持つステータスです。プレイヤー同士の戦いでは、あなたとペットが他のプレイヤーやそのペットに与えるダメージを高め、彼らから受けるダメージを下げます。さらにダンジョン、レイド、デルヴ、リフト以外のすべての場所で最大体力を高めるので、名誉のギアを身につけたプレイヤーは、身につけていないプレイヤーよりはるかに倒されにくくなります。キャラクターシートにはそのすべてが一行で表示されます。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。',
   'guide.stats.warfareTitle': 'ウォーフェア',
   'guide.talentsPage.loadoutNote':
     'ビルドを一つに決めてしまう必要はありません。パネルで名前をつけた構成を保存すると、タレントの選択とアクションバーの両方が記憶されるので、別の構成へ移るのはクリック一回です。条件は振り直しと同じで、戦闘外であること、そしてアリーナの試合の最中でないことです。',

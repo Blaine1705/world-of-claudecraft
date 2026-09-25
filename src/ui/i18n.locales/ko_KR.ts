@@ -1490,6 +1490,60 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorAmount': '명예 {amount}',
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': '명예: {amount}',
+  'hudChrome.worldPvp.tab': '월드 PvP',
+  'hudChrome.worldPvp.title': '월드 PvP',
+  'hudChrome.worldPvp.blurb':
+    'PvP 깃발을 올리면 열린 세계 어디서든 깃발을 올린 다른 플레이어와 싸울 수 있습니다. 상대를 쓰러뜨리면 상대 지갑의 일부와 PvP 장비를 위한 명예를 얻습니다. 전장과 투기장의 보상은 여전히 더 많습니다.',
+  'hudChrome.worldPvp.statusOn':
+    'PvP 깃발이 올라가 있습니다. 깃발을 올린 플레이어가 당신을 공격할 수 있습니다.',
+  'hudChrome.worldPvp.statusOff':
+    'PvP 깃발이 내려가 있습니다. 열린 세계에서는 공격할 수도, 공격받을 수도 없습니다.',
+  'hudChrome.worldPvp.statusDisarming': '깃발은 {time} 후 또는 현재 전투가 끝나면 내려갑니다.',
+  'hudChrome.worldPvp.stakeLine': '패자는 {cap} 또는 지갑의 {percent} 중 더 적은 쪽을 지불합니다.',
+  'hudChrome.worldPvp.honorLine': '처치당 명예 {honor}, 기여한 모두가 나눕니다.',
+  'hudChrome.worldPvp.splitLine':
+    '순수한 1대1은 전부를 가져가고, 조력자와 그 치유사는 나눠 가집니다.',
+  'hudChrome.worldPvp.disarmLine': '끄는 데 {minutes}분이 걸리며 전투가 끝날 때까지 기다립니다.',
+  'hudChrome.worldPvp.groupLine':
+    '파티원과 공격대원끼리는 절대 적대하지 않습니다. 그룹 밖의 길드원과는 싸울 수 있습니다.',
+  'hudChrome.worldPvp.greyLine':
+    '당신보다 {levels}레벨 넘게 낮은 플레이어는 아무것도 주지 않습니다.',
+  'hudChrome.worldPvp.record': '전적: 처치 {kills}, 사망 {deaths}',
+  'hudChrome.worldPvp.enable': '월드 PvP 켜기',
+  'hudChrome.worldPvp.disable': '월드 PvP 끄기',
+  'hudChrome.worldPvp.keepUp': '깃발 유지',
+  'hudChrome.worldPvp.confirmBody':
+    '깃발을 올린 다른 플레이어가 어디서든 당신을 공격할 수 있고, 이기면 지갑에서 최대 {cap}을 가져갑니다. 다시 끌 수 있지만 {minutes}분이 걸립니다.',
+  'hudChrome.worldPvp.confirmAccept': '깃발 올리기',
+  'hudChrome.worldPvp.confirmCancel': '취소',
+  'hudChrome.worldPvp.levelReq': '{level}레벨이 필요합니다.',
+  'hudChrome.worldPvp.pending': '서버에서 PvP 상태를 기다리는 중입니다.',
+  'hudChrome.worldPvp.commandHint':
+    '채팅: /pvp 로 깃발을 전환하고, /pvp on 과 /pvp off 로 직접 설정합니다.',
+  'hudChrome.worldPvp.statusOffFfa':
+    'PvP 깃발이 내려가 있지만, 자유 전투 지역에서는 여전히 공격할 수도, 공격받을 수도 있습니다.',
+  'hudChrome.worldPvp.zoneSanctuary': '성역: 이곳에서는 월드 PvP가 일어나지 않습니다.',
+  'hudChrome.worldPvp.zoneContested': '분쟁 지역: 이곳에서는 깃발을 올린 플레이어끼리만 싸웁니다.',
+  'hudChrome.worldPvp.zoneFfa': '자유 전투 지역: 이곳의 모두가 공격 대상입니다.',
+  'hudChrome.worldPvp.realmDisabled': '이 서버에서는 월드 PvP가 꺼져 있습니다.',
+  'hudChrome.worldPvp.groundSanctuary':
+    '수련의 해안과 이스트브룩 골짜기는 성역이라 월드 PvP가 전혀 없습니다.',
+  'hudChrome.worldPvp.groundContested':
+    '그 밖의 모든 곳은 분쟁 지역이라 깃발을 올린 두 플레이어만 싸울 수 있습니다.',
+  'hudChrome.worldPvp.groundFfa':
+    '드레이크랜드, 서리장막 봉우리, 호박빛 가을터은 자유 전투 지역이라 깃발과 상관없이 그곳의 모두가 싸울 수 있습니다.',
+  'hudChrome.worldPvp.markLine':
+    '그곳에서 깃발을 올리지 않은 플레이어를 공격하면 자신의 깃발이 올라갑니다. 이미 깃발을 올린 상대를 공격할 때는 올라가지 않습니다.',
+  'hudChrome.worldPvp.aidLine':
+    '월드 전투 중인 깃발 올린 플레이어를 치유하거나 보호막을 주거나 강화하면 자신의 깃발이 올라갑니다.',
+  'hudChrome.worldPvp.noStakeLine':
+    '깃발을 올리지 않은 플레이어는 자유 전투 지역에서 쓰러져도 금화를 잃지 않습니다.',
+  'hudChrome.worldPvp.noTakeLine':
+    '깃발을 올리지 않은 전투원도 골드를 얻지 못합니다. 골드는 깃발을 올린 두 플레이어 사이에서만 움직입니다.',
+  'hudChrome.worldPvp.repeatLine':
+    '같은 플레이어를 거듭 처치하면 {second}, 그다음 {third}, 이후로는 아무것도 주지 않으며, 계수는 첫 처치로부터 {reset} 후에 초기화됩니다.',
+  'hudChrome.warfare.reasons.worldKill': '월드 처치',
+  'hudChrome.warfare.reasons.worldAssist': '월드 처치 지원',
   'hudChrome.warfare.honorFloat': '명예 +{amount}',
   'hudChrome.warfare.honorFloatReason': '명예 +{amount} ({reason})',
   'hudChrome.warfare.honorGain': '명예를 {amount} 획득했습니다({reason}).',
@@ -1504,9 +1558,28 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': '쏜할로우 평원 참전',
   'hudChrome.warfare.reasons.battlegroundKill': '명예로운 처치',
   'hudChrome.warfare.reasons.battlegroundAssist': '처치 도움',
+  'hudChrome.warfare.reasons.hillHold': '언덕 점령',
   'hudChrome.warfare.floatReasons.kill': '처치',
   'hudChrome.warfare.floatReasons.assist': '도움',
   'hudChrome.warfare.floatReasons.firstWin': '첫 승리',
+  'hudChrome.warfare.floatReasons.hill': '언덕',
+  'hudChrome.hill.title': '언덕의 왕',
+  'hudChrome.hill.rising': '언덕이 아직 솟아오르지 않았습니다',
+  'hudChrome.hill.heldYou': '당신의 그룹이 언덕을 점령했습니다',
+  'hudChrome.hill.heldOther': '다른 그룹이 언덕을 점령했습니다',
+  'hudChrome.hill.heldNone': '언덕을 점령한 그룹이 없습니다',
+  'hudChrome.hill.counts': '원 안: 아군 {yours}, 점령 측 {theirs}',
+  'hudChrome.hill.countsUnheld': '원 안: 아군 {yours}, 최대 경쟁 그룹 {theirs}',
+  'hudChrome.hill.countsHolding': '원 안: 아군 {yours}, 경쟁 그룹 {theirs}',
+  'hudChrome.hill.contestYou': '언덕 점령 중: {total} 중 {seconds}',
+  'hudChrome.hill.contestOther': '언덕을 빼앗기는 중: {total} 중 {seconds}',
+  'hudChrome.hill.contestNone': '{total} 동안 원 안에서 다수를 유지하면 점령합니다',
+  'hudChrome.hill.inside': '당신은 원 안에 있습니다',
+  'hudChrome.hill.distance': '원까지 {yards}야드',
+  'hudChrome.hill.rises': '{minutes} 후 솟아오릅니다',
+  'hudChrome.hill.falls': '{minutes} 후 사라집니다',
+  'hudChrome.hill.standingRaid':
+    '공격대원은 인원에 포함되지 않습니다. 언덕은 파티만 점령할 수 있습니다',
   'hudChrome.warfareShop.gossipOption': '워페어 세트 둘러보기',
   'hudChrome.warfareShop.gossipOptionAria': '{name}이(가) 운영하는 워페어 세트 상점 둘러보기',
   'hudChrome.warfareShop.jewelry': '장신구',
@@ -1596,6 +1669,43 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.ruinCourtyard': '폐허 안뜰',
   'hudChrome.bg.map.graveyard': '묘지',
   'guide.nav.thornhollow': '쏜할로우 평원',
+  'guide.commandsPage.pvp':
+    '월드 PvP 깃발: /pvp 로 전환하고 /pvp on 과 /pvp off 로 직접 설정합니다. 깃발을 올린 플레이어끼리는 어디서든 싸울 수 있으며, 끄는 데 5분이 걸립니다.',
+  'guide.commandsPage.pvpZones':
+    '월드 PvP 깃발: /pvp 로 전환하고 /pvp on 과 /pvp off 로 직접 설정합니다. 깃발을 올린 플레이어끼리는 분쟁 지역에서 싸울 수 있고, 성역에서는 월드 전투가 전혀 허용되지 않으며, 자유 전투 지역에서는 깃발과 상관없이 싸울 수 있습니다. 끄는 데 5분이 걸립니다.',
+  'guide.nav.worldPvp': '월드 PvP',
+  'guide.worldPvpPage.heading': '월드 PvP',
+  'guide.worldPvpPage.intro':
+    '열린 세계의 플레이어 간 전투는 선택 사항입니다. PvP 깃발을 올리면 파티, 공격대, 길드에 속하지 않은 깃발을 올린 모든 플레이어가 열린 세계 어디서든 적이 되고, 깃발을 내리면 잠시 후 다시 구경꾼이 됩니다. 깃발을 올리지 않은 사람은 공격할 수도, 공격받을 수도 없습니다.',
+  'guide.worldPvpPage.flagHeading': '깃발 올리기와 내리기',
+  'guide.worldPvpPage.flagBody':
+    '채팅에 /pvp 를 입력하거나 G 키로 PvP 창을 열어 월드 PvP 탭을 사용하세요. 탭에는 전적과 판돈도 표시됩니다. 초반 레벨을 지나면 깃발은 즉시 올라갑니다. 내리면 몇 분의 카운트다운이 시작되고, 아직 싸우는 중이면 깃발이 내려가지 않으므로 자신이 시작한 싸움에서 도망치는 수단이 될 수 없습니다. 전투 중인 깃발 올린 플레이어를 치유하면 자신의 깃발도 올라갑니다.',
+  'guide.worldPvpPage.stakesHeading': '처치의 가치',
+  'guide.worldPvpPage.stakesBody':
+    '깃발을 올린 플레이어들이 깃발을 올린 플레이어를 쓰러뜨리면 패자는 지갑에 든 금화의 작은 몫을 지불하고(상한이 있습니다), 승자들은 PvP 장비를 위한 명예를 얻습니다. 기여한 모두가 둘 다 나눕니다. 마지막 일격을 가한 사람, 직전에 대상에게 피해를 준 사람, 그 전사들을 버티게 한 치유사입니다. 순수한 1대1은 전부를 가져가고 무리는 나눕니다.',
+  'guide.worldPvpPage.limitsHeading': '공정한 규칙',
+  'guide.worldPvpPage.limitsBody':
+    '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 계수는 일일 초기화와 함께 초기화됩니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다.',
+  'guide.worldPvpPage.introZones':
+    '열린 세계의 플레이어 간 전투는 선택 사항이며, 그 의미는 지금 서 있는 땅이 정합니다. PvP 깃발을 올리면 파티나 공격대에 속하지 않은 깃발을 올린 모든 플레이어가 분쟁 지역에서 적이 되고, 깃발을 내리면 잠시 후 다시 구경꾼이 됩니다. 두 지역은 월드 전투가 전혀 일어나지 않는 성역이고, 가장 북쪽의 세 지역은 깃발과 상관없이 그곳의 모두가 공격 대상인 자유 전투 지역입니다. 파티원과 공격대원은 어디서든 서로의 적이 되지 않지만, 그룹 밖의 길드원은 다른 누구와 마찬가지로 공격 대상입니다.',
+  'guide.worldPvpPage.zonesHeading': '월드 PvP가 벌어지는 곳',
+  'guide.worldPvpPage.zonesBody':
+    '세계의 땅은 세 종류입니다. 수련의 해안과 이스트브룩 골짜기는 성역이라 깃발과 상관없이 월드 PvP가 전혀 일어나지 않으므로, 새 캐릭터가 깃발이 무엇인지 알기도 전에 싸움에 휘말리는 일은 없습니다. 세계의 대부분은 분쟁 지역이며, 그곳에서는 위의 깃발 규칙이 전부입니다. 드레이크랜드, 서리장막 봉우리, 호박빛 가을터은 자유 전투 지역이라 그 안에 선 모두가 깃발과 상관없이 그 안에 선 다른 모두를 공격할 수 있고, 경계를 넘어 들어갈 때와 나갈 때 모두 안내를 받습니다. 그곳에서 깃발을 올리지 않은 플레이어를 공격하면 자신의 깃발이 올라가므로, 먼저 덤빈 쪽이 언제나 위험을 짊어집니다. 이미 깃발을 올린 상대를 때릴 때는 올라가지 않으니, 자신을 지키거나 깃발을 올리지 않은 누군가를 지키는 일에는 아무 대가가 없습니다.',
+  'guide.worldPvpPage.flagBodyAid':
+    '채팅에 /pvp 를 입력하거나 G 키로 PvP 창을 열어 월드 PvP 탭을 사용하세요. 탭에는 전적과 판돈도 표시됩니다. 초반 레벨을 지나면 깃발은 즉시 올라갑니다. 내리면 몇 분의 카운트다운이 시작되고, 아직 싸우는 중이면 깃발이 내려가지 않으므로 자신이 시작한 싸움에서 도망치는 수단이 될 수 없습니다. 전투 중인 깃발 올린 플레이어를 치유하거나 보호막을 주거나 강화해도 자신의 깃발이 함께 올라가므로, 자신은 깃발을 올리지 않은 채 뒤에서 싸우는 이를 떠받칠 수 없습니다. 깃발을 올리지 않은 플레이어를 도울 때는 아무것도 올라가지 않습니다.',
+  'guide.worldPvpPage.stakesBodyFlagged':
+    '깃발을 올린 플레이어가 다른 플레이어에게 쓰러지면 패자는 지갑에 든 금화의 작은 몫을 지불하고(상한이 있습니다), 승자들은 PvP 장비를 위한 명예를 얻습니다. 깃발을 올리지 않았던 플레이어는 자유 전투 지역에서 쓰러져도 금화를 전혀 내지 않습니다. 기여한 모두가 둘 다 나눕니다. 마지막 일격을 가한 사람, 직전에 대상에게 피해를 준 사람, 그 전사들을 버티게 한 치유사입니다. 순수한 1대1은 전부를 가져가고 무리는 나눕니다.',
+  'guide.worldPvpPage.stakesUnflaggedTake':
+    '깃발을 올리지 않은 전투원 역시 골드를 얻지 못합니다. 골드는 깃발을 올린 두 플레이어 사이에서만 움직이지만, 기여한 모두가 명예는 얻습니다.',
+  'guide.worldPvpPage.limitsBodyHour':
+    '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다.',
+  'guide.worldPvpPage.hillBodyRamp':
+    '세 시간에 한 번, 아무도 예측할 수 없는 때에 자유 전투 지역 가운데 한 곳에 15분 뒤 언덕이 솟아오른다는 소식이 서버 전체에 알려지고, 언덕이 설 원이 탁 트인 땅에 표시됩니다. 솟아오른 언덕은 45분 동안 서 있다가 사라집니다. 원 안에 선 플레이어가 가장 많은 파티가 언덕을 두고 다투며, 1분 동안 끊이지 않고 다수를 유지하면 언덕은 그 파티의 것이 됩니다. 혼자인 플레이어는 1인 파티로 세지만, 공격대원은 전혀 세지 않습니다. 한 파티가 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 명예를 얻으며, 같은 파티가 오래 지킬수록 1분마다 얻는 명예가 늘어납니다. 가득 찬 파티가 아무런 다툼 없이 언덕이 서 있는 내내 지키면 전장 승리 약 세 번에 해당하는 명예를 얻습니다. 언덕의 주인이 바뀌면 새 주인의 누적은 처음부터 시작됩니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.',
+  'guide.worldPvpPage.limitsBodyRaids':
+    '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다. 공격대는 월드 처치에서 아무것도 얻지 못합니다. 공격대원은 명예도 골드도 받지 않으며 다른 사람의 몫도 줄이지 않으니, 보상을 받으려면 파티로 싸우세요.',
+  'guide.worldPvpPage.hillHeading': '언덕의 왕',
+  'guide.worldPvpPage.hillBody':
+    '세 시간에 한 번, 아무도 예측할 수 없는 때에 자유 전투 지역 가운데 한 곳에 15분 뒤 언덕이 솟아오른다는 소식이 서버 전체에 알려지고, 언덕이 설 원이 탁 트인 땅에 표시됩니다. 솟아오른 언덕은 45분 동안 서 있다가 사라집니다. 원 안에 선 플레이어가 가장 많은 파티가 언덕을 두고 다투며, 1분 동안 끊이지 않고 다수를 유지하면 언덕은 그 파티의 것이 됩니다. 혼자인 플레이어는 1인 파티로 세지만, 공격대원은 전혀 세지 않습니다. 한 파티가 언덕을 점령하는 동안 원 안에 선 그 구성원들은 매분 약간의 명예를 얻습니다. 그래서 가득 찬 파티가 아무런 다툼 없이 언덕이 서 있는 내내 지키면 전장 승리 한 번보다 조금 적은 명예를 얻습니다. 벌판 위의 막대가 누가 점령했는지, 아군과 상대의 인원, 그리고 점령 시계를 보여 줍니다. 채팅에 /hill 을 입력하면 언덕이 어디 있는지 알려 줍니다.',
   'guide.thornhollowPage.heading': '쏜할로우 평원',
   'guide.thornhollowPage.intro':
     '가시봉 아래 오래된 숲의 성벽으로 둘러싸인 분지에서 벌어지는 랭크 5대 5 깃발 뺏기 전장. 협곡 양 끝에서 두 폐허 요새가 마주 보고, 그 사이에는 누구도 차지한 적 없는 더 오래된 안뜰이 있다. 다섯 명씩, 요새 둘, 목표 하나. 적의 깃발을 빼앗아 우리 깃발을 빼앗기기 전에 가져와라.',
@@ -1648,6 +1758,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.',
   'hudChrome.statInfo.desc.warfare':
     '플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다.',
+  'hudChrome.statInfo.desc.warfareWithHealth':
+    '플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다. 또한 던전, 공격대, 탐굴, 균열을 제외한 모든 곳에서 최대 생명력이 {health}% 증가합니다.',
   'hudChrome.statInfo.sources.header': '구성:',
   'hudChrome.statInfo.sources.base': '기본: {value}',
   'hudChrome.statInfo.sources.attributes': '능력치에서: {value}',
@@ -12147,6 +12259,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.level.label': '레벨 설정',
   'devCommand.actions.lfgboard.description': '사전 구성 파티 모집 시나리오를 만듭니다.',
   'devCommand.actions.lfgboard.label': '모집 게시판 채우기',
+  'devCommand.actions.hillend.description': '지금 있는 언덕을 바로 사라지게 합니다.',
+  'devCommand.actions.hillend.label': '언덕 종료',
+  'devCommand.actions.hillnow.description': '언덕을 즉시 솟아오르게 하고 그 위에 섭니다.',
+  'devCommand.actions.hillnow.label': '지금 언덕 솟아오르기',
+  'devCommand.actions.hillrise.description': '알린 언덕을 바로 솟아오르게 합니다.',
+  'devCommand.actions.hillrise.label': '언덕 카운트다운 건너뛰기',
+  'devCommand.actions.hillwarn.description':
+    '지금 언덕을 알립니다. 전체 경고 시간이 지나면 솟아오릅니다.',
+  'devCommand.actions.hillwarn.label': '언덕 카운트다운',
   'devCommand.actions.lfgqueue.description': '던전 찾기 대기열 시나리오를 만듭니다.',
   'devCommand.actions.lfgqueue.label': '찾기 대기열 채우기',
   'devCommand.actions.lfgraid.description': '공격대 찾기 시나리오를 만듭니다.',
@@ -15631,6 +15752,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.stats.parryTitle': '무기 막기',
   'guide.stats.warfareBody':
     '워페어는 오직 다른 플레이어를 상대로만 셈해지는 유일한 능력치입니다. 그들에게 주는 피해를 올리고 그들에게서 받는 피해를 낮추며, 캐릭터 정보에는 두 값이 한 줄에 함께 표시됩니다. 생명체를 상대로는 아무 일도 하지 않습니다. 명예로 사는 워페어 장비에서 나오므로, 레벨을 올리는 동안 좇을 것이 아니라 PvP를 즐긴 대가로 주어지는 보상입니다.',
+  'guide.stats.warfareBodyPets':
+    '워페어는 명예 장비가 플레이어와 싸우기 위해 지닌 능력치입니다. 플레이어끼리의 싸움에서 당신과 소환수가 다른 플레이어와 그 소환수에게 주는 피해를 올리고, 그들에게서 받는 피해를 낮춥니다. 또한 던전, 공격대, 탐굴, 균열을 제외한 모든 곳에서 최대 생명력을 높여 주므로, 명예 장비를 입은 플레이어는 입지 않은 플레이어보다 훨씬 쓰러뜨리기 어렵습니다. 캐릭터 정보에는 이 모두가 한 줄에 표시됩니다. 명예로 사는 워페어 장비에서 나오므로, 레벨을 올리는 동안 좇을 것이 아니라 PvP를 즐긴 대가로 주어지는 보상입니다.',
   'guide.stats.warfareTitle': '워페어',
   'guide.talentsPage.loadoutNote':
     '하나의 구성으로 정착할 필요는 없습니다. 패널에서 이름을 붙여 배치를 저장하면 특성 선택과 행동 단축바까지 함께 기억하므로, 다른 구성으로 갈아타는 일은 클릭 한 번이면 끝납니다. 초기화와 같은 규칙이 적용되어, 전투 중이 아니어야 하고 투기장 경기 중이어서도 안 됩니다.',

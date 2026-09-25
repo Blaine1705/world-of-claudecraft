@@ -255,6 +255,7 @@ import {
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
 import { socialInfoFromFrame } from './social_frame_wire';
+import { applySocialSelfWire } from './social_self_wire';
 import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './target_echo';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
@@ -1162,13 +1163,12 @@ export class Api {
 
 // Despawn grace (anti-flicker, entity-map churn). The server keeps known
 // entities in interest out to a drop radius (100yd players / 130yd npcs) that is
-// wider than the add radius, but a wandering entity riding that boundary — or a
-// single late/dropped frame — can still fall out of one snapshot without truly
+// wider than the add radius, but a wandering entity riding that boundary, or a
+// single late/dropped frame, can still fall out of one snapshot without truly
 // leaving. (Distance-tier-throttled entities are NOT a source here: the server
 // lists them in `keep`, so they count as seen and are never missing.) Deleting a
-// briefly-absent entity that frame, then re-creating it the next, churns the
-// entity map; hold it at its last pose for this window instead. Kept short so a
-// genuine leaver (logout, corpse cleanup) lingers only momentarily.
+// briefly-absent entity that frame, then re-creating it the next, churns the map;
+// hold it at its last pose for this window. Short, so a genuine leaver barely lingers.
 const DESPAWN_GRACE_MS = 600;
 
 // Auto-reconnect backoff for an unexpectedly dropped game socket. The server
@@ -1279,6 +1279,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // the snapshot self (`s.bg`, delta-omitted); flag/score dynamics also ride
   // the events queue for banners and the combat log. ---
   bgInfo: import('../world_api').BgInfo | null = null;
+  // --- IWorldWorldPvp: the /pvp readout (`s.wpvp`) + the hill (`s.hill`), delta-omitted. ---
+  worldPvpInfo: import('../world_api').WorldPvpInfo | null = null;
+  hillInfo: import('../world_api').HillInfo | null = null;
   // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
   // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
   // missing key keeps the prior mirror, an explicit null clears it). ---
@@ -2919,6 +2922,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.leaping = !!w.lp;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
+      e.pvpFlag = !!w.pvp; // /pvp flag bit: nameplate + target-frame hostility colour
       e.weaponStowed = !!w.ws;
       e.helmHidden = !!w.hh;
       e.aggroTargetId = w.aggro ?? null;
@@ -3164,7 +3168,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // object predates WARFARE. Preserve numeric PvP fields instead of letting
       // an old six-field object turn the character-sheet percentages into NaN.
       if (s.stats !== undefined) {
-        e.stats = { pvpOffense: 0, pvpDefense: 0, ...s.stats };
+        e.stats = { pvpOffense: 0, pvpDefense: 0, pvpVitality: 0, ...s.stats };
       }
       applySelfCombatScalars(e, s);
       // ticksElapsed is a sim-internal sfx-cadence counter (consume_sfx.ts):
@@ -3274,23 +3278,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // The own presentation has released the spectate hold, so preference
       // changes made while watching can now pass cmd()'s normal guard.
       if (restoreSessionPreferences) this.resendSessionPreferences();
-      // --- IWorldTrade / IWorldDuelArena: trade/duel/arena delta self-decode
-      // (W0a-covered; keep the prior mirror value when the field is omitted).
-      // IWorldSocialGraph.socialInfo has NO snapshot key - it is set only by the
-      // social/socialpos frames. ---
-      if (s.trade !== undefined) this.tradeInfo = s.trade;
-      if (s.duel !== undefined) this.duelInfo = s.duel;
-      if (s.arena !== undefined) this.arenaInfo = s.arena;
-      if (s.bg !== undefined) this.bgInfo = s.bg;
-      if (s.df !== undefined) this.dungeonFinderInfo = s.df;
-      if (s.dfb !== undefined) this.dungeonFinderBoard = s.dfb;
-      if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
-      if (s.honor !== undefined) this.honor = s.honor ?? 0;
-      if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
-      if (s.market !== undefined) this.marketInfo = s.market;
-      if (s.mktU !== undefined) this.marketCollectPending = !!s.mktU;
-      if (s.mail !== undefined) this.mailInfo = s.mail;
-      if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
+      // --- Trade / duel / arena / battleground / finder / card duel / honor /
+      // market / mail / world PvP self-decode (W0a-covered, delta-omitted): the
+      // sibling module owns the cohort and its adopt-by-reference contract. ---
+      applySocialSelfWire(this, s);
       // The four owner-only bank/vault self keys (`bank`, `vault`, `cvault`,
       // `bpsl`): all delta-omitted, strictly decoded and applied by the sibling
       // module, where the delta contract, the by-reference adoption rationale,
@@ -4376,6 +4367,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   bgFlagAction(): void {
     this.cmd({ cmd: 'bg_flag' });
+  }
+  // --- IWorldWorldPvp: raise/lower the /pvp flag (worldPvpInfo is a snapshot read). ---
+  setWorldPvpFlag(enabled: boolean): void {
+    this.cmd({ cmd: 'pvp_flag', on: enabled });
   }
   // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
   // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---

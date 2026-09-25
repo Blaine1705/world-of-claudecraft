@@ -1012,6 +1012,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Thornhollow Fields in-match strip, the wave-respawn overlay and the spawn-protection line; the view core short-circuits an inactive match',
   },
   {
+    call: 'this.hillBar.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the King of the Hill strip while the player stands in the hill zone; the view core short-circuits to hidden with no hill or out of the zone, and the painter elides every repeat',
+  },
+  {
     call: 'this.bgKillFeed.update',
     band: 'medium',
     gate: '',
@@ -1818,8 +1825,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
       // tracker's exact slow-band row shape.
       // chrome 93 -> 94: the Cooldown Manager's per-frame paint
-      // (src/ui/hud/cooldown_manager/), facet-routed chrome.
-    ).toEqual({ window: 49, chrome: 94, none: 17 });
+      // (src/ui/hud/cooldown_manager/), facet-routed chrome. King of the Hill: the
+      // hill bar strip (hud/hill/) is one more chrome surface, 95.
+    ).toEqual({ window: 49, chrome: 95, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

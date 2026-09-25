@@ -360,7 +360,6 @@ import {
   confirmPendingAutoAttackEngage,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
-  isPvpHostileTarget,
 } from './hud/action_bar/attack_on_ability';
 import { BarEditorWindow } from './hud/action_bar/bar_editor';
 import {
@@ -455,6 +454,7 @@ import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
+import { buildHillBarView, HillBar } from './hud/hill';
 import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
@@ -773,6 +773,7 @@ import {
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { createPromptTimeoutBar, PROMPT_TIMEOUT_MS } from './prompt_dialog';
+import { isPvpHostilePlayer, isPvpHostileTargetId } from './pvp_hostile_core';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipModel,
@@ -5472,11 +5473,8 @@ export class Hud {
   });
   // Card Duel window painter (card_duel_view.ts model + card_duel_window.ts
   // painter, the ValeCupWindow shape scaled down). The Card Master NPC's gossip
-  // menu AND the persistent #mm-cardduel micromenu button (the sim allows
-  // playing a card once matched without proximity, so the window must stay
-  // reachable away from the NPC too) both
-  // toggle it; Hud drives render() from the mediumHud band while open, and
-  // auto-opens it the moment a match starts (see the mediumHud band below).
+  // menu AND the persistent #mm-cardduel micromenu button both toggle it (a card
+  // plays without proximity once matched); rendered from the mediumHud band, auto-opened on match start.
   private readonly cardDuelWindow = new CardDuelWindow({
     root: () => $('#card-duel-window'),
     world: () => this.sim,
@@ -5484,8 +5482,7 @@ export class Hud {
     ...this.windowFocus('#card-duel-window'),
   });
 
-  // Thornhollow Fields in-match scoreboard strip + wave-respawn overlay (self-mounting,
-  // elided writers; hud/battleground/).
+  // Thornhollow Fields in-match scoreboard strip + wave-respawn overlay (self-mounting, elided writers).
   private readonly bgMapPainter = new BattlegroundMapPainter();
   private readonly bgScoreboard = new BattlegroundScoreboard({
     layer: () => document.getElementById('ui'),
@@ -5494,6 +5491,10 @@ export class Hud {
   // Top-right kill feed: event-pushed lines, expiry-pruned per frame.
   private readonly bgKillFeed = new BattlegroundKillFeed({
     layer: () => document.getElementById('ui'),
+  });
+  private readonly hillBar = new HillBar({
+    layer: () => document.getElementById('ui'),
+    writers: this.writerFacet,
   });
   // Character window painter (char_view.ts core + char_window.ts painter). It composes
   // presentation helpers with HUD-built stats/progression plus the unequip + drag
@@ -6903,11 +6904,9 @@ export class Hud {
     this.updateReliquaryTracker();
     this.updateRecipeTracker();
     this.charWindow.renderIfOpen();
-    // The arena window's render-skip signature is text-independent (offline sentinel or a
-    // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
-    // one rebuild with fresh t() (self-gated on isOpen).
     this.arenaWindow.relocalize();
     this.bgScoreboard.relocalize();
+    this.hillBar.relocalize();
     this.dungeonFinderWindow.relocalize();
     this.dungeonFinderProposalPopup.relocalize();
     this.bgProposalPopup.relocalize();
@@ -7448,10 +7447,7 @@ export class Hud {
           if (
             this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
             abilityStartsAutoAttack(resolved.effects) &&
-            hasAutoAttackTarget(
-              target,
-              isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo, this.sim.bgInfo),
-            )
+            hasAutoAttackTarget(target, isPvpHostileTargetId(this.sim, tid))
           ) {
             // A TIMED cast must not engage yet (the aggro-before-damage bug). The
             // recorded id only ARMS once castStart below confirms this exact cast
@@ -8995,10 +8991,13 @@ export class Hud {
       // Linked-Discord players get their staff-role name color (else friendly/hostile),
       // plus a Discord info line (nickname + rank + role chips) under the healthbar.
       const tfRoleColor = target.kind === 'player' ? specialRoleColor(target.discordRole) : null;
+      // A mob's template flag, or a player the sim would let us hit (duel, arena,
+      // battleground, or the /pvp flag): one shared verdict (pvp_hostile_core.ts).
+      const tfHostile = target.hostile || isPvpHostilePlayer(this.sim, target);
       this.setStyleProp(
         this.targetNameEl,
         'color',
-        tfRoleColor ?? (target.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)'),
+        tfRoleColor ?? (tfHostile ? 'var(--color-hostile)' : 'var(--color-friendly)'),
       );
       this.targetDiscord.update(target);
       // Redundant non-color cue for forced-colors (high-contrast) mode, where the OS
@@ -9006,7 +9005,7 @@ export class Hud {
       // The base.css forced-colors block underlines #tf-name.hostile; routed through the
       // elided toggleClass writer so the per-frame hot path stays write-elided. Normal
       // mode is unaffected (the rule lives only inside @media (forced-colors: active)).
-      this.toggleClass(this.targetNameEl, 'hostile', target.hostile);
+      this.toggleClass(this.targetNameEl, 'hostile', tfHostile);
       // Every target aura is actionable: hostile buffs can be purged, allied buffs
       // can be maintained, and foreign debuffs coordinate a group. Keep this strip
       // complete and full-rate on every graphics tier; the painter and window both
@@ -9428,6 +9427,7 @@ export class Hud {
       this.updateArenaStatus();
       this.updateFiestaHud();
       this.bgScoreboard.update(buildBgScoreboardView(this.sim.bgInfo, this.sim.playerId));
+      this.hillBar.update(buildHillBarView(this.sim.hillInfo, this.sim.player.pos));
       this.bgKillFeed.update(performance.now() / 1000);
       this.yumiPainter.update(this.sim.arenaInfo);
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
@@ -13299,12 +13299,7 @@ export class Hud {
             if (ev.success) {
               const castTid = sim.player.targetId;
               const castTarget = castTid !== null ? (sim.entities.get(castTid) ?? null) : null;
-              const castPvpHostile = isPvpHostileTarget(
-                castTid,
-                sim.duelInfo,
-                sim.arenaInfo,
-                sim.bgInfo,
-              );
+              const castPvpHostile = isPvpHostileTargetId(sim, castTid);
               if (hasAutoAttackTarget(castTarget, castPvpHostile)) this.sim.startAutoAttack();
             }
           }

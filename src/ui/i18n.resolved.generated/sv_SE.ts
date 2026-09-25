@@ -192,6 +192,22 @@ export const sv_SE: EnTranslations = {
       "lfgboard": {
         "label": "Förbered annonstavlan",
         "description": "Skapa ett scenario med en färdig gruppannons."
+      },
+      "hillwarn": {
+        "label": "Hill countdown",
+        "description": "Announce a hill now; it rises after the full warning."
+      },
+      "hillnow": {
+        "label": "Raise hill now",
+        "description": "Raise a hill at once and stand on it."
+      },
+      "hillrise": {
+        "label": "Skip hill countdown",
+        "description": "Raise the announced hill right away."
+      },
+      "hillend": {
+        "label": "End hill",
+        "description": "Make the current hill fall now."
       }
     }
   },
@@ -2352,13 +2368,72 @@ export const sv_SE: EnTranslations = {
         "battlegroundFirstWin": "första segern i Törnhålefälten idag",
         "battlegroundComplete": "strid i Törnhålefälten utkämpad",
         "battlegroundKill": "hederligt dråp",
-        "battlegroundAssist": "assisterat dödande slag"
+        "battlegroundAssist": "assisterat dödande slag",
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted",
+        "hillHold": "holding the hill"
       },
       "floatReasons": {
         "kill": "Dråp",
         "assist": "Assist",
-        "firstWin": "Första segern"
+        "firstWin": "Första segern",
+        "hill": "Hill"
       }
+    },
+    "worldPvp": {
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusOffFfa": "Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "zoneSanctuary": "Sanctuary: no world PvP here.",
+      "zoneContested": "Contested ground: only flagged players fight here.",
+      "zoneFfa": "Free-for-all ground: everyone here is fair game.",
+      "realmDisabled": "World PvP is disabled on this realm.",
+      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
+      "groundContested": "Everywhere else is contested: only two flagged players can fight.",
+      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
+      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
+      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
+      "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
+      "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
+    },
+    "hill": {
+      "title": "King of the Hill",
+      "rising": "The hill has not risen yet",
+      "heldYou": "Your group holds the hill",
+      "heldOther": "Another group holds the hill",
+      "heldNone": "Nobody holds the hill",
+      "counts": "Inside: you {yours}, holder {theirs}",
+      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
+      "countsHolding": "Inside: you {yours}, rival {theirs}",
+      "contestYou": "Taking the hill: {seconds} of {total}",
+      "contestOther": "Losing the hill: {seconds} of {total}",
+      "contestNone": "Hold a majority inside for {total} to take it",
+      "inside": "You are inside the circle",
+      "distance": "{yards} yd to the circle",
+      "rises": "Rises in {minutes}",
+      "falls": "Falls in {minutes}",
+      "standingRaid": "Raid members do not count: only parties can hold the hill"
     },
     "warfareShop": {
       "gossipOption": "Bläddra bland Krigföringsset",
@@ -2424,7 +2499,8 @@ export const sv_SE: EnTranslations = {
         "hasteRating": "Snabbhetsvärde från din utrustning och setbonusar, som snabbar upp dina attacker och besvärjelser. Ungefär 10 i värde ger 1% snabbhet.",
         "parry": "Din chans att helt parera ett närstridsanfall framifrån utan att ta någon skada. Ett slag bakifrån kan inte pareras.",
         "hitRating": "Träffvärde från din utrustning och setbonusar, som minskar hur ofta dina attacker missar och dina besvärjelser motarbetas, framfor allt mot fiender av högre nivå. Ungefär 10 i värde ger 1% träff.",
-        "warfare": "Ökar skadan mot spelare med {increase}% och minskar skadan från spelare med {reduction}%."
+        "warfare": "Ökar skadan mot spelare med {increase}% och minskar skadan från spelare med {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Attackstyrka",
@@ -3504,6 +3580,7 @@ export const sv_SE: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "BV",
+      "pvpTag": "PvP",
       "cheaterTag": "< Fuskare >",
       "pledgeTag": "Trogen {guild}",
       "npcRoleTag": "<{role}>",
@@ -6085,6 +6162,7 @@ export const sv_SE: EnTranslations = {
       "talents": "Talanger",
       "arena": "Arena och PvP",
       "thornhollow": "Törnhålefälten",
+      "worldPvp": "World PvP",
       "deeds": "Bedrifternas bok",
       "reliquary": "Relikvariet",
       "glossary": "Ordlista",
@@ -6633,6 +6711,8 @@ export const sv_SE: EnTranslations = {
       "completed": "Uppdragen du redan har lämnat in, i den ordning du avslutade dem.",
       "session": "Vad du har gjort sedan du loggade in: dödade fiender, dödsfall, skada och erfarenhet.",
       "arena": "Din Coliseum-status i båda divisionerna: rankning, vinster, förluster och vinstprocent för 1v1 och 2v2.",
+      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
+      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.",
       "listings": "Dina egna listningar på Världsmarknaden, med begärt pris, tiden var och en har kvar, och hur mycket utrymme du har för fler.",
       "buyback": "Vad du nyligen sålt till en handlare och fortfarande kan köpa tillbaka.",
       "groupState": "Hur du har det just nu",
@@ -7386,6 +7466,27 @@ export const sv_SE: EnTranslations = {
       "warfareBodyStatsStay": "Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster.",
       "warfareTradeBody": "Det är den medvetna avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålenivåerna: ett Krigföringsplagg bär aldrig de stridsvärden en episk fängelsehålepjäs i samma plats gör, och allt det faktiskt ger spenderas på andra spelare. Vill du hålla din egen i arenan, köp den. Vill du klara heroiska snabbare, förtjäna din utrustning i fängelsehålorna.",
       "warfareTradeBodyRatingSpent": "Det är den avsiktliga avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålornas nivåer: ett krigföringsföremål har aldrig de stridsvärden som en episk fängelsehåleutrustning på samma plats har, och krigföringsvärdet och setbonusarna det får i stället används helt mot andra spelare. Vill du hävda dig på arenan, köp den. Vill du klara hjältemodiga fängelsehålor snabbare, förtjäna din utrustning där."
+    },
+    "worldPvpPage": {
+      "heading": "World PvP",
+      "intro": "Open-world player-versus-player is opt-in. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy anywhere in the open world; lower it and, after a short delay, you are a bystander again. Nobody who has not raised the flag can attack or be attacked.",
+      "flagHeading": "Raising and lowering the flag",
+      "flagBody": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing a flagged player who is in a fight raises your own flag.",
+      "stakesHeading": "What a kill is worth",
+      "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "limitsHeading": "Fair play rules",
+      "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
+      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
+      "zonesHeading": "Where world PvP happens",
+      "zonesBody": "The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.",
+      "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
+      "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
+      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "hillHeading": "King of the Hill",
+      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
+      "hillBodyRamp": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "limitsBodyRaids": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid."
     },
     "thornhollowPage": {
       "heading": "Törnhålefälten",
@@ -8188,7 +8289,8 @@ export const sv_SE: EnTranslations = {
       "parryTitle": "Parering",
       "parryBody": "Parering är krigarens eget försvar: en chans att helt avvärja ett närstridsslag och inte ta någon skada, och den växer med Styrka. Bara en attack som kommer framifrån kan pareras, vilket är ännu en anledning att hålla dig vänd mot det som slår dig. Andra klasser ser raden på sitt blad stå på noll.",
       "warfareTitle": "Krigföring",
-      "warfareBody": "Krigföring är den enda statistiken som bara räknas mot andra spelare: den höjer skadan du tillfogar dem och sänker skadan du tar från dem, och ditt blad visar båda halvorna på en rad. Mot varelser gör den ingenting alls. Den kommer från Krigföringsutrustning du köper med Heder, så den är en belöning för att spela PvP snarare än något att jaga medan du stiger i nivå."
+      "warfareBody": "Krigföring är den enda statistiken som bara räknas mot andra spelare: den höjer skadan du tillfogar dem och sänker skadan du tar från dem, och ditt blad visar båda halvorna på en rad. Mot varelser gör den ingenting alls. Den kommer från Krigföringsutrustning du köper med Heder, så den är en belöning för att spela PvP snarare än något att jaga medan du stiger i nivå.",
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Varje strid, uppdrag och steg norrut gör din hjälte starkare. Här är hur nivåökning fungerar och vad som håller dig växande när du väl når toppen.",

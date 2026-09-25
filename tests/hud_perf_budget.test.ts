@@ -737,6 +737,15 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 4 },
     reflowAllow: {},
   },
+  // The King of the Hill bar (hud/hill/) rebuilds its skeleton in ONE innerHTML
+  // write when the STRUCTURAL sig changes (a new hill, a holder or challenger
+  // change, crossing the circle); every per-second value rides the elided
+  // writers. The two setAttribute calls are the build-time role + aria-live.
+  {
+    file: 'hud/hill/hill_bar_painter.ts',
+    allow: { '.innerHTML': 1, '.setAttribute': 2 },
+    reflowAllow: {},
+  },
   // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
   // death or an expiry only (the per-frame update elides on the pure core's
   // reference equality); the setAttribute runs once at mount.

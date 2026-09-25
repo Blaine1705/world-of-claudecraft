@@ -192,6 +192,22 @@ export const vi_VN: EnTranslations = {
       "lfgboard": {
         "label": "Tạo dữ liệu bảng đăng nhóm",
         "description": "Tạo kịch bản đăng nhóm lập sẵn."
+      },
+      "hillwarn": {
+        "label": "Hill countdown",
+        "description": "Announce a hill now; it rises after the full warning."
+      },
+      "hillnow": {
+        "label": "Raise hill now",
+        "description": "Raise a hill at once and stand on it."
+      },
+      "hillrise": {
+        "label": "Skip hill countdown",
+        "description": "Raise the announced hill right away."
+      },
+      "hillend": {
+        "label": "End hill",
+        "description": "Make the current hill fall now."
       }
     }
   },
@@ -2352,13 +2368,72 @@ export const vi_VN: EnTranslations = {
         "battlegroundFirstWin": "chiến thắng Cánh Đồng Trũng Gai đầu tiên hôm nay",
         "battlegroundComplete": "trận Cánh Đồng Trũng Gai đã đấu",
         "battlegroundKill": "hạ gục vinh dự",
-        "battlegroundAssist": "hỗ trợ đòn hạ gục"
+        "battlegroundAssist": "hỗ trợ đòn hạ gục",
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted",
+        "hillHold": "holding the hill"
       },
       "floatReasons": {
         "kill": "Hạ Gục",
         "assist": "Hỗ Trợ",
-        "firstWin": "Chiến Thắng Đầu Tiên"
+        "firstWin": "Chiến Thắng Đầu Tiên",
+        "hill": "Hill"
       }
+    },
+    "worldPvp": {
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusOffFfa": "Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "zoneSanctuary": "Sanctuary: no world PvP here.",
+      "zoneContested": "Contested ground: only flagged players fight here.",
+      "zoneFfa": "Free-for-all ground: everyone here is fair game.",
+      "realmDisabled": "World PvP is disabled on this realm.",
+      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
+      "groundContested": "Everywhere else is contested: only two flagged players can fight.",
+      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
+      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
+      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
+      "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
+      "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
+    },
+    "hill": {
+      "title": "King of the Hill",
+      "rising": "The hill has not risen yet",
+      "heldYou": "Your group holds the hill",
+      "heldOther": "Another group holds the hill",
+      "heldNone": "Nobody holds the hill",
+      "counts": "Inside: you {yours}, holder {theirs}",
+      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
+      "countsHolding": "Inside: you {yours}, rival {theirs}",
+      "contestYou": "Taking the hill: {seconds} of {total}",
+      "contestOther": "Losing the hill: {seconds} of {total}",
+      "contestNone": "Hold a majority inside for {total} to take it",
+      "inside": "You are inside the circle",
+      "distance": "{yards} yd to the circle",
+      "rises": "Rises in {minutes}",
+      "falls": "Falls in {minutes}",
+      "standingRaid": "Raid members do not count: only parties can hold the hill"
     },
     "warfareShop": {
       "gossipOption": "Duyệt Bộ Chiến Tranh",
@@ -2424,7 +2499,8 @@ export const vi_VN: EnTranslations = {
         "hasteRating": "Chỉ số thần tốc từ trang bị và phần thưởng bộ trang bị của bạn, đẩy nhanh các đòn tấn công và việc thi triển phép của bạn. Khoảng 10 điểm chỉ số ban 1% thần tốc.",
         "parry": "Cơ hội để bạn gạt trọn vẹn một đòn cận chiến từ phía trước, không nhận chút sát thương nào. Đòn đánh từ phía sau không thể bị gạt.",
         "hitRating": "Chỉ số trúng đòn từ trang bị và các chỉ số bộ của bạn, giảm tần suất tấn công bị hụt và phép thuật bị kháng, đặc biệt khi đối mặt với kẻ địch cấp cao hơn. Khoảng 10 chỉ số cho 1% trúng đòn.",
-        "warfare": "Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%."
+        "warfare": "Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} Công Kích",
@@ -3504,6 +3580,7 @@ export const vi_VN: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "VắngMặt",
+      "pvpTag": "PvP",
       "cheaterTag": "< Kẻ Gian Lận >",
       "pledgeTag": "Trung Thành Với {guild}",
       "npcRoleTag": "<{role}>",
@@ -6085,6 +6162,7 @@ export const vi_VN: EnTranslations = {
       "talents": "Tài Năng",
       "arena": "Đấu Trường & PvP",
       "thornhollow": "Cánh Đồng Trũng Gai",
+      "worldPvp": "World PvP",
       "deeds": "Sách Kỳ Công",
       "reliquary": "Kỳ Trân Các",
       "glossary": "Thuật Ngữ",
@@ -6633,6 +6711,8 @@ export const vi_VN: EnTranslations = {
       "completed": "Những nhiệm vụ bạn đã nộp trả, theo đúng thứ tự bạn đã hoàn thành chúng.",
       "session": "Những gì bạn đã làm kể từ khi đăng nhập: số lần hạ gục, số lần chết, sát thương và kinh nghiệm.",
       "arena": "Vị thế của bạn tại Đấu Trường Tro Tàn ở cả hai hạng đấu: điểm xếp hạng, số trận thắng, số trận thua và tỷ lệ thắng cho 1v1 và cho 2v2.",
+      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
+      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.",
       "listings": "Những món hàng bạn đang rao bán trên Chợ Thế Giới, cùng giá chào bán, thời gian còn lại của mỗi món, và bạn còn bao nhiêu chỗ trống để rao thêm.",
       "buyback": "Những gì bạn vừa bán cho người bán gần đây và vẫn có thể mua lại.",
       "groupState": "Bạn Đang Ra Sao",
@@ -7386,6 +7466,27 @@ export const vi_VN: EnTranslations = {
       "warfareBodyStatsStay": "Mọi món Chiến Trận đều có Điểm Tấn Công Chiến Trận và Điểm Phòng Thủ Chiến Trận; hai chỉ số này hoàn toàn không tác dụng với quái vật. Chúng chỉ áp dụng khi đánh người chơi khác trong đấu tay đôi, đấu trường hoặc chiến trường: Tấn Công tăng sát thương gây ra, Phòng Thủ giảm sát thương nhận vào, mỗi loại có giới hạn riêng. Mỗi dòng giáp cũng là một bộ; thưởng bộ cũng là điểm Chiến Trận hoặc hiệu ứng chỉ tác dụng với người chơi, nên thưởng của cả bộ Danh Dự không có tác dụng với trùm phó bản. Bản thân các món vẫn có chỉ số thường, giáp và sát thương vũ khí hoạt động ở mọi nơi; chỉ điểm Chiến Trận và thưởng bộ ngừng tác dụng khi đánh quái.",
       "warfareTradeBody": "Đó là sự đánh đổi có chủ ý. Trang bị Chiến Tranh được tạo ra để chiến đấu với người chơi, không phải để làm đường tắt vượt qua các bậc hầm ngục: một món trang bị Chiến Tranh không bao giờ mang chỉ số chiến đấu như một món sử thi hầm ngục cùng ô trang bị, và mọi thứ nó mang lại chỉ dùng được trước người chơi khác. Nếu bạn muốn trụ vững ở đấu trường, hãy mua nó. Nếu bạn muốn dọn heroic nhanh hơn, hãy kiếm trang bị của mình trong các hầm ngục.",
       "warfareTradeBodyRatingSpent": "Đó là sự đánh đổi có chủ đích. Trang bị Chiến Trận dành cho việc đấu với người chơi, không phải đường tắt vượt các bậc phó bản: một món Chiến Trận không có những điểm chỉ số chiến đấu mà món sử thi phó bản cùng ô có; thay vào đó, điểm Chiến Trận và thưởng bộ của nó được dành hoàn toàn cho đối thủ là người chơi. Muốn đứng vững trong đấu trường thì hãy mua. Muốn vượt phó bản anh hùng nhanh hơn thì hãy kiếm trang bị trong phó bản."
+    },
+    "worldPvpPage": {
+      "heading": "World PvP",
+      "intro": "Open-world player-versus-player is opt-in. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy anywhere in the open world; lower it and, after a short delay, you are a bystander again. Nobody who has not raised the flag can attack or be attacked.",
+      "flagHeading": "Raising and lowering the flag",
+      "flagBody": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing a flagged player who is in a fight raises your own flag.",
+      "stakesHeading": "What a kill is worth",
+      "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "limitsHeading": "Fair play rules",
+      "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
+      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
+      "zonesHeading": "Where world PvP happens",
+      "zonesBody": "The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.",
+      "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
+      "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
+      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "hillHeading": "King of the Hill",
+      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
+      "hillBodyRamp": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "limitsBodyRaids": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid."
     },
     "thornhollowPage": {
       "heading": "Cánh Đồng Trũng Gai",
@@ -8188,7 +8289,8 @@ export const vi_VN: EnTranslations = {
       "parryTitle": "Đỡ Đòn",
       "parryBody": "Đỡ Đòn là khả năng phòng thủ riêng của chiến binh: cơ hội gạt hẳn một đòn cận chiến sang bên và không nhận sát thương nào, và nó tăng theo Sức Mạnh. Chỉ đòn tấn công đến từ phía trước mới có thể bị đỡ, đây là một lý do nữa để luôn quay mặt về phía thứ đang đánh bạn. Các lớp nhân vật khác thấy dòng này trên bảng của họ luôn nằm ở mức không.",
       "warfareTitle": "Chiến Tranh",
-      "warfareBody": "Chiến Tranh là chỉ số duy nhất chỉ có tác dụng khi đối đầu người chơi khác: nó tăng sát thương bạn gây cho họ và giảm sát thương bạn nhận từ họ, và bảng nhân vật của bạn hiển thị cả hai nửa đó trên cùng một dòng. Với sinh vật thì nó chẳng có tác dụng gì cả. Nó đến từ trang bị Chiến Tranh bạn mua bằng danh dự, nên đây là phần thưởng cho việc chơi PvP chứ không phải thứ đáng để theo đuổi trong lúc lên cấp."
+      "warfareBody": "Chiến Tranh là chỉ số duy nhất chỉ có tác dụng khi đối đầu người chơi khác: nó tăng sát thương bạn gây cho họ và giảm sát thương bạn nhận từ họ, và bảng nhân vật của bạn hiển thị cả hai nửa đó trên cùng một dòng. Với sinh vật thì nó chẳng có tác dụng gì cả. Nó đến từ trang bị Chiến Tranh bạn mua bằng danh dự, nên đây là phần thưởng cho việc chơi PvP chứ không phải thứ đáng để theo đuổi trong lúc lên cấp.",
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Mỗi trận chiến, nhiệm vụ, và mỗi bước về phương bắc đều khiến anh hùng của bạn mạnh hơn. Đây là cách lên cấp hoạt động và điều gì giúp bạn tiếp tục trưởng thành khi đã lên đến đỉnh.",

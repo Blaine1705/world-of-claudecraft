@@ -177,6 +177,7 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'honor',
   'lifetimeHonor',
   'honorArenaDaily',
+  'worldPvp',
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',

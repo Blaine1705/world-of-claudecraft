@@ -40,6 +40,25 @@ export function pvpFractionsFromRatings(
   };
 }
 
+// WARFARE Vitality: the same Warfare Defense Rating also raises maximum health,
+// so honor gear gives players far more health than players without it (owner
+// rule, 2026-09-24). Six rating grants one percent, capped at +50 percent: a
+// full 11-slot kit alone (182) gives about +30 percent and the seven-piece set
+// (+120) reaches the cap. Unlike Offense and Defense it is not scoped to hostile
+// hits: it applies everywhere EXCEPT PvE instances (dungeons, raids, delves,
+// rift floors), which is where raid-tier gear must stay the stronger choice.
+// The context decision lives in pvp/vitality.ts; entity.ts applies the fraction
+// to maxHp while `Entity.pvpVitalityActive` is not false.
+export const PVP_VITALITY_RATING_PER_PCT = 6;
+export const PVP_VITALITY_CAP = 0.5;
+
+export function pvpVitalityFromRating(defenseRating: number): number {
+  return Math.min(
+    PVP_VITALITY_CAP,
+    Math.max(0, defenseRating) / (PVP_VITALITY_RATING_PER_PCT * 100),
+  );
+}
+
 export function pvpDamageMultiplier(source: Entity, target: Entity): number {
   const offense = Math.min(PVP_OFFENSE_CAP, Math.max(0, source.stats.pvpOffense));
   const defense = Math.min(PVP_DEFENSE_CAP, Math.max(0, target.stats.pvpDefense));

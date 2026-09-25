@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4077,
+    "files": 4085,
     "harvestedFiles": 3948,
     "carried": {
       "tests/action_bar_spectate.test.ts": {
@@ -247,6 +247,33 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           1625
+        ]
+      },
+      "tests/hill.test.ts": {
+        "ms": 6063,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          6063
+        ]
+      },
+      "tests/hill_bar_view.test.ts": {
+        "ms": 27,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          27
+        ]
+      },
+      "tests/hill_rules.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5
         ]
       },
       "tests/hub_dummy_drill.test.ts": {
@@ -1196,6 +1223,51 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           10
+        ]
+      },
+      "tests/world_pvp.test.ts": {
+        "ms": 30440,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          30440
+        ]
+      },
+      "tests/world_pvp_rules.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          21
+        ]
+      },
+      "tests/world_pvp_server_dispatch.test.ts": {
+        "ms": 5886,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5886
+        ]
+      },
+      "tests/world_pvp_view.test.ts": {
+        "ms": 271,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          271
+        ]
+      },
+      "tests/world_pvp_zones.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          7
         ]
       }
     },
@@ -2743,6 +2815,9 @@
   "tests/heroic_soulbound.test.ts": 1654,
   "tests/heroic_vendor.test.ts": 8788,
   "tests/highscore_board.test.ts": 25,
+  "tests/hill.test.ts": 6063,
+  "tests/hill_bar_view.test.ts": 27,
+  "tests/hill_rules.test.ts": 5,
   "tests/hitch_forensics.test.ts": 10,
   "tests/hitch_frame_align_core.test.ts": 10,
   "tests/holder_broadcast.test.ts": 1986,
@@ -5254,6 +5329,11 @@
   "tests/world_grid.test.ts": 199,
   "tests/world_interaction_requests.test.ts": 24,
   "tests/world_population_invariant.test.ts": 43341,
+  "tests/world_pvp.test.ts": 30440,
+  "tests/world_pvp_rules.test.ts": 21,
+  "tests/world_pvp_server_dispatch.test.ts": 5886,
+  "tests/world_pvp_view.test.ts": 271,
+  "tests/world_pvp_zones.test.ts": 7,
   "tests/world_telemetry.test.ts": 5,
   "tests/worn_item_cell_view.test.ts": 7,
   "tests/worn_stone_shader.test.ts": 876,

@@ -120,7 +120,16 @@ export type HonorReason =
   | 'battleground_first_win'
   | 'battleground_complete'
   | 'battleground_kill'
-  | 'battleground_assist';
+  | 'battleground_assist'
+  // World PvP (/pvp flag, src/sim/pvp/world_pvp.ts): the killing blow's share
+  // of the kill pool, and everyone else's who damaged the victim or healed a
+  // damager inside the assist window. Two reasons so the float and the chat
+  // line can name which one just paid, like the battleground drip above.
+  | 'world_kill'
+  | 'world_assist'
+  // King of the Hill (pvp/hill.ts): the once-a-minute trickle to a holder
+  // standing inside the circle.
+  | 'hill_hold';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
@@ -837,6 +846,11 @@ export interface Stats {
   // player-vs-player damage only; PvE never reads them.
   pvpOffense: number;
   pvpDefense: number;
+  // WARFARE Vitality: the maximum-health fraction honor gear grants outside PvE
+  // instances (pvp/power.ts pvpVitalityFromRating). Unlike the two above it is
+  // not scoped to hostile hits; pvp/vitality.ts switches it off in dungeons,
+  // raids, delves and rift floors.
+  pvpVitality: number;
 }
 
 // The six class/item attributes authored in content. WARFARE fractions are
@@ -4160,6 +4174,15 @@ export interface ZoneDef {
   westPassZ?: number;
   zMax: number;
   levelRange: [number, number];
+  /**
+   * World PvP policy of the ground (src/sim/pvp/world_pvp_zones.ts). 'sanctuary':
+   * no world PvP at all, flagged or not. 'ffa': free-for-all, everyone standing
+   * here is fair game with no flag. Absent: contested, the mutual-flag rule.
+   * Owner tuning: the tutorial island and the starter zone are sanctuaries, the
+   * three highest-level zones are free-for-all (tests/world_pvp_zones.test.ts
+   * pins the set; flip one word here to move a zone).
+   */
+  worldPvp?: 'sanctuary' | 'ffa';
   biome: BiomeId;
   hub: { x: number; z: number; radius: number; name: string };
   graveyard: { x: number; z: number };
@@ -5396,6 +5419,20 @@ export interface Entity extends ClientMirroredEntityFields {
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */
   jailed?: boolean;
+  /** World PvP flag (/pvp, src/sim/pvp/world_pvp.ts): two flagged players who
+   *  share no party or raid (a guild is no shield) are mutually hostile in the
+   *  open world (isHostileTo's world arm). The DISPLAY mirror of the
+   *  authoritative PlayerMeta.worldPvp state, written only by that module
+   *  (the away.ts meta<->entity precedent), and it rides the entity wire
+   *  (`pvp`) so every nearby client colours the nameplate. Absent/false is
+   *  unflagged, so an unflagged character samples and serializes exactly as
+   *  before the flag existed. */
+  pvpFlag?: boolean;
+  /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
+   *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
+   *  gear's health bonus never reaches raid content. Absent means the open
+   *  world, where it applies; battlegrounds and arenas apply it too. */
+  pvpVitalityActive?: boolean;
   /** Wearing the operator-applied Cheater tag (src/sim/moderation/). Server-set
    *  via setCheaterMark at join restore and when an operator applies or lifts a
    *  mark; never true offline, never user-settable. Cosmetic: nothing reads it
@@ -8378,6 +8415,7 @@ export interface SimConfig {
   playerName?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
+  worldPvpDisabled?: boolean; // realm kill switch for the /pvp flag (server env WORLD_PVP_DISABLED=1)
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
   // Live server: schedule the first world-boss rise at boot instead of one
   // interval out, so a freshly (re)started realm has Thunzharr up immediately.

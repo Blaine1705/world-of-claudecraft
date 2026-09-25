@@ -50,6 +50,7 @@ export const guideStrings = {
     talents: 'Talents',
     arena: 'Arena & PvP',
     thornhollow: 'Thornhollow Fields',
+    worldPvp: 'World PvP',
     deeds: 'Book of Deeds',
     reliquary: 'The Reliquary',
     glossary: 'Glossary',
@@ -979,6 +980,12 @@ export const guideStrings = {
     session: 'What you have done since you logged in: kills, deaths, damage and experience.',
     arena:
       'Your Ashen Coliseum standing in both brackets: rating, wins, losses and win rate for 1v1 and for 2v2.',
+    pvp: 'World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.',
+    // The zone layer retired the "anywhere" claim above (sanctuaries allow no
+    // world PvP and free-for-all zones need no flag), so this row is its
+    // reworded successor and `pvp` is retired in scripts/i18n_retired_keys.mjs.
+    pvpZones:
+      'World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.',
     listings:
       'Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.',
     buyback: 'What you sold to a vendor recently and could still buy back.',
@@ -2240,6 +2247,51 @@ export const guideStrings = {
   // (docs/design/thornhollow-fields-lore.md). Spoiler-safe: the mode, the field,
   // flags, wave respawns, runes, the ladder; no honor amounts, rating math, or
   // tuning constants.
+  // World PvP (the /pvp flag): concepts only, no honor amounts or tuning
+  // constants (guide spoiler policy); the stakes shape is named, never priced.
+  worldPvpPage: {
+    heading: 'World PvP',
+    intro:
+      'Open-world player-versus-player is opt-in. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy anywhere in the open world; lower it and, after a short delay, you are a bystander again. Nobody who has not raised the flag can attack or be attacked.',
+    flagHeading: 'Raising and lowering the flag',
+    flagBody:
+      'Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing a flagged player who is in a fight raises your own flag.',
+    stakesHeading: 'What a kill is worth',
+    stakesBody:
+      'When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.',
+    limitsHeading: 'Fair play rules',
+    limitsBody:
+      'Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.',
+    // The zone layer (src/sim/pvp/world_pvp_zones.ts, ZoneDef.worldPvp) changed
+    // four of the five paragraphs above from "true" to "true only on contested
+    // ground", so each gained a reworded SUCCESSOR key and the original is
+    // retired in scripts/i18n_retired_keys.mjs rather than edited in place: every
+    // non-Latin overlay already carries a reviewed translation of the old claim,
+    // and rewording an already-translated value never marks it pending again.
+    introZones:
+      'Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.',
+    zonesHeading: 'Where world PvP happens',
+    zonesBody:
+      'The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.',
+    flagBodyAid:
+      'Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.',
+    stakesUnflaggedTake:
+      'Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.',
+    stakesBodyFlagged:
+      'When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.',
+    hillHeading: 'King of the Hill',
+    hillBody:
+      'Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.',
+    limitsBodyHour:
+      'Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.',
+    // Successors (2026-09-25): hillBody said a full hold pays a little under one
+    // battleground win, but the hold now ramps (hill_rules.ts hillHonorPerPayout);
+    // limitsBodyHour gains the raid rule (world_pvp_rules.ts worldPvpGroupEarns).
+    hillBodyRamp:
+      'Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.',
+    limitsBodyRaids:
+      "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid.",
+  },
   thornhollowPage: {
     heading: 'Thornhollow Fields',
     intro:
@@ -3857,10 +3909,16 @@ export const guideStrings = {
     parryBody:
       "Parry is the warrior's own defense: a chance to turn a melee blow aside entirely and take no damage, and it grows with Strength. Only an attack coming at your front can be parried, which is one more reason to keep facing whatever is hitting you. Other classes see the row on their sheet sitting at zero.",
     // Warfare: one player-facing PvP rating, inert against anything that is not a
-    // hostile player. No curve or cap numbers here by design.
+    // hostile player or a hostile player's pet. No curve or cap numbers here by design.
+    // warfareBody is retired (scripts/i18n_retired_keys.mjs): it said Warfare does
+    // nothing against creatures, which stopped being true once pets fight with their
+    // owner's Warfare and honor gear grants health (WARFARE Vitality) outside PvE
+    // instances; warfareBodyPets is its successor.
     warfareTitle: 'Warfare',
     warfareBody:
       'Warfare is the one stat that counts only against other players: it raises the damage you deal to them and lowers the damage you take from them, and your sheet shows both halves on one line. Against creatures it does nothing at all. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling.',
+    warfareBodyPets:
+      'Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling.',
   },
 
   // Leveling and Progression. How experience is earned, the journey across the three

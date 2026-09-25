@@ -22,6 +22,7 @@ import {
 import { LAUNCH_PAPERDOLL_SLOTS } from '../src/sim/launch_paperdoll_slots';
 import { pvpFractionsFromRatings } from '../src/sim/pvp';
 import type { EquipSlot, PlayerClass } from '../src/sim/types';
+import { expectedWarfareStamina } from './helpers/warfare_stamina';
 
 /** The item level the whole WARFARE catalog sits at after the retune. */
 const WARFARE_ILVL = 31;
@@ -230,13 +231,13 @@ const WARFARE_LINES: Record<string, [number, number]> = {
   furyforged_legguards: [8, 10],
   furyforged_gauntlets: [5, 9],
   furyforged_sabatons: [7, 6],
-  stormbound_crown: [11, 6],
-  stormbound_spaulders: [9, 5],
-  stormbound_hauberk: [13, 7],
-  stormbound_waistguard: [9, 5],
-  stormbound_legmail: [11, 7],
-  stormbound_handguards: [9, 5],
-  stormbound_greaves: [10, 5],
+  stormbound_crown: [11, 8],
+  stormbound_spaulders: [9, 7],
+  stormbound_hauberk: [13, 10],
+  stormbound_waistguard: [9, 7],
+  stormbound_legmail: [11, 9],
+  stormbound_handguards: [9, 7],
+  stormbound_greaves: [10, 6],
   ashstalker_cowl: [8, 8],
   ashstalker_shoulderguards: [6, 8],
   ashstalker_harness: [8, 12],
@@ -244,20 +245,20 @@ const WARFARE_LINES: Record<string, [number, number]> = {
   ashstalker_legguards: [8, 10],
   ashstalker_grips: [5, 9],
   ashstalker_treads: [7, 6],
-  cinderweave_cowl: [11, 6],
-  cinderweave_mantle: [9, 5],
-  cinderweave_raiment: [13, 7],
-  cinderweave_cord: [9, 5],
-  cinderweave_legwraps: [11, 7],
-  cinderweave_handwraps: [9, 5],
-  cinderweave_slippers: [10, 5],
-  thornhide_headdress: [11, 6],
-  thornhide_mantle: [9, 5],
-  thornhide_vestment: [13, 7],
-  thornhide_cinch: [9, 5],
-  thornhide_leggings: [11, 7],
-  thornhide_gloves: [9, 5],
-  thornhide_boots: [10, 5],
+  cinderweave_cowl: [11, 8],
+  cinderweave_mantle: [9, 7],
+  cinderweave_raiment: [13, 10],
+  cinderweave_cord: [9, 7],
+  cinderweave_legwraps: [11, 9],
+  cinderweave_handwraps: [9, 7],
+  cinderweave_slippers: [10, 6],
+  thornhide_headdress: [11, 8],
+  thornhide_mantle: [9, 7],
+  thornhide_vestment: [13, 10],
+  thornhide_cinch: [9, 7],
+  thornhide_leggings: [11, 9],
+  thornhide_gloves: [9, 7],
+  thornhide_boots: [10, 6],
   final_oath_medallion: [6, 5],
   razorwind_torque: [6, 5],
   cinder_sigil_pendant: [7, 5],
@@ -269,7 +270,7 @@ const WARFARE_LINES: Record<string, [number, number]> = {
   spellbreakers_seal: [7, 4],
   final_argument_greatblade: [8, 12],
   first_blood_razor: [8, 12],
-  emberglass_warstaff: [13, 7],
+  emberglass_warstaff: [13, 10],
 };
 
 describe('FURY WARFARE item budgets', () => {
@@ -319,7 +320,7 @@ describe('FURY WARFARE item budgets', () => {
       expect(line, `${id} line within the WARFARE fraction`).toBeLessThanOrEqual(fractionTotal);
       expect(line, `${id} carries an offense line`).toBeGreaterThan(0);
       expect([line, model?.sta ?? 0], `${id} line and stamina`).toEqual(WARFARE_LINES[id]);
-      expect(primaryStatSum(item), id).toBe(line + Math.max(impliedSta, floor));
+      expect(primaryStatSum(item), id).toBe(line + expectedWarfareStamina(item, impliedSta, floor));
       // Every piece's WARFARE ratings still mirror its FULL slot budget (drives 18.2%).
       // This pair is deliberately NOT rewritten as a fraction multiplication: the
       // rating fraction is 1.0 and unchanged, so a diff here means it drifted.

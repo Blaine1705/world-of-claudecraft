@@ -689,7 +689,11 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  'e651995fbf1ac8413176d75b35b5da91b9a241918ea183430642a9c6b51d3fd5';
+  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  '100b2f995a9b9310c851d22f6bc8ee71dc14daabe1524cf850ef315fa5d545b4';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

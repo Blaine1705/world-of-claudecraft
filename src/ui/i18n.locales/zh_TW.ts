@@ -1448,6 +1448,52 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorAmount': '{amount} 點榮譽',
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': '榮譽：{amount}',
+  'hudChrome.worldPvp.tab': '世界 PvP',
+  'hudChrome.worldPvp.title': '世界 PvP',
+  'hudChrome.worldPvp.blurb':
+    '升起你的 PvP 旗幟，即可在開放世界的任何地方與其他已開啟旗幟的玩家作戰。擊敗對方即可分得其錢袋的一部分，並獲得用於兌換 PvP 裝備的榮譽。戰場與競技場的收益仍然更高。',
+  'hudChrome.worldPvp.statusOn': '你的 PvP 旗幟已升起。已開啟旗幟的玩家可以攻擊你。',
+  'hudChrome.worldPvp.statusOff': '你的 PvP 旗幟已降下。你在開放世界中無法攻擊他人，也不會被攻擊。',
+  'hudChrome.worldPvp.statusDisarming': '你的旗幟將在 {time} 後降下，或在目前戰鬥結束時降下。',
+  'hudChrome.worldPvp.stakeLine': '敗者支付 {cap} 或錢袋的 {percent}，以較少者為準。',
+  'hudChrome.worldPvp.honorLine': '每次擊殺 {honor} 點榮譽，由所有參與者平分。',
+  'hudChrome.worldPvp.splitLine': '乾淨的 1v1 可獨得全部獎勵；協助者及其治療者共同分享。',
+  'hudChrome.worldPvp.disarmLine': '關閉需要 {minutes} 分鐘，並會等到戰鬥結束。',
+  'hudChrome.worldPvp.groupLine':
+    '隊伍和團隊成員之間永遠不會互相敵對。隊伍之外的公會成員之間可以交戰。',
+  'hudChrome.worldPvp.greyLine': '比你低 {levels} 級以上的玩家不會帶來任何收益。',
+  'hudChrome.worldPvp.record': '戰績：{kills} 次擊殺，{deaths} 次死亡',
+  'hudChrome.worldPvp.enable': '開啟世界 PvP',
+  'hudChrome.worldPvp.disable': '關閉世界 PvP',
+  'hudChrome.worldPvp.keepUp': '保持旗幟',
+  'hudChrome.worldPvp.confirmBody':
+    '其他已開啟旗幟的玩家將可以在任何地方攻擊你，並在獲勝時從你的錢袋中最多拿走 {cap}。你可以再次關閉，但需要 {minutes} 分鐘。',
+  'hudChrome.worldPvp.confirmAccept': '升起旗幟',
+  'hudChrome.worldPvp.confirmCancel': '取消',
+  'hudChrome.worldPvp.levelReq': '需要 {level} 級。',
+  'hudChrome.worldPvp.pending': '正在等待伺服器回傳你的 PvP 狀態。',
+  'hudChrome.worldPvp.commandHint': '聊天：/pvp 切換旗幟，/pvp on 與 /pvp off 直接設定。',
+  'hudChrome.worldPvp.statusOffFfa':
+    '你的 PvP 旗幟已降下，但在自由混戰地帶你仍然可以攻擊他人，也會被攻擊。',
+  'hudChrome.worldPvp.zoneSanctuary': '聖域：此處沒有世界 PvP。',
+  'hudChrome.worldPvp.zoneContested': '爭奪地帶：此處只有已開啟旗幟的玩家才能交戰。',
+  'hudChrome.worldPvp.zoneFfa': '自由混戰地帶：此處的每個人都可以被攻擊。',
+  'hudChrome.worldPvp.realmDisabled': '本伺服器已關閉世界 PvP。',
+  'hudChrome.worldPvp.groundSanctuary': '試煉之濱與東溪谷是聖域：完全沒有世界 PvP。',
+  'hudChrome.worldPvp.groundContested':
+    '其餘各處都是爭奪地帶：只有兩名都已開啟旗幟的玩家才能交戰。',
+  'hudChrome.worldPvp.groundFfa':
+    '龍裔荒原、霜幕之境與琥珀秋境是自由混戰地帶：無論是否開啟旗幟，那裡的每個人都能交戰。',
+  'hudChrome.worldPvp.markLine':
+    '在那裡攻擊未開啟旗幟的玩家會升起你自己的旗幟；攻擊已開啟旗幟的玩家則永遠不會。',
+  'hudChrome.worldPvp.aidLine': '在世界戰鬥中為已開啟旗幟的玩家治療、護盾或增益，會升起你的旗幟。',
+  'hudChrome.worldPvp.noStakeLine': '未開啟旗幟的玩家在自由混戰地帶被擊殺時不會損失金幣。',
+  'hudChrome.worldPvp.noTakeLine':
+    '未開啟旗幟的戰鬥者同樣拿不到金幣：金幣只在兩名開啟旗幟的玩家之間轉移。',
+  'hudChrome.worldPvp.repeatLine':
+    '反覆擊殺同一名玩家，收益為 {second}，隨後為 {third}，之後歸零；計數在首次擊殺後 {reset} 重置。',
+  'hudChrome.warfare.reasons.worldKill': '世界擊殺',
+  'hudChrome.warfare.reasons.worldAssist': '世界擊殺助攻',
   'hudChrome.warfare.honorFloat': '+{amount} 榮譽',
   'hudChrome.warfare.honorFloatReason': '+{amount} 榮譽（{reason}）',
   'hudChrome.warfare.honorGain': '你獲得了 {amount} 點榮譽（{reason}）。',
@@ -1462,9 +1508,27 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': '荊谷原野參戰',
   'hudChrome.warfare.reasons.battlegroundKill': '榮譽擊殺',
   'hudChrome.warfare.reasons.battlegroundAssist': '助攻擊殺',
+  'hudChrome.warfare.reasons.hillHold': '佔據山丘',
   'hudChrome.warfare.floatReasons.kill': '擊殺',
   'hudChrome.warfare.floatReasons.assist': '助攻',
   'hudChrome.warfare.floatReasons.firstWin': '首勝',
+  'hudChrome.warfare.floatReasons.hill': '山丘',
+  'hudChrome.hill.title': '山丘之王',
+  'hudChrome.hill.rising': '山丘尚未升起',
+  'hudChrome.hill.heldYou': '你的隊伍佔據著山丘',
+  'hudChrome.hill.heldOther': '另一支隊伍佔據著山丘',
+  'hudChrome.hill.heldNone': '無人佔據山丘',
+  'hudChrome.hill.counts': '圈內：你方 {yours}，佔據方 {theirs}',
+  'hudChrome.hill.countsUnheld': '圈內：你方 {yours}，最大對手 {theirs}',
+  'hudChrome.hill.countsHolding': '圈內：你方 {yours}，對手 {theirs}',
+  'hudChrome.hill.contestYou': '正在奪取山丘：{total} 中的 {seconds}',
+  'hudChrome.hill.contestOther': '正在失去山丘：{total} 中的 {seconds}',
+  'hudChrome.hill.contestNone': '在圈內保持人數優勢 {total} 即可奪取',
+  'hudChrome.hill.inside': '你在圈內',
+  'hudChrome.hill.distance': '距離圓圈 {yards} 碼',
+  'hudChrome.hill.rises': '{minutes} 後升起',
+  'hudChrome.hill.falls': '{minutes} 後消失',
+  'hudChrome.hill.standingRaid': '團隊成員不計入人數：只有隊伍才能佔據山丘',
   'hudChrome.warfareShop.gossipOption': '瀏覽戰爭套裝',
   'hudChrome.warfareShop.gossipOptionAria': '瀏覽 {name} 提供的戰爭套裝商店',
   'hudChrome.warfareShop.jewelry': '飾品',
@@ -1552,6 +1616,43 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.ruinCourtyard': '廢墟庭院',
   'hudChrome.bg.map.graveyard': '墓地',
   'guide.nav.thornhollow': '荊谷原野',
+  'guide.commandsPage.pvp':
+    '世界 PvP 旗幟：/pvp 切換，/pvp on 與 /pvp off 直接設定。已開啟旗幟的玩家可以在任何地方互相作戰；關閉需要 5 分鐘。',
+  'guide.commandsPage.pvpZones':
+    '世界 PvP 旗幟：/pvp 切換，/pvp on 與 /pvp off 直接設定。已開啟旗幟的玩家可以在爭奪地帶互相作戰，聖域完全不允許世界戰鬥，而自由混戰地帶無論是否開啟旗幟都允許作戰；關閉需要 5 分鐘。',
+  'guide.nav.worldPvp': '世界 PvP',
+  'guide.worldPvpPage.heading': '世界 PvP',
+  'guide.worldPvpPage.intro':
+    '開放世界的玩家對戰需要主動開啟。升起你的 PvP 旗幟後，所有不在你的隊伍、團隊或公會中且同樣開啟了旗幟的玩家都會在開放世界的任何地方成為敵人；降下旗幟後，稍作等待你就會重新成為旁觀者。沒有升起旗幟的人既不能攻擊別人，也不會被攻擊。',
+  'guide.worldPvpPage.flagHeading': '升起與降下旗幟',
+  'guide.worldPvpPage.flagBody':
+    '在聊天中輸入 /pvp，或按 G 開啟 PvP 視窗並使用世界 PvP 分頁，那裡還會顯示你的戰績和賭注。度過起始等級後，升起旗幟是即時的。降下旗幟會開始幾分鐘的倒數，而且在你仍在戰鬥時旗幟不會降下，所以關閉永遠不是逃離你挑起的戰鬥的手段。治療正在戰鬥的已開啟旗幟的玩家會升起你自己的旗幟。',
+  'guide.worldPvpPage.stakesHeading': '一次擊殺的價值',
+  'guide.worldPvpPage.stakesBody':
+    '當已開啟旗幟的玩家擊敗另一名已開啟旗幟的玩家時，敗者會支付錢袋中一小部分金幣（有一個不高的上限），而勝者獲得用於兌換 PvP 裝備的榮譽。所有出過力的人共同分享這兩者：最後一擊者、不久前對目標造成過傷害的人，以及讓這些戰士站穩腳跟的治療者。乾淨的一對一可獨得全部獎勵；團隊則平分。',
+  'guide.worldPvpPage.limitsHeading': '公平規則',
+  'guide.worldPvpPage.limitsBody':
+    '反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，計數會隨每日重置而重置。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。',
+  'guide.worldPvpPage.introZones':
+    '開放世界的玩家對戰需要主動開啟，而你腳下的土地決定了這意味著什麼。升起你的 PvP 旗幟後，所有不在你的隊伍或團隊中且同樣開啟了旗幟的玩家都會在爭奪地帶成為敵人；降下旗幟後，稍作等待你就會重新成為旁觀者。有兩座區域是完全不會發生世界戰鬥的聖域，而最北端的三座區域是自由混戰地帶，無論是否開啟旗幟，身處其中的每個人都可以被攻擊。隊伍和團隊的夥伴在任何地方都不會成為你的敵人；隊伍之外的公會成員與其他人一樣可以被攻擊。',
+  'guide.worldPvpPage.zonesHeading': '世界 PvP 發生在哪裡',
+  'guide.worldPvpPage.zonesBody':
+    '世界上的土地分為三種。試煉之濱與東溪谷是聖域：無論是否開啟旗幟，那裡都完全不會發生世界 PvP，所以新角色絕不會在弄清旗幟是什麼之前就被人挑戰。世界的大部分是爭奪地帶，上面那條旗幟規則就是全部。龍裔荒原、霜幕之境與琥珀秋境是自由混戰地帶：站在其中的每個人都可以攻擊站在其中的其他任何人，無論是否開啟旗幟，而且你跨入時會收到提示，離開時同樣會。在那裡攻擊未開啟旗幟的玩家會升起你自己的旗幟，所以挑起戰鬥的一方始終承擔風險。攻擊已經開啟旗幟的玩家則永遠不會升起你的旗幟，這意味著自衛，或是保護未開啟旗幟的人，都不會讓你付出任何代價。',
+  'guide.worldPvpPage.flagBodyAid':
+    '在聊天中輸入 /pvp，或按 G 開啟 PvP 視窗並使用世界 PvP 分頁，那裡還會顯示你的戰績和賭注。度過起始等級後，升起旗幟是即時的。降下旗幟會開始幾分鐘的倒數，而且在你仍在戰鬥時旗幟不會降下，所以關閉永遠不是逃離你挑起的戰鬥的手段。為正在戰鬥的已開啟旗幟的玩家治療、護盾或增益，同樣會升起你自己的旗幟，所以沒有人能不掛旗幟就在背後支撐一名戰鬥者；而援助未開啟旗幟的玩家不會升起任何旗幟。',
+  'guide.worldPvpPage.stakesBodyFlagged':
+    '當一名已開啟旗幟的玩家被另一名玩家擊敗時，敗者會支付錢袋中一小部分金幣（有一個不高的上限），而勝者獲得用於兌換 PvP 裝備的榮譽。未開啟旗幟的玩家則完全不必支付金幣，即便是在自由混戰區域中倒下也一樣。所有出過力的人共同分享這兩者：最後一擊者、不久前對目標造成過傷害的人，以及讓這些戰士站穩腳跟的治療者。乾淨的一對一可獨得全部獎勵；團隊則平分。',
+  'guide.worldPvpPage.stakesUnflaggedTake':
+    '未開啟旗幟的戰鬥者同樣拿不到金幣：金幣只在兩名開啟旗幟的玩家之間轉移，但所有出過力的人仍能獲得榮譽。',
+  'guide.worldPvpPage.limitsBodyHour':
+    '反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。',
+  'guide.worldPvpPage.hillBodyRamp':
+    '每三小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個自由混戰地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立四十五分鐘，然後消失。圈內站著玩家最多的隊伍爭奪這座山丘，連續保持人數優勢一分鐘後，山丘便歸他們所有；單獨一人算作一支一人隊伍，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得榮譽，同一支隊伍佔據得越久，每分鐘獲得的榮譽就越多。一支滿員隊伍在山丘屹立的全程不受爭奪地佔據它，所獲榮譽約相當於三場戰場勝利。山丘易手時，新的佔據者從頭開始累積。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。',
+  'guide.worldPvpPage.limitsBodyRaids':
+    '反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。團隊無法從世界擊殺中獲得任何收益：團隊成員既得不到榮譽也得不到金幣，也不會減少其他人的份額，所以想獲得報酬就以隊伍身分作戰。',
+  'guide.worldPvpPage.hillHeading': '山丘之王',
+  'guide.worldPvpPage.hillBody':
+    '每三小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個自由混戰地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立四十五分鐘，然後消失。圈內站著玩家最多的隊伍爭奪這座山丘，連續保持人數優勢一分鐘後，山丘便歸他們所有；單獨一人算作一支一人隊伍，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得少量榮譽，因此一支滿員隊伍在山丘屹立的全程不受爭奪地佔據它，所獲榮譽略少於一場戰場勝利。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。',
   'guide.thornhollowPage.heading': '荊谷原野',
   'guide.thornhollowPage.intro':
     '一場排位 5v5 奪旗戰場，戰場位於棘峰之下老林中的圍牆山谷：兩座廢棄要塞沿著峽谷兩端遙遙相對，中間是一座更古老的庭院，誰都不曾真正佔據。每方五人，兩座要塞，一個目標：奪走敵方戰旗並趕在對方之前帶回家。',
@@ -1604,6 +1705,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '提高你法術造成的傷害與治療的強度。每點智力都會提供少量法術強度，此外還有來自裝備與增益的加成。',
   'hudChrome.statInfo.desc.warfare':
     '對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。',
+  'hudChrome.statInfo.desc.warfareWithHealth':
+    '對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。此外，在地城、團隊副本、秘探和裂隙以外的所有地方，最大生命值提高 {health}%。',
   'hudChrome.statInfo.sources.header': '構成：',
   'hudChrome.statInfo.sources.base': '基礎：{value}',
   'hudChrome.statInfo.sources.attributes': '來自屬性：{value}',
@@ -11575,6 +11678,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.level.label': '設定等級',
   'devCommand.actions.lfgboard.description': '建立預組隊公告情境。',
   'devCommand.actions.lfgboard.label': '填入組隊公告板',
+  'devCommand.actions.hillend.description': '讓目前的山丘立即消失。',
+  'devCommand.actions.hillend.label': '結束山丘',
+  'devCommand.actions.hillnow.description': '立即升起一座山丘並站在上面。',
+  'devCommand.actions.hillnow.label': '立即升起山丘',
+  'devCommand.actions.hillrise.description': '讓已通告的山丘立即升起。',
+  'devCommand.actions.hillrise.label': '跳過山丘倒數',
+  'devCommand.actions.hillwarn.description': '立即通告一座山丘；完整的預警結束後它會升起。',
+  'devCommand.actions.hillwarn.label': '山丘倒數',
   'devCommand.actions.lfgqueue.description': '建立地城搜尋器佇列情境。',
   'devCommand.actions.lfgqueue.label': '填入搜尋器佇列',
   'devCommand.actions.lfgraid.description': '建立團隊副本搜尋器情境。',
@@ -14917,6 +15028,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.stats.parryTitle': '招架',
   'guide.stats.warfareBody':
     '戰爭是唯一一項只對其他玩家生效的屬性：它提高你對他們造成的傷害，並降低你從他們身上承受的傷害，而你的角色面板會把這兩半顯示在同一行上。面對生物時，它完全沒有作用。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。',
+  'guide.stats.warfareBodyPets':
+    '戰爭是榮譽裝備為對抗玩家而帶有的屬性。在玩家之間的戰鬥中，它提高你和你的寵物對其他玩家及其寵物造成的傷害，並降低你和你的寵物從他們身上承受的傷害。它還會在地城、團隊副本、秘探和裂隙以外的所有地方提高你的最大生命值，因此穿著榮譽裝備的玩家遠比沒有穿的玩家難以擊殺。你的角色面板會把這一切顯示在同一行上。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。',
   'guide.stats.warfareTitle': '戰爭',
   'guide.talentsPage.loadoutNote':
     '你不必只定下一套配置。在面板中儲存一份具名的配置，它會同時記住天賦的選擇與你的動作列，因此切換到另一套只需要點一下，適用的規則與重置相同：必須脫離戰鬥，且不在競技場對戰之中。',
