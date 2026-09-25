@@ -256,11 +256,14 @@ if (want('b_neck')) {
     }
     return best;
   `);
-  await setClock(B.docked + t - 1);
+  // board once to stream the area in, then again once it has loaded (the
+  // ship sailed on meanwhile), a few seconds short of the neck
+  await setClock(B.docked + t - 4);
   await board(1, Math.PI, 0.45, 26);
   await settle(0, 0);
-  await setClock(B.docked + t - 1);
-  await holdCamera(1, Math.PI, GPU ? 2500 : 6000);
+  await setClock(B.docked + t - 4);
+  await board(1, Math.PI, 0.45, 26);
+  await holdCamera(1, Math.PI, 3500);
   await shot('b_neck');
 }
 
