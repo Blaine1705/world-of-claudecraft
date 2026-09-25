@@ -51,6 +51,7 @@ import {
   WORLD_PVP_KILL_HONOR,
   WORLD_PVP_MIN_LEVEL,
   type WorldPvpZonePolicy,
+  worldPvpGroupEarns,
   worldPvpHitMarksAttacker,
   worldPvpPairExempt,
   worldPvpPairHostile,
@@ -659,6 +660,7 @@ export function worldPvpOnPlayerDeath(
     seen.add(pid);
     const r = playerOf(ctx, pid);
     if (!r || !isWorldPvpHostile(ctx, r.e, victim)) return;
+    if (!worldPvpGroupEarns(ctx.partyOf(pid))) return;
     if (worldPvpVictimIsGrey(r.e.level, victim.level)) return;
     const mult = worldPvpPairMultiplier(worldPvpPairRepeats(ctx, r.meta, victimMeta));
     if (mult <= 0) return;

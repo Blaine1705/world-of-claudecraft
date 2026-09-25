@@ -19,6 +19,8 @@ import {
   HILL_LATEST_WARN_OFFSET_SECONDS,
   HILL_LOST_LINE,
   HILL_RADIUS,
+  HILL_RAMP_MAX_HONOR,
+  HILL_RAMP_STEP_HONOR,
   HILL_TAKEN_LINE,
   HILL_WARNING_SECONDS,
   HILL_WINDOW_SECONDS,
@@ -509,13 +511,15 @@ describe('the Honor trickle', () => {
     expect(honorEvents(seen, a)).toEqual([]);
     seen = tickSeconds(sim, 3);
     expect(honorEvents(seen, a)).toEqual([
-      { type: 'honor', pid: a, amount: 1, reason: 'hill_hold' },
+      { type: 'honor', pid: a, amount: 2, reason: 'hill_hold' },
     ]);
-    expect(sim.meta(a)!.honor).toBe(1);
+    expect(sim.meta(a)!.honor).toBe(2);
     seen = tickSeconds(sim, 4 * HILL_ACCRUAL_SECONDS);
     expect(honorEvents(seen, a)).toHaveLength(4);
-    expect(sim.meta(a)!.honor).toBe(5);
-    expect(sim.hillState.active!.honorPaid).toBe(5);
+    // Minutes one to four pay 2 each; the fifth lands on the first ramp step
+    // (five minutes held) and pays 4 (hillHonorPerPayout).
+    expect(sim.meta(a)!.honor).toBe(12);
+    expect(sim.hillState.active!.honorPaid).toBe(12);
     // Stepping out banks nothing but keeps what was banked, so a holder who
     // steps off the rim to fight does not forfeit the minute they stood.
     tickSeconds(sim, 30);
@@ -555,6 +559,33 @@ describe('the Honor trickle', () => {
     expect(sim.meta(rival)!.honor).toBe(0);
   });
 
+  it('ramps with the hold and restarts at 1 a minute when the hill changes hands', () => {
+    const { sim, pids } = hillWorld(['Aleph', 'Bet', 'Gimel']);
+    const [a, b, c] = pids;
+    inside(sim, a);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
+    // Held past the cap: every minute now pays the capped amount.
+    tickSeconds(sim, 26 * 60);
+    sim.events = [];
+    const seen = tickSeconds(sim, HILL_ACCRUAL_SECONDS + 1);
+    expect(honorEvents(seen, a)).toEqual([
+      { type: 'honor', pid: a, amount: HILL_RAMP_MAX_HONOR, reason: 'hill_hold' },
+    ]);
+    // A two-player party takes it from the lone holder: its first minute pays 1.
+    sim.partyInvite(c, b);
+    sim.partyAccept(c);
+    inside(sim, b, 4, 0);
+    inside(sim, c, -4, 0);
+    tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
+    expect(sim.hillState.active!.holder).toBe(`party:${sim.partyOf(b)!.id}`);
+    expect(sim.hillState.active!.heldSeconds).toBeLessThan(5);
+    sim.events = [];
+    const after = tickSeconds(sim, HILL_ACCRUAL_SECONDS + 1);
+    expect(honorEvents(after, b)).toEqual([
+      { type: 'honor', pid: b, amount: HILL_RAMP_STEP_HONOR, reason: 'hill_hold' },
+    ]);
+  });
+
   it("a capture clears the old holder's banked minute", () => {
     const { sim, pids } = hillWorld(['Aleph', 'Bet', 'Gimel']);
     const [a, b, c] = pids;
@@ -567,7 +598,7 @@ describe('the Honor trickle', () => {
     tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
     expect(sim.hillState.active!.holder).toBe(`party:${sim.partyOf(b)!.id}`);
     expect(sim.hillState.active!.accrual.size).toBeLessThanOrEqual(2);
-    expect(sim.meta(a)!.honor).toBe(1); // the one minute banked before the capture paid
+    expect(sim.meta(a)!.honor).toBe(2); // the one minute banked before the capture paid
   });
 });
 
@@ -761,6 +792,6 @@ describe('determinism', () => {
     };
     const first = run();
     expect(run()).toEqual(first);
-    expect(first.honor).toEqual([1, 0]);
+    expect(first.honor).toEqual([HILL_RAMP_STEP_HONOR, 0]); // one paid minute at the ramp's first step
   });
 });

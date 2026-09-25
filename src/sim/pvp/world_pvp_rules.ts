@@ -106,6 +106,14 @@ export function worldPvpHitMarksAttacker(attacker: Entity, victim: Entity): bool
   return !attacker.pvpFlag && !victim.pvpFlag;
 }
 
+/** Does a contributor in this group earn anything from a world kill? A raid
+ *  never does (owner rule 2026-09-25, the King of the Hill raid rule carried to
+ *  kills): a raid member takes neither honor nor gold and is left out of the
+ *  split, so a zerg pays nobody and never dilutes a party's share. */
+export function worldPvpGroupEarns(party: { raid: boolean } | null): boolean {
+  return !party?.raid;
+}
+
 /** Is the victim grey (too low) to this contributor? Level difference only:
  *  the classic rule keys on the VICTIM being far below, never above. */
 export function worldPvpVictimIsGrey(contributorLevel: number, victimLevel: number): boolean {
