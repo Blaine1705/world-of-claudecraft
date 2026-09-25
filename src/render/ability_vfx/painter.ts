@@ -8,7 +8,7 @@ import {
   WARRIOR_UTILITY_AUDIO,
 } from '../../game/fury_audio_core';
 import { WARRIOR_CONTROL_AUDIO } from '../../game/warrior_control_audio_core';
-import type { SimEvent } from '../../sim/types';
+import { DT, type SimEvent } from '../../sim/types';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { warriorFuryStateKind } from '../warrior_fury_state_core';
 import { warriorPowerIntent, warriorPowerKind } from '../warrior_power_core';
@@ -283,6 +283,7 @@ export interface AbilityVfxEntityState {
 interface AbilityVfxHeldSemanticState {
   castingAbility: string | null;
   castRemaining: number;
+  castTotal: number;
   queuedOnSwing: string | null;
   auraStamps: Map<string, number>;
   serial: number;
@@ -1781,6 +1782,7 @@ export class AbilityVfx {
       held = {
         castingAbility: null,
         castRemaining: 0,
+        castTotal: 0,
         queuedOnSwing: null,
         auraStamps: new Map(),
         serial: 0,
@@ -1793,8 +1795,11 @@ export class AbilityVfx {
     // The cast bar is a cast's first entry point: its verdict, refused or
     // not, is latched for the release, impact and lingers that follow. A
     // queued recast of the same ability follows with no idle frame between,
-    // so a bar that restarts (its remaining time jumps back by more than any
-    // pushback) is a new cast too.
+    // so a bar that restarts is a new cast too. Restart is read on the
+    // ELAPSED time going back: pushback adds the same delay to the remaining
+    // time and the total, however many hits land between two frames, so it
+    // never moves elapsed back; the tolerance of one sim tick absorbs the
+    // wire's rounding of both fields.
     const castSpec =
       renderEffects && e.castingAbility ? abilityVfxSpecFor(e.castingAbility) : undefined;
     const castDrawn =
@@ -1808,7 +1813,7 @@ export class AbilityVfx {
         ),
         this.now(),
         e.castRemaining,
-        !castingWasHeld || e.castRemaining - held.castRemaining > 0.5 * e.castTotal,
+        !castingWasHeld || e.castTotal - e.castRemaining < held.castTotal - held.castRemaining - DT,
       );
     if (gateHeld || !renderEffects) {
       // A culled rig is off screen and drops everything with it (the
@@ -2197,6 +2202,7 @@ export class AbilityVfx {
   private latchHeldState(held: AbilityVfxHeldSemanticState, e: AbilityVfxEntityState): void {
     held.castingAbility = e.castingAbility;
     held.castRemaining = e.castRemaining;
+    held.castTotal = e.castTotal;
     held.queuedOnSwing = e.queuedOnSwing ?? null;
     held.frameSeen = this.semanticFrame;
     held.serial++;

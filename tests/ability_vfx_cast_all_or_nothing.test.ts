@@ -28,6 +28,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async (importOriginal) =>
 import type { AbilityVfxEntityState } from '../src/render/ability_vfx/painter';
 import { CAST_VFX_ENGINE, CAST_VFX_KIT } from '../src/render/cast_vfx_family';
 import { ABILITIES } from '../src/sim/data';
+import { CAST_PUSHBACK_SEC } from '../src/sim/types';
 import { castGateRig } from './helpers/cast_vfx_headless';
 
 const MAGE = 5;
@@ -213,6 +214,51 @@ describe('a queued recast of the same ability', () => {
       rig.step();
     }
     expect(rig.drawn()).toBe(CAST_VFX_ENGINE);
+  });
+});
+
+describe('a pushed-back cast bar', () => {
+  // pushbackCast (src/sim/combat/casting_lifecycle.ts) adds CAST_PUSHBACK_SEC
+  // to both the remaining time and the total, once per hit and uncapped, so
+  // several hits between two painter frames jump the remaining time back by
+  // more than half the cast while the elapsed time stays put.
+  const FRAME = 1 / 60;
+  function pushedBack(seconds: number, hits: number) {
+    const rig = castGateRig();
+    let remaining = seconds;
+    let total = seconds;
+    const frame = () => {
+      rig.painter.syncEntity({
+        id: MAGE,
+        castingAbility: 'fireball',
+        castRemaining: remaining,
+        castTotal: total,
+        auras: [],
+      });
+      rig.step(1, FRAME);
+      remaining -= FRAME;
+    };
+    for (let i = 0; i < 6; i++) frame();
+    rig.prove(CAST_VFX_ENGINE);
+    for (let i = 0; i < 6; i++) frame();
+    // The engine is ready mid-bar: this frame alone would draw a fresh cast.
+    expect(rig.readiness.ready(CAST_VFX_ENGINE)).toBe(true);
+    remaining += hits * CAST_PUSHBACK_SEC;
+    total += hits * CAST_PUSHBACK_SEC;
+    while (remaining > 0) frame();
+    return rig;
+  }
+
+  it('stays the refused cast through several hits in one frame', () => {
+    const rig = pushedBack(1.5, 4);
+    expect(rig.drawn()).toBe(0);
+    expect(rig.readiness.snapshot().refused).toBe(1);
+  });
+
+  it('stays the refused cast through one hit on a short cast', () => {
+    const rig = pushedBack(0.4, 1);
+    expect(rig.drawn()).toBe(0);
+    expect(rig.readiness.snapshot().refused).toBe(1);
   });
 });
 
