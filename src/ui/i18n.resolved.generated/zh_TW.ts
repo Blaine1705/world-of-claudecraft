@@ -5682,7 +5682,9 @@ export const zh_TW: EnTranslations = {
       "listingStatusReturned": "已退回",
       "listingStatusCancelled": "已取消",
       "listingStatusSuspended": "已凍結",
-      "listingStatusUnsold": "未售出"
+      "listingStatusUnsold": "未售出",
+      "charselectWebLink": "在 $WOC 交易所網站上出價、購買或出售",
+      "charselectWebNote": "進入遊戲並選擇角色後才能出價、購買或出售。"
     },
     "lootExplorer": {
       "title": "戰利品瀏覽器",

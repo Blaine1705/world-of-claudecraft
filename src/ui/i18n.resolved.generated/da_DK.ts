@@ -5682,7 +5682,9 @@ export const da_DK: EnTranslations = {
       "listingStatusReturned": "Returneret",
       "listingStatusCancelled": "Annulleret",
       "listingStatusSuspended": "Suspenderet",
-      "listingStatusUnsold": "Usolgt"
+      "listingStatusUnsold": "Usolgt",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Bytteoversigt",

@@ -75,7 +75,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "es_ES": [
     "abilityUi.forms.bearOrCat",
@@ -143,7 +145,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "fr_FR": [
     "abilityUi.forms.bearOrCat",
@@ -211,7 +215,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "fr_CA": [
     "abilityUi.forms.bearOrCat",
@@ -279,7 +285,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "en_CA": [],
   "it_IT": [
@@ -348,7 +356,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "de_DE": [
     "abilityUi.forms.bearOrCat",
@@ -416,7 +426,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "zh_CN": [
     "hudChrome.lootQuality.itemName",
@@ -504,7 +516,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "ru_RU": [
     "hudChrome.lootQuality.itemName",
@@ -577,7 +591,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "nl_NL": [
     "abilityUi.forms.bearOrCat",
@@ -645,7 +661,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "pl_PL": [
     "abilityUi.forms.bearOrCat",
@@ -713,7 +731,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "id_ID": [
     "abilityUi.forms.bearOrCat",
@@ -781,7 +801,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "tr_TR": [
     "abilityUi.forms.bearOrCat",
@@ -849,7 +871,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "sv_SE": [
     "abilityUi.forms.bearOrCat",
@@ -917,7 +941,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "vi_VN": [
     "abilityUi.forms.bearOrCat",
@@ -985,7 +1011,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ],
   "da_DK": [
     "abilityUi.forms.bearOrCat",
@@ -1053,6 +1081,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "hudChrome.wocMarket.charselectWebLink",
+    "hudChrome.wocMarket.charselectWebNote"
   ]
 };

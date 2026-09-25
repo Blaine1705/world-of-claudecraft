@@ -5682,7 +5682,9 @@ export const nl_NL: EnTranslations = {
       "listingStatusReturned": "Geretourneerd",
       "listingStatusCancelled": "Geannuleerd",
       "listingStatusSuspended": "Geschorst",
-      "listingStatusUnsold": "Onverkocht"
+      "listingStatusUnsold": "Onverkocht",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Buitverkenner",

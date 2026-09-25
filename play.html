@@ -1045,6 +1045,9 @@
                 <button type="button" class="btn btn-primary" id="btn-charselect-enter" data-i18n="auth.enterWorld">Enter World</button>
                 <button type="button" class="btn btn-secondary" id="btn-charselect-back" data-i18n="auth.back">Back</button>
                 <button type="button" class="btn btn-primary cs-new-btn" id="btn-new-character" data-i18n="auth.newCharacter">New Character</button>
+                <!-- Read-only $WOC Exchange browsing: no character needed, revealed once
+                     src/game/charselect_woc_market_wiring.ts confirms the platform allows it. -->
+                <button type="button" class="btn btn-secondary" id="btn-charselect-woc-market" data-i18n="hudChrome.wocMarket.launcherLabel" hidden>$WOC Exchange</button>
               </div>
             </div>
             <!-- Right: selected character showcase -->
@@ -1074,6 +1077,10 @@
               </div>
               <div id="charselect-reroll-error" class="auth-error" aria-live="polite"></div>
             </div>
+            <!-- Read-only $WOC Exchange browsing, docked where the news panel sits
+                 (src/ui/charselect_woc_market_panel.ts). Painter-built: hidden by
+                 default, replaces the news panel's spot while open. -->
+            <div id="charselect-woc-market" class="cs-news-panel cs-woc-market-panel" role="region" aria-labelledby="charselect-woc-market-title" hidden></div>
           </div>
         </div>
 

@@ -5682,7 +5682,9 @@ export const en: EnTranslations = {
       "listingStatusReturned": "Returned",
       "listingStatusCancelled": "Cancelled",
       "listingStatusSuspended": "Suspended",
-      "listingStatusUnsold": "Unsold"
+      "listingStatusUnsold": "Unsold",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Loot Explorer",

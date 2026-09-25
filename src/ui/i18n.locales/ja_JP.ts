@@ -10495,6 +10495,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingStatusCancelled': '取り下げ済み',
   'hudChrome.wocMarket.listingStatusSuspended': '停止中',
   'hudChrome.wocMarket.listingStatusUnsold': '未売却',
+  'hudChrome.wocMarket.charselectWebLink': '$WOC 取引所のウェブサイトで入札・購入・出品する',
+  'hudChrome.wocMarket.charselectWebNote':
+    '入札、購入、出品するにはキャラクターでゲームに入ってください。',
   'hudChrome.wocMarket.bidBondPayItemAria': '{item} への入札の保証金 {bond} を支払う',
   'hudChrome.wocMarket.strikesTip':
     '確定した取引の支払いをしなかった場合、そのたびに違反が 1 回記録されます。1 回目以降は、違反のたびに取引所の停止期間が長くなります。3 日、次に 14 日、90 日、そして 1 年です。',

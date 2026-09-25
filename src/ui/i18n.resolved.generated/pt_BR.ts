@@ -5682,7 +5682,9 @@ export const pt_BR: EnTranslations = {
       "listingStatusReturned": "Devolvida",
       "listingStatusCancelled": "Cancelada",
       "listingStatusSuspended": "Suspensa",
-      "listingStatusUnsold": "Não vendida"
+      "listingStatusUnsold": "Não vendida",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Explorador de saques",

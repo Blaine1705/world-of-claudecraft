@@ -5682,7 +5682,9 @@ export const ru_RU: EnTranslations = {
       "listingStatusReturned": "Возвращён",
       "listingStatusCancelled": "Отменён",
       "listingStatusSuspended": "Приостановлен",
-      "listingStatusUnsold": "Не продан"
+      "listingStatusUnsold": "Не продан",
+      "charselectWebLink": "Делайте ставки, покупайте или продавайте на сайте биржи $WOC",
+      "charselectWebNote": "Чтобы делать ставки, покупать или продавать, войдите в игру персонажем."
     },
     "lootExplorer": {
       "title": "Обозреватель добычи",

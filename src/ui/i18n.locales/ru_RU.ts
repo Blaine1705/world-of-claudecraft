@@ -10673,6 +10673,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingStatusCancelled': 'Отменён',
   'hudChrome.wocMarket.listingStatusSuspended': 'Приостановлен',
   'hudChrome.wocMarket.listingStatusUnsold': 'Не продан',
+  'hudChrome.wocMarket.charselectWebLink': 'Делайте ставки, покупайте или продавайте на сайте биржи $WOC',
+  'hudChrome.wocMarket.charselectWebNote': 'Чтобы делать ставки, покупать или продавать, войдите в игру персонажем.',
   'hudChrome.wocMarket.bidBondPayItemAria': 'Оплатить залог {bond} за ставку на {item}',
   'hudChrome.wocMarket.strikesTip':
     'Штраф начисляется каждый раз, когда вы не оплачиваете сделку, на которую согласились. После первого каждый следующий штраф отстраняет вас от биржи на всё больший срок: 3 дня, затем 14, затем 90, затем год.',

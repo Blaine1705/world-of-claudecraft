@@ -5682,7 +5682,9 @@ export const pl_PL: EnTranslations = {
       "listingStatusReturned": "Zwrócone",
       "listingStatusCancelled": "Anulowane",
       "listingStatusSuspended": "Zawieszone",
-      "listingStatusUnsold": "Niesprzedane"
+      "listingStatusUnsold": "Niesprzedane",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Eksplorator łupów",

@@ -9987,6 +9987,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingStatusCancelled': '已取消',
   'hudChrome.wocMarket.listingStatusSuspended': '已凍結',
   'hudChrome.wocMarket.listingStatusUnsold': '未售出',
+  'hudChrome.wocMarket.charselectWebLink': '在 $WOC 交易所網站上出價、購買或出售',
+  'hudChrome.wocMarket.charselectWebNote': '進入遊戲並選擇角色後才能出價、購買或出售。',
   'hudChrome.wocMarket.bidBondPayItemAria': '為你對 {item} 的出價支付 {bond} 保證金',
   'hudChrome.wocMarket.strikesTip':
     '每當你未為已承諾的交易付款，就會記一次違約。首次之外，每次違約都會讓你被交易所暫停更長時間：3 天，然後 14 天、90 天，再然後一年。',

@@ -10457,6 +10457,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingStatusCancelled': '취소됨',
   'hudChrome.wocMarket.listingStatusSuspended': '정지됨',
   'hudChrome.wocMarket.listingStatusUnsold': '유찰',
+  'hudChrome.wocMarket.charselectWebLink': '$WOC 거래소 웹사이트에서 입찰, 구매 또는 판매하기',
+  'hudChrome.wocMarket.charselectWebNote': '입찰, 구매 또는 판매하려면 캐릭터로 게임에 입장하세요.',
   'hudChrome.wocMarket.bidBondPayItemAria': '{item} 입찰의 보증금 {bond} 결제',
   'hudChrome.wocMarket.strikesTip':
     '확정한 거래를 결제하지 않을 때마다 위반이 1회 기록됩니다. 첫 번째 이후로는 위반마다 거래소 이용 정지 기간이 길어집니다. 3일, 그다음 14일, 90일, 그다음 1년입니다.',

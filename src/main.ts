@@ -40,6 +40,7 @@ import {
   updateFollowCameraYaw,
   wrapAngle,
 } from './game/camera_follow';
+import { attachCharselectWocMarket } from './game/charselect_woc_market_wiring';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
@@ -455,6 +456,10 @@ import { resetComposedRows, trackComposedChipRow } from './ui/charselect_compose
 import { charselectHintsHtml, wireCharselectRow } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
+import {
+  type CharselectMarketClient,
+  CharselectWocMarketPanel,
+} from './ui/charselect_woc_market_panel';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { classIconUrl } from './ui/class_icon_art';
@@ -7072,6 +7077,27 @@ const redesignEditor = new CharselectRedesignEditor({
   errorText: userFacingApiError,
 });
 
+// The character-select read-only $WOC Exchange (feature request: check
+// listings without needing a character in the world). Attached once,
+// independent of and before enterWorld's own attachWocMarketExchange, which
+// wires the money-moving hooks a live character requires.
+let charselectMarketClient: CharselectMarketClient | null = null;
+const charselectWocMarket = new CharselectWocMarketPanel({
+  root: () => document.getElementById('charselect-woc-market'),
+  client: () => charselectMarketClient,
+  newsHost: () => document.getElementById('charselect-news'),
+  closeRedesignIfOpen: () => {
+    if (redesignEditor.isOpen) redesignEditor.close(false);
+  },
+});
+void attachCharselectWocMarket({
+  api,
+  attach: (client) => {
+    charselectMarketClient = client;
+    document.getElementById('btn-charselect-woc-market')?.removeAttribute('hidden');
+  },
+}).catch((err) => console.warn('[woc] char-select exchange attach failed', err));
+
 // The char-select roster row's real, in-world appearance for the 3D preview.
 function charselectAppearance(c: CharacterSummary): PreviewAppearance {
   // Every iOS WebKit host streams the Armory weapon-skin GLBs after world
@@ -10160,6 +10186,11 @@ function wireStartScreens(): void {
   document
     .getElementById('btn-reroll-cancel')
     ?.addEventListener('click', () => redesignEditor.close(true));
+  // Read-only $WOC Exchange launcher (hidden until attachCharselectWocMarket
+  // confirms the platform allows it, same gate the real Exchange uses).
+  document.getElementById('btn-charselect-woc-market')?.addEventListener('click', (e) => {
+    charselectWocMarket.open(e.currentTarget as HTMLElement);
+  });
   // Close the realm dropdown on outside click or Escape.
   document.addEventListener('click', (e) => {
     if (!realmDropdownOpen) return;

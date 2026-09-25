@@ -5682,7 +5682,9 @@ export const ko_KR: EnTranslations = {
       "listingStatusReturned": "반환됨",
       "listingStatusCancelled": "취소됨",
       "listingStatusSuspended": "정지됨",
-      "listingStatusUnsold": "유찰"
+      "listingStatusUnsold": "유찰",
+      "charselectWebLink": "$WOC 거래소 웹사이트에서 입찰, 구매 또는 판매하기",
+      "charselectWebNote": "입찰, 구매 또는 판매하려면 캐릭터로 게임에 입장하세요."
     },
     "lootExplorer": {
       "title": "전리품 탐색기",
