@@ -1419,6 +1419,9 @@ export const en_XA: EnTranslations = {
       "separate": "[Šéþáŕáţé {meter}]",
       "regroup": "[Ŕéĝŕóúþ {meter}]"
     },
+    "auraTooltip": {
+      "caster": "[Çášţ ƀý {name}]"
+    },
     "auraTracks": {
       "defensives": "[Ðéƒéñšíʋé Çóóļðóŵñš]",
       "self": "[Ɱý Ɓúƒƒš]",
@@ -1761,6 +1764,7 @@ export const en_XA: EnTranslations = {
       "aurasOnPlayerFrame": "[Ɓúƒƒš óñ ţĥé Þļáýéŕ Ƒŕáɱé]",
       "auraBarBelowFrame": "[Ɓúƒƒš Ɓéļóŵ ţĥé Þļáýéŕ Ƒŕáɱé]",
       "alwaysShowAllBuffs": "[Áļŵáýš Šĥóŵ Áļļ Ɓúƒƒš]",
+      "showAuraCaster": "[Šĥóŵ Áúŕá Çášţéŕ íñ Ţóóļţíþš]",
       "highContrastBackground": "[Ĥíĝĥ-Çóñţŕášţ Ɓáçķĝŕóúñð]",
       "startAttackOnAbility": "[Áúţó-Áţţáçķ óñ Áƀíļíţý Úšé]",
       "stopAutoAttackOnTargetSwitch": "[Šţóþ Áúţó-Áţţáçķ óñ Ţáŕĝéţ Šŵíţçĥ]",
@@ -6324,6 +6328,7 @@ export const en_XA: EnTranslations = {
       "ifAurasOnPlayerFrame": "[Þúţš ýóúŕ ƀúƒƒš áñð ðéƀúƒƒš óñ ýóúŕ óŵñ úñíţ ƒŕáɱé áš ŵéļļ áš ţĥé áúŕá ƀáŕ.]",
       "ifAuraBarBelowFrame": "[Ɱóʋéš ţĥé ƀúƒƒ ŕóŵ ƀéļóŵ ýóúŕ úñíţ ƒŕáɱé íñšţéáð óƒ áƀóʋé íţ. Óñļý ɱáţţéŕš ŵĥíļé ƀúƒƒš áŕé óñ ţĥé þļáýéŕ ƒŕáɱé.]",
       "ifAlwaysShowAllBuffs": "[Šĥóŵš éʋéŕý áçţíʋé ƀúƒƒ éʋéñ óñ ţĥé Ļóŵ ĝŕáþĥíçš þŕéšéţ, ƀýþáššíñĝ íţš úšúáļ ƀúƒƒ-íçóñ çáþ.]",
+      "ifShowAuraCaster": "[Áððš á \"Çášţ ƀý\" ļíñé ţó éʋéŕý ƀúƒƒ/ðéƀúƒƒ ţóóļţíþ, ñáɱíñĝ ŵĥó áþþļíéð íţ. Ĥáñðý ƒóŕ ţéļļíñĝ áþáŕţ šéʋéŕáļ çášţéŕš óƒ ţĥé šáɱé ƀúƒƒ, ļíķé ţŵó þáļáðíñš' Ɓļéššíñĝš.]",
       "ifTargetOfTarget": "[Šĥóŵš ŵĥó ýóúŕ ţáŕĝéţ íš ţáŕĝéţíñĝ, ţĥé çļáššíç ŵáý ţó ţéļļ ŵĥéţĥéŕ ţĥé ţáñķ šţíļļ ĥáš íţ.]",
       "ifPetFrame": "[Šĥóŵš á ƒŕáɱé ƒóŕ ýóúŕ þéţ.]",
       "ifChatFontScale": "[Çĥáţ ţéẋţ šížé.]",

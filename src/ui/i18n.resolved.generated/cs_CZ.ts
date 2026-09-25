@@ -1419,6 +1419,9 @@ export const cs_CZ: EnTranslations = {
       "separate": "Oddělit {meter}",
       "regroup": "Znovu seskupit {meter}"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Obranné cooldowny",
       "self": "Moje bonusy",
@@ -1761,6 +1764,7 @@ export const cs_CZ: EnTranslations = {
       "aurasOnPlayerFrame": "Buffy na rámu hráče",
       "auraBarBelowFrame": "Buffy pod rámem hráče",
       "alwaysShowAllBuffs": "Vždy zobrazit všechny buffy",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Vysoce kontrastní pozadí",
       "startAttackOnAbility": "Automatický útok při použití schopnosti",
       "stopAutoAttackOnTargetSwitch": "Zastavit automatický útok při přepnutí cíle",
@@ -6324,6 +6328,7 @@ export const cs_CZ: EnTranslations = {
       "ifAurasOnPlayerFrame": "Přidá tvé buffy a debuffy i na rám hráče, nejen na lištu aur.",
       "ifAuraBarBelowFrame": "Přesune řadu buffů pod rám jednotky místo nad něj. Má význam jen tehdy, když jsou buffy na rámu hráče.",
       "ifAlwaysShowAllBuffs": "Zobrazuje všechna aktivní posílení i při nízkém nastavení grafiky a obchází obvyklý limit ikon posílení.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Zobrazí, na koho míří tvůj cíl, klasický způsob, jak poznat, jestli ho tank ještě drží.",
       "ifPetFrame": "Zobrazí rám pro tvého mazlíčka.",
       "ifChatFontScale": "Velikost textu chatu.",

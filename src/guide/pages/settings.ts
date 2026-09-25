@@ -388,6 +388,10 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
         body: 'guide.settingsPage.ifAlwaysShowAllBuffs',
       },
       {
+        setting: 'hudChrome.options.showAuraCaster',
+        body: 'guide.settingsPage.ifShowAuraCaster',
+      },
+      {
         setting: 'hudChrome.options.showTargetOfTarget',
         body: 'guide.settingsPage.ifTargetOfTarget',
       },

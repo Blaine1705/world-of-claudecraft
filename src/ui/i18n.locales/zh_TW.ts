@@ -1033,6 +1033,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.targetFrameScale': '目標框縮放',
   'hudChrome.options.aurasOnPlayerFrame': '增益顯示在玩家框',
   'hudChrome.options.alwaysShowAllBuffs': '始終顯示所有增益',
+  'hudChrome.options.showAuraCaster': '在提示中顯示光環施放者',
+  'hudChrome.auraTooltip.caster': '施放者：{name}',
   'hud.core.mapCanvasLabel': '地圖',
   'hud.core.mapSummary': '{zone}的地圖。',
   'hud.core.mapMarkerDescription': '{area}。{markers}',
@@ -14657,6 +14659,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '除了光環列之外，也把你的增益與減益顯示在你自己的單位框上。',
   'guide.settingsPage.ifAlwaysShowAllBuffs':
     '即使在低畫質預設下也顯示所有生效中的增益，繞過該檔位平時的增益圖示上限。',
+  'guide.settingsPage.ifShowAuraCaster':
+    '在每個增益／減益提示中加上一行「施放者」，說明是誰施加的。便於分辨多名騎士的祝福等同名增益。',
   'guide.settingsPage.ifChatFontScale': '聊天文字大小。',
   'guide.settingsPage.ifChatIntro': '聊天視窗讀起來的樣子。重設聊天視窗本身的按鈕也在這裡。',
   'guide.settingsPage.ifChatOpacity': '聊天背景有多不透明。',

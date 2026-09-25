@@ -166,7 +166,8 @@ import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
 import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime';
 import type { AuraOverlayController } from './aura_overlay_controller';
 import { auraOverlaySettingsHooks, createAuraOverlayController } from './aura_overlay_wiring';
-import { renderAuraTooltipBodyHtml } from './aura_tooltip';
+import type { AuraTooltipFooterDeps } from './aura_tooltip';
+import { auraTooltipFooterHtml, renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import {
   type AurasDeps,
@@ -4939,19 +4940,18 @@ export class Hud {
     // the un-prioritized layout instead of misattributing another caster's dot.
     isOwn: (a) => isOwnAura(a, this.sim.playerId),
   };
+  // Tooltip footer (countdown + optional "See who buffs" caster line, feature
+  // request): composed in aura_tooltip.ts over the target-aura window's resolver.
+  private readonly auraTooltipFooterDeps: AuraTooltipFooterDeps = {
+    secondsRemainingText: (s) => esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(s))),
+    showCaster: () => this.boolSetting('showAuraCaster'),
+    caster: (id) => targetAuraSourceName(id, (e) => this.sim.entities.get(e), entityDisplayName),
+    casterLineText: (name) => esc(t('hudChrome.auraTooltip.caster', { name })),
+  };
   private readonly aurasPainterDeps: AurasPainterDeps = {
     resolveIconUrl: resolveHudAuraIconUrl,
-    // A MODE aura (form, stance, stealth, Ghost Wolf, the carried flag) prints NO
-    // seconds-remaining line. The sim backs each with a long finite duration
-    // (3600s, or a whole match) purely so nothing can expire it; surfacing that
-    // number is the same lie the suppressed countdown label already avoids, and
-    // on the carried flag it would read as "the flag leaves me in 12 minutes".
-    renderTooltip: (name, remaining, effectHtml, toggle) =>
-      `<div class="tt-title">${esc(name)}</div>${effectHtml}${
-        toggle
-          ? ''
-          : `<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`
-      }`,
+    renderTooltip: (name, remaining, effectHtml, toggle, sourceId) =>
+      `<div class="tt-title">${esc(name)}</div>${effectHtml}${auraTooltipFooterHtml(toggle, remaining, sourceId, this.auraTooltipFooterDeps)}`,
     attachTooltip: (el, html) => this.attachTooltip(el, html),
   };
   // Player auras split across two rows (classic layout): buffs in #buff-bar, debuffs in

@@ -1419,6 +1419,9 @@ export const nl_NL: EnTranslations = {
       "separate": "{meter} loskoppelen",
       "regroup": "{meter} weer samenvoegen"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Defensieve afkoeltijden",
       "self": "Mijn versterkingen",
@@ -1761,6 +1764,7 @@ export const nl_NL: EnTranslations = {
       "aurasOnPlayerFrame": "Buffs op het spelerframe",
       "auraBarBelowFrame": "Buffs onder het spelerframe",
       "alwaysShowAllBuffs": "Altijd Alle Buffs Tonen",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Hoog-contrastachtergrond",
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
       "stopAutoAttackOnTargetSwitch": "Auto-Aanval Stoppen bij Doelwitwissel",
@@ -6324,6 +6328,7 @@ export const nl_NL: EnTranslations = {
       "ifAurasOnPlayerFrame": "Zet je buffs en debuffs ook op je eigen spelerframe, naast de aurabalk.",
       "ifAuraBarBelowFrame": "Verplaatst de buffrij onder je eenheidsframe in plaats van erboven. Heeft alleen effect zolang buffs op het spelerframe staan.",
       "ifAlwaysShowAllBuffs": "Toont elke actieve buff, zelfs met de preset Lage graphics, en omzeilt de gebruikelijke limiet voor buffpictogrammen.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Toont wie het doelwit van jouw doelwit is, de klassieke manier om te zien of de tank het nog vasthoudt.",
       "ifPetFrame": "Toont een frame voor je huisdier.",
       "ifChatFontScale": "Tekstgrootte van de chat.",

@@ -1064,6 +1064,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.targetFrameScale': 'Размер рамки цели',
   'hudChrome.options.aurasOnPlayerFrame': 'Баффы у рамки игрока',
   'hudChrome.options.alwaysShowAllBuffs': 'Всегда показывать все баффы',
+  'hudChrome.options.showAuraCaster': 'Показывать применившего эффект в подсказке',
+  'hudChrome.auraTooltip.caster': 'Применил: {name}',
   'hud.core.mapCanvasLabel': 'Карта',
   'hud.core.mapSummary': 'Карта зоны {zone}.',
   'hud.core.mapMarkerDescription': '{area}. {markers}',
@@ -15594,6 +15596,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Показывает ваши усиления и ослабления не только на панели аур, но и на вашей собственной рамке персонажа.',
   'guide.settingsPage.ifAlwaysShowAllBuffs':
     'Показывает все активные баффы даже на низком графическом пресете, обходя его обычное ограничение на количество значков баффов.',
+  'guide.settingsPage.ifShowAuraCaster':
+    'Добавляет строку "Применил" в подсказку каждого баффа/дебаффа с именем того, кто его наложил. Удобно, чтобы отличить одинаковые баффы от разных персонажей, например благословения нескольких паладинов.',
   'guide.settingsPage.ifChatFontScale': 'Размер текста в чате.',
   'guide.settingsPage.ifChatIntro': 'Как читается окно чата. Здесь же лежит сброс самих окон чата.',
   'guide.settingsPage.ifChatOpacity': 'Насколько плотный фон у чата.',

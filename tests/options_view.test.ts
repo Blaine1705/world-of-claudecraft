@@ -835,6 +835,7 @@ const FRAMES_KEYS = [
   'aurasOnPlayerFrame',
   'auraBarBelowFrame',
   'alwaysShowAllBuffs',
+  'showAuraCaster',
   'showTargetOfTarget',
   'showTargetSwingTimer',
   'showPetFrame',

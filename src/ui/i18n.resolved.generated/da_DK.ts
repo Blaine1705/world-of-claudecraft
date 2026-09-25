@@ -1419,6 +1419,9 @@ export const da_DK: EnTranslations = {
       "separate": "Adskil {meter}",
       "regroup": "Saml {meter} igen"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Defensive nedkølinger",
       "self": "Mine styrkelser",
@@ -1761,6 +1764,7 @@ export const da_DK: EnTranslations = {
       "aurasOnPlayerFrame": "Buffs på spillerrammen",
       "auraBarBelowFrame": "Buffs under spillerrammen",
       "alwaysShowAllBuffs": "Vis altid alle forstærkninger",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Baggrund med høj kontrast",
       "startAttackOnAbility": "Autoangreb ved brug af evne",
       "stopAutoAttackOnTargetSwitch": "Stop autoangreb ved målskift",
@@ -6324,6 +6328,7 @@ export const da_DK: EnTranslations = {
       "ifAurasOnPlayerFrame": "Sætter dine styrkelser og svækkelser på din egen spillerramme, ud over aurabjælken.",
       "ifAuraBarBelowFrame": "Flytter buffrækken under din enhedsramme i stedet for over den. Betyder kun noget, når buffs vises på spillerrammen.",
       "ifAlwaysShowAllBuffs": "Viser alle aktive forstærkninger, selv med grafikindstillingen Lav, og omgår den normale grænse for forstærkningsikoner.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Viser, hvem dit måls mål er, den klassiske måde at se, om tanken stadig har fat i det.",
       "ifPetFrame": "Viser en ramme til dit kæledyr.",
       "ifChatFontScale": "Chattekststørrelse.",

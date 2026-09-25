@@ -1419,6 +1419,9 @@ export const en: EnTranslations = {
       "separate": "Separate {meter}",
       "regroup": "Regroup {meter}"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Defensive Cooldowns",
       "self": "My Buffs",
@@ -1761,6 +1764,7 @@ export const en: EnTranslations = {
       "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "auraBarBelowFrame": "Buffs Below the Player Frame",
       "alwaysShowAllBuffs": "Always Show All Buffs",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "High-Contrast Background",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
       "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
@@ -6324,6 +6328,7 @@ export const en: EnTranslations = {
       "ifAurasOnPlayerFrame": "Puts your buffs and debuffs on your own unit frame as well as the aura bar.",
       "ifAuraBarBelowFrame": "Moves the buff row below your unit frame instead of above it. Only matters while buffs are on the player frame.",
       "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Shows who your target is targeting, the classic way to tell whether the tank still has it.",
       "ifPetFrame": "Shows a frame for your pet.",
       "ifChatFontScale": "Chat text size.",

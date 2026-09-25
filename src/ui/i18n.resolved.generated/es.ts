@@ -1419,6 +1419,9 @@ export const es: EnTranslations = {
       "separate": "Separar {meter}",
       "regroup": "Reagrupar {meter}"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Enfriamientos defensivos",
       "self": "Mis beneficios",
@@ -1761,6 +1764,7 @@ export const es: EnTranslations = {
       "aurasOnPlayerFrame": "Beneficios en el marco del jugador",
       "auraBarBelowFrame": "Beneficios debajo del marco del jugador",
       "alwaysShowAllBuffs": "Mostrar siempre todos los beneficios",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Fondo de alto contraste",
       "startAttackOnAbility": "Ataque automático al usar habilidad",
       "stopAutoAttackOnTargetSwitch": "Detener ataque automático al cambiar de objetivo",
@@ -6324,6 +6328,7 @@ export const es: EnTranslations = {
       "ifAurasOnPlayerFrame": "Muestra tus beneficios y perjuicios en tu propio marco de unidad, además de en la barra de auras.",
       "ifAuraBarBelowFrame": "Mueve la fila de beneficios debajo de tu marco de unidad en vez de encima. Solo importa mientras los beneficios estén en el marco del jugador.",
       "ifAlwaysShowAllBuffs": "Muestra todos los beneficios activos incluso con el preajuste gráfico Bajo, ignorando su límite habitual de iconos de beneficios.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Muestra a quién tiene como objetivo tu objetivo, la forma clásica de saber si el tanque todavía lo controla.",
       "ifPetFrame": "Muestra un marco para tu mascota.",
       "ifChatFontScale": "Tamaño del texto del chat.",

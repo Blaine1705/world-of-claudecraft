@@ -1419,6 +1419,9 @@ export const id_ID: EnTranslations = {
       "separate": "Pisahkan {meter}",
       "regroup": "Gabungkan kembali {meter}"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Cooldown Pertahanan",
       "self": "Buff-ku",
@@ -1761,6 +1764,7 @@ export const id_ID: EnTranslations = {
       "aurasOnPlayerFrame": "Buff pada Bingkai Pemain",
       "auraBarBelowFrame": "Buff di bawah Bingkai Pemain",
       "alwaysShowAllBuffs": "Selalu Tampilkan Semua Buff",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Latar Kontras Tinggi",
       "startAttackOnAbility": "Serangan Otomatis Saat Memakai Kemampuan",
       "stopAutoAttackOnTargetSwitch": "Hentikan Serangan Otomatis Saat Ganti Target",
@@ -6324,6 +6328,7 @@ export const id_ID: EnTranslations = {
       "ifAurasOnPlayerFrame": "Menampilkan buff dan debuff Anda pada bingkai unit Anda sendiri selain di bilah aura.",
       "ifAuraBarBelowFrame": "Memindahkan baris buff ke bawah bingkai unitmu alih-alih di atasnya. Hanya berpengaruh saat buff ditampilkan pada bingkai pemain.",
       "ifAlwaysShowAllBuffs": "Menampilkan setiap buff aktif bahkan pada preset grafis Rendah, melewati batas ikon buff yang biasanya berlaku.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Menampilkan siapa yang sedang disasar oleh sasaran Anda, cara klasik untuk mengetahui apakah tank masih memegangnya.",
       "ifPetFrame": "Menampilkan bingkai untuk peliharaan Anda.",
       "ifChatFontScale": "Ukuran teks obrolan.",

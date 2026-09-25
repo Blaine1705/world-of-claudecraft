@@ -1419,6 +1419,9 @@ export const fr_CA: EnTranslations = {
       "separate": "Séparer {meter}",
       "regroup": "Regrouper {meter}"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Temps de recharge défensifs",
       "self": "Mes buffs",
@@ -1761,6 +1764,7 @@ export const fr_CA: EnTranslations = {
       "aurasOnPlayerFrame": "Améliorations sur le cadre du joueur",
       "auraBarBelowFrame": "Améliorations sous le cadre du joueur",
       "alwaysShowAllBuffs": "Toujours afficher toutes les améliorations",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Arrière-plan à contraste élevé",
       "startAttackOnAbility": "Attaque auto à l'utilisation d'une compétence",
       "stopAutoAttackOnTargetSwitch": "Arrêter l'attaque auto au changement de cible",
@@ -6324,6 +6328,7 @@ export const fr_CA: EnTranslations = {
       "ifAurasOnPlayerFrame": "Affiche vos améliorations et vos affaiblissements sur votre propre cadre, en plus de la barre d'auras.",
       "ifAuraBarBelowFrame": "Déplace la rangée des améliorations sous votre cadre d'unité au lieu de la placer au-dessus. Cela n'a d'effet que lorsque les améliorations sont affichées sur le cadre du joueur.",
       "ifAlwaysShowAllBuffs": "Affiche tous les buffs actifs, même avec le préréglage graphique Faible, en contournant sa limite habituelle d’icônes de buffs.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Affiche qui votre cible cible elle-même, la méthode classique pour vérifier si le tank a toujours l'aggro.",
       "ifPetFrame": "Affiche un cadre pour votre familier.",
       "ifChatFontScale": "Taille du texte de discussion.",

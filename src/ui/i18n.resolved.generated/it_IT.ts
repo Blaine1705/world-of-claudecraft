@@ -1419,6 +1419,9 @@ export const it_IT: EnTranslations = {
       "separate": "Separa {meter}",
       "regroup": "Raggruppa {meter}"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Ricariche difensive",
       "self": "I miei benefici",
@@ -1761,6 +1764,7 @@ export const it_IT: EnTranslations = {
       "aurasOnPlayerFrame": "Buff sul riquadro del giocatore",
       "auraBarBelowFrame": "Buff sotto il riquadro del giocatore",
       "alwaysShowAllBuffs": "Mostra sempre tutti i potenziamenti",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Sfondo a contrasto elevato",
       "startAttackOnAbility": "Attacco automatico all'uso dell'abilita",
       "stopAutoAttackOnTargetSwitch": "Ferma l'Attacco Automatico al Cambio Bersaglio",
@@ -6324,6 +6328,7 @@ export const it_IT: EnTranslations = {
       "ifAurasOnPlayerFrame": "Mette i tuoi buff e debuff sul tuo riquadro del giocatore oltre che sulla barra delle aure.",
       "ifAuraBarBelowFrame": "Sposta la riga dei buff sotto il tuo riquadro unità invece che sopra. Conta solo quando i buff sono sul riquadro del giocatore.",
       "ifAlwaysShowAllBuffs": "Mostra ogni potenziamento attivo anche con il profilo grafico Basso, ignorando il normale limite di icone dei potenziamenti.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Mostra chi sta bersagliando il tuo bersaglio, il modo classico per capire se il tank ha ancora la minaccia.",
       "ifPetFrame": "Mostra un riquadro per il tuo famiglio.",
       "ifChatFontScale": "Dimensione del testo della chat.",

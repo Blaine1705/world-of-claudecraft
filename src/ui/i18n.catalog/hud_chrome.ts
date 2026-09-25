@@ -1635,6 +1635,12 @@ export const hudChromeStrings = {
     separate: 'Separate {meter}',
     regroup: 'Regroup {meter}',
   },
+  // The optional "who applied this" tooltip line (showAuraCaster setting), shared
+  // by the buff bar, debuff bar, and target strip so all three read identically.
+  // Wordy (M16): the five non-Latin fills land in this same change.
+  auraTooltip: {
+    caster: 'Cast by {name}',
+  },
   // The six aura tracks (src/ui/hud/aura_tracks/): bars of the auras YOU have
   // out, one frame per question. All wordy (M16): the five non-Latin fills land
   // in this same change.
@@ -2223,6 +2229,11 @@ export const hudChromeStrings = {
     // every active buff always renders, at the cap's per-frame cost (wordy,
     // M16: the five non-Latin fills land in this same change).
     alwaysShowAllBuffs: 'Always Show All Buffs',
+    // Interface panel toggle: append a "Cast by <name>" line to every buff/debuff
+    // tooltip, so several casters' copies of the same aura (two paladins'
+    // Blessings, two druids' Briarguards) are told apart at a glance. Off by
+    // default (wordy, M16: the five non-Latin fills land in this same change).
+    showAuraCaster: 'Show Aura Caster in Tooltips',
     highContrastBackground: 'High-Contrast Background',
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).

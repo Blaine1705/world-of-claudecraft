@@ -583,6 +583,8 @@ export const guideStrings = {
       'Moves the buff row below your unit frame instead of above it. Only matters while buffs are on the player frame.',
     ifAlwaysShowAllBuffs:
       'Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.',
+    ifShowAuraCaster:
+      'Adds a "Cast by" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins\' Blessings.',
     ifTargetOfTarget:
       'Shows who your target is targeting, the classic way to tell whether the tank still has it.',
     ifPetFrame: 'Shows a frame for your pet.',

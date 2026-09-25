@@ -1062,6 +1062,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.targetFrameScale': '대상 프레임 크기',
   'hudChrome.options.aurasOnPlayerFrame': '버프를 플레이어 프레임에 표시',
   'hudChrome.options.alwaysShowAllBuffs': '모든 버프를 항상 표시',
+  'hudChrome.options.showAuraCaster': '툴팁에 효과 시전자 표시',
+  'hudChrome.auraTooltip.caster': '시전자: {name}',
   'hud.core.mapCanvasLabel': '지도',
   'hud.core.mapSummary': '{zone}의 지도.',
   'hud.core.mapMarkerDescription': '{area}. {markers}',
@@ -15355,6 +15357,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '내 강화 효과와 약화 효과를 오라 막대뿐 아니라 내 유닛 프레임에도 표시합니다.',
   'guide.settingsPage.ifAlwaysShowAllBuffs':
     '낮음 그래픽 설정에서도 평소의 버프 아이콘 상한을 무시하고 활성화된 모든 버프를 표시합니다.',
+  'guide.settingsPage.ifShowAuraCaster':
+    '모든 버프/디버프 툴팁에 "시전자" 줄을 추가하여 누가 걸었는지 표시합니다. 여러 성기사의 축복처럼 같은 버프를 건 사람을 구분할 때 유용합니다.',
   'guide.settingsPage.ifChatFontScale': '채팅 글자 크기입니다.',
   'guide.settingsPage.ifChatIntro':
     '채팅 창이 어떻게 읽히는지를 다룹니다. 채팅 창 자체를 처음 상태로 되돌리는 초기화도 여기에 있습니다.',

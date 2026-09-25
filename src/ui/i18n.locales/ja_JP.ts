@@ -1067,6 +1067,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.targetFrameScale': 'ターゲットフレームの大きさ',
   'hudChrome.options.aurasOnPlayerFrame': 'バフをプレイヤーフレームに表示',
   'hudChrome.options.alwaysShowAllBuffs': 'すべてのバフを常に表示',
+  'hudChrome.options.showAuraCaster': 'ツールチップに効果の使用者を表示',
+  'hudChrome.auraTooltip.caster': '使用者：{name}',
   'hud.core.mapCanvasLabel': 'マップ',
   'hud.core.mapSummary': '{zone}のマップ。',
   'hud.core.mapMarkerDescription': '{area}。{markers}',
@@ -15385,6 +15387,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自分のバフとデバフを、オーラバーだけでなく自分のユニットフレームにも表示します。',
   'guide.settingsPage.ifAlwaysShowAllBuffs':
     '低画質プリセットでも、通常のバフアイコンの上限を無視してすべてのバフを常に表示します。',
+  'guide.settingsPage.ifShowAuraCaster':
+    'すべてのバフ／デバフのツールチップに「使用者」の行を追加し、誰がかけたかを表示します。複数のパラディンのブレッシングなど、同じバフの使用者を見分けるのに便利です。',
   'guide.settingsPage.ifChatFontScale': 'チャットの文字サイズです。',
   'guide.settingsPage.ifChatIntro':
     'チャットウィンドウの読みやすさに関する設定です。チャットウィンドウそのものをリセットする項目もここにあります。',

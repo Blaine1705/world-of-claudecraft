@@ -1004,6 +1004,7 @@ export function buildInterfaceControls(
         disabled: !s.bool('aurasOnPlayerFrame'),
       }),
       boolToggle(s, 'alwaysShowAllBuffs', 'hudChrome.options.alwaysShowAllBuffs'),
+      boolToggle(s, 'showAuraCaster', 'hudChrome.options.showAuraCaster'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
       boolToggle(s, 'showTargetSwingTimer', 'hudChrome.options.showTargetSwingTimer'),
       boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),

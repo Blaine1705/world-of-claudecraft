@@ -1419,6 +1419,9 @@ export const de_DE: EnTranslations = {
       "separate": "{meter} trennen",
       "regroup": "{meter} wieder eingliedern"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Defensive Abklingzeiten",
       "self": "Meine Stärkungen",
@@ -1761,6 +1764,7 @@ export const de_DE: EnTranslations = {
       "aurasOnPlayerFrame": "Stärkungszauber am Spielerfenster",
       "auraBarBelowFrame": "Stärkungszauber unter dem Spielerfenster",
       "alwaysShowAllBuffs": "Immer alle Stärkungszauber anzeigen",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
       "stopAutoAttackOnTargetSwitch": "Automatischen Angriff bei Zielwechsel stoppen",
@@ -6324,6 +6328,7 @@ export const de_DE: EnTranslations = {
       "ifAurasOnPlayerFrame": "Zeigt Ihre Stärkungs- und Schwächungseffekte zusätzlich zur Auren-Leiste auch auf Ihrem eigenen Spielerfenster.",
       "ifAuraBarBelowFrame": "Verschiebt die Stärkungszauberleiste unter dein Einheitenfenster statt darüber. Wirkt nur, solange Stärkungszauber am Spielerfenster angezeigt werden.",
       "ifAlwaysShowAllBuffs": "Zeigt jeden aktiven Stärkungseffekt auch bei der Grafikeinstellung Niedrig an und umgeht das übliche Limit für Stärkungssymbole.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Zeigt, wen Ihr Ziel anvisiert, die klassische Art zu erkennen, ob der Tank es noch hält.",
       "ifPetFrame": "Zeigt ein Fenster für Ihren Begleiter.",
       "ifChatFontScale": "Die Textgröße des Chats.",

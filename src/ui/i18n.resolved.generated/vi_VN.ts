@@ -1419,6 +1419,9 @@ export const vi_VN: EnTranslations = {
       "separate": "Tách {meter}",
       "regroup": "Ghép lại {meter}"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Hồi chiêu phòng thủ",
       "self": "Buff của tôi",
@@ -1761,6 +1764,7 @@ export const vi_VN: EnTranslations = {
       "aurasOnPlayerFrame": "Hiệu Ứng Có Lợi Trên Khung Người Chơi",
       "auraBarBelowFrame": "Hiệu Ứng Có Lợi Bên Dưới Khung Người Chơi",
       "alwaysShowAllBuffs": "Luôn Hiện Mọi Buff",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
       "stopAutoAttackOnTargetSwitch": "Dừng Tự Đánh Khi Đổi Mục Tiêu",
@@ -6324,6 +6328,7 @@ export const vi_VN: EnTranslations = {
       "ifAurasOnPlayerFrame": "Hiện buff và debuff của bạn trên khung nhân vật của chính bạn, bên cạnh thanh hiệu ứng.",
       "ifAuraBarBelowFrame": "Di chuyển hàng hiệu ứng có lợi xuống dưới khung đơn vị của bạn thay vì phía trên. Chỉ có tác dụng khi hiệu ứng có lợi đang nằm trên khung người chơi.",
       "ifAlwaysShowAllBuffs": "Hiển thị mọi buff đang hoạt động ngay cả ở cấu hình đồ họa Thấp, bỏ qua giới hạn biểu tượng buff thông thường.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Hiện mục tiêu của mục tiêu bạn đang nhắm, cách cổ điển để biết liệu tank có còn giữ được nó hay không.",
       "ifPetFrame": "Hiện một khung cho thú cưng của bạn.",
       "ifChatFontScale": "Cỡ chữ trò chuyện.",

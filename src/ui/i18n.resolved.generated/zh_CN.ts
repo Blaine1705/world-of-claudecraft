@@ -1419,6 +1419,9 @@ export const zh_CN: EnTranslations = {
       "separate": "分离{meter}",
       "regroup": "合并{meter}"
     },
+    "auraTooltip": {
+      "caster": "施放者：{name}"
+    },
     "auraTracks": {
       "defensives": "防御性冷却",
       "self": "我的增益",
@@ -1761,6 +1764,7 @@ export const zh_CN: EnTranslations = {
       "aurasOnPlayerFrame": "增益显示在玩家框",
       "auraBarBelowFrame": "增益显示在玩家框下方",
       "alwaysShowAllBuffs": "始终显示所有增益",
+      "showAuraCaster": "在提示中显示光环施放者",
       "highContrastBackground": "高对比度背景",
       "startAttackOnAbility": "使用技能时自动攻击",
       "stopAutoAttackOnTargetSwitch": "切换目标时停止自动攻击",
@@ -6324,6 +6328,7 @@ export const zh_CN: EnTranslations = {
       "ifAurasOnPlayerFrame": "除了光环条之外，也把你的增益和减益显示在你自己的单位框体上。",
       "ifAuraBarBelowFrame": "把增益条移到你的单位框体下方，而不是上方。只有在增益显示于玩家框时才有效。",
       "ifAlwaysShowAllBuffs": "即使在低画质预设下也显示所有生效中的增益，绕过该档位平时的增益图标上限。",
+      "ifShowAuraCaster": "在每个增益 / 减益提示中加上一行“施放者”，说明是谁施加的。便于分辨多名骑士的祝福等同名增益。",
       "ifTargetOfTarget": "显示你的目标正在攻击谁，这是判断坦克有没有拉住的经典办法。",
       "ifPetFrame": "为你的宠物显示一个框体。",
       "ifChatFontScale": "聊天文字的大小。",
