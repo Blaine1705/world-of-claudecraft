@@ -11,13 +11,16 @@
 // at all once a full cycle has run from where the player stands.
 
 /** Yards around the player's lattice point the probe looks for water. */
-export const WATER_APPROACH_RADIUS = 48;
+export const WATER_APPROACH_RADIUS = 60;
 /** Lattice pitch (yards). Water holding a disc of radius pitch / sqrt(2)
  *  anywhere in the probed disc covers at least one lattice point; the
  *  smallest authored lake's footprint is wider than that. */
 export const WATER_APPROACH_PITCH = 12;
-/** Waterline reads one call may take: the per-frame cost bound. */
-export const WATER_APPROACH_READS_PER_CALL = 3;
+/** Waterline reads one call may take: the per-frame cost bound. It must let a
+ *  full cycle of the disc finish before the fastest mover crosses one lattice
+ *  cell at a low frame rate: a slower cycle lets the moving disc skip the same
+ *  world point cycle after cycle, so a pond can go unseen until reached. */
+export const WATER_APPROACH_READS_PER_CALL = 5;
 
 /** The sim's waterline read (`waterLevelAt`): -Infinity off water. */
 export type WaterLevelAt = (x: number, z: number, seed: number) => number;
