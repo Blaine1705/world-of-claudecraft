@@ -71,8 +71,9 @@ const EXCLUDED: Record<string, string> = {
   'goblin_rocket_sled_fx.ts':
     'A mount look, not a cast: the shared plume pair is built with the Goblin Rocket Sled rig ' +
     'in syncMountVisual (mount_lifecycle.ts), before gateMountSwapOnCompile lists the rig, so ' +
-    'the mount gate links it at the first sighting while the rig is still hidden. A boot twin ' +
-    'would link it for every session, sled or not.',
+    'the mount gate links it at the first sighting while the rig is still hidden, for owners and ' +
+    'observers alike. A boot twin, or a plume on the owned-mount prewarm rig ' +
+    '(mount_prewarm.ts), was declined: the gate only delays a cosmetic.',
   'frost_ice_fields.ts':
     'Zone scenery, not a cast: prepareFrostIceParts() fills the cache while buildFrostIceFields ' +
     'assembles the Frostveil spire group, which frost_sky.ts adds to the zone scene, so the zone ' +
