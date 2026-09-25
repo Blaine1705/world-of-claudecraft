@@ -194,6 +194,17 @@ describe('the scene cast-VFX gate over three', () => {
     expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
   });
 
+  it('links the engine family first, then the other pools, then the stand-ins', () => {
+    const bespoke = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial());
+    bespoke.userData.renderCategory = 'vfx';
+    const ring = vfxMesh('ring', new THREE.MeshBasicMaterial({ transparent: true }));
+    const { scene, host, webgl } = harness([]);
+    scene.add(bespoke, ring);
+    const standIns = new THREE.Group();
+    const units = castVfxProgramUnits(scene, standIns, host, webgl, () => Promise.resolve());
+    expect(units.map((unit) => unit.roots?.[0])).toEqual([ring, bespoke, standIns]);
+  });
+
   it('answers with the PROGRAM the record proved, not with the material', () => {
     // The record answers per program while the gate asks per material, so a
     // boolean would be an answer about a program that can already be gone.

@@ -10,10 +10,12 @@
 // player acts on and only a frustum-culled rig may drop it. The other
 // actionable reads are elsewhere: the rig's windup clip, the terrain-draped
 // area ring, the cast bar, the nameplate and the HUD debuffs, with the
-// deadline below bounding the whole window. The band's overlay program is one
-// of the gated set, so drawing it through the closed gate may link that one
-// program cold once (the trade the area ring makes too); its unit then settles
-// as a hit and records it like the rest.
+// deadline below bounding the whole window. The band's overlay program and the
+// ring's link and are proved in their own deadline-exempt boot entry, ahead of
+// the cast pools (castVfxFirstReadsEntry, cast_vfx_prewarm.ts), so drawing
+// them through the closed gate is no cold link once it ran; a boot that
+// reaches it past the hard deadline resumes it as program debt ahead of the
+// cast pools'.
 // The SHELL is the one of those four worth deciding out loud, because "this
 // target has an absorb up" IS a read a player acts on: it stays in the sleep
 // because the HUD carries the same information whole and unheld. The target

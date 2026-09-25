@@ -753,6 +753,11 @@ export class Vfx {
     if (atlas instanceof THREE.Texture) atlas.dispose();
   }
 
+  /** The particle cloud, which the boot links ahead of the cast pools. */
+  cloudDrawable(): THREE.Points {
+    return this.points;
+  }
+
   onContextRestored(): void {
     if (this.disposed) return;
     this.cloudWarmed = false;

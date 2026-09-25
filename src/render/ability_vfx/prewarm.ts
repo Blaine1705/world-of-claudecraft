@@ -111,15 +111,15 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
  *  back the cached WebGLProgram, so no link). Only objects that carry the
  *  renderCategory tag themselves are pooled VFX; a spirit holder group has
  *  no material and so no program of its own. `accept` narrows the walk to
- *  one family. */
+ *  one family, and `seen` carries the programs an earlier walk already took. */
 function pooledPrograms(
   root: THREE.Object3D,
   accept: (object: THREE.Object3D) => boolean = () => true,
+  seen: Set<string> = new Set(),
 ): Array<{
   object: THREE.Object3D;
   materials: THREE.Material[];
 }> {
-  const seen = new Set<string>();
   const found: Array<{ object: THREE.Object3D; materials: THREE.Material[] }> = [];
   root.traverse((child) => {
     if (child.userData?.renderCategory !== 'vfx' || !accept(child)) return;
@@ -156,9 +156,15 @@ export function abilityVfxEngineMaterials(root: THREE.Object3D): THREE.Material[
 }
 
 /** One compile target per distinct pooled program: the unit only needs SOME
- *  object drawing that program. */
+ *  object drawing that program. The engine family comes first, the programs
+ *  the cast gate waits on, and an engine drawable represents a program it
+ *  shares with any other pool, so the unit and the gate entry name the same
+ *  object. */
 export function collectAbilityVfxCompileTargets(root: THREE.Object3D): AbilityVfxCompileTarget[] {
-  return pooledPrograms(root).map((entry, index) => ({
+  const seen = new Set<string>();
+  const engine = pooledPrograms(root, inCastVfxEngine, seen);
+  const rest = pooledPrograms(root, (object) => !inCastVfxEngine(object), seen);
+  return [...engine, ...rest].map((entry, index) => ({
     id: `${entry.object.name || entry.object.type}:${index}`,
     object: entry.object,
   }));

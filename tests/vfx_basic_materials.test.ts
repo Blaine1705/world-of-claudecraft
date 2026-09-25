@@ -78,17 +78,24 @@ describe('the generic basic stand-ins', () => {
     expect(compiled).toEqual(['cast-vfx-basic:bubble-beam', 'cast-vfx-basic:corpse-beacon']);
   });
 
-  it('links the staged lazy stand-ins first, as one unit, once they exist', () => {
+  it('links the staged lazy stand-ins last, as one unit, once they exist', () => {
+    // They never hold a cast, so the pooled programs the gate waits on go first.
     const scene = new THREE.Scene();
+    scene.add(buildCastVfxBasicStandIns());
     const standIns = new THREE.Group();
     standIns.name = 'ability-material-prewarm';
     const compiled: string[] = [];
     const units = castVfxProgramUnits(scene, standIns, noArms, unprovedPrograms, async (root) => {
       compiled.push(root.name);
     });
-    expect(units.map((unit) => unit.id)).toEqual(['ability-materials:compile']);
-    expect(units[0]?.roots).toEqual([standIns]);
+    expect(units.map((unit) => unit.id).at(-1)).toBe('ability-materials:compile');
+    expect(units).toHaveLength(3);
+    expect(units.at(-1)?.roots).toEqual([standIns]);
     for (const unit of units) unit.run();
-    expect(compiled).toEqual(['ability-material-prewarm']);
+    expect(compiled).toEqual([
+      'cast-vfx-basic:bubble-beam',
+      'cast-vfx-basic:corpse-beacon',
+      'ability-material-prewarm',
+    ]);
   });
 });

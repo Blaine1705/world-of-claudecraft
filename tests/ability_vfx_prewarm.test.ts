@@ -187,6 +187,23 @@ describe('collectAbilityVfxCompileTargets', () => {
     );
   });
 
+  it('puts the engine family first, and lets an engine draw represent a shared program', () => {
+    // The resume lane is serial in unit order, so the programs the cast gate
+    // waits on must not queue behind a class pool walked ahead of them.
+    const scene = new THREE.Scene();
+    const shared = new THREE.MeshBasicMaterial({ transparent: true });
+    const bespokeTwin = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shared.clone());
+    bespokeTwin.name = 'bespoke-twin';
+    bespokeTwin.userData.renderCategory = 'vfx';
+    const bespoke = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial());
+    bespoke.name = 'bespoke';
+    bespoke.userData.renderCategory = 'vfx';
+    scene.add(bespokeTwin, bespoke, vfxMesh('ring', shared));
+    const targets = collectAbilityVfxCompileTargets(scene);
+    expect(targets.map((target) => target.object.name)).toEqual(['ring', 'bespoke']);
+    expect(abilityVfxEngineMaterials(scene)).toEqual([shared]);
+  });
+
   it('ignores everything that is not a tagged VFX mesh', () => {
     const scene = new THREE.Scene();
     const holder = new THREE.Group();
@@ -247,10 +264,11 @@ describe('the renderer wires the units into the prewarm resume lane', () => {
     const units = entry.slice(unitsStart, programsStart);
     expect(units).toContain('abilityVfxTexturePrewarmSteps()');
     expect(units).toContain('this.prewarmTexture(texture)');
-    // The program links are the debt arm (cast_vfx_prewarm.ts): the lazy
-    // stand-ins' stage + link, then one unit per pooled program.
+    // The program links are the debt arm (cast_vfx_prewarm.ts): one unit per
+    // pooled program, the engine family first, then the lazy stand-ins'
+    // stage + link, which never hold a cast.
     expect(entry.slice(programsStart)).toContain(
-      'resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],',
+      'resumeProgramUnits: () => [...castVfxUnits(), ...abilityMaterialSlot.resumeUnits()],',
     );
     expect(renderer).toContain(
       'castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);',

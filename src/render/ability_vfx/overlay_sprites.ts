@@ -119,6 +119,11 @@ export class OverlaySprites {
     scene.add(this.points);
   }
 
+  /** The one drawable, which the boot links ahead of the rest of the pools. */
+  get drawable(): THREE.Points {
+    return this.points;
+  }
+
   setViewportScale(value: number): void {
     ((this.points.material as THREE.ShaderMaterial).uniforms.uScale as { value: number }).value =
       value;

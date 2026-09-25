@@ -23,6 +23,7 @@ import { type CastVfxReadiness, createCastVfxReadiness } from './cast_vfx_readin
 import { type CompileArmHost, linkColorPrograms } from './compile_arms';
 import { isProgramKnownReady, markProgramsReadyUnder } from './linked_program_readiness';
 import type { LinkedProgramLike } from './linked_program_touch';
+import type { PrewarmManifestEntry } from './prewarm_entry';
 import type { PrewarmResumeUnit } from './prewarm_resume';
 import { REVEAL_GATE_WATCHDOG_MS } from './reveal_gate';
 
@@ -32,35 +33,86 @@ export interface LinkedProgramSource {
   properties: { get(material: THREE.Material): unknown };
 }
 
-/** One link unit per distinct pooled program, plus one for the staged lazy
- *  stand-ins (null before their stage). Each unit names its root, so the
- *  resume lane warms it through the worker ahead of the link (a hit where
- *  the worker is on, an announced link for the audit everywhere), links it
- *  through the colour arm (the canvas variant: the pools draw in the world
- *  pass), and records its root's programs as linked once that compile
- *  settled: the settle is the proof the gate opens on. `compile` is the
- *  test seam. */
-export function castVfxProgramUnits(
-  scene: THREE.Object3D,
-  standIns: THREE.Object3D | null,
-  host: CompileArmHost,
+type CompileRoot = (root: THREE.Object3D) => Promise<void>;
+
+const colourArm =
+  (host: CompileArmHost): CompileRoot =>
+  (root) =>
+    linkColorPrograms(host, root, false);
+
+/** One unit linking `root` through the colour arm (the canvas variant: the
+ *  pools draw in the world pass), which records its root's programs as linked
+ *  once that compile settled: the settle is the proof the gate opens on. The
+ *  unit names its root, so the resume lane warms it through the worker ahead
+ *  of the link (a hit where the worker is on, an announced link for the audit
+ *  everywhere). */
+function linkUnit(
+  id: string,
+  root: THREE.Object3D,
   webgl: LinkedProgramSource,
-  compile: (root: THREE.Object3D) => Promise<void> = (root) => linkColorPrograms(host, root, false),
-): PrewarmResumeUnit[] {
-  const unit = (id: string, root: THREE.Object3D): PrewarmResumeUnit => ({
+  compile: CompileRoot,
+): PrewarmResumeUnit {
+  return {
     id,
     roots: [root],
     run: () =>
       compile(root).then(() => {
         markProgramsReadyUnder(webgl.properties, root);
       }),
-  });
-  const units: PrewarmResumeUnit[] = [];
-  if (standIns) units.push(unit('ability-materials:compile', standIns));
-  for (const target of collectAbilityVfxCompileTargets(scene)) {
-    units.push(unit(`program:${target.id}`, target.object));
-  }
+  };
+}
+
+/** One link unit per distinct pooled program, the engine family's first
+ *  (the programs the gate waits on), then one for the staged lazy stand-ins
+ *  (null before their stage), which never hold a cast. `compile` is the test
+ *  seam. */
+export function castVfxProgramUnits(
+  scene: THREE.Object3D,
+  standIns: THREE.Object3D | null,
+  host: CompileArmHost,
+  webgl: LinkedProgramSource,
+  compile: CompileRoot = colourArm(host),
+): PrewarmResumeUnit[] {
+  const units = collectAbilityVfxCompileTargets(scene).map((target) =>
+    linkUnit(`program:${target.id}`, target.object, webgl, compile),
+  );
+  if (standIns) units.push(linkUnit('ability-materials:compile', standIns, webgl, compile));
   return units;
+}
+
+export const CAST_VFX_FIRST_READS_ENTRY_ID = 'vfx.cast-first-reads';
+
+/** The boot entry for the reads a player acts on that draw through a closed
+ *  cast gate (the hard-CC band's overlay cloud, the terrain-draped area ring),
+ *  plus the Vfx particle cloud: it draws from the first frame, but only a
+ *  settle proves its program to the gate. Deadline-exempt and placed before
+ *  vfx.ability-primitives, so these link and are PROVED behind the curtain
+ *  instead of linking cold on the first stun or area cast after it. Exempt is
+ *  not never dropped: an entry that starts past the manifest's hard deadline
+ *  is deferred all the same (prewarmEntryShouldDefer), and its units then
+ *  resume as `programs.` debt ahead of the ability primitives'. */
+export function castVfxFirstReadsEntry(
+  roots: readonly (THREE.Object3D | null | undefined)[],
+  host: CompileArmHost,
+  webgl: LinkedProgramSource,
+  compile: CompileRoot = colourArm(host),
+): PrewarmManifestEntry {
+  const units = (): PrewarmResumeUnit[] =>
+    roots.flatMap((root, index) =>
+      root ? [linkUnit(`first-read:${root.name || root.type}:${index}`, root, webgl, compile)] : [],
+    );
+  return {
+    id: CAST_VFX_FIRST_READS_ENTRY_ID,
+    category: 'vfx',
+    priority: 61.75,
+    required: false,
+    deadlineExempt: true,
+    resumeProgramUnits: units,
+    run: async () => {
+      await Promise.all(units().map((unit) => unit.run()));
+    },
+    detail: () => `roots=${units().length}`,
+  };
 }
 
 /** How long the cast gate may hold before it opens whatever its programs say.

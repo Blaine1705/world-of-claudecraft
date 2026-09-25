@@ -823,6 +823,13 @@ GPU work signs. Each rule names its seam and its guard.
   terrain-draped area ring and a mob's windup clip on the cast path, and on the
   per-frame path the hard-CC band (stun, fear, root), re-held right after the
   sleep that releases the held entity's cosmetic pools (`tests/ability_vfx_cast_gate.test.ts`).
+  Because those two draw through a closed gate, their programs (the band's
+  overlay cloud, the ring) link and are proved in their own deadline-exempt
+  boot entry, `vfx.cast-first-reads` (`castVfxFirstReadsEntry`), with the Vfx
+  particle cloud, ahead of `vfx.ability-primitives`; dropped past the hard
+  deadline or skipped on the minimal manifest, it resumes as program debt ahead
+  of the primitives, whose units run engine family first
+  (`tests/cast_vfx_first_reads.test.ts`).
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
   `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, `touch-unproven` (programs a

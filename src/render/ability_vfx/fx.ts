@@ -706,6 +706,12 @@ export class AbilityVfxFx implements SequencerHost {
     this.spirits = new SpiritApparitions(scene, groundY);
   }
 
+  /** The overlay cloud the hard-CC band draws into, drawn through a closed
+   *  cast gate: the boot links and proves it first (cast_vfx_prewarm.ts). */
+  ccBandDrawable(): THREE.Object3D {
+    return this.overlay.drawable;
+  }
+
   // Kick the async GLB loads for every spirit model a sighted player's class
   // can conjure (painter.syncEntity calls this on first sighting), so the
   // model is warm before its first cast - an unwarmed cast skips its spirit.

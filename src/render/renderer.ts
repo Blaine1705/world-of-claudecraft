@@ -112,7 +112,11 @@ import {
 import { CameraImpact, fiestaShakeX, fiestaShakeY } from './camera_impact_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
-import { castVfxProgramUnits, createSceneCastVfxReadiness } from './cast_vfx_prewarm';
+import {
+  castVfxFirstReadsEntry,
+  castVfxProgramUnits,
+  createSceneCastVfxReadiness,
+} from './cast_vfx_prewarm';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
 import {
@@ -6434,15 +6438,20 @@ export class Renderer {
           ),
         texture: (texture) => this.prewarmTexture(texture),
       }),
+      castVfxFirstReadsEntry(
+        [this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()],
+        this.compileArms,
+        this.webgl,
+      ),
       {
         // The cast VFX (cast_vfx_prewarm.ts): stage the lazy stand-ins, link
         // every cast program through the compile arms; the spawn only binds
         // textures for the walk (no frame draws it, so it links nothing:
         // measured 2026-08-28). Dropped by the 3 s budget on the OpenGL
         // desktops: the programs resume as debt right after the compile
-        // remainder, the textures stay cosmetic, and the painter draws no
-        // cast until every program is linked. resumeUnits never replays the
-        // spawn: live, it would pop a white burst at the player's feet.
+        // remainder, engine family first, the textures stay cosmetic, and the
+        // painter draws no cast until the engine is linked. resumeUnits never
+        // replays the spawn: live, it would pop a white burst at the player's feet.
         id: 'vfx.ability-primitives',
         category: 'vfx',
         priority: 62,
@@ -6454,7 +6463,7 @@ export class Renderer {
               for (const texture of step.build()) this.prewarmTexture(texture);
             },
           })),
-        resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],
+        resumeProgramUnits: () => [...castVfxUnits(), ...abilityMaterialSlot.resumeUnits()],
         run: async () => {
           this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
           abilityMaterialSlot.run();

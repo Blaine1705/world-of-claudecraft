@@ -1384,7 +1384,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the cast gate's engine family: the renderer leaf drops the lazy stand-ins from the gate. No capture was retaken.
-  '7ab471d0da3a980366221cb35a0cbafd31b18838afe287fcc4bce438633542a1';
+  // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
+  '9d9fd2be877dd51f80528b68999927dfc10580bf885700d5c5c140672b6b3b26';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1397,7 +1398,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the cast gate's engine family: the renderer leaf drops the lazy stand-ins from the gate. No capture was retaken.
-  '4035951d8e02222ea551d6706fdd99894f4dcee15e118fa920e7e41b4a192cb9';
+  // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
+  'ef14bdd610a41e41f07cc68fb99e9a6c79ce657a1c913f523409f5be4d6a0d82';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2776,7 +2778,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // cast gate engine family: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('b520ee627e0a6974ef8784292f3d1ff5ce11f9a982373af55a36d287a1100f4e');
+      // cast first-reads boot entry: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+    ).toBe('b629a92159367e619a6735acdc94e6ca857a31a916ca31415661f7d4411c3fb2');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

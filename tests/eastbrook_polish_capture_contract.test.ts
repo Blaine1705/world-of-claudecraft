@@ -690,7 +690,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the cast gate's engine family: the renderer leaf drops the lazy stand-ins from the gate. No capture was retaken.
-  '4035951d8e02222ea551d6706fdd99894f4dcee15e118fa920e7e41b4a192cb9';
+  // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
+  'ef14bdd610a41e41f07cc68fb99e9a6c79ce657a1c913f523409f5be4d6a0d82';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

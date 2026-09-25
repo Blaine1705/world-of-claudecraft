@@ -318,7 +318,7 @@ describe('the manifest wiring (source pins)', () => {
     const entryStart = renderer.lastIndexOf('      {', start);
     const entry = renderer.slice(entryStart, renderer.indexOf('\n      {', start));
     expect(entry).toContain('abilityMaterialSlot.run();');
-    expect(entry).toContain('...abilityMaterialSlot.resumeUnits(),');
+    expect(entry).toContain('...abilityMaterialSlot.resumeUnits()]');
   });
 
   it('is a staged compile group, so the boot compile lane links it', () => {
