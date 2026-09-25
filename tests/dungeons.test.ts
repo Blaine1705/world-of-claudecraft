@@ -209,6 +209,40 @@ describe('dungeons: door-trigger entry/exit', () => {
     }
   });
 
+  // Predefined gate/portal direction (feature request): leaving a dungeon
+  // door used to leave the player facing whatever way they last walked
+  // inside the instance (e.g. deeper in, away from the exit) instead of a
+  // predictable outward direction. leaveDungeon now points the player away
+  // from the door along its own authored leaveOffset (detachFromDungeon),
+  // the same vector that already places the drop point, so every door's
+  // exit facing agrees with its real-world orientation without a second
+  // authored field.
+  it('sets a predefined facing on exit, derived from the door, never the last interior facing', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Leaver');
+    const player = sim.entities.get(pid) as AnyEntity;
+
+    // hollow_crypt has no authored leaveOffset: the default south drop
+    // (0, -DUNGEON_DOOR_RETURN_INSET) faces the player back at Math.PI.
+    expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
+    player.facing = 0.6; // an arbitrary interior facing, unrelated to the door
+    player.prevFacing = 0.6;
+    expect(leaveDungeon(sim.ctx, pid)).toBe(true);
+    expect(player.facing).toBeCloseTo(Math.PI, 10);
+    expect(player.prevFacing).toBeCloseTo(Math.PI, 10);
+
+    // the_last_keep's facade drops the player forward (-x) onto the
+    // terrace: leaveOffset { x: -3.5, z: 0 } faces sideways, -Math.PI / 2,
+    // proving the facing tracks the door's own authored offset rather than
+    // a single hardcoded direction.
+    expect(enterDungeon(sim.ctx, 'the_last_keep', pid, true)).toBe(true);
+    player.facing = -2.9;
+    player.prevFacing = -2.9;
+    expect(leaveDungeon(sim.ctx, pid)).toBe(true);
+    expect(player.facing).toBeCloseTo(-Math.PI / 2, 10);
+    expect(player.prevFacing).toBeCloseTo(-Math.PI / 2, 10);
+  });
+
   // Bug repro: jumping into a dungeon door mid-air (the reported "jump into the
   // outer entrance" crypt repro) carries the overworld jump's airborne state
   // across the teleport. Every other sim teleport (portals.ts, sim.ts charge/

@@ -859,6 +859,11 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   settleTeleportArrival(p);
+  // Predefined exit facing (door.facing, derived from the authored leaveOffset):
+  // without this the player keeps whatever facing they walked the interior exit
+  // portal with, which reads as staring back at the door they just left.
+  p.facing = door.facing;
+  p.prevFacing = door.facing;
   p.targetId = null;
   p.autoAttack = false;
   ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
@@ -886,8 +891,18 @@ const DUNGEON_DOOR_RETURN_INSET = 4;
  * and needs the door only as the point to set them back down at when the match
  * ends. Sending them back to their raw interior coordinates instead would drop
  * them into an instance claim that may no longer exist by then.
+ *
+ * `facing` is the predefined direction leaving through THIS door points a
+ * player: away from the door along its authored `leaveOffset` (the same
+ * vector that places the drop point), so it always agrees with the door's
+ * real-world orientation without a second authored field. A battleground
+ * queue pop ignores it and keeps the fighter's own facing (match.returns
+ * captures that separately); only `leaveDungeon` applies it.
  */
-export function detachFromDungeon(ctx: SimContext, p: Entity): { x: number; z: number } | null {
+export function detachFromDungeon(
+  ctx: SimContext,
+  p: Entity,
+): { x: number; z: number; facing: number } | null {
   const dungeon = dungeonAt(p.pos.x);
   if (!dungeon) return null;
   const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
@@ -896,7 +911,11 @@ export function detachFromDungeon(ctx: SimContext, p: Entity): { x: number; z: n
   if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
   cancelProfessionSessionOnDisplacement(ctx, p);
   const drop = dungeon.leaveOffset ?? { x: 0, z: -DUNGEON_DOOR_RETURN_INSET };
-  return { x: dungeon.doorPos.x + drop.x, z: dungeon.doorPos.z + drop.z };
+  return {
+    x: dungeon.doorPos.x + drop.x,
+    z: dungeon.doorPos.z + drop.z,
+    facing: Math.atan2(drop.x, drop.z),
+  };
 }
 
 // Drop one departing player (and every entity they own) from the hate tables of

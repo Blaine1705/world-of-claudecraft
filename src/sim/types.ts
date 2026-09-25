@@ -4059,7 +4059,10 @@ export interface DungeonDef {
   index: number; // x-band for instance origins; must be unique
   doorPos: { x: number; z: number }; // overworld entrance portal
   /** where leaving drops the player, relative to doorPos (default 0,-4);
-   *  doors flush against a building face need a FORWARD drop instead */
+   *  doors flush against a building face need a FORWARD drop instead. Also the
+   *  predefined exit facing: leaveDungeon points the player away from the door
+   *  along this vector, instead of leaving them facing whatever way they were
+   *  walking inside the instance. */
   leaveOffset?: { x: number; z: number };
   /** render the entrance membrane still (no swirl spin): for doors that
    *  read as a building's own doorway rather than a magic portal */
