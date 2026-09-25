@@ -22,10 +22,8 @@ export interface PrewarmGroupSlotOptions<T> {
   /** Per-piece resume work (one unit per texture). Replaces the link step,
    *  unless the slot also names a `linkRoot`. */
   units?: (artifact: T) => readonly PrewarmResumeUnit[];
-  /** The live scene object a group-less artifact's programs are drawn on
-   *  (the precipitation points). Declaring it gives a per-piece resume its
-   *  link step between the stage and the pieces: nothing else links the
-   *  hidden draw after a dropped entry, so its first live frame did. */
+  /** The live object a group-less artifact draws on. Declaring it adds a
+   *  link step between the stage and the pieces. */
   linkRoot?: (artifact: T) => THREE.Object3D;
   /** Make the staged artifact undrawable, for artifacts with no group flag. */
   hide?: (artifact: T) => void;
