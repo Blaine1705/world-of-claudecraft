@@ -206,8 +206,9 @@ describe('wyrmwatch harbor painter', () => {
       const mat = m.material as THREE.Material;
       expect(mat.transparent).toBe(true);
       expect(mat.opacity).toBe(0);
-      // the room behind it shows, and the room stays in its shade
+      // the room behind it shows, it blends nothing, and the room stays in its shade
       expect(mat.depthWrite).toBe(false);
+      expect(mat.colorWrite).toBe(false);
       expect(m.visible).toBe(true);
       expect(m.castShadow).toBe(true);
     }
@@ -225,7 +226,65 @@ describe('wyrmwatch harbor painter', () => {
       expect(mat.transparent).toBe(false);
       expect(mat.opacity).toBe(1);
       expect(mat.depthWrite).toBe(true);
+      expect(mat.colorWrite).toBe(true);
     }
+  });
+
+  it('walking out while the wall is cut away turns it into the ghost, drawing again', () => {
+    withTier('high');
+    buildWyrmwatchHarbor(WORLD_SEED);
+    const floor = WATER_LEVEL + HARBOR_HOUSE_FLOOR_ABOVE_WATER;
+    const ey = floor + HOUSE_EYE_OVER_FEET;
+    const ex = HARBOR_HOUSE.door.x;
+    // indoors by the door, the camera out over the house to the north: the north wall is cut
+    const inZ = HARBOR_HOUSE.z + HARBOR_HOUSE.hd - 1.5;
+    updateHarborHouseShell(ex, ey + 3, inZ - 12, ex, ey, inZ, 1 / 60);
+    const north = harborHouseInternalsForTest.shell().find((r) => r.part === 'HouseWallNorth');
+    if (!north) throw new Error('north');
+    expect(north.alpha).toBe(0);
+    // a step out of the door with the camera still behind the house: the whole shell ghosts
+    const outZ = HARBOR_HOUSE.z + HARBOR_HOUSE.hd + 2.5;
+    updateHarborHouseShell(ex, ey + 3.5, outZ - 13.5, ex, ey, outZ, 1 / 60);
+    expect(north.alpha).toBe(OCCLUDER_FADE_ALPHA);
+    for (const m of north.meshes) {
+      const mat = m.material as THREE.Material;
+      expect(mat.opacity).toBeCloseTo(OCCLUDER_FADE_ALPHA, 9);
+      expect(mat.depthWrite).toBe(true);
+      expect(mat.colorWrite).toBe(true);
+    }
+  });
+
+  it('stops drawing the shell past the fog, with the rest of the harbor', () => {
+    withTier('high');
+    const harbor = buildWyrmwatchHarbor(WORLD_SEED);
+    const shell = harbor.getObjectByName('harborHouseShell');
+    if (!shell) throw new Error('shell');
+    const fogFar = 120;
+    const ey = WATER_LEVEL + 30;
+    updateHarborHouseShell(
+      HARBOR_HOUSE.x + 300,
+      ey,
+      HARBOR_HOUSE.z,
+      0,
+      ey,
+      0,
+      1 / 60,
+      false,
+      fogFar,
+    );
+    expect(shell.visible).toBe(false);
+    updateHarborHouseShell(
+      HARBOR_HOUSE.x + 40,
+      ey,
+      HARBOR_HOUSE.z,
+      0,
+      ey,
+      0,
+      1 / 60,
+      false,
+      fogFar,
+    );
+    expect(shell.visible).toBe(true);
   });
 
   it('ghosts the whole shell for a player outside it hides, and only then', () => {
@@ -255,6 +314,11 @@ describe('wyrmwatch harbor painter', () => {
     const lights = wyrmwatchHarborHouseLights();
     expect(lights).toHaveLength(1 + HARBOR_HOUSE_LANTERNS.filter((l) => l.lit).length);
     expect(lights[0].intensity).toBe(HARBOR_HOUSE_LIGHTS.hearth.intensity);
+    // the budget's flicker pass drives each fire light round its own base, never its default
+    expect(lights[0].userData.baseIntensity).toBe(HARBOR_HOUSE_LIGHTS.hearth.intensity);
+    for (const l of lights.slice(1)) {
+      expect(l.userData.baseIntensity).toBe(HARBOR_HOUSE_LIGHTS.lantern.intensity);
+    }
     const i = HARBOR_HOUSE_INTERIOR;
     for (const l of lights) {
       expect(l.isPointLight).toBe(true);

@@ -218,6 +218,7 @@ export function buildWyrmwatchHarbor(seed: number): THREE.Group {
   group.name = 'wyrmwatchHarbor';
   if (!loaded) {
     console.warn(`wyrmwatch harbor skipped: ${HARBOR_URL} was not preloaded`);
+    clearHarborHouseShell();
     return group;
   }
   const template = templateFor();

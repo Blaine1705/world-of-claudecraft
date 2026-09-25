@@ -62,7 +62,8 @@ export function newHouseShellState(): HouseShellState {
   };
 }
 
-/** The house's world frame for a waterline height. */
+/** The house's world frame for a waterline height (houseShellOcclusion keeps the last one:
+ *  the waterline never moves under the house, so nothing is allocated per frame). */
 export function houseFrame(waterLevel: number) {
   const floorY = waterLevel + HARBOR_HOUSE_FLOOR_ABOVE_WATER;
   const plate = floorY + HARBOR_HOUSE.wallTop + HARBOR_HOUSE.roof.plateLift;
@@ -114,6 +115,9 @@ export function sightCrossesRoof(
   return false;
 }
 
+let cachedFrame: ReturnType<typeof houseFrame> | null = null;
+let cachedWater = Number.NaN;
+
 /**
  * Decide the shell for one frame, writing into `out`. `eye` is the camera's look point
  * over the player, `cam` the camera.
@@ -128,7 +132,11 @@ export function houseShellOcclusion(
   waterLevel: number,
   out: HouseShellState,
 ): HouseShellState {
-  const frame = houseFrame(waterLevel);
+  if (cachedFrame === null || cachedWater !== waterLevel) {
+    cachedFrame = houseFrame(waterLevel);
+    cachedWater = waterLevel;
+  }
+  const frame = cachedFrame;
   const h = HARBOR_HOUSE;
   const inside = eyeInHouse(eyeX, eyeY, eyeZ, frame.floorY);
   out.inside = inside;

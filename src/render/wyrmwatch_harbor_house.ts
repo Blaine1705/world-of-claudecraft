@@ -53,6 +53,8 @@ interface ShellRecord {
 }
 
 let shell: ShellRecord[] = [];
+/** The group the shell meshes hang in (hidden past the fog like the harbor's bands). */
+let shellGroup: THREE.Group | null = null;
 /** Every shell record's fade materials, for the one prefetch latch. */
 let allMats: OccluderFadeMat[] = [];
 /** Where the house stands (world x, z): the prefetch reach is measured from here. */
@@ -75,6 +77,9 @@ export function buildHarborHouseLights(floorY: number): THREE.PointLight[] {
   fire.name = 'harborHouseHearth';
   // in front of the fire, at the height of the flames
   fire.position.set((hearth?.x ?? 0) + (hearth?.hw ?? 0) + 0.4, floorY + 1.1, hearth?.z ?? 0);
+  // the budget's flicker pass drives every contributing fire light from this base (and falls
+  // back to its own bright default without it): the hearth flickers round its own level
+  fire.userData.baseIntensity = h.intensity;
   const out = [fire];
   const l = HARBOR_HOUSE_LIGHTS.lantern;
   for (const spot of HARBOR_HOUSE_LANTERNS) {
@@ -82,6 +87,7 @@ export function buildHarborHouseLights(floorY: number): THREE.PointLight[] {
     const lamp = new THREE.PointLight(l.color, l.intensity, l.distance, l.decay);
     lamp.name = 'harborHouseLantern';
     lamp.position.set(spot.x, floorY + HARBOR_HOUSE.tieBeam - spot.drop, spot.z);
+    lamp.userData.baseIntensity = l.intensity;
     out.push(lamp);
   }
   return out;
@@ -97,6 +103,7 @@ export function buildHarborHouseShell(
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = 'harborHouseShell';
+  shellGroup = group;
   shell = [];
   allMats = [];
   for (const part of HOUSE_SHELL_PARTS) {
@@ -137,7 +144,8 @@ export function harborHouseShellMeshes(): readonly THREE.Mesh[] {
 
 /** One part's fade step toward `occluded ? floor : 1`, gated like advanceOccluderFade: the
  *  flip to transparent waits for its linked program. At rest cut away (alpha 0) it stops
- *  writing depth, so the room behind it shows while its shadow stays. */
+ *  writing depth and colour (neither is a program key, and the shadow pass reads neither),
+ *  so the room behind it shows, it costs no blending, and its shadow stays. */
 function stepPart(
   r: ShellRecord,
   occluded: boolean,
@@ -159,8 +167,16 @@ function stepPart(
   }
   r.alpha = next;
   applyOccluderFade(r.mats, next);
-  if (next === 0) for (const m of r.mats) m.mat.depthWrite = false;
+  const cut = next === 0;
+  for (const m of r.mats) {
+    m.mat.colorWrite = !cut;
+    if (cut) m.mat.depthWrite = false;
+  }
 }
+
+/** Past the fog the shell stops drawing with the rest of the harbor (its bands cull there):
+ *  a yard of slack past the house's reach from its anchor. */
+export const HARBOR_HOUSE_SHELL_CULL_SLACK = 14;
 
 /** Advance the shell one frame (props.ts update, with the frame's camera and eye). */
 export function updateHarborHouseShell(
@@ -172,8 +188,13 @@ export function updateHarborHouseShell(
   eyeZ: number,
   dt: number,
   reducedMotion = false,
+  fogFar = Number.POSITIVE_INFINITY,
 ): void {
   if (shell.length === 0) return;
+  const reach = fogFar + HARBOR_HOUSE_SHELL_CULL_SLACK;
+  const far = (camX - shellAnchorX) ** 2 + (camZ - shellAnchorZ) ** 2 > reach * reach;
+  if (shellGroup && shellGroup.visible === far) shellGroup.visible = !far;
+  if (far) return;
   // warm the fade twins once the camera comes within reach of the house
   prefetchOccluderFadeWithin(harborHouseAllMats(), shellAnchorX, shellAnchorZ, camX, camZ);
   houseShellOcclusion(eyeX, eyeY, eyeZ, camX, camY, camZ, WATER_LEVEL, state);
@@ -194,10 +215,20 @@ export function setHarborHouseAnchor(x: number, z: number): void {
   allMats = [];
 }
 
-/** Drop the shell records (a graphics-profile rebuild or a world without the harbor). */
+/** Drop the shell records and dispose their material clones (a graphics-profile rebuild
+ *  tears the old props down; a world without the harbor builds none). */
 export function clearHarborHouseShell(): void {
+  const disposed = new Set<THREE.Material>();
+  for (const r of shell) {
+    for (const m of r.mats) {
+      if (disposed.has(m.mat)) continue;
+      disposed.add(m.mat);
+      m.mat.dispose();
+    }
+  }
   shell = [];
   allMats = [];
+  shellGroup = null;
 }
 
 export const harborHouseInternalsForTest = {

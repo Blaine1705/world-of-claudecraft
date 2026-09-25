@@ -80,7 +80,11 @@ import {
   wyrmwatchHarborHouseLights,
   wyrmwatchHarborPrewarmParts,
 } from './wyrmwatch_harbor';
-import { harborHouseShellMeshes, updateHarborHouseShell } from './wyrmwatch_harbor_house';
+import {
+  clearHarborHouseShell,
+  harborHouseShellMeshes,
+  updateHarborHouseShell,
+} from './wyrmwatch_harbor_house';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -1697,6 +1701,8 @@ export function buildProps(
       group.add(light);
       fireLights.push(light);
     }
+  } else {
+    clearHarborHouseShell();
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
@@ -2617,7 +2623,7 @@ export function buildProps(
       for (let i = 0; i < transportShips.length; i++) {
         transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
       }
-      updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion);
+      updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, fogFar);
       // Band fog cull (prop_cull_core): a band's first reveal on a walking
       // approach holds until the gate has linked its programs, and an arrival
       // among the bands holds too, with its compiles submitted at the imminent
