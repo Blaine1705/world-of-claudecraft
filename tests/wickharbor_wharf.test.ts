@@ -21,7 +21,12 @@ import {
 import { WYRMWATCH_HARBOR_DECKS, WYRMWATCH_RAIL_HEIGHT } from '../src/sim/content/wyrmwatch_harbor';
 import { PROPS } from '../src/sim/data';
 import { FERRY_PIER_DECK_ABOVE_WATER, FERRY_PIER_DECKS, FERRY_PIERS } from '../src/sim/ferry_piers';
-import { GALE_HARBOR_DECKS, type GaleDeckDef, galeDeckSurfaceAt } from '../src/sim/gale_harbor';
+import {
+  GALE_HARBOR_DECKS,
+  type GaleDeckDef,
+  galeDeckAlong,
+  galeDeckSurfaceAt,
+} from '../src/sim/gale_harbor';
 import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
 import { Sim } from '../src/sim/sim';
 import { shipHullColliders } from '../src/sim/transport_ship';
@@ -58,11 +63,11 @@ function deckLocal(d: GaleDeckDef, x: number, z: number): { along: number; acros
   };
 }
 
-/** The deck's plank height at (x, z), or null off it (strictly inside, by `inset`). */
+/** The deck's plank height at (x, z), or null off it (strictly inside, by `inset`; a deck's
+ *  cuts trim it, the harbor's own footprint test). */
 function surfaceIn(d: GaleDeckDef, x: number, z: number, inset = 1e-6): number | null {
-  const l = deckLocal(d, x, z);
-  if (Math.abs(l.along) > d.hl - inset || Math.abs(l.across) > d.hw - inset) return null;
-  return galeDeckSurfaceAt(d, l.along, terrainAt, WATER_LEVEL);
+  const along = galeDeckAlong(d, x, z, inset);
+  return along === null ? null : galeDeckSurfaceAt(d, along, terrainAt, WATER_LEVEL);
 }
 
 /** Clearance between a circle and a collider (negative = overlap). */

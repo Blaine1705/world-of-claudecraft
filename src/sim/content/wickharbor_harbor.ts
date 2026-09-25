@@ -25,6 +25,13 @@
 //  - the Beacon dock is cut along the end of the stair that comes down onto its root.
 // tests/wickharbor_harbor.test.ts pins all of it and walks every route.
 //
+// The plank heights are the built-in world's (WORLD_SEED), set above the water like the ferry
+// wharf's, and the Blender model is built on that world's terrain: a headless world on another
+// seed keeps the same planks.
+//
+// Imports from ../gale_harbor are type-only, and must stay so: gale_harbor.ts imports this
+// module, so a value imported back would be read before it is initialised.
+//
 // Scale: the player model stands 2.6 yd to the crown on a 0.5 yd body radius and climbs
 // 0.9 yd unaided (MAX_STEP_HEIGHT): the boardwalk is 3.4 wide, the piers 3.6 to 4.4, the
 // stairs 2.6 to 2.8, and the rails stand 1.2 yd (the wharf's, above a jump).

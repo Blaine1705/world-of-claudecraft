@@ -6,6 +6,8 @@
 
 import { describe, expect, it } from 'vitest';
 import { resolveMovement } from '../src/sim/colliders';
+import { EASTBROOK_HARBOR_DECKS } from '../src/sim/eastbrook_harbor';
+import { FERRY_PIER_DECKS } from '../src/sim/ferry_piers';
 import {
   GALE_DECK_FREEBOARD,
   GALE_HARBOR_DECKS,
@@ -15,6 +17,7 @@ import {
   galeDeckSurface,
   galeDeckSurfaceAt,
 } from '../src/sim/gale_harbor';
+import { REACH_DECKS } from '../src/sim/reach_decks';
 import { groundHeight, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const SEED = 20061;
@@ -57,6 +60,17 @@ describe('the deck footprint: a rectangle trimmed by straight cuts', () => {
     // 0.3 from the rectangle's long side
     expect(galeDeckContains(deck, 1.7, -3, 0.2)).toBe(true);
     expect(galeDeckContains(deck, 1.7, -3, 0.4)).toBe(false);
+  });
+});
+
+describe('only the Wickharbor harbor carries deck cuts', () => {
+  // the other walkway surface queries (Eastbrook's quay, the ferry piers, Palmreach's
+  // walkways) lay plain rectangles: a cut on one of their decks would be silently ignored
+  it('keeps every other walkway deck a plain rectangle', () => {
+    for (const d of [...EASTBROOK_HARBOR_DECKS, ...FERRY_PIER_DECKS, ...REACH_DECKS]) {
+      expect(d.cuts, `deck at ${d.x}, ${d.z}`).toBeUndefined();
+    }
+    expect(GALE_HARBOR_DECKS.some((d) => (d.cuts?.length ?? 0) > 0)).toBe(true);
   });
 });
 
