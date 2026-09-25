@@ -1274,7 +1274,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
     // Professions 2.0: the fishing command bodies moved out of sim.ts.
     // Three literals have their ONLY emitter occurrences here ("No fish are
-    // biting.", "A rare catch! Something gleams on your line.", "You need to
+    // biting.", "Something golden flashes beneath the surface!", "You need to
     // face fishable water."); they are byte-identical after the move so their
     // matchers are unchanged, but a rewording of THIS file's sites was
     // invisible to the guard before this entry. The file's other emits
