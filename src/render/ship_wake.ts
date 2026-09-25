@@ -58,7 +58,7 @@ function foamTexture(): THREE.DataTexture {
 function wakeMaterial(): THREE.PointsMaterial {
   if (material) return material;
   material = new THREE.PointsMaterial({
-    size: 2.4,
+    size: 3,
     sizeAttenuation: true,
     map: foamTexture(),
     vertexColors: true,

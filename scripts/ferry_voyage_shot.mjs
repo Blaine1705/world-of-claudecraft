@@ -154,7 +154,9 @@ const DOCKED = 60;
 if (want('deck_walk_at_sea')) {
   await setClock(DOCKED + 45);
   await board(0, 0.28, 11);
-  await sleep(4000);
+  // software rendering runs a frame or two a second: let the dev boarding's
+  // HUD transients (the breath bar's linger) run out first
+  await sleep(10000);
   await page.keyboard.down('w');
   await holdCamera(0, 1200);
   await shot('deck_walk_at_sea');

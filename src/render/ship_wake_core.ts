@@ -17,10 +17,10 @@
 // fewer particles, nothing a player acts on depends on it.
 
 /** Seconds a wake foam patch lingers, and a spray droplet flies. */
-export const WAKE_LIFETIME_S = 4.2;
+export const WAKE_LIFETIME_S = 5;
 export const SPRAY_LIFETIME_S = 0.75;
 /** Particles per second at `WAKE_FULL_SPEED` (the rates scale with speed). */
-export const WAKE_RATE = 18;
+export const WAKE_RATE = 28;
 export const SPRAY_RATE = 26;
 /** Speed (yards per second) at which both emitters run at their full rate. */
 export const WAKE_FULL_SPEED = 16;
