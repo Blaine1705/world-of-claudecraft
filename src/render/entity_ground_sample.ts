@@ -3,6 +3,7 @@ import { isRiftPos } from '../sim/data';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import { groundHeight } from '../sim/world';
 import type { RiftFloorView } from '../world_api/dungeons';
+import { drawnDeckSupportAt } from './deck_frame';
 import {
   commitEntityGroundSample,
   type EntityGroundSample,
@@ -117,13 +118,11 @@ export function sampleStandingSurface(
   force: boolean,
 ): number {
   if (force || entityGroundSampleDue(sample, x, y, z, dt)) {
-    commitEntityGroundSample(
-      sample,
-      x,
-      y,
-      z,
-      standingSurfaceAt(world.cfg.seed, world.riftFloor, x, y, z),
-    );
+    // ...and a scheduled ship's deck as drawn (render/deck_frame.ts): under
+    // way it is in no collider grid, so without it a passenger reads airborne
+    const surface = standingSurfaceAt(world.cfg.seed, world.riftFloor, x, y, z);
+    const deck = drawnDeckSupportAt(world, x, y, z, STAND_SUPPORT_RADIUS);
+    commitEntityGroundSample(sample, x, y, z, Math.max(surface, deck));
   }
   return sample.standY;
 }

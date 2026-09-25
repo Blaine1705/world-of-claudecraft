@@ -7,6 +7,8 @@ import {
   entityRenderPose,
   updateSelfRenderOnDeck,
 } from '../src/render/deck_frame';
+import { sampleStandingSurface } from '../src/render/entity_ground_sample';
+import { createEntityGroundSample } from '../src/render/entity_ground_sample_core';
 import { createSelfRenderPositionState } from '../src/render/self_render_position_core';
 import {
   newWakeParticles,
@@ -168,6 +170,52 @@ describe('the deck frame', () => {
     const idle = { x: 3, z: 4, vx: 0, vz: 0 };
     expect(deckCameraTurn(off, idle, null, mirror)).toBe(0);
     expect(idle).toEqual({ x: 3, z: 4, vx: 0, vz: 0 });
+  });
+});
+
+describe('a passenger stands on the drawn deck (the departure T-pose)', () => {
+  // Bug: the renderer's airborne heuristic compared a passenger's feet with
+  // the standing surface under them, which knew the terrain and the static
+  // collider grid only. Once the ship cast off the moored deck left the grid,
+  // so every passenger read three yards in the air and held the jump pose
+  // (clamped, arms out) for the whole voyage.
+  it('reads the sailing deck as the standing surface, at the drawn pose', () => {
+    const w = { ...world(SAILING), riftFloor: null };
+    const df = deckFrameFor(w);
+    advanceDeckFrame(df, w, 0.016);
+    const drawn = df.ships[0].drawn;
+    const deckY = WATER_LEVEL + 3.3;
+    const at = deckToWorld(drawn, -2, 3, { x: 0, z: 0 });
+    const sample = createEntityGroundSample();
+    expect(sampleStandingSurface(sample, w, at.x, deckY, at.z, 1 / 60, true)).toBeCloseTo(deckY, 6);
+    // off the hull it is the sea again
+    const off = deckToWorld(drawn, 12, 3, { x: 0, z: 0 });
+    expect(sampleStandingSurface(sample, w, off.x, deckY, off.z, 1 / 60, true)).toBeLessThan(
+      WATER_LEVEL,
+    );
+  });
+
+  it('counts only the passenger steps as locomotion, never the ship way', () => {
+    const w = world(SAILING);
+    const df = deckFrameFor(w);
+    advanceDeckFrame(df, w, 0.016);
+    const p = passenger(SAILING, 1, 1);
+    const last = { lastX: 0, lastZ: 0 };
+    const first = entityRenderPose(w, p, 1, null, last);
+    last.lastX = first.x;
+    last.lastZ = first.z;
+    // the ship moves a frame on; the passenger stands still on the deck
+    w.clock = SAILING + 0.05;
+    advanceDeckFrame(df, w, 0.05);
+    const p2 = passenger(SAILING + 0.05, 1, 1);
+    const next = entityRenderPose(w, p2, 1, null, last);
+    const shipMoved = Math.hypot(
+      df.ships[0].drawn.x - df.ships[0].last.x,
+      df.ships[0].drawn.z - df.ships[0].last.z,
+    );
+    expect(shipMoved).toBeGreaterThan(0.1);
+    // the remembered spot rode with the deck: no displacement is left over
+    expect(Math.hypot(next.x - last.lastX, next.z - last.lastZ)).toBeLessThan(1e-6);
   });
 });
 

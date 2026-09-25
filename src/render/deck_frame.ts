@@ -23,9 +23,10 @@
 // the scheduled ships advance it themselves on a frame the renderer did not
 // (a bare props host, the tests).
 
-import { TRANSPORT_ROUTES } from '../sim/content/transport_ships';
+import { TRANSPORT_ROUTES, TRANSPORT_SHIP_HULLS } from '../sim/content/transport_ships';
 import { isFerryPassenger } from '../sim/ferry_passenger';
-import { deckToWorld, worldToDeck } from '../sim/transport_deck';
+import { platformSupportAt } from '../sim/physics';
+import { DeckPlatform, deckToWorld, nearDeck, worldToDeck } from '../sim/transport_deck';
 import {
   angleDelta,
   newTransportPhaseState,
@@ -78,6 +79,8 @@ export interface DeckFrame {
   readonly selfProxy: { prevPos: { x: number; y: number; z: number }; pos: typeof ZERO };
   /** Scratch: the pose `entityRenderPose` returns (read it, never keep it). */
   readonly renderPose: FramedPose;
+  /** Each route's deck as drawn, for the standing surface (null: no hull). */
+  readonly decks: (DeckPlatform | null)[];
 }
 
 const ZERO = { x: 0, y: 0, z: 0 };
@@ -107,6 +110,11 @@ export function deckFrameFor(world: object): DeckFrame {
       selfRoute: -1,
       selfProxy: { prevPos: { ...ZERO }, pos: { ...ZERO } },
       renderPose: { x: 0, y: 0, z: 0, facing: 0 },
+      decks: TRANSPORT_ROUTES.map((route) =>
+        Object.hasOwn(TRANSPORT_SHIP_HULLS, route.ship)
+          ? new DeckPlatform(TRANSPORT_SHIP_HULLS[route.ship])
+          : null,
+      ),
     };
     frames.set(world, df);
   }
@@ -150,6 +158,8 @@ export interface FramedPose {
   y: number;
   z: number;
   facing: number;
+  /** Set by entityRenderPose: the body is drawn on a drawn ship's deck. */
+  deck?: boolean;
 }
 
 const a = { x: 0, z: 0 };
@@ -203,10 +213,17 @@ export function entityRenderPose(
   e: Entity,
   alpha: number,
   self: { x: number; y: number; z: number } | null,
+  last?: { lastX: number; lastZ: number },
 ): FramedPose {
   const df = deckFrameFor(world);
   const out = df.renderPose;
   const framed = deckFramedPose(df, e, alpha, out);
+  out.deck = framed;
+  // The animation reads locomotion off the drawn motion since last frame: a
+  // passenger's remembered spot rides the deck's own motion this frame, so
+  // only their steps on the planks count (never the ship's way, which would
+  // run them on the spot at cruise speed).
+  if (last && framed) carryWithDrawnDeck(df, deckRouteOf(e), last);
   if (!framed) out.facing = e.prevFacing + angleDelta(e.prevFacing, e.facing) * Math.min(1, alpha);
   if (self) {
     out.x = self.x;
@@ -218,6 +235,53 @@ export function entityRenderPose(
     out.z = e.prevPos.z + (e.pos.z - e.prevPos.z) * alpha;
   }
   return out;
+}
+
+/** Move a remembered drawn-world spot with the drawn ship `route` from last
+ *  frame's pose to this frame's (in place); a skip is left alone. */
+function carryWithDrawnDeck(
+  df: DeckFrame,
+  route: number,
+  spot: { lastX: number; lastZ: number },
+): void {
+  const ship = df.ships[route];
+  if (!ship?.hasLast) return;
+  const from = ship.last;
+  const to = ship.drawn;
+  if (Math.hypot(to.x - from.x, to.z - from.z) > CARRY_SNAP_YD) return;
+  worldToDeck(from, spot.lastX, spot.lastZ, a);
+  deckToWorld(to, a.x, a.z, a);
+  spot.lastX = a.x;
+  spot.lastZ = a.z;
+}
+
+/**
+ * The highest drawn ship deck surface under (x, z) at or below the feet (`y`
+ * plus a hair), or -Infinity: the standing surface a passenger is judged
+ * against (render/entity_ground_sample.ts). The moored deck is also in the
+ * collider grid, but a ship under way is not, and without this every
+ * passenger read as airborne and held the jump pose for the whole voyage.
+ * The drawn deck is taken moored and sailing alike, so the frame the grid's
+ * gate and the drawn clock disagree (a cast-off, a mooring) never drops it.
+ */
+export function drawnDeckSupportAt(
+  world: object,
+  x: number,
+  y: number,
+  z: number,
+  r: number,
+): number {
+  const df = frames.get(world);
+  if (!df?.active) return Number.NEGATIVE_INFINITY;
+  let best = Number.NEGATIVE_INFINITY;
+  for (let i = 0; i < df.ships.length; i++) {
+    const ship = df.ships[i];
+    const deck = df.decks[i];
+    if (!deck || !nearDeck(deck.hull, ship.drawn, x, z)) continue;
+    const top = platformSupportAt(deck.at(ship.drawn, WATER_LEVEL), x, z, r, y + 0.01);
+    if (top > best) best = top;
+  }
+  return best;
 }
 
 /** What the local player's display pose reads from the world. */

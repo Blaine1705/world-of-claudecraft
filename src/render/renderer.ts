@@ -10130,7 +10130,7 @@ export class Renderer {
       // turn stream, mouselook, click-move via the sent facing). Remote
       // entities interpolate on their own measured cadence via
       // remoteEntityAlpha (unknown-cadence fallback).
-      const rp = entityRenderPose(sim, e, ea, isSelf ? selfPos : null);
+      const rp = entityRenderPose(sim, e, ea, isSelf ? selfPos : null, v);
       const { x, y, z } = rp; // a passenger rides the drawn deck (deck_frame.ts)
       v.group.position.set(x, y, z);
       let facing = rp.facing;
@@ -10673,7 +10673,7 @@ export class Renderer {
       // fallback path the plain interpolated sim motion is still sampled
       // instead (that path's smoothed selfPos stutters within a snapshot
       // interval). Offline, all of these are the same value.
-      const animFromDisplay = isSelf && this.selfRender.active;
+      const animFromDisplay = isSelf && (this.selfRender.active || rp.deck === true);
       const ax = isSelf && !animFromDisplay ? e.prevPos.x + (e.pos.x - e.prevPos.x) * alpha : x;
       const ay = isSelf && !animFromDisplay ? e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha : y;
       const az = isSelf && !animFromDisplay ? e.prevPos.z + (e.pos.z - e.prevPos.z) * alpha : z;
