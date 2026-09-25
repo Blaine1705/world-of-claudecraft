@@ -244,6 +244,17 @@ describe('the per-family deadline', () => {
     expect(readiness.snapshot().families.map((f) => f.forced)).toEqual([false, true]);
   });
 
+  it('starts a family clock at a per-frame consult too: a hold asks for its families', () => {
+    const { readiness, state } = harness(
+      [{ id: 'ring', program: PROGRAM_A }],
+      [{ id: 'crest', program: null }],
+    );
+    expect(readiness.ready(WARRIOR)).toBe(false);
+    state.nowMs = DEADLINE_MS;
+    expect(readiness.admit(WARRIOR)).toBe(true);
+    expect(readiness.snapshot().families[1]).toMatchObject({ forced: true, refused: 0 });
+  });
+
   it('starts no clock on a diagnostics read', () => {
     const { readiness, state } = harness([{ id: 'a', program: null }]);
     for (let i = 0; i < 3; i++) readiness.snapshot();
@@ -283,6 +294,33 @@ describe('a declined family', () => {
       forced: false,
       pending: null,
     });
+  });
+
+  it('answers on the fast path once latched: no clock, no frame stamp, no second question', () => {
+    const declined = vi.fn(() => true);
+    const now = vi.fn(() => 0);
+    const frame = vi.fn(() => Number.NaN);
+    const readiness = createCastVfxReadiness<Mat>({
+      now,
+      frame,
+      deadlineMs: DEADLINE_MS,
+      families: [
+        { id: 'engine', bit: ENGINE, materials: () => [{ id: 'ring', program: PROGRAM_A }] },
+        { id: 'kit', bit: KIT, materials: () => [], declined },
+      ],
+      linked: (material) => material.program,
+    });
+    expect(readiness.admit(WARRIOR)).toBe(true);
+    const calls = [declined.mock.calls.length, now.mock.calls.length, frame.mock.calls.length];
+    for (let i = 0; i < 50; i++) {
+      expect(readiness.admit(WARRIOR)).toBe(true);
+      expect(readiness.ready(WARRIOR)).toBe(true);
+      expect(readiness.spawnAllowed(KIT)).toBe(false);
+    }
+    expect([declined.mock.calls.length, now.mock.calls.length, frame.mock.calls.length]).toEqual(
+      calls,
+    );
+    expect(readiness.snapshot().families[1]).toMatchObject({ declined: true, requirementMiss: 0 });
   });
 
   it('keeps its pools shut without counting a miss', () => {

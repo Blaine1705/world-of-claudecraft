@@ -56,7 +56,8 @@ export interface CastVfxFamilyDeps<M> {
   materials: () => readonly M[];
   /** The device refused this family's assets outright (the Warrior kit on
    *  constrained memory): the family never holds a cast and is never forced,
-   *  and its pools never draw. */
+   *  and its pools never draw. A device decision, so the core latches it at
+   *  the first read that answers true. */
   declined?: () => boolean;
 }
 
@@ -158,6 +159,7 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
   // its deadline passed): the pools are never disposed, and a family that has
   // opened is not asked to close over a later swap.
   let readyBits = 0;
+  // Latched like readyBits: a declined family answers on the fast path.
   let declinedBits = 0;
   let refused = 0;
   let refreshedAt = Number.NaN;
@@ -198,10 +200,9 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
     const frame = deps.frame();
     if (!force && frame === refreshedAt) return;
     if (!force) refreshedAt = frame;
-    declinedBits = 0;
     for (const family of families) {
       const bit = family.deps.bit;
-      if ((readyBits & bit) !== 0) continue;
+      if (((readyBits | declinedBits) & bit) !== 0) continue;
       if (declined(family)) {
         declinedBits |= bit;
         continue;
@@ -215,7 +216,7 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
   return {
     admit: (mask) => {
       // Steady state: every family the cast asks for latched, nothing to walk.
-      if ((mask & ~readyBits) === 0) return true;
+      if (open(mask)) return true;
       refresh(mask, false);
       if (open(mask)) return true;
       refused++;
@@ -226,7 +227,7 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
       return false;
     },
     ready: (mask) => {
-      if ((mask & ~readyBits) === 0) return true;
+      if (open(mask)) return true;
       refresh(mask, false);
       return open(mask);
     },
@@ -234,7 +235,7 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
       if ((readyBits & bit) !== 0) return true;
       for (const family of families) {
         if (family.deps.bit !== bit) continue;
-        if (!declined(family)) family.miss++;
+        if ((declinedBits & bit) === 0 && !declined(family)) family.miss++;
         break;
       }
       return false;
