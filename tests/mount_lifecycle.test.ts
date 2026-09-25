@@ -335,6 +335,7 @@ describe('the rocket sled plume inside the mount gate', () => {
       if (spec.visualKey === 'mount_rickshaw_mount') continue;
       const v = emptyView();
       syncMountVisual(v, spec, recordingHost().host);
+      expect(v.mountVisual, spec.visualKey).not.toBeNull();
       expect(v.goblinRocketSledFx, spec.visualKey).toBeNull();
     }
   });
@@ -357,8 +358,10 @@ describe('the rocket sled plume inside the mount gate', () => {
     syncMountVisual(v, sled(), host);
     const remounted = v.goblinRocketSledFx;
     expect(remounted).not.toBeNull();
+    const swappedRoot = mountRoot(v);
     syncMountVisual(v, horse(), host);
     expect(v.goblinRocketSledFx).toBeNull();
+    expect(swappedRoot.getObjectByName('GoblinRocketPlume_L')).toBeUndefined();
 
     syncMountVisual(v, sled(), host);
     const lastRoot = mountRoot(v);
