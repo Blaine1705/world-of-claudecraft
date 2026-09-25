@@ -106,7 +106,13 @@ export function buildDeckWood(
   decks: readonly GaleDeckDef[],
   terrain: (x: number, z: number) => number,
   waterLevel: number,
-  opts: { railAll?: boolean; bollards?: boolean } = {},
+  opts: {
+    railAll?: boolean;
+    bollards?: boolean;
+    /** Decks of another batch standing on these ones (the Wickharbor wharf's flight on the
+     *  boardwalk's end): no bollard is planted inside them. */
+    bollardKeepOut?: readonly GaleDeckDef[];
+  } = {},
 ): DeckWood {
   const planks: THREE.BufferGeometry[] = [];
   const posts: THREE.BufferGeometry[] = [];
@@ -181,6 +187,7 @@ export function buildDeckWood(
       for (const side of [1, -1]) {
         const bx = d.x + dirx * (d.hl - 0.5) + pxu * (d.hw - 0.35) * side;
         const bz = d.z + dirz * (d.hl - 0.5) + pzu * (d.hw - 0.35) * side;
+        if (opts.bollardKeepOut?.some((other) => deckContains(other, bx, bz, 0.5))) continue;
         const g = new THREE.BoxGeometry(0.26, 0.72, 0.26);
         g.translate(bx, yAt(d.hl - 0.5) + 0.3, bz);
         posts.push(g.toNonIndexed());

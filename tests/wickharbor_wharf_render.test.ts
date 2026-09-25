@@ -4,14 +4,21 @@ import { MeshoptDecoder } from 'meshoptimizer';
 import type * as THREE from 'three';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { buildDeckWood } from '../src/render/deck_render';
 import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
 import {
   buildWickharborWharf,
   wickharborWharfInternalsForTest,
   wickharborWharfPrewarmParts,
 } from '../src/render/wickharbor_wharf';
-import { WICKHARBOR_WHARF_ORIGIN } from '../src/sim/content/wickharbor_wharf';
-import { WATER_LEVEL } from '../src/sim/world';
+import {
+  WICKHARBOR_WHARF_DECKS,
+  WICKHARBOR_WHARF_ORIGIN,
+  wharfLocal,
+} from '../src/sim/content/wickharbor_wharf';
+import { GALE_HARBOR_DECKS } from '../src/sim/gale_harbor';
+import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The Wickharbor ferry wharf painter (src/render/wickharbor_wharf.ts) over the shipped GLB:
 // the model placed on the waterline at the wharf origin, what each graphics tier really draws
@@ -101,17 +108,26 @@ describe('wickharbor wharf painter', () => {
     }
   });
 
-  it('hands the props prewarm every program it draws', () => {
-    withTier('high');
-    const wharf = buildWickharborWharf();
-    const drawn = new Set<THREE.Material>();
-    wharf.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (mesh.isMesh) drawn.add(mesh.material as THREE.Material);
-    });
-    const warmed = new Set(wickharborWharfPrewarmParts().map((p) => p.material));
-    expect(drawn.size).toBeGreaterThan(0);
-    for (const m of drawn) expect(warmed.has(m)).toBe(true);
+  it('hands the props prewarm every program it draws, on every tier and material family', () => {
+    for (const tier of ['low', 'medium', 'high', 'ultra', 'insane'] as const) {
+      for (const standardMaterials of [true, false]) {
+        activateGfxProfile({
+          ...originalProfile,
+          settings: { ...GFX, effectsTier: tier, standardMaterials },
+        });
+        internals.setLoadedGltfForTest(gltf);
+        const wharf = buildWickharborWharf();
+        const drawn = new Set<THREE.Material>();
+        wharf.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (mesh.isMesh) drawn.add(mesh.material as THREE.Material);
+        });
+        const warmed = new Set(wickharborWharfPrewarmParts().map((p) => p.material));
+        const label = `${tier} ${standardMaterials ? 'standard' : 'lambert'}`;
+        expect(drawn.size, label).toBeGreaterThan(0);
+        for (const m of drawn) expect(warmed.has(m), label).toBe(true);
+      }
+    }
   });
 
   it('builds nothing (and warns) when the model was never preloaded', () => {
@@ -125,5 +141,44 @@ describe('wickharbor wharf painter', () => {
       console.warn = warn;
     }
     expect(String(said[0])).toContain('wickharbor wharf skipped');
+  });
+
+  it('plants no boardwalk bollard through the flight standing on the boardwalk end', () => {
+    const terrain = (x: number, z: number): number => terrainHeight(x, z, WORLD_SEED);
+    const bollards = (keepOut?: typeof WICKHARBOR_WHARF_DECKS) =>
+      buildDeckWood(GALE_HARBOR_DECKS, terrain, WATER_LEVEL, {
+        bollards: true,
+        bollardKeepOut: keepOut,
+      })
+        .posts.map((g) => {
+          g.computeBoundingBox();
+          const bb = g.boundingBox;
+          if (!bb) return null;
+          const dx = bb.max.x - bb.min.x;
+          const dy = bb.max.y - bb.min.y;
+          const dz = bb.max.z - bb.min.z;
+          // a bollard is the 0.26 x 0.72 x 0.26 post (turned with its deck)
+          if (Math.abs(dy - 0.72) > 1e-3 || Math.max(dx, dz) > 0.4) return null;
+          return { x: (bb.min.x + bb.max.x) / 2, z: (bb.min.z + bb.max.z) / 2 };
+        })
+        .filter((p): p is { x: number; z: number } => p !== null);
+    const flight = WICKHARBOR_WHARF_DECKS.find((d) => d.id === 'flight');
+    if (!flight) throw new Error('flight');
+    const near = (p: { x: number; z: number }) => {
+      const l = wharfLocal(p.x, p.z);
+      return (
+        l.along > flight.frame.a0 - 0.6 &&
+        l.along < flight.frame.a1 + 0.6 &&
+        l.across > flight.frame.c0 - 0.6 &&
+        l.across < flight.frame.c1 + 0.6
+      );
+    };
+    // without the keep-out the boardwalk's south-end pair lands in the flight's footprint
+    const all = bollards();
+    expect(all.filter(near)).toHaveLength(2);
+    // with it (what gale_features.ts passes) they are gone, and every other bollard stays
+    const kept = bollards(WICKHARBOR_WHARF_DECKS);
+    expect(kept.filter(near)).toEqual([]);
+    expect(kept).toHaveLength(all.length - 2);
   });
 });

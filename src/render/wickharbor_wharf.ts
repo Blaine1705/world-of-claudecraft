@@ -17,6 +17,10 @@
 // wharf first seen after the curtain links nothing in a live frame. The materials are the
 // surface family's vertex-coloured standard/lambert (vertex_colour_glb_parts.ts, shared with
 // the route markers and the Wyrmwatch harbor: the same programs). Nothing here runs per frame.
+//
+// Residency: like the Wyrmwatch harbor, the parsed GLB and the per-tier merged templates stay
+// resident for the session (about 11k triangles; the templates also back the prewarm twins),
+// so a graphics-profile rebuild converts without a refetch.
 
 import * as THREE from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';

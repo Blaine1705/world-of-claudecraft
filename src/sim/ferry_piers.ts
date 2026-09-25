@@ -82,8 +82,6 @@ const BOXES: readonly (readonly [number, number, number, number])[] = [
   [486, 1880, 509, 1922],
   [451, 364, 484, 389],
 ];
-const BAND_Z1 = Math.min(...BOXES.map((b) => b[1]));
-const BAND_Z2 = Math.max(...BOXES.map((b) => b[3]));
 
 /** Whether (x, z) lies under a ferry pier's planks (nothing grows through).
  *  The footprint never depends on the water level (only the plank height
@@ -106,8 +104,7 @@ export function ferryPierSurface(
   terrainAt: (x: number, z: number) => number,
   waterLevel: number,
 ): number {
-  // one band test first: this runs inside every ground-height sample
-  if (z < BAND_Z1 || z > BAND_Z2) return Number.NEGATIVE_INFINITY;
+  // the site boxes first: this runs inside every ground-height sample
   let inBox = false;
   for (let i = 0; i < BOXES.length && !inBox; i++) {
     const b = BOXES[i];

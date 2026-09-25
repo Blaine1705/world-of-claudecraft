@@ -10,6 +10,7 @@
 // realm modules: build once, update(time) turns the beacon.
 import * as THREE from 'three';
 import { BEACON_SPIRAL, beaconSpiralLift } from '../sim/beacon_spiral';
+import { WICKHARBOR_WHARF_DECKS } from '../sim/content/wickharbor_wharf';
 import { GALE_HARBOR_DECKS } from '../sim/gale_harbor';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
@@ -285,7 +286,8 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
       GALE_HARBOR_DECKS,
       (x, z) => terrainHeight(x, z, seed),
       WATER_LEVEL,
-      { bollards: true },
+      // the wharf's flight stands on the boardwalk's south end: no bollard through its treads
+      { bollards: true, bollardKeepOut: WICKHARBOR_WHARF_DECKS },
     );
     group.add(mergeBoxes(planks, wood));
     group.add(mergeBoxes(posts, postWood));
