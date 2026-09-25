@@ -36,6 +36,9 @@ describe('wickharbor harbor tiers (graphics fairness)', () => {
       lanternPost: 'HarborLanterns',
       crateStack: 'HarborCargo',
       barrel: 'HarborCargo',
+      bollard: 'HarborCargo',
+      // the quay crane's mast and the cargo shelter's posts, with the jib and the roof
+      timberPost: 'HarborCargo',
     };
     const low = wickharborHarborParts('low');
     for (const p of WICKHARBOR_HARBOR_PROPS) {

@@ -43,7 +43,9 @@ def stage(objs, context_path):
     spots = {
         'Boardwalk': ('boardwalk', 1.5, 0.0),
         'PierNorth': ('pierNorth', 4.0, 0.2),
-        'PierMiddle': ('pierMiddle', 6.0, 0.4),
+        'PierMiddle': ('pierMiddle', 1.0, 0.4),
+        'QuayNorth': ('quayNorth', 0.0, 0.0),
+        'QuaySouth': ('quaySouth', -2.0, 0.0),
         'StairSouth': ('stairSouth', 0.0, 0.0),
         'StairNorth': ('stairNorth', 0.0, 0.0),
         'BeaconDock': ('beaconPier', 3.0, 0.0),
@@ -73,6 +75,8 @@ def stage(objs, context_path):
         'wharf_join': ((-4.0, 6.5, 14.0), (0.5, 1.5, 8.5), 30),
         'pier_north_root': ((8.0, 5.0, -2.0), (2.5, 1.0, -8.0), 30),
         'stair_south_foot': ((4.0, 4.5, 9.5), (-2.0, 1.4, 4.4), 30),
+        'owner': ((-20.0, 20.0, 4.0), (10.0, 0.0, 6.0), 26),
+        'quay_from_sea': ((42.0, 11.0, 16.0), (8.0, 1.5, 8.0), 28),
     }
     for name, (eye, look, lens) in cams.items():
         cam = bpy.data.cameras.new(f'Cam_{name}')

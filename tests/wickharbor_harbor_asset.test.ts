@@ -39,18 +39,18 @@ import { WYRMWATCH_RAIL_HEIGHT } from '../src/sim/content/wyrmwatch_harbor';
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, WICKHARBOR_HARBOR_ASSET.target);
-const SHIPPED_SHA256 = '7aee02f2fe27dd43d591085aba4b86dff8ea5f525b43e6ac1261f115dc533ad7';
-const SHIPPED_BYTES = 307476;
+const SHIPPED_SHA256 = '103909af8401fd1f4ec2967c619857ae4641fe0304b0ec95f9ffb745a0936b89';
+const SHIPPED_BYTES = 410120;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
-  HarborDecks: 3596,
-  HarborFrame: 3564,
+  HarborDecks: 5148,
+  HarborFrame: 5328,
   HarborStairs: 1572,
-  HarborRails: 3380,
-  HarborLanterns: 2360,
-  HarborCargo: 540,
-  HarborTrim: 6924,
-  HarborClutter: 1028,
+  HarborRails: 2992,
+  HarborLanterns: 2752,
+  HarborCargo: 2356,
+  HarborTrim: 7624,
+  HarborClutter: 2748,
 };
 /** The player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts). */
 const PLAYER_H = 2.6;
@@ -184,11 +184,12 @@ describe('wickharbor harbor GLB', () => {
       total += count;
     }
     expect(trianglesUnder(node('WickharborHarbor_ROOT'))).toBe(total);
-    // the whole town harbor (a boardwalk, two piers, three stairs and the Beacon dock, about
-    // three times the ferry wharf's planks, dressed): under 26k in all, the low tier under 17k
-    expect(total).toBeLessThan(26000);
+    // the whole town harbor (a boardwalk, the great quay, two piers, three stairs and the
+    // Beacon dock, about five times the ferry wharf's planks, with the quay's crane and cargo
+    // shelter): under 32k in all, the low tier under 21k
+    expect(total).toBeLessThan(32000);
     const low = WICKHARBOR_HARBOR_CRITICAL_PARTS.reduce((n, p) => n + TRIANGLES[p], 0);
-    expect(low).toBeLessThan(17000);
+    expect(low).toBeLessThan(21000);
   });
 
   it("stamps the sim's numbers: the origin, every deck's heights and the rail", () => {
@@ -205,6 +206,8 @@ describe('wickharbor harbor GLB', () => {
     expect(e.railHeight).toBeGreaterThan(PLAYER_H * 0.4);
     for (const p of WICKHARBOR_HARBOR_PROPS) {
       if (p.kind === 'lanternPost') expect(p.height).toBeGreaterThan(PLAYER_H * 1.5);
+      // the crane's mast towers over the quay, the shelter's posts clear a player's head
+      if (p.kind === 'timberPost') expect(p.height).toBeGreaterThan(PLAYER_H * 1.6);
     }
   });
 

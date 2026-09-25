@@ -1,5 +1,6 @@
-"""Wickharbor's wooden harbor: the shore boardwalk, the two north piers, the two bluff stairs and
-the Old Beacon's dock and stair, rebuilt as one harbor in the ferry wharf's wood.
+"""Wickharbor's wooden harbor: the shore boardwalk, the great quay that fills the water off it down
+to the ferry wharf, the two piers out from the quay, the two bluff stairs and the Old Beacon's
+dock and stair, rebuilt as one harbor in the ferry wharf's wood.
 
   npx tsx scripts/assets/wickharbor_harbor/layout.ts        (refresh layout.json from the sim)
   blender --background --python scripts/assets/wickharbor_harbor/build_wickharbor_harbor.py -- \
@@ -34,8 +35,11 @@ tier keeps, so every solid is in a low-tier part):
     HarborStairs         the three stairs: treads, risers, stringers, posts, the stone plinths
     HarborRails          every rail, its posts and newels
     HarborLanterns       the lantern posts and the newel lanterns (the landmarks)
-    HarborCargo          crate stacks and barrels (all collide)
+    HarborCargo          crate stacks, barrels, bollards, the quay crane and the cargo shelter
+                         (all collide; the crane's jib and the shelter's roof stay with them)
     HarborTrim           medium tier and up: fender piles, mooring rings, cleats, bolts, iron
+    HarborFrame also carries the timber sheathing on the quay's side of the wharf's drop, so the
+    wharf reads as the quay's raised berth mole.
     HarborClutter        high tier and up: rope coils, crab pots, sacks, nets, oars, a bucket
 
 Everything is original procedural work for this project.
@@ -68,7 +72,8 @@ PLANK_T = 0.16
 BURY = 0.8          # piles and posts run this far into the ground under them
 DECKS = {d['id']: d for d in LAYOUT['decks']}
 PROPS = LAYOUT['props']
-LEVEL_DECKS = ('boardwalk', 'pierNorth', 'pierMiddle', 'beaconPier')
+LEVEL_DECKS = ('boardwalk', 'pierNorth', 'pierMiddle', 'beaconPier', 'quayNorth', 'quaySouth')
+QUAY = LAYOUT['quay']
 STAIRS = ('stairSouth', 'stairNorth', 'beaconStair')
 
 
@@ -168,6 +173,37 @@ def along_span(poly, c):
     return span_at(flipped, c)
 
 
+def qat(a, c):
+    """A great-quay-frame point (along out to sea, across north) in the model frame (x, z)."""
+    sa, ca = math.sin(QUAY['rot']), math.cos(QUAY['rot'])
+    return (QUAY['x'] + sa * a + ca * c, QUAY['z'] + ca * a - sa * c)
+
+
+def qlocal(x, z):
+    sa, ca = math.sin(QUAY['rot']), math.cos(QUAY['rot'])
+    dx, dz = x - QUAY['x'], z - QUAY['z']
+    return (dx * sa + dz * ca, dx * ca - dz * sa)
+
+
+def qxyz(a, c, y):
+    x, z = qat(a, c)
+    return (x, y, z)
+
+
+def prism(p, top, thick, color, mat=WOOD):
+    """A slab under a convex face of model-frame points (x, y, z), `thick` deep."""
+    bm = p.bm
+    tops = [bm.verts.new(P(x, y, z)) for x, y, z in top]
+    bots = [bm.verts.new(P(x, y - thick, z)) for x, y, z in top]
+    faces = [bm.faces.new(tops), bm.faces.new(list(reversed(bots)))]
+    n = len(top)
+    for i in range(n):
+        j = (i + 1) % n
+        faces.append(bm.faces.new((bots[i], bots[j], tops[j], tops[i])))
+    p.paint(faces, color, mat)
+    p.closed.extend(faces)
+
+
 def hslab(p, d, poly, top, thick, color, mat=WOOD):
     """A horizontal slab over a deck-frame polygon, its top at `top`."""
     if len(poly) < 3:
@@ -198,6 +234,10 @@ def poly_bounds(poly):
 # ---------------------------------------------------------------------------
 BOARD_LEN = 3.3      # boards butt-jointed along each course, staggered course to course
 COURSE = 0.55        # course pitch (a board's width), fitted to each deck
+# the great quay's two fields are broad and seen from above: longer boards, and its frame on a
+# wider grid of piles and joists (a pile every ~3 yd each way, the piers' 2.3 by 2.6)
+QUAY_DECKS = ('quayNorth', 'quaySouth')
+QUAY_BOARD_LEN = 4.4
 
 
 def build_decks():
@@ -213,13 +253,14 @@ def build_decks():
         for i in range(n):
             s0 = a_lo + step * i + 0.025
             s1 = a_lo + step * (i + 1) - 0.025
-            offset = (course % 3) * BOARD_LEN / 3
+            board_len = QUAY_BOARD_LEN if name in QUAY_DECKS else BOARD_LEN
+            offset = (course % 3) * board_len / 3
             cuts = [c_lo]
-            c = c_lo + BOARD_LEN - offset
+            c = c_lo + board_len - offset
             while c < c_hi - 0.6:
                 if c - cuts[-1] > 0.6:
                     cuts.append(c)
-                c += BOARD_LEN
+                c += board_len
             cuts.append(c_hi)
             for j in range(len(cuts) - 1):
                 lo = cuts[j] + (0.015 if j > 0 else 0.0)
@@ -315,7 +356,7 @@ def build_frame():
                    0.28, 0.38, PAL['post'])
         # joists along the heading under the courses
         width = c_hi - c_lo
-        n_joists = max(2, int(round(width / 1.3)))
+        n_joists = max(2, int(round(width / (2.4 if name in QUAY_DECKS else 1.3))))
         for i in range(n_joists):
             c = c_lo + 0.45 + (width - 0.9) * i / (n_joists - 1)
             span = along_span(poly, c)
@@ -324,7 +365,7 @@ def build_frame():
             W.beam(p, xyz(d, span[0] + 0.2, c, under - 0.13), xyz(d, span[1] - 0.2, c, under - 0.13), 0.2, 0.24,
                    PAL['post_dark'])
         # pile bents across the deck every ~2.3 yd: piles at the edges and the middle, a cap
-        bents = rows(a_lo + 0.45, a_hi - 0.4, 2.3)
+        bents = rows(a_lo + 0.45, a_hi - 0.4, 3.0 if name in QUAY_DECKS else 2.3)
         cap = under - 0.3
         lines = {'lo': [], 'hi': []}
         for a in bents:
@@ -332,7 +373,10 @@ def build_frame():
             if span is None or span[1] - span[0] < 1.0:
                 continue
             lo, hi = span[0] + 0.3, span[1] - 0.3
-            cols = (lo, (lo + hi) / 2, hi) if hi - lo > 2.4 else (lo, hi)
+            # a pile every 2.6 yd or less across (the piers' edges and middle), 3.4 on the quay
+            pitch = 3.4 if name in QUAY_DECKS else 2.6
+            m = 1 if hi - lo <= 2.4 else max(2, int(math.ceil((hi - lo) / pitch)))
+            cols = [lo + (hi - lo) * k / m for k in range(m + 1)]
             for c in cols:
                 x, z = at(d, a, c)
                 W.post(p, x, z, under - 0.1, foot(x, z), 0.42, PAL['pile'])
@@ -347,7 +391,57 @@ def build_frame():
     x0, z0 = at(bw, -bw['hl'] + 0.1, -bw['hw'] - 0.1)
     x1, z1 = at(bw, bw['hl'] - 0.1, -bw['hw'] - 0.1)
     stone_line(p, x0, z0, x1, z1, bw['near'] - PLANK_T - 0.12, 0.6, seed=1)
+    build_quay_wall(p)
     return p
+
+
+def sheathing(p, a0, c0, a1, c1, top0, top1):
+    """Vertical boards on the quay's planks along a quay-frame line, from the planks up to a
+    top that runs from top0 to top1, a wale along their heads and a rubbing strip across them."""
+    x0, z0 = qat(a0, c0)
+    x1, z1 = qat(a1, c1)
+    length = math.hypot(x1 - x0, z1 - z0)
+    yaw = math.atan2(x1 - x0, z1 - z0)
+    n = max(1, int(math.ceil(length / 0.36)))
+    for i in range(n):
+        t = (i + 0.5) / n
+        top = top0 + (top1 - top0) * t
+        h = top - (BW_TOP - 0.05)
+        if h < 0.25:
+            continue
+        x, z = x0 + (x1 - x0) * t, z0 + (z1 - z0) * t
+        p.box((x, BW_TOP - 0.05 + h / 2, z), (0.09, h, length / n - 0.035), pick(PAL['plank'], i), WOOD, yaw=yaw)
+    tops = [(x0, top0, z0), (x1, top1, z1)]
+    if max(top0, top1) - BW_TOP > 0.4:
+        W.beam(p, (x0, top0 - 0.1, z0), (x1, top1 - 0.1, z1), 0.2, 0.22, PAL['post_dark'])
+    if min(top0, top1) - BW_TOP > 0.8:
+        W.beam(p, (x0, BW_TOP + 0.5, z0), (x1, BW_TOP + 0.5, z1), 0.16, 0.14, PAL['trim_dark'])
+    for x, y, z in tops:
+        if y - BW_TOP > 0.4:
+            W.post(p, x, z, y, BW_TOP - 0.05, 0.26, PAL['post_dark'])
+
+
+def build_quay_wall(p):
+    """The quay's side of the wharf's drop: the wharf's pier, arm and berth head stand 1.75 yd
+    over the quay, and the wharf's own flight climbs beside it, so the quay dresses their faces
+    in boards (the wharf's frame and piles stand behind them)."""
+    Q = QUAY
+    top = Q['wharfTop'] - 0.5
+    off = 0.05
+    # the wharf pier's north side, from the arm to the berth head, and the berth head's back
+    sheathing(p, Q['armEdge'], Q['wharfEdge'] + off, Q['face'], Q['wharfEdge'] + off, top, top)
+    sheathing(p, Q['face'] - off, Q['wharfEdge'], Q['face'] - off, Q['berthHeadC'], top, top)
+    # the arm's east edge, and the flight's beside it down to where its treads come low
+    sheathing(p, Q['armEdge'] + off, Q['wharfEdge'], Q['armEdge'] + off, Q['armEnd'], top, top)
+    foot = BW_TOP + LAYOUT['firstRise']
+
+    def flight_top(c):
+        t = (c - Q['armEnd']) / (Q['flightFoot'] - Q['armEnd'])
+        return Q['wharfTop'] + (foot - Q['wharfTop']) * t - 0.5
+
+    c_end = Q['armEnd'] + 2.4
+    sheathing(p, Q['armEdge'] + off, Q['armEnd'], Q['armEdge'] + off, c_end, flight_top(Q['armEnd']),
+              flight_top(c_end))
 
 
 # ---------------------------------------------------------------------------
@@ -446,8 +540,9 @@ def build_stairs():
 NEWEL_TOP = 0.2
 # rail corners that carry a newel lantern: (rail index, corner index). The seaward line (0):
 # the boardwalk's north end, the north pier's head (its other corner has a lantern post), the
-# two pier mouths either side of the boardwalk, the middle pier's head (ditto), and the wharf
-# flight's foot; the stairs' heads (1 to 4); the Beacon stair's head and foot (5).
+# north pier's corner on the quay's sea face, the middle pier's two mouths on the face and its
+# head (its other corner has a lantern post), and the face's end by the ferry wharf's berth
+# head; the stairs' heads (1 to 4); the Beacon stair's head and foot (5).
 NEWEL_LANTERNS = {(0, 0), (0, 3), (0, 5), (0, 6), (0, 8), (0, 9), (0, 10), (1, 0), (2, 0), (3, 0), (4, 0),
                   (5, 0), (5, 1), (5, 6), (5, 7)}
 
@@ -529,11 +624,111 @@ def build_cargo():
             p.sweep([(x, base, z), (x, base + h * 0.5, z), (x, base + h, z)], r, r, pick(PAL['plank'], int(abs(z) * 10)),
                     sides=10, radii=[r * 0.84, r, r * 0.84])
             p.cylinder((x, base + h - 0.01, z), (x, base + h + 0.02, z), r * 0.8, PAL['trim_dark'], WOOD, sides=10)
+        elif k == 'bollard':
+            # the ferry wharf's bollard: a dark timber post under an iron cap
+            p.cylinder((x, base - 0.02, z), (x, base + q['height'] - 0.16, z), q['r'] * 0.85, PAL['post_dark'], WOOD,
+                       sides=10)
+            p.cylinder((x, base + q['height'] - 0.16, z), (x, base + q['height'], z), q['r'], PAL['iron'], IRON,
+                       sides=10)
+    timbers = [q for q in PROPS if q['kind'] == 'timberPost']
+    for q in timbers:
+        if q['r'] >= 0.45:
+            build_crane(p, q)
+    shelter = [q for q in timbers if q['r'] < 0.45]
+    if shelter:
+        build_shelter(p, shelter)
     return p
 
 
+def build_crane(p, q):
+    """The quay crane: a stout mast on a timber sill with knee braces, a jib swung out over the
+    sea face on a strut and an iron stay, the fall to a hook with a cargo net slung on it, and the
+    winch on the mast's landward side."""
+    x, z, base = q['x'], q['z'], q['base']
+    top = base + q['height']
+    rot = QUAY['rot']
+    ax, az = math.sin(rot), math.cos(rot)      # out to sea
+    cx, cz = math.cos(rot), -math.sin(rot)     # across the quay
+    p.box((x, base + 0.12, z), (1.7, 0.24, 1.7), PAL['post_dark'], WOOD, yaw=rot, bevel=0.03)
+    W.post(p, x, z, top, base + 0.2, 0.72, PAL['post_dark'], WOOD, bevel=0.03)
+    p.box((x, top + 0.1, z), (0.92, 0.2, 0.92), PAL['trim_dark'], WOOD, yaw=rot, bevel=0.02)
+    for dx, dz in ((ax, az), (-ax, -az), (cx, cz), (-cx, -cz)):
+        W.beam(p, (x + dx * 0.8, base + 0.24, z + dz * 0.8), (x + dx * 0.34, base + 1.7, z + dz * 0.34), 0.2, 0.2,
+               PAL['post'])
+    for yy in (base + 2.2, top - 1.6):
+        p.box((x, yy, z), (0.8, 0.12, 0.8), PAL['iron'], IRON, yaw=rot)
+    jib_y = top - 1.0
+    reach = 5.0
+    tip = (x + ax * reach, jib_y + 0.4, z + az * reach)
+    W.beam(p, (x - ax * 0.5, jib_y - 0.05, z - az * 0.5), tip, 0.34, 0.42, PAL['post'])
+    W.beam(p, (x + ax * 0.36, jib_y - 2.7, z + az * 0.36), (x + ax * 2.9, jib_y + 0.05, z + az * 2.9), 0.24, 0.26,
+           PAL['post_dark'])
+    W.beam(p, (x, top + 0.12, z), (tip[0] - ax * 0.2, tip[1] + 0.2, tip[2] - az * 0.2), 0.07, 0.07, PAL['iron'], IRON)
+    # the sheave at the jib's head, the fall, the hook and the net of cargo slung on it
+    p.cylinder((tip[0] - cx * 0.22, tip[1] - 0.05, tip[2] - cz * 0.22),
+               (tip[0] + cx * 0.22, tip[1] - 0.05, tip[2] + cz * 0.22), 0.26, PAL['iron'], IRON, sides=10)
+    hook_y = base + 2.6
+    p.box((tip[0], (tip[1] + hook_y) / 2, tip[2]), (0.06, tip[1] - hook_y, 0.06), PAL['rope'], ROPE)
+    p.ring((tip[0], hook_y - 0.08, tip[2]), 0.13, 0.04, PAL['iron'], segments=10, axis=(cx, 0, cz), mat=IRON,
+           depth=0.04)
+    W.crate(p, tip[0], hook_y - 1.05, tip[2], 0.72, rot + 0.3, pick(PAL['plank'], 2))
+    p.rock_blob((tip[0], hook_y - 0.62, tip[2]), (0.95, 0.9, 0.95), PAL['net'], ROPE, jitter=0.12)
+    for sx in (-1, 1):
+        p.box((tip[0] + cx * sx * 0.28, hook_y - 0.35, tip[2] + cz * sx * 0.28), (0.04, 0.6, 0.04), PAL['rope_dark'],
+              ROPE)
+    # the winch: a drum between two cheeks on the landward side, rope wound on it, a crank
+    wx, wz = x - ax * 0.75, z - az * 0.75
+    for sx in (-1, 1):
+        p.box((wx + cx * sx * 0.55, base + 0.85, wz + cz * sx * 0.55), (0.12, 1.2, 0.7), PAL['post'], WOOD, yaw=rot)
+    p.cylinder((wx - cx * 0.5, base + 1.15, wz - cz * 0.5), (wx + cx * 0.5, base + 1.15, wz + cz * 0.5), 0.24,
+               PAL['post_dark'], WOOD, sides=10)
+    p.cylinder((wx - cx * 0.36, base + 1.15, wz - cz * 0.36), (wx + cx * 0.36, base + 1.15, wz + cz * 0.36), 0.29,
+               PAL['rope'], ROPE, sides=10)
+    W.beam(p, (wx + cx * 0.62, base + 1.15, wz + cz * 0.62), (wx + cx * 0.72, base + 0.8, wz + cz * 0.72), 0.06,
+           0.06, PAL['iron'], IRON)
+
+
+def build_shelter(p, posts):
+    """The cargo shelter: four corner posts under plates and tie beams, knee braces, a ridge on
+    king posts, and a roof of lapped shingle courses overhanging the posts on every side."""
+    loc = [qlocal(q['x'], q['z']) for q in posts]
+    a0, a1 = min(a for a, _ in loc), max(a for a, _ in loc)
+    c0, c1 = min(c for _, c in loc), max(c for _, c in loc)
+    base = min(q['base'] for q in posts)
+    rot = QUAY['rot']
+    eave = base + posts[0]['height'] - 0.35
+    ridge = eave + 1.2
+    cm = (c0 + c1) / 2
+    for q, (a, c) in zip(posts, loc):
+        W.post(p, q['x'], q['z'], eave + 0.12, base - 0.05, 0.36, PAL['post_dark'], WOOD, bevel=0.025)
+        p.box((q['x'], base + 0.05, q['z']), (0.52, 0.1, 0.52), PAL['iron'], IRON, yaw=rot)
+        da = 1 if a < (a0 + a1) / 2 else -1
+        dc = 1 if c < cm else -1
+        W.beam(p, qxyz(a, c, eave - 0.95), qxyz(a + da * 0.85, c, eave - 0.08), 0.15, 0.15, PAL['post'])
+        W.beam(p, qxyz(a, c, eave - 0.95), qxyz(a, c + dc * 0.85, eave - 0.08), 0.15, 0.15, PAL['post'])
+    for c in (c0, c1):
+        W.beam(p, qxyz(a0 - 0.35, c, eave), qxyz(a1 + 0.35, c, eave), 0.26, 0.3, PAL['post'])
+    for a in (a0, a1):
+        W.beam(p, qxyz(a, c0 - 0.25, eave + 0.2), qxyz(a, c1 + 0.25, eave + 0.2), 0.24, 0.26, PAL['post_dark'])
+        W.beam(p, qxyz(a, cm, eave + 0.3), qxyz(a, cm, ridge - 0.1), 0.2, 0.2, PAL['post_dark'])
+    W.beam(p, qxyz(a0 - 0.55, cm, ridge), qxyz(a1 + 0.55, cm, ridge), 0.24, 0.28, PAL['post_dark'])
+    over, ends = 0.6, 0.6
+    courses = 5
+    for side, ce in ((-1, c0 - over), (1, c1 + over)):
+        ye = eave - 0.22
+        for k in range(courses):
+            t0 = k / courses
+            t1 = min(1.0, (k + 1) / courses + 0.07)
+            ca, cb = ce + (cm - ce) * t0, ce + (cm - ce) * t1
+            ya, yb = ye + (ridge + 0.14 - ye) * t0 + 0.04, ye + (ridge + 0.14 - ye) * t1
+            prism(p, [qxyz(a0 - ends, ca, ya), qxyz(a1 + ends, ca, ya), qxyz(a1 + ends, cb, yb),
+                      qxyz(a0 - ends, cb, yb)], 0.1, pick(PAL['shingle'], k + (side > 0)), WOOD)
+    # the ridge cap
+    W.beam(p, qxyz(a0 - ends, cm, ridge + 0.2), qxyz(a1 + ends, cm, ridge + 0.2), 0.34, 0.12, PAL['shingle'][1])
+
+
 # where boats lie against the harbor: (deck, along from, along to, side) for the fender piles
-FENDERS = (('pierNorth', 3.0, 11.6, 1), ('pierMiddle', -8.0, 11.6, 1), ('pierMiddle', -8.0, 11.6, -1),
+FENDERS = (('pierNorth', 3.0, 11.6, 1), ('pierMiddle', -3.4, 3.4, 1), ('pierMiddle', -3.4, 3.4, -1),
            ('beaconPier', -9.0, 12.6, 1), ('beaconPier', -9.0, 12.6, -1))
 
 
@@ -560,6 +755,19 @@ def build_trim():
                 if i % 2 == 0:
                     xc, zc = at(d, a + step / 2 + 0.5, side * (d['hw'] + 0.06))
                     p.box((xc, top + 0.02, zc), (0.1, 0.1, 0.42), iron, IRON, yaw=d['rot'], bevel=0.015)
+    # fender piles along the quay's sea face (either side of the middle pier), rings between
+    face = QUAY['face'] + 0.12
+    ftop = BW_TOP - PLANK_T - 0.1
+    for c0, c1 in ((QUAY['berthHeadC'] + 0.5, QUAY['midC0'] - 0.4), (QUAY['midC1'] + 0.4, QUAY['northEdge'] - 0.4)):
+        cs = rows(c0, c1, 1.7)
+        for i, c in enumerate(cs):
+            x, z = qat(face, c)
+            bed = max(ground(x, z), -1.4)
+            p.box((x, (ftop + bed) / 2, z), (0.22, ftop - bed, 0.22), PAL['pile'], WOOD, yaw=QUAY['rot'])
+            if i + 1 < len(cs):
+                xr, zr = qat(QUAY['face'] + 0.05, (c + cs[i + 1]) / 2)
+                p.ring((xr, ftop - 0.3, zr), 0.14, 0.035, iron, segments=10,
+                       axis=(math.sin(QUAY['rot']), 0, math.cos(QUAY['rot'])), mat=IRON, depth=0.035)
     # bolt heads along the fascia of every plank field
     for name in LEVEL_DECKS:
         d = DECKS[name]
@@ -620,10 +828,26 @@ def build_clutter():
     for i, (a, c, lift) in enumerate(((-1.6, -1.12, 0.0), (-0.95, -1.12, 0.0), (-1.3, -1.12, 0.62))):
         x, z = at(bw, a, c)
         crab_pot(p, x, bw['near'] + lift, z, bw['rot'] + 0.1 * i)
-    # a net heaped on the middle pier's head, by its crates, and sacks on the Beacon dock
+    # a net heaped on the middle pier by its root, and sacks on the Beacon dock
     pm = DECKS['pierMiddle']
-    nx, nz = at(pm, 10.9, -0.55)
+    nx, nz = at(pm, -1.0, -1.2)
     p.rock_blob((nx, pm['near'] + 0.1, nz), (0.9, 0.26, 0.7), PAL['net'], ROPE, jitter=0.2)
+    # the great quay: a coil by every bollard, sacks by the crane's cargo, crab pots and a net
+    # beside the cargo shelter
+    for q in PROPS:
+        if q['kind'] == 'bollard':
+            a, c = qlocal(q['x'], q['z'])
+            cx, cz = qat(a - 0.75, c + 0.35)
+            W.coil(p, cx, q['base'], cz, 0.3)
+    for i, (a, c) in enumerate(((21.9, 7.6), (22.5, 11.0), (21.5, 11.3))):
+        sx, sz = qat(a, c)
+        p.rock_blob((sx, BW_TOP + 0.26, sz), (0.6, 0.52, 0.48), PAL['rope_dark'] if i % 2 else PAL['rope'], ROPE,
+                    jitter=0.12)
+    for i, (a, c, lift) in enumerate(((20.6, 25.7, 0.0), (21.3, 25.7, 0.0), (20.95, 25.7, 0.62))):
+        x, z = qat(a, c)
+        crab_pot(p, x, BW_TOP + lift, z, QUAY['rot'] + 0.15 * i)
+    nx, nz = qat(15.2, 23.2)
+    p.rock_blob((nx, BW_TOP + 0.1, nz), (1.0, 0.26, 0.8), PAL['net'], ROPE, jitter=0.2)
     bp = DECKS['beaconPier']
     for i, (a, c) in enumerate(((9.2, -1.45), (8.7, -1.5))):
         sx, sz = at(bp, a, c)

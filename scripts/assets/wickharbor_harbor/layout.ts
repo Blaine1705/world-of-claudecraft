@@ -17,6 +17,16 @@ import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  QUAY_ARM_EDGE_A,
+  QUAY_BERTH_HEAD_C,
+  QUAY_FACE_A,
+  QUAY_MID_A1,
+  QUAY_MID_C0,
+  QUAY_MID_C1,
+  QUAY_NORTH_EDGE_C,
+  QUAY_ORIGIN,
+  QUAY_ROT,
+  QUAY_WHARF_EDGE_C,
   WICKHARBOR_BOARDWALK_TOP,
   WICKHARBOR_HARBOR_DECKS,
   WICKHARBOR_HARBOR_FRAME,
@@ -25,6 +35,9 @@ import {
   WICKHARBOR_STAIR_FIRST_RISE,
 } from '../../../src/sim/content/wickharbor_harbor';
 import {
+  WICKHARBOR_ARM_C1,
+  WICKHARBOR_FLIGHT_FOOT_C,
+  WICKHARBOR_WHARF_ABOVE_WATER,
   WICKHARBOR_WHARF_DECKS,
   WICKHARBOR_WHARF_ORIGIN,
 } from '../../../src/sim/content/wickharbor_wharf';
@@ -38,10 +51,10 @@ const r3 = (v: number): number => Math.round(v * 1e3) / 1e3;
 const OX = WICKHARBOR_HARBOR_FRAME.x;
 const OZ = WICKHARBOR_HARBOR_FRAME.z;
 
-/** The terrain grids under the structures (model frame): the shore network, and the Old
- *  Beacon's dock and stair. */
+/** The terrain grids under the structures (model frame): the shore network with the great
+ *  quay, and the Old Beacon's dock and stair. */
 export const TERRAIN_GRIDS = [
-  { x0: -16, x1: 30, z0: -16, z1: 13, step: 0.5 },
+  { x0: -16, x1: 30, z0: -16, z1: 24, step: 0.5 },
   { x0: 26, x1: 65, z0: -44, z1: -5, step: 0.5 },
 ] as const;
 
@@ -127,6 +140,25 @@ export function wickharborHarborLayout() {
       hw: r4(flight.hw),
     },
     wharfOrigin: { x: r4(WICKHARBOR_WHARF_ORIGIN.x - OX), z: r4(WICKHARBOR_WHARF_ORIGIN.z - OZ) },
+    // the great quay's frame (the wharf's) and the edges the model dresses: the sea face, the
+    // wharf's pier, arm and berth head it meets (their planks stand wharfTop over the water),
+    // the north pier's side, the middle pier's finger, and the arm's north end (the flight)
+    quay: {
+      x: r4(QUAY_ORIGIN.x - OX),
+      z: r4(QUAY_ORIGIN.z - OZ),
+      rot: QUAY_ROT,
+      face: QUAY_FACE_A,
+      wharfEdge: QUAY_WHARF_EDGE_C,
+      armEdge: QUAY_ARM_EDGE_A,
+      armEnd: WICKHARBOR_ARM_C1,
+      flightFoot: WICKHARBOR_FLIGHT_FOOT_C,
+      berthHeadC: QUAY_BERTH_HEAD_C,
+      northEdge: r4(QUAY_NORTH_EDGE_C),
+      midC0: QUAY_MID_C0,
+      midC1: QUAY_MID_C1,
+      midA1: QUAY_MID_A1,
+      wharfTop: WICKHARBOR_WHARF_ABOVE_WATER,
+    },
     // each rail as its corners (where posts must stand) and, per leg, the planks' height
     // every half yard (a rail down a stair climbs with it)
     rails: WICKHARBOR_HARBOR_RAILS.map((rail) => ({
