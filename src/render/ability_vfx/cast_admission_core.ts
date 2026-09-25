@@ -13,9 +13,10 @@
 // authored linger (the sequencer's longest dwell); a channel tick extends it,
 // so a refused channel stays refused to its end. A new release of the same
 // ability is a new cast and is decided afresh; only a release that follows a
-// latched cast bar belongs to it. Follow-through is matched to the caster's
-// latest cast of that ability, so two overlapping flights of one ability
-// share one verdict, the newer cast's.
+// latched cast bar belongs to it, and a bar the sim interrupted hands its
+// release to nobody. Follow-through is matched to the caster's latest cast of
+// that ability, so two overlapping flights of one ability share one verdict,
+// the newer cast's.
 //
 // Host-agnostic (RENDER_PURE_CORES): the gate and the clock are injected, and
 // a latch is allocated only on a refusal.
@@ -106,6 +107,16 @@ export class CastAdmission {
   /** A per-frame hold: shown the frame its families are ready. */
   hold(mask: number): boolean {
     return this.gate.ready(mask);
+  }
+
+  /** The caster's cast bar stopped with no release to follow (an interrupt):
+   *  the refusal it latched holds nothing any more, so a later cast of that
+   *  ability is decided afresh instead of being taken for its release. */
+  interrupted(casterId: number): void {
+    const casts = this.refused.get(casterId);
+    if (!casts) return;
+    for (const [abilityId, cast] of casts) if (cast.windup) casts.delete(abilityId);
+    if (casts.size === 0) this.refused.delete(casterId);
   }
 
   /** Whether a refusal is latched for this caster and ability right now. */

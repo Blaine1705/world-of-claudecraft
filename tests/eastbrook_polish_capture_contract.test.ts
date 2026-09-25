@@ -693,7 +693,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
   // Re-minted for the AoE ring slot builder: the renderer leaf moves the ring material to aoe_ring_mesh.ts and names the kit in the gate comment. No capture was retaken.
   // Re-minted for the per-family cast gate: the renderer leaf hands the gate object to the ability presentation and routes the Bloodletting recovery through the painter. No capture was retaken.
-  'd4d623bf835f37ad7ddd8f42cb0404207658f4b3df411004ce485e2462f28eb6';
+  // Re-minted for the cast bar interrupt: the renderer leaf routes an interrupted castStop to the painter. No capture was retaken.
+  '9739ac1ffd8b673065647c28f87ffa9df37d996bf5e4c2779022004f928efd35';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -54,6 +54,30 @@ describe('a cast refused at its cast bar', () => {
     expect(admission.follow(7, 'frostbolt', ENGINE, 5)).toBe(true);
   });
 
+  it('drops the latch of an interrupted cast bar, so a later instant release is its own cast', () => {
+    const { gate, admission } = harness(0);
+    expect(admission.windup(7, 'frostbolt', ENGINE, 0, 2, true)).toBe(false);
+    gate.bits = ENGINE;
+    admission.interrupted(7);
+    expect(admission.isRefused(7, 'frostbolt', 1)).toBe(false);
+    expect(admission.release(7, 'frostbolt', ENGINE, 1)).toBe(true);
+    expect(gate.refusals).toBe(1);
+  });
+
+  it('keeps a refused release through an interrupt of another bar, and leaves other casters alone', () => {
+    const { gate, admission } = harness(0);
+    expect(admission.release(7, 'fire_blast', ENGINE, 0)).toBe(false);
+    expect(admission.windup(7, 'frostbolt', ENGINE, 0, 2, true)).toBe(false);
+    expect(admission.windup(8, 'frostbolt', ENGINE, 0, 2, true)).toBe(false);
+    gate.bits = ENGINE;
+    admission.interrupted(7);
+    // The released cast is still in flight: its impact stays refused.
+    expect(admission.follow(7, 'fire_blast', ENGINE, 1)).toBe(false);
+    expect(admission.release(7, 'frostbolt', ENGINE, 1)).toBe(true);
+    // The other caster's bar was not interrupted: its release belongs to it.
+    expect(admission.release(8, 'frostbolt', ENGINE, 2)).toBe(false);
+  });
+
   it('refuses a cast first seen mid-bar while its families are not ready, and latches it', () => {
     const { gate, admission } = harness(0);
     expect(admission.windup(7, 'frostbolt', ENGINE, 0, 1, false)).toBe(false);

@@ -674,6 +674,12 @@ export class AbilityVfx {
     return this.kitHoldsAnswer;
   }
 
+  // A cast bar the sim stopped short (castStop without success): no release
+  // follows it, so its latched refusal is dropped.
+  castInterrupted(casterId: number): void {
+    this.admission.interrupted(casterId);
+  }
+
   // Bloodletting's recovery heal, which the renderer routes here before its
   // generic heal bloom: true when the Warrior kit claimed it, drawn or
   // refused with its cast (a refused one draws nothing, not the bloom).

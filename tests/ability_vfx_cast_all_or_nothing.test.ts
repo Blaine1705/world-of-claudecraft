@@ -192,6 +192,66 @@ describe('a refusal latched at the cast bar', () => {
   });
 });
 
+describe('an interrupted cast bar', () => {
+  it('hands its refusal to no later cast: an instant release of the same id draws', () => {
+    const rig = castGateRig();
+    const bar = (remaining: number): AbilityVfxEntityState => ({
+      id: MAGE,
+      castingAbility: remaining > 0 ? 'fireball' : null,
+      castRemaining: remaining,
+      castTotal: 2,
+      auras: [],
+    });
+    for (let t = 2; t > 1; t -= 0.05) {
+      rig.painter.syncEntity(bar(t));
+      rig.step();
+    }
+    rig.painter.castInterrupted(MAGE);
+    rig.painter.syncEntity(bar(0));
+    rig.step();
+    rig.prove(CAST_VFX_ENGINE);
+    rig.painter.handleSpellfx({
+      sourceId: MAGE,
+      targetId: VICTIM,
+      school: 'fire',
+      fx: 'projectile',
+      ability: 'fireball',
+    });
+    rig.step(20);
+    expect(rig.drawn()).toBe(CAST_VFX_ENGINE);
+    const snapshot = rig.readiness.snapshot();
+    expect(snapshot.refused).toBe(1);
+    expect(snapshot.requirementMiss).toBe(0);
+  });
+
+  it('keeps the refusal for the release that ends an uninterrupted bar', () => {
+    const rig = castGateRig();
+    const bar = (remaining: number): AbilityVfxEntityState => ({
+      id: MAGE,
+      castingAbility: remaining > 0 ? 'fireball' : null,
+      castRemaining: remaining,
+      castTotal: 2,
+      auras: [],
+    });
+    for (let t = 2; t > 1; t -= 0.05) {
+      rig.painter.syncEntity(bar(t));
+      rig.step();
+    }
+    rig.painter.syncEntity(bar(0));
+    rig.step();
+    rig.prove(CAST_VFX_ENGINE);
+    rig.painter.handleSpellfx({
+      sourceId: MAGE,
+      targetId: VICTIM,
+      school: 'fire',
+      fx: 'projectile',
+      ability: 'fireball',
+    });
+    rig.step(20);
+    expect(rig.drawn()).toBe(0);
+  });
+});
+
 describe('a queued recast of the same ability', () => {
   it('is a new cast: decided afresh though the bar never goes idle between the two', () => {
     const rig = castGateRig();

@@ -1387,7 +1387,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
   // Re-minted for the AoE ring slot builder: the renderer leaf moves the ring material to aoe_ring_mesh.ts and names the kit in the gate comment. No capture was retaken.
   // Re-minted for the per-family cast gate: the renderer leaf hands the gate object to the ability presentation and routes the Bloodletting recovery through the painter. No capture was retaken.
-  '6e07e3c6ca9542b726b8a0cd10519a0602952ee76da565bcfd6fe3e90a725889';
+  // Re-minted for the cast bar interrupt: the renderer leaf routes an interrupted castStop to the painter. No capture was retaken.
+  '0b1bba8d86e13cd0267d0f73841d88579c4b4e507d3e9bf44df1c42bf12cca57';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1403,7 +1404,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
   // Re-minted for the AoE ring slot builder: the renderer leaf moves the ring material to aoe_ring_mesh.ts and names the kit in the gate comment. No capture was retaken.
   // Re-minted for the per-family cast gate: the renderer leaf hands the gate object to the ability presentation and routes the Bloodletting recovery through the painter. No capture was retaken.
-  'd4d623bf835f37ad7ddd8f42cb0404207658f4b3df411004ce485e2462f28eb6';
+  // Re-minted for the cast bar interrupt: the renderer leaf routes an interrupted castStop to the painter. No capture was retaken.
+  '9739ac1ffd8b673065647c28f87ffa9df37d996bf5e4c2779022004f928efd35';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2788,7 +2790,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // per-family cast gate: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('b51cc0bff1bd2897e23b2b1cad85acdc8e97753ce0ea0d2f8515d2770e4ffae8');
+      // cast bar interrupt: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+    ).toBe('411c55eb7b2d0806d927dd54bf4687d81a9df36b598cf0330e74441af4b5261b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

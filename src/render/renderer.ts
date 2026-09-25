@@ -7114,10 +7114,10 @@ export class Renderer {
         }
         break;
       }
-      case 'castStop': {
+      case 'castStop':
         this.needleOfFateVfx.endCast(ev.entityId);
+        if (!ev.success) this.abilityVfx.castInterrupted(ev.entityId);
         break;
-      }
       case 'bgProposed':
         prebuildBattlegroundView(this.bgViews, this.battlegroundViewHost());
         break;
