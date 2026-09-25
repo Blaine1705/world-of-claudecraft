@@ -36,6 +36,7 @@ import { thornhollowFields } from './thornhollow_fields';
 import type { GuidePage, PageContext } from './types';
 import { wishIKnew } from './wish_i_knew';
 import { world } from './world';
+import { worldPvp } from './world_pvp';
 
 export type { GuidePage, PageContext } from './types';
 
@@ -58,6 +59,7 @@ const PAGES: Record<string, GuidePage> = {
   mounts,
   arena,
   'thornhollow-fields': thornhollowFields,
+  'world-pvp': worldPvp,
   deeds,
   reliquary,
   combat,

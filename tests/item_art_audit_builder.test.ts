@@ -847,13 +847,14 @@ describe('item-art audit builder', () => {
     // tree, not invented or derived from either parent.
     // PR3941: measured again after retiring the five premium reins.
     // Viridian Valestrider: measured again with its reins icon, 1284 / 1302.
+    // Warfare Season 2: measured again with its four painted weapons, 1288 / 1306.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '79595f2b1b56601456e75cc242c8c2fd1dc9942a4c3d1c3900327927a3e0db51',
-      catalogBytes: 699669,
+      catalogSha256: '06b4a88dc7e0f64c16ca5d598ab0e40835991c49f949e173eb7e674c2a0ff45f',
+      catalogBytes: 701788,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1284,
-      liveItemCount: 1302,
+      catalogCount: 1288,
+      liveItemCount: 1306,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -871,7 +872,7 @@ describe('item-art audit builder', () => {
         identity: 31,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '30bf3c995d551dd8f9683d2a75432ea70cf93533ebe65e36d5eaa2d09b3ab87e',
+      shippingCatalogSha256: '5c4b91dab3af09a08ab7f48abf56ab964c95c7125c30fd4431d5f68b3fd5ba45',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
+import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
 import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import {
@@ -319,7 +320,9 @@ describe('item webp icons', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04) to 136. This merge unions both waves
     // plus this branch's own Crucible professions weapon additions; re-counted directly
     // off the merged src/ui/weapon_variants.ts (Object.keys(ITEM_WEAPON_VARIANTS).size).
-    expect(WEAPON_IMAGE_IDS.size).toBe(138);
+    // 138 -> 142: the four Warfare Season 2 honor weapons
+    // (warfare-season2-weapons-2026-09-25).
+    expect(WEAPON_IMAGE_IDS.size).toBe(142);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -374,11 +377,15 @@ describe('item webp icons', () => {
     // NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS are each declared empty in
     // src/sim/content/ignivar_loot.ts / zone3.ts), so the ledger is back to the EMPTY
     // set: no artless item can hide behind an open wave, and the next commissioned wave
-    // re-pins its exact membership here when it stages.
+    // re-pins its exact membership here when it stages. Open wave: the 135
+    // Warfare Season 2 armor pieces (content/pvp_honor_season2.ts), painted in a
+    // follow-up art pass.
+    const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
+    expect(season2Armor).toHaveLength(135);
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
-    ).toEqual([]);
+    ).toEqual([...season2Armor].sort());
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

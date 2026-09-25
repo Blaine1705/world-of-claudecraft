@@ -177,6 +177,7 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'honor',
   'lifetimeHonor',
   'honorArenaDaily',
+  'worldPvp',
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
@@ -2327,13 +2328,17 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // and its four ferry:<from>_<to> visit marks (two routes, both ways),
     // earned in this maximal fixture: MEASURED on the ferry branch's tree
     // (94 with the retired single route's two marks, +60 for the second route).
+    // Plus 13,496 for the Warfare Season 2 honor stock (139 item ids across the
+    // maximal fixture's discovered-item and reliquary fields). MEASURED: the
+    // settled blob grew by exactly this much when the stock landed.
     expect(counterfactualBytes - 156144).toBe(
       Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
         183 +
         1548 +
         50 +
         71 +
-        154,
+        154 +
+        13496,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2354,9 +2359,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       ),
       // questsDone moved from 50 to 100 against the SAME forgeBaseline reference
       // point: the +50 hub practice quest delta above, on top of the prior +50
-      // this row already carried. deeds +36 and deedStats +118 more for the
-      // Eastbrook ferry's round-trip deed and its four visit marks (the +154).
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 68, deedStats: 139, reliquary: 80 });
+      // this row already carried. deedStats +4,648 and reliquary +8,848: the
+      // Warfare Season 2 stock's 139 item ids (the 13,496 attributed above).
+      // deeds +36 and deedStats +118 more for the Eastbrook ferry's round-trip
+      // deed and its four visit marks (the +154).
+    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 68, deedStats: 4787, reliquary: 8928 });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2365,12 +2372,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // after the real merge settle: 209,474. RE-MEASURED at 209,524 once the
     // hub training dummy and hub healing dummy PRs landed their two guided
     // practice quests (+50, attributed above; neither dummy nor its NPC touches
-    // any other field this fixture tracks).
+    // any other field this fixture tracks). RE-MEASURED at 223,269 for Warfare
+    // Season 2: exactly +13,496, the 139 honor item ids attributed above.
     expect(
       Buffer.byteLength(JSON.stringify(preReleaseCounterfactual), 'utf8'),
       'field_kit and the Bramblehide release content removed, must reproduce the recorded pre-field-kit Crucible+hammer baseline',
-      // +154 for the Eastbrook ferry's round-trip deed and its four visit marks.
-    ).toBe(209927);
+      // +13,496 for the Warfare Season 2 honor stock, +154 for the Eastbrook
+      // ferry's round-trip deed and its four visit marks.
+    ).toBe(223423);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2381,12 +2390,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 211,392 for the Viridian Valestrider, exactly +22 over the 211,370
     // above: the one new developer-only mount reins id in
     // deedStats.itemsDiscovered (`"reins_avian_strider",`), inside the same
-    // devMountReleaseDelta isolation.
+    // devMountReleaseDelta isolation. RE-MEASURED at 224,888 for Warfare
+    // Season 2: exactly +13,496, the same 139 honor item ids.
     expect(
       counterfactualBytes,
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
-      // +154 for the Eastbrook ferry's round-trip deed and its four visit marks.
-    ).toBe(211546);
+      // +13,496 for the Warfare Season 2 honor stock, +154 for the Eastbrook
+      // ferry's round-trip deed and its four visit marks.
+    ).toBe(225042);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2451,8 +2462,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // ferry:nightbloom_eastbrook, ferry:wickharbor_drakelands,
     // ferry:drakelands_wickharbor), +60 in deedStats. Same standing rule,
     // same 381 width: 211,178..211,559.
-    expect(bytes, reMint).toBeGreaterThan(211178);
-    expect(bytes, reMint).toBeLessThan(211559);
+    // RE-BASED for Warfare Season 2: 224,900 bytes, exactly +13,496 over the
+    // 211,404 above: the 139 honor item ids in deedStats.itemsDiscovered and
+    // the reliquary firstFind rows (attributed in the fixture rows above).
+    // Same standing rule, same 381 width: 224,520..224,901.
+    // Composed at the release/v0.44.0 merge into the ferry branch: 225,054
+    // bytes, the Season 2 stock's +13,496 plus the ferry's +154 over the
+    // 211,404 above. Same standing rule, same 381 width: 224,674..225,055.
+    expect(bytes, reMint).toBeGreaterThan(224674);
+    expect(bytes, reMint).toBeLessThan(225055);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
@@ -2461,8 +2479,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 163,840-byte threshold warned on this legal modeled state. Measured here,
     // after this release merge's settle: this combined fixture (hammer
     // content, field_kit, the Bramblehide release content, and the two hub
-    // practice quests) is 211,084 bytes, 18,292 bytes of headroom below the
-    // threshold. Pin the measured
+    // practice quests) was 211,084 bytes; with the Warfare Season 2 stock it is
+    // 224,900 bytes, 4,476 bytes of headroom below the threshold. Pin the measured
     // relation: a lower threshold or further content growth crossing it
     // requires re-measuring and reviewing both sides together, never silently
     // widening this test's narrow tracking band or the warn threshold itself.

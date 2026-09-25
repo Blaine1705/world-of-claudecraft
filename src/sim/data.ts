@@ -328,6 +328,7 @@ import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
 import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
+import { SEASON2_ITEMS } from './content/pvp_honor_season2';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
 
@@ -378,6 +379,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   RETIRED_HEROIC_ITEMS,
   IGNIVAR_LOOT_ITEMS,
   WARFARE_ITEMS,
+  SEASON2_ITEMS,
   RIFT_ITEMS,
   REALM_ITEMS,
   DRAKELANDS_ITEMS,
