@@ -44,6 +44,12 @@ function legacyStep(
 
 const freshFog = (): THREE.Fog => new THREE.Fog(0x88aacc, 30, 220);
 
+function sceneWith(fog: THREE.Fog): THREE.Scene {
+  const scene = new THREE.Scene();
+  scene.fog = fog;
+  return scene;
+}
+
 function camera(x: number, y: number): THREE.PerspectiveCamera {
   const cam = new THREE.PerspectiveCamera(60, 16 / 9, 0.1, 500);
   cam.position.set(x, y, 0);
@@ -104,8 +110,9 @@ describe('UnderwaterView.frame', () => {
     const legacyFog = freshFog();
     let legacyBlend = 0;
     const cam = camera(10, WATERLINE - 2);
+    const scene = sceneWith(fog);
     for (let i = 0; i < 5; i++) {
-      view.frame(cam, fog, 7, 1 / 60);
+      view.frame(cam, scene, { x: 10, z: 0 }, 7, 1 / 60);
       legacyBlend = legacyStep(legacyBlend, WATERLINE, cam.position.y, 1 / 60, legacyFog);
     }
     expect(view.group.visible).toBe(true);
@@ -117,7 +124,7 @@ describe('UnderwaterView.frame', () => {
   it('stays dry, hidden and fog-neutral where the camera is over no water', () => {
     const view = new UnderwaterView(false);
     const fog = freshFog();
-    view.frame(camera(-10, -50), fog, 7, 1 / 60);
+    view.frame(camera(-10, -50), sceneWith(fog), { x: -10, z: 0 }, 7, 1 / 60);
     expect(view.group.visible).toBe(false);
     expect(fog.near).toBe(30);
     expect(fog.far).toBe(220);

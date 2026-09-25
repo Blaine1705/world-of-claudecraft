@@ -21,6 +21,7 @@
 
 import * as THREE from 'three';
 import { waterLevelAt } from '../sim/world';
+import { createWaterApproachProbe } from './water_approach_core';
 
 /** The colour the world drowns toward. */
 export const UNDERWATER_TINT = 0x1d5f87;
@@ -63,6 +64,18 @@ export function applyUnderwaterFog(fog: THREE.Fog, blend: number, scratch: THREE
   fog.color.lerp(scratch.setHex(UNDERWATER_FOG_COLOR), blend);
   fog.near += (UNDERWATER_FOG_NEAR - fog.near) * blend;
   fog.far += (UNDERWATER_FOG_FAR - fog.far) * blend;
+}
+
+/** The renderer's live compile gate (`renderer.compileGate`), the shape
+ *  fish.ts takes: link a root's programs off-thread, resolve once linked. */
+export type UnderwaterCompileGate = (root: THREE.Object3D) => Promise<unknown>;
+
+/** The water's half of the gate: the one live underside mesh it links (null
+ *  where the water has no underside) and the hold that keeps every underside
+ *  hidden until that link settles. */
+export interface UnderwaterWaterSide {
+  undersideRoot(): THREE.Object3D | null;
+  setUndersideHeld(held: boolean): void;
 }
 
 const BUBBLE_VERT = /* glsl */ `
@@ -116,6 +129,14 @@ export class UnderwaterView {
   private readonly fogScratch = new THREE.Color();
   private time = 0;
   private blend = 0;
+  // 'ready' with no gate installed (no async compile: nothing to wait for).
+  // With one: 'idle' until water is near, 'linking' while the gate holds the
+  // live group and underside, then 'ready'. A rejected link is ready too:
+  // the wash is cosmetic, so it never stays hidden on a failed compile.
+  private gateState: 'idle' | 'linking' | 'ready' = 'ready';
+  private compileGate: UnderwaterCompileGate | null = null;
+  private water: (() => UnderwaterWaterSide) | null = null;
+  private readonly approach = createWaterApproachProbe(waterLevelAt);
 
   constructor(lowGfx: boolean) {
     this.group.name = 'underwater';
@@ -185,11 +206,57 @@ export class UnderwaterView {
    *  and a rising bubble stream. Keyed off the CAMERA, not the player, so a
    *  third-person boom that dips below the surface reads right, and a swimmer
    *  at the surface with the camera under it still sees water rather than air. */
-  frame(camera: THREE.PerspectiveCamera, fog: THREE.Fog, seed: number, dt: number): void {
+  frame(
+    camera: THREE.PerspectiveCamera,
+    scene: THREE.Scene,
+    player: { readonly x: number; readonly z: number },
+    seed: number,
+    dt: number,
+  ): void {
     const cam = camera.position;
-    this.blend = underwaterBlendStep(this.blend, waterLevelAt(cam.x, cam.z, seed), cam.y, dt);
+    const level = waterLevelAt(cam.x, cam.z, seed);
+    if (
+      this.gateState === 'idle' &&
+      (Number.isFinite(level) || this.approach.near(player.x, player.z, seed))
+    ) {
+      this.armCompileGate();
+    }
+    // Re-read every frame: the editor rebuilds the water view in place.
+    this.water?.().setUndersideHeld(this.gateState !== 'ready');
+    this.blend = underwaterBlendStep(this.blend, level, cam.y, dt);
     this.update(camera, this.blend, dt);
-    applyUnderwaterFog(fog, this.blend, this.fogScratch);
+    // The fog stays outside the hold: view range under water is gameplay.
+    applyUnderwaterFog(scene.fog as THREE.Fog, this.blend, this.fogScratch);
+  }
+
+  /** Install (or clear) the renderer's live compile gate and the water whose
+   *  underside it links alongside this view. With a gate, the wash and the
+   *  undersides stay hidden until water comes near the player and the gate
+   *  settles on the LIVE objects, so the program linked is the one drawn.
+   *  Without one (no async compile) they show at once. */
+  setCompileGate(gate: UnderwaterCompileGate | null, water: () => UnderwaterWaterSide): void {
+    this.compileGate = gate;
+    this.water = water;
+    this.gateState = gate ? 'idle' : 'ready';
+    water().setUndersideHeld(this.gateState !== 'ready');
+  }
+
+  private armCompileGate(): void {
+    const gate = this.compileGate;
+    if (!gate) return;
+    this.gateState = 'linking';
+    // Flag only on settle: frame() applies it on the next frame boundary.
+    const settle = (): void => {
+      this.gateState = 'ready';
+    };
+    const underside = this.water?.().undersideRoot() ?? null;
+    try {
+      const links = [gate(this.group)];
+      if (underside) links.push(gate(underside));
+      void Promise.allSettled(links).then(settle);
+    } catch {
+      settle();
+    }
   }
 
   /**
@@ -198,7 +265,7 @@ export class UnderwaterView {
    */
   update(camera: THREE.PerspectiveCamera, blend: number, dt: number): void {
     const amount = Math.min(1, Math.max(0, blend));
-    this.group.visible = amount > 0.002;
+    this.group.visible = amount > 0.002 && this.gateState === 'ready';
     if (!this.group.visible) return;
 
     this.time += dt;

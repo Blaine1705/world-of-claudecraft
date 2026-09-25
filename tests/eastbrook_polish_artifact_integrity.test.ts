@@ -1387,8 +1387,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the underwater blend and fog move out of the renderer leaf. No capture was retaken.
-  '5315f742fe290a980fafc5fae523de4ac555365e11d299a8163ec8a46e8307dc';
+  // Re-minted for the underwater view and weather prewarm lot in the renderer leaf. No capture was retaken.
+  '8b9ace0357da1fb896c572501fff70d9de2d53db21f5521a37294e6438e0dfc5';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1404,8 +1404,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the underwater blend and fog move out of the renderer leaf. No capture was retaken.
-  '970d484d4b280ea2111a460e4668c2ad2783e65386acf6c1d89d4f5d70d38995';
+  // Re-minted for the underwater view and weather prewarm lot in the renderer leaf. No capture was retaken.
+  '7415c589cc04f407c4ab3e75ba4d66c9be723214123567c1d323b17eee490c0f';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2786,9 +2786,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // feature/world-pvp-flag (review round) merge into feature/king-of-the-hill: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-      // underwater blend move out of the renderer leaf: recomputed LAST again over the
+      // underwater view and weather prewarm lot: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('5cbe8efacb615b03c01e92b750caa786c3e774659ac97c379870690928b9188c');
+    ).toBe('4af7a23509847216fdcb83fcc4bf44b057d651c1e737ec23d63d631ff765ff17');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -3111,6 +3111,7 @@ export class Renderer {
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
+    this.underwaterView.setCompileGate(this.worldCompileGate() ?? null, () => this.waterView);
 
     // post chain (bloom + grade, GTAO on ultra); medium gets the grade-only
     // mini chain so the cinematic grade stops being a high-tier privilege;
@@ -4863,7 +4864,7 @@ export class Renderer {
     this.tmpV.set(p.pos.x, p.pos.y, p.pos.z);
     this.updateCamera(this.tmpV, dt);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
-    this.underwaterView.frame(this.camera, this.scene.fog as THREE.Fog, this.sim.cfg.seed, dt);
+    this.underwaterView.frame(this.camera, this.scene, p.pos, this.sim.cfg.seed, dt);
     this.budgetFireLights(p.pos.x, p.pos.z);
     const fogFar = this.subsystemCullFar();
     // The foliage handoff keys off distance planes (foliage_impostor_core.ts /
@@ -11794,7 +11795,7 @@ export class Renderer {
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'zoneFeatures', worldStart);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
-    this.underwaterView.frame(this.camera, this.scene.fog as THREE.Fog, this.sim.cfg.seed, dt);
+    this.underwaterView.frame(this.camera, this.scene, p.pos, this.sim.cfg.seed, dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'ambience', worldStart);
     // shadow frustum follows the player
     const pv = this.views.get(p.id);
