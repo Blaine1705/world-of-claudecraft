@@ -36,8 +36,10 @@ import {
   freeCostAuraActive,
   nextCastCheapMultiplierFromAuras,
 } from '../../../sim/combat/empower_next';
+import { executeWindowBlocksCast } from '../../../sim/combat/execute_threshold';
 import type { MeleeReachActor } from '../../../sim/combat/feral_reach';
 import { willAutoUnshift } from '../../../sim/combat/form_auto_unshift';
+import { formRequirementMet } from '../../../sim/combat/form_requirement';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
 import { packlordActionGlowActive } from '../../../sim/combat/hunter_packlord';
 import {
@@ -59,6 +61,7 @@ import { priestActionGlowActive } from '../../../sim/combat/priest/presentation'
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
 import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
+import { leavingRestrictedToggle } from '../../../sim/combat/toggle_buff';
 import { countRawInSlots } from '../../../sim/item_lock';
 import { isAscensionEmpoweredAbility } from '../../../sim/paladin_devotion';
 import {
@@ -230,6 +233,12 @@ export interface ActionBarPlayerInput {
   potionCdRemaining: number;
   queuedOnSwing: string | null;
   pos: Vec3;
+  /** The combat flag (mirrored online as the self snapshot's `cbt` key): an
+   *  out-of-combat-only ability greys out while it is set. */
+  inCombat?: boolean;
+  /** Character-bound combo points (mirrored online as `combo`): a finisher that
+   *  needs them greys out at zero. Absent reads as zero. */
+  comboPoints?: number;
   /** The player's worn auras: the free-cost proc read (Battle Trance /
    *  next_cast_free) that drives the slot glow and usable state, the kill-window
    *  gate, and the next-cast empowerment read. Both worlds expose the live aura
@@ -263,6 +272,9 @@ export interface ActionBarTargetInput {
   kind: string;
   templateId: string;
   pos: Vec3;
+  /** Current and max health: an execute-window ability (Execute, Duskfire, Hammer
+   *  of Wrath) greys out while the target sits above its threshold. */
+  hp?: number;
   maxHp?: number;
   auras: readonly ActionBarAuraInput[];
 }
@@ -449,6 +461,42 @@ export function actionBarCooldownRemaining(
   const abilityId = ability.def.id;
   if (bypassesCooldown) return 0;
   return player.cooldowns.get(ability.cooldownId ?? abilityId) ?? 0;
+}
+
+/**
+ * The cast gate's situational requirements beyond cost and cooldown, each asked
+ * through the same predicate or field the sim's gate reads (combat/
+ * casting_lifecycle.ts), so a slot greys out exactly when pressing it would be
+ * refused: the target's execute window, combat state, combo points, and a
+ * druid form. The execute check only runs against a live
+ * target whose health is known; with no target the gate auto-acquires one, so
+ * the slot stays lit rather than guessing.
+ */
+export function secondaryRequirementsMet(
+  world: Pick<ActionBarWorldInput, 'player' | 'target'>,
+  ability: ActionBarAbility,
+): boolean {
+  const { player, target } = world;
+  const def = ability.def;
+  if (
+    def.requiresOutOfCombat &&
+    player.inCombat === true &&
+    !leavingRestrictedToggle(def, player.auras)
+  ) {
+    return false;
+  }
+  if (def.spendsCombo && !def.comboOptional && (player.comboPoints ?? 0) <= 0) return false;
+  if (def.requiresForm !== undefined && !formRequirementMet(player.auras, def)) return false;
+  if (
+    target !== null &&
+    !target.dead &&
+    target.hp !== undefined &&
+    target.maxHp !== undefined &&
+    executeWindowBlocksCast(def, player, target.hp, target.maxHp)
+  ) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -780,6 +828,7 @@ export function createActionBarView(
             ? player.savedMana
             : player.resource;
         slot.usable =
+          secondaryRequirementsMet(world, ability) &&
           (!(castingPool < payableCost) || freeByProc || freeBySolarReprisal) &&
           (def.ruinCost ?? 0) <= ruin &&
           soulFragments >= (def.soulFragmentCost ?? 0) &&
