@@ -33,6 +33,7 @@ import {
   isNythraxisGraveEruption,
   NYTHRAXIS_GRAVE_ERUPTION_PALETTE,
   type NythraxisGraveShardPose,
+  nythraxisGraveEruptionRimThickness,
   nythraxisGraveShardFade,
   nythraxisGraveShardPoseInto,
   nythraxisGraveShardRise,
@@ -204,6 +205,9 @@ interface MeteorFx {
   emberMat: THREE.PointsMaterial;
   footprintMat: THREE.MeshBasicMaterial;
   boundaryMat: THREE.LineBasicMaterial;
+  /** The thickened rim band (Grave Eruption only): real geometry width so the
+   *  telegraph reads at melee range, unlike the 1px boundary line. */
+  rimMat?: THREE.MeshBasicMaterial;
   countdownMat: THREE.MeshBasicMaterial;
   veinMat: THREE.LineBasicMaterial;
   flameMat: THREE.MeshBasicMaterial;
@@ -530,6 +534,7 @@ export class MageGroundFx {
       initialElapsed / duration,
       grave ? NYTHRAXIS_GRAVE_ERUPTION_PALETTE : METEOR_FIRE_TELEGRAPH_PALETTE,
       telegraphKindSuffix,
+      grave,
     );
     warning.group.visible = opts.showTelegraph !== false;
     // A fire boss's authored warning hands its ground detail to the contributor
@@ -574,6 +579,7 @@ export class MageGroundFx {
       emberMat,
       footprintMat: warning.footprintMat,
       boundaryMat: warning.boundaryMat,
+      rimMat: warning.rimMat,
       countdownMat: warning.countdownMat,
       veinMat: warning.veinMat,
       flameMat: warning.flameMat,
@@ -729,6 +735,7 @@ export class MageGroundFx {
     m.body.visible = false;
     m.trail.visible = false;
     m.boundaryMat.opacity = 0;
+    if (m.rimMat) m.rimMat.opacity = 0;
     m.beaconEmberMat.opacity = 0;
     m.beaconEmbers.visible = false;
     m.ignivarFireAoe?.erupt();
@@ -781,6 +788,7 @@ export class MageGroundFx {
     const suffix = meteor.telegraphKindSuffix;
     this.releaseMaterial(`meteor-footprint${suffix}`, meteor.footprintMat);
     this.releaseMaterial(`meteor-boundary${suffix}`, meteor.boundaryMat);
+    if (meteor.rimMat) this.releaseMaterial(`meteor-rim${suffix}`, meteor.rimMat);
     this.releaseMaterial(`meteor-countdown${suffix}`, meteor.countdownMat);
     this.releaseMaterial(`meteor-vein${suffix}`, meteor.veinMat);
     this.releaseMaterial(`meteor-flame${suffix}`, meteor.flameMat);
@@ -926,10 +934,12 @@ export class MageGroundFx {
     initialProgress: number,
     palette: MeteorTelegraphPalette,
     kindSuffix: string,
+    thickRim: boolean,
   ): {
     group: THREE.Group;
     footprintMat: THREE.MeshBasicMaterial;
     boundaryMat: THREE.LineBasicMaterial;
+    rimMat?: THREE.MeshBasicMaterial;
     countdownMat: THREE.MeshBasicMaterial;
     veinMat: THREE.LineBasicMaterial;
     flameMat: THREE.MeshBasicMaterial;
@@ -1063,6 +1073,62 @@ export class MageGroundFx {
     countdownRing.renderOrder = 8;
     group.add(countdownRing);
 
+    // The thickened rim band (Grave Eruption only): a real ring MESH straddling
+    // the exact actionable radius, not a 1px WebGL line. It never moves the
+    // actionable boundary (`boundary` above stays the authoritative, unchanged
+    // radius); it only makes that radius easy to read at melee range, which is
+    // gameplay-neutral (it adds legibility, never hides or delays information).
+    // Reuses `countdownIndices`: any two concentric METEOR_TELEGRAPH_SEGMENTS
+    // rings share the same band topology.
+    let rimMat: THREE.MeshBasicMaterial | undefined;
+    let rimGeo: THREE.BufferGeometry | undefined;
+    if (thickRim) {
+      const rimThickness = nythraxisGraveEruptionRimThickness(opts.radius);
+      const rimOuter = opts.radius + rimThickness * 0.5;
+      const rimInner = Math.max(0, opts.radius - rimThickness * 0.5);
+      const rimPositions = new Float32Array(METEOR_TELEGRAPH_SEGMENTS * 2 * 3);
+      for (let i = 0; i < METEOR_TELEGRAPH_SEGMENTS; i++) {
+        const angle = (i / METEOR_TELEGRAPH_SEGMENTS) * Math.PI * 2;
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        const outerX = opts.x + cos * rimOuter;
+        const outerZ = opts.z + sin * rimOuter;
+        const innerX = opts.x + cos * rimInner;
+        const innerZ = opts.z + sin * rimInner;
+        const offset = i * 6;
+        rimPositions[offset] = outerX;
+        rimPositions[offset + 1] = this.groundY(outerX, outerZ) + 0.095;
+        rimPositions[offset + 2] = outerZ;
+        rimPositions[offset + 3] = innerX;
+        rimPositions[offset + 4] = this.groundY(innerX, innerZ) + 0.095;
+        rimPositions[offset + 5] = innerZ;
+      }
+      rimGeo = new THREE.BufferGeometry();
+      rimGeo.setAttribute('position', new THREE.BufferAttribute(rimPositions, 3));
+      rimGeo.setIndex(countdownIndices);
+      rimMat = this.acquireMaterial(
+        `meteor-rim${kindSuffix}`,
+        0.82,
+        () =>
+          new THREE.MeshBasicMaterial({
+            // Brighter than the boundary line itself, under additive blending,
+            // so the band pops against the crypt's own ambient purple torchlight
+            // and any purple player buff/aura standing on the same ground.
+            color: new THREE.Color(palette.boundary).multiplyScalar(1.45),
+            transparent: true,
+            opacity: 0.82,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+          }),
+      );
+      const rim = new THREE.Mesh(rimGeo, rimMat);
+      rim.name = 'mage-meteor-telegraph-rim';
+      rim.frustumCulled = false;
+      rim.renderOrder = 9;
+      group.add(rim);
+    }
+
     const veinVertices: number[] = [];
     const veinBranchCount = 14;
     const veinSegments = 7;
@@ -1192,6 +1258,7 @@ export class MageGroundFx {
       group,
       footprintMat,
       boundaryMat,
+      rimMat,
       countdownMat,
       veinMat,
       flameMat,
@@ -1201,7 +1268,9 @@ export class MageGroundFx {
       countdownPositions,
       flames,
       flameBases,
-      ownedGeometries: [footprintGeo, boundaryGeo, countdownGeo, veinGeo, beaconGeo],
+      ownedGeometries: rimGeo
+        ? [footprintGeo, boundaryGeo, rimGeo, countdownGeo, veinGeo, beaconGeo]
+        : [footprintGeo, boundaryGeo, countdownGeo, veinGeo, beaconGeo],
     };
   }
 
@@ -1631,6 +1700,7 @@ export class MageGroundFx {
       ]) {
         materials.add(material);
       }
+      if (meteor.rimMat) materials.add(meteor.rimMat);
     }
     for (const rune of this.runes) {
       for (const geometry of rune.ownedGeometries) geometries.add(geometry);
@@ -1768,6 +1838,7 @@ export class MageGroundFx {
 
       const warningPulse = 0.88 + Math.sin(m.elapsed * (5 + t * 7)) * 0.12;
       m.boundaryMat.opacity = (0.58 + t * 0.25) * warningPulse;
+      if (m.rimMat) m.rimMat.opacity = (0.72 + t * 0.24) * warningPulse;
       m.countdownMat.opacity = (0.34 + t * 0.5) * warningPulse;
       if (!m.contributorOwnsGroundDetail) {
         m.footprintMat.opacity = (0.18 + t * 0.07) * (0.96 + Math.sin(m.elapsed * 4) * 0.04);
