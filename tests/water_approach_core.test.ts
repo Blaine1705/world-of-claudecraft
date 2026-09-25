@@ -2,7 +2,13 @@
 // (src/render/water_approach_core.ts). Pins: which water it sees, at what
 // read cost per call, that standing still reads nothing, and that the radius
 // buys the fastest ground mover a real lead before it can reach the water.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import {
+  explicitCeilingIntent,
+  FRAME_RATE_CAP_VALUES,
+  type FrameRateCapChoice,
+} from '../src/game/frame_rate_cap_setting';
 import {
   createWaterApproachProbe,
   WATER_APPROACH_DISC_POINTS,
@@ -14,6 +20,7 @@ import {
 import { MOUNTS } from '../src/sim/content/mounts';
 import { RUN_SPEED } from '../src/sim/types';
 import { waterBodies } from '../src/sim/world';
+import { stripComments } from './helpers/strip_comments';
 
 const SEED = 7;
 
@@ -46,11 +53,25 @@ describe('water approach probe', () => {
     expect(checked).toBeGreaterThan(100);
   });
 
-  it('does not see water beyond its radius', () => {
-    const far = WATER_APPROACH_RADIUS + WATER_APPROACH_PITCH * 2;
-    const { near, probe } = settleAt(pond(far, 0, 4), 0, 0);
-    expect(near).toBe(false);
-    expect(probe.reads).toBe(WATER_APPROACH_DISC_POINTS);
+  it('pins the radius, pitch, read budget and disc size', () => {
+    expect(WATER_APPROACH_RADIUS).toBe(48);
+    expect(WATER_APPROACH_PITCH).toBe(12);
+    expect(WATER_APPROACH_READS_PER_CALL).toBe(3);
+    expect(WATER_APPROACH_DISC_POINTS).toBe(49);
+  });
+
+  it('sees a lattice point on its radius and not the one a ring past it', () => {
+    const edge = WATER_APPROACH_RADIUS;
+    const past = WATER_APPROACH_RADIUS + WATER_APPROACH_PITCH;
+    expect(settleAt(pond(edge, 0, 1), 0, 0).near).toBe(true);
+    const beyond = settleAt(pond(past, 0, 1), 0, 0);
+    expect(beyond.near).toBe(false);
+    expect(beyond.probe.reads).toBe(WATER_APPROACH_DISC_POINTS);
+    // On the diagonal the disc stops short of the radius: (2, 3) pitches is
+    // inside it, (3, 3) is past it.
+    const p = WATER_APPROACH_PITCH;
+    expect(settleAt(pond(2 * p, 3 * p, 1), 0, 0).near).toBe(true);
+    expect(settleAt(pond(3 * p, 3 * p, 1), 0, 0).near).toBe(false);
   });
 
   it('guarantees every authored lake footprint is wide enough to be seen', () => {
@@ -115,14 +136,46 @@ describe('water approach probe', () => {
     expect(probe.reads).toBe(reads);
   });
 
-  it('leaves the fastest ground mover more lead than the live gate deadline', () => {
-    // Worst case: the player sits half a lattice diagonal off its lattice
-    // point, the water barely holds the guaranteed disc, and the latch waits
-    // one full read cycle at 20 frames per second. The bar is the renderer's
-    // per-piece gate deadline (VIEW_COMPILE_GATE_MAX_MS).
+  it('leaves the fastest mount more lead to the smallest lake than the gate deadline, at 30 fps', () => {
+    // The floor is the lowest frame-rate cap the game offers: the probe reads
+    // once per frame, so a slower frame rate shortens the lead. The lead is
+    // measured by running the probe along straight approaches at every
+    // bearing, toward the smallest authored lake footprint placed across one
+    // lattice cell, and timed to its waterline.
+    const deadline = rendererGateDeadlineSeconds();
+    const fps = Math.min(
+      ...(Object.keys(FRAME_RATE_CAP_VALUES) as FrameRateCapChoice[])
+        .map((choice) => explicitCeilingIntent(choice) ?? 0)
+        .filter((hz) => hz > 0),
+    );
+    expect(fps).toBe(30);
     const fastest = RUN_SPEED * (1 + Math.max(...Object.values(MOUNTS).map((m) => m.moveSpeedPct)));
-    const seenFrom = WATER_APPROACH_RADIUS - Math.SQRT2 * WATER_APPROACH_PITCH;
-    const cycleSeconds = Math.ceil(WATER_APPROACH_DISC_POINTS / WATER_APPROACH_READS_PER_CALL) / 20;
-    expect(seenFrom / fastest - cycleSeconds).toBeGreaterThan(1.5);
+    const r = Math.min(...waterBodies().map((lake) => lake.radius));
+    const start = WATER_APPROACH_RADIUS + WATER_APPROACH_PITCH * 3;
+    let lead = Number.POSITIVE_INFINITY;
+    for (let cx = 0; cx < WATER_APPROACH_PITCH; cx += 0.5) {
+      for (let cz = 0; cz < WATER_APPROACH_PITCH; cz += 0.5) {
+        for (let deg = 0; deg < 360; deg += 2) {
+          const probe = createWaterApproachProbe(pond(cx, cz, r));
+          const dx = Math.cos((deg * Math.PI) / 180);
+          const dz = Math.sin((deg * Math.PI) / 180);
+          let d = start;
+          while (d > r && !probe.near(cx + dx * d, cz + dz * d, SEED)) d -= fastest / fps;
+          lead = Math.min(lead, (d - r) / fastest);
+        }
+      }
+    }
+    expect(lead).toBeGreaterThan(deadline);
   });
 });
+
+/** The renderer's per-piece live gate deadline (`VIEW_COMPILE_GATE_MAX_MS`),
+ *  read from its source: the constant is private to the renderer. */
+function rendererGateDeadlineSeconds(): number {
+  const source = stripComments(
+    readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
+  );
+  const match = source.match(/\bconst VIEW_COMPILE_GATE_MAX_MS = (\d+);/);
+  expect(match).not.toBeNull();
+  return Number(match?.[1]) / 1000;
+}
