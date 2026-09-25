@@ -523,7 +523,21 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the merge of release/v0.44.0 (PR 4132's System Report) into
     // feature/world-pvp-flag: exact count measured on the MERGED working tree
     // (wc -l < src/ui/hud.ts), never reconciled by arithmetic. Zero slack.
-    ceiling: 18230,
+    // LOWERED 18276 -> 18220 by extracting the HUD frame registry wiring.
+    // LOWERED 18220 -> 18201 by extracting editor menu dependencies.
+    // LOWERED 18201 -> 18191 by extracting chat frame context and focus mouseover routing.
+    // LOWERED 18191 -> 18186 by sharing unit dimensions and pet frame input.
+    // Release/v0.44.0 sync at ee8883fa4f: compose parent pins 18186 / 18235.
+    // Exact merged line count, preserving both extraction sets.
+    // LOWERED 18140 -> 18138 when the Cooldown Manager landed: its five Hud
+    // lines (import, mount, field, settings hook, paint) were paid for by moving
+    // the Auras overlay's controller setup into mountAuraOverlay
+    // (src/ui/aura_overlay_wiring.ts). wc -l on the tree merged with
+    // release/v0.44.0. Exact count, zero slack.
+    // Re-pinned at the 2026-09-25 merge of release/v0.44.0 into feature/world-pvp-flag:
+    // exact count measured on the MERGED working tree (wc -l < src/ui/hud.ts),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 18133,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -553,7 +567,16 @@ const MONOLITHS: MonolithRow[] = [
     // (src/ui/host_diag_section_controller.ts over the pure
     // src/ui/host_diag_view.ts), not a sub-view of this window. Exact count,
     // zero slack.
-    ceiling: 2821,
+    // LOWERED 2830 -> 2829 by extracting shared frame settings and reset-key scope.
+    // LOWERED 2829 -> 2827 by extracting menu placement into OptionsWindowLayout.
+
+    // Release/v0.44.0 sync at ee8883fa4f: compose parent pins 2827 / 2821.
+    // Exact merged line count, preserving both extraction sets.
+    // LOWERED 2818 -> 2813 when Options > Cooldown Manager and the Overlays
+    // sub-view landed: the Auras render method and its placement/teardown lines
+    // moved out with them to src/ui/options_overlay_panels.ts. Measured with
+    // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
+    ceiling: 2813,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1147,7 +1170,11 @@ const MONOLITHS: MonolithRow[] = [
     // release's PR 4054 / 4137 / 4141 extractions above plus this branch's below):
     // exact count measured on the MERGED working tree (wc -l < src/sim/sim.ts),
     // never reconciled by arithmetic. Zero slack.
-    ceiling: 11744,
+    // Frame layout restore extraction: bank the reduced coordinator size.
+    // Re-pinned at the 2026-09-25 merge of release/v0.44.0 into feature/world-pvp-flag:
+    // exact count measured on the MERGED working tree (wc -l < src/sim/sim.ts),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 11740,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1359,7 +1386,8 @@ const MONOLITHS: MonolithRow[] = [
     // click / Enter-Space / double-click wiring moved into wireCharselectRow
     // (src/ui/charselect_hints.ts), which skips activations from inside the
     // lockout disclosure instead of stopping propagation there.
-    ceiling: 11276,
+    // Frame layout extraction: bank the reduced coordinator size.
+    ceiling: 11260,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1761,7 +1789,11 @@ const MONOLITHS: MonolithRow[] = [
     // (where the new wpvp readout also lands), paying for the flag's mirror
     // field, the pvp entity bit and the setWorldPvpFlag send. Measured with
     // wc -l < src/net/online.ts after biome. Exact count, zero slack.
-    ceiling: 5421,
+    // LOWERED 5426 -> 5421 by extracting first-snapshot action bar restore resolution.
+    // Re-pinned at the 2026-09-25 merge of release/v0.44.0 into feature/world-pvp-flag:
+    // exact count measured on the MERGED working tree (wc -l < src/net/online.ts),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 5416,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

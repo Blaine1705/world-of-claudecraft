@@ -209,6 +209,8 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/frame_presets_core.ts',
+  'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
   'src/ui/item_combat_tooltip_view.ts',
   // The zone-entry chat line (welcome hint vs the town-done line); the
@@ -228,6 +230,9 @@ const UI_PURE_CORES = [
   'src/ui/proc_ready_glow_core.ts',
   'src/ui/reticle_ticks_core.ts',
   'src/ui/aura_watchlist_core.ts',
+  // The Cooldown Manager's per-frame core: readiness composed from the action
+  // bar's own pure view, the transform and glow flags, and the cue edges.
+  'src/ui/hud/cooldown_manager/cooldown_manager_view.ts',
   'src/ui/collection_actions_core.ts',
   'src/ui/hud/cosmetics/cosmetics_cards_view.ts',
   'src/ui/hud/cosmetics/cosmetics_view.ts',
@@ -313,6 +318,7 @@ const UI_PURE_CORES = [
   'src/ui/target_flair_line_view.ts',
   'src/ui/meters_breakdown_view.ts',
   'src/ui/interface_unlock_core.ts',
+  'src/ui/focus_targets_core.ts',
   'src/ui/interface_visibility_core.ts',
   'src/ui/interface_unlock_menu_core.ts',
   'src/ui/touch_frame_drag_core.ts',
@@ -2500,6 +2506,12 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/frame_presets_live.ts',
+  'src/ui/frame_editor_deps.ts',
+  'src/ui/frame_presets_controls.ts',
+  'src/ui/options_frame_settings.ts',
+  // Wires registered HUD roots to persistent movers and their live DOM homes.
+  'src/ui/hud_frame_registry.ts',
   // Mints the shared unit and bag-stack step buttons around a number input and
   // writes the input on a press; the rules are quantity_step_core.ts.
   'src/ui/quantity_stepper.ts',
@@ -2511,6 +2523,15 @@ const UI_DOM_MODULES = [
   // RULES it wires up are all in the pure cores (reticle_ticks_core,
   // proc_ready_glow_core, haptic_pulse_core, aura_watchlist_core).
   'src/ui/aura_overlay_wiring.ts',
+  // The Cooldown Manager's browser half: the controller mints and mounts the
+  // floating row and reads one drag rect; the store owns its localStorage record;
+  // the settings panel builds the Options sub-view; the wiring attaches the sfx
+  // engine and reads the live body class. Every RULE is in the two pure cores
+  // (cooldown_manager_config, cooldown_manager_view).
+  'src/ui/hud/cooldown_manager/cooldown_manager_controller.ts',
+  'src/ui/hud/cooldown_manager/cooldown_manager_settings.ts',
+  'src/ui/hud/cooldown_manager/cooldown_manager_store.ts',
+  'src/ui/hud/cooldown_manager/cooldown_manager_wiring.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
   'src/ui/mount_inspect_controller.ts',

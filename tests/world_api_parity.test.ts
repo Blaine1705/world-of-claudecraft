@@ -519,6 +519,7 @@ export const IWORLD_MEMBERS = [
   { name: 'reliquaryRarity', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
+  { name: 'actionBarReadOnly', kind: 'data' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
   // IWorldFarming: the static garden-bed geography plus the viewer's own plot
   // rows (both data), the growth phase's two plot mutations, and the knobs
@@ -871,10 +872,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // and the account-wide Book of Deeds / Reliquary read halves. Counted
     // directly off the resolved IWORLD_MEMBERS literal.
     // World PvP (the /pvp flag) adds worldPvpInfo (data) and setWorldPvpFlag
-    // (method) on its own IWorldWorldPvp facet: 380 members, 108 data, 272 method.
-    // King of the Hill adds hillInfo (data) to that facet: 381, 109, 272.
-    expect(IWORLD_MEMBERS.length).toBe(381);
-    expect(DATA_MEMBERS.length).toBe(109);
+    // (method) on its own IWorldWorldPvp facet, and King of the Hill adds hillInfo
+    // (data): +3 over the release's 379 / 108 / 271 at the 2026-09-25 merge.
+    expect(IWORLD_MEMBERS.length).toBe(382);
+    expect(DATA_MEMBERS.length).toBe(110);
     expect(METHOD_MEMBERS.length).toBe(272);
   });
   it('has no duplicate member names', () => {
@@ -895,6 +896,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountCosmetics',
       'accountDeeds',
       'accountFlair',
+      'actionBarReadOnly',
       'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
@@ -1275,6 +1277,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountAdmin',
       'accountCosmetics',
       'accountDeeds',
+      'actionBarReadOnly',
       'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
@@ -2258,6 +2261,7 @@ type _ExhaustReliquary = AssertNever<
 >;
 
 const FACET_ACTION_BAR = [
+  'actionBarReadOnly',
   'saveActionBarLayout',
   'takeActionBarLayoutRestore',
 ] as const satisfies readonly (keyof IWorldActionBar)[];
@@ -2416,9 +2420,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    // 380 plus the King of the Hill readout hillInfo on IWorldWorldPvp: 381.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(381);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(381);
+    // The release's 379 plus the three World PvP members: 382.
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(382);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(382);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

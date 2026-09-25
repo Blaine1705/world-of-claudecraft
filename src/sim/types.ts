@@ -5841,6 +5841,9 @@ export interface NythraxisEncounterState {
     ascensionStacks: number;
   } | null;
   majorGapTimer?: number;
+  // Seconds left before Bone Storm may begin after a Soul Rend detonation
+  // (nythraxis_soul_rend.ts); 0 when no detonation is settling.
+  soulRendSettleTimer?: number;
   // The Crown Endures: seconds since the first encounter tick (the clock runs
   // through the transition) and the enrage stack the boss carries once it has
   // run out (nythraxis_enrage_clock.ts).

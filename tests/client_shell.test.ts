@@ -2361,7 +2361,7 @@ describe('client HTML shell', () => {
     expect(drawerTitleBody).toContain('min-height: 48px;');
     expect(drawerTitleBody).toContain('margin-bottom: 8px;');
     expect(drawerTitleBody).toContain('padding-bottom: 6px;');
-    expect(drawerTitleBody).toContain('cursor: move;');
+    expect(drawerTitleBody).toContain('cursor: var(--cursor-move, move);');
     // Smaller than the old 560px cap: the More tray only holds short pill
     // buttons now, not a wide desktop-style panel.
     expect(hudMobileCss).toContain(
