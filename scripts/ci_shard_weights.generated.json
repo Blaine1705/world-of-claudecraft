@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4068,
+    "files": 4072,
     "harvestedFiles": 3948,
     "carried": {
       "tests/active_kit_prewarm.test.ts": {
@@ -48,6 +48,24 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           116
+        ]
+      },
+      "tests/deck_frame.test.ts": {
+        "ms": 20,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry Phase 3 adds four suites and grows the voyage suites (the moving deck); actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
+        "runs": [
+          20
+        ]
+      },
+      "tests/deck_prediction.test.ts": {
+        "ms": 1639,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry Phase 3 adds four suites and grows the voyage suites (the moving deck); actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
+        "runs": [
+          1639
         ]
       },
       "tests/deferred_contact_bursts.test.ts": {
@@ -351,31 +369,49 @@
           5
         ]
       },
-      "tests/transport_ferry.test.ts": {
-        "ms": 23615,
+      "tests/transport_deck.test.ts": {
+        "ms": 19772,
         "method": "local-median",
         "measured": "2026-09-25",
-        "reason": "Eastbrook ferry Phase 2 adds four suites absent from the last green full CI harvest; actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
+        "reason": "Eastbrook ferry Phase 3 adds four suites and grows the voyage suites (the moving deck); actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
         "runs": [
-          23615
+          19772
+        ]
+      },
+      "tests/transport_ferry.test.ts": {
+        "ms": 37112,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry Phase 3 adds four suites and grows the voyage suites (the moving deck); actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
+        "runs": [
+          37112
         ]
       },
       "tests/transport_ferry_online.test.ts": {
-        "ms": 2401,
+        "ms": 5566,
         "method": "local-median",
         "measured": "2026-09-25",
-        "reason": "Eastbrook ferry Phase 2 adds four suites absent from the last green full CI harvest; actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
+        "reason": "Eastbrook ferry Phase 3 adds four suites and grows the voyage suites (the moving deck); actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
         "runs": [
-          2401
+          5566
+        ]
+      },
+      "tests/transport_lanes.test.ts": {
+        "ms": 3874,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Eastbrook ferry Phase 3 adds four suites and grows the voyage suites (the moving deck); actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
+        "runs": [
+          3874
         ]
       },
       "tests/transport_wire.test.ts": {
-        "ms": 1514,
+        "ms": 1650,
         "method": "local-median",
         "measured": "2026-09-25",
-        "reason": "Eastbrook ferry Phase 2 adds four suites absent from the last green full CI harvest; actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
+        "reason": "Eastbrook ferry Phase 3 adds four suites and grows the voyage suites (the moving deck); actual local single-worker Vitest run on 2026-09-25, pending a green full-mode CI refresh.",
         "runs": [
-          1514
+          1650
         ]
       },
       "tests/twinstrike_choreography.test.ts": {
@@ -1902,6 +1938,8 @@
   "tests/death_lesson.test.ts": 3358,
   "tests/death_recap_feedback.test.ts": 9,
   "tests/death_target_prevalidation.test.ts": 9,
+  "tests/deck_frame.test.ts": 20,
+  "tests/deck_prediction.test.ts": 1639,
   "tests/deck_railings.test.ts": 256,
   "tests/decor_prop_colliders.test.ts": 48,
   "tests/decoration_dims.test.ts": 1580,
@@ -4792,9 +4830,11 @@
   "tests/training_dummy_preload.test.ts": 603,
   "tests/transfer_lock.test.ts": 10,
   "tests/transmission_neutralize.test.ts": 651,
-  "tests/transport_ferry.test.ts": 23615,
-  "tests/transport_ferry_online.test.ts": 2401,
-  "tests/transport_wire.test.ts": 1514,
+  "tests/transport_deck.test.ts": 19772,
+  "tests/transport_ferry.test.ts": 37112,
+  "tests/transport_ferry_online.test.ts": 5566,
+  "tests/transport_lanes.test.ts": 3874,
+  "tests/transport_wire.test.ts": 1650,
   "tests/travel_speed_fx.test.ts": 18,
   "tests/trivial_mob_passive.test.ts": 1659,
   "tests/trophy_domination_claims.test.ts": 16,

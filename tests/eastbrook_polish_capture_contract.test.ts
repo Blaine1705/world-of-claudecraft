@@ -690,7 +690,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the Eastbrook ferry's Phase 2: the renderer leaf gained the at-sea passenger hide and moved two helpers out. No capture was retaken.
-  'e7a19a56c2928525ec3de02443a01fb6a54b18992d15d4e3077c8b9094857708';
+  // Re-minted for the ferry's Phase 3: the renderer leaf draws passengers in the ship frame (deck_frame.ts), and the two fairway buoys in the cove moved west out of the ferry's swing (zone1.ts). No capture was retaken.
+  '06b5d4ea33b03d1005c635643599beb50abdf0b91f5ed92746e14fb1385bd907';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

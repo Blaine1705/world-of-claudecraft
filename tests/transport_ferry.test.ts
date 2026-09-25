@@ -9,7 +9,7 @@ import { handleFerryDevChat } from '../src/sim/dev/ferry_dev';
 import { restorePet } from '../src/sim/pet/pet_commands';
 import { Sim } from '../src/sim/sim';
 import { deckToWorld, worldToDeck } from '../src/sim/transport_deck';
-import { transportClock } from '../src/sim/transport_ferry';
+import { carryPassengersAcrossClockJump, transportClock } from '../src/sim/transport_ferry';
 import {
   type TransportPose,
   transportCycleSeconds,
@@ -58,6 +58,15 @@ function setClock(sim: Sim, clock: number): void {
 function tickSeconds(sim: Sim, seconds: number): void {
   const n = Math.round(seconds / DT);
   for (let i = 0; i < n; i++) sim.tick();
+}
+
+/** Sail ahead to schedule `clock` the way /dev ferry skips: the ship's
+ *  passengers are carried to the same deck spot at its pose there (a whole
+ *  voyage of real ticks is the one test that pays for it). */
+function sailUntil(sim: Sim, clock: number): void {
+  const from = transportClock(sim.ctx);
+  sim.transportClockOffset = clock - sim.time;
+  carryPassengersAcrossClockJump(sim.ctx, from);
 }
 
 function place(e: Entity, x: number, y: number, z: number): void {
@@ -267,7 +276,7 @@ describe('sailing (the real Sim)', () => {
     expect(p.pos.y).toBeCloseTo(DECK, 3);
     const meta = sim.players.get(p.id);
     expect(meta?.deedStats.visited.has('ferry:eastbrook_wickharbor')).toBe(true);
-  }, 120_000);
+  }, 90_000);
 
   it('both crossings earn the Harbor to Harbor deed', () => {
     const p = sim.player;
@@ -278,9 +287,11 @@ describe('sailing (the real Sim)', () => {
     expect(meta.deedsEarned.has('exp_harbor_to_harbor')).toBe(false);
     setClock(sim, DEPART_EAST - 0.5);
     placeOnDeck(p, 0, 1.5, 0.8);
-    tickSeconds(sim, 1 + VOYAGE_EAST + 1.5);
+    tickSeconds(sim, 1);
+    sailUntil(sim, ARRIVE_WICK - 2);
+    tickSeconds(sim, 3.5);
     expect(meta.deedsEarned.has('exp_harbor_to_harbor')).toBe(true);
-  }, 120_000);
+  });
 
   it('leaves a player on the pier behind', () => {
     const p = sim.player;
@@ -302,14 +313,15 @@ describe('sailing (the real Sim)', () => {
     placeOnDeck(p, 1, -2, 4);
     tickSeconds(sim, 1);
     expect(p.ferryRide?.to).toBe(0);
-    tickSeconds(sim, VOYAGE_WICK);
+    sailUntil(sim, CYCLE - 2);
+    tickSeconds(sim, 2.5);
     expect(p.ferryRide ?? null).toBeNull();
     const there = worldToDeck(EAST, p.pos.x, p.pos.z, { x: 0, z: 0 });
     expect(there.x).toBeCloseTo(-2, 2);
     expect(there.z).toBeCloseTo(4, 2);
     const meta = sim.players.get(p.id);
     expect(meta?.deedStats.visited.has('ferry:wickharbor_eastbrook')).toBe(true);
-  }, 120_000);
+  });
 
   it('a player in combat sails too (the ship outruns the fight)', () => {
     const p = sim.player;
@@ -360,7 +372,8 @@ describe('sailing (the real Sim)', () => {
     const saved = sim.serializeCharacter(p.id);
     expect(saved?.pet?.templateId).toBe('wild_boar');
     expect(saved?.pos).toEqual({ x: WICK.landing.x, z: WICK.landing.z });
-    for (let i = 0; i < 4000 && p.ferryRide; i++) sim.tick();
+    sailUntil(sim, ARRIVE_WICK - 2);
+    for (let i = 0; i < 200 && p.ferryRide; i++) sim.tick();
     expect(p.ferryRide ?? null).toBeNull();
     // the owner steps off on the deck; the pet comes back on the pier, where
     // a pet can stand (never on the seabed beside the hull)
@@ -373,7 +386,7 @@ describe('sailing (the real Sim)', () => {
     expect(fromLanding).toBeLessThan(0.5);
     expect(pet?.pos.y ?? 0).toBeGreaterThan(WATER_LEVEL);
     expect(p.ferryPetParked).toBeUndefined();
-  }, 120_000);
+  });
 
   it('a passenger who goes overboard gets their pet back beside them', () => {
     const p = sim.player;
@@ -413,7 +426,8 @@ describe('sailing (the real Sim)', () => {
     tickSeconds(sim, 2);
     p.hp = 0;
     p.dead = true;
-    tickSeconds(sim, VOYAGE_EAST);
+    sailUntil(sim, ARRIVE_WICK - 2);
+    tickSeconds(sim, 3);
     expect(p.ferryRide ?? null).toBeNull();
     expect(sim.petOf(p.id, true)).toBeNull();
     expect(p.ferryPetParked).toBe(true);
@@ -422,7 +436,7 @@ describe('sailing (the real Sim)', () => {
     sim.tick();
     expect(sim.petOf(p.id)).toBeTruthy();
     expect(p.ferryPetParked).toBeUndefined();
-  }, 120_000);
+  });
 
   it('a relog mid-voyage lands on the destination pier, never in the sea', () => {
     const p = sim.player;
@@ -529,12 +543,13 @@ describe('sailing (the real Sim)', () => {
     tickSeconds(sim, 2);
     p.hp = 0;
     p.dead = true;
-    tickSeconds(sim, VOYAGE_EAST);
+    sailUntil(sim, ARRIVE_WICK - 2);
+    tickSeconds(sim, 3);
     expect(p.ferryRide ?? null).toBeNull();
     const there = worldToDeck(WICK, p.pos.x, p.pos.z, { x: 0, z: 0 });
     expect(there.x).toBeCloseTo(1.5, 2);
     expect(sim.players.get(p.id)?.deedStats.visited.has('ferry:eastbrook_wickharbor')).toBe(false);
-  }, 120_000);
+  });
 
   it('a passenger who releases at sea leaves their body for the destination pier', () => {
     const p = sim.player;

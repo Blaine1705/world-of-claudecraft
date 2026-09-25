@@ -138,7 +138,7 @@ describe('walking the deck under way, online', () => {
     } finally {
       harness.dispose();
     }
-  }, 120_000);
+  }, 60_000);
 
   it('another passenger standing on deck stays glued to the drawn deck at full speed', () => {
     const harness = createOnlineHarness({ latency, frameMs: 1000 / 60 });
@@ -194,7 +194,7 @@ describe('walking the deck under way, online', () => {
     } finally {
       harness.dispose();
     }
-  }, 120_000);
+  }, 60_000);
 
   it('rides a whole voyage and lands docked at Wickharbor, on the same deck spot', () => {
     const harness = createOnlineHarness({ latency, frameMs: 50 });
@@ -231,7 +231,7 @@ describe('walking the deck under way, online', () => {
     } finally {
       harness.dispose();
     }
-  }, 180_000);
+  }, 150_000);
 });
 
 function fakeWs() {
