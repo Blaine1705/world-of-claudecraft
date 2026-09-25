@@ -11266,9 +11266,12 @@ export const pt_BR: EnTranslations = {
       "collectEmpty": "Nada esperando. Receitas de venda e listagens expiradas ficam aqui.",
       "collectNote": "Receitas e bens devolvidos que o Mercador guarda para você.",
       "saleProceeds": "Receitas da venda",
+      "collectAll": "Coletar tudo",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Vendido para {buyer}",
-      "saleOlder": "Mais {count} vendas anteriores, incluídas no total.",
-      "collectAll": "Coletar tudo"
+      "saleOlder": "Mais {count} vendas anteriores, incluídas no total."
     },
     "logs": {
       "listedItem": "{item} listado no Mercado Mundial por {money}.",

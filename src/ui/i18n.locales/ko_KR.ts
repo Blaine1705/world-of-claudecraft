@@ -3442,6 +3442,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleProceeds': '판매 대금',
   'itemUi.market.saleOlder': '이전 판매 {count}건이 더 있으며, 합계에 포함되어 있습니다.',
   'itemUi.market.collectAll': '모두 수령',
+  'itemUi.market.history': '내역',
+  'itemUi.market.historyEmpty':
+    '아직 판매 내역이 없습니다. 세계 시장에서 판매한 아이템이 여기에 표시됩니다.',
+  'itemUi.market.historyNote': '세계 시장에서의 최근 판매 내역입니다.',
   'itemUi.logs.listedItem': '{item}을(를) {money}에 세계 시장에 등록했습니다.',
   'itemUi.logs.sellerSold':
     '{buyer}님이 당신의 {item}을(를) {money}에 샀습니다. 상인에게서 {proceeds}을(를) 수령하세요.',

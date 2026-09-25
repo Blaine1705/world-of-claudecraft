@@ -11266,9 +11266,12 @@ export const da_DK: EnTranslations = {
       "collectEmpty": "Intet venter. Salgsindtægter og udløbne varer hentes her.",
       "collectNote": "Indtjening og returnerede varer, som Købmanden holder for dig.",
       "saleProceeds": "Salgsindtægt",
+      "collectAll": "Hent alt",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Solgt til {buyer}",
-      "saleOlder": "Plus {count} tidligere salg, medregnet i alt.",
-      "collectAll": "Hent alt"
+      "saleOlder": "Plus {count} tidligere salg, medregnet i alt."
     },
     "logs": {
       "listedItem": "Satte {item} til salg på Verdensmarkedet for {money}.",

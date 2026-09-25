@@ -11266,9 +11266,12 @@ export const tr_TR: EnTranslations = {
       "collectEmpty": "Bekleyen bir şey yok. Satış gelirleri ve süresi dolan ilanlar burada toplanır.",
       "collectNote": "Tüccar'ın senin için tuttuğu kazançlar ve geri dönen mallar.",
       "saleProceeds": "Satış geliri",
+      "collectAll": "Hepsini Topla",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "{buyer} kişisine satıldı",
-      "saleOlder": "Ayrıca {count} önceki satış, toplama dahildir.",
-      "collectAll": "Hepsini Topla"
+      "saleOlder": "Ayrıca {count} önceki satış, toplama dahildir."
     },
     "logs": {
       "listedItem": "{item} eşyasını Dünya Pazarı'nda {money} karşılığında ilana koydun.",

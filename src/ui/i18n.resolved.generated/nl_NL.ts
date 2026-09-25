@@ -11266,9 +11266,12 @@ export const nl_NL: EnTranslations = {
       "collectEmpty": "Niets in afwachting. Verkoopopbrengsten en verlopen aanbiedingen komen hier binnen.",
       "collectNote": "Verdiensten en teruggekeerde waren die de Koopman voor je bewaart.",
       "saleProceeds": "Verkoopopbrengst",
+      "collectAll": "Alles ophalen",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Verkocht aan {buyer}",
-      "saleOlder": "Plus {count} eerdere verkopen, inbegrepen in het totaal.",
-      "collectAll": "Alles ophalen"
+      "saleOlder": "Plus {count} eerdere verkopen, inbegrepen in het totaal."
     },
     "logs": {
       "listedItem": "{item} op de Wereldmarkt gezet voor {money}.",

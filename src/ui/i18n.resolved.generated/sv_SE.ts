@@ -11266,9 +11266,12 @@ export const sv_SE: EnTranslations = {
       "collectEmpty": "Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.",
       "collectNote": "Intäkter och returnerade varor som Handlaren håller åt dig.",
       "saleProceeds": "Försäljningsintäkter",
+      "collectAll": "Hämta allt",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Sålt till {buyer}",
-      "saleOlder": "Plus {count} tidigare försäljningar, inräknade i totalen.",
-      "collectAll": "Hämta allt"
+      "saleOlder": "Plus {count} tidigare försäljningar, inräknade i totalen."
     },
     "logs": {
       "listedItem": "Annonserade {item} på Världsmarknaden för {money}.",

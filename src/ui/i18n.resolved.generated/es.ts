@@ -11266,9 +11266,12 @@ export const es: EnTranslations = {
       "collectEmpty": "No hay nada esperando. Las ganancias y publicaciones vencidas se recogen aquí.",
       "collectNote": "Ganancias y bienes devueltos que el Mercader guarda para ti.",
       "saleProceeds": "Ganancias de venta",
+      "collectAll": "Recoger lote completo",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Vendido a {buyer}",
-      "saleOlder": "Más {count} ventas anteriores, incluidas en el total.",
-      "collectAll": "Recoger lote completo"
+      "saleOlder": "Más {count} ventas anteriores, incluidas en el total."
     },
     "logs": {
       "listedItem": "{item} publicado en el Mercado Mundial por {money}.",

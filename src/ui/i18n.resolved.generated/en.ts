@@ -11266,9 +11266,12 @@ export const en: EnTranslations = {
       "collectEmpty": "Nothing waiting. Sale proceeds and expired listings collect here.",
       "collectNote": "Earnings and returned goods the Merchant is holding for you.",
       "saleProceeds": "Sale proceeds",
+      "collectAll": "Collect All",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Sold to {buyer}",
-      "saleOlder": "Plus {count} earlier sales, included in the total.",
-      "collectAll": "Collect All"
+      "saleOlder": "Plus {count} earlier sales, included in the total."
     },
     "logs": {
       "listedItem": "Listed {item} on the World Market for {money}.",

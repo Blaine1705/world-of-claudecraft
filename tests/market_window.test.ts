@@ -108,10 +108,10 @@ describe('market_window: instance-effective icon rims (phase 13 fix round)', () 
   });
 
   it('the def-only negative: the sale LEDGER row has no payload and keeps the def icon', () => {
-    // renderCollectSales rows are historical records whose model carries no
-    // instance, so the rim is the def's, stated rather than defaulted.
+    // renderHistory/renderSalesList rows are historical records whose model
+    // carries no instance, so the rim is the def's, stated rather than defaulted.
     const ledger = painterCode.slice(
-      painterCode.indexOf('private renderCollectSales('),
+      painterCode.indexOf('private renderHistory('),
       painterCode.indexOf('private fungibleBagCount('),
     );
     expect(ledger).toContain('this.deps.itemIcon(item, item.quality)');
@@ -120,7 +120,7 @@ describe('market_window: instance-effective icon rims (phase 13 fix round)', () 
   });
 });
 
-describe('market_window: the Collect tab sale ledger', () => {
+describe('market_window: the History tab sale ledger', () => {
   // The ledger is its own repaint axis: a sale whose proceeds floor to 0 copper
   // moves neither collectionCopper nor collectionItems, so a signature watching
   // only those two would leave an open Collect tab showing a stale list.
@@ -146,17 +146,17 @@ describe('market_window: the Collect tab sale ledger', () => {
 
   it('builds the rows in the pure core, leaving the painter no item resolution', () => {
     expect(core).toContain('collectionSales');
-    // The painter consumes MarketCollectSaleRow; it never reaches into ITEMS to
+    // The painter consumes MarketSaleRow; it never reaches into ITEMS to
     // resolve a LEDGER ROW.
-    expect(painter).toContain('MarketCollectSaleRow');
+    expect(painter).toContain('MarketSaleRow');
     // Scoped to the ledger's own render, not the whole file. The painter does
     // now import ITEMS, for one unrelated seam: it hands the catalog to the
     // localized-search resolver (effectiveSearch), which is a pure core that
     // imports no data of its own and must be given it by its composition point.
     // A blanket file-wide import ban would have to fail that or be deleted, and
     // neither answers what this pin is actually for, so it reads the region.
-    const at = painterCode.indexOf('renderCollect');
-    expect(at, 'the collect render must exist to be scoped').toBeGreaterThan(-1);
+    const at = painterCode.indexOf('renderSalesList');
+    expect(at, 'the sales-list render must exist to be scoped').toBeGreaterThan(-1);
     const ledger = painterCode.slice(at, painterCode.indexOf('\n  private ', at + 1));
     expect(ledger, 'the ledger render resolves no item itself').not.toContain('ITEMS');
   });

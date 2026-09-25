@@ -79,7 +79,8 @@ import {
   COPPER_PER_SILVER,
   type MarketBrowseBody,
   type MarketCollectBody,
-  type MarketCollectSaleRow,
+  type MarketHistoryBody,
+  type MarketSaleRow,
   type MarketSellBody,
   type MarketSellMeta,
   type MarketSubtypeKind,
@@ -473,6 +474,7 @@ export class MarketWindow {
     const tabLabel = (id: MarketTab): string => {
       if (id === 'browse') return t('itemUi.market.browse');
       if (id === 'sell') return t('itemUi.market.sell');
+      if (id === 'history') return t('itemUi.market.history');
       const n = marketCollectBadgeCount(info);
       return n > 0
         ? t('itemUi.market.collectWithCount', {
@@ -502,6 +504,7 @@ export class MarketWindow {
       tab('browse') +
       tab('sell') +
       tab('collect') +
+      tab('history') +
       `</div>` +
       `<div class="mkt-layout${this.tab === 'browse' ? '' : ' mkt-layout-wide'}">${controlsHtml}<div id="market-body"></div></div>` +
       (this.tab === 'browse'
@@ -755,7 +758,11 @@ export class MarketWindow {
       this.renderSell(body, view.body, view.meta);
       return;
     }
-    this.renderCollect(body, view.body);
+    if (view.kind === 'collect') {
+      this.renderCollect(body, view.body);
+      return;
+    }
+    this.renderHistory(body, view.body);
   }
 
   private renderBrowse(body: HTMLElement, view: MarketBrowseBody): void {
@@ -1162,7 +1169,6 @@ export class MarketWindow {
       row.innerHTML = `<span>${esc(t('itemUi.market.saleProceeds'))}</span><span class="mkt-price ui-money">${this.deps.moneyHtml(view.proceeds)}</span>`;
       body.appendChild(row);
     }
-    this.renderCollectSales(body, view.sales, view.salesOmitted);
     for (const { item, count, instance } of view.rows) {
       // Returned goods keep their copy identity: the name color and the icon
       // rim both read the instance-effective quality (the all-surfaces rule).
@@ -1189,15 +1195,19 @@ export class MarketWindow {
     body.appendChild(btn);
   }
 
-  // The itemized ledger under the proceeds line: what sold, to whom, and for how
-  // much, so the single gold figure above is accountable. Sits between the purse
-  // and the returned-goods rows because it explains the purse, not the goods.
-  private renderCollectSales(
-    body: HTMLElement,
-    sales: MarketCollectSaleRow[],
-    omitted: number,
-  ): void {
-    if (sales.length === 0 && omitted === 0) return;
+  // The History tab: the itemized ledger of what sold, to whom, and for how much
+  // (issue: "Different tab for All sales history"), split out of Collect so a
+  // sale stays visible here after its proceeds are claimed on the Collect tab.
+  private renderHistory(body: HTMLElement, view: MarketHistoryBody): void {
+    if (view.state === 'empty') {
+      body.innerHTML = `<div class="mkt-empty">${esc(t('itemUi.market.historyEmpty'))}</div>`;
+      return;
+    }
+    body.innerHTML = `<div class="mkt-note">${esc(t('itemUi.market.historyNote'))}</div>`;
+    this.renderSalesList(body, view.sales, view.salesOmitted);
+  }
+
+  private renderSalesList(body: HTMLElement, sales: MarketSaleRow[], omitted: number): void {
     const list = document.createElement('div');
     list.className = 'mkt-sale-list';
     for (const { item, itemName, count, proceeds, buyerName } of sales) {

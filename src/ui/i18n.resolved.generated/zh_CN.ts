@@ -11266,9 +11266,12 @@ export const zh_CN: EnTranslations = {
       "collectEmpty": "没有待领取内容。销售收益和过期上架会在这里领取。",
       "collectNote": "商人为你保管的收益和退回货物。",
       "saleProceeds": "销售收益",
+      "collectAll": "全部领取",
+      "history": "历史记录",
+      "historyEmpty": "暂无销售记录。你在世界市场出售的物品会显示在这里。",
+      "historyNote": "你在世界市场的近期销售记录。",
       "saleBuyer": "售予{buyer}",
-      "saleOlder": "另有 {count} 笔较早的交易，已计入总额。",
-      "collectAll": "全部领取"
+      "saleOlder": "另有 {count} 笔较早的交易，已计入总额。"
     },
     "logs": {
       "listedItem": "已将 {item} 以 {money} 上架到世界市场。",

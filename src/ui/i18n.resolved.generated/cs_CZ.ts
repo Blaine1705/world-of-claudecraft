@@ -11266,9 +11266,12 @@ export const cs_CZ: EnTranslations = {
       "collectEmpty": "Nic nečeká. Tady si vyzvedneš výnosy z prodeje a vypršelé nabídky.",
       "collectNote": "Výdělky a vrácené zboží, které pro tebe drží Obchodník.",
       "saleProceeds": "Výnosy z prodeje",
+      "collectAll": "Vyzvednout vše",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Prodáno hráči {buyer}",
-      "saleOlder": "Plus {count} dřívějších prodejů, zahrnuto v součtu.",
-      "collectAll": "Vyzvednout vše"
+      "saleOlder": "Plus {count} dřívějších prodejů, zahrnuto v součtu."
     },
     "logs": {
       "listedItem": "{item} nabídnut na Světovém trhu za {money}.",

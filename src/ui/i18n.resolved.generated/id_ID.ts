@@ -11266,9 +11266,12 @@ export const id_ID: EnTranslations = {
       "collectEmpty": "Tidak ada yang menunggu. Hasil penjualan dan daftar kedaluwarsa terkumpul di sini.",
       "collectNote": "Pendapatan dan barang kembalian yang disimpan Pedagang untukmu.",
       "saleProceeds": "Hasil penjualan",
+      "collectAll": "Ambil Semua",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Terjual kepada {buyer}",
-      "saleOlder": "Ditambah {count} penjualan sebelumnya, termasuk dalam total.",
-      "collectAll": "Ambil Semua"
+      "saleOlder": "Ditambah {count} penjualan sebelumnya, termasuk dalam total."
     },
     "logs": {
       "listedItem": "Mendaftarkan {item} di Pasar Dunia seharga {money}.",

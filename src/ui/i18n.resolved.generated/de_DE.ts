@@ -11266,9 +11266,12 @@ export const de_DE: EnTranslations = {
       "collectEmpty": "Nichts wartet. Verkaufserlöse und abgelaufene Angebote werden hier abgeholt.",
       "collectNote": "Erlöse und zurückgegebene Waren, die der Händler für Euch hält.",
       "saleProceeds": "Verkaufserlöse",
+      "collectAll": "Alles abholen",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Verkauft an {buyer}",
-      "saleOlder": "Zuzüglich {count} früherer Verkäufe, in der Summe enthalten.",
-      "collectAll": "Alles abholen"
+      "saleOlder": "Zuzüglich {count} früherer Verkäufe, in der Summe enthalten."
     },
     "logs": {
       "listedItem": "{item} für {money} auf dem Weltmarkt eingestellt.",

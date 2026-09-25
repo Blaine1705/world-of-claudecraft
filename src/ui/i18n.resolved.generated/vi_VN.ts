@@ -11266,9 +11266,12 @@ export const vi_VN: EnTranslations = {
       "collectEmpty": "Không có gì đang chờ. Tiền bán và mặt hàng hết hạn sẽ được thu về tại đây.",
       "collectNote": "Tiền lời và hàng hóa trả lại mà Thương Nhân đang giữ cho bạn.",
       "saleProceeds": "Tiền bán được",
+      "collectAll": "Thu Tất Cả",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Đã bán cho {buyer}",
-      "saleOlder": "Cộng thêm {count} lượt bán trước đó, đã được tính vào tổng.",
-      "collectAll": "Thu Tất Cả"
+      "saleOlder": "Cộng thêm {count} lượt bán trước đó, đã được tính vào tổng."
     },
     "logs": {
       "listedItem": "Đã rao bán {item} trên Chợ Thế Giới với giá {money}.",

@@ -11266,9 +11266,12 @@ export const it_IT: EnTranslations = {
       "collectEmpty": "Non c'è nulla in attesa. Ricavi e inserzioni scadute si ritirano qui.",
       "collectNote": "Ricavi e merci restituite che il Mercante conserva per te.",
       "saleProceeds": "Ricavi di vendita",
+      "collectAll": "Ritira tutto",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Venduto a {buyer}",
-      "saleOlder": "Più {count} vendite precedenti, incluse nel totale.",
-      "collectAll": "Ritira tutto"
+      "saleOlder": "Più {count} vendite precedenti, incluse nel totale."
     },
     "logs": {
       "listedItem": "{item} messo sul Mercato Mondiale per {money}.",

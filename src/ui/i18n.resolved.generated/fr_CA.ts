@@ -11266,9 +11266,12 @@ export const fr_CA: EnTranslations = {
       "collectEmpty": "Rien en attente. Les recettes et annonces expirées se récupèrent ici.",
       "collectNote": "Recettes et biens retournés que le Marchand garde pour vous.",
       "saleProceeds": "Recettes de vente",
+      "collectAll": "Tout récupérer",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Vendu à {buyer}",
-      "saleOlder": "Plus {count} ventes antérieures, incluses dans le total.",
-      "collectAll": "Tout récupérer"
+      "saleOlder": "Plus {count} ventes antérieures, incluses dans le total."
     },
     "logs": {
       "listedItem": "{item} listé au Marché mondial pour {money}.",

@@ -338,7 +338,7 @@ describe('classifyDiff', () => {
     }
   });
 
-  it('captures the market overview, browse collapse, sell price ref, collect ledger, buy confirmation, and expanded armor filters for market window changes', () => {
+  it('captures the market overview, browse collapse, sell price ref, collect ledger, history ledger, buy confirmation, and expanded armor filters for market window changes', () => {
     const plan = classifyDiff(['src/ui/market_window.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
@@ -347,6 +347,7 @@ describe('classifyDiff', () => {
       'market-sweep',
       'market-sell-price-ref',
       'market-collect-ledger',
+      'market-history-ledger',
       'market-buy-confirm',
       'market-armor-filters',
     ]);

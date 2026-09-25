@@ -3471,6 +3471,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleProceeds': '売上',
   'itemUi.market.saleOlder': 'ほかに {count} 件の以前の売却があり、合計に含まれています。',
   'itemUi.market.collectAll': 'すべて受け取る',
+  'itemUi.market.history': '履歴',
+  'itemUi.market.historyEmpty':
+    'まだ売却はありません。ワールドマーケットで売却したアイテムがここに表示されます。',
+  'itemUi.market.historyNote': 'ワールドマーケットでの最近の売却記録です。',
   'itemUi.logs.listedItem': '{item}を{money}でワールドマーケットに出品しました。',
   'itemUi.logs.sellerSold':
     '{buyer}があなたの{item}を{money}で購入しました。商人から{proceeds}を受け取ってください。',
