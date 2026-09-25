@@ -1,6 +1,7 @@
 import type * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { buildFerryPiers } from '../src/render/ferry_piers';
+import { WICKHARBOR_WHARF_DECKS } from '../src/sim/content/wickharbor_wharf';
 import { WYRMWATCH_HARBOR_DECKS } from '../src/sim/content/wyrmwatch_harbor';
 import {
   FERRY_PIER_DECK_ABOVE_WATER,
@@ -35,8 +36,13 @@ describe('ferry piers', () => {
       expect(onFerryPier(out.x, out.z, terrain)).toBe(true);
     }
     // the surface list is the plank-built piers, then the Wyrmwatch cliff harbor's
-    // own decks (drawn by its Blender model, render/wyrmwatch_harbor.ts)
-    expect(FERRY_PIER_DECKS).toEqual([...FERRY_PIERS.flat(), ...WYRMWATCH_HARBOR_DECKS]);
+    // own decks (drawn by its Blender model, render/wyrmwatch_harbor.ts), then the
+    // Wickharbor ferry wharf's (render/wickharbor_wharf.ts)
+    expect(FERRY_PIER_DECKS).toEqual([
+      ...FERRY_PIERS.flat(),
+      ...WYRMWATCH_HARBOR_DECKS,
+      ...WICKHARBOR_WHARF_DECKS,
+    ]);
     // nowhere else
     expect(ferryPierSurface(0, 0, terrain, WATER_LEVEL)).toBe(Number.NEGATIVE_INFINITY);
     expect(ferryPierSurface(-501, 1600, terrain, WATER_LEVEL)).toBe(Number.NEGATIVE_INFINITY);

@@ -25,6 +25,7 @@ import { MAILBOXES } from './content/mailboxes';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
 import { TRANSPORT_ROUTES } from './content/transport_ships';
 import { TUNNELS } from './content/tunnels';
+import { WICKHARBOR_WHARF_CALM_ANCHORS } from './content/wickharbor_wharf';
 import {
   DUNGEONS,
   ESCORTS,
@@ -246,6 +247,9 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
       pad('deckRoot', deck.ax2, deck.az2, 5, 12);
     }
   }
+  // ...and the Wickharbor ferry wharf keeps the shore root its predecessors were seated
+  // on (content/wickharbor_wharf.ts), so the bluff it stands against is unchanged
+  for (const [x, z] of WICKHARBOR_WHARF_CALM_ANCHORS) pad('deckRoot', x, z, 5, 12);
   // Structural props: anything with a modeled footprint a player walks up
   // to. Foliage-like dressing (marshReeds, greatTrees) and hub-internal
   // line work (fences, walls) are deliberately absent: a tree or a fence

@@ -754,7 +754,10 @@ export const GALECREST_PROPS: ZonePropsDef = {
     // against the deck rectangles in sim/gale_harbor.ts; the r4 collider
     // stays clear of every walkway so nobody wedges between hull and rail)
     { key: 'hexShipBlue', x: 492.9, z: 350.2, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 475.1, z: 368.7, rot: 1.45, scale: 6, r: 4, h: 9, float: 0.55 },
+    // (a second hull lay at x 475.1, z 368.7, off the middle pier's south side: its
+    // stern was jammed against the boardwalk's crossing with the old deepwater pier.
+    // It went with that crossing when the ferry wharf was built there,
+    // content/wickharbor_wharf.ts, owner-approved)
     // (this hull lay at x 487, z 370.1, inside the Eastbrook ferry's berth off
     // the deepwater pier's end; it rides at anchor out in the bay since the
     // ferry's Phase 2 timetable, clear of its sailing paths)

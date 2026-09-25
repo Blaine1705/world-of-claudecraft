@@ -80,6 +80,7 @@ import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
+import { harborStructureColliders } from './harbor_structures';
 import { derivedInteriorColliders } from './interior_collider_sets';
 import {
   benchDrawnHeight,
@@ -136,7 +137,6 @@ import {
   terrainHeight,
   waterLevelAt,
 } from './world';
-import { wyrmwatchHarborColliders } from './wyrmwatch_harbor';
 import { yumiMazeColliders } from './yumi_maze_layout';
 
 // Static world collision. Prop placement comes from the per-zone content
@@ -779,9 +779,9 @@ function staticWorldColliders(seed: number): Collider[] {
   // Hand-placed GLB decor (src/sim/decor_prop_colliders.ts): a circle or box per
   // PROPS.decorProps row, walk-through without r/hw+hd, standable with standableTop.
   out.push(...buildDecorPropColliders(seed, PROPS.decorProps ?? []));
-  // Built-in only: the berths (transport_gates.ts), then the Wyrmwatch cliff harbor.
+  // Built-in only: the berths (transport_gates.ts), then the built harbors' rails and props.
   if (content === BUILTIN_WORLD) out.push(...transportBerthColliders(seed));
-  if (content === BUILTIN_WORLD) out.push(...wyrmwatchHarborColliders(seed));
+  if (content === BUILTIN_WORLD) out.push(...harborStructureColliders(seed));
 
   // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
   // grid the renderer lays the hedge GLBs from, so the blocked ground IS the

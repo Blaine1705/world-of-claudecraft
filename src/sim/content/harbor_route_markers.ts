@@ -17,8 +17,9 @@
 //    marker stands 3 yd out from the quay on the south stilt line.
 //  - Moonrest (the Nightbloom): the pier (-501, 1506, -PI/2, 11, 2.2) off the
 //    sunset shore; 1 yd out from the shore root on the south stilt line.
-//  - Wickharbor (the Galecrest): the deepwater pier (464.1, 378, 1.3, 12, 2.0);
-//    on its (narrower) south edge just past where the shore boardwalk joins it.
+//  - Wickharbor (the Galecrest): the ferry wharf's pier (content/wickharbor_wharf.ts:
+//    rot 1.3, 5.6 wide), on its north half short of where the arm from the town's
+//    boardwalk joins it (it stood here on the old deepwater pier too).
 //  - Wyrmwatch (the Drakelands): the pier (498.5, 1899.2, PI/2, 8.5, 2.2) at
 //    the foot of the bluff stair; 2 yd past the stair's foot, south stilt line.
 

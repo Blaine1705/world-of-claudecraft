@@ -8,13 +8,17 @@
 // the same way. The Wyrmwatch pier's root opens onto the cliff harbor
 // (content/wyrmwatch_harbor.ts: its quays, switchback stair and top landing),
 // whose decks join this surface query but are drawn by their own Blender model
-// (render/wyrmwatch_harbor.ts), not the plank builder. WALKABLE raised ground:
+// (render/wyrmwatch_harbor.ts), not the plank builder; the Wickharbor ferry wharf
+// (content/wickharbor_wharf.ts: its pier, berth head, arm and the flight up from the
+// town's boardwalk) joins it the same way, drawn by its own Blender model
+// (render/wickharbor_wharf.ts). WALKABLE raised ground:
 // deck_surfaces.ts folds them into world.ts groundHeight. Nothing on the land
 // moves: each pier roots at the water's edge.
 //
 // Pure leaf: deterministic, no SimContext; terrain and water level are
 // passed in.
 
+import { WICKHARBOR_WHARF_DECKS } from './content/wickharbor_wharf';
 import { WYRMWATCH_HARBOR_DECKS } from './content/wyrmwatch_harbor';
 import { type GaleDeckDef, galeDeckSurfaceAt } from './gale_harbor';
 
@@ -62,18 +66,21 @@ export const FERRY_PIERS: readonly (readonly GaleDeckDef[])[] = [
 ];
 
 /** Every walkable ferry pier deck, in one list (the surface query): the piers
- *  the plank builder draws, then the Wyrmwatch cliff harbor's own decks. */
+ *  the plank builder draws, then the Wyrmwatch cliff harbor's own decks, then the
+ *  Wickharbor ferry wharf's. */
 export const FERRY_PIER_DECKS: readonly GaleDeckDef[] = [
   ...FERRY_PIERS.flat(),
   ...WYRMWATCH_HARBOR_DECKS,
+  ...WICKHARBOR_WHARF_DECKS,
 ];
 
-// Per-site bounding boxes for the cheap early-out (the two berths are a world
+// Per-site bounding boxes for the cheap early-out (the berths are a world
 // apart, so one box would cover the whole east of the map): Moonrest's pier,
-// and the Wyrmwatch pier with its cliff harbor.
+// the Wyrmwatch pier with its cliff harbor, and the Wickharbor wharf.
 const BOXES: readonly (readonly [number, number, number, number])[] = [
   [-514, 1502, -488, 1510],
   [486, 1880, 509, 1922],
+  [451, 364, 484, 389],
 ];
 const BAND_Z1 = Math.min(...BOXES.map((b) => b[1]));
 const BAND_Z2 = Math.max(...BOXES.map((b) => b[3]));
