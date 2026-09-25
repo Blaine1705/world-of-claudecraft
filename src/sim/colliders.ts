@@ -1561,10 +1561,9 @@ export function setColliderGateOpen(seed: number, gate: string, open: boolean): 
   const content = getActiveWorldContent();
   const grid = gridCaches.get(content)?.get(seed);
   if (!grid) {
-    let wishes = pendingGateStates.get(content);
-    if (!wishes) pendingGateStates.set(content, (wishes = new Map()));
-    const bySeed = wishes.get(seed) ?? new Map<string, boolean>();
-    wishes.set(seed, bySeed.set(gate, open));
+    const wishes = pendingGateStates.get(content) ?? new Map<number, Map<string, boolean>>();
+    pendingGateStates.set(content, wishes);
+    wishes.set(seed, (wishes.get(seed) ?? new Map<string, boolean>()).set(gate, open));
     return;
   }
   const list = grid.gated.get(gate);
