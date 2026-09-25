@@ -209,6 +209,8 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/frame_presets_core.ts',
+  'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
   'src/ui/item_combat_tooltip_view.ts',
   // The zone-entry chat line (welcome hint vs the town-done line); the
@@ -313,6 +315,7 @@ const UI_PURE_CORES = [
   'src/ui/target_flair_line_view.ts',
   'src/ui/meters_breakdown_view.ts',
   'src/ui/interface_unlock_core.ts',
+  'src/ui/focus_targets_core.ts',
   'src/ui/interface_visibility_core.ts',
   'src/ui/interface_unlock_menu_core.ts',
   'src/ui/touch_frame_drag_core.ts',
@@ -2496,6 +2499,12 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/frame_presets_live.ts',
+  'src/ui/frame_editor_deps.ts',
+  'src/ui/frame_presets_controls.ts',
+  'src/ui/options_frame_settings.ts',
+  // Wires registered HUD roots to persistent movers and their live DOM homes.
+  'src/ui/hud_frame_registry.ts',
   // Mints the shared unit and bag-stack step buttons around a number input and
   // writes the input on a press; the rules are quantity_step_core.ts.
   'src/ui/quantity_stepper.ts',

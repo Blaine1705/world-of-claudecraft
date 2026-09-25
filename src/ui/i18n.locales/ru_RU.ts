@@ -13,7 +13,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
-  'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
+  'hudChrome.framePresets.pickerLabel': 'Профили рамок: {name}',
+  'hudChrome.framePresets.overwrite': 'Перезаписать профиль',
+  'hudChrome.framePresets.overwriteBody': 'Заменить сохранённый профиль «{name}» текущим расположением?',
+  'hudChrome.framePresets.current': 'Текущая раскладка',
+  'hudChrome.framePresets.new': 'Новый набор',
+  'hudChrome.framePresets.empty': 'Нет сохранённых наборов',
+  'hudChrome.framePresets.deleteNamed': 'Удалить {name}',
+  'hudChrome.framePresets.deleteBody': 'Удалить набор рамок «{name}»?',
+  'hudChrome.framePresets.title': 'Наборы рамок',
+  'hudChrome.framePresets.name': 'Название набора',
+  'hudChrome.framePresets.slot': 'Набор {slot}',
+  'hudChrome.framePresets.remove': 'Удалить',
+  'hudChrome.framePresets.saved': 'Готово.',
+  'hudChrome.framePresets.failed': 'Не удалось сохранить или загрузить набор.',
+  'hudChrome.frameMenus.hide': 'Скрыть рамку',
+  'hudChrome.focusTargets.unset': 'Снять фокус',
+  'hudChrome.frameMenus.units': 'Рамки персонажей',
+  'hudChrome.frameMenus.bars': 'Панели действий',
+  'hudChrome.frameMenus.trackers': 'Отслеживание',
+  'hudChrome.frameMenus.auras': 'Ауры',
+  'hudChrome.frameMenus.combat': 'Боевые индикаторы',
+  'hudChrome.frameMenus.other': 'Другие элементы интерфейса',
+  'hudChrome.frameMenus.options': 'Настройки рамки',
+  'hudChrome.frameMenus.allOptions': 'Все настройки рамок',
+  'hudChrome.frameMenus.independentTarget': 'Закрепить цель цели за целью',
+
+  'hudChrome.focusTargets.frame1': 'Фокус 1',
+  'hudChrome.focusTargets.frame2': 'Фокус 2',
+  'hudChrome.focusTargets.frame3': 'Фокус 3',
+  'hudChrome.interfaceUnlock.combineTrackers': 'Объединить рамки отслеживания',
+  'hudChrome.interfaceUnlock.combineAuras': 'Объединить рамки аур',
+  'guide.interfacePage.frameGroups': '{trackers} объединяет задания, достижения, разломы, вылазки, цели сбора и Реликварий. {auras} объединяет периодический урон по цели и шесть полос аур. Включите нужное объединение в настройках рамок или оставьте рамки раздельными. У {tot} есть полоса ресурса. Три цели {focus} перемещаются отдельно: Shift+F1–F3 назначает их, Ctrl+F1–F3 выбирает. Счётчики урона и угрозы можно перемещать за любую область вне кнопок и менять размер за края даже при заблокированных рамках. После разблокировки доступно отдельное меню видимости с группами. Правый щелчок по рамке открывает сброс размера и её настройки. В разделе «Интерфейс → Рамки» также есть общие настройки и сворачиваемые настройки группы. Отключите привязку цели цели к цели, чтобы перемещать её отдельно; повторное включение сохраняет отдельную позицию на будущее. После назначения фокуса кнопка и подсказка скрываются. Правый щелчок и пункт «Снять фокус» возвращают исходный вид. Применение при наведении работает и на рамках фокуса.',
+  "hudChrome.focusTargets.assign": "Запомнить цель {slot}",
+  "hudChrome.focusTargets.target": "Выбрать цель {slot}",
+  "hudChrome.interfaceUnlock.frameNames.trackerGroup": "Отслеживание задач",
+  "hudChrome.interfaceUnlock.frameNames.auraGroup": "Ауры и эффекты цели",
+  'hudChrome.noticeboard.officerEntry': '{name} ({rank}) После разблокировки рамок показ и скрытие доступны в отдельном меню с группами. Щёлкните разблокированную рамку правой кнопкой, чтобы сбросить размер или открыть её настройки. В разделе «Интерфейс > Рамки» также есть общие настройки и сворачиваемые настройки группы. Включите независимое перемещение цели цели, чтобы отделить её от цели; выключение возвращает её обратно, сохраняя отдельную позицию.',
   'hudChrome.professionTrainers.nameplate': '<{title}>',
   'guide.professions.endgameBodyRaidCollections':
     'Ковка мастера объединяет вещи с меткой «Уникальный (экипируется): Ковка мастера». Прежняя вершина ремесла по-прежнему использует найденные схемы, промежуточные изделия с суточным ограничением и общие материалы финального этапа. Комплекты Горнила представляют отдельный путь с рейдовыми материалами, а не дополнительные расходы поверх прежней цепочки. Обе группы делят один предел ношения в две вещи, поэтому конкурируют за одни и те же два места в вашей сборке. Готовые вещи свободно продаются, пока доведение до совершенства или заказное изготовление не привяжет конкретный экземпляр.',
@@ -9001,8 +9037,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Призыв демона десятины сбрасывает восстановление Раскола разума, а демон возвращает вдвое больше маны за каждый удар.',
   'entities.itemSets.stormkindled.name': 'Регалии грозового розжига',
   'entities.itemSets.stormkindled.bonus2':
-    'Высвобождение оружия с пламенным клеймом даёт 3 Грома. Получаемый урон больше не замедляет чтение ваших заклинаний.',
-  'entities.itemSets.stormkindled.bonus4': 'Бонус Земного толчка за каждый Гром возрастает до 30%.',
+    'Дуговая перегрузка срабатывает с вероятностью 30%. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.stormkindled.bonus4': 'Бонус Земного толчка за каждый Гром возрастает до 30%, а Магматический взрыв наносит на 20% больше урона.',
   'entities.itemSets.warspirit_emberscale.name': 'Угольная чешуя духа войны',
   'entities.itemSets.warspirit_emberscale.bonus2': 'Удар предков продвигает ваш ритм на 3 шага.',
   'entities.itemSets.warspirit_emberscale.bonus4': 'Удар предков наносит на 30% больше урона.',
@@ -12385,7 +12421,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingBlock': '{amount} Блок',
   'hud.combat.blockedDone': '{target} блокирует ваш {ability}, нанося {amount} урона.',
   'hud.combat.blockedTaken': 'Вы блокируете атаку {source}, получая {amount} урона.',
-  'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
+  'hudChrome.options.mouseoverCast': 'Применение при наведении на рамки группы и фокуса',
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
   'hudChrome.options.showTargetSwingTimer': 'Показывать таймер замаха цели',
   'hudChrome.options.showPetFrame': 'Показывать вашего питомца',
@@ -14809,6 +14845,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Пассивно: Дуга молнии и Небесная ветвь накапливают Гром, максимум 5. При 5 зарядах Земной толчок наносит на 125% больше урона, а Разлом земли на 100%, затем расходуется весь Гром. (Громовержец)',
   'entities.abilities.thunder_reservoir.name': 'Грозовой запас',
+  'entities.abilities.lightning_overload.name':
+    'Дуговая перегрузка',
+  'entities.abilities.lightning_overload.description':
+    'Пассивно: Дуговая стрела и Разветвленная молния с вероятностью 20% вызывают перегрузку, повторно поражая первую цель на 50% нанесенного урона и давая 1 заряд Грома. (Громовержец)',
+  'entities.abilities.lava_burst.name':
+    'Магматический взрыв',
+  'entities.abilities.lava_burst.description':
+    'Наносит {damage} урона от огня. Всегда наносит критический удар по цели, горящей от вашего Пепельного толчка. Всплеск магмы: каждый периодический урон Пепельного толчка с вероятностью 20% сбрасывает время восстановления и делает следующий Магматический взрыв в течение 10 сек. мгновенным. Урон растёт с силой заклинаний. (Громовержец)',
+  'entities.abilities.thunderstorm.name':
+    'Штормовой разлом',
+  'entities.abilities.thunderstorm.description':
+    'Призывает раскат грома, нанося {damage} урона от природы противникам в радиусе 10 м и замедляя их на 50% на 5 сек. Восстанавливает 8% вашего максимального запаса маны. Урон растёт с силой заклинаний. (Громовержец)',
   'entities.abilities.tidecall.description':
     'Исцеляет дружественную цель на {damage}. Исцеление усиливается силой заклинаний. Добавляет полный объем до избыточного исцеления в Поток исцеления, вплоть до 30% максимального здоровья цели.',
   'entities.abilities.tidecall.name': 'Зов прилива',
@@ -17420,4 +17468,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   "devCommand.actions.town.description": "Телепортируйтесь в центр города по имени.",
   "devCommand.actions.town.label": "Городской центр",
   "devCommand.fields.town": "Город",
+  'hudChrome.framePresets.apply': 'Применить',
+  'hudChrome.focusTargets.showEmpty': 'Показывать пустые рамки фокуса',
+  'hudChrome.focusTargets.assignHint': 'Выберите цель. Нажмите {key} или кнопку «{button}».',
+  'hudChrome.focusTargets.assignClickHint': 'Выберите цель. Нажмите кнопку «{button}».',
+  'hudChrome.focusTargets.ally': 'Союзник',
+  'hudChrome.focusTargets.enemy': 'Враг',
 };

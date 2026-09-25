@@ -1,3 +1,8 @@
+import { frameSettingRelated } from './frame_menu_core';
+import type { FramePresetControlsDeps } from './frame_presets_controls';
+import { interfaceResetKeys } from './interface_reset_keys';
+import { OptionsFrameSections } from './options_frame_settings';
+import { OptionsWindowLayout } from './options_window_layout';
 // Options window painter: owns the #options-menu DOM, the window-local view-state
 // (which sub-panel is open, the key-capture buffer, the keybind note, the lazily
 // built performance panel), and the open/close lifecycle. It renders the nine
@@ -147,7 +152,7 @@ import { mountViewShell } from './options_window_shell';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
 import { type RestartRequestPhase, restartStripState } from './restart_strip_core';
 import { buildRestartStrip, paintRestartStrip } from './restart_strip_painter';
-import { settingsCard, subhead } from './settings_controls';
+import { settingsCard } from './settings_controls';
 import { exportTransferCode, importTransferCode } from './settings_transfer';
 import type { TransferKind } from './settings_transfer_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
@@ -231,7 +236,7 @@ const LANGUAGE_ENDONYMS: Record<SupportedLanguage, string> = {
  * seam, the keybind store, the shared dropdown builder, focus management, and the
  * chat-timestamp/window state through these closures.
  */
-export interface OptionsWindowDeps {
+export interface OptionsWindowDeps extends FramePresetControlsDeps {
   /** The #options-menu root (Hud owns the id; the painter stays instance-parameterized). */
   root(): HTMLElement;
   /** The live world (offline Sim or online ClientWorld mirror); reads bug-report info and dispatches recovery. */
@@ -410,6 +415,9 @@ export class OptionsWindow {
   // controller, not a persisted setting): reopening the panel returns to the
   // last tab, but a fresh session starts on General. Not reset on close/open.
   private interfaceTab: InterfaceTab = 'general';
+  private readonly layout = new OptionsWindowLayout();
+  private frameOptionsId: string | null = null;
+  private readonly frameSections: OptionsFrameSections;
   private capturingKey: { action: string; index: number } | null = null; // binding awaiting a key
   private conflictingKey: { action: string; index: number } | null = null;
   private keybindNote = '';
@@ -455,7 +463,9 @@ export class OptionsWindow {
   // write, which arrives one round trip after the click that caused it.
   private gpuBackendWriteWatch: (() => void) | null = null;
 
-  constructor(private readonly deps: OptionsWindowDeps) {}
+  constructor(private readonly deps: OptionsWindowDeps) {
+    this.frameSections = new OptionsFrameSections(deps, () => this.render());
+  }
 
   get isOpen(): boolean {
     return this.opened;
@@ -475,6 +485,7 @@ export class OptionsWindow {
     this.returnFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     this.view = 'main';
+    this.frameOptionsId = null;
     this.capturingKey = null;
     this.conflictingKey = null;
     this.keybindNote = '';
@@ -482,6 +493,16 @@ export class OptionsWindow {
     this.render();
     music.pauseForMenu();
     audio.click();
+  }
+
+  openFrameOptions(id: string): void {
+    if (!this.isOpen) this.toggle();
+    this.frameOptionsId = id;
+    this.interfaceTab = id === 'chat' ? 'chat' : 'frames';
+    if (id === 'chat') this.frameOptionsId = null;
+    this.view = 'interface';
+    this.render();
+    this.deps.focusFirstInteractive(this.deps.root());
   }
 
   // Close path (Esc/X close + the window-manager's closeManagedWindow case): hide
@@ -497,7 +518,9 @@ export class OptionsWindow {
     this.graphicsApplied = null;
     this.graphicsBusy = false;
     this.graphicsOutcome = null;
+    this.layout.begin(this.deps.root(), this.view, this.interfaceTab, this.frameOptionsId);
     this.opened = false;
+    this.frameSections.dispose();
     this.syncGpuBackendWatch();
     this.deps.root().removeAttribute('aria-busy');
     this.deps.root().style.display = 'none';
@@ -536,6 +559,7 @@ export class OptionsWindow {
   // -------------------------------------------------------------------------
 
   private render(): void {
+    this.frameSections.dispose();
     const el = this.deps.root();
     if (this.view !== 'graphics') el.removeAttribute('aria-busy');
     // WCAG 2.2 AA: the Esc/options menu is a focus-trapped window, so name the
@@ -553,12 +577,7 @@ export class OptionsWindow {
         ? { label: t('hudChrome.perf.title') }
         : { labelledBy: 'options-title' },
     );
-    // The wide multi-column layouts belong to their own sub-views; clear each when
-    // leaving it so the other sub-views (and the main menu) keep their default width.
-    if (this.view !== 'keybinds') el.classList.remove('kb-wide');
-    if (this.view !== 'graphics') el.classList.remove('gfx-wide');
-    if (this.view !== 'performance') el.classList.remove('perf-wide');
-    if (this.view !== 'auras') el.classList.remove('aura-wide');
+    const centre = this.layout.begin(el, this.view, this.interfaceTab, this.frameOptionsId);
     // The overlay is draggable only while the Performance sub-view is open.
     this.deps.options()?.perfOverlay.setPlacement(this.view === 'performance');
     this.deps.auraOverlays?.().setPlacement(this.view === 'auras');
@@ -606,6 +625,7 @@ export class OptionsWindow {
     // column comes from here. render() re-runs on every navigation, so a control's
     // own self-rerender never has to restate it.
     if (this.opened) el.style.display = 'flex';
+    this.layout.finish(el, centre);
   }
 
   // The desktop shell's backend verdict lands on its own schedule, so the
@@ -636,6 +656,7 @@ export class OptionsWindow {
   // does in one. Focus moves to the menu's first entry because the control that
   // had focus is destroyed by the re-render.
   private goBack(): void {
+    this.frameOptionsId = null;
     audio.click();
     this.view = 'main';
     this.capturingKey = null;
@@ -1652,6 +1673,7 @@ export class OptionsWindow {
     // used to leave Back dead for the rest of the visit).
     wireTabStrip(el, 'opt-tab', (id, focusFollow) => {
       this.interfaceTab = id as InterfaceTab;
+      this.frameOptionsId = null;
       this.render();
       if (focusFollow) focusActiveTab(this.deps.root(), 'opt-tab', 'on');
     });
@@ -1662,12 +1684,7 @@ export class OptionsWindow {
       this.renderThemeControls(body);
     }
 
-    // Frames leads with the Edit Frames action (the unlock mode): arranging
-    // and sizing frames is what this tab is about, so its entry row sits at
-    // the top, with the layout export/import right under it (owner request:
-    // above the party section). The declarative rows below the subhead all
-    // tune the party frames (owner request: one labelled subsection), since
-    // every non-party knob moved into the editor's Frames Settings menu.
+    // Layout actions precede the separate frame and party disclosures.
     if (tab === 'frames') {
       // Frame editing is desktop-only (every gesture refuses touch layouts), so
       // the touch HUD offers neither the entry row nor the layout code rows that
@@ -1675,18 +1692,31 @@ export class OptionsWindow {
       // The native shell forces the touch HUD whatever the Interface Mode override
       // says, so it is gated too (the same union as the Esc menu's row).
       if (!env.touch && !env.nativeShell) buildInterfaceUnlockRow(body, this.deps);
-      if (!env.touch && !env.nativeShell) this.transferRows(body, 'frames');
-      subhead(body, t('hudChrome.partyFrames.optionsSection'), 'set-subhead');
     }
 
-    if (hooks)
-      this.applyControls(body, interfaceControlsForTab(controls, tab), hooks, (focusKey) => {
-        // Through render(), not renderInterface(): the dispatcher re-wires the
-        // title-bar [data-back] control the rebuild just destroyed.
-        this.render();
-        if (focusKey)
-          this.deps.root().querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)?.focus();
-      });
+    const shownControls = this.frameOptionsId
+      ? controls.filter(
+          (control) => 'key' in control && frameSettingRelated(this.frameOptionsId!, control.key),
+        )
+      : interfaceControlsForTab(controls, tab);
+    if (hooks) {
+      const apply = (root: HTMLElement, rows: OptionsControl[]) =>
+        this.applyControls(root, rows, hooks, (focusKey) => {
+          this.render();
+          if (focusKey)
+            this.deps
+              .root()
+              .querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)
+              ?.focus({ preventScroll: true });
+        });
+      if (tab === 'frames')
+        this.frameSections.render(body, shownControls, hooks, this.frameOptionsId, apply, () => {
+          this.frameOptionsId = null;
+          this.render();
+          this.deps.focusFirstInteractive(this.deps.root());
+        });
+      else apply(body, shownControls);
+    }
 
     // (The frames tab's Reset Frame Positions row was retired, owner
     // request: the per-frame size resets live in the editor's Frames
@@ -1728,50 +1758,17 @@ export class OptionsWindow {
     // (every movable frame, the chat box, the meter panels, the target-aura
     // panel): arranging frames is what that tab is about, and a reset that
     // left them strewn about read as a broken button.
-    const offMenuTabKeys: Record<InterfaceTab, readonly (keyof GameSettings)[]> = {
-      general: ['uiScale'],
-      frames: [
-        'playerFrameScale',
-        'targetFrameScale',
-        'partyFrameScale',
-        // The interface editor's dimension drags (movable_frame.ts,
-        // resizeMode 'dimensions') write these; no slider shows them, so the
-        // Frames reset must name them explicitly.
-        'playerFrameWidth',
-        'playerFrameHeight',
-        'targetFrameWidth',
-        'targetFrameHeight',
-        'partyFrameWidth',
-        'partyFrameHeight',
-        'partyFrameColumns',
-        'partyFrameSpacing',
-        'buffsLeftToRight',
-        'debuffsLeftToRight',
-        'lockPlayerFrameToActionBar',
-        'actionBar1Vertical',
-        'actionBar2Vertical',
-        'actionBar3Vertical',
-        'menuRailHorizontal',
-        'frameSnapToGrid',
-        'combineActionBars',
-        'hideUnusedActionSlots',
-        'mouseoverCast',
-        'lockActionBars',
-      ],
-      chat: [],
-      combat: [],
-    };
     // The dedicated-GPU row lives on General: that tab hosts the strip (the
     // others have no next-launch row to stand it beside).
     if (tab === 'general') {
       const restartStrip = this.restartStrip(false, false);
       if (restartStrip) body.appendChild(restartStrip);
     }
-    this.settingsViewFooter(interfaceControlsForTab(controls, tab), (hooks, keys) => {
-      const allKeys = [...keys, ...offMenuTabKeys[tab]];
+    this.settingsViewFooter(shownControls, (hooks, keys) => {
+      const allKeys = interfaceResetKeys(tab, this.frameOptionsId, keys);
       hooks.settings.reset(allKeys);
       for (const k of allKeys) hooks.onSettingChange(k, hooks.settings.get(k));
-      if (tab === 'frames') this.deps.resetUnitFrames();
+      if (tab === 'frames' && !this.frameOptionsId) this.deps.resetUnitFrames();
       this.render();
     });
   }

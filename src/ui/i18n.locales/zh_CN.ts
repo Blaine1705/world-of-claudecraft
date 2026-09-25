@@ -13,6 +13,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.framePresets.pickerLabel': '框架预设：{name}',
+  'hudChrome.framePresets.overwrite': '覆盖预设',
+  'hudChrome.framePresets.overwriteBody': '用当前布局替换已保存的预设“{name}”？',
+  'hudChrome.framePresets.current': '当前布局',
+  'hudChrome.framePresets.new': '新建预设',
+  'hudChrome.framePresets.empty': '没有已保存的预设',
+  'hudChrome.framePresets.deleteNamed': '删除 {name}',
+  'hudChrome.framePresets.deleteBody': '删除框体预设“{name}”？',
+  'hudChrome.framePresets.title': '框体预设',
+  'hudChrome.framePresets.name': '预设名称',
+  'hudChrome.framePresets.slot': '预设 {slot}',
+  'hudChrome.framePresets.remove': '删除',
+  'hudChrome.framePresets.saved': '完成。',
+  'hudChrome.framePresets.failed': '无法保存或加载预设。',
+  'hudChrome.frameMenus.hide': '隐藏框体',
+  'hudChrome.focusTargets.unset': '清除焦点',
+  'hudChrome.frameMenus.units': '单位框架',
+  'hudChrome.frameMenus.bars': '动作条',
+  'hudChrome.frameMenus.trackers': '追踪器',
+  'hudChrome.frameMenus.auras': '光环',
+  'hudChrome.frameMenus.combat': '战斗显示',
+  'hudChrome.frameMenus.other': '其他界面元素',
+  'hudChrome.frameMenus.options': '框架选项',
+  'hudChrome.frameMenus.allOptions': '所有框架选项',
+  'hudChrome.frameMenus.independentTarget': '将目标的目标锁定到目标',
+
+  'hudChrome.focusTargets.frame1': '焦点 1',
+  'hudChrome.focusTargets.frame2': '焦点 2',
+  'hudChrome.focusTargets.frame3': '焦点 3',
+  'hudChrome.interfaceUnlock.combineTrackers': '合并追踪框体',
+  'hudChrome.interfaceUnlock.combineAuras': '合并光环框体',
+  'guide.interfacePage.frameGroups':
+    '{trackers}可合并任务、功绩、裂隙、地下探索、采集目标和圣物匣追踪。{auras}可合并目标持续伤害和六种光环追踪。在框体设置中分别开启合并，关闭则可单独移动。{tot}有资源条。{focus}的三个目标可以独立移动：Shift+F1至F3设置，Ctrl+F1至F3选中。伤害和威胁统计即使在框体锁定时，也可拖动按钮以外的区域移动，拖动边缘调整大小。解锁后，独立的框体显示菜单按组控制显示。右键框体可重置大小或打开相关设置。界面中的框体页也包含通用设置和可折叠的队伍设置。关闭“将目标的目标锁定到目标”可独立移动它，重新开启仍保留独立位置。设置焦点后，设置按钮和说明会隐藏。右键选择“清除焦点”可恢复默认状态。鼠标悬停施法同样适用于焦点框体。',
+  'hudChrome.focusTargets.assign': '设置焦点 {slot}',
+  'hudChrome.focusTargets.target': '选中焦点 {slot}',
+  'hudChrome.interfaceUnlock.frameNames.trackerGroup': '任务追踪器',
+  'hudChrome.interfaceUnlock.frameNames.auraGroup': '光环与目标效果',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':
@@ -8495,8 +8532,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '召唤什一魔会重置碎心术的冷却时间，且什一魔每次攻击回复的法力值翻倍。',
   'entities.itemSets.stormkindled.name': '燃暴礼装',
   'entities.itemSets.stormkindled.bonus2':
-    '焰烙状态下的释放武器获得 3 层雷霆。受到伤害不再延迟你的施法。',
-  'entities.itemSets.stormkindled.bonus4': '大地震击的每层雷霆加成提高至 30%。',
+    '电弧超载的触发几率提高至 30%。受到伤害不再延迟你的施法。',
+  'entities.itemSets.stormkindled.bonus4':
+    '大地震击的每层雷霆加成提高至 30%，熔岩爆裂造成的伤害提高 20%。',
   'entities.itemSets.warspirit_emberscale.name': '战魂烬鳞甲',
   'entities.itemSets.warspirit_emberscale.bonus2': '先祖打击将战魂节律推进 3 段。',
   'entities.itemSets.warspirit_emberscale.bonus4': '先祖打击造成的伤害提高 30%。',
@@ -11618,7 +11656,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingBlock': '{amount} 格挡',
   'hud.combat.blockedDone': '{target}格挡了你的{ability}，造成 {amount} 点伤害。',
   'hud.combat.blockedTaken': '你格挡了{source}的攻击，受到 {amount} 点伤害。',
-  'hudChrome.options.mouseoverCast': '队伍头像上鼠标悬停施法',
+  'hudChrome.options.mouseoverCast': '鼠标悬停队伍和焦点框体施法',
   'hudChrome.options.showTargetOfTarget': '显示目标的目标',
   'hudChrome.options.showTargetSwingTimer': '显示目标的挥击计时器',
   'hudChrome.options.showPetFrame': '显示你的宠物',
@@ -13918,6 +13956,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     '被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
   'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
+  'entities.abilities.lightning_overload.name': '电弧超载',
+  'entities.abilities.lightning_overload.description':
+    '被动：电弧箭和叉状闪电有20%的几率超载，对其第一个目标再次造成所造成伤害的50%，并获得1层雷霆。（雷霆召唤）',
+  'entities.abilities.lava_burst.name': '熔岩爆裂',
+  'entities.abilities.lava_burst.description':
+    '造成{damage}点火焰伤害。对身上带有你的余烬震击燃烧效果的目标必定造成致命一击。熔岩涌动：余烬震击每次跳动有20%的几率重置此技能的冷却时间，并使你在10秒内的下一次熔岩爆裂变为瞬发。伤害随法术强度提高。（雷霆召唤）',
+  'entities.abilities.thunderstorm.name': '风暴破击',
+  'entities.abilities.thunderstorm.description':
+    '召唤一声霹雳，对10米内的敌人造成{damage}点自然伤害，并使其移动速度降低50%，持续5秒。恢复你最大法力值的8%。伤害随法术强度提高。（雷霆召唤）',
   'entities.abilities.tidecall.description':
     '为一个友方目标恢复{damage}点生命值。治疗量随法术强度提高。将过量治疗前的完整治疗量加入愈合水流，最多为目标最大生命值的30%。',
   'entities.abilities.tidecall.name': '潮汐召唤',
@@ -16329,4 +16376,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '按名字传送到城镇中心。',
   'devCommand.actions.town.label': '城镇中心',
   'devCommand.fields.town': '镇',
+  'hudChrome.framePresets.apply': '应用',
+  'hudChrome.focusTargets.showEmpty': '显示空的焦点框体',
+  'hudChrome.focusTargets.assignHint': '选择一个目标。按 {key} 或点击 {button}。',
+  'hudChrome.focusTargets.assignClickHint': '选择一个目标。点击 {button}。',
+  'hudChrome.focusTargets.ally': '盟友',
+  'hudChrome.focusTargets.enemy': '敌人',
 };

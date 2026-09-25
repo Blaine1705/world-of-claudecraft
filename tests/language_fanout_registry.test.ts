@@ -129,6 +129,8 @@ const FANOUT_ARMS: readonly string[] = [
   // what replaced the blanket hud.ts exemption: every memo it clears carries
   // its own row below (masterwrought qr-19-hud-coordinator-fanout-exemption).
   'this.relocalizeCoordinatorMemos|',
+  'this.focusTargets.relocalize|',
+  'refreshHudFrameGroupLabels|',
   'this.bgScoreboard.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
   'this.wocMarketWindow.relocalize|',

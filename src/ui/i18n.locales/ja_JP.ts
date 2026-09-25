@@ -13,6 +13,44 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.framePresets.pickerLabel': 'フレームプリセット：{name}',
+  'hudChrome.framePresets.overwrite': 'プリセットを上書き',
+  'hudChrome.framePresets.overwriteBody':
+    '保存済みプリセット「{name}」を現在のレイアウトで上書きしますか？',
+  'hudChrome.framePresets.current': '現在のレイアウト',
+  'hudChrome.framePresets.new': '新規プリセット',
+  'hudChrome.framePresets.empty': '保存済みプリセットはありません',
+  'hudChrome.framePresets.deleteNamed': '{name} を削除',
+  'hudChrome.framePresets.deleteBody': 'フレームプリセット「{name}」を削除しますか？',
+  'hudChrome.framePresets.title': 'フレームプリセット',
+  'hudChrome.framePresets.name': 'プリセット名',
+  'hudChrome.framePresets.slot': 'プリセット {slot}',
+  'hudChrome.framePresets.remove': '削除',
+  'hudChrome.framePresets.saved': '完了。',
+  'hudChrome.framePresets.failed': 'プリセットを保存または読み込めませんでした。',
+  'hudChrome.frameMenus.hide': 'フレームを非表示',
+  'hudChrome.focusTargets.unset': 'フォーカスを解除',
+  'hudChrome.frameMenus.units': 'ユニットフレーム',
+  'hudChrome.frameMenus.bars': 'アクションバー',
+  'hudChrome.frameMenus.trackers': 'トラッカー',
+  'hudChrome.frameMenus.auras': 'オーラ',
+  'hudChrome.frameMenus.combat': '戦闘表示',
+  'hudChrome.frameMenus.other': 'その他のHUD要素',
+  'hudChrome.frameMenus.options': 'フレーム設定',
+  'hudChrome.frameMenus.allOptions': 'すべてのフレーム設定',
+  'hudChrome.frameMenus.independentTarget': 'ターゲットのターゲットをターゲットに固定',
+
+  'hudChrome.focusTargets.frame1': 'フォーカス 1',
+  'hudChrome.focusTargets.frame2': 'フォーカス 2',
+  'hudChrome.focusTargets.frame3': 'フォーカス 3',
+  'hudChrome.interfaceUnlock.combineTrackers': '追跡フレームをまとめる',
+  'hudChrome.interfaceUnlock.combineAuras': 'オーラフレームをまとめる',
+  'guide.interfacePage.frameGroups':
+    '{trackers} はクエスト、功績、リフト、地下探索、採集目標、聖遺物の追跡をまとめられます。{auras} は対象の継続ダメージと6種のオーラ追跡をまとめられます。フレーム設定で有効にするとまとめて移動でき、無効なら個別に移動できます。{tot} にはリソースバーがあります。{focus} の3つの対象は個別に移動できます。Shift+F1～F3で設定し、Ctrl+F1～F3で選択します。ダメージと脅威メーターはロック中でも、ボタン以外をドラッグして移動し、端をドラッグしてサイズ変更できます。ロック解除中は専用のグループ別メニューで表示を切り替えられます。フレームを右クリックするとサイズのリセットや関連設定を開けます。インターフェースのフレームタブには共通設定と折りたたみ可能なパーティ設定があります。「ターゲットのターゲットをターゲットに固定」をオフにすると個別に移動でき、オンに戻しても個別の位置は保存されます。フォーカスを設定すると設定ボタンと説明が隠れます。右クリックして「フォーカスを解除」を選ぶと元に戻ります。マウスオーバーキャストはフォーカスフレームでも使えます。',
+  'hudChrome.focusTargets.assign': 'フォーカス {slot} を設定',
+  'hudChrome.focusTargets.target': 'フォーカス {slot} を選択',
+  'hudChrome.interfaceUnlock.frameNames.trackerGroup': '進行状況トラッカー',
+  'hudChrome.interfaceUnlock.frameNames.auraGroup': 'オーラとターゲット効果',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':
@@ -8844,8 +8882,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'タイスフィーンドを招来すると精神粉砕のクールダウンがリセットされ、タイスフィーンドの攻撃ごとのマナ回復量が2倍になります。',
   'entities.itemSets.stormkindled.name': 'ストームキンドルの礼装',
   'entities.itemSets.stormkindled.bonus2':
-    '火焔烙印中の武器解放で雷鳴を3獲得します。被ダメージで詠唱が遅れなくなります。',
-  'entities.itemSets.stormkindled.bonus4': '大地の衝撃の雷鳴ごとのボーナスが30%に上昇します。',
+    'アークオーバーロードの発動率が30%になります。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.stormkindled.bonus4':
+    '大地の衝撃の雷鳴ごとのボーナスが30%に上昇し、マグマバーストのダメージが20%増加します。',
   'entities.itemSets.warspirit_emberscale.name': 'ウォースピリットの残火鱗鎧',
   'entities.itemSets.warspirit_emberscale.bonus2': '祖霊の一撃が戦霊の律動を3段階進めます。',
   'entities.itemSets.warspirit_emberscale.bonus4': '祖霊の一撃のダメージが30%増加します。',
@@ -12228,7 +12267,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingBlock': '{amount} ブロック',
   'hud.combat.blockedDone': '{target}は{ability}をブロックし、{amount}のダメージ。',
   'hud.combat.blockedTaken': '{source}の攻撃をブロックし、{amount}のダメージを受けました。',
-  'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
+  'hudChrome.options.mouseoverCast': 'パーティとフォーカスフレームでマウスオーバーキャスト',
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
   'hudChrome.options.showTargetSwingTimer': 'ターゲットの攻撃タイマーを表示',
   'hudChrome.options.showPetFrame': '自分のペットを表示',
@@ -14608,6 +14647,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）',
   'entities.abilities.thunder_reservoir.name': '雷鳴の貯蔵',
+  'entities.abilities.lightning_overload.name': 'アークオーバーロード',
+  'entities.abilities.lightning_overload.description':
+    'パッシブ：電弧の矢と枝分かれの稲妻は20%の確率でオーバーロードし、最初の目標に与えたダメージの50%で再び攻撃し、雷鳴を1獲得する。（サンダーコール）',
+  'entities.abilities.lava_burst.name': 'マグマバースト',
+  'entities.abilities.lava_burst.description':
+    '{damage}の火炎ダメージを与える。あなたの灰燼の衝撃で燃えている目標には必ずクリティカルヒットする。マグマサージ：灰燼の衝撃の継続ダメージごとに20%の確率でこのクールダウンをリセットし、10秒以内の次のマグマバーストを即時詠唱にする。ダメージは呪文威力とともに上がる。（サンダーコール）',
+  'entities.abilities.thunderstorm.name': 'ストームブレイク',
+  'entities.abilities.thunderstorm.description':
+    '雷鳴を呼び、10ヤード以内の敵に{damage}の自然ダメージを与え、5秒間移動速度を50%低下させる。最大マナの8%を回復する。ダメージは呪文威力とともに上がる。（サンダーコール）',
   'entities.abilities.tidecall.description':
     '味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。',
   'entities.abilities.tidecall.name': '潮呼び',
@@ -17188,4 +17236,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
   'devCommand.actions.town.label': 'タウンハブ',
   'devCommand.fields.town': '町',
+  'hudChrome.framePresets.apply': '適用',
+  'hudChrome.focusTargets.showEmpty': '空のフォーカスフレームを表示',
+  'hudChrome.focusTargets.assignHint':
+    '対象を選択してください。{key} を押すか、{button} をクリックしてください。',
+  'hudChrome.focusTargets.assignClickHint': '対象を選択して、{button} をクリックしてください。',
+  'hudChrome.focusTargets.ally': '味方',
+  'hudChrome.focusTargets.enemy': '敵',
 };

@@ -347,6 +347,7 @@ describe('settings_transfer_core', () => {
       'woc_gamepad_xhb_claimed',
       'woc_mobile_chat_bottom',
       'woc_chat_geometry',
+      'woc_chat_frame_hidden',
       'woc_chat_tabs',
       'woc_chat_active_tab',
       'woc_player_frame_pos',

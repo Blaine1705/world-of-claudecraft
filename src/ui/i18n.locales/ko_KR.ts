@@ -13,6 +13,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.framePresets.pickerLabel': '프레임 프리셋: {name}',
+  'hudChrome.framePresets.overwrite': '프리셋 덮어쓰기',
+  'hudChrome.framePresets.overwriteBody': '저장된 프리셋 "{name}"을 현재 배치로 덮어쓰시겠습니까?',
+  'hudChrome.framePresets.current': '현재 배치',
+  'hudChrome.framePresets.new': '새 프리셋',
+  'hudChrome.framePresets.empty': '저장된 프리셋 없음',
+  'hudChrome.framePresets.deleteNamed': '{name} 삭제',
+  'hudChrome.framePresets.deleteBody': '프레임 프리셋 "{name}"을 삭제하시겠습니까?',
+  'hudChrome.framePresets.title': '프레임 프리셋',
+  'hudChrome.framePresets.name': '프리셋 이름',
+  'hudChrome.framePresets.slot': '프리셋 {slot}',
+  'hudChrome.framePresets.remove': '삭제',
+  'hudChrome.framePresets.saved': '완료.',
+  'hudChrome.framePresets.failed': '프리셋을 저장하거나 불러올 수 없습니다.',
+  'hudChrome.frameMenus.hide': '프레임 숨기기',
+  'hudChrome.focusTargets.unset': '주시 해제',
+  'hudChrome.frameMenus.units': '유닛 프레임',
+  'hudChrome.frameMenus.bars': '행동 단축바',
+  'hudChrome.frameMenus.trackers': '추적기',
+  'hudChrome.frameMenus.auras': '오라',
+  'hudChrome.frameMenus.combat': '전투 표시',
+  'hudChrome.frameMenus.other': '기타 HUD 요소',
+  'hudChrome.frameMenus.options': '프레임 설정',
+  'hudChrome.frameMenus.allOptions': '모든 프레임 설정',
+  'hudChrome.frameMenus.independentTarget': '대상의 대상을 대상에 고정',
+
+  'hudChrome.focusTargets.frame1': '주시 대상 1',
+  'hudChrome.focusTargets.frame2': '주시 대상 2',
+  'hudChrome.focusTargets.frame3': '주시 대상 3',
+  'hudChrome.interfaceUnlock.combineTrackers': '추적 프레임 합치기',
+  'hudChrome.interfaceUnlock.combineAuras': '오라 프레임 합치기',
+  'guide.interfacePage.frameGroups':
+    '{trackers}는 퀘스트, 업적, 균열, 탐험, 채집 목표, 성유물 추적을 합칠 수 있습니다. {auras}는 대상 지속 피해와 여섯 오라 추적을 합칠 수 있습니다. 프레임 설정에서 각각 활성화하거나 꺼서 개별 이동하세요. {tot}에는 자원 막대가 있습니다. {focus}의 세 대상은 개별 이동하며 Shift+F1~F3으로 지정하고 Ctrl+F1~F3으로 선택합니다. 피해 및 위협 미터는 잠긴 상태에서도 버튼 이외의 영역을 끌어 이동하고 가장자리를 끌어 크기를 조절할 수 있습니다. 잠금 해제 시 프레임 표시 메뉴에서 그룹별로 표시를 바꾸고, 프레임을 우클릭해 크기를 초기화하거나 관련 설정을 열 수 있습니다. 인터페이스의 프레임 탭에는 공통 설정과 접을 수 있는 파티 설정도 있습니다. 대상의 대상을 대상에 고정하는 옵션을 끄면 따로 이동할 수 있고, 다시 켜도 개별 위치는 보관됩니다. 주시 대상을 지정하면 설정 버튼과 안내가 숨겨집니다. 우클릭하여 주시 해제를 선택하면 기본 상태로 돌아갑니다. 마우스오버 시전은 주시 프레임에서도 작동합니다.',
+  'hudChrome.focusTargets.assign': '주시 대상 {slot} 설정',
+  'hudChrome.focusTargets.target': '주시 대상 {slot} 선택',
+  'hudChrome.interfaceUnlock.frameNames.trackerGroup': '진행 상황 추적기',
+  'hudChrome.interfaceUnlock.frameNames.auraGroup': '오라 및 대상 효과',
   'hudChrome.noticeboard.officerEntry': '{name}({rank})',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':
@@ -8835,8 +8872,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '십일조 악마를 소환하면 정신 파열의 재사용 대기시간이 초기화되고, 십일조 악마가 공격할 때마다 회복하는 마나가 두 배가 됩니다.',
   'entities.itemSets.stormkindled.name': '폭풍점화 예장',
   'entities.itemSets.stormkindled.bonus2':
-    '화염낙인 상태에서 무기 해방 사용 시 천둥을 3 얻습니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
-  'entities.itemSets.stormkindled.bonus4': '대지의 충격의 천둥당 보너스가 30%로 증가합니다.',
+    '전격 과부하의 발동 확률이 30%가 됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.stormkindled.bonus4':
+    '대지의 충격의 천둥당 보너스가 30%로 증가하고, 용암 폭발의 피해가 20% 증가합니다.',
   'entities.itemSets.warspirit_emberscale.name': '전령 잉걸비늘 갑주',
   'entities.itemSets.warspirit_emberscale.bonus2':
     '선조의 일격이 전령의 박자를 3단계 진행시킵니다.',
@@ -12192,7 +12230,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingBlock': '{amount} 방어',
   'hud.combat.blockedDone': '{target}이 당신의 {ability}을 방어하여 {amount}의 피해를 입혔습니다.',
   'hud.combat.blockedTaken': '{source}의 공격을 방어하여 {amount}의 피해를 받았습니다.',
-  'hudChrome.options.mouseoverCast': '파티 창에서 마우스오버 시전',
+  'hudChrome.options.mouseoverCast': '파티 및 주시 프레임에 마우스오버 시전',
   'hudChrome.options.showTargetOfTarget': '대상의 대상 표시',
   'hudChrome.options.showTargetSwingTimer': '대상의 공격 타이머 표시',
   'hudChrome.options.showPetFrame': '내 펫 표시',
@@ -14575,6 +14613,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     '지속 효과: 비전 화살과 하늘가지가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)',
   'entities.abilities.thunder_reservoir.name': '천둥 비축',
+  'entities.abilities.lightning_overload.name': '전격 과부하',
+  'entities.abilities.lightning_overload.description':
+    '지속 효과: 전격 화살과 갈래 번개가 20% 확률로 과부하되어 첫 번째 대상에게 입힌 피해의 50%로 다시 공격하고 천둥을 1 부여합니다. (천둥소환)',
+  'entities.abilities.lava_burst.name': '용암 폭발',
+  'entities.abilities.lava_burst.description':
+    '{damage}의 화염 피해를 입힙니다. 당신의 잉걸 충격으로 불타는 대상에게는 항상 치명타가 적중합니다. 용암 쇄도: 잉걸 충격의 지속 피해가 들어갈 때마다 20% 확률로 이 재사용 대기시간이 초기화되고 10초 안에 사용하는 다음 용암 폭발이 즉시 시전됩니다. 피해는 주문력에 따라 증가합니다. (천둥소환)',
+  'entities.abilities.thunderstorm.name': '폭풍 파쇄',
+  'entities.abilities.thunderstorm.description':
+    '벼락을 내려 10미터 내의 적에게 {damage}의 자연 피해를 입히고 5초 동안 이동 속도를 50% 감소시킵니다. 최대 마나의 8%를 회복합니다. 피해는 주문력에 따라 증가합니다. (천둥소환)',
   'entities.abilities.tidecall.description':
     '아군 대상의 생명력을 {damage}만큼 회복시킵니다. 치유량은 주문력에 따라 증가합니다. 초과 치유 전의 전체 치유량을 치유의 물결에 더하며, 대상 최대 생명력의 30%까지 저장합니다.',
   'entities.abilities.tidecall.name': '해일 부름',
@@ -17149,4 +17196,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '이름을 사용하여 타운 허브로 순간이동합니다.',
   'devCommand.actions.town.label': '타운 허브',
   'devCommand.fields.town': '도시',
+  'hudChrome.framePresets.apply': '적용',
+  'hudChrome.focusTargets.showEmpty': '빈 주시 대상 프레임 표시',
+  'hudChrome.focusTargets.assignHint':
+    '대상을 선택하세요. {key} 키를 누르거나 {button} 버튼을 클릭하세요.',
+  'hudChrome.focusTargets.assignClickHint': '대상을 선택하고 {button} 버튼을 클릭하세요.',
+  'hudChrome.focusTargets.ally': '아군',
+  'hudChrome.focusTargets.enemy': '적',
 };
