@@ -10,7 +10,9 @@
 // compiles each representative in place with compileAsync, then the plume
 // flares and draws. Two tiers: the canvas (Low: tone mapped at the draw) and
 // a render target (Ultra: the composer's target, no tone mapping in the
-// plume), each its own program.
+// plume), each its own program. The fix leg also draws a forward and a
+// reversing rider in one render call and reads each plume's colour back:
+// with one shared pair, only the per-draw push keeps the two apart.
 //
 // The control leg is the release shape, a material pair per rider disposed on
 // dismount (clones of the shared pair: same source, same options). It pins
@@ -155,6 +157,53 @@ function flare(rider: Rider, time: number): void {
   expect(rider.root.getObjectByName('GoblinRocketPlume_L')?.visible).toBe(true);
 }
 
+function reverse(rider: Rider, time: number): void {
+  for (let step = 0; step < 20; step++) {
+    rider.fx.update(0.05, time + step * 0.05, true, true, false, 4, false, true, null);
+  }
+  expect(rider.root.getObjectByName('GoblinRocketPlume_L')?.visible).toBe(true);
+}
+
+/** A camera straight above the plumes, which run rearward (-z) from the
+ *  sockets: on screen each runs up, so a pixel row crosses it. */
+function overheadCamera(): THREE.PerspectiveCamera {
+  const camera = new THREE.PerspectiveCamera(60, WIDTH / HEIGHT, 0.1, 50);
+  camera.position.set(0, 4, -1.6);
+  camera.up.set(0, 0, -1);
+  camera.lookAt(0, 1, -1.6);
+  camera.updateMatrixWorld();
+  camera.updateProjectionMatrix();
+  return camera;
+}
+
+type Rgb = { r: number; g: number; b: number };
+
+/** The brightest pixel of the row crossing a rider's left plume at 70% of its
+ *  outer cone, past the core's tip: the outer layer alone, so neither tier's
+ *  read saturates. The brightest one, so the flame's own sway cannot move the
+ *  plume off the probe. Read from the float target on Ultra and from the
+ *  canvas on Low, in the same task as the render, before it is presented. */
+function plumePixel(s: Stage, rider: Rider, camera: THREE.Camera): Rgb {
+  const outer = rider.root.getObjectByName('GoblinRocketPlume_L_Outer');
+  if (!outer) throw new Error('the rider has a left outer plume');
+  outer.updateWorldMatrix(true, false);
+  const ndc = new THREE.Vector3(0, 0.7, 0).applyMatrix4(outer.matrixWorld).project(camera);
+  const x = Math.floor((ndc.x + 1) * 0.5 * WIDTH);
+  const y = Math.floor((ndc.y + 1) * 0.5 * HEIGHT);
+  const span = 24;
+  const gl = s.renderer.getContext() as WebGL2RenderingContext;
+  s.renderer.setRenderTarget(s.target);
+  const row = s.target ? new Float32Array(span * 2 * 4) : new Uint8Array(span * 2 * 4);
+  gl.readPixels(x - span, y, span * 2, 1, gl.RGBA, s.target ? gl.FLOAT : gl.UNSIGNED_BYTE, row);
+  let best: Rgb = { r: 0, g: 0, b: 0 };
+  for (let i = 0; i < row.length; i += 4) {
+    if (row[i] + row[i + 1] + row[i + 2] > best.r + best.g + best.b) {
+      best = { r: row[i], g: row[i + 1], b: row[i + 2] };
+    }
+  }
+  return best;
+}
+
 function dismount(s: Stage, rider: Rider): void {
   rider.fx.dispose();
   for (const material of rider.materials) material.dispose();
@@ -184,6 +233,22 @@ describe.each(['low', 'ultra'] as const)('the rocket sled plume program (%s)', (
     flare(second, 2);
     s.draw();
     expect(s.programs(), 'a second rider').toBe(baseline + 1);
+
+    // Each draw wears its own rider's values: one render call draws the
+    // forward rider (orange outer layer) and the reversing rider (blue outer
+    // layer) with the same two materials, side by side under the camera so
+    // each plume covers pixels of its own.
+    reverse(second, 3);
+    first.root.position.x = -1;
+    second.root.position.x = 1;
+    const overhead = overheadCamera();
+    s.renderer.setRenderTarget(s.target);
+    s.renderer.render(s.scene, overhead);
+    const forwardPixel = plumePixel(s, first, overhead);
+    const reversePixel = plumePixel(s, second, overhead);
+    expect(forwardPixel.r, 'the forward plume is orange').toBeGreaterThan(forwardPixel.b);
+    expect(reversePixel.b, 'the reversing plume is blue').toBeGreaterThan(reversePixel.r);
+    expect(s.programs(), 'the two riders in one draw').toBe(baseline + 1);
 
     // Everyone dismounts: the moment the release lost the stages.
     dismount(s, first);
