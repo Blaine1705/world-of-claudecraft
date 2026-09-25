@@ -5,6 +5,7 @@ import type * as THREE from 'three';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
+import type { ShipWake } from '../src/render/ship_wake';
 import { freezeStaticMatrices } from '../src/render/static_matrix';
 import { buildScheduledShips } from '../src/render/transport_ferry_ships';
 import {
@@ -25,6 +26,7 @@ import {
   type TransportPose,
   transportFerryViewAt,
   transportShipPoseAt,
+  transportVoyageSeconds,
 } from '../src/sim/transport_schedule';
 
 // The moored transport ship view (src/render/transport_ship.ts) over the shipped
@@ -259,11 +261,18 @@ describe('the scheduled ferry on screen (transport_ferry_ships.ts)', () => {
     transportFerryViewAt(ROUTE, clock, BASE_Y, false, view);
   }
 
-  it('poses the ship from the timetable, frozen props tree and all, and hides it at sea', () => {
+  it('poses the ship from the timetable, frozen props tree and all, the whole voyage long', () => {
     const adopted: TransportShipView[] = [];
-    const ships = buildScheduledShips(source, (v) => adopted.push(v));
+    const wakes: (ShipWake | null)[] = [];
+    const ships = buildScheduledShips(source, (v, w) => {
+      adopted.push(v);
+      wakes.push(w);
+    });
     expect(adopted).toHaveLength(1);
     const ship = adopted[0];
+    const plank = ship.group.getObjectByName('Gangplank') as THREE.Object3D;
+    ships.sync(0.05);
+    expect(plank.visible).toBe(true);
     // the renderer freezes the whole props tree after build
     freezeStaticMatrices(ship.group);
     const want: TransportPose = { x: 0, z: 0, rot: 0 };
@@ -282,20 +291,29 @@ describe('the scheduled ferry on screen (transport_ferry_ships.ts)', () => {
     expect(ship.group.rotation.y).toBeCloseTo(want.rot, 6);
     ship.update(want.x + 20, BASE_Y + 10, want.z, want.x, BASE_Y + 8, want.z, 2000, 0.05, false);
     expect(ship.group.visible).toBe(true);
-    // the at-sea leg: a skip onto the hidden leg adopts the clock outright
-    at(ROUTE.timings.docked + ROUTE.timings.departing + 3);
-    ships.sync(0.05);
+    // under way the gangplank is stowed
+    expect(plank.visible).toBe(false);
+    // mid-voyage, far out at sea: still drawn (no hidden leg any more), and
+    // the wake trails it once it has way on
+    const mid = ROUTE.timings.docked + transportVoyageSeconds(ROUTE, 0) / 2;
+    for (let c = mid; c <= mid + 1; c += 0.05) {
+      at(c);
+      ships.sync(0.05);
+    }
+    transportShipPoseAt(ROUTE, view.clock, want);
     ship.update(want.x + 20, BASE_Y + 10, want.z, want.x, BASE_Y + 8, want.z, 2000, 0.05, false);
-    expect(ship.group.visible).toBe(false);
-    // docked at Wickharbor
+    expect(ship.group.visible).toBe(true);
+    expect(wakes[0]?.points.visible).toBe(true);
+    // docked at Wickharbor: the plank is out again
     const wick = ROUTE.berths[1];
-    at(ROUTE.timings.docked * 2 + 10);
+    at(ROUTE.timings.docked * 2 + transportVoyageSeconds(ROUTE, 0) - 10);
     ships.sync(0.05);
     ship.group.updateMatrixWorld(true);
     expect(ship.group.matrixWorld.elements[12]).toBeCloseTo(wick.x, 3);
     expect(ship.group.matrixWorld.elements[14]).toBeCloseTo(wick.z, 3);
     ship.update(wick.x + 20, BASE_Y + 10, wick.z, wick.x, BASE_Y + 8, wick.z, 2000, 0.05, false);
     expect(ship.group.visible).toBe(true);
+    expect(plank.visible).toBe(true);
   });
 
   it('a world with no ferry leaves the ship where it was built', () => {

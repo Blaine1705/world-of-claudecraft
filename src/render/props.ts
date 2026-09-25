@@ -63,6 +63,7 @@ import {
   updatePropCullables,
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
+import { shipWakePrewarmParts } from './ship_wake';
 import { mergeBandDepth, mergeStaticMeshes, normalizedStaticGeometry } from './static_merge';
 import { buildScheduledShips, type FerryViewSource } from './transport_ferry_ships';
 import {
@@ -1021,6 +1022,8 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
     mesh.receiveShadow = true;
     place(mesh);
   }
+  // ...and a sailing ship's wake and bow splash (ship_wake.ts): one points program
+  for (const points of shipWakePrewarmParts()) place(points);
   return group;
 }
 
@@ -1657,12 +1660,13 @@ export function buildProps(
   // The scheduled ferry (render/transport_ferry_ships.ts): the same ship model,
   // posed every frame from the world's timetable; built-in world only.
   const scheduledShips = builtInWorld
-    ? buildScheduledShips(world, (ship) => {
+    ? buildScheduledShips(world, (ship, wake) => {
         group.add(ship.group);
         ship.group.traverse((o) => {
           if ((o as THREE.Mesh).isMesh) keepFromMerge.add(o);
         });
         transportShips.push(ship);
+        if (wake) group.add(wake.points);
       })
     : null;
 

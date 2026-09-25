@@ -32,7 +32,6 @@ import {
   zoneAt,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
-import { isFerryPassengerAtSea } from '../sim/ferry_passenger';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import {
@@ -264,6 +263,7 @@ import {
   usesLiveDayNightLighting,
   warmDuskGrade,
 } from './day_night_core';
+import { deckCameraTurn, entityRenderPose, updateSelfRenderOnDeck } from './deck_frame';
 import { buildDecorTorchFx, type DecorTorchFxView } from './decor_torch_fx';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { DelveInteriorTracker } from './delve_interior_tracker';
@@ -311,7 +311,7 @@ import {
 } from './environment_transition_core';
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
-import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
+import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -489,7 +489,7 @@ import { NecromancyArmyPortalFx, spawnArmyPortalBurstEvent } from './necromancy_
 import { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
 import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
-import { facingAlpha, POS_EXTRAPOLATION_CAP, remoteEntityAlpha } from './net_interp_core';
+import { POS_EXTRAPOLATION_CAP, remoteEntityAlpha } from './net_interp_core';
 import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import {
@@ -708,7 +708,6 @@ import {
   createSelfRenderPositionState,
   noteSelfIdentity,
   type SelfRenderPrediction,
-  updateSelfRenderPosition,
 } from './self_render_position_core';
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { warmSelfSpiritPrograms } from './self_spirit_warm';
@@ -9867,16 +9866,15 @@ export class Renderer {
     }
     const now = performance.now();
     this.viewCreateRetry.prune(now, sim.entities);
-    updateSelfRenderPosition(
+    updateSelfRenderOnDeck(
+      sim,
       this.selfRender,
       p,
-      sim.cfg.seed,
       alpha,
       dt,
       selfAlphaLead,
       selfMotion,
       selfAuthoritativeDiscontinuity,
-      sim.riftCollisionToken,
     );
     const selfPos = this.selfRenderPosition;
     phaseStart = this.markRendererPhase(framePhaseMs, 'setup', phaseStart);
@@ -10072,9 +10070,7 @@ export class Renderer {
         // Per-frame visibility follows the create/destroy hysteresis above so
         // rigs at the draw edge do not flicker. The object branch below may
         // still re-hide loot.
-        // a ferry passenger on the hidden at-sea leg is not drawn (nor the ship)
-        v.group.visible =
-          raidEncounterViewVisibleDuringCompile(e, v.compilePending) && !isFerryPassengerAtSea(e);
+        v.group.visible = raidEncounterViewVisibleDuringCompile(e, v.compilePending);
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
         // server-side resurrect-range checks, and other ghosts still see it. The
@@ -10134,11 +10130,10 @@ export class Renderer {
       // turn stream, mouselook, click-move via the sent facing). Remote
       // entities interpolate on their own measured cadence via
       // remoteEntityAlpha (unknown-cadence fallback).
-      const x = isSelf ? selfPos.x : e.prevPos.x + (e.pos.x - e.prevPos.x) * ea;
-      const y = isSelf ? selfPos.y : e.prevPos.y + (e.pos.y - e.prevPos.y) * ea;
-      const z = isSelf ? selfPos.z : e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
+      const rp = entityRenderPose(sim, e, ea, isSelf ? selfPos : null);
+      const { x, y, z } = rp; // a passenger rides the drawn deck (deck_frame.ts)
       v.group.position.set(x, y, z);
-      let facing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * facingAlpha(ea);
+      let facing = rp.facing;
       if (ignivarBossFacingLocked(e)) facing = e.facing;
       if (id === p.id && renderFacingOverride !== null) {
         // Follow the camera-driven heading, easing in the one-time engage gap
@@ -11670,6 +11665,7 @@ export class Renderer {
     this.afflictionFamiliar.update(this.sim, this.views, this.reducedMotion(), this.time);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'vfx', worldStart);
 
+    this.camYaw += deckCameraTurn(sim, this.camBoom, this.lastLocalPos, this.camMirror);
     this.updateCamera(selfPos, dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'camera', worldStart);
     // Terrain chunks / tree buckets past the detail horizon are dropped

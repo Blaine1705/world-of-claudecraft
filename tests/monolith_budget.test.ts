@@ -937,7 +937,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12789 -> 12783 at the Eastbrook ferry's Phase 2: collectCasters
     // and sleep moved to renderer_helpers.ts, paying for the at-sea passenger
     // hide. wc -l. Exact count, zero slack.
-    ceiling: 12783,
+    // LOWERED 12783 -> 12779 at the ferry's Phase 3 (the moving deck): the
+    // at-sea hide went, and the deck-framed passenger pose, the self display
+    // pose and the camera carry live in src/render/deck_frame.ts (the entity
+    // loop's three interpolation lines became one call). Exact count.
+    ceiling: 12779,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

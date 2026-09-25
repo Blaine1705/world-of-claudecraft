@@ -115,6 +115,28 @@ interface ShipTemplate {
   clip: THREE.AnimationClip | null;
   /** Each fading sail's box in the ship frame. */
   sailBoxes: Map<string, ShipLocalBox>;
+  /** The wake and bow-splash attachment points, in the ship frame. */
+  sockets: ShipSockets;
+}
+
+/** Where a sailing ship's wake and bow splash leave the hull (ship frame:
+ *  x port, y above the waterline, z bow): the GLB's Socket_Wake and
+ *  Socket_BowSplash, or the hull's stern and stem when a model lacks them. */
+export interface ShipSockets {
+  wake: { x: number; y: number; z: number };
+  bow: { x: number; y: number; z: number };
+}
+
+function readSocket(
+  root: THREE.Object3D,
+  rootInverse: THREE.Matrix4,
+  name: string,
+  fallback: { x: number; y: number; z: number },
+): { x: number; y: number; z: number } {
+  const node = root.getObjectByName(name);
+  if (!node) return { ...fallback };
+  const v = new THREE.Vector3().setFromMatrixPosition(node.matrixWorld).applyMatrix4(rootInverse);
+  return { x: v.x, y: v.y, z: v.z };
 }
 
 const convertedMaterials = new Map<string, THREE.Material>();
@@ -221,6 +243,10 @@ function buildTemplate(gltf: GLTF): ShipTemplate {
   }
   root.updateMatrixWorld(true);
   const rootInverse = root.matrixWorld.clone().invert();
+  const sockets: ShipSockets = {
+    wake: readSocket(root, rootInverse, 'Socket_Wake', { x: 0, y: 0, z: -15.3 }),
+    bow: readSocket(root, rootInverse, 'Socket_BowSplash', { x: 0, y: 0, z: 15.4 }),
+  };
   const sailBoxes = new Map<string, ShipLocalBox>();
   for (const name of [...SAIL_NAMES, ...MAST_NAMES, ...FLAG_FADE_NAMES]) {
     const sail = root.getObjectByName(name);
@@ -277,7 +303,7 @@ function buildTemplate(gltf: GLTF): ShipTemplate {
     seenParts.add(key);
     prewarmParts.push({ geometry: mesh.geometry, material });
   });
-  return { root, clip, sailBoxes, prewarmParts };
+  return { root, clip, sailBoxes, prewarmParts, sockets };
 }
 
 /** The prepared ships' distinct (geometry, material) programs at the live tier,
@@ -329,13 +355,18 @@ export interface TransportShipView {
   group: THREE.Group;
   /** The level of detail drawn last frame (-1 before the first update). */
   readonly lod: number;
+  /** World Y of the ship frame's origin (its waterline). */
+  readonly baseY: number;
+  /** The wake and bow-splash attachment points (ship frame). */
+  readonly sockets: ShipSockets;
   /**
-   * Move a SCHEDULED ship (the ferry's timetable, props.ts) to a new pose, or
-   * hide it (the at-sea leg). The props tree is matrix-frozen after build, so
-   * this recomposes the ship root's own matrix; its children follow through
-   * the scene's world-matrix pass. A moored ship never calls it.
+   * Move a SCHEDULED ship (the ferry's timetable, props.ts) to a new pose.
+   * Under way its gangplank is stowed (hidden). The props tree is
+   * matrix-frozen after build, so this recomposes the ship root's own matrix;
+   * its children follow through the scene's world-matrix pass. A moored ship
+   * never calls it.
    */
-  setPose(x: number, z: number, rot: number, shown: boolean): void;
+  setPose(x: number, z: number, rot: number, underWay: boolean): void;
   update(
     camX: number,
     camY: number,
@@ -364,7 +395,6 @@ export function buildTransportShipView(
   group.add(root);
   // the live pose (a scheduled ship moves it through setPose)
   const pose = { x: placement.x, z: placement.z, rot: placement.rot, baseY: placement.baseY };
-  let hidden = false;
 
   const lods = LOD_NAMES.map((name) => root.getObjectByName(name) ?? null);
   lods.forEach((lod, i) => {
@@ -439,8 +469,12 @@ export function buildTransportShipView(
     get lod() {
       return current;
     },
-    setPose(x, z, rot, shown) {
-      hidden = !shown;
+    baseY: placement.baseY,
+    sockets: template.sockets,
+    setPose(x, z, rot, underWay) {
+      if (plank && plank.visible === underWay) {
+        plank.visible = !underWay;
+      }
       if (pose.x === x && pose.z === z && pose.rot === rot) return;
       pose.x = x;
       pose.z = z;
@@ -450,10 +484,6 @@ export function buildTransportShipView(
       group.updateMatrix();
     },
     update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion) {
-      if (hidden) {
-        group.visible = false;
-        return;
-      }
       const distance = Math.hypot(camX - pose.x, camZ - pose.z);
       if (!transportShipVisible(distance, fogFar)) {
         group.visible = false;

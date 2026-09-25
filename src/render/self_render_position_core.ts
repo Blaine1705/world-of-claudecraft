@@ -91,6 +91,11 @@ export interface ReconciledSelfPrediction {
   kind: 'reconciled';
   position: Vec3Like;
   residual: Vec3Like | null;
+  /** Set while the prediction runs in a sailing ship's frame (the route
+   *  index): position and residual are then deck-relative (x port, y above
+   *  the waterline, z bow), and render/deck_frame.ts places them on the
+   *  drawn deck. */
+  deck?: number | null;
 }
 
 export type SelfRenderPrediction = SelfMotionFrame | ReconciledSelfPrediction;
