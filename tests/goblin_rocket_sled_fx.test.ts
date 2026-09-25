@@ -123,28 +123,31 @@ const freshPlan = (): GoblinRocketSledFxPlan => ({
 });
 
 type Drive = Omit<GoblinRocketSledFxInputs, 'time' | 'mounted'>;
+type Phase = readonly [steps: number, drive: Drive];
 
 /** Drive the controller and, beside it, the pure core with the same inputs,
- *  and return the per-layer uniforms the per-material code wrote before the
- *  pair was shared (the formulas of the release controller). */
-function driveBoth(fx: GoblinRocketSledFx, steps: number, drive: Drive, t0: number) {
+ *  phase after phase, and return the per-layer uniforms the per-material code
+ *  wrote before the pair was shared (the formulas of the release controller). */
+function driveBoth(fx: GoblinRocketSledFx, phases: readonly Phase[], t0: number) {
   const state = freshState();
   const plan = freshPlan();
   let time = t0;
-  for (let i = 0; i < steps; i++) {
-    time += drive.dt;
-    fx.update(
-      drive.dt,
-      time,
-      drive.moving,
-      drive.backwards,
-      drive.airborne,
-      drive.speed,
-      drive.reducedMotion,
-      true,
-      null,
-    );
-    stepGoblinRocketSledFx(state, { ...drive, time, mounted: true }, plan);
+  for (const [steps, drive] of phases) {
+    for (let i = 0; i < steps; i++) {
+      time += drive.dt;
+      fx.update(
+        drive.dt,
+        time,
+        drive.moving,
+        drive.backwards,
+        drive.airborne,
+        drive.speed,
+        drive.reducedMotion,
+        true,
+        null,
+      );
+      stepGoblinRocketSledFx(state, { ...drive, time, mounted: true }, plan);
+    }
   }
   const outer: Snapshot = {
     uTime: time,
@@ -162,7 +165,7 @@ function driveBoth(fx: GoblinRocketSledFx, steps: number, drive: Drive, t0: numb
     uIgnition: plan.ignition,
     uAirborneHeat: Math.min(1, plan.airborneOverburn * 0.72 + plan.stationaryPressure),
   };
-  return { outer, core, visible: plan.visible };
+  return { outer, core, visible: plan.visible, plan: { ...plan } };
 }
 
 const FORWARD: Drive = {
@@ -181,6 +184,8 @@ const REVERSE_AIRBORNE: Drive = {
   speed: 4,
   reducedMotion: false,
 };
+const FORWARD_AIRBORNE: Drive = { ...FORWARD, airborne: true };
+const HOVER: Drive = { ...FORWARD, moving: false, airborne: true, speed: 0 };
 
 describe('the shared plume pair', () => {
   afterEach(() => {
@@ -207,20 +212,47 @@ describe('the shared plume pair', () => {
   it('gives each rider its own values at its own draw, the release formulas exactly', () => {
     const a = ride();
     const b = ride();
-    const expectA = driveBoth(a.fx, 30, FORWARD, 10);
-    const expectB = driveBoth(b.fx, 12, REVERSE_AIRBORNE, 40);
-    expect(expectA.visible && expectB.visible, 'both plumes flare').toBe(true);
-    // A decisive pair: the two riders really write different values.
-    expect(expectA.outer.uOpacity).not.toBe(expectB.outer.uOpacity);
-    expect(expectA.outer.uReverseBlend).not.toBe(expectB.outer.uReverseBlend);
+    const c = ride();
+    const expectA = driveBoth(a.fx, [[30, FORWARD]], 10);
+    const expectB = driveBoth(b.fx, [[12, REVERSE_AIRBORNE]], 40);
+    // A hover right after a short airborne burn: the stationary pressure term
+    // is live, and the core heat reaches its clamp at 1.
+    const expectC = driveBoth(
+      c.fx,
+      [
+        [8, FORWARD_AIRBORNE],
+        [2, HOVER],
+      ],
+      70,
+    );
+    expect(expectA.visible && expectB.visible && expectC.visible, 'all plumes flare').toBe(true);
+    // A decisive pair: the two riders write different values on every uniform.
+    for (const layer of ['outer', 'core'] as const) {
+      for (const key of Object.keys(expectA[layer]) as (keyof Snapshot)[]) {
+        expect(expectA[layer][key], `${layer} ${key}`).not.toBe(expectB[layer][key]);
+      }
+    }
+    expect(expectC.plan.stationaryPressure, 'the hover presses').toBeGreaterThan(0);
+    expect(
+      expectC.plan.airborneOverburn * 0.72 + expectC.plan.stationaryPressure,
+      'the core heat before its clamp',
+    ).toBeGreaterThan(1);
+    expect(expectC.core.uAirborneHeat).toBe(1);
 
-    // Interleaved the way a frame sorts them: B's draw after A's must not
-    // leave B's values on A's next draw, on either layer or nozzle.
+    // Interleaved the way a frame sorts them: another rider's draw must not
+    // leave its values on the next draw, on either layer or nozzle.
+    const riders = [
+      [a, expectA],
+      [b, expectB],
+      [c, expectC],
+    ] as const;
     for (const side of SIDES) {
-      expect(drawAndRead(plumeMesh(a.root, side, 'Outer'))).toEqual(expectA.outer);
-      expect(drawAndRead(plumeMesh(b.root, side, 'Outer'))).toEqual(expectB.outer);
-      expect(drawAndRead(plumeMesh(a.root, side, 'Core'))).toEqual(expectA.core);
-      expect(drawAndRead(plumeMesh(b.root, side, 'Core'))).toEqual(expectB.core);
+      for (const [rider, expected] of riders) {
+        expect(drawAndRead(plumeMesh(rider.root, side, 'Outer'))).toEqual(expected.outer);
+      }
+      for (const [rider, expected] of riders) {
+        expect(drawAndRead(plumeMesh(rider.root, side, 'Core'))).toEqual(expected.core);
+      }
     }
     expect(drawAndRead(plumeMesh(a.root, 'L', 'Outer'))).toEqual(expectA.outer);
   });
