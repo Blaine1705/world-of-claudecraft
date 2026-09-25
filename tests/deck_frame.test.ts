@@ -195,6 +195,26 @@ describe('a passenger stands on the drawn deck (the departure T-pose)', () => {
     );
   });
 
+  it('serves a body on the deck straight from it, never resampling the sea floor', () => {
+    // under way the deck carries a body past the ground cache's displacement
+    // gate every frame, so the terrain below would be resampled all voyage
+    const w = { ...world(SAILING), riftFloor: null };
+    const df = deckFrameFor(w);
+    advanceDeckFrame(df, w, 0.016);
+    const deckY = WATER_LEVEL + 3.3;
+    const sample = createEntityGroundSample();
+    for (let i = 0; i < 5; i++) {
+      w.clock += 0.05;
+      advanceDeckFrame(df, w, 0.05);
+      const at = deckToWorld(df.ships[0].drawn, 1, -2, { x: 0, z: 0 });
+      expect(sampleStandingSurface(sample, w, at.x, deckY, at.z, 0.05, false)).toBeCloseTo(
+        deckY,
+        6,
+      );
+    }
+    expect(sample.valid).toBe(false);
+  });
+
   it('counts only the passenger steps as locomotion, never the ship way', () => {
     const w = world(SAILING);
     const df = deckFrameFor(w);

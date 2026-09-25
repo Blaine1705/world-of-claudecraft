@@ -4330,7 +4330,7 @@ export class Renderer {
       // Whether the budget-governed shadow cadence is currently shedding to
       // every-other-frame updates: surfaced so the ?perf overlay and capture
       // artifacts can tell a half-rate sample from a full-rate one.
-      shadowCadenceHalfRate: this.shadowCadence.halfRate,
+      shadowCadenceHalfRate: this.shadowCadence.halfRate && !this.shadowCadence.held,
       // The live extent shed: a capture must state its step to be comparable.
       shadowExtentStep: this.shadowExtent.step,
       shadowExtentScale: this.shadowExtent.scale,
@@ -4587,7 +4587,8 @@ export class Renderer {
     this.stableFrameTime = state.stableSeconds;
     if (this.adaptiveGrace > 0) this.adaptiveGrace = Math.max(0, this.adaptiveGrace - dt);
     this.applyRenderBudgetState(state);
-    updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled);
+    const held = shipShadowHold(this.sim, this.sun); // a ship under way close by
+    updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled, held);
     updateShadowExtent(this.shadowExtent, dt, state.pressure, state.enabled);
     this.applyShadowShed();
   }
@@ -4609,7 +4610,7 @@ export class Renderer {
     }
     if (!this.sun.castShadow) return;
     const shadowMap = this.webgl.shadowMap;
-    const autoUpdate = !this.shadowCadence.halfRate || shipShadowHold(this.sim, this.sun, extent);
+    const autoUpdate = !this.shadowCadence.halfRate || this.shadowCadence.held;
     if (shadowMap.autoUpdate !== autoUpdate) shadowMap.autoUpdate = autoUpdate;
     // Under half rate three skips the pass when both flags are false and clears
     // needsUpdate after each pass, so the every-other-frame arm is this write.
@@ -10131,7 +10132,7 @@ export class Renderer {
       // entities interpolate on their own measured cadence via
       // remoteEntityAlpha (unknown-cadence fallback).
       const rp = entityRenderPose(sim, e, ea, isSelf ? selfPos : null, v);
-      const { x, y, z } = rp; // a passenger rides the drawn deck (deck_frame.ts)
+      const { x, y, z, deck } = rp; // a passenger rides the drawn deck (deck_frame.ts)
       v.group.position.set(x, y, z);
       let facing = rp.facing;
       if (ignivarBossFacingLocked(e)) facing = e.facing;
@@ -10670,10 +10671,9 @@ export class Renderer {
       // hitches (bursty snapshots at world entry) it stays smooth while the
       // authoritative interp stair-steps, which used to feed the cadence
       // erratic velocities and reset the walk clip. On the lead-smoothing
-      // fallback path the plain interpolated sim motion is still sampled
-      // instead (that path's smoothed selfPos stutters within a snapshot
-      // interval). Offline, all of these are the same value.
-      const animFromDisplay = isSelf && (this.selfRender.active || rp.deck === true);
+      // fallback the interpolated sim motion is sampled (its smoothed selfPos
+      // stutters); a deck passenger always reads the deck-framed display pose.
+      const animFromDisplay = isSelf && (this.selfRender.active || deck === true);
       const ax = isSelf && !animFromDisplay ? e.prevPos.x + (e.pos.x - e.prevPos.x) * alpha : x;
       const ay = isSelf && !animFromDisplay ? e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha : y;
       const az = isSelf && !animFromDisplay ? e.prevPos.z + (e.pos.z - e.prevPos.z) * alpha : z;

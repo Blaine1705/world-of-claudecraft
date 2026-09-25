@@ -33,9 +33,8 @@ export interface ScheduledShips {
  * ticks the view like any moored ship. They start at their first berth, the
  * clock-0 schedule.
  */
-// ONE ROUTE TODAY: IWorld.ferryView serves the first route only, so a second
-// route's ship would be built here but never posed (it would sit at its first
-// berth). Widen ferryView to every route before authoring a second one.
+// Every route's ship is posed from the one transport clock (deck_frame.ts);
+// only the HUD's timetable readout (IWorld.ferryView) is first-route today.
 export function buildScheduledShips(
   source: FerryViewSource,
   adopt: (view: TransportShipView, wake: ShipWake | null) => void,

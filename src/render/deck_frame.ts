@@ -87,6 +87,11 @@ const ZERO = { x: 0, y: 0, z: 0 };
 
 const frames = new WeakMap<object, DeckFrame>();
 
+/** The world's deck frame if one was built, without building it. */
+export function peekDeckFrame(world: object): DeckFrame | undefined {
+  return frames.get(world);
+}
+
 /** The world's deck frame (built on first ask). */
 export function deckFrameFor(world: object): DeckFrame {
   let df = frames.get(world);
@@ -109,7 +114,7 @@ export function deckFrameFor(world: object): DeckFrame {
       posedFrame: 0,
       selfRoute: -1,
       selfProxy: { prevPos: { ...ZERO }, pos: { ...ZERO } },
-      renderPose: { x: 0, y: 0, z: 0, facing: 0 },
+      renderPose: { x: 0, y: 0, z: 0, facing: 0, deck: false },
       decks: TRANSPORT_ROUTES.map((route) =>
         Object.hasOwn(TRANSPORT_SHIP_HULLS, route.ship)
           ? new DeckPlatform(TRANSPORT_SHIP_HULLS[route.ship])
@@ -123,7 +128,9 @@ export function deckFrameFor(world: object): DeckFrame {
 
 const phase = newTransportPhaseState();
 
-/** Advance every route's drawn clock one frame toward the world's clock. */
+/** Advance every route's drawn clock one frame toward the world's clock. The
+ *  transport clock is one for all routes (IWorld.ferryView carries it on its
+ *  first route's view), so a second route's ship is posed here too. */
 export function advanceDeckFrame(df: DeckFrame, source: FerryViewSource, dt: number): void {
   df.frame++;
   const view = source.ferryView();
@@ -131,7 +138,6 @@ export function advanceDeckFrame(df: DeckFrame, source: FerryViewSource, dt: num
   if (!view) return;
   for (let i = 0; i < TRANSPORT_ROUTES.length; i++) {
     const route = TRANSPORT_ROUTES[i];
-    if (route.id !== view.routeId) continue;
     const ship = df.ships[i];
     ship.last.x = ship.drawn.x;
     ship.last.z = ship.drawn.z;
@@ -277,7 +283,7 @@ export function drawnDeckSupportAt(
   for (let i = 0; i < df.ships.length; i++) {
     const ship = df.ships[i];
     const deck = df.decks[i];
-    if (!deck || !nearDeck(deck.hull, ship.drawn, x, z)) continue;
+    if (!deck || !ship.clock.ready || !nearDeck(deck.hull, ship.drawn, x, z)) continue;
     const top = platformSupportAt(deck.at(ship.drawn, WATER_LEVEL), x, z, r, y + 0.01);
     if (top > best) best = top;
   }
