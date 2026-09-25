@@ -966,7 +966,10 @@ const MONOLITHS: MonolithRow[] = [
     // 12790 -> 12789 when the Warrior kit textures moved to demand loading
     // (the boot-time sheet upload loop and its comment went, the kit host
     // gained its assets line). Exact count.
-    ceiling: 12789,
+    // LOWERED 12789 -> 12758: the underwater blend and fog override moved into
+    // UnderwaterView.frame (src/render/underwater.ts), paying for the one-line
+    // underwater compile gate hookup and the weather slot's link root. Exact count.
+    ceiling: 12758,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
