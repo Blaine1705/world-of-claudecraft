@@ -2997,7 +2997,7 @@ export class Renderer {
         return base;
       });
     });
-    this.hillRingVisuals = new HillRingVisuals(this.scene, (x, z) =>
+    this.hillRingVisuals = new HillRingVisuals(this.scene, gate, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
