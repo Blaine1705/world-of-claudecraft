@@ -1,15 +1,17 @@
 // The King of the Hill circle on a real WebGL driver (the browser half of
 // tests/hill_ring_twin.test.ts; the farm_prewarm_programs pattern).
-// renderer.info.programs.length grows when a draw links a program. The CONTROL
-// leg (no gate) proves the harness sees the live ring's first draw link cold
-// and its program only park in the retention FIFO once the hill ends;
-// the PREPARED legs prove that once the twin the first sighting hands to the
-// gate has compiled under the tier's target (the canvas on a direct tier; on a
-// composer tier a tiny throwaway target like the renderer's compile arm uses,
-// while the scene pass draws into a full-size HalfFloat one), the live ring's
-// first draw links ZERO
-// programs, a later hill at a new spot links zero again, and the twin's
-// program stays live, never parked, after the hill ends.
+// renderer.info.programs.length grows when a draw links a program. The ring
+// has TWO programs: both meshes are transparent and DoubleSide, so three
+// draws each in a back pass and a front pass, keys differing by the flipSided
+// bit. The CONTROL leg (no gate) proves the harness sees the live ring's
+// first draw link both cold and only park them in the retention FIFO once the
+// hill ends; the PREPARED legs prove that once the twin the first sighting
+// hands to the gate has compiled under the tier's target (the canvas on a
+// direct tier; on a composer tier a tiny throwaway target like the renderer's
+// compile arm uses, while the scene pass draws into a full-size HalfFloat
+// one), the live ring's first draw links ZERO programs while it really draws,
+// a later hill at a new spot links zero again, and the twin's programs stay
+// live, never parked, after the hill ends.
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { HillRingVisuals } from '../../src/render/hill_ring';
@@ -84,7 +86,7 @@ const programIds = (renderer: THREE.WebGLRenderer): number[] =>
   (renderer.info.programs ?? []).map((p) => (p as { id: number }).id);
 
 describe('hill ring programs on a real WebGL driver', () => {
-  it('control: without a gate the live ring links its program at its first draw', () => {
+  it('control: without a gate the live ring links its two programs at its first draw', () => {
     const { renderer, scene, camera } = setup();
     const visuals = new HillRingVisuals(scene, undefined, () => 0);
     renderer.render(scene, camera);
@@ -93,9 +95,9 @@ describe('hill ring programs on a real WebGL driver', () => {
     visuals.update(0.05);
     renderer.render(scene, camera);
     const ringPrograms = programIds(renderer).filter((id) => !baseline.includes(id));
-    expect(ringPrograms.length).toBeGreaterThan(0);
-    // The hill ends: with nothing else holding it, the program only parks in
-    // the FIFO, one eviction away from the next hill linking it cold.
+    expect(ringPrograms).toHaveLength(2);
+    // The hill ends: with nothing else holding them, the programs only park in
+    // the FIFO, one eviction away from the next hill linking them cold.
     visuals.sync(null);
     renderer.render(scene, camera);
     for (const id of ringPrograms) expect(retainedIds(renderer)).toContain(id);
@@ -114,7 +116,9 @@ describe('hill ring programs on a real WebGL driver', () => {
         renderer.setRenderTarget(bound);
         renderer.render(scene, camera);
         renderer.setRenderTarget(null);
+        return renderer.info.render.triangles;
       };
+      const ringInScene = () => scene.getObjectByName('hill-ring')?.parent === scene;
       const compiled: Promise<unknown>[] = [];
       const gate = (root: THREE.Object3D) => {
         renderer.setRenderTarget(compileBound);
@@ -124,7 +128,7 @@ describe('hill ring programs on a real WebGL driver', () => {
         return linked;
       };
       const visuals = new HillRingVisuals(scene, gate, () => 0);
-      draw();
+      expect(draw()).toBe(0);
       const beforeHill = programIds(renderer);
 
       // The announcement frame builds the live ring and hands the twin to the
@@ -137,26 +141,28 @@ describe('hill ring programs on a real WebGL driver', () => {
       expect(afterTwin.length).toBeGreaterThan(beforeHill.length);
 
       visuals.update(0.05);
-      draw();
+      expect(ringInScene()).toBe(true);
+      expect(draw()).toBeGreaterThan(0);
       expect(programIds(renderer)).toEqual(afterTwin);
 
       visuals.sync(hill({ phase: 'active', holder: 'you', challenger: 'other' }));
       visuals.update(0.3);
-      draw();
+      expect(draw()).toBeGreaterThan(0);
       expect(programIds(renderer)).toEqual(afterTwin);
 
       visuals.sync(null);
-      draw();
-      const twinProgram = afterTwin.filter((id) => !beforeHill.includes(id));
-      expect(twinProgram.length).toBeGreaterThan(0);
-      for (const id of twinProgram) {
+      expect(draw()).toBe(0);
+      const twinPrograms = afterTwin.filter((id) => !beforeHill.includes(id));
+      expect(twinPrograms).toHaveLength(2);
+      for (const id of twinPrograms) {
         expect(programIds(renderer)).toContain(id);
         expect(retainedIds(renderer)).not.toContain(id);
       }
 
       visuals.sync(hill({ x: 20, z: -10 }));
       visuals.update(0.05);
-      draw();
+      expect(ringInScene()).toBe(true);
+      expect(draw()).toBeGreaterThan(0);
       expect(compiled).toHaveLength(1);
       expect(programIds(renderer)).toEqual(afterTwin);
     },
