@@ -80,10 +80,54 @@ export function drawingFamilies(drawables: readonly THREE.Object3D[]): number {
   return bits;
 }
 
+/** Stubs ready every kit preparation a pool checks before its solid pieces
+ *  draw (headless, none of them ever reports ready on its own). */
+export function prepareCastVfxKit(fx: AbilityVfxFx): void {
+  const pools = fx as unknown as Record<string, { preparation: unknown }>;
+  const ready = { ready: () => true, units: () => [], dispose: () => {} };
+  pools.crests.preparation = ready;
+  pools.guards.preparation = ready;
+  pools.spiritHammers.preparation = ready;
+  pools.powerForms.preparation = [ready, ready, ready, ready];
+  pools.furyStates.preparation = [ready, ready, ready];
+}
+
+/** A weapon in each hand of every entity, answering a point and a frame. */
+function equippedWeapon(at: (id: number) => { x: number; z: number }) {
+  return (id: number, hand: 0 | 1) =>
+    Object.assign(
+      (out: THREE.Vector3) => {
+        const p = at(id);
+        out.set(p.x + hand * 0.4, 1, p.z);
+        return true;
+      },
+      {
+        frame: (out: THREE.Matrix4) => {
+          const p = at(id);
+          out.makeTranslation(p.x + hand * 0.4, 1, p.z);
+          return true;
+        },
+      },
+    );
+}
+
 /** The real painter over the real engine, headless, behind the real cast
  *  gate core with one stand-in material per family: `prove(bit)` links a
- *  family, `step` renders a frame. The Vfx particle calls land in `vfx`. */
-export function castGateRig(options: { kitDeclined?: boolean; deadlineMs?: number } = {}) {
+ *  family, `step` renders a frame. The Vfx particle calls land in `vfx`.
+ *  `equipped` gives every entity a weapon and a body and readies the kit's
+ *  preparations, so the kit's solid pieces can draw; `localPlayerId` names
+ *  the local player (the painter plans a local caster's casts apart). */
+export function castGateRig(
+  options: {
+    kitDeclined?: boolean;
+    deadlineMs?: number;
+    equipped?: boolean;
+    localPlayerId?: number;
+    /** Rewrites every mask the painter asks for: a test stand-in for a
+     *  requirement resolver that gets a mask wrong. */
+    askedMask?: (mask: number) => number;
+  } = {},
+) {
   installCastVfxCanvasStub();
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 400);
@@ -99,13 +143,37 @@ export function castGateRig(options: { kitDeclined?: boolean; deadlineMs?: numbe
     pose.height = 2;
     return true;
   });
-  const fx = new AbilityVfxFx(
-    scene,
-    camera,
-    fxAnchor,
-    () => 0,
-    () => 0,
-  );
+  const fx = options.equipped
+    ? new AbilityVfxFx(
+        scene,
+        camera,
+        fxAnchor,
+        () => 0,
+        () => 0,
+        equippedWeapon(place),
+        (id, hand, out) => {
+          const at = place(id);
+          out.x = at.x + hand * 0.4;
+          out.y = 1;
+          out.z = at.z;
+          return true;
+        },
+        () => true,
+        (id, _piece, out) => {
+          const at = place(id);
+          out.makeTranslation(at.x, 1, at.z);
+          return true;
+        },
+        () => true,
+      )
+    : new AbilityVfxFx(
+        scene,
+        camera,
+        fxAnchor,
+        () => 0,
+        () => 0,
+      );
+  if (options.equipped) prepareCastVfxKit(fx);
   const materials = [{ id: 'engine' }, { id: 'kit' }] as const;
   const proved = new Set<string>();
   const clock = { ms: 0, frame: 0 };
@@ -152,17 +220,18 @@ export function castGateRig(options: { kitDeclined?: boolean; deadlineMs?: numbe
       anchor: (id, heightFrac) => ({ ...place(id), y: heightFrac * 2 }),
       spawnAoeRing: () => {},
       triggerAttack: () => {},
-      localPlayerId: () => -99,
+      localPlayerId: () => options.localPlayerId ?? -99,
       isWarrior: (id) => warriors.has(id),
       isLivingWarrior: (id) => warriors.has(id),
       isMob: () => false,
       castingAbilityOf: () => null,
-      castVfxAdmit: (mask) => readiness.admit(mask),
-      castVfxReady: (mask) => readiness.ready(mask),
+      castVfxAdmit: (mask) => readiness.admit(options.askedMask?.(mask) ?? mask),
+      castVfxReady: (mask) => readiness.ready(options.askedMask?.(mask) ?? mask),
     },
     () => clock.ms / 1000,
   );
   const drawables = gatedDrawables(scene);
+  const everDrew = new Set<THREE.Object3D>();
   let drawn = 0;
   const step = (frames = 1, dt = 1 / 20): number => {
     let seen = 0;
@@ -170,7 +239,11 @@ export function castGateRig(options: { kitDeclined?: boolean; deadlineMs?: numbe
       clock.frame++;
       clock.ms += dt * 1000;
       painter.update(dt);
-      seen |= drawingFamilies(drawables);
+      for (const object of drawables) {
+        if (!wouldDraw(object)) continue;
+        seen |= castVfxFamilyBitOf(object);
+        everDrew.add(object);
+      }
     }
     drawn |= seen;
     return seen;
@@ -193,6 +266,8 @@ export function castGateRig(options: { kitDeclined?: boolean; deadlineMs?: numbe
     drawn: () => drawn,
     /** The families any gated pool asked to spawn from since the last reset. */
     asked: () => asked,
+    /** Every gated drawable that drew at least once over the rig's life. */
+    everDrew: () => everDrew,
     resetDrawn: () => {
       drawn = 0;
       asked = 0;

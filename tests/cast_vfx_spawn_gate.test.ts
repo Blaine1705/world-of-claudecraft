@@ -40,6 +40,7 @@ import {
   drawingFamilies,
   gatedDrawables,
   installCastVfxCanvasStub,
+  prepareCastVfxKit,
   wouldDraw,
 } from './helpers/cast_vfx_headless';
 
@@ -184,7 +185,7 @@ function spawnEngine(fx: AbilityVfxFx): void {
 /** One door on a fresh engine: fed once, or every frame when it is held. */
 function driveDoor(name: string, door: (fx: AbilityVfxFx) => void, open: number, kit = false) {
   const rig = engine(open);
-  if (kit) prepareKit(rig.fx);
+  if (kit) prepareCastVfxKit(rig.fx);
   door(rig.fx);
   for (let frame = 0; frame < 4; frame++) {
     if (HELD_DOORS.has(name)) door(rig.fx);
@@ -194,16 +195,9 @@ function driveDoor(name: string, door: (fx: AbilityVfxFx) => void, open: number,
 }
 
 /** Every kit spawn door the Warrior modules use, one by one, with the
- *  preparations the solid pieces wait on stubbed ready. A held piece (guard,
- *  power form) is re-fed every frame, the way the painter holds it. */
-function prepareKit(fx: AbilityVfxFx): void {
-  const pools = fx as unknown as Record<string, { preparation: unknown }>;
-  const ready = { ready: () => true, units: () => [], dispose: () => {} };
-  pools.guards.preparation = ready;
-  pools.spiritHammers.preparation = ready;
-  pools.powerForms.preparation = [ready, ready, ready, ready];
-  pools.furyStates.preparation = [ready, ready, ready];
-}
+ *  preparations the solid pieces wait on stubbed ready (prepareCastVfxKit).
+ *  A held piece (guard, power form, Fury solid) is re-fed every frame, the
+ *  way the painter holds it. */
 
 const KIT_DOORS: Record<string, (fx: AbilityVfxFx) => void> = {
   crest: (fx) => fx.crestAt(0, 0, 0, 1, 1, 0xffffff, 0xffffff, 'fire'),
