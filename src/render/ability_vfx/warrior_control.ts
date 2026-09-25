@@ -53,8 +53,6 @@ export function drawWarriorControlAttempt(
   return true;
 }
 
-/** Armor Shear has zero damage. Refresh metadata, including a Warrior refresh
- * of an existing shared Rogue armor aura, identifies the successful peel. */
 /** The Warrior cast a control aura cue belongs to, or null for any other aura:
  *  the cues drawWarriorControlAura claims. */
 export function warriorControlAuraCast(
@@ -66,6 +64,8 @@ export function warriorControlAuraCast(
   return null;
 }
 
+/** Armor Shear has zero damage. Refresh metadata, including a Warrior refresh
+ * of an existing shared Rogue armor aura, identifies the successful peel. */
 export function drawWarriorControlAura(
   host: Pick<AbilityVfxFx, 'queueWarriorControl'>,
   ev: Extract<SimEvent, { type: 'aura' }>,

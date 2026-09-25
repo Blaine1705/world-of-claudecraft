@@ -13,8 +13,8 @@
 // The other actionable reads are elsewhere: the rig's windup clip, the
 // terrain-draped area ring, the cast bar, the nameplate and the HUD debuffs,
 // with the deadline below bounding the whole window. The band's overlay
-// program and the ring's link and are proved in their own deadline-exempt
-// boot entry, ahead of the cast pools (castVfxFirstReadsEntry,
+// program and the ring's program are linked and proved in their own
+// deadline-exempt boot entry, ahead of the cast pools (castVfxFirstReadsEntry,
 // cast_vfx_prewarm.ts), so drawing them through a closed family is no cold
 // link once it ran; a boot that reaches it past the hard deadline resumes it
 // as program debt ahead of the cast pools'.
@@ -37,6 +37,17 @@
 // off-target. Reading it would mean holding the pools awake for every
 // shielded body on screen, which is the whole cost the sleep exists to
 // avoid.
+// The Warrior control marks and the Bloodletting recovery bloom drew ungated
+// before the per-cast gate and are gated now, decided out loud for the same
+// reason as the shell: each is an in-world duplicate of a read the HUD keeps
+// whole and unheld. Pummel's lockout (pummel_lockout) and Hamstring's slow
+// (hamstring_slow) are auras of their victim, listed on the target frame's
+// aura strip; the Sunder armor status (kind sunder, which the Rogue's Armor
+// Breach shares) is on the same strip with its stack badge
+// (src/ui/auras_view.ts); and the recovery heal is the Warrior's own health
+// on the player frame plus its floating heal number and combat log line
+// (src/ui/heal_landing_feedback_core.ts), all driven by the heal event, never
+// by the bloom.
 //
 // Why a gate rather than an earlier link: the boot manifest's entry for these
 // programs runs after its 3 s budget on the OpenGL desktops (measured
