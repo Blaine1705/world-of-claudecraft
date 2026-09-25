@@ -18,7 +18,12 @@ vi.mock('../src/render/assets/preload', () => ({
 vi.mock('../src/render/ability_vfx/production_assets', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('../src/render/ability_vfx/production_assets')>();
-  return { ...actual, fragmentGeometry: vi.fn(() => new THREE.BoxGeometry(0.2, 0.2, 0.2)) };
+  return {
+    ...actual,
+    fragmentGeometry: vi.fn(() => new THREE.BoxGeometry(0.2, 0.2, 0.2)),
+    // A resident sheet, so the baked layer can draw here at all.
+    bakedTexture: vi.fn(() => new THREE.Texture()),
+  };
 });
 
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
@@ -116,21 +121,27 @@ function spawnEngine(fx: AbilityVfxFx): void {
   for (const door of Object.values(ENGINE_DOORS)) door(fx);
 }
 
-/** Every kit spawn door the Warrior modules use, with the preparations the
- *  solid pieces wait on stubbed ready. */
-function spawnKit(fx: AbilityVfxFx): void {
+/** Every kit spawn door the Warrior modules use, one by one, with the
+ *  preparations the solid pieces wait on stubbed ready. A held piece (guard,
+ *  power form) is re-fed every frame, the way the painter holds it. */
+function prepareKit(fx: AbilityVfxFx): void {
   const pools = fx as unknown as Record<string, { preparation: unknown }>;
   const ready = { ready: () => true, units: () => [], dispose: () => {} };
   pools.guards.preparation = ready;
   pools.spiritHammers.preparation = ready;
   pools.powerForms.preparation = [ready, ready, ready, ready];
   pools.furyStates.preparation = [ready, ready, ready];
-  fx.crestAt(0, 0, 0, 1, 1, 0xffffff, 0xffffff, 'fire');
-  fx.bakedAt('smoke', 0, 0, 0, 1, 0xffffff, 0xffffff, 1, 0, 0);
-  fx.fragmentsAt('stone_chip', 0, 1, 0, 0xffffff, 4, 1, 0, 1);
-  fx.holdWarriorGuard(1, 0, { id: 'guard', remaining: 5, duration: 10 }, true);
-  fx.holdWarriorPower(1, 1, { remaining: 5, duration: 10 }, 1, true);
 }
+
+const KIT_DOORS: Record<string, (fx: AbilityVfxFx) => void> = {
+  crest: (fx) => fx.crestAt(0, 0, 0, 1, 1, 0xffffff, 0xffffff, 'fire'),
+  'baked layer': (fx) => fx.bakedAt('smoke', 0, 0, 0, 1, 0xffffff, 0xffffff, 1, 0, 0),
+  fragments: (fx) => fx.fragmentsAt('stone_chip', 0, 1, 0, 0xffffff, 4, 1, 0, 1),
+  'guard plate': (fx) =>
+    fx.holdWarriorGuard(1, 0, { id: 'guard', remaining: 5, duration: 10 }, true),
+  'power form': (fx) => fx.holdWarriorPower(1, 1, { remaining: 5, duration: 10 }, 1, true),
+};
+const HELD_KIT_DOORS = new Set(['guard plate', 'power form']);
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -186,24 +197,25 @@ describe('with the engine family not ready', () => {
 });
 
 describe('with the kit family not ready', () => {
-  it('draws no kit piece, and asks the kit at every kit door', () => {
-    const { fx, gate, step, drawing } = engine(CAST_VFX_ENGINE);
-    spawnKit(fx);
-    for (let frame = 0; frame < 3; frame++) {
-      fx.holdWarriorGuard(1, 0, { id: 'guard', remaining: 5, duration: 10 }, true);
-      fx.holdWarriorPower(1, 1, { remaining: 5, duration: 10 }, 1, true);
-      step(1);
-    }
-    expect(drawing() & CAST_VFX_KIT).toBe(0);
-    expect(gate.asked.filter((bit) => bit === CAST_VFX_KIT).length).toBeGreaterThanOrEqual(3);
-  });
-
-  it('draws the kit pieces once it opens', () => {
-    const { fx, step, drawing } = engine(CAST_VFX_ENGINE | CAST_VFX_KIT);
-    spawnKit(fx);
-    step(1);
-    expect(drawing() & CAST_VFX_KIT).toBe(CAST_VFX_KIT);
-  });
+  for (const [name, door] of Object.entries(KIT_DOORS)) {
+    it(`refuses the ${name} door, and asks the kit for it`, () => {
+      const drive = (open: number) => {
+        const rig = engine(open);
+        prepareKit(rig.fx);
+        door(rig.fx);
+        for (let frame = 0; frame < 3; frame++) {
+          if (HELD_KIT_DOORS.has(name)) door(rig.fx);
+          rig.step(1);
+        }
+        return rig;
+      };
+      const shut = drive(CAST_VFX_ENGINE);
+      expect(shut.drawing() & CAST_VFX_KIT).toBe(0);
+      expect(shut.gate.asked).toContain(CAST_VFX_KIT);
+      // The same door draws a kit piece once the kit is ready.
+      expect(drive(CAST_VFX_ENGINE | CAST_VFX_KIT).drawing() & CAST_VFX_KIT).toBe(CAST_VFX_KIT);
+    });
+  }
 });
 
 describe('the boot warm-up', () => {

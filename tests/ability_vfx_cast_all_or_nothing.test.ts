@@ -27,6 +27,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async (importOriginal) =>
 
 import type { AbilityVfxEntityState } from '../src/render/ability_vfx/painter';
 import { CAST_VFX_ENGINE, CAST_VFX_KIT } from '../src/render/cast_vfx_family';
+import { ABILITIES } from '../src/sim/data';
 import { castGateRig } from './helpers/cast_vfx_headless';
 
 const MAGE = 5;
@@ -65,7 +66,7 @@ function fireball(rig: ReturnType<typeof castGateRig>, seconds = 1) {
     sourceId: MAGE,
     targetId: VICTIM,
     school: 'fire',
-    ability: 'Fireball',
+    ability: ABILITIES.fireball.name,
     abilityId: 'fireball',
     kind: 'hit',
     crit: true,
@@ -89,7 +90,7 @@ function shieldSlam(rig: ReturnType<typeof castGateRig>) {
     sourceId: WARRIOR,
     targetId: VICTIM,
     school: 'physical',
-    ability: 'Shield Slam',
+    ability: ABILITIES.shield_slam.name,
     abilityId: 'shield_slam',
     kind: 'hit',
     crit: false,
@@ -172,7 +173,7 @@ describe('a refusal latched at the cast bar', () => {
       sourceId: MAGE,
       targetId: VICTIM,
       school: 'fire',
-      ability: 'Fireball',
+      ability: ABILITIES.fireball.name,
       abilityId: 'fireball',
       kind: 'hit',
       crit: true,

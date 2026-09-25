@@ -184,7 +184,8 @@ function walkId(rig: Rig, id: string, tier: 0 | 1, walked: Walked): void {
           sourceId: caster,
           targetId: VICTIM,
           school: 'physical',
-          ability: id,
+          // The wire carries the display name; the id rides beside it.
+          ability: ABILITIES[id]?.name ?? id,
           abilityId: id,
           kind: 'hit',
           crit,

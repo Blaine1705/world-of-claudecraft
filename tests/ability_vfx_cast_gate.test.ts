@@ -13,6 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import { AbilityVfx, type AbilityVfxEntityState } from '../src/render/ability_vfx/painter';
 import { CAST_VFX_ENGINE, CAST_VFX_KIT } from '../src/render/cast_vfx_family';
+import { ABILITIES } from '../src/sim/data';
 
 /** An engine that records every method the painter reaches for, in order. */
 function recordingFx(): {
@@ -287,7 +288,7 @@ describe('events that name their cast loosely', () => {
       sourceId: 1,
       targetId: 2,
       school: 'physical',
-      ability: 'Shield Slam',
+      ability: ABILITIES.shield_slam.name,
       abilityId: 'no_such_proc_for_the_gate',
       kind: 'hit',
       crit: false,
