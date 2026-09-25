@@ -225,9 +225,11 @@ export function createCooldownManagerView(deps: CooldownManagerViewDeps): Cooldo
           current = tickSpell(button, slot, config, dead, opts.preview);
         }
 
-        // Death forgets every edge, so the first living frame only records:
-        // otherwise resurrecting would chime every tracked entry at once.
-        if (dead) {
+        // Death forgets every edge, and so does a spell the current build does
+        // not know, so the first frame back only records: otherwise resurrecting,
+        // or a spec swap, respec or level-up that teaches several spells already
+        // off cooldown, would chime every one of them at once.
+        if (dead || (!rule && button.abilityId === null)) {
           edges.delete(button.baseId);
           continue;
         }

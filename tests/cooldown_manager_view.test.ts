@@ -154,6 +154,8 @@ describe('cooldown manager view over a live Sim (feral druid)', () => {
     view.setTracked([spell(id)]);
     sim.player.gcdRemaining = 1;
     const idle = view.tick(worldOf(sim), OPEN);
+    // Mid-GCD the button is READY (lit) with no sweep: readiness never counts the GCD.
+    expect(idle.buttons[0].ready).toBe(true);
     expect(idle.buttons[0].cooldownPercent).toBe(0);
     const total = ABILITIES[id].cooldown;
     sim.player.cooldowns.set(id, total / 2);
@@ -190,6 +192,34 @@ describe('cooldown manager view over a live Sim (feral druid)', () => {
     view.tick(worldOf(sim), OPEN);
     sim.player.resource = sim.player.maxResource;
     expect(view.tick(worldOf(sim), OPEN).cues).toHaveLength(2);
+  });
+
+  it('does not chime the spells a spec swap teaches that are already ready', () => {
+    const sim = feral();
+    const feralKnown = new Set(sim.known.map((ability) => ability.def.id));
+    const probe = feral();
+    expect(probe.applyTalents({ spec: 'balance', rows: {} })).toBe(true);
+    const taught = probe.known
+      .filter((ability) => !ability.def.passive && !feralKnown.has(ability.def.id))
+      .map((ability) => ability.def.id);
+    expect(taught.length).toBeGreaterThan(0);
+    const view = viewOver(sim);
+    view.setTracked(taught.map((id) => spell(id)));
+    // Tracked while unknown (Other Spells): nothing to announce.
+    view.tick(worldOf(sim), OPEN);
+    view.tick(worldOf(sim), OPEN);
+    expect(sim.applyTalents({ spec: 'balance', rows: {} })).toBe(true);
+    sim.player.resource = sim.player.maxResource;
+    const swapped = view.tick(worldOf(sim), OPEN);
+    expect(swapped.buttons.some((button) => button.ready)).toBe(true);
+    expect(swapped.cues).toEqual([]);
+    // After that first known frame the ordinary edge applies again.
+    const readyCount = swapped.buttons.filter((button) => button.ready).length;
+    sim.player.resource = 0;
+    view.tick(worldOf(sim), OPEN);
+    sim.player.resource = sim.player.maxResource;
+    expect(view.tick(worldOf(sim), OPEN).cues.length).toBeGreaterThan(0);
+    expect(readyCount).toBeGreaterThan(0);
   });
 
   it('plays nothing for a silent spell, and dedupes nothing it should not', () => {
