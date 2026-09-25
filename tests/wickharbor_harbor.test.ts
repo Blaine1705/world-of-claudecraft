@@ -1,7 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { type Collider, queryOpenWorldColliders } from '../src/sim/colliders';
 import {
-  deckLocal,
   deckPoint,
   harborDeck,
   harborLocal,
@@ -12,7 +11,6 @@ import {
   WICKHARBOR_HARBOR_DECKS,
   WICKHARBOR_HARBOR_MOVED_DECOR,
   WICKHARBOR_HARBOR_PROPS,
-  WICKHARBOR_HARBOR_RAILS,
   WICKHARBOR_STAIR_FIRST_RISE,
   type WickharborHarborDeck,
 } from '../src/sim/content/wickharbor_harbor';

@@ -10,11 +10,15 @@ import {
   wickharborHarborInternalsForTest,
   wickharborHarborPrewarmParts,
 } from '../src/render/wickharbor_harbor';
+import {
+  buildWickharborWharf,
+  wickharborWharfInternalsForTest,
+} from '../src/render/wickharbor_wharf';
 import { WICKHARBOR_HARBOR_FRAME } from '../src/sim/content/wickharbor_harbor';
 import { WATER_LEVEL } from '../src/sim/world';
 
 // Wickharbor's wooden harbor painter (src/render/wickharbor_harbor.ts) over the shipped GLB:
-// the model placed on the waterline at the harbor frame's centre, what each graphics tier really
+// the model placed on the waterline at the harbor frame's origin, what each graphics tier really
 // draws (the walkable structure, solids and every lantern on all of them), and the prewarm parts
 // the props warm-up links.
 
@@ -26,6 +30,7 @@ const MEDIUM = LOW + 6924;
 const HIGH = MEDIUM + 1028;
 
 let gltf: GLTF;
+let wharfGltf: GLTF;
 const originalProfile = getActiveGfxProfile();
 
 function withTier(tier: GfxTier): void {
@@ -62,6 +67,21 @@ beforeAll(async () => {
   ) as ArrayBuffer;
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   gltf = await new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
+  const wharfBytes = readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'public',
+      wickharborWharfInternalsForTest.assetUrl.replace(/^\//, ''),
+    ),
+  );
+  const wharfAb = wharfBytes.buffer.slice(
+    wharfBytes.byteOffset,
+    wharfBytes.byteOffset + wharfBytes.byteLength,
+  ) as ArrayBuffer;
+  wharfGltf = await new Promise<GLTF>((resolve, reject) =>
+    loader.parse(wharfAb, '', resolve, reject),
+  );
 });
 
 afterEach(() => {
@@ -70,10 +90,11 @@ afterEach(() => {
 
 afterAll(() => {
   internals.setLoadedGltfForTest(null);
+  wickharborWharfInternalsForTest.setLoadedGltfForTest(null);
 });
 
 describe('wickharbor harbor painter', () => {
-  it('places the model on the waterline at the harbor frame centre', () => {
+  it('places the model on the waterline at the harbor frame origin', () => {
     withTier('high');
     const harbor = buildWickharborHarbor();
     const model = harbor.getObjectByName('wickharborHarborModel');
@@ -120,6 +141,29 @@ describe('wickharbor harbor painter', () => {
         expect(drawn.size, label).toBeGreaterThan(0);
         for (const m of drawn) expect(warmed.has(m), label).toBe(true);
       }
+    }
+  });
+
+  it("draws with the ferry wharf's very materials: one wood, batched together by the props merge", () => {
+    for (const standardMaterials of [true, false]) {
+      activateGfxProfile({
+        ...originalProfile,
+        settings: { ...GFX, effectsTier: 'high', standardMaterials },
+      });
+      internals.setLoadedGltfForTest(gltf);
+      wickharborWharfInternalsForTest.setLoadedGltfForTest(wharfGltf);
+      const materialsOf = (root: THREE.Object3D): Set<THREE.Material> => {
+        const out = new Set<THREE.Material>();
+        root.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (mesh.isMesh) out.add(mesh.material as THREE.Material);
+        });
+        return out;
+      };
+      const harbor = materialsOf(buildWickharborHarbor());
+      const wharf = materialsOf(buildWickharborWharf());
+      expect(harbor.size).toBe(5);
+      expect([...harbor].every((m) => wharf.has(m))).toBe(true);
     }
   });
 

@@ -14,7 +14,10 @@
 // material) programs join the props material prewarm (prewarmParts), so a model first seen
 // after the curtain links nothing in a live frame. The materials are the surface family's
 // vertex-coloured standard/lambert (vertex_colour_glb_parts.ts, shared with the route markers
-// and the Wyrmwatch harbor: the same programs). Nothing here runs per frame.
+// and the Wyrmwatch harbor: the same programs). Every tiered model converts through ONE
+// converter, so models built from the same materials (the wharf and the harbor share all
+// five) draw with the same material objects and the props static merge batches them
+// together. Nothing here runs per frame.
 //
 // Residency: the parsed GLB and the per-tier merged templates stay resident for the session
 // (the templates also back the prewarm twins), so a graphics-profile rebuild converts
@@ -61,6 +64,10 @@ export interface TieredVertexColourModel {
   setLoadedGltfForTest(gltf: GLTF | null): void;
 }
 
+/** The one converter every tiered model draws through (cleared by any model's reset: the
+ *  resetters run together on a graphics-profile rebuild, assets/graphics_profile.ts). */
+const materials = vertexColourMaterialConverter();
+
 export function tieredVertexColourModel(
   spec: TieredVertexColourModelSpec,
 ): TieredVertexColourModel {
@@ -70,7 +77,6 @@ export function tieredVertexColourModel(
    *  `effectsTier|standard`: a preset change converts anew. */
   const templates = new Map<string, VertexColourPart[]>();
   let lastParts: VertexColourPart[] = [];
-  const materials = vertexColourMaterialConverter();
 
   function reset(): void {
     templates.clear();

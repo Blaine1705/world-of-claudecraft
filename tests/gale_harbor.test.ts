@@ -9,6 +9,9 @@ import { resolveMovement } from '../src/sim/colliders';
 import {
   GALE_DECK_FREEBOARD,
   GALE_HARBOR_DECKS,
+  type GaleDeckDef,
+  galeDeckAlong,
+  galeDeckContains,
   galeDeckSurface,
   galeDeckSurfaceAt,
 } from '../src/sim/gale_harbor';
@@ -16,6 +19,46 @@ import { groundHeight, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const SEED = 20061;
 const terrain = (x: number, z: number): number => terrainHeight(x, z, SEED);
+
+describe('the deck footprint: a rectangle trimmed by straight cuts', () => {
+  // a 10 x 4 deck heading +z (rot 0: along = z, across = x), cut by the line x + z = 4 (the
+  // deck keeps the side the normal points into, away from the origin)
+  const n = Math.SQRT1_2;
+  const deck: GaleDeckDef = {
+    x: 0,
+    z: 0,
+    rot: 0,
+    hl: 5,
+    hw: 2,
+    ax: 0,
+    az: 0,
+    cuts: [{ x: 2, z: 2, nx: -n, nz: -n }],
+  };
+
+  it('keeps the rectangle on the cut side, and drops what lies past the cut', () => {
+    expect(galeDeckAlong(deck, 0, 0)).toBe(0);
+    expect(galeDeckAlong(deck, 1.5, -3)).toBe(-3);
+    // inside the rectangle but past the cut line
+    expect(galeDeckAlong(deck, 1.9, 4)).toBeNull();
+    expect(galeDeckContains(deck, 1.9, 4)).toBe(false);
+    // outside the rectangle, whatever the cut says
+    expect(galeDeckAlong(deck, 0, 6)).toBeNull();
+    expect(galeDeckAlong(deck, 3, 0)).toBeNull();
+    // the surface query of a plain rectangle is unchanged by the helper
+    const plain: GaleDeckDef = { ...deck, cuts: undefined };
+    expect(galeDeckAlong(plain, 1.9, 4)).toBe(4);
+  });
+
+  it('insets every edge alike, the cut included', () => {
+    // 0.3 from the cut line (x + z = 4), well inside the rectangle
+    const onCut = { x: 2 - 0.3 * n, z: 2 - 0.3 * n };
+    expect(galeDeckContains(deck, onCut.x, onCut.z, 0.2)).toBe(true);
+    expect(galeDeckContains(deck, onCut.x, onCut.z, 0.4)).toBe(false);
+    // 0.3 from the rectangle's long side
+    expect(galeDeckContains(deck, 1.7, -3, 0.2)).toBe(true);
+    expect(galeDeckContains(deck, 1.7, -3, 0.4)).toBe(false);
+  });
+});
 
 describe('the harbor decks', () => {
   it('anchors every deck to dry shore ground, above the waterline', () => {

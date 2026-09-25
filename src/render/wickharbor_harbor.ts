@@ -1,6 +1,7 @@
 // Wickharbor's wooden harbor on screen: the one Blender-authored model
 // (public/models/props/wickharbor_harbor.glb, scripts/assets/wickharbor_harbor/) placed on the
-// waterline at the harbor frame's centre (sim/content/wickharbor_harbor.ts): the shore
+// waterline at the harbor frame's origin, the boardwalk's centre (WICKHARBOR_HARBOR_FRAME in
+// sim/content/wickharbor_harbor.ts; the model reaches from there to the Beacon dock): the shore
 // boardwalk, the two north piers, the two bluff stairs and the Old Beacon's dock and stair, in
 // the ferry wharf's wood (its sibling model, wickharbor_wharf.ts). Its plank fields are the
 // surfaces the sim walks (sim/gale_harbor.ts), each laid once and clipped to its deck, so no
