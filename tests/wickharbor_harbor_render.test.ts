@@ -25,8 +25,8 @@ import { WATER_LEVEL } from '../src/sim/world';
 const internals = wickharborHarborInternalsForTest;
 const GLB = path.join(__dirname, '..', 'public', internals.assetUrl.replace(/^\//, ''));
 /** Triangles per part (tests/wickharbor_harbor_asset.test.ts pins the same). */
-const LOW = 5148 + 5328 + 1572 + 2992 + 2752 + 2356;
-const MEDIUM = LOW + 7624;
+const LOW = 5148 + 5328 + 1572 + 2992 + 2752 + 1900;
+const MEDIUM = LOW + 8080;
 const HIGH = MEDIUM + 2748;
 
 let gltf: GLTF;

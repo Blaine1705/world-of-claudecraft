@@ -579,11 +579,11 @@ const PROP_FRAME: readonly HarborPropFrame[] = [
   // only the mast stands in the way)
   { deck: 'quay', kind: 'timberPost', along: 23.8, across: 12.2, r: 0.5, height: 7.4 },
   // the cargo shelter on the quay's north side: four corner posts under a shingled roof, the
-  // cargo under it
-  { deck: 'quay', kind: 'timberPost', along: 14.6, across: 22.8, r: 0.2, height: 4.3 },
-  { deck: 'quay', kind: 'timberPost', along: 19.6, across: 22.8, r: 0.2, height: 4.3 },
-  { deck: 'quay', kind: 'timberPost', along: 14.6, across: 25.7, r: 0.2, height: 4.3 },
-  { deck: 'quay', kind: 'timberPost', along: 19.6, across: 25.7, r: 0.2, height: 4.3 },
+  // cargo under it (the eaves stand clear of a player's crown even stood on the crates)
+  { deck: 'quay', kind: 'timberPost', along: 14.6, across: 22.8, r: 0.2, height: 5.2 },
+  { deck: 'quay', kind: 'timberPost', along: 19.6, across: 22.8, r: 0.2, height: 5.2 },
+  { deck: 'quay', kind: 'timberPost', along: 14.6, across: 25.7, r: 0.2, height: 5.2 },
+  { deck: 'quay', kind: 'timberPost', along: 19.6, across: 25.7, r: 0.2, height: 5.2 },
   {
     deck: 'quay',
     kind: 'crateStack',

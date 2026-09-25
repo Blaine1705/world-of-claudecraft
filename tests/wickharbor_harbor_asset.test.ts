@@ -39,8 +39,8 @@ import { WYRMWATCH_RAIL_HEIGHT } from '../src/sim/content/wyrmwatch_harbor';
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, WICKHARBOR_HARBOR_ASSET.target);
-const SHIPPED_SHA256 = '103909af8401fd1f4ec2967c619857ae4641fe0304b0ec95f9ffb745a0936b89';
-const SHIPPED_BYTES = 410120;
+const SHIPPED_SHA256 = '0c2872d472703711ac7b9fa0ba2ea60814e54501c7909338b5439db848ddebab';
+const SHIPPED_BYTES = 409384;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   HarborDecks: 5148,
@@ -48,8 +48,8 @@ const TRIANGLES: Record<string, number> = {
   HarborStairs: 1572,
   HarborRails: 2992,
   HarborLanterns: 2752,
-  HarborCargo: 2356,
-  HarborTrim: 7624,
+  HarborCargo: 1900,
+  HarborTrim: 8080,
   HarborClutter: 2748,
 };
 /** The player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts). */
@@ -186,7 +186,8 @@ describe('wickharbor harbor GLB', () => {
     expect(trianglesUnder(node('WickharborHarbor_ROOT'))).toBe(total);
     // the whole town harbor (a boardwalk, the great quay, two piers, three stairs and the
     // Beacon dock, about five times the ferry wharf's planks, with the quay's crane and cargo
-    // shelter): under 32k in all, the low tier under 21k
+    // shelter): under 32k in all, the low tier under 21k (the quay's planks and frame are most
+    // of the rise; the crane's rig and the shelter's braces are medium-tier trim)
     expect(total).toBeLessThan(32000);
     const low = WICKHARBOR_HARBOR_CRITICAL_PARTS.reduce((n, p) => n + TRIANGLES[p], 0);
     expect(low).toBeLessThan(21000);

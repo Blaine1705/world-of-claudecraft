@@ -35,9 +35,10 @@ tier keeps, so every solid is in a low-tier part):
     HarborStairs         the three stairs: treads, risers, stringers, posts, the stone plinths
     HarborRails          every rail, its posts and newels
     HarborLanterns       the lantern posts and the newel lanterns (the landmarks)
-    HarborCargo          crate stacks, barrels, bollards, the quay crane and the cargo shelter
-                         (all collide; the crane's jib and the shelter's roof stay with them)
-    HarborTrim           medium tier and up: fender piles, mooring rings, cleats, bolts, iron
+    HarborCargo          crate stacks, barrels, bollards, the quay crane's mast and the cargo
+                         shelter's posts and roof (all collide but the roof, the silhouette)
+    HarborTrim           medium tier and up: fender piles, mooring rings, cleats, bolts, iron,
+                         the crane's jib, fall and winch, the shelter's knee braces
     HarborFrame also carries the timber sheathing on the quay's side of the wharf's drop, so the
     wharf reads as the quay's raised berth mole.
     HarborClutter        high tier and up: rope coils, crab pots, sacks, nets, oars, a bucket
@@ -657,6 +658,17 @@ def build_crane(p, q):
                PAL['post'])
     for yy in (base + 2.2, top - 1.6):
         p.box((x, yy, z), (0.8, 0.12, 0.8), PAL['iron'], IRON, yaw=rot)
+    # the jib's heel and the winch stand on the mast, drawn from medium tier (build_crane_rig)
+
+
+def build_crane_rig(p, q):
+    """The crane's rig (medium tier and up: nothing of it collides): the jib, its strut and
+    stay, the fall, hook and slung cargo, and the winch."""
+    x, z, base = q['x'], q['z'], q['base']
+    top = base + q['height']
+    rot = QUAY['rot']
+    ax, az = math.sin(rot), math.cos(rot)
+    cx, cz = math.cos(rot), -math.sin(rot)
     jib_y = top - 1.0
     reach = 5.0
     tip = (x + ax * reach, jib_y + 0.4, z + az * reach)
@@ -688,6 +700,26 @@ def build_crane(p, q):
            0.06, PAL['iron'], IRON)
 
 
+def shelter_frame(posts):
+    loc = [qlocal(q['x'], q['z']) for q in posts]
+    a0, a1 = min(a for a, _ in loc), max(a for a, _ in loc)
+    c0, c1 = min(c for _, c in loc), max(c for _, c in loc)
+    base = min(q['base'] for q in posts)
+    eave = base + posts[0]['height'] - 0.35
+    return loc, a0, a1, c0, c1, eave
+
+
+def build_shelter_braces(p, posts):
+    """The shelter's knee braces (medium tier and up)."""
+    loc, a0, a1, c0, c1, eave = shelter_frame(posts)
+    cm = (c0 + c1) / 2
+    for a, c in loc:
+        da = 1 if a < (a0 + a1) / 2 else -1
+        dc = 1 if c < cm else -1
+        W.beam(p, qxyz(a, c, eave - 0.95), qxyz(a + da * 0.85, c, eave - 0.08), 0.15, 0.15, PAL['post'])
+        W.beam(p, qxyz(a, c, eave - 0.95), qxyz(a, c + dc * 0.85, eave - 0.08), 0.15, 0.15, PAL['post'])
+
+
 def build_shelter(p, posts):
     """The cargo shelter: four corner posts under plates and tie beams, knee braces, a ridge on
     king posts, and a roof of lapped shingle courses overhanging the posts on every side."""
@@ -702,10 +734,6 @@ def build_shelter(p, posts):
     for q, (a, c) in zip(posts, loc):
         W.post(p, q['x'], q['z'], eave + 0.12, base - 0.05, 0.36, PAL['post_dark'], WOOD, bevel=0.025)
         p.box((q['x'], base + 0.05, q['z']), (0.52, 0.1, 0.52), PAL['iron'], IRON, yaw=rot)
-        da = 1 if a < (a0 + a1) / 2 else -1
-        dc = 1 if c < cm else -1
-        W.beam(p, qxyz(a, c, eave - 0.95), qxyz(a + da * 0.85, c, eave - 0.08), 0.15, 0.15, PAL['post'])
-        W.beam(p, qxyz(a, c, eave - 0.95), qxyz(a, c + dc * 0.85, eave - 0.08), 0.15, 0.15, PAL['post'])
     for c in (c0, c1):
         W.beam(p, qxyz(a0 - 0.35, c, eave), qxyz(a1 + 0.35, c, eave), 0.26, 0.3, PAL['post'])
     for a in (a0, a1):
@@ -755,6 +783,14 @@ def build_trim():
                 if i % 2 == 0:
                     xc, zc = at(d, a + step / 2 + 0.5, side * (d['hw'] + 0.06))
                     p.box((xc, top + 0.02, zc), (0.1, 0.1, 0.42), iron, IRON, yaw=d['rot'], bevel=0.015)
+    # the quay crane's rig and the cargo shelter's braces
+    timbers = [q for q in PROPS if q['kind'] == 'timberPost']
+    for q in timbers:
+        if q['r'] >= 0.45:
+            build_crane_rig(p, q)
+    shelter = [q for q in timbers if q['r'] < 0.45]
+    if shelter:
+        build_shelter_braces(p, shelter)
     # fender piles along the quay's sea face (either side of the middle pier), rings between
     face = QUAY['face'] + 0.12
     ftop = BW_TOP - PLANK_T - 0.1
