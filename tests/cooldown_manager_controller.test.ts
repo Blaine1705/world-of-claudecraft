@@ -198,7 +198,9 @@ describe('CooldownManagerController', () => {
     expect(second.hooks.groups()).toMatchObject([
       { id, kind: 'line', spells: ['rake'], orientation: 'vertical', padding: 8 },
     ]);
-    expect(Object.keys(localStorage)).toContain('woc_cooldown_manager:druid:Bob');
+    // Read the key itself: Object.keys over Storage is not portable (on Node 26
+    // it lists the Storage methods rather than the stored keys).
+    expect(localStorage.getItem('woc_cooldown_manager:druid:Bob')).not.toBeNull();
   });
 
   it('plays the spell cue on a ready edge, gated by the combat-only switch', () => {
