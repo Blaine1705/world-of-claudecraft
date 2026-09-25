@@ -22,11 +22,13 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.
 export const WYRMWATCH_HARBOR_ASSET = {
   source: 'scripts/assets/wyrmwatch_harbor/wyrmwatch_harbor_source.glb',
   target: 'public/models/props/wyrmwatch_harbor.glb',
-  /** The fingerprinted inputs: the Blender sources (the ferry's shared shiplib included),
+  /** The fingerprinted inputs: the Blender sources (the house builder and the ferry's shared
+   *  shiplib included),
    *  the sim layout they read, and this builder. */
   inputs: [
     'scripts/assets/wyrmwatch_harbor/wyrmwatch_harbor_source.glb',
     'scripts/assets/wyrmwatch_harbor/build_wyrmwatch_harbor.py',
+    'scripts/assets/wyrmwatch_harbor/build_harbor_house.py',
     'scripts/assets/wyrmwatch_harbor/layout.json',
     'scripts/assets/eastbrook_ferry/shiplib.py',
     'scripts/assets/wyrmwatch_harbor/build.mjs',
@@ -40,10 +42,17 @@ export const WYRMWATCH_HARBOR_ASSET = {
     'Railings',
     'HarborGate',
     'Lanterns',
-    'HarborShack',
     'Cargo',
     'HarborTrim',
     'HarborClutter',
+    'HouseFrame',
+    'HouseWallNorth',
+    'HouseWallSouth',
+    'HouseWallEast',
+    'HouseWallWest',
+    'HouseRoof',
+    'HouseFurnishings',
+    'HouseClutter',
     'PathStoneA',
     'PathStoneB',
     'PathStoneC',

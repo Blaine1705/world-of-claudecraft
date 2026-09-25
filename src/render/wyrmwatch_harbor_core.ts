@@ -4,13 +4,16 @@
 //
 // Fairness (docs/design/graphics-settings-fairness.md): everything a player walks
 // on, bumps into or steers by is kept on EVERY tier: the quays, both flights, the
-// landings, every rail, the gate, the shack, the cargo the sim collides with, every
-// lantern (the landmarks that read the climb at a distance), and the path. A lower
-// preset sheds only dressing nothing collides with: the iron trim, fenders and
-// bolts below medium, the rope coils, net, baskets and loose odds below high. The
-// tier is the STATIC effects tier (GFX.effectsTier), never the frame-rate governor.
+// landings, every rail, the gate, the cargo the sim collides with, every lantern
+// (the landmarks that read the climb at a distance), the path, and the whole
+// Harbormaster's House a player walks into (its frame, walls, door, roof, the wall
+// map and every piece of furniture the sim collides with). A lower preset sheds only
+// dressing nothing collides with: the iron trim, fenders and bolts below medium, the
+// rope coils, baskets, loose odds and the house's clutter below high. The tier is
+// the STATIC effects tier (GFX.effectsTier), never the frame-rate governor.
 
 import type { GfxTier } from './gfx';
+import { HOUSE_SHELL_PARTS } from './wyrmwatch_harbor_house_core';
 
 /** Walkable structure, solids and landmarks: never shed. */
 export const WYRMWATCH_HARBOR_CRITICAL_PARTS = [
@@ -20,13 +23,16 @@ export const WYRMWATCH_HARBOR_CRITICAL_PARTS = [
   'Railings',
   'HarborGate',
   'Lanterns',
-  'HarborShack',
   'Cargo',
+  'HouseFrame',
+  ...HOUSE_SHELL_PARTS,
+  'HouseFurnishings',
 ] as const;
 /** Medium and up: fenders, iron bands, bolts, straps, battens. */
 export const WYRMWATCH_HARBOR_TRIM_PARTS = ['HarborTrim'] as const;
-/** High and up: rope coils, the net, baskets, oars, a bucket, a sack, a spare anchor. */
-export const WYRMWATCH_HARBOR_OPTIONAL_PARTS = ['HarborClutter'] as const;
+/** High and up: rope coils, baskets, a bucket, a sack, a spare anchor, and the house's
+ *  clutter (the sea chest, firewood, books, the rowboat under the stilts). */
+export const WYRMWATCH_HARBOR_OPTIONAL_PARTS = ['HarborClutter', 'HouseClutter'] as const;
 /** The three flagstones the path is laid from (the model's PathStoneA/B/C). */
 export const WYRMWATCH_PATH_STONE_PARTS = ['PathStoneA', 'PathStoneB', 'PathStoneC'] as const;
 

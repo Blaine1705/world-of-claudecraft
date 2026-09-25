@@ -26,8 +26,11 @@ low tier keeps, so every solid is in a low-tier part):
     Railings               every rail, its posts and newels
     HarborGate             the post-and-lintel gate at the head of the stair, anchor crest
     Lanterns               every lantern post, newel lantern and gate lantern (the landmarks)
-    HarborShack            the harbormaster's shack on the north yard
-    Cargo                  crate stacks, barrels, bollards and the net rack (all collide)
+    House*                 the Harbormaster's House on stilts at the north end, walk-in: its
+                           frame, four walls and roof (split so the runtime can cut away the
+                           ones between the camera and a player indoors), its furnishings,
+                           and its high-tier clutter (build_harbor_house.py)
+    Cargo                  crate stacks, barrels and bollards (all collide)
     HarborTrim             medium tier and up: fenders, iron bands, bolts, straps, battens
     HarborClutter          high tier and up: rope coils, the net, baskets, oars, a bucket, a sack
     PathStoneA/B/C         three flagstones the runtime lays along the path to Wyrmwatch
@@ -49,6 +52,8 @@ sys.path.insert(0, HERE)
 import bpy  # noqa: E402
 from mathutils import Vector  # noqa: E402
 from shiplib import EDGE, FLAT, GLOW, IRON, ROPE, WOOD, P, Piece, empty, scale_color, triangles  # noqa: E402
+
+import build_harbor_house as H  # noqa: E402
 
 STONE = 2  # shiplib's third slot (its cloth index) carries the stone here
 
@@ -565,110 +570,7 @@ def build_lanterns(newel_tops, gate_hangs):
 
 
 # ---------------------------------------------------------------------------
-# The harbormaster's shack
-# ---------------------------------------------------------------------------
-SHACK = next(q for q in PROPS if q['kind'] == 'shack')
-WALL_H = 3.8
-RIDGE = 6.1
-EAVE = 0.5
-DOOR_W, DOOR_H = 1.4, 3.2
-
-
-def build_shack():
-    p = Piece('HarborShack', wear=0.08, gradient=0.14)
-    cx, cz, y0 = SHACK['x'], SHACK['z'], SHACK['base']
-    hw, hd = SHACK['hw'], SHACK['hd']
-    # sill and the four corner posts
-    p.box((cx, y0 + 0.1, cz), (hw * 2, 0.2, hd * 2), PAL['post_dark'], WOOD)
-    for sx in (-1, 1):
-        for sz in (-1, 1):
-            post(p, cx + sx * (hw - 0.14), cz + sz * (hd - 0.14), y0 + WALL_H, y0 + 0.2, 0.3, PAL['post'], WOOD,
-                 bevel=0.02)
-    # plank walls: vertical boards, the door in the front (+z) wall, a window in the east (+x)
-    board, t = 0.44, 0.12
-
-    def wall_boards(axis, fixed, span0, span1, gap=None, window=None):
-        n = int(round((span1 - span0) / board))
-        w = (span1 - span0) / n
-        for i in range(n):
-            s0 = span0 + i * w
-            s1 = s0 + w
-            sm = (s0 + s1) / 2
-            col = pick(PAL['wall'], i + (3 if axis == 'x' else 0))
-            ranges = [(y0 + 0.2, y0 + WALL_H)]
-            if gap and s1 > gap[0] and s0 < gap[1]:
-                ranges = [(y0 + DOOR_H + 0.12, y0 + WALL_H)]
-            if window and s1 > window[0] and s0 < window[1]:
-                ranges = [(y0 + 0.2, y0 + 1.65), (y0 + 2.75, y0 + WALL_H)]
-            for ya, yb in ranges:
-                if axis == 'x':   # a wall running along x at z = fixed
-                    p.box((sm, (ya + yb) / 2, fixed), (w - 0.03, yb - ya, t), col, WOOD)
-                else:             # a wall running along z at x = fixed
-                    p.box((fixed, (ya + yb) / 2, sm), (t, yb - ya, w - 0.03), col, WOOD)
-
-    wall_boards('x', cz + hd - 0.08, cx - hw + 0.2, cx + hw - 0.2, gap=(cx - DOOR_W / 2, cx + DOOR_W / 2))
-    wall_boards('x', cz - hd + 0.08, cx - hw + 0.2, cx + hw - 0.2)
-    wall_boards('z', cx + hw - 0.08, cz - hd + 0.2, cz + hd - 0.2, window=(cz + 0.2, cz + 1.3))
-    wall_boards('z', cx - hw + 0.08, cz - hd + 0.2, cz + hd - 0.2)
-    # top plate
-    for sz in (-1, 1):
-        p.box((cx, y0 + WALL_H + 0.08, cz + sz * (hd - 0.1)), (hw * 2 + 0.1, 0.18, 0.24), PAL['post_dark'], WOOD)
-    for sx in (-1, 1):
-        p.box((cx + sx * (hw - 0.1), y0 + WALL_H + 0.08, cz), (0.24, 0.18, hd * 2), PAL['post_dark'], WOOD)
-    # the door: frame, blue leaf with battens, and the step
-    fz = cz + hd - 0.02
-    for sx in (-1, 1):
-        p.box((cx + sx * (DOOR_W / 2 + 0.07), y0 + DOOR_H / 2 + 0.1, fz), (0.16, DOOR_H, 0.2), PAL['trim_dark'], WOOD)
-    p.box((cx, y0 + DOOR_H + 0.12, fz), (DOOR_W + 0.34, 0.18, 0.22), PAL['trim_dark'], WOOD)
-    p.box((cx, y0 + DOOR_H / 2 + 0.1, cz + hd - 0.12), (DOOR_W, DOOR_H - 0.05, 0.1), PAL['accent'], WOOD)
-    for yy in (0.7, 1.95, 2.95):
-        p.box((cx, y0 + yy, cz + hd - 0.06), (DOOR_W - 0.1, 0.14, 0.05), PAL['accent_dark'], WOOD)
-    p.box((cx, y0 + 0.08, cz + hd + 0.28), (DOOR_W + 0.5, 0.16, 0.56), PAL['post'], WOOD)
-    # the window on the east wall, toward the pier: frame, warm panes, open blue shutters
-    wx, wz = cx + hw + 0.01, cz + 0.75
-    p.box((wx, y0 + 2.2, wz), (0.12, 1.05, 1.1), PAL['glow'], GLOW)
-    for yy in (1.65, 2.75):
-        p.box((wx + 0.04, y0 + yy, wz), (0.16, 0.12, 1.34), PAL['trim_dark'], WOOD)
-    for sz in (-1, 1):
-        p.box((wx + 0.04, y0 + 2.2, wz + sz * 0.6), (0.16, 1.2, 0.12), PAL['trim_dark'], WOOD)
-        p.box((wx + 0.06, y0 + 2.2, wz + sz * 0.95), (0.06, 1.1, 0.5), PAL['accent'], WOOD)
-    p.box((wx + 0.02, y0 + 2.2, wz), (0.08, 0.06, 1.1), PAL['iron'], IRON)
-    # gable roof: shingle courses on both slopes, ridge cap, gable ends and barge boards
-    ye, yr = y0 + WALL_H + 0.1, y0 + RIDGE
-    run, rise = hw + EAVE, (y0 + RIDGE) - (y0 + WALL_H + 0.1)
-    slope = math.hypot(run, rise)
-    pitch = math.atan2(rise, run)
-    length = hd * 2 + 0.8
-    courses = 6
-    for side in (-1, 1):
-        for k in range(courses):
-            tm = (k + 0.5) / courses
-            x = cx + side * run * (1 - tm)
-            y = ye + rise * tm
-            p.box((x, y + 0.1, cz), (slope / courses + 0.14, 0.14, length), pick(PAL['shingle'], k + (2 if side > 0 else 0)),
-                  WOOD, roll=-side * pitch)
-    p.box((cx, yr + 0.18, cz), (0.34, 0.24, length + 0.08), PAL['post_dark'], WOOD)
-    for sz in (-1, 1):
-        zz = cz + sz * (hd - 0.02)
-        slab(p, [(cx - hw + 0.05, ye - 0.05), (cx + hw - 0.05, ye - 0.05), (cx, yr - 0.05)], zz - 0.06, zz + 0.06,
-             pick(PAL['wall'], 1), WOOD)
-        for side in (-1, 1):
-            beam(p, (cx + side * (run + 0.02), ye - 0.02, cz + sz * (hd + 0.38)), (cx, yr + 0.08, cz + sz * (hd + 0.38)),
-                 0.12, 0.2, PAL['trim_dark'])
-    # a small awning over the door on two brackets
-    aw_y = y0 + DOOR_H + 0.55
-    p.box((cx, aw_y, cz + hd + 0.5), (DOOR_W + 0.9, 0.12, 1.0), pick(PAL['shingle'], 1), WOOD, pitch=0.3)
-    for sx in (-1, 1):
-        beam(p, (cx + sx * (DOOR_W / 2 + 0.35), aw_y - 0.7, cz + hd + 0.02),
-             (cx + sx * (DOOR_W / 2 + 0.35), aw_y - 0.1, cz + hd + 0.85), 0.1, 0.1, PAL['post_dark'])
-    # the stove pipe through the back slope
-    p.cylinder((cx - 0.7, yr - 1.0, cz - 1.2), (cx - 0.7, yr + 0.9, cz - 1.2), 0.16, PAL['iron'], IRON, sides=8)
-    p.cylinder((cx - 0.7, yr + 0.9, cz - 1.2), (cx - 0.7, yr + 1.05, cz - 1.2), 0.24, PAL['iron_hi'], IRON, sides=8)
-    return p
-
-
-# ---------------------------------------------------------------------------
-# Cargo, bollards and the net rack (everything the sim collides with)
+# Cargo and bollards (everything on the quays the sim collides with)
 # ---------------------------------------------------------------------------
 def crate(p, x, y, z, s, yaw, col):
     p.box((x, y + s / 2, z), (s, s, s), col, WOOD, bevel=0.03, yaw=yaw)
@@ -694,14 +596,6 @@ def build_cargo():
                        sides=10)
             p.cylinder((x, base + q['height'] - 0.16, z), (x, base + q['height'], z), q['r'], PAL['iron'], IRON,
                        sides=10)
-        elif k == 'netRack':
-            hd = q['hd']
-            for s in (-1, 1):
-                post(p, x, z + s * (hd - 0.1), base + q['height'], base - 0.02, 0.16, PAL['post'], WOOD)
-                beam(p, (x - 0.2, base, z + s * (hd - 0.1)), (x, base + 1.4, z + s * (hd - 0.1)), 0.1, 0.1,
-                     PAL['post_dark'])
-            p.box((x, base + q['height'] - 0.12, z), (0.14, 0.14, hd * 2 + 0.2), PAL['post'], WOOD)
-            p.box((x, base + 1.1, z), (0.1, 0.1, hd * 2 - 0.1), PAL['post_dark'], WOOD)
     return p
 
 
@@ -749,10 +643,6 @@ def build_trim():
         elif k == 'gatePost':
             for yy in (TOP + 1.4, TOP + 4.6):
                 p.box((x, yy, z), (0.68, 0.12, 0.68), iron, IRON)
-        elif k == 'shack':
-            for yy in (0.6, 2.4):
-                p.box((x + 0.3, base + yy, z + q['hd'] - 0.04), (0.55, 0.07, 0.05), iron, IRON)
-            p.box((x - 0.45, base + 1.5, z + q['hd'] - 0.03), (0.08, 0.08, 0.05), PAL['brass'], IRON)
     for zp in sorted(q['z'] for q in GATE_POSTS):
         p.box((GATE_POSTS[0]['x'], TOP + GATE_TOP - 0.3, zp), (0.66, 0.66, 0.14), iron, IRON)
     return p
@@ -773,36 +663,11 @@ def build_clutter():
         k, x, z, base = q['kind'], q['x'], q['z'], q['base']
         if k == 'bollard':
             coil(p, x - 0.62, base, z + 0.1, 0.28)
-        elif k == 'netRack':
-            hd = q['hd']
-            # the net hung over the rack's top bar, sagging, drawn on both faces
-            rows = []
-            for i in range(6):
-                zz = z - hd + 0.12 + (hd * 2 - 0.24) * i / 5
-                sag = math.sin(math.pi * i / 5) * 0.22
-                rows.append([(x + 0.05 + 0.04 * j, base + q['height'] - 0.15 - j * 0.42 + sag * (j / 4), zz)
-                             for j in range(5)])
-            grid = [list(col) for col in zip(*rows)]
-            for flip in (1, -1):
-                pts = [[(px + flip * 0.012, py, pz) for px, py, pz in r] for r in grid]
-                p.surface(pts, lambda i, j: PAL['net'] if (i + j) % 2 else PAL['rope_dark'], ROPE,
-                          outward=lambda c, f=flip: (f, 0, 0), soft=False)
-            # two lobster baskets at its foot
-            p.cylinder((x + 0.55, base, z - 0.55), (x + 0.55, base + 0.45, z - 0.55), 0.26, PAL['rope_dark'], ROPE,
-                       sides=8)
-            p.cylinder((x + 0.55, base, z + 0.3), (x + 0.55, base + 0.38, z + 0.3), 0.22, PAL['rope'], ROPE, sides=8)
         elif k == 'barrel' and z > 1.0:
             # a bucket and a sack beside the south quay's second barrel, against the wall
             p.cylinder((x + 0.05, base, z + 0.72), (x + 0.05, base + 0.38, z + 0.72), 0.2, PAL['post'], WOOD, sides=8,
                        r1=0.24)
             p.rock_blob((x - 0.05, base + 0.26, z + 1.2), (0.55, 0.5, 0.45), PAL['rope_dark'], ROPE, jitter=0.12)
-        elif k == 'shack':
-            # a pair of oars leaning on the shack's landward wall
-            wx = x - q['hw'] - 0.12
-            for dz in (-0.6, -0.25):
-                beam(p, (wx - 0.15, base + 0.05, z + dz), (wx + 0.02, base + 2.9, z + dz + 0.2), 0.07, 0.07,
-                     PAL['plank'][2])
-                p.box((wx - 0.12, base + 0.45, z + dz + 0.03), (0.04, 0.8, 0.2), PAL['plank'][0], WOOD, roll=0.06)
         elif k == 'crateStack' and z < 0:
             # a small crate on top of the yard's stack
             p.box((x, base + q['height'] + 0.2, z + 0.1), (0.42, 0.4, 0.42), PAL['plank'][0], WOOD, bevel=0.02,
@@ -874,9 +739,9 @@ def make_materials():
     return mats
 
 
-CRITICAL = ('QuayDecks', 'StairFlights', 'Landings', 'Railings', 'HarborGate', 'Lanterns', 'HarborShack', 'Cargo')
+CRITICAL = ('QuayDecks', 'StairFlights', 'Landings', 'Railings', 'HarborGate', 'Lanterns', 'Cargo') + H.HOUSE_PARTS
 TRIM = ('HarborTrim',)
-OPTIONAL = ('HarborClutter',)
+OPTIONAL = ('HarborClutter',) + H.HOUSE_OPTIONAL
 STONES = tuple(s[0] for s in STONE_SPECS)
 # where the stone kit sits in the model (under the water off the north yard: never drawn in place)
 STONE_KIT_AT = (5.0, -3.0, -14.0)
@@ -890,8 +755,8 @@ def build_scene():
     rails, newel_tops = build_rails()
     gate, gate_hangs = build_gate()
     for piece in (build_quays(), build_flights(), build_landings(), rails, gate,
-                  build_lanterns(newel_tops, gate_hangs), build_shack(), build_cargo(), build_trim(),
-                  build_clutter()):
+                  build_lanterns(newel_tops, gate_hangs), build_cargo(), build_trim(), build_clutter(),
+                  *H.build(sys.modules[__name__])):
         pieces[piece.name] = piece.finish(mats, root)
     for i, (name, rx, rz, sides) in enumerate(STONE_SPECS):
         obj = build_stone(name, rx, rz, sides, i).finish(mats, root)
@@ -906,6 +771,12 @@ def build_scene():
         'decks': {d['id']: [d['near'], d['far']] for d in LAYOUT['decks']},
         'railHeight': RAIL_H,
         'gateTop': round(TOP + GATE_TOP, 4),
+        'house': {
+            'floor': LAYOUT['house']['floor'],
+            'wallTop': LAYOUT['house']['wallTop'],
+            'ridge': LAYOUT['house']['ridge'],
+            'door': [LAYOUT['house']['door']['width'], LAYOUT['house']['door']['height']],
+        },
     }
     return dict(root=root, pieces=pieces, mats=mats)
 

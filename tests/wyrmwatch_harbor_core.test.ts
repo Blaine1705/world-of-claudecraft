@@ -10,6 +10,7 @@ import {
   wyrmwatchHarborParts,
   wyrmwatchPathStones,
 } from '../src/render/wyrmwatch_harbor_core';
+import { HOUSE_SHELL_PARTS } from '../src/render/wyrmwatch_harbor_house_core';
 import {
   WYRMWATCH_HARBOR_DECKS,
   WYRMWATCH_HARBOR_PATH,
@@ -17,6 +18,10 @@ import {
   WYRMWATCH_HARBOR_PROPS,
   type WyrmwatchHarborPropKind,
 } from '../src/sim/content/wyrmwatch_harbor';
+import {
+  HARBOR_HOUSE_PROPS,
+  type HarborHousePropKind,
+} from '../src/sim/content/wyrmwatch_harbor_house';
 import { terrainHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -26,7 +31,7 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // same way every time, seated on the terrain, never under the harbor's planks.
 
 describe('wyrmwatch harbor tiers (graphics fairness)', () => {
-  it('keeps the structure, rails, gate, shack, cargo and every lantern on every tier', () => {
+  it('keeps the structure, rails, gate, house, cargo and every lantern on every tier', () => {
     for (const tier of ['low', 'medium', 'high', 'ultra', 'insane'] as const) {
       const parts = wyrmwatchHarborParts(tier);
       for (const p of WYRMWATCH_HARBOR_CRITICAL_PARTS) expect(parts, tier).toContain(p);
@@ -48,19 +53,33 @@ describe('wyrmwatch harbor tiers (graphics fairness)', () => {
   it('draws every solid the sim collides with in a part the low tier keeps', () => {
     // the model part that draws each colliding prop kind, and the rails
     const drawnBy: Record<WyrmwatchHarborPropKind, string> = {
-      shack: 'HarborShack',
       gatePost: 'HarborGate',
       lanternPost: 'Lanterns',
       bollard: 'Cargo',
       crateStack: 'Cargo',
       barrel: 'Cargo',
-      netRack: 'Cargo',
+    };
+    // the house: its walls, the furniture and cargo inside, and the chimney stack on the
+    // land wall (build_harbor_house.py)
+    const houseDrawnBy: Record<HarborHousePropKind, string> = {
+      hearth: 'HouseFurnishings',
+      chimney: 'HouseWallWest',
+      chartTable: 'HouseFurnishings',
+      armchair: 'HouseFurnishings',
+      settle: 'HouseFurnishings',
+      sideTable: 'HouseFurnishings',
+      crateStack: 'HouseFurnishings',
+      barrel: 'HouseFurnishings',
     };
     const low = wyrmwatchHarborParts('low');
     for (const p of WYRMWATCH_HARBOR_PROPS) expect(low, p.kind).toContain(drawnBy[p.kind]);
+    for (const p of HARBOR_HOUSE_PROPS) expect(low, p.kind).toContain(houseDrawnBy[p.kind]);
+    for (const wall of HOUSE_SHELL_PARTS) expect(low, wall).toContain(wall);
+    expect(low).toContain('HouseFrame');
     expect(low).toContain('Railings');
     for (const shed of [...WYRMWATCH_HARBOR_TRIM_PARTS, ...WYRMWATCH_HARBOR_OPTIONAL_PARTS]) {
       expect(Object.values(drawnBy)).not.toContain(shed);
+      expect(Object.values(houseDrawnBy)).not.toContain(shed);
     }
   });
 });

@@ -27,6 +27,10 @@ import {
   WYRMWATCH_RAIL_HEIGHT,
   WYRMWATCH_TOP_ABOVE_WATER,
 } from '../src/sim/content/wyrmwatch_harbor';
+import {
+  HARBOR_HOUSE,
+  HARBOR_HOUSE_FLOOR_ABOVE_WATER,
+} from '../src/sim/content/wyrmwatch_harbor_house';
 
 // The shipped Wyrmwatch cliff harbor GLB (public/models/props/wyrmwatch_harbor.glb), built in
 // Blender from the sim's own layout (scripts/assets/wyrmwatch_harbor/layout.json, exported from
@@ -38,24 +42,42 @@ import {
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, WYRMWATCH_HARBOR_ASSET.target);
-const SHIPPED_SHA256 = '49c07a45cff5606ec066cd9bd58448c31cae004ae8a00cc077736cb1b76959dd';
-const SHIPPED_BYTES = 233864;
+const SHIPPED_SHA256 = 'cf8f016ea98ecc42dd8cb97e38e410d4fc09881092ece79611215211f7423fe6';
+const SHIPPED_BYTES = 463408;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
-  QuayDecks: 2688,
+  QuayDecks: 2052,
   StairFlights: 1272,
   Landings: 804,
-  Railings: 1844,
+  Railings: 1728,
   HarborGate: 968,
   Lanterns: 1832,
-  HarborShack: 1172,
-  Cargo: 900,
-  HarborTrim: 2724,
-  HarborClutter: 1740,
+  Cargo: 756,
+  HarborTrim: 2236,
+  HarborClutter: 1364,
+  HouseFrame: 1956,
+  HouseWallNorth: 3288,
+  HouseWallSouth: 2316,
+  HouseWallEast: 1948,
+  HouseWallWest: 2212,
+  HouseRoof: 2398,
+  HouseFurnishings: 3052,
+  HouseClutter: 840,
   PathStoneA: 44,
   PathStoneB: 38,
   PathStoneC: 50,
 };
+/** The Harbormaster's House parts (tests/wyrmwatch_harbor_house.test.ts pins its sim side). */
+const HOUSE_PARTS = [
+  'HouseFrame',
+  'HouseWallNorth',
+  'HouseWallSouth',
+  'HouseWallEast',
+  'HouseWallWest',
+  'HouseRoof',
+  'HouseFurnishings',
+  'HouseClutter',
+];
 /** The player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts). */
 const PLAYER_H = 2.6;
 
@@ -90,6 +112,7 @@ interface HarborExtras {
   decks: Record<string, number[]>;
   railHeight: number;
   gateTop: number;
+  house: { floor: number; wallTop: number; ridge: number; door: number[] };
 }
 
 function extras(): HarborExtras {
@@ -183,11 +206,13 @@ describe('wyrmwatch cliff harbor GLB', () => {
       total += count;
     }
     expect(trianglesUnder(node('WyrmwatchHarbor_ROOT'))).toBe(total);
-    // a whole harbor (two quays, a switchback, a gate, a shack): under 18k in all,
-    // the low tier under 12k
-    expect(total).toBeLessThan(18000);
+    // a whole harbor (two quays, a switchback, a gate) and its walk-in house: under 32k in
+    // all, the house under 19k of it, the low tier under 28k
+    expect(total).toBeLessThan(32000);
+    const house = HOUSE_PARTS.reduce((n, p) => n + TRIANGLES[p], 0);
+    expect(house).toBeLessThan(19000);
     const low = WYRMWATCH_HARBOR_CRITICAL_PARTS.reduce((n, p) => n + TRIANGLES[p], 0);
-    expect(low).toBeLessThan(12000);
+    expect(low).toBeLessThan(28000);
   });
 
   it("stamps the sim's numbers: the origin, the deck heights, the rail and the stones", () => {
@@ -200,17 +225,26 @@ describe('wyrmwatch cliff harbor GLB', () => {
     expect(e.stoneTop).toBe(WYRMWATCH_PATH_STONE_TOP);
     // the gate stands generously over the player: more than twice a player's height
     expect(e.gateTop - WYRMWATCH_TOP_ABOVE_WATER).toBeGreaterThan(2 * PLAYER_H);
+    // the house: its floor at the quays height, a room more than twice a player tall to
+    // the wall plate, a door a player walks through with a yard to spare over the head
+    expect(e.house.floor).toBe(HARBOR_HOUSE_FLOOR_ABOVE_WATER);
+    expect(e.house.wallTop).toBe(HARBOR_HOUSE.wallTop);
+    expect(e.house.ridge).toBe(HARBOR_HOUSE.ridge);
+    expect(e.house.door).toEqual([HARBOR_HOUSE.door.width, HARBOR_HOUSE.door.height]);
+    expect(e.house.wallTop).toBeGreaterThan(2 * PLAYER_H);
+    expect(e.house.door[1]).toBeGreaterThan(PLAYER_H + 1);
   });
 
   it('sits on the waterline at its origin, its piles running down into the sea bed', () => {
     const scene = doc.getRoot().listScenes()[0];
     expect(scene.listChildren()[0].getTranslation()).toEqual([0, 0, 0]);
     const { min, max } = getBounds(scene);
-    // the piles reach below the waterline, the gate's crest stands over the cliff top
+    // the piles reach below the waterline; the tallest thing is the house's pennant over its
+    // ridge (the chimney pots just under it), higher than the gate's crest over the cliff top
     expect(min[1]).toBeLessThan(-1.5);
     expect(min[1]).toBeGreaterThan(-4);
-    expect(max[1]).toBeGreaterThan(WYRMWATCH_TOP_ABOVE_WATER + 6);
-    expect(max[1]).toBeLessThan(WYRMWATCH_TOP_ABOVE_WATER + 8);
+    expect(max[1]).toBeGreaterThan(HARBOR_HOUSE_FLOOR_ABOVE_WATER + HARBOR_HOUSE.ridge + 1.5);
+    expect(max[1]).toBeLessThan(HARBOR_HOUSE_FLOOR_ABOVE_WATER + HARBOR_HOUSE.ridge + 3);
     // no timetable, clock or ship state is modelled: no node names one
     for (const n of doc.getRoot().listNodes()) {
       expect(n.getName(), n.getName()).not.toMatch(/timer|clock|schedule|status|depart/i);

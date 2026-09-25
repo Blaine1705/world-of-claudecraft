@@ -1169,7 +1169,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/wildheart_ritual_pyramid.glb": "/media/models/props/wildheart_ritual_pyramid.5ce35a978eb9.glb",
   "models/props/wildheart_rope_bridge.glb": "/media/models/props/wildheart_rope_bridge.7ba7be6452c8.glb",
   "models/props/willow_tree.glb": "/media/models/props/willow_tree.f47e0c46f5cc.glb",
-  "models/props/wyrmwatch_harbor.glb": "/media/models/props/wyrmwatch_harbor.49c07a45cff5.glb",
+  "models/props/wyrmwatch_harbor.glb": "/media/models/props/wyrmwatch_harbor.cf8f016ea98e.glb",
   "models/props/yumi_brazier_stand.glb": "/media/models/props/yumi_brazier_stand.d40737b062f8.glb",
   "models/props/yumi_torch_handle.glb": "/media/models/props/yumi_torch_handle.d03d6671b55a.glb",
   "models/quest/bastion_ward_stone.glb": "/media/models/quest/bastion_ward_stone.4364f96ba4ca.glb",
