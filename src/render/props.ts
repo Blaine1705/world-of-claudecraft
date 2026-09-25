@@ -75,7 +75,12 @@ import {
   transportShipPrewarmParts,
 } from './transport_ship';
 import { applySurfaceDetail, type WornFamilyPick, wornFamilyFor } from './worn_stone';
-import { buildWyrmwatchHarbor, wyrmwatchHarborPrewarmParts } from './wyrmwatch_harbor';
+import {
+  buildWyrmwatchHarbor,
+  wyrmwatchHarborHouseLights,
+  wyrmwatchHarborPrewarmParts,
+} from './wyrmwatch_harbor';
+import { harborHouseShellMeshes, updateHarborHouseShell } from './wyrmwatch_harbor_house';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -1681,8 +1686,18 @@ export function buildProps(
   if (builtInWorld) group.add(buildFerryPiers(seed)); // their piers (render/ferry_piers.ts)
   // ...and the route marker at every berth (render/harbor_route_markers.ts)
   if (builtInWorld) group.add(buildHarborRouteMarkers(seed));
-  // ...and the Wyrmwatch cliff harbor at the Drakelands berth (render/wyrmwatch_harbor.ts)
-  if (builtInWorld) group.add(buildWyrmwatchHarbor(seed));
+  // ...and the Wyrmwatch cliff harbor at the Drakelands berth (render/wyrmwatch_harbor.ts),
+  // its Harbormaster's House walls and roof kept out of the merge (they fade one by one for
+  // the camera, render/wyrmwatch_harbor_house.ts) and its hearth and lanterns lit like a
+  // campfire (root-level, world-positioned, in the fire-light budget)
+  if (builtInWorld) {
+    group.add(buildWyrmwatchHarbor(seed));
+    for (const m of harborHouseShellMeshes()) keepFromMerge.add(m);
+    for (const light of wyrmwatchHarborHouseLights()) {
+      group.add(light);
+      fireLights.push(light);
+    }
+  }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
   activeContent.props.stalls.forEach((s, i) => {
@@ -2602,6 +2617,7 @@ export function buildProps(
       for (let i = 0; i < transportShips.length; i++) {
         transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
       }
+      updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion);
       // Band fog cull (prop_cull_core): a band's first reveal on a walking
       // approach holds until the gate has linked its programs, and an arrival
       // among the bands holds too, with its compiles submitted at the imminent

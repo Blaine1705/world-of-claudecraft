@@ -5,31 +5,49 @@ import type * as THREE from 'three';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
+import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
   buildWyrmwatchHarbor,
+  wyrmwatchHarborHouseLights,
   wyrmwatchHarborInternalsForTest,
   wyrmwatchHarborPrewarmParts,
 } from '../src/render/wyrmwatch_harbor';
 import { wyrmwatchPathStones } from '../src/render/wyrmwatch_harbor_core';
 import {
+  HARBOR_HOUSE_LIGHTS,
+  harborHouseInternalsForTest,
+  harborHouseShellMeshes,
+  updateHarborHouseShell,
+} from '../src/render/wyrmwatch_harbor_house';
+import { HOUSE_EYE_OVER_FEET, HOUSE_SHELL_PARTS } from '../src/render/wyrmwatch_harbor_house_core';
+import {
   WYRMWATCH_HARBOR_ORIGIN,
   WYRMWATCH_HARBOR_PATH,
   WYRMWATCH_HARBOR_PATH_HALF_WIDTH,
 } from '../src/sim/content/wyrmwatch_harbor';
+import {
+  HARBOR_HOUSE,
+  HARBOR_HOUSE_FLOOR_ABOVE_WATER,
+  HARBOR_HOUSE_INTERIOR,
+  HARBOR_HOUSE_LANTERNS,
+} from '../src/sim/content/wyrmwatch_harbor_house';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The Wyrmwatch cliff harbor painter (src/render/wyrmwatch_harbor.ts) over the shipped GLB:
 // the model placed on the waterline at the harbor origin, what each graphics tier really
-// draws (the walkable structure, solids and every lantern on all of them), the path laid
-// from the three flagstones on every tier, and the prewarm parts the props warm-up links.
+// draws (the walkable structure, solids, the Harbormaster's House and every lantern on all
+// of them), the path laid from the three flagstones on every tier, the prewarm parts the
+// props warm-up links, and the house's shell cutaway and firelight
+// (src/render/wyrmwatch_harbor_house.ts).
 
 const internals = wyrmwatchHarborInternalsForTest;
 const GLB = path.join(__dirname, '..', 'public', internals.assetUrl.replace(/^\//, ''));
 /** Triangles per part (tests/wyrmwatch_harbor_asset.test.ts pins the same). */
-const LOW = 2688 + 1272 + 804 + 1844 + 968 + 1832 + 1172 + 900;
-const MEDIUM = LOW + 2724;
-const HIGH = MEDIUM + 1740;
+const HOUSE = 1956 + 3288 + 2316 + 1948 + 2212 + 2398 + 3052;
+const LOW = 2052 + 1272 + 804 + 1728 + 968 + 1832 + 756 + HOUSE;
+const MEDIUM = LOW + 2236;
+const HIGH = MEDIUM + 1364 + 840;
 const STONE_TRIS = [44, 38, 50];
 
 let gltf: GLTF;
@@ -104,8 +122,12 @@ describe('wyrmwatch harbor painter', () => {
       const model = harbor.getObjectByName('wyrmwatchHarborModel');
       if (!model) throw new Error('no model');
       expect(triangles(model), tier).toBe(want);
-      // the lanterns are landmarks: they glow on every tier
-      expect(glowing(model), tier).toBe(1);
+      // the lanterns are landmarks: they glow on every tier (the harbor's glow, and the
+      // house walls' own fading clones of it: every wall has a lit window)
+      expect(glowing(model), tier).toBe(5);
+      // the house's walls and roof stand on every tier, each its own mesh set
+      const shell = new Set(harborHouseShellMeshes().map((m) => m.name));
+      expect([...shell].sort(), tier).toEqual([...HOUSE_SHELL_PARTS].sort());
     }
   });
 
@@ -138,5 +160,109 @@ describe('wyrmwatch harbor painter', () => {
     });
     const warmed = new Set(wyrmwatchHarborPrewarmParts().map((p) => p.material));
     for (const m of drawn) expect(warmed.has(m)).toBe(true);
+  });
+
+  it('draws the house walls and roof with their own materials, never the shared ones', () => {
+    withTier('high');
+    const harbor = buildWyrmwatchHarbor(WORLD_SEED);
+    const shell = new Set<THREE.Material>(
+      harborHouseShellMeshes().map((m) => m.material as THREE.Material),
+    );
+    const shellNames = new Set<string>(HOUSE_SHELL_PARTS);
+    harbor.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh || shellNames.has(mesh.name)) return;
+      expect(shell.has(mesh.material as THREE.Material)).toBe(false);
+    });
+    // one set of materials per part: fading one part never touches another
+    const byPart = new Map<string, Set<THREE.Material>>();
+    for (const m of harborHouseShellMeshes()) {
+      const set = byPart.get(m.name) ?? new Set<THREE.Material>();
+      set.add(m.material as THREE.Material);
+      byPart.set(m.name, set);
+    }
+    const all = [...byPart.values()].flatMap((set) => [...set]);
+    expect(new Set(all).size).toBe(all.length);
+  });
+
+  it('cuts away the wall behind the camera indoors, keeping its shadow, and eases it back', () => {
+    withTier('high');
+    buildWyrmwatchHarbor(WORLD_SEED);
+    const floor = WATER_LEVEL + HARBOR_HOUSE_FLOOR_ABOVE_WATER;
+    const ex = (HARBOR_HOUSE_INTERIOR.x0 + HARBOR_HOUSE_INTERIOR.x1) / 2;
+    const ez = (HARBOR_HOUSE_INTERIOR.z0 + HARBOR_HOUSE_INTERIOR.z1) / 2;
+    const ey = floor + HOUSE_EYE_OVER_FEET;
+    // indoors, looking north at the map: the camera stands out past the door wall
+    updateHarborHouseShell(ex, ey + 3, ez + 11, ex, ey, ez, 1 / 60);
+    const records = harborHouseInternalsForTest.shell();
+    const part = (name: string) => {
+      const r = records.find((x) => x.part === name);
+      if (!r) throw new Error(name);
+      return r;
+    };
+    const south = part('HouseWallSouth');
+    expect(south.alpha).toBe(0);
+    for (const m of south.meshes) {
+      const mat = m.material as THREE.Material;
+      expect(mat.transparent).toBe(true);
+      expect(mat.opacity).toBe(0);
+      // the room behind it shows, and the room stays in its shade
+      expect(mat.depthWrite).toBe(false);
+      expect(m.visible).toBe(true);
+      expect(m.castShadow).toBe(true);
+    }
+    for (const name of ['HouseWallNorth', 'HouseWallEast', 'HouseWallWest']) {
+      expect(part(name).alpha, name).toBe(1);
+      for (const m of part(name).meshes) {
+        expect((m.material as THREE.Material).transparent, name).toBe(false);
+      }
+    }
+    // the camera comes back into the room: the wall eases back to its authored state
+    for (let i = 0; i < 240; i++) updateHarborHouseShell(ex, ey + 0.5, ez + 2, ex, ey, ez, 1 / 60);
+    expect(south.alpha).toBe(1);
+    for (const m of south.meshes) {
+      const mat = m.material as THREE.Material;
+      expect(mat.transparent).toBe(false);
+      expect(mat.opacity).toBe(1);
+      expect(mat.depthWrite).toBe(true);
+    }
+  });
+
+  it('ghosts the whole shell for a player outside it hides, and only then', () => {
+    withTier('high');
+    buildWyrmwatchHarbor(WORLD_SEED);
+    const floor = WATER_LEVEL + HARBOR_HOUSE_FLOOR_ABOVE_WATER;
+    // on the yard, the camera out over the house to the north
+    const ex = HARBOR_HOUSE.door.x + 1;
+    const ez = HARBOR_HOUSE.z + HARBOR_HOUSE.hd + 2.5;
+    const ey = floor + HOUSE_EYE_OVER_FEET;
+    updateHarborHouseShell(ex, ey + 3.5, ez - 13.5, ex, ey, ez, 1 / 60);
+    for (const r of harborHouseInternalsForTest.shell()) {
+      expect(r.alpha, r.part).toBe(OCCLUDER_FADE_ALPHA);
+      for (const m of r.meshes) {
+        expect((m.material as THREE.Material).depthWrite, r.part).toBe(true);
+      }
+    }
+    // looking at the house from the yard: nothing fades
+    buildWyrmwatchHarbor(WORLD_SEED);
+    updateHarborHouseShell(ex, ey + 3.5, ez + 12, ex, ey, ez, 1 / 60);
+    for (const r of harborHouseInternalsForTest.shell()) expect(r.alpha, r.part).toBe(1);
+  });
+
+  it('lights the hearth and the lit lanterns inside the room, for the fire-light budget', () => {
+    withTier('high');
+    buildWyrmwatchHarbor(WORLD_SEED);
+    const lights = wyrmwatchHarborHouseLights();
+    expect(lights).toHaveLength(1 + HARBOR_HOUSE_LANTERNS.filter((l) => l.lit).length);
+    expect(lights[0].intensity).toBe(HARBOR_HOUSE_LIGHTS.hearth.intensity);
+    const i = HARBOR_HOUSE_INTERIOR;
+    for (const l of lights) {
+      expect(l.isPointLight).toBe(true);
+      expect(l.castShadow).toBe(false);
+      expect(l.position.x).toBeGreaterThan(i.x0);
+      expect(l.position.x).toBeLessThan(i.x1);
+      expect(l.position.z).toBeGreaterThan(i.z0);
+      expect(l.position.z).toBeLessThan(i.z1);
+    }
   });
 });

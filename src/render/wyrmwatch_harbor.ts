@@ -5,8 +5,10 @@
 // seated on the terrain (the terrain drawn IS the sim's terrainHeight).
 //
 // Which parts a graphics tier keeps is the pure core's call (wyrmwatch_harbor_core.ts):
-// the walkable structure, rails, gate, shack, cargo, lanterns and the path on every tier;
-// the iron trim from medium, the loose dressing from high. The tier is the static effects
+// the walkable structure, rails, gate, cargo, lanterns, the Harbormaster's House and the
+// path on every tier; the iron trim from medium, the loose dressing from high. The house's
+// four walls and roof are kept apart from the merge (wyrmwatch_harbor_house.ts fades them
+// for the camera); the rest of it merges with the harbor. The tier is the static effects
 // tier (GFX.effectsTier), never the frame-rate governor, and a graphics-profile change
 // rebuilds the props (the resetter below, registered in assets/graphics_profile.ts).
 //
@@ -24,6 +26,10 @@ import {
   WYRMWATCH_HARBOR_PATH,
   WYRMWATCH_HARBOR_PATH_HALF_WIDTH,
 } from '../sim/content/wyrmwatch_harbor';
+import {
+  HARBOR_HOUSE,
+  HARBOR_HOUSE_FLOOR_ABOVE_WATER,
+} from '../sim/content/wyrmwatch_harbor_house';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
@@ -40,6 +46,14 @@ import {
   wyrmwatchHarborParts,
   wyrmwatchPathStones,
 } from './wyrmwatch_harbor_core';
+import {
+  buildHarborHouseLights,
+  buildHarborHouseShell,
+  clearHarborHouseShell,
+  harborHouseShellParts,
+  setHarborHouseAnchor,
+} from './wyrmwatch_harbor_house';
+import { HOUSE_SHELL_PARTS, type HouseShellPart } from './wyrmwatch_harbor_house_core';
 
 const HARBOR_URL = '/models/props/wyrmwatch_harbor.glb';
 
@@ -68,6 +82,8 @@ type HarborPart = VertexColourPart;
 interface HarborTemplate {
   /** The kept parts merged into one geometry per material, in the model's frame. */
   parts: HarborPart[];
+  /** The house's shell parts, each merged per material on its own, in the model's frame. */
+  shell: Map<HouseShellPart, HarborPart[]>;
   /** The three flagstones, each in its own frame (origin at its centre). */
   stones: HarborPart[];
 }
@@ -83,6 +99,7 @@ export function resetWyrmwatchHarborCaches(): void {
   templates.clear();
   materials.clear();
   lastParts = [];
+  clearHarborHouseShell();
 }
 
 function buildTemplate(gltf: GLTF, keep: readonly string[]): HarborTemplate {
@@ -91,20 +108,29 @@ function buildTemplate(gltf: GLTF, keep: readonly string[]): HarborTemplate {
   root.updateMatrixWorld(true);
   const inverse = root.matrixWorld.clone().invert();
   const buckets = new Map<THREE.Material, THREE.BufferGeometry[]>();
+  const shellBuckets = new Map<HouseShellPart, Map<THREE.Material, THREE.BufferGeometry[]>>();
+  const shellNames = new Set<string>(HOUSE_SHELL_PARTS);
   for (const name of keep) {
     const part = root.getObjectByName(name);
     if (!part) continue;
+    let into = buckets;
+    if (shellNames.has(name)) {
+      into = new Map();
+      shellBuckets.set(name as HouseShellPart, into);
+    }
     part.traverse((node) => {
       const mesh = node as THREE.Mesh;
       if (!mesh.isMesh) return;
       const frame = new THREE.Matrix4().multiplyMatrices(inverse, mesh.matrixWorld);
       addToBucket(
-        buckets,
+        into,
         materials.convert(mesh.material as THREE.Material),
         vertexColourMeshGeometry(mesh, frame),
       );
     });
   }
+  const shell = new Map<HouseShellPart, HarborPart[]>();
+  for (const [name, b] of shellBuckets) shell.set(name, mergeVertexColourBuckets(b));
   // the flagstones keep their own frame (the path places each one)
   const stones: HarborPart[] = [];
   for (const name of WYRMWATCH_PATH_STONE_PARTS) {
@@ -126,7 +152,7 @@ function buildTemplate(gltf: GLTF, keep: readonly string[]): HarborTemplate {
     const merged = mergeVertexColourBuckets(stoneBuckets);
     if (merged.length === 1) stones.push(merged[0]);
   }
-  return { parts: mergeVertexColourBuckets(buckets), stones };
+  return { parts: mergeVertexColourBuckets(buckets), shell, stones };
 }
 
 function templateFor(): HarborTemplate {
@@ -137,7 +163,7 @@ function templateFor(): HarborTemplate {
     template = buildTemplate(loaded, wyrmwatchHarborParts(GFX.effectsTier));
     templates.set(key, template);
   }
-  lastParts = [...template.parts, ...template.stones];
+  lastParts = [...template.parts, ...[...template.shell.values()].flat(), ...template.stones];
   return template;
 }
 
@@ -203,11 +229,23 @@ export function buildWyrmwatchHarbor(seed: number): THREE.Group {
     mesh.receiveShadow = true;
     model.add(mesh);
   }
+  // the house's walls and roof, each its own fading part (wyrmwatch_harbor_house.ts), whose
+  // cloned materials join the prewarm list in place of the shared ones
+  model.add(buildHarborHouseShell(template.shell));
+  setHarborHouseAnchor(HARBOR_HOUSE.x, HARBOR_HOUSE.z);
+  lastParts = [...template.parts, ...harborHouseShellParts(), ...template.stones];
   model.position.set(WYRMWATCH_HARBOR_ORIGIN.x, WATER_LEVEL, WYRMWATCH_HARBOR_ORIGIN.z);
   model.userData.assetUrl = HARBOR_URL;
   group.add(model);
   group.add(buildWyrmwatchHarborPath(template, seed));
   return group;
+}
+
+/** The house's firelight (the hearth and two lanterns), world-positioned (props.ts adds
+ *  them to the props root and the fire-light budget, like a campfire's). Empty until the
+ *  harbor model is loaded. */
+export function wyrmwatchHarborHouseLights(): THREE.PointLight[] {
+  return loaded ? buildHarborHouseLights(WATER_LEVEL + HARBOR_HOUSE_FLOOR_ABOVE_WATER) : [];
 }
 
 /** The harbor's distinct (geometry, material) programs at the live tier, for the props
