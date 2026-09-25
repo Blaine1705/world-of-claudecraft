@@ -61,6 +61,7 @@ import { AfflictionFamiliar } from './affliction_familiar';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
+import { buildAoeRingMesh } from './aoe_ring_mesh';
 import { arrivalCoverActive, noteArrivalIfTeleported } from './arrival_cover';
 import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
@@ -2887,17 +2888,9 @@ export class Renderer {
     );
     setRenderCategory(this.groundAimReticle.group, 'ui3d');
     for (let i = 0; i < CLICK_MARKER_POOL; i++) {
-      const mat = new THREE.MeshBasicMaterial({
-        transparent: true,
-        depthWrite: false,
-        depthTest: false,
-      });
-      const ring = new THREE.Mesh(aoeRingGeo, mat);
-      ring.visible = false;
-      ring.renderOrder = 3; // over terrain decals, like the click marker
-      setRenderCategory(ring, 'ui3d');
+      const ring = buildAoeRingMesh(aoeRingGeo);
       this.scene.add(ring);
-      this.aoeRings.push({ ring, mat, radius: 1, elapsed: AOE_RING_LIFETIME });
+      this.aoeRings.push({ ring, mat: ring.material, radius: 1, elapsed: AOE_RING_LIFETIME });
     }
 
     // particle system: projectiles, impacts, heal glows, ambience
@@ -6449,8 +6442,8 @@ export class Renderer {
         // textures for the walk (no frame draws it, so it links nothing:
         // measured 2026-08-28). Dropped by the 3 s budget on the OpenGL
         // desktops: the programs resume as debt right after the compile
-        // remainder, engine family first, the textures stay cosmetic, and the
-        // painter draws no cast until the engine is linked. resumeUnits never
+        // remainder, engine then kit first, the textures stay cosmetic, and the
+        // painter draws no cast until those two are linked. resumeUnits never
         // replays the spawn: live, it would pop a white burst at the player's feet.
         id: 'vfx.ability-primitives',
         category: 'vfx',

@@ -691,7 +691,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the cast gate's engine family: the renderer leaf drops the lazy stand-ins from the gate. No capture was retaken.
   // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
-  'ef14bdd610a41e41f07cc68fb99e9a6c79ce657a1c913f523409f5be4d6a0d82';
+  // Re-minted for the AoE ring slot builder: the renderer leaf moves the ring material to aoe_ring_mesh.ts and names the kit in the gate comment. No capture was retaken.
+  '9f7408948e723dd0993e12f566dc864b495dd8ef3598f72d4c34cecccd964c3b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

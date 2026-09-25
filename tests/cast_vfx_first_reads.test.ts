@@ -19,6 +19,7 @@ vi.mock('../src/render/assets/preload', () => ({
 }));
 
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
+import { buildAoeRingMesh } from '../src/render/aoe_ring_mesh';
 import {
   CAST_VFX_FIRST_READS_ENTRY_ID,
   castVfxFirstReadsEntry,
@@ -67,14 +68,9 @@ function program(): LinkedProgramLike {
   return { getUniforms: () => ({}), getAttributes: () => ({}) } as unknown as LinkedProgramLike;
 }
 
-/** The area ring as the renderer builds each pooled slot. */
+/** The area ring, from the builder the renderer's pooled slots use. */
 function aoeRing(): THREE.Mesh {
-  const ring = new THREE.Mesh(
-    new THREE.RingGeometry(0.88, 1.0, 64),
-    new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, depthTest: false }),
-  );
-  ring.visible = false;
-  return ring;
+  return buildAoeRingMesh(new THREE.RingGeometry(0.88, 1.0, 64));
 }
 
 /** The renderer's cast scene: the real Vfx cloud, the real engine and a
@@ -214,5 +210,12 @@ describe('the renderer wiring (source pin)', () => {
     expect(between).toContain('this.compileArms,');
     expect(between).toContain('this.webgl,');
     expect(renderer.indexOf('activeKitPrewarmEntry(this.scene')).toBeLessThan(at);
+  });
+
+  it('builds every ring slot with the shared builder the fixture uses', () => {
+    expect(renderer).toContain('const ring = buildAoeRingMesh(aoeRingGeo);');
+    expect(renderer).toContain(
+      'this.aoeRings.push({ ring, mat: ring.material, radius: 1, elapsed: AOE_RING_LIFETIME });',
+    );
   });
 });

@@ -1385,7 +1385,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the cast gate's engine family: the renderer leaf drops the lazy stand-ins from the gate. No capture was retaken.
   // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
-  '9d9fd2be877dd51f80528b68999927dfc10580bf885700d5c5c140672b6b3b26';
+  // Re-minted for the AoE ring slot builder: the renderer leaf moves the ring material to aoe_ring_mesh.ts and names the kit in the gate comment. No capture was retaken.
+  '8743f7daa7414771cc4b27152e088b243b9cd7d49f72f6a3a849945e8ea23189';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1399,7 +1400,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the cast gate's engine family: the renderer leaf drops the lazy stand-ins from the gate. No capture was retaken.
   // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
-  'ef14bdd610a41e41f07cc68fb99e9a6c79ce657a1c913f523409f5be4d6a0d82';
+  // Re-minted for the AoE ring slot builder: the renderer leaf moves the ring material to aoe_ring_mesh.ts and names the kit in the gate comment. No capture was retaken.
+  '9f7408948e723dd0993e12f566dc864b495dd8ef3598f72d4c34cecccd964c3b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2780,7 +2782,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // cast first-reads boot entry: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('b629a92159367e619a6735acdc94e6ca857a31a916ca31415661f7d4411c3fb2');
+      // AoE ring slot builder: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+    ).toBe('3d40e5e122ed51a1b2a2ebf0c9e3eb786ed308fed1977c0f3a6445029fc46415');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
