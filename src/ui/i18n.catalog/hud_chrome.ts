@@ -1989,6 +1989,9 @@ export const hudChromeStrings = {
     // Running client version + build id, shown as small secondary text at the foot
     // of the settings menu so players can confirm their build without closing it.
     version: 'v{version} ({build})',
+    // The Game Menu row (and its sub-view title) that holds the three on-screen
+    // overlay panels: Auras, Cooldown Manager and Performance Overlay.
+    overlays: 'Overlays',
     // Adaptive browser-effects tier control (Graphics panel). Auto detects the
     // browser engine/version + device; the rest pin the CSS-effects tier.
     browserEffects: 'Browser Effects',
@@ -2654,6 +2657,7 @@ export const hudChromeStrings = {
     groupSingle: 'Single Button {index}',
     groupGrid: 'Button Group {index}',
     groupLine: 'Line of Spells {index}',
+    groupName: 'Group Name',
     spellCount: '{count} / {max} spells',
     orientation: 'Orientation',
     horizontal: 'Horizontal',

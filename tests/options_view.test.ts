@@ -14,6 +14,7 @@ import {
   buildGraphicsSections,
   buildInterfaceControls,
   buildOptionsMenu,
+  buildOverlaysMenu,
   copyGraphicsDraft,
   flattenGraphicsSections,
   graphicsDraftDirty,
@@ -25,6 +26,7 @@ import {
   type OptionsEnv,
   type OptionsSettingsSource,
   optionsControlKeys,
+  optionsParentView,
   sliderDispatchValue,
   toggleIsOn,
   toggleNextValue,
@@ -1260,10 +1262,8 @@ describe('options_view: main menu routing', () => {
       'hudChrome.controller.title',
       'hud.options.graphics',
       'hud.options.interface',
-      'hudChrome.auraOverlay.title',
-      'hudChrome.cooldownManager.title',
+      'hudChrome.options.overlays',
       'hud.options.audio',
-      'hudChrome.perf.title',
       'hudChrome.fullTransfer.menu',
       'nav.wiki',
       'hudChrome.unstuck.menuButton',
@@ -1277,15 +1277,14 @@ describe('options_view: main menu routing', () => {
     const interfaceRows = offline.filter((e) => e.labelKey === 'hud.options.interface');
     expect(interfaceRows).toHaveLength(1);
     expect(interfaceRows[0].action).toEqual({ kind: 'goto', view: 'interface' });
-    expect(offline.find((e) => e.labelKey === 'hudChrome.auraOverlay.title')?.action).toEqual({
+    // The three on-screen overlay panels sit one level down, behind one row.
+    expect(offline.find((e) => e.labelKey === 'hudChrome.options.overlays')?.action).toEqual({
       kind: 'goto',
-      view: 'auras',
+      view: 'overlays',
     });
-    // Cooldown Manager sits directly below Auras, its sibling overlay panel.
-    expect(offline.find((e) => e.labelKey === 'hudChrome.cooldownManager.title')?.action).toEqual({
-      kind: 'goto',
-      view: 'cooldowns',
-    });
+    for (const view of ['auras', 'cooldowns', 'performance']) {
+      expect(offline.some((e) => e.action.kind === 'goto' && e.action.view === view)).toBe(false);
+    }
     // The Wiki row is unconditional (offline play has a wiki too) and routes to
     // the confirm-first external hop, never a sub-view.
     const wikiRows = offline.filter((e) => e.labelKey === 'nav.wiki');
@@ -1296,6 +1295,24 @@ describe('options_view: main menu routing', () => {
       kind: 'goto',
       view: 'transfer',
     });
+  });
+
+  it('the Overlays list routes to Auras, Cooldown Manager and Performance, in that order', () => {
+    expect(buildOverlaysMenu()).toEqual([
+      { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
+      { labelKey: 'hudChrome.cooldownManager.title', action: { kind: 'goto', view: 'cooldowns' } },
+      { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
+    ]);
+  });
+
+  it('Back from an overlay panel lands on Overlays; from anything else, the Game Menu', () => {
+    for (const view of ['auras', 'cooldowns', 'performance'] as const) {
+      expect(optionsParentView(view)).toBe('overlays');
+    }
+    for (const view of ['overlays', 'interface', 'graphics', 'keybinds', 'transfer'] as const) {
+      expect(optionsParentView(view)).toBe('main');
+    }
+    expect(optionsParentView('main')).toBe('main');
   });
 
   it('leads with Unlock Interface, relabelled Lock Interface while the frames are loose', () => {

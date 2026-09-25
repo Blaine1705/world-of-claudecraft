@@ -445,6 +445,7 @@ export type OptionsPanelId =
   | 'controller'
   | 'graphics'
   | 'interface'
+  | 'overlays'
   | 'auras'
   | 'cooldowns'
   | 'audio'
@@ -498,10 +499,10 @@ export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
     { labelKey: 'hudChrome.controller.title', action: { kind: 'goto', view: 'controller' } },
     { labelKey: 'hud.options.graphics', action: { kind: 'goto', view: 'graphics' } },
     { labelKey: 'hud.options.interface', action: { kind: 'goto', view: 'interface' } },
-    { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
-    { labelKey: 'hudChrome.cooldownManager.title', action: { kind: 'goto', view: 'cooldowns' } },
+    // Auras, Cooldown Manager and Performance Overlay share one row: each is a
+    // floating on-screen overlay, so they sit together one level down.
+    { labelKey: 'hudChrome.options.overlays', action: { kind: 'goto', view: 'overlays' } },
     { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
-    { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
     // Full settings export/import: its own sub-panel, since the code it carries
     // spans every family (the Interface tab's rows carry only their own).
     { labelKey: 'hudChrome.fullTransfer.menu', action: { kind: 'goto', view: 'transfer' } },
@@ -518,6 +519,30 @@ export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
   entries.push({ labelKey: 'hud.options.logout', action: { kind: 'logout' } });
   entries.push({ labelKey: 'hud.options.returnToGame', action: { kind: 'close' } });
   return entries;
+}
+
+/** The sub-views the Overlays row opens onto, in menu order. */
+export const OVERLAY_PANEL_IDS = ['auras', 'cooldowns', 'performance'] as const;
+export type OverlayPanelId = (typeof OVERLAY_PANEL_IDS)[number];
+
+const OVERLAY_LABEL_KEYS: Readonly<Record<OverlayPanelId, TranslationKey>> = {
+  auras: 'hudChrome.auraOverlay.title',
+  cooldowns: 'hudChrome.cooldownManager.title',
+  performance: 'hudChrome.perf.title',
+};
+
+/** The Overlays sub-view's button list: one routing row per overlay panel. */
+export function buildOverlaysMenu(): OptionsMenuEntry[] {
+  return OVERLAY_PANEL_IDS.map((view) => ({
+    labelKey: OVERLAY_LABEL_KEYS[view],
+    action: { kind: 'goto', view },
+  }));
+}
+
+/** Where a sub-view's Back control lands: an overlay panel returns to the
+ *  Overlays list it was opened from, everything else to the Game Menu root. */
+export function optionsParentView(view: 'main' | OptionsPanelId): 'main' | 'overlays' {
+  return (OVERLAY_PANEL_IDS as readonly string[]).includes(view) ? 'overlays' : 'main';
 }
 
 // ---------------------------------------------------------------------------

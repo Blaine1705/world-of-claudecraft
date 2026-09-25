@@ -3,6 +3,7 @@ import { AURA_CUE_NONE, AURA_CUES } from '../src/game/aura_cue_catalog';
 import {
   assignCooldownSpell,
   COOLDOWN_GRID_MAX_SIDE,
+  COOLDOWN_GROUP_NAME_MAX,
   COOLDOWN_LINE_MAX,
   COOLDOWN_MAX_GROUPS,
   type CooldownGroup,
@@ -16,6 +17,7 @@ import {
   newCooldownGroup,
   patchCooldownGroup,
   sanitizeCooldownGroup,
+  sanitizeCooldownGroupName,
   sanitizeCooldownGroups,
   sanitizeCooldownManagerLayout,
   sanitizeCooldownSpellConfig,
@@ -135,6 +137,16 @@ describe('cooldown manager groups: sanitizing a save', () => {
       visibility: 'always',
       showTimer: true,
     });
+  });
+
+  it('keeps a custom group name, cleaned and capped, and treats junk as no name', () => {
+    const named = (name: unknown) => sanitizeCooldownGroup({ id: 'g1', kind: 'line', name })?.name;
+    expect(named('  Burst   Window ')).toBe('Burst Window');
+    expect(named('Tab\there\nnewline')).toBe('Tab here newline');
+    expect(named('x'.repeat(COOLDOWN_GROUP_NAME_MAX + 10))).toHaveLength(COOLDOWN_GROUP_NAME_MAX);
+    expect(named(42)).toBe('');
+    expect(named(undefined)).toBe('');
+    expect(sanitizeCooldownGroupName('   ')).toBe('');
   });
 
   it('grows a grid to hold its spells rather than dropping one', () => {

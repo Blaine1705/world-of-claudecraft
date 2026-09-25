@@ -408,6 +408,36 @@ describe('CooldownManagerSettingsPanel', () => {
     expect(hooks.groups()[0].spells).toEqual([]);
   });
 
+  it('renames a group from its card, and an empty name restores the numbered default', () => {
+    const { root, hooks, settings } = panel();
+    const id = hooks.addGroup('grid') as string;
+    settings.render(root);
+    const nameBox = () => root.querySelector<HTMLInputElement>(`[data-focus-key="cdm-name:${id}"]`);
+    const title = () => root.querySelector('.cdm-group-card .perf-card-title')?.textContent;
+    expect(nameBox()?.value).toBe('');
+    expect(nameBox()?.placeholder).toBe(title());
+    const defaultName = title();
+    const box = nameBox();
+    if (!box) throw new Error('no name box');
+    box.value = '  Burst  ';
+    box.dispatchEvent(new Event('change'));
+    expect(hooks.groups()[0].name).toBe('Burst');
+    // The card title and the Tracked Spells section follow the new name.
+    expect(title()).toBe('Burst');
+    expect(
+      root.querySelector(`.cdm-spell-section[data-group="${id}"] .cdm-spell-section-title`)
+        ?.textContent,
+    ).toContain('Burst');
+    // The rebuild puts focus back in the (new) name box.
+    expect(document.activeElement).toBe(nameBox());
+    const again = nameBox();
+    if (!again) throw new Error('no name box');
+    again.value = '';
+    again.dispatchEvent(new Event('change'));
+    expect(hooks.groups()[0].name).toBe('');
+    expect(title()).toBe(defaultName);
+  });
+
   it('filters every section by spell name as the player types, without a rebuild', () => {
     const { root, hooks, settings } = panel();
     hooks.assign('rake', hooks.addGroup('line'));

@@ -190,8 +190,12 @@ describe('options_window: aura menu routing', () => {
   it('routes the Auras and Cooldown Manager views to their panels and placement previews', () => {
     // Both overlay sub-panels live in options_overlay_panels.ts; the window
     // routes both views there and syncs both previews on every render.
+    expect(painter).toContain("case 'overlays':");
     expect(painter).toContain("case 'auras':");
     expect(painter).toContain("case 'cooldowns':");
+    // Back goes up one level: an overlay panel returns to the Overlays list.
+    expect(painter).toContain('this.view = this.overlayPanels.parentView(this.view);');
+    expect(overlayPanels).toContain('buildOptionsMenuList(buildOverlaysMenu(), {');
     expect(painter).toContain('this.overlayPanels.render(this.view);');
     expect(painter).toContain('this.overlayPanels.sync(this.view);');
     expect(painter).toContain('this.overlayPanels.close();');
@@ -754,16 +758,20 @@ describe('options_window: title-bar back control', () => {
     expect(
       painter.match(/back\.addEventListener\('click', \(\) => this\.goBack\(\)\);/g),
     ).toHaveLength(5);
-    // the click-then-flip-to-main sequence lives ONLY in goBack itself; a stray
+    // the click-then-go-up sequence lives ONLY in goBack itself; a stray
     // inline copy in some handler would push this count past 1
-    expect(painter.match(/audio\.click\(\);\s*this\.view = 'main';/g) ?? []).toHaveLength(1);
+    expect(
+      painter.match(/audio\.click\(\);\s*this\.view = this\.overlayPanels\.parentView/g) ?? [],
+    ).toHaveLength(1);
   });
 
-  it('goBack returns to the root without closing, drops key capture, and moves focus', () => {
+  it('goBack goes up one level without closing, drops key capture, and moves focus', () => {
     const goBack = painter.slice(painter.indexOf('private goBack(): void {'));
     const body = goBack.slice(0, goBack.indexOf('\n  }\n'));
     expect(body).toContain('audio.click();');
-    expect(body).toContain("this.view = 'main';");
+    // One level up (optionsParentView, pinned in options_view.test.ts): an
+    // overlay panel returns to the Overlays list, every other view to the root.
+    expect(body).toContain('this.view = this.overlayPanels.parentView(this.view);');
     expect(body).toContain('this.capturingKey = null;');
     expect(body).toContain("this.keybindNote = '';");
     expect(body).toContain('this.render();');

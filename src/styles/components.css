@@ -16990,6 +16990,12 @@
   .cdm-select {
     min-height: 32px;
   }
+  .cdm-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 220px;
+    min-height: 32px;
+  }
   .cdm-group-actions,
   .cdm-order-row {
     display: flex;
@@ -17061,14 +17067,16 @@
     margin: 0;
     align-self: center;
   }
-  /* Touch: the selects and the search box meet the 40px target floor. */
+  /* Touch: the selects, the name boxes and the search box meet the 40px target floor. */
   @media (pointer: coarse) {
     .cdm-select,
+    .cdm-name,
     .cdm-search {
       min-height: 40px;
     }
   }
   body.mobile-touch .cdm-select,
+  body.mobile-touch .cdm-name,
   body.mobile-touch .cdm-search {
     min-height: 40px;
   }

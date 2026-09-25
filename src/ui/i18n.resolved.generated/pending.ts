@@ -39,6 +39,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -80,7 +81,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "es_ES": [
     "hudChrome.cooldownManager.addGrid",
@@ -112,6 +114,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -153,7 +156,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "fr_FR": [
     "hudChrome.cooldownManager.addGrid",
@@ -185,6 +189,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -226,7 +231,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "fr_CA": [
     "hudChrome.cooldownManager.addGrid",
@@ -258,6 +264,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -299,7 +306,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "en_CA": [],
   "it_IT": [
@@ -332,6 +340,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -373,7 +382,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "de_DE": [
     "hudChrome.cooldownManager.addGrid",
@@ -405,6 +415,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -446,7 +457,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -482,6 +494,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -523,7 +536,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -556,6 +570,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -597,7 +612,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "nl_NL": [
     "hudChrome.cooldownManager.addGrid",
@@ -629,6 +645,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -670,7 +687,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "pl_PL": [
     "hudChrome.cooldownManager.addGrid",
@@ -702,6 +720,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -743,7 +762,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "id_ID": [
     "hudChrome.cooldownManager.addGrid",
@@ -775,6 +795,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -816,7 +837,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "tr_TR": [
     "hudChrome.cooldownManager.addGrid",
@@ -848,6 +870,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -889,7 +912,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "sv_SE": [
     "hudChrome.cooldownManager.addGrid",
@@ -921,6 +945,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -962,7 +987,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "vi_VN": [
     "hudChrome.cooldownManager.addGrid",
@@ -994,6 +1020,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -1035,7 +1062,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ],
   "da_DK": [
     "hudChrome.cooldownManager.addGrid",
@@ -1067,6 +1095,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.groupFullOption",
     "hudChrome.cooldownManager.groupGrid",
     "hudChrome.cooldownManager.groupLine",
+    "hudChrome.cooldownManager.groupName",
     "hudChrome.cooldownManager.groupSingle",
     "hudChrome.cooldownManager.groupsFull",
     "hudChrome.cooldownManager.horizontal",
@@ -1108,6 +1137,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.visCombat",
     "hudChrome.cooldownManager.visHidden",
     "hudChrome.cooldownManager.visHiddenHint",
-    "hudChrome.cooldownManager.visibility"
+    "hudChrome.cooldownManager.visibility",
+    "hudChrome.options.overlays"
   ]
 };

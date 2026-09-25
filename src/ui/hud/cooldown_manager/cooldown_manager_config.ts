@@ -30,6 +30,8 @@ export const COOLDOWN_LINE_MAX = 12;
 /** A grid runs 1 to this many buttons per row, and 1 to this many rows. */
 export const COOLDOWN_GRID_MAX_SIDE = 12;
 export const COOLDOWN_PADDING_MAX = 12;
+/** The longest custom group name, in characters. */
+export const COOLDOWN_GROUP_NAME_MAX = 32;
 
 /** A tracked entry: a snake_case ability id, or an aura token (`aura:<id>`,
  *  `kind:<kind>`, see cooldown_manager_auras.ts). Anything else is junk. */
@@ -43,6 +45,9 @@ export interface CooldownGroup {
   /** Stable id (`g1`, `g2`, ...), unique within the character's groups. */
   id: string;
   kind: CooldownGroupKind;
+  /** The player's name for the group; empty keeps the numbered default
+   *  ("Button Group 2"). */
+  name: string;
   /** The base ability ids, in button order. A spell sits in one group at most. */
   spells: string[];
   /** Group centre, as a fraction of the viewport (0..1 each axis). */
@@ -213,6 +218,18 @@ function oneOf<T extends string>(raw: unknown, values: readonly T[], fallback: T
   return values.find((value) => value === raw) ?? fallback;
 }
 
+/** A custom group name read back: control characters dropped, whitespace
+ *  collapsed and trimmed, capped at COOLDOWN_GROUP_NAME_MAX characters. Anything
+ *  that is not a string is no name (the numbered default). */
+export function sanitizeCooldownGroupName(raw: unknown): string {
+  if (typeof raw !== 'string') return '';
+  const clean = raw
+    .replace(/\p{Cc}/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return Array.from(clean).slice(0, COOLDOWN_GROUP_NAME_MAX).join('').trim();
+}
+
 function record(raw: unknown): Record<string, unknown> {
   return raw && typeof raw === 'object' && !Array.isArray(raw)
     ? (raw as Record<string, unknown>)
@@ -230,6 +247,7 @@ export function newCooldownGroup(
   return {
     id: `g${n}`,
     kind,
+    name: '',
     spells: [],
     posX: 0.5,
     posY: Math.min(0.95, DEFAULT_POS_Y[kind] + step),
@@ -276,6 +294,7 @@ export function sanitizeCooldownGroup(raw: unknown): CooldownGroup | null {
   return {
     id: value.id,
     kind,
+    name: sanitizeCooldownGroupName(value.name),
     spells,
     posX: numberIn(value.posX, 0, 1, base.posX),
     posY: numberIn(value.posY, 0, 1, base.posY),

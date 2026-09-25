@@ -38,6 +38,7 @@ import {
 import {
   COOLDOWN_ALERT_STACKS_MAX,
   COOLDOWN_GRID_MAX_SIDE,
+  COOLDOWN_GROUP_NAME_MAX,
   COOLDOWN_MAX_GROUPS,
   COOLDOWN_OPACITY_MAX,
   COOLDOWN_OPACITY_MIN,
@@ -169,8 +170,15 @@ function entryIcon(id: string, entry: CooldownAuraEntry | undefined): HTMLElemen
   return img;
 }
 
-/** "Button Group 2": numbered within its own kind, in group order. */
+/** The group's player-chosen name, or its numbered default. */
 export function cooldownGroupName(groups: readonly CooldownGroup[], id: string): string {
+  const group = groups.find((entry) => entry.id === id);
+  if (!group) return '';
+  return group.name || cooldownGroupDefaultName(groups, id);
+}
+
+/** "Button Group 2": numbered within its own kind, in group order. */
+export function cooldownGroupDefaultName(groups: readonly CooldownGroup[], id: string): string {
   const group = groups.find((entry) => entry.id === id);
   if (!group) return '';
   let index = 0;
@@ -388,6 +396,36 @@ export class CooldownManagerSettingsPanel {
 
   // ---------------------------------------------------------------- groups
 
+  /** The group's name box. Commits on `change` (Enter or leaving the field), so
+   *  the panel rebuilds once per rename rather than per keystroke; an empty box
+   *  goes back to the numbered default, which is also its placeholder. */
+  private buildNameField(
+    card: HTMLElement,
+    group: CooldownGroup,
+    groups: readonly CooldownGroup[],
+    refresh: (keys?: readonly string[]) => void,
+  ): void {
+    const label = t('hudChrome.cooldownManager.groupName');
+    const focusKey = `cdm-name:${group.id}`;
+    const { row } = settingRow(label);
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'ui-input cdm-name';
+    input.maxLength = COOLDOWN_GROUP_NAME_MAX;
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    input.placeholder = cooldownGroupDefaultName(groups, group.id);
+    input.value = group.name;
+    input.dataset.focusKey = focusKey;
+    input.setAttribute('aria-label', label);
+    input.addEventListener('change', () => {
+      this.host.hooks.patchGroup(group.id, { name: input.value });
+      refresh([focusKey]);
+    });
+    row.appendChild(input);
+    card.appendChild(row);
+  }
+
   /** One group's layout card. Returns the position sliders' setters so a drag on
    *  the live group can move them. */
   private buildGroupCard(
@@ -407,6 +445,7 @@ export class CooldownManagerSettingsPanel {
       hooks.patchGroup(group.id, value);
       if (rebuild) refresh(keys);
     };
+    this.buildNameField(card, group, groups, refresh);
     this.note(
       card,
       t('hudChrome.cooldownManager.spellCount', {
@@ -623,7 +662,7 @@ export class CooldownManagerSettingsPanel {
 
     const search = document.createElement('input');
     search.type = 'search';
-    search.className = 'cdm-search';
+    search.className = 'ui-input cdm-search';
     search.dataset.focusKey = 'cdm-search';
     search.placeholder = t('hudChrome.cooldownManager.searchPlaceholder');
     search.setAttribute('aria-label', t('hudChrome.cooldownManager.search'));

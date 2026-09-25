@@ -434,6 +434,7 @@ export class OptionsWindow {
     cooldowns: () => this.deps.cooldownManager?.(),
     openFocusTrap: (root, returnFocusTo) => this.deps.openFocusTrap(root, returnFocusTo),
     close: () => this.close(),
+    route: (action) => this.routeMenuAction(action),
   });
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
@@ -583,6 +584,7 @@ export class OptionsWindow {
       case 'interface':
         this.renderInterface();
         break;
+      case 'overlays':
       case 'auras':
       case 'cooldowns':
         this.overlayPanels.render(this.view);
@@ -638,14 +640,12 @@ export class OptionsWindow {
     this.gpuBackendWriteWatch = onDesktopGpuBackendWriteFailed(() => this.render());
   }
 
-  // Return to the Game Menu root without closing the window. The title-bar back
-  // control and every footer Back button route here: on mobile especially,
-  // close-then-reopen (More, Menu, sub-panel again) was three taps for what this
-  // does in one. Focus moves to the menu's first entry because the control that
-  // had focus is destroyed by the re-render.
+  // Go up one level (an overlay panel to Overlays, the rest to the Game Menu)
+  // without closing the window; the title-bar and footer Back controls route here.
+  // Focus moves to the first entry: the focused control died in the re-render.
   private goBack(): void {
     audio.click();
-    this.view = 'main';
+    this.view = this.overlayPanels.parentView(this.view);
     this.capturingKey = null;
     this.conflictingKey = null;
     this.keybindNote = '';
