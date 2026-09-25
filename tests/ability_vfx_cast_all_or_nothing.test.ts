@@ -417,6 +417,48 @@ describe('a refused hold', () => {
   });
 });
 
+describe('a held control mark', () => {
+  // The armor and Hamstring marks draw one orbit band of the engine overlay;
+  // the armor status is shared, so a Rogue's Armor Breach wears it too.
+  const marked = (aura: AbilityVfxEntityState['auras'][number]): AbilityVfxEntityState => ({
+    id: VICTIM,
+    castingAbility: null,
+    castRemaining: 0,
+    castTotal: 0,
+    auras: [aura],
+  });
+
+  for (const aura of [
+    { id: 'expose_armor', kind: 'sunder', stacks: 3, remaining: 20, duration: 30, sourceId: 3 },
+    { id: 'hamstring_slow', kind: 'slow', remaining: 12, duration: 15, sourceId: WARRIOR },
+  ]) {
+    it(`draws ${aura.id} on the engine alone and never starts the kit clock`, () => {
+      const rig = castGateRig({ deadlineMs: 5_000 });
+      rig.prove(CAST_VFX_ENGINE);
+      for (let i = 0; i < 400; i++) {
+        rig.painter.syncEntity(marked(aura));
+        rig.step();
+      }
+      expect(rig.drawn()).toBe(CAST_VFX_ENGINE);
+      const snapshot = rig.readiness.snapshot();
+      expect(snapshot.families[1]).toMatchObject({ ready: false, forced: false, refused: 0 });
+      expect(snapshot.requirementMiss).toBe(0);
+    });
+  }
+
+  it('waits on the engine: nothing of it draws while the engine is not ready', () => {
+    const rig = castGateRig();
+    rig.prove(CAST_VFX_KIT);
+    for (let i = 0; i < 10; i++) {
+      rig.painter.syncEntity(
+        marked({ id: 'expose_armor', kind: 'sunder', stacks: 3, remaining: 20, duration: 30 }),
+      );
+      rig.step();
+    }
+    expect(rig.drawn()).toBe(0);
+  });
+});
+
 describe('a declined kit', () => {
   it('never holds a Warrior cast, whose kit pools stay dark, and counts no miss', () => {
     const rig = castGateRig({ kitDeclined: true });

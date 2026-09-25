@@ -19,7 +19,8 @@ import { WARRIOR_VFX_FULL_SPECS } from '../warrior_vfx_specs';
 import { abilityVfxFullSpecFor } from './encounter_specs';
 
 /** The families every Warrior-only read the painter holds per frame waits on
- *  (the readiness, Fury, power and guard holds, the control marks). */
+ *  (the readiness, Fury, power and guard holds). The control marks draw on
+ *  the engine alone (WARRIOR_CONTROL_MARK_REQUIREMENT). */
 export const WARRIOR_KIT_REQUIREMENT = CAST_VFX_ENGINE | CAST_VFX_KIT;
 
 const MEMO_CAP = 1024;

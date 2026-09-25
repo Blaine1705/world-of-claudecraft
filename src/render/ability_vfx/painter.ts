@@ -22,7 +22,11 @@ import {
 import { warriorAttentionSource } from './warrior_attention_core';
 import { WARRIOR_BLADE_STYLES } from './warrior_blades';
 import { drawWarriorControlAura, warriorControlAuraCast } from './warrior_control';
-import { holdWarriorControlMark, isWarriorControlMark } from './warrior_control_marks';
+import {
+  holdWarriorControlMark,
+  isWarriorControlMark,
+  WARRIOR_CONTROL_MARK_REQUIREMENT,
+} from './warrior_control_marks';
 import { warriorGuardKind } from './warrior_guard_plates';
 import { drawWarriorHammerContact } from './warrior_hammer';
 import { drawWarriorLeapLanding, drawWarriorLeapLaunch } from './warrior_leap';
@@ -1952,7 +1956,8 @@ export class AbilityVfx {
           fx,
           e.id,
           aura,
-          this.kitHoldsOpen() && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }),
+          this.admission.hold(WARRIOR_CONTROL_MARK_REQUIREMENT) &&
+            !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }),
         );
         continue;
       }
