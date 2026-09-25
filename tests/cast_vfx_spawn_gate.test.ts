@@ -74,33 +74,46 @@ function engine(open: number) {
     return (gate.open & bit) !== 0;
   });
   const drawables = gatedDrawables(scene);
+  // Held reads (windups, orbits, shells) draw on the frame they are fed and
+  // sweep on the next, so what drew is read on every frame, never the last.
+  let seen = 0;
   const step = (frames = 2) => {
-    for (let i = 0; i < frames; i++) fx.update(1 / 30);
+    for (let i = 0; i < frames; i++) {
+      fx.update(1 / 30);
+      seen |= drawingFamilies(drawables);
+    }
   };
-  return { fx, scene, gate, drawables, step, drawing: () => drawingFamilies(drawables) };
+  return { fx, scene, gate, drawables, step, drawing: () => seen };
 }
 
-/** Every engine spawn door the painter and the sequencer use. */
+/** Every engine spawn door the painter and the sequencer use, one by one. */
+const ENGINE_DOORS: Record<string, (fx: AbilityVfxFx) => void> = {
+  ring: (fx) => fx.ringAt(0, 0, 0, 4, 1, 0xffffff, 1, false),
+  decal: (fx) => fx.decalXZ(0, 0, 2, 0xffffff, 'ember', 2),
+  flipbook: (fx) => fx.flipbookAt(0, 1, 0, 1, 0xffffff, 'burst', 1),
+  pillar: (fx) => fx.pillarAt(0, 0, 0, 1, 4, 0xffffff, 1),
+  'shell flash': (fx) => fx.shellFlash(1, 0xffffff, 1),
+  'shell hold': (fx) => fx.holdShell(2, 0xffffff),
+  'ground aura': (fx) => fx.holdGroundAura(2, 0, 0xffffff, true),
+  'jagged bolt': (fx) => fx.jaggedBolt(1, 2, 0xffffff),
+  'comet trail': (fx) => fx.cometTrail(1, 2, 0xffffff, 0.2, true),
+  'slash arc': (fx) => fx.slashArc(2, 0xffffff),
+  'path ribbon': (fx) =>
+    fx.pathRibbon(0xffffff, 0.1, 1, (pts) => {
+      pts[0].set(0, 1, 0);
+      pts[1].set(1, 1, 0);
+      return 2;
+    }),
+  windup: (fx) => fx.windup(1, 0xffffff, 0.5, 'orb'),
+  orbit: (fx) => fx.orbit(2, 'runes', 0xffffff),
+  // The sequencer's overlay transients go through pushOverlay inside the
+  // frame's overlay batch, so the sequence is that door's case too.
+  sequence: (fx) =>
+    fx.sequenceInstant('fireball', ABILITY_VFX_FULL_SPECS.fireball, 1, 2, 0xff8800, 0),
+};
+
 function spawnEngine(fx: AbilityVfxFx): void {
-  fx.ringAt(0, 0, 0, 4, 1, 0xffffff, 1, false);
-  fx.decalXZ(0, 0, 2, 0xffffff, 'ember', 2);
-  fx.flipbookAt(0, 1, 0, 1, 0xffffff, 'burst', 1);
-  fx.pillarAt(0, 0, 0, 1, 4, 0xffffff, 1);
-  fx.shellFlash(1, 0xffffff, 1);
-  fx.holdShell(2, 0xffffff);
-  fx.holdGroundAura(2, 0, 0xffffff, true);
-  fx.jaggedBolt(1, 2, 0xffffff);
-  fx.cometTrail(1, 2, 0xffffff, 0.2, true);
-  fx.slashArc(2, 0xffffff);
-  fx.pathRibbon(0xffffff, 0.1, 1, (pts) => {
-    pts[0].set(0, 1, 0);
-    pts[1].set(1, 1, 0);
-    return 2;
-  });
-  fx.pushOverlay(0, 1, 0, 0xffffff, 0.3, 0, 1, 1);
-  fx.windup(1, 0xffffff, 0.5, 'orb');
-  fx.orbit(2, 'runes', 0xffffff);
-  fx.sequenceInstant('fireball', ABILITY_VFX_FULL_SPECS.fireball, 1, 2, 0xff8800, 0);
+  for (const door of Object.values(ENGINE_DOORS)) door(fx);
 }
 
 /** Every kit spawn door the Warrior modules use, with the preparations the
@@ -136,14 +149,20 @@ describe('the gated pools', () => {
 });
 
 describe('with the engine family not ready', () => {
-  it('draws no engine piece, and asks the engine at every door', () => {
-    const { fx, gate, step, drawing } = engine(CAST_VFX_KIT);
-    spawnEngine(fx);
-    step(4);
-    expect(drawing() & CAST_VFX_ENGINE).toBe(0);
-    expect(gate.asked.length).toBeGreaterThanOrEqual(14);
-    expect(new Set(gate.asked)).toEqual(new Set([CAST_VFX_ENGINE]));
-  });
+  for (const [name, door] of Object.entries(ENGINE_DOORS)) {
+    it(`refuses the ${name} door, and asks the engine for it`, () => {
+      const shut = engine(CAST_VFX_KIT);
+      door(shut.fx);
+      shut.step(4);
+      expect(shut.drawing()).toBe(0);
+      expect(new Set(shut.gate.asked)).toEqual(new Set([CAST_VFX_ENGINE]));
+      // The same door draws once the engine is ready: the refusal is the gate's.
+      const open = engine(CAST_VFX_ENGINE | CAST_VFX_KIT);
+      door(open.fx);
+      open.step(4);
+      expect(open.drawing()).toBe(CAST_VFX_ENGINE);
+    });
+  }
 
   it('draws them all once it opens (the arm the refusals above are measured against)', () => {
     const { fx, drawables, step, drawing } = engine(CAST_VFX_ENGINE | CAST_VFX_KIT);
