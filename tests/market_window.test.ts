@@ -487,7 +487,11 @@ describe('market_window: behavior preserved through the core', () => {
     // The prompt names the row's resolved copy (quality label included), the
     // same aria name the buy button announces.
     expect(painter).toContain('this.promptBuy(l, parts.ariaName)');
-    expect(painter).toContain('.marketBuy(pending.listingId)');
+    // A whole-stack buy sends no count (byte-identical to the pre-partial-buy
+    // wire shape); a partial buy (tests/market_buy_confirm.test.ts) names one.
+    expect(painter).toContain('.marketBuy(');
+    expect(painter).toContain('pending.listingId,');
+    expect(painter).toContain('pending.buyCount < pending.count ? pending.buyCount : undefined');
     expect(painter).toContain('.marketCancel(l.id)');
     expect(painter).toContain('.marketList(view.form.itemId, qty, each * qty)');
     expect(painter).toContain('.marketCollect()');

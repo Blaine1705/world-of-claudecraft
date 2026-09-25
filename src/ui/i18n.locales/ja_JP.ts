@@ -3447,9 +3447,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.buy': '購入',
   'itemUi.market.reclaim': '回収',
   'itemUi.market.buyAria': '{item}を{price}で購入',
+  'itemUi.market.buyQuantityAria': '{item}を何個購入するか（全{total}個中）',
+  'itemUi.market.buyQuantityBtnAria': 'この数だけ{item}を購入',
   'itemUi.market.buyConfirmTitle': '購入の確認',
   'itemUi.market.buyConfirmBody': '{item}を{price}で購入しますか？',
   'itemUi.market.buyConfirmBodyStack': '{item} x{count}を{price}（各 {each}）で購入しますか？',
+  'itemUi.market.buyConfirmBodyPartial':
+    '{item}を{count}個（全{total}個中）、{price}（各 {each}）で購入しますか？',
   'itemUi.market.buyConfirmAccept': '購入',
   'itemUi.market.buyConfirmCancel': 'キャンセル',
   'itemUi.market.buyChanged':

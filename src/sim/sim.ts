@@ -10510,8 +10510,8 @@ export class Sim {
     this.market.marketListInstance(itemId, price, instance, pid);
   }
 
-  marketBuy(listingId: number, pid?: number): void {
-    this.market.marketBuy(listingId, pid);
+  marketBuy(listingId: number, count?: number, pid?: number): void {
+    this.market.marketBuy(listingId, count, pid);
   }
 
   marketSweepQuote(itemId: string, count: number, pid?: number): void {

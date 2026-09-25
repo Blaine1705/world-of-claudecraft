@@ -5684,6 +5684,7 @@
   body.mobile-touch .mkt-tab,
   body.mobile-touch .mkt-btn,
   body.mobile-touch .mkt-sweep-btn,
+  body.mobile-touch .mkt-buy-partial-btn,
   body.mobile-touch .mkt-sweep-go,
   body.mobile-touch .mkt-sweep-close,
   body.mobile-touch .mkt-list-btn,
@@ -6060,6 +6061,20 @@
     min-height: 40px;
     font-size: 16px;
     box-sizing: border-box;
+  }
+  body.mobile-touch .mkt-buy-partial-qty {
+    min-height: 40px;
+    width: 44px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  /* The row's grid columns are fixed-width `auto` cells (components.css); a
+     narrow phone has no room for icon + name + price + two/three button
+     clusters on one line, so the row wraps to a second line instead of
+     clipping or forcing horizontal scroll. */
+  body.mobile-touch .mkt-row:has(.mkt-buy-partial) {
+    display: flex;
+    flex-wrap: wrap;
   }
   body.mobile-touch #quest-log-window,
   body.mobile-touch #quest-dialog {

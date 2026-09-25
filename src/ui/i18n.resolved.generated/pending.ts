@@ -75,7 +75,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "es_ES": [
     "abilityUi.forms.bearOrCat",
@@ -143,7 +146,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "fr_FR": [
     "abilityUi.forms.bearOrCat",
@@ -211,7 +217,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "fr_CA": [
     "abilityUi.forms.bearOrCat",
@@ -279,7 +288,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "en_CA": [],
   "it_IT": [
@@ -348,7 +360,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "de_DE": [
     "abilityUi.forms.bearOrCat",
@@ -416,7 +431,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "zh_CN": [
     "hudChrome.lootQuality.itemName",
@@ -504,7 +522,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "ru_RU": [
     "hudChrome.lootQuality.itemName",
@@ -577,7 +598,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "nl_NL": [
     "abilityUi.forms.bearOrCat",
@@ -645,7 +669,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "pl_PL": [
     "abilityUi.forms.bearOrCat",
@@ -713,7 +740,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "id_ID": [
     "abilityUi.forms.bearOrCat",
@@ -781,7 +811,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "tr_TR": [
     "abilityUi.forms.bearOrCat",
@@ -849,7 +882,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "sv_SE": [
     "abilityUi.forms.bearOrCat",
@@ -917,7 +953,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "vi_VN": [
     "abilityUi.forms.bearOrCat",
@@ -985,7 +1024,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ],
   "da_DK": [
     "abilityUi.forms.bearOrCat",
@@ -1053,6 +1095,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.trade.offerRemoveTitle",
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
-    "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.unstuck.revivedAtGraveyardFree",
+    "itemUi.market.buyConfirmBodyPartial",
+    "itemUi.market.buyQuantityAria",
+    "itemUi.market.buyQuantityBtnAria"
   ]
 };

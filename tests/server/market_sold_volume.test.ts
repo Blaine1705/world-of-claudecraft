@@ -104,6 +104,29 @@ describe('marketSaleFromBuy (the pure sale verdict)', () => {
     // gross figure.
     expect(marketSaleFromBuy(listing({ price: 1_000, count: 1 }), null)?.copper).toBe(1_000);
   });
+
+  it('reads a listing still present but shrunk as a partial sale', () => {
+    // A partial buy (src/sim/market.ts marketBuy) shrinks the row in place
+    // instead of splicing it out, so a smaller after-count/price at the SAME
+    // id is a sale of the difference, not an unchanged refusal.
+    const before = listing({ count: 5, price: 500 });
+    const after = listing({ count: 3, price: 300 });
+    expect(marketSaleFromBuy(before, after)).toEqual({
+      itemId: 'wyrmfall_core',
+      quantity: 2,
+      copper: 200,
+    });
+  });
+
+  it('never counts a house row as a partial sale either, even a hypothetical shrink', () => {
+    // House rows never shrink in practice (marketBuy guards the whole
+    // seller-proceeds block, including the count/price decrement, on
+    // `!listing.house`), but the refusal is unconditional on `before.house`
+    // regardless of what `after` claims.
+    const before = listing({ house: true, count: 5, price: 700 });
+    const after = listing({ house: true, count: 3, price: 400 });
+    expect(marketSaleFromBuy(before, after)).toBeNull();
+  });
 });
 
 describe('buyWithSoldVolume (the dispatch-site observer)', () => {
@@ -125,8 +148,8 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
         if (index >= 0) book.splice(index, 1);
       }),
     };
-    buyWithSoldVolume(sim, 5, 42);
-    expect(sim.marketBuy).toHaveBeenCalledWith(5, 42);
+    buyWithSoldVolume(sim, 5, undefined, 42);
+    expect(sim.marketBuy).toHaveBeenCalledWith(5, undefined, 42);
     await soldVolumeWriterIdle();
     // saleCount is stamped at admission (the coalescing accumulator's unit),
     // so the writer always receives an explicit count rather than an implied 1.
@@ -158,11 +181,41 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
     sim.marketList('vale_wheat', 3, 90, seller);
     const listingRow = sim.marketListings.find((l) => l.itemId === 'vale_wheat');
     if (!listingRow) throw new Error('seller listing not found');
-    buyWithSoldVolume(sim, listingRow.id, buyer);
+    buyWithSoldVolume(sim, listingRow.id, undefined, buyer);
     await soldVolumeWriterIdle();
     resetMarketSoldVolumeForTests();
     // The whole listing sold, so the observer records its stack and gross price.
     expect(recorded).toEqual([{ itemId: 'vale_wheat', quantity: 3, copper: 90, saleCount: 1 }]);
+  });
+
+  it('records a real Sim.marketBuy PARTIAL sale end to end (row shrinks, never splices)', async () => {
+    // The exact regression the length-drop shortcut could not survive: a
+    // partial buy leaves the row in the book with a smaller count/price, so
+    // this must read the shrink itself rather than seeing "still there" and
+    // recording nothing.
+    const recorded: MarketSoldVolumeEntry[] = [];
+    resetMarketSoldVolumeForTests((entry) => {
+      recorded.push(entry);
+      return Promise.resolve();
+    });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('vale_wheat', 5, seller);
+    const buyerPlayer = sim.players.get(buyer);
+    if (!buyerPlayer) throw new Error('missing buyer');
+    buyerPlayer.copper = 1_000;
+    sim.marketList('vale_wheat', 5, 100, seller); // 20 copper each
+    const listingRow = sim.marketListings.find((l) => l.itemId === 'vale_wheat');
+    if (!listingRow) throw new Error('seller listing not found');
+    buyWithSoldVolume(sim, listingRow.id, 2, buyer);
+    await soldVolumeWriterIdle();
+    resetMarketSoldVolumeForTests();
+    // 2 of 5 units, ceil(100 * 2 / 5) = 40 copper; the row is still listed.
+    expect(recorded).toEqual([{ itemId: 'vale_wheat', quantity: 2, copper: 40, saleCount: 1 }]);
+    expect(sim.marketListings.some((l) => l.id === listingRow.id)).toBe(true);
   });
 
   it('records nothing when the buy is refused', async () => {
@@ -172,7 +225,7 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
       return Promise.resolve();
     });
     const sim = { marketListings: [listing({ id: 5 })], marketBuy: vi.fn() };
-    buyWithSoldVolume(sim, 5, 42);
+    buyWithSoldVolume(sim, 5, undefined, 42);
     await soldVolumeWriterIdle();
     expect(recorded).toEqual([]);
   });
@@ -187,7 +240,7 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
         book.length = 0;
       }),
     };
-    expect(() => buyWithSoldVolume(sim, 5, 42)).not.toThrow();
+    expect(() => buyWithSoldVolume(sim, 5, undefined, 42)).not.toThrow();
     expect(sim.marketBuy).toHaveBeenCalledTimes(1);
   });
 
@@ -203,7 +256,7 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
         throw new Error('boom');
       }),
     };
-    expect(() => buyWithSoldVolume(sim, 5, 42)).toThrow('boom');
+    expect(() => buyWithSoldVolume(sim, 5, undefined, 42)).toThrow('boom');
     expect(recorded).toEqual([]);
   });
 
@@ -229,7 +282,7 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
         if (index >= 0) book.splice(index, 1);
       }),
     };
-    for (const id of [1, 2, 3, 4]) buyWithSoldVolume(sim, id, 42);
+    for (const id of [1, 2, 3, 4]) buyWithSoldVolume(sim, id, undefined, 42);
     await soldVolumeWriterIdle();
     expect(sim.marketBuy, 'every buy must still run').toHaveBeenCalledTimes(4);
     expect(recorded).toEqual(['wyrmfall_core', 'vale_wheat_seed']);
@@ -250,7 +303,7 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
         book.length = 0;
       }),
     };
-    expect(() => buyWithSoldVolume(sim, 5, 42)).not.toThrow();
+    expect(() => buyWithSoldVolume(sim, 5, undefined, 42)).not.toThrow();
     await soldVolumeWriterIdle();
     expect(errors).toHaveLength(1);
   });
@@ -279,8 +332,8 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
         if (index >= 0) book.splice(index, 1);
       }),
     };
-    buyWithSoldVolume(sim, 1, 42);
-    buyWithSoldVolume(sim, 2, 42);
+    buyWithSoldVolume(sim, 1, undefined, 42);
+    buyWithSoldVolume(sim, 2, undefined, 42);
     await new Promise((resolve) => setTimeout(resolve, 0));
     // The second write must not start until the first finishes.
     expect(order).toEqual(['start:wyrmfall_core']);
@@ -350,7 +403,7 @@ const WIRED_SEAMS = [
     // the Market Sweep (game.ts keeps only the case labels).
     file: 'server/market_commands.ts',
     anchor: 'sim.marketCancel(msg.id, pid);',
-    present: 'buyWithSoldVolume(sim, msg.id, pid)',
+    present: 'buyWithSoldVolume(sim, msg.id, count, pid)',
   },
   {
     what: 'sweepWithSoldVolume called at the market_sweep dispatch arm',
@@ -516,7 +569,7 @@ describe('the write tail budget (the server/bank_ledger.ts shape)', () => {
       listing({ id: 3, itemId: 'wyrmfall_core', count: 4, price: 100 }),
     ];
     const sim = sellingSim(book);
-    for (const id of [1, 2, 3]) buyWithSoldVolume(sim, id, 42);
+    for (const id of [1, 2, 3]) buyWithSoldVolume(sim, id, undefined, 42);
     expect(soldVolumeTailStats().depth).toBe(1);
     expect(soldVolumeTailStats().coalescedSales).toBe(2);
     await soldVolumeWriterIdle();
@@ -541,13 +594,13 @@ describe('the write tail budget (the server/bank_ledger.ts shape)', () => {
       listing({ id: 3, itemId: 'wyrmfall_core', count: 4, price: 100 }),
     ];
     const sim = sellingSim(book);
-    buyWithSoldVolume(sim, 1, 42);
+    buyWithSoldVolume(sim, 1, undefined, 42);
     await tick();
     // Sale 1 is on the wire and can no longer absorb anything.
     expect(written).toHaveLength(1);
     expect(soldVolumeTailStats().depth).toBe(0);
-    buyWithSoldVolume(sim, 2, 42);
-    buyWithSoldVolume(sim, 3, 42);
+    buyWithSoldVolume(sim, 2, undefined, 42);
+    buyWithSoldVolume(sim, 3, undefined, 42);
     expect(soldVolumeTailStats().depth).toBe(1);
     expect(soldVolumeTailStats().coalescedSales).toBe(1);
     gates[0]();
@@ -582,7 +635,7 @@ describe('the write tail budget (the server/bank_ledger.ts shape)', () => {
       listing({ id: 3, itemId: 'vale_wheat_seed' }),
     ];
     const sim = sellingSim(book);
-    for (const id of [1, 2, 3]) buyWithSoldVolume(sim, id, 42);
+    for (const id of [1, 2, 3]) buyWithSoldVolume(sim, id, undefined, 42);
     // Two distinct ids, so two entries, and only the repeat seed sale folded.
     expect(soldVolumeTailStats().depth).toBe(2);
     expect(soldVolumeTailStats().coalescedSales).toBe(1);
@@ -606,11 +659,11 @@ describe('the write tail budget (the server/bank_ledger.ts shape)', () => {
       listing({ id: 2, itemId: 'wyrmfall_core', count: 5, price: 700 }),
     ];
     const sim = sellingSim(book);
-    buyWithSoldVolume(sim, 1, 42);
+    buyWithSoldVolume(sim, 1, undefined, 42);
     await tick();
     expect(written).toHaveLength(1);
     expect(soldVolumeTailStats().depth).toBe(0);
-    buyWithSoldVolume(sim, 2, 42);
+    buyWithSoldVolume(sim, 2, undefined, 42);
     expect(soldVolumeTailStats().depth).toBe(1);
     expect(soldVolumeTailStats().coalescedSales).toBe(0);
     gates[0]();
@@ -630,13 +683,13 @@ describe('the write tail budget (the server/bank_ledger.ts shape)', () => {
     const ids = ['wyrmfall_core', 'vale_wheat_seed', 'compost', 'brook_carrot_seed'];
     const book: MarketListing[] = ids.map((itemId, i) => listing({ id: i + 1, itemId }));
     const sim = sellingSim(book);
-    buyWithSoldVolume(sim, 1, 42);
+    buyWithSoldVolume(sim, 1, undefined, 42);
     await tick();
     // The first sale is on the wire, so the one queue slot is free again.
     expect(written).toHaveLength(1);
     expect(soldVolumeTailStats().depth).toBe(0);
     // Three more DISTINCT ids: one fills the slot, the last two are refused.
-    for (const id of [2, 3, 4]) buyWithSoldVolume(sim, id, 42);
+    for (const id of [2, 3, 4]) buyWithSoldVolume(sim, id, undefined, 42);
     expect(soldVolumeTailStats().depth).toBe(1);
     expect(soldVolumeTailStats().droppedSales).toBe(2);
     expect(soldVolumeTailStats().coalescedSales).toBe(0);
@@ -662,12 +715,12 @@ describe('the write tail budget (the server/bank_ledger.ts shape)', () => {
       listing({ id: 3, itemId: 'vale_wheat_seed' }),
     ];
     const sim = sellingSim(book);
-    buyWithSoldVolume(sim, 1, 42);
+    buyWithSoldVolume(sim, 1, undefined, 42);
     await tick();
     // The one slot is free; a seed sale takes it, and the SECOND seed sale is
     // at the cap yet still folds, because coalescing is checked first.
-    buyWithSoldVolume(sim, 2, 42);
-    buyWithSoldVolume(sim, 3, 42);
+    buyWithSoldVolume(sim, 2, undefined, 42);
+    buyWithSoldVolume(sim, 3, undefined, 42);
     expect(soldVolumeTailStats()).toMatchObject({
       depth: 1,
       coalescedSales: 1,

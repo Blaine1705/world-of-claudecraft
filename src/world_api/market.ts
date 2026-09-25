@@ -119,7 +119,10 @@ export interface IWorldMarket {
    *  the actual held copy whose payload matches, refusing transfer-locked
    *  (bindOnTrade-armed or boundTo-bound) copies. Plain stacks use marketList. */
   marketListInstance(itemId: string, price: number, instance: ItemInstancePayload): void;
-  marketBuy(listingId: number): void;
+  /** Buy a listing. `count` omitted (or at/above the listing's stack size) buys
+   *  it whole; anything from 1 up to (stack size - 1) peels that many units off
+   *  a bulk stack at a proportional price instead, leaving the rest listed. */
+  marketBuy(listingId: number, count?: number): void;
   /** Stage a Market Sweep quote: the next marketInfo carries `sweepQuote` for this
    *  item and count (a display/query narrowing, the marketSellPriceCheck precedent). */
   marketSweepQuote(itemId: string, count: number): void;
