@@ -4,8 +4,8 @@
 // The pooled primitives and the generic basics sit hidden in the scene from
 // the renderer's construction, so the visible-only scene compile never
 // collects them; the lazy spell stand-ins join once their group is staged.
-// Every one of them gets a unit, while the gate waits on the engine and kit
-// families alone (cast_vfx_family.ts): the programs the painter draws behind it.
+// Every one of them gets a unit, while the gate waits on the gated families
+// alone (cast_vfx_family.ts): the programs the painter draws behind it.
 // renderer.ts keeps the wiring only.
 //
 // Linked means PROVED linked, by the settle record (linked_program_readiness.ts):
@@ -18,7 +18,9 @@
 // for the 5558 ms it cost once).
 
 import type * as THREE from 'three';
-import { abilityVfxGateMaterials, collectAbilityVfxCompileTargets } from './ability_vfx';
+import { abilityVfxFamilyMaterials, collectAbilityVfxCompileTargets } from './ability_vfx';
+import { warriorKitAssetsState } from './ability_vfx/production_assets';
+import { CAST_VFX_FAMILIES, type CastVfxFamilyId } from './cast_vfx_family';
 import { type CastVfxReadiness, createCastVfxReadiness } from './cast_vfx_readiness_core';
 import { type CompileArmHost, linkColorPrograms } from './compile_arms';
 import { isProgramKnownReady, markProgramsReadyUnder } from './linked_program_readiness';
@@ -128,19 +130,38 @@ export function castVfxFirstReadsEntry(
  *  with its reason, not a measurement, and derived rather than tuned. */
 export const CAST_VFX_READY_DEADLINE_MS = REVEAL_GATE_WATCHDOG_MS * 3;
 
-/** The gate over the engine and kit families' programs in the scene. Their
- *  pools are built with the renderer, before any consult, so the set is read
- *  once and nothing waits on a stage. */
+/** What the gate stamps its once-per-frame walk with: three's render count,
+ *  which moves on every rendered frame and never inside one. */
+export interface CastVfxGateHost extends LinkedProgramSource {
+  info?: { render: { frame: number } };
+}
+
+/** The gate over each family's programs in the scene. Their pools are built
+ *  with the renderer, before any consult, so each set is read once and nothing
+ *  waits on a stage. The kit family stands down on a device that declined the
+ *  kit's assets (warriorKitAssetsState), where its pools never draw. */
 export function createSceneCastVfxReadiness(
   scene: THREE.Object3D,
-  webgl: LinkedProgramSource,
+  webgl: CastVfxGateHost,
   now: () => number = () => performance.now(),
   deadlineMs: number = CAST_VFX_READY_DEADLINE_MS,
+  kitDeclined: () => boolean = () => warriorKitAssetsState() === 'declined',
 ): CastVfxReadiness {
+  let byFamily: Map<CastVfxFamilyId, THREE.Material[]> | null = null;
+  const materialsOf = (id: CastVfxFamilyId): THREE.Material[] => {
+    byFamily ??= abilityVfxFamilyMaterials(scene);
+    return byFamily.get(id) ?? [];
+  };
   return createCastVfxReadiness<THREE.Material>({
     now,
+    frame: () => webgl.info?.render.frame ?? Number.NaN,
     deadlineMs,
-    materials: () => abilityVfxGateMaterials(scene),
+    families: CAST_VFX_FAMILIES.map(({ id, bit }) => ({
+      id,
+      bit,
+      materials: () => materialsOf(id),
+      declined: id === 'kit' ? kitDeclined : undefined,
+    })),
     // The PROGRAM the settle record proved, not a boolean: the core keys its
     // answer on it, so a material three has repointed at a program no settle
     // has seen reads pending again instead of riding the earlier one's answer.

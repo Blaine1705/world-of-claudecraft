@@ -9,11 +9,19 @@
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { tagCastVfxEngine, tagCastVfxKit } from '../src/render/cast_vfx_family';
+import {
+  CAST_VFX_ENGINE,
+  CAST_VFX_KIT,
+  tagCastVfxEngine,
+  tagCastVfxKit,
+} from '../src/render/cast_vfx_family';
 import { castVfxProgramUnits, createSceneCastVfxReadiness } from '../src/render/cast_vfx_prewarm';
 import type { CompileArmHost } from '../src/render/compile_arms';
 import { markProgramReady } from '../src/render/linked_program_readiness';
 import type { LinkedProgramLike } from '../src/render/linked_program_touch';
+
+/** Every gated family: the answer a Warrior cast waits on. */
+const GATED = CAST_VFX_ENGINE | CAST_VFX_KIT;
 
 /** A pooled engine-family mesh: the tag abilityVfxGateMaterials selects
  *  on, so this is what the gate's scene walk collects. */
@@ -59,7 +67,7 @@ function harness(meshes: THREE.Mesh[]) {
 describe('the scene cast-VFX gate over three', () => {
   it('is not ready while a material has no program at all', () => {
     const { readiness } = harness([vfxMesh('ring')]);
-    expect(readiness.ready()).toBe(false);
+    expect(readiness.ready(GATED)).toBe(false);
     expect(readiness.snapshot().pending).toBe(1);
   });
 
@@ -70,10 +78,10 @@ describe('the scene cast-VFX gate over three', () => {
     const { readiness, programs, materialOf } = harness([mesh]);
     const handle = program();
     programs.set(materialOf(mesh), handle);
-    expect(readiness.ready()).toBe(false);
+    expect(readiness.ready(GATED)).toBe(false);
     expect(readiness.snapshot().pending).toBe(1);
     markProgramReady(handle);
-    expect(readiness.ready()).toBe(true);
+    expect(readiness.ready(GATED)).toBe(true);
     expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
   });
 
@@ -88,10 +96,10 @@ describe('the scene cast-VFX gate over three', () => {
       });
     const [unit] = castVfxProgramUnits(scene, null, host, webgl, compile);
     const run = unit.run();
-    expect(readiness.ready()).toBe(false);
+    expect(readiness.ready(GATED)).toBe(false);
     settle();
     await run;
-    expect(readiness.ready()).toBe(true);
+    expect(readiness.ready(GATED)).toBe(true);
   });
 
   it('opens over Points, line and Sprite pools once their units settled, never by the deadline', async () => {
@@ -111,7 +119,7 @@ describe('the scene cast-VFX gate over three', () => {
     }
     const units = castVfxProgramUnits(scene, null, host, webgl, () => Promise.resolve());
     expect(units).toHaveLength(3);
-    expect(readiness.ready()).toBe(false);
+    expect(readiness.ready(GATED)).toBe(false);
     await Promise.all(units.map((unit) => unit.run()));
     expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
   });
@@ -143,7 +151,7 @@ describe('the scene cast-VFX gate over three', () => {
     expect(units.map((unit) => unit.roots)).toEqual([[first]]);
     const run = units[0].run();
     // Held while the shared program is not proved.
-    expect(readiness.ready()).toBe(false);
+    expect(readiness.ready(GATED)).toBe(false);
     expect(readiness.snapshot().pending).toBe(1);
     settle();
     await run;
@@ -165,7 +173,7 @@ describe('the scene cast-VFX gate over three', () => {
     await units[0].run();
     await units[2].run();
     // The transparent program is the one really unlinked: it holds the gate.
-    expect(readiness.ready()).toBe(false);
+    expect(readiness.ready(GATED)).toBe(false);
     expect(readiness.snapshot().pending).toBe(1);
     await units[1].run();
     expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
@@ -179,7 +187,7 @@ describe('the scene cast-VFX gate over three', () => {
       Promise.reject(new Error('lost')),
     );
     await expect(unit.run()).rejects.toThrow('lost');
-    expect(readiness.ready()).toBe(false);
+    expect(readiness.ready(GATED)).toBe(false);
   });
 
   it('links a pooled program outside the gated families and never waits on it', async () => {
@@ -219,6 +227,76 @@ describe('the scene cast-VFX gate over three', () => {
     expect(readiness.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
   });
 
+  it('answers each family on its own: a pending kit program never holds an engine-only cast', async () => {
+    const ring = vfxMesh('ring');
+    const { scene, host, webgl, readiness, programs, materialOf } = harness([ring]);
+    const crest = kitMesh('crest', new THREE.MeshBasicMaterial({ transparent: true }));
+    scene.add(crest);
+    programs.set(materialOf(ring), program());
+    programs.set(materialOf(crest), program());
+    const units = castVfxProgramUnits(scene, null, host, webgl, () => Promise.resolve());
+    await units[0].run();
+    expect(readiness.admit(CAST_VFX_ENGINE)).toBe(true);
+    expect(readiness.admit(GATED)).toBe(false);
+    expect(readiness.snapshot().families).toEqual([
+      expect.objectContaining({ id: 'engine', ready: true, pending: 0, refused: 0 }),
+      expect.objectContaining({ id: 'kit', ready: false, pending: 1, refused: 1 }),
+    ]);
+    await units[1].run();
+    expect(readiness.admit(GATED)).toBe(true);
+  });
+
+  it('stands the kit down on a device that declined its assets: never held, never forced', () => {
+    const ring = vfxMesh('ring');
+    const scene = new THREE.Scene();
+    const crest = kitMesh('crest', new THREE.MeshBasicMaterial({ transparent: true }));
+    scene.add(ring, crest);
+    const proved = program();
+    markProgramReady(proved);
+    const webgl = {
+      properties: {
+        get: (material: THREE.Material) => ({
+          currentProgram: material === ring.material ? proved : null,
+        }),
+      },
+    };
+    const clock = { now: 0 };
+    const readiness = createSceneCastVfxReadiness(
+      scene,
+      webgl,
+      () => clock.now,
+      1000,
+      () => true,
+    );
+    expect(readiness.admit(GATED)).toBe(true);
+    // Its pools still refuse: a declined kit draws nothing, and says nothing.
+    expect(readiness.spawnAllowed(CAST_VFX_KIT)).toBe(false);
+    clock.now = 5000;
+    expect(readiness.admit(GATED)).toBe(true);
+    expect(readiness.snapshot()).toMatchObject({ ready: true, forced: false, requirementMiss: 0 });
+    expect(readiness.snapshot().families[1]).toMatchObject({ id: 'kit', declined: true });
+  });
+
+  it('starts no deadline clock on a diagnostics read taken before the first consult', () => {
+    // The renderer's construction publishes a perfStats() receipt: a snapshot
+    // that started the clock there spent the whole deadline before the world
+    // was up, and the gate was forced at the reveal.
+    const ring = vfxMesh('ring');
+    const scene = new THREE.Scene();
+    scene.add(ring);
+    const webgl = { properties: { get: () => ({ currentProgram: null }) } };
+    const clock = { now: 0 };
+    const readiness = createSceneCastVfxReadiness(scene, webgl, () => clock.now, 1000);
+    expect(readiness.snapshot()).toMatchObject({ ready: false, pending: 1, forced: false });
+    clock.now = 60_000;
+    expect(readiness.admit(CAST_VFX_ENGINE)).toBe(false);
+    clock.now = 60_999;
+    expect(readiness.admit(CAST_VFX_ENGINE)).toBe(false);
+    clock.now = 61_000;
+    expect(readiness.admit(CAST_VFX_ENGINE)).toBe(true);
+    expect(readiness.snapshot()).toMatchObject({ forced: true });
+  });
+
   it('links the engine family first, then the kit, then the other pools, then the stand-ins', () => {
     const bespoke = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial());
     bespoke.userData.renderCategory = 'vfx';
@@ -241,7 +319,7 @@ describe('the scene cast-VFX gate over three', () => {
     markProgramReady(proved);
     h.programs.set(h.materialOf(ready), proved);
     h.programs.set(h.materialOf(pending), program());
-    for (let i = 0; i < 5; i++) expect(h.readiness.ready()).toBe(false);
+    for (let i = 0; i < 5; i++) expect(h.readiness.ready(GATED)).toBe(false);
     expect(h.readiness.snapshot().pending).toBe(1);
   });
 
@@ -258,20 +336,20 @@ describe('the scene cast-VFX gate over three', () => {
     const decalProgram = program();
     h.programs.set(h.materialOf(decal), decalProgram);
     // Ring answered on A; the gate is still shut on the other material.
-    expect(h.readiness.ready()).toBe(false);
+    expect(h.readiness.ready(GATED)).toBe(false);
     expect(h.readiness.snapshot().pending).toBe(1);
 
     // Ring is handed B, which no settle has proved: pending again.
     const b = program();
     h.programs.set(h.materialOf(ring), b);
-    expect(h.readiness.ready()).toBe(false);
+    expect(h.readiness.ready(GATED)).toBe(false);
     expect(h.readiness.snapshot().pending).toBe(2);
 
     // B proved, and the gate opens once both answer.
     markProgramReady(b);
-    expect(h.readiness.ready()).toBe(false);
+    expect(h.readiness.ready(GATED)).toBe(false);
     markProgramReady(decalProgram);
-    expect(h.readiness.ready()).toBe(true);
+    expect(h.readiness.ready(GATED)).toBe(true);
   });
 });
 
@@ -323,12 +401,12 @@ describe('the units the resume lane runs', () => {
     expect(compiled).toEqual([{ root: mesh, target: null }]);
     expect(unit.roots).toEqual([mesh]);
     // Nothing is proved until that compile settles.
-    expect(readiness.ready()).toBe(false);
+    expect(readiness.ready(GATED)).toBe(false);
 
     settle(scene);
     await run;
     // The ambient target is back, and the settle wrote the record.
     expect(current).toBeNull();
-    expect(readiness.ready()).toBe(true);
+    expect(readiness.ready(GATED)).toBe(true);
   });
 });

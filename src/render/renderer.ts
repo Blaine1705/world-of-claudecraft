@@ -3024,9 +3024,8 @@ export class Renderer {
       audio: () => this.audioSink, light: this.lightPulses,
       spiritBuild: (build) => this.queueSpiritPuppetBuild(build),
       compile: this.asyncCompileSupported ? (root) => this.compileGate(root) : null,
+      castGate: this.castVfxReadiness,
       painter: {
-        castVfxAdmit: () => this.castVfxReadiness.admit(),
-        castVfxReady: () => this.castVfxReadiness.ready(),
         spawnAoeRing: (x, z, r, school, color) => this.spawnAoeRing(x, z, r, school, color),
         triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
         lightPulse: (id, school, intensity, duration, range) => this.pulseAt(id, school, intensity, duration, range),
@@ -7572,7 +7571,7 @@ export class Renderer {
         break;
       }
       case 'heal2':
-        if (this.abilityVfxFx.warriorRecovery(ev, this.sim.entities.get(ev.targetId)?.maxHp ?? 0))
+        if (this.abilityVfx.warriorRecovery(ev, this.sim.entities.get(ev.targetId)?.maxHp ?? 0))
           break;
         // Throttle the particle bloom to one per target per 110ms so a burst of tiny
         // simultaneous heals (a Chronomancy group echo converting an AoE that hit

@@ -28,7 +28,12 @@ import {
 // PrewarmResumeUnits (see prewarm_resume.ts).
 
 import type * as THREE from 'three';
-import { inCastVfxEngine, inCastVfxKit } from '../cast_vfx_family';
+import {
+  CAST_VFX_FAMILIES,
+  type CastVfxFamilyId,
+  castVfxFamilyBitOf,
+  inCastVfxFamily,
+} from '../cast_vfx_family';
 import { drawProgramSignature } from '../draw_program_signature_core';
 import { abilityVfxTextures, FLIPBOOK_STYLES, flipbookSheet } from './fx_textures';
 
@@ -138,43 +143,50 @@ function pooledPrograms(
 }
 
 /** The representative material of each distinct program the cast gate
- *  waits on (cast_vfx_family.ts: the engine family, then the kit's), from the
- *  same walk as the compile targets: the gate asks whether each one's program
- *  is proved linked, and a proof of that program covers every clone that
- *  shares it. The other pooled programs keep their compile units and never
- *  hold a cast. One material instance drawn by two objects of different
- *  shapes is two units but one entry here, since the gate reads one current
- *  program per material; no gated pool does that, which
+ *  waits on, family by family (cast_vfx_family.ts, in CAST_VFX_FAMILIES
+ *  order), from the same walk as the compile targets: the gate asks whether
+ *  each one's program is proved linked, and a proof of that program covers
+ *  every clone that shares it. A program two families share is listed under
+ *  the first, which every cast needing the later one needs too. The other
+ *  pooled programs keep their compile units and never hold a cast. One
+ *  material instance drawn by two objects of different shapes is two units
+ *  but one entry here, since the gate reads one current program per
+ *  material; no gated pool does that, which
  *  tests/cast_vfx_engine_family.test.ts pins. */
-export function abilityVfxGateMaterials(root: THREE.Object3D): THREE.Material[] {
+export function abilityVfxFamilyMaterials(
+  root: THREE.Object3D,
+): Map<CastVfxFamilyId, THREE.Material[]> {
   const seen = new Set<string>();
-  const materials: THREE.Material[] = [];
-  for (const entry of [
-    ...pooledPrograms(root, inCastVfxEngine, seen),
-    ...pooledPrograms(root, inCastVfxKit, seen),
-  ]) {
-    for (const material of entry.materials) {
-      if (!materials.includes(material)) materials.push(material);
+  const byFamily = new Map<CastVfxFamilyId, THREE.Material[]>();
+  for (const { id } of CAST_VFX_FAMILIES) {
+    const materials: THREE.Material[] = [];
+    for (const entry of pooledPrograms(root, (object) => inCastVfxFamily(object, id), seen)) {
+      for (const material of entry.materials) {
+        if (!materials.includes(material)) materials.push(material);
+      }
     }
+    byFamily.set(id, materials);
   }
-  return materials;
+  return byFamily;
+}
+
+/** Every gated family's representatives, in family order. */
+export function abilityVfxGateMaterials(root: THREE.Object3D): THREE.Material[] {
+  return [...abilityVfxFamilyMaterials(root).values()].flat();
 }
 
 /** One compile target per distinct pooled program: the unit only needs SOME
- *  object drawing that program. The gated families come first, engine then
- *  kit, so the resume lane closes the gate's window before it links any other
- *  pool, and a gated drawable represents a program it shares with any other
- *  pool, so the unit and the gate entry name the same object. */
+ *  object drawing that program. The gated families come first, in family
+ *  order, so the resume lane closes the gate's window before it links any
+ *  other pool, and a gated drawable represents a program it shares with any
+ *  other pool, so the unit and the gate entry name the same object. */
 export function collectAbilityVfxCompileTargets(root: THREE.Object3D): AbilityVfxCompileTarget[] {
   const seen = new Set<string>();
-  const engine = pooledPrograms(root, inCastVfxEngine, seen);
-  const kit = pooledPrograms(root, inCastVfxKit, seen);
-  const rest = pooledPrograms(
-    root,
-    (object) => !inCastVfxEngine(object) && !inCastVfxKit(object),
-    seen,
+  const gated = CAST_VFX_FAMILIES.flatMap(({ id }) =>
+    pooledPrograms(root, (object) => inCastVfxFamily(object, id), seen),
   );
-  return [...engine, ...kit, ...rest].map((entry, index) => ({
+  const rest = pooledPrograms(root, (object) => castVfxFamilyBitOf(object) === 0, seen);
+  return [...gated, ...rest].map((entry, index) => ({
     id: `${entry.object.name || entry.object.type}:${index}`,
     object: entry.object,
   }));

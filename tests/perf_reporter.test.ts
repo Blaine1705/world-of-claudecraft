@@ -646,7 +646,14 @@ function snapshot(): PerfSnapshot {
       nameplates: { paints: 0, paintsSkipped: 0 },
       renderDiagnostics: renderDiagnostics(),
       prewarm: prewarmStats(),
-      castVfx: { ready: true, refused: 0, pending: 0, forced: false },
+      castVfx: {
+        ready: true,
+        refused: 0,
+        pending: 0,
+        forced: false,
+        requirementMiss: 0,
+        families: [],
+      },
       entryDetailHorizon: {
         active: false,
         cap: 700,

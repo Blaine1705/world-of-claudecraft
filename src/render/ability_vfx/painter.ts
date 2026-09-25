@@ -53,6 +53,7 @@ import {
 import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
 import { isVisuallyDead } from '../anim_state';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
+import { CAST_VFX_ENGINE, CAST_VFX_KIT } from '../cast_vfx_family';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
 import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
 import { abilityVfxFullSpecFor, abilityVfxSpecFor } from './encounter_specs';
@@ -141,15 +142,16 @@ export interface AbilityVfxDeps {
   // gesture below: without an authored clip, triggerAttack would fall back to
   // a weapon swing, which a blessing must never read as. Optional for tests.
   hasGestureClip?: (entityId: number, abilityId: string) => boolean;
-  // Whether a cast may draw at all: false while a program the pooled
-  // primitives or the lazy spell stand-ins need is still unlinked (the boot
-  // manifest missed them and the resume lane has not reached them yet), so a
-  // first cast never links a program cold on a live frame. The renderer's
-  // cast_vfx_readiness_core decides; optional for tests (always admitted).
-  castVfxAdmit?: () => boolean;
+  // Whether a cast drawing from every family in `mask` (cast_vfx_family.ts)
+  // may draw at all: false while a program of one of them is still unlinked
+  // (the boot manifest missed it and the resume lane has not reached it
+  // yet), so a first cast never links a program cold on a live frame. The
+  // renderer's cast_vfx_readiness_core decides; optional for tests (always
+  // admitted).
+  castVfxAdmit?: (mask: number) => boolean;
   // The same answer for the per-frame syncEntity consult, uncounted (a
   // refusal is a cast, not a frame). Defaults to castVfxAdmit.
-  castVfxReady?: () => boolean;
+  castVfxReady?: (mask: number) => boolean;
   // True when the ability resolves with no cast bar (no cast time, channel, or
   // empower hold). Only these get the synthetic pre-release windup phase: a
   // real cast already performed its ceremony through the live castingAbility
@@ -301,6 +303,8 @@ const PHYSICAL_WOUND_DNA = { density: 6, spread: 0.12, up: -1.3, span: 1.1, size
  *  plan for the telegraphs the refusal still owes never charges the cast
  *  budget. Neither the area ring nor a rig clip varies with it. */
 const REFUSED_CAST_TIER = 2;
+
+const PAINTER_FAMILIES = CAST_VFX_ENGINE | CAST_VFX_KIT;
 
 // Palette to school mapping for the pooled point-light flashes (the renderer's
 // pulseAt is school-colored).
@@ -599,11 +603,17 @@ export class AbilityVfx {
   // Returns true when this painter fully handled the event (the renderer skips
   // its generic school-colored arm), false to fall through unchanged.
   private admitted(): boolean {
-    return this.deps.castVfxAdmit?.() ?? true;
+    return this.deps.castVfxAdmit?.(PAINTER_FAMILIES) ?? true;
   }
 
   private ready(): boolean {
-    return (this.deps.castVfxReady ?? this.deps.castVfxAdmit)?.() ?? true;
+    return (this.deps.castVfxReady ?? this.deps.castVfxAdmit)?.(PAINTER_FAMILIES) ?? true;
+  }
+
+  // Bloodletting's recovery heal, which the renderer routes here before its
+  // generic heal bloom: true when the Warrior kit claimed it.
+  warriorRecovery(ev: Extract<SimEvent, { type: 'heal2' }>, maxHp: number): boolean {
+    return this.deps.fx.warriorRecovery(ev, maxHp);
   }
 
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {

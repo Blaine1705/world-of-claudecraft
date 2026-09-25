@@ -6,6 +6,7 @@ import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
+import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import type { CharacterVisual } from './characters/visual';
 import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
@@ -34,16 +35,10 @@ interface PresentationHost {
   spiritBuild: Parameters<AbilityVfxFx['setSpiritBuildScheduler']>[0];
   compile: Parameters<AbilityVfxFx['setSpiritCompileGate']>[0];
   light: LightPulses;
+  castGate: Pick<CastVfxReadiness, 'admit' | 'ready' | 'spawnAllowed'>;
   painter: Pick<
     AbilityVfxDeps,
-    | 'castVfxAdmit'
-    | 'castVfxReady'
-    | 'spawnAoeRing'
-    | 'triggerAttack'
-    | 'lightPulse'
-    | 'addShake'
-    | 'screenFlash'
-    | 'screenImpact'
+    'spawnAoeRing' | 'triggerAttack' | 'lightPulse' | 'addShake' | 'screenFlash' | 'screenImpact'
   >;
 }
 
@@ -89,6 +84,8 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
   const painter = new AbilityVfx(
     {
       ...h.painter,
+      castVfxAdmit: (mask) => h.castGate.admit(mask),
+      castVfxReady: (mask) => h.castGate.ready(mask),
       vfx: h.vfx,
       fx,
       anchor: h.anchor,

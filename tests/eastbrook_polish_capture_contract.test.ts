@@ -692,7 +692,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the cast gate's engine family: the renderer leaf drops the lazy stand-ins from the gate. No capture was retaken.
   // Re-minted for the cast first-reads boot entry: the renderer leaf adds the entry and the engine-first resume, the prewarm policy leaf its constrained resume. No capture was retaken.
   // Re-minted for the AoE ring slot builder: the renderer leaf moves the ring material to aoe_ring_mesh.ts and names the kit in the gate comment. No capture was retaken.
-  '9f7408948e723dd0993e12f566dc864b495dd8ef3598f72d4c34cecccd964c3b';
+  // Re-minted for the per-family cast gate: the renderer leaf hands the gate object to the ability presentation and routes the Bloodletting recovery through the painter. No capture was retaken.
+  'd4d623bf835f37ad7ddd8f42cb0404207658f4b3df411004ce485e2462f28eb6';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

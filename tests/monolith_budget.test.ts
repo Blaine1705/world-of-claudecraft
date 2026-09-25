@@ -933,7 +933,9 @@ const MONOLITHS: MonolithRow[] = [
     // gained its assets line). Exact count.
     // Lowered 12789 -> 12782: the AoE ring slot builder moved to
     // src/render/aoe_ring_mesh.ts, shared with the cast first-reads test.
-    ceiling: 12782,
+    // Lowered 12782 -> 12781: the cast gate's predicates are wired in
+    // renderer_ability_presentation.ts from the one gate object.
+    ceiling: 12781,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
