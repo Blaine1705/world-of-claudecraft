@@ -2855,11 +2855,7 @@ export class Renderer {
         depthTest: false,
       });
       const ring = new THREE.Mesh(cmRingGeo, ringMat);
-      const crossMat = new THREE.MeshBasicMaterial({
-        transparent: true,
-        depthWrite: false,
-        depthTest: false,
-      });
+      const crossMat = ringMat.clone();
       const cross = new THREE.Group();
       for (const rot of [Math.PI / 4, -Math.PI / 4]) {
         const bar = new THREE.Mesh(cmBarGeo, crossMat);

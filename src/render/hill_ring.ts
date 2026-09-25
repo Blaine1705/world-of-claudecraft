@@ -14,6 +14,7 @@
 
 import * as THREE from 'three';
 import type { HillInfo } from '../world_api/world_pvp';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   HILL_RADIAL_STEP_YARDS,
   HILL_RIM_INNER_T,
@@ -123,9 +124,11 @@ export class HillRingVisuals {
     const fillGeo = this.drapedBand(info, fillStops, hillFillAlpha);
     const rimGeo = this.drapedBand(info, rimStops, hillRimAlpha);
     const fill = new THREE.Mesh(fillGeo, fillMat);
-    fill.renderOrder = 9;
+    // Ground band, above the world's own marks and under every player and boss
+    // floor effect (docs/design/vfx-floor-layering.md).
+    fill.renderOrder = floorVfxRenderOrder('ground', 5);
     const rim = new THREE.Mesh(rimGeo, rimMat);
-    rim.renderOrder = 10;
+    rim.renderOrder = floorVfxRenderOrder('ground', 6);
     group.add(fill, rim);
     this.scene.add(group);
     return {

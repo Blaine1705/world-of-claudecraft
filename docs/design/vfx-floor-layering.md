@@ -35,7 +35,7 @@ and a step is clamped so it can never cross into the band above.
 
 | Band | What lands here |
 |---|---|
-| `ground` | The world's own marks: blob shadows, mob night glow, torch and brazier pools, scorch decals. |
+| `ground` | The world's own marks: blob shadows, mob night glow, torch and brazier pools, scorch decals, the King of the Hill circle. |
 | `player` | Class ability ground VFX: buff auras, dissolve decals, shock rings, consecration, runes, meteor footprints, trap rings. |
 | `encounter` | Boss and encounter mechanics: telegraphs, soak zones, hazard fields, death zones, sigils, markers. |
 | `reticle` | The player's own ground aim guide. Additive, so it brightens what lies under it and never hides a telegraph. The click-to-move marker and the AoE landing flash are normal-blended, so they ride the top rung of the `player` band instead. |
@@ -102,15 +102,19 @@ uses; check the neighbours before picking one.
   ribbons, buff shells, overlay sprites, impact flipbook sheets, spirit puppets)
   and the particle cloud in `src/render/vfx.ts`. They are depth-tested against
   the world and additive, so their order only affects blend arithmetic among
-  themselves, not what a player can read. A boss module whose vertical pieces
-  belong to a floor mechanic (the Varkhul forge beams) still rides the ladder so
-  its stack cannot tie with a player band.
+  themselves, not what a player can read. The warrior kit's crest and impact
+  volumes keep their fixed low orders (4 and 5) too; the one flat kind among
+  them (the baked shockwave) sits under every player and encounter rung. A boss
+  module whose vertical pieces belong to a floor mechanic (the Varkhul forge
+  beams) still rides the ladder so its stack cannot tie with a player band.
 - The selection ring under a target and the static dungeon hazard pools stay on
   their existing orders. They are not VFX a player emits or a boss casts.
 - Three pre-existing Group orders stay where they are: two world markers far
   from any raid floor (the mount call beacon and the race line marker root) and
   the camera-attached underwater overlay. They are pinned in the test as the
   only carriers, a list that may only shrink; a module that gains a floor
-  mechanic near them must move its order to leaves first.
+  mechanic near them must move its order to leaves first. A negative Group
+  order (the opaque scene capture's `-Infinity` sentinel) sorts under every
+  rung and is not counted.
 - Materials, lifts, polygon offsets, and depth flags are untouched; the ladder
   changes only which floor mesh paints last.

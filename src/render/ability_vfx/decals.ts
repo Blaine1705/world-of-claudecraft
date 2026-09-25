@@ -200,6 +200,7 @@ export class GroundDecals {
     const stoneCarrier = new THREE.Mesh(this.slots[0].mesh.geometry, this.stoneMaterial);
     stoneCarrier.name = 'warrior-leap-fracture-prewarm';
     stoneCarrier.visible = false;
+    stoneCarrier.renderOrder = floorVfxRenderOrder('player', 0); // the slots' rung
     stoneCarrier.userData.renderCategory = 'vfx';
     this.slots[0].mesh.add(stoneCarrier);
   }

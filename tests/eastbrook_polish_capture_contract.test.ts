@@ -695,7 +695,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  '715a8537d1683523b8af113f00335f5e1f46eeda69d455fa8c0ab58038583bb6';
+  'ebf81e7c8c145c28afe992f4b69fa16ed0374e7960b50f0e823037817dee545d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

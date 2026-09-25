@@ -96,6 +96,7 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/streetlamps.ts', layer: 'ground', strict: true },
   { file: 'src/render/decor_torch_fx.ts', layer: 'ground', strict: true },
   { file: 'src/render/impact_site.ts', layer: 'ground', strict: true },
+  { file: 'src/render/hill_ring.ts', layer: 'ground', strict: true },
   // player class ability ground VFX
   { file: 'src/render/ability_vfx/decals.ts', layer: 'player', strict: true },
   { file: 'src/render/ability_vfx/ground_auras.ts', layer: 'player', strict: true },
@@ -167,6 +168,12 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/ability_vfx/shells.ts',
   'src/render/ability_vfx/spirits.ts',
   'src/render/vfx.ts',
+  // Warrior kit volumes (crest fans, rupture masses, impact volumes): depth-tested
+  // 3D shapes on fixed orders 4 and 5. The one flat kind (the baked shockwave)
+  // rides the same pooled slots on order 5, under every player and encounter
+  // rung, so a boss telegraph still paints over it.
+  'src/render/ability_vfx/baked_impact_layers.ts',
+  'src/render/ability_vfx/signature_crests.ts',
   // vertical or body-anchored class VFX
   'src/render/burning_pact_markers.ts',
   'src/render/characters/paladin_templars_verdict_fx.ts',
@@ -289,7 +296,9 @@ function groupOrderAssignments(file: string): string[] {
   if (names.size === 0) return hits;
   source.split('\n').forEach((line, index) => {
     for (const name of names) {
-      const re = new RegExp(`(^|[^\\w.])${name.replace('.', '\\.')}\\.renderOrder\\s*=`);
+      // A negative order (the opaque-capture sentinel's -Infinity) sorts the
+      // Group under every rung, so it cannot hide a floor mechanic.
+      const re = new RegExp(`(^|[^\\w.])${name.replace('.', '\\.')}\\.renderOrder\\s*=(?!\\s*-)`);
       if (re.test(line)) hits.push(`${file}:${index + 1}: ${line.trim()}`);
     }
   });

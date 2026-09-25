@@ -1389,7 +1389,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  '16066ee57db5876a3a9ad56cca7626cf56d4728b1ed96eeb4aba0a1e9746a70f';
+  '01b0154d838b5b41b6a0f296f8010dd24bd8d2a824514dc1fe00aaefbf9f6a4d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1407,7 +1407,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  '715a8537d1683523b8af113f00335f5e1f46eeda69d455fa8c0ab58038583bb6';
+  'ebf81e7c8c145c28afe992f4b69fa16ed0374e7960b50f0e823037817dee545d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2790,7 +2790,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // release/v0.44.0 (PR 4200) merge into feature/vfx-floor-layering: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-    ).toBe('6af2cff704920e9d77ac8f963af58bc25ca1f833277abd27f8339e67f50031d6');
+    ).toBe('d31a7dc07624ec9afed81290c35edd8a4a08e2bae9d614895dda9e7c3723af42');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
