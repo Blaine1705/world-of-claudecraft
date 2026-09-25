@@ -19,6 +19,10 @@ import { resetFrostNovaRootProfileCaches } from '../frost_nova_root_visual';
 import { type GfxSettings, resetSurfaceMaterialProfileCache } from '../gfx';
 import { prepareGreatTreeProfileAssets } from '../great_tree_prewarm';
 import { clearGroundDecorPrewarmDraws } from '../ground_decor_prewarm';
+import {
+  prepareHarborRouteMarkerAssets,
+  resetHarborRouteMarkerCaches,
+} from '../harbor_route_markers';
 import { resetIceBlockProfileCaches } from '../ice_block_visual';
 import { resetJailSceneProfileCaches } from '../jail_scene';
 import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailbox';
@@ -61,6 +65,7 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
       prepareMailboxProfileAssets(),
       prepareNoticeboardProfileAssets(),
       prepareTransportShipAssets(),
+      prepareHarborRouteMarkerAssets(),
     ]).then(() => undefined),
 ];
 
@@ -87,6 +92,7 @@ const RESETTERS = [
   ['ice_block_visual', resetIceBlockProfileCaches],
   ['temporal_hourglass_visual', resetTemporalHourglassProfileCaches],
   ['transport_ship', resetTransportShipCaches],
+  ['harbor_route_markers', resetHarborRouteMarkerCaches],
   // The boot twin manifest for the lazy ground-decor pools holds the LIVE
   // materials of the retiring profile: a rebuild mints new ones, and a twin
   // wearing a retired material links a program nothing will ever draw.

@@ -781,7 +781,7 @@ function staticWorldColliders(seed: number): Collider[] {
   out.push(...buildDecorPropColliders(seed, PROPS.decorProps ?? []));
   // Scheduled transport ships moor at every berth of their route, gated by
   // the timetable (transport_gates.ts); built-in world only.
-  if (content === BUILTIN_WORLD) out.push(...transportBerthColliders());
+  if (content === BUILTIN_WORLD) out.push(...transportBerthColliders(seed));
 
   // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
   // grid the renderer lays the hedge GLBs from, so the blocked ground IS the

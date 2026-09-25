@@ -116,8 +116,9 @@ describe('Eastbrook ferry berth', () => {
   });
 
   it('seats the deck volumes on the rendered waterline', () => {
-    // one hull per berth, each tagged with its berth's schedule gate
-    const colliders = transportBerthColliders();
+    // one hull per berth, each tagged with its berth's schedule gate (the
+    // berths' harbor route marker posts ride along ungated)
+    const colliders = transportBerthColliders(WORLD_SEED).filter((c) => c.gate !== undefined);
     expect(colliders).toHaveLength(4 * HULL.volumes.length);
     expect(new Set(colliders.map((c) => c.gate))).toEqual(
       new Set([

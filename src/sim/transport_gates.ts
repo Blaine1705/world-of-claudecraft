@@ -22,6 +22,7 @@
 
 import type { Collider } from './colliders';
 import { TRANSPORT_ROUTES, TRANSPORT_SHIP_HULLS } from './content/transport_ships';
+import { harborRouteMarkerColliders } from './harbor_route_markers';
 import { transportBerthOpenAt } from './transport_schedule';
 import { shipHullColliders } from './transport_ship';
 import { WATER_LEVEL } from './world';
@@ -34,9 +35,11 @@ export function transportGateId(routeId: string, berth: number): string {
 /**
  * Every route berth's hull colliders, tagged with the berth's gate. Seated on
  * the waterline (a transport ship floats at WATER_LEVEL, the same seat the
- * renderer draws it on).
+ * renderer draws it on). Then the berths' harbor route markers
+ * (harbor_route_markers.ts): one narrow post each, UNGATED, since the sign
+ * stands on the pier whether or not the ship is in.
  */
-export function transportBerthColliders(): Collider[] {
+export function transportBerthColliders(seed: number): Collider[] {
   const out: Collider[] = [];
   for (const route of TRANSPORT_ROUTES) {
     const hull = TRANSPORT_SHIP_HULLS[route.ship];
@@ -54,6 +57,7 @@ export function transportBerthColliders(): Collider[] {
       }
     });
   }
+  out.push(...harborRouteMarkerColliders(seed));
   return out;
 }
 

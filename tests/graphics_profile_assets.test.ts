@@ -21,6 +21,7 @@ const mocks = vi.hoisted(() => {
     mailbox: prepare(),
     noticeboard: prepare(),
     ship: prepare(),
+    harborMarker: prepare(),
     reset: vi.fn(),
   };
 });
@@ -70,6 +71,10 @@ vi.mock('../src/render/eastbrook_town', () => ({
 vi.mock('../src/render/transport_ship', () => ({
   prepareTransportShipAssets: mocks.ship,
   resetTransportShipCaches: mocks.reset,
+}));
+vi.mock('../src/render/harbor_route_markers', () => ({
+  prepareHarborRouteMarkerAssets: mocks.harborMarker,
+  resetHarborRouteMarkerCaches: mocks.reset,
 }));
 vi.mock('../src/render/eastbrook_grand_armoury', () => ({
   prepareEastbrookGrandArmouryProfileAssets: mocks.armoury,
@@ -147,6 +152,7 @@ const prepareSpies = [
   mocks.mailbox,
   mocks.noticeboard,
   mocks.ship,
+  mocks.harborMarker,
 ];
 
 beforeEach(() => {
@@ -174,6 +180,7 @@ describe('graphics profile asset preparation', () => {
       mocks.mailbox,
       mocks.noticeboard,
       mocks.ship,
+      mocks.harborMarker,
     ]) {
       expect(prepare).toHaveBeenCalledWith();
     }
@@ -224,6 +231,7 @@ describe('graphics profile derived-cache reset', () => {
       'ice_block_visual',
       'temporal_hourglass_visual',
       'transport_ship',
+      'harbor_route_markers',
       'ground_decor_prewarm',
     ]);
     expect(() => resetGraphicsProfileDerivedCaches()).not.toThrow();
