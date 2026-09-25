@@ -1863,6 +1863,11 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Vanguard Gallery',
     desc: 'The Warfare Season 2 spec sets and weapons, bought with honor.',
     clearSource: { kind: 'none' },
+    // Class-personal stock (each set is class-locked and the shop lists only the
+    // viewer's own class), so no single character can fill it: outside both
+    // completion pairs, the Riftbound precedent, so the Conquerors capstone never
+    // needs a character of every class.
+    excludeFromCompletion: 'personal',
     relics: items(...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },
 ]);

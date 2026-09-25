@@ -463,8 +463,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // horizons_mounts rows (goblin_rocket_sled, rallycart_rxt): 445, MEASURED
     // on the merged tree. UNION MERGE: base plus both deltas, the professions
     // and release branches content is disjoint.
-    // +139: the Warfare Season 2 page (135 set pieces and four weapons).
-    expect(full).toEqual({ owned: 580, total: 580 });
+    // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
+    // is class-personal and sits outside completion, so it moves neither pair.
+    expect(full).toEqual({ owned: 441, total: 441 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -492,8 +493,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // (goblin_rocket_sled, rallycart_rxt), the same +2 as the overview pair
     // above: 416, MEASURED on the merged tree. UNION MERGE: base plus both
     // deltas, see the overview pair's note above.
-    // +139: the Warfare Season 2 page.
-    expect(character).toEqual({ owned: 551, total: 551 });
+    // The Warfare Season 2 page is class-personal, outside completion.
+    expect(character).toEqual({ owned: 412, total: 412 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -1266,7 +1267,7 @@ describe('Reliquary Riftbound page (class-personal, outside completion)', () => 
 });
 
 describe('Reliquary outside-completion pages (the flagged set)', () => {
-  it('flags exactly the three pages, in catalog order, each with its reason', () => {
+  it('flags exactly the four pages, in catalog order, each with its reason', () => {
     // Catalog-wide companion to the per-page pins: the flag is the one lever
     // that removes a page from every completion pair, so its whole membership
     // is pinned in one place. Forgebreaker's approved one-time, class-restricted
@@ -1280,6 +1281,8 @@ describe('Reliquary outside-completion pages (the flagged set)', () => {
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
       ['professions_forgebreaker', 'personal'],
+      // Class-locked Warfare Season 2 stock: no single character can fill it.
+      ['conquerors_vanguard_gallery', 'personal'],
     ]);
     // Both reasons are live, so neither arm of the reason-driven chrome
     // (window chip, styles) is pinned against an empty set. Sorting keeps

@@ -583,3 +583,25 @@ describe('buildWarfareVendorView over the full honor stock (Warfare Season 2 fir
     expect(view.sections.filter((s) => s.group === 'season2' && s.kind === 'set')).toHaveLength(27);
   });
 });
+
+describe('buildWarfareVendorView names the spec of each Season 2 set', () => {
+  it('carries the class and spec on Season 2 sets and nothing on the entry tier', () => {
+    const view = buildWarfareVendorView(
+      HONOR_QUARTERMASTER_STOCK,
+      ITEMS,
+      ITEM_SETS,
+      viewer({ viewerClass: 'warrior' }),
+    );
+    const specs = view.sections
+      .filter((s) => s.kind === 'set' && s.group === 'season2')
+      .map((s) => (s.kind === 'set' ? s.spec : undefined));
+    expect(specs).toEqual([
+      { cls: 'warrior', spec: 'arms' },
+      { cls: 'warrior', spec: 'fury' },
+      { cls: 'warrior', spec: 'prot' },
+    ]);
+    for (const s of view.sections) {
+      if (s.kind === 'set' && s.group === 'entry') expect(s.spec, s.key).toBeUndefined();
+    }
+  });
+});

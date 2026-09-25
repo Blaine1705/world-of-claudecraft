@@ -15,13 +15,25 @@
 // not paint, and why the tiers / ownedPieces / nextTier fields below survive
 // anyway).
 
-import { SEASON2_STOCK } from '../../../sim/content/pvp_honor_season2';
+import { SEASON2_SETS, SEASON2_STOCK } from '../../../sim/content/pvp_honor_season2';
 import type { ItemDef, ItemSet } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 
 /** Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts): the top tier,
  *  listed above the entry tier in its own group. */
 const SEASON2_IDS: ReadonlySet<string> = new Set(SEASON2_STOCK);
+
+/** Season 2 set id to the class and spec it is built for, so the painter can
+ *  name the spec beside the set (Bladewake Battlegear, Arms). */
+const SEASON2_SPEC_BY_SET: ReadonlyMap<string, WarfareShopSetSpec> = new Map(
+  SEASON2_SETS.map((set) => [set.setId, { cls: set.cls, spec: set.spec }]),
+);
+
+/** The class and spec a Season 2 set is built for (ids; the painter translates). */
+export interface WarfareShopSetSpec {
+  cls: string;
+  spec: string;
+}
 
 /** The two groups the shop lists, top tier first. */
 export type WarfareShopGroup = 'season2' | 'entry';
@@ -95,6 +107,9 @@ export interface WarfareShopSetSection {
   /** The set id, which is also this section's unique key. */
   key: string;
   setId: string;
+  /** The spec a Season 2 set is built for; absent on the entry tier, whose
+   *  families serve every spec of an armor type. */
+  spec?: WarfareShopSetSpec;
   offers: WarfareShopOffer[];
   /** Every authored tier the set can actually reach, ascending. Piece-count
    *  agnostic: no 2/3/4 literal anywhere, so the 2/4/7 breakpoints render. */
@@ -287,6 +302,7 @@ export function buildWarfareVendorView(
     sections.push({
       kind: 'set',
       group: seasonSetIds.includes(setId) ? 'season2' : 'entry',
+      spec: SEASON2_SPEC_BY_SET.get(setId),
       key: setId,
       setId,
       offers,

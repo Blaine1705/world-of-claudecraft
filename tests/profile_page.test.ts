@@ -190,9 +190,9 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // `npx vitest run tests/profile_page.test.ts` once the tree compiles.
     // +1 on the 411 above: the Viridian Valestrider takes a horizons_mounts
     // slot (RELIQUARY_HORIZON_MOUNTS, src/sim/content/reliquary.ts).
-    // +139 on the 412 above: the Warfare Season 2 Vanguard Gallery (27 five-piece
-    // spec sets plus four weapons, src/sim/content/reliquary.ts).
-    expect(catalogTotal).toBe(551);
+    // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
+    // completion, so the total stays at 412.
+    expect(catalogTotal).toBe(412);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

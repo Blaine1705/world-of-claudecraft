@@ -1026,7 +1026,7 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     }
   });
 
-  it('labels all three outside-completion pages, and renders tag plus note for each', () => {
+  it('labels all four outside-completion pages, and renders tag plus note for each', () => {
     // The generated blob carries the flag for exactly the live flagged set
     // (a third flagged page must surface here the moment it is authored)...
     expect(
@@ -1038,13 +1038,15 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
       ['professions_forgebreaker', 'personal'],
+      // Class-locked Warfare Season 2 stock.
+      ['conquerors_vanguard_gallery', 'personal'],
     ]);
     // ...and the rendered catalog SHOWS the label: the tag beside the page
     // heading and the explanatory note, one pair per flagged page, resolved
     // through t() (never hardcoded English), with none on ordinary pages.
     const html = reliquaryCatalogSections(GUIDE_RELIQUARY);
-    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(3);
-    expect(html.match(/guide-reliquary-note/g)?.length).toBe(3);
+    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(4);
+    expect(html.match(/guide-reliquary-note/g)?.length).toBe(4);
     expect(html).toContain(`(${t('guide.reliquaryPage.retiredTag')})`);
     expect(html).toContain(`(${t('guide.reliquaryPage.personalTag')})`);
     expect(html).toContain(t('guide.reliquaryPage.retiredNote'));

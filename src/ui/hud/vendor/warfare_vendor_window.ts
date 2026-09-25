@@ -28,6 +28,8 @@
 // are honest data and a future caller may want them; this painter simply renders
 // none of it.
 
+import { talentsFor } from '../../../sim/content/talents';
+import type { PlayerClass } from '../../../sim/types';
 import { currencyIconHtml } from '../../currency_art';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName, tEntity } from '../../entity_i18n';
@@ -36,6 +38,7 @@ import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
 import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
+import { tTalent } from '../../talent_i18n';
 import { svgIcon } from '../../ui_icons';
 import type { WarfareShopOffer, WarfareShopSection, WarfareShopView } from './warfare_vendor_view';
 
@@ -106,6 +109,13 @@ function appendOfferTile(
 }
 
 /** Paint the WARFARE shop panel from a prepared view. */
+/** The translated spec name for a Season 2 set, or null (entry tier, unknown). */
+function setSpecName(spec: { cls: string; spec: string } | undefined): string | null {
+  if (!spec) return null;
+  const def = talentsFor(spec.cls as PlayerClass)?.specs.find((s) => s.id === spec.spec);
+  return def ? tTalent({ kind: 'talentSpec', spec: def, field: 'name' }) : null;
+}
+
 export function renderWarfareVendorWindow(
   el: HTMLElement,
   vendorName: string,
@@ -159,6 +169,14 @@ export function renderWarfareVendorWindow(
     const heading = document.createElement('div');
     heading.className = 'vendor-section-title';
     heading.textContent = sectionTitleText(section);
+    // A Season 2 set names the spec it is built for beside the set name.
+    const specName = section.kind === 'set' ? setSpecName(section.spec) : null;
+    if (specName) {
+      const spec = document.createElement('span');
+      spec.className = 'warfare-set-spec';
+      spec.textContent = specName;
+      heading.appendChild(spec);
+    }
     el.appendChild(heading);
     const grid = document.createElement('div');
     grid.className = 'vendor-goods-grid';

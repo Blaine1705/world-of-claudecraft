@@ -7531,6 +7531,25 @@
   .vendor-item.warfare-owned .vi-sub {
     color: var(--gold);
   }
+  /* A group heading (Warfare Season 2 above the entry tier) reads a level
+     above the set titles under it: larger, spaced caps, and a heavier rule,
+     so the Season 2 banner never reads as one more set. */
+  #warfare-window .warfare-group-title {
+    margin-top: 14px;
+    padding-top: 9px;
+    border-top: 2px solid var(--gold);
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  /* The spec a Season 2 set is built for, beside its name. */
+  #warfare-window .warfare-set-spec {
+    margin-left: 8px;
+    color: var(--color-text-light);
+    font-family: inherit;
+    font-size: 11px;
+    opacity: 0.85;
+  }
 
   /* ---------- tutorial and ferry notes ---------- */
   /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the

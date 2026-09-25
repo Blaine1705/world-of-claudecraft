@@ -434,6 +434,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_arms_shoulder: {
     id: 'vanguard_warrior_arms_shoulder',
@@ -451,6 +452,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_arms_chest: {
     id: 'vanguard_warrior_arms_chest',
@@ -468,6 +470,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_arms_legs: {
     id: 'vanguard_warrior_arms_legs',
@@ -485,6 +488,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_arms_gloves: {
     id: 'vanguard_warrior_arms_gloves',
@@ -502,6 +506,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_fury_helmet: {
     id: 'vanguard_warrior_fury_helmet',
@@ -519,6 +524,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_fury_shoulder: {
     id: 'vanguard_warrior_fury_shoulder',
@@ -536,6 +542,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_fury_chest: {
     id: 'vanguard_warrior_fury_chest',
@@ -553,6 +560,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_fury_legs: {
     id: 'vanguard_warrior_fury_legs',
@@ -570,6 +578,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_fury_gloves: {
     id: 'vanguard_warrior_fury_gloves',
@@ -587,6 +596,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_prot_helmet: {
     id: 'vanguard_warrior_prot_helmet',
@@ -604,6 +614,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_prot_shoulder: {
     id: 'vanguard_warrior_prot_shoulder',
@@ -621,6 +632,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_prot_chest: {
     id: 'vanguard_warrior_prot_chest',
@@ -638,6 +650,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_prot_legs: {
     id: 'vanguard_warrior_prot_legs',
@@ -655,6 +668,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_warrior_prot_gloves: {
     id: 'vanguard_warrior_prot_gloves',
@@ -672,6 +686,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior'],
+    classLocked: true,
   },
   vanguard_paladin_holy_helmet: {
     id: 'vanguard_paladin_holy_helmet',
@@ -689,6 +704,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_holy_shoulder: {
     id: 'vanguard_paladin_holy_shoulder',
@@ -706,6 +722,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_holy_chest: {
     id: 'vanguard_paladin_holy_chest',
@@ -723,6 +740,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_holy_legs: {
     id: 'vanguard_paladin_holy_legs',
@@ -740,6 +758,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_holy_gloves: {
     id: 'vanguard_paladin_holy_gloves',
@@ -757,6 +776,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_protection_helmet: {
     id: 'vanguard_paladin_protection_helmet',
@@ -774,6 +794,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_protection_shoulder: {
     id: 'vanguard_paladin_protection_shoulder',
@@ -791,6 +812,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_protection_chest: {
     id: 'vanguard_paladin_protection_chest',
@@ -808,6 +830,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_protection_legs: {
     id: 'vanguard_paladin_protection_legs',
@@ -825,6 +848,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_protection_gloves: {
     id: 'vanguard_paladin_protection_gloves',
@@ -842,6 +866,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_retribution_helmet: {
     id: 'vanguard_paladin_retribution_helmet',
@@ -859,6 +884,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_retribution_shoulder: {
     id: 'vanguard_paladin_retribution_shoulder',
@@ -876,6 +902,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_retribution_chest: {
     id: 'vanguard_paladin_retribution_chest',
@@ -893,6 +920,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_retribution_legs: {
     id: 'vanguard_paladin_retribution_legs',
@@ -910,6 +938,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_paladin_retribution_gloves: {
     id: 'vanguard_paladin_retribution_gloves',
@@ -927,6 +956,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['paladin'],
+    classLocked: true,
   },
   vanguard_hunter_beast_mastery_helmet: {
     id: 'vanguard_hunter_beast_mastery_helmet',
@@ -944,6 +974,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_beast_mastery_shoulder: {
     id: 'vanguard_hunter_beast_mastery_shoulder',
@@ -961,6 +992,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_beast_mastery_chest: {
     id: 'vanguard_hunter_beast_mastery_chest',
@@ -978,6 +1010,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_beast_mastery_legs: {
     id: 'vanguard_hunter_beast_mastery_legs',
@@ -995,6 +1028,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_beast_mastery_gloves: {
     id: 'vanguard_hunter_beast_mastery_gloves',
@@ -1012,6 +1046,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_marksmanship_helmet: {
     id: 'vanguard_hunter_marksmanship_helmet',
@@ -1029,6 +1064,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_marksmanship_shoulder: {
     id: 'vanguard_hunter_marksmanship_shoulder',
@@ -1046,6 +1082,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_marksmanship_chest: {
     id: 'vanguard_hunter_marksmanship_chest',
@@ -1063,6 +1100,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_marksmanship_legs: {
     id: 'vanguard_hunter_marksmanship_legs',
@@ -1080,6 +1118,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_marksmanship_gloves: {
     id: 'vanguard_hunter_marksmanship_gloves',
@@ -1097,6 +1136,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_survival_helmet: {
     id: 'vanguard_hunter_survival_helmet',
@@ -1114,6 +1154,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_survival_shoulder: {
     id: 'vanguard_hunter_survival_shoulder',
@@ -1131,6 +1172,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_survival_chest: {
     id: 'vanguard_hunter_survival_chest',
@@ -1148,6 +1190,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_survival_legs: {
     id: 'vanguard_hunter_survival_legs',
@@ -1165,6 +1208,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_hunter_survival_gloves: {
     id: 'vanguard_hunter_survival_gloves',
@@ -1182,6 +1226,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['hunter'],
+    classLocked: true,
   },
   vanguard_rogue_assassination_helmet: {
     id: 'vanguard_rogue_assassination_helmet',
@@ -1199,6 +1244,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_assassination_shoulder: {
     id: 'vanguard_rogue_assassination_shoulder',
@@ -1216,6 +1262,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_assassination_chest: {
     id: 'vanguard_rogue_assassination_chest',
@@ -1233,6 +1280,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_assassination_legs: {
     id: 'vanguard_rogue_assassination_legs',
@@ -1250,6 +1298,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_assassination_gloves: {
     id: 'vanguard_rogue_assassination_gloves',
@@ -1267,6 +1316,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_combat_helmet: {
     id: 'vanguard_rogue_combat_helmet',
@@ -1284,6 +1334,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_combat_shoulder: {
     id: 'vanguard_rogue_combat_shoulder',
@@ -1301,6 +1352,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_combat_chest: {
     id: 'vanguard_rogue_combat_chest',
@@ -1318,6 +1370,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_combat_legs: {
     id: 'vanguard_rogue_combat_legs',
@@ -1335,6 +1388,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_combat_gloves: {
     id: 'vanguard_rogue_combat_gloves',
@@ -1352,6 +1406,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_subtlety_helmet: {
     id: 'vanguard_rogue_subtlety_helmet',
@@ -1369,6 +1424,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_subtlety_shoulder: {
     id: 'vanguard_rogue_subtlety_shoulder',
@@ -1386,6 +1442,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_subtlety_chest: {
     id: 'vanguard_rogue_subtlety_chest',
@@ -1403,6 +1460,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_subtlety_legs: {
     id: 'vanguard_rogue_subtlety_legs',
@@ -1420,6 +1478,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_rogue_subtlety_gloves: {
     id: 'vanguard_rogue_subtlety_gloves',
@@ -1437,6 +1496,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue'],
+    classLocked: true,
   },
   vanguard_priest_discipline_helmet: {
     id: 'vanguard_priest_discipline_helmet',
@@ -1454,6 +1514,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_discipline_shoulder: {
     id: 'vanguard_priest_discipline_shoulder',
@@ -1471,6 +1532,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_discipline_chest: {
     id: 'vanguard_priest_discipline_chest',
@@ -1488,6 +1550,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_discipline_legs: {
     id: 'vanguard_priest_discipline_legs',
@@ -1505,6 +1568,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_discipline_gloves: {
     id: 'vanguard_priest_discipline_gloves',
@@ -1522,6 +1586,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_holy_helmet: {
     id: 'vanguard_priest_holy_helmet',
@@ -1539,6 +1604,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_holy_shoulder: {
     id: 'vanguard_priest_holy_shoulder',
@@ -1556,6 +1622,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_holy_chest: {
     id: 'vanguard_priest_holy_chest',
@@ -1573,6 +1640,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_holy_legs: {
     id: 'vanguard_priest_holy_legs',
@@ -1590,6 +1658,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_holy_gloves: {
     id: 'vanguard_priest_holy_gloves',
@@ -1607,6 +1676,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_shadow_helmet: {
     id: 'vanguard_priest_shadow_helmet',
@@ -1624,6 +1694,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_shadow_shoulder: {
     id: 'vanguard_priest_shadow_shoulder',
@@ -1641,6 +1712,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_shadow_chest: {
     id: 'vanguard_priest_shadow_chest',
@@ -1658,6 +1730,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_shadow_legs: {
     id: 'vanguard_priest_shadow_legs',
@@ -1675,6 +1748,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_priest_shadow_gloves: {
     id: 'vanguard_priest_shadow_gloves',
@@ -1692,6 +1766,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['priest'],
+    classLocked: true,
   },
   vanguard_shaman_elemental_helmet: {
     id: 'vanguard_shaman_elemental_helmet',
@@ -1709,6 +1784,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_elemental_shoulder: {
     id: 'vanguard_shaman_elemental_shoulder',
@@ -1726,6 +1802,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_elemental_chest: {
     id: 'vanguard_shaman_elemental_chest',
@@ -1743,6 +1820,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_elemental_legs: {
     id: 'vanguard_shaman_elemental_legs',
@@ -1760,6 +1838,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_elemental_gloves: {
     id: 'vanguard_shaman_elemental_gloves',
@@ -1777,6 +1856,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_enhancement_helmet: {
     id: 'vanguard_shaman_enhancement_helmet',
@@ -1794,6 +1874,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_enhancement_shoulder: {
     id: 'vanguard_shaman_enhancement_shoulder',
@@ -1811,6 +1892,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_enhancement_chest: {
     id: 'vanguard_shaman_enhancement_chest',
@@ -1828,6 +1910,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_enhancement_legs: {
     id: 'vanguard_shaman_enhancement_legs',
@@ -1845,6 +1928,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_enhancement_gloves: {
     id: 'vanguard_shaman_enhancement_gloves',
@@ -1862,6 +1946,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_restoration_helmet: {
     id: 'vanguard_shaman_restoration_helmet',
@@ -1879,6 +1964,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_restoration_shoulder: {
     id: 'vanguard_shaman_restoration_shoulder',
@@ -1896,6 +1982,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_restoration_chest: {
     id: 'vanguard_shaman_restoration_chest',
@@ -1913,6 +2000,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_restoration_legs: {
     id: 'vanguard_shaman_restoration_legs',
@@ -1930,6 +2018,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_shaman_restoration_gloves: {
     id: 'vanguard_shaman_restoration_gloves',
@@ -1947,6 +2036,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['shaman'],
+    classLocked: true,
   },
   vanguard_mage_arcane_helmet: {
     id: 'vanguard_mage_arcane_helmet',
@@ -1964,6 +2054,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_arcane_shoulder: {
     id: 'vanguard_mage_arcane_shoulder',
@@ -1981,6 +2072,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_arcane_chest: {
     id: 'vanguard_mage_arcane_chest',
@@ -1998,6 +2090,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_arcane_legs: {
     id: 'vanguard_mage_arcane_legs',
@@ -2015,6 +2108,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_arcane_gloves: {
     id: 'vanguard_mage_arcane_gloves',
@@ -2032,6 +2126,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_fire_helmet: {
     id: 'vanguard_mage_fire_helmet',
@@ -2049,6 +2144,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_fire_shoulder: {
     id: 'vanguard_mage_fire_shoulder',
@@ -2066,6 +2162,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_fire_chest: {
     id: 'vanguard_mage_fire_chest',
@@ -2083,6 +2180,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_fire_legs: {
     id: 'vanguard_mage_fire_legs',
@@ -2100,6 +2198,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_fire_gloves: {
     id: 'vanguard_mage_fire_gloves',
@@ -2117,6 +2216,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_frost_helmet: {
     id: 'vanguard_mage_frost_helmet',
@@ -2134,6 +2234,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_frost_shoulder: {
     id: 'vanguard_mage_frost_shoulder',
@@ -2151,6 +2252,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_frost_chest: {
     id: 'vanguard_mage_frost_chest',
@@ -2168,6 +2270,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_frost_legs: {
     id: 'vanguard_mage_frost_legs',
@@ -2185,6 +2288,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_mage_frost_gloves: {
     id: 'vanguard_mage_frost_gloves',
@@ -2202,6 +2306,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage'],
+    classLocked: true,
   },
   vanguard_warlock_affliction_helmet: {
     id: 'vanguard_warlock_affliction_helmet',
@@ -2219,6 +2324,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_affliction_shoulder: {
     id: 'vanguard_warlock_affliction_shoulder',
@@ -2236,6 +2342,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_affliction_chest: {
     id: 'vanguard_warlock_affliction_chest',
@@ -2253,6 +2360,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_affliction_legs: {
     id: 'vanguard_warlock_affliction_legs',
@@ -2270,6 +2378,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_affliction_gloves: {
     id: 'vanguard_warlock_affliction_gloves',
@@ -2287,6 +2396,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_demonology_helmet: {
     id: 'vanguard_warlock_demonology_helmet',
@@ -2304,6 +2414,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_demonology_shoulder: {
     id: 'vanguard_warlock_demonology_shoulder',
@@ -2321,6 +2432,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_demonology_chest: {
     id: 'vanguard_warlock_demonology_chest',
@@ -2338,6 +2450,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_demonology_legs: {
     id: 'vanguard_warlock_demonology_legs',
@@ -2355,6 +2468,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_demonology_gloves: {
     id: 'vanguard_warlock_demonology_gloves',
@@ -2372,6 +2486,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_destruction_helmet: {
     id: 'vanguard_warlock_destruction_helmet',
@@ -2389,6 +2504,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_destruction_shoulder: {
     id: 'vanguard_warlock_destruction_shoulder',
@@ -2406,6 +2522,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_destruction_chest: {
     id: 'vanguard_warlock_destruction_chest',
@@ -2423,6 +2540,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_destruction_legs: {
     id: 'vanguard_warlock_destruction_legs',
@@ -2440,6 +2558,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_warlock_destruction_gloves: {
     id: 'vanguard_warlock_destruction_gloves',
@@ -2457,6 +2576,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warlock'],
+    classLocked: true,
   },
   vanguard_druid_balance_helmet: {
     id: 'vanguard_druid_balance_helmet',
@@ -2474,6 +2594,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_balance_shoulder: {
     id: 'vanguard_druid_balance_shoulder',
@@ -2491,6 +2612,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_balance_chest: {
     id: 'vanguard_druid_balance_chest',
@@ -2508,6 +2630,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_balance_legs: {
     id: 'vanguard_druid_balance_legs',
@@ -2525,6 +2648,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_balance_gloves: {
     id: 'vanguard_druid_balance_gloves',
@@ -2542,6 +2666,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_feral_helmet: {
     id: 'vanguard_druid_feral_helmet',
@@ -2559,6 +2684,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_feral_shoulder: {
     id: 'vanguard_druid_feral_shoulder',
@@ -2576,6 +2702,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_feral_chest: {
     id: 'vanguard_druid_feral_chest',
@@ -2593,6 +2720,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_feral_legs: {
     id: 'vanguard_druid_feral_legs',
@@ -2610,6 +2738,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_feral_gloves: {
     id: 'vanguard_druid_feral_gloves',
@@ -2627,6 +2756,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_restoration_helmet: {
     id: 'vanguard_druid_restoration_helmet',
@@ -2644,6 +2774,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_restoration_shoulder: {
     id: 'vanguard_druid_restoration_shoulder',
@@ -2661,6 +2792,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_restoration_chest: {
     id: 'vanguard_druid_restoration_chest',
@@ -2678,6 +2810,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_restoration_legs: {
     id: 'vanguard_druid_restoration_legs',
@@ -2695,6 +2828,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_druid_restoration_gloves: {
     id: 'vanguard_druid_restoration_gloves',
@@ -2712,6 +2846,7 @@ export const SEASON2_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
     requiredClass: ['druid'],
+    classLocked: true,
   },
   vanguard_verdict_greatsword: {
     id: 'vanguard_verdict_greatsword',

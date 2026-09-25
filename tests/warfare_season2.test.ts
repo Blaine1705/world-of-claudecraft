@@ -19,6 +19,7 @@ import {
   SEASON2_WEAPON_IDS,
   SEASON2_WEAPON_PRICE,
 } from '../src/sim/content/pvp_honor_season2';
+import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { VANGUARD_SET_ENGINE_BONUSES } from '../src/sim/content/vanguard_set_bonuses';
 import { DUNGEON_X_THRESHOLD, ITEMS, NPCS } from '../src/sim/data';
@@ -91,6 +92,13 @@ describe('the Season 2 stock', () => {
         // The class's own heaviest armor, and wearable through the real equip rules.
         expect(it.armorType, it.id).toBe(maxArmorTypeForClass(set.cls as PlayerClass));
         expect(canEquipItem(set.cls as PlayerClass, it), `${set.cls} wears ${it.id}`).toBe(true);
+        // Class-locked in earnest: no other class can equip it, even one whose
+        // armor type would otherwise allow it (a mage and the priest cloth).
+        expect(it.classLocked, it.id).toBe(true);
+        for (const other of Object.keys(ARMOR_TYPE) as PlayerClass[]) {
+          if (other === set.cls) continue;
+          expect(canEquipItem(other, it), `${other} refused ${it.id}`).toBe(false);
+        }
       }
     }
     for (const id of SEASON2_STOCK) {
@@ -434,5 +442,17 @@ describe('the crowd-control promise: no set makes heavy control spammable', () =
     }
     // Anti-vacuity: the sweep sees the control cuts that do ship.
     expect(Object.keys(cuts).length).toBeGreaterThan(3);
+  });
+});
+
+describe('the Reliquary page: class-personal stock outside completion', () => {
+  it('lists every Season 2 item but never gates the Conquerors capstone', () => {
+    const page = RELIQUARY_PAGES_BY_ID.conquerors_vanguard_gallery;
+    expect(page.shelf).toBe('conquerors');
+    // The sets are class-locked and the shop lists only the viewer's own class,
+    // so no single character can fill the page: the Riftbound precedent.
+    expect(page.excludeFromCompletion).toBe('personal');
+    const listed = new Set(page.relics.map((r) => (r as { itemId?: string }).itemId));
+    for (const id of SEASON2_STOCK) expect(listed.has(id), id).toBe(true);
   });
 });

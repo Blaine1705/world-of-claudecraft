@@ -2454,8 +2454,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 163,840-byte threshold warned on this legal modeled state. Measured here,
     // after this release merge's settle: this combined fixture (hammer
     // content, field_kit, the Bramblehide release content, and the two hub
-    // practice quests) is 211,084 bytes, 18,292 bytes of headroom below the
-    // threshold. Pin the measured
+    // practice quests) was 211,084 bytes; with the Warfare Season 2 stock it is
+    // 224,900 bytes, 4,476 bytes of headroom below the threshold. Pin the measured
     // relation: a lower threshold or further content growth crossing it
     // requires re-measuring and reviewing both sides together, never silently
     // widening this test's narrow tracking band or the warn threshold itself.

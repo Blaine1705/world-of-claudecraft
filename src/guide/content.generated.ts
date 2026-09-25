@@ -7910,6 +7910,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
     "id": "conquerors_vanguard_gallery",
     "shelf": "conquerors",
     "name": "Vanguard Gallery",
+    "excludeFromCompletion": "personal",
     "relics": [
       {
         "kind": "item",
