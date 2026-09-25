@@ -10236,6 +10236,9 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
+        // Auras sits under Overlays; a base commit that predates the Overlays row
+        // still lists it on the Game Menu root, so the Overlays click is optional.
+        document.querySelector('#options-menu .opt-btn[data-menu-action="overlays"]')?.click();
         document.querySelector('#options-menu .opt-btn[data-menu-action="auras"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .aura-settings-intro');
@@ -10305,6 +10308,9 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
+        // Auras sits under Overlays; a base commit that predates the Overlays row
+        // still lists it on the Game Menu root, so the Overlays click is optional.
+        document.querySelector('#options-menu .opt-btn[data-menu-action="overlays"]')?.click();
         document.querySelector('#options-menu .opt-btn[data-menu-action="auras"]')?.click();
       });
       // Poll the panel INTRO, not the proc grid: a class with no authored proc

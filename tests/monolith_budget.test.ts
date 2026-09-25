@@ -518,7 +518,12 @@ const MONOLITHS: MonolithRow[] = [
 
     // Release/v0.44.0 sync at ee8883fa4f: compose parent pins 18186 / 18235.
     // Exact merged line count, preserving both extraction sets.
-    ceiling: 18140,
+    // LOWERED 18140 -> 18138 when the Cooldown Manager landed: its five Hud
+    // lines (import, mount, field, settings hook, paint) were paid for by moving
+    // the Auras overlay's controller setup into mountAuraOverlay
+    // (src/ui/aura_overlay_wiring.ts). wc -l on the tree merged with
+    // release/v0.44.0. Exact count, zero slack.
+    ceiling: 18138,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -553,7 +558,11 @@ const MONOLITHS: MonolithRow[] = [
 
     // Release/v0.44.0 sync at ee8883fa4f: compose parent pins 2827 / 2821.
     // Exact merged line count, preserving both extraction sets.
-    ceiling: 2818,
+    // LOWERED 2818 -> 2813 when Options > Cooldown Manager and the Overlays
+    // sub-view landed: the Auras render method and its placement/teardown lines
+    // moved out with them to src/ui/options_overlay_panels.ts. Measured with
+    // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
+    ceiling: 2813,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {

@@ -580,6 +580,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'swing_timer_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'aura_overlay_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/cooldown_manager/cooldown_manager_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
@@ -881,6 +882,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // clock and performs no layout read during ordinary combat painting.
   {
     file: 'aura_overlay_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
+  // The Cooldown Manager's twin of the above: one app-viewport rect when the player
+  // starts dragging the row while its Options sub-view is open. Pointer moves reuse
+  // it; the per-frame paint path makes no layout read.
+  {
+    file: 'hud/cooldown_manager/cooldown_manager_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },

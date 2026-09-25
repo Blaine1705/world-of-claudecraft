@@ -14,6 +14,7 @@ import {
   buildGraphicsSections,
   buildInterfaceControls,
   buildOptionsMenu,
+  buildOverlaysMenu,
   copyGraphicsDraft,
   flattenGraphicsSections,
   graphicsDraftDirty,
@@ -25,6 +26,7 @@ import {
   type OptionsEnv,
   type OptionsSettingsSource,
   optionsControlKeys,
+  optionsParentView,
   sliderDispatchValue,
   toggleIsOn,
   toggleNextValue,
@@ -1297,9 +1299,8 @@ describe('options_view: main menu routing', () => {
       'hudChrome.controller.title',
       'hud.options.graphics',
       'hud.options.interface',
-      'hudChrome.auraOverlay.title',
+      'hudChrome.options.overlays',
       'hud.options.audio',
-      'hudChrome.perf.title',
       'hudChrome.fullTransfer.menu',
       'nav.wiki',
       'hudChrome.unstuck.menuButton',
@@ -1313,10 +1314,14 @@ describe('options_view: main menu routing', () => {
     const interfaceRows = offline.filter((e) => e.labelKey === 'hud.options.interface');
     expect(interfaceRows).toHaveLength(1);
     expect(interfaceRows[0].action).toEqual({ kind: 'goto', view: 'interface' });
-    expect(offline.find((e) => e.labelKey === 'hudChrome.auraOverlay.title')?.action).toEqual({
+    // The three on-screen overlay panels sit one level down, behind one row.
+    expect(offline.find((e) => e.labelKey === 'hudChrome.options.overlays')?.action).toEqual({
       kind: 'goto',
-      view: 'auras',
+      view: 'overlays',
     });
+    for (const view of ['auras', 'cooldowns', 'performance']) {
+      expect(offline.some((e) => e.action.kind === 'goto' && e.action.view === view)).toBe(false);
+    }
     // The Wiki row is unconditional (offline play has a wiki too) and routes to
     // the confirm-first external hop, never a sub-view.
     const wikiRows = offline.filter((e) => e.labelKey === 'nav.wiki');
@@ -1327,6 +1332,24 @@ describe('options_view: main menu routing', () => {
       kind: 'goto',
       view: 'transfer',
     });
+  });
+
+  it('the Overlays list routes to Auras, Cooldown Manager and Performance, in that order', () => {
+    expect(buildOverlaysMenu()).toEqual([
+      { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
+      { labelKey: 'hudChrome.cooldownManager.title', action: { kind: 'goto', view: 'cooldowns' } },
+      { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
+    ]);
+  });
+
+  it('Back from an overlay panel lands on Overlays; from anything else, the Game Menu', () => {
+    for (const view of ['auras', 'cooldowns', 'performance'] as const) {
+      expect(optionsParentView(view)).toBe('overlays');
+    }
+    for (const view of ['overlays', 'interface', 'graphics', 'keybinds', 'transfer'] as const) {
+      expect(optionsParentView(view)).toBe('main');
+    }
+    expect(optionsParentView('main')).toBe('main');
   });
 
   it('leads with Unlock Interface, relabelled Lock Interface while the frames are loose', () => {
@@ -1367,17 +1390,18 @@ describe('options_view: main menu routing', () => {
 
   it('carries NO System Report row: it is a section inside the Performance view', () => {
     // The owner's decision: the feature was a whole menu row and a whole
-    // sub-panel, which was more room than it deserves. Performance is followed
-    // straight by the transfer row on every host, with nothing between them.
+    // sub-panel, which was more room than it deserves. Performance now sits
+    // under Overlays, as that list's last row, with nothing after it; and the
+    // Game Menu root carries no System Report row either.
     const rows = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
-    expect(rows.some((e) => e.labelKey === 'hudChrome.hostDiag.title')).toBe(false);
-    expect(rows.some((e) => e.action.kind === 'goto' && e.action.view === 'performance')).toBe(
-      true,
-    );
-    const perfAt = rows.findIndex((e) => e.labelKey === 'hudChrome.perf.title');
-    expect(rows[perfAt + 1]?.labelKey, 'nothing sits between them now').toBe(
-      'hudChrome.fullTransfer.menu',
-    );
+    const overlays = buildOverlaysMenu();
+    for (const list of [rows, overlays]) {
+      expect(list.some((e) => e.labelKey === 'hudChrome.hostDiag.title')).toBe(false);
+    }
+    expect(overlays.at(-1)).toEqual({
+      labelKey: 'hudChrome.perf.title',
+      action: { kind: 'goto', view: 'performance' },
+    });
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {

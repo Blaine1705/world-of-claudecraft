@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4072,
+    "files": 4077,
     "harvestedFiles": 3948,
     "carried": {
       "tests/action_bar_spectate.test.ts": {
@@ -48,6 +48,61 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           12
+        ]
+      },
+      "tests/cooldown_manager_auras.test.ts": {
+        "ms": 20,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "PR 4189 (Cooldown Manager) adds these five suites, absent from the last green full CI harvest; local single-worker Vitest default-reporter runs on 2026-09-25, pending the next green full-mode CI refresh.",
+        "runs": [
+          20,
+          20,
+          20
+        ]
+      },
+      "tests/cooldown_manager_catalog.test.ts": {
+        "ms": 2255,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "PR 4189 (Cooldown Manager) adds these five suites, absent from the last green full CI harvest; local single-worker Vitest default-reporter runs on 2026-09-25, pending the next green full-mode CI refresh.",
+        "runs": [
+          2216,
+          2277,
+          2255
+        ]
+      },
+      "tests/cooldown_manager_config.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "PR 4189 (Cooldown Manager) adds these five suites, absent from the last green full CI harvest; local single-worker Vitest default-reporter runs on 2026-09-25, pending the next green full-mode CI refresh.",
+        "runs": [
+          11,
+          11,
+          12
+        ]
+      },
+      "tests/cooldown_manager_controller.test.ts": {
+        "ms": 180,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "PR 4189 (Cooldown Manager) adds these five suites, absent from the last green full CI harvest; local single-worker Vitest default-reporter runs on 2026-09-25, pending the next green full-mode CI refresh.",
+        "runs": [
+          171,
+          180,
+          183
+        ]
+      },
+      "tests/cooldown_manager_view.test.ts": {
+        "ms": 1522,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "PR 4189 (Cooldown Manager) adds these five suites, absent from the last green full CI harvest; local single-worker Vitest default-reporter runs on 2026-09-25, pending the next green full-mode CI refresh.",
+        "runs": [
+          1497,
+          1522,
+          1614
         ]
       },
       "tests/crest_prewarm.test.ts": {
@@ -1820,6 +1875,11 @@
   "tests/continent_map_painter.test.ts": 226,
   "tests/continent_map_view.test.ts": 19,
   "tests/cooking_catch_hint_view.test.ts": 31,
+  "tests/cooldown_manager_auras.test.ts": 20,
+  "tests/cooldown_manager_catalog.test.ts": 2255,
+  "tests/cooldown_manager_config.test.ts": 11,
+  "tests/cooldown_manager_controller.test.ts": 180,
+  "tests/cooldown_manager_view.test.ts": 1522,
   "tests/cooldown_persist.test.ts": 8179,
   "tests/cooldowns_command.test.ts": 1398,
   "tests/coords_format.test.ts": 21,
