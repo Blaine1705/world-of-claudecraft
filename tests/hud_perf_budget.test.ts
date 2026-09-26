@@ -627,7 +627,10 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     // attribute is the shared identity the focus-restore contract keys off
     // (src/ui/focus_restore.ts, #2528). This bar builds once and only re-states, so nothing
     // is ever destroyed under a keyboard player and there is nothing to restore.
-    allow: { '.className': 9, '.setAttribute': 3 },
+    // 13 / 4 with the two lean keycaps above the beam (the row, the key, its arrow and its
+    // cap, plus the arrow's aria-hidden), all built once with the bar; their per-frame key
+    // text, held state and accessible name ride the writers.
+    allow: { '.className': 13, '.setAttribute': 4 },
     reflowAllow: {},
   },
   // The prompt is one line and a tally, built once on the first visible paint and then only

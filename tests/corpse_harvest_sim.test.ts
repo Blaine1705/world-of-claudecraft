@@ -2541,7 +2541,9 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // mirefen_broodmother carries a tag, its spider silk), so he grows MOBS without
     // touching `tagged`: 197. The sibling census in tests/gathering.test.ts
     // ('answers for every shipped template') carries the same 197 and the same reason.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(197);
+    // Plus the four Mirefen muster soldiers (src/sim/content/mirefen_muster.ts): friendly
+    // set dressing nobody can kill, never a corpse to butcher, so untagged: 201.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(201);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

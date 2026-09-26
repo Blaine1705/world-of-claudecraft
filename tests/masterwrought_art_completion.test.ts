@@ -820,7 +820,8 @@ describe('Masterwrought art completion evidence', () => {
     // three Foreman's Wage pieces and the two barrow pieces). The 1209 completion union
     // below is the FROZEN historical figure and is deliberately left alone: keeping the two
     // apart is the whole point of this test.
-    expect(currentOwnerIds).toHaveLength(1291);
+    // 1292 with the Mirefen muster rework's lent muster_shardpike owner.
+    expect(currentOwnerIds).toHaveLength(1292);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -873,6 +874,16 @@ describe('Masterwrought art completion evidence', () => {
     expect(balgathIds.size).toBe(8);
     expect(datedIds.filter((id) => balgathIds.has(id))).toEqual([]);
 
+    // The Mirefen muster rework's lent pike: one more later additive batch, pinned the
+    // same way and stripped by exact id below.
+    const musterBatches = mapping.generatedBatches.filter(
+      ({ batchId: id }) => id === 'muster-shardpike-icon-2026-09-26',
+    );
+    expect(musterBatches).toHaveLength(1);
+    const musterIds = new Set(musterBatches[0].itemIds);
+    expect([...musterIds]).toEqual(['muster_shardpike']);
+    expect(datedIds.filter((id) => musterIds.has(id))).toEqual([]);
+
     // These 25 ids are a later additive wave that never appears in the dated file's own
     // 1,255-item passIds union at all: confirm that up front (no overlap with datedIds)
     // before stripping them back out below, so a future id collision between a new batch
@@ -906,7 +917,8 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'field_kit' &&
         !laterGapFillIds.has(id) &&
         !ossBrainMountIds.has(id) &&
-        !balgathIds.has(id),
+        !balgathIds.has(id) &&
+        !musterIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

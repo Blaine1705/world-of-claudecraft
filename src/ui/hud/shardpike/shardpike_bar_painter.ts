@@ -166,14 +166,15 @@ export class ShardpikeBarPainter {
     const arrow = doc.createElement('span');
     arrow.className = 'pike-lean-arrow';
     arrow.setAttribute('aria-hidden', 'true');
-    arrow.textContent = side === 'left' ? '←' : '→';
+    // A build-time glyph, appended once as a text node (the per-frame text is the cap).
+    arrow.append(side === 'left' ? '←' : '→');
     const cap = doc.createElement('span');
     cap.className = 'pike-lean-cap';
     if (side === 'left') btn.append(arrow, cap);
     else btn.append(cap, arrow);
     const dir: -1 | 1 = side === 'left' ? -1 : 1;
     const release = () => {
-      btn.classList.remove('held');
+      this.writers.toggleClass(btn, 'held', false);
       this.onLean(0);
     };
     btn.addEventListener('pointerdown', (ev) => {
@@ -183,7 +184,7 @@ export class ShardpikeBarPainter {
       } catch {
         // A synthetic or already-released pointer cannot be captured; the press still leans.
       }
-      btn.classList.add('held');
+      this.writers.toggleClass(btn, 'held', true);
       this.onLean(dir);
     });
     btn.addEventListener('pointerup', release);
