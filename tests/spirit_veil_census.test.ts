@@ -306,6 +306,11 @@ function proceduralKeys(): Map<string, string> {
   return out;
 }
 
+type Look = ReturnType<typeof looks>[number];
+
+/** The first look to reach each distinct composed key set, filled by census(). */
+const lookPerKeySet = new Map<string, Look>();
+
 function census(): Map<string, string> {
   const needed = new Map<string, string>();
   const add = (keys: string[], where: string) => {
@@ -314,8 +319,15 @@ function census(): Map<string, string> {
   for (const url of [...playerRigUrls(), ...heldModelUrls()]) {
     for (const part of allParts(url)) add(partKeys(url, part), part.where);
   }
-  for (const { app, worn } of looks()) {
-    for (const part of composedParts(app, worn)) add(partKeys(MODULAR_URL, part), part.where);
+  for (const look of looks()) {
+    const keys = new Set<string>();
+    for (const part of composedParts(look.app, look.worn)) {
+      const partKeyList = partKeys(MODULAR_URL, part);
+      add(partKeyList, part.where);
+      for (const key of partKeyList) keys.add(key);
+    }
+    const set = [...keys].sort().join(',');
+    if (!lookPerKeySet.has(set)) lookPerKeySet.set(set, look);
   }
   for (const [key, where] of proceduralKeys()) add([key], where);
   return needed;
@@ -462,12 +474,16 @@ describe('the census merge model against the real merge', () => {
     [...new Set(composedParts(app, worn).flatMap((part) => partKeys(MODULAR_URL, part)))].sort();
 
   it('keys a sample of looks, every loadout of both genders, exactly as the real merge does', () => {
-    const sample = looks().filter((_, i) => i % 331 === 0);
+    // One look per distinct key set the model produces (so every merged morph
+    // count it claims meets the real merge), plus a stride floor that spans
+    // every loadout of both genders.
+    if (lookPerKeySet.size === 0) census();
+    const sample = [...lookPerKeySet.values(), ...looks().filter((_, i) => i % 331 === 0)];
     const loadouts = new Set(
       sample.map(({ app, worn }) => `${app.gender}:${JSON.stringify(worn)}`),
     );
     expect(loadouts.size).toBe(2 * (ARMOR_SETS.length + 1));
-    expect(sample.length).toBeGreaterThan(50);
+    expect(lookPerKeySet.size).toBeGreaterThan(10);
     for (const { app, worn } of sample) {
       expect(modelKeys(app, worn), JSON.stringify({ app, worn })).toEqual(realKeys(app, worn));
     }

@@ -271,7 +271,9 @@ describe('createSpiritVeilTransparentSort', () => {
         all.push(entry);
       }
       for (let i = 0; i < 18; i++) {
-        all.push(item(next(6) + next(2) * 0.5, next(5) - 2, rigs[next(3)], passes[next(3)]));
+        const entry = item(next(6) + next(2) * 0.5, next(5) - 2, rigs[next(3)], passes[next(3)]);
+        entry.groupOrder = next(3) === 0 ? next(3) - 1 : 0;
+        all.push(entry);
       }
       for (let i = all.length - 1; i > 0; i--) {
         const j = next(i + 1);
