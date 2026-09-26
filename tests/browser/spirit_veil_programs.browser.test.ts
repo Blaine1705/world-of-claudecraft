@@ -298,6 +298,10 @@ describe('the veil family on a real driver', () => {
       const ghost = new THREE.Group();
       ghost.add(composed, knight, sword, armoured);
       w.scene.add(ghost);
+      const empty = w.programs();
+      w.draw();
+      // the harness really draws these rigs: their own materials link here
+      expect(w.programs()).toBeGreaterThan(empty);
       const before = w.programs();
       const meshes = veil(ghost, new SpiritVeilRig());
       expect(meshes.length).toBeGreaterThan(10);
@@ -411,8 +415,11 @@ describe('a death on a real CharacterVisual', () => {
         expect(
           worn().filter((m) => (m as THREE.MeshLambertMaterial).isMeshLambertMaterial).length,
         ).toBeGreaterThan(5);
+        const empty = w.programs();
         w.draw();
         w.draw();
+        // the harness really draws the rig: its live set links programs here
+        expect(w.programs()).toBeGreaterThan(empty);
         await linkFamily(w);
         w.draw();
         const before = w.programs();

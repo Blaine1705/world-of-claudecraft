@@ -295,8 +295,11 @@ describe('the spirit veil on a released spirit', () => {
     expect(warn.mock.calls.some((call) => String(call[0]).startsWith('[spirit-veil]'))).toBe(true);
     // Its shadow and halo stay until the swap actually lands.
     const halo = named(visual, 'class_halo');
+    const proxy = (visual as unknown as { shadowProxy: THREE.Mesh }).shadowProxy;
+    visual.setProxyShadow(true);
     expect(body.castShadow).toBe(true);
     expect(halo.visible).toBe(true);
+    expect(proxy.visible).toBe(true);
 
     gateCalls[0].settle();
     visual.update(FRAME, anim(), true);
@@ -304,6 +307,7 @@ describe('the spirit veil on a released spirit', () => {
     expect(depthSiblings(visual).length).toBeGreaterThan(0);
     expect(body.castShadow).toBe(false);
     expect(halo.visible).toBe(false);
+    expect(proxy.visible).toBe(false);
     visual.dispose();
   });
 
@@ -414,7 +418,7 @@ describe('the spirit veil on a released spirit', () => {
     // The rig's light is budget-dynamic: its own update() writes the flicker
     // (weapon_vfx.ts), which is what brings it back after a revive.
     const update = vi.fn(() => {
-      light.intensity = 2;
+      light.intensity = 1.37;
     });
     const handle = { group, light, update, setTuning: vi.fn(), dispose: vi.fn() };
     (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.push(handle);
@@ -434,7 +438,7 @@ describe('the spirit veil on a released spirit', () => {
     expect(light.visible).toBe(true);
     visual.updateWeaponVfx(FRAME);
     expect(update).toHaveBeenCalled();
-    expect(light.intensity).toBe(2);
+    expect(light.intensity).toBe(1.37);
     (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.length = 0;
     visual.dispose();
   });

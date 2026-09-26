@@ -6,9 +6,12 @@
 
 import { readFileSync } from 'node:fs';
 import type * as THREE from 'three';
+import { MeshBasicMaterial } from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import {
+  createSpiritVeilMaterial,
+  installSpiritVeil,
   noteSpiritVeilMiss,
   resetSpiritVeilLedger,
   setSpiritVeilLateLink,
@@ -19,11 +22,15 @@ import {
   spiritVeilTuplesLinked,
 } from '../src/render/characters/ghost_veil';
 import {
+  createSpiritVeilSortUnit,
   SPIRIT_VEIL_FAMILY,
   SPIRIT_VEIL_FAMILY_KEYS,
+  SPIRIT_VEIL_PASS_KEY,
+  SPIRIT_VEIL_UNIT_KEY,
   spiritVeilKeyOfTuple,
 } from '../src/render/characters/spirit_veil_family_core';
 import type { CompileArmHost } from '../src/render/compile_arms';
+import { sharedUniforms } from '../src/render/gfx';
 import { gpuPrepKindOfLabel } from '../src/render/gpu_prep_budget_core';
 import {
   BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE,
@@ -195,6 +202,52 @@ describe('the entities.spirit-veil-family entry', () => {
     );
     const install = 'installSpiritVeil(this.webgl, () => this.reducedMotion());';
     expect(renderer.split(install).length - 1).toBe(1);
+    // and nothing in the renderer installs another sort over it
+    expect(renderer).not.toMatch(/setTransparentSort\(/);
+  });
+
+  it('installs the per-rig sort and freezes the shimmer clock under reduced motion', () => {
+    let installed: ((a: unknown, b: unknown) => number) | null = null;
+    let reduced = false;
+    installSpiritVeil(
+      {
+        info: { render: { frame: 1 } },
+        setTransparentSort: (sort: ((a: unknown, b: unknown) => number) | null) => {
+          installed = sort;
+        },
+      } as unknown as Parameters<typeof installSpiritVeil>[0],
+      () => reduced,
+    );
+    expect(installed).not.toBeNull();
+    // The installed comparator draws a unit's depth pass before its body.
+    const unit = createSpiritVeilSortUnit();
+    const at = (pass: string, id: number) => ({
+      id,
+      groupOrder: 0,
+      renderOrder: 0,
+      z: 5,
+      object: { userData: { [SPIRIT_VEIL_UNIT_KEY]: unit, [SPIRIT_VEIL_PASS_KEY]: pass } },
+    });
+    const sort = installed as unknown as (a: unknown, b: unknown) => number;
+    expect(sort(at('color', 1), at('depth', 2))).toBeGreaterThan(0);
+
+    const shader = {
+      uniforms: {} as Record<string, { value: unknown }>,
+      vertexShader: '#include <project_vertex>\n#include <fog_vertex>',
+      fragmentShader: '#include <opaque_fragment>',
+    };
+    const veil = createSpiritVeilMaterial(new MeshBasicMaterial());
+    veil.onBeforeCompile(shader as never, {} as never);
+    const clock = shader.uniforms.uVeilTime;
+    const previous = sharedUniforms.uTime.value;
+    try {
+      sharedUniforms.uTime.value = 12.5;
+      expect(clock.value).toBe(12.5);
+      reduced = true;
+      expect(clock.value).toBe(0);
+    } finally {
+      sharedUniforms.uTime.value = previous;
+    }
   });
 });
 
