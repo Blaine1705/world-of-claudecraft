@@ -1689,6 +1689,7 @@ export const de_DE: EnTranslations = {
       "buffs": "Stärkungszauber",
       "unlock": "Fenster der Zielauren verschieben",
       "lock": "Fenster der Zielauren sperren",
+      "close": "Close target aura window",
       "configureRows": "Auren des Ziels konfigurieren",
       "fewerRows": "Weniger Aura-Reihen bevorzugen",
       "moreRows": "Mehr Aura-Reihen bevorzugen",

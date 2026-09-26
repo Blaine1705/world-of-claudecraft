@@ -1689,6 +1689,7 @@ export const id_ID: EnTranslations = {
       "buffs": "Buff",
       "unlock": "Pindahkan jendela aura target",
       "lock": "Kunci jendela aura target",
+      "close": "Close target aura window",
       "configureRows": "Atur aura target",
       "fewerRows": "Utamakan lebih sedikit baris aura",
       "moreRows": "Utamakan lebih banyak baris aura",

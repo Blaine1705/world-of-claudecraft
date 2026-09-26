@@ -7364,6 +7364,17 @@
     cursor: var(--cursor-point);
     opacity: 0.78;
   }
+  /* Size and padding come from the .mt-panel .ui-x-btn rule; this only seats it
+     after the title controls and matches their resting opacity. */
+  .ta-close-btn {
+    flex: 0 0 24px;
+    margin-left: 4px;
+    opacity: 0.78;
+  }
+  .ta-close-btn:hover,
+  .ta-close-btn:focus-visible {
+    opacity: 1;
+  }
   .ta-rows-config-btn {
     position: relative;
     flex: 0 0 24px;

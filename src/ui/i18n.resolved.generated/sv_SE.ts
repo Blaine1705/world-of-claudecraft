@@ -1689,6 +1689,7 @@ export const sv_SE: EnTranslations = {
       "buffs": "Buffar",
       "unlock": "Flytta fönstret för målets auror",
       "lock": "Lås fönstret för målets auror",
+      "close": "Close target aura window",
       "configureRows": "Konfigurera målets auror",
       "fewerRows": "Föredra färre aurarader",
       "moreRows": "Föredra fler aurarader",

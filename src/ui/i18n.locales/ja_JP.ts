@@ -13936,6 +13936,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.buffs': 'バフ',
   'hudChrome.targetAuras.unlock': 'ターゲットオーラウィンドウを移動',
   'hudChrome.targetAuras.lock': 'ターゲットオーラウィンドウをロック',
+  'hudChrome.targetAuras.close': 'ターゲットオーラウィンドウを閉じる',
   'hudChrome.targetAuras.configureRows': 'ターゲットオーラを設定',
   'hudChrome.targetAuras.fewerRows': 'オーラ行数を少なくする',
   'hudChrome.targetAuras.moreRows': 'オーラ行数を多くする',

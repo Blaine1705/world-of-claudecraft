@@ -1689,6 +1689,7 @@ export const tr_TR: EnTranslations = {
       "buffs": "Takviyeler",
       "unlock": "Hedef aura penceresini taşı",
       "lock": "Hedef aura penceresini kilitle",
+      "close": "Close target aura window",
       "configureRows": "Hedef auralarını yapılandır",
       "fewerRows": "Daha az aura satırı tercih et",
       "moreRows": "Daha fazla aura satırı tercih et",

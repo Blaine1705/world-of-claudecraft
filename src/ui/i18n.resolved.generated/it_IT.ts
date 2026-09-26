@@ -1689,6 +1689,7 @@ export const it_IT: EnTranslations = {
       "buffs": "Potenziamenti",
       "unlock": "Sposta la finestra delle aure del bersaglio",
       "lock": "Blocca la finestra delle aure del bersaglio",
+      "close": "Close target aura window",
       "configureRows": "Configura le aure del bersaglio",
       "fewerRows": "Preferisci meno righe di aure",
       "moreRows": "Preferisci più righe di aure",

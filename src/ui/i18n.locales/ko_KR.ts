@@ -13902,6 +13902,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.buffs': '강화 효과',
   'hudChrome.targetAuras.unlock': '대상 오라 창 이동',
   'hudChrome.targetAuras.lock': '대상 오라 창 잠금',
+  'hudChrome.targetAuras.close': '대상 오라 창 닫기',
   'hudChrome.targetAuras.configureRows': '대상 오라 설정',
   'hudChrome.targetAuras.fewerRows': '오라 행 수 줄이기',
   'hudChrome.targetAuras.moreRows': '오라 행 수 늘리기',

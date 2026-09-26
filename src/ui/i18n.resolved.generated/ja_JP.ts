@@ -1689,6 +1689,7 @@ export const ja_JP: EnTranslations = {
       "buffs": "バフ",
       "unlock": "ターゲットオーラウィンドウを移動",
       "lock": "ターゲットオーラウィンドウをロック",
+      "close": "ターゲットオーラウィンドウを閉じる",
       "configureRows": "ターゲットオーラを設定",
       "fewerRows": "オーラ行数を少なくする",
       "moreRows": "オーラ行数を多くする",

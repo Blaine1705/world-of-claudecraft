@@ -1689,6 +1689,7 @@ export const ko_KR: EnTranslations = {
       "buffs": "강화 효과",
       "unlock": "대상 오라 창 이동",
       "lock": "대상 오라 창 잠금",
+      "close": "대상 오라 창 닫기",
       "configureRows": "대상 오라 설정",
       "fewerRows": "오라 행 수 줄이기",
       "moreRows": "오라 행 수 늘리기",

@@ -1689,6 +1689,7 @@ export const vi_VN: EnTranslations = {
       "buffs": "Buff",
       "unlock": "Di chuyển cửa sổ hào quang mục tiêu",
       "lock": "Khóa cửa sổ hào quang mục tiêu",
+      "close": "Close target aura window",
       "configureRows": "Cấu hình hào quang mục tiêu",
       "fewerRows": "Ưu tiên ít hàng hào quang hơn",
       "moreRows": "Ưu tiên nhiều hàng hào quang hơn",

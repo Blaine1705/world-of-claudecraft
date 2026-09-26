@@ -1689,6 +1689,7 @@ export const zh_TW: EnTranslations = {
       "buffs": "增益",
       "unlock": "移動目標光環視窗",
       "lock": "鎖定目標光環視窗",
+      "close": "關閉目標光環視窗",
       "configureRows": "設定目標光環",
       "fewerRows": "減少光環列數",
       "moreRows": "增加光環列數",
