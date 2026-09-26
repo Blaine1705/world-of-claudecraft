@@ -1538,6 +1538,7 @@ export const it_IT: EnTranslations = {
     },
     "targetAuras": {
       "title": "Aure del bersaglio",
+      "close": "Close target aura window",
       "keybindLabel": "Potenziamenti e indebolimenti del bersaglio",
       "all": "Tutti",
       "debuffs": "Indebolimenti",

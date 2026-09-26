@@ -14566,6 +14566,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toZone': 'Карта региона',
   'hudChrome.enchanting.wornTagIndexed': 'Надето ({slot} {index})',
   'hudChrome.targetAuras.title': 'Ауры цели',
+  'hudChrome.targetAuras.close': 'Закрыть окно аур цели',
   'hudChrome.auraTracks.defensives': 'Защитные умения',
   'hudChrome.auraTracks.self': 'Мои эффекты',
   'hudChrome.auraTracks.power': 'Атакующие умения',

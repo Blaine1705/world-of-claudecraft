@@ -1538,6 +1538,7 @@ export const nl_NL: EnTranslations = {
     },
     "targetAuras": {
       "title": "Auras van het doel",
+      "close": "Close target aura window",
       "keybindLabel": "Buffs en debuffs van het doel",
       "all": "Alle",
       "debuffs": "Debuffs",

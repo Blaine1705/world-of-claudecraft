@@ -1538,6 +1538,7 @@ export const pt_BR: EnTranslations = {
     },
     "targetAuras": {
       "title": "Auras do alvo",
+      "close": "Close target aura window",
       "keybindLabel": "Benefícios e penalidades do alvo",
       "all": "Todos",
       "debuffs": "Penalidades",

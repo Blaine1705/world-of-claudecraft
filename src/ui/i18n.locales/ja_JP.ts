@@ -14463,6 +14463,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toZone': 'ゾーンマップ',
   'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
   'hudChrome.targetAuras.title': 'ターゲットのオーラ',
+  'hudChrome.targetAuras.close': 'ターゲットオーラウィンドウを閉じる',
   'hudChrome.auraTracks.defensives': '防御クールダウン',
   'hudChrome.auraTracks.self': '自分のバフ',
   'hudChrome.auraTracks.power': '攻撃クールダウン',

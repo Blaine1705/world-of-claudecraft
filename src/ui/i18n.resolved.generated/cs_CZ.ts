@@ -1538,6 +1538,7 @@ export const cs_CZ: EnTranslations = {
     },
     "targetAuras": {
       "title": "Aury cíle",
+      "close": "Close target aura window",
       "keybindLabel": "Buffy a debuffy cíle",
       "all": "Vše",
       "debuffs": "Debuffy",

@@ -1538,6 +1538,7 @@ export const de_DE: EnTranslations = {
     },
     "targetAuras": {
       "title": "Auren des Ziels",
+      "close": "Close target aura window",
       "keybindLabel": "Stärkungs- und Schwächungszauber des Ziels",
       "all": "Alle",
       "debuffs": "Schwächungszauber",

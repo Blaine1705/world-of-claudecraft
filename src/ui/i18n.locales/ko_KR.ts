@@ -14434,6 +14434,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toZone': '지역 지도',
   'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
   'hudChrome.targetAuras.title': '대상 오라',
+  'hudChrome.targetAuras.close': '대상 오라 창 닫기',
   'hudChrome.auraTracks.defensives': '방어 재사용 대기시간',
   'hudChrome.auraTracks.self': '내 버프',
   'hudChrome.auraTracks.power': '공격 재사용 대기시간',

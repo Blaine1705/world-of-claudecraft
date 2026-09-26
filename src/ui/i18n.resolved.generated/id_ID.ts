@@ -1538,6 +1538,7 @@ export const id_ID: EnTranslations = {
     },
     "targetAuras": {
       "title": "Aura Target",
+      "close": "Close target aura window",
       "keybindLabel": "Buff dan Debuff Target",
       "all": "Semua",
       "debuffs": "Debuff",

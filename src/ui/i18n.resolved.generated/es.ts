@@ -1538,6 +1538,7 @@ export const es: EnTranslations = {
     },
     "targetAuras": {
       "title": "Auras del objetivo",
+      "close": "Close target aura window",
       "keybindLabel": "Beneficios y perjuicios del objetivo",
       "all": "Todos",
       "debuffs": "Perjuicios",

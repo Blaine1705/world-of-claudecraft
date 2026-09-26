@@ -1538,6 +1538,7 @@ export const en_XA: EnTranslations = {
     },
     "targetAuras": {
       "title": "[Ţáŕĝéţ Áúŕáš]",
+      "close": "[Çļóšé ţáŕĝéţ áúŕá ŵíñðóŵ]",
       "keybindLabel": "[Ţáŕĝéţ Ɓúƒƒš áñð Ðéƀúƒƒš]",
       "all": "[Áļļ]",
       "debuffs": "[Ðéƀúƒƒš]",

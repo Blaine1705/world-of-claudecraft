@@ -1538,6 +1538,7 @@ export const ru_RU: EnTranslations = {
     },
     "targetAuras": {
       "title": "Ауры цели",
+      "close": "Закрыть окно аур цели",
       "keybindLabel": "Усиления и ослабления цели",
       "all": "Все",
       "debuffs": "Ослабления",

@@ -1538,6 +1538,7 @@ export const fr_FR: EnTranslations = {
     },
     "targetAuras": {
       "title": "Auras de la cible",
+      "close": "Close target aura window",
       "keybindLabel": "Améliorations et affaiblissements de la cible",
       "all": "Tous",
       "debuffs": "Affaiblissements",

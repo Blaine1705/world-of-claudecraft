@@ -1538,6 +1538,7 @@ export const pl_PL: EnTranslations = {
     },
     "targetAuras": {
       "title": "Aury celu",
+      "close": "Close target aura window",
       "keybindLabel": "Wzmocnienia i osłabienia celu",
       "all": "Wszystko",
       "debuffs": "Osłabienia",

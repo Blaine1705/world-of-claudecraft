@@ -1538,6 +1538,7 @@ export const tr_TR: EnTranslations = {
     },
     "targetAuras": {
       "title": "Hedef Auraları",
+      "close": "Close target aura window",
       "keybindLabel": "Hedefin Takviyeleri ve Zayıflatmaları",
       "all": "Tümü",
       "debuffs": "Zayıflatmalar",

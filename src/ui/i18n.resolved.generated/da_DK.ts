@@ -1538,6 +1538,7 @@ export const da_DK: EnTranslations = {
     },
     "targetAuras": {
       "title": "Målets auraer",
+      "close": "Close target aura window",
       "keybindLabel": "Målets forstærkninger og svækkelser",
       "all": "Alle",
       "debuffs": "Svækkelser",

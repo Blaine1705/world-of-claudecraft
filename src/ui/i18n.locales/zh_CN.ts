@@ -13757,6 +13757,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toZone': '地区地图',
   'hudChrome.enchanting.wornTagIndexed': '已装备（{slot}{index}）',
   'hudChrome.targetAuras.title': '目标光环',
+  'hudChrome.targetAuras.close': '关闭目标光环窗口',
   'hudChrome.auraTracks.defensives': '防御性冷却',
   'hudChrome.auraTracks.self': '我的增益',
   'hudChrome.auraTracks.power': '攻击性冷却',

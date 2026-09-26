@@ -1538,6 +1538,7 @@ export const zh_CN: EnTranslations = {
     },
     "targetAuras": {
       "title": "目标光环",
+      "close": "关闭目标光环窗口",
       "keybindLabel": "目标增益和减益效果",
       "all": "全部",
       "debuffs": "减益",

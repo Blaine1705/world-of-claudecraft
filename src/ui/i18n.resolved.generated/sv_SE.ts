@@ -1538,6 +1538,7 @@ export const sv_SE: EnTranslations = {
     },
     "targetAuras": {
       "title": "Målets auror",
+      "close": "Close target aura window",
       "keybindLabel": "Målets buffar och debuffar",
       "all": "Alla",
       "debuffs": "Debuffar",

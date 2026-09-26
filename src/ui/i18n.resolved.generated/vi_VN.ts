@@ -1538,6 +1538,7 @@ export const vi_VN: EnTranslations = {
     },
     "targetAuras": {
       "title": "Hào Quang Mục Tiêu",
+      "close": "Close target aura window",
       "keybindLabel": "Buff và Debuff Mục Tiêu",
       "all": "Tất cả",
       "debuffs": "Debuff",

@@ -1763,6 +1763,7 @@ export const hudChromeStrings = {
   },
   targetAuras: {
     title: 'Target Auras',
+    close: 'Close target aura window',
     keybindLabel: 'Target Buffs and Debuffs',
     all: 'All',
     debuffs: 'Debuffs',
