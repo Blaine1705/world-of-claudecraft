@@ -211,6 +211,36 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
    phase snapshots, context loss, page errors, and provenance together when the diff touches
    them. Mark absent real-browser evidence VERIFY.
 
+10. **Does new or changed GLSL stay cheap to compile on ANGLE D3D11?** On Windows every program
+   is optimized by fxc once per session, and the shape of the text sets the price. Scope: any
+   diff that adds or edits GLSL (a `ShaderMaterial` string, an `onBeforeCompile` injection, a
+   `THREE.ShaderChunk` override, a post pass, a JS-templated shader). First weigh the REACH: a
+   chunk override or a hook on a shared material lands in every program that includes it, so
+   a small shape there costs more than a large one in a single material. Then check the
+   MEASURED shapes in `docs/perf/shader-compile-cost.md`, and only those:
+
+   - the same heavy code inlined N times (an unrolled loop, a JS-templated repeat, a helper
+     called at N sites): fxc compiles every copy; a real loop without an implicit-gradient
+     read in its body links far cheaper and is not re-unrolled, and a `break` in it is free;
+   - a loop that replaces unrolled copies must end at the live count (packed slots with a
+     break at the first empty one, or a uniform bound), because idle iterations cost GPU
+     time on weak GPUs; its GPU time needs an HD 530 class measurement, not only a link time;
+   - many branches (`if`, early `return`, a ternary ANGLE unfolds into flow, a selector chain
+     repeated in every read): prefer reading once before one split and blending with
+     `mix` or `step`;
+   - chains of dependent texture reads (a parallax walk): each extra dependent step has a
+     measured price;
+   - a new variant axis (a `#define`, a templated value, a `customProgramCacheKey` token):
+     every value is one more full link, including two values that compile the same text.
+
+   The doc's "suspected" list (gradient reads in flow, noise octaves, sampler-array
+   indexing, compile-warning retries, draw-time recompiles) is NOT a rule: ask for a
+   measurement instead of flagging it. A cost claim needs the doc's protocol: link times on
+   ANGLE D3D11 with the driver shader cache disabled, before and after in one run; Linux GL
+   gives ordering only. Severity: SHOULD-FIX for a measured shape added to a wide-reach
+   program without a link measurement, or for a loop conversion without the run-time check;
+   NOTE for a single-material shader.
+
 ## Report
 
 This is a COVERAGE review. Report every real risk with confidence; lower confidence when needed
