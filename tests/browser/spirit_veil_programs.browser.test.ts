@@ -252,6 +252,49 @@ describe('the veil family on a real driver', () => {
 
   for (const offscreen of [false, true]) {
     const arm = offscreen ? 'render-target (composer tiers)' : 'canvas (direct tiers)';
+    it(`fetches every family program's tables at boot, so a first veil queries none, ${arm}`, async () => {
+      const w = world(offscreen);
+      w.draw();
+      await linkFamily(w);
+      w.draw();
+      const gl = w.renderer.getContext() as WebGL2RenderingContext;
+      let queries = 0;
+      const activeUniform = gl.getActiveUniform.bind(gl);
+      const uniformLocation = gl.getUniformLocation.bind(gl);
+      gl.getActiveUniform = (...args: Parameters<typeof gl.getActiveUniform>) => {
+        queries++;
+        return activeUniform(...args);
+      };
+      gl.getUniformLocation = (...args: Parameters<typeof gl.getUniformLocation>) => {
+        queries++;
+        return uniformLocation(...args);
+      };
+      try {
+        const ghost = new THREE.Group();
+        SPIRIT_VEIL_FAMILY.filter((tuple) => tuple.pass !== 'depth').forEach((tuple, i) => {
+          ghost.add(livePart(tuple, (i - 7) * 0.35));
+        });
+        w.scene.add(ghost);
+        veil(ghost, new SpiritVeilRig());
+        w.draw();
+        w.draw();
+        expect(queries).toBe(0);
+        // Control: a shape outside the family links and reflects a program of
+        // its own, so the counter sees first-use queries when there are some.
+        const stray = livePart({ pass: 'color', skinned: true, map: false, morphTargets: 5 }, 0);
+        w.scene.add(stray);
+        veil(stray, new SpiritVeilRig());
+        w.draw();
+        expect(queries).toBeGreaterThan(0);
+      } finally {
+        gl.getActiveUniform = activeUniform;
+        gl.getUniformLocation = uniformLocation;
+      }
+    });
+  }
+
+  for (const offscreen of [false, true]) {
+    const arm = offscreen ? 'render-target (composer tiers)' : 'canvas (direct tiers)';
     it(`veils real parsed rigs (composed look with its stubble decal, a class rig, a weapon) with zero new programs, ${arm}`, async () => {
       const w = world(offscreen);
       await linkFamily(w);

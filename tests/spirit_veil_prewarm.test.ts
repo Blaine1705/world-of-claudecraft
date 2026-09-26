@@ -32,6 +32,7 @@ import {
 import type { CompileArmHost } from '../src/render/compile_arms';
 import { sharedUniforms } from '../src/render/gfx';
 import { gpuPrepKindOfLabel } from '../src/render/gpu_prep_budget_core';
+import { LINKED_PROGRAM_TOUCH_LABEL } from '../src/render/linked_program_touch_lane';
 import {
   BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE,
   CONSTRAINED_PREWARM_KEEP,
@@ -136,6 +137,51 @@ describe('the entities.spirit-veil-family entry', () => {
     expect(spiritVeilTuplesLinked(all)).toBe(false);
     await entry.run();
     expect(spiritVeilTuplesLinked(all)).toBe(false);
+  });
+
+  it("touches each stand-in's linked program after its link, one tail unit each, run and resume alike", async () => {
+    const h = host();
+    const order: string[] = [];
+    const programs = new Map<THREE.Material, { getUniforms(): void; getAttributes(): void }>();
+    const programOf = (material: THREE.Material) => {
+      let program = programs.get(material);
+      if (!program) {
+        program = {
+          getUniforms: vi.fn(() => order.push(`touch:${material.uuid}`)),
+          getAttributes: vi.fn(),
+        };
+        programs.set(material, program);
+      }
+      return program;
+    };
+    h.properties.get = ((material: THREE.Material) => {
+      const program = programOf(material);
+      return { currentProgram: program, programs: new Map([['k', program]]) };
+    }) as never;
+    h.link.mockImplementation((root: THREE.Object3D) => {
+      order.push(`link:${((root as THREE.Mesh).material as THREE.Material).uuid}`);
+      return Promise.resolve();
+    });
+    const entry = spiritVeilFamilyPrewarmEntry(h.arms, h, h.queue, h.link);
+    await entry.run();
+    expect(programs.size).toBe(SPIRIT_VEIL_FAMILY.length);
+    for (const program of programs.values()) {
+      expect(program.getUniforms).toHaveBeenCalledTimes(1);
+      expect(program.getAttributes).toHaveBeenCalledTimes(1);
+    }
+    // every touch follows its own link
+    for (const [material] of programs) {
+      const link = order.indexOf(`link:${material.uuid}`);
+      expect(link).toBeGreaterThan(-1);
+      expect(order.indexOf(`touch:${material.uuid}`)).toBeGreaterThan(link);
+    }
+    const touches = h.queued.filter((q) => q.label === LINKED_PROGRAM_TOUCH_LABEL);
+    expect(touches).toHaveLength(SPIRIT_VEIL_FAMILY.length);
+    for (const q of touches) expect(q.priority).toBe(GPU_WORK_PRIORITY.TAIL_PIECE);
+    // a drop's resume units carry the same tail
+    for (const program of programs.values()) vi.mocked(program.getUniforms).mockClear();
+    for (const unit of entry.resumeProgramUnits?.() ?? []) await unit.run();
+    for (const program of programs.values()) expect(program.getUniforms).toHaveBeenCalledTimes(1);
   });
 
   it('is droppable, and a drop hands every tuple to the program-debt lane', async () => {

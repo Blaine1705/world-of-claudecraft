@@ -13,6 +13,14 @@
 // and a ghost meanwhile waits behind the effect gate rather than linking live.
 // A tuple outside the family (a census gap) is linked late, on the background
 // queue, by a stand-in of its own.
+//
+// Each unit ends with the touch tail (linked_program_touch_lane.ts): once its
+// stand-in linked, the program's uniform and attribute tables are fetched as
+// one budgeted queue unit at the boot lane's tail priority, which the loading
+// cover admits. Without it the first veil a live frame draws (a release, a
+// stealth, a Keeper appearing) pays that reflection round trip inside the
+// frame: the own-release frame on the HD 530 spent 7.2 ms on 274 first-use
+// uniform queries of the veil and the old twins.
 
 import * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
@@ -34,6 +42,7 @@ import {
 } from './characters/spirit_veil_family_core';
 import { type CompileArmHost, linkColorPrograms } from './compile_arms';
 import { markProgramsReadyUnder } from './linked_program_readiness';
+import { runLinkedProgramTouchLane } from './linked_program_touch_lane';
 import type { PrewarmManifestEntry } from './prewarm_entry';
 import type { PrewarmResumeUnit } from './prewarm_resume';
 
@@ -122,7 +131,8 @@ export interface SpiritVeilPrewarmHost {
   link?: (root: THREE.Object3D) => Promise<void>;
 }
 
-/** One unit per tuple: link its stand-in, record the settle, mark the tuple. */
+/** One unit per tuple: link its stand-in, record the settle, mark the tuple,
+ *  then touch the linked program's tables. */
 export function spiritVeilProgramUnits(host: SpiritVeilPrewarmHost): PrewarmResumeUnit[] {
   const link = host.link ?? ((root) => linkColorPrograms(host.arms, root, false));
   return SPIRIT_VEIL_FAMILY.map((tuple) => {
@@ -132,9 +142,15 @@ export function spiritVeilProgramUnits(host: SpiritVeilPrewarmHost): PrewarmResu
       id: `spirit-veil:${key}`,
       roots: [root],
       run: () =>
-        link(root).then(() => {
+        link(root).then(async () => {
           markProgramsReadyUnder(host.properties, root);
           noteSpiritVeilTupleLinked(key, host.properties);
+          await runLinkedProgramTouchLane(
+            host.queue,
+            host.properties,
+            root,
+            GPU_WORK_PRIORITY.BOOT_DEBT,
+          );
         }),
     };
   });
