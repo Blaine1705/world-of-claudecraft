@@ -26,9 +26,4 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.armor': 'Armour',
   'itemUi.stats.armor': 'Armour',
   'itemUi.tooltip.armorStat': '{value} Armour',
-  'hudChrome.playerTooltip.guild': '<{guild}>',
-  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
-  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
-  'guide.interfacePage.framesGovernedUnitTooltip':
-    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

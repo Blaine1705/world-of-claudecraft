@@ -1596,7 +1596,11 @@ const MONOLITHS: MonolithRow[] = [
     // key) moved to server/player_identity_wire.ts. Exact count, zero slack.
     // Release integration composes both extraction sets below the prior pin.
     // Exact count, zero slack.
-    ceiling: 9838,
+    // RE-PINNED 9838 -> 9842 after dropping PR #4179 from the release batch:
+    // reverting that merge restored the pre-existing account cosmetic/storage
+    // imports and removed only the PR's spec field from this file. Measured
+    // with wc -l < server/game.ts on the post-drop tree. Exact count, zero slack.
+    ceiling: 9842,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
