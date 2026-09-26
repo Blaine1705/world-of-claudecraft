@@ -4126,6 +4126,55 @@
     background: var(--color-pike-pip-danger);
     box-shadow: 0 0 8px var(--color-pike-pip-danger-glow);
   }
+  /* The lean keycaps (shardpike_lean_view.ts): the player's ACTUAL lean keys, drawn right
+     above the beam they steer, and press-and-hold buttons in their own right (mouse or
+     finger), so the stick exists whatever the bindings and on a touch screen. Hidden with
+     the beam until the pike is couched. Geometry only on the shared ui-keycap primitive. */
+  .pike-lean {
+    display: flex;
+    justify-content: space-between;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity 120ms linear;
+  }
+  .pike-lean.active {
+    height: 30px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .pike-lean-key {
+    gap: 5px;
+    min-width: 58px;
+    height: 30px;
+    padding: 0 9px;
+    border-color: var(--color-pike-btn-rim);
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-pike-btn-hi),
+      var(--color-pike-btn-lo)
+    );
+    color: var(--color-pike-btn-text);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: var(--cursor-point);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .pike-lean-arrow {
+    color: var(--color-pike-primed);
+    font-size: 16px;
+  }
+  .pike-lean-key.unbound .pike-lean-cap {
+    display: none;
+  }
+  .pike-lean-key.held {
+    border-color: var(--color-pike-primed);
+    box-shadow: 0 0 9px var(--color-pike-primed-glow);
+  }
   .pike-btn {
     width: 40px;
     height: 40px;

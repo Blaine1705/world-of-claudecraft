@@ -8,8 +8,7 @@
 // `sim/lance_trial`, which is a SimContext consumer: src/render may reach for deterministic
 // sim leaves and must never reach for a sim system module (src/CLAUDE.md).
 
-import { LANCE_THRUST_RANGE } from '../sim/lance_balance_core';
-import { SHARDPIKE_ITEM_ID } from '../ui/hud/shardpike/shardpike_bar_view';
+import { isShardpikeItem, LANCE_THRUST_RANGE } from '../sim/lance_balance_core';
 import { type EyeWardMarkerPlan, eyeWardMarkerPlan, eyeWardStateOf } from './eye_ward_marker_core';
 
 /** The shape this driver needs off an entity; a structural subset of the wire entity. */
@@ -54,7 +53,7 @@ export function eyeWardPlanFor(
   if (candidate.asleep) return null;
   const ward = eyeWardStateOf(candidate.auras);
   if (!ward) return null;
-  const wielding = world.equipment.mainhand === SHARDPIKE_ITEM_ID;
+  const wielding = isShardpikeItem(world.equipment.mainhand);
   // The seal is read from the wielder's guidance view, which only a wielder has. A viewer
   // without one cannot tell sealed from pryable, and that is fine: to them both mean
   // "shielded, keep hitting", and the state they DO need (the ward being down) is an aura

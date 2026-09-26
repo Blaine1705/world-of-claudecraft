@@ -349,6 +349,7 @@ export const zh_CN: EnTranslations = {
       "braceTooltip": "将矛尾插入地面，矛尖朝上。你的横移键就是平衡杆：光束会自行漂移，他每次砸地都会把它踢偏。让它离开两端轨道并保持 {set} 秒即可架稳长矛。需要坚实的地面，且不能在坐骑上。",
       "thrustLabel": "织影核心突刺",
       "thrustTooltip": "将架稳的长矛刺入眼中，造成 {damage} 点伤害。没有任何东西能加成它：等级、攻击强度、长矛本身都不行。它会使工头失明并剥离石冢之皮，让泥沼中其他所有武器终于能咬进去。只有架稳的长矛才能送出这一击，射程 {reach} 码，窗口持续 {seconds} 秒。",
+      "braceTooltipLean": "将矛尾抵地，矛尖上举。用横移键或转向键倾斜，或按住横梁上方的两个按键：横梁会自行偏移，他每落下一击都会把它震歪。让它远离两端{set}秒，长矛即告架稳。需要坚实的地面，且不能在坐骑上。",
       "releaseLabel": "放下碎晶长矛",
       "releaseTooltip": "把长矛收起。中途放弃没有惩罚：你失去的是架势，不是这次机会，{rest} 秒后即可重新架起。",
       "whyResting": "你刚刚放下了长矛。等图标上的计时走完。",
@@ -367,6 +368,12 @@ export const zh_CN: EnTranslations = {
       "promptCloser": "靠近工头，还差 {yards} 码",
       "promptBrace": "架起碎晶长矛，然后稳住它",
       "promptFindBoss": "斯克里特的碎晶长矛：用它戳瞎工头的眼睛",
+      "promptFindBossMuster": "征召军的碎晶长矛：用它戳瞎工头的眼睛",
+      "promptHoldSteadyLean": "稳住长矛：用{left}和{right}倾斜",
+      "leanLeft": "向左倾斜",
+      "leanRight": "向右倾斜",
+      "leanLeftKey": "向左倾斜（{key}）",
+      "leanRightKey": "向右倾斜（{key}）",
       "promptTally": "{count} put out",
       "promptLabel": "碎晶长矛指示",
       "blindBanner": "BARROWHIDE BROKEN"
@@ -15964,6 +15971,9 @@ export const zh_CN: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "风暴颂歌链甲之靴"
       },
+      "muster_shardpike": {
+        "name": "征召碎晶长矛"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -17072,6 +17082,18 @@ export const zh_CN: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
+      },
+      "muster_footman": {
+        "name": "征召步兵"
+      },
+      "muster_chaplain": {
+        "name": "征召随军牧师"
+      },
+      "muster_sergeant": {
+        "name": "征召军士"
+      },
+      "muster_captain": {
+        "name": "征召队长"
       },
       "stable_horse": {
         "name": "厩马"
@@ -21416,6 +21438,7 @@ export const zh_CN: EnTranslations = {
     "mailboxName": "邮箱",
     "noticeboardName": "告示板",
     "farmPatchName": "菜畦",
-    "realmBuilderMonumentName": "王国建造者纪念碑"
+    "realmBuilderMonumentName": "王国建造者纪念碑",
+    "musterRackName": "征召兵器架"
   }
 };

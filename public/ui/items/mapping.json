@@ -6775,6 +6775,21 @@
         "mirelight_locket",
         "fenwright_grips"
       ]
+    },
+    {
+      "batchId": "muster-shardpike-icon-2026-09-26",
+      "source": "Derived in-repo from public/ui/items/skerrits_shardpike.webp (batch shardpike-mechanic-icons-2026-08-20) by compositing a painted red-and-cream muster pennant and rope lashing onto the haft with sharp; no new generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "The Skerrit's Shardpike icon it derives from, so the lent muster copy reads as the same weapon wearing the muster's colours.",
+      "commonPrompt": "Derived variant: the Skerrit's Shardpike icon with the Mirefen muster's red pennant (cream trim) tied below the crystal head and cream rope lashing on the haft.",
+      "itemIds": [
+        "muster_shardpike"
+      ]
     }
   ]
 }

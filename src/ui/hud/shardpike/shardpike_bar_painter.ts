@@ -10,6 +10,7 @@ import { t } from '../../i18n';
 import { iconDataUrl } from '../../icons';
 import type { PainterHostWriters } from '../../painter_host';
 import type { ShardpikeBarState, ShardpikeButtonState } from './shardpike_bar_view';
+import type { LeanBindingSource } from './shardpike_lean_view';
 import { shardpikeTooltipHtml, shardpikeTooltipModel } from './shardpike_tooltip';
 
 /**
@@ -38,10 +39,21 @@ export interface ShardpikeBarDeps {
    * swallows that ability cast instead.
    */
   consumePeek?: () => boolean;
+  /** The live key bindings, for the lean keycaps' text (shardpike_lean_view.ts). Absent on
+   *  a host with no keybinds: the keycaps then show their arrows and still work. */
+  keybinds?: () => LeanBindingSource;
 }
 
 /** What the painter calls when a button is pressed. */
 export type ShardpikeAction = ShardpikeButtonState['action'];
+
+/** What the painter calls as a lean keycap is pressed (-1 / 1) and released (0). */
+export type ShardpikeLeanHandler = (hold: -1 | 0 | 1) => void;
+
+interface LeanKeyParts {
+  root: HTMLButtonElement;
+  cap: HTMLElement;
+}
 
 interface ButtonParts {
   root: HTMLButtonElement;
@@ -55,6 +67,8 @@ export class ShardpikeBarPainter {
   private beam: HTMLElement | null = null;
   private pip: HTMLElement | null = null;
   private setFill: HTMLElement | null = null;
+  private lean: HTMLElement | null = null;
+  private leanKeys: { left: LeanKeyParts; right: LeanKeyParts } | null = null;
   private built = false;
   /** The most recent painted state, read by the hover card's lazily-resolved thunk. */
   private last: ShardpikeBarState | null = null;
@@ -64,6 +78,7 @@ export class ShardpikeBarPainter {
     private readonly root: HTMLElement,
     private readonly onAction: (action: ShardpikeAction) => void,
     private readonly deps: ShardpikeBarDeps = {},
+    private readonly onLean: ShardpikeLeanHandler = () => {},
   ) {}
 
   paint(state: ShardpikeBarState): void {
@@ -100,6 +115,11 @@ export class ShardpikeBarPainter {
       }
     }
 
+    if (this.lean && this.leanKeys) {
+      this.writers.toggleClass(this.lean, 'active', state.bracing);
+      this.paintLeanKey(this.leanKeys.left, state.leanKeys.left, 'left');
+      this.paintLeanKey(this.leanKeys.right, state.leanKeys.right, 'right');
+    }
     if (this.beam) this.writers.toggleClass(this.beam, 'active', state.bracing);
     if (this.beam) this.writers.toggleClass(this.beam, 'danger', state.danger);
     if (this.pip) {
@@ -112,6 +132,66 @@ export class ShardpikeBarPainter {
 
   hide(): void {
     this.writers.setDisplay(this.root, 'none');
+    // A hidden bar can never be holding a lean.
+    this.onLean(0);
+  }
+
+  /** One keycap's text and accessible name: the bound key, or the bare arrow when none. */
+  private paintLeanKey(parts: LeanKeyParts, key: string, side: 'left' | 'right'): void {
+    this.writers.setText(parts.cap, key);
+    this.writers.toggleClass(parts.root, 'unbound', key === '');
+    const name =
+      side === 'left'
+        ? key
+          ? t('hudChrome.shardpike.leanLeftKey', { key })
+          : t('hudChrome.shardpike.leanLeft')
+        : key
+          ? t('hudChrome.shardpike.leanRightKey', { key })
+          : t('hudChrome.shardpike.leanRight');
+    this.writers.setAttr(parts.root, 'aria-label', name);
+  }
+
+  /**
+   * One press-and-hold lean keycap.
+   *
+   * Pointer events, so one listener set serves the mouse and a finger alike, with the
+   * pointer CAPTURED on press: a thumb that slides off the cap mid-lean must keep leaning
+   * until it lifts, not drop the stick the instant it crosses the border. Every way the
+   * press can end (release, cancel, a lost capture) releases the lean, so it can never stick.
+   */
+  private buildLeanKey(doc: Document, side: 'left' | 'right'): LeanKeyParts {
+    const btn = doc.createElement('button');
+    btn.type = 'button';
+    btn.className = `ui-keycap pike-lean-key pike-lean-${side}`;
+    const arrow = doc.createElement('span');
+    arrow.className = 'pike-lean-arrow';
+    arrow.setAttribute('aria-hidden', 'true');
+    arrow.textContent = side === 'left' ? '←' : '→';
+    const cap = doc.createElement('span');
+    cap.className = 'pike-lean-cap';
+    if (side === 'left') btn.append(arrow, cap);
+    else btn.append(cap, arrow);
+    const dir: -1 | 1 = side === 'left' ? -1 : 1;
+    const release = () => {
+      btn.classList.remove('held');
+      this.onLean(0);
+    };
+    btn.addEventListener('pointerdown', (ev) => {
+      ev.preventDefault();
+      try {
+        btn.setPointerCapture(ev.pointerId);
+      } catch {
+        // A synthetic or already-released pointer cannot be captured; the press still leans.
+      }
+      btn.classList.add('held');
+      this.onLean(dir);
+    });
+    btn.addEventListener('pointerup', release);
+    btn.addEventListener('pointercancel', release);
+    btn.addEventListener('lostpointercapture', release);
+    // A long press on touch opens the context menu otherwise, which steals the hold.
+    btn.addEventListener('contextmenu', (ev) => ev.preventDefault());
+    return { root: btn, cap };
   }
 
   /**
@@ -140,6 +220,15 @@ export class ShardpikeBarPainter {
     this.beam = beam;
     this.pip = pip;
     this.setFill = setFill;
+
+    // The lean keycaps ride ABOVE the beam: the stick sits right over the thing it steers.
+    const lean = doc.createElement('div');
+    lean.className = 'pike-lean';
+    const left = this.buildLeanKey(doc, 'left');
+    const right = this.buildLeanKey(doc, 'right');
+    lean.append(left.root, right.root);
+    this.lean = lean;
+    this.leanKeys = { left, right };
 
     const group = doc.createElement('div');
     group.className = 'pike-group';
@@ -187,6 +276,6 @@ export class ShardpikeBarPainter {
       this.buttons.set(spec.action, { root: btn, cooldown, window });
     }
 
-    this.root.append(beam, group);
+    this.root.append(lean, beam, group);
   }
 }

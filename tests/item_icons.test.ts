@@ -323,7 +323,9 @@ describe('item webp icons', () => {
     // (foremans_barrowmaul) and Skerrit's Shardpike, whose quest tool got its
     // own held model and therefore its own painted icon, are both disjoint
     // additions to that registry.
-    expect(WEAPON_IMAGE_IDS.size).toBe(140);
+    // 141 with the Mirefen muster rework: the lent muster_shardpike maps to the same
+    // shardpike_spear held model and carries its own painted icon.
+    expect(WEAPON_IMAGE_IDS.size).toBe(141);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

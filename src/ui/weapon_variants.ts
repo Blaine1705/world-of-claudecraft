@@ -178,4 +178,6 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // class default attach, which meant the quest tool the Mirefen world boss's whole
   // level-spread mechanic runs on was drawn as a plain sword.
   skerrits_shardpike: 'shardpike_spear',
+  // The muster's lent copy off the command camp's rack: the same pike in the same hands.
+  muster_shardpike: 'shardpike_spear',
 };

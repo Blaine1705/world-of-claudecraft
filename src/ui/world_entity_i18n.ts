@@ -131,6 +131,11 @@ const MOB_IDS = [
   'thunzharr_waking_peak',
   'balgath_cyclops',
   'thunzharr_stormling',
+  // The Mirefen muster around Balgath's crater (src/sim/content/mirefen_muster.ts).
+  'muster_footman',
+  'muster_chaplain',
+  'muster_sergeant',
+  'muster_captain',
   // Ambient Highwatch Stables horse (zone 3)
   'stable_horse',
   // Procedural Rift creature pool (src/sim/content/rift/mobs.ts). Dev/endless
@@ -750,6 +755,7 @@ type WorldEntityTranslations = {
     noticeboardName: string;
     farmPatchName: string;
     realmBuilderMonumentName: string;
+    musterRackName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -871,6 +877,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       noticeboardName: 'Notice Board',
       farmPatchName: 'Garden Beds',
       realmBuilderMonumentName: 'Realm Builder Monument',
+      musterRackName: 'Muster Weapon Rack',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

@@ -349,6 +349,7 @@ export const nl_NL: EnTranslations = {
       "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
       "thrustLabel": "Loomshard Thrust",
       "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: it drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
       "releaseLabel": "Ground the Shardpike",
       "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
       "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
@@ -367,6 +368,12 @@ export const nl_NL: EnTranslations = {
       "promptCloser": "Get within reach of the Foreman, {yards} yards out",
       "promptBrace": "Couch the Shardpike, then hold it steady",
       "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
       "promptTally": "{count} put out",
       "promptLabel": "Shardpike instruction",
       "blindBanner": "BARROWHIDE BROKEN"
@@ -15964,6 +15971,9 @@ export const nl_NL: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "Stormhymne-kettinglaarzen"
       },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -17072,6 +17082,18 @@ export const nl_NL: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Gewekte Stormling"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_captain": {
+        "name": "Muster Captain"
       },
       "stable_horse": {
         "name": "Stalpaard"
@@ -21416,6 +21438,7 @@ export const nl_NL: EnTranslations = {
     "mailboxName": "Brievenbus",
     "noticeboardName": "Mededelingenbord",
     "farmPatchName": "Tuinbedden",
-    "realmBuilderMonumentName": "Rijksbouwer Monument"
+    "realmBuilderMonumentName": "Rijksbouwer Monument",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

@@ -16,6 +16,7 @@ import {
   makeCombo,
   partyTargetActionSlot,
 } from './keybinds';
+import { applyLanceLean, lanceLeanIntent } from './lance_lean_intent';
 import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
 import { toggleFriendlyNameplates } from './nameplate_view_prefs';
 import {
@@ -1724,7 +1725,9 @@ export class Input {
         surface: false,
       };
     }
-    if (this.controllerMoveInput) return { ...this.controllerMoveInput };
+    if (this.controllerMoveInput) {
+      return applyLanceLean({ ...this.controllerMoveInput }, lanceLeanIntent);
+    }
     const held = (id: string) => this.heldAction(id);
     const bothButtons = this.leftDown && this.rightDown;
     const forward =
@@ -1749,50 +1752,58 @@ export class Input {
     const { dive, surface, swimSteer } = this.readSwimSteer(this.anyMoveHeld());
 
     if (this.mouseCameraEnabled) {
-      return {
+      return applyLanceLean(
+        {
+          forward,
+          back,
+          jump,
+          dive,
+          surface,
+          swimSteer,
+          turnLeft: false,
+          turnRight: false,
+          strafeLeft:
+            held('strafeLeft') ||
+            held('turnLeft') ||
+            this.touchMove.strafeLeft ||
+            this.gamepadMove.strafeLeft,
+          strafeRight:
+            held('strafeRight') ||
+            held('turnRight') ||
+            this.touchMove.strafeRight ||
+            this.gamepadMove.strafeRight,
+        },
+        lanceLeanIntent,
+      );
+    }
+
+    const mouselook = this.isMouselookActive();
+    const aHeld = held('turnLeft');
+    const dHeld = held('turnRight');
+    // A couched Shardpike turns the left/right keys (and the on-screen lean keycaps) into
+    // its balance stick (lance_lean_intent.ts); a no-op outside a brace.
+    return applyLanceLean(
+      {
         forward,
         back,
         jump,
         dive,
         surface,
         swimSteer,
-        turnLeft: false,
-        turnRight: false,
         strafeLeft:
           held('strafeLeft') ||
-          held('turnLeft') ||
+          (mouselook && aHeld) ||
           this.touchMove.strafeLeft ||
           this.gamepadMove.strafeLeft,
         strafeRight:
           held('strafeRight') ||
-          held('turnRight') ||
+          (mouselook && dHeld) ||
           this.touchMove.strafeRight ||
           this.gamepadMove.strafeRight,
-      };
-    }
-
-    const mouselook = this.isMouselookActive();
-    const aHeld = held('turnLeft');
-    const dHeld = held('turnRight');
-    return {
-      forward,
-      back,
-      jump,
-      dive,
-      surface,
-      swimSteer,
-      strafeLeft:
-        held('strafeLeft') ||
-        (mouselook && aHeld) ||
-        this.touchMove.strafeLeft ||
-        this.gamepadMove.strafeLeft,
-      strafeRight:
-        held('strafeRight') ||
-        (mouselook && dHeld) ||
-        this.touchMove.strafeRight ||
-        this.gamepadMove.strafeRight,
-      turnLeft: !mouselook && aHeld,
-      turnRight: !mouselook && dHeld,
-    };
+        turnLeft: !mouselook && aHeld,
+        turnRight: !mouselook && dHeld,
+      },
+      lanceLeanIntent,
+    );
   }
 }

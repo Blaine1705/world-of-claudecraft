@@ -135,8 +135,11 @@ const build = await buildItemArtAudit({
     // eight extra records push one group past an 80-id page boundary, so the
     // contact-sheet page count moves 31 to 32. Both re-measured with
     // `node scripts/item_art_audit.mjs --verify-only` on the merged tree.
-    catalogCount: 1291,
-    liveItemCount: 1309,
+    // Mirefen muster rework: one more disjoint item definition, the lent
+    // muster_shardpike, with its own shipping WebP (the
+    // muster-shardpike-icon-2026-09-26 batch): 1291 + 1 = 1292, 1309 + 1 = 1310.
+    catalogCount: 1292,
+    liveItemCount: 1310,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

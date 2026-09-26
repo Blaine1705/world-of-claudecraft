@@ -15,9 +15,11 @@
 // Pure: no DOM, no clock, no i18n. It returns keys and values the painter resolves, which is
 // also what lets a Vitest assert the priority ladder directly.
 
+import { isShardpikeItem, MUSTER_SHARDPIKE_ID } from '../../../sim/lance_balance_core';
 import type { LanceGuidanceView, LanceTrialView } from '../../../world_api';
 import type { TranslationKey } from '../../i18n';
-import { SHARDPIKE_DANGER_BALANCE, SHARDPIKE_ITEM_ID } from './shardpike_bar_view';
+import { SHARDPIKE_DANGER_BALANCE } from './shardpike_bar_view';
+import type { ShardpikeLeanKeys } from './shardpike_lean_view';
 
 /** How urgent the line is, which is all the painter needs to style it. */
 export type ShardpikePromptTone =
@@ -54,6 +56,8 @@ export interface ShardpikePromptInput {
   guidance: LanceGuidanceView | null;
   restRemaining: number;
   dead: boolean;
+  /** The live lean keys, so "hold it steady" can name them (shardpike_lean_view.ts). */
+  leanKeys?: ShardpikeLeanKeys;
 }
 
 const HIDDEN: ShardpikePromptState = {
@@ -86,7 +90,7 @@ const secs = (v: number): string => String(Math.max(1, Math.ceil(v)));
  *     "what is this for" is on screen before the fight, not during it.
  */
 export function shardpikePromptState(input: ShardpikePromptInput): ShardpikePromptState {
-  if (input.mainhandItemId !== SHARDPIKE_ITEM_ID) return HIDDEN;
+  if (!isShardpikeItem(input.mainhandItemId)) return HIDDEN;
   const g = input.guidance;
   const thrusts = g && g.thrusts > 0 ? g.thrusts : null;
   const show = (
@@ -105,10 +109,17 @@ export function shardpikePromptState(input: ShardpikePromptInput): ShardpikeProm
   }
   if (trial) {
     const drifting = Math.abs(trial.balance) >= SHARDPIKE_DANGER_BALANCE;
-    return show(
-      drifting ? 'urgent' : 'active',
-      drifting ? 'hudChrome.shardpike.promptCatchIt' : 'hudChrome.shardpike.promptHoldSteady',
-    );
+    if (drifting) return show('urgent', 'hudChrome.shardpike.promptCatchIt');
+    // Name the player's ACTUAL lean keys when both sides have one: "your strafe keys" was
+    // simply false for everyone whose strafe keys are on the action bar.
+    const keys = input.leanKeys;
+    if (keys?.left && keys.right) {
+      return show('active', 'hudChrome.shardpike.promptHoldSteadyLean', {
+        left: keys.left,
+        right: keys.right,
+      });
+    }
+    return show('active', 'hudChrome.shardpike.promptHoldSteady');
   }
   if (g?.blinded) {
     return show('success', 'hudChrome.shardpike.promptEyeOut', {
@@ -129,7 +140,12 @@ export function shardpikePromptState(input: ShardpikePromptInput): ShardpikeProm
     });
   }
   if (g?.targetPresent) return show('directive', 'hudChrome.shardpike.promptBrace');
-  return show('idle', 'hudChrome.shardpike.promptFindBoss');
+  return show(
+    'idle',
+    input.mainhandItemId === MUSTER_SHARDPIKE_ID
+      ? 'hudChrome.shardpike.promptFindBossMuster'
+      : 'hudChrome.shardpike.promptFindBoss',
+  );
 }
 
 /** Cheap change key, so the painter only writes DOM when the line actually changes. */

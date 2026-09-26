@@ -64,7 +64,11 @@ describe('painted weapon inventory icons', () => {
     // Shardpike (shardpike-mechanic-icons-2026-08-20) are both disjoint
     // additions to the registry, so 138 + 2 = 140. Re-counted directly off
     // the merged src/ui/weapon_variants.ts.
-    expect(baseWeapons).toHaveLength(140);
+    //
+    // 141 with the Mirefen muster rework: the lent muster_shardpike
+    // (muster-shardpike-icon-2026-09-26) shares the Shardpike's held model and
+    // carries its own painted icon.
+    expect(baseWeapons).toHaveLength(141);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -109,8 +113,9 @@ describe('painted weapon inventory icons', () => {
     // (balgath-boss-icons-2026-08-18), whose maul is a weapon-registry item,
     // and the Shardpike mechanic batch (shardpike-mechanic-icons-2026-08-20),
     // whose pike is another. Re-counted off the merged
-    // public/ui/items/mapping.json.
-    expect(weaponBatches).toHaveLength(9);
+    // public/ui/items/mapping.json. Ten with the Mirefen muster rework's lent-pike
+    // batch (muster-shardpike-icon-2026-09-26, asserted below as `musterWeaponIds`).
+    expect(weaponBatches).toHaveLength(10);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -240,6 +245,15 @@ describe('painted weapon inventory icons', () => {
       .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
       .sort();
     expect(shardpikeWeaponIds).toEqual(['skerrits_shardpike']);
+    // And once more for the muster's lent copy (muster-shardpike-icon-2026-09-26).
+    const musterBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'muster-shardpike-icon-2026-09-26',
+    );
+    expect(musterBatch).toBeDefined();
+    const musterWeaponIds = (musterBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(musterWeaponIds).toEqual(['muster_shardpike']);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
         (id) =>
@@ -250,7 +264,8 @@ describe('painted weapon inventory icons', () => {
           !varkhulWeaponIds.includes(id) &&
           !gapWeaponIds.includes(id) &&
           !bossWeaponIds.includes(id) &&
-          !shardpikeWeaponIds.includes(id),
+          !shardpikeWeaponIds.includes(id) &&
+          !musterWeaponIds.includes(id),
       ),
     );
     expect(
@@ -305,7 +320,8 @@ describe('painted weapon inventory icons', () => {
         !varkhulWeaponIds.includes(id) &&
         !gapWeaponIds.includes(id) &&
         !bossWeaponIds.includes(id) &&
-        !shardpikeWeaponIds.includes(id),
+        !shardpikeWeaponIds.includes(id) &&
+        !musterWeaponIds.includes(id),
     );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));

@@ -4,10 +4,13 @@
 // paint it, and nothing else. Element lookup, the verb dispatch, and turning world state
 // into the bar's state all live here, so the trial's whole input surface is one directory.
 
+import { keyLabel } from '../../../game/keybinds';
+import { lanceLeanIntent } from '../../../game/lance_lean_intent';
 import type { IWorld } from '../../../world_api';
 import type { PainterHostWriters } from '../../painter_host';
 import { type ShardpikeBarDeps, ShardpikeBarPainter } from './shardpike_bar_painter';
 import { shardpikeBarState } from './shardpike_bar_view';
+import { shardpikeLeanKeys } from './shardpike_lean_view';
 import { ShardpikePromptPainter } from './shardpike_prompt_painter';
 import { shardpikePromptState } from './shardpike_prompt_view';
 
@@ -54,6 +57,11 @@ export function createShardpikeBar(
       else w.lanceRelease();
     },
     deps,
+    // The keycaps above the beam hold the lean the same way the keys do: into the client's
+    // movement intent, which folds it into the streamed strafe bits (lance_lean_intent.ts).
+    (hold) => {
+      lanceLeanIntent.hold = hold;
+    },
   );
   return {
     paint(dead: boolean): void {
@@ -61,7 +69,12 @@ export function createShardpikeBar(
       const mainhandItemId = w.equipment.mainhand;
       const trial = w.lanceTrial;
       const restRemaining = w.lanceRestRemaining;
-      painter.paint(shardpikeBarState({ mainhandItemId, trial, restRemaining, dead }));
+      const leanKeys = shardpikeLeanKeys(deps.keybinds?.(), keyLabel);
+      const bar = shardpikeBarState({ mainhandItemId, trial, restRemaining, dead, leanKeys });
+      // Every frame the bar paints, the movement intent learns whether a pike is couched:
+      // that is the one switch that turns the left/right keys into the balance stick.
+      lanceLeanIntent.braced = bar.bracing && !dead;
+      painter.paint(bar);
       prompt?.paint(
         shardpikePromptState({
           mainhandItemId,
@@ -69,10 +82,12 @@ export function createShardpikeBar(
           guidance: w.lanceGuidance,
           restRemaining,
           dead,
+          leanKeys,
         }),
       );
     },
     hide(): void {
+      lanceLeanIntent.braced = false;
       painter.hide();
       prompt?.hide();
     },

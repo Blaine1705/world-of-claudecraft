@@ -349,6 +349,7 @@ export const ja_JP: EnTranslations = {
       "braceTooltip": "石突きを地面に突き立て、穂先を上げる。横移動キーがバランス棒だ：ビームは自然に流れ、彼が地面を叩くたびに弾かれる。両端に触れさせず {set} 秒保てば穂先が定まる。固い地面が必要で、騎乗中は不可。",
       "thrustLabel": "ルームシャード・スラスト",
       "thrustTooltip": "定まった穂先を眼に突き入れ、{damage} のダメージを与える。レベルも攻撃力もパイク自体も、何一つこの値を伸ばさない。番人を盲目にしバロウハイドを剥ぎ取るので、湿地の他のあらゆる武器がようやく通るようになる。定まったパイクだけが放てる一撃で、射程 {reach} ヤード、猶予は {seconds} 秒。",
+      "braceTooltipLean": "石突きを地面に据え、穂先を掲げる。横移動キーか旋回キー、またはバーの上の二つのキーを押し続けて傾けろ。バーはひとりでに揺れ、彼の一撃ごとに弾かれる。{set}秒間端に触れさせなければパイクが据わる。固い地面が必要で、騎乗中は使えない。",
       "releaseLabel": "シャードパイクを下ろす",
       "releaseTooltip": "パイクを収める。降りるのに罰則はない：失うのは構えだけで機会そのものではなく、{rest} 秒後に再び構えられる。",
       "whyResting": "パイクを下ろしたばかりだ。アイコンの残り時間を待て。",
@@ -367,6 +368,12 @@ export const ja_JP: EnTranslations = {
       "promptCloser": "番人に近づけ、あと {yards} ヤード",
       "promptBrace": "シャードパイクを構え、そのまま支えろ",
       "promptFindBoss": "スケリットのシャードパイク：これで番人の眼を潰せ",
+      "promptFindBossMuster": "召集兵団のシャードパイク：これで監督の眼を潰せ",
+      "promptHoldSteadyLean": "パイクを支えろ：{left}と{right}で傾けろ",
+      "leanLeft": "左に傾ける",
+      "leanRight": "右に傾ける",
+      "leanLeftKey": "左に傾ける（{key}）",
+      "leanRightKey": "右に傾ける（{key}）",
       "promptTally": "{count} put out",
       "promptLabel": "シャードパイクの指示",
       "blindBanner": "BARROWHIDE BROKEN"
@@ -15964,6 +15971,9 @@ export const ja_JP: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "嵐の賛歌の鎖の靴"
       },
+      "muster_shardpike": {
+        "name": "召集兵団のシャードパイク"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -17072,6 +17082,18 @@ export const ja_JP: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "目覚めた嵐の精"
+      },
+      "muster_footman": {
+        "name": "召集兵団の歩兵"
+      },
+      "muster_chaplain": {
+        "name": "召集兵団の従軍司祭"
+      },
+      "muster_sergeant": {
+        "name": "召集兵団の軍曹"
+      },
+      "muster_captain": {
+        "name": "召集兵団の隊長"
       },
       "stable_horse": {
         "name": "厩舎の馬"
@@ -21416,6 +21438,7 @@ export const ja_JP: EnTranslations = {
     "mailboxName": "メールボックス",
     "noticeboardName": "掲示板",
     "farmPatchName": "菜園",
-    "realmBuilderMonumentName": "王国建設者の記念碑"
+    "realmBuilderMonumentName": "王国建設者の記念碑",
+    "musterRackName": "召集兵団の武器棚"
   }
 };

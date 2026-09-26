@@ -17,6 +17,7 @@
 // tests/architecture.test.ts UI_PURE_CORES.
 
 import {
+  isShardpikeItem,
   LANCE_FIXED_DAMAGE,
   LANCE_REST_SECONDS,
   LANCE_SET_SECONDS,
@@ -25,8 +26,10 @@ import {
 } from '../../../sim/lance_balance_core';
 import type { LanceTrialView } from '../../../world_api/lance_trial';
 import type { TranslationKey } from '../../i18n';
+import type { ShardpikeLeanKeys } from './shardpike_lean_view';
 
-/** The item whose presence in the mainhand is the bar's whole visibility rule. */
+/** Skerrit's quest pike. The bar shows for ANY Shardpike in the main hand (isShardpikeItem:
+ *  his, or the muster's lent copy from the command camp's rack). */
 export const SHARDPIKE_ITEM_ID = 'skerrits_shardpike';
 
 /**
@@ -86,6 +89,8 @@ export interface ShardpikeBarState {
   /** Seconds left in the thrust window, or 0 while still bracing. */
   windowRemaining: number;
   buttons: readonly ShardpikeButtonState[];
+  /** The keycap text above the beam: the player's live lean keys (shardpike_lean_view.ts). */
+  leanKeys: ShardpikeLeanKeys;
 }
 
 export interface ShardpikeBarInput {
@@ -95,7 +100,11 @@ export interface ShardpikeBarInput {
   /** Seconds until the pike can be braced again; 0 when ready. */
   restRemaining: number;
   dead: boolean;
+  /** The live lean keys; absent on a host with no keybinds (the keycaps show arrows). */
+  leanKeys?: ShardpikeLeanKeys;
 }
+
+const NO_KEYS: ShardpikeLeanKeys = { left: '', right: '' };
 
 const HIDDEN: ShardpikeBarState = {
   visible: false,
@@ -105,6 +114,7 @@ const HIDDEN: ShardpikeBarState = {
   setFrac: 0,
   windowRemaining: 0,
   buttons: [],
+  leanKeys: NO_KEYS,
 };
 
 /**
@@ -114,7 +124,7 @@ const HIDDEN: ShardpikeBarState = {
  * can hide the row without a second branch.
  */
 export function shardpikeBarState(input: ShardpikeBarInput): ShardpikeBarState {
-  if (input.mainhandItemId !== SHARDPIKE_ITEM_ID) return HIDDEN;
+  if (!isShardpikeItem(input.mainhandItemId)) return HIDDEN;
   const trial = input.trial;
   const steadied = trial?.phase === 'steadied';
   const resting = input.restRemaining > 0;
@@ -125,7 +135,7 @@ export function shardpikeBarState(input: ShardpikeBarInput): ShardpikeBarState {
   const brace: ShardpikeButtonState = {
     action: 'brace',
     labelKey: 'hudChrome.shardpike.braceLabel',
-    tooltipKey: 'hudChrome.shardpike.braceTooltip',
+    tooltipKey: 'hudChrome.shardpike.braceTooltipLean',
     tooltipValues: { set: String(LANCE_SET_SECONDS) },
     iconId: 'lance_brace',
     enabled: alive && !trial && !resting,
@@ -179,6 +189,7 @@ export function shardpikeBarState(input: ShardpikeBarInput): ShardpikeBarState {
     setFrac: trial ? Math.min(1, Math.max(0, trial.setProgress)) : 0,
     windowRemaining: steadied ? Math.max(0, trial.windowRemaining) : 0,
     buttons: [brace, thrust, release],
+    leanKeys: input.leanKeys ?? NO_KEYS,
   };
 }
 
@@ -203,5 +214,5 @@ export function shardpikeBarSignature(state: ShardpikeBarState): string {
     .join(',');
   return `${state.bracing ? 'b' : '-'}:${Math.round(state.balanceFrac * 40)}:${
     state.danger ? 'd' : '-'
-  }:${Math.round(state.setFrac * 20)}:${buttons}`;
+  }:${Math.round(state.setFrac * 20)}:${buttons}:${state.leanKeys.left}|${state.leanKeys.right}`;
 }

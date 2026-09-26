@@ -15,6 +15,11 @@ export {
   shardpikeBarState,
 } from './shardpike_bar_view';
 export { type ShardpikeFeedbackHost, shardpikeBlindFeedback } from './shardpike_feedback';
+export {
+  type LeanBindingSource,
+  type ShardpikeLeanKeys,
+  shardpikeLeanKeys,
+} from './shardpike_lean_view';
 export { ShardpikePromptPainter } from './shardpike_prompt_painter';
 export {
   type ShardpikePromptInput,

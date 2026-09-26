@@ -3051,6 +3051,8 @@ const ITEM_ENTITY_IDS = [
   'thornpeak_moonhide_cowl',
   'stormhymn_chain_grips',
   'stormhymn_chain_treads',
+  // The Mirefen muster's lent Shardpike (src/sim/muster_pike.ts).
+  'muster_shardpike',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3730,6 +3732,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   thornpeak_moonhide_cowl: 'Thornpeak Moonhide Cowl',
   stormhymn_chain_grips: 'Stormhymn Chain Grips',
   stormhymn_chain_treads: 'Stormhymn Chain Treads',
+  muster_shardpike: 'Muster Shardpike',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

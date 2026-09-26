@@ -4534,10 +4534,10 @@ export class Hud {
     this.paladinAscensionCharges,
     this.paladinAscensionStatusEl,
   );
-  /** The Shardpike bar: the world boss trial's only input surface (hud/shardpike/). */
   private readonly shardpikeBar = createShardpikeBar(document, this.writerFacet, () => this.sim, {
     attachTooltip: (el, html) => this.attachTooltip(el, html),
     consumePeek: () => this.peekGuard.consume(),
+    keybinds: () => this.keybinds, // live, for the lean keycaps (hud/shardpike/)
   });
   private readonly doomMeter = createDoomMeter(
     document,

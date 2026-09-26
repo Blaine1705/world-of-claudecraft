@@ -349,6 +349,7 @@ export const ko_KR: EnTranslations = {
       "braceTooltip": "창 밑동을 땅에 박고 창끝을 세운다. 좌우 이동 키가 균형 막대다: 빔은 저절로 흐르고, 그가 땅을 내리칠 때마다 튕긴다. 양쪽 끝에 닿지 않게 {set}초간 버티면 창이 고정된다. 단단한 땅이 필요하고, 탈것에 탄 채로는 불가능하다.",
       "thrustLabel": "룸샤드 찌르기",
       "thrustTooltip": "고정된 창을 눈에 찔러 넣어 {damage}의 피해를 입힌다. 레벨도, 공격력도, 창 자체도 이 값을 키우지 못한다. 감독관을 실명시키고 무덤가죽을 벗겨내므로, 늪의 다른 모든 무기가 마침내 먹히기 시작한다. 고정된 창만이 이 일격을 낼 수 있고, 사거리는 {reach}야드, 기회는 {seconds}초 동안 열린다.",
+      "braceTooltipLean": "창끝을 땅에 박고 창날을 치켜든다. 좌우 이동 키나 회전 키로, 또는 막대 위의 두 키를 누르고 있어 기울여라. 막대는 저절로 흔들리고, 그가 내려치는 일격마다 튕겨 나간다. {set}초 동안 양 끝에 닿지 않게 버티면 창이 자리 잡는다. 단단한 땅이 필요하며, 탈것 위에서는 불가능하다.",
       "releaseLabel": "조각창 내리기",
       "releaseTooltip": "창을 거둔다. 물러나도 벌칙은 없다: 잃는 것은 자세뿐이고 기회 자체는 아니며, {rest}초 후 다시 자세를 잡을 수 있다.",
       "whyResting": "방금 창을 내렸다. 아이콘의 시간이 끝날 때까지 기다려라.",
@@ -367,6 +368,12 @@ export const ko_KR: EnTranslations = {
       "promptCloser": "감독관에게 접근하라, {yards}야드 남았다",
       "promptBrace": "조각창 자세를 잡고, 그대로 버텨라",
       "promptFindBoss": "스케릿의 조각창: 이것으로 감독관의 눈을 찔러라",
+      "promptFindBossMuster": "소집대의 조각창: 이것으로 감독관의 눈을 찔러라",
+      "promptHoldSteadyLean": "창을 버텨라: {left}와 {right}로 기울여라",
+      "leanLeft": "왼쪽으로 기울이기",
+      "leanRight": "오른쪽으로 기울이기",
+      "leanLeftKey": "왼쪽으로 기울이기 ({key})",
+      "leanRightKey": "오른쪽으로 기울이기 ({key})",
       "promptTally": "{count} put out",
       "promptLabel": "조각창 지시",
       "blindBanner": "BARROWHIDE BROKEN"
@@ -15964,6 +15971,9 @@ export const ko_KR: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "폭풍찬가 사슬 장화"
       },
+      "muster_shardpike": {
+        "name": "소집대 조각창"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -17072,6 +17082,18 @@ export const ko_KR: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "깨어난 폭풍 정령"
+      },
+      "muster_footman": {
+        "name": "소집대 보병"
+      },
+      "muster_chaplain": {
+        "name": "소집대 군목"
+      },
+      "muster_sergeant": {
+        "name": "소집대 부사관"
+      },
+      "muster_captain": {
+        "name": "소집대 대장"
       },
       "stable_horse": {
         "name": "마구간 말"
@@ -21416,6 +21438,7 @@ export const ko_KR: EnTranslations = {
     "mailboxName": "우편함",
     "noticeboardName": "게시판",
     "farmPatchName": "텃밭",
-    "realmBuilderMonumentName": "왕국 건설자 기념비"
+    "realmBuilderMonumentName": "왕국 건설자 기념비",
+    "musterRackName": "소집대 무기 거치대"
   }
 };

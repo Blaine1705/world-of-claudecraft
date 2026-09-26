@@ -851,13 +851,15 @@ describe('item-art audit builder', () => {
     // disjoint spoils take the catalog to 1291 / 1309 and push one group past
     // an 80-id page boundary (31 to 32 pages, 248 to 256 sheets); the renderer
     // fingerprint is unchanged because the audit lib was not touched.
+    // Mirefen muster rework: measured again the same way after the lent
+    // muster_shardpike joined (1292 / 1310, same groups and pages).
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '89835373d9b76e19140de1845227abad0f1e08d9806e593e7daed2f32d077773',
-      catalogBytes: 704093,
+      catalogSha256: 'b88b3890f8227c45f313dea669e3d35891ac3d5409243838e207390e5f3f6672',
+      catalogBytes: 704617,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1291,
-      liveItemCount: 1309,
+      catalogCount: 1292,
+      liveItemCount: 1310,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -875,7 +877,7 @@ describe('item-art audit builder', () => {
         identity: 32,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '6c9c198ab36a3d5d467be152ff9033b4f0f6e6dad84b07caeb62da057b6e32b7',
+      shippingCatalogSha256: '36cb32cf67f8ae90e10d0ca93dce5e0f844e54367d143466153b0c0717031b15',
       machineChecksPassed: true,
       verdict: null,
     });
