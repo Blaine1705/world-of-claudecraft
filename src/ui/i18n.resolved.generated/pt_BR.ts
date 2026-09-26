@@ -2640,7 +2640,9 @@ export const pt_BR: EnTranslations = {
     },
     "charSheet": {
       "offense": "Ataque",
+      "spell": "Spell",
       "defense": "Defesa",
+      "ratings": "Ratings",
       "playtimeLabel": "Tempo Jogado",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Menos de um minuto",
@@ -2669,6 +2671,7 @@ export const pt_BR: EnTranslations = {
       "names": {
         "spellPower": "Poder Mágico",
         "healPower": "Poder de Cura",
+        "spellCrit": "Spell Crit",
         "critRating": "Índice de crítico",
         "hasteRating": "Índice de aceleração",
         "parry": "Aparar",
@@ -2685,8 +2688,10 @@ export const pt_BR: EnTranslations = {
         "armor": "Suaviza os golpes físicos recebidos. A redução é maior contra atacantes de nível inferior e tem limite de 75%.",
         "attackPower": "Potencializa seus ataques com armas. A cada 14 de poder de ataque, adiciona 1 de dano por segundo.",
         "spellPower": "Aumenta o dano das suas magias e a força das suas curas. Cada ponto de Intelecto concede um pouco de Poder Mágico, além do que vem de equipamentos ou benefícios.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "Seu dano por segundo estimado com armas, combinando o dano e a velocidade da sua arma com seu poder de ataque.",
         "critChance": "Sua chance de um ataque atingir criticamente, causando dano dobrado.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "Sua chance de esquivar completamente de um ataque corpo a corpo recebido, sem sofrer dano.",
         "critRating": "Índice de crítico dos seus equipamentos e benefícios de conjunto, elevando sua chance de acerto crítico. Cerca de 10 de índice concede 1% de crítico.",
         "hasteRating": "Índice de aceleração dos seus equipamentos e benefícios de conjunto, acelerando seus ataques e conjurações. Cerca de 10 de índice concede 1% de aceleração.",

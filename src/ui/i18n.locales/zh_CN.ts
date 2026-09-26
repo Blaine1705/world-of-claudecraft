@@ -1521,7 +1521,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.ladderBody':
     '每场比赛都会牵动一份与角色绑定的持久战场评级，无论胜负，而历代榜单则为国度的勇士们排定名次。',
   'hudChrome.charSheet.offense': '攻击',
+  'hudChrome.charSheet.spell': '法术',
   'hudChrome.charSheet.defense': '防御',
+  'hudChrome.charSheet.ratings': '战斗等级',
   'hudChrome.charSheet.playtimeLabel': '游戏时长',
   'hudChrome.charSheet.playtimeParts': '{major}{minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '不到一分钟',
@@ -1531,6 +1533,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.fromYour': '来自你的 {value} 点{stat}：',
   'hudChrome.statInfo.names.spellPower': '法术强度',
   'hudChrome.statInfo.names.healPower': '治疗强度',
+  'hudChrome.statInfo.names.spellCrit': '法术暴击',
   'hudChrome.statInfo.names.critRating': '暴击等级',
   'hudChrome.statInfo.names.hasteRating': '急速等级',
   'hudChrome.statInfo.names.parry': '招架',
@@ -1567,6 +1570,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.desc.attackPower': '强化你的武器攻击。每14点攻击强度可提高1点每秒伤害。',
   'hudChrome.statInfo.desc.dps':
     '你的预估武器每秒伤害，由武器的伤害与速度以及你的攻击强度共同计算得出。',
+  'hudChrome.statInfo.desc.healPower':
+    '提高你的治疗和持续治疗效果的治疗量，以及吸收护盾的强度。它等于你的法术强度，加上来自装备和套装奖励的治疗强度；治疗强度只提升治疗，从不提升伤害。',
+  'hudChrome.statInfo.desc.spellCrit':
+    '你的法术或治疗造成暴击的几率，暴击时造成150%的伤害或治疗量。法术和治疗使用此几率而非暴击几率：智力只提高此几率，而暴击等级、天赋和套装奖励会同时提高两者。',
   'hudChrome.statInfo.desc.critChance': '你的攻击造成暴击的几率，暴击将造成双倍伤害。',
   'hudChrome.statInfo.desc.dodge': '你完全躲开来袭近战攻击、不受任何伤害的几率。',
   'hudChrome.statInfo.effects.attackPower': '+{value} 攻击强度',

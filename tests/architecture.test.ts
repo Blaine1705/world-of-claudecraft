@@ -547,6 +547,8 @@ const UI_PURE_CORES = [
   'src/ui/char_view.ts',
   'src/ui/masterwrought_cap_view.ts',
   'src/ui/char_stats_view.ts',
+  // The live world -> stat-sheet model bridge (extracted from Hud.statModel).
+  'src/ui/char_stat_model_core.ts',
   'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',

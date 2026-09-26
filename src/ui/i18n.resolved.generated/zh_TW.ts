@@ -2640,7 +2640,9 @@ export const zh_TW: EnTranslations = {
     },
     "charSheet": {
       "offense": "攻擊",
+      "spell": "法術",
       "defense": "防禦",
+      "ratings": "戰鬥等級",
       "playtimeLabel": "遊戲時長",
       "playtimeParts": "{major}{minor}",
       "playtimeUnderMinute": "不到一分鐘",
@@ -2669,6 +2671,7 @@ export const zh_TW: EnTranslations = {
       "names": {
         "spellPower": "法術強度",
         "healPower": "治療強度",
+        "spellCrit": "法術暴擊",
         "critRating": "暴擊等級",
         "hasteRating": "急速等級",
         "parry": "招架",
@@ -2685,8 +2688,10 @@ export const zh_TW: EnTranslations = {
         "armor": "減緩受到的物理打擊。對等級較低的攻擊者減免效果更佳，上限為 75%。",
         "attackPower": "強化你的武器攻擊。每 14 點攻擊強度可增加 1 點每秒傷害。",
         "spellPower": "提高你法術造成的傷害與治療的強度。每點智力都會提供少量法術強度，此外還有來自裝備與增益的加成。",
+        "healPower": "提高你的治療與持續治療效果的治療量，以及吸收護盾的強度。它等於你的法術強度，加上來自裝備與套裝加成的治療強度；治療強度只提升治療，從不提升傷害。",
         "dps": "你的預估武器每秒傷害，由武器的傷害與速度結合你的攻擊強度計算而來。",
         "critChance": "你的攻擊造成暴擊並施加雙倍傷害的機率。",
+        "spellCrit": "你的法術或治療造成暴擊的機率，暴擊時造成150%的傷害或治療量。法術與治療使用此機率而非暴擊機率：智力只提高此機率，而暴擊等級、天賦與套裝加成會同時提高兩者。",
         "dodge": "你完全閃躲受到的近戰攻擊、不受任何傷害的機率。",
         "critRating": "來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。",
         "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。",

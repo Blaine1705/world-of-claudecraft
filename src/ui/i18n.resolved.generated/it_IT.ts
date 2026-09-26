@@ -2640,7 +2640,9 @@ export const it_IT: EnTranslations = {
     },
     "charSheet": {
       "offense": "Attacco",
+      "spell": "Spell",
       "defense": "Difesa",
+      "ratings": "Ratings",
       "playtimeLabel": "Tempo di gioco",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Meno di un minuto",
@@ -2669,6 +2671,7 @@ export const it_IT: EnTranslations = {
       "names": {
         "spellPower": "Potere Magico",
         "healPower": "Potere di Guarigione",
+        "spellCrit": "Spell Crit",
         "critRating": "Indice di critico",
         "hasteRating": "Indice di celerità",
         "parry": "Parata",
@@ -2685,8 +2688,10 @@ export const it_IT: EnTranslations = {
         "armor": "Attutisce i colpi fisici in arrivo. La riduzione è maggiore contro avversari di livello inferiore ed è limitata al 75%.",
         "attackPower": "Potenzia gli attacchi della tua arma. Ogni 14 punti di potenza d'attacco aggiungono 1 punto di danni al secondo.",
         "spellPower": "Aumenta il danno dei tuoi incantesimi e la potenza delle tue cure. Ogni punto di Intelletto conferisce un po' di Potere Magico, in aggiunta a quello dell'equipaggiamento o dei potenziamenti.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "I danni al secondo stimati della tua arma, combinando i danni e la velocità della tua arma con la tua potenza d'attacco.",
         "critChance": "La tua probabilità che un attacco colpisca in modo critico, infliggendo danni doppi.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "La tua probabilità di evitare completamente un attacco in mischia in arrivo, senza subire danni.",
         "critRating": "Indice di critico dal tuo equipaggiamento e dai bonus di set, che aumenta la tua probabilità di colpo critico. Circa 10 punti conferiscono l'1% di critico.",
         "hasteRating": "Indice di celerità dal tuo equipaggiamento e dai bonus di set, che accelera i tuoi attacchi e i tuoi lanci. Circa 10 punti conferiscono l'1% di celerità.",

@@ -52,7 +52,6 @@ import {
 } from '../sim/account_flair';
 import { isOwnAura } from '../sim/aura_classify';
 import { bagPools } from '../sim/bags';
-import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
@@ -191,6 +190,7 @@ import { castDisplayName } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSigFor } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
+import { charStatModel } from './char_stat_model_core';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
 import { progressionHtml, talentSummaryHtml } from './character_progression_view';
@@ -848,14 +848,6 @@ import { openSimpleMenu } from './simple_context_menu';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
-import {
-  type BuffStatSource,
-  buildStatTooltip,
-  type GearStatSource,
-  type StatId,
-  type StatTooltipModel,
-  weaponDps,
-} from './stat_tooltip';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
@@ -5546,8 +5538,9 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#char-window'),
     slotName: (slot) => itemSlotName(slot),
-    statCellHtml: (stat) => statCellHtml(this.statModel(stat), STAT_VIEW_DEPS, { colon: false }),
-    statTooltipHtml: (stat) => statTooltipHtml(this.statModel(stat), STAT_VIEW_DEPS),
+    statCellHtml: (stat) =>
+      statCellHtml(charStatModel(this.sim, stat), STAT_VIEW_DEPS, { colon: false }),
+    statTooltipHtml: (stat) => statTooltipHtml(charStatModel(this.sim, stat), STAT_VIEW_DEPS),
     talentSummaryHtml: () => talentSummaryHtml(this.sim),
     progressionHtml: (level) => progressionHtml(this.sim, level),
     unequip: (slot) => {
@@ -6697,53 +6690,6 @@ export class Hud {
       (equipped, worn) => this.itemTooltip(equipped, false, worn),
       instance,
     );
-  }
-
-  // Build the pure stat-breakdown model for the currently-shown player, the bridge
-  // from the live sim to the host-agnostic stat_tooltip core. The HTML + aria
-  // rendering lives in the unit-tested stat_tooltip_view module; this only feeds
-  // it the current numbers, so the visual tooltip and the screen-reader text read
-  // identical, live values.
-  private statModel(stat: StatId): StatTooltipModel {
-    const sim = this.sim;
-    const p = sim.player;
-    const wpn = sim.equipment.mainhand ? ITEMS[sim.equipment.mainhand] : null;
-    // Equipped items + active auras feed the upstream "Made up of:" source
-    // breakdown; names resolve the same way the buff bar resolves them.
-    const gear: GearStatSource[] = [];
-    for (const id of Object.values(sim.equipment)) {
-      const item = id ? ITEMS[id] : null;
-      if (!item || (!item.stats && !item.spellPower)) continue;
-      gear.push({
-        name: itemDisplayName(item),
-        stats: item.stats,
-        spellPower: item.spellPower,
-      });
-    }
-    const buffs: BuffStatSource[] = p.auras.map((a) => ({
-      kind: a.kind,
-      value: a.value,
-      name: auraDisplayNameForHud(
-        a.name,
-        ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null,
-      ),
-    }));
-    return buildStatTooltip(stat, {
-      cls: sim.cfg.playerClass,
-      stats: p.stats,
-      level: p.level,
-      attackPower: p.attackPower,
-      spellPower: p.spellPower,
-      critChance: p.critChance,
-      dodgeChance: p.dodgeChance,
-      critRating: p.critRating,
-      hasteRating: p.hasteRating,
-      hitRating: p.hitRating,
-      parryChance: sim.cfg.playerClass === 'warrior' ? warriorParryChance(p.stats.str) : 0,
-      dps: weaponDps(wpn?.weapon, p.attackPower),
-      gear,
-      buffs,
-    });
   }
 
   private questProgressText(label: string, current: number, total: number): string {

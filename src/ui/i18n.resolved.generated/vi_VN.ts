@@ -2640,7 +2640,9 @@ export const vi_VN: EnTranslations = {
     },
     "charSheet": {
       "offense": "Tấn Công",
+      "spell": "Spell",
       "defense": "Phòng Thủ",
+      "ratings": "Ratings",
       "playtimeLabel": "Thời Gian Chơi",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Chưa đầy một phút",
@@ -2669,6 +2671,7 @@ export const vi_VN: EnTranslations = {
       "names": {
         "spellPower": "Sức Mạnh Phép Thuật",
         "healPower": "Sức Mạnh Trị Liệu",
+        "spellCrit": "Spell Crit",
         "critRating": "Chỉ Số Chí Mạng",
         "hasteRating": "Chỉ Số Thần Tốc",
         "parry": "Gạt Đòn",
@@ -2685,8 +2688,10 @@ export const vi_VN: EnTranslations = {
         "armor": "Giảm nhẹ các đòn tấn công vật lý nhận vào. Mức giảm lớn hơn khi đối đầu kẻ tấn công cấp thấp hơn và bị giới hạn ở 75%.",
         "attackPower": "Tăng sức mạnh cho các đòn tấn công vũ khí. Cứ 14 công kích sẽ thêm 1 sát thương mỗi giây.",
         "spellPower": "Tăng sát thương của phép thuật và độ mạnh của khả năng trị liệu của bạn. Mỗi điểm Trí Tuệ ban thêm một chút Sức Mạnh Phép Thuật, cộng thêm phần từ trang bị hoặc hiệu ứng tăng cường.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "Sát thương vũ khí ước tính mỗi giây của bạn, kết hợp sát thương và tốc độ vũ khí với sức công kích.",
         "critChance": "Tỉ lệ một đòn tấn công đánh chí mạng, gây sát thương gấp đôi.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "Tỉ lệ bạn né hoàn toàn một đòn cận chiến, không nhận sát thương.",
         "critRating": "Chỉ số chí mạng từ trang bị và phần thưởng bộ trang bị của bạn, nâng tỉ lệ chí mạng của bạn. Khoảng 10 điểm chỉ số ban 1% chí mạng.",
         "hasteRating": "Chỉ số thần tốc từ trang bị và phần thưởng bộ trang bị của bạn, đẩy nhanh các đòn tấn công và việc thi triển phép của bạn. Khoảng 10 điểm chỉ số ban 1% thần tốc.",

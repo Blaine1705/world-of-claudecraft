@@ -2640,7 +2640,9 @@ export const fr_CA: EnTranslations = {
     },
     "charSheet": {
       "offense": "Attaque",
+      "spell": "Spell",
       "defense": "Défense",
+      "ratings": "Ratings",
       "playtimeLabel": "Temps de jeu",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Moins d'une minute",
@@ -2669,6 +2671,7 @@ export const fr_CA: EnTranslations = {
       "names": {
         "spellPower": "Puissance des sorts",
         "healPower": "Puissance de soins",
+        "spellCrit": "Spell Crit",
         "critRating": "Score de critique",
         "hasteRating": "Score de hâte",
         "parry": "Parade",
@@ -2685,8 +2688,10 @@ export const fr_CA: EnTranslations = {
         "armor": "Atténue les coups physiques reçus. La réduction est plus importante contre les attaquants de niveau inférieur et est plafonnée à 75 %.",
         "attackPower": "Renforce vos attaques d'arme. Chaque tranche de 14 de puissance d'attaque ajoute 1 dégât par seconde.",
         "spellPower": "Augmente les dégâts de vos sorts et la puissance de vos soins. Chaque point d'Intelligence confère un peu de Puissance des sorts, en plus de celle de l'équipement ou des améliorations.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "Vos dégâts par seconde estimés à l'arme, combinant les dégâts et la vitesse de votre arme avec votre puissance d'attaque.",
         "critChance": "Vos chances de porter un coup critique avec une attaque, infligeant le double des dégâts.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "Vos chances d'éviter complètement une attaque de mêlée, sans subir aucun dégât.",
         "critRating": "Score de critique de votre équipement et de vos bonus de panoplie, augmentant vos chances de coup critique. Environ 10 points de score confèrent 1% de critique.",
         "hasteRating": "Score de hâte de votre équipement et de vos bonus de panoplie, accélérant vos attaques et vos incantations. Environ 10 points de score confèrent 1% de hâte.",

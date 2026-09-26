@@ -143,7 +143,7 @@ import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { clearSpiritmendCurrents } from './combat/shaman_spiritmend';
 import { clearShamanTalentState, onGhostWolfExited } from './combat/shaman_talents';
 import { blockedMeleeDamage } from './combat/shield_block';
-import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
+import { spellCritChance, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isMobSpellResisted } from './combat/spell_resist';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { threatMod as threatModImpl } from './combat/threat_modifiers';
@@ -6874,9 +6874,8 @@ export class Sim {
   }
 
   private spellCrit(p: Entity): number {
-    // Base + Intellect + the shared crit core (crit rating, talent/set crit,
-    // flat crit auras; recalcPlayerStats) + spell-crit-specific auras.
-    return 0.05 + p.stats.int * 0.0008 + (p.sharedCritBonus ?? 0) + spellCritBonusFromAuras(p);
+    // The spell crit pool lives in combat/spell_combat.ts (the sheet reads it too).
+    return spellCritChance(p);
   }
 
   // Heal core, heal multipliers, heal-absorb soak, crit-vuln bonus, and the

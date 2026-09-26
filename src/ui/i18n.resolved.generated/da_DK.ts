@@ -2640,7 +2640,9 @@ export const da_DK: EnTranslations = {
     },
     "charSheet": {
       "offense": "Angreb",
+      "spell": "Spell",
       "defense": "Forsvar",
+      "ratings": "Ratings",
       "playtimeLabel": "Spilletid",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Under et minut",
@@ -2669,6 +2671,7 @@ export const da_DK: EnTranslations = {
       "names": {
         "spellPower": "Besværgelseskraft",
         "healPower": "Helbredelseskraft",
+        "spellCrit": "Spell Crit",
         "critRating": "Kritvurdering",
         "hasteRating": "Hastevurdering",
         "parry": "Parade",
@@ -2685,8 +2688,10 @@ export const da_DK: EnTranslations = {
         "armor": "Dæmper indkommende fysiske slag. Reduktionen er større mod angribere af lavere niveau og er begrænset til 75%.",
         "attackPower": "Driver dine våbenangreb. For hver 14 angrebsstyrke tilføjes 1 skade pr. sekund.",
         "spellPower": "Øger skaden fra dine besværgelser og styrken af dine helbredelser. Hvert point Intellekt giver en smule Besværgelseskraft, oven i det, der kommer fra udstyr eller buffs.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "Din anslåede våbenskade pr. sekund, der kombinerer dit våbens skade og hastighed med din angrebsstyrke.",
         "critChance": "Din chance for at et angreb rammer kritisk og gør dobbelt skade.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "Din chance for helt at undgå et indkommende nærkampsangreb og tage ingen skade.",
         "critRating": "Kritvurdering fra dit udstyr og sætbonusser, der hæver din chance for kritisk slag. Cirka 10 vurdering giver 1% krit.",
         "hasteRating": "Hastevurdering fra dit udstyr og sætbonusser, der fremskynder dine angreb og besværgelser. Cirka 10 vurdering giver 1% hast.",

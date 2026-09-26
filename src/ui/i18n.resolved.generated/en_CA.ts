@@ -2640,7 +2640,9 @@ export const en_CA: EnTranslations = {
     },
     "charSheet": {
       "offense": "Offense",
+      "spell": "Spell",
       "defense": "Defense",
+      "ratings": "Ratings",
       "playtimeLabel": "Time Played",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Less than a minute",
@@ -2669,6 +2671,7 @@ export const en_CA: EnTranslations = {
       "names": {
         "spellPower": "Spell Power",
         "healPower": "Healing Power",
+        "spellCrit": "Spell Crit",
         "critRating": "Crit Rating",
         "hasteRating": "Haste Rating",
         "parry": "Parry",
@@ -2685,8 +2688,10 @@ export const en_CA: EnTranslations = {
         "armor": "Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.",
         "attackPower": "Powers your weapon attacks. Every 14 attack power adds 1 damage per second.",
         "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
         "critChance": "Your chance for an attack to strike critically, dealing double damage.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage.",
         "critRating": "Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 20 rating grants exactly 1% crit.",
         "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 20 rating grants exactly 1% haste.",

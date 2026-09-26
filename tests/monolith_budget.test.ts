@@ -448,7 +448,13 @@ const MONOLITHS: MonolithRow[] = [
     // Release reconciliation for PR #4179: the death recap UI itself lives in
     // src/ui/death_recap_dialog.ts; hud.ts gained only the constructor/bind/close
     // wiring needed to mount that extracted dialog. Exact count, zero slack.
-    ceiling: 18176,
+    // LOWERED 18235 -> 18181 by the character sheet's Healing Power + Spell
+    // Crit cells: the world -> stat-model bridge (Hud.statModel and its four
+    // imports) moved to the char_stat_model_core pure core rather than growing
+    // by the two new input fields (18235 - 54). Exact count, zero slack.
+    // Release integration composes the death recap mount with that extraction;
+    // measured after resolving both arms. Exact count, zero slack.
+    ceiling: 18122,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1095,7 +1101,13 @@ const MONOLITHS: MonolithRow[] = [
     // Guild custom ranks then compose underneath that pin; the combined tree is
     // measured after the release-line extractions and the offline guildSetRanks
     // stub landed. Exact count, zero slack.
-    ceiling: 11665,
+    // Down 11750 -> 11749 at the character sheet's Spell Crit cell: the spell
+    // crit formula moved out of Sim.spellCrit into combat/spell_combat.ts
+    // spellCritChance (the sheet runs the same function on both hosts), leaving
+    // a one-line delegate. Exact count, zero slack.
+    // Release integration composes both extraction sets and measures below both
+    // parent pins. Exact count, zero slack.
+    ceiling: 11664,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

@@ -1587,7 +1587,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.ladderBody':
     'Каждый матч двигает стойкий рейтинг поля боя, привязанный к персонажу, при победе и при поражении, а таблица всех времён выстраивает чемпионов мира.',
   'hudChrome.charSheet.offense': 'Атака',
+  'hudChrome.charSheet.spell': 'Заклинания',
   'hudChrome.charSheet.defense': 'Защита',
+  'hudChrome.charSheet.ratings': 'Рейтинги',
   'hudChrome.charSheet.playtimeLabel': 'Время в игре',
   'hudChrome.charSheet.playtimeParts': '{major}, {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': 'Меньше минуты',
@@ -1597,6 +1599,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.fromYour': 'От вашей характеристики ({value} {stat}):',
   'hudChrome.statInfo.names.spellPower': 'Сила заклинаний',
   'hudChrome.statInfo.names.healPower': 'Сила исцеления',
+  'hudChrome.statInfo.names.spellCrit': 'Крит. заклинаний',
   'hudChrome.statInfo.names.critRating': 'Рейтинг крит. удара',
   'hudChrome.statInfo.names.hasteRating': 'Рейтинг ускорения',
   'hudChrome.statInfo.names.parry': 'Парирование',
@@ -1638,6 +1641,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Усиливает атаки вашим оружием. Каждые 14 ед. силы атаки добавляют 1 ед. урона в секунду.',
   'hudChrome.statInfo.desc.dps':
     'Приблизительный урон вашего оружия в секунду с учетом урона и скорости оружия, а также вашей силы атаки.',
+  'hudChrome.statInfo.desc.healPower':
+    'Увеличивает силу ваших исцелений и эффектов периодического исцеления, а также прочность поглощающих щитов. Равна вашей силе заклинаний плюс сила исцеления от снаряжения и бонусов комплекта, которая усиливает только исцеление и никогда не увеличивает урон.',
+  'hudChrome.statInfo.desc.spellCrit':
+    'Ваш шанс нанести критический удар заклинанием или исцелением, дающий 150% урона или исцеления. Заклинания и исцеления используют этот шанс вместо шанса крита: интеллект повышает только его, а рейтинг критического удара, таланты и бонусы комплекта повышают оба.',
   'hudChrome.statInfo.desc.critChance':
     'Ваш шанс нанести критический удар, наносящий двойной урон.',
   'hudChrome.statInfo.desc.dodge':

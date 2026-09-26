@@ -2640,7 +2640,9 @@ export const ko_KR: EnTranslations = {
     },
     "charSheet": {
       "offense": "공격",
+      "spell": "주문",
       "defense": "방어",
+      "ratings": "전투 등급",
       "playtimeLabel": "플레이 시간",
       "playtimeParts": "{major} {minor}",
       "playtimeUnderMinute": "1분 미만",
@@ -2669,6 +2671,7 @@ export const ko_KR: EnTranslations = {
       "names": {
         "spellPower": "주문력",
         "healPower": "치유력",
+        "spellCrit": "주문 치명타",
         "critRating": "치명타 등급",
         "hasteRating": "가속 등급",
         "parry": "무기 막기",
@@ -2685,8 +2688,10 @@ export const ko_KR: EnTranslations = {
         "armor": "들어오는 물리 공격을 완화합니다. 낮은 레벨의 공격자에게 더 큰 효과를 발휘하며, 최대 75%까지 적용됩니다.",
         "attackPower": "무기 공격을 강화합니다. 전투력 14당 초당 피해 1이 추가됩니다.",
         "spellPower": "주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.",
+        "healPower": "치유와 지속 치유 효과의 치유량, 흡수 보호막의 크기를 증가시킵니다. 주문력에 장비와 세트 보너스에서 얻는 치유력을 더한 값이며, 치유력은 치유만 증가시키고 피해는 증가시키지 않습니다.",
         "dps": "무기의 피해와 속도, 전투력을 종합한 예상 무기 초당 피해입니다.",
         "critChance": "공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.",
+        "spellCrit": "주문이나 치유가 치명타로 적중하여 150%의 피해량 또는 치유량을 낼 확률입니다. 주문과 치유는 치명타율 대신 이 확률을 사용합니다. 지능은 이 확률만 높이며, 치명타 등급, 특성, 세트 보너스는 둘 다 높입니다.",
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
         "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
         "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",

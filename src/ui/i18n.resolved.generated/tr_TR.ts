@@ -2640,7 +2640,9 @@ export const tr_TR: EnTranslations = {
     },
     "charSheet": {
       "offense": "Saldırı",
+      "spell": "Spell",
       "defense": "Savunma",
+      "ratings": "Ratings",
       "playtimeLabel": "Oynama Süresi",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Bir dakikadan az",
@@ -2669,6 +2671,7 @@ export const tr_TR: EnTranslations = {
       "names": {
         "spellPower": "Büyü Gücü",
         "healPower": "İyileştirme Gücü",
+        "spellCrit": "Spell Crit",
         "critRating": "Kritik Puanı",
         "hasteRating": "Hız Puanı",
         "parry": "Karşılama",
@@ -2685,8 +2688,10 @@ export const tr_TR: EnTranslations = {
         "armor": "Gelen fiziksel darbeleri yumuşatır. Azalma, daha düşük seviyeli saldırganlara karşı daha büyüktür ve en fazla %75 ile sınırlıdır.",
         "attackPower": "Silah saldırılarına güç katar. Her 14 saldırı gücü, saniye başına 1 hasar ekler.",
         "spellPower": "Büyülerinin hasarını ve iyileştirmelerinin gücünü artırır. Her Zeka puanı, teçhizat veya güçlendirmelerden gelenlere ek olarak biraz Büyü Gücü sağlar.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "Silahının hasarını ve hızını saldırı gücünle birleştiren, saniye başına tahmini silah hasarın.",
         "critChance": "Bir saldırının kritik vurma ve çift hasar verme şansın.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "Gelen bir yakın dövüş saldırısından hiç hasar almadan tamamen kaçınma şansın.",
         "critRating": "Teçhizatından ve set bonuslarından gelen kritik puanı, kritik vuruş şansını artırır. Yaklaşık 10 puan %1 kritik sağlar.",
         "hasteRating": "Teçhizatından ve set bonuslarından gelen hız puanı, saldırılarını ve büyü yapmanı hızlandırır. Yaklaşık 10 puan %1 hız sağlar.",

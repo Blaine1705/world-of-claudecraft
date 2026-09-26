@@ -5335,6 +5335,7 @@ const ALL_DELTA_KEYS = [
   'renown',
   'rxp',
   'salv',
+  'scb',
   'sh',
   'sp',
   'stats',
@@ -6598,8 +6599,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 97 unique keys in sorted order', () => {
-    // 96 plus the King of the Hill readout hill (src/sim/pvp/hill.ts).
+  it('ALL_DELTA_KEYS contains exactly 99 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6643,9 +6643,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
     // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
     // Account ledger, pending Town Focus, World PvP and King of the Hill
-    // compose into the merged delta inventory.
-    expect(ALL_DELTA_KEYS).toHaveLength(98);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(98);
+    // compose into the merged delta inventory; the character sheet's Spell
+    // Crit adds the shared crit core scb beside crit in server/self_scalar_wire.ts.
+    expect(ALL_DELTA_KEYS).toHaveLength(99);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(99);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6808,8 +6809,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // sibling, likewise inside the recursive scrape) makes 93.
     // The candidate self in-combat key cbt brings the combined inventory to 94;
     // Account ledger, pending Town Focus, World PvP and King of the Hill
-    // compose into the merged delta inventory.
-    expect(scraped.size).toBe(98);
+    // compose into the merged delta inventory; the Spell Crit sheet cell's
+    // shared crit core scb is emitted from server/self_scalar_wire.ts.
+    expect(scraped.size).toBe(99);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
