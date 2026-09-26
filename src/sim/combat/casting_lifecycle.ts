@@ -353,6 +353,18 @@ function chargeState(p: Entity, abilityId: string, bonusCharges: number, cooldow
   state.maxCharges = maxCharges;
   state.rechargeLength = cooldown;
   state.charges = Math.min(Math.max(state.charges, 0), maxCharges);
+  // Keep exactly one running timer per missing use: a grown cap (a pool saved
+  // under a lower cap) would otherwise strand its new slot, because updateTimers
+  // drops the recharge once the timer list empties. A shrunk cap sheds the
+  // longest timers. A legacy pool without timers converts in updateTimers.
+  if (state.recharges) {
+    const missing = maxCharges - state.charges;
+    state.recharges.sort((a, b) => a - b);
+    state.recharges.length = Math.min(state.recharges.length, missing);
+    while (state.recharges.length < missing) state.recharges.push(cooldown);
+    state.recharge = state.recharges[0] ?? 0;
+    if (state.charges <= 0) p.cooldowns.set(abilityId, state.recharge);
+  }
   p.abilityCharges[abilityId] = state;
   return state;
 }

@@ -9309,7 +9309,13 @@ export function abilitiesKnownAt(
     // on the abilityCharges recharge model. Resolved HERE (the shared known-list
     // builder) so BOTH worlds see it: the offline Sim's meta.known and the
     // ClientWorld's locally recomputed list, which is what the action bar badges.
-    if (id === 'ice_block' && mods?.spec === 'frost') entry.bonusCharges = 1;
+    // Sets the resolved cap (`charges`) with the bonus, like the maxCharges arm
+    // above: normalizeAbilityCharges and the legacy-save caps read `charges`, so a
+    // bonus-only stamp collapsed the pool on every equip swap (refunding a use).
+    if (id === 'ice_block' && mods?.spec === 'frost') {
+      entry.charges = 2;
+      entry.bonusCharges = 1;
+    }
     if (mods) applyTalentMods(entry, mods);
     out.push(entry);
   }
