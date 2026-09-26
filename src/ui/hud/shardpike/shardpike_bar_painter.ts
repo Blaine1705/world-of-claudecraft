@@ -166,8 +166,8 @@ export class ShardpikeBarPainter {
     const arrow = doc.createElement('span');
     arrow.className = 'pike-lean-arrow';
     arrow.setAttribute('aria-hidden', 'true');
-    // A build-time glyph, appended once as a text node (the per-frame text is the cap).
-    arrow.append(side === 'left' ? '←' : '→');
+    // A build-time glyph, set once (the per-frame text is the cap).
+    arrow.textContent = side === 'left' ? '←' : '→';
     const cap = doc.createElement('span');
     cap.className = 'pike-lean-cap';
     if (side === 'left') btn.append(arrow, cap);
