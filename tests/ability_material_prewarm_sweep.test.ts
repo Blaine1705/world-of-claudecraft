@@ -239,14 +239,15 @@ describe('the lazy-material sweep', () => {
     const hits = sweep();
     const files = hits.map((hit) => basename(hit.file));
     for (const module of REGISTERED_MODULES) expect(files).toContain(module);
-    // Vacuity floor, kept just under the real count. Bundles: the eleven
+    // Vacuity floor, kept just under the real count. Bundles: the thirteen
     // registered sources (four lazy spell-visual caches, the coach trail's
-    // guidance set, the ground fire AoE anchor, and five per-instance pool
+    // guidance set, the ground fire AoE anchor, five per-instance pool
     // stand-ins: Ring of Frost, Divine Ascension, Frostglobe, the mage and
-    // the warlock meteor rocks) plus the two excluded scenery bakes. The
+    // the warlock meteor rocks, plus the two rig-adornment stand-ins) plus the
+    // two excluded scenery bakes. The
     // battleground caches are the remaining non-bundle hit.
-    expect(hits.length).toBeGreaterThanOrEqual(14);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(13);
+    expect(hits.length).toBeGreaterThanOrEqual(16);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(15);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

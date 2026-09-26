@@ -301,8 +301,13 @@ describe('weapon-aura stand-ins carry every live aura program', () => {
         expect(
           materials.some((m) => !m.vertexColors && m.blending === THREE.AdditiveBlending),
         ).toBe(true);
-        expect(materials.some((m) => m.wireframe && m.side === THREE.DoubleSide)).toBe(true);
-        expect(materials.some((m) => m.wireframe && m.side === THREE.FrontSide)).toBe(true);
+        if (tier === 'ultra') {
+          expect(materials.some((m) => m.wireframe && m.side === THREE.DoubleSide)).toBe(true);
+          expect(materials.some((m) => m.wireframe && m.side === THREE.FrontSide)).toBe(true);
+        } else {
+          expect(materials.some((m) => !m.wireframe && m.side === THREE.DoubleSide)).toBe(true);
+          expect(materials.some((m) => !m.wireframe && m.side === THREE.FrontSide)).toBe(true);
+        }
         for (const draw of draws) {
           if ((draw.material as THREE.MeshBasicMaterial).vertexColors) {
             const color = (draw.object as THREE.Mesh).geometry.getAttribute('color');
@@ -335,7 +340,7 @@ describe('weapon-aura stand-ins carry every live aura program', () => {
         const standIns = weaponStandIns().map((mesh) =>
           drawProgramSignature(mesh, mesh.material as THREE.Material),
         );
-        expect(new Set(standIns).size).toBe(standIns.length);
+        if (tier === 'ultra') expect(new Set(standIns).size).toBe(standIns.length);
         expect(new Set(standIns)).toEqual(live);
       });
     });

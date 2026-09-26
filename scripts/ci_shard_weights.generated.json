@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4161,
+    "files": 4169,
     "harvestedFiles": 3948,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
@@ -21,6 +21,15 @@
         "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
           7
+        ]
+      },
+      "tests/ability_material_live_draw_parity.test.ts": {
+        "ms": 71,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          71
         ]
       },
       "tests/ability_vfx_draped_pools.test.ts": {
@@ -140,11 +149,29 @@
           30
         ]
       },
+      "tests/action_bar_secondary_requirements.test.ts": {
+        "ms": 1989,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          1989
+        ]
+      },
       "tests/action_bar_spectate.test.ts": {
         "ms": 14,
         "method": "local-median",
         "measured": "2026-09-24",
         "reason": "Frame layout review validation measured locally; current full CI run found coverage just below its floor while the next green full harvest is pending.",
+        "runs": [
+          14
+        ]
+      },
+      "tests/action_cam_core.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
           14
         ]
@@ -248,6 +275,15 @@
           18599
         ]
       },
+      "tests/bag_item_action_menu_destroy.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          21
+        ]
+      },
       "tests/bags_pool_honest_refusal.test.ts": {
         "ms": 1800,
         "method": "local-median",
@@ -273,6 +309,15 @@
         "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
           31
+        ]
+      },
+      "tests/bags_window_touch_destroy_menu.test.ts": {
+        "ms": 48,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          48
         ]
       },
       "tests/bags_window_trade_quantity.test.ts": {
@@ -320,6 +365,24 @@
           12
         ]
       },
+      "tests/camera_view_settings.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          14
+        ]
+      },
+      "tests/cat_form_energy.test.ts": {
+        "ms": 10179,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          10179
+        ]
+      },
       "tests/chat_rate_limit.test.ts": {
         "ms": 3,
         "method": "local-median",
@@ -345,6 +408,15 @@
         "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
           2280
+        ]
+      },
+      "tests/class_vfx_prewarm_homes.test.ts": {
+        "ms": 192,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          192
         ]
       },
       "tests/click_claimed_focus.test.ts": {
@@ -1980,6 +2052,7 @@
   "tests/ability_icons.test.ts": 177,
   "tests/ability_imbue_text.test.ts": 1954,
   "tests/ability_line_of_sight.test.ts": 7,
+  "tests/ability_material_live_draw_parity.test.ts": 71,
   "tests/ability_material_prewarm_sweep.test.ts": 124,
   "tests/ability_requirement_keys.test.ts": 13,
   "tests/ability_self_only.test.ts": 10,
@@ -2037,10 +2110,12 @@
   "tests/action_bar_lock.test.ts": 5,
   "tests/action_bar_painter.test.ts": 18,
   "tests/action_bar_restore.test.ts": 30,
+  "tests/action_bar_secondary_requirements.test.ts": 1989,
   "tests/action_bar_spectate.test.ts": 14,
   "tests/action_bar_toggle.test.ts": 16,
   "tests/action_bar_view.test.ts": 42,
   "tests/action_bar_visibility_core.test.ts": 5,
+  "tests/action_cam_core.test.ts": 14,
   "tests/action_replacement.test.ts": 16,
   "tests/active_animation_timer.test.ts": 8,
   "tests/active_kit_prewarm.test.ts": 69,
@@ -2286,6 +2361,7 @@
   "tests/bag_corner_mark_view.test.ts": 4,
   "tests/bag_filter.test.ts": 27,
   "tests/bag_fine_mark_view.test.ts": 9,
+  "tests/bag_item_action_menu_destroy.test.ts": 21,
   "tests/bag_item_action_menu_paint.test.ts": 494,
   "tests/bag_item_action_menu_vendor_sell.test.ts": 26,
   "tests/bag_item_context_menu.test.ts": 16,
@@ -2310,6 +2386,7 @@
   "tests/bags_window_party_trade.test.ts": 31,
   "tests/bags_window_sort_button.test.ts": 162,
   "tests/bags_window_space_jump.test.ts": 49,
+  "tests/bags_window_touch_destroy_menu.test.ts": 48,
   "tests/bags_window_trade_quantity.test.ts": 88,
   "tests/bags_window_unknown_cell.test.ts": 63,
   "tests/bags_window_use_routing.test.ts": 74,
@@ -2428,6 +2505,7 @@
   "tests/camera_feel_core.test.ts": 12,
   "tests/camera_follow.test.ts": 9,
   "tests/camera_impact_core.test.ts": 12,
+  "tests/camera_view_settings.test.ts": 14,
   "tests/camp_brazier_placement_core.test.ts": 14,
   "tests/camp_braziers.test.ts": 2314,
   "tests/camp_density.test.ts": 47,
@@ -2451,6 +2529,7 @@
   "tests/caster_set_bonus.test.ts": 2441,
   "tests/casting_command.test.ts": 3207,
   "tests/castle_plan_core.test.ts": 13,
+  "tests/cat_form_energy.test.ts": 10179,
   "tests/cauterize.test.ts": 1890,
   "tests/celestial_sprites.test.ts": 6,
   "tests/chain_heal.test.ts": 5989,
@@ -2589,6 +2668,7 @@
   "tests/class_health_table.test.ts": 2280,
   "tests/class_icons.test.ts": 11,
   "tests/class_spec_kits.test.ts": 4747,
+  "tests/class_vfx_prewarm_homes.test.ts": 192,
   "tests/claudium_latency_proxy_target.test.ts": 125,
   "tests/claudium_launcher_balance.test.ts": 16,
   "tests/claudium_purchase_bridge.test.ts": 11,
