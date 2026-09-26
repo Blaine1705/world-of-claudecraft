@@ -97,7 +97,12 @@ export function dispatchMarketCommand(
       return false;
     case 'market_buy':
       if (typeof msg.id === 'number') {
-        buyWithSoldVolume(sim, msg.id, pid);
+        // `count` is optional wire-side (a whole-stack buy sends none); the sim
+        // re-sanitizes it (marketBuy's own clamp), so a junk value here just
+        // falls through to the whole-stack default rather than being laundered.
+        const count =
+          typeof msg.count === 'number' && Number.isFinite(msg.count) ? msg.count : undefined;
+        buyWithSoldVolume(sim, msg.id, count, pid);
         return true;
       }
       return false;

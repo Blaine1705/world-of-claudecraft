@@ -4606,8 +4606,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // here can mint state.
     this.cmd({ cmd: 'market_list_instance', item: itemId, price, instance });
   }
-  marketBuy(listingId: number): void {
-    this.cmd({ cmd: 'market_buy', id: listingId });
+  marketBuy(listingId: number, count?: number): void {
+    this.cmd({ cmd: 'market_buy', id: listingId, ...(count !== undefined && { count }) });
   }
   marketSweepQuote(itemId: string, count: number): void {
     this.cmd({ cmd: 'market_sweep_quote', item: itemId, count });

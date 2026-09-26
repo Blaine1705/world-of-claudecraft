@@ -3462,9 +3462,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.buy': '구매',
   'itemUi.market.reclaim': '회수',
   'itemUi.market.buyAria': '{price}에 {item} 구매',
+  'itemUi.market.buyQuantityAria': '{item} 몇 개를 구매할지 선택 (전체 {total}개 중)',
+  'itemUi.market.buyQuantityBtnAria': '이만큼 {item} 구매',
   'itemUi.market.buyConfirmTitle': '구매 확인',
   'itemUi.market.buyConfirmBody': '{price}에 {item}을(를) 구매할까요?',
   'itemUi.market.buyConfirmBodyStack': '{price}에 {item} x{count}(개당 {each})를 구매할까요?',
+  'itemUi.market.buyConfirmBodyPartial':
+    '{price}에 {item} {count}개(전체 {total}개 중, 개당 {each})를 구매할까요?',
   'itemUi.market.buyConfirmAccept': '구매',
   'itemUi.market.buyConfirmCancel': '취소',
   'itemUi.market.buyChanged':

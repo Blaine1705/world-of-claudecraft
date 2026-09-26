@@ -61,7 +61,7 @@ import {
   preservesMaterialCountOnLoad,
   validateMaterialSlotSourcesOnLoad,
 } from './material_slot_load';
-import type { MaterialComposition } from './material_sources';
+import { type MaterialComposition, takeMaterialCount } from './material_sources';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -862,9 +862,18 @@ export class Market {
     });
   }
 
-  // Buy a listing outright. Coin leaves the buyer, goods enter their bags, and
-  // the seller's proceeds (less the Merchant's cut) wait in their collection.
-  marketBuy(listingId: number, pid?: number): void {
+  // Buy a listing outright, or peel `count` units off it: a buyer may take fewer
+  // than the whole stack of a bulk listing, at a proportional price, instead of
+  // being forced to buy the entire bundle. `count` omitted, non-finite, or
+  // at/above the stack size buys it whole, byte-identical to the original
+  // whole-stack-only behavior; anything from 1 up to (stack size - 1) is a
+  // partial buy.
+  // A partial buyer's share rounds UP to the next whole copper (the per-unit
+  // display's own convention, lowestListingPricePerUnit above), capped so the
+  // remaining stack never prices below MARKET_MIN_PRICE. Since an instanced
+  // listing (marketListInstance) is always a single copy, `want` can never sit
+  // strictly between 1 and its count, so the partial arm never engages one.
+  marketBuy(listingId: number, count?: number, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const { meta, e: p } = r;
@@ -891,7 +900,39 @@ export class Market {
       this.ctx.error(meta.entityId, 'That is your own listing — cancel it to reclaim it.');
       return;
     }
-    if (meta.copper < listing.price) {
+    const want =
+      count === undefined || !Number.isFinite(count) || count >= listing.count
+        ? listing.count
+        : Math.max(1, Math.floor(count));
+    const partial = want < listing.count;
+    const buyPrice = partial
+      ? Math.max(
+          MARKET_MIN_PRICE,
+          Math.min(
+            listing.price - MARKET_MIN_PRICE,
+            Math.ceil((listing.price * want) / listing.count),
+          ),
+        )
+      : listing.price;
+    // A material stack's composition must sum to exactly what is granted
+    // (material_sources.ts), so a partial buy splits it: the buyer's share
+    // grants `taken`, the shrunk row keeps `remaining`. Spend order is the
+    // composition's own deterministic rule (material_sources.ts takeTier);
+    // this can only fail if the listing's own invariant (materialSources sums
+    // to its count) was already broken, in which case the listing is treated
+    // like any other listing an unrecognized state refuses rather than corrupts.
+    let grantMaterialSources = listing.materialSources;
+    let remainingMaterialSources: MaterialComposition | undefined;
+    if (partial && listing.materialSources !== undefined) {
+      const split = takeMaterialCount(listing.materialSources, want);
+      if (!split.ok) {
+        this.ctx.error(meta.entityId, 'That listing is no longer available.');
+        return;
+      }
+      grantMaterialSources = split.value.taken;
+      remainingMaterialSources = split.value.remaining;
+    }
+    if (meta.copper < buyPrice) {
       this.ctx.error(meta.entityId, 'You cannot afford that.');
       return;
     }
@@ -900,29 +941,41 @@ export class Market {
         meta.inventory,
         bagPools(meta.bags),
         listing.itemId,
-        listing.count,
+        want,
         listing.instance,
         listing.craftedRecipeId,
-        listing.materialSources,
+        grantMaterialSources,
       )
     ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
-    this.settleBuy(idx, listing, def, meta);
+    this.settleBuy(
+      idx,
+      listing,
+      def,
+      meta,
+      undefined,
+      partial
+        ? { count: want, price: buyPrice, grantMaterialSources, remainingMaterialSources }
+        : undefined,
+    );
     this.ctx.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
-      text: `Bought ${def.name}${listing.count > 1 ? ' x' + listing.count : ''} for ${formatMoney(listing.price)}.`,
+      text: `Bought ${def.name}${want > 1 ? ' x' + want : ''} for ${formatMoney(buyPrice)}.`,
       pid: meta.entityId,
     });
   }
 
   // The settlement every buy arm shares once its refusals have passed: coin leaves
   // the buyer, the goods land, and (never for house stock) the seller's proceeds
-  // less the cut wait in their collection, the sale is itemized, the row leaves the
-  // book, and an online seller is told. marketBuy and marketSweep differ only in
-  // how they choose rows and what they say to the BUYER afterwards.
+  // less the cut wait in their collection, the sale is itemized, and an online
+  // seller is told. Without `partial` the whole row leaves the book (marketSweep's
+  // shape, and marketBuy's own original whole-stack shape, both unchanged); with
+  // it only `partial.count`/`partial.price` change hands and the row shrinks in
+  // place instead of splicing out. House stock never depletes either way (never
+  // spliced, never shrunk): its `count`/`price` describe one bundle, forever.
   private settleBuy(
     idx: number,
     listing: MarketListing,
@@ -931,35 +984,51 @@ export class Market {
     // A sweep settles many rows of a few sellers: the seller lookup walks every
     // online player, so the sweep hands in a per-command memo of it.
     sellerCache?: Map<string, PlayerMeta | null>,
+    partial?: {
+      count: number;
+      price: number;
+      grantMaterialSources?: MaterialComposition;
+      remainingMaterialSources?: MaterialComposition;
+    },
   ): void {
-    meta.copper -= listing.price;
+    const boughtCount = partial?.count ?? listing.count;
+    const boughtPrice = partial?.price ?? listing.price;
+    meta.copper -= boughtPrice;
     grantCopies(
       this.ctx,
       meta.entityId,
       listing.itemId,
-      listing.count,
+      boughtCount,
       listing.instance,
       listing.craftedRecipeId,
-      listing.materialSources,
+      partial ? partial.grantMaterialSources : listing.materialSources,
     );
     if (!listing.house) {
-      const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
+      const proceeds = Math.max(0, Math.floor(boughtPrice * (1 - MARKET_CUT)));
       const col = this.collectionFor(listing.sellerKey);
       col.copper += proceeds;
-      // Itemize the sale beside the gold it produced. The listing row is spliced
-      // away on the next line, so this is the last point that still knows WHAT
-      // sold; without it the seller's collection is a bare copper total.
+      // Itemize the sale beside the gold it produced. A full buy's row is
+      // spliced away right after, so this is the last point that still knows
+      // WHAT sold; without it the seller's collection is a bare copper total.
       recordSale(col.sales, {
         itemId: listing.itemId,
         // The sold COPY's chosen name, while the listing still exists to read
         // it from; undefined for a plain copy, which is most of them.
         itemName: listing.instance?.name,
-        count: listing.count,
-        price: listing.price,
+        count: boughtCount,
+        price: boughtPrice,
         proceeds,
         buyerName: meta.name,
       });
-      this.marketListings.splice(idx, 1);
+      if (partial) {
+        listing.count -= boughtCount;
+        listing.price -= boughtPrice;
+        if (partial.remainingMaterialSources !== undefined) {
+          listing.materialSources = partial.remainingMaterialSources;
+        }
+      } else {
+        this.marketListings.splice(idx, 1);
+      }
       this.bumpBook();
       let sellerMeta = sellerCache?.get(listing.sellerKey);
       if (sellerMeta === undefined) {
@@ -969,7 +1038,7 @@ export class Market {
       if (sellerMeta) {
         this.ctx.emit({
           type: 'loot',
-          text: `${meta.name} bought your ${def.name} for ${formatMoney(listing.price)} - collect ${formatMoney(proceeds)} from the Merchant.`,
+          text: `${meta.name} bought your ${def.name} for ${formatMoney(boughtPrice)} - collect ${formatMoney(proceeds)} from the Merchant.`,
           pid: sellerMeta.entityId,
         });
       }

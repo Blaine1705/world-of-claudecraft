@@ -15726,6 +15726,33 @@
   .mkt-row:has(.mkt-sweep-btn) {
     grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
   }
+  /* The per-row partial-buy control (a bulk stack need not be bought whole):
+     a narrow quantity field plus its own Buy trigger, so the main Buy button
+     keeps its plain whole-stack meaning. */
+  .mkt-buy-partial {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .mkt-buy-partial-qty {
+    width: 40px;
+    padding: 4px 2px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .mkt-buy-partial-btn {
+    cursor: var(--cursor-point);
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+  /* Same fifth-cell need as Sweep above; a plain bulk stack can be BOTH
+     partial-buyable and sweep-eligible at once, needing a sixth. */
+  .mkt-row:has(.mkt-buy-partial) {
+    grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
+  }
+  .mkt-row:has(.mkt-buy-partial):has(.mkt-sweep-btn) {
+    grid-template-columns: 40px minmax(0, 1fr) auto auto auto auto;
+  }
   .mkt-sell-pick {
     display: flex;
     gap: 10px;

@@ -940,6 +940,14 @@ export class MarketWindow {
         else this.promptBuy(l, parts.ariaName);
       });
       row.appendChild(btn);
+      if (!l.mine && l.count > 1) {
+        // A bulk stack need not be bought whole: a small quantity field beside
+        // the Buy button lets the buyer take just a few units instead (defaults
+        // to 1, so leaving it untouched is a one-click "buy one" action). The
+        // sell tab's #mkt-qty field is the precedent; this one is per-row, so it
+        // is selected by class, never a document-wide id.
+        row.appendChild(this.buildPartialBuyControl(l, parts.ariaName));
+      }
       if (sweepEligibleRow(l)) {
         // Market Sweep: buy this item across many sellers' listings at once. Only
         // a plain, fungible, someone-else's row can stage one (the sim planner's
@@ -1015,22 +1023,35 @@ export class MarketWindow {
 
   // The Browse tab's buy gate. It captures the row's terms in the pure core and
   // states them in Hud's one modal confirm prompt; nothing is sent until OK.
-  private promptBuy(listing: MarketListingView, itemName: string): void {
-    const pending = marketBuyConfirm(listing);
-    // A stack quotes both the total ask and the per-unit ask the row showed, so the
-    // prompt can never read as the price of a single item.
+  // `requestedCount` names a partial buy of a bulk stack (the row's quantity
+  // field); omitted, it buys the listing whole, unchanged from before.
+  private promptBuy(listing: MarketListingView, itemName: string, requestedCount?: number): void {
+    const pending = marketBuyConfirm(listing, requestedCount);
+    // A partial buy states how many of the stack THIS confirm takes, distinct
+    // from a whole-stack buy's body (which states the stack's own count) so the
+    // prompt never reads as "the whole stack" when it is not. A stack (whole or
+    // partial) quotes both the total ask and the per-unit ask the row showed, so
+    // the prompt can never read as the price of a single item.
     const body =
       pending.unitPrice === null
         ? t('itemUi.market.buyConfirmBody', {
             item: itemName,
             price: formatLocalizedMoney(pending.price),
           })
-        : t('itemUi.market.buyConfirmBodyStack', {
-            item: itemName,
-            count: formatNumber(pending.count, { maximumFractionDigits: 0 }),
-            price: formatLocalizedMoney(pending.price),
-            each: formatLocalizedMoney(pending.unitPrice),
-          });
+        : pending.buyCount < pending.count
+          ? t('itemUi.market.buyConfirmBodyPartial', {
+              item: itemName,
+              count: formatNumber(pending.buyCount, { maximumFractionDigits: 0 }),
+              total: formatNumber(pending.count, { maximumFractionDigits: 0 }),
+              price: formatLocalizedMoney(pending.buyPrice),
+              each: formatLocalizedMoney(pending.unitPrice),
+            })
+          : t('itemUi.market.buyConfirmBodyStack', {
+              item: itemName,
+              count: formatNumber(pending.count, { maximumFractionDigits: 0 }),
+              price: formatLocalizedMoney(pending.price),
+              each: formatLocalizedMoney(pending.unitPrice),
+            });
     this.deps.confirmDialog(
       t('itemUi.market.buyConfirmTitle'),
       body,
@@ -1038,6 +1059,39 @@ export class MarketWindow {
       t('itemUi.market.buyConfirmCancel'),
       () => this.commitBuy(pending),
     );
+  }
+
+  // A per-row quantity field plus its own Buy trigger, for taking fewer than a
+  // bulk listing's whole stack. Defaults to 1 (leaving it untouched buys one
+  // unit), bounded [1, l.count]; at l.count it behaves exactly like the row's
+  // main Buy button (marketBuyConfirm treats a requestedCount at or above the
+  // stack size as a whole-stack buy). Selected by CLASS, never an id: Browse
+  // renders one of these per bulk row, unlike the Sell tab's single #mkt-qty.
+  private buildPartialBuyControl(listing: MarketListingView, itemName: string): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'mkt-buy-partial';
+    const input = document.createElement('input');
+    input.className = 'mkt-buy-partial-qty coininput ui-input';
+    input.type = 'number';
+    input.min = '1';
+    input.max = String(listing.count);
+    input.value = '1';
+    input.setAttribute(
+      'aria-label',
+      t('itemUi.market.buyQuantityAria', { item: itemName, total: listing.count }),
+    );
+    wrap.appendChild(input);
+    const qtyBtn = document.createElement('button');
+    qtyBtn.className = 'mkt-buy-partial-btn ui-btn ui-btn--red';
+    qtyBtn.textContent = t('itemUi.market.buy');
+    qtyBtn.setAttribute('aria-label', t('itemUi.market.buyQuantityBtnAria', { item: itemName }));
+    qtyBtn.addEventListener('click', () => {
+      audio.click();
+      const requested = Math.max(1, Math.min(listing.count, Number.parseInt(input.value, 10) || 1));
+      this.promptBuy(listing, itemName, requested);
+    });
+    wrap.appendChild(qtyBtn);
+    return wrap;
   }
 
   // OK pressed: re-resolve the captured listing against the LIVE snapshot before
@@ -1054,7 +1108,14 @@ export class MarketWindow {
       );
       return;
     }
-    this.deps.world().marketBuy(pending.listingId);
+    // A whole-stack buy sends no count (byte-identical to the pre-partial-buy
+    // wire shape); a partial buy names exactly how many.
+    this.deps
+      .world()
+      .marketBuy(
+        pending.listingId,
+        pending.buyCount < pending.count ? pending.buyCount : undefined,
+      );
     audio.coin();
   }
 

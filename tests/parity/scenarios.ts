@@ -4513,7 +4513,7 @@ function marketRoundTrip(): Scenario {
         sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller'),
         'parity scenario market listing',
       );
-      sim.marketBuy(sale.id, buyer);
+      sim.marketBuy(sale.id, undefined, buyer);
       rec.snapshot('bought');
 
       // 4) list a second stack then reclaim it -> the escrow returns to the bags.
