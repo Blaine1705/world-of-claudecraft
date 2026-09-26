@@ -695,7 +695,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  'ebf81e7c8c145c28afe992f4b69fa16ed0374e7960b50f0e823037817dee545d';
+  // Re-minted for the spirit veil: the renderer leaf moved the ghost-style
+  // decision to a core and gained the veil entry, prewarm_policy.ts its keep
+  // row. No capture was retaken.
+  '7a15281efb8f0c967e4e1da18a8d9e75df80bfd955b0dd94c669bcff1382a307';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

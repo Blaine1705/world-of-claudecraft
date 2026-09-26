@@ -55,6 +55,9 @@ vi.mock('../src/render/characters/assets', () => ({
   prepareCharacterProfileAssets: mocks.characters,
   resetCharacterProfileCaches: mocks.reset,
 }));
+vi.mock('../src/render/characters/ghost_veil', () => ({
+  resetSpiritVeilLedger: mocks.reset,
+}));
 vi.mock('../src/render/sky', () => ({
   ensureSkyAssetsAt: mocks.sky,
 }));
@@ -195,6 +198,7 @@ describe('graphics profile derived-cache reset', () => {
       'foliage',
       'props',
       'characters',
+      'spirit_veil',
       'stations',
       'eastbrook_surface_atlas',
       'eastbrook_town',

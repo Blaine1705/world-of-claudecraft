@@ -24,6 +24,9 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'views.landmarks',
   'views.persistent-portals',
   'views.nearby',
+  // A character saved dead enters as a released spirit, and every death after
+  // that draws the veil: skipped, each would wait behind the effect gate.
+  'entities.spirit-veil-family',
   'world.settle-state',
   'post.initial-frame',
   'textures.scene',

@@ -1389,7 +1389,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  '01b0154d838b5b41b6a0f296f8010dd24bd8d2a824514dc1fe00aaefbf9f6a4d';
+  // Re-minted for the spirit veil (renderer.ts and prewarm_policy.ts inputs). No
+  // capture was retaken.
+  '3b16e596e8f32ef8482347ca6121594798338453ee4aedb3add92905c2df2bea';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1407,7 +1409,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  'ebf81e7c8c145c28afe992f4b69fa16ed0374e7960b50f0e823037817dee545d';
+  // Re-minted for the spirit veil (renderer.ts and prewarm_policy.ts inputs). No
+  // capture was retaken.
+  '7a15281efb8f0c967e4e1da18a8d9e75df80bfd955b0dd94c669bcff1382a307';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2790,7 +2794,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // release/v0.44.0 (PR 4200) merge into feature/vfx-floor-layering: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-    ).toBe('d31a7dc07624ec9afed81290c35edd8a4a08e2bae9d614895dda9e7c3723af42');
+      // spirit veil: recomputed LAST again over the re-swept evidence. No capture
+      // was retaken.
+    ).toBe('ad7bb81b63deade38365ddc5687b824752d09b2bdc389f50604bff7d81bb7990');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

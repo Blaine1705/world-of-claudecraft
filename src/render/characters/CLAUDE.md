@@ -44,7 +44,12 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   swap commits (`stageEffectSwap`, twinning each source mesh's KIND because
   three keys `skinning` on `isSkinnedMesh`); the Soul Rend mark is exempt and
   commits at once, being actionable raid information
-  (`tests/character_effect_compile_gate.test.ts`).
+  (`tests/character_effect_compile_gate.test.ts`). A released spirit is the
+  exception to the twin: it wears the spirit veil (`ghost_veil.ts`), one
+  unlit material per (source, shape) over a depth pre-pass sibling, all on
+  the pinned program family of `spirit_veil_family_core.ts` that
+  `../spirit_veil_prewarm.ts` links at boot, so its swap commits at once;
+  a new part shape must join that family (`tests/spirit_veil_census.test.ts`).
 - `halo.ts`: the class halo (`buildHalo`, driven by `VisualDef.halo` +
   `haloUpOffset`/`haloRadius` overrides). Texture, per-color materials, and
   per-radius geometries are shared never-disposed caches, so radii MUST come

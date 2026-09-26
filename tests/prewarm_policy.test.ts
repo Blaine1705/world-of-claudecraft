@@ -110,6 +110,7 @@ const MANIFEST_IDS = [
   'props.material-variants',
   'props.ghost-fade-variants',
   'entities.character-effect-variants',
+  'entities.spirit-veil-family',
   'foliage.materials',
   'foliage.great-tree-materials',
   'world.settle-state',
@@ -1372,6 +1373,9 @@ describe('the keep-list is the minimal entry set', () => {
         // linking before the live governor can lower the post level.
         'post.initial-frame',
         'render.settle-passes',
+        // A character saved dead enters as a released spirit on the first
+        // frame, and a skipped family would stage every death behind the gate.
+        'entities.spirit-veil-family',
         'textures.scene',
         'views.landmarks',
         'views.nearby',

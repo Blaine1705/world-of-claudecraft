@@ -198,6 +198,7 @@ import {
   requestedCharacterForm,
   resolvedCharacterForm,
 } from './characters/form_visual_selection_core';
+import { installSpiritVeil } from './characters/ghost_veil';
 import { visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
 import { modularLookChanged } from './characters/player_look_core';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
@@ -380,6 +381,7 @@ import {
   sharedUniforms,
   urlForcedTier,
 } from './gfx';
+import { characterGhostStyle } from './ghost_style_core';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
 import { createGpuPrepAdmission } from './gpu_prep_admission';
@@ -750,6 +752,7 @@ import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
 import { SpiritGrade } from './spirit_grade';
+import { spiritVeilFamilyPrewarmEntry } from './spirit_veil_prewarm';
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
@@ -757,7 +760,6 @@ import {
   refreshFrozenWorldMatrix,
 } from './static_matrix';
 import { buildStationProps } from './stations';
-import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
@@ -3139,6 +3141,7 @@ export class Renderer {
     // Ghost tint: the grade pass on composer/grade tiers, the base.css filter on
     // low. See spirit_grade.ts.
     this.spiritGrade = new SpiritGrade(canvas, this.post, () => this.reducedMotion());
+    installSpiritVeil(this.webgl, () => this.reducedMotion());
     bd('weather-post');
     window.addEventListener('resize', this.onViewportResize);
     window.addEventListener('orientationchange', this.onOrientationChange);
@@ -6206,6 +6209,10 @@ export class Renderer {
         resumeUnits: characterEffectSlot.resumeUnits,
         run: characterEffectSlot.run,
         detail: characterEffectSlot.detail,
+      },
+      {
+        id: 'entities.spirit-veil-family',
+        ...spiritVeilFamilyPrewarmEntry(this.compileArms, this.webgl, this.backgroundGpuWork),
       },
       {
         // Compile every foliage shader (tree/rock/dressing species + far-tree
@@ -10445,8 +10452,8 @@ export class Renderer {
       }
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;
-      // Warm the local player's own spirit variants once per distinct look, so
-      // a death spirit-release never links them inline on the ungated self view.
+      // Warm the local player's own stealth/form variants once per distinct
+      // look, so a first fade never links them inline on the ungated self view.
       if (e.id === this.sim.player.id) {
         this.selfSpirit.observe(
           v.visual,
@@ -10605,19 +10612,8 @@ export class Renderer {
         v.clickTarget = active.clickProxy;
       }
       v.height = active.height;
-      const stealthGhost = shouldRenderStealthGhost(this.sim.playerId, e);
-      const ghost =
-        ghostWolf ||
-        stealthGhost ||
-        e.templateId.startsWith('vision_') ||
-        e.ghost || // a released player spirit renders translucent (the ghost run)
-        e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
-      // Duskveil/Smokefade wear the denser stealth fade; every spirit read
-      // (ghost run, ghost wolf, visions, the graveyard angel) keeps the thin
-      // ethereal one. A dead stealther is a spirit first.
-      const ghostStyle =
-        stealthGhost && !ghostWolf && !e.ghost ? ('stealth' as const) : ('spirit' as const);
-      active.setGhost(ghost || veilboundState === 'march', ghostStyle);
+      const ghostStyle = characterGhostStyle(this.sim.playerId, e, ghostWolf, veilboundState);
+      active.setGhost(ghostStyle !== null, ghostStyle ?? 'spirit');
       active.setSoulRend(hasSoulRend);
       // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
       // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
