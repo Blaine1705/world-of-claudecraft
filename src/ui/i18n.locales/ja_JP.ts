@@ -9185,9 +9185,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '守りの聖歌が完全に消費されると、10秒以内の次の浄めの聖歌が即時発動になります。この効果は15秒に1回まで発動します。',
   'entities.itemSets.benison_dawnweave.name': 'ベニソン・ドーンウィーヴの法衣',
   'entities.itemSets.benison_dawnweave.bonus2':
-    '熾天使の見守りの救援回復量が180から270に上昇します。被ダメージで詠唱が遅れなくなります。',
+    '囁きの祈り、厳かな祈り、緊急の祈りで体力を回復すると、次の聖歌の癒しの回復量が10%増加し、最大3スタックまで累積する。1回の詠唱につき獲得できるのは1スタックまで。聖歌の癒しの詠唱完了時にすべてのスタックを消費する。ダメージを受けても詠唱が遅延しなくなる。',
   'entities.itemSets.benison_dawnweave.bonus4':
-    '熾天使の見守りが発動すると、守られた味方はさらに10秒かけて最大体力の15%の回復を得ます。',
+    '3スタックで聖歌の癒しの詠唱を完了すると、60秒以内に使う次の囁きの祈りが即時発動になり、回復量が100%増加する。この効果は累積せず、再度獲得すると持続時間が更新される。',
   'entities.itemSets.vesperash.name': 'ヴェスパーアッシュの外套',
   'entities.itemSets.vesperash.bonus2':
     'タイスフィーンド招来のクールダウンが6秒短縮されます。被ダメージで詠唱が遅れなくなります。',
@@ -12472,6 +12472,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.iceFloesCasts': '次の{n}回の詠唱呪文を移動しながら唱えられる',
   'hudChrome.auraEffect.freeCast': '次の詠唱のコストがゼロになる',
   'hudChrome.auraEffect.instantCast': '次の詠唱時間のある呪文が即時発動になる',
+  'hudChrome.auraEffect.benisonPrayers':
+    '次の聖歌の癒しの回復量が{pct}%増加し、すべてのスタックを消費する。',
+  'hudChrome.auraEffect.benisonWhisper':
+    '次の囁きの祈りが即時発動になり、回復量が{pct}%増加する。この効果が切れる前に使用すること。',
   'hudChrome.auraEffect.cheapCast': '次の呪文のコストが{pct}%減少する',
   'hudChrome.auraEffect.increase.sp': '呪文の威力を{value}上昇させる',
   'hudChrome.specPanel.specUnlockBanner': 'スペシャライゼーション解放！',

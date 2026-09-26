@@ -9176,9 +9176,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '수호의 성가가 완전히 소모되면 10초 이내의 다음 정화의 성가가 즉시 시전됩니다. 이 효과는 15초에 한 번만 발동합니다.',
   'entities.itemSets.benison_dawnweave.name': '축복의 새벽직조 예복',
   'entities.itemSets.benison_dawnweave.bonus2':
-    '치천사의 수호의 구원 치유량이 180에서 270으로 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+    '속삭이는 기도, 엄숙한 기도 또는 다급한 기도로 생명력을 회복하면 다음 성가 치유의 치유량이 10% 증가하며, 최대 3회 중첩됩니다. 시전 한 번당 최대 한 중첩을 얻습니다. 성가 치유 시전이 완료되면 모든 중첩을 소모합니다. 피해를 받아도 주문 시전이 지연되지 않습니다.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    '치천사의 수호가 발동하면 보호받은 아군이 10초에 걸쳐 최대 생명력의 15%만큼 추가로 치유됩니다.',
+    '3중첩 상태에서 성가 치유 시전을 완료하면 60초 이내에 사용하는 다음 속삭이는 기도가 즉시 시전되며 치유량이 100% 증가합니다. 이 효과는 중첩되지 않으며, 다시 얻으면 지속시간이 갱신됩니다.',
   'entities.itemSets.vesperash.name': '만과의 잿가루 장막',
   'entities.itemSets.vesperash.bonus2':
     '십일조 악마 소환의 재사용 대기시간이 6초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
@@ -12443,6 +12443,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.iceFloesCasts': '다음 {n}개의 시전 주문을 이동하면서 시전할 수 있습니다',
   'hudChrome.auraEffect.freeCast': '다음 시전에 자원이 들지 않습니다',
   'hudChrome.auraEffect.instantCast': '시전 시간이 있는 다음 주문이 즉시 시전됩니다',
+  'hudChrome.auraEffect.benisonPrayers':
+    '다음 성가 치유의 치유량이 {pct}% 증가하며 모든 중첩을 소모합니다.',
+  'hudChrome.auraEffect.benisonWhisper':
+    '다음 속삭이는 기도가 즉시 시전되며 치유량이 {pct}% 증가합니다. 이 효과가 만료되기 전에 사용하세요.',
   'hudChrome.auraEffect.cheapCast': '다음 주문의 소모량이 {pct}% 감소합니다',
   'hudChrome.auraEffect.increase.sp': '주문력을 {value} 증가시킵니다',
   'hudChrome.specPanel.specUnlockBanner': '전문화 해제!',

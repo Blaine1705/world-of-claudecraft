@@ -14870,9 +14870,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Úder Zahaleného ostří způsobuje trojnásobné poškození místo dvojnásobného.',
   'entities.itemSets.ashveil.name': 'Roucho Popelavého závoje',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Záchrana Serafínské bdělosti léčí za 270 místo 180. Utržené poškození již nezpožďuje sesílání kouzel.',
+    'Obnovení zdraví kouzly Šeptaná modlitba, Slavnostní modlitba nebo Naléhavá modlitba zvýší léčení příštího kouzla Sborové zacelení o 10 %, až na 3 vrstvy. Každé seslání přidá nejvýše jednu vrstvu. Sborové zacelení po dokončení sesílání spotřebuje všechny vrstvy. Utrpěné poškození již nezdržuje sesílání kouzel.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Po spuštění Serafínské bdělosti je její spojenec po dobu 10 s léčen za 15 procent svého maximálního zdraví.',
+    'Dokončení kouzla Sborové zacelení se 3 vrstvami způsobí, že příští Šeptaná modlitba použitá do 60 sekund bude okamžitá a vyléčí o 100 % více. Tento účinek se nesčítá; opětovné získání obnoví jeho trvání.',
   'entities.itemSets.benison_dawnweave.name': 'Požehnaná úsvitová tkanina',
   'entities.itemSets.chronoweave.bonus2':
     'Časová ozvěna převádí 50 procent tvého arkánního poškození jediného cíle na léčení. Utržené poškození již nezpožďuje sesílání kouzel.',

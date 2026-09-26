@@ -3422,6 +3422,8 @@ export const it_IT: EnTranslations = {
       "iceFloesCasts": "I prossimi {n} incantesimi con un tempo di lancio possono essere lanciati in movimento",
       "freeCast": "Il prossimo lancio non costa nulla",
       "instantCast": "Il prossimo incantesimo con un tempo di lancio è istantaneo",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Il prossimo incantesimo costa il {pct}% in meno",
       "radiantResonance": "La tua prossima Luce Risanatrice è istantanea, oppure il tuo prossimo Abbraccio dell'Alba costa il {pct}% di mana in meno e si lancia in {castTime} s",
       "solarReprisal": "Il tuo prossimo Disco Solare non costa mana, ignora il tempo di recupero e infligge il {pct}% di danni in più; il Martello della Grazia ignora il tempo di recupero e ti cura per il 100% dei danni inflitti; oppure la Luce Risanatrice è istantanea",
@@ -21766,8 +21768,8 @@ export const it_IT: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Benedizione della Tessitura dell’Alba",
-        "bonus2": "La cura salvifica della Vigilanza Serafica sale a 270, da 180. I danni subiti non ritardano più il lancio degli incantesimi.",
-        "bonus4": "Quando si attiva la Vigilanza Serafica, l’alleato viene curato anche del 15 percento della salute massima in 10 s."
+        "bonus2": "Ripristinare salute con Preghiera Sussurrata, Preghiera Solenne o Preghiera Urgente aumenta del 10% le cure della tua prossima Cura del Coro, fino a 3 accumuli. Ogni lancio conferisce al massimo un accumulo. Cura del Coro consuma tutti gli accumuli al termine del lancio. I danni subiti non ritardano più il lancio degli incantesimi.",
+        "bonus4": "Completare Cura del Coro con 3 accumuli rende istantanea la tua prossima Preghiera Sussurrata usata entro 60 s e ne aumenta le cure del 100%. Questo beneficio non si accumula; ottenerlo di nuovo ne rinnova la durata."
       },
       "boundstone_vanguard": {
         "name": "Avanguardia Pietrvincolo",

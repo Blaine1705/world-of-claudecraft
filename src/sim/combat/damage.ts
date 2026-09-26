@@ -138,7 +138,6 @@ import { stripPaladinDevotionsFromSource } from './paladin_support';
 import { masteredPaladinAuraValue } from './paladin_talents';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { veilboundMarkDamageMultiplier } from './paladin_veilbound_march';
-import { benisonMendOnVigilTriggered } from './priest/benison';
 import { doctrineConvertDamage } from './priest/doctrine';
 import { cleanupPriestState } from './priest/lifecycle';
 import {
@@ -1083,9 +1082,6 @@ export function dealDamage(
         const healed = ctx.applyHeal(healer, target, aura.value, aura.name);
         if (aura.id === 'seraphic_vigil') {
           priestOnVigilTriggered(ctx, healer, target, healed);
-          // Benison Dawnweave 4pc rides the same trigger POINT (never that
-          // talent-gated function): the set arm is wearer-flag-gated inside.
-          benisonMendOnVigilTriggered(ctx, healer, target);
         }
         ctx.emit({
           type: 'spellfx',

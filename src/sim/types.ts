@@ -505,6 +505,8 @@ export type AuraKind =
   // Vespers Priest: source-owned self resource built by Mindfracture and
   // Effigy-bound Dirge ticks, consumed whole by Call Tithefiend.
   | 'gloomtithe'
+  // Benison Dawnweave: up to three direct-prayer stacks, consumed by Choirmend.
+  | 'benison_prayers'
   // Destruction warlock secondary-resource and cast-shaping state.
   | 'destruction_ruin'
   | 'desolation'

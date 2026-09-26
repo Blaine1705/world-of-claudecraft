@@ -3422,6 +3422,8 @@ export const es_ES: EnTranslations = {
       "iceFloesCasts": "Tus próximos {n} hechizos con tiempo de lanzamiento pueden lanzarse en movimiento",
       "freeCast": "Tu siguiente lanzamiento no cuesta nada",
       "instantCast": "Tu siguiente hechizo con tiempo de lanzamiento es instantáneo",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Tu siguiente hechizo cuesta un {pct}% menos",
       "radiantResonance": "Tu próxima Luz Reparadora es instantánea, o tu próximo Abrazo del Alba cuesta un {pct}% menos de maná y se lanza en {castTime} s",
       "solarReprisal": "Tu próximo Disco Solar no cuesta maná, ignora su tiempo de reutilización e inflige un {pct}% más de daño; el Martillo de Gracia ignora su tiempo de reutilización y te sana por el 100% del daño infligido; o la Luz Reparadora es instantánea",
@@ -21766,8 +21768,8 @@ export const es_ES: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Trama del Alba Benévola",
-        "bonus2": "El rescate de Vigilancia Seráfica cura 270, en lugar de 180. El daño recibido ya no retrasa tus hechizos.",
-        "bonus4": "Cuando se activa Vigilancia Seráfica, su aliado también recupera un 15% de su salud máxima durante 10 s."
+        "bonus2": "Restaurar salud con Plegaria Susurrada, Plegaria Solemne o Plegaria Urgente aumenta la sanación de tu próximo Coro Sanador un 10 %, hasta 3 acumulaciones. Cada lanzamiento otorga como máximo una acumulación. Coro Sanador consume todas las acumulaciones al terminar de lanzarse. El daño recibido ya no retrasa tus lanzamientos.",
+        "bonus4": "Completar Coro Sanador con 3 acumulaciones hace que tu próxima Plegaria Susurrada en un plazo de 60 s sea instantánea y sane un 100 % más. Este beneficio no se acumula; obtenerlo de nuevo renueva su duración."
       },
       "boundstone_vanguard": {
         "name": "Vanguardia Piedravínculo",

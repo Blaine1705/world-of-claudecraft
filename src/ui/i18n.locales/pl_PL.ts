@@ -15137,9 +15137,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Cios Ukrytego Ostrza zadaje potrójne obrażenia zamiast podwójnych.',
   'entities.itemSets.ashveil.name': 'Szaty Popiołowej Zasłony',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Ratunek Seraficznej Warty leczy za 270 zamiast 180. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+    'Przywrócenie zdrowia zaklęciami Szeptana modlitwa, Uroczysta modlitwa lub Pilna modlitwa zwiększa leczenie następnego zaklęcia Chóralne Uzdrowienie o 10%, do 3 kumulacji. Każde rzucenie przyznaje najwyżej jedną kumulację. Chóralne Uzdrowienie zużywa wszystkie kumulacje po zakończeniu rzucania. Otrzymane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Po aktywowaniu Seraficznej Warty jej sojusznik zostaje uleczony o 15 procent maksymalnego zdrowia w ciągu 10 sek.',
+    'Ukończenie zaklęcia Chóralne Uzdrowienie z 3 kumulacjami sprawia, że następna Szeptana modlitwa użyta w ciągu 60 s staje się natychmiastowa i leczy o 100% więcej. Efekt nie kumuluje się; ponowne uzyskanie odnawia czas jego trwania.',
   'entities.itemSets.benison_dawnweave.name': 'Błogosławiona Tkanina Świtu',
   'entities.itemSets.chronoweave.bonus2':
     'Echo Czasu zamienia 50 procent twoich obrażeń tajemnych przeciw jednemu celowi w leczenie. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',

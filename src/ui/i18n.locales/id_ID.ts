@@ -15215,9 +15215,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Serangan Ujung Terselubung Anda menghasilkan tiga kali lipat kerusakan, bukan dua kali lipat.',
   'entities.itemSets.ashveil.name': 'Busana Selubung Abu',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Penyelamatan Kewaspadaan Serafim menyembuhkan 270, naik dari 180. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
+    'Memulihkan kesehatan dengan Doa Berbisik, Doa Khidmat, atau Doa Mendesak meningkatkan penyembuhan Penyembuhan Koor berikutnya sebesar 10%, hingga 3 tumpukan. Setiap perapalan memberikan paling banyak satu tumpukan. Penyembuhan Koor menghabiskan semua tumpukan setelah selesai dirapal. Kerusakan yang diterima tidak lagi menunda perapalan mantra.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Saat Kewaspadaan Serafim terpicu, sekutunya juga dipulihkan sebesar 15 persen dari kesehatan maksimum mereka selama 10 detik.',
+    'Menyelesaikan Penyembuhan Koor dengan 3 tumpukan membuat Doa Berbisik berikutnya yang digunakan dalam 60 detik menjadi instan dan meningkatkan penyembuhannya sebesar 100%. Efek ini tidak dapat ditumpuk; memperolehnya lagi memperbarui durasinya.',
   'entities.itemSets.benison_dawnweave.name': 'Tenunan Fajar Berkah',
   'entities.itemSets.chronoweave.bonus2':
     'Gema Temporal mengubah 50 persen kerusakan Arkana satu target Anda menjadi penyembuhan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',

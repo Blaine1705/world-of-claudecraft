@@ -3422,6 +3422,8 @@ export const vi_VN: EnTranslations = {
       "iceFloesCasts": "Phép tiếp theo {n} của bạn có thời gian thi triển có thể được thi triển trong khi di chuyển",
       "freeCast": "Lần thi triển tiếp theo của bạn không tốn mana",
       "instantCast": "Phép tiếp theo của bạn có thời gian thi triển sẽ lập tức",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Phép tiếp theo của bạn tốn ít hơn {pct}%",
       "radiantResonance": "Thánh Quang Chữa Lành kế tiếp của bạn thành tức thời, hoặc Vòng Tay Bình Minh kế tiếp tốn ít hơn {pct}% mana và niệm trong {castTime} giây",
       "solarReprisal": "Đĩa Nhật Quang kế tiếp của bạn không tốn mana, bỏ qua hồi chiêu và gây thêm {pct}% sát thương; Búa Ân Điển bỏ qua hồi chiêu và hồi cho bạn 100% sát thương đã gây; hoặc Thánh Quang Chữa Lành thành tức thời",
@@ -21766,8 +21768,8 @@ export const vi_VN: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Phúc Lành Dệt Bình Minh",
-        "bonus2": "Lần cứu viện của Cảnh Giác Seraph hồi 270 thay vì 180. Sát thương nhận vào không còn trì hoãn việc niệm phép.",
-        "bonus4": "Khi Cảnh Giác Seraph kích hoạt, đồng minh của bạn cũng được hồi 15% máu tối đa trong 10 giây."
+        "bonus2": "Hồi phục máu bằng Lời Nguyện Thì Thầm, Lời Nguyện Trang Nghiêm hoặc Lời Nguyện Khẩn Cấp tăng lượng hồi máu của Hồi Phục Hợp Xướng kế tiếp thêm 10%, cộng dồn tối đa 3 lần. Mỗi lần niệm chỉ tạo tối đa một cộng dồn. Hồi Phục Hợp Xướng tiêu hao tất cả cộng dồn khi niệm xong. Sát thương nhận vào không còn làm chậm việc niệm phép.",
+        "bonus4": "Hoàn tất Hồi Phục Hợp Xướng với 3 cộng dồn khiến Lời Nguyện Thì Thầm tiếp theo dùng trong vòng 60 giây trở thành tức thì và hồi thêm 100% máu. Hiệu ứng này không cộng dồn; nhận lại hiệu ứng sẽ làm mới thời gian tồn tại."
       },
       "boundstone_vanguard": {
         "name": "Bộ Tiên Phong Đá Trói",

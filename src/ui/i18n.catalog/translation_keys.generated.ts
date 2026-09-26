@@ -8661,6 +8661,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.avatar'
   | 'hudChrome.auraEffect.battleStance'
   | 'hudChrome.auraEffect.battleTrance'
+  | 'hudChrome.auraEffect.benisonPrayers'
+  | 'hudChrome.auraEffect.benisonWhisper'
   | 'hudChrome.auraEffect.berserkerStance'
   | 'hudChrome.auraEffect.bleedVuln'
   | 'hudChrome.auraEffect.blind'

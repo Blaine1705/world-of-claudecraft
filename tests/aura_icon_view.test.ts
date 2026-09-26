@@ -144,8 +144,9 @@ const REUSED_PAINTED_RUNTIME_AURA_SOURCES = [
 // painted ability or authored talent icon that owns the state in production.
 const POST_OVERHAUL_RUNTIME_AURA_SOURCES = [
   ['aegis_first_dawn_speed', 'aegis_first_dawn'],
-  // Benison Dawnweave 4pc mend: same icon family as the Seraphic Vigil it pays off.
-  ['benison_dawnweave_mend', 'seraphic_vigil'],
+  // Dawnweave bonuses use the spell each proc strengthens.
+  ['priest_benison_prayers', 'prayer_of_healing'],
+  ['priest_benison_whisper', 'lesser_heal'],
   ['bloodhook_bleed', 'bloodhook'],
   ['bloodhook_pending', 'bloodhook'],
   ['dawns_wrath', 'hammer_of_wrath'],

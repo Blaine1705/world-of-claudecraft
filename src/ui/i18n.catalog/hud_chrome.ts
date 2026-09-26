@@ -4638,6 +4638,9 @@ export const hudChromeStrings = {
     iceFloesCasts: 'Your next {n} spells with a cast time can be cast while moving',
     freeCast: 'Your next cast costs nothing',
     instantCast: 'Your next spell with a cast time is instant',
+    benisonPrayers: 'Your next Choirmend heals for {pct}% more and consumes all stacks.',
+    benisonWhisper:
+      'Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.',
     cheapCast: 'Your next spell costs {pct}% less',
     radiantResonance:
       "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",

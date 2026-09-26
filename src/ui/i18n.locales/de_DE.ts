@@ -15283,9 +15283,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Dein Schlag mit der Verschleierten Klinge verursacht dreifachen statt doppelten Schaden.',
   'entities.itemSets.ashveil.name': 'Gewand des Aschenschleiers',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Die Rettungsheilung von Seraphischer Wacht steigt von 180 auf 270. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
+    'Wenn Geflüstertes Gebet, Feierliches Gebet oder Dringendes Gebet Gesundheit wiederherstellt, erhöht sich die Heilung deiner nächsten Chorheilung um 10 %, bis zu 3 Stapel. Jeder Zauber gewährt höchstens einen Stapel. Chorheilung verbraucht bei Abschluss des Wirkens alle Stapel. Erlittener Schaden verzögert deine Zauber nicht mehr.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Wenn Seraphische Wacht ausgelöst wird, wird der Verbündete zusätzlich 10 Sek. lang um 15 Prozent seiner maximalen Gesundheit geheilt.',
+    'Wenn du Chorheilung mit 3 Stapeln abschließt, wird dein nächstes Geflüstertes Gebet innerhalb von 60 Sek. sofort gewirkt und heilt 100 % mehr. Dieser Effekt ist nicht stapelbar; erneutes Erhalten erneuert seine Dauer.',
   'entities.itemSets.benison_dawnweave.name': 'Gewand der Morgengewebten Gunst',
   'entities.itemSets.chronoweave.bonus2':
     'Zeitliches Echo wandelt 50 Prozent deines arkanen Einzelzielschadens in Heilung um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',

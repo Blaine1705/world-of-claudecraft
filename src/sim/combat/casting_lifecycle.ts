@@ -1,3 +1,5 @@
+import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
+import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
 // Player cast lifecycle, extracted from the Sim monolith (C4a).
 //
 // This module owns how a cast STARTS (castAbility/castAbilityBySlot: the
@@ -2032,7 +2034,9 @@ export function castAbility(
         }
       : null;
   coldsightReserveRead(ctx, p, ability.id);
-  applyAbility(ctx, p, meta, instantResolved, castTargetId, stormcastReservation);
+  const benisonHealMult =
+    consumedInstantAura?.id === BENISON_WHISPER_AURA_ID ? 1 + BENISON_4PC_WHISPER_HEAL_BONUS : 1;
+  applyAbility(ctx, p, meta, instantResolved, castTargetId, stormcastReservation, benisonHealMult);
   // instant ground-targeted cast: its effects have consumed the aim point. An
   // interleaved instant instead hands the aim back to the cast still running.
   p.castAim = blinkThrough ? heldCastAim : null;
@@ -2655,6 +2659,7 @@ function applyAbility(
   res: ResolvedAbility,
   castTargetId: number | null = null,
   stormcastReservation: StormcastReservation | null = null,
+  benisonHealMult = 1,
 ): void {
   // Consume the mouseover override: an instant cast passes it directly; a
   // timed cast stored it on the entity at start (updateCasting's finish call
@@ -2988,7 +2993,7 @@ function applyAbility(
             stormcastReservation !== null,
           )
         : 1;
-    ctx.runEffects(p, meta, target, res, false, castHealMult);
+    ctx.runEffects(p, meta, target, res, false, castHealMult * benisonHealMult);
     completeStormcastReservation(ctx, p, stormcastReservation);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')

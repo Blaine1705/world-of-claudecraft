@@ -3422,6 +3422,8 @@ export const da_DK: EnTranslations = {
       "iceFloesCasts": "Dine næste {n} trolddomme med en kastetid kan kastes, mens du bevæger dig",
       "freeCast": "Dit næste kast koster ingenting",
       "instantCast": "Din næste trolddom med en kastetid er øjeblikkelig",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Din næste trolddom koster {pct}% mindre",
       "radiantResonance": "Dit næste Lægende Lys bliver øjeblikkeligt, eller din næste Daggryets Favn koster {pct}% mindre mana og kastes på {castTime} sek.",
       "solarReprisal": "Din næste Solskive koster ingen mana, ignorerer nedkølingen og gør {pct}% mere skade; Nådens Hammer ignorerer sin nedkøling og helbreder dig for 100% af den gjorte skade; eller Lægende Lys bliver øjeblikkeligt",
@@ -21766,8 +21768,8 @@ export const da_DK: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Benison-daggryvæv",
-        "bonus2": "Seraphic Vigils redning heler 270 i stedet for 180. Modtaget skade forsinker ikke længere din besværgelse.",
-        "bonus4": "Når Seraphic Vigil udløses, helbredes dens allierede også for 15 procent af deres maksimale helbred over 10 sek."
+        "bonus2": "Når Hvisket Bøn, Højtidelig Bøn eller Hastende Bøn genopretter helbred, øges helbredelsen fra din næste Korhelbredelse med 10 %, op til 3 stakke. Hver kastning giver højst én stak. Korhelbredelse bruger alle stakke, når kastningen fuldføres. Modtaget skade forsinker ikke længere dine besværgelser.",
+        "bonus4": "Når Korhelbredelse fuldføres med 3 stakke, bliver din næste Hvisket Bøn inden for 60 sek. øjeblikkelig og helbreder 100 % mere. Effekten kan ikke stables; hvis du opnår den igen, fornyes varigheden."
       },
       "boundstone_vanguard": {
         "name": "Bundstens-fortrop",

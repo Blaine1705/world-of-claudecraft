@@ -3422,6 +3422,8 @@ export const en_CA: EnTranslations = {
       "iceFloesCasts": "Your next {n} spells with a cast time can be cast while moving",
       "freeCast": "Your next cast costs nothing",
       "instantCast": "Your next spell with a cast time is instant",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Your next spell costs {pct}% less",
       "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
       "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
@@ -21766,8 +21768,8 @@ export const en_CA: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "bonus2": "Restoring health with Whispered Prayer, Solemn Prayer, or Urgent Prayer increases your next Choirmend's healing by 10%, stacking up to 3 times. Each cast grants at most one stack. Choirmend consumes all stacks when it finishes casting. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Finishing Choirmend with 3 stacks makes your next Whispered Prayer within 60 sec instant and increases its healing by 100%. This benefit does not stack; earning it again refreshes its duration."
       },
       "boundstone_vanguard": {
         "name": "Boundstone Vanguard",

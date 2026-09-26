@@ -14435,6 +14435,7 @@ const ABILITY_NAMED_AURA_IDS: Readonly<Record<string, string>> = {
   Lunge: 'lunge',
   // Thundercall's Magma Surge proc aura carries its ability's name.
   'Magma Burst': 'lava_burst',
+  'Whispered Prayer': 'lesser_heal',
 };
 
 export function localizeSimAuraName(name: string): string | null {

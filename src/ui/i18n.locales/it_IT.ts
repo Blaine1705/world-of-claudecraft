@@ -15862,9 +15862,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il colpo del tuo Bordo Velato infligge il triplo dei danni, invece del doppio.',
   'entities.itemSets.ashveil.name': 'Vesti del Velo Cinereo',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'La cura salvifica della Vigilanza Serafica sale a 270, da 180. I danni subiti non ritardano più il lancio degli incantesimi.',
+    'Ripristinare salute con Preghiera Sussurrata, Preghiera Solenne o Preghiera Urgente aumenta del 10% le cure della tua prossima Cura del Coro, fino a 3 accumuli. Ogni lancio conferisce al massimo un accumulo. Cura del Coro consuma tutti gli accumuli al termine del lancio. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Quando si attiva la Vigilanza Serafica, l’alleato viene curato anche del 15 percento della salute massima in 10 s.',
+    'Completare Cura del Coro con 3 accumuli rende istantanea la tua prossima Preghiera Sussurrata usata entro 60 s e ne aumenta le cure del 100%. Questo beneficio non si accumula; ottenerlo di nuovo ne rinnova la durata.',
   'entities.itemSets.benison_dawnweave.name': 'Benedizione della Tessitura dell’Alba',
   'entities.itemSets.chronoweave.bonus2':
     'L’Eco Temporale converte il 50 percento dei danni arcani a bersaglio singolo in cure. I danni subiti non ritardano più il lancio degli incantesimi.',
