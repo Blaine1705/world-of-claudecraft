@@ -692,7 +692,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
   // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
   // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
-  'e1e7c24ea14b4df45f8474e4817d8efa8cc1fc3a25de747516a0c8d6b8331907';
+  // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
+  '6378ea87a26d8bf12d9a51e5a15ebae03040cae83e6a3d6d981064e9b40ead52';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

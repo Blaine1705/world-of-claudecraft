@@ -2,6 +2,8 @@
 // Maintains a bounded ring buffer of recent damage, heal, and absorb events per player,
 // latched at death so the player or raid leader can inspect the lethal sequence.
 
+import { formatNumber } from './i18n';
+
 export interface DeathRecapEvent {
   timestamp: number; // ms
   type: 'damage' | 'heal' | 'absorb';
@@ -89,11 +91,11 @@ export function buildDeathRecapRows(record: DeathRecapRecord): DeathRecapRowView
 
     let amountStr = '';
     if (ev.type === 'damage') {
-      amountStr = `-${Math.round(ev.amount).toLocaleString()}`;
+      amountStr = `-${formatNumber(Math.round(ev.amount), { maximumFractionDigits: 0 })}`;
     } else if (ev.type === 'heal') {
-      amountStr = `+${Math.round(ev.amount).toLocaleString()}`;
+      amountStr = `+${formatNumber(Math.round(ev.amount), { maximumFractionDigits: 0 })}`;
     } else {
-      amountStr = `[${Math.round(ev.amount).toLocaleString()} abs]`;
+      amountStr = `[${formatNumber(Math.round(ev.amount), { maximumFractionDigits: 0 })} abs]`;
     }
 
     let hpStr = '';

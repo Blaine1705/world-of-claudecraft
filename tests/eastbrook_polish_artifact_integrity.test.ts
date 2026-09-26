@@ -1386,7 +1386,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
   // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
   // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
-  '18b963fdded14cf055704e9501b4826be327c8b12421eadbcd43dd7f487b8082';
+  // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
+  '363894033107ed50e29c83d63268e9843d239ef4f64178bbda3dea5b1b057bfc';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1401,7 +1402,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
   // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
   // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
-  'e1e7c24ea14b4df45f8474e4817d8efa8cc1fc3a25de747516a0c8d6b8331907';
+  // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
+  '6378ea87a26d8bf12d9a51e5a15ebae03040cae83e6a3d6d981064e9b40ead52';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2784,7 +2786,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // PR #4199 shader prewarm merge: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('d30525e591f486bfbfb5c11f12adf588c1948d6833c9d8612873efe2e7ade000');
+    ).toBe('f16d51ea5ffbe092076ecf700b2923531725f90bc12d519d2379ce84c792b07c');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

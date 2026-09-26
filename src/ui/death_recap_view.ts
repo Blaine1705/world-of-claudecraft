@@ -2,6 +2,7 @@
 // Computes relative timeline deltas, remaining health percentages, lethal strike
 // identification, and combat event cards for the death recap dialog.
 
+import { formatNumber } from './i18n';
 import type { DeathRecapRecord } from './meters_death_recap';
 
 export interface DeathRecapCardModel {
@@ -80,11 +81,11 @@ export function buildDeathRecapCards(
 
     let amountStr = '';
     if (ev.type === 'damage') {
-      amountStr = `-${Math.round(ev.amount).toLocaleString()}`;
+      amountStr = `-${formatNumber(Math.round(ev.amount), { maximumFractionDigits: 0 })}`;
     } else if (ev.type === 'heal') {
-      amountStr = `+${Math.round(ev.amount).toLocaleString()}`;
+      amountStr = `+${formatNumber(Math.round(ev.amount), { maximumFractionDigits: 0 })}`;
     } else {
-      amountStr = `[${Math.round(ev.amount).toLocaleString()} abs]`;
+      amountStr = `[${formatNumber(Math.round(ev.amount), { maximumFractionDigits: 0 })} abs]`;
     }
 
     const { hpStr, hpPercent } = formatRecapHp(ev.hpAfter, ev.maxHp);

@@ -569,7 +569,10 @@ describe('detachable meter windows', () => {
     expect(healEl.style.top).toBe('100px');
 
     // Move threat adjacent to heal right edge (340px)
-    const threatHandle = threatEl.querySelector('.mt-move-handle') as HTMLElement;
+    const threatHandle = (
+      threatEl.matches('.mt-move-handle') ? threatEl : threatEl.querySelector('.mt-move-handle')
+    ) as HTMLElement;
+    expect(threatHandle).not.toBeNull();
     threatHandle.dispatchEvent(
       new PointerEvent('pointerdown', { button: 0, clientX: 8, clientY: 8 }),
     );

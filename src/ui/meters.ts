@@ -1764,7 +1764,7 @@ export class MetersPanel {
 
   private formatVal(v: number): string {
     if (this.settings.numberFormat === 'detailed') {
-      return Math.round(v).toLocaleString();
+      return formatNumber(Math.round(v), { maximumFractionDigits: 0 });
     }
     return fmtNum(v);
   }

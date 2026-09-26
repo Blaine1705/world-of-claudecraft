@@ -8535,9 +8535,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你的守護聖詠被完全消耗後，你在 10 秒內的下一次滌淨聖歌變為立即施放。該效果每 15 秒最多觸發一次。',
   'entities.itemSets.benison_dawnweave.name': '賜福晨織法衣',
   'entities.itemSets.benison_dawnweave.bonus2':
-    '熾天使守望的救援治療量提高至 270（原為 180）。受到傷害不再延遲你的施法。',
+    '使用低語禱言、莊嚴禱言或緊急禱言恢復生命值，會使你的下一次唱詩癒合的治療量提高 10%，最多疊加 3 層。每次施法最多獲得 1 層。唱詩癒合施法完成時消耗所有層數。受到傷害不再延遲你的施法。',
   'entities.itemSets.benison_dawnweave.bonus4':
-    '熾天使守望觸發時，其守護的盟友還會在 10 秒內獲得相當於其最大生命值 15% 的治療。',
+    '以 3 層完成唱詩癒合會使你在 60 秒內的下一次低語禱言變為瞬發，並使其治療量提高 100%。此效果不可疊加；再次獲得會刷新持續時間。',
   'entities.itemSets.vesperash.name': '晚禱燼灰罩袍',
   'entities.itemSets.vesperash.bonus2': '召喚什一魔的冷卻時間縮短 6 秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.vesperash.bonus4':

@@ -596,6 +596,8 @@ describe('every point-light producer is a carrier source', () => {
       'render/ability_vfx/rings.ts: mesh',
       'render/ability_vfx/rings.ts: slot.mesh',
       'render/gather_nodes.ts: target',
+      'render/goblin_rocket_sled_fx.ts: inner',
+      'render/goblin_rocket_sled_fx.ts: outer',
       'render/jail_scene.ts: swirl',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',

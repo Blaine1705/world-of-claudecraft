@@ -7,7 +7,7 @@ import type { ResolvedAbility } from '../sim/sim';
 import { buildDeathRecapSummary, type DeathRecapCardModel } from './death_recap_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
-import { t } from './i18n';
+import { formatNumber, t } from './i18n';
 import { iconDataUrl } from './icons';
 import type { DeathRecapRecord } from './meters_death_recap';
 import { svgIcon } from './ui_icons';
@@ -111,8 +111,8 @@ export class DeathRecapDialog {
 
     const totalsLine = `
       <div class="death-recap-totals">
-        <span class="recap-total-dmg">${esc(t('hud.core.deathRecapDamage'))}: -${summary.totalDamage.toLocaleString()}</span>
-        ${summary.totalHeal > 0 ? `<span class="recap-total-heal">${esc(t('hud.core.deathRecapHeal'))}: +${summary.totalHeal.toLocaleString()}</span>` : ''}
+        <span class="recap-total-dmg">${esc(t('hud.core.deathRecapDamage'))}: -${formatNumber(summary.totalDamage, { maximumFractionDigits: 0 })}</span>
+        ${summary.totalHeal > 0 ? `<span class="recap-total-heal">${esc(t('hud.core.deathRecapHeal'))}: +${formatNumber(summary.totalHeal, { maximumFractionDigits: 0 })}</span>` : ''}
       </div>
     `;
 
