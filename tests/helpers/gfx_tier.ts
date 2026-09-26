@@ -42,6 +42,7 @@ const basePreferences: GraphicsSettingsSnapshot = {
   characterDetail: 1,
   dynamicLights: 1,
   particleEffects: 1,
+  ghostFade: 1,
 };
 
 export function desktopTierProfile(tier: GfxTier): GfxProfile {
