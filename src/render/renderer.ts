@@ -47,10 +47,6 @@ import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import { isPvpHostilePlayer } from '../ui/pvp_hostile_core';
 import type { IWorld } from '../world_api';
-import {
-  abilityMaterialPrewarmMaterials,
-  buildAbilityMaterialPrewarmGroup,
-} from './ability_material_prewarm';
 import { type AbilityVfx, type AbilityVfxFx, abilityVfxTexturePrewarmSteps } from './ability_vfx';
 import { activeKitPrewarmEntry, resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
@@ -116,7 +112,11 @@ import {
 import { CameraImpact, fiestaShakeX, fiestaShakeY } from './camera_impact_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
-import { castVfxProgramUnits, createSceneCastVfxReadiness } from './cast_vfx_prewarm';
+import {
+  castVfxProgramUnits,
+  castVfxStandInSlot,
+  createSceneCastVfxReadiness,
+} from './cast_vfx_prewarm';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
 import {
@@ -582,7 +582,7 @@ import {
   runPrewarmCompileSubmission,
   submitPrewarmCompileUnit,
 } from './prewarm_compile_submission_core';
-import type { PrewarmManifestEntry } from './prewarm_entry';
+import { type PrewarmManifestEntry, runStartedPrewarmEntry } from './prewarm_entry';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -607,7 +607,6 @@ import {
   prewarmEntryShouldDefer,
   prewarmResumeIsDebt,
   prewarmSubmitShouldStop,
-  resolvePrewarmEntryStatus,
   resolvePrewarmPolicy,
   skyAssetInlineWaitMs,
   withRestoredPrewarmState,
@@ -5497,15 +5496,9 @@ export class Renderer {
     const landmarkSlot = createVariantPrewarmSlot(variantSlotHost, 'landmarks.impact-site', () =>
       buildImpactSitePrewarmGroup(this.impactSite.group, p.pos),
     );
-    const abilityMaterialSlot = createVariantPrewarmSlot(
-      variantSlotHost,
-      'ability-materials',
-      () => {
-        const group = buildAbilityMaterialPrewarmGroup();
-        this.abilityMaterialStandIns = abilityMaterialPrewarmMaterials(group);
-        return group;
-      },
-    );
+    const abilityMaterialSlot = castVfxStandInSlot(variantSlotHost, this.webgl, (materials) => {
+      this.abilityMaterialStandIns = materials;
+    });
     const castVfxUnits = (): PrewarmResumeUnit[] =>
       castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);
     let mountPrewarmGroup: THREE.Group | null = null;
@@ -5785,27 +5778,10 @@ export class Renderer {
         dropEntry(entry, entry.resumeUnits?.() ?? []);
         return;
       }
-      let status: RendererPrewarmManifestEntryStats['status'] = 'completed';
-      try {
-        try {
-          options.onEntryStart?.(entry.id, entry.category);
-        } catch {
-          // Diagnostics must never change whether a prewarm entry runs.
-        }
-        await entry.run();
-      } catch (err) {
-        status = 'failed';
-        console.warn(`Renderer prewarm entry failed: ${entry.id}`, err);
-      }
-      // Deadline-limited work with planned units remaining reports 'partial',
-      // never 'completed'.
-      const progress = entry.progress?.() ?? null;
-      if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
-      // Explicit partial resumes may also recover failed indivisible units.
-      if (status === 'partial' || status === 'failed') {
-        const partialUnits = entry.resumePartialUnits?.() ?? [];
-        if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });
-      }
+      const { status, progress, partialUnits } = await runStartedPrewarmEntry(entry, () =>
+        options.onEntryStart?.(entry.id, entry.category),
+      );
+      if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });
       const after = liveProgramWatch.programCounts(this.webgl);
       const entryEnded = performance.now();
       target.push({

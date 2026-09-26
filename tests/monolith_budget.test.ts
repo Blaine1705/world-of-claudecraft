@@ -900,7 +900,15 @@ const MONOLITHS: MonolithRow[] = [
     // shared one registration seam object. Measured at 12757 after the
     // PR #4177 release-line merge kept both the Colorblind Mode extraction and
     // the packed point-light carrier seam. Exact count.
-    ceiling: 12757,
+    // LOWERED 12789 -> 12771: a started prewarm entry's run, progress and
+    // partial remainder moved into runStartedPrewarmEntry (prewarm_entry.ts),
+    // one fail-soft unit so a throwing progress() cannot end the manifest.
+    // LOWERED 12771 -> 12765: the lazy cast stand-ins' boot slot moved into
+    // castVfxStandInSlot (cast_vfx_prewarm.ts), whose resume link records the
+    // settle the cast gate reads.
+    // Release integration composes both extraction sets below the prior pins.
+    // Exact count, zero slack.
+    ceiling: 12733,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

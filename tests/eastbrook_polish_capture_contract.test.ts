@@ -689,9 +689,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for dropping the three patch's opaque_fragment NaN scrub: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
-  // Re-minted for the three patch's finite-input degenerate-normal guard: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
-  '7f9d7175646fe140d09d7e79b06828dd646a8d2ee89c3bad7ade9b2e19e8b4a8';
+  // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  '3f0975337f93e2433bcb74ce96f545d7f8a4a323d898923dfdd58ea4e2193caa';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

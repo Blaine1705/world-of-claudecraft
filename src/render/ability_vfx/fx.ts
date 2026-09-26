@@ -702,7 +702,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.pillars = new LightPillars(scene);
     this.shells = new BuffShells(scene);
     this.groundAuras = new GroundAuras(scene, tex);
-    this.flipbooks = new ImpactFlipbooks(scene);
+    this.flipbooks = new ImpactFlipbooks(scene, textureReady);
     this.spirits = new SpiritApparitions(scene, groundY);
   }
 
@@ -1321,12 +1321,13 @@ export class AbilityVfxFx implements SequencerHost {
   // The prewarm's finally-block clear() hides everything again.
   authoredPrewarmUnits(host: CrestPrewarmHost, kinds?: readonly CrestKind[]) {
     return [
-      ...this.crests.preparation.units(host, kinds),
+      ...this.crests.units(host, kinds),
       ...this.guards.units(host),
       ...this.powerForms.units(host),
       ...this.spiritHammers.units(host),
       ...this.furyStates.units(host),
       ...(kinds?.includes('harvest_cut') ? this.baked.units(host) : []),
+      ...this.fragments.units(host),
     ];
   }
 
@@ -1339,10 +1340,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.bakedAt('shockwave', x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
     for (const kind of ['shout_dust', 'warrior_power'] as const)
       this.bakedAt(kind, x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
-    for (const kind of ['stone_chip', 'metal_splinter'] as const)
-      this.fragmentsAt(kind, x, y, z, 0xffffff, 1, 1, 0, 1);
     this.baked.update(0.1, this.camera.quaternion, false);
-    this.fragments.update(0.1, false);
     this.rings.spawn(x, gy + 0.15, z, 2, 0.7, 0xffffff, 1, false);
     this.rings.spawn(x, gy + 1.2, z, 1.6, 0.7, 0xffffff, 1, true);
     this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'ember', 1.2);

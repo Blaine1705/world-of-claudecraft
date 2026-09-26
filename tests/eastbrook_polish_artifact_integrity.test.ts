@@ -1383,9 +1383,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for dropping the three patch's opaque_fragment NaN scrub: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
-  // Re-minted for the three patch's finite-input degenerate-normal guard: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
-  'bdc091f9203d5c7521a821216ffde589f76770c8d50f2fc8aec6dfd65e19f092';
+  // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  '69baae5b5bbf4e705ce4b804af52d2c0dbb97e7a55acb5e11339b2168836d85d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1397,9 +1397,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for dropping the three patch's opaque_fragment NaN scrub: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
-  // Re-minted for the three patch's finite-input degenerate-normal guard: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
-  '7f9d7175646fe140d09d7e79b06828dd646a8d2ee89c3bad7ade9b2e19e8b4a8';
+  // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  '3f0975337f93e2433bcb74ce96f545d7f8a4a323d898923dfdd58ea4e2193caa';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2776,11 +2776,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // devalue audit floor: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-      // Opaque NaN scrub drop (three patch hash): recomputed LAST again over the
-      // re-swept evidence. No capture was retaken.
-      // Finite-input normal guard (three patch hash): recomputed LAST again over
-      // the re-swept evidence. No capture was retaken.
-    ).toBe('c4fee5bd5435a97f4f421090434264d028c99b8a5776b9b7118294b5630190da');
+      // fail-soft prewarm entry runner: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+      // cast stand-in slot: recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+    ).toBe('66df1f848b87f02ff3f7a99c9cf2097d4b2d000aa9bc398b3d540b4e2c7bf5b0');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

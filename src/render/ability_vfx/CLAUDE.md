@@ -152,7 +152,31 @@ selected by ability id only:
   (`requestClassKit`), keeps a mip chain on the WebP sheets, and DECLINES them
   on constrained-memory devices, where the kit stays cold and the generic
   presentation runs (`tests/warrior_kit_assets.test.ts`,
-  `tests/active_kit_prewarm.test.ts`). Generic sheets (smoke, dust,
+  `tests/active_kit_prewarm.test.ts`). Every sheet a live cast draws is
+  uploaded by its own unit of the kit recipe (`KIT_SHEETS` in
+  `active_kit_prewarm.ts`), the contact sheets and the generic smoke and dust
+  layers included, since the kit is their only consumer (the loaded shockwave
+  sheet has no live consumer, only the boot-window `prewarmSpawn`); the boot
+  warm-up (`abilityVfxTexturePrewarmSteps`) reads none of them, so the recipe is
+  their one upload home on every renderer, a recycled one included. A sheet is
+  stored as soon as it decodes, so every drawer also waits for this renderer's
+  upload (`textureReady`): the baked layers skip, a contact flipbook binds the
+  procedural shard sheet meanwhile when this renderer uploaded it and skips
+  otherwise (`tests/warrior_kit_sheet_readiness.test.ts`). A rebuilt renderer
+  therefore draws none of them until its own recipe runs, which for another
+  class waits for the next Warrior sighting.
+  A pool built at boot never relies on those getters in its constructor, since
+  the load lands after it: it binds them in
+  a unit of its own preparation recipe, ahead of its compile (the crests'
+  `crest-bind-kit`, the guards' `guard-bind-steel`; `tests/crest_prewarm.test.ts`).
+  A pool whose GEOMETRY comes from the kit builds its meshes in that recipe
+  too, and spawns nothing until their upload unit ran (the solid fragments'
+  `fragment-build`; `tests/solid_impact_fragments_prewarm.test.ts`).
+  Its preparation rides
+  `ACTIVE_KIT_PRIORITY` (the boot-debt lane) under the per-frame budget, never
+  the actionable floor, and it waits out a loading cover: the kit is cosmetic
+  and gated by its own readiness, and the floor once admitted all ten sheets
+  into one frame (about 0.6 s on an Intel HD 530). Generic sheets (smoke, dust,
   shockwave, the harvest splash) ship at 1024px; only signature sheets earn
   2048px, and a new sheet needs the same justification.
 - **Cost rules still apply.** The shared families it extends (`ribbons.ts`
