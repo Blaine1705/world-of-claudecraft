@@ -1883,7 +1883,6 @@ export class Renderer {
   // see src/render/ability_vfx/).
   private abilityVfx: AbilityVfx;
   private abilityVfxFx: AbilityVfxFx;
-  private abilityMaterialStandIns: THREE.Material[] = [];
   private needleOfFateVfx!: NeedleOfFateVfx;
   private sentenceVfx!: SentenceVfx;
   private lightPulses: LightPulses;
@@ -5484,9 +5483,7 @@ export class Renderer {
     const landmarkSlot = createVariantPrewarmSlot(variantSlotHost, 'landmarks.impact-site', () =>
       buildImpactSitePrewarmGroup(this.impactSite.group, p.pos),
     );
-    const abilityMaterialSlot = castVfxStandInSlot(variantSlotHost, this.webgl, (materials) => {
-      this.abilityMaterialStandIns = materials;
-    });
+    const abilityMaterialSlot = castVfxStandInSlot(variantSlotHost, this.webgl, () => {});
     const castVfxUnits = (): PrewarmResumeUnit[] =>
       castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);
     let mountPrewarmGroup: THREE.Group | null = null;

@@ -338,7 +338,7 @@ describe('the manifest wiring (source pins)', () => {
 
   it('is a staged compile group, so the boot compile lane links it', () => {
     expect(renderer).toContain(
-      'const abilityMaterialSlot = castVfxStandInSlot(variantSlotHost, this.webgl, (materials) => {\n      this.abilityMaterialStandIns = materials;\n    });',
+      'const abilityMaterialSlot = castVfxStandInSlot(variantSlotHost, this.webgl, () => {});',
     );
     expect(renderer).toContain('abilityMaterialSlot.staged(),');
   });

@@ -97,7 +97,7 @@ function engine(open: number) {
     undefined,
     weapon,
     undefined,
-    undefined,
+    () => true,
     (id, _piece, out) => {
       out.makeTranslation(id * 2, 1, 0);
       return true;
@@ -182,18 +182,6 @@ function spawnEngine(fx: AbilityVfxFx): void {
   for (const door of Object.values(ENGINE_DOORS)) door(fx);
 }
 
-/** One door on a fresh engine: fed once, or every frame when it is held. */
-function driveDoor(name: string, door: (fx: AbilityVfxFx) => void, open: number, kit = false) {
-  const rig = engine(open);
-  if (kit) prepareCastVfxKit(rig.fx);
-  door(rig.fx);
-  for (let frame = 0; frame < 4; frame++) {
-    if (HELD_DOORS.has(name)) door(rig.fx);
-    rig.step(1);
-  }
-  return rig;
-}
-
 /** Every kit spawn door the Warrior modules use, one by one, with the
  *  preparations the solid pieces wait on stubbed ready (prepareCastVfxKit).
  *  A held piece (guard, power form, Fury solid) is re-fed every frame, the
@@ -217,6 +205,52 @@ const KIT_DOORS: Record<string, (fx: AbilityVfxFx) => void> = {
     ),
 };
 
+async function prepareSpawnGateKit(fx: AbilityVfxFx): Promise<void> {
+  prepareCastVfxKit(fx);
+  const program = {
+    isReady: () => true,
+    getUniforms: () => ({}),
+    getAttributes: () => ({}),
+  };
+  type FragmentPrepHost = {
+    properties: { get(): { programs: Map<string, typeof program> } };
+    compile(): Promise<void>;
+    draw(): void;
+  };
+  const host: FragmentPrepHost = {
+    properties: { get: () => ({ programs: new Map([['flat', program]]) }) },
+    compile: async () => {},
+    draw: () => {},
+  };
+  const fragments = (
+    fx as unknown as {
+      fragments: { units(host: FragmentPrepHost): Array<{ run(): void | Promise<void> }> };
+    }
+  ).fragments;
+  for (const unit of fragments.units(host)) await unit.run();
+}
+
+/** One door on a fresh engine: fed once, or every frame when it is held. */
+async function driveDoor(
+  name: string,
+  door: (fx: AbilityVfxFx) => void,
+  open: number,
+  kit = false,
+) {
+  const rig = engine(open);
+  if (kit) {
+    await prepareSpawnGateKit(rig.fx);
+    for (const drawable of gatedDrawables(rig.scene))
+      if (!rig.drawables.includes(drawable)) rig.drawables.push(drawable);
+  }
+  door(rig.fx);
+  for (let frame = 0; frame < 4; frame++) {
+    if (HELD_DOORS.has(name)) door(rig.fx);
+    rig.step(1);
+  }
+  return rig;
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -235,12 +269,12 @@ describe('the gated pools', () => {
 
 describe('with the engine family not ready', () => {
   for (const [name, door] of Object.entries(ENGINE_DOORS)) {
-    it(`refuses the ${name} door, and asks the engine for it`, () => {
-      const shut = driveDoor(name, door, CAST_VFX_KIT);
+    it(`refuses the ${name} door, and asks the engine for it`, async () => {
+      const shut = await driveDoor(name, door, CAST_VFX_KIT);
       expect(shut.drawing()).toBe(0);
       expect(new Set(shut.gate.asked)).toEqual(new Set([CAST_VFX_ENGINE]));
       // The same door draws once the engine is ready: the refusal is the gate's.
-      expect(driveDoor(name, door, CAST_VFX_ENGINE | CAST_VFX_KIT).drawing()).toBe(
+      expect((await driveDoor(name, door, CAST_VFX_ENGINE | CAST_VFX_KIT)).drawing()).toBe(
         OPEN_DRAWS[name] ?? CAST_VFX_ENGINE,
       );
     });
@@ -284,13 +318,14 @@ describe('with the engine family not ready', () => {
 
 describe('with the kit family not ready', () => {
   for (const [name, door] of Object.entries(KIT_DOORS)) {
-    it(`refuses the ${name} door, and asks the kit for it`, () => {
-      const shut = driveDoor(name, door, CAST_VFX_ENGINE, true);
+    it(`refuses the ${name} door, and asks the kit for it`, async () => {
+      const shut = await driveDoor(name, door, CAST_VFX_ENGINE, true);
       expect(shut.drawing() & CAST_VFX_KIT).toBe(0);
       expect(shut.gate.asked).toContain(CAST_VFX_KIT);
       // The same door draws a kit piece once the kit is ready.
       expect(
-        driveDoor(name, door, CAST_VFX_ENGINE | CAST_VFX_KIT, true).drawing() & CAST_VFX_KIT,
+        (await driveDoor(name, door, CAST_VFX_ENGINE | CAST_VFX_KIT, true)).drawing() &
+          CAST_VFX_KIT,
       ).toBe(CAST_VFX_KIT);
     });
   }

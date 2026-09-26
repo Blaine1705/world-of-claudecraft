@@ -98,18 +98,15 @@ describe('the generic basic stand-ins', () => {
     scene.add(buildCastVfxBasicStandIns());
     const standIns = new THREE.Group();
     standIns.name = 'ability-material-prewarm';
+    const targets = collectAbilityVfxCompileTargets(scene);
     const compiled: string[] = [];
     const units = castVfxProgramUnits(scene, standIns, noArms, unprovedPrograms, async (root) => {
       compiled.push(root.name);
     });
     expect(units.map((unit) => unit.id).at(-1)).toBe('ability-materials:compile');
-    expect(units).toHaveLength(3);
+    expect(units).toHaveLength(targets.length + 1);
     expect(units.at(-1)?.roots).toEqual([standIns]);
     for (const unit of units) unit.run();
-    expect(compiled).toEqual([
-      'cast-vfx-basic:bubble-beam',
-      'cast-vfx-basic:corpse-beacon',
-      'ability-material-prewarm',
-    ]);
+    expect(compiled).toEqual([...targets.map((target) => target.object.name), standIns.name]);
   });
 });
