@@ -1864,6 +1864,7 @@
   #paladin-devotion-frame.tf-unlocked,
   #proc-overlay.tf-unlocked,
   #talking-head.tf-unlocked,
+  #unit-tooltip-anchor.tf-unlocked,
   #meters-window.tf-unlocked {
     cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
@@ -1986,9 +1987,10 @@
   #swingbar-offhand .tf-move-btn,
   #paladin-devotion-frame .tf-move-btn,
   #proc-overlay .tf-move-btn,
-  #meters-window .tf-move-btn,
   .hud-frame-group > .tf-move-btn,
-  .focus-target-row > .tf-move-btn {
+  .focus-target-row > .tf-move-btn,
+  #unit-tooltip-anchor .tf-move-btn,
+  #meters-window .tf-move-btn {
     position: absolute;
     top: -10px;
     right: -10px;
@@ -2023,9 +2025,10 @@
   #paladin-devotion-frame .tf-move-btn:focus-visible,
   #petbar .tf-move-btn:focus-visible,
   #proc-overlay .tf-move-btn:focus-visible,
-  #meters-window .tf-move-btn:focus-visible,
   .hud-frame-group > .tf-move-btn:focus-visible,
-  .focus-target-row > .tf-move-btn:focus-visible {
+  .focus-target-row > .tf-move-btn:focus-visible,
+  #unit-tooltip-anchor .tf-move-btn:focus-visible,
+  #meters-window .tf-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
   }
@@ -2195,6 +2198,18 @@
     display: block !important;
     opacity: 0.55;
     min-height: 48px;
+  }
+  /* The tooltip seat is invisible and click-through in play (visibility, so
+     its box stays measurable), so editing hands both back and dims it like
+     the other placeholders; its name chip says what it seats. Its stock box
+     overlaps the button rail's lower corner (the card always did), so it
+     stacks one above the rail (z-index 19) to keep its corner move button
+     and body grabbable there; the #tooltip card itself stays above both. */
+  body.interface-unlocked #unit-tooltip-anchor.tf-unlocked {
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 0.55;
+    z-index: 20;
   }
   /* A resizable unit frame needs a positioned host for its grip; the three
      already carry one (.unitframe and #party-frames are absolute, #player-frame
@@ -8426,6 +8441,23 @@
     padding: 8px 10px;
     font-size: 12px;
     line-height: 1.5;
+  }
+  /* The mouseover unit tooltip's movable seat (interface_unlock_core.ts
+     'unitTooltip', read by unit_tooltip_seat.ts): an invisible, click-through
+     box whose stock spot is the classic bottom-right slot, MOB_TOOLTIP_MARGIN_RIGHT
+     and MOB_TOOLTIP_MARGIN_BOTTOM in tooltip_clamp_core.ts (the pair is pinned
+     equal by tests/unit_tooltip_seat.test.ts), so an unmoved seat paints the
+     card exactly where it always sat. visibility, not display, hides it: the
+     paint path measures its box. The unlock mode shows it as a dimmed
+     placeholder (below, beside the other force-shown frames). */
+  #unit-tooltip-anchor {
+    position: absolute;
+    right: 56px;
+    bottom: 60px;
+    width: 220px;
+    height: 72px;
+    visibility: hidden;
+    pointer-events: none;
   }
   /* Named per consumer rather than left unscoped: the touch menu and
      consumable captions reuse the tooltip's title metrics, but an unscoped

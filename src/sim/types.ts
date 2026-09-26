@@ -4901,6 +4901,13 @@ export interface Entity extends ClientMirroredEntityFields {
   // the sim border setter (src/sim/deeds.ts setActiveBorder) and player spawn
   // from persisted state; rides the identity wire only when non-null.
   border?: string | null;
+  // The chosen talent specialization (a spec id such as 'holy', never display
+  // text), null for a character with no spec yet and for every mob/npc.
+  // Render-only mirror of PlayerMeta.talentMods.spec, stamped by
+  // recalcPlayerStats beside the other worn-state mirrors so every spec,
+  // respec, loadout, level, and load path refreshes it. The sim never reads
+  // it; it rides the identity wire for the mouseover tooltip's spec line.
+  specId?: string | null;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z

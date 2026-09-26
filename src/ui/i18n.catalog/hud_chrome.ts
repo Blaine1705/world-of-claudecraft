@@ -5193,6 +5193,16 @@ export const hudChromeStrings = {
     elite: 'Elite',
     boss: 'Boss',
   },
+  // The player mouseover tooltip (player_tooltip_view.ts): the classic
+  // <Guild> line and the chosen specialization with its role, both slots
+  // resolved client-side (the spec from its talent name, the role from the
+  // shared talent role labels). Neither is wordy (no four-letter lowercase run
+  // outside the tokens), so no M16 fills are needed; a locale that brackets or
+  // orders them differently owns its punctuation in the overlay.
+  playerTooltip: {
+    guild: '<{guild}>',
+    specRole: '{spec} ({role})',
+  },
   // Movable target frame: the small corner toggle that unlocks the frame for
   // dragging and locks it back in place (target_frame_pos.ts + hud.ts wiring).
   // The one button swaps its accessible name with its pressed state; both values
@@ -5348,6 +5358,10 @@ export const hudChromeStrings = {
       delveTracker: 'Delve Tracker',
       riftTracker: 'Rift Tracker',
       swingBarOffhand: 'Off Hand',
+      // The mouseover unit tooltip's movable seat (#unit-tooltip-anchor), an
+      // invisible box in play, so its chip is what names the placeholder.
+      // Wordy (M16): the five non-Latin fills land in this same change.
+      unitTooltip: 'Tooltip',
     },
     // The frames settings dropdown beside the floating Lock Interface button:
     // a show/hide sub-menu plus the frame-behavior toggles that used to live

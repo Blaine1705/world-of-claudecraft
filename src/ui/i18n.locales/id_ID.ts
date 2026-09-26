@@ -17461,4 +17461,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     'Mewarnai ulang bahaya lantai Nythraxis (cincin hantaman Erupsi Kubur, genangan Api Kubur dan Api Jiwa, garis Api Kubur, serta tanda Sobekan Jiwa) ke palet ramah buta warna dengan rona dan kecerahan yang berbeda, sehingga lingkaran yang bertumpuk tetap memiliki tepi yang terlihat. Ukuran, penghitung waktu, dan posisi tidak berubah.',
   'hud.options.colorblindMode': 'Mode Buta Warna',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

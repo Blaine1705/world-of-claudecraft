@@ -3818,6 +3818,10 @@ export const pl_PL: EnTranslations = {
       "elite": "Elita",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Przesuń ramkę celu",
       "lock": "Zablokuj ramkę celu"
@@ -3900,7 +3904,8 @@ export const pl_PL: EnTranslations = {
         "deedTracker": "Śledzenie czynów",
         "delveTracker": "Śledzenie wypraw",
         "riftTracker": "Śledzenie szczeliny",
-        "swingBarOffhand": "Lewa ręka"
+        "swingBarOffhand": "Lewa ręka",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Ustawienia ramek",
       "framesMenuTitle": "Pokazuj lub ukrywaj poszczególne ramki. Odznaczona ramka pozostaje ukryta, dopóki jej ponownie nie zaznaczysz albo nie przywrócisz ustawień domyślnych.",
@@ -6811,6 +6816,7 @@ export const pl_PL: EnTranslations = {
       "framesGovernedAuraTracks": "Edycja ramek odblokowuje także sześć dobrowolnych ścieżek aur, gdy włączysz je na karcie Walka tych samych opcji interfejsu: ścieżkę Moje premie, ścieżkę defensywnych czasów odnowienia, ścieżkę Moich tarcz, ścieżkę ofensywnych czasów odnowienia, ścieżkę Ruchu i ukrycia oraz ścieżkę Moich premii na sojusznikach. Każda ścieżka jest domyślnie wyłączona i każda nosi własną etykietę, gdy zostanie odblokowana.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Edytuj ramki rozluźnia także panel Dialogu, który zawiera wypowiedź NPC, gdy ten NPC jest poza twoim polem widzenia; nosi chip z nazwą, gdy jest luzem.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Paski, liczniki i tekst walki",
       "barsBody": "Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.",
       "aurasTitle": "Wzmocnienia i osłabienia",

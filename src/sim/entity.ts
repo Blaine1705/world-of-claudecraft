@@ -253,6 +253,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     guildTier: 0,
     title: null,
     border: null,
+    specId: null,
   };
 }
 
@@ -637,6 +638,9 @@ export function recalcPlayerStats(
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the
   // identity wire (terse `eq`) for the inspect-another-player window.
   e.equippedItems = { ...equipment };
+  // Render-only mirror of the chosen spec (Entity.specId): every path that
+  // re-bakes talent mods re-runs this stats pass, so the mirror cannot go stale.
+  e.specId = mods?.spec ?? null;
   // Render-only mirror of PlayerMeta.equipmentInstance, same copy-not-alias
   // reasoning as equippedItems above. Deep-cloned via cloneItemInstancePayload
   // (not a shallow spread) since a payload's own rolled.stats map must not be

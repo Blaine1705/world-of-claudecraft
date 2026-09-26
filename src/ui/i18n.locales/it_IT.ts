@@ -17597,4 +17597,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     "Ricolora i pericoli a terra di Nythraxis (l'anello d'impatto di Eruzione tombale, le pozze di Fiamma tombale e Fuoco dell'anima, la linea di Fuoco tombale e i marchi di Lacerazione dell'anima) con una tavolozza adatta al daltonismo, con tonalità e luminosità distinte, così i cerchi sovrapposti mantengono bordi leggibili. Dimensioni, timer e posizioni non cambiano.",
   'hud.options.colorblindMode': 'Modalità daltonismo',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

@@ -17474,4 +17474,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     'Geeft de vloergevaren van Nythraxis (de inslagring van Grafuitbarsting, de poelen van Grafvlam en Zielenvuur, de lijn van Grafvuur en de tekens van Zielenscheur) een kleurenblindvriendelijk palet met duidelijke tinten en helderheden, zodat overlappende cirkels zichtbare randen houden. Afmetingen, timers en posities veranderen niet.',
   'hud.options.colorblindMode': 'Kleurenblindmodus',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

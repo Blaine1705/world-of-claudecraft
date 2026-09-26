@@ -17463,4 +17463,8 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hud.meters.reset': 'Reiniciar medidores',
   'hud.meters.resetHint': 'Reiniciar datos de combate',
   'hud.meters.groupTotal': 'Total: {total} ({rate})',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

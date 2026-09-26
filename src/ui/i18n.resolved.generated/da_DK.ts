@@ -3818,6 +3818,10 @@ export const da_DK: EnTranslations = {
       "elite": "Elite",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Flyt målrammen",
       "lock": "Lås målrammen"
@@ -3900,7 +3904,8 @@ export const da_DK: EnTranslations = {
         "deedTracker": "Bedriftssporer",
         "delveTracker": "Delve-sporer",
         "riftTracker": "Riftsporer",
-        "swingBarOffhand": "Venstre hånd"
+        "swingBarOffhand": "Venstre hånd",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Rammeindstillinger",
       "framesMenuTitle": "Vis eller skjul enkelte rammer. En fravalgt ramme forbliver skjult, indtil du vælger den igen eller nulstiller til standard.",
@@ -6811,6 +6816,7 @@ export const da_DK: EnTranslations = {
       "framesGovernedAuraTracks": "Rediger rammer løsner også de seks valgfri aurabaner, når du har slået dem til fra Kamp-fanen i de samme grænsefladeindstillinger: Mine fordele-banen, Defensive nedkølinger-banen, Mine skjolde-banen, Offensive nedkølinger-banen, Bevægelse og stealth-banen samt Mine fordele på allierede-banen. Alle baner er slået fra som standard, og hver har sin egen navnebrik, mens den er løsnet.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Edit Frames løsner også dialogpanelet, som bærer en NPC's talte linje, mens den NPC er ude af dit syn; den bærer sin navnechip, mens den er løs.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Bjælker, timere og kamptekst",
       "barsBody": "Din castbjælke dukker op midt på skærmen, lige over dine handlingsbjælker, når du kaster eller kanaliserer, og viser besværgelsens navn og den resterende tid. Dit mål får sin egen castbjælke på sin ramme, så du kan se, hvad der er på vej, og svare på det.\n\nEn tynd svingbjælke sidder under din castbjælke og fyldes op mellem dine våbensving, så en nærkamps- eller afstandsangriber kan se, hvornår det næste automatiske slag lander.\n\nDin erfaringsbjælke løber i fuld bredde under dine handlingsbjælker, inddelt i segmenter, med en lysere strækning, der viser den udhvilede erfaring, du har opsparet.\n\nSvøm under vandet, og en blå åndedrætsbjælke dukker op øverst på skærmen. Den tømmes, mens dit hoved er under, blinker rødt, når den løber ud, og du begynder at drukne, og fyldes hurtigt op igen, i det øjeblik du dukker op. Mellemrum svømmer dig op, og tasten Svøm ned, Ctrl som standard, tager dig dybere.\n\nSkade og helbredelse svæver op over det, de rammer, som små tal, så du kan læse en kamp uden at læse tekst. Fanen Kamp i dit chatvindue holder den fulde skriftlige log.",
       "aurasTitle": "Forstærkninger og svækkelser",

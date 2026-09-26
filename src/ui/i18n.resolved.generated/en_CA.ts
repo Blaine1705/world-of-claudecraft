@@ -3818,6 +3818,10 @@ export const en_CA: EnTranslations = {
       "elite": "Elite",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Move target frame",
       "lock": "Lock target frame"
@@ -3900,7 +3904,8 @@ export const en_CA: EnTranslations = {
         "deedTracker": "Deed Tracker",
         "delveTracker": "Delve Tracker",
         "riftTracker": "Rift Tracker",
-        "swingBarOffhand": "Off Hand"
+        "swingBarOffhand": "Off Hand",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Frames Settings",
       "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",
@@ -6811,6 +6816,7 @@ export const en_CA: EnTranslations = {
       "framesGovernedAuraTracks": "Edit Frames also loosens the six opt-in aura tracks once you have switched them on from the Combat tab of the same Interface options: the My Buffs track, the Defensive Cooldowns track, the My Shields track, the Offensive Cooldowns track, the Movement and Stealth track, and the My Buffs on Allies track. Every track is off by default, and each wears its own name chip while it is loose.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Bars, timers, and combat text",
       "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands. Fighting with a weapon in each hand adds a second bar right below it, filling on its own separate clock, so you can time your abilities between BOTH swings instead of just one.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
       "aurasTitle": "Buffs and debuffs",

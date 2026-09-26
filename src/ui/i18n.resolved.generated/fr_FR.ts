@@ -3818,6 +3818,10 @@ export const fr_FR: EnTranslations = {
       "elite": "Élite",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Déplacer le cadre de la cible",
       "lock": "Verrouiller le cadre de la cible"
@@ -3900,7 +3904,8 @@ export const fr_FR: EnTranslations = {
         "deedTracker": "Suivi des hauts faits",
         "delveTracker": "Suivi des explorations",
         "riftTracker": "Suivi des failles",
-        "swingBarOffhand": "Main gauche"
+        "swingBarOffhand": "Main gauche",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Paramètres des cadres",
       "framesMenuTitle": "Affiche ou masque chaque cadre individuellement. Un cadre décoché reste masqué jusqu'à ce que vous le recochiez ou que vous rétablissiez les valeurs par défaut.",
@@ -6811,6 +6816,7 @@ export const fr_FR: EnTranslations = {
       "framesGovernedAuraTracks": "Modifier les cadres déverrouille aussi les six pistes d’auras facultatives après leur activation dans l’onglet Combat des mêmes options d’interface : Mes améliorations, Temps de recharge défensifs, Mes boucliers, Temps de recharge offensifs, Déplacement et furtivité, et Mes améliorations sur les alliés. Chaque piste est désactivée par défaut et porte sa propre étiquette lorsqu’elle est déverrouillée.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Modifier les cadres desserre également le panneau de dialogue, qui diffuse la ligne parlée d'un PNJ lorsque ce PNJ est hors de votre vue; il porte sa puce nominative lorsqu'il est en vrac.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Barres, minuteries et texte de combat",
       "barsBody": "Votre barre d'incantation apparaît au milieu de l'écran, juste au-dessus de vos barres d'action, chaque fois que vous incantez ou canalisez, et affiche le nom du sort ainsi que le temps restant. Votre cible dispose de sa propre barre d'incantation sur son cadre, pour que vous puissiez voir ce qui arrive et y répondre.\n\nUne fine barre de cadence se trouve sous votre barre d'incantation et se remplit entre vos coups d'arme, pour qu'un attaquant au corps à corps ou à distance puisse voir quand le prochain coup automatique arrivera.\n\nVotre barre d'expérience s'étend sur toute la largeur sous vos barres d'action, graduée en segments, avec une portion plus claire montrant l'expérience reposée que vous avez accumulée.\n\nNagez sous l'eau et une barre de souffle bleue apparaît en haut de l'écran. Elle se vide tant que votre tête est immergée, clignote en rouge une fois épuisée quand vous commencez à vous noyer, puis se remplit rapidement dès que vous refaites surface. Espace vous fait remonter, et la touche Nager vers le bas, Ctrl par défaut, vous emmène plus profond.\n\nLes dégâts et les soins flottent au-dessus de ce qu'ils ont touché sous forme de petits nombres, pour que vous puissiez lire un combat sans lire de texte. L'onglet Combat de votre fenêtre de discussion conserve le relevé écrit complet.",
       "aurasTitle": "Améliorations et affaiblissements",

@@ -17158,4 +17158,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     'Přebarví podlahové hrozby Nythraxisu (zásahový kruh Hrobové erupce, kaluže Hrobového plamene a Duševního ohně, linii Hrobového ohně a značky Rozervání duše) na paletu vhodnou pro barvoslepé, s odlišnými odstíny a jasem, aby překrývající se kruhy zachovaly viditelné okraje. Velikosti, časovače ani pozice se nemění.',
   'hud.options.colorblindMode': 'Režim pro barvoslepé',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

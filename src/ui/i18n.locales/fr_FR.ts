@@ -17675,4 +17675,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     "Recolore les dangers au sol de Nythraxis (l'anneau d'impact d'Eruption funéraire, les flaques de Flamme funéraire et de Feu d'âme, la ligne de Feu funéraire et les marques de Déchirure d'âme) avec une palette adaptée aux daltoniens, aux teintes et luminosités distinctes, afin que les cercles superposés gardent des bords visibles. Les tailles, minuteries et positions ne changent pas.",
   'hud.options.colorblindMode': 'Mode daltonien',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

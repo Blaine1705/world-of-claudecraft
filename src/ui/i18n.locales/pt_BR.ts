@@ -17466,4 +17466,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     'Recolore os perigos no solo de Nythraxis (o anel de impacto da Erupção Tumular, as poças de Chama Tumular e Fogo de Alma, a linha de Fogo Tumular e as marcas de Rasgo da Alma) com uma paleta adequada para daltonismo, com tons e brilhos distintos, para que círculos sobrepostos mantenham bordas visíveis. Tamanhos, temporizadores e posições não mudam.',
   'hud.options.colorblindMode': 'Modo para daltonismo',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

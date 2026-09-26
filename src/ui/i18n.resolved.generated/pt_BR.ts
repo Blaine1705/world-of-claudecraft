@@ -3818,6 +3818,10 @@ export const pt_BR: EnTranslations = {
       "elite": "Elite",
       "boss": "Chefe"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Mover quadro do alvo",
       "lock": "Travar quadro do alvo"
@@ -3900,7 +3904,8 @@ export const pt_BR: EnTranslations = {
         "deedTracker": "Rastreador de feitos",
         "delveTracker": "Rastreador de explorações",
         "riftTracker": "Rastreador de fendas",
-        "swingBarOffhand": "Mão secundária"
+        "swingBarOffhand": "Mão secundária",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Configurações de Quadros",
       "framesMenuTitle": "Mostre ou oculte quadros individuais. Um quadro desmarcado permanece oculto até que você o marque novamente ou redefina para o padrão.",
@@ -6811,6 +6816,7 @@ export const pt_BR: EnTranslations = {
       "framesGovernedAuraTracks": "Editar Quadros também libera as seis trilhas de aura opcionais depois que você as ativa na aba Combate das mesmas opções de Interface: trilha Meus Benefícios, trilha Recargas Defensivas, trilha Meus Escudos, trilha Recargas Ofensivas, trilha Movimento e Furtividade e trilha Meus Benefícios nos Aliados. Todas as trilhas começam desligadas, e cada uma usa seu próprio chip de nome quando está liberada.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Barras, temporizadores e texto de combate",
       "barsBody": "Sua barra de conjuração aparece no meio da tela, logo acima das suas barras de ação, sempre que você conjura ou canaliza, e mostra o nome do feitiço e o tempo restante. Seu alvo tem sua própria barra de conjuração no quadro dele, para que você veja o que está por vir e possa reagir.\n\nUma fina barra de ataque fica sob sua barra de conjuração e se enche entre os golpes da sua arma, para que um combatente corpo a corpo ou à distância veja quando o próximo acerto automático vai acontecer.\n\nSua barra de experiência ocupa toda a largura sob suas barras de ação, dividida em segmentos, com um trecho mais claro mostrando a experiência de descanso que você acumulou.\n\nNade debaixo d'água e uma barra azul de fôlego aparece no topo da tela. Ela se esvazia enquanto sua cabeça estiver submersa, pisca em vermelho quando se esgota e você começa a se afogar, e se enche rapidamente assim que você emerge à superfície. Espaço faz você nadar para cima, e a tecla Nadar para Baixo, Ctrl por padrão, leva você mais fundo.\n\nO dano e a cura sobem, em forma de pequenos números, sobre quem os recebeu, para que você acompanhe uma luta sem precisar ler texto. A aba Combate na sua janela de chat mantém o registro escrito completo.",
       "aurasTitle": "Benefícios e penalidades",

@@ -3818,6 +3818,10 @@ export const vi_VN: EnTranslations = {
       "elite": "Tinh Anh",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Di chuyển khung mục tiêu",
       "lock": "Khóa khung mục tiêu"
@@ -3900,7 +3904,8 @@ export const vi_VN: EnTranslations = {
         "deedTracker": "Theo Dõi Chiến Công",
         "delveTracker": "Theo Dõi Delve",
         "riftTracker": "Theo Dõi Khe Nứt",
-        "swingBarOffhand": "Tay Phụ"
+        "swingBarOffhand": "Tay Phụ",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Cài Đặt Khung",
       "framesMenuTitle": "Hiện hoặc ẩn từng khung riêng lẻ. Một khung chưa được đánh dấu sẽ vẫn ẩn cho đến khi bạn đánh dấu lại hoặc đặt lại về mặc định.",
@@ -6811,6 +6816,7 @@ export const vi_VN: EnTranslations = {
       "framesGovernedAuraTracks": "Chỉnh Khung cũng mở khóa sáu thanh hào quang tùy chọn sau khi bạn bật chúng trong thẻ Chiến Đấu của cùng cửa sổ tùy chọn Giao Diện: Bùa Lợi Của Tôi, Hồi Chiêu Phòng Thủ, Lá Chắn Của Tôi, Hồi Chiêu Tấn Công, Di Chuyển Và Tàng Hình, và Bùa Lợi Của Tôi Trên Đồng Minh. Mặc định mọi thanh đều tắt; mỗi thanh hiện nhãn tên riêng khi được mở khóa.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
       "aurasTitle": "Buff và debuff",

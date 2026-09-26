@@ -17262,4 +17262,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     'Nythraxis zemin tehlikelerini (Mezar Patlaması vuruş halkası, Mezar Alevi ve Ruh Ateşi havuzları, Mezar Ateşi çizgisi ve Ruh Yırtığı işaretleri) renk körlüğüne uygun, farklı tonlara ve parlaklıklara sahip bir palete yeniden boyar; böylece üst üste binen dairelerin kenarları görünür kalır. Boyutlar, zamanlayıcılar ve konumlar değişmez.',
   'hud.options.colorblindMode': 'Renk Körlüğü Modu',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

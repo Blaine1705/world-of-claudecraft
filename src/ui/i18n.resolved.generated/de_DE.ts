@@ -3818,6 +3818,10 @@ export const de_DE: EnTranslations = {
       "elite": "Elite",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Zielfenster verschieben",
       "lock": "Zielfenster sperren"
@@ -3900,7 +3904,8 @@ export const de_DE: EnTranslations = {
         "deedTracker": "Tatentracker",
         "delveTracker": "Tiefentracker",
         "riftTracker": "Riss-Tracker",
-        "swingBarOffhand": "Nebenhand"
+        "swingBarOffhand": "Nebenhand",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Rahmeneinstellungen",
       "framesMenuTitle": "Einzelne Rahmen ein- oder ausblenden. Ein deaktivierter Rahmen bleibt verborgen, bis du ihn wieder aktivierst oder auf die Standardeinstellungen zurücksetzt.",
@@ -6811,6 +6816,7 @@ export const de_DE: EnTranslations = {
       "framesGovernedAuraTracks": "Rahmen bearbeiten löst außerdem die sechs optionalen Aurenleisten, sobald du sie im Reiter Kampf der Interfaceoptionen einschaltest: Meine Stärkungen, defensive Abklingzeiten, meine Schilde, offensive Abklingzeiten, Bewegung und Verstohlenheit sowie Meine Stärkungen auf Verbündeten. Jede Leiste ist zunächst aus und trägt beim Lösen ihren eigenen Namenschip.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Durch Bearbeiten von Frames wird auch das Dialogfenster aufgelockert, das die gesprochene Zeile eines NPCs enthält, während sich dieser NPC außerhalb Ihrer Sicht befindet. Es trägt seinen Namenschip, solange es locker ist.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Leisten, Timer und Kampftext",
       "barsBody": "Deine Zauberleiste erscheint in der Mitte des Bildschirms, direkt über deinen Aktionsleisten, sobald du zauberst oder kanalisierst, und zeigt den Namen des Zaubers sowie die verbleibende Zeit. Dein Ziel bekommt eine eigene Zauberleiste auf seinem Fenster, sodass du siehst, was kommt, und darauf reagieren kannst.\n\nEine dünne Schwungleiste liegt unter deiner Zauberleiste und füllt sich zwischen deinen Waffenschwüngen, sodass ein Nah- oder Fernkämpfer sehen kann, wann der nächste automatische Treffer landet.\n\nDeine Erfahrungsleiste läuft über die volle Breite unter deinen Aktionsleisten, in Segmente unterteilt, mit einem helleren Abschnitt, der die ausgeruhte Erfahrung zeigt, die du angesammelt hast.\n\nSchwimme unter Wasser, und am oberen Bildschirmrand erscheint eine blaue Atemleiste. Sie leert sich, während dein Kopf unter Wasser ist, blinkt rot auf, sobald sie aufgebraucht ist und du zu ertrinken beginnst, und füllt sich schnell wieder, sobald du auftauchst. Die Leertaste lässt dich nach oben schwimmen, und die Taste zum Abtauchen, standardmäßig Strg, bringt dich tiefer.\n\nSchaden und Heilung schweben als kleine Zahlen über dem auf, was sie getroffen haben, sodass du einen Kampf lesen kannst, ohne Text lesen zu müssen. Der Kampf-Reiter in deinem Chatfenster führt das vollständige schriftliche Protokoll.",
       "aurasTitle": "Stärkungs- und Schwächungszauber",

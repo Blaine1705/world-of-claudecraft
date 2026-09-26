@@ -3818,6 +3818,10 @@ export const it_IT: EnTranslations = {
       "elite": "Élite",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Sposta il riquadro del bersaglio",
       "lock": "Blocca il riquadro del bersaglio"
@@ -3900,7 +3904,8 @@ export const it_IT: EnTranslations = {
         "deedTracker": "Tracciatore imprese",
         "delveTracker": "Tracciatore esplorazioni",
         "riftTracker": "Tracciatore varchi",
-        "swingBarOffhand": "Mano secondaria"
+        "swingBarOffhand": "Mano secondaria",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Impostazioni riquadri",
       "framesMenuTitle": "Mostra o nascondi i singoli riquadri. Un riquadro deselezionato resta nascosto finché non lo riselezioni o ripristini i valori predefiniti.",
@@ -6811,6 +6816,7 @@ export const it_IT: EnTranslations = {
       "framesGovernedAuraTracks": "Modifica Strutture allenta anche le sei tracce aura opzionali dopo che le hai attivate dalla scheda Combattimento delle stesse opzioni Interfaccia: la traccia I miei benefici, la traccia Recuperi difensivi, la traccia I miei scudi, la traccia Recuperi offensivi, la traccia Movimento e furtività e la traccia I miei benefici sugli alleati. Ogni traccia è disattivata per impostazione predefinita e, quando è allentata, porta il proprio chip con il nome.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Barre, timer e testo di combattimento",
       "barsBody": "La tua barra di lancio appare al centro dello schermo, appena sopra le barre delle azioni, ogni volta che lanci o canalizzi un incantesimo, e riporta il nome dell'incantesimo e il tempo rimanente. Anche il tuo bersaglio ha una propria barra di lancio sul suo riquadro, così puoi vedere cosa sta arrivando e rispondere.\n\nUna sottile barra dell'attacco sta sotto la tua barra di lancio e si riempie tra un colpo d'arma e l'altro, così chi attacca in mischia o a distanza può vedere quando arriverà il prossimo colpo automatico.\n\nLa tua barra dell'esperienza occupa tutta la larghezza sotto le barre delle azioni, suddivisa in segmenti, con un tratto più chiaro che mostra l'esperienza da riposo che hai accumulato.\n\nNuota sott'acqua e in cima allo schermo compare una barra del Fiato blu. Si consuma finché hai la testa sott'acqua, lampeggia di rosso quando si esaurisce e inizi ad annegare, e si riempie di nuovo in fretta non appena riemergi. Barra spaziatrice ti fa nuotare verso l'alto, e il tasto Nuota Verso il Basso, Ctrl di default, ti porta più in profondità.\n\nI danni e le cure salgono fluttuando sopra ciò che hanno colpito come piccoli numeri, così puoi leggere uno scontro senza leggere del testo. La scheda Combattimento nella tua chat conserva il resoconto scritto completo.",
       "aurasTitle": "Potenziamenti e indebolimenti",

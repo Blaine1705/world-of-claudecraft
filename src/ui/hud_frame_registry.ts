@@ -41,7 +41,7 @@ export function registerHudFrames(deps: {
       draggingBodyClass: 'hud-frame-dragging',
       fallbackSize: spec.fallbackSize,
       isMobileLayout: deps.isMobileLayout,
-      scalable: true,
+      scalable: spec.scalable ?? true,
       resizeMode: dimensions ? 'dimensions' : spec.resizeMode,
       dimensions,
       moveHandle: spec.id === 'damageMeter' ? '#meters-window' : undefined,

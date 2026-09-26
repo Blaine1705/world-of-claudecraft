@@ -17251,4 +17251,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     'Färgar om Nythraxis golvfaror (träffringen från Gravutbrott, pölarna av Gravflamma och Själseld, Graveldslinjen och Själsklyvningsmärkena) till en färgblindvänlig palett med tydliga nyanser och ljusstyrkor, så att överlappande cirklar behåller synliga kanter. Storlekar, timers och positioner ändras inte.',
   'hud.options.colorblindMode': 'Färgblindläge',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

@@ -3818,6 +3818,10 @@ export const nl_NL: EnTranslations = {
       "elite": "Elite",
       "boss": "Baas"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Doelwitframe verplaatsen",
       "lock": "Doelwitframe vergrendelen"
@@ -3900,7 +3904,8 @@ export const nl_NL: EnTranslations = {
         "deedTracker": "Daadvolger",
         "delveTracker": "Delve-volger",
         "riftTracker": "Riftvolger",
-        "swingBarOffhand": "Offhand"
+        "swingBarOffhand": "Offhand",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Frame-instellingen",
       "framesMenuTitle": "Toon of verberg afzonderlijke frames. Een uitgevinkt frame blijft verborgen tot je het weer aanvinkt of terugzet naar de standaardinstellingen.",
@@ -6811,6 +6816,7 @@ export const nl_NL: EnTranslations = {
       "framesGovernedAuraTracks": "Frames bewerken maakt ook de zes optionele aurastromen los zodra je ze hebt ingeschakeld op het tabblad Gevecht van dezelfde Interface-opties: de stroom Mijn buffs, de stroom Verdedigingsafkoelingen, de stroom Mijn schilden, de stroom Aanvalsafkoelingen, de stroom Beweging en sluipen, en de stroom Mijn buffs op bondgenoten. Elke stroom staat standaard uit en draagt zijn eigen naamlabel zolang hij losstaat.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Balken, timers en gevechtstekst",
       "barsBody": "Je spreukbalk verschijnt in het midden van het scherm, net boven je actiebalken, telkens wanneer je een spreuk uitspreekt of kanaliseert, en toont de naam van de spreuk en de resterende tijd. Je doelwit krijgt een eigen spreukbalk op zijn frame, zodat je kunt zien wat eraan komt en erop kunt reageren.\n\nEen dunne wapenslagbalk zit onder je spreukbalk en vult zich tussen je wapenslagen, zodat een nabij- of afstandsaanvaller kan zien wanneer de volgende automatische treffer landt.\n\nJe ervaringsbalk loopt over de volle breedte onder je actiebalken, verdeeld in segmenten, met een lichter stuk dat de uitgeruste ervaring toont die je hebt opgespaard.\n\nZwem onder water en een blauwe adembalk verschijnt bovenaan het scherm. Hij loopt leeg terwijl je hoofd onder water is, knippert rood zodra hij leeg is en je begint te verdrinken, en vult zich snel weer zodra je boven water komt. Spatie zwemt je omhoog, en de toets Omlaag Zwemmen, standaard Ctrl, brengt je dieper.\n\nSchade en genezing zweven als kleine getallen omhoog boven wat ze raken, zodat je een gevecht kunt lezen zonder tekst te lezen. Het tabblad Gevecht in je chatbox houdt het volledige geschreven verslag bij.",
       "aurasTitle": "Buffs en debuffs",

@@ -62,7 +62,7 @@ export const ru_RU: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Подземелье",
-      "town": "Town",
+      "town": "Город",
       "difficulty": "Сложность",
       "name": "Имя",
       "spec": "Специализация",
@@ -162,8 +162,8 @@ export const ru_RU: EnTranslations = {
         "description": "Переместиться в точные координаты мира."
       },
       "town": {
-        "label": "Town hub",
-        "description": "Teleport to a town hub by name."
+        "label": "Городской центр",
+        "description": "Телепортируйтесь в центр города по имени."
       },
       "dungeon": {
         "label": "Войти в подземелье",
@@ -390,15 +390,15 @@ export const ru_RU: EnTranslations = {
       "target": "Target focus {slot}"
     },
     "professionTrainers": {
-      "blacksmithing": "Blacksmithing Trainer",
-      "cooking": "Cooking Trainer",
-      "tailoring": "Tailoring Trainer",
-      "engineering": "Engineering Trainer",
-      "leatherworking": "Leatherworking Trainer",
-      "alchemy": "Alchemy Trainer",
-      "farming": "Farming Trainer",
-      "mining": "Mining Trainer",
-      "hobby": "Hobby Trainer",
+      "blacksmithing": "Учитель кузнечного дела",
+      "cooking": "Учитель кулинарии",
+      "tailoring": "Учитель портняжного дела",
+      "engineering": "Учитель инженерного дела",
+      "leatherworking": "Учитель кожевничества",
+      "alchemy": "Учитель алхимии",
+      "farming": "Учитель земледелия",
+      "mining": "Учитель горного дела",
+      "hobby": "Учитель увлечений",
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Этот выбор материалов больше недоступен.",
@@ -423,41 +423,41 @@ export const ru_RU: EnTranslations = {
       "banner": "Наблюдение за {name}"
     },
     "readyCheck": {
-      "title": "Ready Check",
-      "close": "Close",
+      "title": "Проверка готовности",
+      "close": "Закрыть",
       "prompt": "{name} начал проверку готовности. Вы готовы?",
       "ready": "Готов",
       "notReady": "Не готов",
-      "status": "Ready: {ready}/{total}",
-      "waiting": "Waiting for responses...",
-      "memberReady": "{name} is ready.",
-      "memberNotReady": "{name} is not ready.",
-      "memberPending": "{name} has not responded yet.",
+      "status": "Готовы: {ready}/{total}",
+      "waiting": "Ожидание ответов...",
+      "memberReady": "{name} готов.",
+      "memberNotReady": "{name} не готов.",
+      "memberPending": "{name} ещё не ответил.",
       "result": "Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа.",
       "notInPartyError": "Чтобы начать проверку готовности, вы должны состоять в группе.",
       "inProgressError": "Проверка готовности уже идёт."
     },
     "pullTimer": {
-      "start": "Pull in {seconds} sec!",
-      "cancel": "Pull cancelled.",
+      "start": "Вытяните {seconds} сек!",
+      "cancel": "Таймер начала боя отменён.",
       "countdown": "{seconds}",
-      "pull": "PULL!"
+      "pull": "ТЯНУТЬ!"
     },
     "death": {
       "resurrectAtCorpse": "Воскреснуть у тела",
       "resurrectAtHealer": "Целитель душ (болезнь воскрешения)",
-      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
+      "ghostHint": "Бегите к месту своей гибели или поговорите с Целителем душ, чтобы воскреснуть",
       "spiritHealerAlive": "Целитель душ оберегает мёртвых. Вы всё ещё среди живых.",
-      "keeperTalkTitle": "The Pale Keeper",
-      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
-      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
-      "keeperTalkAccept": "Revive Me",
-      "keeperTalkLeave": "Leave",
+      "keeperTalkTitle": "Целитель душ",
+      "keeperTalkBody": "Я могу поднять вас прямо здесь, но за это придётся платить: болезнь воскрешения снижает все ваши характеристики на 75%, и чем выше уровень, тем дольше она длится, до 10 минут. Если ваш дух вернётся к месту гибели, вы воскреснете без всякого наказания.",
+      "keeperTalkSparedBody": "Я могу поднять вас прямо здесь. Обычно за это платят болезнью воскрешения, которая на время ослабляет всё, что вы есть, но вы недавно в этом мире, поэтому я избавлю вас от неё. Если ваш дух вернётся к месту гибели, вы в любом случае воскреснете без всякого наказания.",
+      "keeperTalkAccept": "Воскресить",
+      "keeperTalkLeave": "Уйти",
       "healerConfirmTitle": "Принять болезнь воскрешения?",
       "healerConfirmBody": "Целитель душ воскресит вас на месте, но болезнь воскрешения снизит все ваши характеристики на 75%, на высоких уровнях до 10 минут. Если дух дойдёт до вашего тела, воскрешение будет без штрафа.",
-      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
-      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
-      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
+      "keeperConfirmBody": "Вы уверены? Целитель душ воскресит вас, но вы станете слабее: болезнь воскрешения снижает все ваши характеристики на 75%, пока не пройдёт, до 10 минут на высоких уровнях.",
+      "keeperConfirmSparedTitle": "Позволить Целителю душ воскресить вас?",
+      "keeperConfirmSparedBody": "Вы уверены? Целитель душ воскресит вас здесь. Ваш уровень ниже 10, поэтому на этот раз болезнь воскрешения вас не ослабит.",
       "healerConfirmAccept": "Воскресить",
       "healerConfirmCancel": "Отмена"
     },
@@ -472,7 +472,7 @@ export const ru_RU: EnTranslations = {
       "help": "Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.",
       "helpAtGraveyard": "Спасение: /unstuck запускает неподвижный отсчёт, после которого ваш дух отправится на ближайшее кладбище. Чтобы вернуться к жизни, примите Подать Хранителя у Целителя душ.",
       "helpUnstuckSickness": "Спасение: /unstuck запускает неподвижный отсчёт, после которого вас перенесёт на ближайшее кладбище и воскресит, если вы пали. Болезнь спасения останется на вас до 5 минут.",
-      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
+      "helpUnstuckWindow": "Спасение: /unstuck запускает неподвижный отсчёт, после которого вас перенесёт на ближайшее кладбище и воскресит, если вы пали. Первое использование за час бесплатно. Воспользуйтесь командой снова в течение часа после прошлого раза, и Болезнь спасения останется на вас до 5 минут.",
       "started": "Перемещение из ловушки через {seconds} сек. Движение, бой, получение урона или другое действие отменят его.",
       "countdown": "Выбраться: {seconds}",
       "completed": "Вы перемещены в ближайшее доступное безопасное место.",
@@ -480,8 +480,8 @@ export const ru_RU: EnTranslations = {
       "revivedAtGraveyard": "Вас вернули на ближайшее кладбище и воскресили. Подать Хранителя тяготит вас.",
       "movedToGraveyard": "Вас перенесли на ближайшее кладбище. Болезнь спасения тяготит вас.",
       "revivedAtGraveyardUnstuck": "Вас перенесли на ближайшее кладбище и воскресили. Болезнь спасения тяготит вас.",
-      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
-      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "movedToGraveyardFree": "Вас перенесли на ближайшее кладбище. Если снова выбраться в течение часа, на вас останется Болезнь спасения.",
+      "revivedAtGraveyardFree": "Вас перенесли на ближайшее кладбище и воскресили. Если снова выбраться в течение часа, на вас останется Болезнь спасения.",
       "cancelledMoved": "Перемещение отменено, потому что вы сдвинулись с места.",
       "cancelledDamaged": "Перемещение отменено, потому что вы получили урон.",
       "cancelledCombat": "Перемещение отменено, потому что вы вступили в бой.",
@@ -588,15 +588,15 @@ export const ru_RU: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Окно обмена закрыто.",
-      "offerQuantityHint": "You will be asked how many to offer",
-      "offerQuantityTitle": "Offer {item}",
-      "offerQuantityInput": "Quantity to offer",
-      "offerQuantityConfirm": "Offer",
-      "offerQuantityAll": "Offer all",
-      "offerRemoveTitle": "Remove {item}",
-      "offerRemoveInput": "Quantity to remove",
-      "offerRemove": "Remove",
-      "offerRemoveAll": "Remove all",
+      "offerQuantityHint": "Вас спросят, сколько предложить",
+      "offerQuantityTitle": "Предложить {item}",
+      "offerQuantityInput": "Количество для предложения",
+      "offerQuantityConfirm": "Предложить",
+      "offerQuantityAll": "Предложить всё",
+      "offerRemoveTitle": "Убрать {item}",
+      "offerRemoveInput": "Количество для удаления",
+      "offerRemove": "Убрать",
+      "offerRemoveAll": "Убрать всё",
       "woc": {
         "tabGold": "Золото",
         "tabWoc": "$WOC",
@@ -687,11 +687,11 @@ export const ru_RU: EnTranslations = {
       "mountsTitle": "Механическая конюшня",
       "mountBuyAria": "Купить: {item}",
       "mountSkinType": "Облик ездового животного",
-      "mountInspectAria": "Preview {item}",
-      "mountRideIt": "Ride it",
-      "mountOnly": "Mount only",
-      "mountBuy": "Purchase Mount Skin",
-      "mountScopeLine": "Account-wide skin. Worn by one character at a time.",
+      "mountInspectAria": "Предпросмотр: {item}",
+      "mountRideIt": "Оседлать",
+      "mountOnly": "Только ездовое животное",
+      "mountBuy": "Купить облик ездового животного",
+      "mountScopeLine": "Облик для всей учётной записи. Надет может быть только одним персонажем за раз.",
       "loading": "Загрузка магазина WOC…",
       "error": "Магазин WOC сейчас недоступен. Повторите попытку позже.",
       "balance": "Баланс Claudium",
@@ -1156,10 +1156,10 @@ export const ru_RU: EnTranslations = {
       "clearArmed": "Нажмите на ячейку, чтобы очистить её."
     },
     "tutorialGreeting": {
-      "eastbrookGuidanceNote": "Welcome to Eastbrook! Marshal Redbrook has work for you in the town square. Turn on golden guidance to find him and follow Wolves at the Door, or explore on your own. You can change this later in Options, Interface, Combat.",
-      "guidanceOn": "Turn guidance on",
-      "guidanceOff": "Turn guidance off",
-      "guidanceSetting": "Eastbrook golden guidance",
+      "eastbrookGuidanceNote": "Добро пожаловать в Истбрук! Маршал Редбрук ждёт вас с работой на городской площади. Включите золотые указатели, чтобы найти его и пройти задание «Волки у порога», или исследуйте всё самостоятельно. Позже это можно изменить в настройках: Интерфейс, Бой.",
+      "guidanceOn": "Включить указатели",
+      "guidanceOff": "Выключить указатели",
+      "guidanceSetting": "Золотые указатели Истбрука",
       "bellHomeNote": "Уже вернулся с берега? Это был паромный колокол. Его близнец висит вон там, у почтового столба Вранопочты: позвони в любой момент, и переправа отнесет тебя обратно на Берег Испытаний. А если позвонил по ошибке - ничего страшного.",
       "islandArrivalNote": "Добро пожаловать на Берег Испытаний. Страж Там ждет чуть дальше на берегу: подойдите к нему. Когда захотите уйти, позвоните в колокол рядом с моим причалом, и он в любое время перенесет вас в долину.",
       "noteClose": "Понятно"
@@ -1340,9 +1340,9 @@ export const ru_RU: EnTranslations = {
       "devTierCol": "Значок",
       "mergedPrs": "Слито PR",
       "devEmpty": "Пока нет участников в рейтинге.",
-      "podiumLabel": "Top three",
-      "unclaimed": "Unclaimed",
-      "prestigeTitle": "Prestige {rank}"
+      "podiumLabel": "Тройка лучших",
+      "unclaimed": "Свободно",
+      "prestigeTitle": "Престиж {rank}"
     },
     "pledge": {
       "open": "Принимает присяги",
@@ -1365,53 +1365,53 @@ export const ru_RU: EnTranslations = {
       "noteLabel": "Заметка на доске",
       "notePlaceholder": "Расскажите соискателям, кого ищет ваша гильдия",
       "save": "Сохранить",
-      "newPlayerFriendlyLabel": "New player friendly",
-      "newPlayerFriendlyHint": "Shown on the recruits' board at the Proving Shore signpost.",
+      "newPlayerFriendlyLabel": "Для новичков",
+      "newPlayerFriendlyHint": "Показывается на доске новичков у указателя Берега Испытаний.",
       "yourPledge": "Ваша присяга: {guild}",
       "since": "Присяга от {date}",
       "withdraw": "Отозвать присягу"
     },
     "guildRanks": {
-      "tab": "Звания",
-      "introEdit": "Назовите звания гильдии и выберите, что может каждое из них. После сохранения изменения касаются всех, у кого это звание.",
-      "introView": "Названия званий и их права. Изменять их может только глава гильдии.",
-      "colRank": "Звание",
-      "colTitle": "Название",
-      "colMembers": "Участники",
-      "colActions": "Порядок",
-      "numbered": "Звание {n}",
+      "tab": "Ranks",
+      "introEdit": "Name your guild ranks and choose what each one may do. Changes apply to everyone holding the rank once you save.",
+      "introView": "Each rank title and what it may do. Only the Guild Master can change them.",
+      "colRank": "Rank",
+      "colTitle": "Title",
+      "colMembers": "Members",
+      "colActions": "Order",
+      "numbered": "Rank {n}",
       "perm": {
-        "invite": "Приглашение",
-        "remove": "Исключение",
-        "promote": "Повышение",
-        "bank": "Банк гильдии",
-        "officerChat": "Офицерский чат",
-        "motd": "Доска",
-        "events": "Календарь"
+        "invite": "Invite",
+        "remove": "Remove",
+        "promote": "Promote",
+        "bank": "Guild Bank",
+        "officerChat": "Officer Chat",
+        "motd": "Billboard",
+        "events": "Calendar"
       },
       "permHint": {
-        "invite": "Приглашать игроков в гильдию и отвечать на их клятвы.",
-        "remove": "Исключать участников с более низким званием.",
-        "promote": "Повышать и понижать участников с более низким званием, но не выше звания на ступень ниже своего.",
-        "bank": "Класть и забирать медь и предметы в банке гильдии. Просматривать его могут все участники.",
-        "officerChat": "Читать офицерский чат и писать в нём.",
-        "motd": "Редактировать доску объявлений гильдии.",
-        "events": "Добавлять и удалять события календаря гильдии."
+        "invite": "Invite players to the guild and answer their pledges.",
+        "remove": "Remove members who hold a lower rank.",
+        "promote": "Promote and demote members who hold a lower rank, up to one rank below their own.",
+        "bank": "Deposit and withdraw copper and items in the guild bank. Every member can view it.",
+        "officerChat": "Read and speak in officer chat.",
+        "motd": "Edit the guild billboard.",
+        "events": "Add and remove guild calendar events."
       },
-      "titleLabel": "Название звания {rank}",
-      "permLabel": "{perm}: {rank}",
-      "leaderLocked": "Глава гильдии всегда обладает всеми правами.",
-      "add": "Добавить звание",
-      "save": "Сохранить звания",
-      "moveUp": "Поднять {rank}",
-      "moveDown": "Опустить {rank}",
-      "remove": "Удалить {rank}",
-      "full": "В гильдии может быть не более {max} званий.",
-      "invalidTitle": "Названия званий могут содержать буквы, цифры, пробелы, апострофы и дефисы, не более {max} символов.",
-      "removeConfirm": "Участники со званием {rank} станут {fallback}. Удалить это звание?",
-      "removeAccept": "Удалить звание",
-      "promoteTo": "Повысить {name} до {rank}",
-      "demoteTo": "Понизить {name} до {rank}"
+      "titleLabel": "Title for {rank}",
+      "permLabel": "{perm} for {rank}",
+      "leaderLocked": "The Guild Master always holds every permission.",
+      "add": "Add Rank",
+      "save": "Save Ranks",
+      "moveUp": "Move {rank} up",
+      "moveDown": "Move {rank} down",
+      "remove": "Remove {rank}",
+      "full": "A guild can have at most {max} ranks.",
+      "invalidTitle": "Rank titles use letters, numbers, spaces, apostrophes, and hyphens, up to {max} characters.",
+      "removeConfirm": "Members holding {rank} will become {fallback}. Remove this rank?",
+      "removeAccept": "Remove Rank",
+      "promoteTo": "Promote {name} to {rank}",
+      "demoteTo": "Demote {name} to {rank}"
     },
     "raidLockout": {
       "title": "Блокировки рейдов",
@@ -1434,7 +1434,7 @@ export const ru_RU: EnTranslations = {
       "runSummary": "{total} за {time}"
     },
     "talkingHead": {
-      "label": "Dialogue"
+      "label": "Диалог"
     },
     "hubLesson": {
       "target": "Сначала возьми манекен в цель.",
@@ -1709,9 +1709,9 @@ export const ru_RU: EnTranslations = {
       "targetPrev": "Цикл целей назад",
       "discord": "Discord",
       "bgFlag": "Действие с флагом",
-      "friendlyNameplates": "Toggle Friendly Nameplates",
+      "friendlyNameplates": "Таблички дружественных",
       "sheathe": "Убрать/обнажить оружие",
-      "hideInterface": "Hide Interface",
+      "hideInterface": "Скрыть интерфейс",
       "dive": "Нырнуть",
       "categoryPet": "Питомец",
       "petAttack": "Питомец: атака",
@@ -1720,22 +1720,22 @@ export const ru_RU: EnTranslations = {
       "petDefensive": "Питомец: защита",
       "petAggressive": "Питомец: агрессия",
       "targetPet": "Питомец: цель",
-      "targetSelf": "Target Self",
-      "targetParty1": "Target Party Member 1",
-      "targetParty2": "Target Party Member 2",
-      "targetParty3": "Target Party Member 3",
-      "targetParty4": "Target Party Member 4",
-      "targetParty5": "Target Party Member 5",
-      "targetParty6": "Target Party Member 6",
-      "targetParty7": "Target Party Member 7",
-      "targetParty8": "Target Party Member 8",
-      "targetParty9": "Target Party Member 9",
+      "targetSelf": "Выбрать себя",
+      "targetParty1": "Выбрать участника группы 1",
+      "targetParty2": "Выбрать участника группы 2",
+      "targetParty3": "Выбрать участника группы 3",
+      "targetParty4": "Выбрать участника группы 4",
+      "targetParty5": "Выбрать участника группы 5",
+      "targetParty6": "Выбрать участника группы 6",
+      "targetParty7": "Выбрать участника группы 7",
+      "targetParty8": "Выбрать участника группы 8",
+      "targetParty9": "Выбрать участника группы 9",
       "mount": "Сесть / Спешиться",
       "mouseHint": "Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру.",
-      "zoomIn": "Zoom Camera In",
-      "zoomOut": "Zoom Camera Out",
-      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
-      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
+      "zoomIn": "Приблизить камеру",
+      "zoomOut": "Отдалить камеру",
+      "wheelHint": "Колесо мыши тоже можно назначить: во время назначения прокрутите его вверх или вниз, при желании удерживая Ctrl, Alt или Shift. Приближение и отдаление камеры по умолчанию стоят на чистом колесе. Перенесите их на сочетание вроде Ctrl+колесо, чтобы освободить колесо для способностей.",
+      "wheelHeldRefused": "Один щелчок колеса не может управлять удерживаемым действием, например движением. Выберите для него клавишу или кнопку мыши."
     },
     "actionBar": {
       "editKeys": "Настроить клавиши панели действий",
@@ -1782,7 +1782,7 @@ export const ru_RU: EnTranslations = {
       "name_rallycart_rxt": "Ралликарт RXT",
       "name_terrorspark_groundshaker": "Ужасоискр, сотрясатель земли",
       "name_drakemaw_raptor": "Раптор Дрейкмо",
-      "name_avian_strider": "Viridian Valestrider",
+      "name_avian_strider": "Изумрудный Долиноход",
       "name_mech_bird": "Заводная механоптица",
       "name_lanternback_troll": "Грумбол Фонареносец",
       "name_chimeglass_tortoise": "Толливер Звонкостёкл",
@@ -1799,7 +1799,7 @@ export const ru_RU: EnTranslations = {
       "desc_rallycart_skin": "Крохотный раллийный автомобиль с могучим рёвом.",
       "desc_terrorspark_groundshaker": "Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.",
       "desc_drakemaw_raptor": "Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.",
-      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
+      "desc_avian_strider": "Огромная верховая птица, чьи тяжёлые когти и сложенные крылья превращают любое путешествие в громоподобный бросок.",
       "desc_mech_bird": "Заводная боевая курица ручной сборки: несётся на щёлкающих сервоприводах, а заводной ключ всё ещё крутится.",
       "desc_lanternback_troll": "Холмовой тролль, укрощённый фонарщиками: на плечах он несёт железный трон, а на обоих подлокотниках горит по штормовому фонарю.",
       "desc_chimeglass_tortoise": "Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.",
@@ -1973,15 +1973,15 @@ export const ru_RU: EnTranslations = {
       "shaderWarmOff": "Выкл.",
       "shaderWarmOn": "Вкл.",
       "shaderWarmNote": "Предварительный прогрев кеша шейдеров в фоне, чтобы в игре не было подтормаживаний. Авто: включается только там, где это поддерживает ваша графическая система (рекомендуется). Вкл.: принудительно везде, на некоторых конфигурациях это может ухудшить производительность. Выкл.: отключено.",
-      "frameRateCap": "Frame Rate Limit",
-      "frameRateCapAuto": "Auto",
-      "frameRateCapDisplay": "Display",
+      "frameRateCap": "Ограничение частоты кадров",
+      "frameRateCapAuto": "Авто",
+      "frameRateCapDisplay": "Дисплей",
       "frameRateCapSixty": "60",
       "frameRateCapThirty": "30",
-      "frameRateCapNote": "Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.",
-      "frameRateCapStatusPaced": "Drawing {fps} images per second on a {hz} Hz display.",
-      "frameRateCapStatusUnpaced": "Limiting to {fps} images per second.",
-      "frameRateCapStatusInert": "This display already runs at or under this limit, so the limit changes nothing.",
+      "frameRateCapNote": "Ограничивает число изображений, которые игра рисует в секунду. На компьютере, который не успевает за своим дисплеем, более низкий предел делает картинку ровнее и снижает нагрев. Предел подстраивается под дисплей, поэтому реальное значение может немного отличаться от числа. Авто: снижает предел, только когда этот компьютер не успевает за своим дисплеем, и затем держит его стабильным (рекомендуется). Дисплей: без ограничения.",
+      "frameRateCapStatusPaced": "Рисуется {fps} изображений в секунду на дисплее {hz} Гц.",
+      "frameRateCapStatusUnpaced": "Ограничение: {fps} изображений в секунду.",
+      "frameRateCapStatusInert": "Этот дисплей уже работает на этой частоте или ниже, поэтому предел ничего не меняет.",
       "gpuBackend": "Графический бэкенд",
       "gpuBackendAuto": "Авто",
       "gpuBackendVulkan": "Vulkan",
@@ -2022,8 +2022,8 @@ export const ru_RU: EnTranslations = {
       "showReliquaryTracker": "Показывать список Реликвария",
       "confirmVendorSell": "Подтверждать продажу",
       "confirmVendorSellNote": "Если отключить, предметы будут продаваться одним кликом без подтверждения, и при смещении ячейки сумки можно продать не тот предмет.",
-      "confirmVendorSellMinQuality": "Confirm Sales From Quality",
-      "confirmVendorSellMinQualityNote": "Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.",
+      "confirmVendorSellMinQuality": "Подтверждать продажу от качества",
+      "confirmVendorSellMinQualityNote": "Предметы ниже этого качества продаются одним щелчком; ошибочно проданный предмет можно выкупить у торговца.",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
@@ -2077,9 +2077,9 @@ export const ru_RU: EnTranslations = {
     },
     "controller": {
       "title": "Геймпад",
-      "device": "Connected Device",
-      "deviceConnected": "Connected",
-      "deviceDisconnected": "No controller detected",
+      "device": "Подключенное устройство",
+      "deviceConnected": "Подключено",
+      "deviceDisconnected": "Геймпад не обнаружен",
       "glyphStyle": "Обозначения кнопок",
       "glyphStyleAuto": "Авто",
       "glyphStyleXbox": "Xbox",
@@ -2104,7 +2104,7 @@ export const ru_RU: EnTranslations = {
       "crossHotbarHelp": "Удерживайте курок, чтобы подсветить восемь ячеек панели действий на крестовине и лицевых кнопках. Нажмите второй курок, чтобы переключиться на второй набор.",
       "crossHotbarResetLayout": "Сбросить крестовую панель",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "Пока крестовая панель включена, курки и крестовина принадлежат ей: настройте их ниже, а не здесь.",
+      "crossHotbarOwnsButtons": "Пока крестовая панель включена, курки настраивают её. Направления крестовины остаются редактируемыми здесь — для меню и передвижения.",
       "cancelAction": "Отмена / Назад",
       "subcommandsAction": "Подкоманды / Карта",
       "cycleHudAction": "Переключить интерфейс",
@@ -2115,12 +2115,12 @@ export const ru_RU: EnTranslations = {
       "crossHotbarDisplayMinimal": "Только при удержании",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "В руках {action}: подтверждение на ячейке кладет действие, отмена возвращает его.",
-      "crossHotbarEditHint": "Перестановка: подтверждение берет действие из ячейки или книги заклинаний и кладет его в ячейку, отмена очищает ячейку.",
+      "crossHotbarEditHint": "Перестановка · крестовина перемещает · подтверждение берёт и кладёт · отмена очищает ячейку",
       "crossHotbarEditHelp": "Удерживайте левый бампер и нажмите верхнюю лицевую кнопку, чтобы переставить панель геймпадом."
     },
     "perf": {
-      "title": "Оверлей производительности",
-      "overlaySection": "Performance Overlay",
+      "title": "Производительность",
+      "overlaySection": "Оверлей производительности",
       "enable": "Показывать оверлей производительности",
       "description": "Выберите, какие показатели отображать, где разместить оверлей и как он выглядит.",
       "sectionPosition": "Положение",
@@ -2469,51 +2469,51 @@ export const ru_RU: EnTranslations = {
       "spellOrder": "Порядок заклинаний",
       "reset": "Сбросить позицию",
       "spellPosition": "Порядок заклинаний {position} / {count}",
-      "watchlist": "Watched Spells",
-      "watchlistHint": "Pick any spell that buffs you to give it its own aura. Picked spells get a full card below, with their own icon, color, position and ground ring.",
-      "watchlistEmpty": "No other spell in your spellbook puts a buff on you.",
-      "watchlistWatch": "Watch {spell}",
-      "watchlistUnwatch": "Stop watching {spell}",
-      "watchlistCount": "{count} watched",
-      "sound": "Alert Sound",
-      "soundNone": "No sound",
-      "soundVolume": "Sound Volume",
-      "soundPreview": "Play",
-      "soundPreviewAria": "Preview the {sound} alert sound",
-      "soundHint": "A sound plays each time this spell procs. Turn the icon, crescents and ground ring off to have the sound alone announce it.",
-      "readyGlow": "Hotbar Glow",
-      "readyGlowHint": "Lights this spell on your action bar while its buff is up.",
-      "reticleTick": "Reticle Tick",
-      "reticleTickHint": "Adds a mark near the centre of the screen that lights when this spell procs.",
-      "haptic": "Rumble",
-      "hapticNone": "Off",
-      "hapticHint": "Vibrates a connected controller, or your phone. Ignored where the device has no haptics.",
+      "watchlist": "Отслеживаемые заклинания",
+      "watchlistHint": "Выберите любое заклинание, накладывающее на вас усиление, чтобы дать ему собственную ауру. Выбранные заклинания получают отдельную карточку ниже, со своим значком, цветом, положением и кольцом на земле.",
+      "watchlistEmpty": "В вашей книге заклинаний нет других заклинаний, накладывающих на вас усиление.",
+      "watchlistWatch": "Отслеживать: {spell}",
+      "watchlistUnwatch": "Не отслеживать: {spell}",
+      "watchlistCount": "Отслеживается: {count}",
+      "sound": "Звук оповещения",
+      "soundNone": "Без звука",
+      "soundVolume": "Громкость звука",
+      "soundPreview": "Прослушать",
+      "soundPreviewAria": "Прослушать звук оповещения «{sound}»",
+      "soundHint": "Звук проигрывается при каждом срабатывании этого заклинания. Отключите значок, полумесяцы и кольцо на земле, чтобы оповещал только звук.",
+      "readyGlow": "Подсветка панели",
+      "readyGlowHint": "Подсвечивает это заклинание на панели действий, пока его усиление активно.",
+      "reticleTick": "Метка прицела",
+      "reticleTickHint": "Добавляет метку у центра экрана, которая загорается при срабатывании заклинания.",
+      "haptic": "Вибрация",
+      "hapticNone": "Выкл.",
+      "hapticHint": "Вибрирует подключённый геймпад или ваш телефон. Игнорируется, если у устройства нет вибрации.",
       "haptics": {
-        "tap": "Tap",
-        "double": "Double",
-        "long": "Long"
+        "tap": "Короткая",
+        "double": "Двойная",
+        "long": "Длинная"
       },
       "cues": {
-        "softChime": "Soft Chime",
-        "musicBox": "Music Box",
-        "glassPing": "Glass Ping",
-        "waterDrop": "Water Drop",
-        "bubblePop": "Bubble Pop",
-        "hardBell": "Hard Bell",
-        "templeGong": "Temple Gong",
-        "anvilStrike": "Anvil Strike",
-        "coinDrop": "Coin Drop",
-        "swordDraw": "Sword Draw",
-        "blaringHorn": "Blaring Horn",
-        "carKlaxon": "Car Klaxon",
-        "sonarPing": "Sonar Ping",
-        "electricZap": "Electric Zap",
-        "catMeow": "Cat Meow",
-        "owlHoot": "Owl Hoot",
-        "wolfHowl": "Wolf Howl",
-        "frogCroak": "Frog Croak",
-        "windWhoosh": "Wind Whoosh",
-        "steamHiss": "Steam Hiss"
+        "softChime": "Мягкий перезвон",
+        "musicBox": "Музыкальная шкатулка",
+        "glassPing": "Звон стекла",
+        "waterDrop": "Капля воды",
+        "bubblePop": "Лопнувший пузырь",
+        "hardBell": "Резкий колокол",
+        "templeGong": "Храмовый гонг",
+        "anvilStrike": "Удар по наковальне",
+        "coinDrop": "Падение монет",
+        "swordDraw": "Обнажение клинка",
+        "blaringHorn": "Ревущий рог",
+        "carKlaxon": "Автомобильный клаксон",
+        "sonarPing": "Сигнал сонара",
+        "electricZap": "Электрический разряд",
+        "catMeow": "Мяуканье кошки",
+        "owlHoot": "Уханье совы",
+        "wolfHowl": "Волчий вой",
+        "frogCroak": "Кваканье лягушки",
+        "windWhoosh": "Порыв ветра",
+        "steamHiss": "Шипение пара"
       },
       "procs": {
         "revenge": "Месть!",
@@ -2640,9 +2640,9 @@ export const ru_RU: EnTranslations = {
     },
     "charSheet": {
       "offense": "Атака",
-      "spell": "Заклинания",
+      "spell": "Spell",
       "defense": "Защита",
-      "ratings": "Рейтинги",
+      "ratings": "Ratings",
       "playtimeLabel": "Время в игре",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Меньше минуты",
@@ -2651,27 +2651,27 @@ export const ru_RU: EnTranslations = {
       "hidePlaytimeAria": "Скрыть время в игре"
     },
     "charSidebar": {
-      "label": "Character details",
-      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
-      "subtitleNoHobby": "Level {level} {className} . {archetype}",
-      "stats": "Stats",
-      "progression": "Progression",
-      "skills": "Skills",
-      "gathering": "Gathering",
-      "crafting": "Crafting",
-      "openProfessions": "Open Professions"
+      "label": "Сведения о персонаже",
+      "subtitle": "Уровень {level} {className} . {archetype} . Увлечение: {hobby}",
+      "subtitleNoHobby": "Уровень {level} {className} . {archetype}",
+      "stats": "Характеристики",
+      "progression": "Прогресс",
+      "skills": "Навыки",
+      "gathering": "Сбор",
+      "crafting": "Ремесло",
+      "openProfessions": "Открыть профессии"
     },
     "questLog": {
-      "completed": "Completed",
-      "zoneSummary": "{count} ({ready} ready)",
-      "shiftHint": "Shift-click a quest to link it in chat."
+      "completed": "Завершённые",
+      "zoneSummary": "{count} (готово: {ready})",
+      "shiftHint": "Щёлкните задание с Shift, чтобы отправить ссылку в чат."
     },
     "statInfo": {
       "fromYour": "От вашей характеристики ({value} {stat}):",
       "names": {
         "spellPower": "Сила заклинаний",
         "healPower": "Сила исцеления",
-        "spellCrit": "Крит. заклинаний",
+        "spellCrit": "Spell Crit",
         "critRating": "Рейтинг крит. удара",
         "hasteRating": "Рейтинг ускорения",
         "parry": "Парирование",
@@ -2688,10 +2688,10 @@ export const ru_RU: EnTranslations = {
         "armor": "Смягчает входящие физические удары. Снижение урона тем больше, чем ниже уровень атакующего, и не превышает 75%.",
         "attackPower": "Усиливает атаки вашим оружием. Каждые 14 ед. силы атаки добавляют 1 ед. урона в секунду.",
         "spellPower": "Увеличивает урон ваших заклинаний и силу исцелений. Каждая единица интеллекта дает немного силы заклинаний, вдобавок к получаемой от снаряжения и усилений.",
-        "healPower": "Увеличивает силу ваших исцелений и эффектов периодического исцеления, а также прочность поглощающих щитов. Равна вашей силе заклинаний плюс сила исцеления от снаряжения и бонусов комплекта, которая усиливает только исцеление и никогда не увеличивает урон.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "Приблизительный урон вашего оружия в секунду с учетом урона и скорости оружия, а также вашей силы атаки.",
         "critChance": "Ваш шанс нанести критический удар, наносящий двойной урон.",
-        "spellCrit": "Ваш шанс нанести критический удар заклинанием или исцелением, дающий 150% урона или исцеления. Заклинания и исцеления используют этот шанс вместо шанса крита: интеллект повышает только его, а рейтинг критического удара, таланты и бонусы комплекта повышают оба.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "Ваш шанс полностью уклониться от входящей атаки в ближнем бою, не получив урона.",
         "critRating": "Рейтинг критического удара от снаряжения и бонусов комплекта повышает шанс критического удара. Примерно 10 рейтинга дают 1% крит. удара.",
         "hasteRating": "Рейтинг ускорения от снаряжения и бонусов комплекта ускоряет ваши атаки и заклинания. Примерно 10 рейтинга дают 1% ускорения.",
@@ -2784,10 +2784,10 @@ export const ru_RU: EnTranslations = {
     },
     "plurals": {
       "guildBoardShown": {
-        "one": "{count} guild shown",
-        "few": "{count} guilds shown",
-        "many": "{count} guilds shown",
-        "other": "{count} guilds shown"
+        "one": "Показана {count} гильдия",
+        "few": "Показано {count} гильдии",
+        "many": "Показано {count} гильдий",
+        "other": "Показано {count} гильдии"
       },
       "commissionMasterworks": {
         "one": "{count} шедевр",
@@ -2918,7 +2918,7 @@ export const ru_RU: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Сообщить об ошибке",
-      "online": "Online",
+      "online": "В сети",
       "realm": "Мир",
       "character": "Персонаж",
       "position": "Позиция",
@@ -2936,13 +2936,13 @@ export const ru_RU: EnTranslations = {
       "failed": "Не удалось отправить отчёт об ошибке. Попробуйте снова."
     },
     "hostDiag": {
-      "title": "System Report",
-      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
-      "create": "Generate system report",
-      "running": "Collecting system details...",
-      "saved": "Report saved as {fileName}.",
-      "savedNoName": "Report saved.",
-      "failed": "The report could not be created. Please try again."
+      "title": "Отчет о системе",
+      "intro": "Собирает сведения об этом компьютере, включая программы, которые больше всего нагружают процессор и память, в файл, который помогает выявить причины проблем с производительностью. Ничего не отправляется: файл остается на вашем компьютере.",
+      "create": "Создать отчет о системе",
+      "running": "Сбор сведений о системе...",
+      "saved": "Отчет сохранен как {fileName}.",
+      "savedNoName": "Отчет сохранен.",
+      "failed": "Не удалось создать отчет. Повторите попытку."
     },
     "paperdoll": {
       "unequipAria": "Снять {item}",
@@ -3489,7 +3489,7 @@ export const ru_RU: EnTranslations = {
         "phaseWardstonesName": "Охранные камни",
         "phaseWardstonesSummary": "На {health} здоровья Сотрясающий топот удерживает рейд на месте, пока прибывает Брат Алдрик и зажигает охранные камни. Все шипы разбиваются, и пол перестаёт гореть, затем к механикам Трона добавляются Разрыв души и Бессмертная ярость.",
         "phaseKingsWrathName": "Королевский гнев",
-        "phaseKingsWrathSummary": "На {health} здоровья Нитраксис ревёт в Королевском гневе и получает на {bonusNormal} больше урона на обычном режиме или на {bonusHeroic} на героическом до конца боя. Могильное извержение теперь происходит каждые {eruptionEveryNormal} сек. ({eruptionEveryHeroic} на героическом), а Могильный огонь — каждые {gravefireEveryNormal} сек. ({gravefireEveryHeroic} на героическом). Все остальные механики сохраняют свой темп.",
+        "phaseKingsWrathSummary": "На {health} здоровья Нитраксис ревёт в Королевском гневе и получает на {bonusNormal} больше урона на обычном режиме или на {bonusHeroic} на героическом до конца боя. Могильное извержение теперь происходит каждые {eruptionEveryNormal} сек. ({eruptionEveryHeroic} на героическом). Все остальные механики сохраняют свой темп.",
         "gravebreakerName": "Гробокрушитель",
         "gravebreakerSummary": "Каждые {seconds} сек. Нитраксис заряжает свой следующий удар, который достигнет цели. Его цель получает только сам удар, но все остальные в радиусе {range} м внутри конуса {arc} градусов перед ним получают {splash} этого удара как физический урон, сниженный их собственной бронёй.",
         "gravebreakerResponse": "Танки держат Нитраксиса лицом от рейда. Все остальные держатся сзади или сбоку от него и никогда не пересекают конус.",
@@ -3498,16 +3498,16 @@ export const ru_RU: EnTranslations = {
         "dreadCurseHeroicSummary": "Каждые {every} сек. Нитраксис бьёт текущего танка на {hitHeroic} максимального здоровья как урон тьмой и накладывает заряд Проклятия ужаса. В течение {duration} сек. каждый заряд увеличивает урон, получаемый этим танком от Нитраксиса, на {perStackHeroic}, вплоть до {max} зарядов.",
         "dreadCurseResponse": "Танки меняются при {stacks} зарядах: второй танк провоцирует Нитраксиса, а проклятый танк держится вне конуса Гробокрушителя, пока заряды спадают. Лекари готовят входящего танка до смены.",
         "boneSpikeName": "Костяной шип",
-        "boneSpikeSummary": "Каждые {everyNormal} сек. Нитраксис пронзает Костяными шипами {victimsNormal} рейдеров, кроме текущей цели. Пронзённый рейдер не может действовать и теряет {drainNormal} максимального здоровья каждую секунду, пока его шип не будет уничтожен.",
-        "boneSpikeHeroicSummary": "Каждые {everyHeroic} сек. Нитраксис пронзает Костяными шипами {victimsHeroic} рейдеров, кроме текущей цели. Пронзённый рейдер не может действовать и теряет {drainHeroic} максимального здоровья каждую секунду, пока его шип не будет уничтожен.",
-        "boneSpikeResponse": "Бойцы немедленно переключаются на Костяные шипы и уничтожают их, чтобы освободить пронзённых рейдеров. Лекари поддерживают пронзённых, пока шипы падают.",
+        "boneSpikeSummary": "Каждые {everyNormal} сек. Нитраксис пронзает Костяными шипами {victimsNormal} рейдеров, кроме текущей цели. Пронзённый рейдер не может действовать и теряет {drainNormal} максимального здоровья каждую секунду, пока его шип не будет уничтожен. Шип разбивается после {hitsNormal} попаданий от кого угодно, независимо от нанесённого урона. Уже пронзённый игрок не может быть выбран снова в течение {cooldown} с, поэтому шипы распределяются по всему рейду.",
+        "boneSpikeHeroicSummary": "Каждые {everyHeroic} сек. Нитраксис пронзает Костяными шипами {victimsHeroic} рейдеров, кроме текущей цели. Пронзённый рейдер не может действовать и теряет {drainHeroic} максимального здоровья каждую секунду, пока его шип не будет уничтожен. Шип разбивается после {hitsHeroic} попаданий от кого угодно, независимо от нанесённого урона. Уже пронзённый игрок не может быть выбран снова в течение {cooldown} с, поэтому шипы распределяются по всему рейду.",
+        "boneSpikeResponse": "Кто ближе, тот бьёт по Костяному шипу: несколько попаданий от кого угодно разбивают его, независимо от урона. Лекари держат пронзённых в живых, пока шипы не падут.",
         "graveEruptionName": "Могильное извержение",
         "graveEruptionSummary": "Каждые {everyNormal} сек. костлявые руки отмечают {countNormal} кругов радиусом {radius} м под рейдерами. Через {warning} сек. каждый круг взрывается на {burstNormal} максимального здоровья как урон тьмой, а затем горит Могильным пламенем ещё {flameNormal} сек., нанося {tickNormal} максимального здоровья каждую секунду всем, кто в нём стоит.",
         "graveEruptionHeroicSummary": "Каждые {everyHeroic} сек. костлявые руки отмечают {countHeroic} кругов радиусом {radius} м под рейдерами. Через {warning} сек. каждый круг взрывается на {burstHeroic} максимального здоровья как урон тьмой, а затем горит Могильным пламенем ещё {flameHeroic} сек., нанося {tickHeroic} максимального здоровья каждую секунду всем, кто в нём стоит.",
         "graveEruptionResponse": "Выходите из каждого предупреждающего круга до его взрыва и держитесь подальше от горящей земли. Танки уводят Нитраксиса подальше от пламени, чтобы у бойцов ближнего боя оставалось место для работы.",
         "bindingSigilName": "Печать связывания",
-        "bindingSigilSummary": "Каждые {everyNormal} сек. на полу в {minDist}-{maxDist} м от Нитраксиса вспыхивает печать древних оберегов, и он начинает Бессмертное восхождение, получая {ascensionNormal} урона и скорости атаки каждые {ascensionEvery} сек. Если он встанет на печать в течение {bindNormal} сек., он оказывается Связан: Восхождение снимается, он оглушается на {stunNormal} сек. и получает на {vulnerability} больше урона в течение {boundNormal} сек. В противном случае каждый рейдер получает {unboundHitNormal} максимального здоровья как урон тьмой, а Нитраксис сохраняет на {unboundBonusNormal} больше урона до следующего связывания.",
-        "bindingSigilHeroicSummary": "Каждые {everyHeroic} сек. на полу в {minDist}-{maxDist} м от Нитраксиса вспыхивает печать древних оберегов, и он начинает Бессмертное восхождение, получая {ascensionHeroic} урона и скорости атаки каждые {ascensionEvery} сек. Если он встанет на печать в течение {bindHeroic} сек., он оказывается Связан: Восхождение снимается, он оглушается на {stunHeroic} сек. и получает на {vulnerability} больше урона в течение {boundHeroic} сек. В противном случае каждый рейдер получает {unboundHitHeroic} максимального здоровья как урон тьмой, а Нитраксис сохраняет на {unboundBonusHeroic} больше урона до следующего связывания.",
+        "bindingSigilSummary": "Каждые {everyNormal} сек. на одной из двух площадок по бокам трона, в {sideOffset} м слева или справа (с точки зрения рейда) от места, где Нитраксис стоял в начале боя, вспыхивает печать древних оберегов (каждый раз с другой стороны), и он начинает Бессмертное восхождение, получая {ascensionNormal} урона и скорости атаки каждые {ascensionEvery} сек. Если он встанет на печать в течение {bindNormal} сек., он оказывается Связан: Восхождение снимается, он оглушается на {stunNormal} сек. и получает на {vulnerability} больше урона в течение {boundNormal} сек. В противном случае каждый рейдер получает {unboundHitNormal} максимального здоровья как урон тьмой, а Нитраксис сохраняет на {unboundBonusNormal} больше урона до следующего связывания.",
+        "bindingSigilHeroicSummary": "Каждые {everyHeroic} сек. на одной из двух площадок по бокам трона, в {sideOffset} м слева или справа (с точки зрения рейда) от места, где Нитраксис стоял в начале боя, вспыхивает печать древних оберегов (каждый раз с другой стороны), и он начинает Бессмертное восхождение, получая {ascensionHeroic} урона и скорости атаки каждые {ascensionEvery} сек. Если он встанет на печать в течение {bindHeroic} сек., он оказывается Связан: Восхождение снимается, он оглушается на {stunHeroic} сек. и получает на {vulnerability} больше урона в течение {boundHeroic} сек. В противном случае каждый рейдер получает {unboundHitHeroic} максимального здоровья как урон тьмой, а Нитраксис сохраняет на {unboundBonusHeroic} больше урона до следующего связывания.",
         "bindingSigilResponse": "Танк сразу же тащит Нитраксиса на печать, невзирая на оставленный рейдом огонь. Бойцы ближнего боя следуют за перетаскиванием, а дальники держатся вне нового конуса Гробокрушителя. Пока он Связан, все выжигают по нему урон.",
         "raiseFallenName": "Поднятие павших",
         "raiseFallenSummary": "Каждые {every} сек. во время фазы Трон Нитраксис поднимает у себя за спиной Восставших королевских стражей. Они бросаются на его текущую цель и сражаются, пока не будут уничтожены.",
@@ -3524,24 +3524,16 @@ export const ru_RU: EnTranslations = {
         "courtSummary": "На героическом Нитраксис поднимает свой двор после каждой Бессмертной ярости, прервана она или нет, как только предыдущий двор пал. Дух Олдрена рассекает всё рядом со своей целью Королевским секачом. Дух Малрика канализирует Исцеление Малрика, с каждым применением исцеляя Нитраксиса всё сильнее. Дух Восса игнорирует провокацию и охотится на рейд.",
         "courtResponse": "Танки принимают на себя Олдрена и разворачивают его удар от рейда. Оглушите или заставьте замолчать Малрика в момент начала Исцеления Малрика и убейте его первым, затем обездвижьте или оглушите Восса, оттащив от лекарей (спровоцировать его нельзя), и добейте его следующим.",
         "kingsWrathName": "Королевский гнев",
-        "kingsWrathSummary": "Нитраксис наносит на {bonusNormal} больше урона на обычном режиме или на {bonusHeroic} на героическом до конца боя. Могильное извержение происходит каждые {eruptionEveryNormal} сек. ({eruptionEveryHeroic} на героическом), а Могильный огонь — каждые {gravefireEveryNormal} сек. ({gravefireEveryHeroic} на героическом).",
+        "kingsWrathSummary": "Нитраксис наносит на {bonusNormal} больше урона на обычном режиме или на {bonusHeroic} на героическом до конца боя. Могильное извержение происходит каждые {eruptionEveryNormal} сек. ({eruptionEveryHeroic} на героическом).",
         "kingsWrathResponse": "Используйте оставшиеся защитные способности от неизбежного урона. Продолжайте чисто выполнять все прежние механики, пока рейд не закончит бой.",
         "boneStormName": "Костяная буря",
-        "boneStormSummary": "Начиная с {first} сек. после начала Королевского гнева и затем каждые {everyNormal} сек., Нитраксис начинает Костяную бурю на {duration} сек. Он игнорирует угрозу, двигается в {speed} раза быстрее обычного и совершает {charges} рывков по {chargeSeconds} сек. каждый. Его вихрь наносит {whirlNormal} максимального здоровья каждую секунду в радиусе {radius} м. Каждый рывок завершается Костяным ударом в том же радиусе на {slamNormal} максимального здоровья. Через {spikeAt} сек. после начала бури он применяет Костяной шип, а Гробокрушитель снова активируется через {rearm} сек. после её окончания.",
-        "boneStormHeroicSummary": "Начиная с {first} сек. после начала Королевского гнева и затем каждые {everyHeroic} сек., Нитраксис начинает Костяную бурю на {duration} сек. Он игнорирует угрозу, двигается в {speed} раза быстрее обычного и совершает {charges} рывков по {chargeSeconds} сек. каждый. Его вихрь наносит {whirlHeroic} максимального здоровья каждую секунду в радиусе {radius} м. Каждый рывок завершается Костяным ударом в том же радиусе на {slamHeroic} максимального здоровья. Через {spikeAt} сек. после начала бури он применяет Костяной шип, а Гробокрушитель снова активируется через {rearm} сек. после её окончания.",
+        "boneStormSummary": "Начиная с {first} сек. после начала Королевского гнева и затем каждые {everyNormal} сек., Нитраксис начинает Костяную бурю на {duration} сек. Он игнорирует угрозу, двигается в {speed} раза быстрее обычного и совершает {charges} рывков по {chargeSeconds} сек. каждый. Его вихрь наносит {whirlNormal} максимального здоровья каждую секунду в радиусе {radius} м. Каждый рывок завершается Костяным ударом в том же радиусе на {slamNormal} максимального здоровья. Первый удар каждой бури наносит вместо этого {openingSlamNormal}. Гробокрушитель снова активируется через {rearm} сек. после её окончания.",
+        "boneStormHeroicSummary": "Начиная с {first} сек. после начала Королевского гнева и затем каждые {everyHeroic} сек., Нитраксис начинает Костяную бурю на {duration} сек. Он игнорирует угрозу, двигается в {speed} раза быстрее обычного и совершает {charges} рывков по {chargeSeconds} сек. каждый. Его вихрь наносит {whirlHeroic} максимального здоровья каждую секунду в радиусе {radius} м. Каждый рывок завершается Костяным ударом в том же радиусе на {slamHeroic} максимального здоровья. Первый удар каждой бури наносит вместо этого {openingSlamHeroic}. Гробокрушитель снова активируется через {rearm} сек. после её окончания.",
         "boneStormResponse": "Рассредоточьтесь и продолжайте убегать от Нитраксиса. Рейдер, которого он преследует рывком, убегает, а все остальные освобождают место вокруг пути рывка, затем танки принимают его на себя, когда буря заканчивается.",
         "crownEnduresName": "Корона выстоит",
         "crownEnduresSummary": "Через {enrageNormal} сек. после пула (таймер приостанавливается на время появления Брата Алдрика на 70% здоровья) срабатывает жёсткий энрейдж «Корона выстоит». Нитраксис получает на {damage} больше урона и на {haste} более быстрые атаки, а затем ещё на {rampStep} урона каждые {rampEveryNormal} сек. Полосы таймера нет. Предупреждения приходят выкриками за {warn60}, {warn30} и {warn10} сек. до срабатывания.",
         "crownEnduresHeroicSummary": "Через {enrageHeroic} сек. после пула (таймер приостанавливается на время появления Брата Алдрика на 70% здоровья) срабатывает жёсткий энрейдж «Корона выстоит». Нитраксис получает на {damage} больше урона и на {haste} более быстрые атаки, а затем ещё на {rampStep} урона каждые {rampEveryHeroic} сек. Полосы таймера нет. Предупреждения приходят выкриками за {warn60}, {warn30} и {warn10} сек. до срабатывания.",
-        "crownEnduresResponse": "Считайте первое предупреждение сигналом к финальному рывку урона. Сохраните манёвренность и защитные способности для оставшихся механик, а затем победите Нитраксиса до наступления энрейджа.",
-        "soulfireName": "Огонь души",
-        "soulfireSummary": "Каждый взрыв Разрыва души оставляет на месте каждой метки лужу лилового огня радиусом {radius} м, которая горит {seconds} сек., нанося {tickNormal} максимального здоровья каждую секунду. Там, где лужи пересекаются, урон наносится от каждой из них. Лужи никогда не появляются в пределах {clearance} м от охранного камня.",
-        "soulfireHeroicSummary": "Каждый взрыв Разрыва души оставляет одну лужу лилового огня радиусом {radius} м на каждую группу сближенных меток, которая горит {secondsHeroic} сек., нанося {tickHeroic} максимального здоровья каждую секунду. Если лужи пересекаются, урон засчитывается лишь один раз, без наложения. Лужи никогда не появляются в пределах {clearance} м от охранного камня.",
-        "soulfireResponse": "Выходите из лиловой лужи сразу после взрыва меток. Выбирайте следующую точку сбора подальше от горящего огня.",
-        "gravefireName": "Могильный огонь",
-        "gravefireSummary": "Каждые {everyNormal} сек. от Нитраксиса к одному из рейдеров тянется линия лилового могильного огня, растущая на {speed} м в секунду до {length} м. Каждый метр горит {burnNormal} сек. и наносит {tickNormal} максимального здоровья каждую секунду всем, кто в нём стоит.",
-        "gravefireHeroicSummary": "Каждые {everyHeroic} сек. от Нитраксиса к одному из рейдеров тянется линия лилового могильного огня, растущая на {speed} м в секунду до {length} м. Каждый метр горит {burnHeroic} сек. и наносит {tickHeroic} максимального здоровья каждую секунду всем, кто в нём стоит.",
-        "gravefireResponse": "Уклоняйтесь от линии по мере её приближения: она узкая и никогда не поворачивает. Дальним рейдерам следует постоянно двигаться, а не стоять на месте."
+        "crownEnduresResponse": "Считайте первое предупреждение сигналом к финальному рывку урона. Сохраните манёвренность и защитные способности для оставшихся механик, а затем победите Нитраксиса до наступления энрейджа."
       }
     },
     "auraEffect": {
@@ -3587,7 +3579,7 @@ export const ru_RU: EnTranslations = {
       "elementalConvergencePrimed": "Следующее заклинание другой стихийной школы активирует Стихийное слияние",
       "hunterFerocity": "Стайная свирепость, {stacks} зар.: урон вашего питомца повышен на {pct}%",
       "cooldownCap": "В этом окне использовано {used} из {cap} сек. сокращения восстановления",
-      "bruinRushWindow": "Cat Form costs no mana and Pins your Bruin Rush target, slowing it by {pct}% for {sec} sec",
+      "bruinRushWindow": "Облик волка не тратит ману и пригвождает цель вашего Натиска бурого, замедляя её на {pct}% на {sec} сек.",
       "funeralHarvestLock": "Погребальная жатва пока не может создать ещё один осколок души",
       "leadenHexLock": "Свинцовый сглаз пока не может снова обездвижить эту цель",
       "forbiddenReflectionReady": "Следующее подходящее умение чернокнижника можно применить повторно",
@@ -3637,7 +3629,7 @@ export const ru_RU: EnTranslations = {
       "coldsightRead": "Следующий «Долгий натяг» наносит на {longDrawPct}% больше урона, или следующий «Зловещий выстрел» наносит на {fellShotPct}% больше",
       "duskEconomy": "Способности стоят на {pct}% меньше энергии",
       "moontide": "Лунный прилив: стадия {stacks} из {max}. Применения Дикой стрелы, Падения небес и Лунного семени в облике Лунного крыла добавляют по 1 стадии. На {max}: Лунное семя становится Лунным всплеском, а Падение небес — Пробуждением солнца; любое из них тратит все 3 стадии",
-      "oldBlood": "Старая кровь: стадия {stacks} из {max}. Попавшие удары Рвущего когтя, Свежевания, Кровавого разлома, Кровавого укуса, Разящих когтей и Костолома добавляют по 1 стадии. На {max}: Кровавый укус становится Кровавой жатвой в облике волка, а Костолом — Дроблением костей в облике бурого",
+      "oldBlood": "Старая кровь: стадия {stacks} из {max}. Попавшие удары Рвущего когтя, Свежевания, Кровавого разлома, Кровавого укуса, Разящих когтей и Костолома добавляют по 1 стадии. На {max}: Кровавый укус становится Кровавой жатвой в облике кота, а Костолом — Дроблением костей в облике бурого",
       "verdance": "Зелень: стадия {stacks} из {max}. Каждый НОВЫЙ посаженный Дикий расцвет или Второй расцвет добавляет 1. При {max} Быстрое восстановление становится Сверхцветением",
       "freeExecute": "Следующее подходящее добивающее умение не требует ресурсов",
       "resourceSap": "Восстанавливает {value} текущего ресурса раз в {interval} сек.",
@@ -3702,7 +3694,7 @@ export const ru_RU: EnTranslations = {
       "elementalTrance": "Получаемый урон снижен на {pct}%. {mana}% всего нанесенного вами урона преобразуется в ману",
       "stealth": "Скрытность; скорость передвижения снижена на {pct}%",
       "formBear": "Облик бурого: повышенное здоровье и броня",
-      "wolfForm": "Cat Form: melee damage and energy; movement speed increased by {pct}%",
+      "wolfForm": "Облик волка: урон в ближнем бою и энергия; скорость передвижения повышена на {pct}%",
       "formTravel": "Форма скорохода: скорость передвижения повышена на {pct}%",
       "formFireball": "Облик огненного шара: скорость повышена на {pct}%; атаки и заклинания недоступны",
       "formMoonkin": "Облик лунного крыла: урон заклинаний повышен на {pct}%, а броня на {armorPct}%",
@@ -3748,8 +3740,7 @@ export const ru_RU: EnTranslations = {
         "shadow": "Тьма",
         "holy": "Свет",
         "nature": "Природа"
-      },
-      "formCat": "Облик кошки: урон в ближнем бою и энергия"
+      }
     },
     "worldBoss": {
       "spawn": "{name} поднимается над Терновыми высотами!"
@@ -3797,26 +3788,26 @@ export const ru_RU: EnTranslations = {
       "pledgeTag": "Присяга: {guild}",
       "npcRoleTag": "<{role}>",
       "npcRole": {
-        "auctioneer": "Auctioneer",
-        "banker": "Banker",
-        "riftForgemaster": "Rift Forgemaster",
-        "cardMaster": "Card Master",
-        "crucibleQuartermaster": "Crucible Quartermaster",
-        "heroicQuartermaster": "Heroic Quartermaster",
-        "pvpVendor": "PvP Vendor",
-        "weaponsmithTrainer": "Blacksmithing Trainer",
-        "cookingTrainer": "Cooking Trainer",
-        "tailoringTrainer": "Tailoring Trainer",
-        "engineeringTrainer": "Engineering Trainer",
-        "leatherworkingTrainer": "Leatherworking Trainer",
-        "alchemyTrainer": "Alchemy Trainer",
-        "weaponVendor": "Weapon Vendor",
-        "armorVendor": "Armor Vendor",
-        "armsDealer": "Arms Dealer",
-        "foodVendor": "Food & Drink Vendor",
-        "potionVendor": "Potion Vendor",
-        "stableMaster": "Stable Master",
-        "generalGoods": "General Goods"
+        "auctioneer": "Аукционист",
+        "banker": "Банкир",
+        "riftForgemaster": "Кузнец Разлома",
+        "cardMaster": "Мастер карт",
+        "crucibleQuartermaster": "Интендант Горнила",
+        "heroicQuartermaster": "Героический интендант",
+        "pvpVendor": "Торговец PvP",
+        "weaponsmithTrainer": "Учитель кузнечного дела",
+        "cookingTrainer": "Учитель кулинарии",
+        "tailoringTrainer": "Учитель портняжного дела",
+        "engineeringTrainer": "Учитель инженерного дела",
+        "leatherworkingTrainer": "Учитель кожевничества",
+        "alchemyTrainer": "Учитель алхимии",
+        "weaponVendor": "Торговец оружием",
+        "armorVendor": "Торговец доспехами",
+        "armsDealer": "Торговец вооружением",
+        "foodVendor": "Торговец едой и напитками",
+        "potionVendor": "Торговец зельями",
+        "stableMaster": "Смотритель стойл",
+        "generalGoods": "Товары общего назначения"
       }
     },
     "mobTooltip": {
@@ -3827,6 +3818,10 @@ export const ru_RU: EnTranslations = {
       "elite": "Элита",
       "boss": "Босс"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Переместить рамку цели",
       "lock": "Закрепить рамку цели"
@@ -3836,7 +3831,7 @@ export const ru_RU: EnTranslations = {
       "lock": "Закрепить рамку игрока"
     },
     "partyFrames": {
-      "header": "Party",
+      "header": "Группа",
       "section": "Рамки группы и рейда",
       "optionsSection": "Настройки фреймов группы",
       "unlock": "Переместить рамки группы и рейда",
@@ -3909,7 +3904,8 @@ export const ru_RU: EnTranslations = {
         "deedTracker": "Трекер деяний",
         "delveTracker": "Трекер вылазки",
         "riftTracker": "Трекер разлома",
-        "swingBarOffhand": "Левая рука"
+        "swingBarOffhand": "Левая рука",
+        "unitTooltip": "Подсказка"
       },
       "framesMenu": "Настройки фреймов",
       "framesMenuTitle": "Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.",
@@ -4016,13 +4012,13 @@ export const ru_RU: EnTranslations = {
       }
     },
     "lootQuality": {
-      "ordinary": "Ordinary",
-      "superior": "Superior",
-      "exceptional": "Exceptional",
-      "magnificent": "Magnificent",
-      "transcendent": "Transcendent",
+      "ordinary": "Обычный",
+      "superior": "Превосходный",
+      "exceptional": "Исключительный",
+      "magnificent": "Великолепный",
+      "transcendent": "Запредельный",
       "itemName": "{item}, {quality}",
-      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+      "tooltip": "{quality}: +{levels} к уровню предмета. Сохраняется при улучшениях."
     },
     "itemTooltip": {
       "requiresLevel": "Требуется уровень {level}",
@@ -4061,14 +4057,14 @@ export const ru_RU: EnTranslations = {
       "quantityAria": "Количество из источника {source}, не более {count}",
       "decreaseAria": "Уменьшить количество из источника {source}",
       "increaseAria": "Увеличить количество из источника {source}",
-      "decreaseByAria": "Decrease units from {source} by {count}",
-      "increaseByAria": "Increase units from {source} by {count}",
-      "moveAll": "Move all units",
-      "fits": "Up to {units} fit right now"
+      "decreaseByAria": "Уменьшить количество из {source} на {count}",
+      "increaseByAria": "Увеличить количество из {source} на {count}",
+      "moveAll": "Переместить все единицы",
+      "fits": "Сейчас поместится не более {units}"
     },
     "materialHint": {
       "fineGrade": "Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.",
-      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
+      "fineFarmGrade": "Отборный сорт. Часть урожая выходит отборной, чаще при высоком навыке фермерства или с заряженным Глазом ремесленника. Обычные продукты никогда не засчитываются там, где нужен отборный сорт, а отборный сорт никогда не засчитывается там, где нужны обычные продукты.",
       "cookingCatch": "Ингредиент для готовки. Сначала нужно приготовить.",
       "usedBy": "Используется в {crafts}.",
       "arcaneDust": "Реагент для ремесла. Выпадает при распылении обычного и необычного снаряжения.",
@@ -4353,14 +4349,14 @@ export const ru_RU: EnTranslations = {
       "subtitle": "Гильдии мира",
       "rosterTitle": "Просмотреть состав гильдии {guild}",
       "back": "Назад",
-      "filters": "Board filters",
-      "newPlayerFriendly": "New player friendly",
-      "newPlayerFriendlyTitle": "This guild welcomes new players",
-      "filterNewPlayersTitle": "Show only guilds that welcome new players",
-      "filterEmpty": "No guild has opened its doors to new players yet.",
-      "showAll": "Show all guilds",
-      "officersOnline": "Officers online",
-      "officersOnlineLabel": "Officers online: {names}",
+      "filters": "Фильтры доски",
+      "newPlayerFriendly": "Для новичков",
+      "newPlayerFriendlyTitle": "Эта гильдия рада новичкам",
+      "filterNewPlayersTitle": "Показывать только гильдии, открытые для новичков",
+      "filterEmpty": "Пока ни одна гильдия не открыла двери новичкам.",
+      "showAll": "Показать все гильдии",
+      "officersOnline": "Офицеры в сети",
+      "officersOnlineLabel": "Офицеры в сети: {names}",
       "officerEntry": "{name} ({rank})",
       "popupTitle": "Гильдейский столб",
       "close": "Закрыть"
@@ -4418,8 +4414,8 @@ export const ru_RU: EnTranslations = {
       "withdrawQuantityTitle": "Забрать {item}",
       "withdrawQuantityInput": "Количество для получения",
       "withdrawQuantityConfirm": "Забрать",
-      "quantityStepDownAria": "Decrease the quantity by {count}",
-      "quantityStepUpAria": "Increase the quantity by {count}",
+      "quantityStepDownAria": "Уменьшить количество на {count}",
+      "quantityStepUpAria": "Увеличить количество на {count}",
       "vaultRowWithdrawName": "Забрать {item}",
       "priceChanged": "Цена изменилась до завершения покупки. Проверьте обновлённую цену и подтвердите покупку ещё раз.",
       "withdrawQuantityAction": "Выбрать количество для получения: {item}",
@@ -4614,23 +4610,23 @@ export const ru_RU: EnTranslations = {
       "ignoredTab": "Игнорируемые",
       "blockedTab": "Заблокированные",
       "who": {
-        "tab": "Who",
-        "searchPlaceholder": "Name, zone, or guild",
-        "search": "Search",
-        "loading": "Asking the realm who is online...",
-        "empty": "No players match.",
-        "count": "{total} online",
-        "countFiltered": "{shown} of {total} online",
-        "capped": "Showing the first {delivered}. Narrow the search to see the rest.",
-        "classFilter": "Filter by class",
-        "allClasses": "All classes",
-        "colStatus": "Status",
-        "colName": "Name",
-        "colLevel": "Level",
-        "colClass": "Class",
-        "colZone": "Zone",
-        "colGuild": "Guild",
-        "sortTitle": "Sort by {column}"
+        "tab": "ВОЗ",
+        "searchPlaceholder": "Имя, зона или гильдия",
+        "search": "Искать",
+        "loading": "Запрашиваем у мира, кто в сети...",
+        "empty": "Никто не подходит под запрос.",
+        "count": "В сети: {total}",
+        "countFiltered": "В сети: {shown} из {total}",
+        "capped": "Показаны первые {delivered}. Сузьте поиск, чтобы увидеть остальных.",
+        "classFilter": "Фильтр по классу",
+        "allClasses": "Все классы",
+        "colStatus": "Статус",
+        "colName": "Имя",
+        "colLevel": "Уровень",
+        "colClass": "Класс",
+        "colZone": "Зона",
+        "colGuild": "Гильдия",
+        "sortTitle": "Сортировать по: {column}"
       },
       "ignoredEmpty": "Вы никого не игнорируете.",
       "blockedEmpty": "Вы никого не заблокировали.",
@@ -4753,7 +4749,7 @@ export const ru_RU: EnTranslations = {
           "farming": "Действует из ваших сумок, когда вы сажаете культуру на грядке."
         },
         "speed": "Быстрее собирает на узлах ниже {tier} уровня.",
-        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
+        "wieldDegrade": "Ниже этого навыка он все еще работает как инструмент более низкого уровня.",
         "rodRequired": "Нужна для рыбалки.",
         "rodBite": "Рыба клюет до {seconds} с быстрее.",
         "rodReel": "Продлевает окно подсечки на {seconds} с.",
@@ -4768,8 +4764,7 @@ export const ru_RU: EnTranslations = {
       "stateCooldown": "Восстанавливается",
       "stateCooldownTimed": "Восстановится через {time}",
       "respawnClock": "{minutes}:{seconds}",
-      "fineGradePreview": "Ваш инструмент даёт здесь отборный сорт добычи.",
-      "title": "Собирательство"
+      "fineGradePreview": "Ваш инструмент даёт здесь отборный сорт добычи."
     },
     "farming": {
       "plantLine": "Вы сажаете: {name}.",
@@ -4856,9 +4851,7 @@ export const ru_RU: EnTranslations = {
       "noviceBody": "Навык земледелия растет с каждым собранным урожаем. Посейте семя на любой грядке, чтобы начать."
     },
     "archetypeTitle": {
-      "none": "Нет",
-      "label": "Титул",
-      "hobbyLabel": "Хобби"
+      "none": "Нет"
     },
     "archetypePair": {
       "engineering+alchemy": "Бомбардир",
@@ -4935,7 +4928,7 @@ export const ru_RU: EnTranslations = {
       "enchant_lucent_infusion": "Светозарное вливание"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Попавшие в цель атаки ближнего боя могут повысить силу на 50 на 15 сек. и восстановить вам 200 ед. здоровья. Действуют модификаторы исцеления. При каждом попадании шанс срабатывания равен 1% за каждые 0,6 сек. базовой скорости атакующего оружия. Внутренней перезарядки нет. Каждая рука дает отдельное усиление; повторное срабатывание обновляет усиление той же руки. Дальние атаки не вызывают этот эффект. В облике волка вместо этого используется базовая скорость атаки в 1 сек."
+      "enchant_weapon_lastflame_zeal": "Попавшие в цель атаки ближнего боя могут повысить силу на 50 на 15 сек. и восстановить вам 200 ед. здоровья. Действуют модификаторы исцеления. При каждом попадании шанс срабатывания равен 1% за каждые 0,6 сек. базовой скорости атакующего оружия. Внутренней перезарядки нет. Обе руки дают одно общее усиление; любое срабатывание обновляет его, и оно никогда не суммируется. Дальние атаки не вызывают этот эффект. В облике волка вместо этого используется базовая скорость атаки в 1 сек."
     },
     "professions": {
       "title": "Профессии",
@@ -5029,18 +5022,18 @@ export const ru_RU: EnTranslations = {
       "majorsLabel": "Главные ремёсла: {a} и {b}",
       "pairsHeld": "Открыто пар: {count}",
       "returnsLabel": "Возвращений: {count}",
-      "retentionFooter": "Returns on respec: 60% of skill kept.",
-      "tutorialLink": "Profession tutorial"
+      "retentionFooter": "При смене специализации сохраняется 60% навыка.",
+      "tutorialLink": "Обучение профессиям"
     },
     "recipeTracker": {
-      "trackerLabel": "Recipes",
-      "collapseHint": "Collapse recipe tracker",
-      "expandHint": "Expand recipe tracker",
-      "pin": "Pin",
-      "unpin": "Unpin",
-      "pinFull": "The recipe tracker is full (up to {cap} recipes)",
-      "pinAria": "Pin {name} to the HUD tracker",
-      "unpinAria": "Unpin {name} from the HUD tracker",
+      "trackerLabel": "Рецепты",
+      "collapseHint": "Свернуть трекер рецептов",
+      "expandHint": "Развернуть трекер рецептов",
+      "pin": "Закрепить",
+      "unpin": "Открепить",
+      "pinFull": "Трекер рецептов заполнен (не более {cap} рецептов)",
+      "pinAria": "Закрепить {name} в трекере HUD",
+      "unpinAria": "Открепить {name} из трекера HUD",
       "haveNeed": "{have}/{need}",
       "resultCount": "{name} x{count}"
     },
@@ -5074,11 +5067,11 @@ export const ru_RU: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(потратит отборный сорт: {count})",
       "reagentVaultDraw": "(возьмёт из хранилища материалов: {count})",
-      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
+      "reagentOrdinaryHeld": "(у вас {name}: {count}, но здесь засчитывается только отборный сорт)",
       "vaultUnreachable": "Хранилище материалов здесь недоступно.",
       "craftFeeLine": "Плата за изготовление: {fee} за штуку",
       "empty": "Известных рецептов пока нет.",
-      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
+      "materialsFooter": "Материалы из хранилища используются автоматически. Новые рецепты можно изучить у станка.",
       "resultAria": "Создать {name}",
       "craftedToast": "Создано: {name}",
       "craftedToastQty": "Создано: {name} x{qty}",
@@ -5169,8 +5162,8 @@ export const ru_RU: EnTranslations = {
       "attunedBanner": "Настройка: {title}",
       "tierTutorial": {
         "title": "Ваш первый ранг",
-        "tierCap": "Ремесло достигает первого ранга при навыке {skill}, и каждый ранг улучшает то, что можно создать. Но превзойти работу редкого качества ремесло может, лишь став одним из двух ваших главных.",
-        "radar": "Ваши ремёсла образуют колесо. Настройтесь на соседнюю пару, и эти два ремесла станут главными без потолка, одно ремесло напротив станет увлечением с потолком редкого качества, а остальные уснут: их знания сохранятся, но будут ограничены обычным качеством, пока вы снова не возьмётесь за них.",
+        "tierCap": "Профессия достигает первого ранга при навыке {skill}, и каждый ранг улучшает то, что она даёт или позволяет создать. Но именно среди ремесленных профессий ремесло может подняться выше работ редкого качества только тогда, когда оно становится одной из двух ваших главных профессий.",
+        "radar": "Ваши ремесленные профессии образуют колесо. Настройтесь на соседнюю пару, и эти два ремесла станут главными без потолка, одно ремесло напротив станет увлечением с потолком редкого качества, а остальные уснут: их знания сохранятся, но будут ограничены обычным качеством, пока вы снова не возьмётесь за них.",
         "masters": "Мастера ремёсел в городах дают задания настройки. Зайдите к одному из них, когда будете готовы, и выберите свою пару. Ничто из выученного не теряется.",
         "dismiss": "Понятно"
       },
@@ -5183,7 +5176,7 @@ export const ru_RU: EnTranslations = {
       "commissionBound": "Изделие на заказ: привязано к получателю"
     },
     "marketWindow": {
-      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
+      "mixedListingsFooter": "Торговец пополняет обычные товары; лоты игроков размещаются рядом по назначенной ими цене."
     },
     "itemMenu": {
       "use": "Использовать",
@@ -5464,7 +5457,7 @@ export const ru_RU: EnTranslations = {
       "roleDps": "Боец",
       "freeRoles": "Любые роли",
       "lockoutDaily": "Ежедневное закрепление за последним боссом",
-      "lockoutWeekly": "Weekly lockout on each boss",
+      "lockoutWeekly": "Еженедельное закрепление за каждым боссом",
       "lockoutNone": "Без закрепления",
       "lockedFor": "Закрыто еще примерно {minutes} мин",
       "attunement": "Требуется допуск: {quest}",
@@ -5478,8 +5471,8 @@ export const ru_RU: EnTranslations = {
       "lootMaybe": "Выпадает не более одного из:",
       "lootChance": "Дополнительно с шансом:",
       "lootHeroic": "Героическая награда, всегда один из:",
-      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
-      "lootHeroicChance": "Heroic bonus, additional chance drops:",
+      "lootHeroicMaybe": "Героическая награда, не более одного из:",
+      "lootHeroicChance": "Героическая награда, дополнительно с шансом:",
       "pct": "{pct}%",
       "blockedLevel": "Только уровни {min}-{max}",
       "blockedSpec": "Требуется специализация",
@@ -5541,45 +5534,43 @@ export const ru_RU: EnTranslations = {
         "sealbreak_shockwave": "Волна сорванной печати (взрыв по области)",
         "gravebreaker": "Гробокрушитель (конус спереди, разверните от рейда)",
         "raise_fallen": "Поднятие павших (периодические волны прислужников)",
-        "soul_rend": "Разрыв души (отмеченным собраться вместе, затем покинуть огонь)",
+        "soul_rend": "Разрыв души (отмеченным собраться вместе, чтобы разделить урон)",
         "deathless_rage": "Бессмертная ярость (прерывается у охранных камней)",
         "wardstones": "Охранные камни (смена фазы)",
         "dread_curse": "Проклятие ужаса (накапливающийся дебафф смены танка, смена при 2 зарядах)",
-        "bone_spike": "Костяной шип (пронзённые рейдеры теряют здоровье, пока шип не уничтожен)",
+        "bone_spike": "Костяной шип (пронзённые игроки теряют здоровье, пока кто-нибудь не разобьёт шип несколькими попаданиями)",
         "grave_eruption": "Могильное извержение (предупреждающие круги оставляют горящую землю)",
         "binding_sigil": "Печать связывания (затащите босса на печать, или заплатит весь рейд)",
         "kings_wrath": "Королевский гнев (30%: постоянный бонус к урону, ускоренные опасности на полу)",
         "bone_storm": "Костяная буря (игнорирует угрозу, вращается и таранит рейд)",
         "crown_endures": "Корона выстоит (жёсткий энрейдж на 6:00, на героическом — 5:00)",
         "deathless_court": "Бессмертный двор (только на героическом, королевский двор восстаёт после Бессмертной ярости)",
-        "bloodmane_rend": "Bloodmane Rend (bleed, watch for target swaps)",
-        "tusk_sweep": "Tusk Sweep (frontal cleave)",
-        "ancestral_sap": "Ancestral Sap (heals its allies)",
-        "call_of_the_hunt": "Call of the Hunt (hastens nearby allies)",
-        "thickhide_ward": "Thickhide Ward (shields nearby allies)",
-        "beast_pit_quake": "Beast Pit Quake (area damage)",
-        "wildheart_pulse": "Wildheart Pulse (pulsing area damage)",
-        "jaguar_roar": "Jaguar Roar (knockback)",
-        "brand_of_the_pyre": "Brand of the Pyre (stacking fire mark, wash it off in conduit water)",
-        "forge_strike": "Forge Strike (stacking tank-swap debuff)",
-        "rain_of_cinders": "Rain of Cinders (three fire cones, stand between them)",
-        "falling_cinders": "Falling Cinders (meteor circles on players, move out)",
-        "revolving_inferno": "Revolving Inferno (rotating fire rays, move through the gaps)",
-        "forge_wave": "Forge Wave (expanding fire wall, use the two safe lanes)",
-        "apocalypse_add": "Ignivar Ashcaller (priority add casting Apocalypse, kill it fast)",
-        "judgment_of_the_forge": "Judgment of the Forge (intermission, share the one safe refuge)",
-        "last_inferno": "Last Inferno (45-second burn at 20% health)",
-        "chains_of_the_forge": "Chains of the Forge (heroic only, stay close to your linked partner)",
-        "makers_brand": "Maker's Brand (stacking tank-swap debuff)",
-        "forgefathers_sweep": "Forgefather's Sweep (wide frontal cone at a non-tank)",
-        "tempering_ray": "Tempering Ray (line to a marked player, intercept it)",
-        "cinder_orbs": "Cinder Orbs (marked players spread to the room edges)",
-        "forgestorm": "Forgestorm (falling meteor circles, move out)",
-        "shared_pyre": "Shared Pyre (gathering circle, split the damage)",
-        "anvils_decree": "Anvil's Decree (three raid-wide hammer strikes, heal through)",
-        "masters_assembly": "The Master's Assembly (block the forge beams, rotate blockers)",
-        "gravefire": "Могильный огонь (движущаяся огненная линия, уклоняйтесь)",
-        "soulfire": "Огонь души (взрывы Разрыва души оставляют горящие лужи)"
+        "bloodmane_rend": "Кровавый разрыв (кровотечение, следите за сменой цели)",
+        "tusk_sweep": "Удар бивнями (рассекающий удар спереди)",
+        "ancestral_sap": "Соки предков (лечит союзников)",
+        "call_of_the_hunt": "Зов охоты (ускоряет союзников поблизости)",
+        "thickhide_ward": "Толстокожая защита (щит для союзников поблизости)",
+        "beast_pit_quake": "Тряска звериной ямы (урон по области)",
+        "wildheart_pulse": "Пульс дикого сердца (периодический урон по области)",
+        "jaguar_roar": "Рёв ягуара (отбрасывание)",
+        "brand_of_the_pyre": "Клеймо костра (накапливающаяся огненная метка, смойте её водой из канала)",
+        "forge_strike": "Кузнечный удар (накапливающийся дебафф для смены танков)",
+        "rain_of_cinders": "Дождь углей (три огненных конуса, стойте между ними)",
+        "falling_cinders": "Падающие угли (метеоритные круги под игроками, выходите)",
+        "revolving_inferno": "Вращающийся ад (вращающиеся огненные лучи, проходите в промежутки)",
+        "forge_wave": "Кузнечная волна (расширяющаяся огненная стена, используйте два безопасных прохода)",
+        "apocalypse_add": "Пеплозов Игнивара (приоритетный прислужник, читающий Апокалипсис, убейте быстро)",
+        "judgment_of_the_forge": "Суд кузни (интермиссия, соберитесь в единственном безопасном укрытии)",
+        "last_inferno": "Последний ад (45-секундная гонка при 20% здоровья)",
+        "chains_of_the_forge": "Цепи кузни (только героический режим, держитесь рядом со связанным напарником)",
+        "makers_brand": "Клеймо творца (накапливающийся дебафф для смены танков)",
+        "forgefathers_sweep": "Взмах Кузнеца-отца (широкий фронтальный конус по не-танку)",
+        "tempering_ray": "Луч закалки (линия к помеченному игроку, перехватите его)",
+        "cinder_orbs": "Угольные сферы (помеченные игроки расходятся к краям зала)",
+        "forgestorm": "Кузнечная буря (падающие метеоритные круги, выходите)",
+        "shared_pyre": "Общий костёр (круг сбора, разделите урон)",
+        "anvils_decree": "Указ наковальни (три удара молотом по всему рейду, вылечивайте)",
+        "masters_assembly": "Сборка мастера (блокируйте лучи кузни, меняйте блокирующих)"
       }
     },
     "cosmetics": {
@@ -5600,8 +5591,8 @@ export const ru_RU: EnTranslations = {
       "applied": "Применено",
       "owned": "В коллекции",
       "storeOnly": "Доступно в магазине WOC",
-      "preview": "Preview",
-      "previewAria": "Preview {name}",
+      "preview": "Предпросмотр",
+      "previewAria": "Предпросмотр: {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "Облик ездового животного накладывается на любое животное, на котором ездит этот персонаж. Скорость не меняется.",
       "mountsNoMount": "Сначала получите ездовое животное: облику нужно, на что садиться.",
@@ -5650,10 +5641,10 @@ export const ru_RU: EnTranslations = {
       "ownedTooltipStatus": "Каталогизировано в Реликварие",
       "missingTooltipStatus": "Ещё не найдено",
       "firstFindClears": "Впервые найдено на прохождении {count}",
-      "foundBy": "Found by {names}",
+      "foundBy": "Нашли: {names}",
       "finderWithDate": "{name} ({date})",
-      "sharedScopeNote": "Shared by every character on your account",
-      "sharedScopeHint": "A relic found by any character on your account fills the page here too.",
+      "sharedScopeNote": "Общее для всех персонажей учётной записи",
+      "sharedScopeHint": "Реликвия, найденная любым персонажем аккаунта, заполняет страницу и здесь.",
       "unlockToast": "Реликвия каталогизирована: {name}",
       "illuminateBanner": "Страница озарена: {name}",
       "illuminateToast": "Все реликвии на странице {name} заполнены.",
@@ -5787,10 +5778,10 @@ export const ru_RU: EnTranslations = {
       "progressAria": "Прогресс: {current} из {target}",
       "renownChip": "Известность: {renown}",
       "earnedDate": "Получено {date}",
-      "earnedBy": "Earned by {names}",
+      "earnedBy": "Получено: {names}",
       "earnerWithDate": "{name} ({date})",
-      "accountScopeNote": "Shared by every character on your account",
-      "accountScopeHint": "A deed any character on your account accomplishes is earned here too, and the Book names who earned it.",
+      "accountScopeNote": "Общее для всех персонажей учётной записи",
+      "accountScopeHint": "Деяние, совершённое любым персонажем учётной записи, засчитывается и здесь, а Книга называет, кто его совершил.",
       "featRibbon": "Подвиг",
       "hiddenBadge": "Скрытое",
       "titleChip": "Награда: звание",
@@ -5841,30 +5832,30 @@ export const ru_RU: EnTranslations = {
       "levels": "Уровни {min} до {max}"
     },
     "mapAtlas": {
-      "level": "Level {level}",
-      "landmarkCount": "{count} landmarks",
-      "filtersAria": "Map layers",
+      "level": "Уровень {level}",
+      "landmarkCount": "Ориентиров: {count}",
+      "filtersAria": "Слои карты",
       "filters": {
-        "quests": "Quests",
-        "gather": "Gather",
-        "dungeons": "Dungeons",
-        "services": "Services",
-        "players": "Players"
+        "quests": "Задания",
+        "gather": "Сбор",
+        "dungeons": "Подземелья",
+        "services": "Службы",
+        "players": "Игроки"
       },
-      "trackedQuests": "Tracked quests",
-      "noTrackedQuests": "No tracked quests",
-      "availableNearby": "Available nearby",
-      "noNearbyQuests": "No nearby quests",
-      "distance": "{distance} yards",
-      "showRoute": "Show Route",
-      "untrack": "Untrack",
-      "track": "Track",
+      "trackedQuests": "Отслеживаемые задания",
+      "noTrackedQuests": "Нет отслеживаемых заданий",
+      "availableNearby": "Доступно поблизости",
+      "noNearbyQuests": "Поблизости нет доступных заданий",
+      "distance": "{distance} ярдов",
+      "showRoute": "Показать маршрут",
+      "untrack": "Не отслеживать",
+      "track": "Отследить",
       "legend": {
-        "dungeon": "Dungeon",
-        "ore": "Ore",
-        "herb": "Herb",
-        "mail": "Mail",
-        "passage": "Passage"
+        "dungeon": "Подземелье",
+        "ore": "Руда",
+        "herb": "Трава",
+        "mail": "Почта",
+        "passage": "Проход"
       },
       "collapseHint": "Collapse map sidebar",
       "expandHint": "Expand map sidebar"
@@ -5887,7 +5878,7 @@ export const ru_RU: EnTranslations = {
       "tabBrowse": "Обзор",
       "tabSell": "Продажа",
       "tabActivity": "Моя активность",
-      "tabHistory": "Sales History",
+      "tabHistory": "История продаж",
       "tabsLabel": "Разделы биржи $WOC",
       "loading": "Загрузка биржи...",
       "loadFailed": "Не удалось связаться с биржей. Попробуйте чуть позже.",
@@ -5912,16 +5903,16 @@ export const ru_RU: EnTranslations = {
       "colCurrentBid": "Текущая ставка",
       "colBuyNow": "Выкуп",
       "colTimeLeft": "Осталось",
-      "colBuyer": "Buyer",
-      "colSoldAt": "Sold",
-      "colSalePrice": "Sale price",
-      "colSaleType": "Type",
-      "saleTypeAuction": "Auction",
-      "saleTypeBuyNow": "Buy now",
-      "saleTypeDirected": "Directed",
-      "saleTypeUnknown": "Unknown",
-      "historyEmpty": "No sales recorded yet.",
-      "historyError": "Sales history could not be loaded.",
+      "colBuyer": "Покупатель",
+      "colSoldAt": "Продал",
+      "colSalePrice": "Цена продажи",
+      "colSaleType": "Тип",
+      "saleTypeAuction": "Аукцион",
+      "saleTypeBuyNow": "Купить сейчас",
+      "saleTypeDirected": "Адресная продажа",
+      "saleTypeUnknown": "Неизвестно",
+      "historyEmpty": "Продаж пока нет.",
+      "historyError": "Не удалось загрузить историю продаж.",
       "reserveMet": "Резерв достигнут",
       "reserveNotMet": "Резерв не достигнут",
       "yourListing": "Ваш лот",
@@ -6595,7 +6586,7 @@ export const ru_RU: EnTranslations = {
       "deeds": "Книга деяний",
       "reliquary": "Реликварий",
       "sheathe": "Убрать/обнажить оружие",
-      "hideInterface": "Hide the interface (screenshots and videos)",
+      "hideInterface": "Скрыть интерфейс (для скриншотов и видео)",
       "crafting": "Крафт",
       "mount": "Сесть / Спешиться",
       "calendar": "Календарь событий",
@@ -6625,8 +6616,8 @@ export const ru_RU: EnTranslations = {
       "attackMove": "Атака с движением (только если вы включили этот параметр)",
       "meters": "Счётчики урона (урон, исцеление и угроза)",
       "petMark": "Питомец: «Метка», выбрать собственного питомца (то же, что щёлкнуть по его рамке)",
-      "targetSelf": "Target yourself",
-      "targetParty": "Target party members 1 to 9, top to bottom as the party frames show them",
+      "targetSelf": "Выбрать себя целью",
+      "targetParty": "Выбрать участников группы с 1 по 9 (сверху вниз, как их показывают рамки группы)",
       "onBarBinding": "Привязать клавишу можно и прямо с панели: выберите «Настроить клавиши панели действий» в окне привязок, затем щёлкните ячейку на живой панели и нажмите нужную клавишу. Закончив, нажмите «Готово». Этот способ работает только на настольных версиях, ведь ему нужна настоящая клавиатура.",
       "clickMoveNote": "«Движение по щелчку» выключено, пока вы сами его не включите: откройте панель «Назначение клавиш» в игровом меню, включите «Движение по щелчку», а затем в строке «Кнопка клика для движения» под ней выберите, какая кнопка мыши ведёт вас пешком (по умолчанию левая, можно правую). Когда настройка включена, щелчок по земле отправляет вас идти туда, а метка на земле показывает, куда вы направляетесь. Щелчок по существу или другому игроку подводит вас к нему и останавливает на нужном расстоянии, при этом сам щелчок по-прежнему делает свою обычную работу: выбирает цель или взаимодействует; а если вы уже стоите достаточно близко, вы просто взаимодействуете и остаётесь на месте. Любая клавиша передвижения тут же возвращает управление вам и прерывает путь, как и удержание кнопки мыши для обзора. Прыжок его не прерывает, так что в прыжке вы продолжаете идти, а игровое меню лишь ставит путь на паузу, и он продолжается, когда вы закроете меню."
     },
@@ -6681,7 +6672,7 @@ export const ru_RU: EnTranslations = {
       "rowBrightness": "Экспозиция сцены, темнее или светлее. Чистое дело вкуса.",
       "rowWeather": "Фоновые дождь и снег. Только атмосфера; отключение немного экономит ресурсы в грозу.",
       "rowBrowserEffects": "Насколько нарядным разрешено быть самому интерфейсу: размытие в стиле стекла, свечение, анимированные меню. Режим «Авто» подстраивается под ваш браузер; трехмерный мир в любом случае не затрагивается.",
-      "rowFrameRateCap": "A ceiling on how many images the game draws each second. A computer that cannot keep up with its display lands on an uneven rhythm; a steady 30 looks smoother than that, halves the work, and keeps the computer cooler. Display means no limit.",
+      "rowFrameRateCap": "Верхний предел числа изображений, которые игра рисует в секунду. Компьютер, который не успевает за своим дисплеем, попадает в неровный ритм; ровные 30 выглядят плавнее, вдвое сокращают работу и снижают нагрев. «Дисплей» означает отсутствие ограничения.",
       "rowTerrainDetail": "Богатые, плавно смешанные текстуры земли либо более простой и быстрый вид местности.",
       "rowFoliageDensity": "Как далеко и как густо растет трава вокруг вашего персонажа.",
       "rowEffectsQuality": "Свечение, объёмное затенение и то, сколько факелов и заклинаний отбрасывают настоящий свет. Самая крупная отдельная экономия среди регуляторов детализации и переключатель, от которого зависят остальные регуляторы освещения.",
@@ -6689,7 +6680,7 @@ export const ru_RU: EnTranslations = {
       "rowFrostedPanels": "Размытие в стиле матового стекла позади окон. Красиво, и именно такие эффекты первым чувствует слабый браузер; оставьте его выключенным ради классической четкой картинки.",
       "rowReduceMotion": "Убирает анимацию интерфейса, и окна появляются мгновенно. В первую очередь это настройка специальных возможностей, но она дает и небольшой прирост производительности.",
       "rowPerfOverlay": "Экранная сводка с FPS, временем кадра и другими показателями. Включите ее, пока подбираете настройки с этой страницы, а затем снова скройте.",
-      "tableFoot": "Ищете ограничение FPS? Искать нечего: темп кадров следует за вашим экраном. Дальность прорисовки — отдельный регулятор, «Дальность обзора», в карточке «Детализация мира», и каждая предустановка выставляет её за вас, пока вы не сдвинете её сами.",
+      "tableFoot": "Дальность прорисовки — отдельный регулятор, «Дальность обзора», в карточке «Детализация мира», и каждая предустановка выставляет её за вас, пока вы не сдвинете её сами.",
       "mobileTitle": "На телефонах и планшетах",
       "mobileBody": "На телефоне или планшете игра запускает вас на Low. Любое сенсорное устройство приземляется туда при первом запуске, намеренно, чтобы вы вошли в мир и играли; поднимите ступень сами из панели «Графика» когда угодно. В браузере Android вся лестница открыта вам, и ваш выбор держится. На iPhone и iPad вы по-прежнему можете выбрать верхние предустановки, и они вступают в силу, как только вы нажмёте «Применить», но при следующем запуске игра вернёт вас на High, потому что iOS может закрыть вкладку, пока строится сцена такого размера. Загруженное приложение ещё строже: его список предустановок заканчивается на High, а отдельные системные регуляторы скрыты, потому что приложение управляет ими само.",
       "touchBody": "На сенсорном экране у панели «Графика» появляется собственная карточка «Сенсорное управление»: размер и мёртвая зона джойстика, размер экранных кнопок, непрозрачность управления, необязательный стик камеры, зеркальная раскладка для левшей и обращённый сенсорный обзор, чтобы экран подстраивался под ваши руки, а не наоборот.",
@@ -6768,7 +6759,7 @@ export const ru_RU: EnTranslations = {
       "keybindsHeading": "Панель «Назначение клавиш»",
       "keybindsBody": "Список клавиш — лишь половина этой панели. Над ним стоят переключатели, задающие, как мышь ведёт игру: камера на мыши, запирается ли курсор во время поворота, движение по щелчку и то, какая кнопка мыши его запускает, атака с движением, раскладка касаний для левшей и фильтр брани в чате.",
       "keybindsMouseBody": "Две вещи здесь легко пропустить. Кнопки мыши назначаются как обычные клавиши, так что щелчок колесом и боковые кнопки могут нести способности, а левая и правая остаются за камерой и за щелчками по миру. И назначать можно прямо с панели способностей: включите здесь режим назначения на панели, затем щёлкните по ячейке и нажмите нужную клавишу.",
-      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
+      "keybindsWheelBody": "Само колесо тоже назначается. Приблизить камеру и Отдалить камеру: обычные назначения, которые по умолчанию стоят на чистом колесе, так что их можно перенести на Ctrl+колесо или на клавиши, а освободившимся колесом запускать ячейки панели действий. У щелчка колеса нет отпускания, поэтому он не может управлять удерживаемым действием, таким как движение вперёд."
     },
     "combat": {
       "intro": "Бой подчиняется привычным правилам классических MMO. Чтобы хорошо играть, изучать их вовсе не обязательно, это лишь общее представление о том, как устроены сражения.",
@@ -6789,7 +6780,7 @@ export const ru_RU: EnTranslations = {
       "deathTitle": "Когда вы пали",
       "deathBody": "Если ваше здоровье опускается до нуля, вы повержены там, где стояли, и там же остаётся ваше тело. Высвободите дух, и вы поднимаетесь призраком на ближайшем кладбище: проворнее живых, вне досягаемости врагов, но без возможности сражаться, собирать добычу или говорить с кем-либо, кроме Целителя душ, парящего над камнями. Дальше выбор за вами. Добегите призраком до своего тела, и вы возродитесь на месте с частью здоровья и маны и вовсе без штрафа. Или примите у Целителя душ мгновенное воскрешение там, где стоите, ценой Подати Хранителя: временного ослабления всего, что вы есть, которое длится тем дольше, чем опытнее вы стали, а совсем новых персонажей обходит стороной. Если вы пали в подземелье, ваш дух ждёт на кладбище снаружи; проведите призрака обратно через дверь, и вы возродитесь у входа. Вылазки, это исключение: если вы пали там, вас просто снова поднимут на ноги у входа в вылазку, но второе падение завершает поход. Каким бы путём вы ни пошли, вы не теряете ни опыта, ни снаряжения, ни монет. Между боями садитесь поесть и попить, чтобы начать следующую схватку в полной силе.",
       "threatTitle": "Кого бьёт враг",
-      "threatBody": "Каждый враг ведёт свой тайный счёт тому, кто досадил ему больше всех. Урон в него добавляет, и исцеление тоже: лечение кладёт угрозу на врагов, что уже сражаются с тем, кого вы вылечили, разделив её между ними, так что самое безопасное лечение — то, что уходит на цель, за которую танк уже взялся. Танки включают защитную стойку или защитный облик, что умножает всё создаваемое ими, а Облик волка у друида, наоборот, сбрасывает угрозу; подстрекательство же поднимает того, кто его применил, прямо на вершину счёта и приковывает к нему врага на несколько секунд. Враги не переключаются в тот же миг, как кто-то обошёл танка: чтобы стянуть врага, нужен явный отрыв, а на расстоянии он должен быть больше, чем в ближнем бою, так что немного терпения в начале боя держит схватку там, где ей место.",
+      "threatBody": "Каждый враг ведёт свой тайный счёт тому, кто досадил ему больше всех. Урон в него добавляет, и исцеление тоже: лечение кладёт угрозу на врагов, что уже сражаются с тем, кого вы вылечили, разделив её между ними, так что самое безопасное лечение — то, что уходит на цель, за которую танк уже взялся. Танки включают защитную стойку или защитный облик, что умножает всё создаваемое ими, а Облик кота у друида, наоборот, сбрасывает угрозу; подстрекательство же поднимает того, кто его применил, прямо на вершину счёта и приковывает к нему врага на несколько секунд. Враги не переключаются в тот же миг, как кто-то обошёл танка: чтобы стянуть врага, нужен явный отрыв, а на расстоянии он должен быть больше, чем в ближнем бою, так что немного терпения в начале боя держит схватку там, где ей место.",
       "hazardsTitle": "Вода может вас убить",
       "breathBody": "В глубокой воде можно плыть, а можно и нырнуть. Пока голова под водой, у верхнего края экрана появляется синяя полоса дыхания и убывает; вынырните — и она наполнится куда быстрее, чем опустела. Дайте ей опустеть до конца, оставаясь под водой, и вы начнёте тонуть, теряя изрядную долю здоровья каждую секунду, пока не доберётесь до воздуха, так что на долгом погружении поглядывайте на полосу. Смерть её обнуляет, так что бег за телом всегда начинается с полной грудью воздуха.",
       "fatigueBody": "У моря нет стены. Переправы, что мир задумал для вас, — проливы и заливы между одним куском суши и другим, а с ними и внутренние озёра — безопасны, сколько бы времени ни заняли. Но уйдите от берега в по-настоящему открытую воду, и она начнёт вытягивать из вас силы: сперва появится предупреждение, у вас будет настоящий срок повернуть назад, а после море станет наносить всё более тяжёлый урон, которого ничем не предотвратить, пока вы не двинетесь обратно к суше. Утоните или выбьетесь из сил так далеко от берега — и высвобождаете дух, как при любой другой смерти, так что считайте горизонт видом, а не целью пути.",
@@ -6797,7 +6788,7 @@ export const ru_RU: EnTranslations = {
       "allyRezBody": "Возвращаться пешком приходится не всегда. Союзник с заклинанием воскрешения может поднять вас сам, и оно приходит к вам предложением, которое вы принимаете или отклоняете; оставите его без ответа — оно истечёт, так что отвечайте, пока оно перед вами. Примете — и встанете рядом с тем, кто его прочёл, с частью здоровья и маны. Иные целители могут предложить это сразу всей павшей группе, но каждый всё равно отвечает на своё предложение. Терновая Лощина — исключение: там до вас не дотянется ни одно воскрешение, и вы ждёте следующей волны своей команды.",
       "unstuckTitle": "Когда вы застряли всерьёз",
       "unstuckBody": "Если мир запер вас там, откуда не выбраться, введите /unstuck. Нужно быть вне боя и стоять на месте, не под оглушением и не в обездвиживании, и не на дуэли и не в матче арены: пойдёт короткий отсчёт, а движение или полученный урон его отменят. Когда он закончится, вас поставят на ближайшем кладбище. Команда никогда вас не убивает и не оставляет тела, а если вы уже пали, она вас там же и поднимет. Плата за это — Болезнь спасения, временное ослабление всего, что вы есть, которое проходит к тому времени, когда командой можно будет воспользоваться снова, и, как и Подать Хранителя, совсем новых персонажей она обходит стороной.",
-      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
+      "unstuckBodyWindow": "Если мир запер вас там, откуда не выбраться, введите /unstuck. Нужно быть вне боя и стоять на месте, не под оглушением и не в обездвиживании, и не на дуэли и не в матче арены: пойдёт короткий отсчёт, а движение или полученный урон его отменят. Когда он закончится, вас поставят на ближайшем кладбище. Команда никогда вас не убивает и не оставляет тела, а если вы уже пали, она вас там же и поднимет. Первое использование за час ничего не стоит. Воспользуйтесь командой снова в течение часа после прошлого раза, и платой станет Болезнь спасения, временное ослабление всего, что вы есть, которое проходит к тому времени, когда командой можно будет воспользоваться снова, и, как и Подать Хранителя, совсем новых персонажей она обходит стороной.",
       "climbTitle": "Как подтянуться на уступ",
       "climbBody": "Уступы — это не стены. Прыгните на то, что слишком высоко, чтобы просто шагнуть, и ваш герой у верхушки прыжка зацепится за край и подтянется наверх, и отдельной клавиши для этого нет. То, что вы и так перескакиваете, проходит без всяких церемоний; полное подтягивание припасено для краёв выше вашей головы. Оно коротко и на это время берёт управление на себя, так что свернуть посреди него не выйдет. Оглушение застанет вас на середине подтягивания — и вы сорвётесь и упадёте, а высота падения считается от того места, откуда вы прыгнули; оглушение же или обездвиживание и вовсе не дадут начать подъём, о чём стоит помнить, когда вы пытаетесь выбраться из скверного положения в бою."
     },
@@ -6821,10 +6812,11 @@ export const ru_RU: EnTranslations = {
       "framePetBody": "Охотники, чернокнижники и все прочие с призванным питомцем получают для него маленькую рамку рядом со своей: там имя, уровень и здоровье. Клик по этой рамке делает питомца вашей целью, и Ctrl+6 делает то же самое с клавиатуры.",
       "framesMoveBody": "Вашу рамку, рамку цели и рамки группы можно двигать. У каждой в углу есть маленькая кнопка перемещения: снимите блокировку, перетащите рамку туда, где хотите её видеть, и заблокируйте снова, чтобы случайный клик её не сдвинул. Если они оказались там, где вам не нравится, «Сбросить положение рамок» в настройках вернёт их все туда, где они были изначально.",
       "framesMoveBodyEditFrames": "Вашу рамку, рамку цели и рамки группы можно двигать. У каждой в углу есть маленькая кнопка перемещения: снимите блокировку, перетащите рамку туда, где хотите её видеть, и заблокируйте снова, чтобы случайный клик её не сдвинул. «Редактирование фреймов» в верхней части вкладки «Рамки» раздела «Интерфейс» в настройках разом отпускает весь остальной интерфейс (а с ним и эти три рамки): панели способностей, полосу чтения, полосу замаха, полосу опыта, миникарту, ряд кнопок, рамку питомца, панель стоек, ряды усилений и ослаблений и плашку «Напоминание о списке желаемого», причём на каждой, пока она отпущена, висит ярлычок с её названием. Если они оказались там, где вам не нравится, кнопка «Сбросить настройки» внизу той же вкладки «Рамки» вернёт их все туда, где они были изначально.",
-      "framesGovernedExtra": "«Редактирование фреймов» также отпускает стопку трекеров под ним (отслеживаемые задания и их цели, ход ваших деяний, ваши страницы Реликвария, вылазка, в которой вы находитесь, любой разлом, в котором вы участвуете, и рецепт или заказ, который вы отслеживаете), панель действий питомца рядом с рамкой питомца, рамку «Эффекты на целях» для ваших ослабляющих эффектов на ближних врагах, медальон «Преданность» паладина, «Шкалу ресурсов Колдовства» чернокнижника, оверлей срабатывания заклинаний, полосу замаха оружия в левой руке для тех, кто дерётся с оружием в каждой руке, и окно счётчика урона с вкладками, и у каждого из них, пока он отпущен, есть ярлычок с его названием.",
+      "framesGovernedExtra": "«Редактирование фреймов» также отпускает стопку трекеров под ним (отслеживаемые задания и их цели, ход ваших деяний, ваши страницы Реликвария, рецепты, закреплённые вами при крафте, вылазка, в которой вы находитесь, любой разлом, в котором вы участвуете, и рецепт или заказ, который вы отслеживаете), панель действий питомца рядом с рамкой питомца, рамку «Эффекты на целях» для ваших ослабляющих эффектов на ближних врагах, медальон «Преданность» паладина, «Шкалу ресурсов Колдовства» чернокнижника, оверлей срабатывания заклинаний, полосу замаха оружия в левой руке для тех, кто дерётся с оружием в каждой руке, и окно счётчика урона с вкладками, и у каждого из них, пока он отпущен, есть ярлычок с его названием.",
       "framesGovernedAuraTracks": "«Редактирование фреймов» также отпускает шесть необязательных дорожек эффектов, если вы включили их на вкладке «Бой» тех же настроек интерфейса: дорожки «Мои эффекты», «Защитные умения», «Мои щиты», «Атакующие умения», «Движение и скрытность» и «Мои эффекты на союзниках». По умолчанию все они выключены, а пока дорожка отпущена, на ней висит ярлык с её названием.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
-      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedTalkingHead": "«Редактировать фреймы» также освобождает панель диалога: она показывает реплику NPC, пока тот находится вне вашего поля зрения, и носит свою табличку с именем, пока откреплена.",
+      "framesGovernedUnitTooltip": "«Редактирование фреймов» также освобождает фрейм подсказки: место, где появляется карточка того, на что наведён курсор. Для существа это уровень и вид, для другого игрока: звание, гильдия, уровень и класс, а также специализация с её ролью. Перетащите фрейм куда угодно, и карточка будет раскрываться оттуда в сторону от ближайших краёв экрана. Снимите флажок «Подсказка» в разделе «Показать или скрыть фреймы» в «Настройках фреймов», чтобы совсем скрыть эту карточку.",
       "barsTitle": "Полосы, таймеры и боевой текст",
       "barsBody": "Ваша полоса чтения появляется посреди экрана, прямо над панелями способностей, каждый раз, когда вы читаете или поддерживаете заклинание, и несёт его название и оставшееся время. У вашей цели своя полоса чтения на её рамке, так что вы видите, что вам готовят, и можете ответить.\n\nПод полосой чтения идёт тонкая полоса замаха: она заполняется между ударами вашего оружия, чтобы боец ближнего или дальнего боя видел, когда придёт следующий автоматический удар.\n\nПолоса опыта тянется во всю ширину под панелями способностей, разбитая на отрезки, а более светлый участок показывает накопленный отдохнувший опыт.\n\nНырните под воду, и наверху экрана появится синяя полоса дыхания. Она убывает, пока голова под водой, вспыхивает красным, когда воздух кончился и вы начинаете тонуть, и быстро наполняется, едва вы всплывёте. Пробел выносит вас наверх, а клавиша погружения, по умолчанию Ctrl, уводит глубже.\n\nУрон и лечение всплывают маленькими числами над тем, по кому они пришлись, так что бой можно читать, не читая текста. Вкладка «Бой» в окне чата хранит полную запись словами.",
       "aurasTitle": "Усиления и ослабления",
@@ -6835,7 +6827,7 @@ export const ru_RU: EnTranslations = {
       "minimapBody": "Справа вверху: круглая миникарта с названием зоны над ней и вашими координатами под ней, окружённая циферблатом, который рисует время суток.\n\nНа ней появляются маленькие указатели, когда им есть что сказать: конверт, пока вас ждут непрочитанные письма, монета, пока выручка с продаж или возвращённые товары ждут у торговца, и кнопка со списком ваших рейдовых блокировок.",
       "mapTitle": "Карта мира и ваши трекеры",
       "mapBody": "M открывает карту мира: вычерченный континент, ваша собственная стрелка на нём, зоны и их названия, окрестные точки интереса, дорожные порталы и найденные вами узлы сбора. Ваша группа тоже видна на ней. Внутри вылазки карта переключается на схему тех комнат, что вы уже исследовали.\n\nПо правому краю, под миникартой, стопка трекеров держит ваши текущие дела на виду, ничего не открывая: отслеживаемые задания и их цели, ход ваших деяний, вылазка, в которой вы находитесь, и любой разлом, в котором вы участвуете. Трекер заданий сворачивается, когда экран нужен вам целиком.",
-      "mapBodyZoneFirst": "M открывает карту мира на той зоне, где вы стоите: ваша собственная стрелка на ней, окрестные точки интереса, те, кто выдаёт задания, с их метками и области, где лежат ваши цели, ремесленные станции, почтовые ящики, доски объявлений и грядки, входы в подземелья и каждый узел сбора в зоне, серый, пока он отрастает заново, и помеченный, когда вашим инструментам он ещё не по силам. Ваша группа тоже видна на ней. Щёлкните карту правой кнопкой или нажмите на ней кнопку «Карта мира», и она отступит до континента, где каждая зона вычерчена со своим названием, а клик по зоне открывает карту этой зоны. Ступите в вылазку, подземелье, разлом или замок, и карта переключится на план того места, где вы стоите; а поле боя «Терновая Лощина» получает собственную карту поля.\n\nПо правому краю, под миникартой, стопка трекеров держит ваши текущие дела на виду, ничего не открывая: отслеживаемые задания и их цели, ход ваших деяний, ваши страницы Реликвария, вылазка, в которой вы находитесь, и любой разлом, в котором вы участвуете. Трекер заданий сворачивается, когда экран нужен вам целиком.",
+      "mapBodyZoneFirst": "M открывает карту мира на той зоне, где вы стоите: ваша собственная стрелка на ней, окрестные точки интереса, те, кто выдаёт задания, с их метками и области, где лежат ваши цели, ремесленные станции, почтовые ящики, доски объявлений и грядки, входы в подземелья и каждый узел сбора в зоне, серый, пока он отрастает заново, и помеченный, когда вашим инструментам он ещё не по силам. Ваша группа тоже видна на ней. Щёлкните карту правой кнопкой или нажмите на ней кнопку «Карта мира», и она отступит до континента, где каждая зона вычерчена со своим названием, а клик по зоне открывает карту этой зоны. Ступите в вылазку, подземелье, разлом или замок, и карта переключится на план того места, где вы стоите; а поле боя «Терновая Лощина» получает собственную карту поля.\n\nПо правому краю, под миникартой, стопка трекеров держит ваши текущие дела на виду, ничего не открывая: отслеживаемые задания и их цели, ход ваших деяний, ваши страницы Реликвария, рецепты, закреплённые вами при крафте, вылазка, в которой вы находитесь, и любой разлом, в котором вы участвуете. Трекер заданий сворачивается, когда экран нужен вам целиком.",
       "gatheringGoalTrackerBody": "Трекер цели сбора присоединяется к стопке, как только вы отслеживаете рецепт в окне создания или заказ на доске: он называет рецепт или заказ, который вы отслеживаете, сколько вы собираете, и насколько ваши материалы при себе и на складе приближают вас к цели. \"Отследить\" заменяет вашу текущую цель, а \"Очистить\" явно её сбрасывает; ни то, ни другое никогда не меняет вашу настройку сбора.",
       "hubPracticeTrackerBody": "Рядом с узлом Eastbrook в стопку добавляется трекер тренировок, как только вы начинаете проходить там управляемые тренировочные уроки: он держит на виду ваши лучшие результаты против тренировочных манекенов. Пока урок активен, полоса подсказок рядом с ним проведет вас через текущий шаг урока, от открытия Счетчиков урона до сравнения второго забега.",
       "chatTitle": "Окно чата",
@@ -6974,7 +6966,7 @@ export const ru_RU: EnTranslations = {
       "dungeonReset": "Оставить собственные пустые подземелья, что и делают после смены сложности.",
       "groupRecovery": "Спасение и присутствие",
       "unstuck": "Выход, когда мир вас запер. Простойте неподвижно короткий отсчёт, и вас перенесут на ближайшее кладбище, а если вы уже пали, там же и поднимут. После этого вас на время тяготит Болезнь спасения, так что это крайнее средство, а не короткий путь.",
-      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
+      "unstuckWindow": "Выход, когда мир вас запер. Простойте неподвижно короткий отсчёт, и вас перенесут на ближайшее кладбище, а если вы уже пали, там же и поднимут. Первое использование за час бесплатно. Воспользуйтесь командой снова в течение часа после прошлого раза, и вас на время будет тяготить Болезнь спасения, так что это средство спасения, а не короткий путь.",
       "afk": "Отметить себя отошедшим от клавиатуры; можно добавить сообщение, которое автоматическим ответом получит каждый, кто вам шепнёт. Повторите команду без сообщения, чтобы снять отметку; любая другая реплика в чате снимает её тоже.",
       "dnd": "Не беспокоить: как «отошёл», только шёпот вам не доставляется, а придерживается.",
       "sit": "Сесть там, где стоите, и снова встать. Вы встанете сами, едва двинетесь, начнёте читать заклинание или получите удар.",
@@ -7081,7 +7073,7 @@ export const ru_RU: EnTranslations = {
       "fatigueDef": "Заплывите достаточно далеко в открытое море, и вода начнёт вытягивать из вас силы: сперва предупреждение, затем нарастающий урон, пока вы не повернёте к берегу.",
       "unstuckTerm": "Болезнь спасения",
       "unstuckDef": "Цена за «Выбраться» из игрового меню. Простойте неподвижно весь отсчёт, и вас опустит на ближайшем кладбище, а после вы какое-то время носите временную слабость.",
-      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
+      "unstuckDefWindow": "Цена за то, чтобы прибегнуть к «Выбраться» из игрового меню больше одного раза за час. Простойте неподвижно весь отсчёт, и вас опустит на ближайшем кладбище. Первое использование за час бесплатно, а повтор в течение часа после прошлого раза вдобавок оставляет на вас на какое-то время временную слабость.",
       "itemLevelTerm": "Уровень предмета",
       "itemLevelDef": "Одно число, что подытоживает силу вещи, удобное, когда надо быстро сравнить две. Включите «Показывать уровень предмета» в настройках, чтобы видеть его в подсказках. Он есть лишь у снаряжения с известным источником, поэтому простые товары торговцев и стартовые вещи не показывают ничего, и отсутствие числа, это норма, а не изъян.",
       "requiredLevelTerm": "Требуемый уровень",
@@ -7186,7 +7178,7 @@ export const ru_RU: EnTranslations = {
       "formsNote": "Друид сражается, меняя облик. Большинство способностей друида принадлежат одному облику, так что нынешний облик решает, что вы можете применить, а сама смена стоит немного маны. Менять облик можно и в бою, и вне его, сколько угодно раз.",
       "formsAutoUnshift": "Лечащее или атакующее заклинание, применённое в облике, само выводит вас из него. Такой выход не стоит маны и не тратит общее восстановление, поэтому мгновенное заклинание срабатывает в тот же миг, как вы его нажали. Обратное превращение остаётся обычной способностью и по-прежнему стоит маны и общего восстановления.",
       "formsMoonwing": "Друид ветки Баланса получает ещё один облик, Облик лунного совуха — облик заклинателя, в котором такой друид и сражается. Это единственный звериный облик, что сохраняет ваши заклинания, а ваш жезл работает лишь в нём или в обычном облике заклинателя.",
-      "formsWolfEngage": "A Cat opens a fight with Bruin Rush, shifts straight into Cat Form to Pin the target, closes the gap with Lunge when it is not stalking, and holds an enemy still with Takedown.",
+      "formsWolfEngage": "Волк открывает бой Натиском бурого, сразу переходит в Облик волка, чтобы пригвоздить цель, сокращает дистанцию Выпадом, когда не скрывается, и удерживает врага Повалом.",
       "formLine": {
         "form_bear": "Танковый облик: толстая шкура, ярость вместо маны и лишняя угроза, чтобы враги били именно вас.",
         "form_cat": "Облик ближнего боя: энергия и приёмы серии, как у разбойника, и куда меньше угрозы.",
@@ -7195,7 +7187,7 @@ export const ru_RU: EnTranslations = {
       "mageEleSummon": "Заклинание Льда, что призывает элементаля вам под бок и натравливает его на вашу цель.",
       "formName": {
         "form_bear": "Облик бурого",
-        "form_cat": "Облик волка",
+        "form_cat": "Облик кота",
         "form_travel": "Форма скорохода"
       }
     },
@@ -7739,7 +7731,7 @@ export const ru_RU: EnTranslations = {
     "deedsPage": {
       "intro": "Книга деяний ведет счет всему, что вы совершили в этом мире, от первых шагов из начальной долины до самых тяжелых сражений, какие только может предложить королевство. Зарабатывайте деяния по ходу игры, носите дарованные ими звания и смотрите, как растет ваша Известность.",
       "howHeading": "Как работают деяния",
-      "howBody": "Деяния зарабатываются и хранятся у каждого персонажа отдельно, так что каждый герой, за которого вы играете, ведёт собственную Книгу; лишь таблица лидеров королевства собирает вашу Известность по всем вашим персонажам и засчитывает каждое деяние только один раз. Каждое деяние ясно говорит, чего оно от вас требует, прямо в Книге деяний в игре, так что вы всегда знаете, к чему стремиться, а за нужными можно следить, чтобы они оставались на виду, пока вы играете. Немногие остаются тайными и раскрываются лишь после того, как вы их заработаете. Книга к тому же ведёт себя честно: всё, что может подтвердить ваш прошлый послужной список, она засчитывает на месте, так что ветеран никогда не открывает её на пустой странице; лишь счётные деяния начинают свой подсчёт заново.",
+      "howBody": "Деяния совершает каждый персонаж по отдельности, но Книга деяний общая для всех персонажей учётной записи: деяние, совершённое любым из них, засчитывается всем, Книга записывает, кто и когда его совершил, а полученный за него титул или рамку может носить любой ваш персонаж. Рейтинг мира собирает вашу Славу так же, считая каждое деяние лишь один раз. Каждое деяние прямо в Книге деяний в игре ясно говорит, чего оно требует, так что вы всегда знаете, за чем гнаться, а нужные можно взять под наблюдение, чтобы держать их на виду во время игры. Немногие остаются тайной и открываются лишь после того, как вы их совершите. Книга остаётся честной: всё, что может подтвердить ваша прошлая история, зачитывается сразу, так что ветеран никогда не открывает пустую страницу; только счётные деяния начинают отсчёт заново.",
       "renownHeading": "Известность",
       "renownBody": "Известность — это счёт, стоящий за Книгой. Каждое добытое вами деяние стоит определённой величины, а ваш итог только растёт, поэтому тихая неделя никогда не отнимает у вас позиций. Горстка зависит скорее от удачи, чем от умения, другие коллекционные деяния сами себе награда, а Подвиги — честь особая, поэтому ни одно из них не стоит никакой Известности. Деяния без Известности всё равно засчитываются к завершению вашей Книги; они просто никогда не приносят очков. Подвиги — единственное исключение, они держатся полностью вне счёта.",
       "rewardsHeading": "Звания и рамки",
@@ -7777,7 +7769,7 @@ export const ru_RU: EnTranslations = {
     "reliquaryPage": {
       "intro": "Реликварий: музей уникальных трофеев из вашего каталога: добыча из подземелий, трофеи профессий, скакуны, облики оружия и титулы. Он относится к Книге деяний как зал трофеев к книге достижений.",
       "howHeading": "Как устроена коллекция",
-      "howBody": "Откройте Реликварий в игре (по умолчанию Shift+X). На каждой полке страницы уникальных реликвий. Силуэт заполняется, когда персонаж впервые получает предмет; страница озаряется, когда заполнены все её реликвии. Некоторые страницы помечены «Выведено» или «Личное»: они вне зачёта и не мешают завершению полки или каталога. Новые находки показывают тост и обновляют открытое окно. Прогресс по персонажу, кроме обликов оружия: это косметика аккаунта.",
+      "howBody": "Откройте Реликварий в игре (по умолчанию Shift+X). На каждой полке лежат страницы уникальных реликвий. Силуэт заполняется, когда любой персонаж вашего аккаунта впервые получает этот предмет, а страница озаряется, когда заполнены все реликвии на ней. Несколько страниц помечены как Снятые или Личные: они вне завершения и никогда не мешают завершению полки или каталога. Новые находки показывают тост и обновляют открытое окно. Прогресс общий для всех персонажей аккаунта: реликвия, найденная одним персонажем, заполняет страницу для всех.",
       "ranksHeading": "Ранги хранителя",
       "ranksBody": "Ранги хранителя растут с уникальными записями каталога и дают только косметические титулы и рамки. Не дают силы, шанса добычи или жалости. Облики оружия аккаунта не считаются в ранге, чтобы престиж оставался привязан к персонажу. Реликвии со страниц «Выведено» и «Личное» в ранг тоже не считаются.",
       "retiredTag": "Выведено",
@@ -7863,7 +7855,7 @@ export const ru_RU: EnTranslations = {
       "groupClasses": "Классы",
       "groupForms": "Облики друида",
       "formBear": "Облик бурого",
-      "formCat": "Облик волка",
+      "formCat": "Облик кота",
       "formTravel": "Форма скорохода",
       "groupCreatures": "Существа",
       "groupPets": "Демоны чернокнижника",
@@ -8187,7 +8179,7 @@ export const ru_RU: EnTranslations = {
         "bonusFmt": "+{value} к {stat}",
         "enchantsNoteOffhand": "Чары делятся на четыре уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия, вторую руку и каждый слот доспеха, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота: щиты и держимые заклинателем предметы во второй руке берут собственные чары на Стойкость, так что ни один надетый слот не остаётся без чар. Высший уровень стоит один осколок перезвона плюс эссенцию: более сильные бонусы для слотов с наибольшим влиянием. Кроме того, осколки кормят ещё три стока: два рецепта оберегов по пять штук за каждый, верхнюю ступень пополнения эффектов инструментов и светозарный уровень, где чары оружия и нагрудника берут по одному, а «Светозарное вливание», два, так что отложите несколько, прежде чем тратить.\n\nМежду ними сидят пять рунных зачарований, по одному потребителю на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берёт две эссенции перезвона; там, где у слота и характеристики есть и базовые, и высшие чары, рунный бонус ложится между ними, тогда как Runed Weave — самое сильное зачарование нагрудника на Дух вообще, а Runed Hide — единственное зачарование поножей на Ловкость. Точные бонусы все в таблице ниже.\n\nНад всеми ними стоит светозарный уровень, венец ремесла и единственные чары, которые вообще требуют навыка: Enchanting 100 для четырёх и 125 для «Светозарного вливания», как показано в столбце «Навык» ниже. Каждое берёт светозарный реагент и поднимает на одну ступень свой собственный слот: оружие (варианты мощи и силы заклинаний), нагрудник и сапоги. Последнее из них, «Светозарное вливание», ложится только на предмет, доведённый до совершенства, а такого предмета пока быть не может: оно написано наперёд, до той работы по доведению до совершенства, которой оно ждёт.",
         "enchantsNoteInfusionLive": "Чары делятся на четыре уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия, вторую руку и каждый слот доспеха, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота: щиты и держимые заклинателем предметы во второй руке берут собственные чары на Стойкость, так что ни один надетый слот не остаётся без чар. Высший уровень стоит один осколок перезвона плюс эссенцию: более сильные бонусы для слотов с наибольшим влиянием. Кроме того, осколки кормят ещё три стока: два рецепта оберегов по пять штук за каждый, верхнюю ступень пополнения эффектов инструментов и светозарный уровень, где чары оружия и нагрудника берут по одному, а «Светозарное вливание», два, так что отложите несколько, прежде чем тратить.\n\nМежду ними сидят пять рунных зачарований, по одному потребителю на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берёт две эссенции перезвона; там, где у слота и характеристики есть и базовые, и высшие чары, рунный бонус ложится между ними, тогда как Runed Weave, самое сильное зачарование нагрудника на Дух вообще, а Runed Hide, единственное зачарование поножей на Ловкость. Точные бонусы все в таблице ниже.\n\nНад всеми ними стоит светозарный уровень, венец ремесла и единственные чары, которые вообще требуют навыка: Enchanting 100 для четырёх и 125 для «Светозарного вливания», как показано в столбце «Навык» ниже. Каждое берёт светозарный реагент и поднимает на одну ступень свой собственный слот: оружие (варианты мощи и силы заклинаний), нагрудник и сапоги. Последнее из них, «Светозарное вливание», ложится только на предмет, доведённый до совершенства: доведение до совершенства, это работа самого владельца, а не зачарователя, и страница Ремесел рассказывает, как предмет его достигает.",
-        "enchantsNoteRaidFormula": "Чары делятся на четыре уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия, вторую руку и каждый слот доспеха, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота: щиты и держимые заклинателем предметы во второй руке берут собственные чары на Стойкость, так что ни один надетый слот не остаётся без чар. Высший уровень стоит один осколок перезвона плюс эссенцию: более сильные бонусы для слотов с наибольшим влиянием. Кроме того, осколки кормят ещё три стока: два рецепта оберегов по пять штук за каждый, верхнюю ступень пополнения эффектов инструментов и светозарный уровень, где чары оружия и нагрудника берут по одному, а «Светозарное вливание», два, так что отложите несколько, прежде чем тратить.\n\nМежду ними сидят пять рунных зачарований, по одному потребителю на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берёт две эссенции перезвона; там, где у слота и характеристики есть и базовые, и высшие чары, рунный бонус ложится между ними, тогда как Runed Weave, самое сильное зачарование нагрудника на Дух вообще, а Runed Hide, единственное зачарование поножей на Ловкость. Точные бонусы все в таблице ниже.\n\nНад обычными нижними уровнями стоит светозарный уровень, вершина обычных чар этого ремесла: Enchanting 100 для четырёх и 125 для «Светозарного вливания», как показано в столбце «Навык» ниже. Каждое берёт светозарный реагент и поднимает на одну ступень свой собственный слот: оружие (варианты мощи и силы заклинаний), нагрудник и сапоги. Последнее из них, «Светозарное вливание», ложится только на предмет, доведённый до совершенства: доведение до совершенства, это работа самого владельца, а не зачарователя, и страница Ремесел рассказывает, как предмет его достигает.\n\n«Рвение Последнего Пламени» изучается по отдельной рейдовой формуле и не относится к бесплатным обычным чарам. Перед нанесением изучите продаваемую формулу при навыке Наложения чар 100. Каждое нанесение расходует 3 Ядра Последнего Пламени и 2 осколка перезвона. Формула выпадает в Горниле или покупается у его интенданта за одно ядро. Правила срабатывания в ближнем бою и зависимости от скорости оружия полностью приведены ниже.",
+        "enchantsNoteRaidFormula": "Чары делятся на четыре уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия, вторую руку и каждый слот доспеха, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота: щиты и держимые заклинателем предметы во второй руке берут собственные чары на Стойкость, так что ни один надетый слот не остаётся без чар. Высший уровень стоит один осколок перезвона плюс эссенцию: более сильные бонусы для слотов с наибольшим влиянием. Кроме того, осколки кормят ещё три стока: два рецепта оберегов по одному за каждый (остальная цена оберега это эссенция и пыль), верхнюю ступень пополнения эффектов инструментов и светозарный уровень, где чары оружия и нагрудника берут по одному, а «Светозарное вливание», два, так что отложите несколько, прежде чем тратить.\n\nМежду ними сидят пять рунных зачарований, по одному потребителю на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берёт две эссенции перезвона; там, где у слота и характеристики есть и базовые, и высшие чары, рунный бонус ложится между ними, тогда как Runed Weave, самое сильное зачарование нагрудника на Дух вообще, а Runed Hide, единственное зачарование поножей на Ловкость. Точные бонусы все в таблице ниже.\n\nНад обычными нижними уровнями стоит светозарный уровень, вершина обычных чар этого ремесла: Enchanting 100 для четырёх и 125 для «Светозарного вливания», как показано в столбце «Навык» ниже. Каждое берёт светозарный реагент и поднимает на одну ступень свой собственный слот: оружие (варианты мощи и силы заклинаний), нагрудник и сапоги. Последнее из них, «Светозарное вливание», ложится только на предмет, доведённый до совершенства: доведение до совершенства, это работа самого владельца, а не зачарователя, и страница Ремесел рассказывает, как предмет его достигает.\n\n«Рвение Последнего Пламени» изучается по отдельной рейдовой формуле и не относится к бесплатным обычным чарам. Перед нанесением изучите продаваемую формулу при навыке Наложения чар 100. Каждое нанесение расходует 3 Ядра Последнего Пламени и 2 осколка перезвона. Формула выпадает в Горниле или покупается у его интенданта за одно ядро. Правила срабатывания в ближнем бою и зависимости от скорости оружия полностью приведены ниже.",
         "charmsHeading": "Обереги для инструментов добытчика",
         "formulaRequired": "Требуется формула",
         "charmsBody": "Обереги добытчика тоже родом из Enchanting. Tinker Gizzel учит обоим в мастерской Eastbrook, как только ваше Enchanting доходит до 25: «Сумке собирателя», что добавляет единицу к сбору, и «Глазу ремесленника», что поднимает уровень того, что выходит из земли. Каждый делается один раз, а потом ставится в кирку, топор или серп, где тратит заряд только на тех сборах, которые действительно улучшил.\n\nПополнение — вот где ремесло продолжает зарабатывать. Заряды восстанавливает тот, кто владеет инструментом, а не заезжий зачарователь, и пополнение стоит вдвое меньше материалов, когда этот владелец и есть зачарователь, подписавший оберег, и ещё меньше со специализацией в Enchanting. Поэтому оберег, проданный через прилавок, — это одна разовая продажа, а дешевле всего держать в ходу те обереги, что ездят на ваших собственных инструментах. Полная лестница зарядов и материалов есть на странице любой добывающей профессии, в разделе «Эффекты инструментов»."
@@ -8256,7 +8248,7 @@ export const ru_RU: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Ритм земледелия",
-        "rhythmBody": "Посадка, это короткое видимое действие: {plant} секунды на любой ступени, ведь мотыга открывает землю, а не покупает скорость. Созревшую культуру снимают мгновенно. Ни действия, которое можно прервать, ни проверки сумок, что могла бы отказать, тут нет, а поспевшая грядка ждет ровно столько, сколько вы ее оставите, так что полная сумка не стоит земледельцу ничего, кроме дороги, чтобы ее разгрузить.\n\nСбор с грядки платит двумя вещами: самим урожаем и мастерством земледелия. В отличие от жилы, он не дает опыта персонажа вовсе, так что грядки, это ремесло, которым занимаются, а не способ поднимать уровень.",
+        "rhythmBody": "Посадка происходит мгновенно, ведь мотыга открывает землю, а не покупает скорость: ждать никакого действия не нужно, и земледелец, который тут же ушел, все равно посадил. Созревшую культуру тоже снимают мгновенно. Ни действия, которое можно прервать, ни проверки сумок, что могла бы отказать, тут нет, а поспевшая грядка ждет ровно столько, сколько вы ее оставите, так что полная сумка не стоит земледельцу ничего, кроме дороги, чтобы ее разгрузить.\n\nСбор с грядки платит двумя вещами: самим урожаем и мастерством земледелия. В отличие от жилы, он не дает опыта персонажа вовсе, так что грядки, это ремесло, которым занимаются, а не способ поднимать уровень.",
         "gainHeading": "Чему учит урожай",
         "gainBody": "Рост навыка детерминирован и привязан к вашему собственному счетчику, а не к культуре: {g1} мастерства за урожай, пока счетчик ниже {p1}, {g2} ниже {p2}, {g3} ниже {p3} и {g4} на всем остатке пути до предела {cap}. Это никогда не бросок на повышение навыка, так что подъем ровно настолько долог, насколько его делает арифметика.\n\nСтупень культуры решает другое: как далеко способна довести вас грядка. Культура 1-й ступени учит до {c1} и там сереет, культура 2-й ступени до {c2}, а культуры 3-й ступени и выше до самого предела, так что переход на грядки повыше, это единственное, что вообще держит счетчик в движении.",
         "yieldsHeading": "Что дает урожай",
@@ -8299,7 +8291,7 @@ export const ru_RU: EnTranslations = {
         "commissionsBody": "Добровольное изделие на заказ несет Узы мастера: вещь привязывается к тому, кто получит ее в обмене, и любой мастер у станка снимет привязку за ступенчатую плату.",
         "provenanceHeading": "Подписанные работы",
         "provenanceBody": "Изделия и находки редкого качества и выше несут подпись мастера, и одинаково подписанные вещи по-прежнему складываются в стопки.",
-        "provenanceBodyUndiscounted": "Некоторые вещи несут имя. Строки источника материала указывают, кто собрал каждую группу единиц, а отдельная отметка «подписано» называет привилегированного автора подписи, если он есть. Эти два факта независимы: обычный собранный материал фиксирует сборщика, но не обязательно получает подпись, а старый подписанный запас может называть автора подписи, честно сообщая, что сборщик не был зафиксирован. Готовое изделие вместо этого называет того, кто его изготовил. Эти записи сопровождают предмет через торговлю, банк, почту, Мировой рынок и даже обратный выкуп у торговца и никогда не исчезают.\n\nСбор автоматически подписывает лучшие результаты: любая добыча редкого или лучшего качества приходит подписанной, а редкая находка подписывает весь свой пятикратный дополнительный урожай целиком. Удачный бросок при сборе с трупа подписывает добычу, если у семейства нет образца для выдачи, а если образец есть, оставляет добычу без подписи и создаёт рядом подписанный безупречный образец. Ремесло подписывает по тому же принципу: каждый экземпляр изделия редкого или лучшего качества выходит подписанным, а шедевр всегда подписывается независимо от качества, поэтому лучший вариант любой вещи всегда называет своего создателя. Подпись обычного материала закреплена за самими единицами и не может быть потеряна только из-за того, что совместимая стопка уже содержит другого сборщика или автора подписи. Отдельный безупречный образец, это отдельный предмет, которому по-прежнему нужно место; если он не помещается, обычная добыча с трупа остаётся, а образец теряется.\n\nГотовые предметы сохраняют одну строгую идентичность, поэтому два экземпляра объединяются только при полном совпадении всех отметок: тот же предмет, тот же автор подписи, те же характеристики шедевра, те же чары, та же привязка. Совместимые материалы делят одну ячейку между разными сборщиками и авторами подписи, сохраняя при этом счётчик для каждого источника. Всплывающая подсказка при наведении показывает краткую сводку источников; откройте «Источники» для полного списка. Разделение по сборщику держит такие стопки раздельными в сумке, и сортировка учитывает этот выбор. Переданный материал может складываться в стопку с материалами получателя как обычно.\n\nПодписи приносят пользу и мастерам: наличие у верстака любого подписанного экземпляра нужного реагента, независимо от того, кто его подписал, добавляет 2 процентных пункта к вероятности шедевра, а реагент, подписанный вашей собственной рукой, уменьшает его требуемое количество на один (но не ниже одного), если только этот реагент не помечен как не подлежащий скидке; рейдовые ядра всегда сохраняют полную стоимость. Собственная подписанная работа редкого или лучшего качества продолжает обучать вас, сегодня только через изготовленные зелья: выпейте редкое зелье, которое вы сварили и подписали, и небольшой ручеёк навыка вернётся в ремесло, которое его создало, пока это ремесло остаётся одной из ваших активных основных профессий. Это действительно касается только зелий и ничего больше, поэтому эликсир, свиток или флакон вершины не возвращают навык, как бы изящно они ни были подписаны.",
+        "provenanceBodyUndiscounted": "Некоторые вещи несут имя. Строки источника материала указывают, кто собрал каждую группу единиц, а отдельная отметка «подписано» называет привилегированного автора подписи, если он есть. Эти два факта независимы: обычный собранный материал фиксирует сборщика, но не обязательно получает подпись, а старый подписанный запас может называть автора подписи, честно сообщая, что сборщик не был зафиксирован. Готовое изделие вместо этого называет того, кто его изготовил. Эти записи сопровождают предмет через торговлю, банк, почту, Мировой рынок и даже обратный выкуп у торговца и никогда не исчезают.\n\nСбор автоматически подписывает лучшие результаты: любая добыча редкого или лучшего качества приходит подписанной, а редкая находка подписывает весь свой пятикратный дополнительный урожай целиком. Удачный бросок при сборе с трупа подписывает добычу, если у семейства нет образца для выдачи, а если образец есть, оставляет добычу без подписи и создаёт рядом подписанный безупречный образец. Ремесло подписывает по тому же принципу: каждый экземпляр изделия редкого или лучшего качества выходит подписанным, а шедевр всегда подписывается независимо от качества, поэтому лучший вариант любой вещи всегда называет своего создателя. Подпись обычного материала закреплена за самими единицами и не может быть потеряна только из-за того, что совместимая стопка уже содержит другого сборщика или автора подписи. Отдельный безупречный образец, это отдельный предмет, которому по-прежнему нужно место; если он не помещается, обычная добыча с трупа остаётся, а образец теряется.\n\nГотовые предметы сохраняют одну строгую идентичность, поэтому два экземпляра объединяются только при полном совпадении всех отметок: тот же предмет, тот же автор подписи, те же характеристики шедевра, те же чары, та же привязка. Совместимые материалы делят одну ячейку между разными сборщиками и авторами подписи, сохраняя при этом счётчик для каждого источника. Всплывающая подсказка при наведении показывает краткую сводку источников; щёлкните по стопке правой кнопкой, чтобы увидеть полный список (на сенсорном экране используйте её кнопку «Источники»). Разделение по сборщику держит такие стопки раздельными в сумке, и сортировка учитывает этот выбор. Переданный материал может складываться в стопку с материалами получателя как обычно.\n\nПодписи приносят пользу и мастерам: наличие у верстака любого подписанного экземпляра нужного реагента, независимо от того, кто его подписал, добавляет 2 процентных пункта к вероятности шедевра, а реагент, подписанный вашей собственной рукой, уменьшает его требуемое количество на один (но не ниже одного), если только этот реагент не помечен как не подлежащий скидке; рейдовые ядра всегда сохраняют полную стоимость. Собственная подписанная работа редкого или лучшего качества продолжает обучать вас, сегодня только через изготовленные зелья: выпейте редкое зелье, которое вы сварили и подписали, и небольшой ручеёк навыка вернётся в ремесло, которое его создало, пока это ремесло остаётся одной из ваших активных основных профессий. Это действительно касается только зелий и ничего больше, поэтому эликсир, свиток или флакон вершины не возвращают навык, как бы изящно они ни были подписаны.",
         "collectorsHeading": "Коллекционеры, трофеи и цена истории",
         "collectorsBody": "Торговцы слепы к происхождению: подписанная вещь продается NPC ровно по своей простой цене. Наценка за подпись существует только между игроками, что как раз и делает ее интересной: стопка руды-находки, подписанная знаменитым собирателем, Prime Cut с удачного сбора, шедевральный клинок с именем ремесленника, что с тех пор ушел на покой, все стоят столько, сколько говорит чья-то память.\n\nКнига деяний играет на том же инстинкте: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen и Glimmer of Hope, это коллекционные отметки с нулевой Известностью, что существуют лишь ради доказательства, что миг случился с вами. Сохраните вещь, что заработала деяние, и вы держите расписку. Ничто из этого не сила; происхождение не покупает характеристик и не выигрывает боев, это бумажный след хороших дней игры.",
         "castPaceHeading": "Время применения и золотой сток",
@@ -10370,9 +10362,9 @@ export const ru_RU: EnTranslations = {
       "fatalBody": "World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта."
     },
     "hostDiag": {
-      "saveTitle": "Save system report",
-      "saveButton": "Save",
-      "fileType": "JSON file"
+      "saveTitle": "Сохранить отчет о системе",
+      "saveButton": "Сохранить",
+      "fileType": "Файл JSON"
     },
     "titlebar": {
       "exitGame": "Выйти из игры"
@@ -10424,11 +10416,11 @@ export const ru_RU: EnTranslations = {
     "inWorld": "в мире",
     "takeOver": "Перехватить",
     "inWorldHint": "Уже в мире. Выйдите в другом месте или перехватите сессию.",
-    "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts ({count})",
-    "lockoutRaids": "Raids",
-    "lockoutDungeons": "Dungeons",
-    "lockoutWorldBosses": "World bosses",
+    "currentLocation": "Текущее местоположение: {zone}",
+    "lockouts": "Блокировки ({count})",
+    "lockoutRaids": "Рейды",
+    "lockoutDungeons": "Подземелья",
+    "lockoutWorldBosses": "Мировые боссы",
     "takeOverConfirm": "Это отключит персонажа от другой сессии и перенесёт его сюда. Продолжить?",
     "renameRequired": "требуется переименование",
     "delete": "Удалить",
@@ -10850,19 +10842,19 @@ export const ru_RU: EnTranslations = {
       "threat": "Угроза",
       "damageShort": "Урон",
       "healingShort": "Исц.",
-      "damageTaken": "Полученный урон",
-      "damageTakenShort": "Получен.",
+      "damageTaken": "Damage Taken",
+      "damageTakenShort": "Taken",
       "avoidableDmg": "Avoidable Damage",
       "avoidableDmgShort": "Avoid.",
-      "interrupts": "Прерывания",
-      "interruptsShort": "Прерыв.",
-      "dispels": "Рассеивания",
-      "dispelsShort": "Рассеян.",
-      "deaths": "Смерти",
-      "deathsShort": "Смерти",
-      "reset": "Сброс счетчиков",
-      "resetHint": "Сбросить данные боя",
-      "groupTotal": "Всего: {total} ({rate})",
+      "interrupts": "Interrupts",
+      "interruptsShort": "Int",
+      "dispels": "Dispels",
+      "dispelsShort": "Disp",
+      "deaths": "Deaths",
+      "deathsShort": "Dead",
+      "reset": "Reset meters",
+      "resetHint": "Reset combat data",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "Текущий",
       "lastFight": "Последний бой",
       "fightIndex": "Бой -{index}",
@@ -10874,16 +10866,16 @@ export const ru_RU: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Предыдущий сегмент",
       "newerSegment": "Следующий сегмент",
-      "selectSegment": "Выбрать сегмент боя",
-      "selectMode": "Выбрать режим счетчика",
-      "back": "Назад",
-      "resetFight": "Сбросить текущий бой",
-      "resetAll": "Сбросить все данные",
-      "criticals": "Криты: {count}",
-      "hits": "Удары: {count}",
-      "topAbility": "Лучшее: {name}",
-      "activity": "Активность: {pct}",
-      "newWindow": "Новое окно",
+      "selectSegment": "Select fight segment",
+      "selectMode": "Select meter mode",
+      "back": "Back",
+      "resetFight": "Reset current fight",
+      "resetAll": "Reset all data",
+      "criticals": "Criticals: {count}",
+      "hits": "Hits: {count}",
+      "topAbility": "Top: {name}",
+      "activity": "Activity: {pct}",
+      "newWindow": "New window",
       "close": "Закрыть счетчики"
     },
     "chat": {
@@ -10891,7 +10883,7 @@ export const ru_RU: EnTranslations = {
       "templates": {
         "battleground": "[Поле боя] {name}: {message}",
         "party": "[Группа] {name}: {message}",
-        "raidWarning": "[Raid Warning] {name}: {message}",
+        "raidWarning": "[Рейдовое предупреждение] {name}: {message}",
         "yell": "{name} кричит: {message}",
         "whisper": "{name} шепчет: {message}",
         "toWhisper": "Кому {name}: {message}",
@@ -11007,7 +10999,7 @@ export const ru_RU: EnTranslations = {
       "deathRecapDrowned": "Вы погибли. Вы утонули.",
       "deathRecapCauterized": "Вы погибли. Ожог Прижигания одолел вас.",
       "respawn": "Вы снова чувствуете себя отдохнувшим и целым.",
-      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
+      "respawnKeeperToll": "Целитель душ воскресил вас, но вы ослабли: болезнь воскрешения снижает все ваши характеристики, пока не пройдёт.",
       "ignoringChat": "Чат от {name} игнорируется.",
       "noLongerIgnoring": "{name} больше не игнорируется.",
       "playerNotNearby": "Этого игрока нет рядом.",
@@ -11031,7 +11023,7 @@ export const ru_RU: EnTranslations = {
       "stunned": "Вы оглушены!",
       "silenced": "Вы лишены дара речи!",
       "busy": "Вы заняты.",
-      "cannotCastWhileMoving": "You can't cast while moving.",
+      "cannotCastWhileMoving": "Вы не можете применять заклинания в движении.",
       "abilityNotReady": "Эта способность еще не готова.",
       "notEnoughRage": "Недостаточно ярости!",
       "notEnoughEnergy": "Недостаточно энергии!",
@@ -11044,8 +11036,8 @@ export const ru_RU: EnTranslations = {
       "requiresForm": "Вы должны быть в облике {form}.",
       "cantInForm": "В облике {form} это невозможно.",
       "bear": "бурого",
-      "cat": "волка",
-      "bearOrCat": "Bruin or Cat",
+      "cat": "кота",
+      "bearOrCat": "бурого или кота",
       "travel": "скорохода",
       "shapeshifted": "В измененном облике это невозможно.",
       "stealthed": "Вы должны быть в незаметности.",
@@ -11379,9 +11371,9 @@ export const ru_RU: EnTranslations = {
       "devotion": "Преданность"
     },
     "forms": {
-      "bear": "медведя",
-      "cat": "волка",
-      "bearOrCat": "Bruin or Cat"
+      "bear": "бурого",
+      "cat": "кота",
+      "bearOrCat": "бурого или кота"
     },
     "cast": {
       "fishing": "Рыбная ловля",
@@ -11409,8 +11401,7 @@ export const ru_RU: EnTranslations = {
       "rift_storm_execution": "Громоотвод",
       "rift_storm_strike": "Гнев призывателя бурь",
       "rift_tide_execution": "Пасть бездны",
-      "rift_tide_strike": "Сокрушающая глубина",
-      "farming": "Посадка"
+      "rift_tide_strike": "Сокрушающая глубина"
     }
   },
   "questUi": {
@@ -11729,19 +11720,19 @@ export const ru_RU: EnTranslations = {
       "buyConfirmAccept": "Купить",
       "buyConfirmCancel": "Отмена",
       "buyChanged": "Этот лот изменился до вашего подтверждения. Проверьте цену и попробуйте снова.",
-      "sweep": "Sweep",
-      "sweepAria": "Sweep the market for {item}",
-      "sweepTitle": "Market Sweep: {item}",
-      "sweepClose": "Close",
-      "sweepNote": "Buys whole listings from other sellers, cheapest per unit first, until your count is covered. You may receive a few more than you asked for.",
-      "sweepQuantity": "Units wanted",
-      "sweepQuoteNone": "No listings of this item to sweep.",
-      "sweepQuoteLine": "{units} units across {listings} listings for {total} ({each} each)",
-      "sweepQuoteShort": "Only {units} units across {listings} listings are available, for {total} ({each} each)",
-      "sweepButton": "Sweep",
-      "sweepConfirmTitle": "Confirm Market Sweep",
-      "sweepConfirmBody": "Buy {item} x{units} across {listings} listings for {total} ({each} each)?",
-      "sweepChanged": "The sweep quote changed before you confirmed. Check the total and try again.",
+      "sweep": "Скупить",
+      "sweepAria": "Скупить {item} на рынке",
+      "sweepTitle": "Скупка: {item}",
+      "sweepClose": "Закрыть",
+      "sweepNote": "Выкупает целые лоты других продавцов, начиная с самой низкой цены за штуку, пока не наберётся нужное количество. Вы можете получить немного больше, чем просили.",
+      "sweepQuantity": "Нужное количество",
+      "sweepQuoteNone": "Нет лотов этого предмета для скупки.",
+      "sweepQuoteLine": "{units} шт. в {listings} лотах за {total} ({each} за шт.)",
+      "sweepQuoteShort": "Доступно только {units} шт. в {listings} лотах за {total} ({each} за шт.)",
+      "sweepButton": "Скупить",
+      "sweepConfirmTitle": "Подтвердить скупку",
+      "sweepConfirmBody": "Купить {item} x{units} из {listings} лотов за {total} ({each} за шт.)?",
+      "sweepChanged": "Расчёт скупки изменился до подтверждения. Проверьте сумму и попробуйте снова.",
       "sellNote": "Выставляйте товары из сумок. Торговец берет {cut}% при продаже. Использовано мест: {used}/{max}.",
       "sellPickEmpty": "Нажмите на предмет в сумках, чтобы выбрать товар для продажи.",
       "quantity": "Количество",
@@ -11820,8 +11811,8 @@ export const ru_RU: EnTranslations = {
       "cannotAfford": "Вам это не по карману.",
       "notYourListing": "Это не ваш лот.",
       "nothingToCollect": "Вам нечего забирать.",
-      "sweepNoListings": "No listings of that item are available to sweep.",
-      "sweepPriceChanged": "Prices changed before your sweep landed. Check the quote and try again.",
+      "sweepNoListings": "Нет лотов этого предмета для скупки.",
+      "sweepPriceChanged": "Цены изменились до завершения скупки. Проверьте расчёт и попробуйте снова.",
       "orderCountNeeded": "Name how many you want.",
       "tooManyOrders": "You may keep at most {count} orders open at once.",
       "orderClosed": "That order is no longer open.",
@@ -12676,7 +12667,7 @@ export const ru_RU: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Проклятие насилия",
-        "description": "Проклинает врага на 8 сек. Следующие 3 наносящих урон действия цели создают по 7 ед. Осуждения и наносят ей 17 ед. урона от Тьмы."
+        "description": "Проклинает врага на 8 сек., нанося урон от Тьмы и создавая 2 ед. Осуждения каждые 2 сек. Следующие 3 наносящих урон действия цели создают по 7 ед. Осуждения и наносят ей 17 ед. урона от Тьмы."
       },
       "cruel_pact": {
         "name": "Жестокий договор",
@@ -12712,7 +12703,7 @@ export const ru_RU: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Губительное клеймо",
-        "description": "Ставит клеймо на противника на 15 сек. Ваши следующие 3 прямых заклинания повторяются по заклеймённому противнику с 25% урона, а при применении по другой цели переносят на него 50% урона."
+        "description": "Ставит клеймо на противника на 15 сек. Ваши следующие 3 прямых заклинания повторяются по заклеймённому противнику с 25% урона, а при применении по другой цели переносят на него 50% урона. Отголоски «Стрелы погибели» также засчитываются как критические попадания, но не получают дополнительный множитель критического урона."
       },
       "wrath": {
         "name": "Дикая стрела",
@@ -12751,7 +12742,7 @@ export const ru_RU: EnTranslations = {
       },
       "bear_form": {
         "name": "Облик бурого",
-        "description": "Вы принимаете облик медведя: броня +110%, максимальное здоровье +30%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя."
+        "description": "Вы принимаете облик медведя: броня +110%, максимальное здоровье +30%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Смена облика также даёт эффект «Стремительная поступь» — краткий всплеск скорости передвижения. Примените снова, чтобы вернуться к облику заклинателя."
       },
       "maul": {
         "name": "Костолом",
@@ -12767,17 +12758,17 @@ export const ru_RU: EnTranslations = {
         "description": "Грозный рев: каждый враг в пределах 10 м получает провокацию, его угроза к вам повышается до уровня самого ненавистного ему врага, и он вынужден атаковать вас 3 сек. Только в облике бурого."
       },
       "cat_form": {
-        "name": "Облик волка",
-        "description": "Превращает вас в волка: ловкость растёт с вашим уровнем, сила атаки +8 плюс 2 за уровень, ваши атаки тратят энергию и серии приёмов, и вы создаёте на 29% меньше угрозы. Примените снова, чтобы вернуться в облик заклинателя."
+        "name": "Облик кота",
+        "description": "Превращает вас в волка: ловкость растёт с вашим уровнем, сила атаки +8 плюс 2 за уровень, ваши атаки тратят энергию и серии приёмов, и вы создаёте на 29% меньше угрозы. Превращение в любой облик даёт Иноходь: 60% скорости передвижения на 3 сек., раз в 20 сек. Примените снова, чтобы вернуться в облик заклинателя."
       },
       "claw": {
         "name": "Рвущий коготь",
-        "description": "Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике волка.",
+        "description": "Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике кота.",
         "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "ferocious_bite": {
         "name": "Кровавый укус",
-        "description": "Завершающий прием, наносящий {damage}. Только в облике волка.",
+        "description": "Завершающий прием, наносящий {damage}. Только в облике кота.",
         "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Кровавой жатвой: укус, расходующий Старую кровь на более мощный удар, который также мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, и восстанавливает энергию."
       },
       "swipe": {
@@ -12809,7 +12800,7 @@ export const ru_RU: EnTranslations = {
       },
       "travel_form": {
         "name": "Форма скорохода",
-        "description": "Мгновенно принимает быструю форму скорохода, повышая скорость передвижения на 40%. В этой форме нельзя использовать другие способности, но переход доступен и в бою: идеально для бегства."
+        "description": "Мгновенно принимает быструю форму скорохода, повышая скорость передвижения на 40% и избавляя от прерываемых обездвиживаний и замедлений. В этой форме нельзя использовать другие способности, но переход доступен и в бою: идеально для бегства. Смена облика также даёт эффект «Стремительная поступь» — краткий всплеск скорости передвижения."
       },
       "enrage": {
         "name": "Раздувание",
@@ -12829,31 +12820,31 @@ export const ru_RU: EnTranslations = {
       },
       "dash": {
         "name": "Рывок",
-        "description": "Рывок вперед, повышающий скорость передвижения на 50% на 15 сек. Только в облике волка."
+        "description": "Рывок вперед, повышающий скорость передвижения на 50% на 15 сек. Только в облике кота."
       },
       "pounce": {
         "name": "Крадущийся удар",
-        "description": "Открывающая атака из скрытности, оглушающая цель на 2 сек. Дает 1 прием серии. Только в облике волка."
+        "description": "Открывающая атака из скрытности, оглушающая цель на 2 сек. Дает 1 прием серии. Только в облике волка. Вне скрытности эта кнопка становится Выпадом."
       },
       "lunge": {
-        "name": "Lunge",
-        "description": "Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage, awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3); a lunge cut short refunds its cooldown. Usable in any form."
+        "name": "Выпад",
+        "description": "Бросок на врага на расстоянии до 12 м, наносящий 60% урона от оружия и дающий 1 очко серии приёмов. Только в облике волка."
       },
       "hamstring_bite": {
-        "name": "Takedown",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec). Cat Form only."
+        "name": "Повал",
+        "description": "Завершающий приём, оглушающий цель на 1 сек. плюс 1 сек. за каждую серию приёмов (5 серий приёмов: 6 сек.). Только в облике волка."
       },
       "insect_swarm": {
         "name": "Жалящий рой",
         "description": "Враг атакован роем насекомых и получает {damage} ед. урона от сил Природы в течение 12 сек."
       },
       "tigers_fury": {
-        "name": "Волчья кровь",
-        "description": "Мгновенно восстанавливает {rage} ед. энергии и повышает силу атаки на {buff} на {duration} сек. Только в облике волка."
+        "name": "Рысья кровь",
+        "description": "Мгновенно восстанавливает {rage} ед. энергии и повышает силу атаки на {buff} на {duration} сек. Только в облике кота."
       },
       "rip": {
         "name": "Кровавый разлом",
-        "description": "Завершающий приём, заставляющий цель кровоточить каждые 2 сек. в течение 24 сек.: 36 урона плюс 24 за каждую потраченную серию приёмов (5 серий приёмов: {damage} суммарно). Только в облике волка.",
+        "description": "Завершающий приём, заставляющий цель кровоточить каждые 2 сек. в течение 24 сек.: 36 урона плюс 24 за каждую потраченную серию приёмов (5 серий приёмов: {damage} суммарно). Только в облике кота.",
         "specNote_feral": "Попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "mortal_strike": {
@@ -13050,11 +13041,11 @@ export const ru_RU: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Облик лунного совуха",
-        "description": "Вы принимаете Облик лунного совуха, усиливая заклинания до обратного перехода. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Баланса)"
+        "description": "Вы принимаете Облик лунного совуха, усиливая заклинания до обратного перехода. Смена облика также даёт эффект «Стремительная поступь» — краткий всплеск скорости передвижения. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Баланса)"
       },
       "feral_charge": {
         "name": "Первобытный всплеск",
-        "description": "Высвобождает первобытную силу. В облике волка скорость восстановления энергии повышается на 100% на 10 сек. В облике бурого мгновенно дает 50 ед. ярости. (знаковое умение Силы зверя)"
+        "description": "Высвобождает первобытную силу. В облике кота скорость восстановления энергии повышается на 100% на 10 сек. В облике бурого мгновенно дает 50 ед. ярости. (знаковое умение Силы зверя)"
       },
       "swiftmend": {
         "name": "Быстрое восстановление",
@@ -13274,7 +13265,7 @@ export const ru_RU: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Стрела погибели",
-        "description": "Тратит 3 Опустошения, чтобы метнуть тяжёлую стрелу хаотического огня, наносящую {damage} урона от огня. Крах укорачивает её чтение на 30%."
+        "description": "Тратит 3 Опустошения, чтобы метнуть тяжёлую стрелу хаотического огня, наносящую {damage} урона от огня до применения критического урона. Всегда наносит критический удар при попадании. Крах укорачивает её чтение на 30%."
       },
       "dark_pact": {
         "name": "Кровавый завет",
@@ -13418,7 +13409,7 @@ export const ru_RU: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Идеальный миг",
-        "description": "Ловит идеальный миг: вы мгновенно получаете 4 чародейских заряда, и в течение 10 сек. «Эфирные стрелы» не расходуют их. (хрономантия)"
+        "description": "Ловит идеальный миг: вы мгновенно получаете 4 чародейских заряда, и в течение 10 сек. «Эфирные стрелы» не расходуют их и наносят на 20% больше урона. (хрономантия)"
       },
       "arcane_surge": {
         "name": "Эфирный всплеск",
@@ -13555,7 +13546,7 @@ export const ru_RU: EnTranslations = {
       },
       "bear_charge": {
         "name": "Натиск бурого",
-        "description": "Бросок на врага, дающий 9 единиц ярости и оглушающий его на 1 сек. Дальность 8-25 м. Только в облике бурого."
+        "description": "Бросок на врага, дающий 9 единиц ярости и оглушающий его на 1 сек. В течение 3 сек. после этого Облик волка не стоит маны и пригвождает цель, замедляя её на 50% на 4 сек. Дальность 8-25 м. Только в облике бурого."
       },
       "demoralizing_roar": {
         "name": "Трусливый рёв",
@@ -13563,11 +13554,11 @@ export const ru_RU: EnTranslations = {
       },
       "prowl": {
         "name": "Скрадывание",
-        "description": "Переход в скрытность в облике волка: вы двигаетесь на 5% медленнее. Нельзя использовать в бою."
+        "description": "Переход в скрытность в облике волка. Нельзя использовать в бою."
       },
       "rake": {
         "name": "Свежевание",
-        "description": "Полосует врага на урон оружия плюс {damage} и вызывает кровотечение на 18 сек. Даёт 1 серию приёмов. Только в облике волка.",
+        "description": "Полосует врага на урон оружия плюс {damage} и вызывает кровотечение на 18 сек. Даёт 1 серию приёмов. Только в облике кота.",
         "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "revive_pet": {
@@ -15083,7 +15074,7 @@ export const ru_RU: EnTranslations = {
         "name": "Ключ зажигания Ужасоискра"
       },
       "reins_avian_strider": {
-        "name": "Reins of the Viridian Valestrider"
+        "name": "Поводья изумрудного долинохода"
       },
       "reins_goblin_rocket_sled": {
         "name": "Ключ зажигания гоблинских ракетных саней"
@@ -17749,19 +17740,19 @@ export const ru_RU: EnTranslations = {
         "name": "Лечебный манекен"
       },
       "healing_dummy_tank": {
-        "name": "Injured Vanguard Dummy"
+        "name": "Раненый манекен-авангард"
       },
       "healing_dummy_soldier": {
-        "name": "Injured Soldier Dummy"
+        "name": "Раненый манекен-солдат"
       },
       "healing_dummy_scout": {
-        "name": "Critical Scout Dummy"
+        "name": "Критически раненый манекен-разведчик"
       },
       "healing_dummy_caster": {
-        "name": "Wounded Spellcaster Dummy"
+        "name": "Раненый манекен-заклинатель"
       },
       "healing_dummy_ranger": {
-        "name": "Battered Ranger Dummy"
+        "name": "Избитый манекен-следопыт"
       },
       "ridge_stalker": {
         "name": "Хребтовый охотник"
@@ -21290,7 +21281,7 @@ export const ru_RU: EnTranslations = {
       "eastbrook_vale": {
         "name": "Истврукская долина",
         "welcome": "Найдите в городе маршала Редбрука: у него есть для вас работа.",
-        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
+        "welcomeDone": "У маршала Редбрука больше нет для вас работы - уютному приморскому городку, где начался ваш путь, стало спокойнее благодаря этому.",
         "pois": {
           "0": {
             "label": "Истврук"
@@ -21336,7 +21327,7 @@ export const ru_RU: EnTranslations = {
       "mirefen_marsh": {
         "name": "Мирефенская топь",
         "welcome": "Доложите стражу Фенвику у ворот Фенбриджа.",
-        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
+        "welcomeDone": "У стража Фенвика больше нет для вас приказов - поселению в глубине топких болот стало безопаснее благодаря этому.",
         "pois": {
           "0": {
             "label": "Фенбридж"
@@ -21367,7 +21358,7 @@ export const ru_RU: EnTranslations = {
       "thornpeak_heights": {
         "name": "Терновые высоты",
         "welcome": "Капитан Тессали едва удерживает стену Хайвотча.",
-        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
+        "welcomeDone": "Капитан Тессали удерживает стену Хайвотча - легко не бывает, но с помощью таких искателей приключений, как вы, теперь это по силам.",
         "pois": {
           "0": {
             "label": "Хайвотч"

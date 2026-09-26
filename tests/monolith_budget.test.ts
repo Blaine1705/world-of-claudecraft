@@ -454,7 +454,14 @@ const MONOLITHS: MonolithRow[] = [
     // by the two new input fields (18235 - 54). Exact count, zero slack.
     // Release integration composes the death recap mount with that extraction;
     // measured after resolving both arms. Exact count, zero slack.
-    ceiling: 18122,
+    // LOWERED 18235 -> 18221 at the movable unit tooltip: the player hover
+    // card's key and lines moved to player_tooltip_view.ts (live resolvers in
+    // player_tooltip.ts) and the world-hover seat resolution to
+    // unit_tooltip_seat.ts. Measured with wc -l after biome. Exact count,
+    // zero slack.
+    // Release integration keeps the current table-driven frame registry and
+    // measures below both parent pins. Exact count, zero slack.
+    ceiling: 18108,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1576,7 +1583,12 @@ const MONOLITHS: MonolithRow[] = [
     // Guild custom ranks then compose under that with the guild_promote /
     // guild_demote arms and the new guild_set_ranks command stacked into one
     // label group dispatched by server/guild_rank_cmd.ts. Exact count.
-    ceiling: 9841,
+    // LOWERED 9965 -> 9962 at the movable unit tooltip: the identity record's
+    // guild, pledge, guild tier, deed title/border lines (plus the new spec
+    // key) moved to server/player_identity_wire.ts. Exact count, zero slack.
+    // Release integration composes both extraction sets below the prior pin.
+    // Exact count, zero slack.
+    ceiling: 9838,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1746,7 +1758,12 @@ const MONOLITHS: MonolithRow[] = [
     // Guild custom ranks then compose under that: the signpost roster body
     // decode moved to src/net/guild_roster_wire.ts, paying for the
     // guildSetRanks send with room to spare. Exact count, zero slack.
-    ceiling: 5394,
+    // LOWERED 5426 -> 5423 at the movable unit tooltip: the identity block's
+    // guild, pledge, guild tier, deed title/border decode (plus the new spec)
+    // moved to src/net/player_identity_wire.ts. Exact count, zero slack.
+    // Release integration composes both extraction sets below the prior pin.
+    // Exact count, zero slack.
+    ceiling: 5391,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

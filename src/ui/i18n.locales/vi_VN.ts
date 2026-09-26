@@ -17331,4 +17331,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     'Đổi màu các vùng nguy hiểm trên sàn của Nythraxis (vòng đánh của Phun trào mộ phần, các vũng Lửa mộ phần và Lửa linh hồn, đường Lửa mộ phần, cùng dấu Xé linh hồn) sang bảng màu thân thiện với người mù màu, với sắc độ và độ sáng khác biệt, để các vòng tròn chồng lên nhau vẫn giữ cạnh rõ. Kích thước, bộ đếm thời gian và vị trí không thay đổi.',
   'hud.options.colorblindMode': 'Chế độ hỗ trợ mù màu',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

@@ -3818,6 +3818,10 @@ export const id_ID: EnTranslations = {
       "elite": "Elite",
       "boss": "Bos"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Pindahkan bingkai sasaran",
       "lock": "Kunci bingkai sasaran"
@@ -3900,7 +3904,8 @@ export const id_ID: EnTranslations = {
         "deedTracker": "Pelacak Perbuatan",
         "delveTracker": "Pelacak Delve",
         "riftTracker": "Pelacak Rift",
-        "swingBarOffhand": "Tangan Kiri"
+        "swingBarOffhand": "Tangan Kiri",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Pengaturan Bingkai",
       "framesMenuTitle": "Tampilkan atau sembunyikan bingkai satu per satu. Bingkai yang tidak dicentang tetap tersembunyi sampai kamu mencentangnya lagi atau mengatur ulang ke bawaan.",
@@ -6811,6 +6816,7 @@ export const id_ID: EnTranslations = {
       "framesGovernedAuraTracks": "Edit Bingkai juga melonggarkan enam jalur aura pilihan setelah kamu menyalakannya dari tab Tempur pada opsi Antarmuka yang sama: jalur Buffku, jalur Masa Tunggu Defensif, jalur Perisaiku, jalur Masa Tunggu Ofensif, jalur Pergerakan dan Sembunyi, serta jalur Buffku pada Sekutu. Semua jalur mati secara bawaan, dan masing-masing memakai chip nama sendiri saat dilonggarkan.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Edit Frames juga melonggarkan panel Dialog, yang membawa kalimat lisan NPC saat NPC tersebut berada di luar pandangan Anda; ia memakai chip namanya saat longgar.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Bilah, penghitung waktu, dan teks pertarungan",
       "barsBody": "Bilah rapalanmu muncul di tengah layar, tepat di atas bilah aksimu, setiap kali kamu merapal atau menyalurkan mantra, dan menampilkan nama mantra serta waktu yang tersisa. Targetmu mendapatkan bilah rapalannya sendiri pada bingkainya, sehingga kamu bisa melihat apa yang akan datang dan meresponsnya.\n\nSebuah bilah ayunan tipis berada di bawah bilah rapalanmu dan terisi di antara ayunan senjatamu, sehingga penyerang jarak dekat atau jarak jauh bisa melihat kapan pukulan otomatis berikutnya akan mendarat.\n\nBilah pengalamanmu membentang selebar penuh di bawah bilah aksimu, terbagi menjadi segmen-segmen, dengan sebuah bagian yang lebih terang menunjukkan pengalaman istirahat yang telah kamu tabung.\n\nBerenang di bawah air dan sebuah bilah napas biru muncul di bagian atas layar. Bilah itu berkurang selama kepalamu terendam, berkedip merah begitu habis dan kamu mulai tenggelam, lalu terisi cepat begitu kamu muncul ke permukaan. Space membuatmu berenang ke atas, dan tombol Berenang Turun, Ctrl secara bawaan, membawamu lebih dalam.\n\nKerusakan dan penyembuhan melayang ke atas dari apa pun yang menerimanya sebagai angka-angka kecil, sehingga kamu bisa membaca sebuah pertarungan tanpa membaca teks. Tab Catatan Tempur di kotak obrolanmu menyimpan catatan tertulis yang lengkap.",
       "aurasTitle": "Buff dan debuff",

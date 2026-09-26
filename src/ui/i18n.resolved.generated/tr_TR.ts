@@ -3818,6 +3818,10 @@ export const tr_TR: EnTranslations = {
       "elite": "Seçkin",
       "boss": "Patron"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Hedef çerçevesini taşı",
       "lock": "Hedef çerçevesini kilitle"
@@ -3900,7 +3904,8 @@ export const tr_TR: EnTranslations = {
         "deedTracker": "Edim Takipçisi",
         "delveTracker": "Delve Takipçisi",
         "riftTracker": "Yarık Takipçisi",
-        "swingBarOffhand": "Sol El"
+        "swingBarOffhand": "Sol El",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Çerçeve Ayarları",
       "framesMenuTitle": "Ayrı ayrı çerçeveleri göster ya da gizle. İşareti kaldırılmış bir çerçeve, tekrar işaretleyene ya da varsayılanlara sıfırlayana kadar gizli kalır.",
@@ -6811,6 +6816,7 @@ export const tr_TR: EnTranslations = {
       "framesGovernedAuraTracks": "Arayüz seçeneklerinin aynı Arayüz sekmesindeki Savaş sekmesinden açtığın altı isteğe bağlı aura izini de Çerçeveleri Düzenle gevşetir: Takviyelerim izi, Savunma Bekleme Süreleri izi, Kalkanlarım izi, Saldırı Bekleme Süreleri izi, Hareket ve Gizlilik izi ve Müttefiklerde Takviyelerim izi. Her iz varsayılan olarak kapalıdır ve gevşekken kendi ad çipini taşır.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
       "aurasTitle": "Takviyeler ve zayıflatmalar",

@@ -761,6 +761,14 @@ export const guideStrings = {
     // for the same reason as the aura tracks. Wordy (M16): non-Latin fills ride along.
     framesGovernedTalkingHead:
       "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+    // The mouseover tooltip's movable seat (interface_unlock_core.ts
+    // 'unitTooltip', unit_tooltip_seat.ts) joined HUD_FRAME_SPECS with the
+    // player card's title, guild, and spec lines (player_tooltip_view.ts).
+    // Own key for the same reason as the aura tracks; the menu names are the
+    // live hudChrome.interfaceUnlock values. Wordy (M16): non-Latin fills ride
+    // along.
+    framesGovernedUnitTooltip:
+      "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
 
     barsTitle: 'Bars, timers, and combat text',
     barsBody:

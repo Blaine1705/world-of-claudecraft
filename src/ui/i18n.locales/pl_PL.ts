@@ -17379,4 +17379,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     'Przekolorowuje zagrożenia na ziemi od Nythraxis (pierścień uderzenia Grobowej erupcji, kałuże Grobowego płomienia i Ognia duszy, linię Grobowego ognia oraz znaki Rozdarcia duszy) na paletę przyjazną daltonistom, z wyraźnie różnymi odcieniami i jasnością, aby nakładające się kręgi zachowały widoczne krawędzie. Rozmiary, liczniki czasu i pozycje się nie zmieniają.',
   'hud.options.colorblindMode': 'Tryb dla daltonistów',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

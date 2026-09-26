@@ -17240,4 +17240,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifColorblindMode':
     "Omfarver Nythraxis' gulvfarer (træfringen fra Grave Eruption, bassinerne af Grave Flame og Soulfire, Gravefire-linjen og Soul Rend-mærkerne) til en farveblindvenlig palet med tydelige nuancer og lysstyrker, så overlappende cirkler bevarer synlige kanter. Størrelser, timere og positioner ændres ikke.",
   'hud.options.colorblindMode': 'Farveblindtilstand',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip': 'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

@@ -3818,6 +3818,10 @@ export const cs_CZ: EnTranslations = {
       "elite": "Elita",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Přesunout rám cíle",
       "lock": "Zamknout rám cíle"
@@ -3900,7 +3904,8 @@ export const cs_CZ: EnTranslations = {
         "deedTracker": "Sledování skutků",
         "delveTracker": "Sledování výprav do hlubin",
         "riftTracker": "Sledování trhlin",
-        "swingBarOffhand": "Levá ruka"
+        "swingBarOffhand": "Levá ruka",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Nastavení rámečků",
       "framesMenuTitle": "Zobraz nebo skryj jednotlivé rámečky. Nezaškrtnutý rámeček zůstane skrytý, dokud ho znovu nezaškrtneš nebo neobnovíš výchozí nastavení.",
@@ -6811,6 +6816,7 @@ export const cs_CZ: EnTranslations = {
       "framesGovernedAuraTracks": "Upravit rámečky po zapnutí v kartě Boj stejných možností Rozhraní uvolní také šest volitelných stop aur: stopu Mých posílení, stopu Obranných obnov, stopu Mých štítů, stopu Útočných obnov, stopu Pohybu a utajení a stopu Mých posílení na spojencích. Každá stopa je ve výchozím stavu vypnutá a po uvolnění nosí vlastní štítek se jménem.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Lišty, časovače a bojový text",
       "barsBody": "Tvá lišta sesílání se objeví uprostřed obrazovky, těsně nad tvými akčními lištami, kdykoli sesíláš nebo kanáluješ kouzlo, a nese jméno kouzla a zbývající čas. Tvůj cíl má na svém rámu vlastní lištu sesílání, takže vidíš, co přichází, a můžeš na to zareagovat.\n\nPod tvou lištou sesílání sedí tenká lišta švihu, která se plní mezi švihy tvé zbraně, takže útočník na blízko nebo na dálku vidí, kdy dopadne další automatický zásah.\n\nTvá lišta zkušeností běží přes celou šířku pod akčními lištami, rozdělená do úseků, se světlejším pruhem, který ukazuje naspořené odpočaté zkušenosti.\n\nPlav pod vodou a nahoře na obrazovce se objeví modrá lišta dechu. Vyprazdňuje se, dokud máš hlavu pod hladinou, jakmile dojde, zabliká červeně a začneš se topit, a jakmile se vynoříš, rychle se doplní. Mezerník tě žene nahoru a klávesa Plavat dolů, ve výchozím stavu Ctrl, tě táhne hlouběji.\n\nPoškození a léčení vyplouvají nad tím, co zasáhly, jako malá čísla, takže boj přečteš, aniž bys musel číst text. Záložka Bojový záznam v tvém chatu drží úplný písemný záznam.",
       "aurasTitle": "Buffy a debuffy",

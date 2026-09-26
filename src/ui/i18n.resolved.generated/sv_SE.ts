@@ -3818,6 +3818,10 @@ export const sv_SE: EnTranslations = {
       "elite": "Elit",
       "boss": "Boss"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "Flytta målramen",
       "lock": "Lås målramen"
@@ -3900,7 +3904,8 @@ export const sv_SE: EnTranslations = {
         "deedTracker": "Dådspårare",
         "delveTracker": "Delve-spårare",
         "riftTracker": "Revspårare",
-        "swingBarOffhand": "Avhand"
+        "swingBarOffhand": "Avhand",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Raminställningar",
       "framesMenuTitle": "Visa eller göm enskilda ramar. En avbockad ram förblir dold tills du bockar för den igen eller återställer till standard.",
@@ -6811,6 +6816,7 @@ export const sv_SE: EnTranslations = {
       "framesGovernedAuraTracks": "Redigera ramar frigör också de sex frivilliga auraraderna när du har slagit på dem på stridsfliken i samma gränssnittsalternativ: raden Mina förstärkningar, raden Defensiva nedkylningar, raden Mina sköldar, raden Offensiva nedkylningar, raden Rörelse och Smygande samt raden Mina förstärkningar på allierade. Varje rad är avstängd från början och får sin egen namnmarkering när den är frigjord.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Redigera ramar lossar också dialogpanelen, som bär en NPC: s talade linje medan den NPC är utom synhåll; den bär sitt namnchip medan den är lös.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Mätare, timer och stridstext",
       "barsBody": "Din besvärjelsemätare visas mitt på skärmen, precis ovanför dina handlingsfält, närhelst du kastar eller kanaliserar, och bär besvärjelsens namn och tiden som återstår. Ditt mål får en egen besvärjelsemätare på sin ram, så du kan se vad som kommer och svara på det.\n\nEn tunn svingmätare sitter under din besvärjelsemätare och fylls mellan dina vapensvingar, så en närstrids- eller distansanfallare kan se när nästa automatiska träff landar.\n\nDin erfarenhetsmätare löper i full bredd under dina handlingsfält, uppdelad i segment, med en ljusare sträcka som visar den vilade erfarenhet du har sparat.\n\nSimma under vatten så visas en blå andningsmätare högst upp på skärmen. Den tappas medan huvudet är under ytan, blinkar rött när den tar slut och du börjar drunkna, och fylls snabbt på igen så fort du dyker upp. Blanksteg simmar dig upp, och tangenten Simma ner, Ctrl som standard, tar dig djupare.\n\nSkada och läkning flyter upp över det de landade på som små siffror, så du kan läsa en strid utan att läsa text. Fliken Stridslogg i din chattruta håller den fullständiga skriftliga redogörelsen.",
       "aurasTitle": "Buffar och debuffar",
