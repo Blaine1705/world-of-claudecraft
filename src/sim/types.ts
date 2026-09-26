@@ -5198,6 +5198,9 @@ export interface Entity extends ClientMirroredEntityFields {
   climb?: LedgeClimb | null;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
+  // Druid Cat Form: how far the parked energy pool sits below full while out of
+  // the form (0 or absent = full). See combat/cat_form_energy.ts.
+  parkedEnergyDeficit?: number;
   sitting: boolean;
   eating: Consuming | null;
   drinking: Consuming | null;

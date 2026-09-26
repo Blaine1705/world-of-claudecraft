@@ -1,3 +1,4 @@
+import { parkCatEnergy, takeCatFormEntryEnergy } from './combat/cat_form_energy';
 import { resetCraftedCollectionState } from './combat/crafted_collection_effects';
 import { clearUnequippedBenisonPrayers } from './combat/priest/benison_dawnweave';
 import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
@@ -746,12 +747,20 @@ export function recalcPlayerStats(
   if (e.kind === 'player') e.scale = scaleMul;
 
   // Druid forms swap the resource bar, classic-style: bear runs on rage
-  // (starts empty, fills from combat), cat on energy (starts full — friendlier
-  // than the classic-era 0). Mana is parked in savedMana and restored on shift-out.
+  // (starts empty, fills from combat), cat on energy. Mana is parked in savedMana
+  // and restored on shift-out. Cat energy is parked too, as it is left: out of
+  // combat a shift into Cat still starts full (friendlier than the classic-era
+  // 0), but mid-fight it returns the parked pool, so leaving Cat and coming back
+  // is never a refill (combat/cat_form_energy.ts).
   const formResource: 'rage' | 'energy' | null = bearForm ? 'rage' : catForm ? 'energy' : null;
+  if (e.resourceType === 'energy' && formResource !== 'energy' && def.resourceType === 'mana') {
+    parkCatEnergy(e, e.resource);
+  }
   if (formResource) {
     if (e.resourceType === 'mana') e.savedMana = e.resource;
-    if (e.resourceType !== formResource) e.resource = formResource === 'energy' ? 100 : 0;
+    if (e.resourceType !== formResource) {
+      e.resource = formResource === 'energy' ? takeCatFormEntryEnergy(e) : 0;
+    }
     e.resourceType = formResource;
     e.maxResource = 100;
   } else if (def.resourceType === 'mana') {

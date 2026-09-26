@@ -483,6 +483,8 @@ function reviveAt(
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   p.hp = Math.max(1, Math.round(p.maxHp * hpFrac));
   p.resource = p.resourceType === 'mana' ? Math.round(p.maxResource * hpFrac) : 0;
+  // A new life starts with a full parked Cat Form pool, whatever the death left.
+  p.parkedEnergyDeficit = 0;
   p.targetId = null;
   p.autoAttack = false;
   p.queuedOnSwing = null;
