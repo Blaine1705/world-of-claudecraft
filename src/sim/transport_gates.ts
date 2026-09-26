@@ -13,10 +13,11 @@
 // the grid is BUILT in the clock-0 state (docked at each route's first
 // berth), so a world that never ticks still sees each ship moored there
 // (Eastbrook and Wickharbor). The grid is shared per (content, seed) inside one process, so
-// two worlds at different ferry phases in ONE process would contend for it:
-// no host does that (the server runs one world Sim per realm process, the
-// browser one world), and a re-apply at the top of every tick keeps each
-// world's own tick consistent regardless.
+// two worlds at different ferry phases in ONE process contend for it. The realm server does
+// build short-lived Sims on the live seed beside its world (character creation, PBE boosts),
+// and each one's constructor sync sets the gates to the clock-0 state until the live world's
+// next tick; the re-apply at the top of every tick heals that within the tick and keeps each
+// world's own tick consistent.
 //
 // Pure leaf over the grid seam: no SimContext, no rng.
 
@@ -59,16 +60,6 @@ export function transportBerthColliders(seed: number): Collider[] {
   }
   out.push(...harborRouteMarkerColliders(seed));
   return out;
-}
-
-/** Whether a gate is open at schedule `clock` (unknown ids stay open). */
-export function transportGateOpenAt(gate: string, clock: number): boolean {
-  for (const route of TRANSPORT_ROUTES) {
-    for (let i = 0; i < route.berths.length; i++) {
-      if (transportGateId(route.id, i) === gate) return transportBerthOpenAt(route, i, clock);
-    }
-  }
-  return true;
 }
 
 /** The gates a freshly built grid starts CLOSED (the clock-0 schedule). */

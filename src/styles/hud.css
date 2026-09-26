@@ -14680,8 +14680,8 @@
   }
 
   /* ---------- ferry timetable ---------- */
-  /* The scheduled ferry between Eastbrook and Wickharbor
-     (src/ui/hud/transport/ferry_hud_painter.ts): a small status panel under the
+  /* The scheduled ferries (Eastbrook to Moonrest, Wickharbor to Wyrmwatch;
+     src/ui/hud/transport/ferry_hud_painter.ts): a small status panel under the
      top of the screen near the docked ship (the countdown to the next departure
      and the boarding hint) or aboard (the quiet sailing line). The panel
      composes .ui-panel; this section sets geometry only. */
