@@ -337,7 +337,7 @@ describe("Harbormaster's House: walking it (the real movement kernel)", () => {
       expect(end.y, `at (${x}, ${z})`).toBeCloseTo(HARBOR_HOUSE_FLOOR_ABOVE_WATER, 3);
       expect(end.sink, `to (${x}, ${z})`).toBeGreaterThan(-0.05);
     }
-  }, 120_000);
+  }, 90_000);
 
   it('rests the player at the rest corner: rested experience accrues there', () => {
     place(H.door.x, 1884.6);
@@ -386,7 +386,7 @@ describe("Harbormaster's House: walking it (the real movement kernel)", () => {
     }
     // a stride never climbs the walls: they are full height
     expect(MAX_STEP_HEIGHT).toBeLessThan(H.wallTop);
-  }, 120_000);
+  }, 90_000);
 
   it('spawns the harbormaster once, under her reserved id, on the floor, turned toward the door', () => {
     const all = [...sim.entities.values()].filter(

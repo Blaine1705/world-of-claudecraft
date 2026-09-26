@@ -635,7 +635,7 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
       Q(25, 20.2),
       Q(33.2, 19.9),
     ]);
-  }, 120_000);
+  }, 35_000);
 
   it('across the whole quay: from the north pier root to its south corner by the berth head, and along the face', () => {
     route([
@@ -648,7 +648,7 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
       Q(13.4, 11.5),
       Q(14.5, 14.5),
     ]);
-  }, 120_000);
+  }, 35_000);
 
   it('the quay to the ferry landing: onto the boardwalk, up the wharf flight, along the pier', () => {
     route([
@@ -660,7 +660,7 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
       wharfPoint(15, 0.5),
       { x: 473.25, z: 380.54 },
     ]);
-  }, 120_000);
+  }, 35_000);
 
   it('the harbor market to the north pier head: down the north stair, along the boardwalk, out along the pier', () => {
     route([
@@ -672,11 +672,11 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
       D('pierNorth', -6, 0),
       D('pierNorth', 9.5, -0.2),
     ]);
-  }, 120_000);
+  }, 35_000);
 
   it('the beach to the boardwalk and along it to the ferry wharf flight', () => {
     route([H(-10.4, -0.9), H(-8.9, -0.8), H(-7.2, -0.6), H(-2, 0.2), H(3, 0.3), H(7.0, 0.2)]);
-  }, 120_000);
+  }, 35_000);
 
   it('the Old Beacon lawn to its dock head: down the stair, out along the dock', () => {
     const st = byId('beaconStair');
@@ -687,7 +687,7 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
       D('beaconPier', -8, 0),
       D('beaconPier', 11, 0),
     ]);
-  }, 120_000);
+  }, 35_000);
 
   it('the rails hold: walking or jumping at every drop keeps the player on the planks', () => {
     // (start, push toward) in a deck's frame, and the height the player must keep
@@ -763,5 +763,5 @@ describe('Wickharbor harbor: walking it (the real movement kernel)', () => {
         }
       }
     }
-  }, 120_000);
+  }, 90_000);
 });
