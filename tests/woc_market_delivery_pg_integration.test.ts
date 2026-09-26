@@ -1969,7 +1969,11 @@ describeDb('woc market delivery finalization against real Postgres', () => {
           // First pass creates the opening; later passes change an existing
           // anchor. Every pass changes both bank and vault without changing stock.
           for (const slot of [bankSlot, vaultSlot]) {
-            slot.materialSources = slot.materialSources.map((entry, index) =>
+            const materialSources = slot.materialSources;
+            if (!materialSources) {
+              throw new Error(`material source fixture is incomplete for ${shape}`);
+            }
+            slot.materialSources = materialSources.map((entry, index) =>
               index === 0
                 ? {
                     ...entry,
