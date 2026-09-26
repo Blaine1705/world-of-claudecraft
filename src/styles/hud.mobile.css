@@ -4795,6 +4795,41 @@
   body.mobile-touch #woc-market-window .wm-table tbody tr:first-child td {
     padding-top: 16px;
   }
+  /* The one-column portrait sheet (~342px, see .wm-browse above) is the ONLY
+     face this costs anything: landscape's two-column .wm-browse leaves the
+     desktop five-column split (components.css, 42/16/18/12/12) plenty of
+     room, so this stays inside the portrait query rather than joining the
+     unconditional rules above. In portrait every money/time column drops to
+     40px or less: under that, an ordinary value ("19 minutes", "$1,234.56")
+     has nowhere to break except mid-word, which the shared
+     overflow-wrap:anywhere rule then does at any character rather than a
+     word boundary. Buy Now is the one column a browsing player can lose
+     without losing information: most rows render it empty already (only a
+     buy-now listing carries a price), and the figure still shows in the
+     row's own detail pane one tap away (wocDetailPaneHtml's buy-now face).
+     Dropping it here, not Seller (the documented "a long name breaks"
+     column) or Item (wraps cleanly around its icon), gives Current Bid and
+     Time Left the room a value needs. Scoped off the Sales History table
+     (wm-sales-table), which keeps its own six-column split and has no
+     per-row detail pane to defer a hidden column into. */
+  @media (orientation: portrait) {
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(4),
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) td:nth-child(4) {
+      display: none;
+    }
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(1) {
+      width: 30%;
+    }
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(2) {
+      width: 22%;
+    }
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(3) {
+      width: 26%;
+    }
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(5) {
+      width: 22%;
+    }
+  }
   /* The touch-target floor for the controls the desktop sheet sizes by padding
      alone. The tab strip came out about 30px tall (7px padding on a 13px line),
      under the 40x40 floor in src/ui/CLAUDE.md; the pager, form and row-open
