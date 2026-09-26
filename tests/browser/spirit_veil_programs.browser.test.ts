@@ -8,8 +8,11 @@
 // mesh). The pixel legs prove what the depth pre-pass, the per-rig sort and
 // the decal variant are for: a ghost's inner surfaces never blend twice, a
 // ghost behind a camera-faded wall still shows through it, and a decal's clear
-// texels stay clear. Node halves: tests/spirit_veil_census.test.ts (the family
-// against the catalogue) and tests/character_spirit_veil.test.ts (the visual).
+// texels stay clear. The knob legs hold a released spirit to the shader before
+// its knobs became uniforms, pixel for pixel. Node halves:
+// tests/spirit_veil_census.test.ts (the family against the catalogue),
+// tests/spirit_veil_palette.test.ts (the palettes) and
+// tests/character_spirit_veil.test.ts (the visual).
 
 import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
@@ -23,6 +26,7 @@ import {
   resetSpiritVeilLedger,
   SPIRIT_VEIL_LOOK,
   SpiritVeilRig,
+  spiritVeilDepthMaterial,
   spiritVeilPassOf,
 } from '../../src/render/characters/ghost_veil';
 import {
@@ -555,4 +559,198 @@ describe('the veil draw order on a real driver', () => {
     // Control: the body veil overwrites the texel's alpha.
     expect(Math.abs(alphaAt(body, 0) - veil)).toBeLessThanOrEqual(3);
   });
+});
+
+// The veil shader before its knobs became uniforms (program key -v1), kept
+// verbatim as the reference the released spirit's look must still equal.
+const V1_SHIMMER = `
+  #if defined ( USE_ENVMAP ) || defined ( USE_SKINNING )
+    vec3 veilObjN = objectNormal;
+  #else
+    vec3 veilObjN = vec3( normal );
+  #endif
+  {
+    vec4 veilW0 = modelMatrix * vec4( transformed, 1.0 );
+    float veilS = max( length( modelMatrix[ 0 ].xyz ), 1e-4 );
+    transformed += veilObjN * ( 0.012 / veilS ) * sin( uVeilTime * 3.0 + veilW0.y * 7.0 );
+  }
+  #include <project_vertex>
+`;
+const V1_COLOR_VERT_PARS = `
+  uniform float uVeilTime;
+  varying vec3 vVeilN;
+  varying vec3 vVeilV;
+  varying float vVeilWY;
+  varying float vVeilH;
+`;
+const V1_COLOR_VERT_TAIL = `
+  #include <fog_vertex>
+  #if defined ( USE_ENVMAP ) || defined ( USE_SKINNING )
+    vVeilN = normalize( transformedNormal );
+  #else
+    vVeilN = normalize( normalMatrix * vec3( normal ) );
+  #endif
+  vVeilV = -mvPosition.xyz;
+  vVeilWY = ( modelMatrix * vec4( transformed, 1.0 ) ).y;
+  vVeilH = vVeilWY - modelMatrix[ 3 ].y;
+`;
+const V1_COLOR_FRAG_PARS = `
+  uniform float uVeilTime;
+  uniform vec3 uVeilTint;
+  uniform vec3 uVeilDeep;
+  uniform vec3 uVeilRim;
+  uniform float uVeilRimStrength;
+  uniform float uVeilOpacity;
+  varying vec3 vVeilN;
+  varying vec3 vVeilV;
+  varying float vVeilWY;
+  varying float vVeilH;
+`;
+const V1_COLOR_FRAG_BODY = `
+  {
+    vec3 veilN = normalize( vVeilN );
+    veilN = gl_FrontFacing ? veilN : -veilN;
+    float veilFres = pow( 1.0 - clamp( dot( veilN, normalize( vVeilV ) ), 0.0, 1.0 ), 2.0 );
+    float veilLum = dot( diffuseColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) );
+    float veilBand = 0.5 + 0.5 * sin( vVeilWY * 5.0 - uVeilTime * 2.2 );
+    float veilRise = smoothstep( 0.0, 1.1, vVeilH );
+    vec3 veilBody = mix( uVeilDeep, uVeilTint, clamp( 0.08 + veilLum * 1.9, 0.0, 1.0 ) );
+    veilBody *= ( 0.7 + 0.3 * veilBand ) * ( 0.35 + 0.65 * veilRise );
+    outgoingLight = veilBody + uVeilRim * uVeilRimStrength * veilFres;
+    float veilAlpha = clamp( uVeilOpacity + ( 1.0 - uVeilOpacity ) * veilFres, 0.0, 1.0 );
+    #ifdef SPIRIT_VEIL_DECAL
+      diffuseColor.a *= veilAlpha;
+    #else
+      diffuseColor.a = veilAlpha;
+    #endif
+  }
+  #include <opaque_fragment>
+`;
+const V1_UNIFORMS = {
+  uVeilTime: { value: 0 },
+  uVeilTint: { value: new THREE.Color(0x7cade1) },
+  uVeilDeep: { value: new THREE.Color(0x213055) },
+  uVeilRim: { value: new THREE.Color(0x90c0ff) },
+  uVeilRimStrength: { value: 2.69 },
+  uVeilOpacity: { value: 0.24 },
+};
+
+function v1ColorMaterial(source: THREE.MeshStandardMaterial): THREE.MeshBasicMaterial {
+  const mat = new THREE.MeshBasicMaterial({
+    map: source.map,
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+    transparent: true,
+    depthWrite: false,
+  });
+  mat.forceSinglePass = true;
+  mat.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, V1_UNIFORMS);
+    shader.vertexShader = `${V1_COLOR_VERT_PARS}\n${shader.vertexShader}`
+      .replace('#include <project_vertex>', V1_SHIMMER)
+      .replace('#include <fog_vertex>', V1_COLOR_VERT_TAIL);
+    shader.fragmentShader = `${V1_COLOR_FRAG_PARS}\n${shader.fragmentShader}`.replace(
+      '#include <opaque_fragment>',
+      V1_COLOR_FRAG_BODY,
+    );
+  };
+  mat.customProgramCacheKey = () => 'spirit-veil-color-v1-reference';
+  return mat;
+}
+
+function v1DepthMaterial(): THREE.MeshBasicMaterial {
+  const mat = new THREE.MeshBasicMaterial({
+    colorWrite: false,
+    depthWrite: true,
+    transparent: true,
+    side: THREE.DoubleSide,
+    fog: false,
+  });
+  mat.forceSinglePass = true;
+  mat.polygonOffset = true;
+  mat.polygonOffsetFactor = 1;
+  mat.polygonOffsetUnits = 4;
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.uVeilTime = V1_UNIFORMS.uVeilTime;
+    shader.vertexShader = `uniform float uVeilTime;\n${shader.vertexShader}`.replace(
+      '#include <project_vertex>',
+      V1_SHIMMER,
+    );
+  };
+  mat.customProgramCacheKey = () => 'spirit-veil-depth-v1-reference';
+  return mat;
+}
+
+function frame(w: World, offscreen: boolean, target?: THREE.WebGLRenderTarget): Uint8Array {
+  const out = new Uint8Array(SIZE * SIZE * 4);
+  if (offscreen && target) {
+    w.renderer.readRenderTargetPixels(target, 0, 0, SIZE, SIZE, out);
+  } else {
+    const gl = w.renderer.getContext();
+    gl.readPixels(0, 0, SIZE, SIZE, gl.RGBA, gl.UNSIGNED_BYTE, out);
+  }
+  return out;
+}
+
+describe('the veil knobs on a real driver', () => {
+  for (const offscreen of [false, true]) {
+    const arm = offscreen ? 'render-target (composer tiers)' : 'canvas (direct tiers)';
+    it(`draws a released spirit (keep colours 0) pixel for pixel as the previous shader did, ${arm}`, async () => {
+      const w = world(offscreen);
+      const target = new THREE.WebGLRenderTarget(SIZE, SIZE);
+      disposers.push(() => target.dispose());
+      const drawTo = (): Uint8Array => {
+        w.renderer.setRenderTarget(offscreen ? target : null);
+        w.renderer.render(w.scene, w.camera);
+        w.renderer.setRenderTarget(null);
+        return frame(w, offscreen, target);
+      };
+      w.camera.position.set(0, 0.6, 3);
+      w.camera.lookAt(0, 0.6, 0);
+      const map = new THREE.DataTexture(
+        new Uint8Array([
+          230, 190, 120, 255, 40, 60, 90, 255, 120, 200, 80, 255, 250, 250, 250, 255,
+        ]),
+        2,
+        2,
+      );
+      map.needsUpdate = true;
+      const source = new THREE.MeshStandardMaterial({ map, color: 0x88aacc });
+      const body = new THREE.Mesh<THREE.BufferGeometry, THREE.Material>(
+        new THREE.SphereGeometry(0.7, 24, 16),
+        source,
+      );
+      body.position.y = 0.6;
+      const depth = new THREE.Mesh<THREE.BufferGeometry, THREE.Material>(body.geometry, source);
+      depth.renderOrder = -1;
+      body.add(depth);
+      w.scene.add(body);
+
+      body.material = createSpiritVeilMaterial(source);
+      depth.material = spiritVeilDepthMaterial('depth:r:0');
+      drawTo();
+      const now = drawTo();
+
+      body.material = v1ColorMaterial(source);
+      depth.material = v1DepthMaterial();
+      drawTo();
+      const before = drawTo();
+
+      let lit = 0;
+      let differing = 0;
+      for (let i = 0; i < now.length; i += 4) {
+        if (before[i] + before[i + 1] + before[i + 2] > 30) lit++;
+        if (
+          now[i] !== before[i] ||
+          now[i + 1] !== before[i + 1] ||
+          now[i + 2] !== before[i + 2] ||
+          now[i + 3] !== before[i + 3]
+        )
+          differing++;
+      }
+      // the sphere covers a real share of the frame, so equality means something
+      expect(lit).toBeGreaterThan(SIZE * SIZE * 0.2);
+      expect(differing).toBe(0);
+    });
+  }
 });

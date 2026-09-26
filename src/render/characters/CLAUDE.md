@@ -36,7 +36,9 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   A sibling key on the same material, `userData.armorDyeFallbackHex`
   (`assets.ts` `recolored()`), carries a flat, multiply-safe approximation of
   the same colorway for the low tier, which has no shader stage to run the
-  spec in at all; `buildTintedClone`'s Lambert branch reads it instead.
+  spec in at all; `buildTintedClone`'s Lambert branch reads it instead. The
+  spirit veil's colour pass splices the same GLSL (`ARMOR_DYE_GLSL_PARS`,
+  `armorDyeRemapGlsl`) so a veil that keeps colours keeps the dye too.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/
   ghost plumbing, one-shot triggers, death/revive edge logic. A transparent
   effect (ghost run, stealth, Shadowform, Moonkin) is a new program per rig

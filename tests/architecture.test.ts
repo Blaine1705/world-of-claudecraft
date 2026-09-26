@@ -979,6 +979,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/material_program_shape_core.ts',
   'src/render/characters/far_bake_groups_core.ts',
   'src/render/characters/spirit_veil_family_core.ts',
+  'src/render/characters/spirit_veil_palette_core.ts',
   'src/render/ghost_style_core.ts',
   'src/render/characters/modular_name_facts_core.ts',
   'src/render/characters/morph_union_core.ts',

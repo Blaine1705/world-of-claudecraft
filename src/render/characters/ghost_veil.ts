@@ -20,9 +20,20 @@
 // The face decals (stubble, scalp hair, makeup) are transparent and write no
 // depth: they wear an alpha-preserving variant of the colour material that
 // keeps their mask, drawn after the veiled head, and get no depth sibling.
+//
+// Every veil user wears a palette (spirit_veil_palette_core.ts): uniform
+// values on these same programs. The colour pass also carries its source's
+// colour and outfit dye (armor_dye.ts, count 0 when undyed) for the palettes
+// that keep some of the rig's own colours.
 
 import * as THREE from 'three';
 import { sharedUniforms } from '../gfx';
+import {
+  ARMOR_DYE_GLSL_PARS,
+  type ArmorDyeSpec,
+  armorDyeRemapGlsl,
+  armorDyeUniformValues,
+} from './armor_dye';
 import {
   createSpiritVeilSortUnit,
   createSpiritVeilTransparentSort,
@@ -36,35 +47,85 @@ import {
   spiritVeilShapeOf,
   spiritVeilTupleKey,
 } from './spirit_veil_family_core';
+import { SPIRIT_VEIL_PALETTES, type SpiritVeilPalette } from './spirit_veil_palette_core';
 
-/** The look, in one place. Colours are sRGB hex (three converts them to the
- *  working space), the rim strength goes past 1 so the rim blooms on the
- *  composer tiers and saturates on the direct ones: the silhouette reads on
- *  every tier. */
-export const SPIRIT_VEIL_LOOK = {
-  tint: 0x7cade1,
-  deep: 0x213055,
-  rim: 0x90c0ff,
-  rimStrength: 2.69,
-  opacity: 0.24,
-} as const;
+/** A released spirit's look. */
+export const SPIRIT_VEIL_LOOK = SPIRIT_VEIL_PALETTES.spirit;
 
 let motionAllowed: () => boolean = () => true;
 
-const veilUniforms = {
-  // The one world clock, frozen under reduced motion (the shimmer and the
-  // rising bands are the only motion the veil adds).
-  uVeilTime: {
-    get value(): number {
-      return motionAllowed() ? sharedUniforms.uTime.value : 0;
-    },
+// The one world clock, frozen under reduced motion (the shimmer and the
+// rising bands are the only motion the veil adds).
+const veilTime = {
+  get value(): number {
+    return motionAllowed() ? sharedUniforms.uTime.value : 0;
   },
-  uVeilTint: { value: new THREE.Color(SPIRIT_VEIL_LOOK.tint) },
-  uVeilDeep: { value: new THREE.Color(SPIRIT_VEIL_LOOK.deep) },
-  uVeilRim: { value: new THREE.Color(SPIRIT_VEIL_LOOK.rim) },
-  uVeilRimStrength: { value: SPIRIT_VEIL_LOOK.rimStrength },
-  uVeilOpacity: { value: SPIRIT_VEIL_LOOK.opacity },
 };
+
+interface PaletteUniforms {
+  uVeilTint: { value: THREE.Color };
+  uVeilDeep: { value: THREE.Color };
+  uVeilRim: { value: THREE.Color };
+  uVeilRimStrength: { value: number };
+  uVeilOpacity: { value: number };
+  uVeilRise: { value: number };
+  uVeilShimmer: { value: number };
+  uVeilKeepColor: { value: number };
+  uVeilBand: { value: number };
+}
+
+const paletteUniformSets = new Map<SpiritVeilPalette, PaletteUniforms>();
+
+/** One uniform set per palette, shared by every material of that palette. */
+function paletteUniforms(palette: SpiritVeilPalette): PaletteUniforms {
+  let set = paletteUniformSets.get(palette);
+  if (!set) {
+    const p = SPIRIT_VEIL_PALETTES[palette];
+    set = {
+      uVeilTint: { value: new THREE.Color(p.tint) },
+      uVeilDeep: { value: new THREE.Color(p.deep) },
+      uVeilRim: { value: new THREE.Color(p.rim) },
+      uVeilRimStrength: { value: p.rimStrength },
+      uVeilOpacity: { value: p.opacity },
+      uVeilRise: { value: p.rise },
+      uVeilShimmer: { value: p.shimmer },
+      uVeilKeepColor: { value: p.keepColor },
+      uVeilBand: { value: p.band },
+    };
+    paletteUniformSets.set(palette, set);
+  }
+  return set;
+}
+
+interface DyeUniforms {
+  uDyeA: { value: number[] };
+  uDyeB: { value: number[] };
+  uDyeC: { value: number[] };
+  uDyeD: { value: number[] };
+  uDyeCount: { value: number };
+}
+
+function dyeUniforms(spec: ArmorDyeSpec | null): DyeUniforms {
+  const u = armorDyeUniformValues(spec);
+  return {
+    uDyeA: { value: u.a },
+    uDyeB: { value: u.b },
+    uDyeC: { value: u.c },
+    uDyeD: { value: u.d },
+    uDyeCount: { value: u.n },
+  };
+}
+
+const UNDYED = dyeUniforms(null);
+
+/** The source's outfit dye, where the source's own shader runs it: only the
+ *  standard arm carries the spec (armor_dye.ts reapplyArmorDyeToClone). The
+ *  low tier's Lambert rebuild has none, its flat stand-in rides `color`. */
+function sourceDye(source: THREE.Material): DyeUniforms {
+  if (!(source as THREE.MeshStandardMaterial).isMeshStandardMaterial) return UNDYED;
+  const spec = (source.userData as { armorDye?: ArmorDyeSpec }).armorDye;
+  return spec ? dyeUniforms(spec) : UNDYED;
+}
 
 // Both passes replay the same shimmer so the colour pass lands on the depth
 // the pre-pass wrote.
@@ -77,13 +138,14 @@ const VERT_SHIMMER = `
   {
     vec4 veilW0 = modelMatrix * vec4( transformed, 1.0 );
     float veilS = max( length( modelMatrix[ 0 ].xyz ), 1e-4 );
-    transformed += veilObjN * ( 0.012 / veilS ) * sin( uVeilTime * 3.0 + veilW0.y * 7.0 );
+    transformed += veilObjN * ( uVeilShimmer / veilS ) * sin( uVeilTime * 3.0 + veilW0.y * 7.0 );
   }
   #include <project_vertex>
 `;
 
 const COLOR_VERT_PARS = `
   uniform float uVeilTime;
+  uniform float uVeilShimmer;
   varying vec3 vVeilN;
   varying vec3 vVeilV;
   varying float vVeilWY;
@@ -109,12 +171,20 @@ const COLOR_FRAG_PARS = `
   uniform vec3 uVeilRim;
   uniform float uVeilRimStrength;
   uniform float uVeilOpacity;
+  uniform float uVeilRise;
+  uniform float uVeilKeepColor;
+  uniform float uVeilBand;
+  uniform vec3 uVeilSrcColor;
   varying vec3 vVeilN;
   varying vec3 vVeilV;
   varying float vVeilWY;
   varying float vVeilH;
+${ARMOR_DYE_GLSL_PARS}
 `;
 
+// At keepColor 0 the uniform branch is skipped and the body is exactly the
+// monochrome veil; the true colour is the source's own (texel times its
+// colour, then its dye), as its lit shader would compose it.
 const COLOR_FRAG_BODY = `
   {
     vec3 veilN = normalize( vVeilN );
@@ -122,9 +192,14 @@ const COLOR_FRAG_BODY = `
     float veilFres = pow( 1.0 - clamp( dot( veilN, normalize( vVeilV ) ), 0.0, 1.0 ), 2.0 );
     float veilLum = dot( diffuseColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) );
     float veilBand = 0.5 + 0.5 * sin( vVeilWY * 5.0 - uVeilTime * 2.2 );
-    float veilRise = smoothstep( 0.0, 1.1, vVeilH );
+    float veilRise = smoothstep( 0.0, uVeilRise, vVeilH );
     vec3 veilBody = mix( uVeilDeep, uVeilTint, clamp( 0.08 + veilLum * 1.9, 0.0, 1.0 ) );
-    veilBody *= ( 0.7 + 0.3 * veilBand ) * ( 0.35 + 0.65 * veilRise );
+    if ( uVeilKeepColor > 0.0 ) {
+      vec3 veilTrue = diffuseColor.rgb * uVeilSrcColor;
+      ${armorDyeRemapGlsl('veilTrue')}
+      veilBody = mix( veilBody, veilTrue, uVeilKeepColor );
+    }
+    veilBody *= ( ( 1.0 - uVeilBand ) + uVeilBand * veilBand ) * ( 0.35 + 0.65 * veilRise );
     outgoingLight = veilBody + uVeilRim * uVeilRimStrength * veilFres;
     float veilAlpha = clamp( uVeilOpacity + ( 1.0 - uVeilOpacity ) * veilFres, 0.0, 1.0 );
     #ifdef SPIRIT_VEIL_DECAL
@@ -138,8 +213,11 @@ const COLOR_FRAG_BODY = `
 
 // Hooks stay idempotent and keep nothing of the shader object: the dry
 // compile of the shader warm-up calls them once more on a throwaway one.
-function veilColorHook(shader: THREE.WebGLProgramParametersWithUniforms): void {
-  Object.assign(shader.uniforms, veilUniforms);
+function veilColorHook(
+  shader: THREE.WebGLProgramParametersWithUniforms,
+  uniforms: Record<string, THREE.IUniform>,
+): void {
+  Object.assign(shader.uniforms, uniforms);
   shader.vertexShader = `${COLOR_VERT_PARS}\n${shader.vertexShader}`
     .replace('#include <project_vertex>', VERT_SHIMMER)
     .replace('#include <fog_vertex>', COLOR_VERT_TAIL);
@@ -149,17 +227,22 @@ function veilColorHook(shader: THREE.WebGLProgramParametersWithUniforms): void {
   );
 }
 
-function veilDepthHook(shader: THREE.WebGLProgramParametersWithUniforms): void {
-  shader.uniforms.uVeilTime = veilUniforms.uVeilTime;
-  shader.vertexShader = `uniform float uVeilTime;\n${shader.vertexShader}`.replace(
-    '#include <project_vertex>',
-    VERT_SHIMMER,
-  );
+function veilDepthHook(
+  shader: THREE.WebGLProgramParametersWithUniforms,
+  shimmer: { value: number },
+): void {
+  shader.uniforms.uVeilTime = veilTime;
+  shader.uniforms.uVeilShimmer = shimmer;
+  shader.vertexShader =
+    `uniform float uVeilTime;\nuniform float uVeilShimmer;\n${shader.vertexShader}`.replace(
+      '#include <project_vertex>',
+      VERT_SHIMMER,
+    );
 }
 
-const COLOR_PROGRAM_KEY = 'spirit-veil-color-v1';
-const DECAL_PROGRAM_KEY = 'spirit-veil-decal-v1';
-const DEPTH_PROGRAM_KEY = 'spirit-veil-depth-v1';
+const COLOR_PROGRAM_KEY = 'spirit-veil-color-v2';
+const DECAL_PROGRAM_KEY = 'spirit-veil-decal-v2';
+const DEPTH_PROGRAM_KEY = 'spirit-veil-depth-v2';
 const colorProgramKey = (): string => COLOR_PROGRAM_KEY;
 const decalProgramKey = (): string => DECAL_PROGRAM_KEY;
 const depthProgramKey = (): string => DEPTH_PROGRAM_KEY;
@@ -169,9 +252,16 @@ type SourceMaterial = THREE.Material & {
   color?: THREE.Color;
 };
 
+const PALETTE_KEY = 'spiritVeilPalette';
+
 /** The pass a veil material draws, or null for any other material. */
 export function spiritVeilPassOf(material: THREE.Material): SpiritVeilPass | null {
   return (material.userData[SPIRIT_VEIL_PASS_KEY] as SpiritVeilPass | undefined) ?? null;
+}
+
+/** The palette a veil material wears, or null for any other material. */
+export function spiritVeilPaletteOf(material: THREE.Material): SpiritVeilPalette | null {
+  return (material.userData[PALETTE_KEY] as SpiritVeilPalette | undefined) ?? null;
 }
 
 /**
@@ -179,10 +269,14 @@ export function spiritVeilPassOf(material: THREE.Material): SpiritVeilPass | nul
  * face decal: its mask is its shape) takes the alpha-preserving decal variant,
  * front faces only like the decals, keeping its polygon offset and its colour
  * so the hair colour still reads in the stipple; every other source becomes the body veil, white
- * over the source map so the tone comes from the texture. Shape-free: the
- * caller caches one per (source, shape).
+ * over the source map so the tone comes from the texture, carrying a copy of
+ * the source's colour and its dye for the palettes that keep them. Shape-free:
+ * the caller caches one per (palette, source, shape).
  */
-export function createSpiritVeilMaterial(source: THREE.Material): THREE.MeshBasicMaterial {
+export function createSpiritVeilMaterial(
+  source: THREE.Material,
+  palette: SpiritVeilPalette = 'spirit',
+): THREE.MeshBasicMaterial {
   const src = source as SourceMaterial;
   const decal = source.transparent === true;
   const mat = new THREE.MeshBasicMaterial({
@@ -200,20 +294,33 @@ export function createSpiritVeilMaterial(source: THREE.Material): THREE.MeshBasi
     mat.polygonOffsetFactor = source.polygonOffsetFactor;
     mat.polygonOffsetUnits = source.polygonOffsetUnits;
   }
-  mat.onBeforeCompile = veilColorHook;
+  const uniforms: Record<string, THREE.IUniform> = {
+    uVeilTime: veilTime,
+    ...paletteUniforms(palette),
+    // A decal already carries its colour on `color`, and has no dye.
+    uVeilSrcColor: { value: !decal && src.color ? src.color.clone() : new THREE.Color(0xffffff) },
+    ...(decal ? UNDYED : sourceDye(source)),
+  };
+  mat.onBeforeCompile = (shader) => veilColorHook(shader, uniforms);
   mat.customProgramCacheKey = decal ? decalProgramKey : colorProgramKey;
   mat.userData[SPIRIT_VEIL_PASS_KEY] = decal ? 'decal' : 'color';
+  mat.userData[PALETTE_KEY] = palette;
   return mat;
 }
 
 const depthMaterials = new Map<string, THREE.MeshBasicMaterial>();
 
-/** The shared depth pre-pass material for one depth tuple key. Never
- *  disposed: every ghost of that shape draws it, and the boot stand-in
- *  holds its program. A small polygon offset keeps the colour pass's
+/** The shared depth pre-pass material for one depth tuple key and palette
+ *  (the pre-pass replays its colour pass's shimmer). Never disposed: every
+ *  ghost of that shape and palette draws it, and the boot stand-in holds the
+ *  program they all share. A small polygon offset keeps the colour pass's
  *  LessEqual test robust across the two programs. */
-export function spiritVeilDepthMaterial(depthKey: string): THREE.MeshBasicMaterial {
-  let mat = depthMaterials.get(depthKey);
+export function spiritVeilDepthMaterial(
+  depthKey: string,
+  palette: SpiritVeilPalette = 'spirit',
+): THREE.MeshBasicMaterial {
+  const cacheKey = `${palette}|${depthKey}`;
+  let mat = depthMaterials.get(cacheKey);
   if (!mat) {
     mat = new THREE.MeshBasicMaterial({
       colorWrite: false,
@@ -227,10 +334,12 @@ export function spiritVeilDepthMaterial(depthKey: string): THREE.MeshBasicMateri
     mat.polygonOffsetFactor = 1;
     mat.polygonOffsetUnits = 4;
     mat.name = `spirit_veil_depth_${depthKey}`;
-    mat.onBeforeCompile = veilDepthHook;
+    const { uVeilShimmer } = paletteUniforms(palette);
+    mat.onBeforeCompile = (shader) => veilDepthHook(shader, uVeilShimmer);
     mat.customProgramCacheKey = depthProgramKey;
     mat.userData[SPIRIT_VEIL_PASS_KEY] = 'depth';
-    depthMaterials.set(depthKey, mat);
+    mat.userData[PALETTE_KEY] = palette;
+    depthMaterials.set(cacheKey, mat);
   }
   return mat;
 }
@@ -346,8 +455,17 @@ export function installSpiritVeil(
 
 const DEPTH_SIBLING_NAME = 'spirit_veil_depth';
 
+/** The pre-pass of a veiled body: its shape, its colour pass's palette. */
+function depthMaterialFor(body: THREE.Mesh): THREE.MeshBasicMaterial {
+  const mat = Array.isArray(body.material) ? body.material[0] : body.material;
+  return spiritVeilDepthMaterial(
+    spiritVeilShapeKey(body),
+    (mat && spiritVeilPaletteOf(mat)) ?? 'spirit',
+  );
+}
+
 function buildDepthSibling(body: THREE.Mesh): THREE.Mesh {
-  const material = spiritVeilDepthMaterial(spiritVeilShapeKey(body));
+  const material = depthMaterialFor(body);
   const skinned = body as THREE.SkinnedMesh;
   let sibling: THREE.Mesh;
   if (skinned.isSkinnedMesh) {
@@ -439,6 +557,8 @@ export class SpiritVeilRig {
         this.siblings.set(mesh, sibling);
       }
       followBody(sibling, mesh);
+      const depth = depthMaterialFor(mesh);
+      if (sibling.material !== depth) sibling.material = depth;
       if (sibling.parent !== mesh) mesh.add(sibling);
       this.tag(sibling, 'depth');
       kept.add(sibling);
