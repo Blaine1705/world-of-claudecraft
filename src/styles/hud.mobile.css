@@ -4808,8 +4808,9 @@
      buy-now listing carries a price), and the figure still shows in the
      row's own detail pane one tap away (wocDetailPaneHtml's buy-now face).
      Dropping it here, not Seller (the documented "a long name breaks"
-     column) or Item (wraps cleanly around its icon), gives Current Bid and
-     Time Left the room a value needs. Scoped off the Sales History table
+     column) or Item (the primary scan target, and the only cell carrying an
+     icon plus text), gives Item, Current Bid and Time Left the room their
+     values need. Scoped off the Sales History table
      (wm-sales-table), which keeps its own six-column split and has no
      per-row detail pane to defer a hidden column into. */
   @media (orientation: portrait) {
@@ -4818,16 +4819,16 @@
       display: none;
     }
     body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(1) {
-      width: 30%;
+      width: 40%;
     }
     body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(2) {
-      width: 22%;
+      width: 18%;
     }
     body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(3) {
-      width: 26%;
+      width: 22%;
     }
     body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(5) {
-      width: 22%;
+      width: 20%;
     }
   }
   /* The touch-target floor for the controls the desktop sheet sizes by padding

@@ -1153,7 +1153,7 @@ export class MageGroundFx {
       const rim = new THREE.Mesh(rimGeo, rimMat);
       rim.name = 'mage-meteor-telegraph-rim';
       rim.frustumCulled = false;
-      rim.renderOrder = 9;
+      rim.renderOrder = floorVfxRenderOrder(layer, 9);
       group.add(rim);
     }
 

@@ -13,6 +13,7 @@ import {
   MageGroundFx,
   type MeteorFallSpawn,
 } from '../src/render/mage_ground_fx';
+import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import { meteorLandingBurst } from '../src/render/meteor_landing_burst';
 import {
   isNythraxisGraveEruption,
@@ -180,6 +181,7 @@ describe('Grave Eruption warning rings', () => {
 
     const rim = grave.getObjectByName('mage-meteor-telegraph-rim') as THREE.Mesh;
     expect(rim).toBeDefined();
+    expect(rim.renderOrder).toBe(floorVfxRenderOrder('encounter', 9));
     const rimMaterial = rim.material as THREE.MeshBasicMaterial;
     // Brighter than the plain boundary color (additive contrast against the
     // hall's own ambient purple), while staying the same purple-danger hue.

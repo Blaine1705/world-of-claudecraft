@@ -538,6 +538,7 @@ describe('mobile: the $WOC Exchange browse table sheds Buy Now in portrait', () 
       expect(m, `a width for th:nth-child(${n}) in the portrait block`).toBeTruthy();
       return m ? Number(m[1]) : 0;
     });
+    expect(widths).toEqual([40, 18, 22, 20]);
     expect(widths.reduce((a, b) => a + b, 0)).toBe(100);
   });
 
