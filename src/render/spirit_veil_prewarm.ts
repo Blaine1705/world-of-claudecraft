@@ -14,10 +14,13 @@
 // A tuple outside the family (a census gap) is linked late, on the background
 // queue, by a stand-in of its own.
 //
-// Each unit ends with the touch tail (linked_program_touch_lane.ts): once its
-// stand-in linked, the program's uniform and attribute tables are fetched as
+// Each unit starts the touch tail (linked_program_touch_lane.ts) once its
+// stand-in linked: the program's uniform and attribute tables are fetched as
 // one budgeted queue unit at the boot lane's tail priority, which the loading
-// cover admits. Without it the first veil a live frame draws (a release, a
+// cover admits. The entry's own run waits for those touches; a resumed unit
+// only starts its touch and settles, because the resume lane runs a debt unit
+// holding the queue, and a unit awaiting another unit of the same queue would
+// never settle. Without it the first veil a live frame draws (a release, a
 // stealth, a Keeper appearing) pays that reflection round trip inside the
 // frame: the own-release frame on the HD 530 spent 7.2 ms on 274 first-use
 // uniform queries of the veil and the old twins.
@@ -131,9 +134,20 @@ export interface SpiritVeilPrewarmHost {
   link?: (root: THREE.Object3D) => Promise<void>;
 }
 
+/** The touch tail of one linked stand-in; never rejects. */
+function touchStandIn(host: SpiritVeilPrewarmHost, root: THREE.Object3D): Promise<unknown> {
+  return runLinkedProgramTouchLane(host.queue, host.properties, root, GPU_WORK_PRIORITY.BOOT_DEBT, {
+    settled: false,
+  }).catch(() => 0);
+}
+
 /** One unit per tuple: link its stand-in, record the settle, mark the tuple,
- *  then touch the linked program's tables. */
-export function spiritVeilProgramUnits(host: SpiritVeilPrewarmHost): PrewarmResumeUnit[] {
+ *  then start the touch of the linked program's tables, handed to `touches`
+ *  when the caller will wait for them. */
+export function spiritVeilProgramUnits(
+  host: SpiritVeilPrewarmHost,
+  touches?: Promise<unknown>[],
+): PrewarmResumeUnit[] {
   const link = host.link ?? ((root) => linkColorPrograms(host.arms, root, false));
   return SPIRIT_VEIL_FAMILY.map((tuple) => {
     const key = spiritVeilKeyOfTuple(tuple);
@@ -142,15 +156,10 @@ export function spiritVeilProgramUnits(host: SpiritVeilPrewarmHost): PrewarmResu
       id: `spirit-veil:${key}`,
       roots: [root],
       run: () =>
-        link(root).then(async () => {
+        link(root).then(() => {
           markProgramsReadyUnder(host.properties, root);
           noteSpiritVeilTupleLinked(key, host.properties);
-          await runLinkedProgramTouchLane(
-            host.queue,
-            host.properties,
-            root,
-            GPU_WORK_PRIORITY.BOOT_DEBT,
-          );
+          touches?.push(touchStandIn(host, root));
         }),
     };
   });
@@ -177,6 +186,7 @@ function installLateLink(host: SpiritVeilPrewarmHost): void {
         .then(() => {
           markProgramsReadyUnder(host.properties, root);
           noteSpiritVeilTupleLinked(key, host.properties);
+          return touchStandIn(host, root);
         })
         .catch(() => undefined)
         .finally(() => inFlight.delete(key));
@@ -199,9 +209,11 @@ export function spiritVeilFamilyPrewarmEntry(
     category: 'entities',
     priority: 47,
     required: false,
-    resumeProgramUnits: () => spiritVeilProgramUnits(host),
+    resumeProgramUnits: () => spiritVeilProgramUnits(host, []),
     run: async () => {
-      await Promise.all(spiritVeilProgramUnits(host).map((unit) => unit.run()));
+      const touches: Promise<unknown>[] = [];
+      await Promise.all(spiritVeilProgramUnits(host, touches).map((unit) => unit.run()));
+      await Promise.all(touches);
     },
     detail: () => `tuples=${SPIRIT_VEIL_FAMILY.length};linked=${spiritVeilLedgerSize()}`,
   };

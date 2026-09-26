@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 import type * as THREE from 'three';
 import { MeshBasicMaterial } from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import {
   createSpiritVeilMaterial,
   installSpiritVeil,
@@ -43,6 +43,7 @@ import {
   prewarmResumeIsDebt,
   resolvePrewarmPolicy,
 } from '../src/render/prewarm_policy';
+import { runResumeUnit } from '../src/render/prewarm_resume_runner';
 import {
   buildSpiritVeilStandIn,
   SPIRIT_VEIL_PREWARM_ENTRY_ID,
@@ -179,9 +180,64 @@ describe('the entities.spirit-veil-family entry', () => {
     expect(touches).toHaveLength(SPIRIT_VEIL_FAMILY.length);
     for (const q of touches) expect(q.priority).toBe(GPU_WORK_PRIORITY.TAIL_PIECE);
     // a drop's resume units carry the same tail
-    for (const program of programs.values()) vi.mocked(program.getUniforms).mockClear();
+    for (const program of programs.values()) {
+      vi.mocked(program.getUniforms).mockClear();
+      vi.mocked(program.getAttributes).mockClear();
+    }
+    h.queued.length = 0;
     for (const unit of entry.resumeProgramUnits?.() ?? []) await unit.run();
-    for (const program of programs.values()) expect(program.getUniforms).toHaveBeenCalledTimes(1);
+    for (const program of programs.values()) {
+      expect(program.getUniforms).toHaveBeenCalledTimes(1);
+      expect(program.getAttributes).toHaveBeenCalledTimes(1);
+    }
+    const resumed = h.queued.filter((q) => q.label === LINKED_PROGRAM_TOUCH_LABEL);
+    expect(resumed).toHaveLength(SPIRIT_VEIL_FAMILY.length);
+    for (const q of resumed) expect(q.priority).toBe(GPU_WORK_PRIORITY.TAIL_PIECE);
+  });
+
+  it('resumes a dropped entry through the real queue and resume runner without holding it', async () => {
+    // The resume lane runs a debt unit holding the queue until it settles, so
+    // a unit that awaited its own touch on that queue would never settle and
+    // would starve every later unit (gates, reveals, uploads) for the session.
+    const queue = createBackgroundGpuQueue();
+    const touched: string[] = [];
+    const state = new Map<THREE.Material, unknown>();
+    const properties = {
+      get: (material: THREE.Material) => {
+        let entry = state.get(material);
+        if (!entry) {
+          const program = {
+            getUniforms: () => touched.push(material.uuid),
+            getAttributes: () => undefined,
+          };
+          entry = { currentProgram: program, programs: new Map([['k', program]]) };
+          state.set(material, entry);
+        }
+        return entry;
+      },
+    };
+    const link = vi.fn(() => Promise.resolve());
+    const entry = spiritVeilFamilyPrewarmEntry({} as CompileArmHost, { properties }, queue, link);
+    const id = `programs.${SPIRIT_VEIL_PREWARM_ENTRY_ID}`;
+    expect(prewarmResumeIsDebt(id)).toBe(true);
+    const units = entry.resumeProgramUnits?.() ?? [];
+    const deps = {
+      queue,
+      ledger: { noteStart: () => undefined },
+      lifecycle: {} as never,
+      arms: null,
+    };
+    const later = vi.fn(() => 'ran');
+    const settled = Promise.all(units.map((unit) => runResumeUnit(unit, { id, units }, deps)));
+    const behind = queue.run(later, GPU_WORK_PRIORITY.ACTIONABLE_VIEW, 'later:unit');
+    const timeout = new Promise((resolve) => setTimeout(() => resolve('stuck'), 2000));
+    expect(await Promise.race([settled.then(() => 'settled'), timeout])).toBe('settled');
+    expect(await Promise.race([behind, timeout])).toBe('ran');
+    expect(link).toHaveBeenCalledTimes(SPIRIT_VEIL_FAMILY.length);
+    // the touches still run, after their held units let go of the queue
+    for (let i = 0; i < 200 && touched.length < SPIRIT_VEIL_FAMILY.length; i++)
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(touched).toHaveLength(SPIRIT_VEIL_FAMILY.length);
   });
 
   it('is droppable, and a drop hands every tuple to the program-debt lane', async () => {
