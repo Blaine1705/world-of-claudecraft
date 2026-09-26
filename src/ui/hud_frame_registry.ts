@@ -32,6 +32,7 @@ export function registerHudFrames(deps: {
     const mover = new MovableFrame({
       frame,
       storageKey: spec.storageKey,
+      legacyStorageKeys: spec.legacyStorageKeys,
       snapToGrid: deps.snapToGrid,
       unlockLabelKey: 'hudChrome.interfaceUnlock.unlockFrame',
       lockLabelKey: 'hudChrome.interfaceUnlock.lockFrame',

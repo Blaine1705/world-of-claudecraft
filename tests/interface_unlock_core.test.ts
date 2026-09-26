@@ -132,9 +132,9 @@ describe('HUD_FRAME_SPECS', () => {
       xpBar: { w: 596, h: 14 },
     });
     // The FULL key list, pinned as literals in spec order: these are persisted
-    // player data (localStorage), so renaming any one of them orphans every
-    // player's saved layout for that frame with no other test failing. A new
-    // frame appends a new key here; an existing key never changes.
+    // player data (localStorage), so renaming any one of them needs a legacy
+    // fallback or it orphans every player's saved layout for that frame with no
+    // other test failing. A new frame appends a new key here.
     expect(HUD_FRAME_STORAGE_KEYS).toEqual([
       'woc_hud_frame_focus_target_1',
       'woc_hud_frame_focus_target_2',
@@ -153,7 +153,7 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_minimap',
       'woc_hud_frame_pet',
       'woc_hud_frame_petbar',
-      'woc_hud_frame_totarget',
+      'woc_hud_frame_target_of_target',
       'woc_hud_frame_stancebar',
       'woc_hud_frame_xpbar',
       'woc_hud_frame_buffbar',
@@ -181,6 +181,9 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_track_utility',
       'woc_hud_frame_track_friendly',
       'woc_hud_frame_track_shields',
+    ]);
+    expect(HUD_FRAME_SPECS.find((s) => s.id === 'targetOfTarget')?.legacyStorageKeys).toEqual([
+      'woc_hud_frame_totarget',
     ]);
   });
 

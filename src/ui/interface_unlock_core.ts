@@ -30,6 +30,8 @@ export interface HudFrameSpec {
   elementId: string;
   /** localStorage key its chosen position + size persist under. */
   storageKey: string;
+  /** Older keys read as migration fallbacks when the durable key changes. */
+  legacyStorageKeys?: readonly string[];
   /** Name chip shown on the frame while unlocked, so a dimmed placeholder is
    *  never an anonymous floating box. Reuses an existing key where one already
    *  names the frame (the unit-frame aria labels, the target-aura tab names). */
@@ -225,7 +227,8 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
   {
     id: 'targetOfTarget',
     elementId: 'totarget-frame',
-    storageKey: 'woc_hud_frame_totarget',
+    storageKey: 'woc_hud_frame_target_of_target',
+    legacyStorageKeys: ['woc_hud_frame_totarget'],
     labelKey: 'hudChrome.unitFrame.targetOfTargetLabel',
     fallbackSize: { w: 240, h: 64 },
     detachToUiRoot: true,
