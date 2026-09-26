@@ -57,8 +57,10 @@ import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { shouldDrawLegacyCastSparkle, syncAbilityVfxCast } from './ability_vfx_registry';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { AbyssalRiftFx } from './abyssal_rift_fx';
+import { ActionCamRig } from './action_cam_core';
 import { AfflictionFamiliar } from './affliction_familiar';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
+import { createAmbienceState, sampleAmbienceInto } from './ambience_state_core';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { arrivalCoverActive, noteArrivalIfTeleported } from './arrival_cover';
@@ -1399,6 +1401,8 @@ export class Renderer {
   private readonly camBoom = createCameraBoom();
   private readonly camFeel = createCameraFeel();
   private readonly camDirector = createCameraDirector();
+  readonly actionCam = new ActionCamRig(); // opt-in over-the-shoulder shift + stride bob
+  private readonly ambience = createAmbienceState();
   private baseFov = CAMERA_BASE_FOV; // setCameraFov's value; camera.fov is overwritten below each frame
   // Player-pose mirror from last frame: any change while a directive runs is
   // manual camera input (or the follow system), which cancels the directive.
@@ -12339,10 +12343,12 @@ export class Renderer {
     // The camera orbits the lagged/led pivot at the player's requested
     // distance. Scene geometry never changes that distance; registered
     // obstructors fade through their subsystem's occluder-fade pass.
-    const px = this.camBoom.x + this.camFeel.leadX;
+    this.actionCam.step(dt, reduce, this.selfSubmerged || p.dead, velX, velZ, selfPos.y);
+    const shoulder = this.actionCam.offset(pose.yaw, pose.dist);
+    const px = this.camBoom.x + this.camFeel.leadX + shoulder.x;
     const py = this.camBoom.y;
-    const pz = this.camBoom.z + this.camFeel.leadZ;
-    const eyeY = py + 2.0;
+    const pz = this.camBoom.z + this.camFeel.leadZ + shoulder.z;
+    const eyeY = py + 2.0 - shoulder.drop;
     const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     const cy = Math.min(eyeY + Math.sin(pose.pitch) * pose.dist, underwaterCeilingY);
     const cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
@@ -12359,7 +12365,7 @@ export class Renderer {
     // way the old terrain walls lifted it.
     groundY += gardenMazeCameraLift(cx, cz);
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
-    const fovTarget = resolveCameraFov(this.baseFov, this.camFeel);
+    const fovTarget = Math.min(100, resolveCameraFov(this.baseFov, this.camFeel) + shoulder.fov);
     if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
       this.camera.fov = fovTarget;
       this.camera.updateProjectionMatrix();
@@ -12367,6 +12373,10 @@ export class Renderer {
     this.cameraLookAt.set(px, eyeY, pz);
     // lookAtFrozen, never a bare lookAt (r185 frozen-matrix aim, static_matrix.ts).
     lookAtFrozen(this.camera, this.cameraLookAt);
+    // Later readers (occluder fades, ambience) want the AVATAR eye, not the
+    // Action Cam aim: a wall hiding the player must still fade.
+    this.cameraLookAt.set(px - shoulder.x, eyeY + shoulder.drop, pz - shoulder.z);
+    const eye = this.cameraLookAt;
 
     // Spatial-audio listener (at the camera, facing the player) + ambience state.
     const sink = this.audioSink;
@@ -12374,24 +12384,12 @@ export class Renderer {
       const cpx = this.camera.position.x,
         cpy = this.camera.position.y,
         cpz = this.camera.position.z;
-      const fx = px - cpx,
-        fy = eyeY - cpy,
-        fz = pz - cpz;
+      const fx = eye.x - cpx,
+        fy = eye.y - cpy,
+        fz = eye.z - cpz;
       const fl = Math.hypot(fx, fy, fz) || 1;
       sink.setListener(cpx, cpy, cpz, fx / fl, fy / fl, fz / fl);
-      const inDungeon = px > DUNGEON_X_THRESHOLD;
-      const biome = zoneBiomeAt(px, pz);
-      const precip =
-        !this.weatherOn || inDungeon
-          ? null
-          : biome === 'peaks' || biome === 'frost'
-            ? 'snow'
-            : biome === 'marsh' || biome === 'haunt'
-              ? 'rain' // the haunted wood drips under a permanent drizzle
-              : null;
-      // Only at the water's edge / in it, sampled at the player, so a loose
-      // threshold made the loop bleed across the low marsh from far off.
-      const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz, seed) + 0.4;
+      const amb = sampleAmbienceInto(this.ambience, eye.x, eye.z, seed, this.weatherOn);
       this.riftAmbience.collect(this.sim, this.sim.player.pos.x, this.riftAmbienceScratch);
       // Early-out: no live rift ambience this frame, so skip building the
       // merged array entirely and hand the static set straight through.
@@ -12402,7 +12400,7 @@ export class Renderer {
         for (const p of this.riftAmbienceScratch) this.ambientPointsMergedScratch.push(p);
         points = this.ambientPointsMergedScratch;
       }
-      sink.ambience(biome, inDungeon, precip, nearWater, 0, points);
+      sink.ambience(amb.biome, amb.inDungeon, amb.precip, amb.nearWater, 0, points);
     }
   }
 
