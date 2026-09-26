@@ -758,7 +758,9 @@ export class MeterData {
         const maxHp = targetEntity?.maxHp;
         const hpAfter = targetEntity?.hp;
         const hpBefore =
-          hpAfter === undefined ? undefined : Math.min(maxHp ?? hpAfter + ev.amount, hpAfter + ev.amount);
+          hpAfter === undefined
+            ? undefined
+            : Math.min(maxHp ?? hpAfter + ev.amount, hpAfter + ev.amount);
         const lethal = (hpAfter !== undefined && hpAfter <= 0) || targetEntity?.dead === true;
 
         this.deathRecapBuffer.push(whoTarget.pid, {
