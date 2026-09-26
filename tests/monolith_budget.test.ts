@@ -1539,7 +1539,17 @@ const MONOLITHS: MonolithRow[] = [
     // autosave stall and release loot-quality reductions compose below both
     // parent pins. wc -l on the merged tree. Exact count, zero slack.
     // Release reconciliation: measured merged tree, preserving both extraction sets.
-    ceiling: 9861,
+    // LOWERED 9979 -> 9965 by the craft_roll_events change: the ftue_events
+    // quest/death record arms of the event drain moved to
+    // server/event_record_observers.ts (which also hosts the new craftRoll
+    // arm), so the audit landed as a net shrink. Exact count, zero slack.
+    // LOWERED 9965 -> 9954 at the developer-badge titles merge: the badge flair
+    // stamp (plus its worn rung-title re-check) moved to
+    // server/dev_badge_stamp.ts, composed with the release extraction above.
+    // Measured with wc -l < server/game.ts on the merged tree. Exact count.
+    // LOWERED again by the merged #4164 tree: the release reconciliation and
+    // developer-badge title extraction compose to the measured file size.
+    ceiling: 9850,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

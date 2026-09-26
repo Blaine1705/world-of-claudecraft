@@ -4886,8 +4886,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // from the guild's (or pledged guild's) collective lifetime XP. 0 for the
   // base look and for the unguilded. Server-set display only.
   guildTier: number;
-  // Book of Deeds display title: a deed id (never display text), null/absent
-  // for untitled players and every mob/npc. Written by the sim title setter
+  // Display title: a title-deed id or a developer-badge rung title id
+  // ('dev:<rung>', not a deed), never display text; null/absent for untitled
+  // players and every mob/npc. Written by the sim title setter
   // (src/sim/deeds.ts setActiveTitle) and player spawn from persisted state;
   // rides the identity wire only when non-null.
   title?: string | null;

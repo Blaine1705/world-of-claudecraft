@@ -240,6 +240,7 @@ import {
   recordDeedUnlocks,
 } from './deeds_records';
 import { appendBookOfDeedsWire } from './deeds_wire';
+import { stampDevBadge } from './dev_badge_stamp';
 import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
@@ -1350,7 +1351,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.guild) out.gd = e.guild;
   if (e.pledgeGuild) out.pg = e.pledgeGuild; // guild pledge (display only; '' for members)
   if (e.guildTier) out.gt = e.guildTier; // guild colour tier (sim/guild_tier.ts)
-  if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
+  if (e.title) out.title = e.title; // active title (a deed or 'dev:<rung>' id; the client localizes)
   if (e.border) out.border = e.border; // Book of Deeds nameplate border (a deed id; the client resolves the slug)
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
@@ -3042,22 +3043,10 @@ export class GameServer {
     if (this.clients.get(session.pid) !== session) return;
     const e = this.sim.entities.get(session.pid);
     if (!e) return;
-    const githubLogin = tier > 0 ? (login ?? undefined) : undefined;
-    const devMergedPrs = tier > 0 ? mergedPrs : undefined;
-    if (
-      (e.devTier ?? 0) !== tier ||
-      (e.devMergedPrs ?? 0) !== (devMergedPrs ?? 0) ||
-      e.githubLogin !== githubLogin
-    ) {
-      // identity diff re-broadcasts the developer-badge flair to nearby players
-      e.devTier = tier;
-      e.devMergedPrs = devMergedPrs;
-      e.githubLogin = githubLogin;
-      if (tier > 0) {
-        console.log(
-          `[dev] ${session.name} dev tier → ${tier} (${mergedPrs} merged PRs, @${login})`,
-        );
-      }
+    // identity diff re-broadcasts the flair; the stamp re-checks a worn rung title
+    const meta = this.sim.meta(session.pid);
+    if (stampDevBadge(e, meta, tier, login, mergedPrs) && tier > 0) {
+      console.log(`[dev] ${session.name} dev tier → ${tier} (${mergedPrs} merged PRs, @${login})`);
     }
   }
 
