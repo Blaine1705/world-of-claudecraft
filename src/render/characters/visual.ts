@@ -75,6 +75,7 @@ import {
   ghostEffectOpacity,
 } from './effect_materials';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
+import { FormAdornments } from './form_adornments';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import { HarvestRecoil } from './harvest_recoil';
@@ -786,6 +787,9 @@ export class CharacterVisual {
   private soulRend = false;
   private shadowform = false;
   private moonkin = false;
+  /** Moonwing's antlers, crescent and wings; Gloamveil's veil (form_adornments.ts).
+   *  Built on the first form edge, so a rig that never shifts pays nothing. */
+  private formAdornments: FormAdornments | null = null;
   private ferocityStage = 0;
   private presentationScale = 1;
   private ascended = false;
@@ -1039,6 +1043,13 @@ export class CharacterVisual {
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
     this.updateMetamorphWings(dt, s, reducedMotion);
+    this.formAdornments?.update(
+      dt,
+      s.moving,
+      s.casting,
+      reducedMotion,
+      this.root.visible && !farMeshShown(this.far, this.farMesh !== null, this.farCompilePending),
+    );
     if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
     // Deferred sheathe swap: lands at the gesture's windup peak (see
     // setWeaponStowed), where the clip is also cut so the chop's downswing never
@@ -2194,6 +2205,7 @@ export class CharacterVisual {
     if (on === this.ghosted && style === this.ghostStyle) return;
     this.ghosted = on;
     this.ghostStyle = style;
+    this.syncFormAdornments();
     this.applyVisualMaterials();
   }
 
@@ -2304,13 +2316,25 @@ export class CharacterVisual {
   setShadowform(on: boolean): void {
     if (on === this.shadowform) return;
     this.shadowform = on;
+    this.syncFormAdornments();
     this.applyVisualMaterials();
   }
 
   setMoonkin(on: boolean): void {
     if (on === this.moonkin) return;
     this.moonkin = on;
+    this.syncFormAdornments();
     this.applyVisualMaterials();
+  }
+
+  private syncFormAdornments(): void {
+    if (this.disposed || (!this.formAdornments && !this.moonkin && !this.shadowform)) return;
+    this.formAdornments ??= new FormAdornments(
+      this.model,
+      this.look ? 'composed' : this.key === 'player_mech' ? 'replacement' : 'classRig',
+      () => this.farBakeGate,
+    );
+    this.formAdornments.sync(this.moonkin, this.shadowform, this.ghosted);
   }
 
   pulseMetamorphosis(strength = 1): void {
@@ -3376,6 +3400,7 @@ export class CharacterVisual {
     this.templarsVerdictFx?.dispose();
     this.templarsVerdictFx = null;
     this.templarsVerdictAction = null;
+    this.formAdornments?.dispose();
     this.disposeWeaponAura();
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();

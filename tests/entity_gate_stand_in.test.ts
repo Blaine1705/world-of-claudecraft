@@ -292,6 +292,25 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(anyCharacterRigDrawing(slots({ visual: rig(true) }))).toBe(true);
   });
 
+  it('form adornments: the tinted body draws throughout, the pieces alone arrive late', () => {
+    // The first mount of a Moonwing or Gloamveil set rides the same injected
+    // gate; the holder hides ONLY the roots it parented into the rig, never
+    // the rig itself, so the body keeps its click target and silhouette.
+    const row = ENTITY_GATE_STAND_INS.find(
+      (r) => r.callSite === '(settled) => this.gateSwapFlagOnCompile(target, settled),',
+    );
+    expect(row?.hides).toContain('form_adornments.ts');
+    expect(row?.standIn).toContain('the same body in its form tint');
+    const holder = sourceOf('src/render/characters/form_adornments.ts');
+    const mount = holder.slice(
+      holder.indexOf('private mount<'),
+      holder.indexOf('\n  }', holder.indexOf('private mount<')),
+    );
+    expect(mount).toContain('root.visible = false;');
+    expect(mount).not.toContain('model.visible');
+    expect(anyCharacterRigDrawing(slots({ visual: rig(true) }))).toBe(true);
+  });
+
   it('mount and weapon gates: the character keeps drawing throughout', () => {
     // Both hide only an accessory node, never the body, so the rider/wearer is
     // the stand-in and no plate is forced.

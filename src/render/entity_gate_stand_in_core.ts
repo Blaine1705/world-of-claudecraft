@@ -154,9 +154,9 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     file: 'src/render/renderer.ts',
     callSite: '(settled) => this.gateSwapFlagOnCompile(target, settled),',
     hides:
-      'the freshly baked far mesh and its shadow proxy; the SAME injected gate also stages the transparent effect clones (visual.ts stageEffectSwap), which hide nothing at all, and reveals the face decals of a body built with them deferred (visual.ts attachDeferredDecals), which hide only themselves',
+      'the freshly baked far mesh and its shadow proxy; the SAME injected gate also stages the transparent effect clones (visual.ts stageEffectSwap), which hide nothing at all, reveals the face decals of a body built with them deferred (visual.ts attachDeferredDecals), which hide only themselves, and holds the first mount of the Moonwing and Gloamveil form adornments (characters/form_adornments.ts), which also hide only themselves',
     standIn:
-      'the articulated rig, held by farMeshShown (characters/far_lod_reveal_core.ts); for the effect-clone use, the body itself, still drawing its current opaque materials until the swap commits; for the deferred decals, the same body, drawn whole from the frame it entered range with only its stubble and makeup paint arriving late',
+      'the articulated rig, held by farMeshShown (characters/far_lod_reveal_core.ts); for the effect-clone use, the body itself, still drawing its current opaque materials until the swap commits; for the deferred decals, the same body, drawn whole from the frame it entered range with only its stubble and makeup paint arriving late; for the form adornments, the same body in its form tint, with only the cosmetic antlers, crescent, wings or veil arriving a link later',
   },
   {
     gate: 'gateSwapFlagOnCompile',

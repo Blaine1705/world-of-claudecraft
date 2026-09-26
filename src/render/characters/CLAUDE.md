@@ -183,6 +183,18 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `paladin_templars_verdict_fx.ts` twins): procedural `AnimationClip`s built in
   code and registered per ability; the template future ability-animation work
   follows.
+- Form adornments: `form_adornments.ts`, the per-rig owner `CharacterVisual`
+  holds and drives from the `setMoonkin`/`setShadowform` edges the renderer
+  already sends, over the pure `form_adornment_core.ts` (what a rig wears, the
+  pose math) and two painters, `moonwing_adornment.ts` (antlers, crescent,
+  wings) and `gloamveil_veil.ts` (the face veil), with their canvas art in
+  `form_adornment_textures.ts` and the shared marker and glow recipe in
+  `rig_fx.ts`. Pieces ride the rig's `head`/`chest` bones, carry the
+  `weaponVfxMesh` marker so no overlay swap, prewarm twin or caster sweep
+  touches them, hide under a ghost or stealth body, and their shared kits are
+  prewarmed through `ABILITY_MATERIAL_SOURCES`; a rig's first mount of a set
+  still waits hidden behind the injected compile gate
+  (`tests/form_adornments.test.ts`, `tests/character_form_adornments.test.ts`).
 - Pure selection cores: `modular.ts` (composed bodies, below),
   `player_look_core.ts`, `form_visual_selection_core.ts`,
   `far_lod_reveal_core.ts` (the rig/far-mesh/shadow-proxy handoff rule: the
