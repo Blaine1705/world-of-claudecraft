@@ -111,7 +111,7 @@ export const MUSTER_CAMPS: readonly MusterCampDef[] = [
     facing: -0.36,
     onCircuit: false,
     soldiers: [
-      { templateId: 'muster_captain', dx: -2.5, dz: 3.5 },
+      { templateId: 'muster_captain', dx: 0.5, dz: 2.5 },
       { templateId: 'muster_sergeant', dx: 5.0, dz: 4.0 },
       { templateId: 'muster_footman', dx: -6.5, dz: 6.0 },
       { templateId: 'muster_footman', dx: 7.5, dz: 7.0 },
