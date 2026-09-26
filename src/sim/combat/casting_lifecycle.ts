@@ -149,9 +149,9 @@ import {
   iceFloesAuraForAbility,
   nextCastCheapMultiplier,
 } from './empower_next';
-import { autoPicksFallenAlly, isFallenGroupMember, pickFallenAlly } from './fallen_ally_target';
 import { shieldEquipped } from './equipment_requirement';
 import { executeWindowBlocksCast, executeWindowThreshold } from './execute_threshold';
+import { autoPicksFallenAlly, isFallenGroupMember, pickFallenAlly } from './fallen_ally_target';
 import { meleeReachActor } from './feral_reach';
 import {
   applyAutoUnshift,

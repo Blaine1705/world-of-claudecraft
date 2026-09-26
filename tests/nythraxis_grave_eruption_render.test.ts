@@ -8,12 +8,12 @@ import {
   abilityVfxFullSpecFor,
   abilityVfxSpecFor,
 } from '../src/render/ability_vfx/encounter_specs';
+import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import {
   handleMageGroundSpellfxEvent,
   MageGroundFx,
   type MeteorFallSpawn,
 } from '../src/render/mage_ground_fx';
-import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import { meteorLandingBurst } from '../src/render/meteor_landing_burst';
 import {
   isNythraxisGraveEruption,

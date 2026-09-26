@@ -14,12 +14,12 @@
 // program with the last material holding it).
 
 import * as THREE from 'three';
-import { GFX } from './gfx';
 import {
   STONEBOUND_SHARD_TINT,
   STONEBOUND_SHELL_TINT,
   stoneboundShellStyle,
 } from './characters/stonebound_shell_core';
+import { GFX } from './gfx';
 
 export function bubbleBeamMaterialOptions(
   color: number,
