@@ -15,7 +15,11 @@
 import { audio } from '../../../game/audio';
 import { type Keybinds, keyLabel } from '../../../game/keybinds';
 import { t } from '../../i18n';
-import { mountActionBarBindBanner, setActionBarBindBannerStatus } from './action_bar_bind_banner';
+import {
+  mountActionBarBindBanner,
+  removeActionBarBindBanner,
+  setActionBarBindBannerStatus,
+} from './action_bar_bind_banner';
 import {
   type ActionBarBindState,
   actionBarBindEnter,
@@ -66,7 +70,7 @@ export class ActionBarBindController {
     if (this.state) return;
     this.deps.closeOptions();
     this.state = actionBarBindEnter();
-    this.bannerEl?.remove();
+    removeActionBarBindBanner(this.bannerEl);
     this.bannerEl = mountActionBarBindBanner(this.deps.bannerParent(), {
       onReset: () => this.confirmReset(),
       onDone: () => this.end(),
@@ -78,7 +82,7 @@ export class ActionBarBindController {
     if (!this.state) return;
     this.cancelPendingCapture();
     this.state = null;
-    this.bannerEl?.remove();
+    removeActionBarBindBanner(this.bannerEl);
     this.bannerEl = null;
     this.sync();
   }

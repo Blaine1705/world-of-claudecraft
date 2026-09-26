@@ -252,6 +252,7 @@ export function bindActionBarBindBannerDrag(el: HTMLElement, uiRoot: HTMLElement
       return;
     }
     if (!moved) placeActionBarBindBanner(el, uiRoot);
+    else keepBannerInViewport(el, uiRoot);
   };
   if (!win) return;
   const Controller = win.AbortController;
@@ -283,4 +284,32 @@ export function setActionBarBindBannerStatus(banner: HTMLElement, state: ActionB
       : status === 'bound'
         ? t('hudChrome.actionBar.boundToKey', { key: state.lastBoundKeyLabel ?? '' })
         : '';
+}
+
+/** Close the transient binding overlay; its drag owns its disconnected resize cleanup. */
+export function removeActionBarBindBanner(banner: HTMLElement | null): void {
+  banner?.remove();
+}
+
+/** Keep a manually placed banner reachable after a viewport or orientation change. */
+function keepBannerInViewport(el: HTMLElement, uiRoot: HTMLElement): void {
+  const scale = liveScale();
+  const viewport = visibleViewport(uiRoot, scale);
+  const pos = draggedWindowPosition(
+    {
+      pointerX: (Number.parseFloat(el.style.left) || 0) * scale,
+      pointerY: (Number.parseFloat(el.style.top) || 0) * scale,
+      grabOffsetX: 0,
+      grabOffsetY: 0,
+    },
+    {
+      scale,
+      viewportWidth: viewport.width,
+      viewportHeight: viewport.height,
+      windowWidth: el.offsetWidth,
+      windowHeight: el.offsetHeight,
+    },
+  );
+  el.style.left = `${pos.left}px`;
+  el.style.top = `${pos.top}px`;
 }

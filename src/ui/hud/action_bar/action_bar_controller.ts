@@ -75,6 +75,8 @@ export interface ActionBarControllerDeps {
   knownAbilityIds(): readonly string[];
   hasAura(kind: string): boolean;
   showAttackButton(): boolean;
+  // A broader owner-presentation hold, including the first snapshot after reconnect.
+  readOnly?(): boolean;
   // The input-surface profile this controller arranges (the desktop keyboard
   // row or the touch ring), read LIVE like every sibling dep because the
   // Interface Mode setting can flip the surface mid-session (syncProfile follows
@@ -136,6 +138,14 @@ export class ActionBarController {
   private unsavedChanges = false;
 
   constructor(private readonly deps: ActionBarControllerDeps) {
+    // A reconnect can be read-only after the spectate label has cleared.
+    // Compose both live signals without changing the caller's dependency bag.
+    if (deps.readOnly) {
+      this.deps = {
+        ...deps,
+        spectating: () => deps.readOnly?.() === true || deps.spectating?.() === true,
+      };
+    }
     this.activeProfile = this.resolveProfile();
     this.activeSpecState = this.deps.talentSpec();
   }

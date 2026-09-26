@@ -532,7 +532,8 @@ const MONOLITHS: MonolithRow[] = [
     // banner merged into that reconciled tree: the PR's error-toast timer and
     // loot notification formatting compose with the quality receipt arm and
     // roll-id close guard. wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 18240,
+    // Release reconciliation: measured merged tree, preserving both extraction sets.
+    ceiling: 18133,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -562,7 +563,16 @@ const MONOLITHS: MonolithRow[] = [
     // (src/ui/host_diag_section_controller.ts over the pure
     // src/ui/host_diag_view.ts), not a sub-view of this window. Exact count,
     // zero slack.
-    ceiling: 2821,
+    // LOWERED 2830 -> 2829 by extracting shared frame settings and reset-key scope.
+    // LOWERED 2829 -> 2827 by extracting menu placement into OptionsWindowLayout.
+
+    // Release/v0.44.0 sync at ee8883fa4f: compose parent pins 2827 / 2821.
+    // Exact merged line count, preserving both extraction sets.
+    // LOWERED 2818 -> 2813 when Options > Cooldown Manager and the Overlays
+    // sub-view landed: the Auras render method and its placement/teardown lines
+    // moved out with them to src/ui/options_overlay_panels.ts. Measured with
+    // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
+    ceiling: 2813,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1156,7 +1166,8 @@ const MONOLITHS: MonolithRow[] = [
     // src/sim/loot/kill_participation.ts beside the participation predicates
     // it shares with the kill snapshot. wc -l on the merged tree. Exact
     // count, zero slack.
-    ceiling: 11683,
+    // Release reconciliation: measured merged tree, preserving both extraction sets.
+    ceiling: 11673,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1377,7 +1388,8 @@ const MONOLITHS: MonolithRow[] = [
     // (with the targetAurasBelowFrame side case riding the same helper), so
     // the coordinator ends smaller. wc -l on the merged tree. Exact count,
     // zero slack.
-    ceiling: 11166,
+    // Release reconciliation: measured merged tree, preserving both extraction sets.
+    ceiling: 11150,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1608,7 +1620,8 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 9979 -> 9934 at this release-line reconcile: the guild-bank
     // autosave stall and release loot-quality reductions compose below both
     // parent pins. wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 9934,
+    // Release reconciliation: measured merged tree, preserving both extraction sets.
+    ceiling: 9861,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1765,7 +1778,17 @@ const MONOLITHS: MonolithRow[] = [
     // RE-CONFIRMED at the v0.44 release-line reconciliation after trimming
     // duplicated coordinator prose. Exact formatted count remains 5426.
     // Exact count, zero slack.
-    ceiling: 5426,
+    // LOWERED 5426 -> 5421 at World PvP (the /pvp flag): the social / PvP /
+    // market / mail self-decode cohort moved to src/net/social_self_wire.ts
+    // (where the new wpvp readout also lands), paying for the flag's mirror
+    // field, the pvp entity bit and the setWorldPvpFlag send. Measured with
+    // wc -l < src/net/online.ts after biome. Exact count, zero slack.
+    // LOWERED 5426 -> 5421 by extracting first-snapshot action bar restore resolution.
+    // Re-pinned at the 2026-09-25 merge of release/v0.44.0 into feature/world-pvp-flag:
+    // exact count measured on the MERGED working tree (wc -l < src/net/online.ts),
+    // never reconciled by arithmetic. Zero slack.
+    // Release reconciliation: measured merged tree, preserving both extraction sets.
+    ceiling: 5404,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2041,7 +2064,10 @@ const MONOLITHS: MonolithRow[] = [
     // merged count, zero slack: any further growth reds again.
     // OSSBrain integration: canvas drawing primitives moved to nameplate_paint_primitives.ts.
     // Measured after formatting; lower the ratchet with the extraction.
-    ceiling: 827,
+    // LOWERED 827 -> 826 at World PvP (PR 4146 review): the state gained the pvpFlag
+    // the name row was built with, paid for by three comment trims. Exact count
+    // (wc -l < src/render/nameplate_canvas.ts), zero slack.
+    ceiling: 826,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

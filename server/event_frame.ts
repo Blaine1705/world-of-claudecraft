@@ -18,14 +18,12 @@ import type { SimEvent } from '../src/sim/types';
 // never reaches botDetector.observeEvent either; the detector reads
 // player-visible behavior, and this event is duplicate server-side evidence
 // of a craft the detector already observes through the craft command itself.
-// lootRollAwarded joins it for the same reason: its one consumer is the
-// server's Discord rare-drop card (server/activity_detect.ts), which reads
-// the tick's events before routing; the winner's client learns of the grant
-// through the 'loot' line and the bag mirror it already receives.
-// The some() guard keeps the common no-craft, no-award tick allocation-free.
+// Loot awards feed Discord activity cards; craft rolls feed the audit observer.
+// Neither is a player-rendered event. Keep ordinary ticks allocation-free.
 const SERVER_ONLY_EVENT_TYPES: ReadonlySet<SimEvent['type']> = new Set([
   'vaultCraftConsume',
   'lootRollAwarded',
+  'craftRoll',
 ]);
 export function filterRoutableEvents(events: readonly SimEvent[]): readonly SimEvent[] {
   return events.some((ev) => SERVER_ONLY_EVENT_TYPES.has(ev.type))

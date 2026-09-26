@@ -180,7 +180,10 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // no existing shelf row moved.
     // The Crucible crafting tier adds 33 items without moving any old shelf gate.
     expect(Object.keys(CRUCIBLE_COLLECTION_ITEMS)).toHaveLength(33);
-    expect(shelf.length).toBe(515);
+    // Re-pinned 515 -> 654 by Warfare Season 2: 139 honor items (27 five-piece
+    // spec sets plus four weapons) sourced at level 29, every one deriving the
+    // same level-20 gate; no existing shelf row moved.
+    expect(shelf.length).toBe(654);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

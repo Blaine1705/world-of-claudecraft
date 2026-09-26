@@ -258,11 +258,17 @@ describe('bindActionBarBindBannerDrag', () => {
     expect(el.style.top).toBe('478px');
   });
 
-  it('removes its resize listener when the banner is removed', async () => {
-    const abortSpy = vi.spyOn(window.AbortController.prototype, 'abort');
-    el.remove();
+  it('releases every resize listener when the banner is removed', async () => {
+    const addSpy = vi.spyOn(window, 'addEventListener');
+    const banner = mountActionBarBindBanner(ui, { onReset: () => {}, onDone: () => {} });
+    const resizeOptions = addSpy.mock.calls
+      .filter(([type]) => type === 'resize')
+      .map(([, , options]) => options as AddEventListenerOptions | undefined);
+    expect(resizeOptions.length).toBeGreaterThan(0);
+    banner.remove();
     await Promise.resolve();
-    expect(abortSpy).toHaveBeenCalled();
+    for (const options of resizeOptions) expect(options?.signal?.aborted).toBe(true);
+    addSpy.mockRestore();
   });
 
   it('drags by the plate, converting visual px to author px under the UI zoom', () => {
