@@ -1482,60 +1482,6 @@ export const hudChromeStrings = {
     since: 'Pledged {date}',
     withdraw: 'Withdraw pledge',
   },
-  // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Social window's
-  // Ranks tab (every member reads the rank table; the Guild Master edits it)
-  // and the roster's promote/demote hovers, which name the rank a click
-  // moves the member to. Wordy values (M16) ship their five non-Latin fills
-  // in the same change.
-  guildRanks: {
-    tab: 'Ranks',
-    introEdit:
-      'Name your guild ranks and choose what each one may do. Changes apply to everyone holding the rank once you save.',
-    introView: 'Each rank title and what it may do. Only the Guild Master can change them.',
-    colRank: 'Rank',
-    colTitle: 'Title',
-    colMembers: 'Members',
-    colActions: 'Order',
-    // An untitled custom rank reads as its ladder position (the Guild Master
-    // is rank 0), the way a guild ledger numbers its seats.
-    numbered: 'Rank {n}',
-    perm: {
-      invite: 'Invite',
-      remove: 'Remove',
-      promote: 'Promote',
-      bank: 'Guild Bank',
-      officerChat: 'Officer Chat',
-      motd: 'Billboard',
-      events: 'Calendar',
-    },
-    // Column-header hovers: what each permission lets a rank do.
-    permHint: {
-      invite: 'Invite players to the guild and answer their pledges.',
-      remove: 'Remove members who hold a lower rank.',
-      promote: 'Promote and demote members who hold a lower rank, up to one rank below their own.',
-      bank: 'Deposit and withdraw copper and items in the guild bank. Every member can view it.',
-      officerChat: 'Read and speak in officer chat.',
-      motd: 'Edit the guild billboard.',
-      events: 'Add and remove guild calendar events.',
-    },
-    // Accessible names for the per-row controls ({rank} is the row's label).
-    titleLabel: 'Title for {rank}',
-    permLabel: '{perm} for {rank}',
-    leaderLocked: 'The Guild Master always holds every permission.',
-    add: 'Add Rank',
-    save: 'Save Ranks',
-    moveUp: 'Move {rank} up',
-    moveDown: 'Move {rank} down',
-    remove: 'Remove {rank}',
-    full: 'A guild can have at most {max} ranks.',
-    invalidTitle:
-      'Rank titles use letters, numbers, spaces, apostrophes, and hyphens, up to {max} characters.',
-    removeConfirm: 'Members holding {rank} will become {fallback}. Remove this rank?',
-    removeAccept: 'Remove Rank',
-    // Roster row hovers for the promote / demote buttons.
-    promoteTo: 'Promote {name} to {rank}',
-    demoteTo: 'Demote {name} to {rank}',
-  },
   // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
   // accessible label, the "all ready" line, and the unlock-countdown templates
   // (digits run through formatNumber; the units reorder per locale).
@@ -1714,7 +1660,6 @@ export const hudChromeStrings = {
     breakdownSummary: '{tab}: {value}',
     breakdownRow: '{value} ({percent})',
     breakdownOther: 'Other ({count})',
-    targetsHeader: 'Targets',
     percent: '{value}%',
     petAbility: '{pet}: {ability}',
     melee: 'Melee',
@@ -1728,173 +1673,6 @@ export const hudChromeStrings = {
     // ("Healing", "Threat"), so the row reads as the action on that meter.
     separate: 'Separate {meter}',
     regroup: 'Regroup {meter}',
-
-    // Settings button & quick menu
-    settingsTitle: 'Details / Meter Settings',
-    optionsEngineBadge: 'WoC Details! Engine',
-    resetDefaults: 'Reset to Defaults',
-    closeSettings: 'Close',
-    densityCompact: 'Density: Compact (16px)',
-    densityStandard: 'Density: Standard (20px)',
-    bgGlass: 'Background: Glass (76%)',
-    bgSolid: 'Background: Solid (98%)',
-    bgMinimal: 'Background: Minimal (45%)',
-    numDetailed: 'Numbers: Detailed',
-    numCompact: 'Numbers: Abbreviated (k/M)',
-    raidTotalsOn: 'Header group total: Yes',
-    raidTotalsOff: 'Header group total: No',
-
-    // Options dialog sidebar tabs
-    tabGeneral: 'Window & Background',
-    tabGeneralDesc: 'Opacity, scale, lock',
-    tabBars: 'Bars & Textures',
-    tabBarsDesc: 'Height, spacing, animation',
-    tabText: 'Text & Typography',
-    tabTextDesc: 'Fonts, k/M, DPS, rank',
-    tabHeader: 'Header & Title',
-    tabHeaderDesc: 'Group total, title bar',
-    tabCombat: 'Combat & Limits',
-    tabCombatDesc: 'Max rows, shields',
-    tabPresets: 'Quick Themes',
-    tabPresetsDesc: 'One-click presets',
-    tabProfiles: 'Profiles & Import',
-    tabProfilesDesc: 'Export, import, and profiles',
-
-    // Tab 1: General (Window & Background)
-    groupWindow: 'Window Appearance & Background',
-    bgMode: 'Background Mode',
-    bgModeDesc: 'Visual styling for the meter panel.',
-    optGlass: 'Glass (Blur)',
-    optGlassDesc: 'Frosted blur effect',
-    optSolid: 'Solid',
-    optSolidDesc: 'Dark high-contrast panel',
-    optMinimal: 'Minimal',
-    optMinimalDesc: 'Faint translucent',
-    optTransparent: 'Transparent',
-    optTransparentDesc: 'No background, bars only',
-    bgOpacity: 'Background Opacity',
-    bgOpacityDesc: 'Opacity percentage for the window background.',
-    windowScale: 'Window Scale',
-    windowScaleDesc: 'Increase or decrease the overall meter scale.',
-    lockPosition: 'Lock Position',
-    lockPositionDesc: 'Lock the window to prevent accidental dragging or resizing in combat.',
-
-    // Tab 2: Bars & Textures
-    groupBars: 'Bar Geometry & Texture',
-    barHeight: 'Bar Height',
-    barHeightDesc: 'Vertical thickness of each combat row (14px compact to 26px spacious).',
-    barSpacing: 'Bar Spacing',
-    barSpacingDesc: 'Vertical pixel gap between adjacent rows.',
-    barTexture: 'Bar Texture',
-    barTextureDesc: 'Visual finish and shading over the class color.',
-    texSpecular: 'Glossy (Specular)',
-    texSpecularDesc: 'Top highlight reflection with bevel',
-    texSmooth: 'Smooth (Flat)',
-    texSmoothDesc: 'Clean flat class color',
-    texGradient: 'Gradient',
-    texGradientDesc: 'Smooth horizontal color gradient',
-    barAnimation: 'Smooth Bar Animation',
-    barAnimationDesc: 'Fluidly interpolates bar growth and decay in real time.',
-    alwaysShowMe: 'Always Show Me',
-    alwaysShowMeDesc: 'Pins your player bar to the bottom if ranked outside visible rows.',
-
-    // Tab 3: Text & Typography
-    groupText: 'Text Formatting & Telemetry',
-    numFormat: 'Number Format',
-    numFormatDesc: 'Display style for totals.',
-    optNumCompact: 'Abbreviated (k / M)',
-    optNumCompactDesc: 'Example: 145.2k, 1.2M',
-    optNumDetailed: 'Full Detailed',
-    optNumDetailedDesc: 'Example: 145,200, 1,240,500',
-    optNumDamageDps: 'Damage | DPS',
-    optNumDamageDpsDesc: 'Example: 239.2k | 18.4k (clean telemetry bar)',
-    showDps: 'Show Rate per Second (DPS / HPS)',
-    showDpsDesc: 'Shows damage or healing rate per second on each bar.',
-    showPercent: 'Show Percentage (%)',
-    showPercentDesc: 'Shows percent contribution of total group output.',
-    showRank: 'Show Rank (#1, #2...)',
-    showRankDesc: 'Shows ordinal rank number beside the name.',
-    showClassIcon: 'Show Class Icon',
-    showClassIconDesc: 'Displays class or role icon next to each player.',
-    groupFont: 'Combat Typography (Font Family)',
-
-    // Tab 4: Header & Title
-    groupHeader: 'Header Customization',
-    showTitleBar: 'Show Title Bar',
-    showTitleBarDesc: 'Displays top bar with combat segment name and controls.',
-    showRaidTotals: 'Group Summary in Subtitle',
-    showRaidTotalsDesc: 'Displays cumulative group DPS/HPS in the header subtitle.',
-
-    // Tab 5: Combat & Limits
-    groupCombat: 'Combat Rules & Limits',
-    maxRows: 'Maximum Visible Rows',
-    maxRowsDesc: 'Simultaneous bars (0 = unlimited, auto-fit to window height).',
-    autoRows: ' (Auto)',
-    barsUnit: ' bars',
-    includeShields: 'Count Absorbs as Healing',
-    includeShieldsDesc: 'Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.',
-
-    // Tab 6: Presets
-    groupPresets: 'One-Click Quick Themes',
-    applyPreset: 'Apply Theme',
-    presetDetailsName: 'Modern Glass',
-    presetDetailsDesc:
-      'Frosted blur background, specular glossy bars, abbreviated numbers, and full telemetry.',
-    presetDetailsBadge: 'Recommended',
-    presetClassicName: 'Classic Solid',
-    presetClassicDesc:
-      'Dark high-contrast solid panel, flat class bars, uncompressed detailed numbers in classic layout.',
-    presetClassicBadge: 'Classic',
-    presetMinimalName: 'Pure Minimal',
-    presetMinimalDesc:
-      'Nearly transparent background, compact 16px bars without gaps, direct text without percentages.',
-    presetMinimalBadge: 'Clean',
-    presetRaidName: 'Raid Focus',
-    presetRaidDesc:
-      'Designed for raids: compact 18px density, 10-bar limit, visible group total, and pinned player bar.',
-    presetRaidBadge: 'Raid',
-    presetProGradientName: 'Pro Gradient',
-    presetProGradientDesc:
-      'Floating transparent panel, horizontal gradient bars, spec icons, and Damage | DPS telemetry.',
-    presetProGradientBadge: 'Pro',
-
-    // Tab 7: Profiles & Import/Export
-    groupManageProfiles: 'Profile Management',
-    activeProfile: 'Active Profile',
-    activeProfileDesc: 'Select or manage independent profiles for different gameplay scenarios.',
-    saveAs: 'Save As...',
-    duplicate: 'Duplicate',
-    deleteProfile: 'Delete',
-    cannotDeleteDefault: 'The Default profile cannot be deleted',
-    promptNewProfile: 'Name of the new profile:',
-    profileCopySuffix: ' (Copy)',
-    groupExport: 'Export Current Profile',
-    exportDesc: 'Encoded profile string of your current configuration. Copy it to share or backup.',
-    copyString: 'Copy Profile String',
-    copiedFeedback: 'Copied to clipboard!',
-    groupImport: 'Import Profile',
-    importDesc: 'Paste a profile string (!WoC-Details:... or JSON) to apply and save.',
-    importPlaceholder: 'Paste profile string here (!WoC-Details:...)',
-    importNamePlaceholder: 'Profile name (optional)',
-    importApply: 'Import & Apply',
-    errEmptyProfile: 'Please paste a profile string.',
-    errInvalidProfile: 'Error: Invalid or corrupt profile string.',
-    importSuccess: 'Profile "{name}" imported successfully!',
-    reportSent: 'Report copied and sent to chat',
-    reportNoData: 'No data recorded.',
-    noDetailedData: 'No detailed data',
-    noDeathEvents: 'No events logged before death',
-    killedBy: 'Killed by {killer} ({ability})',
-    lethalHit: 'Lethal Hit',
-    recentCombatEvents: 'Last {count} combat events',
-    backComparison: 'Comparison',
-    comparisonNeedTwo: 'At least 2 fights are required to compare',
-    backTimeline: 'Timeline',
-    timelineCombatEvents: 'Combat events: {count}',
-    backDev: 'Balance / Dev',
-    balanceAbilitiesCount: 'Logged abilities: {count}',
-    targetSubtitle: 'Target: {target}',
-    noTargetData: 'No player data for this target',
   },
   // The six aura tracks (src/ui/hud/aura_tracks/): bars of the auras YOU have
   // out, one frame per question. All wordy (M16): the five non-Latin fills land
@@ -1937,7 +1715,6 @@ export const hudChromeStrings = {
     buffs: 'Buffs',
     unlock: 'Move target aura window',
     lock: 'Lock target aura window',
-    close: 'Close target aura window',
     configureRows: 'Configure target auras',
     fewerRows: 'Prefer fewer aura rows',
     moreRows: 'Prefer more aura rows',
@@ -3329,17 +3106,12 @@ export const hudChromeStrings = {
     // cancel labels are currency-neutral and reused verbatim.
     buyConfirmBody: 'Buy {item} for {honor}? Honor purchases cannot be refunded.',
   },
-  // Character sheet showcase layout: the four titled stat-panel headings under
-  // the primary attribute tiles (a 2x2 block: Offense beside Spell, Defense
-  // beside Ratings). Stat NAMES themselves reuse itemUi.stats.* / the
-  // statInfo.names.* labels below; only these group headings are new here.
-  // Spell holds the caster stats (Spell Power, Healing Power, Spell Crit);
-  // Ratings holds the gear ratings that feed both the weapon and spell sides.
+  // Character sheet showcase layout: the two titled stat-panel headings under the
+  // primary attribute tiles. Stat NAMES themselves reuse itemUi.stats.* / the
+  // statInfo.names.* labels below; only these two group headings are new here.
   charSheet: {
     offense: 'Offense',
-    spell: 'Spell',
     defense: 'Defense',
-    ratings: 'Ratings',
     // The lifetime "Time Played" line at the foot of the sheet (the same
     // running total the /playtime chat command reports). The value composes
     // the two coarsest units from the plurals.playtime* fragments through
@@ -3385,8 +3157,6 @@ export const hudChromeStrings = {
     names: {
       spellPower: 'Spell Power',
       healPower: 'Healing Power',
-      // The spell and heal crit pool, shown beside the weapon Crit Chance.
-      spellCrit: 'Spell Crit',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
       parry: 'Parry',
@@ -3405,12 +3175,8 @@ export const hudChromeStrings = {
       attackPower: 'Powers your weapon attacks. Every 14 attack power adds 1 damage per second.',
       spellPower:
         'Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.',
-      healPower:
-        'Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.',
       dps: "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
       critChance: 'Your chance for an attack to strike critically, dealing double damage.',
-      spellCrit:
-        'Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.',
       dodge: 'Your chance to completely avoid an incoming melee attack, taking no damage.',
       critRating:
         'Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 20 rating grants exactly 1% crit.',
@@ -5030,7 +4796,7 @@ export const hudChromeStrings = {
     duskfireClaim: 'Death grants {value} Wrack',
     pyreGuardian:
       'Generates {ruin} Wrack every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec',
-    perfectMoment: 'Aether Darts does not consume Arcane Charges and deals 20% increased damage',
+    perfectMoment: 'Aether Darts does not consume Arcane Charges',
     scale: 'Size increased by {pct}%',
     jump: 'Jump height increased by {pct}%',
     // Localized damage-school names spliced into {school} above.
@@ -5194,16 +4960,6 @@ export const hudChromeStrings = {
     elite: 'Elite',
     boss: 'Boss',
   },
-  // The player mouseover tooltip (player_tooltip_view.ts): the classic
-  // <Guild> line and the chosen specialization with its role, both slots
-  // resolved client-side (the spec from its talent name, the role from the
-  // shared talent role labels). Neither is wordy (no four-letter lowercase run
-  // outside the tokens), so no M16 fills are needed; a locale that brackets or
-  // orders them differently owns its punctuation in the overlay.
-  playerTooltip: {
-    guild: '<{guild}>',
-    specRole: '{spec} ({role})',
-  },
   // Movable target frame: the small corner toggle that unlocks the frame for
   // dragging and locks it back in place (target_frame_pos.ts + hud.ts wiring).
   // The one button swaps its accessible name with its pressed state; both values
@@ -5359,10 +5115,6 @@ export const hudChromeStrings = {
       delveTracker: 'Delve Tracker',
       riftTracker: 'Rift Tracker',
       swingBarOffhand: 'Off Hand',
-      // The mouseover unit tooltip's movable seat (#unit-tooltip-anchor), an
-      // invisible box in play, so its chip is what names the placeholder.
-      // Wordy (M16): the five non-Latin fills land in this same change.
-      unitTooltip: 'Tooltip',
     },
     // The frames settings dropdown beside the floating Lock Interface button:
     // a show/hide sub-menu plus the frame-behavior toggles that used to live

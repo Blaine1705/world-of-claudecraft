@@ -194,20 +194,20 @@ export const ja_JP: EnTranslations = {
         "description": "事前編成の募集掲示シナリオを作成します。"
       },
       "hillwarn": {
-        "label": "Hill countdown",
-        "description": "Announce a hill now; it rises after the full warning."
+        "label": "丘のカウントダウン",
+        "description": "今すぐ丘を告知します。警告の時間が過ぎると出現します。"
       },
       "hillnow": {
-        "label": "Raise hill now",
-        "description": "Raise a hill at once and stand on it."
+        "label": "今すぐ丘を出現",
+        "description": "丘をすぐに出現させ、その上に立ちます。"
       },
       "hillrise": {
-        "label": "Skip hill countdown",
-        "description": "Raise the announced hill right away."
+        "label": "丘のカウントダウンを省略",
+        "description": "告知中の丘をすぐに出現させます。"
       },
       "hillend": {
-        "label": "End hill",
-        "description": "Make the current hill fall now."
+        "label": "丘を終了",
+        "description": "現在の丘を今すぐ消します。"
       }
     }
   },
@@ -348,46 +348,46 @@ export const ja_JP: EnTranslations = {
   },
   "hudChrome": {
     "framePresets": {
-      "apply": "Apply",
-      "pickerLabel": "Frame Presets: {name}",
-      "overwrite": "Overwrite Preset",
-      "overwriteBody": "Replace the saved preset \"{name}\" with your current layout?",
-      "current": "Current Layout",
-      "new": "New Preset",
-      "empty": "No saved presets",
-      "deleteNamed": "Delete {name}",
-      "deleteBody": "Delete the frame preset \"{name}\"?",
-      "title": "Frame Presets",
-      "name": "Preset Name",
-      "slot": "Preset {slot}",
-      "remove": "Delete",
-      "saved": "Done.",
-      "failed": "Could not save or load the preset."
+      "apply": "適用",
+      "pickerLabel": "フレームプリセット：{name}",
+      "overwrite": "プリセットを上書き",
+      "overwriteBody": "保存済みプリセット「{name}」を現在のレイアウトで上書きしますか？",
+      "current": "現在のレイアウト",
+      "new": "新規プリセット",
+      "empty": "保存済みプリセットはありません",
+      "deleteNamed": "{name} を削除",
+      "deleteBody": "フレームプリセット「{name}」を削除しますか？",
+      "title": "フレームプリセット",
+      "name": "プリセット名",
+      "slot": "プリセット {slot}",
+      "remove": "削除",
+      "saved": "完了。",
+      "failed": "プリセットを保存または読み込めませんでした。"
     },
     "frameMenus": {
-      "hide": "Hide Frame",
-      "units": "Unit Frames",
-      "bars": "Action Bars",
-      "trackers": "Trackers",
-      "auras": "Auras",
-      "combat": "Combat Displays",
-      "other": "Other HUD Elements",
-      "options": "Frame Options",
-      "allOptions": "All Frame Options",
-      "independentTarget": "Lock Target of Target to Target"
+      "hide": "フレームを非表示",
+      "units": "ユニットフレーム",
+      "bars": "アクションバー",
+      "trackers": "トラッカー",
+      "auras": "オーラ",
+      "combat": "戦闘表示",
+      "other": "その他のHUD要素",
+      "options": "フレーム設定",
+      "allOptions": "すべてのフレーム設定",
+      "independentTarget": "ターゲットのターゲットをターゲットに固定"
     },
     "focusTargets": {
-      "showEmpty": "Show Empty Focus Frames",
-      "assignHint": "Select a target. Press {key} or click {button}.",
-      "assignClickHint": "Select a target. Click {button}.",
-      "ally": "Ally",
-      "enemy": "Enemy",
-      "unset": "Unset Focus",
-      "frame1": "Focus 1",
-      "frame2": "Focus 2",
-      "frame3": "Focus 3",
-      "assign": "Set focus {slot}",
-      "target": "Target focus {slot}"
+      "showEmpty": "空のフォーカスフレームを表示",
+      "assignHint": "対象を選択してください。{key} を押すか、{button} をクリックしてください。",
+      "assignClickHint": "対象を選択して、{button} をクリックしてください。",
+      "ally": "味方",
+      "enemy": "敵",
+      "unset": "フォーカスを解除",
+      "frame1": "フォーカス 1",
+      "frame2": "フォーカス 2",
+      "frame3": "フォーカス 3",
+      "assign": "フォーカス {slot} を設定",
+      "target": "フォーカス {slot} を選択"
     },
     "professionTrainers": {
       "blacksmithing": "鍛冶のトレーナー",
@@ -1371,48 +1371,6 @@ export const ja_JP: EnTranslations = {
       "since": "{date}に誓約",
       "withdraw": "誓約を取り下げる"
     },
-    "guildRanks": {
-      "tab": "Ranks",
-      "introEdit": "Name your guild ranks and choose what each one may do. Changes apply to everyone holding the rank once you save.",
-      "introView": "Each rank title and what it may do. Only the Guild Master can change them.",
-      "colRank": "Rank",
-      "colTitle": "Title",
-      "colMembers": "Members",
-      "colActions": "Order",
-      "numbered": "Rank {n}",
-      "perm": {
-        "invite": "Invite",
-        "remove": "Remove",
-        "promote": "Promote",
-        "bank": "Guild Bank",
-        "officerChat": "Officer Chat",
-        "motd": "Billboard",
-        "events": "Calendar"
-      },
-      "permHint": {
-        "invite": "Invite players to the guild and answer their pledges.",
-        "remove": "Remove members who hold a lower rank.",
-        "promote": "Promote and demote members who hold a lower rank, up to one rank below their own.",
-        "bank": "Deposit and withdraw copper and items in the guild bank. Every member can view it.",
-        "officerChat": "Read and speak in officer chat.",
-        "motd": "Edit the guild billboard.",
-        "events": "Add and remove guild calendar events."
-      },
-      "titleLabel": "Title for {rank}",
-      "permLabel": "{perm} for {rank}",
-      "leaderLocked": "The Guild Master always holds every permission.",
-      "add": "Add Rank",
-      "save": "Save Ranks",
-      "moveUp": "Move {rank} up",
-      "moveDown": "Move {rank} down",
-      "remove": "Remove {rank}",
-      "full": "A guild can have at most {max} ranks.",
-      "invalidTitle": "Rank titles use letters, numbers, spaces, apostrophes, and hyphens, up to {max} characters.",
-      "removeConfirm": "Members holding {rank} will become {fallback}. Remove this rank?",
-      "removeAccept": "Remove Rank",
-      "promoteTo": "Promote {name} to {rank}",
-      "demoteTo": "Demote {name} to {rank}"
-    },
     "raidLockout": {
       "title": "レイドロックアウト",
       "allReady": "すべてのレイドが利用可能",
@@ -1510,7 +1468,6 @@ export const ja_JP: EnTranslations = {
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "その他（{count}）",
-      "targetsHeader": "Targets",
       "percent": "{value}%",
       "petAbility": "{pet}：{ability}",
       "melee": "近接攻撃",
@@ -1518,151 +1475,7 @@ export const ja_JP: EnTranslations = {
       "resize": "ドラッグしてこのメーターの大きさを変更",
       "dock": "このメーターをメーターウィンドウに戻す",
       "separate": "{meter}を分離",
-      "regroup": "{meter}を統合",
-      "settingsTitle": "Details / Meter Settings",
-      "optionsEngineBadge": "WoC Details! Engine",
-      "resetDefaults": "Reset to Defaults",
-      "closeSettings": "Close",
-      "densityCompact": "Density: Compact (16px)",
-      "densityStandard": "Density: Standard (20px)",
-      "bgGlass": "Background: Glass (76%)",
-      "bgSolid": "Background: Solid (98%)",
-      "bgMinimal": "Background: Minimal (45%)",
-      "numDetailed": "Numbers: Detailed",
-      "numCompact": "Numbers: Abbreviated (k/M)",
-      "raidTotalsOn": "Header group total: Yes",
-      "raidTotalsOff": "Header group total: No",
-      "tabGeneral": "Window & Background",
-      "tabGeneralDesc": "Opacity, scale, lock",
-      "tabBars": "Bars & Textures",
-      "tabBarsDesc": "Height, spacing, animation",
-      "tabText": "Text & Typography",
-      "tabTextDesc": "Fonts, k/M, DPS, rank",
-      "tabHeader": "Header & Title",
-      "tabHeaderDesc": "Group total, title bar",
-      "tabCombat": "Combat & Limits",
-      "tabCombatDesc": "Max rows, shields",
-      "tabPresets": "Quick Themes",
-      "tabPresetsDesc": "One-click presets",
-      "tabProfiles": "Profiles & Import",
-      "tabProfilesDesc": "Export, import, and profiles",
-      "groupWindow": "Window Appearance & Background",
-      "bgMode": "Background Mode",
-      "bgModeDesc": "Visual styling for the meter panel.",
-      "optGlass": "Glass (Blur)",
-      "optGlassDesc": "Frosted blur effect",
-      "optSolid": "Solid",
-      "optSolidDesc": "Dark high-contrast panel",
-      "optMinimal": "Minimal",
-      "optMinimalDesc": "Faint translucent",
-      "optTransparent": "Transparent",
-      "optTransparentDesc": "No background, bars only",
-      "bgOpacity": "Background Opacity",
-      "bgOpacityDesc": "Opacity percentage for the window background.",
-      "windowScale": "Window Scale",
-      "windowScaleDesc": "Increase or decrease the overall meter scale.",
-      "lockPosition": "Lock Position",
-      "lockPositionDesc": "Lock the window to prevent accidental dragging or resizing in combat.",
-      "groupBars": "Bar Geometry & Texture",
-      "barHeight": "Bar Height",
-      "barHeightDesc": "Vertical thickness of each combat row (14px compact to 26px spacious).",
-      "barSpacing": "Bar Spacing",
-      "barSpacingDesc": "Vertical pixel gap between adjacent rows.",
-      "barTexture": "Bar Texture",
-      "barTextureDesc": "Visual finish and shading over the class color.",
-      "texSpecular": "Glossy (Specular)",
-      "texSpecularDesc": "Top highlight reflection with bevel",
-      "texSmooth": "Smooth (Flat)",
-      "texSmoothDesc": "Clean flat class color",
-      "texGradient": "Gradient",
-      "texGradientDesc": "Smooth horizontal color gradient",
-      "barAnimation": "Smooth Bar Animation",
-      "barAnimationDesc": "Fluidly interpolates bar growth and decay in real time.",
-      "alwaysShowMe": "Always Show Me",
-      "alwaysShowMeDesc": "Pins your player bar to the bottom if ranked outside visible rows.",
-      "groupText": "Text Formatting & Telemetry",
-      "numFormat": "Number Format",
-      "numFormatDesc": "Display style for totals.",
-      "optNumCompact": "Abbreviated (k / M)",
-      "optNumCompactDesc": "Example: 145.2k, 1.2M",
-      "optNumDetailed": "Full Detailed",
-      "optNumDetailedDesc": "Example: 145,200, 1,240,500",
-      "optNumDamageDps": "Damage | DPS",
-      "optNumDamageDpsDesc": "Example: 239.2k | 18.4k (clean telemetry bar)",
-      "showDps": "Show Rate per Second (DPS / HPS)",
-      "showDpsDesc": "Shows damage or healing rate per second on each bar.",
-      "showPercent": "Show Percentage (%)",
-      "showPercentDesc": "Shows percent contribution of total group output.",
-      "showRank": "Show Rank (#1, #2...)",
-      "showRankDesc": "Shows ordinal rank number beside the name.",
-      "showClassIcon": "Show Class Icon",
-      "showClassIconDesc": "Displays class or role icon next to each player.",
-      "groupFont": "Combat Typography (Font Family)",
-      "groupHeader": "Header Customization",
-      "showTitleBar": "Show Title Bar",
-      "showTitleBarDesc": "Displays top bar with combat segment name and controls.",
-      "showRaidTotals": "Group Summary in Subtitle",
-      "showRaidTotalsDesc": "Displays cumulative group DPS/HPS in the header subtitle.",
-      "groupCombat": "Combat Rules & Limits",
-      "maxRows": "Maximum Visible Rows",
-      "maxRowsDesc": "Simultaneous bars (0 = unlimited, auto-fit to window height).",
-      "autoRows": " (Auto)",
-      "barsUnit": " bars",
-      "includeShields": "Count Absorbs as Healing",
-      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
-      "groupPresets": "One-Click Quick Themes",
-      "applyPreset": "Apply Theme",
-      "presetDetailsName": "Modern Glass",
-      "presetDetailsDesc": "Frosted blur background, specular glossy bars, abbreviated numbers, and full telemetry.",
-      "presetDetailsBadge": "Recommended",
-      "presetClassicName": "Classic Solid",
-      "presetClassicDesc": "Dark high-contrast solid panel, flat class bars, uncompressed detailed numbers in classic layout.",
-      "presetClassicBadge": "Classic",
-      "presetMinimalName": "Pure Minimal",
-      "presetMinimalDesc": "Nearly transparent background, compact 16px bars without gaps, direct text without percentages.",
-      "presetMinimalBadge": "Clean",
-      "presetRaidName": "Raid Focus",
-      "presetRaidDesc": "Designed for raids: compact 18px density, 10-bar limit, visible group total, and pinned player bar.",
-      "presetRaidBadge": "Raid",
-      "presetProGradientName": "Pro Gradient",
-      "presetProGradientDesc": "Floating transparent panel, horizontal gradient bars, spec icons, and Damage | DPS telemetry.",
-      "presetProGradientBadge": "Pro",
-      "groupManageProfiles": "Profile Management",
-      "activeProfile": "Active Profile",
-      "activeProfileDesc": "Select or manage independent profiles for different gameplay scenarios.",
-      "saveAs": "Save As...",
-      "duplicate": "Duplicate",
-      "deleteProfile": "Delete",
-      "cannotDeleteDefault": "The Default profile cannot be deleted",
-      "promptNewProfile": "Name of the new profile:",
-      "profileCopySuffix": " (Copy)",
-      "groupExport": "Export Current Profile",
-      "exportDesc": "Encoded profile string of your current configuration. Copy it to share or backup.",
-      "copyString": "Copy Profile String",
-      "copiedFeedback": "Copied to clipboard!",
-      "groupImport": "Import Profile",
-      "importDesc": "Paste a profile string (!WoC-Details:... or JSON) to apply and save.",
-      "importPlaceholder": "Paste profile string here (!WoC-Details:...)",
-      "importNamePlaceholder": "Profile name (optional)",
-      "importApply": "Import & Apply",
-      "errEmptyProfile": "Please paste a profile string.",
-      "errInvalidProfile": "Error: Invalid or corrupt profile string.",
-      "importSuccess": "Profile \"{name}\" imported successfully!",
-      "reportSent": "Report copied and sent to chat",
-      "reportNoData": "No data recorded.",
-      "noDetailedData": "No detailed data",
-      "noDeathEvents": "No events logged before death",
-      "killedBy": "Killed by {killer} ({ability})",
-      "lethalHit": "Lethal Hit",
-      "recentCombatEvents": "Last {count} combat events",
-      "backComparison": "Comparison",
-      "comparisonNeedTwo": "At least 2 fights are required to compare",
-      "backTimeline": "Timeline",
-      "timelineCombatEvents": "Combat events: {count}",
-      "backDev": "Balance / Dev",
-      "balanceAbilitiesCount": "Logged abilities: {count}",
-      "targetSubtitle": "Target: {target}",
-      "noTargetData": "No player data for this target"
+      "regroup": "{meter}を統合"
     },
     "auraTracks": {
       "defensives": "防御クールダウン",
@@ -1689,7 +1502,6 @@ export const ja_JP: EnTranslations = {
       "buffs": "バフ",
       "unlock": "ターゲットオーラウィンドウを移動",
       "lock": "ターゲットオーラウィンドウをロック",
-      "close": "ターゲットオーラウィンドウを閉じる",
       "configureRows": "ターゲットオーラを設定",
       "fewerRows": "オーラ行数を少なくする",
       "moreRows": "オーラ行数を多くする",
@@ -1917,7 +1729,7 @@ export const ja_JP: EnTranslations = {
       "clickMoveLeft": "左クリック",
       "clickMoveRight": "右クリック",
       "version": "v{version} ({build})",
-      "overlays": "Overlays",
+      "overlays": "オーバーレイ",
       "browserEffects": "ブラウザエフェクト",
       "browserEffectsAuto": "自動",
       "browserEffectsFull": "フル",
@@ -1947,9 +1759,9 @@ export const ja_JP: EnTranslations = {
       "gfxBloom": "ブルーム",
       "gfxAntiAliasing": "アンチエイリアス",
       "gfxDynamicLights": "動的ライト",
-      "gfxGhostFade": "Camera Ghost",
-      "gfxGhostFadeDithered": "Dithered",
-      "gfxGhostFadeSmooth": "Smooth",
+      "gfxGhostFade": "カメラ透過表示",
+      "gfxGhostFadeDithered": "ディザ",
+      "gfxGhostFadeSmooth": "スムーズ",
       "gfxParticleEffects": "パーティクル効果",
       "gfxHalf": "半分",
       "gfxCustomNote": "ダイヤルを変更すると画質プリセットが「詳細」に切り替わります。「高」品質ベースの上に、現在のプリセットに表示されているレベルを起点として組み立てるカスタム設定です。",
@@ -2010,14 +1822,14 @@ export const ja_JP: EnTranslations = {
       "targetHealthText": "ターゲットの体力テキスト",
       "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
       "auraBarBelowFrame": "バフをプレイヤーフレームの下に表示",
-      "targetAurasBelowFrame": "Target Auras Below the Frame",
+      "targetAurasBelowFrame": "ターゲットのオーラをフレームの下に表示",
       "alwaysShowAllBuffs": "すべてのバフを常に表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "stopAutoAttackOnTargetSwitch": "ターゲット切り替え時に自動攻撃を停止",
       "walkByAutoloot": "通りがかり自動ルート",
       "groundReticle": "地面ターゲットのレティクル",
-      "mouseoverCast": "パーティフレームでマウスオーバーキャスト",
+      "mouseoverCast": "パーティとフォーカスフレームでマウスオーバーキャスト",
       "stickyTarget": "地面クリックでターゲットを維持",
       "showItemLevel": "アイテムレベルを表示",
       "showReliquaryTracker": "聖遺物庫トラッカーを表示",
@@ -2364,78 +2176,78 @@ export const ja_JP: EnTranslations = {
       }
     },
     "cooldownManager": {
-      "title": "Cooldown Manager",
-      "intro": "Floating buttons for the spells you pick. They cannot be clicked: each one shows its cooldown, dims while you cannot cast it, and lights up when it is ready.",
-      "generalTitle": "General",
-      "enabled": "Show Cooldown Manager",
-      "idleOpacity": "Opacity While Not Ready",
-      "combatOnly": "Sounds Only in Combat",
-      "dragHint": "While this menu is open, every group shows on screen and you can drag it to move it.",
-      "addSingle": "Add Single Button",
-      "addGrid": "Add Button Group",
-      "addLine": "Add Line of Spells",
-      "groupsFull": "You have the most groups allowed. Delete one to add another.",
-      "noGroups": "Add a single button, a group of buttons or a line of spells to get started.",
-      "groupSingle": "Single Button {index}",
-      "groupGrid": "Button Group {index}",
-      "groupLine": "Line of Spells {index}",
-      "groupName": "Group Name",
-      "spellCount": "{count} / {max} spells",
-      "orientation": "Orientation",
-      "horizontal": "Horizontal",
-      "vertical": "Vertical",
-      "columns": "# Columns",
-      "rows": "# Rows",
-      "direction": "Icon Direction",
-      "dirRight": "Right",
-      "dirLeft": "Left",
-      "dirDown": "Down",
-      "dirUp": "Up",
-      "iconSize": "Icon Size",
-      "iconPadding": "Icon Padding",
-      "opacity": "Opacity",
-      "visibility": "Visibility",
-      "visAlways": "Always Visible",
-      "visCombat": "In Combat",
-      "visHidden": "Hidden",
-      "visHiddenHint": "A hidden group still plays its sounds and lights your action bar.",
-      "showTimer": "Show Timer",
-      "positionX": "Horizontal Position",
-      "positionY": "Vertical Position",
-      "resetPosition": "Reset to Default Position",
-      "deleteGroup": "Delete Group",
-      "deleteGroupAria": "Delete {group}",
-      "trackedTitle": "Tracked Spells",
-      "trackedHint": "Drag a spell onto a group, or select it to choose its group and alerts. A button follows its spell when it changes into another one, and lights up when it does.",
-      "search": "Search spells",
-      "searchPlaceholder": "Search",
-      "notDisplayed": "Not Displayed",
-      "otherSpells": "Other Spells",
-      "otherSpellsHint": "Spells from your other specializations, talent choices and higher levels. Place one now and its button appears once you know it.",
-      "notKnown": "{spell} (not known yet)",
-      "aurasTitle": "Procs, Engines and Buffs",
-      "aurasHint": "Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.",
-      "auraFallback": "Aura",
-      "onlyWhileActive": "Only Show While Active",
-      "alertStacks": "Alert at Stacks",
-      "alertStacksAny": "On gain",
-      "alertStacksHint": "The button lights, pulses and chimes once the aura reaches this many stacks. On gain means as soon as it appears.",
-      "auraSoundHint": "Plays when the aura comes up, or when it reaches your stack goal.",
-      "emptySection": "Drop a spell here.",
-      "spellsEmpty": "You do not know any spells yet.",
-      "selectSpell": "Select {spell}",
-      "group": "Group",
-      "groupFullOption": "{group} (full)",
-      "notInGroupHint": "Put this spell in a group to show its button.",
-      "moveEarlier": "Move {spell} earlier",
-      "moveLater": "Move {spell} later",
-      "glowWhenReady": "Light Up When Ready",
-      "glowWhenReadyHint": "Brightens and outlines the button while the spell can be cast.",
-      "hotbarGlow": "Hotbar Glow",
-      "hotbarGlowHint": "Also lights this spell on your action bar while it is ready.",
-      "onlyWhenReady": "Only Show When Ready",
-      "sound": "Ready Sound",
-      "soundHint": "Plays when the spell becomes ready, or when its button changes into another spell while ready."
+      "title": "クールダウンマネージャー",
+      "intro": "選んだ呪文をフローティングボタンで表示します。ボタンはクリックできません。それぞれクールダウンを表示し、使えない間は暗くなり、使用可能になると光ります。",
+      "generalTitle": "全般",
+      "enabled": "クールダウンマネージャーを表示",
+      "idleOpacity": "準備中の不透明度",
+      "combatOnly": "戦闘中のみ音を鳴らす",
+      "dragHint": "このメニューを開いている間はすべてのグループが画面に表示され、ドラッグして移動できます。",
+      "addSingle": "単体ボタンを追加",
+      "addGrid": "ボタングループを追加",
+      "addLine": "呪文の列を追加",
+      "groupsFull": "グループ数が上限に達しています。追加するには、いずれかを削除してください。",
+      "noGroups": "単体ボタン、ボタングループ、呪文の列のいずれかを追加して始めましょう。",
+      "groupSingle": "単体ボタン {index}",
+      "groupGrid": "ボタングループ {index}",
+      "groupLine": "呪文の列 {index}",
+      "groupName": "グループ名",
+      "spellCount": "{count} / {max} 呪文",
+      "orientation": "向き",
+      "horizontal": "横",
+      "vertical": "縦",
+      "columns": "列数",
+      "rows": "行数",
+      "direction": "アイコンの方向",
+      "dirRight": "右",
+      "dirLeft": "左",
+      "dirDown": "下",
+      "dirUp": "上",
+      "iconSize": "アイコンのサイズ",
+      "iconPadding": "アイコンの間隔",
+      "opacity": "不透明度",
+      "visibility": "表示",
+      "visAlways": "常に表示",
+      "visCombat": "戦闘中",
+      "visHidden": "非表示",
+      "visHiddenHint": "非表示のグループも音を鳴らし、アクションバーを光らせます。",
+      "showTimer": "タイマーを表示",
+      "positionX": "横の位置",
+      "positionY": "縦の位置",
+      "resetPosition": "初期位置に戻す",
+      "deleteGroup": "グループを削除",
+      "deleteGroupAria": "{group}を削除",
+      "trackedTitle": "追跡する呪文",
+      "trackedHint": "呪文をグループにドラッグするか、選択してグループと通知を選びます。呪文が別の呪文に変化すると、ボタンもそれに合わせて変わり、光ります。",
+      "search": "呪文を検索",
+      "searchPlaceholder": "検索",
+      "notDisplayed": "非表示",
+      "otherSpells": "その他の呪文",
+      "otherSpellsHint": "他の専門化、タレントの選択、より高いレベルの呪文です。今配置しておくと、習得したときにボタンが表示されます。",
+      "notKnown": "{spell}（未習得）",
+      "aurasTitle": "発動・エンジン・強化",
+      "aurasHint": "エンジン資源とそのスタック、発動効果、そして自分の呪文で得る強化効果です。それ以外に自分にかかったことのある効果もここに表示されます。",
+      "auraFallback": "オーラ",
+      "onlyWhileActive": "発動中のみ表示",
+      "alertStacks": "スタック数で通知",
+      "alertStacksAny": "獲得時",
+      "alertStacksHint": "オーラがこのスタック数に達すると、ボタンが光って脈打ち、音が鳴ります。「獲得時」は現れた瞬間に通知します。",
+      "auraSoundHint": "オーラが現れたとき、または設定したスタック数に達したときに鳴ります。",
+      "emptySection": "ここに呪文をドロップします。",
+      "spellsEmpty": "まだ呪文を習得していません。",
+      "selectSpell": "{spell}を選択",
+      "group": "グループ",
+      "groupFullOption": "{group}（満杯）",
+      "notInGroupHint": "この呪文をグループに入れると、そのボタンが表示されます。",
+      "moveEarlier": "{spell}を前へ移動",
+      "moveLater": "{spell}を後ろへ移動",
+      "glowWhenReady": "使用可能時に光らせる",
+      "glowWhenReadyHint": "呪文を使用できる間、ボタンを明るくして縁取りします。",
+      "hotbarGlow": "ホットバーの発光",
+      "hotbarGlowHint": "使用可能な間、アクションバー上のこの呪文も光らせます。",
+      "onlyWhenReady": "使用可能時のみ表示",
+      "sound": "準備完了の音",
+      "soundHint": "呪文が使用可能になったとき、または使用可能なままボタンが別の呪文に変化したときに鳴ります。"
     },
     "auraOverlay": {
       "title": "オーラ",
@@ -2561,79 +2373,79 @@ export const ja_JP: EnTranslations = {
         "battlegroundComplete": "ソーンホロウ平原参戦",
         "battlegroundKill": "名誉ある撃破",
         "battlegroundAssist": "撃破アシスト",
-        "worldKill": "world kill",
-        "worldAssist": "world kill assisted",
-        "hillHold": "holding the hill"
+        "worldKill": "ワールド撃破",
+        "worldAssist": "ワールド撃破アシスト",
+        "hillHold": "丘の占拠"
       },
       "floatReasons": {
         "kill": "撃破",
         "assist": "アシスト",
         "firstWin": "初勝利",
-        "hill": "Hill"
+        "hill": "丘"
       }
     },
     "worldPvp": {
-      "tab": "World PvP",
-      "title": "World PvP",
-      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
-      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
-      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
-      "statusOffFfa": "Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.",
-      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
-      "zoneSanctuary": "Sanctuary: no world PvP here.",
-      "zoneContested": "Contested ground: only flagged players fight here.",
-      "zoneFfa": "Free-for-all ground: everyone here is fair game.",
-      "realmDisabled": "World PvP is disabled on this realm.",
-      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
-      "groundContested": "Everywhere else is contested: only two flagged players can fight.",
-      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
-      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
-      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
-      "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
-      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
-      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
-      "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
-      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
-      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
-      "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
-      "greyLine": "Players more than {levels} levels below you pay nothing.",
-      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
-      "record": "Record: {kills} kills, {deaths} deaths",
-      "enable": "Enable World PvP",
-      "disable": "Disable World PvP",
-      "keepUp": "Keep Flag Up",
-      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
-      "confirmAccept": "Raise Flag",
-      "confirmCancel": "Cancel",
-      "levelReq": "Requires level {level}.",
-      "pending": "Waiting for your PvP status from the realm.",
-      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
+      "tab": "ワールドPvP",
+      "title": "ワールドPvP",
+      "blurb": "PvPフラグを立てると、オープンワールドのどこでもフラグを立てた他のプレイヤーと戦えます。倒せば相手の所持金の一部と、PvP装備につながる名誉を得られます。バトルグラウンドとアリーナの報酬はそれより多いままです。",
+      "statusOn": "PvPフラグが立っています。フラグを立てたプレイヤーはあなたを攻撃できます。",
+      "statusOff": "PvPフラグは下りています。オープンワールドでは攻撃も被攻撃もありません。",
+      "statusOffFfa": "PvPフラグは下りていますが、無差別戦闘地帯では攻撃することも攻撃されることもあります。",
+      "statusDisarming": "フラグは {time} 後、または現在の戦闘が終わったときに下ります。",
+      "zoneSanctuary": "聖域: ここではワールドPvPは行われません。",
+      "zoneContested": "係争地: ここで戦えるのはフラグを立てたプレイヤーだけです。",
+      "zoneFfa": "無差別戦闘地帯: ここにいる全員が攻撃対象です。",
+      "realmDisabled": "このレルムではワールドPvPは無効です。",
+      "groundSanctuary": "修練の浜とイーストブルック渓谷は聖域で、ワールドPvPは一切行われません。",
+      "groundContested": "それ以外の場所はすべて係争地で、フラグを立てた者同士だけが戦えます。",
+      "groundFfa": "ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯で、フラグの有無に関わらず誰でも戦えます。",
+      "groupLine": "パーティとレイドのメンバー同士が敵対することはありません。グループ外のギルドメンバーとは戦えます。",
+      "markLine": "そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立ちます。フラグを立てた相手を攻撃しても立ちません。",
+      "aidLine": "ワールドの戦闘中のフラグを立てたプレイヤーを回復、シールド、強化すると自分のフラグが立ちます。",
+      "stakeLine": "敗者は {cap} か所持金の {percent} のうち少ない方を支払います。",
+      "noStakeLine": "無差別戦闘地帯でフラグを立てていないプレイヤーが倒されても、所持金は失われません。",
+      "noTakeLine": "フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きます。",
+      "honorLine": "撃破ごとに名誉 {honor} を、貢献した全員で分配します。",
+      "splitLine": "純粋な1対1なら報酬を独占できます。協力者とそのヒーラーは分け合います。",
+      "repeatLine": "同じプレイヤーを繰り返し倒すと報酬は {second}、次に {third}、その後はゼロになります。カウントは最初の撃破から {reset} でリセットされます。",
+      "greyLine": "あなたより {levels} レベル以上低いプレイヤーからは何も得られません。",
+      "disarmLine": "解除には {minutes} 分かかり、戦闘が終わるまで待ちます。",
+      "record": "戦績: 撃破 {kills}、死亡 {deaths}",
+      "enable": "ワールドPvPを有効にする",
+      "disable": "ワールドPvPを無効にする",
+      "keepUp": "フラグを維持",
+      "confirmBody": "フラグを立てた他のプレイヤーがどこでもあなたを攻撃でき、勝てば所持金から最大 {cap} を奪えます。再び無効にはできますが、{minutes} 分かかります。",
+      "confirmAccept": "フラグを立てる",
+      "confirmCancel": "キャンセル",
+      "levelReq": "レベル {level} が必要です。",
+      "pending": "レルムからのPvP状態を待っています。",
+      "commandHint": "チャット: /pvp でフラグを切り替え、/pvp on と /pvp off で直接設定します。"
     },
     "hill": {
-      "title": "King of the Hill",
-      "rising": "The hill has not risen yet",
-      "heldYou": "Your group holds the hill",
-      "heldOther": "Another group holds the hill",
-      "heldNone": "Nobody holds the hill",
-      "counts": "Inside: you {yours}, holder {theirs}",
-      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
-      "countsHolding": "Inside: you {yours}, rival {theirs}",
-      "contestYou": "Taking the hill: {seconds} of {total}",
-      "contestOther": "Losing the hill: {seconds} of {total}",
-      "contestNone": "Hold a majority inside for {total} to take it",
-      "inside": "You are inside the circle",
-      "distance": "{yards} yd to the circle",
-      "rises": "Rises in {minutes}",
-      "falls": "Falls in {minutes}",
-      "standingRaid": "Raid members do not count: only parties can hold the hill"
+      "title": "丘の王",
+      "rising": "丘はまだ現れていません",
+      "heldYou": "あなたのグループが丘を占拠しています",
+      "heldOther": "別のグループが丘を占拠しています",
+      "heldNone": "丘を占拠しているグループはいません",
+      "counts": "円内: あなた側 {yours}、占拠側 {theirs}",
+      "countsUnheld": "円内: あなた側 {yours}、最大の対抗勢力 {theirs}",
+      "countsHolding": "円内: あなた側 {yours}、対抗勢力 {theirs}",
+      "contestYou": "丘を奪取中: {total} 中 {seconds}",
+      "contestOther": "丘を奪われています: {total} 中 {seconds}",
+      "contestNone": "円内で {total} の間、多数を保てば奪取できます",
+      "inside": "あなたは円の中にいます",
+      "distance": "円まで {yards} ヤード",
+      "rises": "{minutes} 後に出現します",
+      "falls": "{minutes} 後に消えます",
+      "standingRaid": "レイドのメンバーは数えられません。丘を占拠できるのはパーティだけです"
     },
     "warfareShop": {
       "gossipOption": "ウォーフェアセットを見る",
       "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
       "jewelry": "アクセサリー",
       "weapons": "武器",
-      "groupSeason2": "Warfare Season 2: Vanguard",
-      "groupEntry": "Warfare Season 1",
+      "groupSeason2": "ウォーフェア・シーズン2：ヴァンガード",
+      "groupEntry": "ウォーフェア・シーズン1",
       "owned": "所有済み",
       "buyAria": "{item}を{honor}で購入",
       "buyOwnedAria": "{item}を{honor}で購入、所有済み",
@@ -2641,9 +2453,7 @@ export const ja_JP: EnTranslations = {
     },
     "charSheet": {
       "offense": "攻撃",
-      "spell": "Spell",
       "defense": "防御",
-      "ratings": "Ratings",
       "playtimeLabel": "プレイ時間",
       "playtimeParts": "{major}{minor}",
       "playtimeUnderMinute": "1分未満",
@@ -2672,7 +2482,6 @@ export const ja_JP: EnTranslations = {
       "names": {
         "spellPower": "呪文威力",
         "healPower": "治癒力",
-        "spellCrit": "Spell Crit",
         "critRating": "クリティカルレーティング",
         "hasteRating": "ヘイストレーティング",
         "parry": "受け流し",
@@ -2689,17 +2498,15 @@ export const ja_JP: EnTranslations = {
         "armor": "物理攻撃のダメージを軽減します。軽減量は格下の攻撃者に対してより大きくなり、上限は75%です。",
         "attackPower": "武器による攻撃を強化します。攻撃力14ごとに秒間ダメージが1上昇します。",
         "spellPower": "呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。",
-        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "武器のダメージと速度に攻撃力を組み合わせて算出した、推定の秒間ダメージです。",
         "critChance": "攻撃がクリティカルとなり、ダメージが2倍になる確率です。",
-        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
         "critRating": "装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。",
         "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
         "parry": "前方からの近接攻撃を完全に受け流し、ダメージを受けない確率です。背後からの一撃は受け流せません。",
         "hitRating": "装備とセットボーナスによる命中レーティング。攻撃がミスする頻度と呪文が抵抗される頻度を減らし、特に高レベルの敵に有効です。約10レーティングで1%命中。",
         "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。",
-        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
+        "warfareWithHealth": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。さらに、ダンジョン、レイド、デルヴ、リフト以外のすべての場所で最大体力が {health}% 増加します。"
       },
       "effects": {
         "attackPower": "攻撃力 +{value}",
@@ -3117,8 +2924,8 @@ export const ja_JP: EnTranslations = {
       "hint": "フォーカスポイントは各素材の基本産出量にボーナスを加算します。フォーカスしていない素材は基本産出量のままです。",
       "tierHint": "素材にフォーカスを{points}ポイント割り振るごとに採取ティアが1段階上がります（最大{steps}段階）。{points}ポイント未満でも産出量は増えます。",
       "townOnlyHint": "フォーカスは町の中でのみ変更できます。",
-      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
-      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
+      "preferenceHint": "フォーカスは採取する素材の品質と量を高めます。ひとつの素材だけを採取するには、フィールドキットまたは専門技能ウィンドウから採取設定を選んでください。",
+      "pendingLine": "保存しました。この割り振りへの再設定は{time}で完了します。",
       "budgetLabel": "残りポイント：{remaining} / {budget}",
       "saveButton": "フォーカスを保存",
       "notInTownHint": "フォーカスを設定するには町にいる必要があります。",
@@ -3615,8 +3422,8 @@ export const ja_JP: EnTranslations = {
       "iceFloesCasts": "次の{n}回の詠唱呪文を移動しながら唱えられる",
       "freeCast": "次の詠唱のコストがゼロになる",
       "instantCast": "次の詠唱時間のある呪文が即時発動になる",
-      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
-      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
+      "benisonPrayers": "次の聖歌の癒しの回復量が{pct}%増加し、すべてのスタックを消費する。",
+      "benisonWhisper": "次の囁きの祈りが即時発動になり、回復量が{pct}%増加する。この効果が切れる前に使用すること。",
       "cheapCast": "次の呪文のコストが{pct}%減少する",
       "radiantResonance": "次の癒やしの光が即時発動になる。または次の暁の抱擁のマナ消費が{pct}%減少し、詠唱時間が{castTime}秒になる",
       "solarReprisal": "次の陽光の円盤はマナを消費せず、クールダウンを無視してダメージが{pct}%増加する。恩寵の槌はクールダウンを無視し、与えたダメージの100%を回復する。または癒やしの光が即時発動になる",
@@ -3767,7 +3574,7 @@ export const ja_JP: EnTranslations = {
       "resetErrInvalid": "このリセットリンクは無効か、有効期限が切れています。新しいリンクをリクエストしてください。"
     },
     "loot": {
-      "rollWon": "おめでとうございます！ {item} をロール {roll} で獲得しました",
+      "rollWon": "おめでとうございます！ロール {roll} で {item} を獲得しました",
       "chestTitle": "宝箱",
       "takeLootButton": "戦利品を取る",
       "takeLootTooltip": "お金とドロップしたアイテムを受け取ります。採取の機会は消費しません。",
@@ -3819,10 +3626,6 @@ export const ja_JP: EnTranslations = {
       "elite": "エリート",
       "boss": "ボス"
     },
-    "playerTooltip": {
-      "guild": "<{guild}>",
-      "specRole": "{spec} ({role})"
-    },
     "targetFrame": {
       "unlock": "ターゲットフレームを移動",
       "lock": "ターゲットフレームを固定"
@@ -3867,8 +3670,8 @@ export const ja_JP: EnTranslations = {
       "label": "フレーム位置をリセット"
     },
     "interfaceUnlock": {
-      "combineTrackers": "Combine Tracker Frames",
-      "combineAuras": "Combine Aura Frames",
+      "combineTrackers": "追跡フレームをまとめる",
+      "combineAuras": "オーラフレームをまとめる",
       "label": "フレーム編集",
       "unlock": "インターフェースのロックを解除",
       "lock": "インターフェースをロック",
@@ -3879,8 +3682,8 @@ export const ja_JP: EnTranslations = {
       "lockFrame": "このフレームをロック",
       "resizeFrame": "このフレームのサイズを変更",
       "frameNames": {
-        "trackerGroup": "Trackers",
-        "auraGroup": "Aura trackers",
+        "trackerGroup": "進行状況トラッカー",
+        "auraGroup": "オーラとターゲット効果",
         "actionBar1": "アクションバー",
         "actionBar2": "アクションバー 2",
         "actionBar3": "アクションバー 3",
@@ -3905,8 +3708,7 @@ export const ja_JP: EnTranslations = {
         "deedTracker": "功績トラッカー",
         "delveTracker": "デルヴトラッカー",
         "riftTracker": "リフトトラッカー",
-        "swingBarOffhand": "オフハンド",
-        "unitTooltip": "ツールチップ"
+        "swingBarOffhand": "オフハンド"
       },
       "framesMenu": "フレーム設定",
       "framesMenuTitle": "各フレームの表示・非表示を切り替えます。チェックを外したフレームは、再度チェックするか初期設定に戻すまで非表示のままです。",
@@ -4457,8 +4259,8 @@ export const ja_JP: EnTranslations = {
       "vaultTab": "保管庫",
       "vaultCapacityNote": "各素材は最大{cap}個まで保管できます。",
       "vaultEmpty": "素材保管庫は空です。バッグの素材をクリックすると預けられます。",
-      "vaultSearchAria": "Search vault materials by name",
-      "vaultSearchNoMatch": "No material in your vault matches your search.",
+      "vaultSearchAria": "保管庫の素材を名前で検索",
+      "vaultSearchNoMatch": "検索に一致する素材は保管庫にありません。",
       "vaultRowAria": "{item}：{count}/{cap}個保管中",
       "vaultLockedIntro": "素材保管庫を開放すると、銀行のそばに製作素材を蓄えられます。素材ごとに専用の枠があり、それぞれ最大{cap}個まで保管できます。",
       "vaultUnlockButton": "素材保管庫を開放する",
@@ -5858,8 +5660,8 @@ export const ja_JP: EnTranslations = {
         "mail": "郵便",
         "passage": "通路"
       },
-      "collapseHint": "Collapse map sidebar",
-      "expandHint": "Expand map sidebar"
+      "collapseHint": "マップサイドバーを折りたたむ",
+      "expandHint": "マップサイドバーを展開"
     },
     "arenaGate": {
       "minLevelNote": "レベル {level} が必要です"
@@ -6376,7 +6178,7 @@ export const ja_JP: EnTranslations = {
       "talents": "タレント",
       "arena": "アリーナとPvP",
       "thornhollow": "ソーンホロウ平原",
-      "worldPvp": "World PvP",
+      "worldPvp": "ワールドPvP",
       "deeds": "功績の書",
       "reliquary": "聖遺物庫",
       "glossary": "用語集",
@@ -6717,7 +6519,7 @@ export const ja_JP: EnTranslations = {
       "ifHudOpacity": "背後の世界に対して、HUDパネルをどれだけ濃く表示するかです。",
       "ifTooltipScale": "ツールチップの文字サイズです。小さな画面でも、とても大きな画面でも役に立ちます。",
       "ifHighContrastText": "インターフェースの文字を太く、高コントラストにします。第一にはアクセシビリティのための項目ですが、明るい画面でもよく効きます。",
-      "ifColorblindMode": "Recolors the Nythraxis floor hazards (the Grave Eruption strike ring, the Grave Flame and Soulfire pools, the Gravefire line, and the Soul Rend marks) onto a colorblind-safe palette with distinct hues and brightness, so overlapping circles keep their edges. Sizes, timers, and positions never change.",
+      "ifColorblindMode": "Nythraxisの床の危険表示（墓所噴出の打撃リング、墓所の炎と魂火の池、墓所火の線、魂裂きの印）を、色相と明るさが互いにはっきり異なる色覚サポート配色に置き換え、重なった円でも縁が見分けられるようにします。大きさ、タイマー、位置は変わりません。",
       "ifHighContrastBackground": "スタート画面とキャラクター画面の背景を、より簡素で高コントラストなものにします。",
       "ifInvertLookY": "マウス視点の上下方向を反転します。",
       "ifShowItemLevel": "すべてのアイテムのツールチップにアイテムレベルの行を加えます。初期設定はオフで、ステータスだけの昔ながらのツールチップが保たれます。",
@@ -6737,7 +6539,7 @@ export const ja_JP: EnTranslations = {
       "ifPartyShowAuras": "パーティフレームにバフとデバフを表示するかどうかです。同様のスイッチが、リソースバー、吸収、ペット、そして自分をパーティ一覧に含めるかどうかにも用意されています。",
       "ifAurasOnPlayerFrame": "自分のバフとデバフを、オーラバーだけでなく自分のユニットフレームにも表示します。",
       "ifAuraBarBelowFrame": "バフの列をユニットフレームの上ではなく下に移動します。「バフをプレイヤーフレームに表示」が有効なときのみ効果があります。",
-      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
+      "ifTargetAurasBelowFrame": "ターゲットフレームのバフ・デバフ列を、フレームの上ではなく下に表示します（クラシックな配置）。標準のターゲットフレームはアクションバーのすぐ上にあるため、既定ではオフです。フレームを下に余裕のある場所へ移動したら有効にしてください。",
       "ifAlwaysShowAllBuffs": "低画質プリセットでも、通常のバフアイコンの上限を無視してすべてのバフを常に表示します。",
       "ifTargetOfTarget": "ターゲットが誰を狙っているかを表示します。タンクがまだ抱えているかを確かめる、昔ながらの手立てです。",
       "ifPetFrame": "ペット用のフレームを表示します。",
@@ -6815,9 +6617,9 @@ export const ja_JP: EnTranslations = {
       "framesMoveBodyEditFrames": "自分のフレーム、ターゲットフレーム、パーティフレームは、いずれも移動できます。どれも隅に小さな移動ボタンを備えているので、固定を外し、好きな位置へドラッグし、もう一度固定すれば、うっかりクリックしてもずれません。オプションの「インターフェース」にある「フレーム」タブの先頭の「フレーム編集」を使うと、インターフェースの残りの部分もいっせいに動かせるようになり、この3つのフレームもそれに含まれます。アクションバー、キャストバー、スイングバー、経験値バー、ミニマップ、ボタンレール、ペットフレーム、スタンスバー、バフとデバフの列、そして「ウィッシュリストの通知」のチップが対象で、動かせる間はそれぞれに名前のチップが付きます。置き場所を悔やむことになったら、同じ「フレーム」タブの末尾にある「初期設定に戻す」で、すべて元の場所へ戻せます。",
       "framesGovernedExtra": "「フレーム編集」は、その下に積み重なるトラッカー群(追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、製作でピン留めしたレシピ、潜っているデルヴ、参加中のリフト、そして追跡中のレシピまたは依頼)、ペットフレーム脇のペットアクションバー、周囲の敵にかけた継続的なデバフをまとめて表示する「ターゲットデバフ」フレーム、パラディンの「献身」の記章、ウォーロックの「苦痛リソースバー」、スペル発動オーバーレイ、二刀流時のオフハンド用スイングバー、そしてタブ式のダメージメーターウィンドウも緩めます。緩んでいる間はそれぞれに名前のチップが付きます。",
       "framesGovernedAuraTracks": "「フレーム編集」は、同じ「インターフェース」オプションの「戦闘」タブでオンにした任意の6つのオーラトラック、すなわち「自分のバフ」トラック、「防御クールダウン」トラック、「自分のシールド」トラック、「攻撃クールダウン」トラック、「移動とステルス」トラック、「味方へのバフ」トラックも緩めます。どのトラックも初期状態ではオフで、緩んでいる間はそれぞれに名前のチップが付きます。",
-      "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
+      "frameGroups": "{trackers} はクエスト、功績、リフト、地下探索、採集目標、聖遺物の追跡をまとめられます。{auras} は対象の継続ダメージと6種のオーラ追跡をまとめられます。フレーム設定で有効にするとまとめて移動でき、無効なら個別に移動できます。{tot} にはリソースバーがあります。{focus} の3つの対象は個別に移動できます。Shift+F1～F3で設定し、Ctrl+F1～F3で選択します。ダメージと脅威メーターはロック中でも、ボタン以外をドラッグして移動し、端をドラッグしてサイズ変更できます。ロック解除中は専用のグループ別メニューで表示を切り替えられます。フレームを右クリックするとサイズのリセットや関連設定を開けます。インターフェースのフレームタブには共通設定と折りたたみ可能なパーティ設定があります。「ターゲットのターゲットをターゲットに固定」をオフにすると個別に移動でき、オンに戻しても個別の位置は保存されます。フォーカスを設定すると設定ボタンと説明が隠れます。右クリックして「フォーカスを解除」を選ぶと元に戻ります。マウスオーバーキャストはフォーカスフレームでも使えます。",
       "framesGovernedTalkingHead": "「フレームを編集」では会話パネルも動かせるようになります。会話パネルは、話しているNPCが視界の外にいるときにそのセリフを表示するもので、ロック解除中は名前チップを表示します。",
-      "framesGovernedUnitTooltip": "「フレーム編集」ではツールチップフレームも動かせるようになります。マウスを合わせた対象のカードが表示される位置で、クリーチャーならレベルと種類、ほかのプレイヤーなら称号、ギルド、レベルとクラス、そして専門化とその役割が表示されます。好きな場所へドラッグすると、カードはそこから画面の近い端を避ける向きに広がります。「フレーム設定」の「フレームの表示・非表示」でツールチップのチェックを外すと、このカードを完全に非表示にできます。",
+      "framesGovernedUnitTooltip": "「フレーム編集」ではツールチップ枠も動かせるようになります。これは、マウスを置いた対象のカードが表示される場所です。クリーチャーならレベルと種類、他のプレイヤーなら称号、ギルド、レベル、クラス、役割付きの専門化が表示されます。好きな場所へドラッグすると、カードはそこから伸び、画面端に近い側を避けて開きます。フレーム設定の「フレームの表示または非表示」でツールチップのチェックを外すと、このカードを完全に隠せます。",
       "barsTitle": "バー、タイマー、戦闘テキスト",
       "barsBody": "詠唱やチャネルを行うと、画面中央、アクションバーのすぐ上にキャストバーが現れ、呪文の名前と残り時間を伝えます。ターゲットにもそのフレーム上に専用のキャストバーが出るので、何が来るのかを見て応じられます。\n\nキャストバーの下には細いスイングバーがあり、武器を振るたびに満ちていきます。近接や遠隔で戦う人は、次の自動攻撃がいつ当たるのかを見て取れます。\n\n経験値バーはアクションバーの下を画面幅いっぱいに走り、区切りが刻まれ、明るく伸びた部分が蓄えている休息経験値を示します。\n\n水中を泳ぐと、画面上部に青い息バーが現れます。頭が沈んでいる間は減り続け、尽きて溺れ始めると赤く点滅し、水面に出た瞬間に素早く戻ります。スペースで浮上し、初期設定でCtrlの「潜水」キーを押せばさらに深く潜れます。\n\nダメージと回復は、当たった相手の上に小さな数字となって浮かび上がるので、文字を読まなくても戦いの流れがつかめます。書かれた記録はすべて、チャットボックスの「戦闘」タブに残ります。",
       "aurasTitle": "バフとデバフ",
@@ -6928,8 +6730,8 @@ export const ja_JP: EnTranslations = {
       "completed": "すでに納品したクエストを、終えた順に表示します。",
       "session": "ログインしてからの成果です。撃破数、死亡数、ダメージ、経験値が表示されます。",
       "arena": "灰の闘技場での両ブラケットの戦績です。1対1と2対2それぞれのレーティング、勝敗数、勝率が表示されます。",
-      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
-      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.",
+      "pvp": "ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士はどこでも戦えます。解除には5分かかります。",
+      "pvpZones": "ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士は係争地で戦え、聖域ではワールドの戦闘は一切行われず、無差別戦闘地帯ではフラグの有無に関わらず戦えます。解除には5分かかります。",
       "listings": "世界市場に出している自分の出品を、希望価格、それぞれの残り時間、そしてあとどれだけ出せるかとあわせて表示します。",
       "buyback": "最近商人に売った品のうち、まだ買い戻せるものを表示します。",
       "groupState": "今のあなたの状態",
@@ -7683,29 +7485,29 @@ export const ja_JP: EnTranslations = {
       "warfareBodyStatsStay": "ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。",
       "warfareTradeBody": "それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、備えているものはすべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。",
       "warfareTradeBodyRatingSpent": "それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。",
-      "vanguardHeading": "Vanguard gear: Warfare Season 2",
-      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
+      "vanguardHeading": "ヴァンガード装備：ウォーフェア・シーズン2",
+      "vanguardBody": "ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ2人の補給官が元の装備の上段に並べて売っています。元の装備も引き続き販売されます。すべてのスペックに、頭、肩、胴、脚、手の5部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる3セットと、扱えるヴァンガード武器だけが表示されます。ヴァンガード装備は元の装備と同じウォーフェア・レーティングを、より高いアイテムレベルで備えています。各セットには2部位と4部位で発動する2つのボーナスがあり、スペックのアビリティの1つを変化させます。元のセットと違い、これらのボーナスはモンスター相手も含めてどこでも有効ですが、対人戦向けに作られているため、レイドの中ではレイドセットの方が優れた選択のままです。"
     },
     "worldPvpPage": {
-      "heading": "World PvP",
-      "intro": "Open-world player-versus-player is opt-in. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy anywhere in the open world; lower it and, after a short delay, you are a bystander again. Nobody who has not raised the flag can attack or be attacked.",
-      "flagHeading": "Raising and lowering the flag",
-      "flagBody": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing a flagged player who is in a fight raises your own flag.",
-      "stakesHeading": "What a kill is worth",
-      "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
-      "limitsHeading": "Fair play rules",
-      "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
-      "zonesHeading": "Where world PvP happens",
-      "zonesBody": "The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.",
-      "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
-      "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
-      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
-      "hillHeading": "King of the Hill",
-      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
-      "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "hillBodyRamp": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
-      "limitsBodyRaids": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid."
+      "heading": "ワールドPvP",
+      "intro": "オープンワールドの対人戦は任意参加です。PvPフラグを立てると、パーティ、レイド、ギルドに属さないフラグを立てた全プレイヤーがオープンワールドのどこでも敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。フラグを立てていない人は攻撃することも攻撃されることもありません。",
+      "flagHeading": "フラグの上げ下げ",
+      "flagBody": "チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復すると、自分のフラグも立ちます。",
+      "stakesHeading": "撃破の価値",
+      "stakesBody": "フラグを立てたプレイヤーがフラグを立てた相手を倒すと、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。",
+      "limitsHeading": "フェアプレイのルール",
+      "limitsBody": "同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。カウントは日次リセットで元に戻ります。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。",
+      "introZones": "オープンワールドの対人戦は任意参加で、その意味は足元の土地が決めます。PvPフラグを立てると、パーティやレイドに属さないフラグを立てた全プレイヤーが係争地で敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。2つのゾーンはワールドの戦闘が一切起こらない聖域で、最北の3つのゾーンは、フラグの有無に関わらずその場の全員が攻撃対象となる無差別戦闘地帯です。パーティとレイドの仲間はどこでも敵になりませんが、グループ外のギルドメンバーは他の誰とも同じく攻撃対象です。",
+      "zonesHeading": "ワールドPvPが起こる場所",
+      "zonesBody": "世界の土地は3種類に分かれます。修練の浜とイーストブルック渓谷は聖域で、フラグの有無に関わらずワールドPvPは一切起こらないため、新しいキャラクターがフラグとは何かを知る前に戦いを挑まれることはありません。世界の大半は係争地で、そこでは上記のフラグの規則がすべてです。ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯で、そこにいる全員がフラグの有無に関わらず、そこにいる他の全員を攻撃できます。境界を越えて入るときにも、出るときにも通知されます。そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立つので、仕掛けた側が必ずリスクを背負います。すでにフラグを立てている相手を攻撃しても自分のフラグは立たないため、自衛や、フラグを立てていない誰かを守ることには何の代償もありません。",
+      "flagBodyAid": "チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復、シールド、強化した場合も自分のフラグが立つため、自分はフラグを立てないまま戦う者を背後から支え続けることはできません。フラグを立てていないプレイヤーを支援しても、フラグは立ちません。",
+      "stakesUnflaggedTake": "フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きますが、貢献した全員が名誉は得られます。",
+      "stakesBodyFlagged": "フラグを立てたプレイヤーが他のプレイヤーに倒されると、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。フラグを立てていなかったプレイヤーは、無差別戦闘地帯で倒れても金貨を一切支払いません。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。",
+      "hillHeading": "丘の王",
+      "hillBody": "3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分わずかな名誉を得ます。そのため満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利1回分より少し少ない名誉になります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。",
+      "limitsBodyHour": "同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。",
+      "hillBodyRamp": "3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分名誉を得て、同じパーティが占拠し続けるほど1分ごとの名誉は増えていきます。満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利およそ3回分の名誉になります。丘の持ち主が変わると、新しい持ち主の積み上げは最初から始まります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。",
+      "limitsBodyRaids": "同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。レイドはワールドでの撃破から何も得られません。レイドのメンバーは名誉もゴールドも受け取らず、他の人の取り分も減らさないため、報酬を得るにはパーティで戦いましょう。"
     },
     "thornhollowPage": {
       "heading": "ソーンホロウ平原",
@@ -8509,7 +8311,7 @@ export const ja_JP: EnTranslations = {
       "parryBody": "パリィはウォリアー固有の防御です。近接の一撃をまるごと受け流し、ダメージをまったく受けない確率で、筋力とともに伸びます。パリィできるのは正面から来る攻撃だけなので、自分を叩いているものへ体を向け続ける理由がもう一つ増えるわけです。他のクラスでは、キャラクターシートのこの行はゼロのままです。",
       "warfareTitle": "ウォーフェア",
       "warfareBody": "ウォーフェアは、他のプレイヤーに対してのみ効く唯一のステータスです。相手に与えるダメージを高め、相手から受けるダメージを下げ、キャラクターシートにはその両面が一行で表示されます。クリーチャー相手にはまったく働きません。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。",
-      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "ウォーフェアは、プレイヤーと戦うために名誉のギアが持つステータスです。プレイヤー同士の戦いでは、あなたとペットが他のプレイヤーやそのペットに与えるダメージを高め、彼らから受けるダメージを下げます。さらにダンジョン、レイド、デルヴ、リフト以外のすべての場所で最大体力を高めるので、名誉のギアを身につけたプレイヤーは、身につけていないプレイヤーよりはるかに倒されにくくなります。キャラクターシートにはそのすべてが一行で表示されます。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。"
     },
     "progression": {
       "intro": "あらゆる戦い、クエスト、北へ進む一歩が、あなたの英雄を強くします。ここでは、レベリングの仕組みと、頂点に達した後も成長を続けさせるものを紹介します。",
@@ -10563,16 +10365,6 @@ export const ja_JP: EnTranslations = {
       "xpGainRested": "{amount}の経験値を獲得しました（休息ボーナス {rested}）。",
       "deathTitle": "死亡しました。",
       "releaseSpirit": "霊魂を解放",
-      "deathRecap": "Recap",
-      "deathRecapTitle": "Death Recap",
-      "deathRecapKiller": "Killing blow: {killer} ({ability})",
-      "deathRecapNoKiller": "Combat events leading to death",
-      "deathRecapLethal": "Killing Blow",
-      "deathRecapClose": "Close",
-      "deathRecapNoEvents": "No combat events recorded.",
-      "deathRecapCrit": "Crit",
-      "deathRecapDamage": "Damage",
-      "deathRecapHeal": "Healing",
       "chatTab": "チャット",
       "combatLogTab": "戦闘ログ",
       "chatPlaceholder": "発言する... (/s 発言、/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般、/help、! でコミュニティコマンド)",
@@ -10781,7 +10573,7 @@ export const ja_JP: EnTranslations = {
       "compactChat": "コンパクトチャット",
       "frostedPanels": "すりガラスパネル",
       "highContrastText": "高コントラストの文字",
-      "colorblindMode": "Colorblind Mode",
+      "colorblindMode": "色覚サポートモード",
       "reduceMotion": "モーションを減らす",
       "showFps": "FPSを表示",
       "invertLookY": "視点を反転 (Y)",
@@ -10843,19 +10635,6 @@ export const ja_JP: EnTranslations = {
       "threat": "脅威",
       "damageShort": "ダメ",
       "healingShort": "回復",
-      "damageTaken": "Damage Taken",
-      "damageTakenShort": "Taken",
-      "avoidableDmg": "Avoidable Damage",
-      "avoidableDmgShort": "Avoid.",
-      "interrupts": "Interrupts",
-      "interruptsShort": "Int",
-      "dispels": "Dispels",
-      "dispelsShort": "Disp",
-      "deaths": "Deaths",
-      "deathsShort": "Dead",
-      "reset": "Reset meters",
-      "resetHint": "Reset combat data",
-      "groupTotal": "Total: {total} ({rate})",
       "current": "現在",
       "lastFight": "前回の戦闘",
       "fightIndex": "戦闘 -{index}",
@@ -10867,16 +10646,6 @@ export const ja_JP: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "前の区間",
       "newerSegment": "次の区間",
-      "selectSegment": "Select fight segment",
-      "selectMode": "Select meter mode",
-      "back": "Back",
-      "resetFight": "Reset current fight",
-      "resetAll": "Reset all data",
-      "criticals": "Criticals: {count}",
-      "hits": "Hits: {count}",
-      "topAbility": "Top: {name}",
-      "activity": "Activity: {pct}",
-      "newWindow": "New window",
       "close": "メーターを閉じる"
     },
     "chat": {
@@ -11359,9 +11128,9 @@ export const ja_JP: EnTranslations = {
       "anyTarget": "敵または味方の対象",
       "selfOnly": "自分のみ",
       "damageRange": "{min}から{max}",
-      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
-      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
-      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
+      "edictExplosion": "神聖なる昇天の効果中、爆発は半径{radius}m内の敵に{damage}の物理ダメージを与えます。対象が{cap}体を超えるとダメージが減少します。このダメージは攻撃力に応じて増加します。",
+      "edictDamage": "武器ダメージの{weaponPercent}%に加え、{damage}の物理ダメージを与えます。武器ダメージには攻撃力による加算が含まれます。",
+      "verdictDamage": "最後の勅令で起爆すると{verdictSingleDamage}の聖なるダメージを与えます。暁落としで起爆すると半径{verdictAreaRadius}m内に{verdictAreaDamage}の聖なるダメージを与え、対象が{verdictAreaCap}体を超えるとダメージが減少します。どちらの起爆ダメージも呪文威力では増加しません。印を付けられる敵は一度に1体だけです。",
       "finisherDamage": "{base}にコンボポイントごと{perCombo}"
     },
     "resources": {
@@ -11749,39 +11518,39 @@ export const ja_JP: EnTranslations = {
       "saleBuyer": "{buyer}に売却",
       "saleOlder": "ほかに {count} 件の以前の売却があり、合計に含まれています。",
       "collectAll": "すべて受け取る",
-      "ordersTab": "Wanted",
-      "ordersNote": "Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.",
-      "ordersListAria": "Open buy orders",
-      "ordersEmpty": "No open orders yet. Post one and gatherers will see what you need.",
-      "orderCardTitle": "Place an order",
-      "orderPickLabel": "Item wanted",
-      "orderPickEmpty": "Search for an item below, or pick one from the strip at the bottom.",
-      "orderSearchPlaceholder": "Search items...",
-      "orderSearchAria": "Search for an item to order",
-      "orderPickNone": "No item matches.",
-      "orderQuantity": "Units wanted",
-      "orderPriceEach": "Price each",
-      "orderEscrowLine": "Gold held at the Merchant: {total}",
-      "orderCannotAfford": "You cannot afford {total} for this order.",
-      "orderAtCap": "You have no free order slots. Withdraw one first.",
-      "orderPlaceButton": "Place Order",
-      "orderConfirmTitle": "Confirm Order",
-      "orderConfirmBody": "Order {item} x{count} at {each} each? {total} is held at the Merchant until the order is filled or withdrawn.",
-      "orderWanted": "x{count} wanted",
-      "orderBy": "Wanted by {buyer}",
-      "orderMine": "Your order",
-      "orderEach": "each",
-      "orderDeliver": "Deliver",
-      "orderDeliverAria": "Deliver {item} to {buyer}",
-      "orderDeliverNone": "None of this item in your bags.",
-      "orderWithdraw": "Withdraw",
-      "orderWithdrawAria": "Withdraw your order for {item}",
-      "orderDeliverConfirmTitle": "Confirm Delivery",
-      "orderDeliverConfirmBody": "Deliver {item} x{count} to {buyer} for {total} ({each} each)? You collect {proceeds} after the Merchant's cut.",
-      "unlistedTitle": "Not on the market",
-      "unlistedNote": "Materials with no listing at all. Post an order for one, or gather and list it.",
-      "unlistedNone": "Every material has at least one listing right now.",
-      "unlistedStageAria": "Order {item}"
+      "ordersTab": "買い注文",
+      "ordersNote": "欲しいアイテムを掲示すると、ゴールドは商人が預かります。提示価格以下の出品は即座に成立し、残りは売り手を待ちます。商人は納品者から {cut}% の手数料を取ります。現在 {used}/{max} 件の注文を出しています。",
+      "ordersListAria": "未成立の買い注文",
+      "ordersEmpty": "まだ買い注文はありません。掲示すれば採集者があなたの需要を見られます。",
+      "orderCardTitle": "注文を出す",
+      "orderPickLabel": "欲しいアイテム",
+      "orderPickEmpty": "下でアイテムを検索するか、一番下の一覧から選んでください。",
+      "orderSearchPlaceholder": "アイテムを検索...",
+      "orderSearchAria": "注文するアイテムを検索",
+      "orderPickNone": "一致するアイテムはありません。",
+      "orderQuantity": "希望数",
+      "orderPriceEach": "単価",
+      "orderEscrowLine": "商人が預かるゴールド：{total}",
+      "orderCannotAfford": "この注文の {total} を支払えません。",
+      "orderAtCap": "注文枠に空きがありません。先に一つ取り下げてください。",
+      "orderPlaceButton": "注文する",
+      "orderConfirmTitle": "注文の確認",
+      "orderConfirmBody": "{item} x{count} を単価 {each} で注文しますか？{total} は注文が成立または取り下げられるまで商人が預かります。",
+      "orderWanted": "x{count} 募集中",
+      "orderBy": "{buyer} が募集",
+      "orderMine": "あなたの注文",
+      "orderEach": "単価",
+      "orderDeliver": "納品",
+      "orderDeliverAria": "{item} を {buyer} に納品",
+      "orderDeliverNone": "このアイテムはバッグにありません。",
+      "orderWithdraw": "取り下げ",
+      "orderWithdrawAria": "{item} の注文を取り下げる",
+      "orderDeliverConfirmTitle": "納品の確認",
+      "orderDeliverConfirmBody": "{item} x{count} を {buyer} に {total}（単価 {each}）で納品しますか？商人の手数料を引いた {proceeds} を受け取れます。",
+      "unlistedTitle": "市場に出ていないもの",
+      "unlistedNote": "出品が一つもない素材です。注文を出すか、採集して出品しましょう。",
+      "unlistedNone": "今はすべての素材に出品があります。",
+      "unlistedStageAria": "{item} を注文"
     },
     "logs": {
       "listedItem": "{item}を{money}でワールドマーケットに出品しました。",
@@ -11790,11 +11559,11 @@ export const ja_JP: EnTranslations = {
       "collectedMoney": "商人から{money}を受け取ります。",
       "reclaimedItem": "市場から{item}を回収しました。",
       "expiredListing": "{item}の市場出品が期限切れになり、商人のもとで待機しています。",
-      "orderPlaced": "Placed an order for {item} x{count} at {each} each.",
-      "orderDelivered": "Delivered {item} x{count} to {buyer} for {money}. Collect {proceeds} from the Merchant.",
-      "orderReceived": "{seller} delivered {item} x{count} to your order. Collect it from the Merchant.",
-      "orderWithdrawn": "Withdrew your order for {item}; {money} returned.",
-      "orderExpired": "Your order for {item} expired; {money} waits at the Merchant.",
+      "orderPlaced": "{item} x{count} を単価 {each} で注文しました。",
+      "orderDelivered": "{item} x{count} を {buyer} に {money} で納品しました。商人から {proceeds} を受け取ってください。",
+      "orderReceived": "{seller} があなたの注文に {item} x{count} を納品しました。商人から受け取ってください。",
+      "orderWithdrawn": "{item} の注文を取り下げました。{money} が返金されました。",
+      "orderExpired": "{item} の注文が期限切れになりました。{money} が商人のもとで待機しています。",
       "boughtBackItem": "{item}を{money}で買い戻しました。"
     },
     "errors": {
@@ -11814,11 +11583,11 @@ export const ja_JP: EnTranslations = {
       "nothingToCollect": "受け取るものはありません。",
       "sweepNoListings": "このアイテムに一括購入できる出品はありません。",
       "sweepPriceChanged": "一括購入が届く前に価格が変わりました。見積もりを確認してもう一度お試しください。",
-      "orderCountNeeded": "Name how many you want.",
-      "tooManyOrders": "You may keep at most {count} orders open at once.",
-      "orderClosed": "That order is no longer open.",
-      "orderOwn": "That is your own order. Cancel it to withdraw it.",
-      "orderNotYours": "That is not your order."
+      "orderCountNeeded": "希望数を入力してください。",
+      "tooManyOrders": "同時に出せる注文は {count} 件までです。",
+      "orderClosed": "その注文はもう受け付けていません。",
+      "orderOwn": "それはあなた自身の注文です。取り下げてゴールドを戻してください。",
+      "orderNotYours": "それはあなたの注文ではありません。"
     },
     "loot": {
       "takeAll": "すべて取る",
@@ -12323,7 +12092,7 @@ export const ja_JP: EnTranslations = {
       },
       "final_edict": {
         "name": "最後の勅令",
-        "description": "強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に神聖な爆発も放つ。"
+        "description": "強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に物理ダメージの爆発も放つ。"
       },
       "dawnfall": {
         "name": "暁落とし",
@@ -12551,16 +12320,16 @@ export const ja_JP: EnTranslations = {
         "description": "パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）"
       },
       "lightning_overload": {
-        "name": "Arc Overload",
-        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+        "name": "アークオーバーロード",
+        "description": "パッシブ：電弧の矢と枝分かれの稲妻は20%の確率でオーバーロードし、最初の目標に与えたダメージの50%で再び攻撃し、雷鳴を1獲得する。（サンダーコール）"
       },
       "lava_burst": {
-        "name": "Magma Burst",
-        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+        "name": "マグマバースト",
+        "description": "{damage}の火炎ダメージを与える。あなたの灰燼の衝撃で燃えている目標には必ずクリティカルヒットする。マグマサージ：灰燼の衝撃の継続ダメージごとに20%の確率でこのクールダウンをリセットし、10秒以内の次のマグマバーストを即時詠唱にする。ダメージは呪文威力とともに上がる。（サンダーコール）"
       },
       "thunderstorm": {
-        "name": "Stormbreak",
-        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
+        "name": "ストームブレイク",
+        "description": "雷鳴を呼び、10ヤード以内の敵に{damage}の自然ダメージを与え、5秒間移動速度を50%低下させる。最大マナの8%を回復する。ダメージは呪文威力とともに上がる。（サンダーコール）"
       },
       "rockbiter_weapon": {
         "name": "石縛の武器",
@@ -16449,421 +16218,421 @@ export const ja_JP: EnTranslations = {
         "name": "嵐の賛歌の鎖の靴"
       },
       "vanguard_warrior_arms_helmet": {
-        "name": "Bladewake Greathelm"
+        "name": "刃跡の大兜"
       },
       "vanguard_warrior_arms_shoulder": {
-        "name": "Bladewake Pauldrons"
+        "name": "刃跡の肩甲"
       },
       "vanguard_warrior_arms_chest": {
-        "name": "Bladewake Hauberk"
+        "name": "刃跡のホーバーク"
       },
       "vanguard_warrior_arms_legs": {
-        "name": "Bladewake Legplates"
+        "name": "刃跡の脚鎧"
       },
       "vanguard_warrior_arms_gloves": {
-        "name": "Bladewake Crushers"
+        "name": "刃跡の粉砕の篭手"
       },
       "vanguard_warrior_fury_helmet": {
-        "name": "Bloodmarch Visage"
+        "name": "血の行軍の面頬"
       },
       "vanguard_warrior_fury_shoulder": {
-        "name": "Bloodmarch Shoulderguards"
+        "name": "血の行軍の肩当て"
       },
       "vanguard_warrior_fury_chest": {
-        "name": "Bloodmarch Chainmail"
+        "name": "血の行軍の鎖帷子"
       },
       "vanguard_warrior_fury_legs": {
-        "name": "Bloodmarch Leggings"
+        "name": "血の行軍のレギンス"
       },
       "vanguard_warrior_fury_gloves": {
-        "name": "Bloodmarch Grips"
+        "name": "血の行軍のグリップ"
       },
       "vanguard_warrior_prot_helmet": {
-        "name": "Ironmarch Helm"
+        "name": "鉄の行軍の兜"
       },
       "vanguard_warrior_prot_shoulder": {
-        "name": "Ironmarch Spaulders"
+        "name": "鉄の行軍の肩鎧"
       },
       "vanguard_warrior_prot_chest": {
-        "name": "Ironmarch Chestguard"
+        "name": "鉄の行軍の胸甲"
       },
       "vanguard_warrior_prot_legs": {
-        "name": "Ironmarch Legguards"
+        "name": "鉄の行軍の脚甲"
       },
       "vanguard_warrior_prot_gloves": {
-        "name": "Ironmarch Handguards"
+        "name": "鉄の行軍の手甲"
       },
       "vanguard_paladin_holy_helmet": {
-        "name": "Sunvigil Circlet"
+        "name": "陽の守夜のサークレット"
       },
       "vanguard_paladin_holy_shoulder": {
-        "name": "Sunvigil Mantle"
+        "name": "陽の守夜のマントル"
       },
       "vanguard_paladin_holy_chest": {
-        "name": "Sunvigil Hauberk"
+        "name": "陽の守夜のホーバーク"
       },
       "vanguard_paladin_holy_legs": {
-        "name": "Sunvigil Legmail"
+        "name": "陽の守夜の鎖の脚甲"
       },
       "vanguard_paladin_holy_gloves": {
-        "name": "Sunvigil Gloves"
+        "name": "陽の守夜の手袋"
       },
       "vanguard_paladin_protection_helmet": {
-        "name": "Shieldvow Helm"
+        "name": "盾の誓いの兜"
       },
       "vanguard_paladin_protection_shoulder": {
-        "name": "Shieldvow Pauldrons"
+        "name": "盾の誓いの肩甲"
       },
       "vanguard_paladin_protection_chest": {
-        "name": "Shieldvow Breastplate"
+        "name": "盾の誓いの胸当て"
       },
       "vanguard_paladin_protection_legs": {
-        "name": "Shieldvow Legplates"
+        "name": "盾の誓いの脚鎧"
       },
       "vanguard_paladin_protection_gloves": {
-        "name": "Shieldvow Gauntlets"
+        "name": "盾の誓いの篭手"
       },
       "vanguard_paladin_retribution_helmet": {
-        "name": "Lightbrand Crown"
+        "name": "光の烙印の冠"
       },
       "vanguard_paladin_retribution_shoulder": {
-        "name": "Lightbrand Spaulders"
+        "name": "光の烙印の肩鎧"
       },
       "vanguard_paladin_retribution_chest": {
-        "name": "Lightbrand Cuirass"
+        "name": "光の烙印の胴鎧"
       },
       "vanguard_paladin_retribution_legs": {
-        "name": "Lightbrand Legguards"
+        "name": "光の烙印の脚甲"
       },
       "vanguard_paladin_retribution_gloves": {
-        "name": "Lightbrand Gauntlets"
+        "name": "光の烙印の篭手"
       },
       "vanguard_hunter_beast_mastery_helmet": {
-        "name": "Packwarden Coif"
+        "name": "群れの守り手の頭巾"
       },
       "vanguard_hunter_beast_mastery_shoulder": {
-        "name": "Packwarden Spaulders"
+        "name": "群れの守り手の肩鎧"
       },
       "vanguard_hunter_beast_mastery_chest": {
-        "name": "Packwarden Jerkin"
+        "name": "群れの守り手のジャーキン"
       },
       "vanguard_hunter_beast_mastery_legs": {
-        "name": "Packwarden Legguards"
+        "name": "群れの守り手の脚甲"
       },
       "vanguard_hunter_beast_mastery_gloves": {
-        "name": "Packwarden Gauntlets"
+        "name": "群れの守り手の篭手"
       },
       "vanguard_hunter_marksmanship_helmet": {
-        "name": "Farsight Coif"
+        "name": "遠見の頭巾"
       },
       "vanguard_hunter_marksmanship_shoulder": {
-        "name": "Farsight Spaulders"
+        "name": "遠見の肩鎧"
       },
       "vanguard_hunter_marksmanship_chest": {
-        "name": "Farsight Jerkin"
+        "name": "遠見のジャーキン"
       },
       "vanguard_hunter_marksmanship_legs": {
-        "name": "Farsight Legguards"
+        "name": "遠見の脚甲"
       },
       "vanguard_hunter_marksmanship_gloves": {
-        "name": "Farsight Gauntlets"
+        "name": "遠見の篭手"
       },
       "vanguard_hunter_survival_helmet": {
-        "name": "Snaretooth Coif"
+        "name": "罠の牙の頭巾"
       },
       "vanguard_hunter_survival_shoulder": {
-        "name": "Snaretooth Spaulders"
+        "name": "罠の牙の肩鎧"
       },
       "vanguard_hunter_survival_chest": {
-        "name": "Snaretooth Jerkin"
+        "name": "罠の牙のジャーキン"
       },
       "vanguard_hunter_survival_legs": {
-        "name": "Snaretooth Legguards"
+        "name": "罠の牙の脚甲"
       },
       "vanguard_hunter_survival_gloves": {
-        "name": "Snaretooth Gauntlets"
+        "name": "罠の牙の篭手"
       },
       "vanguard_rogue_assassination_helmet": {
-        "name": "Nightcut Hood"
+        "name": "夜斬りのフード"
       },
       "vanguard_rogue_assassination_shoulder": {
-        "name": "Nightcut Shoulderpads"
+        "name": "夜斬りの肩パッド"
       },
       "vanguard_rogue_assassination_chest": {
-        "name": "Nightcut Tunic"
+        "name": "夜斬りのチュニック"
       },
       "vanguard_rogue_assassination_legs": {
-        "name": "Nightcut Breeches"
+        "name": "夜斬りの脚衣"
       },
       "vanguard_rogue_assassination_gloves": {
-        "name": "Nightcut Gloves"
+        "name": "夜斬りの手袋"
       },
       "vanguard_rogue_combat_helmet": {
-        "name": "Brawlmark Hood"
+        "name": "乱闘の印のフード"
       },
       "vanguard_rogue_combat_shoulder": {
-        "name": "Brawlmark Shoulderpads"
+        "name": "乱闘の印の肩パッド"
       },
       "vanguard_rogue_combat_chest": {
-        "name": "Brawlmark Tunic"
+        "name": "乱闘の印のチュニック"
       },
       "vanguard_rogue_combat_legs": {
-        "name": "Brawlmark Breeches"
+        "name": "乱闘の印の脚衣"
       },
       "vanguard_rogue_combat_gloves": {
-        "name": "Brawlmark Gloves"
+        "name": "乱闘の印の手袋"
       },
       "vanguard_rogue_subtlety_helmet": {
-        "name": "Shadewalk Hood"
+        "name": "影歩きのフード"
       },
       "vanguard_rogue_subtlety_shoulder": {
-        "name": "Shadewalk Shoulderpads"
+        "name": "影歩きの肩パッド"
       },
       "vanguard_rogue_subtlety_chest": {
-        "name": "Shadewalk Tunic"
+        "name": "影歩きのチュニック"
       },
       "vanguard_rogue_subtlety_legs": {
-        "name": "Shadewalk Breeches"
+        "name": "影歩きの脚衣"
       },
       "vanguard_rogue_subtlety_gloves": {
-        "name": "Shadewalk Gloves"
+        "name": "影歩きの手袋"
       },
       "vanguard_priest_discipline_helmet": {
-        "name": "Veilpsalm Cowl"
+        "name": "帳の詩篇のカウル"
       },
       "vanguard_priest_discipline_shoulder": {
-        "name": "Veilpsalm Mantle"
+        "name": "帳の詩篇のマントル"
       },
       "vanguard_priest_discipline_chest": {
-        "name": "Veilpsalm Robe"
+        "name": "帳の詩篇のローブ"
       },
       "vanguard_priest_discipline_legs": {
-        "name": "Veilpsalm Leggings"
+        "name": "帳の詩篇のレギンス"
       },
       "vanguard_priest_discipline_gloves": {
-        "name": "Veilpsalm Handwraps"
+        "name": "帳の詩篇の手巻き布"
       },
       "vanguard_priest_holy_helmet": {
-        "name": "Gracewing Cowl"
+        "name": "恩寵の翼のカウル"
       },
       "vanguard_priest_holy_shoulder": {
-        "name": "Gracewing Mantle"
+        "name": "恩寵の翼のマントル"
       },
       "vanguard_priest_holy_chest": {
-        "name": "Gracewing Robe"
+        "name": "恩寵の翼のローブ"
       },
       "vanguard_priest_holy_legs": {
-        "name": "Gracewing Leggings"
+        "name": "恩寵の翼のレギンス"
       },
       "vanguard_priest_holy_gloves": {
-        "name": "Gracewing Handwraps"
+        "name": "恩寵の翼の手巻き布"
       },
       "vanguard_priest_shadow_helmet": {
-        "name": "Duskhymn Cowl"
+        "name": "黄昏の賛歌のカウル"
       },
       "vanguard_priest_shadow_shoulder": {
-        "name": "Duskhymn Mantle"
+        "name": "黄昏の賛歌のマントル"
       },
       "vanguard_priest_shadow_chest": {
-        "name": "Duskhymn Robe"
+        "name": "黄昏の賛歌のローブ"
       },
       "vanguard_priest_shadow_legs": {
-        "name": "Duskhymn Leggings"
+        "name": "黄昏の賛歌のレギンス"
       },
       "vanguard_priest_shadow_gloves": {
-        "name": "Duskhymn Handwraps"
+        "name": "黄昏の賛歌の手巻き布"
       },
       "vanguard_shaman_elemental_helmet": {
-        "name": "Tempestwrit Coif"
+        "name": "嵐の書の頭巾"
       },
       "vanguard_shaman_elemental_shoulder": {
-        "name": "Tempestwrit Pauldrons"
+        "name": "嵐の書の肩甲"
       },
       "vanguard_shaman_elemental_chest": {
-        "name": "Tempestwrit Hauberk"
+        "name": "嵐の書のホーバーク"
       },
       "vanguard_shaman_elemental_legs": {
-        "name": "Tempestwrit Legmail"
+        "name": "嵐の書の鎖の脚甲"
       },
       "vanguard_shaman_elemental_gloves": {
-        "name": "Tempestwrit Gauntlets"
+        "name": "嵐の書の篭手"
       },
       "vanguard_shaman_enhancement_helmet": {
-        "name": "Galeborn Helm"
+        "name": "疾風生まれの兜"
       },
       "vanguard_shaman_enhancement_shoulder": {
-        "name": "Galeborn Spaulders"
+        "name": "疾風生まれの肩鎧"
       },
       "vanguard_shaman_enhancement_chest": {
-        "name": "Galeborn Chainmail"
+        "name": "疾風生まれの鎖帷子"
       },
       "vanguard_shaman_enhancement_legs": {
-        "name": "Galeborn Legguards"
+        "name": "疾風生まれの脚甲"
       },
       "vanguard_shaman_enhancement_gloves": {
-        "name": "Galeborn Grips"
+        "name": "疾風生まれのグリップ"
       },
       "vanguard_shaman_restoration_helmet": {
-        "name": "Brineward Circlet"
+        "name": "潮の守りのサークレット"
       },
       "vanguard_shaman_restoration_shoulder": {
-        "name": "Brineward Mantle"
+        "name": "潮の守りのマントル"
       },
       "vanguard_shaman_restoration_chest": {
-        "name": "Brineward Hauberk"
+        "name": "潮の守りのホーバーク"
       },
       "vanguard_shaman_restoration_legs": {
-        "name": "Brineward Kilt"
+        "name": "潮の守りのキルト"
       },
       "vanguard_shaman_restoration_gloves": {
-        "name": "Brineward Handwraps"
+        "name": "潮の守りの手巻き布"
       },
       "vanguard_mage_arcane_helmet": {
-        "name": "Hourbinder's Hood"
+        "name": "時縛りのフード"
       },
       "vanguard_mage_arcane_shoulder": {
-        "name": "Hourbinder's Amice"
+        "name": "時縛りの肩衣"
       },
       "vanguard_mage_arcane_chest": {
-        "name": "Hourbinder's Robe"
+        "name": "時縛りのローブ"
       },
       "vanguard_mage_arcane_legs": {
-        "name": "Hourbinder's Trousers"
+        "name": "時縛りのズボン"
       },
       "vanguard_mage_arcane_gloves": {
-        "name": "Hourbinder's Gloves"
+        "name": "時縛りの手袋"
       },
       "vanguard_mage_fire_helmet": {
-        "name": "Emberlash Cowl"
+        "name": "燼の鞭のカウル"
       },
       "vanguard_mage_fire_shoulder": {
-        "name": "Emberlash Mantle"
+        "name": "燼の鞭のマントル"
       },
       "vanguard_mage_fire_chest": {
-        "name": "Emberlash Robes"
+        "name": "燼の鞭の法衣"
       },
       "vanguard_mage_fire_legs": {
-        "name": "Emberlash Leggings"
+        "name": "燼の鞭のレギンス"
       },
       "vanguard_mage_fire_gloves": {
-        "name": "Emberlash Gloves"
+        "name": "燼の鞭の手袋"
       },
       "vanguard_mage_frost_helmet": {
-        "name": "Rimewarden Hood"
+        "name": "霜の番人のフード"
       },
       "vanguard_mage_frost_shoulder": {
-        "name": "Rimewarden Shoulderpads"
+        "name": "霜の番人の肩パッド"
       },
       "vanguard_mage_frost_chest": {
-        "name": "Rimewarden Vestment"
+        "name": "霜の番人の祭服"
       },
       "vanguard_mage_frost_legs": {
-        "name": "Rimewarden Legwraps"
+        "name": "霜の番人の脚巻き"
       },
       "vanguard_mage_frost_gloves": {
-        "name": "Rimewarden Mitts"
+        "name": "霜の番人のミトン"
       },
       "vanguard_warlock_affliction_helmet": {
-        "name": "Dreadquill Hood"
+        "name": "恐怖の羽ペンのフード"
       },
       "vanguard_warlock_affliction_shoulder": {
-        "name": "Dreadquill Mantle"
+        "name": "恐怖の羽ペンのマントル"
       },
       "vanguard_warlock_affliction_chest": {
-        "name": "Dreadquill Robe"
+        "name": "恐怖の羽ペンのローブ"
       },
       "vanguard_warlock_affliction_legs": {
-        "name": "Dreadquill Leggings"
+        "name": "恐怖の羽ペンのレギンス"
       },
       "vanguard_warlock_affliction_gloves": {
-        "name": "Dreadquill Handwraps"
+        "name": "恐怖の羽ペンの手巻き布"
       },
       "vanguard_warlock_demonology_helmet": {
-        "name": "Marrowbound Cowl"
+        "name": "骨髄の縛めのカウル"
       },
       "vanguard_warlock_demonology_shoulder": {
-        "name": "Marrowbound Spaulders"
+        "name": "骨髄の縛めの肩鎧"
       },
       "vanguard_warlock_demonology_chest": {
-        "name": "Marrowbound Robe"
+        "name": "骨髄の縛めのローブ"
       },
       "vanguard_warlock_demonology_legs": {
-        "name": "Marrowbound Leggings"
+        "name": "骨髄の縛めのレギンス"
       },
       "vanguard_warlock_demonology_gloves": {
-        "name": "Marrowbound Grips"
+        "name": "骨髄の縛めのグリップ"
       },
       "vanguard_warlock_destruction_helmet": {
-        "name": "Slagcrown Hood"
+        "name": "鉱滓の冠のフード"
       },
       "vanguard_warlock_destruction_shoulder": {
-        "name": "Slagcrown Mantle"
+        "name": "鉱滓の冠のマントル"
       },
       "vanguard_warlock_destruction_chest": {
-        "name": "Slagcrown Robes"
+        "name": "鉱滓の冠の法衣"
       },
       "vanguard_warlock_destruction_legs": {
-        "name": "Slagcrown Leggings"
+        "name": "鉱滓の冠のレギンス"
       },
       "vanguard_warlock_destruction_gloves": {
-        "name": "Slagcrown Gloves"
+        "name": "鉱滓の冠の手袋"
       },
       "vanguard_druid_balance_helmet": {
-        "name": "Starwarden Headdress"
+        "name": "星の番人の頭飾り"
       },
       "vanguard_druid_balance_shoulder": {
-        "name": "Starwarden Spaulders"
+        "name": "星の番人の肩鎧"
       },
       "vanguard_druid_balance_chest": {
-        "name": "Starwarden Vest"
+        "name": "星の番人のベスト"
       },
       "vanguard_druid_balance_legs": {
-        "name": "Starwarden Breeches"
+        "name": "星の番人の脚衣"
       },
       "vanguard_druid_balance_gloves": {
-        "name": "Starwarden Gloves"
+        "name": "星の番人の手袋"
       },
       "vanguard_druid_feral_helmet": {
-        "name": "Bloodmane Helm"
+        "name": "血のたてがみの兜"
       },
       "vanguard_druid_feral_shoulder": {
-        "name": "Bloodmane Shoulderpads"
+        "name": "血のたてがみの肩パッド"
       },
       "vanguard_druid_feral_chest": {
-        "name": "Bloodmane Tunic"
+        "name": "血のたてがみのチュニック"
       },
       "vanguard_druid_feral_legs": {
-        "name": "Bloodmane Legguards"
+        "name": "血のたてがみの脚甲"
       },
       "vanguard_druid_feral_gloves": {
-        "name": "Bloodmane Grips"
+        "name": "血のたてがみのグリップ"
       },
       "vanguard_druid_restoration_helmet": {
-        "name": "Thistlebloom Crown"
+        "name": "薊の花の冠"
       },
       "vanguard_druid_restoration_shoulder": {
-        "name": "Thistlebloom Mantle"
+        "name": "薊の花のマントル"
       },
       "vanguard_druid_restoration_chest": {
-        "name": "Thistlebloom Vest"
+        "name": "薊の花のベスト"
       },
       "vanguard_druid_restoration_legs": {
-        "name": "Thistlebloom Leggings"
+        "name": "薊の花のレギンス"
       },
       "vanguard_druid_restoration_gloves": {
-        "name": "Thistlebloom Gloves"
+        "name": "薊の花の手袋"
       },
       "vanguard_verdict_greatsword": {
-        "name": "Vanguard's Verdict"
+        "name": "先鋒の裁き"
       },
       "vanguard_oath_blade": {
-        "name": "Vanguard's Oath"
+        "name": "先鋒の誓い"
       },
       "vanguard_fang_dagger": {
-        "name": "Vanguard's Fang"
+        "name": "先鋒の牙"
       },
       "vanguard_warstaff": {
-        "name": "Vanguard's Warstaff"
+        "name": "先鋒の戦杖"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -22003,8 +21772,8 @@ export const ja_JP: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "ベニソン・ドーンウィーヴの法衣",
-        "bonus2": "熾天使の見守りの救援回復量が180から270に上昇します。被ダメージで詠唱が遅れなくなります。",
-        "bonus4": "熾天使の見守りが発動すると、守られた味方はさらに10秒かけて最大体力の15%の回復を得ます。"
+        "bonus2": "囁きの祈り、厳かな祈り、緊急の祈りで体力を回復すると、次の聖歌の癒しの回復量が10%増加し、最大3スタックまで累積する。1回の詠唱につき獲得できるのは1スタックまで。聖歌の癒しの詠唱完了時にすべてのスタックを消費する。ダメージを受けても詠唱が遅延しなくなる。",
+        "bonus4": "3スタックで聖歌の癒しの詠唱を完了すると、60秒以内に使う次の囁きの祈りが即時発動になり、回復量が100%増加する。この効果は累積せず、再度獲得すると持続時間が更新される。"
       },
       "boundstone_vanguard": {
         "name": "束縛石の前衛",
@@ -22212,147 +21981,147 @@ export const ja_JP: EnTranslations = {
       },
       "stormkindled": {
         "name": "ストームキンドルの礼装",
-        "bonus2": "火焔烙印中の武器解放で雷鳴を3獲得します。被ダメージで詠唱が遅れなくなります。",
-        "bonus4": "大地の衝撃の雷鳴ごとのボーナスが30%に上昇します。"
+        "bonus2": "アークオーバーロードの発動率が30%になります。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "大地の衝撃の雷鳴ごとのボーナスが30%に上昇し、マグマバーストのダメージが20%増加します。"
       },
       "vale_arcanist": {
         "name": "谷の秘術師の装束",
         "bonus3": "攻撃速度と詠唱速度が15%上昇します。"
       },
       "vanguard_druid_balance": {
-        "name": "星守りの装束",
-        "bonus2": "絡み根の詠唱時間が0.5秒短縮される。",
-        "bonus4": "絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。"
+        "name": "星の番人の衣装",
+        "bonus2": "締めつける根の詠唱時間が0.5秒短縮されます。",
+        "bonus4": "締めつける根を詠唱すると、4秒間移動しながら詠唱でき、移動速度が20%上昇します。発動は20秒に1回まで。"
       },
       "vanguard_druid_feral": {
-        "name": "血たてがみの皮装",
-        "bonus2": "2点：Bruin Rushのクールダウンが3秒短縮。",
-        "bonus4": "4点：Bruin Rushが最大体力6%のシールドを6秒付与。"
+        "name": "血のたてがみの毛皮鎧",
+        "bonus2": "ブルーインラッシュのクールダウンが3秒短縮されます。",
+        "bonus4": "ブルーインラッシュは、あなたに最大体力の6%のシールドを6秒間付与します。"
       },
       "vanguard_druid_restoration": {
-        "name": "アザミ花の祭服",
-        "bonus2": "2点：Fleetmendのクールダウンが1秒短縮。",
-        "bonus4": "4点：Fleetmendで移動速度が3秒間30%上昇。"
+        "name": "薊の花の祭服",
+        "bonus2": "スウィフトメンドのクールダウンが1秒短縮されます。",
+        "bonus4": "スウィフトメンドは、移動速度も3秒間30%上昇させます。"
       },
       "vanguard_hunter_beast_mastery": {
-        "name": "ヴァンガード：Packwarden Harness",
-        "bonus2": "2点：Rattling Shotのクールダウンが4秒短縮。",
-        "bonus4": "4点：Rattling ShotでHowling Rageの残りクールダウンが1秒短縮。"
+        "name": "群れの守り手の狩装束",
+        "bonus2": "動揺の射撃のクールダウンが4秒短縮されます。",
+        "bonus4": "動揺の射撃が野獣の怒りの残りクールダウンを1秒短縮します。"
       },
       "vanguard_hunter_marksmanship": {
-        "name": "ヴァンガード：Farsight Harness",
-        "bonus2": "2点：Trailbreakのクールダウンが4秒短縮。",
-        "bonus4": "4点：Trailbreakで6秒以内の次のLong Drawが即時発動。15秒に1回まで。"
+        "name": "遠見の狩装束",
+        "bonus2": "離脱跳躍のクールダウンが4秒短縮されます。",
+        "bonus4": "離脱跳躍の後6秒以内の次の引き絞りが即時詠唱になります。発動は15秒に1回まで。"
       },
       "vanguard_hunter_survival": {
-        "name": "ヴァンガード：Snaretooth Harness",
-        "bonus2": "2点：Bloodhookのクールダウンが3秒短縮。",
-        "bonus4": "4点：BloodhookでHunting Momentumを1得る。"
+        "name": "罠の牙の狩装束",
+        "bonus2": "血鉤のクールダウンが3秒短縮されます。",
+        "bonus4": "血鉤が狩猟の勢いを1与えます。"
       },
       "vanguard_mage_arcane": {
-        "name": "ヴァンガード：Hourbinder Vestments",
-        "bonus2": "2点：Temporal Barrierのクールダウンが2秒短縮。",
-        "bonus4": "4点：Temporal Barrierが守った対象の移動速度を3秒間20%上昇。"
+        "name": "時縛りの祭服",
+        "bonus2": "時の障壁のクールダウンが2秒短縮されます。",
+        "bonus4": "時の障壁は、守られた対象の移動速度も3秒間20%上昇させます。"
       },
       "vanguard_mage_fire": {
-        "name": "ヴァンガード：Emberlash Regalia",
-        "bonus2": "2点：Cinderfallの再使用が3秒速くなる。",
-        "bonus4": "4点：Cinderfall詠唱でBlazing Barrierの残りクールダウンが2秒短縮。"
+        "name": "燼の鞭の礼装",
+        "bonus2": "灰燼爆ぜのチャージが3秒速く回復します。",
+        "bonus4": "灰燼爆ぜを詠唱すると、ブレイジングバリアの残りクールダウンが2秒短縮されます。"
       },
       "vanguard_mage_frost": {
-        "name": "ヴァンガード：Rimewarden Garb",
-        "bonus2": "2点：Icebindのクールダウンが2秒短縮。",
-        "bonus4": "4点：Icebind詠唱でFlitstepの残りクールダウンが5秒短縮。"
+        "name": "霜の番人の装束",
+        "bonus2": "氷縛のクールダウンが2秒短縮されます。",
+        "bonus4": "氷縛を詠唱すると、瞬き歩みの残りクールダウンが5秒短縮されます。"
       },
       "vanguard_paladin_holy": {
-        "name": "ヴァンガード：Sunvigil Regalia",
-        "bonus2": "2点：Life Covenantのクールダウンが30秒短縮。",
-        "bonus4": "4点：Life Covenantが対象に最大体力8%のシールドを6秒付与。"
+        "name": "陽の守夜の礼装",
+        "bonus2": "生命の契約のクールダウンが30秒短縮されます。",
+        "bonus4": "生命の契約は、味方にもその最大体力の8%のシールドを6秒間付与します。"
       },
       "vanguard_paladin_protection": {
-        "name": "ヴァンガード：Shieldvow Bastion",
-        "bonus2": "2点：Oath Chainのクールダウンが2秒短縮。",
-        "bonus4": "4点：Oath Chainで引き寄せた敵は4秒間30%遅く詠唱し、条件を満たすとSolar Reprisalを得る。"
+        "name": "盾の誓いの砦",
+        "bonus2": "誓いの鎖のクールダウンが2秒短縮されます。",
+        "bonus4": "誓いの鎖で引き寄せられた敵は4秒間呪文の詠唱が30%遅くなり、引き寄せられる敵を縛ったときには誓いの鎖があなたに太陽の報復を与えます。"
       },
       "vanguard_paladin_retribution": {
-        "name": "ヴァンガード：Lightbrand Warplate",
-        "bonus2": "2点：Valkyr Callingのクールダウンが15秒短縮。",
-        "bonus4": "4点：Valkyr CallingがFinal Edictをリセットし、着地後6秒以内の次のFinal Edictのダメージを15%上げる。"
+        "name": "光の烙印の戦鎧",
+        "bonus2": "ヴァルキュリアの召命のクールダウンが15秒短縮されます。",
+        "bonus4": "ヴァルキュリアの召命は最後の勅令のクールダウンをリセットし、着地から6秒以内の次の最後の勅令は15%多くのダメージを与えます。"
       },
       "vanguard_priest_discipline": {
-        "name": "ヴァンガード：Veilpsalm Raiment",
-        "bonus2": "2点：Terror Canticleのクールダウンが3秒短縮。",
-        "bonus4": "4点：Psalm of Warding消費時、守られた味方の移動速度が3秒間20%上昇。8秒に1回まで。"
+        "name": "帳の詩篇の衣装",
+        "bonus2": "精神の絶叫のクールダウンが3秒短縮されます。",
+        "bonus4": "守りの聖歌が完全に消費されると、守られていた味方の移動速度が3秒間20%上昇します。発動は8秒に1回まで。"
       },
       "vanguard_priest_holy": {
-        "name": "ヴァンガード：Gracewing Raiment",
-        "bonus2": "2点：Veilstepのクールダウンが6秒短縮。",
-        "bonus4": "4点：Veilstepが最大体力8%のシールドを6秒付与。"
+        "name": "恩寵の翼の衣装",
+        "bonus2": "ヴェイルステップのクールダウンが6秒短縮されます。",
+        "bonus4": "ヴェイルステップは、あなたにも最大体力の8%のシールドを6秒間付与します。"
       },
       "vanguard_priest_shadow": {
-        "name": "ヴァンガード：Duskhymn Regalia",
-        "bonus2": "2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。",
-        "bonus4": "4点：Call Tithefiendが最大体力10%のシールドを8秒付与。"
+        "name": "黄昏の賛歌の礼装",
+        "bonus2": "嘆きの連祷は、チャネル中に対象の移動速度も30%低下させます。",
+        "bonus4": "タイスフィーンド招来は、あなたにも最大体力の10%のシールドを8秒間付与します。"
       },
       "vanguard_rogue_assassination": {
-        "name": "ヴァンガード：Nightcut Leathers",
-        "bonus2": "2点：Low Blowの消費エネルギーが10減少。",
-        "bonus4": "4点：Low Blowで6秒以内の次の攻撃がクリティカルになる。"
+        "name": "夜斬りの革鎧",
+        "bonus2": "急所打ちのエネルギーコストが10減少します。",
+        "bonus4": "急所打ちは、6秒以内の次の攻撃も必ずクリティカルにします。"
       },
       "vanguard_rogue_combat": {
-        "name": "ヴァンガード：Brawlmark Leathers",
-        "bonus2": "2点：Swift Heelsのクールダウンが60秒短縮。",
-        "bonus4": "4点：Swift Heels中、Wicked SlashとHaymakerがコンボポイントを追加で1得る。"
+        "name": "乱闘の印の革鎧",
+        "bonus2": "駿足のクールダウンが60秒短縮されます。",
+        "bonus4": "駿足の効果中、邪悪な斬撃とヘイメーカーはコンボポイントを1追加で与えます。"
       },
       "vanguard_rogue_subtlety": {
-        "name": "ヴァンガード：Shadewalk Leathers",
-        "bonus2": "2点：Smokefadeのクールダウンが60秒短縮。",
-        "bonus4": "4点：SmokefadeからのGut Punchがコンボポイントを追加で2得る。"
+        "name": "影歩きの革鎧",
+        "bonus2": "煙隠れのクールダウンが60秒短縮されます。",
+        "bonus4": "煙隠れから使ったみぞおち強打は、コンボポイントを2追加で与えます。"
       },
       "vanguard_shaman_elemental": {
-        "name": "ヴァンガード：Tempestwrit Battlemail",
-        "bonus2": "2点：Unleash Weaponのクールダウンが3秒短縮。",
-        "bonus4": "4点：Unleash Weaponで移動詠唱可能になり、4秒間移動速度20%上昇。20秒に1回まで。"
+        "name": "嵐の書の戦の鎖鎧",
+        "bonus2": "武器解放のクールダウンが3秒短縮されます。",
+        "bonus4": "武器解放を使うと、4秒間移動しながら詠唱でき、移動速度が20%上昇します。発動は20秒に1回まで。"
       },
       "vanguard_shaman_enhancement": {
-        "name": "ヴァンガード：Galeborn Warmail",
-        "bonus2": "2点：Ancestral Strikeで対象の移動速度が4秒間30%低下。",
-        "bonus4": "4点：Ancestral StrikeでElemental Tranceの残りクールダウンが4秒短縮。"
+        "name": "疾風生まれの戦鎖帷子",
+        "bonus2": "祖霊の一撃は、対象の移動速度を4秒間30%低下させます。",
+        "bonus4": "祖霊の一撃がエレメンタルトランスの残りクールダウンを4秒短縮します。"
       },
       "vanguard_shaman_restoration": {
-        "name": "ヴァンガード：Brineward Chainmail",
-        "bonus2": "2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。",
-        "bonus4": "4点：Tidecallが対象にあなたの最大体力5%のシールドを6秒付与。"
+        "name": "潮の守りの鎖帷子",
+        "bonus2": "体力が50%未満の味方への癒しの水流の詠唱時間が0.5秒短縮されます。",
+        "bonus4": "潮呼びは、その対象にもあなたの最大体力の5%のシールドを6秒間付与します。"
       },
       "vanguard_warlock_affliction": {
-        "name": "ヴァンガード：Dreadquill Vestments",
-        "bonus2": "2点：Harrowの詠唱時間が0.3秒短縮。",
-        "bonus4": "4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。"
+        "name": "恐怖の羽ペンの祭服",
+        "bonus2": "責め苦の詠唱時間が0.3秒短縮されます。",
+        "bonus4": "喰らうの回復量が30%増加し、移動しながらチャネルできます。"
       },
       "vanguard_warlock_demonology": {
-        "name": "ヴァンガード：Marrowbound Regalia",
-        "bonus2": "2点：Bone Armorのクールダウンが10秒短縮。",
-        "bonus4": "4点：Reaping CommandでBone Armorの残りクールダウンが2秒短縮。"
+        "name": "骨髄の縛めの礼装",
+        "bonus2": "骨の鎧のクールダウンが10秒短縮されます。",
+        "bonus4": "刈り取りの号令が骨の鎧の残りクールダウンを2秒短縮します。"
       },
       "vanguard_warlock_destruction": {
-        "name": "ヴァンガード：Slagcrown Vestments",
-        "bonus2": "2点：Cinderhideのクールダウンが30秒短縮。",
-        "bonus4": "4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。"
+        "name": "鉱滓の冠の祭服",
+        "bonus2": "燼皮のクールダウンが30秒短縮されます。",
+        "bonus4": "コンフラグレートを2回使うごとに、8秒以内の次の破滅の矢が即時詠唱になります。"
       },
       "vanguard_warrior_arms": {
-        "name": "ヴァンガード：Bladewake Battlegear",
-        "bonus2": "2点：Maiming StrikeでOnrushの残りクールダウンが1秒短縮。",
-        "bonus4": "4点：Onrushが次のMaiming Strikeを20%強化。"
+        "name": "刃跡の戦装束",
+        "bonus2": "重傷の一撃が突撃の残りクールダウンを1秒短縮します。",
+        "bonus4": "突撃は次の重傷の一撃も20%強化します（血染めの手の強化1スタック）。"
       },
       "vanguard_warrior_fury": {
-        "name": "ヴァンガード：Bloodmarch Ragegear",
-        "bonus2": "2点：Vaulting Chargeのクールダウンが8秒短縮。",
-        "bonus4": "4点：Vaulting Chargeの着地で激怒する。"
+        "name": "血の行軍の憤怒の装備",
+        "bonus2": "英雄的跳躍のクールダウンが8秒短縮されます。",
+        "bonus4": "英雄的跳躍で着地すると激昂します。"
       },
       "vanguard_warrior_prot": {
-        "name": "ヴァンガード：Ironmarch Bulwark",
-        "bonus2": "2点：Faultlineのクールダウンが5秒短縮。",
-        "bonus4": "4点：Faultlineで受けるダメージが6秒間10%低下。"
+        "name": "鉄の行軍の防壁",
+        "bonus2": "断層のクールダウンが5秒短縮されます。",
+        "bonus4": "断層は、受けるダメージも6秒間10%軽減します。"
       },
       "vesperash": {
         "name": "ヴェスパーアッシュの外套",

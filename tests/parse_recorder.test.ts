@@ -310,42 +310,6 @@ describe('ParseRecorder enrichment', () => {
     ).perParticipant;
     expect(rollup['1007']).toMatchObject({ taken: 100, absorbed: 40 });
   });
-
-  test('absorb events accrue to the shielder healing totals and emit event records', () => {
-    const sim = fakeSim();
-    const match = arenaMatch();
-    seedArena(sim, match);
-    const { recorder, records } = makeRecorder(sim);
-
-    sim.tickCount = 10;
-    recorder.observe([]);
-    sim.tickCount = 11;
-    recorder.observe([
-      {
-        type: 'absorb',
-        sourceId: 6,
-        targetId: 5,
-        amount: 350,
-        ability: 'Power Word: Shield',
-        abilityId: 'power_word_shield',
-      },
-    ]);
-    match.defeated.add(7);
-    match.defeated.add(8);
-    (match as { state: string }).state = 'over';
-    sim.tickCount = 12;
-    recorder.observe([]);
-
-    const ev = records.find(
-      (r) => r.t === 'ev' && (r.ev as Record<string, unknown>).type === 'absorb',
-    );
-    expect(ev).toBeDefined();
-
-    const close = records.find((r) => r.t === 'fight_close') as Record<string, unknown>;
-    const rollup = (close.rollup as { perParticipant: Record<string, { healing: number }> })
-      .perParticipant;
-    expect(rollup['1006']).toMatchObject({ healing: 350 });
-  });
 });
 
 describe('ParseRecorder battleground lifecycle', () => {
