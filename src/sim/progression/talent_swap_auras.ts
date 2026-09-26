@@ -116,6 +116,13 @@ export function droppedAbilityIds(
 
 type OrphanCandidate = Pick<Aura, 'id' | 'kind'> & Partial<Pick<Aura, 'permanent'>>;
 
+const LIVE_RECONCILED_BUFF_IDS = new Set([
+  // Warlock Fiendhide is a long-lived class self-buff whose active armor and
+  // magic reduction are refreshed by reconcileWarlockTalentState after a talent
+  // swap; stripping it here loses the aura before that sync can run.
+  'demon_skin',
+]);
+
 /** The whole orphan rule (see the header) as one predicate over an aura the
  *  swapping player applied. Returns null when the change orphans nothing. */
 export function talentSwapOrphanMatcher(
@@ -139,6 +146,7 @@ export function talentSwapOrphanMatcher(
       if (now === undefined) return true;
       if (now === was) return false;
       const toggle = isFormAuraKind(aura.kind) || isWarriorStanceKind(aura.kind);
+      if (LIVE_RECONCILED_BUFF_IDS.has(aura.id)) return false;
       return !toggle && aura.permanent !== true;
     }
     if (now !== undefined) return false;

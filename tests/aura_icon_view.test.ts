@@ -317,7 +317,7 @@ describe('resolveAuraIconId', () => {
     // ProcDef producers plus the closed semantic inventory above.
     expect(choiceSources).toHaveLength(7);
     expect(new Set(choiceSources.map(([id]) => id)).size).toBe(choiceSources.length);
-    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(106);
+    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(107);
     const expected = new Map<string, string>([
       ...choiceSources,
       ...NON_CHOICE_RUNTIME_AURA_SOURCES,
@@ -334,7 +334,7 @@ describe('resolveAuraIconId', () => {
       POWERUPS.reduce((count, definition) => count + definition.buffs.length, 0),
     );
     expect(REUSED_PAINTED_RUNTIME_AURA_SOURCES).toHaveLength(12);
-    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(146);
+    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(147);
     for (const [id, source] of expected) {
       const paintedIdentity = hasAuraImageIdentity(id) ? id : source;
       const imageUrl = auraImageUrl(paintedIdentity);
