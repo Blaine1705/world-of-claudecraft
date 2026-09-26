@@ -1240,8 +1240,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dawnholdMap.story.ground': 'Садовый этаж',
   'hudChrome.dawnholdMap.story.solar': 'Светлица',
   'hudChrome.guildRanks.tab': 'Ранги',
-  'hudChrome.guildRanks.introEdit': 'Назовите ранги гильдии и выберите, что может делать каждый из них. После сохранения изменения применятся ко всем участникам с этим рангом.',
-  'hudChrome.guildRanks.introView': 'Названия рангов и их возможности. Менять их может только глава гильдии.',
+  'hudChrome.guildRanks.introEdit':
+    'Назовите ранги гильдии и выберите, что может делать каждый из них. После сохранения изменения применятся ко всем участникам с этим рангом.',
+  'hudChrome.guildRanks.introView':
+    'Названия рангов и их возможности. Менять их может только глава гильдии.',
   'hudChrome.guildRanks.colRank': 'Ранг',
   'hudChrome.guildRanks.colTitle': 'Название',
   'hudChrome.guildRanks.colMembers': 'Участники',
@@ -1256,8 +1258,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildRanks.perm.events': 'Календарь',
   'hudChrome.guildRanks.permHint.invite': 'Приглашать игроков в гильдию и отвечать на их заявки.',
   'hudChrome.guildRanks.permHint.remove': 'Исключать участников с более низким рангом.',
-  'hudChrome.guildRanks.permHint.promote': 'Повышать и понижать участников с более низким рангом, но не выше чем на один ранг ниже своего.',
-  'hudChrome.guildRanks.permHint.bank': 'Класть и забирать медь и предметы из банка гильдии. Все участники могут его просматривать.',
+  'hudChrome.guildRanks.permHint.promote':
+    'Повышать и понижать участников с более низким рангом, но не выше чем на один ранг ниже своего.',
+  'hudChrome.guildRanks.permHint.bank':
+    'Класть и забирать медь и предметы из банка гильдии. Все участники могут его просматривать.',
   'hudChrome.guildRanks.permHint.officerChat': 'Читать и писать в офицерский чат.',
   'hudChrome.guildRanks.permHint.motd': 'Редактировать доску гильдии.',
   'hudChrome.guildRanks.permHint.events': 'Добавлять и удалять события календаря гильдии.',
@@ -1270,12 +1274,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildRanks.moveDown': 'Опустить {rank}',
   'hudChrome.guildRanks.remove': 'Удалить {rank}',
   'hudChrome.guildRanks.full': 'В гильдии может быть не больше {max} рангов.',
-  'hudChrome.guildRanks.invalidTitle': 'Названия рангов используют буквы, цифры, пробелы, апострофы и дефисы, до {max} символов.',
-  'hudChrome.guildRanks.removeConfirm': 'Участники с рангом {rank} станут {fallback}. Удалить этот ранг?',
+  'hudChrome.guildRanks.invalidTitle':
+    'Названия рангов используют буквы, цифры, пробелы, апострофы и дефисы, до {max} символов.',
+  'hudChrome.guildRanks.removeConfirm':
+    'Участники с рангом {rank} станут {fallback}. Удалить этот ранг?',
   'hudChrome.guildRanks.removeAccept': 'Удалить ранг',
   'hudChrome.guildRanks.promoteTo': 'Повысить {name} до {rank}',
   'hudChrome.guildRanks.demoteTo': 'Понизить {name} до {rank}',
-  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Подсказка',
   'hudChrome.raidLockout.title': 'Блокировки рейдов',
   'hudChrome.raidLockout.allReady': 'Все рейды доступны',
   'hudChrome.raidLockout.daysHours': '{d}д {h}ч',
@@ -10752,8 +10757,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingStatusCancelled': 'Отменён',
   'hudChrome.wocMarket.listingStatusSuspended': 'Приостановлен',
   'hudChrome.wocMarket.listingStatusUnsold': 'Не продан',
-  'hudChrome.wocMarket.charselectWebLink': 'Делайте ставки, покупайте или продавайте на сайте биржи $WOC',
-  'hudChrome.wocMarket.charselectWebNote': 'Чтобы делать ставки, покупать или продавать, войдите в игру персонажем.',
+  'hudChrome.wocMarket.charselectWebLink':
+    'Делайте ставки, покупайте или продавайте на сайте биржи $WOC',
+  'hudChrome.wocMarket.charselectWebNote':
+    'Чтобы делать ставки, покупать или продавать, войдите в игру персонажем.',
   'hudChrome.wocMarket.bidBondPayItemAria': 'Оплатить залог {bond} за ставку на {item}',
   'hudChrome.wocMarket.strikesTip':
     'Штраф начисляется каждый раз, когда вы не оплачиваете сделку, на которую согласились. После первого каждый следующий штраф отстраняет вас от биржи на всё больший срок: 3 дня, затем 14, затем 90, затем год.',
@@ -14217,7 +14224,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toZone': 'Карта региона',
   'hudChrome.enchanting.wornTagIndexed': 'Надето ({slot} {index})',
   'hudChrome.targetAuras.title': 'Ауры цели',
-  'hudChrome.targetAuras.close': 'Закрыть окно аур цели',
   'hudChrome.auraTracks.defensives': 'Защитные умения',
   'hudChrome.auraTracks.self': 'Мои эффекты',
   'hudChrome.auraTracks.power': 'Атакующие умения',
