@@ -24,6 +24,7 @@ import {
   spiritVeilKeyOfTuple,
 } from '../src/render/characters/spirit_veil_family_core';
 import type { CompileArmHost } from '../src/render/compile_arms';
+import { gpuPrepKindOfLabel } from '../src/render/gpu_prep_budget_core';
 import {
   BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE,
   CONSTRAINED_PREWARM_KEEP,
@@ -39,6 +40,7 @@ import {
   SPIRIT_VEIL_PREWARM_ENTRY_ID,
   spiritVeilFamilyPrewarmEntry,
 } from '../src/render/spirit_veil_prewarm';
+import { stripComments } from './helpers/strip_comments';
 
 const BASE: PrewarmPolicyInput = {
   constrainedMemory: false,
@@ -184,6 +186,16 @@ describe('the entities.spirit-veil-family entry', () => {
     expect(next).toBeGreaterThan(veil);
     expect(renderer.slice(veil, next)).toContain('...spiritVeilFamilyPrewarmEntry(');
   });
+
+  it('is wired into the world renderer: the per-rig sort and the reduced-motion freeze', () => {
+    // Without it three draws a veiled rig in its default order (colour before
+    // the depth pre-pass) and the shimmer ignores reduced motion.
+    const renderer = stripComments(
+      readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
+    );
+    const install = 'installSpiritVeil(this.webgl, () => this.reducedMotion());';
+    expect(renderer.split(install).length - 1).toBe(1);
+  });
 });
 
 describe('a tuple outside the family', () => {
@@ -204,6 +216,9 @@ describe('a tuple outside the family', () => {
     for (const call of h.queued) {
       expect(call.priority).toBe(GPU_WORK_PRIORITY.BACKGROUND);
       expect(call.releaseTail).toBe(true);
+      // The key names the gap in the perf report's unit rows; the budget and
+      // the lanes price every late link as one kind, the head before the colon.
+      expect(gpuPrepKindOfLabel(call.label ?? '')).toBe('spirit-veil-late');
     }
     expect(spiritVeilTuplesLinked(outside)).toBe(true);
     expect(spiritVeilTuplesLinked([family])).toBe(false);

@@ -246,6 +246,42 @@ describe('createSpiritVeilTransparentSort', () => {
     expect(rig.z).toBe(6);
   });
 
+  it("keeps three's order among the world's transparents when veil units are mixed in", () => {
+    // Every band three sorts on, with units of several rigs interleaved and
+    // ties on z and on renderOrder between the world items and the units.
+    let seed = 7;
+    const next = (n: number): number => {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed % n;
+    };
+    const rigs = [
+      createSpiritVeilSortUnit(),
+      createSpiritVeilSortUnit(),
+      createSpiritVeilSortUnit(),
+    ];
+    const passes: SpiritVeilPass[] = ['depth', 'color', 'decal'];
+    for (let round = 0; round < 40; round++) {
+      const sort = createSpiritVeilTransparentSort(() => round);
+      const world: SpiritVeilSortItem[] = [];
+      const all: SpiritVeilSortItem[] = [];
+      for (let i = 0; i < 24; i++) {
+        const entry = item(next(6), next(5) - 2);
+        entry.groupOrder = next(3) === 0 ? next(3) - 1 : 0;
+        world.push(entry);
+        all.push(entry);
+      }
+      for (let i = 0; i < 18; i++) {
+        all.push(item(next(6) + next(2) * 0.5, next(5) - 2, rigs[next(3)], passes[next(3)]));
+      }
+      for (let i = all.length - 1; i > 0; i--) {
+        const j = next(i + 1);
+        [all[i], all[j]] = [all[j], all[i]];
+      }
+      const sorted = [...all].sort(sort).filter((entry) => world.includes(entry));
+      expect(sorted).toEqual([...world].sort(reversePainter));
+    }
+  });
+
   it('puts the unit in the default band whatever renderOrder its meshes carry', () => {
     const sort = createSpiritVeilTransparentSort(() => 1);
     const rig = createSpiritVeilSortUnit();
