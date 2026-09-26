@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { activateGfxProfile, GFX, getActiveGfxProfile } from '../src/render/gfx';
 import { startInteriorEncounterPrewarm } from '../src/render/interior_encounter_prewarm_pass';
+import { collectObjectTextures } from '../src/render/material_texture_slots';
 import { NYTHRAXIS_GRAVE_PREWARM_NAME } from '../src/render/nythraxis_grave_flame_visual';
 import { MOBS } from '../src/sim/data';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
@@ -343,6 +344,25 @@ describe('interior encounter prewarm pass (driven)', () => {
     await drain();
     expect(rigs.built).toEqual([]);
     expect(host.compiled).toEqual([NYTHRAXIS_GRAVE_PREWARM_NAME]);
+  });
+
+  it('uploads the textures bound on the staged encounter visuals before their bounded render', async () => {
+    // The pass reads each staged root's map slots through the shared
+    // material_texture_slots walk: every texture the raid sets bind must reach
+    // webgl.initTexture, and nothing else does.
+    const host = fakeHost();
+    const roots: THREE.Object3D[] = [];
+    const compile = host.compilePrewarmColorPrograms;
+    host.compilePrewarmColorPrograms = async (root: THREE.Object3D) => {
+      roots.push(root);
+      return compile(root);
+    };
+    startInteriorEncounterPrewarm('ignivar_lift', host);
+    await drain();
+    expect(roots.length).toBeGreaterThan(5);
+    const bound = new Set(roots.flatMap((root) => [...collectObjectTextures(root, false)]));
+    expect(bound.size).toBeGreaterThan(0);
+    expect(new Set(host.uploaded)).toEqual(bound);
   });
 
   it('compiles and retains the Ignivar mechanic visuals beside the Varkhul set', async () => {
