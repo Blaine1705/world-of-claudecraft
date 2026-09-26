@@ -514,6 +514,11 @@ function meshPass(mesh: THREE.Mesh): SpiritVeilPass | null {
   return mat ? spiritVeilPassOf(mat) : null;
 }
 
+function meshPalette(mesh: THREE.Mesh): SpiritVeilPalette | null {
+  const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+  return mat ? spiritVeilPaletteOf(mat) : null;
+}
+
 /**
  * One visual's veil state, mirrored from what its meshes actually MOUNT (a
  * veil still linking behind the effect gate is not mounted, and the rig keeps
@@ -528,25 +533,36 @@ export class SpiritVeilRig {
   private readonly tagged = new Set<THREE.Object3D>();
   private readonly hidden = new Map<THREE.Object3D, boolean>();
   private isMounted = false;
+  private mountedPalette: SpiritVeilPalette | null = null;
 
   /** A veil is on this rig's meshes. */
   get mounted(): boolean {
     return this.isMounted;
   }
 
+  /** The palette the mounted veil wears, null while none is mounted. */
+  get palette(): SpiritVeilPalette | null {
+    return this.mountedPalette;
+  }
+
   /**
    * Mirror the mounted veil: a depth sibling under every body wearing the veil
    * colour, the sort unit on every veiled draw, and `hide` hidden (their prior
-   * visibility restored once the veil comes off). Returns whether the veil is
-   * mounted.
+   * visibility restored once the veil comes off; a function is asked with the
+   * mounted palette). Returns whether the veil is mounted.
    */
-  sync(meshes: Iterable<THREE.Mesh>, hide: readonly THREE.Object3D[]): boolean {
+  sync(
+    meshes: Iterable<THREE.Mesh>,
+    hide: readonly THREE.Object3D[] | ((palette: SpiritVeilPalette) => readonly THREE.Object3D[]),
+  ): boolean {
     const current = new Set(meshes);
     const bodies = new Set<THREE.Mesh>();
     const kept = new Set<THREE.Object3D>();
+    let palette: SpiritVeilPalette | null = null;
     for (const mesh of current) {
       const pass = meshPass(mesh);
       if (pass !== 'color' && pass !== 'decal') continue;
+      palette ??= meshPalette(mesh);
       this.tag(mesh, pass);
       kept.add(mesh);
       if (pass !== 'color') continue;
@@ -570,7 +586,14 @@ export class SpiritVeilRig {
     }
     for (const object of [...this.tagged]) if (!kept.has(object)) this.untag(object);
     this.isMounted = kept.size > 0;
-    this.syncHidden(this.isMounted ? hide : []);
+    this.mountedPalette = this.isMounted ? (palette ?? 'spirit') : null;
+    const hidden =
+      this.mountedPalette === null
+        ? []
+        : typeof hide === 'function'
+          ? hide(this.mountedPalette)
+          : hide;
+    this.syncHidden(hidden);
     return this.isMounted;
   }
 
@@ -587,6 +610,7 @@ export class SpiritVeilRig {
     this.syncHidden([]);
     this.siblings.clear();
     this.isMounted = false;
+    this.mountedPalette = null;
   }
 
   private tag(object: THREE.Object3D, pass: SpiritVeilPass): void {

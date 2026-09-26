@@ -71,15 +71,15 @@ import {
   createGhostEffectMaterial,
   createMoonkinEffectMaterial,
   createShadowformEffectMaterial,
-  type GhostStyle,
-  ghostEffectOpacity,
 } from './effect_materials';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import {
+  createSpiritVeilMaterial,
   noteSpiritVeilMiss,
   SpiritVeilRig,
   spiritVeilDepthMaterial,
   spiritVeilKeysFor,
+  spiritVeilPaletteOf,
   spiritVeilPassOf,
   spiritVeilShapeKey,
   spiritVeilTuplesLinked,
@@ -118,6 +118,11 @@ import { configureTightBoneTextures } from './skin_gpu_layout';
 import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
+import {
+  SPIRIT_VEIL_POLICY,
+  type SpiritVeilPalette,
+  type SpiritVeilPolicy,
+} from './spirit_veil_palette_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
 import { warriorActionBlend } from './warrior_action_blend';
@@ -363,7 +368,8 @@ const FEROCITY_EMISSIVE = [0x2a0802, 0x4a0803, 0x6a0803] as const;
 const FEROCITY_EMISSIVE_STRENGTH = [0.08, 0.15, 0.23] as const;
 const ASCENSION_TINT = new THREE.Color(0xffe49a);
 
-export type { GhostStyle } from './effect_materials';
+/** What a ghosted visual wears: a spirit veil palette, or the stealth twin. */
+export type GhostLook = SpiritVeilPalette | 'stealth';
 
 /** The live mixer facts the pure watchdog decides on (see anim_state.ts). */
 function readActionWeight(a: THREE.AnimationAction, into?: AnimActionWeight): AnimActionWeight {
@@ -587,7 +593,7 @@ export class CharacterVisual {
   private stowArmBone: THREE.Object3D | null | undefined;
   private disposed = false;
   private ghosted = false;
-  private ghostStyle: GhostStyle = 'spirit';
+  private ghostLook: GhostLook = 'spirit';
   private mixer: THREE.AnimationMixer;
   private skeletonUpdates: SkeletonUpdateCache;
   private actions = new Map<string, THREE.AnimationAction>();
@@ -663,8 +669,8 @@ export class CharacterVisual {
   private templarsVerdictFx: PaladinTemplarsVerdictFx | null = null;
   private templarsVerdictAction: THREE.AnimationAction | null = null;
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
-  /** The spirit veil's colour materials, per mesh shape then per source (one
-   *  material never draws two shapes: ghost_veil.ts). */
+  /** The spirit veil's colour materials, per (palette, mesh shape) then per
+   *  source (one material never draws two shapes: ghost_veil.ts). */
   private veilMaterials = new Map<string, Map<THREE.Material, THREE.Material>>();
   private readonly spiritVeil = new SpiritVeilRig();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
@@ -2008,10 +2014,18 @@ export class CharacterVisual {
     this.applyCasterShadows();
   }
 
-  /** A released spirit casts no shadow; the flags come back from the
-   *  renderer's plan once the veil comes off. */
+  /** Whether the mounted veil's palette gives up `what` (spirit_veil_palette_
+   *  core.ts): read off what is mounted, so a veil still linking behind the
+   *  effect gate changes nothing yet. */
+  private veilDrops(what: keyof SpiritVeilPolicy): boolean {
+    const palette = this.spiritVeil.palette;
+    return palette !== null && !SPIRIT_VEIL_POLICY[palette][what];
+  }
+
+  /** A veil that casts no shadow keeps the rig out of the shadow pass; the
+   *  flags come back from the renderer's plan once the veil comes off. */
   private casterShadowOn(): boolean {
-    return this.shadowOn && !this.spiritVeil.mounted;
+    return this.shadowOn && !this.veilDrops('castsShadow');
   }
 
   private applyCasterShadows(): void {
@@ -2077,7 +2091,7 @@ export class CharacterVisual {
   private syncShadowProxyVisibility(): void {
     if (!this.shadowProxy) return;
     const show =
-      !this.spiritVeil.mounted &&
+      !this.veilDrops('castsShadow') &&
       shadowProxyShown(this.proxyShadowWanted, this.farMesh !== null, this.farCompilePending);
     if (this.shadowProxy.visible !== show) this.shadowProxy.visible = show;
   }
@@ -2213,10 +2227,10 @@ export class CharacterVisual {
     return this.far;
   }
 
-  setGhost(on: boolean, style: GhostStyle = 'spirit'): void {
-    if (on === this.ghosted && style === this.ghostStyle) return;
+  setGhost(on: boolean, look: GhostLook = 'spirit'): void {
+    if (on === this.ghosted && look === this.ghostLook) return;
     this.ghosted = on;
-    this.ghostStyle = style;
+    this.ghostLook = look;
     this.applyVisualMaterials();
   }
 
@@ -2390,25 +2404,40 @@ export class CharacterVisual {
     this.syncSpiritVeil();
   }
 
+  /** The veil palette the current effect state asks for, or null when it
+   *  asks for none. */
+  private activeVeilPalette(): SpiritVeilPalette | null {
+    if (this.soulRend) return null;
+    if (this.ghosted && this.ghostLook !== 'stealth') return this.ghostLook;
+    return null;
+  }
+
   /** Mirror a mounted spirit veil onto the rig (depth siblings, sort unit,
-   *  halo and weapon-VFX hidden) and its shadow off; everything back on
-   *  revive. Material sweeps only, never per frame. */
+   *  halo hidden, and the weapon-skin VFX and the shadow as its palette's
+   *  policy says); everything back on revive. Material sweeps only, never
+   *  per frame. */
   private syncSpiritVeil(): void {
     const was = this.spiritVeil.mounted;
-    if (!was && !(this.ghosted && this.ghostStyle === 'veil' && !this.soulRend)) return;
+    if (!was && this.activeVeilPalette() === null) return;
     const meshes = [...this.originalMaterials.keys()];
     if (this.farMesh) meshes.push(this.farMesh);
-    const hide: THREE.Object3D[] = [];
-    for (const mesh of this.originalMaterials.keys())
-      if (mesh.name === 'class_halo') hide.push(mesh);
-    for (const handle of this.weaponVfx) {
-      // The light stays visible (three counts visible point lights into every
-      // lit program key); updateWeaponVfx holds it at intensity 0 instead.
-      for (const part of handle.group.children) if (part !== handle.light) hide.push(part);
-    }
+    const hide = (palette: SpiritVeilPalette): THREE.Object3D[] => {
+      const hidden: THREE.Object3D[] = [];
+      for (const mesh of this.originalMaterials.keys())
+        if (mesh.name === 'class_halo') hidden.push(mesh);
+      if (SPIRIT_VEIL_POLICY[palette].weaponVfx) return hidden;
+      for (const handle of this.weaponVfx) {
+        // The light stays visible (three counts visible point lights into every
+        // lit program key); updateWeaponVfx holds it at intensity 0 instead.
+        for (const part of handle.group.children) if (part !== handle.light) hidden.push(part);
+      }
+      return hidden;
+    };
     const mounted = this.spiritVeil.sync(meshes, hide);
-    if (mounted) for (const handle of this.weaponVfx) if (handle.light) handle.light.intensity = 0;
-    if (mounted !== was) this.applyCasterShadows();
+    if (mounted && this.veilDrops('weaponVfx')) {
+      for (const handle of this.weaponVfx) if (handle.light) handle.light.intensity = 0;
+    }
+    if (mounted || was) this.applyCasterShadows();
   }
 
   /**
@@ -2530,9 +2559,10 @@ export class CharacterVisual {
       // scratch and the sibling attaches only at the commit.
       if (spiritVeilPassOf(entry.material) === 'color') {
         const shape = spiritVeilShapeKey(source);
-        if (!veilDepthShapes.has(shape)) {
-          veilDepthShapes.add(shape);
-          twin(spiritVeilDepthMaterial(shape)).castShadow = false;
+        const palette = spiritVeilPaletteOf(entry.material) ?? 'spirit';
+        if (!veilDepthShapes.has(`${palette}|${shape}`)) {
+          veilDepthShapes.add(`${palette}|${shape}`);
+          twin(spiritVeilDepthMaterial(shape, palette)).castShadow = false;
         }
       }
     }
@@ -3228,8 +3258,8 @@ export class CharacterVisual {
     // leaving its motes hanging in the air and its light stuck at whatever
     // the last flicker wrote.
     if (farMeshShown(this.far, this.farMesh !== null, this.farCompilePending)) return;
-    // A released spirit's weapon aura is hidden and its light held at 0.
-    if (this.spiritVeil.mounted) return;
+    // A veil that drops the weapon-skin VFX hides them and holds the light at 0.
+    if (this.veilDrops('weaponVfx')) return;
     this.applyWeaponVfxShed(shed);
     for (const handle of this.weaponVfx) handle.update(dt);
   }
@@ -3611,13 +3641,11 @@ export class CharacterVisual {
   // shadowform, or shifts to moonkin), and it links a second program on its
   // first draw because three keys its cache on customProgramCacheKey().
   private effectSingleMaterial(material: THREE.Material, mesh: THREE.Mesh): THREE.Material {
-    // Death treatments (soul rend, ghost run) win over the shapeshift tints.
+    // Death treatments (soul rend, the veil) win over the shapeshift tints.
     if (this.soulRend) return this.soulRendMaterial(material);
-    if (this.ghosted) {
-      return this.ghostStyle === 'veil'
-        ? this.veilMaterial(material, mesh)
-        : this.ghostMaterial(material);
-    }
+    const veilPalette = this.activeVeilPalette();
+    if (veilPalette) return this.veilMaterial(material, mesh, veilPalette);
+    if (this.ghosted) return this.ghostMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
     if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);
@@ -3684,33 +3712,31 @@ export class CharacterVisual {
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {
-    const opacity = ghostEffectOpacity(this.ghostStyle);
     const cached = this.ghostMaterials.get(material);
-    if (cached) {
-      // one cache serves both flavors; rewrite the opacity on style flips
-      // (stealth -> die -> ghost run reuses the same clones)
-      cached.opacity = opacity;
-      return cached;
-    }
-    const ghost = createGhostEffectMaterial(material, this.ghostStyle);
+    if (cached) return cached;
+    const ghost = createGhostEffectMaterial(material, 'stealth');
     this.ghostMaterials.set(material, ghost);
     return ghost;
   }
 
   /** The veil keeps the class halo's own material: the halo is hidden
    *  while veiled (syncSpiritVeil), so it needs no program of the family. */
-  private veilMaterial(material: THREE.Material, mesh: THREE.Mesh): THREE.Material {
+  private veilMaterial(
+    material: THREE.Material,
+    mesh: THREE.Mesh,
+    palette: SpiritVeilPalette,
+  ): THREE.Material {
     if (mesh.name === 'class_halo') return material;
-    const shape = spiritVeilShapeKey(mesh);
-    let byShape = this.veilMaterials.get(shape);
-    if (!byShape) {
-      byShape = new Map();
-      this.veilMaterials.set(shape, byShape);
+    const key = `${palette}|${spiritVeilShapeKey(mesh)}`;
+    let bySource = this.veilMaterials.get(key);
+    if (!bySource) {
+      bySource = new Map();
+      this.veilMaterials.set(key, bySource);
     }
-    let veil = byShape.get(material);
+    let veil = bySource.get(material);
     if (!veil) {
-      veil = createGhostEffectMaterial(material, 'veil');
-      byShape.set(material, veil);
+      veil = createSpiritVeilMaterial(material, palette);
+      bySource.set(material, veil);
     }
     return veil;
   }

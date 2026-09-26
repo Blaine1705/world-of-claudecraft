@@ -133,7 +133,7 @@ describe('CharacterVisual dispose() clears every cosmetic-overlay material cache
     visual.setAuraGlow(0xffffff, 0);
 
     const cacheNames = [
-      'ghostMaterials',
+      'veilMaterials',
       'soulRendMaterials',
       'shadowformMaterials',
       'moonkinMaterials',

@@ -64,7 +64,7 @@ function fakeVisual(overrides: Record<string, unknown> = {}): AnyVisual {
     farMesh: null,
     farMaterials: null,
     ghosted: false,
-    ghostStyle: 'spirit',
+    ghostLook: 'spirit',
     ghostMaterials: new Map(),
     veilMaterials: new Map(),
     spiritVeil: new SpiritVeilRig(),

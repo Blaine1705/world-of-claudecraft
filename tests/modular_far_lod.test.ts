@@ -35,7 +35,7 @@ import {
   farSourceMaterials,
   takeFarBakeBudget,
 } from '../src/render/characters/assets';
-import { SpiritVeilRig } from '../src/render/characters/ghost_veil';
+import { SpiritVeilRig, spiritVeilPassOf } from '../src/render/characters/ghost_veil';
 import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
 import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
 import { CharacterVisual } from '../src/render/characters/visual';
@@ -398,14 +398,16 @@ describe('buildComposedFar catches a fresh far mesh up on effect state', () => {
       originalMaterials: new Map(),
       farMesh: null,
       farMaterials: null,
-      // A ghost is on before this mesh ever existed, the exact scenario the
+      // A veil is on before this mesh ever existed, the exact scenario the
       // fix closes: a player who stealthed near the camera, then walked far
       // enough to cross into the far band for the first time.
       ghosted: true,
-      ghostStyle: 'spirit',
+      ghostLook: 'spirit',
       ghostMaterials: new Map(),
       veilMaterials: new Map(),
       spiritVeil: new SpiritVeilRig(),
+      casters: [],
+      shadowOn: false,
       weaponVfx: [],
       soulRend: false,
       metamorph: false,
@@ -467,13 +469,13 @@ describe('buildComposedFar catches a fresh far mesh up on effect state', () => {
     expect(order).toEqual(['buildFarMeshes', 'applyVisualMaterials']);
 
     // And the effect actually reached the mesh: a ghosted body's far material
-    // is a transparent clone, never the raw tinted material tintedFarMaterials
-    // handed back. Without the fix this stays the raw, opaque reference.
+    // is its veil, never the raw tinted material tintedFarMaterials handed
+    // back. Without the fix this stays the raw, opaque reference.
     const farMesh = fake.farMesh as THREE.Mesh;
     expect(farMesh).not.toBeNull();
-    const farMat = (farMesh.material as THREE.Material[])[0] as THREE.MeshStandardMaterial;
+    const farMat = (farMesh.material as THREE.Material[])[0];
     expect(farMat).not.toBe(rawFarMats[0]);
-    expect(farMat.transparent).toBe(true);
+    expect(spiritVeilPassOf(farMat)).toBe('color');
   });
 
   it('never calls applyVisualMaterials when the bake yields nothing, so the cheap path stays cheap', () => {
@@ -535,7 +537,7 @@ describe('attemptComposedFar keeps farBakeTried in step with a refused budget', 
       farMesh: null,
       farMaterials: null,
       ghosted: false,
-      ghostStyle: 'spirit',
+      ghostLook: 'spirit',
       ghostMaterials: new Map(),
       veilMaterials: new Map(),
       spiritVeil: new SpiritVeilRig(),

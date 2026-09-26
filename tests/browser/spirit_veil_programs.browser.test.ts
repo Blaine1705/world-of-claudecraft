@@ -20,6 +20,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { assetsReady } from '../../src/render/assets/preload';
 import type { AnimState } from '../../src/render/characters/anim_state';
+import { attachArmorDye } from '../../src/render/characters/armor_dye';
 import {
   createSpiritVeilMaterial,
   installSpiritVeil,
@@ -42,6 +43,10 @@ import {
   SPIRIT_VEIL_FAMILY,
   type SpiritVeilTuple,
 } from '../../src/render/characters/spirit_veil_family_core';
+import {
+  SPIRIT_VEIL_PALETTES,
+  type SpiritVeilPalette,
+} from '../../src/render/characters/spirit_veil_palette_core';
 import { buildStubbleDecal } from '../../src/render/characters/stubble';
 import { CharacterVisual } from '../../src/render/characters/visual';
 import type { CompileArmHost } from '../../src/render/compile_arms';
@@ -428,7 +433,7 @@ describe('a death on a real CharacterVisual', () => {
         w.draw();
         const before = w.programs();
 
-        visual.setGhost(true, 'veil');
+        visual.setGhost(true, 'spirit');
         w.draw();
         w.draw();
         const passes = new Set(worn().map((m) => spiritVeilPassOf(m)));
@@ -751,6 +756,90 @@ describe('the veil knobs on a real driver', () => {
       // the sphere covers a real share of the frame, so equality means something
       expect(lit).toBeGreaterThan(SIZE * SIZE * 0.2);
       expect(differing).toBe(0);
+    });
+  }
+});
+
+describe('the veil palettes on a real driver', () => {
+  /** A lit, mapped rigid body and its depth pre-pass, veiled in `palette`. */
+  function veiledBody(w: World, source: THREE.Material, palette: SpiritVeilPalette): THREE.Mesh {
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.8, 24, 16), source);
+    body.material = createSpiritVeilMaterial(source, palette);
+    w.scene.add(body);
+    new SpiritVeilRig().sync([body], []);
+    return body;
+  }
+
+  const greyMap = (): THREE.DataTexture => {
+    const map = new THREE.DataTexture(new Uint8Array([200, 200, 200, 255]), 1, 1);
+    map.needsUpdate = true;
+    return map;
+  };
+
+  for (const offscreen of [false, true]) {
+    const arm = offscreen ? 'render-target (composer tiers)' : 'canvas (direct tiers)';
+    it(`draws every palette on the family's programs, each its own colour, ${arm}`, async () => {
+      const w = world(offscreen);
+      await linkFamily(w);
+      w.draw();
+      const before = w.programs();
+      const source = new THREE.MeshStandardMaterial({ map: greyMap(), color: 0x6699cc });
+      const pixels = new Map<string, string>();
+      for (const palette of Object.keys(SPIRIT_VEIL_PALETTES) as SpiritVeilPalette[]) {
+        const body = veiledBody(w, source, palette);
+        w.draw();
+        w.draw();
+        expect(w.programs(), palette).toBe(before);
+        pixels.set(palette, w.pixel().join(','));
+        body.removeFromParent();
+      }
+      // every palette reads differently at the centre of the body
+      expect(new Set(pixels.values()).size).toBe(pixels.size);
+    });
+
+    it(`keeps a dyed piece's dye where the palette keeps colours, never in the monochrome body, ${arm}`, async () => {
+      const w = world(offscreen);
+      await linkFamily(w);
+      w.draw();
+      const before = w.programs();
+      const plain = new THREE.MeshStandardMaterial({ map: greyMap() });
+      const dyed = new THREE.MeshStandardMaterial({ map: greyMap() });
+      // every texel to a saturated green (band 400 selects every hue)
+      attachArmorDye(dyed, {
+        rules: [
+          {
+            ref: 0,
+            band: 400,
+            sat: [-1, 0, 1.1, 1.2],
+            val: [-1, 0, 1.1, 1.2],
+            hueMode: 'abs',
+            hue: 120,
+            satMul: 0,
+            satAdd: 1,
+            valMul: 1,
+            valAdd: 0,
+          },
+        ],
+      });
+      const read = (source: THREE.Material, palette: SpiritVeilPalette): number[] => {
+        const body = veiledBody(w, source, palette);
+        w.draw();
+        w.draw();
+        const out = w.pixel();
+        body.removeFromParent();
+        return out;
+      };
+      expect(SPIRIT_VEIL_PALETTES.wolf.keepColor).toBe(1);
+      const keptPlain = read(plain, 'wolf');
+      const keptDyed = read(dyed, 'wolf');
+      // the dye turns the grey texel green in the kept colours (the render
+      // target holds linear values, so the margin is the smaller arm's)
+      expect(Math.abs(keptPlain[1] - keptPlain[0])).toBeLessThan(4);
+      expect(keptDyed[1] - keptDyed[0]).toBeGreaterThan(10);
+      // and never reaches a palette that keeps none
+      expect(SPIRIT_VEIL_PALETTES.spirit.keepColor).toBe(0);
+      expect(read(dyed, 'spirit')).toEqual(read(plain, 'spirit'));
+      expect(w.programs()).toBe(before);
     });
   }
 });

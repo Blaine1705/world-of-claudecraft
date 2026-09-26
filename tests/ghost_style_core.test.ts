@@ -1,9 +1,9 @@
-// Which translucent treatment a character wears (src/render/ghost_style_core.ts):
-// only a released spirit takes the spirit veil; every other ethereal read keeps
-// its transparent twin exactly as before the veil.
+// Which translucent look a character wears (src/render/ghost_style_core.ts):
+// every ethereal read is the spirit veil in its user's palette; a living
+// stealther keeps its transparent twin.
 
 import { describe, expect, it } from 'vitest';
-import { characterGhostStyle } from '../src/render/ghost_style_core';
+import { characterGhostLook } from '../src/render/ghost_style_core';
 import type { Entity } from '../src/sim/types';
 
 const VIEWER = 1;
@@ -19,38 +19,66 @@ function entity(over: Partial<Entity> = {}): Entity {
   } as unknown as Entity;
 }
 
-const stealth = { auras: [{ kind: 'stealth', id: 'duskveil' }] } as unknown as Partial<Entity>;
+const stealth = { auras: [{ kind: 'stealth', id: 'stealth' }] } as unknown as Partial<Entity>;
 
-describe('characterGhostStyle', () => {
-  it('veils a released spirit, whatever else it carries', () => {
-    expect(characterGhostStyle(VIEWER, entity({ ghost: true }), false, 'none')).toBe('veil');
+describe('characterGhostLook', () => {
+  it('veils a released spirit in the released-spirit palette, whatever else it carries', () => {
+    expect(characterGhostLook(VIEWER, entity({ ghost: true }), false, 'none')).toBe('spirit');
     // A dead stealther is a spirit first.
-    expect(characterGhostStyle(VIEWER, entity({ ghost: true, ...stealth }), false, 'none')).toBe(
-      'veil',
+    expect(characterGhostLook(VIEWER, entity({ ghost: true, ...stealth }), false, 'none')).toBe(
+      'spirit',
     );
+    expect(characterGhostLook(VIEWER, entity({ ghost: true }), true, 'march')).toBe('spirit');
   });
 
-  it('keeps the stealth fade for a living stealther', () => {
-    expect(characterGhostStyle(VIEWER, entity(stealth), false, 'none')).toBe('stealth');
-  });
-
-  it('keeps the thin spirit twin for Ghost Wolf, the visions, the angel and the march', () => {
-    expect(characterGhostStyle(VIEWER, entity(), true, 'none')).toBe('spirit');
-    expect(characterGhostStyle(VIEWER, entity(stealth), true, 'none')).toBe('spirit');
-    for (const templateId of ['vision_aldren_warrior', 'vision_malric_mage', 'spirit_healer']) {
+  it('veils the Pale Keeper and the quest visions exactly like a released spirit', () => {
+    for (const templateId of [
+      'vision_aldren_warrior',
+      'vision_malric_mage',
+      'vision_deathstalker_voss',
+    ]) {
       expect(
-        characterGhostStyle(VIEWER, entity({ kind: 'mob', templateId }), false, 'none'),
+        characterGhostLook(VIEWER, entity({ kind: 'mob', templateId }), false, 'none'),
         templateId,
       ).toBe('spirit');
     }
-    expect(characterGhostStyle(VIEWER, entity(), false, 'march')).toBe('spirit');
+    expect(
+      characterGhostLook(
+        VIEWER,
+        entity({ kind: 'npc', templateId: 'spirit_healer' }),
+        false,
+        'none',
+      ),
+    ).toBe('spirit');
+  });
+
+  it('gives Ghost Wolf and the Veilbound March their own palettes', () => {
+    expect(characterGhostLook(VIEWER, entity(), true, 'none')).toBe('wolf');
+    // A stealthed Ghost Wolf stays a wolf.
+    expect(characterGhostLook(VIEWER, entity(stealth), true, 'none')).toBe('wolf');
+    expect(characterGhostLook(VIEWER, entity(), true, 'march')).toBe('wolf');
+    expect(characterGhostLook(VIEWER, entity(), false, 'march')).toBe('march');
+  });
+
+  it('keeps the stealth twin for a living stealther', () => {
+    expect(characterGhostLook(VIEWER, entity(stealth), false, 'none')).toBe('stealth');
+    expect(characterGhostLook(VIEWER, entity(stealth), false, 'march')).toBe('stealth');
   });
 
   it('leaves everyone else opaque', () => {
-    expect(characterGhostStyle(VIEWER, entity(), false, 'none')).toBeNull();
-    expect(characterGhostStyle(VIEWER, entity(), false, 'mark')).toBeNull();
+    expect(characterGhostLook(VIEWER, entity(), false, 'none')).toBeNull();
+    expect(characterGhostLook(VIEWER, entity(), false, 'mark')).toBeNull();
     expect(
-      characterGhostStyle(VIEWER, entity({ kind: 'mob', templateId: 'wolf' }), false, 'none'),
+      characterGhostLook(VIEWER, entity({ kind: 'mob', templateId: 'wolf' }), false, 'none'),
+    ).toBeNull();
+    // a stealth aura on a mob is never drawn as stealth (stealth.ts)
+    expect(
+      characterGhostLook(
+        VIEWER,
+        entity({ kind: 'mob', templateId: 'wolf', ...stealth }),
+        false,
+        'none',
+      ),
     ).toBeNull();
   });
 });

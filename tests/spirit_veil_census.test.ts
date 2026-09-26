@@ -13,6 +13,8 @@
 // every held model a player can carry (item weapons, offhands, weapon skins),
 // the composed library as the real part selection and merge compose it, and
 // the procedural shapes the rig adds (the baked far mesh and the face decals).
+// The other veil users add the form rigs they wear, the quest visions (mobs on
+// fixed player rigs) and the Pale Keeper's composed look.
 //
 // The composed library is modelled the way assets.ts modularVariant builds it:
 // modularPartNames picks the nodes of a look, and mergeSkinnedParts folds the
@@ -41,6 +43,7 @@ import {
   itemWeaponModelUrls,
   VISUALS,
   visualAssetUrlForGraphics,
+  visualKeyFor,
   weaponSkinModelUrls,
 } from '../src/render/characters/manifest';
 import {
@@ -65,6 +68,7 @@ import {
   MODULAR_HEAD_NODES,
   modularMergePartition,
 } from '../src/render/characters/modular_name_facts_core';
+import { NPC_LOOKS, npcLookFor, npcModularKeyFor } from '../src/render/characters/npc_looks';
 import { mergeSkinnedParts } from '../src/render/characters/rig_merge';
 import {
   SPIRIT_VEIL_FAMILY_KEYS,
@@ -72,6 +76,7 @@ import {
   type SpiritVeilShape,
   spiritVeilTupleKey,
 } from '../src/render/characters/spirit_veil_family_core';
+import type { Entity } from '../src/sim/types';
 
 interface GltfPrimitive {
   attributes: Record<string, number>;
@@ -259,6 +264,43 @@ function heldModelUrls(): string[] {
   ];
 }
 
+// The rigs the other veil users draw on top of the player rigs above (the
+// released-spirit palette's Pale Keeper and quest visions, the Ghost Wolf and
+// Veilbound March palettes). A palette is uniform values only, so each needs
+// nothing but its shapes inside the family.
+const VEILED_FORMS = ['form_ghost_wolf', 'form_sheep'] as const;
+const VISION_TEMPLATES = [
+  'vision_aldren_warrior',
+  'vision_malric_mage',
+  'vision_deathstalker_voss',
+] as const;
+const KEEPER = 'spirit_healer';
+
+function formRigUrls(): string[] {
+  const urls = new Set<string>();
+  for (const key of VEILED_FORMS) {
+    const def = VISUALS[key];
+    for (const url of [def.url, ...(def.attach ?? []).map((a) => a.url)]) {
+      urls.add(url);
+      urls.add(visualAssetUrlForGraphics(url, false));
+    }
+  }
+  return [...urls];
+}
+
+/** The keeper's composed look, as npc_looks.ts authors it, plus its props. */
+function keeperParts(): { url: string; part: Part }[] {
+  const look = NPC_LOOKS[KEEPER];
+  const out = composedParts(normalizeAppearance(look.app), look.worn).map((part) => ({
+    url: MODULAR_URL,
+    part,
+  }));
+  for (const attach of VISUALS[npcModularKeyFor(KEEPER)].attach ?? []) {
+    for (const part of allParts(attach.url)) out.push({ url: attach.url, part });
+  }
+  return out;
+}
+
 /** The shapes the rig mints at runtime, beside the GLB parts. */
 function proceduralKeys(): Map<string, string> {
   const out = new Map<string, string>();
@@ -330,6 +372,10 @@ function census(): Map<string, string> {
     if (!lookPerKeySet.has(set)) lookPerKeySet.set(set, look);
   }
   for (const [key, where] of proceduralKeys()) add([key], where);
+  for (const url of formRigUrls()) {
+    for (const part of allParts(url)) add(partKeys(url, part), part.where);
+  }
+  for (const { url, part } of keeperParts()) add(partKeys(url, part), `${KEEPER} ${part.where}`);
   return needed;
 }
 
@@ -345,6 +391,25 @@ describe('the spirit veil family covers the catalogue', () => {
   it('maps every reachable shape to a pinned tuple', () => {
     const missing = [...needed].filter(([key]) => !SPIRIT_VEIL_FAMILY_KEYS.has(key));
     expect(missing.map(([key, where]) => `${key} <- ${where}`)).toEqual([]);
+  });
+
+  it('covers the other veil users: the forms they wear, the visions, the keeper', () => {
+    // A vision is a mob drawn on a fixed player rig, which the walk above
+    // already covers; a keeper is a composed NPC.
+    for (const templateId of VISION_TEMPLATES) {
+      const key = visualKeyFor({ kind: 'mob', templateId } as Entity);
+      expect(key, templateId).toMatch(/^player_/);
+      expect(VISUALS[key].modular, templateId).not.toBe(true);
+    }
+    expect(npcLookFor(KEEPER)).not.toBeNull();
+    expect(keeperParts().length).toBeGreaterThan(5);
+    for (const key of VEILED_FORMS) expect(VISUALS[key], key).toBeDefined();
+    const users = [
+      ...formRigUrls().flatMap((url) => allParts(url).flatMap((part) => partKeys(url, part))),
+      ...keeperParts().flatMap(({ url, part }) => partKeys(url, part)),
+    ];
+    expect(users.length).toBeGreaterThan(10);
+    expect(users.filter((key) => !SPIRIT_VEIL_FAMILY_KEYS.has(key))).toEqual([]);
   });
 
   it('pins nothing the catalogue cannot reach', () => {

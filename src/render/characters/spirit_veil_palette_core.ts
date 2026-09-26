@@ -8,7 +8,7 @@
 //
 // Three-free and deterministic: tests drive it directly.
 
-export type SpiritVeilPalette = 'spirit';
+export type SpiritVeilPalette = 'spirit' | 'wolf' | 'march';
 
 export interface SpiritVeilPaletteValues {
   tint: number;
@@ -46,6 +46,30 @@ export const SPIRIT_VEIL_PALETTES: Readonly<
     keepColor: 0,
     band: 0.3,
   },
+  // The shaman's Ghost Wolf: a living combatant, never the dead blue.
+  wolf: {
+    tint: 0xb1a99a,
+    deep: 0x787878,
+    rim: 0xa3a39e,
+    rimStrength: 1.15,
+    opacity: 0.23,
+    rise: 0.72,
+    shimmer: 0,
+    keepColor: 1,
+    band: 0.3,
+  },
+  // The protection paladin's Veilbound March: holy gold.
+  march: {
+    tint: 0xffe2a0,
+    deep: 0x5a4420,
+    rim: 0xffd27a,
+    rimStrength: 1.03,
+    opacity: 0.12,
+    rise: 0.6,
+    shimmer: 0.01,
+    keepColor: 1,
+    band: 0.22,
+  },
 };
 
 /** What a veiled rig keeps. The class halo is hidden under every palette. */
@@ -58,4 +82,6 @@ export interface SpiritVeilPolicy {
 
 export const SPIRIT_VEIL_POLICY: Readonly<Record<SpiritVeilPalette, Readonly<SpiritVeilPolicy>>> = {
   spirit: { castsShadow: false, weaponVfx: false },
+  wolf: { castsShadow: false, weaponVfx: false },
+  march: { castsShadow: false, weaponVfx: true },
 };

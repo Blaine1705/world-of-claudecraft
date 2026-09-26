@@ -1,9 +1,10 @@
 // @vitest-environment happy-dom
 // A released spirit on the real CharacterVisual (src/render/characters/visual.ts
 // over ghost_veil.ts): the veil mounts on death and comes off on revive, the
-// other 'spirit' users keep their transparent twins, the face decals keep their
-// mask, the halo and the weapon-skin VFX hide, the shadow goes and comes back,
-// and no material is disposed that someone still draws.
+// face decals keep their mask, the halo and the weapon-skin VFX hide, the
+// shadow goes and comes back, and no material is disposed that someone still
+// draws. The other veil users (Ghost Wolf, the March) wear their own palette
+// on the same programs and keep what their palette's policy says.
 
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -194,7 +195,7 @@ describe('the spirit veil on a released spirit', () => {
     const blade = named(visual, 'weapon_blade');
     const living = new Map(rigMeshes(visual).map((mesh) => [mesh, mesh.material]));
 
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
 
     // No staging: every tuple is linked, so nothing waits on the gate.
     expect(gateCalls).toHaveLength(0);
@@ -257,7 +258,7 @@ describe('the spirit veil on a released spirit', () => {
     const originals = (visual as unknown as { originalMaterials: Map<THREE.Mesh, unknown> })
       .originalMaterials;
     originals.set(blade, originals.get(body));
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
     expect(single(body)).not.toBe(single(blade));
     expect((single(body) as THREE.MeshBasicMaterial).map).toBe(
       (single(blade) as THREE.MeshBasicMaterial).map,
@@ -271,7 +272,7 @@ describe('the spirit veil on a released spirit', () => {
     const body = named(visual, 'body');
     const living = single(body);
 
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
 
     // The body keeps drawing its linked materials (never a live link)...
     expect(single(body)).toBe(living);
@@ -317,7 +318,7 @@ describe('the spirit veil on a released spirit', () => {
     const source = single(decal) as THREE.MeshStandardMaterial;
     expect(source.transparent).toBe(true);
 
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
 
     const worn = single(decal) as THREE.MeshBasicMaterial;
     expect(veil.spiritVeilPassOf(worn)).toBe('decal');
@@ -345,7 +346,7 @@ describe('the spirit veil on a released spirit', () => {
     const haloMaterial = halo.material;
     expect(halo.visible).toBe(true);
 
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
     expect(halo.visible).toBe(false);
     expect(halo.material).toBe(haloMaterial);
     expect(halo.children.filter((child) => child.name === 'spirit_veil_depth')).toHaveLength(0);
@@ -364,7 +365,7 @@ describe('the spirit veil on a released spirit', () => {
     expect(blade.castShadow).toBe(true);
     const receive = rigMeshes(visual).map((mesh) => mesh.receiveShadow);
 
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
     expect(body.castShadow).toBe(false);
     expect(blade.castShadow).toBe(false);
     visual.setShadow(false);
@@ -393,7 +394,7 @@ describe('the spirit veil on a released spirit', () => {
     visual.setProxyShadow(true);
     expect(shadowProxy.visible).toBe(true);
 
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
     expect(shadowProxy.visible).toBe(false);
     // the renderer's per-frame plan keeps asking for it
     visual.setProxyShadow(true);
@@ -423,7 +424,7 @@ describe('the spirit veil on a released spirit', () => {
     const handle = { group, light, update, setTuning: vi.fn(), dispose: vi.fn() };
     (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.push(handle);
 
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
     expect(shell.visible).toBe(false);
     expect(motes.visible).toBe(false);
     expect(light.visible).toBe(true);
@@ -445,7 +446,7 @@ describe('the spirit veil on a released spirit', () => {
 
   it('never meets a depth sibling in a rig sweep, and survives a skin sweep mid-veil', async () => {
     const { visual, veil } = await makePriest(true);
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
     const priv = visual as unknown as {
       originalMaterials: Map<THREE.Mesh, unknown>;
       casters: THREE.Mesh[];
@@ -471,14 +472,14 @@ describe('the spirit veil on a released spirit', () => {
     const body = named(visual, 'body');
     const source = single(body);
     const sourceDispose = vi.spyOn(source, 'dispose');
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
     const worn = single(body);
     const wornDispose = vi.spyOn(worn, 'dispose');
     const depth = veil.spiritVeilDepthMaterial(veil.spiritVeilShapeKey(body));
     const depthDispose = vi.spyOn(depth, 'dispose');
 
     visual.setGhost(false);
-    visual.setGhost(true, 'veil');
+    visual.setGhost(true, 'spirit');
     // a second death reuses the cached veil material
     expect(single(body)).toBe(worn);
     expect(wornDispose).not.toHaveBeenCalled();
@@ -490,26 +491,130 @@ describe('the spirit veil on a released spirit', () => {
   });
 });
 
-describe('the other translucent reads keep their twins', () => {
-  it("wears today's transparent clone for the 'spirit' and 'stealth' styles, no veil anywhere", async () => {
+function weaponSkinHandle(visual: CharacterVisual) {
+  const group = new THREE.Group();
+  const light = new THREE.PointLight(0xffaa55, 2, 6, 2);
+  const shell = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial());
+  group.add(light, shell);
+  const update = vi.fn(() => {
+    light.intensity = 1.37;
+  });
+  const handle = { group, light, update, setTuning: vi.fn(), dispose: vi.fn() };
+  (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.push(handle);
+  return { handle, light, shell, update };
+}
+
+describe('the other veil users wear their own palette on the same programs', () => {
+  it('mounts each palette at once, with a depth pre-pass of that palette, and swaps between them', async () => {
     const { visual, veil, gateCalls } = await makePriest(true);
     const body = named(visual, 'body');
-    for (const style of ['spirit', 'stealth'] as const) {
-      visual.setGhost(true, style);
-      // a transparent twin is still staged behind the gate like before
-      expect(gateCalls.length).toBeGreaterThan(0);
-      gateCalls.at(-1)?.settle();
-      visual.update(FRAME, anim(), true);
+    const decal = named(visual, 'ModStubbleDecal');
+    const seen = new Set<THREE.Material>();
+    for (const palette of ['wolf', 'march', 'spirit'] as const) {
+      visual.setGhost(true, palette);
+      expect(gateCalls).toHaveLength(0);
       const worn = single(body);
-      expect(veil.spiritVeilPassOf(worn)).toBeNull();
-      expect(worn.transparent).toBe(true);
-      expect(worn.depthWrite).toBe(true);
-      expect(worn.opacity).toBe(style === 'spirit' ? 0.34 : 0.45);
-      expect(depthSiblings(visual)).toHaveLength(0);
-      expect(named(visual, 'class_halo').visible).toBe(true);
-      expect(body.castShadow).toBe(true);
-      visual.setGhost(false);
+      expect(veil.spiritVeilPassOf(worn)).toBe('color');
+      expect(veil.spiritVeilPaletteOf(worn)).toBe(palette);
+      expect(veil.spiritVeilPaletteOf(single(decal))).toBe(palette);
+      expect(seen.has(worn)).toBe(false);
+      seen.add(worn);
+      const siblings = body.children.filter((child) => child.name === 'spirit_veil_depth');
+      expect(siblings).toHaveLength(1);
+      expect((siblings[0] as THREE.Mesh).material).toBe(
+        veil.spiritVeilDepthMaterial(veil.spiritVeilShapeKey(body), palette),
+      );
+      expect(named(visual, 'class_halo').visible).toBe(false);
     }
+    // a palette worn before is the cached material, not a new one
+    visual.setGhost(true, 'wolf');
+    expect(seen.has(single(body))).toBe(true);
+    visual.setGhost(false);
+    expect(depthSiblings(visual)).toHaveLength(0);
+    expect(named(visual, 'class_halo').visible).toBe(true);
+    visual.dispose();
+  });
+
+  it('keeps the weapon-skin VFX and its light under the March, never its shadow', async () => {
+    const { visual } = await makePriest(true);
+    const body = named(visual, 'body');
+    const { light, shell, update } = weaponSkinHandle(visual);
+    visual.setGhost(true, 'march');
+    expect(shell.visible).toBe(true);
+    visual.updateWeaponVfx(FRAME);
+    expect(update).toHaveBeenCalled();
+    expect(light.intensity).toBe(1.37);
+    expect(body.castShadow).toBe(false);
+    // the same rig dead: the released-spirit palette hides them again
+    visual.setGhost(true, 'spirit');
+    expect(shell.visible).toBe(false);
+    expect(light.intensity).toBe(0);
+    update.mockClear();
+    visual.updateWeaponVfx(FRAME);
+    expect(update).not.toHaveBeenCalled();
+    visual.setGhost(false);
+    expect(shell.visible).toBe(true);
+    expect(body.castShadow).toBe(true);
+    (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.length = 0;
+    visual.dispose();
+  });
+
+  it('casts no shadow under the Ghost Wolf palette, and hides a weapon skin there', async () => {
+    const { visual } = await makePriest(true);
+    const body = named(visual, 'body');
+    const { light, shell } = weaponSkinHandle(visual);
+    const proxy = (visual as unknown as { shadowProxy: THREE.Mesh }).shadowProxy;
+    visual.setProxyShadow(true);
+    visual.setGhost(true, 'wolf');
+    expect(body.castShadow).toBe(false);
+    expect(proxy.visible).toBe(false);
+    expect(shell.visible).toBe(false);
+    expect(light.intensity).toBe(0);
+    visual.setGhost(false);
+    expect(body.castShadow).toBe(true);
+    expect(proxy.visible).toBe(true);
+    (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.length = 0;
+    visual.dispose();
+  });
+
+  it('stages a palette behind the effect gate like the released spirit when unlinked', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { visual, veil, gateCalls } = await makePriest(false);
+    const body = named(visual, 'body');
+    const living = single(body);
+    visual.setGhost(true, 'march');
+    expect(single(body)).toBe(living);
+    expect(gateCalls).toHaveLength(1);
+    const scratch = gateCalls[0].target as THREE.Group;
+    const depthTwin = scratch.children.find(
+      (child) => veil.spiritVeilPassOf(single(child as THREE.Mesh)) === 'depth',
+    ) as THREE.Mesh;
+    expect(veil.spiritVeilPaletteOf(single(depthTwin))).toBe('march');
+    gateCalls[0].settle();
+    visual.update(FRAME, anim(), true);
+    expect(veil.spiritVeilPaletteOf(single(body))).toBe('march');
+    expect(warn).toHaveBeenCalled();
+    visual.dispose();
+  });
+});
+
+describe('stealth keeps its twin', () => {
+  it("wears today's transparent clone for the 'stealth' look, no veil anywhere", async () => {
+    const { visual, veil, gateCalls } = await makePriest(true);
+    const body = named(visual, 'body');
+    visual.setGhost(true, 'stealth');
+    // a transparent twin is still staged behind the gate like before
+    expect(gateCalls.length).toBeGreaterThan(0);
+    gateCalls.at(-1)?.settle();
+    visual.update(FRAME, anim(), true);
+    const worn = single(body);
+    expect(veil.spiritVeilPassOf(worn)).toBeNull();
+    expect(worn.transparent).toBe(true);
+    expect(worn.depthWrite).toBe(true);
+    expect(worn.opacity).toBe(0.45);
+    expect(depthSiblings(visual)).toHaveLength(0);
+    expect(named(visual, 'class_halo').visible).toBe(true);
+    expect(body.castShadow).toBe(true);
     visual.dispose();
   });
 });

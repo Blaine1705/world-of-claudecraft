@@ -63,6 +63,28 @@ describe('the veil palettes', () => {
         keepColor: 0,
         band: 0.3,
       },
+      wolf: {
+        tint: 0xb1a99a,
+        deep: 0x787878,
+        rim: 0xa3a39e,
+        rimStrength: 1.15,
+        opacity: 0.23,
+        rise: 0.72,
+        shimmer: 0,
+        keepColor: 1,
+        band: 0.3,
+      },
+      march: {
+        tint: 0xffe2a0,
+        deep: 0x5a4420,
+        rim: 0xffd27a,
+        rimStrength: 1.03,
+        opacity: 0.12,
+        rise: 0.6,
+        shimmer: 0.01,
+        keepColor: 1,
+        band: 0.22,
+      },
     };
     expect(SPIRIT_VEIL_PALETTES).toEqual(expected);
     expect(SPIRIT_VEIL_LOOK).toBe(SPIRIT_VEIL_PALETTES.spirit);
@@ -71,6 +93,8 @@ describe('the veil palettes', () => {
   it('pins what a veiled rig keeps, per palette', () => {
     expect(SPIRIT_VEIL_POLICY).toEqual({
       spirit: { castsShadow: false, weaponVfx: false },
+      wolf: { castsShadow: false, weaponVfx: false },
+      march: { castsShadow: false, weaponVfx: true },
     });
   });
 });
@@ -182,6 +206,17 @@ describe('a palette is uniform values on the shared programs', () => {
     expect(fragment).toContain('uniform int uDyeCount;');
   });
 
+  it('gives two palettes their own values on one shared text', () => {
+    const source = new THREE.MeshStandardMaterial();
+    const wolf = compiled(createSpiritVeilMaterial(source, 'wolf')).uniforms;
+    const march = compiled(createSpiritVeilMaterial(source, 'march')).uniforms;
+    expect((wolf.uVeilTint.value as THREE.Color).getHex()).toBe(SPIRIT_VEIL_PALETTES.wolf.tint);
+    expect((march.uVeilTint.value as THREE.Color).getHex()).toBe(SPIRIT_VEIL_PALETTES.march.tint);
+    expect(wolf.uVeilKeepColor.value).toBe(1);
+    expect(march.uVeilBand.value).toBe(0.22);
+    expect(wolf.uVeilTint).not.toBe(march.uVeilTint);
+  });
+
   it('replays one shimmer amplitude in both passes, per palette', () => {
     const color = compiled(createSpiritVeilMaterial(new THREE.MeshStandardMaterial(), 'spirit'));
     const depthMaterial = spiritVeilDepthMaterial('depth:s:0', 'spirit');
@@ -194,6 +229,11 @@ describe('a palette is uniform values on the shared programs', () => {
     // one depth material per (palette, shape), shared by every rig
     expect(spiritVeilDepthMaterial('depth:s:0', 'spirit')).toBe(depthMaterial);
     expect(spiritVeilDepthMaterial('depth:s:4', 'spirit')).not.toBe(depthMaterial);
+    const march = compiled(createSpiritVeilMaterial(new THREE.MeshStandardMaterial(), 'march'));
+    const marchDepth = compiled(spiritVeilDepthMaterial('depth:s:0', 'march'));
+    expect(marchDepth.uniforms.uVeilShimmer).toBe(march.uniforms.uVeilShimmer);
+    expect(marchDepth.uniforms.uVeilShimmer.value).toBe(0.01);
+    expect(marchDepth.uniforms.uVeilShimmer).not.toBe(depth.uniforms.uVeilShimmer);
   });
 });
 

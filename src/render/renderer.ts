@@ -381,7 +381,7 @@ import {
   sharedUniforms,
   urlForcedTier,
 } from './gfx';
-import { characterGhostStyle } from './ghost_style_core';
+import { characterGhostLook } from './ghost_style_core';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
 import { createGpuPrepAdmission } from './gpu_prep_admission';
@@ -10612,8 +10612,8 @@ export class Renderer {
         v.clickTarget = active.clickProxy;
       }
       v.height = active.height;
-      const ghostStyle = characterGhostStyle(this.sim.playerId, e, ghostWolf, veilboundState);
-      active.setGhost(ghostStyle !== null, ghostStyle ?? 'spirit');
+      const ghostLook = characterGhostLook(this.sim.playerId, e, ghostWolf, veilboundState);
+      active.setGhost(ghostLook !== null, ghostLook ?? 'spirit');
       active.setSoulRend(hasSoulRend);
       // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
       // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
