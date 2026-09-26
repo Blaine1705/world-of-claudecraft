@@ -2407,8 +2407,9 @@ export class CharacterVisual {
   /** The veil palette the current effect state asks for, or null when it
    *  asks for none. */
   private activeVeilPalette(): SpiritVeilPalette | null {
-    if (this.soulRend) return null;
+    if (this.soulRend) return 'soul-rend';
     if (this.ghosted) return this.ghostLook;
+    if (this.moonkin) return 'moonkin';
     return null;
   }
 
@@ -2482,10 +2483,10 @@ export class CharacterVisual {
     // Nythraxis' Soul Rend mark is ACTIONABLE raid information (the marked
     // player has to see it to react), so it is exempt from the deferral and
     // swaps in on the frame it lands, whatever the link state
-    // (docs/design/graphics-settings-fairness.md). Its one-time link is the
-    // accepted cost, and the encounter prewarm (soulRendPrewarmTargets) is
-    // what usually pays it before the first mark.
-    if (this.soulRend) return staged;
+    // (docs/design/graphics-settings-fairness.md). Its veil is the boot
+    // family's, so the exemption costs a live link only for a tuple the
+    // family has not linked yet, which is late-linked for the next mark.
+    const neverDeferred = this.soulRend;
     const veilMisses: string[] = [];
     const consider = (mesh: THREE.Mesh | null, source: THREE.Material): void => {
       if (!mesh?.geometry) return;
@@ -2498,6 +2499,9 @@ export class CharacterVisual {
       if (veil) {
         if (spiritVeilTuplesLinked(veil) || this.linkedEffectMaterials.has(next)) return;
         veilMisses.push(...veil);
+        if (neverDeferred) return;
+      } else if (neverDeferred) {
+        return;
       } else if (
         next.transparent === source.transparent &&
         !next.userData[SURFACE_RESPONSE_PROGRAM]
@@ -2517,7 +2521,7 @@ export class CharacterVisual {
         consider(this.farMesh, source);
       }
     }
-    if (veilMisses.length > 0) noteSpiritVeilMiss(veilMisses);
+    if (veilMisses.length > 0) noteSpiritVeilMiss(veilMisses, neverDeferred);
     return staged;
   }
 
@@ -3641,12 +3645,10 @@ export class CharacterVisual {
   // shadowform, or shifts to moonkin), and it links a second program on its
   // first draw because three keys its cache on customProgramCacheKey().
   private effectSingleMaterial(material: THREE.Material, mesh: THREE.Mesh): THREE.Material {
-    // Death treatments (soul rend, the veil) win over the shapeshift tints.
-    if (this.soulRend) return this.soulRendMaterial(material);
+    // The veils (Soul Rend first, then a ghost look, then Moonkin) win over the
+    // tints.
     const veilPalette = this.activeVeilPalette();
     if (veilPalette) return this.veilMaterial(material, mesh, veilPalette);
-    if (this.ghosted) return this.ghostMaterial(material);
-    if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
     if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);
     if (this.ascended) return this.ascensionMaterial(material);

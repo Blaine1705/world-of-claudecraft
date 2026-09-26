@@ -28,6 +28,7 @@ import {
   SPIRIT_VEIL_LOOK,
   SpiritVeilRig,
   spiritVeilDepthMaterial,
+  spiritVeilPaletteOf,
   spiritVeilPassOf,
 } from '../../src/render/characters/ghost_veil';
 import {
@@ -45,6 +46,7 @@ import {
 } from '../../src/render/characters/spirit_veil_family_core';
 import {
   SPIRIT_VEIL_PALETTES,
+  SPIRIT_VEIL_POLICY,
   type SpiritVeilPalette,
 } from '../../src/render/characters/spirit_veil_palette_core';
 import { buildStubbleDecal } from '../../src/render/characters/stubble';
@@ -797,6 +799,38 @@ describe('the veil palettes on a real driver', () => {
       expect(new Set(pixels.values()).size).toBe(pixels.size);
     });
 
+    it(`casts a kept shadow from a single-sided source with zero new programs, ${arm}`, async () => {
+      const w = world(offscreen);
+      const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(20, 20),
+        new THREE.MeshStandardMaterial(),
+      );
+      floor.position.z = -2;
+      floor.receiveShadow = true;
+      w.scene.add(floor);
+      await linkFamily(w);
+      w.draw();
+      for (const side of [THREE.FrontSide, THREE.BackSide] as const) {
+        const source = new THREE.MeshStandardMaterial({ map: greyMap(), side });
+        const body = new THREE.Mesh<THREE.BufferGeometry, THREE.Material>(
+          new THREE.SphereGeometry(0.8, 24, 16),
+          source,
+        );
+        body.castShadow = true;
+        w.scene.add(body);
+        w.draw();
+        w.draw();
+        const before = w.programs();
+        expect(SPIRIT_VEIL_POLICY.moonkin.castsShadow).toBe(true);
+        body.material = createSpiritVeilMaterial(source, 'moonkin');
+        new SpiritVeilRig().sync([body], []);
+        w.draw();
+        w.draw();
+        expect(w.programs(), `side ${side}`).toBe(before);
+        body.removeFromParent();
+      }
+    });
+
     it(`keeps a dyed piece's dye where the palette keeps colours, never in the monochrome body, ${arm}`, async () => {
       const w = world(offscreen);
       await linkFamily(w);
@@ -841,5 +875,111 @@ describe('the veil palettes on a real driver', () => {
       expect(read(dyed, 'spirit')).toEqual(read(plain, 'spirit'));
       expect(w.programs()).toBe(before);
     });
+  }
+});
+
+describe('every veil trigger on a real CharacterVisual', () => {
+  beforeAll(async () => {
+    await assetsReady();
+  }, 60_000);
+
+  for (const standardMaterials of [false, true]) {
+    for (const offscreen of [false, true]) {
+      const tier = standardMaterials ? 'standard (above Low)' : 'Lambert (Low)';
+      const arm = offscreen ? 'render-target (composer tiers)' : 'canvas (direct tiers)';
+      it(`links nothing for any palette, Moonkin's kept shadow or Soul Rend once the family ran, ${tier}, ${arm}`, async () => {
+        const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials });
+        try {
+          const w = world(offscreen);
+          w.camera.position.set(0, 1, 4);
+          w.camera.lookAt(0, 1, 0);
+          const floor = new THREE.Mesh(
+            new THREE.PlaneGeometry(20, 20),
+            new THREE.MeshStandardMaterial(),
+          );
+          floor.rotation.x = -Math.PI / 2;
+          floor.receiveShadow = true;
+          w.scene.add(floor);
+          const look = {
+            app: normalizeAppearance({
+              ...DEFAULT_APPEARANCE,
+              gender: 'female',
+              beard: 'none',
+              earrings: 'moonstar',
+              lashes: true,
+            }),
+            worn: fullSet('druid'),
+          };
+          const visual = new CharacterVisual(
+            'player_druid_modular',
+            0xffffff,
+            0,
+            null,
+            null,
+            null,
+            look,
+          );
+          disposers.push(() => visual.dispose());
+          visual.update(1 / 60, IDLE, true);
+          visual.setShadow(true);
+          w.scene.add(visual.root);
+          const casters = (): THREE.Mesh[] => {
+            const out: THREE.Mesh[] = [];
+            visual.root.traverse((object) => {
+              const mesh = object as THREE.Mesh;
+              if (mesh.isMesh && mesh.visible && mesh.castShadow) out.push(mesh);
+            });
+            return out;
+          };
+          const empty = w.programs();
+          w.draw();
+          w.draw();
+          // the harness draws the live rig and its shadow casters
+          expect(w.programs()).toBeGreaterThan(empty);
+          expect(casters().length).toBeGreaterThan(3);
+          await linkFamily(w);
+          w.draw();
+          const before = w.programs();
+
+          const worn = (): Set<string | null> => {
+            const out = new Set<string | null>();
+            visual.root.traverse((object) => {
+              const mesh = object as THREE.Mesh;
+              if (mesh.isMesh && mesh.visible)
+                for (const m of [mesh.material].flat()) out.add(spiritVeilPaletteOf(m));
+            });
+            return out;
+          };
+          for (const palette of Object.keys(SPIRIT_VEIL_PALETTES) as SpiritVeilPalette[]) {
+            if (palette === 'moonkin' || palette === 'soul-rend') continue;
+            visual.setGhost(true, palette);
+            w.draw();
+            w.draw();
+            expect(worn(), palette).toContain(palette);
+            expect(w.programs(), palette).toBe(before);
+            visual.setGhost(false);
+          }
+          visual.setMoonkin(true);
+          w.draw();
+          w.draw();
+          expect(worn()).toContain('moonkin');
+          // Moonkin keeps its shadow: the veiled body casts, on the depth
+          // programs the living rig linked
+          expect(casters().length).toBeGreaterThan(3);
+          expect(w.programs(), 'moonkin').toBe(before);
+          visual.setMoonkin(false);
+          visual.setSoulRend(true);
+          w.draw();
+          w.draw();
+          expect(worn()).toContain('soul-rend');
+          expect(w.programs(), 'soul rend').toBe(before);
+          visual.setSoulRend(false);
+          w.draw();
+          expect(w.programs()).toBe(before);
+        } finally {
+          restoreGfx();
+        }
+      });
+    }
   }
 });

@@ -620,3 +620,86 @@ describe("stealth wears the veil in its source's palette", () => {
     visual.dispose();
   });
 });
+
+describe('Moonkin and Soul Rend wear the veil', () => {
+  it('keeps the Moonkin shadow, with the side the living caster had, and its weapon-skin VFX', async () => {
+    const { visual, veil, gateCalls } = await makePriest(true);
+    const body = named(visual, 'body');
+    const source = single(body);
+    const { light, shell, update } = weaponSkinHandle(visual);
+    const proxy = (visual as unknown as { shadowProxy: THREE.Mesh }).shadowProxy;
+    visual.setProxyShadow(true);
+    visual.setMoonkin(true);
+    expect(gateCalls).toHaveLength(0);
+    const worn = single(body);
+    expect(veil.spiritVeilPaletteOf(worn)).toBe('moonkin');
+    expect(worn.shadowSide).toBe(source.shadowSide ?? THREE.BackSide);
+    expect(body.castShadow).toBe(true);
+    expect(proxy.visible).toBe(true);
+    expect(shell.visible).toBe(true);
+    visual.updateWeaponVfx(FRAME);
+    expect(update).toHaveBeenCalled();
+    expect(light.intensity).toBe(1.37);
+    // the depth pre-pass never casts: the body's own caster is the shadow
+    for (const sibling of depthSiblings(visual)) expect(sibling.castShadow).toBe(false);
+    expect(named(visual, 'class_halo').visible).toBe(false);
+    // a death while in the form: the spirit veil wins and drops the shadow
+    visual.setGhost(true, 'spirit');
+    expect(veil.spiritVeilPaletteOf(single(body))).toBe('spirit');
+    expect(body.castShadow).toBe(false);
+    visual.setGhost(false);
+    expect(veil.spiritVeilPaletteOf(single(body))).toBe('moonkin');
+    expect(body.castShadow).toBe(true);
+    visual.setMoonkin(false);
+    expect(single(body)).toBe(source);
+    (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.length = 0;
+    visual.dispose();
+  });
+
+  it('commits Soul Rend on the frame it lands even unlinked, late-links the tuples, keeps the weapon glow, drops the shadow', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { visual, veil, gateCalls } = await makePriest(false);
+    const late: string[][] = [];
+    veil.setSpiritVeilLateLink((keys) => late.push([...keys]));
+    const body = named(visual, 'body');
+    const { shell } = weaponSkinHandle(visual);
+    visual.setSoulRend(true);
+    // never deferred: no gate, mounted now
+    expect(gateCalls).toHaveLength(0);
+    expect(veil.spiritVeilPaletteOf(single(body))).toBe('soul-rend');
+    expect(depthSiblings(visual).length).toBeGreaterThan(0);
+    expect(late).toHaveLength(1);
+    expect(late[0]).toEqual(
+      expect.arrayContaining([
+        veil.spiritVeilShapeKey(body),
+        ...(veil.spiritVeilKeysFor(single(body), body) ?? []),
+      ]),
+    );
+    expect(
+      warn.mock.calls.some((call) => String(call[0]).includes('committed a never-deferred veil')),
+    ).toBe(true);
+    expect(body.castShadow).toBe(false);
+    expect(shell.visible).toBe(true);
+    expect(named(visual, 'class_halo').visible).toBe(false);
+    visual.setSoulRend(false);
+    expect(veil.spiritVeilPassOf(single(body))).toBeNull();
+    (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.length = 0;
+    visual.dispose();
+  });
+
+  it('draws Soul Rend over a ghost look and over Moonkin, and hands the body back to them', async () => {
+    const { visual, veil } = await makePriest(true);
+    const body = named(visual, 'body');
+    for (const under of ['march', 'moonkin'] as const) {
+      if (under === 'moonkin') visual.setMoonkin(true);
+      else visual.setGhost(true, under);
+      visual.setSoulRend(true);
+      expect(veil.spiritVeilPaletteOf(single(body))).toBe('soul-rend');
+      visual.setSoulRend(false);
+      expect(veil.spiritVeilPaletteOf(single(body))).toBe(under);
+      visual.setGhost(false);
+      visual.setMoonkin(false);
+    }
+    visual.dispose();
+  });
+});

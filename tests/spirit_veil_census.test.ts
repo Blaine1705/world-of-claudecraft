@@ -266,9 +266,10 @@ function heldModelUrls(): string[] {
 
 // The rigs the other veil users draw on top of the player rigs above (the
 // released-spirit palette's Pale Keeper and quest visions, the Ghost Wolf and
-// Veilbound March palettes, stealth on the druid's cat). A palette is uniform
-// values only, so each needs nothing but its shapes inside the family.
-const VEILED_FORMS = ['form_ghost_wolf', 'form_sheep', 'form_cat'] as const;
+// Veilbound March palettes, stealth on the druid's cat, Moonkin on the sheep,
+// and Soul Rend on whatever body a raider wears, so every form rig). A palette
+// is uniform values only, so each needs nothing but its shapes in the family.
+const VEILED_FORMS = Object.keys(VISUALS).filter((key) => key.startsWith('form_'));
 const VISION_TEMPLATES = [
   'vision_aldren_warrior',
   'vision_malric_mage',
@@ -403,7 +404,16 @@ describe('the spirit veil family covers the catalogue', () => {
     }
     expect(npcLookFor(KEEPER)).not.toBeNull();
     expect(keeperParts().length).toBeGreaterThan(5);
-    for (const key of VEILED_FORMS) expect(VISUALS[key], key).toBeDefined();
+    expect(VEILED_FORMS).toEqual(
+      expect.arrayContaining([
+        'form_ghost_wolf',
+        'form_sheep',
+        'form_cat',
+        'form_bear',
+        'form_travel',
+        'form_metamorph',
+      ]),
+    );
     const users = [
       ...formRigUrls().flatMap((url) => allParts(url).flatMap((part) => partKeys(url, part))),
       ...keeperParts().flatMap(({ url, part }) => partKeys(url, part)),

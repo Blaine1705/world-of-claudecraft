@@ -8,7 +8,14 @@
 //
 // Three-free and deterministic: tests drive it directly.
 
-export type SpiritVeilPalette = 'spirit' | 'wolf' | 'march' | 'stealth-rogue' | 'stealth-other';
+export type SpiritVeilPalette =
+  | 'spirit'
+  | 'wolf'
+  | 'march'
+  | 'stealth-rogue'
+  | 'stealth-other'
+  | 'moonkin'
+  | 'soul-rend';
 
 export interface SpiritVeilPaletteValues {
   tint: number;
@@ -94,6 +101,30 @@ export const SPIRIT_VEIL_PALETTES: Readonly<
     keepColor: 0.58,
     band: 0.36,
   },
+  // The balance druid's Moonwing Form (no rig of its own: the druid's body).
+  moonkin: {
+    tint: 0x9373dd,
+    deep: 0x3a2270,
+    rim: 0xc9b8f5,
+    rimStrength: 0.45,
+    opacity: 0.71,
+    rise: 1.1,
+    shimmer: 0,
+    keepColor: 0,
+    band: 0.3,
+  },
+  // Nythraxis' Soul Rend mark, on whichever body the raider wears.
+  'soul-rend': {
+    tint: 0x552a2a,
+    deep: 0x2b0303,
+    rim: 0x930b0b,
+    rimStrength: 1.07,
+    opacity: 0.8,
+    rise: 0.81,
+    shimmer: 0,
+    keepColor: 0,
+    band: 1,
+  },
 };
 
 /** What a veiled rig keeps. The class halo is hidden under every palette. */
@@ -110,4 +141,6 @@ export const SPIRIT_VEIL_POLICY: Readonly<Record<SpiritVeilPalette, Readonly<Spi
   march: { castsShadow: false, weaponVfx: true },
   'stealth-rogue': { castsShadow: false, weaponVfx: false },
   'stealth-other': { castsShadow: false, weaponVfx: false },
+  moonkin: { castsShadow: true, weaponVfx: true },
+  'soul-rend': { castsShadow: false, weaponVfx: true },
 };

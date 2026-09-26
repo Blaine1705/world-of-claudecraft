@@ -254,6 +254,13 @@ type SourceMaterial = THREE.Material & {
 
 const PALETTE_KEY = 'spiritVeilPalette';
 
+/** three's WebGLShadowMap side for a caster with no shadowSide (PCF). */
+const CASTER_SIDE: Record<THREE.Side, THREE.Side> = {
+  [THREE.FrontSide]: THREE.BackSide,
+  [THREE.BackSide]: THREE.FrontSide,
+  [THREE.DoubleSide]: THREE.DoubleSide,
+};
+
 /** The pass a veil material draws, or null for any other material. */
 export function spiritVeilPassOf(material: THREE.Material): SpiritVeilPass | null {
   return (material.userData[SPIRIT_VEIL_PASS_KEY] as SpiritVeilPass | undefined) ?? null;
@@ -302,6 +309,11 @@ export function createSpiritVeilMaterial(
     ...(decal ? UNDYED : sourceDye(source)),
   };
   mat.onBeforeCompile = (shader) => veilColorHook(shader, uniforms);
+  // A palette that keeps its shadow casts with the side three would give the
+  // source's own caster, so the kept shadow culls the faces the living one did,
+  // and a re-derivation of the shared depth material (side is one of its key
+  // inputs) keys the variant the living rig linked.
+  mat.shadowSide = source.shadowSide ?? CASTER_SIDE[source.side];
   mat.customProgramCacheKey = decal ? decalProgramKey : colorProgramKey;
   mat.userData[SPIRIT_VEIL_PASS_KEY] = decal ? 'decal' : 'color';
   mat.userData[PALETTE_KEY] = palette;
@@ -422,17 +434,23 @@ export function setSpiritVeilLateLink(link: LateLink | null): void {
   lateLink = link;
 }
 
-/** A veil staged behind the effect gate because some of its tuples are not
- *  linked yet. Named once per tuple on the dev channel; a tuple outside the
- *  pinned family is a census gap (tests/spirit_veil_census.test.ts). */
-export function noteSpiritVeilMiss(keys: readonly string[]): void {
+/** A veil mounted before some of its tuples linked: staged behind the effect
+ *  gate, or committed at once for a mark that is never deferred (Soul Rend),
+ *  whose draw then links them. Named once per tuple on the dev channel; a
+ *  tuple outside the pinned family is a census gap
+ *  (tests/spirit_veil_census.test.ts). Either way the tuples are late-linked
+ *  so the next veil of that shape commits at once. */
+export function noteSpiritVeilMiss(keys: readonly string[], live = false): void {
   const unlinked = keys.filter((key) => !linkedTuples.has(key));
   const fresh = unlinked.filter((key) => !reportedMisses.has(key));
   for (const key of fresh) reportedMisses.add(key);
   if (fresh.length > 0) {
     const outside = fresh.filter((key) => !SPIRIT_VEIL_FAMILY_KEYS.has(key));
+    const what = live
+      ? 'committed a never-deferred veil unlinked'
+      : 'staged a ghost behind the compile gate';
     console.warn(
-      `[spirit-veil] staged a ghost behind the compile gate: unlinked ${fresh.join(', ')}` +
+      `[spirit-veil] ${what}: unlinked ${fresh.join(', ')}` +
         (outside.length > 0 ? `; outside the pinned family: ${outside.join(', ')}` : ''),
     );
   }

@@ -107,6 +107,28 @@ describe('the veil palettes', () => {
         keepColor: 0.58,
         band: 0.36,
       },
+      moonkin: {
+        tint: 0x9373dd,
+        deep: 0x3a2270,
+        rim: 0xc9b8f5,
+        rimStrength: 0.45,
+        opacity: 0.71,
+        rise: 1.1,
+        shimmer: 0,
+        keepColor: 0,
+        band: 0.3,
+      },
+      'soul-rend': {
+        tint: 0x552a2a,
+        deep: 0x2b0303,
+        rim: 0x930b0b,
+        rimStrength: 1.07,
+        opacity: 0.8,
+        rise: 0.81,
+        shimmer: 0,
+        keepColor: 0,
+        band: 1,
+      },
     };
     expect(SPIRIT_VEIL_PALETTES).toEqual(expected);
     expect(SPIRIT_VEIL_LOOK).toBe(SPIRIT_VEIL_PALETTES.spirit);
@@ -119,6 +141,8 @@ describe('the veil palettes', () => {
       march: { castsShadow: false, weaponVfx: true },
       'stealth-rogue': { castsShadow: false, weaponVfx: false },
       'stealth-other': { castsShadow: false, weaponVfx: false },
+      moonkin: { castsShadow: true, weaponVfx: true },
+      'soul-rend': { castsShadow: false, weaponVfx: true },
     });
   });
 });
@@ -228,6 +252,23 @@ describe('a palette is uniform values on the shared programs', () => {
     expect(fragment).toContain('veilBody = mix( veilBody, veilTrue, uVeilKeepColor );');
     expect(fragment).not.toContain('wocLin2Srgb(diffuseColor.rgb)');
     expect(fragment).toContain('uniform int uDyeCount;');
+  });
+
+  it("casts with the side three gives the source's own caster", () => {
+    const cases: [THREE.Side, THREE.Side | null, THREE.Side][] = [
+      [THREE.FrontSide, null, THREE.BackSide],
+      [THREE.BackSide, null, THREE.FrontSide],
+      [THREE.DoubleSide, null, THREE.DoubleSide],
+      [THREE.FrontSide, THREE.DoubleSide, THREE.DoubleSide],
+    ];
+    for (const [side, shadowSide, expected] of cases) {
+      const source = new THREE.MeshStandardMaterial({ side });
+      source.shadowSide = shadowSide;
+      const veil = createSpiritVeilMaterial(source, 'moonkin');
+      // the veil itself draws both faces, so three's default would differ
+      expect(veil.side).toBe(THREE.DoubleSide);
+      expect(veil.shadowSide, `${side}/${shadowSide}`).toBe(expected);
+    }
   });
 
   it('gives two palettes their own values on one shared text', () => {
