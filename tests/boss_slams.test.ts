@@ -223,7 +223,9 @@ describe('the aimed slams in a live fight', () => {
     const e = sim.entities.get(id);
     if (!e) throw new Error('no boss');
     boss = e;
-    place(player, lair().x + 6, lair().z);
+    // West of his bed, on the crater's flat floor: east of it the marsh border wall climbs,
+    // and a cleave aimed up that slope measures a held jump against rising ground.
+    place(player, lair().x - 6, lair().z);
   });
 
   /** One tick with the subject kept alive: he is mortal (see the header) and standing

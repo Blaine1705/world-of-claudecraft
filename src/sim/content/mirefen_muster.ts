@@ -14,6 +14,8 @@
 //   - every camp is at least 29 yards clear of the edge of every wildlife camp (the
 //     largest idle aggro radius is 20, plus margin), so a quester standing at a picket
 //     cannot pull the Widow Thicket spiders onto the muster;
+//   - every post stands outside Balgath's aggro radius of his bed in the crater, so a
+//     player walking up to a soldier never pulls him (only players start that fight);
 //   - the four PICKETS are Balgath's warpath circuit (content/zone2.ts, in the order of
 //     MUSTER_CIRCUIT), and every leg between them, plus the opening leg from his lair,
 //     is dry end to end (tests/warpath.test.ts).
@@ -96,7 +98,7 @@ export const MUSTER_CAMPS: readonly MusterCampDef[] = [
     soldiers: picket([-19.5, -4], [19.5, -5]),
   },
   {
-    // On the crater's south-west rim, closest to his bed (13 yards off it), in the one gap
+    // On the crater's south-west rim, 40 yards south of his bed in the bowl, in the one gap
     // in the rim's trees wide enough for a squad.
     id: 'crater',
     center: { x: 140, z: 268 },

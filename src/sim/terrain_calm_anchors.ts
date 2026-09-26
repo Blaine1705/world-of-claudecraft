@@ -210,8 +210,12 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
     pad('tunnelMouth', mouthA.x, mouthA.z, mouthA.radius + 2, mouthA.radius + 9);
     pad('tunnelMouth', mouthB.x, mouthB.z, mouthB.radius + 2, mouthB.radius + 9);
   }
-  // World-boss stands: the fight needs a workable raid floor.
-  for (const boss of WORLD_BOSSES) pad('worldBoss', boss.pos.x, boss.pos.z, 10, 18);
+  // World-boss stands: the fight needs a workable raid floor, unless the boss sleeps in
+  // an authored landform that already is one (WorldBossDef.raidFloorPad).
+  for (const boss of WORLD_BOSSES) {
+    if (boss.raidFloorPad === false) continue;
+    pad('worldBoss', boss.pos.x, boss.pos.z, 10, 18);
+  }
   // Escort runs: the escortee walks the authored polyline, so the whole
   // lane keeps workable ground (pads at every authored point plus samples
   // every 8yd along each leg).

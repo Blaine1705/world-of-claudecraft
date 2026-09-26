@@ -19,16 +19,16 @@ import { itemLevel } from '../sim/item_level';
 import type { EquipSlot, ItemDef, PlayerClass } from '../sim/types';
 
 /**
- * The Starfall Crater's western rim, east Mirefen: where he sleeps and wakes.
+ * Inside the Starfall Crater, east Mirefen: where he sleeps and wakes.
  *
  * The same spot the live scheduler spawns him on (WORLD_BOSSES in src/sim/world_boss.ts),
- * so the test drive shows the real opening: dry ground beside Brother Aldric's fallen
- * star, 45+ yards clear of the Widow Thicket camps, with the march on the muster's rim
- * picket as his first leg. Kept as a literal rather than an import so this
+ * so the test drive shows the real opening: the dry north floor of Brother Aldric's
+ * star's crater, 45+ yards clear of the Widow Thicket camps, with the march on the
+ * muster's rim picket as his first leg. Kept as a literal rather than an import so this
  * dev-only module never pulls the world-boss registry into the client bundle; a test
  * welds the two.
  */
-export const BOSS_TEST_DRIVE_POS = { x: 128, z: 262 };
+export const BOSS_TEST_DRIVE_POS = { x: 147, z: 310 };
 
 /**
  * How far off the spawn point the player stands, per axis.

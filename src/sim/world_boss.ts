@@ -45,6 +45,11 @@ export interface WorldBossDef {
   templateId: string;
   // Fixed overworld spawn point (y is grounded at spawn time).
   pos: { x: number; z: number };
+  // Whether the terrain calm-pad roster (terrain_calm_anchors.ts) grades a workable raid
+  // floor around `pos`. Absent means yes. False for a boss whose spawn sits inside an
+  // authored landform that already IS the arena (Balgath's Starfall Crater), where a pad
+  // would re-grade the natural relief under the fixture.
+  raidFloorPad?: boolean;
   // Seconds of sim time between scheduled spawns.
   intervalSeconds: number;
   // Retail-style HP scaling. The boss spawns at `base` HP and gains `perPlayer` more
@@ -55,7 +60,7 @@ export interface WorldBossDef {
 }
 
 // The world bosses of the live world. One per entry; the scheduler tracks each
-// independently. Thunzharr rises at Stormcrag in Thornpeak Heights; Balgath rises beside
+// independently. Thunzharr rises at Stormcrag in Thornpeak Heights; Balgath rises in
 // the Starfall Crater in Mirefen Marsh, and only by day (MobTemplate.slumber).
 export const WORLD_BOSSES: readonly WorldBossDef[] = [
   {
@@ -74,16 +79,20 @@ export const WORLD_BOSSES: readonly WorldBossDef[] = [
     // by INDEX into this array (`worldBossNextAt`), so reordering silently re-points every
     // live timer and every test that forces a spawn by index.
     //
-    // Beside the Starfall Crater, east Mirefen: 40 yards south-west of the centre of the
-    // bowl Brother Aldric's fallen star dug (MIREFEN_IMPACT_CRATER in world.ts), just off
-    // its rim band, and where he sleeps. Picked by measurement rather than by eye: dry
-    // ground, under two yards of relief across a
-    // 13-unit arena, 45+ yards clear of the Widow Thicket spider camps (MAX_AGGRO_RADIUS
-    // is 20, so a level-eight fighting spiders at the camp's edge cannot pull him), and
-    // outside the crater's bowl and rim band so his raid-floor pad never flattens the
-    // fixture. He is a daytime boss (MobTemplate.slumber): at dusk he walks back here
-    // and lies down beside the star, at dawn he rises from it.
-    pos: { x: 128, z: 262 },
+    // IN the Starfall Crater, east Mirefen: 15 yards north of the centre of the bowl
+    // Brother Aldric's fallen star dug (MIREFEN_IMPACT_CRATER in world.ts), on the
+    // scorched floor inside its 20-yard bowl, and where he sleeps. The bowl bottoms out
+    // within a yard of the fen's waterline, so the spot is MEASURED rather than central:
+    // the one stretch of the floor with its whole body-length bed, and the opening leg to
+    // the rim picket, more than a yard above the waterline (tests/warpath.test.ts), the
+    // wall of the marsh border rising only east of it, every muster post outside his
+    // 26-yard aggro radius (so nobody walking up to a soldier pulls him), and 45+ yards
+    // clear of the Widow Thicket spider camps. No raid-floor pad (raidFloorPad below):
+    // the bowl IS his floor, and a calm pad here would re-grade the fixture under it.
+    // He is a daytime boss (MobTemplate.slumber): at dusk he walks back here and lies
+    // down in the star's crater, at dawn he rises from it.
+    pos: { x: 147, z: 310 },
+    raidFloorPad: false,
     intervalSeconds: WORLD_BOSS_INTERVAL_SECONDS,
     // Deliberately a smaller pool and a gentler step than Thunzharr's. Mirefen is the zone
     // players quit in, so this boss has to be killable by whoever actually turns up rather

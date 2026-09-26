@@ -362,6 +362,10 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // rather than to fight him: no leg, chase, leash return or walk to bed ever crosses
     // its circle (content/mirefen_muster.ts MUSTER_COMMAND_KEEP_OUT, mob/keep_out.ts).
     keepOut: [MUSTER_COMMAND_KEEP_OUT],
+    // He stands guard over the fallen star while idle instead of wandering: a 13-unit body
+    // ambling round his spawn walks straight out of the 20-yard crater he sleeps in (the
+    // owner saw him "beside" it). Pulled, he fights and marches exactly as before.
+    idleStationary: true,
     // He WADES. A phasing mover otherwise rides the water surface, and the first cut of
     // this boss crossed the Mirefen lakes with his boots on the waterline like a cork:
     // thirteen yards of granite floating in four yards of fen. With this, his feet stay
@@ -371,7 +375,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // lakes for a different reason: HE can wade, the raid chasing him cannot.
     wadeDepth: 9,
     // A daytime boss (mob/slumber.ts). At dusk, once whatever pull is running has ended,
-    // he walks back to the crater rim he spawns on and lies down; asleep he is neutral,
+    // he walks back into the crater he spawns in and lies down; asleep he is neutral,
     // unattackable and a landmark; at dawn he wakes with a yell the zone hears and the
     // realm gets the "wakes over Mirefen" call. Killed, he rises again at the next dawn
     // (the scheduler in sim.ts reads this same field), so the fight is a once-a-day event
@@ -381,9 +385,11 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       sleepYell: 'Dark. The star sleeps. So does the Foreman.',
       wakeYell: 'DAWN. The star woke me once. The sun wakes me every day.',
       yellRange: 160,
-      // Inside this of the spawn point he lies down: his own body length, so he never
-      // paces on the spot hunting for an exact coordinate a slope or the pad denies him.
-      bedRadius: 6,
+      // Inside this of the spawn point he lies down. Tight, because his bed is 15 yards into
+      // a 20-yard bowl: any looser and a giant coming home from the rim lies down on it
+      // rather than in the crater. The crater floor there is flat and he phases through
+      // obstacles, so he never paces on the spot hunting for the exact coordinate.
+      bedRadius: 3,
       // Balgath_Wake runs 3.95 s (scripts/build_balgath_anims.mjs); the hold outlasts it.
       riseSeconds: 4,
     },
@@ -411,7 +417,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // near the clip clamps that made him skate.
       travelSpeedMult: 1.25,
       // The legs are short now (the pickets ring the crater, 28 to 53 yards apart, and the
-      // opening march from his bed to the rim picket is 37), so a few seconds each at
+      // opening march from his bed to the rim picket is 29), so a few seconds each at
       // travel speed. 25 is two and a half times the longest with room for a slow, and
       // still gives up on a picket he cannot reach, so a wedged body can never leave him
       // travelling (and healing) forever.
@@ -425,7 +431,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       wreckSeconds: 3.4,
       // Walked IN ORDER, wrapping, starting at index 0: the four pickets of the Mirefen
       // muster (content/mirefen_muster.ts, MUSTER_CIRCUIT), which Warden Fenwick sent out
-      // to hold the crater. He wakes in his bed on the crater's south-west rim, marches on
+      // to hold the crater. He wakes in his bed on the crater's scorched floor, marches on
       // the rim picket first, then the west picket, the south picket, the crater picket,
       // and round again. Every run has a reason now: he goes where the soldiers are and
       // flattens them, and the raid chasing him arrives to a picket full of bodies.

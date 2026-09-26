@@ -333,6 +333,8 @@ interface Site {
   campIndex: number;
   /** Soldier slots (world XZ) the footprints keep clear of. */
   slots: { x: number; z: number }[];
+  /** A picket's approach and exit bearings (musterCampOpenings); empty elsewhere. */
+  openings: number[];
   placed: MusterPlacement[];
 }
 
@@ -416,6 +418,7 @@ function place(site: Site, input: MusterLayoutInput, candidates: Candidate[]): b
     if (site.slots.some((slot) => dist(slot.x, slot.z) < MUSTER_SLOT_CLEARANCE)) continue;
     if (!camp.onCircuit && dist(input.rack.x, input.rack.z) < MUSTER_RACK_CLEARANCE) continue;
     if (input.obstacles.some((o) => dist(o.x, o.z) < o.r)) continue;
+    if (inOpeningCone(site, c)) continue;
     if (site.placed.some((p) => boxesOverlap(c, p, 0.25))) continue;
     // and never a centre inside another footprint (a torch inside a tent's canvas)
     if (
@@ -430,6 +433,34 @@ function place(site: Site, input: MusterLayoutInput, candidates: Candidate[]): b
     if (fit.centre - fit.sink < input.minGroundY) continue;
     site.placed.push(placement(camp, c, fit));
     return true;
+  }
+  return false;
+}
+
+/** Slack under MUSTER_OPENING_HALF_ANGLE a footprint's edge may reach into an opening. */
+const OPENING_EDGE_SLACK = 0.08;
+
+/**
+ * Does this candidate's footprint reach into a picket's approach or exit cone? The wall
+ * arc skips its sections by bearing already; this keeps every OTHER piece (the clutter
+ * and tents ring the camp too) out of the gap he walks through, whichever way the circuit
+ * and his lair turn the openings.
+ */
+function inOpeningCone(site: Site, c: Candidate): boolean {
+  if (site.openings.length === 0) return false;
+  const { camp } = site;
+  const corners = musterFootprintCorners(c.key, c.x, c.z, c.rot);
+  const samples: [number, number][] = [...corners, [c.x, c.z]];
+  for (let i = 0; i < 4; i++) {
+    const a = corners[i];
+    const b = corners[(i + 1) % 4];
+    samples.push([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]);
+  }
+  for (const [x, z] of samples) {
+    const bearing = bearingTo(camp.center.x, camp.center.z, x, z);
+    for (const o of site.openings) {
+      if (angleGap(bearing, o) <= MUSTER_OPENING_HALF_ANGLE - OPENING_EDGE_SLACK) return true;
+    }
   }
   return false;
 }
@@ -490,7 +521,7 @@ const INWARD = (b: number): number => b + Math.PI;
 
 function planPicket(site: Site, input: MusterLayoutInput): void {
   const { camp, campIndex } = site;
-  const openings = musterCampOpenings(camp, input);
+  const openings = site.openings;
   const rear = camp.facing + Math.PI;
   const j = (salt: number): number => (jitter(campIndex, 100, salt) - 0.5) * 0.3;
   // The wall: the rear half-ring behind the squad, cut wide at every approach/exit.
@@ -754,6 +785,7 @@ export function planMusterCamps(input: MusterLayoutInput): MusterPlacement[] {
           )
           .map((s) => ({ x: c.center.x + s.dx, z: c.center.z + s.dz })),
       ),
+      openings: musterCampOpenings(camp, input),
       placed: [],
     };
     if (camp.onCircuit) planPicket(site, input);

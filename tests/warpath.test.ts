@@ -37,7 +37,7 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 const BALGATH = 'balgath_cyclops';
 
-/** Where the live scheduler spawns him: the Starfall Crater's rim (world_boss.ts). */
+/** Where the live scheduler spawns him: inside the Starfall Crater (world_boss.ts). */
 function lair(): { x: number; z: number } {
   const row = WORLD_BOSSES.find((b) => b.templateId === BALGATH);
   if (!row) throw new Error('balgath_cyclops is not in WORLD_BOSSES');
@@ -300,11 +300,11 @@ describe('warpath in a live world', () => {
     expect(Math.hypot(boss.pos.x - stop.x, boss.pos.z - stop.z)).toBeLessThanOrEqual(
       def().arriveRadius,
     );
-    // He got there himself: the first stop is the rim picket, 37 yards from his bed, and
-    // he stops within arriveRadius of it, so anything near that gap is a real journey
-    // rather than the shuffle he used to do.
+    // He got there himself: the first stop is the rim picket, 29 yards from his bed in the
+    // crater, and he stops within arriveRadius of it, so anything near that gap is a real
+    // journey out of the bowl rather than the shuffle he used to do.
     expect(Math.hypot(boss.pos.x - boss.spawnPos.x, boss.pos.z - boss.spawnPos.z)).toBeGreaterThan(
-      30,
+      22,
     );
   });
 
