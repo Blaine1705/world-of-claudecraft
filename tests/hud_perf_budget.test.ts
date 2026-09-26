@@ -629,8 +629,10 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     // is ever destroyed under a keyboard player and there is nothing to restore.
     // 13 / 4 with the two lean keycaps above the beam (the row, the key, its arrow and its
     // cap, plus the arrow's aria-hidden), all built once with the bar; their per-frame key
-    // text, held state and accessible name ride the writers.
-    allow: { '.className': 13, '.setAttribute': 4 },
+    // text, held state and accessible name ride the writers. One `.textContent`: each
+    // keycap's aria-hidden arrow glyph, set once when the keycap is built (the HUD's test
+    // DOM cannot host a bare string node, which is why it is not an append).
+    allow: { '.className': 13, '.setAttribute': 4, '.textContent': 1 },
     reflowAllow: {},
   },
   // The prompt is one line and a tally, built once on the first visible paint and then only

@@ -58,6 +58,12 @@ export interface ShardpikePromptInput {
   dead: boolean;
   /** The live lean keys, so "hold it steady" can name them (shardpike_lean_view.ts). */
   leanKeys?: ShardpikeLeanKeys;
+  /** The muster's weapon rack is within interact reach (shardpike_bar.ts measures it). */
+  rackInReach?: boolean;
+  /** The bound interact key's label, '' when none is bound. */
+  interactKey?: string;
+  /** A touch layout: there is no key to name and nothing to click, only a tap. */
+  touch?: boolean;
 }
 
 const HIDDEN: ShardpikePromptState = {
@@ -90,7 +96,16 @@ const secs = (v: number): string => String(Math.max(1, Math.ceil(v)));
  *     "what is this for" is on screen before the fight, not during it.
  */
 export function shardpikePromptState(input: ShardpikePromptInput): ShardpikePromptState {
-  if (!isShardpikeItem(input.mainhandItemId)) return HIDDEN;
+  if (!isShardpikeItem(input.mainhandItemId)) {
+    // Rung 0, the only one without a pike: standing at the muster's rack empty-handed, the
+    // one thing to do is take one, and a rack that looks like scenery never says so itself.
+    if (!input.rackInReach || input.dead) return HIDDEN;
+    const key = input.touch ? '' : (input.interactKey ?? '');
+    let bodyKey: TranslationKey = 'hudChrome.shardpike.promptTakePikeClick';
+    if (input.touch) bodyKey = 'hudChrome.shardpike.promptTakePikeTap';
+    else if (key) bodyKey = 'hudChrome.shardpike.promptTakePike';
+    return { visible: true, tone: 'directive', bodyKey, values: key ? { key } : {}, thrusts: null };
+  }
   const g = input.guidance;
   const thrusts = g && g.thrusts > 0 ? g.thrusts : null;
   const show = (

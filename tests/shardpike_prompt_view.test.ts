@@ -78,6 +78,40 @@ describe('the prompt only exists for someone who can act on it', () => {
   });
 });
 
+describe("the muster's weapon rack rung (no pike in hand yet)", () => {
+  it('tells an empty-handed player at the rack how to take one, naming the interact key', () => {
+    const s = state({ mainhandItemId: 'iron_sword', rackInReach: true, interactKey: 'F' });
+    expect(s.visible).toBe(true);
+    expect(s.tone).toBe('directive');
+    expect(s.bodyKey).toBe('hudChrome.shardpike.promptTakePike');
+    expect(s.values).toEqual({ key: 'F' });
+    expect(s.thrusts).toBeNull();
+  });
+
+  it('falls back to the click line when no interact key is bound', () => {
+    const s = state({ mainhandItemId: null, rackInReach: true, interactKey: '' });
+    expect(s.bodyKey).toBe('hudChrome.shardpike.promptTakePikeClick');
+    expect(s.values).toEqual({});
+  });
+
+  it('says tap on a touch layout, never a key or a click', () => {
+    const s = state({ mainhandItemId: null, rackInReach: true, interactKey: 'F', touch: true });
+    expect(s.bodyKey).toBe('hudChrome.shardpike.promptTakePikeTap');
+    expect(s.values).toEqual({});
+  });
+
+  it('says nothing away from the rack, while dead, or once a pike is in hand', () => {
+    expect(state({ mainhandItemId: 'iron_sword', rackInReach: false }).visible).toBe(false);
+    expect(state({ mainhandItemId: 'iron_sword', rackInReach: true, dead: true }).visible).toBe(
+      false,
+    );
+    // Holding a pike, the ladder above owns the line: the rack rung never outranks it.
+    expect(state({ rackInReach: true, interactKey: 'F' }).bodyKey).not.toBe(
+      'hudChrome.shardpike.promptTakePike',
+    );
+  });
+});
+
 describe('the priority ladder', () => {
   it('puts STRIKE above everything, because the window is the only thing that expires', () => {
     // Deliberately stacked against it: drifting beam, a seal running, a rest timer, out of

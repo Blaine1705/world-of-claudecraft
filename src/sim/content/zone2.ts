@@ -21,7 +21,12 @@ import type {
   ZonePropsDef,
 } from '../types';
 import { FERAL } from './items';
-import { MUSTER_CIRCUIT, type MusterCampId, musterCamp } from './mirefen_muster';
+import {
+  MUSTER_CIRCUIT,
+  MUSTER_COMMAND_KEEP_OUT,
+  type MusterCampId,
+  musterCamp,
+} from './mirefen_muster';
 
 export const DEEPFEN_SHALLOWS_LAKE = { x: -110, z: 310, radius: 35 };
 
@@ -353,6 +358,10 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // A fen is all water and reed banks; pathing a 9-unit giant around them wedges him
     // on the first collider, so he walks the straight line as Thunzharr does.
     phasesThroughObstacles: true,
+    // ...except into the muster's command camp, the one place a player goes to arm up
+    // rather than to fight him: no leg, chase, leash return or walk to bed ever crosses
+    // its circle (content/mirefen_muster.ts MUSTER_COMMAND_KEEP_OUT, mob/keep_out.ts).
+    keepOut: [MUSTER_COMMAND_KEEP_OUT],
     // He WADES. A phasing mover otherwise rides the water surface, and the first cut of
     // this boss crossed the Mirefen lakes with his boots on the waterline like a cork:
     // thirteen yards of granite floating in four yards of fen. With this, his feet stay

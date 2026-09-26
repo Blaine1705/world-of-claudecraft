@@ -20,7 +20,7 @@ import {
   MUSTER_CLUTTER_KEYS,
   MUSTER_PIECE_SPECS,
   type MusterKitKey,
-} from '../src/render/muster_camps_core';
+} from '../src/sim/muster_camp_layout';
 
 // The Mirefen muster camp kit (image-to-glb pipeline, Blender factory at
 // scripts/assets/muster_camp/model.py). Pins the source inventory, the live source

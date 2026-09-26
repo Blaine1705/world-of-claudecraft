@@ -20,6 +20,8 @@ export function offlineWorldConfig(options: {
     // Editor play-test maps opt out of the live world's entry features.
     riftPortals: options.world === undefined,
     compulsoryTutorial: options.world === undefined,
+    // The Mirefen muster camps are the built-in fen's (src/sim/mirefen_muster.ts).
+    mirefenMuster: options.world === undefined,
     // Match live idle-AI throttling outside the player's actionable interest.
     idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
     // The sky's own UTC clock (plus the dev /daynight override), so the world boss who

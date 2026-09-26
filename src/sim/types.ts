@@ -2027,6 +2027,13 @@ export interface MobTemplate {
   // wedge on camp furniture while closing on a target.
   phasesThroughObstacles?: boolean;
   /**
+   * Circles a PHASING mover never walks into (mob/keep_out.ts): a straight line that
+   * would enter one bends round its edge, a target inside one is chased only to its
+   * edge, and a body that finds itself inside walks straight out. The phasing mode
+   * above ignores every wall, so this is the one way to keep a giant out of a place.
+   */
+  keepOut?: readonly { x: number; z: number; radius: number }[];
+  /**
    * Yards of water this body walks THROUGH with its feet on the bed before it would
    * have to swim. A giant does not float: in a fen whose lakes are a few yards deep
    * he wades, the surface rides up his shins, and the raid on the shore watches the
@@ -8674,6 +8681,11 @@ export interface SimConfig {
   // Default OFF so deterministic tests, parity traces, and the RL env never
   // teleport a fresh character mid-scenario unless they opt in.
   compulsoryTutorial?: boolean;
+  // Live worlds (server + offline client): raise the Mirefen muster (its squads, the
+  // command camp and its weapon rack; src/sim/mirefen_muster.ts) on the first tick,
+  // whether or not Balgath is up. Default OFF so deterministic tests, parity traces and
+  // the RL env allocate no muster ids unless they opt in (or see a Balgath).
+  mirefenMuster?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.

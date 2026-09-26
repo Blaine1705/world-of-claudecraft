@@ -224,6 +224,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.shardpike.leanLeft': '向左倾斜',
   'hudChrome.shardpike.promptHoldSteadyLean': '稳住长矛：用{left}和{right}倾斜',
   'hudChrome.shardpike.promptFindBossMuster': '征召军的碎晶长矛：用它戳瞎工头的眼睛',
+  'hudChrome.shardpike.promptTakePike': '按 {key} 或点击武器架，取一把碎晶长矛',
+  'hudChrome.shardpike.promptTakePikeClick': '点击武器架，取一把碎晶长矛',
+  'hudChrome.shardpike.promptTakePikeTap': '轻触武器架，取一把碎晶长矛',
   'hudChrome.shardpike.braceTooltipLean':
     '将矛尾抵地，矛尖上举。用横移键或转向键倾斜，或按住横梁上方的两个按键：横梁会自行偏移，他每落下一击都会把它震歪。让它远离两端{set}秒，长矛即告架稳。需要坚实的地面，且不能在坐骑上。',
   'hudChrome.shardpike.promptLabel': '碎晶长矛指示',

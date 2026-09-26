@@ -66,6 +66,11 @@ export const hudChromeStrings = {
     promptBrace: 'Couch the Shardpike, then hold it steady',
     promptFindBoss: "Skerrit's Shardpike: put out the Foreman's eye with it",
     promptFindBossMuster: "The muster's Shardpike: put out the Foreman's eye with it",
+    // Beside the muster's weapon rack with no pike in hand (shardpike_prompt_view.ts):
+    // the interact key when one is bound, the click alone when none is, the tap on touch.
+    promptTakePike: 'Press {key} or click the rack to take a Shardpike',
+    promptTakePikeClick: 'Click the rack to take a Shardpike',
+    promptTakePikeTap: 'Tap the rack to take a Shardpike',
     promptHoldSteadyLean: 'Hold the pike steady: lean with {left} and {right}',
     // The two press-and-hold keycaps above the beam (shardpike_lean_view.ts): their
     // accessible names, with the bound key when there is one.

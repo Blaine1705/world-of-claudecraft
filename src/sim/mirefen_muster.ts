@@ -4,11 +4,14 @@
 // army's whole lifecycle, driven once per tick from the world-boss scheduler pass
 // (world_boss.ts), which is the one place that already knows whether the Foreman exists:
 //
-//   - MUSTER: the army is raised the first time a Balgath exists in the world (the
-//     scheduler's own spawn, or a dev spawn found by a once-a-second scan) and then stays.
-//     Raising it on the boss rather than at world construction is deliberate: no entity id
-//     moves in any world that never sees him (the parity goldens, the RL env), and the
-//     muster is only ever in a world that has something for it to contain.
+//   - MUSTER: on the live worlds (the realm server and the offline client, which opt in
+//     with SimConfig.mirefenMuster) the army is raised on the FIRST pass, whether Balgath
+//     is up, asleep, dead until dawn, or not spawned yet: the camps are the fen's, not the
+//     fight's, and the weapon rack has to be there for anyone who walks up to it. Worlds
+//     that do not opt in (the parity goldens, the RL env, bare test Sims) still raise it
+//     the first time a Balgath exists (the scheduler's own spawn, or a dev spawn found by
+//     a once-a-second scan), so no entity id moves in a world that never sees him. Once
+//     raised it stays.
 //   - STANCE: soldiers face him while he is within sight, and while he is ENGAGED and
 //     close they brace (aggroTargetId on him, which is what the renderer reads to hold a
 //     combat idle). They never attack him and never enter combat (mob/muster_soldier.ts).
@@ -108,7 +111,9 @@ export function tickMusterArmy(
   dawn: boolean,
 ): void {
   const boss = resolveBoss(ctx, army, scheduled);
-  if (boss && !musterRaised(army)) raiseMuster(ctx, army);
+  // The opt-in raise is the built-in fen's: an editor document has no muster camps.
+  const atBoot = ctx.cfg.mirefenMuster && ctx.cfg.world === undefined;
+  if (!musterRaised(army) && (boss || atBoot)) raiseMuster(ctx, army);
   if (!musterRaised(army)) return;
 
   const engaged = !!boss && !boss.dead && !boss.asleep && boss.inCombat;
@@ -145,9 +150,10 @@ export function tickMusterArmy(
   tickLentPikes(ctx, army.lent, pullEnded);
 }
 
-/** The rack was used: lend a pike (interaction.ts routes the rack's interact here). */
-export function useMusterRack(ctx: SimContext, army: MusterArmyState, pid: number): void {
-  takeMusterPike(ctx, army.lent, pid);
+/** The rack was used: lend a pike (interaction.ts routes both the interact key and the
+ *  rack click here). True when a pike went into the player's hands. */
+export function useMusterRack(ctx: SimContext, army: MusterArmyState, pid: number): boolean {
+  return takeMusterPike(ctx, army.lent, pid);
 }
 
 /** Is this entity the muster's weapon rack? */

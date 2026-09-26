@@ -65,17 +65,17 @@ export function isLentGear(itemId: string | null | undefined): boolean {
  * (either one: Skerrit's quest pike drives the same trial, so a second would be clutter),
  * and when the bags cannot take the pike or the weapons it would displace.
  */
-export function takeMusterPike(ctx: SimContext, lent: LentPikes, pid: number): void {
+export function takeMusterPike(ctx: SimContext, lent: LentPikes, pid: number): boolean {
   const r = ctx.resolve(pid);
-  if (!r) return;
+  if (!r) return false;
   const { meta, e: p } = r;
   if (p.dead) {
     ctx.error(pid, "You can't do that while dead.");
-    return;
+    return false;
   }
   if (isShardpikeItem(meta.equipment.mainhand)) {
     ctx.error(pid, 'You already hold a Shardpike.');
-    return;
+    return false;
   }
   const record: LentPikeRecord = {
     mainhand: meta.equipment.mainhand ?? null,
@@ -87,7 +87,7 @@ export function takeMusterPike(ctx: SimContext, lent: LentPikes, pid: number): v
   if (minted) {
     if (!ctx.canAddItem(MUSTER_SHARDPIKE_ID, 1, pid)) {
       ctx.error(pid, 'Your bags are full.');
-      return;
+      return false;
     }
     // movement: a loan is not an acquisition, so no Reliquary obtain count moves (the
     // item still counts as SEEN in the discovered-items ledger, like any item held); the
@@ -99,10 +99,11 @@ export function takeMusterPike(ctx: SimContext, lent: LentPikes, pid: number): v
     // The swap refused (it has already said why, e.g. no room for the benched off hand):
     // hand nothing out rather than leave a pike loose in the bags.
     if (minted) ctx.removeItem(MUSTER_SHARDPIKE_ID, 1, pid);
-    return;
+    return false;
   }
   lent.set(pid, record);
   ctx.notice(pid, 'You take a Shardpike from the muster rack.');
+  return true;
 }
 
 /**

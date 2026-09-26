@@ -36,6 +36,9 @@ export function buildRealmSimConfig(
     // because this module is where that literal now lives.
     compulsoryTutorial: true,
     worldBossAtBoot: true,
+    // The Mirefen muster (squads, command camp, weapon rack) stands from boot, whether
+    // or not Balgath is up (src/sim/mirefen_muster.ts).
+    mirefenMuster: true,
     // Ranked rift portals spawn on the live realm (dev/test worlds opt in).
     riftPortals: true,
     // Distance-cull idle-mob AI (issue #2703): shouldSkipIdleMobTick skips a

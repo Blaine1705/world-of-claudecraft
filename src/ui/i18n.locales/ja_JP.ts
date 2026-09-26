@@ -228,6 +228,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.shardpike.leanLeft': '左に傾ける',
   'hudChrome.shardpike.promptHoldSteadyLean': 'パイクを支えろ：{left}と{right}で傾けろ',
   'hudChrome.shardpike.promptFindBossMuster': '召集兵団のシャードパイク：これで監督の眼を潰せ',
+  'hudChrome.shardpike.promptTakePike': '{key}を押すか武器棚をクリックして、シャードパイクを取れ',
+  'hudChrome.shardpike.promptTakePikeClick': '武器棚をクリックしてシャードパイクを取れ',
+  'hudChrome.shardpike.promptTakePikeTap': '武器棚をタップしてシャードパイクを取れ',
   'hudChrome.shardpike.braceTooltipLean':
     '石突きを地面に据え、穂先を掲げる。横移動キーか旋回キー、またはバーの上の二つのキーを押し続けて傾けろ。バーはひとりでに揺れ、彼の一撃ごとに弾かれる。{set}秒間端に触れさせなければパイクが据わる。固い地面が必要で、騎乗中は使えない。',
   'hudChrome.shardpike.promptLabel': 'シャードパイクの指示',

@@ -6,6 +6,8 @@
 
 import { keyLabel } from '../../../game/keybinds';
 import { lanceLeanIntent } from '../../../game/lance_lean_intent';
+import { MUSTER_RACK, MUSTER_RACK_TEMPLATE_ID } from '../../../sim/content/mirefen_muster';
+import { INTERACT_RANGE } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import type { PainterHostWriters } from '../../painter_host';
 import { type ShardpikeBarDeps, ShardpikeBarPainter } from './shardpike_bar_painter';
@@ -45,6 +47,7 @@ export function createShardpikeBar(
   // sits with the action bars where the hands are, and the instruction sits up near the
   // middle where the eyes already are during a fight. A missing element is a no-op painter
   // for the same reason the bar's is: narrower test and editor documents must not break.
+  const rack = rackReach();
   const promptRoot = doc.getElementById('shardpike-prompt');
   const prompt = promptRoot ? new ShardpikePromptPainter(writers, promptRoot) : null;
   const painter = new ShardpikeBarPainter(
@@ -83,6 +86,9 @@ export function createShardpikeBar(
           restRemaining,
           dead,
           leanKeys,
+          rackInReach: rack(w),
+          interactKey: interactKeyLabel(deps),
+          touch: doc.body?.classList.contains('mobile-touch') ?? false,
         }),
       );
     },
@@ -91,5 +97,48 @@ export function createShardpikeBar(
       painter.hide();
       prompt?.hide();
     },
+  };
+}
+
+/** The bound interact key's label, '' when there is none (or no keybinds host). */
+function interactKeyLabel(deps: ShardpikeBarDeps): string {
+  const code = deps.keybinds?.().codesForAction('interact')[0];
+  return code ? keyLabel(code) : '';
+}
+
+/**
+ * "Is the muster's weapon rack within interact reach?", cheap enough to ask every frame.
+ *
+ * The rack stands at a fixed post, so the frame's whole cost away from it is one distance
+ * to MUSTER_RACK. Only inside reach is the entity itself confirmed (it is the thing the
+ * press acts on, and a world without the muster has none): looked up once by template and
+ * then held by id, so standing at the rack costs a map lookup, not a roster walk.
+ */
+function rackReach(): (w: IWorld) => boolean {
+  let rackId: number | null = null;
+  let missedAt = -1;
+  return (w) => {
+    const pos = w.player.pos;
+    if (Math.hypot(pos.x - MUSTER_RACK.x, pos.z - MUSTER_RACK.z) > INTERACT_RANGE) return false;
+    let rack = rackId !== null ? w.entities.get(rackId) : undefined;
+    if (rack?.templateId !== MUSTER_RACK_TEMPLATE_ID) {
+      rack = undefined;
+      rackId = null;
+      // A fruitless look is not repeated until an entity is added or dropped.
+      if (missedAt === w.entityRosterVersion) return false;
+      missedAt = w.entityRosterVersion;
+      for (const e of w.entities.values()) {
+        if (e.kind === 'object' && e.templateId === MUSTER_RACK_TEMPLATE_ID) {
+          rack = e;
+          rackId = e.id;
+          break;
+        }
+      }
+    }
+    return (
+      !!rack &&
+      rack.lootable &&
+      Math.hypot(pos.x - rack.pos.x, pos.z - rack.pos.z) <= INTERACT_RANGE
+    );
   };
 }

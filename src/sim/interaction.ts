@@ -273,6 +273,17 @@ export function pickUpObject(
   }
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable) return false;
+  // The muster's weapon rack lends a pike, it is never looted. Both client entry points
+  // (the rack click and the interact key's object arm) send THIS command, not interact,
+  // so the rack is answered here, ahead of the item-payload gate below that it would
+  // otherwise fail silently (a rack carries no objectItemId).
+  if (isMusterRack(obj)) {
+    if (dist2d(p.pos, obj.pos) > INTERACT_RANGE) {
+      ctx.error(meta.entityId, 'Too far away.');
+      return false;
+    }
+    return useMusterRack(ctx, ctx.musterArmy, meta.entityId);
+  }
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
   const isRealmBuilderMonument = obj.templateId === REALM_BUILDER_MONUMENT_TEMPLATE_ID;
   // Preserve the historical no-op for malformed/non-pickup objects. The board

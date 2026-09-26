@@ -6,9 +6,23 @@ import {
   MUSTER_LOW_TIER_KIT_KEYS,
   MUSTER_TORCH_FLAME_HEIGHT,
   musterCampDecor,
-  musterCampPlan,
   renderDecorProps,
 } from '../src/render/muster_camps';
+import { nameplatePlanInto, newNameplatePlan } from '../src/render/nameplate_view';
+import {
+  buildPickOnlyObjectBody,
+  isPickOnlyObjectTemplate,
+  PICK_ONLY_OBJECT_TEMPLATE_IDS,
+} from '../src/render/pick_only_objects';
+import { propPreloadInternalsForTest } from '../src/render/props';
+import {
+  MUSTER_CAMPS,
+  MUSTER_CIRCUIT,
+  MUSTER_RACK,
+  MUSTER_RACK_TEMPLATE_ID,
+  type MusterCampDef,
+} from '../src/sim/content/mirefen_muster';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import {
   angleGap,
   bearingTo,
@@ -25,29 +39,15 @@ import {
   musterFootprintDistance,
   musterPlacementsForTier,
   planMusterCamps,
-} from '../src/render/muster_camps_core';
-import { nameplatePlanInto, newNameplatePlan } from '../src/render/nameplate_view';
-import {
-  buildPickOnlyObjectBody,
-  isPickOnlyObjectTemplate,
-  PICK_ONLY_OBJECT_TEMPLATE_IDS,
-} from '../src/render/pick_only_objects';
-import { propPreloadInternalsForTest } from '../src/render/props';
-import {
-  MUSTER_CAMPS,
-  MUSTER_CIRCUIT,
-  MUSTER_RACK,
-  MUSTER_RACK_TEMPLATE_ID,
-  type MusterCampDef,
-} from '../src/sim/content/mirefen_muster';
-import { BUILTIN_WORLD } from '../src/sim/data';
+} from '../src/sim/muster_camp_layout';
+import { musterCampPlan } from '../src/sim/muster_camp_plan';
 import { INTERACT_RANGE, type WorldContent } from '../src/sim/types';
 import { generateDecorationsInBounds, terrainHeight } from '../src/sim/world';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import { t } from '../src/ui/i18n';
 
-// The Mirefen muster camps' layout core (src/render/muster_camps_core.ts), driven on
+// The Mirefen muster camps' layout core (src/sim/muster_camp_layout.ts), driven on
 // the REAL camp records, the real heightfield and the real tree/rock scatter, exactly
 // as src/render/muster_camps.ts feeds it in game.
 

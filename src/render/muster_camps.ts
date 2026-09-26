@@ -1,4 +1,5 @@
-// The Mirefen muster camps' art: the Three-side adapter over muster_camps_core.ts.
+// The Mirefen muster camps' art: the Three-side adapter over the sim's camp plan
+// (src/sim/muster_camp_layout.ts plans it, src/sim/muster_camp_plan.ts seeds it).
 //
 // Balgath marches between the army pickets ringing the Starfall Crater and smashes them
 // (src/sim/content/mirefen_muster.ts is the layout). The camp kit is thirteen
@@ -15,21 +16,18 @@
 //     the live preset (clutter is shed on the low preset, structure never is);
 //   - `buildMusterRackPickBody` is the weapon rack entity's click volume: the rack's
 //     art is drawn here by the camp, so its sim entity needs only something to pick.
-// Nothing here collides: render-only dressing, never a sim collider.
+// The collision for the same pieces is the sim's (src/sim/muster_camp_colliders.ts, off
+// the same plan), so nothing here needs to know about it.
 
 import * as THREE from 'three';
-import { MUSTER_CAMPS, MUSTER_CIRCUIT, MUSTER_RACK } from '../sim/content/mirefen_muster';
 import { BUILTIN_WORLD } from '../sim/data';
-import type { WorldContent } from '../sim/types';
-import { generateDecorationsInBounds, terrainHeight, WATER_LEVEL } from '../sim/world';
-import { WORLD_BOSSES } from '../sim/world_boss';
 import {
   MUSTER_CLUTTER_KEYS,
   type MusterKitKey,
-  type MusterPlacement,
   musterPlacementsForTier,
-  planMusterCamps,
-} from './muster_camps_core';
+} from '../sim/muster_camp_layout';
+import { musterCampPlan } from '../sim/muster_camp_plan';
+import type { WorldContent } from '../sim/types';
 
 /** The kit's props registry rows (url per piece; one material-dedup kit). */
 export const MUSTER_KIT_PROP_DEFS: Readonly<Record<MusterKitKey, { url: string; kit: string }>> =
@@ -68,50 +66,6 @@ export type RenderDecorProp = AuthoredDecorProp & {
   pitch?: number;
   roll?: number;
 };
-
-/** Balgath's lair: his opening leg starts here (the world-boss spawn record). */
-function balgathLair(): { x: number; z: number } {
-  const def = WORLD_BOSSES.find((boss) => boss.templateId === 'balgath_cyclops');
-  if (!def) throw new Error('muster camps: no balgath_cyclops world-boss record');
-  return def.pos;
-}
-
-/** Trunks and boulders around the camps (the scatter the sim and foliage share). */
-function campObstacles(seed: number): { x: number; z: number; r: number }[] {
-  const out: { x: number; z: number; r: number }[] = [];
-  for (const camp of MUSTER_CAMPS) {
-    const reach = 26;
-    for (const d of generateDecorationsInBounds(seed, {
-      minX: camp.center.x - reach,
-      maxX: camp.center.x + reach,
-      minZ: camp.center.z - reach,
-      maxZ: camp.center.z + reach,
-    })) {
-      out.push({ x: d.x, z: d.z, r: (d.kind === 'rock' ? 1.0 : 0.9) * d.scale });
-    }
-  }
-  return out;
-}
-
-const planBySeed = new Map<number, MusterPlacement[]>();
-
-/** The full muster plan (both tier classes) for a world seed, computed once. */
-export function musterCampPlan(seed: number): readonly MusterPlacement[] {
-  let plan = planBySeed.get(seed);
-  if (!plan) {
-    plan = planMusterCamps({
-      camps: MUSTER_CAMPS,
-      circuit: MUSTER_CIRCUIT,
-      lair: balgathLair(),
-      rack: MUSTER_RACK,
-      heightAt: (x, z) => terrainHeight(x, z, seed),
-      obstacles: campObstacles(seed),
-      minGroundY: WATER_LEVEL + 0.5,
-    });
-    planBySeed.set(seed, plan);
-  }
-  return plan;
-}
 
 /** The muster placements the props pass draws for the live preset, as decor entries.
  *  Empty outside the built-in world (an editor document has no muster). */

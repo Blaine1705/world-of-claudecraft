@@ -143,6 +143,26 @@ export function musterCamp(id: MusterCampId): MusterCampDef {
   return camp;
 }
 
+/**
+ * The circle Balgath never sets foot in: the command camp, whose rack is the one place a
+ * player walks up to without standing in his way. He phases through walls, so its palisade
+ * cannot keep him out; this circle does (MobTemplate.keepOut, mob/keep_out.ts), for every
+ * way he moves: a warpath leg, a focus-phase chase, a leash return, the walk to his bed.
+ * Sized from the camp plan: its outermost piece reaches about 18.8 yards from the centre,
+ * his body is about 3 yards across the shoulders from its middle, and the rest is margin
+ * (tests/muster_camp_colliders.test.ts re-measures all three, and that every leg and his
+ * walk home from every stop stays well clear of it).
+ */
+export const MUSTER_COMMAND_KEEP_OUT: {
+  readonly x: number;
+  readonly z: number;
+  readonly radius: number;
+} = Object.freeze({
+  x: musterCamp('command').center.x,
+  z: musterCamp('command').center.z,
+  radius: 24,
+});
+
 // ---------------------------------------------------------------------------
 // The soldiers
 // ---------------------------------------------------------------------------

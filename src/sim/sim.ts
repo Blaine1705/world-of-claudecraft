@@ -375,6 +375,7 @@ import {
   updateMob as updateMobFn,
 } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
+import { phaseStep } from './mob/phase_step';
 import { applyPlayerDummyVitals } from './mob/practice_dummies';
 import { questGateBlocksAggro, questGateBlocksCombat } from './mob/quest_gated_aggro';
 import {
@@ -2233,6 +2234,7 @@ export class Sim {
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
       compulsoryTutorial: cfg.compulsoryTutorial ?? false,
+      mirefenMuster: cfg.mirefenMuster ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       weeklyRaidResetMs:
@@ -2714,9 +2716,8 @@ export class Sim {
     }
   }
 
-  // World-boss scheduler: the per-slot lifecycle lives in world_boss.ts
-  // (tickWorldBossSchedule); the STATE stays here as live views, and so does the spawn
-  // primitive, which needs createMob/addEntity/groundPos. Draws no rng.
+  // World-boss scheduler (world_boss.ts tickWorldBossSchedule): the STATE stays here as
+  // live views, and so does the spawn primitive (createMob/addEntity/groundPos). No rng.
   private updateWorldBosses(): void {
     tickWorldBossSchedule(
       this.ctx,
@@ -8059,24 +8060,8 @@ export class Sim {
     const step = Math.min(speed * DT, d);
     const canSwim = this.mobCanSwim(MOBS[e.templateId]);
 
-    if (ignoreObstacles) {
-      const nx = e.pos.x + Math.sin(desired) * step;
-      const nz = e.pos.z + Math.cos(desired) * step;
-      e.pos.x = nx;
-      e.pos.z = nz;
-      const g = groundHeight(nx, nz, this.cfg.seed);
-      // Ride the surface while phasing rather than sink under terrain or water, EXCEPT
-      // a body tall enough to wade this water: its feet stay on the bed and the surface
-      // rides up its legs (MobTemplate.wadeDepth). The first Balgath floated across the
-      // Mirefen lakes at travel speed with his boots on the waterline, which is what a
-      // thirteen-yard giant in four yards of fen must never do.
-      const wadeDepth = MOBS[e.templateId]?.wadeDepth;
-      e.pos.y =
-        wadeDepth !== undefined && g >= waterLevelAt(nx, nz, this.cfg.seed) - wadeDepth
-          ? g
-          : Math.max(g, swimSurfaceY(nx, nz, this.cfg.seed));
-      return d - step < 0.3;
-    }
+    // The straight-line step (and the keep-out circles it still obeys): mob/phase_step.ts.
+    if (ignoreObstacles) return phaseStep(e, dest, desired, step, d, this.cfg.seed);
     // Mobs have no nav mesh. Try the straight path first; only if a prop or the
     // waterline eats it do we fan the heading out and take the best slide AROUND
     // the obstacle. That lets a mob round the camp props to reach its target

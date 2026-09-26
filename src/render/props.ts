@@ -1612,7 +1612,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         : ground(d.x, d.z) - 0.05 - (d.sink ?? 0);
     g.position.set(d.x, baseY, d.z);
     g.rotation.y = d.rot ?? 0;
-    // a muster piece leans with the hillside under it (muster_camps_core.ts)
+    // a muster piece leans with the hillside under it (src/sim/muster_camp_layout.ts)
     if (d.pitch || d.roll) g.rotation.set(d.pitch ?? 0, d.rot ?? 0, d.roll ?? 0, 'YXZ');
     group.add(shadowed(g));
     if (d.r) {

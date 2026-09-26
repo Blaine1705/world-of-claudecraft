@@ -1,0 +1,211 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// The Mirefen muster on the two LIVE hosts, and the weapon rack through the real command
+// path each of them uses.
+//
+// The muster used to be raised only once a Balgath existed, so the offline world (whose
+// first world-boss rise is an hour out) had no soldiers, no camp and no rack for its first
+// hour, and a host whose Balgath was not up had none at all. The live hosts now opt in
+// (SimConfig.mirefenMuster) and the muster stands from the first tick, boss or no boss.
+//
+// The rack: every client entry point (the rack click and the interact key's object arm,
+// src/game/interactions.ts and nearby_interaction.ts) sends `pickup`, never `interact`,
+// and the sim's pickup refused any object without an item payload, so the rack silently
+// did nothing online and offline alike. Driven here through GameServer.handleMessage, the
+// exact frames a client sends. Db is mocked (no Postgres), as in the other server rigs.
+vi.mock('../server/db', () => ({
+  pool: { query: vi.fn(async () => ({ rows: [] })) },
+  saveCharacterState: vi.fn(async () => {}),
+  openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
+  closePlaySession: vi.fn(async () => {}),
+  insertChatLogs: vi.fn(async () => {}),
+  loadAccountFlair: vi.fn(async () => null),
+  walletForAccount: vi.fn(async () => null),
+  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+}));
+
+import { GameServer } from '../server/game';
+import { buildRealmSimConfig } from '../server/sim_boot_config';
+import { offlineWorldConfig } from '../src/game/offline_world_config';
+import {
+  MUSTER_CAMPS,
+  MUSTER_PIKE_LEASH,
+  MUSTER_RACK,
+  MUSTER_RACK_TEMPLATE_ID,
+} from '../src/sim/content/mirefen_muster';
+import type { MusterArmyState } from '../src/sim/mirefen_muster';
+import { MUSTER_SHARDPIKE_ID } from '../src/sim/muster_pike';
+import { Sim } from '../src/sim/sim';
+import { inertVaultConsumptionAdmission } from '../src/sim/sim_context';
+import type { Entity } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
+
+afterEach(() => vi.unstubAllGlobals());
+
+const TOTAL = MUSTER_CAMPS.reduce((n, c) => n + c.soldiers.length, 0);
+const army = (sim: Sim) => (sim as unknown as { musterArmy: MusterArmyState }).musterArmy;
+const balgaths = (sim: Sim) =>
+  [...sim.entities.values()].filter((e) => e.templateId === 'balgath_cyclops');
+
+function expectFullMuster(sim: Sim): Entity {
+  const a = army(sim);
+  expect(a.soldierIds.length).toBe(TOTAL);
+  for (const id of a.soldierIds) {
+    const s = sim.entities.get(id);
+    expect(s?.kind).toBe('mob');
+    expect(s?.dead).toBe(false);
+    expect(s?.hostile).toBe(false);
+  }
+  const commander = a.soldierIds
+    .map((id) => sim.entities.get(id))
+    .find((e) => e?.templateId === 'muster_captain');
+  expect(commander, 'the Muster Commander stands at the command camp').toBeDefined();
+  const rack = a.rackId !== null ? sim.entities.get(a.rackId) : undefined;
+  expect(rack?.templateId).toBe(MUSTER_RACK_TEMPLATE_ID);
+  expect(rack?.lootable).toBe(true);
+  return rack as Entity;
+}
+
+describe('the muster stands from boot on both live hosts', () => {
+  it('offline: the browser world config raises it on the first tick with no Balgath anywhere', () => {
+    let n = 0;
+    vi.stubGlobal('crypto', {
+      randomUUID: () => `00000000-0000-4000-8000-${String(++n).padStart(12, '0')}`,
+    });
+    const cfg = offlineWorldConfig({ playerClass: 'mage', name: 'Ana', devCommands: false });
+    expect(cfg.mirefenMuster).toBe(true);
+    // Pin the sky to midnight so the case never depends on when it runs.
+    const sim = new Sim({ ...cfg, dayNightNowMs: () => Date.UTC(2026, 0, 1, 0, 0, 0) });
+    sim.tick();
+    // His first offline rise is an hour out: the muster did not wait for him.
+    expect(balgaths(sim)).toEqual([]);
+    expectFullMuster(sim);
+  });
+
+  it('online: the realm boot config raises it on the first tick, and it outlives his corpse', () => {
+    const cfg = buildRealmSimConfig(undefined, inertVaultConsumptionAdmission);
+    expect(cfg.mirefenMuster).toBe(true);
+    const server = new GameServer();
+    const sim: Sim = server.sim;
+    sim.tick();
+    expectFullMuster(sim);
+    // Kill him and clear his corpse window: the muster is still standing, every one of them.
+    for (const boss of balgaths(sim)) {
+      boss.hp = 0;
+      boss.dead = true;
+      boss.corpseTimer = 0;
+    }
+    for (let i = 0; i < 40; i++) sim.tick();
+    expect(balgaths(sim).filter((b) => !b.dead)).toEqual([]);
+    expectFullMuster(sim);
+  });
+
+  it('a world that does not opt in still raises nothing until a Balgath exists', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
+    for (let i = 0; i < 40; i++) sim.tick();
+    expect(army(sim).soldierIds).toEqual([]);
+    expect(army(sim).rackId).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The rack, through the server's command switch
+// ---------------------------------------------------------------------------
+
+interface Joined {
+  session: { pid: number; blockListLoaded: boolean };
+  e: Entity;
+  frames: { t: string; rid?: number; ok?: boolean; list?: { type: string; text?: string }[] }[];
+}
+
+function join(server: GameServer, id: number, cls: 'warrior' | 'mage'): Joined {
+  const frames: Joined['frames'] = [];
+  const ws = { readyState: 1, send: (payload: string) => frames.push(JSON.parse(payload)) };
+  // biome-ignore lint/suspicious/noExplicitAny: the rig drives GameServer's private surface
+  const session = (server as any).join(ws, id, id, `Pikeman${id}`, cls, null);
+  if ('error' in session) throw new Error(session.error);
+  session.blockListLoaded = true;
+  const e = server.sim.entities.get(session.pid) as Entity;
+  return { session, e, frames };
+}
+
+function metaOf(sim: Sim, pid: number) {
+  const meta = sim.meta(pid);
+  if (!meta) throw new Error(`no meta for ${pid}`);
+  return meta;
+}
+
+function stand(server: GameServer, e: Entity, x: number, z: number): void {
+  e.pos.x = x;
+  e.pos.z = z;
+  e.pos.y = terrainHeight(x, z, server.sim.cfg.seed);
+  e.prevPos = { ...e.pos };
+}
+
+function send(server: GameServer, j: Joined, msg: Record<string, unknown>): void {
+  // biome-ignore lint/suspicious/noExplicitAny: the rig drives GameServer's private surface
+  (server as any).handleMessage(j.session, JSON.stringify({ t: 'cmd', ...msg }));
+}
+
+describe('the weapon rack lends a Shardpike through the real command path', () => {
+  it('a rack click (the pickup command) equips the pike at level 1, remembering the weapons', () => {
+    const server = new GameServer();
+    const sim: Sim = server.sim;
+    sim.tick();
+    const rack = expectFullMuster(sim);
+    const j = join(server, 7, 'mage');
+    const meta = metaOf(sim, j.session.pid);
+    expect(j.e.level).toBe(1);
+    const before = { mainhand: meta.equipment.mainhand, offhand: meta.equipment.offhand };
+    expect(before.mainhand).toBeTruthy();
+    // Beside the rack, well inside interact reach.
+    stand(server, j.e, MUSTER_RACK.x, MUSTER_RACK.z + 2.5);
+    send(server, j, { cmd: 'pickup', id: rack.id, rid: 11 });
+    expect(meta.equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
+    expect(army(sim).lent.get(j.session.pid)).toEqual({
+      mainhand: before.mainhand ?? null,
+      offhand: before.offhand ?? null,
+    });
+    // The client's pending-command promise resolves true (the rack did something).
+    expect(j.frames.find((f) => f.t === 'commandOutcome' && f.rid === 11)?.ok).toBe(true);
+    // The loan ends when he walks out of the muster's reach: pike gone, weapons back.
+    stand(server, j.e, MUSTER_PIKE_LEASH.x + MUSTER_PIKE_LEASH.radius + 20, MUSTER_PIKE_LEASH.z);
+    for (let i = 0; i < 5; i++) sim.tick();
+    expect(meta.equipment.mainhand).toBe(before.mainhand);
+    expect(meta.equipment.offhand).toBe(before.offhand);
+    expect(sim.countItem(MUSTER_SHARDPIKE_ID, j.session.pid)).toBe(0);
+    expect(army(sim).lent.has(j.session.pid)).toBe(false);
+  });
+
+  it('the interact key reaches the rack too, and a second take is refused politely', () => {
+    const server = new GameServer();
+    const sim: Sim = server.sim;
+    sim.tick();
+    const rack = expectFullMuster(sim);
+    const j = join(server, 8, 'warrior');
+    const meta = metaOf(sim, j.session.pid);
+    stand(server, j.e, MUSTER_RACK.x + 1, MUSTER_RACK.z + 2.5);
+    send(server, j, { cmd: 'interact' });
+    expect(meta.equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
+    send(server, j, { cmd: 'pickup', id: rack.id, rid: 12 });
+    expect(j.frames.find((f) => f.t === 'commandOutcome' && f.rid === 12)?.ok).toBe(false);
+    expect(sim.countItem(MUSTER_SHARDPIKE_ID, j.session.pid)).toBe(0);
+  });
+
+  it('refuses from out of reach, and nothing moves', () => {
+    const server = new GameServer();
+    const sim: Sim = server.sim;
+    sim.tick();
+    const rack = expectFullMuster(sim);
+    const j = join(server, 9, 'warrior');
+    const meta = metaOf(sim, j.session.pid);
+    const before = meta.equipment.mainhand;
+    stand(server, j.e, MUSTER_RACK.x, MUSTER_RACK.z + 9);
+    send(server, j, { cmd: 'pickup', id: rack.id, rid: 13 });
+    expect(meta.equipment.mainhand).toBe(before);
+    expect(j.frames.find((f) => f.t === 'commandOutcome' && f.rid === 13)?.ok).toBe(false);
+    expect(army(sim).lent.has(j.session.pid)).toBe(false);
+  });
+});

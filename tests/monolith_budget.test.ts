@@ -1146,7 +1146,10 @@ const MONOLITHS: MonolithRow[] = [
     // literal. The boss branch's own row was measured against a tree 5820 commits
     // older, so it is a historical record here, not a budget. Exact merged count,
     // zero slack: any further growth reds again.
-    ceiling: 11859,
+    // LOWERED 11859 -> 11844 with the phasing step moved to src/sim/mob/phase_step.ts
+    // (where Balgath's keep-out circle round the muster's command camp now lives).
+    // Exact count, zero slack.
+    ceiling: 11844,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -2057,7 +2060,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the keep wall-ledge and parapet loops retired and the Wildheart static set moved beside its field data. Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    ceiling: 2548,
+    // LOWERED 2548 -> 2482 when the Mirefen muster camps gained collision: the camp
+    // colliders and pocket seals live in muster_camp_colliders.ts behind one late-collider
+    // hook the streetlamps now share, and lampAreaAt moved to streetlamp_layout.ts, so the
+    // file shrank. Exact count, zero slack.
+    ceiling: 2482,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

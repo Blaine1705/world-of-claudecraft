@@ -2,12 +2,14 @@
 //
 // Pure and deterministic (no Three, no DOM, no i18n, no clock, no Math.random): the
 // same camp records, height sampler and obstacles always give the same plan, and a
-// Vitest drives it directly (tests/muster_camps_core.test.ts). The Three half is
-// src/render/muster_camps.ts, which feeds this plan to the props decor pass.
+// Vitest drives it directly (tests/muster_camps_core.test.ts). It lives in the sim
+// because ONE plan feeds two readers: the art (src/render/muster_camps.ts hands it to
+// the props decor pass) and the collision (src/sim/muster_camp_colliders.ts turns the
+// structure pieces into sim colliders), so the wall a player bumps into is the wall
+// they see. The seeded plan both read is src/sim/muster_camp_plan.ts.
 //
-// Render-only dressing: nothing here collides (the sim keeps no collider for any of
-// it, and the boss phases through obstacles anyway), so the rules below are about what
-// a player SEES:
+// The boss phases through all of it (and never enters the command camp at all:
+// MobTemplate.keepOut), so the rules below are about what a player SEES and walks:
 //   - a PICKET (a stop on Balgath's circuit) keeps every footprint outside
 //     MUSTER_PICKET_CLEAR_RADIUS of its centre: the squad stands there and he plants
 //     there to slam, so no prop may hide the soldiers or the impact;
@@ -34,7 +36,7 @@
 // (Euler order YXZ). A wall section faces OUT (its sharpened side toward the fen), a
 // tent's door faces the camp centre.
 
-import type { MusterCampDef, MusterCampId } from '../sim/content/mirefen_muster';
+import type { MusterCampDef, MusterCampId } from './content/mirefen_muster';
 
 export type MusterKitKey =
   | 'musterPalisade'
@@ -740,10 +742,18 @@ export function planMusterCamps(input: MusterLayoutInput): MusterPlacement[] {
       camp,
       campIndex,
       // At a picket only the sentries stand outside the clear circle; at the command
-      // camp every soldier stands among the tents.
-      slots: camp.soldiers
-        .filter((s) => !camp.onCircuit || Math.hypot(s.dx, s.dz) > MUSTER_PICKET_CLEAR_RADIUS)
-        .map((s) => ({ x: camp.center.x + s.dx, z: camp.center.z + s.dz })),
+      // camp every soldier stands among the tents. Every OTHER camp's posts count too:
+      // the south picket's flank sentries stand out where the command camp's wall runs
+      // (and a west sentry where the south picket's does), and a post inside a
+      // neighbour's palisade is a soldier stuck in a wall.
+      slots: input.camps.flatMap((c) =>
+        c.soldiers
+          .filter(
+            (s) =>
+              c !== camp || !camp.onCircuit || Math.hypot(s.dx, s.dz) > MUSTER_PICKET_CLEAR_RADIUS,
+          )
+          .map((s) => ({ x: c.center.x + s.dx, z: c.center.z + s.dz })),
+      ),
       placed: [],
     };
     if (camp.onCircuit) planPicket(site, input);
