@@ -10545,9 +10545,9 @@ export class Renderer {
       const ghostLook = characterGhostLook(this.sim.playerId, e, ghostWolf, veilboundState);
       active.setGhost(ghostLook !== null, ghostLook ?? 'spirit');
       active.setSoulRend(hasSoulRend);
-      // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
-      // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
-      // Metamorphosis also grows the body via Entity.scale in the sim.
+      // Shadowform tints the base priest rig shadow-purple (no rig swap); Moonkin Form wears
+      // the spirit veil in its violet palette on the same body. Metamorphosis grows the
+      // body via Entity.scale in the sim.
       active.setShadowform(hasShadowform);
       active.setMoonkin(hasMoonkin);
       // Metamorphosis is no longer a tint on the base rig: it has its own lazy

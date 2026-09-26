@@ -1,4 +1,4 @@
-// The spirit veil's program family: which programs a released spirit can draw,
+// The spirit veil's program family: which programs a veiled rig can draw,
 // named as TUPLES of the per-object facts three (0.185.1) folds into their
 // cache keys, plus the transparent sort that draws each ghost rig as one unit.
 //

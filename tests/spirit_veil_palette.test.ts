@@ -168,17 +168,23 @@ describe('a palette is uniform values on the shared programs', () => {
     ]);
   });
 
-  it('writes the same shader text for every palette, colour and dye: only the values move', () => {
-    const texts = new Set<string>();
+  it('writes the same shader text for every palette, colour and dye, per pass: only the values move', () => {
+    const texts = { color: new Set<string>(), decal: new Set<string>(), depth: new Set<string>() };
+    const text = (s: Shader) => `${s.vertexShader}\n${s.fragmentShader}`;
     const dyed = new THREE.MeshStandardMaterial();
     attachArmorDye(dyed, { rules: [RULE] });
     for (const palette of Object.keys(SPIRIT_VEIL_PALETTES) as SpiritVeilPalette[]) {
       for (const source of [new THREE.MeshStandardMaterial({ color: 0x123456 }), dyed]) {
-        const s = compiled(createSpiritVeilMaterial(source, palette));
-        texts.add(`${s.vertexShader}\n${s.fragmentShader}`);
+        texts.color.add(text(compiled(createSpiritVeilMaterial(source, palette))));
       }
+      const decalSource = new THREE.MeshStandardMaterial({ color: 0x3a2a1a, transparent: true });
+      texts.decal.add(text(compiled(createSpiritVeilMaterial(decalSource, palette))));
+      for (const key of ['depth:s:0', 'depth:r:0'])
+        texts.depth.add(text(compiled(spiritVeilDepthMaterial(key, palette))));
     }
-    expect(texts.size).toBe(1);
+    expect(texts.color.size).toBe(1);
+    expect(texts.decal.size).toBe(1);
+    expect(texts.depth.size).toBe(1);
   });
 
   it("hands each material its palette's values, a copy of its source's colour and its dye", () => {
@@ -251,6 +257,9 @@ describe('a palette is uniform values on the shared programs', () => {
     expect(dyeWrite).toBeGreaterThan(dyeRead);
     expect(fragment).toContain('veilBody = mix( veilBody, veilTrue, uVeilKeepColor );');
     expect(fragment).not.toContain('wocLin2Srgb(diffuseColor.rgb)');
+    // a decal carries no dye: its remap is compiled out of the decal variant
+    expect(fragment.indexOf('#ifndef SPIRIT_VEIL_DECAL')).toBeGreaterThan(branch);
+    expect(fragment.indexOf('#ifndef SPIRIT_VEIL_DECAL')).toBeLessThan(dyeRead);
     expect(fragment).toContain('uniform int uDyeCount;');
   });
 

@@ -1,4 +1,6 @@
-// The spirit veil: how a released spirit (a dead player, `e.ghost`) is drawn.
+// The spirit veil: how every translucent character look is drawn, a released
+// spirit (a dead player, `e.ghost`) first, then each user in its palette
+// (spirit_veil_palette_core.ts).
 //
 // Every rig material of the ghost is replaced by ONE unlit spectral material
 // (a MeshBasicMaterial carrying only the source map, with a constant program
@@ -196,7 +198,9 @@ const COLOR_FRAG_BODY = `
     vec3 veilBody = mix( uVeilDeep, uVeilTint, clamp( 0.08 + veilLum * 1.9, 0.0, 1.0 ) );
     if ( uVeilKeepColor > 0.0 ) {
       vec3 veilTrue = diffuseColor.rgb * uVeilSrcColor;
-      ${armorDyeRemapGlsl('veilTrue')}
+      #ifndef SPIRIT_VEIL_DECAL
+        ${armorDyeRemapGlsl('veilTrue')}
+      #endif
       veilBody = mix( veilBody, veilTrue, uVeilKeepColor );
     }
     veilBody *= ( ( 1.0 - uVeilBand ) + uVeilBand * veilBand ) * ( 0.35 + 0.65 * veilRise );
