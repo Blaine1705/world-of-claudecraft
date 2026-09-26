@@ -233,13 +233,15 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
    - a new variant axis (a `#define`, a templated value, a `customProgramCacheKey` token):
      every value is one more full link, including two values that compile the same text.
 
-   The doc's "suspected" list (gradient reads in flow, noise octaves, sampler-array
-   indexing, compile-warning retries, draw-time recompiles) is NOT a rule: ask for a
-   measurement instead of flagging it. A cost claim needs the doc's protocol: link times on
-   ANGLE D3D11 with the driver shader cache disabled, before and after in one run; Linux GL
-   gives ordering only. Severity: SHOULD-FIX for a measured shape added to a wide-reach
-   program without a link measurement, or for a loop conversion without the run-time check;
-   NOTE for a single-material shader.
+   The doc's "suspected" list (implicit-gradient `texture()` reads inside
+   data-dependent flow, noise octaves, sampler-array indexing, compile-warning retries,
+   draw-time recompiles) is NOT a rule: ask for a measurement instead of flagging it.
+   Explicit-gradient `textureGrad` reads are a measured shape when the derivatives are
+   taken before the split. A cost claim needs the doc's protocol: link times on ANGLE D3D11
+   with the driver shader cache disabled, before and after in one run; Linux GL gives
+   ordering only. Severity: SHOULD-FIX for a measured shape added to a wide-reach program
+   without a link measurement, or for a loop conversion without the run-time check; NOTE
+   for a single-material shader.
 
 ## Report
 
