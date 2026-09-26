@@ -184,6 +184,9 @@ cadence logic of its own. Narrow helpers:
   subtree). Register the module and its band in `tests/floor_vfx_layer.test.ts`,
   or name it there as out of scope with a reason (its completeness sweep fails a
   bare `renderOrder` that is neither); design in `docs/design/vfx-floor-layering.md`.
+  A pooled bespoke subtree calls `tagVfxSubtree` once it is fully built: the
+  warm-up walk selects on each object's OWN tag, so tagging only the root hides
+  its drawables from the prewarm and the cast gate.
 - **Models are real GLB assets** (CC0 kits, Tripo-generated models, and the
   image-to-GLB procedural exporters: props, foliage, dungeon, fish, gather nodes,
   mailbox, delve props, characters, the Eastbrook town kit), loaded via

@@ -40,7 +40,9 @@ layers behind the `index.ts` barrel:
 - `prewarm.ts`: the warm-up work that is SAFE to run in a live frame, as
   explicit units (`abilityVfxTexturePrewarmSteps`, one per impact sheet plus the
   shared canvases; `collectAbilityVfxCompileTargets`, one program link per
-  distinct pooled material). `AbilityVfxFx.prewarmSpawn` stays boot-window only,
+  distinct pooled PROGRAM, keyed by `../draw_program_signature_core.ts`, so a
+  pool's per-slot material clones are one unit and one cast-gate entry, never
+  one per clone). `AbilityVfxFx.prewarmSpawn` stays boot-window only,
   because it spawns VISIBLE primitives; these units are what the renderer's
   `vfx.ability-primitives` manifest entry retains when the entry deadline drops
   it, and what constrained (phone-class) devices run in the background instead

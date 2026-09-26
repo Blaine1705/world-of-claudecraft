@@ -20,6 +20,7 @@
 // PrewarmResumeUnits (see prewarm_resume.ts).
 
 import type * as THREE from 'three';
+import { drawProgramSignature } from '../draw_program_signature_core';
 import { abilityVfxTextures, FLIPBOOK_STYLES, flipbookSheet } from './fx_textures';
 
 export interface AbilityVfxPrewarmTextureStep {
@@ -56,64 +57,61 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
   return steps;
 }
 
-/**
- * Program identity for dedupe purposes. A pool that clones one prototype
- * material per slot (the six flipbook slots) links ONE program for the set,
- * because three derives a ShaderMaterial's program key from its shader source
- * plus defines. Everything else falls back to material identity, which is the
- * conservative answer: an extra unit only costs an idle slot and a cache hit,
- * while a missed one is a link left for combat.
- */
-function programIdentity(material: THREE.Material): string {
-  const shader = material as THREE.ShaderMaterial;
-  if (!shader.isShaderMaterial) return `material:${material.uuid}`;
-  // material.type separates the raw and non-raw variants, which compile
-  // differently from the same source.
-  return `shader:${material.type}|${shader.vertexShader}|${shader.fragmentShader}|${JSON.stringify(shader.defines ?? null)}`;
-}
-
-/**
- * Pooled VFX meshes reachable from `root`, one per distinct program: the
- * compile unit only needs SOME mesh carrying that program, and the pools stamp
- * the renderCategory tag the scene-census diagnostics also key off. Objects
- * without a material (a spirit holder group) carry no program of their own.
- */
-/** The distinct materials the compile targets carry, in the same walk: the
- *  cast readiness gate asks whether each one's program is linked. */
-export function abilityVfxCompileMaterials(root: THREE.Object3D): THREE.Material[] {
+/** One pooled draw per distinct PROGRAM under `root`, in walk order: the
+ *  object whose compile links it and the material that stands for every
+ *  other material on it. That representative must live as long as its pool:
+ *  disposing it would release the program the uncompiled clones rely on. Keyed by drawProgramSignature, never by material
+ *  instance: the verdict pools build one MeshBasicMaterial per part per slot,
+ *  hundreds of instances over a handful of programs, and a clone sharing a
+ *  linked program reuses it on its first draw (three's acquireProgram hands
+ *  back the cached WebGLProgram, so no link). Only objects that carry the
+ *  renderCategory tag themselves are pooled VFX; a spirit holder group has
+ *  no material and so no program of its own. */
+function pooledPrograms(root: THREE.Object3D): Array<{
+  object: THREE.Object3D;
+  materials: THREE.Material[];
+}> {
   const seen = new Set<string>();
-  const materials: THREE.Material[] = [];
+  const found: Array<{ object: THREE.Object3D; materials: THREE.Material[] }> = [];
   root.traverse((child) => {
     if (child.userData?.renderCategory !== 'vfx') return;
     const material = (child as THREE.Mesh).material;
     if (!material) return;
+    const fresh: THREE.Material[] = [];
     for (const mat of Array.isArray(material) ? material : [material]) {
-      const identity = programIdentity(mat);
-      if (seen.has(identity)) continue;
-      seen.add(identity);
-      materials.push(mat);
+      const signature = drawProgramSignature(child, mat);
+      if (seen.has(signature)) continue;
+      seen.add(signature);
+      fresh.push(mat);
     }
+    if (fresh.length > 0) found.push({ object: child, materials: fresh });
   });
+  return found;
+}
+
+/** The representative material of each distinct pooled program, from the
+ *  same walk as the compile targets: the cast readiness gate asks whether
+ *  each one's program is proved linked, and a proof of that program covers
+ *  every clone that shares it. One material instance drawn by two objects of
+ *  different shapes is two units but one entry here, since the gate reads
+ *  one current program per material (the uuid key had the same limit); no
+ *  pool does that today, which tests/class_vfx_prewarm_homes.test.ts pins
+ *  per pool (one gate entry per unit). */
+export function abilityVfxCompileMaterials(root: THREE.Object3D): THREE.Material[] {
+  const materials: THREE.Material[] = [];
+  for (const entry of pooledPrograms(root)) {
+    for (const material of entry.materials) {
+      if (!materials.includes(material)) materials.push(material);
+    }
+  }
   return materials;
 }
 
+/** One compile target per distinct pooled program: the unit only needs SOME
+ *  object drawing that program. */
 export function collectAbilityVfxCompileTargets(root: THREE.Object3D): AbilityVfxCompileTarget[] {
-  const seen = new Set<string>();
-  const targets: AbilityVfxCompileTarget[] = [];
-  root.traverse((child) => {
-    if (child.userData?.renderCategory !== 'vfx') return;
-    const material = (child as THREE.Mesh).material;
-    if (!material) return;
-    const mats = Array.isArray(material) ? material : [material];
-    let fresh = false;
-    for (const mat of mats) {
-      const identity = programIdentity(mat);
-      if (seen.has(identity)) continue;
-      seen.add(identity);
-      fresh = true;
-    }
-    if (!fresh) return;
-    targets.push({ id: `${child.name || child.type}:${targets.length}`, object: child });
-  });
-  return targets;
+  return pooledPrograms(root).map((entry, index) => ({
+    id: `${entry.object.name || entry.object.type}:${index}`,
+    object: entry.object,
+  }));
 }

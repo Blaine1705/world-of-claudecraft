@@ -43,8 +43,8 @@ export interface LinkedProgramSource {
  *  stand-ins (null before their stage). Each unit names its root, so the
  *  resume lane warms it through the worker ahead of the link (a hit where
  *  the worker is on, an announced link for the audit everywhere), links it
- *  through the colour arm (the canvas variant: the pools draw in the world
- *  pass), and records its root's programs as linked once that compile
+ *  through the colour arm (the world pass's variant: the canvas on direct
+ *  tiers, a render target on composer tiers), and records its root's programs as linked once that compile
  *  settled: the settle is the proof the gate opens on. `compile` is the
  *  test seam. */
 export function castVfxProgramUnits(

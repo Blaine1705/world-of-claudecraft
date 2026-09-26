@@ -32,10 +32,17 @@ import { buildMoonwingStandIn, moonwingMaterials } from './characters/moonwing_a
 import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
+import { buildFrozenOrbStandIn, frozenOrbStandInMaterials } from './frozen_orb_fx';
 import { IceBlockVisual, iceMaterials } from './ice_block_visual';
 import { buildGroundFireAoeStandIn, groundFireAoeMaterials } from './ignivar_fire_vfx';
+import { buildMeteorRockStandIn, meteorRockStandInMaterials } from './mage_ground_fx';
+import {
+  buildPaladinAscensionStandIn,
+  paladinAscensionStandInMaterials,
+} from './paladin_ascension_visual';
 import { buildRingOfFrostStandIn, ringOfFrostStandInMaterials } from './ring_of_frost_visual';
 import { TemporalHourglassVisual, temporalHourglassMaterials } from './temporal_hourglass_visual';
+import { buildFelRockStandIn, felRockStandInMaterials } from './warlock_meteor_fx';
 
 /** The reference rig height these visuals scale against; the scale reaches the
  *  geometry only, never the materials, so any live body links the same
@@ -116,6 +123,41 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'ring_of_frost_visual.ts',
     materials: () => [...ringOfFrostStandInMaterials()],
     build: () => buildRingOfFrostStandIn().root,
+  },
+  {
+    // Divine Ascension's seal and solar crown, built per character view when
+    // the aura first shows: the first cast linked the crown (a Mesh and an
+    // InstancedMesh draw) inside a live frame, for the caster and every
+    // observer. The crown is the tier's shared surfaceMat instance, so the
+    // stand-in follows the graphics profile.
+    id: 'paladin-ascension',
+    module: 'paladin_ascension_visual.ts',
+    materials: () => [...paladinAscensionStandInMaterials()],
+    build: () => buildPaladinAscensionStandIn().root,
+  },
+  {
+    // The Frostglobe: per-instance pooled materials like the Ring of Frost,
+    // MeshStandard on every tier, so on Low nothing held the shell and shard
+    // program and the first orb linked it live.
+    id: 'frozen-orb',
+    module: 'frozen_orb_fx.ts',
+    materials: () => [...frozenOrbStandInMaterials()],
+    build: () => buildFrozenOrbStandIn().root,
+  },
+  {
+    // The Meteor rock (mage) and the fel rocks (Rain of Fire, Infernal):
+    // each kept from a live link only by another module's material that
+    // happened to share its key, so each holds its own now.
+    id: 'mage-meteor-rock',
+    module: 'mage_ground_fx.ts',
+    materials: () => [...meteorRockStandInMaterials()],
+    build: () => buildMeteorRockStandIn().root,
+  },
+  {
+    id: 'warlock-fel-rock',
+    module: 'warlock_meteor_fx.ts',
+    materials: () => [...felRockStandInMaterials()],
+    build: () => buildFelRockStandIn().root,
   },
   {
     // Not a spell: the Proving Shore coach's guidance (ribbon, ring, aura,

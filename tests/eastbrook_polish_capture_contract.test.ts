@@ -691,7 +691,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
   // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
-  '3f0975337f93e2433bcb74ce96f545d7f8a4a323d898923dfdd58ea4e2193caa';
+  // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
+  'e1e7c24ea14b4df45f8474e4817d8efa8cc1fc3a25de747516a0c8d6b8331907';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
