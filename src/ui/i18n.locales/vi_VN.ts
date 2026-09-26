@@ -17328,4 +17328,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.',
   'guide.settingsPage.keybindsWheelBody':
     'Bản thân bánh xe cũng bị ràng buộc. Zoom Camera In và Zoom Camera Out là các liên kết thông thường nằm trên bánh xe trần theo mặc định, vì vậy bạn có thể di chuyển chúng đến Ctrl cộng với bánh xe hoặc tới các phím, sau đó cuộn bánh xe tự do để kích hoạt các khe thanh hành động. Một rãnh bánh xe không có cơ cấu nhả nên nó không thể điều khiển một hành động được giữ lại như di chuyển về phía trước.',
+  'guide.settingsPage.ifColorblindMode':
+    'Đổi màu các vùng nguy hiểm trên sàn của Nythraxis (vòng đánh của Phun trào mộ phần, các vũng Lửa mộ phần và Lửa linh hồn, đường Lửa mộ phần, cùng dấu Xé linh hồn) sang bảng màu thân thiện với người mù màu, với sắc độ và độ sáng khác biệt, để các vòng tròn chồng lên nhau vẫn giữ cạnh rõ. Kích thước, bộ đếm thời gian và vị trí không thay đổi.',
+  'hud.options.colorblindMode': 'Chế độ hỗ trợ mù màu',
 };

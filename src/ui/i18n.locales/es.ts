@@ -17611,4 +17611,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.',
   'guide.settingsPage.keybindsWheelBody':
     'La rueda misma también se atasca. Zoom Camera In y Zoom Camera Out son enlaces comunes que se ubican en la rueda desnuda de forma predeterminada, por lo que puedes moverlos a Ctrl más la rueda, o a las teclas, y luego girar la rueda liberada para activar las ranuras de la barra de acción. Una muesca de rueda no tiene liberación, por lo que no puede impulsar una acción retenida como avanzar.',
+  'guide.settingsPage.ifColorblindMode':
+    'Recolorea los peligros de suelo de Nythraxis (el anillo de impacto de Erupción sepulcral, las zonas de Llama sepulcral y Fuego de almas, la línea de Fuego sepulcral y las marcas de Desgarro de almas) con una paleta apta para daltonismo, con tonos y brillo diferenciados, para que los círculos superpuestos conserven bordes visibles. Los tamaños, temporizadores y posiciones no cambian.',
+  'hud.options.colorblindMode': 'Modo para daltonismo',
 };

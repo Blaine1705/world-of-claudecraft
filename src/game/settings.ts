@@ -435,6 +435,14 @@ export const BOOL_SETTINGS = {
   // off by default: thicken the dark outline behind HUD text so labels stay
   // legible against bright terrain (a low-vision / high-glare aid).
   highContrastText: { def: false },
+  // off by default: Colorblind Mode. Recolours the Nythraxis floor hazards (the
+  // Grave Eruption strike ring, the Grave Flame and Soulfire pools, the Gravefire
+  // line, the Soul Rend marks) onto a colourblind-safe palette with distinct hues
+  // AND brightness, so overlapping circles keep their edges for a player with a
+  // colour-vision deficiency. Geometry, timing and opacity floors never change:
+  // an accessibility choice, never a graphics-tier knob. Read live by the
+  // renderer (setHazardPaletteMode) plus a body class hook (interface_body_classes.ts).
+  colorblindMode: { def: false },
   // off by default: an opt-in frosted-glass blur behind HUD panels & windows.
   // Off keeps the classic crisp look (and zero GPU cost); on softens the world
   // showing through translucent frames.

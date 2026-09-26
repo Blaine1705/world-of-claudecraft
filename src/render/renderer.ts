@@ -508,6 +508,7 @@ import {
   wildGlowAmount,
 } from './night_lighting_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
+import type { HazardPaletteMode } from './nythraxis_hazard_palette_core';
 import { NythraxisMechanicVisuals } from './nythraxis_mechanic_visuals';
 import { installOccluderFadeGate } from './occluder_fade_gate';
 import { buildGhostVariantPrewarmGroup } from './occluder_ghost_prewarm';
@@ -775,7 +776,12 @@ import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { uploadDataTextureInChunks } from './texture_upload';
 import { sparkleTexture } from './textures';
-import { targetIntensityFromValues } from './travel_speed_fx';
+import {
+  groundSpeedFromFrame,
+  hasTravelFormAura,
+  targetIntensityFromValues,
+  trackLocalPos,
+} from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
 import { UmbralAnchorMarker } from './umbral_anchor_marker';
 import {
@@ -1415,6 +1421,8 @@ export class Renderer {
   // prefers-reduced-motion query in reducedMotion(). Initialized from Settings
   // and kept live by main.ts's applySetting dispatcher (mirrors showDevBadges).
   reduceMotionSetting = false;
+  // settings-backed Colorblind Mode (Options > Interface); see setHazardPaletteMode.
+  private hazardPaletteMode: HazardPaletteMode = 'classic';
   showNameplates = true;
   // settings-backed developer-badge display toggle (nameplate glyph + outline);
   // initialized from Settings and kept live by main.ts's applySetting dispatcher.
@@ -2932,8 +2940,10 @@ export class Renderer {
     );
     const gate = this.worldCompileGate();
     this.varkhulForgestormVisuals = new VarkhulForgestormVisuals(this.scene, this.groundSample, gate);
-    this.nythraxisMechanicVisuals = new NythraxisMechanicVisuals(this.scene, (x, z) =>
-      groundHeight(x, z, this.sim.cfg.seed),
+    this.nythraxisMechanicVisuals = new NythraxisMechanicVisuals(
+      this.scene,
+      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      this.hazardPaletteMode,
     );
     this.warlockMeteorFx = new WarlockMeteorFx(
       this.scene,
@@ -11961,34 +11971,23 @@ export class Renderer {
     this.runtimeEntryElapsedMs += Math.min(250, Math.max(0, dt * 1000));
   }
 
-  // Drive the travel-form speed-illusion overlay. Presentation only: gated on the
-  // LOCAL player being shifted into travel form AND actually moving, with the
-  // intensity scaled by real ground speed. Honors prefers-reduced-motion. The
-  // streak/vignette math lives in the pure core (travel_speed_fx.ts); this only
-  // derives the speed and forwards a target intensity to the painter.
+  // Drive the travel-form speed-illusion overlay. Presentation only; the speed
+  // sampling, the form check and the streak math live in travel_speed_fx.ts.
+  // Ground speed comes from the SAME interpolated self render position the
+  // camera uses (selfPos), so the cue tracks the smooth on-screen motion.
   private updateTravelSpeedFx(p: Entity, selfPos: THREE.Vector3, dt: number): void {
-    // Measure ground speed from the SAME interpolated self render position the
-    // camera uses (selfPos), advanced per render frame, so the cue tracks the
-    // smooth on-screen motion rather than the raw 20Hz sim-tick snapping of p.pos.
-    let speed = 0;
-    const last = this.lastLocalPos;
-    if (last && dt > 0) {
-      speed = Math.hypot(selfPos.x - last.x, selfPos.z - last.z) / dt;
-    }
-    if (this.lastLocalPos) {
-      this.lastLocalPos.x = selfPos.x;
-      this.lastLocalPos.z = selfPos.z;
-    } else {
-      this.lastLocalPos = { x: selfPos.x, z: selfPos.z };
-    }
-    let inTravelForm = false;
-    for (const aura of p.auras) {
-      if (aura.kind !== 'form_travel') continue;
-      inTravelForm = true;
-      break;
-    }
+    const speed = groundSpeedFromFrame(this.lastLocalPos, selfPos.x, selfPos.z, dt);
+    this.lastLocalPos = trackLocalPos(this.lastLocalPos, selfPos.x, selfPos.z);
+    const inTravelForm = hasTravelFormAura(p.auras);
     const target = targetIntensityFromValues(inTravelForm, speed, this.reducedMotion());
     this.travelSpeedFx.update(target, dt);
+  }
+
+  /** Colorblind Mode (Options > Interface): the Nythraxis hazard palette. */
+  setHazardPaletteMode(mode: HazardPaletteMode): void {
+    this.hazardPaletteMode = mode;
+    this.mageGroundFx.setHazardPaletteMode(mode);
+    this.nythraxisMechanicVisuals?.setPaletteMode(mode);
   }
 
   private reducedMotion(): boolean {

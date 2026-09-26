@@ -17376,4 +17376,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Edytuj ramki rozluźnia także panel Dialogu, który zawiera wypowiedź NPC, gdy ten NPC jest poza twoim polem widzenia; nosi chip z nazwą, gdy jest luzem.',
   'guide.settingsPage.keybindsWheelBody':
     'Samo koło też wiąże. Powiększ kamerę i pomniejsz kamerę to zwykłe powiązania, które domyślnie znajdują się na gołym kole, więc możesz przesunąć je do Ctrl plus kółko lub do klawiszy, a następnie obrócić uwolnione koło, aby uruchomić szczeliny paska akcji. Nacięcie w kole nie ma zwolnienia, więc nie może napędzać wstrzymanej akcji, takiej jak ruch do przodu.',
+  'guide.settingsPage.ifColorblindMode':
+    'Przekolorowuje zagrożenia na ziemi od Nythraxis (pierścień uderzenia Grobowej erupcji, kałuże Grobowego płomienia i Ognia duszy, linię Grobowego ognia oraz znaki Rozdarcia duszy) na paletę przyjazną daltonistom, z wyraźnie różnymi odcieniami i jasnością, aby nakładające się kręgi zachowały widoczne krawędzie. Rozmiary, liczniki czasu i pozycje się nie zmieniają.',
+  'hud.options.colorblindMode': 'Tryb dla daltonistów',
 };

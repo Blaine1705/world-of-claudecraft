@@ -17672,4 +17672,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Modifier les cadres desserre également le panneau de dialogue, qui diffuse la ligne parlée d'un PNJ lorsque ce PNJ est hors de votre vue; il porte sa puce nominative lorsqu'il est en vrac.",
   'guide.settingsPage.keybindsWheelBody':
     "La roue elle-même se lie également. Zoom Camera In et Zoom Camera Out sont des liaisons ordinaires qui se trouvent par défaut sur la roue nue, vous pouvez donc les déplacer vers Ctrl plus la roue, ou vers les touches, puis faire rouler la roue libérée pour déclencher les emplacements de la barre d'action. Une encoche de roue n'a pas de dégagement, elle ne peut donc pas conduire une action maintenue comme avancer.",
+  'guide.settingsPage.ifColorblindMode':
+    "Recolore les dangers au sol de Nythraxis (l'anneau d'impact d'Eruption funéraire, les flaques de Flamme funéraire et de Feu d'âme, la ligne de Feu funéraire et les marques de Déchirure d'âme) avec une palette adaptée aux daltoniens, aux teintes et luminosités distinctes, afin que les cercles superposés gardent des bords visibles. Les tailles, minuteries et positions ne changent pas.",
+  'hud.options.colorblindMode': 'Mode daltonien',
 };

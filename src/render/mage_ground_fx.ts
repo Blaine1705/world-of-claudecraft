@@ -33,12 +33,17 @@ import { type FloorVfxLayer, floorVfxRenderOrder } from './floor_vfx_layer';
 import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
 import {
   isNythraxisGraveEruption,
-  NYTHRAXIS_GRAVE_ERUPTION_PALETTE,
   type NythraxisGraveShardPose,
   nythraxisGraveShardFade,
   nythraxisGraveShardPoseInto,
   nythraxisGraveShardRise,
 } from './nythraxis_grave_core';
+import {
+  type HazardPaletteMode,
+  hazardPaletteMaterialSuffix,
+  type MeteorTelegraphPalette,
+  nythraxisGraveEruptionPalette,
+} from './nythraxis_hazard_palette_core';
 import { isNythraxisBindingSigil, NYTHRAXIS_SIGIL_PALETTE } from './nythraxis_sigil_core';
 import { SCHOOL_COLORS } from './vfx';
 
@@ -81,14 +86,7 @@ export const METEOR_FLAME_GEOMETRY_HALF_HEIGHT = 0.45;
 /** One colour per telegraph material. The fire set is the meteor's own; the
  *  Grave Eruption maps the grave palette onto the same slots, so the two
  *  flavours share every geometry and differ in tint alone. */
-export interface MeteorTelegraphPalette {
-  footprint: number;
-  boundary: number;
-  countdown: number;
-  vein: number;
-  mote: number;
-  shard: number;
-}
+export type { MeteorTelegraphPalette } from './nythraxis_hazard_palette_core';
 
 const METEOR_FIRE_TELEGRAPH_PALETTE: MeteorTelegraphPalette = {
   footprint: 0x260407,
@@ -317,6 +315,7 @@ export class MageGroundFx {
    *  is bounded by name-count x the 7-member Aura['school'] union, not
    *  unbounded: a real ceiling, not a cap this pool enforces itself. */
   private readonly materialPool = new Map<string, THREE.Material[]>();
+  private hazardPaletteMode: HazardPaletteMode = 'classic';
   private disposed = false;
   /** Per-frame scratch for the grave shard poses (the update loop allocates nothing). */
   private readonly shardPose: NythraxisGraveShardPose = {
@@ -537,12 +536,14 @@ export class MageGroundFx {
     body.position.set(opts.x, startY, opts.z);
     trail.position.copy(body.position);
 
-    const telegraphKindSuffix = grave ? ':grave' : '';
+    const telegraphKindSuffix = grave
+      ? `:grave${hazardPaletteMaterialSuffix(this.hazardPaletteMode)}`
+      : '';
     const warning = this.buildMeteorTelegraph(
       opts,
       geometry.flame,
       initialElapsed / duration,
-      grave ? NYTHRAXIS_GRAVE_ERUPTION_PALETTE : METEOR_FIRE_TELEGRAPH_PALETTE,
+      grave ? nythraxisGraveEruptionPalette(this.hazardPaletteMode) : METEOR_FIRE_TELEGRAPH_PALETTE,
       telegraphKindSuffix,
     );
     warning.group.visible = opts.showTelegraph !== false;
@@ -628,6 +629,21 @@ export class MageGroundFx {
    *  grave read instead of a fire meteor. The fourth source is optional only so
    *  the existing three-source callers keep compiling; the renderer hands the
    *  whole IWorld, which always has it. */
+  /** The player's hazard palette (Options > Interface > Colorblind Mode). A
+   *  telegraph's materials are pooled and tinted at spawn, so a flip drops every
+   *  snapshot-managed Grave Eruption; the next sync respawns each from its
+   *  authoritative row with the new palette (same radius, same countdown). */
+  setHazardPaletteMode(mode: HazardPaletteMode): void {
+    if (mode === this.hazardPaletteMode) return;
+    this.hazardPaletteMode = mode;
+    for (let i = this.meteors.length - 1; i >= 0; i--) {
+      const meteor = this.meteors[i];
+      if (!meteor.grave || !meteor.snapshotManaged) continue;
+      this.disposeMeteor(meteor);
+      this.meteors.splice(i, 1);
+    }
+  }
+
   syncWorldMeteorWarnings(world: {
     activeIgnivarMeteors: readonly MeteorWarningState[];
     activeVarkhulAnvilMeteors: readonly MeteorWarningState[];

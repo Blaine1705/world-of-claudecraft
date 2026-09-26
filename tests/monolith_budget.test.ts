@@ -873,8 +873,12 @@ const MONOLITHS: MonolithRow[] = [
     // shake math into camera_impact_core.ts (fiestaShakeX/Y); then LOWERED
     // 12790 -> 12789 when the Warrior kit textures moved to demand loading
     // (the boot-time sheet upload loop and its comment went, the kit host
-    // gained its assets line). Exact count.
-    ceiling: 12789,
+    // gained its assets line). LOWERED 12789 -> 12788 by Colorblind Mode: the
+    // setHazardPaletteMode forwarder came in, paid for by moving the travel-form
+    // speed sampling (groundSpeedFromFrame, trackLocalPos, hasTravelFormAura)
+    // into travel_speed_fx.ts and the hazard-painter rebuild into
+    // NythraxisMechanicVisuals.setPaletteMode. Exact count.
+    ceiling: 12788,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1300,8 +1304,10 @@ const MONOLITHS: MonolithRow[] = [
     // (with the targetAurasBelowFrame side case riding the same helper), so
     // the coordinator ends smaller. wc -l on the merged tree. Exact count,
     // zero slack.
-    // Release reconciliation: measured merged tree, preserving both extraction sets.
-    ceiling: 11150,
+    // Colorblind Mode's interface body-class extraction also composes with
+    // those release-line extractions. Release reconciliation: measured merged
+    // tree at 11140 lines, preserving both extraction sets.
+    ceiling: 11140,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

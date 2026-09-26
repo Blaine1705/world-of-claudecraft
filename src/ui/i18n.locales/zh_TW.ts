@@ -15220,6 +15220,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在起始畫面與角色畫面後方使用較樸素、對比較高的背景。',
   'guide.settingsPage.ifHighContrastText':
     '更厚重、對比更高的介面文字。它首先是一項無障礙選項，而且在明亮的螢幕上表現很好。',
+  'guide.settingsPage.ifColorblindMode':
+    '將 Nythraxis 的地面危險（墳墓爆發的打擊環、墳焰與魂火池、墳火線，以及裂魂標記）改為色盲友善的配色，色相與亮度各不相同，重疊的圓圈也能看清邊緣。範圍、計時和位置完全不變。',
   'guide.settingsPage.ifHudOpacity': 'HUD 面板蓋在後方世界之上時有多不透明。',
   'guide.settingsPage.ifInvertLookY': '反轉滑鼠視角的上下方向。',
   'guide.settingsPage.ifLockBars': '鎖定你的動作列，讓你不會不小心把技能拖出格子。',
@@ -16889,4 +16891,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.focusTargets.assignClickHint': '選擇一個目標。點擊 {button}。',
   'hudChrome.focusTargets.ally': '盟友',
   'hudChrome.focusTargets.enemy': '敵人',
+  'hud.options.colorblindMode': '色盲模式',
 };

@@ -17463,4 +17463,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.',
   'guide.settingsPage.keybindsWheelBody':
     'A própria roda também se liga. Zoom Camera In e Zoom Camera Out são ligações comuns que ficam na roda nua por padrão, então você pode movê-las para Ctrl mais a roda, ou para teclas, e então rolar a roda liberada para disparar slots da barra de ação. Um entalhe de roda não tem liberação, portanto não pode conduzir uma ação retida, como avançar.',
+  'guide.settingsPage.ifColorblindMode':
+    'Recolore os perigos no solo de Nythraxis (o anel de impacto da Erupção Tumular, as poças de Chama Tumular e Fogo de Alma, a linha de Fogo Tumular e as marcas de Rasgo da Alma) com uma paleta adequada para daltonismo, com tons e brilhos distintos, para que círculos sobrepostos mantenham bordas visíveis. Tamanhos, temporizadores e posições não mudam.',
+  'hud.options.colorblindMode': 'Modo para daltonismo',
 };

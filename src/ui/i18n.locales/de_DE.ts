@@ -17614,4 +17614,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Durch Bearbeiten von Frames wird auch das Dialogfenster aufgelockert, das die gesprochene Zeile eines NPCs enthält, während sich dieser NPC außerhalb Ihrer Sicht befindet. Es trägt seinen Namenschip, solange es locker ist.',
   'guide.settingsPage.keybindsWheelBody':
     'Auch das Rad selbst klemmt. „Kamera vergrößern“ und „Kamera verkleinern“ sind gewöhnliche Bindungen, die standardmäßig auf dem bloßen Rad sitzen. Sie können sie also auf Strg plus Rad oder auf Tasten bewegen und dann das freigegebene Rad drehen, um Aktionsleisten-Slots auszulösen. Eine Radkerbe verfügt nicht über eine Auslösefunktion und kann daher keine gehaltene Aktion wie Vorwärtsbewegung ausführen.',
+  'guide.settingsPage.ifColorblindMode':
+    'Färbt die Nythraxis-Bodengefahren (den Trefferring der Graberuption, die Flächen von Grabflamme und Seelenfeuer, die Grabfeuer-Linie und die Markierungen von Seelenriss) in eine farbenblindheitsfreundliche Palette mit klar unterscheidbaren Farbtönen und Helligkeiten um, damit überlappende Kreise sichtbare Ränder behalten. Größen, Timer und Positionen ändern sich nicht.',
+  'hud.options.colorblindMode': 'Farbenblindheitsmodus',
 };

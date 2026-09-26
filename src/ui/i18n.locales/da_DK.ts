@@ -17237,4 +17237,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     "Edit Frames løsner også dialogpanelet, som bærer en NPC's talte linje, mens den NPC er ude af dit syn; den bærer sin navnechip, mens den er løs.",
   'guide.settingsPage.keybindsWheelBody':
     'Selve hjulet binder også. Zoom kamera ind og zoom kamera ud er almindelige bindinger, der som standard sidder på det bare hjul, så du kan flytte dem til Ctrl plus hjulet eller til tasterne og derefter rulle det frigjorte hjul for at skyde action bar slots. Et hjulhak har ingen udløsning, så det kan ikke drive en fastholdt handling som at bevæge sig fremad.',
+  'guide.settingsPage.ifColorblindMode':
+    "Omfarver Nythraxis' gulvfarer (træfringen fra Grave Eruption, bassinerne af Grave Flame og Soulfire, Gravefire-linjen og Soul Rend-mærkerne) til en farveblindvenlig palet med tydelige nuancer og lysstyrker, så overlappende cirkler bevarer synlige kanter. Størrelser, timere og positioner ændres ikke.",
+  'hud.options.colorblindMode': 'Farveblindtilstand',
 };

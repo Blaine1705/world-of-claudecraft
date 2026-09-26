@@ -16102,6 +16102,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Более простой и контрастный фон за стартовым экраном и экраном выбора персонажа.',
   'guide.settingsPage.ifHighContrastText':
     'Более плотный и контрастный текст интерфейса. В первую очередь настройка доступности, и очень удачная на ярком экране.',
+  'guide.settingsPage.ifColorblindMode':
+    'Перекрашивает напольные угрозы Nythraxis (кольцо удара Могильного извержения, лужи Могильного пламени и Огня душ, линию Могильного огня и метки Разрыва души) в палитру для дальтоников с различимыми оттенками и яркостью, чтобы у перекрывающихся кругов оставались видимые края. Размеры, таймеры и позиции не меняются.',
   'guide.settingsPage.ifHudOpacity': 'Насколько плотны панели интерфейса поверх мира за ними.',
   'guide.settingsPage.ifInvertLookY': 'Переворачивает направление обзора мышью вверх и вниз.',
   'guide.settingsPage.ifLockBars':
@@ -17912,4 +17914,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.focusTargets.assignClickHint': 'Выберите цель. Нажмите кнопку «{button}».',
   'hudChrome.focusTargets.ally': 'Союзник',
   'hudChrome.focusTargets.enemy': 'Враг',
+  'hud.options.colorblindMode': 'Режим для дальтоников',
 };

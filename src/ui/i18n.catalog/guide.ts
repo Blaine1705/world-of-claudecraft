@@ -549,6 +549,8 @@ export const guideStrings = {
     ifTooltipScale: 'Tooltip text size, handy on a small screen or a very large one.',
     ifHighContrastText:
       'Heavier, higher-contrast interface text. An accessibility option first, and a good one on a bright screen.',
+    ifColorblindMode:
+      'Recolors the Nythraxis floor hazards (the Grave Eruption strike ring, the Grave Flame and Soulfire pools, the Gravefire line, and the Soul Rend marks) onto a colorblind-safe palette with distinct hues and brightness, so overlapping circles keep their edges. Sizes, timers, and positions never change.',
     ifHighContrastBackground:
       'A plainer, higher-contrast background behind the start and character screens.',
     ifInvertLookY: 'Flips the up and down direction of mouse look.',

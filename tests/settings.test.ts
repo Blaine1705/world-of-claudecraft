@@ -541,6 +541,7 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('chatOpacity')).toBe(1);
     expect(s.get('reduceMotion')).toBe(false);
     expect(s.get('highContrastText')).toBe(false);
+    expect(s.get('colorblindMode')).toBe(false);
     expect(s.get('frostedPanels')).toBe(false);
     expect(s.get('compactChat')).toBe(false);
     expect(s.get('showFps')).toBe(false);

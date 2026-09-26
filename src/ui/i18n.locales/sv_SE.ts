@@ -17248,4 +17248,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Redigera ramar lossar också dialogpanelen, som bär en NPC: s talade linje medan den NPC är utom synhåll; den bär sitt namnchip medan den är lös.',
   'guide.settingsPage.keybindsWheelBody':
     'Själva hjulet binder också. Zoom Camera In och Zoom Camera Out är vanliga bindningar som sitter på det nakna hjulet som standard, så att du kan flytta dem till Ctrl plus hjulet, eller till tangenterna, och sedan rulla det frigjorda hjulet för att skjuta action bar slots. Ett hjulspår har ingen frigöring, så det kan inte driva en hållen åtgärd som att gå framåt.',
+  'guide.settingsPage.ifColorblindMode':
+    'Färgar om Nythraxis golvfaror (träffringen från Gravutbrott, pölarna av Gravflamma och Själseld, Graveldslinjen och Själsklyvningsmärkena) till en färgblindvänlig palett med tydliga nyanser och ljusstyrkor, så att överlappande cirklar behåller synliga kanter. Storlekar, timers och positioner ändras inte.',
+  'hud.options.colorblindMode': 'Färgblindläge',
 };

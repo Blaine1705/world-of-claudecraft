@@ -17155,4 +17155,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.',
   'guide.settingsPage.keybindsWheelBody':
     'Samotné kolo také vázne. Zoom Camera In a Zoom Camera Out jsou obyčejná vázání, která ve výchozím nastavení sedí na holém kolečku, takže je můžete přesunout na Ctrl plus kolečko nebo na klávesy a pak otáčením uvolněného kolečka spouštět sloty akční lišty. Zářez kola nemá žádné uvolnění, takže nemůže řídit drženou akci, jako je pohyb vpřed.',
+  'guide.settingsPage.ifColorblindMode':
+    'Přebarví podlahové hrozby Nythraxisu (zásahový kruh Hrobové erupce, kaluže Hrobového plamene a Duševního ohně, linii Hrobového ohně a značky Rozervání duše) na paletu vhodnou pro barvoslepé, s odlišnými odstíny a jasem, aby překrývající se kruhy zachovaly viditelné okraje. Velikosti, časovače ani pozice se nemění.',
+  'hud.options.colorblindMode': 'Režim pro barvoslepé',
 };

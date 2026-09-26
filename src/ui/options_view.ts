@@ -955,6 +955,7 @@ export function buildInterfaceControls(
     slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
     boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
     boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
+    boolToggle(s, 'colorblindMode', 'hud.options.colorblindMode'),
     boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
     // Camera comfort (mouse-look direction), so it sits with the comfort
     // toggles rather than the Combat tab's attack/action-bar cluster.

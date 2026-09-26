@@ -17259,4 +17259,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
   'guide.settingsPage.keybindsWheelBody':
     'Tekerleğin kendisi de bağlanır. Zoom Camera In ve Zoom Camera Out, varsayılan olarak çıplak tekerleğe oturan sıradan bağlantılardır, böylece bunları Ctrl artı tekerleğe veya tuşlara taşıyabilir ve ardından eylem çubuğu yuvalarını ateşlemek için serbest tekerleği yuvarlayabilirsiniz. Bir tekerlek çentiğinde serbest bırakma yoktur, bu nedenle ileriye doğru hareket etmek gibi tutulan bir hareketi sürdüremez.',
+  'guide.settingsPage.ifColorblindMode':
+    'Nythraxis zemin tehlikelerini (Mezar Patlaması vuruş halkası, Mezar Alevi ve Ruh Ateşi havuzları, Mezar Ateşi çizgisi ve Ruh Yırtığı işaretleri) renk körlüğüne uygun, farklı tonlara ve parlaklıklara sahip bir palete yeniden boyar; böylece üst üste binen dairelerin kenarları görünür kalır. Boyutlar, zamanlayıcılar ve konumlar değişmez.',
+  'hud.options.colorblindMode': 'Renk Körlüğü Modu',
 };

@@ -17594,4 +17594,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
   'guide.settingsPage.keybindsWheelBody':
     "Anche la ruota stessa si lega. Zoom telecamera avanti e Zoom telecamera indietro sono normali collegamenti che si trovano sulla ruota nuda per impostazione predefinita, quindi puoi spostarli su Ctrl più la ruota o sui tasti, quindi ruotare la ruota liberata per attivare gli slot della barra delle azioni. Una tacca della ruota non ha rilascio, quindi non può eseguire un'azione trattenuta come andare avanti.",
+  'guide.settingsPage.ifColorblindMode':
+    "Ricolora i pericoli a terra di Nythraxis (l'anello d'impatto di Eruzione tombale, le pozze di Fiamma tombale e Fuoco dell'anima, la linea di Fuoco tombale e i marchi di Lacerazione dell'anima) con una tavolozza adatta al daltonismo, con tonalità e luminosità distinte, così i cerchi sovrapposti mantengono bordi leggibili. Dimensioni, timer e posizioni non cambiano.",
+  'hud.options.colorblindMode': 'Modalità daltonismo',
 };

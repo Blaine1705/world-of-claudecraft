@@ -17458,4 +17458,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Edit Frames juga melonggarkan panel Dialog, yang membawa kalimat lisan NPC saat NPC tersebut berada di luar pandangan Anda; ia memakai chip namanya saat longgar.',
   'guide.settingsPage.keybindsWheelBody':
     'Roda itu sendiri juga mengikat. Zoom Camera In dan Zoom Camera Out adalah binding biasa yang diletakkan di roda kosong secara default, jadi Anda dapat memindahkannya ke Ctrl plus roda, atau ke tombol, lalu memutar roda yang dibebaskan untuk mengaktifkan slot bilah tindakan. Takik roda tidak memiliki pelepasan, sehingga tidak dapat menggerakkan tindakan yang ditahan seperti bergerak maju.',
+  'guide.settingsPage.ifColorblindMode':
+    'Mewarnai ulang bahaya lantai Nythraxis (cincin hantaman Erupsi Kubur, genangan Api Kubur dan Api Jiwa, garis Api Kubur, serta tanda Sobekan Jiwa) ke palet ramah buta warna dengan rona dan kecerahan yang berbeda, sehingga lingkaran yang bertumpuk tetap memiliki tepi yang terlihat. Ukuran, penghitung waktu, dan posisi tidak berubah.',
+  'hud.options.colorblindMode': 'Mode Buta Warna',
 };

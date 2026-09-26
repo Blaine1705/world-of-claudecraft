@@ -17471,4 +17471,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.',
   'guide.settingsPage.keybindsWheelBody':
     'Het wiel zelf bindt ook. Zoom Camera In en Zoom Camera Out zijn gewone bindingen die standaard op het blote wiel zitten, dus je kunt ze naar Ctrl plus het wiel of naar toetsen verplaatsen en vervolgens aan het vrijgekomen wiel rollen om actiebalkslots af te vuren. Een wielinkeping heeft geen ontgrendeling, dus hij kan geen vastgehouden actie voortzetten, zoals vooruit rijden.',
+  'guide.settingsPage.ifColorblindMode':
+    'Geeft de vloergevaren van Nythraxis (de inslagring van Grafuitbarsting, de poelen van Grafvlam en Zielenvuur, de lijn van Grafvuur en de tekens van Zielenscheur) een kleurenblindvriendelijk palet met duidelijke tinten en helderheden, zodat overlappende cirkels zichtbare randen houden. Afmetingen, timers en posities veranderen niet.',
+  'hud.options.colorblindMode': 'Kleurenblindmodus',
 };

@@ -15960,6 +15960,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '시작 화면과 캐릭터 화면 뒤에 더 단순하고 대비가 높은 배경을 씁니다.',
   'guide.settingsPage.ifHighContrastText':
     '인터페이스 글자를 더 굵고 대비 높게 표시합니다. 무엇보다 접근성 옵션이며, 밝은 화면에서도 아주 요긴합니다.',
+  'guide.settingsPage.ifColorblindMode':
+    'Nythraxis의 바닥 위험 요소(무덤 분출 타격 원, 무덤 불꽃과 영혼불 웅덩이, 무덤불 선, 영혼 절단 표식)를 색상과 밝기가 서로 뚜렷이 다른 색각 이상 친화 팔레트로 바꿔, 겹치는 원의 테두리가 그대로 보이게 합니다. 크기, 타이머, 위치는 바뀌지 않습니다.',
   'guide.settingsPage.ifHudOpacity': '뒤편의 세계 위에서 HUD 패널이 얼마나 불투명한지 정합니다.',
   'guide.settingsPage.ifInvertLookY': '마우스 시점의 위아래 방향을 뒤집습니다.',
   'guide.settingsPage.ifLockBars': '단축바를 잠가 실수로 슬롯에서 능력을 끌어내지 않도록 합니다.',
@@ -17741,4 +17743,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.focusTargets.assignClickHint': '대상을 선택하고 {button} 버튼을 클릭하세요.',
   'hudChrome.focusTargets.ally': '아군',
   'hudChrome.focusTargets.enemy': '적',
+  'hud.options.colorblindMode': '색각 이상 모드',
 };
