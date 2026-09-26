@@ -299,6 +299,7 @@ export const EASTBROOK_FERRY_HULL: ShipHullLayout = {
   railHeight: RAIL,
   length: 31,
   beam: 10.3,
+  halfBeamAt: eastbrookFerryHalfBeam,
   draft: 2.4,
   boarding: [
     { id: 'gangway_port', side: 'port', x: 5.15, y: DECK, z: GANGWAY_Z, width: CLEAR, open: true },

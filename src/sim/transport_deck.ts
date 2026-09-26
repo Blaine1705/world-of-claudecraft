@@ -84,7 +84,10 @@ const local = { x: 0, z: 0 };
 
 /**
  * Is a body at (x, y, z) aboard the ship at `pose` (waterline `baseY`): over
- * the hull's footprint, feet at deck height or in the air above it?
+ * the hull's footprint, feet at deck height or in the air above it? The
+ * footprint follows the hull's taper (`halfBeamAt`): the bow and stern are far
+ * narrower than the beam, and a pier the ship swings past at its ends stands
+ * at a height inside the aboard band.
  */
 export function aboardDeck(
   hull: ShipHullLayout,
@@ -96,9 +99,10 @@ export function aboardDeck(
 ): boolean {
   worldToDeck(pose, x, z, local);
   const above = y - baseY;
+  if (Math.abs(local.z) > hull.length / 2) return false;
+  const halfBeam = hull.halfBeamAt ? hull.halfBeamAt(local.z) : hull.beam / 2;
   return (
-    Math.abs(local.z) <= hull.length / 2 &&
-    Math.abs(local.x) <= hull.beam / 2 &&
+    Math.abs(local.x) <= halfBeam &&
     above >= hull.mainDeckY - DECK_ABOARD_BELOW &&
     above <= DECK_ABOARD_MAX_ABOVE_WATER
   );

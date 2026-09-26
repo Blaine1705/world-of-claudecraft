@@ -85,6 +85,9 @@ export interface ShipHullLayout {
   /** hull length (stem to transom at the deck) and max beam */
   length: number;
   beam: number;
+  /** outer half-beam at deck level at ship-local z (stern -z to stem +z), the hull's
+   *  taper; absent, the hull is `beam` wide from stem to transom */
+  halfBeamAt?: (z: number) => number;
   /** keel depth below the waterline, midships */
   draft: number;
   boarding: readonly ShipBoardingPoint[];

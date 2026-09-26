@@ -596,6 +596,30 @@ describe('sailing (the real Sim)', () => {
     }
   });
 
+  it('never sweeps a player off the end of the Eastbrook pier as the ship turns in alongside', () => {
+    // The last seconds before mooring the hull swings across the T-head; its bow is far
+    // narrower than its beam there, and a body standing still on the pier planks past the
+    // gangplank's foot is never aboard (the review's repro spots, the pier tip).
+    const p = sim.player;
+    for (const [x, z] of [
+      [-116.3, -54.5],
+      [-116.0, -53.5],
+      [-116.4, -55.5],
+    ]) {
+      setClock(sim, CYCLE - 8);
+      const at = sim.ctx.groundPos(x, z);
+      place(p, at.x, at.y, at.z);
+      let rideTicks = 0;
+      for (let i = 0; i < 240; i++) {
+        sim.tick();
+        if (p.ferryRide) rideTicks++;
+      }
+      expect(rideTicks, `(${x}, ${z})`).toBe(0);
+      expect(Math.hypot(p.pos.x - at.x, p.pos.z - at.z), `(${x}, ${z})`).toBeLessThan(0.5);
+      expect(p.pos.y, `(${x}, ${z}) still on the pier planks`).toBeCloseTo(at.y, 2);
+    }
+  });
+
   it('a dev jump from mid-voyage onto a moored phase ends the voyage and returns the pet', () => {
     const p = sim.player;
     restorePet(sim.ctx, p, {
@@ -742,6 +766,22 @@ describe('the second route, Wickharbor to the Drakelands (the real Sim)', () => 
     const at = shipToWorld({ x: b.x, z: b.z, rot: b.rot, baseY: WATER_LEVEL }, lx, lz);
     place(e, at.x, DECK, at.z);
   }
+
+  it('never sweeps a player off the Wickharbor quay as the ship casts off', () => {
+    // just after cast-off the stern swings past the quay beside the berth head
+    const p = sim.player;
+    setClock(sim, B.timings.docked - 0.5);
+    const at = sim.ctx.groundPos(480.5, 386.2);
+    place(p, at.x, at.y, at.z);
+    let rideTicks = 0;
+    for (let i = 0; i < 240; i++) {
+      sim.tick();
+      if (p.ferryRide) rideTicks++;
+    }
+    expect(rideTicks).toBe(0);
+    expect(Math.hypot(p.pos.x - at.x, p.pos.z - at.z)).toBeLessThan(0.5);
+    expect(p.pos.y).toBeCloseTo(at.y, 2);
+  });
 
   it('carries its passenger from Wickharbor and sets them down at the Drakelands pier', () => {
     const p = sim.player;
