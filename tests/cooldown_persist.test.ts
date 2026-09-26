@@ -104,6 +104,25 @@ describe('cooldown_persist leaf', () => {
     expect(fresh.has('raging_gale')).toBe(false); // a use is stored: no empty-pool mirror
   });
 
+  it('restores at most one recharge timer per missing charge, the soonest first', () => {
+    // The shape a pre-fix Winter's Recall left behind: a 2-charge pool with one
+    // charge missing but three timers running, saved mid-recharge.
+    const saved = serializeCooldowns(new Map(), -1, 0, {
+      blink: {
+        charges: 1,
+        maxCharges: 2,
+        recharge: 3,
+        rechargeLength: 19.5,
+        recharges: [12, 3, 7],
+      },
+    })!;
+    expect(saved.abilityCharges?.blink.recharges).toEqual([12, 3, 7]);
+    const pools: Record<string, AbilityChargeState> = {};
+    applyCooldowns(saved, new Map(), 0, pools);
+    expect(pools.blink.recharges).toEqual([3]);
+    expect(pools.blink.charges).toBe(1);
+  });
+
   it('re-arms the empty-pool cooldown mirror when a pool restores with zero charges', () => {
     const saved = serializeCooldowns(new Map([['raging_gale', 6]]), -1, 0, {
       raging_gale: { charges: 0, maxCharges: 2, recharge: 6, rechargeLength: 8 },
