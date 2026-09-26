@@ -782,12 +782,7 @@ import {
 } from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
 import { UmbralAnchorMarker } from './umbral_anchor_marker';
-import {
-  UNDERWATER_FOG_COLOR,
-  UNDERWATER_FOG_FAR,
-  UNDERWATER_FOG_NEAR,
-  UnderwaterView,
-} from './underwater';
+import { UnderwaterView } from './underwater';
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
@@ -1027,8 +1022,6 @@ const SWIM_STRIDE = 2.4;
 // stand height, the authored stroke lays the legs out behind the hips).
 const SWIM_KICK_HZ = 2.6;
 const SWIM_FOOT_TRAIL = 0.19;
-// Depth below the waterline over which the underwater wash fades fully in.
-const UNDERWATER_FADE_DEPTH = 0.45;
 // How far under the line the chase camera is pulled while the player is submerged.
 const UNDERWATER_CAMERA_DIP = 0.5;
 // fire/torch point lights beyond this never shine (their falloff range is
@@ -1672,10 +1665,8 @@ export class Renderer {
   private gardenFeatures: GardenFeaturesView | null = null;
   private galeFeatures: GaleFeaturesView | null = null;
   private fogScratch = new THREE.Color();
-  // Blue wash + bubbles while the CAMERA is under a waterline, and the eased
-  // 0..1 that drives them (and the fog override in updateUnderwater).
+  // Blue wash + bubbles (and the fog override) while the CAMERA is under a waterline.
   private underwaterView!: UnderwaterView;
-  private underwaterBlend = 0;
   // Last frame's submerged read for the LOCAL player, set in sync(). Drives the
   // camera dip below; one frame of lag is invisible at swim speeds.
   private selfSubmerged = false;
@@ -3125,6 +3116,7 @@ export class Renderer {
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
+    this.underwaterView.setCompileGate(this.worldCompileGate() ?? null, () => this.waterView);
 
     // post chain (bloom + grade, GTAO on ultra); medium gets the grade-only
     // mini chain so the cinematic grade stops being a high-tier privilege;
@@ -4877,7 +4869,7 @@ export class Renderer {
     this.tmpV.set(p.pos.x, p.pos.y, p.pos.z);
     this.updateCamera(this.tmpV, dt);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
-    this.updateUnderwater(dt);
+    this.underwaterView.frame(this.camera, this.scene, p.pos, this.sim.cfg.seed, dt);
     this.budgetFireLights(p.pos.x, p.pos.z);
     const fogFar = this.subsystemCullFar();
     // The foliage handoff keys off distance planes (foliage_impostor_core.ts /
@@ -5924,6 +5916,7 @@ export class Renderer {
       stage: () => this.weather.beginPrewarm(),
       hide: () => this.weather.hidePrewarm(),
       units: (textures) => textureResumeUnits('weather-materials', textures),
+      linkRoot: () => this.weather.prewarmRoot(),
       cleanup: () => this.weather.endPrewarm(),
     });
 
@@ -9404,30 +9397,6 @@ export class Renderer {
     }
   }
 
-  // The camera under a waterline: a blue wash, shortened fog, and a rising
-  // bubble stream. Keyed off the CAMERA, not the player, so a third-person boom
-  // that dips below the surface reads right, and a swimmer at the surface with
-  // the camera under it still sees water rather than air.
-  private updateUnderwater(dt: number): void {
-    const cam = this.camera.position;
-    const level = waterLevelAt(cam.x, cam.z, this.sim.cfg.seed);
-    // Fade across the first half-yard under the line, so breaking the surface
-    // is a wash lifting rather than a switch flipping.
-    const depth = Number.isFinite(level) ? level - cam.y : -1;
-    const target = Math.min(1, Math.max(0, depth / UNDERWATER_FADE_DEPTH));
-    this.underwaterBlend += (target - this.underwaterBlend) * (1 - Math.exp(-dt * 7));
-    this.underwaterView.update(this.camera, this.underwaterBlend, dt);
-    if (this.underwaterBlend <= 0.002) return;
-    // Ride ON TOP of whatever the biome fog easing just wrote. The easing pulls
-    // back toward the zone preset every frame and this pulls toward the water,
-    // so surfacing restores the biome's own fog with no state to unwind.
-    const fog = this.scene.fog as THREE.Fog;
-    const b = this.underwaterBlend;
-    fog.color.lerp(this.fogScratch.setHex(UNDERWATER_FOG_COLOR), b);
-    fog.near += (UNDERWATER_FOG_NEAR - fog.near) * b;
-    fog.far += (UNDERWATER_FOG_FAR - fog.far) * b;
-  }
-
   // Hand the prefiltered environment map to the dominant eased sky biome.
   // PMREMs cannot cross-fade, so their shared core fades the current IBL to a
   // low contribution, authorizes the texture/rotation swap, then restores the
@@ -11789,7 +11758,7 @@ export class Renderer {
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'zoneFeatures', worldStart);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
-    this.updateUnderwater(dt);
+    this.underwaterView.frame(this.camera, this.scene, p.pos, this.sim.cfg.seed, dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'ambience', worldStart);
     // shadow frustum follows the player
     const pv = this.views.get(p.id);
