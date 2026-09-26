@@ -2496,6 +2496,8 @@ export const en_XA: EnTranslations = {
     "charSheet": {
       "offense": "[Óƒƒéñšé]",
       "defense": "[Ðéƒéñšé]",
+      "spell": "[Šþéļļ]",
+      "ratings": "[Ŕáţíñĝš]",
       "playtimeLabel": "[Ţíɱé Þļáýéð]",
       "playtimeParts": "[{major}, {minor}]",
       "playtimeUnderMinute": "[Ļéšš ţĥáñ á ɱíñúţé]",

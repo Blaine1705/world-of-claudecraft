@@ -2496,6 +2496,8 @@ export const cs_CZ: EnTranslations = {
     "charSheet": {
       "offense": "Útok",
       "defense": "Obrana",
+      "spell": "Spell",
+      "ratings": "Ratings",
       "playtimeLabel": "Odehraný čas",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Méně než minuta",

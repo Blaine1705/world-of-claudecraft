@@ -2496,6 +2496,8 @@ export const da_DK: EnTranslations = {
     "charSheet": {
       "offense": "Angreb",
       "defense": "Forsvar",
+      "spell": "Spell",
+      "ratings": "Ratings",
       "playtimeLabel": "Spilletid",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Under et minut",

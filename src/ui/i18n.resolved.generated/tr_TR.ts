@@ -2496,6 +2496,8 @@ export const tr_TR: EnTranslations = {
     "charSheet": {
       "offense": "Saldırı",
       "defense": "Savunma",
+      "spell": "Spell",
+      "ratings": "Ratings",
       "playtimeLabel": "Oynama Süresi",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Bir dakikadan az",

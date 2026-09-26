@@ -2496,6 +2496,8 @@ export const ru_RU: EnTranslations = {
     "charSheet": {
       "offense": "Атака",
       "defense": "Защита",
+      "spell": "Заклинание",
+      "ratings": "Рейтинги",
       "playtimeLabel": "Время в игре",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Меньше минуты",

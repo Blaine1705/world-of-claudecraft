@@ -2496,6 +2496,8 @@ export const ko_KR: EnTranslations = {
     "charSheet": {
       "offense": "공격",
       "defense": "방어",
+      "spell": "주문",
+      "ratings": "등급",
       "playtimeLabel": "플레이 시간",
       "playtimeParts": "{major} {minor}",
       "playtimeUnderMinute": "1분 미만",

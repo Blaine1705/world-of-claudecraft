@@ -2496,6 +2496,8 @@ export const nl_NL: EnTranslations = {
     "charSheet": {
       "offense": "Aanval",
       "defense": "Verdediging",
+      "spell": "Spell",
+      "ratings": "Ratings",
       "playtimeLabel": "Speeltijd",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Minder dan een minuut",

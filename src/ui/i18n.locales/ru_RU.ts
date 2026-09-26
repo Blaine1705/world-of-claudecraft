@@ -1763,6 +1763,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Каждый матч двигает стойкий рейтинг поля боя, привязанный к персонажу, при победе и при поражении, а таблица всех времён выстраивает чемпионов мира.',
   'hudChrome.charSheet.offense': 'Атака',
   'hudChrome.charSheet.defense': 'Защита',
+  'hudChrome.charSheet.spell': 'Заклинание',
+  'hudChrome.charSheet.ratings': 'Рейтинги',
   'hudChrome.charSheet.playtimeLabel': 'Время в игре',
   'hudChrome.charSheet.playtimeParts': '{major}, {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': 'Меньше минуты',

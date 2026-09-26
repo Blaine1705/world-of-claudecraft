@@ -2496,6 +2496,8 @@ export const vi_VN: EnTranslations = {
     "charSheet": {
       "offense": "Tấn Công",
       "defense": "Phòng Thủ",
+      "spell": "Spell",
+      "ratings": "Ratings",
       "playtimeLabel": "Thời Gian Chơi",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Chưa đầy một phút",

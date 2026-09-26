@@ -2496,6 +2496,8 @@ export const zh_TW: EnTranslations = {
     "charSheet": {
       "offense": "攻擊",
       "defense": "防禦",
+      "spell": "法術",
+      "ratings": "評分",
       "playtimeLabel": "遊戲時長",
       "playtimeParts": "{major}{minor}",
       "playtimeUnderMinute": "不到一分鐘",

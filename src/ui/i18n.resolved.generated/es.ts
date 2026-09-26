@@ -2496,6 +2496,8 @@ export const es: EnTranslations = {
     "charSheet": {
       "offense": "Ofensiva",
       "defense": "Defensa",
+      "spell": "Spell",
+      "ratings": "Ratings",
       "playtimeLabel": "Tiempo jugado",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Menos de un minuto",

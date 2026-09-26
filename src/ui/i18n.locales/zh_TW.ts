@@ -1731,6 +1731,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '每場比賽都會牽動一份與角色綁定的持久戰場評級，無論勝負，而歷代榜單則為國度的勇士們排定名次。',
   'hudChrome.charSheet.offense': '攻擊',
   'hudChrome.charSheet.defense': '防禦',
+  'hudChrome.charSheet.spell': '法術',
+  'hudChrome.charSheet.ratings': '評分',
   'hudChrome.charSheet.playtimeLabel': '遊戲時長',
   'hudChrome.charSheet.playtimeParts': '{major}{minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '不到一分鐘',

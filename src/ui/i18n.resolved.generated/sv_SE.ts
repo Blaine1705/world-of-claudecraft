@@ -2496,6 +2496,8 @@ export const sv_SE: EnTranslations = {
     "charSheet": {
       "offense": "Anfall",
       "defense": "Försvar",
+      "spell": "Spell",
+      "ratings": "Ratings",
       "playtimeLabel": "Tid spelad",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Mindre än en minut",

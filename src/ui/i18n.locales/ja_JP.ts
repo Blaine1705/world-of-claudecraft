@@ -1801,6 +1801,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どの試合も、キャラクターに結び付いた戦場レートを勝敗にかかわらず動かし、歴代の表がワールドの勇者たちを順に並べます。',
   'hudChrome.charSheet.offense': '攻撃',
   'hudChrome.charSheet.defense': '防御',
+  'hudChrome.charSheet.spell': '呪文',
+  'hudChrome.charSheet.ratings': 'レーティング',
   'hudChrome.charSheet.playtimeLabel': 'プレイ時間',
   'hudChrome.charSheet.playtimeParts': '{major}{minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '1分未満',

@@ -2496,6 +2496,8 @@ export const ja_JP: EnTranslations = {
     "charSheet": {
       "offense": "攻撃",
       "defense": "防御",
+      "spell": "呪文",
+      "ratings": "レーティング",
       "playtimeLabel": "プレイ時間",
       "playtimeParts": "{major}{minor}",
       "playtimeUnderMinute": "1分未満",

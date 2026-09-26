@@ -3166,6 +3166,8 @@ export const hudChromeStrings = {
   charSheet: {
     offense: 'Offense',
     defense: 'Defense',
+    spell: 'Spell',
+    ratings: 'Ratings',
     // The lifetime "Time Played" line at the foot of the sheet (the same
     // running total the /playtime chat command reports). The value composes
     // the two coarsest units from the plurals.playtime* fragments through

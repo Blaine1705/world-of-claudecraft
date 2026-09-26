@@ -2496,6 +2496,8 @@ export const id_ID: EnTranslations = {
     "charSheet": {
       "offense": "Serangan",
       "defense": "Pertahanan",
+      "spell": "Spell",
+      "ratings": "Ratings",
       "playtimeLabel": "Waktu Bermain",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Kurang dari satu menit",

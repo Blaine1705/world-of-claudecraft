@@ -1787,6 +1787,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '모든 경기가 캐릭터에 매인 지속되는 전장 평점을 승패와 상관없이 움직이며, 역대 순위표가 세계의 용사들을 차례로 세웁니다.',
   'hudChrome.charSheet.offense': '공격',
   'hudChrome.charSheet.defense': '방어',
+  'hudChrome.charSheet.spell': '주문',
+  'hudChrome.charSheet.ratings': '등급',
   'hudChrome.charSheet.playtimeLabel': '플레이 시간',
   'hudChrome.charSheet.playtimeParts': '{major} {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '1분 미만',
