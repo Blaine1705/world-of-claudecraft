@@ -20,6 +20,7 @@ import type { MountRideSpec } from '../mount_visuals';
 import {
   createWeaponVfx,
   DEFAULT_TUNING,
+  isWeaponVfxShell,
   WEAPON_VFX,
   type WeaponVfxHandle,
   type WeaponVfxTuning,
@@ -2400,6 +2401,10 @@ export class CharacterVisual {
         // lit program key); updateWeaponVfx holds it at intensity 0 instead.
         for (const part of handle.group.children) if (part !== handle.light) hidden.push(part);
       }
+      if (this.weaponVfx.length > 0)
+        this.model.traverse((object) => {
+          if (isWeaponVfxShell(object)) hidden.push(object);
+        });
       return hidden;
     };
     const mounted = this.spiritVeil.sync(meshes, hide);

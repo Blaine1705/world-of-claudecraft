@@ -496,12 +496,18 @@ function weaponSkinHandle(visual: CharacterVisual) {
   const light = new THREE.PointLight(0xffaa55, 2, 6, 2);
   const shell = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial());
   group.add(light, shell);
+  // weapon_vfx.ts hangs a glow shell off the weapon mesh itself, outside the
+  // handle's group
+  const glow = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial());
+  glow.userData.__vfx = true;
+  glow.userData.weaponVfxMesh = true;
+  named(visual, 'weapon_blade').add(glow);
   const update = vi.fn(() => {
     light.intensity = 1.37;
   });
   const handle = { group, light, update, setTuning: vi.fn(), dispose: vi.fn() };
   (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.push(handle);
-  return { handle, light, shell, update };
+  return { handle, light, shell, glow, update };
 }
 
 describe('the other veil users wear their own palette on the same programs', () => {
@@ -538,12 +544,13 @@ describe('the other veil users wear their own palette on the same programs', () 
   it('keeps the weapon-skin VFX and its light under the March, never its shadow', async () => {
     const { visual } = await makePriest(true);
     const body = named(visual, 'body');
-    const { light, shell, update } = weaponSkinHandle(visual);
+    const { light, shell, glow, update } = weaponSkinHandle(visual);
     const proxy = (visual as unknown as { shadowProxy: THREE.Mesh }).shadowProxy;
     visual.setProxyShadow(true);
     visual.setGhost(true, 'march');
     expect(proxy.visible).toBe(false);
     expect(shell.visible).toBe(true);
+    expect(glow.visible).toBe(true);
     visual.updateWeaponVfx(FRAME);
     expect(update).toHaveBeenCalled();
     expect(light.intensity).toBe(1.37);
@@ -551,12 +558,14 @@ describe('the other veil users wear their own palette on the same programs', () 
     // the same rig dead: the released-spirit palette hides them again
     visual.setGhost(true, 'spirit');
     expect(shell.visible).toBe(false);
+    expect(glow.visible).toBe(false);
     expect(light.intensity).toBe(0);
     update.mockClear();
     visual.updateWeaponVfx(FRAME);
     expect(update).not.toHaveBeenCalled();
     visual.setGhost(false);
     expect(shell.visible).toBe(true);
+    expect(glow.visible).toBe(true);
     expect(body.castShadow).toBe(true);
     (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.length = 0;
     visual.dispose();
@@ -605,7 +614,7 @@ describe("stealth wears the veil in its source's palette", () => {
   it('mounts the rogue or the other stealth palette at once, hides a weapon skin, casts no shadow', async () => {
     const { visual, veil, gateCalls } = await makePriest(true);
     const body = named(visual, 'body');
-    const { light, shell } = weaponSkinHandle(visual);
+    const { light, shell, glow } = weaponSkinHandle(visual);
     const proxy = (visual as unknown as { shadowProxy: THREE.Mesh }).shadowProxy;
     visual.setProxyShadow(true);
     for (const palette of ['stealth-rogue', 'stealth-other'] as const) {
@@ -616,6 +625,7 @@ describe("stealth wears the veil in its source's palette", () => {
       expect(body.castShadow).toBe(false);
       expect(proxy.visible).toBe(false);
       expect(shell.visible).toBe(false);
+      expect(glow.visible).toBe(false);
       expect(light.intensity).toBe(0);
       expect(named(visual, 'class_halo').visible).toBe(false);
     }
