@@ -885,6 +885,7 @@ import {
   paintTooltipAt as paintTooltipAtCore,
 } from './tooltip_paint';
 import { attachTouchFrameDrags, type TouchFrameDrags } from './touch_frame_drag';
+import { installTargetOfTargetControls } from './totarget_frame_controller';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
@@ -2094,6 +2095,9 @@ export class Hud {
   private lastTargetFrameId: number | null = null;
   // Target-of-target frame throttle + identity tracking, the non-self cadence twins
   // of the target frame's fields above (see the showTargetOfTarget paint block).
+  // lastTotFrameId doubles as the frame's live SUBJECT for its click / menu /
+  // mouseover routes: a tot swap bypasses the throttle, so it is always whoever
+  // the frame is showing, and null the moment the frame paints hidden.
   private lastTotFramePaintAt = 0;
   private lastTotFrameId: number | null = null;
   // Title resolve elision for the target frame (the lastIcon pattern): the
@@ -3853,6 +3857,20 @@ export class Hud {
         ),
       },
     });
+    // The target-of-target mini frame acts on its own unit like every other unit
+    // frame (select, unit menu, mouseover cast); the wiring lives in its own
+    // module. Its POSITION comes from the interface editor below, not a corner
+    // button of its own, which is why it takes no MovableFrame here.
+    installTargetOfTargetControls(this.totFrameEl, {
+      subjectId: () => this.lastTotFrameId,
+      onTarget: (id) => this.sim.targetEntity(id),
+      onMenu: (id, x, y) => this.openTargetFrameMenuAt(x, y, id),
+      onHover: (resolve) => {
+        this.hoveredCastUnit = resolve;
+      },
+      isInterfaceUnlocked: () => this.interfaceUnlock.isUnlocked,
+      isMobileLayout,
+    });
     this.initInterfaceUnlock(isMobileLayout);
     this.touchFrameDrags = attachTouchFrameDrags(document, isMobileLayout);
   }
@@ -4750,10 +4768,12 @@ export class Hud {
   // a pure USER toggle (party HP is actionable info), never influenced by
   // data-fx-level, reduce-motion, or the FPS governor.
   private partyCollapsed = loadPartyCollapsed();
-  // The party member the cursor is over (Clique-style mouseover casts): set by
-  // the party rows' mouseenter/mouseleave, read by castSlot to redirect friendly
-  // abilities to the hovered member. null whenever no frame is hovered.
-  private hoveredPartyPid: number | null = null;
+  // The unit the cursor is over (Clique-style mouseover casts): set by the party
+  // rows' and the target-of-target frame's mouseenter/mouseleave, read by
+  // castSlot to redirect friendly abilities onto it. A RESOLVER rather than an
+  // id, because the target-of-target frame's unit changes under a still cursor.
+  // null whenever no frame is hovered.
+  private hoveredCastUnit: (() => number | null) | null = null;
   // The party frames are N further instances of the unit_frame family, one per
   // member, behind a keyed node pool that replaces the old per-rebuild innerHTML wipe
   // + click/contextmenu re-attach. The pool owns #party-frames; updatePartyFrames
@@ -4769,7 +4789,7 @@ export class Hud {
       // Clique-style mouseover casts: castSlot redirects friendly abilities to
       // the hovered member while the cursor is over a party frame.
       onHover: (pid) => {
-        this.hoveredPartyPid = pid;
+        this.hoveredCastUnit = pid === null ? null : () => pid;
       },
       // A party member's pet is an ordinary targetable entity, so selecting it is
       // the same call the row itself makes, just with the pet's id.
@@ -7425,7 +7445,7 @@ export class Hud {
         } else {
           const mouseoverPid = this.focusTargets.castTarget(
             resolved.def,
-            this.hoveredPartyPid,
+            this.hoveredCastUnit?.() ?? null,
             this.optionsHooks?.settings.get('mouseoverCast') ?? true,
           );
           if (mouseoverPid !== null) {
@@ -17223,8 +17243,9 @@ export class Hud {
   // you) gets the social/party menu; your own pet gets the pet menu; a live wild
   // hostile mob (in a party) gets the raid-marker menu, mirroring Sim.setMarker's
   // markable criteria so the menu never appears where it would be a no-op.
-  private openTargetFrameMenuAt(x: number, y: number): void {
-    const tid = this.sim.player.targetId;
+  // `tid` defaults to the current target (the target frame's own right-click);
+  // the target-of-target frame passes ITS unit through the same menu builder.
+  private openTargetFrameMenuAt(x: number, y: number, tid = this.sim.player.targetId): void {
     const t = tid !== null ? this.sim.entities.get(tid) : null;
     if (t && t.kind === 'player' && t.id !== this.sim.playerId) {
       this.openContextMenu(t.id, t.name, x, y);

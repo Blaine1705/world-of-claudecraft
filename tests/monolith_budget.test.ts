@@ -442,98 +442,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    // RESOLVED for the merge of dca7476e0e (PR #3917,
-    // feature/v042-class-rebalance) into this branch (merge-base 7bc787780f,
-    // base ceiling 18851). Our own arm had re-pinned to 18716 across the
-    // release/v0.42.0 sync (compass-strip and rest-indicator painter
-    // extractions, the commission-order feedback move, and the
-    // professions-merge-crucible integration). The incoming arm lowered its
-    // own copy to 18723 via the on-bar key-binding mode extraction
-    // (action_bar_bind_controller.ts / action_bar_bind_banner.ts) and the
-    // Nythraxis-redo sync trim. Neither parent pin fits the resolved tree:
-    // `wc -l < src/ui/hud.ts` on the reconciled file measures 18577, below
-    // both arms, so the ceiling follows it down. Exact merged count, zero
-    // slack: any further growth reds again.
-    // The aura-tracks release sync (186dd8fe7f) composes its system-text
-    // extraction with the OSSBrain long-press and tooltip modules. The
-    // measured combined count is below both parent pins (18574 / 18489).
-    // Re-measured at the release/v0.43.0 sync: the review-fix batches
-    // and the release's own extractions both landed; wc -l on the merged tree.
-    // LOWERED 18352 -> 18350 in the review-fix round: the prompt countdown bar
-    // moved to createPromptTimeoutBar in src/ui/prompt_dialog.ts alongside the
-    // PROMPT_TIMEOUT_MS the sheet's --prompt-timeout-dur mirrors.
-    // Re-measured at the second release/v0.43.0 sync of the account-wide Book
-    // of Deeds / Reliquary change: the release's interface-redesign merge and
-    // this branch's charSheetRefreshSigFor extraction compose to 18343 by
-    // wc -l, below both parent pins (18455 / 18350). Exact count, zero slack.
-    // Re-measured at the release/v0.43.0 sync of the aura Watched Spells
-    // change: the branch had already moved the overlay wiring out to
-    // src/ui/aura_overlay_wiring.ts (its own arm re-pinned 18472 -> 18463), and
-    // the release's extractions compose with it to 18334 by wc -l on the
-    // merged tree, below both parent pins (18463 / 18343). Exact count, zero slack.
-    // Re-measured while reconciling the latest v0.43.0 base: the release-side
-    // screenshot and HUD extractions compose with aura overlay wiring and the
-    // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
-    // merged tree. Exact count, zero slack.
-    // LOWERED 18309 -> 18299 by the map atlas rail's collapse toggle: the new
-    // MapSidebarController settings port would have added 8 lines, so it moved
-    // (with the quest tracker's identical existing port literal) behind a
-    // shared trackerCollapseSettings factory in src/ui/tracker_collapse_settings.ts,
-    // leaving both call sites one line each. Exact count, zero slack.
-    // Re-pinned to the exact composed v0.44.0 batch count after #4087's Town
-    // Focus pending HUD state and #4096's spectate action-bar hold merged
-    // beside #4099. The shared collapse-settings extraction still paid its
-    // own map work; this is the integrated release tree's measured zero-slack
-    // count (`wc -l < src/ui/hud.ts`).
-    // Re-pinned at this release/v0.44.0 merge: the feral Wildfang pass composes
-    // with that integrated release tree at 18309 by wc -l. Exact count,
-    // zero slack.
-    // LOWERED 18309 -> 18284 by the composed player portraits change: the
-    // "which body does this player's frame show" rule moved out to
-    // src/ui/player_portrait_core.ts, so the three frame draws and the
-    // portrait update listener each became one call. Exact count, zero slack.
-    // Re-measured at the release/v0.44.0 sync of that change (the release's
-    // frame-rate-limit wiring plus the per-call portrait lookups compose to
-    // 18291 by wc -l on the merged tree, still under the 18309 the branch
-    // started from). Exact count, zero slack.
-    // LOWERED 18291 -> 18289 at the PR 4100 review round: the Inspect look now
-    // travels as an openInspect parameter (no InspectEntity cast dep), and
-    // the target-of-target key reads targetPortraitKey. Exact count, zero slack.
-    // LOWERED 18289 -> 18286 at the trade quantity prompt sync: the merge queue
-    // measured that branch at 18291 against this pin, so its tradeOfferHeadroom
-    // wrapper folded into the bags binding (the trade-open gate plus the pure
-    // core read on one dependency line). Exact count, zero slack.
-    // LOWERED 18286 -> 18276 at the release/v0.44.0 sync of the Pale Keeper
-    // revive change: the Keeper dialog copy moved out to
-    // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
-    // per-frame healer-range scan (the Keeper is talked to). wc -l on the
-    // merged tree. Exact count, zero slack.
-    // LOWERED 18276 -> 18263 with the character-select raid lockouts: the
-    // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
-    // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
-    // and the minimap badge name a lockout identically. Exact count, zero slack.
-    // LOWERED 18263 -> 18253 at the permanent loot quality (PR 4054) sync
-    // on top of the character-select lockouts landing: the item tooltip column
-    // composition moved to item_combat_tooltip_view.ts and the loot receipt
-    // body decision to loot_quality_receipt.ts (the loot arm keeps its one
-    // guarded log() call through a thin lootReceiptBody adapter), composed
-    // with the trade quantity prompt fold (18263 - 10). wc -l on the merged
-    // tree. Exact count, zero slack.
-    // LOWERED 18253 -> 18235 at the Warrior presentation (PR 4139) base sync:
-    // the heal audio policy (potion cue, HoT silence, the Frenzied
-    // Regeneration exemption) moved out of the heal2 arm into
-    // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
-    // count, zero slack.
-    // Re-pinned 18235 -> 18238 at this release-line reconcile: the batch HUD
-    // state composes with the release extractions and trade quantity surface
-    // at 18238 by wc -l, still below the batch parent pin. Exact merged count,
-    // zero slack.
-    // Re-pinned 18238 -> 18240 after #4140's full-bag loot warning and roll-win
-    // banner merged into that reconciled tree: the PR's error-toast timer and
-    // loot notification formatting compose with the quality receipt arm and
-    // roll-id close guard. wc -l on the merged tree. Exact count, zero slack.
-    // Release reconciliation: measured merged tree, preserving both extraction sets.
-    ceiling: 18133,
+    // Release reconciliation for PR #3806: measured the merged HUD after
+    // composing the candidate's later extraction work with the target-of-target
+    // click, menu and mouseover-cast wiring. Exact count, zero slack.
+    ceiling: 18154,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
