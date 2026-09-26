@@ -3534,15 +3534,7 @@ export const es_ES: EnTranslations = {
         "crownEnduresName": "La Corona perdura",
         "crownEnduresSummary": "A los {enrageNormal} s desde el pull (el reloj se pausa mientras el hermano Aldric entra al 70%), La Corona perdura se activa como un enfurecimiento rígido. Nythraxis gana {damage} más de daño y ataques {haste} más rápidos, y luego otro {rampStep} de daño cada {rampEveryNormal} s. No hay barra de temporizador. Los avisos llegan como gritos cuando quedan {warn60}, {warn30} y {warn10} s.",
         "crownEnduresHeroicSummary": "A los {enrageHeroic} s desde el pull (el reloj se pausa mientras el hermano Aldric entra al 70%), La Corona perdura se activa como un enfurecimiento rígido. Nythraxis gana {damage} más de daño y ataques {haste} más rápidos, y luego otro {rampStep} de daño cada {rampEveryHeroic} s. No hay barra de temporizador. Los avisos llegan como gritos cuando quedan {warn60}, {warn30} y {warn10} s.",
-        "crownEnduresResponse": "Toma el primer aviso como la quema final. Guarda movimiento y tiempos de reutilización defensivos para las mecánicas restantes, y derrota a Nythraxis antes del enfurecimiento.",
-        "gravefireHeroicSummary": "Cada {everyHeroic} s, una línea de fuego sepulcral violeta avanza desde Nythraxis hacia un miembro de la banda, creciendo {speed} yd cada segundo hasta {length} yd. Cada yarda arde durante {burnHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo a cualquiera que permanezca dentro.",
-        "gravefireName": "Fuego sepulcral",
-        "gravefireResponse": "Esquiva la línea cuando llegue: es estrecha y nunca gira. Los miembros a distancia siguen moviéndose en vez de quedarse quietos.",
-        "gravefireSummary": "Cada {everyNormal} s, una línea de fuego sepulcral violeta avanza desde Nythraxis hacia un miembro de la banda, creciendo {speed} yd cada segundo hasta {length} yd. Cada yarda arde durante {burnNormal} s e inflige {tickNormal} de la salud máxima cada segundo a cualquiera que permanezca dentro.",
-        "soulfireHeroicSummary": "Cada detonación de Desgarro de alma deja un charco de fuego morado con {radius} yd de radio por grupo de marcas agrupadas, que arde durante {secondsHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo. Estar donde los charcos se solapan solo aplica un pulso, nunca copias acumuladas. Los charcos nunca aparecen a menos de {clearance} yd de una piedra de resguardo.",
-        "soulfireName": "Fuego de almas",
-        "soulfireResponse": "Sal del charco morado en cuanto detonen las marcas. Mantén el siguiente punto de agrupamiento libre de fuego activo.",
-        "soulfireSummary": "Cada detonación de Desgarro de alma deja un charco de fuego morado con {radius} yd de radio donde estaba cada marca, que arde durante {seconds} s e inflige {tickNormal} de la salud máxima cada segundo. Estar donde los charcos se solapan aplica un pulso de cada uno. Los charcos nunca aparecen a menos de {clearance} yd de una piedra de resguardo."
+        "crownEnduresResponse": "Toma el primer aviso como la quema final. Guarda movimiento y tiempos de reutilización defensivos para las mecánicas restantes, y derrota a Nythraxis antes del enfurecimiento."
       }
     },
     "auraEffect": {
@@ -3749,8 +3741,7 @@ export const es_ES: EnTranslations = {
         "shadow": "Sombra",
         "holy": "Sagrada",
         "nature": "Natural"
-      },
-      "formCat": "Forma felina: daño cuerpo a cuerpo y energía"
+      }
     },
     "worldBoss": {
       "spawn": "¡{name} se alza sobre las Alturas de Thornpeak!"
@@ -4774,8 +4765,7 @@ export const es_ES: EnTranslations = {
       "stateCooldown": "Reapareciendo",
       "stateCooldownTimed": "Reaparece en {time}",
       "respawnClock": "{minutes}:{seconds}",
-      "fineGradePreview": "Tu herramienta refina este rendimiento a calidad fina.",
-      "title": "Recolección"
+      "fineGradePreview": "Tu herramienta refina este rendimiento a calidad fina."
     },
     "farming": {
       "plantLine": "Plantas: {name}.",
@@ -4862,9 +4852,7 @@ export const es_ES: EnTranslations = {
       "noviceBody": "La habilidad de Agricultura aumenta cada vez que recoges un cultivo. Siembra una semilla en cualquier parcela para empezar."
     },
     "archetypeTitle": {
-      "none": "Ninguno",
-      "label": "Título",
-      "hobbyLabel": "Pasatiempo"
+      "none": "Ninguno"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardero",
@@ -5583,9 +5571,7 @@ export const es_ES: EnTranslations = {
         "forgestorm": "Forgestorm (falling meteor circles, move out)",
         "shared_pyre": "Shared Pyre (gathering circle, split the damage)",
         "anvils_decree": "Anvil's Decree (three raid-wide hammer strikes, heal through)",
-        "masters_assembly": "The Master's Assembly (block the forge beams, rotate blockers)",
-        "gravefire": "Fuego sepulcral (una línea de fuego móvil que hay que esquivar)",
-        "soulfire": "Fuego de almas (las detonaciones de Desgarro de alma dejan charcos ardientes)"
+        "masters_assembly": "The Master's Assembly (block the forge beams, rotate blockers)"
       }
     },
     "cosmetics": {
@@ -11416,8 +11402,7 @@ export const es_ES: EnTranslations = {
       "rift_storm_execution": "Vara de rayo",
       "rift_storm_strike": "Ira del invocatormentas",
       "rift_tide_execution": "Fauces abisales",
-      "rift_tide_strike": "Profundidad aplastante",
-      "farming": "Plantar"
+      "rift_tide_strike": "Profundidad aplastante"
     }
   },
   "questUi": {

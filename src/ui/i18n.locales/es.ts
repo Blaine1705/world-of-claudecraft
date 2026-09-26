@@ -13,7 +13,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
-  'abilityUi.cast.farming': 'Plantar',
   'hudChrome.barEditor.armed': 'Toca una ranura para colocar {name}.',
   'hudChrome.barEditor.buttonHeader': 'Botón {button}',
   'hudChrome.barEditor.cellAria': 'Botón {button}, {direction}: {action}',
@@ -4033,7 +4032,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'Debes estar en el pueblo para fijar tu enfoque.',
   'hudChrome.townFocus.saveButton': 'Guardar enfoque',
   'hudChrome.townFocus.title': 'Enfoque del pueblo',
-  'hudChrome.archetypeTitle.label': 'Título',
   'hudChrome.archetypeTitle.none': 'Ninguno',
   'entities.itemSets.crownforged.bonus4':
     'Tus golpes críticos con el arma astillan al objetivo con Astilla de Hueso, haciéndolo sangrar 8 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.',
@@ -10490,7 +10488,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': 'Arma imbuida: {min} a {max} de daño adicional con Verdict',
   'hudChrome.auraEffect.stealth': 'Oculto; velocidad de movimiento reducida un {pct}%',
   'hudChrome.auraEffect.formBear': 'Forma de Bruin: salud y armadura aumentadas',
-  'hudChrome.auraEffect.formCat': 'Forma felina: daño cuerpo a cuerpo y energía',
   'hudChrome.auraEffect.formTravel': 'Forma Fleet: velocidad de movimiento aumentada un {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Actitud en Guardia: daño recibido reducido, más amenaza',
   'hudChrome.auraEffect.righteousFury': 'Juramento Ardiente: amenaza de daño Sagrado muy aumentada',
@@ -10791,7 +10788,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Herboristería',
   'hudChrome.gathering.logging': 'Tala',
   'hudChrome.gathering.mining': 'Minería',
-  'hudChrome.gathering.title': 'Recolección',
   'errors.api.accountSessionLimit': 'Demasiados personajes de esta cuenta ya están en el mundo.',
   'errors.api.crossSiteOrigin': 'Solicitud bloqueada por motivos de seguridad.',
   'errors.api.unsupportedMediaType': 'Formato de solicitud no compatible.',
@@ -11151,7 +11147,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willow_sprite.name': 'Duende del Sauce',
   'entities.mobs.wood_wraith.name': 'Aparecido del Bosque',
   'entities.mobs.wreck_thief.name': 'Ladrón de Wreckfield',
-  'hudChrome.archetypeTitle.hobbyLabel': 'Pasatiempo',
   'hudChrome.auraEffect.armorPct': 'Reduce la armadura un {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Reduce la armadura un {pct}% ({stacks} acumulaciones)',
   'hudChrome.auraEffect.increasePct.allStats': 'Aumenta todos los atributos un {pct}%',
@@ -15971,12 +15966,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'La Corte inmortal (solo heroico, la corte real se alza tras Rabia inmortal)',
   'hudChrome.finder.mech.grave_eruption':
     'Erupción sepulcral (círculos de aviso que dejan suelo ardiente)',
-  'hudChrome.finder.mech.gravefire':
-    'Fuego sepulcral (una línea de fuego móvil que hay que esquivar)',
   'hudChrome.finder.mech.kings_wrath':
     'Ira del rey (30%: bonificación de daño permanente, peligros del suelo más rápidos)',
-  'hudChrome.finder.mech.soulfire':
-    'Fuego de almas (las detonaciones de Desgarro de alma dejan charcos ardientes)',
   'hudChrome.fullTransfer.excluded':
     'Nunca se incluye: tu inicio de sesión, cuenta, cartera ni datos de compra. Los diseños de la barra de acción se guardan en tu cuenta y viajan con ella.',
   'hudChrome.fullTransfer.fullSettings': 'Configuración completa',
@@ -16132,13 +16123,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Los tanques mantienen a Nythraxis mirando lejos de la banda. Todos los demás se quedan detrás o a su lado y nunca cruzan el cono.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     'Cada {seconds} s, Nythraxis carga su siguiente golpe que conecte. Su objetivo solo recibe el golpe, pero todos los demás dentro de {range} yd en el cono frontal de {arc} grados reciben {splash} de ese golpe como daño físico, reducido por su propia armadura.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    'Cada {everyHeroic} s, una línea de fuego sepulcral violeta avanza desde Nythraxis hacia un miembro de la banda, creciendo {speed} yd cada segundo hasta {length} yd. Cada yarda arde durante {burnHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo a cualquiera que permanezca dentro.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': 'Fuego sepulcral',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    'Esquiva la línea cuando llegue: es estrecha y nunca gira. Los miembros a distancia siguen moviéndose en vez de quedarse quietos.',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    'Cada {everyNormal} s, una línea de fuego sepulcral violeta avanza desde Nythraxis hacia un miembro de la banda, creciendo {speed} yd cada segundo hasta {length} yd. Cada yarda arde durante {burnNormal} s e inflige {tickNormal} de la salud máxima cada segundo a cualquiera que permanezca dentro.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': 'Ira del rey',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Usa los tiempos de reutilización defensivos restantes para el daño inevitable. Mantén limpias todas las mecánicas anteriores mientras la banda termina el combate.',
@@ -16167,13 +16151,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cada miembro marcado corre a un punto de agrupamiento y se coloca a {range} yd o menos de las otras marcas antes de que termine la mecha de {fuse} s. Los sanadores completan la salud del grupo cuando las marcas se resuelven.',
   'hudChrome.raidBossGuide.nythraxis.soulRendSummary':
     'Nythraxis marca con Desgarro de alma a {marksNormal} miembros de la banda que no sean su objetivo actual. Tras {fuse} s, cada marca inflige toda la salud máxima de su portador como daño de las Sombras, dividido entre el número de miembros marcados a {range} yd o menos de él.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    'Cada detonación de Desgarro de alma deja un charco de fuego morado con {radius} yd de radio por grupo de marcas agrupadas, que arde durante {secondsHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo. Estar donde los charcos se solapan solo aplica un pulso, nunca copias acumuladas. Los charcos nunca aparecen a menos de {clearance} yd de una piedra de resguardo.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': 'Fuego de almas',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    'Sal del charco morado en cuanto detonen las marcas. Mantén el siguiente punto de agrupamiento libre de fuego activo.',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    'Cada detonación de Desgarro de alma deja un charco de fuego morado con {radius} yd de radio donde estaba cada marca, que arde durante {seconds} s e inflige {tickNormal} de la salud máxima cada segundo. Estar donde los charcos se solapan aplica un pulso de cada uno. Los charcos nunca aparecen a menos de {clearance} yd de una piedra de resguardo.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Carámbanos',
   'abilityUi.cast.sundering': 'Quebrantar',
   'hud.core.mapMarkerLabels.farmPatch': 'Parcelas de cultivo',
