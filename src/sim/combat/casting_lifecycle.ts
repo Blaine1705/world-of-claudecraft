@@ -33,15 +33,9 @@ import { isDispellableAura } from '../aura_classify';
 import { nearestAttackerId } from '../auto_acquire_target';
 import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
-import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
-import {
-  canActivateDivineAscension,
-  hasDevotion,
-  paladinExecuteWindowActive,
-  spendDevotion,
-} from '../paladin_devotion';
+import { canActivateDivineAscension, hasDevotion, spendDevotion } from '../paladin_devotion';
 import { scalePrimaryHealing } from '../primary_healing';
 import {
   completeCorpseHarvestCast,
@@ -156,6 +150,8 @@ import {
   nextCastCheapMultiplier,
 } from './empower_next';
 import { autoPicksFallenAlly, isFallenGroupMember, pickFallenAlly } from './fallen_ally_target';
+import { shieldEquipped } from './equipment_requirement';
+import { executeWindowBlocksCast, executeWindowThreshold } from './execute_threshold';
 import { meleeReachActor } from './feral_reach';
 import {
   applyAutoUnshift,
@@ -248,6 +244,7 @@ import {
 } from './spell_combat';
 import { resolveHostileSpellResist } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
+import { isToggleBuff, leavingRestrictedToggle } from './toggle_buff';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 import {
   armForbiddenReflection,
@@ -270,21 +267,6 @@ export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'mortal_strike',
   'shield_slam',
 ]);
-
-// Forms, stances and stealth are toggles: re-casting cancels the aura, and
-// cancelling is never gated by cost or cooldown (the cooldown gates re-entry).
-function isToggleBuff(ability: AbilityDef): boolean {
-  if (ability.id === 'ghost_wolf') return true;
-  return ability.effects.some(
-    (e) =>
-      e.type === 'selfBuff' &&
-      (isFormAuraKind(e.kind) ||
-        e.kind === 'defensive_stance' ||
-        e.kind === 'stealth' ||
-        e.kind === 'stasis' ||
-        e.healthDrainPctMax !== undefined),
-  );
-}
 
 function isStasisToggle(ability: AbilityDef): boolean {
   return ability.effects.some((effect) => effect.type === 'selfBuff' && effect.kind === 'stasis');
@@ -1171,7 +1153,8 @@ export function castAbility(
   // returns the same SHAMAN_SHOCK_COOLDOWN_IDS for those ids), so the shock
   // behavior is unchanged and other shared-cooldown groups ride the same path.
   const sharedCooldown = sharedCooldownIds(ability.id)?.find((id) => p.cooldowns.has(id));
-  const leavingRestrictedToggle = togglingOff && ability.requiresOutsideInstance;
+  // Same predicate the action bar asks, so the exit press never paints greyed.
+  const leavingRestricted = leavingRestrictedToggle(ability, p.auras);
   // Charge-limited abilities (the abilityCharges recharge model, driven by
   // bonusCharges: Double Charge, extra Blink/Frost Nova/Ice Block): a running
   // cooldown is only the RECHARGE timer; the cast is blocked only once every
@@ -1301,8 +1284,7 @@ export function castAbility(
     return;
   }
   if (ability.requiresShield) {
-    const offhand = p.equippedItems.offhand;
-    if (!offhand || !isShieldItem(ITEMS[offhand])) {
+    if (!shieldEquipped(p.equippedItems)) {
       ctx.error(p.id, 'You must have a shield equipped.');
       return;
     }
@@ -1409,7 +1391,7 @@ export function castAbility(
     ctx.error(p.id, 'You must be stealthed.');
     return;
   }
-  const restriction = leavingRestrictedToggle ? null : activeCastRestriction(ctx, p, ability);
+  const restriction = leavingRestricted ? null : activeCastRestriction(ctx, p, ability);
   if (restriction) {
     emitActiveCastRestrictionError(ctx, p.id, restriction);
     return;
@@ -1596,18 +1578,12 @@ export function castAbility(
       ctx.error(p.id, 'You must be facing your target.');
       return;
     }
-    // execute-style gate: only usable while the target is nearly dead
-    const targetHpThreshold = ability.executeThreshold ?? ability.requiresTargetHpBelow;
-    const targetOutsideExecuteWindow =
-      targetHpThreshold !== undefined &&
-      (ability.executeThreshold !== undefined
-        ? target.hp >= target.maxHp * targetHpThreshold
-        : target.hp > target.maxHp * targetHpThreshold);
+    // execute-style gate: only usable while the target is nearly dead. The predicate is
+    // shared with the action bar so the slot greys out exactly when this refuses.
+    const targetHpThreshold = executeWindowThreshold(ability);
     if (
-      targetOutsideExecuteWindow &&
-      !(ability.id === 'execute' && p.auras.some((aura) => aura.kind === 'sudden_death')) &&
-      !paladinExecuteWindowActive(p, ability.id) &&
-      !dawnsWrathHammerActive(p, ability.id)
+      targetHpThreshold !== undefined &&
+      executeWindowBlocksCast(ability, p, target.hp, target.maxHp)
     ) {
       ctx.error(
         p.id,
