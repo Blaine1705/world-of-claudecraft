@@ -445,7 +445,10 @@ const MONOLITHS: MonolithRow[] = [
     // Release reconciliation for PR #3806: measured the merged HUD after
     // composing the candidate's later extraction work with the target-of-target
     // click, menu and mouseover-cast wiring. Exact count, zero slack.
-    ceiling: 18154,
+    // Release reconciliation for PR #4179: the death recap UI itself lives in
+    // src/ui/death_recap_dialog.ts; hud.ts gained only the constructor/bind/close
+    // wiring needed to mount that extracted dialog. Exact count, zero slack.
+    ceiling: 18176,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1089,7 +1092,10 @@ const MONOLITHS: MonolithRow[] = [
     // it shares with the kill snapshot. wc -l on the merged tree. Exact
     // count, zero slack.
     // Release reconciliation: measured merged tree, preserving both extraction sets.
-    ceiling: 11673,
+    // Guild custom ranks then compose underneath that pin; the combined tree is
+    // measured after the release-line extractions and the offline guildSetRanks
+    // stub landed. Exact count, zero slack.
+    ceiling: 11665,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1555,7 +1561,10 @@ const MONOLITHS: MonolithRow[] = [
     // Measured with wc -l < server/game.ts on the merged tree. Exact count.
     // LOWERED again by the merged #4164 tree: the release reconciliation and
     // developer-badge title extraction compose to the measured file size.
-    ceiling: 9850,
+    // Guild custom ranks then compose under that with the guild_promote /
+    // guild_demote arms and the new guild_set_ranks command stacked into one
+    // label group dispatched by server/guild_rank_cmd.ts. Exact count.
+    ceiling: 9841,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1722,7 +1731,10 @@ const MONOLITHS: MonolithRow[] = [
     // exact count measured on the MERGED working tree (wc -l < src/net/online.ts),
     // never reconciled by arithmetic. Zero slack.
     // Release reconciliation: measured merged tree, preserving both extraction sets.
-    ceiling: 5404,
+    // Guild custom ranks then compose under that: the signpost roster body
+    // decode moved to src/net/guild_roster_wire.ts, paying for the
+    // guildSetRanks send with room to spare. Exact count, zero slack.
+    ceiling: 5394,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

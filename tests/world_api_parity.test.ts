@@ -288,6 +288,7 @@ export const IWORLD_MEMBERS = [
   { name: 'guildEventRemove', kind: 'method' },
   { name: 'guildSetMotd', kind: 'method' },
   { name: 'guildBuyRosterPage', kind: 'method' },
+  { name: 'guildSetRanks', kind: 'method' },
   { name: 'searchCharacters', kind: 'method' }, // async (1/2)
   { name: 'characterProfile', kind: 'method' }, // async
   // Operator-set account flair, by name. A pure LOCAL read (the flair rides the entity
@@ -876,10 +877,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // and the account-wide Book of Deeds / Reliquary read halves. Counted
     // directly off the resolved IWORLD_MEMBERS literal. The pending Town
     // Focus fix adds the townFocusPending data read (interaction facet), and
-    // the Wanted board adds three market-order methods.
-    expect(IWORLD_MEMBERS.length).toBe(386);
+    // the Wanted board adds three market-order methods. Guild custom ranks add
+    // guildSetRanks to the social graph facet.
+    expect(IWORLD_MEMBERS.length).toBe(387);
     expect(DATA_MEMBERS.length).toBe(111);
-    expect(METHOD_MEMBERS.length).toBe(275);
+    expect(METHOD_MEMBERS.length).toBe(276);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1064,6 +1066,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildPromote',
       'guildRoster',
       'guildSetMotd',
+      'guildSetRanks',
       'guildTransfer',
       'harvestCorpse',
       'harvestCrop',
@@ -1517,6 +1520,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildPromote',
       'guildRoster',
       'guildSetMotd',
+      'guildSetRanks',
       'guildTransfer',
       'harvestCorpse',
       'harvestCrop',
@@ -2049,6 +2053,7 @@ const FACET_SOCIAL_GRAPH = [
   'guildEventRemove',
   'guildSetMotd',
   'guildBuyRosterPage',
+  'guildSetRanks',
   'searchCharacters',
   'characterProfile',
   'accountFlair',
@@ -2435,8 +2440,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(386);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(386);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(387);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(387);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

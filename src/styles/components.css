@@ -13077,6 +13077,85 @@
   .soc-pledge-accept {
     color: var(--color-text-success);
   }
+  /* Guild custom ranks (docs/prd/guild-custom-ranks.md): the Ranks tab's
+     guild-control table (the .soc-billboard family card), one row per rank and
+     one checkbox column per permission. It spans both .soc-body grid columns,
+     and on a narrow window the TABLE scrolls sideways inside its own box
+     rather than widening the window. */
+  .soc-ranks {
+    grid-column: 1 / -1;
+    margin: 0 4px 6px;
+    padding: 7px 9px;
+  }
+  .soc-ranks-intro {
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .soc-ranks-scroll {
+    overflow-x: auto;
+  }
+  .soc-ranks-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .soc-ranks-table th,
+  .soc-ranks-table td {
+    padding: 3px 4px;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--color-border-showcase);
+    white-space: nowrap;
+  }
+  .soc-ranks-table thead th {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    white-space: normal;
+    vertical-align: bottom;
+  }
+  .soc-ranks-table thead th.soc-ranks-perm {
+    cursor: help;
+  }
+  .soc-ranks-table .soc-ranks-title {
+    min-width: 132px;
+    text-align: left;
+    font-weight: 400;
+  }
+  .soc-ranks-title input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .soc-ranks-name {
+    color: var(--color-text-light);
+  }
+  .soc-ranks-idx,
+  .soc-ranks-count {
+    color: var(--color-text-muted);
+  }
+  .soc-ranks-table td.soc-ranks-order {
+    text-align: right;
+  }
+  .soc-ranks-order .soc-x {
+    margin-left: 2px;
+  }
+  .soc-ranks-perm .ui-check:disabled {
+    cursor: default;
+  }
+  .soc-ranks-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .soc-ranks-actions .btn {
+    margin: 0;
+    padding: 5px 12px;
+    font-size: 11px;
+  }
   .soc-my-pledge {
     grid-column: 1 / -1;
     display: flex;

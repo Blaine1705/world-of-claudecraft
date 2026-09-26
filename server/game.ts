@@ -310,6 +310,7 @@ import {
 import { dispatchGuildBankCommand } from './guild_bank_wire';
 import { GuildBookHolderIndex, requestGuildBookFlush } from './guild_book_holders';
 import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
+import { dispatchGuildRankCommand } from './guild_rank_cmd';
 import { buyGuildRosterPageAtomic } from './guild_roster_page_db';
 import { guildRosterTransport } from './guild_roster_transport';
 import { HEAVY_SELF_EVENTS, heavySelfMarkOnAccept, heavySelfMarkOnReceipt } from './heavy_self';
@@ -435,8 +436,8 @@ import {
   StableSelfTimerWireCache,
   wireAura,
 } from './snapshot_timer_wire';
-import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
-import { SocialService } from './social';
+import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
+import { guildStampRankOf, SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import {
@@ -2465,7 +2466,7 @@ export class GameServer {
         this.sim.setPlayerGuild(session.pid, snap.guild?.name ?? '', { retroDeeds: firstJoin });
         this.sim.setPlayerGuildMembership(
           session.pid,
-          snap.guild ? { guildId: snap.guild.id, rank: snap.guild.rank } : null,
+          snap.guild ? { guildId: snap.guild.id, rank: guildStampRankOf(snap.guild) } : null,
         );
         // The pledge nameplate line + guild colour tier ride the same fenced
         // stamp: a member tiers by their own guild, a pledge by the pledged
@@ -5066,7 +5067,7 @@ export class GameServer {
    *  set for the target guild. The carrier only lends its escrow transaction;
    *  it is never charged, credited, or named as the actor. */
   private async guildBankSaveCarrier(guildId: number): Promise<ClientSession | null> {
-    let rankByCharacterId: Map<number, GuildRank>;
+    let rankByCharacterId: Map<number, string>;
     try {
       const members = await this.socialDb.guildMembersFresh(guildId);
       rankByCharacterId = new Map(members.map((m) => [m.id, m.rank]));
@@ -7207,17 +7208,11 @@ export class GameServer {
         if (typeof msg.name === 'string')
           void this.social.guildKick(this.actorFor(session), msg.name).catch(logSocialErr);
         break;
+      // Rank ladder moves and edits, shape-checked by server/guild_rank_cmd.ts.
       case 'guild_promote':
-        if (typeof msg.name === 'string')
-          void this.social
-            .guildSetRank(this.actorFor(session), msg.name, 'officer')
-            .catch(logSocialErr);
-        break;
       case 'guild_demote':
-        if (typeof msg.name === 'string')
-          void this.social
-            .guildSetRank(this.actorFor(session), msg.name, 'member')
-            .catch(logSocialErr);
+      case 'guild_set_ranks':
+        dispatchGuildRankCommand(this.social, this.actorFor(session), command, msg, logSocialErr);
         break;
       case 'guild_transfer':
         if (typeof msg.name === 'string')

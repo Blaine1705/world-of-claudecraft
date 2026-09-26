@@ -1371,6 +1371,48 @@ export const zh_TW: EnTranslations = {
       "since": "宣誓於{date}",
       "withdraw": "撤回宣誓"
     },
+    "guildRanks": {
+      "tab": "階級",
+      "introEdit": "為公會階級命名，並選擇每個階級可以做什麼。儲存後，變更會套用到該階級的所有成員。",
+      "introView": "每個階級的名稱及其權限。只有會長可以修改。",
+      "colRank": "階級",
+      "colTitle": "名稱",
+      "colMembers": "成員",
+      "colActions": "排序",
+      "numbered": "階級 {n}",
+      "perm": {
+        "invite": "邀請",
+        "remove": "移除",
+        "promote": "晉升",
+        "bank": "公會銀行",
+        "officerChat": "幹部頻道",
+        "motd": "公告板",
+        "events": "日曆"
+      },
+      "permHint": {
+        "invite": "邀請玩家加入公會，並處理他們的宣誓。",
+        "remove": "移除階級低於自己的成員。",
+        "promote": "晉升或降級階級低於自己的成員，最高可晉升至比自己低一級的階級。",
+        "bank": "在公會銀行存取銅幣和物品。所有成員都可以查看。",
+        "officerChat": "閱讀並發言於幹部頻道。",
+        "motd": "編輯公會公告板。",
+        "events": "新增或刪除公會日曆活動。"
+      },
+      "titleLabel": "{rank}的名稱",
+      "permLabel": "{rank}的{perm}權限",
+      "leaderLocked": "會長永遠擁有所有權限。",
+      "add": "新增階級",
+      "save": "儲存階級",
+      "moveUp": "上移{rank}",
+      "moveDown": "下移{rank}",
+      "remove": "移除{rank}",
+      "full": "一個公會最多只能有 {max} 個階級。",
+      "invalidTitle": "階級名稱只能使用字母、數字、空格、撇號和連字號，最多 {max} 個字元。",
+      "removeConfirm": "擔任{rank}的成員將變為{fallback}。要移除此階級嗎？",
+      "removeAccept": "移除階級",
+      "promoteTo": "將 {name} 晉升為{rank}",
+      "demoteTo": "將 {name} 降級為{rank}"
+    },
     "raidLockout": {
       "title": "團隊副本鎖定",
       "allReady": "所有團隊副本就緒",

@@ -1371,6 +1371,48 @@ export const ko_KR: EnTranslations = {
       "since": "{date}에 서약",
       "withdraw": "서약 철회"
     },
+    "guildRanks": {
+      "tab": "등급",
+      "introEdit": "길드 등급의 이름을 정하고 각 등급이 할 수 있는 일을 고르세요. 저장하면 해당 등급의 모든 길드원에게 적용됩니다.",
+      "introView": "각 등급의 이름과 권한입니다. 길드장만 변경할 수 있습니다.",
+      "colRank": "등급",
+      "colTitle": "이름",
+      "colMembers": "회원",
+      "colActions": "순서",
+      "numbered": "{n}등급",
+      "perm": {
+        "invite": "초대",
+        "remove": "추방",
+        "promote": "승급",
+        "bank": "길드 은행",
+        "officerChat": "장교 대화",
+        "motd": "게시판",
+        "events": "달력"
+      },
+      "permHint": {
+        "invite": "플레이어를 길드에 초대하고 서약에 응답합니다.",
+        "remove": "자신보다 낮은 등급의 길드원을 추방합니다.",
+        "promote": "자신보다 낮은 등급의 길드원을 승급 또는 강등합니다. 승급은 자신보다 한 등급 아래까지 가능합니다.",
+        "bank": "길드 은행에 동화와 아이템을 맡기고 찾습니다. 모든 길드원이 볼 수 있습니다.",
+        "officerChat": "장교 대화를 읽고 말합니다.",
+        "motd": "길드 게시판을 편집합니다.",
+        "events": "길드 달력 이벤트를 추가하고 삭제합니다."
+      },
+      "titleLabel": "{rank} 이름",
+      "permLabel": "{rank}의 {perm} 권한",
+      "leaderLocked": "길드장은 항상 모든 권한을 가집니다.",
+      "add": "등급 추가",
+      "save": "등급 저장",
+      "moveUp": "{rank} 위로 이동",
+      "moveDown": "{rank} 아래로 이동",
+      "remove": "{rank} 삭제",
+      "full": "길드 등급은 최대 {max}개까지 만들 수 있습니다.",
+      "invalidTitle": "등급 이름에는 문자, 숫자, 공백, 아포스트로피, 하이픈만 쓸 수 있으며 최대 {max}자입니다.",
+      "removeConfirm": "{rank} 등급의 길드원은 {fallback}(으)로 바뀝니다. 이 등급을 삭제할까요?",
+      "removeAccept": "등급 삭제",
+      "promoteTo": "{name}을(를) {rank}(으)로 승급",
+      "demoteTo": "{name}을(를) {rank}(으)로 강등"
+    },
     "raidLockout": {
       "title": "공격대 잠금",
       "allReady": "모든 공격대 준비됨",

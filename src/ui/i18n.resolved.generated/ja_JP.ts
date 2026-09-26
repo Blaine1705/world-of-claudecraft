@@ -1371,6 +1371,48 @@ export const ja_JP: EnTranslations = {
       "since": "{date}に誓約",
       "withdraw": "誓約を取り下げる"
     },
+    "guildRanks": {
+      "tab": "ランク",
+      "introEdit": "ギルドのランクに名前を付け、それぞれにできることを選びます。保存すると、そのランクの全員に適用されます。",
+      "introView": "各ランクの名前とできること。変更できるのはギルドマスターのみです。",
+      "colRank": "ランク",
+      "colTitle": "名前",
+      "colMembers": "メンバー",
+      "colActions": "並び順",
+      "numbered": "ランク{n}",
+      "perm": {
+        "invite": "招待",
+        "remove": "除名",
+        "promote": "昇格",
+        "bank": "ギルド銀行",
+        "officerChat": "士官チャット",
+        "motd": "掲示板",
+        "events": "カレンダー"
+      },
+      "permHint": {
+        "invite": "プレイヤーをギルドに招待し、誓約に応答します。",
+        "remove": "自分より下のランクのメンバーを除名します。",
+        "promote": "自分より下のランクのメンバーを昇格・降格します。昇格は自分の一つ下のランクまでです。",
+        "bank": "ギルド銀行で銅貨とアイテムを出し入れします。閲覧は全メンバーが可能です。",
+        "officerChat": "士官チャットを読み、発言します。",
+        "motd": "ギルド掲示板を編集します。",
+        "events": "ギルドカレンダーのイベントを追加・削除します。"
+      },
+      "titleLabel": "{rank}の名前",
+      "permLabel": "{rank}の{perm}",
+      "leaderLocked": "ギルドマスターは常にすべての権限を持ちます。",
+      "add": "ランクを追加",
+      "save": "ランクを保存",
+      "moveUp": "{rank}を上へ",
+      "moveDown": "{rank}を下へ",
+      "remove": "{rank}を削除",
+      "full": "ギルドのランクは最大{max}個までです。",
+      "invalidTitle": "ランク名に使えるのは文字、数字、スペース、アポストロフィ、ハイフンのみで、最大{max}文字です。",
+      "removeConfirm": "{rank}のメンバーは{fallback}になります。このランクを削除しますか？",
+      "removeAccept": "ランクを削除",
+      "promoteTo": "{name}を{rank}に昇格",
+      "demoteTo": "{name}を{rank}に降格"
+    },
     "raidLockout": {
       "title": "レイドロックアウト",
       "allReady": "すべてのレイドが利用可能",
