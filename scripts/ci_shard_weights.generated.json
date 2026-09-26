@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4088,
+    "files": 4093,
     "harvestedFiles": 3948,
     "carried": {
       "tests/action_bar_spectate.test.ts": {
@@ -48,6 +48,17 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           12
+        ]
+      },
+      "tests/character_spirit_veil.test.ts": {
+        "ms": 1610,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "spirit veil suites added before a CI full-mode harvest measured them",
+        "runs": [
+          1604,
+          1621,
+          1610
         ]
       },
       "tests/cooldown_manager_auras.test.ts": {
@@ -202,6 +213,17 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           37
+        ]
+      },
+      "tests/ghost_style_core.test.ts": {
+        "ms": 2,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "spirit veil suites added before a CI full-mode harvest measured them",
+        "runs": [
+          3,
+          2,
+          2
         ]
       },
       "tests/harvest_choreography.test.ts": {
@@ -476,6 +498,39 @@
         "reason": "New spectate preference regression measured locally pending the next full CI harvest",
         "runs": [
           22
+        ]
+      },
+      "tests/spirit_veil_census.test.ts": {
+        "ms": 125,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "spirit veil suites added before a CI full-mode harvest measured them",
+        "runs": [
+          126,
+          125,
+          125
+        ]
+      },
+      "tests/spirit_veil_family_core.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "spirit veil suites added before a CI full-mode harvest measured them",
+        "runs": [
+          6,
+          8,
+          7
+        ]
+      },
+      "tests/spirit_veil_prewarm.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "spirit veil suites added before a CI full-mode harvest measured them",
+        "runs": [
+          12,
+          15,
+          12
         ]
       },
       "tests/steel_sweep.test.ts": {
@@ -1800,6 +1855,7 @@
   "tests/character_shadow_proxy.test.ts": 581,
   "tests/character_sheet.test.ts": 43,
   "tests/character_skeleton_update.test.ts": 10,
+  "tests/character_spirit_veil.test.ts": 1610,
   "tests/character_state_backcompat.test.ts": 3315,
   "tests/character_state_module.test.ts": 15,
   "tests/character_tpose_repair.test.ts": 1197,
@@ -2682,6 +2738,7 @@
   "tests/gfx_override_core.test.ts": 14,
   "tests/gfx_profile.test.ts": 14,
   "tests/ghost_dead_gate.test.ts": 5219,
+  "tests/ghost_style_core.test.ts": 2,
   "tests/github_contributors.test.ts": 28,
   "tests/github_db.test.ts": 11,
   "tests/github_oauth.test.ts": 9,
@@ -4777,6 +4834,9 @@
   "tests/spirit_models.test.ts": 18,
   "tests/spirit_puppet_build.test.ts": 161,
   "tests/spirit_puppet_compile_gate.test.ts": 741,
+  "tests/spirit_veil_census.test.ts": 125,
+  "tests/spirit_veil_family_core.test.ts": 7,
+  "tests/spirit_veil_prewarm.test.ts": 12,
   "tests/stable_yard.test.ts": 4997,
   "tests/stack_size_tooltip_view.test.ts": 52,
   "tests/staff_db.test.ts": 15,
