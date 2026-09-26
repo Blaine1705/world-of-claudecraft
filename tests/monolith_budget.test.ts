@@ -878,7 +878,13 @@ const MONOLITHS: MonolithRow[] = [
     // speed sampling (groundSpeedFromFrame, trackLocalPos, hasTravelFormAura)
     // into travel_speed_fx.ts and the hazard-painter rebuild into
     // NythraxisMechanicVisuals.setPaletteMode. Exact count.
-    ceiling: 12788,
+    // LOWERED 12789 -> 12761 when the point-light pads and the bounded prewarm
+    // pad re-pin went: the carriers (src/render/point_light_carriers.ts) pin
+    // the count now; then 12761 -> 12758 when the fx and placed-GLB lights
+    // shared one registration seam object. Measured at 12757 after the
+    // PR #4177 release-line merge kept both the Colorblind Mode extraction and
+    // the packed point-light carrier seam. Exact count.
+    ceiling: 12757,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

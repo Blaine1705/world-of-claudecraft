@@ -695,7 +695,11 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // merged renderer leaf matches neither parent. No capture was retaken.
   // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  'ebf81e7c8c145c28afe992f4b69fa16ed0374e7960b50f0e823037817dee545d';
+  // Re-minted for the point-light carriers: renderer.ts attaches the packed carriers and drops the pads. No capture was retaken.
+  // Re-minted for the PR #4177 release-line merge: the release-side renderer
+  // leaf and the packed point-light carrier leaf compose in one tree. No
+  // capture was retaken.
+  'f50ddb0eac35e37daf874146b47c3817ddaf0a0889e1a75d591f7a4b7a1b9ada';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
