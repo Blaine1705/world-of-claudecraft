@@ -76,6 +76,7 @@ import {
   type SpiritVeilShape,
   spiritVeilTupleKey,
 } from '../src/render/characters/spirit_veil_family_core';
+import { MOBS } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
 
 interface GltfPrimitive {
@@ -158,6 +159,9 @@ function partKeys(url: string, part: Part): string[] {
   const texture = material?.pbrMetallicRoughness?.baseColorTexture;
   // The veil carries the source map on its own channel; only uv 0 is listed.
   expect(texture?.texCoord ?? 0, `${part.where} map channel`).toBe(0);
+  // An alpha-tested source would lose its cutout under the veil, and a kept
+  // shadow (Moonkin) would move to another depth variant: none ships today.
+  expect(material?.alphaMode, `${part.where} alpha mode`).not.toBe('MASK');
   const attributes = new Set(part.attributes.split(','));
   const shape: SpiritVeilShape = {
     skinned: part.skinned,
@@ -270,11 +274,9 @@ function heldModelUrls(): string[] {
 // and Soul Rend on whatever body a raider wears, so every form rig). A palette
 // is uniform values only, so each needs nothing but its shapes in the family.
 const VEILED_FORMS = Object.keys(VISUALS).filter((key) => key.startsWith('form_'));
-const VISION_TEMPLATES = [
-  'vision_aldren_warrior',
-  'vision_malric_mage',
-  'vision_deathstalker_voss',
-] as const;
+// Every mob the renderer veils as a vision (ghost_style_core.ts routes by the
+// `vision_` prefix), read off the mob table so a new one joins the census.
+const VISION_TEMPLATES = Object.keys(MOBS).filter((id) => id.startsWith('vision_'));
 const KEEPER = 'spirit_healer';
 
 function formRigUrls(): string[] {
@@ -397,6 +399,7 @@ describe('the spirit veil family covers the catalogue', () => {
   it('covers the other veil users: the forms they wear, the visions, the keeper', () => {
     // A vision is a mob drawn on a fixed player rig, which the walk above
     // already covers; a keeper is a composed NPC.
+    expect(VISION_TEMPLATES.length).toBeGreaterThanOrEqual(3);
     for (const templateId of VISION_TEMPLATES) {
       const key = visualKeyFor({ kind: 'mob', templateId } as Entity);
       expect(key, templateId).toMatch(/^player_/);

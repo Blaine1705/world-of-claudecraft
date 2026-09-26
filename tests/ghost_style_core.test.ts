@@ -10,6 +10,7 @@ import {
 } from '../src/render/ghost_style_core';
 import { selfBuffAuraId } from '../src/sim/combat/aura_ids';
 import { ABILITIES } from '../src/sim/content/classes';
+import { MOBS } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
 
 const VIEWER = 1;
@@ -40,11 +41,15 @@ describe('characterGhostLook', () => {
   });
 
   it('veils the Pale Keeper and the quest visions exactly like a released spirit', () => {
-    for (const templateId of [
-      'vision_aldren_warrior',
-      'vision_malric_mage',
-      'vision_deathstalker_voss',
-    ]) {
+    const visions = Object.keys(MOBS).filter((id) => id.startsWith('vision_'));
+    expect(visions).toEqual(
+      expect.arrayContaining([
+        'vision_aldren_warrior',
+        'vision_malric_mage',
+        'vision_deathstalker_voss',
+      ]),
+    );
+    for (const templateId of visions) {
       expect(
         characterGhostLook(VIEWER, entity({ kind: 'mob', templateId }), false, 'none'),
         templateId,

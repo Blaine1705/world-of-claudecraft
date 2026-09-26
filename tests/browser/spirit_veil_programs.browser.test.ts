@@ -853,7 +853,7 @@ describe('the veil palettes on a real driver', () => {
       w.scene.add(floor);
       await linkFamily(w);
       w.draw();
-      for (const side of [THREE.FrontSide, THREE.BackSide] as const) {
+      for (const side of [THREE.FrontSide, THREE.BackSide, THREE.DoubleSide] as const) {
         const source = new THREE.MeshStandardMaterial({ map: greyMap(), side });
         const body = new THREE.Mesh<THREE.BufferGeometry, THREE.Material>(
           new THREE.SphereGeometry(0.8, 24, 16),
@@ -913,6 +913,12 @@ describe('the veil palettes on a real driver', () => {
       // target holds linear values, so the margin is the smaller arm's)
       expect(Math.abs(keptPlain[1] - keptPlain[0])).toBeLessThan(4);
       expect(keptDyed[1] - keptDyed[0]).toBeGreaterThan(10);
+      // and where a palette keeps only part of the colours (the rogue stealth)
+      expect(SPIRIT_VEIL_PALETTES['stealth-rogue'].keepColor).toBeGreaterThan(0);
+      expect(SPIRIT_VEIL_PALETTES['stealth-rogue'].keepColor).toBeLessThan(1);
+      const partPlain = read(plain, 'stealth-rogue');
+      const partDyed = read(dyed, 'stealth-rogue');
+      expect(partDyed[1] - partDyed[0]).toBeGreaterThan(partPlain[1] - partPlain[0] + 2);
       // and never reaches a palette that keeps none
       expect(SPIRIT_VEIL_PALETTES.spirit.keepColor).toBe(0);
       expect(read(dyed, 'spirit')).toEqual(read(plain, 'spirit'));

@@ -258,7 +258,6 @@ describe('CharacterVisual.attachDeferredDecals', () => {
       farBakeGate: gate,
       ghosted: false,
       ghostLook: 'spirit',
-      ghostMaterials: new Map(),
       veilMaterials: new Map(),
       spiritVeil: new SpiritVeilRig(),
       weaponVfx: [],

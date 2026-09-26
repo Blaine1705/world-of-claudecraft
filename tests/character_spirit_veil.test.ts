@@ -539,7 +539,10 @@ describe('the other veil users wear their own palette on the same programs', () 
     const { visual } = await makePriest(true);
     const body = named(visual, 'body');
     const { light, shell, update } = weaponSkinHandle(visual);
+    const proxy = (visual as unknown as { shadowProxy: THREE.Mesh }).shadowProxy;
+    visual.setProxyShadow(true);
     visual.setGhost(true, 'march');
+    expect(proxy.visible).toBe(false);
     expect(shell.visible).toBe(true);
     visual.updateWeaponVfx(FRAME);
     expect(update).toHaveBeenCalled();
@@ -603,12 +606,15 @@ describe("stealth wears the veil in its source's palette", () => {
     const { visual, veil, gateCalls } = await makePriest(true);
     const body = named(visual, 'body');
     const { light, shell } = weaponSkinHandle(visual);
+    const proxy = (visual as unknown as { shadowProxy: THREE.Mesh }).shadowProxy;
+    visual.setProxyShadow(true);
     for (const palette of ['stealth-rogue', 'stealth-other'] as const) {
       visual.setGhost(true, palette);
       expect(gateCalls).toHaveLength(0);
       expect(veil.spiritVeilPaletteOf(single(body))).toBe(palette);
       expect(body.children.filter((child) => child.name === 'spirit_veil_depth')).toHaveLength(1);
       expect(body.castShadow).toBe(false);
+      expect(proxy.visible).toBe(false);
       expect(shell.visible).toBe(false);
       expect(light.intensity).toBe(0);
       expect(named(visual, 'class_halo').visible).toBe(false);
@@ -662,7 +668,9 @@ describe('Moonkin and Soul Rend wear the veil', () => {
     const late: string[][] = [];
     veil.setSpiritVeilLateLink((keys) => late.push([...keys]));
     const body = named(visual, 'body');
-    const { shell } = weaponSkinHandle(visual);
+    const { light, shell, update } = weaponSkinHandle(visual);
+    const proxy = (visual as unknown as { shadowProxy: THREE.Mesh }).shadowProxy;
+    visual.setProxyShadow(true);
     visual.setSoulRend(true);
     // never deferred: no gate, mounted now
     expect(gateCalls).toHaveLength(0);
@@ -679,9 +687,14 @@ describe('Moonkin and Soul Rend wear the veil', () => {
       warn.mock.calls.some((call) => String(call[0]).includes('committed a never-deferred veil')),
     ).toBe(true);
     expect(body.castShadow).toBe(false);
+    expect(proxy.visible).toBe(false);
     expect(shell.visible).toBe(true);
+    visual.updateWeaponVfx(FRAME);
+    expect(update).toHaveBeenCalled();
+    expect(light.intensity).toBe(1.37);
     expect(named(visual, 'class_halo').visible).toBe(false);
     visual.setSoulRend(false);
+    expect(proxy.visible).toBe(true);
     expect(veil.spiritVeilPassOf(single(body))).toBeNull();
     (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.length = 0;
     visual.dispose();
@@ -707,9 +720,13 @@ describe('Moonkin and Soul Rend wear the veil', () => {
 describe('Shadowform is an opaque tint on the source programs, not a veil', () => {
   it('tints every rig material on a program-preserving clone, never staged, keeping shadow, glow and a tinted halo', async () => {
     const { visual, veil, gateCalls } = await makePriest(false);
-    const { SHADOWFORM_TINT, SHADOWFORM_EMISSIVE } = await import(
+    const { SHADOWFORM_TINT, SHADOWFORM_EMISSIVE, SHADOWFORM_EMISSIVE_INTENSITY } = await import(
       '../src/render/characters/shadowform_tint'
     );
+    // today's colours, pinned as the literals the old twin used
+    expect(SHADOWFORM_TINT).toBe(0x5a2a8f);
+    expect(SHADOWFORM_EMISSIVE).toBe(0x2a0a4a);
+    expect(SHADOWFORM_EMISSIVE_INTENSITY).toBe(0.4);
     const body = named(visual, 'body');
     const halo = named(visual, 'class_halo');
     const living = new Map(rigMeshes(visual).map((mesh) => [mesh, single(mesh)]));
@@ -793,7 +810,6 @@ describe('no effect state reaches a lit transparent twin', () => {
           checked++;
           if (veil.spiritVeilPassOf(material) !== null) return;
           expect(material.transparent, `${label} ${mesh.name}`).toBe(sources[i].transparent);
-          expect(material.userData.wocCharacterEffect, `${label} ${mesh.name}`).toBeUndefined();
         });
       }
       return checked;
