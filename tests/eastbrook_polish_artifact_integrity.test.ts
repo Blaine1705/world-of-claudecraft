@@ -1383,13 +1383,12 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  '01b0154d838b5b41b6a0f296f8010dd24bd8d2a824514dc1fe00aaefbf9f6a4d';
+  // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
+  // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
+  // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
+  '779036db025ad0dbf91daaa3199f9814045d7e26beeb9171efe585ae49098877';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1401,13 +1400,12 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  'ebf81e7c8c145c28afe992f4b69fa16ed0374e7960b50f0e823037817dee545d';
+  // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
+  // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
+  // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
+  '986760b00669122f42c84ec204036e153b3d0c8c61937ad028f692732b1314ec';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2784,13 +2782,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // devalue audit floor: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-      // release/v0.44.0 merge into feature/world-pvp-flag: recomputed LAST again over the re-swept evidence. No
+      // fail-soft prewarm entry runner: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+      // cast stand-in slot: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-      // feature/world-pvp-flag (review round) merge into feature/king-of-the-hill: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // release/v0.44.0 (PR 4200) merge into feature/vfx-floor-layering: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-    ).toBe('d31a7dc07624ec9afed81290c35edd8a4a08e2bae9d614895dda9e7c3723af42');
+      // PR #4199 shader prewarm merge: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // PR #4220 release integration: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+    ).toBe('ca9ab4f8d6a03473681cdc27851b48f5492799e9a63d9928f7f351662aa16c14');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

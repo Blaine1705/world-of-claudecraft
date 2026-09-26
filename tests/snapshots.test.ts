@@ -2797,8 +2797,50 @@ describe('autosaves', () => {
     expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
   });
 
-  it('joins the market FIFO before taking the shared DB permit', async () => {
+  it('a periodic market save joins the market FIFO before taking the shared DB permit', async () => {
+    // Historical deadlock this guards against: the old permit->FIFO order let
+    // a market write hold the sole DB permit while it was still waiting for
+    // its OWN turn in the market FIFO behind another entry that also needed
+    // that permit to proceed. Joining the FIFO first, then taking the permit
+    // once it is actually this write's turn, makes that circular wait
+    // impossible. `saveMarket`/`saveMail`/`saveRifts` all ride
+    // `enqueueBackgroundMarketWrite`, which does exactly that.
     const gate = createBackgroundDbGate(1, 0); // the supported one-lane edge
+    const server = new GameServer(undefined, gate);
+
+    let releaseHead!: () => void;
+    const headHold = new Promise<void>((resolve) => {
+      releaseHead = resolve;
+    });
+    const head = (server as any).enqueueMarketWrite(async () => headHold) as Promise<void>;
+    vi.mocked(saveMarketState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+    });
+
+    const marketSave = server.saveMarket();
+    await Promise.resolve();
+    await Promise.resolve();
+    // Queued behind `head` on the FIFO: it must not have taken the permit yet.
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, max: 1 });
+
+    releaseHead();
+    await Promise.all([head, marketSave]);
+    expect(saveMarketState).toHaveBeenCalledTimes(1);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 1 });
+  });
+
+  it('a guild-book-only autosave no longer waits on the market FIFO', async () => {
+    // Direction B (docs/guild-bank/escrow-fix-plan.md section 3.6): book
+    // writes are a read-modify-write under a per-guild row lock, commutative
+    // and order-independent, so a guild-book-only autosave (opts.withMarket
+    // false) no longer needs the shared market writer's commit-order
+    // guarantee. server/game.ts saveCharacter now runs that write directly
+    // instead of queueing it behind whatever else the market writer is doing
+    // (a market/mail autosave, or another guild's dirty-book autosave): the
+    // exact compounding stall named as the escalation trigger in
+    // server/game.ts's enqueueMarketWrite comment. Before this fix the save
+    // below would have hung on the never-released `head` blocker.
+    const gate = createBackgroundDbGate(1, 0);
     const server = new GameServer(undefined, gate);
     const session = joinServer(server, fakeWs(), 1, 'Testa');
     const guildId = 913;
@@ -2814,38 +2856,13 @@ describe('autosaves', () => {
       releaseHead = resolve;
     });
     const head = (server as any).enqueueMarketWrite(async () => headHold) as Promise<void>;
-    const order: string[] = [];
-    vi.mocked(saveCharacterAndGuildBankState).mockImplementationOnce(async () => {
-      expect(gate.stats().inFlight).toBe(1);
-      order.push('character');
-      return true;
-    });
-    vi.mocked(saveMarketState).mockImplementationOnce(async () => {
-      expect(gate.stats().inFlight).toBe(1);
-      order.push('market');
-    });
+    vi.mocked(saveCharacterAndGuildBankState).mockImplementationOnce(async () => true);
 
-    // The dirty-book autosave owns the character FIFO and queues first on the
-    // market writer. A periodic market save queues behind it. Neither may take
-    // the sole DB permit before its market-FIFO turn begins: the old
-    // permit->market order made the market save hold the permit while waiting
-    // behind a character save that needed that same permit.
-    const serialize = vi.spyOn(server.sim, 'serializeCharacter');
-    const characterSave = server.saveAll('autosave');
-    await vi.waitFor(() => {
-      // The character FIFO is running and has reached the held market writer,
-      // so its market entry necessarily precedes the periodic one below.
-      expect(serialize).toHaveBeenCalled();
-    });
-    const marketSave = server.saveMarket();
-    await Promise.resolve();
-    await Promise.resolve();
-    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, max: 1 });
+    await server.saveAll('autosave');
+    expect(saveCharacterAndGuildBankState).toHaveBeenCalledTimes(1);
 
     releaseHead();
-    await Promise.all([head, characterSave, marketSave]);
-    expect(order).toEqual(['character', 'market']);
-    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
+    await head;
   });
 
   it('gates WOC dirty-book preflush and mail persistence at their innermost DB calls', async () => {
@@ -5318,11 +5335,13 @@ const ALL_DELTA_KEYS = [
   'renown',
   'rxp',
   'salv',
+  'scb',
   'sh',
   'sp',
   'stats',
   'tal',
   'tfocus',
+  'tfpend',
   'trade',
   'tslot',
   'vault',
@@ -5439,6 +5458,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   sh: 'spellHaste',
   sp: 'spellPower',
   tfocus: 'townFocus',
+  tfpend: 'townFocusPending',
   tslot: 'toolEffectSlots',
   vault: 'vaultInfo',
   wpvp: 'worldPvpInfo',
@@ -5582,6 +5602,14 @@ function dirtyEveryDeltaField(): {
   // the "carries every key" presence loop, since All encodes as the
   // non-null explicit token, but would not prove a real choice decodes).
   meta.harvestPreference = { kind: 'material', itemId: 'rough_hide' };
+  // tfpend: a REAL queued re-spec (null is the idle default and would fail
+  // the presence loop). Far enough out that no tick in this fixture resolves it.
+  meta.pendingTownFocus = {
+    allocation: { silk: 2 },
+    readyAtTime: sim.time + FAR_FUTURE_MS,
+    coin: 0,
+    materials: 0,
+  };
   // tslot: a REAL slotted effect, not the empty default. Without this the key
   // rides the first snapshot as `[]`, which is not null, so it passes the
   // "dirtied to a non-default value" loop below vacuously and nothing anywhere
@@ -6571,8 +6599,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 97 unique keys in sorted order', () => {
-    // 96 plus the King of the Hill readout hill (src/sim/pvp/hill.ts).
+  it('ALL_DELTA_KEYS contains exactly 99 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6615,11 +6642,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // for 92. Intentional Gathering PR4 adds the owner-only tracked-goal
     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
     // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
-    // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95. The
-    // World PvP flag readout wpvp (src/sim/pvp/world_pvp.ts) makes it 97, and
-    // the King of the Hill readout hill (src/sim/pvp/hill.ts) makes it 97.
-    expect(ALL_DELTA_KEYS).toHaveLength(97);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(97);
+    // Account ledger, pending Town Focus, World PvP and King of the Hill
+    // compose into the merged delta inventory; the character sheet's Spell
+    // Crit adds the shared crit core scb beside crit in server/self_scalar_wire.ts.
+    expect(ALL_DELTA_KEYS).toHaveLength(99);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(99);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6781,10 +6808,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Gathering PR4's ggoal (emitted from the new gathering_goal_wire.ts
     // sibling, likewise inside the recursive scrape) makes 93.
     // The candidate self in-combat key cbt brings the combined inventory to 94;
-    // the account ledger's acct key (server/deeds_wire.ts) makes it 95; the
-    // World PvP readout wpvp makes it 96; the King of the Hill readout hill
-    // makes it 97.
-    expect(scraped.size).toBe(97);
+    // Account ledger, pending Town Focus, World PvP and King of the Hill
+    // compose into the merged delta inventory; the Spell Crit sheet cell's
+    // shared crit core scb is emitted from server/self_scalar_wire.ts.
+    expect(scraped.size).toBe(99);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

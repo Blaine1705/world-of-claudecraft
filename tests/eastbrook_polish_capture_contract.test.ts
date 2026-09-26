@@ -689,13 +689,12 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  'ebf81e7c8c145c28afe992f4b69fa16ed0374e7960b50f0e823037817dee545d';
+  // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
+  // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
+  // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
+  '986760b00669122f42c84ec204036e153b3d0c8c61937ad028f692732b1314ec';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
