@@ -1664,6 +1664,9 @@ export const ja_JP: EnTranslations = {
       "targetSubtitle": "Target: {target}",
       "noTargetData": "No player data for this target"
     },
+    "auraTooltip": {
+      "caster": "使用者：{name}"
+    },
     "auraTracks": {
       "defensives": "防御クールダウン",
       "self": "自分のバフ",
@@ -2012,6 +2015,7 @@ export const ja_JP: EnTranslations = {
       "auraBarBelowFrame": "バフをプレイヤーフレームの下に表示",
       "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "すべてのバフを常に表示",
+      "showAuraCaster": "ツールチップに効果の使用者を表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "stopAutoAttackOnTargetSwitch": "ターゲット切り替え時に自動攻撃を停止",
@@ -6746,6 +6750,7 @@ export const ja_JP: EnTranslations = {
       "ifAuraBarBelowFrame": "バフの列をユニットフレームの上ではなく下に移動します。「バフをプレイヤーフレームに表示」が有効なときのみ効果があります。",
       "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "低画質プリセットでも、通常のバフアイコンの上限を無視してすべてのバフを常に表示します。",
+      "ifShowAuraCaster": "すべてのバフ／デバフのツールチップに「使用者」の行を追加し、誰がかけたかを表示します。複数のパラディンのブレッシングなど、同じバフの使用者を見分けるのに便利です。",
       "ifTargetOfTarget": "ターゲットが誰を狙っているかを表示します。タンクがまだ抱えているかを確かめる、昔ながらの手立てです。",
       "ifPetFrame": "ペット用のフレームを表示します。",
       "ifChatFontScale": "チャットの文字サイズです。",

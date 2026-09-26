@@ -1664,6 +1664,9 @@ export const ru_RU: EnTranslations = {
       "targetSubtitle": "Target: {target}",
       "noTargetData": "No player data for this target"
     },
+    "auraTooltip": {
+      "caster": "Применил: {name}"
+    },
     "auraTracks": {
       "defensives": "Защитные умения",
       "self": "Мои эффекты",
@@ -2012,6 +2015,7 @@ export const ru_RU: EnTranslations = {
       "auraBarBelowFrame": "Баффы под рамкой игрока",
       "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "Всегда показывать все баффы",
+      "showAuraCaster": "Показывать применившего эффект в подсказке",
       "highContrastBackground": "Фон высокой контрастности",
       "startAttackOnAbility": "Автоатака при использовании способности",
       "stopAutoAttackOnTargetSwitch": "Останавливать автоатаку при смене цели",
@@ -6746,6 +6750,7 @@ export const ru_RU: EnTranslations = {
       "ifAuraBarBelowFrame": "Перемещает полосу усилений под рамку персонажа вместо над ней. Действует, только когда усиления отображаются на рамке игрока.",
       "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "Показывает все активные баффы даже на низком графическом пресете, обходя его обычное ограничение на количество значков баффов.",
+      "ifShowAuraCaster": "Добавляет строку \"Применил\" в подсказку каждого баффа/дебаффа с именем того, кто его наложил. Удобно, чтобы отличить одинаковые баффы от разных персонажей, например благословения нескольких паладинов.",
       "ifTargetOfTarget": "Показывает, кого держит целью ваша цель, — классический способ понять, удерживает ли её ещё танк.",
       "ifPetFrame": "Показывает рамку вашего питомца.",
       "ifChatFontScale": "Размер текста в чате.",

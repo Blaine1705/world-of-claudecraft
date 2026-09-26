@@ -1664,6 +1664,9 @@ export const tr_TR: EnTranslations = {
       "targetSubtitle": "Target: {target}",
       "noTargetData": "No player data for this target"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Savunma bekleme süreleri",
       "self": "Güçlendirmelerim",
@@ -2012,6 +2015,7 @@ export const tr_TR: EnTranslations = {
       "auraBarBelowFrame": "Oyuncu Çerçevesinin Altındaki Güçlendirmeler",
       "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "Her Zaman Tüm Güçlendirmeleri Göster",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Yüksek Kontrastlı Arka Plan",
       "startAttackOnAbility": "Yetenek Kullanımında Otomatik Saldırı",
       "stopAutoAttackOnTargetSwitch": "Hedef Değiştirince Otomatik Saldırıyı Durdur",
@@ -6746,6 +6750,7 @@ export const tr_TR: EnTranslations = {
       "ifAuraBarBelowFrame": "Güçlendirme satırını birim çerçevenin üstü yerine altına taşır. Yalnızca güçlendirmeler oyuncu çerçevesindeyken önemlidir.",
       "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "Düşük grafik ön ayarında bile etkin olan tüm güçlendirmeleri gösterir ve güçlendirme simgeleri için uygulanan olağan sınırı kaldırır.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Hedefinizin kimi hedeflediğini gösterir; tankın canavarı hâlâ tutup tutmadığını anlamanın klasik yolu.",
       "ifPetFrame": "Evcil hayvanınız için bir çerçeve gösterir.",
       "ifChatFontScale": "Sohbet metni boyutu.",

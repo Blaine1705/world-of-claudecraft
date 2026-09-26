@@ -412,6 +412,15 @@ export const BOOL_SETTINGS = {
   // AurasPainter's getFxTier closure (hud.ts), never by ui_tier_knobs.ts
   // itself, so no OTHER low-tier knob is affected.
   alwaysShowAllBuffs: { def: false },
+  // off by default: append a "cast by <name>" line to every buff/debuff tooltip
+  // (buff bar, debuff bar, target strip), resolved from the aura's sourceId (read
+  // live by aura_tooltip.ts's auraTooltipFooterHtml, wired from Hud's
+  // auraTooltipFooterDeps). Player
+  // feature request: tell apart several casters' copies of the same buff (e.g.
+  // which paladin's Blessing or druid's Briarguard is on you) without opening the
+  // separate detailed target-aura panel. Off by default so the tooltip stays
+  // uncluttered until a player opts in.
+  showAuraCaster: { def: false },
   // on by default: Clique-style mouseover casting. Pressing an action-bar key
   // for a friendly (heal/buff) ability while the cursor is over a party frame
   // casts it on the hovered member without touching the current target (read

@@ -588,6 +588,8 @@ export const guideStrings = {
       "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
     ifAlwaysShowAllBuffs:
       'Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.',
+    ifShowAuraCaster:
+      'Adds a "Cast by" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins\' Blessings.',
     ifTargetOfTarget:
       'Shows who your target is targeting, the classic way to tell whether the tank still has it.',
     ifPetFrame: 'Shows a frame for your pet.',

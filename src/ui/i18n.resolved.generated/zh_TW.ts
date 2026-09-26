@@ -1664,6 +1664,9 @@ export const zh_TW: EnTranslations = {
       "targetSubtitle": "Target: {target}",
       "noTargetData": "No player data for this target"
     },
+    "auraTooltip": {
+      "caster": "施放者：{name}"
+    },
     "auraTracks": {
       "defensives": "防禦性冷卻",
       "self": "我的增益",
@@ -2012,6 +2015,7 @@ export const zh_TW: EnTranslations = {
       "auraBarBelowFrame": "增益顯示在玩家框下方",
       "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "始終顯示所有增益",
+      "showAuraCaster": "在提示中顯示光環施放者",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
       "stopAutoAttackOnTargetSwitch": "切換目標時停止自動攻擊",
@@ -6746,6 +6750,7 @@ export const zh_TW: EnTranslations = {
       "ifAuraBarBelowFrame": "把增益列移到你的單位框下方，而不是上方。只有在增益顯示於玩家框時才有效。",
       "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "即使在低畫質預設下也顯示所有生效中的增益，繞過該檔位平時的增益圖示上限。",
+      "ifShowAuraCaster": "在每個增益／減益提示中加上一行「施放者」，說明是誰施加的。便於分辨多名騎士的祝福等同名增益。",
       "ifTargetOfTarget": "顯示你的目標正在攻擊誰，這是判斷坦克有沒有拉穩的經典方式。",
       "ifPetFrame": "為你的寵物顯示一個框。",
       "ifChatFontScale": "聊天文字大小。",

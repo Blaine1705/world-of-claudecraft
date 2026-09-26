@@ -1066,6 +1066,7 @@ export function buildInterfaceControls(
       }),
       boolToggle(s, 'targetAurasBelowFrame', 'hudChrome.options.targetAurasBelowFrame'),
       boolToggle(s, 'alwaysShowAllBuffs', 'hudChrome.options.alwaysShowAllBuffs'),
+      boolToggle(s, 'showAuraCaster', 'hudChrome.options.showAuraCaster'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
       boolToggle(s, 'showTargetSwingTimer', 'hudChrome.options.showTargetSwingTimer'),
     ]),

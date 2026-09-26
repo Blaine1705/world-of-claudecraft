@@ -1664,6 +1664,9 @@ export const es_ES: EnTranslations = {
       "targetSubtitle": "Objetivo: {target}",
       "noTargetData": "Sin datos de jugadores para este objetivo"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Enfriamientos defensivos",
       "self": "Mis beneficios",
@@ -2012,6 +2015,7 @@ export const es_ES: EnTranslations = {
       "auraBarBelowFrame": "Beneficios debajo del marco del jugador",
       "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "Mostrar siempre todos los beneficios",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Fondo de alto contraste",
       "startAttackOnAbility": "Ataque automático al usar habilidad",
       "stopAutoAttackOnTargetSwitch": "Detener ataque automático al cambiar de objetivo",
@@ -6746,6 +6750,7 @@ export const es_ES: EnTranslations = {
       "ifAuraBarBelowFrame": "Mueve la fila de beneficios debajo de tu marco de unidad en vez de encima. Solo importa mientras los beneficios estén en el marco del jugador.",
       "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "Muestra todos los beneficios activos incluso con el preajuste gráfico Bajo, ignorando su límite habitual de iconos de beneficios.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Muestra a quién tiene como objetivo tu objetivo, la forma clásica de saber si el tanque todavía lo controla.",
       "ifPetFrame": "Muestra un marco para tu mascota.",
       "ifChatFontScale": "Tamaño del texto del chat.",

@@ -1664,6 +1664,9 @@ export const vi_VN: EnTranslations = {
       "targetSubtitle": "Target: {target}",
       "noTargetData": "No player data for this target"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Hồi chiêu phòng thủ",
       "self": "Buff của tôi",
@@ -2012,6 +2015,7 @@ export const vi_VN: EnTranslations = {
       "auraBarBelowFrame": "Hiệu Ứng Có Lợi Bên Dưới Khung Người Chơi",
       "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "Luôn Hiện Mọi Buff",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
       "stopAutoAttackOnTargetSwitch": "Dừng Tự Đánh Khi Đổi Mục Tiêu",
@@ -6746,6 +6750,7 @@ export const vi_VN: EnTranslations = {
       "ifAuraBarBelowFrame": "Di chuyển hàng hiệu ứng có lợi xuống dưới khung đơn vị của bạn thay vì phía trên. Chỉ có tác dụng khi hiệu ứng có lợi đang nằm trên khung người chơi.",
       "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "Hiển thị mọi buff đang hoạt động ngay cả ở cấu hình đồ họa Thấp, bỏ qua giới hạn biểu tượng buff thông thường.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Hiện mục tiêu của mục tiêu bạn đang nhắm, cách cổ điển để biết liệu tank có còn giữ được nó hay không.",
       "ifPetFrame": "Hiện một khung cho thú cưng của bạn.",
       "ifChatFontScale": "Cỡ chữ trò chuyện.",

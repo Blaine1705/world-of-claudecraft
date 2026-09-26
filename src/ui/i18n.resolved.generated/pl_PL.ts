@@ -1664,6 +1664,9 @@ export const pl_PL: EnTranslations = {
       "targetSubtitle": "Target: {target}",
       "noTargetData": "No player data for this target"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Obronne czasy odnowienia",
       "self": "Moje wzmocnienia",
@@ -2012,6 +2015,7 @@ export const pl_PL: EnTranslations = {
       "auraBarBelowFrame": "Wzmocnienia pod ramką gracza",
       "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "Zawsze pokazuj wszystkie wzmocnienia",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Tło o wysokim kontraście",
       "startAttackOnAbility": "Automatyczny atak przy użyciu umiejętności",
       "stopAutoAttackOnTargetSwitch": "Zatrzymaj automatyczny atak przy zmianie celu",
@@ -6746,6 +6750,7 @@ export const pl_PL: EnTranslations = {
       "ifAuraBarBelowFrame": "Przenosi rząd wzmocnień pod ramkę twojej jednostki zamiast nad nią. Ma znaczenie tylko wtedy, gdy wzmocnienia są wyświetlane na ramce gracza.",
       "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "Pokazuje wszystkie aktywne wzmocnienia nawet przy niskim poziomie grafiki, omijając zwykły limit ikon wzmocnień.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Pokazuje, kogo atakuje twój cel, co jest klasycznym sposobem sprawdzenia, czy tank wciąż go trzyma.",
       "ifPetFrame": "Pokazuje ramkę dla twojego zwierzęcia.",
       "ifChatFontScale": "Rozmiar tekstu czatu.",

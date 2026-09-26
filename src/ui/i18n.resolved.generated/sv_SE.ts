@@ -1664,6 +1664,9 @@ export const sv_SE: EnTranslations = {
       "targetSubtitle": "Target: {target}",
       "noTargetData": "No player data for this target"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Defensiva nedkylningar",
       "self": "Mina förstärkningar",
@@ -2012,6 +2015,7 @@ export const sv_SE: EnTranslations = {
       "auraBarBelowFrame": "Förstärkningar under spelarramen",
       "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "Visa alltid alla förstärkningar",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
       "stopAutoAttackOnTargetSwitch": "Stoppa automatisk attack vid målbyte",
@@ -6746,6 +6750,7 @@ export const sv_SE: EnTranslations = {
       "ifAuraBarBelowFrame": "Flyttar buffraden under din enhetsram i stället för ovanför den. Spelar bara roll när förstärkningar visas på spelarramen.",
       "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "Visar alla aktiva förstärkningar även med grafikförinställningen Låg och kringgår den vanliga gränsen för förstärkningsikoner.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Visar vem ditt mål siktar på, det klassiska sättet att se om tanken fortfarande har aggro.",
       "ifPetFrame": "Visar en ram för ditt djur.",
       "ifChatFontScale": "Textstorlek i chatten.",

@@ -901,6 +901,7 @@ const FRAMES_KEYS = [
   'auraBarBelowFrame',
   'targetAurasBelowFrame',
   'alwaysShowAllBuffs',
+  'showAuraCaster',
   'showTargetOfTarget',
   'showTargetSwingTimer',
 ];

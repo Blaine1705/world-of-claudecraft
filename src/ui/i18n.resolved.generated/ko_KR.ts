@@ -1664,6 +1664,9 @@ export const ko_KR: EnTranslations = {
       "targetSubtitle": "Target: {target}",
       "noTargetData": "No player data for this target"
     },
+    "auraTooltip": {
+      "caster": "시전자: {name}"
+    },
     "auraTracks": {
       "defensives": "방어 재사용 대기시간",
       "self": "내 버프",
@@ -2012,6 +2015,7 @@ export const ko_KR: EnTranslations = {
       "auraBarBelowFrame": "버프를 플레이어 프레임 아래에 표시",
       "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "모든 버프를 항상 표시",
+      "showAuraCaster": "툴팁에 효과 시전자 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
       "stopAutoAttackOnTargetSwitch": "대상 전환 시 자동 공격 중지",
@@ -6746,6 +6750,7 @@ export const ko_KR: EnTranslations = {
       "ifAuraBarBelowFrame": "강화 효과 줄을 유닛 프레임 위가 아니라 아래로 옮깁니다. 강화 효과가 플레이어 프레임에 표시되어 있을 때만 적용됩니다.",
       "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "낮음 그래픽 설정에서도 평소의 버프 아이콘 상한을 무시하고 활성화된 모든 버프를 표시합니다.",
+      "ifShowAuraCaster": "모든 버프/디버프 툴팁에 \"시전자\" 줄을 추가하여 누가 걸었는지 표시합니다. 여러 성기사의 축복처럼 같은 버프를 건 사람을 구분할 때 유용합니다.",
       "ifTargetOfTarget": "내 대상이 누구를 노리고 있는지 보여 줍니다. 탱커가 아직 붙잡고 있는지 확인하는 클래식한 방법입니다.",
       "ifPetFrame": "소환수의 프레임을 표시합니다.",
       "ifChatFontScale": "채팅 글자 크기입니다.",

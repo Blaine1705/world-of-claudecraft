@@ -1664,6 +1664,9 @@ export const cs_CZ: EnTranslations = {
       "targetSubtitle": "Target: {target}",
       "noTargetData": "No player data for this target"
     },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
+    },
     "auraTracks": {
       "defensives": "Obranné cooldowny",
       "self": "Moje bonusy",
@@ -2012,6 +2015,7 @@ export const cs_CZ: EnTranslations = {
       "auraBarBelowFrame": "Buffy pod rámem hráče",
       "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "Vždy zobrazit všechny buffy",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Vysoce kontrastní pozadí",
       "startAttackOnAbility": "Automatický útok při použití schopnosti",
       "stopAutoAttackOnTargetSwitch": "Zastavit automatický útok při přepnutí cíle",
@@ -6746,6 +6750,7 @@ export const cs_CZ: EnTranslations = {
       "ifAuraBarBelowFrame": "Přesune řadu buffů pod rám jednotky místo nad něj. Má význam jen tehdy, když jsou buffy na rámu hráče.",
       "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "Zobrazuje všechna aktivní posílení i při nízkém nastavení grafiky a obchází obvyklý limit ikon posílení.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Zobrazí, na koho míří tvůj cíl, klasický způsob, jak poznat, jestli ho tank ještě drží.",
       "ifPetFrame": "Zobrazí rám pro tvého mazlíčka.",
       "ifChatFontScale": "Velikost textu chatu.",
