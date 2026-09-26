@@ -17093,7 +17093,7 @@ export const da_DK: EnTranslations = {
         "name": "Muster Sergeant"
       },
       "muster_captain": {
-        "name": "Muster Captain"
+        "name": "Muster Commander"
       },
       "stable_horse": {
         "name": "Staldhest"

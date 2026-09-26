@@ -17093,7 +17093,7 @@ export const en_XA: EnTranslations = {
         "name": "[Ɱúšţéŕ Šéŕĝéáñţ]"
       },
       "muster_captain": {
-        "name": "[Ɱúšţéŕ Çáþţáíñ]"
+        "name": "[Ɱúšţéŕ Çóɱɱáñðéŕ]"
       },
       "stable_horse": {
         "name": "[Šţáƀļé Ĥóŕšé]"

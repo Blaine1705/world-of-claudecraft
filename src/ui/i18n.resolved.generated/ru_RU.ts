@@ -17093,7 +17093,7 @@ export const ru_RU: EnTranslations = {
         "name": "Сержант ополчения"
       },
       "muster_captain": {
-        "name": "Капитан ополчения"
+        "name": "Командир ополчения"
       },
       "stable_horse": {
         "name": "Конюшенная лошадь"

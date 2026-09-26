@@ -17093,7 +17093,7 @@ export const ko_KR: EnTranslations = {
         "name": "소집대 부사관"
       },
       "muster_captain": {
-        "name": "소집대 대장"
+        "name": "소집대 지휘관"
       },
       "stable_horse": {
         "name": "마구간 말"

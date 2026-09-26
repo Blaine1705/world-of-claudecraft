@@ -17093,7 +17093,7 @@ export const es: EnTranslations = {
         "name": "Muster Sergeant"
       },
       "muster_captain": {
-        "name": "Muster Captain"
+        "name": "Muster Commander"
       },
       "stable_horse": {
         "name": "Caballo de establo"

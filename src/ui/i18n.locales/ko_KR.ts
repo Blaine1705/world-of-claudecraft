@@ -6646,7 +6646,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': '폭풍소환사의 허리보호구',
   'entities.mobs.thunzharr_waking_peak.name': '천자르, 깨어나는 봉우리',
   'entities.mobs.balgath_cyclops.name': '발가스, 외눈의 감독관',
-  'entities.mobs.muster_captain.name': '소집대 대장',
+  'entities.mobs.muster_captain.name': '소집대 지휘관',
   'entities.mobs.muster_sergeant.name': '소집대 부사관',
   'entities.mobs.muster_chaplain.name': '소집대 군목',
   'entities.mobs.muster_footman.name': '소집대 보병',

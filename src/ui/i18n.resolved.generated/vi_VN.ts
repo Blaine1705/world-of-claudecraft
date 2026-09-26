@@ -17093,7 +17093,7 @@ export const vi_VN: EnTranslations = {
         "name": "Muster Sergeant"
       },
       "muster_captain": {
-        "name": "Muster Captain"
+        "name": "Muster Commander"
       },
       "stable_horse": {
         "name": "Ngựa chuồng"

@@ -6755,7 +6755,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': 'Поясная защита призывателя бурь',
   'entities.mobs.thunzharr_waking_peak.name': 'Тунзарр, Пробуждающийся пик',
   'entities.mobs.balgath_cyclops.name': 'Балгат, Одноглазый Десятник',
-  'entities.mobs.muster_captain.name': 'Капитан ополчения',
+  'entities.mobs.muster_captain.name': 'Командир ополчения',
   'entities.mobs.muster_sergeant.name': 'Сержант ополчения',
   'entities.mobs.muster_chaplain.name': 'Капеллан ополчения',
   'entities.mobs.muster_footman.name': 'Пехотинец ополчения',

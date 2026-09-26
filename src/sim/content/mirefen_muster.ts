@@ -188,7 +188,9 @@ export const MUSTER_MOBS: Record<MusterSoldierTemplateId, MobTemplate> = {
   muster_footman: soldier('muster_footman', 'Muster Footman', 12, 0x8a3b2e),
   muster_chaplain: soldier('muster_chaplain', 'Muster Chaplain', 12, 0xd8cdb0),
   muster_sergeant: soldier('muster_sergeant', 'Muster Sergeant', 13, 0x7a2f25),
-  muster_captain: soldier('muster_captain', 'Muster Captain', 15, 0x9c4a2c),
+  // "Commander", not "Captain": Muster Captain is a named unit in another game (Kings of
+  // War's Halflings), and the originality rule forbids reusing a full name in the same role.
+  muster_captain: soldier('muster_captain', 'Muster Commander', 15, 0x9c4a2c),
 };
 
 /** Ground-object template id of the command camp's weapon rack. */

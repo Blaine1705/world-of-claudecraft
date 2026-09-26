@@ -6668,7 +6668,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': '嵐呼びの腰当て',
   'entities.mobs.thunzharr_waking_peak.name': 'サンザール、目覚めし峰',
   'entities.mobs.balgath_cyclops.name': 'バルガス、単眼の監督',
-  'entities.mobs.muster_captain.name': '召集兵団の隊長',
+  'entities.mobs.muster_captain.name': '召集兵団の指揮官',
   'entities.mobs.muster_sergeant.name': '召集兵団の軍曹',
   'entities.mobs.muster_chaplain.name': '召集兵団の従軍司祭',
   'entities.mobs.muster_footman.name': '召集兵団の歩兵',

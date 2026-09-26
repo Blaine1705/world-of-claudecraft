@@ -17093,7 +17093,7 @@ export const zh_CN: EnTranslations = {
         "name": "征召军士"
       },
       "muster_captain": {
-        "name": "征召队长"
+        "name": "征召指挥官"
       },
       "stable_horse": {
         "name": "厩马"

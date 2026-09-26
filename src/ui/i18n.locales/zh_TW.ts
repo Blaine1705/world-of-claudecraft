@@ -6431,7 +6431,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': '喚雷者腰甲',
   'entities.mobs.thunzharr_waking_peak.name': '桑扎爾，覺醒之峰',
   'entities.mobs.balgath_cyclops.name': '巴爾加斯，獨眼工頭',
-  'entities.mobs.muster_captain.name': '徵召隊長',
+  'entities.mobs.muster_captain.name': '徵召指揮官',
   'entities.mobs.muster_sergeant.name': '徵召軍士',
   'entities.mobs.muster_chaplain.name': '徵召隨軍牧師',
   'entities.mobs.muster_footman.name': '徵召步兵',

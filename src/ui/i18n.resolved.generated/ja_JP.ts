@@ -17093,7 +17093,7 @@ export const ja_JP: EnTranslations = {
         "name": "召集兵団の軍曹"
       },
       "muster_captain": {
-        "name": "召集兵団の隊長"
+        "name": "召集兵団の指揮官"
       },
       "stable_horse": {
         "name": "厩舎の馬"
