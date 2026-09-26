@@ -2296,8 +2296,7 @@
      never started, and the press fell through to the world). Only the mini
      ITSELF is carved out; its own contents still match through it, so a grab
      anywhere on it starts the mini's drag rather than pressing its portrait. */
-  body.interface-unlocked
-    .tf-unlocked
+  body.interface-unlocked .tf-unlocked
     :not(.tf-move-btn):not(.mf-resize-grip):not(#totarget-frame) {
     pointer-events: none !important;
   }
