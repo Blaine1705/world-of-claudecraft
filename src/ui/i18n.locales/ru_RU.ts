@@ -3549,6 +3549,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleProceeds': 'Выручка',
   'itemUi.market.saleOlder': 'Ещё {count} более ранних продаж, включены в общую сумму.',
   'itemUi.market.collectAll': 'Забрать все',
+  'itemUi.market.history': 'История',
+  'itemUi.market.historyEmpty':
+    'Пока нет продаж. Проданные на Мировом рынке товары появятся здесь.',
+  'itemUi.market.historyNote': 'Ваши недавние продажи на Мировом рынке.',
   'itemUi.logs.listedItem': '{item} выставлен на мировой рынок за {money}.',
   'itemUi.logs.sellerSold': '{buyer} купил ваш {item} за {money}. Заберите {proceeds} у Торговца.',
   'itemUi.logs.boughtItem': '{item} куплен за {money}.',

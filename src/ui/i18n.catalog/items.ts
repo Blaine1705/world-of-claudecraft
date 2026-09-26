@@ -383,11 +383,16 @@ const itemStringsEn = {
       collectEmpty: 'Nothing waiting. Sale proceeds and expired listings collect here.',
       collectNote: 'Earnings and returned goods the Merchant is holding for you.',
       saleProceeds: 'Sale proceeds',
-      // The itemized ledger under the proceeds line. saleOlder covers the rows the
-      // ledger cap dropped, whose gold IS still in the total above.
+      collectAll: 'Collect All',
+      // The History tab: the itemized sale ledger, split out of Collect so a
+      // completed sale stays visible after its proceeds are claimed. saleOlder
+      // covers the rows the ledger cap dropped, whose gold IS still counted in
+      // the Collect tab's proceeds total.
+      history: 'History',
+      historyEmpty: 'No sales yet. Items you sell on the World Market show up here.',
+      historyNote: 'Your recent sales on the World Market.',
       saleBuyer: 'Sold to {buyer}',
       saleOlder: 'Plus {count} earlier sales, included in the total.',
-      collectAll: 'Collect All',
       // The Wanted tab (src/sim/market_orders.ts): buy orders and the not-on-the-
       // market strip. Place card, order rows (Deliver / Withdraw), and the strip.
       ordersTab: 'Wanted',
