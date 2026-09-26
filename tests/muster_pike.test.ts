@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { MUSTER_PIKE_LEASH, MUSTER_RACK } from '../src/sim/content/mirefen_muster';
 import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
 import { lanceLeanFromMove } from '../src/sim/lance_trial';
-import type { MusterArmyState } from '../src/sim/mirefen_muster';
+import { MUSTER_STAND_DOWN_SECONDS, type MusterArmyState } from '../src/sim/mirefen_muster';
 import { MUSTER_SHARDPIKE_ID } from '../src/sim/muster_pike';
 import { isDisenchantable } from '../src/sim/professions/enchanting';
 import { isSalvageable } from '../src/sim/professions/salvage';
@@ -19,13 +19,18 @@ import { terrainHeight } from '../src/sim/world';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 
 const BALGATH = 'balgath_cyclops';
-const lair = WORLD_BOSSES.find((b) => b.templateId === BALGATH)?.pos ?? { x: 128, z: 262 };
+const lair = (() => {
+  const row = WORLD_BOSSES.find((b) => b.templateId === BALGATH);
+  if (!row) throw new Error('balgath_cyclops is not in WORLD_BOSSES');
+  return row.pos;
+})();
 const TEST_WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
 
 interface Internals {
   musterArmy: MusterArmyState;
   spawnDevBoss(t: string, x: number, z: number): number;
   setGm(pid?: number, on?: boolean): void;
+  setDevMobsFrozen(on?: boolean): boolean;
   dealDamage(...a: unknown[]): number;
 }
 const inner = (sim: Sim) => sim as unknown as Internals;
@@ -195,6 +200,32 @@ describe('the muster always takes its pike back', () => {
     inner(r.sim).dealDamage(r.sim.player, r.boss, 5000, false, 'physical', 'probe', 'hit', true);
     expect(r.boss.dead).toBe(true);
     r.sim.tick();
+    expectRestored(r);
+  });
+
+  it('not on a brief evade blip mid-fight: only once a reset has stayed quiet', () => {
+    const r = armed();
+    inner(r.sim).setGm(r.sim.playerId, true);
+    place(r.sim, r.sim.player, lair.x, lair.z - 10);
+    for (let i = 0; i < 40; i++) r.sim.tick();
+    expect(r.boss.inCombat).toBe(true);
+    // The AI frozen so the test alone decides when he is in the fight (the muster pass and
+    // the loan sweep still run every tick).
+    inner(r.sim).setDevMobsFrozen(true);
+    const ticks = (seconds: number) => {
+      for (let i = 0; i < Math.round(seconds * 20); i++) r.sim.tick();
+    };
+    // He drops out of combat for three seconds and the raid has him again: same fight.
+    r.boss.inCombat = false;
+    ticks(3);
+    r.boss.inCombat = true;
+    ticks(20);
+    expect(r.meta().equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
+    // He resets for real: the pike stays through the stand-down, then goes back.
+    r.boss.inCombat = false;
+    ticks(MUSTER_STAND_DOWN_SECONDS - 2);
+    expect(r.meta().equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
+    ticks(3);
     expectRestored(r);
   });
 

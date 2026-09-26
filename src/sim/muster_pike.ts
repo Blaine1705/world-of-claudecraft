@@ -9,7 +9,9 @@
 //     weapon, and the off hand if the two-hander benched it). Nothing is lost: the displaced
 //     pieces go to the bags through the ordinary equip swap, which refuses outright when the
 //     bags cannot take them, so the rack refuses too.
-//   - It is reclaimed when the pull ends, when its bearer walks out of the muster's reach
+//   - It is reclaimed when the pull is over (he fell, or a reset has stayed quiet through
+//     the muster's stand-down: a brief evade blip mid-fight keeps it in hand, see
+//     mirefen_muster.ts nextStandUp), when its bearer walks out of the muster's reach
 //     (MUSTER_PIKE_LEASH), or dies. Reclaiming removes it from the hands AND the bags, and
 //     puts the remembered weapons back in the hands if those slots are free.
 //   - It is never saved: savedGearFor folds a lent pike back out of every character save,
@@ -158,8 +160,9 @@ export function reclaimMusterPike(
 /**
  * The per-tick loan sweep, driven by the muster army each world-boss pass.
  *
- * Reclaims on the three live exits (the pull ended, the bearer died, the bearer left the
- * muster's reach) and forgets a loan whose borrower is gone or no longer carries the pike
+ * Reclaims on the three live exits (the pull is over, as the muster army decides it: his
+ * death, or a reset gone quiet through the stand-down; the bearer died; the bearer left
+ * the muster's reach) and forgets a loan whose borrower is gone or no longer carries the pike
  * anywhere (a logout: the leave save already folded it back out, see savedGearFor).
  */
 export function tickLentPikes(ctx: SimContext, lent: LentPikes, pullEnded: boolean): void {

@@ -6,7 +6,8 @@
 // table (dry, clear of wildlife, out of the crater bowl). The behavior runs in a live Sim:
 // the muster rises with the boss, soldiers stay friendly, untouchable and out of every
 // hate table, the arrival slam at each picket kills the squad standing in it and spares the
-// sentries, and the fallen stand back up after the pull and at dawn.
+// sentries, and the fallen stay down for the WHOLE fight (a brief evade included) and stand
+// back up only once he falls, a reset pull has stayed quiet, or at a dawn he is not fighting.
 import { describe, expect, it } from 'vitest';
 import {
   MUSTER_CAMPS,
@@ -19,9 +20,12 @@ import {
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import {
   MUSTER_BRACE_RANGE,
+  MUSTER_BRACE_RELEASE_RANGE,
   MUSTER_FACING_STEP,
   MUSTER_RESPAWN_DELAY,
+  MUSTER_STAND_DOWN_SECONDS,
   type MusterArmyState,
+  nextStandUp,
   tickMusterArmy,
 } from '../src/sim/mirefen_muster';
 import { blindEyeWard } from '../src/sim/mob/eye_ward';
@@ -56,6 +60,7 @@ interface Internals {
   musterArmy: MusterArmyState;
   spawnDevBoss(t: string, x: number, z: number): number;
   setGm(pid?: number, on?: boolean): void;
+  setDevMobsFrozen(on?: boolean): boolean;
   dealDamage(...a: unknown[]): number;
 }
 const inner = (sim: Sim) => sim as unknown as Internals;
@@ -363,5 +368,121 @@ describe('the muster in a live world', () => {
     expect(victim.dead).toBe(true);
     tickMusterArmy(inner(sim).ctx, army, null, true);
     expect(victim.dead).toBe(false);
+  });
+});
+
+describe('the fallen stay down for the whole fight', () => {
+  it('stands them up only at the true end: never engaged, his death soon, a reset slowly, a free dawn at once', () => {
+    const quiet = { engaged: false, fell: false, pullEnded: false, dawn: false };
+    // Mid-fight nothing rises, whatever was pending and even at sunrise.
+    expect(nextStandUp(100, 50, { ...quiet, engaged: true })).toBeNull();
+    expect(nextStandUp(null, 50, { ...quiet, engaged: true, dawn: true })).toBeNull();
+    // He fell: the short delay.
+    expect(nextStandUp(null, 50, { ...quiet, fell: true, pullEnded: true })).toBe(
+      50 + MUSTER_RESPAWN_DELAY,
+    );
+    // Any other end of the pull (an evade, a leash, a wipe): the long quiet.
+    expect(nextStandUp(null, 50, { ...quiet, pullEnded: true })).toBe(
+      50 + MUSTER_STAND_DOWN_SECONDS,
+    );
+    expect(MUSTER_STAND_DOWN_SECONDS).toBeGreaterThanOrEqual(120);
+    expect(MUSTER_STAND_DOWN_SECONDS).toBeLessThanOrEqual(180);
+    // A dawn he is not fighting through: at once.
+    expect(nextStandUp(500, 50, { ...quiet, dawn: true })).toBe(50);
+    // Otherwise the clock holds.
+    expect(nextStandUp(77, 50, quiet)).toBe(77);
+    expect(nextStandUp(null, 50, quiet)).toBeNull();
+  });
+
+  /** An engaged boss with one soldier already dead at his fists, and the mob AI frozen so
+   *  the test alone decides when the pull blips and ends (the muster pass still runs every
+   *  tick, through the real scheduler hook). */
+  function midFight() {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true, world: testWorld() });
+    sim.setPlayerLevel(20);
+    inner(sim).setGm(sim.playerId, true);
+    place(sim, sim.player, lair().x, lair().z - 18);
+    const boss = raise(sim);
+    const army = inner(sim).musterArmy;
+    for (let i = 0; i < 40; i++) sim.tick();
+    expect(army.engaged).toBe(true);
+    const victim = sim.entities.get(army.soldierIds[0]) as Entity;
+    inner(sim).dealDamage(boss, victim, victim.maxHp * 10, false, 'physical', 'probe', 'hit', true);
+    expect(victim.dead).toBe(true);
+    inner(sim).setDevMobsFrozen(true);
+    const ticks = (seconds: number) => {
+      for (let i = 0; i < Math.round(seconds * 20); i++) sim.tick();
+    };
+    return { sim, boss, army, victim, ticks };
+  }
+
+  it('keeps them down through a brief evade blip, and long past the old 12 seconds', () => {
+    const { boss, army, victim, ticks } = midFight();
+    // He drops out of combat for three seconds (a leash, an evade), then the raid has him
+    // again. That is NOT the end of the pull.
+    boss.inCombat = false;
+    ticks(3);
+    expect(army.engaged).toBe(false);
+    boss.inCombat = true;
+    ticks(0.1);
+    expect(army.engaged).toBe(true);
+    expect(army.respawnAt).toBeNull();
+    // Well past the delay the old rule stood them up on (mid-fight, in front of the raid).
+    ticks(MUSTER_RESPAWN_DELAY * 4);
+    expect(victim.dead).toBe(true);
+  });
+
+  it('stands them up after a reset only once it has stayed quiet for the stand-down', () => {
+    const { boss, victim, ticks } = midFight();
+    boss.inCombat = false; // the raid wiped or walked away: he reset
+    ticks(MUSTER_STAND_DOWN_SECONDS - 2);
+    expect(victim.dead).toBe(true);
+    ticks(3);
+    expect(victim.dead).toBe(false);
+    expect(victim.hostile).toBe(false);
+  });
+
+  it('never stands them up at a dawn he is still fighting through', () => {
+    const { sim, boss, army, victim, ticks } = midFight();
+    tickMusterArmy(inner(sim).ctx, army, boss, true);
+    expect(victim.dead).toBe(true);
+    ticks(MUSTER_RESPAWN_DELAY * 2);
+    expect(victim.dead).toBe(true);
+    // ...and his death is the true end: the short delay, then up.
+    boss.inCombat = false;
+    boss.dead = true;
+    ticks(MUSTER_RESPAWN_DELAY + 1);
+    expect(victim.dead).toBe(false);
+  });
+});
+
+describe('the guard is held, not flickered', () => {
+  it('raises inside the brace range and lowers only past the wider release range', () => {
+    expect(MUSTER_BRACE_RELEASE_RANGE).toBeGreaterThan(MUSTER_BRACE_RANGE + 4);
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true, world: testWorld() });
+    sim.setPlayerLevel(20);
+    inner(sim).setGm(sim.playerId, true);
+    place(sim, sim.player, lair().x, lair().z - 18);
+    const boss = raise(sim);
+    const army = inner(sim).musterArmy;
+    for (let i = 0; i < 40; i++) sim.tick();
+    expect(army.engaged).toBe(true);
+    inner(sim).setDevMobsFrozen(true);
+    const s = sim.entities.get(army.soldierIds[army.soldierIds.length - 1]) as Entity;
+    // Put him `d` yards due north of this soldier and run one pass.
+    const at = (d: number) => {
+      place(sim, boss, s.pos.x, s.pos.z + d);
+      sim.tick();
+      return s.aggroTargetId === boss.id;
+    };
+    expect(at(MUSTER_BRACE_RANGE - 3)).toBe(true);
+    // Pacing out through the band keeps the guard up...
+    expect(at(MUSTER_BRACE_RANGE + 3)).toBe(true);
+    expect(at(MUSTER_BRACE_RELEASE_RANGE - 1)).toBe(true);
+    // ...past it, down.
+    expect(at(MUSTER_BRACE_RELEASE_RANGE + 2)).toBe(false);
+    // Coming back into the band does not raise it: only the brace range does.
+    expect(at(MUSTER_BRACE_RANGE + 3)).toBe(false);
+    expect(at(MUSTER_BRACE_RANGE - 3)).toBe(true);
   });
 });
