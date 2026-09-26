@@ -35,12 +35,15 @@ import {
   MUSTER_RACK,
   MUSTER_RACK_TEMPLATE_ID,
 } from '../src/sim/content/mirefen_muster';
+import { MOBS } from '../src/sim/data';
+import { DAY_NIGHT_CYCLE_MS, NOON_PHASE } from '../src/sim/day_night';
 import type { MusterArmyState } from '../src/sim/mirefen_muster';
 import { MUSTER_SHARDPIKE_ID } from '../src/sim/muster_pike';
 import { Sim } from '../src/sim/sim';
 import { inertVaultConsumptionAdmission } from '../src/sim/sim_context';
 import type { Entity } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { WORLD_BOSSES } from '../src/sim/world_boss';
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -79,9 +82,46 @@ describe('the muster stands from boot on both live hosts', () => {
     // Pin the sky to midnight so the case never depends on when it runs.
     const sim = new Sim({ ...cfg, dayNightNowMs: () => Date.UTC(2026, 0, 1, 0, 0, 0) });
     sim.tick();
-    // His first offline rise is an hour out: the muster did not wait for him.
-    expect(balgaths(sim)).toEqual([]);
     expectFullMuster(sim);
+  });
+
+  // The owner's offline playtest found the soldiers standing round an EMPTY crater: the
+  // offline world did not opt into worldBossAtBoot, so his first rise was a full interval
+  // (an hour) out and the only Balgath to be had was a /dev spawn. The browser world now
+  // boots like the realm does, with him in his bed from the first tick.
+  const BED = WORLD_BOSSES.find((b) => b.templateId === 'balgath_cyclops')?.pos ?? { x: 0, z: 0 };
+  const BED_RADIUS = MOBS.balgath_cyclops?.slumber?.bedRadius ?? 0;
+  function offlineBoot(nowMs: number): Sim {
+    let n = 0;
+    vi.stubGlobal('crypto', {
+      randomUUID: () => `00000000-0000-4000-8000-${String(++n).padStart(12, '0')}`,
+    });
+    const cfg = offlineWorldConfig({ playerClass: 'mage', name: 'Ana', devCommands: false });
+    const sim = new Sim({ ...cfg, dayNightNowMs: () => nowMs });
+    sim.tick();
+    return sim;
+  }
+
+  it('offline: Balgath is in his crater bed on the first tick, asleep by night', () => {
+    const sim = offlineBoot(Date.UTC(2026, 0, 1, 0, 0, 0));
+    const [boss] = balgaths(sim);
+    expect(balgaths(sim)).toHaveLength(1);
+    expect(Math.hypot(boss.pos.x - BED.x, boss.pos.z - BED.z)).toBeLessThanOrEqual(BED_RADIUS);
+    expect(boss.dead).toBe(false);
+    expect(boss.asleep).toBe(true);
+    expect(boss.hostile).toBe(false);
+    expect(army(sim).bossId).toBe(boss.id);
+  });
+
+  it('offline: Balgath is in his crater bed on the first tick, awake by day', () => {
+    // Solar noon of the UTC-anchored cycle (NOON_PHASE), whatever the date.
+    const sim = offlineBoot(Math.round(DAY_NIGHT_CYCLE_MS * NOON_PHASE));
+    const [boss] = balgaths(sim);
+    expect(balgaths(sim)).toHaveLength(1);
+    expect(Math.hypot(boss.pos.x - BED.x, boss.pos.z - BED.z)).toBeLessThanOrEqual(BED_RADIUS);
+    expect(boss.dead).toBe(false);
+    expect(boss.asleep).toBe(false);
+    expect(boss.hostile).toBe(true);
   });
 
   it('online: the realm boot config raises it on the first tick, and it outlives his corpse', () => {

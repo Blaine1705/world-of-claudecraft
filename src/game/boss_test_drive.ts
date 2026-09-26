@@ -90,6 +90,7 @@ export function bestInSlot(cls: PlayerClass): ItemDef[] {
 
 /** The concrete offline Sim surface this needs. Narrow on purpose. */
 interface TestDriveSim {
+  cfg: { worldBossAtBoot?: boolean };
   playerId: number;
   player: {
     pos: { x: number; z: number; y: number };
@@ -138,7 +139,12 @@ export function applyBossTestDrive(
     sim.equipItem(item.id, sim.playerId);
   }
 
-  const boss = sim.spawnDevBoss(plan.templateId, BOSS_TEST_DRIVE_POS.x, BOSS_TEST_DRIVE_POS.z);
+  // A world that boots its world bosses (the offline world, worldBossAtBoot) has the
+  // scheduler put him on this very spot on the first tick; a test-drive copy there would
+  // stand inside him. Only a world that does not boot him gets one (-1 when none).
+  const boss = sim.cfg.worldBossAtBoot
+    ? -1
+    : sim.spawnDevBoss(plan.templateId, BOSS_TEST_DRIVE_POS.x, BOSS_TEST_DRIVE_POS.z);
 
   // Stand due SOUTH of him, not off a diagonal. The chase camera boots at its own
   // default yaw and does not adopt the player's facing, so the only way to guarantee the

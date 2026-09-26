@@ -83,6 +83,7 @@ describe('applyBossTestDrive', () => {
       spawned: [] as Array<[string, number, number]>,
     };
     const sim: {
+      cfg: { worldBossAtBoot?: boolean };
       playerId: number;
       player: {
         pos: { x: number; y: number; z: number };
@@ -96,6 +97,7 @@ describe('applyBossTestDrive', () => {
       spawnDevBoss: (t: string, x: number, z: number) => number;
       groundPos: (x: number, z: number) => { x: number; y: number; z: number };
     } = {
+      cfg: {},
       playerId: 7,
       player: { pos: { x: 0, y: 0, z: 0 }, prevPos: { x: 0, y: 0, z: 0 }, facing: 0 },
       setPlayerLevel: (level: number) => {
@@ -142,6 +144,23 @@ describe('applyBossTestDrive', () => {
       ['balgath_cyclops', BOSS_TEST_DRIVE_POS.x, BOSS_TEST_DRIVE_POS.z],
     ]);
     expect(calls.equipped.length).toBeGreaterThan(5);
+  });
+
+  it('spawns no second copy into a world that boots him in this very bed', () => {
+    // The offline world boots its world bosses (worldBossAtBoot), and the scheduler puts
+    // him on BOSS_TEST_DRIVE_POS on the first tick: a test-drive copy would stand inside him.
+    const { sim, calls } = fakeSim();
+    sim.cfg = { worldBossAtBoot: true };
+    const id = applyBossTestDrive(sim, { templateId: 'balgath_cyclops' }, 'warrior');
+    expect(id).toBe(-1);
+    expect(calls.spawned).toEqual([]);
+    expect(calls.gm).toEqual([true]);
+    expect(
+      Math.hypot(
+        sim.player.pos.x - BOSS_TEST_DRIVE_POS.x,
+        sim.player.pos.z - BOSS_TEST_DRIVE_POS.z,
+      ),
+    ).toBeGreaterThan(8);
   });
 
   it('stands the player off the spawn point and faces them at it', () => {

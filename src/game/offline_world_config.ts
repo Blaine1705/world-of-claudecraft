@@ -22,6 +22,9 @@ export function offlineWorldConfig(options: {
     compulsoryTutorial: options.world === undefined,
     // The Mirefen muster camps are the built-in fen's (src/sim/mirefen_muster.ts).
     mirefenMuster: options.world === undefined,
+    // Boot like the live realm: the world bosses are up from the first tick instead of one
+    // interval (an hour) out, so the muster never stands round an empty Starfall Crater.
+    worldBossAtBoot: options.world === undefined,
     // Match live idle-AI throttling outside the player's actionable interest.
     idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
     // The sky's own UTC clock (plus the dev /daynight override), so the world boss who
