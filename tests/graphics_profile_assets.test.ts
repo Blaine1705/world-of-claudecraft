@@ -21,6 +21,7 @@ const mocks = vi.hoisted(() => {
     mailbox: prepare(),
     noticeboard: prepare(),
     reset: vi.fn(),
+    sledReset: vi.fn(),
   };
 });
 
@@ -111,8 +112,14 @@ vi.mock('../src/render/stations', () => ({
 vi.mock('../src/render/temporal_hourglass_visual', () => ({
   resetTemporalHourglassProfileCaches: mocks.reset,
 }));
+vi.mock('../src/render/paladin_ascension_visual', () => ({
+  resetPaladinAscensionProfileCaches: mocks.reset,
+}));
 vi.mock('../src/render/wildheart_terrain', () => ({
   resetWildheartTerrainProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/goblin_rocket_sled_fx', () => ({
+  resetGoblinRocketSledProfileCaches: mocks.sledReset,
 }));
 vi.mock('../src/render/ground_decor_prewarm', () => ({
   clearGroundDecorPrewarmDraws: mocks.reset,
@@ -150,6 +157,7 @@ beforeEach(() => {
   preloadInternalsForTest.reset();
   for (const prepare of prepareSpies) prepare.mockReset().mockResolvedValue(undefined);
   mocks.reset.mockClear();
+  mocks.sledReset.mockClear();
 });
 
 describe('graphics profile asset preparation', () => {
@@ -215,11 +223,15 @@ describe('graphics profile derived-cache reset', () => {
       'frost_nova_root_visual',
       'ice_block_visual',
       'temporal_hourglass_visual',
+      'paladin_ascension_visual',
+      'goblin_rocket_sled_fx',
       'ground_decor_prewarm',
     ]);
     expect(() => resetGraphicsProfileDerivedCaches()).not.toThrow();
+    // The rocket sled owner is bound to its own resetter, not only named.
+    expect(mocks.sledReset).toHaveBeenCalledTimes(1);
     expect(mocks.reset).toHaveBeenCalledTimes(
-      graphicsProfileAssetsInternalsForTest.resetOwners.length,
+      graphicsProfileAssetsInternalsForTest.resetOwners.length - 1,
     );
   });
 });

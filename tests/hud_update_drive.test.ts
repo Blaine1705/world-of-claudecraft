@@ -826,6 +826,17 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'removes the resurrection prompt node once the player is alive',
   },
   {
+    call: 'this.deathRecapDialog.close',
+    band: 'frame',
+    gate: '!p.dead && this.deathRecapDialog.isOpen()',
+    surface: 'window',
+    guard: {
+      kind: 'none',
+      why: 'one-way close row; the call is itself gated on the window being open and performs no steady repaint',
+    },
+    why: 'closes the death recap modal once the player is alive again',
+  },
+  {
     call: 'document.body.classList.toggle',
     band: 'frame',
     gate: '',
@@ -1827,7 +1838,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 93 -> 94: the Cooldown Manager's per-frame paint
       // (src/ui/hud/cooldown_manager/), facet-routed chrome. King of the Hill: the
       // hill bar strip (hud/hill/) is one more chrome surface, 95.
-    ).toEqual({ window: 49, chrome: 95, none: 17 });
+    ).toEqual({ window: 50, chrome: 95, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1861,7 +1872,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // Up one more on the release arm's own callsite-guarded row, beside the
       // crucible vendor close counted above; counted off the merged table.
       callsite: 13,
-      none: 3,
+      // Death recap close joins this bucket as a one-way dismissal: it has no
+      // invalidation latch because there is no steady repaint path to guard.
+      none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
     // grow quietly: every entry is a window this repo knows has no invalidation guard.
@@ -1870,6 +1883,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         .map((r) => r.call)
         .sort(),
     ).toEqual([
+      'this.deathRecapDialog.close',
       'this.lootRolls.update',
       'this.questDialog.updateProximity',
       'this.updateMapWindow',

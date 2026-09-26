@@ -689,19 +689,20 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
+  // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
+  // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
   // Re-minted for the spirit veil: the renderer leaf moved the ghost-style
   // decision to a core and gained the veil entry, prewarm_policy.ts its keep
   // row. No capture was retaken.
   // Re-minted for the widened spirit veil: the renderer leaf lost the lit twin
   // group, the self warm and the Soul Rend live arm, prewarm_policy.ts its keep
   // note. No capture was retaken.
-  '1f5ea18637b08addea45e2c0bbd87c6c0d344edb1667c0f7363599d7f1ca409b';
+  // Re-minted for the merge of release/v0.44.0 into feature/spirit-veil: the
+  // merged renderer leaf matches neither parent. No capture was retaken.
+  '1fd5fa93934d20f56bfc8979b324578419100532b884a018625592c707c78220';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

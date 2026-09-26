@@ -146,7 +146,12 @@ async function makePriest(linked: boolean): Promise<Harness> {
   const visual = new CharacterVisual('player_priest', 0xffffff, 0);
   visual.update(FRAME, anim(), true);
   const gateCalls: GateCall[] = [];
-  visual.setFarBakeGate((target, settle) => gateCalls.push({ target, settle }));
+  // The form adornments (form_adornments.ts) hold their first mount behind the
+  // same gate; they are rig FX, not an effect swap, so they settle at once.
+  visual.setFarBakeGate((target, settle) => {
+    if (/^(moonwing|gloamveil)_/.test(target.name)) settle();
+    else gateCalls.push({ target, settle });
+  });
   visual.setShadow(true);
   return { visual, veil, family, gateCalls };
 }

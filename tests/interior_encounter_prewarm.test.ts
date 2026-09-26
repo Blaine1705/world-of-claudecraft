@@ -1,10 +1,16 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  ENCOUNTER_PREWARM_SETS,
+  type EncounterPrewarmSet,
   encounterPrewarmDisabled,
   encounterPrewarmForInterior,
+  encounterPrewarmSpecForSets,
   INTERIOR_ENCOUNTER_PREWARM,
+  unclaimedEncounterPrewarmSets,
 } from '../src/render/interior_encounter_prewarm';
+import { DUNGEONS } from '../src/sim/data';
+import { IGNIVAR_LIFT_ROOM_ID, IGNIVAR_RAID_ROOM_IDS } from '../src/sim/ignivar_raid_ids';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 // Every source pin below reads the COMMENT-STRIPPED text: a pin that a comment
@@ -19,6 +25,76 @@ describe('interior encounter prewarm spec', () => {
     const spec = INTERIOR_ENCOUNTER_PREWARM.ignivar_depths;
     expect(spec).toEqual({ varkhulVisuals: true, ignivarVisuals: true });
     expect(encounterPrewarmForInterior('ignivar_depths')).toEqual(spec);
+  });
+
+  it('warms both raid sets from the Forge-Lift and the Halls, before either boss room', () => {
+    for (const interior of ['ignivar_lift', 'ignivar_approach']) {
+      const spec = INTERIOR_ENCOUNTER_PREWARM[interior];
+      expect(spec).toEqual({ varkhulVisuals: true, ignivarVisuals: true });
+      expect(encounterPrewarmForInterior(interior)).toEqual(spec);
+    }
+  });
+
+  it('claims a set once whichever interior asks, and narrows a spec to the unclaimed sets', () => {
+    const lift = INTERIOR_ENCOUNTER_PREWARM.ignivar_lift;
+    const claimed = new Set<EncounterPrewarmSet>();
+    expect(unclaimedEncounterPrewarmSets(lift, claimed)).toEqual([
+      'varkhulVisuals',
+      'ignivarVisuals',
+    ]);
+    claimed.add('varkhulVisuals');
+    claimed.add('ignivarVisuals');
+    for (const interior of ['ignivar_approach', 'ignivar', 'ignivar_depths']) {
+      expect(unclaimedEncounterPrewarmSets(INTERIOR_ENCOUNTER_PREWARM[interior], claimed)).toEqual(
+        [],
+      );
+    }
+    // A claim on the raid sets says nothing about the crypt's.
+    expect(unclaimedEncounterPrewarmSets(INTERIOR_ENCOUNTER_PREWARM.nythraxis, claimed)).toEqual([
+      'nythraxisGraveVisuals',
+    ]);
+
+    // Every staged set, one per flag the spec can carry.
+    expect([...ENCOUNTER_PREWARM_SETS].sort()).toEqual([
+      'ignivarVisuals',
+      'nythraxisGraveVisuals',
+      'varkhulVisuals',
+    ]);
+    const depths = INTERIOR_ENCOUNTER_PREWARM.ignivar_depths;
+    const onlyIgnivar = encounterPrewarmSpecForSets(depths, ['ignivarVisuals']);
+    expect(onlyIgnivar.ignivarVisuals).toBe(true);
+    expect(onlyIgnivar.varkhulVisuals).toBe(false);
+    for (const set of ENCOUNTER_PREWARM_SETS) {
+      expect(encounterPrewarmSpecForSets(depths, [set])[set]).toBe(true);
+      expect(encounterPrewarmSpecForSets(depths, [])[set]).toBe(false);
+    }
+  });
+
+  it('keys every row by an interior some dungeon room declares, the lift first in the raid', () => {
+    const interiors = new Set<string>(Object.values(DUNGEONS).map((room) => room.interior));
+    const rows = Object.keys(INTERIOR_ENCOUNTER_PREWARM);
+    expect(rows.length).toBeGreaterThanOrEqual(5);
+    for (const row of rows) expect(interiors.has(row), row).toBe(true);
+    // The rows count on the raid entering through the lift, its quiet room.
+    expect(IGNIVAR_RAID_ROOM_IDS[0]).toBe(IGNIVAR_LIFT_ROOM_ID);
+    expect(DUNGEONS[IGNIVAR_LIFT_ROOM_ID].interior).toBe('ignivar_lift');
+    for (const room of IGNIVAR_RAID_ROOM_IDS) {
+      const interior = DUNGEONS[room].interior;
+      expect(interior && encounterPrewarmForInterior(interior), room).not.toBeNull();
+    }
+  });
+
+  it('claims every staged flag a row sets as a set, and nothing else', () => {
+    const staged = new Set<string>();
+    const flags = new Set<string>();
+    for (const spec of Object.values(INTERIOR_ENCOUNTER_PREWARM)) {
+      for (const [flag, on] of Object.entries(spec)) {
+        flags.add(flag);
+        if (on === true) staged.add(flag);
+      }
+    }
+    expect([...staged].sort()).toEqual([...ENCOUNTER_PREWARM_SETS].sort());
+    expect([...flags].sort()).toEqual([...ENCOUNTER_PREWARM_SETS].sort());
   });
 
   it('warms the Ignivar mechanic visuals in the Crucible arena, without the Varkhul set', () => {
@@ -89,16 +165,20 @@ describe('interior encounter prewarm spec', () => {
     // The mark draws the spirit veil, one program family the boot manifest
     // links for every rig, so warming class rigs or live bodies in the crypt
     // would link nothing new; neither the catalog nor the live arm may return.
+    // The one character rig the pass builds is Varkhul's (a mob).
     const pass = readSource('../src/render/interior_encounter_prewarm_pass.ts');
     for (const gone of [
       'setSoulRend',
-      'createCharacterVisual',
-      'prewarmEntity',
+      "prewarmEntity('player'",
       'queueLiveSoulRendPrewarm',
       'WEAPON_SKINS',
+      'ALL_CLASSES',
     ]) {
       expect(pass, gone).not.toContain(gone);
     }
+    expect(pass.match(/createCharacterVisual\(/g)).toHaveLength(1);
+    expect(pass.match(/prewarmEntity\(/g)).toHaveLength(1);
+    expect(pass).toContain("host.prewarmEntity('mob', template.id");
     const spec = readSource('../src/render/interior_encounter_prewarm.ts');
     expect(spec).not.toMatch(/soulRend/);
     const renderer = readSource('../src/render/renderer.ts');

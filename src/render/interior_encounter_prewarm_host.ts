@@ -1,4 +1,5 @@
 import type * as THREE from 'three';
+import type { Entity } from '../sim/types';
 
 export interface InteriorEncounterPrewarmHost {
   shutdownStarted: boolean;
@@ -13,6 +14,14 @@ export interface InteriorEncounterPrewarmHost {
     run<T>(work: () => T | Promise<T>, priority?: number, label?: string): Promise<T>;
   };
   webgl: { initTexture(texture: THREE.Texture): void };
+  prewarmEntity(
+    kind: 'player' | 'mob' | 'npc',
+    templateId: string,
+    color: number,
+    scale: number,
+    skin?: number,
+    id?: number,
+  ): Entity;
   compilePrewarmColorPrograms(root: THREE.Object3D, includeOffscreen: boolean): Promise<void>;
   compileShadowPrograms(root: THREE.Object3D): Promise<void>;
   renderBoundedPrewarmRoot(group: THREE.Group, child: THREE.Object3D): void;

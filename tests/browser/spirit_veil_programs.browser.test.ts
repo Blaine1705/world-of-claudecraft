@@ -31,6 +31,7 @@ import {
   spiritVeilPaletteOf,
   spiritVeilPassOf,
 } from '../../src/render/characters/ghost_veil';
+import { buildGloamveilStandIn } from '../../src/render/characters/gloamveil_veil';
 import {
   DEFAULT_APPEARANCE,
   fullSet,
@@ -39,6 +40,7 @@ import {
   stubbleDecals,
 } from '../../src/render/characters/modular';
 import { modularMergePartition } from '../../src/render/characters/modular_name_facts_core';
+import { buildMoonwingStandIn } from '../../src/render/characters/moonwing_adornment';
 import { mergeSkinnedParts } from '../../src/render/characters/rig_merge';
 import {
   SPIRIT_VEIL_FAMILY,
@@ -987,6 +989,16 @@ describe('every veil trigger on a real CharacterVisual', () => {
           expect(w.programs()).toBeGreaterThan(empty);
           expect(casters().length).toBeGreaterThan(3);
           await linkFamily(w);
+          // The Moonwing and Gloamveil adornments mount with their forms; the
+          // boot manifest links their kits through these same stand-ins
+          // (ABILITY_MATERIAL_SOURCES), so the count below is the body's.
+          const standIns = [buildMoonwingStandIn(), buildGloamveilStandIn()];
+          for (const standIn of standIns) {
+            standIn.position.set(0, 1, 0);
+            w.scene.add(standIn);
+          }
+          w.draw();
+          for (const standIn of standIns) standIn.removeFromParent();
           w.draw();
           const before = w.programs();
 
