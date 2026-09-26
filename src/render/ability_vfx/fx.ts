@@ -13,6 +13,7 @@ import {
   MAX_CC_BANDS,
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
+import type { ShardpikeThrowFx } from '../shardpike_throw_fx';
 import { tanHalfVerticalFov } from '../vfx_screen_bounds_core';
 import type { WarriorFuryStateAura, WarriorFuryStateKind } from '../warrior_fury_state_core';
 import type { WarriorPowerAnchor } from '../warrior_power_anchor';
@@ -458,6 +459,7 @@ const PROJ_STYLE_BY_PALETTE: Record<string, BoltTrailStyle> = {
 };
 
 export class AbilityVfxFx implements SequencerHost {
+  shardpikeThrow?: ShardpikeThrowFx;
   private ribbons: AbilityVfxRibbons;
   private worldLightCb:
     | ((
@@ -2422,6 +2424,7 @@ export class AbilityVfxFx implements SequencerHost {
     // the archetype sequences advance here so their transient draws (release
     // flash, gavel descent, stun stars) land inside this frame's overlay batch
     this.contactBursts.update(this, dt);
+    this.shardpikeThrow?.update(dt, reducedMotion);
     this.sequencer.update(this, dt);
     this.furyAudio.update(this, dt);
     // Pack after the sequence emits this frame's contacts, so the visible
@@ -2486,6 +2489,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   clear(): void {
+    this.shardpikeThrow?.dispose();
     this.guards.clear();
     this.powerForms.clear();
     this.spiritHammers.clear();

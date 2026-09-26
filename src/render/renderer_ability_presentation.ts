@@ -11,6 +11,7 @@ import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
+import { ShardpikeThrowFx } from './shardpike_throw_fx';
 import type { Vfx } from './vfx';
 import type { VfxAnchorResolver } from './vfx_anchor';
 import { sampleWarriorPowerBone } from './warrior_power_anchor';
@@ -80,6 +81,14 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     },
   );
   fx.setViewportScale(h.height() * h.pixelRatio(), 60, h.height());
+  fx.shardpikeThrow = new ShardpikeThrowFx(
+    h.scene,
+    h.world,
+    visual,
+    fx,
+    () => h.painter.castVfxReady?.() ?? true,
+    h.camera,
+  );
   fx.setSpiritBuildScheduler(h.spiritBuild);
   fx.setSpiritCompileGate(h.compile);
   fx.onRushArrival = createOnrushArrivalHandler(() => h.world().entities, h.views, h.visual);

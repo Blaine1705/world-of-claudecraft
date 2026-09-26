@@ -607,6 +607,7 @@ export class AbilityVfx {
   }
 
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
+    if (this.deps.fx.shardpikeThrow?.handleEvent(ev)) return true;
     // Physical Warrior ticks are wounds. The wire's tick companion has no
     // ability label, so preserve its recipient cue without an ivory magic puff.
     if (ev.fx === 'tick' && ev.school === 'physical' && this.deps.isWarrior?.(ev.sourceId)) {

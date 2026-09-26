@@ -101,6 +101,7 @@ import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { shareRigSkeleton } from './rig_shared_skeleton';
 import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
+import { prepareShardpikeThrowClip } from './shardpike_throw_clip';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
@@ -2477,6 +2478,7 @@ export function prepareVisual(key: string): PreparedVisual {
 
   prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
   prepareWarriorActionFallbacks(key, clips, gltf.scene);
+  prepareShardpikeThrowClip(key, clips, gltf.scene, def.clips.idle);
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No
   // face decals on a modular throwaway: the flatten drops them (farBakeMeshes),
   // and the default look's scalp decal would otherwise be minted and thrown

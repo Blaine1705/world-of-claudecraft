@@ -31,10 +31,12 @@ import {
   shockLanceBalance,
   stepLanceBalance,
 } from './lance_balance_core';
+import { throwLance } from './lance_throw';
 import { blindEyeWard } from './mob/eye_ward';
 import { onQuestEventForQuests } from './quests/quest_credit';
 import type { SimContext } from './sim_context';
 import { DT, dist2d, type Entity, type MoveInput } from './types';
+import { drawWeapon } from './weapon_stow';
 
 /** Skerrit's quest pike. The muster's lent copy drives the same trial (isShardpikeItem). */
 export const LANCE_ITEM_ID = SKERRITS_SHARDPIKE_ID;
@@ -111,6 +113,7 @@ export function lanceBrace(ctx: SimContext, pid: number): void {
     return;
   }
   p.sitting = false;
+  drawWeapon(p);
   meta.lance = {
     phase: 'bracing',
     beam: freshLanceBalance(ctx.tickCount),
@@ -144,6 +147,10 @@ export function lanceThrust(ctx: SimContext, pid: number): void {
     ctx.error(pid, 'The pike is not set.');
     return;
   }
+  if (p.dead || p.ghost || meta.equipment.mainhand !== LANCE_ITEM_ID) {
+    endSession(meta, p);
+    return;
+  }
   const target = nearestEyeWardMob(ctx, p);
   if (!target) {
     ctx.error(pid, 'Nothing worth the point in reach.');
@@ -151,27 +158,29 @@ export function lanceThrust(ctx: SimContext, pid: number): void {
   }
   // Blind BEFORE the damage lands, so the poke that opens the window is never itself
   // dampened by the ward it just removed: the point went into the eye, not the hide.
-  const blinded = blindEyeWard(ctx, target);
-  ctx.dealDamage(
-    p,
-    target,
-    LANCE_FIXED_DAMAGE,
-    false,
-    'physical',
-    'Loomshard Thrust',
-    'hit',
-    true,
-    undefined,
-    true,
-    true,
-    // alreadyFinal: no source-side output mods either. Fixed means fixed.
-    true,
-    LANCE_THRUST_ABILITY,
-  );
-  if (blinded) {
-    ctx.notice(pid, 'Your thrust finds the Loomshard. The Barrowhide sloughs away!');
-    noteLanceBlind(ctx, pid, target);
-  }
+  throwLance(ctx, p, target, (caster, victim) => {
+    const blinded = blindEyeWard(ctx, victim);
+    ctx.dealDamage(
+      caster,
+      victim,
+      LANCE_FIXED_DAMAGE,
+      false,
+      'physical',
+      'Loomshard Thrust',
+      'hit',
+      true,
+      undefined,
+      true,
+      true,
+      // alreadyFinal: no source-side output mods either. Fixed means fixed.
+      true,
+      LANCE_THRUST_ABILITY,
+    );
+    if (blinded) {
+      ctx.notice(pid, 'Your thrust finds the Loomshard. The Barrowhide sloughs away!');
+      noteLanceBlind(ctx, pid, victim);
+    }
+  });
   endSession(meta, p);
   meta.lanceRestUntil = ctx.time + LANCE_REST_SECONDS;
 }

@@ -99,6 +99,7 @@ import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
 import { SanguineWeaponSheath } from './sanguine_weapon_sheath';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
+import { shardpikeProp } from './shardpike_prop';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -994,8 +995,7 @@ export class CharacterVisual {
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
       this.skeletonUpdates = new SkeletonUpdateCache(this.model);
-      const isWarriorRig = key === 'player_warrior' || key === 'player_warrior_modular';
-      const signatureClips = isWarriorRig
+      const signatureClips = key.startsWith('player_')
         ? Array.from(prep.clips.keys()).filter((n) => n.startsWith('Signature_'))
         : [];
       for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES, ...signatureClips]) {
@@ -3428,6 +3428,19 @@ export class CharacterVisual {
   /** Fire the landed-thrust burst on the reticle. No-op on a rig that has no eye. */
   strikeEyeWardMarker(): void {
     this.eyeWardMarker?.strike();
+  }
+
+  releaseShardpikeProp() {
+    return shardpikeProp(this.model);
+  }
+
+  sampleEyeAnchor(out: THREE.Vector3): boolean {
+    const spec = this.def.eyeGlow;
+    const bone = spec && this.model.getObjectByName(spec.bone);
+    if (!spec || !bone) return false;
+    bone.updateWorldMatrix(true, false);
+    out.fromArray(spec.offset).applyMatrix4(bone.matrixWorld);
+    return true;
   }
 
   dispose(): void {
