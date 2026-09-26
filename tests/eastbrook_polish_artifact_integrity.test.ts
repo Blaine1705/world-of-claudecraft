@@ -1383,17 +1383,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the point-light carriers: renderer.ts attaches the packed carriers and drops the pads. No capture was retaken.
-  // Re-minted for the PR #4177 release-line merge: the release-side renderer
-  // leaf and the packed point-light carrier leaf compose in one tree. No
-  // capture was retaken.
-  'f54f01cf5dd6632b99367cd0b88e07092dbbed9de60f451879fb3990f322e66c';
+  // Re-minted for dropping the three patch's opaque_fragment NaN scrub: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
+  // Re-minted for the three patch's finite-input degenerate-normal guard: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
+  'bdc091f9203d5c7521a821216ffde589f76770c8d50f2fc8aec6dfd65e19f092';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1405,17 +1397,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the point-light carriers: renderer.ts attaches the packed carriers and drops the pads. No capture was retaken.
-  // Re-minted for the PR #4177 release-line merge: the release-side renderer
-  // leaf and the packed point-light carrier leaf compose in one tree. No
-  // capture was retaken.
-  'f50ddb0eac35e37daf874146b47c3817ddaf0a0889e1a75d591f7a4b7a1b9ada';
+  // Re-minted for dropping the three patch's opaque_fragment NaN scrub: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
+  // Re-minted for the three patch's finite-input degenerate-normal guard: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
+  '7f9d7175646fe140d09d7e79b06828dd646a8d2ee89c3bad7ade9b2e19e8b4a8';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2792,16 +2776,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // devalue audit floor: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-      // release/v0.44.0 merge into feature/world-pvp-flag: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // feature/world-pvp-flag (review round) merge into feature/king-of-the-hill: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // release/v0.44.0 (PR 4200) merge into feature/vfx-floor-layering: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // Re-minted for the point-light carriers: renderer.ts attaches the packed carriers and drops the pads. No capture was retaken.
-      // PR #4177 release-line merge: recomputed LAST again over the re-swept
-      // evidence. No capture was retaken.
-    ).toBe('ed43dc1f3558e03a37a43e1a0ef749bcd758815397b13a4b4377bb56f4f2827b');
+      // Opaque NaN scrub drop (three patch hash): recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // Finite-input normal guard (three patch hash): recomputed LAST again over
+      // the re-swept evidence. No capture was retaken.
+    ).toBe('c4fee5bd5435a97f4f421090434264d028c99b8a5776b9b7118294b5630190da');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

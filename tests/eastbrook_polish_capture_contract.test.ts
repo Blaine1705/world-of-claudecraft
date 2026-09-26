@@ -689,17 +689,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the point-light carriers: renderer.ts attaches the packed carriers and drops the pads. No capture was retaken.
-  // Re-minted for the PR #4177 release-line merge: the release-side renderer
-  // leaf and the packed point-light carrier leaf compose in one tree. No
-  // capture was retaken.
-  'f50ddb0eac35e37daf874146b47c3817ddaf0a0889e1a75d591f7a4b7a1b9ada';
+  // Re-minted for dropping the three patch's opaque_fragment NaN scrub: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
+  // Re-minted for the three patch's finite-input degenerate-normal guard: pnpm-lock.yaml moved (the three patch hash), no renderer input changed. No capture was retaken.
+  '7f9d7175646fe140d09d7e79b06828dd646a8d2ee89c3bad7ade9b2e19e8b4a8';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
