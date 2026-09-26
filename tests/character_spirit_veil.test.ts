@@ -294,13 +294,16 @@ describe('the spirit veil on a released spirit', () => {
     expect(depthTwin.isSkinnedMesh).toBe(true);
     expect(warn.mock.calls.some((call) => String(call[0]).startsWith('[spirit-veil]'))).toBe(true);
     // Its shadow and halo stay until the swap actually lands.
+    const halo = named(visual, 'class_halo');
     expect(body.castShadow).toBe(true);
+    expect(halo.visible).toBe(true);
 
     gateCalls[0].settle();
     visual.update(FRAME, anim(), true);
     expect(veil.spiritVeilPassOf(single(body))).toBe('color');
     expect(depthSiblings(visual).length).toBeGreaterThan(0);
     expect(body.castShadow).toBe(false);
+    expect(halo.visible).toBe(false);
     visual.dispose();
   });
 
@@ -378,6 +381,29 @@ describe('the spirit veil on a released spirit', () => {
     visual.dispose();
   });
 
+  it('hides the far shadow proxy while veiled, whatever the plan asks, and restores it on revive', async () => {
+    const { visual } = await makePriest(true);
+    const proxy = (visual as unknown as { shadowProxy: THREE.Mesh | null }).shadowProxy;
+    expect(proxy).not.toBeNull();
+    const shadowProxy = proxy as THREE.Mesh;
+    visual.setProxyShadow(true);
+    expect(shadowProxy.visible).toBe(true);
+
+    visual.setGhost(true, 'veil');
+    expect(shadowProxy.visible).toBe(false);
+    // the renderer's per-frame plan keeps asking for it
+    visual.setProxyShadow(true);
+    visual.setFar(true);
+    visual.setFar(false);
+    expect(shadowProxy.visible).toBe(false);
+
+    visual.setGhost(false);
+    expect(shadowProxy.visible).toBe(true);
+    visual.setProxyShadow(false);
+    expect(shadowProxy.visible).toBe(false);
+    visual.dispose();
+  });
+
   it('hides the weapon-skin VFX but keeps its light counted at intensity 0', async () => {
     const { visual } = await makePriest(true);
     const group = new THREE.Group();
@@ -385,7 +411,11 @@ describe('the spirit veil on a released spirit', () => {
     const shell = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial());
     const motes = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial());
     group.add(light, shell, motes);
-    const update = vi.fn();
+    // The rig's light is budget-dynamic: its own update() writes the flicker
+    // (weapon_vfx.ts), which is what brings it back after a revive.
+    const update = vi.fn(() => {
+      light.intensity = 2;
+    });
     const handle = { group, light, update, setTuning: vi.fn(), dispose: vi.fn() };
     (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.push(handle);
 
@@ -401,8 +431,10 @@ describe('the spirit veil on a released spirit', () => {
     visual.setGhost(false);
     expect(shell.visible).toBe(true);
     expect(motes.visible).toBe(true);
+    expect(light.visible).toBe(true);
     visual.updateWeaponVfx(FRAME);
     expect(update).toHaveBeenCalled();
+    expect(light.intensity).toBe(2);
     (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.length = 0;
     visual.dispose();
   });
